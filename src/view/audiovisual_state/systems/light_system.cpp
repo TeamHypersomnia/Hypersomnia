@@ -341,7 +341,17 @@ void light_system::render_all_lights(const light_system_input in) const {
 	standard_shader.set_as_current(renderer);
 	draw_sentience_neons();
 
+	if (in.strict_fow) {
+		renderer.stencil_positive_test();
+		renderer.set_stencil(true);
+	}
+
 	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);
+
+	if (in.strict_fow) {
+		renderer.set_stencil(false);
+	}
+
 	renderer.call_triangles(D::UNDER_FOREGROUND_NEONS);
 
 	in.neon_callback();

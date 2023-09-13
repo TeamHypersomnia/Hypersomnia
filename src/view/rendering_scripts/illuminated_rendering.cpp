@@ -77,6 +77,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
 
+	const bool strict_fow = in.strict_fow_mode();
+
 	//const bool is_zoomed_out = cone.eye.zoom < 1.f;
 
 	const auto non_zoomed_matrix = [&]() {
@@ -162,7 +164,20 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_particles_neons = [&]() {
+#if 0
+		if (strict_fow) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+		}
+#endif
+
 		renderer.call_triangles_direct_ptr(in.drawn_particles.neons);
+
+#if 0
+		if (strict_fow) {
+			renderer.set_stencil(false);
+		}
+#endif
 	};
 
 #if BUILD_STENCIL_BUFFER
@@ -542,7 +557,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 				shaders.illuminating_smoke->set_as_current(renderer);
 
+				if (strict_fow) {
+					renderer.set_stencil(true);
+					renderer.stencil_positive_test();
+				}
+
 				renderer.fullscreen_quad();
+
+				if (strict_fow) {
+					renderer.set_stencil(false);
+				}
 
 				shaders.standard->set_as_current(renderer);
 
@@ -567,7 +591,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			cast_highlight,
 			make_drawing_input,
 			in.perf_settings,
-			in.light_requests
+			in.light_requests,
+			strict_fow
 		};
 
 		light.render_all_lights(light_input);
@@ -580,7 +605,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		shaders.smoke->set_as_current(renderer);
 
+		if (strict_fow) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+		}
+
 		renderer.fullscreen_quad();
+
+		if (strict_fow) {
+			renderer.set_stencil(false);
+		}
 	};
 
 	/* Flow */
@@ -639,6 +673,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	shaders.illuminated->set_as_current(renderer);
 
 	renderer.call_triangles(D::SOLID_OBSTACLES);
+
+	if (strict_fow) {
+		renderer.set_stencil(true);
+		renderer.stencil_positive_test();
+	}
+
 	renderer.call_triangles(D::REMNANTS);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
@@ -650,6 +690,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 	renderer.call_triangles(D::DROPPED_ITEMS_OVERLAYS);
+
+	if (strict_fow) {
+		renderer.set_stencil(false);
+	}
 
 	set_shader_with_matrix(shaders.illuminated);
 
@@ -666,8 +710,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_crosshairs();
 	draw_weapon_laser();
 
+	if (strict_fow) {
+		renderer.set_stencil(true);
+		renderer.stencil_positive_test();
+	}
+
 	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
+
+	if (strict_fow) {
+		renderer.set_stencil(false);
+	}
 
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 

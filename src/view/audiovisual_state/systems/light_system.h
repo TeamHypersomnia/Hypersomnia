@@ -52,6 +52,7 @@ struct light_system_input {
 	std::function<draw_renderable_input()> make_drawing_in;
 	const performance_settings& perf_settings;
 	const std::vector<visibility_request>& requests;
+	const bool strict_fow;
 };
 
 struct light_system {

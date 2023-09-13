@@ -6520,3 +6520,5 @@ This will discard your redo history."
         
     - When crosshair is near the edges, we could automatically zoom out up to e.g. 75%
 
+- If zoomed out, do not render particles outside of fov
+

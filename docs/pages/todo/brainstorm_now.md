@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
 - Move blunaz to tools so it doesn't confuse people
 
 - For balance, decrease FoV angle when zooming out

@@ -72,6 +72,10 @@ struct illuminated_rendering_input {
 	const bool streamer_mode;
 	augs::thread_pool& pool;
 
+	bool strict_fow_mode() const {
+		return camera_edge_zoomout_mult > 0.35f;
+	}
+
 	auto get_considered_fov() const {
 		auto considered_fov = drawing.fog_of_war;
 
