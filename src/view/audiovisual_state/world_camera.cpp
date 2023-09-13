@@ -262,7 +262,7 @@ void world_camera::tick(
 	interp_zoom(current_eye.zoom, target_zoom);
 
 	/* Here it's reversed */
-	const float in_avgs = 15.0f;
+	const float in_avgs = 12.0f;
 	const float out_avgs = 5.0f;
 
 	interp_zoom(current_edge_zoomout_mult, target_edge_zoomout_mult, out_avgs, in_avgs);
@@ -295,7 +295,7 @@ float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
 
 	auto crosshair = ::calc_crosshair_displacement(entity_to_chase);
 
-	if (current_edge_zoomout_mult > 0.1f) {
+	if (current_edge_zoomout_mult > settings.edge_zoom_in_cutoff_mult) {
 		crosshair *= settings.edge_zoom_in_zone_expansion;
 	}
 

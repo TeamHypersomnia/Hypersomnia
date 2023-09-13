@@ -22,6 +22,7 @@ struct world_camera_settings {
 	bool enable_smoothing = true;
 
 	float edge_zoom_out_zone = 0.005f;
+	float edge_zoom_in_cutoff_mult = 0.03f;
 	float edge_zoom_in_zone_expansion = 5.0f;
 	// END GEN INTROSPECTOR
 };

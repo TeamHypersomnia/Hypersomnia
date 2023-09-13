@@ -16,28 +16,6 @@ summary: That which we are brainstorming at the moment.
 - Show the error in client setupinstead of waiting to press Abort
     - try it out on moxvalix server
 
-- Experimental auto zoom-out during gameplay
-    - How do we do this?
-        - Best to start zooming out before we get to screen edges
-        - But bounds must be calculated with non-zoomed cone
-            - So we must either make the zoom effect render-only or track how much of it is zoomed out by edge proximity
-        - Zoom is retrieved during setup advance
-            - So can't we retrieve a non-zoomed bound for just the setup advance?
-
-    - Problems with rendering zoomed out crosshair
-        - Let's just keep the base offset in screen space (0,0-1920,1080) etc
-            - NO - this won't work
-            - Note how on logic-side, the physical rotation of the character would have to change smoothly with the zoom
-                - because we have weapons, the laser is not collinear with the player-crosshair line
-            -
-
-        - Render with normal zoomed projection
-        - And only multiply the base offset by zoom when calculating crosshair offset
-            - Might still end up a little different due to how the crosshair moves a little while the character runs
-            - but we can't help that
-        
-    - When crosshair is near the edges, we could automatically zoom out up to e.g. 75%
-
 - fix editor panning in windowed mode
 
 - watch out when including cpp-httplib as it takes a lot to compile
