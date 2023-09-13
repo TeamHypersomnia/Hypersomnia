@@ -78,7 +78,7 @@ struct illuminated_rendering_input {
 		considered_fov.size *= camera_requested_fov_expansion;
 
 		if (camera_edge_zoomout_mult > 0.0f) {
-			const auto max_fov_reduction = 1.0f / 9;
+			const auto max_fov_reduction = 1.0f / 11;
 			const auto fov_reduction = augs::interp(1.0f, max_fov_reduction, camera_edge_zoomout_mult);
 
 			considered_fov.angle *= fov_reduction;
