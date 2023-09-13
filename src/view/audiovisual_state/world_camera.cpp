@@ -255,7 +255,8 @@ void world_camera::tick(
 		settings,
 		screen_size,
 		mid_step_crosshair_displacement,
-		last_real_zoom
+		last_real_zoom,
+		current_edge_zoomout_mult
 	);
 
 	interp_zoom(current_eye.zoom, target_zoom);
@@ -278,20 +279,25 @@ float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
 	const world_camera_settings& settings,
 	const vec2 screen_size_real,
 	const vec2 mid_step_crosshair_displacement,
-	const float current_zoom
+	const float last_real_zoom,
+	const float current_edge_zoomout_mult
 ) {
 	if (entity_to_chase.dead()) {
 		return 0.0f;
 	}
 
-	const auto screen_size = screen_size_real / current_zoom;
+	const auto screen_size = screen_size_real / last_real_zoom;
 	const auto zone = screen_size.bigger_side() * settings.edge_zoom_out_zone;
 
 	if (zone == 0.0f) {
 		return 0.0f;
 	}
 
-	const auto crosshair = ::calc_crosshair_displacement(entity_to_chase);
+	auto crosshair = ::calc_crosshair_displacement(entity_to_chase);
+
+	if (current_edge_zoomout_mult > 0.1f) {
+		crosshair *= settings.edge_zoom_in_zone_expansion;
+	}
 
 	const auto dist_l = crosshair.x - (-screen_size.x);
 	const auto dist_t = crosshair.y - (-screen_size.y);
