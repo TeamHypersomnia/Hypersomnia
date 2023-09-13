@@ -7,7 +7,10 @@ std::string to_forward_slashes(std::string);
 std::string format_field_name(std::string s);
 
 #if PLATFORM_WINDOWS
-std::string wstr_to_utf8(const wchar_t *wstr);
+namespace augs {
+	std::string wstr_to_utf8(const wchar_t *wstr);
+}
+
 #endif
 
 namespace augs {
