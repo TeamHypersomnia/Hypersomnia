@@ -71,6 +71,21 @@ struct illuminated_rendering_input {
 	const std::vector<visibility_request>& light_requests;
 	const bool streamer_mode;
 	augs::thread_pool& pool;
+
+	auto get_considered_fov() const {
+		auto considered_fov = drawing.fog_of_war;
+
+		considered_fov.size *= camera_requested_fov_expansion;
+
+		if (camera_edge_zoomout_mult > 0.0f) {
+			const auto max_fov_reduction = 1.0f / 6;
+			const auto fov_reduction = augs::interp(1.0f, max_fov_reduction, camera_edge_zoomout_mult);
+
+			considered_fov.angle *= fov_reduction;
+		}
+
+		return considered_fov;
+	}
 };
 
 void enqueue_illuminated_rendering_jobs(

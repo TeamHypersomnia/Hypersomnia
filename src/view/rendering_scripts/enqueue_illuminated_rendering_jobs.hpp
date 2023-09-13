@@ -21,7 +21,7 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& thunders = av.get<thunder_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
 	const auto& screen_size = cone.screen_size;
-	const auto& settings = in.drawing;
+	const auto settings = in.drawing;
 	const auto& damage_indication_settings = in.damage_indication;
 	const auto& queried_cone = in.queried_cone;
 	const auto& actual_cone = in.camera.cone;
@@ -41,10 +41,12 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& cosm = viewed_character.get_cosmos();
 	const auto indicator_meta = in.indicator_meta;
 
+	const auto considered_fov = in.get_considered_fov();
+
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
 		viewed_character_transform.has_value() 
-		&& settings.fog_of_war.is_enabled()
+		&& considered_fov.is_enabled()
 	;
 #else
 	const bool fog_of_war_effective = false;
@@ -79,7 +81,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, streamer_mode, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [&cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {
@@ -144,7 +146,7 @@ void enqueue_illuminated_rendering_jobs(
 				character,
 				pre_step_crosshair_displacement,
 				interp,
-				settings.fog_of_war.angle
+				considered_fov.angle
 			);
 		};
 
@@ -182,7 +184,7 @@ void enqueue_illuminated_rendering_jobs(
 		draw_sentiences_hud(input);
 	};
 
-	auto explosives_hud_job = [cone, &dedicated, global_time_seconds, &necessarys, &settings, &interp, &cosm, viewed_character]() {
+	auto explosives_hud_job = [cone, &dedicated, global_time_seconds, &necessarys, settings, &interp, &cosm, viewed_character]() {
 		int current_hud = 0;
 
 		auto& target_vectors = dedicated[DV::EXPLOSIVE_HUDS];
@@ -216,7 +218,7 @@ void enqueue_illuminated_rendering_jobs(
 		});
 	};
 
-	auto indicators_and_callouts_job = [&interp, viewed_character, &gui_font, &special_indicators, get_drawer_for, get_line_drawer_for, &settings, &cosm, cone, screen_size, &visible]() {
+	auto indicators_and_callouts_job = [&interp, viewed_character, &gui_font, &special_indicators, get_drawer_for, get_line_drawer_for, settings, &cosm, cone, screen_size, &visible]() {
 		auto drawer = get_drawer_for(D::INDICATORS_AND_CALLOUTS);
 		auto line_drawer = get_line_drawer_for(D::INDICATORS_AND_CALLOUTS);
 

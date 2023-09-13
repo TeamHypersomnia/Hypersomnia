@@ -101,15 +101,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	auto& profiler = in.frame_performance;
 	auto& renderer = in.renderer;
 
-	auto considered_fov = settings.fog_of_war;
-	considered_fov.size *= in.camera_requested_fov_expansion;
-
-	if (in.camera_edge_zoomout_mult > 0.0f) {
-		const auto max_fov_reduction = 1.0f / 6;
-		const auto fov_reduction = augs::interp(1.0f, max_fov_reduction, in.camera_edge_zoomout_mult);
-
-		considered_fov.angle *= fov_reduction;
-	}
+	const auto considered_fov = in.get_considered_fov();
 
 	/* Shader manipulation lambdas */
 
