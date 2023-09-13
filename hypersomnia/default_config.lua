@@ -216,7 +216,7 @@ treat_as_music_sounds_longer_than_secs = 5,
   },
   camera = {
     edge_zoom_out_zone = 0.005,
-    edge_zoom_in_zone_expansion = 2.5,
+    edge_zoom_in_zone_expansion = 1.0,
     edge_zoom_in_cutoff_mult = 0.2,
 
     additional_position_smoothing = {

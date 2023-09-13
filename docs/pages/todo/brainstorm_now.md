@@ -6,6 +6,30 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Problem: spectator experience will be inconsistent with different screen sizes
+    - A periodic view update might do, e.g. once every 0.5s
+        - Screw it, let's send it with ping for now
+
+        - Okay this will probably work best
+            - Encode this float a single byte then it's just several bytes/sec overhead
+        - Though we'd need to communicate which player we're spectating to avoid too much overhead
+            - Which will be nice anyway
+
+        - However the view might flicker
+        - It won't if we drive zoom updates only through these periodic sends
+        - We'll need a separate state category for this I guess
+            - Can't we just include a byte in net statistics?
+            - Yeah let's use this
+
+
+
+    - and will surely be just because it's all view-side
+    - it would then be best to tie it to crosshair system logic
+    - and especially with different local edge zoom behavior settings!
+
+    - We might leave it for later although it's going to be a pain in the ass
+        - Just disabling it or always zooming in won't do 
+
 - Move blunaz to tools so it doesn't confuse people
 
 - For balance, decrease FoV angle when zooming out
