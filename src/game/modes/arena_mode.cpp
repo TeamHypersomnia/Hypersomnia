@@ -1413,7 +1413,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 					bool weapon_requirement_met = true;
 
 					if (s->level == final_level) {
-						weapon_requirement_met  = ko.origin.on_tool_used(in.cosm, [&](const auto& tool) {
+						weapon_requirement_met = ko.origin.on_tool_used(in.cosm, [&](const auto& tool) {
 							if constexpr(is_nullopt_v<decltype(tool)>) {
 
 							}
@@ -1430,9 +1430,9 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 						});
 					}
 
-					if (weapon_requirement_met) {
-						const bool tool_humiliating = ko.origin.cause.is_humiliating(in.cosm);
+					const bool tool_humiliating = ko.origin.cause.is_humiliating(in.cosm);
 
+					if (weapon_requirement_met) {
 						if (tool_humiliating) {
 							s->level += 2;
 
@@ -1448,6 +1448,18 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 						}
 						else {
 							s->level += 1;
+						}
+					}
+					else {
+						/* 
+							Corner case: Decrease a victim's level if we kill with a non-final melee weapon
+						*/
+
+						if (tool_humiliating) {
+							if (const auto v = stats_of(ko.victim.id)) {
+								v->level -= 1;
+								v->level = std::max(0, v->level);
+							}
 						}
 					}
 				}
