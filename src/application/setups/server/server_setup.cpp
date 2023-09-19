@@ -1096,6 +1096,17 @@ void server_setup::broadcast_info(const std::string& text) {
 	broadcast(message);
 }
 
+void server_setup::try_apply(const public_client_settings& requested_settings) {
+	const bool can_already_resend_settings = server_time - when_last_sent_admin_public_settings > 1.0;
+
+	auto& current_requested_settings = integrated_client.settings.public_settings;
+
+	if (can_already_resend_settings && current_requested_settings != requested_settings) {
+		current_requested_settings = requested_settings;
+		integrated_client.rebroadcast_public_settings = true;
+	}
+}
+
 void server_setup::apply(const config_lua_table& cfg) {
 	/* 
 		If we just applied the changes from game settings,
@@ -1106,18 +1117,17 @@ void server_setup::apply(const config_lua_table& cfg) {
 
 	integrated_client_vars = cfg.client;
 
-	auto& current_requested_settings = integrated_client.settings.public_settings;
-
-	auto requested_settings = current_requested_settings;
+	auto requested_settings = integrated_client.settings.public_settings;
 	requested_settings.character_input = cfg.input.character;
 
-	const bool can_already_resend_settings = server_time - when_last_sent_admin_public_settings > 1.0;
-	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
+	try_apply(requested_settings);
+}
 
-	if (resend_requested_settings) {
-		current_requested_settings = requested_settings;
-		integrated_client.rebroadcast_public_settings = true;
-	}
+void server_setup::apply_nonzoomedout_visible_world_area(const vec2 area) {
+	auto requested_settings = integrated_client.settings.public_settings;
+	requested_settings.nonzoomedout_visible_world_area = area;
+
+	try_apply(requested_settings);
 }
 
 void register_external_resources_of(

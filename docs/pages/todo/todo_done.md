@@ -6522,3 +6522,29 @@ This will discard your redo history."
 
 - If zoomed out, do not render particles outside of fov
 
+- Problem: spectator experience will be inconsistent with different screen sizes
+    - If we disable settings.edge_zoom_in_cutoff_mult (it's just an experimental tweak) and just sync the client's screen size/zoom as public settings it becomes an auto-correcting system
+
+    - A periodic view update might do, e.g. once every 0.5s
+        - Screw it, let's send it with ping for now
+
+        - Okay this will probably work best
+            - Encode this float a single byte then it's just several bytes/sec overhead
+        - Though we'd need to communicate which player we're spectating to avoid too much overhead
+            - Which will be nice anyway
+
+        - However the view might flicker
+        - It won't if we drive zoom updates only through these periodic sends
+        - We'll need a separate state category for this I guess
+            - Can't we just include a byte in net statistics?
+            - Yeah let's use this
+
+
+
+    - and will surely be just because it's all view-side
+    - it would then be best to tie it to crosshair system logic
+    - and especially with different local edge zoom behavior settings!
+
+    - We might leave it for later although it's going to be a pain in the ass
+        - Just disabling it or always zooming in won't do 
+

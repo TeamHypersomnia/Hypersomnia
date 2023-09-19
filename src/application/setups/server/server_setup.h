@@ -325,6 +325,8 @@ public:
 	void apply(const server_vars&, bool first_time = false);
 	void apply(const server_private_vars&);
 
+	void try_apply(const public_client_settings& integrated_client_requested_settings);
+
 	void rechoose_arena();
 	void rebroadcast_server_public_vars();
 
@@ -656,4 +658,6 @@ public:
 
 	bool send_file_chunk(client_id_type id, const arena_files_database_entry& entry, file_chunk_index_type i);
 	void clean_unused_cached_files();
+
+	void apply_nonzoomedout_visible_world_area(vec2);
 };

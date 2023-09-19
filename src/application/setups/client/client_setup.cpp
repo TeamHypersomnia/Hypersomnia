@@ -1445,6 +1445,11 @@ void client_setup::apply(const config_lua_table& cfg) {
 	adapter->set(vars.network_simulator);
 }
 
+void client_setup::apply_nonzoomedout_visible_world_area(vec2 area) {
+	auto& r = requested_settings;
+	r.public_settings.nonzoomedout_visible_world_area = area;
+}
+
 bool client_setup::is_connected() const {
 	if (is_replaying()) {
 		return true;

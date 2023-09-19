@@ -13,8 +13,7 @@ extern float max_zoom_out_at_edges_v;
 struct entropy_accumulator {
 	struct input {
 		input_settings settings;
-		const vec2i screen_size;
-		const zoom_type zoom;
+		const vec2 visible_world_area;
 	};
 
 	mode_player_entropy mode;
@@ -34,7 +33,7 @@ struct entropy_accumulator {
 		if (handle) {
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, motion_type)) {
 				if (const auto crosshair = handle.find_crosshair()) {
-					const auto total_bound = vec2(in.screen_size) / (in.zoom * max_zoom_out_at_edges_v);
+					const auto total_bound = in.visible_world_area / max_zoom_out_at_edges_v;
 					return to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.character.crosshair_sensitivity, total_bound);
 				}
 			}

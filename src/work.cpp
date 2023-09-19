@@ -125,6 +125,8 @@ std::atomic<int> signal_status = 0;
 static_assert(std::atomic<int>::is_always_lock_free);
 #endif
 
+constexpr bool no_edge_zoomout_v = false;
+
 work_result work(const int argc, const char* const * const argv) try {
 #if PLATFORM_UNIX	
 	auto signal_handler = [](const int signal_type) {
@@ -1771,6 +1773,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		return camera_cone(get_camera_eye(viewing_config), logic_get_screen_size());
 	};
 
+	auto get_nonzoomedout_visible_world_area = [&](const config_lua_table& viewing_config) {
+		return vec2(logic_get_screen_size()) / get_camera_eye(viewing_config, no_edge_zoomout_v).zoom;
+	};
+
 	auto get_queried_cone = [&](const config_lua_table& viewing_config) {		
 		const auto query_mult = viewing_config.session.camera_query_aabb_mult;
 
@@ -1784,7 +1790,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto get_setup_customized_config = [&]() {
-		return visit_current_setup([&](auto& setup) {
+		return visit_current_setup([&]<typename S>(S& setup) {
 			auto config_copy = config;
 
 			/*
@@ -1794,6 +1800,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			setup.customize_for_viewing(config_copy);
 			setup.apply(config_copy);
+
+			if constexpr(is_one_of_v<S, client_setup, server_setup>) {
+				setup.apply_nonzoomedout_visible_world_area(get_nonzoomedout_visible_world_area(config_copy));
+			}
 
 			if (get_camera_eye(config_copy).zoom < 1.f) {
 				/* Force linear filtering when zooming out */
@@ -2381,15 +2391,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				const auto input_cfg = get_current_input_settings(viewing_config);
 
-				const bool with_edge_zoomout = false;
-
 				if (const auto motion = total_collected.calc_motion(
 					get_viewed_character(), 
 					game_motion_type::MOVE_CROSSHAIR,
 					entropy_accumulator::input {
 						input_cfg, 
-						logic_get_screen_size(), 
-						get_camera_eye(viewing_config, with_edge_zoomout).zoom 
+						get_nonzoomedout_visible_world_area(viewing_config)
 					}
 				)) {
 					return vec2(motion->offset) * input_cfg.character.crosshair_sensitivity;
@@ -2435,14 +2442,26 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		}
 
+		auto nonzoomedout_area = get_nonzoomedout_visible_world_area(viewing_config);
+
+		visit_current_setup([&]<typename S>(const S& setup) {
+			if constexpr(is_one_of_v<S, client_setup, server_setup>) {
+				const auto currently_viewed = setup.get_viewed_player_nonzoomedout_visible_world_area();
+
+				if (currently_viewed != vec2::zero) {
+					nonzoomedout_area = currently_viewed;
+				}
+			}
+		});
+
 		gameplay_camera.tick(
 			screen_size,
+			nonzoomedout_area,
 			interp,
 			frame_delta,
 			viewing_config.camera,
 			viewed_character,
-			calc_pre_step_crosshair_displacement(viewing_config),
-			get_camera_eye(viewing_config, false).zoom
+			calc_pre_step_crosshair_displacement(viewing_config)
 		);
 
 		hud_messages.advance(viewing_config.hud_messages.value);
@@ -2453,9 +2472,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			return setup.get_inv_tickrate();
 		});
 
-		visit_current_setup([&](const auto& setup) {
-			using S = remove_cref<decltype(setup)>;
-
+		visit_current_setup([&]<typename S>(const S& setup) {
 			const auto now_sampled_cosmos = cosm.get_cosmos_id();
 
 			auto resample = [&]() {
@@ -2607,8 +2624,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				[&viewing_config, &setup_post_cleanup](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
 			);
 
-			const bool with_edge_zoomout = false;
-			const auto zoom = get_camera_eye(viewing_config, with_edge_zoomout).zoom;
+			const auto nonzoomedout_zoom = get_camera_eye(viewing_config, no_edge_zoomout_v).zoom;
 			const auto input_cfg = get_current_input_settings(viewing_config);
 
 			if constexpr(std::is_same_v<S, client_setup>) {
@@ -2619,7 +2635,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						frame_delta,
 						logic_get_screen_size(), 
 						input_cfg, 
-						zoom,
+						nonzoomedout_zoom,
 						viewing_config.simulation_receiver, 
 						viewing_config.lag_compensation, 
 						network_performance,
@@ -2639,7 +2655,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					{ 
 						logic_get_screen_size(), 
 						input_cfg, 
-						zoom,
+						nonzoomedout_zoom,
 						get_detected_nat(),
 						network_performance,
 						server_stats
@@ -2665,7 +2681,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						frame_delta, 
 						logic_get_screen_size(), 
 						input_cfg, 
-						zoom 
+						nonzoomedout_zoom 
 					},
 					callbacks
 				);

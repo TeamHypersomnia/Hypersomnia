@@ -32,13 +32,12 @@ struct setup_advance_input {
 	const augs::delta frame_delta;
 	const vec2i screen_size;
 	const input_settings settings;
-	const zoom_type zoom;
+	const zoom_type nonzoomedout_zoom;
 
 	auto make_accumulator_input() const {
 		return entropy_accumulator::input {
 			settings,
-			screen_size,
-			zoom
+			vec2(screen_size) / nonzoomedout_zoom
 		};
 	}
 };
@@ -53,7 +52,7 @@ struct lag_compensation_settings;
 struct server_advance_input {
 	const vec2i screen_size;
 	const input_settings settings;
-	const zoom_type zoom;
+	const zoom_type nonzoomedout_zoom;
 
 	const nat_detection_result last_detected_nat;
 
@@ -63,8 +62,7 @@ struct server_advance_input {
 	auto make_accumulator_input() const {
 		return entropy_accumulator::input {
 			settings,
-			screen_size,
-			zoom
+			vec2(screen_size) / nonzoomedout_zoom
 		};
 	}
 };
@@ -74,7 +72,7 @@ struct client_advance_input {
 
 	const vec2i& screen_size;
 	const input_settings settings;
-	const zoom_type zoom;
+	const zoom_type nonzoomedout_zoom;
 
 	const simulation_receiver_settings& simulation_receiver;
 	const lag_compensation_settings& lag_compensation;
@@ -88,8 +86,7 @@ struct client_advance_input {
 	auto make_accumulator_input() const {
 		return entropy_accumulator::input {
 			settings,
-			screen_size,
-			zoom
+			vec2(screen_size) / nonzoomedout_zoom
 		};
 	}
 };

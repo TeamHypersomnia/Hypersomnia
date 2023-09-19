@@ -44,12 +44,12 @@ struct world_camera {
 
 	void tick(
 		const vec2i screen_size,
+		const vec2 nonzoomedout_visible_world_area,
 		const interpolation_system& interp, 
 		augs::delta dt,
 		world_camera_settings settings,
 		const_entity_handle entity_to_chase,
-		const vec2 mid_step_crosshair_displacement,
-		const float last_real_zoom
+		const vec2 mid_step_crosshair_displacement
 	);
 
 	auto get_effective_flash_mult() const {
@@ -81,9 +81,8 @@ private:
 	static float calc_camera_zoom_out_due_to_character_crosshair(
 		const const_entity_handle,
 		const world_camera_settings&,
-		const vec2 screen_size,
+		const vec2 nonzoomedout_visible_world_area,
 		const vec2 crosshair_displacement,
-		const float current_zoom,
 		const float current_edge_zoomout_mult
 	);
 };

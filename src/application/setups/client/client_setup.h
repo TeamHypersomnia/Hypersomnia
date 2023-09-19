@@ -852,4 +852,6 @@ public:
 
 	void handle_received(const file_chunk_packet& chunk);
 	file_chunk_index_type calc_num_chunks_per_tick() const;
+
+	void apply_nonzoomedout_visible_world_area(vec2);
 };

@@ -234,6 +234,9 @@ namespace net_messages {
 
 		serialize_bool(s, settings.keep_movement_forces_relative_to_crosshair);
 
+		serialize_float(s, p.nonzoomedout_visible_world_area.x);
+		serialize_float(s, p.nonzoomedout_visible_world_area.y);
+
 		return true;
 	}
 

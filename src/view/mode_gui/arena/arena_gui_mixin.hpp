@@ -262,3 +262,32 @@ entity_id arena_gui_mixin<D>::get_viewed_character_id() const {
 		}
 	);
 }
+
+template <class D>
+vec2 arena_gui_mixin<D>::get_viewed_player_nonzoomedout_visible_world_area() const {
+	const auto& self = static_cast<const D&>(*this);
+
+	if (!self.is_gameplay_on()) {
+		return vec2::zero;
+	}
+
+	const auto mode_id = [&]() {
+		if (arena_gui.spectator.active) {
+			const auto spectating = arena_gui.spectator.now_spectating;
+
+			if (spectating.is_set()) {
+				return spectating;
+			}
+		}
+
+		return self.get_local_player_id();
+	}();
+
+	if (mode_id.is_set()) {
+		if (auto metas = self.find_player_metas()) {
+			return (*metas)[mode_id.value].public_settings.nonzoomedout_visible_world_area;
+		}
+	}
+
+	return vec2::zero;
+}

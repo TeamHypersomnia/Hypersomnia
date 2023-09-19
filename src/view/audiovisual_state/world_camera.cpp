@@ -42,12 +42,12 @@ namespace augs {
 
 void world_camera::tick(
 	const vec2i screen_size,
+	const vec2 nonzoomedout_visible_world_area,
 	const interpolation_system& interp,
 	const augs::delta dt,
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase,
-	const vec2 mid_step_crosshair_displacement,
-	const float last_real_zoom
+	const vec2 mid_step_crosshair_displacement
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
@@ -253,9 +253,8 @@ void world_camera::tick(
 	target_edge_zoomout_mult = calc_camera_zoom_out_due_to_character_crosshair(
 		entity_to_chase,
 		settings,
-		screen_size,
+		nonzoomedout_visible_world_area,
 		mid_step_crosshair_displacement,
-		last_real_zoom,
 		current_edge_zoomout_mult
 	);
 
@@ -277,16 +276,15 @@ void world_camera::tick(
 float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
 	const const_entity_handle entity_to_chase,
 	const world_camera_settings& settings,
-	const vec2 screen_size_real,
+	const vec2 nonzoomedout_visible_world_area,
 	const vec2 mid_step_crosshair_displacement,
-	const float last_real_zoom,
 	const float current_edge_zoomout_mult
 ) {
 	if (entity_to_chase.dead()) {
 		return 0.0f;
 	}
 
-	const auto screen_size = screen_size_real / last_real_zoom;
+	const auto screen_size = nonzoomedout_visible_world_area;
 	const auto zone = screen_size.bigger_side() * settings.edge_zoom_out_zone;
 
 	if (zone == 0.0f) {
