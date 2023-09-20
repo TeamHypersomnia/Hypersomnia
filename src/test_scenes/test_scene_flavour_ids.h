@@ -356,6 +356,9 @@ enum class test_sound_decorations {
 	PORTAL_EXIT_SOUND,
 
 	FIRE_DAMAGE,
+
+	GLASS_DAMAGE_SOUND,
+
 	LAVA_AMBIENCE,
 
 	COUNT

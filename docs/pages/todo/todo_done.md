@@ -6548,3 +6548,10 @@ This will discard your redo history."
     - We might leave it for later although it's going to be a pain in the ass
         - Just disabling it or always zooming in won't do 
 
+- Fix spawns in gungame mode - they're currently shuffled per-round
+
+
+- For balance, decrease FoV angle when zooming out
+- Show the error in client setupinstead of waiting to press Abort
+    - try it out on moxvalix server
+

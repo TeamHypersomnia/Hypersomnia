@@ -530,6 +530,14 @@ namespace test_flavours {
 		);
 
 		flavour_with_sound(
+			test_sound_decorations::GLASS_DAMAGE_SOUND,
+			test_scene_sound_id::GLASS_DAMAGE,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
+		flavour_with_sound(
 			test_sound_decorations::LAVA_AMBIENCE,
 			test_scene_sound_id::LAVA_AMBIENCE,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,

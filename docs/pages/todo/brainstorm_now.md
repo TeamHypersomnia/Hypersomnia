@@ -6,15 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Scripting will be tough so let's first do some high-prio high-dopamine stuff
+    - FFA
+    - Map cycling
+        - Could actually be a server-side script although we'd rather such a basic functionality be built-in
+    - Simple server-sided scripting
+        - To just get our hands dirty with the whole concept; here we won't have to worry about security etc
+
+- Scripting proper: Client-side
+    - Problem: Synchronizing global script state like the solvable, e.g. upon incoming connection
+        - We'll effectively have to disallow creating globals in the script
+            - Unless there's an easy way to iterate over them in luau which would be the best
+            - Yeah that would be perfect actually because the only other option would be some ugly calls to bindings to reserve a new "tracked" global variable
 
 - Move blunaz to tools so it doesn't confuse people
 
-- For balance, decrease FoV angle when zooming out
-
 - make it clear you don't have to use mouse4/5 to advance through the level?
-
-- Show the error in client setupinstead of waiting to press Abort
-    - try it out on moxvalix server
 
 - fix editor panning in windowed mode
 
@@ -74,8 +81,6 @@ summary: That which we are brainstorming at the moment.
         - Would probably need to serialize them before nodes.
         - Even though there are nodes inside too, but they are more "virtual"
 
-
-- Fix spawns in gungame mode - they're currently shuffled per-round
 
 - Alright we really need to sort out how custom maps are stored on the server
     - for now just
