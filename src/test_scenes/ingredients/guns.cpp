@@ -4186,6 +4186,7 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BLUNAZ_SHOT);
 			gun_def.kickback_towards_wielder = kickback_mult * 150.f;
 			gun_def.recoil_multiplier = 3.25f;
+			gun_def.buy_type = buy_menu_type::TOOLS;
 
 			default_gun_props(meta);
 			set_density_mult(meta, 0.7f);

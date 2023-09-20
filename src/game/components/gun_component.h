@@ -24,6 +24,7 @@
 #include "game/detail/sentience_shake.h"
 #include "game/enums/weapon_action_type.h"
 #include "augs/pad_bytes.h"
+#include "view/mode_gui/arena/buy_menu_type.h"
 
 namespace augs {
 	struct introspection_access;
@@ -134,6 +135,7 @@ namespace invariants {
 		real32 shell_spawn_delay_mult = 0.f;
 
 		real32 basic_penetration_distance = 15.0f;
+		buy_menu_type buy_type = buy_menu_type::COUNT;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {
