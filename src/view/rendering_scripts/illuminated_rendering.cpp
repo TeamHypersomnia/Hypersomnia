@@ -648,12 +648,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
-	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
-		write_fow_to_stencil();
-	}
 
 	light_pass();
+
+	if (fog_of_war_effective) {
+		write_fow_to_stencil();
+	}
 
 	set_shader_with_matrix(shaders.illuminated);
 

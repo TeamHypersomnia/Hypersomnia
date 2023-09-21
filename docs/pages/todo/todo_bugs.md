@@ -196,6 +196,8 @@ We have a demo file
 - crash on bigilab: we should be able to reproduce it with a demo on windows
 
 - linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
+	- Solved (NO IDEA WHY): simply let neon fow draw first, then draw the diffuse fog of war
+
 	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
 	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 
 		- although only with higher glsl version
