@@ -93,7 +93,13 @@ void world_camera::tick(
 		screen_size,
 		mid_step_crosshair_displacement,
 		current_eye.zoom
-	);
+	); 
+
+#if 0
+	const auto max_zoom_out = max_zoom_out_at_edges_v;
+
+	camera_crosshair_offset /= augs::interp(1.0f, max_zoom_out, current_edge_zoomout_mult);
+#endif
 
 	current_eye = target_cone;
 	current_eye.transform.pos += camera_crosshair_offset;

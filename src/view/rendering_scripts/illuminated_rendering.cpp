@@ -648,7 +648,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
-		renderer.call_and_clear_triangles();
+	renderer.call_and_clear_triangles();
 
 	light_pass();
 
@@ -659,6 +659,18 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.illuminated);
 
 	renderer.call_triangles(D::GROUND);
+
+	if (strict_fow) {
+		renderer.set_stencil(true);
+		renderer.stencil_positive_test();
+	}
+
+	renderer.call_triangles(D::MISSILES);
+
+	if (strict_fow) {
+		renderer.set_stencil(false);
+	}
+
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 
 	{

@@ -354,6 +354,17 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	renderer.call_triangles(D::UNDER_FOREGROUND_NEONS);
 
+	if (in.strict_fow) {
+		renderer.set_stencil(true);
+		renderer.stencil_positive_test();
+	}
+
+	renderer.call_triangles(D::MISSILES_NEONS);
+
+	if (in.strict_fow) {
+		renderer.set_stencil(false);
+	}
+
 	in.neon_callback();
 	renderer.call_and_clear_triangles();
 
