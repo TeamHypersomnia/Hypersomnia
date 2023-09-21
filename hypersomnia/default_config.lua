@@ -602,12 +602,12 @@ treat_as_music_sounds_longer_than_secs = 5,
       background_color = "15 15 15 200",
       bg_lumi_mult = 0.69999998807907104,
       border_color = "109 109 127 100",
-      current_player_bg_lumi_mult = 1.6000000238418579,
+      current_player_bg_lumi_mult = 1.5000000238418579,
       current_player_text_lumi_mult = 1.7000000476837158,
       dead_player_bg_alpha_mult = 0.30000001192092896,
       dead_player_bg_lumi_mult = 0.5,
       dead_player_text_alpha_mult = 0.60000002384185791,
-      dead_player_text_lumi_mult = 0.80000001192092896,
+      dead_player_text_lumi_mult = 0.45000001192092896,
       cell_bg_alpha = 0.56000000238418579,
       faction_logo_alpha = 0.80000001192092896,
       avatar_alpha = 1,
@@ -701,9 +701,9 @@ treat_as_music_sounds_longer_than_secs = 5,
 		  background_dark = "0 0 0 0"
 	  },
       METROPOLIS = {
-		  standard = "230 40 255 255",
-		  current_player_text = "240 70 255 255",
-		  background_dark = "20 0 75 255"
+		  standard = "40 230 255 255",
+		  current_player_text = "70 240  255 255",
+		  background_dark = "0 20 75 255"
 	  },
       ATLANTIS = {
 		  standard = "0 255 0 255"
