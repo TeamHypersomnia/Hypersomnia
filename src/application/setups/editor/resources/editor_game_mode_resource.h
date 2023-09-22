@@ -83,7 +83,7 @@ struct editor_gun_game_mode {
 	uint32_t max_team_score = 2;
 
 	uint32_t warmup_time = 81;
-	uint32_t freeze_time = 5;
+	uint32_t freeze_time = 0;
 	uint32_t round_time = 60 * 20;
 	uint32_t round_end_time = 5;
 
