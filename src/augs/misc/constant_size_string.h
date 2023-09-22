@@ -120,7 +120,52 @@ namespace augs {
 			len = 0;
 			arr[0] = 0;
 		}
+
+		auto& operator+=(const char* b) {
+			while(*b && len < const_count) {
+				arr[len++] = *b++;
+			}
+
+			arr[len] = 0;
+
+			return *this;
+		}
+
+		template <class T>
+		auto& operator+=(const T& b) {
+			unsigned new_len = std::min(const_count, unsigned(len + b.length()));
+
+			for (unsigned i = len; i < new_len; ++i) {
+				arr[i] = b[i - len];
+			}
+
+			arr[new_len] = 0;
+			len = new_len;
+
+			return *this;
+		}
 	};
+
+	template <unsigned const_count>
+	constant_size_string<const_count> operator+(const std::string& a, const char* b) {
+		constant_size_string<const_count> result(a);
+		result += b;
+		return result;
+	}
+
+    template <unsigned const_count>
+    constant_size_string<const_count> operator+(const constant_size_string<const_count>& a, const std::string& b) {
+        constant_size_string<const_count> result(a);
+        result += b;
+        return result;
+    }
+
+    template <unsigned const_count>
+    constant_size_string<const_count> operator+(const std::string& a, const constant_size_string<const_count>& b) {
+        constant_size_string<const_count> result(a);
+        result += b;
+        return result;
+    }
 }
 
 template <unsigned const_count>

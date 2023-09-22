@@ -65,7 +65,7 @@ inline void setup_game_mode_defaults(
 	basic_eq.extra_ammo_pieces = 6;
 
 	/* To coincide with the spawn protection */
-	basic_eq.haste_time = 3;
+	basic_eq.haste_time = 1.5f;
 
 	editor_requested_equipment final_eq;
 	final_eq.electric_armor = true;
@@ -79,10 +79,12 @@ inline void setup_game_mode_defaults(
 	e.gun_game.final_equipment[faction_type::RESISTANCE] = final_eq;
 
 	editor_requested_equipment warmup_eq;
+	warmup_eq.firearm = o[test_shootable_weapons::BAKA47];
 	warmup_eq.melee = o[test_melee_weapons::ELECTRIC_RAPIER];
-	warmup_eq.explosive = o[test_hand_explosives::FORCE_GRENADE];
 	warmup_eq.num_explosives = 3;
+	warmup_eq.extra_ammo_pieces++;
 
 	e.gun_game.warmup_equipment.resistance = warmup_eq;
+	e.gun_game.warmup_equipment.resistance.firearm = o[test_shootable_weapons::BILMER2000];
 	e.gun_game.warmup_equipment.metropolis = warmup_eq;
 }

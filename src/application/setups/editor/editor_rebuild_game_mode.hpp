@@ -164,6 +164,8 @@ auto setup_ruleset_from_editor_mode(
 					subrules.basic_eq[f] = ::to_game_requested_equipment(vars.basic_equipment[f], find_resource, f);
 					subrules.final_eq[f] = ::to_game_requested_equipment(vars.final_equipment[f], find_resource, f);
 
+					rules.free_for_all = vars.free_for_all;
+
 					auto& basic_eq = subrules.basic_eq[f];
 
 					if (basic_eq.weapon.is_set()) {

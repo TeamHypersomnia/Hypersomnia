@@ -2,7 +2,7 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2023-04-05 14:39:20.396351 UTC"
+        "version_timestamp": "2023-09-22 08:48:36.165702 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -12,10 +12,9 @@
         "default_server_mode": "bomb_defusal"
     },
     "playtesting": {
-        "mode": "quick_test"
+        "mode": "gun_game"
     },
     "game_modes": {
-        "bomb_defusal": {},
         "quick_test": {
             "equipment": {
                 "metropolis": {
@@ -26,7 +25,47 @@
             }
         }
     },
+    "external_resources": [
+        {
+            "path": "miniature.png",
+            "file_hash": "13950e55ea24236222b7685036747496b75a20a5abd1ecbb1b7e3fbf43e7898b",
+            "id": "@miniature",
+            "size": [400, 200]
+        }
+    ],
     "layers": [
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "ffa_spawn (9)",
+                "ffa_spawn (13)",
+                "ffa_spawn (19)",
+                "ffa_spawn (15)",
+                "ffa_spawn (14)",
+                "ffa_spawn (12)",
+                "ffa_spawn (11)",
+                "ffa_spawn (10)",
+                "ffa_spawn (8)",
+                "ffa_spawn (7)",
+                "ffa_spawn (6)",
+                "ffa_spawn (5)",
+                "ffa_spawn (4)",
+                "ffa_spawn (3)",
+                "ffa_spawn (31)",
+                "ffa_spawn (27)",
+                "ffa_spawn (26)",
+                "ffa_spawn (25)",
+                "ffa_spawn (24)",
+                "ffa_spawn (22)",
+                "ffa_spawn (21)",
+                "ffa_spawn (18)",
+                "ffa_spawn (17)",
+                "ffa_spawn (16)",
+                "ffa_spawn (2)",
+                "ffa_spawn (1)",
+                "ffa_spawn"
+            ]
+        },
         {
             "id": "markers",
             "is_open_in_editor": false,
@@ -268,7 +307,6 @@
         },
         {
             "id": "ground",
-            "is_open_in_editor": false,
             "nodes": [
                 "soil"
             ]
@@ -1593,6 +1631,159 @@
             "id": "ct_spawn (32)-ml",
             "type": "team_spawn",
             "pos": [-1217.0, 575.0]
+        },
+        {
+            "id": "ffa_spawn",
+            "type": "ffa_spawn",
+            "pos": [-1537.0, 513.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (1)",
+            "type": "ffa_spawn",
+            "pos": [-1537.0, -577.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (2)",
+            "type": "ffa_spawn",
+            "pos": [-1537.0, -33.0]
+        },
+        {
+            "id": "ffa_spawn (3)",
+            "type": "ffa_spawn",
+            "pos": [-897.0, -417.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (4)",
+            "type": "ffa_spawn",
+            "pos": [-737.0, 257.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (5)",
+            "type": "ffa_spawn",
+            "pos": [-481.0, 609.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (6)",
+            "type": "ffa_spawn",
+            "pos": [511.0, 545.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (7)",
+            "type": "ffa_spawn",
+            "pos": [575.0, -737.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (8)",
+            "type": "ffa_spawn",
+            "pos": [1697.0, -673.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (9)",
+            "type": "ffa_spawn",
+            "pos": [1151.0, -705.0]
+        },
+        {
+            "id": "ffa_spawn (10)",
+            "type": "ffa_spawn",
+            "pos": [1665.0, 513.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (11)",
+            "type": "ffa_spawn",
+            "pos": [1633.0, -1.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (12)",
+            "type": "ffa_spawn",
+            "pos": [1185.0, -65.0]
+        },
+        {
+            "id": "ffa_spawn (13)",
+            "type": "ffa_spawn",
+            "pos": [929.0, 193.0]
+        },
+        {
+            "id": "ffa_spawn (14)",
+            "type": "ffa_spawn",
+            "pos": [191.0, 127.0]
+        },
+        {
+            "id": "ffa_spawn (15)",
+            "type": "ffa_spawn",
+            "pos": [-385.0, -417.0]
+        },
+        {
+            "id": "ffa_spawn (16)",
+            "type": "ffa_spawn",
+            "pos": [-2465.0, 33.0]
+        },
+        {
+            "id": "ffa_spawn (17)",
+            "type": "ffa_spawn",
+            "pos": [-1985.0, -511.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (18)",
+            "type": "ffa_spawn",
+            "pos": [-1729.0, -1089.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (21)",
+            "type": "ffa_spawn",
+            "pos": [1119.0, -1025.0]
+        },
+        {
+            "id": "ffa_spawn (22)",
+            "type": "ffa_spawn",
+            "pos": [2497.0, -1345.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (24)",
+            "type": "ffa_spawn",
+            "pos": [2593.0, -513.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (25)",
+            "type": "ffa_spawn",
+            "pos": [2625.0, -65.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (26)",
+            "type": "ffa_spawn",
+            "pos": [2623.0, 1183.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (27)",
+            "type": "ffa_spawn",
+            "pos": [1633.0, 1217.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (31)",
+            "type": "ffa_spawn",
+            "pos": [-2017.0, 1217.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (19)",
+            "type": "ffa_spawn",
+            "pos": [97.0, -289.0]
         },
         {
             "id": "tt_buy_zone",

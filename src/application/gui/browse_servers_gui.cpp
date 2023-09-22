@@ -765,8 +765,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		ImGui::Columns(num_columns);
 		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
-		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * max_server_name_length_v);
-		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("Capture the flag").x);
+		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * max_server_name_length_v - 4);
+		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("Capture the fla(FFA)").x);
 		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
 		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  9").x);
 		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2));

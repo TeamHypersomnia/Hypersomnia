@@ -6,7 +6,8 @@ bool is_reasonably_in_view(
 	const F target_character,
 	const vec2 pre_step_crosshair_displacement,
 	const interpolation_system& interp,
-	const float fow_angle
+	const float fow_angle,
+	const bool teammates_are_enemies
 ) {
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
@@ -14,7 +15,11 @@ bool is_reasonably_in_view(
 		return false;
 	}
 
-	if (viewed_character.get_official_faction() == target_character.get_official_faction()) {
+	if (viewed_character == target_character) {
+		return true;
+	}
+
+	if (!teammates_are_enemies && viewed_character.get_official_faction() == target_character.get_official_faction()) {
 		return true;
 	}
 

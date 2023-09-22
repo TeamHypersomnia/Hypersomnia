@@ -473,8 +473,8 @@ uint32_t test_mode::get_max_num_active_players(const const_input) const {
 }
 
 bool test_mode_player::operator<(const test_mode_player& b) const {
-	const auto ao = arena_player_order { get_nickname(), stats.calc_score() };
-	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score() };
+	const auto ao = arena_player_order { get_nickname(), stats.calc_score(), 0 };
+	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score(), 0 };
 
 	return ao < bo;
 }

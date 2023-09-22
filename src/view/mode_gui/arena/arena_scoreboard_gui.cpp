@@ -211,6 +211,21 @@ void arena_scoreboard_gui::draw_gui(
 
 	pen.y += cell_h;
 
+	if (mode_input.rules.is_ffa()) {
+		if constexpr(!std::is_same_v<M, test_mode>) {
+			if (typed_mode.is_match_summary()) {
+				const auto winner = typed_mode.get_victorious_player_nickname();
+
+				const auto label = winner + " WON THE MATCH!";
+				const auto text_pos = vec2(sz.x / 2, 0.0f);
+
+				text_stroked(label, yellow, text_pos, { augs::ralign::CX, augs::ralign::CY });
+
+				pen.y += font_h;
+			}
+		}
+	}
+
 	auto& player_col = columns[3];
 
 	for (auto& c : columns) {
@@ -317,8 +332,11 @@ void arena_scoreboard_gui::draw_gui(
 	};
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
-		(void)on_top;
-		auto& colors = in.config.faction_view.colors[faction];
+		const bool all = faction == faction_type::FFA;
+
+		auto get_colors = [&](const auto faction) {
+			return in.config.faction_view.colors[faction];
+		};
 
 		const auto& cosm = mode_input.cosm;
 
@@ -337,11 +355,12 @@ void arena_scoreboard_gui::draw_gui(
 
 		sort_range(sorted_players);
 
-		const auto& bg_dark = colors.background_dark;
-
 		const auto faction_score = typed_mode.get_faction_score(faction);
 
 		auto draw_headline = [&]() {
+			const auto& colors = get_colors(faction);
+			const auto& bg_dark = colors.background_dark;
+
 			const auto bg_height = cell_h * 3;
 			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
 
@@ -441,13 +460,17 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x = prev_pen_x;
 		};
 
-		if (!on_top) {
-			draw_headline();
+		if (!all) {
+			if (!on_top) {
+				draw_headline();
+			}
 		}
 
 		const auto h = sorted_players.size() * cell_h;
 
 		for (const auto& c : columns) {
+			const auto& bg_dark = get_colors(faction).background_dark;
+
 			const auto col_border_orig = ltrbi(c.l, 0, c.l + 1, h - 1);
 			aabb(col_border_orig, bg_dark);
 		}
@@ -457,6 +480,9 @@ void arena_scoreboard_gui::draw_gui(
 		for (const auto& p : sorted_players) {
 			const auto& player_id = p.second;
 			const auto& player_data = p.first;
+
+			const auto& colors = get_colors(player_data.get_faction());
+			const auto& bg_dark = colors.background_dark;
 
 			const bool is_local = player_id == draw_in.local_player_id;
 			const bool censor_avatar = streamer_mode && !is_local;
@@ -492,12 +518,6 @@ void arena_scoreboard_gui::draw_gui(
 				else {
 					if (!is_conscious) {
 						return bg_dark;
-						//return is_local ? rgba(bg_dark).multiply_rgb(1.5f) : bg_dark;
-						col = bg_dark;
-						total_lumi = 1.f;
-						total_alpha = 1.f;
-						/* total_lumi *= cfg.dead_player_bg_lumi_mult; */
-						/* total_alpha *= cfg.dead_player_bg_alpha_mult; */
 					}
 				}
 
@@ -505,7 +525,7 @@ void arena_scoreboard_gui::draw_gui(
 			}();	
 
 			const auto faction_text_col = [&]() {
-				auto col = colors.standard;
+				auto col = white;
 
 				auto total_lumi = cfg.text_lumi_mult;
 				auto total_alpha = 1.f;
@@ -740,8 +760,10 @@ void arena_scoreboard_gui::draw_gui(
 			pen.y += cell_h;
 		}
 
-		if (on_top) {
-			draw_headline();
+		if (!all) {
+			if (on_top) {
+				draw_headline();
+			}
 		}
 	};
 
@@ -752,8 +774,13 @@ void arena_scoreboard_gui::draw_gui(
 	else {
 		const auto participants = typed_mode.calc_participating_factions(mode_input);
 
-		print_faction(participants.defusing, true);
-		print_faction(participants.bombing, false);
+		if (mode_input.rules.is_ffa()) {
+			print_faction(faction_type::FFA, true);
+		}
+		else {
+			print_faction(participants.defusing, true);
+			print_faction(participants.bombing, false);
+		}
 	}
 
 	{

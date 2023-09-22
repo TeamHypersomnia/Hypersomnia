@@ -201,6 +201,8 @@ public:
 				if (!r.enable_tactical_indicators) {
 					settings.draw_tactical_indicators.is_enabled = false;
 				}
+
+				settings.teammates_are_enemies = in.rules.is_ffa();
 			}
 		);
 	}

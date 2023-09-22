@@ -48,8 +48,8 @@ int arena_mode_player_stats::calc_score() const {
 }
 
 bool arena_mode_player::operator<(const arena_mode_player& b) const {
-	const auto ao = arena_player_order { get_nickname(), stats.calc_score() };
-	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score() };
+	const auto ao = arena_player_order { get_nickname(), stats.calc_score(), stats.level };
+	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score(), b.stats.level };
 
 	return ao < bo;
 }
@@ -333,19 +333,29 @@ void arena_mode::init_spawned(
 	});
 }
 
+arena_mode_faction_state& arena_mode::get_spawns_for(const input in, const faction_type faction) {
+	if (in.rules.is_ffa()) {
+		if (ffa_faction.shuffled_spawns.size() > 0) {
+			return ffa_faction;
+		}
+	}
+
+	return factions[faction];
+}
+
 void arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		const auto faction = typed_handle.get_official_faction();
-		auto& faction_state = factions[faction];
+		auto& spawns_state = get_spawns_for(in, faction);
 
-		auto& spawns = faction_state.shuffled_spawns;
-		auto& spawn_idx = faction_state.current_spawn_index;
+		auto& spawns = spawns_state.shuffled_spawns;
+		auto& spawn_idx = spawns_state.current_spawn_index;
 
 		auto reshuffle = [&]() {
-			reshuffle_spawns(cosm, faction);
+			reshuffle_spawns(cosm, spawns_state);
 		};
 
 		if (spawns.empty()) {
@@ -412,7 +422,7 @@ bool arena_mode::add_player_custom(const input_type in, const add_player_input& 
 	return true;
 }
 
-mode_player_id arena_mode::add_player(const input_type in, const entity_name_str& nickname) {
+mode_player_id arena_mode::add_player(const input_type in, const client_nickname_type& nickname) {
 	if (const auto new_id = find_first_free_player(); new_id.is_set()) {
 		const auto result = add_player_custom(in, { new_id, nickname });
 		(void)result;
@@ -447,14 +457,9 @@ mode_entity_id arena_mode::lookup(const mode_player_id& id) const {
 	return mode_entity_id::dead();
 }
 
-void arena_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
-	const auto reshuffle_seed = get_step_rng_seed(cosm) + static_cast<unsigned>(faction);
-	auto rng = randomization(reshuffle_seed);
-
-	auto& faction_state = factions[faction];
-
-	auto& spawns = faction_state.shuffled_spawns;
-	const auto last_spawn = spawns.empty() ? mode_entity_id::dead() : spawns.back();
+void arena_mode::fill_spawns(const cosmos& cosm, faction_type faction, arena_mode_faction_state& out) {
+	auto& spawns = out.shuffled_spawns;
+	out.current_spawn_index = 0;
 
 	spawns.clear();
 
@@ -464,6 +469,18 @@ void arena_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction
 
 	for_each_faction_spawn(cosm, faction, adder);
 
+	reshuffle_spawns(cosm, out);
+}
+
+void arena_mode::reshuffle_spawns(const cosmos& cosm, arena_mode_faction_state& out) {
+	const auto reshuffle_seed = get_step_rng_seed(cosm) + spawn_reshuffle_counter;
+	++spawn_reshuffle_counter;
+
+	auto rng = randomization(reshuffle_seed);
+	auto& spawns = out.shuffled_spawns;
+
+	const auto last_spawn = spawns.empty() ? mode_entity_id::dead() : spawns.back();
+
 	shuffle_range(spawns, rng);
 
 	if (last_spawn.is_set() && spawns.size() > 1) {
@@ -472,7 +489,7 @@ void arena_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction
 		}
 	}
 
-	faction_state.current_spawn_index = 0;
+	out.current_spawn_index = 0;
 }
 
 template <class C, class F>
@@ -914,8 +931,10 @@ void arena_mode::setup_round(
 	current_round = {};
 
 	for_each_faction([&](const auto faction) {
-		reshuffle_spawns(cosm, faction);
+		fill_spawns(cosm, faction, factions[faction]);
 	});
+
+	fill_spawns(cosm, faction_type::FFA, ffa_faction);
 
 	messages::changed_identities_message msg;
 
@@ -1365,7 +1384,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 		if (ko.knockouter.id == ko.victim.id) {
 			knockouts_dt = 0;
 		}
-		else if (ko.knockouter.faction == ko.victim.faction) {
+		else if (!in.rules.is_ffa() && ko.knockouter.faction == ko.victim.faction) {
 			knockouts_dt = -1;
 			give_monetary_award(in, ko.knockouter.id, in.rules.economy.team_kill_penalty * -1);
 		}
@@ -1472,6 +1491,8 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 					const bool victory_already = s->level > final_level;
 
 					if (victory_already) {
+						victorious_player_nickname = ko.knockouter.name;
+
 						standard_victory(in, step, ko.knockouter.faction);
 					}
 					else {
@@ -1501,7 +1522,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 	if (ko.assist.id.is_set()) {
 		int assists_dt = 1;
 
-		if (ko.assist.faction == ko.victim.faction) {
+		if (!in.rules.is_ffa() && ko.assist.faction == ko.victim.faction) {
 			assists_dt = -1;
 		}
 
@@ -1519,6 +1540,10 @@ bool arena_mode::is_halfway_round(const const_input_type in) const {
 }
 
 bool arena_mode::is_final_round(const const_input_type in) const {
+	if (in.rules.is_ffa()) {
+		return true;
+	}
+
 	const auto max_rounds = in.rules.get_num_rounds();
 	const auto current_round = get_current_round_number();
 
@@ -2310,6 +2335,16 @@ void arena_mode::handle_game_commencing(const input_type in, const logic_step st
 	const bool are_factions_ready = [&]() {
 		const auto p = calc_participating_factions(in);
 
+		if (in.rules.is_ffa()) {
+			uint32_t total_players = 0;
+
+			p.for_each([&](const faction_type f) {
+				total_players += num_players_in(f);
+			});
+
+			return total_players >= 1;
+		}
+
 		bool all_have_at_least_one = true;
 
 		p.for_each([&](const faction_type f) {
@@ -2826,7 +2861,7 @@ float arena_mode::get_round_end_seconds_left(const const_input_type in) const {
 		return -1.f;
 	}
 
-	return static_cast<float>(in.rules.round_end_secs) - get_seconds_since_win(in);
+	return std::max(0.0f, in.rules.round_end_secs) - get_seconds_since_win(in);
 }
 
 bool arena_mode::bomb_exploded(const const_input_type in) const {
@@ -2963,7 +2998,7 @@ auto arena_mode::find_player_by_impl(S& self, const E& identifier) {
 	for (auto& it : self.players) {
 		auto& player_data = it.second;
 
-		if constexpr(std::is_same_v<entity_name_str, E>) {
+		if constexpr(std::is_same_v<client_nickname_type, E>) {
 			if (player_data.session.nickname == identifier) {
 				return std::addressof(it);
 			}
@@ -2972,6 +3007,9 @@ auto arena_mode::find_player_by_impl(S& self, const E& identifier) {
 			if (player_data.session.id == identifier) {
 				return std::addressof(it);
 			}
+		}
+		else {
+			static_assert(always_false_v<E>, "non-exhaustive");
 		}
 	}
 
@@ -3002,7 +3040,7 @@ const arena_mode_player* arena_mode::find(const session_id_type& session_id) con
 	return nullptr;
 }
 
-arena_mode_player* arena_mode::find_player_by(const entity_name_str& nickname) {
+arena_mode_player* arena_mode::find_player_by(const client_nickname_type& nickname) {
 	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
@@ -3010,7 +3048,7 @@ arena_mode_player* arena_mode::find_player_by(const entity_name_str& nickname) {
 	return nullptr;
 }
 
-const arena_mode_player* arena_mode::find_player_by(const entity_name_str& nickname) const {
+const arena_mode_player* arena_mode::find_player_by(const client_nickname_type& nickname) const {
 	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
@@ -3023,6 +3061,7 @@ void arena_mode::restart_match(const input_type in, const logic_step step) {
 	factions = {};
 	had_first_blood = false;
 	prepare_to_fight_counter = 0;
+	victorious_player_nickname = {};
 	clear_duel();
 
 	if (in.rules.warmup_secs > 4) {
@@ -3313,6 +3352,10 @@ mode_player_id arena_mode::get_opponent_duellist(const mode_player_id& id) const
 	 return id == duellist_1 ? duellist_2 : duellist_1;
 }
 
+client_nickname_type arena_mode::get_victorious_player_nickname() const {
+	return victorious_player_nickname;
+}
+
 bool arena_mode::is_a_duellist(const mode_player_id& id) const {
 	return id == duellist_1 || id == duellist_2;
 }
@@ -3323,11 +3366,21 @@ void arena_mode::clear_duel() {
 }
 
 game_mode_name_type arena_mode::get_name(const_input_type in) const {
-	return std::visit([](const auto& s) { return s.get_name(); }, in.rules.subrules);
+	auto name = game_mode_name_type(std::visit([](const auto& s) { return s.get_name(); }, in.rules.subrules));
+
+	if (in.rules.is_ffa()) {
+		name += " (FFA)";
+	}
+
+	return name;
 }
 
 bool arena_mode_ruleset::has_economy() const {
 	return std::visit([](const auto& s) { return s.has_economy(); }, subrules);
+}
+
+bool arena_mode_ruleset::is_ffa() const {
+	return free_for_all;
 }
 
 bool arena_mode::levelling_enabled(const_input_type in) const {

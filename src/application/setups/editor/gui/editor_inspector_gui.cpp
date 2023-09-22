@@ -2417,6 +2417,8 @@ EDIT_FUNCTION(
 			FACTION_EQUIPMENT_PROPERTY("Round start equipment", bomb_defusal.round_start_equipment);
 		}
 		else if constexpr(std::is_same_v<I, editor_gun_game_mode>) {
+			MULTIPROPERTY("Free for all", gun_game.free_for_all);
+
 			force_show_extra_ammo = true;
 			FACTION_EQUIPMENT_PROPERTY("Basic equipment", gun_game.basic_equipment);
 			force_show_extra_ammo = false;

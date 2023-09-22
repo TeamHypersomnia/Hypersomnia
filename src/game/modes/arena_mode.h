@@ -30,7 +30,9 @@ struct arena_mode_ruleset {
 	using mode_type = arena_mode;
 
 	// GEN INTROSPECTOR struct arena_mode_ruleset
-	std::vector<entity_name_str> bot_names;
+	bool free_for_all = false;
+
+	std::vector<client_nickname_type> bot_names;
 	std::vector<rgba> player_colors;
 
 	rgba excess_player_color = orange;
@@ -45,7 +47,7 @@ struct arena_mode_ruleset {
 	uint32_t allow_spawn_for_secs_after_starting = 10;
 	uint32_t max_players_per_team = 32;
 	uint32_t round_secs = 120;
-	uint32_t round_end_secs = 5;
+	real32 round_end_secs = 5;
 	uint32_t freeze_secs = 10;
 	uint32_t buy_secs_after_freeze = 30;
 	uint32_t warmup_secs = 45;
@@ -91,6 +93,8 @@ struct arena_mode_ruleset {
 
 	bool has_economy() const;
 	bool has_bomb_mechanics() const { return bomb_flavour.is_set(); }
+
+	bool is_ffa() const;
 };
 
 struct arena_mode_faction_state {
@@ -142,7 +146,7 @@ struct arena_mode_player {
 	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
-	arena_mode_player(const entity_name_str& nickname = {}) {
+	arena_mode_player(const client_nickname_type& nickname = {}) {
 		session.nickname = nickname;
 	}
 
@@ -311,7 +315,9 @@ private:
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS);
 	void setup_round(input, logic_step, const round_transferred_players& = {});
-	void reshuffle_spawns(const cosmos&, faction_type);
+	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
+
+	void fill_spawns(const cosmos&, faction_type, arena_mode_faction_state& out);
 
 	void set_players_frozen(input in, bool flag);
 	void release_triggers_of_weapons_of_players(input in);
@@ -364,7 +370,7 @@ private:
 	bool add_player_custom(input, const add_player_input&);
 
 	void remove_player(input, logic_step, const mode_player_id&);
-	mode_player_id add_player(input, const entity_name_str& nickname);
+	mode_player_id add_player(input, const client_nickname_type& nickname);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
 	faction_choice_result choose_faction(const_input, const mode_player_id&, const faction_type faction);
@@ -385,6 +391,9 @@ private:
 	arena_mode_state state = arena_mode_state::INIT;
 
 	per_actual_faction<arena_mode_faction_state> factions;
+	arena_mode_faction_state ffa_faction;
+	uint8_t spawn_reshuffle_counter = 0;
+
 	std::map<mode_player_id, player_type> players;
 	arena_mode_round_state current_round;
 
@@ -400,6 +409,7 @@ private:
 	uint32_t scramble_counter = 0;
 	uint32_t prepare_to_fight_counter = 0;
 
+	client_nickname_type victorious_player_nickname = {};
 	mode_player_id duellist_1 = mode_player_id::dead();
 	mode_player_id duellist_2 = mode_player_id::dead();
 
@@ -452,9 +462,9 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	player_type* find_player_by(const entity_name_str& nickname);
+	player_type* find_player_by(const client_nickname_type& nickname);
 	player_type* find(const mode_player_id&);
-	const player_type* find_player_by(const entity_name_str& nickname) const;
+	const player_type* find_player_by(const client_nickname_type& nickname) const;
 	const player_type* find(const mode_player_id&) const;
 
 	const player_type* find(const session_id_type&) const;
@@ -587,6 +597,7 @@ public:
 
 	bool is_a_duellist(const mode_player_id&) const;
 	mode_player_id get_opponent_duellist(const mode_player_id&) const;
+	client_nickname_type get_victorious_player_nickname() const;
 	void clear_duel();
 
 	void handle_duel_desertion(input, logic_step, const mode_player_id&);
@@ -597,4 +608,6 @@ public:
 	bool can_respawn_already() const;
 
 	bool levelling_enabled(const_input) const;
+
+	arena_mode_faction_state& get_spawns_for(input, faction_type faction);
 };

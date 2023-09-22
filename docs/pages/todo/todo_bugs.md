@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Write unit tests for constant size string just in case
+
 - It looks like the stuck udp transmissions were due to acks not going through because of too small sequence buffers for acked packets.
 	- We WON'T have this problem normally because we're otherwise always sending at a tickrate of 60.
 		- so the packets will go through.

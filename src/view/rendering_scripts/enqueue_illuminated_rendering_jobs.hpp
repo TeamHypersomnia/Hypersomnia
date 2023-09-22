@@ -146,7 +146,8 @@ void enqueue_illuminated_rendering_jobs(
 				character,
 				pre_step_crosshair_displacement,
 				interp,
-				considered_fov.angle
+				considered_fov.angle,
+				settings.teammates_are_enemies
 			);
 		};
 
@@ -521,7 +522,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	auto sentiences_job = [ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -555,7 +556,9 @@ void enqueue_illuminated_rendering_jobs(
 
 			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-					if (typed_handle.get_official_faction() == fow_faction) {
+					const bool is_local = typed_handle == fog_of_war_character;
+
+					if (is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
 						::specific_draw_entity(typed_handle, friendly_drawing_in);

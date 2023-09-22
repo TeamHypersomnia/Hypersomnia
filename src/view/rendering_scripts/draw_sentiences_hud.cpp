@@ -59,6 +59,14 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto circle_positioning_zoom = 1.0f;
 
 	auto viewer_faction_matches = [&](const auto f) {
+		if (f == watched_character) {
+			return true;
+		}
+
+		if (in.settings.teammates_are_enemies) {
+			return false;
+		}
+
 		if (!watched_character) {
 			return false;
 		}

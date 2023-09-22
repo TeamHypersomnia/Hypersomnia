@@ -56,6 +56,10 @@ struct test_mode_ruleset {
 	bool should_hide_details_when_spectating_enemies() const {
 		return true;
 	}
+
+	bool is_ffa() const {
+		return false;
+	}
 };
 
 struct test_mode_player_stats {

@@ -85,5 +85,7 @@ struct game_drawing_settings {
 	fog_of_war_settings fog_of_war;
 	fog_of_war_appearance_settings fog_of_war_appearance;
 	crosshair_drawing_settings crosshair;
+
+	bool teammates_are_enemies = false;
 	// END GEN INTROSPECTOR
 };

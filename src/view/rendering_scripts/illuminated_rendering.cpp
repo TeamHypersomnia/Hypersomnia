@@ -774,7 +774,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			character,
 			in.pre_step_crosshair_displacement,
 			interp,
-			considered_fov.angle
+			considered_fov.angle,
+			settings.teammates_are_enemies
 		);
 	};
 

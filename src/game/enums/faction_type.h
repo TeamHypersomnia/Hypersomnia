@@ -11,6 +11,7 @@ enum class faction_type {
 	RESISTANCE,
 
 	DEFAULT,
+	FFA,
 	COUNT
 	// END GEN INTROSPECTOR
 };

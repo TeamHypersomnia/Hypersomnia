@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2023-05-06 01:28:50.462132 UTC"
+        "version_timestamp": "2023-09-22 08:44:04.507470 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -12,11 +12,7 @@
         "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
-        "mode": "quick_test"
-    },
-    "game_modes": {
-        "bomb_defusal": {},
-        "quick_test": {}
+        "mode": "gun_game"
     },
     "external_resources": [
         {
@@ -2683,6 +2679,12 @@
             }
         },
         {
+            "path": "miniature.png",
+            "file_hash": "0bac59c94788e5ee96bece125acf334ea48c4ad39335841777e0168f2542786b",
+            "id": "@miniature",
+            "size": [361, 400]
+        },
+        {
             "path": "sfx/fan_ambience_left.ogg",
             "file_hash": "b3c204b20fd21a9f925abd8518a2e0b9d490127c8f532545c61a8c8cd454829d",
             "id": "@fan_ambience_left",
@@ -2747,6 +2749,110 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "ffa_spawn (49)",
+                "ffa_spawn (98)",
+                "ffa_spawn (44)",
+                "ffa_spawn (48)",
+                "ffa_spawn (47)",
+                "ffa_spawn (46)",
+                "ffa_spawn (45)",
+                "ffa_spawn (43)",
+                "ffa_spawn (42)",
+                "ffa_spawn (41)",
+                "ffa_spawn (40)",
+                "ffa_spawn (39)",
+                "ffa_spawn (38)",
+                "ffa_spawn (62)",
+                "ffa_spawn (78)",
+                "ffa_spawn (77)",
+                "ffa_spawn (76)",
+                "ffa_spawn (89)",
+                "ffa_spawn (88)",
+                "ffa_spawn (87)",
+                "ffa_spawn (86)",
+                "ffa_spawn (85)",
+                "ffa_spawn (84)",
+                "ffa_spawn (83)",
+                "ffa_spawn (82)",
+                "ffa_spawn (81)",
+                "ffa_spawn (80)",
+                "ffa_spawn (79)",
+                "ffa_spawn (75)",
+                "ffa_spawn (74)",
+                "ffa_spawn (73)",
+                "ffa_spawn (72)",
+                "ffa_spawn (71)",
+                "ffa_spawn (70)",
+                "ffa_spawn (69)",
+                "ffa_spawn (68)",
+                "ffa_spawn (67)",
+                "ffa_spawn (66)",
+                "ffa_spawn (65)",
+                "ffa_spawn (64)",
+                "ffa_spawn (63)",
+                "ffa_spawn (61)",
+                "ffa_spawn (60)",
+                "ffa_spawn (59)",
+                "ffa_spawn (58)",
+                "ffa_spawn (57)",
+                "ffa_spawn (56)",
+                "ffa_spawn (55)",
+                "ffa_spawn (54)",
+                "ffa_spawn (53)",
+                "ffa_spawn (52)",
+                "ffa_spawn (51)",
+                "ffa_spawn (50)",
+                "ffa_spawn (37)",
+                "ffa_spawn (36)",
+                "ffa_spawn (35)",
+                "ffa_spawn (34)",
+                "ffa_spawn (33)",
+                "ffa_spawn (32)",
+                "ffa_spawn (31)",
+                "ffa_spawn (30)",
+                "ffa_spawn (29)",
+                "ffa_spawn (28)",
+                "ffa_spawn (27)",
+                "ffa_spawn (26)",
+                "ffa_spawn (25)",
+                "ffa_spawn (24)",
+                "ffa_spawn (23)",
+                "ffa_spawn (22)",
+                "ffa_spawn (97)",
+                "ffa_spawn (96)",
+                "ffa_spawn (95)",
+                "ffa_spawn (21)",
+                "ffa_spawn (20)",
+                "ffa_spawn (19)",
+                "ffa_spawn (91)",
+                "ffa_spawn (92)",
+                "ffa_spawn (90)",
+                "ffa_spawn (18)",
+                "ffa_spawn (17)",
+                "ffa_spawn (16)",
+                "ffa_spawn (15)",
+                "ffa_spawn (14)",
+                "ffa_spawn (94)",
+                "ffa_spawn (93)",
+                "ffa_spawn (13)",
+                "ffa_spawn (12)",
+                "ffa_spawn (11)",
+                "ffa_spawn (10)",
+                "ffa_spawn (2)",
+                "ffa_spawn (9)",
+                "ffa_spawn (8)",
+                "ffa_spawn (7)",
+                "ffa_spawn (6)",
+                "ffa_spawn (5)",
+                "ffa_spawn (4)",
+                "ffa_spawn (3)",
+                "ffa_spawn (1)",
+                "ffa_spawn"
+            ]
+        },
         {
             "id": "New layer 2"
         },
@@ -16271,6 +16377,575 @@
             "faction": "METROPOLIS",
             "pos": [2810.0, -1779.0],
             "rotation": -360.0
+        },
+        {
+            "id": "ffa_spawn",
+            "type": "ffa_spawn",
+            "pos": [-3169.0, -2177.0]
+        },
+        {
+            "id": "ffa_spawn (1)",
+            "type": "ffa_spawn",
+            "pos": [-3089.0, -1953.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (2)",
+            "type": "ffa_spawn",
+            "pos": [-2993.0, -2415.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (3)",
+            "type": "ffa_spawn",
+            "pos": [-3105.0, -1249.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (4)",
+            "type": "ffa_spawn",
+            "pos": [-2401.0, -1249.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (5)",
+            "type": "ffa_spawn",
+            "pos": [-2161.0, -1249.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (6)",
+            "type": "ffa_spawn",
+            "pos": [-1537.0, -1055.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (7)",
+            "type": "ffa_spawn",
+            "pos": [-2257.0, -1089.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (8)",
+            "type": "ffa_spawn",
+            "pos": [-1553.0, -465.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (9)",
+            "type": "ffa_spawn",
+            "pos": [-3057.0, -481.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (10)",
+            "type": "ffa_spawn",
+            "pos": [-3057.0, -3457.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (11)",
+            "type": "ffa_spawn",
+            "pos": [-2065.0, -3457.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (12)",
+            "type": "ffa_spawn",
+            "pos": [-2097.0, -2545.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (13)",
+            "type": "ffa_spawn",
+            "pos": [-1729.0, -2785.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (14)",
+            "type": "ffa_spawn",
+            "pos": [-1729.0, -3489.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (15)",
+            "type": "ffa_spawn",
+            "pos": [-17.0, -3473.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (16)",
+            "type": "ffa_spawn",
+            "pos": [-161.0, -2431.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (17)",
+            "type": "ffa_spawn",
+            "pos": [-2097.0, -2257.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (18)",
+            "type": "ffa_spawn",
+            "pos": [-401.0, -1265.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (19)",
+            "type": "ffa_spawn",
+            "pos": [479.0, -1985.0]
+        },
+        {
+            "id": "ffa_spawn (20)",
+            "type": "ffa_spawn",
+            "pos": [705.0, -2273.0]
+        },
+        {
+            "id": "ffa_spawn (21)",
+            "type": "ffa_spawn",
+            "pos": [321.0, -2657.0]
+        },
+        {
+            "id": "ffa_spawn (22)",
+            "type": "ffa_spawn",
+            "pos": [321.0, -3505.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (23)",
+            "type": "ffa_spawn",
+            "pos": [511.0, -4177.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (24)",
+            "type": "ffa_spawn",
+            "pos": [799.0, -4001.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (25)",
+            "type": "ffa_spawn",
+            "pos": [833.0, -4801.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (26)",
+            "type": "ffa_spawn",
+            "pos": [-961.0, -4785.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (27)",
+            "type": "ffa_spawn",
+            "pos": [-1073.0, -4337.0]
+        },
+        {
+            "id": "ffa_spawn (28)",
+            "type": "ffa_spawn",
+            "pos": [-1089.0, -3713.0]
+        },
+        {
+            "id": "ffa_spawn (29)",
+            "type": "ffa_spawn",
+            "pos": [-1087.0, -4113.0]
+        },
+        {
+            "id": "ffa_spawn (30)",
+            "type": "ffa_spawn",
+            "pos": [-465.0, -3711.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (31)",
+            "type": "ffa_spawn",
+            "pos": [15.0, -1841.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (32)",
+            "type": "ffa_spawn",
+            "pos": [321.0, -1489.0]
+        },
+        {
+            "id": "ffa_spawn (33)",
+            "type": "ffa_spawn",
+            "pos": [767.0, -1409.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (34)",
+            "type": "ffa_spawn",
+            "pos": [1951.0, -705.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (35)",
+            "type": "ffa_spawn",
+            "pos": [2225.0, -977.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (36)",
+            "type": "ffa_spawn",
+            "pos": [2239.0, -1825.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (37)",
+            "type": "ffa_spawn",
+            "pos": [3023.0, -2033.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (38)",
+            "type": "ffa_spawn",
+            "pos": [2033.0, -2241.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (39)",
+            "type": "ffa_spawn",
+            "pos": [1265.0, -2753.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (40)",
+            "type": "ffa_spawn",
+            "pos": [1265.0, -3121.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (41)",
+            "type": "ffa_spawn",
+            "pos": [3583.0, -2593.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (42)",
+            "type": "ffa_spawn",
+            "pos": [3569.0, -1633.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (43)",
+            "type": "ffa_spawn",
+            "pos": [3855.0, -3985.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (44)",
+            "type": "ffa_spawn",
+            "pos": [2433.0, -3441.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (45)",
+            "type": "ffa_spawn",
+            "pos": [2897.0, -4897.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (46)",
+            "type": "ffa_spawn",
+            "pos": [2927.0, -3823.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (47)",
+            "type": "ffa_spawn",
+            "pos": [1153.0, -3825.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (48)",
+            "type": "ffa_spawn",
+            "pos": [1183.0, -4897.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (49)",
+            "type": "ffa_spawn",
+            "pos": [3329.0, -4225.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (50)",
+            "type": "ffa_spawn",
+            "pos": [2559.0, -1425.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (51)",
+            "type": "ffa_spawn",
+            "pos": [2191.0, -753.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (52)",
+            "type": "ffa_spawn",
+            "pos": [2801.0, -113.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (53)",
+            "type": "ffa_spawn",
+            "pos": [1665.0, -433.0]
+        },
+        {
+            "id": "ffa_spawn (54)",
+            "type": "ffa_spawn",
+            "pos": [1313.0, -17.0]
+        },
+        {
+            "id": "ffa_spawn (55)",
+            "type": "ffa_spawn",
+            "pos": [1537.0, 689.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (56)",
+            "type": "ffa_spawn",
+            "pos": [2047.0, 975.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (57)",
+            "type": "ffa_spawn",
+            "pos": [1873.0, 641.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (58)",
+            "type": "ffa_spawn",
+            "pos": [2849.0, 641.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (59)",
+            "type": "ffa_spawn",
+            "pos": [2367.0, 31.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (60)",
+            "type": "ffa_spawn",
+            "pos": [3311.0, 561.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (61)",
+            "type": "ffa_spawn",
+            "pos": [3215.0, 1519.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (62)",
+            "type": "ffa_spawn",
+            "pos": [3167.0, 1247.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (63)",
+            "type": "ffa_spawn",
+            "pos": [2593.0, 1519.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (64)",
+            "type": "ffa_spawn",
+            "pos": [3057.0, 1873.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (65)",
+            "type": "ffa_spawn",
+            "pos": [2991.0, 2367.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (66)",
+            "type": "ffa_spawn",
+            "pos": [2289.0, 2337.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (67)",
+            "type": "ffa_spawn",
+            "pos": [2111.0, 1537.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (68)",
+            "type": "ffa_spawn",
+            "pos": [1279.0, 3327.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (69)",
+            "type": "ffa_spawn",
+            "pos": [625.0, 3345.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (70)",
+            "type": "ffa_spawn",
+            "pos": [977.0, 2943.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (71)",
+            "type": "ffa_spawn",
+            "pos": [-111.0, 2785.0]
+        },
+        {
+            "id": "ffa_spawn (72)",
+            "type": "ffa_spawn",
+            "pos": [-113.0, 2129.0]
+        },
+        {
+            "id": "ffa_spawn (73)",
+            "type": "ffa_spawn",
+            "pos": [-289.0, 1521.0]
+        },
+        {
+            "id": "ffa_spawn (74)",
+            "type": "ffa_spawn",
+            "pos": [-273.0, 1231.0]
+        },
+        {
+            "id": "ffa_spawn (75)",
+            "type": "ffa_spawn",
+            "pos": [575.0, 929.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (76)",
+            "type": "ffa_spawn",
+            "pos": [879.0, 927.0]
+        },
+        {
+            "id": "ffa_spawn (77)",
+            "type": "ffa_spawn",
+            "pos": [1729.0, 943.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (78)",
+            "type": "ffa_spawn",
+            "pos": [879.0, 1505.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (79)",
+            "type": "ffa_spawn",
+            "pos": [-273.0, 575.0]
+        },
+        {
+            "id": "ffa_spawn (80)",
+            "type": "ffa_spawn",
+            "pos": [495.0, 591.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (81)",
+            "type": "ffa_spawn",
+            "pos": [-209.0, 273.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (82)",
+            "type": "ffa_spawn",
+            "pos": [-1137.0, -113.0]
+        },
+        {
+            "id": "ffa_spawn (83)",
+            "type": "ffa_spawn",
+            "pos": [-1167.0, -737.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ffa_spawn (84)",
+            "type": "ffa_spawn",
+            "pos": [-785.0, -401.0]
+        },
+        {
+            "id": "ffa_spawn (85)",
+            "type": "ffa_spawn",
+            "pos": [-769.0, 113.0]
+        },
+        {
+            "id": "ffa_spawn (86)",
+            "type": "ffa_spawn",
+            "pos": [97.0, -129.0]
+        },
+        {
+            "id": "ffa_spawn (87)",
+            "type": "ffa_spawn",
+            "pos": [831.0, -737.0]
+        },
+        {
+            "id": "ffa_spawn (88)",
+            "type": "ffa_spawn",
+            "pos": [975.0, -111.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (89)",
+            "type": "ffa_spawn",
+            "pos": [959.0, 607.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (90)",
+            "type": "ffa_spawn",
+            "pos": [-1281.0, -1729.0]
+        },
+        {
+            "id": "ffa_spawn (91)",
+            "type": "ffa_spawn",
+            "pos": [-881.0, -2193.0]
+        },
+        {
+            "id": "ffa_spawn (92)",
+            "type": "ffa_spawn",
+            "pos": [-1297.0, -1297.0]
+        },
+        {
+            "id": "ffa_spawn (93)",
+            "type": "ffa_spawn",
+            "pos": [-721.0, -3137.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (94)",
+            "type": "ffa_spawn",
+            "pos": [-1249.0, -3121.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "ffa_spawn (95)",
+            "type": "ffa_spawn",
+            "pos": [769.0, -3457.0]
+        },
+        {
+            "id": "ffa_spawn (96)",
+            "type": "ffa_spawn",
+            "pos": [1711.0, -3457.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (97)",
+            "type": "ffa_spawn",
+            "pos": [2383.0, -2897.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "ffa_spawn (98)",
+            "type": "ffa_spawn",
+            "pos": [3295.0, -3457.0],
+            "rotation": -90.0
         },
         {
             "id": "Servers (8)",

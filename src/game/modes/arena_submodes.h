@@ -18,6 +18,8 @@ struct bomb_defusal_rules {
 
 struct gun_game_rules {
 	// GEN INTROSPECTOR struct gun_game_rules
+	bool free_for_all = true;
+
 	per_actual_faction<requested_equipment> basic_eq;
 	per_actual_faction<requested_equipment> final_eq;
 

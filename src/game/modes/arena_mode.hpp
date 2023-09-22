@@ -6,7 +6,9 @@
 template <class F>
 void arena_mode::for_each_player_in(const faction_type faction, F&& callback) const {
 	for (auto& it : players) {
-		if (it.second.get_faction() == faction) {
+		const auto player_faction = it.second.get_faction();
+
+		if (player_faction == faction || (faction == faction_type::FFA && player_faction != faction_type::SPECTATOR)) {
 			if (continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
 				return;
 			}

@@ -6,6 +6,32 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- FFA
+    - Maybe just a simple flag in the ruleset?
+        - Yeah it's the least bloat
+        - We can control the name of the game mode anyway
+        - Note just because it forces a restart does not mean the flag can't be in the ruleset or has to be chosen alongside the mode
+            - There's plenty of flags changing of which would force a match's restart, even max rounds
+    - Remember to make sentiences of the same faction invisible outside of fow
+
+
+
+    - The flag has to be effectively transmitted through the network, as a byte
+        - Otherwise it'd have to be a separate mode which we don't want in case we want to apply FFA modifier to other modes (e.g. construction?)
+        - Then it needs to be passed with ruleset
+    - Modifier bitset?
+    - Actually maybe make it a separate mode?
+
+- Additional switches under mode selector (FF/FFA)
+    - Only FFA. Why?
+        - FFA is a switch that requires a match restart.
+        - E.g. ticking Friendly-Fire on/off does NOT require a match restart.
+            - Thus it should be somewhere else. Can be close but somewhere else.
+            - Some 'mode overrides' menu could be cool or just do it in the vars tab
+    
+- Editor: Show selection AABB and size somewhere
+- Throw grenades further when zooming out
+
 - Scripting will be tough so let's first do some high-prio high-dopamine stuff
     - FFA
     - Map cycling
@@ -18,10 +44,17 @@ summary: That which we are brainstorming at the moment.
         - We'll effectively have to disallow creating globals in the script
             - Unless there's an easy way to iterate over them in luau which would be the best
             - Yeah that would be perfect actually because the only other option would be some ugly calls to bindings to reserve a new "tracked" global variable
+        - Problem.. what about tables? It'd be nigh impossible to properly serialize them.
+            - But we can make it clear and still support simple global variables out of the box
+        - What if some of these vars involve audiovisual behaviors and we don't even want them serialized by default? Maybe it'd be better to make replicated vars explicit after all?
+            - We could have some preffixing system? Or a custom type like ReplicatedFloat? Hard to say
+            - How about using "local"/global semantics for this? So a "local x" global would NOT be replicated, but a classic global "x" would.
+        
 
 - Move blunaz to tools so it doesn't confuse people
 
 - make it clear you don't have to use mouse4/5 to advance through the level?
+    - Say "(Optional) "?
 
 - fix editor panning in windowed mode
 

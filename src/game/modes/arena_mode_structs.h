@@ -14,6 +14,7 @@
 #include "view/character_hud_type.h"
 #include "augs/misc/timing/speed_vars.h"
 #include "game/detail/inventory/requested_equipment.h"
+#include "augs/network/network_types.h"
 
 using mode_entity_id = entity_id;
 
@@ -42,7 +43,7 @@ enum class scoreboard_icon_type {
 
 struct arena_migrated_player {
 	// GEN INTROSPECTOR struct arena_migrated_player
-	entity_name_str nickname;
+	client_nickname_type nickname;
 	session_id_type id = session_id_type::dead();
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
@@ -84,7 +85,7 @@ struct arena_mode_win {
 struct knockout_participant {
 	// GEN INTROSPECTOR struct knockout_participant
 	mode_player_id id;
-	std::string name;
+	client_nickname_type name;
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 };

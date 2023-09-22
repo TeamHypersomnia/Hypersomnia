@@ -54,7 +54,7 @@ struct editor_bomb_defusal_mode {
 	uint32_t freeze_time = 10;
 	uint32_t buy_time = 30;
 	uint32_t round_time = 120;
-	uint32_t round_end_time = 5;
+	real32 round_end_time = 5.0f;
 
 	uint32_t respawn_after_ms = 0;
 	uint32_t spawn_protection_ms = 0;
@@ -79,6 +79,7 @@ struct editor_gun_game_mode {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_gun_game_mode
+	bool free_for_all = true;
 	uint32_t max_team_score = 2;
 
 	uint32_t warmup_time = 81;
@@ -87,7 +88,7 @@ struct editor_gun_game_mode {
 	uint32_t round_end_time = 5;
 
 	uint32_t respawn_after_ms = 1000;
-	uint32_t spawn_protection_ms = 3000;
+	uint32_t spawn_protection_ms = 1500;
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 
