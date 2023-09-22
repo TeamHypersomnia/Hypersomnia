@@ -28,6 +28,19 @@ The game will start with an **interactive Tutorial!**
 
 *Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 
+# Press
+
+<a href="https://news.ycombinator.com/item?id=36469297"> <img src="https://upload.wikimedia.org/wikipedia/en/b/bf/Hackernews_logo.png"> </a>
+
+<!-- *(270 votes, 40+ comments)* -->
+
+**[Open Source Friend](https://t.me/open_source_friend/2483)** <sub>(200 votes, 16.5k views)</sub>
+
+<!-- *(200 votes, 16.5k views)*  -->
+
+[ifun.de](https://www.ifun.de/hypersomnia-freier-multiplayer-shooter-fuer-mac-win-und-linux-212657/) | [GAMINGDEPUTY](https://www.gamingdeputy.com/hypersomnia-is-a-free-multiplayer-shooter-for-mac-win-and-linux/)
+
+
 # Watch gameplay
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/CHLPzZqANlM/0.jpg)](https://www.youtube.com/watch?v=CHLPzZqANlM "Video Title")
