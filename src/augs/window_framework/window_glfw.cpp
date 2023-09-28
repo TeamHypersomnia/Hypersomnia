@@ -275,7 +275,6 @@ namespace augs {
 			platform->last_mouse_pos = new_mouse_pos;
 
 			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
-				LOG_NVPS(dt.x, dt.y);
 				auto ch = do_raw_motion({
 					static_cast<short>(dt.x),
 					static_cast<short>(dt.y) 
@@ -476,7 +475,6 @@ namespace augs {
 	}
 
 	bool window::set_cursor_clipping_impl(bool clip) {
-		LOG_NVPS(clip);
 		glfwSetInputMode(platform->window, GLFW_CURSOR, clip ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 		return true;
 	}

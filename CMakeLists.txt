@@ -1603,12 +1603,16 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(USE_GLFW)
 		message("Linking GLFW statically.")
 
-		set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/glfw")
-		set(GLFW_HINTS "${GLFW_ROOT}/lib-macos")
-
 		prefer_static_libraries()
 
-		find_library(GLFW NAMES glfw3 HINTS ${GLFW_HINTS})
+		if(APPLE)
+			set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/glfw")
+			set(GLFW_HINTS "${GLFW_ROOT}/lib-macos")
+			find_library(GLFW NAMES glfw3 HINTS ${GLFW_HINTS})
+		else()
+			find_library(GLFW NAMES glfw glfw3)
+		endif()
+
 		list(APPEND HYPERSOMNIA_LIBS ${GLFW})
 		message("FOUND GLFW LIB: ${GLFW}")
 
