@@ -1316,10 +1316,36 @@ void editor_setup::save() {
 	remove_last_saved_json();
 }
 
+#define JUST_INCREMENT_TIMESTAMP 0
+
+#if JUST_INCREMENT_TIMESTAMP
+#include "augs/string/typesafe_sscanf.h"
+#endif
+
 void editor_setup::save_project_file_as(const augs::path_type& path) {
 	LOG("Saving project file as: %x", path);
 
+#if JUST_INCREMENT_TIMESTAMP
+	{
+		int micros = 0;
+		auto str = project.meta.version_timestamp.operator std::string();
+		typesafe_sscanf(str, "2023-08-26 10:22:38.%x UTC", micros);
+		++micros;
+		ensure(micros < 1000000);
+		auto ms_s = std::to_string(micros);
+
+		while (ms_s.size() < 6) {
+			ms_s = "0" + ms_s;
+		}
+
+		auto pos = std::strlen("2023-08-26 10:22:38.");
+		auto new_stamp = str.substr(0, pos) + ms_s + " UTC";
+		project.meta.version_timestamp = new_stamp;
+		fdlskfjsdl
+	}
+#else
 	project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
+#endif
 
 	if (project.about.author.empty()) {
 		project.about.author = std::string(simulated_client.nickname);

@@ -224,9 +224,7 @@ namespace augs {
 			const auto extension = file_path.extension();
 
 			auto do_open_file = [&]() {
-				auto in = with_exceptions<std::ifstream>();
-				in.open(file_path, std::ios::in | std::ios::binary);
-				return in;
+				return open_binary_input_stream(file_path);
 			};
 
 			if (extension == ".png") {
@@ -358,8 +356,7 @@ namespace augs {
 	}
 
 	void image::from_binary_file(const path_type& path) try {
-		auto in = with_exceptions<std::ifstream>();
-		in.open(path, std::ios::in | std::ios::binary);
+		auto in = open_binary_input_stream(path);
 
 		auto magic_numbers = decltype(get_bin_file_magic_numbers())();
 

@@ -156,8 +156,7 @@ void client_setup::flush_demo_steps() {
 
 	future_flushed_demo = launch_async(
 		[&]() {
-			auto out = augs::with_exceptions<std::ofstream>();
-			out.open(recorded_demo_path, std::ios::out | std::ios::binary | std::ios::app);
+			auto out = augs::open_binary_output_stream_append(recorded_demo_path);
 
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;

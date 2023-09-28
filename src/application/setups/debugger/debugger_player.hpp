@@ -54,8 +54,7 @@ auto debugger_player::make_snapshotted_advance_input(const player_advance_input_
 			const auto paths = folder.get_paths();
 			const auto live_file_path = paths.entropies_live_file;
 
-			auto s = augs::with_exceptions<std::ofstream>();
-			s.open(live_file_path, std::ios::out | std::ios::binary | std::ios::app);
+			auto s = augs::open_binary_output_stream_append(live_file_path);
 
 			augs::write_bytes(s, current_step);
 			augs::write_bytes(s, existing_entropy);

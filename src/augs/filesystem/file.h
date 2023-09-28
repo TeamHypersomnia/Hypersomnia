@@ -17,6 +17,12 @@ namespace augs {
 		return stream;
 	}
 
+	inline auto open_binary_output_stream_append(const augs::path_type& path) {
+		auto s = with_exceptions<std::ofstream>();
+		s.open(path, std::ios::out | std::ios::binary | std::ios::app);
+		return s;
+	}
+
 	inline auto open_binary_output_stream(const augs::path_type& path) {
 		auto s = with_exceptions<std::ofstream>();
 		s.open(path, std::ios::out | std::ios::binary);

@@ -110,7 +110,7 @@ bool start_client_gui_state::perform(
 
 			if (!demo_path.empty() && demo_choice_result == D::SHOULD_ANALYZE) {
 				try {
-					auto t = augs::with_exceptions<std::ifstream>();
+					auto t = augs::open_binary_input_stream(demo_path);
 					t.open(demo_path);
 
 					augs::read_bytes(t, demo_meta);

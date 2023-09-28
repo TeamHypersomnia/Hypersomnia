@@ -62,7 +62,7 @@ public:
 					path_meta meta;
 
 					try {
-						auto t = augs::with_exceptions<std::ifstream>(full_path, std::ios::in | std::ios::binary);
+						auto t = augs::open_binary_input_stream(full_path);
 						decltype(demo_file_meta::server_name) name;
 						augs::read_bytes(t, name);
 
