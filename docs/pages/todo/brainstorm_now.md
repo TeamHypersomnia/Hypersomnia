@@ -6,6 +6,36 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Net stats not measured for some reason
+
+- Server administration
+    - Config organization
+        - Current system is not so bad
+            - How to make RCON changes persistent?
+                - config.lua could store it
+    - Auto-updating
+        - Broadcasting on-demand might be tempting but scheduled periodic checks will feel better/safer for people
+            - It will also allow for controllable server maintenance periods
+            - And def easier to implement
+        - Note the updates will already be distributed in time if we read the e.g. "2:30" as if it's in the local timezone
+    - Map-cycling
+        - A var so we don't yet have to make overriding rulesets for this
+            - A list of string pairs: { map, mode }, if mode is empty it means default
+            - Actually let's have them in a single string e.g. 
+                {
+                    "de_cyberaqua bomb_defusal",
+                    "fy_minilab gun_game",
+                    "de_silo"
+                }
+            - arena_and_mode_identifier
+            - shouldn't this be serialized as a block? along with all vars
+                - maybe let's send the entire server_vars as a block always so it's not a problem
+                - this struct can easily get big and doesn't need to be responsive at all
+        - Purely server-side state
+        - The only problem will be mispredicted delay, the clients will see beginning of the new round for a fraction of a second
+        
+
+
 - FFA
     - Maybe just a simple flag in the ruleset?
         - Yeah it's the least bloat

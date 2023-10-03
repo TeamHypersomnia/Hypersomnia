@@ -1480,6 +1480,8 @@ void server_setup::advance_clients_state() {
 			const auto rcon_level = get_rcon_level(client_id);
 
 			if (rcon_level >= rcon_level_type::BASIC) {
+				refresh_runtime_info_for_rcon();
+
 				server->send_payload(
 					client_id, 
 					game_channel_type::RELIABLE_MESSAGES, 
