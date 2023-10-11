@@ -139,7 +139,11 @@ void perform_rcon_gui(
 							LOG("Requesting the server to shut down");
 						}
 
-						if (do_command_button("Restart & update server", RS::RESTART)) {
+						if (do_command_button("Restart server", RS::RESTART)) {
+							LOG("Requesting the server to restart");
+						}
+
+						if (do_command_button("Check and apply updates now", RS::CHECK_FOR_UPDATES_NOW)) {
 							LOG("Requesting the server to restart");
 						}
 

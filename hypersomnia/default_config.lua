@@ -767,6 +767,9 @@ treat_as_music_sounds_longer_than_secs = 5,
     arena = "de_cyberaqua",
     game_mode = "",
 
+    daily_autoupdate = false,
+    daily_autoupdate_hour = "03:00",
+
     external_arena_files_provider = "https://hypersomnia.xyz/arenas",
     sync_all_external_arenas_on_startup = false,
 

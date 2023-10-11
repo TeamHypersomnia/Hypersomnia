@@ -266,6 +266,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			result->server.allow_nat_traversal = false;
 		}
 
+		if (params.daily_autoupdate) {
+			result->server.daily_autoupdate = true;
+		}
+
 		if (result->client.nickname.empty()) {
 			result->client.nickname = augs::get_user_name();
 		}
@@ -355,14 +359,14 @@ work_result work(const int argc, const char* const * const argv) try {
 	const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
 
 	auto last_update_result = self_update_result();
-	
-	if (params.only_check_update_availability_and_quit || (config.http_client.update_on_launch && !params.suppress_autoupdate)) {
-		/* 
-			TODO: SKIP UPDATING IF THERE ARE UNSAVED CHANGES IN EDITOR PROJECTS! 
-			This could potentially erase someone's work because of breaking changes to editor files' binary structure!
-		*/
 
+	const bool should_run_self_updater = 
+		params.update_once_now ||
+		params.only_check_update_availability_and_quit ||
+		(config.http_client.update_on_launch && !params.no_update_on_launch)
+	;
 
+	if (should_run_self_updater) {
 		using update_result = self_update_result_type;
 
 		LOG("Checking for updates");
@@ -371,6 +375,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			params.type == app_type::DEDICATED_SERVER
 			|| params.type == app_type::MASTERSERVER
 		;
+
+		LOG_NVPS(should_update_headless);
 
 		last_update_result = check_and_apply_updates(
 			params.appimage_path,
@@ -412,8 +418,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	}
 	else {
-		if (params.suppress_autoupdate) {
-			LOG("Skipping update check due to --no-update flag.");
+		if (params.no_update_on_launch) {
+			LOG("Skipping update check due to --no-update-on-launch flag.");
 		}
 		else {
 			LOG("Skipping update check due to update_on_launch = false.");
@@ -807,6 +813,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		auto& server = *server_ptr;
 
+		std::future<self_update_result> availability_check;
+
 		while (server.is_running()) {
 			const auto zoom = 1.f;
 
@@ -825,6 +833,47 @@ work_result work(const int argc, const char* const * const argv) try {
 				},
 				solver_callbacks()
 			);
+
+			if (server.should_check_for_updates_once()) {
+				LOG("Launching an async check for updates.");
+
+				auto config_http_client = config.http_client;
+
+				/* Give it a little longer, it's async anyway. */
+				config_http_client.update_connection_timeout_secs = 10;
+
+				const auto config_window = config.window;
+
+				availability_check = launch_async(
+					[&imgui_atlas_image, params, config_http_client, config_window]() {
+						const bool only_check_update_availability_and_quit = true;
+
+						return check_and_apply_updates(
+							params.appimage_path,
+							only_check_update_availability_and_quit,
+							*imgui_atlas_image,
+							config_http_client,
+							config_window,
+							true // should_update_headless
+						);
+					}
+				);
+			}
+
+			if (valid_and_is_ready(availability_check)) {
+				LOG("Finished the async check for updates.");
+
+				using update_result = self_update_result_type;
+
+				const auto result = availability_check.get();
+
+				if (result.type == update_result::UPDATE_AVAILABLE) {
+					return work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER;
+				}
+				else {
+					LOG("The dedicated server is up to date.");
+				}
+			}
 
 			server.sleep_until_next_tick();
 		}

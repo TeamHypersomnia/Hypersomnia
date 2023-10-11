@@ -5,7 +5,10 @@
 namespace augs {
 	template <unsigned const_count>
 	class constant_size_string {
+	public:
 		using array_type = std::array<char, const_count + 1>;
+	private:
+
 
 		unsigned len = 0;
 		array_type arr = {};

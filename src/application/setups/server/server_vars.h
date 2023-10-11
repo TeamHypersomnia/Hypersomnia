@@ -61,6 +61,9 @@ struct server_vars {
 	bool allow_direct_arena_file_downloads = true;
 	address_string_type external_arena_files_provider = "";
 
+	bool daily_autoupdate = false;
+	hour_and_minute_str daily_autoupdate_hour = "";
+
 	uint32_t send_heartbeat_to_server_list_once_every_secs = 10;
 	uint32_t resolve_server_list_address_once_every_secs = 60;
 

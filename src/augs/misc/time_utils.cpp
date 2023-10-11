@@ -177,15 +177,15 @@ std::string augs::date_time::how_long_ago_tell_seconds() const {
 	return format_how_long_ago(true, seconds_ago());
 }
 
-uint64_t augs::date_time::seconds_ago() const {
-	return static_cast<uint64_t>(std::difftime(std::time(nullptr), t));
+int64_t augs::date_time::seconds_ago() const {
+	return static_cast<int64_t>(std::difftime(std::time(nullptr), t));
 }
 
 double augs::date_time::secs_since_epoch() {
 	return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const uint64_t secs) {
+std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const int64_t secs) {
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;
 	const auto days = hrs / 24;
@@ -216,7 +216,7 @@ std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const 
 	return typesafe_sprintf("%x days ago", days);
 }
 
-std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, const uint64_t secs) {
+std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, const int64_t secs) {
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;
 	const auto days = hrs / 24;

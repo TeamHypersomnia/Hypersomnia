@@ -32,7 +32,10 @@ struct cmd_line_params {
 	bool no_router = false;
 
 	bool suppress_server_webhook = false;
-	bool suppress_autoupdate = false;
+
+	bool no_update_on_launch = false;
+	bool update_once_now = false;
+	bool daily_autoupdate = false;
 
 	std::optional<port_type> first_udp_command_port;
 	std::optional<port_type> server_list_port;
@@ -94,9 +97,6 @@ struct cmd_line_params {
 			else if (a == "--server") {
 				start_server = true;
 			}
-			else if (a == "--no-update") {
-				suppress_autoupdate = true;
-			}
 			else if (a == "--upgraded-successfully") {
 				upgraded_successfully = true;
 			}
@@ -105,6 +105,15 @@ struct cmd_line_params {
 			}
 			else if (a == "--no-router") {
 				no_router = true;
+			}
+			else if (a == "--no-update-on-launch") {
+				no_update_on_launch = true;
+			}
+			else if (a == "--daily-autoupdate") {
+				daily_autoupdate = true;
+			}
+			else if (a == "--update-once-now") {
+				update_once_now = true;
 			}
 			else if (a == "--suppress-server-webhook") {
 				suppress_server_webhook = true;

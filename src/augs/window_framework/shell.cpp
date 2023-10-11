@@ -95,6 +95,18 @@ namespace augs {
 		for (int i = 1; i < previous_argc; ++i) {
 			const auto arg = std::string(previous_argv[i]);
 
+			if (
+				arg == "--upgraded-successfully" || 
+				arg == "--update-once-now"
+			) {
+				/* 
+					Do not propagate flags meant to be passed 
+					for only a single launch. 
+				*/
+
+				continue;
+			}
+
 			if (is_appimage) {
 				/* 
 					Prevent duplicating the flags given by the AppImage run script. 

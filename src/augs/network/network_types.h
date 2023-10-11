@@ -39,6 +39,7 @@ using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
+using hour_and_minute_str = augs::constant_size_string<5>;
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
 using version_timestamp_string = augs::constant_size_string<max_version_timestamp_length_v>;

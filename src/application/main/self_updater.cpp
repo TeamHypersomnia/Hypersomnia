@@ -595,16 +595,18 @@ self_update_result check_and_apply_updates(
 
 	auto advance_update_logic = [&]() {
 		const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-		auto loading_window = scoped_window("Loading in progress", nullptr, flags);
+		auto loading_window = cond_scoped_window(window.has_value(), "Loading in progress", nullptr, flags);
 
 		{
-			auto child = scoped_child("loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
+			auto child = cond_scoped_child(window.has_value(), "loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
 
-			print_new_version_available();
-			print_version_transition_info();
-			ImGui::Columns(2);
-			print_upstream();
-			ImGui::Columns(1);
+			if (window.has_value()) {
+				print_new_version_available();
+				print_version_transition_info();
+				ImGui::Columns(2);
+				print_upstream();
+				ImGui::Columns(1);
+			}
 
 			if (current_state == state::DOWNLOADING) {
 				if (valid_and_is_ready(future_response)) {
@@ -701,7 +703,9 @@ self_update_result check_and_apply_updates(
 					current_state = state::SAVING_ARCHIVE_TO_DISK;
 				}
 
-				print_download_progress_bar();
+				if (window.has_value()) {
+					print_download_progress_bar();
+				}
 			}
 			else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
 				if (valid_and_is_ready(completed_save)) {
@@ -782,7 +786,9 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
-				print_saving_progress();
+				if (window.has_value()) {
+					print_saving_progress();
+				}
 			}
 			else if (current_state == state::EXTRACTING) {
 				ensure(!is_appimage);
@@ -986,7 +992,9 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
-				print_extracting_progress();
+				if (window.has_value()) {
+					print_extracting_progress();
+				}
 			}
 			else if (current_state == state::MOVING_FILES_AROUND) {
 				if (valid_and_is_ready(completed_move)) {
@@ -1000,16 +1008,20 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
-				text("Moving files around...");
+				if (window.has_value()) {
+					text("Moving files around...");
+				}
 			}
 			else {
 				ensure(false && "Unknown state!");
 			}
 		}
 
-		if (current_state != state::MOVING_FILES_AROUND) {
-			if (do_cancel_button()) {
-				interrupt(R::CANCELLED);
+		if (window.has_value()) {
+			if (current_state != state::MOVING_FILES_AROUND) {
+				if (do_cancel_button()) {
+					interrupt(R::CANCELLED);
+				}
 			}
 		}
 	};
@@ -1060,15 +1072,16 @@ self_update_result check_and_apply_updates(
 			);
 
 			augs::imgui::pass_inputs(entropy);
+
+			ImGui::NewFrame();
+			center_next_window(vec2::square(1.f), ImGuiCond_Always);
 		}
 
-		ImGui::NewFrame();
-		center_next_window(vec2::square(1.f), ImGuiCond_Always);
-
 		advance_update_logic();
-		augs::imgui::render();
 
 		if (window.has_value()) {
+			augs::imgui::render();
+
 			renderer.clear_current_fbo();
 
 			ensure(imgui_atlas.has_value());
@@ -1105,9 +1118,8 @@ self_update_result check_and_apply_updates(
 			}
 
 			window->swap_buffers();
+			renderer.next_frame();
 		}
-
-		renderer.next_frame();
 	}
 
 	return result;

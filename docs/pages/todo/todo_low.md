@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- wrong nickname in duel of honor notifications? (Pythagoras1 vs Pythagoras)
+
 - crate caption
 - send heartbeats when state changes too
     - but dont skip sending heartbeats because the servers will disappear otherwise

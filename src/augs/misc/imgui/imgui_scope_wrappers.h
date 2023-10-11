@@ -50,6 +50,15 @@ namespace augs {
 		}
 		
 		template <class... T>
+		auto cond_scoped_child(const bool do_it, T&&... args) {
+			if (do_it) {
+				ImGui::BeginChild(std::forward<T>(args)...);
+			}
+
+			return scope_guard([do_it]() { if (do_it) { ImGui::EndChild(); } });
+		}
+
+		template <class... T>
 		auto scoped_window(T&&... args) {
 			const bool is_open = ImGui::Begin(std::forward<T>(args)...);
 			return window_scope(scope_guard([](){ ImGui::End(); }), is_open);

@@ -6,6 +6,7 @@ namespace rcon_commands {
 	enum class special : unsigned char {
 		SHUTDOWN,
 		RESTART,
+		CHECK_FOR_UPDATES_NOW,
 		REQUEST_RUNTIME_INFO,
 		DOWNLOAD_LOGS,
 

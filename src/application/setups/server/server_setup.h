@@ -148,6 +148,9 @@ class server_setup :
 	net_time_t when_last_resolved_server_list_addr = 0;
 	net_time_t when_last_resolved_internal_address = 0;
 
+	std::chrono::system_clock::time_point when_to_check_for_updates;
+	hour_and_minute_str when_to_check_for_updates_last_var;
+
 	std::vector<std::byte> heartbeat_buffer;
 	std::future<resolve_address_result> future_resolved_server_list_addr;
 	std::optional<netcode_address_t> resolved_server_list_addr;
@@ -192,9 +195,14 @@ class server_setup :
 	void push_duel_interrupted_webhook(const messages::duel_interrupted_message& summary);
 	std::string get_next_duel_pic_link();
 
+	void check_for_updates();
+	bool check_for_updates_once = false;
+
 public:
 	net_time_t last_logged_at = 0;
 	server_profiler profiler;
+
+	bool should_check_for_updates_once();
 private:
 	/* No server state follows later in code. */
 
@@ -368,6 +376,8 @@ public:
 			}
 
 			auto scope = measure_scope(profiler.step);
+
+			check_for_updates();
 
 			step_collected.clear();
 
@@ -646,6 +656,7 @@ public:
 	void log_match_start_json(const messages::team_match_start_message&);
 
 	void schedule_shutdown();
+	void schedule_restart();
 	void send_goodbye_to_masterserver();
 
 	void broadcast_shutdown_message();

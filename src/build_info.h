@@ -101,6 +101,8 @@ Options:
                                 Remember to set --no-router if you're hosting e.g. on a proper VPS without a router.
 	--no-router					Disables NAT traversal for incoming connections. NAT traversal is unnecessary if you forwarded the ports,
                                 plan to only play over LAN or have a proper server instance with a dedicated IP address, without a router.
+    --daily-autoupdates         Dedicated server only. Set this to apply updates when available, at a given hour every day - 03:00 (AM) by default.
+                                To change the hour, set the server.daily_autoupdate_hour variable in config.lua, e.g. to "19:30".
 
 If debugger_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one.)"

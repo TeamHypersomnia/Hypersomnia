@@ -1868,6 +1868,13 @@ void do_server_vars(
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 		revertable_input_text(SCOPE_CFG_NVP(server_name));
 
+		revertable_checkbox(SCOPE_CFG_NVP(daily_autoupdate));
+
+		if (scope_cfg.daily_autoupdate) {
+			auto scope = scoped_indent();
+			revertable_input_text(SCOPE_CFG_NVP(daily_autoupdate_hour));
+		}
+
 		revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
 
 		revertable_input_text(SCOPE_CFG_NVP(external_arena_files_provider));

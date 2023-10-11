@@ -1,3 +1,4 @@
+#include "augs/misc/time_utils.h"
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
@@ -1556,6 +1557,91 @@ void server_setup::advance_clients_state() {
 	}
 }
 
+static auto get_todays_time_at(const hour_and_minute_str& timeStr) {
+    std::tm tm{};
+    std::istringstream ss(timeStr);
+    ss >> std::get_time(&tm, "%H:%M");
+
+    // Get the current time
+    auto now = std::chrono::system_clock::now();
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm* now_tm = std::localtime(&now_time_t);
+
+    // Set the hours and minutes from timeStr
+    now_tm->tm_hour = tm.tm_hour;
+    now_tm->tm_min = tm.tm_min;
+	now_tm->tm_sec = 0;
+
+    auto time_t = std::mktime(now_tm);
+    return std::chrono::system_clock::from_time_t(time_t);
+}
+
+void server_setup::check_for_updates() {
+	if (is_integrated()) {
+		return;
+	}
+
+	if (!vars.daily_autoupdate) {
+		return;
+	}
+
+	const auto check_when = vars.daily_autoupdate_hour;
+
+	if (check_when.empty()) {
+		when_to_check_for_updates_last_var = "";
+		return;
+	}
+
+	const auto now = std::chrono::system_clock::now();
+
+	auto get_next_check_readable = [&]() {
+		return augs::date_time(when_to_check_for_updates).get_readable();
+	};
+
+	auto get_how_long_until_next_check = [&]() {
+		const auto diff = std::chrono::duration<double>(when_to_check_for_updates - now).count();
+
+		return augs::date_time::format_how_long_ago_brief(true, diff);
+	};
+
+	if (when_to_check_for_updates_last_var != check_when) {
+		when_to_check_for_updates_last_var = check_when;
+		when_to_check_for_updates = ::get_todays_time_at(check_when);
+
+		if (now >= when_to_check_for_updates) {
+			when_to_check_for_updates += std::chrono::hours(24);
+		}
+
+		LOG(
+			"Daily autoupdates enabled at: %x. Next check happening in %x (%x)",
+			check_when,
+			get_how_long_until_next_check(),
+			get_next_check_readable()
+		);
+	}
+
+	if (now >= when_to_check_for_updates) {
+		check_for_updates_once = true;
+		when_to_check_for_updates += std::chrono::hours(24);
+
+		LOG(
+			"Time to check for updates. Next check scheduled in: %x (%x)",
+			get_how_long_until_next_check(),
+			get_next_check_readable()
+		);
+	}
+}
+
+bool server_setup::should_check_for_updates_once() {
+	if (check_for_updates_once) {
+		check_for_updates_once = false;
+
+		return true;
+	}
+
+	return false;
+}
+
 void server_setup::broadcast_shutdown_message() {
 	server_broadcasted_chat message;
 	message.target = chat_target_type::SERVER_SHUTTING_DOWN;
@@ -1577,6 +1663,12 @@ void server_setup::schedule_shutdown() {
 
 	shutdown_scheduled = true;
 	broadcast_shutdown_message();
+}
+
+void server_setup::schedule_restart() {
+	schedule_shutdown();
+
+	request_restart_after_shutdown = true;
 }
 
 template <class P>
@@ -1606,7 +1698,14 @@ message_handler_result server_setup::handle_rcon_payload(
 			}
 		}
 
+		LOG("Performing a RCON command: %x", typed_payload);
+
 		switch (typed_payload) {
+			case special::CHECK_FOR_UPDATES_NOW:
+				check_for_updates_once = true;
+
+				return continue_v;
+
 			case special::SHUTDOWN: {
 				LOG("Shutting down due to rcon's request.");
 				schedule_shutdown();
@@ -1616,9 +1715,7 @@ message_handler_result server_setup::handle_rcon_payload(
 
 			case special::RESTART: {
 				LOG("Restarting the server due to rcon's request.");
-				schedule_shutdown();
-
-				request_restart_after_shutdown = true;
+				schedule_restart();
 
 				return continue_v;
 			}

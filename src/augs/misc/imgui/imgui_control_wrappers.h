@@ -89,7 +89,7 @@ namespace augs {
 
 		template <unsigned buffer_size, class... Args>
 		bool input_text(const std::string& label, constant_size_string<buffer_size>& value, Args&&... args) {
-			std::array<char, buffer_size> buf;
+			typename remove_cref<decltype(value)>::array_type buf;
 			return input_text(buf, label, value, std::forward<Args>(args)...);
 		}
 
