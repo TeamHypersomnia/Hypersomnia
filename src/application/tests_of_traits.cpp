@@ -68,6 +68,14 @@ using test_type_map = type_map<
 	type_pair<const int, std::string>
 >;
 
+using test_type_value_map = type_value_map<uint32_t,
+	static_cast<uint32_t>(-1),
+	type_uint32_pair<int, 2>,
+	type_uint32_pair<double, 10>,
+	type_uint32_pair<float, 5931>,
+	type_uint32_pair<const int, 0>
+>;
+
 void ftrait_test(int, double, char);
 
 struct ftrait {
@@ -152,6 +160,12 @@ struct tests_of_traits {
 	static_assert(same<test_type_map::at<double>, int>);
 	static_assert(same<test_type_map::at<float>, const char*>);
 	static_assert(same<test_type_map::at<const int>, std::string>);
+
+	static_assert(2 == test_type_value_map::at<int>);
+	static_assert(10 == test_type_value_map::at<double>);
+	static_assert(5931 == test_type_value_map::at<float>);
+	static_assert(0 == test_type_value_map::at<const int>);
+	static_assert(static_cast<uint32_t>(-1) == test_type_value_map::at<const double>);
 
 	static_assert(augs::is_byte_stream_v<augs::memory_stream>);
 	static_assert(augs::is_byte_stream_v<augs::cref_memory_stream>);

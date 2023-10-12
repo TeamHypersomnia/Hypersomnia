@@ -145,6 +145,9 @@ struct only_block_message : public yojimbo::BlockMessage {
 		return true;
 	}
 
+	template <typename T>
+	bool read_standard_block_message(T& output);
+
 	YOJIMBO_MESSAGE_BOILERPLATE();
 };
 
@@ -204,11 +207,12 @@ namespace net_messages {
 		bool read_payload(server_public_vars&);
 	};
 
-	struct new_server_vars : preserialized_message_type_for_t<server_vars> {
+	struct new_server_vars : only_block_message {
 		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
+		static constexpr bool client_to_server = true;
 
-		bool write_payload(const server_vars&);
+		template <class F>
+		bool write_payload(F block_allocator, const server_vars&);
 		bool read_payload(server_vars&);
 	};
 

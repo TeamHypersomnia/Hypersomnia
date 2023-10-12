@@ -1184,14 +1184,22 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	}
 
 	if (!arena_gui.scoreboard.show && rcon_gui.show) {
-		auto on_new_payload = [&](const auto& new_payload) {
-			rcon_command_variant payload;
-			payload = new_payload;
+		auto on_new_payload = [&]<typename P>(const P& new_payload) {
+			if constexpr(std::is_same_v<P, server_vars>) {
+				send_payload(
+					game_channel_type::RELIABLE_MESSAGES,
+					new_payload
+				);
+			}
+			else {
+				rcon_command_variant payload;
+				payload = new_payload;
 
-			send_payload(
-				game_channel_type::RELIABLE_MESSAGES,
-				payload
-			);
+				send_payload(
+					game_channel_type::RELIABLE_MESSAGES,
+					payload
+				);
+			}
 		};
 
 		const bool is_remote_server = true;

@@ -193,15 +193,6 @@ namespace net_messages {
 	}
 
 	template <class Stream>
-	bool serialize(Stream& s, server_vars& c) {
-		if (!unsafe_serialize(s, c)) {
-			return false;
-		}
-
-		return sanitization::arena_name_safe(c.arena);
-	}
-
-	template <class Stream>
 	bool serialize(Stream& s, server_runtime_info& c) {
 		if (!unsafe_serialize(s, c)) {
 			return false;

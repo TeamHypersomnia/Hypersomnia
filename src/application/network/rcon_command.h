@@ -17,6 +17,5 @@ namespace rcon_commands {
 using rcon_command_variant = std::variant<
 	std::monostate,
 	match_command,
-	rcon_commands::special,
-	server_vars
+	rcon_commands::special
 >;

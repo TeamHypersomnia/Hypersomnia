@@ -94,18 +94,25 @@ message_handler_result server_setup::handle_payload(
 		c.rebroadcast_public_settings = true;
 		c.last_keyboard_activity_time = server_time;
 	}
-	else if constexpr (std::is_same_v<T, rcon_command_variant>) {
+	else if constexpr (is_one_of_v<T, rcon_command_variant, server_vars>) {
 		const auto level = get_rcon_level(client_id);
 
 		LOG("Detected rcon level: %x", static_cast<int>(level));
 
 		if (level >= rcon_level_type::BASIC) {
-			const auto result = std::visit(
-				[&](const auto& typed_payload) {
-					return handle_rcon_payload(level, typed_payload);
-				},
-				payload
-			);
+			const auto result = [&]() {
+				if constexpr(std::is_same_v<T, server_vars>) {
+					return handle_rcon_payload(level, payload);
+				}
+				else {
+					return std::visit(
+						[&](const auto& typed_payload) {
+							return handle_rcon_payload(level, typed_payload);
+						},
+						payload
+					);
+				}
+			}();
 
 			if (result == abort_v) {
 				return result;

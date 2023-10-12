@@ -38,6 +38,40 @@ bool unsafe_write_message(
 	return true;
 }
 
+template <class F, class T>
+bool write_standard_block_message(
+	F block_allocator,
+	const T& input
+) {
+	augs::byte_counter_stream s;
+	augs::write_bytes(s, input);
+
+	auto block = block_allocator(s.size());
+	auto pts = augs::make_ptr_write_stream(reinterpret_cast<std::byte*>(block), s.size());
+
+	augs::write_bytes(pts, input);
+
+	return true;
+}
+
+template <typename T>
+bool only_block_message::read_standard_block_message(T& output) {
+	auto data = reinterpret_cast<const std::byte*>(GetBlockData());
+	auto size = static_cast<std::size_t>(GetBlockSize());
+
+	auto pts = augs::make_ptr_read_stream(data, size);
+
+	try {
+		augs::read_bytes(pts, output);
+	}
+	catch (const augs::stream_read_error& err) {
+		LOG("Failed to read %x: %x", get_type_name<T>(), err.what());
+		return false;
+	}
+
+	return true;
+}
+
 constexpr std::size_t max_server_step_size_v = 
 	max_message_size_v 
 	- yojimbo::ConservativeMessageHeaderBits / 8
@@ -47,22 +81,21 @@ namespace net_messages {
 	inline bool new_server_vars::read_payload(
 		server_vars& output
 	) {
-		// TODO SECURITY: don't blindly trust the server!!!
-		// TODO BANDWIDTH: optimize vars i/o
+		const auto result = read_standard_block_message(output);
 
-		try {
-			return unsafe_read_message(*this, output);
-		}
-		catch (const augs::stream_read_error& err) {
-			LOG_NVPS("Failed to read new_server_vars: %x", err.what());
+		if (!sanitization::arena_name_safe(output.arena)) {
 			return false;
 		}
+
+		return result;
 	}
 
+	template <class F>
 	inline bool new_server_vars::write_payload(
+		F block_allocator,
 		const server_vars& input
 	) {
-		return unsafe_write_message(*this, input);
+		return write_standard_block_message(block_allocator, input);
 	}
 
 	inline bool new_server_public_vars::read_payload(
@@ -91,34 +124,13 @@ namespace net_messages {
 		F block_allocator,
 		const server_runtime_info& input
 	) {
-		augs::byte_counter_stream s;
-		augs::write_bytes(s, input);
-
-		auto block = block_allocator(s.size());
-		auto pts = augs::make_ptr_write_stream(reinterpret_cast<std::byte*>(block), s.size());
-
-		augs::write_bytes(pts, input);
-
-		return true;
+		return write_standard_block_message(block_allocator, input);
 	}
 
 	inline bool new_server_runtime_info::read_payload(
 		server_runtime_info& output
 	) {
-		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
-		auto size = static_cast<std::size_t>(GetBlockSize());
-
-		auto pts = augs::make_ptr_read_stream(data, size);
-
-		try {
-			augs::read_bytes(pts, output);
-		}
-		catch (const augs::stream_read_error& err) {
-			LOG_NVPS("Failed to read new_server_runtime_info: %x", err.what());
-			return false;
-		}
-
-		return true;
+		return read_standard_block_message(output);
 	}
 
 	inline bool player_avatar_exchange::read_payload(

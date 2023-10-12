@@ -42,6 +42,16 @@ struct server_public_vars {
 	bool operator==(const server_public_vars&) const = default;
 };
 
+enum class arena_cycle_type {
+	// GEN INTROSPECTOR enum class arena_cycle_type
+	REPEAT_CURRENT,
+	LIST,
+	ALL_ON_DISK,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct server_vars {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -50,6 +60,10 @@ struct server_vars {
 	// GEN INTROSPECTOR struct server_vars
 	arena_identifier arena;
 	game_mode_name_type game_mode;
+
+	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
+	std::vector<arena_and_mode_identifier> cycle_list;
+	game_mode_name_type cycle_always_game_mode;
 
 	std::optional<arena_playtesting_context> playtesting_context;
 

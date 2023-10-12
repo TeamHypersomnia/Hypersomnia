@@ -767,6 +767,18 @@ treat_as_music_sounds_longer_than_secs = 5,
     arena = "de_cyberaqua",
     game_mode = "",
 
+    cycle = "REPEAT_CURRENT", -- | "LIST" | "ALL_ON_DISK"
+
+    cycle_list = {
+      "de_cyberaqua",
+      "fy_minilab bomb_defusal",
+      "de_silo"
+    }, -- just add "arena mode" or "arena" for the map-default mode.
+
+    -- Convenience var to override the game mode
+    -- for all maps on the list or on the disk.
+    cycle_always_game_mode = "",
+
     daily_autoupdate = false,
     daily_autoupdate_hour = "03:00",
 

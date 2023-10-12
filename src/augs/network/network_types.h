@@ -38,6 +38,7 @@ constexpr std::size_t max_address_string_length_v = 255;
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
+using arena_and_mode_identifier = augs::constant_size_string<max_arena_name_length_v + max_game_mode_name_length_v + 1>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
 using hour_and_minute_str = augs::constant_size_string<5>;
 

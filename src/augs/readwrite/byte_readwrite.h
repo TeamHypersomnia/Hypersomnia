@@ -20,6 +20,7 @@
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
+#include "augs/readwrite/sane_max_size.h"
 #include "augs/readwrite/stream_read_error.h"
 #include "augs/templates/resize_no_init.h"
 
@@ -330,6 +331,12 @@ namespace augs {
 			return;
 		}
 
+		if (s > sane_max_size_map::at<Container>) {
+			throw stream_read_error(
+				"Requested storage size is bigger than the sane max size!"
+			);
+		}
+
 		if (s > storage.max_size()) {
 			throw stream_read_error(
 				"Requested storage size is bigger than its max_size!"
@@ -376,6 +383,7 @@ namespace augs {
 	) {
 		const auto s = storage.size();
 		ensure(s <= std::numeric_limits<container_size_type>::max());
+		ensure(s <= sane_max_size_map::at<Container>);
 		write_bytes(ar, static_cast<container_size_type>(s));
 
 		if (s == 0) {
