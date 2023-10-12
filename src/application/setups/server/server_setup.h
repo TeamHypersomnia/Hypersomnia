@@ -197,12 +197,14 @@ class server_setup :
 
 	void check_for_updates();
 	bool check_for_updates_once = false;
+	bool write_vars_to_disk_once = false;
 
 public:
 	net_time_t last_logged_at = 0;
 	server_profiler profiler;
 
 	bool should_check_for_updates_once();
+	bool should_write_vars_to_disk_once();
 private:
 	/* No server state follows later in code. */
 
@@ -671,4 +673,8 @@ public:
 	void clean_unused_cached_files();
 
 	void apply_nonzoomedout_visible_world_area(vec2);
+
+	const server_vars& get_current_vars() const {
+		return vars;
+	}
 };

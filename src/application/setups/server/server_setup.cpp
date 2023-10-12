@@ -1035,6 +1035,8 @@ void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	vars = new_vars;
 
 	if (reload_arena) {
+		write_vars_to_disk_once = true;
+
 		try {
 			rechoose_arena();
 		}
@@ -1642,6 +1644,16 @@ bool server_setup::should_check_for_updates_once() {
 	return false;
 }
 
+bool server_setup::should_write_vars_to_disk_once() {
+	if (write_vars_to_disk_once) {
+		write_vars_to_disk_once = false;
+
+		return true;
+	}
+
+	return false;
+}
+
 void server_setup::broadcast_shutdown_message() {
 	server_broadcasted_chat message;
 	message.target = chat_target_type::SERVER_SHUTTING_DOWN;
@@ -1734,6 +1746,7 @@ message_handler_result server_setup::handle_rcon_payload(
 		LOG("New server vars from the client.");
 
 		apply(typed_payload);
+		write_vars_to_disk_once = true;
 
 		return continue_v;
 	}

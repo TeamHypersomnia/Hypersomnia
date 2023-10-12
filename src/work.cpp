@@ -815,6 +815,16 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		std::future<self_update_result> availability_check;
 
+		auto write_vars_to_disk = [&]() {
+			change_with_save([&](auto& cfg) {
+				cfg.server = server.get_current_vars();
+			});
+		};
+
+		auto save_config = augs::scope_guard([&]() {
+			write_vars_to_disk();
+		});
+
 		while (server.is_running()) {
 			const auto zoom = 1.f;
 
@@ -833,6 +843,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				},
 				solver_callbacks()
 			);
+
+			if (server.should_write_vars_to_disk_once()) {
+				write_vars_to_disk();
+			}
 
 			if (server.should_check_for_updates_once()) {
 				LOG("Launching an async check for updates.");
