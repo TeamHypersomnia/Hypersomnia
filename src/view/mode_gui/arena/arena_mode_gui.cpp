@@ -351,6 +351,47 @@ void arena_gui_state::draw_mode_gui(
 		);
 	};
 
+	auto draw_text_indicator_at = [&](const auto& val, const auto t) {
+		const auto s = in.screen_size;
+		auto general_drawer = get_drawer();
+
+		print_stroked(
+			general_drawer,
+			{ s.x / 2, static_cast<int>(t) },
+			val,
+			{ augs::ralign::CX }
+		);
+	};
+
+	auto colored = [&](const auto& text, const auto& c) {
+		using namespace augs::gui::text;
+		const auto text_style = style(
+			in.gui_fonts.gui,
+			c
+		);
+
+		return formatted_string(text, text_style);
+	};
+
+	const auto game_screen_top = mode_in.game_screen_top + 2;
+
+	auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
+		draw_text_indicator_at(colored(val, col), game_screen_top);
+	};
+
+	auto draw_time_left = [&](const auto& typed_mode) {
+		if (const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input)); time_left > 0.f) {
+			const auto c = std::ceil(time_left);
+			const auto col = time_left <= 10.f ? red : white;
+
+			draw_time_at_top(format_mins_secs(c), col);
+
+			return true;
+		}
+
+		return false;
+	};
+
 	if constexpr(std::is_same_v<M, test_mode>) {
 		/* Only draw scoreboard so that we know who's online */
 
@@ -364,6 +405,7 @@ void arena_gui_state::draw_mode_gui(
 
 		if (prediction.play_predictable) {
 			draw_context_tip();
+			draw_time_left(typed_mode);
 		}
 	}
 	else {
@@ -379,17 +421,6 @@ void arena_gui_state::draw_mode_gui(
 
 			return std::nullopt;
 		}();
-
-		const auto game_screen_top = mode_in.game_screen_top + 2;
-
-		auto colored = [&](const auto& text, const auto& c) {
-			const auto text_style = style(
-				in.gui_fonts.gui,
-				c
-			);
-
-			return formatted_string(text, text_style);
-		};
 
 		auto calc_size = [&](const auto& text) { 
 			return get_text_bbox(colored(text, white));;
@@ -1004,18 +1035,6 @@ void arena_gui_state::draw_mode_gui(
 			}
 		};
 
-		auto draw_text_indicator_at = [&](const auto& val, const auto t) {
-			const auto s = in.screen_size;
-			auto general_drawer = get_drawer();
-
-			print_stroked(
-				general_drawer,
-				{ s.x / 2, static_cast<int>(t) },
-				val,
-				{ augs::ralign::CX }
-			);
-		};
-
 		auto play_tick_if_soon = [&](const auto& val, const auto& when_ticking_starts, const bool alarm) {
 			auto play_tick = [&]() {
 				auto& vol = in.config.audio_volume;
@@ -1047,10 +1066,6 @@ void arena_gui_state::draw_mode_gui(
 			else {
 				last = std::nullopt;
 			}
-		};
-
-		auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
-			draw_text_indicator_at(colored(val, col), game_screen_top);
 		};
 
 		auto draw_info_indicator = [&](const auto& val) {
@@ -1220,12 +1235,7 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 
-			if (const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input)); time_left > 0.f) {
-				const auto c = std::ceil(time_left);
-				const auto col = time_left <= 10.f ? red : white;
-
-				draw_time_at_top(format_mins_secs(c), col);
-
+			if (draw_time_left(typed_mode)) {
 				return;
 			}
 		};

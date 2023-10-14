@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- test mode should allow changing teams instead of forcing spectators to nonspectators
+
 - wrong nickname in duel of honor notifications? (Pythagoras1 vs Pythagoras)
 
 - crate caption

@@ -84,7 +84,7 @@ struct editor_gun_game_mode {
 
 	uint32_t warmup_time = 81;
 	uint32_t freeze_time = 0;
-	uint32_t round_time = 60 * 20;
+	uint32_t round_time = 30 * 2 * 60;
 	uint32_t round_end_time = 5;
 
 	uint32_t respawn_after_ms = 1000;
@@ -117,6 +117,7 @@ struct editor_quick_test_mode {
 	// GEN INTROSPECTOR struct editor_quick_test_mode
 	per_actual_faction<editor_requested_equipment> equipment;
 	uint32_t respawn_time_ms = 1000;
+	uint32_t round_time = 120;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_quick_test_mode&) const = default;

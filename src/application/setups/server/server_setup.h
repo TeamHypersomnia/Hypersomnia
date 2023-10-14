@@ -92,12 +92,16 @@ class server_setup :
 
 	server_runtime_info runtime_info;
 
-	augs::path_type current_arena_folder;
-	augs::secure_hash_type current_arena_hash;
-
 	server_public_vars make_public_vars() const;
 
 	/* The rest is server-specific */
+	std::size_t arena_cycle_current_index = 0;
+	std::vector<std::size_t> shuffled_cycle_indices;
+	randomization cycle_rng = randomization::from_random_device();
+
+	augs::path_type current_arena_folder;
+	augs::secure_hash_type current_arena_hash;
+
 	sol::state& lua;
 	const packaged_official_content& official;
 
@@ -332,7 +336,7 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&);
-	void apply(const server_vars&, bool first_time = false);
+	bool apply(const server_vars&, bool first_time = false);
 	void apply(const server_private_vars&);
 
 	void try_apply(const public_client_settings& integrated_client_requested_settings);
@@ -677,4 +681,6 @@ public:
 	const server_vars& get_current_vars() const {
 		return vars;
 	}
+
+	bool is_playtesting_server() const;
 };

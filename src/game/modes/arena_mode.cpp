@@ -1785,6 +1785,26 @@ void arena_mode::process_win_conditions(const input_type in, const logic_step st
 			}
 		}
 	}
+	else {
+		if (get_round_seconds_left(in) <= 0.f) {
+			bool all_spectators = true;
+
+			for (const auto& it : players) {
+				const auto& p = it.second;
+
+				if (!p.is_bot && p.get_faction() != faction_type::SPECTATOR) {
+					all_spectators = false;
+				}
+			}
+
+			if (all_spectators) {
+				/* Gun game specific: Trigger map change after the round_time if nobody's playing. */
+				messages::match_summary_ended summary_ended;
+				summary_ended.is_final = true;
+				step.post_message(summary_ended);
+			}
+		}
+	}
 
 #if 0
 	auto process_subrules_conditions = [&](const S& subrules) {

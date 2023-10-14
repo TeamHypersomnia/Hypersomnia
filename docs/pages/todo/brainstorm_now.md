@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix uploading php version?
+
 - Less round time on small maps to increase tension on T side
     - e.g. on duel practice
     

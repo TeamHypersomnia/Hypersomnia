@@ -147,6 +147,9 @@ std::string cut_trailing_number_and_spaces(std::string&&);
 std::string cut_trailing_number(const std::string&);
 std::string cut_trailing_number_and_spaces(const std::string&);
 
+std::string get_first_word(const std::string&);
+std::string get_second_word(const std::string&);
+
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
 

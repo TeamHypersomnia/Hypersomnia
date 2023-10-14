@@ -307,14 +307,78 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		}
 	}
 
-	if (vars.shutdown_after_first_match) {
+	{
 		const auto& ends = step.get_queue<messages::match_summary_ended>();
+
+		bool any_ended = false;
 
 		for (const auto& ended : ends) {
 			request_immediate_heartbeat();
 
 			if (ended.is_final) {
-				schedule_shutdown();
+				if (vars.shutdown_after_first_match) {
+					schedule_shutdown();
+				}
+
+				any_ended = true;
+			}
+		}
+
+		auto choose_next_from = [&](const auto& list) {
+			if (list.empty()) {
+				return;
+			}
+
+			auto rebuild_indices = [&]() {
+				for (std::size_t l = 0; l < list.size(); ++l) {
+					shuffled_cycle_indices.push_back(l);
+				}
+
+				reverse_range(shuffled_cycle_indices);
+
+				if (vars.cycle_randomize_order) {
+					shuffle_range(shuffled_cycle_indices, cycle_rng);
+				}
+			};
+
+
+			for (std::size_t tries = 0; tries < list.size(); ++tries) {
+				if (shuffled_cycle_indices.empty() || shuffled_cycle_indices.back() >= list.size()) {
+					rebuild_indices();
+				}
+
+				const auto next_index = shuffled_cycle_indices.back();
+				shuffled_cycle_indices.pop_back();
+
+				const auto next_entry = list[next_index];
+
+				auto new_vars = vars;
+				new_vars.arena = ::get_first_word(next_entry);
+				new_vars.game_mode = ::get_second_word(next_entry);
+
+				if (!vars.cycle_always_game_mode.empty()) {
+					new_vars.game_mode = vars.cycle_always_game_mode;
+				}
+
+				if (apply(new_vars)) {
+					break;
+				}
+			}
+		};
+
+		if (any_ended && !is_playtesting_server()) {
+			switch (vars.cycle) {
+				case arena_cycle_type::REPEAT_CURRENT:
+					break;
+				case arena_cycle_type::LIST:
+					choose_next_from(vars.cycle_list);
+					break;
+				case arena_cycle_type::ALL_ON_DISK:
+					choose_next_from(runtime_info.arenas_on_disk);
+					break;
+
+				default:
+					break;
 			}
 		}
 	}
@@ -624,6 +688,10 @@ uint32_t server_setup::get_num_active_players() const {
 	);
 }
 
+bool server_setup::is_playtesting_server() const {
+	return vars.playtesting_context.has_value();
+}
+
 void server_setup::send_heartbeat_to_server_list() {
 	ensure(resolved_server_list_addr.has_value());
 
@@ -663,7 +731,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
-	heartbeat.is_editor_playtesting_server = vars.playtesting_context.has_value();
+	heartbeat.is_editor_playtesting_server = is_playtesting_server();
 
 	arena.on_mode_with_input(
 		[&heartbeat](const auto& mode, const auto&) {
@@ -1020,12 +1088,23 @@ void server_setup::rebroadcast_server_public_vars() {
 	for_each_id_and_client(broadcast_new_vars, only_connected_v);
 }
 
-void server_setup::apply(const server_vars& new_vars, const bool first_time) {
+bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	if (!first_time) {
 		if (new_vars == vars) {
-			return;
+			return false;
 		}
 	}
+
+	if (
+		vars.cycle_randomize_order != new_vars.cycle_randomize_order
+		|| vars.cycle != new_vars.cycle
+		|| vars.cycle_list != new_vars.cycle_list
+	
+	) {
+		shuffled_cycle_indices.clear();
+	}
+
+	bool chosen_next_area = false;
 
 	const auto previous_arena = vars.arena;
 
@@ -1039,6 +1118,7 @@ void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 
 		try {
 			rechoose_arena();
+			chosen_next_area = true;
 		}
 		catch (const augs::json_deserialization_error& err) {
 			LOG("Failed to load \"%x\":\n%x. Keeping the current arena.", vars.arena, err.what());
@@ -1089,6 +1169,8 @@ void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	if (first_time || last_broadcast_public_vars != new_public_vars) {
 		rebroadcast_server_public_vars();
 	}
+
+	return chosen_next_area;
 }
 
 void server_setup::broadcast_info(const std::string& text) {
@@ -2639,6 +2721,8 @@ void server_setup::refresh_runtime_info_for_rcon() {
 	add_from(OFFICIAL_ARENAS_DIR);
 	add_from(DOWNLOADED_ARENAS_DIR);
 	add_from(EDITOR_PROJECTS_DIR);
+
+	sort_range(out_entries, augs::natural_order);
 
 	auto broadcast_new_info_to_rcons = [&](const auto recipient_id, auto&) {
 		const auto rcon_level = get_rcon_level(recipient_id);

@@ -64,6 +64,7 @@ struct server_vars {
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;
 	game_mode_name_type cycle_always_game_mode;
+	bool cycle_randomize_order = false;
 
 	std::optional<arena_playtesting_context> playtesting_context;
 

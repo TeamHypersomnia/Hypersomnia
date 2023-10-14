@@ -9,6 +9,7 @@
 #include "game/messages/mode_notification.h"
 #include "augs/templates/logically_empty.h"
 #include "game/modes/detail/delete_with_held_items.hpp"
+#include "game/messages/hud_message.h"
 
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/cosmos/create_entity.hpp"
@@ -264,6 +265,14 @@ void test_mode::remove_old_lying_items(input_type in, logic_step) {
 }
 
 void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
+	if (in.rules.round_secs != 0) {
+		if (get_round_seconds_left(in) <= 0.0f) {
+			messages::match_summary_ended summary_ended;
+			summary_ended.is_final = true;
+			step.post_message(summary_ended);
+		}
+	}
+
 	add_or_remove_players(in, entropy, step);
 
 	auto& cosm = in.cosm;
@@ -365,6 +374,8 @@ arena_migrated_session test_mode::emigrate() const {
 void test_mode::migrate(const input_type in, const arena_migrated_session& session) {
 	ensure(players.empty());
 
+	bool f = false;
+
 	for (const auto& migrated_player : session.players) {
 		const auto mode_id = migrated_player.mode_id;
 		const auto& it = players.try_emplace(mode_id);
@@ -375,6 +386,11 @@ void test_mode::migrate(const input_type in, const arena_migrated_session& sessi
 
 		new_player.session = migrated_player.data;
 		new_player.session.faction = new_player.session.faction;
+
+		if (new_player.session.faction == faction_type::SPECTATOR) {
+			new_player.session.faction = f ? faction_type::METROPOLIS : faction_type::RESISTANCE;
+			f = !f;
+		}
 
 		create_controlled_character_for(in, mode_id);
 	}
@@ -477,4 +493,12 @@ bool test_mode_player::operator<(const test_mode_player& b) const {
 	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score(), 0 };
 
 	return ao < bo;
+}
+
+float test_mode::get_seconds_passed_in_cosmos(const const_input in) const {
+	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
+}
+
+float test_mode::get_round_seconds_left(const const_input in) const {
+	return static_cast<float>(in.rules.round_secs) - get_seconds_passed_in_cosmos(in);
 }

@@ -49,6 +49,7 @@ struct test_mode_ruleset {
 	real32 respawn_after_ms = 3000;
 	per_actual_faction<test_mode_faction_rules> factions;
 	test_mode_view_rules view;
+	uint32_t round_secs = 120;
 	// END GEN INTROSPECTOR
 
 	test_mode_ruleset();
@@ -155,6 +156,7 @@ public:
 	session_id_type next_session_id = session_id_type::first();
 	std::optional<arena_playtesting_context> playtesting_context;
 	entity_id infinite_ammo_for;
+	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
@@ -254,4 +256,7 @@ public:
 	const auto& get_players() const {
 		return players;
 	}
+
+	float get_seconds_passed_in_cosmos(const_input) const;
+	float get_round_seconds_left(const_input) const;
 };

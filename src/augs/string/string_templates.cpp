@@ -161,6 +161,24 @@ std::optional<unsigned long> get_trailing_number(const std::string& s) {
 	return std::nullopt;
 }
 
+std::string get_first_word(const std::string& arena_and_mode) {
+	try {
+		return arena_and_mode.substr(0, arena_and_mode.find(" "));
+	}
+	catch (const std::out_of_range&) {
+		return "";
+	}
+}
+
+std::string get_second_word(const std::string& arena_and_mode) {
+	try {
+		return get_first_word(arena_and_mode.substr(arena_and_mode.find_first_not_of(" ", arena_and_mode.find_first_of(" "))));
+	}
+	catch (const std::out_of_range&) {
+		return "";
+	}
+}
+
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
 
@@ -185,6 +203,29 @@ TEST_CASE("Getting type's name") {
 	REQUIRE("dummy" == get_type_name_strip_namespace<dummy_nmsp::dummy>());
 	REQUIRE("std::string" == get_type_name<std::string>());
 	REQUIRE("string" == get_type_name_strip_namespace<std::string>());
+
+	//REQUIRE("dummy_a<dummy_nmsp::dummy_b<int> >" == get_type_name_strip_namespace<dummy_nmsp::dummy_a<dummy_nmsp::dummy_b<int>>>());
+}
+
+TEST_CASE("first and second word") {
+	REQUIRE("de_cyberaqua" == get_first_word("de_cyberaqua   "));
+	REQUIRE("fy_minilab" == get_first_word("fy_minilab"));
+	REQUIRE("de_silo" == get_first_word("de_silo gun_game"));
+
+	REQUIRE("" == get_second_word("de_cyberaqua   "));
+	REQUIRE("" == get_second_word("fy_minilab"));
+	REQUIRE("gun_game" == get_second_word("de_silo gun_game"));
+	REQUIRE("gun_game" == get_second_word("de_silo gun_game     "));
+
+	REQUIRE("a" == get_first_word("a           b"));
+	REQUIRE("b" == get_second_word("a           b"));
+	REQUIRE("ab" == get_first_word("ab"));
+
+	REQUIRE("" == get_first_word(""));
+	REQUIRE("" == get_second_word(""));
+
+	REQUIRE("" == get_first_word("     "));
+	REQUIRE("" == get_second_word("           "));
 
 	//REQUIRE("dummy_a<dummy_nmsp::dummy_b<int> >" == get_type_name_strip_namespace<dummy_nmsp::dummy_a<dummy_nmsp::dummy_b<int>>>());
 }

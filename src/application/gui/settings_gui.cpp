@@ -1766,14 +1766,17 @@ void settings_gui_state::perform(
 #include "application/gui/config_nvp.h"
 #include "application/setups/editor/resources/editor_game_mode_resource.h"
 
+bool perform_game_mode_chooser(game_mode_name_type& current_arena, const std::string& caption = "Game mode");
+
 bool perform_game_mode_chooser(
-	game_mode_name_type& current_mode
+	game_mode_name_type& current_mode,
+	const std::string& caption
 ) {
 	const auto displayed_str = current_mode.empty() ? std::string("(Map default)") : std::string(current_mode);
 
 	bool chosen = false;
 
-	if (auto combo = augs::imgui::scoped_combo("Game mode", displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
+	if (auto combo = augs::imgui::scoped_combo(caption.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 		auto do_entry = [&](const std::string& value, const std::string& displayed_value) {
 			const bool is_current = value == current_mode;
 
@@ -1831,6 +1834,16 @@ void do_server_vars(
 
 	auto revert = make_revert_button_lambda(vars, last_saved_vars);
 
+	auto revertable_enum = [&](auto l, auto& f, auto&&... args) {
+		enum_combo(l, f, std::forward<decltype(args)>(args)...);
+		revert(f);
+	};
+
+	auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
+		checkbox(l, f, std::forward<decltype(args)>(args)...);
+		revert(f);
+	};
+
 	if (pane == rcon_pane::ARENAS) {
 		if (perform_arena_chooser(vars.arena, runtime_info)) {
 			vars.game_mode = "";
@@ -1840,6 +1853,85 @@ void do_server_vars(
 
 		perform_game_mode_chooser(vars.game_mode);
 		revert(vars.game_mode);
+
+		text("\n");
+
+		ImGui::Separator();
+		text_color("Cycle", yellow);
+		ImGui::Separator();
+
+		revertable_enum("Cycle type", vars.cycle);
+
+		if (vars.cycle == arena_cycle_type::LIST || vars.cycle == arena_cycle_type::ALL_ON_DISK) {
+			text("Force a specific game mode when cycling");
+			ImGui::SameLine();
+			perform_game_mode_chooser(vars.cycle_always_game_mode, "##ForceChooser");
+
+			revert(vars.cycle_always_game_mode);
+
+			revertable_checkbox("Randomize order", vars.cycle_randomize_order);
+		}
+
+		if (vars.cycle == arena_cycle_type::LIST) {
+			ImGui::Separator();
+			text_color("Cycle arena list", yellow);
+			ImGui::Separator();
+
+			std::optional<std::size_t> to_remove;
+
+			if (ImGui::Button("Add arena to list")) {
+				vars.cycle_list.push_back("de_cyberaqua");
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clear list")) {
+				vars.cycle_list.clear();
+			}
+
+			for (std::size_t i = 0; i < vars.cycle_list.size(); ++i) {
+				auto scope = scoped_id(i);
+
+				auto& entry = vars.cycle_list[i];
+
+				if (ImGui::Button("-")) {
+					to_remove = i;
+				}
+
+				ImGui::SameLine();
+
+				bool modified = false;
+
+				auto arena = arena_identifier(::get_first_word(entry));
+				auto mode = game_mode_name_type(::get_second_word(entry));
+
+				if (perform_arena_chooser(arena, runtime_info)) {
+					mode = "";
+
+					modified = true;
+				}
+
+				ImGui::SameLine();
+
+				if (perform_game_mode_chooser(mode)) {
+					modified = true;
+				}
+
+				if (modified) {
+					if (mode.empty()) {
+						entry = arena.operator std::string();
+					}
+					else {
+						entry = typesafe_sprintf("%x %x", arena, mode);
+					}
+				}
+			}
+
+			if (to_remove.has_value()) {
+				vars.cycle_list.erase(vars.cycle_list.begin() + *to_remove);
+			}
+		}
+
 	}
 	else if (pane == rcon_pane::VARS) {
 		int field_id = 999998;

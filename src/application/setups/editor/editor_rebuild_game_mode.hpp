@@ -222,6 +222,7 @@ auto setup_ruleset_from_editor_mode(
 			auto rules = typename T::ruleset_type();
 
 			rules.respawn_after_ms = vars.respawn_time_ms;
+			rules.round_secs = vars.round_time;
 
 			::for_each_faction(
 				[&](const faction_type f) {

@@ -17,7 +17,7 @@ bool perform_arena_chooser(
 	const server_runtime_info* info = nullptr
 );
 
-bool perform_game_mode_chooser(game_mode_name_type& current_arena);
+bool perform_game_mode_chooser(game_mode_name_type& current_arena, const std::string& caption = "Game mode");
 
 bool start_server_gui_state::perform(
 	server_start_input& into,
