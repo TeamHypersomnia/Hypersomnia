@@ -769,11 +769,13 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     cycle = "REPEAT_CURRENT", -- | "LIST" | "ALL_ON_DISK"
 
+    -- Just add "arena mode" or "arena" for the map-default mode.
+    -- "mode" can be bomb_defusal, gun_game or quick_test.
     cycle_list = {
       "de_cyberaqua",
       "fy_minilab bomb_defusal",
       "de_silo"
-    }, -- just add "arena mode" or "arena" for the map-default mode.
+    }, 
 
     -- Convenience var to override the game mode
     -- for all maps on the list or on the disk.
