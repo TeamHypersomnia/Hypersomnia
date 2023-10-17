@@ -42,7 +42,7 @@ return {
   masterserver = {
 	ip = "0.0.0.0",
 	suppress_community_server_webhooks_after_launch_for_secs = 20,
-	server_entry_timeout_secs = 60,
+	server_entry_timeout_secs = 65,
 
 	first_udp_command_port = 8430,
 	num_udp_command_ports = 30,

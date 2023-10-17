@@ -6555,3 +6555,27 @@ This will discard your redo history."
 - Show the error in client setupinstead of waiting to press Abort
     - try it out on moxvalix server
 
+        
+
+
+- FFA
+    - Maybe just a simple flag in the ruleset?
+        - Yeah it's the least bloat
+        - We can control the name of the game mode anyway
+        - Note just because it forces a restart does not mean the flag can't be in the ruleset or has to be chosen alongside the mode
+            - There's plenty of flags changing of which would force a match's restart, even max rounds
+    - Remember to make sentiences of the same faction invisible outside of fow
+- Additional switches under mode selector (FF/FFA)
+    - Only FFA. Why?
+        - FFA is a switch that requires a match restart.
+        - E.g. ticking Friendly-Fire on/off does NOT require a match restart.
+            - Thus it should be somewhere else. Can be close but somewhere else.
+            - Some 'mode overrides' menu could be cool or just do it in the vars tab
+    
+
+- Scripting will be tough so let's first do some high-prio high-dopamine stuff
+    - FFA
+    - Map cycling
+        - Could actually be a server-side script although we'd rather such a basic functionality be built-in
+- Move blunaz to tools so it doesn't confuse people
+

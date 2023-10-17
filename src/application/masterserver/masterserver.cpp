@@ -26,6 +26,7 @@
 #include "application/masterserver/server_list_entry_json.h"
 #include "3rdparty/rapidjson/include/rapidjson/prettywriter.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/network/netcode_utils.h"
 
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
@@ -356,8 +357,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		LOG("The HTTP listening thread has quit.");
 	});
 
-	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
-
 	struct webhook_job {
 		std::unique_ptr<std::future<std::string>> job;
 	};
@@ -506,19 +505,15 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 		finalize_webhook_jobs();
 
-		auto process_socket_messages = [&](auto& socket) {
-			netcode_address_t from;
-			const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
-
-			if (packet_bytes < 1) {
-				return;
-			}
-
+		auto process_socket_messages = [&](
+			netcode_socket_t socket,
+			const netcode_address_t from,
+			const uint8_t* const packet_buffer,
+			const int packet_bytes
+		) {
 			if (is_banned_server(from)) {
 				return;
 			}
-
-			MSR_LOG("Received packet bytes: %x", packet_bytes);
 
 			try {
 				auto send_to_with_socket = [&](auto which_socket, auto to, const auto& typed_response) {
@@ -579,7 +574,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 								}
 							}
 
-							MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
+							MSR_LOG("Packet (%x bytes) from %x. New: %x. Heartbeat changed: %x.", packet_bytes, ::ToString(from), is_new_server, heartbeats_mismatch);
 
 							if (is_new_server || heartbeats_mismatch) {
 								reserialize_list();
@@ -681,7 +676,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		};
 
 		for (auto& s : udp_command_sockets) {
-			process_socket_messages(s.socket);
+			::receive_netcode_packets<true>(s.socket, process_socket_messages);
 		}
 
 		const auto timeout_secs = settings.server_entry_timeout_secs;

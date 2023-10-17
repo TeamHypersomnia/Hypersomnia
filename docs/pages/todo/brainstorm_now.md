@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix uploading php version?
-
 - Less round time on small maps to increase tension on T side
     - e.g. on duel practice
     
@@ -38,17 +36,6 @@ summary: That which we are brainstorming at the moment.
                 - this struct can easily get big and doesn't need to be responsive at all
         - Purely server-side state
         - The only problem will be mispredicted delay, the clients will see beginning of the new round for a fraction of a second
-        
-
-
-- FFA
-    - Maybe just a simple flag in the ruleset?
-        - Yeah it's the least bloat
-        - We can control the name of the game mode anyway
-        - Note just because it forces a restart does not mean the flag can't be in the ruleset or has to be chosen alongside the mode
-            - There's plenty of flags changing of which would force a match's restart, even max rounds
-    - Remember to make sentiences of the same faction invisible outside of fow
-
 
 
     - The flag has to be effectively transmitted through the network, as a byte
@@ -57,22 +44,8 @@ summary: That which we are brainstorming at the moment.
     - Modifier bitset?
     - Actually maybe make it a separate mode?
 
-- Additional switches under mode selector (FF/FFA)
-    - Only FFA. Why?
-        - FFA is a switch that requires a match restart.
-        - E.g. ticking Friendly-Fire on/off does NOT require a match restart.
-            - Thus it should be somewhere else. Can be close but somewhere else.
-            - Some 'mode overrides' menu could be cool or just do it in the vars tab
-    
 - Editor: Show selection AABB and size somewhere
 - Throw grenades further when zooming out
-
-- Scripting will be tough so let's first do some high-prio high-dopamine stuff
-    - FFA
-    - Map cycling
-        - Could actually be a server-side script although we'd rather such a basic functionality be built-in
-    - Simple server-sided scripting
-        - To just get our hands dirty with the whole concept; here we won't have to worry about security etc
 
 - Scripting proper: Client-side
     - Problem: Synchronizing global script state like the solvable, e.g. upon incoming connection
@@ -85,12 +58,6 @@ summary: That which we are brainstorming at the moment.
             - We could have some preffixing system? Or a custom type like ReplicatedFloat? Hard to say
             - How about using "local"/global semantics for this? So a "local x" global would NOT be replicated, but a classic global "x" would.
         
-
-- Move blunaz to tools so it doesn't confuse people
-
-- make it clear you don't have to use mouse4/5 to advance through the level?
-    - Say "(Optional) "?
-
 - fix editor panning in windowed mode
 
 - watch out when including cpp-httplib as it takes a lot to compile

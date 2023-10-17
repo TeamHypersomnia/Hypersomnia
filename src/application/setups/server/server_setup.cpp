@@ -883,7 +883,7 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 	}
 
 	const auto since_last = server_time - when_last;
-	const auto send_every = vars.send_heartbeat_to_server_list_once_every_secs;
+	const auto send_every = std::clamp(vars.send_heartbeat_to_server_list_once_every_secs, 1u, 60u);
 
 	const bool send_for_the_first_time = !has_sent_any_heartbeats();
 
