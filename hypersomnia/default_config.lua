@@ -798,7 +798,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 
     send_heartbeat_to_server_list_once_every_secs = 10,
-    resolve_server_list_address_once_every_secs = 60,
+    resolve_server_list_address_once_every_secs = 3600,
     sleep_mult = 0.1,
     log_performance_once_every_secs = 0,
 
