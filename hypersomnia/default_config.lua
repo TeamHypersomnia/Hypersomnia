@@ -335,7 +335,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     autosave = {
       enabled = true,
       once_every_min = 2,
-      if_loaded_autosave_show = "AUTOSAVE",
+      if_loaded_autosave_show = "AUTOSAVED_VERSION",
       alert_when_loaded_autosave = true
     },
 

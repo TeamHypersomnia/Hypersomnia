@@ -1181,7 +1181,9 @@ bool server_details_gui_state::perform(
 	const bool censor_ips = false;
 #endif
 
-	if (censor_ips) {
+	checkbox("Show IPs", show_ips);
+
+	if (censor_ips && !show_ips) {
 		if (ImGui::Button("Copy External IP address to clipboard")) {
 			ImGui::SetClipboardText(external_address.c_str());
 		}
@@ -1197,6 +1199,7 @@ bool server_details_gui_state::perform(
 
 	auto name = heartbeat.server_name;
 	auto arena = heartbeat.current_arena;
+	auto version = heartbeat.server_version;
 
 	if (streamer_mode && entry.is_community_server) {
 		name = "Community server";
@@ -1215,6 +1218,8 @@ bool server_details_gui_state::perform(
 	if (heartbeat.nat.type != nat_type::PUBLIC_INTERNET) {
 		input_text("Port delta", delta, ImGuiInputTextFlags_ReadOnly);
 	}
+
+	input_text("Server version", version, ImGuiInputTextFlags_ReadOnly);
 
 	perform_online_players(entry, faction_view, streamer_mode);
 	return false;

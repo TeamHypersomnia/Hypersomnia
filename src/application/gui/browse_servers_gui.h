@@ -66,6 +66,8 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 	using base = standard_window_mixin<server_details_gui_state>;
 	using base::base;
 
+	bool show_ips = false;
+
 	bool perform(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
 	void perform_online_players(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
 };
