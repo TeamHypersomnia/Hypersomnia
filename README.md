@@ -30,6 +30,8 @@ The game will start with an **interactive Tutorial!**
 
 # Press
 
+<a href="https://pubhtml5.com/mxdt/dbwn/Linux_USA_10.2023_downmagaz.net/89"> <img src="https://upload.wikimedia.org/wikipedia/en/0/05/Linux_Magazine_international_logo.png" alt="Issue 275, page 89"> </a>
+
 <a href="https://news.ycombinator.com/item?id=36469297"> <img src="https://upload.wikimedia.org/wikipedia/en/b/bf/Hackernews_logo.png"> </a>
 
 <!-- *(270 votes, 40+ comments)* -->
