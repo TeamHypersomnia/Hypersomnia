@@ -84,8 +84,8 @@ return {
 
   app_controls = {
     F1 = "SHOW_PERFORMANCE",
-    F9 = "TOGGLE_STREAMER_MODE",
-    F10 = "TOGGLE_CINEMATIC_MODE",
+    --F9 = "TOGGLE_STREAMER_MODE",
+    --F10 = "TOGGLE_CINEMATIC_MODE",
     F12 = "SHOW_LOGS"
   },
 

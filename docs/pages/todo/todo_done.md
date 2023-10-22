@@ -6578,4 +6578,7 @@ This will discard your redo history."
     - Map cycling
         - Could actually be a server-side script although we'd rather such a basic functionality be built-in
 - Move blunaz to tools so it doesn't confuse people
+- change f10+ bindings TOGGLE_STREAMER_MODE etc because they'll be accidentally hit
+    - i'd unassign them
 
+- internal addresses are fucked up again, no port shown and doesnt detect it

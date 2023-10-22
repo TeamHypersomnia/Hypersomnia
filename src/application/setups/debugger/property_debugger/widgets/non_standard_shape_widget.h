@@ -229,24 +229,28 @@ struct non_standard_shape_widget {
 		auto perform_standard_widget = [&]() {
 			ImGui::Separator();
 
+			auto do_vertices = [&]() {
+				/* Perform the standard widget for manual tweaking */
+				auto iw = scoped_item_width(-1);
+
+				for (auto& v : object.source_polygon) {
+					auto id = scoped_id(index_in(object.source_polygon, v));
+
+					auto vi = vec2i(v);
+					if (drag_vec2("##" + identity_label, vi)) {
+						v = vi;
+						result = tweaker_type::CONTINUOUS;
+					}
+				}
+			};
+
 			if (object.source_polygon.size() > 0) {
-				text("Vertices:");
+				if (auto node = scoped_tree_node_ex("Collider shape vertices")) {
+					do_vertices();
+				}
 			}
 			else {
 				text("The shape has default vertices.");
-			}
-
-			/* Perform the standard widget for manual tweaking */
-			auto iw = scoped_item_width(-1);
-
-			for (auto& v : object.source_polygon) {
-				auto id = scoped_id(index_in(object.source_polygon, v));
-
-				auto vi = vec2i(v);
-				if (drag_vec2("##" + identity_label, vi)) {
-					v = vi;
-					result = tweaker_type::CONTINUOUS;
-				}
 			}
 		};
 

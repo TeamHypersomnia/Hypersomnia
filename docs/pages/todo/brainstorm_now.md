@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+# BEFORE STEAM
+
+- fix small capsule
+- Demos should be lz4 compressed and keep max 100 mb worth maybe
+
+# REST
+
 - Less round time on small maps to increase tension on T side
     - e.g. on duel practice
     

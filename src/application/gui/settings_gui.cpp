@@ -436,7 +436,12 @@ void settings_gui_state::perform(
 					return key_to_string(found_k);
 				}();
 
-				const auto label = std::string("Streamer mode (") + streamer_hotkey + ")";
+				auto label = std::string("Streamer mode");
+
+				if (streamer_hotkey != "(UNASSIGNED)") {
+					label += "(" + streamer_hotkey + ")";
+				}
+
 				revertable_checkbox(label, config.streamer_mode);
 
 				tooltip_on_hover(typesafe_sprintf("Quickly toggle with %x at any time.\nCensors all player-provided content to prevent abuse during streams.\n\nWARNING!\nCommunity servers can host custom arenas with explicit sprites/sounds.\nTo be 100% secure, only play on the official servers -\nor on the servers of people you trust.", streamer_hotkey));
