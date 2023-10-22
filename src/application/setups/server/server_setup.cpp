@@ -836,7 +836,9 @@ void server_setup::resolve_internal_address_if_its_time() {
 		auto new_address = future_internal_address.get();
 
 		if (new_address.has_value()) {
-			new_address->port = last_start.port;
+			if (auto s = find_underlying_socket()) {
+				new_address->port = s->address.port;
+			}
 
 			if (new_address != internal_address) {
 				request_immediate_heartbeat();
