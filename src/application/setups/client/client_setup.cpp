@@ -48,13 +48,41 @@
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "application/setups/server/file_chunk_packet.h"
 #include "application/setups/client/direct_file_download.hpp"
+#include "augs/misc/compress.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
-	auto source = augs::open_binary_input_stream(source_path);
 
+	auto source_bytes = augs::file_to_bytes(source_path);
+	auto source = augs::make_ptr_read_stream(source_bytes);
 	augs::read_bytes(source, meta);
-	augs::read_vector_until_eof(source, demo_steps);
+
+	const auto pos = source.get_read_pos();
+
+	if (pos < source_bytes.size()) {
+		std::vector<std::byte> decompressed;
+		decompressed.resize(meta.uncompressed_size);
+
+		augs::decompress(
+			source_bytes.data() + pos,
+			source_bytes.size() - pos,
+			decompressed
+		);
+
+		auto s = augs::make_ptr_read_stream(decompressed);
+
+		try {
+			while (s.get_read_pos() <= decompressed.size()) {
+				demo_step step;
+				augs::read_bytes(s, step);
+				demo_steps.emplace_back(std::move(step));
+			}
+		}
+		catch (...) {
+
+		}
+	}
+
 
 	gui.open();
 }
@@ -163,6 +191,7 @@ void client_setup::flush_demo_steps() {
 				meta.server_name = displayed_connecting_server_name;
 				meta.server_address = last_addr.address;
 				meta.version = hypersomnia_version();
+				meta.when_recorded = augs::date_time().get_utc_timestamp();
 				augs::write_bytes(out, meta);
 
 				const auto version_info_path = augs::path_type(recorded_demo_path).replace_extension(".version.txt");

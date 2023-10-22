@@ -78,6 +78,8 @@ struct texture_in_progress {
 };
 
 class viewables_streaming {
+	std::future<bool> future_compressed_demos;
+
 	std::vector<rgba> general_atlas_pbo_fallback;
 
 	all_loaded_gui_fonts loaded_gui_fonts;
@@ -141,6 +143,8 @@ public:
 	void display_loading_progress() const;
 
 	void request_rescan();
+	void recompress_demos();
+	void wait_demos_compressed();
 
 	auto& get_general_atlas() {
 		return general_atlas;

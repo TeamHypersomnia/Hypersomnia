@@ -31,19 +31,28 @@ namespace augs {
 		const std::vector<std::byte>& input,
 		std::vector<std::byte>& output
 	) {
+		compress(state, input.data(), input.size(), output);
+	}
+
+	void compress(
+		std::vector<std::byte>& state,
+		const std::byte* input,
+		const std::size_t input_size,
+		std::vector<std::byte>& output
+	) {
 #if DISABLE_COMPRESSION
 		(void)state;
-		concatenate(output, input);
+		output.insert(output.end(), input, input + input_size);
 #else
-		const auto size_bound = LZ4_compressBound(input.size());
+		const auto size_bound = LZ4_compressBound(input_size);
 		const auto prev_size = output.size();
 		output.resize(prev_size + size_bound);
 
 		const auto bytes_written = LZ4_compress_fast_extState(
 			reinterpret_cast<void*>(state.data()), 
-			reinterpret_cast<const char*>(input.data()), 
+			reinterpret_cast<const char*>(input), 
 			reinterpret_cast<char*>(output.data() + prev_size), 
-			input.size(),
+			input_size,
 			size_bound,
 			1
 		);
@@ -89,12 +98,12 @@ namespace augs {
 
 		if (bytes_read < 0) {
 			output.clear();
-			throw decompression_error("Decompression failure. Failed to read any bytes.");
+			throw decompression_error("CHECK IF YOU PASSED CORRECT uncompressed_size! Decompression failure. Failed to read any bytes.");
 		}
 
 		if (uncompressed_size != static_cast<std::size_t>(bytes_read)) {
 			output.clear();
-			throw decompression_error("Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
+			throw decompression_error("CHECK IF YOU PASSED CORRECT uncompressed_size! Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
 		}
 #endif
 	}

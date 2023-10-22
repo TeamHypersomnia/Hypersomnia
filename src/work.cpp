@@ -1260,11 +1260,14 @@ work_result work(const int argc, const char* const * const argv) try {
 			});
 
 			map_catalogue_gui.request_refresh();
+			streaming.recompress_demos();
 		}
 	};
 
 	auto launch_client = [&](const bool ignore_nat_check) {
 		bool public_internet = false;
+
+		streaming.wait_demos_compressed();
 
 		if (ignore_nat_check) {
 			LOG("Finished NAT traversal. Connecting immediately.");

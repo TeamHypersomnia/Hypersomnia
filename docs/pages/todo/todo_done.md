@@ -6582,3 +6582,7 @@ This will discard your redo history."
     - i'd unassign them
 
 - internal addresses are fucked up again, no port shown and doesnt detect it
+- Demos should be lz4 compressed and keep max 100 mb worth maybe
+    - This can be done asynchronously in main menu, exactly like with neon map regeneration
+    - It's good because it won't delay getting back to the main menu when client is exited, plus it will work even if the client crashes and doesn't get the chance to compress
+

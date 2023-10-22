@@ -10,7 +10,6 @@ summary: That which we are brainstorming at the moment.
 # BEFORE STEAM
 
 - fix small capsule
-- Demos should be lz4 compressed and keep max 100 mb worth maybe
 
 # REST
 

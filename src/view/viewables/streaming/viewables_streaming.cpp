@@ -12,6 +12,11 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
+#include "augs/misc/compress.h"
+#include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/to_bytes.h"
+#include "application/setups/client/demo_file_meta.h"
 
 void viewables_streaming::request_rescan() {
 	if (!general_atlas.empty()) {
@@ -338,6 +343,10 @@ void texture_in_progress<output_type>::finalize_load(augs::renderer& renderer) {
 }
 
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
+	if (valid_and_is_ready(future_compressed_demos)) {
+		future_compressed_demos.get();
+	}
+
 	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
@@ -428,6 +437,82 @@ bool viewables_streaming::general_atlas_in_progress() const {
 	return general_atlas_progress.has_value();
 }
 
+void viewables_streaming::wait_demos_compressed() {
+	if (future_compressed_demos.valid()) {
+		future_compressed_demos.get();
+	}
+}
+
+void viewables_streaming::recompress_demos() {
+	future_compressed_demos = launch_async([]() {
+		std::vector<augs::path_type> file_list;
+
+		augs::for_each_in_directory(
+			augs::path_type(DEMOS_DIR),
+			[](auto&&...) { return callback_result::CONTINUE; },
+			[&file_list](const augs::path_type& demo) {
+				if (demo.extension() == ".dem") {
+					file_list.push_back(demo);
+				}
+
+				return callback_result::CONTINUE;
+			}
+		);
+
+		if (file_list.size() > 0) {
+			LOG("%x demos to be compressed.", file_list.size());
+		}
+		else {
+			LOG("All demos are already compressed.");
+		}
+
+		auto state = augs::make_compression_state();
+
+		for (const auto& demo_path : file_list) {
+			LOG("Compressing: %x", demo_path);
+			auto contents = augs::file_to_bytes(demo_path);
+
+			demo_file_meta meta;
+
+			auto s = augs::make_ptr_read_stream(contents);
+			try {
+				augs::read_bytes(s, meta);
+			}
+			catch (...) {
+				/* Broken/deprecated demo. Just delete it and move on. */
+
+				augs::remove_file(demo_path);
+				continue;
+			}
+
+			const auto pos = s.get_read_pos();
+
+			if (pos == contents.size()) {
+				LOG("Demo was empty.");
+				continue;
+			}
+
+			meta.uncompressed_size = contents.size() - pos;
+			auto compressed = augs::to_bytes(meta);
+
+			augs::compress(
+				state,
+				contents.data() + pos,
+				contents.size() - pos,
+				compressed
+			);
+
+			auto new_path = demo_path;
+			new_path.replace_extension(".demc");
+
+			augs::bytes_to_file(compressed, new_path);
+			augs::remove_file(demo_path);
+		}
+
+		return true;
+	});
+}
+
 void viewables_streaming::display_loading_progress() const {
 	using namespace augs::imgui;
 
@@ -468,6 +553,14 @@ void viewables_streaming::display_loading_progress() const {
 
 		if (progress_percent >= 0.f) {
 			ImGui::ProgressBar(progress_percent, ImVec2(-1.0f,0.0f));
+		}
+	}
+	else {
+		if (future_compressed_demos.valid()) {
+			center_next_window(ImGuiCond_Always);
+			auto loading_window = scoped_window("Demo file compression in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
+
+			text_color("The game is compressing demo files. Please be patient.\n", yellow);
 		}
 	}
 }

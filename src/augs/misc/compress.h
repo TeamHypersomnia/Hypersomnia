@@ -20,6 +20,13 @@ namespace augs {
 		std::vector<std::byte>& output
 	);
 
+	void compress(
+		std::vector<std::byte>& state,
+		const std::byte* input,
+		const std::size_t input_size,
+		std::vector<std::byte>& output
+	);
+
 	std::vector<std::byte> decompress(
 		const std::vector<std::byte>& input,
 		std::size_t uncompressed_size

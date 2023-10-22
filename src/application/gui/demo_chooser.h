@@ -52,7 +52,7 @@ public:
 				all_paths.clear();
 
 				auto path_adder = [this](const auto& full_path) {
-					if (full_path.extension() != ".dem") {
+					if (full_path.extension() != ".demc") {
 						return callback_result::CONTINUE;
 					}
 
@@ -63,11 +63,11 @@ public:
 
 					try {
 						auto t = augs::open_binary_input_stream(full_path);
-						decltype(demo_file_meta::server_name) name;
-						augs::read_bytes(t, name);
+						demo_file_meta file_meta;
+						augs::read_bytes(t, file_meta);
 
-						meta.server_name = name;
-						meta.write_time = augs::date_time(augs::last_write_time(full_path)).how_long_ago();
+						meta.server_name = file_meta.server_name;
+						meta.write_time = augs::date_time::from_utc_timestamp(file_meta.when_recorded).how_long_ago();
 					}
 					catch (const std::ifstream::failure&) {
 
