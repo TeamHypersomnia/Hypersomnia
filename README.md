@@ -395,7 +395,8 @@ Irrespectively of the OS, you will need the following software in order to build
 	- For Linux, use your distro-specific package. Make sure to install ```libc++```, ```libc++abi``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
-  - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-1_1_1d.exe
+  - On Windows, you can get the appropriate installer here: https://slproweb.com/products/Win32OpenSSL.html
+  - The game is known to work with v1.1.1w, but later versions should work too.
 
 Once dependencies are installed, go to the directory where you wish to have your *Hypersomnia* project downloaded,
 open git bash and paste:
