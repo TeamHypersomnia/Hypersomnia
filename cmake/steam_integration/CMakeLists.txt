@@ -1,0 +1,68 @@
+cmake_minimum_required(VERSION 3.12)
+project(SteamIntegrationLib)
+
+set(CMAKE_CXX_STANDARD 11)
+
+option(BUILD_STEAM "Build Steamworks. If off, will build stubs for distributing a non-steam version of the game." ON)
+
+if(MSVC)
+    set(INSTALL_FOLDER windows)
+elseif(APPLE)
+    set(INSTALL_FOLDER macos)
+elseif(UNIX)
+    set(INSTALL_FOLDER linux)
+endif()
+
+# Define the shared library target
+add_library(steam_integration SHARED steam_integration.cpp)
+
+# Set the output name and version for the shared library
+set_target_properties(steam_integration PROPERTIES
+    OUTPUT_NAME steam_integration
+)
+
+if(BUILD_STEAM)
+    include_directories(${PROJECT_SOURCE_DIR}/steamworks/sdk/public/steam)
+
+    add_definitions(-DBUILD_STEAM=1)
+
+    IF(WIN32)
+        SET(STEAM_LIBNAME steam_api64)
+        SET(STEAM_RUNTIMENAME steam_api64.dll)
+        SET(STEAM_PATHNAME redistributable_bin/win64)
+    ELSEIF(APPLE)
+        # universal binary
+        SET(STEAM_LIBNAME steam_api)
+        SET(STEAM_RUNTIMENAME libsteam_api.dylib)
+        SET(STEAM_PATHNAME redistributable_bin/osx)
+    ELSE()
+        SET(STEAM_LIBNAME steam_api)
+        SET(STEAM_RUNTIMENAME libsteam_api.so)
+        SET(STEAM_PATHNAME redistributable_bin/linux64)
+    ENDIF()
+
+    FIND_LIBRARY(STEAM_LIBRARY
+        NAMES ${STEAM_LIBNAME}
+        HINTS
+        ${PROJECT_SOURCE_DIR}/${STEAM_PATHNAME}
+    )
+
+    FIND_FILE(STEAM_RUNTIME
+        NAMES ${STEAM_RUNTIMENAME}
+        HINTS
+        ${PROJECT_SOURCE_DIR}/${STEAM_PATHNAME}
+        PATHS
+        ${EXTERNAL_BINARY_PATH}
+        ${CMAKE_LIBRARY_PATH}
+        /usr/local/lib
+        /usr/lib
+    )
+
+    target_link_libraries(steam_integration ${STEAM_LIBRARY})
+endif()
+
+install(
+    TARGETS steam_integration
+    LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/bin/${INSTALL_FOLDER}
+)
+

@@ -151,6 +151,11 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 
 ## Building switches for functionality using 3rdparty libraries.
 
+## If off, will simply build steam_integration.cpp in the project
+## with null interface.
+
+option(LINK_DYNAMIC_STEAM_INTEGRATION "Use dynamic Steam integration library." ON)
+
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
 option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_NET_OPT})
@@ -1589,6 +1594,41 @@ endif()
 # We define libraries upon which Hypersomnia depends.
 
 set(HYPERSOMNIA_LIBS lua streflop blake3)
+
+include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
+
+if(LINK_DYNAMIC_STEAM_INTEGRATION)
+	message("Steam integration will be linked dynamically.")
+
+	if (MSVC)
+		set(PLATFORM_NAME "windows")
+	elseif(APPLE)
+		set(PLATFORM_NAME "macos")
+	elseif(UNIX)
+		set(PLATFORM_NAME "linux")
+	endif()
+
+	set(LIBSTEAM_INTEGRATION_LOCATION ${PROJECT_SOURCE_DIR}/cmake/steam_integration/bin/${PLATFORM_NAME})
+
+	find_library(STEAM_INTEGRATION_LIBRARY
+        NAMES steam_integration
+        HINTS
+		${LIBSTEAM_INTEGRATION_LOCATION}
+    )
+
+	message("LIBSTEAM_INTEGRATION_LOCATION: ${LIBSTEAM_INTEGRATION_LOCATION}")
+	message("PLATFORM_NAME: ${PLATFORM_NAME}")
+	message("STEAM_INTEGRATION_LIBRARY: ${STEAM_INTEGRATION_LIBRARY}")
+
+	target_link_libraries(Hypersomnia ${STEAM_INTEGRATION_LIBRARY})
+else()
+	message("Steam integration will NOT be linked. Building stubs directly.")
+	## Build stubs
+
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"cmake/steam_integration/steam_integration.cpp"
+	)
+endif()
 
 if(BUILD_OPENGL)
 	find_package(OpenGL REQUIRED)

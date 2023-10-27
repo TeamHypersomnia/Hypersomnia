@@ -1,5 +1,8 @@
 # Just so rg doesn't search it
 .git
+
+cmake/steam_integration/steamworks
+
 #################
 ## Eclipse
 #################

@@ -110,6 +110,8 @@
 #include "application/main/self_updater.h"
 #include "application/setups/editor/packaged_official_content.h"
 #include "augs/string/parse_url.h"
+#include "steam_integration.h"
+
 #include "work_result.h"
 
 std::function<void()> ensure_handler;
@@ -128,6 +130,24 @@ static_assert(std::atomic<int>::is_always_lock_free);
 constexpr bool no_edge_zoomout_v = false;
 
 work_result work(const int argc, const char* const * const argv) try {
+	if (::steam_restart()) {
+		return work_result::STEAM_RESTART;
+	}
+
+	const auto steam_status = steam_init_result(::steam_init());
+
+	if (steam_status == steam_init_result::FAILURE) {
+		LOG("Failed to init Steam API!");
+		return work_result::FAILURE;
+	}
+
+	auto deinit = augs::scope_guard([]() {
+		::steam_deinit();
+	});
+
+	const bool is_steam_client = steam_status == steam_init_result::SUCCESS;
+	(void)is_steam_client;
+
 #if PLATFORM_UNIX	
 	auto signal_handler = [](const int signal_type) {
    		signal_status = signal_type;

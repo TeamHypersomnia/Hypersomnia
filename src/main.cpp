@@ -182,6 +182,11 @@ int main(const int argc, const char* const * const argv) {
 		};
 
 		switch (completed_work_result) {
+			case work_result::STEAM_RESTART: 
+				LOG("Game was started without Steam client. Restarting.");
+				save_success_logs();
+				return 1;
+
 			case work_result::REPORT_UPDATE_AVAILABLE: 
 				LOG("Update available.");
 				save_success_logs();

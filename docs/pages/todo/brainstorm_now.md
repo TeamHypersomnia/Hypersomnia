@@ -9,9 +9,26 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- Lower the audio delay in OpenAL esp for Windows
+    - use WASAPI Exclusive mode vs Shared? https://github.com/kcat/openal-soft/issues/682
+
+- Determining if game runs steam
+    - No point in having config var, why?
+        - We'll anyway ship a non-steam lib to hypersomnia.xyz to have no proprietary soft in foss distributions
+        - So when we have a non-steam lib, a config var like this would not work anyway
+        - And when you're launching from steam, there's no advantage disabling it
+    - Just return true/false from steam_init
+
+- The most *basic* Steamworks API integration
+    - at least make the avatar and nickname be always set from the steam on startup
+    - non-steam clients
+
 - fix small capsule
 
 # REST
+
+- Welcome widget at the top-left showing the nickname and avatar, e.g. Welcome Pythagoras
+    - Use an ImGui popup for this
 
 - Less round time on small maps to increase tension on T side
     - e.g. on duel practice

@@ -1,6 +1,8 @@
 #pragma once
 
 enum class work_result {
+	STEAM_RESTART,
+
 	SUCCESS,
 	FAILURE,
 	RELAUNCH_DEDICATED_SERVER,
