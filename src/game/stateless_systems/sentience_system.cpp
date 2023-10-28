@@ -510,10 +510,21 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 		is_headshot = false;
 	}
 
+	event_template.play_headshot_sound = is_headshot;
+
 	const auto& amount = def.base * (is_headshot ? d.headshot_mult : 1.0f);
 
-	auto process_and_post_health = [&](const auto& event) {
+	int events_posted = 0;
+
+	auto process_and_post_health = [&](auto event) {
+		if (events_posted > 0) {
+			/* Play HS just once (in case we post PED destruction + health event in the same step */
+
+			event.play_headshot_sound = false;
+		}
+
 		process_and_post_health_event(event, step);
+		++events_posted;
 	};
 
 	if (sentience) {

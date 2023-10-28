@@ -293,9 +293,6 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto subject = cosm[h.subject];
 		const auto& sentience = subject.get<invariants::sentience>();
 
-		bool play_headshot = false;
-		const bool was_headshot = h.origin.circumstances.headshot;
-
 		sound_effect_input effect;
 
 		auto predictability = always_predictable_v;
@@ -304,16 +301,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			if (h.special_result == messages::health_event::result_type::DEATH) {
 				effect = sentience.death_sound;
 				predictability = never_predictable_v;
-
-				if (was_headshot) {
-					play_headshot = true;
-				}
 			}
 			else if (h.damage.total() > 0) {
-				if (was_headshot) {
-					play_headshot = true;
-				}
-
 				effect = h.was_dead ? sentience.corpse_health_decrease_sound : sentience.health_decrease_sound;
 			}
 			else {
@@ -330,10 +319,6 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					effect.modifier.pitch *= 1.5f;
 
 					predictability = never_predictable_v;
-				}
-
-				if (was_headshot) {
-					play_headshot = true;
 				}
 			}
 			else {
@@ -382,7 +367,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			);
 		}
 
-		if (play_headshot) {
+		if (h.play_headshot_sound) {
 			auto hs_effect = sentience.headshot_sound;
 
 			hs_effect.start(
