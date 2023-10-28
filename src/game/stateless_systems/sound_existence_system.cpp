@@ -359,22 +359,28 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			start.clear_when_target_alive = true;
 		}
 
-		if (effect.id.is_set()) {
-			effect.start(
-				step,
-				start,
-				predictability
-			);
-		}
+		const bool was_headshot = h.origin.circumstances.headshot;
 
 		if (h.play_headshot_sound) {
 			auto hs_effect = sentience.headshot_sound;
 
 			hs_effect.start(
 				step,
-				sound_effect_start_input::at_listener(subject),
+				sound_effect_start_input::fire_and_forget(h.point_of_impact).set_listener(subject),
 				never_predictable_v
 			);
+		}
+
+		if (effect.id.is_set()) {
+			const bool skip = was_headshot && (effect.id == sentience.health_decrease_sound.id || effect.id == sentience.corpse_health_decrease_sound.id);
+
+			if (!skip) {
+				effect.start(
+					step,
+					start,
+					predictability
+				);
+			}
 		}
 	}
 
