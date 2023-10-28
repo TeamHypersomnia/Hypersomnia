@@ -154,7 +154,7 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 ## If off, will simply build steam_integration.cpp in the project
 ## with null interface.
 
-option(LINK_DYNAMIC_STEAM_INTEGRATION "Use dynamic Steam integration library." ON)
+option(LINK_STEAM_INTEGRATION "Use dynamic Steam integration library." ON)
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
@@ -1581,7 +1581,7 @@ set(HYPERSOMNIA_SRCS
 	${HYPERSOMNIA_HEADERS}
 )
 
-if(LINK_DYNAMIC_STEAM_INTEGRATION)
+if(LINK_STEAM_INTEGRATION)
 	set(CMAKE_MACOSX_RPATH TRUE)
 	set(CMAKE_SKIP_BUILD_RPATH FALSE)
 	set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -1598,13 +1598,24 @@ else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()
 
+if(LINK_STEAM_INTEGRATION)
+	# Copy the library so it's next to the executable
+	add_custom_target(CopyLibrary
+		COMMAND ${CMAKE_COMMAND} -E copy ${STEAM_INTEGRATION_LIBRARY} ${CMAKE_BINARY_DIR}
+		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
+		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
+	)
+
+	add_dependencies(Hypersomnia CopyLibrary)
+endif()
+
 # We define libraries upon which Hypersomnia depends.
 
 set(HYPERSOMNIA_LIBS lua streflop blake3)
 
 include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
 
-if(LINK_DYNAMIC_STEAM_INTEGRATION)
+if(LINK_STEAM_INTEGRATION)
 	message("Steam integration will be linked dynamically.")
 
 	if (MSVC)
