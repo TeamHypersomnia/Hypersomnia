@@ -154,7 +154,7 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 ## If off, will simply build steam_integration.cpp in the project
 ## with null interface.
 
-option(LINK_STEAM_INTEGRATION "Use dynamic Steam integration library." ON)
+option(LINK_STEAM_INTEGRATION "Use dynamic Steam integration library." OFF)
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})

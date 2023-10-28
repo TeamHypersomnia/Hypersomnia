@@ -272,6 +272,7 @@ namespace test_flavours {
 			sentience.corpse_health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.headshot_sound.modifier.doppler_factor = 0;
+			sentience.headshot_sound.modifier.reference_distance = 1700.f;
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
 			sentience.head_hitbox_radius = 11.0f;
