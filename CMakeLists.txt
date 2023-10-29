@@ -843,6 +843,17 @@ if(BUILD_TEST_SCENES)
 	message("Building of test scenes is enabled.")
 endif()
 
+include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
+
+if(NOT LINK_STEAM_INTEGRATION)
+	message("Steam integration will NOT be linked. Building stubs directly.")
+	## Build stubs
+
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"cmake/steam_integration/steam_integration.cpp"
+	)
+endif()
+
 # natvis files for easier debugging in Visual Studio.
 
 if(MSVC_SPECIFIC)
@@ -1639,13 +1650,6 @@ if(LINK_STEAM_INTEGRATION)
 	message("STEAM_INTEGRATION_LIBRARY: ${STEAM_INTEGRATION_LIBRARY}")
 
 	target_link_libraries(Hypersomnia ${STEAM_INTEGRATION_LIBRARY})
-else()
-	message("Steam integration will NOT be linked. Building stubs directly.")
-	## Build stubs
-
-	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
-		"cmake/steam_integration/steam_integration.cpp"
-	)
 endif()
 
 if(BUILD_OPENGL)
