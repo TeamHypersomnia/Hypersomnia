@@ -87,5 +87,6 @@ struct game_drawing_settings {
 	crosshair_drawing_settings crosshair;
 
 	bool teammates_are_enemies = false;
+	bool stencil_before_light_pass = false;
 	// END GEN INTROSPECTOR
 };

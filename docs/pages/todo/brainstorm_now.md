@@ -9,6 +9,8 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- logarithmic audio slider
+
 - Lower the audio delay in OpenAL esp for Windows
     - use WASAPI Exclusive mode vs Shared? https://github.com/kcat/openal-soft/issues/682
 

@@ -256,6 +256,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.window.fullscreen = true;
 #endif
 
+#if PLATFORM_WINDOWS
+		result.drawing.stencil_before_light_pass = true;
+#else
+		result.drawing.stencil_before_light_pass = false;
+#endif
+
 		return result_ptr;
 	}();
 

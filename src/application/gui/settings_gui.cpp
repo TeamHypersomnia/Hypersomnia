@@ -1580,6 +1580,9 @@ void settings_gui_state::perform(
 			}
 
 			case settings_pane::ADVANCED: {
+				revertable_checkbox("Stencil before light pass", config.drawing.stencil_before_light_pass);
+				tooltip_on_hover("If your field of view is glitched (disappearing enemies),\ntry toggling on and off.");
+
 				const auto cwd = augs::get_current_working_directory();
 				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
 				text("Cache folder location: %x (%x)", GENERATED_FILES_DIR, std::filesystem::absolute(GENERATED_FILES_DIR));
