@@ -20,7 +20,7 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
       run: sudo apt-get install --fix-missing cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libxcb-glx0-dev libx11-xcb-dev
 
     - name: Install OpenAL soft dependencies
-      run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev
+      run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev libpipewire-0.3-dev
 
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
