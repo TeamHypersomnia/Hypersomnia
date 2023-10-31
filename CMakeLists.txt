@@ -1609,17 +1609,6 @@ else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()
 
-if(LINK_STEAM_INTEGRATION)
-	# Copy the library so it's next to the executable
-	add_custom_target(CopyLibrary
-		COMMAND ${CMAKE_COMMAND} -E copy ${STEAM_INTEGRATION_LIBRARY} ${CMAKE_BINARY_DIR}
-		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
-		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
-	)
-
-	add_dependencies(Hypersomnia CopyLibrary)
-endif()
-
 # We define libraries upon which Hypersomnia depends.
 
 set(HYPERSOMNIA_LIBS lua streflop blake3)
@@ -1644,12 +1633,30 @@ if(LINK_STEAM_INTEGRATION)
         HINTS
 		${LIBSTEAM_INTEGRATION_LOCATION}
     )
+	
+	set(STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_LIBRARY})
+
+	if (MSVC)
+		string(REPLACE ".lib" ".dll" STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_RUNTIME})
+	endif()
 
 	message("LIBSTEAM_INTEGRATION_LOCATION: ${LIBSTEAM_INTEGRATION_LOCATION}")
 	message("PLATFORM_NAME: ${PLATFORM_NAME}")
 	message("STEAM_INTEGRATION_LIBRARY: ${STEAM_INTEGRATION_LIBRARY}")
+	message("STEAM_INTEGRATION_RUNTIME: ${STEAM_INTEGRATION_RUNTIME}")
 
 	target_link_libraries(Hypersomnia ${STEAM_INTEGRATION_LIBRARY})
+endif()
+
+if(LINK_STEAM_INTEGRATION)
+	# Copy the library so it's next to the executable
+	add_custom_target(CopyLibrary
+		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_BINARY_DIR}"
+		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
+		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
+	)
+
+	add_dependencies(Hypersomnia CopyLibrary)
 endif()
 
 if(BUILD_OPENGL)

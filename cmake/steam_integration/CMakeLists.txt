@@ -22,6 +22,7 @@ set_target_properties(steam_integration PROPERTIES
 )
 
 if(BUILD_STEAM)
+    message("Building a Steam version of the library.")
     include_directories(${PROJECT_SOURCE_DIR}/steamworks/sdk/public/steam)
 
     add_definitions(-DBUILD_STEAM=1)
@@ -59,10 +60,17 @@ if(BUILD_STEAM)
     )
 
     target_link_libraries(steam_integration ${STEAM_LIBRARY})
+else()
+    message("Building a Non-Steam version of the library.")
 endif()
 
+# Set the installation path to a local directory
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/bin")
+
+# Specify the installation target
 install(
     TARGETS steam_integration
-    LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/bin/${INSTALL_FOLDER}
+    RUNTIME DESTINATION ${INSTALL_FOLDER}
+    LIBRARY DESTINATION ${INSTALL_FOLDER}
+    ARCHIVE DESTINATION ${INSTALL_FOLDER}
 )
-
