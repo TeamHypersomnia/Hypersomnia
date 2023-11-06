@@ -43,6 +43,9 @@ jobs:
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
 
+    - name: Build Non-Steam libsteam_integration
+      run: . cmake/build_nonsteam_integration.sh
+
     - name: Generate CMake files
       run: . cmake/linux_actions/generate_cmake_files.sh
 
