@@ -25,7 +25,7 @@ jobs:
     - name: Install ImageMagick for create-dmg
       run: brew install graphicsmagick imagemagick
     - name: Install create-dmg
-      run: npm install --global create-dmg
+      run: brew install create-dmg
     - name: Install ninja
       run: brew install ninja
     - name: Install sodium

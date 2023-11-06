@@ -45,8 +45,7 @@ if [ -f "$EXE_PATH" ]; then
 		7z a -sfx $SFX_PATH $APP_PATH
 
 		echo "Generating a .dmg for first-time downloads on MacOS."
-		create-dmg $APP_PATH
-		mv "Hypersomnia undefined.dmg" $DMG_PATH
+		create-dmg $DMG_PATH $APP_PATH
 	fi
 
 	if [[ "$PLATFORM" = "Linux" ]]
