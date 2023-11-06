@@ -36,12 +36,7 @@ before_build:
   - cd C:\projects\hypersomnia
 
 build_script:
-  - pushd cmake/steam_integration
-  - mkdir build
-  - pushd build
-  - cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
-  - popd
-  - popd
+  - ps: 'pushd cmake/steam_integration; mkdir build; pushd build; cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..; popd; popd'
   - mkdir nin
   - cd nin
   - mkdir %CONFIGURATION%
