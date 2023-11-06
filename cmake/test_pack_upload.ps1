@@ -4,7 +4,7 @@ param(
 	[Int32]$console_mode=0
 )
 
-$target_exe = "../nin/" + $configuration + "/Hypersomnia.exe"
+$target_exe = "Hypersomnia.exe"
 
 $good_log = "logs/exit_success_debug_log.txt"
 $fail_log = "logs/exit_failure_debug_log.txt"
@@ -47,7 +47,6 @@ $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
 $version = "1.2.$commitNumber"
 
-mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user
 $releaseNotesPath = "release_notes.txt"

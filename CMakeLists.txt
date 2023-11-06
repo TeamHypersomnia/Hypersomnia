@@ -154,7 +154,9 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 ## If off, will simply build steam_integration.cpp in the project
 ## with null interface.
 
-option(LINK_STEAM_INTEGRATION "Use dynamic Steam integration library." OFF)
+option(OUTPUT_TO_HYPERSOMNIA_FOLDER "If enabled, the executable with its dll files will be copied to hypersomnia folder to prepare it for packaging." OFF)
+
+option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version." ON)
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
@@ -1599,6 +1601,16 @@ if(LINK_STEAM_INTEGRATION)
 	set(CMAKE_INSTALL_RPATH $ORIGIN)
 endif()
 
+if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+	if (OUTPUT_TO_HYPERSOMNIA_FOLDER)
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/hypersomnia)
+	else()
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+	endif()
+endif()
+
+message("CMAKE_RUNTIME_OUTPUT_DIRECTORY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 if(MSVC)
 	if(BUILD_IN_CONSOLE_MODE)
 		add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
@@ -1650,8 +1662,10 @@ endif()
 
 if(LINK_STEAM_INTEGRATION)
 	# Copy the library so it's next to the executable
+	message("${STEAM_INTEGRATION_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 	add_custom_target(CopyLibrary
-		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_BINARY_DIR}"
+		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
 		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
 	)
