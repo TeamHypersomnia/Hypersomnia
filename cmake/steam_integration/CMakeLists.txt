@@ -64,6 +64,9 @@ else()
     message("Building a Non-Steam version of the library.")
 endif()
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+
 # Set the installation path to a local directory
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/bin")
 

@@ -37,7 +37,7 @@ jobs:
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
     - name: Generate downloadable archives
-      run: cmake/generate_archives.sh MacOS master
+      run: cmake/generate_archives.sh MacOS
 
     - uses: actions/upload-artifact@v3
       with:

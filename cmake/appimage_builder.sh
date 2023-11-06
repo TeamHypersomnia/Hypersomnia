@@ -5,7 +5,16 @@ set -e
 rm -rf /tmp/AppDir
 
 mkdir /tmp/AppDir/usr/bin -p
+mkdir /tmp/AppDir/usr/lib -p
+
 cp build/current/Hypersomnia /tmp/AppDir/usr/bin
+cp build/current/libsteam_integration.so /tmp/AppDir/usr/lib
+
+pushd /tmp/AppDir/usr/bin
+	# So linuxdeploy can find it
+	ln -s ../lib/libsteam_integration.so
+popd
+
 cp hypersomnia/content/gfx/cyan_scythe.png /tmp/AppDir/
 
 if [ ! -f linuxdeploy-x86_64.AppImage ]; then

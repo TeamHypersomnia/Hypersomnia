@@ -4,11 +4,6 @@ EXE_PATH="build/current/Hypersomnia"
 PLATFORM=$1
 GIT_BRANCH=$2
 
-if [ "$GIT_BRANCH" != "master" ]; then
-	echo "Branch is $GIT_BRANCH. Skipping archivization."
-	exit 0
-fi
-
 if [ -f "$EXE_PATH" ]; then
 	echo "Executable exists. Generating archives."
 
@@ -17,8 +12,6 @@ if [ -f "$EXE_PATH" ]; then
 	COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 	VERSION="1.2.$COMMIT_NUMBER"
 	RELEASE_NOTES_FILENAME="release_notes.txt"
-
-	cp build/current/Hypersomnia hypersomnia/Hypersomnia
 
 	pushd hypersomnia
 	rm -r cache logs user
@@ -45,6 +38,9 @@ if [ -f "$EXE_PATH" ]; then
 		cp -R cmake/macos_contents $CONTENTS_DIR
 		cp -R hypersomnia "$CONTENTS_DIR/MacOS"
 
+		cp build/current/Hypersomnia "$CONTENTS_DIR/MacOS"
+		cp build/current/libsteam_integration.dylib "$CONTENTS_DIR/MacOS"
+
 		echo "Generating a highly compressed .sfx archive for updates on MacOS."
 		7z a -sfx $SFX_PATH $APP_PATH
 
@@ -57,6 +53,9 @@ if [ -f "$EXE_PATH" ]; then
 	then
 		SFX_PATH="Hypersomnia-for-$PLATFORM.sfx"
 		TAR_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
+
+		cp build/current/Hypersomnia hypersomnia
+		cp build/current/libsteam_integration.so hypersomnia
 
 		echo "Generating a highly compressed .sfx archive for updates on Linux."
 		7z a -sfx $SFX_PATH hypersomnia

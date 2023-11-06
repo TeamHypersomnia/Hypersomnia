@@ -6586,3 +6586,9 @@ This will discard your redo history."
     - This can be done asynchronously in main menu, exactly like with neon map regeneration
     - It's good because it won't delay getting back to the main menu when client is exited, plus it will work even if the client crashes and doesn't get the chance to compress
 
+
+- Adding the steam dll to the package
+    - It's the local deployment script that can do it
+        - Note it has to copy *both* libsteam and libsteam_integration
+        - So the CI builders can only include the nonsteam version of libsteam integration
+        - They'll build the nonsteam library too

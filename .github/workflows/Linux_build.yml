@@ -56,7 +56,7 @@ jobs:
       run: cmake/appimage_builder.sh
 
     - name: Generate downloadable archives
-      run: cmake/generate_archives.sh Linux master
+      run: cmake/generate_archives.sh Linux
 
     - uses: actions/upload-artifact@v3
       with:

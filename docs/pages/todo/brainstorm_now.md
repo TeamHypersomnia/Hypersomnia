@@ -9,6 +9,13 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- figure out how to test it (steamworks integration etc, downloading, updates) before publishing
+
+- we'll seriously need to support reading user files from a different cwd
+    - + trivial appimage launches
+    - + wont accidentally delete user config on windows or all steam platforms
+    - + simpler self-updater though we can still leave legacy restore/backup logic as it won't hurt
+
 - logarithmic audio slider
 
 - Lower the audio delay in OpenAL esp for Windows
@@ -28,6 +35,8 @@ summary: That which we are brainstorming at the moment.
 - fix small capsule
 
 # REST
+
+- we can upload macos too, in the worst case it doesnt work lol
 
 - Welcome widget at the top-left showing the nickname and avatar, e.g. Welcome Pythagoras
     - Use an ImGui popup for this
