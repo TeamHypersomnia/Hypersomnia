@@ -156,7 +156,14 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 
 option(OUTPUT_TO_HYPERSOMNIA_FOLDER "If enabled, the executable with its dll files will be copied to hypersomnia folder to prepare it for packaging." OFF)
 
-option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version." ON)
+## Before enabling this option, first call:
+## cmake/build_steam_integration.sh, or 
+## cmake/build_nonsteam_integration.sh
+## to generate a suitable library that either interfaces with libsteam_api.so or triggers a non-Steam version of the game.
+## (it will be output to cmake/steam_integration/bin/linux/libsteam_integration.so,
+## and later copied from there to the executable folder every time you build.)
+
+option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version." OFF)
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
