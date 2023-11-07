@@ -9,6 +9,13 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- Adjust Tutorial after balancing
+
+- Sprinting balance
+- Akimbo balance
+    - Higher Density multiplier
+    - Stamina doesn't regenerate when walking
+
 - Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
 
 - disable LINK_STEAM_INTEGRATION by default later when we're done testing steamworks features
@@ -38,6 +45,8 @@ summary: That which we are brainstorming at the moment.
 - fix small capsule
 
 # REST
+
+- Server monitor notifications might work funky if a player connected with suppress_webhooks = true
 
 - CI should publish appimage with -g, then the deployment script should strip and repack it
     - The only problem is the self-updater will download the non-debug version again unless we can check but that's a lot of work for now

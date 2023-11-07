@@ -29,6 +29,24 @@ extern "C" {
 	const char* steam_get_username() {
 		return SteamFriends()->GetPersonaName();
 	}
+
+	uint8_t* steam_get_avatar(uint32_t* width, uint32_t* height) {
+		int iImage = SteamFriends()->GetLargeFriendAvatar(SteamUser()->GetSteamID());
+
+		if (iImage != 0) {
+			SteamUtils()->GetImageSize(iImage, width, height);
+
+			uint8_t* rgba = new uint8_t[4 * (*width) * (*height)];
+			SteamUtils()->GetImageRGBA(iImage, rgba, 4 * (*width) * (*height));
+
+			return rgba;
+		}
+
+		// Avatar retrieval failed
+		*width = 0;
+		*height = 0;
+		return nullptr;
+	}
 }
 #else
 // non-steam version
@@ -53,6 +71,12 @@ extern "C" {
 	const char* steam_get_username() {
 		return nullptr;
 	}
+
+    uint8_t* steam_get_avatar(int* uint32_t, uint32_t* height) {
+        *width = 0;
+        *height = 0;
+        return nullptr;
+    }
 }
 
 #endif
