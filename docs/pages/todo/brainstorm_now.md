@@ -9,6 +9,8 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
+
 - disable LINK_STEAM_INTEGRATION by default later when we're done testing steamworks features
 - figure out how to test it (steamworks integration etc, downloading, updates) before publishing
 

@@ -306,6 +306,12 @@ work_result work(const int argc, const char* const * const argv) try {
 			result->client.nickname = augs::get_user_name();
 		}
 
+		if (is_steam_client) {
+			if (const auto steam_username = steam_get_username()) {
+				result->client.nickname = std::string(steam_username);
+			}
+		}
+
 		return result;
 	}();
 
@@ -1029,6 +1035,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	settings_gui_state settings_gui = std::string("Settings");
 	start_client_gui_state start_client_gui = std::string("Connect to server");
 	start_server_gui_state start_server_gui = std::string("Host a server");
+
+	start_client_gui.is_steam_client = is_steam_client;
 
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");

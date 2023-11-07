@@ -30,6 +30,8 @@ public:
 
 	std::optional<simple_popup> error_popup;
 
+	bool is_steam_client = false;
+
 	bool was_shrinked = false;
 	bool will_be_upscaled = false;
 	bool do_initial_load = true;

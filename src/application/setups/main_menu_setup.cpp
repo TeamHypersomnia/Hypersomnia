@@ -91,11 +91,13 @@ main_menu_setup::main_menu_setup(
 	const packaged_official_content& official,
 	const main_menu_settings settings
 ) {
-	try {
-		menu_theme.emplace(settings.menu_theme_path);
-	}
-	catch (const std::runtime_error& err) {
-		// LOG("Warning: could not load the main menu theme:\n%x", err.what());
+	if (!settings.menu_theme_path.empty()) {
+		try {
+			menu_theme.emplace(settings.menu_theme_path);
+		}
+		catch (...) {
+			// LOG("Warning: could not load the main menu theme:\n%x", err.what());
+		}
 	}
 
 	//query_latest_news(settings.latest_news_url);

@@ -230,7 +230,12 @@ bool start_client_gui_state::perform(
 				text_color("Best official server", yellow);
 			}
 
-			base::acquire_keyboard_once();
+			/* No need to encourage editing the nickname if we got it from Steam */
+			const bool is_nonsteam = !is_steam_client;
+
+			if (is_nonsteam) {
+				base::acquire_keyboard_once();
+			}
 		}
 
 		const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
