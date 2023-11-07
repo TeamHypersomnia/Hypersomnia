@@ -159,11 +159,16 @@ option(OUTPUT_TO_HYPERSOMNIA_FOLDER "If enabled, the executable with its dll fil
 ## Before enabling this option, first call:
 ## cmake/build_steam_integration.sh, or 
 ## cmake/build_nonsteam_integration.sh
-## to generate a suitable library that either interfaces with libsteam_api.so or triggers a non-Steam version of the game.
-## (it will be output to cmake/steam_integration/bin/linux/libsteam_integration.so,
-## and later copied from there to the executable folder every time you build.)
+## to generate a suitable library that either interfaces with libsteam_api.so or provides a non-Steam version of the game.
+## The built library will be output to cmake/steam_integration/bin/linux/libsteam_integration.so,
+## and later copied from there to the executable folder every time you build - executable will have its RPATH set to $ORIGIN.
+## 
+## Note: cmake/build_steam_integration.sh will only work
+## if you have Steamworks SDK downloaded into cmake/steam_integration/steamworks/sdk.
+## The libsteam_integration.so/.dll/.dylib libraries that come with this repo (in cmake/steam_integration/steamworks/bin)
+## are already built against Steamworks SDK - they were built with cmake/build_steam_integration.sh.
 
-option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version." OFF)
+option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version. It will also set the executable's RPATH to ORIGIN on all platforms." OFF)
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
