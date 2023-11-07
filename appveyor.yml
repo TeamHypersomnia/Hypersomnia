@@ -40,6 +40,7 @@ build_script:
   - mkdir build
   - cd build
   - cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+  - ninja install
   - cd ../../..
   - mkdir nin
   - cd nin
