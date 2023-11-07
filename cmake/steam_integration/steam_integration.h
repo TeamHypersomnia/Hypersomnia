@@ -13,9 +13,12 @@ enum class steam_init_result {
 };
 
 extern "C" {
+	DLL_EXPORT int steam_get_appid();
+
 	DLL_EXPORT int steam_init();
 	DLL_EXPORT bool steam_restart();
 	DLL_EXPORT void steam_deinit();
+	DLL_EXPORT const char* steam_get_username();
 }
 
 #undef DLL_EXPORT

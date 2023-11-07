@@ -130,6 +130,12 @@ static_assert(std::atomic<int>::is_always_lock_free);
 constexpr bool no_edge_zoomout_v = false;
 
 work_result work(const int argc, const char* const * const argv) try {
+#if CREATE_STEAM_APPID
+	augs::save_as_text("steam_appid.txt", std::to_string(::steam_get_appid()));
+#elif !IS_PRODUCTION_BUILD
+	augs::remove_file("steam_appid.txt");
+#endif
+
 	if (::steam_restart()) {
 		return work_result::STEAM_RESTART;
 	}

@@ -1,6 +1,8 @@
 # Just so rg doesn't search it
 .git
 
+steam_appid.txt
+
 cmake/steam_integration/steamworks/sdk
 
 #################

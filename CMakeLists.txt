@@ -170,6 +170,9 @@ option(OUTPUT_TO_HYPERSOMNIA_FOLDER "If enabled, the executable with its dll fil
 
 option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This allows the same executable to dynamically switch between a Steam and Non-Steam version. It will also set the executable's RPATH to ORIGIN on all platforms." OFF)
 
+## This is only a convenience developer option.
+option(DEVELOP_STEAM_INTEGRATION "Enable this ONLY if you're developing integration with Steamworks. This will call add_subdirectory for libsteam_integration.so with -DBUILD_STEAM=1. This will also create steam_appid.txt next to the executable, preventing it from restarting through Steam." OFF)
+
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
 option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_NET_OPT})
@@ -857,15 +860,21 @@ if(BUILD_TEST_SCENES)
 	message("Building of test scenes is enabled.")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
+set(STEAM_INTEGRATION_DIR ${PROJECT_SOURCE_DIR}/cmake/steam_integration)
 
-if(NOT LINK_STEAM_INTEGRATION)
-	message("Steam integration will NOT be linked. Building stubs directly.")
+include_directories(${STEAM_INTEGRATION_DIR})
+
+if(NOT LINK_STEAM_INTEGRATION AND NOT DEVELOP_STEAM_INTEGRATION)
+	message("Steam integration will NOT be linked at all. Building stubs directly.")
 	## Build stubs
 
 	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"cmake/steam_integration/steam_integration.cpp"
 	)
+elseif (DEVELOP_STEAM_INTEGRATION)
+	message("DEVELOP_STEAM_INTEGRATION is set. Adding it directly as a target.")
+
+	add_subdirectory(${STEAM_INTEGRATION_DIR})
 endif()
 
 # natvis files for easier debugging in Visual Studio.
@@ -1765,6 +1774,11 @@ endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS)
 	list(APPEND HYPERSOMNIA_LIBS vorbisfile)
+endif()
+
+if(DEVELOP_STEAM_INTEGRATION)
+	list(APPEND HYPERSOMNIA_LIBS steam_integration)
+	file_flag("src/work.cpp" "-DCREATE_STEAM_APPID=1")
 endif()
 
 if(MSVC)

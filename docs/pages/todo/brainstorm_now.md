@@ -37,6 +37,9 @@ summary: That which we are brainstorming at the moment.
 
 # REST
 
+- CI should publish appimage with -g, then the deployment script should strip and repack it
+    - The only problem is the self-updater will download the non-debug version again unless we can check but that's a lot of work for now
+
 - we can upload macos too, in the worst case it doesnt work lol
 
 - Welcome widget at the top-left showing the nickname and avatar, e.g. Welcome Pythagoras

@@ -6,6 +6,10 @@ const int steam_app_id = 2660970;
 #include "steam_api.h"
 
 extern "C" {
+	int steam_get_appid() {
+		return steam_app_id;
+	}
+
 	int steam_init() {
 		if (SteamAPI_Init()) {
 			return (int)steam_init_result::SUCCESS;
@@ -22,11 +26,18 @@ extern "C" {
 		SteamAPI_Shutdown();
 	}
 
+	const char* steam_get_username() {
+		return SteamFriends()->GetPersonaName();
+	}
 }
 #else
 // non-steam version
 
 extern "C" {
+	int steam_get_appid() {
+		return 0;
+	}
+
 	int steam_init() {
 		return (int)steam_init_result::DISABLED;
 	}
@@ -37,6 +48,10 @@ extern "C" {
 
 	void steam_deinit() {
 
+	}
+
+	const char* steam_get_username() {
+		return nullptr;
 	}
 }
 
