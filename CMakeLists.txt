@@ -1632,10 +1632,13 @@ if(LINK_STEAM_INTEGRATION)
 
 	if (MSVC)
 		set(PLATFORM_NAME "windows")
+		set(STEAM_API_FILENAME "steam_api64.dll")
 	elseif(APPLE)
 		set(PLATFORM_NAME "macos")
+		set(STEAM_API_FILENAME "libsteam_api.dylib")
 	elseif(UNIX)
 		set(PLATFORM_NAME "linux")
+		set(STEAM_API_FILENAME "libsteam_api.so")
 	endif()
 
 	set(LIBSTEAM_INTEGRATION_LOCATION ${PROJECT_SOURCE_DIR}/cmake/steam_integration/bin/${PLATFORM_NAME})
@@ -1647,6 +1650,7 @@ if(LINK_STEAM_INTEGRATION)
     )
 	
 	set(STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_LIBRARY})
+	set(STEAM_API_RUNTIME ${LIBSTEAM_INTEGRATION_LOCATION}/${STEAM_API_FILENAME})
 
 	if (MSVC)
 		string(REPLACE ".lib" ".dll" STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_RUNTIME})
@@ -1656,6 +1660,7 @@ if(LINK_STEAM_INTEGRATION)
 	message("PLATFORM_NAME: ${PLATFORM_NAME}")
 	message("STEAM_INTEGRATION_LIBRARY: ${STEAM_INTEGRATION_LIBRARY}")
 	message("STEAM_INTEGRATION_RUNTIME: ${STEAM_INTEGRATION_RUNTIME}")
+	message("STEAM_API_RUNTIME: ${STEAM_API_RUNTIME}")
 
 	target_link_libraries(Hypersomnia ${STEAM_INTEGRATION_LIBRARY})
 endif()
@@ -1664,13 +1669,19 @@ if(LINK_STEAM_INTEGRATION)
 	# Copy the library so it's next to the executable
 	message("${STEAM_INTEGRATION_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-	add_custom_target(CopyLibrary
+	add_custom_target(CopySteamIntegration
 		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
 		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
 	)
 
-	add_dependencies(Hypersomnia CopyLibrary)
+	add_custom_target(CopySteamApi
+		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_API_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
+		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
+	)
+
+	add_dependencies(Hypersomnia CopySteamIntegration CopySteamApi)
 endif()
 
 if(BUILD_OPENGL)
