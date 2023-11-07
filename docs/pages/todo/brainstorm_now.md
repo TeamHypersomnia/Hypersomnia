@@ -9,6 +9,7 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- disable LINK_STEAM_INTEGRATION by default later when we're done testing steamworks features
 - figure out how to test it (steamworks integration etc, downloading, updates) before publishing
 
 - we'll seriously need to support reading user files from a different cwd
