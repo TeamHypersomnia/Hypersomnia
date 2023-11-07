@@ -16,7 +16,7 @@ endif()
 set(CMAKE_MACOSX_RPATH TRUE)
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH $ORIGIN)
+set(CMAKE_INSTALL_RPATH "\$ORIGIN")
 
 # Define the shared library target
 add_library(steam_integration SHARED steam_integration.cpp)
