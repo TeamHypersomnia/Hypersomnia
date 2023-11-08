@@ -308,15 +308,19 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 
 		if (is_steam_client) {
-			if (const auto steam_username = steam_get_username()) {
-				result->client.nickname = std::string(steam_username);
+			if (result->client.use_account_nickname) {
+				if (const auto steam_username = ::steam_get_username()) {
+					result->client.nickname = std::string(steam_username);
+				}
 			}
 
-			if (const auto avatar = ::steam_get_avatar(); avatar.get_size().is_nonzero()) {
-				const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
-				avatar.save_as_png(cached_file_path);
+			if (result->client.use_account_avatar) {
+				if (const auto avatar = ::steam_get_avatar(); avatar.get_size().is_nonzero()) {
+					const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
+					avatar.save_as_png(cached_file_path);
 
-				result->client.avatar_image_path = cached_file_path;
+					result->client.avatar_image_path = cached_file_path;
+				}
 			}
 		}
 

@@ -16,7 +16,7 @@ constexpr std::size_t max_rcon_password_length_v = 30;
 constexpr std::size_t max_chat_message_length_v = 180;
 
 constexpr std::size_t min_nickname_length_v = 1;
-constexpr std::size_t max_nickname_length_v = 30;
+constexpr std::size_t max_nickname_length_v = 40;
 constexpr std::size_t max_server_name_length_v = 60;
 
 constexpr std::size_t arena_public_key_length_v = 80;

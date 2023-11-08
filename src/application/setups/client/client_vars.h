@@ -43,6 +43,9 @@ struct client_chat_settings {
 
 struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
+	bool use_account_nickname = true;
+	bool use_account_avatar = true;
+
 	client_nickname_type nickname = "Player";
 	client_net_vars net;
 

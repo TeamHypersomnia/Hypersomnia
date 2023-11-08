@@ -9,7 +9,24 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- disable updater if is_steam_client
+
+- Rich presence
+    - Per-setup status string
+    - Editing: de_desert_remake
+    - Playtesting: de_desert_remake
+    - also use "connect" feature to implement joins
+    
+
+- /skip command
+    - with 60 sec timeout
+- /restart maybe too
+    - with 60 sec timeout
+    
 - Adjust Tutorial after balancing
+    - Also: 
+    - Ricochets chapter should come immediately after shooting chapter
+    - Leave backpack/deagles akimbo chapter at the end
 
 - Sprinting balance
 - Akimbo balance

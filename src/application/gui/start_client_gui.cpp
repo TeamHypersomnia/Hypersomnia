@@ -18,6 +18,8 @@
 #include "application/setups/client/demo_file.h"
 #include "application/gui/pretty_tabs.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "steam_integration.h"
+#include "steam_integration_helpers.hpp"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -238,9 +240,35 @@ bool start_client_gui_state::perform(
 			}
 		}
 
-		const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+		bool nickname_choice_active = true;
 
-		input_text(label, into_vars.nickname);
+		if (is_steam_client && into_vars.use_account_nickname) {
+			nickname_choice_active = false;
+		}
+
+		auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+
+		if (is_steam_client) {
+			label = "##NicknameInactive";
+		}
+
+		{
+			auto scope = maybe_disabled_with_clear_text_cols({}, !nickname_choice_active);
+
+			input_text(label, into_vars.nickname);
+		}
+
+		if (is_steam_client) {
+			ImGui::SameLine();
+
+			if (checkbox("Use Steam nickname", into_vars.use_account_nickname)) {
+				if (into_vars.use_account_nickname) {
+					if (const auto steam_username = ::steam_get_username()) {
+						into_vars.nickname = std::string(steam_username);
+					}
+				}
+			}
+		}
 
 		struct loading_result {
 			std::optional<augs::path_type> new_path;
@@ -305,57 +333,6 @@ bool start_client_gui_state::perform(
 		};
 
 		augs::path_type p = into_vars.avatar_image_path;
-
-		if (input_text<512>("Avatar image", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
-			reload_avatar(p);
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Browse") && !error_popup && !mouse_has_to_move_off_browse) {
-			mouse_has_to_move_off_browse = true;
-
-			avatar_loading_result = launch_async(
-				[&window]() {
-					const std::vector<augs::window::file_dialog_filter> filters = { {
-						"Image file",
-						"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
-					} };
-
-					loading_result out;
-					out.new_path = window.open_file_dialog(filters, "Choose avatar image");
-
-					if (out.new_path.has_value()) {
-						try {
-							out.load_image(*out.new_path);
-						}
-						catch (const augs::image_loading_error& err) {
-							out.error_message = err.what();
-						}
-						catch (const augs::file_open_error& err) {
-							out.error_message = err.what();
-						}
-					}
-
-					return out;
-				}
-			);
-		}
-
-		if (!ImGui::IsItemHovered()) {
-			mouse_has_to_move_off_browse = false;
-		}
-
-		if (!p.empty()) {
-			ImGui::SameLine();
-
-			if (ImGui::Button("Clear") && !error_popup) {
-				p = "";
-				was_shrinked = false;
-				will_be_upscaled = false;
-			}
-		}
-
 		const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
 		const auto half_size = first_size / 2;
 		const auto icon_size = vec2::square(22);
@@ -392,13 +369,88 @@ bool start_client_gui_state::perform(
 			text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
 		}
 
+		bool avatar_choice_active = true;
+
+		if (is_steam_client) {
+			if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
+				if (into_vars.use_account_avatar) {
+					if (const auto avatar = ::steam_get_avatar(); avatar.get_size().is_nonzero()) {
+						const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
+						avatar.save_as_png(cached_file_path);
+
+						p = cached_file_path;
+						reload_avatar(p);
+					}
+				}
+			}
+
+			avatar_choice_active = !into_vars.use_account_avatar;
+		}
+		else {
+			if (input_text<512>("Avatar image", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				reload_avatar(p);
+			}
+		}
+
+		if (avatar_choice_active) {
+			ImGui::SameLine();
+
+			if (ImGui::Button("Browse Avatar") && !error_popup && !mouse_has_to_move_off_browse) {
+				mouse_has_to_move_off_browse = true;
+
+				avatar_loading_result = launch_async(
+					[&window]() {
+						const std::vector<augs::window::file_dialog_filter> filters = { {
+							"Image file",
+							"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
+						} };
+
+						loading_result out;
+						out.new_path = window.open_file_dialog(filters, "Choose avatar image");
+
+						if (out.new_path.has_value()) {
+							try {
+								out.load_image(*out.new_path);
+							}
+							catch (const augs::image_loading_error& err) {
+								out.error_message = err.what();
+							}
+							catch (const augs::file_open_error& err) {
+								out.error_message = err.what();
+							}
+						}
+
+						return out;
+					}
+				);
+			}
+
+			if (!ImGui::IsItemHovered()) {
+				mouse_has_to_move_off_browse = false;
+			}
+
+			if (!p.empty()) {
+				ImGui::SameLine();
+
+				if (ImGui::Button("Clear") && !error_popup) {
+					p = "";
+					was_shrinked = false;
+					will_be_upscaled = false;
+				}
+			}
+		}
+
 		const auto size_str = typesafe_sprintf("%xx%x", first_size.x, first_size.y);
 
-		if (was_shrinked) {
-			text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
-		}
-		else if (will_be_upscaled) {
-			text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
+		const bool show_tip = false;
+
+		if (show_tip) {
+			if (was_shrinked) {
+				text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
+			}
+			else if (will_be_upscaled) {
+				text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
+			}
 		}
 
 		if (::valid_and_is_ready(avatar_loading_result)) {
@@ -442,10 +494,15 @@ bool start_client_gui_state::perform(
 		into_vars.avatar_image_path = p;
 
 		checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
+		ImGui::SameLine();
+		text_disabled("You can later rewatch your match in Replay tab.");
 
-		if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
-			text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
+		if (const bool show_browser_tip = false) {
+			if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+				text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
+			}
 		}
+
 		//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}
 
