@@ -47,6 +47,14 @@ extern "C" {
 		*height = 0;
 		return nullptr;
 	}
+
+	bool steam_set_rich_presence(const char* key, const char* value) {
+		return SteamFriends()->SetRichPresence(key, value);
+	}
+
+	void steam_clear_rich_presence() {
+		SteamFriends()->ClearRichPresence();
+	}
 }
 #else
 // non-steam version
@@ -72,11 +80,19 @@ extern "C" {
 		return nullptr;
 	}
 
-    uint8_t* steam_get_avatar(int* uint32_t, uint32_t* height) {
+    uint8_t* steam_get_avatar(uint32_t* width, uint32_t* height) {
         *width = 0;
         *height = 0;
         return nullptr;
     }
+
+	bool steam_set_rich_presence(const char*, const char*) {
+		return false;
+	}
+
+	void steam_clear_rich_presence() {
+
+	}
 }
 
 #endif

@@ -3389,7 +3389,7 @@ game_mode_name_type arena_mode::get_name(const_input_type in) const {
 	auto name = game_mode_name_type(std::visit([](const auto& s) { return s.get_name(); }, in.rules.subrules));
 
 	if (in.rules.is_ffa()) {
-		name += " (FFA)";
+		name = "FFA " + name;
 	}
 
 	return name;

@@ -386,14 +386,11 @@ bool start_client_gui_state::perform(
 
 			avatar_choice_active = !into_vars.use_account_avatar;
 		}
-		else {
-			if (input_text<512>("Avatar image", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
-				reload_avatar(p);
-			}
-		}
 
 		if (avatar_choice_active) {
-			ImGui::SameLine();
+			if (is_steam_client) {
+				ImGui::SameLine();
+			}
 
 			if (ImGui::Button("Browse Avatar") && !error_popup && !mouse_has_to_move_off_browse) {
 				mouse_has_to_move_off_browse = true;
@@ -438,6 +435,20 @@ bool start_client_gui_state::perform(
 					will_be_upscaled = false;
 				}
 			}
+
+#if PLATFORM_LINUX
+			/* In case the file browser doesn't open on Linux */
+
+			ImGui::SameLine();
+
+			text("Path");
+
+			ImGui::SameLine();
+
+			if (input_text<512>("(Enter)", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				reload_avatar(p);
+			}
+#endif
 		}
 
 		const auto size_str = typesafe_sprintf("%xx%x", first_size.x, first_size.y);

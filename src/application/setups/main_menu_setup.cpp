@@ -300,3 +300,7 @@ void main_menu_setup::draw_overlays(
 		{ augs::ralign::R, augs::ralign::B }
 	);
 }
+
+void main_menu_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	pairs.push_back({ "steam_display", "#Status_AtMainMenu" });
+}

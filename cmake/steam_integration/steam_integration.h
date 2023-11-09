@@ -22,6 +22,9 @@ extern "C" {
 
 	DLL_EXPORT const char* steam_get_username();
 	DLL_EXPORT uint8_t* steam_get_avatar(uint32_t* width, uint32_t* height);
+
+	DLL_EXPORT bool steam_set_rich_presence(const char*, const char*);
+	DLL_EXPORT void steam_clear_rich_presence();
 }
 
 #undef DLL_EXPORT

@@ -1,0 +1,41 @@
+"lang"
+{
+	"english"
+	{
+		"tokens"
+		{
+			"#Status_AtMainMenu"	"Main menu"
+
+			"#Status_Editing"	"Editing map: %mapname%"
+			"#Status_Playtesting"	"Playtesting map: %mapname%"
+
+			// Tutorial [ Level: 17 ]
+			"#Status_Tutorial"	"{#Tutorial} [ {#Level}: %level% ]"
+			"#Status_ShootingRange"	"Shooting Range"
+
+			// de_cyberaqua - Bomb defusal [ 14:3 ]
+			// first score is always ours.
+			"#Status_PlayingTeam"	"%mapname% - %gamemode% [ %score1%:%score2% ]"
+			// fy_minilab - FFA Gun Game [ Level: 4 ]
+			"#Status_PlayingLevel"	"%mapname% - %gamemode% [ {#Level}: %level% ]"
+			"#Level"  "Level"
+			"#Tutorial"  "Tutorial"
+		}
+	}
+
+	"polish"
+	{
+		"tokens"
+		{
+			"#Status_AtMainMenu"	"Menu główne"
+
+			"#Status_Editing"	"Edytuje mapę: %mapname%"
+			"#Status_Playtesting"	"Testuje mapę: %mapname%"
+
+			"#Status_ShootingRange"	"Strzelnica"
+
+			"#Level"  "Poziom"
+			"#Tutorial"  "Samouczek"
+		}
+	}
+}

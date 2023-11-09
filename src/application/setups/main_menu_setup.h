@@ -34,6 +34,8 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/network/netcode_sockets.h"
 
+#include "steam_rich_presence_pairs.h"
+
 struct self_update_result;
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -204,4 +206,6 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

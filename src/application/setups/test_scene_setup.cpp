@@ -709,3 +709,13 @@ test_arena_handle<false> test_scene_setup::get_arena_handle() {
 test_arena_handle<true> test_scene_setup::get_arena_handle() const {
 	return get_arena_handle_impl<test_arena_handle<true>>(*this);
 }
+
+void test_scene_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	if (is_tutorial()) {
+		pairs.push_back({ "steam_display", "#Status_Tutorial" });
+		pairs.push_back({ "level", std::to_string(tutorial.level) });
+	}
+	else {
+		pairs.push_back({ "steam_display", "#Status_ShootingRange" });
+	}
+}

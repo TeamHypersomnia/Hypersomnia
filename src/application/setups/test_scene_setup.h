@@ -21,6 +21,7 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/arena/scene_entity_to_node_map.h"
 #include "application/setups/editor/project/editor_project_paths.h"
+#include "steam_rich_presence_pairs.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -331,4 +332,6 @@ public:
 	auto get_paths() const {
 		return editor_project_paths(current_arena_folder);
 	}
+
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

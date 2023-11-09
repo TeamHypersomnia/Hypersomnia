@@ -9,6 +9,10 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- A simple friends panel under Escape when playing on a server should be trivial
+    - Will be WAY faster to send an invite this way rather than press home and navigate
+        - especially with filtering
+
 - disable updater if is_steam_client
 
 - Rich presence

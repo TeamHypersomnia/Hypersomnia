@@ -1219,6 +1219,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto setup_launcher = [&](auto&& setup_init_callback) {
+		::steam_clear_rich_presence();
 		get_audiovisuals().get<particles_simulation_system>().clear();
 		
 		game_gui_mode_flag = false;
@@ -2803,6 +2804,24 @@ work_result work(const int argc, const char* const * const argv) try {
 					},
 					callbacks
 				);
+			}
+
+			thread_local augs::timer rich_presence_timer;
+			const auto passed_secs = rich_presence_timer.get<std::chrono::seconds>();
+
+			if (passed_secs > 2.0) {
+				rich_presence_timer.reset();
+
+				thread_local steam_rich_presence_pairs pairs;
+				pairs.clear();
+
+				if constexpr(is_one_of_v<S, main_menu_setup, test_scene_setup>) {
+					setup.get_steam_rich_presence_pairs(pairs);
+				}
+
+				for (auto& p : pairs) {
+					::steam_set_rich_presence(p.first.c_str(), p.second.c_str());
+				}
 			}
 		}
 
