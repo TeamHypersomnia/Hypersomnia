@@ -131,28 +131,43 @@ static_assert(std::atomic<int>::is_always_lock_free);
 constexpr bool no_edge_zoomout_v = false;
 
 work_result work(const int argc, const char* const * const argv) try {
+	const bool is_cli_tool = cmd_line_params(argc, argv).is_cli_tool();
+
+	if (is_cli_tool) {
+		LOG("Launching a CLI tool. Skipping Steam API initialization.");
+	}
+	else {
 #if CREATE_STEAM_APPID
-	augs::save_as_text("steam_appid.txt", std::to_string(::steam_get_appid()));
+		augs::save_as_text("steam_appid.txt", std::to_string(::steam_get_appid()));
 #elif !IS_PRODUCTION_BUILD
-	augs::remove_file("steam_appid.txt");
+		augs::remove_file("steam_appid.txt");
 #endif
 
-	if (::steam_restart()) {
-		return work_result::STEAM_RESTART;
+		if (::steam_restart()) {
+			return work_result::STEAM_RESTART;
+		}
 	}
 
-	const auto steam_status = steam_init_result(::steam_init());
+	const auto steam_status = 
+		is_cli_tool ?
+		steam_init_result::DISABLED : 
+		steam_init_result(::steam_init())
+	;
 
 	if (steam_status == steam_init_result::FAILURE) {
 		LOG("Failed to init Steam API!");
 		return work_result::FAILURE;
 	}
 
-	auto deinit = augs::scope_guard([]() {
-		::steam_deinit();
+	const bool steam_initialized = steam_status == steam_init_result::SUCCESS;
+
+	auto deinit = augs::scope_guard([steam_initialized]() {
+		if (steam_initialized) {
+			::steam_deinit();
+		}
 	});
 
-	const bool is_steam_client = steam_status == steam_init_result::SUCCESS;
+	const bool is_steam_client = steam_initialized;
 	(void)is_steam_client;
 
 #if PLATFORM_UNIX	
@@ -421,10 +436,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG("Checking for updates");
 
-		const bool should_update_headless = 
-			params.type == app_type::DEDICATED_SERVER
-			|| params.type == app_type::MASTERSERVER
-		;
+		const bool should_update_headless = is_cli_tool;
 
 		LOG_NVPS(should_update_headless);
 
@@ -2815,9 +2827,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				thread_local steam_rich_presence_pairs pairs;
 				pairs.clear();
 
-				if constexpr(is_one_of_v<S, main_menu_setup, test_scene_setup>) {
-					setup.get_steam_rich_presence_pairs(pairs);
-				}
+				setup.get_steam_rich_presence_pairs(pairs);
 
 				for (auto& p : pairs) {
 					::steam_set_rich_presence(p.first.c_str(), p.second.c_str());

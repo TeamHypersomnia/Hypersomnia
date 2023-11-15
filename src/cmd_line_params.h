@@ -162,4 +162,8 @@ struct cmd_line_params {
 			}
 		}
 	}
+
+	bool is_cli_tool() const {
+		return type == app_type::MASTERSERVER || type == app_type::DEDICATED_SERVER;
+	}
 };
