@@ -48,6 +48,8 @@
 #include "application/setups/client/direct_file_download.h"
 #include "application/setups/client/bandwidth_monitor.h"
 
+#include "steam_rich_presence_pairs.h"
+
 struct config_lua_table;
 
 class https_file_downloader;
@@ -854,4 +856,6 @@ public:
 	file_chunk_index_type calc_num_chunks_per_tick() const;
 
 	void apply_nonzoomedout_visible_world_area(vec2);
+
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

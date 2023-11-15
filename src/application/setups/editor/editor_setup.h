@@ -55,6 +55,7 @@
 #include "application/main/miniature_generator.h"
 #include "application/network/network_common.h"
 #include "application/arena/scene_entity_to_node_map.h"
+#include "steam_rich_presence_pairs.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -824,4 +825,6 @@ public:
 	}
 
 	void do_uploading_imgui();
+
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

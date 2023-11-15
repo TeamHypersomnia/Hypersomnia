@@ -1772,3 +1772,13 @@ void client_setup::wait_for_demo_flush() {
 		future_flushed_demo.wait();
 	}
 }
+
+void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	::get_arena_steam_rich_presence_pairs(
+		pairs,
+		sv_public_vars.arena,
+		get_arena_handle(client_arena_type::REFERENTIAL),
+		client_player_id,
+		is_replaying()
+	);
+}

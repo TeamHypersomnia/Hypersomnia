@@ -2765,6 +2765,15 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 	c.downloading_status = type;
 }
 
+void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	::get_arena_steam_rich_presence_pairs(
+		pairs,
+		get_current_arena_name(),
+		get_arena_handle(),
+		get_integrated_player_id(),
+		false
+	);
+}
 
 #include "augs/readwrite/to_bytes.h"
 

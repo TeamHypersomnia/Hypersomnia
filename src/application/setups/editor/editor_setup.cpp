@@ -3745,6 +3745,11 @@ void editor_setup::advance_uploading() {
 	}
 }
 
+void editor_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	pairs.push_back({ "steam_display", "#Status_Editing" });
+	pairs.push_back({ "mapname", get_arena_name() });
+}
+
 template struct create_resource_command<editor_material_resource>;
 
 template struct edit_resource_command<editor_sprite_resource>;

@@ -35,6 +35,7 @@
 #include "application/setups/server/rcon_level.h"
 #include "game/messages/mode_notification.h"
 #include "application/setups/server/file_chunk_packet.h"
+#include "steam_rich_presence_pairs.h"
 
 struct netcode_socket_t;
 struct config_lua_table;
@@ -683,4 +684,5 @@ public:
 	}
 
 	bool is_playtesting_server() const;
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

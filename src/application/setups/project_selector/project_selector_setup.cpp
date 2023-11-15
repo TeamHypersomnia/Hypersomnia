@@ -960,3 +960,7 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 			return custom_imgui_result::OPEN_SELECTED_PROJECT;
 	}
 }
+
+void project_selector_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	pairs.push_back({ "steam_display", "#Status_ProjectSelector" });
+}

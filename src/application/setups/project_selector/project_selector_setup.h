@@ -24,6 +24,7 @@
 #include "application/setups/editor/project/editor_project_about.h"
 #include "application/setups/editor/project/editor_project_meta.h"
 #include "application/setups/editor/project/editor_project_about.h"
+#include "steam_rich_presence_pairs.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -168,4 +169,6 @@ public:
 	bool handle_input_before_game(
 		const handle_input_before_game_input
 	);
+
+	void get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const;
 };
