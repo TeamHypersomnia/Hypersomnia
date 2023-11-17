@@ -150,8 +150,11 @@ class server_setup :
 	net_time_t when_last_sent_net_statistics = 0;
 	net_time_t when_last_sent_admin_public_settings = 0;
 	net_time_t when_last_sent_heartbeat_to_server_list = 0;
+	net_time_t when_last_sent_tell_me_my_address = 0;
 	net_time_t when_last_resolved_server_list_addr = 0;
 	net_time_t when_last_resolved_internal_address = 0;
+
+	double tell_me_my_address_stamp = 0;
 
 	std::chrono::system_clock::time_point when_to_check_for_updates;
 	hour_and_minute_str when_to_check_for_updates_last_var;
@@ -162,6 +165,9 @@ class server_setup :
 
 	std::future<std::optional<netcode_address_t>> future_internal_address;
 	std::optional<netcode_address_t> internal_address;
+
+	std::future<std::optional<netcode_address_t>> future_external_address;
+	std::optional<netcode_address_t> external_address;
 
 	net_time_t server_time = 0.0;
 	bool shutdown_scheduled = false;
@@ -239,6 +245,9 @@ private:
 	void refresh_available_direct_download_bandwidths();
 	void send_packets_if_its_time();
 
+	void send_tell_me_my_address();
+	void send_tell_me_my_address_if_its_time();
+
 	void send_heartbeat_to_server_list();
 	void send_heartbeat_to_server_list_if_its_time();
 
@@ -279,7 +288,13 @@ private:
 	bool has_sent_any_heartbeats() const;
 	void shutdown();
 
-	bool respond_to_ping_requests(
+	bool handle_masterserver_response(
+		const netcode_address_t& from,
+		const std::byte* packet_buffer,
+		const std::size_t packet_bytes
+	);
+
+	bool handle_gameserver_command(
 		const netcode_address_t& from,
 		const std::byte* packet_buffer,
 		const std::size_t packet_bytes
@@ -439,6 +454,7 @@ public:
 				resolve_internal_address_if_its_time();
 				resolve_heartbeat_host_if_its_time();
 				send_heartbeat_to_server_list_if_its_time();
+				send_tell_me_my_address_if_its_time();
 			}
 
 			reinfer_if_necessary_for(step_collected);

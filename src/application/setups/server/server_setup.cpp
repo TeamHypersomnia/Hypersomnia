@@ -81,7 +81,11 @@ server_setup::server_setup(
 			in,
 			dedicated == std::nullopt,
 			[this](auto&&... args) {
-				if (respond_to_ping_requests(std::forward<decltype(args)>(args)...)) {
+				if (handle_masterserver_response(std::forward<decltype(args)>(args)...)) {
+					return true;
+				}
+
+				if (handle_gameserver_command(std::forward<decltype(args)>(args)...)) {
 					return true;
 				}
 
@@ -93,6 +97,8 @@ server_setup::server_setup(
 	nat_traversal(nat_traversal_input, resolved_server_list_addr),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
+	yojimbo::random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
+
 	{
 		auto initial_vars_modified = initial_vars;
 		auto source_server_name = std::string(initial_vars_modified.server_name);
@@ -629,7 +635,41 @@ void server_setup::finalize_webhook_jobs() {
 	erase_if(pending_jobs, finalize);
 }
 
-bool server_setup::respond_to_ping_requests(
+bool server_setup::handle_masterserver_response(
+	const netcode_address_t&,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) {
+	auto handle = [&](const auto& typed_request) {
+		using T = remove_cref<decltype(typed_request)>;
+
+		if constexpr(std::is_same_v<T, masterserver_out::tell_me_my_address>) {
+			if (!external_address.has_value()) {
+				if (!std::memcmp(&tell_me_my_address_stamp, &typed_request.session_timestamp, sizeof(tell_me_my_address_stamp))) {
+					external_address = typed_request.address;
+
+					LOG("masterserver_out::tell_me_my_address arrived with result: %x", ::ToString(typed_request.address));
+				}	
+
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	try {
+		const auto response = augs::from_bytes<masterserver_response>(packet_buffer, packet_bytes);
+		return std::visit(handle, response);
+	}
+	catch (const augs::stream_read_error& err) {
+
+	}
+
+	return false;
+}
+
+bool server_setup::handle_gameserver_command(
 	const netcode_address_t& from,
 	const std::byte* packet_buffer,
 	const std::size_t packet_bytes
@@ -648,6 +688,12 @@ bool server_setup::respond_to_ping_requests(
 			server->send_udp_packet(from, bytes.data(), bytes.size());
 
 			return true;
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
+			// handled elsewhere
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive");
 		}
 
 		return false;
@@ -690,6 +736,49 @@ uint32_t server_setup::get_num_active_players() const {
 
 bool server_setup::is_playtesting_server() const {
 	return vars.playtesting_context.has_value();
+}
+
+void server_setup::send_tell_me_my_address_if_its_time() {
+	if (external_address.has_value()) {
+		return;
+	}
+
+	if (!server_list_enabled()) {
+		return;
+	}
+
+	if (resolved_server_list_addr == std::nullopt) {
+		return;
+	}
+
+	auto& when_last = when_last_sent_tell_me_my_address;
+
+	const auto since_last = server_time - when_last;
+	const auto send_every = 0.5;
+
+	const bool send_for_the_first_time = when_last == 0;
+
+	if (send_for_the_first_time || since_last >= send_every) {
+		const auto times = send_for_the_first_time ? 4 : 1;
+
+		for (int i = 0; i < times; ++i) {
+			send_tell_me_my_address();
+		}
+
+		when_last = server_time;
+	}
+}
+
+void server_setup::send_tell_me_my_address() {
+	ensure(resolved_server_list_addr.has_value());
+
+	const auto request = masterserver_in::tell_me_my_address { tell_me_my_address_stamp };
+	auto bytes = augs::to_bytes(masterserver_request(request));
+
+	const auto destination_address = resolved_server_list_addr.value();
+	LOG("Sending masterserver_in::tell_me_my_address to %x", ToString(to_yojimbo_addr(destination_address)));
+
+	server->send_udp_packet(destination_address, bytes.data(), bytes.size());
 }
 
 void server_setup::send_heartbeat_to_server_list() {
