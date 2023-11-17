@@ -36,6 +36,11 @@ void client_start_input::set_custom(const std::string& target) {
 	chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
 }
 
+void client_start_input::set_official(const std::string& target) { 
+	preferred_official_address = target;
+	chosen_address_type = connect_address_type::OFFICIAL;
+}
+
 void start_client_gui_state::clear_demo_choice() {
 	demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
 	demo_meta = {};

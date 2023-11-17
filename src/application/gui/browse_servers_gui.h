@@ -48,6 +48,10 @@ struct server_list_entry {
 	server_heartbeat heartbeat;
 	bool is_community_server = false;
 
+	bool is_official_server() const {
+		return !is_community_server;
+	}
+
 	ping_progress progress;
 
 	bool is_set() const;
@@ -84,6 +88,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 		const bool streamer_mode
 	);
 
+	std::optional<std::string> requested_official_connection;
 	std::optional<netcode_address_t> requested_connection;
 	std::string displayed_connecting_server_name;
 
@@ -111,7 +116,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::string loading_dots;
 	uint64_t ping_sequence_counter = 0;
 
-	void refresh_server_list(browse_servers_input);
 	void refresh_server_pings();
 
 	server_list_entry* find_entry(const netcode_address_t&);
@@ -125,6 +129,8 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void handle_incoming_udp_packets(netcode_socket_t&);
 	void send_pings_and_punch_requests(netcode_socket_t&);
 
+	void refresh_server_list(browse_servers_input);
+	void handle_server_list_response();
 public:
 
 	using base = standard_window_mixin<browse_servers_gui_state>;
@@ -132,9 +138,14 @@ public:
 	~browse_servers_gui_state();
 
 	bool perform(browse_servers_input);
+
+	void sync_download_server_entry(browse_servers_input, const client_start_input& in);
+
 	void advance_ping_logic();
 
 	void reping_all_servers();
 
 	const server_list_entry* find_entry(const client_start_input& in) const;
+
+	bool refreshed_at_least_once() const;
 };

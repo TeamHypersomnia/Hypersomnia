@@ -20,4 +20,5 @@ struct client_start_input {
 
 	address_and_port get_address_and_port() const;
 	void set_custom(const std::string& target);
+	void set_official(const std::string& target);
 };

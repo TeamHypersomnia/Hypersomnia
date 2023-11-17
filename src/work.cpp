@@ -1329,6 +1329,16 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
+	auto get_browse_servers_input = [&]() {
+		return browse_servers_input {
+			config.server_list_provider,
+			config.client_start,
+			config.official_arena_servers,
+			config.faction_view,
+			config.streamer_mode && config.streamer_mode_flags.community_servers
+		};
+	};
+
 	auto launch_client = [&](const bool ignore_nat_check) {
 		bool public_internet = false;
 
@@ -1338,6 +1348,21 @@ work_result work(const int argc, const char* const * const argv) try {
 			LOG("Finished NAT traversal. Connecting immediately.");
 		}
 		else {
+			if (config.client_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+				if (!browse_servers_gui.refreshed_at_least_once()) {
+					/* 
+						If we're connecting to a custom server via CLI
+						(either via Steam API, CLI flag or relaunching with last remembered activity)
+						we need to ask the server list to know if the server is behind NAT.
+					*/
+
+					browse_servers_gui.sync_download_server_entry(
+						get_browse_servers_input(),
+						config.client_start
+					);
+				}
+			}
+
 			if (auto info = find_chosen_server_info()) {
 				LOG("Found the chosen server in the browser list.");
 
@@ -1626,16 +1651,6 @@ work_result work(const int argc, const char* const * const argv) try {
 		launch_setup(activity_type::CLIENT);
 	};
 
-	auto get_browse_servers_input = [&]() {
-		return browse_servers_input {
-			config.server_list_provider,
-			config.client_start,
-			config.official_arena_servers,
-			config.faction_view,
-			config.streamer_mode && config.streamer_mode_flags.community_servers
-		};
-	};
-
 	auto get_map_catalogue_input = [&]() {
 		return map_catalogue_input {
 			config.server.external_arena_files_provider,
@@ -1673,7 +1688,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto perform_start_client = [&](const auto frame_num) {
+	auto perform_start_client_gui = [&](const auto frame_num) {
 		const bool perform_result = start_client_gui.perform(
 			frame_num,
 			get_general_renderer(), 
@@ -1689,7 +1704,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto perform_start_server = [&]() {
+	auto perform_start_server_gui = [&]() {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
 			config.server_start, 
 			config.server, 
@@ -2178,8 +2193,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				if (!has_current_setup()) {
 					perform_last_exit_incorrect();
-					perform_start_client(frame_num);
-					perform_start_server();
+					perform_start_client_gui(frame_num);
+					perform_start_server_gui();
 				}
 
 				perform_failed_to_load_arena_popup();

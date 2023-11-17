@@ -66,6 +66,27 @@ browse_servers_gui_state::browse_servers_gui_state(const std::string& title)
 
 double yojimbo_time();
 
+void browse_servers_gui_state::sync_download_server_entry(
+	const browse_servers_input in,
+	const client_start_input& server
+) {
+	LOG("Calling sync_download_server_entry.");
+
+	/*
+		For now this will just refresh the whole list
+		so find_entry later returns a valid entry.
+	*/
+
+	(void)server;
+
+	refresh_server_list(in);
+	handle_server_list_response();
+}
+
+bool browse_servers_gui_state::refreshed_at_least_once() const {
+	return when_last_started_refreshing_server_list != 0;
+}
+
 void browse_servers_gui_state::refresh_server_list(const browse_servers_input in) {
 	using namespace httplib;
 
@@ -448,11 +469,16 @@ void browse_servers_gui_state::show_server_list(
 
 				displayed_connecting_server_name = s.heartbeat.server_name;
 
-				if (s.progress.found_on_internal_network) {
-					requested_connection = s.heartbeat.internal_network_address;
-				}
+				if (const auto official_data = find_resolved_official(s.address)) {
+					requested_official_connection = official_data->host;
+				}	
 				else {
-					requested_connection = s.address;
+					if (s.progress.found_on_internal_network) {
+						requested_connection = s.heartbeat.internal_network_address;
+					}
+					else {
+						requested_connection = s.address;
+					}
 				}
 			}
 		}
@@ -523,6 +549,51 @@ const resolve_address_result* browse_servers_gui_state::find_resolved_official(c
 	return nullptr;
 }
 
+void browse_servers_gui_state::handle_server_list_response() {
+	using namespace httplib_utils;
+
+	auto result = data->future_response.get();
+
+	if (result == std::nullopt || result.value() == nullptr) {
+		error_message = "Couldn't connect to the server list host.";
+		return;
+	}
+
+	const auto& response = result.value();
+	const auto status = response->status;
+
+	LOG("Server list response status: %x", status);
+
+	if (!successful(status)) {
+		const auto couldnt_download = std::string("Couldn't download the server list.\n");
+
+		error_message = couldnt_download + "HTTP response: " + std::to_string(status);
+		return;
+	}
+
+	const auto& bytes = response->body;
+
+	LOG("Server list response bytes: %x", bytes.size());
+
+	auto stream = augs::make_ptr_read_stream(bytes.data(), bytes.size());
+
+	try {
+		while (stream.has_unread_bytes()) {
+			server_list_entry entry;
+
+			augs::read_bytes(stream, entry.address);
+			augs::read_bytes(stream, entry.time_hosted);
+			augs::read_bytes(stream, entry.heartbeat);
+
+			server_list.emplace_back(std::move(entry));
+		}
+	}
+	catch (const augs::stream_read_error& err) {
+		error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
+		server_list.clear();
+	}
+}
+
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
@@ -540,49 +611,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return false;
 	}
 
-	const auto couldnt_download = std::string("Couldn't download the server list.\n");
-
-	auto handle_response = [&](const auto& result) {
-		if (result == std::nullopt || result.value() == nullptr) {
-			error_message = "Couldn't connect to the server list host.";
-			return;
-		}
-
-		const auto& response = result.value();
-		const auto status = response->status;
-
-		LOG("Server list response status: %x", status);
-
-		if (!successful(status)) {
-			error_message = couldnt_download + "HTTP response: " + std::to_string(status);
-			return;
-		}
-
-		const auto& bytes = response->body;
-
-		LOG("Server list response bytes: %x", bytes.size());
-
-		auto stream = augs::make_ptr_read_stream(bytes.data(), bytes.size());
-
-		try {
-			while (stream.has_unread_bytes()) {
-				server_list_entry entry;
-
-				augs::read_bytes(stream, entry.address);
-				augs::read_bytes(stream, entry.time_hosted);
-				augs::read_bytes(stream, entry.heartbeat);
-
-				server_list.emplace_back(std::move(entry));
-			}
-		}
-		catch (const augs::stream_read_error& err) {
-			error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
-			server_list.clear();
-		}
-	};
-
 	if (valid_and_is_ready(data->future_response)) {
-		handle_response(data->future_response.get());
+		handle_server_list_response();
 	}
 
 	if (valid_and_is_ready(data->future_official_addresses)) {
@@ -599,6 +629,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	bool has_local_servers = false;
 	bool has_official_servers = false;
 	bool has_community_servers = false;
+
+	requested_connection = std::nullopt;
+	requested_official_connection = std::nullopt;
 
 	for (auto& s : server_list) {
 		const auto& name = s.heartbeat.server_name;
@@ -753,8 +786,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	if (when_last_started_refreshing_server_list == 0) {
 		refresh_server_list(in);
 	}
-
-	requested_connection = std::nullopt;
 
 	auto do_list_view = [&](bool disable_content_view) {
 		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
@@ -928,15 +959,20 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			if (ImGui::Button("Connect")) {
 				auto& s = selected_server;
 
-				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
+				LOG("Chosen server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
 
 				displayed_connecting_server_name = s.heartbeat.server_name;
 
-				if (s.progress.found_on_internal_network) {
-					requested_connection = s.heartbeat.internal_network_address;
-				}
+				if (const auto official_data = find_resolved_official(s.address)) {
+					requested_official_connection = official_data->host;
+				}	
 				else {
-					requested_connection = s.address;
+					if (s.progress.found_on_internal_network) {
+						requested_connection = s.heartbeat.internal_network_address;
+					}
+					else {
+						requested_connection = s.address;
+					}
 				}
 			}
 
@@ -987,14 +1023,23 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return true;
 	}
 
+	if (requested_official_connection.has_value()) {
+		in.client_start.set_official(*requested_official_connection);
+		in.client_start.displayed_connecting_server_name = displayed_connecting_server_name;
+
+		return true;
+	}
+
 	return false;
 }
 
 const server_list_entry* browse_servers_gui_state::find_entry(const client_start_input& in) const {
-	if (const auto connected_address = to_netcode_addr(in.get_address_and_port())) {
-		LOG("Finding the server entry by: %x", ::ToString(*connected_address));
-		LOG("Number of servers in the browser: %x", server_list.size());
+	const auto queried_addr_and_port = in.get_address_and_port();
 
+	LOG("Finding the server entry by: %x:%x", queried_addr_and_port.address, queried_addr_and_port.default_port);
+	LOG("Number of servers in the browser: %x", server_list.size());
+
+	if (const auto connected_address = to_netcode_addr(queried_addr_and_port)) {
 		for (auto& s : server_list) {
 			if (s.address == *connected_address) {
 				return &s;
