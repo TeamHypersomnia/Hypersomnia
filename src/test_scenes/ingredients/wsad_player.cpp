@@ -280,7 +280,7 @@ namespace test_flavours {
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 
-			sentience.sprint_drains_cp_per_second = 25.f;
+			sentience.sprint_drains_cp_per_second = 50.f;
 			sentience.exertion_cooldown_for_cp_regen_ms = 500.f;
 			sentience.dash_drains_cp = 60.f;
 			sentience.cp_regen_mult_when_moving = 0.3f;
