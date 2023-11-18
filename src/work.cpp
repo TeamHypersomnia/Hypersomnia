@@ -1231,8 +1231,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
+	bool set_rich_presence_now = true;
+
 	auto setup_launcher = [&](auto&& setup_init_callback) {
 		::steam_clear_rich_presence();
+		set_rich_presence_now = true;
+		
 		get_audiovisuals().get<particles_simulation_system>().clear();
 		
 		game_gui_mode_flag = false;
@@ -2880,7 +2884,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			thread_local augs::timer rich_presence_timer;
 			const auto passed_secs = rich_presence_timer.get<std::chrono::seconds>();
 
-			if (passed_secs > 2.0) {
+			if (passed_secs > 2.0 || set_rich_presence_now) {
+				set_rich_presence_now = false;
 				rich_presence_timer.reset();
 
 				thread_local steam_rich_presence_pairs pairs;
