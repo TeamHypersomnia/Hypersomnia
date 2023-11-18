@@ -7,6 +7,7 @@ const int steam_app_id = 2660970;
 #include "steam_api.h"
 
 steam_callback_queue_type steam_event_queue;
+uint8_t* avatar_data = nullptr;
 
 class new_url_launch_parameters_t {
 private:
@@ -48,10 +49,15 @@ extern "C" {
 		if (iImage != 0) {
 			SteamUtils()->GetImageSize(iImage, width, height);
 
-			uint8_t* rgba = new uint8_t[4 * (*width) * (*height)];
-			SteamUtils()->GetImageRGBA(iImage, rgba, 4 * (*width) * (*height));
+			if (avatar_data) {
+				delete [] avatar_data;
+			}
 
-			return rgba;
+			avatar_data = new uint8_t[4 * (*width) * (*height)];
+
+			SteamUtils()->GetImageRGBA(iImage, avatar_data, 4 * (*width) * (*height));
+
+			return avatar_data;
 		}
 
 		// Avatar retrieval failed

@@ -14,13 +14,12 @@ inline std::string steam_get_launch_command_line_string() {
 	return std::string();
 }
 
-inline augs::image steam_get_avatar() {
+inline augs::image steam_get_avatar_image() {
 	uint32_t w = 0;
 	uint32_t h = 0;
 
 	if (const auto rgba = steam_get_avatar(&w, &h)) {
 		auto result = augs::image(rgba, vec2u(w, h));
-		delete [] rgba;
 
 		const auto max_s = static_cast<unsigned>(max_avatar_side_v);
 		result.scale(vec2u::square(max_s));
