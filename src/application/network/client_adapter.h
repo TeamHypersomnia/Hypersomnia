@@ -17,6 +17,7 @@ class client_adapter {
 	GameAdapter adapter;
 	yojimbo::Client client;
 	client_auxiliary_command_callback_type auxiliary_command_callback;
+	netcode_address_t connected_ip_address;
 
 	friend GameAdapter;
 
@@ -68,4 +69,6 @@ public:
 	const netcode_socket_t* find_underlying_socket() const;
 
 	yojimbo::BlockProgress get_block_progress(game_channel_type) const;
+
+	netcode_address_t get_connected_ip_address() const;
 };

@@ -2854,6 +2854,14 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 	c.downloading_status = type;
 }
 
+std::string server_setup::get_steam_join_command_line() const {
+	if (external_address.has_value()) {
+		return typesafe_sprintf("%x", ::ToString(*external_address));
+	}
+
+	return "";
+}
+
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -2862,6 +2870,10 @@ void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 		get_integrated_player_id(),
 		false
 	);
+
+	if (const auto join_cmd = get_steam_join_command_line(); !join_cmd.empty()) {
+		pairs.push_back({ "connect", join_cmd });
+	}
 }
 
 #include "augs/readwrite/to_bytes.h"

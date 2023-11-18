@@ -700,5 +700,7 @@ public:
 	}
 
 	bool is_playtesting_server() const;
+
+	std::string get_steam_join_command_line() const;
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 };

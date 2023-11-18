@@ -496,6 +496,7 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 		return resolved_addr;
 	}
 
+	connected_ip_address = resolved_addr.addr;
 	const auto& target_addr = to_yojimbo_addr(resolved_addr.addr);
 
 	auto local_addr = yojimbo::Address("127.0.0.1", 8412);
@@ -693,6 +694,10 @@ const netcode_socket_t* client_adapter::find_underlying_socket() const {
 	}
 
 	return nullptr;
+}
+
+netcode_address_t client_adapter::get_connected_ip_address() const {
+	return connected_ip_address;
 }
 
 yojimbo::BlockProgress client_adapter::get_block_progress(const game_channel_type channel) const {

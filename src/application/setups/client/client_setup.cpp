@@ -189,7 +189,7 @@ void client_setup::flush_demo_steps() {
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;
 				meta.server_name = displayed_connecting_server_name;
-				meta.server_address = last_addr.address;
+				meta.server_address = connect_addr.address;
 				meta.version = hypersomnia_version();
 				meta.when_recorded = augs::date_time().get_utc_timestamp();
 				augs::write_bytes(out, meta);
@@ -294,11 +294,13 @@ client_setup::client_setup(
 	const client_start_input& in,
 	const client_vars& initial_vars,
 	const nat_detection_settings& nat_detection,
-	port_type preferred_binding_port
+	const port_type preferred_binding_port,
+	const std::optional<netcode_address_t> before_traversal_server_address
 ) : 
 	lua(lua),
 	official(official),
-	last_addr(in.get_address_and_port()),
+	connect_addr(in.get_address_and_port()),
+	before_traversal_server_address(before_traversal_server_address),
 	displayed_connecting_server_name(in.displayed_connecting_server_name),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(preferred_binding_port, [this](std::byte* bytes, std::size_t n) {
@@ -309,7 +311,7 @@ client_setup::client_setup(
 {
 	(void)nat_detection;
 
-	LOG("Initializing connection with %x", last_addr.address);
+	LOG("Initializing connection with %x", connect_addr.address);
 
 	const auto& input_demo_path = in.replay_demo;
 
@@ -352,7 +354,7 @@ client_setup::client_setup(
 		else {
 			augs::network::enable_detailed_logs(true);
 
-			const auto resolution = adapter->connect(last_addr);
+			const auto resolution = adapter->connect(connect_addr);
 
 			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 				const auto reason = typesafe_sprintf(
@@ -364,11 +366,11 @@ client_setup::client_setup(
 			}
 			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 				const auto reason = typesafe_sprintf(
-					"You have entered an invalid address!", last_addr.address
+					"You have entered an invalid address!", connect_addr.address
 				);
 
 				set_disconnect_reason(reason);
-				LOG("Address: \"%x\"", last_addr.address);
+				LOG("Address: \"%x\"", connect_addr.address);
 			}
 			else {
 				resolved_server_address = resolution.addr;
@@ -1773,6 +1775,10 @@ void client_setup::wait_for_demo_flush() {
 	}
 }
 
+std::string client_setup::get_steam_join_command_line() const {
+	return typesafe_sprintf("%x", ::ToString(get_server_address_for_others_to_join()));
+}
+
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -1781,4 +1787,14 @@ void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 		client_player_id,
 		is_replaying()
 	);
+
+	pairs.push_back({ "connect", get_steam_join_command_line() });
+}
+
+netcode_address_t client_setup::get_server_address_for_others_to_join() const {
+	if (before_traversal_server_address.has_value()) {
+		return *before_traversal_server_address;
+	}
+
+	return adapter->get_connected_ip_address();
 }

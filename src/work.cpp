@@ -1339,7 +1339,17 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 	};
 
-	auto launch_client = [&](const bool ignore_nat_check) {
+	auto launch_client_setup = [&](
+		const bool ignore_nat_check,
+
+		/* 
+			NAT traversal could make us connect to a different server port, 
+			so for Steam Rich Presence to provide a correct Join Game server address,
+			we need to keep track of what address we wanted to connect to originally.
+		*/
+
+		const std::optional<netcode_address_t> before_traversal_server_address = std::nullopt
+	) {
 		bool public_internet = false;
 
 		streaming.wait_demos_compressed();
@@ -1402,7 +1412,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				config.client_start,
 				config.client,
 				config.nat_detection,
-				bound_port
+				bound_port,
+				before_traversal_server_address
 			);
 		});
 
@@ -1449,7 +1460,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			case activity_type::CLIENT: {
 				const bool ignore_nat_check = false;
 
-				if (!launch_client(ignore_nat_check)) {
+				if (!launch_client_setup(ignore_nat_check)) {
 					return;
 				}
 
@@ -1563,10 +1574,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		save_last_activity(mode);
 	};
 
-	auto finalize_pending_launch = [&]() {
+	auto finalize_pending_launch = [&](std::optional<netcode_address_t> before_addr = std::nullopt) {
 		if (pending_launch == activity_type::CLIENT) {
 			const bool ignore_nat_check = true;
-			launch_client(ignore_nat_check);
+			launch_client_setup(ignore_nat_check, before_addr);
 		}
 		else {
 			launch_setup(*pending_launch);
@@ -1623,10 +1634,11 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto state = nat_traversal->get_current_state();
 
 		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
+			const auto before_traversal_server_address = ::to_netcode_addr(config.client_start.get_address_and_port());
 			config.client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
 			nat_traversal.reset();
 
-			finalize_pending_launch();
+			finalize_pending_launch(before_traversal_server_address);
 		}
 		else if (state == nat_traversal_session::state::TIMED_OUT) {
 			const auto next_port = get_bound_local_port();
@@ -2865,36 +2877,48 @@ work_result work(const int argc, const char* const * const argv) try {
 		);
 	};
 
-	if (!params.debugger_target.empty()) {
-		launch_debugger(lua, params.debugger_target);
-	}
-	else if (params.start_server) {
-		launch_setup(activity_type::SERVER);
-	}
-	else if (params.should_connect) {
-		{
-			const auto& target = params.connect_address;
-
+	{
+		auto connect_to = [&](const auto& target) {
 			if (!target.empty()) {
 				change_with_save([&](config_lua_table& cfg) {
 					cfg.client_start.set_custom(target);
 				});
 			}
-		}
 
-		launch_setup(activity_type::CLIENT);
-	}
-	else {
-		if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
-			if (!config.skip_tutorial) {
-				launch_setup(activity_type::TUTORIAL);
-			}
-			else {
-				launch_setup(config.get_last_activity());
-			}
+			launch_setup(activity_type::CLIENT);
+		};
+
+		const auto steam_cli = steam_get_launch_command_line_string();
+
+		if (steam_cli.length() > 1) {
+			LOG("Detected Steam CLI (length: %x): %x", steam_cli.length(), steam_cli);
+			connect_to(steam_cli);
 		}
 		else {
-			launch_setup(activity_type::MAIN_MENU);
+			LOG("No Steam CLI detected.");
+
+			if (!params.debugger_target.empty()) {
+				launch_debugger(lua, params.debugger_target);
+			}
+			else if (params.start_server) {
+				launch_setup(activity_type::SERVER);
+			}
+			else if (params.should_connect) {
+				connect_to(params.connect_address);
+			}
+			else {
+				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
+					if (!config.skip_tutorial) {
+						launch_setup(activity_type::TUTORIAL);
+					}
+					else {
+						launch_setup(config.get_last_activity());
+					}
+				}
+				else {
+					launch_setup(activity_type::MAIN_MENU);
+				}
+			}
 		}
 	}
 

@@ -101,8 +101,9 @@ class client_setup :
 	const packaged_official_content& official;
 
 	simulation_receiver receiver;
+	address_and_port connect_addr;
 
-	address_and_port last_addr;
+	std::optional<netcode_address_t> before_traversal_server_address;
 	std::string displayed_connecting_server_name;
 
 	netcode_address_t resolved_server_address;
@@ -597,7 +598,8 @@ public:
 		const client_start_input&,
 		const client_vars& initial_vars,
 		const nat_detection_settings& nat_detection,
-		port_type preferred_binding_port
+		port_type preferred_binding_port,
+		const std::optional<netcode_address_t> before_traversal_server_address
 	);
 
 	~client_setup();
@@ -691,7 +693,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, official, client_in, vars_backup, nat_detection_settings(), port_type(0));
+					new (this) client_setup(l, official, client_in, vars_backup, nat_detection_settings(), port_type(0), std::nullopt);
 				}
 
 				demo_player = std::move(player_backup);
@@ -858,4 +860,7 @@ public:
 	void apply_nonzoomedout_visible_world_area(vec2);
 
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
+
+	netcode_address_t get_server_address_for_others_to_join() const;
+	std::string get_steam_join_command_line() const;
 };

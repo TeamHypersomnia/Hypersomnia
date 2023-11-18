@@ -25,6 +25,7 @@ extern "C" {
 
 	DLL_EXPORT bool steam_set_rich_presence(const char*, const char*);
 	DLL_EXPORT void steam_clear_rich_presence();
+	DLL_EXPORT int steam_get_launch_command_line(char* buf, int bufsize);
 }
 
 #undef DLL_EXPORT

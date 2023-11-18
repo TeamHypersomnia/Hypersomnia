@@ -55,6 +55,10 @@ extern "C" {
 	void steam_clear_rich_presence() {
 		SteamFriends()->ClearRichPresence();
 	}
+
+	int steam_get_launch_command_line(char* buf, int bufsize) {
+		return SteamApps()->GetLaunchCommandLine(buf, bufsize);
+	}
 }
 #else
 // non-steam version
@@ -92,6 +96,10 @@ extern "C" {
 
 	void steam_clear_rich_presence() {
 
+	}
+
+	int steam_get_launch_command_line(char*, int) {
+		return 0;
 	}
 }
 
