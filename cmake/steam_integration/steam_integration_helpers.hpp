@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/image/image.h"
+#include "augs/network/network_types.h"
 
 inline std::string steam_get_launch_command_line_string() {
 	char buffer[512];
@@ -20,6 +21,8 @@ inline augs::image steam_get_avatar() {
 		auto result = augs::image(rgba, vec2u(w, h));
 		delete [] rgba;
 
+		const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+		result.scale(vec2u::square(max_s));
 		return result;
 	}
 

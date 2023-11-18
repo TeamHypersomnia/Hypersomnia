@@ -1780,12 +1780,15 @@ std::string client_setup::get_steam_join_command_line() const {
 }
 
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	const auto player_group_identifier = get_steam_join_command_line();
+
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
 		sv_public_vars.arena,
 		get_arena_handle(client_arena_type::REFERENTIAL),
 		client_player_id,
-		is_replaying()
+		is_replaying(),
+		player_group_identifier
 	);
 
 	pairs.push_back({ "connect", get_steam_join_command_line() });

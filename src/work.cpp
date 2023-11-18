@@ -2857,7 +2857,12 @@ work_result work(const int argc, const char* const * const argv) try {
 				setup.get_steam_rich_presence_pairs(pairs);
 
 				for (auto& p : pairs) {
-					::steam_set_rich_presence(p.first.c_str(), p.second.c_str());
+					if (p.second.has_value()) {
+						::steam_set_rich_presence(p.first.c_str(), p.second.value().c_str());
+					}
+					else {
+						::steam_set_rich_presence(p.first.c_str(), nullptr);
+					}
 				}
 			}
 		}

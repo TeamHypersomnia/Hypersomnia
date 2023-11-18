@@ -2863,12 +2863,15 @@ std::string server_setup::get_steam_join_command_line() const {
 }
 
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	const auto player_group_identifier = get_steam_join_command_line();
+
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
 		get_current_arena_name(),
 		get_arena_handle(),
 		get_integrated_player_id(),
-		false
+		false,
+		player_group_identifier
 	);
 
 	if (const auto join_cmd = get_steam_join_command_line(); !join_cmd.empty()) {

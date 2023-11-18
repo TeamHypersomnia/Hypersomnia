@@ -39,7 +39,8 @@ void get_arena_steam_rich_presence_pairs(
 	const std::string& mapname,
 	const basic_arena_handle<C, M, I>& handle,
 	const mode_player_id& local_id,
-	const bool replaying
+	const bool replaying,
+	const std::string& player_group_identifier
 ) {
 	std::string gamemode;
 	std::string score1;
@@ -48,9 +49,12 @@ void get_arena_steam_rich_presence_pairs(
 	bool spectating = false;
 	std::string annotation;
 
+	uint32_t num_others_in_group = 0;
+
 	handle.on_mode_with_input(
 		[&]<typename T>(const T& mode, const auto& input) {
 			gamemode = mode.get_name(input);
+			num_others_in_group = mode.get_num_players();
 
 			if (auto player_data = mode.find(local_id)) {
 				if (player_data->get_faction() == faction_type::SPECTATOR) {
@@ -113,5 +117,14 @@ void get_arena_steam_rich_presence_pairs(
 		else {
 			pairs.push_back({ "steam_display", status("%xJustMode") });
 		}
+	}
+
+	if (num_others_in_group > 1) {
+		pairs.push_back({ "steam_player_group", player_group_identifier });
+		pairs.push_back({ "steam_player_group_size", std::to_string(num_others_in_group) });
+	}
+	else {
+		pairs.push_back({ "steam_player_group", std::nullopt });
+		pairs.push_back({ "steam_player_group_size", std::nullopt });
 	}
 }
