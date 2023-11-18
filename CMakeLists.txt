@@ -1653,21 +1653,22 @@ set(HYPERSOMNIA_LIBS lua streflop blake3)
 
 include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
 
+if (MSVC)
+	set(PLATFORM_NAME "windows")
+	set(STEAM_API_FILENAME "steam_api64.dll")
+elseif(APPLE)
+	set(PLATFORM_NAME "macos")
+	set(STEAM_API_FILENAME "libsteam_api.dylib")
+elseif(UNIX)
+	set(PLATFORM_NAME "linux")
+	set(STEAM_API_FILENAME "libsteam_api.so")
+endif()
+
+set(LIBSTEAM_INTEGRATION_LOCATION ${PROJECT_SOURCE_DIR}/cmake/steam_integration/bin/${PLATFORM_NAME})
+set(STEAM_API_RUNTIME ${LIBSTEAM_INTEGRATION_LOCATION}/${STEAM_API_FILENAME})
+
 if(LINK_STEAM_INTEGRATION)
 	message("Steam integration will be linked dynamically.")
-
-	if (MSVC)
-		set(PLATFORM_NAME "windows")
-		set(STEAM_API_FILENAME "steam_api64.dll")
-	elseif(APPLE)
-		set(PLATFORM_NAME "macos")
-		set(STEAM_API_FILENAME "libsteam_api.dylib")
-	elseif(UNIX)
-		set(PLATFORM_NAME "linux")
-		set(STEAM_API_FILENAME "libsteam_api.so")
-	endif()
-
-	set(LIBSTEAM_INTEGRATION_LOCATION ${PROJECT_SOURCE_DIR}/cmake/steam_integration/bin/${PLATFORM_NAME})
 
 	find_library(STEAM_INTEGRATION_LIBRARY
         NAMES steam_integration
@@ -1676,7 +1677,6 @@ if(LINK_STEAM_INTEGRATION)
     )
 	
 	set(STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_LIBRARY})
-	set(STEAM_API_RUNTIME ${LIBSTEAM_INTEGRATION_LOCATION}/${STEAM_API_FILENAME})
 
 	if (MSVC)
 		string(REPLACE ".lib" ".dll" STEAM_INTEGRATION_RUNTIME ${STEAM_INTEGRATION_RUNTIME})
@@ -1689,11 +1689,21 @@ if(LINK_STEAM_INTEGRATION)
 	message("STEAM_API_RUNTIME: ${STEAM_API_RUNTIME}")
 
 	target_link_libraries(Hypersomnia ${STEAM_INTEGRATION_LIBRARY})
+
+	set(COPY_STEAM_LIBS_TO_EXE_FOLDER ON)
+elseif(DEVELOP_STEAM_INTEGRATION AND MSVC)
+	set(STEAM_INTEGRATION_RUNTIME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cmake/steam_integration/steam_integration.dll)
+	
+	set(COPY_STEAM_LIBS_TO_EXE_FOLDER ON)
+else()
+	set(COPY_STEAM_LIBS_TO_EXE_FOLDER OFF)
 endif()
 
-if(LINK_STEAM_INTEGRATION)
+if(COPY_STEAM_LIBS_TO_EXE_FOLDER)
 	# Copy the library so it's next to the executable
+	message("COPY_STEAM_LIBS_TO_EXE_FOLDER is ON.")
 	message("${STEAM_INTEGRATION_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	message("${STEAM_API_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 	add_custom_target(CopySteamIntegration
 		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
@@ -1708,6 +1718,8 @@ if(LINK_STEAM_INTEGRATION)
 	)
 
 	add_dependencies(Hypersomnia CopySteamIntegration CopySteamApi)
+else()
+	message("COPY_STEAM_LIBS_TO_EXE_FOLDER is OFF.")
 endif()
 
 if(BUILD_OPENGL)

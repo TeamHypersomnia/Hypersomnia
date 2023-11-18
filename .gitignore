@@ -12,7 +12,6 @@ cmake/steam_integration/steamworks/sdk
 *.pydevproject
 .project
 .metadata
-bin/
 tmp/
 *.tmp
 *.exe
@@ -108,7 +107,6 @@ DocProject/Help/html
 publish
 
 # Others
-[Bb]in
 [Oo]bj
 sql
 TestResults
@@ -150,7 +148,6 @@ Desktop.ini
 dist
 eggs
 parts
-bin
 var
 sdist
 develop-eggs
