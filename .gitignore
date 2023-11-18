@@ -224,8 +224,8 @@ hypersomnia/.Hypersomnia
 hypersomnia/Hypersomnia
 hypersomnia/libsteam_integration.so
 hypersomnia/libsteam_api.so
-hypersomnia/libsteam_integration.dll
-hypersomnia/libsteam_api.dll
+hypersomnia/steam_integration.dll
+hypersomnia/steam_api64.dll
 hypersomnia/libsteam_integration.dylib
 hypersomnia/libsteam_api.dylib
 *.hist

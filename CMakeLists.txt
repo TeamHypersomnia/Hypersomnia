@@ -1705,19 +1705,17 @@ if(COPY_STEAM_LIBS_TO_EXE_FOLDER)
 	message("${STEAM_INTEGRATION_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 	message("${STEAM_API_RUNTIME} will be copied to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-	add_custom_target(CopySteamIntegration
+	add_custom_command(TARGET Hypersomnia POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_INTEGRATION_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
 		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
 	)
 
-	add_custom_target(CopySteamApi
+	add_custom_command(TARGET Hypersomnia POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy "${STEAM_API_RUNTIME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 		#COMMENT "Copying ${STEAM_INTEGRATION_LIBRARY} to ${CMAKE_BINARY_DIR}"
 		DEPENDS ${STEAM_INTEGRATION_LIBRARY}
 	)
-
-	add_dependencies(Hypersomnia CopySteamIntegration CopySteamApi)
 else()
 	message("COPY_STEAM_LIBS_TO_EXE_FOLDER is OFF.")
 endif()
