@@ -112,6 +112,7 @@
 #include "augs/string/parse_url.h"
 #include "steam_integration.h"
 #include "steam_integration_helpers.hpp"
+#include "steam_integration_callbacks.h"
 
 #include "work_result.h"
 
@@ -2132,6 +2133,37 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
+	auto process_steam_callbacks = [&]() {
+		if (const auto steam_queue = reinterpret_cast<steam_callback_queue_type*>(steam_run_callbacks())) {
+			for (const auto steam_event : *steam_queue) {
+				std::visit(
+					[&]<typename E>(const E&) {
+						if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
+							LOG("steam_new_url_launch_parameters received.");
+
+							const auto steam_cli = steam_get_launch_command_line_string();
+
+							if (steam_cli.length() > 1) {
+								LOG("Detected Steam CLI (length: %x): %x", steam_cli.length(), steam_cli);
+
+								config.client_start.set_custom(steam_cli);
+
+								start_client_setup();
+							}
+							else {
+								LOG("Invalid Steam CLI: %x", steam_cli);
+							}
+						}
+						else {
+							static_assert(always_false_v<E>, "Non-exhaustive");
+						}
+					},
+					steam_event
+				);
+			}
+		}
+	};
+
 	auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
 		bool freeze_imgui_inputs = false;
 
@@ -2895,7 +2927,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		const auto steam_cli = steam_get_launch_command_line_string();
 
-		if (steam_cli.length() > 1) {
+		if (steam_cli.length() > 0) {
 			LOG("Detected Steam CLI (length: %x): %x", steam_cli.length(), steam_cli);
 			connect_to(steam_cli);
 		}
@@ -3214,6 +3246,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				const bool was_any_imgui_popup_opened = ImGui::IsPopupOpen(0u, ImGuiPopupFlags_AnyPopupId);
 
 				do_imgui_pass(get_current_frame_num(), new_window_entropy, frame_delta, in_direct_gameplay);
+				process_steam_callbacks();
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;

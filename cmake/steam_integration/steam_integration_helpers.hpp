@@ -6,8 +6,9 @@ inline std::string steam_get_launch_command_line_string() {
 	char buffer[512];
 	int num_bytes = steam_get_launch_command_line(buffer, sizeof(buffer));
 
-	if (num_bytes != 0) {
-		return std::string(buffer, buffer + num_bytes);
+	if (num_bytes > 0 && uint32_t(num_bytes) < sizeof(buffer)) {
+		/* Exclude the terminating zero */
+		return std::string(buffer, buffer + num_bytes - 1);
 	}
 
 	return std::string();

@@ -1,9 +1,21 @@
 #include "steam_integration.h"
 
 #if BUILD_STEAM
+#include "steam_integration_callbacks.h"
 
 const int steam_app_id = 2660970;
 #include "steam_api.h"
+
+steam_callback_queue_type steam_event_queue;
+
+class new_url_launch_parameters_t {
+private:
+	STEAM_CALLBACK( new_url_launch_parameters_t, OnReceived, NewUrlLaunchParameters_t );
+};
+
+void new_url_launch_parameters_t::OnReceived(NewUrlLaunchParameters_t* pCallback) {
+	steam_event_queue.push_back(steam_new_url_launch_parameters {});
+}
 
 extern "C" {
 	int steam_get_appid() {
@@ -59,6 +71,14 @@ extern "C" {
 	int steam_get_launch_command_line(char* buf, int bufsize) {
 		return SteamApps()->GetLaunchCommandLine(buf, bufsize);
 	}
+
+	void* steam_run_callbacks() {
+		steam_event_queue.clear();
+
+		SteamAPI_RunCallbacks();
+
+		return &steam_event_queue;
+	}
 }
 #else
 // non-steam version
@@ -100,6 +120,10 @@ extern "C" {
 
 	int steam_get_launch_command_line(char*, int) {
 		return 0;
+	}
+
+	void* steam_run_callbacks() {
+		return nullptr;
 	}
 }
 
