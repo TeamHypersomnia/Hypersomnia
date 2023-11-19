@@ -172,8 +172,16 @@ struct arena_mode_player {
 		return false;
 	}
 
+	auto get_level() const {
+		return stats.level;
+	}
+
+	auto get_score() const {
+		return stats.calc_score();
+	}
+
 	auto get_order() const {
-		return arena_player_order_info { get_nickname(), stats.calc_score() };
+		return arena_player_order_info { get_nickname(), stats.calc_score(), stats.level };
 	}
 };
 

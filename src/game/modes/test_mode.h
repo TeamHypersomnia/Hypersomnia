@@ -113,6 +113,14 @@ struct test_mode_player {
 		return session.id;
 	}
 
+	auto get_score() const {
+		return stats.calc_score();
+	}
+
+	auto get_level() const {
+		return 0;
+	}
+
 	test_mode_player(const mode_entity_id controlled_character_id = mode_entity_id()) : controlled_character_id(controlled_character_id) {}
 };
 

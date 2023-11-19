@@ -48,10 +48,7 @@ int arena_mode_player_stats::calc_score() const {
 }
 
 bool arena_mode_player::operator<(const arena_mode_player& b) const {
-	const auto ao = arena_player_order { get_nickname(), stats.calc_score(), stats.level };
-	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score(), b.stats.level };
-
-	return ao < bo;
+	return ::compare_arena_players(*this, b);
 }
 
 std::size_t arena_mode::get_round_rng_seed(const cosmos& cosm) const {
