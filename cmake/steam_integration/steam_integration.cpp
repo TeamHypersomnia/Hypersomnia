@@ -1,6 +1,7 @@
 #include "steam_integration.h"
 
 #if BUILD_STEAM
+#include <optional>
 #include "steam_integration_callbacks.h"
 
 const int steam_app_id = 2660970;
@@ -18,6 +19,13 @@ void new_url_launch_parameters_t::OnReceived(NewUrlLaunchParameters_t* pCallback
 	steam_event_queue.push_back(steam_new_url_launch_parameters {});
 }
 
+std::optional<new_url_launch_parameters_t> new_url_launch_parameters_object;
+
+template <class F>
+void for_each_callback_object(F callback) {
+	callback(new_url_launch_parameters_object);
+}
+
 extern "C" {
 	int steam_get_appid() {
 		return steam_app_id;
@@ -25,6 +33,8 @@ extern "C" {
 
 	int steam_init() {
 		if (SteamAPI_Init()) {
+			for_each_callback_object([](auto& o) { o.emplace(); });
+
 			return (int)steam_init_result::SUCCESS;
 		}
 
@@ -36,6 +46,8 @@ extern "C" {
 	}
 
 	void steam_deinit() {
+		for_each_callback_object([](auto& o) { o = std::nullopt; });
+
 		SteamAPI_Shutdown();
 	}
 
