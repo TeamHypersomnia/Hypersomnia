@@ -7,24 +7,44 @@
 const int steam_app_id = 2660970;
 #include "steam_api.h"
 
+/*
+	Test:
+	steam://run/2660970//arena.hypersomnia.xyz/
+*/
+
 steam_callback_queue_type steam_event_queue;
 uint8_t* avatar_data = nullptr;
 
-class new_url_launch_parameters_t {
+class CGameManager
+{
 private:
-	STEAM_CALLBACK( new_url_launch_parameters_t, OnReceived, NewUrlLaunchParameters_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedOverlay, GameOverlayActivated_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedLaunchParameters, NewUrlLaunchParameters_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedRichPresenceJoin, GameRichPresenceJoinRequested_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedServerCahnge, GameServerChangeRequested_t );
+	
 };
 
-void new_url_launch_parameters_t::OnReceived(NewUrlLaunchParameters_t* pCallback) {
+void CGameManager::OnReceivedOverlay( GameOverlayActivated_t*  )
+{
+
+}
+
+void CGameManager::OnReceivedLaunchParameters(NewUrlLaunchParameters_t* ) {
 	steam_event_queue.push_back(steam_new_url_launch_parameters {});
 }
 
-std::optional<new_url_launch_parameters_t> new_url_launch_parameters_object;
-
-template <class F>
-void for_each_callback_object(F callback) {
-	callback(new_url_launch_parameters_object);
+void CGameManager::OnReceivedRichPresenceJoin( GameRichPresenceJoinRequested_t* pCallback  )
+{
+	steam_event_queue.push_back(steam_new_join_game_request { pCallback->m_rgchConnect });
 }
+
+void CGameManager::OnReceivedServerCahnge( GameServerChangeRequested_t* pCallback )
+{
+	steam_event_queue.push_back(steam_change_server_request { pCallback->m_rgchServer, pCallback->m_rgchPassword });
+}
+
+std::optional<CGameManager> CGameManager_object;
 
 extern "C" {
 	int steam_get_appid() {
@@ -33,7 +53,7 @@ extern "C" {
 
 	int steam_init() {
 		if (SteamAPI_Init()) {
-			for_each_callback_object([](auto& o) { o.emplace(); });
+			CGameManager_object.emplace();
 
 			return (int)steam_init_result::SUCCESS;
 		}
@@ -46,7 +66,7 @@ extern "C" {
 	}
 
 	void steam_deinit() {
-		for_each_callback_object([](auto& o) { o = std::nullopt; });
+		CGameManager_object = std::nullopt;
 
 		SteamAPI_Shutdown();
 	}
