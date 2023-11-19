@@ -2151,36 +2151,45 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		};
 
-		const auto steam_cli = steam_get_launch_command_line_string();
+		auto handler_lbd = [&]<typename E>(const E& event) {
+			if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
+				LOG("(Steam Callback) steam_new_url_launch_parameters.");
+				(void)event;
 
-		if (const auto steam_queue = reinterpret_cast<steam_callback_queue_type*>(steam_run_callbacks())) {
-			for (const auto& steam_event : *steam_queue) {
-				std::visit(
-					[&]<typename E>(const E& event) {
-						if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
-							LOG("(Steam Callback) steam_new_url_launch_parameters.");
-							(void)event;
-
-							connect_to(steam_get_launch_command_line_string());
-						}
-						else if constexpr(std::is_same_v<E, steam_new_join_game_request>) {
-							LOG("(Steam Callback) steam_new_join_game_request.");
-
-							connect_to(event.connect_cli);
-						}
-						else if constexpr(std::is_same_v<E, steam_change_server_request>) {
-							LOG("(Steam Callback) steam_change_server_request.");
-
-							connect_to(event.server_address);
-						}
-						else {
-							static_assert(always_false_v<E>, "Non-exhaustive");
-						}
-					},
-					steam_event
-				);
+				connect_to(steam_get_launch_command_line_string());
 			}
-		}
+			else if constexpr(std::is_same_v<E, steam_new_join_game_request>) {
+				LOG("(Steam Callback) steam_new_join_game_request.");
+
+				connect_to(std::string(event.connect_cli.data()));
+			}
+			else if constexpr(std::is_same_v<E, steam_change_server_request>) {
+				LOG("(Steam Callback) steam_change_server_request.");
+
+				connect_to(std::string(event.server_address.data()));
+			}
+			else {
+				static_assert(always_false_v<E>, "Non-exhaustive");
+			}
+		};
+
+		auto handler_c = [](void* ctx, uint32_t idx, void* object) {
+			LOG_NVPS(idx);
+
+			auto check_index = [&]<typename T>(T) {
+				if (idx == T::index) {
+					auto lbd = reinterpret_cast<decltype(handler_lbd)*>(ctx);
+
+					lbd->operator()(*reinterpret_cast<T*>(object));
+				}
+			};
+
+			check_index(steam_new_url_launch_parameters());
+			check_index(steam_new_join_game_request());
+			check_index(steam_change_server_request());
+		};
+
+		steam_run_callbacks(handler_c, &handler_lbd);
 	};
 
 	auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {

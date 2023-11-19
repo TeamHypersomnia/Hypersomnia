@@ -13,6 +13,8 @@ enum class steam_init_result {
 	DISABLED
 };
 
+using steam_callback_handler_type = void(*)(void*, uint32_t, void*);
+
 extern "C" {
 	DLL_EXPORT int steam_get_appid();
 
@@ -27,7 +29,7 @@ extern "C" {
 	DLL_EXPORT void steam_clear_rich_presence();
 	DLL_EXPORT int steam_get_launch_command_line(char* buf, int bufsize);
 
-	DLL_EXPORT void* steam_run_callbacks();
+	DLL_EXPORT void steam_run_callbacks(steam_callback_handler_type, void* ctx);
 }
 
 #undef DLL_EXPORT

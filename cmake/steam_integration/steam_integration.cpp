@@ -12,7 +12,6 @@ const int steam_app_id = 2660970;
 	steam://run/2660970//arena.hypersomnia.xyz/
 */
 
-steam_callback_queue_type steam_event_queue;
 uint8_t* avatar_data = nullptr;
 
 class CGameManager
@@ -22,7 +21,15 @@ private:
 	STEAM_CALLBACK( CGameManager, OnReceivedLaunchParameters, NewUrlLaunchParameters_t );
 	STEAM_CALLBACK( CGameManager, OnReceivedRichPresenceJoin, GameRichPresenceJoinRequested_t );
 	STEAM_CALLBACK( CGameManager, OnReceivedServerCahnge, GameServerChangeRequested_t );
-	
+public:
+
+	steam_callback_handler_type callback_handler = nullptr;
+	void* ctx = nullptr;
+
+	template <class T>
+	void handle(T event) {
+		callback_handler(ctx, T::index, &event);
+	}
 };
 
 void CGameManager::OnReceivedOverlay( GameOverlayActivated_t*  )
@@ -31,17 +38,17 @@ void CGameManager::OnReceivedOverlay( GameOverlayActivated_t*  )
 }
 
 void CGameManager::OnReceivedLaunchParameters(NewUrlLaunchParameters_t* ) {
-	steam_event_queue.push_back(steam_new_url_launch_parameters {});
+	handle(steam_new_url_launch_parameters {});
 }
 
 void CGameManager::OnReceivedRichPresenceJoin( GameRichPresenceJoinRequested_t* pCallback  )
 {
-	steam_event_queue.push_back(steam_new_join_game_request { pCallback->m_rgchConnect });
+	handle(steam_new_join_game_request { { std::to_array(pCallback->m_rgchConnect) } });
 }
 
 void CGameManager::OnReceivedServerCahnge( GameServerChangeRequested_t* pCallback )
 {
-	steam_event_queue.push_back(steam_change_server_request { pCallback->m_rgchServer, pCallback->m_rgchPassword });
+	handle(steam_change_server_request { { std::to_array(pCallback->m_rgchServer) }, { std::to_array(pCallback->m_rgchPassword) } });
 }
 
 std::optional<CGameManager> CGameManager_object;
@@ -110,12 +117,11 @@ extern "C" {
 		return SteamApps()->GetLaunchCommandLine(buf, bufsize);
 	}
 
-	void* steam_run_callbacks() {
-		steam_event_queue.clear();
+	void steam_run_callbacks(steam_callback_handler_type callback_handler, void* ctx) {
+		CGameManager_object->callback_handler = callback_handler;
+		CGameManager_object->ctx = ctx;
 
 		SteamAPI_RunCallbacks();
-
-		return &steam_event_queue;
 	}
 }
 #else
@@ -160,8 +166,8 @@ extern "C" {
 		return 0;
 	}
 
-	void* steam_run_callbacks() {
-		return nullptr;
+	void steam_run_callbacks(steam_callback_handler_type, void*) {
+
 	}
 }
 
