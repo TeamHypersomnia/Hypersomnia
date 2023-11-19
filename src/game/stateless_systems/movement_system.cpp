@@ -208,6 +208,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				cp_damage_by_sprint = def.sprint_drains_cp_per_second * delta.in_seconds();
 
+				{
+					const auto& wielded_guns = it.get_wielded_guns();
+
+					if (wielded_guns.size() == 2) {
+						cp_damage_by_sprint *= 1.4f;
+					}
+				}
+
 				if (cp.value <= cp_damage_by_sprint) {
 					cp_damage_by_sprint = 0.0f;
 					movement.was_sprint_effective = false;
@@ -292,6 +300,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 					else {
 						movement_force_mult /= 2.f;
+
+						{
+							const auto& wielded_guns = it.get_wielded_guns();
+
+							if (wielded_guns.size() == 2) {
+								movement_force_mult *= 0.85f;
+							}
+						}
 
 						if (is_sentient) {
 							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint;
