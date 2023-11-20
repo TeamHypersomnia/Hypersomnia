@@ -2165,7 +2165,34 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		};
 
-		auto handler_lbd = [&]<typename E>(const E& event) {
+		using steam_queue_type = std::vector<
+			std::variant<
+				steam_new_url_launch_parameters,
+				steam_new_join_game_request,
+				steam_change_server_request
+			>
+		>; 
+		
+		thread_local steam_queue_type steam_events;
+
+		steam_events.clear();
+
+		auto handler_c = [](void* ctx, uint32_t idx, void* object) {
+			auto check_index = [&]<typename T>(T) {
+				if (idx == T::index) {
+					auto typed_ctx = reinterpret_cast<steam_queue_type*>(ctx);
+					typed_ctx->push_back(*reinterpret_cast<T*>(object));
+				}
+			};
+
+			check_index(steam_new_url_launch_parameters());
+			check_index(steam_new_join_game_request());
+			check_index(steam_change_server_request());
+		};
+
+		steam_run_callbacks(handler_c, &steam_events);
+
+		auto handler_lbd = [connect_to]<typename E>(const E& event) {
 			if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
 				LOG("(Steam Callback) steam_new_url_launch_parameters.");
 				(void)event;
@@ -2187,23 +2214,9 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		};
 
-		auto handler_c = [](void* ctx, uint32_t idx, void* object) {
-			LOG_NVPS(idx);
-
-			auto check_index = [&]<typename T>(T) {
-				if (idx == T::index) {
-					auto lbd = reinterpret_cast<decltype(handler_lbd)*>(ctx);
-
-					lbd->operator()(*reinterpret_cast<T*>(object));
-				}
-			};
-
-			check_index(steam_new_url_launch_parameters());
-			check_index(steam_new_join_game_request());
-			check_index(steam_change_server_request());
-		};
-
-		steam_run_callbacks(handler_c, &handler_lbd);
+		for (auto& event : steam_events) {
+			std::visit(handler_lbd, event);
+		}
 	};
 
 	auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
