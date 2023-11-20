@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Miniature generation should trigger "dirty" revision
+
+- Windows also has to be able to read from appdata folder
 
 # BEFORE STEAM
 

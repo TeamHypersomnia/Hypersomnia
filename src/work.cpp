@@ -441,9 +441,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG_NVPS(should_update_headless);
 
+		const bool only_check = is_steam_client || params.only_check_update_availability_and_quit;
+
 		last_update_result = check_and_apply_updates(
 			params.appimage_path,
-			params.only_check_update_availability_and_quit,
+			only_check,
 			*imgui_atlas_image,
 			config.http_client,
 			config.window,
@@ -452,31 +454,36 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG_NVPS(last_update_result.type);
 
-		if (params.only_check_update_availability_and_quit) {
-			if (last_update_result.type == update_result::UPDATE_AVAILABLE) {
-				return work_result::REPORT_UPDATE_AVAILABLE;
+		if (is_steam_client) {
+			LOG("No need to run updater as this is a Steam client.");
+		}
+		else {
+			if (params.only_check_update_availability_and_quit) {
+				if (last_update_result.type == update_result::UPDATE_AVAILABLE) {
+					return work_result::REPORT_UPDATE_AVAILABLE;
+				}
+				else {
+					return work_result::REPORT_UPDATE_UNAVAILABLE;
+				}
 			}
-			else {
-				return work_result::REPORT_UPDATE_UNAVAILABLE;
+
+			if (last_update_result.type == update_result::UPGRADED) {
+				LOG("work: Upgraded successfully. Requesting relaunch.");
+				return work_result::RELAUNCH_UPGRADED;
 			}
-		}
 
-		if (last_update_result.type == update_result::UPGRADED) {
-			LOG("work: Upgraded successfully. Requesting relaunch.");
-			return work_result::RELAUNCH_UPGRADED;
-		}
+			if (last_update_result.type == update_result::EXIT_APPLICATION) {
+				return work_result::SUCCESS;
+			}
 
-		if (last_update_result.type == update_result::EXIT_APPLICATION) {
-			return work_result::SUCCESS;
-		}
+			if (last_update_result.exit_with_failure_if_not_upgraded) {
+				return work_result::FAILURE;
+			}
 
-		if (last_update_result.exit_with_failure_if_not_upgraded) {
-			return work_result::FAILURE;
-		}
-
-		if (last_update_result.type == update_result::UP_TO_DATE) {
-			if (params.upgraded_successfully) {
-				last_update_result.type = update_result::FIRST_LAUNCH_AFTER_UPGRADE;
+			if (last_update_result.type == update_result::UP_TO_DATE) {
+				if (params.upgraded_successfully) {
+					last_update_result.type = update_result::FIRST_LAUNCH_AFTER_UPGRADE;
+				}
 			}
 		}
 	}

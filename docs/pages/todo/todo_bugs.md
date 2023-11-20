@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- pepsik bug
+	- Launching through steam gives no textures
+	- set_display error when setting fullscreen
+	- non-steam client works though
+	- issue with steam overlay wanting to take hold of our display?
+	- maybe we should sort out the window problems once and for all
+
 - Write unit tests for constant size string just in case
 
 - It looks like the stuck udp transmissions were due to acks not going through because of too small sequence buffers for acked packets.

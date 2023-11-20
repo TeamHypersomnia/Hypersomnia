@@ -288,6 +288,8 @@ void main_menu_setup::draw_overlays(
 				return colored("Hypersomnia is up to date.", green);
 			case R::FAILED:
 				return colored("Failed to connect with the update server.", red);
+			case R::UPDATE_AVAILABLE:
+				return colored("Updates are available. Restart to install.", yellow);
 
 			default: return colored("", white);
 		}

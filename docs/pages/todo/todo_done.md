@@ -6592,3 +6592,19 @@ This will discard your redo history."
         - Note it has to copy *both* libsteam and libsteam_integration
         - So the CI builders can only include the nonsteam version of libsteam integration
         - They'll build the nonsteam library too
+
+- Server should send a welcome message with server guid for party identification on steam so everyone can setup the same rich presence string
+    - this msg will later be handy for other stuff like welcome message
+
+- I guess let's have server guids to identify parties/connect targets?
+    - In any case, the connecting client needs to query the official masterserver (unless the server is not nat protected but it's highly unlikely)
+    - The problem is how the server identifies itself
+        - There's actually no way in case of sym nat
+        - So we need to include our identifier in the periodic heartbeat
+    - Connecting by ip can work as it does now but with sync downloading the list first 
+    - For special id we can have a clause
+    - For less complexity the server should know its ip/port
+        - and the clients will have to know the pre-traversal original ip/port 
+
+    - Note we need a communication round with the masterserver either way
+    - So we can just use an ip and it'll be more robust in case of more masterservers
