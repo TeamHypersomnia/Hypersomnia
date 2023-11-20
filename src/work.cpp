@@ -2144,6 +2144,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				config.client_start.set_custom(address_string);
 
+				/* We must know if it's behind NAT */
+
+				browse_servers_gui.sync_download_server_entry(
+					get_browse_servers_input(),
+					config.client_start
+				);
+
 				start_client_setup();
 			}
 			else {
