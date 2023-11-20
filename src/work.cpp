@@ -2734,6 +2734,15 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		});
 
+		auto audio_volume = viewing_config.audio_volume;
+
+		if (viewing_config.audio.mute_main_menu_background) {
+			if (has_main_menu() && !has_current_setup()) {
+				audio_volume.sound_effects = 0.0f;
+				audio_volume.music = 0.0f;
+			}
+		}
+
 		get_audiovisuals().advance(audiovisual_advance_input {
 			audio_buffers,
 			audio_renderer,
@@ -2751,7 +2760,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			streaming.loaded_sounds,
 
-			viewing_config.audio_volume,
+			audio_volume,
 			viewing_config.sound,
 			viewing_config.performance,
 

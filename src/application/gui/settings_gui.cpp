@@ -653,6 +653,8 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(master), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(sound_effects), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(music), 0.f, 1.f);
+
+					revertable_checkbox("Mute Main menu background", config.audio.mute_main_menu_background);
 				}
 
 				text_disabled("\n\n");

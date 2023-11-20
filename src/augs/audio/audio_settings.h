@@ -16,6 +16,7 @@ namespace augs {
 
 	struct audio_settings {
 		// GEN INTROSPECTOR struct augs::audio_settings
+		bool mute_main_menu_background = false;
 		bool enable_hrtf = false;
 		std::string output_device_name = "";
 		unsigned max_number_of_sound_sources = 4096u;

@@ -66,7 +66,7 @@ struct audiovisual_advance_input {
 	const plain_animations_pool& plain_animations;
 
 	const loaded_sounds_map& sounds;
-	const augs::audio_volume_settings& audio_volume;
+	const augs::audio_volume_settings audio_volume;
 	const sound_system_settings& sound_settings;
 	const performance_settings& performance;
 	const images_in_atlas_map& game_images;
