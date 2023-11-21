@@ -110,6 +110,15 @@ void test_scene_setup::restart_arena() {
 	auto pre_crosshair = character() ? character().get<components::crosshair>() : components::crosshair();
 	auto pre_movement_flags = character() ? character().get<components::movement>().flags : components::movement().flags;
 
+	auto get_next = [&](auto l) -> uint32_t {
+		if (l == 5) {
+			// skip deagles level (6)
+			return 7;
+		}
+
+		return l + 1;
+	};
+
 	{
 		for (auto& l : project.layers.pool) {
 			if (begins_with(l.unique_name, "Level")) {
@@ -119,7 +128,7 @@ void test_scene_setup::restart_arena() {
 					l.editable.active = false;
 				}
 
-				l.editable.active = layer_level == tutorial.level || layer_level == tutorial.level + 1;
+				l.editable.active = layer_level == tutorial.level || layer_level == get_next(tutorial.level);
 			}
 		}
 
@@ -236,7 +245,7 @@ void test_scene_setup::restart_mode() {
 
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;
-	const bool is_ricochets_level = tutorial.level == 8;
+	const bool is_ricochets_level = tutorial.level == 7;
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
 	const bool is_planting_level = tutorial.level == 14;
 	const bool is_defusing_level = tutorial.level == 15;

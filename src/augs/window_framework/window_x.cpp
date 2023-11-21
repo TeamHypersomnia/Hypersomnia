@@ -1052,7 +1052,7 @@ namespace augs {
 
 	void window::check_current_context() {
 #if !IS_PRODUCTION_BUILD
-		LOG("Re-checking current context");
+		//LOG("Re-checking current context");
 #endif
 	}
 

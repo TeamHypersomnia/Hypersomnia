@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-27 15:06:15.594143 UTC"
+        "version_timestamp": "2023-11-21 22:26:52.415839 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -287,6 +287,7 @@
     "layers": [
         {
             "id": "Level21",
+            "is_open_in_editor": false,
             "nodes": [
                 "exit19",
                 "point_light (106)",
@@ -625,6 +626,7 @@
         },
         {
             "id": "Level20",
+            "is_open_in_editor": false,
             "nodes": [
                 "arrow (187)-right",
                 "arrow (187)",
@@ -665,6 +667,7 @@
         },
         {
             "id": "Level19",
+            "is_open_in_editor": false,
             "nodes": [
                 "exit19 (1)",
                 "arrow (59)",
@@ -755,6 +758,7 @@
         },
         {
             "id": "Level18",
+            "is_open_in_editor": false,
             "nodes": [
                 "exit18",
                 "arrow (27)",
@@ -838,6 +842,7 @@
         },
         {
             "id": "Level17",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs23",
                 "obs24",
@@ -879,6 +884,7 @@
         },
         {
             "id": "Level16",
+            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_256 (98)",
                 "hazard (11)",
@@ -909,6 +915,7 @@
         },
         {
             "id": "Level15",
+            "is_open_in_editor": false,
             "nodes": [
                 "electric_rapier (5)",
                 "electric_rapier (4)",
@@ -978,6 +985,7 @@
         },
         {
             "id": "Level14",
+            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (20)",
                 "exit14",
@@ -1024,6 +1032,7 @@
         },
         {
             "id": "Level13",
+            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (18)",
                 "exit13",
@@ -1089,6 +1098,7 @@
         },
         {
             "id": "Level12",
+            "is_open_in_editor": false,
             "nodes": [
                 "vent (50)",
                 "vent (52)",
@@ -1301,6 +1311,7 @@
         },
         {
             "id": "Level11",
+            "is_open_in_editor": false,
             "nodes": [
                 "vent (45)",
                 "vent (46)",
@@ -1333,6 +1344,7 @@
         },
         {
             "id": "Level10",
+            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (17)",
                 "calico",
@@ -1375,6 +1387,7 @@
         },
         {
             "id": "Level9",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs12 (5)",
                 "obs12 (1)",
@@ -1483,6 +1496,44 @@
         {
             "id": "Level8",
             "nodes": [
+                "tip3_1 (12)",
+                "dev_floor_256 (52)",
+                "tip3_1 (67)",
+                "dev_floor_256 (138)",
+                "metropolis_backpack",
+                "awka (1)",
+                "awka",
+                "hazard (5)",
+                "floor_right (12)",
+                "dev_floor_256 (44)",
+                "team_spawn (20)",
+                "tip3_1 (14)",
+                "dev_floor_256 (45)",
+                "tip3_1 (20)",
+                "tip3_1 (19)",
+                "tip3_1 (18)",
+                "tip3_1 (15)",
+                "tip3_1 (17)",
+                "entry8",
+                "exit8",
+                "vent (30)",
+                "vent (38)",
+                "vent (37)",
+                "vent (34)",
+                "vent (35)",
+                "vent (36)",
+                "dev_floor_256 (51)",
+                "dev_floor_256 (50)",
+                "dev_floor_256 (49)",
+                "dev_floor_256 (46)",
+                "dev_floor_256 (48)",
+                "Strong lamp (18)",
+                "Strong lamp (19)"
+            ]
+        },
+        {
+            "id": "Level7",
+            "nodes": [
                 "team_spawn (7)",
                 "obs6 (4)",
                 "obs6 (5)",
@@ -1508,8 +1559,8 @@
                 "tip3_1 (11)",
                 "tip3_1 (9)",
                 "tip3_1 (10)",
-                "entry8",
-                "exit8",
+                "entry7",
+                "exit7",
                 "vent (31)",
                 "hard_wooden_wall (16)",
                 "hard_wooden_wall (15)",
@@ -1531,44 +1582,6 @@
                 "Strong lamp (16)",
                 "Strong lamp (15)",
                 "floor_right (8)"
-            ]
-        },
-        {
-            "id": "Level7",
-            "nodes": [
-                "tip3_1 (12)",
-                "dev_floor_256 (52)",
-                "tip3_1 (67)",
-                "dev_floor_256 (138)",
-                "metropolis_backpack",
-                "awka (1)",
-                "awka",
-                "hazard (5)",
-                "floor_right (12)",
-                "dev_floor_256 (44)",
-                "team_spawn (20)",
-                "tip3_1 (14)",
-                "dev_floor_256 (45)",
-                "tip3_1 (20)",
-                "tip3_1 (19)",
-                "tip3_1 (18)",
-                "tip3_1 (15)",
-                "tip3_1 (17)",
-                "entry7",
-                "exit7",
-                "vent (30)",
-                "vent (38)",
-                "vent (37)",
-                "vent (34)",
-                "vent (35)",
-                "vent (36)",
-                "dev_floor_256 (51)",
-                "dev_floor_256 (50)",
-                "dev_floor_256 (49)",
-                "dev_floor_256 (46)",
-                "dev_floor_256 (48)",
-                "Strong lamp (18)",
-                "Strong lamp (19)"
             ]
         },
         {
@@ -1629,6 +1642,7 @@
         },
         {
             "id": "Level4",
+            "is_open_in_editor": false,
             "nodes": [
                 "tip4_1 (2)",
                 "tip4_1 (18)",
@@ -1755,6 +1769,7 @@
         },
         {
             "id": "Level3",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (6)",
                 "tip3_1",
@@ -1776,6 +1791,7 @@
         },
         {
             "id": "Level2",
+            "is_open_in_editor": false,
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
@@ -1814,6 +1830,7 @@
         },
         {
             "id": "Level1",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (2)",
                 "tip1_1",
@@ -1835,6 +1852,7 @@
         },
         {
             "id": "Level0",
+            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
@@ -2924,13 +2942,14 @@
         {
             "id": "floor_right (12)",
             "type": "@water_room_floor",
-            "pos": [25344.0, -8768.0],
+            "pos": [25344.0, -4224.0],
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
         },
         {
             "id": "dev_floor_256 (44)",
             "type": "dev_floor_256",
+            "active": false,
             "pos": [25344.0, -6080.0],
             "size": [1536, 2304],
             "color": [255, 0, 0, 255]
@@ -2938,6 +2957,7 @@
         {
             "id": "dev_floor_256 (45)",
             "type": "dev_floor_256",
+            "active": false,
             "pos": [25344.0, -7744.0],
             "size": [1536, 1024],
             "color": [0, 255, 0, 255]
@@ -2945,7 +2965,7 @@
         {
             "id": "vent (30)",
             "type": "@materials/vent.png",
-            "pos": [25344.0, -9408.0029296875],
+            "pos": [25344.0, -4864.00341796875],
             "rotation": 90.0,
             "size": [256, 2304]
         },
@@ -2959,14 +2979,14 @@
         {
             "id": "vent (35)",
             "type": "@materials/vent.png",
-            "pos": [26304.0, -4128.0],
-            "size": [384, 10304]
+            "pos": [26304.0, -1856.0],
+            "size": [384, 5760]
         },
         {
             "id": "vent (36)",
             "type": "@materials/vent.png",
-            "pos": [24384.0, -4128.0],
-            "size": [384, 10304]
+            "pos": [24384.0, -1856.0],
+            "size": [384, 5760]
         },
         {
             "id": "dev_floor_256 (46)",
@@ -3020,6 +3040,7 @@
         {
             "id": "dev_floor_256 (52)",
             "type": "dev_floor_256",
+            "active": false,
             "pos": [25344.0, -4032.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -6480,6 +6501,7 @@
         {
             "id": "dev_floor_256 (138)",
             "type": "dev_floor_256",
+            "active": false,
             "pos": [25344.0, -4544.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -11741,7 +11763,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry6",
+            "portal_exit": "entry7",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -12170,7 +12192,7 @@
             "context_tip": "Bullets can bounce against walls!\nGlass is the easiest to ricochet off."
         },
         {
-            "id": "entry8",
+            "id": "entry7",
             "type": "portal",
             "pos": [24704.0, 9471.9990234375],
             "rotation": -180.0,
@@ -12193,7 +12215,7 @@
             "context_tip": ""
         },
         {
-            "id": "exit8",
+            "id": "exit7",
             "type": "portal",
             "pos": [18111.99609375, 9471.9990234375],
             "rotation": -180.0,
@@ -12206,7 +12228,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry9",
+            "portal_exit": "entry8",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -12248,6 +12270,7 @@
         {
             "id": "hazard (5)",
             "type": "hazard",
+            "active": false,
             "pos": [25344.0, -6080.0],
             "size": [1536, 2304],
             "exit_cooldown_ms": 500.0,
@@ -12271,6 +12294,7 @@
         {
             "id": "tip3_1 (14)",
             "type": "portal",
+            "active": false,
             "shape": "BOX",
             "pos": [25344.0, -7744.0],
             "size": [1536, 1024],
@@ -12356,7 +12380,7 @@
             "context_tip": "Inventory space is limited.\nTry picking up both sniper rifles."
         },
         {
-            "id": "entry7",
+            "id": "entry8",
             "type": "portal",
             "pos": [25344.0, 640.00048828125],
             "rotation": -90.0,
@@ -12379,9 +12403,9 @@
             "context_tip": ""
         },
         {
-            "id": "exit7",
+            "id": "exit8",
             "type": "portal",
-            "pos": [25344.0, -8768.0068359375],
+            "pos": [25344.0, -4224.0068359375],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -12392,7 +12416,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry8",
+            "portal_exit": "entry9",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -12492,6 +12516,7 @@
         {
             "id": "tip3_1 (12)",
             "type": "portal",
+            "active": false,
             "shape": "BOX",
             "pos": [25344.0, -4032.0],
             "size": [1536, 256],
@@ -16121,6 +16146,7 @@
         {
             "id": "tip3_1 (67)",
             "type": "portal",
+            "active": false,
             "shape": "BOX",
             "pos": [25344.0, -4544.0],
             "size": [1536, 256],

@@ -6626,3 +6626,14 @@ This will discard your redo history."
 
 - figure out how to test it (steamworks integration etc, downloading, updates) before publishing
 
+- Determining if game runs steam
+    - No point in having config var, why?
+        - We'll anyway ship a non-steam lib to hypersomnia.xyz to have no proprietary soft in foss distributions
+        - So when we have a non-steam lib, a config var like this would not work anyway
+        - And when you're launching from steam, there's no advantage disabling it
+    - Just return true/false from steam_init
+
+- The most *basic* Steamworks API integration
+    - at least make the avatar and nickname be always set from the steam on startup
+    - non-steam clients
+
