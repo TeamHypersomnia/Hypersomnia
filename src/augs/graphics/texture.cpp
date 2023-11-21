@@ -4,6 +4,7 @@
 
 #include "augs/graphics/backend_access.h"
 #include "augs/graphics/renderer.h"
+#include "augs/window_framework/window.h"
 
 namespace augs {
 	namespace graphics {
@@ -62,6 +63,8 @@ namespace augs {
 			(void)source;
 			(void)new_size;
 
+			augs::window::get_current().check_current_context();
+
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
@@ -114,6 +117,8 @@ namespace augs {
 		}
 
 		void texture::create() {
+			augs::window::get_current().check_current_context();
+
 			GL_CHECK(glGenTextures(1, &id));
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
 
@@ -152,6 +157,8 @@ namespace augs {
 
 		void texture::destroy() {
 			if (built) {
+				augs::window::get_current().check_current_context();
+
 				GL_CHECK(glDeleteTextures(1, &id));
 				built = false;
 			}

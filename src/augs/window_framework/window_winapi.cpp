@@ -871,6 +871,15 @@ namespace augs {
 		return -1;
 	}
 
+	void window::check_current_context() {
+#if !IS_PRODUCTION_BUILD
+		LOG("Re-checking current context");
+#endif
+		if (is_current() && wglGetCurrentContext() != platform->hglrc) {
+			ensure(set_as_current_impl());
+		}
+	}
+
 	window::~window() {
 		destroy();
 		window_ptr = nullptr;

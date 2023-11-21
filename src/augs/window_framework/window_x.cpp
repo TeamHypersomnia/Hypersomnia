@@ -1050,6 +1050,12 @@ namespace augs {
 		return -1;
 	}
 
+	void window::check_current_context() {
+#if !IS_PRODUCTION_BUILD
+		LOG("Re-checking current context");
+#endif
+	}
+
 	window::~window() {
 		destroy();
 	}

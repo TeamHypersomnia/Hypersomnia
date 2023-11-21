@@ -215,5 +215,7 @@ namespace augs {
 		auto get_last_mouse_pos() const {
 			return last_mouse_pos;
 		}
+
+		void check_current_context();
 	};
 }

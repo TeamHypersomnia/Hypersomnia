@@ -2,11 +2,13 @@
 #include "augs/log.h"
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/backend_access.h"
+#include "augs/window_framework/window.h"
 
 namespace augs {
 	namespace graphics {
 		fbo::fbo(const vec2u size, const fbo_opts& opts) : size(size), tex(size) {
 			(void)opts;
+			augs::window::get_current().check_current_context();
 
 			GL_CHECK(glGenFramebuffers(1, &id));
 			created = true;

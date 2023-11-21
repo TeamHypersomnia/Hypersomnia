@@ -8,6 +8,7 @@
 #include "augs/graphics/backend_access.h"
 #include "augs/graphics/renderer.h"
 #include "augs/templates/enum_introspect.h"
+#include "augs/window_framework/window.h"
 
 namespace augs {
 	namespace graphics {
@@ -115,6 +116,8 @@ namespace augs {
 #if BUILD_OPENGL
 			built = true;
 
+			augs::window::get_current().check_current_context();
+
 			if (shader_type == type::VERTEX) {
 				GL_CHECK(id = glCreateShader(GL_VERTEX_SHADER)); 
 			}
@@ -145,6 +148,8 @@ namespace augs {
 
 		void shader::destroy() {
 			if (built) {
+				augs::window::get_current().check_current_context();
+
 				GL_CHECK(glDeleteShader(id));
 				built = false;
 			}
@@ -206,6 +211,8 @@ namespace augs {
 #endif
 		{
 #if BUILD_OPENGL
+			augs::window::get_current().check_current_context();
+
 			GL_CHECK(id = glCreateProgram());
 
 			GL_CHECK(glAttachShader(id, new_vertex.id));

@@ -3240,6 +3240,7 @@ work_result work(const int argc, const char* const * const argv) try {
 								streaming.request_rescan();
 							}
 
+							write_buffer.should_recheck_current_context = true;
 							map_catalogue_gui.request_rescan();
 						}
 
@@ -4267,6 +4268,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		{
 			auto& read_buffer = get_read_buffer();
+
+			if (read_buffer.should_recheck_current_context) {
+				augs::window::get_current().check_current_context();
+
+				read_buffer.should_recheck_current_context = false;
+			}
 
 			const auto swap_when = read_buffer.swap_when;
 

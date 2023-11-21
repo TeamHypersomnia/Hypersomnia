@@ -8,22 +8,14 @@ summary: That which we are brainstorming at the moment.
 
 - Miniature generation should trigger "dirty" revision
 
-- Windows also has to be able to read from appdata folder
-
 # BEFORE STEAM
 
-- A simple friends panel under Escape when playing on a server should be trivial
-    - Will be WAY faster to send an invite this way rather than press home and navigate
-        - especially with filtering
+- Windows also has to be able to read from appdata folder
+    - CLI argument: --roaming-folder
+        - set by AppRun to $HOME/.config so we don't have to call readenv
+        - default will just work like always
 
-- disable updater if is_steam_client
-
-- Rich presence
-    - Per-setup status string
-    - Editing: de_desert_remake
-    - Playtesting: de_desert_remake
-    - also use "connect" feature to implement joins
-    
+- Trailer
 
 - /skip command
     - with 60 sec timeout
@@ -35,15 +27,7 @@ summary: That which we are brainstorming at the moment.
     - Ricochets chapter should come immediately after shooting chapter
     - Leave backpack/deagles akimbo chapter at the end
 
-- Sprinting balance
-- Akimbo balance
-    - Higher Density multiplier
-    - Stamina doesn't regenerate when walking
-
 - Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
-
-- disable LINK_STEAM_INTEGRATION by default later when we're done testing steamworks features
-- figure out how to test it (steamworks integration etc, downloading, updates) before publishing
 
 - we'll seriously need to support reading user files from a different cwd
     - + trivial appimage launches

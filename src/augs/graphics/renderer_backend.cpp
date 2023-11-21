@@ -11,6 +11,7 @@
 #include "augs/graphics/shader.h"
 #include "augs/graphics/fbo.h"
 #include "augs/graphics/texture.h"
+#include "augs/window_framework/window.h"
 #include "augs/log.h"
 
 #if PLATFORM_UNIX
@@ -52,6 +53,8 @@ namespace augs {
 		renderer_backend::~renderer_backend() = default;
 
 		renderer_backend::renderer_backend() : platform(std::make_unique<renderer_backend::platform_data>()) {
+			augs::window::get_current().check_current_context();
+
 			const char* fname = "gladLoadGL";
 #if USE_GLFW 
 			fname = "gladLoadGLLoader";
@@ -72,6 +75,8 @@ namespace augs {
 			GL_CHECK(LOG("GL Version: %x", glGetString(GL_VERSION)));
 
 			LOG("Calling %x succeeded.", fname);
+
+			augs::window::get_current().check_current_context();
 
 			set_blending(true);
 

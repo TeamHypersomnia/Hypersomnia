@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/settable_as_current_op.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	template <class derived, bool always_force_set = false>
@@ -46,6 +47,7 @@ namespace augs {
 
 	public:
 		static derived& get_current() {
+			ensure(current_instance != nullptr);
 			return *current_instance;
 		}
 

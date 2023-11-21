@@ -2,12 +2,14 @@
 #include "augs/log.h"
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/rgba.h"
+#include "augs/window_framework/window.h"
 
 #define PERSISTENT 0
 
 namespace augs {
 	namespace graphics {
 		pbo::pbo() {
+			augs::window::get_current().check_current_context();
 			GL_CHECK(glGenBuffers(1, &id));
 			created = true;
 		}
@@ -106,6 +108,7 @@ namespace augs {
 
 		void pbo::destroy() {
 			if (created) {
+				augs::window::get_current().check_current_context();
 				GL_CHECK(glDeleteBuffers(1, &id));
 				created = false;
 				persistent_ptr = nullptr;

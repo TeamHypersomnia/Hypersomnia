@@ -512,6 +512,10 @@ namespace augs {
 		return -1;
 	}
 
+	void window::check_current_context() {
+
+	}
+
 	window::~window() {
 		destroy();
 	}

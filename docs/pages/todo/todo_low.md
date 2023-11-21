@@ -4,6 +4,14 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+# Steam
+
+- A simple friends panel under Escape when playing on a server should be trivial
+    - Will be WAY faster to send an invite this way rather than press home and navigate
+        - especially with filtering
+
+# Rest
+
 - test mode should allow changing teams instead of forcing spectators to nonspectators
 
 - wrong nickname in duel of honor notifications? (Pythagoras1 vs Pythagoras)

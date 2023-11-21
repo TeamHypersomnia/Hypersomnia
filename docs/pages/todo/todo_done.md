@@ -6608,3 +6608,21 @@ This will discard your redo history."
 
     - Note we need a communication round with the masterserver either way
     - So we can just use an ip and it'll be more robust in case of more masterservers
+
+- disable updater if is_steam_client
+
+- Rich presence
+    - Per-setup status string
+    - Editing: de_desert_remake
+    - Playtesting: de_desert_remake
+    - also use "connect" feature to implement joins
+    
+- Akimbo balance
+    - Higher Density multiplier
+    - Stamina doesn't regenerate when walking
+- Sprinting balance
+
+- disable LINK_STEAM_INTEGRATION by default later when we're done testing steamworks features
+
+- figure out how to test it (steamworks integration etc, downloading, updates) before publishing
+
