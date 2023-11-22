@@ -1,7 +1,7 @@
 #pragma once
 
 namespace augs {
-	template <class derived, class Rr, bool always_force_set = false>
+	template <class derived, class Rr, bool always_force_set = true>
 	class settable_commandizer : protected settable_as_current_mixin<derived, always_force_set> {
 		static constexpr bool is_const = std::is_const_v<derived>;
 

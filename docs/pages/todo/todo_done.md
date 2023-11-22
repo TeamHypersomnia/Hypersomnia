@@ -6637,3 +6637,8 @@ This will discard your redo history."
     - at least make the avatar and nickname be always set from the steam on startup
     - non-steam clients
 
+- Adjust Tutorial after balancing
+    - Also: 
+    - Ricochets chapter should come immediately after shooting chapter
+    - Leave backpack/deagles akimbo chapter at the end
+

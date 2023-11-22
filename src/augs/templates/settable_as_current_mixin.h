@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 
 namespace augs {
-	template <class derived, bool always_force_set = false>
+	template <class derived, bool always_force_set = true>
 	class settable_as_current_mixin {
 		static derived* marked_instance;
 		static derived* previous_instance;
@@ -96,24 +96,32 @@ namespace augs {
 		bool set_as_current(Args&&... args) {
 			auto& self = static_cast<derived&>(*this);
 
-			if (!is_current() || always_force_set) {
+			/*
+				Bind every time, don't check if we're already bound.
+
+				We realized there are no performance savings whatsoever,
+				whereas some bugs could be introduced
+				by e.g. not re-binding the texture after some other GL calls.
+			*/
+
+			// if (!is_current() || always_force_set) {
 				push_instance(std::addressof(self));
 				return self.set_as_current_impl(std::forward<Args>(args)...);
-			}
+			// }
 
-			return true;
+			// return true;
 		}
 
 		template <class... Args, bool C = is_const, class = std::enable_if_t<C>>
 		bool set_as_current(Args&&... args) const {
 			const auto& self = static_cast<derived&>(*this);
 
-			if (!is_current() || always_force_set) {
+			// if (!is_current() || always_force_set) {
 				push_instance(std::addressof(self));
 				return self.set_as_current_impl(std::forward<Args>(args)...);
-			}
+			// }
 
-			return true;
+			// return true;
 		}
 	};
 

@@ -10,29 +10,38 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- Windows also has to be able to read from appdata folder
-    - CLI argument: --roaming-folder
-        - set by AppRun to $HOME/.config so we don't have to call readenv
-        - default will just work like always
+- Add Join our Discord link to description
 
 - Trailer
-
-- /skip command
-    - with 60 sec timeout
-- /restart maybe too
-    - with 60 sec timeout
-    
-- Adjust Tutorial after balancing
-    - Also: 
-    - Ricochets chapter should come immediately after shooting chapter
-    - Leave backpack/deagles akimbo chapter at the end
-
-- Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
+    - Gameplay segment
+        - Decide on which maps to show - we don't have do to a lot
+            - de_cyberaqua
+            - virtual_reality_1
+            - de_silo
+            - de_rambo
+            - de_duel_practice
+        - For trailer it's enough only the shown maps are copyright-free
+            - We can fix other maps post-release
+        - 1) No intro, just fade into gameplay right away
+        - 2) A ~5 second gameplay segment per each map with map name shown in top left every time
+    - Editor segment
+        - 1) "Create custom maps from scratch!" - Simple Map creation timelapse
+            - Just make a good map offline to prepare a long command history. THEN turn on obs recording whilst you replay actions with Redo.
+                - (Instead of trying to record a perfect session of you creating the map)
+        - 2) "Clone existing maps!" ~10 sec segment - Close up on tweaking existing full-blown maps like cyberaqua with shown mouse movements.
+        - 3) "Playtest your work online with a single click!" - ~5 sec segment
 
 - we'll seriously need to support reading user files from a different cwd
     - + trivial appimage launches
     - + wont accidentally delete user config on windows or all steam platforms
     - + simpler self-updater though we can still leave legacy restore/backup logic as it won't hurt
+- Windows also has to be able to read from appdata folder
+    - CLI argument: --roaming-folder
+        - set by AppRun to $HOME/.config so we don't have to call readenv
+        - default will just work like always
+
+- Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
+
 
 - logarithmic audio slider
 
@@ -40,6 +49,11 @@ summary: That which we are brainstorming at the moment.
 
 # REST
 
+- /skip command
+    - with 60 sec timeout
+- /restart maybe too
+    - with 60 sec timeout
+    
 - Lower the audio delay in OpenAL esp for Windows
     - use WASAPI Exclusive mode vs Shared? https://github.com/kcat/openal-soft/issues/682
 

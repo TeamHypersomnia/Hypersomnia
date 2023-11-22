@@ -412,7 +412,7 @@ namespace augs {
 			LOG("WINAPI: Calling wglCreateContextAttribsARB.");
 			const int attribList[] = {
     			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-    			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+    			WGL_CONTEXT_MINOR_VERSION_ARB, 0,
     			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
     			0, 0
 			};
@@ -433,9 +433,10 @@ namespace augs {
 
 		p.nSize = sizeof(p);
 		p.nVersion = 1;
-		p.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+		p.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_SWAP_COPY | PFD_DEPTH_DONTCARE;
 		p.iPixelType = PFD_TYPE_RGBA;
 		p.cColorBits = 24;
+		p.cAlphaBits = 8;
 
 		{
 			LOG("WINAPI: Calling ChoosePixelFormat.");
@@ -469,7 +470,7 @@ namespace augs {
     			WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
     			WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
     			WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-    			WGL_COLOR_BITS_ARB, static_cast<int>(settings.bpp),
+    			WGL_COLOR_BITS_ARB, 24,
     			WGL_ALPHA_BITS_ARB, 8,
     			WGL_DEPTH_BITS_ARB, 0,
     			WGL_STENCIL_BITS_ARB, 8,

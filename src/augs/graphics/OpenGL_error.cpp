@@ -1,6 +1,7 @@
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/log.h"
 #include "augs/ensure.h"
+// #include <thread>
 
 static const char * get_OpenGL_error_string(int errID) {
 	if (errID == GL_NO_ERROR) return "";
@@ -13,10 +14,11 @@ static const char * get_OpenGL_error_string(int errID) {
 }
 
 void check_OpenGL_error(const char* stmt, const char* fname, int line) {
+	//LOG("%x (t: %x)", stmt, std::this_thread::get_id());
 	const GLenum err { glGetError() };
 
 	if (err != GL_NO_ERROR) {
-		LOG("OpenAL error %x, (%x) at %x:%x - for %x", err, get_OpenGL_error_string(err), fname, line, stmt);
+		LOG("OpenGL error %x, (%x) at %x:%x - for %x", err, get_OpenGL_error_string(err), fname, line, stmt);
 #if !IS_PRODUCTION_BUILD
 		ensure(false && "OpenGL error.");
 #endif

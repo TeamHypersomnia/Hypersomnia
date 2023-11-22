@@ -9,7 +9,7 @@
 namespace augs {
 	namespace graphics {
 		void texture::perform(backend_access, const texImage2D_command& cmd) { 
-			texImage2D(cmd.source);
+			GL_texImage2D(cmd.source);
 		}
 
 		void texture::perform(backend_access, const set_filtering_command& cmd) { 
@@ -38,6 +38,7 @@ namespace augs {
 
 		bool texture::set_as_current_impl(backend_access) const {
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
+
 			return true;
 		}
 
@@ -47,24 +48,26 @@ namespace augs {
 
 		texture::texture(const vec2u new_size, const rgba* const source) {
 			create();
-			texImage2D(new_size, std::addressof(source->r));
+			GL_texImage2D(new_size, std::addressof(source->r));
 		}
 
 		texture::texture(const image& source) {
 			create();
-			texImage2D(source);
+			GL_texImage2D(source);
 		}
 
-		void texture::texImage2D(const image& source) {
-			texImage2D(source.get_size(), source.data());
+		void texture::GL_texImage2D(const image& source) {
+			GL_texImage2D(source.get_size(), source.data());
 		}
 
-		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {
+		void texture::GL_texImage2D(const vec2u new_size, const unsigned char* const source) {
 			(void)source;
 			(void)new_size;
 
 			augs::window::get_current().check_current_context();
 
+			// Just in case
+			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,

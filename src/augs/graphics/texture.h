@@ -35,8 +35,8 @@ namespace augs {
 			bool set_as_current_impl(backend_access) const;
 			static void set_current_to_none_impl(backend_access);
 
-			void texImage2D(const vec2u size, const unsigned char* const source);
-			void texImage2D(const image& rgba_source);
+			void GL_texImage2D(const vec2u size, const unsigned char* const source);
+			void GL_texImage2D(const image& rgba_source);
 
 			void set_filtering(filtering_type);
 
