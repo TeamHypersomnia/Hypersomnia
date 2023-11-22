@@ -102,6 +102,8 @@ namespace augs {
 				We realized there are no performance savings whatsoever,
 				whereas some bugs could be introduced
 				by e.g. not re-binding the texture after some other GL calls.
+
+				See: 99de1cc851d33915eacb3b6166397008d296fad2
 			*/
 
 			// if (!is_current() || always_force_set) {

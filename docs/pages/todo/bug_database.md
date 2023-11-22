@@ -5,6 +5,19 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Discord streaming issue + Pepsik bug (broken textures when launching with Steam overlay0
+	- Quoting 99de1cc851d33915eacb3b6166397008d296fad2:
+		settable_as_current_mixin would skip calling glBindTexture if the
+		texture was already bound, even if it was a while ago - it appears that
+		for GL to work properly, we must re-bind the texture right before using
+		calling glTexImage2D - perhaps it's because of glActiveTexture or glBindBuffer calls in between.
+		Importantly, it's no longer an issue if we just always
+		bind the texture/fbo/shader etc., and there is no difference in
+		framerate whether we skip re-binding or not.
+
+- (Windows) Print screen in fullscreen works if we disable double-buffering.
+	- This may be the reason why it works in some other games, maybe they have doublebuffering disabled?
+
 - audit properly what happens upon death
 	- it's consistently the only time the clients crash
 	- sprawdzic na nagraniu czy to sie dzieje na spekcie czy od razu
