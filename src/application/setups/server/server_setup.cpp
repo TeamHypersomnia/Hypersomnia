@@ -1861,7 +1861,6 @@ message_handler_result server_setup::handle_rcon_payload(
 	const rcon_level_type level,
 	const P& typed_payload
 ) {
-	using namespace rcon_commands;
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
 	constexpr auto continue_v = message_handler_result::CONTINUE;
 
@@ -1870,9 +1869,11 @@ message_handler_result server_setup::handle_rcon_payload(
 
 		return continue_v;
 	}
-	else if constexpr(std::is_same_v<P, special>) {
+	else if constexpr(std::is_same_v<P, server_maintenance_command>) {
+		using command = server_maintenance_command;
+
 		if (level == rcon_level_type::BASIC) {
-			if (typed_payload != special::REQUEST_RUNTIME_INFO) {
+			if (typed_payload != command::REQUEST_RUNTIME_INFO) {
 				/* 
 					Basic RCON can only ask REQUEST_RUNTIME_INFO.
 					The other tasks are administrative.
@@ -1886,26 +1887,26 @@ message_handler_result server_setup::handle_rcon_payload(
 		LOG("Performing a RCON command: %x", typed_payload);
 
 		switch (typed_payload) {
-			case special::CHECK_FOR_UPDATES_NOW:
+			case command::CHECK_FOR_UPDATES_NOW:
 				check_for_updates_once = true;
 
 				return continue_v;
 
-			case special::SHUTDOWN: {
+			case command::SHUTDOWN: {
 				LOG("Shutting down due to rcon's request.");
 				schedule_shutdown();
 
 				return continue_v;
 			}
 
-			case special::RESTART: {
+			case command::RESTART: {
 				LOG("Restarting the server due to rcon's request.");
 				schedule_restart();
 
 				return continue_v;
 			}
 
-			case special::REQUEST_RUNTIME_INFO: 
+			case command::REQUEST_RUNTIME_INFO: 
 				refresh_runtime_info_for_rcon();
 
 				return continue_v;

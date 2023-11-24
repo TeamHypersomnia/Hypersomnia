@@ -35,7 +35,7 @@ void perform_rcon_gui(
 	else {
 		do_pretty_tabs(state.active_pane);
 
-		using RS = rcon_commands::special;
+		using RS = server_maintenance_command;
 
 		auto do_command_button = [&](const std::string& label, const auto cmd) {
 			if (ImGui::Button(label.c_str())) {

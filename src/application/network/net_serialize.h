@@ -188,7 +188,7 @@ namespace net_messages {
 	}
 
 	template <class Stream>
-	bool serialize(Stream& s, rcon_commands::special& c) {
+	bool serialize(Stream& s, server_maintenance_command& c) {
 		return serialize_enum(s, c);
 	}
 

@@ -2,8 +2,7 @@
 #include "application/setups/server/server_vars.h"
 #include "game/modes/mode_commands/match_command.h"
 
-namespace rcon_commands {
-	enum class special : unsigned char {
+enum class server_maintenance_command : unsigned char {
 		SHUTDOWN,
 		RESTART,
 		CHECK_FOR_UPDATES_NOW,
@@ -12,10 +11,9 @@ namespace rcon_commands {
 
 		COUNT
 	};
-};
 
 using rcon_command_variant = std::variant<
 	std::monostate,
 	match_command,
-	rcon_commands::special
+	server_maintenance_command
 >;
