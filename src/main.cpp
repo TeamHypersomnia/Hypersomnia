@@ -10,6 +10,7 @@
 
 #include "cmd_line_params.h"
 #include "build_info.h"
+#include <mutex>
 
 extern std::mutex log_mutex;
 
