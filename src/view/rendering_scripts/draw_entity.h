@@ -672,10 +672,12 @@ FORCE_INLINE void draw_neon_map(
 	});
 }
 
+template <class F = default_customize_input>
 FORCE_INLINE void draw_color_highlight(
 	const const_entity_handle& handle,
 	const rgba color,
-	const draw_renderable_input& in
+	const draw_renderable_input& in,
+	F&& customize_input = default_customize_input()
 ) {
 	handle.constrained_dispatch<entities_with_renderables>([&in, color](const auto typed_handle) {
 		specific_draw_color_highlight(typed_handle, color, in);
