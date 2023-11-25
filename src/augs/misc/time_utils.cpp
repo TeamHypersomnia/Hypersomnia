@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <filesystem>
+#include <mutex>
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"

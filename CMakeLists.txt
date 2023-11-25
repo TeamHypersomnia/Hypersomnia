@@ -1906,6 +1906,10 @@ if(MSVC_SPECIFIC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
 
+if(MSVC AND GENERATE_DEBUG_INFORMATION)
+	set_target_properties(Hypersomnia PROPERTIES COMPILE_PDB_NAME Hypersomnia COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+endif()
+
 # We add a command to automatically create an archive for every Release build.
 
 # Custom targets for Makefile
