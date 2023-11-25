@@ -558,15 +558,27 @@ void enqueue_illuminated_rendering_jobs(
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					const bool is_local = typed_handle == fog_of_war_character;
 
+					const rgba SHADOW_COLOR = rgba(0, 0, 0, 80);
+					const auto shadow_input_customizer = 
+						[](const sprite_drawing_input& original_input) -> const sprite_drawing_input& {
+							const vec2 SHADOW_OFFSET = vec2(5, 5);
+							std::optional<sprite_drawing_input> modified_input;
+							modified_input.emplace(original_input);
+							modified_input->renderable_transform += SHADOW_OFFSET;
+							return *modified_input;
+					};
+
 					if (is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
+						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
 						::specific_draw_entity(typed_handle, friendly_drawing_in);
 						::specific_draw_border(typed_handle, borders_friendly_drawing_in, standard_border_provider);
 					}
 					else {
 						draw_lights_for(neons_enemy_drawing_in, typed_handle);
 
+						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, enemy_drawing_in, shadow_input_customizer);
 						::specific_draw_entity(typed_handle, enemy_drawing_in);
 						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
 					}
