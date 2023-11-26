@@ -6,30 +6,36 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Miniature generation should trigger "dirty" revision
-
 # BEFORE STEAM
 
-- Add Join our Discord link to description
 
-- Trailer
-    - Gameplay segment
-        - Decide on which maps to show - we don't have do to a lot
-            - de_cyberaqua
-            - virtual_reality_1
-            - de_silo
-            - de_rambo
-            - de_duel_practice
-        - For trailer it's enough only the shown maps are copyright-free
-            - We can fix other maps post-release
-        - 1) No intro, just fade into gameplay right away
-        - 2) A ~5 second gameplay segment per each map with map name shown in top left every time
-    - Editor segment
-        - 1) "Create custom maps from scratch!" - Simple Map creation timelapse
-            - Just make a good map offline to prepare a long command history. THEN turn on obs recording whilst you replay actions with Redo.
-                - (Instead of trying to record a perfect session of you creating the map)
-        - 2) "Clone existing maps!" ~10 sec segment - Close up on tweaking existing full-blown maps like cyberaqua with shown mouse movements.
-        - 3) "Playtest your work online with a single click!" - ~5 sec segment
+## For trailer
+
+- simple chat/rcon commands to set players by nickname in position and give them weapons would come a long way
+    - text area in rcon even
+    - on exec, autorestart round if it's won/lost already
+    - give a hotkey to exec custom rcon commands
+    - seteq nickname 2Xzamiec electric_armor
+        - we have to do 2X because with "zamiec zamiec" we don't know if the other should be held or in backpack
+
+- Preps
+    - Decide sound effects
+
+## Post trailer (During review)
+
+- fix those movement flags not propagading through respawns in ffa
+
+- Host multiple official servers to accomodate a potential spike in the number of players
+    - Each instance will can have the same config directory
+        - Except they will have differing configs for map cycles, no?
+            - We can make a --config CLI to read another config from the cwd that works like config.force.lua
+                - server1.force.lua
+                - server2.force.lua (all can be next to config.force.lua)
+                - etc.
+            - Otherwise they'll all just read from .config/Hypersomnia or local folder
+
+- Miniature generation should trigger "dirty" revision
+- logarithmic audio slider
 
 - we'll seriously need to support reading user files from a different cwd
     - + trivial appimage launches
@@ -40,12 +46,8 @@ summary: That which we are brainstorming at the moment.
         - set by AppRun to $HOME/.config so we don't have to call readenv
         - default will just work like always
 
-- Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
-
-
-- logarithmic audio slider
-
-- fix small capsule
+- GIFs for Steam description
+- Add Join our Discord link to description
 
 # REST
 

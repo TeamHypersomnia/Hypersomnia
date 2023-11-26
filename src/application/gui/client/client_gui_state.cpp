@@ -20,6 +20,11 @@ bool client_gui_state::control(const handle_input_before_game_input in) {
 				s = !s;
 				return true;
 			}
+			
+			if (*it == general_gui_intent_type::EXECUTE_RCON_GAME_COMMANDS) {
+				rcon.request_execute_custom_game_commands = true;
+				return true;
+			}
 
 			auto invoke_chat = [&](const chat_target_type t) {
 				chat.open_input_bar(t);

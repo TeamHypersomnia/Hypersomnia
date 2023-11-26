@@ -6642,3 +6642,6 @@ This will discard your redo history."
     - Ricochets chapter should come immediately after shooting chapter
     - Leave backpack/deagles akimbo chapter at the end
 
+- Consider taking the small logo from hypersomnia overlayed over pavement rather than glass
+
+- fix small capsule

@@ -184,6 +184,82 @@ entity_id requested_equipment::generate_for_impl(
 
 	entity_id result_weapon;
 
+	auto fill_with_ammo = [&](const auto& weapon) {
+		const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
+		const auto chamber_mag_slot = weapon[slot_function::GUN_CHAMBER_MAGAZINE];
+
+		auto create_charge_in_chamber = [&](const auto& charge_flavour) {
+			if (charge_flavour.is_set()) {
+				if (chamber_slot) {
+					if (const auto c = make_owned_item(charge_flavour)) {
+						c.set_charges(1);
+
+						transfer(c, chamber_slot, false);
+
+						if (chamber_mag_slot) {
+							if (const auto num_fitting = c.num_charges_fitting_in(chamber_mag_slot); num_fitting > 0) {
+								if (const auto cm = make_owned_item(charge_flavour)) {
+									cm.set_charges(num_fitting);
+
+									transfer(cm, chamber_mag_slot, false);
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		const auto magazine_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+		if (magazine_slot) {
+			const auto final_mag_flavour = [&]() {
+				if (eq.non_standard_mag.is_set()) {
+					return eq.non_standard_mag;
+				}
+
+				return magazine_slot->only_allow_flavour;
+			}();
+
+			if (ammo_pieces_to_generate_left < 0) {
+				ammo_pieces_to_generate_left = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
+			}
+
+			if (ammo_pieces_to_generate_left > 0) {
+				if (const auto new_mag = make_ammo_piece(final_mag_flavour)) {
+					transfer(new_mag, magazine_slot, false);
+					--ammo_pieces_to_generate_left;
+
+					if (const auto loaded_charge = new_mag[slot_function::ITEM_DEPOSIT].get_item_if_any()) {
+						create_charge_in_chamber(loaded_charge.get_flavour_id());
+					}
+
+					generate_spares(final_mag_flavour);
+				}
+			}
+		}
+		else if (chamber_slot) {
+			const auto final_charge_flavour = [&]() {
+				if (eq.non_standard_mag.is_set()) {
+					return eq.non_standard_charge;
+				}
+
+				return chamber_slot->only_allow_flavour;
+			}();
+
+			if (ammo_pieces_to_generate_left < 0) {
+				ammo_pieces_to_generate_left = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
+			}
+
+			if (ammo_pieces_to_generate_left > 0) {
+				create_charge_in_chamber(final_charge_flavour);
+				--ammo_pieces_to_generate_left;
+
+				generate_spares(final_charge_flavour);
+			}
+		}
+	};
+
 	if (eq.weapon.is_set()) {
 		if (const auto weapon = make_owned_item(eq.weapon)) {
 			result_weapon = weapon.get_id();
@@ -191,82 +267,22 @@ entity_id requested_equipment::generate_for_impl(
 			/* So that the effect transform is valid */
 			weapon.set_logic_transform(character_transform);
 
-			const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
-			const auto chamber_mag_slot = weapon[slot_function::GUN_CHAMBER_MAGAZINE];
-
-			auto create_charge_in_chamber = [&](const auto& charge_flavour) {
-				if (charge_flavour.is_set()) {
-					if (chamber_slot) {
-						if (const auto c = make_owned_item(charge_flavour)) {
-							c.set_charges(1);
-
-							transfer(c, chamber_slot, false);
-
-							if (chamber_mag_slot) {
-								if (const auto num_fitting = c.num_charges_fitting_in(chamber_mag_slot); num_fitting > 0) {
-									if (const auto cm = make_owned_item(charge_flavour)) {
-										cm.set_charges(num_fitting);
-
-										transfer(cm, chamber_mag_slot, false);
-									}
-								}
-							}
-						}
-					}
-				}
-			};
-
-			const auto magazine_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-			if (magazine_slot) {
-				const auto final_mag_flavour = [&]() {
-					if (eq.non_standard_mag.is_set()) {
-						return eq.non_standard_mag;
-					}
-
-					return magazine_slot->only_allow_flavour;
-				}();
-
-				if (ammo_pieces_to_generate_left < 0) {
-					ammo_pieces_to_generate_left = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
-				}
-
-				if (ammo_pieces_to_generate_left > 0) {
-					if (const auto new_mag = make_ammo_piece(final_mag_flavour)) {
-						transfer(new_mag, magazine_slot, false);
-						--ammo_pieces_to_generate_left;
-
-						if (const auto loaded_charge = new_mag[slot_function::ITEM_DEPOSIT].get_item_if_any()) {
-							create_charge_in_chamber(loaded_charge.get_flavour_id());
-						}
-
-						generate_spares(final_mag_flavour);
-					}
-				}
-			}
-			else if (chamber_slot) {
-				const auto final_charge_flavour = [&]() {
-					if (eq.non_standard_mag.is_set()) {
-						return eq.non_standard_charge;
-					}
-
-					return chamber_slot->only_allow_flavour;
-				}();
-
-				if (ammo_pieces_to_generate_left < 0) {
-					ammo_pieces_to_generate_left = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
-				}
-
-				if (ammo_pieces_to_generate_left > 0) {
-					create_charge_in_chamber(final_charge_flavour);
-					--ammo_pieces_to_generate_left;
-
-					generate_spares(final_charge_flavour);
-				}
-			}
+			fill_with_ammo(weapon);
 
 			if constexpr(!to_the_ground) {
 				pickup(weapon);
+			}
+		}
+
+		if (eq.weapon_secondary.is_set()) {
+			if (const auto weapon = make_owned_item(eq.weapon_secondary)) {
+				weapon.set_logic_transform(character_transform);
+
+				fill_with_ammo(weapon);
+
+				if constexpr(!to_the_ground) {
+					transfer(weapon, character[slot_function::SECONDARY_HAND]);
+				}
 			}
 		}
 	}

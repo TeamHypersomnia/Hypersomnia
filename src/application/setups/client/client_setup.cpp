@@ -1214,7 +1214,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		rcon_gui.show = false;
 	}
 
-	if (!arena_gui.scoreboard.show && rcon_gui.show) {
+	{
 		auto on_new_payload = [&]<typename P>(const P& new_payload) {
 			if constexpr(std::is_same_v<P, server_vars>) {
 				send_payload(
@@ -1233,11 +1233,18 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		};
 
-		const bool is_remote_server = true;
+		if (!arena_gui.scoreboard.show && rcon_gui.show) {
+			const bool is_remote_server = true;
 
-		perform_rcon_gui(
+			::perform_rcon_gui(
+				rcon_gui,
+				is_remote_server,
+				on_new_payload
+			);
+		}
+
+		::do_pending_rcon_payloads(
 			rcon_gui,
-			is_remote_server,
 			on_new_payload
 		);
 	}

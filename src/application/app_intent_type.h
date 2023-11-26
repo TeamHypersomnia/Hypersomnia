@@ -26,6 +26,7 @@ enum class general_gui_intent_type {
 	TEAM_CHAT,
 	BUY_MENU,
 	SERVER_ADMIN_PANEL,
+	EXECUTE_RCON_GAME_COMMANDS,
 
 	CHOOSE_TEAM,
 

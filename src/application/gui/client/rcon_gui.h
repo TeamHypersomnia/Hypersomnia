@@ -2,6 +2,7 @@
 #include "application/setups/client/rcon_pane.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/server/rcon_level.h"
+#include "game/modes/mode_commands/mode_entropy_structs.h"
 #include "augs/log.h"
 
 struct rcon_gui_state {
@@ -12,6 +13,8 @@ struct rcon_gui_state {
 	server_vars edited_sv_vars;
 
 	server_runtime_info runtime_info;
+	custom_game_commands_string_type custom_commands_text;
+	bool request_execute_custom_game_commands = false;
 
 	bool show = false;
 

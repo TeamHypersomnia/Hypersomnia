@@ -188,6 +188,7 @@ struct arena_mode_player {
 struct arena_mode_round_state {
 	// GEN INTROSPECTOR struct arena_mode_round_state
 	bool cache_players_frozen = false;
+	bool skip_freeze_time = false;
 	arena_mode_win last_win;
 	arena_mode_knockouts_vector knockouts;
 	mode_player_id bomb_planter;
@@ -200,6 +201,10 @@ enum class round_start_type {
 };
 
 struct debugger_property_accessors;
+
+struct setup_next_round_params {
+	bool skip_freeze_time = false;
+};
 
 class arena_mode {
 public:
@@ -321,8 +326,8 @@ private:
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, logic_step);
 
-	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS);
-	void setup_round(input, logic_step, const round_transferred_players& = {});
+	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
+	void setup_round(input, logic_step, const round_transferred_players& = {}, setup_next_round_params = {});
 	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
 
 	void fill_spawns(const cosmos&, faction_type, arena_mode_faction_state& out);
@@ -470,9 +475,11 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	player_type* find_player_by(const client_nickname_type& nickname);
+	using player_entry_type = decltype(players)::value_type;
+
+	player_entry_type* find_player_by(const client_nickname_type& nickname);
 	player_type* find(const mode_player_id&);
-	const player_type* find_player_by(const client_nickname_type& nickname) const;
+	const player_entry_type* find_player_by(const client_nickname_type& nickname) const;
 	const player_type* find(const mode_player_id&) const;
 
 	const player_type* find(const session_id_type&) const;
@@ -618,4 +625,6 @@ public:
 	bool levelling_enabled(const_input) const;
 
 	arena_mode_faction_state& get_spawns_for(input, faction_type faction);
+
+	float get_freeze_time(const_input) const;
 };

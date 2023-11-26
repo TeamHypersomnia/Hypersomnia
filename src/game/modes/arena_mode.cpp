@@ -33,6 +33,9 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/modes/detail/delete_with_held_items.hpp"
 #include "game/modes/detail/hud_message_players.h"
+#include "game/modes/mode_commands/translate_game_commands.h"
+#include "test_scenes/test_scene_flavour_ids.h"
+#include "test_scenes/test_scene_flavours.h"
 
 using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
@@ -851,7 +854,9 @@ void arena_mode::play_start_round_sound(const input_type in, const const_logic_s
 		battle_event::START
 	;
 
-	if (start_event == battle_event::PREPARE_TO_FIGHT) {
+	const bool has_prepare_to_fight_sound = false;
+
+	if (has_prepare_to_fight_sound && start_event == battle_event::PREPARE_TO_FIGHT) {
 		// Custom logic: Distribute "PREPARE" sounds evenly
 
 		const auto p = calc_participating_factions(in);
@@ -880,7 +885,8 @@ void arena_mode::play_start_round_sound(const input_type in, const const_logic_s
 void arena_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
-	const arena_mode::round_transferred_players& transfers
+	const arena_mode::round_transferred_players& transfers,
+	const setup_next_round_params params
 ) {
 	auto access = allocate_new_entity_access();
 
@@ -927,6 +933,10 @@ void arena_mode::setup_round(
 
 	current_round = {};
 
+	if (params.skip_freeze_time) {
+		current_round.skip_freeze_time = true;
+	}
+
 	for_each_faction([&](const auto faction) {
 		fill_spawns(cosm, faction, factions[faction]);
 	});
@@ -959,13 +969,14 @@ void arena_mode::setup_round(
 		step.post_message(msg);
 	}
 
-	if (in.rules.freeze_secs > 0.f) {
+	if (get_freeze_time(in) > 0.f) {
 		if (state != arena_mode_state::WARMUP) {
 			set_players_frozen(in, true);
 			release_triggers_of_weapons_of_players(in);
 		}
 	}
 	else {
+		set_players_frozen(in, false);
 		play_start_round_sound(in, step);
 	}
 
@@ -1052,14 +1063,14 @@ arena_mode::round_transferred_players arena_mode::make_transferred_players(const
 	return result;
 }
 
-void arena_mode::start_next_round(const input_type in, const logic_step step, const round_start_type type) {
+void arena_mode::start_next_round(const input_type in, const logic_step step, const round_start_type type, const setup_next_round_params params) {
 	state = arena_mode_state::LIVE;
 
 	if (type == round_start_type::KEEP_EQUIPMENTS) {
-		setup_round(in, step, make_transferred_players(in));
+		setup_round(in, step, make_transferred_players(in), params);
 	}
 	else {
-		setup_round(in, step);
+		setup_round(in, step, {}, params);
 	}
 }
 
@@ -1082,13 +1093,17 @@ arena_mode_player_stats* arena_mode::stats_of(const mode_player_id& id) {
 }
 
 template <class E>
-static void delete_all_owned_items(const E handle) {
+static void delete_all_owned_items(const E handle, const std::optional<entity_flavour_id> except = std::nullopt) {
 	deletion_queue q;
 
 	auto& cosm = handle.get_cosmos();
 
 	handle.for_each_contained_item_recursive(
 		[&](const auto& contained) {
+			if (except == contained.get_flavour_id()) {
+				return;
+			}
+
 			q.push_back(entity_id(contained.get_id()));
 		}
 	);
@@ -1841,8 +1856,120 @@ void arena_mode::scramble_assigned_factions(const arena_mode::participating_fact
 	}
 }
 
+
+template <class H, class F>
+void set_specific_equipment_for(allocate_new_entity_access access, logic_step step, const requested_equipment& eq, H player_handle, F except_flavour) {
+	::delete_all_owned_items(player_handle, entity_flavour_id(except_flavour));
+	eq.generate_for(access, player_handle, step, 1);
+}
+
 void arena_mode::handle_special_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto& g = entropy.general;
+
+	auto handle_game_command = [&]<typename G>(const G& cmd) {
+		if constexpr(std::is_same_v<G, no_arg_game_command>) {
+			switch (cmd) {
+				case no_arg_game_command::ROUND_RESTART:
+					start_next_round(in, step);
+					break;
+				case no_arg_game_command::ROUND_RESTART_NOFREEZE: {
+					setup_next_round_params params;
+					params.skip_freeze_time = true;
+
+					start_next_round(in, step, round_start_type::KEEP_EQUIPMENTS, params); 
+					break;
+				}
+				case no_arg_game_command::RICH:
+					for (auto& p : players) {
+						p.second.stats.money = 1000000;
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+		else if constexpr(std::is_same_v<G, setpos_game_command>) {
+			if (auto player = find_player_by(cmd.nickname)) {
+				if (auto handle = in.cosm[player->second.controlled_character_id]) {
+					handle.set_logic_transform(cmd.new_transform);
+
+					auto& off = handle.template get<components::crosshair>().base_offset;
+					off = off.length() * cmd.new_transform.get_direction();
+				}
+			}
+		}
+		else if constexpr(std::is_same_v<G, seteq_game_command>) {
+			if (auto player = find_player_by(cmd.nickname)) {
+				if (auto handle = in.cosm[player->second.controlled_character_id]) {
+					requested_equipment eq;
+
+					eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+
+					auto faction = player->second.get_faction();
+
+					for (auto item_str : cmd.items) {
+						auto i = item_str.operator std::string();
+
+						if (i == "armor") {
+							eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+							continue;
+						}
+
+						if (i == "backpack") {
+							eq.back_wearable = to_entity_flavour_id(faction == faction_type::METROPOLIS ? test_tool_items::METROPOLIS_BACKPACK : test_tool_items::RESISTANCE_BACKPACK);
+							continue;
+						}
+
+						bool akimbo = false;
+
+						if (i.substr(0, 2) == "2X") {
+							akimbo = true;
+
+							i.erase(i.begin());
+							i.erase(i.begin());
+						}
+
+						auto item_lambda = [&](const auto flavour_id, const auto& flavour) {
+							if (flavour.template get<invariants::text_details>().resource_id != i) {
+								return;
+							}
+
+							auto add_to_other = [&]() {
+								if (eq.other_equipment.size() < eq.other_equipment.max_size()) {
+									eq.other_equipment.push_back({ 1, flavour_id });
+								}
+							};
+
+							if (::is_weapon_like(flavour)) {
+								if (eq.weapon.is_set()) {
+									add_to_other();
+								}
+								else {
+									eq.weapon = flavour_id;
+
+									if (akimbo) {
+										eq.weapon_secondary = flavour_id;
+									}
+								}
+							}
+							else {
+								add_to_other();
+							}
+						};
+
+						in.cosm.for_each_flavour_having<invariants::item>(item_lambda);
+					}
+
+					auto access = allocate_new_entity_access();
+					::set_specific_equipment_for(access, step, eq, handle, in.rules.bomb_flavour);
+				}
+			}
+		}
+		else {
+			static_assert(always_false_v<G>, "Non-exhaustive");
+		}
+	};
 
 	std::visit(
 		[&](const auto& cmd) {
@@ -1850,6 +1977,9 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 
 			if constexpr(std::is_same_v<C, std::monostate>) {
 
+			}
+			else if constexpr(std::is_same_v<C, custom_game_commands_string_type>) {
+				::translate_game_commands(cmd, handle_game_command);
 			}
 			else if constexpr(std::is_same_v<C, match_command>) {
 				switch (cmd) {
@@ -2822,11 +2952,11 @@ float arena_mode::get_seconds_passed_in_cosmos(const const_input_type in) const 
 }
 
 float arena_mode::get_round_seconds_passed(const const_input_type in) const {
-	return get_seconds_passed_in_cosmos(in) - static_cast<float>(in.rules.freeze_secs);
+	return get_seconds_passed_in_cosmos(in) - get_freeze_time(in);
 }
 
 float arena_mode::get_freeze_seconds_left(const const_input_type in) const {
-	return static_cast<float>(in.rules.freeze_secs) - get_seconds_passed_in_cosmos(in);
+	return get_freeze_time(in) - get_seconds_passed_in_cosmos(in);
 }
 
 float arena_mode::get_buy_seconds_left(const const_input_type in) const {
@@ -2846,11 +2976,11 @@ float arena_mode::get_buy_seconds_left(const const_input_type in) const {
 		return 0.f;
 	}
 
-	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_seconds_passed_in_cosmos(in);
+	return static_cast<float>(get_freeze_time(in) + in.rules.buy_secs_after_freeze) - get_seconds_passed_in_cosmos(in);
 }
 
 float arena_mode::get_round_seconds_left(const const_input_type in) const {
-	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_seconds_passed_in_cosmos(in);
+	return static_cast<float>(in.rules.round_secs) + get_freeze_time(in) - get_seconds_passed_in_cosmos(in);
 }
 
 float arena_mode::get_seconds_since_win(const const_input_type in) const {
@@ -3057,20 +3187,12 @@ const arena_mode_player* arena_mode::find(const session_id_type& session_id) con
 	return nullptr;
 }
 
-arena_mode_player* arena_mode::find_player_by(const client_nickname_type& nickname) {
-	if (const auto r = find_player_by_impl(*this, nickname)) {
-		return std::addressof(r->second);
-	}
-
-	return nullptr;
+arena_mode::player_entry_type* arena_mode::find_player_by(const client_nickname_type& nickname) {
+	return find_player_by_impl(*this, nickname);
 }
 
-const arena_mode_player* arena_mode::find_player_by(const client_nickname_type& nickname) const {
-	if (const auto r = find_player_by_impl(*this, nickname)) {
-		return std::addressof(r->second);
-	}
-
-	return nullptr;
+const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nickname_type& nickname) const {
+	return find_player_by_impl(*this, nickname);
 }
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
@@ -3286,7 +3408,7 @@ mode_player_id arena_mode::get_next_to_spectate(
 
 	// TODO: Optimize
 	if (const auto player = find_player_by(it->nickname)) {
-		return lookup(player->controlled_character_id);
+		return lookup(player->second.controlled_character_id);
 	}
 
 	return {};
@@ -3402,4 +3524,8 @@ bool arena_mode_ruleset::is_ffa() const {
 
 bool arena_mode::levelling_enabled(const_input_type in) const {
 	return state != arena_mode_state::WARMUP && std::holds_alternative<gun_game_rules>(in.rules.subrules);
+}
+
+float arena_mode::get_freeze_time(const const_input_type in) const {
+	return current_round.skip_freeze_time ? 0.0f : in.rules.freeze_secs;
 }

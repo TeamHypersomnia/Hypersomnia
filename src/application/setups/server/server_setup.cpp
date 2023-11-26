@@ -1864,7 +1864,7 @@ message_handler_result server_setup::handle_rcon_payload(
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
 	constexpr auto continue_v = message_handler_result::CONTINUE;
 
-	if constexpr(std::is_same_v<P, match_command>) {
+	if constexpr(is_one_of_v<P, match_command, custom_game_commands_string_type>) {
 		local_collected.mode_general.special_command = typed_payload;
 
 		return continue_v;
@@ -2312,11 +2312,11 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 			auto& rcon_gui = integrated_client_gui.rcon;
 
-			if (!arena_gui.scoreboard.show && rcon_gui.show) {
-				auto on_new_payload = [&](const auto& new_payload) {
-					handle_rcon_payload(rcon_level_type::MASTER, new_payload);
-				};
+			auto on_new_payload = [&](const auto& new_payload) {
+				handle_rcon_payload(rcon_level_type::MASTER, new_payload);
+			};
 
+			if (!arena_gui.scoreboard.show && rcon_gui.show) {
 				const bool has_maintenance = false;
 
 				rcon_gui.level = rcon_level_type::MASTER;
@@ -2327,6 +2327,11 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 					on_new_payload
 				);
 			}
+
+			::do_pending_rcon_payloads(
+				rcon_gui,
+				on_new_payload
+			);
 		}
 	}
 

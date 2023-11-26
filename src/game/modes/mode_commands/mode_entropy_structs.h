@@ -23,7 +23,10 @@ struct add_player_input {
 	}
 };
 
+using custom_game_commands_string_type = std::string;
+
 using all_general_mode_commands_variant = std::variant<
 	std::monostate,
-	match_command
+	match_command,
+	custom_game_commands_string_type
 >;	

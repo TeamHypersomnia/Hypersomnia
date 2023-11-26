@@ -130,6 +130,7 @@ return {
 	U = "TEAM_CHAT",
 
 	F8 = "SERVER_ADMIN_PANEL",
+	F10 = "EXECUTE_RCON_GAME_COMMANDS",
 
 	RightMouseButton = "SPECTATE_PREVIOUS",
 	LeftMouseButton = "SPECTATE_NEXT"

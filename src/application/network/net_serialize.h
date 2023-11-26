@@ -271,6 +271,12 @@ namespace net_messages {
 	}
 
 	template <class Stream>
+	bool serialize(Stream& s, std::string& e) {
+		/* Default to max 8 KB per std::string */
+		return serialize_stdstring(s, e, 0, default_max_std_string_length_v); 
+	}
+
+	template <class Stream>
 	bool serialize(Stream& s, wielding_setup& p) {
 		return serialize_trivial_as_bytes(s, p);
 	}

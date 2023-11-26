@@ -6,6 +6,19 @@
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 
 template <class F>
+void do_pending_rcon_payloads(
+	rcon_gui_state& state, 
+	F&& on_new_payload
+) {
+	auto& custom_commands = state.custom_commands_text;
+
+	if (state.request_execute_custom_game_commands) {
+		on_new_payload(custom_commands);
+		state.request_execute_custom_game_commands = false;
+	}
+}
+
+template <class F>
 void perform_rcon_gui(
 	rcon_gui_state& state, 
 	const bool is_remote_server,
@@ -23,6 +36,7 @@ void perform_rcon_gui(
 	centered_text(window_name);
 
 	const auto level = state.level;
+	auto& custom_commands = state.custom_commands_text;
 
 	if (level == rcon_level_type::INTEGRATED_ONLY) {
 		text_color("This is an integrated server. Only the host has RCON access.", red);
@@ -112,6 +126,24 @@ void perform_rcon_gui(
 				augs::for_each_enum_except_bounds([&](const MC cmd) {
 					do_command_button(format_enum(cmd), cmd);
 				});
+
+				ImGui::Separator();
+
+				text_color("Execute custom game commands", yellow);
+
+				input_multiline_text("##CommandsArea", custom_commands, 10);
+
+				{
+					const auto len = custom_commands.length();
+					const bool len_valid = len > 0 && len <= default_max_std_string_length_v;
+						
+					auto scope = maybe_disabled_cols({}, !len_valid);
+
+					if (ImGui::Button("Execute") || state.request_execute_custom_game_commands) {
+						on_new_payload(custom_commands);
+						state.request_execute_custom_game_commands = false;
+					}
+				}
 
 				break;
 

@@ -34,6 +34,7 @@ constexpr std::size_t block_fragment_size_v = 1 * 1024;
 constexpr std::size_t max_packet_size_v = 4 * 1024;
 
 constexpr std::size_t max_address_string_length_v = 255;
+constexpr std::size_t default_max_std_string_length_v = 1024 * 8;
 
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length_v>;

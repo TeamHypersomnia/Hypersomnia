@@ -4,7 +4,7 @@
 #include "game/cosmos/step_declaration.h"
 #include "game/detail/spells/all_spells.h"
 
-using other_equipment_vector = std::vector<augs::simple_pair<int, item_flavour_id>>;
+using other_equipment_vector = augs::constant_size_vector<augs::simple_pair<int, item_flavour_id>, 10>;
 
 class cosmos;
 
@@ -13,6 +13,7 @@ class allocate_new_entity_access;
 struct requested_equipment {
 	// GEN INTROSPECTOR struct requested_equipment
 	item_flavour_id weapon;
+	item_flavour_id weapon_secondary;
 	item_flavour_id non_standard_mag;
 	item_flavour_id non_standard_charge;
 	int num_given_ammo_pieces = -1;
