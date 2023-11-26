@@ -560,12 +560,11 @@ void enqueue_illuminated_rendering_jobs(
 
 					const rgba SHADOW_COLOR = rgba(0, 0, 0, 80);
 					const auto shadow_input_customizer = 
-						[](const sprite_drawing_input& original_input) -> const sprite_drawing_input& {
-							const vec2 SHADOW_OFFSET = vec2(5, 5);
-							std::optional<sprite_drawing_input> modified_input;
-							modified_input.emplace(original_input);
-							modified_input->renderable_transform += SHADOW_OFFSET;
-							return *modified_input;
+						[](const sprite_drawing_input& original_input) {
+							const vec2 SHADOW_OFFSET = vec2(7, 7);
+							auto modified_input = original_input;
+							modified_input.renderable_transform += SHADOW_OFFSET;
+							return modified_input;
 					};
 
 					if (is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
