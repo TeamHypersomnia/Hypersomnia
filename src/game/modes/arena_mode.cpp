@@ -1889,7 +1889,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 					break;
 			}
 		}
-		else if constexpr(std::is_same_v<G, setpos_game_command>) {
+		else if constexpr(std::is_same_v<G, pos_game_command>) {
 			if (auto player = find_player_by(cmd.nickname)) {
 				if (auto handle = in.cosm[player->second.controlled_character_id]) {
 					handle.set_logic_transform(cmd.new_transform);
@@ -1899,7 +1899,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 				}
 			}
 		}
-		else if constexpr(std::is_same_v<G, seteq_game_command>) {
+		else if constexpr(std::is_same_v<G, eq_game_command>) {
 			if (auto player = find_player_by(cmd.nickname)) {
 				if (auto handle = in.cosm[player->second.controlled_character_id]) {
 					requested_equipment eq;

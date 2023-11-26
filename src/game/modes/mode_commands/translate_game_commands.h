@@ -16,30 +16,30 @@ enum class no_arg_game_command {
 };
 
 /*
-	setpos nickname x y [angle]
+	pos nickname x y [angle]
 	examples:
 
-	setpos "Pythagoras" 20 10
-	setpos Pythagoras 20 10 90
+	pos "Pythagoras" 20 10
+	pos Pythagoras 20 10 90
 */
 
-struct setpos_game_command {
+struct pos_game_command {
 	client_nickname_type nickname;
 	transformr new_transform;
 };
 
 /*
-	seteq nickname items...
+	eq nickname items...
 	examples:
 
-	seteq "Pythagoras" backpack armor
-	seteq Pythagoras baka47 szturm backpack force_grenade
-	seteq Pythagoras
+	eq "Pythagoras" backpack armor
+	eq Pythagoras armor baka47 szturm backpack force_grenade
+	eq Pythagoras
 
 	(can be empty too)
 */
 
-struct seteq_game_command {
+struct eq_game_command {
 	client_nickname_type nickname;
 	augs::constant_size_vector<augs::constant_size_string<30>, 20> items;
 };
@@ -48,16 +48,16 @@ struct seteq_game_command {
 	all_commands is a line-breaked sequence of commands, e.g.
 
 	round_restart
-	setpos Pythagoras 10 10 45
+	pos Pythagoras 10 10 45
 	rich
-	setpos "cold dimensions" 505 5
-	setpos Pythagoras 0 0
+	pos slow3586 505 5
+	pos Pythagoras 0 0
 
 	Nickname will or will not be delimited by ", depending if it has a space. If there's no ",
 	assume all characters until the next space consitute the nickname.
 
-	callback is a generic lambda and will be called on seteq_game_command,
-	setpos_game_command or no_arg_game_command respectively depending on the type of command.
+	callback is a generic lambda and will be called on eq_game_command,
+	pos_game_command or no_arg_game_command respectively depending on the type of command.
 */
 
 template <class S, class F>
@@ -100,8 +100,8 @@ void translate_game_commands(
         else if (command == "rich") {
             callback(no_arg_game_command::RICH);
         }
-        else if (command == "setpos") {
-            setpos_game_command cmd;
+        else if (command == "pos") {
+            pos_game_command cmd;
             cmd.nickname = read_nickname(line_stream);
 
             // Read transform
@@ -112,8 +112,8 @@ void translate_game_commands(
 
             callback(cmd);
         }
-        else if (command == "seteq") {
-            seteq_game_command cmd;
+        else if (command == "eq") {
+            eq_game_command cmd;
             cmd.nickname = read_nickname(line_stream);
 
             // Read items

@@ -15,7 +15,7 @@ summary: That which we are brainstorming at the moment.
     - text area in rcon even
     - on exec, autorestart round if it's won/lost already
     - give a hotkey to exec custom rcon commands
-    - seteq nickname 2Xzamiec electric_armor
+    - eq nickname 2Xzamiec electric_armor
         - we have to do 2X because with "zamiec zamiec" we don't know if the other should be held or in backpack
 
 - Preps

@@ -422,8 +422,6 @@ void enqueue_illuminated_rendering_jobs(
 				neons    = make_drawing_input(D::DROPPED_ITEMS_NEONS),
 				overlays = make_drawing_input(D::DROPPED_ITEMS_OVERLAYS)
 			]() {
-				std::optional<sprite_drawing_input> offset_input;
-
 				visible.for_each<render_layer::ITEMS_ON_GROUND>(
 					cosm,
 					[&](const auto& handle) {
@@ -457,10 +455,9 @@ void enqueue_illuminated_rendering_jobs(
 							const auto overlay_alpha = 1.0f - bounce_progress;
 							const auto bounce_elevation = bounce_progress * bounce_height * bounce_dir;
 
-							auto make_offset_input = [bounce_elevation, &offset_input](const auto& original) -> const auto& {
-								offset_input.emplace(original);
-								offset_input->renderable_transform += bounce_elevation;
-								return *offset_input;
+							auto make_offset_input = [bounce_elevation](auto offset_input) {
+								offset_input.renderable_transform += bounce_elevation;
+								return offset_input;
 							};
 
 							auto shadow_color = rgba(0, 0, 0, 120);
@@ -560,9 +557,8 @@ void enqueue_illuminated_rendering_jobs(
 
 					const rgba SHADOW_COLOR = rgba(0, 0, 0, 80);
 					const auto shadow_input_customizer = 
-						[](const sprite_drawing_input& original_input) {
+						[](auto modified_input) {
 							const vec2 SHADOW_OFFSET = vec2(7, 7);
-							auto modified_input = original_input;
 							modified_input.renderable_transform += SHADOW_OFFSET;
 							return modified_input;
 					};
