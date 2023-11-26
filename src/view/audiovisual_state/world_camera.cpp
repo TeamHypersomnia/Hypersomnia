@@ -244,6 +244,11 @@ void world_camera::tick(
 	dont_smooth_once = false;
 
 	auto interp_zoom = [dt](auto& current, const auto& target, float in_avgs = 5.f, float out_avgs = 10.f) {
+		if (std::abs(current - target) < 0.001f) {
+			current = target;
+			return;
+		}
+
 		if (target > current) {
 			auto avgs_per_sec = in_avgs;
 			float zoom_averaging_constant = 1.0f - static_cast<float>(std::pow(0.5f, avgs_per_sec * dt.in_seconds()));
