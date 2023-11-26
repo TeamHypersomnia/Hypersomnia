@@ -848,15 +848,15 @@ entity_id arena_mode::create_character_for_player(
 }
 
 void arena_mode::play_start_round_sound(const input_type in, const const_logic_step step) { 
+	const bool has_prepare_to_fight_sound = false;
+
 	const auto start_event = 
-		is_first_round_in_half(in) ?
+		has_prepare_to_fight_sound && is_first_round_in_half(in) ?
 		battle_event::PREPARE_TO_FIGHT :
 		battle_event::START
 	;
 
-	const bool has_prepare_to_fight_sound = false;
-
-	if (has_prepare_to_fight_sound && start_event == battle_event::PREPARE_TO_FIGHT) {
+	if (start_event == battle_event::PREPARE_TO_FIGHT) {
 		// Custom logic: Distribute "PREPARE" sounds evenly
 
 		const auto p = calc_participating_factions(in);

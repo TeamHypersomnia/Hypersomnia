@@ -11,19 +11,12 @@ summary: That which we are brainstorming at the moment.
 
 ## For trailer
 
-- simple chat/rcon commands to set players by nickname in position and give them weapons would come a long way
-    - text area in rcon even
-    - on exec, autorestart round if it's won/lost already
-    - give a hotkey to exec custom rcon commands
-    - eq nickname 2Xzamiec electric_armor
-        - we have to do 2X because with "zamiec zamiec" we don't know if the other should be held or in backpack
-
 - Preps
     - Decide sound effects
 
 ## Post trailer (During review)
 
-- fix those movement flags not propagading through respawns in ffa
+- fix those movement flags not propagating through respawns in ffa
 
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will can have the same config directory

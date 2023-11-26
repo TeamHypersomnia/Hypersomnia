@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 #include "game/common_state/entity_name_str.h"
 #include "game/modes/mode_player_id.h"
 #include "game/modes/mode_commands/match_command.h"
