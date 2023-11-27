@@ -28,6 +28,10 @@ struct pos_game_command {
 	transformr new_transform;
 };
 
+struct plant_game_command {
+	transformr bomb_transform;
+};
+
 /*
 	eq nickname items...
 	examples:
@@ -99,6 +103,16 @@ void translate_game_commands(
 		}
         else if (command == "rich") {
             callback(no_arg_game_command::RICH);
+        }
+        else if (command == "plant") {
+            plant_game_command cmd;
+
+			line_stream >> cmd.bomb_transform.pos.x >> cmd.bomb_transform.pos.y;
+            if (!(line_stream >> cmd.bomb_transform.rotation)) {
+                cmd.bomb_transform.rotation = 0; // Default angle if not provided
+            }
+
+            callback(cmd);
         }
         else if (command == "pos") {
             pos_game_command cmd;

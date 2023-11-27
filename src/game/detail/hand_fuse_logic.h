@@ -197,9 +197,9 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		base(fused_entity), step(step) 
 	{}
 
-	void arm_explosive(const arming_source_type source_type, bool play_sound = true) const {
+	void arm_explosive(const arming_source_type source_type, bool play_sound = true, bool skip_cooldown = false) const {
 		if (holder) {
-			if (::arm_explosive_cooldown_passed(holder)) {
+			if (skip_cooldown || ::arm_explosive_cooldown_passed(holder)) {
 				auto& transfers = holder.template get<components::item_slot_transfers>();
 				transfers.when_last_armed_explosive = clk.now;
 			}

@@ -36,6 +36,7 @@
 #include "game/modes/mode_commands/translate_game_commands.h"
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "game/detail/hand_fuse_logic.h"
 
 using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
@@ -1888,6 +1889,17 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 				default:
 					break;
 			}
+		}
+		else if constexpr(std::is_same_v<G, plant_game_command>) {
+			on_bomb_entity(in, [&](auto typed_bomb) {
+				if constexpr(!is_nullopt_v<decltype(typed_bomb)>) {
+					const auto bomb_nonconst = in.cosm[typed_bomb.get_id()];
+					const auto fuse_logic = fuse_logic_provider(bomb_nonconst, step);
+					fuse_logic.arm_explosive(arming_source_type::SHOOT_INTENT, true, true);
+
+					bomb_nonconst.set_logic_transform(cmd.bomb_transform);
+				}
+			});
 		}
 		else if constexpr(std::is_same_v<G, pos_game_command>) {
 			if (auto player = find_player_by(cmd.nickname)) {
