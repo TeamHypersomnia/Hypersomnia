@@ -297,19 +297,20 @@ private:
 		learnt_spells_array_type saved_spells;
 	};
 
-	struct transfer_meta {
-		const round_transferred_player& player;
-		messages::changed_identities_message& msg;
-	};
-
 	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;
-	round_transferred_players make_transferred_players(input) const;
+	round_transferred_players make_transferred_players(input, bool only_input_flags = false) const;
 
 	void count_win(input, const_logic_step, faction_type);
 
 	void standard_victory(input, const_logic_step, faction_type, bool announce = true, bool play_theme = true);
 
-	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
+	void create_character_for_player(
+		input,
+		logic_step,
+		mode_player_id,
+		messages::changed_identities_message& changed_identities,
+		const round_transferred_player* = nullptr
+	);
 
 	template <class H>
 	void reset_equipment_for(logic_step step, input in, mode_player_id ko, H character_handle);
@@ -320,14 +321,15 @@ private:
 		mode_player_id,
 		entity_id character, 
 		logic_step, 
-		std::optional<transfer_meta> = std::nullopt
+		messages::changed_identities_message& changed_identities,
+		const round_transferred_player* = nullptr
 	);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, logic_step);
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
-	void setup_round(input, logic_step, const round_transferred_players& = {}, setup_next_round_params = {});
+	void setup_round(input, logic_step, const round_transferred_players&, setup_next_round_params = {});
 	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
 
 	void fill_spawns(const cosmos&, faction_type, arena_mode_faction_state& out);

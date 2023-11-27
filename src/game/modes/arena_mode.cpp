@@ -160,7 +160,8 @@ void arena_mode::init_spawned(
 	const mode_player_id player_id,
 	const entity_id id, 
 	const logic_step step,
-	const std::optional<transfer_meta> transferred
+	messages::changed_identities_message& changed_identities,
+	const round_transferred_player* transferred
 ) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
@@ -172,11 +173,11 @@ void arena_mode::init_spawned(
 		if (levelling_enabled(in)) {
 			reset_equipment_for(step, in, player_id, typed_handle);
 		}
-		else if (transferred.has_value() && transferred->player.survived) {
-			const auto& eq = transferred->player.saved_eq;
+		else if (transferred != nullptr && transferred->survived) {
+			const auto& eq = transferred->saved_eq;
 
 			if (const auto sentience = typed_handle.template find<components::sentience>()) {
-				sentience->learnt_spells = transferred->player.saved_spells;
+				sentience->learnt_spells = transferred->saved_spells;
 			}
 
 			std::vector<entity_id> created_items;
@@ -193,7 +194,7 @@ void arena_mode::init_spawned(
 				const auto target_slot = cosm[target_slot_id];
 
 				auto skip_creation = [&]() {
-					transferred->msg.changes[i.source_entity_id] = entity_id();
+					changed_identities.changes[i.source_entity_id] = entity_id();
 					created_items.push_back(entity_id());
 				};
 
@@ -246,7 +247,7 @@ void arena_mode::init_spawned(
 
 					{
 						const auto new_id = new_item.get_id();
-						transferred->msg.changes[i.source_entity_id] = new_id;
+						changed_identities.changes[i.source_entity_id] = new_id;
 
 						created_items.push_back(new_id);
 					}
@@ -321,8 +322,8 @@ void arena_mode::init_spawned(
 
 		::resurrect(step, typed_handle, in.rules.spawn_protection_ms);
 
-		if (transferred.has_value()) {
-			typed_handle.template get<components::movement>().flags = transferred->player.movement;
+		if (transferred != nullptr) {
+			typed_handle.template get<components::movement>().flags = transferred->movement;
 
 			/* Reset the wielding to hide some mags/bullets that were in hands due to reloading */
 			::perform_wielding(
@@ -775,11 +776,12 @@ bool arena_mode::give_bomb_to_random_player(const input_type in, const logic_ste
 }
 
 
-entity_id arena_mode::create_character_for_player(
+void arena_mode::create_character_for_player(
 	const input_type in, 
 	const logic_step step,
 	const mode_player_id id,
-	const std::optional<transfer_meta> transferred
+	messages::changed_identities_message& changed_identities,
+	const round_transferred_player* transferred
 ) {
 	auto access = allocate_new_entity_access();
 
@@ -802,7 +804,7 @@ entity_id arena_mode::create_character_for_player(
 					[](entity_handle) {},
 					[&](const entity_handle new_character) {
 						teleport_to_next_spawn(in, new_character);
-						init_spawned(in, id, new_character, step, transferred);
+						init_spawned(in, id, new_character, step, changed_identities, transferred);
 					}
 				);
 
@@ -824,7 +826,14 @@ entity_id arena_mode::create_character_for_player(
 				}
 			}
 
-			p.controlled_character_id = handle;
+			const auto old_id = p.controlled_character_id;
+			const auto new_id = handle.get_id();
+
+			if (old_id.is_set()) {
+				changed_identities.changes[old_id] = new_id;
+			}
+
+			p.controlled_character_id = new_id;
 
 			if (state == arena_mode_state::LIVE) {
 				if (get_freeze_seconds_left(in) > 0.f) {
@@ -837,15 +846,17 @@ entity_id arena_mode::create_character_for_player(
 					handle.set_frozen(true);
 				}
 			}
-
-			return p.controlled_character_id;
 		}
 		else {
+			const auto old_id = p.controlled_character_id;
+
+			if (old_id.is_set()) {
+				changed_identities.changes[old_id] = entity_id();
+			}
+
 			p.controlled_character_id.unset();
 		}
 	}
-	
-	return entity_id::dead();
 }
 
 void arena_mode::play_start_round_sound(const input_type in, const const_logic_step step) { 
@@ -895,21 +906,6 @@ void arena_mode::setup_round(
 
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
-
-	const auto former_ids = [&]() {
-		std::unordered_map<mode_player_id, entity_id> result;
-
-		for (const auto& p : players) {
-			const auto new_id = cosm[p.second.controlled_character_id].get_id();
-
-			if (new_id.is_set()) {
-				result.try_emplace(p.first, new_id);
-			}
-		}
-
-		return result;
-	}();
-
 	round_speeds = in.rules.speeds;
 
 	cosm.set(in.clean_round_state);
@@ -944,30 +940,20 @@ void arena_mode::setup_round(
 
 	fill_spawns(cosm, faction_type::FFA, ffa_faction);
 
-	messages::changed_identities_message msg;
+	messages::changed_identities_message changed_identities;
 
 	for (auto& it : players) {
 		const auto id = it.first;
 		const auto transferred = mapped_or_nullptr(transfers, id);
 
-		const auto meta = 
-			transferred != nullptr ? 
-			std::make_optional(transfer_meta{ *transferred, msg }) :
-		   	std::optional<transfer_meta>()
-		;
-
-		const auto new_id = create_character_for_player(in, step, id, meta);
-
-		if (const auto former_id = mapped_or_nullptr(former_ids, id)) {
-			msg.changes.try_emplace(*former_id, new_id);
-		}
+		create_character_for_player(in, step, id, changed_identities, transferred);
 	}
 
 	spawn_and_kick_bots(in, step);
 	spawn_characters_for_recently_assigned(in, step);
 
-	if (msg.changes.size() > 0) {
-		step.post_message(msg);
+	if (changed_identities.changes.size() > 0) {
+		step.post_message(changed_identities);
 	}
 
 	if (get_freeze_time(in) > 0.f) {
@@ -998,7 +984,7 @@ void arena_mode::setup_round(
 	step.post_message(messages::hud_message { messages::special_hud_command::CLEAR });
 }
 
-arena_mode::round_transferred_players arena_mode::make_transferred_players(const input_type in) const {
+arena_mode::round_transferred_players arena_mode::make_transferred_players(const input_type in, const bool only_input_flags) const {
 	round_transferred_players result;
 
 	const auto& cosm = in.cosm;
@@ -1011,7 +997,7 @@ arena_mode::round_transferred_players arena_mode::make_transferred_players(const
 			auto& pm = result[id];
 			pm.movement = handle.get<components::movement>().flags;
 
-			if (::sentient_and_unconscious(handle)) {
+			if (only_input_flags || ::sentient_and_unconscious(handle)) {
 				continue;
 			}
 
@@ -1071,7 +1057,8 @@ void arena_mode::start_next_round(const input_type in, const logic_step step, co
 		setup_round(in, step, make_transferred_players(in), params);
 	}
 	else {
-		setup_round(in, step, {}, params);
+		const bool only_inputs = true;
+		setup_round(in, step, make_transferred_players(in, only_inputs), params);
 	}
 }
 
@@ -2453,6 +2440,8 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 }
 
 void arena_mode::spawn_characters_for_recently_assigned(const input_type in, const logic_step step) {
+	messages::changed_identities_message changed_identities;
+
 	for (const auto& it : players) {
 		const auto& player_data = it.second;
 		const auto id = it.first;
@@ -2462,7 +2451,7 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 		}
 
 		auto do_spawn = [&]() {
-			create_character_for_player(in, step, id);
+			create_character_for_player(in, step, id, changed_identities);
 		};
 
 		if (state == arena_mode_state::WARMUP) {
@@ -2476,6 +2465,10 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 				do_spawn();
 			}
 		}
+	}
+
+	if (changed_identities.changes.size() > 0) {
+		step.post_message(changed_identities);
 	}
 }
 
@@ -2534,7 +2527,7 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 
 	state = arena_mode_state::LIVE;
 	reset_players_stats(in);
-	setup_round(in, step);
+	setup_round(in, step, make_transferred_players(in, true));
 
 	post_team_match_start(in, step);
 	check_duel_of_honor(in, step);
@@ -2909,7 +2902,6 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 	const auto& clk = cosm.get_clock();
 
 	for (auto& it : players) {
-		auto& player_data = it.second;
 		const auto id = it.first;
 
 		on_player_handle(cosm, id, [&](const auto& player_handle) {
@@ -2924,11 +2916,10 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 					transfer.movement = player_handle.template get<components::movement>().flags;
 
 					::delete_with_held_items_except(in.rules.bomb_flavour, step, player_handle);
-					player_data.controlled_character_id.unset();
 
-					messages::changed_identities_message dummy_msg;
-					const auto meta = transfer_meta { transfer, dummy_msg };
-					create_character_for_player(in, step, id, meta);
+					messages::changed_identities_message changed_identities;
+					create_character_for_player(in, step, id, changed_identities, &transfer);
+					step.post_message(changed_identities);
 				}
 			}
 		});
@@ -3226,7 +3217,7 @@ void arena_mode::restart_match(const input_type in, const logic_step step) {
 		state = arena_mode_state::LIVE;
 	}
 
-	setup_round(in, step);
+	setup_round(in, step, make_transferred_players(in, true));
 }
 
 unsigned arena_mode::calc_max_faction_score() const {

@@ -3,15 +3,15 @@
 #include "augs/math/vec2.h"
 
 enum class intent_change {
-	PRESSED,
-	RELEASED
+	RELEASED,
+	PRESSED
 };
 
 template <class K>
 std::optional<intent_change> to_intent_change(const K& ch) {
 	switch (ch) {
-		case K::PRESSED: return intent_change::PRESSED;
 		case K::RELEASED: return intent_change::RELEASED;
+		case K::PRESSED: return intent_change::PRESSED;
 		default: return std::nullopt;
 	}
 }

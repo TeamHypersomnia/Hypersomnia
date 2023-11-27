@@ -8,12 +8,23 @@
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
+#include "game/messages/changed_identities_message.h"
 
 void input_system::make_input_messages(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
+	const auto& changed_ids_queue = step.get_queue<messages::changed_identities_message>();
+
 	for (const auto& p : step.get_entropy().players) {
-		const auto subject = cosm[p.first];
+		auto considered_id = p.first;
+
+		for (const auto& c : changed_ids_queue) {
+			if (const auto new_id = mapped_or_nullptr(c.changes, considered_id)) {
+				considered_id = *new_id;
+			}
+		}
+
+		const auto subject = cosm[considered_id];
 
 		if (subject.dead()) {
 			continue;
@@ -29,7 +40,7 @@ void input_system::make_input_messages(const logic_step step) {
 		for (const auto& intent : commands.intents) {
 			auto msg = messages::intent_message();
 			msg.game_intent::operator=(intent);
-			msg.subject = p.first;
+			msg.subject = considered_id;
 			step.post_message(msg);
 		}
 
@@ -40,7 +51,7 @@ void input_system::make_input_messages(const logic_step step) {
 
 			msg.motion = type;
 			msg.offset = vec2(motion.second) * settings.crosshair_sensitivity;
-			msg.subject = p.first;
+			msg.subject = considered_id;
 			step.post_message(msg);
 		}
 	}
