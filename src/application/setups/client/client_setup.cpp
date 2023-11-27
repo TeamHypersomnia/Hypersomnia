@@ -178,9 +178,12 @@ void client_setup::flush_demo_steps() {
 		return;
 	}
 
-	when_last_flushed_demo = client_time;
+	wait_for_demo_flush();
 
+	ensure(demo_steps_being_flushed.empty());
 	std::swap(demo_steps_being_flushed, unflushed_demo_steps);
+
+	when_last_flushed_demo = client_time;
 
 	future_flushed_demo = launch_async(
 		[&]() {
@@ -392,7 +395,6 @@ client_setup::~client_setup() {
 
 	augs::network::enable_detailed_logs(false);
 
-	wait_for_demo_flush();
 	flush_demo_steps();
 	wait_for_demo_flush();
 }
@@ -752,6 +754,10 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 }
 
 bool client_setup::is_spectating_referential() const {
+	if (is_replaying()) {
+		return demo_player.gui.shown_arena_type == client_arena_type::REFERENTIAL;
+	}
+
 	const bool should_spectator_be_drawn = get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
 		[this](const auto& typed_mode) {
 			return arena_gui.spectator.should_be_drawn(typed_mode);
@@ -887,13 +893,7 @@ void client_setup::advance_demo_recorder() {
 	++recorded_demo_step;
 
 	if (client_time - when_last_flushed_demo > vars.flush_demo_to_disk_once_every_secs) {
-		if (::valid_and_is_ready(future_flushed_demo)) {
-			future_flushed_demo.get();
-		}
-
-		if (demo_flushing_finished()) {
-			flush_demo_steps();
-		}
+		flush_demo_steps();
 	}
 }
 
@@ -1771,7 +1771,6 @@ bool client_setup::requires_cursor() const {
 }
 
 void client_setup::ensure_handler() {
-	wait_for_demo_flush();
 	flush_demo_steps();
 	wait_for_demo_flush();
 }

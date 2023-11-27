@@ -30,10 +30,6 @@ struct client_demo_player {
 		paused = false;
 	}
 
-	bool all_steps_played() const {
-		return current_step >= demo_steps.size();
-	}
-
 	bool is_paused() const {
 		return paused;
 	}
@@ -60,14 +56,6 @@ struct client_demo_player {
 		return is_paused() ? 0.0 : speed;
 	}
 
-	const auto& get_nth_step(const demo_step_num_type n) const {
-		if (all_steps_played()) {
-			return default_step;
-		}
-
-		return demo_steps[n];
-	}
-
 	void seek_backward(const demo_step_num_type offset) {
 		seek_to(current_step - std::min(current_step, offset));
 	}
@@ -82,7 +70,14 @@ struct client_demo_player {
 
 	template <class StepState>
 	void advance_player(StepState advance_state) {
-		current_secs += advance_state(get_nth_step(current_step++));
+		if (current_step < demo_steps.size()) {
+			current_secs += advance_state(demo_steps[current_step]);
+
+			++current_step;
+		}
+		else {
+			current_secs += advance_state(default_step);
+		}
 	}
 
 	template <class RewindState>
