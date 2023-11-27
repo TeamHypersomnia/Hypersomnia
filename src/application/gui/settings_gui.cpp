@@ -31,6 +31,7 @@
 #include "application/gui/do_server_vars.h"
 #include "application/gui/pretty_tabs.h"
 #include "application/setups/editor/editor_paths.h"
+#include "augs/string/typesafe_sscanf.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -486,6 +487,58 @@ void settings_gui_state::perform(
 					auto indent = scoped_indent();
 
 					revertable_checkbox(CONFIG_NVP(window.border));
+
+					thread_local std::string width;
+					thread_local std::string height;
+
+					if (width.empty()) {
+						width = std::to_string(config.window.size.x);
+					}
+
+					if (height.empty()) {
+						height = std::to_string(config.window.size.y);
+					}
+
+					text("Dimensions");
+					ImGui::SameLine();
+
+					ImGui::PushItemWidth(ImGui::CalcTextSize("999999").x);
+
+					if (input_text<10>("##Window width", width, ImGuiInputTextFlags_CharsDecimal)) {
+					}
+
+					ImGui::SameLine();
+
+					text("x");
+
+					ImGui::SameLine();
+
+					if (input_text<10>("##Window height", height, ImGuiInputTextFlags_CharsDecimal)) {
+					}
+
+					ImGui::PopItemWidth();
+
+					int cx = 0;
+					int cy = 0;
+
+					typesafe_sscanf(width, "%x", cx);
+					typesafe_sscanf(height, "%x", cy);
+
+					if (vec2i(cx, cy) != config.window.size) {
+						ImGui::SameLine();
+
+						if (ImGui::Button("Apply")) {
+							config.window.size.set(cx, cy);
+
+							if (config.window.size.x < 100) {
+								config.window.size.x = 100;
+							}
+
+							if (config.window.size.y < 100) {
+								config.window.size.y = 100;
+							}
+						}
+					}
 				}
 
 				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
