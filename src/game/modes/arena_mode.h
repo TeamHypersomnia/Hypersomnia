@@ -204,6 +204,7 @@ struct debugger_property_accessors;
 
 struct setup_next_round_params {
 	bool skip_freeze_time = false;
+	bool predictable = true;
 };
 
 class arena_mode {

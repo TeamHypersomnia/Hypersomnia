@@ -673,53 +673,56 @@ void game_gui_system::standard_post_solve(
 	const auto& cosm = step.get_cosmos();
 
 	const auto pickups = always_predictable_v;
-	const auto identities = always_predictable_v;
 
-	if (identities.should_play(settings.prediction)) {
-		auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
-			using M = remove_cref<decltype(migrated)>;
+	auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
+		using M = remove_cref<decltype(migrated)>;
 
-			M result;
+		M result;
 
-			for (auto& it : migrated) {
-				if (const auto new_id = mapped_or_nullptr(key_map, it.first)) {
-					result.try_emplace(*new_id, std::move(it.second));
-				}
-				else {
-					result.try_emplace(it.first, std::move(it.second));
-				}
+		for (auto& it : migrated) {
+			if (const auto new_id = mapped_or_nullptr(key_map, it.first)) {
+				result.try_emplace(*new_id, std::move(it.second));
 			}
+			else {
+				result.try_emplace(it.first, std::move(it.second));
+			}
+		}
 
-			migrated = std::move(result);
+		migrated = std::move(result);
+	};
+
+	for (const auto& changed : step.get_queue<messages::changed_identities_message>()) {
+		const auto predictability = changed.predictable ? always_predictable_v : never_predictable_v;
+
+		if (!predictability.should_play(settings.prediction)) {
+			continue;
+		}
+
+		migrate_nodes(item_buttons, changed.changes);
+		migrate_nodes(character_guis, changed.changes);
+
+		auto migrate_id = [&](auto& id) {
+			if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
+				id = *new_id;
+			}
 		};
 
-		for (const auto& changed : step.get_queue<messages::changed_identities_message>()) {
-			migrate_nodes(item_buttons, changed.changes);
-			migrate_nodes(character_guis, changed.changes);
+		for (auto& it : character_guis) {
+			auto& ch = it.second;
 
-			auto migrate_id = [&](auto& id) {
-				if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
-					id = *new_id;
-				}
-			};
+			for (auto& h : ch.hotbar_buttons) {
+				std::visit(
+					[&]<typename A>(A& assigned) {
+						if constexpr(std::is_same_v<A, entity_id>) {
+							migrate_id(assigned);
+						}
+					},
+					h.last_assigned
+				);
+			}
 
-			for (auto& it : character_guis) {
-				auto& ch = it.second;
-
-				for (auto& h : ch.hotbar_buttons) {
-					std::visit(
-						[&]<typename A>(A& assigned) {
-							if constexpr(std::is_same_v<A, entity_id>) {
-								migrate_id(assigned);
-							}
-						},
-						h.last_assigned
-					);
-				}
-
-				for (auto& s : ch.last_setup.hand_selections) {
-					migrate_id(s);
-				}
+			for (auto& s : ch.last_setup.hand_selections) {
+				migrate_id(s);
 			}
 		}
 	}

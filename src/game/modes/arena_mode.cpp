@@ -941,6 +941,7 @@ void arena_mode::setup_round(
 	fill_spawns(cosm, faction_type::FFA, ffa_faction);
 
 	messages::changed_identities_message changed_identities;
+	changed_identities.predictable = params.predictable;
 
 	for (auto& it : players) {
 		const auto id = it.first;
@@ -1857,12 +1858,17 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 	auto handle_game_command = [&]<typename G>(const G& cmd) {
 		if constexpr(std::is_same_v<G, no_arg_game_command>) {
 			switch (cmd) {
-				case no_arg_game_command::ROUND_RESTART:
-					start_next_round(in, step);
+				case no_arg_game_command::ROUND_RESTART: {
+					setup_next_round_params params;
+					params.predictable = false;
+
+					start_next_round(in, step, round_start_type::KEEP_EQUIPMENTS, params); 
 					break;
+				}
 				case no_arg_game_command::ROUND_RESTART_NOFREEZE: {
 					setup_next_round_params params;
 					params.skip_freeze_time = true;
+					params.predictable = false;
 
 					start_next_round(in, step, round_start_type::KEEP_EQUIPMENTS, params); 
 					break;
