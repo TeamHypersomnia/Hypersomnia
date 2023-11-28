@@ -701,9 +701,6 @@ void game_gui_system::standard_post_solve(
 				if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
 					id = *new_id;
 				}
-				else {
-					id = {};
-				}
 			};
 
 			for (auto& it : character_guis) {

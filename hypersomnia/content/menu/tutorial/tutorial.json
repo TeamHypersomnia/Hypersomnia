@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-11-21 22:26:52.415839 UTC"
+        "version_timestamp": "2023-11-28 17:08:18.430557 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1642,7 +1642,6 @@
         },
         {
             "id": "Level4",
-            "is_open_in_editor": false,
             "nodes": [
                 "tip4_1 (2)",
                 "tip4_1 (18)",
@@ -12102,7 +12101,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "This means you can always move fast -\njust put your weapons away."
+            "context_tip": "This means you can always move fast -\njust hide your weapons."
         },
         {
             "id": "tip4_1 (13)",
@@ -13261,7 +13260,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Wielding heavy guns slows you down,\nbut stashed weapons do not affect your movement speed."
+            "context_tip": "Wielding heavy guns slows you down,\nbut hidden weapons do not affect your movement speed."
         },
         {
             "id": "exit12",

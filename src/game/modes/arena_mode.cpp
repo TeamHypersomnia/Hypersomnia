@@ -2919,7 +2919,10 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 
 					messages::changed_identities_message changed_identities;
 					create_character_for_player(in, step, id, changed_identities, &transfer);
-					step.post_message(changed_identities);
+
+					if (changed_identities.changes.size() > 0) {
+						step.post_message(changed_identities);
+					}
 				}
 			}
 		});

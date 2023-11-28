@@ -8,8 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- tutorial wording (hidden weapons)
-
 ## For trailer
 
 - Preps
