@@ -208,7 +208,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     misprediction_smoothing_multiplier = 1.2000000476837158
   },
   lag_compensation = {
-    confirm_controlled_character_death = true,
+    confirm_local_character_death = true,
 	simulate_decorative_organisms_during_reconciliation = false,
 
 	effect_prediction = {
@@ -442,7 +442,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	    y = 3
 	  },
 
-      keep_movement_forces_relative_to_crosshair = false
+      forward_moves_towards_crosshair = false
 	},
 
 	swap_mouse_buttons_in_akimbo = false,

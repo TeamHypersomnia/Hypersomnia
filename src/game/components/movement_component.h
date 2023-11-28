@@ -88,7 +88,7 @@ namespace components {
 		bool frozen = false;
 		bool was_sprint_effective = false;
 		bool was_walk_effective = false;
-		bool keep_movement_forces_relative_to_crosshair = false;
+		bool forward_moves_towards_crosshair = false;
 
 		real32 surface_slowdown_ms = 0.f;
 

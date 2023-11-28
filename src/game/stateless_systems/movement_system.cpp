@@ -168,7 +168,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const auto requested_by_input_aa = considered_flags.get_force_requested_by_input(movement_def.input_acceleration_axes);
 			const bool non_zero_requested = requested_by_input_aa.is_nonzero();
 			const auto requested_by_input = [&]() {
-				if (!movement.keep_movement_forces_relative_to_crosshair) {
+				if (!movement.forward_moves_towards_crosshair) {
 					return requested_by_input_aa;
 				}
 

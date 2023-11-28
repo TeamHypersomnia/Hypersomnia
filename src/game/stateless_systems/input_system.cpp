@@ -34,7 +34,7 @@ void input_system::make_input_messages(const logic_step step) {
 		const auto& settings = p.second.settings;
 
 		if (const auto movement = subject.template find<components::movement>()) {
-			movement->keep_movement_forces_relative_to_crosshair = settings.keep_movement_forces_relative_to_crosshair;
+			movement->forward_moves_towards_crosshair = settings.forward_moves_towards_crosshair;
 		}
 
 		for (const auto& intent : commands.intents) {

@@ -287,7 +287,7 @@ class client_setup :
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
 
-			if (in.lag_compensation.confirm_controlled_character_death) {
+			if (in.lag_compensation.confirm_local_character_death) {
 				out.disable_knockouts = get_viewed_character();
 			}
 

@@ -6,7 +6,7 @@ bool calc_angled_damping_enabled(const E& handle) {
 
 	if (handle.template get<invariants::rigid_body>().angled_damping) {
 		if constexpr(E::template has<components::movement>()) {
-			return !handle.template get<components::movement>().keep_movement_forces_relative_to_crosshair;
+			return !handle.template get<components::movement>().forward_moves_towards_crosshair;
 		}
 
 		return true;

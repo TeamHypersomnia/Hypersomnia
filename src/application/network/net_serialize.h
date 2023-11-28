@@ -223,7 +223,7 @@ namespace net_messages {
 		serialize_float(s, settings.crosshair_sensitivity.x);
 		serialize_float(s, settings.crosshair_sensitivity.y);
 
-		serialize_bool(s, settings.keep_movement_forces_relative_to_crosshair);
+		serialize_bool(s, settings.forward_moves_towards_crosshair);
 
 		serialize_float(s, p.nonzoomedout_visible_world_area.x);
 		serialize_float(s, p.nonzoomedout_visible_world_area.y);

@@ -421,11 +421,8 @@ void settings_gui_state::perform(
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
-				ImGui::Separator();
-
-				text_color("Application", yellow);
-
-				ImGui::Separator();
+				text("At startup, launch.."); ImGui::SameLine();
+				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
 
 				const auto streamer_hotkey = [&]() -> std::string {
 					const auto found_k = key_or_default(config.app_controls, app_intent_type::TOGGLE_STREAMER_MODE);
@@ -479,14 +476,10 @@ void settings_gui_state::perform(
 					ImGui::Separator();
 				}
 
-				text("At startup, launch.."); ImGui::SameLine();
-				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
 
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();
-
-					revertable_checkbox(CONFIG_NVP(window.border));
 
 					thread_local std::string width;
 					thread_local std::string height;
@@ -530,22 +523,21 @@ void settings_gui_state::perform(
 						if (ImGui::Button("Apply")) {
 							config.window.size.set(cx, cy);
 
-							if (config.window.size.x < 100) {
-								config.window.size.x = 100;
+							if (config.window.size.x < 300) {
+								config.window.size.x = 300;
 							}
 
-							if (config.window.size.y < 100) {
-								config.window.size.y = 100;
+							if (config.window.size.y < 300) {
+								config.window.size.y = 300;
 							}
 						}
 					}
+
+					revertable_checkbox("Border", config.window.border);
 				}
 
-				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
 
-				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
-
-				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
+				//input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
 #if DEPRECATED
 				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);
@@ -559,7 +551,7 @@ void settings_gui_state::perform(
 				}
 #endif
 
-				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
+				revertable_enum_radio("Vsync:", config.window.vsync_mode);
 
 				{
 					auto& mf = config.window.max_fps;
@@ -575,35 +567,6 @@ void settings_gui_state::perform(
 				}
 
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
-
-				ImGui::Separator();
-
-				text_color("Automatic updates", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.http_client;
-
-					revertable_checkbox("Automatically update when the game starts", scope_cfg.update_on_launch);
-					revertable_slider(SCOPE_CFG_NVP(update_connection_timeout_secs), 1, 3600);
-
-					input_text<100>(SCOPE_CFG_NVP(self_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_host);
-					input_text<100>(SCOPE_CFG_NVP(self_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_path);
-
-					ImGui::Separator();
-
-					text_color("Masterserver", yellow);
-
-					ImGui::Separator();
-
-					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider.address);
-					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
-				}
-
-				text_disabled("\n\n");
-
-				ImGui::Separator();
 
 				if (ImGui::Button("Reset all settings to factory defaults")) {
 					config = config_lua_table(lua, augs::path_type("default_config.lua"));
@@ -636,7 +599,7 @@ void settings_gui_state::perform(
 					revertable_slider("Speed", config.interpolation.speed, 50.f, 1000.f);
 				}
 
-				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
+				//revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
 				ImGui::Separator();
 
@@ -679,18 +642,6 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.performance;
 					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
-				}
-
-				ImGui::Separator();
-
-				text_color("Decorations", yellow);
-
-				ImGui::Separator();
-
-				auto& scope_cfg = config.lag_compensation;
-
-				{
-					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
 				}
 
 				break;
@@ -790,34 +741,36 @@ void settings_gui_state::perform(
 						}
 					}
 
-					if (checkbox("Separate sensitivity axes", separate_axes)) {
+					if (checkbox("Separate sensitivity x & y", separate_axes)) {
 						if (separate_axes == false) {
 							scope_cfg.crosshair_sensitivity.y = scope_cfg.crosshair_sensitivity.x;
 						}
 					}
 
-					revertable_checkbox(SCOPE_CFG_NVP(keep_movement_forces_relative_to_crosshair));
+					revertable_checkbox(SCOPE_CFG_NVP(forward_moves_towards_crosshair));
 				}
 
-				revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));
+				if (auto node = scoped_tree_node("Advanced")) {
+					{
+						auto& scope_cfg = config.hotbar;
 
-				{
-					auto& scope_cfg = config.input.game_gui;
-					revertable_checkbox(SCOPE_CFG_NVP(allow_switching_to_bare_hands_as_previous_wielded_weapon));
-				}
+						revertable_checkbox(SCOPE_CFG_NVP(hide_unassigned_hotbar_buttons));
+						//revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
+					}
 
-				{
-					auto& scope_cfg = config.game_gui;
+					revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));
 
-					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
-					// revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
-				}
+					{
+						auto& scope_cfg = config.input.game_gui;
+						revertable_checkbox(SCOPE_CFG_NVP(allow_switching_to_bare_hands_as_previous_wielded_weapon));
+					}
 
-				{
-					auto& scope_cfg = config.hotbar;
+					{
+						auto& scope_cfg = config.game_gui;
 
-					revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
-					revertable_checkbox(SCOPE_CFG_NVP(hide_unassigned_hotbar_buttons));
+						revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
+						// revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
+					}
 				}
 
 				const auto binding_text_color = rgba(255, 255, 255, 255);
@@ -1075,6 +1028,7 @@ void settings_gui_state::perform(
 					}
 				}
 
+#if 0
 				{
 					auto& scope_cfg = config;
 					revertable_checkbox("Show HUD messages", scope_cfg.hud_messages.is_enabled);
@@ -1091,6 +1045,7 @@ void settings_gui_state::perform(
 						revertable_slider(SCOPE_CFG_NVP(max_simultaneous_messages), 1, 10);
 					}
 				}
+#endif
 
 				if (auto node = scoped_tree_node("Camera")) {
 					auto& scope_cfg = config.camera;
@@ -1309,7 +1264,7 @@ void settings_gui_state::perform(
 
 					{
 						auto& scope_cfg = config.lag_compensation;
-						revertable_checkbox(SCOPE_CFG_NVP(confirm_controlled_character_death));
+						revertable_checkbox(SCOPE_CFG_NVP(confirm_local_character_death));
 
 						augs::introspect(
 							[&](const std::string& label, auto& field){
@@ -1318,6 +1273,12 @@ void settings_gui_state::perform(
 							scope_cfg.effect_prediction
 						); 
 					}
+				}
+
+
+				{
+					auto& scope_cfg = config.lag_compensation;
+					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
 				}
 
 				ImGui::Separator();
@@ -1635,6 +1596,39 @@ void settings_gui_state::perform(
 			}
 
 			case settings_pane::ADVANCED: {
+				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+
+				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
+
+				ImGui::Separator();
+
+				text_color("Automatic updates", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.http_client;
+
+					revertable_checkbox("Automatically update when the game starts", scope_cfg.update_on_launch);
+					revertable_slider(SCOPE_CFG_NVP(update_connection_timeout_secs), 1, 3600);
+
+					input_text<100>(SCOPE_CFG_NVP(self_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_host);
+					input_text<100>(SCOPE_CFG_NVP(self_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_path);
+
+					ImGui::Separator();
+
+					text_color("Masterserver", yellow);
+
+					ImGui::Separator();
+
+					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider.address);
+					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
+				}
+
+				text_disabled("\n\n");
+
+				ImGui::Separator();
+
 				revertable_checkbox("Stencil before light pass", config.drawing.stencil_before_light_pass);
 				tooltip_on_hover("If your field of view is glitched (disappearing enemies),\ntry toggling on and off.");
 
@@ -1694,7 +1688,7 @@ void settings_gui_state::perform(
 				}
 
 				revertable_checkbox("Show performance", config.session.show_performance);
-				revertable_checkbox("Show logs", config.session.show_performance);
+				revertable_checkbox("Show logs", config.session.show_logs);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
 				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);
 				
