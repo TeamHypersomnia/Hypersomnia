@@ -6652,3 +6652,6 @@ This will discard your redo history."
     - give a hotkey to exec custom rcon commands
     - eq nickname 2Xzamiec electric_armor
         - we have to do 2X because with "zamiec zamiec" we don't know if the other should be held or in backpack
+- fix those movement flags not propagating through respawns in ffa
+
+- Miniature generation should trigger "dirty" revision

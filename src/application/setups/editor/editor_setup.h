@@ -167,6 +167,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	double global_time_seconds = 0.0;
 
+	bool dirty_after_resource_hash_changed = false;
 	bool dirty_after_loading_autosave = false;
 	bool dirty_after_redirecting_paths = false;
 	bool should_recount_internal_resource_references = true;

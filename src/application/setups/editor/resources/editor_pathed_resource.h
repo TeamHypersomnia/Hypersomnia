@@ -18,7 +18,7 @@ struct editor_pathed_resource {
 
 	void set_hash_stamp(const augs::file_time_type& stamp_when_hashed);
 
-	void maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp);
+	bool maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp);
 
 	std::string get_display_name() const;
 

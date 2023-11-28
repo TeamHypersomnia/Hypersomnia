@@ -15,8 +15,6 @@ summary: That which we are brainstorming at the moment.
 
 ## Post trailer (During review)
 
-- fix those movement flags not propagating through respawns in ffa
-
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will can have the same config directory
         - Except they will have differing configs for map cycles, no?
@@ -26,7 +24,6 @@ summary: That which we are brainstorming at the moment.
                 - etc.
             - Otherwise they'll all just read from .config/Hypersomnia or local folder
 
-- Miniature generation should trigger "dirty" revision
 - logarithmic audio slider
 
 - we'll seriously need to support reading user files from a different cwd

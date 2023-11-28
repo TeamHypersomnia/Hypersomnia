@@ -297,6 +297,7 @@ editor_setup::~editor_setup() {
 
 		Note we're "dirty" if we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
 		We're also "dirty" if we haven't saved after auto-redirecting pathed resources.
+		We're also "dirty" if we haven't saved after some resources have changed hash (e.g. a miniature was generated).
 
 		In these cases, last_saved.json will not be restored even if we're at a saved revision in history.
 	*/
@@ -995,6 +996,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 	rebuilt_project.last_unbacked_resources.clear();
 
+	bool some_hash_changed = false;
+
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
 		using resource_type = typename P::value_type;
 		using id_type = editor_typed_resource_id<resource_type>;
@@ -1035,7 +1038,12 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			auto match_path_to_existing_resource = [&]() {
 				if (const auto found_resource_id = mapped_or_nullptr(resource_by_path, path_in_project)) {
 					if (const auto found_resource = find_resource(*found_resource_id)) {
-						found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
+						const bool hash_changed = found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
+
+						if (hash_changed) {
+							some_hash_changed = true;
+						}
+
 						file.associated_resource = found_resource_id->operator editor_resource_id();
 
 						return true;
@@ -1228,6 +1236,11 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 	rescan_missing_pathed_resources(std::addressof(changes.missing));
 
+	if (some_hash_changed) {
+		dirty_after_resource_hash_changed = true;
+		force_autosave();
+	}
+
 	return changes;
 }
 
@@ -1306,6 +1319,7 @@ void editor_setup::save() {
 	history.mark_revision_as_saved();
 	autosave_timer.reset();
 
+	dirty_after_resource_hash_changed = false;
 	dirty_after_loading_autosave = false;
 	dirty_after_redirecting_paths = false;
 
@@ -1360,7 +1374,7 @@ void editor_setup::save_project_file_as(const augs::path_type& path) {
 }
 
 bool editor_setup::is_dirty() const {
-	return dirty_after_loading_autosave || dirty_after_redirecting_paths;
+	return dirty_after_loading_autosave || dirty_after_redirecting_paths || dirty_after_resource_hash_changed;
 }
 
 bool editor_setup::everything_completely_saved() const {
@@ -1385,8 +1399,8 @@ std::string editor_setup::get_arena_name_with_star() const {
 
 bool editor_setup::autosave_needed() const {
 	/*
-		The reason we don't need to check for if it's dirty is because
-		once it becomes dirty for whatever reason, we force autosave.
+		The reason we don't need to check for if it's is_dirty is because
+		once it becomes is_dirty for whatever reason, we force autosave.
 	*/
 
 	return !history.at_saved_revision() && !history.at_autosaved_revision();
@@ -1757,12 +1771,14 @@ void editor_setup::save_last_project_location() {
 	augs::save_as_text(get_editor_last_project_path(), paths.project_folder.string());
 }
 
-void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp) {
+bool editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp) {
 	const auto fresh_stamp_utc = fresh_stamp;
 
 	if (stamp_when_hashed == fresh_stamp_utc && file_hash.size() > 0) {
-		return;
+		return false;
 	}
+
+	const auto old_hash = file_hash;
 
 	try {
 		file_hash = augs::to_hex_format(augs::secure_hash(augs::file_to_bytes(full_path)));
@@ -1771,6 +1787,8 @@ void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, cons
 	catch (...) {
 		file_hash = "";
 	}
+
+	return file_hash != old_hash;
 }
 
 std::string editor_pathed_resource::get_display_name() const {

@@ -3131,12 +3131,19 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			ImGui::Separator();
 
-			if (!in.setup.is_generating_miniature()) {
+			{
 				constexpr int standard_miniature_size = 400;
 
 				text_disabled("Generate a small 400x400 miniature.\nFor previewing arena in catalogues.");
+
+				{
+					auto scope = maybe_disabled_cols({}, in.setup.is_generating_miniature());
+
 				if (ImGui::Button("Generate miniature")) {
+						if (!in.setup.is_generating_miniature()) {
 					in.setup.request_arena_screenshot(in.setup.get_paths().miniature, standard_miniature_size, false);
+				}
+					}
 				}
 
 				if (ImGui::IsItemHovered()) {

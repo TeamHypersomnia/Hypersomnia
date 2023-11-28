@@ -26,6 +26,9 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			else {
 				recent_message.set("Saved arena miniature to\n%x", miniature_generator->output_path);
 				recent_message.show_for_at_least_ms = 10000;
+
+				/* Force rescan so the editor sees new miniature hash */
+				on_window_activate();
 			}
 
 			miniature_generator.reset();
