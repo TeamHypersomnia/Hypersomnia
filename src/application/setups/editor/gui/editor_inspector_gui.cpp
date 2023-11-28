@@ -3137,7 +3137,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				text_disabled("Generate a small 400x400 miniature.\nFor previewing arena in catalogues.");
 
 				{
-					auto scope = maybe_disabled_cols({}, in.setup.is_generating_miniature());
+					auto scope = maybe_disabled_cols(in.setup.is_generating_miniature());
 
 				if (ImGui::Button("Generate miniature")) {
 						if (!in.setup.is_generating_miniature()) {
