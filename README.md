@@ -45,6 +45,8 @@ The game will start with an **interactive Tutorial!**
 
 # Watch gameplay
 
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/L4zSA34fD_E/0.jpg)](https://www.youtube.com/watch?v=L4zSA34fD_E "Video Title")
+
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/CHLPzZqANlM/0.jpg)](https://www.youtube.com/watch?v=CHLPzZqANlM "Video Title")
 
 # Learn to make maps!
