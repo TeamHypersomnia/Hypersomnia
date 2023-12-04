@@ -3139,10 +3139,10 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				{
 					auto scope = maybe_disabled_cols(in.setup.is_generating_miniature());
 
-				if (ImGui::Button("Generate miniature")) {
+					if (ImGui::Button("Generate miniature")) {
 						if (!in.setup.is_generating_miniature()) {
-					in.setup.request_arena_screenshot(in.setup.get_paths().miniature, standard_miniature_size, false);
-				}
+							in.setup.request_arena_screenshot(in.setup.get_paths().miniature, standard_miniature_size, false);
+						}
 					}
 				}
 

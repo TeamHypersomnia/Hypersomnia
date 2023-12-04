@@ -6655,3 +6655,10 @@ This will discard your redo history."
 - fix those movement flags not propagating through respawns in ffa
 
 - Miniature generation should trigger "dirty" revision
+## For trailer
+
+- Preps
+    - Decide sound effects
+- logarithmic audio slider
+    - Not UI-side though, let's scale it in openal 
+

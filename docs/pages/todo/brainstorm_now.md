@@ -8,10 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-## For trailer
-
-- Preps
-    - Decide sound effects
 
 ## Post trailer (During review)
 
@@ -24,12 +20,11 @@ summary: That which we are brainstorming at the moment.
                 - etc.
             - Otherwise they'll all just read from .config/Hypersomnia or local folder
 
-- logarithmic audio slider
-
 - we'll seriously need to support reading user files from a different cwd
     - + trivial appimage launches
     - + wont accidentally delete user config on windows or all steam platforms
     - + simpler self-updater though we can still leave legacy restore/backup logic as it won't hurt
+
 - Windows also has to be able to read from appdata folder
     - CLI argument: --roaming-folder
         - set by AppRun to $HOME/.config so we don't have to call readenv
@@ -37,6 +32,8 @@ summary: That which we are brainstorming at the moment.
 
 - GIFs for Steam description
 - Add Join our Discord link to description
+
+- Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
 
 # REST
 

@@ -11,8 +11,8 @@ enum class buy_menu_type {
 	HEAVY_GUNS,
 	SHOTGUNS,
 	GRENADES,
-	SPELLS,
 	ARMORS,
+	SPELLS,
 	TOOLS,
 	COUNT
 	// END GEN INTROSPECTOR
