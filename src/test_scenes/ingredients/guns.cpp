@@ -4068,13 +4068,14 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::COVERT, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1100;
+			meta.get<invariants::item>().standard_price = 1600;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::COVERT_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
