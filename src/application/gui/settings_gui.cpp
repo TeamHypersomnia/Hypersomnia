@@ -277,6 +277,7 @@ std::string get_custom_binding_name(const app_intent_type) {
 }
 
 void settings_gui_state::perform(
+	augs::window& window,
 	sol::state& lua,
 	const augs::audio_context& audio,
 	const augs::path_type& config_path_for_saving,
@@ -567,6 +568,13 @@ void settings_gui_state::perform(
 				}
 
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
+
+				text("\n");
+				ImGui::Separator();
+
+				if (ImGui::Button("Reveal user folder in explorer")) {
+					window.reveal_in_explorer(USER_DIR);
+				}
 
 				if (ImGui::Button("Reset all settings to factory defaults")) {
 					config = config_lua_table(lua, augs::path_type("default_config.lua"));

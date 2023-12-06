@@ -1,10 +1,24 @@
 #pragma once
+#include <set>
+#include <unordered_set>
+
 #include "augs/filesystem/path.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/network/netcode_socket_raii.h"
+#include "augs/misc/randomization.h"
+#include "application/nat/stun_server_provider.h"
+#include "application/nat/stun_session.h"
+#include "application/masterserver/netcode_address_hash.h"
 
 struct config_lua_table;
+
+namespace augs {
+	class audio_context;
+	class window;
+	class renderer;
+	struct window_settings;
+};
 
 enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
@@ -28,17 +42,6 @@ struct key_hijack_request {
 	std::optional<int> for_idx;
 	std::optional<augs::event::keys::key> captured;
 };
-
-namespace augs {
-	class audio_context;
-};
-
-#include "augs/misc/randomization.h"
-#include "application/nat/stun_server_provider.h"
-#include "application/nat/stun_session.h"
-#include <set>
-#include <unordered_set>
-#include "application/masterserver/netcode_address_hash.h"
 
 class stun_server_tester {
 	randomization rng;
@@ -92,6 +95,7 @@ public:
 	void set_hijacked_key(augs::event::keys::key);
 
 	void perform(
+		augs::window& window,
 		sol::state& lua,
 		const augs::audio_context& audio,
 		const augs::path_type& path_for_saving,
@@ -101,13 +105,6 @@ public:
 		vec2i screen_size
 	);
 };
-
-namespace augs {
-	class window;
-	class audio_context;
-	class renderer;
-	struct window_settings;
-}
 
 struct all_necessary_fbos;
 struct all_necessary_shaders;

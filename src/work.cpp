@@ -2231,6 +2231,7 @@ work_result work(
 		});
 
 		perform_imgui_pass(
+			window,
 			new_window_entropy,
 			logic_get_screen_size(),
 			frame_delta,

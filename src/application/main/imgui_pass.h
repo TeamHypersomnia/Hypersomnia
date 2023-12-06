@@ -11,10 +11,12 @@ namespace sol {
 }
 
 namespace augs {
+	class window;
 	class delta;
 }
 
 void perform_imgui_pass(
+	augs::window& window,
 	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,

@@ -10,6 +10,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 void perform_imgui_pass(
+	augs::window& window,
 	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
@@ -58,6 +59,7 @@ void perform_imgui_pass(
 		!should_hide_settings
 	) {
 		settings_gui.perform(
+			window,
 			lua,
 			audio,
 			path_for_saving_config,
