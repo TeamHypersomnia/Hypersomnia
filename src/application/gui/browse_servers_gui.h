@@ -130,7 +130,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void send_pings_and_punch_requests(netcode_socket_t&);
 
 	void refresh_server_list(browse_servers_input);
-	void handle_server_list_response();
 public:
 
 	using base = standard_window_mixin<browse_servers_gui_state>;

@@ -66,6 +66,53 @@ browse_servers_gui_state::browse_servers_gui_state(const std::string& title)
 
 double yojimbo_time();
 
+static std::vector<server_list_entry> to_server_list(std::optional<httplib::Result> result, std::string& error_message) {
+    using namespace httplib_utils;
+
+    if (result == std::nullopt || result.value() == nullptr) {
+        error_message = "Couldn't connect to the server list host.";
+        return {};
+    }
+
+    const auto& response = result.value();
+    const auto status = response->status;
+
+    LOG("Server list response status: %x", status);
+
+    if (!successful(status)) {
+        const auto couldnt_download = std::string("Couldn't download the server list.\n");
+
+        error_message = couldnt_download + "HTTP response: " + std::to_string(status);
+        return {};
+    }
+
+    const auto& bytes = response->body;
+
+    LOG("Server list response bytes: %x", bytes.size());
+
+    auto stream = augs::make_ptr_read_stream(bytes.data(), bytes.size());
+
+	std::vector<server_list_entry> new_server_list;
+
+    try {
+        while (stream.has_unread_bytes()) {
+            server_list_entry entry;
+
+            augs::read_bytes(stream, entry.address);
+            augs::read_bytes(stream, entry.time_hosted);
+            augs::read_bytes(stream, entry.heartbeat);
+
+            new_server_list.emplace_back(std::move(entry));
+        }
+    }
+    catch (const augs::stream_read_error& err) {
+        error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
+        new_server_list.clear();
+    }
+
+    return new_server_list;
+}
+
 void browse_servers_gui_state::sync_download_server_entry(
 	const browse_servers_input in,
 	const client_start_input& server
@@ -79,8 +126,42 @@ void browse_servers_gui_state::sync_download_server_entry(
 
 	(void)server;
 
-	refresh_server_list(in);
-	handle_server_list_response();
+	when_last_started_refreshing_server_list = yojimbo_time();
+
+	/* Todo: make async */
+	auto lbd = 
+		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
+			/* 
+				Right now it's the same as the one that downloads the whole list,
+				but we'll need to support downloading just one entry.
+			*/
+
+			const auto resolved = resolve_address(address);
+			LOG(resolved.report());
+
+			if (resolved.result != resolve_result_type::OK) {
+				return std::nullopt;
+			}
+
+			auto resolved_addr = resolved.addr;
+			const auto intended_port = resolved_addr.port;
+			resolved_addr.port = 0;
+
+			const auto address_str = ::ToString(resolved_addr);
+			const auto timeout = 5;
+
+			LOG("Connecting to server list at: %x:%x", address_str, intended_port);
+
+			httplib::Client cli(address_str.c_str(), intended_port);
+			cli.set_write_timeout(timeout);
+			cli.set_read_timeout(timeout);
+			cli.set_follow_location(true);
+
+			return cli.Get("/server_list_binary");
+		}
+	;
+
+	server_list = ::to_server_list(lbd(), error_message);
 }
 
 bool browse_servers_gui_state::refreshed_at_least_once() const {
@@ -555,51 +636,6 @@ const resolve_address_result* browse_servers_gui_state::find_resolved_official(c
 	return nullptr;
 }
 
-void browse_servers_gui_state::handle_server_list_response() {
-	using namespace httplib_utils;
-
-	auto result = data->future_response.get();
-
-	if (result == std::nullopt || result.value() == nullptr) {
-		error_message = "Couldn't connect to the server list host.";
-		return;
-	}
-
-	const auto& response = result.value();
-	const auto status = response->status;
-
-	LOG("Server list response status: %x", status);
-
-	if (!successful(status)) {
-		const auto couldnt_download = std::string("Couldn't download the server list.\n");
-
-		error_message = couldnt_download + "HTTP response: " + std::to_string(status);
-		return;
-	}
-
-	const auto& bytes = response->body;
-
-	LOG("Server list response bytes: %x", bytes.size());
-
-	auto stream = augs::make_ptr_read_stream(bytes.data(), bytes.size());
-
-	try {
-		while (stream.has_unread_bytes()) {
-			server_list_entry entry;
-
-			augs::read_bytes(stream, entry.address);
-			augs::read_bytes(stream, entry.time_hosted);
-			augs::read_bytes(stream, entry.heartbeat);
-
-			server_list.emplace_back(std::move(entry));
-		}
-	}
-	catch (const augs::stream_read_error& err) {
-		error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
-		server_list.clear();
-	}
-}
-
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
@@ -618,7 +654,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	if (valid_and_is_ready(data->future_response)) {
-		handle_server_list_response();
+		server_list = ::to_server_list(data->future_response.get(), error_message);
 	}
 
 	if (valid_and_is_ready(data->future_official_addresses)) {

@@ -197,8 +197,13 @@ work_result work(
 		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 	}
 
-	/* Just use the "user" folder when developing */
-#if !IS_PRODUCTION_BUILD
+	/* 
+		Just use the "user" folder when developing.
+		CREATE_STEAM_APPID means we're still not really in "true" production.
+		Otherwise the numbered user folder will show up in our git as we can't easily ignore it.
+	*/
+
+#if !IS_PRODUCTION_BUILD || CREATE_STEAM_APPID
 	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 #endif
 
@@ -1376,6 +1381,9 @@ work_result work(
 						get_browse_servers_input(),
 						config.client_start
 					);
+				}
+				else {
+					LOG("Already refreshed the server list, no need to download info about this server.");
 				}
 			}
 
