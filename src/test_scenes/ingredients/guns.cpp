@@ -4051,7 +4051,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 3.5f;
+			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.low_ammo_cue_sound.modifier.reference_distance = 300.f;
@@ -4075,7 +4075,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1600;
+			meta.get<invariants::item>().standard_price = 1300;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::COVERT_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
