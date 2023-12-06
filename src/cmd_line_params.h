@@ -9,6 +9,7 @@ struct cmd_line_params {
 
 	std::string live_log_path;
 
+	std::optional<augs::path_type> calling_cwd;
 	augs::path_type appdata_dir;
 
 	augs::path_type exe_path;
@@ -161,6 +162,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--appdata-dir") {
 				appdata_dir = get_next();
+			}
+			else if (a == "--calling-cwd") {
+				calling_cwd = get_next();
 			}
 			else {
 

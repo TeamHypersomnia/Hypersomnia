@@ -11,5 +11,7 @@ fi
 
 config_home="${XDG_CONFIG_HOME}/Hypersomnia"
 
+CALLING_CWD=$(pwd)
+
 cd "${APPDIR}/usr/share/hypersomnia/"
-"${APPDIR}/usr/bin/Hypersomnia" --appdata-dir "${config_home}" --keep-cwd --appimage-path "${APPIMAGE}" "$@"
+"${APPDIR}/usr/bin/Hypersomnia" --calling-cwd "${CALLING_CWD}" --appdata-dir "${config_home}" --appimage-path "${APPIMAGE}" "$@"

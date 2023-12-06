@@ -110,8 +110,21 @@ int main(const int argc, const char* const * const argv) {
 	const auto exe_path = params.exe_path;
 #endif
 
+	const bool is_appimage = !params.appimage_path.empty();
+	bool change_cwd_to_exe = !params.keep_cwd;
+
+	if (is_appimage) {
+		change_cwd_to_exe = false;
+	}
+
+	auto calling_cwd = augs::get_current_working_directory();
+
+	if (params.calling_cwd.has_value()) {
+		calling_cwd = params.calling_cwd.value();
+	}
+
 #if PLATFORM_UNIX
-	if (!params.keep_cwd) {
+	if (change_cwd_to_exe) {
 		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
 			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
@@ -126,7 +139,7 @@ int main(const int argc, const char* const * const argv) {
 			::APPDATA_DIR = params.appdata_dir;
 		}
 		else {
-			::APPDATA_DIR = params.appimage_path.parent_path() / params.appdata_dir;
+			::APPDATA_DIR = calling_cwd / params.appdata_dir;
 		}
 	}
 	else {
@@ -160,13 +173,22 @@ int main(const int argc, const char* const * const argv) {
 	*/
 
 	LOG("Started at %x", augs::date_time().get_readable());
-	LOG("Working directory: %x", augs::get_current_working_directory());
+
+	if (is_appimage) {
+		LOG("AppImage called from directory: \"%x\"", calling_cwd);
+	}
+	else {
+		LOG("Executable called from directory: \"%x\"", calling_cwd);
+	}
+
+	LOG("Chosen working directory: \"%x\"", augs::get_current_working_directory());
+
 	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
 
 	LOG("Complete command line:\n%x", params.complete_command_line);
 	LOG("Parsed as:\n%x", params.parsed_as);
 
-	if (!params.appimage_path.empty()) {
+	if (is_appimage) {
 		LOG("Running from an AppImage: %x", params.appimage_path);
 	}
 
@@ -179,8 +201,8 @@ int main(const int argc, const char* const * const argv) {
 	}
 	else {
 		LOG(
-			"App data directory: \"%x\" (%x) (via --appdata-dir)", 
-			params.appdata_dir.is_absolute() ? "Absolute" : "Relative",
+			"App data directory: \"%x\" (via --appdata-dir %x)", 
+			::APPDATA_DIR,
 			params.appdata_dir
 		);
 	}
