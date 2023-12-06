@@ -37,7 +37,7 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 
 
 		auto try_with = [&](const auto& tried_stem) {
-			const auto with_existent_ext = augs::first_existing_extension(OFFICIAL_CONTENT_PATH / path(tried_stem), augs::SOUND_EXTENSIONS);
+			const auto with_existent_ext = augs::first_existing_extension(OFFICIAL_CONTENT_DIR / path(tried_stem), augs::SOUND_EXTENSIONS);
 
 			if (!with_existent_ext.empty()) {
 				maybe_official_sound_path m;
@@ -61,7 +61,7 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 			throw test_scene_asset_loading_error(
 				"Failed to load %x: sound file was not found at %x.", 
 				stem, 
-				OFFICIAL_CONTENT_PATH / stem
+				OFFICIAL_CONTENT_DIR / stem
 			);
 		}
 	});

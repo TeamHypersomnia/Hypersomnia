@@ -117,12 +117,11 @@
 #include "work_result.h"
 
 std::function<void()> ensure_handler;
-bool log_to_live_file = false;
-std::string log_timestamp_format;
+
+extern std::mutex log_mutex;
+extern std::string log_timestamp_format;
 
 extern float max_zoom_out_at_edges_v;
-extern std::mutex log_mutex;
-extern std::string live_log_path;
 
 #if PLATFORM_UNIX
 std::atomic<int> signal_status = 0;
@@ -131,18 +130,38 @@ static_assert(std::atomic<int>::is_always_lock_free);
 
 constexpr bool no_edge_zoomout_v = false;
 
-work_result work(const int argc, const char* const * const argv) try {
-	const bool is_cli_tool = cmd_line_params(argc, argv).is_cli_tool();
+work_result work(
+	const cmd_line_params& parsed_params,
+	const bool log_directory_existed,
+	const int argc,
+	const char* const * const argv
+) try {
+	const auto& params = parsed_params;
+
+	const bool is_cli_tool = params.is_cli_tool();
 
 	if (is_cli_tool) {
 		LOG("Launching a CLI tool. Skipping Steam API initialization.");
+		LOG("WARNING: CLI tools will always read \"user\",\n instead of the folder named after the SteamID");
 	}
 	else {
+		const bool running_from_appimage = !params.appimage_path.empty();
+
+		if (!running_from_appimage) {
+			/* 
+				Creating steam_appid.txt will fail on a read-only system.
+			*/
+
 #if CREATE_STEAM_APPID
-		augs::save_as_text("steam_appid.txt", std::to_string(::steam_get_appid()));
+			LOG("Creating steam_appid.txt");
+
+			augs::save_as_text("steam_appid.txt", std::to_string(::steam_get_appid()));
 #elif !IS_PRODUCTION_BUILD
-		augs::remove_file("steam_appid.txt");
+			LOG("Removing steam_appid.txt");
+
+			augs::remove_file("steam_appid.txt");
 #endif
+		}
 
 		if (::steam_restart()) {
 			return work_result::STEAM_RESTART;
@@ -169,7 +188,19 @@ work_result work(const int argc, const char* const * const argv) try {
 	});
 
 	const bool is_steam_client = steam_initialized;
-	(void)is_steam_client;
+
+	if (is_steam_client) {
+		const auto steam_id = std::to_string(::steam_get_id());
+		::USER_DIR = DOCUMENTS_DIR / steam_id;
+	}
+	else {
+		::USER_DIR = DOCUMENTS_DIR / NONSTEAM_USER_FOLDER_NAME;
+	}
+
+	/* Just use the "user" folder when developing */
+#if !IS_PRODUCTION_BUILD
+	::USER_DIR = DOCUMENTS_DIR / NONSTEAM_USER_FOLDER_NAME;
+#endif
 
 #if PLATFORM_UNIX	
 	auto signal_handler = [](const int signal_type) {
@@ -183,19 +214,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	setup_float_flags();
 
-#if IS_PRODUCTION_BUILD
-	const bool log_directory_existed = augs::exists(LOG_FILES_DIR);
-#endif
-
 	{
-		LOG("Started at %x", augs::date_time().get_readable());
-		LOG("Working directory: %x", augs::get_current_working_directory());
-		LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
-
 		const auto all_created_directories = std::vector<augs::path_type> {
-			LOG_FILES_DIR,
-			GENERATED_FILES_DIR,
-			USER_FILES_DIR,
+			CACHE_DIR,
+			USER_DIR,
 			DEMOS_DIR,
 
 			DOWNLOADED_ARENAS_DIR,
@@ -218,8 +240,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	}
 
 	const auto canon_config_path = augs::path_type("default_config.lua");
-	const auto local_config_path = augs::path_type(USER_FILES_DIR "/config.lua");
-	const auto force_config_path = augs::path_type(USER_FILES_DIR "/config.force.lua");
+	const auto local_config_path = USER_DIR / "config.lua";
+	const auto force_config_path = USER_DIR / "config.force.lua";
 
 	LOG("Creating lua state.");
 	auto lua = augs::create_lua_state();
@@ -290,16 +312,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto& canon_config = *canon_config_ptr;
 
-	LOG("Parsing command-line parameters.");
-
-	const auto params = cmd_line_params(argc, argv);
-	LOG("Complete command line:\n%x", params.complete_command_line);
-	LOG("Parsed as:\n%x", params.parsed_as);
-
-	if (!params.appimage_path.empty()) {
-		LOG("Running from an AppImage: %x", params.appimage_path);
-	}
-
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
 
@@ -332,7 +344,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			if (result->client.use_account_avatar) {
 				if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-					const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
+					const auto cached_file_path = USER_DIR / "cached_avatar.png";
 					avatar.save_as_png(cached_file_path);
 
 					result->client.avatar_image_path = cached_file_path;
@@ -349,26 +361,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
-
-		if (config.log_to_live_file) {
-			/* Might have been set in main.cpp so do not disable it here */
-			::log_to_live_file = config.log_to_live_file;
-		}
-
 		::log_timestamp_format = config.log_timestamp_format;
-	}
-
-	if (::log_to_live_file) {
-		if (config.remove_live_log_file_on_start) {
-			augs::remove_file(::live_log_path);
-		}
-
-		if (config.log_to_live_file) {
-			LOG("Live log was enabled due to a flag in config.");
-		}
-		else if (params.live_log_path.size() > 0) {
-			LOG(std::string("Live log was enabled due to a flag: --live-log ") + params.live_log_path);
-		}
 	}
 
 	const auto fp_test_settings = [&]() {
@@ -412,7 +405,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	LOG("Initializing ImGui.");
 
-	const auto imgui_ini_path = std::string(USER_FILES_DIR) + "/" + get_preffix_for(current_app_type) + "imgui.ini";
+	const auto imgui_ini_path = std::string(USER_DIR) + "/" + get_preffix_for(current_app_type) + "imgui.ini";
 	const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
 	const auto imgui_raii = augs::imgui::context_raii(
@@ -1069,6 +1062,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	start_server_gui_state start_server_gui = std::string("Host a server");
 
 	start_client_gui.is_steam_client = is_steam_client;
+	start_server_gui.is_steam_client = is_steam_client;
 
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");

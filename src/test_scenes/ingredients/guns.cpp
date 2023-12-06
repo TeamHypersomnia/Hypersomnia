@@ -4095,7 +4095,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4650.f, 4650.f};
-			gun_def.shot_cooldown_ms = 400.f;
+			gun_def.shot_cooldown_ms = 380.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;

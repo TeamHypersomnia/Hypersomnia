@@ -2661,7 +2661,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			const auto full_path = 
 				resource_id.is_official 
-				? OFFICIAL_CONTENT_PATH / path_in_project
+				? OFFICIAL_CONTENT_DIR / path_in_project
 				: in.setup.resolve_project_path(path_in_project)
 			;
 

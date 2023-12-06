@@ -31,6 +31,7 @@
 #include "application/main/extract_archive.h"
 #include "hypersomnia_version.h"
 #include "augs/window_framework/exec.h"
+#include "augs/window_framework/platform_utils.h"
 
 #if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
@@ -55,8 +56,6 @@ using namespace httplib_utils;
 
 using R = self_update_result_type;
 namespace fs = std::filesystem;
-
-void rename_cwd_to_old();
 
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
@@ -192,7 +191,6 @@ self_update_result check_and_apply_updates(
 			2) No extracting necessary (yay).
 			3) Do not move around any folders in the cwd.
 			4) rm/mv just the single downloaded AppImage.
-			5) Instead simply rename cwd to cwd.old. The run script will populate the new cwd with the necessary config and content files.
 		*/
 
 		LOG("Updating from an AppImage: %x", archive_path);
@@ -282,7 +280,7 @@ self_update_result check_and_apply_updates(
 	const auto target_archive_path = 
 		is_appimage ?
 		appimage_new_path :
-		GENERATED_FILES_DIR / archive_filename
+		CACHE_DIR / archive_filename
 	;
 
 	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
@@ -654,7 +652,7 @@ self_update_result check_and_apply_updates(
 							}
 							
 							{
-								const auto target_signature_path = augs::path_type(GENERATED_FILES_DIR) / "last_updater_signature.sig";
+								const auto target_signature_path = CACHE_DIR / "last_updater_signature.sig";
 								augs::save_as_text(target_signature_path, new_signature);
 
 								const auto result = ::verify_ssh_signature(
@@ -746,20 +744,7 @@ self_update_result check_and_apply_updates(
 											return callback_result::ABORT;
 										}
 
-										try {
-											/* 
-												AppImage flow 5) Instead simply rename cwd to cwd.old. 
-												The run script will populate the cwd with the necessary config and content files.
-
-												It will also bring back the user/log files from the .old folder.
-											*/
-
-											rename_cwd_to_old();
-											return callback_result::CONTINUE;
-										}
-										catch (...) {
-											return callback_result::ABORT;
-										}
+										return callback_result::CONTINUE;
 									};
 
 									completed_move = launch_async(appimage_move_files_around_procedure);
@@ -796,8 +781,8 @@ self_update_result check_and_apply_updates(
 				if (extractor->has_completed()) {
 					auto move_files_around_procedure = [target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
 						const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
-							LOG_FILES_DIR,
-							USER_FILES_DIR
+							LOGS_DIR,
+							USER_DIR
 						};
 
 						auto remove_dangling_OLD_path = [&]() {
@@ -815,7 +800,7 @@ self_update_result check_and_apply_updates(
 
 							const auto BUNDLE_path = get_bundle_directory();
 							const auto CURRENT_path = BUNDLE_path / "Contents";
-							const auto EXE_dir = augs::path_type(get_executable_path()).replace_filename("");
+							const auto EXE_dir = augs::path_type(augs::get_executable_path()).replace_filename("");
 
 							auto backup_user_files = [&]() {
 								for (const auto& u : paths_from_old_version_to_keep) {
@@ -1123,27 +1108,4 @@ self_update_result check_and_apply_updates(
 	}
 
 	return result;
-}
-
-void rename_cwd_to_old() {
-	LOG("rename_cwd_to_old: CWD: %x", fs::current_path());
-	fs::path cwd = fs::current_path();
-
-	// make a new name for cwd
-	fs::path new_cwd = cwd;
-	new_cwd += ".old";
-
-	LOG("rename_cwd_to_old: Remove CWD.old: %x", new_cwd);
-	fs::remove_all(new_cwd);
-
-	LOG("rename_cwd_to_old: Change CWD to CWD/..: %x", cwd.parent_path());
-	fs::current_path(cwd.parent_path());
-
-	LOG("rename_cwd_to_old: Rename %x to %x", cwd, new_cwd);
-	fs::rename(cwd, new_cwd);
-
-	// change current working directory back to the newly renamed directory
-	// won't really be necessary as we're quitting but just in case something wants to dump logs
-	LOG("rename_cwd_to_old: Set CWD to .old: %x", new_cwd);
-	fs::current_path(new_cwd);
 }

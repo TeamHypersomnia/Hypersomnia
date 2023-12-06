@@ -153,8 +153,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		return out;
 	};
 
-	auto banlist_notifications 	= banlist_to_set(augs::path_type(USER_FILES_DIR) / "masterserver_banlist_notifications.txt");
-	auto banlist_servers 		= banlist_to_set(augs::path_type(USER_FILES_DIR) / "masterserver_banlist_servers.txt");
+	auto banlist_notifications 	= banlist_to_set(USER_DIR / "masterserver_banlist_notifications.txt");
+	auto banlist_servers 		= banlist_to_set(USER_DIR / "masterserver_banlist_servers.txt");
 
 	auto is_banned_notifications = [&](netcode_address_t t) {
 		t.port = 0;
@@ -183,7 +183,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	httplib::Server http;
 
-	const auto masterserver_dump_path = augs::path_type(USER_FILES_DIR) / "masterserver.dump";
+	const auto masterserver_dump_path = USER_DIR / "masterserver.dump";
 
 	auto reserialize_list = [&]() {
 		MSR_LOG("Reserializing the server list.");

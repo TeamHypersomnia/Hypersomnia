@@ -184,7 +184,7 @@ void stun_manager_window::perform() {
 	}
 
 	if (all_candidates == std::nullopt) {
-		all_candidates.emplace(augs::path_type(DETAIL_DIR "/web/candidate_stun_servers.txt"));
+		all_candidates.emplace(augs::path_type(DETAIL_DIR / "web/candidate_stun_servers.txt"));
 	}
 
 	if (ImGui::Button("Start analysis")) {
@@ -1634,7 +1634,8 @@ void settings_gui_state::perform(
 
 				const auto cwd = augs::get_current_working_directory();
 				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
-				text("Cache folder location: %x (%x)", GENERATED_FILES_DIR, std::filesystem::absolute(GENERATED_FILES_DIR));
+				text("Cache folder location: %x (%x)", CACHE_DIR, std::filesystem::absolute(CACHE_DIR));
+				text("User folder location: %x (%x)", USER_DIR, std::filesystem::absolute(USER_DIR));
 
 				if (ImGui::Button("Dump debug log")) {
 					get_dumped_log_path();

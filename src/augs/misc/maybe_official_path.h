@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
-
-#define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
+#include "all_paths.h"
 
 std::string format_field_name(std::string s);
 
@@ -66,7 +65,7 @@ struct maybe_official_path {
 		}
 
 		if (is_official || project_dir.empty()) {
-			return OFFICIAL_CONTENT_PATH / path;
+			return OFFICIAL_CONTENT_DIR / path;
 		}
 
 		return project_dir / path;

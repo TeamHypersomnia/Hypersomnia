@@ -6,9 +6,10 @@
 #include "augs/readwrite/lua_file.h"
 #include "augs/templates/can_stream.h"
 #include "augs/readwrite/to_bytes.h"
+#include "all_paths.h"
 
-const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
-const auto test_lua_file_path = GENERATED_FILES_DIR "/test_lua_readwrite.lua";
+const auto test_file_path = CACHE_DIR / "test_byte_readwrite.bin";
+const auto test_lua_file_path = CACHE_DIR / "test_lua_readwrite.lua";
 
 namespace detail {
 	struct dummy_A {

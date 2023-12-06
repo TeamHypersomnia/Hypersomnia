@@ -712,8 +712,8 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 
 		std::unordered_map<augs::path_type, ad_hoc_entry_id> subject_ids;
 		auto next_id = files.root.fill_thumbnail_entries(paths.project_folder, subject_ids);
-		next_id = official_files_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), subject_ids, next_id);
-		next_id = gui.filesystem.official_special_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), subject_ids, next_id);
+		next_id = official_files_root.fill_thumbnail_entries(OFFICIAL_CONTENT_DIR, subject_ids, next_id);
+		next_id = gui.filesystem.official_special_root.fill_thumbnail_entries(OFFICIAL_CONTENT_DIR, subject_ids, next_id);
 
 		ad_hoc_atlas_subjects new_subjects;
 		new_subjects.reserve(subject_ids.size());

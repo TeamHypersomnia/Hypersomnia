@@ -8,15 +8,23 @@ mkdir /tmp/AppDir/usr/bin -p
 mkdir /tmp/AppDir/usr/lib -p
 
 cp build/current/Hypersomnia /tmp/AppDir/usr/bin
-cp build/current/libsteam_integration.so /tmp/AppDir/usr/lib
-
 strip /tmp/AppDir/usr/bin/Hypersomnia
-strip /tmp/AppDir/usr/lib/libsteam_integration.so
 
-pushd /tmp/AppDir/usr/bin
+if [ -f "build/current/libsteam_integration.so" ]; then
+	cp build/current/libsteam_integration.so /tmp/AppDir/usr/lib
+	strip /tmp/AppDir/usr/lib/libsteam_integration.so
+
+	pushd /tmp/AppDir/usr/bin
 	# So linuxdeploy can find it
 	ln -s ../lib/libsteam_integration.so
-popd
+	popd
+else
+	echo "Warning: libsteam_integration.so was not found!"
+	echo "Game might have been built with DEVELOP_STEAM_INTEGRATION=1"
+	echo "In that case, we must add a steam_appid.txt to the .AppImage."
+
+	echo "2660970" > hypersomnia/steam_appid.txt
+fi
 
 cp hypersomnia/content/gfx/cyan_scythe.png /tmp/AppDir/
 

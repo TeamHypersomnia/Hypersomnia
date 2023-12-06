@@ -47,6 +47,7 @@
 #include "game/detail/flavour_presentation.h"
 #include "game/inferred_caches/organism_cache.hpp"
 #include "game/cosmos/solvers/standard_solver.h"
+#include "all_paths.h"
 
 static bool reported = false;
 
@@ -311,10 +312,10 @@ static void save_all_reported_weapons() {
 
 	reported = true;
 
-	augs::save_as_json(reported_firearms, LOG_FILES_DIR "/all_firearms.json");
-	augs::save_as_json(reported_melees, LOG_FILES_DIR "/all_melees.json");
-	augs::save_as_json(reported_explosives, LOG_FILES_DIR "/all_explosives.json");
-	augs::save_as_json(reported_spells, LOG_FILES_DIR "/all_spells.json");
+	augs::save_as_json(reported_firearms, LOGS_DIR / "all_firearms.json");
+	augs::save_as_json(reported_melees, LOGS_DIR / "all_melees.json");
+	augs::save_as_json(reported_explosives, LOGS_DIR / "all_explosives.json");
+	augs::save_as_json(reported_spells, LOGS_DIR / "all_spells.json");
 }
 
 test_mode_ruleset::test_mode_ruleset() {

@@ -4,6 +4,7 @@
 #include "augs/ensure.h"
 
 #include "augs/misc/lua/lua_utils.h"
+#include "all_paths.h"
 
 namespace augs {
 	sol::state create_lua_state() {
@@ -36,7 +37,7 @@ namespace augs {
 			} 
 		};
 		
-		const auto utils_path = DETAIL_DIR "/utils.lua";
+		const auto utils_path = DETAIL_DIR / "utils.lua";
 		const auto pfr = lua.do_file(utils_path);
 
 		if (!pfr.valid()) {

@@ -1,10 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "application/arena/intercosm_paths.h"
-
-#define USER_DOWNLOADS_DIR 		(augs::path_type(USER_FILES_DIR) 		/ "downloads")
-#define OFFICIAL_ARENAS_DIR  	(augs::path_type(OFFICIAL_CONTENT_DIR) 	/ "arenas")
-#define DOWNLOADED_ARENAS_DIR 	(USER_DOWNLOADS_DIR      				/ "arenas")
+#include "all_paths.h"
 
 struct arena_paths {
 	intercosm_paths int_paths;

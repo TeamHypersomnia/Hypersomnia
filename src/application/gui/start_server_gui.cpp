@@ -188,7 +188,19 @@ as well as to test your skills in a laggy environment.
 		}
 		else {
 			if (const auto result = nat_detection->query_result()) {
-				text_color(result->describe(), nat_type_to_color(result->type));
+				const auto color = nat_type_to_color(result->type);
+
+				if (color == green) {
+					text_color("No port forwarding necessary.", color);
+				}
+				else if (color == orange && result->port_delta != 1) {
+					text_color("Port forwarding might be necessary.", color);
+				}
+				else {
+					text_color("Consider port forwarding if others can't connect.", color);
+				}
+
+				text_color(result->describe(), color);
 			}
 			else {
 				text_color(typesafe_sprintf("NAT detection for port %x in progress...", currently_bound_port), red);
@@ -201,7 +213,14 @@ as well as to test your skills in a laggy environment.
 			}
 		}
 
-		{
+		if (!is_steam_client) {
+			/* 
+				Don't show this on the Steam client because two Steam processes could mess something up.
+				CLI tools actually launch without Steam API but they read from the "user" folder so the user might be surprised.
+
+				For running dedicated servers you're better off downloading a non-steam version of the game.
+			*/
+
 			ImGui::Separator();
 			text("Server instance type:");
 

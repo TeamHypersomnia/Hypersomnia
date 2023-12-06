@@ -2,9 +2,6 @@ return {
   streamer_mode = false,
   launch_at_startup = "LAST_ACTIVITY", -- or "MAIN_MENU"
 
-  log_to_live_file = false,
-  remove_live_log_file_on_start = true,
-
   log_timestamp_format = "[%H:%M:%S] ",
   --log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
   --log_timestamp_format = "",

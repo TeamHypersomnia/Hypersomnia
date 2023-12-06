@@ -11,6 +11,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/cosmos.h"
 #include "augs/misc/readable_bytesize.h"
+#include "all_paths.h"
 
 inline auto static_allocations_info() {
 	return std::string(
@@ -30,12 +31,12 @@ inline auto static_allocations_info() {
 
 inline auto directories_info() {
 	return typesafe_sprintf(
-		"LOG_FILES_DIR=%x\n"
-		"GENERATED_FILES_DIR=%x\n"
-		"USER_FILES_DIR=%x\n",
-		LOG_FILES_DIR,
-		GENERATED_FILES_DIR,
-		USER_FILES_DIR
+		"LOGS_DIR=%x\n"
+		"CACHE_DIR=%x\n"
+		"USER_DIR=%x\n",
+		LOGS_DIR,
+		CACHE_DIR,
+		USER_DIR
 	);
 }
 

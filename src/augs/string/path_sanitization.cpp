@@ -395,8 +395,8 @@ TEST_CASE("File path sanitization test") {
 
 #if TEST_SYMLINKS
 	const auto test_symlink_fname = "test_parent_symlink";
-	const auto test_symlink_path = augs::path_type(DETAIL_DIR) / test_symlink_fname;
-	const auto test_deep_symlink_dir = augs::path_type(DETAIL_DIR) / augs::path_type("test") / augs::path_type("test");
+	const auto test_symlink_path = DETAIL_DIR / test_symlink_fname;
+	const auto test_deep_symlink_dir = DETAIL_DIR / augs::path_type("test") / augs::path_type("test");
 	const auto test_deep_symlink_path = test_deep_symlink_dir / test_symlink_fname;
 
 	try {

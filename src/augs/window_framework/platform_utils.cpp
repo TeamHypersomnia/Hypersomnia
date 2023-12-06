@@ -110,3 +110,62 @@ namespace augs {
 }
 
 #endif
+
+namespace augs {
+#ifdef __APPLE__   
+#include "CoreFoundation/CoreFoundation.h"
+#include <unistd.h>
+#include <libgen.h>
+	path_type get_executable_path() {
+		CFBundleRef mainBundle = CFBundleGetMainBundle();
+		CFURLRef exeURL = CFBundleCopyExecutableURL(mainBundle);
+		char path[PATH_MAX];
+		if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
+		{
+			// error!
+		}
+		CFRelease(exeURL);
+
+		return path;
+	}
+
+#elif PLATFORM_UNIX
+#include <unistd.h>
+	path_type get_executable_path() {
+		char dest[PATH_MAX];
+		memset(dest,0,sizeof(dest)); // readlink does not null terminate!
+
+		if (readlink("/proc/self/exe", dest, PATH_MAX) == -1) {
+
+		} 
+		else {
+			return dest;
+		}
+
+		return augs::path_type();
+	}
+#endif
+}
+
+
+namespace augs {
+#if PLATFORM_WINDOWS
+	path_type get_default_documents_dir() {
+		char path[MAX_PATH];
+		HRESULT result = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+
+		if (SUCCEEDED(result)) {
+			return path_type(path) / "My Games" / "Hypersomnia";
+		}
+		else {
+			// Handle error
+			return path_type();
+		}
+	}
+#else
+	path_type get_default_documents_dir() {
+		/* Default to CWD */
+		return "";
+	}
+#endif
+}

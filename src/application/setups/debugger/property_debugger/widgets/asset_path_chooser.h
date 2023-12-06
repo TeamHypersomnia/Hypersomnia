@@ -57,7 +57,7 @@ public:
 				};
 
 				{
-					const auto in_official_path = OFFICIAL_CONTENT_PATH;
+					const auto in_official_path = OFFICIAL_CONTENT_DIR;
 
 					if (augs::exists(in_official_path)) {
 						augs::for_each_in_directory_recursive(

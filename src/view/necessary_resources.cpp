@@ -154,7 +154,7 @@ catch (const augs::sound_decoding_error& err) {
 }
 
 augs::path_type get_procedural_image_path(const augs::path_type& from_source_path) {
-	return augs::path_type(GENERATED_FILES_DIR) / from_source_path;
+	return CACHE_DIR / from_source_path;
 }
 
 necessary_image_definitions_map::necessary_image_definitions_map(

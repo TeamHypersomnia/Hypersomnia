@@ -10,6 +10,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/log_path_getters.h"
 #include "augs/misc/time_utils.h"
+#include "all_paths.h"
 
 #if PLATFORM_UNIX
 #define OUTPUT_TO_STDOUT 1
@@ -27,13 +28,13 @@
 
 std::mutex log_mutex;
 
-extern bool log_to_live_file;
-extern std::string log_timestamp_format;
+bool log_to_live_file = false;
+std::string log_timestamp_format;
 std::string live_log_path;
 app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
-	return std::string(LOG_FILES_DIR) + "/" + get_preffix_for(current_app_type) + name;
+	return LOGS_DIR / (get_preffix_for(current_app_type) + name);
 }
 
 std::optional<std::string> find_last_incorrect_exit() {

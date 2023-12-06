@@ -303,7 +303,7 @@ bool start_client_gui_state::perform(
 					}
 				}
 
-				const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
+				const auto cached_file_path = USER_DIR / "cached_avatar.png";
 				loaded_image.save_as_png(cached_file_path);
 
 				new_path = cached_file_path;
@@ -380,7 +380,7 @@ bool start_client_gui_state::perform(
 			if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
 				if (into_vars.use_account_avatar) {
 					if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-						const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
+						const auto cached_file_path = USER_DIR / "cached_avatar.png";
 						avatar.save_as_png(cached_file_path);
 
 						p = cached_file_path;

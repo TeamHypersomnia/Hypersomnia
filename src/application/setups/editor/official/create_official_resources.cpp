@@ -13,8 +13,7 @@
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 #include "application/setups/editor/official/official_id_to_pool_id.h"
-
-#define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
+#include "all_paths.h"
 
 template <class R>
 auto& get_resource(const editor_typed_resource_id<R> typed_id, editor_resource_pools& pools) {
@@ -40,7 +39,7 @@ auto& create_official(const E official_id, editor_resource_pools& pools) {
 			const auto exts,
 			const auto default_ext
 		) -> decltype(auto) {
-			const auto full_path_no_ext = OFFICIAL_CONTENT_PATH / content_folder / lowercase_stem;
+			const auto full_path_no_ext = OFFICIAL_CONTENT_DIR / content_folder / lowercase_stem;
 			const auto found_extension = augs::first_existing_extension(full_path_no_ext, exts, default_ext).extension();
 
 			/* Due to how maybe_official_path is handled, we have to remove the first element */
@@ -62,7 +61,7 @@ auto& create_official(const E official_id, editor_resource_pools& pools) {
 		if constexpr(std::is_base_of_v<R, editor_sprite_resource>) {
 			auto& result = create_pathed_resource("gfx", augs::IMAGE_EXTENSIONS, ".png");
 
-			const auto full_path = result.external_file.path_in(OFFICIAL_CONTENT_PATH);
+			const auto full_path = result.external_file.path_in(OFFICIAL_CONTENT_DIR);
 
 			try {
 				result.editable.size = augs::image::get_size(full_path);

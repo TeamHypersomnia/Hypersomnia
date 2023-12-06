@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Figure out the XDG_CONFIG_HOME where to store the dynamic data
-if [ -z $XDG_CONFIG_HOME ]; then
-  if [ -z $HOME ]; then
+if [ -z "$XDG_CONFIG_HOME" ]; then
+  if [ -z "$HOME" ]; then
     HOME=$(getent passwd "$(whoami)" | cut -d':' -f 6)
   fi
 
@@ -11,42 +11,5 @@ fi
 
 config_home="${XDG_CONFIG_HOME}/Hypersomnia"
 
-# If there isn't already data in our config dir, 
-# copy it from the mounted AppImage to the config dir.
-#
-# Existence of the .old folder with simultaneous 
-# lack of config_home signals a completed game update.
-# Copy the user and logs directories from the old folder.
-
-if ! [ -d "${config_home}" ]; then
-  mkdir -p "${config_home}"
-
-  if [ -d "${config_home}.old"/user ]; then
-    cp -r "${config_home}.old"/user "${config_home}"
-  fi
-  if [ -d "${config_home}.old"/logs ]; then
-    cp -r "${config_home}.old"/logs "${config_home}"
-  fi
-fi
-
-# At this point, "${config_home}" is guaranteed to exist.
-# Copy all of the executable's static files that might be missing.
-
-src="${APPDIR}"/usr/share/hypersomnia/
-dst="${config_home}/"
-
-for file in "$src"*; do
-    base=$(basename "$file")
-    if [ ! -e "$dst$base" ]; then
-        cp -r "$file" "$dst"
-    fi
-done
- 
-
-# Run the actual executable. The --keep-cwd is needed since we need to
-# run from the config dir since the AppImage is only mounted read-only.
-# Also pass the $APPIMAGE via --appimage-path
-# a read-only file-system
-
-cd "${config_home}"
-"${APPDIR}"/usr/bin/Hypersomnia --keep-cwd --appimage-path "${APPIMAGE}" $@
+cd "${APPDIR}/usr/share/hypersomnia/"
+"${APPDIR}/usr/bin/Hypersomnia" --documents-dir "${config_home}" --keep-cwd --appimage-path "${APPIMAGE}" "$@"

@@ -63,7 +63,7 @@ void regenerate_and_gather_subjects(
 				auto stamp_path = path;
 				stamp_path += ".stamp";
 
-				auto cache_preffix = std::string(GENERATED_FILES_DIR);
+				auto cache_preffix = CACHE_DIR.string();
 				auto original_gif_path = path.string();
 
 				/* Remove first folder */
@@ -101,7 +101,7 @@ void regenerate_and_gather_subjects(
 					augs::image img; 
 					img.from_bytes(frame.serialized_frame, "dummy.bin");
 
-					auto generated_png_path = augs::path_type(GENERATED_FILES_DIR) / gif;
+					auto generated_png_path = CACHE_DIR / gif;
 					generated_png_path += typesafe_sprintf(".%x.png", i);
 					LOG("Generated_png_path: %x. Creating directories.", generated_png_path);
 
@@ -110,7 +110,7 @@ void regenerate_and_gather_subjects(
 					img.save_as_png(generated_png_path);
 				};
 
-				auto stamp_path = augs::path_type(GENERATED_FILES_DIR) / gif;
+				auto stamp_path = CACHE_DIR / gif;
 				stamp_path += ".stamp";
 
 				augs::save_as_bytes(augs::last_write_time(gif), stamp_path);

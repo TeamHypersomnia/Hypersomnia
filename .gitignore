@@ -172,12 +172,9 @@ pip-log.txt
 /ReleaseDebug
 /ReleaseExe
 /RelDeb
-/hypersomnia/saves
-/hypersomnia/content/music
 /hypersomnia/cache
 /hypersomnia/logs
 /hypersomnia/user
-/hypersomnia/choreographic/voices
 
 *.log
 *.tlog

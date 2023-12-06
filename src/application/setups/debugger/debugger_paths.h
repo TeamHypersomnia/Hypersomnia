@@ -5,7 +5,7 @@
 
 #include "application/arena/arena_paths.h"
 
-#define DEBUGGER_DIR (augs::path_type(USER_FILES_DIR) / "debugger")
+#define DEBUGGER_DIR (USER_DIR / "debugger")
 
 inline auto get_last_folders_path() {
 	return DEBUGGER_DIR / "last_folders.lua";

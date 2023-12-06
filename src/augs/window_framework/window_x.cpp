@@ -26,6 +26,7 @@
 #include "augs/window_framework/window.h"
 
 #include "augs/window_framework/detail_xinput.h"
+#include "all_paths.h"
 
 int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
 
@@ -973,7 +974,7 @@ namespace augs {
 	}
 
 	static std::optional<path_type> read_chosen_path(const augs::path_type& script_path) {
-		const auto& temp_result = GENERATED_FILES_DIR "/last_file_path.txt";
+		const auto& temp_result = CACHE_DIR / "last_file_path.txt";
 
 		try {
 			const auto result = file_to_string(temp_result);
@@ -1000,24 +1001,24 @@ namespace augs {
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
-		return choose_path(DETAIL_DIR "/unix/open_file.local");
+		return choose_path(DETAIL_DIR / "unix/open_file.local");
 	}
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
-		return choose_path(DETAIL_DIR "/unix/save_file.local");
+		return choose_path(DETAIL_DIR / "unix/save_file.local");
 	}
 
 	std::optional<path_type> window::choose_directory_dialog(
 		const std::string& /* custom_title */
 	) {
-		return choose_path(DETAIL_DIR "/unix/choose_directory.local");
+		return choose_path(DETAIL_DIR / "unix/choose_directory.local");
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		const auto script_path = DETAIL_DIR "/unix/reveal_file.local";
+		const auto script_path = DETAIL_DIR / "unix/reveal_file.local";
 
 		if (!augs::exists(script_path)) {
 			LOG("WARNING! Could not find the script file: %x.", script_path);

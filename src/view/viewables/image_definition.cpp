@@ -7,11 +7,11 @@
 #include "view/viewables/regeneration/desaturations.h"
 
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
-	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.relative_path().replace_extension(".neon_map.png").string();
+	return CACHE_DIR / from_source_path.relative_path().replace_extension(".neon_map.png").string();
 }
 
 augs::path_type get_desaturation_path(augs::path_type from_source_path) {
-	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.relative_path().replace_extension(".desaturation.png").string();
+	return CACHE_DIR / from_source_path.relative_path().replace_extension(".desaturation.png").string();
 }
 
 augs::path_type image_definition_view::calc_custom_neon_map_path() const {

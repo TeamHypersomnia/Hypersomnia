@@ -125,30 +125,6 @@ set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${HYPERSOMNIA_RESOURCES
 ## Application packaging switches.
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
-## Hardcoded, relative paths for directories that the executable might use.
-
-# From where will the game pull its official resources.
-
-set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content")
-
-# Some essentials lua scripts, ssh-keygen, and internal data files needed by the executable.
-set(HYPERSOMNIA_DETAIL_DIR "detail")
-
-# Where the game will save logs.
-# Deleting this folder will have no effect on the game.
-
-set(HYPERSOMNIA_LOG_FILES_DIR "logs")
-
-# Where the game will save neon maps and other regenerable content.
-# Deleting this folder will have no effect on the game, except that some resources might take time to generate again.
-
-set(HYPERSOMNIA_GENERATED_FILES_DIR "cache")
-
-# Where the game will save user arenas, all downloaded arenas, gui layouts, user config etc.
-# Deleting this folder might possibly result in data loss, e.g. the untitled works and some user settings.
-
-set(HYPERSOMNIA_USER_FILES_DIR "user")
-
 ## Building switches for functionality using 3rdparty libraries.
 
 ## If off, will simply build steam_integration.cpp in the project
@@ -1591,14 +1567,7 @@ endif()
 
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
-add_definitions(-DDETAIL_DIR="${HYPERSOMNIA_DETAIL_DIR}")
-add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")
-add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
-add_definitions(-DUSER_FILES_DIR="${HYPERSOMNIA_USER_FILES_DIR}")
-add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
-
 # We build the main Hypersomnia executable.
-
 
 set(HYPERSOMNIA_CPPS
 	${HYPERSOMNIA_VERSION_FILE_CPP}

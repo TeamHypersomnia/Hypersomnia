@@ -232,7 +232,7 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 				client.set_write_timeout(3);
 				client.set_keep_alive(true);
 
-				const auto miniatures_directory = augs::path_type(GENERATED_FILES_DIR) / "miniatures";
+				const auto miniatures_directory = CACHE_DIR / "miniatures";
 
 				augs::create_directories(miniatures_directory);
 

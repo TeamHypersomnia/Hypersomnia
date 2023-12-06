@@ -18,6 +18,7 @@ public:
 
 	server_instance_type instance_type = server_instance_type::INTEGRATED;
 
+	bool is_steam_client = false;
 	bool show_help = false;
 	bool show_nat_details = false;
 

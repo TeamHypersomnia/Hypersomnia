@@ -409,7 +409,7 @@ namespace augs {
 
 #if PLATFORM_LINUX
 	static std::optional<path_type> read_chosen_path(const augs::path_type& script_path) {
-		const auto& temp_result = GENERATED_FILES_DIR "/last_file_path.txt";
+		const auto& temp_result = CACHE_DIR / "last_file_path.txt";
 
 		try {
 			const auto result = file_to_string(temp_result);
@@ -438,7 +438,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path(DETAIL_DIR "/unix/open_file.local");
+		return choose_path(DETAIL_DIR / "unix/open_file.local");
 #else
 		return std::nullopt;
 #endif
@@ -449,7 +449,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path(DETAIL_DIR "/unix/save_file.local");
+		return choose_path(DETAIL_DIR / "unix/save_file.local");
 #else
 		return std::nullopt;
 #endif
@@ -459,7 +459,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path(DETAIL_DIR "/unix/choose_directory.local");
+		return choose_path(DETAIL_DIR / "unix/choose_directory.local");
 #else
 		return std::nullopt;
 #endif

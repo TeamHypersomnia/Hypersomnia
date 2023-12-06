@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/window_framework/pipe.h"
 #include "signing_keys.h"
+#include "all_paths.h"
 
 #if PLATFORM_WINDOWS
 #define SSH_KEYGEN_BINARY "ssh-keygen"
@@ -26,7 +27,7 @@ inline ssh_verification_result verify_ssh_signature(
 ) {
 	const auto ssh_namespace = type == verified_object_type::UPDATER ? "self_updater" : "hypersomnia";
 
-	const auto allowed_signers = augs::path_type(GENERATED_FILES_DIR) / "allowed_signers";
+	const auto allowed_signers = CACHE_DIR / "allowed_signers";
 	augs::save_as_text(allowed_signers, ::SIGNING_PUBLIC_KEY);
 
 	const auto verification_command = typesafe_sprintf(

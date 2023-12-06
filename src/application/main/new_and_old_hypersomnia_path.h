@@ -5,20 +5,18 @@
 #include <unistd.h>
 #include <libgen.h>
 
-augs::path_type get_executable_path();
-
 static auto get_bundle_directory() {
-			CFBundleRef mainBundle = CFBundleGetMainBundle();
-		CFURLRef exeURL = CFBundleCopyBundleURL(mainBundle);
-		char path[PATH_MAX];
-		if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
-		{
-			// error!
-		}
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+	CFURLRef exeURL = CFBundleCopyBundleURL(mainBundle);
+	char path[PATH_MAX];
 
-		CFRelease(exeURL);
+	if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX)) {
+		// error!
+	}
 
-return augs::path_type(path);
+	CFRelease(exeURL);
+
+	return augs::path_type(path);
 }
 
 #define NEW_HYPERSOMNIA (get_bundle_directory() / "Contents.new")

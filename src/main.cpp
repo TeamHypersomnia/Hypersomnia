@@ -1,5 +1,6 @@
 #include <iostream>
 #include <clocale>
+#include <mutex>
 
 #include "augs/log.h"
 #include "augs/log_path_getters.h"
@@ -10,45 +11,18 @@
 
 #include "cmd_line_params.h"
 #include "build_info.h"
-#include <mutex>
+#include "augs/window_framework/platform_utils.h"
+#include "augs/filesystem/directory.h"
+#include "augs/misc/time_utils.h"
+#include "all_paths.h"
+
+augs::path_type DOCUMENTS_DIR;
+augs::path_type USER_DIR;
 
 extern std::mutex log_mutex;
 
 extern std::string live_log_path;
 extern bool log_to_live_file;
-
-#ifdef __APPLE__   
-#include "CoreFoundation/CoreFoundation.h"
-#include <unistd.h>
-#include <libgen.h>
-
-augs::path_type get_executable_path() {
-	CFBundleRef mainBundle = CFBundleGetMainBundle();
-	CFURLRef exeURL = CFBundleCopyExecutableURL(mainBundle);
-	char path[PATH_MAX];
-	if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
-	{
-		// error!
-	}
-	CFRelease(exeURL);
-
-	return path;
-}
-
-#elif PLATFORM_UNIX
-#include <unistd.h>
-augs::path_type get_current_exe_path() {
-	char dest[PATH_MAX];
-	memset(dest,0,sizeof(dest)); // readlink does not null terminate!
-	if (readlink("/proc/self/exe", dest, PATH_MAX) == -1) {
-
-		} else {
-			return dest;
-		}
-
-	return augs::path_type();
-}
-#endif
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -59,7 +33,12 @@ augs::path_type get_current_exe_path() {
 #include "augs/window_framework/create_process.h"
 #include "work_result.h"
 
-work_result work(const int argc, const char* const * const argv);
+work_result work(
+	const cmd_line_params& parsed_params,
+	bool log_directory_existed,
+	int argc,
+	const char* const * const argv
+);
 
 #if PLATFORM_WINDOWS
 #if BUILD_IN_CONSOLE_MODE
@@ -95,45 +74,6 @@ int main(const int argc, const char* const * const argv) {
 		return EXIT_SUCCESS;
 	}
 
-#ifdef __APPLE__    
-	const auto exe_path = get_executable_path();
-#else
-	const auto exe_path = params.exe_path;
-#endif
-
-	if (!params.keep_cwd) {
-#ifdef __APPLE__    
-		auto exe_dir = get_executable_path();
-		exe_dir.replace_filename("");
-
-		std::cout << "CHANGING CWD TO: " << exe_dir << std::endl;
-		std::filesystem::current_path(exe_dir);
-		std::cout << "CHANGED CWD TO: " << std::filesystem::current_path().string() << std::endl;
-
-#elif PLATFORM_UNIX
-		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
-			exe_path.replace_filename("");
-			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
-			std::filesystem::current_path(exe_path);
-			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
-		}
-#endif
-	}
-
-	{
-		std::unique_lock<std::mutex> lock(log_mutex);
-
-		::current_app_type = params.type;
-
-		if (!params.live_log_path.empty()) {
-			::log_to_live_file = true;
-			::live_log_path = params.live_log_path;
-		}
-		else {
-			::live_log_path = ::get_path_in_log_files("live_debug.txt");
-		}
-	}
-
 	if (params.help_only) {
 		std::cout << get_help_section() << std::endl;
 		
@@ -164,7 +104,85 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 
-	const auto completed_work_result = work(argc, argv);
+#ifdef __APPLE__    
+	const auto exe_path = augs::get_executable_path();
+#else
+	const auto exe_path = params.exe_path;
+#endif
+
+#if PLATFORM_UNIX
+	if (!params.keep_cwd) {
+		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
+			exe_path.replace_filename("");
+			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::filesystem::current_path(exe_path);
+			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+		}
+	}
+#endif
+
+	if (!params.documents_dir.empty()) {
+		::DOCUMENTS_DIR = params.documents_dir;
+	}
+	else {
+		::DOCUMENTS_DIR = augs::get_default_documents_dir();
+	}
+
+	const bool log_directory_existed = augs::exists(LOGS_DIR);
+
+	/* 
+		LOGS_DIR is always in DOCUMENTS_DIR
+		so it will create the documents dir as well.
+	*/
+
+	augs::create_directories(LOGS_DIR);
+
+	{
+		std::unique_lock<std::mutex> lock(log_mutex);
+
+		::current_app_type = params.type;
+
+		if (!params.live_log_path.empty()) {
+			::log_to_live_file = true;
+			::live_log_path = params.live_log_path;
+		}
+	}
+
+	/*
+		Now that the documents/logs folder exists,
+		and we have set the potential live log path,
+		we can start logging.
+	*/
+
+	LOG("Started at %x", augs::date_time().get_readable());
+	LOG("Working directory: %x", augs::get_current_working_directory());
+	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
+
+	LOG("Complete command line:\n%x", params.complete_command_line);
+	LOG("Parsed as:\n%x", params.parsed_as);
+
+	if (!params.appimage_path.empty()) {
+		LOG("Running from an AppImage: %x", params.appimage_path);
+	}
+
+	if (::log_to_live_file) {
+		LOG(std::string("Live log was enabled due to a flag: --live-log ") + params.live_log_path);
+	}
+
+	if (params.documents_dir.empty()) {
+		LOG("Documents directory: \"%x\" (Default)", params.documents_dir);
+	}
+	else {
+		LOG("Documents directory: \"%x\" (via --documents-dir)", params.documents_dir);
+	}
+
+	const auto completed_work_result = work(
+		params,
+		log_directory_existed,
+		argc,
+		argv
+	);
+
 	LOG_NVPS(completed_work_result);
 
 	{

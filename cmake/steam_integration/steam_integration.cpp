@@ -78,6 +78,10 @@ extern "C" {
 		SteamAPI_Shutdown();
 	}
 
+	uint64_t steam_get_id() {
+		return SteamUser()->GetSteamID().ConvertToUint64();
+	}
+
 	const char* steam_get_username() {
 		return SteamFriends()->GetPersonaName();
 	}
@@ -142,6 +146,10 @@ extern "C" {
 
 	void steam_deinit() {
 
+	}
+
+	uint64_t steam_get_id() {
+		return 0;
 	}
 
 	const char* steam_get_username() {

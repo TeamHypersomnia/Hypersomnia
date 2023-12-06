@@ -112,7 +112,7 @@ void allocate_flavours_and_assets_for_resource(
 						This way we won't have to specify RESOLVED flag here.
 					*/
 
-					new_definition.source_image.path = augs::path_type(GENERATED_FILES_DIR) / resolve_path(resource.external_file.path_in_project);
+					new_definition.source_image.path = CACHE_DIR / resolve_path(resource.external_file.path_in_project);
 					new_definition.source_image.path += typesafe_sprintf(".%x.png", i);
 					new_definition.source_image.is_official = maybe_official_image_path::RESOLVED;
 
