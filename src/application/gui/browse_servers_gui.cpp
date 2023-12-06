@@ -101,6 +101,8 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	selected_server = {};
 	selected_server.address = prev_addr;
 
+	LOG("Launching future_official_addresses");
+
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
 			official_addrs results;
@@ -124,6 +126,8 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 			return results;
 		}
 	);
+
+	LOG("Launching future_response");
 
 	data->future_response = launch_async(
 		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
@@ -151,6 +155,8 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 			return cli.Get("/server_list_binary");
 		}
 	);
+
+	LOG("refresh_server_list returns.");
 
 	when_last_started_refreshing_server_list = yojimbo_time();
 }

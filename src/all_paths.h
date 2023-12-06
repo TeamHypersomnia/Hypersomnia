@@ -6,7 +6,7 @@
 */
 
 /* 
-	Can be overridden with --documents-dir.
+	Can be overridden with --appdata-dir.
 	If not specified, it will be by default:
 
 	- Windows: Documents/My Games/Hypersomnia/
@@ -14,7 +14,7 @@
 	- MacOS: Just the CWD temporarily.
 */
 
-extern augs::path_type DOCUMENTS_DIR;
+extern augs::path_type APPDATA_DIR;
 
 /* 
 	From where will the game pull its official resources.
@@ -63,11 +63,11 @@ extern augs::path_type DOCUMENTS_DIR;
 	App-data specific.
 */
 
-#define LOGS_DIR (DOCUMENTS_DIR / LOGS_FOLDER_NAME)
-#define CACHE_DIR (DOCUMENTS_DIR / CACHE_FOLDER_NAME)
+#define LOGS_DIR (APPDATA_DIR / LOGS_FOLDER_NAME)
+#define CACHE_DIR (APPDATA_DIR / CACHE_FOLDER_NAME)
 
 /*
-	DOCUMENTS_DIR with appended Steam ID or NONSTEAM_USER_FOLDER_NAME ("user")
+	APPDATA_DIR with appended Steam ID or NONSTEAM_USER_FOLDER_NAME ("user")
 	Must be resolved at runtime.
 */
 

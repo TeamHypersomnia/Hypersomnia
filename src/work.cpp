@@ -191,15 +191,15 @@ work_result work(
 
 	if (is_steam_client) {
 		const auto steam_id = std::to_string(::steam_get_id());
-		::USER_DIR = DOCUMENTS_DIR / steam_id;
+		::USER_DIR = APPDATA_DIR / steam_id;
 	}
 	else {
-		::USER_DIR = DOCUMENTS_DIR / NONSTEAM_USER_FOLDER_NAME;
+		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 	}
 
 	/* Just use the "user" folder when developing */
 #if !IS_PRODUCTION_BUILD
-	::USER_DIR = DOCUMENTS_DIR / NONSTEAM_USER_FOLDER_NAME;
+	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 #endif
 
 #if PLATFORM_UNIX	
@@ -4170,13 +4170,23 @@ work_result work(
 				try {
 					prepare_next_game_frame();
 				}
+				catch (const entity_creation_error& err) {
+					LOG("Failed to create entity: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
 				catch (const std::runtime_error& err) {
 					LOG("Runtime error: %x", err.what());
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}
-				catch (const entity_creation_error& err) {
-					LOG("Failed to create entity: %x", err.what());
+				catch (const std::logic_error& err) {
+					LOG("Logic error: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
+				catch (const std::exception& err) {
+					LOG("Exception: %x", err.what());
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}

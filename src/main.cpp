@@ -16,7 +16,7 @@
 #include "augs/misc/time_utils.h"
 #include "all_paths.h"
 
-augs::path_type DOCUMENTS_DIR;
+augs::path_type APPDATA_DIR;
 augs::path_type USER_DIR;
 
 extern std::mutex log_mutex;
@@ -121,17 +121,22 @@ int main(const int argc, const char* const * const argv) {
 	}
 #endif
 
-	if (!params.documents_dir.empty()) {
-		::DOCUMENTS_DIR = params.documents_dir;
+	if (!params.appdata_dir.empty()) {
+		if (params.appdata_dir.is_absolute()) {
+			::APPDATA_DIR = params.appdata_dir;
+		}
+		else {
+			::APPDATA_DIR = params.appimage_path.parent_path() / params.appdata_dir;
+		}
 	}
 	else {
-		::DOCUMENTS_DIR = augs::get_default_documents_dir();
+		::APPDATA_DIR = augs::get_default_documents_dir();
 	}
 
 	const bool log_directory_existed = augs::exists(LOGS_DIR);
 
 	/* 
-		LOGS_DIR is always in DOCUMENTS_DIR
+		LOGS_DIR is always in APPDATA_DIR
 		so it will create the documents dir as well.
 	*/
 
@@ -169,11 +174,15 @@ int main(const int argc, const char* const * const argv) {
 		LOG(std::string("Live log was enabled due to a flag: --live-log ") + params.live_log_path);
 	}
 
-	if (params.documents_dir.empty()) {
-		LOG("Documents directory: \"%x\" (Default)", params.documents_dir);
+	if (params.appdata_dir.empty()) {
+		LOG("App data directory: \"%x\" (Default)", ::APPDATA_DIR);
 	}
 	else {
-		LOG("Documents directory: \"%x\" (via --documents-dir)", params.documents_dir);
+		LOG(
+			"App data directory: \"%x\" (%x) (via --appdata-dir)", 
+			params.appdata_dir.is_absolute() ? "Absolute" : "Relative",
+			params.appdata_dir
+		);
 	}
 
 	const auto completed_work_result = work(

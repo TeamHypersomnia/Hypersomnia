@@ -9,7 +9,7 @@ struct cmd_line_params {
 
 	std::string live_log_path;
 
-	augs::path_type documents_dir;
+	augs::path_type appdata_dir;
 
 	augs::path_type exe_path;
 	augs::path_type appimage_path;
@@ -159,8 +159,8 @@ struct cmd_line_params {
 			else if (a == "--sync-external-arenas") {
 				sync_external_arenas = true;
 			}
-			else if (a == "--documents-dir") {
-				documents_dir = get_next();
+			else if (a == "--appdata-dir") {
+				appdata_dir = get_next();
 			}
 			else {
 

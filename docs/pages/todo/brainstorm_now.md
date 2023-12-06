@@ -8,21 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- we'll seriously need to support reading user files from a different cwd
-    - + trivial appimage launches
-    - + wont accidentally delete user config on windows or all steam platforms
-    - + simpler self-updater though we can still leave legacy restore/backup logic as it won't hurt
-- Windows also has to be able to read from appdata folder
-    - CLI argument: --roaming-folder
-        - set by AppRun to $HOME/.config so we don't have to call readenv
-        - default will just work like always
-- Implementation
-    - Deciding where to save on Windows
-        - Will have to be something like
-        - %APPDATA%/Roaming/Hypersomnia/847329847
-        - %APPDATA%/Roaming//847329847
-    - Linux also has to consider the steam id
-
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will can have the same config directory
         - Except they will have differing configs for map cycles, no?
