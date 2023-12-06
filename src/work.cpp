@@ -405,7 +405,7 @@ work_result work(
 
 	LOG("Initializing ImGui.");
 
-	const auto imgui_ini_path = std::string(USER_DIR) + "/" + get_preffix_for(current_app_type) + "imgui.ini";
+	const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
 	const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
 	const auto imgui_raii = augs::imgui::context_raii(

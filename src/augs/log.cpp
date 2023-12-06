@@ -34,7 +34,7 @@ std::string live_log_path;
 app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
-	return LOGS_DIR / (get_preffix_for(current_app_type) + name);
+	return (LOGS_DIR / (get_preffix_for(current_app_type) + name)).string();
 }
 
 std::optional<std::string> find_last_incorrect_exit() {

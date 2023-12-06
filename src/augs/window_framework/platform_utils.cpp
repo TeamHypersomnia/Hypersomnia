@@ -147,9 +147,10 @@ namespace augs {
 #endif
 }
 
+#if PLATFORM_WINDOWS
+#include <Shlobj.h>
 
 namespace augs {
-#if PLATFORM_WINDOWS
 	path_type get_default_documents_dir() {
 		char path[MAX_PATH];
 		HRESULT result = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
@@ -162,10 +163,12 @@ namespace augs {
 			return path_type();
 		}
 	}
+}
 #else
+namespace augs {
 	path_type get_default_documents_dir() {
 		/* Default to CWD */
 		return "";
 	}
-#endif
 }
+#endif

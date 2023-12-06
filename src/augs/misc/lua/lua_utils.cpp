@@ -38,7 +38,7 @@ namespace augs {
 		};
 		
 		const auto utils_path = DETAIL_DIR / "utils.lua";
-		const auto pfr = lua.do_file(utils_path);
+		const auto pfr = lua.do_file(utils_path.string());
 
 		if (!pfr.valid()) {
 			throw lua_state_creation_error(
