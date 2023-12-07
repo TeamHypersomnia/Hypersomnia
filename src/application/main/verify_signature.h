@@ -31,7 +31,7 @@ inline ssh_verification_result verify_ssh_signature(
 	augs::save_as_text(allowed_signers, ::SIGNING_PUBLIC_KEY);
 
 	const auto verification_command = typesafe_sprintf(
-		"%x -Y verify -f %x -I hypersomnia -n %x -s %x",
+		"%x -Y verify -f \"%x\" -I hypersomnia -n %x -s \"%x\"",
 		SSH_KEYGEN_BINARY,
 		allowed_signers,
 		ssh_namespace,
