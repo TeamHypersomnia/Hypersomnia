@@ -164,6 +164,39 @@ namespace augs {
 		}
 	}
 }
+#elif PLATFORM_MACOS
+#include <sysdir.h>  // for sysdir_start_search_path_enumeration
+
+static std::string expandTilde(const char* str) {
+	if (!str) return {};
+
+	glob_t globbuf;
+
+	if (glob(str, GLOB_TILDE, nullptr, &globbuf) == 0) {
+		std::string result(globbuf.gl_pathv[0]);
+
+		globfree(&globbuf);
+
+		return result;
+	} 
+	else {
+		return "";
+	}
+}
+
+namespace augs {
+	path_type get_default_documents_dir() {
+		char path[PATH_MAX];
+
+		if (auto state = sysdir_start_search_path_enumeration(SYSDIR_DIRECTORY_APPLICATION_SUPPORT, SYSDIR_DOMAIN_MASK_USER)) {
+			if (sysdir_get_next_search_path_enumeration(state, path)) {
+				return path_type(expandTilde(path)) / "Hypersomnia";
+			}
+		}
+
+		return "";
+	}
+}
 #else
 namespace augs {
 	path_type get_default_documents_dir() {
