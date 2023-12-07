@@ -113,7 +113,7 @@ struct archive_extractor {
 			const auto& source = archive_path;
 			const auto& target = destination_path;
 
-			return typesafe_sprintf("%x -o%x", source, target);
+			return typesafe_sprintf("\"%x\" -o\"%x\"", source, target);
 		}();
 
 		completed_extraction = launch_async(
