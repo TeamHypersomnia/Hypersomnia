@@ -572,6 +572,8 @@ work_result work(
 			last_exit_incorrect_popup = simple_popup { "Warning", full_content, "" };
 		}
 	}
+#else
+	(void)log_directory_existed;
 #endif
 
 	augs::remove_file(get_crashed_controllably_path());

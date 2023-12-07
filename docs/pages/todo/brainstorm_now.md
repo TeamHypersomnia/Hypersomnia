@@ -8,6 +8,8 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- use Application Support folder on MacOS
+
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will can have the same config directory
         - Except they will have differing configs for map cycles, no?

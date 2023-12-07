@@ -6676,3 +6676,6 @@ This will discard your redo history."
         - %APPDATA%/Roaming/Hypersomnia/847329847
         - %APPDATA%/Roaming//847329847
     - Linux also has to consider the steam id
+- "open user folder" should highlight a file inside
+    - just highlight a "config.lua" or create if it doesn't exist
+

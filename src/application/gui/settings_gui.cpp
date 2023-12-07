@@ -572,8 +572,15 @@ void settings_gui_state::perform(
 				text("\n");
 				ImGui::Separator();
 
-				if (ImGui::Button("Reveal user folder in explorer")) {
-					window.reveal_in_explorer(USER_DIR);
+				if (ImGui::Button("Open user folder in explorer")) {
+					const auto config_path = USER_DIR / "config.lua";
+
+					if (!augs::exists(config_path)) {
+						LOG("%x doesn't exist, create a stub", config_path);
+						augs::save_as_text(config_path, "return {}");
+					}
+
+					window.reveal_in_explorer(config_path);
 				}
 
 				if (ImGui::Button("Reset all settings to factory defaults")) {
