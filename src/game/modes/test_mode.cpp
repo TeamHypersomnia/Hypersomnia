@@ -296,7 +296,13 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 		)) {
 			const auto player_id = lookup(typed_handle.get_id());
 
-			if (!find(player_id)->allow_respawn) {
+			const auto player_data = find(player_id);
+
+			if (player_data == nullptr) {
+				return;
+			}
+
+			if (!player_data->allow_respawn) {
 				return;
 			}
 
