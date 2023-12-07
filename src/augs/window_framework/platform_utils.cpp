@@ -166,6 +166,7 @@ namespace augs {
 }
 #elif PLATFORM_MACOS
 #include <sysdir.h>  // for sysdir_start_search_path_enumeration
+#include <glob.h>    // for glob needed to expand ~ to user dir
 
 static std::string expandTilde(const char* str) {
 	if (!str) return {};
