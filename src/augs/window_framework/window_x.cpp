@@ -1025,7 +1025,7 @@ namespace augs {
 			return;
 		}
 
-		const auto shell_command = typesafe_sprintf("%x %x", script_path, p.string());
+		const auto shell_command = typesafe_sprintf("%x \"%x\"", script_path, p.string());
 
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
