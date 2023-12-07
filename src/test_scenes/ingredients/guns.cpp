@@ -2753,7 +2753,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1.8");
+			charge_deposit_def.space_available = to_space_units("1.4");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -2811,7 +2811,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.13");
+			charge_deposit_def.space_available = to_space_units("0.12");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -3962,7 +3962,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 4.f;
+			gun_def.damage_multiplier = 30.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 1.02f;
@@ -3983,7 +3983,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 700;
+			meta.get<invariants::item>().standard_price = 800;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -4005,7 +4005,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 4.7f;
+			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 1.25f;
@@ -4075,7 +4075,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1300;
+			meta.get<invariants::item>().standard_price = 1100;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::COVERT_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
