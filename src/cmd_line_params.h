@@ -42,6 +42,7 @@ struct cmd_line_params {
 
 	std::optional<port_type> first_udp_command_port;
 	std::optional<port_type> server_list_port;
+	std::optional<port_type> server_port;
 
 	bool is_updater = false;
 	augs::path_type verified_archive;
@@ -105,6 +106,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;
+			}
+			else if (a == "--server-port") {
+				server_port = std::atoi(get_next());
 			}
 			else if (a == "--no-router") {
 				no_router = true;

@@ -8,7 +8,13 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- use Application Support folder on MacOS
+- Cross-platform autocloud
+    - For flags that have different defaults depending on the OS, we should simply use e.g. std::optional<bool> and resolve the OS-specific default at logic-time
+
+- Join game should work with LAN
+    - Try connecting to the internal server
+
+- Further simplifications to settings
 
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will can have the same config directory

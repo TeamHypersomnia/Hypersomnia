@@ -135,7 +135,7 @@ Or will you join the underground civilization that awaits the end of war in this
     - To achieve it in *Hypersomnia*, I had to: 
       - Use the same compiler - ``clang`` - on **all** OSes. It's very nice of LLVM to be ieee754-compliant by default.
       - Replace all math functions like ``std::sin``, ``std::sqrt`` by these from [STREFLOP.](https://nicolas.brodu.net/programmation/streflop/index.html)
-      - ..after which ``streflop::sqrt`` became a huge bottleneck - thankfully, I found another efficient [ieee754-compliant implementation.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/3rdparty/streflop/libm/flt-32/e_sqrtf.h)
+      - ..after which ``streflop::sqrt`` became a huge bottleneck - thankfully, I found another efficient [ieee754-compliant implementation.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/3rdparty/streflop/libm/flt-32/e_sqrtf.cpp)
   - Apart from worrying about floats.. 
     - I had to watch out even when iterating ``std::unordered_map`` - often replacing them with deterministically ordered ``std::map``.
     - I had to use a [portable RNG (xorshift)](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/augs/misc/xorshift.hpp), ditching the entire ``<random>`` header (its implementation differs across OSes).

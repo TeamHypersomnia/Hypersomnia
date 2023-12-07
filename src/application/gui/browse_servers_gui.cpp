@@ -18,6 +18,7 @@
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
 #include "augs/misc/httplib_utils.h"
+#include "application/network/resolve_address.h"
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;
@@ -1078,15 +1079,18 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 const server_list_entry* browse_servers_gui_state::find_entry(const client_start_input& in) const {
 	const auto queried_addr_and_port = in.get_address_and_port();
 
-	LOG("Finding the server entry by: %x:%x", queried_addr_and_port.address, queried_addr_and_port.default_port);
-	LOG("Number of servers in the browser: %x", server_list.size());
-
 	if (const auto connected_address = to_netcode_addr(queried_addr_and_port)) {
+		LOG("Finding the server entry by: %x", ::ToString(*connected_address));
+		LOG("Number of servers in the browser: %x", server_list.size());
+
 		for (auto& s : server_list) {
 			if (s.address == *connected_address) {
 				return &s;
 			}
 		}
+	}
+	else {
+		LOG("find_entry: couldn't parse %x (default port: %x)", queried_addr_and_port.address, queried_addr_and_port.default_port);
 	}
 
 	return nullptr;

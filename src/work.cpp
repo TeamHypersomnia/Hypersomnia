@@ -273,11 +273,6 @@ work_result work(
 #endif
 #endif
 
-#if IS_PRODUCTION_BUILD
-		result.client.suppress_webhooks = false;
-		result.server.suppress_new_community_server_webhook = false;
-#endif
-
 		/* Tweak performance defaults */
 
 		const auto concurrency = std::thread::hardware_concurrency();
@@ -612,6 +607,10 @@ work_result work(
 	}
 
 	auto chosen_server_port = [&](){
+		if (params.server_port.has_value()) {
+			return *params.server_port;
+		}
+
 		return config.server_start.port;
 	};
 
@@ -1755,11 +1754,24 @@ work_result work(
 				launch_setup(activity_type::SERVER);
 			}
 			else {
+				const auto chosen_port = get_bound_local_port();
+				LOG_NVPS(get_bound_local_port(), chosen_server_port());
+
 				auxiliary_socket.reset();
 
-				augs::restart_application(argc, argv, params.exe_path.string(), { "--dedicated-server" });
+				const auto cmd_line = typesafe_sprintf(
+					"--dedicated-server --server-port %x",
+					chosen_port
+				);
+
+				augs::restart_application(argc, argv, params.exe_path.string(), { cmd_line });
 				config.client_start.displayed_connecting_server_name = "local dedicated server";
-				config.client_start.set_custom(typesafe_sprintf("%x:%x", config.server_start.ip, chosen_server_port()));
+
+				const auto address_str = typesafe_sprintf("%x:%x", config.server_start.ip, chosen_port);
+
+				LOG("Connecting to the launched dedicated server at: %x", address_str);
+
+				config.client_start.set_custom(address_str);
 
 				launch_setup(activity_type::CLIENT);
 			}

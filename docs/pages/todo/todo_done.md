@@ -6679,3 +6679,5 @@ This will discard your redo history."
 - "open user folder" should highlight a file inside
     - just highlight a "config.lua" or create if it doesn't exist
 
+- use Application Support folder on MacOS
+
