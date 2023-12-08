@@ -128,6 +128,12 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 }
 
 bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) const {
+	const bool is_dotfile = begins_with(path.filename().string(), ".");
+
+	if (is_dotfile) {
+		return true;
+	}
+
 	return 
 		path == project_json
 		|| path == legacy_autosave_json

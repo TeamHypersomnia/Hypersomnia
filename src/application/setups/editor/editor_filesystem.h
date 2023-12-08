@@ -305,7 +305,10 @@ struct editor_filesystem_node {
 
 				if (folder) {
 					new_node.type = editor_filesystem_node_type::FOLDER;
-					subfolders.emplace_back(std::move(new_node));
+
+					if (!hidden_in_explorer) {
+						subfolders.emplace_back(std::move(new_node));
+					}
 				}
 				else {
 					const auto extension = filename.extension().string();
