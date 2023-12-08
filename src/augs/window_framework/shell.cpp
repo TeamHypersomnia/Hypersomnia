@@ -174,7 +174,7 @@ namespace augs {
 		if (login != nullptr) {
 			return std::string(login);
 		}
-		struct passwd *pw = getpwuid(geteuid());
+		struct passwd *pw = getpwuid(getuid());
 		if (pw != nullptr) {
 			return std::string(pw->pw_name);
 		}
