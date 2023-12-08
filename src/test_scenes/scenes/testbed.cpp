@@ -312,10 +312,10 @@ static void save_all_reported_weapons() {
 
 	reported = true;
 
-	augs::save_as_json(reported_firearms, LOGS_DIR / "all_firearms.json");
-	augs::save_as_json(reported_melees, LOGS_DIR / "all_melees.json");
-	augs::save_as_json(reported_explosives, LOGS_DIR / "all_explosives.json");
-	augs::save_as_json(reported_spells, LOGS_DIR / "all_spells.json");
+	augs::save_as_json(reported_firearms, LOGS_DIR / "firearms.json");
+	augs::save_as_json(reported_melees, LOGS_DIR / "melees.json");
+	augs::save_as_json(reported_explosives, LOGS_DIR / "explosives.json");
+	augs::save_as_json(reported_spells, LOGS_DIR / "spells.json");
 }
 
 test_mode_ruleset::test_mode_ruleset() {

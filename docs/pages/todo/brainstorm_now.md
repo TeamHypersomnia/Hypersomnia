@@ -8,8 +8,11 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- Cross-platform autocloud
-    - For flags that have different defaults depending on the OS, we should simply use e.g. std::optional<bool> and resolve the OS-specific default at logic-time
+- First let's handle the servers, even then the press kit
+
+- Integrating discord API would be nice
+
+- Add steam logo to github
 
 - Join game should work with LAN
     - Try connecting to the internal server

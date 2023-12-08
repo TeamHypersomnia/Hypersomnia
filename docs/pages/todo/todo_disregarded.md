@@ -678,3 +678,10 @@ summary: Just a hidden scratchpad.
         - hard to detect against backpacks i guess
     - dont autokill, let's just implement fist fighting
 
+
+- Cross-platform autocloud
+    - For flags that have different defaults depending on the OS, we should simply use e.g. std::optional<bool> and resolve the OS-specific default at logic-time
+- DISREGARDED: why?
+	- Dont wanna introduce another delay when launching
+	- Settings for different platforms might vary too much
+	- Otherwise the only thing left to sync is maps which are too big imo and should be managed carefully anyway (don't want to have them overwritten)

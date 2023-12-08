@@ -466,7 +466,7 @@ namespace augs {
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& full_path) {
-		const auto command = augs::path_type(typesafe_sprintf("open -a Finder \"%x\"", full_path));
+		const auto command = augs::path_type(typesafe_sprintf("open -R -a Finder \"%x\"", full_path));
 		shell(command);
 	}
 
