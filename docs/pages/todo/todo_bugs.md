@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- bogbosbinted glitch
+	- likely paths in cache are broken esp with spaces
+- cant write polish characters when launching from steam
+
+- shuncio bug
+	- game crashed in main menu 
+
 - pepsik bug
 	- Launching through steam gives no textures
 	- set_display error when setting fullscreen
