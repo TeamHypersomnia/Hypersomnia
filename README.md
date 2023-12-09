@@ -15,6 +15,10 @@ Challenge your friend to an intense duel, or gather two clans to fight a spectac
 Written in modern C++, without a game engine!
 Forever free and open-source :heart: 
 
+# Steam wishlist open!
+
+<a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" height=140 hspace=1> </a>
+
 # Download the game
 
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" height=70 hspace=1> </a>
