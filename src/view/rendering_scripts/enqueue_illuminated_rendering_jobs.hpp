@@ -82,6 +82,7 @@ void enqueue_illuminated_rendering_jobs(
 	};
 
 	auto sentience_hud_job = [&cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+		(void)fog_of_war_effective;
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {

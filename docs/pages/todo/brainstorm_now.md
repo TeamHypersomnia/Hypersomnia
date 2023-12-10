@@ -8,6 +8,8 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- update weapons stats
+
 - First let's handle the servers, even then the press kit
 
 - Integrating discord API would be nice
