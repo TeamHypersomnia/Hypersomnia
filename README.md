@@ -126,7 +126,7 @@ Or will you join the underground civilization that awaits the end of war in this
 
 # Tech highlights
 
-- **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D)** written for packing textures was used in **[Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
+- **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
   - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers.](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=)
 - My Entity-Component-System **[idea from 2013](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)** describes techniques similar to **[Unity Engine patent from 2018.](https://patents.google.com/patent/US10599560B2/en)**
   - **[See this discussion.](https://github.com/TeamHypersomnia/Hypersomnia/issues/264)**
@@ -332,7 +332,7 @@ Or will you join the underground civilization that awaits the end of war in this
 
 *Hypersomnia* has been in development **since 2013** (as seen in the commit history).
 
-It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money as much as I could. My financial decisions allowed me to focus entirely on *Hypersomnia*.
+It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money as much as I could which let me focus entirely on *Hypersomnia* for at least 5 years uninterrupted.
 
 I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
 
