@@ -332,7 +332,7 @@ Or will you join the underground civilization that awaits the end of war in this
 
 *Hypersomnia* has been in development **since 2013** (as seen in the commit history).
 
-It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money as much as I could which let me focus entirely on *Hypersomnia* for at least 5 years uninterrupted.
+It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money to be able to work less and focus on *Hypersomnia*. My financial decisions now let me develop the game full-time.
 
 I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
 
