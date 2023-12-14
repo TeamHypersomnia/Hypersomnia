@@ -31,7 +31,7 @@ struct pathed_asset_widget {
 	) const {
 		static_assert(handles<T>);
 
-		return typesafe_sprintf("Set %x to %x", formatted_label, augs::filename_first(get_viewable_pool<T>(defs)[to].get_source_path().path));
+		return typesafe_sprintf("Set %x to %x", formatted_label, augs::filename_first(get_viewable_pool<T>(defs)[to].get_loadable_path().path));
 	}
 
 	template <class T>
@@ -52,9 +52,9 @@ struct pathed_asset_widget {
 		/* Definitions might get altered so we need to keep a copy */
 		const auto found_def = mapped_or_nullptr(definitions, object);
 
-		using P = remove_cref<decltype(found_def->get_source_path())>;
+		using P = remove_cref<decltype(found_def->get_loadable_path())>;
 
-		const auto current_source = found_def ? P(found_def->get_source_path()) : P();
+		const auto current_source = found_def ? P(found_def->get_loadable_path()) : P();
 
 		chooser.perform(identity_label, current_source, project_path, on_choice, true_returner());
 

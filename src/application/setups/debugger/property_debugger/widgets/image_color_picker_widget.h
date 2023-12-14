@@ -33,7 +33,7 @@ struct image_color_picker_widget {
 	}
 
 	void update_preview() const {
-		const auto& p = defs[id].get_source_path();
+		const auto& p = defs[id].get_loadable_path();
 
 		if (current_preview.path != p) {
 			current_preview.image.from_file(p.resolve(project_path));

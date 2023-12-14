@@ -299,7 +299,7 @@ void create_official_filesystem_from(
 					new_node.name = typed_resource.cached_official_name;
 
 					if (auto sprite = flavour.template find<invariants::sprite>()) {
-						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
+						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_loadable_path().resolve({});
 					}
 
 					if (auto animation = flavour.template find<invariants::animation>()) {

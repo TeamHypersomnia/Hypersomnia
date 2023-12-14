@@ -739,7 +739,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 							auto result = new_node.custom_thumbnail_path;
 
 							if (auto sprite = flavour.template find<invariants::sprite>()) {
-								result = built_officials.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
+								result = built_officials.viewables.image_definitions[sprite->image_id].get_loadable_path().resolve({});
 							}
 
 							if (auto animation = flavour.template find<invariants::animation>()) {

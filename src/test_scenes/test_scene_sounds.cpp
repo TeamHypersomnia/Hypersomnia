@@ -51,7 +51,7 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 		try_with(stem);
 		try_with(path(stem) += "_1");
 
-		if (!definition.get_source_path().path.empty()) {
+		if (!definition.get_loadable_path().path.empty()) {
 			const auto new_allocation = all_definitions.allocate(std::move(definition));
 			(void)new_allocation;
 			(void)id;

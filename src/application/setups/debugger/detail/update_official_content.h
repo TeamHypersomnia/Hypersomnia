@@ -82,7 +82,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 
 	auto find_and_remap_by_path = [&](const auto& reference_pool, const auto& target_pool, auto& field) {
 		if (const auto found = mapped_or_nullptr(reference_pool, field)) {
-			const auto source_path = found->get_source_path();
+			const auto source_path = found->get_loadable_path();
 
 			if (const auto found_in_new = ::find_asset_id_by_path(source_path, target_pool)) {
 				field = *found_in_new;
@@ -147,7 +147,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 
 	auto add_pathed_assets = [&](auto& custom, const auto& official, const std::string& type_name) {
 		for (const auto& o : official) {
-			const auto source_path = o.get_source_path();
+			const auto source_path = o.get_loadable_path();
 			const auto existing_custom_asset = find_asset_id_by_path(source_path, custom);
 
 			if (existing_custom_asset.has_value()) {

@@ -23,7 +23,7 @@ struct sound_definition {
 		source_sound = p;
 	}
 
-	const auto& get_source_path() const {
+	const auto& get_loadable_path() const {
 		return source_sound;
 	}
 };

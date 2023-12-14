@@ -55,7 +55,7 @@ struct image_definition {
 		return source_image;
 	}
 
-	auto get_source_path() const {
+	auto get_loadable_path() const {
 		const bool is_generated_in_cache = get_source_gif_path() != std::nullopt;
 
 		if (is_generated_in_cache) {

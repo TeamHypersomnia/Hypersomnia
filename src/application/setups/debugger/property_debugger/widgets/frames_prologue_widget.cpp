@@ -89,7 +89,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 			const auto& frames = source_animation.frames;
 
 			const auto& first_image_def = image_defs[frames[0].image_id];
-			const auto& first_source_path = first_image_def.get_source_path();
+			const auto& first_source_path = first_image_def.get_loadable_path();
 			const auto first_path_no_ext = augs::path_type(first_source_path.path).replace_extension("");
 
 			frames_type new_frames;

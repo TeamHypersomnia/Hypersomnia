@@ -23,7 +23,7 @@ public:
 		T& d
 	) : 
 		def(d), 
-		resolved_source_path(d.get_source_path().resolve(project_dir)),
+		resolved_source_path(d.get_loadable_path().resolve(project_dir)),
 		project_dir(project_dir)
 	{
 	}

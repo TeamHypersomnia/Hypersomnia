@@ -27,7 +27,7 @@ I get_id_or_import(
 		def_type def;
 		def.set_source_path(source_path);
 
-		const auto resolved = def.get_source_path().resolve(project_path);
+		const auto resolved = def.get_loadable_path().resolve(project_path);
 
 		::load_meta_lua_if_exists(in.lua, def.meta, resolved);
 

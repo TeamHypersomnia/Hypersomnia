@@ -66,7 +66,7 @@ void create_unpathed_asset_id_command<I>::undo(const debugger_command_input in) 
 
 template <class I>
 std::string create_pathed_asset_id_command<I>::describe() const {
-	return typesafe_sprintf("Started tracking asset file: %x", construct_from.get_source_path().filename_first());
+	return typesafe_sprintf("Started tracking asset file: %x", construct_from.get_loadable_path().filename_first());
 }
 
 template <class I>

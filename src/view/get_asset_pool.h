@@ -48,10 +48,10 @@ auto& access_asset_pool(E&& cmd_in, cosmos_common_significant_access access) {
 template <class T>
 decltype(auto) get_displayed_name(const T& object) {
 	if constexpr(std::is_same_v<T, sound_definition>) {
-		return cut_trailing_number_and_spaces(object.get_source_path().get_prettified_filename());
+		return cut_trailing_number_and_spaces(object.get_loadable_path().get_prettified_filename());
 	}
 	else {
-		return object.get_source_path().get_prettified_filename();
+		return object.get_loadable_path().get_prettified_filename();
 	}
 }
 

@@ -57,7 +57,7 @@ void load_test_scene_images(
 		image_definition definition;
 		definition.set_source_path({ at_stem.string(), true });
 
-		const auto resolved_no_ext = definition.get_source_path().resolve({});
+		const auto resolved_no_ext = definition.get_loadable_path().resolve({});
 		const auto with_existent_ext = augs::first_existing_extension(resolved_no_ext, augs::IMAGE_EXTENSIONS);
 
 		if (with_existent_ext.empty()) {

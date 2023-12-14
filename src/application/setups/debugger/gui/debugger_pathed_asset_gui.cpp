@@ -129,7 +129,7 @@ void debugger_pathed_asset_gui<asset_id_type>::perform(
 
 	for_each_id_and_object(definitions,
 		[&](const asset_id_type id, const def_type& object) mutable {
-			const auto path = object.get_source_path();
+			const auto path = object.get_loadable_path();
 			auto new_entry = asset_entry_type(path, id);
 
 #if BUILD_LOCATION_FINDERS
