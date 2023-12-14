@@ -8,16 +8,14 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- Join game should work with LAN
+    - Try connecting to the internal server
+
 - update weapons stats
 
 - First let's handle the servers, even then the press kit
 
 - Integrating discord API would be nice
-
-- Add steam logo to github
-
-- Join game should work with LAN
-    - Try connecting to the internal server
 
 - Further simplifications to settings
 

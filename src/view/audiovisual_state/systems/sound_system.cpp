@@ -243,20 +243,6 @@ void sound_system::generic_sound_cache::eat_followup() {
 	followup_inputs.erase(followup_inputs.begin());
 }
 
-static float convert_audio_volume(const float slider) {
-    constexpr float min_log = 0.001;
-    constexpr float max_log = 1.0;
-
-    if (slider <= 0) {
-        return 0;
-    }
-	else if (slider < min_log) {
-        return slider * min_log / min_log;
-    } 
-
-	return min_log * std::pow(max_log / min_log, slider);
-}
-
 void sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
 
@@ -367,19 +353,17 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const bool is_nonlinear = !is_linear && dist_model != augs::distance_model::NONE;
 
-	const auto mult_via_settings = std::clamp(::convert_audio_volume([&]() -> float {
-		const auto master = in.volume.master;
-
+	const auto mult_via_settings = [&]() {
 		if (original.input.modifier.always_direct_listener) {
 			if (const auto buf = source.buffer_meta; buf.is_set()) {
 				if (buf.computed_length_in_seconds > in.settings.treat_as_music_sounds_longer_than_secs) {
-					return master * in.volume.music;
+					return in.volume.get_music_volume();
 				}
 			}
 		}
 
-		return master * in.volume.sound_effects;
-	}()), 0.f, 1.f);
+		return in.volume.get_sound_effects_volume();
+	}();
 
 	const auto flash_mult = in.owner.get_effective_flash_mult();
 

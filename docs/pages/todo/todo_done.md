@@ -6681,3 +6681,5 @@ This will discard your redo history."
 
 - use Application Support folder on MacOS
 
+- Add steam logo to github
+

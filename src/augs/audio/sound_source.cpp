@@ -22,6 +22,20 @@ int g_num_sources = 0;
 #endif
 
 namespace augs {
+	float convert_audio_volume(const float slider) {
+		constexpr float min_log = 0.001;
+		constexpr float max_log = 1.0;
+
+		if (slider <= 0) {
+			return 0;
+		}
+		else if (slider < min_log) {
+			return slider * min_log / min_log;
+		} 
+
+		return min_log * std::pow(max_log / min_log, slider);
+	}
+
 	sound_source::sound_source() {
 #if BUILD_OPENAL
 		alGenSources(1, &id);
