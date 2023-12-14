@@ -8,8 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- gungame level up sound
-
 - update weapons stats
 
 - First let's handle the servers, even then the press kit
