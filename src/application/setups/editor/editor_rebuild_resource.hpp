@@ -1,6 +1,8 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
 
+augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
+
 template <class R, class F>
 void allocate_flavours_and_assets_for_resource(
 	const R& resource,
@@ -112,7 +114,7 @@ void allocate_flavours_and_assets_for_resource(
 						This way we won't have to specify RESOLVED flag here.
 					*/
 
-					new_definition.source_image.path = CACHE_DIR / resolve_path(resource.external_file.path_in_project);
+					new_definition.source_image.path = ::get_path_in_cache(resolve_path(resource.external_file.path_in_project));
 					new_definition.source_image.path += typesafe_sprintf(".%x.png", i);
 					new_definition.source_image.is_official = maybe_official_image_path::RESOLVED;
 

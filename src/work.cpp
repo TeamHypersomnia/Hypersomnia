@@ -4213,6 +4213,11 @@ work_result work(
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}
+				catch (const std::ios_base::failure& err) {
+					LOG("std::ios_base::failure: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
 				catch (...) {
 					LOG("Unknown error.");
 					game_thread_result = work_result::FAILURE;

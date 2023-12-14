@@ -6,12 +6,20 @@
 #include "view/viewables/image_definition.h"
 #include "view/viewables/regeneration/desaturations.h"
 
+augs::path_type get_path_in_cache(const augs::path_type& from_source_path) {
+	if (::begins_with(from_source_path.string(), OFFICIAL_CONTENT_DIR.string())) {
+		return CACHE_DIR / from_source_path;
+	}
+
+	return CACHE_DIR / std::filesystem::relative(from_source_path, USER_DIR);
+}
+
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
-	return CACHE_DIR / from_source_path.relative_path().replace_extension(".neon_map.png").string();
+	return get_path_in_cache(from_source_path).replace_extension(".neon_map.png").string();
 }
 
 augs::path_type get_desaturation_path(augs::path_type from_source_path) {
-	return CACHE_DIR / from_source_path.relative_path().replace_extension(".desaturation.png").string();
+	return get_path_in_cache(from_source_path).replace_extension(".desaturation.png").string();
 }
 
 augs::path_type image_definition_view::calc_custom_neon_map_path() const {

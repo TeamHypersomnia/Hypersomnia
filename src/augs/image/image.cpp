@@ -264,6 +264,9 @@ namespace augs {
 		catch (const image_loading_error& err) {
 			throw;
 		}
+		catch (const augs::file_open_error& err) {
+			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
+		}
 		catch (const std::exception& err) {
 			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
 		}

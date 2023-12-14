@@ -87,8 +87,9 @@ void regenerate_and_gather_subjects(
 	}
 
 	if (!gifs_to_regenerate.empty()) {
-		for (const auto& gif : gifs_to_regenerate) {
-			auto new_job = [&gif]() {
+		for (const auto& gif_rel : gifs_to_regenerate) {
+			auto new_job = [&gif_rel]() {
+				const auto gif = USER_DIR / gif_rel;
 				const auto frames = augs::image::gif_to_frames(gif);
 
 				LOG("Regenerate gif: %x (%x frames)", gif, frames.size());
@@ -101,7 +102,7 @@ void regenerate_and_gather_subjects(
 					augs::image img; 
 					img.from_bytes(frame.serialized_frame, "dummy.bin");
 
-					auto generated_png_path = CACHE_DIR / gif;
+					auto generated_png_path = CACHE_DIR / gif_rel;
 					generated_png_path += typesafe_sprintf(".%x.png", i);
 					LOG("Generated_png_path: %x. Creating directories.", generated_png_path);
 
@@ -110,7 +111,7 @@ void regenerate_and_gather_subjects(
 					img.save_as_png(generated_png_path);
 				};
 
-				auto stamp_path = CACHE_DIR / gif;
+				auto stamp_path = CACHE_DIR / gif_rel;
 				stamp_path += ".stamp";
 
 				augs::save_as_bytes(augs::last_write_time(gif), stamp_path);
