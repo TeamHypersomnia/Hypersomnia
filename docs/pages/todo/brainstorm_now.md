@@ -8,8 +8,16 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- Join game should work with LAN
-    - Try connecting to the internal server
+- Fix Steam invites over LAN
+    - 1) Connecting to a server that is actually over lan
+        - easy - just ping internal address during connection
+    - 2) Correct rich presence for a server we connected to over LAN from invite
+    - 3) Correct rich presence for a server we connected to over LAN from CLI/custom connect
+        - Server has to let you know its address
+
+    - Also the rich presence string should show the external address, not internal
+    - Join game should work with LAN
+        - Try connecting to the internal server
 
 - update weapons stats
 

@@ -217,7 +217,6 @@ class client_setup :
 	void send_pending_commands();
 	void send_packets();
 	void exchange_file_packets();
-	void traverse_nat_if_required();
 
 	template <class T, class F>
 	message_handler_result handle_payload(
@@ -351,7 +350,6 @@ class client_setup :
 		{
 			auto scope = measure_scope(performance.sending_packets);
 			send_packets();
-			traverse_nat_if_required();
 		}
 
 		if (in_game) {

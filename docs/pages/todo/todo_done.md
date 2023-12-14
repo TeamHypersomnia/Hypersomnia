@@ -6683,3 +6683,14 @@ This will discard your redo history."
 
 - Add steam logo to github
 
+
+- bogbosbinted glitch
+	- likely paths in cache are broken esp with spaces
+- cant write polish characters when launching from steam
+- pepsik bug
+	- Launching through steam gives no textures
+	- set_display error when setting fullscreen
+	- non-steam client works though
+	- issue with steam overlay wanting to take hold of our display?
+	- maybe we should sort out the window problems once and for all
+

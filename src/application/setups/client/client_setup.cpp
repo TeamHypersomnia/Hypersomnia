@@ -998,16 +998,6 @@ void client_setup::special_request(const special_client_request r) {
 	pending_requests.push_back(r);
 }
 
-void client_setup::traverse_nat_if_required() {
-	if (is_replaying()) {
-		return;
-	}
-
-	if (!adapter->is_connecting()) {
-		return;
-	}
-}
-
 file_chunk_index_type client_setup::calc_num_chunks_per_tick() const {
 	const auto inv_tickrate = default_inv_tickrate;
 

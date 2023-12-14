@@ -166,7 +166,6 @@ class server_setup :
 	std::future<std::optional<netcode_address_t>> future_internal_address;
 	std::optional<netcode_address_t> internal_address;
 
-	std::future<std::optional<netcode_address_t>> future_external_address;
 	std::optional<netcode_address_t> external_address;
 
 	net_time_t server_time = 0.0;

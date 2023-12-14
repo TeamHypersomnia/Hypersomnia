@@ -66,6 +66,17 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_ALL, "");
 	std::setlocale(LC_NUMERIC, "C");
 
+	/*
+		For some reason, when launching through Steam, Polish characters didn't work.
+		This is because std::setlocale(LC_ALL, "") results in LC_ALL being set to "C", 
+		even though a non-Steam client will correctly set it to e.g. en_US.UTF-8.
+	
+		Setting LC_CTYPE to a locale-agnostic UTF-8 encoding seems to fix this.
+	*/
+#if PLATFORM_LINUX
+	std::setlocale(LC_CTYPE, "C.UTF-8");
+#endif
+
 	const auto params = cmd_line_params(argc, argv);
 
 	if (params.version_line_only) {
