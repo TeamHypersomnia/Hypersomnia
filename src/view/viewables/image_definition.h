@@ -20,6 +20,8 @@ namespace sol {
 	class state;
 }
 
+augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
+
 struct image_definition {
 	// GEN INTROSPECTOR struct image_definition
 	maybe_official_image_path source_image;
@@ -37,8 +39,33 @@ struct image_definition {
 		source_image = p;
 	}
 
-	const auto& get_source_path() const {
+	std::optional<augs::path_type> get_source_gif_path() const {
+		auto path = source_image.path;
+
+		if (path.extension() == ".png") {
+			if (path.replace_extension("").replace_extension("").extension() == ".gif") {
+				return path;
+			}
+		}
+
+		return std::nullopt;
+	};
+
+	auto get_specified_source_path() const {
 		return source_image;
+	}
+
+	auto get_source_path() const {
+		const bool is_generated_in_cache = get_source_gif_path() != std::nullopt;
+
+		if (is_generated_in_cache) {
+			auto path = source_image;
+			path.path = ::get_path_in_cache(path.path);
+
+			return path;
+		}
+
+		return get_specified_source_path();
 	}
 };
 

@@ -15,6 +15,8 @@
 #include "augs/readwrite/to_bytes.h"
 #include "augs/filesystem/directory.h"
 
+augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
+
 static bool should_regenerate(
 	const augs::path_type& source,
 	const augs::path_type& stamp
@@ -55,42 +57,24 @@ void regenerate_and_gather_subjects(
 	std::unordered_set<augs::path_type> gifs_to_regenerate;
 
 	for (const auto& d : in.image_definitions) {
-		const auto def = make_view(d);
-		auto path = def.get_source_image_path();
+		if (const auto path = d.get_source_gif_path()) {
+			const auto& original_gif_path = *path;
+			auto stamp_path = ::get_path_in_cache(*path);
+			stamp_path += ".stamp";
 
-		if (path.extension() == ".png") {
-			if (path.replace_extension("").replace_extension("").extension() == ".gif") {
-				auto stamp_path = path;
-				stamp_path += ".stamp";
-
-				auto cache_preffix = CACHE_DIR.string();
-				auto original_gif_path = path.string();
-
-				/* Remove first folder */
-
-				if (begins_with(original_gif_path, cache_preffix)) {
-					cut_preffix(original_gif_path, cache_preffix);
-
-					if (original_gif_path.size() > 0) {
-						/* Remove separator */
-						original_gif_path.erase(original_gif_path.begin());
-
-						if (!found_in(gifs_to_regenerate, original_gif_path)) {
-							if (should_regenerate(original_gif_path, stamp_path)) {
-								gifs_to_regenerate.emplace(original_gif_path);
-							}
-						}
-					}
+			if (!found_in(gifs_to_regenerate, original_gif_path)) {
+				if (::should_regenerate(original_gif_path, stamp_path)) {
+					gifs_to_regenerate.emplace(original_gif_path);
 				}
 			}
 		}
 	}
 
 	if (!gifs_to_regenerate.empty()) {
-		for (const auto& gif_rel : gifs_to_regenerate) {
-			auto new_job = [&gif_rel]() {
-				const auto gif = USER_DIR / gif_rel;
+		for (const auto& gif : gifs_to_regenerate) {
+			auto new_job = [&gif]() {
 				const auto frames = augs::image::gif_to_frames(gif);
+				const auto generated_png_path_base = ::get_path_in_cache(gif);
 
 				LOG("Regenerate gif: %x (%x frames)", gif, frames.size());
 
@@ -102,7 +86,7 @@ void regenerate_and_gather_subjects(
 					augs::image img; 
 					img.from_bytes(frame.serialized_frame, "dummy.bin");
 
-					auto generated_png_path = CACHE_DIR / gif_rel;
+					auto generated_png_path = generated_png_path_base;
 					generated_png_path += typesafe_sprintf(".%x.png", i);
 					LOG("Generated_png_path: %x. Creating directories.", generated_png_path);
 
@@ -111,7 +95,7 @@ void regenerate_and_gather_subjects(
 					img.save_as_png(generated_png_path);
 				};
 
-				auto stamp_path = CACHE_DIR / gif_rel;
+				auto stamp_path = generated_png_path_base;
 				stamp_path += ".stamp";
 
 				augs::save_as_bytes(augs::last_write_time(gif), stamp_path);

@@ -31,7 +31,7 @@ struct subjects_gathering_input {
 	/* Necessary definitions are initialized once, and never modified later on. */
 	const necessary_image_definitions_map& necessary_image_definitions;
 
-	const image_definitions_map image_definitions;
+	image_definitions_map image_definitions;
 	const all_gui_fonts_inputs gui_font_inputs;
 	const augs::path_type unofficial_project_dir;
 	atlas_progress_structs* const progress;
@@ -53,12 +53,6 @@ struct general_atlas_output {
 };
 
 struct atlas_input_subjects;
-
-void regenerate_and_gather_subjects(
-	subjects_gathering_input,
-	atlas_input_subjects& output,
-	augs::time_measurements& neon_regeneration_performance
-);
 
 general_atlas_output create_general_atlas(
 	general_atlas_input in,
