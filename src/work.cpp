@@ -1,3 +1,28 @@
+/*
+	BEFORE YOU CONTINUE:
+
+	If it's your first time reading the codebase...
+	work.cpp is arguably the most complex source file in Hypersomnia, boasting over 4000 lines of code.
+
+	Why?
+
+	It's where the top-most level flow control happens.
+	Examples of what you'll find here:
+
+	- Initializing window, audio, renderers and passing them by reference to whatever subsystems might require them.
+	- Client connecting from the command line.
+	- Interactions between all the top-level app modules like e.g. editor hosting a server, tutorial exiting to the main menu etc.
+	- Keeping the separately running game thread that continuously produces frames to be rendered on the main thread.
+	- Inputs being propagated to either gui or gameplay.
+	- Running the main loop:
+		- waiting on a game thread to produce a frame,
+		- calling GL commands on the main thread,
+		- finally swapping window buffers.
+
+	It would be extremely counterproductive to separate it into many files because the above tasks are inherently interconnected.
+	I believe it's the simplest to just have everything that relates to the main game loop in a single function: "work".
+*/
+
 #if PLATFORM_UNIX
 #include <csignal>
 #endif
