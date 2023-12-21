@@ -272,6 +272,7 @@ work_result work(
 	const auto canon_config_path = augs::path_type("default_config.lua");
 	const auto local_config_path = USER_DIR / "config.lua";
 	const auto force_config_path = USER_DIR / "config.force.lua";
+	const auto private_config_path = USER_DIR / "config.private.lua";
 
 	LOG("Creating lua state.");
 	auto lua = augs::create_lua_state();
@@ -346,6 +347,10 @@ work_result work(
 
 		if (augs::exists(force_config_path)) {
 			result->load_patch(lua, force_config_path);
+		}
+
+		if (augs::exists(private_config_path)) {
+			result->load_patch(lua, private_config_path);
 		}
 
 		if (params.no_router) {
