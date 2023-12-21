@@ -166,7 +166,7 @@ struct cmd_line_params {
 				sync_external_arenas = true;
 			}
 			else if (a == "--sync-external-arenas-and-quit") {
-				sync_external_arenas = true;
+				sync_external_arenas_and_quit = true;
 			}
 			else if (a == "--appdata-dir") {
 				appdata_dir = get_next();
