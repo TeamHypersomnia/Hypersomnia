@@ -775,6 +775,7 @@ work_result work(
 
 		{
 			bool sync = false;
+			bool quit_after_sync = false;
 
 			if (config.server.sync_all_external_arenas_on_startup) {
 				LOG("sync_all_external_arenas_on_startup specified.");
@@ -783,6 +784,11 @@ work_result work(
 			else if (params.sync_external_arenas) {
 				LOG("--sync-external-arenas specified.");
 				sync = true;
+			}
+			else if (params.sync_external_arenas_and_quit) {
+				LOG("--sync-external-arenas-and-quit specified.");
+				sync = true;
+				quit_after_sync = true;
 			}
 
 			if (sync) {
@@ -861,6 +867,10 @@ work_result work(
 				}
 				else {
 					LOG("Couldn't parse arena provider URL: \"%x\". Aborting sync.", provider);
+				}
+
+				if (quit_after_sync) {
+					return work_result::SUCCESS;
 				}
 			}
 		}

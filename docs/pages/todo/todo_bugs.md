@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- dont do nat traversal when replaying a demo
+
 - shuncio bug
 	- game crashed in main menu 
 

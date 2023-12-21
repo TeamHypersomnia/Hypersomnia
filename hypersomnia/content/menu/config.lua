@@ -17,7 +17,6 @@ return {
   },
 
   audio_volume = {
-    sound_effects = 0.3,
     music = 0.15
   },
 
