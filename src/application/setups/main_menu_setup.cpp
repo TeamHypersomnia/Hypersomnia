@@ -184,7 +184,7 @@ main_menu_setup::main_menu_setup(
 	initial_step_number = cosm.get_total_steps_passed();
 
 #if 0
-	gui.root.buttons[main_menu_button_type::PLAY_ON_THE_OFFICIAL_SERVER].set_appearing_caption("Connect to official server");
+	gui.root.buttons[main_menu_button_type::QUICK_PLAY].set_appearing_caption("Connect to official server");
 	gui.root.buttons[main_menu_button_type::BROWSE_SERVERS].set_appearing_caption("Browse servers");
 	gui.root.buttons[main_menu_button_type::HOST_SERVER].set_appearing_caption("Host server");
 	gui.root.buttons[main_menu_button_type::CONNECT_TO_SERVER].set_appearing_caption("Connect to server");

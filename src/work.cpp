@@ -2527,7 +2527,7 @@ work_result work(
 
 				break;
 
-			case T::PLAY_ON_THE_OFFICIAL_SERVER:
+			case T::QUICK_PLAY:
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {

@@ -71,7 +71,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(main_menu_button_type::PLAY_ON_THE_OFFICIAL_SERVER);
+			button_callback(main_menu_button_type::QUICK_PLAY);
 			return true;
 		}
 
