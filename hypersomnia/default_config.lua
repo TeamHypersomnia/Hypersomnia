@@ -66,7 +66,8 @@ return {
 
   official_arena_servers = {
 	"arena.hypersomnia.xyz",
-	"arena-us.hypersomnia.xyz"
+	"arena-us.hypersomnia.xyz",
+	"arena-de.hypersomnia.xyz"
   },
 
   client_start = {
