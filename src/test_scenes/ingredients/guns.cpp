@@ -3647,7 +3647,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HUNTER, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.8f);
+			set_density_mult(meta, 0.2f);
 			make_default_gun_container(meta, item_holding_stance::SNIPER_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SNIPER_DRAW);
 			meta.get<invariants::item>().standard_price = 2400;
