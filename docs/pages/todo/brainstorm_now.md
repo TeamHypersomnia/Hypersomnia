@@ -10,9 +10,6 @@ summary: That which we are brainstorming at the moment.
 
 - discord logo on gh
 
-- buff deagle
-- host_with_default_port -> host_and_default_port
-
 - Credits
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will have its own config directory

@@ -6694,3 +6694,5 @@ This will discard your redo history."
 	- issue with steam overlay wanting to take hold of our display?
 	- maybe we should sort out the window problems once and for all
 
+- buff deagle
+- host_with_default_port -> host_and_default_port

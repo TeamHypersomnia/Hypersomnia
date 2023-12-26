@@ -13,9 +13,11 @@ Online shooter with relentless dynamics.
 Challenge your friend to an intense duel, or gather two clans to fight a spectacular war.  
 
 Written in modern C++, without a game engine!
-Forever free and open-source :heart: 
+Forever free and open-source :heart:
+### Join us:
 
-# [📰 Press Kit](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
+<a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
+
 # Steam wishlist open!
 
 <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" height=140 hspace=1> </a>
@@ -47,6 +49,7 @@ The game will start with an **interactive Tutorial!**
 
 [ifun.de](https://www.ifun.de/hypersomnia-freier-multiplayer-shooter-fuer-mac-win-und-linux-212657/) | [GAMINGDEPUTY](https://www.gamingdeputy.com/hypersomnia-is-a-free-multiplayer-shooter-for-mac-win-and-linux/)
 
+# [📰 Press Kit](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
 
 # Watch gameplay
 
