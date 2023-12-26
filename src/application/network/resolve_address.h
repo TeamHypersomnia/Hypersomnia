@@ -5,7 +5,7 @@
 #include "application/network/resolve_address_result.h"
 #include "augs/network/port_type.h"
 #include "augs/filesystem/path.h"
-#include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_connect_string.h"
 
 namespace yojimbo {
 	class Address;

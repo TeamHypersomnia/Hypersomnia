@@ -8,7 +8,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_connect_string.h"
 #include "augs/log.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/misc/time_utils.h"

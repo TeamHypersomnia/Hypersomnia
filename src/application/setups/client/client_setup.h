@@ -2,7 +2,7 @@
 #include <future>
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
-#include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_connect_string.h"
 #include "application/intercosm.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/window_framework/window.h"
-#include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_connect_string.h"
 #include "application/setups/client/client_vars.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
@@ -10,6 +10,7 @@
 #include "augs/graphics/frame_num_type.h"
 #include "hypersomnia_version.h"
 #include "application/setups/client/demo_file.h"
+#include "application/gui/start_client_tab_type.h"
 
 namespace augs {
 	class window;

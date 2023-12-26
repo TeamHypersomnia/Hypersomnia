@@ -7,7 +7,7 @@
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/netcode_socket_raii.h"
-#include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_connect_string.h"
 #include "view/faction_view_settings.h"
 
 #include <chrono>
