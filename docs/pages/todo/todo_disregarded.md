@@ -685,3 +685,12 @@ summary: Just a hidden scratchpad.
 	- Dont wanna introduce another delay when launching
 	- Settings for different platforms might vary too much
 	- Otherwise the only thing left to sync is maps which are too big imo and should be managed carefully anyway (don't want to have them overwritten)
+
+
+    - Each instance will have the same config directory
+        - Except they will have differing configs for map cycles, no?
+            - We can make a --config CLI to read another config from the cwd that works like config.force.lua
+                - server1.force.lua
+                - server2.force.lua (all can be next to config.force.lua)
+                - etc.
+            - Otherwise they'll all just read from .config/Hypersomnia or local folder

@@ -23,26 +23,9 @@
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
-address_and_port client_start_input::get_address_and_port() const {
-	if (chosen_address_type == connect_address_type::OFFICIAL) {
-		return { preferred_official_address, default_port };
-	}
-
-	return { custom_address, default_port };
-}
-
-void client_start_input::set_custom(const std::string& target) { 
-	custom_address = target;
-	chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
-}
-
-void client_start_input::set_official(const std::string& target) { 
-	preferred_official_address = target;
-	chosen_address_type = connect_address_type::OFFICIAL;
-}
-
 void start_client_gui_state::clear_demo_choice() {
 	demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
+	demo_path.clear();
 	demo_meta = {};
 	demo_size = {};
 }
@@ -52,7 +35,7 @@ bool start_client_gui_state::perform(
 	augs::renderer& renderer,
 	augs::graphics::texture& avatar_preview_tex,
 	augs::window& window,
-	client_start_input& into_start,
+	client_connect_string& into_connect_string,
 	client_vars& into_vars,
 	const std::vector<std::string>& official_arena_servers
 ) {
@@ -72,16 +55,16 @@ bool start_client_gui_state::perform(
 
 	bool result = false;
 
-	if (into_start.chosen_address_type == connect_address_type::REPLAY) {
-		using D = demo_choice_result_type;
+	{
+		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
-		auto& demo_path = into_start.replay_demo;
+		do_pretty_tabs(current_tab);
 
-		{
-			auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
-			auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
+		// auto& scope_cfg = into;
 
-			do_pretty_tabs(into_start.chosen_address_type);
+		if (current_tab == start_client_tab_type::REPLAY) {
+			using D = demo_choice_result_type;
 
 			thread_local demo_chooser chooser;
 
@@ -101,12 +84,12 @@ bool start_client_gui_state::perform(
 				ImGui::SameLine();
 			}
 
-			if (ImGui::Button("Folder in explorer")) {
+			if (ImGui::Button("Demo folder in explorer")) {
 				window.reveal_in_explorer(DEMOS_DIR);
 			}
 
 			chooser.perform(
-				"replay_demo_chooser",
+				"##replay_demo_chooser",
 				demo_path.string(),
 				augs::path_type(DEMOS_DIR),
 				[&](const auto& new_choice) {
@@ -165,42 +148,7 @@ bool start_client_gui_state::perform(
 				text(demo_meta.version.get_summary());
 			}
 		}
-
-		{
-			auto scope = scoped_child("replay cancel");
-
-			ImGui::Separator();
-
-			{
-				const bool result_good = demo_choice_result == D::OK || demo_choice_result == D::MIGHT_BE_INCOMPATIBLE;
-
-				auto scope = maybe_disabled_cols({}, !result_good || demo_path.empty());
-
-				if (ImGui::Button("Replay!")) {
-					result = true;
-					//show = false;
-				}
-			}
-
-			ImGui::SameLine();
-
-			if (ImGui::Button("Cancel")) {
-				show = false;
-			}
-		}
-
-		return result;
-	}
-
-	{
-		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
-		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
-
-		do_pretty_tabs(into_start.chosen_address_type);
-
-		// auto& scope_cfg = into;
-
-		if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
 #if IS_PRODUCTION_BUILD
@@ -218,7 +166,7 @@ bool start_client_gui_state::perform(
 			checkbox("Show", show);
 		}
 		else {
-			auto& preferred = into_start.preferred_official_address;
+			auto& preferred = last_best_server;
 
 			if (preferred.empty()) {
 				if (official_arena_servers.size() > 0) {
@@ -514,7 +462,7 @@ bool start_client_gui_state::perform(
 		text_disabled("You can later rewatch your match in Replay tab.");
 
 		if (const bool show_browser_tip = false) {
-			if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+			if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 				text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
 			}
 		}
@@ -527,27 +475,37 @@ bool start_client_gui_state::perform(
 
 		ImGui::Separator();
 
-		{
+		if (current_tab == start_client_tab_type::REPLAY) {
+			using D = demo_choice_result_type;
+
+			const bool result_good = demo_choice_result == D::OK || demo_choice_result == D::MIGHT_BE_INCOMPATIBLE;
+
+			auto scope = maybe_disabled_cols({}, !result_good || demo_path.empty());
+
+			if (ImGui::Button("Replay!")) {
+				result = true;
+				into_connect_string = typesafe_sprintf("%x%x", demo_address_preffix_v, demo_path);
+				//show = false;
+			}
+		}
+		else {
 			const bool custom_addr_empty = 
-				into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS
+				current_tab == start_client_tab_type::CUSTOM_ADDRESS
 				&& custom_address.empty()
 			;
 
 			auto scope = maybe_disabled_cols({}, custom_addr_empty || !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
-				clear_demo_choice();
-				into_start.replay_demo.clear();
-
-				if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
-					into_start.displayed_connecting_server_name = "";
-					into_start.custom_address = custom_address;
-				}
-				else if (into_start.chosen_address_type == connect_address_type::OFFICIAL) {
-					into_start.displayed_connecting_server_name = into_start.preferred_official_address;
-				}
-				else if (into_start.chosen_address_type == connect_address_type::REPLAY) {
-					into_start.displayed_connecting_server_name = "demo replay";
+				switch (current_tab) {
+					case start_client_tab_type::BEST:
+						into_connect_string = last_best_server;
+						break;
+					case start_client_tab_type::CUSTOM_ADDRESS:
+						into_connect_string = custom_address;
+						break;
+					default:
+						break;
 				}
 
 				result = true;

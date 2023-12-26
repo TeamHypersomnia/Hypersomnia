@@ -70,17 +70,6 @@ return {
 	"arena-de.hypersomnia.xyz"
   },
 
-  client_start = {
-  	default_port = 8412,
-	custom_address = "127.0.0.1",
-
-	chosen_address_type = "OFFICIAL",
-
-	preferred_official_address = "",
-
-	replay_demo = ""
-  },
-
   app_controls = {
     F1 = "SHOW_PERFORMANCE",
     --F9 = "TOGGLE_STREAMER_MODE",
@@ -829,6 +818,8 @@ treat_as_music_sounds_longer_than_secs = 5,
     max_bots = 0,
     max_direct_file_bandwidth = 6
   },
+
+  client_connect = "127.0.0.1",
 
   client = {
 	nickname = "",

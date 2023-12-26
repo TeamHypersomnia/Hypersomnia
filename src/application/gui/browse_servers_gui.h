@@ -7,11 +7,11 @@
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/netcode_socket_raii.h"
+#include "application/setups/client/client_start_input.h"
 #include "view/faction_view_settings.h"
 
 #include <chrono>
 
-struct client_start_input;
 struct nat_detection_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
@@ -60,7 +60,9 @@ struct server_list_entry {
 
 struct browse_servers_input {
 	const address_and_port& server_list_provider;
-	client_start_input& client_start;
+	client_connect_string& client_connect;
+	std::string& displayed_connecting_server_name;
+
 	const std::vector<std::string>& official_arena_servers;
 	const faction_view_settings& faction_view;
 	const bool streamer_mode;
@@ -138,13 +140,13 @@ public:
 
 	bool perform(browse_servers_input);
 
-	void sync_download_server_entry(browse_servers_input, const client_start_input& in);
+	void sync_download_server_entry(browse_servers_input, const client_connect_string& in);
 
 	void advance_ping_logic();
 
 	void reping_all_servers();
 
-	const server_list_entry* find_entry(const client_start_input& in) const;
+	const server_list_entry* find_entry(const client_connect_string& in) const;
 
 	bool refreshed_at_least_once() const;
 };

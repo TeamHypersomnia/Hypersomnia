@@ -116,7 +116,7 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib::Resu
 
 void browse_servers_gui_state::sync_download_server_entry(
 	const browse_servers_input in,
-	const client_start_input& server
+	const client_connect_string& server
 ) {
 	LOG("Calling sync_download_server_entry.");
 
@@ -1060,15 +1060,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	if (requested_connection.has_value()) {
-		in.client_start.set_custom(::ToString(*requested_connection));
-		in.client_start.displayed_connecting_server_name = displayed_connecting_server_name;
+		in.client_connect = ::ToString(*requested_connection);
+		in.displayed_connecting_server_name = displayed_connecting_server_name;
 
 		return true;
 	}
 
 	if (requested_official_connection.has_value()) {
-		in.client_start.set_official(*requested_official_connection);
-		in.client_start.displayed_connecting_server_name = displayed_connecting_server_name;
+		in.client_connect = *requested_official_connection;
+		in.displayed_connecting_server_name = displayed_connecting_server_name;
 
 		return true;
 	}
@@ -1076,11 +1076,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	return false;
 }
 
-const server_list_entry* browse_servers_gui_state::find_entry(const client_start_input& in) const {
-	const auto queried_addr_and_port = in.get_address_and_port();
-
-	if (const auto connected_address = to_netcode_addr(queried_addr_and_port)) {
-		LOG("Finding the server entry by: %x", ::ToString(*connected_address));
+const server_list_entry* browse_servers_gui_state::find_entry(const client_connect_string& in) const {
+	if (const auto connected_address = ::find_netcode_addr(in)) {
+		LOG("Finding the server entry by: %x", in);
 		LOG("Number of servers in the browser: %x", server_list.size());
 
 		for (auto& s : server_list) {
@@ -1090,7 +1088,7 @@ const server_list_entry* browse_servers_gui_state::find_entry(const client_start
 		}
 	}
 	else {
-		LOG("find_entry: couldn't parse %x (default port: %x)", queried_addr_and_port.address, queried_addr_and_port.default_port);
+		LOG("find_entry: Not an IP address: %x.", in);
 	}
 
 	return nullptr;

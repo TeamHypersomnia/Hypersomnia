@@ -174,7 +174,7 @@ struct config_lua_table {
 	server_private_vars server_private;
 	augs::dedicated_server_input dedicated_server;
 
-	client_start_input client_start;
+	client_connect_string client_connect;
 	client_vars client;
 	performance_settings performance;
 

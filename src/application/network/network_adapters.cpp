@@ -74,7 +74,7 @@ game_connection_config::game_connection_config() {
 }
 
 void game_connection_config::set_max_packet_size(const unsigned s) {
-	protocolId = 8412;
+	protocolId = DEFAULT_GAME_PORT_V;
 
 	maxPacketSize = s;
     maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );
@@ -302,15 +302,23 @@ std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string
 	return from;
 }
 
-std::optional<netcode_address_t> to_netcode_addr(const std::string& ip, const port_type port) {
-	struct netcode_address_t addr;
+std::optional<augs::path_type> find_demo_path(const client_connect_string& str) {
+	if (begins_with(str, demo_address_preffix_v)) {
+		auto path = str;
+		cut_preffix(path, demo_address_preffix_v);
 
-	if (NETCODE_OK == netcode_parse_address(ip.c_str(), &addr)) {
-		addr.port = port;
-		return addr;
+		return path;
 	}
 
-	return std::nullopt;
+	return {};
+}
+
+std::optional<netcode_address_t> find_netcode_addr(const client_connect_string& str) {
+	address_and_port in;
+	in.address = str;
+	in.default_port = DEFAULT_GAME_PORT_V;
+
+	return find_netcode_addr(in);
 }
 
 netcode_address_t to_netcode_addr(const yojimbo::Address& t) {
@@ -347,7 +355,7 @@ std::future<resolve_address_result> async_resolve_address(const address_and_port
 	return launch_async([in]() { return resolve_address(in); });
 }
 
-std::optional<netcode_address_t> to_netcode_addr(const address_and_port& in) {
+std::optional<netcode_address_t> find_netcode_addr(const address_and_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
 
@@ -486,9 +494,13 @@ std::future<std::optional<netcode_address_t>> async_get_internal_network_address
 	return launch_async([]() { return get_internal_network_address(); });
 }
 
-resolve_address_result client_adapter::connect(const address_and_port& in) {
+resolve_address_result client_adapter::connect(const client_connect_string& str) {
 	uint64_t clientId;
 	yojimbo::random_bytes((uint8_t*)&clientId, 8);
+
+	address_and_port in;
+	in.address = str;
+	in.default_port = DEFAULT_GAME_PORT_V;
 
 	const auto resolved_addr = resolve_address(in);
 
@@ -499,10 +511,10 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 	connected_ip_address = resolved_addr.addr;
 	const auto& target_addr = to_yojimbo_addr(resolved_addr.addr);
 
-	auto local_addr = yojimbo::Address("127.0.0.1", 8412);
+	auto local_addr = yojimbo::Address("127.0.0.1", DEFAULT_GAME_PORT_V);
 
 	if (target_addr.GetType() == yojimbo::AddressType::ADDRESS_IPV6) {
-		local_addr = yojimbo::Address("::1", 8412);
+		local_addr = yojimbo::Address("::1", DEFAULT_GAME_PORT_V);
 	}
 
 	local_addr.SetPort(target_addr.GetPort());

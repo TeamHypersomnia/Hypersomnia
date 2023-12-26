@@ -4,7 +4,7 @@
 struct address_and_port {
 	// GEN INTROSPECTOR struct address_and_port
 	address_string_type address = "127.0.0.1";
-	port_type default_port = 8412;
+	port_type default_port = DEFAULT_GAME_PORT_V;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const address_and_port& b) const {

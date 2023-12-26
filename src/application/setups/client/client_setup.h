@@ -101,7 +101,7 @@ class client_setup :
 	const packaged_official_content& official;
 
 	simulation_receiver receiver;
-	address_and_port connect_addr;
+	client_connect_string connect_string;
 
 	std::optional<netcode_address_t> before_traversal_server_address;
 	std::string displayed_connecting_server_name;
@@ -593,7 +593,8 @@ public:
 	client_setup(
 		sol::state& lua,
 		const packaged_official_content& official,
-		const client_start_input&,
+		const client_connect_string&,
+		const std::string& displayed_connecting_server_name,
 		const client_vars& initial_vars,
 		const nat_detection_settings& nat_detection,
 		port_type preferred_binding_port,
@@ -685,13 +686,14 @@ public:
 
 				{
 					auto& l = lua;
+					const auto disp_backup = displayed_connecting_server_name;
+					const auto& official = this->official;
 
-					client_start_input client_in;
-					client_in.replay_demo = player_backup.source_path;
+					const auto in_string = connect_string;
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, official, client_in, vars_backup, nat_detection_settings(), port_type(0), std::nullopt);
+					new (this) client_setup(l, official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt);
 				}
 
 				demo_player = std::move(player_backup);

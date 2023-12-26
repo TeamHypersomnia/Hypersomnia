@@ -40,7 +40,7 @@ class client_adapter {
 
 public:
 	client_adapter(std::optional<port_type> preferred_binding_port, client_auxiliary_command_callback_type);
-	resolve_address_result connect(const address_and_port&);
+	resolve_address_result connect(const client_connect_string&);
 
 	template <class H>
 	void advance(

@@ -192,7 +192,7 @@ void client_setup::flush_demo_steps() {
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;
 				meta.server_name = displayed_connecting_server_name;
-				meta.server_address = connect_addr.address;
+				meta.server_address = connect_string;
 				meta.version = hypersomnia_version();
 				meta.when_recorded = augs::date_time().get_utc_timestamp();
 				augs::write_bytes(out, meta);
@@ -294,7 +294,8 @@ bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n)
 client_setup::client_setup(
 	sol::state& lua,
 	const packaged_official_content& official,
-	const client_start_input& in,
+	const client_connect_string& connect_string,
+	const std::string& displayed,
 	const client_vars& initial_vars,
 	const nat_detection_settings& nat_detection,
 	const port_type preferred_binding_port,
@@ -302,9 +303,9 @@ client_setup::client_setup(
 ) : 
 	lua(lua),
 	official(official),
-	connect_addr(in.get_address_and_port()),
+	connect_string(connect_string),
 	before_traversal_server_address(before_traversal_server_address),
-	displayed_connecting_server_name(in.displayed_connecting_server_name),
+	displayed_connecting_server_name(displayed.empty() ? connect_string : displayed),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(preferred_binding_port, [this](std::byte* bytes, std::size_t n) {
 		return handle_auxiliary_command(bytes, n);
@@ -314,18 +315,18 @@ client_setup::client_setup(
 {
 	(void)nat_detection;
 
-	LOG("Initializing connection with %x", connect_addr.address);
+	LOG("Initializing connection with %x", connect_string);
 
-	const auto& input_demo_path = in.replay_demo;
+	const auto input_demo_path = ::find_demo_path(connect_string);
 
-	if (!input_demo_path.empty() && in.chosen_address_type == connect_address_type::REPLAY) {
+	if (input_demo_path.has_value()) {
 		const auto error = typesafe_sprintf(
 			"Failed to open demo file:\n%x", 
-			input_demo_path
+			*input_demo_path
 		);
 
 		try {
-			play_demo_from(input_demo_path);
+			play_demo_from(*input_demo_path);
 		}
 		catch (const augs::file_open_error& err) {
 			set_disconnect_reason(error + "\n" + err.what(), true);
@@ -357,7 +358,7 @@ client_setup::client_setup(
 		else {
 			augs::network::enable_detailed_logs(true);
 
-			const auto resolution = adapter->connect(connect_addr);
+			const auto resolution = adapter->connect(connect_string);
 
 			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 				const auto reason = typesafe_sprintf(
@@ -369,11 +370,11 @@ client_setup::client_setup(
 			}
 			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 				const auto reason = typesafe_sprintf(
-					"You have entered an invalid address!", connect_addr.address
+					"You have entered an invalid address!", connect_string
 				);
 
 				set_disconnect_reason(reason);
-				LOG("Address: \"%x\"", connect_addr.address);
+				LOG("Address: \"%x\"", connect_string);
 			}
 			else {
 				resolved_server_address = resolution.addr;

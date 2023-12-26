@@ -7,7 +7,7 @@ struct masterserver_settings {
 	unsigned server_entry_timeout_secs = 60;
 	unsigned suppress_community_server_webhooks_after_launch_for_secs = 20;
 
-	port_type first_udp_command_port = 8430;
+	port_type first_udp_command_port = DEFAULT_MASTERSERVER_PORT_V;
 	int num_udp_command_ports = 5;
 
 	port_type server_list_port = 8420;

@@ -107,7 +107,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
 
-		if (const auto new_local_address = to_netcode_addr(settings.ip, new_port)) {
+		if (auto new_local_address = ::find_netcode_addr(settings.ip)) {
+			new_local_address->port = new_port;
 			udp_command_sockets.emplace_back(*new_local_address);
 		}
 		else {

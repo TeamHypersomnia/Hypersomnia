@@ -294,7 +294,6 @@ work_result work(
 		result.server.suppress_new_community_server_webhook = true;
 
 #if PLATFORM_UNIX
-		result.client_start.chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
 		result.window.fullscreen = false;
 #endif
 #endif
@@ -1113,6 +1112,7 @@ work_result work(
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 	map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
+	std::string displayed_connecting_server_name;
 
 	auto emplace_main_menu = [&map_catalogue_gui, &p = main_menu] (auto&&... args) {
 		if (p == nullptr) {
@@ -1122,7 +1122,7 @@ work_result work(
 	};
 
 	auto find_chosen_server_info = [&]() {
-		return browse_servers_gui.find_entry(config.client_start);
+		return browse_servers_gui.find_entry(config.client_connect);
 	};
 
 	ingame_menu_gui ingame_menu;
@@ -1384,7 +1384,8 @@ work_result work(
 	auto get_browse_servers_input = [&]() {
 		return browse_servers_input {
 			config.server_list_provider,
-			config.client_start,
+			config.client_connect,
+			displayed_connecting_server_name,
 			config.official_arena_servers,
 			config.faction_view,
 			config.streamer_mode && config.streamer_mode_flags.community_servers
@@ -1410,17 +1411,17 @@ work_result work(
 			LOG("Finished NAT traversal. Connecting immediately.");
 		}
 		else {
-			if (config.client_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+			if (const bool is_ip_address = find_netcode_addr(config.client_connect).has_value()) {
 				if (!browse_servers_gui.refreshed_at_least_once()) {
 					/* 
-						If we're connecting to a custom server via CLI
-						(either via Steam API, CLI flag or relaunching with last remembered activity)
+						If we're connecting to a specific IP address - as opposed to e.g. a domain -
+						either via Steam API, CLI flag or relaunching with last remembered activity -
 						we need to ask the server list to know if the server is behind NAT.
 					*/
 
 					browse_servers_gui.sync_download_server_entry(
 						get_browse_servers_input(),
-						config.client_start
+						config.client_connect
 					);
 				}
 				else {
@@ -1464,13 +1465,16 @@ work_result work(
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
 				*official,
-				config.client_start,
+				config.client_connect,
+				displayed_connecting_server_name,
 				config.client,
 				config.nat_detection,
 				bound_port,
 				before_traversal_server_address
 			);
 		});
+
+		displayed_connecting_server_name.clear();
 
 		save_last_activity(activity_type::CLIENT);
 
@@ -1643,8 +1647,8 @@ work_result work(
 
 	auto next_nat_traversal_attempt = [&]() {
 		const auto& server_nat = chosen_server_nat;
-		const auto& client_start = config.client_start;
-		const auto traversed_address = to_netcode_addr(client_start.get_address_and_port());
+		const auto& client_connect = config.client_connect;
+		const auto traversed_address = find_netcode_addr(client_connect);
 
 		ensure(traversed_address.has_value());
 		ensure(nat_detection_complete());
@@ -1689,8 +1693,8 @@ work_result work(
 		const auto state = nat_traversal->get_current_state();
 
 		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
-			const auto before_traversal_server_address = ::to_netcode_addr(config.client_start.get_address_and_port());
-			config.client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
+			const auto before_traversal_server_address = ::find_netcode_addr(config.client_connect);
+			config.client_connect = ::ToString(nat_traversal->get_opened_address());
 			nat_traversal.reset();
 
 			finalize_pending_launch(before_traversal_server_address);
@@ -1708,7 +1712,7 @@ work_result work(
 	auto start_client_setup = [&]() {
 		change_with_save(
 			[&](auto& cfg) {
-				cfg.client_start = config.client_start;
+				cfg.client_connect = config.client_connect;
 				cfg.client = config.client;
 			}
 		);
@@ -1761,7 +1765,7 @@ work_result work(
 			get_general_renderer(), 
 			streaming.avatar_preview_tex, 
 			window, 
-			config.client_start, 
+			config.client_connect, 
 			config.client,
 			config.official_arena_servers
 		);
@@ -1805,13 +1809,13 @@ work_result work(
 				);
 
 				augs::restart_application(argc, argv, params.exe_path.string(), { cmd_line });
-				config.client_start.displayed_connecting_server_name = "local dedicated server";
+				displayed_connecting_server_name = "local dedicated server";
 
 				const auto address_str = typesafe_sprintf("%x:%x", config.server_start.ip, chosen_port);
 
 				LOG("Connecting to the launched dedicated server at: %x", address_str);
 
-				config.client_start.set_custom(address_str);
+				config.client_connect = address_str;
 
 				launch_setup(activity_type::CLIENT);
 			}
@@ -2205,13 +2209,13 @@ work_result work(
 			if (address_string.length() > 0) {
 				LOG("(Steam Callback) Joining server (length: %x): %x", address_string.length(), address_string);
 
-				config.client_start.set_custom(address_string);
+				config.client_connect = address_string;
 
 				/* We must know if it's behind NAT */
 
 				browse_servers_gui.sync_download_server_entry(
 					get_browse_servers_input(),
-					config.client_start
+					config.client_connect
 				);
 
 				start_client_setup();
@@ -2528,25 +2532,24 @@ work_result work(
 				break;
 
 			case T::QUICK_PLAY:
-				start_client_gui.open();
-
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 					client_start_requested = true;
 				}
 				else {
-					config.client_start.chosen_address_type = connect_address_type::OFFICIAL;
+					start_client_gui.open();
+					start_client_gui.current_tab = start_client_tab_type::BEST;
 				}
 
 				break;
 
 			case T::CONNECT_TO_SERVER:
-				start_client_gui.open();
-
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 					client_start_requested = true;
 				}
-
-				config.client_start.chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
+				else {
+					start_client_gui.open();
+					start_client_gui.current_tab = start_client_tab_type::CUSTOM_ADDRESS;
+				}
 
 				break;
 				
@@ -3040,7 +3043,7 @@ work_result work(
 		auto connect_to = [&](const auto& target) {
 			if (!target.empty()) {
 				change_with_save([&](config_lua_table& cfg) {
-					cfg.client_start.set_custom(target);
+					cfg.client_connect = target;
 				});
 			}
 

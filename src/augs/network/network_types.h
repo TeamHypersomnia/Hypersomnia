@@ -4,6 +4,21 @@
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/port_type.h"
 
+/*
+	Dhp XX, 273 (Thanissaro)
+
+	8 - Of paths, the eightfold is best.
+	4 - Of truths, the four sayings.
+	1 - Of qualities, dispassion.
+	2 - Of two-footed beings,
+		the one with the eyes
+		to see.
+*/
+constexpr port_type DEFAULT_GAME_PORT_V = 8412;
+
+constexpr port_type DEFAULT_MASTERSERVER_PORT_V = 8430;
+constexpr const char* demo_address_preffix_v = "demo://";
+
 constexpr std::size_t max_avatar_bytes_v = 64 * 1024;
 constexpr std::size_t max_avatar_side_v = 80;
 
