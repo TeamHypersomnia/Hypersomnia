@@ -3,7 +3,7 @@
 #include <optional>
 #include "application/network/resolve_address_result.h"
 #include "application/nat/stun_request_structs.h"
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "augs/network/network_types.h"
 #include "application/nat/netcode_packet_queue.h"
 #include "augs/misc/log_function.h"
@@ -26,7 +26,7 @@ class stun_session {
 	log_function log_info;
 
 public: 
-	const address_and_port host;
+	const host_with_default_port host;
 
 	enum class state {
 		RESOLVING_STUN_HOST,
@@ -35,7 +35,7 @@ public:
 		COMPLETED
 	};
 
-	stun_session(const address_and_port& host, log_function log_info);
+	stun_session(const host_with_default_port& host, log_function log_info);
 
 	std::optional<netcode_address_t> query_result() const;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "augs/templates/maybe.h"
 
 struct nat_traversal_settings {

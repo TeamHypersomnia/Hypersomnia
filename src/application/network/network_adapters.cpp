@@ -314,7 +314,7 @@ std::optional<augs::path_type> find_demo_path(const client_connect_string& str) 
 }
 
 std::optional<netcode_address_t> find_netcode_addr(const client_connect_string& str) {
-	address_and_port in;
+	host_with_default_port in;
 	in.address = str;
 	in.default_port = DEFAULT_GAME_PORT_V;
 
@@ -351,11 +351,11 @@ yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
 	return yojimbo::Address(t.data.ipv6, t.port);
 }
 
-std::future<resolve_address_result> async_resolve_address(const address_and_port& in) {
+std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in) {
 	return launch_async([in]() { return resolve_address(in); });
 }
 
-std::optional<netcode_address_t> find_netcode_addr(const address_and_port& in) {
+std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
 
@@ -378,7 +378,7 @@ std::optional<netcode_address_t> find_netcode_addr(const address_and_port& in) {
 	return std::nullopt;
 }
 
-resolve_address_result resolve_address(const address_and_port& in) {
+resolve_address_result resolve_address(const host_with_default_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
 
@@ -498,7 +498,7 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 	uint64_t clientId;
 	yojimbo::random_bytes((uint8_t*)&clientId, 8);
 
-	address_and_port in;
+	host_with_default_port in;
 	in.address = str;
 	in.default_port = DEFAULT_GAME_PORT_V;
 

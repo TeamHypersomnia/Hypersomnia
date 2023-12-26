@@ -5,7 +5,7 @@
 
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "application/nat/nat_detection_settings.h"
 #include "application/network/resolve_address_result.h"
 #include "application/nat/nat_type.h"
@@ -63,7 +63,7 @@ class nat_detection_session {
 
 	void analyze_results(port_type source_port);
 
-	address_and_port get_next_stun_host();
+	host_with_default_port get_next_stun_host();
 
 	void advance_resolution_of_stun_hosts();
 	void advance_resolution_of_port_probing_host();

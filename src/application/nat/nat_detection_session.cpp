@@ -34,7 +34,7 @@ std::string nat_detection_result::describe() const {
 	}
 }
 
-address_and_port nat_detection_session::get_next_stun_host() {
+host_with_default_port nat_detection_session::get_next_stun_host() {
 	return stun_provider.get_next();
 }
 

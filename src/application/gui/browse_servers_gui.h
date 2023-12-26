@@ -15,7 +15,7 @@
 struct nat_detection_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
-struct address_and_port;
+struct host_with_default_port;
 struct resolve_address_result;
 
 using official_addrs = std::vector<resolve_address_result>;
@@ -59,7 +59,7 @@ struct server_list_entry {
 };
 
 struct browse_servers_input {
-	const address_and_port& server_list_provider;
+	const host_with_default_port& server_list_provider;
 	client_connect_string& client_connect;
 	std::string& displayed_connecting_server_name;
 

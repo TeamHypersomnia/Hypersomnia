@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/filesystem/path_declaration.h"
 
-struct address_and_port;
+struct host_with_default_port;
 
 using stun_counter_type = int;
 
@@ -14,9 +14,9 @@ struct stun_server_provider {
 
 	stun_server_provider(const augs::path_type& list_file);
 	void load(const augs::path_type& list_file);
-	address_and_port get_next();
+	host_with_default_port get_next();
 
-	address_and_port get_next_port_probe(const nat_port_probing_settings&);
+	host_with_default_port get_next_port_probe(const nat_port_probing_settings&);
 
 	double seconds_to_wait_for_next(double usage_cooldown_secs) const;
 };

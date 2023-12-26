@@ -82,12 +82,12 @@ void stun_server_provider::load(const augs::path_type& list_file) {
 
 double yojimbo_time();
 
-address_and_port stun_server_provider::get_next() {
+host_with_default_port stun_server_provider::get_next() {
 	if (servers.empty()) {
 		return {};
 	}
 
-	auto result = address_and_port();
+	auto result = host_with_default_port();
 	result.default_port = 3478;
 
 	const auto current_server_i = current_stun_server % servers.size();
@@ -100,7 +100,7 @@ address_and_port stun_server_provider::get_next() {
 	return result;
 }
 
-address_and_port stun_server_provider::get_next_port_probe(const nat_port_probing_settings& settings) {
+host_with_default_port stun_server_provider::get_next_port_probe(const nat_port_probing_settings& settings) {
 	auto result = settings.host;
 
 	const auto num_available_without_first = settings.num_available - 1;

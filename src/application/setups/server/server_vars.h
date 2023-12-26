@@ -4,7 +4,7 @@
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_vector.h"
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "application/setups/server/server_webhook_vars.h"
 #include "augs/misc/secure_hash.h"
 #include "application/arena/arena_playtesting_context.h"
@@ -69,7 +69,7 @@ struct server_vars {
 	std::optional<arena_playtesting_context> playtesting_context;
 
 	server_name_type server_name;
-	address_and_port notified_server_list;
+	host_with_default_port notified_server_list;
 	bool suppress_new_community_server_webhook = false;
 
 	bool allow_nat_traversal = true;

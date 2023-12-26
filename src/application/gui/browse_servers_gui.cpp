@@ -192,7 +192,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
 
 			for (const auto& a : addresses) {
-				address_and_port in;
+				host_with_default_port in;
 
 				in.address = a;
 				in.default_port = 0;

@@ -46,7 +46,7 @@
 #include "application/setups/client/lag_compensation_settings.h"
 #include "application/app_intent_type.h"
 #include "application/network/simulation_receiver_settings.h"
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
 #include "application/masterserver/masterserver_settings.h"
@@ -121,12 +121,12 @@ struct config_lua_table {
 
 	float_consistency_test_settings float_consistency_test;
 
-	address_and_port server_list_provider;
+	host_with_default_port server_list_provider;
 
 	nat_detection_settings nat_detection;
 	nat_traversal_settings nat_traversal;
 
-	address_and_port extra_address_resolution_port;
+	host_with_default_port extra_address_resolution_port;
 
 	masterserver_settings masterserver;
 

@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
-#include "application/network/address_and_port.h"
+#include "application/network/host_with_default_port.h"
 #include "augs/filesystem/path_declaration.h"
 #include "all_paths.h"
 
 struct nat_port_probing_settings {
 	// GEN INTROSPECTOR struct nat_port_probing_settings
-	address_and_port host;
+	host_with_default_port host;
 
 	int num_available = 15;
 	int num_probed_for_detection = 3;

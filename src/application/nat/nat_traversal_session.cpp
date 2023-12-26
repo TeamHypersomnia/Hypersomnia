@@ -335,7 +335,7 @@ netcode_address_t nat_traversal_session::get_opened_address() const {
 }
 
 stun_session::stun_session(
-	const address_and_port& host,
+	const host_with_default_port& host,
 	log_function log_info
 ) : 
 	future_stun_host(async_resolve_address(host)), 
