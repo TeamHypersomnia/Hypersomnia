@@ -24,6 +24,8 @@ enum class demo_choice_result_type {
 	MIGHT_BE_INCOMPATIBLE
 };
 
+struct server_list_entry;
+
 class start_client_gui_state : public standard_window_mixin<start_client_gui_state> {
 public:
 	using base = standard_window_mixin<start_client_gui_state>;
@@ -40,8 +42,6 @@ public:
 	demo_file_meta demo_meta;
 	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
 
-	std::string last_best_server;
-
 	augs::path_type demo_path;
 	std::string custom_address;
 	std::string demo_size;
@@ -50,16 +50,21 @@ public:
 	bool mouse_has_to_move_off_browse = false;
 	std::optional<augs::frame_num_type> avatar_submitted_when;
 
-	start_client_tab_type current_tab = start_client_tab_type::BEST;
+	start_client_tab_type current_tab = start_client_tab_type::BEST_SERVER;
+	bool request_refresh_best_server = false;
+	bool request_server_list_open = false;
 
 	void clear_demo_choice();
 
 	bool perform(
+		const server_list_entry* best_server,
+		const bool refresh_in_progress,
 		augs::frame_num_type current_frame,
 		augs::renderer& renderer,
 		augs::graphics::texture& avatar_preview_tex,
 		augs::window& window,
 		client_connect_string&,
+		std::string& into_displayed_connecting_server_name,
 		client_vars&,
 		const std::vector<std::string>& official_arena_servers
 	);

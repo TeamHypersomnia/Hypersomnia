@@ -8,8 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
-- discord logo on gh
-
 - Credits
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will have its own config directory

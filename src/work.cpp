@@ -1412,7 +1412,7 @@ work_result work(
 		}
 		else {
 			if (const bool is_ip_address = find_netcode_addr(config.client_connect).has_value()) {
-				if (!browse_servers_gui.refreshed_at_least_once()) {
+				if (auto info = find_chosen_server_info(); info == nullptr) {
 					/* 
 						If we're connecting to a specific IP address - as opposed to e.g. a domain -
 						either via Steam API, CLI flag or relaunching with last remembered activity -
@@ -1425,7 +1425,7 @@ work_result work(
 					);
 				}
 				else {
-					LOG("Already refreshed the server list, no need to download info about this server.");
+					LOG("Already have this server entry, no need to download info about this server.");
 				}
 			}
 
@@ -1760,18 +1760,33 @@ work_result work(
 	};
 
 	auto perform_start_client_gui = [&](const auto frame_num) {
+		const auto best_server = browse_servers_gui.find_best_server();
+
 		const bool perform_result = start_client_gui.perform(
+			best_server,
+			browse_servers_gui.refresh_in_progress(),
 			frame_num,
 			get_general_renderer(), 
 			streaming.avatar_preview_tex, 
 			window, 
 			config.client_connect, 
+			displayed_connecting_server_name,
 			config.client,
 			config.official_arena_servers
 		);
 
 		if (perform_result || client_start_requested) {
 			start_client_setup();
+		}
+
+		if (start_client_gui.request_server_list_open) {
+			start_client_gui.request_server_list_open = false;
+
+			browse_servers_gui.open();
+
+			if (best_server != nullptr) {
+				browse_servers_gui.select_server(*best_server);
+			}
 		}
 	};
 
@@ -2341,6 +2356,20 @@ work_result work(
 					do_nat_detection_logic();
 				}
 
+				if (start_client_gui.show) {
+					if (start_client_gui.current_tab == start_client_tab_type::BEST_SERVER) {
+						if (!browse_servers_gui.refreshed_at_least_once()) {
+							browse_servers_gui.refresh_server_list(get_browse_servers_input());
+						}
+					}
+				}
+
+				if (start_client_gui.request_refresh_best_server) {
+					start_client_gui.request_refresh_best_server = false;
+
+					browse_servers_gui.refresh_server_list(get_browse_servers_input());
+				}
+
 				browse_servers_gui.advance_ping_logic();
 
 				if (const bool show_server_browser = !has_current_setup() || ingame_menu.show) {
@@ -2537,7 +2566,7 @@ work_result work(
 				}
 				else {
 					start_client_gui.open();
-					start_client_gui.current_tab = start_client_tab_type::BEST;
+					start_client_gui.current_tab = start_client_tab_type::BEST_SERVER;
 				}
 
 				break;

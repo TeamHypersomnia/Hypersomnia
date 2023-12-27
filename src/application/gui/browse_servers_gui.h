@@ -3,12 +3,12 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/server/server_instance_type.h"
 #include "augs/misc/timing/timer.h"
-#include "application/masterserver/server_heartbeat.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/netcode_socket_raii.h"
 #include "application/setups/client/client_connect_string.h"
 #include "view/faction_view_settings.h"
+#include "application/gui/server_list_entry.h"
 
 #include <chrono>
 
@@ -19,44 +19,6 @@ struct host_with_default_port;
 struct resolve_address_result;
 
 using official_addrs = std::vector<resolve_address_result>;
-
-enum class server_entry_state {
-	GIVEN_UP,
-	AWAITING_RESPONSE,
-	PING_MEASURED
-};
-
-struct ping_progress {
-	int ping = -1;
-	uint64_t ping_sequence = -1;
-
-	net_time_t when_sent_first_ping = -1;
-	net_time_t when_sent_last_ping = -1;
-
-	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
-
-	bool found_on_internal_network = false;
-
-	void set_ping_from(const net_time_t current_time) {
-		ping = static_cast<int>((current_time - when_sent_last_ping) * 1000);
-	}
-};
-
-struct server_list_entry {
-	netcode_address_t address;
-	double time_hosted;
-	server_heartbeat heartbeat;
-	bool is_community_server = false;
-
-	bool is_official_server() const {
-		return !is_community_server;
-	}
-
-	ping_progress progress;
-
-	bool is_set() const;
-	bool is_behind_nat() const;
-};
 
 struct browse_servers_input {
 	const host_with_default_port& server_list_provider;
@@ -90,8 +52,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 		const bool streamer_mode
 	);
 
-	std::optional<std::string> requested_official_connection;
-	std::optional<netcode_address_t> requested_connection;
+	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
 
 	net_time_t when_last_started_refreshing_server_list = 0;
@@ -104,6 +65,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::vector<server_list_entry> server_list;
 
+	bool scroll_once_to_selected = false;
 	server_list_entry selected_server;
 	official_addrs official_server_addresses;
 
@@ -111,7 +73,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	bool only_responding = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
-	augs::maybe<int> at_most_ping = augs::maybe<int>(100, false);
+	augs::maybe<uint32_t> at_most_ping = augs::maybe<uint32_t>(100, false);
 
 	int sort_by_column = 0;
 	bool ascending = true;
@@ -131,7 +93,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void handle_incoming_udp_packets(netcode_socket_t&);
 	void send_pings_and_punch_requests(netcode_socket_t&);
 
-	void refresh_server_list(browse_servers_input);
+	void refresh_custom_connect_strings();
 public:
 
 	using base = standard_window_mixin<browse_servers_gui_state>;
@@ -147,6 +109,12 @@ public:
 	void reping_all_servers();
 
 	const server_list_entry* find_entry(const client_connect_string& in) const;
+	const server_list_entry* find_best_server() const;
+	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;
+
+	void select_server(const server_list_entry&);
+
+	bool refresh_in_progress() const;
 };

@@ -20,6 +20,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "steam_integration.h"
 #include "steam_integration_helpers.hpp"
+#include "application/gui/server_list_entry.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -31,11 +32,14 @@ void start_client_gui_state::clear_demo_choice() {
 }
 
 bool start_client_gui_state::perform(
+	const server_list_entry* best_server,
+	const bool refresh_in_progress,
 	const augs::frame_num_type current_frame,
 	augs::renderer& renderer,
 	augs::graphics::texture& avatar_preview_tex,
 	augs::window& window,
 	client_connect_string& into_connect_string,
+	std::string& into_displayed_connecting_server_name,
 	client_vars& into_vars,
 	const std::vector<std::string>& official_arena_servers
 ) {
@@ -63,17 +67,23 @@ bool start_client_gui_state::perform(
 
 		// auto& scope_cfg = into;
 
-		if (current_tab == start_client_tab_type::REPLAY) {
+		if (current_tab == start_client_tab_type::REPLAY_DEMO) {
 			using D = demo_choice_result_type;
 
 			thread_local demo_chooser chooser;
 
 			// text_disabled(typesafe_sprintf("The demos are stored inside \"%x\" folder.", DEMOS_DIR));
 
-			text(typesafe_sprintf("Choose demo to replay (from %x):", DEMOS_DIR));
+			chooser.perform(
+				"##replay_demo_chooser",
+				demo_path.string(),
+				augs::path_type(DEMOS_DIR),
+				[&](const auto& new_choice) {
+					demo_path = new_choice.path;
+					demo_choice_result = D::SHOULD_ANALYZE;
+				}
+			);
 
-			ImGui::SameLine();
-			
 			{
 				auto scope = maybe_disabled_cols({}, demo_path.empty());
 
@@ -87,16 +97,6 @@ bool start_client_gui_state::perform(
 			if (ImGui::Button("Demo folder in explorer")) {
 				window.reveal_in_explorer(DEMOS_DIR);
 			}
-
-			chooser.perform(
-				"##replay_demo_chooser",
-				demo_path.string(),
-				augs::path_type(DEMOS_DIR),
-				[&](const auto& new_choice) {
-					demo_path = new_choice.path;
-					demo_choice_result = D::SHOULD_ANALYZE;
-				}
-			);
 
 			if (!demo_path.empty() && demo_choice_result == D::SHOULD_ANALYZE) {
 				try {
@@ -147,6 +147,9 @@ bool start_client_gui_state::perform(
 
 				text(demo_meta.version.get_summary());
 			}
+			else {
+				text(typesafe_sprintf("Choose demo to replay (from %x).", DEMOS_DIR));
+			}
 		}
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
@@ -165,27 +168,74 @@ bool start_client_gui_state::perform(
 
 			checkbox("Show", show);
 		}
-		else {
-			auto& preferred = last_best_server;
+		else if (current_tab == start_client_tab_type::BEST_SERVER) {
+			(void)official_arena_servers;
 
-			if (preferred.empty()) {
-				if (official_arena_servers.size() > 0) {
-					preferred = official_arena_servers[0];
+			if (best_server == nullptr) {
+				auto cs = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,0));
+
+				auto sname = std::string("Finding the best server...");
+				input_text<max_server_name_length_v>("##BestServer", sname, ImGuiInputTextFlags_ReadOnly);
+			}
+			else {
+				{
+					thread_local bool hovered = false;
+
+					auto cs = std::make_tuple(
+						cond_scoped_style_color(hovered, ImGuiCol_FrameBg, rgba(255,255,255,60)),
+						cond_scoped_style_color(!hovered, ImGuiCol_FrameBg, rgba(255,255,255,20))
+					);
+
+					auto sname = std::string(best_server->heartbeat.server_name);
+					//ImGui::Selectable( "huh t", false, 0, { ImGui::CalcItemWidth(), 0.0f });
+
+					input_text<max_server_name_length_v>("##BestServer", sname, ImGuiInputTextFlags_ReadOnly);
+
+					hovered = ImGui::IsItemHovered();
+
+					if (hovered) {
+						text_tooltip("Show in Server Browser");
+					}
+
+					if (ImGui::IsItemActivated()) {
+						ImGui::ClearActiveID();
+						request_server_list_open = true;
+					}
+				}	
+
+			}
+
+			ImGui::SameLine();
+
+			{
+				auto curs = scoped_preserve_cursor();
+
+				text_color("Players:", green);
+				ImGui::SameLine();
+				text(best_server ? std::to_string(best_server->heartbeat.num_online) : std::string("?"));
+
+				ImGui::SameLine();
+
+				text_color("Ping:", cyan);
+				ImGui::SameLine();
+
+				//const auto col = best_server->progress.get_ping_color();
+
+				text(best_server ? best_server->progress.get_ping_string() : std::string("?"));
+			}
+
+			text_color("Players: 99  Ping: 999", rgba(0,0,0,0));
+			ImGui::SameLine();
+
+			{
+				auto scope = maybe_disabled_cols({}, refresh_in_progress);
+
+				if (ImGui::Button("Refresh")) {
+					request_refresh_best_server = true;
 				}
 			}
 
-			if (preferred.empty()) {
-				text("Could not determine the best official server.", red);
-			}
-			else {
-				auto p = preferred;
-				input_text<100>("##Official", p, ImGuiInputTextFlags_ReadOnly);
-				ImGui::SameLine();
-
-				text_color("Best official server", yellow);
-			}
-
-			/* No need to encourage editing the nickname if we got it from Steam */
+			/* No need to encourage editing the nickname if we don't have it from Steam */
 			const bool is_nonsteam = !is_steam_client;
 
 			if (is_nonsteam) {
@@ -193,174 +243,85 @@ bool start_client_gui_state::perform(
 			}
 		}
 
-		bool nickname_choice_active = true;
+		if (current_tab != start_client_tab_type::REPLAY_DEMO) {
+			bool nickname_choice_active = true;
 
-		if (is_steam_client && into_vars.use_account_nickname) {
-			nickname_choice_active = false;
-		}
-
-		auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
-
-		if (is_steam_client) {
-			label = "##NicknameInactive";
-		}
-
-		{
-			auto scope = maybe_disabled_with_clear_text_cols({}, !nickname_choice_active);
-
-			input_text(label, into_vars.nickname);
-		}
-
-		if (is_steam_client) {
-			ImGui::SameLine();
-
-			if (checkbox("Use Steam nickname", into_vars.use_account_nickname)) {
-				if (into_vars.use_account_nickname) {
-					if (const auto steam_username = ::steam_get_username()) {
-						into_vars.nickname = std::string(steam_username);
-					}
-				}
-			}
-		}
-
-		struct loading_result {
-			std::optional<augs::path_type> new_path;
-			augs::image loaded_image;
-			std::string error_message;
-
-			bool was_shrinked = false;
-			bool will_be_upscaled = false;
-
-			void load_image(const augs::path_type& from) {
-				loaded_image.from_file(from);
-
-				const auto max_s = static_cast<unsigned>(max_avatar_side_v);
-
-				auto sz = loaded_image.get_size();
-
-				if (sz != vec2u::square(max_s)) {
-					sz.x = std::min(sz.x, max_s);
-					sz.y = std::min(sz.x, max_s);
-
-					if (sz != loaded_image.get_size()) {
-						was_shrinked = true;
-						loaded_image.scale(sz);
-					}
-					else {
-						will_be_upscaled = true;
-					}
-				}
-
-				const auto cached_file_path = USER_DIR / "cached_avatar.png";
-				loaded_image.save_as_png(cached_file_path);
-
-				new_path = cached_file_path;
-			}
-		};
-
-		thread_local std::future<loading_result> avatar_loading_result;
-
-		auto reload_avatar = [&](const augs::path_type& from_path) {
-			const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
-
-			if (avatar_upload_completed && !avatar_loading_result.valid() && !from_path.empty()) {
-				avatar_loading_result = launch_async(
-					[from_path]() {
-						loading_result out;
-						out.new_path = from_path;
-
-						try {
-							out.load_image(from_path);
-						}
-						catch (const augs::image_loading_error& err) {
-							out.error_message = err.what();
-						}
-						catch (const augs::file_open_error& err) {
-							out.error_message = err.what();
-						}
-
-						return out;
-					}
-				);
-			}
-		};
-
-		augs::path_type p = into_vars.avatar_image_path;
-		const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
-		const auto half_size = first_size / 2;
-		const auto icon_size = vec2::square(22);
-
-		if (!p.empty()) {
-			augs::atlas_entry entry;
-			entry.atlas_space = xywh(0, 0, 1, 1);
-
-			if (augs::imgui::game_image_button("##AvatarButton", entry, first_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
-
+			if (is_steam_client && into_vars.use_account_nickname) {
+				nickname_choice_active = false;
 			}
 
-			ImGui::SameLine();
-			text_disabled(typesafe_sprintf("%xx%x", first_size.x, first_size.y));
+			auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 
-			ImGui::SameLine();
-
-			if (augs::imgui::game_image_button("##AvatarButtonHalf", entry, half_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
-
+			if (is_steam_client) {
+				label = "##NicknameInactive";
 			}
 
-			ImGui::SameLine();
+			{
+				auto scope = maybe_disabled_with_clear_text_cols({}, !nickname_choice_active);
 
-			text_disabled(typesafe_sprintf("%xx%x", half_size.x, half_size.y));
-
-			ImGui::SameLine();
-
-
-			if (augs::imgui::game_image_button("##AvatarButtonSmall", entry, icon_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
-
+				input_text(label, into_vars.nickname);
 			}
 
-			ImGui::SameLine();
-			text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
-		}
-
-		bool avatar_choice_active = true;
-
-		if (is_steam_client) {
-			if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
-				if (into_vars.use_account_avatar) {
-					if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-						const auto cached_file_path = USER_DIR / "cached_avatar.png";
-						avatar.save_as_png(cached_file_path);
-
-						p = cached_file_path;
-						reload_avatar(p);
-					}
-				}
-			}
-
-			avatar_choice_active = !into_vars.use_account_avatar;
-		}
-
-		if (avatar_choice_active) {
 			if (is_steam_client) {
 				ImGui::SameLine();
+
+				if (checkbox("Use Steam nickname", into_vars.use_account_nickname)) {
+					if (into_vars.use_account_nickname) {
+						if (const auto steam_username = ::steam_get_username()) {
+							into_vars.nickname = std::string(steam_username);
+						}
+					}
+				}
 			}
 
-			if (ImGui::Button("Browse Avatar") && !error_popup && !mouse_has_to_move_off_browse) {
-				mouse_has_to_move_off_browse = true;
+			struct loading_result {
+				std::optional<augs::path_type> new_path;
+				augs::image loaded_image;
+				std::string error_message;
 
-				avatar_loading_result = launch_async(
-					[&window]() {
-						const std::vector<augs::window::file_dialog_filter> filters = { {
-							"Image file",
-							"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
-						} };
+				bool was_shrinked = false;
+				bool will_be_upscaled = false;
 
-						loading_result out;
-						out.new_path = window.open_file_dialog(filters, "Choose avatar image");
+				void load_image(const augs::path_type& from) {
+					loaded_image.from_file(from);
 
-						if (out.new_path.has_value()) {
+					const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+
+					auto sz = loaded_image.get_size();
+
+					if (sz != vec2u::square(max_s)) {
+						sz.x = std::min(sz.x, max_s);
+						sz.y = std::min(sz.x, max_s);
+
+						if (sz != loaded_image.get_size()) {
+							was_shrinked = true;
+							loaded_image.scale(sz);
+						}
+						else {
+							will_be_upscaled = true;
+						}
+					}
+
+					const auto cached_file_path = USER_DIR / "cached_avatar.png";
+					loaded_image.save_as_png(cached_file_path);
+
+					new_path = cached_file_path;
+				}
+			};
+
+			thread_local std::future<loading_result> avatar_loading_result;
+
+			auto reload_avatar = [&](const augs::path_type& from_path) {
+				const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
+
+				if (avatar_upload_completed && !avatar_loading_result.valid() && !from_path.empty()) {
+					avatar_loading_result = launch_async(
+						[from_path]() {
+							loading_result out;
+							out.new_path = from_path;
+
 							try {
-								out.load_image(*out.new_path);
+								out.load_image(from_path);
 							}
 							catch (const augs::image_loading_error& err) {
 								out.error_message = err.what();
@@ -368,106 +329,197 @@ bool start_client_gui_state::perform(
 							catch (const augs::file_open_error& err) {
 								out.error_message = err.what();
 							}
+
+							return out;
 						}
+					);
+				}
+			};
 
-						return out;
-					}
-				);
-			}
-
-			if (!ImGui::IsItemHovered()) {
-				mouse_has_to_move_off_browse = false;
-			}
+			augs::path_type p = into_vars.avatar_image_path;
+			const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
+			const auto half_size = first_size / 2;
+			const auto icon_size = vec2::square(22);
 
 			if (!p.empty()) {
+				augs::atlas_entry entry;
+				entry.atlas_space = xywh(0, 0, 1, 1);
+
+				if (augs::imgui::game_image_button("##AvatarButton", entry, first_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
+
+				}
+
+				ImGui::SameLine();
+				text_disabled(typesafe_sprintf("%xx%x", first_size.x, first_size.y));
+
 				ImGui::SameLine();
 
-				if (ImGui::Button("Clear") && !error_popup) {
-					p = "";
-					was_shrinked = false;
-					will_be_upscaled = false;
+				if (augs::imgui::game_image_button("##AvatarButtonHalf", entry, half_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
+
+				}
+
+				ImGui::SameLine();
+
+				text_disabled(typesafe_sprintf("%xx%x", half_size.x, half_size.y));
+
+				ImGui::SameLine();
+
+
+				if (augs::imgui::game_image_button("##AvatarButtonSmall", entry, icon_size, {}, augs::imgui_atlas_type::AVATAR_PREVIEW)) {
+
+				}
+
+				ImGui::SameLine();
+				text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
+			}
+
+			bool avatar_choice_active = true;
+
+			if (is_steam_client) {
+				if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
+					if (into_vars.use_account_avatar) {
+						if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
+							const auto cached_file_path = USER_DIR / "cached_avatar.png";
+							avatar.save_as_png(cached_file_path);
+
+							p = cached_file_path;
+							reload_avatar(p);
+						}
+					}
+				}
+
+				avatar_choice_active = !into_vars.use_account_avatar;
+			}
+
+			if (avatar_choice_active) {
+				if (is_steam_client) {
+					ImGui::SameLine();
+				}
+
+				if (ImGui::Button("Browse Avatar") && !error_popup && !mouse_has_to_move_off_browse) {
+					mouse_has_to_move_off_browse = true;
+
+					avatar_loading_result = launch_async(
+						[&window]() {
+							const std::vector<augs::window::file_dialog_filter> filters = { {
+								"Image file",
+								"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
+							} };
+
+							loading_result out;
+							out.new_path = window.open_file_dialog(filters, "Choose avatar image");
+
+							if (out.new_path.has_value()) {
+								try {
+									out.load_image(*out.new_path);
+								}
+								catch (const augs::image_loading_error& err) {
+									out.error_message = err.what();
+								}
+								catch (const augs::file_open_error& err) {
+									out.error_message = err.what();
+								}
+							}
+
+							return out;
+						}
+					);
+				}
+
+				if (!ImGui::IsItemHovered()) {
+					mouse_has_to_move_off_browse = false;
+				}
+
+				if (!p.empty()) {
+					ImGui::SameLine();
+
+					if (ImGui::Button("Clear") && !error_popup) {
+						p = "";
+						was_shrinked = false;
+						will_be_upscaled = false;
+					}
+				}
+
+	#if PLATFORM_LINUX
+				/* In case the file browser doesn't open on Linux */
+
+				ImGui::SameLine();
+
+				text("Path");
+
+				ImGui::SameLine();
+
+				if (input_text<512>("(Enter)", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
+					reload_avatar(p);
+				}
+	#endif
+			}
+
+			const auto size_str = typesafe_sprintf("%xx%x", first_size.x, first_size.y);
+
+			const bool show_tip = false;
+
+			if (show_tip) {
+				if (was_shrinked) {
+					text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
+				}
+				else if (will_be_upscaled) {
+					text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
 				}
 			}
 
-#if PLATFORM_LINUX
-			/* In case the file browser doesn't open on Linux */
+			if (::valid_and_is_ready(avatar_loading_result)) {
+				auto result = avatar_loading_result.get();
 
-			ImGui::SameLine();
+				const auto& error_msg = result.error_message;
 
-			text("Path");
+				was_shrinked = false;
+				will_be_upscaled = false;
 
-			ImGui::SameLine();
+				if (error_msg.size() > 0) {
+					error_popup = simple_popup();
+					error_popup->title = "Error";
+					error_popup->message = error_msg;
+				}
+				else if (result.new_path.has_value()) {
+					p = *result.new_path;
 
-			if (input_text<512>("(Enter)", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
+					avatar_preview_tex.texImage2D(renderer, std::move(result.loaded_image));
+					avatar_preview_tex.set_filtering(renderer, augs::filtering_type::LINEAR);
+
+					augs::graphics::texture::set_current_to_previous(renderer);
+					avatar_submitted_when = current_frame;
+
+					was_shrinked = result.was_shrinked;
+					will_be_upscaled  = result.will_be_upscaled;
+				}
+			}
+
+			if (do_initial_load) {
 				reload_avatar(p);
+				do_initial_load = false;
 			}
-#endif
+
+			if (error_popup) {
+				if (error_popup->perform()) {
+					error_popup = std::nullopt;
+				}
+			}
+
+			into_vars.avatar_image_path = p;
+
+			checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
+			ImGui::SameLine();
+			text_disabled("You can later rewatch your match in Replay tab.");
+
+			if (const bool show_browser_tip = false) {
+				if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
+					text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
+				}
+			}
+
+			//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 		}
-
-		const auto size_str = typesafe_sprintf("%xx%x", first_size.x, first_size.y);
-
-		const bool show_tip = false;
-
-		if (show_tip) {
-			if (was_shrinked) {
-				text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
-			}
-			else if (will_be_upscaled) {
-				text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
-			}
-		}
-
-		if (::valid_and_is_ready(avatar_loading_result)) {
-			auto result = avatar_loading_result.get();
-
-			const auto& error_msg = result.error_message;
-
-			was_shrinked = false;
-			will_be_upscaled = false;
-
-			if (error_msg.size() > 0) {
-				error_popup = simple_popup();
-				error_popup->title = "Error";
-				error_popup->message = error_msg;
-			}
-			else if (result.new_path.has_value()) {
-				p = *result.new_path;
-
-				avatar_preview_tex.texImage2D(renderer, std::move(result.loaded_image));
-				avatar_preview_tex.set_filtering(renderer, augs::filtering_type::LINEAR);
-
-				augs::graphics::texture::set_current_to_previous(renderer);
-				avatar_submitted_when = current_frame;
-
-				was_shrinked = result.was_shrinked;
-				will_be_upscaled  = result.will_be_upscaled;
-			}
-		}
-
-		if (do_initial_load) {
-			reload_avatar(p);
-			do_initial_load = false;
-		}
-
-		if (error_popup) {
-			if (error_popup->perform()) {
-				error_popup = std::nullopt;
-			}
-		}
-
-		into_vars.avatar_image_path = p;
-
-		checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
-		ImGui::SameLine();
-		text_disabled("You can later rewatch your match in Replay tab.");
-
-		if (const bool show_browser_tip = false) {
-			if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
-				text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
-			}
-		}
-
-		//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}
 
 	{
@@ -475,7 +527,7 @@ bool start_client_gui_state::perform(
 
 		ImGui::Separator();
 
-		if (current_tab == start_client_tab_type::REPLAY) {
+		if (current_tab == start_client_tab_type::REPLAY_DEMO) {
 			using D = demo_choice_result_type;
 
 			const bool result_good = demo_choice_result == D::OK || demo_choice_result == D::MIGHT_BE_INCOMPATIBLE;
@@ -485,6 +537,7 @@ bool start_client_gui_state::perform(
 			if (ImGui::Button("Replay!")) {
 				result = true;
 				into_connect_string = typesafe_sprintf("%x%x", demo_address_preffix_v, demo_path);
+				into_displayed_connecting_server_name = demo_path.filename().string();
 				//show = false;
 			}
 		}
@@ -494,12 +547,21 @@ bool start_client_gui_state::perform(
 				&& custom_address.empty()
 			;
 
-			auto scope = maybe_disabled_cols({}, custom_addr_empty || !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));
+			const bool best_still_unresolved = 
+				current_tab == start_client_tab_type::BEST_SERVER
+				&& best_server == nullptr
+			;
+
+			auto scope = maybe_disabled_cols({}, best_still_unresolved || custom_addr_empty || !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
 				switch (current_tab) {
-					case start_client_tab_type::BEST:
-						into_connect_string = last_best_server;
+					case start_client_tab_type::BEST_SERVER:
+						if (best_server) {
+							into_connect_string = std::string(best_server->get_connect_string());
+							into_displayed_connecting_server_name = best_server->heartbeat.server_name;
+						}
+
 						break;
 					case start_client_tab_type::CUSTOM_ADDRESS:
 						into_connect_string = custom_address;

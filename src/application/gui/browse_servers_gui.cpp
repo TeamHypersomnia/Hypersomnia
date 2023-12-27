@@ -42,6 +42,66 @@ void BRW_LOG(Args&&... args) {
 #define BRW_LOG_NVPS BRW_LOG
 #endif
 
+static uint32_t order_category(
+	const server_list_entry& entry
+) {
+	const auto& a = entry.heartbeat;
+
+	/*
+		Order:
+
+		0. Local servers
+		1. Servers with players with no NAT (based on ping)
+		2. Servers with players with NAT
+		3. Empty servers with no NAT
+		4. Empty servers with NAT
+	*/
+
+	if (entry.progress.found_on_internal_network) {
+		return 0;
+	}
+
+	if (a.num_online > 0 		&& a.nat.type == nat_type::PUBLIC_INTERNET) {
+		/* Non-empty public, best category */
+		return 1; 
+	}
+	else if (a.num_online > 0) {
+		/* Non-empty NAT */
+		return 1 + static_cast<uint32_t>(a.nat.type); /* 2-5 */
+	}
+	else if (a.num_online == 0 && a.nat.type == nat_type::PUBLIC_INTERNET) {
+		/* Empty public */
+		return 10 + static_cast<uint32_t>(a.nat.type); /* 10-14 */
+	}
+	else {
+		/* Empty NAT */
+		return 100 + static_cast<uint32_t>(a.nat.type); /* 100-104 */
+	}
+}
+
+static bool compare_servers(
+	const server_list_entry& a,
+	const server_list_entry& b
+) {
+	{
+		const auto ca = order_category(a);
+		const auto cb = order_category(b);
+		
+		if (ca != cb) {
+			/* Favor better category */
+			return ca < cb;
+		}
+	}
+
+	if (a.progress.ping != b.progress.ping) {
+		/* Favor closer one */
+		return a.progress.ping < b.progress.ping;
+	}
+
+	/* Favor more recent one */
+	return a.time_hosted > b.time_hosted;
+}
+
 bool server_list_entry::is_set() const {
 	return heartbeat.server_name.size() > 0;
 }
@@ -127,8 +187,6 @@ void browse_servers_gui_state::sync_download_server_entry(
 
 	(void)server;
 
-	when_last_started_refreshing_server_list = yojimbo_time();
-
 	/* Todo: make async */
 	auto lbd = 
 		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
@@ -163,16 +221,21 @@ void browse_servers_gui_state::sync_download_server_entry(
 	;
 
 	server_list = ::to_server_list(lbd(), error_message);
+	refresh_custom_connect_strings();
 }
 
 bool browse_servers_gui_state::refreshed_at_least_once() const {
 	return when_last_started_refreshing_server_list != 0;
 }
 
+bool browse_servers_gui_state::refresh_in_progress() const {
+	return data->refresh_op_in_progress();
+}
+
 void browse_servers_gui_state::refresh_server_list(const browse_servers_input in) {
 	using namespace httplib;
 
-	if (data->refresh_op_in_progress()) {
+	if (refresh_in_progress()) {
 		return;
 	}
 
@@ -247,6 +310,22 @@ void browse_servers_gui_state::refresh_server_pings() {
 	for (auto& s : server_list) {
 		s.progress = {};
 	}
+}
+
+std::string server_list_entry::get_connect_string() const {
+	if (!custom_connect_string.empty()) {
+		return custom_connect_string;
+	}
+
+	return ::ToString(get_connect_address());
+}
+
+netcode_address_t server_list_entry::get_connect_address() const {
+	if (progress.found_on_internal_network && heartbeat.internal_network_address.has_value()) {
+		return *heartbeat.internal_network_address;
+	}
+
+	return address;
 }
 
 bool server_list_entry::is_behind_nat() const {
@@ -447,6 +526,12 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 constexpr auto num_columns = 7;
 
+void browse_servers_gui_state::select_server(const server_list_entry& s) {
+	selected_server = s;
+	//server_details.open();
+	scroll_once_to_selected = true;
+}
+
 void browse_servers_gui_state::show_server_list(
 	const std::string& label,
 	const std::vector<server_list_entry*>& server_list,
@@ -479,24 +564,22 @@ void browse_servers_gui_state::show_server_list(
 
 		const bool is_selected = selected_server.address == s.address;
 
-		{
+		if (progress.responding()) {
 			const auto ping = progress.ping;
 
-			if (ping != -1) {
-				if (ping > 999) {
-					do_text("999>");
-				}
-				else {
-					do_text(typesafe_sprintf("%x", ping));
-				}
+			if (ping > 999) {
+				do_text("999>");
 			}
 			else {
-				if (given_up) {
-					do_text("?");
-				}
-				else {
-					do_text(loading_dots);
-				}
+				do_text(typesafe_sprintf("%x", ping));
+			}
+		}
+		else {
+			if (given_up) {
+				do_text("?");
+			}
+			else {
+				do_text(loading_dots);
 			}
 		}
 
@@ -509,6 +592,14 @@ void browse_servers_gui_state::show_server_list(
 
 			if (streamer_mode && s.is_community_server) {
 				displayed_name = "Community server";
+			}
+
+			if (is_selected) {
+				if (scroll_once_to_selected) {
+					scroll_once_to_selected = false;
+
+					ImGui::SetScrollHereY(0.0f);
+				}
 			}
 
 			if (ImGui::Selectable(displayed_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
@@ -553,21 +644,11 @@ void browse_servers_gui_state::show_server_list(
 		
 		if (ImGui::IsItemClicked()) {
 			if (ImGui::IsMouseDoubleClicked(0)) {
-				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), d.server_name);
+				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
 				displayed_connecting_server_name = s.heartbeat.server_name;
 
-				if (const auto official_data = find_resolved_official(s.address)) {
-					requested_official_connection = official_data->host;
-				}	
-				else {
-					if (s.progress.found_on_internal_network) {
-						requested_connection = s.heartbeat.internal_network_address;
-					}
-					else {
-						requested_connection = s.address;
-					}
-				}
+				requested_connection = s.get_connect_string();
 			}
 		}
 
@@ -619,6 +700,8 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 	}
+
+	scroll_once_to_selected = false;
 }
 
 const resolve_address_result* browse_servers_gui_state::find_resolved_official(const netcode_address_t& n) {
@@ -637,8 +720,34 @@ const resolve_address_result* browse_servers_gui_state::find_resolved_official(c
 	return nullptr;
 }
 
+void browse_servers_gui_state::refresh_custom_connect_strings() {
+	for (auto& s : server_list) {
+		if (const auto resolved = find_resolved_official(s.address)) {
+			if (s.address.port == DEFAULT_GAME_PORT_V) {
+				s.custom_connect_string = resolved->host;
+			}
+			else {
+				s.custom_connect_string = typesafe_sprintf("%x:%x", resolved->host, s.address.port);
+			}
+		}
+		else {
+			s.custom_connect_string.clear();
+		}
+	}
+}
+
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
+
+	if (valid_and_is_ready(data->future_response)) {
+		server_list = ::to_server_list(data->future_response.get(), error_message);
+		refresh_custom_connect_strings();
+	}
+
+	if (valid_and_is_ready(data->future_official_addresses)) {
+		official_server_addresses = data->future_official_addresses.get();
+		refresh_custom_connect_strings();
+	}
 
 	if (!show) {
 		return false;
@@ -654,14 +763,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return false;
 	}
 
-	if (valid_and_is_ready(data->future_response)) {
-		server_list = ::to_server_list(data->future_response.get(), error_message);
-	}
-
-	if (valid_and_is_ready(data->future_official_addresses)) {
-		official_server_addresses = data->future_official_addresses.get();
-	}
-
 	thread_local ImGuiTextFilter filter;
 
 	filter_with_hint(filter, "##HierarchyFilter", "Filter server names/arenas...");
@@ -674,7 +775,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	bool has_community_servers = false;
 
 	requested_connection = std::nullopt;
-	requested_official_connection = std::nullopt;
 
 	for (auto& s : server_list) {
 		const auto& name = s.heartbeat.server_name;
@@ -683,7 +783,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		auto push_if_passes = [&](auto& target_list) {
 			if (only_responding) {
-				if (s.progress.ping == -1) {
+				if (!s.progress.responding()) {
 					return;
 				}
 			}
@@ -715,14 +815,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			push_if_passes(local_server_list);
 		}
 		else {
-			if (const auto resolved = find_resolved_official(s.address)) {
+			if (const bool is_official = !s.custom_connect_string.empty()) {
 				has_official_servers = true;
 				s.is_community_server = false;
 				push_if_passes(official_server_list);
-
-				if (std::string(name) == "Player's server") {
-					s.heartbeat.server_name = resolved->host;
-				}
 			}
 			else {
 				has_community_servers = true;
@@ -1006,17 +1102,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				displayed_connecting_server_name = s.heartbeat.server_name;
 
-				if (const auto official_data = find_resolved_official(s.address)) {
-					requested_official_connection = official_data->host;
-				}	
-				else {
-					if (s.progress.found_on_internal_network) {
-						requested_connection = s.heartbeat.internal_network_address;
-					}
-					else {
-						requested_connection = s.address;
-					}
-				}
+				requested_connection = s.get_connect_string();
 			}
 
 			ImGui::SameLine();
@@ -1031,7 +1117,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::SameLine();
 
 		{
-			auto scope = maybe_disabled_cols({}, data->refresh_op_in_progress());
+			auto scope = maybe_disabled_cols({}, refresh_in_progress());
 
 			if (ImGui::Button("Refresh ping")) {
 				refresh_server_pings();
@@ -1060,20 +1146,21 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	if (requested_connection.has_value()) {
-		in.client_connect = ::ToString(*requested_connection);
-		in.displayed_connecting_server_name = displayed_connecting_server_name;
-
-		return true;
-	}
-
-	if (requested_official_connection.has_value()) {
-		in.client_connect = *requested_official_connection;
+		in.client_connect = *requested_connection;
 		in.displayed_connecting_server_name = displayed_connecting_server_name;
 
 		return true;
 	}
 
 	return false;
+}
+
+const server_list_entry* browse_servers_gui_state::find_best_server() const {
+	if (server_list.empty()) {
+		return nullptr;
+	}
+
+	return &minimum_of(server_list, compare_servers);
 }
 
 const server_list_entry* browse_servers_gui_state::find_entry(const client_connect_string& in) const {
