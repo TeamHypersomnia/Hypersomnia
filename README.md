@@ -12,8 +12,9 @@
 Online shooter with relentless dynamics.  
 Challenge your friend to an intense duel, or gather two clans to fight a spectacular war.  
 
-Written in modern C++, without a game engine!
+Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
+
 ### Join us:
 
 <a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
