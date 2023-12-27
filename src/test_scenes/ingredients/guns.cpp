@@ -4094,7 +4094,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1500.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5700.f, 5700.f};
+			gun_def.muzzle_velocity = {5400.f, 5400.f};
 			gun_def.shot_cooldown_ms = 380.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
