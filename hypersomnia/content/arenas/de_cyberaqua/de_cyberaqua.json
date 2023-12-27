@@ -19,7 +19,8 @@
     },
     "game_modes": {
         "bomb_defusal": {
-            "warmup_time": 81
+            "warmup_time": 81,
+            "round_time": 100
         },
         "gun_game": {
             "warmup_time": 81

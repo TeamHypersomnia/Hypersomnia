@@ -53,7 +53,7 @@ struct editor_bomb_defusal_mode {
 	uint32_t warmup_time = 16;
 	uint32_t freeze_time = 10;
 	uint32_t buy_time = 30;
-	uint32_t round_time = 120;
+	uint32_t round_time = 90;
 	real32 round_end_time = 5.0f;
 
 	uint32_t respawn_after_ms = 0;
