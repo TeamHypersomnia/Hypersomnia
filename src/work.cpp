@@ -2620,11 +2620,9 @@ work_result work(
 				settings_gui.open();
 				break;
 
-#if 0
-			case T::CREATORS:
-				main_menu->launch_creators_screen();
+			case T::CREDITS:
+				augs::open_url("https://hypersomnia.xyz/credits");
 				break;
-#endif
 
 			case T::QUIT:
 				LOG("Quitting due to Quit pressed in main menu.");

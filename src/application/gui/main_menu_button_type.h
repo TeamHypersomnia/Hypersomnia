@@ -12,6 +12,7 @@ enum class main_menu_button_type {
 	TUTORIAL,
 	EDITOR,
 	SETTINGS,
+	CREDITS,
 	QUIT,
 
 	COUNT
