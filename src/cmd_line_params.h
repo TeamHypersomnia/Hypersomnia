@@ -31,6 +31,8 @@ struct cmd_line_params {
 	bool sync_external_arenas_and_quit = false;
 	std::optional<int> autoupdate_delay;
 
+	augs::path_type apply_config;
+
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
@@ -153,6 +155,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--verify") {
 				verified_archive = get_next();
+			}
+			else if (a == "--apply-config") {
+				apply_config = get_next();
 			}
 			else if (a == "--edit") {
 				editor_target = get_next();

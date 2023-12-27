@@ -2,8 +2,19 @@
 #include "augs/filesystem/path.h"
 
 /* 
-	Hardcoded, relative paths for directories that the executable might use.
+	All paths to directories that the executable might read from or write to.
 */
+
+/* 
+	Can be overridden with --calling-cwd.
+	If not specified, will be the full path to the directory
+	from which the executable was called.
+
+	CLI flags taking a path argument like --apply-config
+	will assume the file is in CALLING_CWD/argument.
+*/
+
+extern augs::path_type CALLING_CWD;
 
 /* 
 	Can be overridden with --appdata-dir.

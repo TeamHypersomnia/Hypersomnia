@@ -16,6 +16,7 @@
 #include "augs/misc/time_utils.h"
 #include "all_paths.h"
 
+augs::path_type CALLING_CWD;
 augs::path_type APPDATA_DIR;
 augs::path_type USER_DIR;
 
@@ -128,10 +129,10 @@ int main(const int argc, const char* const * const argv) {
 		change_cwd_to_exe = false;
 	}
 
-	auto calling_cwd = augs::get_current_working_directory();
+	::CALLING_CWD = augs::get_current_working_directory();
 
 	if (params.calling_cwd.has_value()) {
-		calling_cwd = params.calling_cwd.value();
+		::CALLING_CWD = params.calling_cwd.value();
 	}
 
 #if PLATFORM_UNIX
@@ -150,7 +151,7 @@ int main(const int argc, const char* const * const argv) {
 			::APPDATA_DIR = params.appdata_dir;
 		}
 		else {
-			::APPDATA_DIR = calling_cwd / params.appdata_dir;
+			::APPDATA_DIR = CALLING_CWD / params.appdata_dir;
 		}
 	}
 	else {
@@ -186,10 +187,10 @@ int main(const int argc, const char* const * const argv) {
 	LOG("Started at %x", augs::date_time().get_readable());
 
 	if (is_appimage) {
-		LOG("AppImage called from directory: \"%x\"", calling_cwd);
+		LOG("AppImage called from directory: \"%x\"", CALLING_CWD);
 	}
 	else {
-		LOG("Executable called from directory: \"%x\"", calling_cwd);
+		LOG("Executable called from directory: \"%x\"", CALLING_CWD);
 	}
 
 	LOG("Chosen working directory: \"%x\"", augs::get_current_working_directory());

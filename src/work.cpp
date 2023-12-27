@@ -344,6 +344,11 @@ work_result work(
 			result->load_patch(lua, local_config_path);
 		}
 
+		if (!params.apply_config.empty()) {
+			const auto cli_config_path = CALLING_CWD / params.apply_config;
+			result->load_patch(lua, cli_config_path);
+		}
+
 		if (augs::exists(force_config_path)) {
 			result->load_patch(lua, force_config_path);
 		}
