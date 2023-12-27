@@ -2491,6 +2491,10 @@ augs::path_type server_setup::get_unofficial_content_dir() const {
 	return current_arena_folder;
 }
 
+/* 
+	Timing attack resistant password comparator.
+*/
+
 bool safe_equal(const decltype(requested_client_settings::rcon_password)& candidate_password, const std::string& actual_password) {
 	const bool rcon_is_disabled = actual_password.empty();
 
@@ -2512,7 +2516,7 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 		}
 	}
 
-	return matches == static_cast<int>(actual_password.size());
+	return matches == static_cast<int>(actual_password.size()) && candidate_password.size() == actual_password.size();
 }
 
 netcode_address_t to_netcode_addr(const yojimbo::Address& t);
