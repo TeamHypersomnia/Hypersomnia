@@ -55,7 +55,21 @@ static uint32_t order_category(
 		2. Servers with players with NAT
 		3. Empty servers with no NAT
 		4. Empty servers with NAT
+		5. Full servers with no NAT
+		6. Full servers with NAT
 	*/
+
+	if (a.is_full()) {
+		/* 
+			Still consider it as there's always a chance it gets freed in the meantime
+		*/
+
+		if (a.nat.type == nat_type::PUBLIC_INTERNET) {
+			return 1000;
+		}
+
+		return 10000;
+	}
 
 	if (entry.progress.found_on_internal_network) {
 		return 0;

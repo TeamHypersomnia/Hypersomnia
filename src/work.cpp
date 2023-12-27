@@ -2571,7 +2571,9 @@ work_result work(
 
 			case T::QUICK_PLAY:
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+#if !IS_PRODUCTION_BUILD
 					client_start_requested = true;
+#endif
 				}
 				else {
 					start_client_gui.open();
@@ -2582,7 +2584,9 @@ work_result work(
 
 			case T::CONNECT_TO_SERVER:
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+#if !IS_PRODUCTION_BUILD
 					client_start_requested = true;
+#endif
 				}
 				else {
 					start_client_gui.open();

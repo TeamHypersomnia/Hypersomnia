@@ -204,6 +204,10 @@ server_setup::~server_setup() {
 	}
 }
 
+bool server_heartbeat::is_full() const {
+	return num_online == max_online;
+}
+
 void server_heartbeat::validate() {
 	if (server_name.empty()) {
 		server_name = "Hypersomnia Server";

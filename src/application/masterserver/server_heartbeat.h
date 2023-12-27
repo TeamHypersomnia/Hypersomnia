@@ -58,6 +58,8 @@ struct server_heartbeat {
 	void validate();
 	bool is_valid() const;
 
+	bool is_full() const;
+
 	bool is_behind_nat() const {
 		return nat.type != nat_type::PUBLIC_INTERNET;
 	}

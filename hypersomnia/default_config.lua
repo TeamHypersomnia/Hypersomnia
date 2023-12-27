@@ -774,7 +774,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     cycle_always_game_mode = "",
 
     -- Applies when cycle is "LIST" or "ALL_ON_DISK".
-    cycle_randomize_order = false,
+    cycle_randomize_order = true,
 
     daily_autoupdate = false,
     daily_autoupdate_hour = "03:00",
