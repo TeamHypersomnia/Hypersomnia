@@ -647,6 +647,19 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::HUMORESQUE);
+
+			invariants::continuous_sound sound_def;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::HUMORESQUE);
+			sound_def.effect.modifier.doppler_factor = 0;
+			sound_def.effect.modifier.repetitions = -1;
+			sound_def.effect.modifier.always_direct_listener = true;
+
+
+			meta.set(sound_def);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
 
 			invariants::continuous_sound sound_def;

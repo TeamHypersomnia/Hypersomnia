@@ -342,6 +342,7 @@ enum class test_sound_decorations {
 	LOUDY_FAN,
 
 	ARABESQUE,
+	HUMORESQUE,
 	GENERIC_BOMB_SOON_EXPLODES_THEME,
 
 	FOOTSTEP_DIRT,

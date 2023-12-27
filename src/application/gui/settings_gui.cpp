@@ -2082,6 +2082,7 @@ void do_server_vars(
 		ImGui::Separator();
 
 		revertable_slider(SCOPE_CFG_NVP(sleep_mult), 0.0f, 0.9f);
+		revertable_checkbox(SCOPE_CFG_NVP(sync_all_external_arenas_on_startup));
 	}
 }
 

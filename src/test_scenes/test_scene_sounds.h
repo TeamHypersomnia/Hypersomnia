@@ -265,6 +265,7 @@ enum class test_scene_sound_id {
 	LEVEL_UP,
 
 	ARABESQUE,
+	HUMORESQUE,
 
 	COUNT
 	// END GEN INTROSPECTOR
