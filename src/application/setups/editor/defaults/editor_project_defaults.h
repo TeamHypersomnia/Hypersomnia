@@ -79,5 +79,5 @@ inline void setup_project_defaults(
 	const editor_official_resource_map& o
 ) {
 	::setup_default_server_mode(defaults, modes);
-	defaults.warmup_theme.id = o[test_sound_decorations::ARABESQUE];
+	defaults.warmup_theme.id = o[test_sound_decorations::HUMORESQUE];
 }

@@ -50,7 +50,7 @@ struct editor_bomb_defusal_mode {
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
 	uint32_t max_team_score = 16;
 
-	uint32_t warmup_time = 81;
+	uint32_t warmup_time = 16;
 	uint32_t freeze_time = 10;
 	uint32_t buy_time = 30;
 	uint32_t round_time = 120;
@@ -82,9 +82,9 @@ struct editor_gun_game_mode {
 	bool free_for_all = true;
 	uint32_t max_team_score = 2;
 
-	uint32_t warmup_time = 81;
+	uint32_t warmup_time = 16;
 	uint32_t freeze_time = 0;
-	uint32_t round_time = 30 * 2 * 60;
+	uint32_t round_time = 30 * 60;
 	uint32_t round_end_time = 5;
 
 	uint32_t respawn_after_ms = 1000;

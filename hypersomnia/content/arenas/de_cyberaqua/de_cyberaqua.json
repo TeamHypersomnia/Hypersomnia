@@ -9,10 +9,21 @@
     },
     "settings": {
         "default_server_mode": "bomb_defusal",
-        "ambient_light_color": [0, 67, 90, 255]
+        "ambient_light_color": [0, 67, 90, 255],
+        "warmup_theme": {
+            "id": "arabesque"
+        }
     },
     "playtesting": {
         "mode": "gun_game"
+    },
+    "game_modes": {
+        "bomb_defusal": {
+            "warmup_time": 81
+        },
+        "gun_game": {
+            "warmup_time": 81
+        }
     },
     "external_resources": [
         {
