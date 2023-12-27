@@ -8,18 +8,16 @@ summary: That which we are brainstorming at the moment.
 
 # BEFORE STEAM
 
+- Further simplifications to settings
+
 - Credits
+
 - Host multiple official servers to accomodate a potential spike in the number of players
     - Each instance will have its own config directory
     - Autoupdating mulitple servers
         - Not our problem: We'll trigger autoupdates manually anyway
         - But for other people doing this, they'll just need to set daily autoupdates by a minute away per instance at least
             - Or two minutes after the first one completes
-
-- Quick play should find the best server to play
-
-- Refactor all that bullshit with address/port
-    - Default port should be hardcoded to 8412, not being saved as a config variable
 
 - Fix Steam invites over LAN
     - 1) Connecting to a server that is actually over lan
@@ -34,15 +32,9 @@ summary: That which we are brainstorming at the moment.
 
 - update weapons stats
 
-- First let's handle the servers, even then the press kit
-
 - Integrating discord API would be nice
 
-- Further simplifications to settings
-
-
 - GIFs for Steam description
-- Add Join our Discord link to description
 
 - Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
 

@@ -363,6 +363,7 @@ void settings_gui_state::perform(
 			drag_rect_bounded_vec2i(l, f, std::forward<decltype(args)>(args)...);
 			revert(f);
 		};
+		(void)revertable_drag_rect_bounded_vec2i;
 
 		auto revertable_drag = [&](auto l, auto& f, auto&&... args) {
 			drag(l, f, std::forward<decltype(args)>(args)...);
@@ -618,7 +619,7 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				text_color("Effects", yellow);
+				text_color("General Effects", yellow);
 
 				ImGui::Separator();
 
@@ -630,7 +631,7 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				text_color("Explosion effects intensity", yellow);
+				text_color("Explosion effects", yellow);
 
 				ImGui::Separator();
 
@@ -642,27 +643,10 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(smoke_amount), 0.f, 1.f);
 				}
 
-				ImGui::Separator();
-
-				text_color("Lighting", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.drawing;
-					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
-				}
-
-
-				{
-					auto& scope_cfg = config.performance;
-					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
-				}
-
 				break;
 			}
 			case settings_pane::AUDIO: {
-				text_color("Volume settings", yellow);
+				text_color("Volume", yellow);
 
 				ImGui::Separator();
 
@@ -676,7 +660,7 @@ void settings_gui_state::perform(
 					revertable_checkbox("Mute Main menu background", config.audio.mute_main_menu_background);
 				}
 
-				text_disabled("\n\n");
+				text_disabled("\n");
 
 				ImGui::Separator();
 
@@ -707,7 +691,7 @@ void settings_gui_state::perform(
 					revertable_checkbox("Make listener face the same direction as character", scope_cfg.set_listener_orientation_to_character_orientation);
 				}
 
-				text_disabled("\n\n");
+				text_disabled("\n");
 
 				ImGui::Separator();
 				text_color("Sound physics", yellow);
@@ -716,6 +700,9 @@ void settings_gui_state::perform(
 				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
 				revertable_slider("Max object speed for doppler calculation", config.sound.max_speed_for_doppler_calculation, 0.f, 10000.f);
 
+				text_disabled("\n");
+
+				ImGui::Separator();
 				text_color("Sound quality", yellow);
 
 				ImGui::Separator();
@@ -723,12 +710,17 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.sound;
 
+#if 0
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
+#endif
+
 					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
 					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
 
+#if 0
 					revertable_slider(SCOPE_CFG_NVP(missile_impact_sound_cooldown_duration), 1.f, 100.f);
 					revertable_slider(SCOPE_CFG_NVP(missile_impact_occurences_before_cooldown), 0, 10);
+#endif
 				}
 
 				break;
@@ -1032,6 +1024,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.arena_mode_gui;
 					revertable_checkbox("Show contextual tips", scope_cfg.context_tip_settings.is_enabled);
 
+#if 0
 					if (scope_cfg.context_tip_settings.is_enabled) {
 						auto& scope_cfg = config.arena_mode_gui.context_tip_settings.value;
 						auto indent = scoped_indent();
@@ -1041,6 +1034,7 @@ void settings_gui_state::perform(
 						revertable_color_edit(SCOPE_CFG_NVP(tip_text_color));
 						revertable_color_edit(SCOPE_CFG_NVP(bound_key_color));
 					}
+#endif
 				}
 
 #if 0
@@ -1162,7 +1156,7 @@ void settings_gui_state::perform(
 							revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
 						}
 
-						revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
+						//revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
 					}
 				}
 
@@ -1229,35 +1223,42 @@ void settings_gui_state::perform(
 					input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
 				}
 
-				revertable_checkbox("Record demo", scope_cfg.demo_recording_path.is_enabled);
+				revertable_checkbox("Record demo", scope_cfg.record_demo);
 
+#if 0
 				if (scope_cfg.demo_recording_path.is_enabled) {
 					auto scope = scoped_indent();
 					
-					input_text<512>("Target demo directory", scope_cfg.demo_recording_path.value, ImGuiInputTextFlags_EnterReturnsTrue); revert(scope_cfg.demo_recording_path.value);
 					revertable_slider(SCOPE_CFG_NVP(flush_demo_to_disk_once_every_secs), 1u, 120u);
 				}
+#endif
 
+#if 0
 				{
 					auto& scope_cfg = config.arena_mode_gui;
 					revertable_checkbox(SCOPE_CFG_NVP(show_client_resyncing_notifier));
 				}
+#endif
 
 				if (auto node = scoped_tree_node("Chat window")) {
 					auto& scope_cfg = config.client.client_chat;
 
 					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+#if 0
 					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
+#endif
 
 					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
 					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
 				}
 
+#if 0
 				if (auto node = scoped_tree_node("Advanced")) {
 					revertable_enum_radio("Spectate:", scope_cfg.spectated_arena_type, true);
 					revertable_slider(SCOPE_CFG_NVP(max_buffered_server_commands), 0u, 10000u);
 					revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
 				}
+#endif
 
 				revertable_slider("Max direct file bandwidth (per second)", scope_cfg.max_direct_file_bandwidth, 0.0f, 2.f, "%.2f MB");
 
@@ -1398,25 +1399,25 @@ void settings_gui_state::perform(
 					}
 				}	
 				
-				if (auto node = scoped_tree_node("Action notifications")) {
-					auto& scope_cfg = config.editor.action_notification;
-
-					revertable_checkbox(SCOPE_CFG_NVP(enabled));
-
-					if (scope_cfg.enabled) {
-						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
-						revertable_drag(SCOPE_CFG_NVP(offset.y));
-
-						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
-						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
-
-						revertable_slider(SCOPE_CFG_NVP(max_width), 10u, 1000u);
-						revertable_drag_vec2(SCOPE_CFG_NVP(text_padding));
-					}
-				}
-
 				if (auto node = scoped_tree_node("Interface")) {
 					revertable_checkbox("Warp cursor when moving nodes with T", config.editor.warp_cursor_when_moving_nodes);
+
+					if (auto node = scoped_tree_node("Action notifications")) {
+						auto& scope_cfg = config.editor.action_notification;
+
+						revertable_checkbox(SCOPE_CFG_NVP(enabled));
+
+						if (scope_cfg.enabled) {
+							revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
+							revertable_drag(SCOPE_CFG_NVP(offset.y));
+
+							revertable_color_edit(SCOPE_CFG_NVP(bg_color));
+							revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
+
+							revertable_slider(SCOPE_CFG_NVP(max_width), 10u, 1000u);
+							revertable_drag_vec2(SCOPE_CFG_NVP(text_padding));
+						}
+					}
 
 					if (auto node = scoped_tree_node("Grid")) {
 						auto& scope_cfg = config.editor.grid.render;
@@ -1454,18 +1455,6 @@ void settings_gui_state::perform(
 						auto& scope_cfg = config.editor;
 						revertable_checkbox(SCOPE_CFG_NVP(keep_source_nodes_selected_on_mirroring));
 					}
-				}
-
-				if (auto node = scoped_tree_node("Appearance")) {
-#if 0
-					if (auto node = scoped_tree_node("Property editor")) {
-						auto& scope_cfg = config.editor.property_debugger;
-
-						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_active_bg));
-					}
-#endif
 
 					if (auto node = scoped_tree_node("Entity highlights")) {
 						{
@@ -1488,17 +1477,25 @@ void settings_gui_state::perform(
 #endif
 					}
 
+				}
 
 #if 0
+				if (auto node = scoped_tree_node("Appearance")) {
+					if (auto node = scoped_tree_node("Property editor")) {
+						auto& scope_cfg = config.editor.property_debugger;
+
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_active_bg));
+					}
+
 					auto& scope_cfg = config.editor;
 
 					revertable_color_edit(SCOPE_CFG_NVP(tutorial_text_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_border_color));
-#endif
 				}
 
-#if 0
 				if (auto node = scoped_tree_node("Player")) {
 					auto& scope_cfg = config.editor.player;
 
@@ -1526,13 +1523,9 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::INTERFACE: {
-				if (auto node = scoped_tree_node("GUI font")) {
-					auto scope = scoped_indent();
+				revertable_slider("UI Font size", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
 
-					revertable_slider("Size in pixels", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
-				}
-
-				if (auto node = scoped_tree_node("Arena mode GUI")) {
+				if (auto node = scoped_tree_node("In-game HUD skin")) {
 					if (auto node = scoped_tree_node("Scoreboard")) {
 						auto scope = scoped_indent();
 						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
@@ -1588,7 +1581,9 @@ void settings_gui_state::perform(
 					if (auto node = scoped_tree_node("Money indicator")) {
 						auto scope = scoped_indent();
 
-						revertable_drag_rect_bounded_vec2i("Money indicator position", scope_cfg.money_indicator_pos, 0.3f, -vec2i(screen_size), vec2i(screen_size));
+						drag("Money indicator position X", scope_cfg.money_indicator_pos.x, 0.3f, -vec2i(screen_size).x, vec2i(screen_size).x);
+						drag("Money indicator position Y", scope_cfg.money_indicator_pos.y, 0.3f, -vec2i(screen_size).y, vec2i(screen_size).y);
+
 						revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
 						revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
 						revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
@@ -1596,16 +1591,16 @@ void settings_gui_state::perform(
 					}
 				}
 
-				text(
-					"Note: what follows is the original ImGui style tweaker.\n"
-					"It is used because imgui is being continuously improved,\n"
-					"so keeping it up to date by ourselves would be pretty hard.\n\n"
-					"To save your changes to the local configuration file,\n"
-					"You need to push Save Ref and only then Save settings at the bottom."
-				);
-				
-				ImGui::Separator();
-				ImGui::ShowStyleEditor(&config.gui_style);
+				if (auto node = scoped_tree_node("ImGUI style editor (Advanced)")) {
+					text(
+						"This is the ImGUI-provided style tweaker.\n"
+						"To save your changes to the local configuration file,\n"
+						"You need to push Save Ref and only then Save settings at the bottom."
+					);
+
+					ImGui::Separator();
+					ImGui::ShowStyleEditor(&config.gui_style);
+				}
 
 				break;
 			}
@@ -1640,35 +1635,27 @@ void settings_gui_state::perform(
 					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
 				}
 
-				text_disabled("\n\n");
+				ImGui::Separator();
+
+				text_color("Rendering", yellow);
 
 				ImGui::Separator();
 
 				revertable_checkbox("Stencil before light pass", config.drawing.stencil_before_light_pass);
 				tooltip_on_hover("If your field of view is glitched (disappearing enemies),\ntry toggling on and off.");
 
-				const auto cwd = augs::get_current_working_directory();
-				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
-				text("Cache folder location: %x (%x)", CACHE_DIR, std::filesystem::absolute(CACHE_DIR));
-				text("User folder location: %x (%x)", USER_DIR, std::filesystem::absolute(USER_DIR));
-
-				if (ImGui::Button("Dump debug log")) {
-					get_dumped_log_path();
-					
-					const auto logs = program_log::get_current().get_complete();
-					auto failure_log_path = augs::path_type(get_dumped_log_path());
-
-					augs::save_as_text(failure_log_path, logs);
-
-					augs::open_text_editor(failure_log_path.string());
-					augs::open_text_editor(failure_log_path.replace_filename("").string());
+				{
+					auto& scope_cfg = config.drawing;
+					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
 				}
 
-				ImGui::SameLine();
 
-				if (ImGui::Button("Open STUN manager")) {
-					stun_manager.open();
+				{
+					auto& scope_cfg = config.performance;
+					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
 				}
+
+				ImGui::Separator();
 
 #if !PLATFORM_WINDOWS
 				{
@@ -1801,6 +1788,36 @@ void settings_gui_state::perform(
 
 					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
 				}
+
+				ImGui::Separator();
+
+				text_color("Info", yellow);
+
+				ImGui::Separator();
+
+				const auto cwd = augs::get_current_working_directory();
+				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
+				text("Cache folder location: %x (%x)", CACHE_DIR, std::filesystem::absolute(CACHE_DIR));
+				text("User folder location: %x (%x)", USER_DIR, std::filesystem::absolute(USER_DIR));
+
+				if (ImGui::Button("Dump debug log")) {
+					get_dumped_log_path();
+					
+					const auto logs = program_log::get_current().get_complete();
+					auto failure_log_path = augs::path_type(get_dumped_log_path());
+
+					augs::save_as_text(failure_log_path, logs);
+
+					augs::open_text_editor(failure_log_path.string());
+					augs::open_text_editor(failure_log_path.replace_filename("").string());
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Open STUN manager")) {
+					stun_manager.open();
+				}
+
 
 				break;
 			}
@@ -2005,6 +2022,7 @@ void do_server_vars(
 			}
 		}
 
+		text_disabled("\n");
 	}
 	else if (pane == rcon_pane::VARS) {
 		int field_id = 999998;
@@ -2054,6 +2072,8 @@ void do_server_vars(
 			revertable_slider(SCOPE_CFG_NVP(kick_if_no_network_payloads_for_secs), 2u, 300u);
 			revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
 		}
+
+		text_disabled("\n");
 
 		ImGui::Separator();
 

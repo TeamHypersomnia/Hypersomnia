@@ -508,7 +508,7 @@ bool start_client_gui_state::perform(
 
 			into_vars.avatar_image_path = p;
 
-			checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
+			checkbox("Record demo", into_vars.record_demo);
 			ImGui::SameLine();
 			text_disabled("You can later rewatch your match in Replay tab.");
 

@@ -2376,14 +2376,17 @@ bool server_setup::should_have_admin_character() const {
 }
 
 void server_setup::sleep_until_next_tick() {
-	const auto sleep_dt = server_time - get_current_time();
+	const auto sleep_mult = std::clamp(vars.sleep_mult, 0.f, 0.9f);
+
+	if (sleep_mult <= 0.0f) {
+		return;
+	}
+
+	const auto sleep_dt = static_cast<float>(server_time - get_current_time());
+	const auto to_sleep_ms = sleep_dt * sleep_mult;
 
 	if (sleep_dt > 0.0) {
-		const auto mult = std::clamp(vars.sleep_mult, 0.f, 0.9f);
-
-		if (mult > 0.f) {
-			yojimbo_sleep(static_cast<float>(sleep_dt) * mult);
-		}
+		yojimbo_sleep(to_sleep_ms);
 	}
 }
 

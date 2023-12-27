@@ -6698,3 +6698,8 @@ This will discard your redo history."
 - host_with_default_port -> host_and_default_port
 - discord logo on gh
 
+- Quick play should find the best server to play
+
+- Refactor all that bullshit with address/port
+    - Default port should be hardcoded to 8412, not being saved as a config variable
+- Add Join our Discord link to description
