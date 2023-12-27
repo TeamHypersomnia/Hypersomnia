@@ -29,6 +29,7 @@ struct cmd_line_params {
 	bool keep_cwd = false;
 	bool sync_external_arenas = false;
 	bool sync_external_arenas_and_quit = false;
+	std::optional<int> autoupdate_delay;
 
 	int test_fp_consistency = -1;
 	std::string connect_address;
@@ -107,6 +108,10 @@ struct cmd_line_params {
 			}
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;
+			}
+			else if (a == "--delayed-autoupdate") {
+				daily_autoupdate = true;
+				autoupdate_delay = std::atoi(get_next());
 			}
 			else if (a == "--server-port") {
 				server_port = std::atoi(get_next());

@@ -76,6 +76,8 @@ struct server_vars {
 	bool allow_direct_arena_file_downloads = true;
 	address_string_type external_arena_files_provider = "";
 
+	int autoupdate_delay = 0;
+
 	bool daily_autoupdate = false;
 	hour_and_minute_str daily_autoupdate_hour = "";
 

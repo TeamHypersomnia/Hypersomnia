@@ -1783,6 +1783,15 @@ void server_setup::check_for_updates() {
 		when_to_check_for_updates_last_var = check_when;
 		when_to_check_for_updates = ::get_todays_time_at(check_when);
 
+		if (vars.autoupdate_delay) {
+			/*
+				Prevent secondary instances from downloading/extracting
+				the update at the same time.
+			*/
+
+			when_to_check_for_updates += std::chrono::minutes(vars.autoupdate_delay);
+		}
+
 		if (now >= when_to_check_for_updates) {
 			when_to_check_for_updates += std::chrono::hours(24);
 		}

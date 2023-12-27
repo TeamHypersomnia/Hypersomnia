@@ -360,6 +360,10 @@ work_result work(
 			result->server.daily_autoupdate = true;
 		}
 
+		if (params.autoupdate_delay.has_value()) {
+			result->server.autoupdate_delay = *params.autoupdate_delay;
+		}
+
 		if (result->client.nickname.empty()) {
 			result->client.nickname = augs::get_user_name();
 		}
