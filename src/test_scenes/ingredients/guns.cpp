@@ -3153,7 +3153,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.15f);
+			set_density_mult(meta, 1.4f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2800;
 			set_chambering_duration_ms(meta, 600.f);
@@ -3259,9 +3259,9 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYBERSPRAY, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.2f);
+			set_density_mult(meta, 1.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
-			meta.get<invariants::item>().standard_price = 2100;
+			meta.get<invariants::item>().standard_price = 2600;
 			set_chambering_duration_ms(meta, 300.f);
 
 			auto& item = meta.get<invariants::item>();
