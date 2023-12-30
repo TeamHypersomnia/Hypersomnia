@@ -210,8 +210,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				{
 					const auto& wielded_guns = it.get_wielded_guns();
+					const bool is_akimbo = wielded_guns.size() == 2;
 
-					if (wielded_guns.size() == 2) {
+					if (is_akimbo) {
 						cp_damage_by_sprint *= 1.4f;
 					}
 				}
@@ -303,9 +304,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 						{
 							const auto& wielded_guns = it.get_wielded_guns();
+							const bool is_akimbo = wielded_guns.size() == 2;
 
-							if (wielded_guns.size() == 2) {
-								movement_force_mult *= 0.85f;
+							if (is_akimbo) {
+								movement_force_mult *= 0.78f;
 							}
 						}
 
