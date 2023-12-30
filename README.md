@@ -19,7 +19,7 @@ Forever free and open-source :heart:
 
 <a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
 
-# Steam wishlist open!
+# Get it on Steam!
 
 <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" height=140 hspace=1> </a>
 
