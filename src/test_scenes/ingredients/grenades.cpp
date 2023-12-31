@@ -132,7 +132,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 550;
+			item.standard_price = 600;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -160,10 +160,10 @@ namespace test_flavours {
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
 
-			dmg.base = 150.f;
+			dmg.base = 180.f;
 			in.inner_ring_color = yellow;
 			in.outer_ring_color = orange;
-			in.effective_radius = 450.f;
+			in.effective_radius = 550.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 3000.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
@@ -253,7 +253,7 @@ namespace test_flavours {
 			dmg.base = 6.f;
 			in.inner_ring_color = white;
 			in.outer_ring_color = white;
-			in.effective_radius = 1250.f;
+			in.effective_radius = 1900.f;
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
@@ -311,7 +311,7 @@ namespace test_flavours {
 			dmg.base = 45.0f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
-			in.effective_radius = 700.f;
+			in.effective_radius = 1100.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
