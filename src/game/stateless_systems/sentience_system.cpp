@@ -615,9 +615,12 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 
 			auto after_shield_damage = amount;
 
+			if (false) {
+				/* Interferences ignore shield */
 			if (amount > 0 && is_shield_enabled()) {
 				const auto mult = std::max(0.01f, absorption->first.cp);
 				after_shield_damage = apply_ped(amount / mult).excessive * mult;
+			}
 			}
 
 			if (after_shield_damage != 0) {
