@@ -3564,7 +3564,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {11000.f, 11000.f};
+			gun_def.muzzle_velocity = {18000.f, 18000.f};
 			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HPSR_CHAMBERING);
@@ -3617,7 +3617,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {10000.f, 10000.f};
+			gun_def.muzzle_velocity = {14000.f, 14000.f};
 			gun_def.shot_cooldown_ms = 400.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HUNTER_CHAMBERING);
@@ -4214,10 +4214,10 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::BLUNAZ:         return 0.0f;
 		case W::KEK9:           return 15.0f;
 		case W::SN69:           return 15.0f;
+		case W::PRO90:          return 20.0f;
 		case W::CALICO:         return 30.0f;
 		case W::BULWARK:        return 30.0f;
 		case W::COVERT:         return 40.0f;
-		case W::PRO90:          return 40.0f;
 		case W::WARX:           return 40.0f;
 		case W::GRADOBICIE:     return 40.0f;
 		case W::CYBERSPRAY:     return 50.0f;
