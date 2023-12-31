@@ -514,6 +514,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			from_convex_partition(shape);
 		}
 		else {
+			const image_shape_type* non_standard_shape = nullptr;
+
 			const auto additional_rotation = [&]() {
 				const auto& typed_self = handle;
 
@@ -525,7 +527,13 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 					if (const auto anim = logicals.find(stance.carry)) {
 						if (anim->frames.size() > 0) {
-							auto considered_offsets = logicals.get_offsets(anim->frames[0].image_id).torso;
+							auto& offsets = logicals.get_offsets(anim->frames[0].image_id);
+
+							if (!offsets.non_standard_shape.empty()) {
+								non_standard_shape = &offsets.non_standard_shape;
+							}
+
+							auto considered_offsets = offsets.torso;
 
 							if (typed_self.only_secondary_holds_item()) {
 								considered_offsets.flip_vertically();
@@ -540,7 +548,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				return 0.f;
 			}();
 
-			from_box_shape(handle.get_logical_size(), additional_rotation);
+			if (non_standard_shape) {
+				from_convex_partition(*non_standard_shape);
+			}
+			else {
+				from_box_shape(handle.get_logical_size(), additional_rotation);
+			}
 		}
 
 		return;

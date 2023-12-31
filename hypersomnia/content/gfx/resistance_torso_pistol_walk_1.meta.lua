@@ -101,7 +101,7 @@ return {
     },
     non_standard_shape = {
       convex_partition = {},
-      source_polygon = {}
+      source_polygon = { {x = -42.0, y = 10.0}, {x = -42.0, y = -14.0}, {x = -31.0, y = -21.0}, {x = 69.0, y = -4.0}, {x = 69.0, y = 13.0}, {x = 23.0, y = 18.0}, {x = -27.0, y = 20.0} }
     },
     torso = {
       back = {
