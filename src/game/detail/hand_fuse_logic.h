@@ -9,6 +9,7 @@
 #include "game/detail/bombsite_in_range.h"
 #include "game/messages/battle_event_message.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/physics/infer_damping.hpp"
 #include "augs/log.h"
 
 template <class E>
@@ -276,6 +277,45 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			*/
 
 			perform_transfer(request, step);
+
+			if (fuse_def.apply_movement_boost) {
+				const auto vel = holder.get_effective_velocity();
+				const auto speed = vel.length();
+
+				if (speed > 1.0f) {
+					const auto look_dir = holder.get_logic_transform().get_direction();
+					const auto vel_dir = vec2(vel).normalize_hint(speed);
+
+					auto parallel_mult = (look_dir.dot(vel_dir) + 1) / 2;
+
+					if (parallel_mult > 0.8f) {
+						parallel_mult -= 0.8f;
+						parallel_mult *= 5.0f;
+
+						float dash_bonus = 0.0f;
+
+						if (const auto movement = holder.template find<components::movement>()) {
+							dash_bonus = movement->linear_inertia_ms;
+						}
+
+						if (auto body = fused_entity.template find<components::rigid_body>()) {
+							const auto total_speed = dash_bonus * 8 + speed * 4;
+							body.set_velocity(body.get_velocity().add_length(total_speed * parallel_mult));
+
+							const auto considered_max_speed = 10000.0f;
+							const auto speed_mult = total_speed / considered_max_speed;
+
+							const auto min_damping = 0.4f;
+
+							// LOG_NVPS(total_speed, parallel_mult);
+							fuse.damping_mult = augs::interp(1.0f, min_damping, speed_mult * parallel_mult);
+							fuse.damping_mult = std::max(fuse.damping_mult, min_damping);
+
+							body.infer_damping();
+						}
+					}
+				}
+			}
 		}
 		else {
 			refresh_fused_physics();

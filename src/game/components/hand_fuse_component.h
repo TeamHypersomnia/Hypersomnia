@@ -29,6 +29,7 @@ namespace components {
 		bool arming_requested = false;
 		uint8_t arming_source = arming_source_type::NONE;
 		pad_bytes<2> pad;
+		float damping_mult = 1.0f;
 
 		signi_entity_id character_now_defusing;
 		slot_function slot_when_armed = slot_function::INVALID;
@@ -48,6 +49,9 @@ namespace invariants {
 		bool always_release_when_armed = false;
 		bool must_stand_still_to_arm = false;
 		bool override_release_impulse = false;
+
+		bool apply_movement_boost = true;
+		pad_bytes<3> pad;
 
 		real32 arming_duration_ms = -1.f;
 		real32 defusing_duration_ms = -1.f;

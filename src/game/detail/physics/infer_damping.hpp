@@ -86,6 +86,12 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		}
 	});
 
+	handle.template dispatch_on_having_all<components::hand_fuse>([&damping](const auto& typed_handle) {
+		const auto& fuse = typed_handle.template get<components::hand_fuse>();
+
+		damping.linear *= fuse.damping_mult;
+	});
+
 	return damping.sanitize();
 }
 

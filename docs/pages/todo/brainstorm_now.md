@@ -6,7 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-# BEFORE STEAM
+- allow changing rcon pass from rcon? won't work with config.force.lua tho
+- fix that masterserver dump vs banlist or just dont use dump at all
+- rcon command to sync maps would be good
 
 - Further simplifications to settings
 

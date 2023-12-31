@@ -253,7 +253,7 @@ namespace test_flavours {
 			dmg.base = 6.f;
 			in.inner_ring_color = white;
 			in.outer_ring_color = white;
-			in.effective_radius = 1900.f;
+			in.effective_radius = 2100.f;
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
@@ -527,6 +527,7 @@ namespace test_flavours {
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			fuse.override_release_impulse = true;
+			fuse.apply_movement_boost = false;
 			fuse.additional_release_impulse = {};
 			fuse.additional_secondary_release_impulse = {};
 #if 0
