@@ -59,7 +59,7 @@ void world_camera::tick(
 	const auto height = [&]() {
 		if (entity_to_chase.alive()) {
 			if (auto movement = entity_to_chase.find<components::movement>()) {
-				return movement->portal_inertia_ms;
+				return std::max(0.0f, movement->portal_inertia_ms);
 			}
 		}
 
