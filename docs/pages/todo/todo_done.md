@@ -6703,3 +6703,9 @@ This will discard your redo history."
 - Refactor all that bullshit with address/port
     - Default port should be hardcoded to 8412, not being saved as a config variable
 - Add Join our Discord link to description
+- throw grenade force bonus proportional to movement speed
+
+- remove city mini from cycle
+- Buff flashbang/ped/interference
+- update weapons stats
+
