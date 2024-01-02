@@ -305,6 +305,19 @@ static void report_all_spells(cosmos& cosm) {
 	);
 }
 
+template <class T>
+auto toarr(const std::unordered_map<std::string, T>& m) {
+	std::vector<T> out;
+
+	for (auto& e : m) {
+		out.push_back(e.second);
+	}
+
+	sort_range(out, [](auto& a, auto& b) { return a.price < b.price; });
+
+	return out;
+}
+
 static void save_all_reported_weapons() {
 	if (reported) {
 		return;
@@ -312,10 +325,10 @@ static void save_all_reported_weapons() {
 
 	reported = true;
 
-	augs::save_as_json(reported_firearms, LOGS_DIR / "firearms.json");
-	augs::save_as_json(reported_melees, LOGS_DIR / "melees.json");
-	augs::save_as_json(reported_explosives, LOGS_DIR / "explosives.json");
-	augs::save_as_json(reported_spells, LOGS_DIR / "spells.json");
+	augs::save_as_json(toarr(reported_firearms), LOGS_DIR / "firearms.json");
+	augs::save_as_json(toarr(reported_melees), LOGS_DIR / "melees.json");
+	augs::save_as_json(toarr(reported_explosives), LOGS_DIR / "explosives.json");
+	augs::save_as_json(toarr(reported_spells), LOGS_DIR / "spells.json");
 }
 
 test_mode_ruleset::test_mode_ruleset() {
