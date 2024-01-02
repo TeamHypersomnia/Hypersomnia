@@ -1922,7 +1922,7 @@ namespace test_flavours {
 				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PRO90_ROUND);
 
-				cartridge.num_rounds_spawned = 2;
+				cartridge.num_rounds_spawned = 1;
 				cartridge.rounds_spread_degrees  = 6.5f;
 
 				meta.set(cartridge);
@@ -3130,12 +3130,12 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4900.f, 5400.f};
-			gun_def.shot_cooldown_ms = 61.f;
+			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 1.1;
+			gun_def.damage_multiplier = 2.0f;
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
