@@ -60,7 +60,7 @@ return {
     item = {
       akimbo_offset = {
         pos = {
-          x = 23,
+          x = 10,
           y = -2
         },
         rotation = 11
