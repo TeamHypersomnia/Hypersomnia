@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- zbudowalbym gierke z address sanitizerem
+- fix connection stats
 - allow changing rcon pass from rcon? won't work with config.force.lua tho
 - fix that masterserver dump vs banlist or just dont use dump at all
 - rcon command to sync maps would be good
@@ -31,8 +33,6 @@ summary: That which we are brainstorming at the moment.
     - Also the rich presence string should show the external address, not internal
     - Join game should work with LAN
         - Try connecting to the internal server
-
-- update weapons stats
 
 - Integrating discord API would be nice
 

@@ -15,6 +15,7 @@ struct torso_offsets {
 	transformi shoulder;
 	transformi secondary_shoulder;
 	real32 strafe_facing_offset = 0.f;
+	bool is_akimbo = false;
 	// END GEN INTROSPECTOR
 
 	void flip_vertically() {
@@ -55,7 +56,7 @@ struct item_offsets {
 	transformi shoulder_anchor;
 	transformi head_anchor;
 	transformi attachment_anchor;
-	transformi beep_offset;
+	transformi akimbo_offset;
 	// END GEN INTROSPECTOR
 };
 

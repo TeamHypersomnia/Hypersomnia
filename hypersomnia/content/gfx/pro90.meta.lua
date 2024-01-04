@@ -36,12 +36,12 @@ return {
       }
     },
     item = {
-      attachment_anchor = {
+      akimbo_offset = {
         pos = {
-          x = 0,
-          y = 0
+          x = 22,
+          y = 2
         },
-        rotation = 0
+        rotation = 4
       },
       back_anchor = {
         pos = {
@@ -59,18 +59,18 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -1,
-          y = 6
+          x = -1 - 22,
+          y = 6 - 2 
         },
-        rotation = 0
+        rotation = -4
       },
       head_anchor = {
         pos = {
-          x = 0,
-          y = 0
+          x = -4,
+          y = -3
         },
-        rotation = 0
-      }
+        rotation = -4
+      },
     },
     legs = {
       foot = {

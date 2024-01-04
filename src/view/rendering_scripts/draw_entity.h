@@ -416,6 +416,10 @@ FORCE_INLINE void specific_entity_drawer(
 							return item_def.draw_over_hands_when_reloading;
 						}
 
+						if (stance_offsets.is_akimbo && item_def.draw_under_hands_in_akimbo) {
+							return false;
+						}
+
 						return item_def.draw_over_hands;
 					}
 
@@ -505,6 +509,12 @@ FORCE_INLINE void specific_entity_drawer(
 
 						auto stance_offsets_for_head = stance_offsets;
 						auto anchor_for_head = head_offsets.item.head_anchor;
+
+						if (wielded_items.size() == 1) {
+							if (const auto w = cosm[wielded_items[0]]) {
+								anchor_for_head += logicals.get_offsets(w.get_image_id()).item.head_anchor;
+							} 
+						}
 
 						if (only_secondary) {
 							stance_offsets_for_head.flip_vertically();

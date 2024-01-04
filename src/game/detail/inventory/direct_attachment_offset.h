@@ -79,25 +79,39 @@ attachment_offset direct_attachment_offset(
 		};
 
 		switch (type) {
-			case slot_function::PRIMARY_HAND: 
-				attachment_offset = get_actual_offsets_by_torso().primary_hand;
+			case slot_function::PRIMARY_HAND: {
+				auto offsets = get_actual_offsets_by_torso();
+				attachment_offset = offsets.primary_hand;
+
 				anchor = anchors.hand_anchor;
+
+				if (offsets.is_akimbo) {
+					anchor += anchors.akimbo_offset;
+				}
 
 				if (const auto h = container[slot_function::SECONDARY_HAND]; h && h.has_items()) {
 					anchor.rotation = 0;
 				}
 
 				break;
+			}
 
-			case slot_function::SECONDARY_HAND: 
-				attachment_offset = get_actual_offsets_by_torso().secondary_hand;
+			case slot_function::SECONDARY_HAND: {
+				auto offsets = get_actual_offsets_by_torso();
+				attachment_offset = offsets.secondary_hand;
+
 				anchor = anchors.hand_anchor;
+
+				if (offsets.is_akimbo) {
+					anchor += anchors.akimbo_offset;
+				}
 
 				if (const auto h = container[slot_function::PRIMARY_HAND]; h && h.has_items()) {
 					anchor.rotation = 0;
 				}
 
 				break;
+			}
 
 			case slot_function::BACK: 
 				attachment_offset = get_actual_offsets_by_torso().back;

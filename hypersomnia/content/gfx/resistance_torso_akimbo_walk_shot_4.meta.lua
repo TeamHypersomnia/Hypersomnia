@@ -111,6 +111,7 @@ return {
       source_polygon = {}
     },
     torso = {
+      is_akimbo = true,
       back = {
         pos = {
           x = -15,

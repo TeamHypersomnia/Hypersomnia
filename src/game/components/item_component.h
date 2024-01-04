@@ -43,7 +43,8 @@ namespace invariants {
 		item_holding_stance holding_stance = item_holding_stance::BARE_LIKE;
 
 		bool stackable = false;
-		pad_bytes<3> pad;
+		bool draw_under_hands_in_akimbo = false;
+		pad_bytes<2> pad;
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
@@ -57,6 +58,8 @@ namespace invariants {
 
 		faction_type specific_to = faction_type::SPECTATOR;
 		unsigned gratis_ammo_pieces_with_first = 0;
+
+		transformi hand_anchor_offset;
 		// END GEN INTROSPECTOR
 	};
 }

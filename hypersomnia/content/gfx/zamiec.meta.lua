@@ -50,12 +50,12 @@ return {
       }
     },
     item = {
-      attachment_anchor = {
+      akimbo_offset = {
         pos = {
-          x = 0,
-          y = 0
+          x = 10,
+          y = 7
         },
-        rotation = 0
+        rotation = 15
       },
       back_anchor = {
         pos = {
@@ -73,17 +73,17 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -16,
-          y = 8
+          x = -16 - 10,
+          y = 8 - 7
         },
-        rotation = 0
+        rotation = -15
       },
       head_anchor = {
         pos = {
-          x = 0,
+          x = -4,
           y = 0
         },
-        rotation = 0
+        rotation = -15
       },
       shoulder_anchor = {
         pos = {

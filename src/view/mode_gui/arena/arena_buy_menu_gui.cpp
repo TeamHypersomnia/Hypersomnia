@@ -911,7 +911,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_smg = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (price_of(item_flavour_id(id)) > 1500) {
+					if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::SUBMACHINE_GUNS) {
 						callback(id, flavour);
 					}
 				});
@@ -974,7 +974,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				case buy_menu_type::SUBMACHINE_GUNS: {
 					do_item_menu(
-						item_holding_stance::PISTOL_LIKE,
+						item_holding_stance::RIFLE_LIKE,
 						for_each_smg
 					);
 					break;
