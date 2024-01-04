@@ -3426,7 +3426,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
-			meta.get<invariants::item>().standard_price = 6200;
+			meta.get<invariants::item>().standard_price = 5900;
 			set_chambering_duration_ms(meta, 700.f);
 
 			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
