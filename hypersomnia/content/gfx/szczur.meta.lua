@@ -55,8 +55,8 @@ return {
     item = {
       akimbo_offset = {
         pos = {
-          x = 10,
-          y = 7
+          x = -3,
+          y = 3
         },
         rotation = 0
       },
@@ -83,10 +83,10 @@ return {
       },
       head_anchor = {
         pos = {
-          x = -4,
+          x = -3,
           y = 0
         },
-        rotation = -15
+        rotation = -8
       },
       shoulder_anchor = {
         pos = {

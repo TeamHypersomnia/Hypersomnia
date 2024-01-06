@@ -876,6 +876,7 @@ namespace test_scenes {
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::BULWARK);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::ZAMIEC);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::SZCZUR);
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::ASSAULT_RATTLE);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::MINI_KNIFE);
