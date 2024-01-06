@@ -86,7 +86,7 @@ return {
           x = -3,
           y = 0
         },
-        rotation = -8
+        rotation = -4
       },
       shoulder_anchor = {
         pos = {

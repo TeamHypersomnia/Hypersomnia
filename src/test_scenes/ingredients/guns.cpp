@@ -3332,6 +3332,8 @@ namespace test_flavours {
 			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZCZUR_MUZZLE);
+			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
+			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4950.f, 4950.f};
