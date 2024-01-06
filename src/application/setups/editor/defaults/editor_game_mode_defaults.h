@@ -42,6 +42,7 @@ inline void setup_game_mode_defaults(
 		o[test_shootable_weapons::PRO90],
 		o[test_shootable_weapons::CYBERSPRAY],
 		o[test_shootable_weapons::ZAMIEC],
+		o[test_shootable_weapons::SZCZUR],
 
 		o[test_shootable_weapons::WARX],
 		o[test_shootable_weapons::GRADOBICIE],
