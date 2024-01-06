@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2023-08-09 19:05:04.159880 UTC"
+        "version_timestamp": "2024-01-06 00:52:03.546828 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -192,6 +192,13 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 10",
+            "nodes": [
+                "szczur (1)",
+                "szczur"
+            ]
+        },
         {
             "id": "Layer 6",
             "nodes": [
@@ -1790,6 +1797,16 @@
             "id": "pro90-right",
             "type": "pro90",
             "pos": [1447.0, 4200.0]
+        },
+        {
+            "id": "szczur",
+            "type": "szczur",
+            "pos": [-947.0, 4000.0]
+        },
+        {
+            "id": "szczur (1)",
+            "type": "szczur",
+            "pos": [1357.0, 4000.0]
         },
         {
             "id": "electric_armor",

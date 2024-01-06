@@ -242,6 +242,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     enabled = false
   },
   drawing = {
+    --custom_zoom = 4,
     snap_zoom_to_fov_size = true,
     snap_zoom_to_multiple_if_different_by_pixels = 100,
 

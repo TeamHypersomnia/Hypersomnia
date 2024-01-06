@@ -1157,6 +1157,73 @@ namespace test_flavours {
 			meta.set(missile);
 		}
 
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::SZCZUR_ROUND);
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, rgba(255, 255, 255, 255));
+
+			{
+				{
+					invariants::trace trace_def;
+
+					trace_def.max_multiplier_x = {0.670f, 1.8f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 466.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+
+					meta.set(trace_def);
+				}
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+			meta.template get<invariants::rigid_body>().damping.linear = 1.35f;
+
+			invariants::missile missile;
+
+			{
+				auto& dest_eff = missile.damage.effects.destruction;
+				dest_eff.particles.modifier.color = pink;
+				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			}
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.modifier.color = pink;
+			missile.trace_particles.modifier.scale_amounts *= 0.5f;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
+			missile.trace_particles_fly_backwards = true;
+			missile.muzzle_leave_particles.modifier.color = pink;
+			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.modifier.color = pink;
+			missile.ricochet_born_cooldown_ms = 17.f;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			missile.max_lifetime_ms = 850.f;
+			missile.damage.base = 10;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.doppler_factor = 0.6f;
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
 		const auto pro90_round_col = rgba(255, 234, 30, 255);
 
 		{
@@ -1645,6 +1712,18 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::CYAN_SHELL);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
+			test_flavours::add_shell_dynamic_body(meta);
+
+			invariants::remnant remnant;
+			remnant.lifetime_secs = 5.f;
+			remnant.start_shrinking_when_remaining_ms = 3000.f;
+			meta.set(remnant);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::PINK_SHELL);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::PINK_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
@@ -2237,6 +2316,34 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::SZCZUR_CHARGE);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE_CHARGE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			{
+				invariants::item item;
+				item.space_occupied_per_charge = to_space_units("0.01");
+				item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+				item.stackable = true;
+
+				meta.set(item);
+			}
+
+			{
+				invariants::cartridge cartridge; 
+
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
+				cartridge.shell_trace_particles.modifier.color = pink;
+
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PINK_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZCZUR_ROUND);
+
+				meta.set(cartridge);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYBERSPRAY_CHARGE);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
@@ -2608,9 +2715,42 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.34");
+			charge_deposit_def.space_available = to_space_units("0.35");
 			charge_deposit_def.mounting_duration_ms = 300.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ZAMIEC_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.8");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 100;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::SZCZUR_MAGAZINE);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SZCZUR_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			meta.get<invariants::text_details>().name =
+				"Szczur magazine"
+			;
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.30");
+			charge_deposit_def.mounting_duration_ms = 300.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::SZCZUR_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -2901,6 +3041,16 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+			
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, pink);
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::SZCZUR_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
 			
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, cyan);
@@ -3169,6 +3319,66 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SZCZUR);
+
+			meta.get<invariants::text_details>().description =
+				"Pretty good SMG."
+			;
+
+			meta.get<invariants::text_details>().name =
+				"Szczur"
+			;
+
+			auto& gun_def = meta.get<invariants::gun>();
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZCZUR_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4950.f, 4950.f};
+			gun_def.shot_cooldown_ms = 90.f;
+
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 2.4;
+			gun_def.headshot_multiplier = 2.5f;
+			gun_def.head_radius_multiplier = 0.85f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
+			gun_def.recoil_multiplier = 0.17f;
+			gun_def.buy_type = buy_menu_type::SUBMACHINE_GUNS;
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.052f;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SZCZUR, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.5f);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f, false);
+			meta.get<invariants::item>().standard_price = 2200;
+			set_chambering_duration_ms(meta, 390.f);
+
+			auto& item = meta.get<invariants::item>();
+			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			only_allow_mag(meta, test_container_items::SZCZUR_MAGAZINE);
+			item.flip_when_reloading = true;
+			item.draw_mag_over_when_reloading = false;
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
+
+			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
+			mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
+			item.draw_over_hands = true;
+			item.draw_under_hands_in_akimbo = true;
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ZAMIEC);
 
 			meta.get<invariants::text_details>().description =
@@ -3184,7 +3394,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5300.f, 5400.f};
+			gun_def.muzzle_velocity = {5250.f, 5300.f};
 			gun_def.shot_cooldown_ms = 75.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3213,7 +3423,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f, false);
-			meta.get<invariants::item>().standard_price = 2300;
+			meta.get<invariants::item>().standard_price = 2400;
 			set_chambering_duration_ms(meta, 600.f);
 
 			auto& item = meta.get<invariants::item>();
@@ -4231,6 +4441,7 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::GRADOBICIE:     return 40.0f;
 		case W::CYBERSPRAY:     return 50.0f;
 		case W::ZAMIEC:         return 50.0f;
+		case W::SZCZUR:         return 50.0f;
 		case W::GALILEA:        return 110.0f;
 		case W::BILMER2000:     return 110.0f;
 		case W::BAKA47:         return 110.0f;
