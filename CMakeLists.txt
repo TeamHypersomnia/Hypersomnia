@@ -164,7 +164,7 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 
-option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." ON)
+option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
 
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
