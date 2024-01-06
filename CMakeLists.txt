@@ -164,6 +164,8 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 
+option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." ON)
+
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
 
@@ -1480,14 +1482,26 @@ if(BUILD_NETWORKING)
 endif()
 
 if(BUILD_FREETYPE)
-	message("Building Freetype (no harfbuzz/png/bzip2/brotli/zlib).")
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype2")
+	if(USE_SYSTEM_FREETYPE)
+		message("Looking for system freetype")
+		find_package(Freetype REQUIRED)
 
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(freetype PUBLIC -mcmodel=large -no-pie)
+		if (FREETYPE_FOUND)
+			message("Found the system freetype at: ${FREETYPE_LIBRARIES}")
+
+		endif()
 	endif()
 
-	add_include_dirs_of("freetype")
+	if (NOT (USE_SYSTEM_FREETYPE AND FREETYPE_FOUND))
+		message("Building Freetype (no harfbuzz/png/bzip2/brotli/zlib).")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype2")
+
+		if(ADD_MCMODEL_LARGE_FLAG)
+			target_compile_options(freetype PUBLIC -mcmodel=large -no-pie)
+		endif()
+
+		add_include_dirs_of("freetype")
+	endif()
 endif()
 
 
