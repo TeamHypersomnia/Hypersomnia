@@ -6709,3 +6709,5 @@ This will discard your redo history."
 - Buff flashbang/ped/interference
 - update weapons stats
 
+- dropped mags should fly to the side
+

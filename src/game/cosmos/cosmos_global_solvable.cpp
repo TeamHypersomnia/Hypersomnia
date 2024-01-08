@@ -150,6 +150,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					transfer.target_slot = target_slot;
 					transfer.params = request.params;
 					transfer.params.bypass_mounting_requirements = true;
+					transfer.params.drop_to_the_side = true;
 					transfer.params.set_specified_quantity(access, 1);
 
 					const auto previous_charges = transferred_item.template get<components::item>().get_charges();

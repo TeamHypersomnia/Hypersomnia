@@ -381,10 +381,23 @@ perform_transfer_result perform_transfer_impl::operator()(
 		rigid_body.set_angular_velocity(0.f);
 		rigid_body.set_transform(initial_transform_of_transferred);
 
+		auto final_direction = initial_transform_of_transferred.get_direction();
+
+		if (r.params.drop_to_the_side && source_slot_container.alive()) {
+			if (const auto t = source_slot_container.find_logic_transform()) {
+				final_direction = t->get_direction();
+
+				if (auto slot = source_root[slot_function::SECONDARY_HAND]; slot && !slot.has_items()) {
+					final_direction.rotate(-90);
+				}
+				else {
+					final_direction.rotate(90);
+				}
+			}
+		}
+
 		const auto total_impulse = r.params.additional_drop_impulse + standard_drop_impulse;
-		const auto impulse = 
-			total_impulse.linear * initial_transform_of_transferred.get_direction()
-		;
+		const auto impulse = total_impulse.linear * final_direction;
 
 		const auto mass = rigid_body.get_mass();
 

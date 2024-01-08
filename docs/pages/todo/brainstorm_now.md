@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Ranked matches (w/o matchmaking yet)
+    - Just have servers with 2, 4 slots etc.
+    - Ranked only starts when the server gets full
+        - This way it's automatically hidden from Quick play feature
+    - What about non-steam players who connect?
+        - Won't really be many these days
+        - Tbh we might just host 1-2 servers with [Casual] and disallow non-steam clients on the ranked ones
+        - Will later be able to login through discord
+            - Btw can't the C++ discord api authenticate for us? Without having to do oauth
+        
+
+
+
 - zbudowalbym gierke z address sanitizerem
 - fix connection stats
 - allow changing rcon pass from rcon? won't work with config.force.lua tho

@@ -34,7 +34,7 @@ public:
 	bool perform_recoils = true;
 	bool set_source_root_as_sender = false;
 
-	pad_bytes<1> pad;
+	bool drop_to_the_side = false;
 	// END GEN INTROSPECTOR
 
 	void set_specified_quantity(allocate_new_entity_access, int);
