@@ -11607,7 +11607,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Whenever you're stuck, press Escape.\nThen click \"Restart from last checkpoint\"."
+            "context_tip": "To skip the Tutorial, press Escape.\nThen click \"Quit to menu\"."
         },
         {
             "id": "tip4_1 (7)",
