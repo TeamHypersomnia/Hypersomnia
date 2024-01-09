@@ -171,7 +171,7 @@ return {
   },
   audio_volume = {
     master = 1,
-    sound_effects = 1,
+    sound_effects = 0.75,
     music = 0.55
   },
   sound = {
