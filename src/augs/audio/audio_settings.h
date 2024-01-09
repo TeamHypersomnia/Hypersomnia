@@ -16,7 +16,7 @@ namespace augs {
 		}
 
 		float get_music_volume() const {
-			return convert_audio_volume(std::clamp(master * sound_effects, 0.f, 1.f));
+			return convert_audio_volume(std::clamp(master * music, 0.f, 1.f));
 		}
 	};
 
