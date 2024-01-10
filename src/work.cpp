@@ -254,17 +254,10 @@ work_result work(
 			EDITOR_PROJECTS_DIR
 		};
 
-		{
-			std::string all;
+			LOG("Creating directories:");
 
 			for (const auto& a : all_created_directories) {
-				all += "\n" + a.string();
-			}
-
-			LOG("Creating directories:%x", all);
-		}
-
-		for (const auto& a : all_created_directories) {
+				LOG(a);
 			augs::create_directories(a);
 		}
 	}

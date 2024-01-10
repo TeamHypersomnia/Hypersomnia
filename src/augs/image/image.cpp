@@ -17,6 +17,11 @@
 #include "augs/image/blit.h"
 #include "augs/readwrite/byte_file.h"
 #define STB_IMAGE_IMPLEMENTATION
+
+#if PLATFORM_WINDOWS
+#define STBI_WINDOWS_UTF8
+#endif
+
 #include "3rdparty/stb/stb_image.h"
 #include "augs/readwrite/memory_stream.h"
 
@@ -252,7 +257,12 @@ namespace augs {
 				int y;
 				int comp;
 
-				const auto str_path = string_windows_friendly(make_windows_friendly(file_path));
+#if PLATFORM_WINDOWS
+				const auto wide_str = file_path.string();
+				const auto str_path = wstr_to_utf8(wide_str);
+#else
+				const auto str_path = file_path.string();
+#endif
 
 				if (!stbi_info(str_path.c_str(), &x, &y, &comp)) {
 					throw image_loading_error("Failed to read size of %x:\nstbi_info returned 0!", file_path);
