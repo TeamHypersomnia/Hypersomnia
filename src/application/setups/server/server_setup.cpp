@@ -653,10 +653,10 @@ bool server_setup::handle_masterserver_response(
 					external_address = typed_request.address;
 
 					LOG("masterserver_out::tell_me_my_address arrived with result: %x", ::ToString(typed_request.address));
-				}	
 
 				return true;
 			}
+		}
 		}
 
 		return false;
