@@ -292,7 +292,7 @@ void editor_entity_selector::do_mousemotion(
 		const auto query = visible_entities_query {
 			cosm,
 			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size()),
-			accuracy_type::PROXIMATE,
+			accuracy_type::EXACT,
 			filter,
 			tree_of_npo_filter::all_and_force_add_all_icons()
 		};
