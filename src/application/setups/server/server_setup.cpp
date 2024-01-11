@@ -1384,9 +1384,9 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	return chosen_next_area;
 }
 
-void server_setup::broadcast_info(const std::string& text) {
+void server_setup::broadcast_info(const std::string& text, const chat_target_type target) {
 	server_broadcasted_chat message;
-	message.target = chat_target_type::INFO_CRITICAL;
+	message.target = target;
 	message.message = text;
 
 	broadcast(message);
@@ -1981,14 +1981,49 @@ void server_setup::schedule_restart() {
 
 template <class P>
 message_handler_result server_setup::handle_rcon_payload(
+	const client_id_type& rcon_client_id,
 	const rcon_level_type level,
 	const P& typed_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
 	constexpr auto continue_v = message_handler_result::CONTINUE;
 
-	if constexpr(is_one_of_v<P, match_command, custom_game_commands_string_type>) {
+	auto notification = [&](const auto& action) {
+		const auto nickname = get_client_state(to_mode_player_id(rcon_client_id)).get_nickname();
+
+		broadcast_info(typesafe_sprintf("%x %x.", nickname, action), chat_target_type::INFO);
+	};
+
+	if constexpr(std::is_same_v<P, match_command>) {
 		local_collected.mode_general.special_command = typed_payload;
+
+		switch (typed_payload) {
+			case match_command::RESTART_MATCH:
+				notification("restarted the match");
+				break;
+
+			case match_command::RESTART_MATCH_NO_WARMUP:
+				notification("restarted the match (warmup skipped)");
+				break;
+
+			case match_command::SWAP_TEAMS:
+				notification("swapped teams");
+				break;
+
+			case match_command::SCRAMBLE_TEAMS:
+				notification("scrambled teams");
+				break;
+
+			default:
+				break;
+		}
+
+		return continue_v;
+	}
+	else if constexpr(std::is_same_v<P, custom_game_commands_string_type>) {
+		local_collected.mode_general.special_command = typed_payload;
+
+		notification("executed custom game commands");
 
 		return continue_v;
 	}
@@ -2041,6 +2076,17 @@ message_handler_result server_setup::handle_rcon_payload(
 	}
 	else if constexpr(std::is_same_v<P, server_vars>) {
 		LOG("New server vars from the client.");
+
+		auto& new_v = typed_payload;
+		auto& old_v = vars;
+		
+		if (new_v.arena != old_v.arena) {
+			notification(typesafe_sprintf("changed arena to %x", new_v.arena));
+		}
+
+		if (new_v.game_mode != old_v.game_mode) {
+			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode));
+		}
 
 		apply(typed_payload);
 		write_vars_to_disk_once = true;
@@ -2436,7 +2482,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 			auto& rcon_gui = integrated_client_gui.rcon;
 
 			auto on_new_payload = [&](const auto& new_payload) {
-				handle_rcon_payload(rcon_level_type::MASTER, new_payload);
+				handle_rcon_payload(get_integrated_client_id(), rcon_level_type::MASTER, new_payload);
 			};
 
 			if (!arena_gui.scoreboard.show && rcon_gui.show) {

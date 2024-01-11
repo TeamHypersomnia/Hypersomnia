@@ -118,12 +118,12 @@ message_handler_result server_setup::handle_payload(
 		if (level >= rcon_level_type::BASIC) {
 			const auto result = [&]() {
 				if constexpr(std::is_same_v<T, server_vars>) {
-					return handle_rcon_payload(level, payload);
+					return handle_rcon_payload(client_id, level, payload);
 				}
 				else {
 					return std::visit(
 						[&](const auto& typed_payload) {
-							return handle_rcon_payload(level, typed_payload);
+							return handle_rcon_payload(client_id, level, typed_payload);
 						},
 						payload
 					);

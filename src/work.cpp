@@ -261,7 +261,7 @@ work_result work(
 		LOG("Creating directories:");
 
 		for (const auto& a : all_created_directories) {
-			LOG(a);
+			LOG("%x", a);
 			augs::create_directories(a);
 		}
 	}

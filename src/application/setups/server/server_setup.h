@@ -289,6 +289,7 @@ private:
 
 	template <class P>
 	message_handler_result handle_rcon_payload(
+		const client_id_type&, 
 		rcon_level_type,
 		const P& payload
 	);
@@ -611,7 +612,7 @@ public:
 	}
 
 	void broadcast(const ::server_broadcasted_chat&, std::optional<client_id_type> except = std::nullopt);
-	void broadcast_info(const std::string&);
+	void broadcast_info(const std::string&, chat_target_type = chat_target_type::INFO_CRITICAL);
 
 	std::string find_client_nickname(const client_id_type&) const;
 
