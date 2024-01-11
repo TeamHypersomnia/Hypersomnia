@@ -4,7 +4,7 @@
 #include "augs/misc/secure_hash.h"
 #include "3rdparty/blake3/blake3.h"
 
-std::string get_hex_representation(const unsigned char *Bytes, const size_t Length) {
+std::string get_hex_representation(const uint8_t *Bytes, const size_t Length) {
 	std::ostringstream os;
 	os.fill('0');
 	os<<std::hex;
@@ -12,6 +12,10 @@ std::string get_hex_representation(const unsigned char *Bytes, const size_t Leng
 		os<<std::setw(2)<<(unsigned int)*ptr;
 	}
 	return os.str();
+}
+
+std::string get_hex_representation(const std::byte *Bytes, const size_t Length) {
+	return get_hex_representation(reinterpret_cast<const uint8_t*>(Bytes), Length);
 }
 
 augs::hash_string_type get_hex_representation(const augs::secure_hash_type& bytes) {

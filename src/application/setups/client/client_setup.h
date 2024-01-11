@@ -47,6 +47,7 @@
 #include "application/setups/client/arena_downloading_session.h"
 #include "application/setups/client/direct_file_download.h"
 #include "application/setups/client/bandwidth_monitor.h"
+#include "steam_integration_callbacks.h"
 
 #include "steam_rich_presence_pairs.h"
 
@@ -91,6 +92,8 @@ class client_setup :
 	all_modes_variant predicted_mode;
 
 	std::vector<special_client_request> pending_requests;
+	std::optional<steam_auth_ticket> pending_steam_auth;
+
 	bool now_resyncing = false;
 	bool schedule_disconnect = false;
 
@@ -331,23 +334,27 @@ class client_setup :
 
 		const bool in_game = new_local_entropy.has_value();
 
-		if (is_connected()) {
+		{
 			auto scope = measure_scope(performance.sending_messages);
 
-			send_pending_commands();
+			if (is_connected()) {
+				send_pending_commands();
+			}
 
-			if (in_game) {
-				auto new_client_entropy = new_local_entropy->get_for(
-					get_viewed_character(), 
-					get_local_player_id()
-				);
+			if (is_connected()) {
+				if (in_game) {
+					auto new_client_entropy = new_local_entropy->get_for(
+						get_viewed_character(), 
+						get_local_player_id()
+					);
 
-				//LOG("In game. Sending client entropy. Predicted %x: ", receiver.predicted_entropies.size());
-				send_to_server(new_client_entropy);
+					//LOG("In game. Sending client entropy. Predicted %x: ", receiver.predicted_entropies.size());
+					send_to_server(new_client_entropy);
+				}
 			}
 		}
 
-		{
+		if (is_connected()) {
 			auto scope = measure_scope(performance.sending_packets);
 			send_packets();
 		}
@@ -863,4 +870,6 @@ public:
 
 	netcode_address_t get_server_address_for_others_to_join() const;
 	std::string get_steam_join_command_line() const;
+
+	void send_auth_ticket(const steam_auth_ticket&);
 };

@@ -133,6 +133,33 @@ namespace net_messages {
 		return read_standard_block_message(output);
 	}
 
+	inline bool steam_auth_request::read_payload(
+		steam_auth_request_payload& payload
+	) {
+		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
+		auto size = static_cast<std::size_t>(GetBlockSize());
+
+		auto& ticket = payload.ticket_bytes;
+
+		ticket.resize(size);
+		std::memcpy(ticket.data(), data, size);
+
+		return true;
+	}
+
+	template <class F>
+	inline bool steam_auth_request::write_payload(
+		F block_allocator,
+		const steam_auth_request_payload& payload
+	) {
+		const auto& ticket = payload.ticket_bytes;
+		auto block = block_allocator(ticket.size());
+
+		std::memcpy(block, ticket.data(), ticket.size());
+
+		return true;
+	}
+
 	inline bool player_avatar_exchange::read_payload(
 		session_id_type& session_id,
 		arena_player_avatar_payload& payload

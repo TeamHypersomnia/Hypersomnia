@@ -1,10 +1,12 @@
 #include "steam_integration.h"
 
+
+const int steam_app_id = 2660970;
+
 #if BUILD_STEAM
 #include <optional>
 #include "steam_integration_callbacks.h"
 
-const int steam_app_id = 2660970;
 #include "steam_api.h"
 
 /*
@@ -20,7 +22,9 @@ private:
 	STEAM_CALLBACK( CGameManager, OnReceivedOverlay, GameOverlayActivated_t );
 	STEAM_CALLBACK( CGameManager, OnReceivedLaunchParameters, NewUrlLaunchParameters_t );
 	STEAM_CALLBACK( CGameManager, OnReceivedRichPresenceJoin, GameRichPresenceJoinRequested_t );
-	STEAM_CALLBACK( CGameManager, OnReceivedServerCahnge, GameServerChangeRequested_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedServerChange, GameServerChangeRequested_t );
+	STEAM_CALLBACK( CGameManager, OnReceivedAuthTicket, GetTicketForWebApiResponse_t );
+
 public:
 
 	steam_callback_handler_type callback_handler = nullptr;
@@ -46,9 +50,22 @@ void CGameManager::OnReceivedRichPresenceJoin( GameRichPresenceJoinRequested_t* 
 	handle(steam_new_join_game_request { { std::to_array(pCallback->m_rgchConnect) } });
 }
 
-void CGameManager::OnReceivedServerCahnge( GameServerChangeRequested_t* pCallback )
+void CGameManager::OnReceivedServerChange( GameServerChangeRequested_t* pCallback )
 {
 	handle(steam_change_server_request { { std::to_array(pCallback->m_rgchServer) }, { std::to_array(pCallback->m_rgchPassword) } });
+}
+
+void CGameManager::OnReceivedAuthTicket( GetTicketForWebApiResponse_t* pCallback )
+{
+	const auto ticket_ptr = reinterpret_cast<const std::byte*>(pCallback->m_rgubTicket);
+	const auto ticket_len = pCallback->m_cubTicket;
+
+	steam_auth_ticket ticket;
+	ticket.request_id = pCallback->m_hAuthTicket;
+	ticket.result = pCallback->m_eResult;
+	ticket.ticket_bytes.assign(ticket_ptr, ticket_ptr + ticket_len);
+
+	handle(std::move(ticket));
 }
 
 std::optional<CGameManager> CGameManager_object;
@@ -121,6 +138,10 @@ extern "C" {
 		return SteamApps()->GetLaunchCommandLine(buf, bufsize);
 	}
 
+	uint32_t steam_request_auth_ticket(const char* identity) {
+		return SteamUser()->GetAuthTicketForWebApi(identity);
+	}
+
 	void steam_run_callbacks(steam_callback_handler_type callback_handler, void* ctx) {
 		CGameManager_object->callback_handler = callback_handler;
 		CGameManager_object->ctx = ctx;
@@ -133,7 +154,8 @@ extern "C" {
 
 extern "C" {
 	int steam_get_appid() {
-		return 0;
+		/* For use in WebAPIs by non-Steam binaries */
+		return steam_app_id;
 	}
 
 	int steam_init() {
@@ -172,6 +194,10 @@ extern "C" {
 
 	int steam_get_launch_command_line(char*, int) {
 		return 0;
+	}
+
+	uint32_t steam_request_auth_ticket(const char*) {
+		return 34320;
 	}
 
 	void steam_run_callbacks(steam_callback_handler_type, void*) {

@@ -184,7 +184,7 @@ void editor_tweaked_widget_tracker::update(const std::size_t current_command_ind
 	last_tweaked = current_session;
 }
 
-std::string get_hex_representation(const unsigned char*, size_t length);
+std::string get_hex_representation(const uint8_t*, size_t length);
 
 std::string as_hex(const rgba& col) {
 	return to_uppercase(get_hex_representation(std::addressof(col.r), 4));

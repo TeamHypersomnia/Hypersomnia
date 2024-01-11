@@ -21,6 +21,8 @@ struct server_client_state {
 	using type = client_state_type;
 
 	type state = type::NETCODE_NEGOTIATING_CONNECTION;
+	net_time_t when_connected = -1.0;
+
 	net_time_t last_valid_payload_time = -1.0;
 	net_time_t last_keyboard_activity_time = -1.0;
 
@@ -48,6 +50,9 @@ struct server_client_state {
 	arena_player_meta meta;
 
 	uint32_t direct_file_chunks_left = 0;
+
+	bool auth_requested = false;
+	std::string authenticated_id;
 
 	server_client_state() = default;
 	server_client_state(const net_time_t server_time) {
@@ -112,6 +117,7 @@ struct server_client_state {
 
 		state = type::PENDING_WELCOME;
 		last_valid_payload_time = server_time;
+		when_connected = server_time;
 	}
 
 	void unset() {
@@ -124,5 +130,30 @@ struct server_client_state {
 
 	std::string get_nickname() const {
 		return settings.chosen_nickname;
+	}
+
+	bool authenticated() const {
+		return !authenticated_id.empty();
+	}
+
+	bool should_kick_due_to_unauthenticated(const server_vars& v, const net_time_t server_time) const {
+		if (!v.require_authentication) {
+			return false;
+		}
+
+		if (authenticated()) {
+			return false;
+		}
+
+		const auto diff = server_time - when_connected;
+		return diff > std::max(0.0f, v.kick_if_unauthenticated_for_secs);
+	}
+
+	net_time_t secs_since_connected(const net_time_t server_time) const {
+		if (when_connected < 0.0) {
+			return 0.0;
+		}
+
+		return server_time - when_connected;
 	}
 };

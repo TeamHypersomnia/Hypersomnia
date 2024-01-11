@@ -58,6 +58,8 @@ struct server_vars {
 	bool operator==(const server_vars&) const = default;
 
 	// GEN INTROSPECTOR struct server_vars
+	bool require_authentication = false;
+
 	arena_identifier arena;
 	game_mode_name_type game_mode;
 
@@ -89,6 +91,7 @@ struct server_vars {
 	uint32_t move_to_spectators_if_afk_for_secs = 120;
 	uint32_t kick_if_afk_for_secs = 7200;
 	uint32_t kick_if_no_network_payloads_for_secs = 10;
+	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
 
 	uint32_t reset_resync_timer_once_every_secs = 10;
@@ -130,5 +133,10 @@ struct server_private_vars {
 	std::string discord_webhook_url = "";
 	std::string telegram_webhook_url = "";
 	std::string telegram_channel_id = "@hypersomnia_monitor";
+
+	std::string steam_web_api_key = "";
+
+	std::string report_match_api_key = "";
+	std::string report_match_endpoint = "https://hypersomnia.xyz/report_match";
 	// END GEN INTROSPECTOR
 };

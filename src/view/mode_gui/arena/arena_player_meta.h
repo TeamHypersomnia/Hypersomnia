@@ -4,6 +4,10 @@
 #include "application/network/requested_client_settings.h"
 #include "game/modes/session_id.h"
 
+struct steam_auth_request_payload {
+	std::vector<std::byte> ticket_bytes;
+};
+
 struct arena_player_avatar_payload {
 	std::vector<std::byte> image_bytes;
 };

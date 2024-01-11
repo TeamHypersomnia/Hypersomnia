@@ -244,6 +244,10 @@ bool client_setup::send_payload(Args&&... args) {
 		return true;
 	}
 
+	if (!is_connected()) {
+		return false;
+	}
+
 	return adapter->send_payload(std::forward<Args>(args)...);
 }
 
@@ -733,7 +737,7 @@ entity_id client_setup::get_controlled_character_id() const {
 
 void client_setup::customize_for_viewing(config_lua_table& config) const {
 #if !IS_PRODUCTION_BUILD
-	config.window.name = "Arena client";
+	config.window.name = "Hypersomnia - Client";
 #endif
 
 	if (is_gameplay_on()) {
@@ -906,6 +910,35 @@ void client_setup::send_pending_commands() {
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
 	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
 
+	auto send_pending_auth = [&]() {
+		if (!pending_steam_auth.has_value()) {
+			return;
+		}
+
+		auto& ticket = *pending_steam_auth;
+
+		if (!ticket.successful()) {
+			const auto reason = typesafe_sprintf(
+				"Couldn't authenticate Steam account.\nError code: %x",
+				ticket.result
+			);
+
+			set_disconnect_reason(reason, true);
+			disconnect();
+
+			return;
+		}
+
+		LOG("Correct auth ticket received. Sending ticket to server.");
+
+		send_payload(
+			game_channel_type::RELIABLE_MESSAGES,
+			steam_auth_request_payload({ ticket.ticket_bytes })
+		);
+
+		pending_steam_auth.reset();
+	};
+
 	auto send_settings = [&]() {
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
@@ -923,6 +956,12 @@ void client_setup::send_pending_commands() {
 		when_sent_client_settings = client_time;
 		current_requested_settings = requested_settings;
 	};
+
+	send_pending_auth();
+
+	if (!is_connected()) {
+		return;
+	}
 
 	if (init_send || resend_requested_settings) {
 		send_settings();
@@ -979,6 +1018,10 @@ void client_setup::send_pending_commands() {
 
 			has_sent_avatar = true;
 		}
+	}
+
+	if (!is_connected()) {
+		return;
 	}
 
 	for (const auto& pending_request : pending_requests) {
@@ -1797,4 +1840,8 @@ netcode_address_t client_setup::get_server_address_for_others_to_join() const {
 	}
 
 	return adapter->get_connected_ip_address();
+}
+
+void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
+	pending_steam_auth = ticket;
 }

@@ -745,10 +745,23 @@ treat_as_music_sounds_longer_than_secs = 5,
     rcon_password = "",
     discord_webhook_url = "",
     telegram_webhook_url = "",
-    telegram_channel_id = "@hypersomnia_monitor"
+    telegram_channel_id = "@hypersomnia_monitor",
+
+    -- For authenticating users through Steam tickets.
+    steam_web_api_key = "",
+
+    -- Ranked servers only.
+    -- This secret key allows reporting match results to the leaderboard.
+    report_match_api_key = "",
+    report_match_endpoint = "https://hypersomnia.xyz/report_match"
   },
 
   server = {
+    -- If true, will kick players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
+    -- Set to true for ranked servers. Note you'll need to setup your own steam_web_api_key in order to authenticate players.
+    require_authentication = false,
+    kick_if_unauthenticated_for_secs = 4.0,
+
     server_name = "${MY_NICKNAME}'s server",
 
     arena = "de_cyberaqua",

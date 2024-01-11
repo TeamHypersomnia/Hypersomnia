@@ -24,6 +24,15 @@
 #include "augs/string/to_forward_slashes.h"
 
 namespace augs {
+	template <class T, class F>
+	std::optional<T> json_find(F& from, const std::string& label) {
+		if (from.HasMember(label) && from[label].template Is<T>()) {
+			return from[label].template Get<T>();
+		}
+
+		return std::nullopt;
+	}
+
 	template <class F, class T>
 	void general_read_json_value(const F& from, T& out) {
 		if constexpr(has_custom_to_json_value_v<T>) {

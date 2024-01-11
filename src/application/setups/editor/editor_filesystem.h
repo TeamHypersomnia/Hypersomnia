@@ -27,7 +27,7 @@ using editor_filesystem_ui_state =
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
 
-std::string get_hex_representation(const unsigned char*, size_t length);
+std::string get_hex_representation(const uint8_t*, size_t length);
 
 struct forbidden_path_result {
 	augs::path_type forbidden_path;

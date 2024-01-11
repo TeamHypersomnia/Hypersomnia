@@ -47,6 +47,8 @@
 #include "application/setups/editor/editor_paths.h"
 #include "game/modes/arena_mode.hpp"
 #include "game/messages/mode_notification.h"
+#include "augs/misc/httplib_utils.h"
+#include "steam_integration.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
@@ -227,12 +229,22 @@ bool server_heartbeat::is_valid() const {
 }
 
 template <class F>
-void server_setup::push_webhook_job(F&& f) {
-	push_session_webhook_job(mode_player_id(), std::forward<F>(f));
+void server_setup::push_notification_job(F&& f) {
+	push_session_webhook_job(mode_player_id(), job_type::NOTIFICATION, std::forward<F>(f));
 }
 
 template <class F>
-void server_setup::push_session_webhook_job(const mode_player_id player_id, F&& f) {
+void server_setup::push_avatar_job(const mode_player_id player_id, F&& f) {
+	push_session_webhook_job(player_id, job_type::AVATAR, std::forward<F>(f));
+}
+
+template <class F>
+void server_setup::push_auth_job(const mode_player_id player_id, F&& f) {
+	push_session_webhook_job(player_id, job_type::AUTH, std::forward<F>(f));
+}
+
+template <class F>
+void server_setup::push_session_webhook_job(const mode_player_id player_id, job_type type, F&& f) {
 	auto ptr = std::make_unique<std::future<std::string>>(
 		std::async(std::launch::async, std::forward<F>(f))
 	);
@@ -243,7 +255,89 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, F&& 
 		session_id = session_id_type();
 	}
 	
-	pending_jobs.emplace_back(webhook_job{ player_id, *session_id, std::move(ptr) });
+	pending_jobs.emplace_back(webhook_job{ player_id, *session_id, type, std::move(ptr) });
+}
+
+std::string get_hex_representation(const std::byte*, size_t length);
+
+template <class T=std::string, class F>
+std::optional<T> GetIf(F& from, const std::string& label) {
+	return augs::json_find<T>(from, label);
+}
+
+void server_setup::request_auth(mode_player_id player_id, const steam_auth_request_payload& payload) {
+	const auto api_key = private_vars.steam_web_api_key;
+	const auto& ticket = payload.ticket_bytes;
+	const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
+
+	push_auth_job(
+		player_id,
+
+		[api_key, ticket_hex]() {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client("api.steampowered.com");
+
+#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(4);
+			http_client.set_write_timeout(4);
+
+			const auto appid = std::to_string(::steam_get_appid());
+			const auto identity = "hypersomnia_gameserver";
+
+			httplib::Params params;
+			params.emplace("key", api_key);
+			params.emplace("appid", appid);
+			params.emplace("ticket", ticket_hex);
+			params.emplace("identity", identity);
+
+			const auto result = http_client.Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
+
+			if (result) {
+				if (httplib_utils::successful(result->status)) {
+					LOG("Steam auth response: %x", result->body);
+
+					try {
+						auto doc = augs::json_document_from(result->body);
+
+						if (doc.HasMember("response") && doc["response"].HasMember("params")) {
+							auto& params = doc["response"]["params"];
+
+							if (GetIf<bool>(params, "publisherbanned") == true) {
+								LOG("Banned by the publisher.");
+								return std::string("publisherbanned");
+							}
+
+							if (GetIf(params, "result") == "OK") {
+								if (auto steamid = GetIf(params, "steamid")) {
+									LOG("Detected Steam ID: %x", *steamid);
+									return std::string("steam:") + *steamid;
+								}
+							}
+						}
+
+						LOG("Failed to deserialize Steam auth response. Schema is out of date.");
+						return std::string("");
+					}
+					catch (const augs::json_deserialization_error& err ) {
+						LOG("Failed to deserialize Steam auth response. Reason: %x", err.what());
+						return std::string("");
+					}
+				}
+				else {
+					LOG("Steam auth failed, http code: %x", result->status);
+					return std::string("");
+				}
+			}
+			else {
+				LOG("Steam auth failed: no HTTPS response!");
+				return std::string("");
+			}
+		}
+	);
 }
 
 void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
@@ -413,7 +507,7 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 		auto fled = vars.webhooks.fled_pic_link;
 		auto reconsidered = vars.webhooks.reconsidered_pic_link;
 
-		push_webhook_job(
+		push_notification_job(
 			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
 				const auto ca_path = CA_CERT_PATH;
 				http_client_type http_client(discord_webhook_url.host);
@@ -460,7 +554,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 
 		LOG("pushing match summary webhook.");
 
-		push_webhook_job(
+		push_notification_job(
 			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
 				const auto ca_path = CA_CERT_PATH;
 				http_client_type http_client(discord_webhook_url.host);
@@ -495,7 +589,7 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 
 		LOG("pushing duel webhook with %x versus %x", first, second);
 
-		push_webhook_job(
+		push_notification_job(
 			[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
 				const auto ca_path = CA_CERT_PATH;
 				http_client_type http_client(discord_webhook_url.host);
@@ -548,7 +642,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		auto current_arena_name = get_current_arena_name();
 		auto priv_vars = private_vars;
 
-		push_session_webhook_job(
+		push_avatar_job(
 			id,
 			[priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
 				if (telegram_webhook_url.valid()) {
@@ -626,7 +720,28 @@ void server_setup::finalize_webhook_jobs() {
 		if (is_ready(*webhook_job.job)) {
 			if (auto client = find_client_state(webhook_job.player_id)) {
 				if (webhook_job.session_id == find_session_id(webhook_job.player_id)) {
-					client->uploaded_avatar_url = webhook_job.job->get();
+					switch (webhook_job.type) {
+						case job_type::AVATAR:
+							client->uploaded_avatar_url = webhook_job.job->get();
+
+						case job_type::AUTH:
+							client->authenticated_id = webhook_job.job->get();
+
+							LOG(
+								"Authenticated \"%x\". ID: %x. Took %x secs.", 
+								client->get_nickname(), 
+								client->authenticated_id,
+								client->secs_since_connected(server_time)
+							);
+
+							if (client->authenticated_id == "publisherbanned") {
+								kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
+							}
+
+						default:
+							break;
+
+					}
 				}
 			}
 
@@ -654,9 +769,9 @@ bool server_setup::handle_masterserver_response(
 
 					LOG("masterserver_out::tell_me_my_address arrived with result: %x", ::ToString(typed_request.address));
 
-				return true;
+					return true;
+				}	
 			}
-		}
 		}
 
 		return false;
@@ -798,6 +913,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
 	}
 
+	heartbeat.require_authentication = vars.require_authentication;
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(
@@ -875,6 +991,10 @@ void server_setup::send_heartbeat_to_server_list() {
 }
 
 void server_setup::resolve_server_list() {
+	if (!server_list_enabled()) {
+		return;
+	}
+
 	const auto& in = vars.notified_server_list;
 
 	LOG("Requesting resolution of server_list address at %x", in.address);
@@ -921,10 +1041,6 @@ void server_setup::resolve_heartbeat_host_if_its_time() {
 }
 
 void server_setup::resolve_internal_address_if_its_time() {
-	if (!server_list_enabled()) {
-		return;
-	}
-
 	if (valid_and_is_ready(future_internal_address)) {
 		auto new_address = future_internal_address.get();
 
@@ -1128,7 +1244,7 @@ net_time_t server_setup::get_current_time() {
 
 void server_setup::customize_for_viewing(config_lua_table& config) const {
 #if !IS_PRODUCTION_BUILD
-	config.window.name = "Arena server";
+	config.window.name = "Hypersomnia - Server";
 #endif
 
 	if (is_gameplay_on()) {
@@ -1524,7 +1640,23 @@ void server_setup::advance_clients_state() {
 		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
 
+		if (c.state == client_state_type::IN_GAME) {
+			if (c.should_kick_due_to_afk(vars, server_time)) {
+				kick(client_id, "AFK!");
+			}
+
+			automove_to_spectators_if_afk(client_id, c);
+		}
+
 		if (c.is_set()) {
+			if (c.should_kick_due_to_inactivity(vars, server_time)) {
+				kick(client_id, "No messages arrived for too long!");
+			}
+
+			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
+				kick(client_id, "Account is required to play on this server!");
+			}
+
 			{
 				const auto num_commands = c.pending_entropies.size();
 				const auto max_commands = vars.max_buffered_client_commands;
@@ -1697,28 +1829,6 @@ void server_setup::advance_clients_state() {
 			}
 		}
 
-		if (c.state == client_state_type::IN_GAME) {
-			if (c.should_kick_due_to_afk(vars, server_time)) {
-				kick(client_id, "AFK!");
-			}
-
-			automove_to_spectators_if_afk(client_id, c);
-		}
-
-		if (c.state > client_state_type::NETCODE_NEGOTIATING_CONNECTION) {
-			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				kick(client_id, "No messages arrived for too long!");
-			}
-		}
-
-#if 0
-		else if (c.state == S::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::RELIABLE_MESSAGES)) {
-				c.set_in_game(server_time);
-			}
-
-		}
-#endif
 		if (c.state == S::IN_GAME) {
 			contribute_to_step_entropy();
 		}

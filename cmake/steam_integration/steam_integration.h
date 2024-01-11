@@ -32,6 +32,8 @@ extern "C" {
 	DLL_EXPORT int steam_get_launch_command_line(char* buf, int bufsize);
 
 	DLL_EXPORT void steam_run_callbacks(steam_callback_handler_type, void* ctx);
+
+	DLL_EXPORT uint32_t steam_request_auth_ticket(const char* identity);
 }
 
 #undef DLL_EXPORT

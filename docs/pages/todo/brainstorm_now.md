@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Editor: copy path to clipboard
+
 - Ranked matches (w/o matchmaking yet)
     - Just have servers with 2, 4 slots etc.
     - Ranked only starts when the server gets full

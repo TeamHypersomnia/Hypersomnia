@@ -181,9 +181,18 @@ class server_setup :
 	server_nat_traversal nat_traversal;
 	bool suppress_community_server_webhook_this_run = false;
 
+	enum class job_type {
+		NOTIFICATION,
+		AVATAR,
+		AUTH
+	};
+
 	struct webhook_job {
 		mode_player_id player_id;
 		session_id_type session_id;
+
+		job_type type = job_type::NOTIFICATION;
+
 		std::unique_ptr<std::future<std::string>> job;
 	};
 
@@ -192,10 +201,18 @@ class server_setup :
 	uint32_t duel_pic_counter = 0;
 
 	template <class F>
-	void push_webhook_job(F&& f);
+	void push_session_webhook_job(mode_player_id player_id, job_type type, F&& f);
 
 	template <class F>
-	void push_session_webhook_job(mode_player_id session_id, F&& f);
+	void push_notification_job(F&& f);
+
+	template <class F>
+	void push_avatar_job(mode_player_id player_id, F&& f);
+
+	template <class F>
+	void push_auth_job(mode_player_id player_id, F&& f);
+
+	void request_auth(mode_player_id player_id, const steam_auth_request_payload&);
 
 	void finalize_webhook_jobs();
 
@@ -398,6 +415,7 @@ public:
 
 			auto scope = measure_scope(profiler.step);
 
+			finalize_webhook_jobs();
 			check_for_updates();
 
 			step_collected.clear();

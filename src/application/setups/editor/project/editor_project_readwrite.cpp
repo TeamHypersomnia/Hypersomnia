@@ -209,11 +209,7 @@ void unpack_string_id(const M& node_name_map, editor_typed_node_id<N>& id, const
 
 template <class T, class F>
 std::optional<T> GetIf(F& from, const std::string& label) {
-	if (from.HasMember(label) && from[label].template Is<T>()) {
-		return from[label].template Get<T>();
-	}
-
-	return std::nullopt;
+	return augs::json_find<T>(from, label);
 }
 
 template <class F>

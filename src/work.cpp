@@ -214,6 +214,10 @@ work_result work(
 
 	const bool is_steam_client = steam_initialized;
 
+	LOG_NVPS(is_steam_client);
+
+	uint32_t steam_auth_request_id = 0;
+
 	if (is_steam_client) {
 		const auto steam_id = std::to_string(::steam_get_id());
 		::USER_DIR = APPDATA_DIR / steam_id;
@@ -254,10 +258,10 @@ work_result work(
 			EDITOR_PROJECTS_DIR
 		};
 
-			LOG("Creating directories:");
+		LOG("Creating directories:");
 
-			for (const auto& a : all_created_directories) {
-				LOG(a);
+		for (const auto& a : all_created_directories) {
+			LOG(a);
 			augs::create_directories(a);
 		}
 	}
@@ -1453,6 +1457,12 @@ work_result work(
 			}
 		}
 
+		if (is_steam_client) {
+			LOG("Calling steam_request_auth_ticket.");
+			steam_auth_request_id = ::steam_request_auth_ticket("hypersomnia_gameserver");
+			LOG_NVPS(steam_auth_request_id);
+		}
+
 		setup_launcher([&]() {
 			auto bound_port = get_bound_local_port();
 			auxiliary_socket.reset();
@@ -2246,7 +2256,8 @@ work_result work(
 			std::variant<
 				steam_new_url_launch_parameters,
 				steam_new_join_game_request,
-				steam_change_server_request
+				steam_change_server_request,
+				steam_auth_ticket
 			>
 		>; 
 		
@@ -2265,11 +2276,12 @@ work_result work(
 			check_index(steam_new_url_launch_parameters());
 			check_index(steam_new_join_game_request());
 			check_index(steam_change_server_request());
+			check_index(steam_auth_ticket());
 		};
 
 		steam_run_callbacks(handler_c, &steam_events);
 
-		auto handler_lbd = [connect_to]<typename E>(const E& event) {
+		auto handler_lbd = [connect_to, steam_auth_request_id, visit_current_setup]<typename E>(const E& event) {
 			if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
 				LOG("(Steam Callback) steam_new_url_launch_parameters.");
 				(void)event;
@@ -2285,6 +2297,19 @@ work_result work(
 				LOG("(Steam Callback) steam_change_server_request.");
 
 				connect_to(std::string(event.server_address.data()));
+			}
+			else if constexpr(std::is_same_v<E, steam_auth_ticket>) {
+				LOG("(Steam Callback) steam_auth_ticket.");
+
+				if (event.request_id == steam_auth_request_id) {
+					visit_current_setup([&](auto& setup) {
+						using T = remove_cref<decltype(setup)>;
+
+						if constexpr(is_one_of_v<T, client_setup>) {
+							setup.send_auth_ticket(event);
+						}
+					});
+				}
 			}
 			else {
 				static_assert(always_false_v<E>, "Non-exhaustive");

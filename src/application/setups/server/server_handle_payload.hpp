@@ -29,7 +29,23 @@ message_handler_result server_setup::handle_payload(
 
 	ensure(c.is_set());
 
-	if constexpr (std::is_same_v<T, requested_client_settings>) {
+	if constexpr (std::is_same_v<T, steam_auth_request_payload>) {
+		if (c.auth_requested) {
+			kick(client_id, "Client requested authentication twice.");
+
+			return abort_v;
+		}
+
+		if (!vars.require_authentication) {
+			return continue_v;
+		}
+
+		LOG("steam_auth_request_payload from: %x", c.get_nickname());
+
+		c.auth_requested = true;
+		request_auth(to_mode_player_id(client_id), payload);
+	}
+	else if constexpr (std::is_same_v<T, requested_client_settings>) {
 		/* 
 			A client might re-state its requested settings
 			even outside of the PENDING_WELCOME state
