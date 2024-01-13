@@ -289,6 +289,7 @@ work_result work(
 		result.http_client.update_on_launch = false;
 		result.client.suppress_webhooks = true;
 		result.server.suppress_new_community_server_webhook = true;
+		result.unit_tests.run = true;
 
 #if PLATFORM_UNIX
 		result.window.fullscreen = false;

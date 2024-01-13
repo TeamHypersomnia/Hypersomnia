@@ -658,7 +658,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     break_on_failure = true,
     log_successful = false,
     redirect_log_to_path = "",
-    run = true
+    run = false
   },
   window = {
     app_icon_path = "content/gfx/necessary/app.ico",
