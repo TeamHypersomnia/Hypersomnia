@@ -293,7 +293,10 @@ namespace sanitization {
 	}
 
 	std::string try_generate_sanitized_filename(const std::string& untrusted_filename) {
-		const auto first_pass = str_ops(untrusted_filename)
+		/* Prune weird non-ASCII characters */
+		const auto transformable_pass = whitelisted_str(untrusted_filename, transformable_set);
+
+		const auto first_pass = str_ops(transformable_pass)
 			.to_lowercase()
 			.replace_all(" ", "_").subject
 		;

@@ -5,6 +5,15 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- fix crash:
+	C:\projects\hypersomnia\src\augs\string\path_sanitization.cpp(506): FAILED:
+	  REQUIRE( S::try_generate_sanitized_filename("훶훳힄훳챨?┖궸?) == "" )
+	due to unexpected exception with message:
+	  대상 멀티바이트 코드페이지에 유니코드 문자의 매핑이 없습니다.
+- Not sure how possible, we don't even have this line of code lol
+	- likely just prune non-asciis before trying to generate a safe fname 
+	- but test on windows later if it crashes
+
 - dont do nat traversal when replaying a demo
 
 - shuncio bug

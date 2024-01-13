@@ -19,6 +19,7 @@ namespace sanitization {
 	};
 
 	constexpr auto portable_alphanumeric_set = "_abcdefghijklmnopqrstuvwxyz0123456789";
+	constexpr auto transformable_set = ". _abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	std::string describe(forbidden_path_type);
 	std::string describe_for_arena(forbidden_path_type);
