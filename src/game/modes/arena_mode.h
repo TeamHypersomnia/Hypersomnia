@@ -431,6 +431,8 @@ private:
 
 	entity_id bomb_entity;
 	entity_id bomb_detonation_theme;
+
+	float ranked_match_countdown_secs = -1.0f;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -619,7 +621,7 @@ public:
 	void clear_duel();
 
 	void handle_duel_desertion(input, logic_step, const mode_player_id&);
-	void report_match_result(input, const_logic_step);
+	void post_match_summary(input, const_logic_step);
 
 	game_mode_name_type get_name(const_input) const;
 

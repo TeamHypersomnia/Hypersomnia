@@ -752,17 +752,37 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     -- Ranked servers only.
     -- This secret key allows reporting match results to the leaderboard.
-    report_match_api_key = "",
-    report_match_endpoint = "https://hypersomnia.xyz/report_match"
+    report_ranked_match_api_key = "",
+    report_ranked_match_url = "https://hypersomnia.xyz/report_match"
   },
 
   server = {
-    -- If true, will kick players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
-    -- Set to true for ranked servers. Note you'll need to setup your own steam_web_api_key in order to authenticate players.
+    server_name = "${MY_NICKNAME}'s server",
+
+    -- If true, kicks players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
+    -- Set to true for ranked servers that wish to report matches to an endpoint.
+    -- Note you'll need to setup your own steam_web_api_key in order to authenticate players.
     require_authentication = false,
     kick_if_unauthenticated_for_secs = 4.0,
 
-    server_name = "${MY_NICKNAME}'s server",
+    -- Initiates a "proper" match when the server becomes full,
+    -- Use the server_start.slots variable to determine if the server is meant for
+    -- 1v1 (slots=2), 2v2 (slots=4) or other configurations.
+    ranked_start_when_full = false,
+
+    -- Allow the last free slot to be used by a spectator.
+    -- Use for tournaments between trusted friends only or in offline setups.
+    ranked_allow_one_spectator = false,
+
+    -- Freeze the entire game completely if a client disconnects.
+    -- This could be due to a game crash or network failure.
+    --
+    -- This effectively stops time.
+    --
+    -- THe characters will end up with their buttons released.
+    -- The match will resume once all players are back.
+    -- Use for tournaments between trusted friends only or in offline setups.
+    ranked_freeze_match_on_disconnect_secs = 0,
 
     arena = "de_cyberaqua",
     game_mode = "",

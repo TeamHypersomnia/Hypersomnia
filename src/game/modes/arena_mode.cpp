@@ -1604,7 +1604,7 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 		release_triggers_of_weapons_of_players(in);
 
 		if (is_final_round(in)) {
-			report_match_result(in, step);
+			post_match_summary(in, step);
 		}
 	}
 }
@@ -2012,7 +2012,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 						break;
 
 					case C::TEST_ANNOUNCE_MATCH_RESULT:
-						report_match_result(in, step);
+						post_match_summary(in, step);
 						break;
 
 					default: break;
@@ -2559,7 +2559,7 @@ mode_player_id arena_mode::find_best_player_in(faction_type faction) const {
 	return best;
 }
 
-void arena_mode::report_match_result(const input_type in, const const_logic_step step) {
+void arena_mode::post_match_summary(const input_type in, const const_logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	const auto result = calc_match_result(in);
@@ -2577,8 +2577,10 @@ void arena_mode::report_match_result(const input_type in, const const_logic_step
 	const auto first_team  = tied ? p.defusing  : *result.winner;
 	const auto second_team = tied ? p.bombing   : *result.loser;
 
-	auto make_entry = [](const auto& player) {
+	auto make_entry = [](const mode_player_id id, const auto& player) {
 		messages::match_summary_message::player_entry new_entry;
+
+		new_entry.id = id;
 
 		new_entry.kills = player.stats.knockouts;
 		new_entry.assists = player.stats.assists;
@@ -2604,7 +2606,7 @@ void arena_mode::report_match_result(const input_type in, const const_logic_step
 				strongest_in_first = id;
 			}
 
-			summary.first_faction.emplace_back(make_entry(player));
+			summary.first_faction.emplace_back(make_entry(id, player));
 		}
 	);
 
@@ -2615,7 +2617,7 @@ void arena_mode::report_match_result(const input_type in, const const_logic_step
 				strongest_in_second = id;
 			}
 
-			summary.second_faction.emplace_back(make_entry(player));
+			summary.second_faction.emplace_back(make_entry(id, player));
 		}
 	);
 

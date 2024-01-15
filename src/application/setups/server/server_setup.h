@@ -184,7 +184,8 @@ class server_setup :
 	enum class job_type {
 		NOTIFICATION,
 		AVATAR,
-		AUTH
+		AUTH,
+		REPORT_MATCH
 	};
 
 	struct webhook_job {
@@ -219,6 +220,7 @@ class server_setup :
 	void push_connected_webhook(mode_player_id);
 	void push_duel_of_honor_webhook(const std::string& first, const std::string& second);
 	void push_match_summary_webhook(const messages::match_summary_message& summary);
+	void push_report_match_webhook(const messages::match_summary_message& summary);
 	void push_duel_interrupted_webhook(const messages::duel_interrupted_message& summary);
 	std::string get_next_duel_pic_link();
 
@@ -316,6 +318,8 @@ private:
 		const std::byte* packet_buffer,
 		const std::size_t packet_bytes
 	);
+
+	void start_ranked_match_if_conditions_met();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;

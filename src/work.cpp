@@ -423,7 +423,7 @@ work_result work(
 
 	auto network_raii = augs::network_raii();
 
-	if (config.unit_tests.run) {
+	if (config.unit_tests.run || params.unit_tests_only) {
 		/* Needed by some unit tests */
 
 		LOG("Running unit tests.");

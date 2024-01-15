@@ -140,7 +140,7 @@ as well as to test your skills in a laggy environment.
 		checkbox("I'm behind router", into_vars.allow_nat_traversal);
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("Enables NAT traversal. If you're behind a router, leave this on.\n\nThis technique lets clients establish a direct connection with your server -\nwithout port forwarding necessary.\n\nYou can disable this if you plan to only play over LAN.");
+			text_tooltip("Enables NAT traversal. If you're behind a router, leave this on.\n\nThis technique lets your friends establish a direct connection with your PC -\nwithout port forwarding necessary.\n\nYou can disable this if you plan to only play over LAN.");
 		}
 
 		{

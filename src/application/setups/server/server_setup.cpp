@@ -38,6 +38,7 @@
 #include "application/detail_file_paths.h"
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/webhooks.h"
+#include "application/setups/server/ranked_webhooks.h"
 #include "game/messages/hud_message.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/readwrite/json_readwrite_errors.h"
@@ -408,6 +409,8 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 
 			push_match_summary_webhook(summary);
 			log_match_end_json(summary);
+
+			push_report_match_webhook(summary);
 		}
 	}
 
@@ -576,6 +579,68 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 				);
 
 				http_client.Post(discord_webhook_url.location.c_str(), items);
+
+				return "";
+			}
+		);
+	}
+}
+
+void server_setup::push_report_match_webhook(const messages::match_summary_message& summary) {
+	finalize_webhook_jobs();
+
+	if (const auto report_webhook_url = parsed_url(private_vars.report_ranked_match_url); report_webhook_url.valid()) {
+		const auto server_name = get_server_name();
+
+		LOG("Reporting ranked match result.");
+
+		const auto api_key = private_vars.report_ranked_match_api_key;
+
+		const auto json_body = ranked_webhooks::json_report_match(
+			server_name,
+			get_current_arena_name(),
+			vars.game_mode,
+			summary,
+			[&](const mode_player_id& mode_id) -> std::string {
+				if (const auto state = find_client_state(mode_id)) {
+					if (state->authenticated()) {
+						return state->authenticated_id;
+					}
+					else {
+						LOG("COULDN'T GET ACCOUNT ID FOR %x!!! UNAUTHENTICATED!", state->get_nickname());
+					}
+				}
+				else {
+					LOG("COULDN'T GET ACCOUNT ID FOR %x!!!", mode_id.value);
+				}
+
+				return "ERROR_UNKNOWN_ID";
+			}
+		);
+
+		LOG("Match report JSON: %x", json_body);
+
+		push_notification_job(
+			[report_webhook_url, api_key, json_body]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(report_webhook_url.host);
+
+#if BUILD_OPENSSL
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
+#endif
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
+
+				httplib::Headers headers;
+				headers.emplace("apikey", api_key);
+
+				auto result = http_client.Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
+
+				if (result) {
+					LOG("/report_match: %x", result->body);
+				}
 
 				return "";
 			}

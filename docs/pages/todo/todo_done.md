@@ -6710,4 +6710,5 @@ This will discard your redo history."
 - update weapons stats
 
 - dropped mags should fly to the side
+- nerf kek9 and sn69 as they're deadly in akimbo, like a free smg
 

@@ -136,7 +136,7 @@ struct server_private_vars {
 
 	std::string steam_web_api_key = "";
 
-	std::string report_match_api_key = "";
-	std::string report_match_endpoint = "https://hypersomnia.xyz/report_match";
+	std::string report_ranked_match_api_key = "";
+	std::string report_ranked_match_url = "https://hypersomnia.xyz/report_match";
 	// END GEN INTROSPECTOR
 };

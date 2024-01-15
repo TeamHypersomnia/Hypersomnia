@@ -64,6 +64,8 @@ namespace messages {
 
 	struct match_summary_message {
 		struct player_entry {
+			mode_player_id id;
+
 			int kills = 0;
 			int assists = 0;
 			int deaths = 0;

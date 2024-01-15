@@ -6,6 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Rankeds
+    - Should start **whenever there's >=2 players.**
+        - Why?
+            - This is the most flexible:
+                - People might connect in any configuration.
+                - The most often will be 1v1.
+                - But sometimes a third person might connect mid-way, and we don't want to leave them alone when countdown is still ongoing.
+                - We'd also have to otherwise prioritize e.g. 1v1 servers first so people aren't left with a non-full server despite having a 1v1 or 2v2 setup ready.
+    - There needs to be a 5-10 sec period where you can accept the current team configuration
+        - At this point server becomes unjoinable
+        - Should be impossible to restart match through rcon or any other way
+        - just have a bool in arena mode for ranked behaviors override
+    - Why not treat Warmup as ranked countdown?
+    - Type /ready to skip warmup
+        - Should work for everything too
+    - Anytime someone changes team warmup timer resets
+
+    - When server is full allow changing teams without limit
+    - Server will send ranked messages:
+        - Countdown ranked
+            - This is only informational for clients but will sit in the state and will be decremented.
+            - In case a mode is changed and this is reverted to -1, the server will detect a ranked again.
+        - Cancel ranked
+            - In case team composition changes
+        - Start ranked
+
+
+- Let's save all matches to the database just in case we later want to analyze the data
+
+- round mmr numbers to e.g. 2 decimals
+
+- Add gamer role to discord to be pinged by server-monitor
+    - only new server/connect notifs
+
+
 - Editor: copy path to clipboard
 
 - Ranked matches (w/o matchmaking yet)
