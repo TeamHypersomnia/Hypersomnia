@@ -14,7 +14,7 @@
 #include "application/setups/server/server_vars.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
-#include "application/setups/server/public_settings_update.h"
+#include "application/setups/server/synced_meta_update.h"
 #include "application/setups/server/request_arena_file_download.h"
 #include "game/modes/session_id.h"
 #include "application/network/net_serialize.h"
@@ -160,7 +160,7 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 	};
 
-	struct public_settings_update : net_message_with_payload<::public_settings_update> {
+	struct synced_meta_update : net_message_with_payload<::synced_meta_update> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
 	};
@@ -317,7 +317,7 @@ namespace net_messages {
 
 	using all_t = type_list<
 		client_welcome*,
-		public_settings_update*, 
+		synced_meta_update*, 
 		new_server_vars*,
 		new_server_public_vars*,
 		new_server_runtime_info*,

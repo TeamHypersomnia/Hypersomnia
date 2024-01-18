@@ -40,7 +40,7 @@
 struct netcode_socket_t;
 struct config_lua_table;
 struct draw_setup_gui_input;
-struct public_settings_update;
+struct synced_meta_update;
 
 struct packaged_official_content;
 
@@ -253,7 +253,7 @@ private:
 	void handle_client_messages();
 	void advance_clients_state();
 
-	void rebroadcast_public_settings();
+	void rebroadcast_player_synced_metas();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
 	void broadcast_net_statistics();
 
@@ -464,7 +464,7 @@ public:
 			{
 				auto scope = measure_scope(profiler.send_entropies);
 
-				rebroadcast_public_settings();
+				rebroadcast_player_synced_metas();
 				send_server_step_entropies(step_collected);
 				broadcast_net_statistics();
 			}
@@ -663,7 +663,7 @@ public:
 	void reset_player_meta_to_default(const mode_player_id&);
 	void log_performance();
 
-	::public_settings_update make_public_settings_update_from(
+	::synced_meta_update make_synced_meta_update_from(
 		const server_client_state&,
 		const client_id_type& id
 	) const;

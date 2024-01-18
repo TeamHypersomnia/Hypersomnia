@@ -1472,7 +1472,7 @@ void server_setup::try_apply(const public_client_settings& requested_settings) {
 
 	if (can_already_resend_settings && current_requested_settings != requested_settings) {
 		current_requested_settings = requested_settings;
-		integrated_client.rebroadcast_public_settings = true;
+		integrated_client.rebroadcast_synced_meta = true;
 	}
 }
 
@@ -1665,7 +1665,7 @@ void server_setup::send_complete_solvable_state_to(const client_id_type client_i
 	send_full_arena_snapshot_to(client_id);
 
 	auto download_existing_public_settings  = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
-		const auto downloaded_settings = make_public_settings_update_from(cc, client_id_of_settings);
+		const auto downloaded_settings = make_synced_meta_update_from(cc, client_id_of_settings);
 
 		server->send_payload(
 			recipient_client_id,
@@ -2185,11 +2185,11 @@ void server_setup::handle_client_messages() {
 	server->advance(server_time, message_handler);
 }
 
-::public_settings_update server_setup::make_public_settings_update_from(
+::synced_meta_update server_setup::make_synced_meta_update_from(
 	const server_client_state& c,
 	const client_id_type& id
 ) const {
-	::public_settings_update update;
+	::synced_meta_update update;
 
 	update.subject_id = to_mode_player_id(id);
 	update.new_settings = c.settings.public_settings;
@@ -2197,19 +2197,19 @@ void server_setup::handle_client_messages() {
 	return update;
 }
 
-void server_setup::rebroadcast_public_settings() {
+void server_setup::rebroadcast_player_synced_metas() {
 	auto rebroadcast_if_needed = [&](const auto client_id, auto& c) {
-		if (!c.rebroadcast_public_settings) {
+		if (!c.rebroadcast_synced_meta) {
 			return;
 		}
 
-		c.rebroadcast_public_settings = false;
+		c.rebroadcast_synced_meta = false;
 
 		if (to_mode_player_id(client_id) == get_local_player_id()) {
 			when_last_sent_admin_public_settings = server_time;
 		}
 
-		const auto broadcasted_update = make_public_settings_update_from(c, client_id);
+		const auto broadcasted_update = make_synced_meta_update_from(c, client_id);
 
 		auto update_for_client = [this, &broadcasted_update](const auto recipient_client_id, const auto& c) {
 			if (c.should_pause_solvable_stream()) {

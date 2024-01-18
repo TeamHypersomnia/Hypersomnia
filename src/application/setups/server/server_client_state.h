@@ -31,7 +31,7 @@ struct server_client_state {
 	std::optional<augs::secure_hash_type> now_downloading_file;
 
 	requested_client_settings settings;
-	bool rebroadcast_public_settings = false;
+	bool rebroadcast_synced_meta = false;
 
 	client_pending_entropies pending_entropies;
 	uint8_t num_entropies_accepted = 0;

@@ -2,7 +2,7 @@
 #include "augs/log.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "application/setups/server/public_settings_update.h"
+#include "application/setups/server/synced_meta_update.h"
 #include "augs/readwrite/to_bytes.h"
 #include "game/modes/mode_commands/match_command.h"
 #include "augs/window_framework/mouse_rel_bound.h"
@@ -378,7 +378,7 @@ namespace net_messages {
 	}
 
 	template <typename Stream>
-	bool serialize(Stream& stream, ::public_settings_update& payload) {
+	bool serialize(Stream& stream, ::synced_meta_update& payload) {
 		if (!serialize(stream, payload.subject_id)) {
 			return false;
 		}

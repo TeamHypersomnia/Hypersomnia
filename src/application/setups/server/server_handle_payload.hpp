@@ -108,7 +108,7 @@ message_handler_result server_setup::handle_payload(
 			c.state = S::WELCOME_ARRIVED;
 		}
 
-		c.rebroadcast_public_settings = true;
+		c.rebroadcast_synced_meta = true;
 		c.last_keyboard_activity_time = server_time;
 	}
 	else if constexpr (is_one_of_v<T, rcon_command_variant, server_vars>) {

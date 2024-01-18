@@ -342,7 +342,7 @@ message_handler_result client_setup::handle_payload(
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
-	else if constexpr (std::is_same_v<T, public_settings_update>) {
+	else if constexpr (std::is_same_v<T, synced_meta_update>) {
 		if (pause_solvable_stream) {
 			/* 
 				Ignore.
@@ -358,7 +358,7 @@ message_handler_result client_setup::handle_payload(
 			because it only affects the incoming entropies and they are unpacked on the go
 			whenever networked_server_step_entropy arrives.
 
-			networked_server_step_entropy and public_settings_update are on the same channel.
+			networked_server_step_entropy and synced_meta_update are on the same channel.
 		*/
 
 		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
