@@ -2192,8 +2192,7 @@ void server_setup::handle_client_messages() {
 	::synced_meta_update update;
 
 	update.subject_id = to_mode_player_id(id);
-	update.new_meta.public_settings = c.settings.public_settings;
-	update.new_meta.authenticated = c.is_authenticated();
+	update.new_meta = c.make_synced_meta();
 	
 	return update;
 }

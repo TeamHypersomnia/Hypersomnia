@@ -458,7 +458,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	*/
 
 	/*
-		Some node-generating funcitons need a logic_step.
+		Some node-generating functions need a logic_step.
 		Therefore we have no choice but to fully step the cosmos with a standard solver
 		so that we have a logic_step to be passed.
 	*/

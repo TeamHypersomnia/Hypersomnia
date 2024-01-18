@@ -156,4 +156,13 @@ struct server_client_state {
 
 		return server_time - when_connected;
 	}
+
+	auto make_synced_meta() const {
+		synced_player_meta new_meta;
+
+		new_meta.public_settings = settings.public_settings;
+		new_meta.authenticated = is_authenticated();
+
+		return new_meta;
+	}
 };
