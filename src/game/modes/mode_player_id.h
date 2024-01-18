@@ -3,7 +3,7 @@
 #include "augs/templates/hash_templates.h"
 
 struct mode_player_id {
-	using id_value_type = uint32_t;
+	using id_value_type = uint8_t;
 	// GEN INTROSPECTOR struct mode_player_id
 	id_value_type value = static_cast<id_value_type>(-1);
 	// END GEN INTROSPECTOR

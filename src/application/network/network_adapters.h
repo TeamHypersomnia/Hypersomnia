@@ -37,8 +37,8 @@ public:
         return YOJIMBO_NEW(allocator, GameMessageFactory, allocator);
     }
 
-	void OnServerClientConnected(client_id_type clientIndex) override;
-	void OnServerClientDisconnected(client_id_type clientIndex) override;
+	void OnServerClientConnected(int clientIndex) override;
+	void OnServerClientDisconnected(int clientIndex) override;
    
 private:
     server_adapter* m_server;

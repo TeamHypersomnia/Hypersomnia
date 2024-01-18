@@ -42,7 +42,7 @@ struct client_requested_chat {
 struct server_broadcasted_chat {
 	static constexpr auto buf_len = max_chat_message_length_v;
 
-	session_id_type author = session_id_type::dead();
+	mode_player_id author = mode_player_id::dead();
 	chat_target_type target;
 	augs::constant_size_string<buf_len> message;
 	recipient_effect_type recipient_effect = recipient_effect_type::NONE;

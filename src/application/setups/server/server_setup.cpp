@@ -321,7 +321,7 @@ void server_setup::request_auth(mode_player_id player_id, const steam_auth_reque
 							if (GetIf(params, "result") == "OK") {
 								if (auto steamid = GetIf(params, "steamid")) {
 									LOG("Detected Steam ID: %x", *steamid);
-									return std::string("steam:") + *steamid;
+									return std::string("steam_") + *steamid;
 								}
 							}
 						}
@@ -789,11 +789,13 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 void server_setup::finalize_webhook_jobs() {
 	auto finalize = [&](auto& webhook_job) {
 		if (is_ready(*webhook_job.job)) {
+			LOG("Finalized webhook job: %x.", webhook_job.type);
 			if (auto client = find_client_state(webhook_job.player_id)) {
 				if (webhook_job.session_id == find_session_id(webhook_job.player_id)) {
 					switch (webhook_job.type) {
 						case job_type::AVATAR:
 							client->uploaded_avatar_url = webhook_job.job->get();
+							LOG("Received avatar from %x.", client->get_nickname());
 
 						case job_type::AUTH:
 							client->authenticated_id = webhook_job.job->get();
@@ -1216,12 +1218,12 @@ mode_player_id server_setup::get_integrated_player_id() const {
 }
 
 client_id_type server_setup::get_integrated_client_id() const {
-	return static_cast<client_id_type>(get_integrated_player_id().value);
+	return client_id_type { get_integrated_player_id().value };
 }
 
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	mode_player_id out;
-	out.value = static_cast<mode_player_id::id_value_type>(id);
+	out.value =  { id };
 
 	return out;
 }
@@ -1711,58 +1713,65 @@ void server_setup::advance_clients_state() {
 		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
 
-		if (c.state == client_state_type::IN_GAME) {
-			if (c.should_kick_due_to_afk(vars, server_time)) {
-				kick(client_id, "AFK!");
-			}
-
-			automove_to_spectators_if_afk(client_id, c);
-		}
-
-		if (c.is_set()) {
-			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				kick(client_id, "No messages arrived for too long!");
-			}
-
-			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
-				kick(client_id, "Account is required to play on this server!");
-			}
-
-			{
-				const auto num_commands = c.pending_entropies.size();
-				const auto max_commands = vars.max_buffered_client_commands;
-
-				if (num_commands > max_commands) {
-					const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
-					kick(client_id, reason);
+		auto check_all_kick_conditions = [&]() {
+			if (c.state == client_state_type::IN_GAME) {
+				if (c.should_kick_due_to_afk(vars, server_time)) {
+					kick(client_id, "AFK!");
 				}
+
+				automove_to_spectators_if_afk(client_id, c);
 			}
 
-			if (!removed_someone_already) {
-				if (c.when_kicked.has_value()) {
-					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
+			if (c.is_set()) {
+				if (c.should_kick_due_to_inactivity(vars, server_time)) {
+					kick(client_id, "No messages arrived for too long!");
+				}
 
-					if (server_time - *c.when_kicked > linger_secs) {
-						LOG("Disconnecting kicked client %x.", client_id);
-						disconnect_and_unset(client_id);
+				if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
+					kick(client_id, "Account is required to play on this server!");
+				}
+
+				{
+					const auto num_commands = c.pending_entropies.size();
+					const auto max_commands = vars.max_buffered_client_commands;
+
+					if (num_commands > max_commands) {
+						const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
+						kick(client_id, reason);
+					}
+				}
+
+				if (!removed_someone_already) {
+					if (c.when_kicked.has_value()) {
+						const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
+
+						if (server_time - *c.when_kicked > linger_secs) {
+							LOG("Disconnecting kicked client %x.", client_id);
+							disconnect_and_unset(client_id);
+						}
 					}
 				}
 			}
-		}
+		};
 
-		if (!c.is_set()) {
-			if (!removed_someone_already) {
+		auto remove_from_game_if_kicked = [&]() {
+			if (!removed_someone_already && !c.is_set()) {
 				if (player_added_to_mode(mode_id)) {
 					ensure(!removed_someone_already);
+					removed_someone_already = true;
 
 					mode_entropy_general cmd;
 					cmd.removed_player = mode_id;
 
 					local_collected.control(cmd);
-					removed_someone_already = true;
 				}
 			}
+		};
 
+		check_all_kick_conditions();
+		remove_from_game_if_kicked();
+
+		if (const bool is_disconnected = !c.is_set()) {
 			return;
 		}
 
@@ -1844,17 +1853,13 @@ void server_setup::advance_clients_state() {
 
 			{
 				auto download_existing_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
-					const auto session_id_of_avatar = find_session_id(client_id_of_avatar);
+					server->send_payload(
+						recipient_client_id,
+						game_channel_type::RELIABLE_MESSAGES,
 
-					if (session_id_of_avatar) {
-						server->send_payload(
-							recipient_client_id,
-							game_channel_type::RELIABLE_MESSAGES,
-
-							*session_id_of_avatar,
-							cc.meta.avatar
-						);
-					}
+						to_mode_player_id(client_id_of_avatar),
+						cc.meta.avatar
+					);
 				};
 
 				for_each_id_and_client(download_existing_avatar, connected_and_integrated_v);
@@ -1884,6 +1889,8 @@ void server_setup::advance_clients_state() {
 		if (!added_someone_already) {
 			if (c.state > client_state_type::PENDING_WELCOME) {
 				if (!player_added_to_mode(mode_id)) {
+					LOG("Adding %x to game state. State: %x", c.get_nickname(), c.state);
+
 					if (add_client_to_mode()) {
 						if (c.state == S::WELCOME_ARRIVED) {
 							send_state_for_the_first_time();
@@ -2538,10 +2545,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
 				server_broadcasted_chat message;
 
-				const auto session_id = find_session_id(get_integrated_client_id());
-				ensure(session_id.has_value());
-
-				message.author = *session_id;
+				message.author = to_mode_player_id(get_integrated_client_id());
 				message.message = std::string(chat.current_message);
 				message.target = chat.target;
 
@@ -2653,20 +2657,6 @@ const server_client_state* server_setup::find_client_state(const mode_player_id 
 	}
 
 	return nullptr;
-}
-
-std::optional<client_id_type> server_setup::find_client_id(const session_id_type sid) const {
-	std::optional<client_id_type> found;
-
-	auto find = [&](const client_id_type cid, auto&) {
-		if (find_session_id(cid) == sid) {
-			found = cid;
-		}
-	};
-
-	for_each_id_and_client(find, connected_and_integrated_v);
-
-	return found;
 }
 
 server_client_state& server_setup::get_client_state(const mode_player_id id) {
@@ -2821,7 +2811,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		get_current_time(),
 		sender_player_nickname,
 		sender_player_faction,
-		payload.author == find_session_id(get_local_player_id())
+		payload.author == get_local_player_id()
 	);
 
 	auto send_it = [&](const auto recipient_client_id, auto&) {
@@ -2898,10 +2888,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 	server_broadcasted_chat message;
 	message.message = reason;
 	message.target = chat_target_type::KICK;
-
-	if (const auto session_id = find_session_id(kicked_id)) {
-		message.author = *session_id;
-	}
+	message.author = to_mode_player_id(kicked_id);
 
 	const auto except = kicked_id;
 	broadcast(message, except);
@@ -2999,7 +2986,7 @@ bool server_setup::is_dedicated() const {
 	return dedicated.has_value();
 }
 
-void server_setup::handle_new_session(const add_player_input&) {
+void server_setup::reset_player_meta_to_default(const mode_player_id&) {
 	rebuild_player_meta_viewables = true;
 }
 
@@ -3096,12 +3083,10 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 			chat_target_type::DOWNLOADING_FILES
 		;
 
-		if (const auto session_id = find_session_id(client_id)) {
-			message.author = *session_id;
+		message.author = to_mode_player_id(client_id);
 
-			const auto except = client_id;
-			broadcast(message, except);
-		}
+		const auto except = client_id;
+		broadcast(message, except);
 	}
 
 	c.downloading_status = type;

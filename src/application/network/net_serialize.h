@@ -65,15 +65,14 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::mode_player_id& i) {
-		static const auto max_val = mode_player_id::machine_admin();
-		serialize_int(s, i.value, 0, max_val.value);
-		serialize_align(s);
+		static_assert(std::is_same_v<mode_player_id::id_value_type, uint8_t>);
+		serialize_int(s, i.value, 0, std::numeric_limits<uint8_t>::max());
 		return true;
 	}
 
 	template <class Stream>
-	bool serialize(Stream& s, ::session_id_type& i) {
-		serialize_uint32(s, i.value);
+	bool serialize(Stream&, ::session_id_type&) {
+		static_assert(always_false_v<Stream>, "Deprecated");
 		return true;
 	}
 

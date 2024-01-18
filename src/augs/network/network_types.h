@@ -91,7 +91,7 @@ inline bool is_nickname_valid_characters(const T& nickname) {
 }
 
 using net_time_t = double;
-using client_id_type = int;
+using client_id_type = uint8_t;
 using channel_id_type = int;
 
 constexpr client_id_type dead_client_id_v = -1;

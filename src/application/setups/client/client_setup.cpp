@@ -823,61 +823,29 @@ double client_setup::get_audiovisual_speed() const {
 	return mult * get_arena_handle().get_audiovisual_speed();
 }
 
-bool client_setup::push_or_handle(untimely_payload& p) {
-	const auto session_id = p.associated_id;
-
-	if (logically_set(find_by(session_id))) {
-		const auto typed_handler = [&](auto& typed_payload) {
-			return handle_untimely(typed_payload, session_id);
-		};
-
-		return std::visit(typed_handler, p.payload);
+bool client_setup::handle_new_avatar(arena_player_avatar_payload& new_avatar, const mode_player_id player_id) {
+	if (!logically_set(player_id)) {
+		set_disconnect_reason("The server sent an invalid player id!");
+		return false;
 	}
 
-	const auto next_session_id = get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-		[&](const auto& mode) {
-			return mode.get_next_session_id();
-		}
-	);
+	if (new_avatar.image_bytes.size() > 0) {
+		try {
+			const auto size = augs::image::get_size(new_avatar.image_bytes);
 
-	const bool can_still_appear = p.associated_id.value >= next_session_id.value;
-
-	if (can_still_appear) {
-		untimely_payloads.emplace_back(p);
-	}
-
-	return true;
-}
-
-template <class U>
-bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
-	if constexpr(std::is_same_v<U, arena_player_avatar_payload>) {
-		auto& new_avatar = u;
-
-		if (new_avatar.image_bytes.size() > 0) {
-			try {
-				const auto size = augs::image::get_size(new_avatar.image_bytes);
-
-				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					set_disconnect_reason(typesafe_sprintf("The server has tried to send an avatar of size %xx%x!", size.x, size.y));
-					return false;
-				}
-			}
-			catch (const augs::image_loading_error& err) {
-				set_disconnect_reason("The server has tried to send an invalid avatar!\n%x", err.what());
+			if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+				set_disconnect_reason(typesafe_sprintf("The server has tried to send an avatar of size %xx%x!", size.x, size.y));
 				return false;
 			}
 		}
-
-		const auto player_id = find_by(session_id);
-		ensure(logically_set(player_id));
-
-		player_metas[player_id.value].avatar = std::move(new_avatar);
-		rebuild_player_meta_viewables = true;
+		catch (const augs::image_loading_error& err) {
+			set_disconnect_reason("The server has tried to send an invalid avatar!\n%x", err.what());
+			return false;
+		}
 	}
-	else {
-		static_assert(always_false_v<U>);
-	}
+
+	player_metas[player_id.value].avatar = std::move(new_avatar);
+	rebuild_player_meta_viewables = true;
 
 	return true;
 }
@@ -975,7 +943,7 @@ void client_setup::send_pending_commands() {
 				/* Send an empty payload to signal that there won't be any avatar. */
 				arena_player_avatar_payload payload;
 
-				const auto dummy_client_id = session_id_type::dead();
+				const auto dummy_client_id = mode_player_id::dead();
 
 				send_payload(
 					game_channel_type::RELIABLE_MESSAGES,
@@ -995,7 +963,7 @@ void client_setup::send_pending_commands() {
 				}
 
 				if (payload.image_bytes.size() > 0 && payload.image_bytes.size() <= max_avatar_bytes_v) {
-					const auto dummy_client_id = session_id_type::dead();
+					const auto dummy_client_id = mode_player_id::dead();
 
 					send_payload(
 						game_channel_type::RELIABLE_MESSAGES,
@@ -1689,30 +1657,6 @@ mode_player_id client_setup::get_local_player_id() const {
 	return client_player_id;
 }
 
-mode_player_id client_setup::find_by(const session_id_type id) const {
-	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-		[&](const auto& mode) {
-			return mode.lookup(id);
-		}
-	);
-}
-
-std::optional<session_id_type> client_setup::find_session_id(const mode_player_id id) const {
-	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-		[&](const auto& mode) -> std::optional<session_id_type> {
-			if (const auto entry = mode.find(id)) {
-				return entry->session.id;
-			}
-
-			return std::nullopt;
-		}
-	);
-}
-
-std::optional<session_id_type> client_setup::find_local_session_id() const {
-	return find_session_id(get_local_player_id());
-}
-
 template <class I, class O, class K>
 auto find_in_indirectors(const I& indirectors, O& objects, const K key) -> maybe_const_ptr_t<std::is_const_v<O>, typename O::value_type> {
 	if (key.indirection_index >= indirectors.size()) {
@@ -1768,35 +1712,8 @@ void restore_interpolations(
 	);
 }
 
-void client_setup::handle_new_session(const add_player_input& in) {
-	const auto new_player = in.id;
-	const auto new_session_id = find_session_id(new_player);
-
-	ensure(new_session_id.has_value());
-
-	auto& meta = player_metas[new_player.value];
-	meta.clear_session_channeled_data();
-	meta.session_id = *new_session_id;
-
-	auto untimely_handler = [&](auto& untimely) {
-		if (logically_set(find_by(untimely.associated_id))) {
-			const auto typed_handler = [&](auto& typed_payload) {
-				return handle_untimely(typed_payload, untimely.associated_id);
-			};
-
-			const auto result = std::visit(typed_handler, untimely.payload);
-
-			if (!result) {
-				disconnect();
-			}
-
-			return true;
-		}
-
-		return false;
-	};
-
-	erase_if(untimely_payloads, untimely_handler);
+void client_setup::reset_player_meta_to_default(const mode_player_id& removed_player) {
+	player_metas[removed_player.value].clear();
 	rebuild_player_meta_viewables = true;
 }
 

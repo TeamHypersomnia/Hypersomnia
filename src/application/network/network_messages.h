@@ -278,14 +278,14 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 
 		bool read_payload(
-			session_id_type& session_id,
+			mode_player_id&,
 			arena_player_avatar_payload&
 		);
 
 		template <class F>
 		bool write_payload(
 			F block_allocator,
-			const session_id_type& session_id,
+			const mode_player_id&,
 			const arena_player_avatar_payload&
 		);
 	};

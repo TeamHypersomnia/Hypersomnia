@@ -17,7 +17,7 @@ class server_adapter {
 	auxiliary_command_callback_type auxiliary_command_callback;
 
 	struct connection_event {
-		client_id_type client_id = -1;
+		client_id_type client_id = dead_client_id_v;
 		bool connected = false;
 	};
 

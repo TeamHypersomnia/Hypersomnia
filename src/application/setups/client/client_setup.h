@@ -145,15 +145,6 @@ class client_setup :
 	std::vector<file_chunk_packet> buffered_chunk_packets;
 	BandwidthMonitor direct_bandwidth;
 
-	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
-
-	struct untimely_payload {
-		session_id_type associated_id;
-		untimely_payload_variant payload;
-	};
-
-	std::vector<untimely_payload> untimely_payloads;
-
 	net_time_t when_last_flushed_demo = 0.0;
 	augs::path_type recorded_demo_path;
 	demo_step_num_type recorded_demo_step = 0;
@@ -171,11 +162,8 @@ class client_setup :
 		return external_downloader != nullptr;
 	}
 
-	template <class U>
-	bool handle_untimely(U&, session_id_type);
-
-	bool push_or_handle(untimely_payload&);
-	void handle_new_session(const add_player_input& in);
+	bool handle_new_avatar(arena_player_avatar_payload&, mode_player_id);
+	void reset_player_meta_to_default(const mode_player_id&);
 
 	template <class T>
 	void set_demo_failed_reason(T&& reason) {
@@ -428,10 +416,10 @@ class client_setup :
 				auto advance_referential = [&](const auto& entropy) {
 					referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
 
-					const auto& added = entropy.general.added_player;
+					const auto& removed = entropy.general.removed_player;
 
-					if (logically_set(added)) {
-						handle_new_session(added);
+					if (logically_set(removed)) {
+						reset_player_meta_to_default(removed);
 					}
 				};
 
@@ -772,9 +760,6 @@ public:
 	void ensure_handler();
 
 	mode_player_id get_local_player_id() const;
-	std::optional<session_id_type> find_local_session_id() const;
-	std::optional<session_id_type> find_session_id(mode_player_id) const;
-	mode_player_id find_by(session_id_type) const;
 
 	online_arena_handle<false> get_arena_handle(std::optional<client_arena_type> = std::nullopt);
 	online_arena_handle<true> get_arena_handle(std::optional<client_arena_type> = std::nullopt) const;

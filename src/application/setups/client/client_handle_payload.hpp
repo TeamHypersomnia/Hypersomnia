@@ -159,7 +159,7 @@ message_handler_result client_setup::handle_payload(
 				get_current_time(),
 				sender_player_nickname,
 				sender_player_faction,
-				author_id == find_local_session_id()
+				author_id == get_local_player_id()
 			);
 
 			LOG(new_entry.to_string());
@@ -390,11 +390,11 @@ message_handler_result client_setup::handle_payload(
 
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
-		session_id_type session_id;
+		mode_player_id player_id;
 		arena_player_avatar_payload new_avatar;
 
 		const bool result = read_payload(
-			session_id,
+			player_id,
 			new_avatar
 		);
 
@@ -402,9 +402,7 @@ message_handler_result client_setup::handle_payload(
 			return abort_v;
 		}
 
-		auto p = untimely_payload { session_id, std::move(new_avatar) };
-
-		if (!push_or_handle(p)) {
+		if (!handle_new_avatar(new_avatar, player_id)) {
 			return abort_v;
 		}
 	}

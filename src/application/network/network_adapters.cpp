@@ -16,15 +16,15 @@
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
-void GameAdapter::OnServerClientConnected(const client_id_type clientIndex) {
+void GameAdapter::OnServerClientConnected(const int clientIndex) {
 	if (m_server != nullptr) {
-		m_server->client_connected(clientIndex);
+		m_server->client_connected(static_cast<client_id_type>(clientIndex));
 	}
 }
 
-void GameAdapter::OnServerClientDisconnected(const client_id_type clientIndex) {
+void GameAdapter::OnServerClientDisconnected(const int clientIndex) {
 	if (m_server != nullptr) {
-		m_server->client_disconnected(clientIndex);
+		m_server->client_disconnected(static_cast<client_id_type>(clientIndex));
 	}
 }
 

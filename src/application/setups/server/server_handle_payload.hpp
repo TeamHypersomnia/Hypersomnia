@@ -52,6 +52,7 @@ message_handler_result server_setup::handle_payload(
 		*/
 
 		auto& new_nick = payload.chosen_nickname;
+		LOG("Received requested_client_settings from %x. Client state: %x", new_nick, c.state);
 
 		if (!is_nickname_valid_characters(new_nick)) {
 			const auto reason = typesafe_sprintf(
@@ -148,17 +149,15 @@ message_handler_result server_setup::handle_payload(
 	}
 	else if constexpr (std::is_same_v<T, client_requested_chat>) {
 		if (c.state == S::IN_GAME) {
-			if (const auto session_id = find_session_id(client_id)) {
-				server_broadcasted_chat message;
+			server_broadcasted_chat message;
 
-				message.author = *session_id;
-				message.message = std::string(payload.message);
-				message.target = payload.target;
+			message.author = to_mode_player_id(client_id);
+			message.message = std::string(payload.message);
+			message.target = payload.target;
 
-				broadcast(message);
+			broadcast(message);
 
-				c.last_keyboard_activity_time = server_time;
-			}
+			c.last_keyboard_activity_time = server_time;
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
@@ -220,9 +219,7 @@ message_handler_result server_setup::handle_payload(
 					server_broadcasted_chat message;
 					message.target = chat_target_type::FINISHED_DOWNLOADING;
 
-					if (const auto session_id = find_session_id(client_id)) {
-						message.author = *session_id;
-					}
+					message.author = to_mode_player_id(client_id);
 
 					{
 						const auto except = client_id;
@@ -287,7 +284,7 @@ message_handler_result server_setup::handle_payload(
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		{
-			session_id_type dummy_id;
+			mode_player_id dummy_id;
 			arena_player_avatar_payload payload;
 
 			if (read_payload(dummy_id, payload)) {
@@ -312,23 +309,18 @@ message_handler_result server_setup::handle_payload(
 								push_connected_webhook(to_mode_player_id(client_id));
 							}
 
-							if (const auto session_id_of_avatar = find_session_id(client_id)) {
-								auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
-									server->send_payload(
-										recipient_client_id,
-										game_channel_type::RELIABLE_MESSAGES,
+							auto broadcast_avatar = [this, client_id, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
+								server->send_payload(
+									recipient_client_id,
+									game_channel_type::RELIABLE_MESSAGES,
 
-										*session_id_of_avatar,
-										client_with_updated_avatar.meta.avatar
-									);
-								};
+									to_mode_player_id(client_id),
+									client_with_updated_avatar.meta.avatar
+								);
+							};
 
-								for_each_id_and_client(broadcast_avatar, only_connected_v);
-								rebuild_player_meta_viewables = true;
-							}
-							else {
-								kick(client_id, "sending an avatar too early");
-							}
+							for_each_id_and_client(broadcast_avatar, only_connected_v);
+							rebuild_player_meta_viewables = true;
 						}
 					}
 					catch (...) {

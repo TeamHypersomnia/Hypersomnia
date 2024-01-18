@@ -543,8 +543,10 @@ public:
 						solve_settings()
 					);
 
-					if (logically_set(unpacked.general.added_player)) {
-						handle_new_session(unpacked.general.added_player);
+					const auto& removed = unpacked.general.removed_player;
+
+					if (logically_set(removed)) {
+						reset_player_meta_to_default(removed);
 					}
 				}
 			}
@@ -658,7 +660,7 @@ public:
 	bool is_integrated() const;
 	bool is_dedicated() const;
 
-	void handle_new_session(const add_player_input& in);
+	void reset_player_meta_to_default(const mode_player_id&);
 	void log_performance();
 
 	::public_settings_update make_public_settings_update_from(
@@ -687,8 +689,6 @@ public:
 
 	server_client_state* find_client_state(mode_player_id);
 	const server_client_state* find_client_state(mode_player_id) const;
-
-	std::optional<client_id_type> find_client_id(session_id_type) const;
 
 	std::vector<std::string> get_all_nicknames() const;
 

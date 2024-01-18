@@ -161,21 +161,21 @@ namespace net_messages {
 	}
 
 	inline bool player_avatar_exchange::read_payload(
-		session_id_type& session_id,
+		mode_player_id& player_id,
 		arena_player_avatar_payload& payload
 	) {
-		using id_type = session_id_type::id_value_type;
+		using id_type = mode_player_id::id_value_type;
 
 		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
 		auto size = static_cast<std::size_t>(GetBlockSize());
 
-		const bool session_id_written_properly = size >= sizeof(id_type);
+		const bool player_id_written_properly = size >= sizeof(id_type);
 
-		if (!session_id_written_properly) {
+		if (!player_id_written_properly) {
 			return false;
 		}
 
-		session_id.value = *reinterpret_cast<const id_type*>(data);
+		player_id.value = *reinterpret_cast<const id_type*>(data);
 
 		data += sizeof(id_type);
 		size -= sizeof(id_type);
@@ -193,16 +193,16 @@ namespace net_messages {
 	template <class F>
 	inline bool player_avatar_exchange::write_payload(
 		F block_allocator,
-		const session_id_type& session_id,
+		const mode_player_id& player_id,
 		const arena_player_avatar_payload& payload
 	) {
-		using id_type = session_id_type::id_value_type;
+		using id_type = mode_player_id::id_value_type;
 
 		const auto& png = payload.image_bytes;
 		auto block = block_allocator(sizeof(id_type) + png.size());
 
-		std::memcpy(block, &session_id.value, sizeof(session_id));
-		std::memcpy(block + sizeof(session_id), png.data(), png.size());
+		std::memcpy(block, &player_id.value, sizeof(player_id));
+		std::memcpy(block + sizeof(player_id), png.data(), png.size());
 
 		return true;
 	}

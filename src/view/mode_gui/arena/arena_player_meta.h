@@ -20,14 +20,14 @@ struct arena_player_network_stats {
 struct arena_player_meta {
 	arena_player_avatar_payload avatar;
 	arena_player_network_stats stats;
-	session_id_type session_id;
 
 	public_client_settings public_settings;
 
-	void clear_session_channeled_data() {
+	void clear() {
 		avatar.image_bytes.clear();
+
 		stats = {};
-		session_id = {};
+		public_settings = {};
 	}
 };
 
