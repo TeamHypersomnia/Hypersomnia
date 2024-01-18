@@ -88,6 +88,12 @@ server_setup::server_setup(
 					return true;
 				}
 
+				if (!is_joinable()) {
+					if (is_connection_request_packet(std::forward<decltype(args)>(args)...)) {
+						return true;
+					}
+				}
+
 				if (handle_gameserver_command(std::forward<decltype(args)>(args)...)) {
 					return true;
 				}
@@ -3124,6 +3130,37 @@ void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 	if (const auto join_cmd = get_steam_join_command_line(); !join_cmd.empty()) {
 		pairs.push_back({ "connect", join_cmd });
 	}
+}
+
+#define NETCODE_CONNECTION_REQUEST_PACKET           0
+
+bool server_setup::is_connection_request_packet(
+	const netcode_address_t& from,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) const {
+	if (packet_bytes < 1) {
+		return false;
+	}
+
+	(void)from;
+	return static_cast<uint8_t>(packet_buffer[0]) == NETCODE_CONNECTION_REQUEST_PACKET;
+}
+
+bool server_setup::is_ranked_waiting_for_reconnect() const {
+	return false;
+}
+
+bool server_setup::is_ranked_live_or_commencing() const {
+	return false;
+}
+
+bool server_setup::is_joinable() const {
+	if (is_ranked_live_or_commencing()) {
+		return is_ranked_waiting_for_reconnect();
+	}
+
+	return true;
 }
 
 #include "augs/readwrite/to_bytes.h"

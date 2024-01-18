@@ -725,4 +725,14 @@ public:
 
 	std::string get_steam_join_command_line() const;
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
+
+	bool is_joinable() const;
+	bool is_ranked_live_or_commencing() const;
+	bool is_ranked_waiting_for_reconnect() const;
+
+	bool is_connection_request_packet(
+		const netcode_address_t& from,
+		const std::byte* packet_buffer,
+		const std::size_t packet_bytes
+	) const;
 };
