@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- fix enemy health bars visible outside of fov
+	- we should just test a point against the visibility polygon no?
+
 - fix crash:
 	C:\projects\hypersomnia\src\augs\string\path_sanitization.cpp(506): FAILED:
 	  REQUIRE( S::try_generate_sanitized_filename("훶훳힄훳챨?┖궸?) == "" )

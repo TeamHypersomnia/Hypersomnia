@@ -33,6 +33,7 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/network/netcode_sockets.h"
+#include "application/arena/synced_dynamic_vars.h"
 
 #include "steam_rich_presence_pairs.h"
 
@@ -53,6 +54,7 @@ class main_menu_setup : public default_setup_settings {
 	intercosm scene;
 	test_mode mode;
 	test_mode_ruleset ruleset;
+	synced_dynamic_vars dummy_dynamic_vars;
 	entity_id viewed_character_id;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -141,7 +143,7 @@ public:
 			mode_entropy entropy;
 
 			mode.advance(
-				{ ruleset, scene.world },
+				{ dummy_dynamic_vars, ruleset, scene.world },
 				entropy,
 				callbacks,
 				solve_settings()
@@ -185,7 +187,7 @@ public:
 
 	template <class F>
 	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { ruleset, scene.world });
+		callback(mode, test_mode::const_input { dummy_dynamic_vars, ruleset, scene.world });
 	}
 
 	auto get_game_gui_subject_id() const {

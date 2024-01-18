@@ -389,6 +389,11 @@ namespace net_messages {
 	}
 
 	template <typename Stream>
+	bool serialize(Stream& stream, ::synced_dynamic_vars& payload) {
+		return unsafe_serialize(stream, payload);
+	}
+
+	template <typename Stream>
 	bool serialize(Stream& stream, ::synced_meta_update& payload) {
 		if (!serialize(stream, payload.subject_id)) {
 			return false;

@@ -84,6 +84,7 @@ class client_setup :
 	/* Other replicated state */
 	all_modes_variant current_mode_state;
 	server_public_vars sv_public_vars;
+	synced_dynamic_vars sv_dynamic_vars;
 	augs::path_type current_arena_folder;
 
 	mode_player_id client_player_id;
@@ -188,7 +189,8 @@ class client_setup :
 				self.scene,
 				self.predicted_cosmos,
 				self.ruleset,
-				self.clean_round_state
+				self.clean_round_state,
+				self.sv_dynamic_vars
 			};
 		}
 		else {
@@ -199,7 +201,8 @@ class client_setup :
 				self.scene,
 				self.scene.world,
 				self.ruleset,
-				self.clean_round_state
+				self.clean_round_state,
+				self.sv_dynamic_vars
 			};
 		}
 	}

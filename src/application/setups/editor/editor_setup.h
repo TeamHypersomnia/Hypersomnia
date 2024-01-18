@@ -55,6 +55,7 @@
 #include "application/main/miniature_generator.h"
 #include "application/network/network_common.h"
 #include "application/arena/scene_entity_to_node_map.h"
+#include "application/arena/synced_dynamic_vars.h"
 #include "steam_rich_presence_pairs.h"
 
 struct config_lua_table;
@@ -123,6 +124,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	all_rulesets_variant ruleset;
 	all_modes_variant current_mode_state;
 	cosmos_solvable_significant clean_round_state;
+	synced_dynamic_vars dummy_dynamic_vars;
 
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -246,7 +248,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 			self.scene,
 			self.scene.world,
 			self.ruleset,
-			self.clean_round_state
+			self.clean_round_state,
+			self.dummy_dynamic_vars
 		};
 	}
 

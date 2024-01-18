@@ -207,6 +207,8 @@ struct setup_next_round_params {
 	bool predictable = true;
 };
 
+struct synced_dynamic_vars;
+
 class arena_mode {
 public:
 	using ruleset_type = arena_mode_ruleset;
@@ -218,13 +220,14 @@ public:
 	struct basic_input {
 		using mode_type = arena_mode;
 
+		const synced_dynamic_vars& dynamic_vars;
 		const ruleset_type& rules;
 		const cosmos_solvable_significant& clean_round_state;
 		maybe_const_ref_t<C, cosmos> cosm;
 
 		template <bool is_const = C, class = std::enable_if_t<!is_const>>
 		operator basic_input<!is_const>() const {
-			return { rules, clean_round_state, cosm };
+			return { dynamic_vars, rules, clean_round_state, cosm };
 		}
 	};
 

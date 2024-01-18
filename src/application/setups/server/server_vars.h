@@ -42,6 +42,16 @@ struct server_public_vars {
 	bool operator==(const server_public_vars&) const = default;
 };
 
+enum class ranked_autostart_type {
+	// GEN INTROSPECTOR enum class ranked_autostart_type
+	NEVER,
+	TEAMS_EQUAL,
+	SERVER_FULL,
+	ALWAYS,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 enum class arena_cycle_type {
 	// GEN INTROSPECTOR enum class arena_cycle_type
 	REPEAT_CURRENT,
@@ -50,6 +60,19 @@ enum class arena_cycle_type {
 
 	COUNT
 	// END GEN INTROSPECTOR
+};
+
+struct server_ranked_vars {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct server_ranked_vars
+	ranked_autostart_type autostart_when = ranked_autostart_type::NEVER;
+	uint16_t rejoin_time_limit = 150;
+	uint8_t max_rejoins = 1;
+	bool freeze_match_on_disconnect = false;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const server_ranked_vars&) const = default;
 };
 
 struct server_vars {
@@ -62,6 +85,10 @@ struct server_vars {
 
 	arena_identifier arena;
 	game_mode_name_type game_mode;
+
+	server_ranked_vars ranked;
+
+	bool friendly_fire = true;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;

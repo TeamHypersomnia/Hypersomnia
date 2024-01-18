@@ -342,6 +342,31 @@ message_handler_result client_setup::handle_payload(
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
+	else if constexpr (std::is_same_v<T, synced_dynamic_vars>) {
+		if (pause_solvable_stream) {
+			/* 
+				Ignore.
+				We will resync everything once we're done anyway.
+				Wouldn't hurt to apply it but why bother, just in case.
+			*/
+
+			return continue_v;
+		}
+
+		sv_dynamic_vars = payload;
+
+		LOG(
+			"New synced_dynamic_vars. Run ranked logic: %x, FF: %x", 
+			sv_dynamic_vars.run_ranked_logic,
+			sv_dynamic_vars.friendly_fire
+		);
+
+		/*
+			The predicted cosmos was predicted under the assumption of old state vars.
+		*/
+
+		receiver.schedule_reprediction = true;
+	}
 	else if constexpr (std::is_same_v<T, synced_meta_update>) {
 		if (pause_solvable_stream) {
 			/* 
@@ -362,6 +387,12 @@ message_handler_result client_setup::handle_payload(
 		*/
 
 		player_metas[payload.subject_id.value].synced = payload.new_meta;
+
+		/*
+			The predicted cosmos was predicted under the assumption of old metas.
+		*/
+
+		receiver.schedule_reprediction = true;
 	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
 		const auto& mode_player_stats = payload.stats;

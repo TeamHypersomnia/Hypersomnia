@@ -765,27 +765,53 @@ treat_as_music_sounds_longer_than_secs = 5,
     require_authentication = false,
     kick_if_unauthenticated_for_secs = 4.0,
 
-    -- Initiates a "proper" match when the server becomes full,
-    -- Use the server_start.slots variable to determine if the server is meant for
-    -- 1v1 (slots=2), 2v2 (slots=4) or other configurations.
-    ranked_start_when_full = false,
+    ranked = {
+      -- Note you can always host a "ranked" match locally -
+      -- even if you don't report winners/losers to the MMR database.
+      -- 
+      -- It will still make the match behave like a proper tournament match.
+      -- For example:
+      --    - The server becomes unjoinable after starting the match.
+      --    - Match will be frozen for a while when someone disonnects mid-way, allowing them to rejoin.
+      --
+      -- You may absolutely use it on some LAN torunaments.
 
-    -- Allow the last free slot to be used by a spectator.
-    -- Use for tournaments between trusted friends only or in offline setups.
-    ranked_allow_one_spectator = false,
+      -- Enables ranked match logic depending on team composition,
+      -- With "SERVER_FULL", use the server_start.slots variable to determine if the server is meant for
+      -- 1v1 (slots=2), 2v2 (slots=4) or other configurations.
+      -- ALWAYS will allow asymmetrical teams liks 1v3.
+      -- NEVER is the default for casual servers.
+      autostart_when = "NEVER", -- "| TEAMS_EQUAL | SERVER_FULL | SERVER_FULL_EQUAL_TEAMS | ALWAYS",
 
-    -- Freeze the entire game completely if a client disconnects.
-    -- This could be due to a game crash or network failure.
-    --
-    -- This effectively stops time.
-    --
-    -- THe characters will end up with their buttons released.
-    -- The match will resume once all players are back.
-    -- Use for tournaments between trusted friends only or in offline setups.
-    ranked_freeze_match_on_disconnect_secs = 0,
+      -- Only "NEVER" and "ALWAYS" are implemented right now.
+
+      -- Max: 65535
+      rejoin_time_limit = 150,
+
+      -- After this many rejoins,
+      -- you will no longer be able to join this match after disconnect.
+      --
+      -- On official ranked servers, this results in a ban.
+      -- Feel free to set it to a high value for matches between trusted friends.
+      -- Max: 255
+      max_rejoins = 1,
+
+      -- Freeze the entire game completely if a client disconnects.
+      -- This could be due to a game crash or network failure.
+      --
+      -- This effectively stops time.
+      -- If false, will just lengthen the freeze time on the next round.
+      --
+      -- THe characters will end up with their buttons released (except Use button).
+      -- The match will resume once all players are back.
+      -- Use for tournaments between trusted friends only.
+      freeze_match_on_disconnect = false
+    },
 
     arena = "de_cyberaqua",
     game_mode = "",
+
+    friendly_fire = true, -- not implemented yet
 
     cycle = "REPEAT_CURRENT", -- | "LIST" | "ALL_ON_DISK"
 

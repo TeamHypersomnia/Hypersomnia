@@ -148,7 +148,8 @@ main_menu_setup::main_menu_setup(
 			scene,
 			scene.world,
 			rv,
-			dummy
+			dummy,
+			dummy_dynamic_vars
 		};
 
 		::load_arena_from_path(
@@ -177,7 +178,7 @@ main_menu_setup::main_menu_setup(
 			ruleset = *r;
 		}
 
-		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
+		viewed_character_id = cosm[mode.lookup(mode.add_player({ dummy_dynamic_vars, ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
 	}
 
 	const bool is_recording_available = is_intro_scene_available && false;
@@ -198,7 +199,7 @@ main_menu_setup::main_menu_setup(
 	if (is_recording_available) {
 		while (cosm.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
 			mode.advance(
-				{ ruleset, cosm },
+				{ dummy_dynamic_vars, ruleset, cosm },
 				mode_entropy(),
 				solver_callbacks(),
 				solve_settings()

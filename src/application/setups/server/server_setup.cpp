@@ -1330,6 +1330,24 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 	private_vars = private_new_vars;
 }
 
+synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
+	bool all_authenticated = true;
+
+	for_each_id_and_client([&all_authenticated](const auto, const auto& c) {
+		if (!c.is_authenticated()) {
+			all_authenticated = false;
+		}
+	}, only_connected_v);
+
+	synced_dynamic_vars out;
+
+	out.run_ranked_logic = all_authenticated && vars.ranked.autostart_when == ranked_autostart_type::ALWAYS;
+	out.friendly_fire = vars.friendly_fire;
+	out.ranked = vars.ranked;
+
+	return out;
+}
+
 server_public_vars server_setup::make_public_vars() const {
 	server_public_vars pub;
 
@@ -1664,18 +1682,25 @@ void server_setup::send_complete_solvable_state_to(const client_id_type client_i
 
 	send_full_arena_snapshot_to(client_id);
 
-	auto download_existing_public_settings  = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
-		const auto downloaded_settings = make_synced_meta_update_from(cc, client_id_of_settings);
+	auto send_player_synced_meta = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
+		const auto new_meta = make_synced_meta_update_from(cc, client_id_of_settings);
 
 		server->send_payload(
 			recipient_client_id,
 			game_channel_type::RELIABLE_MESSAGES,
 
-			downloaded_settings
+			new_meta
 		);
 	};
 
-	for_each_id_and_client(download_existing_public_settings, connected_and_integrated_v);
+	for_each_id_and_client(send_player_synced_meta, connected_and_integrated_v);
+
+	server->send_payload(
+		client_id, 
+		game_channel_type::RELIABLE_MESSAGES, 
+
+		last_broadcast_dynamic_vars
+	);
 }
 
 void server_setup::advance_clients_state() {
@@ -2195,6 +2220,28 @@ void server_setup::handle_client_messages() {
 	update.new_meta = c.make_synced_meta();
 	
 	return update;
+}
+
+void server_setup::rebroadcast_synced_dynamic_vars() {
+	const auto current_dynamic_vars = make_synced_dynamic_vars();
+
+	if (current_dynamic_vars != last_broadcast_dynamic_vars) {
+		auto rebroadcast = [&](const auto recipient_client_id, auto& c) {
+			if (c.should_pause_solvable_stream()) {
+				return;
+			}
+
+			server->send_payload(
+				recipient_client_id, 
+				game_channel_type::RELIABLE_MESSAGES,
+
+				current_dynamic_vars
+			);
+		};
+
+		last_broadcast_dynamic_vars = current_dynamic_vars;
+		for_each_id_and_client(rebroadcast, only_connected_v);
+	}
 }
 
 void server_setup::rebroadcast_player_synced_metas() {

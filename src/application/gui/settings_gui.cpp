@@ -2048,6 +2048,9 @@ void do_server_vars(
 
 		ImGui::Separator();
 
+		revertable_checkbox("Friendly fire", vars.friendly_fire);
+		revertable_enum("Start ranked when...", vars.ranked.autostart_when);
+
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 		revertable_input_text(SCOPE_CFG_NVP(server_name));
 

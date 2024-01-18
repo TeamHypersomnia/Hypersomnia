@@ -124,6 +124,8 @@ struct test_mode_player {
 	test_mode_player(const mode_entity_id controlled_character_id = mode_entity_id()) : controlled_character_id(controlled_character_id) {}
 };
 
+struct synced_dynamic_vars;
+
 class test_mode {
 public:
 	using ruleset_type = test_mode_ruleset;
@@ -135,12 +137,13 @@ public:
 	struct basic_input {
 		using mode_type = test_mode;
 
+		const synced_dynamic_vars& dynamic_vars;
 		const ruleset_type& rules;
 		maybe_const_ref_t<C, cosmos> cosm;
 
 		template <bool is_const = C, class = std::enable_if_t<!is_const>>
 		operator basic_input<!is_const>() const {
-			return { rules, cosm };
+			return { dynamic_vars, rules, cosm };
 		}
 	};
 

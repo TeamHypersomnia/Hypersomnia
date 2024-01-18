@@ -11,6 +11,7 @@ struct intercosm;
 
 struct arena_paths;
 struct game_drawing_settings;
+struct synced_dynamic_vars;
 
 template <bool C, class ModeVariant, class RulesVariant>
 class basic_arena_handle {
@@ -33,12 +34,12 @@ class basic_arena_handle {
 				ensure(vars != nullptr);
 
 				if constexpr(M::needs_clean_round_state) {
-					const auto in = I { *vars, self.clean_round_state, self.advanced_cosm };
+					const auto in = I { self.dynamic_vars, *vars, self.clean_round_state, self.advanced_cosm };
 
 					return callback(typed_mode, in);
 				}
 				else {
-					const auto in = I { *vars, self.advanced_cosm };
+					const auto in = I { self.dynamic_vars, *vars, self.advanced_cosm };
 					return callback(typed_mode, in);
 				}
 			}
@@ -73,6 +74,7 @@ public:
 	maybe_const_ref_t<C, cosmos> advanced_cosm;
 	maybe_const_ref_t<C, RulesVariant> ruleset;
 	const cosmos_solvable_significant& clean_round_state;
+	const synced_dynamic_vars& dynamic_vars;
 
 	template <class T>
 	void transfer_all_solvables(T& from) {

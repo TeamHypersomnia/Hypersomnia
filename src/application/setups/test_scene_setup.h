@@ -23,6 +23,8 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "steam_rich_presence_pairs.h"
 
+#include "application/arena/synced_dynamic_vars.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -56,6 +58,7 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	std::string nickname;
 
 	cosmos_solvable_significant dummy_clean_round_state;
+	synced_dynamic_vars dummy_dynamic_vars;
 	uint32_t clean_step_number = 0;
 
 	intercosm scene;
@@ -87,7 +90,8 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 			self.scene,
 			self.scene.world,
 			self.ruleset,
-			self.dummy_clean_round_state
+			self.dummy_clean_round_state,
+			self.dummy_dynamic_vars
 		};
 	}
 

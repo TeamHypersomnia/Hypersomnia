@@ -19,6 +19,7 @@
 #include "game/modes/session_id.h"
 #include "application/network/net_serialize.h"
 #include "application/network/download_progress_message.h"
+#include "application/arena/synced_dynamic_vars.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -161,6 +162,11 @@ namespace net_messages {
 	};
 
 	struct synced_meta_update : net_message_with_payload<::synced_meta_update> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
+	struct synced_dynamic_vars_update : net_message_with_payload<::synced_dynamic_vars> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
 	};
@@ -318,6 +324,7 @@ namespace net_messages {
 	using all_t = type_list<
 		client_welcome*,
 		synced_meta_update*, 
+		synced_dynamic_vars_update*, 
 		new_server_vars*,
 		new_server_public_vars*,
 		new_server_runtime_info*,

@@ -35,6 +35,7 @@
 #include "application/setups/server/rcon_level.h"
 #include "game/messages/mode_notification.h"
 #include "application/setups/server/file_chunk_packet.h"
+#include "application/arena/synced_dynamic_vars.h"
 #include "steam_rich_presence_pairs.h"
 
 struct netcode_socket_t;
@@ -90,10 +91,12 @@ class server_setup :
 	server_private_vars private_vars;
 
 	server_public_vars last_broadcast_public_vars;
+	synced_dynamic_vars last_broadcast_dynamic_vars;
 
 	server_runtime_info runtime_info;
 
 	server_public_vars make_public_vars() const;
+	synced_dynamic_vars make_synced_dynamic_vars() const;
 
 	/* The rest is server-specific */
 	std::size_t arena_cycle_current_index = 0;
@@ -246,7 +249,8 @@ private:
 			self.scene,
 			self.scene.world,
 			self.ruleset,
-			self.clean_round_state
+			self.clean_round_state,
+			self.last_broadcast_dynamic_vars
 		};
 	}
 
@@ -254,6 +258,7 @@ private:
 	void advance_clients_state();
 
 	void rebroadcast_player_synced_metas();
+	void rebroadcast_synced_dynamic_vars();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
 	void broadcast_net_statistics();
 
@@ -465,6 +470,7 @@ public:
 				auto scope = measure_scope(profiler.send_entropies);
 
 				rebroadcast_player_synced_metas();
+				rebroadcast_synced_dynamic_vars();
 				send_server_step_entropies(step_collected);
 				broadcast_net_statistics();
 			}
