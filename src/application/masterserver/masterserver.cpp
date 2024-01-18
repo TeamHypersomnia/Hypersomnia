@@ -223,8 +223,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			next.arena = data.current_arena;
 			next.game_mode = data.game_mode;
 
-			next.num_playing = data.num_fighting;
 			next.num_spectating = data.get_num_spectators();
+			next.num_playing = data.num_online - next.num_spectating;
 
 			next.slots = data.max_online;
 

@@ -538,7 +538,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 	}
 }
 
-constexpr auto num_columns = 7;
+constexpr auto num_columns = 6;
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
 	selected_server = s;
@@ -688,12 +688,7 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto max_players = std::min(d.max_fighting, d.max_online);
-		do_text(typesafe_sprintf("%x/%x", d.num_fighting, max_players));
-
-		ImGui::NextColumn();
-
-		do_text(typesafe_sprintf("%x/%x", d.get_num_spectators(), d.get_max_spectators()));
+		do_text(typesafe_sprintf("%x/%x", d.num_online, d.max_online));
 
 		ImGui::NextColumn();
 
@@ -803,7 +798,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (at_least_players.is_enabled) {
-				if (s.heartbeat.num_fighting < at_least_players.value) {
+				if (s.heartbeat.num_online < at_least_players.value) {
 					return;
 				}
 			}
@@ -858,11 +853,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto by_players = [](const T& a, const T& b) {
-			return a->heartbeat.num_fighting < b->heartbeat.num_fighting;
-		};
-
-		auto by_spectators = [](const T& a, const T& b) {
-			return a->heartbeat.get_num_spectators() < b->heartbeat.get_num_spectators();
+			return a->heartbeat.num_online < b->heartbeat.num_online;
 		};
 
 		auto by_arena = [](const T& a, const T& b) {
@@ -918,12 +909,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					return sort_by(by_players, by_ping, by_appeared);
 
 				case 4: 
-					return sort_by(by_spectators, by_ping, by_appeared);
-
-				case 5: 
 					return sort_by(by_arena, by_ping, by_appeared);
 
-				case 6: 
+				case 5: 
 					return sort_by(by_appeared, by_ping, by_players);
 					
 				default:
@@ -952,9 +940,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * max_server_name_length_v - 4);
 		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("Capture the fla(FFA)").x);
 		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  9").x);
-		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2));
-		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
+		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2));
+		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * 25);
 
 		int current_col = 0;
 
@@ -995,7 +982,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			do_column(with_label, col);
 			do_column("Game mode");
 			do_column("Players");
-			do_column("Spectators");
 			do_column("Arena");
 			do_column("First appeared");
 

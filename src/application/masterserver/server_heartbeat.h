@@ -33,9 +33,6 @@ struct server_heartbeat {
 	arena_identifier current_arena;
 	game_mode_name_type game_mode;
 
-	uint8_t num_fighting;
-	uint8_t max_fighting;
-
 	uint8_t num_online;
 	uint8_t max_online;
 
@@ -67,10 +64,6 @@ struct server_heartbeat {
 	}
 
 	int get_num_spectators() const {
-		return num_online - num_fighting;
-	}
-
-	int get_max_spectators() const {
-		return max_online - num_fighting;
+		return players_spectating.size();
 	}
 };

@@ -1000,17 +1000,10 @@ void server_setup::send_heartbeat_to_server_list() {
 		vars.suppress_new_community_server_webhook
 	;
 
-	heartbeat.max_online = get_num_slots();
 	heartbeat.internal_network_address = internal_address;
 
 	heartbeat.num_online = get_num_connected();
-	heartbeat.num_fighting = get_num_active_players();
-
-	arena.on_mode_with_input(
-		[&heartbeat](const auto& mode, const auto& input) {
-			heartbeat.max_fighting = mode.get_max_num_active_players(input);
-		}
-	);
+	heartbeat.max_online = get_num_slots();
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
 	heartbeat.is_editor_playtesting_server = is_playtesting_server();
