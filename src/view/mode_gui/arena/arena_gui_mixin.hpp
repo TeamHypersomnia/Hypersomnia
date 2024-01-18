@@ -285,7 +285,7 @@ vec2 arena_gui_mixin<D>::get_viewed_player_nonzoomedout_visible_world_area() con
 
 	if (mode_id.is_set()) {
 		if (auto metas = self.find_player_metas()) {
-			return (*metas)[mode_id.value].public_settings.nonzoomedout_visible_world_area;
+			return (*metas)[mode_id.value].synced.public_settings.nonzoomedout_visible_world_area;
 		}
 	}
 

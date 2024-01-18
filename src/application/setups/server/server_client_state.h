@@ -132,7 +132,7 @@ struct server_client_state {
 		return settings.chosen_nickname;
 	}
 
-	bool authenticated() const {
+	bool is_authenticated() const {
 		return !authenticated_id.empty();
 	}
 
@@ -141,7 +141,7 @@ struct server_client_state {
 			return false;
 		}
 
-		if (authenticated()) {
+		if (is_authenticated()) {
 			return false;
 		}
 

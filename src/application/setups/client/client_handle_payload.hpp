@@ -361,7 +361,7 @@ message_handler_result client_setup::handle_payload(
 			networked_server_step_entropy and synced_meta_update are on the same channel.
 		*/
 
-		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
+		player_metas[payload.subject_id.value].synced = payload.new_meta;
 	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
 		const auto& mode_player_stats = payload.stats;

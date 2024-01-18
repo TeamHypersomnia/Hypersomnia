@@ -2,7 +2,6 @@
 #include <array>
 #include "augs/network/network_types.h"
 #include "application/network/requested_client_settings.h"
-#include "game/modes/session_id.h"
 
 struct steam_auth_request_payload {
 	std::vector<std::byte> ticket_bytes;
@@ -17,17 +16,22 @@ struct arena_player_network_stats {
 	uint8_t download_progress = 255;
 };
 
+struct synced_player_meta {
+	public_client_settings public_settings;
+	bool authenticated = false;
+};
+
 struct arena_player_meta {
 	arena_player_avatar_payload avatar;
 	arena_player_network_stats stats;
 
-	public_client_settings public_settings;
+	synced_player_meta synced;
 
 	void clear() {
 		avatar.image_bytes.clear();
 
 		stats = {};
-		public_settings = {};
+		synced = {};
 	}
 };
 

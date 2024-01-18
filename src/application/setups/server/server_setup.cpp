@@ -609,7 +609,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 			summary,
 			[&](const mode_player_id& mode_id) -> std::string {
 				if (const auto state = find_client_state(mode_id)) {
-					if (state->authenticated()) {
+					if (state->is_authenticated()) {
 						return state->authenticated_id;
 					}
 					else {
@@ -2192,7 +2192,8 @@ void server_setup::handle_client_messages() {
 	::synced_meta_update update;
 
 	update.subject_id = to_mode_player_id(id);
-	update.new_settings = c.settings.public_settings;
+	update.new_meta.public_settings = c.settings.public_settings;
+	update.new_meta.authenticated = c.is_authenticated();
 	
 	return update;
 }

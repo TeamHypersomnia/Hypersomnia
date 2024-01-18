@@ -448,7 +448,7 @@ class client_setup :
 					};
 
 					auto get_settings_for = [&](const mode_player_id& mode_id) {
-						return player_metas[mode_id.value].public_settings.character_input;
+						return player_metas[mode_id.value].synced.public_settings.character_input;
 					};
 
 					return entropy.unpack(mode_id_to_entity_id, get_settings_for);

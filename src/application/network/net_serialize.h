@@ -230,6 +230,17 @@ namespace net_messages {
 		return true;
 	}
 
+	template <typename Stream>
+	bool serialize(Stream& stream, ::synced_player_meta& payload) {
+		if (!serialize(stream, payload.public_settings)) {
+			return false;
+		}
+
+		serialize_bool(stream, payload.authenticated);
+
+		return true;
+	}
+
 	template <class Stream>
 	bool serialize(Stream& s, mode_commands::team_choice& c) {
 		return serialize_enum(s, c);
@@ -383,7 +394,7 @@ namespace net_messages {
 			return false;
 		}
 
-		if (!serialize(stream, payload.new_settings)) {
+		if (!serialize(stream, payload.new_meta)) {
 			return false;
 		}
 
