@@ -2591,10 +2591,33 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		return new_entry;
 	};
 
+	messages::match_summary_message summary;
+
+	if (in.rules.is_ffa()) {
+		for_each_player_best_to_worst_in(
+			faction_type::FFA,
+			[&](const auto& id, const auto& player) {
+				summary.first_faction.emplace_back(make_entry(id, player));
+			}
+		);
+
+		if (summary.first_faction.size() > 1) {
+			/*
+				Only one winner, the rest have lost
+			*/
+
+			summary.second_faction = summary.first_faction;
+			summary.second_faction.erase(summary.second_faction.begin());
+
+			summary.first_faction = { summary.first_faction[0] };
+		}
+
+		step.post_message(summary);
+		return;
+	}
+
 	auto strongest_in_first = mode_player_id::dead();
 	auto strongest_in_second = mode_player_id::dead();
-
-	messages::match_summary_message summary;
 
 	summary.first_team_score = result.winner_score;
 	summary.second_team_score = result.loser_score;
