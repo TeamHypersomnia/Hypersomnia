@@ -226,7 +226,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					movement_force_mult *= 1.45f;
 				}
 				else if (current_haste == haste_type::NORMAL) {
-					movement_force_mult *= 1.3f;
+					movement_force_mult *= 1.18f;
 				}
 
 				if (considered_flags.dashing && cp.value > 0.0f) {

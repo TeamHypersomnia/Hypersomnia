@@ -987,6 +987,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 
 	heartbeat.require_authentication = vars.require_authentication;
+	heartbeat.is_ranked = vars.ranked.autostart_when != ranked_autostart_type::NEVER;
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(
@@ -1003,7 +1004,13 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.internal_network_address = internal_address;
 
 	heartbeat.num_online = get_num_connected();
-	heartbeat.max_online = get_num_slots();
+
+	if (is_joinable()) {
+		heartbeat.max_online = get_num_slots();
+	}
+	else {
+		heartbeat.max_online = heartbeat.num_online;
+	}
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
 	heartbeat.is_editor_playtesting_server = is_playtesting_server();
