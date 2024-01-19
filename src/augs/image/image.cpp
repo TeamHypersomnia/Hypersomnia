@@ -258,8 +258,7 @@ namespace augs {
 				int comp;
 
 #if PLATFORM_WINDOWS
-				const auto wide_str = file_path.string();
-				const auto str_path = wstr_to_utf8(wide_str.c_str());
+				const auto str_path = wstr_to_utf8(file_path.c_str());
 #else
 				const auto str_path = file_path.string();
 #endif
