@@ -1138,6 +1138,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 				//MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
 				//tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
+				MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
 				MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
 				tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
 

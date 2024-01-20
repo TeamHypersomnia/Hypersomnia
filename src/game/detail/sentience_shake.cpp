@@ -6,7 +6,7 @@ void sentience_shake::apply(
 	const invariants::sentience& sentience_def,
 	components::sentience& sentience
 ) const {
-	if (augs::is_zero(strength)) {
+	if (augs::is_zero(strength) || augs::is_zero(duration_ms)) {
 		return;
 	}
 
