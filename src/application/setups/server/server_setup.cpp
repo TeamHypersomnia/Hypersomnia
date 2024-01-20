@@ -796,6 +796,7 @@ void server_setup::finalize_webhook_jobs() {
 						case job_type::AVATAR:
 							client->uploaded_avatar_url = webhook_job.job->get();
 							LOG("Received avatar from %x.", client->get_nickname());
+							break;
 
 						case job_type::AUTH:
 							client->authenticated_id = webhook_job.job->get();
@@ -810,6 +811,7 @@ void server_setup::finalize_webhook_jobs() {
 							if (client->authenticated_id == "publisherbanned") {
 								kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
 							}
+							break;
 
 						default:
 							break;
