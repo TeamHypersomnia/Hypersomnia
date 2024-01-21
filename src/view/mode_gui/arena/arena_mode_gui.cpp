@@ -23,6 +23,25 @@
 
 #include "augs/math/simple_calculations.h"
 #include "game/detail/flavour_presentation.h"
+#include "application/arena/synced_dynamic_vars.h"
+
+auto get_bright_wave(const float secs, const float upperLimit1 = 0.58, const float lowerLimit2 = 0.80) {
+	float cycleTime = std::fmod(secs, 1.f); 
+	float wave = sin(cycleTime * 2 * M_PI);
+	float hue;
+	if (wave > 0) {
+		// Map to the range 0 to upperLimit1
+		hue = wave * upperLimit1;
+	}
+	else {
+		// Map to the range lowerLimit2 to 1
+		hue = (1 - lowerLimit2) * wave + 1;
+	}
+
+	return rgba(hsv{ hue, 1.0, 1.0 });
+}
+
+double yojimbo_time();
 
 void draw_weapon_flavour_with_attachments(
 	augs::vertex_triangle_buffer& output_buffer,
@@ -351,7 +370,7 @@ void arena_gui_state::draw_mode_gui(
 		);
 	};
 
-	auto draw_text_indicator_at = [&](const auto& val, const auto t) {
+	auto draw_text_indicator_at = [&](const auto& val, const auto t, const rgba stroke_col = black) {
 		const auto s = in.screen_size;
 		auto general_drawer = get_drawer();
 
@@ -359,7 +378,8 @@ void arena_gui_state::draw_mode_gui(
 			general_drawer,
 			{ s.x / 2, static_cast<int>(t) },
 			val,
-			{ augs::ralign::CX }
+			{ augs::ralign::CX },
+			stroke_col
 		);
 	};
 
@@ -367,6 +387,17 @@ void arena_gui_state::draw_mode_gui(
 		using namespace augs::gui::text;
 		const auto text_style = style(
 			in.gui_fonts.gui,
+			c
+		);
+
+		return formatted_string(text, text_style);
+	};
+
+	auto larger_colored = [&](const auto& text, const auto& c) {
+		using namespace augs::gui::text;
+
+		const auto text_style = style(
+			in.gui_fonts.larger_gui,
 			c
 		);
 
@@ -410,6 +441,8 @@ void arena_gui_state::draw_mode_gui(
 	}
 	else {
 		using namespace augs::gui::text;
+
+		const bool is_ranked = mode_input.dynamic_vars.run_ranked_logic;
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
 		const auto death_hazard_icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_HAZARD];
@@ -529,15 +562,6 @@ void arena_gui_state::draw_mode_gui(
 
 			const bool is_weapon_your_own = tool_owner == viewed_player_id;
 			const bool is_weapon_killers = tool_owner == killer_player_id;
-
-			auto larger_colored = [&](const auto& text, const auto& c) {
-				const auto text_style = style(
-					in.gui_fonts.larger_gui,
-					c
-				);
-
-				return formatted_string(text, text_style);
-			};
 
 			const auto killed_you_str = is_suicide ? "killed yourself" : "killed you with";
 			const auto owner_str = [&]() -> std::string {
@@ -1089,11 +1113,13 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		/* Synonym */
-		auto draw_warmup_indicator = [&](const auto& val, const formatted_string& val2 = {}) {
+		auto draw_warmup_indicator = [&](const auto& val, const formatted_string& val2 = {}, const rgba stroke_col = black) {
 			const auto one_sixth_t = in.screen_size.y / 6;
 
-			draw_text_indicator_at(val, one_sixth_t);
-			draw_text_indicator_at(val2, one_sixth_t + in.gui_fonts.gui.metrics.get_height());
+			auto& font = val.empty() ? in.gui_fonts.gui : *val[0].format.font;
+
+			draw_text_indicator_at(val, one_sixth_t, stroke_col);
+			draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
 		};
 
 		const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input);
@@ -1103,11 +1129,32 @@ void arena_gui_state::draw_mode_gui(
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
-			draw_warmup_indicator(colored("WARMUP", white), colored(format_mins_secs(c), white));
+
+			if (is_ranked) {
+				const auto secs = yojimbo_time();
+
+				const auto left_col = ::get_bright_wave(secs / 8.f + 0.3f);
+				const auto right_col = ::get_bright_wave(secs / 4.f);
+
+				const auto one_sixth_t = in.screen_size.y / 6;
+
+				auto& font = in.gui_fonts.larger_gui;
+
+				const auto val = larger_colored("RANKED MATCH", left_col) + larger_colored(" COUNTDOWN", right_col);
+				const auto val2 = larger_colored(format_mins_secs(c), white);
+				 
+				draw_text_indicator_at(val, one_sixth_t);
+				draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
+			}
+			else {
+				draw_warmup_indicator(colored("WARMUP", white), colored(format_mins_secs(c), white));
+			}
 		};
 
 		auto draw_warmup_welcome = [&]() {
-			const auto& original_welcome = mode_input.rules.view.warmup_welcome_message;
+			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after this countdown!!![/color]");
+
+			const auto& original_welcome = is_ranked ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;
 			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;
 
 			if (non_spectator && !original_welcome.empty()) {

@@ -2188,9 +2188,8 @@ message_handler_result server_setup::handle_rcon_payload(
 		if (new_v.arena != old_v.arena) {
 			notification(typesafe_sprintf("changed arena to %x", new_v.arena));
 		}
-
-		if (new_v.game_mode != old_v.game_mode) {
-			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode));
+		else if (new_v.game_mode != old_v.game_mode) {
+			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode.empty() ? "map default" : new_v.game_mode));
 		}
 
 		apply(typed_payload);

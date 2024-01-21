@@ -26,6 +26,14 @@ struct cosmos_solvable_significant;
 
 class arena_mode;
 
+enum class ranked_state_type {
+	// GEN INTROSPECTOR enum class ranked_state
+	NONE,
+	COMMENCING,
+	LIVE
+	// END GEN INTROSPECTOR
+};
+
 struct arena_mode_ruleset {
 	using mode_type = arena_mode;
 
@@ -436,6 +444,7 @@ private:
 	entity_id bomb_detonation_theme;
 
 	float ranked_match_countdown_secs = -1.0f;
+	ranked_state_type ranked_state = ranked_state_type::NONE;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
