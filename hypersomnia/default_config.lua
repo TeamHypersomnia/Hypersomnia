@@ -117,6 +117,7 @@ return {
 	M = "CHOOSE_TEAM",
 
 	Y = "CHAT",
+	Slash = "CHAT_COMMAND",
 	U = "TEAM_CHAT",
 
 	F8 = "SERVER_ADMIN_PANEL",

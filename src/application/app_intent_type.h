@@ -23,6 +23,7 @@ enum class general_gui_intent_type {
 	TOGGLE_WEAPON_LASER,
 
 	CHAT,
+	CHAT_COMMAND,
 	TEAM_CHAT,
 	BUY_MENU,
 	SERVER_ADMIN_PANEL,

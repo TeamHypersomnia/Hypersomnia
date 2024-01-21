@@ -243,6 +243,17 @@ void chat_gui_state::open_input_bar(const chat_target_type t) {
 	ImGui::SetWindowFocus("ChatWindow");
 }
 
+static int InputTextCallback(ImGuiInputTextCallbackData* data) {
+	if (data->EventFlag == ImGuiInputTextFlags_CallbackAlways) {
+		const auto current_input_text = std::string(data->Buf, data->BufTextLen);
+
+		if (current_input_text == "/") {
+			data->ClearSelection();
+		}
+	}
+	return 0;
+}
+
 bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 	using namespace augs::imgui;
 
@@ -300,10 +311,18 @@ bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 	std::array<char, max_chat_message_length_v> buf;
 	buf[0] = '\0';
 
+	if (set_command) {
+		buf[0] = '/';
+		buf[1] = 0;
+		current_message = "/";
+
+		set_command = false;
+	}
+
 	{
 		auto scope = augs::imgui::scoped_item_width(size.x);
 
-		if (input_text(buf, "##ChatInput", current_message, ImGuiInputTextFlags_EnterReturnsTrue)) {
+		if (input_text(buf, "##ChatInput", current_message, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways, InputTextCallback)) {
 			show = false;
 
 			if (current_message.size() > 0) {

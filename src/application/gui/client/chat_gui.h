@@ -50,6 +50,7 @@ struct chat_gui_state {
 	chat_target_type target = chat_target_type::GENERAL;
 
 	std::string current_message;
+	bool set_command = false;
 	std::vector<chat_gui_entry> history;
 
 	template <class T>
