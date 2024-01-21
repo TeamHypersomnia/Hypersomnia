@@ -12,8 +12,8 @@ real32 collinearize_AB_with_C(
 		C_crosshair.set_length(B_muzzle.length() + 2);
 	}
 
-	auto ray_a = A_barrel_center - (B_muzzle - A_barrel_center).set_length(5000.f);
-	auto ray_b = A_barrel_center + (B_muzzle - A_barrel_center).set_length(5000.f);
+	auto ray_a = A_barrel_center - (B_muzzle - A_barrel_center).set_length(15000.f);
+	auto ray_b = A_barrel_center + (B_muzzle - A_barrel_center).set_length(15000.f);
 
 	const auto intersection = circle_ray_intersection(
 		ray_b, 
