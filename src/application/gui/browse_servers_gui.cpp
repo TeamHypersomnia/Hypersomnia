@@ -1163,6 +1163,25 @@ const server_list_entry* browse_servers_gui_state::find_best_server() const {
 	return &minimum_of(server_list, compare_servers);
 }
 
+const server_list_entry* browse_servers_gui_state::find_best_ranked() const {
+	auto filtered = server_list;
+
+	erase_if(
+		filtered,
+		[&](auto& f) {
+			const bool good = f.is_official_server(); //&& f.heartbeat.is_ranked;
+
+			return !good;
+		}
+	);
+
+	if (filtered.empty()) {
+		return nullptr;
+	}
+
+	return &minimum_of(filtered, compare_servers);
+}
+
 const server_list_entry* browse_servers_gui_state::find_entry(const client_connect_string& in) const {
 	if (const auto connected_address = ::find_netcode_addr(in)) {
 		LOG("Finding the server entry by: %x", in);

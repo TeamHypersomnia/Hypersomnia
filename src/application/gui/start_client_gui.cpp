@@ -168,13 +168,13 @@ bool start_client_gui_state::perform(
 
 			checkbox("Show", show);
 		}
-		else if (current_tab == start_client_tab_type::BEST_SERVER) {
+		else if (current_tab == start_client_tab_type::BEST_RANKED) {
 			(void)official_arena_servers;
 
 			if (best_server == nullptr) {
 				auto cs = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,0));
 
-				auto sname = std::string("Finding the best server...");
+				auto sname = std::string("Finding the best ranked server...");
 				input_text<max_server_name_length_v>("##BestServer", sname, ImGuiInputTextFlags_ReadOnly);
 			}
 			else {
@@ -548,7 +548,7 @@ bool start_client_gui_state::perform(
 			;
 
 			const bool best_still_unresolved = 
-				current_tab == start_client_tab_type::BEST_SERVER
+				current_tab == start_client_tab_type::BEST_RANKED
 				&& best_server == nullptr
 			;
 
@@ -556,7 +556,7 @@ bool start_client_gui_state::perform(
 
 			if (ImGui::Button("Connect!")) {
 				switch (current_tab) {
-					case start_client_tab_type::BEST_SERVER:
+					case start_client_tab_type::BEST_RANKED:
 						if (best_server) {
 							into_connect_string = std::string(best_server->get_connect_string());
 							into_displayed_connecting_server_name = best_server->heartbeat.server_name;

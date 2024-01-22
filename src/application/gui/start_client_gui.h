@@ -50,7 +50,7 @@ public:
 	bool mouse_has_to_move_off_browse = false;
 	std::optional<augs::frame_num_type> avatar_submitted_when;
 
-	start_client_tab_type current_tab = start_client_tab_type::BEST_SERVER;
+	start_client_tab_type current_tab = start_client_tab_type::BEST_RANKED;
 	bool request_refresh_best_server = false;
 	bool request_server_list_open = false;
 

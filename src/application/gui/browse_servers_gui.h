@@ -110,6 +110,7 @@ public:
 
 	const server_list_entry* find_entry(const client_connect_string& in) const;
 	const server_list_entry* find_best_server() const;
+	const server_list_entry* find_best_ranked() const;
 	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;

@@ -71,7 +71,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(main_menu_button_type::QUICK_PLAY);
+			button_callback(main_menu_button_type::PLAY_RANKED);
 			return true;
 		}
 
@@ -127,6 +127,7 @@ struct main_menu_gui {
 
 		root.set_menu_buttons_colors(cyan);
 		root.buttons[std::size_t(main_menu_button_type::DOWNLOAD_MAPS)].colorize = green;
+		root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].color_wave = true;
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {

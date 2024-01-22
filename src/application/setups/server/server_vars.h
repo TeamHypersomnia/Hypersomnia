@@ -73,6 +73,10 @@ struct server_ranked_vars {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_vars&) const = default;
+
+	bool is_ranked_server() const {
+		return autostart_when != ranked_autostart_type::NEVER;
+	}
 };
 
 struct server_vars {

@@ -25,22 +25,6 @@
 #include "game/detail/flavour_presentation.h"
 #include "application/arena/synced_dynamic_vars.h"
 
-auto get_bright_wave(const float secs, const float upperLimit1 = 0.58, const float lowerLimit2 = 0.80) {
-	float cycleTime = std::fmod(secs, 1.f); 
-	float wave = sin(cycleTime * 2 * M_PI);
-	float hue;
-	if (wave > 0) {
-		// Map to the range 0 to upperLimit1
-		hue = wave * upperLimit1;
-	}
-	else {
-		// Map to the range lowerLimit2 to 1
-		hue = (1 - lowerLimit2) * wave + 1;
-	}
-
-	return rgba(hsv{ hue, 1.0, 1.0 });
-}
-
 double yojimbo_time();
 
 void draw_weapon_flavour_with_attachments(
@@ -239,6 +223,10 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	}
 
 	if constexpr(std::is_same_v<arena_mode, M>) {
+		if (typed_mode.get_ranked_state() == ranked_state_type::LIVE) {
+			choose_team.show = false;
+		}
+
 		if (prediction.play_unpredictable) {
 			const auto p = typed_mode.calc_participating_factions(mode_input);
 
@@ -1133,8 +1121,8 @@ void arena_gui_state::draw_mode_gui(
 			if (is_ranked) {
 				const auto secs = yojimbo_time();
 
-				const auto left_col = ::get_bright_wave(secs / 8.f + 0.3f);
-				const auto right_col = ::get_bright_wave(secs / 4.f);
+				const auto left_col = rgba::get_bright_wave(secs / 8.f + 0.3f);
+				const auto right_col = rgba::get_bright_wave(secs / 4.f);
 
 				const auto one_sixth_t = in.screen_size.y / 6;
 
@@ -1152,7 +1140,7 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_warmup_welcome = [&]() {
-			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after this countdown!!![/color]");
+			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after it starts!!![/color]");
 
 			const auto& original_welcome = is_ranked ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;
 			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;
@@ -1253,11 +1241,24 @@ void arena_gui_state::draw_mode_gui(
 			if (const auto match_begins_in_seconds = typed_mode.get_match_begins_in_seconds(mode_input); match_begins_in_seconds >= 0.f) {
 				const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
-				if (c > 0.f) {
-					draw_warmup_indicator(colored("Match begins in", yellow), colored(format_mins_secs(match_begins_in_seconds), yellow));
+				if (is_ranked) {
+					const auto secs = yojimbo_time();
+					const auto right_col = rgba::get_bright_wave(secs / 4.f);
+
+					if (c > 0.f) {
+						draw_warmup_indicator(larger_colored("RANKED MATCH STARTING IN", right_col), larger_colored(format_mins_secs(match_begins_in_seconds)+"\n", yellow));
+					}
+					else {
+						draw_warmup_indicator(larger_colored("RANKED MATCH HAS BEGUN!", right_col));
+					}
 				}
 				else {
-					draw_warmup_indicator(colored("The match has begun", yellow));
+					if (c > 0.f) {
+						draw_warmup_indicator(colored("Match begins in", yellow), colored(format_mins_secs(match_begins_in_seconds), yellow));
+					}
+					else {
+						draw_warmup_indicator(colored("The match has begun", yellow));
+					}
 				}
 
 				return;

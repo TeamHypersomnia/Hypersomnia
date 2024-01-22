@@ -278,3 +278,20 @@ rgba& rgba::mult_brightness(const float mult) {
 }
 
 rgba rgba::zero = rgba(0, 0, 0, 0);
+
+rgba rgba::get_bright_wave(const float secs, const float upperLimit1, const float lowerLimit2) {
+	float cycleTime = std::fmod(secs, 1.f); 
+	float wave = sin(cycleTime * 2 * M_PI);
+	float hue;
+	if (wave > 0) {
+		// Map to the range 0 to upperLimit1
+		hue = wave * upperLimit1;
+	}
+	else {
+		// Map to the range lowerLimit2 to 1
+		hue = (1 - lowerLimit2) * wave + 1;
+	}
+
+	return rgba(hsv{ hue, 1.0, 1.0 });
+}
+

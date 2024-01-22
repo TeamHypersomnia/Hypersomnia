@@ -1773,7 +1773,7 @@ work_result work(
 	};
 
 	auto perform_start_client_gui = [&](const auto frame_num) {
-		const auto best_server = browse_servers_gui.find_best_server();
+		const auto best_server = browse_servers_gui.find_best_ranked();
 
 		const bool perform_result = start_client_gui.perform(
 			best_server,
@@ -2385,7 +2385,7 @@ work_result work(
 				}
 
 				if (start_client_gui.show) {
-					if (start_client_gui.current_tab == start_client_tab_type::BEST_SERVER) {
+					if (start_client_gui.current_tab == start_client_tab_type::BEST_RANKED) {
 						if (!browse_servers_gui.refreshed_at_least_once()) {
 							browse_servers_gui.refresh_server_list(get_browse_servers_input());
 						}
@@ -2588,7 +2588,7 @@ work_result work(
 
 				break;
 
-			case T::QUICK_PLAY:
+			case T::PLAY_RANKED:
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 #if !IS_PRODUCTION_BUILD
 					client_start_requested = true;
@@ -2596,7 +2596,7 @@ work_result work(
 				}
 				else {
 					start_client_gui.open();
-					start_client_gui.current_tab = start_client_tab_type::BEST_SERVER;
+					start_client_gui.current_tab = start_client_tab_type::BEST_RANKED;
 				}
 
 				break;

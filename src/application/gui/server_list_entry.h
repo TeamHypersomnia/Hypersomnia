@@ -63,7 +63,9 @@ struct server_list_entry {
 
 	ping_progress progress;
 
-	bool is_official_server() const;
+	bool is_official_server() const {
+		return !is_community_server;
+	}
 
 	std::string get_connect_string() const;
 	netcode_address_t get_connect_address() const;

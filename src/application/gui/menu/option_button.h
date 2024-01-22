@@ -13,6 +13,8 @@
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 
+double yojimbo_time();
+
 template <class Enum>
 class option_button : public menu_rect_node<Enum> {
 public:
@@ -34,7 +36,8 @@ public:
 	rgba colorize = white;
 	bool click_callback_required = false;
 	bool is_discord = false;
-	pad_bytes<2> pad;
+	bool color_wave = false;
+	pad_bytes<1> pad;
 
 	template <class M>
 	vec2i get_target_button_size(const M& manager, const augs::baked_font& gui_font) const {
@@ -107,9 +110,21 @@ public:
 		const auto& necessarys = context.get_necessary_images();
 		const auto& gui_font = context.get_gui_font();
 		const auto output = context.get_output();
-		const auto color = this_id->colorize;
+		auto color = this_id->colorize;
+		auto secondary_color = color;
+
+		auto secs = yojimbo_time() / 4.0f;
 
 		const auto& detector = this_id->detector;
+
+		if (detector.is_hovered) {
+			secs *= 2;
+		}
+
+		if (this_id->color_wave) {
+			color = rgba::get_bright_wave(secs, 0.55);
+			secondary_color = rgba::get_bright_wave(secs + 0.4f, 0.55);
+		}
 
 		rgba inside_col = white;
 		rgba border_col = white;
@@ -188,7 +203,7 @@ public:
 		this_id->appearing_caption.draw(
 			output, 
 			internal_rc.left_top(),
-			{ gui_font , color }
+			{ gui_font , secondary_color }
 		);
 
 		if (this_id->is_discord) {
