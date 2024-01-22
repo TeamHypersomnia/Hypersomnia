@@ -75,7 +75,7 @@ struct server_ranked_vars {
 
 	bool operator==(const server_ranked_vars&) const = default;
 
-	bool is_ranked_server() const {
+	bool is_ranked() const {
 		return autostart_when != ranked_autostart_type::NEVER;
 	}
 };

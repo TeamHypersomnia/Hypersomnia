@@ -71,7 +71,7 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 				case N::RANKED_STARTING:
 					do_entry(
-						"Teams are locked. Starting in 8 seconds.\nTo cancel, Alt+F4 or go to Spectators.\nThis is your last chance to leave.",
+						"Starting in 5 seconds.\nAlt+F4 or go to Spectators to cancel.",
 						yellow
 					);
 

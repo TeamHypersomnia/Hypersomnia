@@ -145,6 +145,7 @@ struct arena_mode_player {
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 
 	bool is_bot = false;
+	bool disconnected = false;
 	// END GEN INTROSPECTOR
 
 	arena_mode_player(const client_nickname_type& nickname = {}) {
@@ -464,6 +465,7 @@ public:
 	float get_seconds_passed_in_cosmos(const_input) const;
 
 	float get_warmup_seconds_left(const_input) const;
+	bool is_waiting_for_players(const_input) const;
 	float get_match_begins_in_seconds(const_input) const;
 
 	float get_freeze_seconds_left(const_input) const;

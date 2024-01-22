@@ -1110,10 +1110,12 @@ void arena_gui_state::draw_mode_gui(
 			draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
 		};
 
+		const bool waiting_for_players = typed_mode.is_waiting_for_players(mode_input);
 		const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input);
 		const bool now_is_warmup = warmup_left > 0.f;
 
 		auto draw_warmup_timer = [&]() {
+
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
@@ -1128,11 +1130,24 @@ void arena_gui_state::draw_mode_gui(
 
 				auto& font = in.gui_fonts.larger_gui;
 
-				const auto val = larger_colored("RANKED MATCH", left_col) + larger_colored(" COUNTDOWN", right_col);
-				const auto val2 = larger_colored(format_mins_secs(c), white);
-				 
-				draw_text_indicator_at(val, one_sixth_t);
-				draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
+				if (waiting_for_players) {
+					const auto num_dots = uint64_t(secs * 3) % 3 + 1;
+					const auto loading_dots = std::string(num_dots, '.');
+					const auto nondots = std::string(3-num_dots, '.');
+
+					const auto val = larger_colored(std::string("RANKED LOBBY"), green);
+					const auto val2 = larger_colored(std::string("WAITING FOR PLAYERS") + loading_dots, white) + larger_colored(nondots, rgba(0,0,0,0));
+
+					draw_text_indicator_at(val, one_sixth_t);
+					draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
+				}
+				else {
+					const auto val = larger_colored("RANKED MATCH", left_col) + larger_colored(" COUNTDOWN", right_col);
+					const auto val2 = larger_colored(format_mins_secs(c), white);
+					 
+					draw_text_indicator_at(val, one_sixth_t);
+					draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
+				}
 			}
 			else {
 				draw_warmup_indicator(colored("WARMUP", white), colored(format_mins_secs(c), white));
@@ -1140,6 +1155,10 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_warmup_welcome = [&]() {
+			if (waiting_for_players) {
+				return;
+			}
+
 			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after it starts!!![/color]");
 
 			const auto& original_welcome = is_ranked ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;

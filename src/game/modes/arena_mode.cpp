@@ -1999,7 +1999,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 
 					case C::RESTART_MATCH_NO_WARMUP:
 #if IS_PRODUCTION_BUILD
-						if (in.dynamic_vars.ranked.is_ranked_server()) {
+						if (in.dynamic_vars.is_ranked()) {
 							/*
 								Forbid skipping warmups on a ranked server.
 							*/
@@ -3102,8 +3102,20 @@ float arena_mode::get_warmup_seconds(const const_input_type in) const {
 	return static_cast<float>(in.rules.warmup_secs);
 }
 
+bool arena_mode::is_waiting_for_players(const const_input_type in) const { 
+	if (in.dynamic_vars.is_ranked() && state == arena_mode_state::WARMUP) {
+		return ranked_state == ranked_state_type::NONE && !teams_viable_for_match(in);
+	}
+
+	return false;
+}
+
 float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
+		if (is_waiting_for_players(in)) {
+			return 10000.0f;
+		}
+
 		return get_warmup_seconds(in) - get_seconds_passed_in_cosmos(in);
 	}
 
@@ -3119,7 +3131,7 @@ float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
 			auto match_begins_in_secs = match_begins_in_secs_v;
 
 			if (ranked_state == ranked_state_type::STARTING) {
-				match_begins_in_secs = 8;
+				match_begins_in_secs = 5;
 			}
 
 			return warmup_secs + match_begins_in_secs - secs;
