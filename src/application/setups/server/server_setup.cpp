@@ -798,8 +798,22 @@ void server_setup::finalize_webhook_jobs() {
 							LOG("Received avatar from %x.", client->get_nickname());
 							break;
 
-						case job_type::AUTH:
-							client->authenticated_id = webhook_job.job->get();
+						case job_type::AUTH: {
+							const auto new_id = webhook_job.job->get();
+
+							if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
+								LOG(
+									"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
+									client->get_nickname(), 
+									new_id,
+									client->secs_since_connected(server_time)
+								);
+
+								kick(to_client_id(webhook_job.player_id), "Duplicate connection.");
+								break;
+							}
+
+							client->authenticated_id = new_id;
 
 							LOG(
 								"Authenticated \"%x\". ID: %x. Took %x secs.", 
@@ -812,6 +826,8 @@ void server_setup::finalize_webhook_jobs() {
 								kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
 							}
 							break;
+						}
+						
 
 						default:
 							break;
@@ -2695,6 +2711,24 @@ const server_client_state* server_setup::find_client_state(const std::string& ni
 	};
 
 	for_each_id_and_client(check_nickname, connected_and_integrated_v);
+
+	return result;
+}
+
+mode_player_id server_setup::find_client_by_account_id(const std::string& account_id) const {
+	mode_player_id result;
+
+	auto check_id = [&](const auto id, const auto& c) {
+		if (c.authenticated_id == account_id) {
+			result = to_mode_player_id(id);
+
+			return callback_result::ABORT;
+		}
+
+		return callback_result::CONTINUE;
+	};
+
+	for_each_id_and_client(check_id, connected_and_integrated_v);
 
 	return result;
 }

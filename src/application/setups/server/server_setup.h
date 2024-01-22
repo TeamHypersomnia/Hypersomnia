@@ -695,6 +695,7 @@ public:
 
 	server_client_state* find_client_state(mode_player_id);
 	const server_client_state* find_client_state(mode_player_id) const;
+	mode_player_id find_client_by_account_id(const std::string&) const;
 
 	std::vector<std::string> get_all_nicknames() const;
 
