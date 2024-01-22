@@ -357,7 +357,7 @@ message_handler_result client_setup::handle_payload(
 
 		LOG(
 			"New synced_dynamic_vars. Run ranked logic: %x, FF: %x", 
-			sv_dynamic_vars.run_ranked_logic,
+			sv_dynamic_vars.is_ranked(),
 			sv_dynamic_vars.friendly_fire
 		);
 

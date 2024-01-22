@@ -116,6 +116,13 @@ message_handler_result server_setup::handle_payload(
 
 		LOG("Detected rcon level: %x", static_cast<int>(level));
 
+#if IS_PRODUCTION_BUILD
+		if (is_ranked_live_or_starting()) {
+			LOG("Cannot execute RCON commands during a ranked match.");
+			return continue_v;
+		}
+#endif
+
 		if (level >= rcon_level_type::BASIC) {
 			const auto result = [&]() {
 				if constexpr(std::is_same_v<T, server_vars>) {

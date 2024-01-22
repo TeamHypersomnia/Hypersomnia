@@ -2,6 +2,8 @@
 
 enum class battle_event {
 	// GEN INTROSPECTOR enum class battle_event
+	RANKED_STARTING,
+
 	START,
 	PREPARE_TO_FIGHT,
 	FIRST_BLOOD,

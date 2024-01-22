@@ -213,7 +213,11 @@ as well as to test your skills in a laggy environment.
 			}
 		}
 
+#if IS_PRODUCTION_BUILD
 		if (!is_steam_client) {
+#else
+		if (true) {
+#endif
 			/* 
 				Don't show this on the Steam client because two Steam processes could mess something up.
 				CLI tools actually launch without Steam API but they read from the "user" folder so the user might be surprised.

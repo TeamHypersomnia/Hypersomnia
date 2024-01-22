@@ -4,6 +4,15 @@
 #include "game/modes/mode_player_id.h"
 
 namespace messages {
+	enum class no_arg_mode_notification {
+		TEAMS_ARE_NOT_VIABLE_FOR_RANKED,
+		FAILED_TO_AUTHENTICATE,
+		FAILED_TO_CHECK_BANS,
+
+		RANKED_STARTING,
+		RANKED_STARTED
+	};
+
 	enum class joined_or_left {
 		JOINED,
 		LEFT
@@ -17,6 +26,6 @@ namespace messages {
 	struct mode_notification {
 		mode_player_id subject_mode_id;
 		std::string subject_name;
-		std::variant<faction_choice, joined_or_left> payload;
+		std::variant<faction_choice, joined_or_left, no_arg_mode_notification> payload;
 	};
 }

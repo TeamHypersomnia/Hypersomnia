@@ -799,7 +799,14 @@ void server_setup::finalize_webhook_jobs() {
 							break;
 
 						case job_type::AUTH: {
+#if IS_PRODUCTION_BUILD
 							const auto new_id = webhook_job.job->get();
+#else
+							/*
+								For testing so we can use just a single steam account
+							*/
+							const auto new_id = std::string("steam_") + client->get_nickname();
+#endif
 
 							if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
 								LOG(
@@ -825,6 +832,14 @@ void server_setup::finalize_webhook_jobs() {
 							if (client->authenticated_id == "publisherbanned") {
 								kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
 							}
+
+							if (private_vars.check_ban_endpoint.empty()) {
+								client->verified_has_no_ban = true;
+							}
+							else {
+								// TODO: Check ban.
+							}
+
 							break;
 						}
 						
@@ -949,6 +964,15 @@ bool server_setup::is_playtesting_server() const {
 }
 
 void server_setup::send_tell_me_my_address_if_its_time() {
+	if (is_dedicated()) {
+		/* 
+			This is only useful for integrated servers
+			to get a correct Steam rich presence string.
+		*/
+
+		return;
+	}
+
 	if (external_address.has_value()) {
 		return;
 	}
@@ -1350,16 +1374,28 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 
 synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	bool all_authenticated = true;
+	bool all_not_banned = true;
 
-	for_each_id_and_client([&all_authenticated](const auto, const auto& c) {
+	for_each_id_and_client([&all_authenticated, &all_not_banned](const auto, const auto& c) {
 		if (!c.is_authenticated()) {
 			all_authenticated = false;
+		}
+
+		if (!c.verified_has_no_ban) {
+			all_not_banned = false;
 		}
 	}, only_connected_v);
 
 	synced_dynamic_vars out;
 
-	out.run_ranked_logic = all_authenticated && vars.ranked.autostart_when == ranked_autostart_type::ALWAYS;
+	out.all_authenticated = all_authenticated;
+	out.all_not_banned = all_not_banned;
+
+	if (!vars.require_authentication) {
+		out.all_authenticated = true;
+		out.all_not_banned = true;
+	}
+
 	out.friendly_fire = vars.friendly_fire;
 	out.ranked = vars.ranked;
 
@@ -1733,7 +1769,27 @@ void server_setup::advance_clients_state() {
 	};
 
 	auto automove_to_spectators_if_afk = [&](const client_id_type client_id, auto& c) {
+		if (!c.is_set()) {
+			return;
+		}
+
 		if (c.should_move_to_spectators_due_to_afk(vars, server_time)) {
+			/*
+				Don't move to spectators during afk if it's a ranked.
+				Kick instead.
+			*/
+
+			if (const bool ranked_on = is_ranked_live_or_starting()) {
+				/*
+					TODO_RANKED: Actually launch match freeze logic!!!
+					No reason to disconnect.
+					Then unfreeze if movement detected. But yeah we can do it later.
+				*/
+
+				kick(client_id, "AFK!");
+				return;
+			}
+
 			const auto mode_id = to_mode_player_id(client_id);
 
 			const auto moved_player_faction = get_arena_handle().on_mode(
@@ -1757,6 +1813,17 @@ void server_setup::advance_clients_state() {
 		const auto mode_id = to_mode_player_id(client_id);
 
 		auto check_all_kick_conditions = [&]() {
+			if (!c.is_set()) {
+				return;
+			}
+
+			if (c.state < client_state_type::IN_GAME) {
+				if (!is_joinable()) {
+					/* Joined too late. */
+					kick(client_id, "Joined too late! Match is ongoing.");
+				}
+			}
+
 			if (c.state == client_state_type::IN_GAME) {
 				if (c.should_kick_due_to_afk(vars, server_time)) {
 					kick(client_id, "AFK!");
@@ -1765,33 +1832,31 @@ void server_setup::advance_clients_state() {
 				automove_to_spectators_if_afk(client_id, c);
 			}
 
-			if (c.is_set()) {
-				if (c.should_kick_due_to_inactivity(vars, server_time)) {
-					kick(client_id, "No messages arrived for too long!");
+			if (c.should_kick_due_to_inactivity(vars, server_time)) {
+				kick(client_id, "No messages arrived for too long!");
+			}
+
+			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
+				kick(client_id, "Account is required to play on this server!");
+			}
+
+			{
+				const auto num_commands = c.pending_entropies.size();
+				const auto max_commands = vars.max_buffered_client_commands;
+
+				if (num_commands > max_commands) {
+					const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
+					kick(client_id, reason);
 				}
+			}
 
-				if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
-					kick(client_id, "Account is required to play on this server!");
-				}
+			if (!removed_someone_already) {
+				if (c.when_kicked.has_value()) {
+					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
 
-				{
-					const auto num_commands = c.pending_entropies.size();
-					const auto max_commands = vars.max_buffered_client_commands;
-
-					if (num_commands > max_commands) {
-						const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
-						kick(client_id, reason);
-					}
-				}
-
-				if (!removed_someone_already) {
-					if (c.when_kicked.has_value()) {
-						const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
-
-						if (server_time - *c.when_kicked > linger_secs) {
-							LOG("Disconnecting kicked client %x.", client_id);
-							disconnect_and_unset(client_id);
-						}
+					if (server_time - *c.when_kicked > linger_secs) {
+						LOG("Disconnecting kicked client %x.", client_id);
+						disconnect_and_unset(client_id);
 					}
 				}
 			}
@@ -2626,12 +2691,14 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 			if (!arena_gui.scoreboard.show && rcon_gui.show) {
 				const bool has_maintenance = false;
+				const bool during_ranked = false;
 
 				rcon_gui.level = rcon_level_type::MASTER;
 
 				::perform_rcon_gui(
 					rcon_gui,
 					has_maintenance,
+					during_ranked,
 					on_new_payload
 				);
 			}
@@ -2964,7 +3031,6 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 		return;
 	}
 
-
 	c.when_kicked = server_time;
 
 	server_broadcasted_chat message;
@@ -3218,16 +3284,24 @@ bool server_setup::is_ranked_waiting_for_reconnect() const {
 	return false;
 }
 
-bool server_setup::is_ranked_live_or_commencing() const {
-	return false;
+bool server_setup::is_ranked_live_or_starting() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.get_ranked_state() != ranked_state_type::NONE;
+		}
+	);
 }
 
 bool server_setup::is_joinable() const {
-	if (is_ranked_live_or_commencing()) {
+	if (is_ranked_live_or_starting()) {
 		return is_ranked_waiting_for_reconnect();
 	}
 
 	return true;
+}
+
+void server_setup::restart_match() {
+	handle_rcon_payload(to_client_id(mode_player_id::machine_admin()), rcon_level_type::MASTER, match_command::RESTART_MATCH);
 }
 
 #include "augs/readwrite/to_bytes.h"

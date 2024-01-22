@@ -110,6 +110,8 @@ enum class test_scene_sound_id {
 
 	BOMB_EXPLOSION,
 
+	RANKED_STARTING,
+
 	MT_START,
 
 	MT_BOMB_PLANTED,

@@ -6712,3 +6712,20 @@ This will discard your redo history."
 - dropped mags should fly to the side
 - nerf kek9 and sn69 as they're deadly in akimbo, like a free smg
 
+
+- structure the db so it's future-proof already
+    - modes should have separate tables? probably
+        - let's have team-based and ffa-based
+        - Since we're saving all matches, we could always recalculate mmrs and recreate tables separately
+    - so a separate "players" table for just id->nickname assignment
+
+- handle ties in report_match
+- Quick play should be colorful "Play ranked"
+
+- Kick duplicate identities
+
+
+- Setup countdown defaults to long again
+    - and weapon defaults to something else than launcher
+
+- Disable all rcon commands during ranked

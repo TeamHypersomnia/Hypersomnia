@@ -433,6 +433,7 @@ arena_mode_ruleset::arena_mode_ruleset() {
 	{
 		auto& mt = rs.view.event_sounds[faction_type::METROPOLIS];
 
+		mt[battle_event::RANKED_STARTING] = to_sound_id(test_scene_sound_id::RANKED_STARTING);
 		mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
 		mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
 		mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);

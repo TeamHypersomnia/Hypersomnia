@@ -37,6 +37,7 @@
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "game/detail/hand_fuse_logic.h"
+#include "application/arena/synced_dynamic_vars.h"
 
 using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
@@ -1620,6 +1621,10 @@ void arena_mode::play_sound_globally(const const_logic_step step, const assets::
 	effect.start(step, input, info);
 }
 
+void arena_mode::play_ranked_starting_sound(const input_type in, const const_logic_step step) const {
+	play_sound_for(in, step, battle_event::RANKED_STARTING, never_predictable_v);
+}
+
 void arena_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id, const predictability_info info) const {
 	sound_effect_input effect;
 	effect.id = id;
@@ -1993,8 +1998,19 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 						break;
 
 					case C::RESTART_MATCH_NO_WARMUP:
-						restart_match(in, step);
-						end_warmup_and_go_live(in, step);
+#if IS_PRODUCTION_BUILD
+						if (in.dynamic_vars.ranked.is_ranked_server()) {
+							/*
+								Forbid skipping warmups on a ranked server.
+							*/
+						}
+						else
+#endif
+						{
+							restart_match(in, step);
+							end_warmup_and_go_live(in, step);
+						}
+
 						break;
 
 					case C::SWAP_TEAMS:
@@ -2141,6 +2157,8 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 	const auto current_round = get_current_round_number();
 	auto& cosm = in.cosm;
 
+	bool should_restart = false;
+
 	for (const auto& p : entropy.players) {
 		const auto& command_variant = p.second;
 		const auto id = p.first;
@@ -2280,6 +2298,10 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					});
 				}
 				else if constexpr(std::is_same_v<C, team_choice>) {
+					if (get_ranked_state() == ranked_state_type::LIVE) {
+						return;
+					}
+
 					const auto previous_faction = player_data->get_faction();
 
 					const auto requested_faction = typed_command;
@@ -2395,6 +2417,10 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					notification.payload = choice;
 
 					step.post_message(std::move(notification));
+
+					if (get_ranked_state() == ranked_state_type::STARTING) {
+						should_restart = true;
+					}
 				}
 				else {
 					static_assert(always_false_v<C>, "Non-exhaustive std::visit");
@@ -2403,6 +2429,10 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 
 			std::visit(command_callback, command_variant);
 		}
+	}
+
+	if (should_restart) {
+		restart_match(in, step);
 	}
 }
 
@@ -2478,19 +2508,10 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 	}
 }
 
-void arena_mode::handle_game_commencing(const input_type in, const logic_step step) {
-	if (commencing_timer_ms != -1.f) {
-		commencing_timer_ms -= step.get_delta().in_milliseconds();
+arena_mode::composition_info arena_mode::get_team_composition_info(const_input_type in) const {
+	composition_info info;
 
-		if (commencing_timer_ms <= 0.f) {
-			commencing_timer_ms = -1.f;
-			restart_match(in, step);
-		}
-
-		return;
-	}
-
-	const bool are_factions_ready = [&]() {
+	info.each_team_has_at_least_one = [this, in]() {
 		const auto p = calc_participating_factions(in);
 
 		if (in.rules.is_ffa()) {
@@ -2503,25 +2524,65 @@ void arena_mode::handle_game_commencing(const input_type in, const logic_step st
 			return total_players >= 1;
 		}
 
-		bool all_have_at_least_one = true;
+		bool all_have = true;
 
 		p.for_each([&](const faction_type f) {
 			if (num_players_in(f) == 0) {
-				all_have_at_least_one = false;
+				all_have = false;
 			}
 		});
 
-		return all_have_at_least_one;
+		return all_have;
 	}();
 
-	if (!should_commence_when_ready && !are_factions_ready) {
+	return info;
+}
+
+bool arena_mode::teams_viable_for_match(const_input_type in) const {
+	// TODO_RANKED: handle different ranked requirements here
+
+	return get_team_composition_info(in).each_team_has_at_least_one;
+}
+
+void arena_mode::handle_game_commencing(const input_type in, const logic_step step) {
+	if (ranked_state != ranked_state_type::NONE) {
+		/*
+			Don't trigger it accidentally when the other team
+			accidentally disconnects during ranked. We have to wait for them.
+		*/
+
+		return;
+	}
+
+	if (commencing_timer_ms != -1.f) {
+		commencing_timer_ms -= step.get_delta().in_milliseconds();
+
+		if (commencing_timer_ms <= 0.f) {
+			commencing_timer_ms = -1.f;
+			restart_match(in, step);
+		}
+
+		return;
+	}
+
+	const bool teams_viable = teams_viable_for_match(in); 
+
+	if (!should_commence_when_ready && !teams_viable) {
 		should_commence_when_ready = true;
 		return;
 	}
 
-	if (should_commence_when_ready && are_factions_ready) {
-		commencing_timer_ms = static_cast<real32>(in.rules.game_commencing_seconds * 1000);
+	if (should_commence_when_ready && teams_viable) {
 		should_commence_when_ready = false;
+
+		if (in.dynamic_vars.is_ranked()) {
+			/* Insta-restart for rankeds */
+			restart_match(in, step);
+		}
+		else {
+			commencing_timer_ms = static_cast<real32>(in.rules.game_commencing_seconds * 1000);
+		}
+
 		return;
 	}
 }
@@ -2531,12 +2592,47 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 		return;
 	}
 
+	bool ranked_started = false;
+
+	if (ranked_state == ranked_state_type::STARTING) {
+		auto interrupt = [&](auto type) {
+			restart_match(in, step);
+
+			messages::mode_notification notification;
+			notification.payload = type;
+
+			step.post_message(std::move(notification));
+		};
+
+		if (!in.dynamic_vars.all_authenticated) {
+			interrupt(messages::no_arg_mode_notification::FAILED_TO_AUTHENTICATE);
+			return;
+		}
+		else if (!in.dynamic_vars.all_not_banned) {
+			interrupt(messages::no_arg_mode_notification::FAILED_TO_CHECK_BANS);
+			return;
+		}
+		else {
+			ranked_state = ranked_state_type::LIVE;
+			ranked_started = true;
+		}
+	}
+
 	state = arena_mode_state::LIVE;
 	reset_players_stats(in);
 	setup_round(in, step, make_transferred_players(in, true));
 
 	post_team_match_start(in, step);
 	check_duel_of_honor(in, step);
+
+	/* Has to be here because setup_round clears all transient messages. */
+
+	if (ranked_started) {
+		messages::mode_notification notification;
+		notification.payload = messages::no_arg_mode_notification::RANKED_STARTED;
+
+		step.post_message(std::move(notification));
+	}
 }
 
 bool arena_mode::is_first_round_in_half(const const_input_type in) const { 
@@ -2736,7 +2832,14 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 
 	spawn_and_kick_bots(in, step);
 	add_or_remove_players(in, entropy, step);
-	handle_special_commands(in, entropy, step);
+
+#if IS_PRODUCTION_BUILD
+	if (ranked_state == ranked_state_type::NONE)
+#endif
+	{
+		handle_special_commands(in, entropy, step);
+	}
+
 	spawn_characters_for_recently_assigned(in, step);
 
 	if (in.rules.allow_game_commencing) {
@@ -2750,13 +2853,42 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		respawn_the_dead(in, step, in.rules.warmup_respawn_after_ms);
 
 		if (get_warmup_seconds_left(in) <= 0.f) {
-			if (!current_round.cache_players_frozen) {
-				set_players_frozen(in, true);
-				release_triggers_of_weapons_of_players(in);
+			bool match_starting = true;
+
+			if (in.dynamic_vars.is_ranked()) {
+				if (teams_viable_for_match(in)) {
+					if (ranked_state == ranked_state_type::NONE) {
+						ranked_state = ranked_state_type::STARTING;
+						play_ranked_starting_sound(in, step);
+
+						messages::mode_notification notification;
+						notification.payload = messages::no_arg_mode_notification::RANKED_STARTING;
+
+						step.post_message(std::move(notification));
+					}
+				}
+				else {
+					match_starting = false;
+				}
 			}
 
-			if (get_match_begins_in_seconds(in) <= 0.f) {
-				end_warmup_and_go_live(in, step);
+			if (match_starting) {
+				if (!current_round.cache_players_frozen) {
+					set_players_frozen(in, true);
+					release_triggers_of_weapons_of_players(in);
+				}
+
+				if (get_match_begins_in_seconds(in) <= 0.f) {
+					end_warmup_and_go_live(in, step);
+				}
+			}
+			else {
+				restart_match(in, step);
+
+				messages::mode_notification notification;
+				notification.payload = messages::no_arg_mode_notification::TEAMS_ARE_NOT_VIABLE_FOR_RANKED;
+
+				step.post_message(std::move(notification));
 			}
 		}
 	}
@@ -2962,9 +3094,17 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 
 const float match_begins_in_secs_v = 4.f;
 
+float arena_mode::get_warmup_seconds(const const_input_type in) const {
+	if (in.dynamic_vars.is_ranked()) {
+		return std::max(5.0f, static_cast<float>(in.dynamic_vars.ranked.countdown_time));
+	}
+
+	return static_cast<float>(in.rules.warmup_secs);
+}
+
 float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
-		return static_cast<float>(in.rules.warmup_secs) - get_seconds_passed_in_cosmos(in);
+		return get_warmup_seconds(in) - get_seconds_passed_in_cosmos(in);
 	}
 
 	return -1.f;
@@ -2973,10 +3113,15 @@ float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
 float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		const auto secs = get_seconds_passed_in_cosmos(in);
-		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
+		const auto warmup_secs = get_warmup_seconds(in);
 
 		if (secs >= warmup_secs) {
-			const auto match_begins_in_secs = match_begins_in_secs_v;
+			auto match_begins_in_secs = match_begins_in_secs_v;
+
+			if (ranked_state == ranked_state_type::STARTING) {
+				match_begins_in_secs = 8;
+			}
+
 			return warmup_secs + match_begins_in_secs - secs;
 		}
 	}
@@ -3233,6 +3378,8 @@ const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nic
 }
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
+	ranked_state = ranked_state_type::NONE;
+
 	reset_players_stats(in);
 	factions = {};
 	had_first_blood = false;
@@ -3240,7 +3387,7 @@ void arena_mode::restart_match(const input_type in, const logic_step step) {
 	victorious_player_nickname = {};
 	clear_duel();
 
-	if (in.rules.warmup_secs > 4) {
+	if (get_warmup_seconds(in) > 0) {
 		state = arena_mode_state::WARMUP;
 
 		for (auto& p : players) {

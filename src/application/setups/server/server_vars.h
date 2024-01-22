@@ -67,6 +67,7 @@ struct server_ranked_vars {
 
 	// GEN INTROSPECTOR struct server_ranked_vars
 	ranked_autostart_type autostart_when = ranked_autostart_type::NEVER;
+	uint16_t countdown_time = 81;
 	uint16_t rejoin_time_limit = 150;
 	uint8_t max_rejoins = 1;
 	bool freeze_match_on_disconnect = false;
@@ -169,5 +170,6 @@ struct server_private_vars {
 
 	std::string report_ranked_match_api_key = "";
 	std::string report_ranked_match_url = "https://hypersomnia.xyz/report_match";
+	std::string check_ban_endpoint = "https://hypersomnia.xyz/check_ban";
 	// END GEN INTROSPECTOR
 };

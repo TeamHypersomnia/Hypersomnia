@@ -430,7 +430,7 @@ void arena_gui_state::draw_mode_gui(
 	else {
 		using namespace augs::gui::text;
 
-		const bool is_ranked = mode_input.dynamic_vars.run_ranked_logic;
+		const bool is_ranked = mode_input.dynamic_vars.is_ranked();
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
 		const auto death_hazard_icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_HAZARD];

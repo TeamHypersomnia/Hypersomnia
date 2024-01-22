@@ -2044,12 +2044,22 @@ void do_server_vars(
 			revert(f);
 		};
 
+		if (auto node = scoped_tree_node("Ranked")) {
+			revertable_enum("Start ranked when...", vars.ranked.autostart_when);
+			revertable_slider("Countdown time", vars.ranked.countdown_time, uint16_t(3u), uint16_t(300u));
+			revertable_slider("Rejoin time limit", vars.ranked.rejoin_time_limit, uint16_t(0u), uint16_t(600u));
+			revertable_slider("Max rejoins", vars.ranked.max_rejoins, uint8_t(0u), uint8_t(20u));
+
+			revertable_checkbox("Freeze match on disconnect", vars.ranked.freeze_match_on_disconnect);
+		}
+
+		ImGui::Separator();
+
 		text_color("General", yellow);
 
 		ImGui::Separator();
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
-		revertable_enum("Start ranked when...", vars.ranked.autostart_when);
 
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 		revertable_input_text(SCOPE_CFG_NVP(server_name));

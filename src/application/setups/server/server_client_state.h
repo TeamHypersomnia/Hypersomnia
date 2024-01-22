@@ -53,6 +53,7 @@ struct server_client_state {
 
 	bool auth_requested = false;
 	std::string authenticated_id;
+	bool verified_has_no_ban = false;
 
 	server_client_state() = default;
 	server_client_state(const net_time_t server_time) {

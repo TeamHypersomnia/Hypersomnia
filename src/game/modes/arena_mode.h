@@ -20,19 +20,12 @@
 #include "game/enums/faction_choice_result.h"
 #include "game/modes/session_id.h"
 #include "game/modes/arena_submodes.h"
+#include "game/modes/ranked_state_type.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
 
 class arena_mode;
-
-enum class ranked_state_type {
-	// GEN INTROSPECTOR enum class ranked_state
-	NONE,
-	COMMENCING,
-	LIVE
-	// END GEN INTROSPECTOR
-};
 
 struct arena_mode_ruleset {
 	using mode_type = arena_mode;
@@ -360,6 +353,7 @@ private:
 	void play_faction_sound(const_logic_step, faction_type, assets::sound_id, predictability_info) const;
 	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type, predictability_info) const;
 
+	void play_ranked_starting_sound(input, const_logic_step) const;
 	void play_sound_for(input, const_logic_step, battle_event, predictability_info) const;
 	void play_win_sound(input, const_logic_step, faction_type) const;
 	void play_win_theme(input, const_logic_step, faction_type) const;
@@ -443,7 +437,6 @@ private:
 	entity_id bomb_entity;
 	entity_id bomb_detonation_theme;
 
-	float ranked_match_countdown_secs = -1.0f;
 	ranked_state_type ranked_state = ranked_state_type::NONE;
 	// END GEN INTROSPECTOR
 
@@ -644,4 +637,18 @@ public:
 	arena_mode_faction_state& get_spawns_for(input, faction_type faction);
 
 	float get_freeze_time(const_input) const;
+
+	auto get_ranked_state() const {
+		return ranked_state;
+	}
+
+	struct composition_info {
+		bool each_team_has_at_least_one = false;
+		//bool teams_equal = false;
+	};
+
+	composition_info get_team_composition_info(const_input) const;
+	bool teams_viable_for_match(const_input) const;
+
+	float get_warmup_seconds(const const_input in) const;
 };

@@ -11,6 +11,7 @@
 #include "game/modes/session_id.h"
 #include "game/modes/arena_mode_structs.h"
 #include "augs/templates/continue_or_callback_result.h"
+#include "game/modes/ranked_state_type.h"
 
 #include "application/arena/arena_playtesting_context.h"
 
@@ -270,4 +271,8 @@ public:
 
 	float get_seconds_passed_in_cosmos(const_input) const;
 	float get_round_seconds_left(const_input) const;
+
+	auto get_ranked_state() const {
+		return ranked_state_type::NONE;
+	}
 };

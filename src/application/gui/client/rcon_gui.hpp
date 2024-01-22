@@ -22,8 +22,10 @@ template <class F>
 void perform_rcon_gui(
 	rcon_gui_state& state, 
 	const bool is_remote_server,
+	const bool during_ranked,
 	F&& on_new_payload
 ) {
+	(void)during_ranked;
 	using namespace augs::imgui;
 
 	const bool has_maintenance_tab = is_remote_server;
@@ -46,6 +48,12 @@ void perform_rcon_gui(
 		text_color("Access denied.", red);
 		ImGui::Separator();
 	}
+#if IS_PRODUCTION_BUILD
+	else if (during_ranked) {
+		text_color("RCON is unavailable during ranked matches.", red);
+		ImGui::Separator();
+	}
+#endif
 	else {
 		do_pretty_tabs(state.active_pane);
 

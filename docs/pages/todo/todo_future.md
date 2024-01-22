@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- We should actually freeze the match on afk
+
 - MacOS fix: make non-raw input work
 	- although this will only bite you in the ass with reveal to explorer etc, and even then not necessarily
 

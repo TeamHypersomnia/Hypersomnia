@@ -36,8 +36,54 @@ bool chat_gui_state::add_entry_from_mode_notification(
 	auto handle_payload = [&](const auto& payload) {
 		using P = remove_cref<decltype(payload)>;
 		using F = faction_choice;
+		using N = no_arg_mode_notification;
 
-		if constexpr(std::is_same_v<P, F>) {
+		if constexpr(std::is_same_v<P, N>) {
+			switch (payload) {
+				case N::TEAMS_ARE_NOT_VIABLE_FOR_RANKED:
+					do_entry(
+						"Teams are not viable for a ranked match! Restarting countdown.",
+						orange
+					);
+					break;
+
+				case N::FAILED_TO_AUTHENTICATE:
+					do_entry(
+						"Failed to authenticate users for a ranked match.\nTry again.",
+						orange
+					);
+					break;
+
+				case N::FAILED_TO_CHECK_BANS:
+					do_entry(
+						"Failed to check bans for some users.\nTry again.",
+						orange
+					);
+					break;
+
+				case N::RANKED_STARTED:
+					do_entry(
+						"============================\nNOW THERE IS NO TURNING BACK.\n============================\nRanked match has started! GL & HF.\n",
+						green
+					);
+
+					break;
+
+				case N::RANKED_STARTING:
+					do_entry(
+						"Teams are locked. Starting in 8 seconds.\nTo cancel, Alt+F4 or go to Spectators.\nThis is your last chance to leave.",
+						yellow
+					);
+
+					break;
+
+				default:
+					break;
+			}
+
+			return true;
+		}
+		else if constexpr(std::is_same_v<P, F>) {
 			auto make_entry = [&](auto&&... args) {
 				if (current_mode_id != msg.subject_mode_id) {
 					return;

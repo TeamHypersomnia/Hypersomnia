@@ -1237,10 +1237,12 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 		if (!arena_gui.scoreboard.show && rcon_gui.show) {
 			const bool is_remote_server = true;
+			const bool during_ranked = is_ranked_live_or_starting();
 
 			::perform_rcon_gui(
 				rcon_gui,
 				is_remote_server,
+				during_ranked,
 				on_new_payload
 			);
 		}
@@ -1761,4 +1763,12 @@ netcode_address_t client_setup::get_server_address_for_others_to_join() const {
 
 void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
 	pending_steam_auth = ticket;
+}
+
+bool client_setup::is_ranked_live_or_starting() const {
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+		[&](const auto& mode) {
+			return mode.get_ranked_state() != ranked_state_type::NONE;
+		}
+	);
 }

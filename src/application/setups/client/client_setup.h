@@ -860,4 +860,6 @@ public:
 	std::string get_steam_join_command_line() const;
 
 	void send_auth_ticket(const steam_auth_ticket&);
+
+	bool is_ranked_live_or_starting() const;
 };

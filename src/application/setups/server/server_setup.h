@@ -734,7 +734,8 @@ public:
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 
 	bool is_joinable() const;
-	bool is_ranked_live_or_commencing() const;
+	bool is_ranked_live() const;
+	bool is_ranked_live_or_starting() const;
 	bool is_ranked_waiting_for_reconnect() const;
 
 	bool is_connection_request_packet(
@@ -742,4 +743,6 @@ public:
 		const std::byte* packet_buffer,
 		const std::size_t packet_bytes
 	) const;
+
+	void restart_match();
 };

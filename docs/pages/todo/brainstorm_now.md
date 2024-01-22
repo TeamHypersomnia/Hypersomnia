@@ -6,6 +6,55 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- lock in rosters with vector of pairs i guess,session to faction
+    - are there any cases we forgot?
+    - just force disable adding/removing in the mode 
+        - although nothing will be added in the server client logic as it checks for it
+
+- Check bans asynchronously on connect
+    - Restart the match if you kick because of a ban
+
+- on ranked start and just restart the match inconsequentially
+
+- Post ranked deplyoment
+    - Remove test id replacement to match nick for testing
+    - && is_ranked in find best ranked
+    - default_config.lua: uncomment check_ban_endpoint = "https://hypersomnia.xyz/check_ban"
+
+- color wave "ranked" for server list entries
+
+- if match ends when someone is disconnected, count him as connected if it's within rejoin time limit
+    - to avoid corner cases where someone crashes near the end of the match despite good intentions
+
+- might leave it at "quick play" so that "browse servers" doesnt sound like its unranked
+
+- unjoinable: fix max players for server browser
+
+- Syncing non-state settings like crosshair settings, steam auth id etc
+    - Server must send it before rebroadcasting entropy so everyone knows how to unpack entropies
+    - We can't reset it to default when new player info arrives
+        - But we can reset it on disconnect
+
+- Best if the whole freeze logic is deterministic state
+    - Just react to remove_player
+    - And have counters how many each of them is allowed to disconnect
+
+- As steam auth is external we have to sync it with messages
+    - And at least keep "authorized" bool per player if not the full id
+
+- Watch out for handling idle matches when offline
+    - Take care only to report when ranked is initialized and not when server is non-empty as there might still be 1 player idling
+
+- Nerf haste for rankeds
+- If interrupted when <= 4 rounds played, don't count wins 
+- If absent when ended, don't count win but count a loss
+
+- note a match freeze could occur during a sensitive moment like bomb defusing
+    - We might make defusing a toggle later to avoid accidents
+        - Easier to press H/G too
+    - Though we could skip freezing if the character who disconnected is dead
+    - Right now let's only implement freezing on the next round
+
 - Rankeds
     - Should start **whenever there's >=2 players.**
         - Why?
@@ -15,6 +64,11 @@ summary: That which we are brainstorming at the moment.
                 - But sometimes a third person might connect mid-way, and we don't want to leave them alone when countdown is still ongoing.
                 - We'd also have to otherwise prioritize e.g. 1v1 servers first so people aren't left with a non-full server despite having a 1v1 or 2v2 setup ready.
     - There needs to be a 5-10 sec period where you can accept the current team configuration
+        - Actually do we need this if we restart the countdown every time composition changes?
+            - So you can't trick someone in the last moment
+        - Just have 5 seconds during which you can still disconnect without consequence
+            - this is the "Match starting in..." stage
+
         - At this point server becomes unjoinable
         - Should be impossible to restart match through rcon or any other way
         - just have a bool in arena mode for ranked behaviors override

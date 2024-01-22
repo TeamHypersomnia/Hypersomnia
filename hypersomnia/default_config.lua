@@ -754,7 +754,10 @@ treat_as_music_sounds_longer_than_secs = 5,
     -- Ranked servers only.
     -- This secret key allows reporting match results to the leaderboard.
     report_ranked_match_api_key = "",
-    report_ranked_match_url = "https://hypersomnia.xyz/report_match"
+    report_ranked_match_url = "https://hypersomnia.xyz/report_match",
+
+    check_ban_endpoint = ""
+    --check_ban_endpoint = "https://hypersomnia.xyz/check_ban"
   },
 
   server = {
@@ -786,6 +789,9 @@ treat_as_music_sounds_longer_than_secs = 5,
 
       -- Only "NEVER" and "ALWAYS" are implemented right now.
 
+      -- The "RANKED COUNTDOWN" timer.
+      countdown_time = 81,
+
       -- Max: 65535
       rejoin_time_limit = 150,
 
@@ -795,7 +801,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       -- On official ranked servers, this results in a ban.
       -- Feel free to set it to a high value for matches between trusted friends.
       -- Max: 255
-      max_rejoins = 1,
+      max_rejoins = 3,
 
       -- Freeze the entire game completely if a client disconnects.
       -- This could be due to a game crash or network failure.
