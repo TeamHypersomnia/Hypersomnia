@@ -15,7 +15,8 @@ namespace messages {
 
 	enum class joined_or_left {
 		JOINED,
-		LEFT
+		LEFT,
+		RANKED_BANNED
 	};
 
 	struct faction_choice {

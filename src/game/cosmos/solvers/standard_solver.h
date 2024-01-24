@@ -25,7 +25,6 @@ struct standard_solver {
 		solve_result result;
 		const auto step = logic_step(input, queues, step_rng, result);
 
-		cosmic::increment_step(input.cosm);
 		callbacks.pre_solve(step);
 		standard_solve(step);
 		step.flush_pending_allocations();

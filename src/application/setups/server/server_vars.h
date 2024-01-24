@@ -70,12 +70,14 @@ struct server_ranked_vars {
 	uint16_t countdown_time = 81;
 	uint16_t rejoin_time_limit = 150;
 	uint8_t max_rejoins = 1;
-	bool freeze_match_on_disconnect = false;
+	uint8_t match_unfreezes_in_secs = 5;
+	bool freeze_match_on_disconnect = true;
+	float client_network_timeout_secs = 1.0f;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_vars&) const = default;
 
-	bool is_ranked() const {
+	bool is_ranked_server() const {
 		return autostart_when != ranked_autostart_type::NEVER;
 	}
 };
@@ -122,7 +124,7 @@ struct server_vars {
 
 	uint32_t move_to_spectators_if_afk_for_secs = 120;
 	uint32_t kick_if_afk_for_secs = 7200;
-	uint32_t kick_if_no_network_payloads_for_secs = 10;
+	float client_network_timeout_secs = 3.0f;
 	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
 
@@ -155,6 +157,14 @@ struct server_vars {
 
 	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR
+
+	float get_client_network_timeout_secs() const {
+		if (ranked.is_ranked_server()) {
+			return ranked.client_network_timeout_secs;
+		}
+
+		return client_network_timeout_secs;
+	}
 };
 
 struct server_private_vars {

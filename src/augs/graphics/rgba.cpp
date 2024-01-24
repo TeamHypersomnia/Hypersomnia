@@ -1,8 +1,12 @@
 #include <limits>
 #include <array>
 #include <algorithm>
+#include <cmath>
 #include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/rgba.h"
+
+template <class T>
+constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 namespace rgba_detail {
 	hsv rgb2hsv(const rgb in) {
@@ -280,15 +284,14 @@ rgba& rgba::mult_brightness(const float mult) {
 rgba rgba::zero = rgba(0, 0, 0, 0);
 
 rgba rgba::get_bright_wave(const float secs, const float upperLimit1, const float lowerLimit2) {
-	float cycleTime = std::fmod(secs, 1.f); 
-	float wave = sin(cycleTime * 2 * M_PI);
+	const float cycleTime = std::fmod(secs, 1.f); 
+	const float wave = std::sin(cycleTime * 2 * PI<double>);
 	float hue;
+
 	if (wave > 0) {
-		// Map to the range 0 to upperLimit1
 		hue = wave * upperLimit1;
 	}
 	else {
-		// Map to the range lowerLimit2 to 1
 		hue = (1 - lowerLimit2) * wave + 1;
 	}
 

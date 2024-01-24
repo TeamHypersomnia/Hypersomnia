@@ -227,7 +227,7 @@ bool test_scene_setup::is_killed(const std::string& name) const {
 void test_scene_setup::remove(logic_step step, const std::string& name) {
 	if (auto h = to_handle(name)) {
 		if (h.template has<components::sentience>()) {
-			::delete_with_held_items_except({}, step, h);
+			::delete_with_held_items_except({}, h);
 		}
 		else {
 			step.queue_deletion_of(h, "test_scene_setup::remove");

@@ -295,6 +295,7 @@ namespace net_messages {
 	bool serialize(Stream& s, add_player_input& p) {
 		return 
 			serialize(s, p.id)
+			&& serialize(s, p.migrate_from_id)
 			&& serialize_stdstring(s, p.name, min_nickname_length_v, max_nickname_length_v)
 			&& serialize_enum(s, p.faction)
 		;

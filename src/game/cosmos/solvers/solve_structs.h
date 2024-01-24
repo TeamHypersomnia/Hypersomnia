@@ -12,4 +12,6 @@ struct solve_settings {
 	bool simulate_decorative_organisms = true;
 	bool play_transfer_sounds = true;
 	bool drop_weapons_if_empty = true;
+
+	bool pause_simulation = false;
 };

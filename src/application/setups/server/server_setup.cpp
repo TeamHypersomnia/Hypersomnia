@@ -128,7 +128,7 @@ server_setup::server_setup(
 	}
 
 	if (dedicated == std::nullopt) {
-		integrated_client.init(server_time);
+		integrated_client.init(server_time, next_session_id++);
 		integrated_client.state = client_state_type::IN_GAME;
 		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
 
@@ -237,7 +237,7 @@ bool server_heartbeat::is_valid() const {
 
 template <class F>
 void server_setup::push_notification_job(F&& f) {
-	push_session_webhook_job(mode_player_id(), job_type::NOTIFICATION, std::forward<F>(f));
+	push_session_webhook_job(mode_player_id::dead(), job_type::NOTIFICATION, std::forward<F>(f));
 }
 
 template <class F>
@@ -256,13 +256,7 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 		std::async(std::launch::async, std::forward<F>(f))
 	);
 
-	auto session_id = find_session_id(player_id);
-
-	if (!session_id.has_value()) {
-		session_id = session_id_type();
-	}
-	
-	pending_jobs.emplace_back(webhook_job{ player_id, *session_id, type, std::move(ptr) });
+	pending_jobs.emplace_back(webhook_job{ player_id, find_session_id(player_id), type, std::move(ptr) });
 }
 
 std::string get_hex_representation(const std::byte*, size_t length);
@@ -382,7 +376,50 @@ void server_setup::log_match_end_json(const messages::match_summary_message& sum
 	LOG("SERVER_EVENT match_end: %x", augs::to_json_string_nopretty(end));
 }
 
+void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
+	const auto& notifications = step.get_queue<messages::mode_notification>();
+
+	for (const auto& n : notifications) {
+		using J = messages::joined_or_left;
+
+		if (std::holds_alternative<J>(n.payload) && std::get<J>(n.payload) == J::RANKED_BANNED) {
+			const auto message = typesafe_sprintf("%x got banned for leaving the ranked match.", n.subject_name);
+
+			broadcast_info(message, chat_target_type::INFO_CRITICAL);
+
+			const auto id_to_ban = key_or_default(suspended_clients_by_account, n.subject_mode_id);
+
+#if !IS_PRODUCTION_BUILD
+			ensure(!id_to_ban.empty());
+#endif
+
+			if (!id_to_ban.empty()) {
+				// TODO_RANKED - call ban endpoint
+			}
+		}
+	}
+}
+
+void server_setup::purge_expired_suspended_player_info() {
+	if (suspended_clients_by_account.empty()) {
+		return;
+	}
+
+	get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			erase_if(
+				suspended_clients_by_account,
+				[&mode](const auto& suspended_entry) {
+					return nullptr == mode.find_suspended(suspended_entry.second);
+				}
+			);
+		}
+	);
+}
+
 void server_setup::default_server_post_solve(const const_logic_step step) {
+	purge_expired_suspended_player_info();
+
 	{
 		const auto& match_starts = step.get_queue<messages::team_match_start_message>();
 
@@ -788,73 +825,86 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 void server_setup::finalize_webhook_jobs() {
 	auto finalize = [&](auto& webhook_job) {
-		if (is_ready(*webhook_job.job)) {
-			LOG("Finalized webhook job: %x.", webhook_job.type);
-			if (auto client = find_client_state(webhook_job.player_id)) {
-				if (webhook_job.session_id == find_session_id(webhook_job.player_id)) {
-					switch (webhook_job.type) {
-						case job_type::AVATAR:
-							client->uploaded_avatar_url = webhook_job.job->get();
-							LOG("Received avatar from %x.", client->get_nickname());
-							break;
+		if (!is_ready(*webhook_job.job)) {
+			return false;
+		}
 
-						case job_type::AUTH: {
-#if IS_PRODUCTION_BUILD
-							const auto new_id = webhook_job.job->get();
+		const auto webhook_result = webhook_job.job->get();
+
+		LOG("Finalized webhook job: %x. Result: %x", webhook_job.type, webhook_result);
+
+		/* Non-client jobs */
+		switch (webhook_job.type) {
+			case job_type::NOTIFICATION:
+				return true;
+			case job_type::REPORT_MATCH:
+				return true;
+			default:
+				break;
+		}
+
+		if (auto client = find_client_state(webhook_job.player_id)) {
+			if (client->session_id == webhook_job.client_session_id) {
+				switch (webhook_job.type) {
+					case job_type::AVATAR:
+						client->uploaded_avatar_url = webhook_result;
+						LOG("Received avatar from %x.", client->get_nickname());
+						break;
+
+					case job_type::AUTH: {
+#if 0
+						const auto new_id = webhook_result;
 #else
-							/*
-								For testing so we can use just a single steam account
-							*/
-							const auto new_id = std::string("steam_") + client->get_nickname();
+						/*
+							For testing so we can use just a single steam account
+						*/
+						const auto new_id = std::string("steam_") + client->get_nickname();
 #endif
 
-							if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
-								LOG(
-									"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
-									client->get_nickname(), 
-									new_id,
-									client->secs_since_connected(server_time)
-								);
-
-								kick(to_client_id(webhook_job.player_id), "Duplicate connection.");
-								break;
-							}
-
-							client->authenticated_id = new_id;
-
+						if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
 							LOG(
-								"Authenticated \"%x\". ID: %x. Took %x secs.", 
+								"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
 								client->get_nickname(), 
-								client->authenticated_id,
+								new_id,
 								client->secs_since_connected(server_time)
 							);
 
-							if (client->authenticated_id == "publisherbanned") {
-								kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
-							}
-
-							if (private_vars.check_ban_endpoint.empty()) {
-								client->verified_has_no_ban = true;
-							}
-							else {
-								// TODO: Check ban.
-							}
-
+							kick(to_client_id(webhook_job.player_id), "Duplicate connection.");
 							break;
 						}
-						
 
-						default:
-							break;
+						client->authenticated_id = new_id;
 
+						LOG(
+							"Authenticated \"%x\". ID: %x. Took %x secs.", 
+							client->get_nickname(), 
+							client->authenticated_id,
+							client->secs_since_connected(server_time)
+						);
+
+						if (client->authenticated_id == "publisherbanned") {
+							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
+						}
+
+						if (private_vars.check_ban_endpoint.empty()) {
+							client->verified_has_no_ban = true;
+						}
+						else {
+							// TODO: Check ban.
+						}
+
+						break;
 					}
+					
+
+					default:
+						break;
+
 				}
 			}
-
-			return true;
 		}
 
-		return false;
+		return true;
 	};
 
 	erase_if(pending_jobs, finalize);
@@ -1029,7 +1079,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 
 	heartbeat.require_authentication = vars.require_authentication;
-	heartbeat.is_ranked = vars.ranked.autostart_when != ranked_autostart_type::NEVER;
+	heartbeat.is_ranked_server = vars.ranked.autostart_when != ranked_autostart_type::NEVER;
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(
@@ -1274,19 +1324,15 @@ client_id_type server_setup::to_client_id(const mode_player_id& id) {
 	return static_cast<client_id_type>(id.value);
 }
 
-std::optional<session_id_type> server_setup::find_session_id(const mode_player_id& id) const {
-	return get_arena_handle().on_mode(
-		[&](const auto& mode) -> std::optional<session_id_type> {
-			if (const auto entry = mode.find(id)) {
-				return entry->get_session_id();
-			}
+std::optional<server_client_session_id> server_setup::find_session_id(const mode_player_id& id) const {
+	if (auto state = find_client_state(id)) {
+		return state->session_id;
+	}
 
-			return std::nullopt;
-		}
-	);
+	return std::nullopt;
 }
 
-std::optional<session_id_type> server_setup::find_session_id(const client_id_type& id) const {
+std::optional<server_client_session_id> server_setup::find_session_id(const client_id_type& id) const {
 	return find_session_id(to_mode_player_id(id));
 }
 
@@ -1628,6 +1674,8 @@ void server_setup::rechoose_arena() {
 	arena_gui.reset();
 	arena_gui.choose_team.show = ::is_spectator(arena, get_local_player_id());
 
+	suspended_clients_by_account.clear();
+
 	integrated_client_gui.rcon.show = false;
 
 	if (should_have_admin_character()) {
@@ -1664,13 +1712,33 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 
 void server_setup::init_client(const client_id_type& id) {
 	auto& new_client = clients[id];
-	new_client.init(server_time);
+	new_client.init(server_time, next_session_id++);
 
-	LOG("Client %x connected.", id);
+	LOG("Client %x connected. SID: %x", id, new_client.session_id);
 }
 
 void server_setup::unset_client(const client_id_type& id) {
 	LOG("Client disconnected. Details:\n%x", describe_client(id));
+
+	const bool will_be_suspended = get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			return mode.should_suspend_instead_of_remove(in) && mode.find(to_mode_player_id(id));
+		}
+	);
+
+	if (will_be_suspended) {
+		if (clients[id].is_authenticated()) {
+			const auto account_id = clients[id].authenticated_id;
+
+			LOG("Suspending %x (client id: %x)", account_id, id);
+
+			suspended_clients_by_account[account_id] = to_mode_player_id(id);
+		}
+		else {
+			LOG("WARNING! Unauthenticated client during ranked!");
+		}
+	}
+
 	clients[id].unset();
 }
 
@@ -1817,10 +1885,26 @@ void server_setup::advance_clients_state() {
 				return;
 			}
 
-			if (c.state < client_state_type::IN_GAME) {
+			if (!player_added_to_mode(mode_id)) {
 				if (!is_joinable()) {
 					/* Joined too late. */
 					kick(client_id, "Joined too late! Match is ongoing.");
+				}
+
+				const bool wrong_id = 
+					is_ranked_waiting_for_reconnect() && 
+					c.is_authenticated() && 
+					!found_in(suspended_clients_by_account, c.authenticated_id)
+				;
+
+				if (wrong_id) {
+					LOG(
+						"%x has connected to a match that's not theirs! Account ID: %x.", 
+						c.get_nickname(), 
+						c.authenticated_id
+					);
+
+					kick(client_id, "Connected to a wrong match.");
 				}
 			}
 
@@ -1832,8 +1916,9 @@ void server_setup::advance_clients_state() {
 				automove_to_spectators_if_afk(client_id, c);
 			}
 
-			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				kick(client_id, "No messages arrived for too long!");
+			if (c.should_kick_due_to_network_timeout(vars, server_time)) {
+				kick(client_id, "Connection timed out!");
+				c.kick_no_linger = true;
 			}
 
 			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
@@ -1854,7 +1939,7 @@ void server_setup::advance_clients_state() {
 				if (c.when_kicked.has_value()) {
 					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
 
-					if (server_time - *c.when_kicked > linger_secs) {
+					if (c.kick_no_linger || server_time - *c.when_kicked > linger_secs) {
 						LOG("Disconnecting kicked client %x.", client_id);
 						disconnect_and_unset(client_id);
 					}
@@ -1942,14 +2027,23 @@ void server_setup::advance_clients_state() {
 
 			mode_entropy_general cmd;
 
+			mode_player_id migrate_from_id;
+
+			if (const auto m = mapped_or_nullptr(suspended_clients_by_account, c.authenticated_id)) {
+				migrate_from_id = *m;
+			}
+
 			cmd.added_player = add_player_input {
 				mode_id,
 				std::move(final_nickname),
-				faction_type::SPECTATOR
+				faction_type::SPECTATOR,
+				migrate_from_id
 			};
 
 			local_collected.control(cmd);
 			added_someone_already = true;
+
+			suspended_clients_by_account.erase(c.authenticated_id);
 
 			return true;
 		};
@@ -1997,19 +2091,39 @@ void server_setup::advance_clients_state() {
 		if (!added_someone_already) {
 			if (c.state > client_state_type::PENDING_WELCOME) {
 				if (!player_added_to_mode(mode_id)) {
-					LOG("Adding %x to game state. State: %x", c.get_nickname(), c.state);
+					const bool auth_requirement_fulfilled = [&]() {
+						if (is_ranked_live()) {
+							if (is_ranked_waiting_for_reconnect()) {
+								/* 
+									Only add if it's one of the disconnected players.
+									If it's empty, it will be kicked eventually.
+								*/
 
-					if (add_client_to_mode()) {
-						if (c.state == S::WELCOME_ARRIVED) {
-							send_state_for_the_first_time();
-
-							c.state = S::RECEIVING_INITIAL_SNAPSHOT;
+								return found_in(suspended_clients_by_account, c.authenticated_id);
+							}
+							else {
+								return false;
+							}
 						}
-					}
-					else {
-						LOG("Couldn't add client to the game mode. Disconnecting.");
-						disconnect_and_unset(client_id);
-						return;
+
+						return true;
+					}();
+
+					if (auth_requirement_fulfilled) {
+						LOG("Adding %x to game state. State: %x", c.get_nickname(), c.state);
+
+						if (add_client_to_mode()) {
+							if (c.state == S::WELCOME_ARRIVED) {
+								send_state_for_the_first_time();
+
+								c.state = S::RECEIVING_INITIAL_SNAPSHOT;
+							}
+						}
+						else {
+							LOG("Couldn't add client to the game mode. Disconnecting.");
+							disconnect_and_unset(client_id);
+							return;
+						}
 					}
 				}
 			}
@@ -2802,7 +2916,11 @@ mode_player_id server_setup::find_client_by_account_id(const std::string& accoun
 
 const server_client_state* server_setup::find_client_state(const mode_player_id id) const {
 	if (id.is_set()) {
-		return std::addressof(get_client_state(id));
+		auto& c = get_client_state(id);
+
+		if (c.is_set()) {
+			return std::addressof(c);
+		}
 	}
 
 	return nullptr;
@@ -3281,7 +3399,15 @@ bool server_setup::is_connection_request_packet(
 }
 
 bool server_setup::is_ranked_waiting_for_reconnect() const {
-	return false;
+	return suspended_clients_by_account.size() > 0;
+}
+
+bool server_setup::is_ranked_live() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.get_ranked_state() == ranked_state_type::LIVE;
+		}
+	);
 }
 
 bool server_setup::is_ranked_live_or_starting() const {

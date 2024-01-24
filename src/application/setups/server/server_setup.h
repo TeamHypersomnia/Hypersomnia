@@ -146,6 +146,9 @@ class server_setup :
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
+	uint32_t next_session_id = 0;
+	std::unordered_map<std::string, mode_player_id> suspended_clients_by_account;
+
 	server_client_state integrated_client;
 
 	unsigned ticks_until_sending_packets = 0;
@@ -185,15 +188,16 @@ class server_setup :
 	bool suppress_community_server_webhook_this_run = false;
 
 	enum class job_type {
-		NOTIFICATION,
 		AVATAR,
 		AUTH,
+
+		NOTIFICATION,
 		REPORT_MATCH
 	};
 
 	struct webhook_job {
 		mode_player_id player_id;
-		session_id_type session_id;
+		std::optional<server_client_session_id> client_session_id;
 
 		job_type type = job_type::NOTIFICATION;
 
@@ -230,6 +234,8 @@ class server_setup :
 	void check_for_updates();
 	bool check_for_updates_once = false;
 	bool write_vars_to_disk_once = false;
+
+	void purge_expired_suspended_player_info();
 
 public:
 	net_time_t last_logged_at = 0;
@@ -353,8 +359,8 @@ public:
 	static mode_player_id to_mode_player_id(const client_id_type&);
 	static client_id_type to_client_id(const mode_player_id&);
 
-	std::optional<session_id_type> find_session_id(const client_id_type&) const;
-	std::optional<session_id_type> find_session_id(const mode_player_id&) const;
+	std::optional<server_client_session_id> find_session_id(const client_id_type&) const;
+	std::optional<server_client_session_id> find_session_id(const mode_player_id&) const;
 
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
@@ -495,6 +501,8 @@ public:
 
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
+						ban_players_who_left_for_good(step);
+
 						{
 							auto& notifications = step.get_queue<messages::mode_notification>();
 
@@ -703,6 +711,7 @@ public:
 	std::string get_current_arena_name() const;
 
 	void default_server_post_solve(const const_logic_step step);
+	void ban_players_who_left_for_good(const const_logic_step step);
 
 	void log_match_end_json(const messages::match_summary_message&);
 	void log_match_start_json(const messages::team_match_start_message&);

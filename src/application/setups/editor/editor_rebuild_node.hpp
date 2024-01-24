@@ -7,7 +7,7 @@
 
 template <class T>
 void make_unselectable(T& agg) {
-	agg.when_born.step = 2;
+	agg.when_born.step = 1;
 }
 
 template <class T>
@@ -39,7 +39,7 @@ bool setup_entity_from_node(
 		sorting_order->order = total_order;
 	}
 	
-	ensure(agg.when_born.step == 1);
+	ensure(agg.when_born.step == 0);
 
 	if (!layer.editable.selectable_on_scene) {
 		::make_unselectable(agg);

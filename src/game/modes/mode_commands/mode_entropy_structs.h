@@ -9,6 +9,7 @@ struct add_player_input {
 	mode_player_id id;
 	entity_name_str name;
 	faction_type faction = faction_type::SPECTATOR;
+	mode_player_id migrate_from_id = {};
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {

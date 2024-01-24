@@ -39,6 +39,10 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
 
+bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
+	return dynamic_vars.is_ranked_server();
+}
+
 using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
 
@@ -400,6 +404,23 @@ bool arena_mode::add_player_custom(const input_type in, const add_player_input& 
 
 	const auto& new_id = add_in.id;
 
+	if (const bool migrate = add_in.migrate_from_id.is_set()) {
+		const auto migrate_from = add_in.migrate_from_id;
+		
+		ensure(found_in(suspended_players, add_in.migrate_from_id));
+
+		auto& new_player = (*players.try_emplace(new_id).first).second;
+
+		ensure(!new_player.is_set());
+
+		new_player = suspended_players.at(migrate_from);
+		erase_element(suspended_players, migrate_from);
+
+		LOG("Migrating '%x' from id %x to id %x", new_player.get_nickname(), migrate_from.value, new_id.value);
+
+		return true;
+	}
+
 	auto& new_player = (*players.try_emplace(new_id).first).second;
 
 	if (new_player.is_set()) {
@@ -436,19 +457,72 @@ mode_player_id arena_mode::add_player(const input_type in, const client_nickname
 	return {};
 }
 
-void arena_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
-	handle_duel_desertion(in, step, id);
+void arena_mode::erase_player(input_type in, const logic_step step, const mode_player_id& id, const bool suspended) {
+	if (const auto entry = suspended ? find_suspended(id) : find(id)) {
+		if (!suspended) {
+			handle_duel_desertion(in, step, id);
+		}
 
-	const auto controlled_character_id = lookup(id);
+		const auto controlled_character_id = entry->controlled_character_id;
+		::delete_with_held_items_except(in.rules.bomb_flavour, in.cosm[controlled_character_id]);
 
-	::delete_with_held_items_except(in.rules.bomb_flavour, step, in.cosm[controlled_character_id]);
-
-	if (const auto entry = find(id)) {
 		const auto previous_faction = entry->get_faction();
 		const auto free_color = entry->assigned_color;
 
-		erase_element(players, id);
+		if (suspended) {
+			erase_element(suspended_players, id);
+		}
+		else {
+			erase_element(players, id);
+		}
+
 		assign_free_color_to_best_uncolored(in, previous_faction, free_color);
+	}
+}
+
+bool arena_mode::should_suspend_instead_of_remove(const const_input_type in) const {
+	return is_ranked_live() && !last_summary_already(in);
+}
+
+void arena_mode::notify_ranked_banned(
+	const mode_player_id& id_when_suspended,
+	const client_nickname_type& nickname,
+	const const_logic_step step
+) {
+	messages::mode_notification notification;
+
+	notification.subject_mode_id = id_when_suspended;
+	notification.subject_name = nickname,
+	notification.payload = messages::joined_or_left::RANKED_BANNED;
+
+	step.post_message(std::move(notification));
+}
+
+void arena_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
+	auto suspend = [&]() {
+		if (const auto entry = find(id)) {
+			++entry->times_suspended;
+
+			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked)) {
+				LOG("%x exceeded suspension limits. Kicking right away.", id.value);
+				notify_ranked_banned(id, entry->get_nickname(), step);
+				erase_player(in, step, id, false);
+			}
+			else {
+				LOG("Arena: suspending %x.", id.value);
+				entry->unset_inputs_once = true;
+
+				suspended_players[id] = *entry;
+				erase_element(players, id);
+			}
+		}
+	};
+
+	if (should_suspend_instead_of_remove(in)) {
+		suspend();
+	}
+	else {
+		erase_player(in, step, id, false);
 	}
 }
 
@@ -916,7 +990,15 @@ void arena_mode::setup_round(
 		they become invalid when we assign the clean_round_state.
 	*/
 
-	step.transient.flush_everything();
+	{
+		/*
+			Preserve mode notifs as they're harmless.
+		*/
+
+		const auto notifications = step.get_queue<messages::mode_notification>();
+		step.transient.flush_everything();
+		step.get_queue<messages::mode_notification>() = notifications;
+	}
 
 	cosm.set_fixed_delta(round_speeds.calc_fixed_delta());
 
@@ -1999,7 +2081,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 
 					case C::RESTART_MATCH_NO_WARMUP:
 #if IS_PRODUCTION_BUILD
-						if (in.dynamic_vars.is_ranked()) {
+						if (in.is_ranked_server()) {
 							/*
 								Forbid skipping warmups on a ranked server.
 							*/
@@ -2102,10 +2184,14 @@ void arena_mode::migrate(const input_type in, const arena_migrated_session& sess
 	next_session_id = session.next_session_id;
 }
 
-void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
+bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	bool added_or_removed = false;
+
 	const auto& g = entropy.general;
 
 	if (logically_set(g.added_player)) {
+		added_or_removed = true;
+
 		const auto& a = g.added_player;
 		const auto result = add_player_custom(in, a);
 		(void)result;
@@ -2120,15 +2206,24 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 			step.post_message(std::move(notification));
 		}
 
-		if (a.faction == faction_type::DEFAULT) {
-			auto_assign_faction(in, a.id);
+		if (const bool has_rejoined = a.migrate_from_id.is_set()) {
+			/* 
+				Faction will be already set if we migrate from existing player data.
+			*/
 		}
 		else {
-			choose_faction(in, a.id, a.faction);
+			if (a.faction == faction_type::DEFAULT) {
+				auto_assign_faction(in, a.id);
+			}
+			else {
+				choose_faction(in, a.id, a.faction);
+			}
 		}
 	}
 
 	if (logically_set(g.removed_player)) {
+		added_or_removed = true;
+
 		if (const auto entry = find(g.removed_player)) {
 			messages::mode_notification notification;
 
@@ -2145,6 +2240,8 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 	if (logically_set(g.removed_player) && logically_set(g.added_player)) {
 		ensure(g.removed_player != g.added_player.id);
 	}
+
+	return added_or_removed;
 }
 
 mode_player_id arena_mode::find_first_free_player() const {
@@ -2575,7 +2672,7 @@ void arena_mode::handle_game_commencing(const input_type in, const logic_step st
 	if (should_commence_when_ready && teams_viable) {
 		should_commence_when_ready = false;
 
-		if (in.dynamic_vars.is_ranked()) {
+		if (in.is_ranked_server()) {
 			/* Insta-restart for rankeds */
 			restart_match(in, step);
 		}
@@ -2591,8 +2688,6 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 	if (state != arena_mode_state::WARMUP) {
 		return;
 	}
-
-	bool ranked_started = false;
 
 	if (ranked_state == ranked_state_type::STARTING) {
 		auto interrupt = [&](auto type) {
@@ -2614,7 +2709,11 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 		}
 		else {
 			ranked_state = ranked_state_type::LIVE;
-			ranked_started = true;
+
+			messages::mode_notification notification;
+			notification.payload = messages::no_arg_mode_notification::RANKED_STARTED;
+
+			step.post_message(std::move(notification));
 		}
 	}
 
@@ -2624,15 +2723,6 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 
 	post_team_match_start(in, step);
 	check_duel_of_honor(in, step);
-
-	/* Has to be here because setup_round clears all transient messages. */
-
-	if (ranked_started) {
-		messages::mode_notification notification;
-		notification.payload = messages::no_arg_mode_notification::RANKED_STARTED;
-
-		step.post_message(std::move(notification));
-	}
 }
 
 bool arena_mode::is_first_round_in_half(const const_input_type in) const { 
@@ -2812,6 +2902,80 @@ void arena_mode::check_duel_of_honor(const input_type in, const logic_step step)
 	}
 }
 
+float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars) const {
+	return std::max(0.0f, vars.rejoin_time_limit - total_time_suspended);
+}
+
+bool arena_mode_player::suspend_limit_exceeded(const server_ranked_vars& vars) const {
+	if (times_suspended > vars.max_rejoins) {
+		return true;
+	}
+
+	if (total_time_suspended > vars.rejoin_time_limit) {
+		return true;
+	}
+
+	return false;
+}
+
+bool arena_mode::handle_suspended_logic(const input_type in, const logic_step step) {
+	std::vector<mode_player_id> to_erase;
+
+	for (auto& p : suspended_players) {
+		p.second.total_time_suspended += step.get_delta().in_seconds();
+
+		if (p.second.unset_inputs_once) {
+			p.second.unset_inputs_once = false;
+			const auto character = step.get_cosmos()[p.second.controlled_character_id];
+
+			unset_input_flags_of_orphaned_entity(character);
+		}
+
+		if (p.second.suspend_limit_exceeded(in.dynamic_vars.ranked)) {
+			LOG("%x exceeded suspension limits. Kicking for good.", p.first.value);
+			notify_ranked_banned(p.first, p.second.get_nickname(), step);
+			to_erase.push_back(p.first);
+		}
+	}
+
+	for (const auto& p : to_erase) {
+		erase_player(in, step, p, true);
+	}
+
+	const bool any_suspended = suspended_players.size() > 0;
+
+	if (any_suspended) {
+		unfreezing_match_in_secs = in.dynamic_vars.ranked.match_unfreezes_in_secs;
+	}
+	else if (unfreezing_match_in_secs > 0.0f) {
+		unfreezing_match_in_secs -= step.get_delta().in_seconds();
+	}
+
+	return unfreezing_match_in_secs > 0.0f;
+}
+
+float arena_mode::get_match_unfreezes_in_secs() const {
+	return unfreezing_match_in_secs;
+}
+
+float arena_mode::find_suspended_time_left(const const_input in) const {
+	if (suspended_players.empty()) {
+		return 0.0f;
+	}
+
+	float shortest_time_until_kick = 100000.0f;
+
+	for (auto& s : suspended_players) {
+		shortest_time_until_kick = std::min(s.second.suspended_time_until_kick(in.dynamic_vars.ranked), shortest_time_until_kick);
+	}
+
+	return shortest_time_until_kick;
+}
+
+void arena_mode::mode_solve_paused(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	add_or_remove_players(in, entropy, step);
+}
+
 void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart_match(in, step);
@@ -2831,7 +2995,12 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	}
 
 	spawn_and_kick_bots(in, step);
-	add_or_remove_players(in, entropy, step);
+
+	if (const bool teams_changed = add_or_remove_players(in, entropy, step)) {
+		if (in.is_ranked_server() && !is_ranked_live()) {
+			restart_match(in, step);
+		}
+	}
 
 #if IS_PRODUCTION_BUILD
 	if (ranked_state == ranked_state_type::NONE)
@@ -2855,7 +3024,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		if (get_warmup_seconds_left(in) <= 0.f) {
 			bool match_starting = true;
 
-			if (in.dynamic_vars.is_ranked()) {
+			if (in.is_ranked_server()) {
 				if (teams_viable_for_match(in)) {
 					if (ranked_state == ranked_state_type::NONE) {
 						ranked_state = ranked_state_type::STARTING;
@@ -3078,7 +3247,7 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 					round_transferred_player transfer;
 					transfer.movement = player_handle.template get<components::movement>().flags;
 
-					::delete_with_held_items_except(in.rules.bomb_flavour, step, player_handle);
+					::delete_with_held_items_except(in.rules.bomb_flavour, player_handle);
 
 					messages::changed_identities_message changed_identities;
 					create_character_for_player(in, step, id, changed_identities, &transfer);
@@ -3094,8 +3263,12 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 
 const float match_begins_in_secs_v = 4.f;
 
+bool arena_mode::last_summary_already(const const_input in) const {
+	return is_match_summary() && is_final_round(in);
+}
+
 float arena_mode::get_warmup_seconds(const const_input_type in) const {
-	if (in.dynamic_vars.is_ranked()) {
+	if (in.is_ranked_server()) {
 		return std::max(5.0f, static_cast<float>(in.dynamic_vars.ranked.countdown_time));
 	}
 
@@ -3103,7 +3276,7 @@ float arena_mode::get_warmup_seconds(const const_input_type in) const {
 }
 
 bool arena_mode::is_waiting_for_players(const const_input_type in) const { 
-	if (in.dynamic_vars.is_ranked() && state == arena_mode_state::WARMUP) {
+	if (in.is_ranked_server() && state == arena_mode_state::WARMUP) {
 		return ranked_state == ranked_state_type::NONE && !teams_viable_for_match(in);
 	}
 
@@ -3357,6 +3530,10 @@ auto arena_mode::find_player_by_impl(S& self, const E& identifier) {
 	return R(nullptr);
 }
 
+const arena_mode_player* arena_mode::find_suspended(const mode_player_id& id) const {
+	return mapped_or_nullptr(suspended_players, id);
+}
+
 arena_mode_player* arena_mode::find(const mode_player_id& id) {
 	return mapped_or_nullptr(players, id);
 }
@@ -3390,6 +3567,8 @@ const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nic
 }
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
+	suspended_players.clear();
+
 	ranked_state = ranked_state_type::NONE;
 
 	reset_players_stats(in);
@@ -3651,7 +3830,7 @@ uint32_t arena_mode::get_max_num_active_players(const const_input_type in) const
 }
 
 void arena_mode::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
-	if (is_match_summary() && is_final_round(in)) {
+	if (last_summary_already(in)) {
 		/* Not a desertion when the outcome is known already */
 		return;
 	}
@@ -3724,4 +3903,8 @@ bool arena_mode::levelling_enabled(const_input_type in) const {
 
 float arena_mode::get_freeze_time(const const_input_type in) const {
 	return current_round.skip_freeze_time ? 0.0f : in.rules.freeze_secs;
+}
+
+bool arena_mode::is_ranked_live() const { 
+	return ranked_state == ranked_state_type::LIVE;
 }

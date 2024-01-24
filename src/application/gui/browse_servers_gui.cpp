@@ -1169,7 +1169,7 @@ const server_list_entry* browse_servers_gui_state::find_best_ranked() const {
 	erase_if(
 		filtered,
 		[&](auto& f) {
-			const bool good = f.is_official_server(); //&& f.heartbeat.is_ranked;
+			const bool good = f.is_official_server(); //&& f.heartbeat.is_ranked_server;
 
 			return !good;
 		}

@@ -8,7 +8,7 @@ class arena_mode;
 void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm);
 
 template <class H>
-static void delete_with_held_items_except(const entity_flavour_id drop_instead, const logic_step step, const H handle) {
+static void delete_with_held_items_except(const entity_flavour_id drop_instead, const H handle) {
 	if (handle) {
 		deletion_queue q;
 		q.push_back(handle.get_id());
@@ -22,8 +22,10 @@ static void delete_with_held_items_except(const entity_flavour_id drop_instead, 
 						auto request = item_slot_transfer_request::drop(contained);
 						request.params.bypass_mounting_requirements = true;
 
-						const auto result = perform_transfer_no_step(request, step.get_cosmos());
-						result.notify_logical(step);
+						const auto result = perform_transfer_no_step(request, handle.get_cosmos());
+						// Not required as there will never be any deletion involved.
+						//result.notify_logical(step);
+						(void)result;
 
 						return;
 					}

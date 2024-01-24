@@ -13,8 +13,8 @@ struct synced_dynamic_vars {
 
 	bool operator==(const synced_dynamic_vars&) const = default;
 
-	bool is_ranked() const {
-		return ranked.is_ranked();
+	bool is_ranked_server() const {
+		return ranked.is_ranked_server();
 	}
 };
 

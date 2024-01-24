@@ -217,6 +217,10 @@ public:
 	const player_type* find_player_by(const entity_name_str& nickname) const;
 	const player_type* find(const mode_player_id&) const;
 
+	const player_type* find_suspended(const mode_player_id&) const {
+		return nullptr;
+	}
+
 	const player_type* find(const session_id_type&) const;
 	mode_player_id lookup(const session_id_type&) const;
 
@@ -274,5 +278,9 @@ public:
 
 	auto get_ranked_state() const {
 		return ranked_state_type::NONE;
+	}
+
+	bool should_suspend_instead_of_remove(const_input) const {
+		return false;
 	}
 };

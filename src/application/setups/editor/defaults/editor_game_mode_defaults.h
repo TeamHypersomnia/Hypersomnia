@@ -14,13 +14,17 @@ inline void setup_game_mode_defaults(
 	e.quick_test.equipment.resistance.backpack = true;
 
 	e.bomb_defusal.warmup_equipment.metropolis.firearm = o[test_shootable_weapons::BAKA47];
-	e.bomb_defusal.warmup_equipment.metropolis.melee = o[test_melee_weapons::POSEIDON];
-	e.bomb_defusal.warmup_equipment.metropolis.extra_ammo_pieces = 3;
+	e.bomb_defusal.warmup_equipment.metropolis.melee = o[test_melee_weapons::ASSAULT_RATTLE];
+	e.bomb_defusal.warmup_equipment.metropolis.explosive = o[test_hand_explosives::FORCE_GRENADE];
+	e.bomb_defusal.warmup_equipment.metropolis.extra_ammo_pieces = 5;
+	e.bomb_defusal.warmup_equipment.metropolis.num_explosives = 2;
 	e.bomb_defusal.warmup_equipment.metropolis.backpack = true;
 
 	e.bomb_defusal.warmup_equipment.resistance.firearm = o[test_shootable_weapons::SZTURM];
-	e.bomb_defusal.warmup_equipment.resistance.melee = o[test_melee_weapons::FURY_THROWER];
-	e.bomb_defusal.warmup_equipment.resistance.extra_ammo_pieces = 3;
+	e.bomb_defusal.warmup_equipment.resistance.melee = o[test_melee_weapons::ASSAULT_RATTLE];
+	e.bomb_defusal.warmup_equipment.resistance.explosive = o[test_hand_explosives::FORCE_GRENADE];
+	e.bomb_defusal.warmup_equipment.resistance.extra_ammo_pieces = 5;
+	e.bomb_defusal.warmup_equipment.resistance.num_explosives = 2;
 	e.bomb_defusal.warmup_equipment.resistance.backpack = true;
 
 	e.bomb_defusal.round_start_equipment.metropolis.firearm = o[test_shootable_weapons::SN69];

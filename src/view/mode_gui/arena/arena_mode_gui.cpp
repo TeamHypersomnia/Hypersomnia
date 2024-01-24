@@ -430,7 +430,7 @@ void arena_gui_state::draw_mode_gui(
 	else {
 		using namespace augs::gui::text;
 
-		const bool is_ranked = mode_input.dynamic_vars.is_ranked();
+		const bool is_ranked_server = mode_input.is_ranked_server();
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
 		const auto death_hazard_icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_HAZARD];
@@ -1113,14 +1113,54 @@ void arena_gui_state::draw_mode_gui(
 		const bool waiting_for_players = typed_mode.is_waiting_for_players(mode_input);
 		const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input);
 		const bool now_is_warmup = warmup_left > 0.f;
+		const auto match_unfreezes_secs = typed_mode.get_match_unfreezes_in_secs();
+
+		auto draw_match_is_frozen = [&]() {
+			const auto c = std::ceil(match_unfreezes_secs);
+
+			play_tick_if_soon(c, 5.f, true);
+
+			if (match_unfreezes_secs == mode_input.dynamic_vars.ranked.match_unfreezes_in_secs) {
+				const auto& s = typed_mode.get_suspended_players();
+				const auto secs = yojimbo_time();
+
+				const auto num_dots = uint64_t(secs * 3) % 3 + 1;
+				const auto loading_dots = std::string(num_dots, '.');
+				const auto nondots = std::string(3-num_dots, '.');
+
+				const auto best_time_limit = format_mins_secs(typed_mode.find_suspended_time_left(mode_input));
+
+				auto prnt = [&](auto col, const auto... vars) {
+					return larger_colored(typesafe_sprintf(vars...), col);
+				};
+
+				const auto players_str = 
+					(s.size() == 1
+					? typesafe_sprintf("%x", (*s.begin()).second.get_nickname())
+					: typesafe_sprintf("%x players", s.size()))
+				;
+
+				const auto full = 
+					prnt(white, "Waiting %x for ", best_time_limit)
+					+ prnt(cyan, players_str)
+					+ prnt(white, " to reconnect")
+					+ prnt(white, loading_dots)
+					+ larger_colored(nondots, rgba(0,0,0,0))
+				;
+
+				draw_warmup_indicator(larger_colored("MATCH IS FROZEN!", orange), full);
+			}
+			else {
+				draw_warmup_indicator(larger_colored("WE'RE BACK. MATCH UNFREEZING IN:", green), larger_colored(format_mins_secs(c), yellow));
+			}
+		};
 
 		auto draw_warmup_timer = [&]() {
-
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
 
-			if (is_ranked) {
+			if (is_ranked_server) {
 				const auto secs = yojimbo_time();
 
 				const auto left_col = rgba::get_bright_wave(secs / 8.f + 0.3f);
@@ -1161,7 +1201,7 @@ void arena_gui_state::draw_mode_gui(
 
 			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after it starts!!![/color]");
 
-			const auto& original_welcome = is_ranked ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;
+			const auto& original_welcome = is_ranked_server ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;
 			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;
 
 			if (non_spectator && !original_welcome.empty()) {
@@ -1260,7 +1300,7 @@ void arena_gui_state::draw_mode_gui(
 			if (const auto match_begins_in_seconds = typed_mode.get_match_begins_in_seconds(mode_input); match_begins_in_seconds >= 0.f) {
 				const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
-				if (is_ranked) {
+				if (is_ranked_server) {
 					const auto secs = yojimbo_time();
 					const auto right_col = rgba::get_bright_wave(secs / 4.f);
 
@@ -1372,7 +1412,10 @@ void arena_gui_state::draw_mode_gui(
 			}
 
 			if (!is_game_commencing()) {
-				if (now_is_warmup) {
+				if (match_unfreezes_secs > 0.0f) {
+					draw_match_is_frozen();
+				}
+				else if (now_is_warmup) {
 					draw_warmup_timer();
 				}
 				else {

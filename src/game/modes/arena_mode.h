@@ -136,6 +136,8 @@ struct arena_mode_player_stats {
 	int calc_score() const;
 };
 
+struct server_ranked_vars;
+
 struct arena_mode_player {
 	// GEN INTROSPECTOR struct arena_mode_player
 	player_session_data session;
@@ -145,7 +147,10 @@ struct arena_mode_player {
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 
 	bool is_bot = false;
-	bool disconnected = false;
+	bool unset_inputs_once = false;
+
+	float total_time_suspended = 0.0f;
+	uint16_t times_suspended = 0;
 	// END GEN INTROSPECTOR
 
 	arena_mode_player(const client_nickname_type& nickname = {}) {
@@ -185,6 +190,9 @@ struct arena_mode_player {
 	auto get_order() const {
 		return arena_player_order_info { get_nickname(), stats.calc_score(), stats.level };
 	}
+
+	bool suspend_limit_exceeded(const server_ranked_vars&) const;
+	float suspended_time_until_kick(const server_ranked_vars&) const;
 };
 
 struct arena_mode_round_state {
@@ -211,6 +219,8 @@ struct setup_next_round_params {
 
 struct synced_dynamic_vars;
 
+bool _is_ranked(const synced_dynamic_vars& dynamic_vars);
+
 class arena_mode {
 public:
 	using ruleset_type = arena_mode_ruleset;
@@ -226,6 +236,10 @@ public:
 		const ruleset_type& rules;
 		const cosmos_solvable_significant& clean_round_state;
 		maybe_const_ref_t<C, cosmos> cosm;
+
+		bool is_ranked_server() const {
+			return ::_is_ranked(dynamic_vars);
+		}
 
 		template <bool is_const = C, class = std::enable_if_t<!is_const>>
 		operator basic_input<!is_const>() const {
@@ -281,6 +295,8 @@ public:
 
 	arena_mode_player_stats* stats_of(const mode_player_id&);
 
+	void erase_player(input, logic_step, const mode_player_id&, const bool suspended);
+
 private:
 	struct transferred_inventory {
 		struct item {
@@ -331,7 +347,9 @@ private:
 		const round_transferred_player* = nullptr
 	);
 
+	bool handle_suspended_logic(input, logic_step);
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
+	void mode_solve_paused(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, logic_step);
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
@@ -378,7 +396,7 @@ private:
 	void end_warmup_and_go_live(input, logic_step);
 
 	void execute_player_commands(input, mode_entropy&, logic_step);
-	void add_or_remove_players(input, const mode_entropy&, logic_step);
+	bool add_or_remove_players(input, const mode_entropy&, logic_step);
 	void handle_special_commands(input, const mode_entropy&, logic_step);
 	void spawn_characters_for_recently_assigned(input, logic_step);
 	void spawn_and_kick_bots(input, logic_step);
@@ -417,6 +435,8 @@ private:
 	uint8_t spawn_reshuffle_counter = 0;
 
 	std::map<mode_player_id, player_type> players;
+	std::unordered_map<mode_player_id, player_type> suspended_players;
+
 	arena_mode_round_state current_round;
 
 	augs::stepped_clock clock_before_setup;
@@ -439,6 +459,7 @@ private:
 	entity_id bomb_detonation_theme;
 
 	ranked_state_type ranked_state = ranked_state_type::NONE;
+	float unfreezing_match_in_secs = -1.0f;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -493,6 +514,7 @@ public:
 	player_type* find(const mode_player_id&);
 	const player_entry_type* find_player_by(const client_nickname_type& nickname) const;
 	const player_type* find(const mode_player_id&) const;
+	const player_type* find_suspended(const mode_player_id&) const;
 
 	const player_type* find(const session_id_type&) const;
 	mode_player_id lookup(const session_id_type&) const;
@@ -505,12 +527,18 @@ public:
 
 	mode_player_id find_best_player_in(faction_type) const;
 
+	void notify_ranked_banned(
+		const mode_player_id& id_when_suspended,
+		const client_nickname_type& nickname,
+		const_logic_step
+	);
+
 	template <class C>
 	decltype(auto) advance(
 		const input in, 
 		mode_entropy entropy, 
 		C callbacks,
-		const solve_settings settings
+		solve_settings settings
 	) {
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
@@ -518,12 +546,26 @@ public:
 			step_input, 
 			solver_callbacks(
 				[&](const logic_step step) {
-					callbacks.pre_solve(step);
-					mode_pre_solve(in, entropy, step);
-					execute_player_commands(in, entropy, step);
+					settings.pause_simulation = handle_suspended_logic(in, step);
+
+					if (settings.pause_simulation) {
+						/*
+							Will just handle rejoins and additional suspensions should they happen.
+						*/
+
+						mode_solve_paused(in, entropy, step);
+					}
+					else {
+						callbacks.pre_solve(step);
+						mode_pre_solve(in, entropy, step);
+						execute_player_commands(in, entropy, step);
+					}
 				},
 				[&](const logic_step step) {
-					mode_post_solve(in, entropy, step);
+					if (!settings.pause_simulation) {
+						mode_post_solve(in, entropy, step);
+					}
+
 					callbacks.post_solve(const_logic_step(step));
 				},
 				callbacks.post_cleanup
@@ -653,4 +695,15 @@ public:
 	bool teams_viable_for_match(const_input) const;
 
 	float get_warmup_seconds(const const_input in) const;
+
+	bool last_summary_already(const const_input in) const;
+
+	bool is_ranked_live() const;
+
+	const auto& get_suspended_players() const {
+		return suspended_players;
+	}
+	bool should_suspend_instead_of_remove(const const_input in) const;
+	float find_suspended_time_left(const const_input in) const;
+	float get_match_unfreezes_in_secs() const;
 };

@@ -56,6 +56,38 @@ data_living_one_step& standard_solver::get_thread_local_queues() {
 void standard_solve(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	auto& performance = cosm.profiler;
+
+	const bool pause_simulation = step.get_settings().pause_simulation;
+
+	auto input_and_intents_pass = [&]() {
+		input_system().make_input_messages(step);
+
+		intent_contextualization_system().contextualize_crosshair_action_intents(step);
+		intent_contextualization_system().contextualize_movement_intents(step);
+
+		intent_contextualization_system().handle_use_button_presses(step);
+	};
+
+	if (pause_simulation) {
+		auto logic_scope = measure_scope(performance.logic);
+
+		/*
+			Only handle inputs.
+		*/
+
+		input_and_intents_pass();
+
+		{
+			auto scope = measure_scope(performance.movement);
+			movement_system().set_movement_flags_from_input(step);
+		}
+
+		crosshair_system().handle_crosshair_intents(step);
+		crosshair_system().update_base_offsets(step);
+
+		return;
+	}
+
 	auto& global = cosm.get_global_solvable();
 
 #if STRESS_TEST_REINFERENCES
@@ -125,12 +157,8 @@ void standard_solve(const logic_step step) {
 
 	sentience_system().cast_spells(step);
 
-	input_system().make_input_messages(step);
+	input_and_intents_pass();
 
-	intent_contextualization_system().contextualize_crosshair_action_intents(step);
-	intent_contextualization_system().contextualize_movement_intents(step);
-
-	intent_contextualization_system().handle_use_button_presses(step);
 	intent_contextualization_system().advance_use_interactions(step);
 
 	{
@@ -267,4 +295,6 @@ void standard_solve(const logic_step step) {
 	(void)queued_at_end_num;
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
+
+	cosmic::increment_step(cosm);
 }

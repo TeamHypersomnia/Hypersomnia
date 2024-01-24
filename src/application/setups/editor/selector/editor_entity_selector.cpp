@@ -280,7 +280,7 @@ void editor_entity_selector::do_mousemotion(
 	vis.clear();
 
 	auto is_selectable = [](auto handle) {
-		return handle.when_born().step == 1;
+		return handle.when_born().step == 0;
 	};
 
 	if (rectangular_drag_origin.has_value()) {
@@ -394,7 +394,7 @@ entity_id editor_entity_selector::calc_hovered_entity(
 	ids.clear();
 
 	auto is_selectable = [](auto handle) {
-		return handle.when_born().step == 1;
+		return handle.when_born().step == 0;
 	};
 
 	auto add = [&](const auto selected_handle) {

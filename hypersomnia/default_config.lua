@@ -786,11 +786,14 @@ treat_as_music_sounds_longer_than_secs = 5,
       -- ALWAYS will allow asymmetrical teams liks 1v3.
       -- NEVER is the default for casual servers.
       autostart_when = "NEVER", -- "| TEAMS_EQUAL | SERVER_FULL | SERVER_FULL_EQUAL_TEAMS | ALWAYS",
-
       -- Only "NEVER" and "ALWAYS" are implemented right now.
 
       -- The "RANKED COUNTDOWN" timer.
       countdown_time = 81,
+
+      -- Keep this relatively tight so the match can instantly freeze
+      -- in case the game crashes in a critical situation.
+      client_network_timeout_secs = 1,
 
       -- Max: 65535
       rejoin_time_limit = 150,
@@ -803,6 +806,12 @@ treat_as_music_sounds_longer_than_secs = 5,
       -- Max: 255
       max_rejoins = 3,
 
+      -- When all players finally rejoin,
+      -- match will remain frozen for this many more seconds 
+      -- for everyone to get ready.
+      -- Max: 255
+      match_unfreezes_in_secs = 5,
+
       -- Freeze the entire game completely if a client disconnects.
       -- This could be due to a game crash or network failure.
       --
@@ -812,8 +821,12 @@ treat_as_music_sounds_longer_than_secs = 5,
       -- THe characters will end up with their buttons released (except Use button).
       -- The match will resume once all players are back.
       -- Use for tournaments between trusted friends only.
-      freeze_match_on_disconnect = false
+      -- "false" option IS NOT SUPPORTED YET!!!
+      freeze_match_on_disconnect = true
     },
+
+    -- For unranked games, can be reasonably high.
+    client_network_timeout_secs = 5,
 
     arena = "de_cyberaqua",
     game_mode = "",
@@ -855,7 +868,6 @@ treat_as_music_sounds_longer_than_secs = 5,
     sleep_mult = 0.1,
     log_performance_once_every_secs = 0,
 
-    kick_if_no_network_payloads_for_secs = 10,
     move_to_spectators_if_afk_for_secs = 120,
     kick_if_afk_for_secs = 2 * 3600,
     time_limit_to_enter_game_since_connection = 15,
