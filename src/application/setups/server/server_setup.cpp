@@ -376,18 +376,64 @@ void server_setup::log_match_end_json(const messages::match_summary_message& sum
 	LOG("SERVER_EVENT match_end: %x", augs::to_json_string_nopretty(end));
 }
 
+void server_setup::lock_ranked_roster_if_started(const const_logic_step step) {
+	const auto& notifications = step.get_queue<messages::mode_notification>();
+
+	for (const auto& n : notifications) {
+		using J = messages::no_arg_mode_notification;
+
+		if (n.payload == decltype(n.payload)(J::RANKED_STARTED)) {
+			/*
+				Lock in the game id to account id mappings.
+				We'll need them later to make a proper match report for the database endpoint.
+			*/
+
+			get_arena_handle().on_mode(
+				[&](auto& mode) {
+					mode.for_each_player(
+						[&](auto, auto& player) {
+							player.server_ranked_account_id.clear();
+
+							return callback_result::CONTINUE;
+						}
+					);
+
+					for_each_id_and_client(
+						[&](const auto& cid, const auto& c) {
+							if (auto entry = mode.find(to_mode_player_id(cid))) {
+								/*
+									Should always be set since ranked won't start
+									unless everyone is authenticated.
+								*/
+
+								ensure(c.is_authenticated());
+
+								entry->server_ranked_account_id = c.authenticated_id;
+							}
+							else {
+								/* Didn't make it in time, will be kicked in the next step. */
+							}
+						},
+						only_connected_v
+					);
+				}
+			);
+		}
+	}
+}
+
 void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::mode_notification>();
 
 	for (const auto& n : notifications) {
 		using J = messages::joined_or_left;
 
-		if (std::holds_alternative<J>(n.payload) && std::get<J>(n.payload) == J::RANKED_BANNED) {
-			const auto message = typesafe_sprintf("%x got banned for leaving the ranked match.", n.subject_name);
+		if (n.payload == decltype(n.payload)(J::RANKED_BANNED)) {
+			const auto message = typesafe_sprintf("%x ABANDONED the ranked match with a penalty.", n.subject_name);
 
 			broadcast_info(message, chat_target_type::INFO_CRITICAL);
 
-			const auto id_to_ban = key_or_default(suspended_clients_by_account, n.subject_mode_id);
+			const auto id_to_ban = n.subject_account_id;
 
 #if !IS_PRODUCTION_BUILD
 			ensure(!id_to_ban.empty());
@@ -400,26 +446,7 @@ void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
 	}
 }
 
-void server_setup::purge_expired_suspended_player_info() {
-	if (suspended_clients_by_account.empty()) {
-		return;
-	}
-
-	get_arena_handle().on_mode(
-		[&](const auto& mode) {
-			erase_if(
-				suspended_clients_by_account,
-				[&mode](const auto& suspended_entry) {
-					return nullptr == mode.find_suspended(suspended_entry.second);
-				}
-			);
-		}
-	);
-}
-
 void server_setup::default_server_post_solve(const const_logic_step step) {
-	purge_expired_suspended_player_info();
-
 	{
 		const auto& match_starts = step.get_queue<messages::team_match_start_message>();
 
@@ -852,7 +879,7 @@ void server_setup::finalize_webhook_jobs() {
 						break;
 
 					case job_type::AUTH: {
-#if 0
+#if IS_PRODUCTION_BUILD
 						const auto new_id = webhook_result;
 #else
 						/*
@@ -1674,8 +1701,6 @@ void server_setup::rechoose_arena() {
 	arena_gui.reset();
 	arena_gui.choose_team.show = ::is_spectator(arena, get_local_player_id());
 
-	suspended_clients_by_account.clear();
-
 	integrated_client_gui.rcon.show = false;
 
 	if (should_have_admin_character()) {
@@ -1719,26 +1744,6 @@ void server_setup::init_client(const client_id_type& id) {
 
 void server_setup::unset_client(const client_id_type& id) {
 	LOG("Client disconnected. Details:\n%x", describe_client(id));
-
-	const bool will_be_suspended = get_arena_handle().on_mode_with_input(
-		[&](const auto& mode, const auto& in) {
-			return mode.should_suspend_instead_of_remove(in) && mode.find(to_mode_player_id(id));
-		}
-	);
-
-	if (will_be_suspended) {
-		if (clients[id].is_authenticated()) {
-			const auto account_id = clients[id].authenticated_id;
-
-			LOG("Suspending %x (client id: %x)", account_id, id);
-
-			suspended_clients_by_account[account_id] = to_mode_player_id(id);
-		}
-		else {
-			LOG("WARNING! Unauthenticated client during ranked!");
-		}
-	}
-
 	clients[id].unset();
 }
 
@@ -1892,9 +1897,8 @@ void server_setup::advance_clients_state() {
 				}
 
 				const bool wrong_id = 
-					is_ranked_waiting_for_reconnect() && 
 					c.is_authenticated() && 
-					!found_in(suspended_clients_by_account, c.authenticated_id)
+					has_suspended_players() && !is_currently_suspended(c.authenticated_id)
 				;
 
 				if (wrong_id) {
@@ -2029,8 +2033,8 @@ void server_setup::advance_clients_state() {
 
 			mode_player_id migrate_from_id;
 
-			if (const auto m = mapped_or_nullptr(suspended_clients_by_account, c.authenticated_id)) {
-				migrate_from_id = *m;
+			if (const auto suspended_player = find_suspended_player_id(c.authenticated_id); suspended_player.is_set()) {
+				migrate_from_id = suspended_player;
 			}
 
 			cmd.added_player = add_player_input {
@@ -2042,8 +2046,6 @@ void server_setup::advance_clients_state() {
 
 			local_collected.control(cmd);
 			added_someone_already = true;
-
-			suspended_clients_by_account.erase(c.authenticated_id);
 
 			return true;
 		};
@@ -2093,17 +2095,12 @@ void server_setup::advance_clients_state() {
 				if (!player_added_to_mode(mode_id)) {
 					const bool auth_requirement_fulfilled = [&]() {
 						if (is_ranked_live()) {
-							if (is_ranked_waiting_for_reconnect()) {
-								/* 
-									Only add if it's one of the disconnected players.
-									If it's empty, it will be kicked eventually.
-								*/
+							/* 
+								Only add if it's one of the disconnected players.
+								If id is empty, this client will be kicked eventually.
+							*/
 
-								return found_in(suspended_clients_by_account, c.authenticated_id);
-							}
-							else {
-								return false;
-							}
+							return is_currently_suspended(c.authenticated_id); 
 						}
 
 						return true;
@@ -3398,8 +3395,28 @@ bool server_setup::is_connection_request_packet(
 	return static_cast<uint8_t>(packet_buffer[0]) == NETCODE_CONNECTION_REQUEST_PACKET;
 }
 
-bool server_setup::is_ranked_waiting_for_reconnect() const {
-	return suspended_clients_by_account.size() > 0;
+std::size_t server_setup::num_suspended_players() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.num_suspended_players();
+		}
+	);
+}
+
+bool server_setup::is_currently_suspended(std::string account_id) const {
+	return find_suspended_player_id(account_id) != mode_player_id::dead();
+}
+
+mode_player_id server_setup::find_suspended_player_id(std::string account_id) const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.find_suspended_player_id(account_id);
+		}
+	);
+}
+
+bool server_setup::has_suspended_players() const {
+	return num_suspended_players() > 0;
 }
 
 bool server_setup::is_ranked_live() const {
@@ -3420,7 +3437,7 @@ bool server_setup::is_ranked_live_or_starting() const {
 
 bool server_setup::is_joinable() const {
 	if (is_ranked_live_or_starting()) {
-		return is_ranked_waiting_for_reconnect();
+		return has_suspended_players();
 	}
 
 	return true;

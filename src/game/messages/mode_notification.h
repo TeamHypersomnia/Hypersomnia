@@ -22,11 +22,14 @@ namespace messages {
 	struct faction_choice {
 		faction_choice_result result = faction_choice_result::FAILED;
 		faction_type target_faction = faction_type::DEFAULT;
+
+		bool operator==(const faction_choice& b) const = default;
 	};
 
 	struct mode_notification {
 		mode_player_id subject_mode_id;
 		std::string subject_name;
+		std::string subject_account_id;
 		std::variant<faction_choice, joined_or_left, no_arg_mode_notification> payload;
 	};
 }

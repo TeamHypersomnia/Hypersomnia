@@ -92,6 +92,9 @@ struct test_mode_player {
 	bool allow_respawn = true;
 	// END GEN INTROSPECTOR
 
+	/* Dummy field for compatibility */
+	std::string server_ranked_account_id;
+
 	auto should_hide_in_scoreboard() const {
 		return hide_in_scoreboard;
 	}
@@ -225,6 +228,15 @@ public:
 	mode_player_id lookup(const session_id_type&) const;
 
 	template <class F>
+	void for_each_player(F callback) {
+		for (auto& p : players) {
+			if (callback(p.first, p.second) == callback_result::ABORT) {
+				return;
+			}
+		}
+	}
+
+	template <class F>
 	void for_each_player_id(F callback) const {
 		for (const auto& p : players) {
 			if (callback(p.first) == callback_result::ABORT) {
@@ -282,5 +294,13 @@ public:
 
 	bool should_suspend_instead_of_remove(const_input) const {
 		return false;
+	}
+
+	std::size_t num_suspended_players() const {
+		return 0;
+	};
+
+	mode_player_id find_suspended_player_id(const std::string&) const {
+		return mode_player_id::dead();
 	}
 };

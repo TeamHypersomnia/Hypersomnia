@@ -153,6 +153,14 @@ struct arena_mode_player {
 	uint16_t times_suspended = 0;
 	// END GEN INTROSPECTOR
 
+	/*
+		Helper struct only used by the server -
+		won't be synchronized to clients since it doesn't influence
+		the deterministic simulation.
+	*/
+
+	std::string server_ranked_account_id;
+
 	arena_mode_player(const client_nickname_type& nickname = {}) {
 		session.nickname = nickname;
 	}
@@ -436,6 +444,7 @@ private:
 
 	std::map<mode_player_id, player_type> players;
 	std::unordered_map<mode_player_id, player_type> suspended_players;
+	std::unordered_map<mode_player_id, player_type> abandoned_players;
 
 	arena_mode_round_state current_round;
 
@@ -646,6 +655,15 @@ public:
 		}
 	}
 
+	template <class F>
+	void for_each_player(F callback) {
+		for (auto& p : players) {
+			if (callback(p.first, p.second) == callback_result::ABORT) {
+				return;
+			}
+		}
+	}
+
 	auto get_next_session_id() const {
 		return next_session_id;
 	}
@@ -703,7 +721,14 @@ public:
 	const auto& get_suspended_players() const {
 		return suspended_players;
 	}
+
+	std::size_t num_suspended_players() const {
+		return suspended_players.size();
+	};
+
 	bool should_suspend_instead_of_remove(const const_input in) const;
 	float find_suspended_time_left(const const_input in) const;
 	float get_match_unfreezes_in_secs() const;
+
+	mode_player_id find_suspended_player_id(const std::string& account_id) const;
 };

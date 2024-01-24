@@ -147,7 +147,6 @@ class server_setup :
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
 	uint32_t next_session_id = 0;
-	std::unordered_map<std::string, mode_player_id> suspended_clients_by_account;
 
 	server_client_state integrated_client;
 
@@ -235,7 +234,10 @@ class server_setup :
 	bool check_for_updates_once = false;
 	bool write_vars_to_disk_once = false;
 
-	void purge_expired_suspended_player_info();
+	std::size_t num_suspended_players() const;
+
+	bool is_currently_suspended(std::string account_id) const;
+	mode_player_id find_suspended_player_id(std::string account_id) const;
 
 public:
 	net_time_t last_logged_at = 0;
@@ -502,6 +504,7 @@ public:
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
 						ban_players_who_left_for_good(step);
+						lock_ranked_roster_if_started(step);
 
 						{
 							auto& notifications = step.get_queue<messages::mode_notification>();
@@ -712,6 +715,7 @@ public:
 
 	void default_server_post_solve(const const_logic_step step);
 	void ban_players_who_left_for_good(const const_logic_step step);
+	void lock_ranked_roster_if_started(const const_logic_step step);
 
 	void log_match_end_json(const messages::match_summary_message&);
 	void log_match_start_json(const messages::team_match_start_message&);
@@ -745,7 +749,7 @@ public:
 	bool is_joinable() const;
 	bool is_ranked_live() const;
 	bool is_ranked_live_or_starting() const;
-	bool is_ranked_waiting_for_reconnect() const;
+	bool has_suspended_players() const;
 
 	bool is_connection_request_packet(
 		const netcode_address_t& from,

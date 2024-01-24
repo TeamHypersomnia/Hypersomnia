@@ -489,11 +489,15 @@ void arena_mode::notify_ranked_banned(
 	const client_nickname_type& nickname,
 	const const_logic_step step
 ) {
+	const auto& banned_player = suspended_players.at(id_when_suspended);
+	abandoned_players[id_when_suspended] = banned_player;
+
 	messages::mode_notification notification;
 
 	notification.subject_mode_id = id_when_suspended;
 	notification.subject_name = nickname,
 	notification.payload = messages::joined_or_left::RANKED_BANNED;
+	notification.subject_account_id = banned_player.server_ranked_account_id;
 
 	step.post_message(std::move(notification));
 }
@@ -2395,7 +2399,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					});
 				}
 				else if constexpr(std::is_same_v<C, team_choice>) {
-					if (get_ranked_state() == ranked_state_type::LIVE) {
+					if (is_ranked_live()) {
 						return;
 					}
 
@@ -2490,6 +2494,10 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					const auto final_faction = player_data->get_faction();
 
 					if (result == faction_choice_result::CHANGED) {
+						if (in.is_ranked_server()) {
+							should_restart = true;
+						}
+
 						/* 
 							Note: moving to AFK is also implemented in terms of mode_commands::team choice,
 							so in practice, there are no more ways to defect the duel.
@@ -2514,10 +2522,6 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					notification.payload = choice;
 
 					step.post_message(std::move(notification));
-
-					if (get_ranked_state() == ranked_state_type::STARTING) {
-						should_restart = true;
-					}
 				}
 				else {
 					static_assert(always_false_v<C>, "Non-exhaustive std::visit");
@@ -2902,6 +2906,16 @@ void arena_mode::check_duel_of_honor(const input_type in, const logic_step step)
 	}
 }
 
+mode_player_id arena_mode::find_suspended_player_id(const std::string& account_id) const {
+	for (auto& s : suspended_players) {
+		if (s.second.server_ranked_account_id == account_id) {
+			return s.first;
+		}
+	}
+
+	return mode_player_id::dead();
+}
+
 float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars) const {
 	return std::max(0.0f, vars.rejoin_time_limit - total_time_suspended);
 }
@@ -2926,9 +2940,10 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 
 		if (p.second.unset_inputs_once) {
 			p.second.unset_inputs_once = false;
-			const auto character = step.get_cosmos()[p.second.controlled_character_id];
 
-			unset_input_flags_of_orphaned_entity(character);
+			if (const auto character = step.get_cosmos()[p.second.controlled_character_id]) {
+				unset_input_flags_of_orphaned_entity(character);
+			}
 		}
 
 		if (p.second.suspend_limit_exceeded(in.dynamic_vars.ranked)) {
@@ -3568,6 +3583,7 @@ const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nic
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
 	suspended_players.clear();
+	abandoned_players.clear();
 
 	ranked_state = ranked_state_type::NONE;
 
