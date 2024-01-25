@@ -1,13 +1,11 @@
 #pragma once
 
 namespace ranked_webhooks {
-	template <class F>
 	inline std::string json_report_match(
 		const std::string& server_name,
 		const std::string& arena,
 		const std::string& game_mode,
-		const messages::match_summary_message& info,
-		F&& mode_id_to_account_id
+		const messages::match_summary_message& info
 	) {
 		using namespace rapidjson;
 
@@ -31,16 +29,23 @@ namespace ranked_webhooks {
 		writer.Key("lose_score");
 		writer.Int(info.second_team_score);
 
-		writer.Key("nicknames");
+		writer.Key("player_infos");
 
 		{
 			writer.StartObject();
 
 			auto write_faction = [&](const auto& faction) {
 				for (const auto& f : faction) {
-					const auto id = mode_id_to_account_id(f.id);
-					writer.Key(id.c_str());
-					writer.String(f.nickname.c_str());
+					writer.Key(f.account_id);
+
+					{
+						writer.StartObject();
+						writer.Key("nickname");
+						writer.String(f.nickname.c_str());
+						writer.Key("abandoned");
+						writer.Bool(f.abandoned);
+						writer.EndObject();
+					}
 				}
 			};
 
@@ -54,8 +59,7 @@ namespace ranked_webhooks {
 			writer.StartArray();
 
 			for (const auto& f : faction) {
-				const auto id = mode_id_to_account_id(f.id);
-				writer.String(id.c_str());
+				writer.String(f.account_id.c_str());
 			}
 
 			writer.EndArray();

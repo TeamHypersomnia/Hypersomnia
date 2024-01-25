@@ -180,6 +180,6 @@ struct server_private_vars {
 
 	std::string report_ranked_match_api_key = "";
 	std::string report_ranked_match_url = "https://hypersomnia.xyz/report_match";
-	std::string check_ban_endpoint = "https://hypersomnia.xyz/check_ban";
+	std::string check_ban_url = "https://hypersomnia.xyz/check_ban";
 	// END GEN INTROSPECTOR
 };

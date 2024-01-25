@@ -64,8 +64,6 @@ namespace messages {
 
 	struct match_summary_message {
 		struct player_entry {
-			mode_player_id id;
-
 			int kills = 0;
 			int assists = 0;
 			int deaths = 0;
@@ -73,6 +71,7 @@ namespace messages {
 			int score = 0;
 
 			std::string nickname;
+			std::string account_id;
 
 			bool abandoned = false;
 		};

@@ -669,23 +669,8 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		const auto json_body = ranked_webhooks::json_report_match(
 			server_name,
 			get_current_arena_name(),
-			vars.game_mode,
-			summary,
-			[&](const mode_player_id& mode_id) -> std::string {
-				if (const auto state = find_client_state(mode_id)) {
-					if (state->is_authenticated()) {
-						return state->authenticated_id;
-					}
-					else {
-						LOG("COULDN'T GET ACCOUNT ID FOR %x!!! UNAUTHENTICATED!", state->get_nickname());
-					}
-				}
-				else {
-					LOG("COULDN'T GET ACCOUNT ID FOR %x!!!", mode_id.value);
-				}
-
-				return "ERROR_UNKNOWN_ID";
-			}
+			get_current_game_mode_name(),
+			summary
 		);
 
 		LOG("Match report JSON: %x", json_body);
@@ -913,7 +898,7 @@ void server_setup::finalize_webhook_jobs() {
 							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
 						}
 
-						if (private_vars.check_ban_endpoint.empty()) {
+						if (private_vars.check_ban_url.empty()) {
 							client->verified_has_no_ban = true;
 						}
 						else {
@@ -1092,6 +1077,14 @@ void server_setup::send_tell_me_my_address() {
 	server->send_udp_packet(destination_address, bytes.data(), bytes.size());
 }
 
+game_mode_name_type server_setup::get_current_game_mode_name() const {
+	return get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& input) {
+			return mode.get_name(input);
+		}
+	);
+}
+
 void server_setup::send_heartbeat_to_server_list() {
 	ensure(resolved_server_list_addr.has_value());
 
@@ -1109,11 +1102,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.is_ranked_server = vars.ranked.autostart_when != ranked_autostart_type::NEVER;
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
-	heartbeat.game_mode = arena.on_mode_with_input(
-		[&](const auto& mode, const auto& input) {
-			return mode.get_name(input);
-		}
-	);
+	heartbeat.game_mode = get_current_game_mode_name();
 
 	heartbeat.suppress_new_community_server_webhook = 
 		suppress_community_server_webhook_this_run ||

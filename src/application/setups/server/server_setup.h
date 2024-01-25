@@ -226,8 +226,10 @@ class server_setup :
 	void push_connected_webhook(mode_player_id);
 	void push_duel_of_honor_webhook(const std::string& first, const std::string& second);
 	void push_match_summary_webhook(const messages::match_summary_message& summary);
-	void push_report_match_webhook(const messages::match_summary_message& summary);
 	void push_duel_interrupted_webhook(const messages::duel_interrupted_message& summary);
+
+	void push_report_match_webhook(const messages::match_summary_message& summary);
+
 	std::string get_next_duel_pic_link();
 
 	void check_for_updates();
@@ -712,6 +714,7 @@ public:
 
 	const server_name_type& get_server_name() const;
 	std::string get_current_arena_name() const;
+	game_mode_name_type get_current_game_mode_name() const;
 
 	void default_server_post_solve(const const_logic_step step);
 	void ban_players_who_left_for_good(const const_logic_step step);

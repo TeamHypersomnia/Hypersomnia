@@ -2767,16 +2767,30 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	const auto first_team  = tied ? p.defusing  : *result.winner;
 	const auto second_team = tied ? p.bombing   : *result.loser;
 
-	auto make_entry = [](const mode_player_id id, const auto& player) {
-		messages::match_summary_message::player_entry new_entry;
+	const auto sorted_abandoned_nonspectating = [&]() {
+		std::vector<std::pair<arena_mode_player, mode_player_id>> out;
 
-		new_entry.id = id;
+		for (const auto& s : abandoned_players) {
+			if (s.second.get_faction() != faction_type::SPECTATOR) {
+				out.emplace_back(s.second, s.first);
+			}
+		}
+
+		sort_range(out);
+
+		return out;
+	}();
+
+	auto make_entry = [](const mode_player_id, const auto& player, const bool abandoned = false) {
+		messages::match_summary_message::player_entry new_entry;
 
 		new_entry.kills = player.stats.knockouts;
 		new_entry.assists = player.stats.assists;
 		new_entry.deaths = player.stats.deaths;
 		new_entry.nickname = player.get_nickname();
 		new_entry.score = player.stats.calc_score();
+		new_entry.account_id = player.server_ranked_account_id;
+		new_entry.abandoned = abandoned;
 
 		return new_entry;
 	};
@@ -2790,6 +2804,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 				summary.first_faction.emplace_back(make_entry(id, player));
 			}
 		);
+
+		for (auto& s : sorted_abandoned_nonspectating) {
+			summary.first_faction.emplace_back(make_entry(s.second, s.first, true));
+		}
 
 		if (summary.first_faction.size() > 1) {
 			/*
@@ -2812,44 +2830,50 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.first_team_score = result.winner_score;
 	summary.second_team_score = result.loser_score;
 
-	for_each_player_best_to_worst_in(
-		first_team,
-		[&](const auto& id, const auto& player) {
-			if (strongest_in_first == mode_player_id::dead()) {
-				strongest_in_first = id;
-			}
-
-			summary.first_faction.emplace_back(make_entry(id, player));
+	auto add_to_first = [&](const auto& id, const auto& player) {
+		if (strongest_in_first == mode_player_id::dead()) {
+			strongest_in_first = id;
 		}
-	);
 
-	for_each_player_best_to_worst_in(
-		second_team,
-		[&](const auto& id, const auto& player) {
-			if (strongest_in_second == mode_player_id::dead()) {
-				strongest_in_second = id;
-			}
+		summary.first_faction.emplace_back(make_entry(id, player));
+	};
 
-			summary.second_faction.emplace_back(make_entry(id, player));
+	auto add_to_second = [&](const auto& id, const auto& player) {
+		if (strongest_in_second == mode_player_id::dead()) {
+			strongest_in_second = id;
 		}
-	);
+
+		summary.second_faction.emplace_back(make_entry(id, player));
+	};
+
+	for_each_player_best_to_worst_in(first_team, add_to_first);
+	for_each_player_best_to_worst_in(second_team, add_to_second);
+
+	for (const auto& s : sorted_abandoned_nonspectating) {
+		if (s.first.get_faction() == first_team) {
+			summary.first_faction.emplace_back(make_entry(s.second, s.first, true));
+		}
+
+		if (s.first.get_faction() == second_team) {
+			summary.second_faction.emplace_back(make_entry(s.second, s.first, true));
+		}
+	}
 
 	auto strongest_1 = find(strongest_in_first);
 	auto strongest_2 = find(strongest_in_second);
 
-	if (strongest_1 == nullptr || strongest_2 == nullptr) {
-		LOG("There are no opposing players. No match summary to be reported");
+	if (strongest_1 && strongest_2) {
+		const auto stronger_of_the_two = (*strongest_1 < *strongest_2) ? strongest_in_first : strongest_in_second;
+		summary.mvp_player_id = result.is_tie() ? stronger_of_the_two : strongest_in_first;
 
-		return;
-	}
+		if (result.is_tie() && stronger_of_the_two == strongest_in_second) {
+			/* 
+				Note this doesn't matter for a ranked.
+				Flip teams so that the first is where the mvp is
+			*/
 
-	// Note it's LESS because stronger come first
-	const auto stronger_of_the_two = (*strongest_1 < *strongest_2) ? strongest_in_first : strongest_in_second;
-	summary.mvp_player_id = result.is_tie() ? stronger_of_the_two : strongest_in_first;
-
-	if (stronger_of_the_two == strongest_in_second) {
-		// Flip teams so that the first is where the mvp is
-		summary.flip_teams();
+			summary.flip_teams();
+		}
 	}
 
 	step.post_message(summary);
