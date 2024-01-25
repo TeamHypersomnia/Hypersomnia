@@ -6,48 +6,54 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- lock in rosters with vector of pairs i guess,session to faction
-    - are there any cases we forgot?
-    - just force disable adding/removing in the mode 
-        - although nothing will be added in the server client logic as it checks for it
+- Triggering abandon cases
+    - When all enemies banned
+    - FFA abandon
+        - easy, just when only one player remains, use ranking by level when they abandoned
+            - just have to save this info somehow
+    - Actually we have to save player info in bomb defusal too
+
+- If interrupted when <= 4 rounds played, don't count wins 
+- If absent when ended, don't count win but count a worst-case loss (3x lost)
+
+- Post ranked deplyoment
+    - #if 0 in server setup
+    - Remove test id replacement to match nick for testing
+    - && is_ranked_server in find best ranked
+    - default_config.lua: uncomment check_ban_url = "https://hypersomnia.xyz/check_ban"
+    - multiple api keys, one per official server
+    - disable "Play ranked" button in non-steam clients
+    - Look at "TODO_RANKED"
+
+
+- make defuse not require holding so it's less abusable by suspends
+    - and if defusing, always restore the mouse no matter what
+
+- POST-CRASH REJOINING: Create a 'user/ranked.json' file whenever a match starts
+    - Should just spawn a modal that overrides the crash notification modal
+    - But when to delete it?
+        - match summary
+        - abandon button in the modal
+
+- While quit to menu/alt f4 should technically abandon match right away to force people to at least disconnect the network cable/kill process to abuse it, it's still a useful mechanic when we want to pause for any reason
+    - we should just implement a /pee command that'll count suspension without the disconnect
+
+- fix tick playing once in the beginning
+- maybe lock mouse cursor if someone has u
+    - Or just restore the cursor - easier and more comfortable
+    - Maybe we should do it for all
+    - If you back up on suspend, only back up if unsuspended already
+        - cause it might overwrite backup and then there'd be a surprise
+    - Maybe don't overwrite base crosshair after all? tho backup is not much of a problem
+
+- We could have nickname-based authorization for integrated servers without a steam api who want to run a "ranked" mode
+    - Will be hella useful for offline tournaments
 
 - Check bans asynchronously on connect
     - Restart the match if you kick because of a ban
-
 - on ranked start and just restart the match inconsequentially
 
-- Post ranked deplyoment
-    - Remove test id replacement to match nick for testing
-    - && is_ranked in find best ranked
-    - default_config.lua: uncomment check_ban_endpoint = "https://hypersomnia.xyz/check_ban"
-
 - color wave "ranked" for server list entries
-
-- if match ends when someone is disconnected, count him as connected if it's within rejoin time limit
-    - to avoid corner cases where someone crashes near the end of the match despite good intentions
-
-- might leave it at "quick play" so that "browse servers" doesnt sound like its unranked
-
-- unjoinable: fix max players for server browser
-
-- Syncing non-state settings like crosshair settings, steam auth id etc
-    - Server must send it before rebroadcasting entropy so everyone knows how to unpack entropies
-    - We can't reset it to default when new player info arrives
-        - But we can reset it on disconnect
-
-- Best if the whole freeze logic is deterministic state
-    - Just react to remove_player
-    - And have counters how many each of them is allowed to disconnect
-
-- As steam auth is external we have to sync it with messages
-    - And at least keep "authorized" bool per player if not the full id
-
-- Watch out for handling idle matches when offline
-    - Take care only to report when ranked is initialized and not when server is non-empty as there might still be 1 player idling
-
-- Nerf haste for rankeds
-- If interrupted when <= 4 rounds played, don't count wins 
-- If absent when ended, don't count win but count a loss
 
 - note a match freeze could occur during a sensitive moment like bomb defusing
     - We might make defusing a toggle later to avoid accidents
@@ -55,59 +61,13 @@ summary: That which we are brainstorming at the moment.
     - Though we could skip freezing if the character who disconnected is dead
     - Right now let's only implement freezing on the next round
 
-- Rankeds
-    - Should start **whenever there's >=2 players.**
-        - Why?
-            - This is the most flexible:
-                - People might connect in any configuration.
-                - The most often will be 1v1.
-                - But sometimes a third person might connect mid-way, and we don't want to leave them alone when countdown is still ongoing.
-                - We'd also have to otherwise prioritize e.g. 1v1 servers first so people aren't left with a non-full server despite having a 1v1 or 2v2 setup ready.
-    - There needs to be a 5-10 sec period where you can accept the current team configuration
-        - Actually do we need this if we restart the countdown every time composition changes?
-            - So you can't trick someone in the last moment
-        - Just have 5 seconds during which you can still disconnect without consequence
-            - this is the "Match starting in..." stage
-
-        - At this point server becomes unjoinable
-        - Should be impossible to restart match through rcon or any other way
-        - just have a bool in arena mode for ranked behaviors override
-    - Why not treat Warmup as ranked countdown?
-    - Type /ready to skip warmup
-        - Should work for everything too
-    - Anytime someone changes team warmup timer resets
-
-    - When server is full allow changing teams without limit
-    - Server will send ranked messages:
-        - Countdown ranked
-            - This is only informational for clients but will sit in the state and will be decremented.
-            - In case a mode is changed and this is reverted to -1, the server will detect a ranked again.
-        - Cancel ranked
-            - In case team composition changes
-        - Start ranked
-
 
 - Let's save all matches to the database just in case we later want to analyze the data
-
-- round mmr numbers to e.g. 2 decimals
 
 - Add gamer role to discord to be pinged by server-monitor
     - only new server/connect notifs
 
-
 - Editor: copy path to clipboard
-
-- Ranked matches (w/o matchmaking yet)
-    - Just have servers with 2, 4 slots etc.
-    - Ranked only starts when the server gets full
-        - This way it's automatically hidden from Quick play feature
-    - What about non-steam players who connect?
-        - Won't really be many these days
-        - Tbh we might just host 1-2 servers with [Casual] and disallow non-steam clients on the ranked ones
-        - Will later be able to login through discord
-            - Btw can't the C++ discord api authenticate for us? Without having to do oauth
-        
-
 
 
 - zbudowalbym gierke z address sanitizerem

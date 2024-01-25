@@ -694,3 +694,7 @@ summary: Just a hidden scratchpad.
                 - server2.force.lua (all can be next to config.force.lua)
                 - etc.
             - Otherwise they'll all just read from .config/Hypersomnia or local folder
+
+- if match ends when someone is disconnected, count him as connected if it's within rejoin time limit
+    - to avoid corner cases where someone crashes near the end of the match despite good intentions
+

@@ -6729,3 +6729,91 @@ This will discard your redo history."
     - and weapon defaults to something else than launcher
 
 - Disable all rcon commands during ranked
+- unjoinable: fix max players for server browser
+
+- Decrease no message timeout for rankeds to e.g. 1 second
+    - since this is effectively the delay between crashing and disconnecting
+
+- release inputs of the disconnected player since they might've crashed so releases won't register
+
+- Rejoins
+    - The only stat that matters to be preserved is money
+        - but it wont hurt to preserve everything
+    - So we can just have this player entry and not remove it, just mark as inactive and dont create a character
+    - Server needs to reset suspended players on post solve
+
+
+- We don't want to kill/disappear character of the disconnected player 
+    - Since they may reconnect in a sec
+    - Only when we definitely ban them
+
+- lock in rosters with vector of pairs i guess,session to faction
+    - are there any cases we forgot?
+    - just force disable adding/removing in the mode 
+        - although nothing will be added in the server client logic as it checks for it
+
+- Nerf haste for rankeds
+- As steam auth is external we have to sync it with messages
+    - And at least keep "authorized" bool per player if not the full id
+
+- Rankeds
+    - Should start **whenever there's >=2 players.**
+        - Why?
+            - This is the most flexible:
+                - People might connect in any configuration.
+                - The most often will be 1v1.
+                - But sometimes a third person might connect mid-way, and we don't want to leave them alone when countdown is still ongoing.
+                - We'd also have to otherwise prioritize e.g. 1v1 servers first so people aren't left with a non-full server despite having a 1v1 or 2v2 setup ready.
+    - There needs to be a 5-10 sec period where you can accept the current team configuration
+        - Actually do we need this if we restart the countdown every time composition changes?
+            - So you can't trick someone in the last moment
+        - Just have 5 seconds during which you can still disconnect without consequence
+            - this is the "Match starting in..." stage
+
+        - At this point server becomes unjoinable
+        - Should be impossible to restart match through rcon or any other way
+        - just have a bool in arena mode for ranked behaviors override
+    - Why not treat Warmup as ranked countdown?
+    - Type /ready to skip warmup
+        - Should work for everything too
+    - Anytime someone changes team warmup timer resets
+
+    - When server is full allow changing teams without limit
+    - Server will send ranked messages:
+        - Countdown ranked
+            - This is only informational for clients but will sit in the state and will be decremented.
+            - In case a mode is changed and this is reverted to -1, the server will detect a ranked again.
+        - Cancel ranked
+            - In case team composition changes
+        - Start ranked
+
+- Ranked matches (w/o matchmaking yet)
+    - Just have servers with 2, 4 slots etc.
+    - Ranked only starts when the server gets full
+        - This way it's automatically hidden from Quick play feature
+    - What about non-steam players who connect?
+        - Won't really be many these days
+        - Tbh we might just host 1-2 servers with [Casual] and disallow non-steam clients on the ranked ones
+        - Will later be able to login through discord
+            - Btw can't the C++ discord api authenticate for us? Without having to do oauth
+        
+
+- round mmr numbers to e.g. 2 decimals
+
+- Syncing non-state settings like crosshair settings, steam auth id etc
+    - Server must send it before rebroadcasting entropy so everyone knows how to unpack entropies
+    - We can't reset it to default when new player info arrives
+        - But we can reset it on disconnect
+
+- Best if the whole freeze logic is deterministic state
+    - Just react to remove_player
+    - And have counters how many each of them is allowed to disconnect
+
+#include "docs/pages/todo/todo_done.md"
+- Keeping the suspension map might ba source of bugs
+    - What if we change mode suddenly?
+    - Tho that's meant to be impossible during ranked
+
+- watch out for view-side callbacks for removed players
+    - might invalidate some metas?
+    - actually with a separate suspended map it's all good

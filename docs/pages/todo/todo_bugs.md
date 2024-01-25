@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- watch out for changed increment step order as we're now increasing it at the end
+	- esp. portals, editor selector
+
 - fix enemy health bars visible outside of fov
 	- we should just test a point against the visibility polygon no?
 
