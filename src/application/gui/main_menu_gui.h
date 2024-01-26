@@ -15,6 +15,7 @@ using viewing_main_menu_context = viewing_menu_context<main_menu_button_type>;
 
 struct main_menu_gui {
 	bool show = true;
+	bool has_play_ranked_button = false;
 
 	main_menu_context::tree_type tree;
 	main_menu_context::root_type root;
@@ -127,12 +128,20 @@ struct main_menu_gui {
 
 		root.set_menu_buttons_colors(cyan);
 		root.buttons[std::size_t(main_menu_button_type::DOWNLOAD_MAPS)].colorize = green;
-		root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].color_wave = true;
+
+		if (has_play_ranked_button) {
+			root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].color_wave = true;
+		}
+
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {
 			const auto e = static_cast<main_menu_button_type>(i);
 			root.buttons[i].set_complete_caption(format_enum(e));
+		}
+
+		if (!has_play_ranked_button) {
+			root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].set_complete_caption("Quick play");
 		}
 
 		root.buttons[0].is_discord = true;

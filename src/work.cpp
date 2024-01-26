@@ -1746,6 +1746,7 @@ work_result work(
 	};
 
 	auto perform_browse_servers = [&]() {
+		browse_servers_gui.allow_ranked_servers = main_menu_gui.has_play_ranked_button;
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
@@ -1773,7 +1774,7 @@ work_result work(
 	};
 
 	auto perform_start_client_gui = [&](const auto frame_num) {
-		const auto best_server = browse_servers_gui.find_best_ranked();
+		const auto best_server = browse_servers_gui.find_best_server(main_menu_gui.has_play_ranked_button);
 
 		const bool perform_result = start_client_gui.perform(
 			best_server,
@@ -3850,6 +3851,7 @@ work_result work(
 				else {
 					const auto context = create_menu_context(main_menu_gui);
 
+					main_menu_gui.has_play_ranked_button = is_steam_client;
 					main_menu_gui.advance(context, frame_delta);
 
 #if MENU_ART

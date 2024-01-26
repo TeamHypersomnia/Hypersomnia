@@ -96,6 +96,8 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void refresh_custom_connect_strings();
 public:
 
+	bool allow_ranked_servers = false;
+
 	using base = standard_window_mixin<browse_servers_gui_state>;
 	browse_servers_gui_state(const std::string& title);
 	~browse_servers_gui_state();
@@ -110,7 +112,7 @@ public:
 
 	const server_list_entry* find_entry(const client_connect_string& in) const;
 	const server_list_entry* find_best_server() const;
-	const server_list_entry* find_best_ranked() const;
+	const server_list_entry* find_best_server(bool is_ranked) const;
 	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;
