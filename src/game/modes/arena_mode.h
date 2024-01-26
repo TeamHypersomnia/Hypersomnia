@@ -131,6 +131,10 @@ struct arena_mode_player_stats {
 	int level = 0;
 
 	arena_mode_player_round_state round_state;
+
+	float total_time_suspended = 0.0f;
+	uint16_t times_suspended = 0;
+	int abandoned_at_score = -1;
 	// END GEN INTROSPECTOR
 
 	int calc_score() const;
@@ -148,9 +152,6 @@ struct arena_mode_player {
 
 	bool is_bot = false;
 	bool unset_inputs_once = false;
-
-	float total_time_suspended = 0.0f;
-	uint16_t times_suspended = 0;
 	// END GEN INTROSPECTOR
 
 	/*

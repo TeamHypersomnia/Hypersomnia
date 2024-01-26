@@ -490,7 +490,9 @@ void arena_mode::notify_ranked_banned(
 	const const_logic_step step
 ) {
 	const auto& banned_player = suspended_players.at(id_when_suspended);
-	abandoned_players[id_when_suspended] = banned_player;
+	auto& abandoned_player = abandoned_players[id_when_suspended];
+	abandoned_player = banned_player;
+	abandoned_player.stats.abandoned_at_score = get_score(abandoned_player.get_faction());
 
 	messages::mode_notification notification;
 
@@ -505,7 +507,7 @@ void arena_mode::notify_ranked_banned(
 void arena_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
 	auto suspend = [&]() {
 		if (const auto entry = find(id)) {
-			++entry->times_suspended;
+			++entry->stats.times_suspended;
 
 			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked)) {
 				LOG("%x exceeded suspension limits. Kicking right away.", id.value);
@@ -2812,7 +2814,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		return out;
 	}();
 
-	auto make_entry = [](const mode_player_id, const auto& player, const bool abandoned = false) {
+	auto make_entry = [](const mode_player_id, const auto& player) {
 		messages::match_summary_message::player_entry new_entry;
 
 		new_entry.kills = player.stats.knockouts;
@@ -2821,7 +2823,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		new_entry.nickname = player.get_nickname();
 		new_entry.score = player.stats.calc_score();
 		new_entry.account_id = player.server_ranked_account_id;
-		new_entry.abandoned = abandoned;
+		new_entry.abandoned_at_score = player.stats.abandoned_at_score;
 
 		return new_entry;
 	};
@@ -2837,7 +2839,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		);
 
 		for (auto& s : sorted_abandoned_nonspectating) {
-			summary.first_faction.emplace_back(make_entry(s.second, s.first, true));
+			summary.first_faction.emplace_back(make_entry(s.second, s.first));
 		}
 
 		if (summary.first_faction.size() > 1) {
@@ -2882,11 +2884,11 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 
 	for (const auto& s : sorted_abandoned_nonspectating) {
 		if (s.first.get_faction() == first_team) {
-			summary.first_faction.emplace_back(make_entry(s.second, s.first, true));
+			summary.first_faction.emplace_back(make_entry(s.second, s.first));
 		}
 
 		if (s.first.get_faction() == second_team) {
-			summary.second_faction.emplace_back(make_entry(s.second, s.first, true));
+			summary.second_faction.emplace_back(make_entry(s.second, s.first));
 		}
 	}
 
@@ -2972,15 +2974,15 @@ mode_player_id arena_mode::find_suspended_player_id(const std::string& account_i
 }
 
 float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars) const {
-	return std::max(0.0f, vars.rejoin_time_limit - total_time_suspended);
+	return std::max(0.0f, vars.rejoin_time_limit - stats.total_time_suspended);
 }
 
 bool arena_mode_player::suspend_limit_exceeded(const server_ranked_vars& vars) const {
-	if (times_suspended > vars.max_rejoins) {
+	if (stats.times_suspended > vars.max_rejoins) {
 		return true;
 	}
 
-	if (total_time_suspended > vars.rejoin_time_limit) {
+	if (stats.total_time_suspended > vars.rejoin_time_limit) {
 		return true;
 	}
 
@@ -2991,7 +2993,7 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 	std::vector<mode_player_id> to_erase;
 
 	for (auto& p : suspended_players) {
-		p.second.total_time_suspended += step.get_delta().in_seconds();
+		p.second.stats.total_time_suspended += step.get_delta().in_seconds();
 
 		if (p.second.unset_inputs_once) {
 			p.second.unset_inputs_once = false;

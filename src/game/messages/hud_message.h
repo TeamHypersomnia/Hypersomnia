@@ -73,7 +73,7 @@ namespace messages {
 			std::string nickname;
 			std::string account_id;
 
-			bool abandoned = false;
+			int abandoned_at_score = -1;
 		};
 
 		int first_team_score = 0;

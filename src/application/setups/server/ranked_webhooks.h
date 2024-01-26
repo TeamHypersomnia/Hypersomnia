@@ -42,8 +42,12 @@ namespace ranked_webhooks {
 						writer.StartObject();
 						writer.Key("nickname");
 						writer.String(f.nickname.c_str());
-						writer.Key("abandoned");
-						writer.Bool(f.abandoned);
+
+						if (f.abandoned_at_score != -1) {
+							writer.Key("abandoned_at_score");
+							writer.Int(f.abandoned_at_score);
+						}
+
 						writer.EndObject();
 					}
 				}
