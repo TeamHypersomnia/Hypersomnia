@@ -1278,7 +1278,7 @@ void arena_gui_state::draw_mode_gui(
 				auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
 
 				if (typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-					indicator_text += colored(typed_mode.is_halfway_round(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n", white);
+					indicator_text += colored(typed_mode.is_halftime_summary(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n", white);
 
 					{
 						const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);

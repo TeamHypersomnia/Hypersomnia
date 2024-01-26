@@ -481,7 +481,7 @@ void arena_mode::erase_player(input_type in, const logic_step step, const mode_p
 }
 
 bool arena_mode::should_suspend_instead_of_remove(const const_input_type in) const {
-	return is_ranked_live() && !last_summary_already(in);
+	return is_ranked_live() && !is_last_summary(in);
 }
 
 void arena_mode::notify_ranked_banned(
@@ -1628,6 +1628,10 @@ bool arena_mode::is_halfway_round(const const_input_type in) const {
 }
 
 bool arena_mode::is_final_round(const const_input_type in) const {
+	if (abandoned_team != faction_type::COUNT) {
+		return true;
+	}
+
 	if (in.rules.is_ffa()) {
 		return true;
 	}
@@ -1646,6 +1650,16 @@ bool arena_mode::is_final_round(const const_input_type in) const {
 	});
 
 	return someone_has_over_half || current_round >= max_rounds;
+}
+
+void arena_mode::trigger_match_summary(const input_type in, const const_logic_step step) {
+	state = arena_mode_state::MATCH_SUMMARY;
+	set_players_frozen(in, true);
+	release_triggers_of_weapons_of_players(in);
+
+	if (is_final_round(in)) {
+		post_match_summary(in, step);
+	}
 }
 
 void arena_mode::count_win(const input_type in, const const_logic_step step, const faction_type winner) {
@@ -1686,13 +1700,7 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 	}
 
 	if (is_halfway_round(in) || is_final_round(in)) {
-		state = arena_mode_state::MATCH_SUMMARY;
-		set_players_frozen(in, true);
-		release_triggers_of_weapons_of_players(in);
-
-		if (is_final_round(in)) {
-			post_match_summary(in, step);
-		}
+		trigger_match_summary(in, step);
 	}
 }
 
@@ -1806,6 +1814,37 @@ void arena_mode::standard_victory(const input_type in, const const_logic_step st
 	}
 }
 
+std::optional<faction_type> arena_mode::any_team_abandoned_match(const input_type in) {
+	if (!is_ranked_live()) {
+		return std::nullopt;
+	}
+
+	if (abandoned_players.empty()) {
+		return std::nullopt;
+	}
+
+	const bool any_suspended = suspended_players.size() > 0;
+
+	if (any_suspended) {
+		return std::nullopt;
+	}
+
+	const auto info = get_team_composition_info(in);
+
+	if (in.rules.is_ffa()) {
+		if (info.total_playing <= 1) {
+			return faction_type::FFA;
+		}
+	}
+	else {
+		if (!info.each_team_has_at_least_one) {
+			return info.missing_faction;
+		}
+	}
+
+	return std::nullopt;
+}
+
 void arena_mode::process_win_conditions(const input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
 
@@ -1913,7 +1952,7 @@ void arena_mode::swap_assigned_factions(const arena_mode::participating_factions
 	for (auto& it : players) {
 		auto& player_data = it.second;
 		auto& faction = player_data.session.faction;
-		faction = p.get_swapped(faction);
+		faction = p.get_opposing(faction);
 	}
 }
 
@@ -2612,17 +2651,15 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 arena_mode::composition_info arena_mode::get_team_composition_info(const_input_type in) const {
 	composition_info info;
 
-	info.each_team_has_at_least_one = [this, in]() {
-		const auto p = calc_participating_factions(in);
+	const auto p = calc_participating_factions(in);
 
+	p.for_each([this, &info](const faction_type f) {
+		info.total_playing += num_players_in(f);
+	});
+
+	info.each_team_has_at_least_one = [this, in, &info, &p]() {
 		if (in.rules.is_ffa()) {
-			uint32_t total_players = 0;
-
-			p.for_each([&](const faction_type f) {
-				total_players += num_players_in(f);
-			});
-
-			return total_players >= 1;
+			return info.total_playing > 1;
 		}
 
 		bool all_have = true;
@@ -2630,6 +2667,7 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 		p.for_each([&](const faction_type f) {
 			if (num_players_in(f) == 0) {
 				all_have = false;
+				info.missing_faction = f;
 			}
 		});
 
@@ -2753,19 +2791,12 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	const auto p = calc_participating_factions(in);
 
 	const auto result = calc_match_result(in);
-
 	const bool tied = result.is_tie();
 
-	if (!tied) {
-		if (!result.winner.has_value() || !result.loser.has_value()) {
-			LOG("Wrong match result.");
+	const auto first_team  = tied ? p.defusing  : result.winner;
+	const auto second_team = tied ? p.bombing   : result.loser;
 
-			return;
-		}
-	}
-
-	const auto first_team  = tied ? p.defusing  : *result.winner;
-	const auto second_team = tied ? p.bombing   : *result.loser;
+	LOG("Posting a match summary. First team: %x. Second team: %x", first_team, second_team);
 
 	const auto sorted_abandoned_nonspectating = [&]() {
 		std::vector<std::pair<arena_mode_player, mode_player_id>> out;
@@ -2869,7 +2900,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		if (result.is_tie() && stronger_of_the_two == strongest_in_second) {
 			/* 
 				Note this doesn't matter for a ranked.
-				Flip teams so that the first is where the mvp is
+				Flip teams so that the first is where the mvp is.
 			*/
 
 			summary.flip_teams();
@@ -3015,10 +3046,50 @@ void arena_mode::mode_solve_paused(const input_type in, const mode_entropy& entr
 	add_or_remove_players(in, entropy, step);
 }
 
+void arena_mode::run_match_abandon_logic(const input_type in, const logic_step step) {
+	if (abandoned_team != faction_type::COUNT) {
+		return;
+	}
+
+	if (
+		state == arena_mode_state::LIVE ||
+		state == arena_mode_state::ROUND_END_DELAY ||
+		is_halftime_summary(in)
+	) {
+		if (const auto abandoned = any_team_abandoned_match(in)) {
+			LOG("Ranked match was abandoned by faction: %x.", abandoned);
+			abandoned_team = *abandoned;
+
+			if (in.rules.is_ffa()) {
+				auto f = faction_type::FFA;
+
+				for_each_player_best_to_worst_in(
+					faction_type::FFA,
+					[&](const auto&, const auto& p) {
+						if (f == faction_type::FFA) {
+							f = p.get_faction();
+						}
+					}
+				);
+
+				current_round.last_win = { in.cosm.get_clock(), f };
+			}
+			else {
+				const auto winner = calc_participating_factions(in).get_opposing(abandoned_team);
+				current_round.last_win = { in.cosm.get_clock(), winner };
+			}
+
+			trigger_match_summary(in, step);
+		}
+	}
+}
+
 void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart_match(in, step);
 	}
+
+	run_match_abandon_logic(in, step);
 
 	if (state != arena_mode_state::WARMUP) {
 		auto specific_presolve = [&]<typename S>(const S&) {
@@ -3302,7 +3373,11 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 
 const float match_begins_in_secs_v = 4.f;
 
-bool arena_mode::last_summary_already(const const_input in) const {
+bool arena_mode::is_halftime_summary(const const_input in) const {
+	return is_match_summary() && !is_final_round(in);
+}
+
+bool arena_mode::is_last_summary(const const_input in) const {
 	return is_match_summary() && is_final_round(in);
 }
 
@@ -3520,9 +3595,28 @@ unsigned arena_mode::get_score(const faction_type f) const {
 arena_mode_match_result arena_mode::calc_match_result(const const_input_type in) const {
 	const auto p = calc_participating_factions(in);
 
-	if (get_score(p.bombing) == get_score(p.defusing)) {
+	if (abandoned_team != faction_type::COUNT) {
+		arena_mode_match_result result;
+
+		result.loser = abandoned_team;
+		result.winner = p.get_opposing(result.loser);
+
+		result.winner_score = get_score(result.winner);
+		result.loser_score =  get_score(result.loser);
+
+		return result;
+	}
+
+	if (const bool tied = get_score(p.bombing) == get_score(p.defusing)) {
+		/* Arbitrary. */
+
 		auto tie = arena_mode_match_result::make_tie();
-		tie.winner_score = tie.loser_score = get_score(p.bombing);
+
+		tie.winner = p.defusing;
+		tie.loser = p.bombing;
+
+		tie.winner_score = get_score(tie.winner);
+		tie.loser_score =  get_score(tie.loser);
 
 		return tie;
 	}
@@ -3531,15 +3625,15 @@ arena_mode_match_result arena_mode::calc_match_result(const const_input_type in)
 
 	if (get_score(p.bombing) > get_score(p.defusing)) {
 		result.winner = p.bombing;
-		result.loser  = p.defusing;
 	}
 	else {
 		result.winner = p.defusing;
-		result.loser  = p.bombing;
 	}
 
-	result.winner_score = get_score(*result.winner);
-	result.loser_score =  get_score(*result.loser);
+	result.loser = p.get_opposing(result.winner);
+
+	result.winner_score = get_score(result.winner);
+	result.loser_score = get_score(result.loser);
 
 	return result;
 }
@@ -3609,6 +3703,7 @@ void arena_mode::restart_match(const input_type in, const logic_step step) {
 	suspended_players.clear();
 	abandoned_players.clear();
 
+	abandoned_team = faction_type::COUNT;
 	ranked_state = ranked_state_type::NONE;
 
 	reset_players_stats(in);
@@ -3870,7 +3965,7 @@ uint32_t arena_mode::get_max_num_active_players(const const_input_type in) const
 }
 
 void arena_mode::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
-	if (last_summary_already(in)) {
+	if (is_last_summary(in)) {
 		/* Not a desertion when the outcome is known already */
 		return;
 	}

@@ -54,7 +54,7 @@ void arena_scoreboard_gui::draw_gui(
 			force_show = true;
 		}
 
-		is_halftime = typed_mode.is_match_summary() && typed_mode.is_halfway_round(mode_input);;
+		is_halftime = typed_mode.is_halftime_summary(mode_input);
 	}
 
 	const bool should_show = show || force_show;

@@ -668,13 +668,13 @@ treat_as_music_sounds_longer_than_secs = 5,
     fullscreen = true,
     name = "Hypersomnia",
     position = {
-      x = 189,
-      y = 208
+      x = 0,
+      y = 0
     },
     draw_own_cursor_in_fullscreen = false,
     log_keystrokes = false,
     size = {
-      x = 1200,
+      x = 1920,
       y = 700
     },
 	vsync_mode = "OFF",
@@ -756,8 +756,8 @@ treat_as_music_sounds_longer_than_secs = 5,
     report_ranked_match_api_key = "",
     report_ranked_match_url = "https://hypersomnia.xyz/report_match",
 
-    check_ban_endpoint = ""
-    --check_ban_endpoint = "https://hypersomnia.xyz/check_ban"
+    check_ban_url = ""
+    --check_ban_url = "https://hypersomnia.xyz/check_ban"
   },
 
   server = {

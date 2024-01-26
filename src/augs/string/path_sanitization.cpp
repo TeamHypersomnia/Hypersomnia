@@ -526,4 +526,76 @@ TEST_CASE("try_generate_sanitized_filename") {
 	REQUIRE(S::try_generate_sanitized_filename("emoji😊test.txt") == "emojitest.txt");
 }
 
+#include "augs/string/parse_url.h"
+
+TEST_CASE("parsed_url tests") {
+	SECTION("Invalid URLs") {
+		REQUIRE(!parsed_url("http://").valid());
+		REQUIRE(parsed_url("localhost").valid());
+		REQUIRE(!parsed_url("").valid());
+		REQUIRE(!parsed_url(":8000").valid());
+		REQUIRE(!parsed_url("//").valid());
+		REQUIRE(!parsed_url("/").valid());
+	}
+
+    SECTION("Standard HTTP URL") {
+        parsed_url url("http://www.example.com/path?query=value");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "http");
+        REQUIRE(url.host == "www.example.com");
+        REQUIRE(url.port == -1); // Default value for port
+        REQUIRE(url.location == "/path");
+        REQUIRE(url.query == "query=value");
+    }
+
+    SECTION("HTTPS URL with port") {
+        parsed_url url("https://localhost:8080/path?query=value");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "https");
+        REQUIRE(url.host == "localhost");
+        REQUIRE(url.port == 8080);
+        REQUIRE(url.location == "/path");
+        REQUIRE(url.query == "query=value");
+    }
+
+    SECTION("URL without path") {
+        parsed_url url("http://www.example.com");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "http");
+        REQUIRE(url.host == "www.example.com");
+        REQUIRE(url.port == -1);
+        REQUIRE(url.location.empty());
+        REQUIRE(url.query.empty());
+    }
+
+    SECTION("URL with IPv4 address and port") {
+        parsed_url url("http://192.168.1.1:3000");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "http");
+        REQUIRE(url.host == "192.168.1.1");
+        REQUIRE(url.port == 3000);
+        REQUIRE(url.location.empty());
+        REQUIRE(url.query.empty());
+    }
+
+    SECTION("URL (no protocol)") {
+        parsed_url url("www.example.com");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "");
+		REQUIRE(url.host == "www.example.com");
+        REQUIRE(url.port == -1);
+        REQUIRE(url.location.empty());
+        REQUIRE(url.query.empty());
+    }
+
+    SECTION("URL with invalid port") {
+        parsed_url url("http://www.example.com:abc");
+		REQUIRE(url.valid());
+        REQUIRE(url.protocol == "http");
+        REQUIRE(url.host == "www.example.com");
+        REQUIRE(url.port == -1); // Invalid port should leave port at default value
+        REQUIRE(url.location.empty());
+        REQUIRE(url.query.empty());
+    }
+}
 #endif

@@ -286,7 +286,7 @@ public:
 			return result;
 		}
 
-		faction_type get_swapped(faction_type f) const {
+		faction_type get_opposing(faction_type f) const {
 			if (f == bombing) {
 				return defusing;
 			}
@@ -359,6 +359,8 @@ private:
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 	void mode_solve_paused(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, logic_step);
+
+	void run_match_abandon_logic(input, logic_step);
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
 	void setup_round(input, logic_step, const round_transferred_players&, setup_next_round_params = {});
@@ -453,6 +455,7 @@ private:
 
 	bool had_first_blood = false;
 	bool should_commence_when_ready = false;
+	faction_type abandoned_team = faction_type::COUNT;
 
 	uint32_t current_num_bots = 0;
 	augs::speed_vars round_speeds;
@@ -480,6 +483,9 @@ private:
 
 	void swap_assigned_factions(const participating_factions&);
 	void scramble_assigned_factions(const participating_factions&);
+
+	std::optional<faction_type> any_team_abandoned_match(input in);
+	void trigger_match_summary(input in, const_logic_step);
 
 public:
 
@@ -705,7 +711,9 @@ public:
 	}
 
 	struct composition_info {
+		uint32_t total_playing = 0;
 		bool each_team_has_at_least_one = false;
+		faction_type missing_faction = faction_type::COUNT;
 		//bool teams_equal = false;
 	};
 
@@ -714,7 +722,8 @@ public:
 
 	float get_warmup_seconds(const const_input in) const;
 
-	bool last_summary_already(const const_input in) const;
+	bool is_halftime_summary(const const_input in) const;
+	bool is_last_summary(const const_input in) const;
 
 	bool is_ranked_live() const;
 

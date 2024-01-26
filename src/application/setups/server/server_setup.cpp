@@ -662,7 +662,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 	if (const auto report_webhook_url = parsed_url(private_vars.report_ranked_match_url); report_webhook_url.valid()) {
 		const auto server_name = get_server_name();
 
-		LOG("Reporting ranked match result.");
+		LOG("Reporting ranked match result to: %x", private_vars.report_ranked_match_url);
 
 		const auto api_key = private_vars.report_ranked_match_api_key;
 
@@ -677,29 +677,26 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 
 		push_notification_job(
 			[report_webhook_url, api_key, json_body]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(report_webhook_url.host);
-
-#if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
-#endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
+				auto http_client = httplib_utils::make_client(report_webhook_url);
 
 				httplib::Headers headers;
 				headers.emplace("apikey", api_key);
 
-				auto result = http_client.Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
+				auto result = http_client->Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
 
 				if (result) {
 					LOG("/report_match: %x", result->body);
+				}
+				else {
+					LOG("/report_match: null result.");
 				}
 
 				return "";
 			}
 		);
+	}
+	else {
+		LOG("report_ranked_match_url was not set.");
 	}
 }
 

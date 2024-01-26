@@ -227,17 +227,27 @@ struct arena_mode_economy_rules {
 };
 
 struct arena_mode_match_result {
-	std::optional<faction_type> winner;
-	std::optional<faction_type> loser;
+	faction_type winner = faction_type::SPECTATOR;
+	faction_type loser = faction_type::SPECTATOR;
 
 	int winner_score = 0;
 	int loser_score  = 0;
 
+	/*
+		Not necessarily equivalent to winner_score == loser_score,
+		since the match could've been abandoned.
+	*/
+
+	bool tied = false;
+
 	static auto make_tie() {
-		return arena_mode_match_result();
+		arena_mode_match_result result;
+		result.tied = true;
+
+		return result;
 	}
 
 	bool is_tie() const {
-		return winner == std::nullopt;
+		return tied;
 	}
 };
