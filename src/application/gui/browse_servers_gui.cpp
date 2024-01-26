@@ -20,6 +20,8 @@
 #include "augs/misc/httplib_utils.h"
 #include "application/network/resolve_address.h"
 
+double yojimbo_time();
+
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;
 constexpr auto server_entry_timeout = 5;
@@ -600,6 +602,16 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 		{
+			if (s.is_official_server() && s.heartbeat.is_ranked_server) {
+				auto secs = yojimbo_time() / 4.0f;
+
+				auto wave_color = rgba::get_bright_wave(secs, 0.55);
+				auto col_scope = scoped_style_color(ImGuiCol_Text, wave_color);
+
+				text("RANKED");
+				ImGui::SameLine();
+			}
+
 			auto col_scope = scoped_style_color(ImGuiCol_Text, color);
 
 			auto displayed_name = d.server_name;
