@@ -31,6 +31,41 @@ void start_client_gui_state::clear_demo_choice() {
 	demo_size = {};
 }
 
+struct avatar_loading_result_info {
+	std::optional<augs::path_type> new_path;
+	augs::image loaded_image;
+	std::string error_message;
+
+	bool was_shrinked = false;
+	bool will_be_upscaled = false;
+
+	void load_image(const augs::path_type& from) {
+		loaded_image.from_file(from);
+
+		const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+
+		auto sz = loaded_image.get_size();
+
+		if (sz != vec2u::square(max_s)) {
+			sz.x = std::min(sz.x, max_s);
+			sz.y = std::min(sz.x, max_s);
+
+			if (sz != loaded_image.get_size()) {
+				was_shrinked = true;
+				loaded_image.scale(sz);
+			}
+			else {
+				will_be_upscaled = true;
+			}
+		}
+
+		const auto cached_file_path = USER_DIR / "cached_avatar.png";
+		loaded_image.save_as_png(cached_file_path);
+
+		new_path = cached_file_path;
+	}
+};
+
 bool start_client_gui_state::perform(
 	const server_list_entry* best_server,
 	const bool refresh_in_progress,
@@ -274,42 +309,7 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			struct loading_result {
-				std::optional<augs::path_type> new_path;
-				augs::image loaded_image;
-				std::string error_message;
-
-				bool was_shrinked = false;
-				bool will_be_upscaled = false;
-
-				void load_image(const augs::path_type& from) {
-					loaded_image.from_file(from);
-
-					const auto max_s = static_cast<unsigned>(max_avatar_side_v);
-
-					auto sz = loaded_image.get_size();
-
-					if (sz != vec2u::square(max_s)) {
-						sz.x = std::min(sz.x, max_s);
-						sz.y = std::min(sz.x, max_s);
-
-						if (sz != loaded_image.get_size()) {
-							was_shrinked = true;
-							loaded_image.scale(sz);
-						}
-						else {
-							will_be_upscaled = true;
-						}
-					}
-
-					const auto cached_file_path = USER_DIR / "cached_avatar.png";
-					loaded_image.save_as_png(cached_file_path);
-
-					new_path = cached_file_path;
-				}
-			};
-
-			thread_local std::future<loading_result> avatar_loading_result;
+			thread_local std::future<avatar_loading_result_info> avatar_loading_result;
 
 			auto reload_avatar = [&](const augs::path_type& from_path) {
 				const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
@@ -317,7 +317,7 @@ bool start_client_gui_state::perform(
 				if (avatar_upload_completed && !avatar_loading_result.valid() && !from_path.empty()) {
 					avatar_loading_result = launch_async(
 						[from_path]() {
-							loading_result out;
+							avatar_loading_result_info out;
 							out.new_path = from_path;
 
 							try {
@@ -406,7 +406,7 @@ bool start_client_gui_state::perform(
 								"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
 							} };
 
-							loading_result out;
+							avatar_loading_result_info out;
 							out.new_path = window.open_file_dialog(filters, "Choose avatar image");
 
 							if (out.new_path.has_value()) {

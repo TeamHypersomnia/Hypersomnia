@@ -231,6 +231,7 @@ namespace augs {
 			const auto str_path = in.source_font_path.string();
 
 			io.Fonts->AddFontFromFileTTF(str_path.c_str(), in.size_in_pixels, nullptr, ranges.data());
+			io.Fonts->AddFontFromFileTTF(str_path.c_str(), in.size_in_pixels * 1.2f, nullptr, io.Fonts->GetGlyphRangesDefault());
 			io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
 			LOG("IMGUI FONT ATLAS SIZE: %xx%x", width, height);

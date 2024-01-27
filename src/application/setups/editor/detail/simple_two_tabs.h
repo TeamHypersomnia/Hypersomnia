@@ -9,20 +9,19 @@ namespace augs {
 			const E b,
 			const std::string& a_str,
 			const std::string& b_str,
-			F after_first
-		) {
-			const auto bg_cols = std::array<rgba, 3> {
+			F after_first,
+			const std::array<rgba, 3>  bg_cols = {
 				rgba(0, 0, 0, 0),
 				rgba(15, 40, 70, 255),
 				rgba(35, 60, 90, 255)
-			};
+			},
 
-			const auto selected_cols = std::array<rgba, 3> {
+			const std::array<rgba, 3> selected_cols = {
 				rgba(35-10, 60-10, 90-10, 255),
 				rgba(35, 60, 90, 255),
 				rgba(35+10, 60+10, 90+10, 255)
-			};
-
+			}
+		) {
 			const auto avail = ImGui::GetContentRegionAvail();
 			auto spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 

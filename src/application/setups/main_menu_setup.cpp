@@ -247,17 +247,6 @@ void main_menu_setup::draw_overlays(
 	using FS = formatted_string;
 	const auto build_number_text = FS(typesafe_sprintf("Build %x", hypersomnia_version().get_version_string()), s);
 
-	vec2i padding = { 6, 6 };
-
-	print_stroked(
-		output,
-		vec2i(screen_size.x, screen_size.y) - padding,
-		build_number_text,
-		{ augs::ralign::R, augs::ralign::B }
-	);
-
-	const auto bbox = get_text_bbox(build_number_text);
-
 	auto colored = [&](const auto& text, const auto& color) {
 		return FS(std::string(text) + " ", { gui_font, color });
 	};
@@ -296,10 +285,17 @@ void main_menu_setup::draw_overlays(
 		}
 	}();
 	
+	const auto bbox = get_text_bbox(build_number_text);
+	const auto dbbox = get_text_bbox(description);
+	(void)bbox;
+	(void)dbbox;
+
+	vec2i padding = { 6, 6 };
+
 	print_stroked(
 		output,
-		vec2i(screen_size.x - bbox.x, screen_size.y) - padding,
-		description,
+		vec2i(screen_size.x, screen_size.y) - padding,
+		description + build_number_text,
 		{ augs::ralign::R, augs::ralign::B }
 	);
 }

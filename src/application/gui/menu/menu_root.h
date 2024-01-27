@@ -111,6 +111,18 @@ public:
 	}
 
 	template <class C>
+	auto get_menu_ltrb(const C context) const {
+		vec2 expand = { 14, 10 };
+
+		ltrb buttons_bg;
+		buttons_bg.set_position(buttons.front().rc.left_top());
+		buttons_bg.w(static_cast<float>(get_max_menu_button_size(context.get_necessary_images(), context.get_gui_font()).x));
+		buttons_bg.b = buttons.back().rc.b;
+
+		return buttons_bg.expand_from_center(expand);
+	}
+
+	template <class C>
 	void draw_background_behind_buttons(
 		const C context,
 		vec2 expand = { 14, 10 },

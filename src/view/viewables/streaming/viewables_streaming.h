@@ -153,4 +153,6 @@ public:
 	auto& get_general_or_blank() {
 		return general_atlas_in_progress() ? blank_atlas : general_atlas;
 	}
+
+	bool is_loading_resources() const;
 };

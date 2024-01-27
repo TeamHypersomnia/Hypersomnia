@@ -513,6 +513,10 @@ void viewables_streaming::recompress_demos() {
 	});
 }
 
+bool viewables_streaming::is_loading_resources() const {
+	return general_atlas_progress.has_value();
+}
+
 void viewables_streaming::display_loading_progress() const {
 	using namespace augs::imgui;
 

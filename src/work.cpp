@@ -84,6 +84,7 @@
 #include "application/gui/start_server_gui.h"
 #include "application/gui/browse_servers_gui.h"
 #include "application/gui/map_catalogue_gui.h"
+#include "application/gui/leaderboards_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 
 #include "application/masterserver/masterserver.h"
@@ -218,8 +219,9 @@ work_result work(
 
 	uint32_t steam_auth_request_id = 0;
 
+	const auto steam_id = std::to_string(::steam_get_id());
+
 	if (is_steam_client) {
-		const auto steam_id = std::to_string(::steam_get_id());
 		::USER_DIR = APPDATA_DIR / steam_id;
 	}
 	else {
@@ -1104,6 +1106,7 @@ work_result work(
 
 	std::unique_ptr<main_menu_setup> main_menu;
 	main_menu_gui main_menu_gui;
+	ltrb menu_ltrb;
 
 	auto has_main_menu = [&]() {
 		return main_menu != nullptr;
@@ -1119,6 +1122,9 @@ work_result work(
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 	map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
+
+	leaderboards_gui_state leaderboards_gui = std::string("Leaderboards");
+
 	std::string displayed_connecting_server_name;
 
 	auto emplace_main_menu = [&map_catalogue_gui, &p = main_menu] (auto&&... args) {
@@ -1145,6 +1151,15 @@ work_result work(
 
 	auto streaming_ptr = std::make_unique<viewables_streaming>();
 	viewables_streaming& streaming = *streaming_ptr;
+
+	try {
+		augs::image avatar;
+		avatar.from_file(config.client.avatar_image_path);
+		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
+	}
+	catch (...) {
+
+	}
 
 	auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
@@ -1384,6 +1399,8 @@ work_result work(
 			});
 
 			map_catalogue_gui.request_refresh();
+			leaderboards_gui.request_refresh();
+
 			streaming.recompress_demos();
 		}
 	};
@@ -1743,6 +1760,19 @@ work_result work(
 			window,
 			config.streamer_mode && config.streamer_mode_flags.map_catalogue
 		};
+	};
+
+	auto perform_leaderboards = [&]() {
+		leaderboards_gui.perform({
+			config.client.nickname,
+			steam_id,
+
+			config.main_menu.leaderboards_provider_url,
+			get_general_renderer(),
+			streaming.avatar_preview_tex,
+
+			menu_ltrb
+		});
 	};
 
 	auto perform_browse_servers = [&]() {
@@ -2407,6 +2437,10 @@ work_result work(
 
 				if (const bool show_map_catalogue = !has_current_setup()) {
 					perform_map_catalogue();
+				}
+
+				if (const bool show_leaderboards = !has_current_setup()) {
+					perform_leaderboards();
 				}
 
 				if (!has_current_setup()) {
@@ -3853,6 +3887,8 @@ work_result work(
 
 					main_menu_gui.has_play_ranked_button = is_steam_client;
 					main_menu_gui.advance(context, frame_delta);
+
+					menu_ltrb = main_menu_gui.root.get_menu_ltrb(context);
 
 #if MENU_ART
 					get_drawer().aabb(streaming.necessary_images_in_atlas[assets::necessary_image_id::ART_1], ltrb(0, 0, screen_size.x, screen_size.y), white);

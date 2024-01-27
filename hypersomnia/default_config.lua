@@ -638,6 +638,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     speed = 1000
   },
   main_menu = {
+    leaderboards_provider_url = "https://hypersomnia.xyz/leaderboards",
     menu_intro_scene_entropy_path = "abc",
     menu_background_arena_path = "content/menu/menu",
     menu_theme_path = "",
@@ -796,7 +797,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       client_network_timeout_secs = 1,
 
       -- Max: 65535
-      rejoin_time_limit = 150,
+      rejoin_time_limit = 180,
 
       -- After this many rejoins,
       -- you will no longer be able to join this match after disconnect.

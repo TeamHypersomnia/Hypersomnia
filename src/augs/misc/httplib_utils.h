@@ -17,10 +17,10 @@ namespace httplib_utils {
 		auto proto_and_host = parsed.protocol.empty() ? parsed.host : (parsed.protocol + "://" + parsed.host);
 
 		if (parsed.port != -1) {
-			return std::make_unique<http_client_type>(proto_and_host, parsed.port);
+			return std::make_unique<http_client_type>(parsed.host, parsed.port);
 		}
 
-		return std::make_unique<http_client_type>(proto_and_host);
+		return std::make_unique<http_client_type>(parsed.host);
 	}
 
 	inline auto make_client(const parsed_url& parsed, const int io_timeout = 5) {

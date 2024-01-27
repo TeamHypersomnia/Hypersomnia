@@ -3,6 +3,7 @@
 
 struct main_menu_settings {
 	// GEN INTROSPECTOR struct main_menu_settings
+	std::string leaderboards_provider_url;
 	augs::path_type menu_intro_scene_entropy_path;
 	augs::path_type menu_background_arena_path;
 	
