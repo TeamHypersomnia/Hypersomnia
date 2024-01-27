@@ -475,6 +475,12 @@ private:
 	float unfreezing_match_in_secs = -1.0f;
 	// END GEN INTROSPECTOR
 
+	/*
+		Used only by the server to correctly report matches.
+	*/
+
+	std::string match_start_timestamp;
+
 	friend augs::introspection_access;
 	friend debugger_property_accessors;
 	friend class editor_setup;

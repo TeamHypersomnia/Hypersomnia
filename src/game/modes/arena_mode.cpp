@@ -38,6 +38,7 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
+#include "augs/misc/time_utils.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -2761,6 +2762,8 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 		}
 	}
 
+	match_start_timestamp = augs::date_time::get_utc_timestamp_iso8601();
+
 	state = arena_mode_state::LIVE;
 	reset_players_stats(in);
 	setup_round(in, step, make_transferred_players(in, true));
@@ -2829,6 +2832,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	};
 
 	messages::match_summary_message summary;
+	summary.match_start_timestamp = match_start_timestamp;
 
 	if (in.rules.is_ffa()) {
 		for_each_player_best_to_worst_in(
@@ -3702,6 +3706,8 @@ const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nic
 }
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
+	match_start_timestamp.clear();
+
 	suspended_players.clear();
 	abandoned_players.clear();
 

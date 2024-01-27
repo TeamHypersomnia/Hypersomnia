@@ -35,8 +35,10 @@ namespace augs {
 		static std::string format_how_long_ago_brief(bool tell_seconds, const int64_t secs);
 		static double secs_since_epoch();
 
+		static std::string format_time_point_utc_iso8601(const std::chrono::system_clock::time_point& tp);
 		static std::string format_time_point_utc(const std::chrono::system_clock::time_point& tp);
 		static std::string get_utc_timestamp();
+		static std::string get_utc_timestamp_iso8601();
 #if 0
 		static std::optional<std::chrono::system_clock::time_point> from_utc_timestamp(const std::string& s);
 #endif

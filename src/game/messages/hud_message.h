@@ -83,6 +83,7 @@ namespace messages {
 		std::vector<player_entry> second_faction;
 
 		mode_player_id mvp_player_id;
+		std::string match_start_timestamp;
 
 		bool is_tie() const {
 			return first_team_score == second_team_score;

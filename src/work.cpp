@@ -219,7 +219,7 @@ work_result work(
 
 	uint32_t steam_auth_request_id = 0;
 
-	const auto steam_id = std::to_string(::steam_get_id());
+	const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
 
 	if (is_steam_client) {
 		::USER_DIR = APPDATA_DIR / steam_id;

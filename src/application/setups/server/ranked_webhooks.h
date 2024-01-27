@@ -14,6 +14,9 @@ namespace ranked_webhooks {
 
 		writer.StartObject();
 
+		writer.Key("match_start_date");
+		writer.String(info.match_start_timestamp.c_str());
+
 		writer.Key("server_name");
 		writer.String(server_name.c_str());
 

@@ -69,6 +69,18 @@ augs::date_time::date_time(
 }
 #endif
 
+std::string augs::date_time::format_time_point_utc_iso8601(const std::chrono::system_clock::time_point& tp) {
+	// Convert system_clock::time_point to utc tm structure
+	auto t = std::chrono::system_clock::to_time_t(tp);
+	std::tm* utc_tm = std::gmtime(&t); // Using gmtime to convert to UTC time
+
+	// Use stringstream and put_time to format the tm structure to ISO 8601
+	std::ostringstream oss;
+	oss << std::put_time(utc_tm, "%FT%T") << "Z"; // ISO 8601 format with Z indicating UTC time
+
+	return oss.str();
+}
+
 std::string augs::date_time::format_time_point_utc(const std::chrono::system_clock::time_point& tp) {
 	std::ostringstream o;
 	const auto ttp = std::chrono::time_point_cast<std::chrono::microseconds>(tp);
@@ -110,6 +122,10 @@ auto convert_string_to_time_t(const std::string &utc_timestamp) {
 
 augs::date_time augs::date_time::from_utc_timestamp(const std::string& timestamp) {
 	return augs::date_time(convert_string_to_time_t(timestamp));
+}
+
+std::string augs::date_time::get_utc_timestamp_iso8601() {
+	return format_time_point_utc_iso8601(std::chrono::system_clock::now());
 }
 
 std::string augs::date_time::get_utc_timestamp() {
