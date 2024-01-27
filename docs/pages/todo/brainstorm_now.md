@@ -6,36 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Ranks
-    - 1st: Sol Invictus (gold)
-    - 2nd: Aurora (violet bird)
-    - 3nd: Boreas (silver bird)
-
-- Counting MMR with abandons
-    - Only problem is if you're in a team with abandoned players
-        - High-risk high-reward
-            - If you win 1v2, count it as a big win (so as if 1v2 was played)
-            - If you lose, count it as if it's a loss (so as if 2v2 was played)
-            - But only if you have less than e.g. 12 rounds won.
-            - If there were no abandons until 11 rounds won, lock and evenly distribute the team winnings
-                - So if you want to pull a HH scenario:
-                    - You enter with say team of 5
-                    - You have the incentive to stay full with all 5 until e.g. 12:5
-                    - Anyone who stayed until 12 won rounds has locked in rewards in case of a win
-                    - so you want to exit at 11 score when another win already more or less certain
-
-- Show abandoned players in match summary
-
-- Triggering abandon cases
-    - When all enemies banned
-    - FFA abandon
-        - easy, just when only one player remains, use ranking by level when they abandoned
-            - just have to save this info somehow
-    - Actually we have to save player info in bomb defusal too
-
-- If interrupted when <= 4 rounds played, don't count wins 
-- If absent when ended, don't count win but count a worst-case loss (3x lost)
-
 - Post ranked deplyoment
     - Remove test id replacement to match nick for testing
         - this is actually just in prod
@@ -46,12 +16,30 @@ summary: That which we are brainstorming at the moment.
     - disable "Play ranked" button in non-steam clients
     - Look at "TODO_RANKED"
 
+- Separate contribution threshold for counting ENEMIES into mmr
+    - Should be low like score >= 3
+    - So we can actually simulate the high stakes scenario
+
+- article about matchmaking rules
+    - event multiplier
+    - abandoning players don't show in death log as perpetrators
+
+- we might set some good maps twice on the list to increase probability
+
+- Ranks
+    - 1st: Sol Invictus (gold)
+    - 2nd: Aurora (violet bird)
+    - 3nd: Boreas (silver bird)
+
+- Show abandoned players in match summary
+
 - make defuse not require holding so it's less abusable by suspends
     - and if defusing, always restore the mouse no matter what
 
 - POST-CRASH REJOINING: Create a 'user/ranked.json' file whenever a match starts
     - Should just spawn a modal that overrides the crash notification modal
     - But when to delete it?
+        - AUTOMATICALLY AFTER AN HOUR. (or exactly 1.5min * 30 rounds = 45 minutes which is the maximum duration of a match)
         - match summary
         - abandon button in the modal
 

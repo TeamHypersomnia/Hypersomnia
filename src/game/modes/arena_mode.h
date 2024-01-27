@@ -152,6 +152,7 @@ struct arena_mode_player {
 
 	bool is_bot = false;
 	bool unset_inputs_once = false;
+	bool ready_for_ranked = false;
 	// END GEN INTROSPECTOR
 
 	/*
@@ -473,6 +474,7 @@ private:
 
 	ranked_state_type ranked_state = ranked_state_type::NONE;
 	float unfreezing_match_in_secs = -1.0f;
+	float secs_when_warmup_ended = 0.0f;
 	// END GEN INTROSPECTOR
 
 	/*

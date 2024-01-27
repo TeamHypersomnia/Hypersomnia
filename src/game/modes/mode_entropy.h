@@ -21,7 +21,7 @@ using mode_player_command_variant = std::variant<
 	mode_commands::team_choice,
 	mode_commands::spell_purchase,
 	mode_commands::item_purchase,
-	mode_commands::special_purchase
+	mode_commands::special_request
 >;
 
 using mode_player_entropy = mode_player_command_variant;

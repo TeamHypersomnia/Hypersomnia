@@ -280,13 +280,14 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	};
 
 
+	const auto mmr_text = "MMR:";
+	const auto mmr_num_text = typesafe_sprintf("%4f", our_mmr);
+
 	if (played) {
 		text("Place:");
 		ImGui::SameLine();
 		text_color(std::string("#")+std::to_string(our_place), place_col(our_place));
 
-		const auto mmr_text = typesafe_sprintf("MMR:", our_mmr);
-		const auto mmr_num_text = typesafe_sprintf("%4f", our_mmr);
 
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
@@ -296,7 +297,14 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PopFont();
 	}
 	else {
-		text("You haven't played any match yet!");
+		text("You haven't played any ranked match yet!");
+
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+		text(mmr_text);
+		ImGui::SameLine();
+		text_disabled(mmr_num_text);
+		ImGui::PopFont();
 	}
 
 	ImGui::NextColumn();

@@ -3,10 +3,10 @@
 #include "game/organization/special_flavour_id_types.h"
 #include "game/detail/spells/all_spells.h"
 
-enum class special_purchase_request {
-	// GEN INTROSPECTOR enum class special_purchase_request
-	AUTOBUY,
+enum class special_mode_request {
+	// GEN INTROSPECTOR enum class special_mode_request
 	REBUY_PREVIOUS,
+	READY_FOR_RANKED,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -15,5 +15,5 @@ enum class special_purchase_request {
 namespace mode_commands {
 	using spell_purchase = spell_id;
 	using item_purchase = item_flavour_id;
-	using special_purchase = special_purchase_request;
+	using special_request = special_mode_request;
 }

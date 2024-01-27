@@ -9,6 +9,8 @@ namespace messages {
 		FAILED_TO_AUTHENTICATE,
 		FAILED_TO_CHECK_BANS,
 
+		PLAYER_READY_FOR_RANKED,
+
 		RANKED_STARTING,
 		RANKED_STARTED
 	};
@@ -30,6 +32,7 @@ namespace messages {
 		mode_player_id subject_mode_id;
 		std::string subject_name;
 		std::string subject_account_id;
+		int players_left = 0;
 		std::variant<faction_choice, joined_or_left, no_arg_mode_notification> payload;
 	};
 }

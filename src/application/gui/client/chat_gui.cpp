@@ -40,6 +40,18 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 		if constexpr(std::is_same_v<P, N>) {
 			switch (payload) {
+				case N::PLAYER_READY_FOR_RANKED: {
+					const auto ready = typesafe_sprintf("%x is ready.", msg.subject_name);
+					const auto left = 
+						msg.players_left == 0 ?
+						"\nEveryone is ready. Let's roll." : 
+						typesafe_sprintf(" %x player%x left.", msg.players_left, msg.players_left > 1 ? "s" : "")
+					;
+
+					do_entry(ready + left, green);
+					break;
+				}
+
 				case N::TEAMS_ARE_NOT_VIABLE_FOR_RANKED:
 					do_entry(
 						"Teams are not viable for a ranked match! Restarting countdown.",

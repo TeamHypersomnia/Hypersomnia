@@ -1119,6 +1119,10 @@ void client_setup::perform_chat_input_bar() {
 		message.target = chat.target;
 		message.message = chat.current_message;
 
+		if (message.message == "/go") {
+			control(mode_player_entropy(mode_commands::special_request::READY_FOR_RANKED));
+		}
+
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
 			message

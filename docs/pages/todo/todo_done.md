@@ -6817,3 +6817,34 @@ This will discard your redo history."
 - watch out for view-side callbacks for removed players
     - might invalidate some metas?
     - actually with a separate suspended map it's all good
+
+- server should send match_start_date too
+    - maybe save it in database as well just in case
+
+- master rcon could authorize even during a ranked for quick testing by the dev
+    - tho it'll go to the database so it's not too smart
+    - no i guess let's leave rcon unavailable during ranked
+- Counting MMR with abandons
+    - Only problem is if you're in a team with abandoned players
+        - High-risk high-reward
+            - If you win 1v2, count it as a big win (so as if 1v2 was played)
+            - If you lose, count it as if it's a loss (so as if 2v2 was played)
+            - But only if you have less than e.g. 12 rounds won.
+            - If there were no abandons until 11 rounds won, lock and evenly distribute the team winnings
+                - So if you want to pull a HH scenario:
+                    - You enter with say team of 5
+                    - You have the incentive to stay full with all 5 until e.g. 12:5
+                    - Anyone who stayed until 12 won rounds has locked in rewards in case of a win
+                    - so you want to exit at 11 score when another win already more or less certain
+
+
+- Triggering abandon cases
+    - When all enemies banned
+    - FFA abandon
+        - easy, just when only one player remains, use ranking by level when they abandoned
+            - just have to save this info somehow
+    - Actually we have to save player info in bomb defusal too
+
+- If interrupted when <= 4 rounds played, don't count wins 
+- If absent when ended, don't count win but count a worst-case loss (3x lost)
+

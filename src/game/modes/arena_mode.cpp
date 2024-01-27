@@ -2311,10 +2311,44 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 				using namespace mode_commands;
 				using C = remove_cref<decltype(typed_command)>;
 
+				if constexpr(std::is_same_v<C, special_request>) {
+					switch (typed_command) {
+						case special_mode_request::READY_FOR_RANKED: {
+							if (in.is_ranked_server() && ranked_state == ranked_state_type::NONE && teams_viable_for_match(in)) {
+								if (!player_data->ready_for_ranked) {
+									player_data->ready_for_ranked = true;
+
+									int players_left = 0;
+
+									for (auto& p : players) {
+										if (!p.second.ready_for_ranked) {
+											++players_left;
+										}
+									}
+
+									messages::mode_notification notification;
+									notification.subject_mode_id = id;
+									notification.subject_name = player_data->get_nickname();
+									notification.players_left = players_left;
+									notification.payload = messages::no_arg_mode_notification::PLAYER_READY_FOR_RANKED;
+
+									step.post_message(notification);
+								}
+							}
+
+							return;
+						}
+
+						default: {
+							break;
+						}
+					}
+				}
+
 				if constexpr(is_monostate_v<C>) {
 
 				}
-				else if constexpr(is_one_of_v<C, item_purchase, spell_purchase, special_purchase>) {
+				else if constexpr(is_one_of_v<C, item_purchase, spell_purchase, special_request>) {
 					if (get_buy_seconds_left(in) <= 0.f) {
 						return;
 					}
@@ -2421,9 +2455,9 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 									money -= *price;
 								}
 							}
-							else if constexpr(std::is_same_v<C, special_purchase_request>) {
+							else if constexpr(std::is_same_v<C, special_mode_request>) {
 								switch (typed_command) {
-									case special_purchase_request::REBUY_PREVIOUS: {
+									case special_mode_request::REBUY_PREVIOUS: {
 
 										break;
 									}
@@ -3137,12 +3171,40 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	if (state == arena_mode_state::WARMUP) {
 		respawn_the_dead(in, step, in.rules.warmup_respawn_after_ms);
 
-		if (get_warmup_seconds_left(in) <= 0.f) {
+		bool all_ready_for_ranked = false;
+
+		if (
+			in.is_ranked_server() && 
+			ranked_state == ranked_state_type::NONE &&
+			teams_viable_for_match(in)
+		) {
+			all_ready_for_ranked = true;
+
+			for (auto& p : players) {
+				if (!p.second.ready_for_ranked) {
+					all_ready_for_ranked = false;
+					break;
+				}
+			}
+		}
+
+		if (get_warmup_seconds_left(in) <= 0.0f || all_ready_for_ranked) {
+			if (all_ready_for_ranked) {
+				LOG("All players are ready for ranked.");
+			}
+
 			bool match_starting = true;
 
 			if (in.is_ranked_server()) {
 				if (teams_viable_for_match(in)) {
 					if (ranked_state == ranked_state_type::NONE) {
+						for (auto& p : players) {
+							p.second.ready_for_ranked = false;
+						}
+
+						LOG("Starting ranked.");
+						secs_when_warmup_ended = get_seconds_passed_in_cosmos(in);
+
 						ranked_state = ranked_state_type::STARTING;
 						play_ranked_starting_sound(in, step);
 
@@ -3404,6 +3466,10 @@ bool arena_mode::is_waiting_for_players(const const_input_type in) const {
 }
 
 float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
+	if (ranked_state == ranked_state_type::STARTING) {
+		return -1.0f;
+	}
+
 	if (state == arena_mode_state::WARMUP) {
 		if (is_waiting_for_players(in)) {
 			return 10000.0f;
@@ -3416,18 +3482,19 @@ float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
 }
 
 float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
+	if (ranked_state == ranked_state_type::STARTING) {
+		const auto secs = get_seconds_passed_in_cosmos(in);
+		const auto match_begins_in_secs = 5;
+
+		return secs_when_warmup_ended + match_begins_in_secs - secs;
+	}
+
 	if (state == arena_mode_state::WARMUP) {
 		const auto secs = get_seconds_passed_in_cosmos(in);
 		const auto warmup_secs = get_warmup_seconds(in);
 
 		if (secs >= warmup_secs) {
-			auto match_begins_in_secs = match_begins_in_secs_v;
-
-			if (ranked_state == ranked_state_type::STARTING) {
-				match_begins_in_secs = 5;
-			}
-
-			return warmup_secs + match_begins_in_secs - secs;
+			return warmup_secs + match_begins_in_secs_v - secs;
 		}
 	}
 
@@ -3777,6 +3844,7 @@ void arena_mode::reset_players_stats(const input_type in) {
 		auto& p = it.second;
 		p.stats = {};
 		p.round_when_chosen_faction = static_cast<uint32_t>(-1);
+		p.ready_for_ranked = false;
 	}
 
 	clear_players_round_state(in);
