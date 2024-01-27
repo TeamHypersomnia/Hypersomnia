@@ -40,9 +40,10 @@ message_handler_result server_setup::handle_payload(
 			return continue_v;
 		}
 
-		LOG("steam_auth_request_payload from: %x", c.get_nickname());
+		LOG("steam_auth_request_payload from: %x. Took %x secs.", c.get_nickname(), server_time - c.when_connected);
 
 		c.auth_requested = true;
+		c.when_sent_auth_ticket = server_time;
 		request_auth(to_mode_player_id(client_id), payload);
 	}
 	else if constexpr (std::is_same_v<T, requested_client_settings>) {
