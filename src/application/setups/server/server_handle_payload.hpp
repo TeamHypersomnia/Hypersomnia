@@ -36,7 +36,7 @@ message_handler_result server_setup::handle_payload(
 			return abort_v;
 		}
 
-		if (!vars.require_authentication) {
+		if (!vars.requires_authentication()) {
 			return continue_v;
 		}
 

@@ -1103,7 +1103,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
 	}
 
-	heartbeat.require_authentication = vars.require_authentication;
+	heartbeat.require_authentication = vars.requires_authentication();
 	heartbeat.is_ranked_server = is_ranked_server();
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
@@ -1458,7 +1458,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.all_authenticated = all_authenticated;
 	out.all_not_banned = all_not_banned;
 
-	if (!vars.require_authentication) {
+	if (!vars.requires_authentication()) {
 		out.all_authenticated = true;
 		out.all_not_banned = true;
 	}
@@ -3466,7 +3466,7 @@ void server_setup::handle_client_chat_command(
 ) {
 	const auto& cli = get_client_state(to_mode_player_id(id));
 
-	if (vars.require_authentication && !cli.is_authenticated()) {
+	if (vars.requires_authentication() && !cli.is_authenticated()) {
 		LOG("Unauthenticated for a chat command.");
 		return;
 	}

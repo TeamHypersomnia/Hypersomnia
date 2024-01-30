@@ -764,10 +764,9 @@ treat_as_music_sounds_longer_than_secs = 5,
   server = {
     server_name = "${MY_NICKNAME}'s server",
 
-    -- If true, kicks players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
-    -- Set to true for ranked servers that wish to report matches to an endpoint.
+    -- If > 0, kicks players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
+    -- Will happen on all ranked servers by default.
     -- Note you'll need to setup your own steam_web_api_key in order to authenticate players.
-    require_authentication = false,
     kick_if_unauthenticated_for_secs = 6.0,
 
     ranked = {

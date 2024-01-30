@@ -88,8 +88,6 @@ struct server_vars {
 	bool operator==(const server_vars&) const = default;
 
 	// GEN INTROSPECTOR struct server_vars
-	bool require_authentication = false;
-
 	arena_identifier arena;
 	game_mode_name_type game_mode;
 
@@ -164,6 +162,10 @@ struct server_vars {
 		}
 
 		return client_network_timeout_secs;
+	}
+
+	bool requires_authentication() const {
+		return ranked.is_ranked_server() && kick_if_unauthenticated_for_secs > 0;
 	}
 };
 
