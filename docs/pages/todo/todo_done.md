@@ -6851,3 +6851,17 @@ This will discard your redo history."
 - require authentication should be implied
 - fix map cycling on rankeds
 
+- fix browsing servers from esc when starting from in-game setup
+
+- waiting for match flag for servers so they don't appear in find best ranked if someone disconnected and serv is joinable
+
+- Separate contribution threshold for counting ENEMIES into mmr
+    - Should be low like score >= 3
+    - So we can actually simulate the high stakes scenario
+
+- we might set some good maps twice on the list to increase probability
+
+- color wave "ranked" for server list entries
+
+- Let's save all matches to the database just in case we later want to analyze the data
+

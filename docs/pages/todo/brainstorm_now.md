@@ -9,10 +9,6 @@ summary: That which we are brainstorming at the moment.
 - matches: show how long ago and a map miniature
 - last matches on the homepage
 
-- waiting for match flag for servers so they don't appear in find best ranked if someone disconnected and serv is joinable
-
-- fix browsing servers from esc when starting from in-game setup
-
 - Post ranked deplyoment
     - Remove test id replacement to match nick for testing
         - this is actually just in prod
@@ -23,22 +19,14 @@ summary: That which we are brainstorming at the moment.
     - disable "Play ranked" button in non-steam clients
     - Look at "TODO_RANKED"
 
-- Separate contribution threshold for counting ENEMIES into mmr
-    - Should be low like score >= 3
-    - So we can actually simulate the high stakes scenario
-
 - article about matchmaking rules
     - event multiplier
     - abandoning players don't show in death log as perpetrators
-
-- we might set some good maps twice on the list to increase probability
 
 - Ranks
     - 1st: Sol Invictus (gold)
     - 2nd: Aurora (violet bird)
     - 3nd: Boreas (silver bird)
-
-- Show abandoned players in match summary
 
 - make defuse not require holding so it's less abusable by suspends
     - and if defusing, always restore the mouse no matter what
@@ -68,16 +56,12 @@ summary: That which we are brainstorming at the moment.
     - Restart the match if you kick because of a ban
 - on ranked start and just restart the match inconsequentially
 
-- color wave "ranked" for server list entries
-
 - note a match freeze could occur during a sensitive moment like bomb defusing
     - We might make defusing a toggle later to avoid accidents
         - Easier to press H/G too
     - Though we could skip freezing if the character who disconnected is dead
     - Right now let's only implement freezing on the next round
 
-
-- Let's save all matches to the database just in case we later want to analyze the data
 
 - Add gamer role to discord to be pinged by server-monitor
     - only new server/connect notifs

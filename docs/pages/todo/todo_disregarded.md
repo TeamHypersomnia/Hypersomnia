@@ -701,3 +701,5 @@ summary: Just a hidden scratchpad.
 - simulate ranked in host a server menu
 - > Ranked (simulated)
 
+- Show abandoned players in match summary
+

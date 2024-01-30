@@ -50,8 +50,16 @@ struct server_heartbeat {
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_spectating;
 
 	bool require_authentication = false;
-	bool is_ranked_server = false;
+	uint8_t ranked_state = 0;
 	// END GEN INTROSPECTOR
+
+	bool is_ranked_server() const {
+		return ranked_state >= 1;
+	}
+
+	bool is_still_joinable_ranked() const {
+		return ranked_state == 1;
+	}
 
 	bool operator==(const server_heartbeat&) const = default;
 

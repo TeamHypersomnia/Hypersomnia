@@ -603,7 +603,7 @@ void browse_servers_gui_state::show_server_list(
 
 		{
 			if (s.is_official_server() ) {
-				if (s.heartbeat.is_ranked_server) {
+				if (s.heartbeat.is_ranked_server()) {
 					auto secs = yojimbo_time() / 4.0f;
 
 					auto wave_color = rgba::get_bright_wave(secs, 0.55);
@@ -809,7 +809,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const auto effective_name = std::string(name) + " " + std::string(arena);
 
 		auto push_if_passes = [&](auto& target_list) {
-			if (!allow_ranked_servers && s.heartbeat.is_ranked_server) {
+			if (!allow_ranked_servers && s.heartbeat.is_ranked_server()) {
 				return;
 			}
 
@@ -1191,7 +1191,7 @@ const server_list_entry* browse_servers_gui_state::find_best_server(const bool r
 	erase_if(
 		filtered,
 		[&](auto& f) {
-			const bool good = f.is_official_server() && (ranked == f.heartbeat.is_ranked_server);
+			const bool good = f.is_official_server() && (ranked && f.heartbeat.is_still_joinable_ranked());
 
 			return !good;
 		}

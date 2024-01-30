@@ -1111,7 +1111,19 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 
 	heartbeat.require_authentication = vars.requires_authentication();
-	heartbeat.is_ranked_server = is_ranked_server();
+
+	if (is_ranked_server()) {
+		if (is_ranked_live_or_starting()) {
+			heartbeat.ranked_state = 2;
+		}
+		else {
+			heartbeat.ranked_state = 1;
+		}
+	}
+	else {
+		heartbeat.ranked_state = 0;
+	}
+
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = get_current_game_mode_name();
