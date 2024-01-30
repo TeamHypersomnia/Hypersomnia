@@ -6848,3 +6848,6 @@ This will discard your redo history."
 - If interrupted when <= 4 rounds played, don't count wins 
 - If absent when ended, don't count win but count a worst-case loss (3x lost)
 
+- require authentication should be implied
+- fix map cycling on rankeds
+

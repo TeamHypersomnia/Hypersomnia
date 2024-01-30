@@ -698,3 +698,6 @@ summary: Just a hidden scratchpad.
 - if match ends when someone is disconnected, count him as connected if it's within rejoin time limit
     - to avoid corner cases where someone crashes near the end of the match despite good intentions
 
+- simulate ranked in host a server menu
+- > Ranked (simulated)
+

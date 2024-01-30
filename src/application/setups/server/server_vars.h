@@ -115,6 +115,7 @@ struct server_vars {
 	bool daily_autoupdate = false;
 	hour_and_minute_str daily_autoupdate_hour = "";
 
+	float when_idle_change_maps_once_every_mins = 15.0f;
 	uint32_t send_heartbeat_to_server_list_once_every_secs = 10;
 	uint32_t resolve_server_list_address_once_every_secs = 60;
 

@@ -1934,6 +1934,11 @@ void do_server_vars(
 		revert(f);
 	};
 
+	auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
+		slider(l, f, std::forward<decltype(args)>(args)...);
+		revert(f);
+	};
+
 	if (pane == rcon_pane::ARENAS) {
 		if (perform_arena_chooser(vars.arena, runtime_info)) {
 			vars.game_mode = "";
@@ -1960,6 +1965,8 @@ void do_server_vars(
 			revert(vars.cycle_always_game_mode);
 
 			revertable_checkbox("Randomize order", vars.cycle_randomize_order);
+			revertable_slider("When idle, change map once every minutes", vars.when_idle_change_maps_once_every_mins, float(0.0f), float(120.0f));
+			tooltip_on_hover("0 disables changing on idle.");
 		}
 
 		if (vars.cycle == arena_cycle_type::LIST) {
@@ -2028,11 +2035,6 @@ void do_server_vars(
 		int field_id = 999998;
 
 		auto& scope_cfg = vars;
-
-		auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
-			slider(l, f, std::forward<decltype(args)>(args)...);
-			revert(f);
-		};
 
 		auto revertable_input_text = [&](auto l, auto& f, auto&&... args) {
 			input_text(l, f, std::forward<decltype(args)>(args)...);

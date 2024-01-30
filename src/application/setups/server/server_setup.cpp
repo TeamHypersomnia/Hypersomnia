@@ -560,7 +560,14 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		}
 
 		if (any_ended && !is_playtesting_server()) {
-			choose_next_map_from_cycle();
+			if (!is_idle()) {
+				/*
+					Don't do changes on idle when an idle match ends as this is controlled by an explicit interval: 
+					when_idle_change_maps_once_every_mins
+				*/
+
+				choose_next_map_from_cycle();
+			}
 		}
 	}
 }
@@ -3452,12 +3459,41 @@ constexpr auto map_command_interval_secs_v = 30u;
 constexpr auto map_command_interval_secs_v = 4u;
 #endif
 
+bool server_setup::is_idle() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.is_idle();
+		}
+	);
+}
+
 bool server_setup::can_use_map_command_now() const {
 	return get_arena_handle().on_mode(
 		[&](const auto& mode) {
 			return mode.can_use_map_command_now();
 		}
 	);
+}
+
+void server_setup::handle_changing_maps_on_idle() {
+	if (!is_idle()) {
+		when_last_changed_map_due_to_idle = server_time;
+	}
+	else {
+		const auto interval = vars.when_idle_change_maps_once_every_mins;
+
+		if (interval > 0) {
+			const auto since_last = server_time - when_last_changed_map_due_to_idle;
+
+			const auto clamped_interval = std::max(3.0f / 60.0f, interval);
+
+			if (since_last >= 60 * clamped_interval) {
+				LOG("Idle for %x minutes. Selecting next map.", vars.when_idle_change_maps_once_every_mins);
+				choose_next_map_from_cycle();
+				when_last_changed_map_due_to_idle = server_time;
+			}
+		}
+	}
 }
 
 void server_setup::handle_client_chat_command(

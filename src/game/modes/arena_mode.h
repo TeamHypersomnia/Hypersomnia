@@ -751,4 +751,6 @@ public:
 	mode_player_id find_suspended_player_id(const std::string& account_id) const;
 
 	bool can_use_map_command_now() const;
+
+	bool is_idle() const;
 };

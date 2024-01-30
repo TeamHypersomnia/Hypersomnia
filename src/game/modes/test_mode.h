@@ -307,4 +307,8 @@ public:
 	bool can_use_map_command_now() const {
 		return true;
 	}
+
+	bool is_idle() const {
+		return players.empty();
+	}
 };

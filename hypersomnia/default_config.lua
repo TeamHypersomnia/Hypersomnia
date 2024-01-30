@@ -843,6 +843,9 @@ treat_as_music_sounds_longer_than_secs = 5,
       "de_silo"
     }, 
 
+    -- Will go to the next map in the cycle when there are no players on the server.
+    when_idle_change_maps_once_every_mins = 15,
+
     -- Convenience var to override the game mode
     -- for all maps on the list or on the disk.
     cycle_always_game_mode = "",

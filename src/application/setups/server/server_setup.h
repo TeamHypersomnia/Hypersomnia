@@ -162,6 +162,7 @@ class server_setup :
 	net_time_t when_last_resolved_internal_address = 0;
 
 	net_time_t when_last_used_map_command = 0;
+	net_time_t when_last_changed_map_due_to_idle = 0;
 
 	double tell_me_my_address_stamp = 0;
 
@@ -342,6 +343,7 @@ private:
 
 	template <class T>
 	void choose_next_map_from(const T&);
+	void handle_changing_maps_on_idle();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -444,6 +446,8 @@ public:
 
 			finalize_webhook_jobs();
 			check_for_updates();
+
+			handle_changing_maps_on_idle();
 
 			step_collected.clear();
 
@@ -776,4 +780,5 @@ public:
 	bool can_use_map_command_now() const;
 
 	void choose_next_map_from_cycle();
+	bool is_idle() const;
 };

@@ -4123,3 +4123,7 @@ bool arena_mode::is_ranked_live() const {
 bool arena_mode::can_use_map_command_now() const { 
 	return state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
 }
+
+bool arena_mode::is_idle() const {
+	return can_use_map_command_now() && players.empty() && suspended_players.empty() && abandoned_players.empty();
+}
