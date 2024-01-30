@@ -1393,6 +1393,7 @@ work_result work(
 	auto launch_main_menu = [&]() {
 		if (!has_main_menu()) {
 			main_menu_gui = {};
+			main_menu_gui.has_play_ranked_button = is_steam_client;
 			
 			setup_launcher([&]() {
 				emplace_main_menu(lua, *official, config.main_menu);
@@ -1776,7 +1777,7 @@ work_result work(
 	};
 
 	auto perform_browse_servers = [&]() {
-		browse_servers_gui.allow_ranked_servers = main_menu_gui.has_play_ranked_button;
+		browse_servers_gui.allow_ranked_servers = is_steam_client;
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
@@ -1804,7 +1805,7 @@ work_result work(
 	};
 
 	auto perform_start_client_gui = [&](const auto frame_num) {
-		const auto best_server = browse_servers_gui.find_best_server(main_menu_gui.has_play_ranked_button);
+		const auto best_server = browse_servers_gui.find_best_server(is_steam_client);
 
 		const bool perform_result = start_client_gui.perform(
 			best_server,
@@ -3885,7 +3886,6 @@ work_result work(
 				else {
 					const auto context = create_menu_context(main_menu_gui);
 
-					main_menu_gui.has_play_ranked_button = is_steam_client;
 					main_menu_gui.advance(context, frame_delta);
 
 					menu_ltrb = main_menu_gui.root.get_menu_ltrb(context);

@@ -11,8 +11,6 @@ summary: That which we are brainstorming at the moment.
 
 - waiting for match flag for servers so they don't appear in find best ranked if someone disconnected and serv is joinable
 
-- corner case - everyone abandons?
-
 - fix browsing servers from esc when starting from in-game setup
 
 - Post ranked deplyoment

@@ -4,6 +4,10 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- corner case - everyone abandons?
+    - have to count suspended when checking if someone abandoned the match and run this logic on 
+        - Doesn't matter since everyone loses in this case as it should be (it's counted as a loss on the report_match endpoint)
+
 # Steam
 
 - A simple friends panel under Escape when playing on a server should be trivial
