@@ -70,6 +70,8 @@ struct arena_files_database_entry {
 
 using arena_files_database_type = std::unordered_map<augs::secure_hash_type, arena_files_database_entry>;
 
+struct client_requested_chat;
+
 class server_setup : 
 	public default_setup_settings,
 	public arena_gui_mixin<server_setup> /* For the admin player */
@@ -158,6 +160,8 @@ class server_setup :
 	net_time_t when_last_sent_tell_me_my_address = 0;
 	net_time_t when_last_resolved_server_list_addr = 0;
 	net_time_t when_last_resolved_internal_address = 0;
+
+	net_time_t when_last_used_map_command = 0;
 
 	double tell_me_my_address_stamp = 0;
 
@@ -335,6 +339,9 @@ private:
 	);
 
 	void start_ranked_match_if_conditions_met();
+
+	template <class T>
+	void choose_next_map_from(const T&);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -761,4 +768,12 @@ public:
 	) const;
 
 	void restart_match();
+
+	void handle_client_chat_command(client_id_type, const ::client_requested_chat&);
+
+	bool is_ranked_server() const;
+
+	bool can_use_map_command_now() const;
+
+	void choose_next_map_from_cycle();
 };

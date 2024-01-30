@@ -4119,3 +4119,7 @@ float arena_mode::get_freeze_time(const const_input_type in) const {
 bool arena_mode::is_ranked_live() const { 
 	return ranked_state == ranked_state_type::LIVE;
 }
+
+bool arena_mode::can_use_map_command_now() const { 
+	return state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
+}

@@ -602,14 +602,20 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 		{
-			if (s.is_official_server() && s.heartbeat.is_ranked_server) {
-				auto secs = yojimbo_time() / 4.0f;
+			if (s.is_official_server() ) {
+				if (s.heartbeat.is_ranked_server) {
+					auto secs = yojimbo_time() / 4.0f;
 
-				auto wave_color = rgba::get_bright_wave(secs, 0.55);
-				auto col_scope = scoped_style_color(ImGuiCol_Text, wave_color);
+					auto wave_color = rgba::get_bright_wave(secs, 0.55);
+					auto col_scope = scoped_style_color(ImGuiCol_Text, wave_color);
 
-				text("RANKED");
-				ImGui::SameLine();
+					text("RANKED");
+					ImGui::SameLine();
+				}
+				else {
+					text_disabled("CASUAL");
+					ImGui::SameLine();
+				}
 			}
 
 			auto col_scope = scoped_style_color(ImGuiCol_Text, color);

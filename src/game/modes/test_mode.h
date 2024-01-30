@@ -303,4 +303,8 @@ public:
 	mode_player_id find_suspended_player_id(const std::string&) const {
 		return mode_player_id::dead();
 	}
+
+	bool can_use_map_command_now() const {
+		return true;
+	}
 };

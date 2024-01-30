@@ -749,4 +749,6 @@ public:
 	float get_match_unfreezes_in_secs() const;
 
 	mode_player_id find_suspended_player_id(const std::string& account_id) const;
+
+	bool can_use_map_command_now() const;
 };

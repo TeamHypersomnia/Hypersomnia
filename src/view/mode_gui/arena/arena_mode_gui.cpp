@@ -1199,7 +1199,7 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 
-			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will be BANNED if you leave the match after it starts!!![/color]");
+			const auto ranked_instruction = std::string("Type [color=green]/go[/color] when you are ready.\n[color=orange]You will LOSE MMR if you leave the match after it starts!!![/color]");
 
 			const auto& original_welcome = is_ranked_server ? ranked_instruction : mode_input.rules.view.warmup_welcome_message;
 			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;

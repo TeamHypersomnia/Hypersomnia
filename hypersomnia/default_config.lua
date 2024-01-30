@@ -675,7 +675,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     draw_own_cursor_in_fullscreen = false,
     log_keystrokes = false,
     size = {
-      x = 1920,
+      x = 1200,
       y = 700
     },
 	vsync_mode = "OFF",
@@ -768,7 +768,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     -- Set to true for ranked servers that wish to report matches to an endpoint.
     -- Note you'll need to setup your own steam_web_api_key in order to authenticate players.
     require_authentication = false,
-    kick_if_unauthenticated_for_secs = 4.0,
+    kick_if_unauthenticated_for_secs = 6.0,
 
     ranked = {
       -- Note you can always host a "ranked" match locally -

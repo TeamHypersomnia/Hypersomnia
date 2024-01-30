@@ -446,6 +446,64 @@ void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
 	}
 }
 
+template <class T>
+void server_setup::choose_next_map_from(const T& list) {
+	if (list.empty()) {
+		return;
+	}
+
+	auto rebuild_indices = [&]() {
+		for (std::size_t l = 0; l < list.size(); ++l) {
+			shuffled_cycle_indices.push_back(l);
+		}
+
+		reverse_range(shuffled_cycle_indices);
+
+		if (vars.cycle_randomize_order) {
+			shuffle_range(shuffled_cycle_indices, cycle_rng);
+		}
+	};
+
+	for (std::size_t tries = 0; tries < list.size(); ++tries) {
+		if (shuffled_cycle_indices.empty() || shuffled_cycle_indices.back() >= list.size()) {
+			rebuild_indices();
+		}
+
+		const auto next_index = shuffled_cycle_indices.back();
+		shuffled_cycle_indices.pop_back();
+
+		const auto next_entry = list[next_index];
+
+		auto new_vars = vars;
+		new_vars.arena = ::get_first_word(next_entry);
+		new_vars.game_mode = ::get_second_word(next_entry);
+
+		if (!vars.cycle_always_game_mode.empty()) {
+			new_vars.game_mode = vars.cycle_always_game_mode;
+		}
+
+		if (apply(new_vars)) {
+			break;
+		}
+	}
+}
+
+void server_setup::choose_next_map_from_cycle() {
+	switch (vars.cycle) {
+		case arena_cycle_type::REPEAT_CURRENT:
+			break;
+		case arena_cycle_type::LIST:
+			choose_next_map_from(vars.cycle_list);
+			break;
+		case arena_cycle_type::ALL_ON_DISK:
+			choose_next_map_from(runtime_info.arenas_on_disk);
+			break;
+
+		default:
+			break;
+	}
+}
+
 void server_setup::default_server_post_solve(const const_logic_step step) {
 	{
 		const auto& match_starts = step.get_queue<messages::team_match_start_message>();
@@ -501,62 +559,8 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 			}
 		}
 
-		auto choose_next_from = [&](const auto& list) {
-			if (list.empty()) {
-				return;
-			}
-
-			auto rebuild_indices = [&]() {
-				for (std::size_t l = 0; l < list.size(); ++l) {
-					shuffled_cycle_indices.push_back(l);
-				}
-
-				reverse_range(shuffled_cycle_indices);
-
-				if (vars.cycle_randomize_order) {
-					shuffle_range(shuffled_cycle_indices, cycle_rng);
-				}
-			};
-
-
-			for (std::size_t tries = 0; tries < list.size(); ++tries) {
-				if (shuffled_cycle_indices.empty() || shuffled_cycle_indices.back() >= list.size()) {
-					rebuild_indices();
-				}
-
-				const auto next_index = shuffled_cycle_indices.back();
-				shuffled_cycle_indices.pop_back();
-
-				const auto next_entry = list[next_index];
-
-				auto new_vars = vars;
-				new_vars.arena = ::get_first_word(next_entry);
-				new_vars.game_mode = ::get_second_word(next_entry);
-
-				if (!vars.cycle_always_game_mode.empty()) {
-					new_vars.game_mode = vars.cycle_always_game_mode;
-				}
-
-				if (apply(new_vars)) {
-					break;
-				}
-			}
-		};
-
 		if (any_ended && !is_playtesting_server()) {
-			switch (vars.cycle) {
-				case arena_cycle_type::REPEAT_CURRENT:
-					break;
-				case arena_cycle_type::LIST:
-					choose_next_from(vars.cycle_list);
-					break;
-				case arena_cycle_type::ALL_ON_DISK:
-					choose_next_from(runtime_info.arenas_on_disk);
-					break;
-
-				default:
-					break;
-			}
+			choose_next_map_from_cycle();
 		}
 	}
 }
@@ -1082,6 +1086,10 @@ game_mode_name_type server_setup::get_current_game_mode_name() const {
 	);
 }
 
+bool server_setup::is_ranked_server() const {
+	return vars.ranked.autostart_when != ranked_autostart_type::NEVER;
+}
+
 void server_setup::send_heartbeat_to_server_list() {
 	ensure(resolved_server_list_addr.has_value());
 
@@ -1096,7 +1104,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 
 	heartbeat.require_authentication = vars.require_authentication;
-	heartbeat.is_ranked_server = vars.ranked.autostart_when != ranked_autostart_type::NEVER;
+	heartbeat.is_ranked_server = is_ranked_server();
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = get_current_game_mode_name();
@@ -1912,7 +1920,7 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
-				kick(client_id, "Account is required to play on this server!");
+				kick(client_id, "Authentication timed out. Try connecting again.");
 			}
 
 			{
@@ -3287,7 +3295,12 @@ void server_setup::refresh_runtime_info_for_rcon() {
 			augs::for_each_in_directory(
 				root,
 				[&](const auto& p) {
-					out_entries.push_back({ std::filesystem::relative(p, root).string() });
+					const auto arena_name = std::filesystem::relative(p, root).string();
+
+					if (sanitization::arena_name_safe(arena_name)) {
+						out_entries.push_back({ arena_name });
+					}
+
 					return callback_result::CONTINUE;
 				},
 				[](const auto&) { return callback_result::CONTINUE; }
@@ -3431,6 +3444,133 @@ bool server_setup::is_joinable() const {
 
 void server_setup::restart_match() {
 	handle_rcon_payload(to_client_id(mode_player_id::machine_admin()), rcon_level_type::MASTER, match_command::RESTART_MATCH);
+}
+
+#if IS_PRODUCTION_BUILD
+constexpr auto map_command_interval_secs_v = 30u;
+#else
+constexpr auto map_command_interval_secs_v = 4u;
+#endif
+
+bool server_setup::can_use_map_command_now() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			return mode.can_use_map_command_now();
+		}
+	);
+}
+
+void server_setup::handle_client_chat_command(
+	const client_id_type id,
+	const ::client_requested_chat& chat
+) {
+	const auto& cli = get_client_state(to_mode_player_id(id));
+
+	if (vars.require_authentication && !cli.is_authenticated()) {
+		LOG("Unauthenticated for a chat command.");
+		return;
+	}
+
+	if (chat.target == chat_target_type::GENERAL) {
+		if (chat.message == "/next") {
+			if (!can_use_map_command_now()) {
+				return;
+			}
+
+			if (vars.cycle == arena_cycle_type::LIST || vars.cycle == arena_cycle_type::ALL_ON_DISK) {
+				auto perform_if_can_already = [&]() {
+					if (server_time - when_last_used_map_command < map_command_interval_secs_v) {
+						const auto message = typesafe_sprintf("Map can only be changed once every %x seconds. Please wait.", map_command_interval_secs_v);
+
+						broadcast_info(message, chat_target_type::INFO_CRITICAL);
+
+						return;
+					}
+
+					when_last_used_map_command = server_time;
+
+					choose_next_map_from_cycle();
+				};
+
+				perform_if_can_already();
+			}
+			else {
+				const auto message = "No map cycle on the server.";
+
+				broadcast_info(message, chat_target_type::INFO_CRITICAL);
+			}
+		}
+		else if (begins_with(chat.message, "/map ")) {
+			if (!can_use_map_command_now()) {
+				return;
+			}
+
+			const auto requested_map = arena_and_mode_identifier(chat.message.operator std::string().substr(5));
+
+			LOG("Client '%x' requested map: %x", cli.get_nickname(), requested_map);
+
+			const auto arena = arena_identifier(::get_first_word(requested_map));
+			const auto mode = game_mode_name_type(::get_second_word(requested_map));
+
+			auto perform_if_can_already = [&](arena_and_mode_identifier with = {}) {
+				if (server_time - when_last_used_map_command < map_command_interval_secs_v) {
+					const auto message = typesafe_sprintf("Map can only be used once %x seconds. Please wait.", map_command_interval_secs_v);
+
+					broadcast_info(message, chat_target_type::INFO_CRITICAL);
+
+					return;
+				}
+
+				when_last_used_map_command = server_time;
+
+				auto new_vars = vars;
+
+				if (!with.empty()) {
+					new_vars.arena = arena_identifier(::get_first_word(with));
+					new_vars.game_mode = game_mode_name_type(::get_second_word(with));
+				}
+				else {
+					new_vars.arena = arena;
+					new_vars.game_mode = mode;
+				}
+
+				apply(new_vars);
+			};
+
+			if (is_ranked_server()) {
+				if (vars.cycle == arena_cycle_type::ALL_ON_DISK && found_in(runtime_info.arenas_on_disk, arena)) {
+					perform_if_can_already();
+				}
+				else if (vars.cycle == arena_cycle_type::LIST) {
+					if (found_in(vars.cycle_list, requested_map)) {
+						perform_if_can_already();
+					}
+					else if (mode == "") {
+						for (const auto& cycle_entry : vars.cycle_list) {
+							if (::get_first_word(cycle_entry) == arena) {
+								perform_if_can_already(cycle_entry);
+							}
+						}
+					}
+				}
+				else {
+					const auto message = typesafe_sprintf("\"%x\" is NOT on the map cycle list.", requested_map);
+
+					broadcast_info(message, chat_target_type::INFO_CRITICAL);
+				}
+			}
+			else {
+				if (found_in(runtime_info.arenas_on_disk, arena)) {
+					perform_if_can_already();
+				}
+				else {
+					const auto message = typesafe_sprintf("\"%x\" is NOT on the server.", requested_map);
+
+					broadcast_info(message, chat_target_type::INFO_CRITICAL);
+				}
+			}
+		}
+	}
 }
 
 #include "augs/readwrite/to_bytes.h"

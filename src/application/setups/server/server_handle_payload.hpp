@@ -165,6 +165,8 @@ message_handler_result server_setup::handle_payload(
 
 			broadcast(message);
 
+			handle_client_chat_command(client_id, payload);
+
 			c.last_keyboard_activity_time = server_time;
 		}
 	}
