@@ -221,6 +221,12 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	our_mmr = yojimbo_time()*2.5f-20.0f;
 #endif
 
+#if 0
+	if (!all.leaderboards_team.empty()) {
+		all.leaderboards_team[0].mmr = yojimbo_time()*2.5f-20.0f;
+	}
+#endif
+
 	if (refresh_in_progress() && !refreshed_once) {
 		text_color("Downloading leaderboards...", yellow);
 		return;
@@ -241,6 +247,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	ImGui::Columns(3);
 
 	ImGui::SetColumnWidth(0, max_avatar_side_v + 10);
+
+	const auto col_h = ImGui::GetTextLineHeight();
 
 	{
 		const auto one_letter = ImGui::CalcTextSize("9");
@@ -384,7 +392,14 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		ImGui::Separator();
 
+		const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
+		auto sv = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(item_spacing.x,item_spacing.y*2.5f));
+
 		for (const auto& s : list) {
+			auto open_url = [&]() {
+				augs::open_url(typesafe_sprintf("https://hypersomnia.xyz/user/%x", s.account_id));
+			};
+
 			const auto place = 1 + index_in(list, s);
 			const auto col = place_col(place);
 
@@ -410,14 +425,88 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			ImGui::NextColumn();
 
 			{
+
+				bool viewing = false;
+
+				const auto this_rank = ::get_rank_for(s.mmr);
+
+				auto do_hovered_logic = [&]() {
+					if (viewing) {
+						return;
+					}
+
+					viewing = true;
+
+					auto sc = scoped_tooltip();
+
+					{
+						auto crs = scoped_preserve_cursor();
+
+						const auto entry = in.necessary_images.at(assets::necessary_image_id::RANK_BACKGROUND);
+
+						const auto cols = colors_nha {
+							this_rank.name_color,
+							this_rank.name_color,
+							this_rank.name_color
+						};
+
+						augs::imgui::game_image_button("##RankBgSub", entry, entry.get_original_size(), cols, augs::imgui_atlas_type::GAME);
+					}
+
+					const auto entry = in.necessary_images.at(this_rank.icon);
+
+					augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
+					ImGui::SameLine();
+
+					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+					text_color(this_rank.name, this_rank.name_color);
+					ImGui::PopFont();
+				};
+
+				{
+					const auto entry = in.necessary_images.at(this_rank.icon);
+					const auto sz = vec2::scaled_to_max_size(entry.get_original_size(), col_h*1.7f); 
+
+					if (augs::imgui::game_image_button("##RankMiniIcon", entry, sz, {}, augs::imgui_atlas_type::GAME)) {
+						open_url();
+					}
+
+					if (ImGui::IsItemHovered()) {
+						do_hovered_logic();
+					}
+
+					ImGui::SameLine();
+				}
+
 				const auto alpha_sin = (std::sin(yojimbo_time()*2) + 1) / 2;
-				auto col_sin = col;
+				auto col_sin = this_rank.name_color;
 				col_sin.a =  alpha_sin*30+20;
 
-				auto progress_bg_cols = scoped_selectable_colors({ col_sin, rgba(255, 255, 255, 30), rgba(255, 255, 255, 60) });
+				if (!is_us) {
+					col_sin.a = 60;
+				}
 
-				if (ImGui::Selectable(s.nickname.c_str(), is_us, ImGuiSelectableFlags_SpanAllColumns)) {
-					augs::open_url(typesafe_sprintf("https://hypersomnia.xyz/user/%x", s.account_id));
+				auto this_rank_hov = this_rank.name_color;
+				this_rank_hov.a = 90;
+
+				auto this_rank_act = this_rank.name_color;
+				this_rank_act.a = 120;
+
+				auto every_two = place % 2 == 0;
+
+				if (every_two && !is_us && !viewing) {
+					col_sin = rgba(255, 255, 255, 8);
+				}
+
+				auto progress_bg_cols = scoped_selectable_colors({ col_sin, this_rank_hov, this_rank_act });
+
+
+				if (ImGui::Selectable(s.nickname.c_str(), every_two || is_us || viewing, ImGuiSelectableFlags_SpanAllColumns)) {
+					open_url();
+				}
+
+				if (ImGui::IsItemHovered()) {
+					do_hovered_logic();
 				}
 			}
 
@@ -427,8 +516,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			text(typesafe_sprintf("%2f", s.mmr));
 
 			ImGui::NextColumn();
-
-			ImGui::Separator();
 		}
 	};
 
