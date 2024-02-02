@@ -208,9 +208,9 @@ struct arena_mode_economy_rules {
 	money_type maximum_money = 20000;
 	money_type warmup_initial_money = 20000;
 
-	money_type losing_faction_award = 1700;
+	money_type losing_faction_award = 1900;
 	money_type winning_faction_award = 3700;
-	money_type consecutive_loss_bonus = 500;
+	money_type consecutive_loss_bonus = 800;
 	uint32_t max_consecutive_loss_bonuses = 4;
 
 	money_type team_kill_penalty = 1000;
