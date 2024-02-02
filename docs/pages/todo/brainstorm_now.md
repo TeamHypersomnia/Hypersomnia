@@ -32,8 +32,11 @@ summary: That which we are brainstorming at the moment.
     - and if defusing, always restore the mouse no matter what
 
 - POST-CRASH REJOINING: Create a 'user/ranked.json' file whenever a match starts
+    - We could just have the server heartbeat include a match id and save last_match_id.json
+        - then just download the server list if this file exists
+        - if match doesn't exist, delete this file
     - Should just spawn a modal that overrides the crash notification modal
-    - But when to delete it?
+    - (Disregarded) But when to delete it?
         - AUTOMATICALLY AFTER AN HOUR. (or exactly 1.5min * 30 rounds = 45 minutes which is the maximum duration of a match)
         - match summary
         - abandon button in the modal
