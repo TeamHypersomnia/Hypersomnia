@@ -11,25 +11,43 @@ struct rank_info {
 	rgba number_color;
 };
 
-const auto get_rank_info() {
+inline auto get_ranks_info() {
 	using I = assets::necessary_image_id;
-	const auto bronze = rgba(222, 166, 96, 255);
+	const auto bronze = rgba(196, 106, 0, 255);
+	const auto bronzer = rgba(222, 166, 96, 255);
+	const auto gold = rgba(255, 211, 0, 255);
 
-	return {
+	return std::array<rank_info, 15> { {
 		{ "Elo Hell 3",			I::RANK_HELL_3, -99.0f, red, red },
 		{ "Elo Hell 2",			I::RANK_HELL_2, -10.0f, red, red },
 		{ "Elo Hell 1",			I::RANK_HELL_1, -5.0f, 	red, red },
-		{ "Bronze",				I::RANK_1, 		-0.0f,	bronze, green },
+		{ "Bronze",				I::RANK_1, 		0.0f,	bronze, green },
 		{ "Bronze Elite",		I::RANK_2, 		5.0f,	bronze, green },
-		{ "Survivor",			I::RANK_3, 		10.0f, 	bronze, green },
-		{ "Seeker",				I::RANK_4, 		15.0f, 	bronze, green },
-		{ "Knower",				I::RANK_5, 		20.0f, 	bronze, green },
+		{ "Survivor",			I::RANK_3, 		10.0f, 	bronzer, green },
+		{ "Seeker",				I::RANK_4, 		15.0f, 	bronzer, green },
+		{ "Knower",				I::RANK_5, 		20.0f, 	bronzer, green },
 		{ "Platinum",			I::RANK_6, 		25.0f, 	silver, green },
 		{ "Twin Plates",		I::RANK_7, 		30.0f, 	silver, green },
-		{ "Starling",			I::RANK_8, 		35.0f, 	silver, green },
-		{ "Ascendant",			I::RANK_9,		40.0f, 	silver, green },
-		{ "Skylord",			I::RANK_10, 	45.0f, 	silver, silver },
+		{ "Starling",			I::RANK_8, 		35.0f, 	white, white },
+		{ "Ascendant",			I::RANK_9,		40.0f, 	white, white },
+		{ "Skylord",			I::RANK_10, 	45.0f, 	white, white },
 		{ "Aurora Borealis",	I::RANK_11, 	50.0f, 	cyan, cyan },
 		{ "Sol Invictus",		I::RANK_12, 	55.0f, 	gold, gold }
-	};
+	} };
 };
+
+inline auto get_rank_for(const float mmr) {
+	const auto ranks = ::get_ranks_info();
+	const auto n = ranks.size();
+
+	for (std::size_t i = 0; i < n; ++i) {
+		const auto next = ranks[n - i - 1];
+
+		if (mmr >= next.min_mmr) {
+			return next;
+		}
+	}
+
+	return ranks[0];
+}
+

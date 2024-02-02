@@ -186,6 +186,8 @@ namespace assets {
 		DOWNLOAD_ICON,
 		UPLOAD_ICON,
 
+		RANK_BACKGROUND,
+
 		RANK_HELL_3,
 		RANK_HELL_2,
 		RANK_HELL_1,

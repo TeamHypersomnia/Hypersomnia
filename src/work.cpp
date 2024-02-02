@@ -1770,6 +1770,7 @@ work_result work(
 
 			config.main_menu.leaderboards_provider_url,
 			get_general_renderer(),
+			streaming.necessary_images_in_atlas,
 			streaming.avatar_preview_tex,
 
 			menu_ltrb

@@ -24,6 +24,7 @@
 #include "augs/window_framework/shell.h"
 
 #include "augs/misc/imgui/imgui_game_image.h"
+#include "view/ranks_info.h"
 
 double yojimbo_time();
 
@@ -216,6 +217,10 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 	}
 
+#if 0
+	our_mmr = yojimbo_time()*2.5f-20.0f;
+#endif
+
 	if (refresh_in_progress() && !refreshed_once) {
 		text_color("Downloading leaderboards...", yellow);
 		return;
@@ -233,9 +238,20 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		text_color(typesafe_sprintf("Welcome home,", in.nickname), green);
 	}
 
-	ImGui::Columns(2);
+	ImGui::Columns(3);
 
 	ImGui::SetColumnWidth(0, max_avatar_side_v + 10);
+
+	{
+		const auto one_letter = ImGui::CalcTextSize("9");
+		const auto nick_w = ImGui::CalcTextSize(in.nickname.c_str()).x + one_letter.x*4;
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+		const auto mmr_w = ImGui::CalcTextSize("MMR: 9.99999999").x;
+		ImGui::PopFont();
+		const auto col_w = std::max(nick_w, mmr_w);
+
+		ImGui::SetColumnWidth(1, col_w);
+	}
 
 	{
 		const auto avatar_size = vec2(max_avatar_side_v, max_avatar_side_v);
@@ -283,6 +299,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	const auto mmr_text = "MMR:";
 	const auto mmr_num_text = typesafe_sprintf("%4f", our_mmr);
 
+	const auto our_rank = ::get_rank_for(our_mmr);
+
 	if (played) {
 		text("Place:");
 		ImGui::SameLine();
@@ -293,7 +311,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		text(mmr_text);
 		ImGui::SameLine();
-		text_color(mmr_num_text, our_mmr >=  0.0f ? green : red);
+		text_color(mmr_num_text, our_rank.number_color);
 		ImGui::PopFont();
 	}
 	else {
@@ -308,6 +326,35 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	}
 
 	ImGui::NextColumn();
+
+	{
+		auto crs = scoped_preserve_cursor();
+
+		const auto entry = in.necessary_images.at(assets::necessary_image_id::RANK_BACKGROUND);
+
+		auto cols = colors_nha {
+			our_rank.name_color,
+			rgba(our_rank.name_color).mult_luminance(1.1f),
+			rgba(our_rank.name_color).mult_luminance(1.2f)
+		};
+
+		augs::imgui::game_image_button("##RankBg", entry, entry.get_original_size(), cols, augs::imgui_atlas_type::GAME);
+	}
+
+	{
+		const auto entry = in.necessary_images.at(our_rank.icon);
+
+		augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
+	}
+
+	ImGui::SameLine();
+
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+	text_color(our_rank.name, our_rank.name_color);
+	ImGui::PopFont();
+
+	ImGui::NextColumn();
+
 	ImGui::Columns(1);
 
 	ImGui::Separator();
