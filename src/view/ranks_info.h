@@ -29,7 +29,7 @@ inline auto get_ranks_info() {
 		{ "Platinum",			I::RANK_6, 		25.0f, 	silver, green },
 		{ "Twin Plates",		I::RANK_7, 		30.0f, 	silver, green },
 		{ "Starling",			I::RANK_8, 		35.0f, 	white, white },
-		{ "Ascendant",			I::RANK_9,		40.0f, 	white, white },
+		{ "Sentinel",			I::RANK_9,		40.0f, 	white, white },
 		{ "Skylord",			I::RANK_10, 	45.0f, 	white, white },
 		{ "Aurora Borealis",	I::RANK_11, 	50.0f, 	cyan, cyan },
 		{ "Sol Invictus",		I::RANK_12, 	55.0f, 	gold, gold }
