@@ -196,6 +196,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	thread_local ImGuiTextFilter filter;
 
+#if 0
+	if (!all.leaderboards_team.empty()) {
+		all.leaderboards_team[0].mmr = 62.498f;
+		all.leaderboards_team[1].mmr = 51.847f;
+	}
+#endif
+
 	float our_mmr = 0.0f;
 
 	auto get_current_list = [&]() -> std::vector<leaderboards_entry>& {
@@ -219,12 +226,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 #if 0
 	our_mmr = yojimbo_time()*2.5f-20.0f;
-#endif
-
-#if 0
-	if (!all.leaderboards_team.empty()) {
-		all.leaderboards_team[0].mmr = yojimbo_time()*2.5f-20.0f;
-	}
 #endif
 
 	if (refresh_in_progress() && !refreshed_once) {
@@ -323,7 +324,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PopFont();
 	}
 	else {
-		text("You haven't played any ranked match yet!");
+		text("No matches yet!");
 
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
