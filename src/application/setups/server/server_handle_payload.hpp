@@ -250,6 +250,7 @@ message_handler_result server_setup::handle_payload(
 
 				/* Prevent kick after the inactivity period */
 
+				c.when_connected = server_time;
 				c.last_valid_payload_time = server_time;
 				c.last_keyboard_activity_time = server_time;
 
