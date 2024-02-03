@@ -486,11 +486,11 @@ bool arena_mode::should_suspend_instead_of_remove(const const_input_type in) con
 }
 
 void arena_mode::notify_ranked_banned(
+	const arena_mode_player& banned_player,
 	const mode_player_id& id_when_suspended,
 	const client_nickname_type& nickname,
 	const const_logic_step step
 ) {
-	const auto& banned_player = suspended_players.at(id_when_suspended);
 	auto& abandoned_player = abandoned_players[id_when_suspended];
 	abandoned_player = banned_player;
 	abandoned_player.stats.abandoned_at_score = get_score(abandoned_player.get_faction());
@@ -512,7 +512,7 @@ void arena_mode::remove_player(input_type in, const logic_step step, const mode_
 
 			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked)) {
 				LOG("%x exceeded suspension limits. Kicking right away.", id.value);
-				notify_ranked_banned(id, entry->get_nickname(), step);
+				notify_ranked_banned(*entry, id, entry->get_nickname(), step);
 				erase_player(in, step, id, false);
 			}
 			else {
@@ -3043,7 +3043,7 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 
 		if (p.second.suspend_limit_exceeded(in.dynamic_vars.ranked)) {
 			LOG("%x exceeded suspension limits. Kicking for good.", p.first.value);
-			notify_ranked_banned(p.first, p.second.get_nickname(), step);
+			notify_ranked_banned(p.second, p.first, p.second.get_nickname(), step);
 			to_erase.push_back(p.first);
 		}
 	}

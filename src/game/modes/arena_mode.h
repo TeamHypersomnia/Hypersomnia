@@ -552,6 +552,7 @@ public:
 	mode_player_id find_best_player_in(faction_type) const;
 
 	void notify_ranked_banned(
+		const arena_mode_player& player_data,
 		const mode_player_id& id_when_suspended,
 		const client_nickname_type& nickname,
 		const_logic_step

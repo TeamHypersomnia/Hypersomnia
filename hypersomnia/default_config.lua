@@ -793,7 +793,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 
       -- Keep this relatively tight so the match can instantly freeze
       -- in case the game crashes in a critical situation.
-      client_network_timeout_secs = 1,
+      client_network_timeout_secs = 1.5,
 
       -- Max: 65535
       rejoin_time_limit = 180,
