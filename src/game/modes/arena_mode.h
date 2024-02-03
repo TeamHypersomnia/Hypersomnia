@@ -289,6 +289,10 @@ public:
 		}
 
 		faction_type get_opposing(faction_type f) const {
+			if (f == faction_type::SPECTATOR) {
+				return f;
+			}
+
 			if (f == bombing) {
 				return defusing;
 			}
