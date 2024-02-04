@@ -1227,10 +1227,10 @@ work_result work(
 		return current_setup != nullptr;
 	};
 
-	auto will_abandon_ranked_match = [&]() {
+	auto would_abandon_ranked_match = [&]() {
 		if (has_current_setup()) {
 			if (const auto setup = std::get_if<client_setup>(std::addressof(*current_setup))) {
-				return setup->is_ranked_live();
+				return setup->would_abandon_match();
 			}
 		}
 
@@ -1955,7 +1955,7 @@ work_result work(
 			background_setup != nullptr,
 			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup),
 			is_during_tutorial(),
-			will_abandon_ranked_match()
+			would_abandon_ranked_match()
 		};
 	};
 
@@ -2758,7 +2758,7 @@ work_result work(
 
 			case T::QUIT_TO_MENU:
 				if (allow_popup) {
-					if (will_abandon_ranked_match()) {
+					if (would_abandon_ranked_match()) {
 						make_abandon_popup(T::QUIT_TO_MENU);
 						break;
 					}
@@ -2784,7 +2784,7 @@ work_result work(
 
 			case T::QUIT_GAME:
 				if (allow_popup) {
-					if (will_abandon_ranked_match()) {
+					if (would_abandon_ranked_match()) {
 						make_abandon_popup(T::QUIT_GAME);
 						break;
 					}

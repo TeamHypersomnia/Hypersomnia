@@ -862,5 +862,5 @@ public:
 	void send_auth_ticket(const steam_auth_ticket&);
 
 	bool is_ranked_live_or_starting() const;
-	bool is_ranked_live() const;
+	bool would_abandon_match() const;
 };

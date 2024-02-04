@@ -109,7 +109,7 @@ struct ingame_menu_gui {
 			if (e == ingame_menu_button_type::QUIT_TO_MENU) {
 				if (context.deps.will_abandon_match) {
 					root.buttons[i].colorize = red;
-					root.buttons[i].set_complete_caption("Abandon Match (Quit to menu)");
+					root.buttons[i].set_complete_caption("Abandon match (Quit to menu)");
 				}
 				else if (context.deps.will_quit_to_editor) {
 					root.buttons[i].set_complete_caption("Quit to Editor");
@@ -122,7 +122,7 @@ struct ingame_menu_gui {
 			if (e == ingame_menu_button_type::QUIT_GAME) {
 				if (context.deps.will_abandon_match) {
 					root.buttons[i].colorize = red;
-					root.buttons[i].set_complete_caption("Abandon Match (Quit game)");
+					root.buttons[i].set_complete_caption("Abandon match (Quit game)");
 				}
 			}
 

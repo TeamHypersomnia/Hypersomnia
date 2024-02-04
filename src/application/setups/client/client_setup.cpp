@@ -1777,10 +1777,10 @@ bool client_setup::is_ranked_live_or_starting() const {
 	);
 }
 
-bool client_setup::is_ranked_live() const {
-	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-		[&](const auto& mode) {
-			return mode.get_ranked_state() == ranked_state_type::LIVE;
+bool client_setup::would_abandon_match() const {
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			return mode.should_suspend_instead_of_remove(in);
 		}
 	);
 }
