@@ -6,9 +6,10 @@ bool is_reasonably_in_view(
 	const F target_character,
 	const vec2 pre_step_crosshair_displacement,
 	const interpolation_system& interp,
-	const float fow_angle,
+	const fog_of_war_settings considered_fow,
 	const bool teammates_are_enemies
 ) {
+	const auto fow_angle = considered_fow.angle;
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
 	if (viewed_character.dead() || viewed_character_transform == std::nullopt) {
@@ -27,6 +28,10 @@ bool is_reasonably_in_view(
 
 	const auto from = viewed_character_transform->pos;
 	const auto to = target_character.get_viewing_transform(interp).pos;
+
+	if (!ltrb::center_and_size(from, considered_fow.get_real_size()).hover(to)) {
+		return false;
+	}
 
 	auto look_dir = calc_crosshair_displacement(viewed_character) + pre_step_crosshair_displacement;
 

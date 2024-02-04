@@ -147,7 +147,7 @@ void enqueue_illuminated_rendering_jobs(
 				character,
 				pre_step_crosshair_displacement,
 				interp,
-				considered_fov.angle,
+				considered_fov,
 				settings.teammates_are_enemies
 			);
 		};

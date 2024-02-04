@@ -703,3 +703,12 @@ summary: Just a hidden scratchpad.
 
 - Show abandoned players in match summary
 
+- Queue bot
+    - Can submit ids of players involved in a match to the db endpoint
+    - When someone connects and is the only one, check their id if it's in any existing match
+    - Ok I think location should be determined on the queue stage 
+        - otherwise someone can connect and trigger the match on a server that's more advantageous to them
+
+- Add gamer role to discord to be pinged by server-monitor
+    - only new server/connect notifs
+

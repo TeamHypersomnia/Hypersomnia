@@ -6868,3 +6868,5 @@ This will discard your redo history."
 - give info about ALL disconnect except explicit ones
 - fix spectators going to match
 
+- Credits
+
