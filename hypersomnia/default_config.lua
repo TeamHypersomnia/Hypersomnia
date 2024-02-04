@@ -804,7 +804,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       -- On official ranked servers, this results in a ban.
       -- Feel free to set it to a high value for matches between trusted friends.
       -- Max: 255
-      max_rejoins = 3,
+      max_rejoins = 5,
 
       -- When all players finally rejoin,
       -- match will remain frozen for this many more seconds 

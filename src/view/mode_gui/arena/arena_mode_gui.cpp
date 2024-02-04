@@ -1278,13 +1278,21 @@ void arena_gui_state::draw_mode_gui(
 				auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
 
 				if (typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-					indicator_text += colored(typed_mode.is_halftime_summary(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n", white);
+					if (typed_mode.is_halftime_summary(mode_input)) {
+						indicator_text += larger_colored("\n\nFIRST HALF ENDED.", white);
+						indicator_text += larger_colored(" DO NOT LEAVE YET!!!", orange);
+
+						indicator_text += larger_colored("\nSWAPPING TEAMS IN:\n", white);
+					}
+					else {
+						indicator_text += larger_colored("\n\nMATCH ENDED.\nYou can now leave the match.\n", white);
+					}
 
 					{
 						const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);
 						const auto c = std::ceil(summary_secs_left);
 
-						indicator_text += colored(format_mins_secs(c), white);
+						indicator_text += larger_colored(format_mins_secs(c), white);
 					}
 				}
 

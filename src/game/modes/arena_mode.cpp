@@ -3551,7 +3551,13 @@ float arena_mode::get_seconds_since_win(const const_input_type in) const {
 
 float arena_mode::get_match_summary_seconds_left(const const_input_type in) const {
 	if (const auto since_win = get_seconds_since_win(in); since_win != -1.f) {
-		return static_cast<float>(in.rules.match_summary_seconds) - since_win;
+		const auto summary_secs = 
+			is_halftime_summary(in) ?
+			in.rules.halftime_summary_seconds :
+			in.rules.match_summary_seconds
+		;
+
+		return static_cast<float>(summary_secs) - since_win;
 	}
 
 	return -1.f;

@@ -54,6 +54,7 @@ struct arena_mode_ruleset {
 	uint32_t warmup_secs = 45;
 	uint32_t warmup_respawn_after_ms = 2000;
 	uint32_t max_rounds = 30;
+	uint32_t halftime_summary_seconds = 8;
 	uint32_t match_summary_seconds = 15;
 	uint32_t game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
