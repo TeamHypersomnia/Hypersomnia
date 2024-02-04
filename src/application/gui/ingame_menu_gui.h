@@ -107,11 +107,22 @@ struct ingame_menu_gui {
 			root.buttons[i].set_complete_caption(format_enum(e));
 
 			if (e == ingame_menu_button_type::QUIT_TO_MENU) {
-				if (context.deps.will_quit_to_editor) {
+				if (context.deps.will_abandon_match) {
+					root.buttons[i].colorize = red;
+					root.buttons[i].set_complete_caption("Abandon Match (Quit to menu)");
+				}
+				else if (context.deps.will_quit_to_editor) {
 					root.buttons[i].set_complete_caption("Quit to Editor");
 				}
 				else if (context.deps.will_quit_to_projects) {
 					root.buttons[i].set_complete_caption("Quit to Projects");
+				}
+			}
+
+			if (e == ingame_menu_button_type::QUIT_GAME) {
+				if (context.deps.will_abandon_match) {
+					root.buttons[i].colorize = red;
+					root.buttons[i].set_complete_caption("Abandon Match (Quit game)");
 				}
 			}
 

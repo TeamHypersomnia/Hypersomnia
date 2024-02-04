@@ -17,6 +17,7 @@ struct menu_context_dependencies {
 	const bool will_quit_to_editor;
 	const bool will_quit_to_projects;
 	const bool is_tutorial;
+	const bool will_abandon_match;
 };
 
 template <bool is_const, class Enum>

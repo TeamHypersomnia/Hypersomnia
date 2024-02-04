@@ -6865,3 +6865,6 @@ This will discard your redo history."
 
 - Let's save all matches to the database just in case we later want to analyze the data
 
+- give info about ALL disconnect except explicit ones
+- fix spectators going to match
+

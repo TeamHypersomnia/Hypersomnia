@@ -1776,3 +1776,11 @@ bool client_setup::is_ranked_live_or_starting() const {
 		}
 	);
 }
+
+bool client_setup::is_ranked_live() const {
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+		[&](const auto& mode) {
+			return mode.get_ranked_state() == ranked_state_type::LIVE;
+		}
+	);
+}

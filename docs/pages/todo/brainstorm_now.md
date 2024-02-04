@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Negative MMR should have a half-life of 2 days
+    - halver service decreasing it every 24 hours
+    - we can just say "is halved every two days"
+    - until it's less than -1 so you still have to put in some work
+
+- Queue bot
+    - Can submit ids of players involved in a match to the db endpoint
+    - When someone connects and is the only one, check their id if it's in any existing match
+    - Ok I think location should be determined on the queue stage 
+        - otherwise someone can connect and trigger the match on a server that's more advantageous to them
+
 - matches: show how long ago and a map miniature
 - last matches on the homepage
 

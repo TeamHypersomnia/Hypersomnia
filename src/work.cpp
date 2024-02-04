@@ -547,6 +547,41 @@ work_result work(
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 
+	auto abandon_pending_op = std::optional<ingame_menu_button_type>();
+	auto abandon_are_you_sure_popup = std::optional<simple_popup>();
+
+	auto make_abandon_popup = [&](auto op) {
+		abandon_pending_op = op;
+
+		simple_popup sp;
+		sp.title = "WARNING";
+		sp.warning_notice_above = "Are you sure you want to abandon the match?";
+		sp.message = "You have 3 minutes to rejoin after quitting.\n";
+
+		sp.warning_notice = "\nIf you do not come back,\nyou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
+
+		abandon_are_you_sure_popup = sp;
+	};
+
+	auto perform_abandon_are_you_sure_popup = [&]() {
+		if (abandon_are_you_sure_popup.has_value()) {
+			const auto result = abandon_are_you_sure_popup->perform({
+				{ "Abandon", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
+				{ "Cancel", rgba::zero, rgba::zero }
+			});
+
+			if (result) {
+				abandon_are_you_sure_popup = std::nullopt;
+
+				if (result == 2) {
+					abandon_pending_op = std::nullopt;
+				}
+			}
+		}
+
+		return 0;
+	};
+
 	auto failed_to_load_arena_popup = std::optional<simple_popup>();
 	auto last_exit_incorrect_popup = std::optional<simple_popup>();
 
@@ -1190,6 +1225,16 @@ work_result work(
 
 	auto has_current_setup = [&]() {
 		return current_setup != nullptr;
+	};
+
+	auto will_abandon_ranked_match = [&]() {
+		if (has_current_setup()) {
+			if (const auto setup = std::get_if<client_setup>(std::addressof(*current_setup))) {
+				return setup->is_ranked_live();
+			}
+		}
+
+		return false;
 	};
 
 	auto is_during_tutorial = [&]() {
@@ -1909,7 +1954,8 @@ work_result work(
 			viewing_config.audio_volume,
 			background_setup != nullptr,
 			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup),
-			is_during_tutorial()
+			is_during_tutorial(),
+			will_abandon_ranked_match()
 		};
 	};
 
@@ -2452,6 +2498,7 @@ work_result work(
 				}
 
 				perform_failed_to_load_arena_popup();
+				perform_abandon_are_you_sure_popup();
 
 				streaming.display_loading_progress();
 
@@ -2689,7 +2736,7 @@ work_result work(
 		}
 	};
 
-	auto do_ingame_menu_option = [&](const ingame_menu_button_type t) {
+	auto do_ingame_menu_option = [&](const ingame_menu_button_type t, const bool allow_popup = true) {
 		using T = decltype(t);
 
 		switch (t) {
@@ -2710,6 +2757,13 @@ work_result work(
 				break;
 
 			case T::QUIT_TO_MENU:
+				if (allow_popup) {
+					if (will_abandon_ranked_match()) {
+						make_abandon_popup(T::QUIT_TO_MENU);
+						break;
+					}
+				}
+
 				if (background_setup != nullptr) {
 					restore_background_setup();
 				}
@@ -2729,6 +2783,13 @@ work_result work(
 				break;
 
 			case T::QUIT_GAME:
+				if (allow_popup) {
+					if (will_abandon_ranked_match()) {
+						make_abandon_popup(T::QUIT_GAME);
+						break;
+					}
+				}
+
 				LOG("Quitting due to Quit pressed in ingame menu.");
 				request_quit();
 				break;
@@ -3584,6 +3645,10 @@ work_result work(
 						if (was_released) {
 							control_main_menu();
 							control_ingame_menu();
+
+							if (abandon_pending_op.has_value() && !abandon_are_you_sure_popup.has_value()) {
+								do_ingame_menu_option(*abandon_pending_op, false);
+							}
 						}
 						else {
 							if (control_main_menu()) {
