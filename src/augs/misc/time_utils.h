@@ -2,6 +2,7 @@
 #include <ctime>
 #include <string>
 #include <chrono>
+#include <optional>
 #include "augs/filesystem/file_time_type.h"
 
 namespace augs {
