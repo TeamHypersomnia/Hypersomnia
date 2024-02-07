@@ -1506,10 +1506,20 @@ if(BUILD_FREETYPE)
 	endif()
 endif()
 
-if (APPLE)
+if (APPLE OR LINUX)
 	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
-		"src/3rdparty/date/src/ios.mm"
+		"src/3rdparty/date/src/tz.cpp"
 	)
+
+	file_flag("src/3rdparty/date/src/tz.cpp" "-DUSE_OS_TZDB=1")
+
+	if (APPLE)
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/3rdparty/date/src/ios.mm"
+		)
+
+		file_flag("src/3rdparty/date/src/ios.mm" "-DUSE_OS_TZDB=1")
+	endif()
 endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})

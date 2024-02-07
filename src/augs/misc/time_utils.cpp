@@ -6,6 +6,12 @@
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
+
+#if !PLATFORM_WINDOWS
+#define USE_OS_TZDB 1
+#include "date/tz.h"
+#endif
+
 #include "date/date.h"
 
 #if PLATFORM_WINDOWS
@@ -366,12 +372,6 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     }
 }
 #else
-#define USE_OS_TZDB 1
-#include "date/tz.h"
-#if !PLATFORM_MACOS
-#include "3rdparty/date/src/tz.cpp"
-#endif
-
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
     using namespace std::chrono;
 
