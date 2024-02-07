@@ -39,6 +39,12 @@ namespace augs {
 		static std::string format_time_point_utc(const std::chrono::system_clock::time_point& tp);
 		static std::string get_utc_timestamp();
 		static std::string get_utc_timestamp_iso8601();
+
+		static std::string format_countdown(const int64_t secs);
+		static std::string format_countdown_letters(const int64_t secs);
+
+		static double get_secs_until_next_weekend_evening(const std::string& location_id);
+		static std::optional<std::string> format_time_until_weekend_evening(const std::string& location_id);
 #if 0
 		static std::optional<std::chrono::system_clock::time_point> from_utc_timestamp(const std::string& s);
 #endif

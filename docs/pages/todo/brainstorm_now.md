@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- update early access
 - Editor: copy path to clipboard
 
 - zbudowalbym gierke z address sanitizerem

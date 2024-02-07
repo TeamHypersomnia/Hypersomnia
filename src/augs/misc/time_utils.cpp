@@ -6,7 +6,7 @@
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
-#include "3rdparty/date.h"
+#include "date/date.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -233,6 +233,53 @@ std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const 
 	return typesafe_sprintf("%x days ago", days);
 }
 
+
+std::string augs::date_time::format_countdown_letters(const int64_t secs) {
+	const int seconds = secs % 60;
+	const int totalMinutes = secs / 60;
+	const int minutes = totalMinutes % 60;
+	const int totalHours = totalMinutes / 60;
+	const int hours = totalHours % 24;
+	const int days = totalHours / 24;
+
+	std::stringstream ss;
+
+	if (days > 0) {
+		ss << days << "d ";
+	}
+
+	// Include hours if days > 0 or hours > 0. If days > 0 but hours == 0, include "0h "
+	if (days > 0 || hours > 0) {
+		ss << hours << "h ";
+	}
+
+	// Include minutes if hours > 0, days > 0 or minutes > 0. 
+	// If days > 0 or hours > 0 but minutes == 0, include "0m "
+	if (hours > 0 || days > 0 || minutes > 0) {
+		ss << minutes << "m ";
+	}
+
+	// Seconds are always included, as they are the smallest unit of time here
+	ss << seconds << "s";
+
+	return ss.str();
+}
+
+std::string augs::date_time::format_countdown(const int64_t secs) {
+    const int seconds = secs % 60;
+    const int totalMinutes = secs / 60;
+    const int minutes = totalMinutes % 60;
+    const int totalHours = totalMinutes / 60;
+    const int hours = totalHours % 24;
+    const int days = totalHours / 24;
+
+    char buffer[30];
+
+    std::snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
+
+    return std::string(buffer);
+}
+
 std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, const int64_t secs) {
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;
@@ -253,4 +300,87 @@ std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, 
 	}
 
 	return typesafe_sprintf("%xd", days);
+}
+
+#include <map>
+#define USE_OS_TZDB 1
+#include "date/tz.h"
+#include "date/tz.cpp"
+
+#include "date/tz.h" // Ensure Howard Hinnant's date library is included
+#include <chrono>
+#include <string>
+
+// Function to get the IANA time zone name based on locationId
+std::string getTimeZoneName(const std::string& locationId) {
+    if (locationId == "aus") {
+        return "Australia/Sydney";
+    } else if (locationId == "ru") {
+        return "Europe/Moscow";
+    } else if (locationId == "de") {
+        return "Europe/Berlin";
+    } else if (locationId == "us-central") {
+        return "America/Chicago";
+    } else if (locationId == "pl") {
+        return "Europe/Warsaw";
+    }
+
+    return ""; // Return an empty string for unknown locationIds
+}
+
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+    using namespace std::chrono;
+
+    const auto& timeZoneName = getTimeZoneName(locationId);
+    if (timeZoneName.empty()) {
+        return -1; // Invalid locationId
+    }
+
+    auto timeZone = date::locate_zone(timeZoneName);
+    auto now = date::make_zoned(timeZone, system_clock::now());
+    auto localTime = now.get_local_time();
+    auto localDay = date::floor<date::days>(localTime);
+    date::weekday localWeekday{localDay};
+
+    auto eveningStart = localDay + hours(19); // 19:00 on the current day
+    auto durationUntilStart = eveningStart - localTime;
+    auto secondsUntilStart = duration_cast<seconds>(durationUntilStart).count();
+
+    // Check if the event is ongoing
+    if ((localWeekday == date::Friday || localWeekday == date::Saturday || localWeekday == date::Sunday) && 
+        secondsUntilStart >= -7200 && secondsUntilStart < 0) {
+        return 0.0; // Event is ongoing
+    }
+
+    // Calculate time until the next weekend evening
+    int daysToAdd = 0;
+    auto weekdayEncoding = localWeekday.iso_encoding();
+    if (weekdayEncoding <= date::Thursday.iso_encoding()) { // From Sunday to Thursday
+        daysToAdd = date::Friday.iso_encoding() - weekdayEncoding;
+        if (weekdayEncoding == 7) { // Special case for Sunday
+            daysToAdd = 5;
+        }
+    } else if (weekdayEncoding == date::Friday.iso_encoding() && secondsUntilStart < 0) { // Friday after 19:00
+        daysToAdd = 1; // Next is Saturday
+    } else if (weekdayEncoding == date::Saturday.iso_encoding() && secondsUntilStart < 0) { // Saturday after 19:00
+        daysToAdd = 1; // Next is Sunday
+    }
+
+    auto nextEventStart = (localDay + date::days(daysToAdd)) + hours(19); // 19:00 on the next event day
+    auto durationUntilNextEvent = nextEventStart - localTime;
+    return duration_cast<seconds>(durationUntilNextEvent).count();
+}
+
+std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
+	const auto secs = get_secs_until_next_weekend_evening(location_id);
+
+	if (secs == -1) {
+		return std::nullopt;
+	}
+
+	if (secs == 0) {
+		return std::string("");
+	}
+
+	return format_countdown_letters(secs);
 }

@@ -53,6 +53,8 @@ struct server_heartbeat {
 	uint8_t ranked_state = 0;
 	// END GEN INTROSPECTOR
 
+	double cached_time_to_event = 0.0;
+
 	bool is_ranked_server() const {
 		return ranked_state >= 1;
 	}
@@ -75,4 +77,6 @@ struct server_heartbeat {
 	int get_num_spectators() const {
 		return players_spectating.size();
 	}
+
+	std::string get_location_id() const;
 };
