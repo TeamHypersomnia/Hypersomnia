@@ -330,7 +330,7 @@ std::string getTimeZoneName(const std::string& locationId) {
 // MSVC supports C++20 chrono 
 
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
-	using clock = std::chrono::system_clock;
+  using clock = std::chrono::system_clock;
     using namespace std::chrono_literals;
 
     const auto& timeZoneName = getTimeZoneName(locationId);
@@ -355,21 +355,23 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
         }
 
         int daysToAdd = 0;
-        if (localWeekday < std::chrono::Friday) {
-            daysToAdd = (std::chrono::Friday - localWeekday).count();
-        } else if (localWeekday == std::chrono::Friday && secondsUntilStart < 0) {
+        auto weekdayEncoding = localWeekday.c_encoding(); // Use c_encoding for comparison
+
+        if (weekdayEncoding < std::chrono::Friday.c_encoding()) {
+            daysToAdd = (std::chrono::Friday.c_encoding() - weekdayEncoding) % 7;
+        } else if (weekdayEncoding == std::chrono::Friday.c_encoding() && secondsUntilStart < 0) {
             daysToAdd = 1; // Next is Saturday
-        } else if (localWeekday == std::chrono::Saturday && secondsUntilStart < 0) {
+        } else if (weekdayEncoding == std::chrono::Saturday.c_encoding() && secondsUntilStart < 0) {
             daysToAdd = 1; // Next is Sunday
         } else {
-            daysToAdd = (7 - localWeekday.c_encoding() + std::chrono::Friday.c_encoding()) % 7;
+            daysToAdd = (7 - weekdayEncoding + std::chrono::Friday.c_encoding()) % 7;
         }
 
         auto nextEventStart = localDayPoint + std::chrono::days(daysToAdd) + 19h;
         auto durationUntilNextEvent = nextEventStart - localTime;
         return std::chrono::duration_cast<std::chrono::seconds>(durationUntilNextEvent).count();
-    } catch (const std::exception& e) {
-        return -1; // Indicate an error occurred
+    } catch (...) {
+        return -1;
     }
 }
 #else
