@@ -331,25 +331,26 @@ std::string getTimeZoneName(const std::string& locationId) {
 
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
 	using clock = std::chrono::system_clock;
-	using namespace std::chrono_literals;
+    using namespace std::chrono_literals;
 
-    auto timeZoneName = getTimeZoneName(locationId);
+    const auto& timeZoneName = getTimeZoneName(locationId);
     if (timeZoneName.empty()) {
         return -1; // Invalid locationId
     }
 
     try {
-        auto zonedTimeNow = std::chrono::zoned_time(timeZoneName, clock::now());
+        auto zonedTimeNow = std::chrono::zoned_time{timeZoneName, clock::now()};
         auto localTime = zonedTimeNow.get_local_time();
         auto localDayPoint = std::chrono::floor<std::chrono::days>(localTime);
-        auto localWeekday = std::chrono::weekday{localDayPoint};
+        std::chrono::weekday localWeekday{localDayPoint};
 
         auto eveningStart = localDayPoint + 19h;
         auto durationUntilStart = eveningStart - localTime;
         auto secondsUntilStart = std::chrono::duration_cast<std::chrono::seconds>(durationUntilStart).count();
 
+        auto twoHoursInSeconds = std::chrono::duration_cast<std::chrono::seconds>(-2h).count();
         if ((localWeekday == std::chrono::Friday || localWeekday == std::chrono::Saturday || localWeekday == std::chrono::Sunday) &&
-            secondsUntilStart >= -2h && secondsUntilStart < 0s) {
+            secondsUntilStart >= twoHoursInSeconds && secondsUntilStart < 0) {
             return 0.0; // Event is ongoing
         }
 
@@ -361,14 +362,14 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
         } else if (localWeekday == std::chrono::Saturday && secondsUntilStart < 0) {
             daysToAdd = 1; // Next is Sunday
         } else {
-            daysToAdd = (7 - localWeekday.count() + std::chrono::Friday.count()) % 7;
+            daysToAdd = (7 - localWeekday.c_encoding() + std::chrono::Friday.c_encoding()) % 7;
         }
 
         auto nextEventStart = localDayPoint + std::chrono::days(daysToAdd) + 19h;
         auto durationUntilNextEvent = nextEventStart - localTime;
         return std::chrono::duration_cast<std::chrono::seconds>(durationUntilNextEvent).count();
-    } catch (...) {
-		return -1;
+    } catch (const std::exception& e) {
+        return -1; // Indicate an error occurred
     }
 }
 #else
