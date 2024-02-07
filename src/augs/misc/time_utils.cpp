@@ -302,15 +302,6 @@ std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, 
 	return typesafe_sprintf("%xd", days);
 }
 
-#include <map>
-#define USE_OS_TZDB 1
-#include "date/tz.h"
-#include "date/tz.cpp"
-
-#include "date/tz.h" // Ensure Howard Hinnant's date library is included
-#include <chrono>
-#include <string>
-
 // Function to get the IANA time zone name based on locationId
 std::string getTimeZoneName(const std::string& locationId) {
     if (locationId == "aus") {
@@ -327,6 +318,57 @@ std::string getTimeZoneName(const std::string& locationId) {
 
     return ""; // Return an empty string for unknown locationIds
 }
+
+#if PLATFORM_WINDOWS
+
+// MSVC supports C++20 chrono 
+
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+	using clock = std::chrono::system_clock;
+	using namespace std::chrono_literals;
+
+    auto timeZoneName = getTimeZoneName(locationId);
+    if (timeZoneName.empty()) {
+        return -1; // Invalid locationId
+    }
+
+    try {
+        auto zonedTimeNow = std::chrono::zoned_time(timeZoneName, clock::now());
+        auto localTime = zonedTimeNow.get_local_time();
+        auto localDayPoint = std::chrono::floor<std::chrono::days>(localTime);
+        auto localWeekday = std::chrono::weekday{localDayPoint};
+
+        auto eveningStart = localDayPoint + 19h;
+        auto durationUntilStart = eveningStart - localTime;
+        auto secondsUntilStart = std::chrono::duration_cast<std::chrono::seconds>(durationUntilStart).count();
+
+        if ((localWeekday == std::chrono::Friday || localWeekday == std::chrono::Saturday || localWeekday == std::chrono::Sunday) &&
+            secondsUntilStart >= -2h && secondsUntilStart < 0s) {
+            return 0.0; // Event is ongoing
+        }
+
+        int daysToAdd = 0;
+        if (localWeekday < std::chrono::Friday) {
+            daysToAdd = (std::chrono::Friday - localWeekday).count();
+        } else if (localWeekday == std::chrono::Friday && secondsUntilStart < 0) {
+            daysToAdd = 1; // Next is Saturday
+        } else if (localWeekday == std::chrono::Saturday && secondsUntilStart < 0) {
+            daysToAdd = 1; // Next is Sunday
+        } else {
+            daysToAdd = (7 - localWeekday.count() + std::chrono::Friday.count()) % 7;
+        }
+
+        auto nextEventStart = localDayPoint + std::chrono::days(daysToAdd) + 19h;
+        auto durationUntilNextEvent = nextEventStart - localTime;
+        return std::chrono::duration_cast<std::chrono::seconds>(durationUntilNextEvent).count();
+    } catch (...) {
+		return -1;
+    }
+}
+#else
+#define USE_OS_TZDB 1
+#include "date/tz.h"
+#include "date/tz.cpp"
 
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
     using namespace std::chrono;
@@ -370,6 +412,7 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     auto durationUntilNextEvent = nextEventStart - localTime;
     return duration_cast<seconds>(durationUntilNextEvent).count();
 }
+#endif
 
 std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
 	const auto secs = get_secs_until_next_weekend_evening(location_id);
