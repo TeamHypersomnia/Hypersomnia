@@ -1316,7 +1316,7 @@ CONSTCD11
 std::chrono::duration<Rep, Period>
 abs(std::chrono::duration<Rep, Period> d)
 {
-    return d >= d.zero() ? d : -d;
+    return d >= d.zero() ? d : static_cast<decltype(d)>(-d);
 }
 
 // round down
@@ -4206,8 +4206,8 @@ template <class CharT, class Traits, class Duration>
 inline
 typename std::enable_if
 <
-    std::ratio_less<typename Duration::period, days::period>::value
-    , std::basic_ostream<CharT, Traits>&
+    !std::is_convertible<Duration, days>::value,
+    std::basic_ostream<CharT, Traits>&
 >::type
 operator<<(std::basic_ostream<CharT, Traits>& os, const sys_time<Duration>& tp)
 {
@@ -6351,7 +6351,10 @@ read_signed(std::basic_istream<CharT, Traits>& is, unsigned m = 1, unsigned M = 
         if (('0' <= c && c <= '9') || c == '-' || c == '+')
         {
             if (c == '-' || c == '+')
+            {
                 (void)is.get();
+                --M;
+            }
             auto x = static_cast<int>(read_unsigned(is, std::max(m, 1u), M));
             if (!is.fail())
             {
@@ -6590,7 +6593,7 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
 
         CONSTDATA int not_a_year = numeric_limits<short>::min();
         CONSTDATA int not_a_2digit_year = 100;
-        CONSTDATA int not_a_century = not_a_year / 100;
+        CONSTDATA int not_a_century = numeric_limits<int>::min();
         CONSTDATA int not_a_month = 0;
         CONSTDATA int not_a_day = 0;
         CONSTDATA int not_a_hour = numeric_limits<int>::min();
@@ -7517,7 +7520,12 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                     {
                         auto c = static_cast<char>(Traits::to_char_type(ic));
                         if (c == '-')
+                        {
                             neg = true;
+                            (void)is.get();
+                        }
+                        else if (c == '+')
+                            (void)is.get();
                     }
                     if (modified == CharT{})
                     {

@@ -1037,6 +1037,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/date/include"
 	# Only for v3
 	# "${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/src"
 )
@@ -1505,6 +1506,11 @@ if(BUILD_FREETYPE)
 	endif()
 endif()
 
+if (APPLE)
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"src/3rdparty/date/src/ios.mm"
+	)
+endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
