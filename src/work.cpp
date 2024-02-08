@@ -2064,12 +2064,12 @@ work_result work(
 		auto logic_eye = get_logic_eye(with_edge_zoomout);
 
 		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
-		const float target_visible_pixels_y = considered_fov_size.y;
+		const float target_visible_pixels_x = considered_fov_size.x;
 
 		const bool should_zoom_to_fov = viewing_config.drawing.snap_zoom_to_fov_size;
 
-		if (should_zoom_to_fov && target_visible_pixels_y != 0.0f) {
-			const float screen_y = float(logic_get_screen_size().y);
+		if (should_zoom_to_fov && target_visible_pixels_x != 0.0f) {
+			const float screen_x = float(logic_get_screen_size().x);
 
 			float closest_zoom_multiple = 1.0f;
 			float closest_multiple_dist = std::numeric_limits<float>::max();
@@ -2080,9 +2080,9 @@ work_result work(
 				}
 
 				const auto mult = i < 0 ? (1.0f / (-i)) : float(i);
-				const auto scaled = target_visible_pixels_y * mult;
+				const auto scaled = target_visible_pixels_x * mult;
 
-				const auto dist = std::abs(scaled - screen_y);
+				const auto dist = std::abs(scaled - screen_x);
 
 				if (dist < closest_multiple_dist) {
 					closest_multiple_dist = dist;
@@ -2092,7 +2092,7 @@ work_result work(
 
 			const auto eps = viewing_config.drawing.snap_zoom_to_multiple_if_different_by_pixels;
 
-			auto zoom_to_snap_to_fov = screen_y / target_visible_pixels_y;
+			auto zoom_to_snap_to_fov = screen_x / target_visible_pixels_x;
 
 			if (closest_multiple_dist <= eps) {
 				zoom_to_snap_to_fov = closest_zoom_multiple;
