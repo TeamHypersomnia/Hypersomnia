@@ -78,9 +78,9 @@ void log_ensure_rel(int type, const char* left_name, const char* right_name, con
 	save_log_and_terminate();
 }
 
-void log_ensure(const char* expr, const char* file, const int line)
+void log_ensure(const char* expr, const char* function, const char* file, const int line)
 {
-	LOG("ensure(%x) failed\nfile: %x\nline: %x", expr, file, line);
+	LOG("ensure(%x) failed in:\nfunction: %x, \nfile: %x\nline: %x", expr, function, file, line);
 	save_log_and_terminate();
 }
 

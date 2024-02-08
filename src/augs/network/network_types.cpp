@@ -4,6 +4,7 @@
 
 #include "augs/network/network_types.h"
 #include "augs/log.h"
+#include "augs/ensure.h"
 #include <cstdio>
 #include <stdarg.h> 
 
@@ -20,7 +21,7 @@ vsprintf(Buffer,Format,args);
 va_end(args);
 // now everything is written on “Buffer” , so it is ready for use with “InGamePrint”
 
-LOG(Buffer);  // finaly print the text
+LOG_NOFORMAT(Buffer);  // finaly print the text
 return 0;
 }
 
@@ -36,6 +37,7 @@ namespace augs {
 
 			yojimbo_log_level(YOJIMBO_LOG_LEVEL_INFO);
 			yojimbo_set_printf_function(custom_print);
+			yojimbo_set_assert_function(log_ensure);
 			return result;
 		}
 

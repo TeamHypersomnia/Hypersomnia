@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Need a better way to measure bandwidth as we have large packet buffers
+
 - watch out for changed increment step order as we're now increasing it at the end
 	- esp. portals, editor selector
 
