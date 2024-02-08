@@ -6870,3 +6870,6 @@ This will discard your redo history."
 
 - Credits
 
+- don't check win conditions when someone abandons
+
+- update early access

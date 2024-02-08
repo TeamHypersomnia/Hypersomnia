@@ -3545,9 +3545,21 @@ void server_setup::handle_client_chat_command(
 		return;
 	}
 
+	auto broadcast_only_warmup = [&]() {
+		if (is_ranked_server()) {
+			/* Should be obvious for everyone. */
+			return;
+		}
+
+		const auto message = typesafe_sprintf("Map can only be changed during warmup.");
+
+		broadcast_info(message, chat_target_type::INFO_CRITICAL);
+	};
+
 	if (chat.target == chat_target_type::GENERAL) {
 		if (chat.message == "/next") {
 			if (!can_use_map_command_now()) {
+				broadcast_only_warmup();
 				return;
 			}
 
@@ -3576,6 +3588,7 @@ void server_setup::handle_client_chat_command(
 		}
 		else if (begins_with(chat.message, "/map ")) {
 			if (!can_use_map_command_now()) {
+				broadcast_only_warmup();
 				return;
 			}
 

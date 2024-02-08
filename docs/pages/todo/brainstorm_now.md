@@ -7,9 +7,6 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - optimize de_rambo
-- don't check win conditions when someone abandons
-
-- update early access
 - Editor: copy path to clipboard
 
 - zbudowalbym gierke z address sanitizerem
