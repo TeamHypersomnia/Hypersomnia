@@ -1851,6 +1851,10 @@ std::optional<faction_type> arena_mode::any_team_abandoned_match(const input_typ
 void arena_mode::process_win_conditions(const input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
 
+	if (const bool any_suspended = suspended_players.size() > 0) {
+		return;
+	}
+
 	const auto p = calc_participating_factions(in);
 
 	auto victory_for = [&](const auto winner) {
@@ -3147,7 +3151,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	spawn_and_kick_bots(in, step);
 
 	if (const bool teams_changed = add_or_remove_players(in, entropy, step)) {
-		if (in.is_ranked_server() && !is_ranked_live()) {
+		if (const bool during_countdown = in.is_ranked_server() && !is_ranked_live()) {
 			restart_match(in, step);
 		}
 	}
