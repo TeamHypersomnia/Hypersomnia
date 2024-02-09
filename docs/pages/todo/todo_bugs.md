@@ -5,7 +5,16 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- Need a better way to measure bandwidth as we have large packet buffers
+- unknown crash, happens with many people
+	- sometimes crashed all people on windows an linux players survived
+	- other times it crashed just me and two windows players survived
+	- local test with many clients doesnt show anything
+	- address sanitizer + many clients doesnt show anything
+	- 
+
+- fix connection stats
+	- Need a better way to measure bandwidth as we have large packet buffers
+	- Use bandwidth monitor on all netcode send/recv calls, easy
 
 - watch out for changed increment step order as we're now increasing it at the end
 	- esp. portals, editor selector

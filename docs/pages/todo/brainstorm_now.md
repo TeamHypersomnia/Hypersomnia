@@ -11,8 +11,6 @@ summary: That which we are brainstorming at the moment.
 - optimize de_rambo
 - Editor: copy path to clipboard
 
-- zbudowalbym gierke z address sanitizerem
-- fix connection stats
 - allow changing rcon pass from rcon? won't work with config.force.lua tho
 - fix that masterserver dump vs banlist or just dont use dump at all
 - rcon command to sync maps would be good

@@ -29,6 +29,7 @@ void buffer_data(
 	(void)usage;
 	GL_CHECK(glBufferSubData(target, 0, size, data));
 #else
+	GL_CHECK(glBufferData(target, size, nullptr, usage));
 	GL_CHECK(glBufferData(target, size, data, usage));
 #endif
 }

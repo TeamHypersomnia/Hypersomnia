@@ -6,6 +6,7 @@
 #include "augs/log.h"
 #include "augs/window_framework/shell.h"
 #include "augs/filesystem/file.h"
+#include "all_paths.h"
 
 struct unhandled_key {
 	int key, scancode, action, mods;
