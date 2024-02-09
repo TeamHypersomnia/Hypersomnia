@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
 - we'll have to update to the latest version of yojimbo at some point
 
 - optimize de_rambo
