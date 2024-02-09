@@ -24,6 +24,7 @@ if [ "$BUILD_TYPE" == "steam" ]; then
   pushd /tmp/AppDir/usr/bin
   # So linuxdeploy can find it
   ln -s ../lib/libsteam_integration.so
+  ln -s ../lib/libsteam_api.so
   popd
 else
 	if [ -f "build/current/libsteam_integration.so" ]; then
