@@ -47,21 +47,6 @@ if [ -f "$EXE_PATH" ]; then
 		echo "Generating a .dmg for first-time downloads on MacOS."
 		create-dmg $DMG_PATH $APP_PATH
 	fi
-
-	if [[ "$PLATFORM" = "Linux" ]]
-	then
-		SFX_PATH="Hypersomnia-for-$PLATFORM.sfx"
-		TAR_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
-
-		cp build/current/Hypersomnia hypersomnia
-		cp build/current/libsteam_integration.so hypersomnia
-
-		echo "Generating a highly compressed .sfx archive for updates on Linux."
-		7z a -sfx $SFX_PATH hypersomnia
-
-		echo "Generating a tar.gz for first-time downloads on Linux."
-		tar -czf $TAR_PATH hypersomnia
-	fi
 else
 	echo "No exe found. Nothing to archivize."
 fi
