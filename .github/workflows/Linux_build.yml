@@ -43,20 +43,29 @@ jobs:
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
 
+    - name: Backup Steam lib
+      run: cp cmake/steam_integration/bin/linux/libsteam_integration.so libsteam_integration.so.bak
+
+    - name: Build Non-Steam libsteam_integration
+      run: . cmake/build_nonsteam_integration.sh
+
     - name: Generate CMake files
       run: . cmake/linux_actions/generate_cmake_files.sh
 
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
 
+    - name: Build AppImage
+      run: cmake/appimage_builder.sh
+
+    - name: Restore Steam lib
+      run: cp libsteam_integration.so.bak cmake/steam_integration/bin/linux/libsteam_integration.so 
+
     - name: Build AppImage (Steam)
       run: cmake/appimage_builder.sh --steam
 
-    - name: Build Non-Steam libsteam_integration
-      run: . cmake/build_nonsteam_integration.sh
-
-    - name: Build AppImage (Non-Steam)
-      run: cmake/appimage_builder.sh
+    - name: Generate downloadable archives
+      run: cmake/generate_archives.sh Linux
 
     - uses: actions/upload-artifact@v3
       with:
