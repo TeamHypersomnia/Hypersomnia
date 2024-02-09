@@ -3599,7 +3599,11 @@ void server_setup::handle_client_chat_command(
 			const auto arena = arena_identifier(::get_first_word(requested_map));
 			const auto mode = game_mode_name_type(::get_second_word(requested_map));
 
+			bool found = false;
+
 			auto perform_if_can_already = [&](arena_and_mode_identifier with = {}) {
+				found = true;
+
 				if (server_time - when_last_used_map_command < map_command_interval_secs_v) {
 					const auto message = typesafe_sprintf("Map can only be used once %x seconds. Please wait.", map_command_interval_secs_v);
 
@@ -3640,7 +3644,8 @@ void server_setup::handle_client_chat_command(
 						}
 					}
 				}
-				else {
+
+				if (!found) {
 					const auto message = typesafe_sprintf("\"%x\" is NOT on the map cycle list.", requested_map);
 
 					broadcast_info(message, chat_target_type::INFO_CRITICAL);

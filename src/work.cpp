@@ -3648,6 +3648,7 @@ work_result work(
 
 							if (abandon_pending_op.has_value() && !abandon_are_you_sure_popup.has_value()) {
 								do_ingame_menu_option(*abandon_pending_op, false);
+								abandon_pending_op = std::nullopt;
 							}
 						}
 						else {
