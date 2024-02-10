@@ -566,6 +566,13 @@ namespace augs {
 	}
 
 	void window::set_window_border_enabled(const bool enabled) {
+		RECT rect;
+		// Use GetClientRect for client area size
+		GetClientRect(platform->hwnd, &rect);
+
+		// Map client area size to screen coordinates to ensure correct adjustment
+		MapWindowPoints(platform->hwnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+
 		if (enabled) {
 			platform->style = WS_OVERLAPPEDWINDOW;
 			platform->exstyle = WS_EX_WINDOWEDGE;
@@ -575,12 +582,22 @@ namespace augs {
 			platform->exstyle = WS_EX_APPWINDOW;
 		}
 
+		// Adjust the rect to the new style, so the client area remains constant
+		AdjustWindowRectEx(&rect, platform->style, FALSE, platform->exstyle);
+
+		// Apply the new styles
 		SetWindowLongPtr(platform->hwnd, GWL_EXSTYLE, platform->exstyle);
 		SetWindowLongPtr(platform->hwnd, GWL_STYLE, platform->style);
 
-		SetWindowPos(platform->hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-		set_window_rect(get_window_rect_impl());
-		show();
+		// Set the new position and size, taking into account the adjusted rect
+		SetWindowPos(platform->hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
+
+		// Update current_rect with the new window position and size
+		current_rect = get_window_rect_impl();
+
+		// Optional: Invalidate and update the window to force a redraw
+		InvalidateRect(platform->hwnd, NULL, TRUE);
+		UpdateWindow(platform->hwnd);
 	}
 
 	bool window::swap_buffers() {
@@ -635,11 +652,11 @@ namespace augs {
 	}
 
 	xywhi window::get_window_rect_impl() const {
-		static RECT r;
+		RECT r;
 		GetClientRect(platform->hwnd, &r);
 		ClientToScreen(platform->hwnd, (POINT*)&r);
-		ClientToScreen(platform->hwnd, (POINT*)&r + 1);
-		return ltrbi(r.left, r.top, r.right, r.bottom);
+		ClientToScreen(platform->hwnd, ((POINT*)&r) + 1);
+		return ltrbi(r.left, r.top, r.right, r.bottom); // Assuming ltrbi creates a rectangle from left, top, right, bottom
 	}
 
 	void window::set(const vsync_type mode) {
