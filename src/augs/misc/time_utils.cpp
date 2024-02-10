@@ -330,7 +330,8 @@ std::string getTimeZoneName(const std::string& locationId) {
 // MSVC supports C++20 chrono 
 
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
-  using clock = std::chrono::system_clock;
+	using namespace std::chrono;
+    using clock = system_clock;
     using namespace std::chrono_literals;
 
     const auto& timeZoneName = getTimeZoneName(locationId);
@@ -339,38 +340,28 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     }
 
     try {
-        auto zonedTimeNow = std::chrono::zoned_time{timeZoneName, clock::now()};
-        auto localTime = zonedTimeNow.get_local_time();
-        auto localDayPoint = std::chrono::floor<std::chrono::days>(localTime);
-        std::chrono::weekday localWeekday{localDayPoint};
+        auto zonedTimeNow = zoned_time{timeZoneName, clock::now()};
+    auto localTimeSys = zonedTimeNow.get_sys_time(); // Use system time for comparisons
 
-        auto eveningStart = localDayPoint + 19h;
-        auto durationUntilStart = eveningStart - localTime;
-        auto secondsUntilStart = std::chrono::duration_cast<std::chrono::seconds>(durationUntilStart).count();
+        std::array<time_point<clock>, 3> weekendEvenings{
+        zoned_time{timeZoneName, floor<days>(localTimeSys) + days((Friday - weekday{localTimeSys}).count()) + 19h}.get_sys_time(),
+        zoned_time{timeZoneName, floor<days>(localTimeSys) + days((Saturday - weekday{localTimeSys}).count()) + 19h}.get_sys_time(),
+        zoned_time{timeZoneName, floor<days>(localTimeSys) + days((Sunday - weekday{localTimeSys}).count()) + 19h}.get_sys_time(),
+        };
 
-        auto twoHoursInSeconds = std::chrono::duration_cast<std::chrono::seconds>(-2h).count();
-        if ((localWeekday == std::chrono::Friday || localWeekday == std::chrono::Saturday || localWeekday == std::chrono::Sunday) &&
-            secondsUntilStart >= twoHoursInSeconds && secondsUntilStart < 0) {
-            return 0.0; // Event is ongoing
+        double closestDistance = std::numeric_limits<double>::max();
+        for (const auto& evening : weekendEvenings) {
+        auto durationUntilEvening = evening - localTimeSys;
+            if (durationUntilEvening.count() >= 0) { // Future event
+                closestDistance = std::min(closestDistance, static_cast<double>(duration_cast<seconds>(durationUntilEvening).count()));
+            } else if (duration_cast<seconds>(-durationUntilEvening) < 2h) { // Ongoing event
+                return 0.0;
+        }
         }
 
-        int daysToAdd = 0;
-        auto weekdayEncoding = localWeekday.c_encoding(); // Use c_encoding for comparison
-
-        if (weekdayEncoding < std::chrono::Friday.c_encoding()) {
-            daysToAdd = (std::chrono::Friday.c_encoding() - weekdayEncoding) % 7;
-        } else if (weekdayEncoding == std::chrono::Friday.c_encoding() && secondsUntilStart < 0) {
-            daysToAdd = 1; // Next is Saturday
-        } else if (weekdayEncoding == std::chrono::Saturday.c_encoding() && secondsUntilStart < 0) {
-            daysToAdd = 1; // Next is Sunday
-        } else {
-            daysToAdd = (7 - weekdayEncoding + std::chrono::Friday.c_encoding()) % 7;
-        }
-
-        auto nextEventStart = localDayPoint + std::chrono::days(daysToAdd) + 19h;
-        auto durationUntilNextEvent = nextEventStart - localTime;
-        return std::chrono::duration_cast<std::chrono::seconds>(durationUntilNextEvent).count();
-    } catch (...) {
+        return closestDistance;
+    } 
+	catch (...) {
         return -1;
     }
 }
@@ -386,37 +377,27 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     auto timeZone = date::locate_zone(timeZoneName);
     auto now = date::make_zoned(timeZone, system_clock::now());
     auto localTime = now.get_local_time();
-    auto localDay = date::floor<date::days>(localTime);
-    date::weekday localWeekday{localDay};
+    auto localDayPoint = floor<days>(localTime);
 
-    auto eveningStart = localDay + hours(19); // 19:00 on the current day
-    auto durationUntilStart = eveningStart - localTime;
-    auto secondsUntilStart = duration_cast<seconds>(durationUntilStart).count();
+    std::array<system_clock::time_point, 3> weekendEvenings{
+        date::make_zoned(timeZone, localDayPoint + days((date::Friday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+        date::make_zoned(timeZone, localDayPoint + days((date::Saturday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+        date::make_zoned(timeZone, localDayPoint + days((date::Sunday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+    };
 
-    // Check if the event is ongoing
-    if ((localWeekday == date::Friday || localWeekday == date::Saturday || localWeekday == date::Sunday) && 
-        secondsUntilStart >= -7200 && secondsUntilStart < 0) {
-        return 0.0; // Event is ongoing
-    }
-
-    // Calculate time until the next weekend evening
-    int daysToAdd = 0;
-    auto weekdayEncoding = localWeekday.iso_encoding();
-    if (weekdayEncoding <= date::Thursday.iso_encoding()) { // From Sunday to Thursday
-        daysToAdd = date::Friday.iso_encoding() - weekdayEncoding;
-        if (weekdayEncoding == 7) { // Special case for Sunday
-            daysToAdd = 5;
+    double closestDistance = std::numeric_limits<double>::max();
+    for (const auto& evening : weekendEvenings) {
+        auto durationUntilEvening = evening - system_clock::now();
+        if (durationUntilEvening.count() >= 0) { // Future event
+            closestDistance = std::min(closestDistance, static_cast<double>(duration_cast<seconds>(durationUntilEvening).count()));
+        } else if (duration_cast<seconds>(-durationUntilEvening) < 2h) { // Ongoing event
+            return 0.0;
         }
-    } else if (weekdayEncoding == date::Friday.iso_encoding() && secondsUntilStart < 0) { // Friday after 19:00
-        daysToAdd = 1; // Next is Saturday
-    } else if (weekdayEncoding == date::Saturday.iso_encoding() && secondsUntilStart < 0) { // Saturday after 19:00
-        daysToAdd = 1; // Next is Sunday
     }
 
-    auto nextEventStart = (localDay + date::days(daysToAdd)) + hours(19); // 19:00 on the next event day
-    auto durationUntilNextEvent = nextEventStart - localTime;
-    return duration_cast<seconds>(durationUntilNextEvent).count();
+    return closestDistance;
 }
+
 #endif
 
 std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
