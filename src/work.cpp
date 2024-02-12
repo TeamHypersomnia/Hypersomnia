@@ -1178,7 +1178,7 @@ work_result work(
 	};
 
 	settings_gui_state settings_gui = std::string("Settings");
-	settings_gui.display_size_for_clipping = window.get_display();
+	settings_gui.display_size_for_clipping = window.get_display().get_size();
 
 	start_client_gui_state start_client_gui = std::string("Connect to server");
 	start_server_gui_state start_server_gui = std::string("Host a server");
