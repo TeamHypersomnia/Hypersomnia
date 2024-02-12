@@ -1,11 +1,13 @@
 #include <queue>
 #include <GLFW/glfw3.h>
 
+#if PLATFORM_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #include <shlobj.h>
 #undef min
 #undef max
+#endif
 
 #include "augs/misc/scope_guard.h"
 #include "augs/window_framework/window.h"
