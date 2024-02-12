@@ -65,9 +65,11 @@ namespace augs {
 		std::vector<unhandled_window_size> unhandled_window_sizes;
 		std::vector<unhandled_focus> unhandled_focuses;
 
+#if PLATFORM_WINDOWS
 		auto get_hwnd() const {
 			return glfwGetWin32Window(window);
 		}
+#endif
 	};
 }
 
