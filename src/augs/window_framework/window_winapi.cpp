@@ -39,42 +39,6 @@ auto get_hinstance() {
 
 augs::window* window_ptr = nullptr;
 
-static augs::path_type PickContainer(const std::wstring& custom_title) {
-	augs::path_type result;
-    IFileDialog *pfd;
-    
-    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
-    {
-        DWORD dwOptions;
-        if (SUCCEEDED(pfd->GetOptions(&dwOptions)))
-        {
-            pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
-        }
-        
-        pfd->SetTitle(custom_title.c_str());
-
-        if (SUCCEEDED(pfd->Show(NULL)))
-        {
-            IShellItem *psi;
-            if (SUCCEEDED(pfd->GetResult(&psi)))
-            {
-				LPWSTR g_path = nullptr;
-                if(!SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &g_path)))
-                {
-                    MessageBox(NULL, L"GetIDListName() failed", NULL, NULL);
-                }
-
-				result = augs::path_type(g_path);
-
-                psi->Release();
-            }
-        }
-        pfd->Release();
-    }
-
-    return result;
-}
-
 LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	auto& self = *window_ptr;
 	self.handle_wndproc(hwnd, umsg, wParam, lParam);
@@ -88,18 +52,18 @@ namespace augs {
 		HDC hdc = nullptr;
 		HGLRC hglrc = nullptr;
 
-		int style = 0xdeadbeef;
-		int exstyle = 0xdeadbeef;
+		int style = WS_POPUP;
+		int exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 
 		bool double_click_occured = false;
 
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef;
-	};
 
-	std::wstring widen(const std::string& s) {
-		return std::wstring(s.begin(), s.end());
-	}
+		auto get_hwnd() const {
+			return hwnd;
+		}
+	};
 
 	void window::handle_wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		const auto new_change = handle_event(
@@ -280,7 +244,6 @@ namespace augs {
 			{
 				const auto p = MAKEPOINTS(lParam);
 				const auto new_pos = basic_vec2<short>{ p.x, p.y };
-
 				platform->double_click_occured = false;
 
 				return handle_mousemove(new_pos);
@@ -389,7 +352,7 @@ namespace augs {
 
 		auto make_window = [&]() {
 			LOG("WINAPI: Calling CreateWindowEx.");
-			platform->hwnd = CreateWindowEx(0, L"augwin", L"blahblahb", 0, 0, 0, 0, 0, 0, 0, get_hinstance(), this);
+			platform->hwnd = CreateWindowEx(platform->exstyle, L"augwin", L"blahblahb", platform->style, 0, 0, 0, 0, 0, 0, get_hinstance(), this);
 			ensure(platform->hwnd);
 
 			LOG("WINAPI: Calling GetDC.");
@@ -566,47 +529,7 @@ namespace augs {
 	}
 
 	void window::set_window_border_enabled(const bool enabled) {
-		RECT rect;
-		// Use GetClientRect for client area size
-		GetClientRect(platform->hwnd, &rect);
-
-		// Map client area size to screen coordinates to ensure correct adjustment
-		MapWindowPoints(platform->hwnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
-
-		if (enabled) {
-			platform->style = WS_OVERLAPPEDWINDOW;
-			platform->exstyle = WS_EX_WINDOWEDGE;
-		}
-		else {
-			platform->style = WS_POPUP;
-			platform->exstyle = WS_EX_APPWINDOW;
-		}
-
-		// Adjust the rect to the new style, so the client area remains constant
-		AdjustWindowRectEx(&rect, platform->style, FALSE, platform->exstyle);
-
-		// Apply the new styles
-		SetWindowLongPtr(platform->hwnd, GWL_EXSTYLE, platform->exstyle);
-		SetWindowLongPtr(platform->hwnd, GWL_STYLE, platform->style);
-
-		// Set the new position and size, taking into account the adjusted rect
-		SetWindowPos(platform->hwnd, NULL, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
-
-		// Update current_rect with the new window position and size
-		current_rect = get_window_rect_impl();
-
-		// Optional: Invalidate and update the window to force a redraw
-		InvalidateRect(platform->hwnd, NULL, TRUE);
-		UpdateWindow(platform->hwnd);
-	}
-
-	bool window::swap_buffers() {
-		return SwapBuffers(platform->hdc) != FALSE;
-	}
-
-	void window::show() {
-		LOG("WINAPI: Calling ShowWindow.");
-		ShowWindow(platform->hwnd, SW_SHOW);
+		/* Idk I can't get this working */
 	}
 
 	bool window::set_as_current_impl() {
@@ -640,15 +563,14 @@ namespace augs {
 	}
 
 	void window::set_window_rect(const xywhi r) {
-		static RECT wr = { 0 };
-		const auto result = 
-			(SetRect(&wr, r.x, r.y, r.r(), r.b())) &&
-			(AdjustWindowRectEx(&wr, platform->style, FALSE, platform->exstyle)) &&
-			(MoveWindow(platform->hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE))
-		;
+		RECT wr = {r.x, r.y, r.r(), r.b()}; // Use width and height for client size
+		BOOL result = AdjustWindowRectEx(&wr, platform->style, FALSE /* Check if you have a menu */, platform->exstyle);
 
-		(void)result;
-		current_rect = r;
+		if (result) {
+			result = MoveWindow(platform->hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE);
+		}
+
+		current_rect = get_window_rect_impl(); 
 	}
 
 	xywhi window::get_window_rect_impl() const {
@@ -673,157 +595,6 @@ namespace augs {
 		
 	}
 
-	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
-		std::wstring filter;
-
-		auto to_reserve = std::size_t{ 0 };
-
-		for (const auto& f : filters) {
-			to_reserve += f.description.length();
-			to_reserve += f.extension.length() + 1;
-			to_reserve += 2;
-		}
-
-		filter.reserve(to_reserve);
-
-		for (const auto& f : filters) {
-			const auto description = widen(f.description);
-			const auto extension = widen(f.extension);
-
-			filter += widen(f.description);
-			filter.push_back(L'\0');
-			filter += L'*';
-			filter += widen(f.extension);
-			filter.push_back(L'\0');
-		}
-
-		return filter;
-	}
-
-	std::optional<path_type> window::open_file_dialog(
-		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
-	) {
-		const auto filter = get_filter(filters);
-		const auto title = widen(custom_title);
-		
-		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
-		fill_range(szFile, 0);
-
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = platform->hwnd;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
-		ofn.lpstrFilter = filter.data();
-		ofn.lpstrTitle = title.data();
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR;
-
-		// Display the Open dialog box. 
-
-		auto show_after = scope_guard([this]() {
-			show();
-		});
-
-		if (GetOpenFileName(&ofn) == TRUE) {
-			return augs::path_type(ofn.lpstrFile);
-		}
-		else {
-			return std::nullopt;
-		}
-	}
-
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& custom_title
-	) {
-		const auto title = widen(custom_title);
-		const auto choice = ::PickContainer(title);
-
-		if (!choice.empty()) {
-			return choice;
-		}
-
-		return std::nullopt;
-	}
-
-	std::optional<path_type> window::save_file_dialog(
-		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
-	) {
-		const auto filter = get_filter(filters);
-		const auto title = widen(custom_title);
-
-		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
-		fill_range(szFile, 0);
-
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = platform->hwnd;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
-		ofn.lpstrFilter = filter.data();
-		ofn.lpstrTitle = title.data();
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-
-		// Display the Open dialog box. 
-
-		auto show_after = scope_guard([this]() {
-			show();
-		});
-
-		if (GetSaveFileName(&ofn) == TRUE) {
-			auto result = augs::path_type(ofn.lpstrFile);
-			const auto supposed_extension = filters[ofn.nFilterIndex - 1].extension;
-
-			if (supposed_extension != ".*") {
-				if (result.extension() != supposed_extension) {
-					result += filters[ofn.nFilterIndex - 1].extension;
-				}
-			}
-
-			return result;
-		}
-		else {
-			return std::nullopt;
-		}
-	}
-
-	static void BrowseToFile(LPCTSTR filename)
-	{
-		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-
-    	const auto pidl = ILCreateFromPath(filename);
-    	
-		if (pidl) {
-			LOG("pidl non-null");
-        	SHOpenFolderAndSelectItems(pidl,0,0,0);
-        	ILFree(pidl);
-    	}
-		else {
-			LOG("pidl is null");
-		}
-
-		CoUninitialize();
-	}
-
-	void window::reveal_in_explorer(const augs::path_type& p) {
-		auto absolute_path = std::filesystem::absolute(p);
-		const auto wide_path = absolute_path.wstring();
-		LOG_NVPS(absolute_path.string());
-		BrowseToFile(wide_path.c_str());
-	}
 
 	void window::set_cursor_pos(vec2i pos) {
 		last_mouse_pos = pos;
@@ -849,6 +620,11 @@ namespace augs {
 			return ClipCursor(NULL);
 		}
 	}
+	
+	void window::show() {
+		LOG("WINAPI: Calling ShowWindow.");
+		ShowWindow(platform->hwnd, SW_SHOW);
+	}
 
 	void window::set_cursor_visible_impl(const bool flag) {
 		if (!flag) {
@@ -863,26 +639,6 @@ namespace augs {
 		static RECT rc;
 		GetWindowRect(GetDesktopWindow(), &rc);
 		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
-	}
-
-	static auto to_message_box_button(const int button_code) {
-		switch (button_code) {
-			case IDCANCEL:
-				return message_box_button::CANCEL;
-			case IDRETRY:
-				return message_box_button::RETRY;
-			default:
-				return message_box_button::CANCEL;
-		}
-	}
-	message_box_button window::retry_cancel(
-		const std::string& caption,
-		const std::string& text
-	) {
-		const auto wide_caption = widen(caption);
-		const auto wide_text = widen(text);
-
-		return to_message_box_button(MessageBox(platform->hwnd, wide_text.c_str(), wide_caption.c_str(), MB_RETRYCANCEL | MB_ICONEXCLAMATION));
 	}
 
 	int window::get_refresh_rate() {
@@ -903,20 +659,5 @@ namespace augs {
 		window_ptr = nullptr;
 	}
 
-	std::string wstr_to_utf8(const WCHAR *wstr) {
-		std::string ret;
-
-		int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, nullptr, 0, nullptr, nullptr);
-		if(len > 0)
-		{
-			ret.resize(len);
-			WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &ret[0], len, nullptr, nullptr);
-			ret.pop_back();
-		}
-
-		return ret;
-	}
+	#include "explorer_utils_winapi.hpp"
 }
-
-
-#include "augs/filesystem/winapi_exists.hpp"

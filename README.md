@@ -407,7 +407,9 @@ Irrespectively of the OS, you will need the following software in order to build
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
   - On Windows, you can get the appropriate installer here: https://slproweb.com/products/Win32OpenSSL.html
-  - The game is known to work with v1.1.1w, but later versions should work too.
+  - The game is known to work with v3.1.4, but later versions should work too.
+    - Install it to ``C:\OpenSSL-Win64``
+  - As of 11th Feb 2024, CMake might be bitching about missing ``missing: OPENSSL_CRYPTO_LIBRARY``. That is because since OpenSSL v3.1.5, filenames for libraries have changed. You'll have to manually move ``libcrypto_static`` and ``libssl_static`` from ``C:\OpenSSL-Win64\lib\VC\x64\MT`` to a ``VC\static`` folder with ``libssl64MT.lib`` and ``libcrypto64MT.lib`` names respectively, where FindOpenSSL.cmake expects them. It is what it is.  
 
 Once dependencies are installed, go to the directory where you wish to have your *Hypersomnia* project downloaded,
 open git bash and paste:
@@ -450,10 +452,13 @@ Next, run these commands:
 cd Hypersomnia
 mkdir build
 cd build
-set CONFIGURATION=Release
-cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ..
+set CONFIGURATION=RelWithDebInfo
+cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 -DOPENSSL_ROOT_DIR=C:\OpenSSL-Win64 -DUSE_GLFW=1 ..
 ninja
 ```
+
+This will build a non-Steam client by default.
+To build a Steam client, add a ``-DLINK_STEAM_INTEGRATION=1`` flag to the ``cmake`` command.
 
 Note: your computer **might start lagging heavily** for the duration of the build as ``ninja`` will use all available cores for compilation.
 
@@ -461,11 +466,14 @@ If you intend to develop the game, it is best to use "Debug" configuration for t
 
 If you want to somehow customize your build, e.g. disable certain game features, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
 
-If the game builds successfully, issue this command to launch it:
+If the game builds successfully, run this command to launch it:
 
 ```
 ninja run
 ```
+
+If you built with ``-DLINK_STEAM_INTEGRATION=1``, **don't forget to create a ``hypersomnia/steam_appid.txt`` file** with ``2660970`` in it.
+Otherwise the game will try to restart itself through Steam.
 
 <!-- Note that the 64-bit version is more likely to be kept up to date. -->
 

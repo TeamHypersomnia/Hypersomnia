@@ -360,6 +360,8 @@ namespace augs {
 		if (settings.fullscreen) {
 			set_fullscreen_hint(true);
 		}
+		
+		last_windowed_rect = current_settings.make_window_rect();
 	}
 
 	void window::destroy() {

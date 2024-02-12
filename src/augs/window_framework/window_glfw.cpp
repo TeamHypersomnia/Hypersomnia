@@ -1,11 +1,19 @@
 #include <queue>
 #include <GLFW/glfw3.h>
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <shlobj.h>
+#undef min
+#undef max
+
+#include "augs/misc/scope_guard.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/translate_glfw_enums.h"
 #include "augs/log.h"
 #include "augs/window_framework/shell.h"
 #include "augs/filesystem/file.h"
+#include "augs/window_framework/platform_utils.h"
 #include "all_paths.h"
 
 struct unhandled_key {
@@ -43,7 +51,7 @@ struct unhandled_focus {
 namespace augs {
 	struct window::platform_data {
 		GLFWwindow* window = nullptr;
-		vec2d last_mouse_pos;
+		vec2d last_mouse_pos_for_dt;
 
 		std::vector<unhandled_key> unhandled_keys;
 		std::vector<unhandled_char> unhandled_characters;
@@ -54,6 +62,10 @@ namespace augs {
 		std::vector<unhandled_window_position> unhandled_window_positions;
 		std::vector<unhandled_window_size> unhandled_window_sizes;
 		std::vector<unhandled_focus> unhandled_focuses;
+
+		auto get_hwnd() const {
+			return glfwGetWin32Window(window);
+		}
 	};
 }
 
@@ -144,8 +156,8 @@ namespace augs {
 		}
 		else {
 			window = glfwCreateWindow(settings.size.x, settings.size.y, settings.name.c_str(), NULL, NULL);
+			glfwSetWindowPos(window, settings.position.x, settings.position.y);
 		}
-
 
 		if (window == nullptr) {
 			destroy();
@@ -158,7 +170,6 @@ namespace augs {
 		glfwSetCharCallback(window, glfw_callbacks::character_callback);
 		glfwSetMouseButtonCallback(window, glfw_callbacks::mouse_button_callback);
 		glfwSetScrollCallback(window, glfw_callbacks::scroll_callback);
-		glfwSetCursorPosCallback(window, glfw_callbacks::cursor_callback);
 
 		glfwSetWindowPosCallback(window, glfw_callbacks::window_pos_callback);
 		glfwSetWindowSizeCallback(window, glfw_callbacks::window_size_callback);
@@ -176,7 +187,15 @@ namespace augs {
 		set(settings.vsync_mode);
 
 		current_settings = settings;
+		last_windowed_rect = current_settings.make_window_rect();
+
 		current_rect = get_window_rect_impl();
+
+		last_mouse_pos = current_rect.get_size() / 2;
+		platform->last_mouse_pos_for_dt = last_mouse_pos;
+		set_cursor_pos(last_mouse_pos);
+		
+		glfwSetCursorPosCallback(window, glfw_callbacks::cursor_callback);
 	}
 
 	void window::set_window_name(const std::string& name) {
@@ -272,8 +291,8 @@ namespace augs {
 
 		for (const auto& cursor : platform->unhandled_cursors) {
 			auto new_mouse_pos = vec2d(cursor.xpos, cursor.ypos);
-			auto dt = new_mouse_pos - platform->last_mouse_pos;
-			platform->last_mouse_pos = new_mouse_pos;
+			auto dt = new_mouse_pos - platform->last_mouse_pos_for_dt;
+			platform->last_mouse_pos_for_dt = new_mouse_pos;
 
 			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
 				auto ch = do_raw_motion({
@@ -348,10 +367,9 @@ namespace augs {
 					glfwSetWindowMonitor(platform->window, primary, 0, 0, mode->width, mode->height, mode->refreshRate);
 				}
 				else {
-					const auto pos = current_settings.position;
-					const auto size = current_settings.size;
+					const auto rect = last_windowed_rect;
 					LOG("SETTING WINDOWED MODE.");
-					glfwSetWindowMonitor(platform->window, NULL, pos.x, pos.y, size.x, size.y, 0);
+					glfwSetWindowMonitor(platform->window, NULL, rect.x, rect.y, rect.w, rect.h, 0);
 				}
 			}
 		}
@@ -404,8 +422,12 @@ namespace augs {
 	}
 
 	void window::set_cursor_pos(const vec2i pos) {
+		platform->last_mouse_pos_for_dt = pos;
 		last_mouse_pos = pos;
 	
+		glfwSetCursorPos(platform->window, pos.x, pos.y);
+		platform->unhandled_cursors.clear();
+
 	}
 
 #if PLATFORM_LINUX
@@ -434,6 +456,9 @@ namespace augs {
 	}
 #endif
 
+#if PLATFORM_WINDOWS
+	#include "explorer_utils_winapi.hpp"
+#else
 	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
@@ -466,10 +491,20 @@ namespace augs {
 #endif
 	}
 
+	message_box_button window::retry_cancel(
+		const std::string& caption,
+		const std::string& text
+	) {
+		LOG("RETRY CANCEL!!");
+		LOG_NVPS(caption, text);
+		return message_box_button::CANCEL;
+	}
+
 	void window::reveal_in_explorer(const augs::path_type& full_path) {
-		const auto command = augs::path_type(typesafe_sprintf("open -R -a Finder \"%x\"", full_path));
+		const auto command = typesafe_sprintf("open -R -a Finder \"%x\"", full_path);
 		shell(command);
 	}
+#endif
 
 	void window::set_cursor_visible_impl(bool) {
 		/* Implemented with GLFW_CURSOR_DISABLED */
@@ -488,15 +523,6 @@ namespace augs {
 
 			default: glfwSwapInterval(0); break;
 		}
-	}
-
-	message_box_button window::retry_cancel(
-		const std::string& caption,
-		const std::string& text
-	) {
-		LOG("RETRY CANCEL!!");
-		LOG_NVPS(caption, text);
-		return message_box_button::CANCEL;
 	}
 
 	int window::get_refresh_rate() {

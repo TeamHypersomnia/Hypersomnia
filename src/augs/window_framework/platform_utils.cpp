@@ -14,12 +14,24 @@ namespace augs {
 #if BUILD_WINDOW_FRAMEWORK
 
 #if USE_GLFW
+#include <GLFW/glfw3.h>
+
 namespace augs {
 	bool set_display(const vec2i, const int) {
 		return true;
 	}
 
-	xywhi get_display() {
+	xywhi get_display_no_window() {
+		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+
+		if (primary) {
+			const GLFWvidmode* mode = glfwGetVideoMode(primary);
+
+			if (mode) {
+				return { 0, 0, mode->width, mode->height };
+			}
+		}
+
 		return {};
 	}
 
@@ -203,6 +215,30 @@ namespace augs {
 	path_type get_default_documents_dir() {
 		/* Default to CWD */
 		return "";
+	}
+}
+#endif
+
+#if PLATFORM_WINDOWS
+#include "augs/filesystem/winapi_exists.hpp"
+
+namespace augs {
+	std::string wstr_to_utf8(const WCHAR *wstr) {
+		std::string ret;
+
+		int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, nullptr, 0, nullptr, nullptr);
+		if(len > 0)
+		{
+			ret.resize(len);
+			WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &ret[0], len, nullptr, nullptr);
+			ret.pop_back();
+		}
+
+		return ret;
+	}
+	
+	std::wstring widen(const std::string& s) {
+		return std::wstring(s.begin(), s.end());
 	}
 }
 #endif

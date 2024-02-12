@@ -8,8 +8,13 @@
 #include "augs/readwrite/to_bytes.h"
 #include "all_paths.h"
 
-const auto test_file_path = CACHE_DIR / "test_byte_readwrite.bin";
-const auto test_lua_file_path = CACHE_DIR / "test_lua_readwrite.lua";
+inline auto test_file_path() {
+	return CACHE_DIR / "test_byte_readwrite.bin";
+}
+
+inline auto test_lua_file_path() {
+	return CACHE_DIR / "test_lua_readwrite.lua"; 
+}
 
 namespace detail {
 	struct dummy_A {
@@ -95,7 +100,7 @@ bool try_to_reload_with_file(T& v) {
 		}
 	}
 
-	const auto& path = test_file_path;
+	const auto& path = test_file_path();
 	const auto tmp = ref_or_get(v);
 
 	augs::save_as_bytes(v, path);
@@ -120,7 +125,7 @@ bool try_to_reload_with_bytes(T& v) {
 		}
 	}
 
-	const auto& path = test_file_path;
+	const auto& path = test_file_path();
 
 	const auto tmp = ref_or_get(v);
 
@@ -151,7 +156,7 @@ bool try_to_reload_with_lua(sol::state& lua, T& v) {
 		}
 	}
 
-	const auto& path = test_lua_file_path;
+	const auto& path = test_lua_file_path();
 
 	const auto tmp = ref_or_get(v);
 
@@ -176,7 +181,7 @@ bool try_to_reload_with_memory_stream(T& v) {
 		}
 	}
 
-	const auto& path = test_file_path;
+	const auto& path = test_file_path();
 
 	const auto tmp = ref_or_get(v);
 

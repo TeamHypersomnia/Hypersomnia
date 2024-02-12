@@ -1129,6 +1129,36 @@ work_result work(
 		get_general_renderer()
 	};
 
+	auto remember_window_settings = augs::scope_guard([&]() {
+		/*
+			Remember window size, position and fullscreen status.
+			People don't expect to have to save it.
+		*/
+
+		configurables.sync_back_into(config);
+
+		bool update = false;
+
+		if (config.window.position != last_saved_config.window.position) {
+			last_saved_config.window.position = config.window.position;
+			update = true;
+		}
+
+		if (config.window.size != last_saved_config.window.size) {
+			last_saved_config.window.size = config.window.size;
+			update = true;
+		}
+
+		if (config.window.fullscreen != last_saved_config.window.fullscreen) {
+			last_saved_config.window.fullscreen = config.window.fullscreen;
+			update = true;
+		}
+
+		if (update) {
+			last_saved_config.save_patch(lua, canon_config, local_config_path);
+		}
+	});
+
 	atlas_profiler atlas_performance;
 	frame_profiler game_thread_performance;
 
@@ -4459,9 +4489,9 @@ work_result work(
 			IMGUI is our top GUI whose priority precedes everything else. 
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
 		*/
-
+	
+		window.handle_pending_requests();
 		configurables.apply_main_thread(get_read_buffer().new_settings);
-		configurables.sync_back_into(config);
 
 		if (config.session.show_performance) {
 			const auto viewed_character = get_viewed_character();

@@ -669,8 +669,8 @@ treat_as_music_sounds_longer_than_secs = 5,
     fullscreen = true,
     name = "Hypersomnia",
     position = {
-      x = 0,
-      y = 0
+      x = 40,
+      y = 40
     },
     draw_own_cursor_in_fullscreen = false,
     log_keystrokes = false,

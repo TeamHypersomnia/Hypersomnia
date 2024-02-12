@@ -18,7 +18,7 @@
 #include "augs/misc/constant_size_string.h"
 
 TEST_CASE("Filesystem test") {
-	const auto& path = test_file_path;
+	const auto& path = test_file_path();
 
 	augs::save_as_text(path, "");
 	REQUIRE(augs::exists(path));
@@ -329,7 +329,7 @@ TEST_CASE("Lua readwrite General") {
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {
-	const auto& path = test_file_path;
+	const auto& path = test_file_path();
 
 	using map_type = std::unordered_map<int, double>;
 	using T = std::variant<std::monostate, double, std::string, map_type, std::optional<std::string>>;

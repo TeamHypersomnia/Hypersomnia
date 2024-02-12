@@ -123,11 +123,14 @@ int main(const int argc, const char* const * const argv) {
 #endif
 
 	const bool is_appimage = !params.appimage_path.empty();
+
+#if PLATFORM_UNIX
 	bool change_cwd_to_exe = !params.keep_cwd;
 
 	if (is_appimage) {
 		change_cwd_to_exe = false;
 	}
+#endif
 
 	::CALLING_CWD = augs::get_current_working_directory();
 

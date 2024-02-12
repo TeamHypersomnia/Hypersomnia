@@ -120,6 +120,7 @@ namespace augs {
 		bool mouse_pos_paused = false;
 		vec2i last_mouse_pos;
 		xywhi current_rect;
+		xywhi last_windowed_rect;
 
 		std::optional<event::change> handle_mousemove(
 			const basic_vec2<short> new_position
@@ -150,6 +151,9 @@ namespace augs {
 		void destroy();
 
 		xywhi get_window_rect_impl() const;
+
+		std::optional<vec2i> requested_cursor_pos;
+		void set_cursor_pos(vec2i);
 	public:
 		window(const window_settings&);
 		~window();
@@ -175,7 +179,6 @@ namespace augs {
 		vec2i get_screen_size() const;
 		xywhi get_window_rect() const;
 
-		void set_cursor_pos(vec2i);
 		void set_cursor_clipping(bool flag); 
 		void set_cursor_visible(bool flag); 
 
@@ -217,5 +220,11 @@ namespace augs {
 		}
 
 		void check_current_context();
+		
+		void request_cursor_pos(const vec2i pos) {
+			requested_cursor_pos = pos;
+		}
+		
+		void handle_pending_requests();
 	};
 }

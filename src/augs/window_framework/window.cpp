@@ -63,6 +63,10 @@ namespace augs {
 
 		if (ch.msg == message::move || ch.msg == message::resize) {
 			current_rect = get_window_rect_impl();
+			
+			if (!current_settings.fullscreen) {
+				last_windowed_rect = current_rect;
+			}
 		}
 
 		if (const auto mouse_change = sync_mouse_on_click_activate(ch)) {
@@ -128,12 +132,8 @@ namespace augs {
 	}
 
 	void window::sync_back_into(window_settings& into) {
-		if (!current_settings.fullscreen && can_control_window_geometry) {
-			const auto rect = get_window_rect();
-
-			into.size = rect.get_size();
-			into.position = rect.get_position();
-		}
+		into.size = last_windowed_rect.get_size();
+		into.position = last_windowed_rect.get_position();
 	}
 
 	std::optional<event::change> window::handle_mousemove(const basic_vec2<short> new_pos) {
@@ -178,18 +178,16 @@ namespace augs {
 				set_fullscreen_hint(true);
 			}
 			else {
-				set_window_border_enabled(settings.border);
 				set_fullscreen_geometry(false);
 				set_fullscreen_hint(false);
+				set_window_border_enabled(settings.border);
 			}
 		}
 
-#if !USE_GLFW
 		if (!settings.fullscreen) {
 			if (force
 				|| changed(settings.position)
 				|| changed(settings.size)
-				|| changed(settings.border)
 			) {
 				xywhi screen_rect;
 
@@ -199,12 +197,12 @@ namespace augs {
 				set_window_rect(screen_rect);
 			}
 		}
-#endif
 		
 		current_settings = settings;
 
 		if (force) {
 			current_rect = get_window_rect_impl();
+			last_windowed_rect = settings.make_window_rect();
 		}
 	}
 
@@ -247,5 +245,12 @@ namespace augs {
 
 	bool window::is_active() const {
 		return active;
+	}
+	
+	void window::handle_pending_requests() {
+		if (requested_cursor_pos) {
+			set_cursor_pos(*requested_cursor_pos);
+			requested_cursor_pos = std::nullopt;
+		}
 	}
 }

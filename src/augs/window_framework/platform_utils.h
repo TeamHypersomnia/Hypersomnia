@@ -14,4 +14,7 @@ namespace augs {
 	bool is_character_newline(unsigned i);
 	augs::path_type get_executable_path();
 	augs::path_type get_default_documents_dir();
+
+	std::string wstr_to_utf8(const wchar_t* wstr);
+	std::wstring widen(const std::string& s);
 }

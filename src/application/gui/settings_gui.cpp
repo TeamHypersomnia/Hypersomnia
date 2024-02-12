@@ -32,6 +32,7 @@
 #include "application/gui/pretty_tabs.h"
 #include "application/setups/editor/editor_paths.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/window_framework/platform_utils.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -483,54 +484,104 @@ void settings_gui_state::perform(
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();
 
-					thread_local std::string width;
-					thread_local std::string height;
+					{
+						thread_local std::string width;
+						thread_local std::string height;
 
-					if (width.empty()) {
-						width = std::to_string(config.window.size.x);
-					}
+						if (width.empty()) {
+							width = std::to_string(config.window.size.x);
+						}
 
-					if (height.empty()) {
-						height = std::to_string(config.window.size.y);
-					}
+						if (height.empty()) {
+							height = std::to_string(config.window.size.y);
+						}
 
-					text("Dimensions");
-					ImGui::SameLine();
-
-					ImGui::PushItemWidth(ImGui::CalcTextSize("999999").x);
-
-					if (input_text<10>("##Window width", width, ImGuiInputTextFlags_CharsDecimal)) {
-					}
-
-					ImGui::SameLine();
-
-					text("x");
-
-					ImGui::SameLine();
-
-					if (input_text<10>("##Window height", height, ImGuiInputTextFlags_CharsDecimal)) {
-					}
-
-					ImGui::PopItemWidth();
-
-					int cx = 0;
-					int cy = 0;
-
-					typesafe_sscanf(width, "%x", cx);
-					typesafe_sscanf(height, "%x", cy);
-
-					if (vec2i(cx, cy) != config.window.size) {
+						text("Dimensions");
 						ImGui::SameLine();
 
-						if (ImGui::Button("Apply")) {
-							config.window.size.set(cx, cy);
+						ImGui::PushItemWidth(ImGui::CalcTextSize("999999").x);
 
-							if (config.window.size.x < 300) {
-								config.window.size.x = 300;
+						if (input_text<10>("##Window width", width, ImGuiInputTextFlags_CharsDecimal)) {
+						}
+
+						ImGui::SameLine();
+
+						text("x");
+
+						ImGui::SameLine();
+
+						if (input_text<10>("##Window height", height, ImGuiInputTextFlags_CharsDecimal)) {
+						}
+
+						ImGui::PopItemWidth();
+
+						int cx = 0;
+						int cy = 0;
+
+						typesafe_sscanf(width, "%x", cx);
+						typesafe_sscanf(height, "%x", cy);
+
+						if (vec2i(cx, cy) != config.window.size) {
+							ImGui::SameLine();
+
+							if (ImGui::Button("Apply")) {
+								config.window.size.set(cx, cy);
+
+								if (config.window.size.x < 300) {
+									config.window.size.x = 300;
+								}
+
+								if (config.window.size.y < 300) {
+									config.window.size.y = 300;
+								}
 							}
+						}
+					}
 
-							if (config.window.size.y < 300) {
-								config.window.size.y = 300;
+					{
+						thread_local std::string posx;
+						thread_local std::string posy;
+
+						if (posx.empty()) {
+							posx = std::to_string(config.window.position.x);
+						}
+
+						if (posy.empty()) {
+							posy = std::to_string(config.window.position.y);
+						}
+
+						text("Position");
+						ImGui::SameLine();
+
+						ImGui::PushItemWidth(ImGui::CalcTextSize("999999").x);
+
+						if (input_text<10>("##Window posx", posx, ImGuiInputTextFlags_CharsDecimal)) {
+						}
+
+						ImGui::SameLine();
+
+						if (input_text<10>("##Window posy", posy, ImGuiInputTextFlags_CharsDecimal)) {
+						}
+
+						ImGui::PopItemWidth();
+
+						int cx = 0;
+						int cy = 0;
+
+						typesafe_sscanf(posx, "%x", cx);
+						typesafe_sscanf(posy, "%x", cy);
+
+						if (vec2i(cx, cy) != config.window.position) {
+							ImGui::SameLine();
+
+							const auto sz = augs::get_display_no_window();
+							LOG_NVPS(sz);
+
+							if (ImGui::Button("Apply##Pos")) {
+								config.window.position.set(cx, cy);
+
+								config.window.position.x = std::clamp(config.window.position.x, 0, sz.w - 100);
+								config.window.position.y = std::clamp(config.window.position.y, 0, sz.h - 100);
 							}
 						}
 					}
@@ -1334,6 +1385,22 @@ void settings_gui_state::perform(
 					rcon_pane::VARS
 				);
 
+				if (auto node = scoped_tree_node("API keys")) {
+					auto& scope_cfg = config.server_private;
+
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+					input_text(SCOPE_CFG_NVP(steam_web_api_key), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.steam_web_api_key);
+					
+					if (ImGui::Button("Get your Steam API Key")) {
+						 augs::open_url("https://steamcommunity.com/dev/apikey");
+					}
+					
+					text_disabled("For authenticating Steam users on your server.");
+				}
+
+				
 				if (auto node = scoped_tree_node("RCON")) {
 					auto& scope_cfg = config.server_private;
 
