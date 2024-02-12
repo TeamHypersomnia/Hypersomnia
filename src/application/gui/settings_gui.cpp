@@ -574,14 +574,13 @@ void settings_gui_state::perform(
 						if (vec2i(cx, cy) != config.window.position) {
 							ImGui::SameLine();
 
-							const auto sz = augs::get_display_no_window();
-							LOG_NVPS(sz);
+							const auto sz = display_size_for_clipping;
 
 							if (ImGui::Button("Apply##Pos")) {
 								config.window.position.set(cx, cy);
 
-								config.window.position.x = std::clamp(config.window.position.x, 0, sz.w - 100);
-								config.window.position.y = std::clamp(config.window.position.y, 0, sz.h - 100);
+								config.window.position.x = std::clamp(config.window.position.x, 0, sz.x - 100);
+								config.window.position.y = std::clamp(config.window.position.y, 0, sz.y - 100);
 							}
 						}
 					}

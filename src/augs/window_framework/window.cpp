@@ -114,8 +114,8 @@ namespace augs {
 
 	void window::set_fullscreen_geometry(const bool flag) {
 #if USE_GLFW
-		return;
-#endif
+		(void)flag;
+#else
 		if (flag) {
 			const auto detected_display = get_display();
 
@@ -129,6 +129,7 @@ namespace augs {
 		else {
  			set_window_rect(get_current_settings().make_window_rect());
 		}	
+#endif
 	}
 
 	void window::sync_back_into(window_settings& into) {

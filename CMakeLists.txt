@@ -48,6 +48,8 @@ if(CLANG)
 endif()
 
 if(MSVC)
+	set(USE_GLFW ON)
+
 	if(CLANG)
 		message("Building with Clang on Windows.")
 	else()
@@ -800,11 +802,6 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_glfw.cpp"
 			"src/augs/window_framework/translate_glfw_enums.cpp"
-		)
-	elseif(MSVC)
-		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
-			"src/augs/window_framework/window_winapi.cpp"
-			"src/augs/window_framework/translate_winapi_enums.cpp"
 		)
 	elseif(UNIX)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS

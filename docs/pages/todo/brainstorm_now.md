@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- make no router default for dedicated servers tbh
+
+- the counter is fucked up of course
+- show enemy silhouettes in spectator
 
 - we'll have to update to the latest version of yojimbo at some point
 

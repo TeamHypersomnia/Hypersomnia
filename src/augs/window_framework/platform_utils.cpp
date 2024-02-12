@@ -21,20 +21,6 @@ namespace augs {
 		return true;
 	}
 
-	xywhi get_display_no_window() {
-		GLFWmonitor* primary = glfwGetPrimaryMonitor();
-
-		if (primary) {
-			const GLFWvidmode* mode = glfwGetVideoMode(primary);
-
-			if (mode) {
-				return { 0, 0, mode->width, mode->height };
-			}
-		}
-
-		return {};
-	}
-
 	std::optional<vec2i> find_cursor_pos() {
 		return std::nullopt;
 	}
@@ -46,23 +32,6 @@ namespace augs {
 #undef max
 
 namespace augs {
-	bool set_display(const vec2i v, const int bpp) {
-		static DEVMODE screen;
-		ZeroMemory(&screen, sizeof(screen));
-		screen.dmSize = sizeof(screen);
-		screen.dmPelsWidth = v.x;
-		screen.dmPelsHeight = v.y;
-		screen.dmBitsPerPel = bpp;
-		screen.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		return ChangeDisplaySettings(&screen, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
-	}
-
-	xywhi get_display_no_window() {
-		static RECT rc;
-		GetWindowRect(GetDesktopWindow(), &rc);
-		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
-	}
-
 	std::optional<vec2i> find_cursor_pos() {
 		POINT p;
 
@@ -84,18 +53,6 @@ namespace augs {
 		return true;
 	}
 
-	xywhi get_display_no_window() {
-		if (Display* d = XOpenDisplay(NULL)) {
-			auto guard = augs::scope_guard([d](){ XCloseDisplay(d); });
-
-			if (Screen*  s = DefaultScreenOfDisplay(d)) {
-				return { 0, 0, s->width, s->height };
-			}
-		}
-
-		return {};
-	}
-
 	std::optional<vec2i> find_cursor_pos() {
 		return std::nullopt;
 	}
@@ -110,10 +67,6 @@ namespace augs {
 namespace augs {
 	bool set_display(const vec2i, const int) {
 		return true;
-	}
-
-	xywhi get_display() {
-		return {};
 	}
 
 	std::optional<vec2i> find_cursor_pos() {

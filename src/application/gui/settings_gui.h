@@ -91,6 +91,8 @@ public:
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;
 
+	vec2i display_size_for_clipping;
+
 	bool should_hijack_key() const;
 	void set_hijacked_key(augs::event::keys::key);
 
