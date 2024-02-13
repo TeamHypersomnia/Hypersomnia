@@ -103,7 +103,11 @@ self_update_result check_and_apply_updates(
 
 	const auto version_path = 
 		is_appimage ? 
+#if HEADLESS
+		typesafe_sprintf("%x/version-Headless-AppImage.txt", update_path) :
+#else
 		typesafe_sprintf("%x/version-AppImage.txt", update_path) :
+#endif
 		typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING)
 	;
 
