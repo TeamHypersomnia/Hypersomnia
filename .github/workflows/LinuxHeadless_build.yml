@@ -34,6 +34,9 @@ jobs:
     - name: Install packages
       run: sudo apt-get install --fix-missing cmake ninja-build
 
+    - name: Install OpenSSL3
+      run: cmake/linux_actions/install_openssl3.sh
+
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm_headless.sh
 
