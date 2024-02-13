@@ -34,7 +34,10 @@ Only 29 MB!
 
 The game will start with an **interactive Tutorial!**
 
-*Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
+Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" height=25 hspace=1 vspace=20><b>Headless Dedicated Server</b></a>
+
+*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
+<br undefined>
 
 # Press
 
