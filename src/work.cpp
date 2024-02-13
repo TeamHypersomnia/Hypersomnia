@@ -27,10 +27,14 @@
 #include <csignal>
 #endif
 
+#include <sol/sol.hpp>
 #include <functional>
+
+#include "augs/templates/thread_templates.h"
 
 #include "fp_consistency_tests.h"
 
+#include "augs/window_framework/shell.h"
 #include "augs/log_path_getters.h"
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
@@ -48,6 +52,30 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/lua/lua_utils.h"
 
+#include "game/organization/all_component_includes.h"
+#include "game/organization/all_messages_includes.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+
+#include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/cosmos.h"
+
+#include "application/session_profiler.h"
+#include "application/config_lua_table.h"
+
+#include "application/gui/headless_map_catalogue.h"
+
+#if HEADLESS
+
+#else
+#include "view/rendering_scripts/illuminated_rendering.h"
+#include "view/viewables/images_in_atlas_map.h"
+#include "view/viewables/streaming/viewables_streaming.h"
+#include "view/frame_profiler.h"
+#include "view/shader_paths.h"
+
+#include "view/game_gui/game_gui_system.h"
+
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/renderer_backend.h"
 
@@ -58,26 +86,8 @@
 #include "augs/audio/audio_command_buffers.h"
 #include "augs/drawing/drawing.hpp"
 
-#include "game/organization/all_component_includes.h"
-#include "game/organization/all_messages_includes.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-
-#include "game/cosmos/data_living_one_step.h"
-#include "game/cosmos/cosmos.h"
-
-#include "view/game_gui/game_gui_system.h"
-
 #include "view/audiovisual_state/world_camera.h"
 #include "view/audiovisual_state/audiovisual_state.h"
-#include "view/rendering_scripts/illuminated_rendering.h"
-#include "view/viewables/images_in_atlas_map.h"
-#include "view/viewables/streaming/viewables_streaming.h"
-#include "view/frame_profiler.h"
-#include "view/shader_paths.h"
-
-#include "application/session_profiler.h"
-#include "application/config_lua_table.h"
 
 #include "application/gui/settings_gui.h"
 #include "application/gui/start_client_gui.h"
@@ -86,12 +96,6 @@
 #include "application/gui/map_catalogue_gui.h"
 #include "application/gui/leaderboards_gui.h"
 #include "application/gui/ingame_menu_gui.h"
-
-#include "application/masterserver/masterserver.h"
-
-#include "application/network/network_common.h"
-#include "application/setups/all_setups.h"
-
 #include "application/setups/editor/editor_paths.h"
 
 #include "application/main/imgui_pass.h"
@@ -100,25 +104,8 @@
 #include "application/main/release_flags.h"
 #include "application/main/flash_afterimage.h"
 #include "application/main/abortable_popup.h"
-#if BUILD_DEBUGGER_SETUP
-#include "application/setups/debugger/debugger_player.hpp"
-#endif
-
-#include "application/nat/nat_detection_session.h"
-#include "application/nat/nat_traversal_session.h"
-#include "application/input/input_pass_result.h"
-#include "application/main/nat_traversal_details_window.h"
-
 #include "application/setups/draw_setup_gui_input.h"
-#include "application/network/resolve_address.h"
-#include "augs/network/netcode_socket_raii.h"
-
-#include "cmd_line_params.h"
-#include "build_info.h"
-
-#include "augs/readwrite/byte_readwrite.h"
 #include "view/game_gui/special_indicator_logic.h"
-#include "augs/window_framework/create_process.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "application/main/game_frame_buffer.h"
 #include "application/main/cached_visibility_data.h"
@@ -126,35 +113,73 @@
 #include "view/rendering_scripts/launch_visibility_jobs.h"
 #include "view/rendering_scripts/for_each_vis_request.h"
 #include "view/hud_messages/hud_messages_gui.h"
-#include "game/cosmos/for_each_entity.h"
+#include "application/input/input_pass_result.h"
+
 #include "application/setups/client/demo_paths.h"
+
+#include "steam_integration_callbacks.h"
+
+#include "application/main/nat_traversal_details_window.h"
+#endif
+
+#include "steam_integration.h"
+#include "steam_integration_helpers.hpp"
+
+#if HEADLESS
+#include "application/setups/server/server_setup.h"
+#else
+#include "application/setups/all_setups.h"
+#include "application/setups/editor/editor_setup_for_each_highlight.hpp"
+#endif
+
+#include "application/masterserver/masterserver.h"
+#include "application/network/network_common.h"
+
+#if BUILD_DEBUGGER_SETUP
+#include "application/setups/debugger/debugger_player.hpp"
+#endif
+
+#include "augs/misc/lua/lua_utils.h"
+
+#include "application/nat/nat_detection_session.h"
+#include "application/nat/nat_traversal_session.h"
+
+#include "application/network/resolve_address.h"
+#include "augs/network/netcode_socket_raii.h"
+
+#include "cmd_line_params.h"
+#include "build_info.h"
+
+#include "augs/readwrite/byte_readwrite.h"
+#include "augs/window_framework/create_process.h"
+#include "game/cosmos/for_each_entity.h"
 #include "application/nat/stun_server_provider.h"
 #include "application/arena/arena_paths.h"
-
-#include "application/setups/editor/editor_setup_for_each_highlight.hpp"
 
 #include "application/main/self_updater.h"
 #include "application/setups/editor/packaged_official_content.h"
 #include "augs/string/parse_url.h"
-#include "steam_integration.h"
-#include "steam_integration_helpers.hpp"
-#include "steam_integration_callbacks.h"
 
 #include "work_result.h"
 
+void yojimbo_sleep(double time);
 std::function<void()> ensure_handler;
 
 extern std::mutex log_mutex;
 extern std::string log_timestamp_format;
-
-extern float max_zoom_out_at_edges_v;
 
 #if PLATFORM_UNIX
 std::atomic<int> signal_status = 0;
 static_assert(std::atomic<int>::is_always_lock_free);
 #endif
 
+float max_zoom_out_at_edges_v = 0.7f;
+
+#if HEADLESS
+
+#else
 constexpr bool no_edge_zoomout_v = false;
+#endif
 
 work_result work(
 	const cmd_line_params& parsed_params,
@@ -163,6 +188,8 @@ work_result work(
 	const char* const * const argv
 ) try {
 	const auto& params = parsed_params;
+	(void)argc;
+	(void)argv;
 
 	const bool is_cli_tool = params.is_cli_tool();
 
@@ -218,6 +245,7 @@ work_result work(
 	LOG_NVPS(is_steam_client);
 
 	uint32_t steam_auth_request_id = 0;
+	(void)steam_auth_request_id;
 
 	const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
 
@@ -332,6 +360,10 @@ work_result work(
 		result.drawing.stencil_before_light_pass = false;
 #endif
 
+#if HEADLESS
+		result.server.allow_nat_traversal = false;
+#endif
+
 		return result_ptr;
 	}();
 
@@ -421,6 +453,10 @@ work_result work(
 		perform_float_consistency_tests(fp_test_settings)
 	;
 
+	if (!float_tests_succeeded) {
+		LOG("WARNING! FLOAT CONSISTENCY TESTS HAVE FAILED!");
+	}
+
 	LOG("Initializing network RAII.");
 
 	auto network_raii = augs::network_raii();
@@ -443,6 +479,9 @@ work_result work(
 
 	LOG("Initializing ImGui.");
 
+#if HEADLESS
+	const augs::image* imgui_atlas_image = nullptr;
+#else
 	const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
 	const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
@@ -454,6 +493,7 @@ work_result work(
 
 	LOG("Creating the ImGui atlas image.");
 	const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
+#endif
 
 	auto last_update_result = self_update_result();
 
@@ -529,10 +569,13 @@ work_result work(
 
 	augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
+	(void)until_first_swap;
+	(void)until_first_swap_measured;
 
 	session_profiler render_thread_performance;
 	network_profiler network_performance;
 	network_info network_stats;
+	(void)network_stats;
 	server_network_info server_stats;
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
@@ -547,59 +590,10 @@ work_result work(
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 
-	auto abandon_pending_op = std::optional<ingame_menu_button_type>();
-	auto abandon_are_you_sure_popup = std::optional<simple_popup>();
-
-	auto make_abandon_popup = [&](auto op) {
-		abandon_pending_op = op;
-
-		simple_popup sp;
-		sp.title = "WARNING";
-		sp.warning_notice_above = "Are you sure you want to abandon the match?";
-		sp.message = "You have 3 minutes to rejoin after quitting.\n";
-
-		sp.warning_notice = "\nIf you do not come back,\nyou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
-
-		abandon_are_you_sure_popup = sp;
-	};
-
-	auto perform_abandon_are_you_sure_popup = [&]() {
-		if (abandon_are_you_sure_popup.has_value()) {
-			const auto result = abandon_are_you_sure_popup->perform({
-				{ "Abandon", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
-				{ "Cancel", rgba::zero, rgba::zero }
-			});
-
-			if (result) {
-				abandon_are_you_sure_popup = std::nullopt;
-
-				if (result == 2) {
-					abandon_pending_op = std::nullopt;
-				}
-			}
-		}
-
-		return 0;
-	};
-
-	auto failed_to_load_arena_popup = std::optional<simple_popup>();
+#if HEADLESS
+#else
 	auto last_exit_incorrect_popup = std::optional<simple_popup>();
-
-	auto perform_failed_to_load_arena_popup = [&]() {
-		if (failed_to_load_arena_popup.has_value()) {
-			if (failed_to_load_arena_popup->perform()) {
-				failed_to_load_arena_popup = std::nullopt;
-			}
-		}
-	};
-
-	auto perform_last_exit_incorrect = [&]() {
-		if (last_exit_incorrect_popup.has_value()) {
-			if (last_exit_incorrect_popup->perform()) {
-				last_exit_incorrect_popup = std::nullopt;
-			}
-		}
-	};
+#endif
 
 #if IS_PRODUCTION_BUILD
 	if (log_directory_existed) {
@@ -637,7 +631,10 @@ work_result work(
 				+ notice_post_content
 			;
 
+#if HEADLESS
+#else
 			last_exit_incorrect_popup = simple_popup { "Warning", full_content, "" };
+#endif
 		}
 	}
 #else
@@ -688,6 +685,7 @@ work_result work(
 	};
 
 	auto chosen_server_nat = nat_detection_result();
+	(void)chosen_server_nat;
 
 	auto auxiliary_socket = std::optional<netcode_socket_raii>();
 
@@ -720,11 +718,11 @@ work_result work(
 	recreate_auxiliary_socket();
 
 	auto pending_launch = std::optional<activity_type>();
+	(void)pending_launch;
 
 	auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
 
 	auto nat_detection = std::optional<nat_detection_session>();
-	auto nat_detection_popup = abortable_popup_state();
 
 	auto nat_detection_complete = [&]() {
 		if (nat_detection == std::nullopt) {
@@ -754,37 +752,6 @@ work_result work(
 	restart_nat_detection();
 
 	auto nat_traversal = std::optional<nat_traversal_session>();
-	auto nat_traversal_details = nat_traversal_details_window();
-
-	auto do_traversal_details_popup = [&](auto& window) {
-		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
-			nat_traversal.reset();
-			pending_launch = std::nullopt;
-
-			if (chosen_server_port() == 0) {
-				const auto next_port = get_bound_local_port();
-				recreate_auxiliary_socket(next_port + 1);
-			}
-		}
-	};
-
-	auto do_detection_details_popup = [&]() {
-		const auto message = 
-			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
-		;
-
-		const bool should_be_open = 
-			pending_launch.has_value() 
-			&& !nat_detection_complete()
-		;
-
-		const auto title = "Launching setup...";
-
-		if (const bool aborted = nat_detection_popup.perform(should_be_open, title, message)) {
-			pending_launch = std::nullopt;
-		}
-	};
-
 	auto make_server_nat_traversal_input = [&]() {
 		return server_nat_traversal_input {
 			config.nat_detection,
@@ -1051,6 +1018,95 @@ work_result work(
 
 		return work_result::SUCCESS;
 	}
+#if HEADLESS
+	LOG("Headless build. Nothing to do.");
+	return work_result::SUCCESS;
+#else
+	auto abandon_pending_op = std::optional<ingame_menu_button_type>();
+	auto abandon_are_you_sure_popup = std::optional<simple_popup>();
+
+	auto make_abandon_popup = [&](auto op) {
+		abandon_pending_op = op;
+
+		simple_popup sp;
+		sp.title = "WARNING";
+		sp.warning_notice_above = "Are you sure you want to abandon the match?";
+		sp.message = "You have 3 minutes to rejoin after quitting.\n";
+
+		sp.warning_notice = "\nIf you do not come back,\nyou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
+
+		abandon_are_you_sure_popup = sp;
+	};
+
+	auto perform_abandon_are_you_sure_popup = [&]() {
+		if (abandon_are_you_sure_popup.has_value()) {
+			const auto result = abandon_are_you_sure_popup->perform({
+				{ "Abandon", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
+				{ "Cancel", rgba::zero, rgba::zero }
+			});
+
+			if (result) {
+				abandon_are_you_sure_popup = std::nullopt;
+
+				if (result == 2) {
+					abandon_pending_op = std::nullopt;
+				}
+			}
+		}
+
+		return 0;
+	};
+
+	auto failed_to_load_arena_popup = std::optional<simple_popup>();
+
+	auto perform_failed_to_load_arena_popup = [&]() {
+		if (failed_to_load_arena_popup.has_value()) {
+			if (failed_to_load_arena_popup->perform()) {
+				failed_to_load_arena_popup = std::nullopt;
+			}
+		}
+	};
+
+	auto perform_last_exit_incorrect = [&]() {
+		if (last_exit_incorrect_popup.has_value()) {
+			if (last_exit_incorrect_popup->perform()) {
+				last_exit_incorrect_popup = std::nullopt;
+			}
+		}
+	};
+
+	auto nat_traversal_details = nat_traversal_details_window();
+
+	auto do_traversal_details_popup = [&](auto& window) {
+		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
+			nat_traversal.reset();
+			pending_launch = std::nullopt;
+
+			if (chosen_server_port() == 0) {
+				const auto next_port = get_bound_local_port();
+				recreate_auxiliary_socket(next_port + 1);
+			}
+		}
+	};
+
+	auto nat_detection_popup = abortable_popup_state();
+
+	auto do_detection_details_popup = [&]() {
+		const auto message = 
+			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
+		;
+
+		const bool should_be_open = 
+			pending_launch.has_value() 
+			&& !nat_detection_complete()
+		;
+
+		const auto title = "Launching setup...";
+
+		if (const bool aborted = nat_detection_popup.perform(should_be_open, title, message)) {
+			pending_launch = std::nullopt;
+		}
+	};
 
 	LOG("Initializing the audio context.");
 
@@ -4653,11 +4709,14 @@ work_result work(
 	}
 
 	return game_thread_result;
+#endif
 }
 catch (const config_read_error& err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
 	return work_result::FAILURE;
 }
+#if HEADLESS
+#else
 catch (const augs::imgui_init_error& err) {
 	LOG("Failed init imgui:\n%x", err.what());
 	return work_result::FAILURE;
@@ -4678,6 +4737,7 @@ catch (const necessary_resource_loading_error& err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
 	return work_result::FAILURE;
 }
+#endif
 catch (const augs::lua_state_creation_error& err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
 	return work_result::FAILURE;

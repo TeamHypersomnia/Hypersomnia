@@ -22,7 +22,11 @@ struct cmd_line_params {
 	bool version_only = false;
 	bool version_line_only = false;
 	bool start_server = false;
+#if HEADLESS
+	app_type type = app_type::DEDICATED_SERVER;
+#else
 	app_type type = app_type::GAME_CLIENT;
+#endif
 	bool upgraded_successfully = false;
 	bool should_connect = false;
 	bool only_check_update_availability_and_quit = false;

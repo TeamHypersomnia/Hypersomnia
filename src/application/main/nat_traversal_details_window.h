@@ -2,6 +2,7 @@
 #include "augs/log_path_getters.h"
 #include "augs/filesystem/file.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/nat/nat_traversal_session.h"
 
 std::string nat_traversal_state_to_string(const nat_traversal_session::state state);
 std::string nat_type_to_string(const nat_type type);

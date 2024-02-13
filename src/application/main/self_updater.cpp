@@ -7,21 +7,25 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/math/matrix.h"
 #include "application/main/self_updater.h"
-#include "augs/graphics/renderer.h"
-#include "augs/graphics/renderer_backend.h"
 #include "augs/misc/timing/timer.h"
-#include "augs/window_framework/window.h"
 #include "3rdparty/include_httplib.h"
 
+#if !HEADLESS
+#include "augs/graphics/renderer.h"
+#include "augs/graphics/renderer_backend.h"
+#include "augs/window_framework/window.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 #include "augs/graphics/shader.h"
 #include "augs/graphics/texture.h"
+#include "view/shader_paths.h"
+#include "augs/window_framework/platform_utils.h"
+#endif
+
 #include "augs/misc/readable_bytesize.h"
 
-#include "view/shader_paths.h"
 #include "augs/readwrite/byte_file.h"
 
 #include "augs/filesystem/directory.h"
@@ -31,7 +35,6 @@
 #include "application/main/extract_archive.h"
 #include "hypersomnia_version.h"
 #include "augs/window_framework/exec.h"
-#include "augs/window_framework/platform_utils.h"
 
 #if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
@@ -63,9 +66,16 @@ self_update_result check_and_apply_updates(
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& http_settings,
 	augs::window_settings window_settings,
-	const bool headless
+	bool headless
 ) {
+	(void)window_settings;
+	(void)imgui_atlas_image;
+
+#if HEADLESS
+	headless = true;
+#else
 	using namespace augs::imgui;
+#endif
 
 	self_update_result result;
 
@@ -177,7 +187,11 @@ self_update_result check_and_apply_updates(
 
 	const auto archive_path = 
 		is_appimage ? 
+#if HEADLESS
+		typesafe_sprintf("%x/Hypersomnia-Headless.AppImage", update_path) :
+#else
 		typesafe_sprintf("%x/Hypersomnia.AppImage", update_path) :
+#endif
 		typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION)
 	;
 
@@ -196,6 +210,7 @@ self_update_result check_and_apply_updates(
 		LOG("Updating from an AppImage: %x", archive_path);
 	}
 
+#if !HEADLESS
 	const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 	auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
 
@@ -214,10 +229,12 @@ self_update_result check_and_apply_updates(
 	std::optional<augs::graphics::shader_program> standard;
 
 	augs::renderer renderer;
+#endif
 
 	if (headless) {
 		LOG("Forced updating in headless mode (server application).");
 	}
+#if !HEADLESS
 	else {
 		try {
 			window.emplace(window_settings);
@@ -260,6 +277,7 @@ self_update_result check_and_apply_updates(
 	augs::local_entropy entropy;
 
 	renderer.set_viewport({ vec2i{0, 0}, window_size });
+#endif
 
 	std::atomic<uint64_t> downloaded_bytes = 1;
 	std::atomic<uint64_t> total_bytes = 1;
@@ -332,8 +350,15 @@ self_update_result check_and_apply_updates(
 	auto completed_save = std::future<self_update_result_type>();
 
 	double total_secs = 0;
+	(void)total_secs;
 
-	auto mbox_guarded_action = [&window](auto&& action, const auto& action_name, const auto&... path) {
+	auto mbox_guarded_action = 
+#if HEADLESS
+		[]
+#else
+		[&window]
+#endif
+		(auto&& action, const auto& action_name, const auto&... path) {
 		for (;;) {
 			try {
 				action();
@@ -343,6 +368,10 @@ self_update_result check_and_apply_updates(
 				const auto format = "Cannot %x:\n%x\n\nPlease close the applications that might be using it, then try again!\n\nDetails:\n\n%x";
 				const auto error_text = typesafe_sprintf(format, action_name, path..., err.what());
 
+#if HEADLESS
+				LOG(error_text);
+				return callback_result::ABORT;
+#else
 				if (window == std::nullopt) {
 					LOG(error_text);
 					return callback_result::ABORT;
@@ -351,6 +380,7 @@ self_update_result check_and_apply_updates(
 				if (window->retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
 					return callback_result::ABORT;
 				}
+#endif
 			}
 			catch (const fs::filesystem_error& err) {
 				const auto format = [&]() {
@@ -370,6 +400,10 @@ self_update_result check_and_apply_updates(
 					return typesafe_sprintf(format, action_name, err.path1(), err.path2(), err.what());
 				}();
 
+#if HEADLESS
+				LOG(error_text);
+				return callback_result::ABORT;
+#else
 				if (window == std::nullopt) {
 					LOG(error_text);
 					return callback_result::ABORT;
@@ -378,6 +412,7 @@ self_update_result check_and_apply_updates(
 				if (window->retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
 					return callback_result::ABORT;
 				}
+#endif
 			}
 		}
 	};
@@ -447,6 +482,7 @@ self_update_result check_and_apply_updates(
 	current_state = state::EXTRACTING;
 #endif
 
+#if !HEADLESS
 	auto print_new_version_available = []() {
 		text_color("New version available!", yellow);
 
@@ -590,12 +626,16 @@ self_update_result check_and_apply_updates(
 
 		return ImGui::Button("Cancel");
 	};
+#endif
 
 	auto advance_update_logic = [&]() {
+#if !HEADLESS
 		const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 		auto loading_window = cond_scoped_window(window.has_value(), "Loading in progress", nullptr, flags);
+#endif
 
 		{
+#if !HEADLESS
 			auto child = cond_scoped_child(window.has_value(), "loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
 
 			if (window.has_value()) {
@@ -605,6 +645,7 @@ self_update_result check_and_apply_updates(
 				print_upstream();
 				ImGui::Columns(1);
 			}
+#endif
 
 			if (current_state == state::DOWNLOADING) {
 				if (valid_and_is_ready(future_response)) {
@@ -701,9 +742,11 @@ self_update_result check_and_apply_updates(
 					current_state = state::SAVING_ARCHIVE_TO_DISK;
 				}
 
+#if !HEADLESS
 				if (window.has_value()) {
 					print_download_progress_bar();
 				}
+#endif
 			}
 			else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
 				if (valid_and_is_ready(completed_save)) {
@@ -771,9 +814,11 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
+#if !HEADLESS
 				if (window.has_value()) {
 					print_saving_progress();
 				}
+#endif
 			}
 			else if (current_state == state::EXTRACTING) {
 				ensure(!is_appimage);
@@ -977,9 +1022,11 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
+#if !HEADLESS
 				if (window.has_value()) {
 					print_extracting_progress();
 				}
+#endif
 			}
 			else if (current_state == state::MOVING_FILES_AROUND) {
 				if (valid_and_is_ready(completed_move)) {
@@ -993,15 +1040,18 @@ self_update_result check_and_apply_updates(
 					}
 				}
 
+#if !HEADLESS
 				if (window.has_value()) {
 					text("Moving files around...");
 				}
+#endif
 			}
 			else {
 				ensure(false && "Unknown state!");
 			}
 		}
 
+#if !HEADLESS
 		if (window.has_value()) {
 			if (current_state != state::MOVING_FILES_AROUND) {
 				if (do_cancel_button()) {
@@ -1009,6 +1059,7 @@ self_update_result check_and_apply_updates(
 				}
 			}
 		}
+#endif
 	};
 
 	while (!should_quit) {
@@ -1038,6 +1089,7 @@ self_update_result check_and_apply_updates(
 		}
 #endif
 
+#if !HEADLESS
 		if (window.has_value()) {
 			window->collect_entropy(entropy);
 
@@ -1061,9 +1113,11 @@ self_update_result check_and_apply_updates(
 			ImGui::NewFrame();
 			center_next_window(vec2::square(1.f), ImGuiCond_Always);
 		}
+#endif
 
 		advance_update_logic();
 
+#if !HEADLESS
 		if (window.has_value()) {
 			augs::imgui::render();
 
@@ -1105,6 +1159,7 @@ self_update_result check_and_apply_updates(
 			window->swap_buffers();
 			renderer.next_frame();
 		}
+#endif
 	}
 
 	return result;

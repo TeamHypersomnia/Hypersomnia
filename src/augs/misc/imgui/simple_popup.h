@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include "augs/graphics/rgba.h"
 
 struct simple_popup {
 	static simple_popup sum_all(const std::vector<simple_popup>& popups);
@@ -20,5 +21,8 @@ struct simple_popup {
 
 	bool details_expanded = false;
 	int perform(const std::vector<button>& buttons = {});
-	std::string make_log() const;
+
+	std::string make_log() const {
+		return title + ": " + message;
+	}
 };

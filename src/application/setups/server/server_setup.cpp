@@ -49,6 +49,7 @@
 #include "game/modes/arena_mode.hpp"
 #include "game/messages/mode_notification.h"
 #include "augs/misc/httplib_utils.h"
+#include "application/gui/client/chat_gui_entry.hpp"
 #include "steam_integration.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
@@ -1608,10 +1609,12 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 		}
 	}
 
+#if !HEADLESS
 	{
 		auto& rcon_gui = integrated_client_gui.rcon;
 		rcon_gui.on_arrived(vars);
 	}
+#endif
 
 	if (reload_net_sim) {
 		server->set(vars.network_simulator);
@@ -1737,10 +1740,12 @@ void server_setup::rechoose_arena() {
 		arena_files_database[current_arena_hash] = { paths.project_json, {} };
 	}
 
+#if !HEADLESS
 	arena_gui.reset();
 	arena_gui.choose_team.show = ::is_spectator(arena, get_local_player_id());
 
 	integrated_client_gui.rcon.show = false;
+#endif
 
 	if (should_have_admin_character()) {
 		const auto admin_id = get_integrated_player_id();
@@ -1753,7 +1758,9 @@ void server_setup::rechoose_arena() {
 
 			if (playtesting_context) {
 				admin_faction = playtesting_context->first_player_faction;
+#if !HEADLESS
 				arena_gui.choose_team.show = false;
+#endif
 			}
 
 			cmd.added_player = add_player_input {
@@ -2788,92 +2795,6 @@ double server_setup::get_audiovisual_speed() const {
 	return get_arena_handle().get_audiovisual_speed();
 }
 
-custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
-	if (!server->is_running()) {
-		using namespace augs::imgui;
-
-		center_next_window(vec2::square(0.3f), ImGuiCond_FirstUseEver);
-
-		const auto window_name = "Connection status";
-		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
-
-		if (failure_reason.size() > 0) {
-			text(failure_reason);
-		}
-		else {
-			const auto addr = yojimbo::Address(last_start.ip.c_str(), last_start.port);
-
-			{
-				char buffer[256];
-				addr.ToString(buffer, sizeof(buffer));
-				text("Failed to host the server at address: %x", buffer);
-			}
-		}
-
-		text("\n");
-		ImGui::Separator();
-
-		if (ImGui::Button("Go back")) {
-			return quit_playtesting_or(custom_imgui_result::GO_TO_MAIN_MENU);
-		}
-	}
-	else {
-		if (is_integrated()) {
-			auto& chat = integrated_client_gui.chat;
-
-			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
-				server_broadcasted_chat message;
-
-				message.author = to_mode_player_id(get_integrated_client_id());
-				message.message = std::string(chat.current_message);
-				message.target = chat.target;
-
-				broadcast(message);
-
-				chat.current_message.clear();
-			}
-
-			auto& rcon_gui = integrated_client_gui.rcon;
-
-			auto on_new_payload = [&](const auto& new_payload) {
-				handle_rcon_payload(get_integrated_client_id(), rcon_level_type::MASTER, new_payload);
-			};
-
-			if (!arena_gui.scoreboard.show && rcon_gui.show) {
-				const bool has_maintenance = false;
-				const bool during_ranked = false;
-
-				rcon_gui.level = rcon_level_type::MASTER;
-
-				::perform_rcon_gui(
-					rcon_gui,
-					has_maintenance,
-					during_ranked,
-					on_new_payload
-				);
-			}
-
-			::do_pending_rcon_payloads(
-				rcon_gui,
-				on_new_payload
-			);
-		}
-	}
-
-	return quit_playtesting_or(arena_gui_base::perform_custom_imgui(in));
-}
-
-setup_escape_result server_setup::escape() {
-	if (!is_gameplay_on()) {
-		return quit_playtesting_or(setup_escape_result::GO_TO_MAIN_MENU);
-	}
-
-	if (integrated_client_gui.rcon.escape()) {
-		return setup_escape_result::JUST_FETCH;
-	}
-
-	return quit_playtesting_or(arena_gui_base::escape());
-}
 
 bool server_setup::is_gameplay_on() const {
 	return is_running();
@@ -3047,7 +2968,35 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 }
 
 netcode_address_t to_netcode_addr(const yojimbo::Address& t);
-bool is_internal(const netcode_address_t& address);
+
+bool is_internal(const netcode_address_t& address) {
+	if (address.type == NETCODE_ADDRESS_IPV4) {
+		auto ip = address.data.ipv4;
+
+		if (ip[0] == 127) {
+			return true;
+		}
+
+		if (ip[0] == 10) {
+			return true;
+		}
+
+		if (ip[0] == 172) {
+			if (ip[1] >= 16 && ip[1] <= 31) {
+				return true;
+			}
+		}
+
+		if (ip[0] == 192) {
+			if (ip[1] == 168) {
+				return true;
+			}
+		}
+	}
+
+	// TODO
+	return false;
+}
 
 rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const { 
 	if (is_integrated()) {
@@ -3153,9 +3102,11 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 
 	for_each_id_and_client(send_it, connected_and_integrated_v);
 
+#if !HEADLESS
 	if (integrated_received) {
 		integrated_client_gui.chat.add_entry(std::move(new_entry));
 	}
+#endif
 
 	if (is_dedicated() || integrated_received) {
 		LOG("Server: %x", new_entry.to_string());
@@ -3232,6 +3183,11 @@ const arena_player_metas* server_setup::find_player_metas() const {
 	return std::addressof(integrated_player_metas);
 }
 	
+#if !HEADLESS
+bool server_setup::requires_cursor() const {
+	return arena_gui_base::requires_cursor() || integrated_client_gui.requires_cursor();
+}
+
 bool server_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
@@ -3280,6 +3236,95 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	arena_gui_base::draw_custom_gui(in);
 }
 
+custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	if (!server->is_running()) {
+		using namespace augs::imgui;
+
+		center_next_window(vec2::square(0.3f), ImGuiCond_FirstUseEver);
+
+		const auto window_name = "Connection status";
+		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+
+		if (failure_reason.size() > 0) {
+			text(failure_reason);
+		}
+		else {
+			const auto addr = yojimbo::Address(last_start.ip.c_str(), last_start.port);
+
+			{
+				char buffer[256];
+				addr.ToString(buffer, sizeof(buffer));
+				text("Failed to host the server at address: %x", buffer);
+			}
+		}
+
+		text("\n");
+		ImGui::Separator();
+
+		if (ImGui::Button("Go back")) {
+			return quit_playtesting_or(custom_imgui_result::GO_TO_MAIN_MENU);
+		}
+	}
+	else {
+		if (is_integrated()) {
+			auto& chat = integrated_client_gui.chat;
+
+			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
+				server_broadcasted_chat message;
+
+				message.author = to_mode_player_id(get_integrated_client_id());
+				message.message = std::string(chat.current_message);
+				message.target = chat.target;
+
+				broadcast(message);
+
+				chat.current_message.clear();
+			}
+
+			auto& rcon_gui = integrated_client_gui.rcon;
+
+			auto on_new_payload = [&](const auto& new_payload) {
+				handle_rcon_payload(get_integrated_client_id(), rcon_level_type::MASTER, new_payload);
+			};
+
+			if (!arena_gui.scoreboard.show && rcon_gui.show) {
+				const bool has_maintenance = false;
+				const bool during_ranked = false;
+
+				rcon_gui.level = rcon_level_type::MASTER;
+
+				::perform_rcon_gui(
+					rcon_gui,
+					has_maintenance,
+					during_ranked,
+					on_new_payload
+				);
+			}
+
+			::do_pending_rcon_payloads(
+				rcon_gui,
+				on_new_payload
+			);
+		}
+	}
+
+	return quit_playtesting_or(arena_gui_base::perform_custom_imgui(in));
+}
+
+setup_escape_result server_setup::escape() {
+	if (!is_gameplay_on()) {
+		return quit_playtesting_or(setup_escape_result::GO_TO_MAIN_MENU);
+	}
+
+	if (integrated_client_gui.rcon.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
+	return quit_playtesting_or(arena_gui_base::escape());
+}
+
+#endif
+
 bool server_setup::is_integrated() const {
 	return dedicated == std::nullopt;
 }
@@ -3317,10 +3362,6 @@ void server_setup::log_performance() {
 			}
 		}
 	}
-}
-
-bool server_setup::requires_cursor() const {
-	return arena_gui_base::requires_cursor() || integrated_client_gui.requires_cursor();
 }
 
 bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {

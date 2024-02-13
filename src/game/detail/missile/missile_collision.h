@@ -5,7 +5,11 @@
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/stateless_systems/sentience_system.h"
 
+#if HEADLESS
+void draw_headshot_debug_lines(vec2, vec2, vec2, float) {}
+#else
 void draw_headshot_debug_lines(vec2 missile_pos, vec2 impact_dir, vec2 head_pos, float head_radius);
+#endif
 
 struct missile_collision_result {
 	transformr transform_of_impact;

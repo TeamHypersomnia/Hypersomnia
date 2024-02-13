@@ -3,6 +3,10 @@
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "augs/templates/traits/is_variant.h"
+#include "game/enums/marker_type.h"
+#include "test_scenes/test_scene_physical_materials.h"
+#include "application/setups/editor/resources/editor_prefab_resource.h"
+#include "augs/graphics/rgba.h"
 
 struct editor_official_resource_map {
 	template <class A, class B>

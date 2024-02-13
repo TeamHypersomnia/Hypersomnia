@@ -68,6 +68,7 @@ vec2u image_definition_view::read_source_image_size() const {
 	return augs::image::get_size(resolved_source_path);
 }
 
+#if !HEADLESS
 std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_map(
 	const bool force_regenerate
 ) const {
@@ -113,3 +114,4 @@ void image_definition_view::regenerate_desaturation(
 		);
 	}
 }
+#endif

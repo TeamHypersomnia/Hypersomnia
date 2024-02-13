@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/remove_cref.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "game/modes/all_mode_includes.h"
 
 template <class F>
 void for_each_faction(F callback) {

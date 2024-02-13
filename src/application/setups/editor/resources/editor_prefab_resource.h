@@ -1,6 +1,7 @@
 #pragma once
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/nodes/editor_prefab_node_editable.h"
+#include "game/organization/all_entity_types.h"
 
 enum class editor_builtin_prefab_type {
 	// GEN INTROSPECTOR enum class editor_builtin_prefab_type

@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/graphics/rgba.h"
+#include "augs/math/vec2.h"
 
 struct editor_sprite_resource;
 

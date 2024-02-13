@@ -1,10 +1,10 @@
 #pragma once
-#include "application/setups/editor/editor_official_resource_map.h"
-#include "application/setups/editor/resources/editor_resource_pools.h"
 #include "application/intercosm.h"
 
 #include "game/modes/arena_mode.h"
 #include "game/modes/test_mode.h"
+#include "application/setups/editor/resources/editor_resource_pools.h"
+#include "application/setups/editor/editor_official_resource_map.h"
 
 struct packaged_official_content {
 	intercosm built_content;

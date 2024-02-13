@@ -6,6 +6,10 @@ if [ "$1" == "--steam" ]; then
   BUILD_TYPE="steam"
 fi
 
+if [ "$1" == "--headless" ]; then
+  BUILD_TYPE="headless"
+fi
+
 # In case we're testing locally
 rm -rf /tmp/AppDir
 
@@ -62,6 +66,8 @@ rm -rf /tmp/AppDir/usr/share/hypersomnia/cache
 
 if [ "$BUILD_TYPE" == "steam" ]; then
   OUTPUT_NAME="Hypersomnia-Steam.AppImage"
+elif [ "$BUILD_TYPE" == "headless" ]; then
+  OUTPUT_NAME="Hypersomnia-Headless.AppImage"
 else
   OUTPUT_NAME="Hypersomnia.AppImage"
 fi

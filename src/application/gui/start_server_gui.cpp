@@ -267,36 +267,3 @@ as well as to test your skills in a laggy environment.
 	return result;
 }
 
-std::string nat_type_to_string(const nat_type type) {
-	switch (type) {
-		case nat_type::PUBLIC_INTERNET: 
-			return "Public Internet";
-		case nat_type::PORT_PRESERVING_CONE: 
-			return "Port-preserving cone";
-		case nat_type::CONE: 
-			return "Cone";
-		case nat_type::ADDRESS_SENSITIVE: 
-			return "Symmetric (address sensitive)";
-		case nat_type::PORT_SENSITIVE: 
-			return "Symmetric (port sensitive)";
-
-		default:
-			return "Unknown";
-	}
-}
-
-rgba nat_type_to_color(const nat_type type) {
-	switch (type) {
-		case nat_type::PUBLIC_INTERNET: 
-		case nat_type::PORT_PRESERVING_CONE: 
-		case nat_type::CONE: 
-			return green;
-		case nat_type::ADDRESS_SENSITIVE: 
-			return yellow;
-		case nat_type::PORT_SENSITIVE: 
-			return orange;
-
-		default:
-			return white;
-	}
-}

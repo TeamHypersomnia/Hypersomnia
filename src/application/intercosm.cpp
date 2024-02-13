@@ -192,3 +192,14 @@ static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::
 static_assert(augs::has_lua_readwrite_overloads_v<make_entity_pool<controlled_character>>);
 
 #endif
+
+/* 
+	Build some large-ass sources in the same file
+*/
+
+#include "application/setups/editor/packaged_official_content.hpp"
+#include "application/setups/editor/official/create_official_prefabs.h"
+#include "application/arena/build_arena_from_editor_project.hpp"
+
+#include "application/network/network_common.h"
+template void build_arena_from_editor_project<online_arena_handle<false>>(online_arena_handle<false> arena_handle, build_arena_input);

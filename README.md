@@ -30,7 +30,7 @@ Forever free and open-source :heart:
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
 <br undefined>
 
-Only 27 MB!
+Only 29 MB!
 
 The game will start with an **interactive Tutorial!**
 

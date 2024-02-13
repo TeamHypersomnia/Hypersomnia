@@ -156,7 +156,10 @@ struct config_lua_table {
 	general_gui_intent_map general_gui_controls;
 	inventory_gui_intent_map inventory_gui_controls;
 	
+#if !HEADLESS
 	ImGuiStyle gui_style;
+#endif
+
 	debug_settings debug;
 	session_settings session;
 	test_scene_settings test_scene;

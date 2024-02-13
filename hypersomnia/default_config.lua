@@ -69,7 +69,8 @@ return {
 	"arena-us.hypersomnia.xyz",
 	"arena-de.hypersomnia.xyz",
 	"arena-aus.hypersomnia.xyz",
-	"arena-ru.hypersomnia.xyz"
+	"arena-ru.hypersomnia.xyz",
+	"arena-ch.hypersomnia.xyz"
   },
 
   app_controls = {

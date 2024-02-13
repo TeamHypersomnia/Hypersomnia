@@ -335,6 +335,25 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 	return any_pathed_project_resources_changed;
 }
 
+std::string editor_pathed_resource::get_display_name() const {
+	return path_in_project.stem().string();
+}
+
+editor_pathed_resource::editor_pathed_resource(
+	const augs::path_type& path_in_project, 
+	const std::string& file_hash,
+	const augs::file_time_type& stamp
+) : 
+	path_in_project(path_in_project),
+	file_hash(file_hash)
+{
+	set_hash_stamp(stamp);
+}
+
+void editor_pathed_resource::set_hash_stamp(const augs::file_time_type& stamp) {
+	stamp_when_hashed = stamp;
+}
+
 namespace editor_project_readwrite {
 	void write_editor_view(const augs::path_type& json_path, const editor_view& view) {
 		augs::save_as_json(view, json_path);
@@ -1560,4 +1579,16 @@ namespace editor_project_readwrite {
 
 		return augs::from_json_subobject<editor_project_meta>(document, "meta").version_timestamp;
 	}
+}
+
+editor_project_about read_about_from(const augs::path_type& arena_folder_path) {
+	const auto paths = editor_project_paths(arena_folder_path);
+
+	return editor_project_readwrite::read_only_project_about(paths.project_json);
+}
+
+editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
+	const auto paths = editor_project_paths(arena_folder_path);
+
+	return editor_project_readwrite::read_only_project_meta(paths.project_json);
 }

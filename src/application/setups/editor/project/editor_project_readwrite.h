@@ -62,3 +62,5 @@ namespace editor_project_readwrite {
 	editor_view read_editor_view(const augs::path_type& json_path);
 }
 
+editor_project_about read_about_from(const augs::path_type& arena_folder_path);
+editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);

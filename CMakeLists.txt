@@ -108,11 +108,14 @@ else()
 	set(DEFAULT_NET_OPT ON)
 endif()
 
-if (HYPERSOMNIA_DEDICATED_SERVER)
-	message("Building a minimal executable required to run a dedicated server.")
+if (HEADLESS)
+	message("Building a minimal executable required to run a dedicated server or a masterserver.")
 
 	set(DEFAULT_OPT OFF)
 	set(DEFAULT_NET_OPT ON)
+	set(HAS_HEAD OFF)
+else()
+	set(HAS_HEAD YES)
 endif()
 
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
@@ -397,10 +400,14 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	"src/main.cpp"
 	"src/work.cpp"
 	"src/application/main/self_updater.cpp"
+)
+
+if(HAS_HEAD)
+	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/application/tests_of_traits.cpp"
-
-)
+	)
+endif()
 
 if(BUILD_DEBUGGER_SETUP)
 set(HYPERSOMNIA_DEBUGGER_SETUP_CPPS
@@ -453,40 +460,182 @@ macro(file_flag path flags)
 endmacro()
 
 if(BUILD_NETWORKING)
-	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
+	set(HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/setups/server/server_setup.cpp"
-		"src/application/setups/client/client_setup.cpp"
 		"src/application/network/network_adapters.cpp"
 		"src/augs/network/network_types.cpp"
 	)
+
+	if(HAS_HEAD)
+		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
+		"src/application/setups/client/client_setup.cpp"
+		)
+	endif()
 endif()
 
-set(HYPERSOMNIA_CODEBASE_CPPS
-	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
-	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
-
+if(HAS_HEAD)
+	set(HYPERSOMNIA_EDITOR_CPPS
 	"src/application/setups/editor/commands/toggle_active_commands.cpp"
 	"src/application/setups/editor/commands/clone_nodes_command.cpp"
 	"src/application/setups/editor/commands/delete_nodes_command.cpp"
 	"src/application/setups/editor/mover/editor_node_mover.cpp"
 	"src/application/setups/editor/commands/node_transform_commands.cpp"
 	"src/application/setups/editor/selector/editor_entity_selector.cpp"
-	"src/application/setups/editor/official/create_official_resources.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
-	"src/augs/misc/secure_hash.cpp"
-	"src/application/setups/editor/project/editor_project_readwrite.cpp"
-	"src/application/setups/editor/project/editor_project_paths.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
-	"src/augs/string/path_sanitization.cpp"
-	"src/augs/misc/imgui/simple_popup.cpp"
-	"src/application/config_lua_table.cpp"
-	"src/view/audiovisual_state/systems/interpolation_system.cpp"
+	"src/application/setups/editor/editor_setup.cpp"
+	"src/application/setups/editor/editor_setup_imgui.cpp"
+	"src/application/setups/editor/gui/editor_inspector_gui.cpp"
+	"src/application/setups/editor/gui/editor_filesystem_gui.cpp"
+	"src/application/setups/editor/gui/editor_layers_gui.cpp"
+	"src/application/setups/editor/gui/editor_toolbar_gui.cpp"
+	)
+
+	set(HYPERSOMNIA_AUDIOVISUAL_CPPS
 	"src/view/audiovisual_state/systems/particles_simulation_system.cpp"
 	"src/view/audiovisual_state/systems/past_infection_system.cpp"
 	"src/view/audiovisual_state/systems/pure_color_highlight_system.cpp"
 	"src/view/audiovisual_state/systems/sound_system.cpp"
 	"src/view/audiovisual_state/systems/thunder_system.cpp"
 	"src/view/audiovisual_state/systems/damage_indication_system.cpp"
+
+	"src/view/game_gui/elements/action_button.cpp"
+	"src/view/game_gui/elements/character_gui.cpp"
+	"src/view/game_gui/elements/drag_and_drop.cpp"
+	"src/view/game_gui/elements/gui_grid.cpp"
+	"src/view/game_gui/elements/gui_positioning.cpp"
+	"src/view/game_gui/elements/hotbar_button.cpp"
+	"src/view/game_gui/elements/item_button.cpp"
+	"src/view/game_gui/elements/pixel_line_connector.cpp"
+	"src/view/game_gui/elements/drag_and_drop_target_drop_item.cpp"
+	"src/view/game_gui/elements/game_gui_root.cpp"
+	"src/view/game_gui/elements/value_bar.cpp"
+	"src/view/game_gui/elements/slot_button.cpp"
+	"src/view/game_gui/game_gui_system.cpp"
+	"src/view/viewables/particle_effect.cpp"
+	"src/view/audiovisual_state/aabb_highlighter.cpp"
+	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
+	"src/view/audiovisual_state/systems/light_system.cpp"
+	"src/view/rendering_scripts/draw_sentiences_hud.cpp"
+	"src/view/rendering_scripts/draw_explosion_body_highlights.cpp"
+	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
+	"src/view/rendering_scripts/draw_circular_progresses.cpp"
+
+	"src/augs/image/font.cpp"
+
+	"src/view/viewables/regeneration/desaturations.cpp"
+	"src/view/viewables/regeneration/buttons_with_corners.cpp"
+	"src/view/viewables/regeneration/images_from_commands.cpp"
+	"src/view/viewables/regeneration/neon_maps.cpp"
+
+	"src/augs/gui/button_corners.cpp"
+	"src/augs/gui/clipboard.cpp"
+	"src/augs/gui/gui_traversal_structs.cpp"
+	"src/augs/gui/formatted_string.cpp"
+	"src/augs/gui/rect.cpp"
+
+	"src/augs/gui/appearance_detector.cpp"
+	"src/augs/misc/imgui/simple_popup.cpp"
+
+	"src/application/gui/settings_gui.cpp"
+	"src/application/gui/start_client_gui.cpp"
+	"src/application/gui/start_server_gui.cpp"
+	"src/view/mode_gui/arena/arena_mode_gui.cpp"
+	"src/view/mode_gui/arena/arena_scoreboard_gui.cpp"
+	"src/view/mode_gui/arena/arena_choose_team_gui.cpp"
+	"src/view/mode_gui/arena/arena_buy_menu_gui.cpp"
+	"src/view/mode_gui/arena/arena_spectator_gui.cpp"
+	"src/application/gui/client/chat_gui.cpp"
+	"src/application/gui/client/client_gui_state.cpp"
+	"src/application/gui/browse_servers_gui.cpp"
+	"src/application/gui/leaderboards_gui.cpp"
+	"src/view/hud_messages/hud_messages_gui.cpp"
+	"src/application/gui/map_catalogue_gui.cpp"
+
+	"src/augs/gui/dragger.cpp"
+	"src/augs/gui/rect_world.cpp"
+	"src/augs/gui/text/caret.cpp"
+	"src/augs/gui/text/drafter.cpp"
+	"src/augs/gui/text/draft_redrawer.cpp"
+	"src/augs/gui/text/printer.cpp"
+	"src/augs/gui/text/word_separator.cpp"
+
+	"src/augs/graphics/texture.cpp"
+	"src/augs/graphics/fbo.cpp"
+	"src/augs/graphics/renderer.cpp"
+	"src/augs/graphics/renderer_backend.cpp"
+	"src/augs/graphics/shader.cpp"
+	"src/augs/graphics/vertex.cpp"
+
+	"src/view/audiovisual_state/world_camera.cpp"
+	"src/view/audiovisual_state/audiovisual_state.cpp"
+	"src/view/audiovisual_state/audiovisual_profiler.cpp"
+	"src/view/audiovisual_state/systems/randomizing_system.cpp"
+	"src/augs/audio/audio_context.cpp"
+	"src/augs/audio/sound_buffer.cpp"
+	"src/augs/audio/sound_source.cpp"
+
+	"src/augs/audio/audio_backend.cpp"
+	"src/augs/audio/sound_data.cpp"
+
+	"src/augs/misc/imgui/path_tree_structs.cpp"
+	"src/augs/graphics/pbo.cpp"
+	"src/game/debug_draw.cpp"
+	"src/application/setups/project_selector/project_selector_setup.cpp"
+
+	"src/augs/texture_atlas/bake_fresh_atlas.cpp"
+	"src/view/necessary_resources.cpp"
+
+	"src/view/frame_profiler.cpp"
+	"src/augs/texture_atlas/atlas_profiler.cpp"
+	"src/view/viewables/streaming/viewables_streaming.cpp"
+	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
+	"src/view/viewables/avatar_atlas.cpp"
+	"src/augs/math/snapping_grid.cpp"
+	"src/augs/templates/history.cpp"
+	"src/application/main/imgui_pass.cpp"
+	"src/application/main/draw_debug_lines.cpp"
+	"src/application/main/draw_debug_details.cpp"
+	"src/application/main/release_flags.cpp"
+	"src/augs/gui/bbcode.cpp"
+	"src/augs/misc/imgui/imgui_utils.cpp"
+	"src/augs/misc/imgui/imgui_controls.cpp"
+	"src/augs/misc/imgui/imgui_control_wrappers.cpp"
+	"src/augs/window_framework/window.cpp"
+	"src/application/setups/test_scene_setup.cpp"
+	"src/application/setups/main_menu_setup.cpp"
+
+	"src/application/setups/client/https_file_uploader.cpp"
+	"src/augs/drawing/drawing.cpp"
+	"src/game/detail/describers.cpp"
+	"src/game/detail/names_and_descriptions.cpp"
+	"src/view/viewables/loaded_sounds_map.cpp"
+	"src/view/viewables/standard_atlas_distribution.cpp"
+	"src/application/network/simulation_receiver.cpp"
+	"src/application/main/miniature_generator.cpp"
+	)
+endif()
+
+set(HYPERSOMNIA_CODEBASE_CPPS
+	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
+	${HYPERSOMNIA_NETWORKING_CPPS}
+	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
+	${HYPERSOMNIA_EDITOR_CPPS}
+	${HYPERSOMNIA_AUDIOVISUAL_CPPS}
+
+	"src/augs/window_framework/event.cpp"
+	"src/view/viewables/image_cache.cpp"
+	"src/application/setups/editor/official/create_official_resources.cpp"
+	"src/augs/window_framework/platform_utils.cpp"
+	"src/view/audiovisual_state/systems/interpolation_system.cpp"
+	"src/view/viewables/image_definition.cpp"
+	"src/augs/misc/value_meter.cpp"
+	"src/game/debug_drawing_settings.cpp"
+	"src/augs/image/image.cpp"
+	"src/augs/graphics/rgba.cpp"
+	"src/augs/misc/secure_hash.cpp"
+	"src/augs/string/path_sanitization.cpp"
+	"src/application/config_lua_table.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
 	"src/game/stateless_systems/demolitions_system.cpp"
 	"src/game/stateless_systems/melee_system.cpp"
@@ -510,54 +659,11 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/visibility_system.cpp"
 	"src/game/stateless_systems/physics_system.cpp"
 	"src/game/stateless_systems/portal_system.cpp"
-	"src/view/viewables/image_definition.cpp"
-	"src/view/viewables/particle_effect.cpp"
-	"src/view/audiovisual_state/aabb_highlighter.cpp"
-	"src/view/game_gui/elements/action_button.cpp"
-	"src/view/game_gui/elements/character_gui.cpp"
-	"src/view/game_gui/elements/drag_and_drop.cpp"
-	"src/view/game_gui/elements/gui_grid.cpp"
-	"src/view/game_gui/elements/gui_positioning.cpp"
-	"src/view/game_gui/elements/hotbar_button.cpp"
-	"src/view/game_gui/elements/item_button.cpp"
-	"src/view/game_gui/elements/pixel_line_connector.cpp"
-	"src/view/game_gui/elements/drag_and_drop_target_drop_item.cpp"
-	"src/view/game_gui/elements/game_gui_root.cpp"
-	"src/view/game_gui/elements/value_bar.cpp"
-	"src/view/game_gui/elements/slot_button.cpp"
-	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
-	"src/view/game_gui/game_gui_system.cpp"
-	"src/view/audiovisual_state/systems/light_system.cpp"
-	"src/view/rendering_scripts/draw_sentiences_hud.cpp"
-	"src/view/rendering_scripts/draw_explosion_body_highlights.cpp"
-	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
-	"src/view/rendering_scripts/draw_circular_progresses.cpp"
-	"src/view/audiovisual_state/world_camera.cpp"
-	"src/view/necessary_resources.cpp"
-	"src/view/audiovisual_state/audiovisual_state.cpp"
-	"src/view/viewables/loaded_sounds_map.cpp"
-	"src/view/viewables/standard_atlas_distribution.cpp"
+	"src/application/setups/editor/project/editor_project_readwrite.cpp"
+	"src/application/setups/editor/project/editor_project_paths.cpp"
+	"src/application/gui/headless_map_catalogue.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
-	"src/view/audiovisual_state/audiovisual_profiler.cpp"
-	"src/view/viewables/image_cache.cpp"
-	"src/view/frame_profiler.cpp"
-	"src/view/viewables/regeneration/desaturations.cpp"
-	"src/view/viewables/regeneration/buttons_with_corners.cpp"
-	"src/view/viewables/regeneration/images_from_commands.cpp"
-	"src/view/viewables/regeneration/neon_maps.cpp"
-	"src/augs/graphics/texture.cpp"
-	"src/augs/gui/button_corners.cpp"
-	"src/augs/audio/audio_context.cpp"
-	"src/augs/audio/sound_buffer.cpp"
-	"src/augs/audio/sound_source.cpp"
 	"src/augs/ensure.cpp"
-	"src/augs/drawing/drawing.cpp"
-	"src/augs/gui/clipboard.cpp"
-	"src/augs/gui/gui_traversal_structs.cpp"
-	"src/augs/gui/formatted_string.cpp"
-	"src/augs/gui/rect.cpp"
-	"src/augs/image/font.cpp"
-	"src/augs/image/image.cpp"
 	"src/augs/window_framework/shell.cpp"
 	"src/augs/misc/action_list/action_list.cpp"
 	"src/augs/misc/enum/enum_bitset.cpp"
@@ -567,7 +673,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/time_utils.cpp"
 	"src/augs/string/typesafe_sprintf.cpp"
 	"src/augs/string/typesafe_sscanf.cpp"
-	"src/augs/texture_atlas/bake_fresh_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
 	"src/game/assets/physical_material.cpp"
@@ -583,7 +688,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/physics/physics_friction_fields.cpp"
 	"src/game/detail/physics/ray_casts.cpp"
 	"src/game/detail/physics/physics_scripts.cpp"
-	"src/augs/misc/value_meter.cpp"
 	"src/game/detail/visible_entities.cpp"
 	"src/game/detail/inventory/wielding_result.cpp"
 	"src/game/enums/attitude_type.cpp"
@@ -596,10 +700,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/cosmos/cosmic_entropy.cpp"
 	"src/game/cosmos/data_living_one_step.cpp"
 	"src/augs/filesystem/directory.cpp"
-	"src/augs/gui/appearance_detector.cpp"
 	"src/augs/misc/timing/delta.cpp"
 	"src/augs/misc/timing/stepped_timing.cpp"
-	"src/augs/window_framework/platform_utils.cpp"
 	"src/game/components/car_component.cpp"
 	"src/game/components/container_component.cpp"
 	"src/game/components/missile_component.cpp"
@@ -615,27 +717,9 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/ai/behaviours/target_closest_enemy.cpp"
 	"src/game/detail/entity_scripts.cpp"
 	"src/game/enums/filters.cpp"
-	"src/game/detail/describers.cpp"
-	"src/game/detail/names_and_descriptions.cpp"
 	"src/game/cosmos/cosmos_solvable_significant.cpp"
-	"src/application/setups/test_scene_setup.cpp"
-	"src/application/setups/main_menu_setup.cpp"
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
-	"src/augs/graphics/fbo.cpp"
-	"src/augs/graphics/rgba.cpp"
-	"src/augs/graphics/renderer.cpp"
-	"src/augs/graphics/renderer_backend.cpp"
-	"src/augs/graphics/shader.cpp"
-	"src/augs/graphics/vertex.cpp"
-	"src/augs/audio/audio_backend.cpp"
-	"src/augs/gui/dragger.cpp"
-	"src/augs/gui/rect_world.cpp"
-	"src/augs/gui/text/caret.cpp"
-	"src/augs/gui/text/drafter.cpp"
-	"src/augs/gui/text/draft_redrawer.cpp"
-	"src/augs/gui/text/printer.cpp"
-	"src/augs/gui/text/word_separator.cpp"
 	"src/augs/math/rects.cpp"
 	"src/augs/math/math.cpp"
 	"src/augs/misc/timing/fixed_delta_timer.cpp"
@@ -643,9 +727,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/smooth_value_field.cpp"
 	"src/augs/misc/timing/timer.cpp"
 	"src/augs/log.cpp"
-	"src/augs/window_framework/event.cpp"
-	"src/augs/window_framework/window.cpp"
-	"src/augs/audio/sound_data.cpp"
 	"src/game/inferred_caches/relational_cache.cpp"
 	"src/game/components/motor_joint_component.cpp"
 	"src/augs/misc/enum/enum_boolset.cpp"
@@ -661,23 +742,11 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
 	"src/augs/misc/lua/lua_utils.cpp"
 	"src/test_scenes/test_scenes_content.cpp"
-	"src/augs/misc/imgui/imgui_utils.cpp"
-	"src/augs/misc/imgui/imgui_control_wrappers.cpp"
-	"src/application/gui/settings_gui.cpp"
-	"src/application/gui/start_client_gui.cpp"
-	"src/application/gui/start_server_gui.cpp"
 	"src/game/assets/recoil_player.cpp"
-	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
 	"src/game/cosmos/cosmic_profiler.cpp"
-	"src/application/main/draw_debug_lines.cpp"
-	"src/application/main/draw_debug_details.cpp"
-	"src/application/main/imgui_pass.cpp"
-	"src/application/main/release_flags.cpp"
-	"src/game/debug_drawing_settings.cpp"
 	"src/application/session_profiler.cpp"
 	"src/application/intercosm.cpp"
-	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
 	"src/game/cosmos/solvers/standard_solver.cpp"
@@ -692,85 +761,58 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/cosmos/entity_id.cpp"
 	"src/augs/misc/children_vector_tracker.cpp"
 	"src/augs/templates/container_templates.cpp"
-	"src/augs/templates/history.cpp"
 	"src/game/cosmos/state_tests.cpp"
 	"src/build_info.cpp"
 	"src/augs/misc/pool/pool.cpp"
-	"src/augs/math/snapping_grid.cpp"
 	"src/game/detail/sentience_shake.cpp"
 	"src/augs/string/get_type_name.cpp"
-	"src/augs/misc/imgui/path_tree_structs.cpp"
-	"src/augs/texture_atlas/atlas_profiler.cpp"
-	"src/augs/graphics/pbo.cpp"
-	"src/view/viewables/streaming/viewables_streaming.cpp"
-	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
 	"src/game/stateless_systems/movement_path_system.cpp"
 	"src/game/stateless_systems/animation_system.cpp"
 	"src/game/detail/organisms/startle_nearbly_organisms.cpp"
 	"src/game/stateless_systems/remnant_system.cpp"
-	"src/view/audiovisual_state/systems/randomizing_system.cpp"
 	"src/game/modes/test_mode.cpp"
 	"src/game/components/hand_fuse_component.cpp"
-	"src/game/debug_draw.cpp"
 	"src/game/detail/explosive/detonate.cpp"
 	"src/game/modes/arena_mode.cpp"
-	"src/view/mode_gui/arena/arena_mode_gui.cpp"
 	"src/view/asset_funcs.cpp"
-	"src/view/mode_gui/arena/arena_scoreboard_gui.cpp"
-	"src/view/mode_gui/arena/arena_choose_team_gui.cpp"
 	"src/game/detail/sentience/sentience_logic.cpp"
 	"src/game/cosmos/cosmos_global_solvable.cpp"
 	"src/augs/misc/enum/enum_map.cpp"
-	"src/view/mode_gui/arena/arena_buy_menu_gui.cpp"
 	"src/game/detail/flavour_scripts.cpp"
 	"src/game/modes/mode_entropy.cpp"
 	"src/application/input/adjust_game_motions.cpp"
-	"src/application/network/simulation_receiver.cpp"
 	"src/application/arena/arena_paths.cpp"
 	"src/application/arena/intercosm_paths.cpp"
 	"src/augs/misc/compress.cpp"
 	"src/fp_consistency_tests.cpp"
-	"src/view/mode_gui/arena/arena_spectator_gui.cpp"
 	"src/game/inferred_caches/organism_cache.cpp"
-	"src/view/viewables/avatar_atlas.cpp"
 	"src/augs/window_framework/create_process.cpp"
-	"src/application/gui/client/chat_gui.cpp"
-	"src/application/gui/client/client_gui_state.cpp"
-	"src/application/gui/browse_servers_gui.cpp"
-	"src/application/gui/leaderboards_gui.cpp"
 	"src/application/masterserver/masterserver.cpp"
 	"src/application/nat/nat_detection_session.cpp"
 	"src/application/nat/nat_traversal_session.cpp"
 	"src/application/setups/server/server_nat_traversal.cpp"
-	"src/application/main/miniature_generator.cpp"
-	"src/application/setups/editor/editor_setup.cpp"
-	"src/application/setups/editor/editor_setup_imgui.cpp"
-	"src/application/setups/editor/gui/editor_inspector_gui.cpp"
-	"src/application/setups/editor/gui/editor_filesystem_gui.cpp"
-	"src/application/setups/editor/gui/editor_layers_gui.cpp"
-	"src/application/setups/project_selector/project_selector_setup.cpp"
-	"src/view/hud_messages/hud_messages_gui.cpp"
-	"src/application/setups/editor/gui/editor_toolbar_gui.cpp"
 	"src/application/setups/client/arena_downloading_session.cpp"
 	"src/application/setups/client/https_file_downloader.cpp"
-	"src/application/gui/map_catalogue_gui.cpp"
-	"src/application/setups/client/https_file_uploader.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
-	"src/3rdparty/lodepng/lodepng.cpp"
 	"src/3rdparty/polypartition/src/polypartition.cpp"
+	"src/3rdparty/crc32/crc32.c"
+	"src/3rdparty/lodepng/lodepng.cpp"
+)
+
+if (HAS_HEAD)
+	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/imgui/imgui.cpp"
 	"src/3rdparty/imgui/imgui_widgets.cpp"
 	"src/3rdparty/imgui/imgui_tables.cpp"
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
-
-	"src/3rdparty/crc32/crc32.c"
-)
+	)
+endif()
 
 file_flag("src/3rdparty/imgui/imgui.cpp" "-Wno-error")
 file_flag("src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp" "-Wno-error")
@@ -811,9 +853,11 @@ if(BUILD_WINDOW_FRAMEWORK)
 		)
 	endif()
 else()
+	if(HAS_HEAD)
 	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"src/augs/window_framework/window_stubs.cpp"
 	)
+	endif()
 endif()
 
 if(BUILD_OPENGL)
@@ -1581,6 +1625,12 @@ endif()
 
 if(BUILD_STENCIL_BUFFER)
 	add_definitions(-DBUILD_STENCIL_BUFFER)
+endif()
+
+if (HEADLESS)
+	add_definitions(-DHEADLESS=1)
+else()
+	add_definitions(-DHEADLESS=0)
 endif()
 
 # We configure additional user options for building the game.

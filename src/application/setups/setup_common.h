@@ -102,6 +102,7 @@ namespace sol {
 struct config_lua_table;
 class images_in_atlas_map;
 
+#if !HEADLESS
 struct perform_custom_imgui_input {
 	sol::state& lua;
 	augs::window& window;
@@ -129,3 +130,4 @@ struct handle_input_before_game_input {
 
 	augs::window& window;
 };
+#endif

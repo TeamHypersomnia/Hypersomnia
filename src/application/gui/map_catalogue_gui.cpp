@@ -23,182 +23,12 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/project/editor_project_meta.h"
 #include "augs/readwrite/to_bytes.h"
+#include "application/gui/headless_map_catalogue.hpp"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
 editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
-
-static void rescan_versions_on_disk(std::vector<map_catalogue_entry>& into) {
-	const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
-
-	for (auto& m : into) {
-		try {
-			const auto path = downloads_directory / m.name;
-
-			m.version_on_disk = read_meta_from(path).version_timestamp;
-		}
-		catch (...) {
-			m.version_on_disk = std::nullopt;
-		}
-	}
-}
-
-void headless_map_catalogue::rescan_official_arenas() {
-	official_names.clear();
-
-	auto register_arena = [&](const auto& path) {
-		official_names.emplace(path.filename().string());
-		return callback_result::CONTINUE;
-	};
-
-	const auto source_directory = augs::path_type(OFFICIAL_ARENAS_DIR);
-
-	augs::for_each_directory_in_directory(source_directory, register_arena);
-}
-
-struct multi_arena_synchronizer_internal {
-	https_file_downloader external;
-	std::optional<arena_downloading_session> current_session;
-
-	multi_arena_synchronizer_internal(const parsed_url& url) : external(url) {}
-
-	auto make_requester(std::string arena_name) {
-		return [&downloader = this->external, arena_name](const augs::secure_hash_type&, const augs::path_type& path) {
-			const auto location = typesafe_sprintf("%x/%x", arena_name, path.string());
-			downloader.download_file(location);
-		};
-	}
-};
-
-multi_arena_synchronizer::multi_arena_synchronizer(
-	const arena_synchronizer_input& arena_names,
-	const parsed_url& parent_folder_url
-) : 
-	input(arena_names), 
-	data(std::make_unique<multi_arena_synchronizer_internal>(parent_folder_url))
-{
-	init_next_session();
-}
-
-multi_arena_synchronizer::~multi_arena_synchronizer() = default;
-
-template <class F>
-void multi_arena_synchronizer::for_each_with_progress(F callback) const {
-	/* 
-		For now there's no parallel downloads,
-		so all maps before the current have 100%, 0% after, and non-0 for the current.
-	*/
-
-	for (std::size_t i = 0; i < input.size(); ++i) {
-		float progress = 0.0f;
-
-		if (i < current_map) {
-			progress = 1.0f;
-		}
-		else if (i == current_map) {
-			progress = session().get_total_percent_complete(get_current_file_percent_complete());
-		}
-
-		callback(input[i].name, progress);
-	}
-}
-
-float multi_arena_synchronizer::get_current_file_percent_complete() const {
-	if (data->external.get_total_bytes() == 0) {
-		return 0.0f;
-	}
-
-	return float(data->external.get_downloaded_bytes()) / data->external.get_total_bytes();
-}
-
-void multi_arena_synchronizer::init_next_session() {
-	if (current_map < input.size()) {
-		const auto& current_input = input[current_map];
-
-		data->current_session = arena_downloading_session(
-			current_input.name,
-			current_input.version,
-			data->make_requester(current_input.name)
-		);
-	}
-}
-
-arena_downloading_session& multi_arena_synchronizer::session() {
-	return *data->current_session;
-}
-
-const arena_downloading_session& multi_arena_synchronizer::session() const {
-	return *data->current_session;
-}
-
-void multi_arena_synchronizer::advance() {
-	if (finished()) {
-		return;
-	}
-
-	if (const auto new_file = data->external.get_downloaded_file()) {
-		session().advance_with(augs::make_ptr_read_stream(new_file->second));
-	}
-
-	if (session().finished()) {
-		if (session().has_error()) {
-			LOG("Failed to download %x: %x", session().get_arena_name(), session().get_error());
-
-			last_error = session().get_error();
-		}
-
-		++current_map;
-
-		init_next_session();
-	}
-}
-
-bool multi_arena_synchronizer::finished() const {
-	return current_map >= input.size();
-}
-
-std::optional<std::string> multi_arena_synchronizer::get_error() const {
-	return last_error;
-}
-
-std::optional<std::string> multi_arena_synchronizer::get_current_map_name() const {
-	if (current_map < input.size()) {
-		return input[current_map].name;
-	}
-
-	return std::nullopt;
-}
-
-float multi_arena_synchronizer::get_current_map_progress() const {
-	if (data->current_session.has_value()) {
-		return session().get_total_percent_complete(get_current_file_percent_complete());
-	}
-
-	return 1.0f;
-}
-
-float multi_arena_synchronizer::get_total_progress() const {
-	std::size_t all = 0;
-	float total = 0.0f;
-
-	for_each_with_progress([&](const auto&, const float progress) {
-		++all;
-		total += progress;
-	});
-
-	if (all == 0) {
-		return 1.0f;
-	}
-
-	return total / all;
-}
-
-headless_map_catalogue::headless_map_catalogue() {
-	rescan_official_arenas();
-}
-
-headless_map_catalogue::~headless_map_catalogue() = default;
 
 map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) : base(title) {}
 map_catalogue_gui_state::~map_catalogue_gui_state() = default;
@@ -333,26 +163,9 @@ std::optional<std::vector<ad_hoc_atlas_subject>> map_catalogue_gui_state::get_ne
 	return std::nullopt;
 }
 
-void headless_map_catalogue::rescan_versions_on_disk() {
-	::rescan_versions_on_disk(map_list);
-}
-
 std::string sanitize_arena_short_description(std::string in);
 
 using S = map_catalogue_entry::state;
-
-S map_catalogue_entry::get_state() const {
-	if (version_on_disk.has_value()) {
-		if (version_on_disk == version_timestamp) {
-			return S::ON_DISK;
-		}
-		else {
-			return S::UPDATE_AVAILABLE;
-		}
-	}
-
-	return S::NOT_FOUND;
-}
 
 void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	using namespace augs::imgui;
@@ -707,68 +520,12 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	ImGui::Columns(1);
 }
 
-
-void headless_map_catalogue::request_rescan() {
-	should_rescan = true;
-}
-
 void map_catalogue_gui_state::request_rescan() {
 	headless.request_rescan();
 }
 
-void headless_map_catalogue::request_refresh() {
-	refreshed_once = false;
-}
-
 void map_catalogue_gui_state::request_refresh() {
 	headless.request_refresh();
-}
-
-arena_synchronizer_input headless_map_catalogue::launch_download_all(const address_string_type& address) {
-	arena_synchronizer_input downloadable_arenas;
-
-	for (const auto& s : map_list) {
-		if (s.get_state() != S::ON_DISK) {
-			downloadable_arenas.push_back({ s.name, s.version_timestamp, s.last_displayed_index });
-		}
-	}
-
-	sort_range(downloadable_arenas);
-
-	launch_download(downloadable_arenas, parsed_url(address));
-
-	return downloadable_arenas;
-}
-
-headless_catalogue_result headless_map_catalogue::advance(const headless_map_catalogue_input in) {
-	auto result = headless_catalogue_result::IN_PROGRESS;
-
-	if (!refreshed_once) {
-		refreshed_once = true;
-		refresh(in.external_arena_files_provider);
-	}
-
-	if (should_rescan) {
-		should_rescan = false;
-
-		if (!downloading.has_value() && !list_refresh_in_progress()) {
-			LOG("Rescanning map catalogue on disk due to window activate.");
-			rescan_versions_on_disk();
-		}
-	}
-
-	if (downloading.has_value()) {
-		downloading->advance();
-	}
-
-	if (valid_and_is_ready(future_response)) {
-		map_list = future_response.get();
-
-		should_rescan = false;
-		result = headless_catalogue_result::LIST_REFRESH_COMPLETE;
-	}
-
-	return result;
 }
 
 bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
@@ -1115,33 +872,6 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	return address_modified;
 }
 
-bool headless_map_catalogue::finalize_download() {
-	if (downloading.has_value() && downloading->finished()) {
-		if (const auto error = downloading->get_error()) {
-			auto popup = simple_popup();
-
-			popup.title = "Failed to download maps";
-			popup.message = *error;
-
-			LOG_NOFORMAT(popup.make_log());
-
-			download_failed_popup = popup;
-		}
-
-		downloading = std::nullopt;
-		rescan_versions_on_disk();
-		should_rescan = false;
-
-		return true;
-	}
-
-	return false;
-}
-
-bool headless_map_catalogue::list_refresh_in_progress() const {
-	return future_response.valid();
-}
-
 bool map_catalogue_gui_state::refresh_in_progress() const {
 	return headless.list_refresh_in_progress() || future_downloaded_miniatures.valid();
 }
@@ -1157,84 +887,3 @@ void map_catalogue_gui_state::refresh(const address_string_type address) {
 	headless.refresh(address);
 }
 
-void headless_map_catalogue::refresh(const address_string_type address) {
-	using namespace httplib;
-	using namespace httplib_utils;
-
-	if (downloading.has_value() || list_refresh_in_progress()) {
-		return;
-	}
-
-	map_list.clear();
-	list_catalogue_error = {};
-
-	future_response = launch_async(
-		[&last_error = this->list_catalogue_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
-			if (const auto parsed = parsed_url(address); parsed.valid()) {
-				const auto ca_path = CA_CERT_PATH;
-				auto client = http_client_type(parsed.host);
-
-#if BUILD_OPENSSL
-				client.set_ca_cert_path(ca_path.c_str());
-				client.enable_server_certificate_verification(true);
-#endif
-				client.set_follow_location(true);
-				client.set_read_timeout(3);
-				client.set_write_timeout(3);
-				client.set_keep_alive(true);
-
-				const auto location = parsed.location + "?format=json";
-
-				auto response = client.Get(location.c_str());
-
-				if (response == nullptr) {
-					last_error = "Response was null.";
-					return {};
-				}
-
-				if (!successful(response->status)) {
-					last_error = typesafe_sprintf("Request failed with status: %x", response->status);
-					return {};
-				}
-
-				try {
-					auto result = augs::from_json_string<std::vector<map_catalogue_entry>>(response->body);
-
-					erase_if(result, [&](const auto& e) { 
-						const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
-						const auto arena_name = e.name;
-						const auto arena_folder_path = downloads_directory / arena_name;
-
-						const auto sanitized = sanitization::sanitize_arena_path(downloads_directory, arena_name);
-						const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
-
-						if (!sanitized_path || *sanitized_path != arena_folder_path) {
-							return true;
-						}
-
-						return found_in(officials, e.name); 
-					});
-
-					for (auto& r : result) {
-						r.short_description = sanitize_arena_short_description(r.short_description);
-					}
-
-					::rescan_versions_on_disk(result);
-
-					return result;
-				}
-				catch (const std::runtime_error& err) {
-					last_error = err.what();
-				}
-				catch (...) {
-					last_error = "Unknown error during deserialization.";
-				}
-
-				return {};
-			}
-
-			last_error = typesafe_sprintf("Couldn't parse URL: %x", address);
-			return {};
-		}
-	);
-}

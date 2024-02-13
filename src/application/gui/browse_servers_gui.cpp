@@ -378,34 +378,7 @@ server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(cons
 	return nullptr;
 }
 
-bool is_internal(const netcode_address_t& address) {
-	if (address.type == NETCODE_ADDRESS_IPV4) {
-		auto ip = address.data.ipv4;
-
-		if (ip[0] == 127) {
-			return true;
-		}
-
-		if (ip[0] == 10) {
-			return true;
-		}
-
-		if (ip[0] == 172) {
-			if (ip[1] >= 16 && ip[1] <= 31) {
-				return true;
-			}
-		}
-
-		if (ip[0] == 192) {
-			if (ip[1] == 168) {
-				return true;
-			}
-		}
-	}
-
-	// TODO
-	return false;
-}
+bool is_internal(const netcode_address_t& address);
 
 bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
 	const auto current_time = yojimbo_time();

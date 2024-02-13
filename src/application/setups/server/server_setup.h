@@ -22,11 +22,13 @@
 #include "augs/misc/serialization_buffers.h"
 
 #include "application/network/server_step_entropy.h"
+#if !HEADLESS
+#include "application/gui/client/client_gui_state.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
+#endif
 #include "application/network/network_common.h"
 
 #include "application/setups/server/chat_structs.h"
-#include "application/gui/client/client_gui_state.h"
 #include "application/setups/server/server_profiler.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "application/nat/nat_type.h"
@@ -73,10 +75,14 @@ using arena_files_database_type = std::unordered_map<augs::secure_hash_type, are
 struct client_requested_chat;
 
 class server_setup : 
-	public default_setup_settings,
-	public arena_gui_mixin<server_setup> /* For the admin player */
+	public default_setup_settings
+#if !HEADLESS
+	, public arena_gui_mixin<server_setup> /* For the admin player */
+#endif
 {
+#if !HEADLESS
 	using arena_gui_base = arena_gui_mixin<server_setup>;
+#endif
 
 	/* This is loaded from the arena folder */
 	intercosm scene;
@@ -185,7 +191,9 @@ class server_setup :
 	bool rebuild_player_meta_viewables = false;
 	arena_player_metas integrated_player_metas;
 
+#if !HEADLESS
 	client_gui_state integrated_client_gui;
+#endif
 	std::string failure_reason;
 
 	server_nat_traversal nat_traversal;
@@ -386,6 +394,12 @@ public:
 
 	entity_id get_controlled_character_id() const;
 
+#if HEADLESS
+	auto get_viewed_character_id() const {
+		return entity_id();
+	}
+#endif
+
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}
@@ -551,11 +565,13 @@ public:
 							request_immediate_heartbeat();
 						}
 
+#if !HEADLESS
 						const auto current_time = get_current_time();
 
 						erase_if(notifications, [this, current_time](const auto& msg) {
 							return integrated_client_gui.chat.add_entry_from_mode_notification(current_time, msg, get_local_player_id());
 						});
+#endif
 
 						default_server_post_solve(step);
 						old_callback(step);
@@ -624,8 +640,15 @@ public:
 
 	bool is_gameplay_on() const;
 
+#if !HEADLESS
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 	setup_escape_result escape();
+	void draw_custom_gui(const draw_setup_gui_input& in) const;
+	bool requires_cursor() const;
+	bool handle_input_before_game(
+		const handle_input_before_game_input in
+	);
+#endif
 
 	bool is_running() const;
 	bool should_have_admin_character() const;
@@ -681,12 +704,6 @@ public:
 	template <class F>
 	void for_each_id_and_client(F&& callback, for_each_flags = {}) const;
 
-	bool handle_input_before_game(
-		const handle_input_before_game_input in
-	);
-
-	void draw_custom_gui(const draw_setup_gui_input& in) const;
-
 	bool is_integrated() const;
 	bool is_dedicated() const;
 
@@ -698,7 +715,6 @@ public:
 		const client_id_type& id
 	) const;
 
-	bool requires_cursor() const;
 	bool player_added_to_mode(mode_player_id) const;
 
 	const netcode_socket_t* find_underlying_socket() const;

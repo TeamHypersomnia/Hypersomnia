@@ -44,7 +44,6 @@
 #include "application/setups/editor/packaged_official_content.h"
 
 #include "application/setups/editor/official/create_official_resources.h"
-#include "application/setups/editor/official/create_official_prefabs.h"
 #include "augs/gui/text/printer.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
@@ -69,70 +68,13 @@
 #include "application/arena/arena_handle.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 
-#include "application/arena/build_arena_from_editor_project.hpp"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
+#include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
 
 render_layer_filter get_layer_filter_for_miniature();
-
-template <class R, class F>
-void packaged_official_content::for_each_resource(F callback) {
-	resources.template get_pool_for<R>().for_each_id_and_object(
-		[&](const auto& raw_id, const auto& object) {
-			const bool official = true;
-			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, official);
-
-			callback(typed_id, object);
-		}
-	);
-}
-
-packaged_official_content::packaged_official_content(sol::state& lua) {
-	built_content.populate_official_content(
-		lua,
-		60
-	);
-
-	::create_official_resources(built_content, resources);
-
-	auto map_with_tag = [&](const auto id, auto& obj) {
-		ensure(obj.official_tag.has_value());
-
-		if (obj.official_tag) {
-			resource_map[*obj.official_tag] = id;
-		}
-	};
-
-	auto map_with_type = [&](const auto id, auto& obj) {
-		resource_map[obj.editable.type] = id;
-	};
-
-	resources.pools.for_each_container(
-		[&]<typename P>(const P&) {
-			using R = typename P::mapped_type;
-
-			if constexpr(!is_one_of_v<R, editor_prefab_resource, editor_game_mode_resource>) {
-				if constexpr(is_one_of_v<R, editor_area_marker_resource, editor_point_marker_resource>) {
-					for_each_resource<R>(map_with_type);
-				}
-				else {
-					for_each_resource<R>(map_with_tag);
-				}
-			}
-		}
-	);
-
-	create_official_prefabs();
-	for_each_resource<editor_prefab_resource>(map_with_type);
-
-	auto find_lambda = [&](auto id) {
-		return resources.find_typed(id);
-	};
-
-	::setup_resource_defaults_after_creating_officials(find_lambda, resource_map);
-}
 
 editor_setup::editor_setup(
 	const editor_settings& settings,
@@ -1789,25 +1731,6 @@ bool editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, cons
 	}
 
 	return file_hash != old_hash;
-}
-
-std::string editor_pathed_resource::get_display_name() const {
-	return path_in_project.stem().string();
-}
-
-editor_pathed_resource::editor_pathed_resource(
-	const augs::path_type& path_in_project, 
-	const std::string& file_hash,
-	const augs::file_time_type& stamp
-) : 
-	path_in_project(path_in_project),
-	file_hash(file_hash)
-{
-	set_hash_stamp(stamp);
-}
-
-void editor_pathed_resource::set_hash_stamp(const augs::file_time_type& stamp) {
-	stamp_when_hashed = stamp;
 }
 
 editor_layer* editor_setup::find_layer(const editor_layer_id& id) {
@@ -3471,14 +3394,6 @@ const editor_official_resource_map& editor_setup::get_official_resource_map() co
 	return official.resource_map;
 }
 
-const editor_resource_pools& official_get_resources(const packaged_official_content& official) {
-	return official.resources;
-}
-
-const editor_official_resource_map& official_get_resource_map(const packaged_official_content& official) {
-	return official.resource_map;
-}
-
 arena_playtesting_context editor_setup::make_playtesting_context() const {
 	return { 
 		get_camera_eye().transform.pos,
@@ -3819,6 +3734,3 @@ template struct create_node_command<editor_melee_node>;
 template struct create_node_command<editor_explosive_node>;
 
 template struct create_node_command<editor_prefab_node>;
-
-#include "application/network/network_common.h"
-template void build_arena_from_editor_project<online_arena_handle<false>>(online_arena_handle<false> arena_handle, build_arena_input);

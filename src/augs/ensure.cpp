@@ -5,7 +5,9 @@
 #include "augs/ensure.h"
 #include "augs/ensure_rel.h"
 #include "augs/filesystem/file.h"
+#if !HEADLESS
 #include "augs/window_framework/window.h"
+#endif
 #include "augs/window_framework/shell.h"
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/log_path_getters.h"
@@ -18,10 +20,12 @@ void save_log_and_terminate() {
 		ensure_handler();
 	}
 
+#if !HEADLESS
 	if (augs::window::current_exists()) {
 		augs::window::get_current().set_cursor_clipping(false);
 		augs::window::get_current().set_cursor_visible(true);
 	}
+#endif
 	
 	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");
 

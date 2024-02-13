@@ -848,18 +848,6 @@ rgba editor_portal_info::get_icon_color() const {
 	return get_editor_color_preset(color_preset).portal.inner_ring;
 }
 
-void editor_portal_info::apply(const editor_color_preset preset) {
-	auto cols = get_editor_color_preset(preset).portal;
-
-	rings_effect.value.inner_color = cols.inner_ring;
-	rings_effect.value.outer_color = cols.outer_ring;
-	light_color = cols.light;
-	ambience_particles.color = cols.ambience_particles;
-	begin_entering_particles.color = cols.begin_entering_particles;
-	enter_particles.color = cols.enter_particles;
-	exit_particles.color = cols.exit_particles;
-}
-
 EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	bool last_result = false;

@@ -340,3 +340,16 @@ void create_official_filesystem_from(
 
 	official_files_root.adding_children_finished();
 }
+
+void editor_portal_info::apply(const editor_color_preset preset) {
+	auto cols = get_editor_color_preset(preset).portal;
+
+	rings_effect.value.inner_color = cols.inner_ring;
+	rings_effect.value.outer_color = cols.outer_ring;
+	light_color = cols.light;
+	ambience_particles.color = cols.ambience_particles;
+	begin_entering_particles.color = cols.begin_entering_particles;
+	enter_particles.color = cols.enter_particles;
+	exit_particles.color = cols.exit_particles;
+}
+

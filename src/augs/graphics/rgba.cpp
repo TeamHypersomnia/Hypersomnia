@@ -2,7 +2,10 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+#if HEADLESS
+#else
 #include "3rdparty/imgui/imgui.h"
+#endif
 #include "augs/graphics/rgba.h"
 
 template <class T>
@@ -122,6 +125,8 @@ rgba::rgba(const uint32_t v) :
 	)
 {}
 
+#if HEADLESS
+#else
 rgba::rgba(const ImVec4& v) :
 	rgba(
 		to_0_255(v.x),
@@ -139,6 +144,7 @@ rgba::operator ImVec4() const {
 		to_0_1(a)
 	};
 }
+#endif
 
 #include "augs/log.h"
 

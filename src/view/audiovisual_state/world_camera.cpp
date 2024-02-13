@@ -10,7 +10,7 @@
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
 
-float max_zoom_out_at_edges_v = 0.7f;
+extern float max_zoom_out_at_edges_v;
 
 camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const
 {

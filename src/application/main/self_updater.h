@@ -31,6 +31,10 @@ struct self_update_result {
 	bool exit_with_failure_if_not_upgraded = false;
 };
 
+namespace augs {
+	class image;
+}
+
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	bool only_check_availability_and_quit,

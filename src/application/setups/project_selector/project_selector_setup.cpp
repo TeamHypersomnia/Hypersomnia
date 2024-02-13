@@ -37,21 +37,7 @@
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
-std::string sanitize_arena_short_description(std::string in) {
-	int newlines = 0;
-
-	for (auto& c : in) {
-		if (c == '\n') {
-			++newlines;
-
-			if (newlines > 1) {
-				c = ' ';
-			}
-		}
-	}
-
-	return in;
-}
+std::string sanitize_arena_short_description(std::string in);
 
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
@@ -109,18 +95,6 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 	}
 
 	return std::nullopt;
-}
-
-static editor_project_about read_about_from(const augs::path_type& arena_folder_path) {
-	const auto paths = editor_project_paths(arena_folder_path);
-
-	return editor_project_readwrite::read_only_project_about(paths.project_json);
-}
-
-editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
-	const auto paths = editor_project_paths(arena_folder_path);
-
-	return editor_project_readwrite::read_only_project_meta(paths.project_json);
 }
 
 std::optional<project_tab_type> project_selector_setup::is_project_name_taken(const arena_identifier& arena_name) const {
