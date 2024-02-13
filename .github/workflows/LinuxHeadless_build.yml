@@ -49,7 +49,7 @@ jobs:
     - name: Build AppImage
       run: cmake/appimage_builder.sh --headless
 
-    - name: Generate downloadable archives
+    - name: Create release_notes.txt
       run: cmake/generate_archives.sh Linux
 
     - uses: actions/upload-artifact@v3
@@ -57,3 +57,4 @@ jobs:
         name: LinuxHeadless-binaries
         path: |
           Hypersomnia-Headless.AppImage
+          hypersomnia/release_notes.txt
