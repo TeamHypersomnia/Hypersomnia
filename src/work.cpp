@@ -364,6 +364,10 @@ work_result work(
 		result.server.allow_nat_traversal = false;
 #endif
 
+		if (params.type == app_type::DEDICATED_SERVER) {
+			result.server.allow_nat_traversal = false;
+		}
+
 		return result_ptr;
 	}();
 

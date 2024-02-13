@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- the counter is fucked up of course
 - show enemy silhouettes in spectator
 
 - we'll have to update to the latest version of yojimbo at some point

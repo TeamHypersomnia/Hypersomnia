@@ -6873,3 +6873,4 @@ This will discard your redo history."
 - don't check win conditions when someone abandons
 
 - update early access
+- the counter is fucked up of course
