@@ -10,7 +10,7 @@ sudo apt update
 sudo apt install -y build-essential checkinstall zlib1g-dev
 
 # Define OpenSSL version
-OPENSSL_VERSION="openssl-3.0.8"
+OPENSSL_VERSION="openssl-3.2.1"
 
 # Download OpenSSL from the official source
 sudo wget "https://github.com/openssl/openssl/releases/download/${OPENSSL_VERSION}/${OPENSSL_VERSION}.tar.gz"
@@ -23,7 +23,7 @@ cd "${OPENSSL_VERSION}/"
 
 echo "OpenSSL3: Calling ./config"
 # Configure OpenSSL
-sudo ./config no-shared
+sudo ./config no-shared no-tests
 
 echo "OpenSSL3: Calling make"
 # Build OpenSSL
@@ -31,7 +31,7 @@ sudo make
 
 echo "OpenSSL3: Calling make install"
 # Install OpenSSL
-sudo make install
+sudo make install_sw
 
 # Update links and cache for shared libraries
 sudo ldconfig
