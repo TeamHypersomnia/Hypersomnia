@@ -21,15 +21,19 @@ sudo tar xvf "${OPENSSL_VERSION}.tar.gz"
 # Navigate to the extracted OpenSSL directory
 cd "${OPENSSL_VERSION}/"
 
+echo "OpenSSL3: Calling ./config"
 # Configure OpenSSL
-./config
+sudo ./config
 
+echo "OpenSSL3: Calling make"
 # Build OpenSSL
-make
+sudo make
 
+echo "OpenSSL3: Calling make test"
 # Run tests (optional, can be skipped with 'make -k test' if some tests fail)
-make test
+sudo make test
 
+echo "OpenSSL3: Calling make install"
 # Install OpenSSL
 sudo make install
 
