@@ -35,7 +35,7 @@ jobs:
       run: sudo apt-get install --fix-missing cmake ninja-build
 
     - name: Install LLVM
-      run: . cmake/linux_actions/install_llvm.sh
+      run: . cmake/linux_actions/install_llvm_headless.sh
 
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
