@@ -7,7 +7,7 @@
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_LINKER=lld-link -DARCHITECTURE=\"x64\" -DGENERATE_DEBUG_INFORMATION=1 -DBUILD_DEBUGGER_SETUP=0 -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\\OpenSSL-Win64",
+      "cmakeCommandArgs": "cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_LINKER=lld-link -DARCHITECTURE=\"x64\" -DGENERATE_DEBUG_INFORMATION=0 -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\\OpenSSL-Win64",
       "ctestCommandArgs": ""
     }
   ]

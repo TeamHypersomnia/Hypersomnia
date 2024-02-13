@@ -154,6 +154,11 @@ option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This al
 ## This is only a convenience developer option.
 option(DEVELOP_STEAM_INTEGRATION "Enable this ONLY if you're developing integration with Steamworks. This will call add_subdirectory for libsteam_integration.so with -DBUILD_STEAM=1. This will also create steam_appid.txt next to the executable, preventing it from restarting through Steam." OFF)
 
+if (HEADLESS)
+	set(LINK_STEAM_INTEGRATION OFF)
+	set(DEVELOP_STEAM_INTEGRATION OFF)
+endif()
+
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
 option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_NET_OPT})
@@ -184,7 +189,7 @@ option(LINK_TIME_OPTIMIZATION "Perform link-time optimization. Can drastically i
 
 ## Debug information.
 
-option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
+option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." OFF)
 option(BUILD_DEBUGGER_SETUP "Build debugger setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." OFF)
 
 ## Thread sanitizer.
