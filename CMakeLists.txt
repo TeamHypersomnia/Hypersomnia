@@ -1927,7 +1927,7 @@ if (BUILD_OPENSSL)
 	# Static linking of SSL makes compilation on Linux a pain.
 	# Let's do it for Windows and Apple only
 
-	if (NOT LINUX)
+	if (HEADLESS OR NOT LINUX)
 		set(OPENSSL_USE_STATIC_LIBS TRUE)
 	endif()
 

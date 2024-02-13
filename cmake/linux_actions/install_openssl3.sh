@@ -23,15 +23,11 @@ cd "${OPENSSL_VERSION}/"
 
 echo "OpenSSL3: Calling ./config"
 # Configure OpenSSL
-sudo ./config
+sudo ./config no-shared
 
 echo "OpenSSL3: Calling make"
 # Build OpenSSL
 sudo make
-
-echo "OpenSSL3: Calling make test"
-# Run tests (optional, can be skipped with 'make -k test' if some tests fail)
-sudo make test
 
 echo "OpenSSL3: Calling make install"
 # Install OpenSSL
