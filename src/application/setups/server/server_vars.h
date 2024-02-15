@@ -170,6 +170,13 @@ struct server_vars {
 	}
 };
 
+struct url_and_key_pair {
+	// GEN INTROSPECTOR struct url_and_key_pair
+	std::string url;
+	std::string api_key;
+	// END GEN INTROSPECTOR
+};
+
 struct server_private_vars {
 	// GEN INTROSPECTOR struct server_private_vars
 	std::string master_rcon_password = "";
@@ -183,6 +190,9 @@ struct server_private_vars {
 
 	std::string report_ranked_match_api_key = "";
 	std::string report_ranked_match_url = "https://hypersomnia.xyz/report_match";
+
+	std::vector<url_and_key_pair> report_ranked_match_aux_endpoints;
+
 	std::string check_ban_url = "https://hypersomnia.xyz/check_ban";
 	// END GEN INTROSPECTOR
 };

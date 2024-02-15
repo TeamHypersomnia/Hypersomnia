@@ -758,6 +758,10 @@ treat_as_music_sounds_longer_than_secs = 5,
     report_ranked_match_api_key = "",
     report_ranked_match_url = "https://hypersomnia.xyz/report_match",
 
+    report_ranked_match_aux_endpoints = {
+    -- { url = "example.com", api_key = "example" }
+    },
+
     check_ban_url = ""
     --check_ban_url = "https://hypersomnia.xyz/check_ban"
   },
