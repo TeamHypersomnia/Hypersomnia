@@ -10,7 +10,7 @@
 #include "application/setups/debugger/property_debugger/browsed_path_entry_base.h"
 #include "application/setups/debugger/property_debugger/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
-#include "augs/misc/time_utils.h"
+#include "augs/misc/date_time.h"
 #include "augs/log.h"
 #include "augs/misc/readable_bytesize.h"
 #include "augs/readwrite/stream_read_error.h"

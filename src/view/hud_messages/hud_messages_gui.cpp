@@ -2,7 +2,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/logic_step.h"
 #include "game/messages/hud_message.h"
-#include "augs/misc/time_utils.h"
+#include "augs/misc/date_time.h"
 #include "augs/graphics/renderer.h"
 #include "augs/gui/text/printer.h"
 #include "view/hud_messages/hud_message_settings.h"

@@ -675,7 +675,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/readable_bytesize.cpp"
 	"src/augs/misc/action_list/standard_actions.cpp"
 	"src/augs/readwrite/memory_stream.cpp"
-	"src/augs/misc/time_utils.cpp"
+	"src/augs/misc/date_time.cpp"
 	"src/augs/string/typesafe_sprintf.cpp"
 	"src/augs/string/typesafe_sscanf.cpp"
 	"src/game/assets/animation.cpp"

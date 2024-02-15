@@ -14,7 +14,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/nat/stun_request.h"
 #include "application/nat/stun_server_provider.h"
-#include "augs/misc/time_utils.h"
+#include "augs/misc/date_time.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;

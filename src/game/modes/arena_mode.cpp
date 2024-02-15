@@ -38,7 +38,7 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
-#include "augs/misc/time_utils.h"
+#include "augs/misc/date_time.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
