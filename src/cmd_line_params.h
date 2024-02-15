@@ -36,6 +36,7 @@ struct cmd_line_params {
 	std::optional<int> autoupdate_delay;
 
 	augs::path_type apply_config;
+	augs::path_type assign_teams;
 
 	int test_fp_consistency = -1;
 	std::string connect_address;
@@ -162,6 +163,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--apply-config") {
 				apply_config = get_next();
+			}
+			else if (a == "--assign-teams") {
+				assign_teams = get_next();
 			}
 			else if (a == "--edit") {
 				editor_target = get_next();

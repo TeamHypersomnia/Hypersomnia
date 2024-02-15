@@ -759,4 +759,6 @@ public:
 	bool can_use_map_command_now() const;
 
 	bool is_idle() const;
+
+	bool team_choice_allowed(const const_input in) const;
 };

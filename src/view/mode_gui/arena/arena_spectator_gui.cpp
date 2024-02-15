@@ -298,12 +298,12 @@ void arena_spectator_gui::advance(
 		}
 
 		if (const auto data = mode.find(local_player)) {
-			const auto faction = demo_replay_mode ? faction_type::SPECTATOR : data->get_faction();
+			const auto viewer_faction = demo_replay_mode ? faction_type::SPECTATOR : data->get_faction();
 
 			now_spectating = mode.get_next_to_spectate(
 				in, 
 				reference_order, 
-				faction, 
+				viewer_faction, 
 				off, 
 				secs_until_switching_dead_teammate
 			);

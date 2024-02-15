@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- check out the new stun server
+
 - show enemy silhouettes in spectator
 
 - we'll have to update to the latest version of yojimbo at some point

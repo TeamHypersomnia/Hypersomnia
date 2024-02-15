@@ -3,7 +3,8 @@
 #include "application/masterserver/netcode_address_hash.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
-#include "application/setups/server/server_start_input.h"
+#include "application/setups/server/server_listen_input.h"
+#include "application/setups/server/server_assigned_teams.h"
 #include "application/intercosm.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -121,6 +122,8 @@ class server_setup :
 	arena_files_database_type arena_files_database;
 
 	augs::server_listen_input last_start;
+	server_assigned_teams assigned_teams;
+
 	std::optional<augs::dedicated_server_input> dedicated;
 
 	std::unordered_set<augs::secure_hash_type> cached_currently_downloaded_files;
@@ -368,7 +371,8 @@ public:
 		std::optional<augs::dedicated_server_input>,
 
 		const server_nat_traversal_input& nat_traversal_input,
-		bool suppress_community_server_webhook_this_run
+		bool suppress_community_server_webhook_this_run,
+		const server_assigned_teams& assigned_teams
 	);
 
 	~server_setup();
@@ -797,4 +801,7 @@ public:
 
 	void choose_next_map_from_cycle();
 	bool is_idle() const;
+
+	bool has_assigned_teams() const;
+	faction_type get_assigned_team(const std::string&) const;
 };

@@ -227,6 +227,10 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 			choose_team.show = false;
 		}
 
+		if (mode_input.dynamic_vars.preassigned_factions) {
+			choose_team.show = false;
+		}
+
 		if (prediction.play_unpredictable) {
 			const auto p = typed_mode.calc_participating_factions(mode_input);
 

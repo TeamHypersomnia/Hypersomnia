@@ -5,7 +5,7 @@
 
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 
-#include "application/setups/server/server_start_input.h"
+#include "application/setups/server/server_listen_input.h"
 #include "application/setups/client/client_connect_string.h"
 
 #include "augs/misc/timing/timer.h"

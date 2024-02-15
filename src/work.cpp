@@ -30,6 +30,7 @@
 #include <sol/sol.hpp>
 #include <functional>
 
+#include "augs/templates/enum_introspect.h"
 #include "augs/templates/thread_templates.h"
 
 #include "fp_consistency_tests.h"
@@ -372,6 +373,23 @@ work_result work(
 	}();
 
 	auto& canon_config = *canon_config_ptr;
+
+	if (!params.assign_teams.empty()) {
+		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
+	}
+
+	const auto assigned_teams = 
+		params.assign_teams.empty() ? 
+		server_assigned_teams() :
+		server_assigned_teams(CALLING_CWD / params.assign_teams)
+	;
+
+	if (params.type == app_type::DEDICATED_SERVER && params.assign_teams.empty()) {
+		LOG("No players were assigned to teams for this dedicated server session.");
+	}
+	else {
+		LOG("Assigned teams: %x", assigned_teams.id_to_faction);
+	}
 
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
@@ -931,7 +949,8 @@ work_result work(
 			config.dedicated_server,
 
 			make_server_nat_traversal_input(),
-			params.suppress_server_webhook
+			params.suppress_server_webhook,
+			assigned_teams
 		);
 
 		auto& server = *server_ptr;
@@ -1724,7 +1743,8 @@ work_result work(
 						std::nullopt,
 
 						make_server_nat_traversal_input(),
-						params.suppress_server_webhook
+						params.suppress_server_webhook,
+						assigned_teams
 					);
 				});
 #endif
@@ -2387,7 +2407,8 @@ work_result work(
 								std::nullopt,
 
 								make_server_nat_traversal_input(),
-								params.suppress_server_webhook
+								params.suppress_server_webhook,
+								assigned_teams
 							);
 						});
 					}

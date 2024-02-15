@@ -5,6 +5,7 @@
 #include "augs/image/image.h"
 
 enum class self_update_result_type {
+	// GEN INTROSPECTOR enum class self_update_result_type
 	NONE,
 
 	EXIT_APPLICATION,
@@ -22,6 +23,7 @@ enum class self_update_result_type {
 	FIRST_LAUNCH_AFTER_UPGRADE,
 
 	UPDATE_AVAILABLE
+	// END GEN INTROSPECTOR
 };
 
 struct self_update_result {

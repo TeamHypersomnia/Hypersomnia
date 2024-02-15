@@ -2479,7 +2479,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					});
 				}
 				else if constexpr(std::is_same_v<C, team_choice>) {
-					if (is_ranked_live()) {
+					if (!team_choice_allowed(in)) {
 						return;
 					}
 
@@ -2719,9 +2719,17 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 }
 
 bool arena_mode::teams_viable_for_match(const_input_type in) const {
+	if (!get_team_composition_info(in).each_team_has_at_least_one) {
+		return false;
+	}
+
 	// TODO_RANKED: handle different ranked requirements here
 
-	return get_team_composition_info(in).each_team_has_at_least_one;
+	if (in.dynamic_vars.preassigned_factions) {
+		return in.dynamic_vars.all_assigned_present;
+	}
+
+	return true;
 }
 
 void arena_mode::handle_game_commencing(const input_type in, const logic_step step) {
@@ -3151,7 +3159,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	spawn_and_kick_bots(in, step);
 
 	if (const bool teams_changed = add_or_remove_players(in, entropy, step)) {
-		if (const bool during_countdown = in.is_ranked_server() && !is_ranked_live()) {
+		if (const bool during_starting = in.is_ranked_server() && ranked_state == ranked_state_type::STARTING) {
 			restart_match(in, step);
 		}
 	}
@@ -4136,4 +4144,16 @@ bool arena_mode::can_use_map_command_now() const {
 
 bool arena_mode::is_idle() const {
 	return can_use_map_command_now() && players.empty() && suspended_players.empty() && abandoned_players.empty();
+}
+
+bool arena_mode::team_choice_allowed(const const_input_type in) const {
+	if (is_ranked_live()) {
+		return false;
+	}
+
+	if (in.dynamic_vars.preassigned_factions) {
+		return false;
+	}
+
+	return true;
 }

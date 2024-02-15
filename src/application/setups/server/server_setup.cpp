@@ -50,6 +50,7 @@
 #include "game/messages/mode_notification.h"
 #include "augs/misc/httplib_utils.h"
 #include "application/gui/client/chat_gui_entry.hpp"
+#include "application/setups/server/server_assigned_teams.hpp"
 #include "steam_integration.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
@@ -72,13 +73,15 @@ server_setup::server_setup(
 	const client_vars& integrated_client_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
 	const server_nat_traversal_input& nat_traversal_input,
-	bool suppress_community_server_webhook_this_run
+	const bool suppress_community_server_webhook_this_run,
+	const server_assigned_teams& assigned_teams
 ) : 
 	integrated_client_vars(integrated_client_vars),
 	lua(lua),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
+	assigned_teams(assigned_teams),
 	dedicated(dedicated),
 	server(
 		std::make_unique<server_adapter>(
@@ -249,6 +252,10 @@ std::string server_heartbeat::get_location_id() const {
 
 	if (begins_with(n, "[DE]")) {
 		return "de";
+	}
+
+	if (begins_with(n, "[CH]")) {
+		return "ch";
 	}
 
 	return "";
@@ -908,6 +915,17 @@ void server_setup::finalize_webhook_jobs() {
 						const auto new_id = std::string("steam_") + client->get_nickname();
 #endif
 
+						if (new_id.empty()) {
+							LOG(
+								"Failed to authenticate \"%x\". There was a problem with authentication endpoint. Took %x secs.", 
+								client->get_nickname(), 
+								client->secs_since_connected(server_time)
+							);
+
+							kick(to_client_id(webhook_job.player_id), "Authentication failure. Try again.");
+							break;
+						}
+
 						if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
 							LOG(
 								"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
@@ -1501,6 +1519,22 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	synced_dynamic_vars out;
 
+	out.preassigned_factions = has_assigned_teams();
+
+	if (has_assigned_teams()) {
+		std::size_t num_in_game = 0;
+
+		auto count_in_game = [&](auto, auto& c) {
+			if (c.state == client_state_type::IN_GAME) {
+				++num_in_game;
+			}
+		};
+
+		for_each_id_and_client(count_in_game, connected_and_integrated_v);
+
+		out.all_assigned_present = num_in_game == assigned_teams.id_to_faction.size();
+	}
+
 	out.all_authenticated = all_authenticated;
 	out.all_not_banned = all_not_banned;
 
@@ -1876,6 +1910,14 @@ void server_setup::send_complete_solvable_state_to(const client_id_type client_i
 	);
 }
 
+faction_type server_setup::get_assigned_team(const std::string& authenticated_id) const {
+	if (const auto team = mapped_or_nullptr(assigned_teams.id_to_faction, authenticated_id)) {
+		return *team;
+	}
+
+	return faction_type::COUNT;
+}
+
 void server_setup::advance_clients_state() {
 	/* Do it only once per tick */
 	bool added_someone_already = false;
@@ -1942,19 +1984,26 @@ void server_setup::advance_clients_state() {
 					kick(client_id, "Joined too late! Match is ongoing.");
 				}
 
-				const bool wrong_id = 
-					c.is_authenticated() && 
-					has_suspended_players() && !is_currently_suspended(c.authenticated_id)
-				;
+				if (c.is_authenticated()) {
+					const auto this_id = c.authenticated_id;
 
-				if (wrong_id) {
-					LOG(
-						"%x has connected to a match that's not theirs! Account ID: %x.", 
-						c.get_nickname(), 
-						c.authenticated_id
-					);
+					const bool not_among_suspended = 
+						has_suspended_players() && !is_currently_suspended(this_id)
+					;
 
-					kick(client_id, "Connected to a wrong match.");
+					const bool not_among_assigned = 
+						has_assigned_teams() && !found_in(assigned_teams.id_to_faction, this_id)
+					;
+
+					if (not_among_suspended || not_among_assigned) {
+						LOG(
+							"%x has connected to a match that's not theirs! Account ID: %x.", 
+							c.get_nickname(), 
+							c.authenticated_id
+						);
+
+						kick(client_id, "Connected to a wrong match.");
+					}
 				}
 			}
 
@@ -2083,10 +2132,26 @@ void server_setup::advance_clients_state() {
 				migrate_from_id = suspended_player;
 			}
 
+			auto faction = faction_type::SPECTATOR;
+
+			if (has_assigned_teams()) {
+				faction = get_assigned_team(c.authenticated_id);
+
+				if (faction == faction_type::COUNT) {
+					LOG("WARNING! NO TEAM FOUND FOR %x", final_nickname);
+					kick(client_id, "There was a problem when pre-assigning your team.");
+
+					faction = faction_type::SPECTATOR;
+				}
+				else {
+					LOG("Assigned team for %x: %x", final_nickname, faction);
+				}
+			}
+
 			cmd.added_player = add_player_input {
 				mode_id,
 				std::move(final_nickname),
-				faction_type::SPECTATOR,
+				faction,
 				migrate_from_id
 			};
 
@@ -2147,6 +2212,10 @@ void server_setup::advance_clients_state() {
 							*/
 
 							return is_currently_suspended(c.authenticated_id); 
+						}
+
+						if (has_assigned_teams()) {
+							return get_assigned_team(c.authenticated_id) != faction_type::COUNT;
 						}
 
 						return true;
@@ -2465,6 +2534,13 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 	const auto current_dynamic_vars = make_synced_dynamic_vars();
 
 	if (current_dynamic_vars != last_broadcast_dynamic_vars) {
+		LOG(
+			"Sending new dynamic vars at step: %x. %x %x",
+			scene.world.get_total_steps_passed(),
+			current_dynamic_vars.preassigned_factions,
+			current_dynamic_vars.all_assigned_present
+		);
+
 		auto rebroadcast = [&](const auto recipient_client_id, auto& c) {
 			if (c.should_pause_solvable_stream()) {
 				return;
@@ -3704,6 +3780,10 @@ void server_setup::handle_client_chat_command(
 			}
 		}
 	}
+}
+
+bool server_setup::has_assigned_teams() const { 
+	return !assigned_teams.id_to_faction.empty();
 }
 
 #include "augs/readwrite/to_bytes.h"

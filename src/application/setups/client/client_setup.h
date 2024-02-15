@@ -464,6 +464,8 @@ class client_setup :
 
 					get_viewed_character(),
 
+					sv_dynamic_vars,
+
 					unpack,
 
 					referential_arena,

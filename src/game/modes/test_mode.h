@@ -311,4 +311,8 @@ public:
 	bool is_idle() const {
 		return players.empty();
 	}
+
+	bool team_choice_allowed(const_input) const {
+		return true;
+	}
 };

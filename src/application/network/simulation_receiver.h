@@ -14,6 +14,7 @@
 #include "application/network/simulation_receiver_settings.h"
 
 #include "application/network/interpolation_transfer.h"
+#include "application/arena/synced_dynamic_vars.h"
 
 /* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION 1
@@ -74,7 +75,11 @@ public:
 	struct incoming_entropy_entry {
 		server_step_entropy_meta meta;
 		received_entropy_type payload;
+
+		std::optional<synced_dynamic_vars> new_dynamic_vars;
 	};
+
+	std::optional<synced_dynamic_vars> next_dynamic_vars;
 
 	std::vector<prestep_client_context> incoming_contexts;
 	std::vector<incoming_entropy_entry> incoming_entropies;
@@ -93,13 +98,21 @@ public:
 		predicted_entropies.clear();
 	}
 
+	void acquire_next_dynamic_vars(
+		const synced_dynamic_vars& vars
+	) {
+		next_dynamic_vars = vars;
+	}
+
 	void acquire_next_server_entropy(
 		const prestep_client_context& context,
 		const server_step_entropy_meta& meta,
 		const received_entropy_type& payload
 	) {
 		incoming_contexts.push_back(context);
-		incoming_entropies.push_back({meta, payload});
+		incoming_entropies.push_back({meta, payload, next_dynamic_vars});
+
+		next_dynamic_vars = std::nullopt;
 
 		if (incoming_contexts.size() < incoming_entropies.size()) {
 			incoming_contexts.emplace_back();
@@ -116,6 +129,8 @@ public:
 		past_infection_system& past,
 
 		const entity_id locally_controlled_entity, 
+
+		synced_dynamic_vars& sv_dynamic_vars,
 
 		F&& unpack_entropy,
 
@@ -215,6 +230,23 @@ public:
 
 					{
 						const auto& actual_server_entropy = unpack_entropy(actual_server_step.payload);
+
+						{
+							const auto& new_dynamic_vars = actual_server_step.new_dynamic_vars;
+
+							if (new_dynamic_vars.has_value()) {
+								sv_dynamic_vars = *new_dynamic_vars;
+
+								LOG(
+									"New synced_dynamic_vars. Step: %x, Run ranked logic: %x, FF: %x; preassigned teams: %x %x", 
+									referential_arena.get_cosmos().get_total_steps_passed(),
+									sv_dynamic_vars.is_ranked_server(),
+									sv_dynamic_vars.friendly_fire,
+									sv_dynamic_vars.preassigned_factions,
+									sv_dynamic_vars.all_assigned_present
+								);
+							}
+						}
 
 						advance_referential(actual_server_entropy);
 

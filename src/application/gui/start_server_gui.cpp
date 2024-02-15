@@ -20,7 +20,7 @@ bool perform_arena_chooser(
 bool perform_game_mode_chooser(game_mode_name_type& current_arena, const std::string& caption = "Game mode");
 
 bool start_server_gui_state::perform(
-	server_start_input& into,
+	server_listen_input& into,
 	server_vars& into_vars,
 
 	const nat_detection_session* nat_detection,

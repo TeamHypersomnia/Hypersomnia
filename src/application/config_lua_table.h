@@ -39,7 +39,7 @@
 #include "application/setups/main_menu_settings.h"
 #include "application/setups/debugger/debugger_settings.h"
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/server/server_start_input.h"
+#include "application/setups/server/server_listen_input.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_connect_string.h"
 #include "application/setups/client/client_vars.h"
@@ -172,7 +172,7 @@ struct config_lua_table {
 	faction_view_settings faction_view;
 	damage_indication_settings damage_indication;
 
-	server_start_input server_start;
+	server_listen_input server_start;
 	server_vars server;
 	server_private_vars server_private;
 	augs::dedicated_server_input dedicated_server;

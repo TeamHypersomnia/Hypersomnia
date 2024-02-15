@@ -6874,3 +6874,6 @@ This will discard your redo history."
 
 - update early access
 - the counter is fucked up of course
+
+- allowed_teams.json
+- setup 2x event on ch too

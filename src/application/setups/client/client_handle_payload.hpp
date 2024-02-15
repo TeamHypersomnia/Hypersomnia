@@ -353,13 +353,7 @@ message_handler_result client_setup::handle_payload(
 			return continue_v;
 		}
 
-		sv_dynamic_vars = payload;
-
-		LOG(
-			"New synced_dynamic_vars. Run ranked logic: %x, FF: %x", 
-			sv_dynamic_vars.is_ranked_server(),
-			sv_dynamic_vars.friendly_fire
-		);
+		receiver.acquire_next_dynamic_vars(payload);
 
 		/*
 			The predicted cosmos was predicted under the assumption of old state vars.
@@ -379,11 +373,8 @@ message_handler_result client_setup::handle_payload(
 		}
 
 		/* 
-			We can assign it right away and it won't desync,
-			because it only affects the incoming entropies and they are unpacked on the go
-			whenever networked_server_step_entropy arrives.
-
 			networked_server_step_entropy and synced_meta_update are on the same channel.
+			TODO: push this to simulation receiver to avoid desyncs.
 		*/
 
 		player_metas[payload.subject_id.value].synced = payload.new_meta;

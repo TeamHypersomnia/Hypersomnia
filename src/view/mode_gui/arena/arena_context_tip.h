@@ -164,8 +164,10 @@ inline void draw_context_tip(
 		};
 
 		if (current_faction == faction_type::SPECTATOR) {
-			if (!team_choice_opened) {
-				return do_text("You are a Spectator. Press {CHOOSE_TEAM} to change teams.");
+			if (const bool can_change_teams = typed_mode.team_choice_allowed(mode_input)) {
+				if (!team_choice_opened) {
+					return do_text("You are a Spectator. Press {CHOOSE_TEAM} to change teams.");
+				}
 			}
 
 			return {};
