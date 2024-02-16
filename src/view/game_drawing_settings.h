@@ -40,6 +40,8 @@ struct game_drawing_settings {
 	int snap_zoom_to_multiple_if_different_by_pixels = 10;
 	float custom_zoom = 1.0f;
 
+	bool draw_enemy_silhouettes_in_spectator = true;
+
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_aabb_highlighter = true;

@@ -49,6 +49,7 @@ struct illuminated_rendering_input {
 	const vec2 pre_step_crosshair_displacement;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
+	const bool can_draw_enemy_silhouettes;
 	const necessary_images_in_atlas_map& necessary_images;
 	const all_loaded_gui_fonts& fonts;
 	const images_in_atlas_map& game_images;

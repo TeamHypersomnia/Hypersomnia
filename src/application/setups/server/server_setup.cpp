@@ -3745,6 +3745,18 @@ bool server_setup::has_assigned_teams() const {
 	return !assigned_teams.id_to_faction.empty();
 }
 
+faction_type server_setup::get_assigned_faction() const { 
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			if (const auto p = mode.find(get_local_player_id())) {
+				return p->get_faction();
+			}
+
+			return faction_type::COUNT;
+		}
+	);
+}
+
 #include "augs/readwrite/to_bytes.h"
 
 // TODO: rewrite unit tests to use streams since we're no longer using preserialized_message 

@@ -9,6 +9,7 @@ struct demo_player_gui : standard_window_mixin<demo_player_gui> {
 	using base::base;
 	using introspect_base = base;
 
+	bool draw_enemy_silhouettes = true;
 	bool show_spectator_overlay = true;
 	bool pending_interpolation_snap = false;
 	bool pending_dump = false;

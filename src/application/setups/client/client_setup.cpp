@@ -746,6 +746,8 @@ void client_setup::customize_for_viewing(config_lua_table& config) const {
 
 	if (is_replaying()) {
 		config.arena_mode_gui.show_spectator_overlay = demo_player.gui.show_spectator_overlay;
+		config.drawing.draw_enemy_silhouettes_in_spectator = demo_player.gui.draw_enemy_silhouettes;
+
 		config.client.spectated_arena_type = demo_player.gui.shown_arena_type;
 
 		if (is_paused()) {
@@ -1781,6 +1783,18 @@ bool client_setup::would_abandon_match() const {
 	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
 		[&](const auto& mode, const auto& in) {
 			return mode.should_suspend_instead_of_remove(in);
+		}
+	);
+}
+
+faction_type client_setup::get_assigned_faction() const { 
+	return get_arena_handle(client_arena_type::PREDICTED).on_mode(
+		[&](const auto& mode) {
+			if (const auto p = mode.find(get_local_player_id())) {
+				return p->get_faction();
+			}
+
+			return faction_type::COUNT;
 		}
 	);
 }

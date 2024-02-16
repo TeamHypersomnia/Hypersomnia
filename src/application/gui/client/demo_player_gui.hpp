@@ -18,6 +18,7 @@ inline void demo_player_gui::perform(
 	}
 
 	checkbox("Show spectator overlay", show_spectator_overlay);
+	checkbox("Draw enemy silhouettes", draw_enemy_silhouettes);
 	text("POV:"); ImGui::SameLine(); 
 
 	if (enum_radio(shown_arena_type, true)) {

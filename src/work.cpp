@@ -2308,6 +2308,24 @@ work_result work(
 		return result;
 	};
 
+	auto can_show_enemy_silhouettes = [&]() {
+		if (is_replaying_demo()) {
+			return true;
+		}
+
+		bool result = false;
+
+		on_specific_setup([&](client_setup& setup) {
+			result = setup.get_assigned_faction() == faction_type::SPECTATOR;
+		});
+
+		on_specific_setup([&](server_setup& setup) {
+			result = setup.get_assigned_faction() == faction_type::SPECTATOR;
+		});
+
+		return result;
+	};
+
 	augs::timer ad_hoc_animation_timer;
 
 	auto perform_setup_custom_imgui = [&]() {
@@ -4168,6 +4186,7 @@ work_result work(
 					calc_pre_step_crosshair_displacement(viewing_config),
 					get_audiovisuals(),
 					viewing_config.drawing,
+					can_show_enemy_silhouettes(),
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,

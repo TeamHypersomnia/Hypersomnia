@@ -11,6 +11,7 @@ void enqueue_illuminated_rendering_jobs(
 	using D = augs::dedicated_buffer;
 	using DV = augs::dedicated_buffer_vector;
 
+	const bool draw_enemy_silhouettes = in.can_draw_enemy_silhouettes && in.drawing.draw_enemy_silhouettes_in_spectator;
 	const bool streamer_mode = in.streamer_mode;
 	const auto& necessarys = in.necessary_images;
 
@@ -81,7 +82,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [draw_enemy_silhouettes, &cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		(void)fog_of_war_effective;
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
@@ -148,7 +149,8 @@ void enqueue_illuminated_rendering_jobs(
 				pre_step_crosshair_displacement,
 				interp,
 				considered_fov,
-				settings.teammates_are_enemies
+				settings.teammates_are_enemies,
+				draw_enemy_silhouettes
 			);
 		};
 
@@ -520,7 +522,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	auto sentiences_job = [draw_enemy_silhouettes, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -540,11 +542,27 @@ void enqueue_illuminated_rendering_jobs(
 			return typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
 		};
 
+		auto occluded_highlight_provider = [](const auto& typed_handle) -> std::optional<rgba> {
+			switch (typed_handle.get_official_faction()) {
+				case faction_type::RESISTANCE:
+					return orange;
+				case faction_type::METROPOLIS:
+					return cyan;
+				case faction_type::ATLANTIS:
+					return green;
+
+				default:
+					return std::nullopt;
+			}
+		};
+
 		const auto friendly_drawing_in = make_drawing_input(D::FRIENDLY_SENTIENCES);
 		const auto enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCES);
 
 		const auto borders_friendly_drawing_in = make_drawing_input(D::BORDERS_FRIENDLY_SENTIENCES);
 		const auto borders_enemy_drawing_in = make_drawing_input(D::BORDERS_ENEMY_SENTIENCES);
+
+		const auto occluded_enemy_highlights_in = make_drawing_input(D::OCCLUDED_ENEMY_HIGHLIGHTS);
 
 		const auto neons_friendly_drawing_in = make_drawing_input(D::NEONS_FRIENDLY_SENTIENCES);
 		const auto neons_enemy_drawing_in = make_drawing_input(D::NEONS_ENEMY_SENTIENCES);
@@ -564,7 +582,7 @@ void enqueue_illuminated_rendering_jobs(
 							return modified_input;
 					};
 
-					if (is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
+					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
 						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
@@ -577,6 +595,10 @@ void enqueue_illuminated_rendering_jobs(
 						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, enemy_drawing_in, shadow_input_customizer);
 						::specific_draw_entity(typed_handle, enemy_drawing_in);
 						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
+
+						if (draw_enemy_silhouettes) {
+							::specific_draw_border(typed_handle, occluded_enemy_highlights_in, occluded_highlight_provider);
+						}
 					}
 				});
 			});

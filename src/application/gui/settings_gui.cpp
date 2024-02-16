@@ -1136,6 +1136,8 @@ void settings_gui_state::perform(
 					if (auto node = scoped_tree_node("HUD")) {
 						revertable_checkbox("Cinematic mode", config.drawing.cinematic_mode);
 
+						revertable_checkbox("Draw enemy silhouettes in Spectator", config.drawing.draw_enemy_silhouettes_in_spectator);
+
 						revertable_checkbox(SCOPE_CFG_NVP(draw_inventory));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_hotbar));
 

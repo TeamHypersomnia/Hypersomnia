@@ -238,6 +238,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			renderer.call_triangles(D::BORDERS_ENEMY_SENTIENCES);
 			renderer.set_stencil(false);
 
+			renderer.call_triangles(D::OCCLUDED_ENEMY_HIGHLIGHTS);
 			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 		}
 		else {
