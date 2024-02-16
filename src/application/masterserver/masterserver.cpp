@@ -27,6 +27,7 @@
 #include "3rdparty/rapidjson/include/rapidjson/prettywriter.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/network/netcode_utils.h"
+#include "augs/misc/httplib_utils.h"
 
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
@@ -405,15 +406,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			push_webhook_job(
 				[ip_str, data, discord_webhook_url]() -> std::string {
 					const auto ca_path = CA_CERT_PATH;
-					http_client_type http_client(discord_webhook_url.host);
-
-#if BUILD_OPENSSL
-					http_client.set_ca_cert_path(ca_path.c_str());
-					http_client.enable_server_certificate_verification(true);
-#endif
-					http_client.set_follow_location(true);
-					http_client.set_read_timeout(5);
-					http_client.set_write_timeout(5);
+					auto client = httplib_utils::make_client(discord_webhook_url);
 
 					const auto game_mode_name = std::string(data.game_mode);
 
@@ -430,7 +423,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 					MSR_LOG("Sending a discord notification for %x", data.server_name);
 
-					http_client.Post(discord_webhook_url.location.c_str(), items);
+					client->Post(discord_webhook_url.location.c_str(), items);
 
 					return "";
 				}
@@ -450,15 +443,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			push_webhook_job(
 				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
 					const auto ca_path = CA_CERT_PATH;
-					http_client_type http_client(telegram_webhook_url.host);
-
-#if BUILD_OPENSSL
-					http_client.set_ca_cert_path(ca_path.c_str());
-					http_client.enable_server_certificate_verification(true);
-#endif
-					http_client.set_follow_location(true);
-					http_client.set_read_timeout(5);
-					http_client.set_write_timeout(5);
+					auto client = httplib_utils::make_client(telegram_webhook_url);
 
 					auto items = telegram_webhooks::form_new_community_server(
 						telegram_channel_id,
@@ -471,7 +456,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 					MSR_LOG("Sending a telegram notification for %x", data.server_name);
 
-					http_client.Post(location.c_str(), items);
+					client->Post(location.c_str(), items);
 
 					return "";
 				}

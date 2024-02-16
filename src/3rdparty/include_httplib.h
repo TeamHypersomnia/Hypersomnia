@@ -6,10 +6,6 @@
 
 #include "3rdparty/cpp-httplib/httplib.h"
 
-#if BUILD_OPENSSL
-using http_client_type = httplib::SSLClient;
-#else
 using http_client_type = httplib::Client;
-#endif
 
 #undef ADD

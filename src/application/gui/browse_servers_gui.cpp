@@ -219,28 +219,10 @@ void browse_servers_gui_state::sync_download_server_entry(
 				but we'll need to support downloading just one entry.
 			*/
 
-			const auto resolved = resolve_address(address);
-			LOG(resolved.report());
+			LOG("Connecting to server list at: %x", address);
 
-			if (resolved.result != resolve_result_type::OK) {
-				return std::nullopt;
-			}
-
-			auto resolved_addr = resolved.addr;
-			const auto intended_port = resolved_addr.port;
-			resolved_addr.port = 0;
-
-			const auto address_str = ::ToString(resolved_addr);
-			const auto timeout = 5;
-
-			LOG("Connecting to server list at: %x:%x", address_str, intended_port);
-
-			httplib::Client cli(address_str.c_str(), intended_port);
-			cli.set_write_timeout(timeout);
-			cli.set_read_timeout(timeout);
-			cli.set_follow_location(true);
-
-			return cli.Get("/server_list_binary");
+			auto cli = httplib_utils::make_client(address);
+			return cli->Get("/server_list_binary");
 		}
 	;
 
@@ -300,28 +282,10 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	data->future_response = launch_async(
 		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
-			const auto resolved = resolve_address(address);
-			LOG(resolved.report());
+			LOG("Connecting to server list at: %x", address);
 
-			if (resolved.result != resolve_result_type::OK) {
-				return std::nullopt;
-			}
-
-			auto resolved_addr = resolved.addr;
-			const auto intended_port = resolved_addr.port;
-			resolved_addr.port = 0;
-
-			const auto address_str = ::ToString(resolved_addr);
-			const auto timeout = 5;
-
-			LOG("Connecting to server list at: %x:%x", address_str, intended_port);
-
-			httplib::Client cli(address_str.c_str(), intended_port);
-			cli.set_write_timeout(timeout);
-			cli.set_read_timeout(timeout);
-			cli.set_follow_location(true);
-
-			return cli.Get("/server_list_binary");
+			auto cli = httplib_utils::make_client(address);
+			return cli->Get("/server_list_binary");
 		}
 	);
 

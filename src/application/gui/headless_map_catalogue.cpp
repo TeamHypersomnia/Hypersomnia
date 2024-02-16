@@ -193,21 +193,12 @@ void headless_map_catalogue::refresh(const address_string_type address) {
 	future_response = launch_async(
 		[&last_error = this->list_catalogue_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
-				const auto ca_path = CA_CERT_PATH;
-				auto client = http_client_type(parsed.host);
-
-#if BUILD_OPENSSL
-				client.set_ca_cert_path(ca_path.c_str());
-				client.enable_server_certificate_verification(true);
-#endif
-				client.set_follow_location(true);
-				client.set_read_timeout(3);
-				client.set_write_timeout(3);
-				client.set_keep_alive(true);
+				auto client = httplib_utils::make_client(parsed, 3);
+				client->set_keep_alive(true);
 
 				const auto location = parsed.location + "?format=json";
 
-				auto response = client.Get(location.c_str());
+				auto response = client->Get(location.c_str());
 
 				if (response == nullptr) {
 					last_error = "Response was null.";

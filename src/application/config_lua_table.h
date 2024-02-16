@@ -121,7 +121,7 @@ struct config_lua_table {
 
 	float_consistency_test_settings float_consistency_test;
 
-	host_with_default_port server_list_provider;
+	std::string server_list_provider;
 
 	nat_detection_settings nat_detection;
 	nat_traversal_settings nat_traversal;

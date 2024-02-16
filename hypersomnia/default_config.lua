@@ -6,10 +6,7 @@ return {
   --log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
   --log_timestamp_format = "",
 
-  server_list_provider = {
-	  address = "masterserver.hypersomnia.xyz",
-	  default_port = 8420
-  },
+  server_list_provider = "masterserver.hypersomnia.xyz:8420",
 
   nat_detection = {
 	  packet_interval_ms = 5,
@@ -60,7 +57,7 @@ return {
   http_client = {
     update_on_launch = true,
 	update_connection_timeout_secs = 2,
-	self_update_host = "hypersomnia.xyz",
+	self_update_host = "https://hypersomnia.xyz",
 	self_update_path = "/builds/latest"
   },
 

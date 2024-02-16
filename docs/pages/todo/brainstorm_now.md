@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- test over 192.168.0.1
 - show enemy silhouettes in spectator
 
 - we'll have to update to the latest version of yojimbo at some point

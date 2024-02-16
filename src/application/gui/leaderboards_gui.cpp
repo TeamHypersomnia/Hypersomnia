@@ -101,14 +101,11 @@ void leaderboards_gui_state::refresh_leaderboards(const leaderboards_input in) {
 	if (const auto parsed = parsed_url(in.provider_url); parsed.valid()) {
 		data->future_response = launch_async(
 			[parsed]() -> std::optional<httplib::Result> {
-				using namespace httplib_utils;
-
-				LOG_NVPS(parsed.host, parsed.protocol, parsed.port, parsed.location);
-				auto http_client = make_client(parsed);
+				auto http_client = httplib_utils::make_client(parsed);
 
 				const auto final_location = parsed.location + "?format=json";
 
-				return launch_download(*http_client, final_location.c_str());
+				return httplib_utils::launch_download(*http_client, final_location.c_str());
 			}
 		);
 	}

@@ -18,17 +18,8 @@ https_file_downloader::https_file_downloader(
 }
 
 void https_file_downloader::worker_func() {
-	const auto ca_path = CA_CERT_PATH;
-	auto client = http_client_type(parsed.host);
-
-#if BUILD_OPENSSL
-	client.set_ca_cert_path(ca_path.c_str());
-	client.enable_server_certificate_verification(true);
-#endif
-	client.set_follow_location(true);
-	client.set_read_timeout(3);
-	client.set_write_timeout(3);
-	client.set_keep_alive(true);
+	auto client = httplib_utils::make_client(parsed, 3);
+	client->set_keep_alive(true);
 
 	while (keepRunning) {
 		std::string path;
@@ -50,7 +41,7 @@ void https_file_downloader::worker_func() {
 
 			downloadedBytes = 0;
 
-			auto res = client.Get(
+			auto res = client->Get(
 				final_location.c_str(), 
 				[this](std::size_t data_length, std::size_t total_length) {
 					const auto dt = data_length - downloadedBytes;

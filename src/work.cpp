@@ -528,8 +528,6 @@ work_result work(
 	if (should_run_self_updater) {
 		using update_result = self_update_result_type;
 
-		LOG("Checking for updates");
-
 		const bool should_update_headless = is_cli_tool;
 
 		LOG_NVPS(should_update_headless);

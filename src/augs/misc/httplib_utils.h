@@ -13,28 +13,14 @@ namespace httplib_utils {
 		return client.Get(resource.c_str(), std::forward<F>(args)...);
 	}
 
-	inline auto client_from_parsed(const parsed_url& parsed) {
-		auto proto_and_host = parsed.protocol.empty() ? parsed.host : (parsed.protocol + "://" + parsed.host);
-
-		if (parsed.port != -1) {
-			return std::make_unique<http_client_type>(parsed.host, parsed.port);
-		}
-
-		return std::make_unique<http_client_type>(parsed.host);
-	}
-
-	inline auto make_client(const parsed_url& parsed, const int io_timeout = 5) {
+	inline auto make_client(const std::string& scheme_host_port, const int io_timeout = 5) {
 		const auto ca_path = CA_CERT_PATH;
 
-		auto http_client_ptr = client_from_parsed(parsed);
+		auto http_client_ptr = std::make_unique<http_client_type>(scheme_host_port.c_str());
 		auto& http_client = *http_client_ptr;
 
 #if BUILD_OPENSSL
 		http_client.set_ca_cert_path(ca_path.c_str());
-
-		const bool is_https = parsed.protocol.empty() || parsed.protocol == "https";
-
-		http_client.enable_server_certificate_verification(is_https);
 #endif
 
 		http_client.set_follow_location(true);
@@ -42,5 +28,9 @@ namespace httplib_utils {
 		http_client.set_write_timeout(io_timeout);
 
 		return http_client_ptr;
+	}
+
+	inline auto make_client(const parsed_url& parsed, const int io_timeout = 5) {
+		return make_client(parsed.get_scheme_host_port(), io_timeout);
 	}
 }

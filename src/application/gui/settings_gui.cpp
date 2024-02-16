@@ -1697,7 +1697,7 @@ void settings_gui_state::perform(
 
 					ImGui::Separator();
 
-					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider.address);
+					input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
 					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
 				}
 

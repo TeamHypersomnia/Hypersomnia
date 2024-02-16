@@ -50,17 +50,8 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 		address = in.external_arena_files_provider
 	]() {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
-				const auto ca_path = CA_CERT_PATH;
-				auto client = http_client_type(parsed.host);
-
-#if BUILD_OPENSSL
-				client.set_ca_cert_path(ca_path.c_str());
-				client.enable_server_certificate_verification(true);
-#endif
-				client.set_follow_location(true);
-				client.set_read_timeout(3);
-				client.set_write_timeout(3);
-				client.set_keep_alive(true);
+				auto client = httplib_utils::make_client(parsed, 3);
+				client->set_keep_alive(true);
 
 				const auto miniatures_directory = CACHE_DIR / "miniatures";
 
@@ -84,7 +75,7 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 
 					const auto location = typesafe_sprintf("%x/%x/miniature.png", parsed.location, m.name);
 
-					auto response = client.Get(location.c_str());
+					auto response = client->Get(location.c_str());
 
 					if (response == nullptr) {
 						set_result(0);

@@ -309,16 +309,7 @@ void server_setup::request_auth(mode_player_id player_id, const steam_auth_reque
 		player_id,
 
 		[api_key, ticket_hex]() {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client("api.steampowered.com");
-
-#if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
-#endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(4);
-			http_client.set_write_timeout(4);
+			auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
 
 			const auto appid = std::to_string(::steam_get_appid());
 			const auto identity = "hypersomnia_gameserver";
@@ -329,7 +320,7 @@ void server_setup::request_auth(mode_player_id player_id, const steam_auth_reque
 			params.emplace("ticket", ticket_hex);
 			params.emplace("identity", identity);
 
-			const auto result = http_client.Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
+			const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
 
 			if (result) {
 				if (httplib_utils::successful(result->status)) {
@@ -627,16 +618,7 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 
 		push_notification_job(
 			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(discord_webhook_url.host);
-
-#if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
-#endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
+				auto http_client = httplib_utils::make_client(discord_webhook_url);
 
 				auto items = discord_webhooks::form_duel_interrupted(
 					server_name,
@@ -645,7 +627,7 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 					interrupt_info
 				);
 
-				http_client.Post(discord_webhook_url.location.c_str(), items);
+				http_client->Post(discord_webhook_url.location.c_str(), items);
 
 				return "";
 			}
@@ -674,16 +656,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 
 		push_notification_job(
 			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(discord_webhook_url.host);
-
-#if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
-#endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
+				auto client = httplib_utils::make_client(discord_webhook_url);
 
 				auto items = discord_webhooks::form_match_summary(
 					server_name,
@@ -693,7 +666,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 					summary
 				);
 
-				http_client.Post(discord_webhook_url.location.c_str(), items);
+				client->Post(discord_webhook_url.location.c_str(), items);
 
 				return "";
 			}
@@ -766,16 +739,7 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 
 		push_notification_job(
 			[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(discord_webhook_url.host);
-
-#if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
-#endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
+				auto client = httplib_utils::make_client(discord_webhook_url);
 
 				auto items = discord_webhooks::form_duel_of_honor(
 					server_name,
@@ -784,7 +748,7 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 					duel_pic_link
 				);
 
-				http_client.Post(discord_webhook_url.location.c_str(), items);
+				client->Post(discord_webhook_url.location.c_str(), items);
 
 				return "";
 			}
@@ -823,16 +787,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 				if (telegram_webhook_url.valid()) {
 					auto telegram_channel_id = priv_vars.telegram_channel_id;
 
-					const auto ca_path = CA_CERT_PATH;
-					http_client_type http_client(telegram_webhook_url.host);
-
-#if BUILD_OPENSSL
-					http_client.set_ca_cert_path(ca_path.c_str());
-					http_client.enable_server_certificate_verification(true);
-#endif
-					http_client.set_follow_location(true);
-					http_client.set_read_timeout(5);
-					http_client.set_write_timeout(5);
+					auto client = httplib_utils::make_client(telegram_webhook_url);
 
 					auto items = telegram_webhooks::form_player_connected(
 						telegram_channel_id,
@@ -840,7 +795,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 					);
 
 					const auto location = telegram_webhook_url.location + "/sendMessage";
-					auto response = http_client.Post(location.c_str(), items);
+					auto response = client->Post(location.c_str(), items);
 
 					if (response) {
 						LOG("Received TG response.");
@@ -851,16 +806,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 				}
 
 				if (discord_webhook_url.valid()) {
-					const auto ca_path = CA_CERT_PATH;
-					http_client_type http_client(discord_webhook_url.host);
-
-#if BUILD_OPENSSL
-					http_client.set_ca_cert_path(ca_path.c_str());
-					http_client.enable_server_certificate_verification(true);
-#endif
-					http_client.set_follow_location(true);
-					http_client.set_read_timeout(5);
-					http_client.set_write_timeout(5);
+					auto client = httplib_utils::make_client(discord_webhook_url);
 
 					auto items = discord_webhooks::form_player_connected(
 						avatar,
@@ -870,7 +816,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 						current_arena_name
 					);
 
-					auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
+					auto response = client->Post(discord_webhook_url.location.c_str(), items);
 
 					LOG("PUSH RESPONSE:");
 

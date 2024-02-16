@@ -82,15 +82,12 @@ self_update_result check_and_apply_updates(
 	const auto ca_path = CA_CERT_PATH;
 	const auto& host_url = http_settings.self_update_host;
 
-	http_client_type http_client(host_url.c_str());
+	LOG("Checking for updates at %x.", host_url);
 
-#if BUILD_OPENSSL
-	http_client.set_ca_cert_path(ca_path.c_str());
-	http_client.enable_server_certificate_verification(true);
-#endif
-	http_client.set_follow_location(true);
-	http_client.set_read_timeout(http_settings.update_connection_timeout_secs);
-	http_client.set_write_timeout(http_settings.update_connection_timeout_secs);
+	auto client = httplib_utils::make_client(
+		host_url,
+		http_settings.update_connection_timeout_secs
+	);
 
 	const auto& update_path = http_settings.self_update_path;
 
@@ -111,15 +108,15 @@ self_update_result check_and_apply_updates(
 		typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING)
 	;
 
-	auto log_null_response = [&http_client]() {
+	auto log_null_response = [&client]() {
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-		auto result = http_client.get_openssl_verify_result();
+		auto result = client->get_openssl_verify_result();
 
 		if (result) {
 			LOG("verify error: %x", X509_verify_cert_error_string(result));
 		}
 #else
-		(void)http_client;
+		(void)client;
 #endif
 
 		LOG("Response was null!");
@@ -131,7 +128,7 @@ self_update_result check_and_apply_updates(
 	const auto current_version = hypersomnia_version().get_version_string();
 
 	{
-		const auto response = launch_download(http_client, version_path); 
+		const auto response = launch_download(*client, version_path); 
 
 		if (response == nullptr) {
 			log_null_response();
@@ -312,8 +309,8 @@ self_update_result check_and_apply_updates(
 
 	auto future_response = launch_async(
 		/* Using optional as the return type only to fix the compilation error on Windows */
-		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib::Result> {
-			return launch_download(http_client, archive_path, [&](uint64_t len, uint64_t total) {
+		[&exit_requested, archive_path, &client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib::Result> {
+			return launch_download(*client, archive_path, [&](uint64_t len, uint64_t total) {
 				downloaded_bytes = len;
 				total_bytes = total;
 

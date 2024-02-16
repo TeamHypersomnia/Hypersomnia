@@ -21,7 +21,7 @@ struct resolve_address_result;
 using official_addrs = std::vector<resolve_address_result>;
 
 struct browse_servers_input {
-	const host_with_default_port& server_list_provider;
+	const std::string& server_list_provider;
 	client_connect_string& client_connect;
 	std::string& displayed_connecting_server_name;
 

@@ -27,19 +27,10 @@ https_file_uploader::https_file_uploader(
 }
 
 void https_file_uploader::worker_func() {
-	const auto ca_path = CA_CERT_PATH;
-	auto client = http_client_type(parsed.host);
+	auto client = httplib_utils::make_client(parsed, 3);
 
-	LOG("Uploading to host: %x, location: %x", parsed.host, parsed.location);
-
-#if BUILD_OPENSSL
-	client.set_ca_cert_path(ca_path.c_str());
-	client.enable_server_certificate_verification(true);
-#endif
-	client.set_follow_location(true);
-	client.set_read_timeout(3);
-	client.set_write_timeout(3);
-	client.set_keep_alive(true);
+	LOG("Uploading to: %x, location: %x", parsed.get_scheme_host_port(), parsed.location);
+	client->set_keep_alive(true);
 
 	std::vector<std::byte> file_buffer;
 
@@ -117,7 +108,7 @@ void https_file_uploader::worker_func() {
 			};
 
 			(void)provider_items;
-			auto res = client.Post(parsed.location, httplib::Headers(), items, provider_items);
+			auto res = client->Post(parsed.location, httplib::Headers(), items, provider_items);
 
 			if (res && httplib_utils::successful(res->status)) {
 				try {
