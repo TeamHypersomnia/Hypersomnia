@@ -596,7 +596,7 @@ void enqueue_illuminated_rendering_jobs(
 						::specific_draw_entity(typed_handle, enemy_drawing_in);
 						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
 
-						if (draw_enemy_silhouettes) {
+						if (draw_enemy_silhouettes && typed_handle.template get<components::sentience>().is_conscious()) {
 							::specific_draw_border(typed_handle, occluded_enemy_highlights_in, occluded_highlight_provider);
 						}
 					}
