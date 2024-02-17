@@ -6877,3 +6877,6 @@ This will discard your redo history."
 
 - allowed_teams.json
 - setup 2x event on ch too
+- test over 192.168.0.1
+- show enemy silhouettes in spectator
+

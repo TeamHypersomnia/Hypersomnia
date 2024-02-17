@@ -6,9 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- test over 192.168.0.1
-- show enemy silhouettes in spectator
-
+- dont kick spectators during ranked
+- disable enemy highlight when dead
 - we'll have to update to the latest version of yojimbo at some point
 
 - optimize de_rambo

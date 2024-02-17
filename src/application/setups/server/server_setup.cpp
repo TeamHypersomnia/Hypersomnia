@@ -1888,42 +1888,47 @@ void server_setup::advance_clients_state() {
 		return static_cast<uint32_t>(ms * inv_simulation_delta_ms);
 	};
 
+	auto get_faction_of = [&](const auto cid) {
+		const auto mode_id = to_mode_player_id(cid);
+
+		return get_arena_handle().on_mode(
+			[&](const auto& typed_mode) {
+				if (const auto data = typed_mode.find(mode_id)) {
+					return data->get_faction();
+				}
+
+				return faction_type::SPECTATOR;
+			}
+		);
+	};
+
 	auto automove_to_spectators_if_afk = [&](const client_id_type client_id, auto& c) {
 		if (!c.is_set()) {
 			return;
 		}
 
 		if (c.should_move_to_spectators_due_to_afk(vars, server_time)) {
-			/*
-				Don't move to spectators during afk if it's a ranked.
-				Kick instead.
-			*/
-
-			if (const bool ranked_on = is_ranked_live_or_starting()) {
-				/*
-					TODO_RANKED: Actually launch match freeze logic!!!
-					No reason to disconnect.
-					Then unfreeze if movement detected. But yeah we can do it later.
-				*/
-
-				kick(client_id, "AFK!");
-				return;
-			}
-
 			const auto mode_id = to_mode_player_id(client_id);
-
-			const auto moved_player_faction = get_arena_handle().on_mode(
-				[&](const auto& typed_mode) {
-					if (const auto data = typed_mode.find(mode_id)) {
-						return data->get_faction();
-					}
-
-					return faction_type::SPECTATOR;
-				}
-			);
+			const auto moved_player_faction = get_faction_of(client_id);
 
 			if (moved_player_faction != faction_type::SPECTATOR) {
-				moved_to_spectators.push_back(mode_id);
+				if (const bool ranked_on = is_ranked_live_or_starting()) {
+					/*
+						TODO_RANKED: Actually launch match freeze logic!!!
+						No reason to disconnect.
+						Then unfreeze if movement detected. But yeah we can do it later.
+					*/
+
+					/*
+						Don't move to spectators during afk if it's a ranked.
+						Kick instead.
+					*/
+
+					kick(client_id, "AFK!");
+				}
+				else {
+					moved_to_spectators.push_back(mode_id);
+				}
 			}
 		}
 	};
@@ -1967,7 +1972,11 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (c.state == client_state_type::IN_GAME) {
-				if (c.should_kick_due_to_afk(vars, server_time)) {
+				const bool ranked_on = is_ranked_live_or_starting();
+				const bool is_spectator = get_faction_of(client_id) == faction_type::SPECTATOR;
+				const bool prevent_kick = ranked_on && is_spectator;
+
+				if (!prevent_kick && c.should_kick_due_to_afk(vars, server_time)) {
 					kick(client_id, "AFK!");
 				}
 
