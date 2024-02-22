@@ -334,6 +334,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	const auto& colliders_data = handle.template get<invariants::fixtures>(); 
 
 	b2FixtureDef fixdef;
+	b2PolygonShape polygon_shape;
+	b2CircleShape circle_shape;
 
 	fixdef.userData = handle;
 
@@ -419,10 +421,9 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				}
 			}
 
-			b2PolygonShape ps;
-			ps.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
+			polygon_shape.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
 
-			fixdef.shape = &ps;
+			fixdef.shape = &polygon_shape;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
 			ensure_less(static_cast<short>(ci), std::numeric_limits<short>::max());
@@ -435,11 +436,10 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	};
 
 	auto from_circle_shape = [&](const real32 radius) {
-		b2CircleShape shape;
-		shape.m_radius = si.get_meters(radius);
-		shape.m_p += b2Vec2(connection.shape_offset.pos);
+		circle_shape.m_radius = si.get_meters(radius);
+		circle_shape.m_p += b2Vec2(connection.shape_offset.pos);
 
-		fixdef.shape = &shape;
+		fixdef.shape = &circle_shape;
 		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
 		new_fix->index_in_component = 0u;
@@ -470,10 +470,9 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			v += off_meters;
 		}
 
-		b2PolygonShape ps;
-		ps.Set(verts.data(), verts.size());
+		polygon_shape.Set(verts.data(), verts.size());
 
-		fixdef.shape = &ps;
+		fixdef.shape = &polygon_shape;
 		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
 		new_fix->index_in_component = 0;

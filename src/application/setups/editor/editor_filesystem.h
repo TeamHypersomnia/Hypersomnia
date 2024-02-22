@@ -41,6 +41,7 @@ struct forbidden_path_result {
 
 	auto get_suggested_path() const {
 		auto good = forbidden_path;
+		ensure(suggested_filename.has_value());
 		good.replace_filename(*suggested_filename);
 
 		return good;

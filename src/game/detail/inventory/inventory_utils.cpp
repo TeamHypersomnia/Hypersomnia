@@ -368,7 +368,17 @@ std::string format_space_units(const inventory_space_type u) {
 }
 
 inventory_space_type calc_space_occupied_with_children(const const_entity_handle item_entity) {
-	auto space_occupied = *item_entity.find_space_occupied();
+	if (item_entity.dead()) {
+		return 0;
+	}
+
+	const auto maybe_space = item_entity.find_space_occupied();
+
+	if (!maybe_space.has_value()) {
+		return 0;
+	}
+
+	auto space_occupied = *maybe_space;
 
 	if (auto* const container = item_entity.find<invariants::container>()) {
 		ensure_eq(item_entity.get<components::item>().get_charges(), 1);
