@@ -8,8 +8,6 @@
 
 std::string to_forward_slashes(std::string in_str);
 
-double yojimbo_time();
-
 https_file_uploader::https_file_uploader(
 	const augs::path_type& project_folder,
 	const parsed_url& upload_url,

@@ -16,6 +16,10 @@
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
+namespace augs {
+	double steady_secs();
+}
+
 void GameAdapter::OnServerClientConnected(const int clientIndex) {
 	if (m_server != nullptr) {
 		m_server->client_connected(static_cast<client_id_type>(clientIndex));
@@ -141,7 +145,7 @@ bool try_fire_interval(const double interval, net_time_t& when_last, const doubl
 }
 
 bool try_fire_interval(const double interval, net_time_t& when_last) {
-	return try_fire_interval(interval, when_last, yojimbo_time());
+	return try_fire_interval(interval, when_last, augs::steady_secs());
 }
 
 bool auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes) {

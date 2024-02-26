@@ -20,8 +20,6 @@
 #include "augs/misc/httplib_utils.h"
 #include "application/network/resolve_address.h"
 
-double yojimbo_time();
-
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;
 constexpr auto server_entry_timeout = 5;
@@ -140,8 +138,6 @@ browse_servers_gui_state::browse_servers_gui_state(const std::string& title)
 {
 
 }
-
-double yojimbo_time();
 
 static std::vector<server_list_entry> to_server_list(std::optional<httplib::Result> result, std::string& error_message) {
     using namespace httplib_utils;
@@ -291,7 +287,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	LOG("refresh_server_list returns.");
 
-	when_last_started_refreshing_server_list = yojimbo_time();
+	when_last_started_refreshing_server_list = augs::steady_secs();
 }
 
 void browse_servers_gui_state::refresh_server_pings() {
@@ -345,7 +341,7 @@ server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(cons
 bool is_internal(const netcode_address_t& address);
 
 bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
-	const auto current_time = yojimbo_time();
+	const auto current_time = augs::steady_secs();
 
 	if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
 		const auto sequence = *maybe_sequence;
@@ -392,7 +388,7 @@ void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& soc
 }
 
 void browse_servers_gui_state::animate_dot_column() {
-	const auto current_time = yojimbo_time();
+	const auto current_time = augs::steady_secs();
 
 	const auto num_dots = uint64_t(current_time * 3) % 3 + 1;
 	loading_dots = std::string(num_dots, '.');
@@ -408,7 +404,7 @@ void browse_servers_gui_state::advance_ping_logic() {
 }
 
 void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& socket) {
-	const auto current_time = yojimbo_time();
+	const auto current_time = augs::steady_secs();
 
 	auto interval_passed = [current_time](const auto last, const auto interval) {
 		return current_time - last >= interval;
@@ -546,7 +542,7 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto wave_color = rgba::get_bright_wave(yojimbo_time() / 4.0f, 0.55);
+		const auto wave_color = rgba::get_bright_wave(augs::steady_secs() / 4.0f, 0.55);
 
 		{
 			if (s.is_official_server() ) {

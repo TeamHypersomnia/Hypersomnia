@@ -26,8 +26,6 @@
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "view/ranks_info.h"
 
-double yojimbo_time();
-
 struct leaderboards_gui_internal {
 	std::future<std::optional<httplib::Result>> future_response;
 
@@ -43,8 +41,6 @@ leaderboards_gui_state::leaderboards_gui_state(const std::string& title)
 {
 
 }
-
-double yojimbo_time();
 
 static all_leaderboards to_players_list(std::optional<httplib::Result> result, std::string& error_message) {
     using namespace httplib_utils;
@@ -222,7 +218,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	}
 
 #if 0
-	our_mmr = yojimbo_time()*2.5f-20.0f;
+	our_mmr = augs::steady_secs()*2.5f-20.0f;
 #endif
 
 	if (refresh_in_progress() && !refreshed_once) {
@@ -231,7 +227,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	}
 
 	if (refresh_in_progress()) {
-		const auto secs = yojimbo_time();
+		const auto secs = augs::steady_secs();
 
 		const auto num_dots = uint64_t(secs * 3) % 3 + 1;
 		const auto loading_dots = std::string(num_dots, '.');
@@ -476,7 +472,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 					ImGui::SameLine();
 				}
 
-				const auto alpha_sin = (std::sin(yojimbo_time()*2) + 1) / 2;
+				const auto alpha_sin = (std::sin(augs::steady_secs()*2) + 1) / 2;
 				auto col_sin = this_rank.name_color;
 				col_sin.a =  alpha_sin*30+20;
 

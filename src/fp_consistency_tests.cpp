@@ -25,19 +25,27 @@ static_assert(std::numeric_limits<real32>::is_iec559);
 #endif
 
 void setup_float_flags() {
+#if PLATFORM_WEB
+	return;
+#else
 #if USE_STREFLOP
 	streflop::fesetround(streflop::FE_TONEAREST);
 	streflop::streflop_init<streflop::Simple>();
 #else
 	std::fesetround(FE_TONEAREST);
 #endif
+#endif
 }
 
 void ensure_float_flags_hold() {
+#if PLATFORM_WEB
+	return;
+#else
 #if USE_STREFLOP
 	ensure_eq(streflop::fegetround(), static_cast<int>(streflop::FE_TONEAREST));
 #else
 	ensure_eq(std::fegetround(), FE_TONEAREST);
+#endif
 #endif
 }
 

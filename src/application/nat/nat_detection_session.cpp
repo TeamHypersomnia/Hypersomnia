@@ -461,10 +461,8 @@ std::string stringize_bytes(const std::vector<std::byte>& bytes) {
 	return bytes_str;
 }
 
-double yojimbo_time();
-
 std::string describe_packet(const netcode_queued_packet& p, const std::optional<int> saved_ttl) {
-	return typesafe_sprintf("[PACKET%x] [%f] %x (%x bytes): %x", p.ttl ? typesafe_sprintf(" TTL = %x (def: %x)", *p.ttl, saved_ttl ? *saved_ttl : -1337) : "", yojimbo_time(), std::string("<") + ToString(p.to) + ">", p.bytes.size(), stringize_bytes(p.bytes));
+	return typesafe_sprintf("[PACKET%x] [%f] %x (%x bytes): %x", p.ttl ? typesafe_sprintf(" TTL = %x (def: %x)", *p.ttl, saved_ttl ? *saved_ttl : -1337) : "", augs::steady_secs(), std::string("<") + ToString(p.to) + ">", p.bytes.size(), stringize_bytes(p.bytes));
 }
 
 void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_sink) {

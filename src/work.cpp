@@ -163,7 +163,10 @@
 
 #include "work_result.h"
 
-void yojimbo_sleep(double time);
+namespace augs {
+	void sleep(double secs);
+}
+
 std::function<void()> ensure_handler;
 
 extern std::mutex log_mutex;
@@ -378,6 +381,7 @@ work_result work(
 		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
 	}
 
+#if BUILD_NETWORKING
 	const auto assigned_teams = 
 		params.assign_teams.empty() ? 
 		server_assigned_teams() :
@@ -390,6 +394,7 @@ work_result work(
 	else {
 		LOG("Assigned teams: %x", assigned_teams.id_to_faction);
 	}
+#endif
 
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
@@ -479,9 +484,11 @@ work_result work(
 		LOG("WARNING! FLOAT CONSISTENCY TESTS HAVE FAILED!");
 	}
 
+#if BUILD_NETWORKING
 	LOG("Initializing network RAII.");
 
 	auto network_raii = augs::network_raii();
+#endif
 
 	if (config.unit_tests.run || params.unit_tests_only) {
 		/* Needed by some unit tests */
@@ -597,6 +604,7 @@ work_result work(
 	network_info network_stats;
 	(void)network_stats;
 	server_network_info server_stats;
+	(void)server_stats;
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
@@ -609,6 +617,7 @@ work_result work(
 
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
+	(void)change_with_save;
 
 #if HEADLESS
 #else
@@ -668,10 +677,14 @@ work_result work(
 
 	auto freetype_library = std::optional<augs::freetype_raii>();
 
+	auto pending_launch = std::optional<activity_type>();
+	(void)pending_launch;
+
 	if (params.type == app_type::GAME_CLIENT) {
 		freetype_library.emplace();
 	}
 
+#if BUILD_NETWORKING
 	if (params.type == app_type::MASTERSERVER) {
 		auto adjusted_config = config;
 		auto& masterserver = adjusted_config.masterserver;
@@ -737,9 +750,6 @@ work_result work(
 
 	recreate_auxiliary_socket();
 
-	auto pending_launch = std::optional<activity_type>();
-	(void)pending_launch;
-
 	auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
 
 	auto nat_detection = std::optional<nat_detection_session>();
@@ -780,6 +790,8 @@ work_result work(
 			stun_provider
 		};
 	};
+
+#endif
 
 	const auto official = std::make_unique<packaged_official_content>(lua);
 
@@ -894,7 +906,7 @@ work_result work(
 						return work_result::SUCCESS;
 					}
 
-					yojimbo_sleep(1.0 / 1000);
+					augs::sleep(1.0 / 1000);
 				}
 			}
 			else {
@@ -902,12 +914,17 @@ work_result work(
 			}
 
 			if (quit_after_sync) {
+				LOG("Quitting after map sync finished.");
 				return work_result::SUCCESS;
+			}
+			else {
+				LOG("Map sync finished.");
 			}
 		}
 	}
 
 	if (params.type == app_type::DEDICATED_SERVER) {
+#if BUILD_NETWORKING
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
 
 		if (config.server.allow_nat_traversal) {
@@ -922,7 +939,7 @@ work_result work(
 							return work_result::SUCCESS;
 						}
 
-						yojimbo_sleep(1.0 / 1000);
+						augs::sleep(1.0 / 1000);
 					}
 				}
 			}
@@ -936,7 +953,6 @@ work_result work(
 		auto start = config.server_start;
 		start.port = bound_port;
 
-#if BUILD_NETWORKING
 		auto server_ptr = std::make_unique<server_setup>(
 			lua,
 			*official,
@@ -1031,14 +1047,16 @@ work_result work(
 
 			server.sleep_until_next_tick();
 		}
-#endif
 
 		if (server.server_restart_requested()) {
 			return work_result::RELAUNCH_DEDICATED_SERVER;
 		}
+#endif
 
+		LOG("Quitting the dedicated server with success.");
 		return work_result::SUCCESS;
 	}
+
 #if HEADLESS
 	LOG("Headless build. Nothing to do.");
 	return work_result::SUCCESS;
@@ -1337,11 +1355,13 @@ work_result work(
 	};
 
 	auto would_abandon_ranked_match = [&]() {
+#if BUILD_NETWORKING
 		if (has_current_setup()) {
 			if (const auto setup = std::get_if<client_setup>(std::addressof(*current_setup))) {
 				return setup->would_abandon_match();
 			}
 		}
+#endif
 
 		return false;
 	};
@@ -1399,8 +1419,13 @@ work_result work(
 		}
 		else {
 			if (has_current_setup()) {
-				if (auto* setup = std::get_if<T>(&*current_setup)) {
-					callback(*setup);
+				/* Test */
+				static_assert(is_one_of_list_v<project_selector_setup, setup_variant>);
+
+				if constexpr(is_one_of_list_v<T, setup_variant>) {
+					if (auto* setup = std::get_if<T>(&*current_setup)) {
+						callback(*setup);
+					}
 				}
 			}
 		}
@@ -1647,6 +1672,7 @@ work_result work(
 
 			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
+#if BUILD_NETWORKING
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
 				*official,
@@ -1657,6 +1683,9 @@ work_result work(
 				bound_port,
 				before_traversal_server_address
 			);
+#else
+			(void)before_traversal_server_address;
+#endif
 		});
 
 		displayed_connecting_server_name.clear();
@@ -1745,10 +1774,10 @@ work_result work(
 						assigned_teams
 					);
 				});
-#endif
 
 				break;
 			}
+#endif
 
 			case activity_type::DEBUGGER:
 				launch_debugger(lua);
@@ -2412,6 +2441,7 @@ work_result work(
 
 						background_setup = std::move(current_setup);
 
+#if BUILD_NETWORKING
 						setup_launcher([&]() {
 							emplace_current_setup(std::in_place_type_t<server_setup>(),
 								lua,
@@ -2427,6 +2457,7 @@ work_result work(
 								assigned_teams
 							);
 						});
+#endif
 					}
 
 					break;
@@ -4713,7 +4744,7 @@ work_result work(
 								std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
 							}
 							case augs::max_fps_type::SLEEP_ZERO:
-								yojimbo_sleep(0);
+								augs::sleep(0);
 								break;
 							case augs::max_fps_type::YIELD:
 								std::this_thread::yield();

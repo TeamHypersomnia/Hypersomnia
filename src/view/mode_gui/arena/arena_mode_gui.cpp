@@ -25,7 +25,9 @@
 #include "game/detail/flavour_presentation.h"
 #include "application/arena/synced_dynamic_vars.h"
 
-double yojimbo_time();
+namespace augs {
+	double steady_secs();
+}
 
 void draw_weapon_flavour_with_attachments(
 	augs::vertex_triangle_buffer& output_buffer,
@@ -1126,7 +1128,7 @@ void arena_gui_state::draw_mode_gui(
 
 			if (match_unfreezes_secs == mode_input.dynamic_vars.ranked.match_unfreezes_in_secs) {
 				const auto& s = typed_mode.get_suspended_players();
-				const auto secs = yojimbo_time();
+				const auto secs = augs::steady_secs();
 
 				const auto num_dots = uint64_t(secs * 3) % 3 + 1;
 				const auto loading_dots = std::string(num_dots, '.');
@@ -1165,7 +1167,7 @@ void arena_gui_state::draw_mode_gui(
 			play_tick_if_soon(c, 5.f, true);
 
 			if (is_ranked_server) {
-				const auto secs = yojimbo_time();
+				const auto secs = augs::steady_secs();
 
 				const auto left_col = rgba::get_bright_wave(secs / 8.f + 0.3f);
 				const auto right_col = rgba::get_bright_wave(secs / 4.f);
@@ -1313,7 +1315,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
 				if (is_ranked_server) {
-					const auto secs = yojimbo_time();
+					const auto secs = augs::steady_secs();
 					const auto right_col = rgba::get_bright_wave(secs / 4.f);
 
 					if (c > 0.f) {

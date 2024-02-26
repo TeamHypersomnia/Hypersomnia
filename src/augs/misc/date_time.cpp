@@ -204,6 +204,12 @@ int64_t augs::date_time::seconds_ago() const {
 	return static_cast<int64_t>(std::difftime(std::time(nullptr), t));
 }
 
+double augs::steady_secs() {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::duration<double>>(now.time_since_epoch());
+    return elapsed.count();
+}
+
 double augs::date_time::secs_since_epoch() {
 	return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
@@ -420,3 +426,23 @@ std::optional<std::string> augs::date_time::format_time_until_weekend_evening(co
 
 	return format_countdown_letters(secs);
 }
+
+#if BUILD_NETWORKING
+/* Reliable yojimbo implementation */
+void yojimbo_sleep(double);
+
+namespace augs {
+	void sleep(double secs) {
+		yojimbo_sleep(secs);
+	}
+}
+#else
+#include <thread>
+
+namespace augs {
+	void sleep(double secs) {
+		std::this_thread::sleep_for(std::chrono::duration<double>(secs));
+	}
+}
+#endif
+

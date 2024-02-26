@@ -1,9 +1,38 @@
+#include "augs/string/typesafe_sscanf.h"
+
+bool is_more_recent(const std::string& next_version, const std::string& current_version) {
+	int major_a = 0;
+	int minor_a = 0;
+	int revision_a = 0;
+	int major_b = 0;
+	int minor_b = 0;
+	int revision_b = 0;
+
+	const auto format = "%x.%x.%x";
+
+	if (
+		typesafe_sscanf(   next_version, format, major_a, minor_a, revision_a)
+		&& typesafe_sscanf(current_version, format, major_b, minor_b, revision_b)
+
+	) {
+		if (major_a != major_b) {
+			return major_a > major_b;
+		}
+		if (minor_a != minor_b) {
+			return minor_a > minor_b;
+		}
+		if (revision_a != revision_b) {
+			return revision_a > revision_b;
+		}
+	}
+
+	return false;
+}
 
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
 
 #include "augs/math/vec2.h"
-#include "augs/string/typesafe_sscanf.h"
 #include "augs/string/typesafe_sprintf.h"
 
 template <typename... A>
@@ -21,9 +50,7 @@ int test_scanf(
 	);
 }
 
-bool is_more_recent(const std::string& next_version, const std::string& current_version);
-
-TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
+TEST_CASE("IsMoreRecent", "IsMoreRecentSeveralTests") {
 	REQUIRE(!is_more_recent("", ""));
 	REQUIRE(!is_more_recent("0.", ""));
 	REQUIRE(!is_more_recent("", "0."));
@@ -37,6 +64,9 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	REQUIRE(!is_more_recent("2.0.0", "3.0.0"));
 	REQUIRE(!is_more_recent("2.999.43", "3.0.0"));
 	REQUIRE(is_more_recent("3.0.0", "2.999.43"));
+}
+
+TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 
 	{
 		const auto format = "%x";

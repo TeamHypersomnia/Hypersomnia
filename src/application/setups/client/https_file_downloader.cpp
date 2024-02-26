@@ -6,7 +6,9 @@
 
 std::string to_forward_slashes(std::string in_str);
 
-double yojimbo_time();
+namespace augs {
+	double steady_secs();
+}
 
 https_file_downloader::https_file_downloader(
 	const parsed_url& parent_folder_url
@@ -113,11 +115,11 @@ bool https_file_downloader::is_running() {
 }
 
 BandwidthMonitor::BandwidthMonitor() : total_bytes_(0), average_speed_(0.0) {
-    last_time_ = yojimbo_time();
+    last_time_ = augs::steady_secs();
 }
 
 void BandwidthMonitor::newDataReceived(std::size_t bytes) {
-    double current_time = yojimbo_time();
+    double current_time = augs::steady_secs();
 
     // Add the new data
     data_.push_back({bytes, current_time});

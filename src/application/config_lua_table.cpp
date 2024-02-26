@@ -8,6 +8,10 @@
 #include "application/config_lua_table.h"
 #include "application/nat/stun_server_provider.h"
 
+namespace augs {
+	double steady_secs();
+}
+
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
 	load(lua, config_lua_path);
 }
@@ -80,8 +84,6 @@ void stun_server_provider::load(const augs::path_type& list_file) {
 	usage_timestamps.resize(servers.size(), net_time_t(-1));
 }
 
-double yojimbo_time();
-
 host_with_default_port stun_server_provider::get_next() {
 	if (servers.empty()) {
 		return {};
@@ -92,7 +94,7 @@ host_with_default_port stun_server_provider::get_next() {
 
 	const auto current_server_i = current_stun_server % servers.size();
 
-	usage_timestamps[current_server_i] = yojimbo_time();
+	usage_timestamps[current_server_i] = augs::steady_secs();
 	result.address = servers[current_server_i];
 
 	++current_stun_server;
@@ -122,6 +124,6 @@ double stun_server_provider::seconds_to_wait_for_next(const double usage_cooldow
 		return 0.0;
 	}
 
-	const auto passed = yojimbo_time() - ts;
+	const auto passed = augs::steady_secs() - ts;
 	return usage_cooldown_secs - passed;
 }

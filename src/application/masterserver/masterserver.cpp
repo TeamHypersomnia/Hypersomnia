@@ -89,9 +89,6 @@ bool host_equal(const netcode_address_t& a, const netcode_address_t& b) {
 	return 1 == netcode_address_equal(&aa, &bb);
 }
 
-double yojimbo_time();
-void yojimbo_sleep(double);
-
 void perform_masterserver(const config_lua_table& cfg) try {
 	using namespace httplib;
 
@@ -691,7 +688,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			reserialize_list();
 		}
 
-		yojimbo_sleep(settings.sleep_ms / 1000);
+		augs::sleep(settings.sleep_ms / 1000);
 	}
 
 	LOG("Stopping the HTTP masterserver.");

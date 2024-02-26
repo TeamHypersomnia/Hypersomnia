@@ -53,4 +53,7 @@ namespace augs {
 	private:
 		std::string how_long_ago(bool tell_seconds) const;
 	};
+
+	double steady_secs();
+	void sleep(double);
 }

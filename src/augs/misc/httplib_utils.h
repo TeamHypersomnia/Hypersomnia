@@ -16,7 +16,18 @@ namespace httplib_utils {
 	inline auto make_client(const std::string& scheme_host_port, const int io_timeout = 5) {
 		const auto ca_path = CA_CERT_PATH;
 
+#if BUILD_OPENSSL
 		auto http_client_ptr = std::make_unique<http_client_type>(scheme_host_port.c_str());
+#else
+		auto addr =  scheme_host_port;
+
+		if (begins_with(addr, "https")) {
+			cut_preffix(addr, "https");
+			addr = "http" + addr;
+		}
+
+		auto http_client_ptr = std::make_unique<http_client_type>(addr.c_str());
+#endif
 		auto& http_client = *http_client_ptr;
 
 #if BUILD_OPENSSL

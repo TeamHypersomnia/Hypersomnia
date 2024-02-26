@@ -13,7 +13,9 @@
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 
-double yojimbo_time();
+namespace augs {
+	double steady_secs();
+}
 
 template <class Enum>
 class option_button : public menu_rect_node<Enum> {
@@ -113,7 +115,7 @@ public:
 		auto color = this_id->colorize;
 		auto secondary_color = color;
 
-		auto secs = yojimbo_time() / 4.0f;
+		auto secs = augs::steady_secs() / 4.0f;
 
 		const auto& detector = this_id->detector;
 

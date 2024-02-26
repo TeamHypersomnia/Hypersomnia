@@ -2863,7 +2863,7 @@ void server_setup::sleep_until_next_tick() {
 	const auto to_sleep_ms = sleep_dt * sleep_mult;
 
 	if (sleep_dt > 0.0) {
-		yojimbo_sleep(to_sleep_ms);
+		augs::sleep(to_sleep_ms);
 	}
 }
 

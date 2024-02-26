@@ -98,24 +98,30 @@ endif()
 # Then, try to work from there.
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
 
+option(BUILD_FOR_WEB "Build web version." OFF)
+
+if (BUILD_FOR_WEB)
+	set(HYPERSOMNIA_BARE ON) # Temporary
+endif()
+
+set(DEFAULT_OPT ON)
+set(DEFAULT_NET_OPT ON)
+set(HAS_HEAD YES)
+
 if (HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
 	
 	set(DEFAULT_OPT OFF)
 	set(DEFAULT_NET_OPT OFF)
-else()
-	set(DEFAULT_OPT ON)
-	set(DEFAULT_NET_OPT ON)
+
+	set(HEADLESS ON)
 endif()
 
 if (HEADLESS)
 	message("Building a minimal executable required to run a dedicated server or a masterserver.")
 
-	set(DEFAULT_OPT OFF)
-	set(DEFAULT_NET_OPT ON)
 	set(HAS_HEAD OFF)
-else()
-	set(HAS_HEAD YES)
+	set(DEFAULT_OPT OFF)
 endif()
 
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
@@ -154,7 +160,7 @@ option(LINK_STEAM_INTEGRATION "Link against libsteam_integration.so/dll. This al
 ## This is only a convenience developer option.
 option(DEVELOP_STEAM_INTEGRATION "Enable this ONLY if you're developing integration with Steamworks. This will call add_subdirectory for libsteam_integration.so with -DBUILD_STEAM=1. This will also create steam_appid.txt next to the executable, preventing it from restarting through Steam." OFF)
 
-if (HEADLESS)
+if (HEADLESS OR BUILD_FOR_WEB)
 	set(LINK_STEAM_INTEGRATION OFF)
 	set(DEVELOP_STEAM_INTEGRATION OFF)
 endif()
@@ -170,8 +176,8 @@ option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there 
 
 ## Switches for functionality originating from the Hypersomnia codebase.
 
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_NET_OPT})
-option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
+option(BUILD_TEST_SCENES "Build built-in official content (legacy flag - should always be on)" ON)
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
@@ -469,6 +475,10 @@ if(BUILD_NETWORKING)
 		"src/application/setups/server/server_setup.cpp"
 		"src/application/network/network_adapters.cpp"
 		"src/augs/network/network_types.cpp"
+		"src/application/masterserver/masterserver.cpp"
+		"src/application/nat/nat_detection_session.cpp"
+		"src/application/nat/nat_traversal_session.cpp"
+		"src/application/setups/server/server_nat_traversal.cpp"
 	)
 
 	if(HAS_HEAD)
@@ -792,10 +802,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/fp_consistency_tests.cpp"
 	"src/game/inferred_caches/organism_cache.cpp"
 	"src/augs/window_framework/create_process.cpp"
-	"src/application/masterserver/masterserver.cpp"
-	"src/application/nat/nat_detection_session.cpp"
-	"src/application/nat/nat_traversal_session.cpp"
-	"src/application/setups/server/server_nat_traversal.cpp"
 	"src/application/setups/client/arena_downloading_session.cpp"
 	"src/application/setups/client/https_file_downloader.cpp"
 )
@@ -1339,6 +1345,10 @@ elseif(UNIX)
 	else()
 		add_definitions(-DPLATFORM_LINUX=1)
 	endif()
+endif()
+
+if(BUILD_FOR_WEB)
+	add_definitions(-DPLATFORM_WEB=1)
 endif()
 
 add_definitions(-DYOJIMBO_WITH_MBEDTLS=0)

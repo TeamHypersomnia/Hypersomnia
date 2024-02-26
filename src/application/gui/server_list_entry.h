@@ -8,7 +8,9 @@ enum class server_entry_state {
 	PING_MEASURED
 };
 
-double yojimbo_time();
+namespace augs {
+	double steady_secs();
+}
 
 struct ping_progress {
 	uint32_t ping = -1;
@@ -39,7 +41,7 @@ struct ping_progress {
 		}
 
 		if (state == server_entry_state::AWAITING_RESPONSE) {
-			const auto current_time = yojimbo_time();
+			const auto current_time = augs::steady_secs();
 
 			const auto num_dots = uint64_t(current_time * 3) % 3 + 1;
 

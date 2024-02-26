@@ -20,12 +20,10 @@ using traversal_step = masterserver_in::nat_traversal_step;
 std::string nat_traversal_state_to_string(const nat_traversal_session::state state);
 std::string nat_type_to_string(const nat_type type);
 
-double yojimbo_time();
-
 nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, stun_server_provider& stun_provider) : 
 	input(input), 
 	session_guid(augs::date_time().secs_since_epoch()),
-	when_began(yojimbo_time()),
+	when_began(augs::steady_secs()),
 	chosen_masterserver_port_probe(stun_provider.get_next_port_probe(input.detection_settings.port_probing).default_port)
 {
 	log_info("---- BEGIN NAT TRAVERSAL ----");
@@ -339,7 +337,7 @@ stun_session::stun_session(
 	log_function log_info
 ) : 
 	future_stun_host(async_resolve_address(host)), 
-	when_began(yojimbo_time()),
+	when_began(augs::steady_secs()),
 	log_info(log_info),
 	host(host)
 {
@@ -367,7 +365,7 @@ std::optional<netcode_queued_packet> stun_session::advance(const double request_
 
 	if (stun_host.has_value()) {
 		if (try_fire_interval(request_interval_secs, when_generated_last_packet)) {
-			when_sent_first_request = yojimbo_time();
+			when_sent_first_request = augs::steady_secs();
 			return netcode_queued_packet { *stun_host, augs::to_bytes(source_request) };
 		}
 	}
@@ -395,7 +393,7 @@ stun_session::state stun_session::get_current_state() const {
 
 bool stun_session::has_timed_out(const double timeout_secs) const { 
 	if (get_current_state() == stun_session::state::SENDING_REQUEST_PACKETS) {
-		return yojimbo_time() - when_began >= timeout_secs;
+		return augs::steady_secs() - when_began >= timeout_secs;
 	}
 
 	return false;
@@ -411,7 +409,7 @@ bool stun_session::handle_packet(const std::byte* const packet_buffer, const int
 			log_info(typesafe_sprintf("received STUN response: <%x> -> <%x>", ::ToString(*stun_host), ::ToString(*translated)));
 		}
 
-		when_completed = yojimbo_time();
+		when_completed = augs::steady_secs();
 		external_address = *translated;
 
 		return true;

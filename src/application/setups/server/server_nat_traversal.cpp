@@ -11,7 +11,9 @@
 #include "application/masterserver/masterserver.h"
 #include "application/nat/stun_server_provider.h"
 
-double yojimbo_time();
+namespace augs {
+	double steady_secs();
+}
 
 server_nat_traversal::server_nat_traversal(
 	const server_nat_traversal_input& input,
@@ -298,7 +300,7 @@ bool server_nat_traversal::handle_auxiliary_command(
 }
 
 server_nat_traversal::session::session() 
-	: when_appeared(yojimbo_time()) 
+	: when_appeared(augs::steady_secs()) 
 {}
 
 void server_nat_traversal::session::open_holes(

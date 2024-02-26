@@ -20,35 +20,6 @@ hypersomnia_version::hypersomnia_version() :
 {
 }
 
-bool is_more_recent(const std::string& next_version, const std::string& current_version) {
-	int major_a = 0;
-	int minor_a = 0;
-	int revision_a = 0;
-	int major_b = 0;
-	int minor_b = 0;
-	int revision_b = 0;
-
-	const auto format = "%x.%x.%x";
-
-	if (
-		   typesafe_sscanf(   next_version, format, major_a, minor_a, revision_a)
-		&& typesafe_sscanf(current_version, format, major_b, minor_b, revision_b)
-	
-	) {
-		if (major_a != major_b) {
-			return major_a > major_b;
-		}
-		if (minor_a != minor_b) {
-			return minor_a > minor_b;
-		}
-		if (revision_a != revision_b) {
-			return revision_a > revision_b;
-		}
-	}
-
-	return false;
-}
-
 std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
 		"Hypersomnia version %x\n"
