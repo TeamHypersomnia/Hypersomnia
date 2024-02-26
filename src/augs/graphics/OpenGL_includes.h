@@ -4,7 +4,9 @@
 #if BUILD_OPENGL
 #include <glad/glad.h>
 
-#if USE_GLFW
+#if USE_SDL2
+#include <SDL2/SDL.h>
+#elif USE_GLFW
 #include <GLFW/glfw3.h>
 #elif PLATFORM_WINDOWS
 #include <GL/GL.h>

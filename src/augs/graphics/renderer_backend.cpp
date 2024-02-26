@@ -56,15 +56,18 @@ namespace augs {
 		renderer_backend::renderer_backend() : platform(std::make_unique<renderer_backend::platform_data>()) {
 			augs::window::get_current().check_current_context();
 
+#if BUILD_OPENGL
+
 			const char* fname = "gladLoadGL";
-#if USE_GLFW 
+#if USE_GLFW || USE_SDL2
 			fname = "gladLoadGLLoader";
 #endif
 
-#if BUILD_OPENGL
 			LOG("Calling %x.", fname);
 
-#if USE_GLFW 
+#if USE_SDL2 
+			if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+#elif USE_GLFW 
 			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 #else
 			if (!gladLoadGL()) {
@@ -72,10 +75,13 @@ namespace augs {
 				LOG("Calling %x failed.", fname);
 				throw renderer_error("Failed to initialize GLAD!"); 		
 			}
-#endif
+
 			GL_CHECK(LOG("GL Version: %x", glGetString(GL_VERSION)));
 
 			LOG("Calling %x succeeded.", fname);
+#else
+			LOG("OpenGL was not built. Nothing to init in the renderer backend.");
+#endif
 
 			augs::window::get_current().check_current_context();
 

@@ -1,13 +1,12 @@
-#include <queue>
 #include <GLFW/glfw3.h>
-#include "augs/misc/scope_guard.h"
+
+#include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
-#include "augs/window_framework/translate_glfw_enums.h"
 #include "augs/log.h"
-#include "augs/window_framework/shell.h"
 #include "augs/filesystem/file.h"
-#include "augs/window_framework/platform_utils.h"
-#include "all_paths.h"
+
+augs::event::keys::key translate_glfw_key(int);
+augs::event::keys::key translate_glfw_mouse_key(int);
 
 struct unhandled_key {
 	int key, scancode, action, mods;
@@ -132,6 +131,7 @@ namespace augs {
 
 		glfwWindowHint(GLFW_SAMPLES, 0);
 		glfwWindowHint(GLFW_DEPTH_BITS, 0);
+		glfwWindowHint(GLFW_STENCIL_BITS, 8);
 		glfwWindowHint(GLFW_DECORATED, settings.border);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -343,7 +343,7 @@ namespace augs {
 
 	void window::set_window_rect(const xywhi r) {
 		auto& window = platform->window;
-					LOG("SETTING WINDOW RECT: %x", r);
+		LOG("SETTING WINDOW RECT: %x", r);
 
 		glfwSetWindowPos(window, r.x, r.y);
 		glfwSetWindowSize(window, r.w, r.h);
@@ -466,4 +466,4 @@ namespace augs {
 	}
 }
 
-
+#include "augs/window_framework/translate_glfw_enums.hpp"

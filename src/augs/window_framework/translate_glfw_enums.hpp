@@ -1,6 +1,4 @@
-#if BUILD_WINDOW_FRAMEWORK && USE_GLFW
 #include <GLFW/glfw3.h>
-#include "augs/window_framework/translate_glfw_enums.h"
 
 using namespace augs::event;
 using namespace augs::event::keys;
@@ -147,4 +145,3 @@ key translate_glfw_key(const int m) {
 	default: return key::INVALID;
 	}
 }
-#endif

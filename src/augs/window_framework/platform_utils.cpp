@@ -14,8 +14,6 @@ namespace augs {
 #if BUILD_WINDOW_FRAMEWORK
 
 #if USE_GLFW
-#include <GLFW/glfw3.h>
-
 namespace augs {
 	bool set_display(const vec2i, const int) {
 		return true;

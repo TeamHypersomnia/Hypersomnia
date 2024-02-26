@@ -1,10 +1,7 @@
-#if BUILD_WINDOW_FRAMEWORK
 #define XK_MISCELLANY
 #define XK_LATIN1
 #define XK_3270
 #include <X11/keysymdef.h>
-
-#include "augs/window_framework/translate_x_enums.h"
 
 using namespace augs::event;
 using namespace augs::event::keys;
@@ -156,4 +153,3 @@ key translate_keysym(const xcb_keysym_t m) {
 	default:												return key::INVALID;
 	}
 }
-#endif

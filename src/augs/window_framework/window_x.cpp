@@ -28,6 +28,9 @@
 #include "augs/window_framework/detail_xinput.h"
 #include "all_paths.h"
 
+typedef uint32_t xcb_keysym_t; 
+augs::event::keys::key translate_keysym(const xcb_keysym_t);
+
 int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
 
 template <class T>
@@ -998,3 +1001,5 @@ namespace augs {
 	}
 }
 
+
+#include "augs/window_framework/translate_x_enums.hpp"

@@ -59,7 +59,7 @@ namespace augs {
 		friend glfw_callbacks;
 #endif
 
-#if PLATFORM_WINDOWS || USE_GLFW
+#if PLATFORM_WINDOWS || USE_GLFW || USE_SDL2
 	public:
 		struct platform_data;
 	private:

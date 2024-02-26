@@ -1,3 +1,4 @@
+#include "augs/misc/scope_guard.h"
 #include <Windows.h>
 #include <shlobj.h>
 #undef min

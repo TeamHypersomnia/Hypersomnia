@@ -853,17 +853,21 @@ if(BUILD_WINDOW_FRAMEWORK)
 		"src/augs/window_framework/window_explorer_utils.cpp"
 	)
 
-	if(USE_GLFW)
+	if(USE_SDL2)
+		message("Using SDL as the window framework.")
+
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/augs/window_framework/window_sdl2.cpp"
+		)
+	elseif(USE_GLFW)
 		message("Using GLFW as the window framework.")
 
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_glfw.cpp"
-			"src/augs/window_framework/translate_glfw_enums.cpp"
 		)
 	elseif(UNIX)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_x.cpp"
-			"src/augs/window_framework/translate_x_enums.cpp"
 			"src/augs/window_framework/print_x_devices.cpp"
 		)
 	endif()
@@ -1625,6 +1629,10 @@ if(BUILD_WINDOW_FRAMEWORK)
 	add_definitions(-DBUILD_WINDOW_FRAMEWORK=1)
 endif()
 
+if(USE_SDL2)
+	add_definitions(-DUSE_SDL2=1)
+endif()
+
 if(USE_GLFW)
 	add_definitions(-DUSE_GLFW=1)
 endif()
@@ -1796,7 +1804,18 @@ if(BUILD_OPENGL)
 endif()
 
 if(BUILD_WINDOW_FRAMEWORK)
-	if(USE_GLFW)
+	if(USE_SDL2)
+		# Find the SDL2 package
+		find_package(SDL2 REQUIRED)
+
+		# Include the SDL2 directories
+		include_directories(${SDL2_INCLUDE_DIRS})
+
+		# Link against the SDL2 libraries
+		list(APPEND HYPERSOMNIA_LIBS ${SDL2_LIBRARIES})
+
+		message("Found SDL2 library: ${SDL2_LIBRARIES}")
+	elseif(USE_GLFW)
 		message("Linking GLFW statically.")
 
 		prefer_static_libraries()

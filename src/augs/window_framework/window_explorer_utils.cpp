@@ -3,6 +3,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/log.h"
 #include "augs/window_framework/shell.h"
+#include "augs/window_framework/platform_utils.h"
 
 #if PLATFORM_WINDOWS
 #include "augs/window_framework/explorer_utils_winapi.hpp"
