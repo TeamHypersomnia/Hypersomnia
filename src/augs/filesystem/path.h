@@ -105,7 +105,7 @@ namespace augs {
 
 }
 
-#if !PLATFORM_WINDOWS
+#if !PLATFORM_WEB && !PLATFORM_WINDOWS
 namespace std {
 	template <>
 	struct hash<augs::path_type> {

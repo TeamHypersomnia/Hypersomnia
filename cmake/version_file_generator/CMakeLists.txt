@@ -19,6 +19,8 @@ endif()
 
 if(CLANG)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+	message("Clang full version string: ${clang_full_version_string}")
+
 	string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
 
 	message("Clang version: ${CLANG_VERSION_STRING}")

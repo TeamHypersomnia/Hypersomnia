@@ -76,6 +76,10 @@ SET(cxxflags "-DLIBM_COMPILING_FLT32 -Wno-unused-parameter -I\"${CMAKE_CURRENT_S
 
 if (CLANG OR GCC)
 	SET(cxxflags "${cxxflags} -fno-strict-aliasing -msse -msse2")
+
+	if (BUILD_FOR_WEB)
+		SET(cxxflags "${cxxflags} -msimd128")
+	endif()
 endif()
 
 SET_SOURCE_FILES_PROPERTIES(${libm_flt32_source} PROPERTIES COMPILE_FLAGS "${cxxflags}")

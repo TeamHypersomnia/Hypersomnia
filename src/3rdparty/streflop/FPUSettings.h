@@ -136,6 +136,11 @@ enum FPU_RoundMode {
 #define STREFLOP_FLDCW(cw) do { short tmp = (cw); __asm { fclex }; __asm { fldcw tmp }; } while (0)
 #define STREFLOP_STMXCSR(cw) do { int tmp; __asm { stmxcsr tmp }; (cw) = tmp; } while (0)
 #define STREFLOP_LDMXCSR(cw) do { int tmp = (cw); __asm { ldmxcsr tmp }; } while (0)
+#elif PLATFORM_WEB
+#define STREFLOP_FSTCW(cw) (cw=0);
+#define STREFLOP_FLDCW(cw) ((void)cw);
+#define STREFLOP_STMXCSR(cw) (cw=0);
+#define STREFLOP_LDMXCSR(cw) ((void)cw);
 #else
 #define STREFLOP_FSTCW(cw) do { asm volatile ("fstcw %0" : "=m" (cw) : ); } while (0)
 #define STREFLOP_FLDCW(cw) do { asm volatile ("fclex \n fldcw %0" : : "m" (cw)); } while (0)

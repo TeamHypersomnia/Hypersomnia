@@ -42,6 +42,8 @@ endif()
 
 if(CLANG)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+	message("Clang full version string: ${clang_full_version_string}")
+
 	string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
 
 	message("Clang version: ${CLANG_VERSION_STRING}")
@@ -73,6 +75,9 @@ if(UNIX)
 		message("Building for x86 architecture.")
 	elseif(${ARCHITECTURE} STREQUAL "x64")
 		message("Building for x64 architecture.")
+	elseif(${ARCHITECTURE} STREQUAL "Web")
+		message("Building for Web.")
+		set(BUILD_FOR_WEB ON)
 	else()
 		message(FATAL_ERROR "Unknown architecture: ${ARCHITECTURE}")
 	endif()
@@ -90,6 +95,21 @@ else()
 	set(XCLANG_STR "")
 endif()
 
+if(BUILD_FOR_WEB)
+	# We're pre-building the tools
+
+    if(NOT INTROSPECTOR_GENERATOR_PATH)
+        message(FATAL_ERROR "INTROSPECTOR_GENERATOR_PATH not set for WebAssembly build")
+    endif()
+
+    if(NOT VERSION_FILE_GENERATOR_PATH)
+        message(FATAL_ERROR "VERSION_FILE_GENERATOR_PATH not set for WebAssembly build")
+    endif()
+else()
+    set(INTROSPECTOR_GENERATOR_PATH Introspector-generator)
+    set(VERSION_FILE_GENERATOR_PATH version_file_generator)
+endif()
+
 ##################################################
 ### ALL CUSTOMIZABLE BUILD SWITCHES BEGIN HERE ###
 
@@ -97,8 +117,6 @@ endif()
 # you might want to try turning HYPERSOMNIA_BARE on to build the minimal possible working Hypersomnia runtime.
 # Then, try to work from there.
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
-
-option(BUILD_FOR_WEB "Build web version." OFF)
 
 if (BUILD_FOR_WEB)
 	set(HYPERSOMNIA_BARE ON) # Temporary
@@ -163,6 +181,10 @@ option(DEVELOP_STEAM_INTEGRATION "Enable this ONLY if you're developing integrat
 if (HEADLESS OR BUILD_FOR_WEB)
 	set(LINK_STEAM_INTEGRATION OFF)
 	set(DEVELOP_STEAM_INTEGRATION OFF)
+endif()
+
+if (BUILD_FOR_WEB)
+	set(USE_SDL2 ON)
 endif()
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
@@ -978,7 +1000,9 @@ set(GENERATED_INTROSPECTORS_HEADER "${GENERATED_SOURCES_PATH}/introspectors.h")
 
 # We build the generator of type information required for introspection.
 
-add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
+if (NOT BUILD_FOR_WEB)
+	add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
+endif()
 
 # We prepare a correct input configuration file for Introspector-generator.
 
@@ -1012,7 +1036,7 @@ configure_file(
 
 add_custom_command(
 	OUTPUT ${GENERATED_INTROSPECTORS_HEADER}
-	COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
+	COMMAND ${INTROSPECTOR_GENERATOR_PATH} ${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
 	COMMENT "Generating type information for introspection..."
 	DEPENDS ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
 )
@@ -1040,11 +1064,13 @@ if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
 endif()
 
 if(BUILD_VERSION_FILE_GENERATOR)
-	add_subdirectory("${CMAKE_MODULE_PATH}/version_file_generator")
+	if (NOT BUILD_FOR_WEB)
+		add_subdirectory("${CMAKE_MODULE_PATH}/version_file_generator")
+	endif()
 
 	add_custom_command(
 		OUTPUT ${HYPERSOMNIA_VERSION_FILE_CPP}
-		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
+		COMMAND ${VERSION_FILE_GENERATOR_PATH} ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
 		COMMENT "Generating version files..."
 	)
 else()
@@ -1918,7 +1944,9 @@ elseif(CLANG)
 
 			prefer_shared_libraries()
 		else()
-			if (CLANG_VERSION_STRING VERSION_LESS 9.0)
+			if (BUILD_FOR_WEB)
+				message("Omitting c++fs.")
+			elseif (CLANG_VERSION_STRING VERSION_LESS 9.0)
 				message("Appending c++fs.")
 				list(APPEND HYPERSOMNIA_LIBS c++fs)
 			else()

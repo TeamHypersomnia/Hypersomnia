@@ -51,7 +51,38 @@ cd $TARGET_DIR
 export CC=$C_COMPILER
 export CXX=$CXX_COMPILER
 
-cmake -DARCHITECTURE=$ARCHITECTURE -DCMAKE_BUILD_TYPE=$CONFIGURATION $ADDITIONAL_FLAGS $@ $OLDPWD -G Ninja
+if [[ "$ARCHITECTURE" = "Web" ]]
+then
+	echo "Building for Web. Pre-building version and introspector generators."
+
+	mkdir prebuilt-version
+	mkdir prebuilt-introspector
+
+	SRCPWD=$OLDPWD
+	echo "SRCPWD: $SRCPWD"
+
+	pushd prebuilt-version
+		cmake -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/version_file_generator -G Ninja
+		ninja
+		VERSION_FILE_GENERATOR_PATH=$(pwd)/version_file_generator
+	popd
+
+	pushd prebuilt-introspector
+		cmake -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/Introspector-generator -G Ninja
+		ninja
+		INTROSPECTOR_GENERATOR_PATH=$(pwd)/Introspector-generator
+	popd
+
+	echo "Calling emconfigure. Building with emscripten."
+
+	emcmake cmake -DARCHITECTURE=$ARCHITECTURE \
+		-DCMAKE_BUILD_TYPE=$CONFIGURATION \
+		-DVERSION_FILE_GENERATOR_PATH=$VERSION_FILE_GENERATOR_PATH \
+		-DINTROSPECTOR_GENERATOR_PATH=$INTROSPECTOR_GENERATOR_PATH \
+		$ADDITIONAL_FLAGS $@ $SRCPWD -G Ninja
+else
+	cmake -DARCHITECTURE=$ARCHITECTURE -DCMAKE_BUILD_TYPE=$CONFIGURATION $ADDITIONAL_FLAGS $@ $OLDPWD -G Ninja
+fi
 
 pushd ../
 	# For simplicity of subsequent scripts, create a symlink to the last created build
