@@ -60,18 +60,14 @@ namespace augs {
 #endif
 
 #if PLATFORM_WINDOWS || USE_GLFW
+	public:
 		struct platform_data;
+	private:
 		std::unique_ptr<platform_data> platform;
 
 		local_entropy wndproc_queue;
 
 		void show();
-
-#if DECLARE_FRIEND_WNDPROC
-	public:
-		void handle_wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-	private:
-#endif
 
 		template <class H, class U, class W, class L>
 		std::optional<event::change> handle_event(

@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- dont kick spectators during ranked
-- disable enemy highlight when dead
 - we'll have to update to the latest version of yojimbo at some point
 
 - optimize de_rambo

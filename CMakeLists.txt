@@ -849,6 +849,10 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 # Conditional inclusion of source files happens here.
 
 if(BUILD_WINDOW_FRAMEWORK)
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"src/augs/window_framework/window_explorer_utils.cpp"
+	)
+
 	if(USE_GLFW)
 		message("Using GLFW as the window framework.")
 

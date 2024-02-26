@@ -6880,3 +6880,5 @@ This will discard your redo history."
 - test over 192.168.0.1
 - show enemy silhouettes in spectator
 
+- dont kick spectators during ranked
+- disable enemy highlight when dead
