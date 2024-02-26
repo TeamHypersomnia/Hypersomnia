@@ -21,7 +21,6 @@
 #include "augs/filesystem/file.h"
 
 #include "augs/window_framework/print_x_devices.h"
-#include "augs/window_framework/translate_x_enums.h"
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
 

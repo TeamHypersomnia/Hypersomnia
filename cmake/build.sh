@@ -4,6 +4,9 @@ ARCHITECTURE=$2
 C_COMPILER=$CC
 CXX_COMPILER=$CXX
 
+shift
+shift
+
 if [[ ! -z "$C_COMPILER" ]] && [[ -z "$CXX_COMPILER" ]]
 then
 	echo "You must specify both a C and a C++ compiler, or leave both unspecified."
