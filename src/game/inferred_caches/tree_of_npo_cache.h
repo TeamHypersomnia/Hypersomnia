@@ -23,18 +23,6 @@ namespace components {
 
 class cosmos;
 
-union tree_of_npo_node {
-	using payload_type = unversioned_entity_id;
-	static_assert(sizeof(payload_type) <= sizeof(void*));
-
-	payload_type payload;
-	void* bytes;
-
-	tree_of_npo_node() {
-		bytes = nullptr;
-	}
-};
-
 struct tree_of_npo_node_input {		
 	tree_of_npo_type type = tree_of_npo_type::RENDERABLES;
 	ltrb aabb;
@@ -73,10 +61,7 @@ public:
 			F callback;
 
 			bool QueryCallback(const int32 node_id) const {
-				tree_of_npo_node node;
-				node.bytes = tree->GetUserData(node_id);
-				
-				callback(node.payload);
+				callback(tree->GetNode(node_id).payload1);
 				return true;
 			}
 		};
@@ -99,10 +84,7 @@ public:
 			F callback;
 
 			bool QueryCallback(const int32 node_id) const {
-				tree_of_npo_node node;
-				node.bytes = tree->GetUserData(node_id);
-				
-				callback(node.payload);
+				callback(tree->GetNode(node_id).payload1);
 				return true;
 			}
 		};

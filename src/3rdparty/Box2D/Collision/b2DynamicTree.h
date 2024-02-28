@@ -24,6 +24,8 @@
 
 #define b2_nullNode (-1)
 
+#include "game/cosmos/entity_id.h"
+
 /// A node in the dynamic tree. The client does not interact with this directly.
 struct b2TreeNode
 {
@@ -35,7 +37,10 @@ struct b2TreeNode
 	/// Enlarged AABB
 	b2AABB aabb;
 
-	void* userData;
+	union {
+		void* userData;
+		unversioned_entity_id payload1;
+	};
 
 	union
 	{
@@ -82,6 +87,9 @@ public:
 	/// Get proxy user data.
 	/// @return the proxy user data or 0 if the id is invalid.
 	void* GetUserData(int32 proxyId) const;
+
+	b2TreeNode& GetNode(int32 proxyId);
+	const b2TreeNode& GetNode(int32 proxyId) const;
 
 	/// Get the fat AABB for a proxy.
 	const b2AABB& GetFatAABB(int32 proxyId) const;
@@ -162,6 +170,18 @@ private:
 
 	int32 m_insertionCount;
 };
+
+inline b2TreeNode& b2DynamicTree::GetNode(int32 proxyId)
+{
+	b2Assert(0 <= proxyId && proxyId < m_nodeCapacity);
+	return m_nodes[proxyId];
+}
+
+inline const b2TreeNode& b2DynamicTree::GetNode(int32 proxyId) const
+{
+	b2Assert(0 <= proxyId && proxyId < m_nodeCapacity);
+	return m_nodes[proxyId];
+}
 
 inline void* b2DynamicTree::GetUserData(int32 proxyId) const
 {

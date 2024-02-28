@@ -75,10 +75,9 @@ void tree_of_npo_cache::specific_infer_cache_for(const E& handle) {
 			cache.type = data.type;
 			cache.recorded_aabb = new_aabb;
 
-			tree_of_npo_node new_node;
-			new_node.payload = id;
-
-			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
+			auto& tree = get_tree(cache).nodes;
+			cache.tree_proxy_id = tree.CreateProxy(new_b2AABB, nullptr);
+			tree.GetNode(cache.tree_proxy_id).payload1 = id;
 		}
 		else {
 			const vec2 displacement = new_aabb.get_center() - cache.recorded_aabb.get_center();
