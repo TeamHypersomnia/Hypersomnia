@@ -30,7 +30,6 @@ struct cmd_line_params {
 	bool upgraded_successfully = false;
 	bool should_connect = false;
 	bool only_check_update_availability_and_quit = false;
-	bool keep_cwd = false;
 	bool sync_external_arenas = false;
 	bool sync_external_arenas_and_quit = false;
 	std::optional<int> autoupdate_delay;
@@ -84,16 +83,12 @@ struct cmd_line_params {
 				/* MacOS process identifier. Ignore. */
 				continue;
 			}
-			else if (a == "--keep-cwd") {
-				keep_cwd = true;
-			}
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();
 				exe_path = appimage_path;
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
-				keep_cwd = true;
 			}
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
@@ -143,7 +138,6 @@ struct cmd_line_params {
 			}
 			else if (a == "--test-fp-consistency") {
 				test_fp_consistency = std::atoi(get_next());
-				keep_cwd = true;
 			}
 			else if (a == "--nat-punch-port") {
 				first_udp_command_port = std::atoi(get_next());

@@ -86,7 +86,7 @@ namespace augs {
 			const auto arg = std::string(previous_argv[i]);
 
 			if (arg == "--appimage-path") {
-				LOG("Restarting the app as an AppImage. Skipping --keep-cwd and --appimage-path arguments.");
+				LOG("Restarting the app as an AppImage. Skipping --appimage-path argument.");
 				is_appimage = true;
 			}
 		}
@@ -111,10 +111,6 @@ namespace augs {
 				/* 
 					Prevent duplicating the flags given by the AppImage run script. 
 				*/
-
-				if (arg == "--keep-cwd") {
-					continue;
-				}
 
 				if (arg == "--appimage-path") {
 					/* Skip the value as well */

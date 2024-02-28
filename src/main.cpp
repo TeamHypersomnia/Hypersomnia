@@ -124,28 +124,18 @@ int main(const int argc, const char* const * const argv) {
 
 	const bool is_appimage = !params.appimage_path.empty();
 
-#if PLATFORM_UNIX
-	bool change_cwd_to_exe = !params.keep_cwd;
-
-	if (is_appimage) {
-		change_cwd_to_exe = false;
-	}
-#endif
-
 	::CALLING_CWD = augs::get_current_working_directory();
 
 	if (params.calling_cwd.has_value()) {
 		::CALLING_CWD = params.calling_cwd.value();
 	}
 
-#if PLATFORM_UNIX
-	if (change_cwd_to_exe) {
-		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
-			exe_path.replace_filename("");
-			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
-			std::filesystem::current_path(exe_path);
-			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
-		}
+#if PLATFORM_MACOS
+	if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
+		exe_path.replace_filename("");
+		std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+		std::filesystem::current_path(exe_path);
+		std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
 	}
 #endif
 
