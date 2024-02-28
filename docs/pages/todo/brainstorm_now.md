@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- check auto-vectorization if determinism breaks
+- --embed-file
+
 - we'll have to update to the latest version of yojimbo at some point
 
 - optimize de_rambo

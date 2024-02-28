@@ -289,6 +289,11 @@ struct transition
     std::ostream&
     operator<<(std::ostream& os, const transition& t)
     {
+#if PLATFORM_WEB
+		os << "Unsupported in Web.";
+		(void)t;
+		return os;
+#else
         using date::operator<<;
         os << t.timepoint << "Z ";
         if (t.info->offset >= std::chrono::seconds{0})
@@ -300,6 +305,7 @@ struct transition
             os << " standard ";
         os << t.info->abbrev;
         return os;
+#endif
     }
 };
 

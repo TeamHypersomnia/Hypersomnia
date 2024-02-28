@@ -380,6 +380,10 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
 }
 #else
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+#if 0
+	(void)locationId;
+	return -1.0;
+#else
     using namespace std::chrono;
 
     const auto& timeZoneName = getTimeZoneName(locationId);
@@ -409,6 +413,7 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     }
 
     return closestDistance;
+#endif
 }
 
 #endif

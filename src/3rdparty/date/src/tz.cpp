@@ -2730,7 +2730,12 @@ std::ostream&
 operator<<(std::ostream& os, const leap_second& x)
 {
     using namespace date;
+#if PLATFORM_WEB
+	(void)x;
+	return os << "Unsupported in Web.";
+#else
     return os << x.date_ << "  +";
+#endif
 }
 
 #if USE_OS_TZDB

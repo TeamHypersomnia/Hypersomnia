@@ -293,10 +293,9 @@ entity_id requested_equipment::generate_for_impl(
 	}
 
 	for (const auto& it : eq.other_equipment) {
-		auto n = it.first;
 		const auto& f = it.second;
 
-		while (n--) {
+		for (uint32_t i = 0; i < it.first; ++i) {
 			pickup(make_owned_item(f));
 		}
 	}

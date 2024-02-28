@@ -224,6 +224,11 @@ template <class Duration>
 std::string
 nonexistent_local_time::make_msg(local_time<Duration> tp, const local_info& i)
 {
+#if PLATFORM_WEB
+	(void)tp;
+	(void)i;
+	return "nonexistent_local_time";
+#else
     assert(i.result == local_info::nonexistent);
     std::ostringstream os;
     os << tp << " is in a gap between\n"
@@ -234,6 +239,7 @@ nonexistent_local_time::make_msg(local_time<Duration> tp, const local_info& i)
        << " which are both equivalent to\n"
        << i.first.end << " UTC";
     return os.str();
+#endif
 }
 
 class ambiguous_local_time
@@ -261,6 +267,11 @@ template <class Duration>
 std::string
 ambiguous_local_time::make_msg(local_time<Duration> tp, const local_info& i)
 {
+#if PLATFORM_WEB
+	(void)tp;
+	(void)i;
+	return "ambiguous_local_time";
+#else
     assert(i.result == local_info::ambiguous);
     std::ostringstream os;
     os << tp << " is ambiguous.  It could be\n"
@@ -269,6 +280,7 @@ ambiguous_local_time::make_msg(local_time<Duration> tp, const local_info& i)
        << tp << ' ' << i.second.abbrev  << " == "
        << tp - i.second.offset  << " UTC";
     return os.str();
+#endif
 }
 
 class time_zone;

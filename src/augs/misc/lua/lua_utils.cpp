@@ -38,6 +38,7 @@ namespace augs {
 		};
 		
 		const auto utils_path = DETAIL_DIR / "utils.lua";
+		LOG("Calling %x", utils_path);
 		const auto pfr = lua.do_file(utils_path.string());
 
 		if (!pfr.valid()) {
@@ -45,6 +46,8 @@ namespace augs {
 				"Failed to build %x:\n%x", utils_path, pfr.operator std::string()
 			);
 		}
+
+		LOG("Lua state created successfully.");
 
 		return lua;
 	}

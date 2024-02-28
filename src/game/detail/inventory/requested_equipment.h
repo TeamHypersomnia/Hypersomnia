@@ -4,7 +4,7 @@
 #include "game/cosmos/step_declaration.h"
 #include "game/detail/spells/all_spells.h"
 
-using other_equipment_vector = augs::constant_size_vector<augs::simple_pair<int, item_flavour_id>, 10>;
+using other_equipment_vector = augs::constant_size_vector<augs::simple_pair<uint32_t, item_flavour_id>, 10>;
 
 class cosmos;
 

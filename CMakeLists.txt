@@ -1295,12 +1295,43 @@ if(ADD_MCMODEL_LARGE_FLAG)
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large -no-pie")
 endif()
 
+if(BUILD_FOR_WEB)
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mbulk-memory")
+	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -mbulk-memory")
+endif()
+
 if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
 if(LINUX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -unwindlib=libgcc")
+endif()
+
+if(BUILD_FOR_WEB)
+	# Note if USE_NATIVE_EXCEPTIONS is ON,
+	# the CMake targets (tests, run) will fail as the emsdk's nodejs
+	# need --experimental-wasm-eh flag for this to work.
+	# This flag is unnecessary in the latest nodejs.
+
+	set(USE_NATIVE_EXCEPTIONS OFF)
+
+	if (USE_NATIVE_EXCEPTIONS)
+		set(EXCEPTIONS_FLAG "-fwasm-exceptions")
+	else()
+		set(EXCEPTIONS_FLAG "-fexceptions")
+	endif()
+
+	set(ADDITIONAL_WEB_FLAGS "${EXCEPTIONS_FLAG}")
+
+	if(GENERATE_DEBUG_INFORMATION)
+		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -g")
+	endif()
+
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory -s USE_PTHREADS=1 ${ADDITIONAL_WEB_FLAGS}")
+
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
+	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
 endif()
 
 # We configure additional flags for linker.
