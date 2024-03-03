@@ -21,6 +21,7 @@ std::unique_ptr<FT_Library> augs::freetype_raii::freetype_library(std::make_uniq
 namespace augs {
 #if BUILD_FREETYPE
 	freetype_raii::freetype_raii() {
+		LOG("Calling FT_Init_FreeType");
 		const auto success = !FT_Init_FreeType(freetype_library.get()) && "freetype initialization";
 		(void)success;
 		ensure(success);

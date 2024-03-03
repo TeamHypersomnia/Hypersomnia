@@ -243,6 +243,10 @@ else()
 	message("Building without debugger setup.")
 endif()
 
+if (BUILD_FOR_WEB)
+	set(BUILD_FREETYPE ON) # Slowly enabling one by one
+endif()
+
 ## Static allocation switches. Possible values are one or zero.
 
 # If this variable is nonzero, the cosmos will use a statically allocated number
@@ -1332,12 +1336,12 @@ if(BUILD_FOR_WEB)
 		# Ensure we're not stripping any debug information post-link.
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ERROR_ON_WASM_CHANGES_AFTER_LINK")
 
-		# There are some huge functions that can cause us to overflow with debug symbols
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=16MB")
-
 		# We have to, otherwise the i64 legalization will modify the wasm.
 		set(USE_BIGINT ON)
 	endif()
+
+	# There are some huge functions that can cause us to overflow with debug symbols
+	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -s STACK_SIZE=16MB")
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory -s USE_PTHREADS=1 ${ADDITIONAL_WEB_FLAGS}")
 

@@ -673,14 +673,14 @@ work_result work(
 	augs::remove_file(get_crashed_controllably_path());
 	augs::remove_file(get_exit_success_path());
 
-	LOG("Initializing freetype");
-
 	auto freetype_library = std::optional<augs::freetype_raii>();
 
 	auto pending_launch = std::optional<activity_type>();
 	(void)pending_launch;
 
 	if (params.type == app_type::GAME_CLIENT) {
+		LOG("Initializing freetype");
+
 		freetype_library.emplace();
 	}
 
