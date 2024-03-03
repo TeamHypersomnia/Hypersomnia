@@ -5,18 +5,17 @@
 
 #include <cstring>
 
-#if BUILD_SOUND_FORMAT_DECODERS
-#include <ogg/ogg.h>
-#include <vorbis/vorbisfile.h>
-#define OGG_BUFFER_SIZE 4096
-#endif
-
 #include "augs/misc/scope_guard.h"
 #include "augs/audio/sound_data.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"
 #include "augs/build_settings/setting_log_audio_files.h"
+
+
+#if BUILD_SOUND_FORMAT_DECODERS
+#include "stb/stb_vorbis.c"
+#endif
 
 template <class T>
 auto fclosed_unique(T* const ptr) {
@@ -35,37 +34,23 @@ namespace augs {
 		const auto extension = path.extension();
 		const auto path_str = path.string();
 
-		if (extension == ".ogg") {
-			std::vector<char> buffer;
-			// TODO: throw if the file fails to load as OGG
-			// TODO: detect endianess
-			int endian = 0;             // 0 for Little-Endian, 1 for Big-Endian
-			int bitStream = 0xdeadbeef;
-			long bytes = 0xdeadbeef;
-			char array[OGG_BUFFER_SIZE]; 
+        if (extension == ".ogg") {
+            short* decoded_samples = nullptr;
 
-			OggVorbis_File oggFile;
+            // Decode the file
+            int samples_output = stb_vorbis_decode_filename(path_str.c_str(), &channels, &frequency, &decoded_samples);
+            if (samples_output < 0) {
+                // Handle error
+                throw sound_decoding_error("Failed to decode %x as OGG file. STB error code: %x", path, samples_output);
+            }
 
-			if (0 != ov_fopen(path_str.c_str(), &oggFile)) {
-				throw sound_decoding_error("Error! Failed to load %x.", path);
-			}
-			
-			auto scope = scope_guard([&oggFile](){
-				ov_clear(&oggFile);
-			});
+            // Use decoded_samples and samples_output as needed
+            samples.resize(samples_output * channels);
+            std::memcpy(samples.data(), decoded_samples, samples_output * channels * sizeof(short));
 
-			const auto* pInfo = ov_info(&oggFile, -1);
-			channels = pInfo->channels;
-			frequency = pInfo->rate;
-
-			do {
-				bytes = ov_read(&oggFile, array, OGG_BUFFER_SIZE, endian, 2, 1, &bitStream);
-				buffer.insert(buffer.end(), array, array + bytes);
-			} while (bytes > 0);
-
-			samples.resize(buffer.size() / sizeof(sound_sample_type));
-			std::memcpy(samples.data(), buffer.data(), buffer.size());
-		}
+            // Free the decoded_samples buffer
+            free(decoded_samples);
+        }
 		else if (extension == ".wav") {
 #if PLATFORM_UNIX
 			auto wav_file = fclosed_unique(fopen(path_str.c_str(), "rbe"));

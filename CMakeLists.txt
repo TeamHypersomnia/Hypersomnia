@@ -194,7 +194,7 @@ option(BUILD_OPENSSL "Build SSL support. Required for secure automatic applicati
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_NET_OPT})
-option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
+option(BUILD_SOUND_FORMAT_DECODERS "Build stb_vorbis. If this is off, ogg files won't be loaded." ${DEFAULT_OPT})
 
 ## Switches for functionality originating from the Hypersomnia codebase.
 
@@ -245,6 +245,7 @@ endif()
 
 if (BUILD_FOR_WEB)
 	set(BUILD_FREETYPE ON) # Slowly enabling one by one
+	set(BUILD_SOUND_FORMAT_DECODERS ON) # Slowly enabling one by one
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -1529,31 +1530,6 @@ add_library(lua ${LUA_CPPS})
 
 include(add_include_dirs_of)
 
-if(BUILD_SOUND_FORMAT_DECODERS)
-	# We build OGG.
-	
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-	
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(ogg PUBLIC -mcmodel=large -no-pie)
-	endif()
-
-	add_include_dirs_of("ogg")
-	
-	# We build Vorbis. It must know the paths for OGG that we have just built.
-	
-	set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-	set(OGG_LIBRARIES ogg)
-	
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
-	
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(vorbis PUBLIC -mcmodel=large -no-pie)
-	endif()
-
-	add_include_dirs_of("vorbis")
-endif()
-
 if(BUILD_OPENAL)
 	# We build OpenAL Soft. We need to set some variables beforehand.
 	
@@ -1953,10 +1929,6 @@ endif()
 
 if(BUILD_FREETYPE)
 	list(APPEND HYPERSOMNIA_LIBS freetype)
-endif()
-
-if(BUILD_SOUND_FORMAT_DECODERS)
-	list(APPEND HYPERSOMNIA_LIBS vorbisfile)
 endif()
 
 if(DEVELOP_STEAM_INTEGRATION)
