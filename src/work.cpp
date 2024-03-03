@@ -723,7 +723,9 @@ work_result work(
 	auto auxiliary_socket = std::optional<netcode_socket_raii>();
 
 	auto get_bound_local_port = [&]() {
+#if BUILD_NETWORKING
 		return auxiliary_socket ? auxiliary_socket->socket.address.port : 0;
+#endif
 	};
 
 	auto last_requested_local_port = port_type(0);
@@ -1116,6 +1118,7 @@ work_result work(
 
 	auto nat_traversal_details = nat_traversal_details_window();
 
+#if BUILD_NETWORKING
 	auto do_traversal_details_popup = [&](auto& window) {
 		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
 			nat_traversal.reset();
@@ -1146,6 +1149,8 @@ work_result work(
 			pending_launch = std::nullopt;
 		}
 	};
+
+#endif
 
 	LOG("Initializing the audio context.");
 
@@ -1299,6 +1304,7 @@ work_result work(
 	auto find_chosen_server_info = [&]() {
 		return browse_servers_gui.find_entry(config.client_connect);
 	};
+	(void)find_chosen_server_info;
 
 	ingame_menu_gui ingame_menu;
 
@@ -1524,6 +1530,7 @@ work_result work(
 				browse_servers_gui.open();
 			}
 
+#if BUILD_NETWORKING
 			if (auxiliary_socket == std::nullopt) {
 				recreate_auxiliary_socket();
 
@@ -1531,6 +1538,7 @@ work_result work(
 					restart_nat_detection();
 				}
 			}
+#endif
 		}
 	};
 
@@ -1596,6 +1604,7 @@ work_result work(
 		};
 	};
 
+#if BUILD_NETWORKING
 	auto launch_client_setup = [&](
 		const bool ignore_nat_check,
 
@@ -1672,7 +1681,6 @@ work_result work(
 
 			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
-#if BUILD_NETWORKING
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
 				*official,
@@ -1683,9 +1691,6 @@ work_result work(
 				bound_port,
 				before_traversal_server_address
 			);
-#else
-			(void)before_traversal_server_address;
-#endif
 		});
 
 		displayed_connecting_server_name.clear();
@@ -1694,6 +1699,7 @@ work_result work(
 
 		return true;
 	};
+#endif
 
 	auto launch_editor = [&](auto&&... args) {
 		setup_launcher([&]() {
@@ -1848,6 +1854,10 @@ work_result work(
 		save_last_activity(mode);
 	};
 
+	bool client_start_requested = false;
+	bool server_start_requested = false;
+
+#if BUILD_NETWORKING
 	auto finalize_pending_launch = [&](std::optional<netcode_address_t> before_addr = std::nullopt) {
 		if (pending_launch == activity_type::CLIENT) {
 			const bool ignore_nat_check = true;
@@ -1920,9 +1930,7 @@ work_result work(
 			next_nat_traversal_attempt();
 		}
 	};
-
-	bool client_start_requested = false;
-	bool server_start_requested = false;
+#endif
 
 	auto start_client_setup = [&]() {
 		change_with_save(
@@ -1937,30 +1945,6 @@ work_result work(
 		launch_setup(activity_type::CLIENT);
 	};
 
-	auto get_map_catalogue_input = [&]() {
-		return map_catalogue_input {
-			config.server.external_arena_files_provider,
-			streaming.ad_hoc.in_atlas,
-			streaming.necessary_images_in_atlas,
-			window,
-			config.streamer_mode && config.streamer_mode_flags.map_catalogue
-		};
-	};
-
-	auto perform_leaderboards = [&]() {
-		leaderboards_gui.perform({
-			config.client.nickname,
-			steam_id,
-
-			config.main_menu.leaderboards_provider_url,
-			get_general_renderer(),
-			streaming.necessary_images_in_atlas,
-			streaming.avatar_preview_tex,
-
-			menu_ltrb
-		});
-	};
-
 	auto perform_browse_servers = [&]() {
 		browse_servers_gui.allow_ranked_servers = is_steam_client;
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
@@ -1970,25 +1954,7 @@ work_result work(
 		}
 	};
 
-	auto perform_map_catalogue = [&]() {
-		const bool perform_result = map_catalogue_gui.perform(get_map_catalogue_input());
-
-		if (perform_result) {
-			change_with_save(
-				[&](auto& cfg) {
-					cfg.server.external_arena_files_provider = config.server.external_arena_files_provider;
-				}
-			);
-		}
-
-		if (map_catalogue_gui.open_host_server_window.has_value()) {
-			config.server.arena = *map_catalogue_gui.open_host_server_window;
-			start_server_gui.open();
-
-			map_catalogue_gui.open_host_server_window = std::nullopt;
-		}
-	};
-
+#if BUILD_NETWORKING
 	auto perform_start_client_gui = [&](const auto frame_num) {
 		const auto best_server = browse_servers_gui.find_best_server(is_steam_client);
 
@@ -2064,6 +2030,50 @@ work_result work(
 
 				launch_setup(activity_type::CLIENT);
 			}
+		}
+	};
+#endif
+
+	auto get_map_catalogue_input = [&]() {
+		return map_catalogue_input {
+			config.server.external_arena_files_provider,
+			streaming.ad_hoc.in_atlas,
+			streaming.necessary_images_in_atlas,
+			window,
+			config.streamer_mode && config.streamer_mode_flags.map_catalogue
+		};
+	};
+
+	auto perform_leaderboards = [&]() {
+		leaderboards_gui.perform({
+			config.client.nickname,
+			steam_id,
+
+			config.main_menu.leaderboards_provider_url,
+			get_general_renderer(),
+			streaming.necessary_images_in_atlas,
+			streaming.avatar_preview_tex,
+
+			menu_ltrb
+		});
+	};
+
+	auto perform_map_catalogue = [&]() {
+		const bool perform_result = map_catalogue_gui.perform(get_map_catalogue_input());
+
+		if (perform_result) {
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.server.external_arena_files_provider = config.server.external_arena_files_provider;
+				}
+			);
+		}
+
+		if (map_catalogue_gui.open_host_server_window.has_value()) {
+			config.server.arena = *map_catalogue_gui.open_host_server_window;
+			start_server_gui.open();
+
+			map_catalogue_gui.open_host_server_window = std::nullopt;
 		}
 	};
 
@@ -2416,6 +2426,7 @@ work_result work(
 					break;
 
 				case custom_imgui_result::PLAYTEST_ONLINE:
+#if BUILD_NETWORKING
 					if constexpr(std::is_same_v<S, editor_setup>) {
 						setup.prepare_for_online_playtesting();
 
@@ -2441,7 +2452,6 @@ work_result work(
 
 						background_setup = std::move(current_setup);
 
-#if BUILD_NETWORKING
 						setup_launcher([&]() {
 							emplace_current_setup(std::in_place_type_t<server_setup>(),
 								lua,
@@ -2457,8 +2467,8 @@ work_result work(
 								assigned_teams
 							);
 						});
-#endif
 					}
+#endif
 
 					break;
 
@@ -2485,7 +2495,9 @@ work_result work(
 					config.client_connect
 				);
 
+#if BUILD_NETWORKING
 				start_client_setup();
+#endif
 			}
 			else {
 				LOG("(Steam Callback) Server address was empty.");
@@ -2562,6 +2574,8 @@ work_result work(
 	};
 
 	auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
+		(void)frame_num;
+
 		bool freeze_imgui_inputs = false;
 
 		on_specific_setup([&](editor_setup& editor) {
@@ -2583,6 +2597,7 @@ work_result work(
 			audio,
 			lua,
 			[&]() {
+#if BUILD_NETWORKING
 				auto do_nat_detection_logic = [&]() {
 					bool do_nat_detection = true;
 
@@ -2622,6 +2637,7 @@ work_result work(
 				if (nat_traversal == std::nullopt) {
 					do_nat_detection_logic();
 				}
+#endif
 
 				if (start_client_gui.show) {
 					if (start_client_gui.current_tab == start_client_tab_type::BEST_RANKED) {
@@ -2653,8 +2669,10 @@ work_result work(
 
 				if (!has_current_setup()) {
 					perform_last_exit_incorrect();
+#if BUILD_NETWORKING
 					perform_start_client_gui(frame_num);
 					perform_start_server_gui();
+#endif
 				}
 
 				perform_failed_to_load_arena_popup();
@@ -2662,6 +2680,7 @@ work_result work(
 
 				streaming.display_loading_progress();
 
+#if BUILD_NETWORKING
 				advance_nat_traversal();
 				do_traversal_details_popup(window);
 				do_detection_details_popup();
@@ -2685,6 +2704,7 @@ work_result work(
 						}
 					}
 				}
+#endif
 			},
 
 			[&]() {
@@ -3282,6 +3302,7 @@ work_result work(
 				}
 			}
 			else if constexpr(std::is_same_v<S, server_setup>) {
+#if BUILD_NETWORKING
 				setup.advance(
 					{ 
 						logic_get_screen_size(), 
@@ -3293,6 +3314,7 @@ work_result work(
 					},
 					callbacks
 				);
+#endif
 			}
 			else {
 #if BUILD_DEBUGGER_SETUP
