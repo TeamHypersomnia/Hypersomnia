@@ -56,6 +56,8 @@ namespace augs {
 		renderer_backend::renderer_backend() : platform(std::make_unique<renderer_backend::platform_data>()) {
 			augs::window::get_current().check_current_context();
 
+#if !PLATFORM_WEB
+
 #if BUILD_OPENGL
 
 			const char* fname = "gladLoadGL";
@@ -82,6 +84,7 @@ namespace augs {
 #else
 			LOG("OpenGL was not built. Nothing to init in the renderer backend.");
 #endif
+#endif
 
 			augs::window::get_current().check_current_context();
 
@@ -91,14 +94,18 @@ namespace augs {
 			set_clear_color(black);
 
 			GL_CHECK(glDisable(GL_DITHER));
+			GL_CHECK(glDisable(GL_DEPTH_TEST));
+
+#if !PLATFORM_WEB
 			GL_CHECK(glDisable(GL_LINE_SMOOTH));
 			GL_CHECK(glDisable(GL_POLYGON_SMOOTH));
 			GL_CHECK(glDisable(GL_MULTISAMPLE));
-			GL_CHECK(glDisable(GL_DEPTH_TEST));
-			GL_CHECK(glDepthMask(GL_FALSE));
 
 			GL_CHECK(glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST));
 			GL_CHECK(glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST));
+#endif
+
+			GL_CHECK(glDepthMask(GL_FALSE));
 
 			GL_CHECK(glGenVertexArrays(1, &platform->vao_buffer));
 			GL_CHECK(glBindVertexArray(platform->vao_buffer));

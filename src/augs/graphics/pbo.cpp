@@ -73,39 +73,6 @@ namespace augs {
 			}
 		}
 
-		void* pbo::map_buffer() {
-#if BUILD_OPENGL
-#if PERSISTENT
-			if (!persistent_ptr) {
-				persistent_ptr = glMapBufferRange(
-					GL_PIXEL_UNPACK_BUFFER, 
-					0,
-					size,
-					GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT
-				);
-			}
-
-			return persistent_ptr;
-#else
-			return glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
-#endif
-#else
-			return nullptr;
-#endif
-		}
-
-		bool pbo::unmap_buffer() {
-#if BUILD_OPENGL
-#if PERSISTENT
-			return true;
-#else
-			return glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-#endif
-#else
-			return true;
-#endif
-		}
-
 		void pbo::destroy() {
 			if (created) {
 				augs::window::get_current().check_current_context();

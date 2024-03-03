@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "augs/window_framework/window.h"
 #include "augs/log.h"
