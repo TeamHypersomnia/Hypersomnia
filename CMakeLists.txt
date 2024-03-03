@@ -1311,7 +1311,7 @@ endif()
 if(BUILD_FOR_WEB)
 	# Note if USE_NATIVE_EXCEPTIONS is ON,
 	# the CMake targets (tests, run) will fail as the emsdk's nodejs
-	# need --experimental-wasm-eh flag for this to work.
+	# needs --experimental-wasm-eh flag for this to work.
 	# This flag is unnecessary in the latest nodejs.
 
 	set(USE_NATIVE_EXCEPTIONS OFF)
@@ -1329,6 +1329,13 @@ if(BUILD_FOR_WEB)
 	endif()
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory -s USE_PTHREADS=1 ${ADDITIONAL_WEB_FLAGS}")
+
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=1024MB -sASSERTIONS")
+
+	# Embed all files
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.lua@/default_config.lua")
 
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
 	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
