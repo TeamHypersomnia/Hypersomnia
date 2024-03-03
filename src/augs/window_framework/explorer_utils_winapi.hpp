@@ -56,7 +56,7 @@ namespace augs {
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
 		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = get_hwnd(platform);
+		ofn.hwndOwner = get_hwnd(*platform);
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
@@ -70,7 +70,7 @@ namespace augs {
 		// Display the Open dialog box. 
 
 		auto show_after = scope_guard([this]() {
-			ShowWindow(get_hwnd(platform), SW_SHOW);
+			ShowWindow(get_hwnd(*platform), SW_SHOW);
 		});
 
 		if (GetOpenFileName(&ofn) == TRUE) {
@@ -144,7 +144,7 @@ namespace augs {
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
 		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = get_hwnd(platform);
+		ofn.hwndOwner = get_hwnd(*platform);
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
@@ -158,7 +158,7 @@ namespace augs {
 		// Display the Open dialog box. 
 
 		auto show_after = scope_guard([this]() {
-			ShowWindow(get_hwnd(platform), SW_SHOW);
+			ShowWindow(get_hwnd(*platform), SW_SHOW);
 		});
 
 		if (GetSaveFileName(&ofn) == TRUE) {
@@ -221,6 +221,6 @@ namespace augs {
 		const auto wide_caption = widen(caption);
 		const auto wide_text = widen(text);
 
-		return to_message_box_button(MessageBox(get_hwnd(platform), wide_text.c_str(), wide_caption.c_str(), MB_RETRYCANCEL | MB_ICONEXCLAMATION));
+		return to_message_box_button(MessageBox(get_hwnd(*platform), wide_text.c_str(), wide_caption.c_str(), MB_RETRYCANCEL | MB_ICONEXCLAMATION));
 	}
 }
