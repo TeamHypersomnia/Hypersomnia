@@ -511,12 +511,12 @@ if(BUILD_NETWORKING)
 		"src/application/nat/nat_detection_session.cpp"
 		"src/application/nat/nat_traversal_session.cpp"
 		"src/application/setups/server/server_nat_traversal.cpp"
-		"src/application/gui/browse_servers_gui.cpp"
 	)
 
 	if(HAS_HEAD)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/setups/client/client_setup.cpp"
+		"src/application/gui/browse_servers_gui.cpp"
 		)
 	endif()
 endif()
@@ -2034,7 +2034,7 @@ if (BUILD_OPENSSL)
 	# Static linking of SSL makes compilation on Linux a pain.
 	# Let's do it for Windows and Apple only
 
-	if (HEADLESS OR NOT LINUX)
+	if (APPLE)
 		set(OPENSSL_USE_STATIC_LIBS TRUE)
 	endif()
 
