@@ -79,7 +79,9 @@ struct stun_manager_window : public standard_window_mixin<stun_manager_window> {
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::GENERAL;
 
+#if BUILD_NETWORKING
 	stun_manager_window stun_manager = std::string("STUN manager");
+#endif
 
 	std::optional<simple_popup> already_bound_popup;
 

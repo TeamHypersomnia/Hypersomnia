@@ -8,6 +8,7 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/gameserver_commands.h"
 #include "augs/network/netcode_queued_packet.h"
+#include "application/network/resolve_address.h"
 
 template <class T>
 auto make_gameserver_command_bytes(T&& command) {

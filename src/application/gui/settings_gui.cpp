@@ -85,6 +85,7 @@ int performance_settings::get_num_pool_workers() const {
 	return get_default_num_pool_workers();
 }
 
+#if BUILD_NETWORKING
 #include "augs/network/netcode_utils.h"
 #include "augs/templates/container_templates.h"
 
@@ -253,6 +254,7 @@ void stun_manager_window::perform() {
 		text("Servers with duplicate resolved addresses: %x", tester->num_duplicate_resolved_addresses);
 	}
 }
+#endif
 
 std::string get_custom_binding_name(const game_intent_type intent) {
 	switch (intent) {
@@ -287,7 +289,9 @@ void settings_gui_state::perform(
 	config_lua_table& last_saved_config,
 	vec2i screen_size
 ) {
+#if BUILD_NETWORKING
 	stun_manager.perform();
+#endif
 
 	auto for_each_input_map = [&](auto callback) {
 		callback(config.app_controls);
@@ -1883,7 +1887,9 @@ void settings_gui_state::perform(
 				ImGui::SameLine();
 
 				if (ImGui::Button("Open STUN manager")) {
+#if BUILD_NETWORKING
 					stun_manager.open();
+#endif
 				}
 
 

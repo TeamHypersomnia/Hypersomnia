@@ -93,7 +93,9 @@
 #include "application/gui/settings_gui.h"
 #include "application/gui/start_client_gui.h"
 #include "application/gui/start_server_gui.h"
+#if BUILD_NETWORKING
 #include "application/gui/browse_servers_gui.h"
+#endif
 #include "application/gui/map_catalogue_gui.h"
 #include "application/gui/leaderboards_gui.h"
 #include "application/gui/ingame_menu_gui.h"
@@ -1286,8 +1288,15 @@ work_result work(
 	start_client_gui.is_steam_client = is_steam_client;
 	start_server_gui.is_steam_client = is_steam_client;
 
+#if BUILD_NETWORKING
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
+
+	auto find_chosen_server_info = [&]() {
+		return browse_servers_gui.find_entry(config.client_connect);
+	};
+#endif
+
 	map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
 
 	leaderboards_gui_state leaderboards_gui = std::string("Leaderboards");
@@ -1300,11 +1309,6 @@ work_result work(
 			map_catalogue_gui.rebuild_miniatures();
 		}
 	};
-
-	auto find_chosen_server_info = [&]() {
-		return browse_servers_gui.find_entry(config.client_connect);
-	};
-	(void)find_chosen_server_info;
 
 	ingame_menu_gui ingame_menu;
 
@@ -1503,11 +1507,14 @@ work_result work(
 		network_stats = {};
 		server_stats = {};
 
+#if BUILD_NETWORKING
 		if (main_menu != nullptr) {
 			was_browser_open_in_main_menu = browse_servers_gui.show;
 		}
 
 		browse_servers_gui.close();
+#endif
+
 		map_catalogue_gui.close();
 		settings_gui.close();
 
@@ -1525,12 +1532,12 @@ work_result work(
 			}
 		});
 
+#if BUILD_NETWORKING
 		if (main_menu != nullptr) {
 			if (was_browser_open_in_main_menu) {
 				browse_servers_gui.open();
 			}
 
-#if BUILD_NETWORKING
 			if (auxiliary_socket == std::nullopt) {
 				recreate_auxiliary_socket();
 
@@ -1538,8 +1545,8 @@ work_result work(
 					restart_nat_detection();
 				}
 			}
-#endif
 		}
+#endif
 	};
 
 	auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
@@ -1593,6 +1600,7 @@ work_result work(
 		}
 	};
 
+#if BUILD_NETWORKING
 	auto get_browse_servers_input = [&]() {
 		return browse_servers_input {
 			config.server_list_provider,
@@ -1604,7 +1612,6 @@ work_result work(
 		};
 	};
 
-#if BUILD_NETWORKING
 	auto launch_client_setup = [&](
 		const bool ignore_nat_check,
 
@@ -1930,7 +1937,6 @@ work_result work(
 			next_nat_traversal_attempt();
 		}
 	};
-#endif
 
 	auto start_client_setup = [&]() {
 		change_with_save(
@@ -1954,7 +1960,6 @@ work_result work(
 		}
 	};
 
-#if BUILD_NETWORKING
 	auto perform_start_client_gui = [&](const auto frame_num) {
 		const auto best_server = browse_servers_gui.find_best_server(is_steam_client);
 
@@ -2488,6 +2493,7 @@ work_result work(
 
 				config.client_connect = address_string;
 
+#if BUILD_NETWORKING
 				/* We must know if it's behind NAT */
 
 				browse_servers_gui.sync_download_server_entry(
@@ -2495,7 +2501,6 @@ work_result work(
 					config.client_connect
 				);
 
-#if BUILD_NETWORKING
 				start_client_setup();
 #endif
 			}
@@ -2639,6 +2644,7 @@ work_result work(
 				}
 #endif
 
+#if BUILD_NETWORKING
 				if (start_client_gui.show) {
 					if (start_client_gui.current_tab == start_client_tab_type::BEST_RANKED) {
 						if (!browse_servers_gui.refreshed_at_least_once()) {
@@ -2658,6 +2664,7 @@ work_result work(
 				if (const bool show_server_browser = !has_current_setup() || ingame_menu.show) {
 					perform_browse_servers();
 				}
+#endif
 
 				if (const bool show_map_catalogue = !has_current_setup()) {
 					perform_map_catalogue();
@@ -2848,7 +2855,9 @@ work_result work(
 				break;
 
 			case T::BROWSE_SERVERS:
+#if BUILD_NETWORKING
 				browse_servers_gui.open();
+#endif
 
 				break;
 
@@ -2929,7 +2938,9 @@ work_result work(
 				break;
 
 			case T::BROWSE_SERVERS:
+#if BUILD_NETWORKING
 				browse_servers_gui.open();
+#endif
 				break;
 
 			case T::RESUME:

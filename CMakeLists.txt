@@ -119,7 +119,8 @@ endif()
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
 
 if (BUILD_FOR_WEB)
-	set(HYPERSOMNIA_BARE ON) # Temporary
+	set(DEFAULT_OPT OFF)
+	set(DEFAULT_NET_OPT OFF)
 endif()
 
 set(DEFAULT_OPT ON)
@@ -246,6 +247,9 @@ endif()
 if (BUILD_FOR_WEB)
 	set(BUILD_FREETYPE ON) # Slowly enabling one by one
 	set(BUILD_SOUND_FORMAT_DECODERS ON) # Slowly enabling one by one
+
+	set(BUILD_OPENGL ON) # Slowly enabling one by one
+	set(BUILD_WINDOW_FRAMEWORK ON) # Slowly enabling one by one
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -506,6 +510,7 @@ if(BUILD_NETWORKING)
 		"src/application/nat/nat_detection_session.cpp"
 		"src/application/nat/nat_traversal_session.cpp"
 		"src/application/setups/server/server_nat_traversal.cpp"
+		"src/application/gui/browse_servers_gui.cpp"
 	)
 
 	if(HAS_HEAD)
@@ -589,7 +594,6 @@ if(HAS_HEAD)
 	"src/view/mode_gui/arena/arena_spectator_gui.cpp"
 	"src/application/gui/client/chat_gui.cpp"
 	"src/application/gui/client/client_gui_state.cpp"
-	"src/application/gui/browse_servers_gui.cpp"
 	"src/application/gui/leaderboards_gui.cpp"
 	"src/view/hud_messages/hud_messages_gui.cpp"
 	"src/application/gui/map_catalogue_gui.cpp"
@@ -875,6 +879,8 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 # Source files that are included conditionally.
 # Conditional inclusion of source files happens here.
 
+set(USING_X_WINDOW_SYSTEM OFF)
+
 if(BUILD_WINDOW_FRAMEWORK)
 	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"src/augs/window_framework/window_explorer_utils.cpp"
@@ -893,6 +899,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 			"src/augs/window_framework/window_glfw.cpp"
 		)
 	elseif(UNIX)
+		set(USING_X_WINDOW_SYSTEM ON)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_x.cpp"
 			"src/augs/window_framework/print_x_devices.cpp"
@@ -953,7 +960,7 @@ if(MSVC_SPECIFIC)
 	)
 endif()
 
-if(BUILD_GLAD)
+if(BUILD_GLAD AND NOT BUILD_FOR_WEB)
 	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 		"src/3rdparty/glad/glad.c"
 	)
@@ -1330,6 +1337,10 @@ if(BUILD_FOR_WEB)
 	endif()
 
 	set(ADDITIONAL_WEB_FLAGS "${EXCEPTIONS_FLAG}")
+
+	if (USE_SDL2)
+		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -sUSE_SDL=2")
+	endif()
 
 	if(GENERATE_DEBUG_INFORMATION)
 		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -g")
@@ -1988,11 +1999,11 @@ elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 endif()
 
-if (UNIX)
+if (UNIX AND NOT BUILD_FOR_WEB)
 	list(APPEND HYPERSOMNIA_LIBS dl)
 endif()
 
-if (BUILD_WINDOW_FRAMEWORK AND LINUX)
+if (USING_X_WINDOW_SYSTEM)
 	list(APPEND HYPERSOMNIA_LIBS Xi)
 endif()
 

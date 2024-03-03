@@ -1,7 +1,6 @@
 #include <future>
 
 #include "application/gui/browse_servers_gui.h"
-#include "augs/network/netcode_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "3rdparty/include_httplib.h"
 #include "augs/templates/thread_templates.h"
@@ -12,17 +11,22 @@
 #include "augs/log.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/misc/date_time.h"
-#include "augs/network/netcode_sockets.h"
 #include "application/nat/nat_detection_settings.h"
-#include "application/network/resolve_address.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
 #include "augs/misc/httplib_utils.h"
+
 #include "application/network/resolve_address.h"
 
+#if BUILD_NETWORKING
+#include "augs/network/netcode_utils.h"
+#include "augs/network/netcode_sockets.h"
+
 constexpr auto ping_retry_interval = 1;
-constexpr auto reping_interval = 10;
 constexpr auto server_entry_timeout = 5;
+#endif
+
+constexpr auto reping_interval = 10;
 constexpr auto max_packets_per_frame_v = 64;
 
 #define LOG_BROWSER 1
@@ -253,6 +257,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
 			official_addrs results;
+#if BUILD_NETWOKRING
 
 			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
 
@@ -270,6 +275,9 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 				}
 			}
 
+#else
+			(void)addresses;
+#endif
 			return results;
 		}
 	);
@@ -378,6 +386,7 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 }
 
 void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
+#if BUILD_NETWORKING
 	auto packet_handler = [&](const auto& from, uint8_t* buffer, const int bytes_received) {
 		if (handle_gameserver_response(from, buffer, bytes_received)) {
 			return;
@@ -385,6 +394,9 @@ void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& soc
 	};
 
 	::receive_netcode_packets(socket, packet_handler);
+#else
+	(void)socket;
+#endif
 }
 
 void browse_servers_gui_state::animate_dot_column() {
@@ -444,6 +456,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			}
 		};
 
+#if BUILD_NETWORKING
 		if (p.state == S::AWAITING_RESPONSE) {
 			auto& when_first_ping = p.when_sent_first_ping;
 			auto& when_last_ping = p.when_sent_last_ping;
@@ -461,6 +474,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 				continue;
 			}
 		}
+#endif
 
 		if (p.state == S::PING_MEASURED) {
 			auto& when_last_ping = p.when_sent_last_ping;

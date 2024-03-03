@@ -1,4 +1,5 @@
 #pragma once
+#include "game/modes/test_mode.h"
 #include "view/game_gui/special_indicator.h"
 #include "game/detail/hand_fuse_math.h"
 #include "game/modes/arena_mode.hpp"
