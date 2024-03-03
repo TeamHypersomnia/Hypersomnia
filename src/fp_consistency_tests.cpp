@@ -56,13 +56,8 @@ void ensure_float_flags_hold() {
 
 // Last stress test passes: 20000000
 
-#if PLATFORM_UNIX
 #define CANONICAL_RESULT_5000 "11000000100011010001000000011111"
 #define CANONICAL_RESULT_STRESS_TEST "01000000100001010101011011001110"
-#elif PLATFORM_WINDOWS
-#define CANONICAL_RESULT_5000 "11000000100011010001000000011111"
-#define CANONICAL_RESULT_STRESS_TEST "01000000100001010101011011001110"
-#endif
 
 struct operation_meta {
 	int opcode;
@@ -109,7 +104,11 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 		LOG("(FP consistency test) Generating a fp consistency test report to: %x", target_report_path);
 	}
 
-	all_ops.resize(passes);
+	if (generate_op_report) {
+		LOG("Calling all_ops.resize with %x. Sizeof operation_meta: %x", passes, sizeof(operation_meta));
+		all_ops.resize(passes);
+		LOG("Resized all_ops.");
+	}
 
 	auto timer = augs::timer();
 	auto scope = augs::scope_guard(
