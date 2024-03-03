@@ -22,12 +22,6 @@
 [submodule "cmake/Introspector-generator"]
 	path = cmake/Introspector-generator
 	url = https://github.com/TeamHypersomnia/Introspector-generator.git
-[submodule "src/3rdparty/ogg"]
-	path = src/3rdparty/ogg
-	url = https://github.com/xiph/ogg
-[submodule "src/3rdparty/vorbis"]
-	path = src/3rdparty/vorbis
-	url = https://github.com/xiph/vorbis
 [submodule "src/3rdparty/imgui"]
 	path = src/3rdparty/imgui
 	url = https://github.com/ocornut/imgui
