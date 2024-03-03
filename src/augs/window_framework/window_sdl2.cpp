@@ -32,7 +32,7 @@ namespace augs {
 
         #ifdef __EMSCRIPTEN__
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2); // Use WebGL 2.0
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); // GLES 3.0 corresponds to WebGL 2.0
         #else
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

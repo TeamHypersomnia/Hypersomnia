@@ -74,6 +74,8 @@ namespace augs {
 		) try {
 #if PLATFORM_MACOS
 			const auto glsl_version = "#version 150";
+#elif PLATFORM_WEB
+			const auto glsl_version = "#version 300 es";
 #else
 			const auto glsl_version = "#version 130";
 #endif
