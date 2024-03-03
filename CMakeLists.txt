@@ -1314,9 +1314,11 @@ if(BUILD_FOR_WEB)
 	# needs --experimental-wasm-eh flag for this to work.
 	# This flag is unnecessary in the latest nodejs.
 
-	set(USE_NATIVE_EXCEPTIONS OFF)
+	set(USE_NATIVE_EXCEPTIONS ON)
+	set(USE_BIGINT ON)
 
 	if (USE_NATIVE_EXCEPTIONS)
+		message("Enabling native exceptions")
 		set(EXCEPTIONS_FLAG "-fwasm-exceptions")
 	else()
 		set(EXCEPTIONS_FLAG "-fexceptions")
@@ -1326,11 +1328,25 @@ if(BUILD_FOR_WEB)
 
 	if(GENERATE_DEBUG_INFORMATION)
 		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -g")
+
+		# Ensure we're not stripping any debug information post-link.
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ERROR_ON_WASM_CHANGES_AFTER_LINK")
+
+		# There are some huge functions that can cause us to overflow with debug symbols
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=16MB")
+
+		# We have to, otherwise the i64 legalization will modify the wasm.
+		set(USE_BIGINT ON)
 	endif()
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory -s USE_PTHREADS=1 ${ADDITIONAL_WEB_FLAGS}")
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=1024MB -sASSERTIONS")
+
+	if (USE_BIGINT)
+		message("Enabling WASM_BIGINT")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM_BIGINT")
+	endif()
 
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
