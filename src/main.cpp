@@ -131,11 +131,15 @@ int main(const int argc, const char* const * const argv) {
 	}
 
 #if PLATFORM_MACOS
-	if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
-		exe_path.replace_filename("");
-		std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
-		std::filesystem::current_path(exe_path);
-		std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+	const bool force_keep_cwd = params.unit_tests_only;
+
+	if (!force_keep_cwd) {
+		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
+			exe_path.replace_filename("");
+			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::filesystem::current_path(exe_path);
+			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+		}
 	}
 #endif
 
