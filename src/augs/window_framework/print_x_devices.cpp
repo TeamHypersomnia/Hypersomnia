@@ -17,7 +17,7 @@ void print_classes(std::string& total_info, Display *display, XIAnyClassInfo **c
 		{
 			case XIButtonClass:
 			{
-				XIButtonClassInfo *b = (XIButtonClassInfo*)classes[i];
+				XIButtonClassInfo *b = reinterpret_cast<XIButtonClassInfo*>(classes[i]);
 				pf("\t\tButtons supported: %x\n", b->num_buttons);
 				pf("\t\tButton labels:");
 				for (j = 0; j < b->num_buttons; j++)
@@ -33,13 +33,13 @@ void print_classes(std::string& total_info, Display *display, XIAnyClassInfo **c
 			break;
 			case XIKeyClass:
 			{
-				XIKeyClassInfo *k = (XIKeyClassInfo*)classes[i];
+				XIKeyClassInfo *k = reinterpret_cast<XIKeyClassInfo*>(classes[i]);
 				pf("\t\tKeycodes supported: %x\n", k->num_keycodes);
 			}
 			break;
 			case XIValuatorClass:
 			{
-				XIValuatorClassInfo *v = (XIValuatorClassInfo*)classes[i];
+				XIValuatorClassInfo *v = reinterpret_cast<XIValuatorClassInfo*>(classes[i]);
 				pf("\t\tDetail for Valuator %x:\n", v->number);
 				pf("\t\t  Label: '%x'\n", (v->label) ?  XGetAtomName(display, v->label) : "None");
 				pf("\t\t  Range: %x - %x\n", v->min, v->max);

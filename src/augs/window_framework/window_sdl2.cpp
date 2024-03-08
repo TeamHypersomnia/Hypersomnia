@@ -24,9 +24,13 @@ namespace augs {
     window::window(const window_settings& settings)
         : platform(std::make_unique<window::platform_data>()) {
         
+		LOG("Calling SDL_Init.");
+
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             throw window_error("SDL_Init failed: " + std::string(SDL_GetError()));
         }
+
+		LOG("Calling SDL_GL_SetAttribute.");
 
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
@@ -39,16 +43,26 @@ namespace augs {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         #endif
 
+		LOG("Calling SDL_CreateWindow.");
+
+		auto initial_fs = settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0;
+
+#if PLATFORM_WEB
+		initial_fs = 0;
+#endif
+
         platform->window = SDL_CreateWindow(settings.name.c_str(), 
                                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                             settings.size.x, settings.size.y, 
                                             SDL_WINDOW_OPENGL | (settings.border ? 0 : SDL_WINDOW_BORDERLESS) | 
-                                            (settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
+                                            initial_fs);
 
         if (!platform->window) {
             SDL_Quit();
             throw window_error("SDL_CreateWindow failed: " + std::string(SDL_GetError()));
         }
+
+		LOG("Calling SDL_GL_CreateContext.");
 
         platform->gl_context = SDL_GL_CreateContext(platform->window);
 
@@ -58,15 +72,29 @@ namespace augs {
             throw window_error("SDL_GL_CreateContext failed: " + std::string(SDL_GetError()));
         }
 
+		LOG("Setting as current.");
+
 		set_as_current();
 
+#if PLATFORM_WEB
+		/*
+			SDL_GL_SetSwapInterval will call emscripten_set_main_loop_timing
+			which needs to be called only after emscripten_set_main_loop.
+		*/
+#else
+		LOG("Calling SDL_GL_SetSwapInterval");
+
         SDL_GL_SetSwapInterval(settings.vsync_mode == vsync_type::ON ? 1 : 0);
+#endif
 
         current_settings = settings;
         last_windowed_rect = current_settings.make_window_rect();
         current_rect = get_window_rect_impl();
         last_mouse_pos = current_rect.get_size() / 2;
+		LOG("Warping cursor to center.");
         set_cursor_pos(last_mouse_pos);
+
+		LOG("Finished setting up the SDL2 window.");
     }
 
     void window::set_window_name(const std::string& name) {
@@ -264,7 +292,7 @@ namespace augs {
     }
 
     void window::check_current_context() {
-        // This function can be used to check the current OpenGL context, etc.
+
     }
 
     window::~window() {

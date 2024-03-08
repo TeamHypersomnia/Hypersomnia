@@ -187,6 +187,11 @@ float max_zoom_out_at_edges_v = 0.7f;
 constexpr bool no_edge_zoomout_v = false;
 #endif
 
+#if PLATFORM_WEB
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
+
 work_result work(
 	const cmd_line_params& parsed_params,
 	const bool log_directory_existed,
@@ -374,6 +379,10 @@ work_result work(
 			result.server.allow_nat_traversal = false;
 		}
 
+#if PLATFORM_WEB
+		result.window.fullscreen = false;
+#endif
+
 		return result_ptr;
 	}();
 
@@ -528,6 +537,9 @@ work_result work(
 
 	auto last_update_result = self_update_result();
 
+#if PLATFORM_WEB
+	LOG("Nothing to self-update on the Web.");
+#else
 	const bool should_run_self_updater = 
 		params.update_once_now ||
 		params.only_check_update_availability_and_quit ||
@@ -595,6 +607,7 @@ work_result work(
 			LOG("Skipping update check due to update_on_launch = false.");
 		}
 	}
+#endif
 
 	augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
@@ -798,6 +811,8 @@ work_result work(
 #endif
 
 	const auto official = std::make_unique<packaged_official_content>(lua);
+
+#if !PLATFORM_WEB
 
 	auto handle_sigint = [&]() {
 #if PLATFORM_UNIX
@@ -1061,6 +1076,8 @@ work_result work(
 		return work_result::SUCCESS;
 	}
 
+#endif // #if !PLATFORM_WEB
+
 #if HEADLESS
 	LOG("Headless build. Nothing to do.");
 	return work_result::SUCCESS;
@@ -1161,8 +1178,11 @@ work_result work(
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
-	auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
+	const auto num_pool_workers = config.performance.get_num_pool_workers();
+	LOG("Creating the thread pool with %x workers.", num_pool_workers);
+	auto thread_pool = augs::thread_pool(num_pool_workers);
 
+	LOG("Initializing audio command buffers.");
 	augs::audio_command_buffers audio_buffers(thread_pool);
 
 	LOG("Initializing the window.");
@@ -1862,6 +1882,7 @@ work_result work(
 	};
 
 	bool client_start_requested = false;
+	(void)client_start_requested;
 	bool server_start_requested = false;
 
 #if BUILD_NETWORKING
@@ -4599,6 +4620,11 @@ work_result work(
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}
+				catch (const std::ios_base::failure& err) {
+					LOG("std::ios_base::failure: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
 				catch (const std::runtime_error& err) {
 					LOG("Runtime error: %x", err.what());
 					game_thread_result = work_result::FAILURE;
@@ -4611,11 +4637,6 @@ work_result work(
 				}
 				catch (const std::exception& err) {
 					LOG("Exception: %x", err.what());
-					game_thread_result = work_result::FAILURE;
-					request_quit();
-				}
-				catch (const std::ios_base::failure& err) {
-					LOG("std::ios_base::failure: %x", err.what());
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}
@@ -4634,10 +4655,11 @@ work_result work(
 		}
 	};
 
+	LOG("Starting game_thread_worker");
 	auto game_thread = std::thread(game_thread_worker);
 
-	auto audio_thread_joiner = augs::scope_guard([&]() { audio_buffers.quit(); });
-	auto game_thread_joiner = augs::scope_guard([&]() { game_thread.join(); });
+	auto audio_thread_joiner = augs::scope_guard([&]() { LOG("audio_thread_joiner"); audio_buffers.quit(); });
+	auto game_thread_joiner = augs::scope_guard([&]() { LOG("game_thread_joiner"); game_thread.join(); });
 
 	request_quit = [&]() {
 		get_write_buffer().should_quit = true;
@@ -4684,7 +4706,59 @@ work_result work(
 
 	augs::timer this_frame_timer;
 
-	for (;;) {
+	struct main_loop_input {
+		augs::window& window;
+		game_frame_buffer_swapper& buffer_swapper;
+		augs::graphics::renderer_backend& renderer_backend;
+		augs::thread_pool& thread_pool;
+		augs::timer& this_frame_timer;
+		augs::timer& until_first_swap;
+		session_profiler& render_thread_performance;
+		bool& until_first_swap_measured;
+		renderer_backend_result& rendering_result;
+		std::atomic<augs::frame_num_type>& current_frame;
+
+		decltype(get_read_buffer)& get_read_buffer;
+		decltype(game_main_thread_synced_op)& game_main_thread_synced_op;
+	};
+
+	auto main_loop_in = main_loop_input {
+		window,
+		buffer_swapper,
+		renderer_backend,
+		thread_pool,
+		this_frame_timer,
+		until_first_swap,
+		render_thread_performance,
+		until_first_swap_measured,
+		rendering_result,
+		current_frame,
+
+		get_read_buffer,
+		game_main_thread_synced_op
+	};
+
+	auto main_loop_in_ptr = reinterpret_cast<void*>(&main_loop_in);
+
+	static auto main_loop_iter = [](void* arg) -> bool {
+		LOG("main_loop_iter");
+		auto& mi = *reinterpret_cast<main_loop_input*>(arg);
+
+		auto& window = mi.window;
+		auto& buffer_swapper = mi.buffer_swapper;
+		auto& renderer_backend = mi.renderer_backend;
+		auto& thread_pool = mi.thread_pool;
+		auto& this_frame_timer = mi.this_frame_timer;
+		(void)this_frame_timer;
+		auto& until_first_swap = mi.until_first_swap;
+		auto& render_thread_performance = mi.render_thread_performance;
+		auto& until_first_swap_measured = mi.until_first_swap_measured;
+		auto& rendering_result = mi.rendering_result;
+		auto& current_frame = mi.current_frame;
+
+		auto& get_read_buffer = mi.get_read_buffer;
+		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op;
+
 		auto scope = measure_scope(render_thread_performance.fps);
 
 		auto swap_window_buffers = [&]() {
@@ -4760,6 +4834,7 @@ work_result work(
 				auto scope = measure_scope(render_thread_performance.render_wait);
 				buffer_swapper.swap_buffers(game_main_thread_synced_op);
 
+#if !PLATFORM_WEB
 				const auto max_fps = get_read_buffer().max_fps;
 
 				if (max_fps.is_enabled && max_fps.value >= 10) {
@@ -4793,6 +4868,7 @@ work_result work(
 
 					this_frame_timer.reset();
 				}
+#endif
 			}
 		}
 
@@ -4810,9 +4886,31 @@ work_result work(
 		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
 
 		if (read_buffer.should_quit) {
+			return false;
+		}
+
+		return true;
+	};
+
+#if PLATFORM_WEB
+	auto main_loop_iter_em = [](void* arg) {
+		if (!main_loop_iter(arg)) {
+			emscripten_cancel_main_loop();
+		}
+	};
+
+	LOG("Calling emscripten_set_main_loop_arg.");
+
+	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 1);
+
+	LOG("Post emscripten_set_main_loop_arg (shouldn't happen).");
+#else
+	for (;;) {
+		if (!main_loop_iter(main_loop_in_ptr)) {
 			break;
 		}
 	}
+#endif
 
 	return game_thread_result;
 #endif

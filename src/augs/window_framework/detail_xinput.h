@@ -77,7 +77,7 @@ xcb_input_fp3232_t *
 xcb_input_raw_button_press_axisvalues (const xcb_input_raw_button_press_event_t *R)
 {
     xcb_generic_iterator_t prev = xcb_input_raw_button_press_valuator_mask_end(R);
-    return (xcb_input_fp3232_t *) ((char *) prev.data + XCB_TYPE_PAD(xcb_input_fp3232_t, prev.index) + 0);
+	return reinterpret_cast<xcb_input_fp3232_t *> ((char *) prev.data + XCB_TYPE_PAD(xcb_input_fp3232_t, prev.index) + 0);
 }
 
 int

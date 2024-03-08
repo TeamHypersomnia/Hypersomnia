@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- our trivially_copyable_tuple actually sucks because it doesnt take into account the internal member alignment
+
 - unknown crash, happens with many people
 	- sometimes crashed all people on windows an linux players survived
 	- other times it crashed just me and two windows players survived

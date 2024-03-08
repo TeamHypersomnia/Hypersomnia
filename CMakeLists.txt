@@ -118,14 +118,14 @@ endif()
 # Then, try to work from there.
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
 
+set(DEFAULT_OPT ON)
+set(DEFAULT_NET_OPT ON)
+set(HAS_HEAD YES)
+
 if (BUILD_FOR_WEB)
 	set(DEFAULT_OPT OFF)
 	set(DEFAULT_NET_OPT OFF)
 endif()
-
-set(DEFAULT_OPT ON)
-set(DEFAULT_NET_OPT ON)
-set(HAS_HEAD YES)
 
 if (HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
@@ -245,7 +245,7 @@ else()
 	message("Building without debugger setup.")
 endif()
 
-if (BUILD_FOR_WEB)
+if (BUILD_FOR_WEB OR HYPERSOMNIA_BARE)
 	set(BUILD_FREETYPE ON) # Slowly enabling one by one
 	set(BUILD_SOUND_FORMAT_DECODERS ON) # Slowly enabling one by one
 
@@ -442,8 +442,15 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/main.cpp"
 	"src/work.cpp"
+)
+
+set(HYPERSOMNIA_SELF_UPDATER_CPP
 	"src/application/main/self_updater.cpp"
 )
+
+if(NOT BUILD_FOR_WEB)
+	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS ${HYPERSOMNIA_SELF_UPDATER_CPP})
+endif()
 
 if(HAS_HEAD)
 	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
@@ -1170,7 +1177,7 @@ endif()
 
 if(CLANG)
 	if(NOT MSVC)
-		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra")
+		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra -Wcast-align -Wover-aligned")
 	endif()
 
 	# -Wall and -Wextra cover everything already
@@ -1195,17 +1202,17 @@ if(CLANG)
 
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 
-	file_flag("src/augs/image/image.cpp" "-Wno-error")
+	file_flag("src/augs/image/image.cpp" "-Wno-error -Wno-cast-align")
 	file_flag("src/augs/network/network_types.cpp" "-Wno-error=deprecated-declarations")
 	file_flag("src/3rdparty/yojimbo/yojimbo.cpp" "-Wno-error=deprecated-declarations")
-	file_flag("src/3rdparty/yojimbo/netcode.io/netcode.c" "-Wno-error=deprecated-declarations")
+	file_flag("src/application/network/network_adapters.cpp" "-Wno-cast-align")
 	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error=deprecated-declarations")
+	file_flag("src/3rdparty/Box2D/Common/b2BlockAllocator.cpp" "-Wno-cast-align")
 endif()
 
 if(APPLE)
 	file_flag("src/augs/network/network_types.cpp" "-Wno-error")
 	file_flag("src/3rdparty/yojimbo/yojimbo.cpp" "-Wno-error")
-	file_flag("src/3rdparty/yojimbo/netcode.io/netcode.c" "-Wno-error")
 	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error")
 endif()
 
@@ -1327,7 +1334,8 @@ if(BUILD_FOR_WEB)
 	# needs --experimental-wasm-eh flag for this to work.
 	# This flag is unnecessary in the latest nodejs.
 
-	set(USE_NATIVE_EXCEPTIONS ON)
+	# currently won't work as everything would be unwound on the C++ stack in work.cpp
+	set(USE_NATIVE_EXCEPTIONS OFF)
 	set(USE_BIGINT ON)
 
 	if (USE_NATIVE_EXCEPTIONS)
@@ -1345,25 +1353,22 @@ if(BUILD_FOR_WEB)
 
 	if(GENERATE_DEBUG_INFORMATION)
 		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -g")
-
-		# Ensure we're not stripping any debug information post-link.
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ERROR_ON_WASM_CHANGES_AFTER_LINK")
-
-		# We have to, otherwise the i64 legalization will modify the wasm.
-		set(USE_BIGINT ON)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 -Wno-limited-postlink-optimizations")
+		set(STACK_SIZE "64MB")
+	else()
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_BLOCKING_ON_MAIN_THREAD=1")
+		set(STACK_SIZE "64MB")
 	endif()
 
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
 	# There are some huge functions that can cause us to overflow with debug symbols
-	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -s STACK_SIZE=16MB")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=${STACK_SIZE}")
 
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory -s USE_PTHREADS=1 ${ADDITIONAL_WEB_FLAGS}")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=1024MB")
 
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=1024MB -sASSERTIONS")
-
-	if (USE_BIGINT)
-		message("Enabling WASM_BIGINT")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM_BIGINT")
-	endif()
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ADDITIONAL_WEB_FLAGS}")
 
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
@@ -1372,6 +1377,11 @@ if(BUILD_FOR_WEB)
 
 	if (BUILD_OPENGL)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2")
+	endif()
+
+	if (USE_BIGINT)
+		message("Enabling WASM_BIGINT")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM_BIGINT")
 	endif()
 
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
