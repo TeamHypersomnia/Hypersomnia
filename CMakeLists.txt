@@ -1334,8 +1334,7 @@ if(BUILD_FOR_WEB)
 	# needs --experimental-wasm-eh flag for this to work.
 	# This flag is unnecessary in the latest nodejs.
 
-	# currently won't work as everything would be unwound on the C++ stack in work.cpp
-	set(USE_NATIVE_EXCEPTIONS OFF)
+	set(USE_NATIVE_EXCEPTIONS ON)
 	set(USE_BIGINT ON)
 
 	if (USE_NATIVE_EXCEPTIONS)

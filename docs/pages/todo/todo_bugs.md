@@ -5,6 +5,19 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- why tf are we using sleep_until_tasks_posted in main loop? this should be used by workers instead
+    - actually: sleep_until_tasks_posted was NEVER sleeping since tasks_posted > 0 was always true (it was never zeroed)
+	- additionally, we wait for the frame completion in swap_buffers so there's no fear that we'd start rendering an in-progress frame
+
+	- OLD:
+	    - I think i know why...
+		- we wanted help_until_no_tasks to be called only once something is posted and not be skipped
+		    - otherwise wait_for_all_tasks_to_complete would just sleep potentially
+		- but this still could be accidentally skipped if there's a performance hit in main and all tasks are ALRLEADY complete
+	    - on the other hand if one worker takes longer with their task than the main helper we're not properly calling "wait until all tasks complete"
+		- this explains the actual sigsegv
+	    - this entire thing needs to be reworked with proper signaling 
+
 - our trivially_copyable_tuple actually sucks because it doesnt take into account the internal member alignment
 
 - unknown crash, happens with many people

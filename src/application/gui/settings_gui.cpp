@@ -72,6 +72,9 @@ int performance_settings::get_default_num_pool_workers() {
 		+ rendering_threads
 		+ main_threads
 		+ openal_threads
+#if PLATFORM_WEB
+		+ 4 // to be on the safe side to ensure responsiveness
+#endif
 	;
 
 	return std::max(0, concurrency - total_other_threads);

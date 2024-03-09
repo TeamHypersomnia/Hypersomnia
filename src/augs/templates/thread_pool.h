@@ -127,11 +127,6 @@ namespace augs {
 			return workers.size();
 		}
 
-		void sleep_until_tasks_posted() {
-			auto lock = lock_completion();
-			completion_variable.wait(lock, [this]{ return tasks_posted > 0; });
-		}
-
 		void help_until_no_tasks() {
 			for (;;) {
 				std::function<void()> task;

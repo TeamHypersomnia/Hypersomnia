@@ -192,17 +192,27 @@ constexpr bool no_edge_zoomout_v = false;
 #include <emscripten/html5.h>
 #endif
 
+#if PLATFORM_WEB
+#define WEBSTATIC static
+#else
+#define WEBSTATIC 
+#endif
+
 work_result work(
 	const cmd_line_params& parsed_params,
 	const bool log_directory_existed,
 	const int argc,
 	const char* const * const argv
 ) try {
-	const auto& params = parsed_params;
+	WEBSTATIC const auto params = parsed_params;
 	(void)argc;
 	(void)argv;
 
-	const bool is_cli_tool = params.is_cli_tool();
+#if PLATFORM_WEB
+	WEBSTATIC const bool is_steam_client = false;
+	WEBSTATIC const auto steam_id = std::string("0");
+#else
+	WEBSTATIC const bool is_cli_tool = params.is_cli_tool();
 
 	if (is_cli_tool) {
 		LOG("Launching a CLI tool. Skipping Steam API initialization.");
@@ -232,7 +242,7 @@ work_result work(
 		}
 	}
 
-	const auto steam_status = 
+	WEBSTATIC const auto steam_status = 
 		is_cli_tool ?
 		steam_init_result::DISABLED : 
 		steam_init_result(::steam_init())
@@ -243,22 +253,23 @@ work_result work(
 		return work_result::FAILURE;
 	}
 
-	const bool steam_initialized = steam_status == steam_init_result::SUCCESS;
+	WEBSTATIC const bool steam_initialized = steam_status == steam_init_result::SUCCESS;
 
-	auto deinit = augs::scope_guard([steam_initialized]() {
+	WEBSTATIC auto deinit = augs::scope_guard([&]() {
 		if (steam_initialized) {
 			::steam_deinit();
 		}
 	});
 
-	const bool is_steam_client = steam_initialized;
+	WEBSTATIC const bool is_steam_client = steam_initialized;
 
 	LOG_NVPS(is_steam_client);
 
-	uint32_t steam_auth_request_id = 0;
+	WEBSTATIC uint32_t steam_auth_request_id = 0;
 	(void)steam_auth_request_id;
 
-	const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
+	WEBSTATIC const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
+#endif
 
 	if (is_steam_client) {
 		::USER_DIR = APPDATA_DIR / steam_id;
@@ -277,8 +288,8 @@ work_result work(
 	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 #endif
 
-#if PLATFORM_UNIX	
-	auto signal_handler = [](const int signal_type) {
+#if PLATFORM_UNIX && !PLATFORM_WEB
+	WEBSTATIC auto signal_handler = [](const int signal_type) {
    		signal_status = signal_type;
 	};
 
@@ -307,17 +318,17 @@ work_result work(
 		}
 	}
 
-	const auto canon_config_path = augs::path_type("default_config.lua");
-	const auto local_config_path = USER_DIR / "config.lua";
-	const auto force_config_path = USER_DIR / "config.force.lua";
-	const auto private_config_path = USER_DIR / "config.private.lua";
+	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.lua");
+	WEBSTATIC const auto local_config_path = USER_DIR / "config.lua";
+	WEBSTATIC const auto force_config_path = USER_DIR / "config.force.lua";
+	WEBSTATIC const auto private_config_path = USER_DIR / "config.private.lua";
 
 	LOG("Creating lua state.");
-	auto lua = augs::create_lua_state();
+	WEBSTATIC auto lua = augs::create_lua_state();
 
 	LOG("Loading the config.");
 
-	const auto canon_config_ptr = [&]() {
+	WEBSTATIC const auto canon_config_ptr = [&]() {
 		auto result_ptr = std::make_unique<config_lua_table>(
 			lua,
 			canon_config_path
@@ -386,14 +397,14 @@ work_result work(
 		return result_ptr;
 	}();
 
-	auto& canon_config = *canon_config_ptr;
+	WEBSTATIC auto& canon_config = *canon_config_ptr;
 
 	if (!params.assign_teams.empty()) {
 		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
 	}
 
 #if BUILD_NETWORKING
-	const auto assigned_teams = 
+	WEBSTATIC const auto assigned_teams = 
 		params.assign_teams.empty() ? 
 		server_assigned_teams() :
 		server_assigned_teams(CALLING_CWD / params.assign_teams)
@@ -407,7 +418,7 @@ work_result work(
 	}
 #endif
 
-	auto config_ptr = [&]() {
+	WEBSTATIC auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
 
 		if (augs::exists(local_config_path)) {
@@ -465,14 +476,14 @@ work_result work(
 
 	LOG("Loaded user configs.");
 
-	auto& config = *config_ptr;
+	WEBSTATIC auto& config = *config_ptr;
 
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		::log_timestamp_format = config.log_timestamp_format;
 	}
 
-	const auto fp_test_settings = [&]() {
+	WEBSTATIC const auto fp_test_settings = [&]() {
 		auto result = config.float_consistency_test;
 
 		if (params.test_fp_consistency != -1) {
@@ -487,7 +498,7 @@ work_result work(
 		return result;
 	}();	
 
-	const auto float_tests_succeeded = 
+	WEBSTATIC const auto float_tests_succeeded = 
 		perform_float_consistency_tests(fp_test_settings)
 	;
 
@@ -498,7 +509,7 @@ work_result work(
 #if BUILD_NETWORKING
 	LOG("Initializing network RAII.");
 
-	auto network_raii = augs::network_raii();
+	WEBSTATIC auto network_raii = augs::network_raii();
 #endif
 
 	if (config.unit_tests.run || params.unit_tests_only) {
@@ -520,27 +531,27 @@ work_result work(
 	LOG("Initializing ImGui.");
 
 #if HEADLESS
-	const augs::image* imgui_atlas_image = nullptr;
+	WEBSTATIC const augs::image* imgui_atlas_image = nullptr;
 #else
-	const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
-	const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
+	WEBSTATIC const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
+	WEBSTATIC const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
-	const auto imgui_raii = augs::imgui::context_raii(
+	WEBSTATIC const auto imgui_raii = augs::imgui::context_raii(
 		imgui_ini_path.c_str(),
 		imgui_log_path.c_str(),
 		config.gui_style
 	);
 
 	LOG("Creating the ImGui atlas image.");
-	const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
+	WEBSTATIC const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
 #endif
 
-	auto last_update_result = self_update_result();
+	WEBSTATIC auto last_update_result = self_update_result();
 
 #if PLATFORM_WEB
 	LOG("Nothing to self-update on the Web.");
 #else
-	const bool should_run_self_updater = 
+	WEBSTATIC const bool should_run_self_updater = 
 		params.update_once_now ||
 		params.only_check_update_availability_and_quit ||
 		(config.http_client.update_on_launch && !params.no_update_on_launch)
@@ -609,24 +620,24 @@ work_result work(
 	}
 #endif
 
-	augs::timer until_first_swap;
-	bool until_first_swap_measured = false;
+	WEBSTATIC augs::timer until_first_swap;
+	WEBSTATIC bool until_first_swap_measured = false;
 	(void)until_first_swap;
 	(void)until_first_swap_measured;
 
-	session_profiler render_thread_performance;
-	network_profiler network_performance;
-	network_info network_stats;
+	WEBSTATIC session_profiler render_thread_performance;
+	WEBSTATIC network_profiler network_performance;
+	WEBSTATIC network_info network_stats;
 	(void)network_stats;
-	server_network_info server_stats;
+	WEBSTATIC server_network_info server_stats;
 	(void)server_stats;
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	auto last_saved_config_ptr = std::make_unique<config_lua_table>(config);
-	auto& last_saved_config = *last_saved_config_ptr;
+	WEBSTATIC auto last_saved_config_ptr = std::make_unique<config_lua_table>(config);
+	WEBSTATIC auto& last_saved_config = *last_saved_config_ptr;
 
-	auto change_with_save = [&](auto setter) {
+	WEBSTATIC auto change_with_save = [&](auto setter) {
 		setter(config);
 		setter(last_saved_config);
 
@@ -636,7 +647,7 @@ work_result work(
 
 #if HEADLESS
 #else
-	auto last_exit_incorrect_popup = std::optional<simple_popup>();
+	WEBSTATIC auto last_exit_incorrect_popup = std::optional<simple_popup>();
 #endif
 
 #if IS_PRODUCTION_BUILD
@@ -688,9 +699,9 @@ work_result work(
 	augs::remove_file(get_crashed_controllably_path());
 	augs::remove_file(get_exit_success_path());
 
-	auto freetype_library = std::optional<augs::freetype_raii>();
+	WEBSTATIC auto freetype_library = std::optional<augs::freetype_raii>();
 
-	auto pending_launch = std::optional<activity_type>();
+	WEBSTATIC auto pending_launch = std::optional<activity_type>();
 	(void)pending_launch;
 
 	if (params.type == app_type::GAME_CLIENT) {
@@ -724,7 +735,7 @@ work_result work(
 		return work_result::SUCCESS;
 	}
 
-	auto chosen_server_port = [&](){
+	WEBSTATIC auto chosen_server_port = [&](){
 		if (params.server_port.has_value()) {
 			return *params.server_port;
 		}
@@ -732,20 +743,20 @@ work_result work(
 		return config.server_start.port;
 	};
 
-	auto chosen_server_nat = nat_detection_result();
+	WEBSTATIC auto chosen_server_nat = nat_detection_result();
 	(void)chosen_server_nat;
 
-	auto auxiliary_socket = std::optional<netcode_socket_raii>();
+	WEBSTATIC auto auxiliary_socket = std::optional<netcode_socket_raii>();
 
-	auto get_bound_local_port = [&]() {
+	WEBSTATIC auto get_bound_local_port = [&]() {
 #if BUILD_NETWORKING
 		return auxiliary_socket ? auxiliary_socket->socket.address.port : 0;
 #endif
 	};
 
-	auto last_requested_local_port = port_type(0);
+	WEBSTATIC auto last_requested_local_port = port_type(0);
 
-	auto recreate_auxiliary_socket = [&](std::optional<port_type> temporary_port = std::nullopt) {
+	WEBSTATIC auto recreate_auxiliary_socket = [&](std::optional<port_type> temporary_port = std::nullopt) {
 		const auto preferred_port = temporary_port.has_value() ? *temporary_port : chosen_server_port();
 		last_requested_local_port = preferred_port;
 
@@ -767,11 +778,11 @@ work_result work(
 
 	recreate_auxiliary_socket();
 
-	auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
+	WEBSTATIC auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
 
-	auto nat_detection = std::optional<nat_detection_session>();
+	WEBSTATIC auto nat_detection = std::optional<nat_detection_session>();
 
-	auto nat_detection_complete = [&]() {
+	WEBSTATIC auto nat_detection_complete = [&]() {
 		if (nat_detection == std::nullopt) {
 			return false;
 		}
@@ -779,12 +790,12 @@ work_result work(
 		return nat_detection->query_result().has_value();
 	};
 
-	auto restart_nat_detection = [&]() {
+	WEBSTATIC auto restart_nat_detection = [&]() {
 		nat_detection.reset();
 		nat_detection.emplace(config.nat_detection, stun_provider);
 	};
 
-	auto get_detected_nat = [&]() {
+	WEBSTATIC auto get_detected_nat = [&]() {
 		if (nat_detection == std::nullopt) {
 			return nat_detection_result();
 		}
@@ -798,8 +809,8 @@ work_result work(
 
 	restart_nat_detection();
 
-	auto nat_traversal = std::optional<nat_traversal_session>();
-	auto make_server_nat_traversal_input = [&]() {
+	WEBSTATIC auto nat_traversal = std::optional<nat_traversal_session>();
+	WEBSTATIC auto make_server_nat_traversal_input = [&]() {
 		return server_nat_traversal_input {
 			config.nat_detection,
 			config.nat_traversal,
@@ -810,11 +821,11 @@ work_result work(
 
 #endif
 
-	const auto official = std::make_unique<packaged_official_content>(lua);
+	WEBSTATIC const auto official = std::make_unique<packaged_official_content>(lua);
 
 #if !PLATFORM_WEB
 
-	auto handle_sigint = [&]() {
+	WEBSTATIC auto handle_sigint = [&]() {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
 			const auto sig = signal_status.load();
@@ -1033,14 +1044,16 @@ work_result work(
 
 				const auto config_window = config.window;
 
+				auto imgui_atlas_ptr = imgui_atlas_image.get();
+
 				availability_check = launch_async(
-					[&imgui_atlas_image, params, config_http_client, config_window]() {
+					[imgui_atlas_ptr, params=params, config_http_client, config_window]() {
 						const bool only_check_update_availability_and_quit = true;
 
 						return check_and_apply_updates(
 							params.appimage_path,
 							only_check_update_availability_and_quit,
-							*imgui_atlas_image,
+							*imgui_atlas_ptr,
 							config_http_client,
 							config_window,
 							true // should_update_headless
@@ -1082,10 +1095,10 @@ work_result work(
 	LOG("Headless build. Nothing to do.");
 	return work_result::SUCCESS;
 #else
-	auto abandon_pending_op = std::optional<ingame_menu_button_type>();
-	auto abandon_are_you_sure_popup = std::optional<simple_popup>();
+	WEBSTATIC auto abandon_pending_op = std::optional<ingame_menu_button_type>();
+	WEBSTATIC auto abandon_are_you_sure_popup = std::optional<simple_popup>();
 
-	auto make_abandon_popup = [&](auto op) {
+	WEBSTATIC auto make_abandon_popup = [&](auto op) {
 		abandon_pending_op = op;
 
 		simple_popup sp;
@@ -1098,7 +1111,7 @@ work_result work(
 		abandon_are_you_sure_popup = sp;
 	};
 
-	auto perform_abandon_are_you_sure_popup = [&]() {
+	WEBSTATIC auto perform_abandon_are_you_sure_popup = [&]() {
 		if (abandon_are_you_sure_popup.has_value()) {
 			const auto result = abandon_are_you_sure_popup->perform({
 				{ "Abandon", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
@@ -1117,9 +1130,9 @@ work_result work(
 		return 0;
 	};
 
-	auto failed_to_load_arena_popup = std::optional<simple_popup>();
+	WEBSTATIC auto failed_to_load_arena_popup = std::optional<simple_popup>();
 
-	auto perform_failed_to_load_arena_popup = [&]() {
+	WEBSTATIC auto perform_failed_to_load_arena_popup = [&]() {
 		if (failed_to_load_arena_popup.has_value()) {
 			if (failed_to_load_arena_popup->perform()) {
 				failed_to_load_arena_popup = std::nullopt;
@@ -1127,7 +1140,7 @@ work_result work(
 		}
 	};
 
-	auto perform_last_exit_incorrect = [&]() {
+	WEBSTATIC auto perform_last_exit_incorrect = [&]() {
 		if (last_exit_incorrect_popup.has_value()) {
 			if (last_exit_incorrect_popup->perform()) {
 				last_exit_incorrect_popup = std::nullopt;
@@ -1135,10 +1148,10 @@ work_result work(
 		}
 	};
 
-	auto nat_traversal_details = nat_traversal_details_window();
+	WEBSTATIC auto nat_traversal_details = nat_traversal_details_window();
 
 #if BUILD_NETWORKING
-	auto do_traversal_details_popup = [&](auto& window) {
+	WEBSTATIC auto do_traversal_details_popup = [&](auto& window) {
 		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
 			nat_traversal.reset();
 			pending_launch = std::nullopt;
@@ -1150,9 +1163,9 @@ work_result work(
 		}
 	};
 
-	auto nat_detection_popup = abortable_popup_state();
+	WEBSTATIC auto nat_detection_popup = abortable_popup_state();
 
-	auto do_detection_details_popup = [&]() {
+	WEBSTATIC auto do_detection_details_popup = [&]() {
 		const auto message = 
 			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
 		;
@@ -1173,31 +1186,31 @@ work_result work(
 
 	LOG("Initializing the audio context.");
 
-	augs::audio_context audio(config.audio);
+	WEBSTATIC augs::audio_context audio(config.audio);
 
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
-	const auto num_pool_workers = config.performance.get_num_pool_workers();
+	WEBSTATIC const auto num_pool_workers = config.performance.get_num_pool_workers();
 	LOG("Creating the thread pool with %x workers.", num_pool_workers);
-	auto thread_pool = augs::thread_pool(num_pool_workers);
+	WEBSTATIC auto thread_pool = augs::thread_pool(num_pool_workers);
 
 	LOG("Initializing audio command buffers.");
-	augs::audio_command_buffers audio_buffers(thread_pool);
+	WEBSTATIC augs::audio_command_buffers audio_buffers(thread_pool);
 
 	LOG("Initializing the window.");
-	augs::window window(config.window);
+	WEBSTATIC augs::window window(config.window);
 
 	LOG("Initializing the renderer backend.");
-	augs::graphics::renderer_backend renderer_backend;
+	WEBSTATIC augs::graphics::renderer_backend renderer_backend;
 
-	game_frame_buffer_swapper buffer_swapper;
+	WEBSTATIC game_frame_buffer_swapper buffer_swapper;
 
-	auto get_read_buffer = [&]() -> game_frame_buffer& {
+	WEBSTATIC auto get_read_buffer = [&]() -> game_frame_buffer& {
 		return buffer_swapper.get_read_buffer();
 	};
 
-	auto get_write_buffer = [&]() -> game_frame_buffer& {
+	WEBSTATIC auto get_write_buffer = [&]() -> game_frame_buffer& {
 		return buffer_swapper.get_write_buffer();
 	};
 
@@ -1205,24 +1218,24 @@ work_result work(
 	get_read_buffer().new_settings = config.window;
 	get_read_buffer().swap_when = config.performance.swap_window_buffers_when;
 
-	auto logic_get_screen_size = [&]() {
+	WEBSTATIC auto logic_get_screen_size = [&]() {
 		return get_write_buffer().screen_size;
 	};
 
-	auto get_general_renderer = [&]() -> augs::renderer& {
+	WEBSTATIC auto get_general_renderer = [&]() -> augs::renderer& {
 		return get_write_buffer().renderers.all[renderer_type::GENERAL];
 	};
 
 	LOG_NVPS(renderer_backend.get_max_texture_size());
 
 	LOG("Initializing the necessary fbos.");
-	all_necessary_fbos necessary_fbos(
+	WEBSTATIC all_necessary_fbos necessary_fbos(
 		logic_get_screen_size(),
 		config.drawing
 	);
 
 	LOG("Initializing the necessary shaders.");
-	all_necessary_shaders necessary_shaders(
+	WEBSTATIC all_necessary_shaders necessary_shaders(
 		get_general_renderer(),
 		CANON_SHADER_FOLDER,
 		LOCAL_SHADER_FOLDER,
@@ -1230,28 +1243,28 @@ work_result work(
 	);
 
 	LOG("Initializing the necessary sounds.");
-	all_necessary_sounds necessary_sounds(
+	WEBSTATIC all_necessary_sounds necessary_sounds(
 		"content/sfx/necessary"
 	);
 
 	LOG("Initializing the necessary image definitions.");
-	const necessary_image_definitions_map necessary_image_definitions(
+	WEBSTATIC const necessary_image_definitions_map necessary_image_definitions(
 		lua,
 		"content/gfx/necessary",
 		config.content_regeneration.regenerate_every_time
 	);
 
 	LOG("Creating the ImGui atlas.");
-	auto imgui_atlas = augs::graphics::texture(*imgui_atlas_image);
+	WEBSTATIC auto imgui_atlas = augs::graphics::texture(*imgui_atlas_image);
 
-	const auto configurables = configuration_subscribers {
+	WEBSTATIC const auto configurables = configuration_subscribers {
 		window,
 		necessary_fbos,
 		audio,
 		get_general_renderer()
 	};
 
-	auto remember_window_settings = augs::scope_guard([&]() {
+	WEBSTATIC auto remember_window_settings = augs::scope_guard([&]() {
 		/*
 			Remember window size, position and fullscreen status.
 			People don't expect to have to save it.
@@ -1281,8 +1294,8 @@ work_result work(
 		}
 	});
 
-	atlas_profiler atlas_performance;
-	frame_profiler game_thread_performance;
+	WEBSTATIC atlas_profiler atlas_performance;
+	WEBSTATIC frame_profiler game_thread_performance;
 
 	/* 
 		unique_ptr is used to avoid stack overflow.
@@ -1291,46 +1304,46 @@ work_result work(
 		therefore it resides in a separate unique_ptr.
 	*/
 
-	std::unique_ptr<main_menu_setup> main_menu;
-	main_menu_gui main_menu_gui;
-	ltrb menu_ltrb;
+	WEBSTATIC std::unique_ptr<main_menu_setup> main_menu;
+	WEBSTATIC main_menu_gui main_menu_gui;
+	WEBSTATIC ltrb menu_ltrb;
 
-	auto has_main_menu = [&]() {
+	WEBSTATIC auto has_main_menu = [&]() {
 		return main_menu != nullptr;
 	};
 
-	settings_gui_state settings_gui = std::string("Settings");
+	WEBSTATIC settings_gui_state settings_gui = std::string("Settings");
 	settings_gui.display_size_for_clipping = window.get_display().get_size();
 
-	start_client_gui_state start_client_gui = std::string("Connect to server");
-	start_server_gui_state start_server_gui = std::string("Host a server");
+	WEBSTATIC start_client_gui_state start_client_gui = std::string("Connect to server");
+	WEBSTATIC start_server_gui_state start_server_gui = std::string("Host a server");
 
 	start_client_gui.is_steam_client = is_steam_client;
 	start_server_gui.is_steam_client = is_steam_client;
 
 #if BUILD_NETWORKING
-	bool was_browser_open_in_main_menu = false;
-	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
+	WEBSTATIC bool was_browser_open_in_main_menu = false;
+	WEBSTATIC browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 
-	auto find_chosen_server_info = [&]() {
+	WEBSTATIC auto find_chosen_server_info = [&]() {
 		return browse_servers_gui.find_entry(config.client_connect);
 	};
 #endif
 
-	map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
+	WEBSTATIC map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
 
-	leaderboards_gui_state leaderboards_gui = std::string("Leaderboards");
+	WEBSTATIC leaderboards_gui_state leaderboards_gui = std::string("Leaderboards");
 
-	std::string displayed_connecting_server_name;
+	WEBSTATIC std::string displayed_connecting_server_name;
 
-	auto emplace_main_menu = [&map_catalogue_gui, &p = main_menu] (auto&&... args) {
-		if (p == nullptr) {
-			p = std::make_unique<main_menu_setup>(std::forward<decltype(args)>(args)...);
+	WEBSTATIC auto emplace_main_menu = [&] (auto&&... args) {
+		if (main_menu == nullptr) {
+			main_menu = std::make_unique<main_menu_setup>(std::forward<decltype(args)>(args)...);
 			map_catalogue_gui.rebuild_miniatures();
 		}
 	};
 
-	ingame_menu_gui ingame_menu;
+	WEBSTATIC ingame_menu_gui ingame_menu;
 
 	/*
 		Runtime representations of viewables,
@@ -1341,8 +1354,8 @@ work_result work(
 
 	LOG("Initializing the streaming of viewables.");
 
-	auto streaming_ptr = std::make_unique<viewables_streaming>();
-	viewables_streaming& streaming = *streaming_ptr;
+	WEBSTATIC auto streaming_ptr = std::make_unique<viewables_streaming>();
+	WEBSTATIC viewables_streaming& streaming = *streaming_ptr;
 
 	try {
 		augs::image avatar;
@@ -1353,22 +1366,22 @@ work_result work(
 
 	}
 
-	auto get_blank_texture = [&]() {
+	WEBSTATIC auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
 	};
 
-	auto get_drawer_for = [&](augs::renderer& chosen_renderer) { 
+	WEBSTATIC auto get_drawer_for = [&](augs::renderer& chosen_renderer) { 
 		return augs::drawer_with_default {
 			chosen_renderer.get_triangle_buffer(),
 			get_blank_texture()
 		};
 	};
 
-	world_camera gameplay_camera;
+	WEBSTATIC world_camera gameplay_camera;
 	LOG("Initializing the audiovisual state.");
-	auto audiovisuals = std::make_unique<audiovisual_state>();
+	WEBSTATIC auto audiovisuals = std::make_unique<audiovisual_state>();
 
-	auto get_audiovisuals = [&]() -> audiovisual_state& {
+	WEBSTATIC auto get_audiovisuals = [&]() -> audiovisual_state& {
 		return *audiovisuals;
 	};
 
@@ -1377,14 +1390,14 @@ work_result work(
 		The lambdas that aid to make the main loop code more concise.
 	*/	
 
-	std::unique_ptr<setup_variant> current_setup = nullptr;
-	std::unique_ptr<setup_variant> background_setup = nullptr;
+	WEBSTATIC std::unique_ptr<setup_variant> current_setup = nullptr;
+	WEBSTATIC std::unique_ptr<setup_variant> background_setup = nullptr;
 
-	auto has_current_setup = [&]() {
+	WEBSTATIC auto has_current_setup = [&]() {
 		return current_setup != nullptr;
 	};
 
-	auto would_abandon_ranked_match = [&]() {
+	WEBSTATIC auto would_abandon_ranked_match = [&]() {
 #if BUILD_NETWORKING
 		if (has_current_setup()) {
 			if (const auto setup = std::get_if<client_setup>(std::addressof(*current_setup))) {
@@ -1396,7 +1409,7 @@ work_result work(
 		return false;
 	};
 
-	auto is_during_tutorial = [&]() {
+	WEBSTATIC auto is_during_tutorial = [&]() {
 		if (has_current_setup()) {
 			if (const auto setup = std::get_if<test_scene_setup>(std::addressof(*current_setup))) {
 				return setup->is_tutorial();
@@ -1406,14 +1419,14 @@ work_result work(
 		return false;
 	};
 
-	auto restore_background_setup = [&]() {
+	WEBSTATIC auto restore_background_setup = [&]() {
 		current_setup = std::move(background_setup);
 		background_setup = std::unique_ptr<setup_variant>();
 
 		ingame_menu.show = false;
 	};
 
-	auto visit_current_setup = [&](auto callback) -> decltype(auto) {
+	WEBSTATIC auto visit_current_setup = [&](auto callback) -> decltype(auto) {
 		if (has_current_setup()) {
 			return std::visit(
 				[&](auto& setup) -> decltype(auto) {
@@ -1427,19 +1440,19 @@ work_result work(
 		}
 	};
 
-	auto setup_requires_cursor = [&]() {
+	WEBSTATIC auto setup_requires_cursor = [&]() {
 		return visit_current_setup([&](const auto& s) {
 			return s.requires_cursor();
 		});
 	};
 
-	auto get_interpolation_ratio = [&]() {
+	WEBSTATIC auto get_interpolation_ratio = [&]() {
 		return visit_current_setup([&](auto& setup) {
 			return setup.get_interpolation_ratio();
 		});
 	};
 
-	auto on_specific_setup = [&](auto callback) -> decltype(auto) {
+	WEBSTATIC auto on_specific_setup = [&](auto callback) -> decltype(auto) {
 		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
 		if constexpr(std::is_same_v<T, main_menu_setup>) {
@@ -1461,23 +1474,23 @@ work_result work(
 		}
 	};
 
-	auto get_unofficial_content_dir = [&]() {
+	WEBSTATIC auto get_unofficial_content_dir = [&]() {
 		return visit_current_setup([&](const auto& s) { return s.get_unofficial_content_dir(); });
 	};
 
-	auto get_render_layer_filter = [&]() {
+	WEBSTATIC auto get_render_layer_filter = [&]() {
 		return visit_current_setup([&](const auto& s) { return s.get_render_layer_filter(); });
 	};
 
 	/* TODO: We need to have one game gui per cosmos. */
-	game_gui_system game_gui;
-	bool game_gui_mode_flag = false;
+	WEBSTATIC game_gui_system game_gui;
+	WEBSTATIC bool game_gui_mode_flag = false;
 
-	hud_messages_gui hud_messages;
+	WEBSTATIC hud_messages_gui hud_messages;
 
-	std::atomic<augs::frame_num_type> current_frame = 0;
+	WEBSTATIC std::atomic<augs::frame_num_type> current_frame = 0;
 
-	auto load_all = [&](const all_viewables_defs& new_defs) {
+	WEBSTATIC auto load_all = [&](const all_viewables_defs& new_defs) {
 		const auto frame_num = current_frame.load();
 
 		std::optional<arena_player_metas> new_player_metas;
@@ -1509,9 +1522,9 @@ work_result work(
 		});
 	};
 
-	bool set_rich_presence_now = true;
+	WEBSTATIC bool set_rich_presence_now = true;
 
-	auto setup_launcher = [&](auto&& setup_init_callback) {
+	WEBSTATIC auto setup_launcher = [&](auto&& setup_init_callback) {
 		::steam_clear_rich_presence();
 		set_rich_presence_now = true;
 		
@@ -1569,7 +1582,7 @@ work_result work(
 #endif
 	};
 
-	auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
+	WEBSTATIC auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
 		using Tag = decltype(tag);
 		using T = type_of_in_place_type_t<Tag>; 
 
@@ -1585,7 +1598,7 @@ work_result work(
 	};
 
 #if BUILD_DEBUGGER_SETUP
-	auto launch_debugger = [&](auto&&... args) {
+	WEBSTATIC auto launch_debugger = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(std::in_place_type_t<debugger_setup>(),
 				std::forward<decltype(args)>(args)...
@@ -1593,18 +1606,18 @@ work_result work(
 		});
 	};
 #else
-	auto launch_debugger = [&](auto&&...) {
+	WEBSTATIC auto launch_debugger = [&](auto&&...) {
 
 	};
 #endif
 
-	auto save_last_activity = [&](const activity_type mode) {
+	WEBSTATIC auto save_last_activity = [&](const activity_type mode) {
 		change_with_save([mode](config_lua_table& cfg) {
 			cfg.last_activity = mode;
 		});
 	};
 
-	auto launch_main_menu = [&]() {
+	WEBSTATIC auto launch_main_menu = [&]() {
 		if (!has_main_menu()) {
 			main_menu_gui = {};
 			main_menu_gui.has_play_ranked_button = is_steam_client;
@@ -1621,7 +1634,7 @@ work_result work(
 	};
 
 #if BUILD_NETWORKING
-	auto get_browse_servers_input = [&]() {
+	WEBSTATIC auto get_browse_servers_input = [&]() {
 		return browse_servers_input {
 			config.server_list_provider,
 			config.client_connect,
@@ -1632,7 +1645,7 @@ work_result work(
 		};
 	};
 
-	auto launch_client_setup = [&](
+	WEBSTATIC auto launch_client_setup = [&](
 		const bool ignore_nat_check,
 
 		/* 
@@ -1691,11 +1704,13 @@ work_result work(
 			}
 		}
 
+#if !PLATFORM_WEB
 		if (is_steam_client) {
 			LOG("Calling steam_request_auth_ticket.");
 			steam_auth_request_id = ::steam_request_auth_ticket("hypersomnia_gameserver");
 			LOG_NVPS(steam_auth_request_id);
 		}
+#endif
 
 		setup_launcher([&]() {
 			auto bound_port = get_bound_local_port();
@@ -1728,7 +1743,7 @@ work_result work(
 	};
 #endif
 
-	auto launch_editor = [&](auto&&... args) {
+	WEBSTATIC auto launch_editor = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(
 				std::in_place_type_t<editor_setup>(),
@@ -1741,7 +1756,7 @@ work_result work(
 		save_last_activity(activity_type::EDITOR);
 	};
 
-	auto launch_setup = [&](const activity_type mode) {
+	WEBSTATIC auto launch_setup = [&](const activity_type mode) {
 		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
 			change_with_save(
 				[&](auto& cfg) {
@@ -1881,12 +1896,13 @@ work_result work(
 		save_last_activity(mode);
 	};
 
-	bool client_start_requested = false;
+	WEBSTATIC bool client_start_requested = false;
+	WEBSTATIC bool server_start_requested = false;
 	(void)client_start_requested;
-	bool server_start_requested = false;
+	(void)server_start_requested;
 
 #if BUILD_NETWORKING
-	auto finalize_pending_launch = [&](std::optional<netcode_address_t> before_addr = std::nullopt) {
+	WEBSTATIC auto finalize_pending_launch = [&](std::optional<netcode_address_t> before_addr = std::nullopt) {
 		if (pending_launch == activity_type::CLIENT) {
 			const bool ignore_nat_check = true;
 			launch_client_setup(ignore_nat_check, before_addr);
@@ -1898,7 +1914,7 @@ work_result work(
 		pending_launch = std::nullopt;
 	};
 
-	auto next_nat_traversal_attempt = [&]() {
+	WEBSTATIC auto next_nat_traversal_attempt = [&]() {
 		const auto& server_nat = chosen_server_nat;
 		const auto& client_connect = config.client_connect;
 		const auto traversed_address = find_netcode_addr(client_connect);
@@ -1924,13 +1940,13 @@ work_result work(
 		}, stun_provider);
 	};
 
-	auto start_nat_traversal = [&]() {
+	WEBSTATIC auto start_nat_traversal = [&]() {
 		nat_traversal_details.reset();
 
 		next_nat_traversal_attempt();
 	};
 	
-	auto advance_nat_traversal = [&]() {
+	WEBSTATIC auto advance_nat_traversal = [&]() {
 		if (nat_traversal_details.aborted) {
 			return;
 		}
@@ -1942,7 +1958,7 @@ work_result work(
 		}
 	};
 
-	auto check_nat_traversal_result = [&]() {
+	WEBSTATIC auto check_nat_traversal_result = [&]() {
 		const auto state = nat_traversal->get_current_state();
 
 		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
@@ -1959,7 +1975,7 @@ work_result work(
 		}
 	};
 
-	auto start_client_setup = [&]() {
+	WEBSTATIC auto start_client_setup = [&]() {
 		change_with_save(
 			[&](auto& cfg) {
 				cfg.client_connect = config.client_connect;
@@ -1972,7 +1988,7 @@ work_result work(
 		launch_setup(activity_type::CLIENT);
 	};
 
-	auto perform_browse_servers = [&]() {
+	WEBSTATIC auto perform_browse_servers = [&]() {
 		browse_servers_gui.allow_ranked_servers = is_steam_client;
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
@@ -1981,7 +1997,7 @@ work_result work(
 		}
 	};
 
-	auto perform_start_client_gui = [&](const auto frame_num) {
+	WEBSTATIC auto perform_start_client_gui = [&](const auto frame_num) {
 		const auto best_server = browse_servers_gui.find_best_server(is_steam_client);
 
 		const bool perform_result = start_client_gui.perform(
@@ -2012,7 +2028,7 @@ work_result work(
 		}
 	};
 
-	auto perform_start_server_gui = [&]() {
+	WEBSTATIC auto perform_start_server_gui = [&]() {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
 			config.server_start, 
 			config.server, 
@@ -2060,7 +2076,7 @@ work_result work(
 	};
 #endif
 
-	auto get_map_catalogue_input = [&]() {
+	WEBSTATIC auto get_map_catalogue_input = [&]() {
 		return map_catalogue_input {
 			config.server.external_arena_files_provider,
 			streaming.ad_hoc.in_atlas,
@@ -2070,7 +2086,7 @@ work_result work(
 		};
 	};
 
-	auto perform_leaderboards = [&]() {
+	WEBSTATIC auto perform_leaderboards = [&]() {
 		leaderboards_gui.perform({
 			config.client.nickname,
 			steam_id,
@@ -2084,7 +2100,7 @@ work_result work(
 		});
 	};
 
-	auto perform_map_catalogue = [&]() {
+	WEBSTATIC auto perform_map_catalogue = [&]() {
 		const bool perform_result = map_catalogue_gui.perform(get_map_catalogue_input());
 
 		if (perform_result) {
@@ -2103,13 +2119,13 @@ work_result work(
 		}
 	};
 
-	auto get_viewable_defs = [&]() -> const all_viewables_defs& {
+	WEBSTATIC auto get_viewable_defs = [&]() -> const all_viewables_defs& {
 		return visit_current_setup([&](auto& setup) -> const all_viewables_defs& {
 			return setup.get_viewable_defs();
 		});
 	};
 
-	auto create_game_gui_deps = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto create_game_gui_deps = [&](const config_lua_table& viewing_config) {
 		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
@@ -2121,7 +2137,7 @@ work_result work(
 		};
 	};
 
-	auto create_menu_context_deps = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto create_menu_context_deps = [&](const config_lua_table& viewing_config) {
 		return menu_context_dependencies{
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
@@ -2134,7 +2150,7 @@ work_result work(
 		};
 	};
 
-	auto get_game_gui_subject = [&]() -> const_entity_handle {
+	WEBSTATIC auto get_game_gui_subject = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([&](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
 		});
@@ -2146,7 +2162,7 @@ work_result work(
 		return viewed_cosmos[gui_character_id];
 	};
 
-	auto get_viewed_character = [&]() -> const_entity_handle {
+	WEBSTATIC auto get_viewed_character = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([&](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
 		});
@@ -2158,7 +2174,7 @@ work_result work(
 		return viewed_cosmos[viewed_character_id];
 	};
 
-	auto get_controlled_character = [&]() -> const_entity_handle {
+	WEBSTATIC auto get_controlled_character = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([&](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
 		});
@@ -2170,7 +2186,7 @@ work_result work(
 		return viewed_cosmos[controlled_character_id];
 	};
 		
-	auto should_draw_game_gui = [&]() {
+	WEBSTATIC auto should_draw_game_gui = [&]() {
 		{
 			bool should = true;
 
@@ -2204,7 +2220,7 @@ work_result work(
 		return true;
 	};
 
-	auto get_logic_eye = [&](const bool with_edge_zoomout) {
+	WEBSTATIC auto get_logic_eye = [&](const bool with_edge_zoomout) {
 		if (const auto custom = visit_current_setup(
 			[](const auto& setup) { 
 				return setup.find_current_camera_eye(); 
@@ -2221,11 +2237,11 @@ work_result work(
 	};
 
 
-	auto get_camera_edge_zoomout_mult = [&]() {		
+	WEBSTATIC auto get_camera_edge_zoomout_mult = [&]() {		
 		return gameplay_camera.current_edge_zoomout_mult;
 	};
 
-	auto get_camera_requested_fov_expansion = [&]() {		
+	WEBSTATIC auto get_camera_requested_fov_expansion = [&]() {		
 		auto result = 1.0f / get_logic_eye(false).zoom;
 
 		if (get_camera_edge_zoomout_mult() > 0.001f) {
@@ -2235,7 +2251,7 @@ work_result work(
 		return result;
 	};
 
-	auto get_camera_eye = [&](const config_lua_table& viewing_config, bool with_edge_zoomout = true) {		
+	WEBSTATIC auto get_camera_eye = [&](const config_lua_table& viewing_config, bool with_edge_zoomout = true) {		
 		auto logic_eye = get_logic_eye(with_edge_zoomout);
 
 		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
@@ -2281,15 +2297,15 @@ work_result work(
 		return logic_eye;
 	};
 
-	auto get_camera_cone = [&](const config_lua_table& viewing_config) {		
+	WEBSTATIC auto get_camera_cone = [&](const config_lua_table& viewing_config) {		
 		return camera_cone(get_camera_eye(viewing_config), logic_get_screen_size());
 	};
 
-	auto get_nonzoomedout_visible_world_area = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto get_nonzoomedout_visible_world_area = [&](const config_lua_table& viewing_config) {
 		return vec2(logic_get_screen_size()) / get_camera_eye(viewing_config, no_edge_zoomout_v).zoom;
 	};
 
-	auto get_queried_cone = [&](const config_lua_table& viewing_config) {		
+	WEBSTATIC auto get_queried_cone = [&](const config_lua_table& viewing_config) {		
 		const auto query_mult = viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = [&]() {
@@ -2301,7 +2317,7 @@ work_result work(
 		return queried_cone;
 	};
 
-	auto get_setup_customized_config = [&]() {
+	WEBSTATIC auto get_setup_customized_config = [&]() {
 		return visit_current_setup([&]<typename S>(S& setup) {
 			auto config_copy = config;
 
@@ -2363,7 +2379,7 @@ work_result work(
 		});
 	};
 
-	auto is_replaying_demo = [&]() {
+	WEBSTATIC auto is_replaying_demo = [&]() {
 		bool result = false;
 
 		on_specific_setup([&](client_setup& setup) {
@@ -2373,7 +2389,7 @@ work_result work(
 		return result;
 	};
 
-	auto can_show_enemy_silhouettes = [&]() {
+	WEBSTATIC auto can_show_enemy_silhouettes = [&]() {
 		if (is_replaying_demo()) {
 			return true;
 		}
@@ -2391,9 +2407,9 @@ work_result work(
 		return result;
 	};
 
-	augs::timer ad_hoc_animation_timer;
+	WEBSTATIC augs::timer ad_hoc_animation_timer;
 
-	auto perform_setup_custom_imgui = [&]() {
+	WEBSTATIC auto perform_setup_custom_imgui = [&]() {
 		/*
 			The debugger setup might want to use IMGUI to create views of entities or resources,
 			thus we ask the current setup for its custom ImGui logic.
@@ -2507,7 +2523,8 @@ work_result work(
 		});
 	};
 
-	auto process_steam_callbacks = [&]() {
+#if !PLATFORM_WEB
+	WEBSTATIC auto process_steam_callbacks = [&]() {
 		auto connect_to = [&](const std::string& address_string) {
 			if (address_string.length() > 0) {
 				LOG("(Steam Callback) Joining server (length: %x): %x", address_string.length(), address_string);
@@ -2559,7 +2576,7 @@ work_result work(
 
 		steam_run_callbacks(handler_c, &steam_events);
 
-		auto handler_lbd = [connect_to, steam_auth_request_id, visit_current_setup]<typename E>(const E& event) {
+		auto handler_lbd = [&]<typename E>(const E& event) {
 			if constexpr(std::is_same_v<E, steam_new_url_launch_parameters>) {
 				LOG("(Steam Callback) steam_new_url_launch_parameters.");
 				(void)event;
@@ -2598,8 +2615,9 @@ work_result work(
 			std::visit(handler_lbd, event);
 		}
 	};
+#endif
 
-	auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
+	WEBSTATIC auto do_imgui_pass = [&](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
 		(void)frame_num;
 
 		bool freeze_imgui_inputs = false;
@@ -2755,14 +2773,14 @@ work_result work(
 		new_window_entropy = augs::imgui::filter_inputs(new_window_entropy);
 	};
 
-	auto decide_on_cursor_clipping = [&](const bool in_direct_gameplay, const auto& cfg) {
+	WEBSTATIC auto decide_on_cursor_clipping = [&](const bool in_direct_gameplay, const auto& cfg) {
 		get_write_buffer().should_clip_cursor = (
 			in_direct_gameplay
 			|| cfg.window.draws_own_cursor()
 		);
 	};
 
-	auto get_current_input_settings = [&](const auto& cfg) {
+	WEBSTATIC auto get_current_input_settings = [&](const auto& cfg) {
 		auto settings = cfg.input;
 
 #if BUILD_NETWORKING
@@ -2774,7 +2792,7 @@ work_result work(
 		return settings;
 	};
 
-	auto handle_app_intent = [&](const app_intent_type intent) {
+	WEBSTATIC auto handle_app_intent = [&](const app_intent_type intent) {
 		using T = decltype(intent);
 
 		switch (intent) {
@@ -2820,7 +2838,7 @@ work_result work(
 		}
 	};
 	
-	auto handle_general_gui_intent = [&](const general_gui_intent_type intent) {
+	WEBSTATIC auto handle_general_gui_intent = [&](const general_gui_intent_type intent) {
 		using T = decltype(intent);
 
 		switch (intent) {
@@ -2844,7 +2862,7 @@ work_result work(
 		}
 	};
  
-	auto main_ensure_handler = [&]() {
+	WEBSTATIC auto main_ensure_handler = [&]() {
 		visit_current_setup(
 			[&](auto& setup) {
 				setup.ensure_handler();
@@ -2854,14 +2872,14 @@ work_result work(
 
 	::ensure_handler = main_ensure_handler;
 
-	bool should_quit = false;
+	WEBSTATIC bool should_quit = false;
 
-	augs::event::state common_input_state;
+	WEBSTATIC augs::event::state common_input_state;
 	common_input_state.mouse.pos = window.get_last_mouse_pos();
 
-	std::function<void()> request_quit;
+	WEBSTATIC std::function<void()> request_quit;
 
-	auto do_main_menu_option = [&](const main_menu_button_type t) {
+	WEBSTATIC auto do_main_menu_option = [&](const main_menu_button_type t) {
 		LOG("Menu option: %x", augs::enum_to_string(t));
 		
 		using T = decltype(t);
@@ -2946,7 +2964,7 @@ work_result work(
 		}
 	};
 
-	auto do_ingame_menu_option = [&](const ingame_menu_button_type t, const bool allow_popup = true) {
+	WEBSTATIC auto do_ingame_menu_option = [&](const ingame_menu_button_type t, const bool allow_popup = true) {
 		using T = decltype(t);
 
 		switch (t) {
@@ -3010,7 +3028,7 @@ work_result work(
 		}
 	};
 
-	auto setup_pre_solve = [&](auto...) {
+	WEBSTATIC auto setup_pre_solve = [&](auto...) {
 		get_general_renderer().save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
@@ -3020,13 +3038,13 @@ work_result work(
 		are separated only because MSVC outputs ICEs if they become nested.
 	*/
 
-	visible_entities all_visible;
+	WEBSTATIC visible_entities all_visible;
 
-	auto get_character_camera = [&](const config_lua_table& viewing_config) -> character_camera {
+	WEBSTATIC auto get_character_camera = [&](const config_lua_table& viewing_config) -> character_camera {
 		return { get_viewed_character(), { get_camera_eye(viewing_config), logic_get_screen_size() } };
 	};
 
-	auto reacquire_visible_entities = [&](
+	WEBSTATIC auto reacquire_visible_entities = [&](
 		const vec2i& screen_size,
 		const const_entity_handle& viewed_character,
 		const config_lua_table& viewing_config
@@ -3052,7 +3070,7 @@ work_result work(
 		game_thread_performance.num_visible_entities.measure(all_visible.count_all());
 	};
 
-	auto calc_pre_step_crosshair_displacement = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto calc_pre_step_crosshair_displacement = [&](const config_lua_table& viewing_config) {
 		if (get_viewed_character() != get_controlled_character()) {
 			return vec2::zero;
 		}
@@ -3081,12 +3099,12 @@ work_result work(
 		});
 	};
 
-	bool pending_new_state_sample = true;
-	auto last_sampled_cosmos = cosmos_id_type(-1);
+	WEBSTATIC bool pending_new_state_sample = true;
+	WEBSTATIC auto last_sampled_cosmos = cosmos_id_type(-1);
 
-	augs::timer state_changed_timer;
+	WEBSTATIC augs::timer state_changed_timer;
 
-	auto audiovisual_step = [&](
+	WEBSTATIC auto audiovisual_step = [&](
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		const double speed_multiplier,
@@ -3233,7 +3251,7 @@ work_result work(
 		pending_new_state_sample = false;
 	};
 
-	auto setup_post_solve = [&](
+	WEBSTATIC auto setup_post_solve = [&](
 		const const_logic_step step, 
 		const augs::audio_renderer* audio_renderer,
 		const config_lua_table& viewing_config,
@@ -3271,7 +3289,7 @@ work_result work(
 		}
 	};
 
-	auto setup_post_cleanup = [&](const auto& cfg, const const_logic_step step) {
+	WEBSTATIC auto setup_post_cleanup = [&](const auto& cfg, const const_logic_step step) {
 		if (cfg.debug.log_solvable_hashes) {
 			const auto& cosm = step.get_cosmos();
 			const auto ts = cosm.get_timestamp().step;
@@ -3281,7 +3299,7 @@ work_result work(
 		}
 	};
 
-	auto advance_setup = [&](
+	WEBSTATIC auto advance_setup = [&](
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		auto& setup,
@@ -3304,7 +3322,7 @@ work_result work(
 			auto callbacks = solver_callbacks(
 				setup_pre_solve,
 				setup_audiovisual_post_solve,
-				[&viewing_config, &setup_post_cleanup](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
+				[&](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
 			);
 
 			const auto nonzoomedout_zoom = get_camera_eye(viewing_config, no_edge_zoomout_v).zoom;
@@ -3398,7 +3416,7 @@ work_result work(
 		audiovisual_step(audio_renderer, frame_delta, setup.get_audiovisual_speed(), viewing_config);
 	};
 
-	auto advance_current_setup = [&](
+	WEBSTATIC auto advance_current_setup = [&](
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		const input_pass_result& result
@@ -3459,11 +3477,11 @@ work_result work(
 		The main loop variables.
 	*/
 
-	augs::timer frame_timer;
+	WEBSTATIC augs::timer frame_timer;
 	
-	release_flags releases;
+	WEBSTATIC release_flags releases;
 
-	auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
 		return [&]() {
 			return game_gui.create_context(
 				logic_get_screen_size(),
@@ -3474,7 +3492,7 @@ work_result work(
 		};
 	};
 
-	auto make_create_menu_context = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto make_create_menu_context = [&](const config_lua_table& viewing_config) {
 		return [&](auto& gui) {
 			return gui.create_context(
 				logic_get_screen_size(),
@@ -3484,7 +3502,7 @@ work_result work(
 		};
 	};
 
-	auto close_next_imgui_window = [&]() {
+	WEBSTATIC auto close_next_imgui_window = [&]() {
 		ImGuiContext& g = *GImGui;
 
 		if (g.WindowsFocusOrder.size() > 0) {
@@ -3494,7 +3512,7 @@ work_result work(
 		}
 	};
 
-	auto let_imgui_hijack_mouse = [&](auto&& create_game_gui_context, auto&& create_menu_context) {
+	WEBSTATIC auto let_imgui_hijack_mouse = [&](auto&& create_game_gui_context, auto&& create_menu_context) {
 		if (!ImGui::GetIO().WantCaptureMouse) {
 			return;
 		}
@@ -3532,7 +3550,7 @@ work_result work(
 		});
 	};
 
-	auto advance_game_gui = [&](const auto context, const auto frame_delta) {
+	WEBSTATIC auto advance_game_gui = [&](const auto context, const auto frame_delta) {
 		auto scope = measure_scope(game_thread_performance.advance_game_gui);
 
 		game_gui.advance(context, frame_delta);
@@ -3546,12 +3564,12 @@ work_result work(
 
 	ImGui::GetIO().MousePos = { 0, 0 };
 
-	cached_visibility_data cached_visibility;
-	debug_details_summaries debug_summaries;
+	WEBSTATIC cached_visibility_data cached_visibility;
+	WEBSTATIC debug_details_summaries debug_summaries;
 
-	auto game_thread_result = work_result::SUCCESS;
+	WEBSTATIC auto game_thread_result = work_result::SUCCESS;
 
-	auto game_thread_worker = [&]() {
+	WEBSTATIC auto game_thread_worker = [&]() {
 		auto prepare_next_game_frame = [&]() {
 			auto frame = measure_scope(game_thread_performance.total);
 
@@ -3743,7 +3761,9 @@ work_result work(
 				const bool was_any_imgui_popup_opened = ImGui::IsPopupOpen(0u, ImGuiPopupFlags_AnyPopupId);
 
 				do_imgui_pass(get_current_frame_num(), new_window_entropy, frame_delta, in_direct_gameplay);
+#if !PLATFORM_WEB
 				process_steam_callbacks();
+#endif
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;
@@ -4656,19 +4676,19 @@ work_result work(
 	};
 
 	LOG("Starting game_thread_worker");
-	auto game_thread = std::thread(game_thread_worker);
+	WEBSTATIC auto game_thread = std::thread(game_thread_worker);
 
-	auto audio_thread_joiner = augs::scope_guard([&]() { LOG("audio_thread_joiner"); audio_buffers.quit(); });
-	auto game_thread_joiner = augs::scope_guard([&]() { LOG("game_thread_joiner"); game_thread.join(); });
+	WEBSTATIC auto audio_thread_joiner = augs::scope_guard([&]() { LOG("audio_thread_joiner"); audio_buffers.quit(); });
+	WEBSTATIC auto game_thread_joiner = augs::scope_guard([&]() { LOG("game_thread_joiner"); game_thread.join(); });
 
 	request_quit = [&]() {
 		get_write_buffer().should_quit = true;
 		should_quit = true;
 	};
 
-	renderer_backend_result rendering_result;
+	WEBSTATIC renderer_backend_result rendering_result;
 
-	auto game_main_thread_synced_op = [&]() {
+	WEBSTATIC auto game_main_thread_synced_op = [&]() {
 		auto scope = measure_scope(game_thread_performance.synced_op);
 
 		/* 
@@ -4704,7 +4724,7 @@ work_result work(
 		});
 	};
 
-	augs::timer this_frame_timer;
+	WEBSTATIC augs::timer this_frame_timer;
 
 	struct main_loop_input {
 		augs::window& window;
@@ -4722,7 +4742,7 @@ work_result work(
 		decltype(game_main_thread_synced_op)& game_main_thread_synced_op;
 	};
 
-	auto main_loop_in = main_loop_input {
+	WEBSTATIC auto main_loop_in = main_loop_input {
 		window,
 		buffer_swapper,
 		renderer_backend,
@@ -4738,10 +4758,9 @@ work_result work(
 		game_main_thread_synced_op
 	};
 
-	auto main_loop_in_ptr = reinterpret_cast<void*>(&main_loop_in);
+	WEBSTATIC auto main_loop_in_ptr = reinterpret_cast<void*>(&main_loop_in);
 
 	static auto main_loop_iter = [](void* arg) -> bool {
-		LOG("main_loop_iter");
 		auto& mi = *reinterpret_cast<main_loop_input*>(arg);
 
 		auto& window = mi.window;
@@ -4826,7 +4845,6 @@ work_result work(
 
 			{
 				auto scope = measure_scope(render_thread_performance.render_help);
-				thread_pool.sleep_until_tasks_posted();
 				thread_pool.help_until_no_tasks();
 			}
 
@@ -4893,7 +4911,7 @@ work_result work(
 	};
 
 #if PLATFORM_WEB
-	auto main_loop_iter_em = [](void* arg) {
+	static auto main_loop_iter_em = [](void* arg) {
 		if (!main_loop_iter(arg)) {
 			emscripten_cancel_main_loop();
 		}

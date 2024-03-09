@@ -30,6 +30,9 @@ void bake_fresh_atlas(
 	const bake_fresh_atlas_input in,
 	const bake_fresh_atlas_output out
 ) {
+#if PLATFORM_WEB
+	LOG("bake_fresh_atlas");
+#endif
 	const auto& subjects = in.subjects;
 
 	auto& baked = out.baked;
