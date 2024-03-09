@@ -694,7 +694,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 
 			push_notification_job(
 				[report_webhook_url, api_key, json_body]() -> std::string {
-					auto http_client = httplib_utils::make_client(report_webhook_url);
+					auto http_client = httplib_utils::make_client(report_webhook_url, 60 * 3);
 
 					httplib::Headers headers;
 					headers.emplace("apikey", api_key);
