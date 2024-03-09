@@ -4919,9 +4919,7 @@ work_result work(
 
 	LOG("Calling emscripten_set_main_loop_arg.");
 
-	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 1);
-
-	LOG("Post emscripten_set_main_loop_arg (shouldn't happen).");
+	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 0);
 #else
 	for (;;) {
 		if (!main_loop_iter(main_loop_in_ptr)) {
