@@ -4588,7 +4588,7 @@ work_result work(
 
 			thread_pool.submit();
 
-			auto scope = measure_scope(game_thread_performance.main_help);
+			auto scope = measure_scope(game_thread_performance.help_tasks);
 
 			thread_pool.help_until_no_tasks();
 			thread_pool.wait_for_all_tasks_to_complete();
@@ -4670,7 +4670,7 @@ work_result work(
 #endif
 			}
 
-			auto scope = measure_scope(game_thread_performance.main_wait);
+			auto scope = measure_scope(game_thread_performance.wait_swap);
 			finalize_frame_and_swap();
 		}
 	};

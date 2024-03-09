@@ -4,10 +4,15 @@
 #include "augs/templates/exception_templates.h"
 #include "augs/audio/audio_settings.h"
 
+#if PLATFORM_WEB
+typedef struct ALCcontext_struct ALCcontext;
+typedef struct ALCdevice_struct ALCdevice;
+#else
 /** Opaque device handle */
 typedef struct ALCdevice ALCdevice;
 /** Opaque context handle */
 typedef struct ALCcontext ALCcontext;
+#endif
 
 namespace augs {
 	struct audio_error : error_with_typesafe_sprintf {

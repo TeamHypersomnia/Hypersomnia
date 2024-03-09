@@ -1,4 +1,5 @@
 #include "augs/audio/audio_backend.h"
+#include "augs/log.h"
 #include "augs/audio/sound_source.h"
 #include "augs/audio/audio_command.h"
 #include "augs/templates/always_false.h"
@@ -6,8 +7,9 @@
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/alext.h>
+#if !PLATFORM_WEB
 #include <AL/efx.h>
+#endif
 #endif
 
 /* A shortcut which will be heavily used from now on */
@@ -19,15 +21,19 @@ constexpr bool same = std::is_same_v<A, B>;
 
 namespace augs {
 	audio_backend::audio_backend() {
+#if !PLATFORM_WEB
 #if BUILD_OPENAL
 		alGenFilters(1, &lowpass_filter_id);
 		alFilteri(lowpass_filter_id, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
 #endif
+#endif
 	}
 
 	audio_backend::~audio_backend() {
+#if !PLATFORM_WEB
 #if BUILD_OPENAL
 		alDeleteFilters(1, &lowpass_filter_id);
+#endif
 #endif
 	}
 
@@ -59,12 +65,12 @@ namespace augs {
 
 					if (t.is_direct_listener) {
 						source.set_relative_and_zero_vel_pos();
-						source.set_air_absorption_factor(t.air_absorption_factor);
+						source.set_air_absorption_factor(0.f);
 					}
 					else {
 						source.set_relative(false);
 						source.set_position(si, t.position);
-						source.set_air_absorption_factor(0.f);
+						source.set_air_absorption_factor(t.air_absorption_factor);
 					}
 
 					source.set_spatialize(!t.is_direct_listener);
@@ -91,6 +97,7 @@ namespace augs {
 					source.set_distance_model(t.model);
 					source.set_looping(t.looping);
 
+#if !PLATFORM_WEB
 					if (t.lowpass_gainhf >= 0.f) {
 						alFilterf(lowpass_filter_id, AL_LOWPASS_GAINHF, t.lowpass_gainhf);
 						alSourcei(source.get_id(), AL_DIRECT_FILTER, lowpass_filter_id);
@@ -98,6 +105,7 @@ namespace augs {
 					else {
 						alSourcei(source.get_id(), AL_DIRECT_FILTER, AL_FILTER_NULL);
 					}
+#endif
 				}
 				else if constexpr(same<C, update_flash_noise>) {
 					auto& source = flash_noise_source;

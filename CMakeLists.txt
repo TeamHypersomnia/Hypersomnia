@@ -246,11 +246,13 @@ else()
 endif()
 
 if (BUILD_FOR_WEB OR HYPERSOMNIA_BARE)
-	set(BUILD_FREETYPE ON) # Slowly enabling one by one
-	set(BUILD_SOUND_FORMAT_DECODERS ON) # Slowly enabling one by one
+	# Slowly enabling one by one
+	set(BUILD_FREETYPE ON) 
+	set(BUILD_SOUND_FORMAT_DECODERS ON)
 
-	set(BUILD_OPENGL ON) # Slowly enabling one by one
-	set(BUILD_WINDOW_FRAMEWORK ON) # Slowly enabling one by one
+	set(BUILD_OPENGL ON)
+	set(BUILD_OPENAL ON)
+	set(BUILD_WINDOW_FRAMEWORK ON)
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -1368,6 +1370,10 @@ if(BUILD_FOR_WEB)
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ADDITIONAL_WEB_FLAGS}")
+	
+	if (BUILD_OPENAL)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lopenal")
+	endif()
 
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
@@ -1555,7 +1561,7 @@ add_library(lua ${LUA_CPPS})
 
 include(add_include_dirs_of)
 
-if(BUILD_OPENAL)
+if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 	# We build OpenAL Soft. We need to set some variables beforehand.
 	
 	set(LIBTYPE "STATIC")
@@ -1944,7 +1950,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 	endif()
 endif()
 
-if(BUILD_OPENAL)
+if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 	list(APPEND HYPERSOMNIA_LIBS OpenAL)
 endif()
 

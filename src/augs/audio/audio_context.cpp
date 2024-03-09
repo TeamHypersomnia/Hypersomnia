@@ -5,8 +5,22 @@
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/efx.h>
+#if PLATFORM_WEB
+
+#define AL_SOURCE_DISTANCE_MODEL                 0x200
+
+#define ALC_HRTF_SOFT                            0x1992
+#define ALC_HRTF_STATUS_SOFT                     0x1993
+#define ALC_HRTF_DISABLED_SOFT                   0x0000
+#define ALC_HRTF_ENABLED_SOFT                    0x0001
+#define ALC_HRTF_DENIED_SOFT                     0x0002
+#define ALC_HRTF_REQUIRED_SOFT                   0x0003
+#define ALC_HRTF_HEADPHONES_DETECTED_SOFT        0x0004
+#define ALC_HRTF_UNSUPPORTED_FORMAT_SOFT         0x0005
+#else
 #include <AL/alext.h>
+#include <AL/efx.h>
+#endif
 #endif
 
 #include "augs/log.h"
@@ -143,16 +157,30 @@ namespace augs {
 #endif
 	}
 
-	void audio_device::reset_device(audio_settings settings) {
 #if BUILD_OPENAL
-		ALCint attrs[] = {
+	static std::array<ALCint, 9> make_attrs(const audio_settings& settings) {
+#if PLATFORM_WEB
+		return {
+			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
+			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
+			0
+		};
+#else
+		return {
 			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
 			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
 			ALC_OUTPUT_LIMITER_SOFT, AL_TRUE,
-		   	0	/* end of list */
+			0
 		};
+#endif
+	}
+#endif
 
-		alcResetDeviceSOFT(device, attrs);
+	void audio_device::reset_device(audio_settings settings) {
+#if BUILD_OPENAL && !PLATFORM_WEB
+		auto attrs = make_attrs(settings);
+
+		alcResetDeviceSOFT(device, &attrs[0]);
 		AL_CHECK_DEVICE(device);
 		log_hrtf_status();
 #else
@@ -164,7 +192,8 @@ namespace augs {
 		: device(settings.output_device_name) 
 	{
 #if BUILD_OPENAL
-		context = alcCreateContext(device, nullptr);
+		auto attrs = make_attrs(settings);
+		context = alcCreateContext(device, &attrs[0]);
 
 		if (!context || !set_as_current()) {
 			if (context) {

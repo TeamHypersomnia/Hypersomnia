@@ -5,8 +5,11 @@
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
+#if PLATFORM_WEB
+#define AL_SOURCE_SPATIALIZE_SOFT                0x1214
+#else
 #include <AL/alext.h>
-#include <AL/efx.h>
+#endif
 #endif
 
 #include "augs/math/vec2.h"
@@ -189,9 +192,11 @@ namespace augs {
 
 	void sound_source::set_air_absorption_factor(const float absorption) const {
 		(void)absorption;
+#if !PLATFORM_WEB
 		AL_CHECK(alSourcef(id, AL_AIR_ABSORPTION_FACTOR, absorption));
 #if TRACE_PARAMETERS
 		LOG_NVPS(absorption);
+#endif
 #endif
 	}
 
@@ -268,7 +273,9 @@ namespace augs {
 
 	void sound_source::set_direct_channels(const bool flag) const {
 		(void)flag;
+#if !PLATFORM_WEB
 		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag ? 1 : 0));
+#endif
 
 #if TRACE_PARAMETERS
 		LOG_NVPS(flag);
