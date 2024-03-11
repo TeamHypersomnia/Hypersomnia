@@ -17,6 +17,11 @@
 #define ALC_HRTF_REQUIRED_SOFT                   0x0003
 #define ALC_HRTF_HEADPHONES_DETECTED_SOFT        0x0004
 #define ALC_HRTF_UNSUPPORTED_FORMAT_SOFT         0x0005
+
+typedef ALCboolean (*ALC_RESET_DEVICE_SOFT)(ALCdevice *, const ALCint *attribs);
+
+ALC_RESET_DEVICE_SOFT alcResetDeviceSOFT;
+
 #else
 #include <AL/alext.h>
 #include <AL/efx.h>
@@ -177,10 +182,13 @@ namespace augs {
 #endif
 
 	void audio_device::reset_device(audio_settings settings) {
-#if BUILD_OPENAL && !PLATFORM_WEB
+#if BUILD_OPENAL
 		auto attrs = make_attrs(settings);
 
-		alcResetDeviceSOFT(device, &attrs[0]);
+		if ((bool)alcResetDeviceSOFT) {
+			alcResetDeviceSOFT(device, &attrs[0]);
+		}
+
 		AL_CHECK_DEVICE(device);
 		log_hrtf_status();
 #else
@@ -205,6 +213,10 @@ namespace augs {
 				settings.output_device_name
 			);
 		}
+
+#if PLATFORM_WEB
+		alcResetDeviceSOFT = reinterpret_cast<ALC_RESET_DEVICE_SOFT>(alcGetProcAddress(device, "alcResetDeviceSOFT"));
+#endif
 
 		AL_CHECK(alEnable(AL_SOURCE_DISTANCE_MODEL));
 
@@ -277,8 +289,8 @@ namespace augs {
 			return !(field == augs::get_corresponding_field(field, settings, current_settings));
 		};
 
-		if (force 
-			|| changed(settings.enable_hrtf)
+		if (// force // don't have to force it since we're setting it on alcCreateContext
+			changed(settings.enable_hrtf)
 			|| changed(settings.max_number_of_sound_sources)
 		) {
 			device.reset_device(settings);

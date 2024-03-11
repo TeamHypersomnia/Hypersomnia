@@ -3033,11 +3033,6 @@ work_result work(
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
 
-	/* 
-		The audiovisual_step, advance_setup and advance_current_setup lambdas
-		are separated only because MSVC outputs ICEs if they become nested.
-	*/
-
 	WEBSTATIC visible_entities all_visible;
 
 	WEBSTATIC auto get_character_camera = [&](const config_lua_table& viewing_config) -> character_camera {
@@ -3376,7 +3371,9 @@ work_result work(
 #endif
 
 				if constexpr(std::is_same_v<S, editor_setup>) {
-					pending_new_state_sample = true;
+					if (!setup.is_playtesting()) {
+						pending_new_state_sample = true;
+					}
 				}
 
 				setup.advance(
@@ -3421,6 +3418,16 @@ work_result work(
 		const augs::delta frame_delta,
 		const input_pass_result& result
 	) { 
+		/* 
+			Advance the current setup's logic,
+			and let the audiovisual_state sample the game world 
+			that it chooses via get_viewed_cosmos.
+
+			This also advances the audiovisual state, based on the cosmos returned by the setup.
+		*/
+
+		auto scope = measure_scope(game_thread_performance.advance_setup);
+
 		visit_current_setup(
 			[&](auto& setup) {
 				advance_setup(audio_renderer, frame_delta, setup, result);
@@ -4032,19 +4039,6 @@ work_result work(
 				});
 			};
 
-			auto do_advance_setup = [&](const augs::audio_renderer* const audio_renderer, auto& with_result) {
-				/* 
-					Advance the current setup's logic,
-					and let the audiovisual_state sample the game world 
-					that it chooses via get_viewed_cosmos.
-
-					This also advances the audiovisual state, based on the cosmos returned by the setup.
-				*/
-
-				auto scope = measure_scope(game_thread_performance.advance_setup);
-				advance_current_setup(audio_renderer, frame_delta, with_result);
-			};
-
 			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				return viewing_game_gui_context {
 					make_create_game_gui_context(viewing_config)(),
@@ -4416,7 +4410,11 @@ work_result work(
 				audio_renderer.emplace(augs::audio_renderer { *audio_buffer });
 			}
 
-			do_advance_setup(audio_renderer ? std::addressof(audio_renderer.value()) : nullptr, input_result);
+			advance_current_setup(
+				audio_renderer ? std::addressof(audio_renderer.value()) : nullptr,
+				frame_delta,
+				input_result
+			);
 
 			auto create_menu_context = make_create_menu_context(new_viewing_config);
 			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);

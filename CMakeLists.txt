@@ -1185,7 +1185,7 @@ if(CLANG)
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
-	set(DISABLED_WARNINGS "-Wno-error=unused-command-line-argument -Wno-error=missing-braces")
+	set(DISABLED_WARNINGS "-Wno-error=unused-command-line-argument -Wno-error=missing-braces -Wno-deprecated-enum-enum-conversion")
 
 	if (APPLE)
 		set(DISABLED_WARNINGS "${DISABLED_WARNINGS} -Wno-error=deprecated-declarations")
@@ -1357,10 +1357,10 @@ if(BUILD_FOR_WEB)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 -Wno-limited-postlink-optimizations")
 		set(STACK_SIZE "64MB")
 	else()
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_BLOCKING_ON_MAIN_THREAD=1")
 		set(STACK_SIZE "16MB")
 	endif()
 
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_BLOCKING_ON_MAIN_THREAD=1")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
 	# There are some huge functions that can cause us to overflow with debug symbols
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=${STACK_SIZE}")

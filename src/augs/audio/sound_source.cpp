@@ -166,7 +166,9 @@ namespace augs {
 
 	void sound_source::set_doppler_factor(const float factor) const {
 		(void)factor;
+#if !PLATFORM_WEB
 		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, std::clamp(factor, 0.f, 1.f)));
+#endif
 	}
 
 	void sound_source::set_spatialize(const bool f) const {
@@ -280,18 +282,6 @@ namespace augs {
 #if TRACE_PARAMETERS
 		LOG_NVPS(flag);
 #endif
-	}
-
-	float sound_source::get_gain() const {
-		float gain = 0.f;
-		AL_CHECK(alGetSourcef(id, AL_GAIN, &gain));
-		return gain;
-	}
-
-	float sound_source::get_pitch() const {
-		float pitch = 0.f;
-		AL_CHECK(alGetSourcef(id, AL_PITCH, &pitch));
-		return pitch;
 	}
 
 	bool sound_source::is_playing() const {

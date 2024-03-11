@@ -63,8 +63,6 @@ namespace augs {
 		void set_spatialize(bool) const;
 
 		float get_time_in_seconds() const;
-		float get_gain() const;
-		float get_pitch() const;
 		bool is_playing() const;
 
 		void bind_buffer(const single_sound_buffer&);

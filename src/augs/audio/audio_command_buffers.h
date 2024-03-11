@@ -8,11 +8,11 @@
 #include "augs/audio/audio_command.h"
 #include "augs/audio/audio_backend.h"
 
-static constexpr int num_audio_buffers_v = 2;
+static constexpr int num_audio_buffers_v = 4;
 
 namespace augs {
 	class audio_command_buffers {
-		thread_pool& pool_to_help;
+		thread_pool& pool_to_help_when_idle;
 		audio_backend backend;
 		std::optional<std::thread> audio_thread;
 
@@ -78,7 +78,7 @@ namespace augs {
 
 			if (has_finished()) {
 				for_completion.notify_all();
-				pool_to_help.help_until_no_tasks();
+				pool_to_help_when_idle.help_until_no_tasks();
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace augs {
 		}
 
 	public:
-		audio_command_buffers(thread_pool& pool_to_help) : pool_to_help(pool_to_help) {
+		audio_command_buffers(thread_pool& pool_to_help_when_idle) : pool_to_help_when_idle(pool_to_help_when_idle) {
 			audio_thread.emplace(make_worker_lambda());
 		}
 

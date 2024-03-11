@@ -767,7 +767,7 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.sound;
 
-#if 0
+#if !IS_PRODUCTION_BUILD
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
 #endif
 

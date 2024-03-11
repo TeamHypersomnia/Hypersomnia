@@ -69,7 +69,7 @@ class sound_system {
 		const_entity_handle get_listener() const;
 		std::optional<transformr> find_transform(const absolute_or_local&) const;
 
-		bool under_short_sound_limit() const;
+		bool short_sound_limit_exceeded() const;
 	};
 
 	struct effect_not_found {};

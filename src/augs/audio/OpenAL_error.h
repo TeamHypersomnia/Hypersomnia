@@ -1,6 +1,6 @@
 #pragma once
 #if BUILD_OPENAL
-	#if IS_PRODUCTION_BUILD || PLATFORM_WEB
+	#if IS_PRODUCTION_BUILD
 		#define AL_CHECK(stmt) (void)(stmt);
 	#else
 		void check_OpenAL_error(const char* stmt, const char* fname, int line);

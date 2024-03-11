@@ -42,8 +42,8 @@ const cosmos& sound_system::update_properties_input::get_cosmos() const {
 	return ear.viewed_character.get_cosmos();
 }
 
-bool sound_system::update_properties_input::under_short_sound_limit() const {
-	return static_cast<int>(owner.short_sounds.size()) < settings.max_short_sounds;
+bool sound_system::update_properties_input::short_sound_limit_exceeded() const {
+	return static_cast<int>(owner.short_sounds.size()) >= settings.max_short_sounds;
 }
 
 void sound_system::clear() {
@@ -571,7 +571,7 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 			}
 
 			if (in.settings.max_short_sounds > 0 && !id_pool.full() && short_sounds.size() < short_sounds.max_size()) {
-				if (!in.under_short_sound_limit()) {
+				if (in.short_sound_limit_exceeded()) {
 					if (short_sounds.size() > 0) {
 						short_sounds[0].stop_and_free(in);
 						short_sounds.erase(short_sounds.begin());
