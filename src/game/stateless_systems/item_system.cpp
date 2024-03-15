@@ -105,7 +105,7 @@ void maybe_reload_akimbo(components::item_slot_transfers& transfers, const T& ca
 
 	auto& cosm = capability.get_cosmos();
 
-	LOG("Resetting akimbo in maybe_reload_akimbo");
+	RLD_LOG("Resetting akimbo in maybe_reload_akimbo");
 	akimbo = {};
 
 	if (ctx.alive(cosm)) {
@@ -123,11 +123,11 @@ void maybe_reload_akimbo(components::item_slot_transfers& transfers, const T& ca
 			LOG_NVPS(next_to_reload_idx, akimbo.next);
 		}
 		else {
-			LOG("No two guns found to consider for akimbo");
+			RLD_LOG("No two guns found to consider for akimbo");
 		}
 	}
 	else {
-		LOG("No context found to consider for akimbo extension");
+		RLD_LOG("No context found to consider for akimbo extension");
 	}
 }
 

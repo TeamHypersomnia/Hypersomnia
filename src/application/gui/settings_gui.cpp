@@ -767,9 +767,13 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.sound;
 
-#if !IS_PRODUCTION_BUILD
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
-#endif
+
+					if (scope_cfg.processing_frequency == sound_processing_frequency::PERIODIC) {
+						auto indent = scoped_indent();
+
+						revertable_slider("Hz", scope_cfg.custom_processing_frequency, 1, 60);
+					}
 
 					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
 					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));

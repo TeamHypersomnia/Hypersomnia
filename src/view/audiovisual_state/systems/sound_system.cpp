@@ -243,6 +243,17 @@ void sound_system::generic_sound_cache::eat_followup() {
 	followup_inputs.erase(followup_inputs.begin());
 }
 
+void sound_system::generic_sound_cache::update_elapsed(const augs::delta dt) {
+	const auto& input = original.input;
+	const auto& m = input.modifier;
+	const auto dt_this_frame = dt.in_seconds() * m.pitch;
+	const bool gain_dependent_lifetime = original.start.silent_trace_like;
+
+	if (!gain_dependent_lifetime) {
+		elapsed_secs += dt_this_frame;
+	}
+}
+
 void sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
 
@@ -251,10 +262,6 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto dt_this_frame = in.dt.in_seconds() * m.pitch;
 	const bool gain_dependent_lifetime = original.start.silent_trace_like;
-
-	if (!gain_dependent_lifetime) {
-		elapsed_secs += dt_this_frame;
-	}
 
 	const auto listening_faction = (listening_character ? listening_character.get_official_faction() : faction_type::SPECTATOR);
 	const auto target_faction = original.start.listener_faction;
@@ -637,6 +644,80 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 	}
 }
 
+void sound_system::update_elapsed_times(const augs::delta dt) {
+	silent_trace_cooldown += dt.in_milliseconds();
+
+	if (silent_trace_cooldown > 150.f) {
+		silent_trace_cooldown = 0.f;
+
+		--current_num_silent_traces;
+
+		if (current_num_silent_traces < 0) {
+			current_num_silent_traces = 0;
+		}
+	}
+
+	auto update_facade = [&](auto& cache) {
+		cache.update_elapsed(dt);
+	};
+
+	for (auto& it : firearm_engine_caches) {
+		auto& cache = it.second.cache;
+		update_facade(cache);
+	}
+
+	for (auto& it : continuous_sound_caches) {
+		auto& cache = it.second.cache;
+		update_facade(cache);
+	}
+
+	for (auto& it : short_sounds) {
+		update_facade(it);
+	}
+
+	erase_if (collision_sound_successions, [&](auto& it) {
+		auto& c = it.second;
+
+		c.remaining_ms -= dt.in_milliseconds();
+
+		if (c.remaining_ms <= 0.f) {
+			return true;
+		}
+
+		return false;
+	});
+
+	erase_if (collision_sound_cooldowns, [&](auto& it) {
+		auto& c = it.second;
+
+		c -= dt.in_milliseconds();
+
+		if (c <= 0.f) {
+			return true;
+		}
+
+		return false;
+	});
+
+	erase_if (damage_sound_successions, [&](auto& it) {
+		auto& c = it.second;
+
+		c.current_ms += dt.in_milliseconds();
+
+		if (c.current_ms > c.max_ms) {
+			c.current_ms = 0.f;
+			--c.consecutive_occurences;
+
+			if (0 == c.consecutive_occurences) {
+				return true;
+			}
+		}
+
+		return false;
+	});
+
+}
+
 void sound_system::update_sound_properties(const update_properties_input in) {
 	const auto& renderer = in.renderer;
 
@@ -649,18 +730,6 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		in.settings,
 		screen_center
 	);
-
-	silent_trace_cooldown += in.dt.in_milliseconds();
-
-	if (silent_trace_cooldown > 150.f) {
-		silent_trace_cooldown = 0.f;
-
-		--current_num_silent_traces;
-
-		if (current_num_silent_traces < 0) {
-			current_num_silent_traces = 0;
-		}
-	}
 
 	const auto& cosm = in.get_cosmos();
 
@@ -971,47 +1040,6 @@ void sound_system::fade_sources(
 	const augs::audio_renderer& renderer,
 	const augs::delta dt
 ) {
-	erase_if (collision_sound_successions, [&](auto& it) {
-		auto& c = it.second;
-
-		c.remaining_ms -= dt.in_milliseconds();
-
-		if (c.remaining_ms <= 0.f) {
-			return true;
-		}
-
-		return false;
-	});
-
-	erase_if (collision_sound_cooldowns, [&](auto& it) {
-		auto& c = it.second;
-
-		c -= dt.in_milliseconds();
-
-		if (c <= 0.f) {
-			return true;
-		}
-
-		return false;
-	});
-
-	erase_if (damage_sound_successions, [&](auto& it) {
-		auto& c = it.second;
-
-		c.current_ms += dt.in_milliseconds();
-
-		if (c.current_ms > c.max_ms) {
-			c.current_ms = 0.f;
-			--c.consecutive_occurences;
-
-			if (0 == c.consecutive_occurences) {
-				return true;
-			}
-		}
-
-		return false;
-	});
-
 	erase_if(fading_sources, [this, dt, &renderer](fading_source& f) {
 		const auto proxy = augs::sound_source_proxy { renderer, f.source };
 

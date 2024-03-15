@@ -4,6 +4,7 @@ enum class sound_processing_frequency {
 	// GEN INTROSPECTOR enum class sound_processing_frequency
 	EVERY_SINGLE_FRAME,
 	EVERY_SIMULATION_STEP,
+	PERIODIC,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -36,5 +37,6 @@ struct sound_system_settings {
 	int max_short_sounds = 64;
 
 	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
+	int custom_processing_frequency = 10;
 	// END GEN INTROSPECTOR
 };

@@ -25,6 +25,7 @@
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 #include "application/performance_settings.h"
 #include "view/character_camera.h"
+#include "augs/misc/timing/timer.h"
 
 class cosmos;
 class visible_entities;
@@ -103,6 +104,9 @@ struct audiovisual_state {
 	void reserve_caches_for_entities(const std::size_t);
 
 private:
+
+	augs::timer periodic_audio_update_timer;
+
 	randomization& get_rng() {
 		return randomizing.rng;
 	}

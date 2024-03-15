@@ -31,6 +31,7 @@
 #include "game/detail/visible_entities.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/damage_indication_settings.h"
+//#include "augs/log.h"
 
 template <class E>
 void interpolation_system::set_updated_interpolated_transform(
@@ -70,8 +71,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	auto scaled_state_dt = state_dt;
 
-	auto dt = frame_dt;
-	dt *= input.speed_multiplier;
+	auto scaled_frame_dt = frame_dt;
+	scaled_frame_dt *= input.speed_multiplier;
 	
 	if (scaled_state_dt) {
 		*scaled_state_dt *= input.speed_multiplier;
@@ -102,14 +103,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			cone_for_explosion_particles, 
 			cosm.get_common_assets(), 
 			input.particle_effects, 
-			dt, 
+			scaled_frame_dt, 
 			input.performance.special_effects.explosions,
 			particles
 		);
 	};
 
 	auto advance_attenuation_variations = [&]() {
-		get<light_system>().advance_attenuation_variations(rng, cosm, dt);
+		get<light_system>().advance_attenuation_variations(rng, cosm, scaled_frame_dt);
 	};
 
 	auto advance_world_hover_highlighter = [&]() {
@@ -118,15 +119,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	};
 
 	auto advance_thunders = [&]() {
-		thunders.advance(rng, cosm, queried_cone, input.particle_effects, dt, particles);
+		thunders.advance(rng, cosm, queried_cone, input.particle_effects, scaled_frame_dt, particles);
 	};
 
 	auto advance_damage_indication = [&]() {
-		damage_indication.advance(input.damage_indication, dt);
+		damage_indication.advance(input.damage_indication, scaled_frame_dt);
 	};
 
 	auto advance_highlights = [&]() {
-		highlights.advance(dt);
+		highlights.advance(scaled_frame_dt);
 	};
 
 	auto advance_visible_particle_streams = [&]() {
@@ -139,7 +140,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			cosm,
 			input.particle_effects,
 			anims,
-			dt,
+			scaled_frame_dt,
 			interp
 		);
 	};
@@ -158,7 +159,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		advance_damage_indication();
 
-		randomizing.advance(dt);
+		randomizing.advance(scaled_frame_dt);
 	};
 
 	auto launch_particle_jobs = [&]() {
@@ -166,7 +167,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		particles.integrate_and_draw_all_particles({
 			cosm,
-			dt,
+			scaled_frame_dt,
 			interp,
 			input.game_images,
 			anims,
@@ -218,10 +219,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 					[&](const auto typed_wandering_pixels) {
 						const auto wandering_id = typed_wandering_pixels.get_id();
 
-						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, dt]() {
+						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, scaled_frame_dt]() {
 							auto handle = cosm[wandering_id];
 
-							wandering_pixels.advance_for(handle, dt);
+							wandering_pixels.advance_for(handle, scaled_frame_dt);
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, handle, game_images);
 						};
 
@@ -255,10 +256,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 					[&](const auto typed_wandering_pixels) {
 						const auto wandering_id = typed_wandering_pixels.get_id();
 
-						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, dt]() {
+						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, scaled_frame_dt]() {
 							auto handle = cosm[wandering_id];
 
-							wandering_pixels.advance_for(handle, dt);
+							wandering_pixels.advance_for(handle, scaled_frame_dt);
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, handle, game_images);
 						};
 
@@ -274,49 +275,38 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	const auto& sound_freq = input.sound_settings.processing_frequency;
 	const bool sound_every_step = sound_freq == sound_processing_frequency::EVERY_SIMULATION_STEP;
+	const bool sound_periodic = sound_freq == sound_processing_frequency::PERIODIC;
+	const auto sound_processing_frequency = std::max(1, input.sound_settings.custom_processing_frequency);
 
-	const auto chosen_update_dt = sound_every_step ? *scaled_state_dt : dt;
+	const auto periodic_dt = augs::delta::steps_per_second(sound_processing_frequency);
+	auto scaled_periodic_dt = periodic_dt;
+	scaled_periodic_dt *= input.speed_multiplier;
 
-	/* Fading should take the same amount of time regardless of audiovisual speed multiplier */
-	const auto chosen_fade_dt =   sound_every_step ? *state_dt : frame_dt;
-
-	auto audio_job = [this, input, chosen_update_dt, chosen_fade_dt]() {
-		auto scope = measure_scope(performance.sound_logic);
-
-		const auto viewed_character = input.camera.viewed_character;
-		auto& interpol = this->get<interpolation_system>();
-
-		auto& command_buffers = input.command_buffers;
-
-		{
-			auto ear = input.camera;
-
-			if (viewed_character) {
-				ear.cone.eye.transform = viewed_character.get_viewing_transform(interpol);
-			}
-			
-			this->get<sound_system>().update_sound_properties(
-				{
-					*input.audio_renderer,
-					this->get<sound_system>(),
-					input.audio_volume,
-					input.sound_settings,
-					input.sounds,
-					interpol,
-					ear,
-					ear.cone,
-					chosen_update_dt,
-					input.speed_multiplier,
-					input.inv_tickrate,
-					input.interpolation_ratio
-				}
-			);
+	const auto chosen_update_dt = [&]() {
+		if (sound_every_step) {
+			return *scaled_state_dt;
 		}
 
-		this->get<sound_system>().fade_sources(*input.audio_renderer, chosen_fade_dt);
+		if (sound_periodic) {
+			return scaled_periodic_dt;
+		}
 
-		command_buffers.submit_write_buffer();
-	};
+		return scaled_frame_dt;
+	}();
+
+	/* Fading should take the same amount of time regardless of audiovisual speed multiplier */
+
+	const auto chosen_fade_dt = [&]() {
+		if (sound_every_step) {
+			return *state_dt;
+		}
+
+		if (sound_periodic) {
+			return periodic_dt;
+		}
+
+		return frame_dt;
+	}();
 
 	synchronous_facade();
 
@@ -332,6 +322,22 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			return true;
 		}
 
+		if (sound_freq == sound_processing_frequency::PERIODIC) {
+			if (input.sound_settings.custom_processing_frequency <= 0) {
+				return false;
+			}
+
+			const auto interval = 1.0f / input.sound_settings.custom_processing_frequency;
+
+			if (periodic_audio_update_timer.get<std::chrono::seconds>() >= interval) {
+				periodic_audio_update_timer.reset();
+
+				return true;
+			}
+
+			return false;
+		}
+
 		if (sound_every_step) {
 			return input.new_state_delta.has_value();
 		}
@@ -339,9 +345,51 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		return false;
 	}();
 
-	if (should_update_audio) {
-		input.pool.enqueue(audio_job);
-	}
+	auto audio_job = [this, should_update_audio, input, chosen_update_dt, chosen_fade_dt, scaled_frame_dt]() {
+		auto scope = measure_scope(performance.sound_logic);
+
+		if (should_update_audio) {
+			const auto viewed_character = input.camera.viewed_character;
+			auto& interpol = this->get<interpolation_system>();
+
+			{
+				auto ear = input.camera;
+
+				if (viewed_character) {
+					ear.cone.eye.transform = viewed_character.get_viewing_transform(interpol);
+				}
+				
+				this->get<sound_system>().update_sound_properties(
+					{
+						*input.audio_renderer,
+						this->get<sound_system>(),
+						input.audio_volume,
+						input.sound_settings,
+						input.sounds,
+						interpol,
+						ear,
+						ear.cone,
+						chosen_update_dt,
+						input.speed_multiplier,
+						input.inv_tickrate,
+						input.interpolation_ratio
+					}
+				);
+			}
+
+			this->get<sound_system>().fade_sources(*input.audio_renderer, chosen_fade_dt);
+		}
+
+		this->get<sound_system>().update_elapsed_times(
+			scaled_frame_dt
+		);
+
+		if (input.audio_renderer != nullptr) {
+			input.command_buffers.submit_write_buffer();
+		}
+	};
+
+	input.pool.enqueue(audio_job);
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
@@ -480,6 +528,9 @@ void audiovisual_state::standard_post_solve(
 					0.0
 				}
 			);
+		}
+		else {
+			//LOG("NO AUDIO RENDERER!");
 		}
 	}
 

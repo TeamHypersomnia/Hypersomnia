@@ -392,6 +392,7 @@ work_result work(
 
 #if PLATFORM_WEB
 		result.window.fullscreen = false;
+		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;
 #endif
 
 		return result_ptr;

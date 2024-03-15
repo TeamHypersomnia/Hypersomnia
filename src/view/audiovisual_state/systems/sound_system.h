@@ -104,6 +104,7 @@ class sound_system {
 		bool should_play(update_properties_input in) const;
 		bool rebind_buffer(update_properties_input in);
 		void update_properties(update_properties_input in);
+		void update_elapsed(augs::delta dt);
 
 		augs::sound_source_proxy get_proxy(const update_properties_input& in);
 		void stop_and_free(const update_properties_input& in);
@@ -189,6 +190,7 @@ public:
 
 	void update_effects_from_messages(const_logic_step, update_properties_input);
 	void update_sound_properties(update_properties_input);
+	void update_elapsed_times(const augs::delta scaled_frame_dt);
 
 	void fade_sources(
 		const augs::audio_renderer& renderer,
