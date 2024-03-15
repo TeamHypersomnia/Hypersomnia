@@ -63,7 +63,7 @@ namespace fs = std::filesystem;
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	const bool only_check_availability_and_quit,
-	const augs::image& imgui_atlas_image,
+	const augs::image* imgui_atlas_image,
 	const http_client_settings& http_settings,
 	augs::window_settings window_settings,
 	bool headless
@@ -245,7 +245,10 @@ self_update_result check_and_apply_updates(
 			window->apply(window_settings);
 
 			renderer_backend.emplace();
-			imgui_atlas.emplace(imgui_atlas_image);
+
+			if (imgui_atlas_image != nullptr) {
+				imgui_atlas.emplace(*imgui_atlas_image);
+			}
 
 			LOG("Initializing the standard shader.");
 

@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- why is this retransmitted every second? NaNs?
+	[18:32:50] Received requested_client_settings from [someone]. Client state: 5
+	[18:32:51] Received requested_client_settings from [someone]. Client state: 5
+	[18:32:52] Received requested_client_settings from [someone]. Client state: 5
+
 - why tf are we using sleep_until_tasks_posted in main loop? this should be used by workers instead
     - actually: sleep_until_tasks_posted was NEVER sleeping since tasks_posted > 0 was always true (it was never zeroed)
 	- additionally, we wait for the frame completion in swap_buffers so there's no fear that we'd start rendering an in-progress frame

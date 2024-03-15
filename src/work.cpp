@@ -532,7 +532,7 @@ work_result work(
 	LOG("Initializing ImGui.");
 
 #if HEADLESS
-	WEBSTATIC const augs::image* imgui_atlas_image = nullptr;
+	WEBSTATIC const auto imgui_atlas_image = std::unique_ptr<augs::image>(nullptr);
 #else
 	WEBSTATIC const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
 	WEBSTATIC const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
@@ -570,7 +570,7 @@ work_result work(
 		last_update_result = check_and_apply_updates(
 			params.appimage_path,
 			only_check,
-			*imgui_atlas_image,
+			imgui_atlas_image.get(),
 			config.http_client,
 			config.window,
 			should_update_headless
@@ -1054,7 +1054,7 @@ work_result work(
 						return check_and_apply_updates(
 							params.appimage_path,
 							only_check_update_availability_and_quit,
-							*imgui_atlas_ptr,
+							imgui_atlas_ptr,
 							config_http_client,
 							config_window,
 							true // should_update_headless
