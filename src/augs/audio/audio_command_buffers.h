@@ -8,7 +8,7 @@
 #include "augs/audio/audio_command.h"
 #include "augs/audio/audio_backend.h"
 
-static constexpr int num_audio_buffers_v = 4;
+static constexpr int num_audio_buffers_v = 10;
 
 namespace augs {
 	class audio_command_buffers {
@@ -73,10 +73,16 @@ namespace augs {
 		}
 
 		void report_completion() {
-			auto lk = lock_queue();
-			read_index = next_to(read_index);
+			bool finished = false;
 
-			if (has_finished()) {
+			{
+				auto lk = lock_queue();
+				read_index = next_to(read_index);
+
+				finished = has_finished();
+			}
+
+			if (finished) {
 				for_completion.notify_all();
 				pool_to_help_when_idle.help_until_no_tasks();
 			}

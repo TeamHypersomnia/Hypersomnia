@@ -32,13 +32,17 @@ namespace augs {
 		}
 
 		void register_completion() {
+			bool completed = false;
+
 			{
 				auto lock = lock_completion();
 				++tasks_completed;
 
-				if (tasks_completed == tasks_posted) {
-					completion_variable.notify_all();
-				}
+				completed = tasks_completed == tasks_posted;
+			}
+
+			if (completed) {
+				completion_variable.notify_all();
 			}
 		}
 
