@@ -113,7 +113,7 @@ namespace augs {
 	}
 
 	void window::set_fullscreen_geometry(const bool flag) {
-#if USE_GLFW
+#if USE_GLFW || USE_SDL2
 		(void)flag;
 #else
 		if (flag) {

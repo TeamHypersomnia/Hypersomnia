@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Emscripten-Generated Code</title>
+  <style>
+    body, html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrollbars */
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block; /* Remove the margin inside the body */
+    }
+    .spinner {
+      position: absolute; /* Center the spinner */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 50px;
+      width: 50px;
+      -webkit-animation: rotation .8s linear infinite;
+      -moz-animation: rotation .8s linear infinite;
+      -o-animation: rotation .8s linear infinite;
+      animation: rotation 0.8s linear infinite;
+      border-left: 10px solid rgb(0,150,240);
+      border-right: 10px solid rgb(0,150,240);
+      border-bottom: 10px solid rgb(0,150,240);
+      border-top: 10px solid rgb(100,0,200);
+      border-radius: 100%;
+    }
+    @-webkit-keyframes rotation {
+      from {-webkit-transform: rotate(0deg);}
+      to {-webkit-transform: rotate(360deg);}
+    }
+    @-moz-keyframes rotation {
+      from {-moz-transform: rotate(0deg);}
+      to {-moz-transform: rotate(360deg);}
+    }
+    @-o-keyframes rotation {
+      from {-o-transform: rotate(0deg);}
+      to {-o-transform: rotate(360deg);}
+    }
+    @keyframes rotation {
+      from {transform: rotate(0deg);}
+      to {transform: rotate(360deg);}
+    }
+  </style>
+</head>
+<body>
+  <div id="spinner" class="spinner"></div>
+  <canvas id="canvas" tabindex="-1"></canvas>
+  <script type='text/javascript'>
+    function resizeCanvas() {
+      var canvas = document.getElementById('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    var Module = {
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        resizeCanvas(); // Initial canvas resize
+        return canvas;
+      })(),
+      setStatus: function(text) {
+        if (text) document.getElementById('spinner').style.display = 'inline-block';
+        else document.getElementById('spinner').style.display = 'none';
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        var spinnerElement = document.getElementById('spinner');
+        if (left) spinnerElement.style.display = 'inline-block';
+        else spinnerElement.style.display = 'none';
+      }
+    };
+    
+    // Resize the canvas every time the window size changes
+    window.addEventListener('resize', resizeCanvas);
+
+    Module.setStatus('Downloading...');
+    window.onerror = function() {
+      Module.setStatus('Exception thrown, see JavaScript console');
+      document.getElementById('spinner').style.display = 'none';
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

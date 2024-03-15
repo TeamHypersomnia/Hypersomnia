@@ -4,6 +4,13 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
+#if PLATFORM_WEB
+#include <emscripten.h>
+
+EM_JS(int, get_canvas_width, (), { return canvas.width; });
+EM_JS(int, get_canvas_height, (), { return canvas.height; });
+#endif
+
 augs::event::keys::key translate_sdl2_key(int);
 augs::event::keys::key translate_sdl2_mouse_key(int);
 
@@ -60,9 +67,17 @@ namespace augs {
 		initial_fs = 0;
 #endif
 
+#if PLATFORM_WEB
+		const auto window_w = get_canvas_width();
+		const auto window_h = get_canvas_height();
+#else
+		const auto window_w = settings.size.x;
+		const auto window_h = settings.size.y;
+#endif
+
         platform->window = SDL_CreateWindow(settings.name.c_str(), 
                                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-                                            settings.size.x, settings.size.y, 
+                                            window_w, window_h, 
                                             SDL_WINDOW_OPENGL | (settings.border ? 0 : SDL_WINDOW_BORDERLESS) | SDL_WINDOW_SHOWN |
                                             initial_fs);
 
@@ -121,6 +136,17 @@ namespace augs {
 
     void window::collect_entropy(local_entropy& output) {
         SDL_Event event;
+
+#if PLATFORM_WEB
+		if (get_canvas_width() != current_rect.w || get_canvas_height() != current_rect.h) {
+			event::change ch;
+			ch.msg = event::message::resize;
+			common_event_handler(ch, output);
+			output.push_back(ch);
+
+			SDL_SetWindowSize(platform->window, current_rect.w, current_rect.h);
+		}
+#endif
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -223,8 +249,11 @@ namespace augs {
     }
 
     void window::set_window_rect(const xywhi r) {
+		(void)r;
+#if !PLATFORM_WEB
         SDL_SetWindowPosition(platform->window, r.x, r.y);
         SDL_SetWindowSize(platform->window, r.w, r.h);
+#endif
     }
 
     void window::set_fullscreen_hint(const bool hint) {
@@ -232,9 +261,15 @@ namespace augs {
     }
 
     xywhi window::get_window_rect_impl() const {
-        int width, height, xpos, ypos;
-        SDL_GetWindowSize(platform->window, &width, &height);
+        int width=0, height=0, xpos=0, ypos=0;
+#if PLATFORM_WEB
+		width = get_canvas_width();
+		height = get_canvas_height();
+#else
+		SDL_GetWindowSize(platform->window, &width, &height);
         SDL_GetWindowPosition(platform->window, &xpos, &ypos);
+#endif
+		//LOG_NVPS( xpos, ypos, width, height );
         return { xpos, ypos, width, height };
     }
 
