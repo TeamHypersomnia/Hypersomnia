@@ -486,7 +486,9 @@ void settings_gui_state::perform(
 					ImGui::Separator();
 				}
 
+#if !PLATFORM_WEB
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
+#endif
 
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();

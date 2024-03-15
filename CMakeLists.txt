@@ -202,7 +202,7 @@ option(BUILD_SOUND_FORMAT_DECODERS "Build stb_vorbis. If this is off, ogg files 
 
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_TEST_SCENES "Build built-in official content (legacy flag - should always be on)" ON)
-option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
+option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ON)
 
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
 

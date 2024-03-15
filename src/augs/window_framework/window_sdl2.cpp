@@ -32,8 +32,6 @@ namespace augs {
 
 		LOG("Calling SDL_GL_SetAttribute.");
 
-		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
         #ifdef __EMSCRIPTEN__
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); // GLES 3.0 corresponds to WebGL 2.0
@@ -42,6 +40,17 @@ namespace augs {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         #endif
+
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 		LOG("Calling SDL_CreateWindow.");
 
@@ -54,7 +63,7 @@ namespace augs {
         platform->window = SDL_CreateWindow(settings.name.c_str(), 
                                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                             settings.size.x, settings.size.y, 
-                                            SDL_WINDOW_OPENGL | (settings.border ? 0 : SDL_WINDOW_BORDERLESS) | 
+                                            SDL_WINDOW_OPENGL | (settings.border ? 0 : SDL_WINDOW_BORDERLESS) | SDL_WINDOW_SHOWN |
                                             initial_fs);
 
         if (!platform->window) {
