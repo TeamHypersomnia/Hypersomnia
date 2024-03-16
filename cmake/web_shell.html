@@ -13,9 +13,9 @@
       overflow: hidden; /* Prevent scrollbars */
     }
     canvas {
+      display: block; /* Remove the margin inside the body */
       width: 100%;
       height: 100%;
-      display: block; /* Remove the margin inside the body */
     }
     .spinner {
       position: absolute; /* Center the spinner */
@@ -58,8 +58,20 @@
   <script type='text/javascript'>
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      var devicePixelRatio = window.devicePixelRatio || 1; // Consider device pixel ratio
+      var width = window.innerWidth * devicePixelRatio;
+      var height = window.innerHeight * devicePixelRatio;
+
+      // Update canvas size to match the window size, factoring in device pixel ratio
+      canvas.width = width;
+      canvas.height = height;
+
+      // Use CSS to adjust the displayed size of the canvas
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+
+      // Inform your game or application about the resize event, if necessary
+      // For example, you might need to adjust the viewport or camera settings
     }
 
     var Module = {
