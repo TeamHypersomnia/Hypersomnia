@@ -1972,11 +1972,17 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (c.state == client_state_type::IN_GAME) {
-				const bool ranked_on = is_ranked_live_or_starting();
-				const bool is_spectator = get_faction_of(client_id) == faction_type::SPECTATOR;
-				const bool prevent_kick = ranked_on && is_spectator;
+				{
+					const bool ranked_on = is_ranked_live_or_starting();
+					const bool is_spectator = get_faction_of(client_id) == faction_type::SPECTATOR;
+					const bool any_suspended = num_suspended_players();
 
-				if (!prevent_kick && c.should_kick_due_to_afk(vars, server_time)) {
+					if (const bool prevent_kick = ranked_on && (is_spectator || any_suspended)) {
+						c.last_keyboard_activity_time = server_time;
+					}
+				}
+
+				if (c.should_kick_due_to_afk(vars, server_time)) {
 					kick(client_id, "AFK!");
 				}
 
