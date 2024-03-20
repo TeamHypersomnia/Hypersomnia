@@ -45,6 +45,8 @@ namespace augs {
 	struct window::platform_data {
 		GLFWwindow* window = nullptr;
 		vec2d last_mouse_pos_for_dt;
+		bool mouse_pos_initialized = false;
+		int clips_called = 0;
 
 		std::vector<unhandled_key> unhandled_keys;
 		std::vector<unhandled_char> unhandled_characters;
@@ -185,9 +187,18 @@ namespace augs {
 
 		current_rect = get_window_rect_impl();
 
-		last_mouse_pos = current_rect.get_size() / 2;
-		platform->last_mouse_pos_for_dt = last_mouse_pos;
-		set_cursor_pos(last_mouse_pos);
+		if (settings.draws_own_cursor()) {
+			last_mouse_pos = current_rect.get_size() / 2;
+			platform->last_mouse_pos_for_dt = last_mouse_pos;
+			set_cursor_pos(last_mouse_pos);
+		}
+		else {
+			double mx, my;
+			glfwGetCursorPos(window, &mx, &my);
+
+			last_mouse_pos.set(mx, my);
+			platform->last_mouse_pos_for_dt = last_mouse_pos;
+		}
 		
 		glfwSetCursorPosCallback(window, glfw_callbacks::cursor_callback);
 	}
@@ -284,8 +295,14 @@ namespace augs {
 		}
 
 		for (const auto& cursor : platform->unhandled_cursors) {
-			auto new_mouse_pos = vec2d(cursor.xpos, cursor.ypos);
-			auto dt = new_mouse_pos - platform->last_mouse_pos_for_dt;
+			const auto new_mouse_pos = vec2d(cursor.xpos, cursor.ypos);
+
+			if (!platform->mouse_pos_initialized) {
+				platform->last_mouse_pos_for_dt = new_mouse_pos;
+				platform->mouse_pos_initialized = true;
+			}
+
+			const auto dt = new_mouse_pos - platform->last_mouse_pos_for_dt;
 			platform->last_mouse_pos_for_dt = new_mouse_pos;
 
 			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
@@ -429,6 +446,11 @@ namespace augs {
 	}
 
 	bool window::set_cursor_clipping_impl(bool clip) {
+		if (clip && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
+			platform->mouse_pos_initialized = false;
+			platform->clips_called = 1;
+		}
+
 		glfwSetInputMode(platform->window, GLFW_CURSOR, clip ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 		return true;
 	}
