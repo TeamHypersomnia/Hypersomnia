@@ -735,8 +735,9 @@ namespace augs {
 				wm_delete_window_atom,
 				get_current_settings().log_keystrokes
 			)) {
-				common_event_handler(*ch, output);
-				output.push_back(*ch);
+				if (common_event_handler(*ch, output)) {
+					output.push_back(*ch);
+				}
 			}
 		}
 

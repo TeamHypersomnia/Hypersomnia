@@ -48,8 +48,15 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	void window::common_event_handler(event::change ch, local_entropy& output) {
+	bool window::common_event_handler(event::change ch, local_entropy& output) {
 		using namespace event;
+
+		if (ch.msg == message::keydown || ch.msg == message::keyup) {
+			if (ch.data.key.key == keys::key::INVALID) {
+				/* Don't emit event */
+				return false;
+			}
+		}
 
 		if (ch.msg == message::activate
 			|| ch.msg == message::click_activate
@@ -96,6 +103,8 @@ namespace augs {
 				}
 			}
 		}
+
+		return true;
 	}
 
 	local_entropy window::collect_entropy() {

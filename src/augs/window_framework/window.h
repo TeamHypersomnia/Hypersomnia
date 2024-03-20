@@ -124,7 +124,7 @@ namespace augs {
 		
 		event::change do_raw_motion(const basic_vec2<short>);
 		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
-		void common_event_handler(event::change, local_entropy&);
+		bool common_event_handler(event::change, local_entropy&);
 
 		using settable_as_current_base = settable_as_current_mixin<window>;
 		friend settable_as_current_base;

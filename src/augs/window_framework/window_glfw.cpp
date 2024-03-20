@@ -220,8 +220,9 @@ namespace augs {
 		auto& window = platform->window;
 
 		auto handle_event = [&](const auto& ch) {
-			common_event_handler(ch, output);
-			output.push_back(ch);
+			if (common_event_handler(ch, output)) {
+				output.push_back(ch);
+			}
 		};
 
 		if (glfwWindowShouldClose(window)) {

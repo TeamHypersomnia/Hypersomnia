@@ -16,8 +16,6 @@ augs::event::keys::key translate_sdl2_mouse_key(int);
 
 namespace augs {
     struct window::platform_data {
-		vec2d last_mouse_pos_for_dt;
-
         SDL_Window* window = nullptr;
         SDL_GLContext gl_context;
     };
@@ -141,12 +139,20 @@ namespace augs {
 		if (get_canvas_width() != current_rect.w || get_canvas_height() != current_rect.h) {
 			event::change ch;
 			ch.msg = event::message::resize;
-			common_event_handler(ch, output);
-			output.push_back(ch);
+
+			if (common_event_handler(ch, output)) {
+				output.push_back(ch);
+			}
 
 			SDL_SetWindowSize(platform->window, current_rect.w, current_rect.h);
 		}
 #endif
+
+		auto handle_event = [&](const auto& ch) {
+			if (common_event_handler(ch, output)) {
+				output.push_back(ch);
+			}
+		};
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -156,8 +162,7 @@ namespace augs {
                         event::change ch;
                         ch.msg = event.type == SDL_KEYDOWN ? event::message::keydown : event::message::keyup;
                         ch.data.key.key = translate_sdl2_key(event.key.keysym.sym);
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
                 case SDL_TEXTINPUT:
@@ -165,8 +170,7 @@ namespace augs {
                         event::change ch;
                         ch.msg = event::message::character;
                         ch.data.character.code_point = static_cast<unsigned int>(*event.text.text);
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
                 case SDL_MOUSEBUTTONDOWN:
@@ -175,8 +179,7 @@ namespace augs {
                         event::change ch;
                         ch.msg = event.type == SDL_MOUSEBUTTONDOWN ? event::message::keydown : event::message::keyup;
                         ch.data.key.key = translate_sdl2_mouse_key(event.button.button);
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
                 case SDL_MOUSEWHEEL:
@@ -184,8 +187,7 @@ namespace augs {
                         event::change ch;
                         ch.msg = event::message::wheel;
                         ch.data.scroll.amount = event.wheel.y;
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
                 case SDL_MOUSEMOTION:
@@ -198,8 +200,8 @@ namespace augs {
 								static_cast<short>(dx),
 								static_cast<short>(dy)
 							});
-							common_event_handler(ch, output);
-							output.push_back(ch);
+
+							handle_event(ch);
 						}
 					} 
 					else {
@@ -212,8 +214,7 @@ namespace augs {
 
 						auto ch = handle_mousemove(new_pos);
 						if (ch) {
-							common_event_handler(*ch, output);
-							output.push_back(*ch);
+							handle_event(*ch);
 						}
 					}
 
@@ -222,26 +223,22 @@ namespace augs {
                     if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
                         event::change ch;
                         ch.msg = event::message::resize;
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
                         event::change ch;
                         ch.msg = event::message::activate;
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
                         event::change ch;
                         ch.msg = event::message::deactivate;
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
                 case SDL_QUIT:
                     {
                         event::change ch;
                         ch.msg = event::message::close;
-                        common_event_handler(ch, output);
-                        output.push_back(ch);
+						handle_event(ch);
                     }
                     break;
             }
@@ -303,7 +300,6 @@ namespace augs {
 
     void window::set_cursor_pos(const vec2i pos) {
         SDL_WarpMouseInWindow(platform->window, pos.x, pos.y);
-        platform->last_mouse_pos_for_dt = pos;
         last_mouse_pos = pos;
     }
 
