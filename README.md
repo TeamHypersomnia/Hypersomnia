@@ -412,7 +412,7 @@ Irrespectively of the OS, you will need the following software in order to build
   - On Windows, you can get the appropriate installer here: https://slproweb.com/products/Win32OpenSSL.html
   - The game is known to work with v3.1.4, but later versions should work too.
     - Install it to ``C:\OpenSSL-Win64``
-  - As of 11th Feb 2024, CMake might be bitching about missing ``missing: OPENSSL_CRYPTO_LIBRARY``. That is because since OpenSSL v3.1.5, filenames for libraries have changed. You'll have to manually move ``libcrypto_static`` and ``libssl_static`` from ``C:\OpenSSL-Win64\lib\VC\x64\MT`` to a ``VC\static`` folder with ``libssl64MT.lib`` and ``libcrypto64MT.lib`` names respectively, where FindOpenSSL.cmake expects them. It is what it is.  
+  - Make sure to install the latest CMake as 3.28.1 fails to find static OpenSSL libraries.
 
 Once dependencies are installed, go to the directory where you wish to have your *Hypersomnia* project downloaded,
 open git bash and paste:
