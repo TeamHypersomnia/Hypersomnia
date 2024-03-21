@@ -164,7 +164,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoResize
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoDocking
 	;
 
 	auto imgui_window = augs::imgui::scoped_window("Leaderboards", &show, flags);

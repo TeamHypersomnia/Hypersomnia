@@ -756,7 +756,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	centered_size_mult = vec2(0.8f, 0.7f);
 
-	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings);
+	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking);
 
 	if (!imgui_window) {
 		return false;

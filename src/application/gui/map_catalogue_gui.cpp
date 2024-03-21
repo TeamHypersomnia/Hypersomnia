@@ -529,7 +529,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 	centered_size_mult = vec2(0.9f, 0.8f);
 
-	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
 
 	if (!imgui_window) {
 		return false;

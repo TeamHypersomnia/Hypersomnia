@@ -182,7 +182,7 @@ void stun_manager_window::perform() {
 
 	centered_size_mult = vec2(0.6f, 0.8f);
 
-	auto manager = make_scoped_window();
+	auto manager = make_scoped_window(ImGuiWindowFlags_NoDocking);
 
 	if (!manager) {
 		return;
@@ -336,7 +336,7 @@ void settings_gui_state::perform(
 
 	centered_size_mult = vec2::square(0.65f);
 	
-	auto settings = make_scoped_window();
+	auto settings = make_scoped_window(ImGuiWindowFlags_NoDocking);
 
 	if (!settings) {
 		return;
