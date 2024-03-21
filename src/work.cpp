@@ -4235,6 +4235,14 @@ work_result work(
 				auto cone = get_camera_cone(viewing_config);
 				cone.eye.transform.pos.discard_fract();
 
+				if (screen_size.x % 2 == 1) {
+					cone.eye.transform.pos.x -= 0.5f;
+				}
+
+				if (screen_size.y % 2 == 1) {
+					cone.eye.transform.pos.y -= 0.5f;
+				}
+
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
 					get_camera_requested_fov_expansion(),

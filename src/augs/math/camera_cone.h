@@ -34,7 +34,7 @@ struct camera_cone {
 	using transform_type = transformr;
 
 	camera_eye eye;
-	vec2i screen_size;
+	vec2 screen_size;
 
 	camera_cone(
 		const camera_eye eye,
@@ -92,7 +92,7 @@ struct camera_cone {
 	}
 
 	auto get_world_screen_center() const {
-		return to_world_space(vec2(screen_size) / 2);
+		return to_world_space(screen_size / 2);
 	}
 };
 

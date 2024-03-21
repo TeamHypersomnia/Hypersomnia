@@ -84,7 +84,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto non_zoomed_matrix = [&]() {
 		auto non_zoomed_cone = cone;
 		non_zoomed_cone.eye.zoom = 1.f;
-		non_zoomed_cone.eye.transform.pos = screen_size / 2;
+		non_zoomed_cone.eye.transform.pos = vec2(screen_size) / 2;
 
 		return non_zoomed_cone.get_projection_matrix();
 	}();
