@@ -4,13 +4,20 @@
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/nth_type_in.h"
 
+template<typename T1, typename... Ts>
+constexpr bool check_alignments() {
+	return (... && (alignof(T1) == alignof(Ts)));
+}
+
 namespace augs {
 	template <class... Types>
 	class trivially_copyable_tuple {
 		std::aligned_storage_t<
 			sum_sizes_of_types_in_list_v<type_list<Types...>>,
-			constexpr_max_v<std::size_t, alignof(Types)...>
+			alignof(first_type_t<Types...>)
 		> buf;
+
+		static_assert(check_alignments<Types...>());
 		
 		template <class type>
 		void init() {

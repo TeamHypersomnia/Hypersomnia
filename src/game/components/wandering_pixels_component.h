@@ -6,13 +6,12 @@
 constexpr uint16_t MAX_WANDERING_PIXELS = 10000;
 
 namespace components {
-	struct wandering_pixels {
+	struct alignas(4) wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
 		rgba color = white;
 		uint16_t num_particles = 0u;
 		bool force_particles_within_bounds = false;
 		bool illuminate = false;
-		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const wandering_pixels&) const = default;
