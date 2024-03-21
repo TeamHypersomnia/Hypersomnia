@@ -1688,6 +1688,9 @@ void settings_gui_state::perform(
 
 			case settings_pane::ADVANCED: {
 				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+#if PLATFORM_UNIX
+				revertable_checkbox("Map CAPS LOCK to ESC", config.window.map_caps_lock_to_esc);
+#endif
 
 				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
 

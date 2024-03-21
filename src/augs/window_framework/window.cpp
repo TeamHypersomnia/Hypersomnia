@@ -52,6 +52,14 @@ namespace augs {
 		using namespace event;
 
 		if (ch.msg == message::keydown || ch.msg == message::keyup) {
+			if (ch.data.key.key == keys::key::CAPSLOCK) {
+				if (current_settings.map_caps_lock_to_esc) {
+					ch.data.key.key = keys::key::ESC;
+					output.push_back(ch);
+					return false;
+				}
+			}
+
 			if (ch.data.key.key == keys::key::INVALID) {
 				/* Don't emit event */
 				return false;

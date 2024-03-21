@@ -38,6 +38,7 @@ namespace augs {
 		vsync_type vsync_mode = vsync_type::OFF;
 		maybe<int> max_fps = maybe<int>::disabled(60);
 		max_fps_type max_fps_method = max_fps_type::YIELD;
+		bool map_caps_lock_to_esc = false;
 		// END GEN INTROSPECTOR
 
 		xywhi make_window_rect() const {

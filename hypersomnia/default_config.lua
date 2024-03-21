@@ -676,9 +676,15 @@ treat_as_music_sounds_longer_than_secs = 5,
       x = 1200,
       y = 700
     },
-	vsync_mode = "OFF",
-	enabled_max_fps = 400,
-	max_fps_method = "YIELD"
+    vsync_mode = "OFF",
+    enabled_max_fps = 400,
+    max_fps_method = "YIELD",
+
+    -- Looks like GLFW disables X mappings.
+    -- This is for Linux users (like me)
+    -- who are likely to have bound CAPS LOCK to ESC through e.g. xmodmap -e "keysym Caps_Lock = Escape"
+    -- GLFW will not recognize these mappings.
+    map_caps_lock_to_esc = false
   },
   faction_view = {
 	colors = {
