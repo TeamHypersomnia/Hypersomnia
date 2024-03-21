@@ -2058,7 +2058,9 @@ if (BUILD_OPENSSL)
 	endif()
 
 	if (MSVC)
+		message("Linking OpenSSL statically")
 		set(OPENSSL_MSVC_STATIC_RT TRUE)
+		set(OPENSSL_USE_STATIC_LIBS true)
 	endif()
 
 	find_package(OpenSSL REQUIRED)
