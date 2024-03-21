@@ -257,7 +257,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
 			official_addrs results;
-#if BUILD_NETWOKRING
+#if BUILD_NETWORKING
 
 			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
 
