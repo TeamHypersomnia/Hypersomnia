@@ -207,6 +207,7 @@ work_result work(
 	WEBSTATIC const auto params = parsed_params;
 	(void)argc;
 	(void)argv;
+	(void)log_directory_existed;
 
 #if PLATFORM_WEB
 	WEBSTATIC const bool is_steam_client = false;
@@ -651,52 +652,6 @@ work_result work(
 #if HEADLESS
 #else
 	WEBSTATIC auto last_exit_incorrect_popup = std::optional<simple_popup>();
-#endif
-
-#if IS_PRODUCTION_BUILD
-	if (log_directory_existed) {
-		if (const auto last_failure_log = find_last_incorrect_exit()) {
-			change_with_save([&](config_lua_table& cfg) {
-				cfg.last_activity = activity_type::MAIN_MENU;
-			});
-
-			const auto notice_pre_content = "Looks like the game has crashed since the last time.\n\n";
-
-			const auto notice_content = last_failure_log == "" ? 
-				"It was most likely a segmentation fault.\n"
-#if PLATFORM_UNIX
-				"Consider sending developers the core file generated upon crash.\n\n"
-#else
-				"Consider contacting developers about the problem,\n"
-				"describing exactly the game's behavior prior to the crash.\n\n"
-#endif
-				:
-
-				"Consider sending developers the log file located at:\n"
-				"%x\n\n"
-			;
-
-			const auto notice_post_content =
-				"If you experience repeated crashes,\n"
-				"you might try resetting all your settings,\n"
-				"which can be done by pressing \"Reset to factory default\" in Settings->General,\n"
-				"and then hitting Save settings."
-			;
-
-			const auto full_content = 
-				notice_pre_content 
-				+ typesafe_sprintf(notice_content, *last_failure_log) 
-				+ notice_post_content
-			;
-
-#if HEADLESS
-#else
-			last_exit_incorrect_popup = simple_popup { "Warning", full_content, "" };
-#endif
-		}
-	}
-#else
-	(void)log_directory_existed;
 #endif
 
 	augs::remove_file(get_crashed_controllably_path());
