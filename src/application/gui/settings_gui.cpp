@@ -740,7 +740,7 @@ void settings_gui_state::perform(
 					text_color(stat.message, col);
 				}
 
-				text_disabled("If you experience a drop in sound quality with HRTF,\ntry setting the sample rate of your audio device to 44.1 kHz,\nor consider replacing the hrtf presets found in detail/hrtf with your own.");
+				text_disabled("If you experience a drop in sound quality with HRTF,\ntry setting the sample rate of your audio device to 44.1 kHz,\nor consider providing your own presets in detail/hrtf.");
 
 				{
 
