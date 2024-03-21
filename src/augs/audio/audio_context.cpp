@@ -86,7 +86,7 @@ namespace augs {
 
 	audio_device::audio_device(const std::string& device_name) {
 #if BUILD_OPENAL
-		const auto hrtf_path = (std::filesystem::current_path() / "content" / "hrtf").string();
+		const auto hrtf_path = (std::filesystem::current_path() / "detail" / "hrtf").string();
 		LOG_NVPS(hrtf_path);
 
 		setenv("ALSOFT_LOCAL_PATH", hrtf_path.c_str(), 0);
