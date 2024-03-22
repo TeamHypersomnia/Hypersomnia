@@ -31,14 +31,28 @@ jobs:
     - name: Update packages
       run: sudo apt-get update
 
-    - name: Install packages
-      run: sudo apt-get install --fix-missing cmake ninja-build alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libglfw3-wayland libglfw3-dev
+    # Install dependencies for building GLFW with X11 and Wayland support
+    - name: Install build dependencies
+      run: sudo apt-get install --fix-missing cmake ninja-build alsa-oss osspd-alsa osspd libasound2 libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev xorg-dev
 
     - name: Install OpenAL soft dependencies
       run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev libpipewire-0.3-dev
 
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
+
+    # Clone the GLFW source code
+    - name: Clone GLFW
+      run: git clone https://github.com/glfw/glfw.git
+
+    # Build GLFW from source with support for both X11 and Wayland
+    - name: Build GLFW from source
+      run: |
+        cd glfw
+        mkdir build && cd build
+        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=ON
+        make
+        sudo make install
 
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
