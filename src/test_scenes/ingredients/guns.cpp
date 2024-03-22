@@ -4436,14 +4436,14 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::KEK9:           return 15.0f;
 		case W::SN69:           return 15.0f;
 		case W::PRO90:          return 20.0f;
-		case W::CALICO:         return 30.0f;
-		case W::BULWARK:        return 30.0f;
 		case W::COVERT:         return 40.0f;
 		case W::WARX:           return 40.0f;
 		case W::GRADOBICIE:     return 40.0f;
 		case W::CYBERSPRAY:     return 50.0f;
 		case W::ZAMIEC:         return 50.0f;
 		case W::SZCZUR:         return 50.0f;
+		case W::CALICO:         return 60.0f;
+		case W::BULWARK:        return 60.0f;
 		case W::GALILEA:        return 110.0f;
 		case W::BILMER2000:     return 110.0f;
 		case W::BAKA47:         return 110.0f;
