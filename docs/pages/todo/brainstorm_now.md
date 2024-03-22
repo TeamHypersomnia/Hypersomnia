@@ -6,6 +6,37 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- test windows from appveyor before deploying
+
+- web: handle escape correctly so we dont have to double tap it
+
+- why the heck is fps counter more FPS than wait_swap?
+
+- we can't just omit posting commands as we might skip existential ones?
+    - actually no because then the existential commands won't be posted
+
+- disable crashed last time popup
+
+- OpenAL fixes to emscripten
+    - case 0x200 /* AL_SOURCE_DISTANCE_MODEL */:
+    - 
+      if (!isFinite(src.bufOffset)) {
+        // Just in case any calculations go wrong
+        src.bufOffset = 0.0;
+      }
+
+- remove periodic entries from server logs so they only contain meaningful information
+
+- web: prevent ctrl+w from closing
+
+- fix steam_76561198118088474 profile on the web
+
+- after we debug the web:
+    - fix number of worker threads
+    - reduce stack size to a reasonable amount
+    - save fullscreen=false always to config
+
+- consider enabling freetype for imgui
 - check auto-vectorization if determinism breaks
 - --embed-file
 

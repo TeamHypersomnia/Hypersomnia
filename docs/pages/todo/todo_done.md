@@ -6882,3 +6882,12 @@ This will discard your redo history."
 
 - dont kick spectators during ranked
 - disable enemy highlight when dead
+
+- check french characters on windows
+    - might have to set std::setlocale(LC_CTYPE, "C.UTF-8"); there too
+    - works out of the box
+
+- wrong clear color for the background? maybe it needs to be 0,0,0,255
+	- yep
+- our trivially_copyable_tuple actually sucks because it doesnt take into account the internal member alignment
+

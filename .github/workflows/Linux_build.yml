@@ -41,7 +41,6 @@ jobs:
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
 
-    # Clone the GLFW source code
     - name: Clone GLFW
       run: git clone https://github.com/glfw/glfw.git
 

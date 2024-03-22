@@ -5,6 +5,18 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- investigate smoothness problems within 200-300 fps ranges
+
+- Simple opt - if a source has 0 gain, stop calling all updates on it (since we determined that AL calls can be bottleneck too) 
+    - test it with normal update freq on tutorial with all levels (from editor)
+    - e.g. the shooting range has NO reason to NOT be as "snappy" as empty scene on web
+    - we could set a certain gain threshold to consider it 0 too
+    - https://web.dev/articles/profiling-web-audio-apps-in-chrome
+
+- You should always post messages and skip the updates if the buffers are overwhelmed
+    - Even with this we'll want to have less frequent updates
+    - so a third option for update frequency lower than every_simulation_step
+
 - Cull/fade sound sources that are obviously too far away
 	- we need to fade them if they're playing so they delete
 		- actually just stop them abruptly since they'll be inaudible at that point anyway
