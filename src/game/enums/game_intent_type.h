@@ -30,7 +30,10 @@ enum class game_intent_type {
 
 	DASH,
 	SPRINT,
+	TOGGLE_SPRINT,
+
 	WALK_SILENTLY,
+	TOGGLE_WALK_SILENTLY,
 
 	INTERACT,
 	RELOAD,

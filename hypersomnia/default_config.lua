@@ -84,12 +84,16 @@ return {
     D = "MOVE_RIGHT",
 
     LeftShift = "SPRINT",
+    -- LeftShift = "TOGGLE_SPRINT",
+
     Space = "DASH",
 
     LeftMouseButton = "SHOOT",
     RightMouseButton = "SHOOT_SECONDARY",
 
     LeftControl = "WALK_SILENTLY",
+    -- LeftControl = "TOGGLE_WALK_SILENTLY",
+
     G = "DROP",
 
     MiddleMouseButton = "THROW_FORCE_GRENADE",

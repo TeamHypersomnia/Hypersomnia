@@ -83,10 +83,35 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 							break;
 						case game_intent_type::WALK_SILENTLY:
 							flags.walking = it.was_pressed();
+
+							if (flags.walking) {
+								flags.sprinting = false;
+							}
+
 							break;
+
+						case game_intent_type::TOGGLE_SPRINT:
+							if (it.was_pressed()) {
+								flags.sprinting = !flags.sprinting;
+								flags.walking = false;
+							}
+							break;
+
+						case game_intent_type::TOGGLE_WALK_SILENTLY:
+							if (it.was_pressed()) {
+								flags.walking = !flags.walking;
+								flags.sprinting = false;
+							}
+							break;
+
 						case game_intent_type::SPRINT:
 							flags.sprinting = it.was_pressed();
+
+							if (flags.sprinting) {
+								flags.walking = false;
+							}
 							break;
+
 						case game_intent_type::DASH:
 							flags.dashing = it.was_pressed();
 							break;
