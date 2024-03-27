@@ -1336,6 +1336,10 @@ if(BUILD_FOR_WEB)
 	# needs --experimental-wasm-eh flag for this to work.
 	# This flag is unnecessary in the latest nodejs.
 
+	# Make sure to run the game at least once before packaging
+	# so the neon maps are generated.
+	set(EMBED_CONTENT_CACHE ON)
+
 	set(USE_NATIVE_EXCEPTIONS ON)
 	set(USE_BIGINT ON)
 
@@ -1379,6 +1383,7 @@ if(BUILD_FOR_WEB)
 
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/cache/content@/cache/content")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.lua@/default_config.lua")
 
