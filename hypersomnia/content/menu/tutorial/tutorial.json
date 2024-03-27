@@ -13231,7 +13231,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "So whenever you can, always free your hands with {HOLSTER}.\nThen tap {LAST_USED_WEAPON} to alternate between combat and fast movement!"
+            "context_tip": "So always free your hands with {HOLSTER}.\nThen tap {LAST_USED_WEAPON} to alternate between combat and fast movement!"
         },
         {
             "id": "tip4_1 (18)",

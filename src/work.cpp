@@ -403,6 +403,9 @@ work_result work(
 		result.game_controls[augs::event::keys::key::C] = game_intent_type::TOGGLE_WALK_SILENTLY;
 		result.game_controls[augs::event::keys::key::V] = game_intent_type::WIELD_BOMB;
 
+		result.game_controls[augs::event::keys::key::K] = game_intent_type::THROW_PED_GRENADE;
+		result.game_controls[augs::event::keys::key::L] = game_intent_type::THROW_FLASHBANG;
+
 		result.general_gui_controls[augs::event::keys::key::T] = general_gui_intent_type::BUY_MENU;
 		result.general_gui_controls.erase(augs::event::keys::key::B);
 
