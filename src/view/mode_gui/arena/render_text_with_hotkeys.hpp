@@ -27,6 +27,19 @@ void render_text_with_hotkeys_line(const std::string& input, T&& text, H&& hotke
         } else if (general_map.count(matched_key)) {
 			hotkey(general_map.at(matched_key));
         }
+		else {
+			if (matched_key == "WALK_SILENTLY") {
+				matched_key = "TOGGLE_WALK_SILENTLY";
+			}
+
+			if (matched_key == "SPRINT") {
+				matched_key = "TOGGLE_SPRINT";
+			}
+
+			if (game_map.count(matched_key)) {
+				hotkey(game_map.at(matched_key));
+			}
+		}
 
         searchStart += match.position() + match.length();
     }

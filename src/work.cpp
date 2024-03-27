@@ -396,6 +396,19 @@ work_result work(
 		result.window.border = false;
 		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;
 		result.sound.max_short_sounds = 32;
+
+		result.game_controls.erase(augs::event::keys::key::LCTRL);
+
+		/* Some rebinding is necessary for the Web */
+		result.game_controls[augs::event::keys::key::C] = game_intent_type::TOGGLE_WALK_SILENTLY;
+		result.game_controls[augs::event::keys::key::V] = game_intent_type::WIELD_BOMB;
+
+		result.general_gui_controls[augs::event::keys::key::T] = general_gui_intent_type::BUY_MENU;
+		result.general_gui_controls.erase(augs::event::keys::key::B);
+
+		result.inventory_gui_controls[augs::event::keys::key::B] = inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3;
+		result.inventory_gui_controls.erase(augs::event::keys::key::V);
+
 #endif
 
 		return result_ptr;
