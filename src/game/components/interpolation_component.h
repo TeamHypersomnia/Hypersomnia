@@ -7,6 +7,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::interpolation
 		mutable transformr desired_transform;
+		mutable transformr previous_transform;
 		mutable transformr interpolated_transform;
 		mutable float rotational_slowdown_multiplier = 1.f;
 		mutable float positional_slowdown_multiplier = 1.f;

@@ -632,8 +632,8 @@ treat_as_music_sounds_longer_than_secs = 5,
     autocollapse_hotbar_buttons = true
   },
   interpolation = {
-    enabled = true,
-    speed = 1000
+    method = "LINEAR",
+    speed = 1000 -- only for EXPONENTIAL method
   },
   main_menu = {
     leaderboards_provider_url = "https://hypersomnia.xyz/leaderboards",

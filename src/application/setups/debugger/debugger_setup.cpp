@@ -247,14 +247,14 @@ void debugger_setup::customize_for_viewing(config_lua_table& config) const {
 
 	if (!anything_opened() || is_editing_mode()) {
 		config.drawing.draw_aabb_highlighter = false;
-		config.interpolation.enabled = false;
+		config.interpolation.method = interpolation_method::NONE;
 		config.drawing.draw_area_markers = {};
 		config.drawing.draw_callout_indicators = {};
 	}
 
 	if (miniature_generator.has_value()) {
 		config.drawing.draw_aabb_highlighter = false;
-		config.interpolation.enabled = false;
+		config.interpolation.method = interpolation_method::NONE;
 		config.drawing.draw_area_markers.is_enabled = false;
 		config.drawing.draw_callout_indicators.is_enabled = false;
 	}

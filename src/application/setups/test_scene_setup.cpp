@@ -617,7 +617,7 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	}
 
 	if (speed < 1.0f) {
-		//config.interpolation.enabled = false;
+		//config.interpolation.method = interpolation_method::NONE;
 	}
 
 	if (is_tutorial()) {

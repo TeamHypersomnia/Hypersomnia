@@ -666,9 +666,10 @@ void settings_gui_state::perform(
 					);
 				}
 
-				revertable_checkbox("Interpolate frames", config.interpolation.enabled);
 				
-				if (config.interpolation.enabled) {
+				revertable_enum("Interpolation method", config.interpolation.method);
+				
+				if (config.interpolation.method == interpolation_method::EXPONENTIAL) {
 					auto scope = scoped_indent();
 
 					revertable_slider("Speed", config.interpolation.speed, 50.f, 1000.f);

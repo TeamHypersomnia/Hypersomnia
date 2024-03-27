@@ -14,7 +14,7 @@ void snap_interpolated_to_logical(cosmos& cosm) {
 		[&](const auto& e) {
 			if (const auto current = e.find_logic_transform()) {
 				const auto& info = get_corresponding<components::interpolation>(e);
-				info.desired_transform = info.interpolated_transform = *current;
+				info.desired_transform = info.previous_transform = info.interpolated_transform = *current;
 			}
 		}
 	);
@@ -25,6 +25,7 @@ void interpolation_system::update_desired_transforms(const cosmos& cosm) {
 		[&](const auto& e) {
 			if (const auto current = e.find_logic_transform()) {
 				const auto& info = get_corresponding<components::interpolation>(e);
+				info.previous_transform = info.desired_transform;
 				info.desired_transform = *current;
 			}
 		}
@@ -36,9 +37,10 @@ void interpolation_system::integrate_interpolated_transforms(
 	const cosmos& cosm,
 	const augs::delta delta,
 	const augs::delta fixed_delta_for_slowdowns,
-	const double speed_multiplier
+	const double speed_multiplier,
+	const double interpolation_ratio
 ) {
-	set_interpolation_enabled(settings.enabled);
+	set_interpolation_enabled(settings.enabled());
 
 	(void)speed_multiplier;
 
@@ -62,30 +64,43 @@ void interpolation_system::integrate_interpolated_transforms(
 
 			auto& cache = info;
 
-			const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
-			const auto considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
+			if (settings.method == interpolation_method::EXPONENTIAL) {
+				const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
+				const auto considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
 
-			if (cache.positional_slowdown_multiplier > 1.f) {
-				cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
+				if (cache.positional_slowdown_multiplier > 1.f) {
+					cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
 
-				if (cache.positional_slowdown_multiplier < 1.f) {
-					cache.positional_slowdown_multiplier = 1.f;
+					if (cache.positional_slowdown_multiplier < 1.f) {
+						cache.positional_slowdown_multiplier = 1.f;
+					}
 				}
-			}
 
-			if (cache.rotational_slowdown_multiplier > 1.f) {
-				cache.rotational_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
+				if (cache.rotational_slowdown_multiplier > 1.f) {
+					cache.rotational_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
 
-				if (cache.rotational_slowdown_multiplier < 1.f) {
-					cache.rotational_slowdown_multiplier = 1.f;
+					if (cache.rotational_slowdown_multiplier < 1.f) {
+						cache.rotational_slowdown_multiplier = 1.f;
+					}
 				}
+
+				const auto positional_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_positional_speed * seconds));
+				const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_rotational_speed * seconds));
+
+				auto& integrated = info.interpolated_transform;
+				integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant * speed, rotational_averaging_constant);
 			}
+			else {
+				auto& integrated = info.interpolated_transform;
 
-			const auto positional_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_positional_speed * seconds));
-			const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_rotational_speed * seconds));
+				auto ratio = static_cast<float>(interpolation_ratio);
 
-			auto& integrated = info.interpolated_transform;
-			integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant * speed, rotational_averaging_constant);
+				if (settings.method == interpolation_method::LINEAR_EXTRAPOLATE) {
+					ratio += 1.0f;
+				}
+
+				integrated = info.previous_transform.interp_separate(info.desired_transform, ratio, ratio);
+			}
 		}
 	);
 }

@@ -5,8 +5,6 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
-- investigate smoothness problems within 200-300 fps ranges
-
 - Simple opt - if a source has 0 gain, stop calling all updates on it (since we determined that AL calls can be bottleneck too) 
     - test it with normal update freq on tutorial with all levels (from editor)
     - e.g. the shooting range has NO reason to NOT be as "snappy" as empty scene on web

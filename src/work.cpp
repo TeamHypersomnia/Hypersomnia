@@ -3083,7 +3083,8 @@ work_result work(
 				cosm, 
 				frame_delta, 
 				cosm.get_fixed_delta(),
-				speed_multiplier
+				speed_multiplier,
+				get_interpolation_ratio()
 			);
 		}
 
@@ -4586,7 +4587,16 @@ work_result work(
 
 				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
 
-				buffer_swapper.wait_swap();
+				{
+					/*
+						On the web, it is the wait_swap that correctly reports the effective FPS,
+						because even though render_thread_performance.fps might report north of 1000 FPS,
+						the main loop is simply called infrequently.
+					*/
+
+					auto scope = measure_scope(game_thread_performance.wait_swap);
+					buffer_swapper.wait_swap();
+				}
 
 				{
 					auto& write_buffer = get_write_buffer();
@@ -4638,7 +4648,6 @@ work_result work(
 #endif
 			}
 
-			auto scope = measure_scope(game_thread_performance.wait_swap);
 			finalize_frame_and_swap();
 		}
 	};

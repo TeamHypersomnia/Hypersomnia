@@ -6891,3 +6891,6 @@ This will discard your redo history."
 	- yep
 - our trivially_copyable_tuple actually sucks because it doesnt take into account the internal member alignment
 
+
+- investigate smoothness problems within 200-300 fps ranges
+	- done: implemented linear interpolation method

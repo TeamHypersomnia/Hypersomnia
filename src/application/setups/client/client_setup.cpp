@@ -751,7 +751,7 @@ void client_setup::customize_for_viewing(config_lua_table& config) const {
 		config.client.spectated_arena_type = demo_player.gui.shown_arena_type;
 
 		if (is_paused()) {
-			config.interpolation.enabled = false;
+			config.interpolation.method = interpolation_method::NONE;
 		}
 	}
 }

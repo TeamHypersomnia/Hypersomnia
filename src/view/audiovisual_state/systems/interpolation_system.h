@@ -25,7 +25,8 @@ public:
 		const cosmos&,
 		const augs::delta delta, 
 		const augs::delta fixed_delta_for_slowdowns,
-		const double speed_multiplier
+		const double speed_multiplier,
+		const double interpolation_ratio
 	);
 
 	void update_desired_transforms(const cosmos&);
