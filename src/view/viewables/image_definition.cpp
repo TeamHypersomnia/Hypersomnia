@@ -68,6 +68,7 @@ vec2u image_definition_view::read_source_image_size() const {
 	return augs::image::get_size(resolved_source_path);
 }
 
+#if !HEADLESS
 static bool already_packaged(const augs::path_type& source_path) {
 #if PLATFORM_WEB
 	if (::begins_with(source_path.string(), OFFICIAL_CONTENT_DIR.string())) {
@@ -84,7 +85,6 @@ static bool already_packaged(const augs::path_type& source_path) {
 	return false;
 }
 
-#if !HEADLESS
 std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_map(
 	const bool force_regenerate
 ) const {
