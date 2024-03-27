@@ -5,6 +5,22 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+
+- WebGL glitches with a lot of vertices.
+	- implement imgui call in terms of glDrawArrays to avoid glitches
+		- glitchuje przy (cnt*3=11454, sizeof(vertex_triangle) * cnt=229080)
+		    -  (cnt*3=11448, sizeof(vertex_triangle) * cnt=228960) jest okej
+	    - just unpack indices
+	    - BETTER YET, check what causes the two to interfere
+		- eg disable illuinated rendering
+	    - INGAME MENU DOES NOT BREAK WITH SETTINGS GUI!!!
+	- FIXED: It was enough to use glBufferSubData as recommended by Emscripten docs.
+
+- (FALSE ALARM) massive race condition - pbo/fbo/texture "currents" might be read/written from multiple workers
+    - and fix silly race conditions first
+        - we actually dont have a race condition
+	- these are properly commandized
+
 - why is this retransmitted every second? NaNs?
 	[18:32:50] Received requested_client_settings from [someone]. Client state: 5
 	[18:32:51] Received requested_client_settings from [someone]. Client state: 5

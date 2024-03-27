@@ -6,9 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- test windows from appveyor before deploying
+- clicking outside should close buy menu too
+
+- always allow changing maps when alone on the server
 
 - web: handle escape correctly so we dont have to double tap it
+    - just detect if mouse is released and if so autotrigger the ingame menu
 
 - why the heck is fps counter more FPS than wait_swap?
 

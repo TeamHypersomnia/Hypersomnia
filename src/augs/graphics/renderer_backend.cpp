@@ -14,8 +14,16 @@
 #include "augs/window_framework/window.h"
 #include "augs/log.h"
 
-#if PLATFORM_UNIX
-#define USE_BUFFER_SUB_DATA 0
+static auto get_gl_draw_mode() {
+#if PLATFORM_WEB
+	return GL_DYNAMIC_DRAW;
+#else
+	return GL_STREAM_DRAW;
+#endif
+}
+
+#if PLATFORM_WEB
+#define USE_BUFFER_SUB_DATA 1
 #endif
 
 #if BUILD_OPENGL
@@ -45,6 +53,9 @@ constexpr bool same = std::is_same_v<A, B>;
 namespace augs {
 	namespace graphics {
 		struct renderer_backend::platform_data {
+			GLuint triangle_buffer_size = 0;
+			GLuint elements_buffer_size = 0;
+
 			GLuint triangle_buffer_id = 0xdeadbeef;
 			GLuint special_buffer_id = 0xdeadbeef;
 			GLuint imgui_elements_id = 0xdeadbeef;
@@ -135,12 +146,16 @@ namespace augs {
 #if USE_BUFFER_SUB_DATA
 			/* Preallocate necessary space */
 
+			platform->triangle_buffer_size = sizeof(vertex_triangle) * 10000;
+			platform->elements_buffer_size = sizeof(uint16_t) * 10000;
+
 			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, platform->triangle_buffer_id));
-			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * 30000, nullptr, GL_STREAM_DRAW));
-			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, platform->special_buffer_id));
-			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 6000, nullptr, GL_STREAM_DRAW));
+			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, platform->triangle_buffer_size, nullptr, get_gl_draw_mode()));
 			GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, platform->imgui_elements_id));
-			GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * 12000, nullptr, GL_STREAM_DRAW));
+			GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, platform->elements_buffer_size, nullptr, get_gl_draw_mode()));
+
+			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, platform->special_buffer_id));
+			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 10000, nullptr, get_gl_draw_mode()));
 #endif
 
 #if BUILD_OPENGL
@@ -157,38 +172,53 @@ namespace augs {
 			return max_texture_size;
 		}
 
-		void renderer_backend::perform(const drawcall_command& cmd) {
+		void renderer_backend::perform(const drawcall_command& composite_cmd) {
 #if BUILD_OPENGL
-			const auto& p = *platform;
+			auto handle = [this](const drawcall_command& cmd, const uint32_t offset, const uint32_t count) {
+				const auto& p = *platform;
 
-			const auto triangles = cmd.triangles;
-			const auto lines = cmd.lines;
-			const auto specials = cmd.specials;
+				const auto triangles = cmd.triangles;
+				const auto lines = cmd.lines;
+				const auto specials = cmd.specials;
 
-			const auto cnt = static_cast<GLsizei>(cmd.count);
-			const auto specials_cnt = cnt * 3;
+				const auto cnt = static_cast<GLsizei>(count);
+				const auto specials_cnt = cnt * 3;
 
-			if (specials) {
-				enable_special_vertex_attribute();
-				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
-				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials, GL_STREAM_DRAW));
+				if (specials) {
+					enable_special_vertex_attribute();
+					GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
+					GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials+offset, get_gl_draw_mode()));
+				}
+
+				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
+
+				if (triangles) {
+					GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * cnt, triangles+offset, get_gl_draw_mode()));
+					GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, cnt * 3));
+				}
+
+				if (lines) {
+					GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * cnt, lines+offset, get_gl_draw_mode()));
+					GL_CHECK(glDrawArrays(GL_LINES, 0, cnt * 2));
+				}
+
+				if (specials) {
+					disable_special_vertex_attribute();
+				}
+			};
+
+#if USE_BUFFER_SUB_DATA
+			const uint32_t max_at_once = 10000;
+
+			for (uint32_t i = 0; i < composite_cmd.count; i += max_at_once) {
+				auto cmd = composite_cmd;
+
+				const auto count = std::min(composite_cmd.count - i, max_at_once);
+				handle(cmd, i, count);
 			}
-
-			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
-
-			if (triangles) {
-				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * cnt, triangles, GL_STREAM_DRAW));
-				GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, cnt * 3));
-			}
-
-			if (lines) {
-				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * cnt, lines, GL_STREAM_DRAW));
-				GL_CHECK(glDrawArrays(GL_LINES, 0, cnt * 2));
-			}
-
-			if (specials) {
-				disable_special_vertex_attribute();
-			}
+#else
+			handle(composite_cmd, 0, composite_cmd.count);
+#endif
 #else
 			(void)cmd;
 #endif
@@ -269,11 +299,30 @@ namespace augs {
 						cmd_list = typed_cmd.cmd_list;
 						fb_height = typed_cmd.fb_height;
 
+						const auto triangles_size = (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert);
+						const auto elements_size = (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
+
 						GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
-						buffer_data(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+#if USE_BUFFER_SUB_DATA
+						if (platform->triangle_buffer_size < triangles_size) {
+							platform->triangle_buffer_size = triangles_size;
+
+							GL_CHECK(glBufferData(GL_ARRAY_BUFFER, triangles_size, nullptr, get_gl_draw_mode()));
+						}
+#endif
+
+						buffer_data(GL_ARRAY_BUFFER, triangles_size, (const GLvoid*)cmd_list->VtxBuffer.Data, get_gl_draw_mode());
 
 						GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, p.imgui_elements_id));
-						buffer_data(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+#if USE_BUFFER_SUB_DATA
+						if (platform->elements_buffer_size < elements_size) {
+							platform->elements_buffer_size = elements_size;
+
+							GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements_size, nullptr, get_gl_draw_mode()));
+						}
+#endif
+
+						buffer_data(GL_ELEMENT_ARRAY_BUFFER, elements_size, (const GLvoid*)cmd_list->IdxBuffer.Data, get_gl_draw_mode());
 
 						lists_to_delete.emplace_back(cmd_list);
 						cmd_i = 0;
@@ -380,7 +429,7 @@ namespace augs {
 			GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
 			GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
 			GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
-			GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW));
+			GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, get_gl_draw_mode()));
 
 			GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 6));
 

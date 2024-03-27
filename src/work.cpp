@@ -4477,6 +4477,10 @@ work_result work(
 			auto illuminated_rendering_job = [&]() {
 				/* #1 */
 				perform_illuminated_rendering(illuminated_input);
+
+				// Call this in case we don't call perform_illuminated_rendering
+				// necessary_shaders.standard->set_as_current(get_general_renderer());
+
 				/* #2 */
 				draw_debug_lines(get_general_renderer(), new_viewing_config);
 

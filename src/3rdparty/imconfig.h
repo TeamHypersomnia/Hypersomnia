@@ -1,1 +1,2 @@
-#define ImDrawIdx unsigned int
+#pragma once
+

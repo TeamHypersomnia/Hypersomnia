@@ -635,7 +635,6 @@ if(HAS_HEAD)
 	"src/augs/audio/sound_data.cpp"
 
 	"src/augs/misc/imgui/path_tree_structs.cpp"
-	"src/augs/graphics/pbo.cpp"
 	"src/game/debug_draw.cpp"
 	"src/application/setups/project_selector/project_selector_setup.cpp"
 
