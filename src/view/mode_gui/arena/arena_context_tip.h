@@ -40,8 +40,32 @@ inline void draw_context_tip(
 
 	const auto& settings = maybe_settings.value;
 
-	auto format_key = [&](const auto& m, const auto key) {
-		const auto found_k = key_or_default(m, key);
+	auto format_key = [&]<typename K>(const auto& m, const K key) {
+		auto found_k = key_or_default(m, key);
+
+		auto preffix = std::string();
+
+		if constexpr(std::is_same_v<K, game_intent_type>) {
+			if (key == game_intent_type::WALK_SILENTLY) {
+				if (found_k == keys::key()) {
+					found_k = key_or_default(m, game_intent_type::TOGGLE_WALK_SILENTLY);
+					preffix = "Press ";
+				}
+				else {
+					preffix = "Hold ";
+				}
+			}
+
+			if (key == game_intent_type::SPRINT) {
+				if (found_k == keys::key()) {
+					found_k = key_or_default(m, game_intent_type::TOGGLE_SPRINT);
+					preffix = "Press ";
+				}
+				else {
+					preffix = "Hold ";
+				}
+			}
+		}
 
 		if (found_k == keys::key()) {
 			return colored("(UNASSIGNED)", settings.bound_key_color);
@@ -63,7 +87,13 @@ inline void draw_context_tip(
 			return alt_char + " (" + shortened + ")" ;
 		}();
 
-		return colored(key_str, settings.bound_key_color);
+		auto result = colored(key_str, settings.bound_key_color);
+
+		if (!preffix.empty()) {
+			result = colored(preffix, settings.tip_text_color) + result;
+		}
+
+		return result;
 	};
 
 	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);

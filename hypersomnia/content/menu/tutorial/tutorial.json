@@ -11006,7 +11006,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold {SPRINT} to sprint.\nQuickly run over the red tiles!"
+            "context_tip": "{SPRINT} to sprint.\nQuickly run over the red tiles!"
         },
         {
             "id": "exit1",
@@ -11272,7 +11272,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the blue floor!"
+            "context_tip": "{WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the blue floor!"
         },
         {
             "id": "entry3",
@@ -11956,7 +11956,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} while shooting both Deagles."
+            "context_tip": "Aim in the opposite direction (down).\n{SPRINT} and {MOVE_FORWARD} while shooting both Deagles."
         },
         {
             "id": "tip3_1 (5)",
@@ -15206,7 +15206,7 @@
                 "amount": 0.0
             },
             "exit_position": "PORTAL_CENTER",
-            "context_tip": "Tip: Use dash to boost ({DASH}). It prolongs airborne time.\nDon't use Sprint ({SPRINT}). It is useless when flying."
+            "context_tip": "Tip: Use dash to boost ({DASH}). It prolongs airborne time.\nDon't {SPRINT} (Sprint). It is useless when flying."
         },
         {
             "id": "tip2_1 (4)",
@@ -16170,7 +16170,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} - THEN shoot both Awkas."
+            "context_tip": "Aim in the opposite direction (down).\n{SPRINT} and {MOVE_FORWARD} - THEN shoot both Awkas."
         },
         {
             "id": "tip4_1 (20)",
