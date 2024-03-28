@@ -64,7 +64,12 @@ void interpolation_system::integrate_interpolated_transforms(
 
 			auto& cache = info;
 
-			if (settings.method == interpolation_method::EXPONENTIAL) {
+			const bool compensating_lag = 
+				cache.positional_slowdown_multiplier > 1.0f
+				|| cache.rotational_slowdown_multiplier > 1.0f
+			;
+
+			if (compensating_lag || settings.method == interpolation_method::EXPONENTIAL) {
 				const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
 				const auto considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
 
