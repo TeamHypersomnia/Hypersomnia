@@ -6,6 +6,7 @@
 
 #if PLATFORM_WEB
 #include <emscripten.h>
+#include <emscripten/html5.h>
 
 EM_JS(int, get_canvas_width, (), { return canvas.width; });
 EM_JS(int, get_canvas_height, (), { return canvas.height; });
@@ -16,6 +17,11 @@ augs::event::keys::key translate_sdl2_mouse_key(int);
 
 namespace augs {
     struct window::platform_data {
+#if PLATFORM_WEB
+		int esc_presses;
+		augs::timer pointer_lock_ignore_timer;
+
+#endif
         SDL_Window* window = nullptr;
         SDL_GLContext gl_context;
     };
@@ -24,6 +30,25 @@ namespace augs {
         return d.window;
     }
 }
+
+#if PLATFORM_WEB
+static EM_BOOL Emscripten_HandlePointerLockChange(int eventType, const EmscriptenPointerlockChangeEvent *changeEvent, void *userData)
+{
+	(void)eventType;
+
+	if (!changeEvent->isActive) {
+		auto platform = (augs::window::platform_data*)userData;
+		auto& timer = platform->pointer_lock_ignore_timer;
+
+		if (timer.get<std::chrono::milliseconds>() > 50.0) {
+			int& esc_presses = platform->esc_presses;
+			++esc_presses;
+		}
+	}
+
+	return 0;
+}
+#endif
 
 namespace augs {
     window::window(const window_settings& settings)
@@ -45,6 +70,10 @@ namespace augs {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         #endif
+
+#if PLATFORM_WEB
+		emscripten_set_pointerlockchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, (void*)platform.get(), 0, Emscripten_HandlePointerLockChange);
+#endif
 
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
@@ -243,6 +272,21 @@ namespace augs {
                     break;
             }
         }
+
+#if PLATFORM_WEB
+		auto& esc_presses = platform->esc_presses;
+
+		if (esc_presses > 0) {
+			event::change ch;
+			ch.data.key.key = event::keys::key::ESC;
+			ch.msg = event::message::keyup;
+
+			output.push_back(ch);
+
+			esc_presses = 0;
+		}
+#endif
+
     }
 
     void window::set_window_rect(const xywhi r) {
@@ -311,6 +355,9 @@ namespace augs {
 		SDL_bool relative = clip ? SDL_TRUE : SDL_FALSE;
 
 		if (SDL_SetRelativeMouseMode(relative) == 0) {
+#if PLATFORM_WEB
+			platform->pointer_lock_ignore_timer.reset();
+#endif
 			return true; // Successfully set the relative mouse mode
 		}
 		else {

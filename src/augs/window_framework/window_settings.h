@@ -45,12 +45,6 @@ namespace augs {
 			return { position, size };
 		}
 
-		bool draws_own_cursor() const {
-			if (fullscreen) {
-				return draw_own_cursor_in_fullscreen;
-			}
-
-			return false;
-		}
+		bool draws_own_cursor() const;
 	};
 }

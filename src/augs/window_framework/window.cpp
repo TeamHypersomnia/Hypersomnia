@@ -13,6 +13,14 @@
 /* Common interface */
 
 namespace augs {
+	bool window_settings::draws_own_cursor() const {
+		if (fullscreen) {
+			return draw_own_cursor_in_fullscreen;
+		}
+
+		return false;
+	}
+
 	event::change window::do_raw_motion(basic_vec2<short> motion) {
 		/* Clamp it out of consideration for network */
 		motion.x = std::clamp(motion.x, mouse_rel_min_v, mouse_rel_max_v);

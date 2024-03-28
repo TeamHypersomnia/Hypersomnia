@@ -409,6 +409,9 @@ work_result work(
 		result.general_gui_controls[augs::event::keys::key::T] = general_gui_intent_type::BUY_MENU;
 		result.general_gui_controls.erase(augs::event::keys::key::B);
 
+		result.general_gui_controls.erase(augs::event::keys::key::TILDE);
+		result.general_gui_controls[augs::event::keys::key::HOME] = general_gui_intent_type::TOGGLE_MOUSE_CURSOR;
+
 		result.inventory_gui_controls[augs::event::keys::key::B] = inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3;
 		result.inventory_gui_controls.erase(augs::event::keys::key::V);
 
@@ -3794,7 +3797,13 @@ work_result work(
 					/* Now is the time to actually track the input state. */
 					common_input_state.apply(e);
 
-					if (!was_any_imgui_popup_opened && e.was_pressed(key::ESC)) {
+#if PLATFORM_WEB
+					const bool ESC_pressed = e.was_released(key::ESC);
+#else
+					const bool ESC_pressed = e.was_pressed(key::ESC);
+#endif
+
+					if (!was_any_imgui_popup_opened && ESC_pressed) {
 						if (has_current_setup()) {
 							if (ingame_menu.show) {
 								ingame_menu.show = false;
