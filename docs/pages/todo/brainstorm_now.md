@@ -30,8 +30,6 @@ summary: That which we are brainstorming at the moment.
 
 - remove periodic entries from server logs so they only contain meaningful information
 
-- web: prevent ctrl+w from closing
-
 - fix steam_76561198118088474 profile on the web
 
 - after we debug the web:

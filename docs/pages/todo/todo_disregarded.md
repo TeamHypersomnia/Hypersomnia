@@ -5,6 +5,8 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- we should still show a prompt on ctrl+w because people will be used to it and will accidentally click it
+
 - DISREGARDED:
     - Switch to previous weapon when:
         - throwing nade

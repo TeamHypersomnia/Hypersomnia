@@ -13,8 +13,7 @@ void snap_interpolated_to_logical(cosmos& cosm) {
 	cosm.for_each_having<invariants::interpolation>( 
 		[&](const auto& e) {
 			if (const auto current = e.find_logic_transform()) {
-				const auto& info = get_corresponding<components::interpolation>(e);
-				info.desired_transform = info.previous_transform = info.interpolated_transform = *current;
+				get_corresponding<components::interpolation>(e).snap_to(*current);
 			}
 		}
 	);

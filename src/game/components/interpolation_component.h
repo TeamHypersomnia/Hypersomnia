@@ -13,9 +13,8 @@ namespace components {
 		mutable float positional_slowdown_multiplier = 1.f;
 		// END GEN INTROSPECTOR
 
-		template <class T>
-		void set_place_of_birth(T&& t) {
-			desired_transform = interpolated_transform = std::forward<T>(t);
+		auto snap_to(const transformr& r) {
+			desired_transform = previous_transform = interpolated_transform = r;
 		}
 	};
 }

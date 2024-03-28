@@ -128,7 +128,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				[transform_of_finishing, trace, during_penetration](const auto typed_handle) {
 					{
 						auto& interp = get_corresponding<components::interpolation>(typed_handle);
-						interp.set_place_of_birth(transform_of_finishing);
+						interp.snap_to(transform_of_finishing);
 					}
 
 					{

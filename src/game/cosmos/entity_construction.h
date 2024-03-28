@@ -49,7 +49,7 @@ void construct_post_inference(const handle_type h) {
 		auto& interpolation = get_corresponding<components::interpolation>(h);
 
 		if (const auto t = h.find_logic_transform()) {
-			interpolation.set_place_of_birth(*t);
+			interpolation.snap_to(*t);
 		}
 		else {
 			warning_other(h, "interpolation found but no transform could be found at time of birth");
