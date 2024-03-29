@@ -6,6 +6,7 @@
   <title>Emscripten-Generated Code</title>
   <style>
     body, html {
+      background-color: #111; /* Dark gray background */
       width: 100%;
       height: 100%;
       margin: 0;
@@ -95,6 +96,11 @@
     
     // Resize the canvas every time the window size changes
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "F11") {
+        e.preventDefault = function() { console.log("ignore prevent default"); };
+      }
+    }, { capture: true });
 
     Module.setStatus('Downloading...');
     window.onerror = function() {

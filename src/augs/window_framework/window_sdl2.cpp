@@ -10,6 +10,19 @@
 
 EM_JS(int, get_canvas_width, (), { return canvas.width; });
 EM_JS(int, get_canvas_height, (), { return canvas.height; });
+
+int FilterEvents(void* userdata, SDL_Event *event) {
+	(void)userdata;
+
+	if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
+		if (event->key.keysym.sym == SDLK_F11) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
 #endif
 
 augs::event::keys::key translate_sdl2_key(int);
@@ -95,6 +108,8 @@ namespace augs {
 		auto initial_fs = settings.fullscreen ? SDL_WINDOW_FULLSCREEN : 0;
 
 #if PLATFORM_WEB
+		/* Let F11 events be handled by the browser. */
+		SDL_SetEventFilter(FilterEvents, NULL);
 		initial_fs = 0;
 #endif
 
@@ -301,8 +316,14 @@ namespace augs {
 #endif
     }
 
+
     void window::set_fullscreen_hint(const bool hint) {
-        SDL_SetWindowFullscreen(platform->window, hint ? SDL_WINDOW_FULLSCREEN : 0);
+#if PLATFORM_WEB
+		(void)hint;
+		//requestFullscreen(EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT, EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE, EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT);
+#else
+		SDL_SetWindowFullscreen(platform->window, hint ? SDL_WINDOW_FULLSCREEN : 0);
+#endif
     }
 
     xywhi window::get_window_rect_impl() const {
