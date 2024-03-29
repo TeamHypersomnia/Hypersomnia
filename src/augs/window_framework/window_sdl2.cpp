@@ -21,6 +21,7 @@ namespace augs {
 		int esc_presses;
 		augs::timer pointer_lock_ignore_timer;
 
+		bool has_pointer_lock = false;
 #endif
         SDL_Window* window = nullptr;
         SDL_GLContext gl_context;
@@ -36,8 +37,11 @@ static EM_BOOL Emscripten_HandlePointerLockChange(int eventType, const Emscripte
 {
 	(void)eventType;
 
+	auto platform = (augs::window::platform_data*)userData;
+
+	platform->has_pointer_lock = changeEvent->isActive;
+
 	if (!changeEvent->isActive) {
-		auto platform = (augs::window::platform_data*)userData;
 		auto& timer = platform->pointer_lock_ignore_timer;
 
 		if (timer.get<std::chrono::milliseconds>() > 50.0) {

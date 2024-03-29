@@ -91,10 +91,12 @@ struct main_menu_gui {
 			return true;
 		}
 
+#if !PLATFORM_WEB
 		if (change.was_pressed(augs::event::keys::key::Q)) {
 			button_callback(main_menu_button_type::QUIT);
 			return true;
 		}
+#endif
 
 		const auto gui_entropies = 
 			world.consume_raw_input_and_generate_gui_events(

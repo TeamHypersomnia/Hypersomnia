@@ -2932,10 +2932,12 @@ work_result work(
 				augs::open_url("https://hypersomnia.xyz/credits");
 				break;
 
+#if !PLATFORM_WEB
 			case T::QUIT:
 				LOG("Quitting due to Quit pressed in main menu.");
 				request_quit();
 				break;
+#endif
 
 			default: break;
 		}
@@ -2989,6 +2991,7 @@ work_result work(
 				settings_gui.open();
 				break;
 
+#if !PLATFORM_WEB
 			case T::QUIT_GAME:
 				if (allow_popup) {
 					if (would_abandon_ranked_match()) {
@@ -3000,6 +3003,7 @@ work_result work(
 				LOG("Quitting due to Quit pressed in ingame menu.");
 				request_quit();
 				break;
+#endif
 
 			default: break;
 		}

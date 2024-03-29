@@ -13,7 +13,9 @@ enum class main_menu_button_type {
 	EDITOR,
 	SETTINGS,
 	CREDITS,
+#if !PLATFORM_WEB
 	QUIT,
+#endif
 
 	COUNT
 	// END GEN INTROSPECTOR

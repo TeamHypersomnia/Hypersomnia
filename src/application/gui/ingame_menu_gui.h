@@ -119,12 +119,14 @@ struct ingame_menu_gui {
 				}
 			}
 
+#if !PLATFORM_WEB
 			if (e == ingame_menu_button_type::QUIT_GAME) {
 				if (context.deps.will_abandon_match) {
 					root.buttons[i].colorize = red;
 					root.buttons[i].set_complete_caption("Abandon match (Quit game)");
 				}
 			}
+#endif
 
 			if (e == ingame_menu_button_type::SERVER_DETAILS) {
 				if (context.deps.is_tutorial) {
