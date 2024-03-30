@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- "download native client" in the right top
+
+- web: prevent right click from triggering context menu (preferred), or...
+    - ...always capture mouse when editor/proj selector is open
+    - note though right clicks will be useful even in the main menu for server browser/catalogue
+
 - clicking outside should close buy menu too
 
 - always allow changing maps when alone on the server

@@ -94,11 +94,14 @@ class viewables_streaming {
 
 	sound_definitions_map future_sound_definitions;
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
+	std::vector<augs::path_type> sound_paths_info;
+
 	std::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 
 	std::vector<augs::file_time_type> image_write_times;
 	std::vector<augs::file_time_type> sound_write_times;
 
+	std::optional<sound_progress_structs> sounds_progress;
 	std::optional<atlas_progress_structs> general_atlas_progress;
 	std::optional<augs::frame_num_type> general_atlas_submitted_when;
 
@@ -153,6 +156,4 @@ public:
 	auto& get_general_or_blank() {
 		return general_atlas_in_progress() ? blank_atlas : general_atlas;
 	}
-
-	bool is_loading_resources() const;
 };

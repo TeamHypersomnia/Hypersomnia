@@ -73,7 +73,7 @@ int performance_settings::get_default_num_pool_workers() {
 		+ main_threads
 		+ openal_threads
 #if PLATFORM_WEB
-		+ 2 // to be on the safe side so we don't deadlock because of new threads created
+		+ 4 // to be on the safe side so we don't deadlock because of new threads created
 #endif
 	;
 

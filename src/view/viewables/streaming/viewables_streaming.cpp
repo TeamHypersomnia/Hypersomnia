@@ -292,6 +292,18 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		});
 
 		if (sound_requests.size() > 0) {
+			sounds_progress.emplace();
+
+			sound_paths_info.clear();
+
+			for (const auto& r : sound_requests) {
+				if (!r.second.source_sound.empty()) {
+					sound_paths_info.push_back(r.second.source_sound);
+				}
+			}
+
+			sounds_progress->max_sounds.store(sound_paths_info.size());
+
 			future_loaded_buffers = launch_async(
 				[&](){
 					using value_type = decltype(future_loaded_buffers.get());
@@ -312,6 +324,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 						catch (...) {
 							result.push_back(std::nullopt);
 						}
+
+						sounds_progress->current_sound_num += 1;
 					}
 
 					return result;
@@ -380,6 +394,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	if (valid_and_is_ready(future_loaded_buffers)) {
 		auto& now_loaded_defs = now_all_defs.sounds;
 		auto& new_loaded_defs = future_sound_definitions;
+
+		sounds_progress = std::nullopt;
 
 		{
 			thread_local std::unordered_set<ALuint> all_unloaded_buffers;
@@ -513,34 +529,57 @@ void viewables_streaming::recompress_demos() {
 	});
 }
 
-bool viewables_streaming::is_loading_resources() const {
-	return general_atlas_progress.has_value();
-}
-
 void viewables_streaming::display_loading_progress() const {
 	using namespace augs::imgui;
 
 	std::string loading_message;
 
-	const auto& progress = general_atlas_progress;
 	float progress_percent = -1.f;
 
-	if (progress.has_value()) {
-		const auto& a_neon_i = progress->current_neon_map_num;
-		const auto neon_i = a_neon_i.load();
+	{
+		const auto& progress = general_atlas_progress;
 
-		const auto& a_neon_max_i = progress->max_neon_maps;
-		const auto neon_max_i = a_neon_max_i.load();
+		if (loading_message.empty() && progress.has_value()) {
+			const auto& a_neon_i = progress->current_neon_map_num;
+			const auto neon_i = a_neon_i.load();
 
-		const auto neons_finished = neon_i == 0 || neon_i == neon_max_i;
+			const auto& a_neon_max_i = progress->max_neon_maps;
+			const auto neon_max_i = a_neon_max_i.load();
 
-		if (!neons_finished) {
-			loading_message = typesafe_sprintf("Regenerating neon map %x of %x...", neon_i, neon_max_i);
+			const auto neons_finished = neon_i == 0 || neon_i == neon_max_i;
 
-			progress_percent = float(neon_i) / neon_max_i;
+			if (!neons_finished) {
+				loading_message = typesafe_sprintf("Regenerating neon map %x of %x...", neon_i, neon_max_i);
+
+				progress_percent = float(neon_i) / neon_max_i;
+			}
+			else {
+				loading_message = "Loading the game atlas...";
+			}
 		}
-		else {
-			loading_message = "Loading the game atlas...";
+	}
+
+	{
+		const auto& progress = sounds_progress;
+
+		if (loading_message.empty() && progress.has_value()) {
+			const auto& a_sound_i = progress->current_sound_num;
+			const auto sound_i = a_sound_i.load();
+
+			const auto& a_sound_max_i = progress->max_sounds;
+			const auto sound_max_i = a_sound_max_i.load();
+
+			const auto sounds_finished = sound_i == sound_max_i;
+
+			if (!sounds_finished) {
+				loading_message = typesafe_sprintf("Loading %x...", sound_paths_info[sound_i].filename(), sound_i+1, sound_max_i);
+
+				progress_percent = float(sound_i+1) / sound_max_i;
+			}
+			else {
+				loading_message = "Loading sounds...";
+				progress_percent = 1.0f;
+			}
 		}
 	}
 
@@ -550,7 +589,7 @@ void viewables_streaming::display_loading_progress() const {
 		center_next_window(ImGuiCond_Always);
 		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
 
-		text_color("The game is regenerating resources. Please be patient.\n", yellow);
+		text_color("The game is loading resources. Please be patient.\n", yellow);
 		ImGui::Separator();
 
 		text(loading_message);

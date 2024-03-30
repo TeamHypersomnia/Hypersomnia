@@ -1365,7 +1365,7 @@ if(BUILD_FOR_WEB)
 		set(INITIAL_MEMORY "512MB")
 	endif()
 
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_MEMORY_GROWTH -Wno-pthreads-mem-growth")
+	#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_MEMORY_GROWTH -Wno-pthreads-mem-growth")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_BLOCKING_ON_MAIN_THREAD=1")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
 	# There are some huge functions that can cause us to overflow with debug symbols
