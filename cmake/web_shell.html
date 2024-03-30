@@ -89,12 +89,16 @@
       // For example, you might need to adjust the viewport or camera settings
     }
 
+    var urlPath = window.location.pathname;
+    console.log("urlPath:", urlPath);
+
     var Module = {
       canvas: (function() {
         var canvas = document.getElementById('canvas');
         resizeCanvas(); // Initial canvas resize
         return canvas;
       })(),
+      arguments: [urlPath],
       setStatus: function(text) {
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var statusElement = document.getElementById('downloading-text');

@@ -2,6 +2,7 @@
 #include "augs/filesystem/path.h"
 #include "augs/app_type.h"
 #include "augs/network/network_types.h"
+#include "application/activity_type.h"
 
 struct cmd_line_params {
 	std::string complete_command_line;
@@ -56,6 +57,8 @@ struct cmd_line_params {
 	augs::path_type verified_archive;
 	augs::path_type verified_signature;
 
+	std::optional<activity_type> launch_activity;
+
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
 		complete_command_line = exe_path.string();
@@ -86,6 +89,18 @@ struct cmd_line_params {
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();
 				exe_path = appimage_path;
+			}
+			else if (a == "/tutorial") {
+				launch_activity = activity_type::TUTORIAL;
+			}
+			else if (a == "/menu") {
+				launch_activity = activity_type::MAIN_MENU;
+			}
+			else if (a == "/editor") {
+				launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
+			}
+			else if (a == "/range") {
+				launch_activity = activity_type::SHOOTING_RANGE;
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;

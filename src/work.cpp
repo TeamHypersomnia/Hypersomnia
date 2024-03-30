@@ -3449,6 +3449,10 @@ work_result work(
 			else if (params.should_connect) {
 				connect_to(params.connect_address);
 			}
+			else if (params.launch_activity.has_value()) {
+				LOG("Activity %x was specified from the command line.", *params.launch_activity);
+				launch_setup(*params.launch_activity);
+			}
 			else {
 				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
 					if (!config.skip_tutorial) {

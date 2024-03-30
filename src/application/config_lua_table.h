@@ -52,37 +52,13 @@
 #include "application/masterserver/masterserver_settings.h"
 #include "application/nat/nat_detection_settings.h"
 #include "application/nat/nat_traversal_settings.h"
+#include "application/activity_type.h"
 #include "fp_consistency_tests.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
 	LAST_ACTIVITY,
-	COUNT
-	// END GEN INTROSPECTOR
-};
-
-enum class activity_type {
-	// GEN INTROSPECTOR enum class activity_type
-	MAIN_MENU,
-
-	SHOOTING_RANGE,
-	TUTORIAL,
-
-	EDITOR,
-	EDITOR_PROJECT_SELECTOR,
-
-	DEBUGGER,
-
-	LOCAL_DETERMINISM_TEST,
-
-	DIRECTOR,
-
-	CLIENT,
-	SERVER,
-
-	CLIENT_AND_SERVER,
-	TWO_CLIENTS_AND_SERVER,
 	COUNT
 	// END GEN INTROSPECTOR
 };
