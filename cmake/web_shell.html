@@ -81,19 +81,23 @@
   </div>
   <canvas id="canvas" tabindex="-1"></canvas>
   <script type='text/javascript'>
+    console.log('dpi', window.devicePixelRatio || 1);
+
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
-      var devicePixelRatio = window.devicePixelRatio || 1; // Consider device pixel ratio
-      var width = window.innerWidth * devicePixelRatio;
-      var height = window.innerHeight * devicePixelRatio;
+      const dpr = window.devicePixelRatio || 1;
+
+      const {width, height} = canvas.getBoundingClientRect();
+      const displayWidth = Math.round(width * dpr);
+      const displayHeight = Math.round(height * dpr);
 
       // Update canvas size to match the window size, factoring in device pixel ratio
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = displayWidth;
+      canvas.height = displayHeight;
 
       // Use CSS to adjust the displayed size of the canvas
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
+      //canvas.style.width = window.innerWidth + 'px';
+      //canvas.style.height = window.innerHeight + 'px';
 
       // Inform your game or application about the resize event, if necessary
       // For example, you might need to adjust the viewport or camera settings
