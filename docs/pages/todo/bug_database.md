@@ -5,6 +5,10 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- high dpi problems?
+	- https://thecharliecrisp.medium.com/supporting-high-dpi-devices-with-webassembly-emscripten-and-glfw-26c3d2934ce5
+	- used clientWidth rounded, works fine
+
 - Discord streaming issue + Pepsik bug (broken textures when launching with Steam overlay0
 	- Quoting 99de1cc851d33915eacb3b6166397008d296fad2:
 		settable_as_current_mixin would skip calling glBindTexture if the

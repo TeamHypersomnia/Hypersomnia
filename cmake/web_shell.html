@@ -65,6 +65,11 @@
       background-color: #4CAF50;
       width: 0%; /* Initial progress */
     }
+    .progress-mb {
+      color: white; /* White text color */
+      font-size: 24px; /* Size of the MB progress text */
+      margin-top: 20px; /* Spacing between the progress bar and the MB progress text */
+    }
     @keyframes rotation {
       from {transform: rotate(0deg);}
       to {transform: rotate(360deg);}
@@ -78,11 +83,10 @@
     <div class="progress-bar" id="progress-bar">
       <div class="progress-bar-inner" id="progress-bar-inner"></div>
     </div>
+    <div class="progress-mb" id="progress-mb">0MB/0MB</div>
   </div>
   <canvas id="canvas" tabindex="-1"></canvas>
   <script type='text/javascript'>
-    console.log('dpi', window.devicePixelRatio || 1);
-
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
       const dpr = window.devicePixelRatio || 1;
@@ -91,16 +95,8 @@
       const displayWidth = Math.round(width * dpr);
       const displayHeight = Math.round(height * dpr);
 
-      // Update canvas size to match the window size, factoring in device pixel ratio
       canvas.width = displayWidth;
       canvas.height = displayHeight;
-
-      // Use CSS to adjust the displayed size of the canvas
-      //canvas.style.width = window.innerWidth + 'px';
-      //canvas.style.height = window.innerHeight + 'px';
-
-      // Inform your game or application about the resize event, if necessary
-      // For example, you might need to adjust the viewport or camera settings
     }
 
     var urlPath = window.location.pathname;
@@ -117,19 +113,32 @@
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var statusElement = document.getElementById('downloading-text');
         var progressElement = document.getElementById('progress-bar-inner');
+        var progressMbElement = document.getElementById('progress-mb');
+
         if (m) {
-          var progress = parseInt(m[2]) / parseInt(m[4]) * 100;
+          var currentBytes = parseFloat(m[2]);
+          var totalBytes = parseFloat(m[4]);
+          var progress = currentBytes / totalBytes * 100;
+
+          var currentMB = (currentBytes / (1024 * 1024)).toFixed(2);
+          var totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+
           statusElement.innerHTML = 'Downloading... ' + progress.toFixed(0) + '%';
           progressElement.style.width = progress + '%';
+          progressMbElement.innerHTML = `${currentMB} MB of ${totalMB} MB`; // Update MB progress text
+          document.getElementById('spinner').style.display = 'block';
         } else {
           statusElement.innerHTML = text;
         }
+
         if (text) {
           document.getElementById('spinner').style.display = 'block';
+          progressMbElement.style.display = 'block'; // Ensure MB progress text is visible during download
         } else {
           document.getElementById('spinner').style.display = 'none';
           document.getElementById('progress-bar-inner').style.display = 'none';
           document.getElementById('downloading-text').style.display = 'none';
+          progressMbElement.style.display = 'none'; // Hide MB progress text when download is complete
 
           statusElement.innerHTML = 'Ready.';
           progressElement.style.width = '100%';
@@ -144,7 +153,6 @@
       }
     };
 
-    // Resize the canvas every time the window size changes
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener("keydown", (e) => {
       if (e.code === "F11") {

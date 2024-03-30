@@ -5,7 +5,6 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-
 - WebGL glitches with a lot of vertices.
 	- implement imgui call in terms of glDrawArrays to avoid glitches
 		- glitchuje przy (cnt*3=11454, sizeof(vertex_triangle) * cnt=229080)
