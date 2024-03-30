@@ -1361,10 +1361,11 @@ if(BUILD_FOR_WEB)
 		set(STACK_SIZE "32MB")
 		set(INITIAL_MEMORY "1800MB")
 	else()
-		set(STACK_SIZE "16MB")
-		set(INITIAL_MEMORY "1024MB")
+		set(STACK_SIZE "4MB")
+		set(INITIAL_MEMORY "512MB")
 	endif()
 
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_MEMORY_GROWTH -Wno-pthreads-mem-growth")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_BLOCKING_ON_MAIN_THREAD=1")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
 	# There are some huge functions that can cause us to overflow with debug symbols
@@ -1381,10 +1382,10 @@ if(BUILD_FOR_WEB)
 	endif()
 
 	# Embed all files
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/cache/content@/cache/content")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.lua@/default_config.lua")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/cache/content@/cache/content")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.lua@/default_config.lua")
 
 	if (BUILD_OPENGL)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2")

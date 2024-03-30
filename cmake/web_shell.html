@@ -12,40 +12,48 @@
       margin: 0;
       padding: 0;
       overflow: hidden; /* Prevent scrollbars */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     canvas {
       display: block; /* Remove the margin inside the body */
       width: 100%;
       height: 100%;
     }
-    .spinner {
-      position: absolute; /* Center the spinner */
+    .center-container {
+      position: absolute;
+      text-align: center;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+    .downloading-text {
+      color: white; /* White text color */
+      font-size: 24px; /* Increased font size */
+      margin-top: 20px; /* Space below the text */
+      margin-bottom: 20px; /* Space below the text */
+    }
+    .spinner {
+      margin: auto;
       height: 50px;
       width: 50px;
-      -webkit-animation: rotation .8s linear infinite;
-      -moz-animation: rotation .8s linear infinite;
-      -o-animation: rotation .8s linear infinite;
       animation: rotation 0.8s linear infinite;
-      border-left: 10px solid rgb(0,150,240);
-      border-right: 10px solid rgb(0,150,240);
-      border-bottom: 10px solid rgb(0,150,240);
-      border-top: 10px solid rgb(100,0,200);
-      border-radius: 100%;
+      border-left: 6px solid rgba(255, 255, 255, 0.2);
+      border-right: 6px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
     }
-    @-webkit-keyframes rotation {
-      from {-webkit-transform: rotate(0deg);}
-      to {-webkit-transform: rotate(360deg);}
+    .progress-bar {
+      width: 700px;
+      background-color: #ddd;
+      margin: 20px auto 0; /* Centered with margin top */
     }
-    @-moz-keyframes rotation {
-      from {-moz-transform: rotate(0deg);}
-      to {-moz-transform: rotate(360deg);}
-    }
-    @-o-keyframes rotation {
-      from {-o-transform: rotate(0deg);}
-      to {-o-transform: rotate(360deg);}
+    .progress-bar-inner {
+      height: 20px;
+      background-color: #4CAF50;
+      width: 0%; /* Initial progress */
     }
     @keyframes rotation {
       from {transform: rotate(0deg);}
@@ -54,7 +62,13 @@
   </style>
 </head>
 <body>
-  <div id="spinner" class="spinner"></div>
+  <div class="center-container">
+    <div class="spinner" id="spinner"></div>
+    <div class="downloading-text" id="downloading-text">Downloading... 0%</div>
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-bar-inner" id="progress-bar-inner"></div>
+    </div>
+  </div>
   <canvas id="canvas" tabindex="-1"></canvas>
   <script type='text/javascript'>
     function resizeCanvas() {
@@ -82,18 +96,36 @@
         return canvas;
       })(),
       setStatus: function(text) {
-        if (text) document.getElementById('spinner').style.display = 'inline-block';
-        else document.getElementById('spinner').style.display = 'none';
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+        var statusElement = document.getElementById('downloading-text');
+        var progressElement = document.getElementById('progress-bar-inner');
+        if (m) {
+          var progress = parseInt(m[2]) / parseInt(m[4]) * 100;
+          statusElement.innerHTML = 'Downloading... ' + progress.toFixed(0) + '%';
+          progressElement.style.width = progress + '%';
+        } else {
+          statusElement.innerHTML = text;
+        }
+        if (text) {
+          document.getElementById('spinner').style.display = 'block';
+        } else {
+          document.getElementById('spinner').style.display = 'none';
+          document.getElementById('progress-bar-inner').style.display = 'none';
+          document.getElementById('downloading-text').style.display = 'none';
+
+          statusElement.innerHTML = 'Ready.';
+          progressElement.style.width = '100%';
+        }
       },
       totalDependencies: 0,
       monitorRunDependencies: function(left) {
         this.totalDependencies = Math.max(this.totalDependencies, left);
-        var spinnerElement = document.getElementById('spinner');
-        if (left) spinnerElement.style.display = 'inline-block';
-        else spinnerElement.style.display = 'none';
+        var progress = ((this.totalDependencies - left) / this.totalDependencies) * 100;
+        document.getElementById('progress-bar-inner').style.width = progress + '%';
+        document.getElementById('downloading-text').innerHTML = 'Downloading... ' + progress.toFixed(0) + '%';
       }
     };
-    
+
     // Resize the canvas every time the window size changes
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener("keydown", (e) => {
