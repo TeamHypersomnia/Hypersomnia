@@ -83,7 +83,7 @@
     <div class="progress-bar" id="progress-bar">
       <div class="progress-bar-inner" id="progress-bar-inner"></div>
     </div>
-    <div class="progress-mb" id="progress-mb">0MB/0MB</div>
+    <div class="progress-mb" id="progress-mb">0 MB</div>
   </div>
   <canvas id="canvas" tabindex="-1"></canvas>
   <script type='text/javascript'>
@@ -97,6 +97,14 @@
 
       canvas.width = displayWidth;
       canvas.height = displayHeight;
+    }
+
+    function hideProgress() {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('progress-bar-inner').style.display = 'none';
+      document.getElementById('downloading-text').style.display = 'none';
+      document.getElementById('downloading-text').style.display = 'none';
+      document.getElementById('progress-mb').style.display = 'none'; // Hide MB progress text when download is complete
     }
 
     var urlPath = window.location.pathname;
@@ -135,12 +143,7 @@
           document.getElementById('spinner').style.display = 'block';
           progressMbElement.style.display = 'block'; // Ensure MB progress text is visible during download
         } else {
-          document.getElementById('spinner').style.display = 'none';
-          document.getElementById('progress-bar-inner').style.display = 'none';
-          document.getElementById('downloading-text').style.display = 'none';
-          progressMbElement.style.display = 'none'; // Hide MB progress text when download is complete
-
-          statusElement.innerHTML = 'Ready.';
+          statusElement.innerHTML = 'Entering the game world.';
           progressElement.style.width = '100%';
         }
       },

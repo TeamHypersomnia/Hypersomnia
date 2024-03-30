@@ -6894,3 +6894,7 @@ This will discard your redo history."
 
 - investigate smoothness problems within 200-300 fps ranges
 	- done: implemented linear interpolation method
+- try avoiding blocking on the main thread but i dont know how we'll do it
+    - maybe just check readiness? and if frame isnt ready just dont wait and dont render it
+    - we'll have to disable the "helper"
+

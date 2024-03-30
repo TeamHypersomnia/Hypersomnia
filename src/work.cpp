@@ -190,6 +190,11 @@ constexpr bool no_edge_zoomout_v = false;
 #if PLATFORM_WEB
 #include <emscripten.h>
 #include <emscripten/html5.h>
+
+EM_JS(void, call_hideProgress, (), {
+  hideProgress();
+});
+
 #endif
 
 #if PLATFORM_WEB
@@ -4773,13 +4778,30 @@ work_result work(
 
 	WEBSTATIC auto main_loop_in_ptr = reinterpret_cast<void*>(&main_loop_in);
 
+#if PLATFORM_WEB
+	window.swap_buffers();
+
+	WEBSTATIC bool swapped_once = false;
+#endif
+
 	static auto main_loop_iter = [](void* arg) -> bool {
 		auto& mi = *reinterpret_cast<main_loop_input*>(arg);
 
-		auto& window = mi.window;
 		auto& buffer_swapper = mi.buffer_swapper;
-		auto& renderer_backend = mi.renderer_backend;
+		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op;
 		auto& thread_pool = mi.thread_pool;
+		auto& renderer_backend = mi.renderer_backend;
+
+#if PLATFORM_WEB
+		(void)thread_pool;
+
+		if (!buffer_swapper.try_swap_buffers(game_main_thread_synced_op)) {
+			return true;
+		}
+#endif
+
+		auto& window = mi.window;
+
 		auto& this_frame_timer = mi.this_frame_timer;
 		(void)this_frame_timer;
 		auto& until_first_swap = mi.until_first_swap;
@@ -4789,12 +4811,17 @@ work_result work(
 		auto& current_frame = mi.current_frame;
 
 		auto& get_read_buffer = mi.get_read_buffer;
-		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op;
 
 		auto scope = measure_scope(render_thread_performance.fps);
 
 		auto swap_window_buffers = [&]() {
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
+
+			if (!swapped_once) {
+				call_hideProgress();
+				swapped_once = true;
+			}
+
 			window.swap_buffers();
 
 			if (!until_first_swap_measured) {
@@ -4856,6 +4883,7 @@ work_result work(
 				read_buffer.screen_size = window.get_screen_size();
 			}
 
+#if !PLATFORM_WEB
 			{
 				auto scope = measure_scope(render_thread_performance.render_help);
 				thread_pool.help_until_no_tasks();
@@ -4865,7 +4893,6 @@ work_result work(
 				auto scope = measure_scope(render_thread_performance.render_wait);
 				buffer_swapper.swap_buffers(game_main_thread_synced_op);
 
-#if !PLATFORM_WEB
 				const auto max_fps = get_read_buffer().max_fps;
 
 				if (max_fps.is_enabled && max_fps.value >= 10) {
@@ -4899,8 +4926,8 @@ work_result work(
 
 					this_frame_timer.reset();
 				}
-#endif
 			}
+#endif
 		}
 
 		auto& read_buffer = get_read_buffer();

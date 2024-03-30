@@ -108,6 +108,20 @@ public:
 #endif
 
 	template <class T>
+	bool try_swap_buffers(T&& synchronized_op) {
+		{
+			std::scoped_lock lk(swapper_m);
+
+			if (!already_waiting.load()) {
+				return false;
+			}
+		}
+
+		swap_buffers(std::forward<T>(synchronized_op));
+		return true;
+	}
+
+	template <class T>
 	void swap_buffers(T&& synchronized_op) {
 		{
 			std::unique_lock<std::mutex> lk(swapper_m);
@@ -128,7 +142,7 @@ public:
 
 	void notify_swap_completion() {
 		{
-			std::unique_lock<std::mutex> lk(waiter_m);
+			std::scoped_lock lk(waiter_m);
 			swap_complete.store(true);
 		}
 
@@ -139,7 +153,7 @@ public:
 		swap_complete.store(false);
 		
 		{
-			std::unique_lock<std::mutex> lk(swapper_m);
+			std::scoped_lock lk(swapper_m);
 			already_waiting.store(true);
 		}
 
