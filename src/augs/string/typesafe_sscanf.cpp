@@ -100,8 +100,8 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 		const auto sprintfed = "-1";
 
 		unsigned s1 = 0xdeadbeef;
-		REQUIRE(0 == test_scanf(sprintfed, format, s1));
-		REQUIRE(s1 == 0xdeadbeef);
+		REQUIRE(1 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == uint32_t(-1));
 	}
 
 	{

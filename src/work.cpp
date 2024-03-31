@@ -195,6 +195,10 @@ EM_JS(void, call_hideProgress, (), {
   hideProgress();
 });
 
+EM_JS(void, call_setLocation, (const char* newPath), {
+	setLocation(newPath);
+});
+
 #endif
 
 #if PLATFORM_WEB
@@ -3284,6 +3288,8 @@ work_result work(
 		}
 	};
 
+	WEBSTATIC augs::timer rich_presence_timer;
+
 	WEBSTATIC auto advance_setup = [&](
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
@@ -3377,7 +3383,6 @@ work_result work(
 				);
 			}
 
-			thread_local augs::timer rich_presence_timer;
 			const auto passed_secs = rich_presence_timer.get<std::chrono::seconds>();
 
 			if (passed_secs > 2.0 || set_rich_presence_now) {
@@ -3782,6 +3787,7 @@ work_result work(
 
 				configurables.apply(viewing_config);
 				write_buffer.new_settings = viewing_config.window;
+				write_buffer.browser_location = visit_current_setup([&](const auto& setup) { return setup.get_browser_location(); });
 				write_buffer.swap_when = viewing_config.performance.swap_window_buffers_when;
 				write_buffer.max_fps = viewing_config.window.max_fps;
 				write_buffer.max_fps_method = viewing_config.window.max_fps_method;
@@ -4793,6 +4799,7 @@ work_result work(
 	window.swap_buffers();
 
 	WEBSTATIC bool swapped_once = false;
+	WEBSTATIC std::string current_browser_location = "/";
 #endif
 
 	static auto main_loop_iter = [](void* arg) -> bool {
@@ -4844,6 +4851,21 @@ work_result work(
 				program_log::get_current().mark_last_init_log();
 			}
 		};
+
+#if PLATFORM_WEB
+		{
+			auto& read_buffer = get_read_buffer();
+			const auto location = "/" + read_buffer.browser_location;
+
+			if (current_browser_location != location) {
+				current_browser_location = location;
+
+				LOG("Setting browser location to: \"%x\"", current_browser_location);
+
+				call_setLocation(current_browser_location.c_str());
+			}
+		}
+#endif
 
 		{
 			auto& read_buffer = get_read_buffer();

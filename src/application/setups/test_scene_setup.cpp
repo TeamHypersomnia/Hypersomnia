@@ -116,6 +116,29 @@ void test_scene_setup::set_tutorial_surfing_challenge() {
 	set_tutorial_level(max_tutorial_level);
 }
 
+std::string test_scene_setup::get_browser_location() const {
+	if (is_tutorial()) {
+		std::string out = "tutorial";
+
+		if (tutorial.level == 0) {
+			return out;
+		}
+
+		if (tutorial.challenge) {
+			out += "/challenge";
+		}
+		else {
+			out += "/";
+			out += std::to_string(tutorial.level);
+		}
+
+		return out;
+	}
+	else {
+		return "range";
+	}
+}
+
 void test_scene_setup::set_tutorial_level(uint32_t level) {
 	auto& cosm = scene.world;
 
@@ -129,6 +152,7 @@ void test_scene_setup::set_tutorial_level(uint32_t level) {
 
 	if (is_challenge) {
 		tutorial.level = max_tutorial_level - 1;
+		tutorial.challenge = true;
 	}
 
 	restart_arena();
@@ -621,7 +645,12 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 						shooting_range = true;
 					}
 
+					if (begins_with(name, "hard_surf_start")) {
+						tutorial.challenge = true;
+					}
+
 					if (begins_with(name, "entry")) {
+						tutorial.challenge = false;
 						uint32_t new_level = 0;
 
 						if (typesafe_sscanf(name, "entry%x", new_level)) {

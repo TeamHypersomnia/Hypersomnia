@@ -41,7 +41,7 @@ enum class test_scene_type {
 
 struct tutorial_state {
 	uint32_t level = 0;
-
+	bool challenge = false;
 };
 
 template <bool C>
@@ -343,4 +343,6 @@ public:
 
 	void set_tutorial_level(uint32_t level);
 	void set_tutorial_surfing_challenge();
+
+	std::string get_browser_location() const;
 };

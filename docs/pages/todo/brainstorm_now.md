@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- render "please be patient" OVER leaderboards
+
 - "download native client" in the right top
 
 - web: prevent right click from triggering context menu (preferred), or...

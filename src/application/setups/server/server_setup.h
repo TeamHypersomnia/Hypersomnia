@@ -806,4 +806,8 @@ public:
 
 	bool has_assigned_teams() const;
 	faction_type get_assigned_team(const std::string&) const;
+
+	std::string get_browser_location() const {
+		return "";
+	}
 };

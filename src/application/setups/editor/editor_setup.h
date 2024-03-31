@@ -831,4 +831,8 @@ public:
 	void do_uploading_imgui();
 
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
+
+	std::string get_browser_location() const {
+		return "editor";
+	}
 };

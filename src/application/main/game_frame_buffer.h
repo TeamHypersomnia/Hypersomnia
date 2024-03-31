@@ -44,6 +44,7 @@ struct all_game_renderers {
 struct game_frame_buffer {
 	augs::local_entropy new_window_entropy;
 	augs::window_settings new_settings;
+	std::string browser_location;
 	swap_buffers_moment swap_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	augs::maybe<int> max_fps = augs::maybe<int>::disabled(60);
 	augs::max_fps_type max_fps_method = augs::max_fps_type::YIELD;

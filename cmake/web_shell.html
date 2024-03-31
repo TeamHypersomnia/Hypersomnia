@@ -108,6 +108,13 @@
       document.getElementById('progress-mb').style.display = 'none'; // Hide MB progress text when download is complete
     }
 
+    function setLocation(newLocation) {
+      const locStr = UTF8ToString(newLocation);
+
+      console.log("New location: ", locStr);
+      window.history.pushState("object or string", "Title", locStr);
+    }
+
     var urlPath = window.location.pathname;
     console.log("urlPath:", urlPath);
 

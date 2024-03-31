@@ -210,4 +210,8 @@ public:
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
+
+	std::string get_browser_location() const {
+		return "";
+	}
 };

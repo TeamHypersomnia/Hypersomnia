@@ -867,4 +867,8 @@ public:
 	bool would_abandon_match() const;
 	
 	faction_type get_assigned_faction() const;
+
+	std::string get_browser_location() const {
+		return "";
+	}
 };
