@@ -1135,6 +1135,10 @@ void client_setup::perform_chat_input_bar() {
 }
 
 void client_setup::snap_interpolation_of_viewed() {
+	snap_interpolated_to_logical(get_arena_handle(get_viewed_arena_type()).get_cosmos());
+}
+
+void client_setup::snap_interpolations() {
 	auto snap_for = [&](const auto arena_type) {
 		snap_interpolated_to_logical(get_arena_handle(arena_type).get_cosmos());
 	};
@@ -1153,7 +1157,7 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 	auto& pending_snap = demo_player.gui.pending_interpolation_snap;
 
 	if (pending_snap) {
-		snap_interpolation_of_viewed();
+		snap_interpolations();
 		pending_snap = false;
 	}
 

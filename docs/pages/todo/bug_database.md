@@ -5,6 +5,10 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Nasty interpolation glitch when connecting -
+	- Referential cosmos needs to be snapped as well because we begin from spectator view which shows referential cosmos by default.
+	- the only "bug" left is when you go spectate during warmup since your player disappears and you go back to spectating at origin (0, 0) pos
+
 - high dpi problems?
 	- https://thecharliecrisp.medium.com/supporting-high-dpi-devices-with-webassembly-emscripten-and-glfw-26c3d2934ce5
 	- used clientWidth rounded, works fine

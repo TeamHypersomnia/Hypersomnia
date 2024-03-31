@@ -3289,6 +3289,7 @@ work_result work(
 	};
 
 	WEBSTATIC augs::timer rich_presence_timer;
+	WEBSTATIC client_arena_type last_viewed_arena_type = client_arena_type::COUNT;
 
 	WEBSTATIC auto advance_setup = [&](
 		const augs::audio_renderer* audio_renderer,
@@ -3340,6 +3341,13 @@ work_result work(
 
 				if (setup.is_replaying() && setup.is_paused()) {
 					pending_new_state_sample = true;
+				}
+
+				const auto viewed = setup.get_viewed_arena_type();
+
+				if (last_viewed_arena_type != viewed) {
+					last_viewed_arena_type = viewed;
+					setup.snap_interpolation_of_viewed();
 				}
 			}
 			else if constexpr(std::is_same_v<S, server_setup>) {

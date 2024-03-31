@@ -222,8 +222,6 @@ class client_setup :
 
 	void send_to_server(total_client_entropy&);
 
-	client_arena_type get_viewed_arena_type() const;
-
 	auto get_controlled_character() const {
 		return get_viewed_cosmos()[get_controlled_character_id()];
 	}
@@ -572,7 +570,7 @@ class client_setup :
 	}
 
 	void perform_demo_player_imgui(augs::window& window);
-	void snap_interpolation_of_viewed();
+	void snap_interpolations();
 
 	void request_direct_file_download(const augs::secure_hash_type&);
 
@@ -708,7 +706,7 @@ public:
 			);
 
 			if (needs_snap) {
-				snap_interpolation_of_viewed();
+				snap_interpolations();
 			}
 
 			return;
@@ -867,6 +865,9 @@ public:
 	bool would_abandon_match() const;
 	
 	faction_type get_assigned_faction() const;
+
+	void snap_interpolation_of_viewed();
+	client_arena_type get_viewed_arena_type() const;
 
 	std::string get_browser_location() const {
 		return "";

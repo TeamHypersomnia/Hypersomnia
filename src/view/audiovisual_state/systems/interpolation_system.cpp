@@ -104,6 +104,16 @@ void interpolation_system::integrate_interpolated_transforms(
 				}
 
 				integrated = info.previous_transform.interp_separate(info.desired_transform, ratio, ratio);
+
+				if (info.desired_transform == info.previous_transform) {
+					/* 
+						For numerical stability when bodies are asleep.
+						0.3*previous + 0.7*desired would be numerically different than
+						just "desired" even though previous == desired.
+					*/
+
+					integrated = info.desired_transform;
+				}
 			}
 		}
 	);

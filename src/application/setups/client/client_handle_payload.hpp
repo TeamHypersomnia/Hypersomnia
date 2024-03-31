@@ -288,6 +288,7 @@ message_handler_result client_setup::handle_payload(
 
 		if (!was_resyncing) {
 			snap_interpolated_to_logical(predicted_cosmos);
+			snap_interpolated_to_logical(referential.advanced_cosm);
 		}
 	}
 #if CONTEXTS_SEPARATE
