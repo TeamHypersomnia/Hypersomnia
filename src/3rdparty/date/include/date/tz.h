@@ -224,7 +224,7 @@ template <class Duration>
 std::string
 nonexistent_local_time::make_msg(local_time<Duration> tp, const local_info& i)
 {
-#if PLATFORM_WEB
+#if 1
 	(void)tp;
 	(void)i;
 	return "nonexistent_local_time";
@@ -267,7 +267,7 @@ template <class Duration>
 std::string
 ambiguous_local_time::make_msg(local_time<Duration> tp, const local_info& i)
 {
-#if PLATFORM_WEB
+#if 1
 	(void)tp;
 	(void)i;
 	return "ambiguous_local_time";

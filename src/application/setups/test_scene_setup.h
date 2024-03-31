@@ -75,6 +75,8 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	test_scene_type type;
 
 	tutorial_state tutorial;
+	uint32_t max_tutorial_level = 0;
+
 	bool should_init_level = false;
 	float restart_arena_in_ms = -1;
 
@@ -338,4 +340,7 @@ public:
 	}
 
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
+
+	void set_tutorial_level(uint32_t level);
+	void set_tutorial_surfing_challenge();
 };

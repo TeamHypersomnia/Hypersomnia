@@ -3,6 +3,7 @@
 #include "augs/app_type.h"
 #include "augs/network/network_types.h"
 #include "application/activity_type.h"
+#include "augs/string/typesafe_sscanf.h"
 
 struct cmd_line_params {
 	std::string complete_command_line;
@@ -58,6 +59,8 @@ struct cmd_line_params {
 	augs::path_type verified_signature;
 
 	std::optional<activity_type> launch_activity;
+	std::optional<int> tutorial_level;
+	bool tutorial_challenge = false;
 
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
@@ -86,21 +89,37 @@ struct cmd_line_params {
 				/* MacOS process identifier. Ignore. */
 				continue;
 			}
+			else if (a.size() > 1 && a[0] == '/') {
+				/* URL location argument. */
+
+				if (begins_with(a, "/tutorial")) {
+					launch_activity = activity_type::TUTORIAL;
+
+					uint32_t level = 0;
+					std::string keyword;
+
+					if (1 == typesafe_sscanf(a, "/tutorial/%x", level)) {
+						tutorial_level = level;
+					}
+					else if (1 == typesafe_sscanf(a, "/tutorial/%x", keyword)) {
+						if (keyword == "challenge") {
+							tutorial_challenge = true;
+						}
+					}
+				}
+				else if (begins_with(a, "/menu")) {
+					launch_activity = activity_type::MAIN_MENU;
+				}
+				else if (begins_with(a, "/editor")) {
+					launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
+				}
+				else if (begins_with(a, "/range")) {
+					launch_activity = activity_type::SHOOTING_RANGE;
+				}
+			}
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();
 				exe_path = appimage_path;
-			}
-			else if (a == "/tutorial") {
-				launch_activity = activity_type::TUTORIAL;
-			}
-			else if (a == "/menu") {
-				launch_activity = activity_type::MAIN_MENU;
-			}
-			else if (a == "/editor") {
-				launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
-			}
-			else if (a == "/range") {
-				launch_activity = activity_type::SHOOTING_RANGE;
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;

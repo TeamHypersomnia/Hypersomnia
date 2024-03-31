@@ -61,6 +61,11 @@ int typesafe_scanf_detail(
 		const auto value_beginning_at_source = source_pos + how_many_format_advanced;
 
 		if (value_beginning_at_source < source_string.size() && format_pos + 2 <= format.size()) {
+			// Match the entire chunk leading up to %x
+			if (format_pos > 0 && source_string.substr(source_pos, how_many_format_advanced) != format.substr(previous_format_pos, how_many_format_advanced)) {
+				return 0;
+			}
+
 			const auto terminating_character = format[format_pos + 2];
 			const auto found_terminating = source_string.find(terminating_character, value_beginning_at_source);
 
@@ -71,7 +76,7 @@ int typesafe_scanf_detail(
 
 				const auto read_substr = source_string.substr(
 					value_beginning_at_source, 
-					found_terminating - value_beginning_at_source
+					found_terminating != std::string::npos ? found_terminating - value_beginning_at_source : std::string::npos
 				);
 
 				auto read_chunk = std::istringstream(read_substr);
@@ -79,7 +84,7 @@ int typesafe_scanf_detail(
 				read_elements = detail_typesafe_scanf_value(read_chunk, val);
 			}
 
-			source_pos = found_terminating;
+			source_pos = found_terminating != std::string::npos ? found_terminating : source_string.size();
 			format_pos = format_pos + 2;
 
 			return read_elements + typesafe_scanf_detail(

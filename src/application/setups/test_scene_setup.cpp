@@ -19,6 +19,8 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/calc_ammo_info.hpp"
 
+void snap_interpolated_to_logical(cosmos& cosm);
+
 using portal_marker = editor_area_marker_node;
 
 test_scene_setup::test_scene_setup(
@@ -86,6 +88,18 @@ void test_scene_setup::init(const test_scene_type new_type) {
 		}
 	};
 
+	for (auto& l : project.layers.pool) {
+		if (begins_with(l.unique_name, "Level")) {
+			uint32_t level = 0;
+
+			if (1 == typesafe_sscanf(l.unique_name, "Level%x", level)) {
+				max_tutorial_level = std::max(level, max_tutorial_level);
+			}
+		}
+	}
+
+	LOG("Tutorial levels: %x", max_tutorial_level);
+
 	restart_arena();
 
 	//if (recording_type != input_recording_type::DISABLED) {
@@ -96,6 +110,36 @@ void test_scene_setup::init(const test_scene_type new_type) {
 
 	/* Close any window that might be open by default */
 	escape();
+}
+
+void test_scene_setup::set_tutorial_surfing_challenge() {
+	set_tutorial_level(max_tutorial_level);
+}
+
+void test_scene_setup::set_tutorial_level(uint32_t level) {
+	auto& cosm = scene.world;
+
+	auto character = [&]() {
+		return cosm[get_controlled_character_id()];
+	};
+
+	tutorial.level = std::min(max_tutorial_level, level);
+
+	const bool is_challenge = tutorial.level == max_tutorial_level;
+
+	if (is_challenge) {
+		tutorial.level = max_tutorial_level - 1;
+	}
+
+	restart_arena();
+	
+	if (is_challenge) {
+		if (const auto tp = find<portal_marker>("hard_surf_start")) {
+			character().set_logic_transform(tp->editable.pos);
+		}
+	}
+
+	snap_interpolated_to_logical(cosm);
 }
 
 void test_scene_setup::restart_arena() {

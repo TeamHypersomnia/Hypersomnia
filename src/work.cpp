@@ -3457,6 +3457,17 @@ work_result work(
 			else if (params.launch_activity.has_value()) {
 				LOG("Activity %x was specified from the command line.", *params.launch_activity);
 				launch_setup(*params.launch_activity);
+
+				if (params.launch_activity == activity_type::TUTORIAL) {
+					on_specific_setup([&](test_scene_setup& setup) {
+						if (params.tutorial_level.has_value()) {
+							setup.set_tutorial_level(*params.tutorial_level);
+						}
+						else if (params.tutorial_challenge) {
+							setup.set_tutorial_surfing_challenge();
+						}
+					});
+				}
 			}
 			else {
 				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
@@ -4817,10 +4828,12 @@ work_result work(
 		auto swap_window_buffers = [&]() {
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
 
+#if PLATFORM_WEB
 			if (!swapped_once) {
 				call_hideProgress();
 				swapped_once = true;
 			}
+#endif
 
 			window.swap_buffers();
 

@@ -289,8 +289,8 @@ struct transition
     std::ostream&
     operator<<(std::ostream& os, const transition& t)
     {
-#if PLATFORM_WEB
-		os << "Unsupported in Web.";
+#if 1
+		os << "Unsupported.";
 		(void)t;
 		return os;
 #else

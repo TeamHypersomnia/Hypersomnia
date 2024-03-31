@@ -2730,9 +2730,9 @@ std::ostream&
 operator<<(std::ostream& os, const leap_second& x)
 {
     using namespace date;
-#if PLATFORM_WEB
+#if 1
 	(void)x;
-	return os << "Unsupported in Web.";
+	return os << "Unsupported.";
 #else
     return os << x.date_ << "  +";
 #endif

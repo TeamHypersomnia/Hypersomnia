@@ -69,6 +69,78 @@ TEST_CASE("IsMoreRecent", "IsMoreRecentSeveralTests") {
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 
 	{
+		const auto format = "";
+		const auto sprintfed = "";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "1234";
+		const auto sprintfed = "";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "%x";
+		const auto sprintfed = "1";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(1 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 1);
+	}
+
+	{
+		const auto format = "%x";
+		const auto sprintfed = "-1";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "";
+		const auto sprintfed = "1234";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "";
+		const auto sprintfed = "%x";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "%x";
+		const auto sprintfed = "%x";
+
+		unsigned s1 = 0xdeadbeef;
+		REQUIRE(0 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == 0xdeadbeef);
+	}
+
+	{
+		const auto format = "%x";
+		const auto sprintfed = "%x";
+
+		std::string s1;
+		REQUIRE(1 == test_scanf(sprintfed, format, s1));
+		REQUIRE(s1 == "%x");
+	}
+
+	{
 		const auto format = "%x";
 		const auto sprintfed = "1442";
 
@@ -156,6 +228,25 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 		REQUIRE(b == 233);
 		REQUIRE(p == "abcd");
 	}
+
+	{
+		int a=-1, b=-1;
+
+		REQUIRE(1 == test_scanf("/tutorial/4", "/tutorial/%x", a));
+		REQUIRE(a == 4);
+		REQUIRE(0 == test_scanf("/tutorial/", "/tutorial/%x", a));
+		REQUIRE(0 == test_scanf("/tutorial", "/tutorial/%x", a));
+		REQUIRE(0 == test_scanf("/tutorial4343", "/tutorial/%x", a));
+		REQUIRE(1 == test_scanf("/tutorial/8888/43543", "/tutorial/%x", a));
+		REQUIRE(a == 8888);
+		REQUIRE(2 == test_scanf("/tutorial/1/2", "/tutorial/%x/%x", a, b));
+		REQUIRE(a == 1);
+		REQUIRE(b == 2);
+		REQUIRE(2 == test_scanf("/tutorial/3/4/", "/tutorial/%x/%x", a, b));
+		REQUIRE(a == 3);
+		REQUIRE(b == 4);
+	}
+
 }
 
 #endif

@@ -6898,3 +6898,6 @@ This will discard your redo history."
     - maybe just check readiness? and if frame isnt ready just dont wait and dont render it
     - we'll have to disable the "helper"
 
+
+- lets have links to tutorial levels as a showcase already
+    - /tutorial/12 etc
