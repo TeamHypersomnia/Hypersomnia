@@ -85,7 +85,7 @@
     </div>
     <div class="progress-mb" id="progress-mb">0 MB</div>
   </div>
-  <canvas id="canvas" tabindex="-1"></canvas>
+  <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
   <script type='text/javascript'>
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
@@ -158,7 +158,7 @@
 
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener("keydown", (e) => {
-      if (e.code === "F11") {
+      if (e.code === "F11" || e.code === "F12") {
         e.preventDefault = function() { console.log("ignore prevent default"); };
       }
     }, { capture: true });
