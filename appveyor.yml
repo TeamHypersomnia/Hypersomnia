@@ -22,6 +22,9 @@ install:
 
   - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.6/LLVM-16.0.6-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
+  - dir C:\
+  - dir C:\OpenSSL-v30-Win64
+  - dir C:\OpenSSL-v30-Win64\bin
 
 notifications:
   - provider: Email
@@ -46,7 +49,7 @@ build_script:
   - cd nin
   - mkdir %CONFIGURATION%
   - cd %CONFIGURATION%
-  - cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v30-Win64 ../..
+  - cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v30-Win64\bin ../..
   - ninja
 
 test_script:
