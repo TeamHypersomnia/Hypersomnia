@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- web input lag - collect entropy before swapping buffers
+
 - render "please be patient" OVER leaderboards
 
 - "download native client" in the right top

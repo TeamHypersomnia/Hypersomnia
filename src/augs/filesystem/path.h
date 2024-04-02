@@ -106,6 +106,8 @@ namespace augs {
 }
 
 #if !PLATFORM_WEB && !PLATFORM_WINDOWS
+#if defined(__clang__)
+#if __clang_major__ < 17
 namespace std {
 	template <>
 	struct hash<augs::path_type> {
@@ -114,4 +116,6 @@ namespace std {
 		}
 	};
 }
+#endif
+#endif
 #endif
