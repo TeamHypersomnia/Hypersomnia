@@ -72,8 +72,6 @@ bool viewables_streaming::finished_generating_atlas() const {
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
-	bring_loading_popup_to_front = true;
-
 	const auto current_frame = in.current_frame;
 	const auto& new_all_defs = in.new_defs;
 	auto& now_all_defs = now_loaded_viewables_defs;
@@ -202,6 +200,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		rescan_for_modified_images = false;
 
 		if (new_atlas_required) {
+			bring_loading_popup_to_front = true;
+
 			auto scope = measure_scope(performance.launching_atlas_reload);
 
 			rgba* pbo_buffer = nullptr;
@@ -294,6 +294,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		});
 
 		if (sound_requests.size() > 0) {
+			bring_loading_popup_to_front = true;
+
 			sounds_progress.emplace();
 
 			sound_paths_info.clear();
@@ -606,6 +608,8 @@ void viewables_streaming::display_loading_progress() const {
 		}
 	}
 	else {
+		bring_loading_popup_to_front = true;
+
 		if (future_compressed_demos.valid()) {
 			center_next_window(ImGuiCond_Always);
 			auto loading_window = scoped_window("Demo file compression in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
