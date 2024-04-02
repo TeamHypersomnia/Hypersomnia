@@ -111,6 +111,8 @@ class viewables_streaming {
 	augs::graphics::texture blank_atlas = augs::image::white_pixel();
 	augs::graphics::texture general_atlas = augs::image::white_pixel();
 
+	mutable bool bring_loading_popup_to_front = true;
+
 public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
 

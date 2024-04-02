@@ -108,18 +108,10 @@ public:
 	}
 #endif
 
-	template <class T>
-	bool try_swap_buffers(T&& synchronized_op) {
-		{
-			std::scoped_lock lk(swapper_m);
+	bool can_swap_buffers() {
+		std::scoped_lock lk(swapper_m);
 
-			if (!already_waiting.load()) {
-				return false;
-			}
-		}
-
-		swap_buffers(std::forward<T>(synchronized_op));
-		return true;
+		return already_waiting.load();
 	}
 
 	template <class T>

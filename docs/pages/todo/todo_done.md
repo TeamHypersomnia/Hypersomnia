@@ -6901,3 +6901,18 @@ This will discard your redo history."
 
 - lets have links to tutorial levels as a showcase already
     - /tutorial/12 etc
+- web input lag - collect entropy before swapping buffers
+
+- render "please be patient" OVER leaderboards
+
+- web: prevent right click from triggering context menu (preferred), or...
+    - ...always capture mouse when editor/proj selector is open
+    - note though right clicks will be useful even in the main menu for server browser/catalogue
+
+- web: handle escape correctly so we dont have to double tap it
+    - just detect if mouse is released and if so autotrigger the ingame menu
+
+- why the heck is fps counter more FPS than wait_swap?
+
+- disable crashed last time popup
+

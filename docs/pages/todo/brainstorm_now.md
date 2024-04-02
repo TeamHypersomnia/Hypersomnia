@@ -6,29 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- web input lag - collect entropy before swapping buffers
-
-- render "please be patient" OVER leaderboards
-
 - "download native client" in the right top
-
-- web: prevent right click from triggering context menu (preferred), or...
-    - ...always capture mouse when editor/proj selector is open
-    - note though right clicks will be useful even in the main menu for server browser/catalogue
 
 - clicking outside should close buy menu too
 
 - always allow changing maps when alone on the server
 
-- web: handle escape correctly so we dont have to double tap it
-    - just detect if mouse is released and if so autotrigger the ingame menu
-
-- why the heck is fps counter more FPS than wait_swap?
-
 - we can't just omit posting commands as we might skip existential ones?
     - actually no because then the existential commands won't be posted
-
-- disable crashed last time popup
 
 - OpenAL fixes to emscripten
     - case 0x200 /* AL_SOURCE_DISTANCE_MODEL */:

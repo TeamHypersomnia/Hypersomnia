@@ -72,6 +72,8 @@ bool viewables_streaming::finished_generating_atlas() const {
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
+	bring_loading_popup_to_front = true;
+
 	const auto current_frame = in.current_frame;
 	const auto& new_all_defs = in.new_defs;
 	auto& now_all_defs = now_loaded_viewables_defs;
@@ -585,6 +587,11 @@ void viewables_streaming::display_loading_progress() const {
 
 	if (loading_message.size() > 0) {
 		loading_message += "\n";
+
+		if (bring_loading_popup_to_front) {
+			bring_loading_popup_to_front = false;
+			ImGui::SetNextWindowFocus();
+		}
 
 		center_next_window(ImGuiCond_Always);
 		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);

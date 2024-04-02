@@ -4817,15 +4817,6 @@ work_result work(
 		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op;
 		auto& thread_pool = mi.thread_pool;
 		auto& renderer_backend = mi.renderer_backend;
-
-#if PLATFORM_WEB
-		(void)thread_pool;
-
-		if (!buffer_swapper.try_swap_buffers(game_main_thread_synced_op)) {
-			return true;
-		}
-#endif
-
 		auto& window = mi.window;
 
 		auto& this_frame_timer = mi.this_frame_timer;
@@ -4838,7 +4829,18 @@ work_result work(
 
 		auto& get_read_buffer = mi.get_read_buffer;
 
-		auto scope = measure_scope(render_thread_performance.fps);
+		auto collect_window_entropy = [&]() {
+			auto& read_buffer = get_read_buffer();
+
+			auto scope = measure_scope(render_thread_performance.local_entropy);
+
+			auto& next_entropy = read_buffer.new_window_entropy;
+			next_entropy.clear();
+
+			window.collect_entropy(next_entropy);
+
+			read_buffer.screen_size = window.get_screen_size();
+		};
 
 		auto swap_window_buffers = [&]() {
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
@@ -4860,7 +4862,19 @@ work_result work(
 			}
 		};
 
+
 #if PLATFORM_WEB
+		(void)thread_pool;
+
+		if (!buffer_swapper.can_swap_buffers()) {
+			return true;
+		}
+
+		auto scope = measure_scope(render_thread_performance.fps);
+
+		collect_window_entropy();
+		buffer_swapper.swap_buffers(game_main_thread_synced_op);
+
 		{
 			auto& read_buffer = get_read_buffer();
 			const auto location = "/" + read_buffer.browser_location;
@@ -4873,6 +4887,8 @@ work_result work(
 				call_setLocation(current_browser_location.c_str());
 			}
 		}
+#else
+		auto scope = measure_scope(render_thread_performance.fps);
 #endif
 
 		{
@@ -4912,66 +4928,53 @@ work_result work(
 			}
 		}
 
-		{
-			{
-				auto& read_buffer = get_read_buffer();
-
-				auto scope = measure_scope(render_thread_performance.local_entropy);
-
-				auto& next_entropy = read_buffer.new_window_entropy;
-				next_entropy.clear();
-
-				window.collect_entropy(next_entropy);
-
-				read_buffer.screen_size = window.get_screen_size();
-			}
-
 #if !PLATFORM_WEB
-			{
-				auto scope = measure_scope(render_thread_performance.render_help);
-				thread_pool.help_until_no_tasks();
-			}
+		collect_window_entropy();
 
-			{
-				auto scope = measure_scope(render_thread_performance.render_wait);
-				buffer_swapper.swap_buffers(game_main_thread_synced_op);
+		{
+			auto scope = measure_scope(render_thread_performance.render_help);
+			thread_pool.help_until_no_tasks();
+		}
 
-				const auto max_fps = get_read_buffer().max_fps;
+		{
+			auto scope = measure_scope(render_thread_performance.render_wait);
+			buffer_swapper.swap_buffers(game_main_thread_synced_op);
 
-				if (max_fps.is_enabled && max_fps.value >= 10) {
-					const auto target_delay_ms = 1000.0 / max_fps.value;
-					const auto method = get_read_buffer().max_fps_method;
+			const auto max_fps = get_read_buffer().max_fps;
 
-					auto passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
+			if (max_fps.is_enabled && max_fps.value >= 10) {
+				const auto target_delay_ms = 1000.0 / max_fps.value;
+				const auto method = get_read_buffer().max_fps_method;
 
-					while (passed_ms < target_delay_ms) {
-						switch (method) {
-							case augs::max_fps_type::SLEEP:
-							{
-								const auto to_sleep_ms = target_delay_ms - passed_ms;
+				auto passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
 
-								std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
-							}
-							case augs::max_fps_type::SLEEP_ZERO:
-								augs::sleep(0);
-								break;
-							case augs::max_fps_type::YIELD:
-								std::this_thread::yield();
-								break;
-							case augs::max_fps_type::BUSY:
-								break;
-							default:
-								break;
+				while (passed_ms < target_delay_ms) {
+					switch (method) {
+						case augs::max_fps_type::SLEEP:
+						{
+							const auto to_sleep_ms = target_delay_ms - passed_ms;
+
+							std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
 						}
-
-						passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
+						case augs::max_fps_type::SLEEP_ZERO:
+							augs::sleep(0);
+							break;
+						case augs::max_fps_type::YIELD:
+							std::this_thread::yield();
+							break;
+						case augs::max_fps_type::BUSY:
+							break;
+						default:
+							break;
 					}
 
-					this_frame_timer.reset();
+					passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
 				}
+
+				this_frame_timer.reset();
 			}
-#endif
 		}
+#endif
 
 		auto& read_buffer = get_read_buffer();
 
