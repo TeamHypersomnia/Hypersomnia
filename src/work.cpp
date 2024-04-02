@@ -199,6 +199,13 @@ EM_JS(void, call_setLocation, (const char* newPath), {
 	setLocation(newPath);
 });
 
+extern std::mutex open_url_on_main_lk;
+extern std::string open_url_on_main;
+
+EM_JS(void, call_openUrl, (const char* newPath), {
+	openUrl(newPath);
+});
+
 #endif
 
 #if PLATFORM_WEB
@@ -4876,6 +4883,23 @@ work_result work(
 
 		collect_window_entropy();
 		buffer_swapper.swap_buffers(game_main_thread_synced_op);
+
+		{
+			std::string url_to_open;
+
+			{
+				std::scoped_lock lk(open_url_on_main_lk);
+
+				if (!open_url_on_main.empty()) {
+					url_to_open = open_url_on_main;
+					open_url_on_main.clear();
+				}
+			}
+
+			if (!url_to_open.empty()) {
+				call_openUrl(url_to_open.c_str());
+			}
+		}
 
 		{
 			auto& read_buffer = get_read_buffer();

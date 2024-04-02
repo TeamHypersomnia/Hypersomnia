@@ -50,10 +50,22 @@ namespace augs {
 #endif
 
 
+#if PLATFORM_WEB
+
+std::mutex open_url_on_main_lk;
+std::string open_url_on_main;
+
+#endif
+
 namespace augs {
 #if PLATFORM_WINDOWS
 	void open_url(const std::string& url) {
 		augs::shell(url);
+	}
+#elif PLATFORM_WEB
+	void open_url(const std::string& url) {
+		std::scoped_lock lk(open_url_on_main_lk);
+		open_url_on_main = url;
 	}
 #elif PLATFORM_LINUX
 	void open_url(const std::string& url) {

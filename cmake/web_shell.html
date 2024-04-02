@@ -100,6 +100,11 @@
       canvas.height = displayHeight;
     }
 
+    function openUrl(url) {
+      const urlStr = UTF8ToString(url);
+      window.open(urlStr, '_blank');
+    }
+
     function hideProgress() {
       document.getElementById('spinner').style.display = 'none';
       document.getElementById('progress-bar-inner').style.display = 'none';
