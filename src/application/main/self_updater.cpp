@@ -312,7 +312,7 @@ self_update_result check_and_apply_updates(
 
 	auto future_response = launch_async(
 		/* Using optional as the return type only to fix the compilation error on Windows */
-		[&exit_requested, archive_path, &client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib::Result> {
+		[&exit_requested, archive_path, &client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib_result> {
 			return launch_download(*client, archive_path, [&](uint64_t len, uint64_t total) {
 				downloaded_bytes = len;
 				total_bytes = total;

@@ -1352,7 +1352,9 @@ work_result work(
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 	catch (...) {
-
+		augs::image avatar;
+		avatar.from_file("content/gfx/necessary/blank_avatar.png");
+		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 
 	WEBSTATIC auto get_blank_texture = [&]() {

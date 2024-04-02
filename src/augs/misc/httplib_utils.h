@@ -14,6 +14,9 @@ namespace httplib_utils {
 	}
 
 	inline auto make_client(const std::string& scheme_host_port, const int io_timeout = 5) {
+#if PLATFORM_WEB
+		return std::make_unique<http_client_type>(scheme_host_port.c_str(), io_timeout);
+#else
 		const auto ca_path = CA_CERT_PATH;
 
 #if BUILD_OPENSSL
@@ -39,6 +42,7 @@ namespace httplib_utils {
 		http_client.set_write_timeout(io_timeout);
 
 		return http_client_ptr;
+#endif
 	}
 
 	inline auto make_client(const parsed_url& parsed, const int io_timeout = 5) {

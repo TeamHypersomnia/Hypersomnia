@@ -125,7 +125,7 @@ bool server_list_entry::is_set() const {
 }
 
 struct browse_servers_gui_internal {
-	std::future<std::optional<httplib::Result>> future_response;
+	std::future<std::optional<httplib_result>> future_response;
 	netcode_socket_t socket;
 
 	std::future<official_addrs> future_official_addresses;
@@ -143,7 +143,7 @@ browse_servers_gui_state::browse_servers_gui_state(const std::string& title)
 
 }
 
-static std::vector<server_list_entry> to_server_list(std::optional<httplib::Result> result, std::string& error_message) {
+static std::vector<server_list_entry> to_server_list(std::optional<httplib_result> result, std::string& error_message) {
     using namespace httplib_utils;
 
     if (result == std::nullopt || result.value() == nullptr) {
@@ -213,7 +213,7 @@ void browse_servers_gui_state::sync_download_server_entry(
 
 	/* Todo: make async */
 	auto lbd = 
-		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
+		[address = in.server_list_provider]() -> std::optional<httplib_result> {
 			/* 
 				Right now it's the same as the one that downloads the whole list,
 				but we'll need to support downloading just one entry.
@@ -285,7 +285,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	LOG("Launching future_response");
 
 	data->future_response = launch_async(
-		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
+		[address = in.server_list_provider]() -> std::optional<httplib_result> {
 			LOG("Connecting to server list at: %x", address);
 
 			auto cli = httplib_utils::make_client(address);

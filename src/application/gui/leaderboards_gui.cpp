@@ -23,7 +23,7 @@
 #include "view/ranks_info.h"
 
 struct leaderboards_gui_internal {
-	std::future<std::optional<httplib::Result>> future_response;
+	std::future<std::optional<httplib_result>> future_response;
 
 	bool refresh_op_in_progress() const {
 		return future_response.valid();
@@ -38,7 +38,7 @@ leaderboards_gui_state::leaderboards_gui_state(const std::string& title)
 
 }
 
-static all_leaderboards to_players_list(std::optional<httplib::Result> result, std::string& error_message) {
+static all_leaderboards to_players_list(std::optional<httplib_result> result, std::string& error_message) {
     using namespace httplib_utils;
 
     if (result == std::nullopt || result.value() == nullptr) {
@@ -92,7 +92,7 @@ void leaderboards_gui_state::refresh_leaderboards(const leaderboards_input in) {
 
 	if (const auto parsed = parsed_url(in.provider_url); parsed.valid()) {
 		data->future_response = launch_async(
-			[parsed]() -> std::optional<httplib::Result> {
+			[parsed]() -> std::optional<httplib_result> {
 				auto http_client = httplib_utils::make_client(parsed);
 
 				const auto final_location = parsed.location + "?format=json";
