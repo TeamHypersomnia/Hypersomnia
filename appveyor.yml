@@ -1,3 +1,7 @@
+environment:
+  matrix:
+    - CMAKE_VERSION: "3.29.0"
+
 branches:
   only:
     - master
@@ -11,6 +15,17 @@ clone_script:
   - git clone --recurse-submodules https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 install:
+  # Download CMake installer
+  - ps: |
+        $url = "https://github.com/Kitware/CMake/releases/download/v$env:CMAKE_VERSION/cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
+        $destination = "C:\projects\cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
+        Invoke-WebRequest -Uri $url -OutFile $destination
+
+  # Install CMake
+  - ps: Start-Process -FilePath "msiexec" -ArgumentList "/i C:\projects\cmake-$env:CMAKE_VERSION-windows-x86_64.msi /quiet /qn /norestart /log install.log ADD_CMAKE_TO_PATH=System" -Wait -NoNewWindow
+
+  # Update the PATH, just in case it's needed
+  - SET PATH=C:\Program Files\CMake\bin;%PATH%
   - mkdir C:\projects\deps
   - cd C:\projects\deps
 
@@ -23,8 +38,8 @@ install:
   - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.6/LLVM-16.0.6-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
   - dir C:\
-  - dir C:\OpenSSL-v31-Win64
-  - dir C:\OpenSSL-v31-Win64\bin
+  - dir C:\OpenSSL-v32-Win64
+  - dir C:\OpenSSL-v32-Win64\bin
 
 notifications:
   - provider: Email
@@ -49,7 +64,7 @@ build_script:
   - cd nin
   - mkdir %CONFIGURATION%
   - cd %CONFIGURATION%
-  - cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v31-Win64 ../..
+  - cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v32-Win64 ../..
   - ninja
 
 test_script:
