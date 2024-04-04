@@ -98,6 +98,10 @@ namespace augs {
 		if (!alcIsExtensionPresent(device, "ALC_EXT_EFX")) {
 			LOG("Warning! ALC_EXT_EFX extension is not present.");
 		}
+
+		ALCint sample_rate = 0;
+		alcGetIntegerv(device, ALC_FREQUENCY, 1, &sample_rate);
+		LOG("Device sample rate: %x", sample_rate);
 #else
 		(void)device_name;
 #endif
@@ -137,6 +141,26 @@ namespace augs {
 		LOG(stat.message);
 	}
 
+	std::string audio_device::get_output_mode() const {
+#if BUILD_OPENAL && !PLATFORM_WEB
+		ALint mode;
+		alcGetIntegerv(device, ALC_OUTPUT_MODE_SOFT, 1, &mode);
+
+		switch (mode) {
+			case ALC_ANY_SOFT: return "ALC_ANY_SOFT";
+			case ALC_STEREO_BASIC_SOFT: return "ALC_STEREO_BASIC_SOFT";
+			case ALC_STEREO_UHJ_SOFT: return "ALC_STEREO_UHJ_SOFT";
+			case ALC_STEREO_HRTF_SOFT: return "ALC_STEREO_HRTF_SOFT";
+			case ALC_SURROUND_5_1_SOFT: return "ALC_SURROUND_5_1_SOFT";
+			case ALC_SURROUND_6_1_SOFT: return "ALC_SURROUND_6_1_SOFT";
+			case ALC_SURROUND_7_1_SOFT: return "ALC_SURROUND_7_1_SOFT";
+			default: return "UNKNOWN";
+		}
+#else
+		return "UNKNOWN";
+#endif
+	}
+
 	audio_device::hrtf_stat audio_device::get_hrtf_status() const {
 #if BUILD_OPENAL
 		ALint hrtf_status;
@@ -166,14 +190,28 @@ namespace augs {
 	static std::array<ALCint, 9> make_attrs(const audio_settings& settings) {
 #if PLATFORM_WEB
 		return {
-			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
+			ALC_HRTF_SOFT, settings.output_mode == audio_output_mode::STEREO_HRTF, /* request HRTF */
 			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
 			0
 		};
 #else
+		auto output_mode_to_al_mode = [](const audio_output_mode mode) {
+			using O = audio_output_mode;
+			switch (mode) {
+				case O::AUTO: return ALC_ANY_SOFT;
+				case O::STEREO_BASIC: return ALC_STEREO_BASIC_SOFT;
+				case O::STEREO_UHJ: return ALC_STEREO_UHJ_SOFT;
+				case O::STEREO_HRTF: return ALC_STEREO_HRTF_SOFT;
+				case O::SURROUND_5_1: return ALC_SURROUND_5_1_SOFT;
+				case O::SURROUND_6_1: return ALC_SURROUND_6_1_SOFT;
+				case O::SURROUND_7_1: return ALC_SURROUND_7_1_SOFT;
+				default: return ALC_ANY_SOFT;
+			}
+		};
+
 		return {
-			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
 			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
+			ALC_OUTPUT_MODE_SOFT, output_mode_to_al_mode(settings.output_mode),
 			ALC_OUTPUT_LIMITER_SOFT, AL_TRUE,
 			0
 		};
@@ -290,7 +328,7 @@ namespace augs {
 		};
 
 		if (// force // don't have to force it since we're setting it on alcCreateContext
-			changed(settings.enable_hrtf)
+			changed(settings.output_mode)
 			|| changed(settings.max_number_of_sound_sources)
 		) {
 			device.reset_device(settings);

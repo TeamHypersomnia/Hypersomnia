@@ -369,14 +369,23 @@ work_result work(
 
 		const auto concurrency = std::thread::hardware_concurrency();
 
+		bool hrtf = true;
+
 		if (concurrency <= 4) {
-			result.audio.enable_hrtf = false;
+			hrtf = false;
 			result.window.max_fps.value = 60;
 		}
 
 #if !NDEBUG
-		result.audio.enable_hrtf = false;
+		hrtf = false;
 #endif
+
+		if (hrtf) {
+			result.audio.output_mode = audio_output_mode::STEREO_HRTF;
+		}
+		else {
+			result.audio.output_mode = audio_output_mode::AUTO;
+		}
 
 #if PLATFORM_LINUX
 		/* 

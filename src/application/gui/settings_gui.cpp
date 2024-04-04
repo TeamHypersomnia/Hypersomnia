@@ -728,17 +728,25 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
+				revertable_enum("Output mode", config.audio.output_mode);
+
+				text_disabled("Set to Auto for speakers.\nFor headphones, HRTF is the best.");
 
 				{
 					auto scope = scoped_indent(); 
 
 					const auto stat = audio.get_device().get_hrtf_status();
-					text(" Status on device:");
+					text(" Device HRTF status:");
 					ImGui::SameLine();
 
 					const auto col = stat.success ? green : red;
 					text_color(stat.message, col);
+#if !PLATFORM_WEB
+					const auto output_mode = audio.get_device().get_output_mode();
+					text(" Device output status:");
+					ImGui::SameLine();
+					text_color(output_mode, gray4);
+#endif
 				}
 
 				text_disabled("If you experience a drop in sound quality with HRTF,\ntry setting the sample rate of your audio device to 44.1 kHz,\nor consider providing your own presets in detail/hrtf.");

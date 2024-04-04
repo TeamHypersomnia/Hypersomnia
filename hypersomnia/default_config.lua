@@ -166,8 +166,8 @@ return {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
   },
   audio = {
+    output_mode = "STEREO_HRTF",
     mute_main_menu_background = true,
-    enable_hrtf = true,
     max_number_of_sound_sources = 4200,
     output_device_name = "",
 	sound_meters_per_second = 150

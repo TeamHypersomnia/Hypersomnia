@@ -1,6 +1,50 @@
 #pragma once
 #include <string>
 
+enum class audio_output_mode {
+	// GEN INTROSPECTOR enum class audio_output_mode
+	AUTO,
+#if !PLATFORM_WEB
+	STEREO_BASIC,
+	STEREO_UHJ,
+#endif
+	STEREO_HRTF,
+#if !PLATFORM_WEB
+	SURROUND_5_1,
+	SURROUND_6_1,
+	SURROUND_7_1,
+#endif
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+template <class Enum>
+auto format_enum(const Enum e);
+
+template <>
+inline auto format_enum(const audio_output_mode e) {
+	constexpr std::array<const char*, 7> vals = {
+#if PLATFORM_WEB
+		"Auto",
+		"Stereo HRTF (Headphones)",
+#else
+		"Auto",
+		"Stereo (Basic)",
+		"Stereo (Ambisonic UHJ)",
+		"Stereo HRTF (Headphones)",
+		"5.1 Surround",
+		"6.1 Surround",
+		"7.1 Surround"
+#endif
+	};
+
+	if (static_cast<uint8_t>(e) < static_cast<uint8_t>(vals.size())) {
+		return std::string(vals[static_cast<uint8_t>(e)]);
+	}
+
+	return std::string("UnknownEnumValue");
+}
+
 namespace augs {
 	float convert_audio_volume(float);
 
@@ -23,7 +67,7 @@ namespace augs {
 	struct audio_settings {
 		// GEN INTROSPECTOR struct augs::audio_settings
 		bool mute_main_menu_background = false;
-		bool enable_hrtf = false;
+		audio_output_mode output_mode = audio_output_mode::STEREO_HRTF;
 		std::string output_device_name = "";
 		unsigned max_number_of_sound_sources = 4096u;
 		float sound_meters_per_second = 180.f;

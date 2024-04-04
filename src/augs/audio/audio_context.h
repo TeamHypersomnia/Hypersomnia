@@ -45,6 +45,7 @@ namespace augs {
 
 		void reset_device(audio_settings);
 		hrtf_stat get_hrtf_status() const;
+		std::string get_output_mode() const;
 		void log_hrtf_status() const;
 
 		operator ALCdevice*() {
