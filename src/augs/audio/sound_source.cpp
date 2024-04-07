@@ -9,6 +9,7 @@
 #define AL_SOURCE_SPATIALIZE_SOFT                0x1214
 #else
 #include <AL/alext.h>
+#include "3rdparty/openal-soft/core/mixer/defs.h"
 #endif
 #endif
 
@@ -56,6 +57,7 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_PITCH, 1));
 		AL_CHECK(alSourcef(id, AL_GAIN, 1));
 		AL_CHECK(alSourcei(id, AL_LOOPING, AL_FALSE));
+		AL_CHECK(alSourcei(id, AL_SOURCE_RESAMPLER_SOFT, static_cast<std::uint8_t>(Resampler::Spline)));
 
 		initialized = true;
 	}
