@@ -260,8 +260,7 @@ namespace augs {
 							static_cast<short>(event.motion.y)
 						};
 
-						auto ch = handle_mousemove(new_pos);
-						if (ch) {
+						if (const auto ch = handle_mousemove(new_pos)) {
 							handle_event(*ch);
 						}
 					}

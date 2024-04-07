@@ -307,7 +307,7 @@ namespace augs {
 			platform->last_mouse_pos_for_dt = new_mouse_pos;
 
 			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
-				auto ch = do_raw_motion({
+				const auto ch = do_raw_motion({
 					static_cast<short>(dt.x),
 					static_cast<short>(dt.y) 
 				});
@@ -320,8 +320,9 @@ namespace augs {
 					static_cast<short>(cursor.ypos)
 			   	};
 
-				auto ch = handle_mousemove(new_pos);
-				handle_event(*ch);
+				if (const auto ch = handle_mousemove(new_pos)) {
+					handle_event(*ch);
+				}
 			}
 		}
 
