@@ -7,7 +7,7 @@
 #include "hypersomnia_version.h"
 
 #include "application/network/net_serialize.h"
-#include "3rdparty/yojimbo/netcode.io/netcode.c"
+#include "3rdparty/yojimbo/netcode/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/thread_templates.h"
 
@@ -191,14 +191,6 @@ void server_adapter::disconnect_client(const client_id_type& id) {
 
 void server_adapter::send_packets() {
 	server.SendPackets();
-}
-
-void server_adapter::send_packets_to(const client_id_type& id) {
-	server.SendPacketsTo(id);
-}
-
-void server_adapter::receive_packets_from(const client_id_type& id) {
-	server.ReceivePacketsFrom(id);
 }
 
 bool client_auxiliary_command_function(void* context, uint8_t* packet, int bytes) {
@@ -500,7 +492,7 @@ std::future<std::optional<netcode_address_t>> async_get_internal_network_address
 
 resolve_address_result client_adapter::connect(const client_connect_string& str) {
 	uint64_t clientId;
-	yojimbo::random_bytes((uint8_t*)&clientId, 8);
+	yojimbo_random_bytes((uint8_t*)&clientId, 8);
 
 	host_with_default_port in;
 	in.address = str;
@@ -714,10 +706,6 @@ const netcode_socket_t* client_adapter::find_underlying_socket() const {
 
 netcode_address_t client_adapter::get_connected_ip_address() const {
 	return connected_ip_address;
-}
-
-yojimbo::BlockProgress client_adapter::get_block_progress(const game_channel_type channel) const {
-	return client.GetBlockProgress(static_cast<int>(channel));
 }
 
 const netcode_socket_t* server_adapter::find_underlying_socket() const {

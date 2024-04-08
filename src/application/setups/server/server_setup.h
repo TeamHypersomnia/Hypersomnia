@@ -31,7 +31,7 @@
 
 #include "application/setups/server/chat_structs.h"
 #include "application/setups/server/server_profiler.h"
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_type.h"
 #include "application/setups/server/server_nat_traversal.h"
 

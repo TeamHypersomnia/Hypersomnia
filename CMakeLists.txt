@@ -976,16 +976,15 @@ if(BUILD_GLAD AND NOT BUILD_FOR_WEB)
 endif()
 
 if(BUILD_NETWORKING)
-	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
-		"src/3rdparty/yojimbo/yojimbo.cpp"
-		"src/3rdparty/yojimbo/tlsf/tlsf.c"
-		"src/3rdparty/yojimbo/reliable.io/reliable.c"
+	file(GLOB_RECURSE YOJIMBO_SOURCE_FILES
+		"src/3rdparty/yojimbo/source/*.cpp"
 	)
 
-	# "src/3rdparty/yojimbo/tlsf/tlsf.h"
-	# "src/3rdparty/yojimbo/yojimbo.h"
-	# "src/3rdparty/yojimbo/netcode.io/netcode.h"
-	# "src/3rdparty/yojimbo/reliable.io/reliable.h" 
+	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
+		${YOJIMBO_SOURCE_FILES}
+		"src/3rdparty/yojimbo/tlsf/tlsf.c"
+		"src/3rdparty/yojimbo/reliable/reliable.c"
+	)
 endif()
 
 # Project resource files, e.g. an icon.
@@ -1140,8 +1139,12 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/sodium"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/include"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/serialize"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/date/include"
@@ -2037,20 +2040,25 @@ if (USING_X_WINDOW_SYSTEM)
 	list(APPEND HYPERSOMNIA_LIBS Xi)
 endif()
 
+# Add libsodium
+
 if (BUILD_NETWORKING)
 	if (MSVC)
-		set(SODIUM_HINTS "${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows")
+		file(GLOB_RECURSE SODIUM_SOURCE_FILES
+			"src/3rdparty/yojimbo/sodium/*.c"
+		)
+
+		add_library(sodium STATIC ${SODIUM_SOURCE_FILES})
+		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()
-		set(SODIUM_HINTS "")
+		prefer_static_libraries()
+
+		find_library(SODIUM NAMES sodium)
+
+		prefer_shared_libraries()
+
+		list(APPEND HYPERSOMNIA_LIBS ${SODIUM})
 	endif()
-
-	prefer_static_libraries()
-
-	find_library(SODIUM NAMES sodium HINTS ${SODIUM_HINTS})
-
-	prefer_shared_libraries()
-
-	list(APPEND HYPERSOMNIA_LIBS ${SODIUM})
 endif()
 
 if (BUILD_OPENSSL)

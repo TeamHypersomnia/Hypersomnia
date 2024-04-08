@@ -47,8 +47,6 @@ public:
 	);
 
 	void send_packets();
-	void send_packets_to(const client_id_type&);
-	void receive_packets_from(const client_id_type&);
 	void stop();
 
 	bool is_running() const;

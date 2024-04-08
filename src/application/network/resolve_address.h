@@ -1,7 +1,7 @@
 #pragma once
 #include <future>
 #include <optional>
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/network/resolve_address_result.h"
 #include "augs/network/port_type.h"
 #include "augs/filesystem/path.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include <variant>
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "application/masterserver/nat_traversal_step_payload.h"
 #include "application/masterserver/gameserver_commands.h"

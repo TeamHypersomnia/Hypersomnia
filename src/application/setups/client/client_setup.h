@@ -43,7 +43,7 @@
 #include "application/gui/client/demo_player_gui.h"
 #include "application/setups/client/client_demo_player.h"
 #include "application/nat/nat_detection_settings.h"
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/setups/client/arena_downloading_session.h"
 #include "application/setups/client/direct_file_download.h"
 #include "application/setups/client/bandwidth_monitor.h"
@@ -843,7 +843,12 @@ public:
 		return displayed_connecting_server_name;
 	}
 
-	auto get_current_file_download_progress() const;
+	struct download_progress {
+		uint32_t downloadedBytes;
+		uint32_t blockSize;
+	};
+
+	download_progress get_current_file_download_progress() const;
 	float get_current_file_percent_complete() const;
 	float get_total_download_percent_complete(const bool smooth) const;
 

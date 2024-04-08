@@ -1,9 +1,9 @@
 #pragma once
-#include "3rdparty/yojimbo/yojimbo.h"
+#include "3rdparty/yojimbo/include/yojimbo.h"
 #undef write_bytes
 #undef read_bytes
 
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 
 #include "application/setups/server/server_listen_input.h"
 #include "application/setups/client/client_connect_string.h"

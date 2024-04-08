@@ -1,6 +1,6 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_detection_session.h"
 #include "hypersomnia_version.h"
 

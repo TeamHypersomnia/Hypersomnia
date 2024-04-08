@@ -1173,22 +1173,22 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 	}
 }
 
-auto client_setup::get_current_file_download_progress() const {
+client_setup::download_progress client_setup::get_current_file_download_progress() const {
 	if (external_downloader != nullptr) {
-		return yojimbo::BlockProgress {
+		return {
 			uint32_t(external_downloader->get_downloaded_bytes()),
 			uint32_t(external_downloader->get_total_bytes())
 		};
 	}
 
 	if (direct_downloader.has_value()) {
-		return yojimbo::BlockProgress {
+		return {
 			uint32_t(direct_downloader->get_downloaded_bytes()),
 			uint32_t(direct_downloader->get_total_bytes())
 		};
 	}
 
-	return yojimbo::BlockProgress { 0, 0 };
+	return { 0, 0 };
 }
 
 float client_setup::get_current_file_percent_complete() const {

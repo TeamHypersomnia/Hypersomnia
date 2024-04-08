@@ -110,7 +110,7 @@ server_setup::server_setup(
 	nat_traversal(nat_traversal_input, resolved_server_list_addr),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
-	yojimbo::random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
+	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
 
 	{
 		auto initial_vars_modified = initial_vars;

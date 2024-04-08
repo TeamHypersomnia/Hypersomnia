@@ -1,5 +1,5 @@
 #pragma once
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/masterserver/nat_traversal_step.h"
 
 #define NETCODE_AUXILIARY_COMMAND_PACKET 200

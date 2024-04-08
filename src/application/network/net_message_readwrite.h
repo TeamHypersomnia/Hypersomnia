@@ -59,7 +59,10 @@ decltype(auto) replay_serialized_net_message(std::vector<std::byte>& demo_bytes,
 						demo_bytes.resize(demo_bytes.size() + 4 - (demo_bytes.size() % 4));
 					}
 
-					auto stream = yojimbo::ReadStream(allocator, reinterpret_cast<const uint8_t*>(demo_bytes.data() + pos), demo_bytes.size() - pos);
+					auto stream = yojimbo::ReadStream(
+						reinterpret_cast<const uint8_t*>(demo_bytes.data() + pos),
+						demo_bytes.size() - pos
+					);
 
 					if (!msg.Serialize(stream)) {
 						throw augs::stream_read_error("error reading replayed net message from stream!");
@@ -82,8 +85,6 @@ std::vector<std::byte> net_message_to_bytes(net_message_type& msg) {
 
 	augs::write_bytes(ar, id);
 
-	auto& allocator = yojimbo::GetDefaultAllocator();
-
 	if constexpr(is_block_message_v<net_message_type>) {
 		const auto block_bytes = reinterpret_cast<const std::byte*>(msg.GetBlockData());
 		const auto block_size = msg.GetBlockSize();
@@ -94,7 +95,7 @@ std::vector<std::byte> net_message_to_bytes(net_message_type& msg) {
 		thread_local std::vector<uint8_t> buffer;
 		buffer.resize(max_packet_size_v);
 
-		auto stream = yojimbo::WriteStream(allocator, buffer.data(), buffer.size());
+		auto stream = yojimbo::WriteStream(buffer.data(), buffer.size());
 
 		msg.Serialize(stream);
 		stream.Flush();

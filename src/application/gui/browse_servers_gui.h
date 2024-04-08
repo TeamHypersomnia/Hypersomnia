@@ -3,7 +3,7 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/server/server_instance_type.h"
 #include "augs/misc/timing/timer.h"
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/netcode_socket_raii.h"
 #include "application/setups/client/client_connect_string.h"

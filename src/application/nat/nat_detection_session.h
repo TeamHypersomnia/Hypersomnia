@@ -3,7 +3,7 @@
 #include <optional>
 #include <future>
 
-#include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 
 #include "application/network/host_with_default_port.h"
 #include "application/nat/nat_detection_settings.h"

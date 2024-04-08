@@ -1,4 +1,5 @@
 #pragma once
+#include "3rdparty/yojimbo/serialize/serialize.h"
 #include "augs/log.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -363,8 +364,8 @@ namespace net_messages {
 			return false;
 		}
 
-		serialize_uint32(stream, payload.net.jitter.buffer_at_least_steps);
-		serialize_uint32(stream, payload.net.jitter.buffer_at_least_ms);
+		serialize_bits(stream, payload.net.jitter.buffer_at_least_steps, 32);
+		serialize_bits(stream, payload.net.jitter.buffer_at_least_ms, 32);
 		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
 		serialize_bool(stream, payload.suppress_webhooks);
 
@@ -601,7 +602,7 @@ namespace net_messages {
 				state_hash.emplace();
 			}
 
-			serialize_uint32(s, *state_hash);
+			serialize_bits(s, *state_hash, 32);
 		}
 		else {
 			state_hash = std::nullopt;

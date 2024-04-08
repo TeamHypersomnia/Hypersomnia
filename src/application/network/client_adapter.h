@@ -68,7 +68,5 @@ public:
 
 	const netcode_socket_t* find_underlying_socket() const;
 
-	yojimbo::BlockProgress get_block_progress(game_channel_type) const;
-
 	netcode_address_t get_connected_ip_address() const;
 };

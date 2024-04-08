@@ -1,4 +1,4 @@
-#include "3rdparty/yojimbo/yojimbo.h"
+#include "3rdparty/yojimbo/include/yojimbo.h"
 #undef write_bytes
 #undef read_bytes
 

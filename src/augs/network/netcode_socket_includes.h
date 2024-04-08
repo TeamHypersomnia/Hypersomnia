@@ -35,6 +35,6 @@
 
 #else
 
-    #error netcode.io - unknown platform!
+    #error netcode - unknown platform!
 
 #endif
