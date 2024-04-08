@@ -148,4 +148,6 @@ namespace augs {
 		return in.tellg(); 
 	};
 
+	std::vector<std::string> file_to_lines(const path_type& path);
+	void lines_to_file(const path_type& path, const std::vector<std::string>&);
 }

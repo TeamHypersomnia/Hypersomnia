@@ -65,7 +65,7 @@ stun_server_provider::stun_server_provider(const augs::path_type& list_file) {
 }
 
 namespace augs {
-	auto file_to_lines(const augs::path_type& path) {
+	std::vector<std::string> file_to_lines(const augs::path_type& path) {
 		auto content = file_to_string(path);
 		auto s = std::stringstream(content);
 
@@ -76,6 +76,20 @@ namespace augs {
 		}
 
 		return out;
+	}
+
+	void lines_to_file(const path_type& path, const std::vector<std::string>& lines) {
+		std::string total_text;
+
+		for (auto& l : lines) {
+			total_text += l + "\n";
+		}	
+
+		if (const bool cut_trailing_newline = total_text.size() > 0) {
+			total_text.pop_back();
+		}
+
+		save_as_text(path, total_text);
 	}
 }
 

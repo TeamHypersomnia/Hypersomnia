@@ -78,7 +78,7 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_CTYPE, "C.UTF-8");
 #endif
 
-	const auto params = cmd_line_params(argc, argv);
+	auto params = cmd_line_params(argc, argv);
 
 	if (params.version_line_only) {
 		std::cout << hypersomnia_version().get_version_string() << std::endl;
@@ -193,6 +193,36 @@ int main(const int argc, const char* const * const argv) {
 	LOG("Chosen working directory: \"%x\"", augs::get_current_working_directory());
 
 	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
+
+	if (params.as_service) {
+		LOG("Running the app as a service due to --as-service flag.");
+
+		const auto launch_flags_path = LOGS_DIR / "launch.flags";
+
+		try {
+			const auto lines = augs::file_to_lines(launch_flags_path);
+
+			if (lines.empty()) {
+				LOG("service: launch.flags file was empty.");
+			}
+			else {
+				LOG("service launch.flags has %x elements:\n%x", lines.size(), lines);
+			}
+
+			std::vector<const char*> argv;
+
+			for (const auto& l : lines) {
+				argv.push_back(l.c_str());
+			}
+
+			params.parse(argv.size(), argv.data(), 0);
+
+			augs::remove_file(launch_flags_path);
+		}
+		catch (...) {
+			LOG("service: no launch.flags file detected.");
+		}
+	}
 
 	LOG("Complete command line:\n%x", params.complete_command_line);
 	LOG("Parsed as:\n%x", params.parsed_as);

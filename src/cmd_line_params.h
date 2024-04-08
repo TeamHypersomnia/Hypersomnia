@@ -43,6 +43,7 @@ struct cmd_line_params {
 	std::string connect_address;
 
 	bool no_router = false;
+	bool as_service = false;
 
 	bool suppress_server_webhook = false;
 
@@ -62,19 +63,15 @@ struct cmd_line_params {
 	std::optional<int> tutorial_level;
 	bool tutorial_challenge = false;
 
-	cmd_line_params(const int argc, const char* const * const argv) {
-		exe_path = argv[0];
-		complete_command_line = exe_path.string();
-		parsed_as = std::string();
-
-		for (int i = 1; i < argc; ++i) {
+	void parse(const int argc, const char* const * const argv, const int start_i) {
+		for (int i = start_i; i < argc; ++i) {
 			const auto a = std::string(argv[i]);
 
 			complete_command_line += " " + a;
 			parsed_as += typesafe_sprintf("%x=%x ", i, a);
 		}
 
-		for (int i = 1; i < argc; ++i) {
+		for (int i = start_i; i < argc; ++i) {
 			auto get_next = [&i, argc, argv]() {
 				if (i + 1 < argc) {
 					return argv[++i];
@@ -135,6 +132,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--is-update-available") {
 				only_check_update_availability_and_quit = true;
+			}
+			else if (a == "--as-service") {
+				as_service = true;
 			}
 			else if (a == "--server") {
 				start_server = true;
@@ -224,6 +224,13 @@ struct cmd_line_params {
 
 			}
 		}
+	}
+
+	cmd_line_params(const int argc, const char* const * const argv) {
+		exe_path = argv[0];
+		complete_command_line = exe_path.string();
+
+		parse(argc, argv, 1);
 	}
 
 	bool is_cli_tool() const {

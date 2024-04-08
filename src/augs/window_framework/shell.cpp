@@ -4,6 +4,7 @@
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/create_process.h"
 #include "augs/string/string_templates.h"
+#include "all_paths.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -92,15 +93,27 @@ namespace augs {
 		auto previous_arguments = std::string();
 
 		bool is_appimage = false;
+		bool is_service = false;
 
 #if PLATFORM_LINUX
 		for (int i = 1; i < previous_argc; ++i) {
 			const auto arg = std::string(previous_argv[i]);
 
+			if (arg == "--as-service") {
+				is_service = true;
+			}
+
 			if (arg == "--appimage-path") {
 				LOG("Restarting the app as an AppImage. Skipping --appimage-path argument.");
 				is_appimage = true;
 			}
+		}
+
+		if (is_service) {
+			const auto launch_flags_path = path_type(LOGS_DIR / "launch.flags");
+			lines_to_file(launch_flags_path, added_arguments);
+
+			return EXIT_SUCCESS;
 		}
 #endif
 
