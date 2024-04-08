@@ -57,7 +57,10 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_PITCH, 1));
 		AL_CHECK(alSourcef(id, AL_GAIN, 1));
 		AL_CHECK(alSourcei(id, AL_LOOPING, AL_FALSE));
+
+#if !PLATFORM_WEB
 		AL_CHECK(alSourcei(id, AL_SOURCE_RESAMPLER_SOFT, static_cast<std::uint8_t>(Resampler::Spline)));
+#endif
 
 		initialized = true;
 	}

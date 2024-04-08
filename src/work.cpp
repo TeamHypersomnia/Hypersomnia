@@ -1578,6 +1578,7 @@ work_result work(
 				browse_servers_gui.open();
 			}
 
+#if !PLATFORM_WEB
 			if (auxiliary_socket == std::nullopt) {
 				recreate_auxiliary_socket();
 
@@ -1586,6 +1587,7 @@ work_result work(
 				}
 			}
 		}
+#endif
 #endif
 	};
 

@@ -231,36 +231,6 @@ void server_heartbeat::validate() {
 	}
 }
 
-std::string server_heartbeat::get_location_id() const {
-	const auto n = std::string(server_name);
-
-	if (begins_with(n, "[AUS]")) {
-		return "aus";
-	}
-
-	if (begins_with(n, "[PL]")) {
-		return "pl";
-	}
-
-	if (begins_with(n, "[US]")) {
-		return "us-central";
-	}
-
-	if (begins_with(n, "[RU]")) {
-		return "ru";
-	}
-
-	if (begins_with(n, "[DE]")) {
-		return "de";
-	}
-
-	if (begins_with(n, "[CH]")) {
-		return "ch";
-	}
-
-	return "";
-}
-
 bool server_heartbeat::is_valid() const {
 	if (!is_nickname_valid_characters(server_name)) {
 		return false;

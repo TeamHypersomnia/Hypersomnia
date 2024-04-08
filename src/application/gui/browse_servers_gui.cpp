@@ -24,10 +24,10 @@
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto server_entry_timeout = 5;
-#endif
 
 constexpr auto reping_interval = 10;
 constexpr auto max_packets_per_frame_v = 64;
+#endif
 
 #define LOG_BROWSER 1
 
@@ -385,8 +385,8 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 	return false;
 }
 
+#if !PLATFORM_WEB
 void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
-#if BUILD_NETWORKING
 	auto packet_handler = [&](const auto& from, uint8_t* buffer, const int bytes_received) {
 		if (handle_gameserver_response(from, buffer, bytes_received)) {
 			return;
@@ -394,9 +394,6 @@ void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& soc
 	};
 
 	::receive_netcode_packets(socket, packet_handler);
-#else
-	(void)socket;
-#endif
 }
 
 void browse_servers_gui_state::animate_dot_column() {
@@ -456,7 +453,6 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			}
 		};
 
-#if BUILD_NETWORKING
 		if (p.state == S::AWAITING_RESPONSE) {
 			auto& when_first_ping = p.when_sent_first_ping;
 			auto& when_last_ping = p.when_sent_last_ping;
@@ -474,7 +470,6 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 				continue;
 			}
 		}
-#endif
 
 		if (p.state == S::PING_MEASURED) {
 			auto& when_last_ping = p.when_sent_last_ping;
@@ -494,6 +489,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		}
 	}
 }
+#endif
 
 constexpr auto num_columns = 7;
 
@@ -1428,3 +1424,34 @@ void browse_servers_gui_state::reping_all_servers() {
 		s.progress = {};
 	}
 }
+
+std::string server_heartbeat::get_location_id() const {
+	const auto n = std::string(server_name);
+
+	if (begins_with(n, "[AUS]")) {
+		return "aus";
+	}
+
+	if (begins_with(n, "[PL]")) {
+		return "pl";
+	}
+
+	if (begins_with(n, "[US]")) {
+		return "us-central";
+	}
+
+	if (begins_with(n, "[RU]")) {
+		return "ru";
+	}
+
+	if (begins_with(n, "[DE]")) {
+		return "de";
+	}
+
+	if (begins_with(n, "[CH]")) {
+		return "ch";
+	}
+
+	return "";
+}
+
