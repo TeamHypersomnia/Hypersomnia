@@ -93,9 +93,10 @@ namespace augs {
 		auto previous_arguments = std::string();
 
 		bool is_appimage = false;
-		bool is_service = false;
 
 #if PLATFORM_LINUX
+		bool is_service = false;
+
 		for (int i = 1; i < previous_argc; ++i) {
 			const auto arg = std::string(previous_argv[i]);
 
