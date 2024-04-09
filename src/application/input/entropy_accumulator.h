@@ -60,7 +60,7 @@ struct entropy_accumulator {
 
 		if (handle) {
 			const auto player_id = handle.get_id();
-			auto& player_entry = out.cosmic[player_id];
+			cosmic_entropy::player_entropy_type player_entry;
 			player_entry.settings = in.settings.character;
 
 			auto& player = player_entry.commands;
@@ -87,6 +87,10 @@ struct entropy_accumulator {
 			concatenate(player.intents, new_intents);
 
 			player += cosmic;
+
+			if (!player.empty()) {
+				out.cosmic.players.try_emplace(player_id, std::move(player_entry));
+			}
 		}
 
 		out.clear_dead_entities(handle.get_cosmos());

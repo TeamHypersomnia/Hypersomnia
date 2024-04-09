@@ -44,7 +44,7 @@ namespace augs {
 
 	template <class T>
 	struct key_representable_as_string<T, decltype(typename T::key_type(), void())> 
-		: std::bool_constant<std::is_same_v<std::string, typename T::key_type>> {
+	: std::bool_constant<std::is_enum_v<typename T::key_type> || std::is_same_v<std::string, typename T::key_type>> {
 	};
 
 	template <class T>

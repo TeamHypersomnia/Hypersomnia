@@ -315,7 +315,7 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, double>) {
 			to.Double(from);
 		}
-		else if constexpr(std::is_same_v<T, int>) {
+		else if constexpr(std::is_same_v<T, int> || std::is_same_v<T, short>) {
 			to.Int(from);
 		}
 		else if constexpr(std::is_same_v<T, uint64_t>) {
@@ -329,6 +329,16 @@ namespace augs {
 		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive general_write_json_value");
+		}
+	}
+
+	template <class T>
+	decltype(auto) json_stringize(const T& val) {
+		if constexpr(std::is_enum_v<T>) {
+			return enum_to_string(val);
+		}
+		else {
+			return val;
 		}
 	}
 
@@ -346,7 +356,7 @@ namespace augs {
 				to.StartObject();
 
 				for (const auto& it : from) {
-					to.Key(it.first);
+					to.Key(json_stringize(it.first));
 					write_json(to, it.second);
 				}
 
@@ -443,7 +453,7 @@ namespace augs {
 				const auto defaults = typename Container::mapped_type();
 
 				for (const auto& it : from) {
-					to.Key(it.first);
+					to.Key(json_stringize(it.first));
 					write_json_diff(to, it.second, defaults, true);
 				}
 

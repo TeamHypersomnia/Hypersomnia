@@ -3,8 +3,12 @@
 #include "augs/math/vec2.h"
 
 enum class intent_change {
+	// GEN INTROSPECTOR enum class intent_change
 	RELEASED,
-	PRESSED
+	PRESSED,
+
+	COUNT
+	// END GEN INTROSPECTOR
 };
 
 template <class K>
