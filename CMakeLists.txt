@@ -2046,7 +2046,7 @@ if (BUILD_NETWORKING)
 	if (MSVC)
 		file(GLOB_RECURSE SODIUM_SOURCE_FILES "src/3rdparty/yojimbo/sodium/*.c")
 
-		set_source_files_properties(${SODIUM_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-mssse3")
+		set_source_files_properties(${SODIUM_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-mssse3 -msse4.1")
 		add_library(sodium STATIC ${SODIUM_SOURCE_FILES})
 		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()
