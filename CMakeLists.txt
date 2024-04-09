@@ -2048,6 +2048,9 @@ if (BUILD_NETWORKING)
 			"src/3rdparty/yojimbo/sodium/*.c"
 		)
 
+
+		set_source_files_properties(${LUA_CPPS} PROPERTIES COMPILE_FLAGS "-mssse3");
+
 		add_library(sodium STATIC ${SODIUM_SOURCE_FILES})
 		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()
