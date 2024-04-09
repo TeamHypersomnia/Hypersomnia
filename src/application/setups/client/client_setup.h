@@ -252,7 +252,7 @@ class client_setup :
 	void advance_demo_recorder();
 
 	template <class Callbacks, class ServerPayloadProvider, class TotalLocalEntropyProvider>
-	void advance_single_step(
+	auto advance_single_step(
 		const client_advance_input& in,
 		const Callbacks& callbacks,
 		ServerPayloadProvider server_payload_provider,
@@ -558,15 +558,18 @@ class client_setup :
 			}
 		}
 
+		auto chosen_dt = default_inv_tickrate;
+
 		if (in_game) {
-			client_time += get_inv_tickrate();
+			chosen_dt = get_inv_tickrate();
 		}
-		else {
-			client_time += default_inv_tickrate;
-		}
+
+		client_time += chosen_dt;
 
 		update_stats(in.network_stats);
 		total_collected.clear();
+
+		return chosen_dt;
 	}
 
 	void perform_demo_player_imgui(augs::window& window);
@@ -621,12 +624,14 @@ public:
 			Will never be less than 0 because client_time is only ever incremented by dt_secs 
 				conditional upon that it is LESS than current_time
 
+			Could be more than 1 if the client has less FPS than the tickrate.
+
 			if current = client_time then
 			ratio = (client_time - (client_time - dt_secs)) / dt_secs = 1
 		*/
 
 		const auto at_0 = client_time - dt_secs;
-		return (get_current_time() - at_0) / dt_secs;
+		return std::min(1.0, (get_current_time() - at_0) / dt_secs);
 	}
 
 	const_entity_handle get_viewed_character() const {
@@ -714,33 +719,48 @@ public:
 
 		const auto current_time = get_current_time();
 
-		if (client_time < current_time) {
-			if (downloading) {
-				if (is_trying_external_download()) {
-					if (send_keepalive_download_progress()) {
-						handle_incoming_payloads();
-						send_packets();
-					}
-
-					advance_external_downloader();
-				}
-				else {
-					exchange_file_packets();
+		if (downloading) {
+			if (is_trying_external_download()) {
+				if (send_keepalive_download_progress()) {
+					handle_incoming_payloads();
+					send_packets();
 				}
 
-				update_stats(in.network_stats);
+				advance_external_downloader();
+
+				client_time = current_time;
 			}
 			else {
+				if (client_time < current_time) {
+					exchange_file_packets();
+
+					client_time += default_inv_tickrate;
+				}
+			}
+
+			update_stats(in.network_stats);
+		}
+		else {
+			if (client_time < current_time) {
 				auto local_entropy_provider = [&]() {
 					return get_total_local_player_entropy(in);
 				};
 
-				advance_single_step(
+				const auto advanced_dt = advance_single_step(
 					in, 
 					callbacks, 
 					[this](){ handle_incoming_payloads(); }, 
 					local_entropy_provider
 				);
+
+				/*
+					Don't let us fall back too much.
+					If we didn't do this, interpolation ratio could stay 1
+						even long after the performance drop is gone - since it's based on the difference
+						between current_time and client_time.
+				*/
+
+				client_time = std::max(client_time, current_time - advanced_dt);
 			}
 		}
 	}

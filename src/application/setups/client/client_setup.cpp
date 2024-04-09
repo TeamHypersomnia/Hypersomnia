@@ -1068,8 +1068,6 @@ void client_setup::exchange_file_packets() {
 	}
 
 	send_packets();
-
-	client_time += inv_tickrate;
 }
 
 void client_setup::send_download_progress() {
