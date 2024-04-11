@@ -163,6 +163,10 @@
 #include "application/setups/editor/packaged_official_content.h"
 #include "augs/string/parse_url.h"
 
+#if BUILD_WEBRTC
+#include "rtc/rtc.hpp"
+#endif
+
 #include "work_result.h"
 
 namespace augs {

@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix spawn prediction on connect to prevent the unpleasant glitch
+    - might just have to make it predictable instead of dependent on cosmos step?
+
 - "download native client" in the right top
 
 - clicking outside should close buy menu too

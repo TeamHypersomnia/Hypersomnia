@@ -191,7 +191,8 @@ endif()
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
-option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_NET_OPT})
+option(BUILD_NETWORKING "Build networking." ${DEFAULT_NET_OPT})
+option(BUILD_WEBRTC "Build WebRTC for client and server. This will enable networking on the Web and cross-play between web and native clients." ${DEFAULT_NET_OPT})
 option(BUILD_OPENSSL "Build SSL support. Required for secure automatic application updates." ${DEFAULT_NET_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
@@ -243,6 +244,10 @@ if (BUILD_DEBUGGER_SETUP)
 	message("Building with debugger setup. Compilation will take a while.")
 else()
 	message("Building without debugger setup.")
+endif()
+
+if (NOT BUILD_NETWORKING)
+	set(BUILD_WEBRTC OFF)
 endif()
 
 if (BUILD_FOR_WEB OR HYPERSOMNIA_BARE)
@@ -1717,6 +1722,10 @@ if(BUILD_NETWORKING)
 	add_definitions(-DBUILD_NETWORKING=1)
 endif()
 
+if(BUILD_WEBRTC) 
+	add_definitions(-DBUILD_WEBRTC=1)
+endif()
+
 if(BUILD_FREETYPE) 
 	add_definitions(-DBUILD_FREETYPE=1)
 endif()
@@ -1961,6 +1970,28 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_LIBS ${XCB_LIBRARIES})
 		list(APPEND HYPERSOMNIA_LIBS ${X11_XCB_LIBRARIES})
 	endif()
+endif()
+
+if(BUILD_WEBRTC)
+	set(USE_GNUTLS OFF CACHE BOOL "" FORCE)
+	set(USE_MBEDTLS OFF CACHE BOOL "" FORCE)
+
+	set(NO_MEDIA ON CACHE BOOL "" FORCE)
+	set(NO_WEBSOCKET ON CACHE BOOL "" FORCE)
+	set(NO_EXAMPLES ON CACHE BOOL "" FORCE)
+	set(NO_TESTS ON CACHE BOOL "" FORCE)
+
+	if(BUILD_FOR_WEB)
+		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/datachannel-wasm" EXCLUDE_FROM_ALL)
+		list(APPEND HYPERSOMNIA_LIBS datachannel-wasm)
+	else()
+		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel" EXCLUDE_FROM_ALL)
+
+		# Would otherwise give error on src/3rdparty/libdatachannel/src/rtp.cpp
+		target_compile_options(datachannel-static PRIVATE -Wno-cast-align)
+
+		list(APPEND HYPERSOMNIA_LIBS datachannel-static)
+	endif()	
 endif()
 
 if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)

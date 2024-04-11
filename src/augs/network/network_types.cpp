@@ -8,6 +8,10 @@
 #include <cstdio>
 #include <stdarg.h> 
 
+#if BUILD_WEBRTC
+#include "rtc/rtc.hpp"
+#endif
+
 bool InitializeYojimbo();
 void ShutdownYojimbo();
 
@@ -25,6 +29,12 @@ LOG_NOFORMAT(Buffer);  // finaly print the text
 return 0;
 }
 
+#if BUILD_WEBRTC
+void rtc_log_callback(rtc::LogLevel, std::string message) {
+	LOG_NOFORMAT(message);
+}
+#endif
+
 namespace augs {
 	namespace network {
 		void enable_detailed_logs(const bool flag) {
@@ -38,11 +48,20 @@ namespace augs {
 			yojimbo_log_level(YOJIMBO_LOG_LEVEL_INFO);
 			yojimbo_set_printf_function(custom_print);
 			yojimbo_set_assert_function(log_ensure);
+
+#if BUILD_WEBRTC
+			rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
+			rtc::Preload();
+#endif
+
 			return result;
 		}
 
 		bool deinit() {
 			LOG("Shutting down the network library.");
+#if BUILD_WEBRTC
+			rtc::Cleanup();
+#endif
 			ShutdownYojimbo();
 			return true;
 		}
