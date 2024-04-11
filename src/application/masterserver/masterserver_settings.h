@@ -4,6 +4,8 @@
 struct masterserver_settings {
 	// GEN INTROSPECTOR struct masterserver_settings
 	std::string ip = "127.0.0.1";
+	augs::path_type ssl_cert_path;
+	augs::path_type ssl_private_key_path;
 	unsigned server_entry_timeout_secs = 60;
 	unsigned suppress_community_server_webhooks_after_launch_for_secs = 20;
 

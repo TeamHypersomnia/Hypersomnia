@@ -180,7 +180,23 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	std::shared_mutex serialized_list_mutex;
 
-	httplib::Server http;
+	std::unique_ptr<httplib::Server> http_ptr;
+
+	const auto& cert_path = settings.ssl_cert_path;
+	const auto& key_path = settings.ssl_private_key_path;
+
+	if (!cert_path.empty() && !key_path.empty()) {
+		LOG("Starting HTTPS server.");
+
+		http_ptr = std::make_unique<httplib::SSLServer>(cert_path.c_str(), key_path.c_str());
+	}
+	else {
+		LOG("Starting HTTP server. Cert or key file unspecified.");
+
+		http_ptr = std::make_unique<httplib::Server>();
+	}
+
+	auto& http = *http_ptr;
 
 	const auto masterserver_dump_path = USER_DIR / "masterserver.dump";
 
