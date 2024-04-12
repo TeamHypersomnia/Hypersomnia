@@ -1428,8 +1428,8 @@ void browse_servers_gui_state::reping_all_servers() {
 std::string server_heartbeat::get_location_id() const {
 	const auto n = std::string(server_name);
 
-	if (begins_with(n, "[AUS]")) {
-		return "aus";
+	if (begins_with(n, "[AU]")) {
+		return "au";
 	}
 
 	if (begins_with(n, "[PL]")) {

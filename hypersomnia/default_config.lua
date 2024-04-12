@@ -36,7 +36,7 @@ return {
   masterserver = {
 	ip = "0.0.0.0",
 	ssl_cert_path = "",
-	ssl_key_path = "",
+	ssl_private_key_path = "",
 	suppress_community_server_webhooks_after_launch_for_secs = 20,
 	server_entry_timeout_secs = 65,
 
@@ -67,7 +67,7 @@ return {
 	"arena.hypersomnia.xyz",
 	"arena-us.hypersomnia.xyz",
 	"arena-de.hypersomnia.xyz",
-	"arena-aus.hypersomnia.xyz",
+	"arena-au.hypersomnia.xyz",
 	"arena-ru.hypersomnia.xyz",
 	"arena-ch.hypersomnia.xyz"
   },

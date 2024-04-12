@@ -316,7 +316,7 @@ std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, 
 
 // Function to get the IANA time zone name based on locationId
 std::string getTimeZoneName(const std::string& locationId) {
-    if (locationId == "aus") {
+    if (locationId == "au") {
         return "Australia/Sydney";
     } else if (locationId == "ru") {
         return "Europe/Moscow";
