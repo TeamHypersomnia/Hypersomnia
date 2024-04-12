@@ -188,7 +188,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	if (!cert_path.empty() && !key_path.empty()) {
 		LOG("Starting HTTPS server.");
 
-		http_ptr = std::make_unique<httplib::SSLServer>(cert_path.c_str(), key_path.c_str());
+		const auto cert = augs::string_windows_friendly(cert_path);
+		const auto key = augs::string_windows_friendly(key_path);
+
+		http_ptr = std::make_unique<httplib::SSLServer>(cert.c_str(), key.c_str());
 	}
 	else {
 		LOG("Starting HTTP server. Cert or key file unspecified.");
