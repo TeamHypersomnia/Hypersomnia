@@ -108,7 +108,9 @@ void https_file_uploader::worker_func() {
 			(void)provider_items;
 			auto res = client->Post(parsed.location, httplib::Headers(), items, provider_items);
 
-			if (res && httplib_utils::successful(res->status)) {
+			if (res) {
+				LOG("HTML response: %x. Body: %x", res->status, res->body);
+
 				try {
 					auto doc = augs::json_document_from(res->body);
 
@@ -136,12 +138,7 @@ void https_file_uploader::worker_func() {
 				break;
 			}
 			else {
-				if (res) {
-					set_error("HTTP uploader: error when uploading. Status: %x", res->status);
-				}
-				else {
-					set_error("HTTP uploader: error when uploading. Response was null.");
-				}
+				set_error("HTTP uploader: error when uploading. Response was null.");
 
 				keepRunning = false;
 				break;
