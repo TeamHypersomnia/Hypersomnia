@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- hide settings in web that can crash the app like number of threads
+- resolve_address -> address_utils
+- consider having short ids for peers so links don't take much space and are easily transferred without copying (e.g. in school)
+
+- how about using server->config.override_send_and_receive
+    - but on server doing BOTH! This function will send and receive packets using NETCODE but will also handle webrtc queues
+
+    - ultimately:
+        - on server, impl. aux_receive_packet, aux_send_packet and call them *in addition*
+            - except if on web, dont use aux, just use override, but that can be controlled setup-side
+        - on client using override *(or not using it)* is enough since we'll use only one medium
+
+- server will be the hardest as it needs to know which clients are from webrtc
+
+    - we'll have to assign a random ip, or a localhost one
+    - look for networkSimulator->IsActive() to find good entry points
+    - we can use "override
+
 - fix spawn prediction on connect to prevent the unpleasant glitch
     - might just have to make it predictable instead of dependent on cosmos step?
 

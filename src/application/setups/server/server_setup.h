@@ -75,6 +75,8 @@ using arena_files_database_type = std::unordered_map<augs::secure_hash_type, are
 
 struct client_requested_chat;
 
+struct webrtc_server_detail;
+
 class server_setup : 
 	public default_setup_settings
 #if !HEADLESS
@@ -108,6 +110,8 @@ class server_setup :
 	synced_dynamic_vars make_synced_dynamic_vars() const;
 
 	/* The rest is server-specific */
+	std::unique_ptr<webrtc_server_detail> webrtc_server;
+
 	std::size_t arena_cycle_current_index = 0;
 	std::vector<std::size_t> shuffled_cycle_indices;
 	randomization cycle_rng = randomization::from_random_device();
@@ -174,6 +178,12 @@ class server_setup :
 	net_time_t when_last_changed_map_due_to_idle = 0;
 
 	double tell_me_my_address_stamp = 0;
+
+	static bool is_webrtc_only();
+
+	bool handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n);
+    bool send_packet_override(const netcode_address_t&,const std::byte*,int);
+    int receive_packet_override(netcode_address_t&,std::byte*,int);
 
 	std::chrono::system_clock::time_point when_to_check_for_updates;
 	hour_and_minute_str when_to_check_for_updates_last_var;
@@ -372,7 +382,8 @@ public:
 
 		const server_nat_traversal_input& nat_traversal_input,
 		bool suppress_community_server_webhook_this_run,
-		const server_assigned_teams& assigned_teams
+		const server_assigned_teams& assigned_teams,
+		const std::string& webrtc_signalling_server_url
 	);
 
 	~server_setup();

@@ -51,6 +51,9 @@ struct server_heartbeat {
 
 	bool require_authentication = false;
 	uint8_t ranked_state = 0;
+
+	bool is_webrtc_only_server = false;
+	webrtc_peer_id webrtc_server_id = { 0 };
 	// END GEN INTROSPECTOR
 
 	double cached_time_to_event = 0.0;

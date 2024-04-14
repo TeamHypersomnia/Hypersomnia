@@ -7,6 +7,7 @@ return {
   --log_timestamp_format = "",
 
   server_list_provider = "masterserver.hypersomnia.xyz:8420",
+  webrtc_signalling_server_url = "wss://masterserver.hypersomnia.xyz:8000",
 
   nat_detection = {
 	  packet_interval_ms = 5,

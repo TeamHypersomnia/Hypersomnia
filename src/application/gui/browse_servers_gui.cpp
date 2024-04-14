@@ -15,6 +15,7 @@
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
 #include "augs/misc/httplib_utils.h"
+#include "augs/misc/to_hex_str.h"
 
 #include "application/network/resolve_address.h"
 
@@ -304,7 +305,19 @@ void browse_servers_gui_state::refresh_server_pings() {
 	}
 }
 
+bool server_list_entry::only_webrtc() const {
+#if PLATFORM_WEB
+	return true;
+#else
+	return heartbeat.is_webrtc_only_server;
+#endif
+}
+
 std::string server_list_entry::get_connect_string() const {
+	if (only_webrtc()) {
+		return std::string("web://") + ::get_hex_representation(heartbeat.webrtc_server_id);
+	}
+
 	if (!custom_connect_string.empty()) {
 		return custom_connect_string;
 	}

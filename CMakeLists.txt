@@ -1151,6 +1151,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/serialize"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel/deps/json/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/date/include"
 	# Only for v3
@@ -1977,7 +1978,7 @@ if(BUILD_WEBRTC)
 	set(USE_MBEDTLS OFF CACHE BOOL "" FORCE)
 
 	set(NO_MEDIA ON CACHE BOOL "" FORCE)
-	set(NO_WEBSOCKET ON CACHE BOOL "" FORCE)
+	set(NO_WEBSOCKET OFF CACHE BOOL "" FORCE)
 	set(NO_EXAMPLES ON CACHE BOOL "" FORCE)
 	set(NO_TESTS ON CACHE BOOL "" FORCE)
 

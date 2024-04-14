@@ -13,6 +13,10 @@ namespace yojimbo {
 
 struct host_with_default_port;
 
+std::string add_ws_preffix(const std::string& websocket_url);
+bool is_internal_webrtc_address(const netcode_address_t& t);
+netcode_address_t make_internal_webrtc_address(unsigned short client_identifier);
+
 std::string ToString(const yojimbo::Address&);
 std::string ToString(const netcode_address_t&);
 

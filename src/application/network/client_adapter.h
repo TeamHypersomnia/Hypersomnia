@@ -8,15 +8,21 @@ struct netcode_socket_t;
 struct resolve_address_result;
 
 using client_auxiliary_command_callback_type = std::function<bool (std::byte*, std::size_t n)>;
+using send_packet_override_type = std::function<bool (const netcode_address_t&,const std::byte*,int)>;
+using receive_packet_override_type = std::function<int (netcode_address_t&,std::byte*,int)>;
 
 class client_adapter {
 	friend bool client_auxiliary_command_function(void* context, uint8_t* packet, int bytes);
+	friend void client_send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes);
+	friend int client_receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes);
 
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::Client client;
 	client_auxiliary_command_callback_type auxiliary_command_callback;
+	send_packet_override_type send_packet_override;
+	receive_packet_override_type receive_packet_override;
 	netcode_address_t connected_ip_address;
 
 	friend GameAdapter;
@@ -39,7 +45,13 @@ class client_adapter {
 	bool has_messages_to_send(const game_channel_type&) const;
 
 public:
-	client_adapter(std::optional<port_type> preferred_binding_port, client_auxiliary_command_callback_type);
+	client_adapter(
+		std::optional<port_type> preferred_binding_port,
+		client_auxiliary_command_callback_type,
+		send_packet_override_type,
+		receive_packet_override_type
+	);
+
 	resolve_address_result connect(const client_connect_string&);
 
 	template <class H>

@@ -42,6 +42,7 @@
 #include "game/messages/hud_message.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/readwrite/json_readwrite_errors.h"
+#include "augs/misc/to_hex_str.h"
 
 #include "application/setups/server/server_json_events.h"
 #include "augs/readwrite/json_readwrite.h"
@@ -52,6 +53,7 @@
 #include "application/gui/client/chat_gui_entry.hpp"
 #include "application/setups/server/server_assigned_teams.hpp"
 #include "steam_integration.h"
+#include <queue>
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
@@ -64,6 +66,208 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 
 #include "application/setups/server/server_handle_payload.hpp"
 
+#if BUILD_WEBRTC
+
+#include <nlohmann/json.hpp>
+#include "rtc/rtc.hpp"
+
+struct webrtc_server_detail {
+    using client_id = unsigned short;
+    static constexpr client_id max_clients = 64;
+
+    struct packet {
+        client_id client_id;
+        std::vector<std::byte> bytes;
+    };
+
+    std::mutex packets_lk;
+    std::mutex connections_lk;
+    std::string message;
+    std::queue<packet> received_packets;
+
+	webrtc_peer_id this_server_id;
+
+    rtc::WebSocket ws;
+    rtc::Configuration config;
+    std::unordered_map<client_id, std::shared_ptr<rtc::PeerConnection>> pcs;
+    std::unordered_map<client_id, std::shared_ptr<rtc::DataChannel>> dcs;
+    std::unordered_map<std::string, client_id> id_map;
+
+    void set_message(const std::string& m) {
+        std::scoped_lock lock(connections_lk);
+        message = "WebRTC: " + m;
+        LOG_NOFORMAT(message);
+    }
+
+    std::optional<packet> receive_packet() {
+        std::scoped_lock lk(packets_lk);
+        if (received_packets.empty()) {
+            return std::nullopt;
+        }
+        auto next = received_packets.front();
+        received_packets.pop();
+        return next;
+    }
+
+    void send(client_id id, const std::byte* data, size_t size) {
+		std::scoped_lock lock(connections_lk);
+		std::shared_ptr<rtc::DataChannel> dc;
+
+		if (dcs.count(id)) {
+			dc = dcs[id];
+		} else {
+			set_message("Attempted to send data to a non-existent data channel");
+			return;
+		}
+
+		dc->send(data, size);
+    }
+
+    void disconnect(client_id id) {
+        {
+            std::scoped_lock lock(connections_lk);
+            if (pcs.count(id)) {
+                pcs[id]->close();
+                pcs.erase(id);
+            }
+            if (dcs.count(id)) {
+                dcs[id]->close();
+                dcs.erase(id);
+            }
+            id_map.erase(std::find_if(id_map.begin(), id_map.end(), [id](const auto& pair) { return pair.second == id; }));
+        }
+        set_message("Disconnected client: " + std::to_string(id));
+    }
+
+    void listen(const std::string& signaling_server_url) {
+		yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&this_server_id), sizeof(this_server_id));
+
+		const auto this_server_id_str = ::get_hex_representation(this_server_id);
+		const auto url = signaling_server_url + "/" + this_server_id_str; 
+
+		setup_websocket(url);
+    }
+
+	void setup_websocket(const std::string& url) {
+        ws.onOpen([this]() {
+            set_message("WebSocket server connected, ready for clients.");
+        });
+
+        ws.onMessage([this](const rtc::message_variant& data) {
+			if (!std::holds_alternative<std::string>(data))
+				return;
+
+			auto json_message = nlohmann::json::parse(std::get<std::string>(data));
+            handle_message(json_message);
+        });
+
+        ws.onError([this](const std::string& error) {
+            set_message("WebSocket error: " + error);
+        });
+
+        ws.onClosed([this]() {
+            set_message("WebSocket closed.");
+        });
+
+		ws.open(add_ws_preffix(url));
+    }
+
+	void handle_message(const nlohmann::json& message) {
+		std::scoped_lock lock(connections_lk);  
+		auto external_id = message["id"].get<std::string>();
+		auto type = message["type"].get<std::string>();
+
+		if (type == "offer") {
+			if (id_map.find(external_id) == id_map.end()) {
+				const auto id = assign_client_id();
+
+				if (id < max_clients) {
+					id_map[external_id] = id;
+					auto pc = setup_peer_connection(id, external_id);
+					pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+				} else {
+					set_message("Max clients reached, cannot assign new ID");
+					return;
+				}
+			}
+		}
+		else if (type == "candidate") {
+			if (id_map.find(external_id) != id_map.end()) {
+				client_id id = id_map[external_id];
+				if (pcs.count(id)) {
+					pcs[id]->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+				}
+			}
+			else {
+				set_message("Received a candidate for an unknown session ID");
+			}
+		}
+	}
+
+    client_id assign_client_id() {
+        for (client_id id = 0; id < max_clients; ++id) {
+            if (pcs.find(id) == pcs.end()) {
+                return id;
+            }
+        }
+
+        return max_clients; // Indicate that no IDs are available
+    }
+
+    std::shared_ptr<rtc::PeerConnection> setup_peer_connection(client_id id, std::string external_id) {
+        auto pc = std::make_shared<rtc::PeerConnection>(config);
+        pcs[id] = pc;
+
+        pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
+			{
+				std::scoped_lock lock(connections_lk);
+				dcs[id] = dc;
+			}
+
+            setup_data_channel_handlers(id, dc);
+        });
+
+		pc->onLocalDescription([this, external_id](const rtc::Description& description) {
+			nlohmann::json message = {{"id", external_id},
+			{"type", description.typeString()},
+			{"description", std::string(description)}};
+
+			ws.send(message.dump());
+		});
+
+		pc->onLocalCandidate([this, external_id](const rtc::Candidate& candidate) {
+			nlohmann::json message = {{"id", external_id},
+							{"type", "candidate"},
+							{"candidate", std::string(candidate)},
+							{"mid", candidate.mid()}};
+
+			ws.send(message.dump());
+		});
+
+        return pc;
+    }
+
+    void setup_data_channel_handlers(client_id id, std::shared_ptr<rtc::DataChannel> dc) {
+        dc->onMessage([this, id](const rtc::message_variant& message) {
+            if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
+                std::scoped_lock lock(packets_lk);
+                received_packets.push({id, *bytes});
+            }
+        });
+    }
+};
+#else
+#error "Not implemented"
+#endif
+
+bool server_setup::is_webrtc_only() {
+#if PLATFORM_WEB
+	return true;
+#else
+	return false;
+#endif
+}
+
 server_setup::server_setup(
 	sol::state& lua,
 	const packaged_official_content& official,
@@ -74,7 +278,8 @@ server_setup::server_setup(
 	const std::optional<augs::dedicated_server_input> dedicated,
 	const server_nat_traversal_input& nat_traversal_input,
 	const bool suppress_community_server_webhook_this_run,
-	const server_assigned_teams& assigned_teams
+	const server_assigned_teams& assigned_teams,
+	const std::string& webrtc_signalling_server_url
 ) : 
 	integrated_client_vars(integrated_client_vars),
 	lua(lua),
@@ -88,22 +293,15 @@ server_setup::server_setup(
 			in,
 			dedicated == std::nullopt,
 			[this](auto&&... args) {
-				if (handle_masterserver_response(std::forward<decltype(args)>(args)...)) {
-					return true;
-				}
-
-				if (!is_joinable()) {
-					if (is_connection_request_packet(std::forward<decltype(args)>(args)...)) {
-						return true;
-					}
-				}
-
-				if (handle_gameserver_command(std::forward<decltype(args)>(args)...)) {
-					return true;
-				}
-
-				return nat_traversal.handle_auxiliary_command(std::forward<decltype(args)>(args)...); 
-			}
+				return this->handle_auxiliary_command(std::forward<decltype(args)>(args)...);
+			},
+			[this](auto&&... args) {
+				return this->send_packet_override(std::forward<decltype(args)>(args)...);
+			},
+			[this](auto&&... args) {
+				return this->receive_packet_override(std::forward<decltype(args)>(args)...);
+			},
+			is_webrtc_only()
 		)
 	),
 	server_time(yojimbo_time()),
@@ -111,6 +309,21 @@ server_setup::server_setup(
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
+
+#if BUILD_WEBRTC
+	/* 
+		Always. Native servers should also support web traffic.
+	*/
+
+	const bool use_webrtc = true;
+#else
+	const bool use_webrtc = false;
+#endif
+
+	if (use_webrtc) {
+		webrtc_server = std::make_unique<webrtc_server_detail>();
+		webrtc_server->listen(webrtc_signalling_server_url);
+	}
 
 	{
 		auto initial_vars_modified = initial_vars;
@@ -181,6 +394,54 @@ server_setup::server_setup(
 
 	resolve_server_list();
 	refresh_runtime_info_for_rcon();
+}
+
+bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n) {
+	if (handle_masterserver_response(from, packet, n)) {
+		return true;
+	}
+
+	if (!is_joinable()) {
+		if (is_connection_request_packet(from, packet, n)) {
+			return true;
+		}
+	}
+
+	if (handle_gameserver_command(from, packet, n)) {
+		return true;
+	}
+
+	return nat_traversal.handle_auxiliary_command(from, packet, n); 
+}
+
+bool server_setup::send_packet_override(
+	const netcode_address_t& to,
+	const std::byte* packet,
+	int bytes
+) {
+	if (webrtc_server != nullptr && ::is_internal_webrtc_address(to)) {
+		webrtc_server->send(to.port, packet, bytes);
+
+		return true;
+	}
+
+	/* Send real UDP packet instead */
+	return false;
+}
+
+int server_setup::receive_packet_override(netcode_address_t& from, std::byte* buffer, int bytes) {
+	if (webrtc_server != nullptr) {
+		if (const auto packet = webrtc_server->receive_packet()) {
+			from = ::make_internal_webrtc_address(packet->client_id);
+
+			const auto bytes_read = std::min(bytes, static_cast<int>(packet->bytes.size()));
+			std::memcpy(buffer, packet->bytes.data(), bytes_read);
+
+			return bytes_read;
+		}
+	}
+
+	return 0;
 }
 
 void server_setup::reset_afk_timer() {
@@ -1080,6 +1341,14 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.nat = nat_traversal.last_detected_nat;
 
+	if (webrtc_server) {
+		heartbeat.webrtc_server_id = webrtc_server->this_server_id;
+	}
+
+#if PLATFORM_WEB
+	heartbeat.is_webrtc_only_server = true;
+#endif
+
 	if (!vars.allow_nat_traversal) {
 		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
 	}
@@ -1754,6 +2023,15 @@ void server_setup::init_client(const client_id_type& id) {
 void server_setup::unset_client(const client_id_type& id) {
 	LOG("Client disconnected. Details:\n%x", describe_client(id));
 	clients[id].unset();
+
+	if (webrtc_server) {
+		const auto address = to_netcode_addr(server->get_client_address(id));
+
+		if (::is_internal_webrtc_address(address)) {
+			const auto client_webrtc_id = address.port;
+			webrtc_server->disconnect(client_webrtc_id);
+		}
+	}
 }
 
 void server_setup::disconnect_and_unset(const client_id_type& id) {

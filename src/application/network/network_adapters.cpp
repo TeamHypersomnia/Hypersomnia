@@ -153,10 +153,28 @@ bool auxiliary_command_function(void* context, struct netcode_address_t* from, u
 	return adapter->auxiliary_command_callback(*from, reinterpret_cast<const std::byte*>(packet), bytes);
 }
 
+void send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<yojimbo::Server*>(context)->GetParent();
+	adapter->send_packet_override(*to, reinterpret_cast<const std::byte*>(packet), bytes);
+}
+
+bool aux_send_packet(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<yojimbo::Server*>(context)->GetParent();
+	return adapter->send_packet_override(*to, reinterpret_cast<const std::byte*>(packet), bytes);
+}
+
+int receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<yojimbo::Server*>(context)->GetParent();
+	return adapter->receive_packet_override(*from, reinterpret_cast<std::byte*>(packet), bytes);
+}
+
 server_adapter::server_adapter(
 	const augs::server_listen_input& in, 
 	const bool is_integrated, 
-	auxiliary_command_callback_type auxiliary_command_callback
+	auxiliary_command_callback_type auxiliary_command_callback,
+	send_packet_override_type send_packet_override,
+	receive_packet_override_type receive_packet_override,
+	const bool is_webrtc_only
 ) :
 	connection_config(in),
 	adapter(this),
@@ -166,9 +184,12 @@ server_adapter::server_adapter(
 		yojimbo::Address(in.ip.c_str(), in.port), 
 		connection_config, 
 		adapter, 
-		yojimbo_time()
+		yojimbo_time(),
+		this
 	),
-	auxiliary_command_callback(auxiliary_command_callback)
+	auxiliary_command_callback(auxiliary_command_callback),
+	send_packet_override(send_packet_override),
+	receive_packet_override(receive_packet_override)
 {
 	auto slots = in.slots;
 
@@ -182,6 +203,16 @@ server_adapter::server_adapter(
 	if (auto detail = server.GetServerDetail()) {
 		detail->config.auxiliary_command_function = auxiliary_command_function;
 		detail->config.auxiliary_command_context = this;
+
+		if (is_webrtc_only) {
+			detail->config.override_send_and_receive = 1;
+			detail->config.send_packet_override = ::send_packet_override;
+			detail->config.receive_packet_override = ::receive_packet_override;
+		}
+		else {
+			detail->config.aux_send_packet = ::aux_send_packet;
+			detail->config.aux_receive_packet = ::receive_packet_override;
+		}
 	}
 }
 
@@ -200,7 +231,9 @@ bool client_auxiliary_command_function(void* context, uint8_t* packet, int bytes
 
 client_adapter::client_adapter(
 	const std::optional<port_type> preferred_binding_port,
-	client_auxiliary_command_callback_type auxiliary_command_callback
+	client_auxiliary_command_callback_type auxiliary_command_callback,
+	send_packet_override_type send_packet_override,
+	receive_packet_override_type receive_packet_override
 ) :
 	connection_config(),
 	adapter(nullptr),
@@ -209,14 +242,44 @@ client_adapter::client_adapter(
 		preferred_binding_port ? yojimbo::Address("0.0.0.0", *preferred_binding_port) : yojimbo::Address("0.0.0.0"), 
 		connection_config, 
 		adapter, 
-		yojimbo_time()
+		yojimbo_time(),
+		this
 	),
-	auxiliary_command_callback(auxiliary_command_callback)
+	auxiliary_command_callback(auxiliary_command_callback),
+	send_packet_override(send_packet_override),
+	receive_packet_override(receive_packet_override)
 {
 }
 
 std::optional<unsigned long> get_trailing_number(const std::string& s);
 std::string cut_trailing_number(const std::string& s);
+
+std::string add_ws_preffix(const std::string& websocket_url) {
+	const auto preffix = websocket_url.find("://") == std::string::npos ? "ws://" : "";
+	return std::string(preffix) + websocket_url;
+}
+
+netcode_address_t make_internal_webrtc_address(unsigned short client_identifier) {
+	netcode_address_t address;
+	address.type = NETCODE_ADDRESS_IPV4;
+	address.port = client_identifier;
+	address.data.ipv4[0] = 127;
+	address.data.ipv4[1] = 255;
+	address.data.ipv4[2] = 255;
+	address.data.ipv4[3] = 255;
+
+	return address;
+}
+
+bool is_internal_webrtc_address(const netcode_address_t& address) {
+	if (address.type == NETCODE_ADDRESS_IPV4) {
+		const auto ip = address.data.ipv4;
+
+		return ip[0] == 127 && ip[1] == 255 && ip[2] == 255 && ip[3] == 255;
+	}
+
+	return false;
+}
 
 netcode_address_t to_netcode_addr(sockaddr_in* addr_ipv4) {
 	netcode_address_t out;
@@ -490,22 +553,46 @@ std::future<std::optional<netcode_address_t>> async_get_internal_network_address
 	return launch_async([]() { return get_internal_network_address(); });
 }
 
+void client_send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<yojimbo::Client*>(context)->GetParent();
+	adapter->send_packet_override(*to, reinterpret_cast<const std::byte*>(packet), bytes);
+}
+
+int client_receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<yojimbo::Client*>(context)->GetParent();
+	return adapter->receive_packet_override(*from, reinterpret_cast<std::byte*>(packet), bytes);
+}
+
 resolve_address_result client_adapter::connect(const client_connect_string& str) {
-	uint64_t clientId;
-	yojimbo_random_bytes((uint8_t*)&clientId, 8);
+	const auto webrtc_id = find_webrtc_id(str);
+	const bool use_webrtc = webrtc_id != "";
 
-	host_with_default_port in;
-	in.address = str;
-	in.default_port = DEFAULT_GAME_PORT_V;
+	auto resolved_addr = resolve_address_result();
 
-	const auto resolved_addr = resolve_address(in);
+	if (!use_webrtc) {
+		host_with_default_port in;
+		in.address = str;
+		in.default_port = DEFAULT_GAME_PORT_V;
 
-	if (resolved_addr.result != resolve_result_type::OK) {
-		return resolved_addr;
+		resolved_addr = resolve_address(in);
+
+		if (resolved_addr.result != resolve_result_type::OK) {
+			return resolved_addr;
+		}
 	}
 
-	connected_ip_address = resolved_addr.addr;
-	const auto& target_addr = to_yojimbo_addr(resolved_addr.addr);
+	if (use_webrtc) {
+		/*
+			Doesnt matter, we won't use sockets either way
+		*/
+
+		connected_ip_address = ::make_internal_webrtc_address(DEFAULT_GAME_PORT_V);
+	}
+	else {
+		connected_ip_address = resolved_addr.addr;
+	}
+
+	const auto target_addr = to_yojimbo_addr(connected_ip_address);
 
 	auto local_addr = yojimbo::Address("127.0.0.1", DEFAULT_GAME_PORT_V);
 
@@ -520,6 +607,9 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 		local_addr
 	};
 
+	uint64_t clientId;
+	yojimbo_random_bytes((uint8_t*)&clientId, 8);
+
 	client.InsecureConnect(
 		privateKey.data(), 
 		clientId,
@@ -530,6 +620,12 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 	if (auto detail = client.GetClientDetail()) {
 		detail->config.auxiliary_command_function = client_auxiliary_command_function;
 		detail->config.auxiliary_command_context = this;
+
+		if (use_webrtc) {
+			detail->config.override_send_and_receive = 1;
+			detail->config.send_packet_override = ::client_send_packet_override;
+			detail->config.receive_packet_override = ::client_receive_packet_override;
+		}
 	}
 
 	return resolved_addr;

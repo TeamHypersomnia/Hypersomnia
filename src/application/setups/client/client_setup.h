@@ -67,6 +67,8 @@ struct arena_download_input {
 	augs::secure_hash_type project_hash;
 };
 
+struct webrtc_client_detail;
+
 class client_setup : 
 	public default_setup_settings,
 	public arena_gui_mixin<client_setup>
@@ -101,6 +103,8 @@ class client_setup :
 	arena_player_metas player_metas;
 
 	/* The rest is client-specific */
+	bool connect_called = false;
+
 	sol::state& lua;
 	const packaged_official_content& official;
 
@@ -110,7 +114,6 @@ class client_setup :
 	std::optional<netcode_address_t> before_traversal_server_address;
 	std::string displayed_connecting_server_name;
 
-	netcode_address_t resolved_server_address;
 	client_state_type state = client_state_type::NETCODE_NEGOTIATING_CONNECTION;
 
 	client_vars vars;
@@ -139,6 +142,8 @@ class client_setup :
 	std::optional<arena_downloading_session> downloading;
 	bool pause_solvable_stream = false;
 
+	std::unique_ptr<webrtc_client_detail> webrtc_client;
+
 	std::unique_ptr<https_file_downloader> external_downloader;
 	std::optional<direct_file_download> direct_downloader;
 	std::optional<augs::secure_hash_type> last_requested_direct_file_hash;
@@ -158,6 +163,8 @@ class client_setup :
 
 	client_demo_player demo_player;
 	/* No client state follows later in code. */
+
+	bool is_webrtc() const;
 
 	bool is_trying_external_download() const {
 		return external_downloader != nullptr;
@@ -599,7 +606,8 @@ public:
 		const client_vars& initial_vars,
 		const nat_detection_settings& nat_detection,
 		port_type preferred_binding_port,
-		const std::optional<netcode_address_t> before_traversal_server_address
+		const std::optional<netcode_address_t> before_traversal_server_address,
+		const std::string& webrtc_signalling_server_url
 	);
 
 	~client_setup();
@@ -653,6 +661,9 @@ public:
 	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;
 
+	bool pending_pre_connection_handshake() const;
+	void connect();
+
 	template <class Callbacks>
 	void advance(
 		const client_advance_input& in,
@@ -696,7 +707,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt);
+					new (this) client_setup(l, official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt, "");
 				}
 
 				demo_player = std::move(player_backup);
@@ -718,6 +729,15 @@ public:
 		}
 
 		const auto current_time = get_current_time();
+
+		if (pending_pre_connection_handshake()) {
+			return;
+		}
+		else {
+			if (!connect_called) {
+				connect();
+			}
+		}
 
 		if (downloading) {
 			if (is_trying_external_download()) {
@@ -873,6 +893,8 @@ public:
 	float get_total_download_percent_complete(const bool smooth) const;
 
 	bool handle_auxiliary_command(std::byte*, int n);
+	bool send_packet_override(const netcode_address_t&,const std::byte*,int);
+	int receive_packet_override(netcode_address_t&,std::byte*,int);
 
 	void handle_received(const file_chunk_packet& chunk);
 	file_chunk_index_type calc_num_chunks_per_tick() const;

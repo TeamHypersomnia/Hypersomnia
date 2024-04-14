@@ -1003,7 +1003,8 @@ work_result work(
 
 			make_server_nat_traversal_input(),
 			params.suppress_server_webhook,
-			assigned_teams
+			assigned_teams,
+			config.webrtc_signalling_server_url
 		);
 
 		auto& server = *server_ptr;
@@ -1670,6 +1671,7 @@ work_result work(
 		const std::optional<netcode_address_t> before_traversal_server_address = std::nullopt
 	) {
 		bool public_internet = false;
+		auto connect_string = config.client_connect;
 
 		streaming.wait_demos_compressed();
 
@@ -1677,7 +1679,25 @@ work_result work(
 			LOG("Finished NAT traversal. Connecting immediately.");
 		}
 		else {
-			if (const bool is_ip_address = find_netcode_addr(config.client_connect).has_value()) {
+			const bool is_webrtc_id = ::uses_webrtc(connect_string);
+			const bool is_ip_address = !is_webrtc_id && find_netcode_addr(connect_string).has_value();
+
+#if PLATFORM_WEB
+			/* Anything other than web:// string must be queried and translated to web://. */
+			const bool should_query_server_list = !is_webrtc_id;
+			(void)is_ip_address;
+#else
+			/* 
+				On native, we can connect directly if given:
+			   	- webrtc id, then we'll connect using webrtc id. 
+				- if we're given a domain name. Then we connect directly and natively.
+
+				Only time we need to query is when given an ip address.
+			*/
+			const bool should_query_server_list = is_ip_address;
+#endif
+
+			if (should_query_server_list) {
 				if (auto info = find_chosen_server_info(); info == nullptr) {
 					/* 
 						If we're connecting to a specific IP address - as opposed to e.g. a domain -
@@ -1687,7 +1707,7 @@ work_result work(
 
 					browse_servers_gui.sync_download_server_entry(
 						get_browse_servers_input(),
-						config.client_connect
+						connect_string
 					);
 				}
 				else {
@@ -1697,6 +1717,11 @@ work_result work(
 
 			if (auto info = find_chosen_server_info()) {
 				LOG("Found the chosen server in the browser list.");
+
+				if (info->only_webrtc()) {
+					/* Will convert the connect string to web:// */
+					connect_string = info->get_connect_string();
+				}
 
 				if (info->heartbeat.is_behind_nat()) {
 					LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
@@ -1739,12 +1764,14 @@ work_result work(
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
 				*official,
-				config.client_connect,
+				connect_string,
 				displayed_connecting_server_name,
 				config.client,
 				config.nat_detection,
 				bound_port,
-				before_traversal_server_address
+				before_traversal_server_address,
+
+				config.webrtc_signalling_server_url
 			);
 		});
 
@@ -1832,7 +1859,8 @@ work_result work(
 
 						make_server_nat_traversal_input(),
 						params.suppress_server_webhook,
-						assigned_teams
+						assigned_teams,
+						config.webrtc_signalling_server_url
 					);
 				});
 
@@ -2519,7 +2547,8 @@ work_result work(
 
 								make_server_nat_traversal_input(),
 								params.suppress_server_webhook,
-								assigned_teams
+								assigned_teams,
+								config.webrtc_signalling_server_url
 							);
 						});
 					}

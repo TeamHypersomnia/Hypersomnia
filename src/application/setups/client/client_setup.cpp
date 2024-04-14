@@ -49,6 +49,186 @@
 #include "application/setups/server/file_chunk_packet.h"
 #include "application/setups/client/direct_file_download.hpp"
 #include "augs/misc/compress.h"
+#include "augs/misc/to_hex_str.h"
+
+#if BUILD_WEBRTC
+
+#include <nlohmann/json.hpp>
+#include "rtc/rtc.hpp"
+
+struct webrtc_client_detail {
+    std::mutex message_lk;
+	std::mutex packets_lk;
+	std::mutex ready_lk;
+
+	using packet = std::vector<std::byte>;
+
+	std::string message;
+	std::queue<packet> received_packets;
+	std::atomic<bool> ready = false;
+	std::atomic<bool> is_error_state = false;
+
+	std::string server_id;
+
+    rtc::WebSocket ws;
+    rtc::Configuration config;
+    std::shared_ptr<rtc::PeerConnection> pc;
+    std::shared_ptr<rtc::DataChannel> dc;
+
+	bool is_error() {
+		std::scoped_lock lock(ready_lk);
+		return is_error_state;
+	}
+
+	bool is_ready() {
+		std::scoped_lock lock(ready_lk);
+		return ready;
+	}
+
+	void send(
+		const std::byte* packet,
+		int bytes
+	) {
+		ensure(is_ready());
+		dc->send(packet, bytes);
+	}
+
+	std::optional<packet> receive_packet() {
+		std::scoped_lock lk (packets_lk);
+
+		if (received_packets.empty()) {
+			return std::nullopt;
+		}
+
+		const auto next = received_packets.front();
+		received_packets.pop();
+		return next;
+	}
+
+	void connect(
+		const std::string& signalling_server_url,
+		const std::string& dest_server_id
+	) {
+		server_id = dest_server_id;
+
+		webrtc_peer_id cid;
+		yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&cid), sizeof(cid));
+
+		const auto this_client_id = ::get_hex_representation(cid);
+		const auto url = signalling_server_url + "/" + this_client_id;
+
+		setup_websocket(url);
+	}
+
+	auto get_status() {
+		std::scoped_lock lock(message_lk);
+		return message;
+	}
+
+    void set_message(const std::string& m) {
+        std::scoped_lock lock(message_lk);
+        message = "WebRTC: " + m;
+
+		LOG_NOFORMAT(message);
+    }
+
+    void setup_websocket(const std::string& url) {
+        ws.onOpen([this]() {
+            set_message("WebSocket connected, signaling ready");
+			setup_peer_connection();
+        });
+
+        ws.onError([this](const std::string& error) {
+            set_message("WebSocket error: " + error);
+
+			std::scoped_lock lock(ready_lk);
+			is_error_state = true;
+        });
+
+        ws.onClosed([this]() {
+            set_message("WebSocket closed");
+        });
+
+        ws.onMessage([this](const rtc::message_variant& data) {
+            if (!std::holds_alternative<std::string>(data))
+                return;
+
+            auto message = nlohmann::json::parse(std::get<std::string>(data));
+
+            if (message["type"] == "answer") {
+                pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+            }
+			else if (message["type"] == "candidate") {
+                pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+            }
+        });
+
+		ws.open(add_ws_preffix(url)); // Open WebSocket connection with the provided URL
+    }
+
+	void setup_peer_connection() {
+		pc = std::make_shared<rtc::PeerConnection>(config);
+
+		pc->onStateChange(
+			[this](rtc::PeerConnection::State state) { set_message(std::string("State: ") + std::to_string(int(state))); });
+
+		pc->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
+			set_message(std::string("Gathering State: ") + std::to_string(int(state)));
+		});
+
+		pc->onLocalDescription([this](const rtc::Description& description) {
+			nlohmann::json message = {{"id", server_id},
+			{"type", description.typeString()},
+			{"description", std::string(description)}};
+
+			ws.send(message.dump());
+		});
+
+		pc->onLocalCandidate([this](const rtc::Candidate& candidate) {
+			nlohmann::json message = {{"id", server_id},
+							{"type", "candidate"},
+							{"candidate", std::string(candidate)},
+							{"mid", candidate.mid()}};
+
+			ws.send(message.dump());
+		});
+
+		{
+			dc = pc->createDataChannel("dataChannel");
+
+			dc->onOpen([this]() {
+				set_message("DataChannel open");
+
+				{
+					std::scoped_lock lock(ready_lk);
+					ready = true;
+				}
+			});
+
+			dc->onMessage([this](const rtc::message_variant &message) {
+				if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
+					std::scoped_lock lock(packets_lk);
+					received_packets.push(*bytes);
+				}
+			});
+
+			dc->onClosed([this]() {
+				set_message("DataChannel closed");
+
+				std::scoped_lock lock(ready_lk);
+				is_error_state = true;
+			});
+		}
+	}
+};
+
+#else
+#error "Not implemented"
+
+struct webrtc_client_detail {
+	explicit webrtc_client_detail(const std::string&) {}
+};
+#endif
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
@@ -295,6 +475,51 @@ bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n)
 	return true;
 }
 
+bool client_setup::send_packet_override(
+	const netcode_address_t& to,
+	const std::byte* packet,
+	int bytes
+) {
+	/* This function will only be called if we decided to use WebRTC. */
+
+	ensure(webrtc_client != nullptr);
+
+	if (webrtc_client != nullptr) {
+		if (::is_internal_webrtc_address(to)) {
+			webrtc_client->send(packet, bytes);
+		}
+	}
+
+	return true;
+}
+
+int client_setup::receive_packet_override(netcode_address_t& from, std::byte* buffer, int bytes) {
+	/* This function will only be called if we decided to use WebRTC. */
+
+	ensure(webrtc_client != nullptr);
+
+	if (webrtc_client != nullptr) {
+		if (const auto packet = webrtc_client->receive_packet()) {
+			from = ::make_internal_webrtc_address(DEFAULT_GAME_PORT_V);
+
+			const auto bytes_read = std::min(bytes, static_cast<int>(packet->size()));
+			std::memcpy(buffer, packet->data(), bytes_read);
+
+			return bytes_read;
+		}
+	}
+
+	return 0;
+}
+
+bool client_setup::is_webrtc() const {
+	return webrtc_client != nullptr;
+}
+
+bool client_setup::pending_pre_connection_handshake() const {
+	return is_webrtc() && !webrtc_client->is_ready();
+}
+
 client_setup::client_setup(
 	sol::state& lua,
 	const packaged_official_content& official,
@@ -303,7 +528,9 @@ client_setup::client_setup(
 	const client_vars& initial_vars,
 	const nat_detection_settings& nat_detection,
 	const port_type preferred_binding_port,
-	const std::optional<netcode_address_t> before_traversal_server_address
+	const std::optional<netcode_address_t> before_traversal_server_address,
+
+	const std::string& webrtc_signalling_server_url
 ) : 
 	lua(lua),
 	official(official),
@@ -311,13 +538,33 @@ client_setup::client_setup(
 	before_traversal_server_address(before_traversal_server_address),
 	displayed_connecting_server_name(displayed.empty() ? connect_string : displayed),
 	vars(initial_vars),
-	adapter(std::make_unique<client_adapter>(preferred_binding_port, [this](std::byte* bytes, std::size_t n) {
-		return handle_auxiliary_command(bytes, n);
-	})),
+	adapter(std::make_unique<client_adapter>(
+		preferred_binding_port, 
+		[this](auto&&... args) {
+			return this->handle_auxiliary_command(std::forward<decltype(args)>(args)...);
+		},
+		[this](auto&&... args) {
+			return this->send_packet_override(std::forward<decltype(args)>(args)...);
+		},
+		[this](auto&&... args) {
+			return this->receive_packet_override(std::forward<decltype(args)>(args)...);
+		}
+	)),
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
 	(void)nat_detection;
+
+	const auto webrtc_id = find_webrtc_id(connect_string);
+	const bool use_webrtc = webrtc_id != "";
+
+	if (use_webrtc) {
+		webrtc_client = std::make_unique<webrtc_client_detail>();
+		webrtc_client->connect(
+			webrtc_signalling_server_url,
+			webrtc_id
+		);
+	}
 
 	LOG("Initializing connection with %x", connect_string);
 
@@ -360,37 +607,43 @@ client_setup::client_setup(
 			set_disconnect_reason(reason);
 		}
 		else {
-			augs::network::enable_detailed_logs(true);
-
-			const auto resolution = adapter->connect(connect_string);
-
-			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
-				const auto reason = typesafe_sprintf(
-					"Couldn't resolve host.\nCheck if the provided address is correct."
-				);
-
-				set_disconnect_reason(reason);
-				LOG("Address: \"%x\"", resolution.host);
-			}
-			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
-				const auto reason = typesafe_sprintf(
-					"You have entered an invalid address!", connect_string
-				);
-
-				set_disconnect_reason(reason);
-				LOG("Address: \"%x\"", connect_string);
-			}
-			else {
-				resolved_server_address = resolution.addr;
-
-				ensure_eq(resolution.result, resolve_result_type::OK);
-
-				const auto new_demo_fname = augs::date_time().get_readable_for_file() + ".dem";
-				const auto new_demo_path = augs::path_type(DEMOS_DIR) / new_demo_fname;
-
-				record_demo_to(new_demo_path);
+			if (!pending_pre_connection_handshake()) {
+				connect();
 			}
 		}
+	}
+}
+
+void client_setup::connect() {
+	connect_called = true;
+
+	augs::network::enable_detailed_logs(true);
+
+	const auto resolution = adapter->connect(connect_string);
+
+	if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
+		const auto reason = typesafe_sprintf(
+			"Couldn't resolve host.\nCheck if the provided address is correct."
+		);
+
+		set_disconnect_reason(reason);
+		LOG("Address: \"%x\"", resolution.host);
+	}
+	else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
+		const auto reason = typesafe_sprintf(
+			"You have entered an invalid address!", connect_string
+		);
+
+		set_disconnect_reason(reason);
+		LOG("Address: \"%x\"", connect_string);
+	}
+	else {
+		ensure_eq(resolution.result, resolve_result_type::OK);
+
+		const auto new_demo_fname = augs::date_time().get_readable_for_file() + ".dem";
+		const auto new_demo_path = augs::path_type(DEMOS_DIR) / new_demo_fname;
+
+		record_demo_to(new_demo_path);
 	}
 }
 
@@ -1275,6 +1528,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	else {
 		auto print_reason_if_any = [&]() {
 			if (last_disconnect_reason.empty()) {
+				if (webrtc_client && webrtc_client->is_error()) {
+					text(webrtc_client->get_status());
+				}
+
 				return;
 			}
 
@@ -1426,6 +1683,22 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				disconnect();
 			}
 		}
+		else if (const bool webrtc_handshake_in_progress = is_webrtc() && !webrtc_client->is_ready() && !webrtc_client->is_error()) {
+			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
+
+			text("\n");
+
+			text_color(webrtc_client->get_status(), yellow);
+
+			text("\n");
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
+				disconnect();
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
 		else if (state == C::NETCODE_NEGOTIATING_CONNECTION && adapter->is_connecting()) {
 			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 
@@ -1527,6 +1800,10 @@ void client_setup::send_to_server(
 void client_setup::disconnect() {
 	if (is_replaying()) {
 		demo_player.source_path.clear();
+		return;
+	}
+
+	if (pending_pre_connection_handshake()) {
 		return;
 	}
 

@@ -65,6 +65,8 @@ struct server_list_entry {
 
 	ping_progress progress;
 
+	bool only_webrtc() const;
+
 	bool is_official_server() const {
 		return !is_community_server;
 	}
