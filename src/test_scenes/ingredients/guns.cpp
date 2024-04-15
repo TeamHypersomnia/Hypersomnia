@@ -3279,7 +3279,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4900.f, 5200.f};
+			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3453,7 +3453,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5400.f, 6000.f};
+			gun_def.muzzle_velocity = {5900.f, 6000.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -4435,10 +4435,10 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::BLUNAZ:         return 0.0f;
 		case W::KEK9:           return 15.0f;
 		case W::SN69:           return 15.0f;
-		case W::PRO90:          return 20.0f;
 		case W::COVERT:         return 40.0f;
 		case W::WARX:           return 40.0f;
 		case W::GRADOBICIE:     return 40.0f;
+		case W::PRO90:          return 50.0f;
 		case W::CYBERSPRAY:     return 50.0f;
 		case W::ZAMIEC:         return 50.0f;
 		case W::SZCZUR:         return 50.0f;
