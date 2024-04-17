@@ -4328,6 +4328,7 @@ namespace test_flavours {
 			gun_def.recoil_multiplier = 2.75f;
 			gun_def.kickback_towards_wielder = kickback_mult * 170.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(900);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.35f;
@@ -4346,7 +4347,7 @@ namespace test_flavours {
 			set_density_mult(meta, 2.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1200;
+			meta.get<invariants::item>().standard_price = 1600;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::DEAGLE_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
