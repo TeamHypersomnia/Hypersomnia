@@ -129,10 +129,8 @@ struct browse_servers_gui_internal {
 	std::future<std::optional<httplib_result>> future_response;
 	netcode_socket_t socket;
 
-	std::future<official_addrs> future_official_addresses;
-
 	bool refresh_op_in_progress() const {
-		return future_official_addresses.valid() || future_response.valid();
+		return future_response.valid();
 	}
 };
 
@@ -246,42 +244,11 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 		return;
 	}
 
-	official_server_addresses.clear();
 	error_message.clear();
 	server_list.clear();
 	auto prev_addr = selected_server.address;
 	selected_server = {};
 	selected_server.address = prev_addr;
-
-	LOG("Launching future_official_addresses");
-
-	data->future_official_addresses = launch_async(
-		[addresses=in.official_arena_servers]() {
-			official_addrs results;
-#if BUILD_NETWORKING
-
-			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
-
-			for (const auto& a : addresses) {
-				host_with_default_port in;
-
-				in.address = a;
-				in.default_port = 0;
-
-				const auto result = resolve_address(in);
-				LOG(result.report());
-
-				if (result.result == resolve_result_type::OK) {
-					results.emplace_back(result);
-				}
-			}
-
-#else
-			(void)addresses;
-#endif
-			return results;
-		}
-	);
 
 	LOG("Launching future_response");
 
@@ -726,31 +693,11 @@ void browse_servers_gui_state::show_server_list(
 	scroll_once_to_selected = false;
 }
 
-const resolve_address_result* browse_servers_gui_state::find_resolved_official(const netcode_address_t& n) {
-	for (const auto& o : official_server_addresses) {
-		auto compared_for_officiality = o.addr;
-		compared_for_officiality.port = 0;
-
-		auto candidate = n;
-		candidate.port = 0;
-
-		if (candidate == compared_for_officiality) {
-			return &o;
-		}
-	}
-
-	return nullptr;
-}
-
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
 	if (valid_and_is_ready(data->future_response)) {
 		server_list = ::to_server_list(data->future_response.get(), error_message);
-	}
-
-	if (valid_and_is_ready(data->future_official_addresses)) {
-		official_server_addresses = data->future_official_addresses.get();
 	}
 
 	if (!show) {
@@ -822,7 +769,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			push_if_passes(local_server_list);
 		}
 		else {
-			if (const bool is_official = !s.is_official_server()) {
+			if (const bool is_official = s.is_official_server()) {
 				has_official_servers = true;
 				push_if_passes(official_server_list);
 			}
@@ -1374,6 +1321,14 @@ bool server_details_gui_state::perform(
 	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
 	acquire_keyboard_once();
+
+	auto official_url = entry.meta.official_url;
+
+	if (!official_url.empty()) {
+		input_text("Official URL", official_url, ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::Separator();
+	}
 
 	auto webrtc_id = std::string(entry.webrtc_id);
 

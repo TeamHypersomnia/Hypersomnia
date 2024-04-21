@@ -22,6 +22,8 @@ struct masterserver_settings {
 	augs::path_type key_pem_path;
 
 	float sleep_ms = 8;
+
+	std::vector<std::string> official_hosts;
 	// END GEN INTROSPECTOR
 
 	port_type get_last_udp_command_port() const {

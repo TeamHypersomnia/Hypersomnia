@@ -1683,7 +1683,6 @@ work_result work(
 			config.server_list_provider,
 			config.client_connect,
 			displayed_connecting_server_name,
-			config.official_arena_servers,
 			config.faction_view,
 			config.streamer_mode && config.streamer_mode_flags.community_servers
 		};
@@ -1702,6 +1701,7 @@ work_result work(
 	) {
 		bool public_internet = false;
 		auto connect_string = config.client_connect;
+		std::string official_url;
 
 		LOG("Launching client setup with connect string: %x", connect_string);
 
@@ -1744,7 +1744,12 @@ work_result work(
 
 				if (auto info = find_chosen_server_info()) {
 					LOG("Found the chosen server in the browser list.");
-					if (info->heartbeat.is_behind_nat()) {
+					if (info->is_official_server()) {
+						official_url = info->meta.official_url;
+
+						LOG("It's an official server at %x. Connecting directly.", official_url);
+					}
+					else if (info->heartbeat.is_behind_nat()) {
 						LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
 
 						chosen_server_nat = info->heartbeat.nat;
@@ -1807,7 +1812,17 @@ work_result work(
 
 		displayed_connecting_server_name.clear();
 
-		save_last_activity(activity_type::CLIENT);
+
+		change_with_save(
+			[&](auto& cfg) {
+				if (!official_url.empty()) {
+					cfg.client_connect = official_url;
+				}
+
+				cfg.client = config.client;
+				cfg.last_activity = activity_type::CLIENT;
+			}
+		);
 
 		return true;
 	};
@@ -2053,13 +2068,6 @@ work_result work(
 
 #if BUILD_NETWORKING
 	WEBSTATIC auto start_client_setup = [&]() {
-		change_with_save(
-			[&](auto& cfg) {
-				cfg.client_connect = config.client_connect;
-				cfg.client = config.client;
-			}
-		);
-
 		client_start_requested = false;
 
 		launch_setup(activity_type::CLIENT);
@@ -2086,8 +2094,7 @@ work_result work(
 			window, 
 			config.client_connect, 
 			displayed_connecting_server_name,
-			config.client,
-			config.official_arena_servers
+			config.client
 		);
 
 		if (perform_result || client_start_requested) {

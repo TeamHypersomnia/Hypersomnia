@@ -58,6 +58,7 @@ using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using arena_and_mode_identifier = augs::constant_size_string<max_arena_name_length_v + max_game_mode_name_length_v + 1>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
+using host_string_type = augs::constant_size_string<50>;
 using webrtc_id_type = address_string_type;
 using hour_and_minute_str = augs::constant_size_string<5>;
 using signalling_message_str = augs::constant_size_string<max_signalling_udp_message_length_v>;

@@ -15,17 +15,12 @@
 struct nat_detection_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
-struct host_with_default_port;
-struct resolve_address_result;
-
-using official_addrs = std::vector<resolve_address_result>;
 
 struct browse_servers_input {
 	const std::string& server_list_provider;
 	client_connect_string& client_connect;
 	std::string& displayed_connecting_server_name;
 
-	const std::vector<std::string>& official_arena_servers;
 	const faction_view_settings& faction_view;
 	const bool streamer_mode;
 };
@@ -69,7 +64,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	bool scroll_once_to_selected = false;
 	server_list_entry selected_server;
-	official_addrs official_server_addresses;
 
 	server_details_gui_state server_details = std::string("Server details");
 
@@ -86,8 +80,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	server_list_entry* find_entry(const netcode_address_t&);
 	server_list_entry* find_entry_by_internal_address(const netcode_address_t&, uint64_t ping_sequence);
-
-	const resolve_address_result* find_resolved_official(const netcode_address_t&);
 
 	bool handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
 

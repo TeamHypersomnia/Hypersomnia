@@ -205,6 +205,12 @@ class signalling_server {
 			requested.erase(requested.begin());
 		}
 
+		/*
+			Remove : to not overshadow ip:port addresses
+		*/
+
+		erase_if(requested, [](const auto c) { return c == ':'; });
+
 		if (requested.empty()) {
 			return find_free_id(peers);
 		}

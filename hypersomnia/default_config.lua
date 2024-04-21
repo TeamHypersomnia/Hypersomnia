@@ -52,7 +52,16 @@ return {
 	server_list_port = 8420,
 
 	cert_pem_path = "",
-	key_pem_path = ""
+	key_pem_path = "",
+
+	official_hosts = {
+	      "arena.hypersomnia.xyz",
+	      "arena-us.hypersomnia.xyz",
+	      "arena-de.hypersomnia.xyz",
+	      "arena-au.hypersomnia.xyz",
+	      "arena-ru.hypersomnia.xyz",
+	      "arena-ch.hypersomnia.xyz"
+	}
   },
 
   float_consistency_test = {
@@ -66,15 +75,6 @@ return {
 	update_connection_timeout_secs = 2,
 	self_update_host = "https://hypersomnia.xyz",
 	self_update_path = "/builds/latest"
-  },
-
-  official_arena_servers = {
-	"arena.hypersomnia.xyz",
-	"arena-us.hypersomnia.xyz",
-	"arena-de.hypersomnia.xyz",
-	"arena-au.hypersomnia.xyz",
-	"arena-ru.hypersomnia.xyz",
-	"arena-ch.hypersomnia.xyz"
   },
 
   app_controls = {

@@ -6,11 +6,21 @@ enum class server_type : uint8_t {
 };
 
 struct masterserver_entry_meta {
+	static constexpr bool force_read_field_by_field = true;
+
 	// GEN INTROSPECTOR struct masterserver_entry_meta
 	double time_hosted = 0.0;
-	bool is_official = false;
+	host_string_type official_url;
 	server_type type = server_type::NATIVE;
 	// END GEN INTROSPECTOR
+
+	bool is_community_server() const {
+		return official_url.empty();
+	}
+
+	bool is_official_server() const {
+		return !official_url.empty();
+	}
 };
 
 struct masterserver_client {

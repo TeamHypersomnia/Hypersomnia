@@ -75,8 +75,7 @@ bool start_client_gui_state::perform(
 	augs::window& window,
 	client_connect_string& into_connect_string,
 	std::string& into_displayed_connecting_server_name,
-	client_vars& into_vars,
-	const std::vector<std::string>& official_arena_servers
+	client_vars& into_vars
 ) {
 	if (!show) {
 		return false;
@@ -204,8 +203,6 @@ bool start_client_gui_state::perform(
 			checkbox("Show", show);
 		}
 		else if (current_tab == start_client_tab_type::BEST_RANKED) {
-			(void)official_arena_servers;
-
 			if (best_server == nullptr) {
 				auto cs = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,0));
 

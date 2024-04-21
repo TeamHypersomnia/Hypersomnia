@@ -31,6 +31,7 @@
 
 #include "application/masterserver/masterserver_client.h"
 #include "application/masterserver/signalling_server.h"
+#include "application/network/network_adapters.h"
 
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
@@ -63,6 +64,43 @@ static void set_cors(httplib::Response& res) {
 	res.set_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 };
 
+using ip_to_host = std::unordered_map<
+	std::string,
+	std::string
+>;
+
+std::string to_string_no_port(netcode_address_t n) {
+	n.port = 0;
+	return ::ToString(n);
+}
+
+static std::string find_official_url(
+	const ip_to_host& map,
+	const netcode_address_t& ip
+) {
+	if (const auto host = mapped_or_nullptr(map, to_string_no_port(ip))) {
+		return typesafe_sprintf("%x:%x", *host, ip.port);
+	}
+
+	return "";
+}
+
+static ip_to_host resolve_all(
+	const std::vector<std::string>& official_hosts
+) {
+	LOG("Resolving all official servers.");
+
+	ip_to_host out;
+
+	for (const auto& host : official_hosts) {
+		if (auto result = hostname_to_netcode_address_t(host)) {
+			out[::to_string_no_port(*result)] = host;
+		}
+	}
+
+	return out;
+}
+
 void perform_masterserver(const config_lua_table& cfg) try {
 	using namespace httplib;
 
@@ -75,6 +113,34 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	LOG("Creating %x masterserver sockets for UDP commands.", num_sockets);
 
 	augs::timer since_launch;
+
+	augs::timer since_last_official_hosts_refresh;
+	std::future<ip_to_host> future_ip_to_host;
+
+	const auto official_hosts = settings.official_hosts;
+	auto ip_noport_to_official = resolve_all(official_hosts);
+
+	auto keep_official_hosts_up_to_date = [&]() {
+		if (valid_and_is_ready(future_ip_to_host)) {
+			ip_noport_to_official = future_ip_to_host.get();
+		}
+
+		if (since_last_official_hosts_refresh.get<std::chrono::hours>() >= 1.0) {
+			if (is_free_slot(future_ip_to_host)) {
+				since_last_official_hosts_refresh.reset();
+
+				future_ip_to_host = launch_async(
+					[official_hosts]() {
+						return resolve_all(official_hosts);
+					}
+				);
+			}
+		}
+	};
+
+	auto find_official_url = [&](const netcode_address_t& n) {
+		return ::find_official_url(ip_noport_to_official, n);
+	};
 
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
@@ -238,8 +304,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			next.server_version = data.server_version;
 
-			next.is_official = meta.is_official;
-			next.is_ranked = meta.is_official && data.is_ranked_server();
+			next.official_url = meta.official_url;
+			next.is_ranked = meta.is_official_server() && data.is_ranked_server();
 			next.is_web_server = meta.type == server_type::WEB;
 			next.name = data.server_name;
 			next.ip = ::ToString(ip);
@@ -272,6 +338,18 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			next.players_metropolis = data.players_metropolis;
 			next.players_spectating = data.players_spectating;
 
+			next.site_displayed_address = [&next]() {
+				if (!next.official_url.empty()) {
+					return next.official_url;
+				}
+
+				if (next.is_web_server) {
+					return next.webrtc_id;
+				}
+
+				return next.ip;
+			}();
+
 			augs::write_json(writer, next);
 		};
 
@@ -293,7 +371,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
 			meta.type = server_type::WEB;
-			meta.is_official = false;
 			
 			write_json_entry(
 				server.second.last_heartbeat,
@@ -625,6 +702,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							server_entry.last_heartbeat = typed_request;
 							server_entry.time_last_heartbeat = current_time;
 							server_entry.meta.time_hosted = current_time;
+							server_entry.meta.official_url = find_official_url(from);
 
 							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
@@ -770,6 +848,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		if (previous_size != server_list.size()) {
 			reserialize_list();
 		}
+
+		keep_official_hosts_up_to_date();
 
 		signalling.send_signalling_packets(send_to_gameserver);
 		signalling.process_timeouts_if_its_time();

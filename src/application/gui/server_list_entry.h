@@ -67,11 +67,11 @@ struct server_list_entry {
 	ping_progress progress;
 
 	bool is_community_server() const {
-		return !meta.is_official;
+		return meta.is_community_server();
 	}
 
 	bool is_official_server() const {
-		return meta.is_official;
+		return meta.is_official_server();
 	}
 
 	std::string get_connect_string() const;

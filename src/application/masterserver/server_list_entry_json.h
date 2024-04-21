@@ -6,11 +6,13 @@ struct server_list_entry_json {
 	std::string server_version;
 
 	bool is_web_server = false;
-	bool is_official = false;
 	bool is_ranked = false;
+
+	std::string site_displayed_address;
 
 	std::string name;
 	std::string ip;
+	std::string official_url;
 	std::string webrtc_id;
 
 	double time_hosted = 0.0;

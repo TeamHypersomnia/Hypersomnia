@@ -65,7 +65,6 @@ public:
 		augs::window& window,
 		client_connect_string&,
 		std::string& into_displayed_connecting_server_name,
-		client_vars&,
-		const std::vector<std::string>& official_arena_servers
+		client_vars&
 	);
 };

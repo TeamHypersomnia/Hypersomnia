@@ -107,8 +107,6 @@ struct config_lua_table {
 
 	masterserver_settings masterserver;
 
-	std::vector<std::string> official_arena_servers;
-
 	http_client_settings http_client;
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
