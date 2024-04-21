@@ -6916,3 +6916,8 @@ This will discard your redo history."
 
 - disable crashed last time popup
 
+- execute all SETUPS for peerconnection and datachannel too because you can never be safe enough and we have the main thread id safeguard already
+
+- send back actual id from signalling server to the server and set it as link correctly
+- also set the link when connecting
+

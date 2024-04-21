@@ -100,6 +100,7 @@ class webrtc_server_detail {
 
     std::mutex packets_lk;
 	std::mutex message_lk;
+	std::mutex this_server_id_lk;
     std::mutex connections_lk;
 
     std::string message;
@@ -107,7 +108,7 @@ class webrtc_server_detail {
 
 	std::vector<packet> packets_to_send;
 
-	webrtc_peer_id this_server_id = {};
+	webrtc_id_type this_server_id = {};
 
     rtc::Configuration config;
     std::unordered_map<client_id, std::shared_ptr<rtc::PeerConnection>> pcs;
@@ -115,6 +116,11 @@ class webrtc_server_detail {
 
 	/* We need this since yojimbo can only identify clients by slot (port) */
     std::unordered_map<std::string, client_id> id_map;
+
+	auto set_this_server_id(const std::string& new_id) {
+		std::scoped_lock lk(this_server_id_lk);
+		this_server_id = new_id;
+	}
 
     void set_message(const std::string& m) {
         std::scoped_lock lock(message_lk);
@@ -163,7 +169,15 @@ class webrtc_server_detail {
 					return;
 
 				auto json_message = nlohmann::json::parse(std::get<std::string>(data));
-				handle_message(self, json_message);
+
+				const auto your_id_key = "your_id";
+
+				if (json_message.contains(your_id_key) && json_message[your_id_key].is_string()) {
+					self->set_this_server_id(std::string(json_message[your_id_key]));
+				}
+				else {
+					handle_message(self, json_message);
+				}
 			}
         });
 
@@ -467,6 +481,11 @@ public:
 
 			set_message("Disconnected client: " + std::to_string(id));
 		});
+	}
+
+	auto get_this_server_id() {
+		std::scoped_lock lk(this_server_id_lk);
+		return this_server_id;
 	}
 
 	~webrtc_server_detail() {
@@ -3432,6 +3451,16 @@ void server_setup::refresh_available_direct_download_bandwidths() {
 	for_each_id_and_client(refresh_chunks, connected_and_integrated_v);
 }
 
+std::string server_setup::get_browser_location() const {
+#if PLATFORM_WEB
+	if (!resolved_this_server_webrtc_id.empty()) {
+		return typesafe_sprintf("game/%x", resolved_this_server_webrtc_id);
+	}
+#endif
+
+	return "";
+}
+
 void server_setup::send_packets_if_its_time() {
 	auto& ticks_remaining = ticks_until_sending_packets;
 
@@ -3462,6 +3491,19 @@ void server_setup::send_packets_if_its_time() {
 		}
 
 		webrtc_server->clean_old_entries();
+	}
+#endif
+
+#if PLATFORM_WEB
+	if (webrtc_server) {
+		if (resolved_this_server_webrtc_id.empty()) {
+			const auto resolved_id = webrtc_server->get_this_server_id();
+
+			if (!resolved_id.empty()) {
+				LOG("This server WebRTC id: %x", resolved_id);
+				resolved_this_server_webrtc_id = resolved_id;
+			}
+		}
 	}
 #endif
 }

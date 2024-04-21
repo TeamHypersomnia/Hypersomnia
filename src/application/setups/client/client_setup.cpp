@@ -739,6 +739,10 @@ client_setup::client_setup(
 	}
 }
 
+std::string client_setup::get_browser_location() const {
+	return typesafe_sprintf("game/%x", connect_string);
+}
+
 void client_setup::connect() {
 	connect_called = true;
 

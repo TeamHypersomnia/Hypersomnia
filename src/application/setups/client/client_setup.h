@@ -916,7 +916,5 @@ public:
 	void snap_interpolation_of_viewed();
 	client_arena_type get_viewed_arena_type() const;
 
-	std::string get_browser_location() const {
-		return "";
-	}
+	std::string get_browser_location() const;
 };

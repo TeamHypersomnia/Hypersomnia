@@ -235,7 +235,7 @@ class server_setup :
 	std::vector<webhook_job> pending_jobs;
 
 #if PLATFORM_WEB
-	std::future<void> heartbeat_job;
+	webrtc_id_type resolved_this_server_webrtc_id;
 #endif
 
 	uint32_t duel_pic_counter = 0;
@@ -842,7 +842,5 @@ public:
 	bool has_assigned_teams() const;
 	faction_type get_assigned_team(const std::string&) const;
 
-	std::string get_browser_location() const {
-		return "";
-	}
+	std::string get_browser_location() const;
 };

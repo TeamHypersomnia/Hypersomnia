@@ -244,6 +244,12 @@ class signalling_server {
 		else {
 			LOG("Web peer connected from unknown address. Chosen WebRTC id: %x", chosen_webrtc_id);
 		}
+
+		nlohmann::json message = {
+			{"your_id", std::string(chosen_webrtc_id) }
+		};
+
+		ws->send(message.dump());
 	}
 
 	void relay_message(nlohmann::json message, const webrtc_id_type& source_id) {
