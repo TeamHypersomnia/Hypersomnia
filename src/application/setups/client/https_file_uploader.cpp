@@ -95,6 +95,10 @@ void https_file_uploader::worker_func() {
 				reinterpret_cast<const char*>(file_buffer.data() + file_buffer.size())
 			);
 
+#if PLATFORM_WEB
+			// TODO_WEB
+			auto res = augs::emscripten_http::result();
+#else
 			httplib::MultipartFormDataItems items = {
 				{"apikey", api_key, "", "text/plain"},
 				{"arena", arena_name, "", "text/plain"},
@@ -106,7 +110,9 @@ void https_file_uploader::worker_func() {
 			};
 
 			(void)provider_items;
+
 			auto res = client->Post(parsed.location, httplib::Headers(), items, provider_items);
+#endif
 
 			if (res) {
 				LOG("HTML response: %x. Body: %x", res->status, res->body);

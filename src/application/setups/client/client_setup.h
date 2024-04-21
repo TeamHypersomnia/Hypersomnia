@@ -142,7 +142,7 @@ class client_setup :
 	std::optional<arena_downloading_session> downloading;
 	bool pause_solvable_stream = false;
 
-	std::unique_ptr<webrtc_client_detail> webrtc_client;
+	std::shared_ptr<webrtc_client_detail> webrtc_client;
 
 	std::unique_ptr<https_file_downloader> external_downloader;
 	std::optional<direct_file_download> direct_downloader;

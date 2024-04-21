@@ -41,7 +41,7 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 };
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
-#if !PLATFORM_WEB
+#if BUILD_NATIVE_SOCKETS
 	netcode_socket_raii server_browser_socket;
 #endif
 
@@ -92,7 +92,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
 
 	void animate_dot_column();
-#if !PLATFORM_WEB
+#if BUILD_NATIVE_SOCKETS
 	void handle_incoming_udp_packets(netcode_socket_t&);
 	void send_pings_and_punch_requests(netcode_socket_t&);
 #endif
@@ -110,7 +110,7 @@ public:
 
 	void sync_download_server_entry(browse_servers_input, const client_connect_string& in);
 
-#if !PLATFORM_WEB
+#if BUILD_NATIVE_SOCKETS
 	void advance_ping_logic();
 #endif
 

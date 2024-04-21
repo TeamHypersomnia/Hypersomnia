@@ -15,8 +15,8 @@ void cosmos_solvable::clear() {
 	significant.specific_names.clear();
 }
 
-std::size_t cosmos_solvable::get_entities_count() const {
-	return significant.entity_pools.size();
+uint32_t cosmos_solvable::get_entities_count() const {
+	return static_cast<uint32_t>(significant.entity_pools.size());
 }
 
 bool cosmos_solvable::empty() const {

@@ -24,10 +24,15 @@ struct gameserver_nat_traversal_response_packet {
 
 using gameserver_command = std::variant<
 	gameserver_ping_request,
-	masterserver_out::nat_traversal_step
+	masterserver_out::nat_traversal_step,
+	masterserver_out::webrtc_signalling_payload
 >;
 
 struct gameserver_command_wrapper {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct gameserver_command_wrapper
 	uint8_t marker = NETCODE_AUXILIARY_COMMAND_PACKET;
 	gameserver_command payload;
+	// END GEN INTROSPECTOR
 };

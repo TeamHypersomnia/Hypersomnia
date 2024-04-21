@@ -303,6 +303,9 @@ namespace augs {
 
 	template <class Archive, class Serialized>
 	void write_bytes(Archive& ar, const Serialized& storage) {
+#if !PLATFORM_WEB
+		static_assert(!std::is_same_v<Serialized, std::size_t>, "Don't serialize size_t, it will cause incompatbility with the Web!");
+#endif
 		if constexpr(has_special_write_v<Archive, Serialized>) {
 			ar.special_write(storage);
 		}

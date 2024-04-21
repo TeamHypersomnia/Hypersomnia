@@ -12264,7 +12264,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "ALL surfaces can bounce bullets - including wood!\nKill 2 enemies covering behind orange boxes."
+            "context_tip": "ALL surfaces can bounce bullets - including wood!\nKill 2 enemies that hide behind orange boxes."
         },
         {
             "id": "hazard (5)",

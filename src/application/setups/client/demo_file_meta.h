@@ -9,6 +9,6 @@ struct demo_file_meta {
 	address_string_type server_address;
 	hypersomnia_version version;
 	version_timestamp_string when_recorded;
-	std::size_t uncompressed_size = 0;
+	int64_t uncompressed_size = 0;
 	// END GEN INTROSPECTOR
 };

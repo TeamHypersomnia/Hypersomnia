@@ -89,7 +89,18 @@ struct cmd_line_params {
 			else if (a.size() > 1 && a[0] == '/') {
 				/* URL location argument. */
 
-				if (begins_with(a, "/tutorial")) {
+				if (begins_with(a, "/game")) {
+					std::string webrtc_id;
+
+					if (1 == typesafe_sscanf(a, "/game/%x", webrtc_id)) {
+						should_connect = true;
+						connect_address = webrtc_id;
+					}
+				}
+				else if (begins_with(a, "/host")) {
+					start_server = true;
+				}
+				else if (begins_with(a, "/tutorial")) {
 					launch_activity = activity_type::TUTORIAL;
 
 					uint32_t level = 0;

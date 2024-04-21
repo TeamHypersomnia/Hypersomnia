@@ -34,3 +34,6 @@
 [submodule "src/3rdparty/libdatachannel"]
 	path = src/3rdparty/libdatachannel
 	url = https://github.com/paullouisageneau/libdatachannel.git
+[submodule "src/3rdparty/datachannel-wasm"]
+	path = src/3rdparty/datachannel-wasm
+	url = https://github.com/paullouisageneau/datachannel-wasm.git

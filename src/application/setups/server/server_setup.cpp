@@ -55,6 +55,8 @@
 #include "steam_integration.h"
 #include <queue>
 
+#include "augs/templates/main_thread_queue.h"
+
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
 };
@@ -71,122 +73,168 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 
-struct webrtc_server_detail {
-    using client_id = unsigned short;
-    static constexpr client_id max_clients = 64;
+#if PLATFORM_WEB
+#define USE_WEBSOCKET 1
+#else
+#define USE_WEBSOCKET 0
+#endif
 
-    struct packet {
-        client_id client_id;
-        std::vector<std::byte> bytes;
-    };
+class webrtc_server_detail {
+	using this_sptr = std::shared_ptr<webrtc_server_detail>;
+
+	/* 
+		On new data channel, we'll first internally assign it a free id between 0-64.
+		(no point in having more since it's the yojimbo limit.)
+
+		All packets from this datachannel will have this port set so yojimbo can distinguish it from other WebRTC clients.
+	*/
+
+	using client_id = port_type;
+
+	static constexpr client_id max_clients = 64;
+
+	struct packet {
+		client_id client_id;
+		std::vector<std::byte> bytes;
+	};
 
     std::mutex packets_lk;
+	std::mutex message_lk;
     std::mutex connections_lk;
+
     std::string message;
     std::queue<packet> received_packets;
 
-	webrtc_peer_id this_server_id;
+	std::vector<packet> packets_to_send;
 
-    rtc::WebSocket ws;
+	webrtc_peer_id this_server_id = {};
+
     rtc::Configuration config;
     std::unordered_map<client_id, std::shared_ptr<rtc::PeerConnection>> pcs;
     std::unordered_map<client_id, std::shared_ptr<rtc::DataChannel>> dcs;
+
+	/* We need this since yojimbo can only identify clients by slot (port) */
     std::unordered_map<std::string, client_id> id_map;
 
     void set_message(const std::string& m) {
-        std::scoped_lock lock(connections_lk);
+        std::scoped_lock lock(message_lk);
         message = "WebRTC: " + m;
         LOG_NOFORMAT(message);
     }
 
-    std::optional<packet> receive_packet() {
-        std::scoped_lock lk(packets_lk);
-        if (received_packets.empty()) {
-            return std::nullopt;
-        }
-        auto next = received_packets.front();
-        received_packets.pop();
-        return next;
-    }
-
-    void send(client_id id, const std::byte* data, size_t size) {
-		std::scoped_lock lock(connections_lk);
-		std::shared_ptr<rtc::DataChannel> dc;
-
-		if (dcs.count(id)) {
-			dc = dcs[id];
-		} else {
-			set_message("Attempted to send data to a non-existent data channel");
-			return;
+	client_id assign_client_id() {
+		for (client_id id = 0; id < max_clients; ++id) {
+			if (pcs.find(id) == pcs.end()) {
+				return id;
+			}
 		}
 
-		dc->send(data, size);
-    }
+		return max_clients; // Indicate that no IDs are available
+	}
 
-    void disconnect(client_id id) {
-        {
-            std::scoped_lock lock(connections_lk);
-            if (pcs.count(id)) {
-                pcs[id]->close();
-                pcs.erase(id);
-            }
-            if (dcs.count(id)) {
-                dcs[id]->close();
-                dcs.erase(id);
-            }
-            id_map.erase(std::find_if(id_map.begin(), id_map.end(), [id](const auto& pair) { return pair.second == id; }));
-        }
-        set_message("Disconnected client: " + std::to_string(id));
-    }
+#if USE_WEBSOCKET
+	std::mutex ready_lk;
+	std::atomic<bool> ready = false;
 
-    void listen(const std::string& signaling_server_url) {
-		yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&this_server_id), sizeof(this_server_id));
+	rtc::WebSocket ws;
 
-		const auto this_server_id_str = ::get_hex_representation(this_server_id);
-		const auto url = signaling_server_url + "/" + this_server_id_str; 
+	void mark_ready() {
+        set_message("WebSocket server connected, ready for clients.");
 
-		setup_websocket(url);
-    }
+		std::scoped_lock lock(ready_lk);
+		ready = true;
+	}
 
-	void setup_websocket(const std::string& url) {
-        ws.onOpen([this]() {
-            set_message("WebSocket server connected, ready for clients.");
+	static void setup_websocket(
+		this_sptr self,
+		const std::string& url
+	) {
+		auto& ws = self->ws;
+
+		ws.onOpen([wself = std::weak_ptr(self)]() {
+			if (auto self = wself.lock()) {
+				self->mark_ready();
+			}
         });
 
-        ws.onMessage([this](const rtc::message_variant& data) {
-			if (!std::holds_alternative<std::string>(data))
-				return;
+		ws.onMessage([wself = std::weak_ptr(self)](const rtc::message_variant& data) {
+			if (auto self = wself.lock()) {
+				if (!std::holds_alternative<std::string>(data))
+					return;
 
-			auto json_message = nlohmann::json::parse(std::get<std::string>(data));
-            handle_message(json_message);
+				auto json_message = nlohmann::json::parse(std::get<std::string>(data));
+				handle_message(self, json_message);
+			}
         });
 
-        ws.onError([this](const std::string& error) {
-            set_message("WebSocket error: " + error);
+		ws.onError([wself = std::weak_ptr(self)](const std::string& error) {
+			if (auto self = wself.lock()) {
+				self->set_message("WebSocket error: " + error);
+			}
         });
 
-        ws.onClosed([this]() {
-            set_message("WebSocket closed.");
+		ws.onClosed([wself = std::weak_ptr(self)]() {
+			if (auto self = wself.lock()) {
+				self->set_message("WebSocket closed.");
+			}
         });
 
-		ws.open(add_ws_preffix(url));
+		main_thread_queue::execute([&]() { ws.open(add_ws_preffix(url)); });
     }
 
-	void handle_message(const nlohmann::json& message) {
-		std::scoped_lock lock(connections_lk);  
+	void answer_json(const std::string& json) {
+		main_thread_queue::execute([&]() { ws.send(json); });
+	}
+
+#else
+	// TODO_SECURITY: use proper secure channels
+	std::unordered_map<uint64_t, double> masterserver_received_messages;
+
+	struct pending_signalling_packet {
+		uint64_t guid = 0;
+		std::string message;
+		int times = 5;
+	};
+
+	double when_last_sent_packets = -1;
+	std::vector<pending_signalling_packet> pending_packets;
+
+	void answer_json(const std::string& json) {
+		pending_signalling_packet packet;
+		yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&packet.guid), sizeof(packet.guid));
+
+		packet.message = json;
+
+		pending_packets.emplace_back(std::move(packet));
+	}
+
+#endif
+
+	void receive(client_id id, const rtc::message_variant& message) {
+		if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
+			std::scoped_lock lock(packets_lk);
+			received_packets.push({id, *bytes});
+		}
+	}
+
+	static void handle_message(this_sptr self, const nlohmann::json& message) {
+		std::scoped_lock lock(self->connections_lk);  
 		auto external_id = message["id"].get<std::string>();
 		auto type = message["type"].get<std::string>();
 
+		auto& id_map = self->id_map;
+		auto& pcs = self->pcs;
+
 		if (type == "offer") {
 			if (id_map.find(external_id) == id_map.end()) {
-				const auto id = assign_client_id();
+				const auto id = self->assign_client_id();
 
 				if (id < max_clients) {
 					id_map[external_id] = id;
-					auto pc = setup_peer_connection(id, external_id);
+					auto pc = setup_peer_connection(self, id, external_id);
 					pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
 				} else {
-					set_message("Max clients reached, cannot assign new ID");
+					self->set_message("Max clients reached, cannot assign new ID");
 					return;
 				}
 			}
@@ -199,62 +247,233 @@ struct webrtc_server_detail {
 				}
 			}
 			else {
-				set_message("Received a candidate for an unknown session ID");
+				self->set_message("Received a candidate for an unknown session ID");
 			}
 		}
 	}
 
-    client_id assign_client_id() {
-        for (client_id id = 0; id < max_clients; ++id) {
-            if (pcs.find(id) == pcs.end()) {
-                return id;
-            }
-        }
+    static std::shared_ptr<rtc::PeerConnection> setup_peer_connection(this_sptr self, client_id id, std::string external_id) {
+		auto pc = std::make_shared<rtc::PeerConnection>(self->config);
+		self->pcs[id] = pc;
 
-        return max_clients; // Indicate that no IDs are available
-    }
+		pc->onDataChannel([wself = std::weak_ptr(self), id](std::shared_ptr<rtc::DataChannel> dc) {
+			if (auto self = wself.lock()) {
+				{
+					std::scoped_lock lock(self->connections_lk);
+					self->dcs[id] = dc;
+				}
 
-    std::shared_ptr<rtc::PeerConnection> setup_peer_connection(client_id id, std::string external_id) {
-        auto pc = std::make_shared<rtc::PeerConnection>(config);
-        pcs[id] = pc;
-
-        pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
-			{
-				std::scoped_lock lock(connections_lk);
-				dcs[id] = dc;
+				setup_data_channel_handlers(self, id, dc);
 			}
-
-            setup_data_channel_handlers(id, dc);
         });
 
-		pc->onLocalDescription([this, external_id](const rtc::Description& description) {
-			nlohmann::json message = {{"id", external_id},
-			{"type", description.typeString()},
-			{"description", std::string(description)}};
+		pc->onLocalDescription([wself = std::weak_ptr(self), external_id](const rtc::Description& description) {
+			if (auto self = wself.lock()) {
+				nlohmann::json message = {{"id", external_id},
+				{"type", description.typeString()},
+				{"description", std::string(description)}};
 
-			ws.send(message.dump());
+				self->answer_json(message.dump());
+			}
 		});
 
-		pc->onLocalCandidate([this, external_id](const rtc::Candidate& candidate) {
-			nlohmann::json message = {{"id", external_id},
-							{"type", "candidate"},
-							{"candidate", std::string(candidate)},
-							{"mid", candidate.mid()}};
+		pc->onLocalCandidate([wself = std::weak_ptr(self), external_id](const rtc::Candidate& candidate) {
+			if (auto self = wself.lock()) {
+				nlohmann::json message = {{"id", external_id},
+				{"type", "candidate"},
+				{"candidate", std::string(candidate)},
+				{"mid", candidate.mid()}};
 
-			ws.send(message.dump());
+				self->answer_json(message.dump());
+			}
 		});
 
         return pc;
     }
 
-    void setup_data_channel_handlers(client_id id, std::shared_ptr<rtc::DataChannel> dc) {
-        dc->onMessage([this, id](const rtc::message_variant& message) {
-            if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
-                std::scoped_lock lock(packets_lk);
-                received_packets.push({id, *bytes});
-            }
+    static void setup_data_channel_handlers(this_sptr self, const client_id id, std::shared_ptr<rtc::DataChannel> dc) {
+		dc->onMessage([wself = std::weak_ptr(self), id](const rtc::message_variant& message) {
+			if (auto self = wself.lock()) {
+				self->receive(id, message);
+			}
         });
     }
+
+public:
+
+#if USE_WEBSOCKET
+    static void listen(
+		this_sptr self,
+		const std::string& signaling_server_url,
+		const std::vector<rtc::IceServer>& iceServers
+	) {
+		self->config.iceServers = iceServers;
+		const auto url = signaling_server_url;
+		setup_websocket(self, url);
+    }
+
+	bool is_ready() {
+		std::scoped_lock lock(ready_lk);
+		return ready;
+	}
+#else
+	static void listen(
+		this_sptr,
+		const std::string&,
+		const std::vector<rtc::IceServer>&
+	) {
+
+	}
+
+	bool is_ready() {
+		return true;
+	}
+
+	static void handle_message(
+		this_sptr self,
+		const masterserver_out::webrtc_signalling_payload& p
+	) {
+		const auto guid = std::bit_cast<uint64_t>(p.message_guid);
+
+		if (!found_in(self->masterserver_received_messages, guid)) {
+			self->masterserver_received_messages.try_emplace(guid, augs::high_precision_secs());
+
+			try {
+				auto json_message = nlohmann::json::parse(p.message);
+				handle_message(self, json_message);
+			}
+			catch (...) {
+
+			}
+		}
+	}
+
+#endif
+
+	void send(client_id id, const std::byte* data, size_t size) {
+		packets_to_send.emplace_back(packet{ id, { data, data + size } });
+	}
+
+	static void send_pending_packets(this_sptr self) {
+		if (self->packets_to_send.empty()) {
+			return;
+		}
+
+		main_thread_queue::execute_async([wself = std::weak_ptr(self), packets = self->packets_to_send]() { 
+			auto self = wself.lock();
+
+			if (!self) {
+				return;
+			}
+
+			std::scoped_lock lock(self->connections_lk);
+
+			auto& dcs = self->dcs;
+
+			for (const auto& p : packets) {
+				const auto id = p.client_id;
+
+				if (dcs.count(id)) {
+					const auto dc = dcs.at(id);
+
+					if (dc->isOpen()) {
+						dc->send(p.bytes);
+					}
+				}
+			}
+		});
+
+		self->packets_to_send.clear();
+	}
+
+#if USE_WEBSOCKET
+	void send_ws(const rtc::binary& msg) {
+		main_thread_queue::execute([&]() { ws.send(msg); });
+	}
+#else
+	template <class P>
+	void send_signalling_packets(P send) {
+		const auto current_time = augs::high_precision_secs();
+
+		if (current_time - when_last_sent_packets > 0.1) {
+			for (auto& p : pending_packets) {
+				masterserver_in::webrtc_signalling_payload payload;
+				payload.message = p.message;
+				LOG_NVPS(p.message, p.guid);
+				payload.message_guid = std::bit_cast<int64_t>(p.guid);
+
+				send(payload);
+
+				p.times--;
+			}
+
+			when_last_sent_packets = current_time;
+		}
+
+		erase_if(pending_packets, [](const auto& p) { return p.times <= 0; });
+	}
+
+	void clean_old_entries() {
+		const auto c = augs::high_precision_secs();
+
+		erase_if(
+			masterserver_received_messages,
+			[c](auto& e) {
+				return c - e.second > 20.0;
+			}
+		);
+	}
+#endif
+
+    std::optional<packet> receive_next_packet() {
+        std::scoped_lock lk(packets_lk);
+        if (received_packets.empty()) {
+            return std::nullopt;
+        }
+        auto next = received_packets.front();
+        received_packets.pop();
+        return next;
+    }
+
+	void disconnect(const client_id id) {
+		main_thread_queue::execute([&](){
+			/*
+				Note we don't need this called in onClosed events,
+				because if transport is broken for any reason,
+				the client will timeout and the game server will eventually call this synchronously.
+			*/
+
+			{
+				std::scoped_lock lock(connections_lk);
+
+				if (dcs.count(id)) {
+					dcs.erase(id);
+				}
+
+				if (pcs.count(id)) {
+					pcs.erase(id);
+				}
+
+				std::erase_if(
+					id_map, 
+					[id](const auto& pair) { return pair.second == id; }
+				);
+			}
+
+			set_message("Disconnected client: " + std::to_string(id));
+		});
+	}
+
+	~webrtc_server_detail() {
+		main_thread_queue::execute([&](){
+			std::scoped_lock lock(connections_lk);
+			dcs.clear();
+			pcs.clear();
+#if USE_WEBSOCKET
+			ws.close();
+#endif
+		});
+	}
 };
 #else
 #error "Not implemented"
@@ -268,6 +487,8 @@ bool server_setup::is_webrtc_only() {
 #endif
 }
 
+std::vector<rtc::IceServer> get_ice_servers();
+
 server_setup::server_setup(
 	sol::state& lua,
 	const packaged_official_content& official,
@@ -276,7 +497,9 @@ server_setup::server_setup(
 	const server_private_vars& private_initial_vars,
 	const client_vars& integrated_client_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
+#if BUILD_NATIVE_SOCKETS
 	const server_nat_traversal_input& nat_traversal_input,
+#endif
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
 	const std::string& webrtc_signalling_server_url
@@ -304,8 +527,10 @@ server_setup::server_setup(
 			is_webrtc_only()
 		)
 	),
-	server_time(yojimbo_time()),
+	server_time(server_setup::get_current_time()),
+#if BUILD_NATIVE_SOCKETS
 	nat_traversal(nat_traversal_input, resolved_server_list_addr),
+#endif
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
@@ -321,8 +546,12 @@ server_setup::server_setup(
 #endif
 
 	if (use_webrtc) {
-		webrtc_server = std::make_unique<webrtc_server_detail>();
-		webrtc_server->listen(webrtc_signalling_server_url);
+		webrtc_server = std::make_shared<webrtc_server_detail>();
+		webrtc_server->listen(
+			webrtc_server,
+			webrtc_signalling_server_url,
+			::get_ice_servers()
+		);
 	}
 
 	{
@@ -345,7 +574,7 @@ server_setup::server_setup(
 	}
 
 	if (dedicated == std::nullopt) {
-		integrated_client.init(server_time, next_session_id++);
+		integrated_client.init(server_time, next_session_id++, yojimbo::Address("0.0.0.0", 0));
 		integrated_client.state = client_state_type::IN_GAME;
 		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
 
@@ -407,11 +636,15 @@ bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const
 		}
 	}
 
+#if BUILD_NATIVE_SOCKETS
 	if (handle_gameserver_command(from, packet, n)) {
 		return true;
 	}
 
 	return nat_traversal.handle_auxiliary_command(from, packet, n); 
+#else
+	return false;
+#endif
 }
 
 bool server_setup::send_packet_override(
@@ -431,7 +664,7 @@ bool server_setup::send_packet_override(
 
 int server_setup::receive_packet_override(netcode_address_t& from, std::byte* buffer, int bytes) {
 	if (webrtc_server != nullptr) {
-		if (const auto packet = webrtc_server->receive_packet()) {
+		if (const auto packet = webrtc_server->receive_next_packet()) {
 			from = ::make_internal_webrtc_address(packet->client_id);
 
 			const auto bytes_read = std::min(bytes, static_cast<int>(packet->bytes.size()));
@@ -449,6 +682,11 @@ void server_setup::reset_afk_timer() {
 }
 
 void server_setup::send_goodbye_to_masterserver() {
+#if PLATFORM_WEB
+	/*
+		Unnecessary; socket close will trigger peer removal and list reserialization on the masterserver.
+	*/
+#elif BUILD_NATIVE_SOCKETS
 	if (has_sent_any_heartbeats() && resolved_server_list_addr.has_value()) {
 		const auto destination_address = resolved_server_list_addr.value();
 
@@ -459,6 +697,7 @@ void server_setup::send_goodbye_to_masterserver() {
 			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
 		}
 	}
+#endif
 }
 
 void server_setup::shutdown() {
@@ -532,6 +771,10 @@ std::optional<T> GetIf(F& from, const std::string& label) {
 }
 
 void server_setup::request_auth(mode_player_id player_id, const steam_auth_request_payload& payload) {
+#if PLATFORM_WEB
+	(void)player_id;
+	(void)payload;
+#else
 	const auto api_key = private_vars.steam_web_api_key;
 	const auto& ticket = payload.ticket_bytes;
 	const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
@@ -595,6 +838,7 @@ void server_setup::request_auth(mode_player_id player_id, const steam_auth_reque
 			}
 		}
 	);
+#endif
 }
 
 void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
@@ -828,6 +1072,25 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 	}
 }
 
+#if PLATFORM_WEB
+void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupted_message&) {}
+void server_setup::push_match_summary_webhook(const messages::match_summary_message&) {}
+void server_setup::push_report_match_webhook(const messages::match_summary_message&) {}
+void server_setup::push_duel_of_honor_webhook(const std::string&, const std::string&) {}
+void server_setup::push_connected_webhook(mode_player_id) {}
+void server_setup::finalize_webhook_jobs() {}
+bool server_setup::handle_masterserver_response(
+	const netcode_address_t&,
+	const std::byte*,
+	const std::size_t
+) { return false; }
+
+void server_setup::send_tell_me_my_address_if_its_time() {}
+void server_setup::send_tell_me_my_address() {}
+void server_setup::resolve_server_list() {}
+void server_setup::resolve_heartbeat_host_if_its_time() {}
+void server_setup::resolve_internal_address_if_its_time() {}
+#else
 std::string server_setup::get_next_duel_pic_link() {
 	auto pattern = vars.webhooks.duel_of_honor_pic_link_pattern;
 	auto duel_pic_i = duel_pic_counter % vars.webhooks.num_duel_pics;
@@ -1199,75 +1462,6 @@ bool server_setup::handle_masterserver_response(
 	return false;
 }
 
-bool server_setup::handle_gameserver_command(
-	const netcode_address_t& from,
-	const std::byte* packet_buffer,
-	const std::size_t packet_bytes
-) {
-	auto handle = [&](const auto& typed_request) {
-		using T = remove_cref<decltype(typed_request)>;
-
-		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
-			const auto sequence = typed_request.sequence;
-			LOG("Received ping request from: %x (sequence: %x / %f)", ::ToString(from), sequence, augs::bit_cast<double>(sequence));
-
-			auto response = gameserver_ping_response();
-			response.sequence = sequence;
-
-			auto bytes = augs::to_bytes(response);
-			server->send_udp_packet(from, bytes.data(), bytes.size());
-
-			return true;
-		}
-		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
-			// handled elsewhere
-		}
-		else {
-			static_assert(always_false_v<T>, "Non-exhaustive");
-		}
-
-		return false;
-	};
-
-	try {
-		const auto request = read_gameserver_command(packet_buffer, packet_bytes);
-		return std::visit(handle, request);
-	}
-	catch (const augs::stream_read_error&) {
-
-	}
-
-	return false;
-}
-
-uint32_t server_setup::get_num_slots() const {
-	return last_start.slots;
-}
-
-uint32_t server_setup::get_num_connected() const {
-	const auto& arena = get_arena_handle();
-
-	return arena.on_mode_with_input(
-		[&](const auto& mode, const auto&) {
-			return mode.get_num_players();
-		}
-	);
-}
-
-uint32_t server_setup::get_num_active_players() const {
-	const auto& arena = get_arena_handle();
-
-	return arena.on_mode_with_input(
-		[&](const auto& mode, const auto&) {
-			return mode.get_num_active_players();
-		}
-	);
-}
-
-bool server_setup::is_playtesting_server() const {
-	return vars.playtesting_context.has_value();
-}
-
 void server_setup::send_tell_me_my_address_if_its_time() {
 	if (is_dedicated()) {
 		/* 
@@ -1320,121 +1514,28 @@ void server_setup::send_tell_me_my_address() {
 	server->send_udp_packet(destination_address, bytes.data(), bytes.size());
 }
 
-game_mode_name_type server_setup::get_current_game_mode_name() const {
-	return get_arena_handle().on_mode_with_input(
-		[&](const auto& mode, const auto& input) {
-			return mode.get_name(input);
-		}
-	);
+std::string server_setup::get_steam_join_command_line() const {
+	if (external_address.has_value()) {
+		return typesafe_sprintf("%x", ::ToString(*external_address));
+	}
+
+	return "";
 }
 
-bool server_setup::is_ranked_server() const {
-	return vars.ranked.autostart_when != ranked_autostart_type::NEVER;
-}
+void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
+	const auto player_group_identifier = get_steam_join_command_line();
 
-void server_setup::send_heartbeat_to_server_list() {
-	ensure(resolved_server_list_addr.has_value());
-
-	const auto& arena = get_arena_handle();
-
-	server_heartbeat heartbeat;
-
-	heartbeat.nat = nat_traversal.last_detected_nat;
-
-	if (webrtc_server) {
-		heartbeat.webrtc_server_id = webrtc_server->this_server_id;
-	}
-
-#if PLATFORM_WEB
-	heartbeat.is_webrtc_only_server = true;
-#endif
-
-	if (!vars.allow_nat_traversal) {
-		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
-	}
-
-	heartbeat.require_authentication = vars.requires_authentication();
-
-	if (is_ranked_server()) {
-		if (is_ranked_live_or_starting()) {
-			heartbeat.ranked_state = 2;
-		}
-		else {
-			heartbeat.ranked_state = 1;
-		}
-	}
-	else {
-		heartbeat.ranked_state = 0;
-	}
-
-	heartbeat.server_name = get_server_name();
-	heartbeat.current_arena = get_current_arena_name();
-	heartbeat.game_mode = get_current_game_mode_name();
-
-	heartbeat.suppress_new_community_server_webhook = 
-		suppress_community_server_webhook_this_run ||
-		vars.suppress_new_community_server_webhook
-	;
-
-	heartbeat.internal_network_address = internal_address;
-
-	heartbeat.num_online = get_num_connected();
-
-	if (is_joinable()) {
-		heartbeat.max_online = get_num_slots();
-	}
-	else {
-		heartbeat.max_online = heartbeat.num_online;
-	}
-
-	heartbeat.server_version = hypersomnia_version().get_version_string();
-	heartbeat.is_editor_playtesting_server = is_playtesting_server();
-
-	arena.on_mode_with_input(
-		[&heartbeat](const auto& mode, const auto&) {
-			auto fill = [&](const auto faction, auto& target) {
-				thread_local std::vector<server_heartbeat_player_info> players;
-				players.clear();
-
-				mode.for_each_player_in(
-					faction,
-					[&](const auto, const auto& player) {
-						auto converted = [](auto i) {
-							return static_cast<uint8_t>(std::clamp(i, 0, 255));
-						};
-
-						players.push_back({ player.get_nickname(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
-					}
-				);
-
-				sort_range(players);
-				target.assign(players.begin(), players.begin() + std::min(players.size(), target.max_size()));
-			};
-
-			fill(faction_type::RESISTANCE, heartbeat.players_resistance);
-			fill(faction_type::METROPOLIS, heartbeat.players_metropolis);
-			fill(faction_type::SPECTATOR, heartbeat.players_spectating);
-
-			heartbeat.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
-			heartbeat.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
-		}
+	::get_arena_steam_rich_presence_pairs(
+		pairs,
+		get_current_arena_name(),
+		get_arena_handle(),
+		get_integrated_player_id(),
+		false,
+		player_group_identifier
 	);
 
-	heartbeat.validate();
-	heartbeat_buffer.clear();
-
-	{
-		auto ss = augs::ref_memory_stream(heartbeat_buffer);
-		augs::write_bytes(ss, masterserver_request(std::move(heartbeat)));
-	}
-
-	const auto heartbeat_bytes = heartbeat_buffer.size();
-
-	if (heartbeat_bytes > 0) {
-		const auto destination_address = resolved_server_list_addr.value();
-		LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
-
-		server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_bytes);
+	if (const auto join_cmd = get_steam_join_command_line(); !join_cmd.empty()) {
+		pairs.push_back({ "connect", join_cmd });
 	}
 }
 
@@ -1445,12 +1546,11 @@ void server_setup::resolve_server_list() {
 
 	const auto& in = vars.notified_server_list;
 
-	LOG("Requesting resolution of server_list address at %x", in.address);
-	future_resolved_server_list_addr = async_resolve_address(in);
-}
+	LOG("Requesting resolution of server_list address at %x", in);
 
-bool server_setup::server_list_enabled() const {
-	return server->is_running() && vars.notified_server_list.address.size() > 0;
+	if (auto parsed = parsed_url(in); parsed.valid()) {
+		future_resolved_server_list_addr = async_resolve_address({ parsed.host, port_type(parsed.port) });
+	}
 }
 
 void server_setup::resolve_heartbeat_host_if_its_time() {
@@ -1521,6 +1621,221 @@ void server_setup::resolve_internal_address_if_its_time() {
 	}
 }
 
+bool server_setup::handle_gameserver_command(
+	const netcode_address_t& from,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) {
+	auto handle = [&](const auto& typed_request) {
+		using T = remove_cref<decltype(typed_request)>;
+
+		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
+			const auto sequence = typed_request.sequence;
+			LOG("Received ping request from: %x (sequence: %x / %f)", ::ToString(from), sequence, augs::bit_cast<double>(sequence));
+
+			auto response = gameserver_ping_response();
+			response.sequence = sequence;
+
+			auto bytes = augs::to_bytes(response);
+			server->send_udp_packet(from, bytes.data(), bytes.size());
+
+			return true;
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
+			// handled elsewhere
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
+			LOG("webrtc_signalling_payload");
+
+			if (webrtc_server) {
+				webrtc_server->handle_message(webrtc_server, typed_request);
+			}
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive");
+		}
+
+		return false;
+	};
+
+	try {
+		const auto request = read_gameserver_command(packet_buffer, packet_bytes);
+		return std::visit(handle, request);
+	}
+	catch (const augs::stream_read_error&) {
+
+	}
+
+	return false;
+}
+
+bool server_setup::server_list_enabled() const {
+	return server->is_running() && vars.notified_server_list.size() > 0;
+}
+#endif
+
+
+uint32_t server_setup::get_num_slots() const {
+	return last_start.slots;
+}
+
+uint32_t server_setup::get_num_connected() const {
+	const auto& arena = get_arena_handle();
+
+	return arena.on_mode_with_input(
+		[&](const auto& mode, const auto&) {
+			return mode.get_num_players();
+		}
+	);
+}
+
+uint32_t server_setup::get_num_active_players() const {
+	const auto& arena = get_arena_handle();
+
+	return arena.on_mode_with_input(
+		[&](const auto& mode, const auto&) {
+			return mode.get_num_active_players();
+		}
+	);
+}
+
+bool server_setup::is_playtesting_server() const {
+	return vars.playtesting_context.has_value();
+}
+
+game_mode_name_type server_setup::get_current_game_mode_name() const {
+	return get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& input) {
+			return mode.get_name(input);
+		}
+	);
+}
+
+bool server_setup::is_ranked_server() const {
+	return vars.ranked.autostart_when != ranked_autostart_type::NEVER;
+}
+
+void server_setup::send_heartbeat_to_server_list() {
+#if BUILD_NATIVE_SOCKETS
+	ensure(resolved_server_list_addr.has_value());
+#endif
+
+	const auto& arena = get_arena_handle();
+
+	server_heartbeat heartbeat;
+
+#if BUILD_NATIVE_SOCKETS
+	heartbeat.nat = nat_traversal.last_detected_nat;
+#endif
+
+	if (!vars.allow_nat_traversal) {
+		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
+	}
+
+	heartbeat.require_authentication = vars.requires_authentication();
+
+	if (is_ranked_server()) {
+		if (is_ranked_live_or_starting()) {
+			heartbeat.ranked_state = 2;
+		}
+		else {
+			heartbeat.ranked_state = 1;
+		}
+	}
+	else {
+		heartbeat.ranked_state = 0;
+	}
+
+	heartbeat.server_name = get_server_name();
+	heartbeat.current_arena = get_current_arena_name();
+	heartbeat.game_mode = get_current_game_mode_name();
+
+	heartbeat.suppress_new_community_server_webhook = 
+		suppress_community_server_webhook_this_run ||
+		vars.suppress_new_community_server_webhook
+	;
+
+#if BUILD_NATIVE_SOCKETS
+	heartbeat.internal_network_address = internal_address;
+#endif
+
+	heartbeat.num_online = get_num_connected();
+
+	if (is_joinable()) {
+		heartbeat.max_online = get_num_slots();
+	}
+	else {
+		heartbeat.max_online = heartbeat.num_online;
+	}
+
+	heartbeat.server_version = hypersomnia_version().get_version_string();
+	heartbeat.is_editor_playtesting_server = is_playtesting_server();
+
+	arena.on_mode_with_input(
+		[&heartbeat](const auto& mode, const auto&) {
+			auto fill = [&](const auto faction, auto& target) {
+				thread_local std::vector<server_heartbeat_player_info> players;
+				players.clear();
+
+				mode.for_each_player_in(
+					faction,
+					[&](const auto, const auto& player) {
+						auto converted = [](auto i) {
+							return static_cast<uint8_t>(std::clamp(i, 0, 255));
+						};
+
+						players.push_back({ player.get_nickname(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
+					}
+				);
+
+				sort_range(players);
+				target.assign(players.begin(), players.begin() + std::min(players.size(), target.max_size()));
+			};
+
+			fill(faction_type::RESISTANCE, heartbeat.players_resistance);
+			fill(faction_type::METROPOLIS, heartbeat.players_metropolis);
+			fill(faction_type::SPECTATOR, heartbeat.players_spectating);
+
+			heartbeat.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
+			heartbeat.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
+		}
+	);
+
+	heartbeat.validate();
+	heartbeat_buffer.clear();
+
+#if PLATFORM_WEB
+	{
+		auto ss = augs::ref_memory_stream(heartbeat_buffer);
+		augs::write_bytes(ss, heartbeat);
+	}
+#else
+	{
+		auto ss = augs::ref_memory_stream(heartbeat_buffer);
+		augs::write_bytes(ss, masterserver_request(std::move(heartbeat)));
+	}
+#endif
+
+	const auto heartbeat_bytes = heartbeat_buffer.size();
+
+	if (heartbeat_bytes > 0) {
+#if PLATFORM_WEB
+		if (webrtc_server && webrtc_server->is_ready()) {
+			LOG("Sending heartbeat through websocket to signalling server. Bytes: %x", heartbeat_bytes);
+			webrtc_server->send_ws(heartbeat_buffer);
+		}
+		else {
+			LOG("Can't send heartbeat, websocket connection to signalling server is not ready.");
+		}
+#else
+		const auto destination_address = resolved_server_list_addr.value();
+		LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
+
+		server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_bytes);
+#endif
+	}
+}
+
 void server_setup::request_immediate_heartbeat() {
 	when_last_sent_heartbeat_to_server_list = 0;
 	LOG("Requesting immediate heartbeat to the server list.");
@@ -1531,15 +1846,29 @@ bool server_setup::has_sent_any_heartbeats() const {
 }
 
 void server_setup::send_heartbeat_to_server_list_if_its_time() {
+#if PLATFORM_WEB
+	if (!server->is_running()) {
+		return;
+	}
+
+	if (webrtc_server && !webrtc_server->is_ready()) {
+		return;
+	}
+
+	const int times_to_send_first_time = 1;
+#else
 	if (!server_list_enabled()) {
 		return;
 	}
 
-	auto& when_last = when_last_sent_heartbeat_to_server_list;
-
 	if (resolved_server_list_addr == std::nullopt) {
 		return;
 	}
+
+	const int times_to_send_first_time = 4;
+#endif
+
+	auto& when_last = when_last_sent_heartbeat_to_server_list;
 
 	const auto since_last = server_time - when_last;
 	const auto send_every = std::clamp(vars.send_heartbeat_to_server_list_once_every_secs, 1u, 60u);
@@ -1547,7 +1876,7 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 	const bool send_for_the_first_time = !has_sent_any_heartbeats();
 
 	if (send_for_the_first_time || since_last >= send_every) {
-		const auto times = when_last == 0 ? 4 : 1;
+		const auto times = when_last == 0 ? times_to_send_first_time : 1;
 
 		for (int i = 0; i < times; ++i) {
 			send_heartbeat_to_server_list();
@@ -1676,14 +2005,15 @@ std::string server_setup::describe_client(const client_id_type id) const {
 	std::string nickname = find_client_nickname(id);
 
 	return typesafe_sprintf(
-		"Id: %x\nNickname%x",
+		"Id: %x\nNickname%x\nIP:%x",
 		id,
-		nickname.empty() ? std::string(" unknown") : std::string(": " + nickname)
+		nickname.empty() ? std::string(" unknown") : std::string(": " + nickname),
+		::ToString(get_client_address(id))
 	);
 }
 
 net_time_t server_setup::get_current_time() {
-	return yojimbo_time();
+	return augs::high_precision_secs();
 }
 
 void server_setup::customize_for_viewing(config_lua_table& config) const {
@@ -2013,25 +2343,41 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }
 
+yojimbo::Address server_setup::get_client_address(const client_id_type& id) const {
+	return clients[id].address;
+}
+
 void server_setup::init_client(const client_id_type& id) {
 	auto& new_client = clients[id];
-	new_client.init(server_time, next_session_id++);
+
+	auto new_address = yojimbo::Address("0.0.0.0", 0);
+
+	if (const auto addr = server->get_client_address(id)) {
+		new_address = ::to_yojimbo_addr(*addr);
+	}
+
+	new_client.init(server_time, next_session_id++, new_address);
 
 	LOG("Client %x connected. SID: %x", id, new_client.session_id);
 }
 
 void server_setup::unset_client(const client_id_type& id) {
 	LOG("Client disconnected. Details:\n%x", describe_client(id));
-	clients[id].unset();
 
 	if (webrtc_server) {
-		const auto address = to_netcode_addr(server->get_client_address(id));
+		const auto address = to_netcode_addr(get_client_address(id));
 
 		if (::is_internal_webrtc_address(address)) {
+			LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
 			const auto client_webrtc_id = address.port;
 			webrtc_server->disconnect(client_webrtc_id);
 		}
+		else {
+			LOG("Not a WebRTC client.");
+		}
 	}
+
+	clients[id].unset();
 }
 
 void server_setup::disconnect_and_unset(const client_id_type& id) {
@@ -2596,6 +2942,10 @@ void server_setup::broadcast_shutdown_message() {
 	for (int i = 0; i < 10; ++i) {
 		server->send_packets();
 	}
+
+	if (webrtc_server) {
+		webrtc_server->send_pending_packets(webrtc_server);
+	}
 }
 
 void server_setup::schedule_shutdown() {
@@ -3022,12 +3372,15 @@ bool server_setup::send_file_chunk(const client_id_type client_id, const arena_f
 		}
 
 		if (auto s = find_underlying_socket()) {
-			auto address = to_netcode_addr(server->get_client_address(client_id));
+			auto address = to_netcode_addr(get_client_address(client_id));
 
 			const auto num_packet_bytes = sizeof(packet);
 			// LOG("sending chunk %x to %x (%x bytes). CMD: %x", chunk_index, ::ToString(address), num_packet_bytes, packet.command);
 			auto socket = *s;
-			netcode_socket_send_packet(&socket, &address, reinterpret_cast<void*>(&packet), num_packet_bytes);
+
+			if (!send_packet_override(address, reinterpret_cast<std::byte*>(&packet), num_packet_bytes)) {
+				netcode_socket_send_packet(&socket, &address, reinterpret_cast<void*>(&packet), num_packet_bytes);
+			}
 
 			return true;
 		}
@@ -3082,7 +3435,30 @@ void server_setup::send_packets_if_its_time() {
 
 		ticks_remaining = vars.send_packets_once_every_tick;
 		--ticks_remaining;
+
+		if (webrtc_server) {
+			webrtc_server->send_pending_packets(webrtc_server);
+		}
 	}
+
+#if BUILD_NATIVE_SOCKETS
+	if (webrtc_server) {
+		if (resolved_server_list_addr.has_value()) {
+			const auto destination_address = resolved_server_list_addr.value();
+
+			webrtc_server->send_signalling_packets(
+				[&](const auto& payload) {
+					const auto request = masterserver_request(payload);
+					auto bytes = augs::to_bytes(request);
+
+					server->send_udp_packet(destination_address, bytes.data(), bytes.size());
+				}
+			);
+		}
+
+		webrtc_server->clean_old_entries();
+	}
+#endif
 }
 
 double server_setup::get_inv_tickrate() const {
@@ -3308,15 +3684,15 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	const auto& c = clients[id];
 
 	if (vars.auto_authorize_loopback_for_rcon) {
-		if (server->get_client_address(id).IsLoopback()) {
+		if (get_client_address(id).IsLoopback()) {
 			LOG("Auto-authorizing the loopback client for master rcon.");
 			return rcon_level_type::MASTER;
 		}
 	}
 
 	if (vars.auto_authorize_internal_for_rcon) {
-		if (is_internal(to_netcode_addr(server->get_client_address(id)))) {
-			LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(server->get_client_address(id)));
+		if (is_internal(to_netcode_addr(get_client_address(id)))) {
+			LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(get_client_address(id)));
 			return rcon_level_type::MASTER;
 		}
 	}
@@ -3736,31 +4112,6 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 	}
 
 	c.downloading_status = type;
-}
-
-std::string server_setup::get_steam_join_command_line() const {
-	if (external_address.has_value()) {
-		return typesafe_sprintf("%x", ::ToString(*external_address));
-	}
-
-	return "";
-}
-
-void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
-	const auto player_group_identifier = get_steam_join_command_line();
-
-	::get_arena_steam_rich_presence_pairs(
-		pairs,
-		get_current_arena_name(),
-		get_arena_handle(),
-		get_integrated_player_id(),
-		false,
-		player_group_identifier
-	);
-
-	if (const auto join_cmd = get_steam_join_command_line(); !join_cmd.empty()) {
-		pairs.push_back({ "connect", join_cmd });
-	}
 }
 
 #define NETCODE_CONNECTION_REQUEST_PACKET           0

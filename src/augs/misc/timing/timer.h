@@ -33,4 +33,6 @@ namespace augs {
 			return augs::delta{ extract<std::chrono::seconds>() };
 		}
 	};
+
+	double high_precision_secs();
 }

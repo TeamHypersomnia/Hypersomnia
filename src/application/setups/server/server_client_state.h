@@ -7,6 +7,7 @@
 #include "application/network/requested_client_settings.h"
 #include "application/network/client_state_type.h"
 
+#include "3rdparty/yojimbo/include/yojimbo_address.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
 using client_pending_entropies = std::vector<total_client_entropy>;
@@ -21,6 +22,8 @@ using server_client_session_id = uint32_t;
 
 struct server_client_state {
 	using type = client_state_type;
+
+	yojimbo::Address address;
 
 	type state = type::NETCODE_NEGOTIATING_CONNECTION;
 	net_time_t when_connected = -1.0;
@@ -116,9 +119,10 @@ struct server_client_state {
 		return state != type::NETCODE_NEGOTIATING_CONNECTION;
 	}
 
-	void init(const net_time_t server_time, const uint32_t new_session_id) {
+	void init(const net_time_t server_time, const uint32_t new_session_id, const yojimbo::Address& new_address) {
 		ensure(!is_set());
 
+		address = new_address;
 		state = type::PENDING_WELCOME;
 		last_valid_payload_time = server_time;
 		when_connected = server_time;

@@ -103,7 +103,7 @@ struct server_vars {
 	std::optional<arena_playtesting_context> playtesting_context;
 
 	server_name_type server_name;
-	host_with_default_port notified_server_list;
+	address_string_type notified_server_list;
 	bool suppress_new_community_server_webhook = false;
 
 	bool allow_nat_traversal = true;

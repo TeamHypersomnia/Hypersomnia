@@ -5,8 +5,12 @@ struct server_list_entry_json {
 	// GEN INTROSPECTOR struct server_list_entry_json
 	std::string server_version;
 
+	bool is_official = false;
+	bool is_ranked = false;
+
 	std::string name;
 	std::string ip;
+	std::string webrtc_id;
 
 	double time_hosted = 0.0;
 	double time_last_heartbeat = 0.0;

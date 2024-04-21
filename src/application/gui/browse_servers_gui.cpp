@@ -19,7 +19,7 @@
 
 #include "application/network/resolve_address.h"
 
-#if BUILD_NETWORKING
+#if BUILD_NATIVE_SOCKETS
 #include "augs/network/netcode_utils.h"
 #include "augs/network/netcode_sockets.h"
 
@@ -118,7 +118,7 @@ static bool compare_servers(
 	}
 
 	/* Favor more recent one */
-	return a.time_hosted > b.time_hosted;
+	return a.meta.time_hosted > b.meta.time_hosted;
 }
 
 bool server_list_entry::is_set() const {
@@ -177,7 +177,8 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
             server_list_entry entry;
 
             augs::read_bytes(stream, entry.address);
-            augs::read_bytes(stream, entry.time_hosted);
+			augs::read_bytes(stream, entry.webrtc_id);
+            augs::read_bytes(stream, entry.meta);
             augs::read_bytes(stream, entry.heartbeat);
 
             new_server_list.emplace_back(std::move(entry));
@@ -305,17 +306,9 @@ void browse_servers_gui_state::refresh_server_pings() {
 	}
 }
 
-bool server_list_entry::only_webrtc() const {
-#if PLATFORM_WEB
-	return true;
-#else
-	return heartbeat.is_webrtc_only_server;
-#endif
-}
-
 std::string server_list_entry::get_connect_string() const {
-	if (only_webrtc()) {
-		return std::string("web://") + ::get_hex_representation(heartbeat.webrtc_server_id);
+	if (!webrtc_id.empty()) {
+		return webrtc_id;
 	}
 
 	if (!custom_connect_string.empty()) {
@@ -398,7 +391,7 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 	return false;
 }
 
-#if !PLATFORM_WEB
+#if BUILD_NATIVE_SOCKETS
 void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
 	auto packet_handler = [&](const auto& from, uint8_t* buffer, const int bytes_received) {
 		if (handle_gameserver_response(from, buffer, bytes_received)) {
@@ -703,7 +696,7 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto secs_ago = augs::date_time::secs_since_epoch() - s.time_hosted;
+		const auto secs_ago = augs::date_time::secs_since_epoch() - s.meta.time_hosted;
 		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
 
 		ImGui::NextColumn();
@@ -868,7 +861,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto by_appeared = [](const T& a, const T& b) {
-			return a->time_hosted > b->time_hosted;
+			return a->meta.time_hosted > b->meta.time_hosted;
 		};
 
 		auto make_comparator = [&](auto op1, auto op2, auto op3) {
@@ -1381,6 +1374,16 @@ bool server_details_gui_state::perform(
 	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
 	acquire_keyboard_once();
+
+	auto webrtc_id = std::string(entry.webrtc_id);
+
+	if (webrtc_id != "") {
+		auto link = "https://hypersomnia.io/game/" + webrtc_id;
+		input_text("WebRTC id", webrtc_id, ImGuiInputTextFlags_ReadOnly);
+		input_text("Link", link, ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::Separator();
+	}
 
 #if IS_PRODUCTION_BUILD
 	const bool censor_ips = true;

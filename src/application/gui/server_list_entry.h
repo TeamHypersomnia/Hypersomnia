@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/network/network_types.h"
 #include "application/masterserver/server_heartbeat.h"
+#include "application/masterserver/masterserver_client.h"
 
 enum class server_entry_state {
 	GIVEN_UP,
@@ -58,14 +59,14 @@ struct ping_progress {
 
 struct server_list_entry {
 	netcode_address_t address;
-	double time_hosted;
+	webrtc_id_type webrtc_id;
+	masterserver_entry_meta meta;
+
 	server_heartbeat heartbeat;
 	bool is_community_server = false;
 	std::string custom_connect_string;
 
 	ping_progress progress;
-
-	bool only_webrtc() const;
 
 	bool is_official_server() const {
 		return !is_community_server;

@@ -1697,11 +1697,13 @@ void settings_gui_state::perform(
 
 			case settings_pane::ADVANCED: {
 				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+
+				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
+
 #if PLATFORM_UNIX
 				revertable_checkbox("Map CAPS LOCK to ESC", config.window.map_caps_lock_to_esc);
 #endif
 
-				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
 
 				ImGui::Separator();
 
@@ -2159,7 +2161,11 @@ void do_server_vars(
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
 
-		revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
+		revertable_input_text(SCOPE_CFG_NVP(notified_server_list));
+
+#if !IS_PRODUCTION_BUILD
+		revertable_slider("Heartbeat interval (secs)", vars.send_heartbeat_to_server_list_once_every_secs, 1u, 50u);
+#endif
 		revertable_input_text(SCOPE_CFG_NVP(server_name));
 
 		revertable_checkbox(SCOPE_CFG_NVP(daily_autoupdate));

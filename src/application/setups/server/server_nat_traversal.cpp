@@ -163,6 +163,10 @@ bool server_nat_traversal::handle_auxiliary_command(
 			/* Handled elsewhere */
 			return;
 		}
+		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
+			/* Handled elsewhere */
+			return;
+		}
 		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
 			if (last_detected_nat.type == nat_type::PUBLIC_INTERNET) {
 				return;

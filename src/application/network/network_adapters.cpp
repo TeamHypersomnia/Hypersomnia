@@ -120,6 +120,27 @@ std::string resolve_address_result::report() const {
 	}
 }
 
+bool operator==(const netcode_address_t& a, const netcode_address_t& b) {
+	auto aa = a;
+	auto bb = b;
+	return 1 == netcode_address_equal(&aa, &bb);
+}
+
+bool operator!=(const netcode_address_t& a, const netcode_address_t& b) {
+	auto aa = a;
+	auto bb = b;
+	return 0 == netcode_address_equal(&aa, &bb);
+}
+
+bool host_equal(const netcode_address_t& a, const netcode_address_t& b) {
+	auto aa = a;
+	auto bb = b;
+	aa.port = 0;
+	bb.port = 0;
+
+	return 1 == netcode_address_equal(&aa, &bb);
+}
+
 std::string ToString(const yojimbo::Address& addr) {
 	char buffer[256];
 	addr.ToString(buffer, sizeof(buffer));
@@ -184,7 +205,7 @@ server_adapter::server_adapter(
 		yojimbo::Address(in.ip.c_str(), in.port), 
 		connection_config, 
 		adapter, 
-		yojimbo_time(),
+		augs::high_precision_secs(),
 		this
 	),
 	auxiliary_command_callback(auxiliary_command_callback),
@@ -197,6 +218,7 @@ server_adapter::server_adapter(
 		slots -= 1;
 	}
 
+	LOG("Starting yojimbo::Server.");
 	server.Start(std::max(1, slots));
 	LOG("Server address is %x", ToString(server.GetAddress()));
 
@@ -242,7 +264,7 @@ client_adapter::client_adapter(
 		preferred_binding_port ? yojimbo::Address("0.0.0.0", *preferred_binding_port) : yojimbo::Address("0.0.0.0"), 
 		connection_config, 
 		adapter, 
-		yojimbo_time(),
+		augs::high_precision_secs(),
 		this
 	),
 	auxiliary_command_callback(auxiliary_command_callback),
@@ -505,6 +527,7 @@ resolve_address_result resolve_address(const host_with_default_port& in) {
 	return out;
 }
 
+#if BUILD_NATIVE_SOCKETS
 std::optional<netcode_address_t> get_internal_network_address() {
 	const char* google_dns_server = "8.8.8.8";
 	int dns_port = 53;
@@ -538,7 +561,7 @@ std::optional<netcode_address_t> get_internal_network_address() {
 		return std::nullopt;
 	}
 
-	#if NETCODE_PLATFORM == NETCODE_PLATFORM_MAC || NETCODE_PLATFORM == NETCODE_PLATFORM_UNIX
+	#if NETCODE_PLATFORM == NETCODE_PLATFORM_MAC || NETCODE_PLATFORM == NETCODE_PLATFORM_UNIX || PLATFORM_WEB
 	close(sock);
 	#elif NETCODE_PLATFORM == NETCODE_PLATFORM_WINDOWS
 	closesocket(sock);
@@ -552,6 +575,7 @@ std::optional<netcode_address_t> get_internal_network_address() {
 std::future<std::optional<netcode_address_t>> async_get_internal_network_address() {
 	return launch_async([]() { return get_internal_network_address(); });
 }
+#endif
 
 void client_send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes) {
 	auto* adapter = reinterpret_cast<yojimbo::Client*>(context)->GetParent();
@@ -757,19 +781,8 @@ std::size_t server_adapter::num_connected_clients() const {
 	return server.GetNumConnectedClients();
 }
 
-yojimbo::Address server_adapter::get_client_address(const client_id_type& id) const {
-	if (const auto s = server.GetServerDetail()) {
-		auto addr = s->client_address[id];
-
-		char buffer[NETCODE_MAX_ADDRESS_STRING_LENGTH];
-		netcode_address_to_string(&addr, buffer);
-
-		return yojimbo::Address(buffer);
-	}
-	else {
-		LOG("WARNING! Trying to get_client_address with a null netcode_server_t!");
-		return yojimbo::Address();
-	}
+netcode_address_t* server_adapter::get_client_address(const client_id_type& id) const {
+	return server.GetClientAddress(id);
 }
 
 void server_adapter::send_udp_packet(const netcode_address_t& in_to, std::byte* const packet_data, const std::size_t packet_bytes) const {

@@ -78,7 +78,7 @@ public:
 		return inferred.flavour_ids.get_entities_by_flavour_id(id);
 	}
 	
-	std::size_t get_entities_count() const;
+	uint32_t get_entities_count() const;
 	
 	template <class E>
 	auto get_count_of() const {

@@ -5,6 +5,34 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- RARE, but there still is some leak in 
+	- 
+		ws.onClosed([wself = std::weak_ptr(self)]() {
+			if (auto self = wself.lock()) {
+				self->set_message("WebSocket closed.");
+			}
+		});
+		- even though self must still exist
+	- Also when reconnecting client:
+DOMException: The operation failed for an operation-specific reason
+    _rtcSendMessage http://localhost:6931/Hypersomnia.js:17228
+    browserIterationFunc http://localhost:6931/Hypersomnia.js:15583
+    callUserCallback http://localhost:6931/Hypersomnia.js:6708
+    runIter http://localhost:6931/Hypersomnia.js:7352
+    Browser_mainLoop_runner http://localhost:6931/Hypersomnia.js:7251
+    requestAnimationFrame http://localhost:6931/Hypersomnia.js:7647
+    Browser_mainLoop_scheduler_rAF http://localhost:6931/Hypersomnia.js:7119
+
+  	17228 was: dataChannel.send(byteArray);
+	- also when closing server:
+[04:34:57] server stopped Hypersomnia.js:2612:16
+<empty string>
+Invalid UTF-8 leading byte 0xffffffaa encountered when deserializing a UTF-8 string in wasm memory to a JS string!
+[04:34:57] h򘄰ێ7] Hypersomnia.js:2612:16
+[04:34:57] All demos are already compressed.
+	- this suggests that "this" already doesnt exist but onclosed is called only later somehow. - we assign to this->message and LOG it, which results in junk.
+		- what if theres more than one reference count for this?
+
 - WebGL glitches with a lot of vertices.
 	- implement imgui call in terms of glDrawArrays to avoid glitches
 		- glitchuje przy (cnt*3=11454, sizeof(vertex_triangle) * cnt=229080)

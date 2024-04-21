@@ -107,7 +107,7 @@ public:
 
 	std::size_t num_connected_clients() const;
 
-	yojimbo::Address get_client_address(const client_id_type& id) const;
+	netcode_address_t* get_client_address(const client_id_type& id) const;
 
 	void send_udp_packet(const netcode_address_t& to, std::byte*, std::size_t n) const;
 	const netcode_socket_t* find_underlying_socket() const;

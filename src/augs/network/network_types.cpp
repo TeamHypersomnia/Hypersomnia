@@ -29,7 +29,7 @@ LOG_NOFORMAT(Buffer);  // finaly print the text
 return 0;
 }
 
-#if BUILD_WEBRTC
+#if BUILD_WEBRTC && !PLATFORM_WEB
 void rtc_log_callback(rtc::LogLevel, std::string message) {
 	LOG_NOFORMAT(message);
 }
@@ -50,7 +50,13 @@ namespace augs {
 			yojimbo_set_assert_function(log_ensure);
 
 #if BUILD_WEBRTC
+#if !PLATFORM_WEB
+#if IS_PRODUCTION_BUILD
 			rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
+#else
+			rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
+#endif
+#endif
 			rtc::Preload();
 #endif
 

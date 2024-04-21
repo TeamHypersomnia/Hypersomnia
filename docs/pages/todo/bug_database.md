@@ -5,6 +5,20 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- server likely shouldn't stop when changing tab
+    - do workers still run?
+    - we're out of luck because packets will still not be sent so it will still stall/timeout
+
+- why the f is there nat traversal when connecting to 127.0.0.1?
+    - it works like this with a local masterserver - 127.0.0.1 is reported as external ip and is subsequently found on the server list as an entry when connecting.
+	- Fixed by disabling for internal addresses
+
+- test what happens when server list is empty
+    - works
+
+- fix memory leaks when closing webrtc connections (both client and server)
+    - done: using shared_ptr/weak_ptr, destructing and all important ops executed in the main thread
+
 - Nasty interpolation glitch when connecting -
 	- Referential cosmos needs to be snapped as well because we begin from spectator view which shows referential cosmos by default.
 	- the only "bug" left is when you go spectate during warmup since your player disappears and you go back to spectating at origin (0, 0) pos

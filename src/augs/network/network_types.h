@@ -51,6 +51,8 @@ constexpr std::size_t max_packet_size_v = 4 * 1024;
 constexpr std::size_t max_address_string_length_v = 255;
 constexpr std::size_t default_max_std_string_length_v = 1024 * 8;
 
+constexpr std::size_t max_signalling_udp_message_length_v = 1024 * 4;
+
 using webrtc_peer_id = std::array<uint8_t, 8>;
 
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
@@ -58,7 +60,9 @@ using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using arena_and_mode_identifier = augs::constant_size_string<max_arena_name_length_v + max_game_mode_name_length_v + 1>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
+using webrtc_id_type = address_string_type;
 using hour_and_minute_str = augs::constant_size_string<5>;
+using signalling_message_str = augs::constant_size_string<max_signalling_udp_message_length_v>;
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
 using version_timestamp_string = augs::constant_size_string<max_version_timestamp_length_v>;

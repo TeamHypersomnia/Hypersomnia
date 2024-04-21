@@ -39,6 +39,8 @@
 #include "augs/misc/maybe_official_path.h"
 
 #include "3rdparty/imgui/imgui.h"
+#include "augs/network/netcode_sockets.h"
+#include "application/masterserver/nat_traversal_step.h"
 
 #include "augs/misc/constant_size_string.h"
 /* Define several other traits which will validate properties of some other types. */
@@ -295,6 +297,7 @@ struct tests_of_traits {
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::enum_map<game_intent_type, vec2>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::enum_boolset<game_intent_type>>, "Trait has failed");
+	static_assert(!augs::is_byte_readwrite_appropriate_v<augs::memory_stream, masterserver_out::webrtc_signalling_payload>);
 	static_assert(is_container_v<std::vector<int>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<vec2>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<cosmos>>, "Trait has failed");

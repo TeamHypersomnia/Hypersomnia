@@ -130,6 +130,9 @@ as well as to test your skills in a laggy environment.
 		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
+#if PLATFORM_WEB
+		(void)currently_bound_port;
+#else
 		auto do_port = [&](const auto& label, auto& val) {
 			auto chosen_port = static_cast<int>(val);
 
@@ -214,10 +217,12 @@ as well as to test your skills in a laggy environment.
 		}
 
 #if IS_PRODUCTION_BUILD
-		if (!is_steam_client) {
+		const bool choose_instance = !is_steam_client;
 #else
-		if (true) {
+		const bool choose_instance = true;
 #endif
+
+		if (choose_instance) {
 			/* 
 				Don't show this on the Steam client because two Steam processes could mess something up.
 				CLI tools actually launch without Steam API but they read from the "user" folder so the user might be surprised.
@@ -238,6 +243,7 @@ as well as to test your skills in a laggy environment.
 			ImGui::Separator();
 		}
 
+#endif
 		text_disabled("See Settings->Server for more options to tweak.\n\n");
 
 		//text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");

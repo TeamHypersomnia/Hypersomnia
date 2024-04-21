@@ -20,6 +20,8 @@ netcode_address_t make_internal_webrtc_address(unsigned short client_identifier)
 std::string ToString(const yojimbo::Address&);
 std::string ToString(const netcode_address_t&);
 
+bool is_internal(const netcode_address_t& address);
+
 yojimbo::Address to_yojimbo_addr(const netcode_address_t& t);
 netcode_address_t to_netcode_addr(const yojimbo::Address& t);
 
@@ -30,5 +32,7 @@ std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port&
 resolve_address_result resolve_address(const host_with_default_port& in);
 std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in);
 
+#if BUILD_NATIVE_SOCKETS
 std::optional<netcode_address_t> get_internal_network_address();
 std::future<std::optional<netcode_address_t>> async_get_internal_network_address();
+#endif

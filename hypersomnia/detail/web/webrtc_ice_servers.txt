@@ -1,0 +1,2 @@
+stun.l.google.com:19302
+stun.1und1.de:3478

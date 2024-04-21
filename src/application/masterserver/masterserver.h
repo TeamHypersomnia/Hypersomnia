@@ -15,7 +15,9 @@ using masterserver_request = std::variant<
 	masterserver_in::goodbye,
 
 	masterserver_in::nat_traversal_step,
-	masterserver_in::stun_result_info
+	masterserver_in::stun_result_info,
+
+	masterserver_in::webrtc_signalling_payload
 >;
 
 using masterserver_response = std::variant<

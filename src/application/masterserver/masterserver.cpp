@@ -29,6 +29,9 @@
 #include "augs/network/netcode_utils.h"
 #include "augs/misc/httplib_utils.h"
 
+#include "application/masterserver/masterserver_client.h"
+#include "application/masterserver/signalling_server.h"
+
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
 
@@ -53,41 +56,12 @@ void MSR_LOG(Args&&... args) {
 #define MSR_LOG_NVPS MSR_LOG
 #endif
 
-struct masterserver_client_meta {
-	double time_hosted;
 
-	masterserver_client_meta() {
-		time_hosted = augs::date_time::secs_since_epoch();
-	}
+static void set_cors(httplib::Response& res) {
+	res.set_header("Access-Control-Allow-Origin", "*"); // Allows any domain
+	res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // Allowed methods
+	res.set_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 };
-
-struct masterserver_client {
-	double time_last_heartbeat;
-
-	masterserver_client_meta meta;
-	server_heartbeat last_heartbeat;
-};
-
-bool operator==(const netcode_address_t& a, const netcode_address_t& b) {
-	auto aa = a;
-	auto bb = b;
-	return 1 == netcode_address_equal(&aa, &bb);
-}
-
-bool operator!=(const netcode_address_t& a, const netcode_address_t& b) {
-	auto aa = a;
-	auto bb = b;
-	return 0 == netcode_address_equal(&aa, &bb);
-}
-
-bool host_equal(const netcode_address_t& a, const netcode_address_t& b) {
-	auto aa = a;
-	auto bb = b;
-	aa.port = 0;
-	bb.port = 0;
-
-	return 1 == netcode_address_equal(&aa, &bb);
-}
 
 void perform_masterserver(const config_lua_table& cfg) try {
 	using namespace httplib;
@@ -173,6 +147,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		return found_in(banlist_servers.second, ::to_lowercase(t));
 	};
 
+	auto signalling = signalling_server(
+		settings.signalling_peer_timeout_secs,
+		settings.signalling_server_port,
+		settings.signalling_ssl_cert_path,
+		settings.signalling_ssl_private_key_path
+	);
+
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;
@@ -206,6 +187,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	auto reserialize_list = [&]() {
 		MSR_LOG("Reserializing the server list.");
 
+		const auto peer_map = signalling.get_new_peers_map();
+
 		std::lock_guard<std::shared_mutex> lock(serialized_list_mutex);
 
 		serialized_list.clear();
@@ -216,7 +199,25 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			const auto address = server.first;
 
 			augs::write_bytes(ss, address);
-			augs::write_bytes(ss, server.second.meta.time_hosted);
+			augs::write_bytes(ss, webrtc_id_type());
+			augs::write_bytes(ss, server.second.meta);
+			augs::write_bytes(ss, server.second.last_heartbeat);
+		}
+
+		for (auto& server : peer_map) {
+			if (!server.second.is_server()) {
+				continue;
+			}
+
+			const auto ip_address = server.second.ip_informational;
+			const auto webrtc_id = webrtc_id_type(server.first);
+
+			masterserver_entry_meta meta;
+			meta.time_hosted = server.second.time_hosted;
+
+			augs::write_bytes(ss, ip_address);
+			augs::write_bytes(ss, webrtc_id);
+			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 
@@ -225,18 +226,26 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 		writer.StartArray();
 
-		for (auto& server : server_list) {
-			const auto& data = server.second.last_heartbeat;
-
+		auto write_json_entry = [&](
+			const server_heartbeat& data,
+			const double time_hosted,
+			const bool is_official,
+			const double time_last_heartbeat,
+			const netcode_address_t& ip,
+			const webrtc_id_type& webrtc_id
+		) {
 			server_list_entry_json next;
 
 			next.server_version = data.server_version;
 
+			next.is_official = is_official;
+			next.is_ranked = is_official && data.is_ranked_server();
 			next.name = data.server_name;
-			next.ip = ::ToString(server.first);
+			next.ip = ::ToString(ip);
+			next.webrtc_id = webrtc_id;
 
-			next.time_hosted = server.second.meta.time_hosted;
-			next.time_last_heartbeat = server.second.time_last_heartbeat;
+			next.time_hosted = time_hosted;
+			next.time_last_heartbeat = time_last_heartbeat;
 			next.arena = data.current_arena;
 			next.game_mode = data.game_mode;
 
@@ -263,6 +272,32 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			next.players_spectating = data.players_spectating;
 
 			augs::write_json(writer, next);
+		};
+
+		for (const auto& server : server_list) {
+			write_json_entry(
+				server.second.last_heartbeat,
+				server.second.meta.time_hosted,
+				server.second.meta.is_official,
+				server.second.time_last_heartbeat,
+				server.first,
+				webrtc_id_type()
+			);
+		}
+
+		for (const auto& server : peer_map) {
+			if (!server.second.is_server()) {
+				continue;
+			}
+
+			write_json_entry(
+				server.second.last_heartbeat,
+				server.second.time_hosted,
+				false /* Official servers are always native */,
+				server.second.time_last_heartbeat,
+				server.second.ip_informational,
+				webrtc_id_type(server.first)
+			);
 		}
 
 		writer.EndArray();
@@ -271,10 +306,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	};
 
 	auto dump_server_list_to_file = [&]() {
-		const auto n = server_list.size();
-
-		if (n > 0) {
-			LOG("Saving %x servers to %x", n, masterserver_dump_path);
+		if (!serialized_list.empty()) {
+			LOG("Saving servers to %x", masterserver_dump_path);
 			augs::bytes_to_file(std::as_const(serialized_list), masterserver_dump_path);
 		}
 		else {
@@ -295,7 +328,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				const auto address = augs::read_bytes<netcode_address_t>(source);
 
 				masterserver_client entry;
-				augs::read_bytes(source, entry.meta.time_hosted);
+
+				webrtc_id_type dummy;
+				augs::read_bytes(source, dummy);
+				augs::read_bytes(source, entry.meta);
 				augs::read_bytes(source, entry.last_heartbeat);
 
 				entry.time_last_heartbeat = current_time;
@@ -335,45 +371,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		server_list.erase(by_external_addr);
 		reserialize_list();
 	};
-
-	auto define_http_server = [&]() {
-		http.Get("/server_list_binary", [&](const Request&, Response& res) {
-			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
-
-			if (serialized_list.size() > 0) {
-				MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
-
-				res.set_content_provider(
-					serialized_list.size(),
-					"application/octet-stream",
-					make_list_streamer_lambda()
-				);
-			}
-		});
-
-		http.Get("/server_list_json", [&](const Request&, Response& res) {
-			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
-
-			if (serialized_list_json.size() > 0) {
-				MSR_LOG("JSON list request arrived. Sending list of size: %x", serialized_list_json.size());
-
-				res.set_content_provider(
-					serialized_list_json.size(),
-					"application/json",
-					make_json_list_streamer_lambda()
-				);
-			}
-		});
-	};
-
-	define_http_server();
-
-	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
-
-	auto listening_thread = std::thread([&http, in_settings=settings]() {
-		http.listen(in_settings.ip.c_str(), in_settings.server_list_port);
-		LOG("The HTTP listening thread has quit.");
-	});
 
 	struct webhook_job {
 		std::unique_ptr<std::future<std::string>> job;
@@ -485,6 +482,59 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		}
 	};
 
+	auto define_http_server = [&]() {
+		http.Get("/server_list_binary", [&](const Request&, Response& res) {
+			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
+
+			set_cors(res);
+
+			if (serialized_list.size() > 0) {
+				MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
+
+				res.set_content_provider(
+					serialized_list.size(),
+					"application/octet-stream",
+					make_list_streamer_lambda()
+				);
+			}
+		});
+
+		http.Get("/server_list_json", [&](const Request&, Response& res) {
+			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
+
+			set_cors(res);
+
+			if (serialized_list_json.size() > 0) {
+				MSR_LOG("JSON list request arrived. Sending list of size: %x", serialized_list_json.size());
+
+				res.set_content_provider(
+					serialized_list_json.size(),
+					"application/json",
+					make_json_list_streamer_lambda()
+				);
+			}
+		});
+
+		http.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
+			set_cors(res);
+			res.status = 204;
+		});
+
+		http.Options("/server_list_json", [](const httplib::Request&, httplib::Response& res) {
+			set_cors(res);
+			res.status = 204;
+		});
+	};
+
+	define_http_server();
+
+	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
+
+	auto listening_thread = std::thread([&http, in_settings=settings]() {
+		http.listen(in_settings.ip.c_str(), in_settings.server_list_port);
+		LOG("The HTTP listening thread has quit.");
+	});
+
 	while (true) {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
@@ -506,6 +556,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		const auto current_time = augs::date_time::secs_since_epoch();
 
 		finalize_webhook_jobs();
+
+		auto send_to_gameserver = [&udp_command_sockets](const auto& typed_command, netcode_address_t server_address) {
+			auto& socket_readable_by_gameserver_address = udp_command_sockets[0];
+
+			auto bytes = make_gameserver_command_bytes(typed_command);
+			netcode_socket_send_packet(&socket_readable_by_gameserver_address.socket, &server_address, bytes.data(), bytes.size());
+			LOG("Sending %x b to %x", bytes.size(), ::ToString(server_address));
+		};
 
 		auto process_socket_messages = [&](
 			netcode_socket_t socket,
@@ -531,21 +589,22 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					send_to(from, typed_response);
 				};
 
-				auto send_to_gameserver = [&](const auto& typed_command, netcode_address_t server_address) {
-					auto& socket_readable_by_gameserver_address = udp_command_sockets[0];
-
-					auto bytes = make_gameserver_command_bytes(typed_command);
-					netcode_socket_send_packet(&socket_readable_by_gameserver_address.socket, &server_address, bytes.data(), bytes.size());
-				};
-
 				auto handle = [&](const auto& typed_request) {
 					using R = remove_cref<decltype(typed_request)>;
 
 					if constexpr(std::is_same_v<R, masterserver_in::goodbye>) {
+						// TODO_SECURITY: has to include a ticket
+
 						if (const auto entry = mapped_or_nullptr(server_list, from)) {
 							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
 							remove_from_list(from);
 						}
+					}
+					else if constexpr(std::is_same_v<R, masterserver_in::webrtc_signalling_payload>) {
+						signalling.relay_message(
+							typed_request,
+							::ToString(from)
+						);
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::heartbeat>) {
 						if (is_banned_server_name(typed_request.server_name)) {
@@ -561,6 +620,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							const auto heartbeat_before = server_entry.last_heartbeat;
 							server_entry.last_heartbeat = typed_request;
 							server_entry.time_last_heartbeat = current_time;
+							server_entry.meta.time_hosted = current_time;
 
 							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
@@ -704,6 +764,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		erase_if(server_list, erase_if_dead);
 
 		if (previous_size != server_list.size()) {
+			reserialize_list();
+		}
+
+		signalling.send_signalling_packets(send_to_gameserver);
+		signalling.process_timeouts_if_its_time();
+
+		if (signalling.should_reserialize()) {
 			reserialize_list();
 		}
 

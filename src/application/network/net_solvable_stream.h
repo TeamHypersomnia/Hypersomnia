@@ -50,7 +50,7 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 		const auto& initial_pool = initial_signi.entity_pools.get_for<E>();
 		const auto& current_pool = current_signi.entity_pools.get_for<E>();
 
-		augs::write_bytes(*this, storage.size());
+		augs::write_bytes(*this, static_cast<uint32_t>(storage.size()));
 
 		for (const auto& s : storage) {
 			const bool never_changes_at_all = never_changes_pred(body_flavours[s.flavour_id]);
@@ -128,7 +128,7 @@ struct net_solvable_stream_cref : augs::cref_memory_stream {
 		using E = entity_type_of<typename V::value_type>;
 		const auto& initial_bodies = initial_signi.entity_pools.get_for<E>();
 
-		using size_type = decltype(storage.size());
+		using size_type = uint32_t;
 
 		size_type n;
 		augs::read_bytes(*this, n);

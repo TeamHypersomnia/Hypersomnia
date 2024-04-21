@@ -51,12 +51,16 @@
 #include "augs/misc/compress.h"
 #include "augs/misc/to_hex_str.h"
 
+#include "augs/templates/main_thread_queue.h"
+
 #if BUILD_WEBRTC
 
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 
 struct webrtc_client_detail {
+	using this_sptr = std::shared_ptr<webrtc_client_detail>;
+
     std::mutex message_lk;
 	std::mutex packets_lk;
 	std::mutex ready_lk;
@@ -68,7 +72,7 @@ struct webrtc_client_detail {
 	std::atomic<bool> ready = false;
 	std::atomic<bool> is_error_state = false;
 
-	std::string server_id;
+	std::string dest_server_id;
 
     rtc::WebSocket ws;
     rtc::Configuration config;
@@ -80,9 +84,201 @@ struct webrtc_client_detail {
 		return is_error_state;
 	}
 
+	void set_error() {
+		std::scoped_lock lock(ready_lk);
+		is_error_state = true;
+	}
+
+	void set_ready() {
+		std::scoped_lock lock(ready_lk);
+		ready = true;
+	}
+
 	bool is_ready() {
 		std::scoped_lock lock(ready_lk);
 		return ready;
+	}
+
+	void receive(const rtc::message_variant &message) {
+		if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
+			std::scoped_lock lock(packets_lk);
+			received_packets.push(*bytes);
+		}
+	}
+
+    void set_message(const std::string& m) {
+        std::scoped_lock lock(message_lk);
+        message = "WebRTC: " + m;
+
+		LOG_NOFORMAT(message);
+    }
+
+    static void setup_websocket(this_sptr self, const std::string& url) {
+		auto& ws = self->ws;
+
+		ws.onOpen([wself = std::weak_ptr(self)]() {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			self->set_message("WebSocket connected, signaling ready");
+			setup_peer_connection(self);
+        });
+
+		ws.onError([wself = std::weak_ptr(self)](const std::string& error) {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			self->set_message("WebSocket error: " + error);
+			self->set_error();
+        });
+
+		ws.onClosed([wself = std::weak_ptr(self)]() {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			self->set_message("WebSocket closed");
+        });
+
+		ws.onMessage([wself = std::weak_ptr(self)](const rtc::message_variant& data) {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+            if (!std::holds_alternative<std::string>(data))
+                return;
+
+			auto& pc = self->pc;
+
+            auto message = nlohmann::json::parse(std::get<std::string>(data));
+
+			if (message.contains("id") && message["id"].is_string() && message["id"].get<std::string>() == self->dest_server_id) {
+				if (message["type"] == "answer") {
+					pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+				}
+				else if (message["type"] == "candidate") {
+					pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+				}
+			}
+			else {
+				LOG("Skipped message with unmatching id.");
+			}
+        });
+
+		main_thread_queue::execute([&]() { ws.open(add_ws_preffix(url)); });
+    }
+
+	static void setup_peer_connection(this_sptr self) {
+		auto& pc = self->pc;
+		auto& dc = self->dc;
+
+		pc = std::make_shared<rtc::PeerConnection>(self->config);
+
+		pc->onStateChange(
+			[wself = std::weak_ptr(self)](rtc::PeerConnection::State state) { 
+				auto self = wself.lock();
+				if (!self) {
+					return;
+				}
+
+				self->set_message(std::string("State: ") + std::to_string(int(state))); 
+			}
+		);
+
+		pc->onGatheringStateChange([wself = std::weak_ptr(self)](rtc::PeerConnection::GatheringState state) {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			self->set_message(std::string("Gathering State: ") + std::to_string(int(state)));
+		});
+
+		pc->onLocalDescription([wself = std::weak_ptr(self)](const rtc::Description& description) {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			nlohmann::json message = {{"id", self->dest_server_id},
+			{"type", description.typeString()},
+			{"description", std::string(description)}};
+
+			self->ws.send(message.dump());
+		});
+
+		pc->onLocalCandidate([wself = std::weak_ptr(self)](const rtc::Candidate& candidate) {
+			auto self = wself.lock();
+			if (!self) {
+				return;
+			}
+
+			nlohmann::json message = {{"id", self->dest_server_id},
+							{"type", "candidate"},
+							{"candidate", std::string(candidate)},
+							{"mid", candidate.mid()}};
+
+			self->ws.send(message.dump());
+		});
+
+		{
+			dc = pc->createDataChannel("dataChannel");
+
+			dc->onOpen([wself = std::weak_ptr(self)]() {
+				auto self = wself.lock();
+				if (!self) {
+					return;
+				}
+
+				self->set_message("DataChannel open");
+				self->set_ready();
+				self->ws.close();
+			});
+
+			dc->onMessage([wself = std::weak_ptr(self)](const rtc::message_variant &message) {
+				auto self = wself.lock();
+				if (!self) {
+					return;
+				}
+
+				self->receive(message);
+			});
+
+			dc->onClosed([wself = std::weak_ptr(self)]() {
+				auto self = wself.lock();
+				if (!self) {
+					return;
+				}
+
+				self->set_message("DataChannel closed");
+				self->set_error();
+			});
+		}
+	}
+
+public:
+	static void connect(
+		this_sptr self,
+		const std::string& signalling_server_url,
+		const std::string& requested_server_id,
+		const std::vector<rtc::IceServer>& iceServers
+	) {
+		self->config.iceServers = iceServers;
+		self->dest_server_id = requested_server_id;
+		const auto url = signalling_server_url;
+
+		setup_websocket(self, url);
+	}
+
+	auto get_status() {
+		std::scoped_lock lock(message_lk);
+		return message;
 	}
 
 	void send(
@@ -90,10 +286,25 @@ struct webrtc_client_detail {
 		int bytes
 	) {
 		ensure(is_ready());
-		dc->send(packet, bytes);
+		ensure(dc != nullptr);
+
+		main_thread_queue::execute_async([
+			wdc = std::weak_ptr(dc),
+			msg = rtc::binary(packet, packet + bytes)
+		]() { 
+			auto dc = wdc.lock();
+
+			if (!dc) {
+				return;
+			}
+
+			if (dc->isOpen()) {
+				dc->send(msg);
+			}
+		});
 	}
 
-	std::optional<packet> receive_packet() {
+	std::optional<packet> receive_next_packet() {
 		std::scoped_lock lk (packets_lk);
 
 		if (received_packets.empty()) {
@@ -105,120 +316,12 @@ struct webrtc_client_detail {
 		return next;
 	}
 
-	void connect(
-		const std::string& signalling_server_url,
-		const std::string& dest_server_id
-	) {
-		server_id = dest_server_id;
-
-		webrtc_peer_id cid;
-		yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&cid), sizeof(cid));
-
-		const auto this_client_id = ::get_hex_representation(cid);
-		const auto url = signalling_server_url + "/" + this_client_id;
-
-		setup_websocket(url);
-	}
-
-	auto get_status() {
-		std::scoped_lock lock(message_lk);
-		return message;
-	}
-
-    void set_message(const std::string& m) {
-        std::scoped_lock lock(message_lk);
-        message = "WebRTC: " + m;
-
-		LOG_NOFORMAT(message);
-    }
-
-    void setup_websocket(const std::string& url) {
-        ws.onOpen([this]() {
-            set_message("WebSocket connected, signaling ready");
-			setup_peer_connection();
-        });
-
-        ws.onError([this](const std::string& error) {
-            set_message("WebSocket error: " + error);
-
-			std::scoped_lock lock(ready_lk);
-			is_error_state = true;
-        });
-
-        ws.onClosed([this]() {
-            set_message("WebSocket closed");
-        });
-
-        ws.onMessage([this](const rtc::message_variant& data) {
-            if (!std::holds_alternative<std::string>(data))
-                return;
-
-            auto message = nlohmann::json::parse(std::get<std::string>(data));
-
-            if (message["type"] == "answer") {
-                pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
-            }
-			else if (message["type"] == "candidate") {
-                pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
-            }
-        });
-
-		ws.open(add_ws_preffix(url)); // Open WebSocket connection with the provided URL
-    }
-
-	void setup_peer_connection() {
-		pc = std::make_shared<rtc::PeerConnection>(config);
-
-		pc->onStateChange(
-			[this](rtc::PeerConnection::State state) { set_message(std::string("State: ") + std::to_string(int(state))); });
-
-		pc->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
-			set_message(std::string("Gathering State: ") + std::to_string(int(state)));
+	~webrtc_client_detail() {
+		main_thread_queue::execute([&]() { 
+			dc = nullptr;
+			pc = nullptr;
+			ws.close();
 		});
-
-		pc->onLocalDescription([this](const rtc::Description& description) {
-			nlohmann::json message = {{"id", server_id},
-			{"type", description.typeString()},
-			{"description", std::string(description)}};
-
-			ws.send(message.dump());
-		});
-
-		pc->onLocalCandidate([this](const rtc::Candidate& candidate) {
-			nlohmann::json message = {{"id", server_id},
-							{"type", "candidate"},
-							{"candidate", std::string(candidate)},
-							{"mid", candidate.mid()}};
-
-			ws.send(message.dump());
-		});
-
-		{
-			dc = pc->createDataChannel("dataChannel");
-
-			dc->onOpen([this]() {
-				set_message("DataChannel open");
-
-				{
-					std::scoped_lock lock(ready_lk);
-					ready = true;
-				}
-			});
-
-			dc->onMessage([this](const rtc::message_variant &message) {
-				if (const auto bytes = std::get_if<std::vector<std::byte>>(&message)) {
-					std::scoped_lock lock(packets_lk);
-					received_packets.push(*bytes);
-				}
-			});
-
-			dc->onClosed([this]() {
-				set_message("DataChannel closed");
-
-				std::scoped_lock lock(ready_lk);
-				is_error_state = true;
-			});
-		}
 	}
 };
 
@@ -499,7 +602,7 @@ int client_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 	ensure(webrtc_client != nullptr);
 
 	if (webrtc_client != nullptr) {
-		if (const auto packet = webrtc_client->receive_packet()) {
+		if (const auto packet = webrtc_client->receive_next_packet()) {
 			from = ::make_internal_webrtc_address(DEFAULT_GAME_PORT_V);
 
 			const auto bytes_read = std::min(bytes, static_cast<int>(packet->size()));
@@ -518,6 +621,19 @@ bool client_setup::is_webrtc() const {
 
 bool client_setup::pending_pre_connection_handshake() const {
 	return is_webrtc() && !webrtc_client->is_ready();
+}
+
+std::vector<rtc::IceServer> get_ice_servers() {
+	const auto path = DETAIL_DIR / "web/webrtc_ice_servers.txt";
+	const auto lines = augs::file_to_lines(path);
+
+	std::vector<rtc::IceServer> out;
+
+	for (const auto& l : lines) {
+		out.emplace_back(std::string("stun:") + l);
+	}
+
+	return out;
 }
 
 client_setup::client_setup(
@@ -559,10 +675,12 @@ client_setup::client_setup(
 	const bool use_webrtc = webrtc_id != "";
 
 	if (use_webrtc) {
-		webrtc_client = std::make_unique<webrtc_client_detail>();
+		webrtc_client = std::make_shared<webrtc_client_detail>();
 		webrtc_client->connect(
+			webrtc_client,
 			webrtc_signalling_server_url,
-			webrtc_id
+			webrtc_id,
+			::get_ice_servers()
 		);
 	}
 
@@ -964,7 +1082,7 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 }
 
 net_time_t client_setup::get_current_time() {
-	return yojimbo_time();
+	return augs::high_precision_secs();
 }
 
 entity_id client_setup::get_controlled_character_id() const {

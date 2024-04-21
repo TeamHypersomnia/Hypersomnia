@@ -38,9 +38,13 @@ return {
 	ip = "0.0.0.0",
 	ssl_cert_path = "",
 	ssl_private_key_path = "",
+	signalling_ssl_cert_path = "",
+	signalling_ssl_private_key_path = "",
 	suppress_community_server_webhooks_after_launch_for_secs = 20,
 	server_entry_timeout_secs = 65,
+	signalling_peer_timeout_secs = 25,
 
+	signalling_server_port = 8000,
 	first_udp_command_port = 8430,
 	num_udp_command_ports = 30,
 
@@ -876,10 +880,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     allow_nat_traversal = true,
 
-    notified_server_list = {
-      address = "masterserver.hypersomnia.xyz",
-      default_port = 8430
-    },
+    notified_server_list = "masterserver.hypersomnia.xyz:8430",
 
     send_heartbeat_to_server_list_once_every_secs = 10,
     resolve_server_list_address_once_every_secs = 3600,

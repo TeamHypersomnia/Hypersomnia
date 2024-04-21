@@ -192,6 +192,8 @@ endif()
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
 option(BUILD_NETWORKING "Build networking." ${DEFAULT_NET_OPT})
+option(BUILD_MASTERSERVER "Build the masterserver." ${DEFAULT_NET_OPT})
+option(BUILD_NATIVE_SOCKETS "Native socket operations like ping and NAT traversal. Disabled for the web." ${DEFAULT_NET_OPT})
 option(BUILD_WEBRTC "Build WebRTC for client and server. This will enable networking on the Web and cross-play between web and native clients." ${DEFAULT_NET_OPT})
 option(BUILD_OPENSSL "Build SSL support. Required for secure automatic application updates." ${DEFAULT_NET_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
@@ -250,7 +252,7 @@ if (NOT BUILD_NETWORKING)
 	set(BUILD_WEBRTC OFF)
 endif()
 
-if (BUILD_FOR_WEB OR HYPERSOMNIA_BARE)
+if (BUILD_FOR_WEB)
 	# Slowly enabling one by one
 	set(BUILD_FREETYPE ON) 
 	set(BUILD_SOUND_FORMAT_DECODERS ON)
@@ -258,6 +260,12 @@ if (BUILD_FOR_WEB OR HYPERSOMNIA_BARE)
 	set(BUILD_OPENGL ON)
 	set(BUILD_OPENAL ON)
 	set(BUILD_WINDOW_FRAMEWORK ON)
+
+	set(BUILD_NETWORKING ON)
+	set(BUILD_WEBRTC ON)
+	set(BUILD_MASTERSERVER OFF)
+	set(BUILD_NATIVE_SOCKETS OFF)
+	set(BUILD_UNIT_TESTS OFF)
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -521,11 +529,16 @@ if(BUILD_NETWORKING)
 		"src/application/setups/server/server_setup.cpp"
 		"src/application/network/network_adapters.cpp"
 		"src/augs/network/network_types.cpp"
-		"src/application/masterserver/masterserver.cpp"
 		"src/application/nat/nat_detection_session.cpp"
 		"src/application/nat/nat_traversal_session.cpp"
 		"src/application/setups/server/server_nat_traversal.cpp"
 	)
+
+	if (BUILD_MASTERSERVER)
+		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
+			"src/application/masterserver/masterserver.cpp"
+		)
+	endif()
 
 	if(HAS_HEAD)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
@@ -1723,6 +1736,14 @@ if(BUILD_NETWORKING)
 	add_definitions(-DBUILD_NETWORKING=1)
 endif()
 
+if(BUILD_MASTERSERVER) 
+	add_definitions(-DBUILD_MASTERSERVER=1)
+endif()
+
+if(BUILD_NATIVE_SOCKETS) 
+	add_definitions(-DBUILD_NATIVE_SOCKETS=1)
+endif()
+
 if(BUILD_WEBRTC) 
 	add_definitions(-DBUILD_WEBRTC=1)
 endif()
@@ -1984,6 +2005,8 @@ if(BUILD_WEBRTC)
 
 	if(BUILD_FOR_WEB)
 		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/datachannel-wasm" EXCLUDE_FROM_ALL)
+		target_compile_options(datachannel-wasm PRIVATE -Wno-unused-parameter)
+
 		list(APPEND HYPERSOMNIA_LIBS datachannel-wasm)
 	else()
 		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel" EXCLUDE_FROM_ALL)
@@ -2075,10 +2098,12 @@ endif()
 # Add libsodium
 
 if (BUILD_NETWORKING)
-	if (MSVC)
+	if (MSVC OR BUILD_FOR_WEB)
 		file(GLOB_RECURSE SODIUM_SOURCE_FILES "src/3rdparty/yojimbo/sodium/*.c")
 
-		set_source_files_properties(${SODIUM_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-mssse3 -msse4.1")
+		if (NOT BUILD_FOR_WEB)
+			set_source_files_properties(${SODIUM_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-mssse3 -msse4.1")
+		endif()
 		add_library(sodium STATIC ${SODIUM_SOURCE_FILES})
 		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()

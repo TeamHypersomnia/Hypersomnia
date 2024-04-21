@@ -75,7 +75,7 @@ using arena_files_database_type = std::unordered_map<augs::secure_hash_type, are
 
 struct client_requested_chat;
 
-struct webrtc_server_detail;
+class webrtc_server_detail;
 
 class server_setup : 
 	public default_setup_settings
@@ -110,7 +110,7 @@ class server_setup :
 	synced_dynamic_vars make_synced_dynamic_vars() const;
 
 	/* The rest is server-specific */
-	std::unique_ptr<webrtc_server_detail> webrtc_server;
+	std::shared_ptr<webrtc_server_detail> webrtc_server;
 
 	std::size_t arena_cycle_current_index = 0;
 	std::vector<std::size_t> shuffled_cycle_indices;
@@ -148,8 +148,6 @@ class server_setup :
 
 		return result;
 	}
-
-	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;
 
@@ -189,13 +187,16 @@ class server_setup :
 	hour_and_minute_str when_to_check_for_updates_last_var;
 
 	std::vector<std::byte> heartbeat_buffer;
+
+#if BUILD_NATIVE_SOCKETS
 	std::future<resolve_address_result> future_resolved_server_list_addr;
-	std::optional<netcode_address_t> resolved_server_list_addr;
 
 	std::future<std::optional<netcode_address_t>> future_internal_address;
 	std::optional<netcode_address_t> internal_address;
 
+	std::optional<netcode_address_t> resolved_server_list_addr;
 	std::optional<netcode_address_t> external_address;
+#endif
 
 	net_time_t server_time = 0.0;
 	bool shutdown_scheduled = false;
@@ -209,7 +210,9 @@ class server_setup :
 #endif
 	std::string failure_reason;
 
+#if BUILD_NATIVE_SOCKETS
 	server_nat_traversal nat_traversal;
+#endif
 	bool suppress_community_server_webhook_this_run = false;
 
 	enum class job_type {
@@ -230,6 +233,10 @@ class server_setup :
 	};
 
 	std::vector<webhook_job> pending_jobs;
+
+#if PLATFORM_WEB
+	std::future<void> heartbeat_job;
+#endif
 
 	uint32_t duel_pic_counter = 0;
 
@@ -340,6 +347,7 @@ private:
 	void init_client(const client_id_type&);
 	void unset_client(const client_id_type&);
 
+	yojimbo::Address get_client_address(const client_id_type&) const;
 	mode_player_id get_integrated_player_id() const;
 	client_id_type get_integrated_client_id() const;
 
@@ -380,7 +388,9 @@ public:
 		const client_vars& integrated_client_vars,
 		std::optional<augs::dedicated_server_input>,
 
+#if BUILD_NATIVE_SOCKETS
 		const server_nat_traversal_input& nat_traversal_input,
+#endif
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
 		const std::string& webrtc_signalling_server_url
@@ -449,6 +459,7 @@ public:
 			return;
 		}
 
+#if BUILD_NATIVE_SOCKETS
 		if (vars.allow_nat_traversal) {
 			nat_traversal.last_detected_nat = in.last_detected_nat;
 
@@ -461,6 +472,7 @@ public:
 		else {
 			nat_traversal.last_detected_nat = nat_detection_result();
 		}
+#endif
 
 		const auto current_time = get_current_time();
 
@@ -612,8 +624,20 @@ public:
 				}
 			}
 
-			++current_simulation_step;
-			server_time += get_inv_tickrate();
+			const auto advanced_dt = get_inv_tickrate();
+			server_time += advanced_dt;
+
+			if (is_integrated()) {
+				/*
+					Don't let us fall back too much.
+					If we didn't do this, performance drops might make the game freeze further
+					because we'll increasing the simulation debt.
+
+					This also fixes the freeze on web when e.g. the tab is changed.
+				*/
+
+				server_time = std::max(server_time, current_time - advanced_dt * 5);
+			}
 
 			update_stats(in.server_stats);
 			step_collected.clear();

@@ -8,13 +8,20 @@ bool begins_with(const std::string& value, const std::string& beginning);
 std::string& cut_preffix(std::string& value, const std::string& preffix);
 
 inline std::string find_webrtc_id(client_connect_string s) {
-	if (begins_with(s, "web://")) {
-		cut_preffix(s, "web://");
+#if PLATFORM_WEB
+	/* IP or not, it's always webrtc id */
+	return s;
+#endif
 
-		return s;
+	if (begins_with(s, "localhost")) {
+		return "";
 	}
 
-	return "";
+	if (s.find_first_of(".:[]") != std::string::npos) {
+		return "";
+	}
+
+	return s;
 }
 
 inline bool uses_webrtc(const client_connect_string& s) {
