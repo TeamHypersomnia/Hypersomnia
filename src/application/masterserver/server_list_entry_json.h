@@ -5,6 +5,7 @@ struct server_list_entry_json {
 	// GEN INTROSPECTOR struct server_list_entry_json
 	std::string server_version;
 
+	bool is_web_server = false;
 	bool is_official = false;
 	bool is_ranked = false;
 

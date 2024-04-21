@@ -214,6 +214,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
+			meta.type = server_type::WEB;
 
 			augs::write_bytes(ss, ip_address);
 			augs::write_bytes(ss, webrtc_id);
@@ -228,8 +229,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 		auto write_json_entry = [&](
 			const server_heartbeat& data,
-			const double time_hosted,
-			const bool is_official,
+			const masterserver_entry_meta meta,
 			const double time_last_heartbeat,
 			const netcode_address_t& ip,
 			const webrtc_id_type& webrtc_id
@@ -238,13 +238,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			next.server_version = data.server_version;
 
-			next.is_official = is_official;
-			next.is_ranked = is_official && data.is_ranked_server();
+			next.is_official = meta.is_official;
+			next.is_ranked = meta.is_official && data.is_ranked_server();
+			next.is_web_server = meta.type == server_type::WEB;
 			next.name = data.server_name;
 			next.ip = ::ToString(ip);
 			next.webrtc_id = webrtc_id;
 
-			next.time_hosted = time_hosted;
+			next.time_hosted = meta.time_hosted;
 			next.time_last_heartbeat = time_last_heartbeat;
 			next.arena = data.current_arena;
 			next.game_mode = data.game_mode;
@@ -277,8 +278,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		for (const auto& server : server_list) {
 			write_json_entry(
 				server.second.last_heartbeat,
-				server.second.meta.time_hosted,
-				server.second.meta.is_official,
+				server.second.meta,
 				server.second.time_last_heartbeat,
 				server.first,
 				webrtc_id_type()
@@ -290,10 +290,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				continue;
 			}
 
+			masterserver_entry_meta meta;
+			meta.time_hosted = server.second.time_hosted;
+			meta.type = server_type::WEB;
+			meta.is_official = false;
+			
 			write_json_entry(
 				server.second.last_heartbeat,
-				server.second.time_hosted,
-				false /* Official servers are always native */,
+				meta,
 				server.second.time_last_heartbeat,
 				server.second.ip_informational,
 				webrtc_id_type(server.first)

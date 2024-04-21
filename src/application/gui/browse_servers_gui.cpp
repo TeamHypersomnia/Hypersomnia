@@ -307,9 +307,26 @@ void browse_servers_gui_state::refresh_server_pings() {
 }
 
 std::string server_list_entry::get_connect_string() const {
-	if (!webrtc_id.empty()) {
+	/*
+		Cases:
+		Web server will always have a WebRTC id.
+		Native server can also have WebRTC id as a reserved alias - e.g. 'pl', 'us' etc. for the official servers.
+
+		- Web connects to Web - can only use webrtc id.
+		- Native connects to Web - can only use webrtc id.
+		- Web connects to Native - prefer alias, then ip as webrtc id.
+		- Native connects to Native - only ip. No point taking webrtc id.
+	
+	*/
+
+	if (meta.type == server_type::WEB) {
 		return webrtc_id;
 	}
+#if PLATFORM_WEB
+	else if (meta.type == server_type::NATIVE && !webrtc_id.empty()) {
+		return webrtc_id;
+	}
+#endif
 
 	if (!custom_connect_string.empty()) {
 		return custom_connect_string;
@@ -436,6 +453,10 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			break;
 		}
 
+		if (s.meta.type == server_type::WEB) {
+			continue;
+		}
+
 		auto& p = s.progress;
 
 		using S = server_entry_state;
@@ -537,22 +558,27 @@ void browse_servers_gui_state::show_server_list(
 
 		const bool is_selected = selected_server.address == s.address;
 
-		if (progress.responding()) {
-			const auto ping = progress.ping;
-
-			if (ping > 999) {
-				do_text("999>");
-			}
-			else {
-				do_text(typesafe_sprintf("%x", ping));
-			}
+		if (sp->meta.type == server_type::WEB) {
+			do_text("Web");
 		}
 		else {
-			if (given_up) {
-				do_text("?");
+			if (progress.responding()) {
+				const auto ping = progress.ping;
+
+				if (ping > 999) {
+					do_text("999>");
+				}
+				else {
+					do_text(typesafe_sprintf("%x", ping));
+				}
 			}
 			else {
-				do_text(loading_dots);
+				if (given_up) {
+					do_text("?");
+				}
+				else {
+					do_text(loading_dots);
+				}
 			}
 		}
 
