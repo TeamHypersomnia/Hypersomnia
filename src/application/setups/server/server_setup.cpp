@@ -231,8 +231,11 @@ class webrtc_server_detail {
 
 				if (id < max_clients) {
 					id_map[external_id] = id;
-					auto pc = setup_peer_connection(self, id, external_id);
-					pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+
+					main_thread_queue::execute([&]() {		
+						auto pc = setup_peer_connection(self, id, external_id);
+						pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+					});
 				} else {
 					self->set_message("Max clients reached, cannot assign new ID");
 					return;
@@ -243,7 +246,9 @@ class webrtc_server_detail {
 			if (id_map.find(external_id) != id_map.end()) {
 				client_id id = id_map[external_id];
 				if (pcs.count(id)) {
-					pcs[id]->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+					main_thread_queue::execute([&]() {		
+						pcs[id]->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+					});
 				}
 			}
 			else {

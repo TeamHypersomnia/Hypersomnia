@@ -123,7 +123,10 @@ struct webrtc_client_detail {
 			}
 
 			self->set_message("WebSocket connected, signaling ready");
-			setup_peer_connection(self);
+
+			main_thread_queue::execute([&]() {		
+				setup_peer_connection(self);
+			});
         });
 
 		ws.onError([wself = std::weak_ptr(self)](const std::string& error) {
@@ -160,10 +163,14 @@ struct webrtc_client_detail {
 
 			if (message.contains("id") && message["id"].is_string() && message["id"].get<std::string>() == self->dest_server_id) {
 				if (message["type"] == "answer") {
-					pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+					main_thread_queue::execute([&]() {		
+						pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+					});
 				}
 				else if (message["type"] == "candidate") {
-					pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+					main_thread_queue::execute([&]() {		
+						pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+					});
 				}
 			}
 			else {
