@@ -229,7 +229,6 @@ void browse_servers_gui_state::sync_download_server_entry(
 	;
 
 	server_list = ::to_server_list(lbd(), error_message);
-	refresh_custom_connect_strings();
 }
 
 bool browse_servers_gui_state::refreshed_at_least_once() const {
@@ -327,10 +326,6 @@ std::string server_list_entry::get_connect_string() const {
 		return webrtc_id;
 	}
 #endif
-
-	if (!custom_connect_string.empty()) {
-		return custom_connect_string;
-	}
 
 	return ::ToString(get_connect_address());
 }
@@ -602,7 +597,7 @@ void browse_servers_gui_state::show_server_list(
 
 			auto displayed_name = d.server_name;
 
-			if (streamer_mode && s.is_community_server) {
+			if (streamer_mode && s.is_community_server()) {
 				displayed_name = "Community server";
 			}
 
@@ -698,7 +693,7 @@ void browse_servers_gui_state::show_server_list(
 		{
 			auto displayed_arena = std::string(d.current_arena);
 
-			if (streamer_mode && s.is_community_server) {
+			if (streamer_mode && s.is_community_server()) {
 				displayed_arena = "Community arena";
 			}
 
@@ -710,7 +705,7 @@ void browse_servers_gui_state::show_server_list(
 		if (d.game_mode.size() > 0) {
 			auto displayed_mode = std::string(d.game_mode);
 
-			if (streamer_mode && s.is_community_server) {
+			if (streamer_mode && s.is_community_server()) {
 				displayed_mode = "Game mode";
 			}
 
@@ -747,33 +742,15 @@ const resolve_address_result* browse_servers_gui_state::find_resolved_official(c
 	return nullptr;
 }
 
-void browse_servers_gui_state::refresh_custom_connect_strings() {
-	for (auto& s : server_list) {
-		if (const auto resolved = find_resolved_official(s.address)) {
-			if (s.address.port == DEFAULT_GAME_PORT_V) {
-				s.custom_connect_string = resolved->host;
-			}
-			else {
-				s.custom_connect_string = typesafe_sprintf("%x:%x", resolved->host, s.address.port);
-			}
-		}
-		else {
-			s.custom_connect_string.clear();
-		}
-	}
-}
-
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
 	if (valid_and_is_ready(data->future_response)) {
 		server_list = ::to_server_list(data->future_response.get(), error_message);
-		refresh_custom_connect_strings();
 	}
 
 	if (valid_and_is_ready(data->future_official_addresses)) {
 		official_server_addresses = data->future_official_addresses.get();
-		refresh_custom_connect_strings();
 	}
 
 	if (!show) {
@@ -842,18 +819,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (is_internal) {
 			has_local_servers = true;
-			s.is_community_server = false;
 			push_if_passes(local_server_list);
 		}
 		else {
-			if (const bool is_official = !s.custom_connect_string.empty()) {
+			if (const bool is_official = !s.is_official_server()) {
 				has_official_servers = true;
-				s.is_community_server = false;
 				push_if_passes(official_server_list);
 			}
 			else {
 				has_community_servers = true;
-				s.is_community_server = true;
 				push_if_passes(community_server_list);
 			}
 		}
@@ -1437,7 +1411,7 @@ bool server_details_gui_state::perform(
 	auto arena = heartbeat.current_arena;
 	auto version = heartbeat.server_version;
 
-	if (streamer_mode && entry.is_community_server) {
+	if (streamer_mode && entry.is_community_server()) {
 		name = "Community server";
 		arena = "Community arena";
 	}

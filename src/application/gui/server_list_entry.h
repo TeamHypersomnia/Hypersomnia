@@ -63,13 +63,15 @@ struct server_list_entry {
 	masterserver_entry_meta meta;
 
 	server_heartbeat heartbeat;
-	bool is_community_server = false;
-	std::string custom_connect_string;
 
 	ping_progress progress;
 
+	bool is_community_server() const {
+		return !meta.is_official;
+	}
+
 	bool is_official_server() const {
-		return !is_community_server;
+		return meta.is_official;
 	}
 
 	std::string get_connect_string() const;

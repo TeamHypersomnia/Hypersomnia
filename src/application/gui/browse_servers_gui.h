@@ -96,8 +96,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void handle_incoming_udp_packets(netcode_socket_t&);
 	void send_pings_and_punch_requests(netcode_socket_t&);
 #endif
-
-	void refresh_custom_connect_strings();
 public:
 
 	bool allow_ranked_servers = false;
