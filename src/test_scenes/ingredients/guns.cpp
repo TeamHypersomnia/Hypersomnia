@@ -4315,7 +4315,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1500.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5400.f, 5400.f};
+			gun_def.muzzle_velocity = {5000.f, 5000.f};
 			gun_def.shot_cooldown_ms = 380.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -4327,7 +4327,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.75f;
 			gun_def.kickback_towards_wielder = kickback_mult * 170.f;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(900);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
 			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.maximum_heat = 2.f;
@@ -4344,7 +4344,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 2.6f);
+			set_density_mult(meta, 3.0f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1600;
