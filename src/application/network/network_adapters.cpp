@@ -240,6 +240,18 @@ server_adapter::server_adapter(
 
 void server_adapter::disconnect_client(const client_id_type& id) {
 	server.DisconnectClient(id);
+	erase_if(
+		pending_events,
+		[id](const auto& e) {
+			if (e.client_id == id && e.connected == false) {
+				LOG("Remove disconnection event from pending_events since the caller will already manage it.");
+
+				return true;
+			}
+
+			return false;
+		}
+	);
 }
 
 void server_adapter::send_packets() {

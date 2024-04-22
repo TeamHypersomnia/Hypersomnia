@@ -10,6 +10,7 @@ void server_adapter::process_connections_disconnections(H&& handler) {
 			handler.init_client(p.client_id);
 		}
 		else {
+			LOG("Calling unset_client from disconnect callback.");
 			handler.unset_client(p.client_id);
 		}
 	}

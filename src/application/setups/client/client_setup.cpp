@@ -50,6 +50,7 @@
 #include "application/setups/client/direct_file_download.hpp"
 #include "augs/misc/compress.h"
 #include "augs/misc/to_hex_str.h"
+#include "application/detail_file_paths.h"
 
 #include "augs/templates/main_thread_queue.h"
 
@@ -71,6 +72,9 @@ struct webrtc_client_detail {
 	std::queue<packet> received_packets;
 	std::atomic<bool> ready = false;
 	std::atomic<bool> is_error_state = false;
+
+	bool has_description = false;
+	std::vector<nlohmann::json> pending_candidates;
 
 	std::string dest_server_id;
 
@@ -176,9 +180,22 @@ struct webrtc_client_detail {
 					if (message["type"] == "answer") {
 						main_thread_queue::execute([&]() {		
 							pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+							self->has_description = true;
+
+							for (auto& candidate : self->pending_candidates) {
+								pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+							}
+
+							self->pending_candidates.clear();
 						});
 					}
 					else if (message["type"] == "candidate") {
+						if (!self->has_description) {
+							LOG("Candidate arrived too early. Saving.");
+							self->pending_candidates.push_back(message);
+							return;
+						}
+
 						main_thread_queue::execute([&]() {		
 							pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
 						});
@@ -193,7 +210,7 @@ struct webrtc_client_detail {
 			}
         });
 
-		main_thread_queue::execute([&]() { ws.open(add_ws_preffix(url)); });
+		main_thread_queue::execute([&]() { ws.open(add_ws_preffix(url + "/random")); });
     }
 
 	static void setup_peer_connection(this_sptr self) {
@@ -285,6 +302,33 @@ struct webrtc_client_detail {
 	}
 
 public:
+#if !PLATFORM_WEB
+	auto make_ws_config() {
+		rtc::WebSocketConfiguration config;
+
+		const auto ca_path = CA_CERT_PATH;
+		/*
+			TODO_SECURITY:
+			For the life of me, can't get this to work otherwise.
+			It keeps spitting  
+
+			[23:22:59] rtc::impl::TlsTransport::InfoCallback@823: TLS alert: unknown CA
+			[23:22:59] rtc::impl::TlsTransport::doRecv@792: TLS recv: Handshake failed: error:0A000086:SSL routines::certificate verify failed
+			[23:22:59] rtc::impl::TlsTransport::doRecv@800: TLS handshake failed
+			
+			Even though the same damn file is used in cpp-httplib for https connections.
+			And even though it works when the web client is trying to connect.
+
+			WTF?!!!!
+		*/
+		config.disableTlsVerification = true;
+
+		return config;
+	}
+
+	webrtc_client_detail() : ws(make_ws_config()) {}
+#endif
+
 	static void connect(
 		this_sptr self,
 		const std::string& signalling_server_url,
@@ -680,6 +724,18 @@ client_setup::client_setup(
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
+
+#if PLATFORM_WEB
+	{
+		uint32_t test;
+
+		for (int i = 0; i < 5; ++i) {
+			yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&test), sizeof(test));
+			LOG("Test random value: %x", test);
+		}
+	}
+#endif
+
 	(void)nat_detection;
 
 	const auto webrtc_id = find_webrtc_id(connect_string);

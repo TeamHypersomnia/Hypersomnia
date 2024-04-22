@@ -221,6 +221,18 @@ EM_JS(void, call_openUrl, (const char* newPath), {
 #define WEBSTATIC 
 #endif
 
+#if PLATFORM_WEB
+randomization netcode_rng;
+std::mutex rng_lk;
+
+extern "C" {
+	uint32_t randombytes_external(void) {
+		std::scoped_lock lk(rng_lk);
+		return netcode_rng.random<uint32_t>();
+	}
+}
+#endif
+
 work_result work(
 	const cmd_line_params& parsed_params,
 	const bool log_directory_existed,
@@ -430,7 +442,7 @@ work_result work(
 
 #if PLATFORM_WEB
 		/* Point to HTTPS one */
-		result.server_list_provider = "https://masterserver.hypersomnia.xyz:8420";
+		//result.server_list_provider = "https://masterserver.hypersomnia.xyz:8420";
 
 		result.window.fullscreen = false;
 		result.window.border = false;
@@ -576,6 +588,16 @@ work_result work(
 	LOG("Initializing network RAII.");
 
 	WEBSTATIC auto network_raii = augs::network_raii();
+
+#if PLATFORM_WEB
+	const auto random_seed = EM_ASM_INT_V({
+		return Module.getRandomValue();
+	});
+
+	LOG("Random seed for this run: %x", random_seed);
+
+	netcode_rng = randomization(random_seed);
+#endif
 #endif
 
 	if (config.unit_tests.run || params.unit_tests_only) {

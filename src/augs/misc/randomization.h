@@ -25,6 +25,9 @@ struct basic_randomization {
 		int variation
 	);
 
+	template <class T>
+	T random();
+
 	uint32_t randval(
 		uint32_t min, 
 		uint32_t max

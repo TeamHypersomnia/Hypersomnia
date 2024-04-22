@@ -150,6 +150,19 @@ class signalling_server {
 		return ss.str();
 	}
 
+	static webrtc_id_type find_free_random_guid(const peer_map& list) {
+		std::array<uint8_t, 32> guid;
+		std::string str;
+
+		do {
+			yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&guid), sizeof(guid));
+			str = augs::to_hex_format(guid);
+		}
+		while (found_in(list, str));
+
+		return str;
+	}
+
 	static webrtc_id_type find_free_id(const peer_map& list) {
 		for (int i = 0; i <= 0xFF; ++i) {
 			webrtc_id_type id = formatHex(i, 2);
@@ -207,6 +220,10 @@ class signalling_server {
 
 		if (requested.size() > 0 && requested[0] == '/') {
 			requested.erase(requested.begin());
+		}
+
+		if (requested == "random") {
+			return find_free_random_guid(peers);
 		}
 
 		/*

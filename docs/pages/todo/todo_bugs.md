@@ -5,6 +5,28 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- major: external ids are wrongly reused on webrtc server
+	- peer disconnects right away after establishing connection and someone else takes the same id
+	- so offers end up being directed to the same peerconnection object
+	- we should remove the mapping as soon as connection is established
+	- or simply generate secure guids for clients connections - will be even safer as nobody will be able spoof offers
+		- but still remove that mapping as there's no point keeping it/accepting new offers to the peer connection
+- Maybe this is why we had problems with connectivity earlier:
+- web client couldnt reconnect when there was a problem with transporting signalling messages due to a bug in signalling server
+    - but this could happen due to other reasons and we'd like to be able to reconnect successfully
+    - set some DC/PC timeouts on the server when we fail to connect the peer via webrtc
+
+
+
+
+
+-
+Id: 0
+Nickname unknown
+IP:NONE
+[05:18:18] Not a WebRTC client.
+- I think we're getting a double disconnect call and it's unset again
+
 - also it crashes after a lot of attempts but no errors earlier so i'd suspect a memory leak? it usually fails to allocate something
 
 - on connection

@@ -111,9 +111,15 @@ class webrtc_server_detail {
 
 	webrtc_id_type this_server_id = {};
 
+	struct pc_meta {
+		bool has_description = false;
+		std::vector<nlohmann::json> pending_candidates;
+	};
+
     rtc::Configuration config;
     std::unordered_map<client_id, std::shared_ptr<rtc::PeerConnection>> pcs;
     std::unordered_map<client_id, std::shared_ptr<rtc::DataChannel>> dcs;
+	std::unordered_map<client_id, pc_meta> pc_metas;
 
 	/* We need this since yojimbo can only identify clients by slot (port) */
     std::unordered_map<std::string, client_id> id_map;
@@ -239,10 +245,14 @@ class webrtc_server_detail {
 
 		auto& id_map = self->id_map;
 		auto& pcs = self->pcs;
+		auto& pc_metas = self->pc_metas;
 
 		if (type == "offer") {
-			if (id_map.find(external_id) == id_map.end()) {
+			LOG("Received SDP offer.");
+			if (!found_in(id_map, external_id)) {
 				const auto id = self->assign_client_id();
+
+				LOG("New peer: mapping %x to %x", external_id, id);
 
 				if (id < max_clients) {
 					id_map[external_id] = id;
@@ -250,19 +260,41 @@ class webrtc_server_detail {
 					main_thread_queue::execute([&]() {		
 						auto pc = setup_peer_connection(self, id, external_id);
 						pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+
+						pc_metas[id].has_description = true;
+
+						for (auto& candidate : pc_metas[id].pending_candidates) {
+							pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+						}
+
+						pc_metas[id].pending_candidates.clear();
 					});
-				} else {
+				}
+				else {
 					self->set_message("Max clients reached, cannot assign new ID");
 					return;
 				}
 			}
 		}
 		else if (type == "candidate") {
-			if (id_map.find(external_id) != id_map.end()) {
-				client_id id = id_map[external_id];
-				if (pcs.count(id)) {
+			LOG("Received SDP candidate from %x.", external_id);
+
+			if (const auto id_ptr = mapped_or_nullptr(id_map, external_id)) {
+				const auto id = *id_ptr;
+
+				if (!pc_metas[id].has_description) {
+					pc_metas[id].pending_candidates.push_back(message);
+					LOG("Candidate arrived too early. Saving.");
+					return;
+				}
+
+				LOG("Peer: %x maps to %x", external_id, id);
+
+				if (const auto pc = mapped_or_nullptr(pcs, id)) {
+					LOG("calling addRemoteCandidate.");
+
 					main_thread_queue::execute([&]() {		
-						pcs[id]->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+						(*pc)->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
 					});
 				}
 			}
@@ -308,10 +340,48 @@ class webrtc_server_detail {
 			}
 		});
 
+		pc->onStateChange([wself = std::weak_ptr(self), id](rtc::PeerConnection::State state) {
+			if (auto self = wself.lock()) {
+				self->set_message(typesafe_sprintf("PeerConnection state change: %x", state));
+
+				if (state >= rtc::PeerConnection::State::Disconnected) {
+					self->disconnect(id);
+				}
+			}
+		});
+
         return pc;
     }
 
     static void setup_data_channel_handlers(this_sptr self, const client_id id, std::shared_ptr<rtc::DataChannel> dc) {
+		dc->onOpen([wself = std::weak_ptr(self), id]() {
+			if (auto self = wself.lock()) {
+				LOG("DataChannel opened. Removing %x from internal guid map", id);
+
+				std::scoped_lock lk(self->connections_lk);  
+
+				/* 
+					No longer need external id mapping,
+					because no offers/candidates will ever be transmitted from now on.
+				*/
+				self->erase_from_id_map(id);
+			}
+		});
+
+		dc->onError([wself = std::weak_ptr(self), id](const std::string& error) {
+			if (auto self = wself.lock()) {
+				self->set_message("DataChannel error: " + error);
+				self->disconnect(id);
+			}
+		});
+
+		dc->onClosed([wself = std::weak_ptr(self), id]() {
+			if (auto self = wself.lock()) {
+				self->set_message(typesafe_sprintf("DataChannel closed: %x", id));
+				self->disconnect(id);
+			}
+		});
+
 		dc->onMessage([wself = std::weak_ptr(self), id](const rtc::message_variant& message) {
 			if (auto self = wself.lock()) {
 				self->receive(id, message);
@@ -455,32 +525,51 @@ public:
         return next;
     }
 
-	void disconnect(const client_id id) {
-		main_thread_queue::execute([&](){
-			/*
-				Note we don't need this called in onClosed events,
-				because if transport is broken for any reason,
-				the client will timeout and the game server will eventually call this synchronously.
-			*/
+	void erase_from_id_map(const client_id id) {
+		std::erase_if(
+			id_map, 
+			[id](const auto& pair) { return pair.second == id; }
+		);
 
+		pc_metas.erase(id);
+	}
+
+	void disconnect(const client_id id) {
+		/*
+			Safe disconnect - allows us to deinit the peer connection
+			because of literally any reason - onclose, onstatechange,
+			our server's kick logic etc.
+
+			Map removal happens under a lock and destruction happens outside of the lock -
+			which means it won't ever deadlock in case other destruction logic called "disconnect" again.
+		*/
+
+		main_thread_queue::execute([&](){
 			{
+				std::shared_ptr<rtc::DataChannel> preserve_dc;
+				std::shared_ptr<rtc::PeerConnection> preserve_pc;
+
 				std::scoped_lock lock(connections_lk);
 
 				if (dcs.count(id)) {
+					preserve_dc = dcs[id];
 					dcs.erase(id);
 				}
 
 				if (pcs.count(id)) {
+					preserve_pc = pcs[id];
 					pcs.erase(id);
 				}
 
-				std::erase_if(
-					id_map, 
-					[id](const auto& pair) { return pair.second == id; }
-				);
-			}
+				erase_from_id_map(id);
 
-			set_message("Disconnected client: " + std::to_string(id));
+				if (preserve_dc || preserve_pc) {
+					set_message("Disconnected client: " + std::to_string(id));
+				}
+				else {
+					set_message("Empty disconnect: " + std::to_string(id));
+				}
+			}
 		});
 	}
 
@@ -491,10 +580,25 @@ public:
 
 	~webrtc_server_detail() {
 		main_thread_queue::execute([&](){
-			std::scoped_lock lock(connections_lk);
-			dcs.clear();
-			pcs.clear();
+			/*
+				Safe destructor - some callbacks might still be running asynchronously.
+
+				Map removal happens under a lock and destruction happens outside of the lock -
+				which means it won't ever deadlock in case other destruction logic called "disconnect" with connections_lk.
+
+				ws.close() won't trigger any relevant logic.
+			*/
+			{
+				auto preserve_dcs = dcs;
+				auto preserve_pcs = pcs;
+
+				std::scoped_lock lock(connections_lk);
+				dcs.clear();
+				pcs.clear();
+			}
+
 #if USE_WEBSOCKET
+			std::scoped_lock lock(connections_lk);
 			ws.close();
 #endif
 		});
@@ -1681,7 +1785,7 @@ bool server_setup::handle_gameserver_command(
 			// handled elsewhere
 		}
 		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
-			LOG("webrtc_signalling_payload");
+			LOG("webrtc_signalling_payload: %x", typed_request.message);
 
 			if (webrtc_server) {
 				webrtc_server->handle_message(webrtc_server, typed_request);
@@ -2398,26 +2502,32 @@ void server_setup::init_client(const client_id_type& id) {
 }
 
 void server_setup::unset_client(const client_id_type& id) {
-	LOG("Client disconnected. Details:\n%x", describe_client(id));
+	if (clients[id].is_set()) {
+		LOG("Client disconnected. Details:\n%x", describe_client(id));
 
-	if (webrtc_server) {
-		const auto address = to_netcode_addr(get_client_address(id));
+		if (webrtc_server) {
+			const auto address = to_netcode_addr(get_client_address(id));
 
-		if (::is_internal_webrtc_address(address)) {
-			LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
-			const auto client_webrtc_id = address.port;
-			webrtc_server->disconnect(client_webrtc_id);
+			if (::is_internal_webrtc_address(address)) {
+				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
+				const auto client_webrtc_id = address.port;
+				webrtc_server->disconnect(client_webrtc_id);
+			}
+			else {
+				LOG("Not a WebRTC client.");
+			}
 		}
-		else {
-			LOG("Not a WebRTC client.");
-		}
+
+		clients[id].unset();
 	}
-
-	clients[id].unset();
+	else {
+		LOG("WARNING: client was already unset.");
+	}
 }
 
 void server_setup::disconnect_and_unset(const client_id_type& id) {
 	server->disconnect_client(id);
+	LOG("Calling unset_client from disconnect_and_unset");
 	unset_client(id);
 }
 

@@ -102,6 +102,12 @@ real32 basic_randomization<T>::randval(
 	return min + static_cast<real32>(u01) * (max - min);
 }
 
+template <> template <>
+uint32_t basic_randomization<xorshift_state>::random<uint32_t>() {
+	const auto result64 = xoshiro256ss(&generator);
+    return (uint32_t)(result64 & 0xFFFFFFFF);
+}
+
 template <class T>
 uint64_t basic_randomization<T>::randval(
 	const uint64_t min, 
