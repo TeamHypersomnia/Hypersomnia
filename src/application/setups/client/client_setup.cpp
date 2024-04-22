@@ -645,18 +645,7 @@ bool client_setup::pending_pre_connection_handshake() const {
 	return is_webrtc() && !webrtc_client->is_ready();
 }
 
-std::vector<rtc::IceServer> get_ice_servers() {
-	const auto path = DETAIL_DIR / "web/webrtc_ice_servers.txt";
-	const auto lines = augs::file_to_lines(path);
-
-	std::vector<rtc::IceServer> out;
-
-	for (const auto& l : lines) {
-		out.emplace_back(std::string("stun:") + l);
-	}
-
-	return out;
-}
+std::vector<rtc::IceServer> get_ice_servers();
 
 client_setup::client_setup(
 	sol::state& lua,

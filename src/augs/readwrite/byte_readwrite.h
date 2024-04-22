@@ -31,6 +31,14 @@
 extern bool LOG_BYTE_SERIALIZE;
 #endif
 
+#ifdef write_bytes
+#undef write_bytes
+#endif
+
+#ifdef read_bytes
+#undef read_bytes
+#endif
+
 namespace augs {
 	namespace detail {	
 		template <class Archive, class Serialized>

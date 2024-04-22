@@ -512,7 +512,18 @@ bool server_setup::is_webrtc_only() {
 #endif
 }
 
-std::vector<rtc::IceServer> get_ice_servers();
+std::vector<rtc::IceServer> get_ice_servers() {
+	const auto path = DETAIL_DIR / "web/webrtc_ice_servers.txt";
+	const auto lines = augs::file_to_lines(path);
+
+	std::vector<rtc::IceServer> out;
+
+	for (const auto& l : lines) {
+		out.emplace_back(std::string("stun:") + l);
+	}
+
+	return out;
+}
 
 server_setup::server_setup(
 	sol::state& lua,
@@ -4417,6 +4428,36 @@ faction_type server_setup::get_assigned_faction() const {
 			return faction_type::COUNT;
 		}
 	);
+}
+
+std::string server_heartbeat::get_location_id() const {
+	const auto n = std::string(server_name);
+
+	if (begins_with(n, "[AU]")) {
+		return "au";
+	}
+
+	if (begins_with(n, "[PL]")) {
+		return "pl";
+	}
+
+	if (begins_with(n, "[US]")) {
+		return "us-central";
+	}
+
+	if (begins_with(n, "[RU]")) {
+		return "ru";
+	}
+
+	if (begins_with(n, "[DE]")) {
+		return "de";
+	}
+
+	if (begins_with(n, "[CH]")) {
+		return "ch";
+	}
+
+	return "";
 }
 
 #include "augs/readwrite/to_bytes.h"

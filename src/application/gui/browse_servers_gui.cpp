@@ -1397,33 +1397,3 @@ void browse_servers_gui_state::reping_all_servers() {
 	}
 }
 
-std::string server_heartbeat::get_location_id() const {
-	const auto n = std::string(server_name);
-
-	if (begins_with(n, "[AU]")) {
-		return "au";
-	}
-
-	if (begins_with(n, "[PL]")) {
-		return "pl";
-	}
-
-	if (begins_with(n, "[US]")) {
-		return "us-central";
-	}
-
-	if (begins_with(n, "[RU]")) {
-		return "ru";
-	}
-
-	if (begins_with(n, "[DE]")) {
-		return "de";
-	}
-
-	if (begins_with(n, "[CH]")) {
-		return "ch";
-	}
-
-	return "";
-}
-
