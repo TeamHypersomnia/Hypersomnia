@@ -59,7 +59,6 @@ struct ping_progress {
 
 struct server_list_entry {
 	netcode_address_t address;
-	webrtc_id_type webrtc_id;
 	masterserver_entry_meta meta;
 
 	server_heartbeat heartbeat;

@@ -11,6 +11,7 @@ struct masterserver_entry_meta {
 	// GEN INTROSPECTOR struct masterserver_entry_meta
 	double time_hosted = 0.0;
 	host_string_type official_url;
+	webrtc_id_type webrtc_id;
 	server_type type = server_type::NATIVE;
 	// END GEN INTROSPECTOR
 

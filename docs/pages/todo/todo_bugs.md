@@ -5,6 +5,32 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- also it crashes after a lot of attempts but no errors earlier so i'd suspect a memory leak? it usually fails to allocate something
+
+- on connection
+WebAssembly.Exception { message: (2) […] }
+​
+message: Array [ "std::__2::system_error", "mutex lock failed: Permission denied" ]
+​
+<prototype>: Object { is: is(), getArg: getArg(), … }
+lockdown-install.js:1:97687
+    functors moz-extension://198dfcff-e68b-447c-b2d9-33d5c8132959/lockdown-install.js:1
+    (Async: EventHandlerNonNull)
+    _wsSetMessageCallback http://localhost:6931/Hypersomnia.js:17773
+    Hypersomnia.wasm.rtc::WebSocket::open(std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&) http://localhost:6931/Hypersomnia.wasm:53447828
+    Hypersomnia.wasm.webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()::operator()() const http://localhost:6931/Hypersomnia.wasm:10329175
+    Hypersomnia.wasm.decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()::operator()() const http://localhost:6931/Hypersomnia.wasm:10525055
+    Hypersomnia.wasm.decltype(std::declval<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>()()) std::__2::__invoke[abi:ue170004]<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()&>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&) http://localhost:6931/Hypersomnia.wasm:10524928
+    Hypersomnia.wasm.void std::__2::__invoke_void_return_wrapper<void, true>::__call[abi:ue170004]<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()&>(decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()&) http://localhost:6931/Hypersomnia.wasm:10524854
+    Hypersomnia.wasm.std::__2::__function::__alloc_func<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'(), std::__2::allocator<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()>, void ()>::operator()[abi:ue170004]() http://localhost:6931/Hypersomnia.wasm:10520326
+    Hypersomnia.wasm.std::__2::__function::__func<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'(), std::__2::allocator<decltype(auto) main_thread_queue::execute_impl<webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()>(webrtc_client_detail::setup_websocket(std::__2::shared_ptr<webrtc_client_detail>, std::__2::basic_string<char, std::__2::char_traits<char>, std::__2::allocator<char>> const&)::'lambda1'()&&)::'lambda'()>, void ()>::operator()() http://localhost:6931/Hypersomnia.wasm:10520242
+    Hypersomnia.wasm.std::__2::__function::__value_func<void ()>::operator()[abi:ue170004]() const http://localhost:6931/Hypersomnia.wasm:673968
+    Hypersomnia.wasm.std::__2::function<void ()>::operator()() const http://localhost:6931/Hypersomnia.wasm:672839
+    Hypersomnia.wasm.main_thread_queue::process_tasks() http://localhost:6931/Hypersomnia.wasm:1387652
+    Hypersomnia.wasm.work(cmd_line_params const&, bool, int, char const* const*)::$_68::operator()(void*) const http://localhost:6931/Hypersomnia.wasm:1385211
+    Hypersomnia.wasm.work(cmd_line_params const&, bool, int, char const* const*)::$_62::operator()(void*) const http://localhost:6931/Hypersomnia.wasm:1384701
+    Hypersomnia.wasm.work(cmd_line_params const&, bool, int, char const* const*)::$_62::__invoke(void*)
+
 - RARE, but there still is some leak in 
 	- 
 		ws.onClosed([wself = std::weak_ptr(self)]() {

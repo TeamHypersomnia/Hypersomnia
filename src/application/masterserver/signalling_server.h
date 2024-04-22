@@ -19,6 +19,9 @@ class signalling_server {
 
     std::unordered_set<std::shared_ptr<rtc::WebSocket>> active_connections;
 
+	std::mutex aliases_mutex;
+	std::unordered_map<std::string, std::string> webrtc_id_aliases;
+
 	std::atomic<bool> dirty = false;
 
 	struct pending_signalling_packet {
@@ -258,9 +261,24 @@ class signalling_server {
 		ws->send(message.dump());
 	}
 
-	void relay_message(nlohmann::json message, const webrtc_id_type& source_id) {
+	void relay_message(nlohmann::json message, webrtc_id_type source_id) {
 		if (message.contains("id") && message["id"].is_string()) {
 			std::string dest_id = message["id"];
+
+			{
+				std::scoped_lock lk(aliases_mutex);
+
+				if (const auto target = mapped_or_nullptr(webrtc_id_aliases, dest_id)) {
+					LOG("Destination Alias '%x' resolved to '%x'", dest_id, *target);
+					dest_id = *target;
+				}
+
+				if (const auto target = key_or_default(webrtc_id_aliases, source_id); target != "") {
+					LOG("Source '%x' aliased to '%x'", source_id, target);
+					message["alias"] = target;
+				}
+			}
+
 			message["id"] = source_id;
 
 			netcode_address_t maybe_native;
@@ -421,6 +439,13 @@ public:
 		}
 
 		erase_if(pending_packets, [](const auto& p) { return p.times <= 0; });
+	}
+
+	void set_webrtc_id_alias(
+		const std::string& from, const std::string& to
+	) {
+		std::scoped_lock lk(aliases_mutex);
+		webrtc_id_aliases[from] = to;
 	}
 
 	template <class... Args>

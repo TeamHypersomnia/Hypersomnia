@@ -32,6 +32,7 @@
 #include "application/masterserver/masterserver_client.h"
 #include "application/masterserver/signalling_server.h"
 #include "application/network/network_adapters.h"
+#include "augs/string/typesafe_sscanf.h"
 
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
@@ -99,6 +100,29 @@ static ip_to_host resolve_all(
 	}
 
 	return out;
+}
+
+static auto to_webrtc_alias(
+	const bool is_ranked,
+	std::string location_id,
+	const std::string& full_name
+) {
+	if (location_id == "us-central") {
+		location_id = "us";
+	}
+
+	if (is_ranked) {
+		location_id = "ranked-" + location_id;
+	}
+
+	std::string rest;
+	int index = 0;
+
+	if (typesafe_sscanf(full_name, "%x#%x", rest, index)) {
+		location_id += typesafe_sprintf(":%x", index);
+	}
+
+	return location_id;
 }
 
 void perform_masterserver(const config_lua_table& cfg) try {
@@ -265,7 +289,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			const auto address = server.first;
 
 			augs::write_bytes(ss, address);
-			augs::write_bytes(ss, webrtc_id_type());
 			augs::write_bytes(ss, server.second.meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
@@ -276,14 +299,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			}
 
 			const auto ip_address = server.second.ip_informational;
-			const auto webrtc_id = webrtc_id_type(server.first);
 
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
 			meta.type = server_type::WEB;
+			meta.webrtc_id = webrtc_id_type(server.first);
 
 			augs::write_bytes(ss, ip_address);
-			augs::write_bytes(ss, webrtc_id);
 			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
@@ -297,8 +319,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			const server_heartbeat& data,
 			const masterserver_entry_meta meta,
 			const double time_last_heartbeat,
-			const netcode_address_t& ip,
-			const webrtc_id_type& webrtc_id
+			const netcode_address_t& ip
 		) {
 			server_list_entry_json next;
 
@@ -309,7 +330,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			next.is_web_server = meta.type == server_type::WEB;
 			next.name = data.server_name;
 			next.ip = ::ToString(ip);
-			next.webrtc_id = webrtc_id;
+			next.webrtc_id = meta.webrtc_id;
 
 			next.time_hosted = meta.time_hosted;
 			next.time_last_heartbeat = time_last_heartbeat;
@@ -358,8 +379,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				server.second.last_heartbeat,
 				server.second.meta,
 				server.second.time_last_heartbeat,
-				server.first,
-				webrtc_id_type()
+				server.first
 			);
 		}
 
@@ -371,13 +391,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
 			meta.type = server_type::WEB;
+			meta.webrtc_id = webrtc_id_type(server.first);
 			
 			write_json_entry(
 				server.second.last_heartbeat,
 				meta,
 				server.second.time_last_heartbeat,
-				server.second.ip_informational,
-				webrtc_id_type(server.first)
+				server.second.ip_informational
 			);
 		}
 
@@ -704,9 +724,20 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							server_entry.meta.time_hosted = current_time;
 							server_entry.meta.official_url = find_official_url(from);
 
-							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
-
 							const auto ip_str = ::ToString(from);
+
+							if (server_entry.meta.is_official_server()) {
+								const auto new_webrtc_alias = ::to_webrtc_alias(
+									server_entry.last_heartbeat.is_ranked_server(),
+									server_entry.last_heartbeat.get_location_id(),
+									server_entry.last_heartbeat.server_name
+								);
+
+								server_entry.meta.webrtc_id = new_webrtc_alias;
+								signalling.set_webrtc_id_alias(new_webrtc_alias, ip_str);
+							}
+
+							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
 							if (is_new_server) {
 								if (!typed_request.suppress_new_community_server_webhook) {

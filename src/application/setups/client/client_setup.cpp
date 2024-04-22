@@ -159,22 +159,37 @@ struct webrtc_client_detail {
 
 			auto& pc = self->pc;
 
-            auto message = nlohmann::json::parse(std::get<std::string>(data));
+			const auto message_str = std::get<std::string>(data);
+			auto message = nlohmann::json::parse(message_str);
 
-			if (message.contains("id") && message["id"].is_string() && message["id"].get<std::string>() == self->dest_server_id) {
-				if (message["type"] == "answer") {
-					main_thread_queue::execute([&]() {		
-						pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
-					});
+			if (message.contains("id") && message["id"].is_string()) {
+				const auto sender_id = message["id"].get<std::string>();
+				std::string alias;
+
+				if (message.contains("alias") && message["alias"].is_string()) {
+					alias = message["alias"].get<std::string>();
 				}
-				else if (message["type"] == "candidate") {
-					main_thread_queue::execute([&]() {		
-						pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
-					});
+
+				LOG("Sender id: '%x' (alias: '%x') (expected: '%x')", sender_id, alias, self->dest_server_id);
+
+				if (self->dest_server_id == sender_id || self->dest_server_id == alias) {
+					if (message["type"] == "answer") {
+						main_thread_queue::execute([&]() {		
+							pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+						});
+					}
+					else if (message["type"] == "candidate") {
+						main_thread_queue::execute([&]() {		
+							pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+						});
+					}
+				}
+				else {
+					LOG("Incorrect sender id.");
 				}
 			}
 			else {
-				LOG("Skipped message with unmatching id.");
+				LOG("Skipped message with no id: %x", message_str);
 			}
         });
 

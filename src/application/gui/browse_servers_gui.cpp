@@ -175,7 +175,6 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
             server_list_entry entry;
 
             augs::read_bytes(stream, entry.address);
-			augs::read_bytes(stream, entry.webrtc_id);
             augs::read_bytes(stream, entry.meta);
             augs::read_bytes(stream, entry.heartbeat);
 
@@ -284,6 +283,8 @@ std::string server_list_entry::get_connect_string() const {
 		- Native connects to Native - only ip. No point taking webrtc id.
 	
 	*/
+
+	const auto& webrtc_id = meta.webrtc_id;
 
 	if (meta.type == server_type::WEB) {
 		return webrtc_id;
@@ -1330,7 +1331,7 @@ bool server_details_gui_state::perform(
 		ImGui::Separator();
 	}
 
-	auto webrtc_id = std::string(entry.webrtc_id);
+	auto webrtc_id = std::string(entry.meta.webrtc_id);
 
 	if (webrtc_id != "") {
 		auto link = "https://hypersomnia.io/game/" + webrtc_id;

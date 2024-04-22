@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- set some DC/PC timeouts on the server when we fail to connect the peer via webrtc
+    - web client couldnt reconnect when there was a problem with transporting signalling messages due to a bug in signalling server
+        - but this could happen due to other reasons and we'd like to be able to reconnect successfully
+
 - fix clipoard on web
 - fix tip order in tutorial about fast reloads etc move it to later
 
