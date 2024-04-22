@@ -55,6 +55,7 @@
 #include "steam_integration.h"
 #include <queue>
 
+#include "augs/templates/bit_cast.h"
 #include "augs/templates/main_thread_queue.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
@@ -352,7 +353,7 @@ public:
 		this_sptr self,
 		const masterserver_out::webrtc_signalling_payload& p
 	) {
-		const auto guid = std::bit_cast<uint64_t>(p.message_guid);
+		const auto guid = augs::bit_cast<uint64_t>(p.message_guid);
 
 		if (!found_in(self->masterserver_received_messages, guid)) {
 			self->masterserver_received_messages.try_emplace(guid, augs::high_precision_secs());
@@ -419,7 +420,7 @@ public:
 				masterserver_in::webrtc_signalling_payload payload;
 				payload.message = p.message;
 				LOG_NVPS(p.message, p.guid);
-				payload.message_guid = std::bit_cast<int64_t>(p.guid);
+				payload.message_guid = augs::bit_cast<int64_t>(p.guid);
 
 				send(payload);
 

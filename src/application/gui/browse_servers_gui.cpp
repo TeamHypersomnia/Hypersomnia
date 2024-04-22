@@ -174,7 +174,7 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
         while (stream.has_unread_bytes()) {
             server_list_entry entry;
 
-            augs::read_bytes(stream, entry.address);
+			augs::read_bytes(stream, entry.address);
             augs::read_bytes(stream, entry.meta);
             augs::read_bytes(stream, entry.heartbeat);
 

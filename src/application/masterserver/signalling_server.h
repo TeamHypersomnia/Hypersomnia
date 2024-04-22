@@ -3,6 +3,7 @@
 #include "rtc/rtc.hpp"
 
 #include "augs/string/path_sanitization.h"
+#include "augs/templates/bit_cast.h"
 
 void yojimbo_random_bytes( uint8_t * data, int bytes );
 
@@ -388,7 +389,7 @@ public:
 		const masterserver_out::webrtc_signalling_payload& p,
 		const std::string& source_webrtc_id
 	) {
-		const auto guid = std::bit_cast<uint64_t>(p.message_guid);
+		const auto guid = augs::bit_cast<uint64_t>(p.message_guid);
 
 		try {
 			auto json_message = nlohmann::json::parse(p.message);
@@ -430,7 +431,7 @@ public:
 				masterserver_out::webrtc_signalling_payload payload;
 				payload.message = p.message;
 				LOG_NVPS(payload.message, p.guid, ::ToString(p.target));
-				payload.message_guid = std::bit_cast<int64_t>(p.guid);
+				payload.message_guid = augs::bit_cast<int64_t>(p.guid);
 
 				send(payload, p.target);
 
