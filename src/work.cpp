@@ -429,6 +429,9 @@ work_result work(
 		}
 
 #if PLATFORM_WEB
+		/* Point to HTTPS one */
+		result.server_list_provider = "https://masterserver.hypersomnia.xyz:8420";
+
 		result.window.fullscreen = false;
 		result.window.border = false;
 		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;

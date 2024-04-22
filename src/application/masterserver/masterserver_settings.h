@@ -18,6 +18,7 @@ struct masterserver_settings {
 	int num_udp_command_ports = 5;
 
 	port_type server_list_port = 8420;
+	port_type fallback_http_server_list_port = 8410;
 
 	augs::path_type cert_pem_path;
 	augs::path_type key_pem_path;

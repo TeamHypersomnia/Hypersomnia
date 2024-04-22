@@ -6,7 +6,7 @@ return {
   --log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
   --log_timestamp_format = "",
 
-  server_list_provider = "masterserver.hypersomnia.xyz:8420",
+  server_list_provider = "masterserver.hypersomnia.xyz:8410",
   webrtc_signalling_server_url = "wss://masterserver.hypersomnia.xyz:8000",
 
   nat_detection = {
@@ -51,6 +51,7 @@ return {
 
 	sleep_ms = 8,
 	server_list_port = 8420,
+	fallback_http_server_list_port = 8410,
 
 	cert_pem_path = "",
 	key_pem_path = "",

@@ -253,6 +253,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	std::shared_mutex serialized_list_mutex;
 
 	std::unique_ptr<httplib::Server> http_ptr;
+	std::unique_ptr<httplib::Server> fallback_http_ptr;
 
 	const auto& cert_path = settings.ssl_cert_path;
 	const auto& key_path = settings.ssl_private_key_path;
@@ -264,14 +265,16 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		const auto key = augs::string_windows_friendly(key_path);
 
 		http_ptr = std::make_unique<httplib::SSLServer>(cert.c_str(), key.c_str());
+
+		if (settings.fallback_http_server_list_port != 0) {
+			fallback_http_ptr = std::make_unique<httplib::Server>();
+		}
 	}
 	else {
 		LOG("Starting HTTP server. Cert or key file unspecified.");
 
 		http_ptr = std::make_unique<httplib::Server>();
 	}
-
-	auto& http = *http_ptr;
 
 	const auto masterserver_dump_path = USER_DIR / "masterserver.dump";
 
@@ -584,8 +587,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		}
 	};
 
-	auto define_http_server = [&]() {
-		http.Get("/server_list_binary", [&](const Request&, Response& res) {
+	auto define_http_server = [&](auto& server) {
+		server.Get("/server_list_binary", [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
 
 			set_cors(res);
@@ -601,7 +604,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			}
 		});
 
-		http.Get("/server_list_json", [&](const Request&, Response& res) {
+		server.Get("/server_list_json", [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
 
 			set_cors(res);
@@ -617,25 +620,40 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			}
 		});
 
-		http.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
+		server.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
 			set_cors(res);
 			res.status = 204;
 		});
 
-		http.Options("/server_list_json", [](const httplib::Request&, httplib::Response& res) {
+		server.Options("/server_list_json", [](const httplib::Request&, httplib::Response& res) {
 			set_cors(res);
 			res.status = 204;
 		});
 	};
 
-	define_http_server();
+	define_http_server(*http_ptr);
+
+	if (fallback_http_ptr) {
+		define_http_server(*fallback_http_ptr);
+	}
 
 	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
 
-	auto listening_thread = std::thread([&http, in_settings=settings]() {
-		http.listen(in_settings.ip.c_str(), in_settings.server_list_port);
+	auto listening_thread = std::thread([&http_ptr, in_settings=settings]() {
+		http_ptr->listen(in_settings.ip.c_str(), in_settings.server_list_port);
 		LOG("The HTTP listening thread has quit.");
 	});
+
+	std::optional<std::thread> fallback_listening_thread;
+
+	if (fallback_http_ptr) {
+		LOG("Hosting a FALLBACK HTTP server list at port: %x (HTTP)", settings.fallback_http_server_list_port);
+
+		fallback_listening_thread = std::thread([&fallback_http_ptr, in_settings=settings]() {
+			fallback_http_ptr->listen(in_settings.ip.c_str(), in_settings.fallback_http_server_list_port);
+			LOG("The fallback HTTP listening thread has quit.");
+		});
+	}
 
 	while (true) {
 #if PLATFORM_UNIX
@@ -894,9 +912,19 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	}
 
 	LOG("Stopping the HTTP masterserver.");
-	http.stop();
+	http_ptr->stop();
+
 	LOG("Joining the HTTP listening thread.");
 	listening_thread.join();
+
+	if (fallback_http_ptr) {
+		fallback_http_ptr->stop();
+	}
+
+	if (fallback_listening_thread.has_value()) {
+		LOG("Joining the FALLBACK HTTP listening thread.");
+		fallback_listening_thread->join();
+	}
 
 	dump_server_list_to_file();
 }
