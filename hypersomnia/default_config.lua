@@ -45,6 +45,7 @@ return {
 	signalling_peer_timeout_secs = 25,
 
 	signalling_server_port = 8000,
+	signalling_server_bind_address = "0.0.0.0",
 	first_udp_command_port = 8430,
 	num_udp_command_ports = 30,
 

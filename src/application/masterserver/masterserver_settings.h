@@ -12,6 +12,7 @@ struct masterserver_settings {
 	unsigned suppress_community_server_webhooks_after_launch_for_secs = 20;
 
 	unsigned signalling_peer_timeout_secs = 25;
+	std::string signalling_server_bind_address = "0.0.0.0";
 	port_type signalling_server_port = 8000;
 	port_type first_udp_command_port = DEFAULT_MASTERSERVER_PORT_V;
 	int num_udp_command_ports = 5;

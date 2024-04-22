@@ -315,6 +315,7 @@ class signalling_server {
 	}
 
 	auto make_config(
+		const std::string& bind_address,
 		const int port,
 		const augs::path_type& cert,
 		const augs::path_type& pem
@@ -333,7 +334,7 @@ class signalling_server {
 			LOG("Starting signalling server WITHOUT SSL."); 
 		}
 
-		config.bindAddress = "127.0.0.1"; 
+		config.bindAddress = bind_address; 
 		config.maxMessageSize = 1000;
 
 		return config;

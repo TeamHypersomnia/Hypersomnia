@@ -239,6 +239,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	auto signalling = signalling_server(
 		settings.signalling_peer_timeout_secs,
+		settings.signalling_server_bind_address,
 		settings.signalling_server_port,
 		settings.signalling_ssl_cert_path,
 		settings.signalling_ssl_private_key_path
