@@ -2145,6 +2145,7 @@ if (BUILD_OPENSSL)
 			message(FATAL_ERROR "Static OpenSSL libraries not found")
 		endif()
 		
+		include_directories(${OPENSSL_ROOT_DIR}/include)
 		list(APPEND HYPERSOMNIA_LIBS ${LIBSSL_STATIC} ${LIBCRYPTO_STATIC})
 	else()
 		find_package(OpenSSL REQUIRED)
