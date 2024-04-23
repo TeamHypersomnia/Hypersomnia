@@ -39,10 +39,7 @@ install:
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
   - dir C:\
   - dir C:\OpenSSL-v32-Win64
-  - dir C:\OpenSSL-v32-Win64\bin
-  - dir C:\OpenSSL-v32-Win64\lib
-  - dir C:\OpenSSL-v32-Win64\lib\VC
-  - dir C:\OpenSSL-v32-Win64\lib\VC\static
+  - dir /S C:\OpenSSL-v32-Win64\lib
 
 notifications:
   - provider: Email
