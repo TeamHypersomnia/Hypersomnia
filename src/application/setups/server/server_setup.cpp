@@ -2730,6 +2730,8 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (c.should_kick_due_to_network_timeout(vars, server_time)) {
+				const auto timeout_secs = vars.get_client_network_timeout_secs();
+				LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
 				kick(client_id, "Connection timed out!");
 				c.kick_no_linger = true;
 			}
