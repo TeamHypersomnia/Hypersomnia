@@ -529,7 +529,18 @@ work_result work(
 		}
 
 		if (result->client.nickname.empty()) {
-			result->client.nickname = augs::get_user_name();
+			const auto system_user_name = augs::get_user_name();
+
+#if PLATFORM_WEB
+			if (!params.origin.empty()) {
+				result->client.nickname = typesafe_sprintf("[%x] %x", params.origin, system_user_name);
+			}
+			else {
+				result->client.nickname = system_user_name;
+			}
+#else
+			result->client.nickname = system_user_name;
+#endif
 		}
 
 		if (is_steam_client) {

@@ -63,6 +63,8 @@ struct cmd_line_params {
 	std::optional<int> tutorial_level;
 	bool tutorial_challenge = false;
 
+	std::string origin;
+
 	void parse(const int argc, const char* const * const argv, const int start_i) {
 		for (int i = start_i; i < argc; ++i) {
 			const auto a = std::string(argv[i]);
@@ -89,41 +91,54 @@ struct cmd_line_params {
 			else if (a.size() > 1 && a[0] == '/') {
 				/* URL location argument. */
 
-				if (begins_with(a, "/game")) {
+				std::string loc;
+				std::string query;
+
+				if (!typesafe_sscanf(a, "%x?%x", loc, query)) {
+					loc = a;
+				}
+
+				if (begins_with(loc, "/game")) {
 					std::string webrtc_id;
 
-					if (1 == typesafe_sscanf(a, "/game/%x", webrtc_id)) {
+					if (1 == typesafe_sscanf(loc, "/game/%x", webrtc_id)) {
 						should_connect = true;
 						connect_address = webrtc_id;
 					}
 				}
-				else if (begins_with(a, "/host")) {
+				else if (begins_with(loc, "/host")) {
 					start_server = true;
 				}
-				else if (begins_with(a, "/tutorial")) {
+				else if (begins_with(loc, "/tutorial")) {
 					launch_activity = activity_type::TUTORIAL;
 
 					uint32_t level = 0;
 					std::string keyword;
 
-					if (1 == typesafe_sscanf(a, "/tutorial/%x", level)) {
+					if (1 == typesafe_sscanf(loc, "/tutorial/%x", level)) {
 						tutorial_level = level;
 					}
-					else if (1 == typesafe_sscanf(a, "/tutorial/%x", keyword)) {
+					else if (1 == typesafe_sscanf(loc, "/tutorial/%x", keyword)) {
 						if (keyword == "challenge") {
 							tutorial_challenge = true;
 						}
 					}
 				}
-				else if (begins_with(a, "/menu")) {
+				else if (begins_with(loc, "/menu")) {
 					launch_activity = activity_type::MAIN_MENU;
 				}
-				else if (begins_with(a, "/editor")) {
+				else if (begins_with(loc, "/editor")) {
 					launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
 				}
-				else if (begins_with(a, "/range")) {
+				else if (begins_with(loc, "/range")) {
 					launch_activity = activity_type::SHOOTING_RANGE;
 				}
+
+				if (!query.empty()) {
+					typesafe_sscanf(query, "origin=%x", origin);
+				}
+
+				LOG_NVPS(a, loc, query, origin);
 			}
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();

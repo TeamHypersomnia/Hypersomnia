@@ -121,7 +121,9 @@
     }
 
     var urlPath = window.location.pathname;
+    var queryString = window.location.search;
     console.log("urlPath:", urlPath);
+    console.log("queryString:", queryString);
 
     var Module = {
       canvas: (function() {
@@ -129,7 +131,7 @@
         resizeCanvas(); // Initial canvas resize
         return canvas;
       })(),
-      arguments: [urlPath],
+      arguments: [urlPath + queryString],
       setStatus: function(text) {
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var statusElement = document.getElementById('downloading-text');

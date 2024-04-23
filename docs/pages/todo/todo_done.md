@@ -6921,3 +6921,4 @@ This will discard your redo history."
 - send back actual id from signalling server to the server and set it as link correctly
 - also set the link when connecting
 
+= origin parameter that adds a preffix to the nickname like /game/us:1&origin=hackernews it would make [hackernews] web_user1
