@@ -785,6 +785,11 @@ treat_as_music_sounds_longer_than_secs = 5,
   server = {
     server_name = "${MY_NICKNAME}'s server",
 
+    allow_webrtc_clients = true,
+
+    webrtc_port_range_begin = 9000,
+    webrtc_port_range_end = 9100,
+
     -- If > 0, kicks players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
     -- Will happen on all ranked servers by default.
     -- Note you'll need to setup your own steam_web_api_key in order to authenticate players.

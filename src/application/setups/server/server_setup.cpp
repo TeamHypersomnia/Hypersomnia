@@ -391,30 +391,32 @@ class webrtc_server_detail {
 
 public:
 
-#if USE_WEBSOCKET
     static void listen(
 		this_sptr self,
 		const std::string& signaling_server_url,
-		const std::vector<rtc::IceServer>& iceServers
+		const std::vector<rtc::IceServer>& iceServers,
+		const port_type ports_begin,
+		const port_type ports_end
 	) {
 		self->config.iceServers = iceServers;
+		self->config.portRangeBegin = { ports_begin };
+		self->config.portRangeEnd = { ports_end };
+
+#if USE_WEBSOCKET
 		const auto url = signaling_server_url;
 		setup_websocket(self, url);
+#else
+		(void)self;
+		(void)signaling_server_url;
+#endif
     }
 
+#if USE_WEBSOCKET
 	bool is_ready() {
 		std::scoped_lock lock(ready_lk);
 		return ready;
 	}
 #else
-	static void listen(
-		this_sptr,
-		const std::string&,
-		const std::vector<rtc::IceServer>&
-	) {
-
-	}
-
 	bool is_ready() {
 		return true;
 	}
@@ -685,12 +687,14 @@ server_setup::server_setup(
 	const bool use_webrtc = false;
 #endif
 
-	if (use_webrtc) {
+	if (use_webrtc && vars.allow_webrtc_clients) {
 		webrtc_server = std::make_shared<webrtc_server_detail>();
 		webrtc_server->listen(
 			webrtc_server,
 			webrtc_signalling_server_url,
-			::get_ice_servers()
+			::get_ice_servers(),
+			vars.webrtc_port_range_begin,
+			vars.webrtc_port_range_end
 		);
 	}
 
