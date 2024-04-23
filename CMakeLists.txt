@@ -2122,7 +2122,7 @@ if (BUILD_OPENSSL)
 
 	# Static linking of SSL makes compilation on Linux a pain.
 	# Let's do it for Windows and Apple only
-	message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR})")
+	message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
 
 	if (APPLE)
 		set(OPENSSL_USE_STATIC_LIBS TRUE)
@@ -2133,9 +2133,23 @@ if (BUILD_OPENSSL)
 		set(OPENSSL_MSVC_STATIC_RT TRUE)
 		set(OPENSSL_USE_STATIC_LIBS TRUE)
 	endif()
+	
+	if (MSVC)
+		# This has to be done like this to accomodate Your Weekly Change to OpenSSL Library paths
+		# It will warn me if it doesn't find static libs instead of silently choosing dll ones
+		
+		find_library(LIBSSL_STATIC NAMES libssl_static PATHS ${OPENSSL_ROOT_DIR}/lib/VC/x64/MT)
+		find_library(LIBCRYPTO_STATIC NAMES libcrypto_static PATHS ${OPENSSL_ROOT_DIR}/lib/VC/x64/MT)
 
-	find_package(OpenSSL REQUIRED)
-	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)
+		if(NOT LIBSSL_STATIC OR NOT LIBCRYPTO_STATIC)
+			message(FATAL_ERROR "Static OpenSSL libraries not found")
+		endif()
+		
+		list(APPEND HYPERSOMNIA_LIBS ${LIBSSL_STATIC} ${LIBCRYPTO_STATIC})
+	else()
+		find_package(OpenSSL REQUIRED)
+		list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)
+	endif()
 
 	if (MSVC)
 		list(APPEND HYPERSOMNIA_LIBS crypt32.lib)
