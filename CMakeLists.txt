@@ -2122,6 +2122,7 @@ if (BUILD_OPENSSL)
 
 	# Static linking of SSL makes compilation on Linux a pain.
 	# Let's do it for Windows and Apple only
+	message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR})")
 
 	if (APPLE)
 		set(OPENSSL_USE_STATIC_LIBS TRUE)

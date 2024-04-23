@@ -1,6 +1,6 @@
 environment:
   matrix:
-    - CMAKE_VERSION: "3.29.0"
+    - CMAKE_VERSION: "3.29.2"
 
 branches:
   only:
@@ -40,6 +40,9 @@ install:
   - dir C:\
   - dir C:\OpenSSL-v32-Win64
   - dir C:\OpenSSL-v32-Win64\bin
+  - dir C:\OpenSSL-v32-Win64\lib
+  - dir C:\OpenSSL-v32-Win64\lib\VC
+  - dir C:\OpenSSL-v32-Win64\lib\VC\static
 
 notifications:
   - provider: Email
@@ -54,6 +57,7 @@ before_build:
   - cd C:\projects\hypersomnia
 
 build_script:
+  - cmake --version
   - cd cmake/steam_integration
   - mkdir build
   - cd build
