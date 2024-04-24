@@ -398,6 +398,7 @@ public:
 		const port_type ports_begin,
 		const port_type ports_end
 	) {
+		LOG("Web port range: %x-%x", ports_begin, ports_end);
 		self->config.iceServers = iceServers;
 		self->config.portRangeBegin = { ports_begin };
 		self->config.portRangeEnd = { ports_end };

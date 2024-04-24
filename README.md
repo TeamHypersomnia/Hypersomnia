@@ -409,10 +409,8 @@ Irrespectively of the OS, you will need the following software in order to build
 	- For Linux, use your distro-specific package. Make sure to install ```libc++```, ```libc++abi``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
-  - On Windows, you can get the appropriate installer here: https://slproweb.com/products/Win32OpenSSL.html
-  - The game is known to work with v3.1.4, but later versions should work too.
-    - Install it to ``C:\OpenSSL-Win64``
-  - Make sure to install the latest CMake as 3.28.1 fails to find static OpenSSL libraries.
+  - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-3_2_1.msi
+    - It needs to be this version specifically, otherwise CMake will fail to find static libraries.
 
 Once dependencies are installed, go to the directory where you wish to have your *Hypersomnia* project downloaded,
 open git bash and paste:
@@ -441,7 +439,7 @@ Refer to [appveyor.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/mast
 Prerequisites:
 - **Visual Studio 2022 Community** or newer.
 
-Open up the terminal. Setup the environment:
+Open up the standard Windows ``cmd`` prompt (it **won't work** with PowerShell or others). Setup the environment:
 
 ```
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
