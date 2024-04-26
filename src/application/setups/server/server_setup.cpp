@@ -400,8 +400,13 @@ public:
 	) {
 		LOG("Web port range: %x-%x", ports_begin, ports_end);
 		self->config.iceServers = iceServers;
+#if PLATFORM_WEB
+		(void)ports_begin;
+		(void)ports_end;
+#else
 		self->config.portRangeBegin = { ports_begin };
 		self->config.portRangeEnd = { ports_end };
+#endif
 
 #if USE_WEBSOCKET
 		const auto url = signaling_server_url;
@@ -4552,6 +4557,10 @@ std::string server_heartbeat::get_location_id() const {
 
 	if (begins_with(n, "[AU]")) {
 		return "au";
+	}
+
+	if (begins_with(n, "[NL]")) {
+		return "nl";
 	}
 
 	if (begins_with(n, "[PL]")) {

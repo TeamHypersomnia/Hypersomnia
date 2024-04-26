@@ -62,7 +62,8 @@ return {
 	      "arena-de.hypersomnia.xyz",
 	      "arena-au.hypersomnia.xyz",
 	      "arena-ru.hypersomnia.xyz",
-	      "arena-ch.hypersomnia.xyz"
+	      "arena-ch.hypersomnia.xyz",
+	      "arena-nl.hypersomnia.xyz"
 	}
   },
 
