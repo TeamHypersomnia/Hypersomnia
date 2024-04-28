@@ -97,6 +97,7 @@ class webrtc_server_detail {
 	struct packet {
 		client_id client_id;
 		std::vector<std::byte> bytes;
+		bool disconnect_packet = false;
 	};
 
     std::mutex packets_lk;
@@ -123,6 +124,7 @@ class webrtc_server_detail {
 
 	/* We need this since yojimbo can only identify clients by slot (port) */
     std::unordered_map<std::string, client_id> id_map;
+	client_id last_client_id = 0;
 
 	auto set_this_server_id(const std::string& new_id) {
 		std::scoped_lock lk(this_server_id_lk);
@@ -136,8 +138,11 @@ class webrtc_server_detail {
     }
 
 	client_id assign_client_id() {
-		for (client_id id = 0; id < max_clients; ++id) {
+		for (client_id i = 0; i < max_clients; ++i) {
+			const auto id = last_client_id + i;
+
 			if (pcs.find(id) == pcs.end()) {
+				++last_client_id;
 				return id;
 			}
 		}
@@ -475,7 +480,12 @@ public:
 					const auto dc = dcs.at(id);
 
 					if (dc->isOpen()) {
-						dc->send(p.bytes);
+						try {
+							dc->send(p.bytes);
+						}
+						catch (const std::runtime_error& err) {
+							LOG("Failed to send DC message: %x", err.what());
+						}
 					}
 				}
 			}
@@ -573,6 +583,11 @@ public:
 
 				if (preserve_dc || preserve_pc) {
 					set_message("Disconnected client: " + std::to_string(id));
+
+					std::scoped_lock lock(packets_lk);
+
+					/* Push a disconnect packet for this client */
+					received_packets.push({ id, {}, true });
 				}
 				else {
 					set_message("Empty disconnect: " + std::to_string(id));
@@ -815,7 +830,25 @@ bool server_setup::send_packet_override(
 int server_setup::receive_packet_override(netcode_address_t& from, std::byte* buffer, int bytes) {
 	if (webrtc_server != nullptr) {
 		if (const auto packet = webrtc_server->receive_next_packet()) {
-			from = ::make_internal_webrtc_address(packet->client_id);
+			const auto id = packet->client_id;
+
+			from = ::make_internal_webrtc_address(id);
+
+			if (packet->disconnect_packet) {
+				const auto to_kick = to_yojimbo_addr(from);
+
+				for (auto& c : clients) {
+					if (c.is_set() && c.address == to_kick) {
+						const auto to_kick_id = static_cast<client_id_type>(index_in(clients, c));
+
+						kick(to_kick_id, "DataChannel closed.");
+						c.kick_no_linger = true;
+						break;
+					}
+				}
+
+				return 0;
+			}
 
 			const auto bytes_read = std::min(bytes, static_cast<int>(packet->bytes.size()));
 			std::memcpy(buffer, packet->bytes.data(), bytes_read);

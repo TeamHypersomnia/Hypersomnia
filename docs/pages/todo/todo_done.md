@@ -6923,3 +6923,9 @@ This will discard your redo history."
 
 = origin parameter that adds a preffix to the nickname like /game/us:1&origin=hackernews it would make [hackernews] web_user1
 - fix timeouts, implement pause on the server for web clients only?
+
+- check if the datachannel has a chance to send the goodbye messages before being closed due to any reason, since we're both unsetting the client and closing the datachannel at the same time, disconnect_client from adapter probably sends some udp packets at that moment
+
+- fix macos build 
+    - use old macos image
+
