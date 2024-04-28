@@ -2516,11 +2516,10 @@ void server_setup::unset_client(const client_id_type& id) {
 		LOG("Client disconnected. Details:\n%x", describe_client(id));
 
 		if (webrtc_server) {
-			const auto address = to_netcode_addr(get_client_address(id));
-
-			if (::is_internal_webrtc_address(address)) {
+			if (clients[id].is_web_client()) {
 				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
-				const auto client_webrtc_id = address.port;
+
+				const auto client_webrtc_id = get_client_address(id).GetPort();
 				webrtc_server->disconnect(client_webrtc_id);
 			}
 			else {
@@ -3864,17 +3863,22 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 
 	const auto& c = clients[id];
 
-	if (vars.auto_authorize_loopback_for_rcon) {
-		if (get_client_address(id).IsLoopback()) {
-			LOG("Auto-authorizing the loopback client for master rcon.");
-			return rcon_level_type::MASTER;
-		}
+	if (c.is_web_client()) {
+		LOG("Avoiding loopback/internal RCON check since it's a Web client.");
 	}
+	else {
+		if (vars.auto_authorize_loopback_for_rcon) {
+			if (get_client_address(id).IsLoopback()) {
+				LOG("Auto-authorizing the loopback client for master rcon.");
+				return rcon_level_type::MASTER;
+			}
+		}
 
-	if (vars.auto_authorize_internal_for_rcon) {
-		if (is_internal(to_netcode_addr(get_client_address(id)))) {
-			LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(get_client_address(id)));
-			return rcon_level_type::MASTER;
+		if (vars.auto_authorize_internal_for_rcon) {
+			if (is_internal(to_netcode_addr(get_client_address(id)))) {
+				LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(get_client_address(id)));
+				return rcon_level_type::MASTER;
+			}
 		}
 	}
 
@@ -4584,6 +4588,10 @@ std::string server_heartbeat::get_location_id() const {
 	}
 
 	return "";
+}
+
+bool server_client_state::is_web_client() const {
+	return ::is_internal_webrtc_address(to_netcode_addr(address));
 }
 
 #include "augs/readwrite/to_bytes.h"

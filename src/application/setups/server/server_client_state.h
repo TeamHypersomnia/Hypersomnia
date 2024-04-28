@@ -183,4 +183,6 @@ struct server_client_state {
 
 		return new_meta;
 	}
+
+	bool is_web_client() const;
 };
