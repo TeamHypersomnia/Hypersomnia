@@ -127,6 +127,7 @@ struct server_vars {
 
 	uint32_t move_to_spectators_if_afk_for_secs = 120;
 	uint32_t kick_if_afk_for_secs = 7200;
+	float web_client_network_timeout_secs = 1.5f;
 	float client_network_timeout_secs = 3.0f;
 	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
@@ -161,9 +162,13 @@ struct server_vars {
 	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR
 
-	float get_client_network_timeout_secs() const {
+	float get_client_network_timeout_secs(const bool is_web) const {
 		if (ranked.is_ranked_server()) {
 			return ranked.client_network_timeout_secs;
+		}
+
+		if (is_web) {
+			return web_client_network_timeout_secs;
 		}
 
 		return client_network_timeout_secs;

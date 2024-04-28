@@ -1854,9 +1854,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				else if (state == C::RECEIVING_INITIAL_SNAPSHOT) {
 					text("Receiving the initial state:");
 				}
-				else if (state == C::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
-					text("Receiving the initial state correction:");
-				}
 				else if (pause_solvable_stream) {
 					text("Download complete. Rejoining the game.");
 				}

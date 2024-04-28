@@ -46,7 +46,9 @@ void server_adapter::client_disconnected(const client_id_type id) {
 
 game_connection_config::game_connection_config() {
 	numChannels = static_cast<int>(game_channel_type::COUNT);
-	timeout = 10;
+
+	/* We manage the timeout ourselves. */
+	timeout = -1;
 
 	{
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::RELIABLE_MESSAGES)];

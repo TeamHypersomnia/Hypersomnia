@@ -223,7 +223,7 @@ namespace net_messages {
 	};
 
 	struct special_client_request : net_message_with_payload<::special_client_request> {
-		static constexpr bool server_to_client = false;
+		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = true;
 	};
 

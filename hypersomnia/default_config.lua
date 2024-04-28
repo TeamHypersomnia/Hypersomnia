@@ -855,6 +855,10 @@ treat_as_music_sounds_longer_than_secs = 5,
     -- For unranked games, can be reasonably high.
     client_network_timeout_secs = 5,
 
+    -- Use aggressive timeouts for web clients - these will be paused instead of kicked.
+    -- By detecting a pause early, we won't clog the network with undelivered packets.
+    web_client_network_timeout_secs = 1.5,
+
     arena = "de_cyberaqua",
     game_mode = "",
 

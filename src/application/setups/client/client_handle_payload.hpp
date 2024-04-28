@@ -213,6 +213,13 @@ message_handler_result client_setup::handle_payload(
 			state = client_state_type::RECEIVING_INITIAL_SNAPSHOT;
 		}
 	}
+	else if constexpr (std::is_same_v<T, special_client_request>) {
+		if (payload == special_client_request::UNPAUSE_WEB_CLIENT) {
+			special_request(special_client_request::UNPAUSE_WEB_CLIENT);
+			now_resyncing = true;
+			receiver.clear();
+		}
+	}
 	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {
 		if (pause_solvable_stream) {
 			/* 

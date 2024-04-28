@@ -20,6 +20,12 @@ enum class downloading_type {
 
 using server_client_session_id = uint32_t; 
 
+enum class client_pause_state {
+	LIVE,
+	PAUSED,
+	WAITING_UNPAUSE
+};
+
 struct server_client_state {
 	using type = client_state_type;
 
@@ -64,6 +70,14 @@ struct server_client_state {
 
 	server_client_session_id session_id = 0;
 
+	client_pause_state web_client_paused = client_pause_state::LIVE;
+	uint32_t entropies_since_pause = 0;
+	net_time_t when_last_zeroed_entropy_counter = 0;
+
+	bool is_web_client_paused() const {
+		return web_client_paused != client_pause_state::LIVE;
+	}
+
 	server_client_state() = default;
 
 	void reset_solvable_stream() {
@@ -93,6 +107,10 @@ struct server_client_state {
 		return diff > std::max(bare_minimum_afk, v.kick_if_afk_for_secs);
 	}
 
+	auto get_client_network_timeout_secs(const server_vars& v) const {
+		return v.get_client_network_timeout_secs(is_web_client());
+	}
+
 	bool should_kick_due_to_network_timeout(const server_vars& v, const net_time_t server_time) const {
 		if (downloading_status != downloading_type::NONE) {
 			return false;
@@ -102,7 +120,7 @@ struct server_client_state {
 
 		if (state == type::IN_GAME) {
 			const auto bare_minimum_limit = 0.2f;
-			return diff > std::max(bare_minimum_limit, v.get_client_network_timeout_secs());
+			return diff > std::max(bare_minimum_limit, get_client_network_timeout_secs(v));
 		}
 
 		const auto bare_minimum_limit = 2u;
@@ -134,7 +152,7 @@ struct server_client_state {
 	}
 
 	bool should_pause_solvable_stream() const {
-		return downloading_status != downloading_type::NONE; 
+		return is_web_client_paused() || downloading_status != downloading_type::NONE; 
 	}
 
 	std::string get_nickname() const {

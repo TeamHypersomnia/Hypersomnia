@@ -2739,10 +2739,21 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (c.should_kick_due_to_network_timeout(vars, server_time)) {
-				const auto timeout_secs = vars.get_client_network_timeout_secs();
-				LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
-				kick(client_id, "Connection timed out!");
-				c.kick_no_linger = true;
+				if (!c.is_web_client_paused()) {
+					const auto timeout_secs = c.get_client_network_timeout_secs(vars);
+					LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
+
+					if (c.is_web_client()) {
+						LOG("Pausing the web client due to timeout.");
+						c.web_client_paused = client_pause_state::PAUSED;
+						c.entropies_since_pause = 0;
+						c.reset_solvable_stream();
+					}
+					else {
+						kick(client_id, "Connection timed out!");
+						c.kick_no_linger = true;
+					}
+				}
 			}
 
 			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
@@ -2793,6 +2804,9 @@ void server_setup::advance_clients_state() {
 		}
 
 		auto contribute_to_step_entropy = [&]() {
+			if (c.is_web_client_paused()) {
+				return;
+			}
 #if 0
 			c.pending_entropies.set_lower_limit(
 				c.settings.net.requested_jitter_buffer_ms * inv_simulation_delta_ms;

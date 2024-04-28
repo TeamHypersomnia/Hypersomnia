@@ -192,7 +192,43 @@ message_handler_result server_setup::handle_payload(
 			c.last_keyboard_activity_time = server_time;
 		}
 
-		c.pending_entropies.emplace_back(std::move(payload));
+		if (c.web_client_paused == client_pause_state::PAUSED) {
+			++c.entropies_since_pause;
+
+			bool unpause = false;
+
+			if (server_time - c.when_last_zeroed_entropy_counter > 3.0f) {
+				c.when_last_zeroed_entropy_counter = server_time;
+				c.entropies_since_pause = 0;
+			}
+
+			if (c.entropies_since_pause >= 30) {
+				unpause = true;
+				LOG("Web client is back (packets resumed at a reasonable rate).");
+			}
+
+			if (!payload.empty()) {
+				unpause = true;
+				LOG("Web client is back (keystrokes resumed).");
+			}
+
+			if (unpause) {
+				LOG("Re-sending complete solvable state.");
+
+				server->send_payload(
+					client_id, 
+					game_channel_type::RELIABLE_MESSAGES, 
+
+					special_client_request::UNPAUSE_WEB_CLIENT
+				);
+
+				c.web_client_paused = client_pause_state::WAITING_UNPAUSE;
+			}
+		}
+
+		if (!c.is_web_client_paused()) {
+			c.pending_entropies.emplace_back(std::move(payload));
+		}
 		// LOG("Received %xth command from client. ", c.pending_entropies.size());
 	}
 	else if constexpr (std::is_same_v<T, special_client_request>) {
@@ -270,6 +306,11 @@ message_handler_result server_setup::handle_payload(
 				break;
 
 			case special_client_request::RESYNC_ARENA:
+				if (c.is_web_client_paused()) {
+					break;
+				}
+
+			case special_client_request::UNPAUSE_WEB_CLIENT:
 				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {
 					c.resyncs_counter = 0;
 					LOG("Resetting the resync counter.");
@@ -285,7 +326,14 @@ message_handler_result server_setup::handle_payload(
 					return abort_v;
 				}
 
-				send_full_arena_snapshot_to(client_id);
+				if (payload == special_client_request::UNPAUSE_WEB_CLIENT) {
+					send_complete_solvable_state_to(client_id);
+					c.web_client_paused = client_pause_state::LIVE;
+				}
+				else {
+					send_full_arena_snapshot_to(client_id);
+				}
+
 				reinference_necessary = true;
 
 				break;
