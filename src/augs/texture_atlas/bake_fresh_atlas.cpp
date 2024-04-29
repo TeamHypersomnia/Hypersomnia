@@ -205,7 +205,10 @@ void bake_fresh_atlas(
 			return augs::image_view(out.whole_image, output_image_size);
 		}
 		else {
+			LOG("Allocating new atlas: %xx%x", output_image_size.x, output_image_size.y);
 			out.fallback_output.resize(output_image_size.area());
+			LOG("Allocated.");
+
 			return augs::image_view(out.fallback_output.data(), output_image_size);
 		}
 	}();

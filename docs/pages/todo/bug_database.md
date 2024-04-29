@@ -5,6 +5,10 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Space station crash on web 
+	- Had to decrease texture sizes. Maybe we should have some scaling fallback
+	- Or just increase memory 
+
 - server likely shouldn't stop when changing tab
     - do workers still run?
     - we're out of luck because packets will still not be sent so it will still stall/timeout

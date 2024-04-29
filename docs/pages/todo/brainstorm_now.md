@@ -6,22 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- see how krunker handles tab switches, if it timeouts, if there is sound etc
-
 - assign random nicknames, or just ask for one
     - will later take them from accounts once we have authentication
 
-- increase timeout
-- host causal pl server
 - diagnose why web cant connect to native local servers but first add TURN servers maybe
 - memory problem with hyperactive space station
 
 - fix clipoard on web
 - fix tip order in tutorial about fast reloads etc move it to later
-
-- browser adjustments for web servers
-    - show webrtc instead of id
-    - dont try to ping and show as active
 
 - setup stun/ice/turn servers
 

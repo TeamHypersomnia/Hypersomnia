@@ -6929,3 +6929,12 @@ This will discard your redo history."
 - fix macos build 
     - use old macos image
 
+- increase timeout
+- host causal pl server
+
+- see how krunker handles tab switches, if it timeouts, if there is sound etc
+	- it just works, seems it's an emscripten limitation
+
+- browser adjustments for web servers
+    - show webrtc instead of id
+    - dont try to ping and show as active
