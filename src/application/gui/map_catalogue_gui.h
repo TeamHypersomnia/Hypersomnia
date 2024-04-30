@@ -44,9 +44,9 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 	int sort_by_column = 1;
 	bool ascending = false;
 
-	std::unordered_set<const map_catalogue_entry*> selected_arenas;
+	std::unordered_set<std::string> selected_arenas;
 
-	const map_catalogue_entry* last_selected = nullptr;
+	std::string last_selected;
 
 	ImGuiTextFilter filter;
 
@@ -78,4 +78,6 @@ public:
 	bool is_downloading() const { return get_downloading().has_value(); }
 
 	std::optional<std::string> open_host_server_window;
+
+	const map_catalogue_entry* find_entry_by(const std::string&);
 };

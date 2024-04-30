@@ -653,6 +653,10 @@ bool client_setup::send_packet_override(
 	const std::byte* packet,
 	int bytes
 ) {
+	if (is_replaying()) {
+		return 0;
+	}
+
 	/* This function will only be called if we decided to use WebRTC. */
 
 	ensure(webrtc_client != nullptr);
@@ -667,6 +671,10 @@ bool client_setup::send_packet_override(
 }
 
 int client_setup::receive_packet_override(netcode_address_t& from, std::byte* buffer, int bytes) {
+	if (is_replaying()) {
+		return 0;
+	}
+
 	/* This function will only be called if we decided to use WebRTC. */
 
 	ensure(webrtc_client != nullptr);

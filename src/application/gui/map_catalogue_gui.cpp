@@ -249,7 +249,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
 		auto id = scoped_id(arena_name.c_str());
 
-		auto entry_id = std::addressof(entry);
+		auto entry_id = entry.name;
 		const bool is_selected = found_in(selected_arenas, entry_id);
 		auto maybe_progress = mapped_or_nullptr(progress_of, arena_name);
 
@@ -519,6 +519,16 @@ void map_catalogue_gui_state::request_refresh() {
 	headless.request_refresh();
 }
 
+const map_catalogue_entry* map_catalogue_gui_state::find_entry_by(const std::string& name) {
+	for (auto& m : headless.get_map_list()) {
+		if (m.name == name) {
+			return std::addressof(m);
+		}
+	}
+
+	return nullptr;
+}
+
 bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	using namespace httplib_utils;
 	using namespace augs::imgui;
@@ -595,7 +605,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 				for (auto& entry : headless.get_map_list()) {
 					if (entry.passed_filter) {
-						const auto entry_id = std::addressof(entry);
+						const auto entry_id = entry.name;
 						const bool is_selected = found_in(selected_arenas, entry_id);
 
 						if (!is_selected) {
@@ -607,7 +617,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 				}
 
 				for (auto& entry : headless.get_map_list()) {
-					const auto entry_id = std::addressof(entry);
+					const auto entry_id = entry.name;
 
 					if (entry.passed_filter) {
 						if (all_selected_already) {
@@ -646,7 +656,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 				auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_dl_button), false);
 
-				auto selected_entry = last_selected;
+				auto selected_entry = find_entry_by(last_selected);
 
 				if (selected_entry != nullptr) {
 					auto& entry = *selected_entry;
@@ -786,9 +796,11 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 			else {
 				arena_synchronizer_input downloadable_arenas;
 			   
-				for (const auto s : selected_arenas) {
-					if (s->get_state() != S::ON_DISK) {
-						downloadable_arenas.push_back({ s->name, s->version_timestamp, s->last_displayed_index });
+				for (const auto& map : headless.get_map_list()) {
+					if (found_in(selected_arenas, map.name)) {
+						if (map.get_state() != S::ON_DISK) {
+							downloadable_arenas.push_back({ map.name, map.version_timestamp, map.last_displayed_index });
+						}
 					}
 				}
 
@@ -873,7 +885,7 @@ void map_catalogue_gui_state::refresh(const address_string_type address) {
 	}
 
 	selected_arenas.clear();
-	last_selected = nullptr;
+	last_selected = "";
 
 	headless.refresh(address);
 }
