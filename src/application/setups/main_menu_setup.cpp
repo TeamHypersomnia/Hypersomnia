@@ -252,6 +252,9 @@ void main_menu_setup::draw_overlays(
 	};
 
 	const auto description = [&]() {
+#if PLATFORM_WEB
+		return colored("", gray);
+#endif
 		const auto t = last_update_result.type;
 		using R = self_update_result_type;
 

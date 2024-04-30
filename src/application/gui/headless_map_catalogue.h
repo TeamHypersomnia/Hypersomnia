@@ -4,6 +4,7 @@
 #include "augs/network/network_types.h"
 #include "augs/string/parse_url.h"
 #include "augs/misc/imgui/simple_popup.h"
+#include "augs/persistent_filesystem.h"
 
 using ad_hoc_entry_id = uint32_t;
 
@@ -56,6 +57,8 @@ struct arena_synchronizer_input_entry {
 using arena_synchronizer_input = std::vector<arena_synchronizer_input_entry>;
 
 class multi_arena_synchronizer {
+	hold_persistent_filesystem_raii hold_fs;
+
 	arena_synchronizer_input input;
 	std::unique_ptr<multi_arena_synchronizer_internal> data;
 	std::size_t current_map = 0;

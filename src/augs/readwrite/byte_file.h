@@ -42,19 +42,31 @@ namespace augs {
 			static_assert(!std::is_same_v<typename O::value_type, std::byte>, "Use bytes_to_file for directly writing the binary files!");
 		}
 
-		auto out = open_binary_output_stream(path);
-		write_bytes(out, object);
+		{
+			auto out = open_binary_output_stream(path);
+			write_bytes(out, object);
+		}
+
+		sync_if_persistent(path);
 	}
 
 	inline void save_string_as_bytes(const std::string& bytes, const path_type& path) {
-		auto out = open_binary_output_stream(path);
-		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
+		{
+			auto out = open_binary_output_stream(path);
+			out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
+		}
+
+		sync_if_persistent(path);
 	}
 
 	template <class S>
 	inline void bytes_to_file(const S& source, const path_type& path) {
-		auto out = open_binary_output_stream(path);
-		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(source.data()), source.size());
+		{
+			auto out = open_binary_output_stream(path);
+			out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(source.data()), source.size());
+		}
+
+		sync_if_persistent(path);
 	}
 
 	template <class S, class ContainerType>

@@ -73,6 +73,7 @@
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
+#include "augs/persistent_filesystem.h"
 
 render_layer_filter get_layer_filter_for_miniature();
 
@@ -232,6 +233,8 @@ editor_setup::editor_setup(
 }
 
 editor_setup::~editor_setup() {
+	auto sync_after = hold_persistent_filesystem_raii();
+
 	autosave_now_if_needed();
 
 	/*
@@ -1258,6 +1261,8 @@ void editor_setup::restore_last_saved_json() {
 }
 
 void editor_setup::save() {
+	auto sync_after = hold_persistent_filesystem_raii();
+
 	history.mark_revision_as_saved();
 	autosave_timer.reset();
 
@@ -1349,6 +1354,8 @@ bool editor_setup::autosave_needed() const {
 }
 
 void editor_setup::force_autosave() {
+	auto sync_after = hold_persistent_filesystem_raii();
+
 	bool just_backed_up_message = false;
 
 	if (!augs::exists(paths.last_saved_json)) {

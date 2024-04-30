@@ -198,6 +198,54 @@ constexpr bool no_edge_zoomout_v = false;
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+EM_JS(void, call_syncFileSystem, (), {
+  Module.syncFileSystem();
+});
+
+std::mutex persistent_filesystem_lk;
+int persistent_filesystem_holders = 0;
+
+void sync_persistent_filesystem() {
+	{
+		std::scoped_lock lk(persistent_filesystem_lk);
+
+		if (persistent_filesystem_holders > 0) {
+			return;
+		}
+	}
+
+	main_thread_queue::get_instance().execute(
+		[]() {
+			call_syncFileSystem();
+		}
+	);
+}
+
+void persistent_filesystem_hold() {
+	std::scoped_lock lk(persistent_filesystem_lk);
+	++persistent_filesystem_holders;
+	LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
+}
+
+void persistent_filesystem_flush() {
+	bool run = false;
+
+	{
+		std::scoped_lock lk(persistent_filesystem_lk);
+		--persistent_filesystem_holders;
+
+		LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
+
+		if (persistent_filesystem_holders == 0) {
+			run = true;
+		}
+	}
+
+	if (run) {
+		sync_persistent_filesystem();
+	}
+}
+
 EM_JS(void, call_hideProgress, (), {
   hideProgress();
 });
@@ -213,6 +261,10 @@ EM_JS(void, call_openUrl, (const char* newPath), {
 	openUrl(newPath);
 });
 
+#else
+void persistent_filesystem_hold() {}
+void persistent_filesystem_flush() {}
+void sync_persistent_filesystem() {}
 #endif
 
 #if PLATFORM_WEB
@@ -317,6 +369,11 @@ work_result work(
 	else {
 		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 	}
+
+	/*
+		On Web, ::USER_DIR will be CWD/user,
+		just like during normal development on Linux.
+	*/
 
 	/* 
 		Just use the "user" folder when developing.
@@ -1692,9 +1749,11 @@ work_result work(
 #endif
 
 	WEBSTATIC auto save_last_activity = [&](const activity_type mode) {
-		change_with_save([mode](config_lua_table& cfg) {
-			cfg.last_activity = mode;
-		});
+		if (mode != activity_type::CLIENT) {
+			change_with_save([mode](config_lua_table& cfg) {
+				cfg.last_activity = mode;
+			});
+		}
 	};
 
 	WEBSTATIC auto launch_main_menu = [&]() {
@@ -1848,15 +1907,23 @@ work_result work(
 
 		displayed_connecting_server_name.clear();
 
+#if PLATFORM_WEB
+		if (is_official_webrtc_id(connect_string)) {
+			official_url = connect_string;
+		}
+#endif
 
 		change_with_save(
 			[&](auto& cfg) {
+				cfg.client = config.client;
+
 				if (!official_url.empty()) {
 					cfg.client_connect = official_url;
+					cfg.last_activity = activity_type::CLIENT;
 				}
-
-				cfg.client = config.client;
-				cfg.last_activity = activity_type::CLIENT;
+				else {
+					cfg.last_activity = activity_type::MAIN_MENU;
+				}
 			}
 		);
 

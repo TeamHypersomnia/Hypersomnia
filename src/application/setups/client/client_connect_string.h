@@ -7,6 +7,11 @@ using client_connect_string = std::string;
 bool begins_with(const std::string& value, const std::string& beginning);
 std::string& cut_preffix(std::string& value, const std::string& preffix);
 
+inline bool is_official_webrtc_id(const client_connect_string& s) {
+	/* Non-ip with a : */
+	return s.find(":") != std::string::npos && s.find(".") == std::string::npos;
+}
+
 inline std::string find_webrtc_id(client_connect_string s) {
 #if PLATFORM_WEB
 	/* IP or not, it's always webrtc id */

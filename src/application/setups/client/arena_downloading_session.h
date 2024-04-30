@@ -9,12 +9,15 @@
 #include "augs/misc/secure_hash.h"
 #include "augs/network/network_types.h"
 #include "augs/readwrite/memory_stream_declaration.h"
+#include "augs/persistent_filesystem.h"
 
 using hash_or_timestamp = std::variant<augs::secure_hash_type, version_timestamp_string>;
 
 struct arena_downloading_session {
 private:
 	using file_requester_type = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
+
+	hold_persistent_filesystem_raii hold_fs;
 
 	struct file_hash_info {
 		bool marked_for_download_already = false;

@@ -33,6 +33,7 @@
 #include "augs/templates/in_order_of.h"
 
 #include "augs/window_framework/shell.h"
+#include "augs/persistent_filesystem.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
@@ -777,6 +778,8 @@ bool project_selector_setup::create_new_project_files() {
 	const auto& cloning_from = user_input.cloning_from;
 	const auto sanitized = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(chosen_name));
 	const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
+
+	auto sync_after = hold_persistent_filesystem_raii();
 
 	if (sanitized_path) {
 		if (!cloning_from.empty()) {

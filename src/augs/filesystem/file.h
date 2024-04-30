@@ -9,7 +9,19 @@
 
 #include "augs/filesystem/path.h"
 
+void sync_persistent_filesystem();
+
 namespace augs {
+	inline void sync_if_persistent(const path_type& path) {
+#if PLATFORM_WEB
+		if (!path.empty() && path.begin()->string() == "user") {
+			sync_persistent_filesystem();
+		}
+#else
+		(void)path;
+#endif
+	}
+
 	template <class T, class... Args>
 	auto with_exceptions(Args&&... args) {
 		auto stream = T(std::forward<Args>(args)...);
@@ -40,10 +52,6 @@ namespace augs {
 	
 	inline auto last_write_time(const path_type& path) {
 		return std::filesystem::last_write_time(path);
-	}
-
-	inline decltype(auto) copy_file_or_dir(const path_type& from, const path_type& to) {
-		return std::filesystem::copy(from, to);
 	}
 
 #if PLATFORM_WINDOWS
@@ -129,9 +137,13 @@ namespace augs {
 
 	template <class S>
 	void save_as_text(const path_type& path, const S& text) {
-		auto out = with_exceptions<std::ofstream>();
-		out.open(path, std::ios::out);
-		out << text;
+		{
+			auto out = with_exceptions<std::ofstream>();
+			out.open(path, std::ios::out);
+			out << text;
+		}
+
+		sync_if_persistent(path);
 	}
 
 	template <class S>

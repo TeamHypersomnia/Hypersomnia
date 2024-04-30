@@ -878,7 +878,7 @@ bool client_setup::setup_external_arena_download_session() {
 			this->external_downloader->download_file(location);
 		};
 
-		downloading = arena_downloading_session(
+		downloading.emplace(
 			last_download_request.arena_name,
 			last_download_request.project_hash,
 			external_file_requester
@@ -903,7 +903,7 @@ void client_setup::setup_direct_arena_download_session() {
 		this->request_direct_file_download(hash);
 	};
 
-	downloading = arena_downloading_session(
+	downloading.emplace(
 		last_download_request.arena_name,
 		last_download_request.project_hash,
 		direct_file_requester
@@ -1036,7 +1036,7 @@ bool client_setup::finalize_arena_download() {
 		return false;
 	}
 
-	downloading = std::nullopt;
+	downloading.reset();
 
 	return try_load_arena_according_to(sv_public_vars, false);
 }

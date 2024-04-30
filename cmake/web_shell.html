@@ -132,6 +132,8 @@
         return canvas;
       })(),
       arguments: [urlPath + queryString],
+      preRun: [],
+      postRun: [],
       setStatus: function(text) {
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var statusElement = document.getElementById('downloading-text');
@@ -169,6 +171,51 @@
         document.getElementById('progress-bar-inner').style.width = progress + '%';
         document.getElementById('downloading-text').innerHTML = 'Downloading... ' + progress.toFixed(0) + '%';
       }
+    };
+
+    Module['preRun'].push(function() {
+      // Add a run dependency to ensure syncing is done before the application starts
+      Module.addRunDependency('idbfs');
+
+      // Create a folder inside our virtual file system
+      FS.mkdir('/user');
+      // Mount IDBFS on this folder
+      FS.mount(IDBFS, {}, '/user');
+
+      // Synchronize from IndexedDB to memory
+      FS.syncfs(true, function (err) {
+        if (err) console.error('Error loading from IndexedDB', err);
+        else console.log('Loaded from IndexedDB');
+
+        // Remove the run dependency after IDBFS is fully loaded
+        Module.removeRunDependency('idbfs');
+      });
+    });
+
+    Module.syncFileSystem = function() {
+      if (Module.isSyncing) {
+        Module.needsSync = true; // Mark that a new sync is needed after the current one
+        console.log("Still syncing, delaying syncfs");
+        return;
+      }
+
+      Module.isSyncing = true;
+      Module.needsSync = false;
+
+      console.log("Calling FS.syncfs.");
+
+      FS.syncfs(false, function(err) {
+        Module.isSyncing = false;
+        if (err) {
+          console.error("Filesystem sync failed", err);
+          Module.syncFileSystem();
+        } else {
+          console.log("Filesystem synced successfully");
+          if (Module.needsSync) {
+            Module.syncFileSystem(); // There was a request during sync, so we sync again
+          }
+        }
+      });
     };
 
     window.addEventListener('resize', resizeCanvas);

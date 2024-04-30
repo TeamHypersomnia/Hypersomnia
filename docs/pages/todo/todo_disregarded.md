@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- low prio - web server could also pause when we switch tabs
+    - but the clients will stay there for 25 seconds by default so it's good enough
+        - if you don't play that long as the host what're you even doing
+
 - we should still show a prompt on ctrl+w because people will be used to it and will accidentally click it
 
 - DISREGARDED:

@@ -505,9 +505,8 @@ class client_setup :
 					if (!is_replaying()) {
 						if (num_commands > max_commands) {
 							set_disconnect_reason(typesafe_sprintf(
-								"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
-								num_commands,
-								max_commands
+								"Connection timed out (predicted commands: %x).", 
+								num_commands
 							));
 
 							disconnect();

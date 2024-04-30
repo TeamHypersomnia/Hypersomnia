@@ -290,7 +290,7 @@ void multi_arena_synchronizer::init_next_session() {
 	if (current_map < input.size()) {
 		const auto& current_input = input[current_map];
 
-		data->current_session = arena_downloading_session(
+		data->current_session.emplace(
 			current_input.name,
 			current_input.version,
 			data->make_requester(current_input.name)
