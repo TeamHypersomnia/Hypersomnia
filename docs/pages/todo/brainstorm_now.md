@@ -6,13 +6,28 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- simple user browser folder in settings?
+
+- use ip to determine closest server? (just like we get it from peerconnection somehow or the sites like whatisyourip)
+    - ipalyzer could help maybe
+    - maybe we could set imaginary coordinates to all servers
+
+- login to enter leaderboards!
+    - guest (only casual matches)
+
+- fix clipoard on web
+    - how hard can it be? just run anything you need on the main thread
+
+- run a memory profiler to detect leaks
+
+- also handle the web server being alt tabbed
+- lets encrypt certs?
 - assign random nicknames, or just ask for one
     - will later take them from accounts once we have authentication
 
 - diagnose why web cant connect to native local servers but first add TURN servers maybe
 - memory problem with hyperactive space station
 
-- fix clipoard on web
 - fix tip order in tutorial about fast reloads etc move it to later
 
 - setup stun/ice/turn servers

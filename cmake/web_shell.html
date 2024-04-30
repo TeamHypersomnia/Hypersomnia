@@ -192,7 +192,7 @@
       });
     });
 
-    Module.syncFileSystem = function() {
+    Module.sync_idbfs = function() {
       if (Module.isSyncing) {
         Module.needsSync = true; // Mark that a new sync is needed after the current one
         console.log("Still syncing, delaying syncfs");
@@ -208,11 +208,12 @@
         Module.isSyncing = false;
         if (err) {
           console.error("Filesystem sync failed", err);
-          Module.syncFileSystem();
+          Module.sync_idbfs();
         } else {
           console.log("Filesystem synced successfully");
           if (Module.needsSync) {
-            Module.syncFileSystem(); // There was a request during sync, so we sync again
+            console.log("Resyncing.");
+            Module.sync_idbfs(); // There was a request during sync, so we sync again
           }
         }
       });

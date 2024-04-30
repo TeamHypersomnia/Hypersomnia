@@ -8,14 +8,18 @@
 #include <filesystem>
 
 #include "augs/filesystem/path.h"
+#if PLATFORM_WEB
+#include "augs/log.h"
+#endif
 
-void sync_persistent_filesystem();
+void persistent_filesystem_sync();
 
 namespace augs {
 	inline void sync_if_persistent(const path_type& path) {
 #if PLATFORM_WEB
 		if (!path.empty() && path.begin()->string() == "user") {
-			sync_persistent_filesystem();
+			LOG("sync_if_persistent: %x", path);
+			persistent_filesystem_sync();
 		}
 #else
 		(void)path;

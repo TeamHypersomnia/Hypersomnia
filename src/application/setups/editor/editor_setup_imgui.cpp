@@ -476,7 +476,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 						}
 					}
 
-					::sync_persistent_filesystem();
+					::persistent_filesystem_sync();
 
 					redirect_or_missing_popup = std::nullopt;
 					on_window_activate();

@@ -198,54 +198,6 @@ constexpr bool no_edge_zoomout_v = false;
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-EM_JS(void, call_syncFileSystem, (), {
-  Module.syncFileSystem();
-});
-
-std::mutex persistent_filesystem_lk;
-int persistent_filesystem_holders = 0;
-
-void sync_persistent_filesystem() {
-	{
-		std::scoped_lock lk(persistent_filesystem_lk);
-
-		if (persistent_filesystem_holders > 0) {
-			return;
-		}
-	}
-
-	main_thread_queue::get_instance().execute(
-		[]() {
-			call_syncFileSystem();
-		}
-	);
-}
-
-void persistent_filesystem_hold() {
-	std::scoped_lock lk(persistent_filesystem_lk);
-	++persistent_filesystem_holders;
-	LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
-}
-
-void persistent_filesystem_flush() {
-	bool run = false;
-
-	{
-		std::scoped_lock lk(persistent_filesystem_lk);
-		--persistent_filesystem_holders;
-
-		LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
-
-		if (persistent_filesystem_holders == 0) {
-			run = true;
-		}
-	}
-
-	if (run) {
-		sync_persistent_filesystem();
-	}
-}
-
 EM_JS(void, call_hideProgress, (), {
   hideProgress();
 });
@@ -260,12 +212,9 @@ extern std::string open_url_on_main;
 EM_JS(void, call_openUrl, (const char* newPath), {
 	openUrl(newPath);
 });
-
-#else
-void persistent_filesystem_hold() {}
-void persistent_filesystem_flush() {}
-void sync_persistent_filesystem() {}
 #endif
+
+#include "augs/persistent_filesystem.hpp"
 
 #if PLATFORM_WEB
 #define WEBSTATIC static

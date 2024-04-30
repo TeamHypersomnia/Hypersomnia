@@ -3,7 +3,7 @@
 
 void persistent_filesystem_hold();
 void persistent_filesystem_flush();
-void sync_persistent_filesystem();
+void persistent_filesystem_sync();
 
 struct hold_persistent_filesystem_raii {
 	hold_persistent_filesystem_raii() {

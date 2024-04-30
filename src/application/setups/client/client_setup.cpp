@@ -54,6 +54,8 @@
 
 #include "augs/templates/main_thread_queue.h"
 
+#include "augs/persistent_filesystem.h"
+
 #if BUILD_WEBRTC
 
 #include <nlohmann/json.hpp>
@@ -536,6 +538,8 @@ void client_setup::flush_demo_steps() {
 
 	future_flushed_demo = launch_async(
 		[&]() {
+			auto hold_fs = hold_persistent_filesystem_raii();
+
 			auto out = augs::open_binary_output_stream_append(recorded_demo_path);
 
 			if (!was_demo_meta_written) {
