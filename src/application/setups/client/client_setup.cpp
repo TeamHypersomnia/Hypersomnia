@@ -742,8 +742,11 @@ client_setup::client_setup(
 
 	(void)nat_detection;
 
+	const auto input_demo_path = ::find_demo_path(connect_string);
+	const bool is_opening_demo = input_demo_path.has_value();
+
 	const auto webrtc_id = find_webrtc_id(connect_string);
-	const bool use_webrtc = webrtc_id != "";
+	const bool use_webrtc = !is_opening_demo && webrtc_id != "";
 
 	if (use_webrtc) {
 		webrtc_client = std::make_shared<webrtc_client_detail>();
@@ -757,9 +760,7 @@ client_setup::client_setup(
 
 	LOG("Initializing connection with %x", connect_string);
 
-	const auto input_demo_path = ::find_demo_path(connect_string);
-
-	if (input_demo_path.has_value()) {
+	if (is_opening_demo) {
 		const auto error = typesafe_sprintf(
 			"Failed to open demo file:\n%x", 
 			*input_demo_path
@@ -1313,9 +1314,11 @@ void client_setup::handle_incoming_payloads() {
 void client_setup::advance_demo_recorder() {
 	++recorded_demo_step;
 
+#if !PLATFORM_WEB
 	if (client_time - when_last_flushed_demo > vars.flush_demo_to_disk_once_every_secs) {
 		flush_demo_steps();
 	}
+#endif
 }
 
 void client_setup::send_pending_commands() {
