@@ -63,7 +63,7 @@ struct cmd_line_params {
 	std::optional<int> tutorial_level;
 	bool tutorial_challenge = false;
 
-	std::string origin;
+	std::string guest;
 
 	void parse(const int argc, const char* const * const argv, const int start_i) {
 		for (int i = start_i; i < argc; ++i) {
@@ -135,10 +135,10 @@ struct cmd_line_params {
 				}
 
 				if (!query.empty()) {
-					typesafe_sscanf(query, "origin=%x", origin);
+					typesafe_sscanf(query, "guest=%x", guest);
 				}
 
-				LOG_NVPS(a, loc, query, origin);
+				LOG_NVPS(a, loc, query, guest);
 			}
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();

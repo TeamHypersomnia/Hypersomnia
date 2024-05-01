@@ -538,8 +538,8 @@ work_result work(
 			const auto system_user_name = augs::get_user_name();
 
 #if PLATFORM_WEB
-			if (!params.origin.empty()) {
-				result->client.nickname = typesafe_sprintf("[%x] %x", params.origin, system_user_name);
+			if (!params.guest.empty()) {
+				result->client.nickname = typesafe_sprintf("[%x] %x", params.guest, system_user_name);
 			}
 			else {
 				result->client.nickname = system_user_name;

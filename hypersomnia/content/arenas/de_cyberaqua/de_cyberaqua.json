@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2023-09-22 08:44:04.507470 UTC"
+        "version_timestamp": "2024-05-01 21:27:34.369608 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -15,7 +15,7 @@
         }
     },
     "playtesting": {
-        "mode": "gun_game"
+        "mode": "quick_test"
     },
     "game_modes": {
         "bomb_defusal": {
@@ -3022,6 +3022,7 @@
                 "Metal obstacle (3)",
                 "Metal obstacle-see-through (1)",
                 "Metal obstacle (4)",
+                "Metal obstacle (100)",
                 "Metal obstacle (5)",
                 "Metal obstacle (54)",
                 "Metal obstacle (6)",
@@ -3075,6 +3076,7 @@
                 "Metal obstacle (69)",
                 "Metal obstacle (68)",
                 "Metal obstacle (25)",
+                "Metal obstacle (101)",
                 "Metal obstacle (67)",
                 "Metal obstacle (66)",
                 "Metal obstacle (65)",
@@ -15213,6 +15215,18 @@
             "pos": [-1024.0, -1136.0],
             "rotation": -180.0,
             "flip_vertically": true
+        },
+        {
+            "id": "Metal obstacle (100)",
+            "type": "@blank4",
+            "pos": [-3136.0, -1168.0],
+            "size": [128, 32]
+        },
+        {
+            "id": "Metal obstacle (101)",
+            "type": "@blank4",
+            "pos": [1456.0, 3184.0],
+            "size": [32, 608]
         },
         {
             "id": "Humming disabled",
