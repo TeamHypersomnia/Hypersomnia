@@ -5,16 +5,19 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- major: external ids are wrongly reused on webrtc server
-	- peer disconnects right away after establishing connection and someone else takes the same id
-	- so offers end up being directed to the same peerconnection object
-	- we should remove the mapping as soon as connection is established
-	- or simply generate secure guids for clients connections - will be even safer as nobody will be able spoof offers
-		- but still remove that mapping as there's no point keeping it/accepting new offers to the peer connection
-- Maybe this is why we had problems with connectivity earlier:
-- web client couldnt reconnect when there was a problem with transporting signalling messages due to a bug in signalling server
-    - but this could happen due to other reasons and we'd like to be able to reconnect successfully
-    - set some DC/PC timeouts on the server when we fail to connect the peer via webrtc
+- map catalogue crash
+	- happens when atlas is loaded simultaneously
+		- try debugging with
+		new_ad_hoc_images = ad_hoc_atlas_subjects();
+		static int lim=1;
+		lim++;
+		lim%=32;
+		for (int i = 1; i < lim; ++i) {
+			new_ad_hoc_images->push_back(ad_hoc_atlas_subject { ad_hoc_entry_id(i), typesafe_sprintf("cache/test/%x.png", i) } );
+		}
+	- address sanitizer doesnt show anything
+	- thread sanitizer hangs though
+
 
 
 

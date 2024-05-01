@@ -351,7 +351,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 				if (ImGui::GetIO().KeyCtrl) {
 					if (found_in(selected_arenas, entry_id)) {
 						selected_arenas.erase(entry_id);
-						last_selected = nullptr;
+						last_selected = "";
 					}
 					else {
 						selected_arenas.emplace(entry_id);

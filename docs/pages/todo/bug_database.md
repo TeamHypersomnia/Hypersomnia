@@ -18,6 +18,16 @@ summary: Notable bugs.
     - wouldn't execute_async prolong the existence of dc even long after its disconnected?
         - no we're only passing packets vector
 
+- major: external ids are wrongly reused on webrtc server
+	- peer disconnects right away after establishing connection and someone else takes the same id
+	- so offers end up being directed to the same peerconnection object
+	- we should remove the mapping as soon as connection is established
+	- or simply generate secure guids for clients connections - will be even safer as nobody will be able spoof offers
+		- but still remove that mapping as there's no point keeping it/accepting new offers to the peer connection
+- Maybe this is why we had problems with connectivity earlier:
+- web client couldnt reconnect when there was a problem with transporting signalling messages due to a bug in signalling server
+    - but this could happen due to other reasons and we'd like to be able to reconnect successfully
+    - set some DC/PC timeouts on the server when we fail to connect the peer via webrtc
 
 - latent bug: new client can take slot of a freshly disconnected client and a character will be orphaned forever
 	- can amortize by assigning consecutive client indices even when server is empty
