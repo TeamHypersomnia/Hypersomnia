@@ -53,6 +53,7 @@ struct server_client_state {
 	unsigned unauthorized_rcon_commands = 0;
 	std::optional<net_time_t> when_kicked;
 	bool kick_no_linger = false;
+	bool queue_kick_due_to_closed_datachannel = false;
 
 	std::string uploaded_avatar_url;
 	bool pushed_connected_webhook = false;

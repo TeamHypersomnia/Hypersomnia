@@ -69,7 +69,6 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 					auto set_result = [&](const ad_hoc_entry_id id) {
 						std::unique_lock<std::mutex> lock(miniature_mutex);
 						result[index] = { id, next_path };
-						LOG_NVPS(index, for_maps.size());
 						++miniature_counter;
 					};
 

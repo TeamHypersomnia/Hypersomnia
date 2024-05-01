@@ -839,10 +839,12 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 
 				for (auto& c : clients) {
 					if (c.is_set() && c.address == to_kick) {
-						const auto to_kick_id = static_cast<client_id_type>(index_in(clients, c));
+						{
+							const auto to_kick_id = static_cast<client_id_type>(index_in(clients, c));
+							LOG("queue_kick_due_to_closed_datachannel (id: %x): setting flag.", to_kick_id);
+						}
 
-						kick(to_kick_id, "DataChannel closed.");
-						c.kick_no_linger = true;
+						c.queue_kick_due_to_closed_datachannel = true;
 						break;
 					}
 				}
@@ -2719,6 +2721,8 @@ void server_setup::advance_clients_state() {
 		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
 
+		// TODO: the kick logic could really use some refactor...
+
 		auto check_all_kick_conditions = [&]() {
 			if (!c.is_set()) {
 				return;
@@ -2801,6 +2805,13 @@ void server_setup::advance_clients_state() {
 					const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
 					kick(client_id, reason);
 				}
+			}
+
+			if (c.queue_kick_due_to_closed_datachannel) {
+				c.queue_kick_due_to_closed_datachannel = false;
+
+				LOG("queue_kick_due_to_closed_datachannel (id: %x): calling disconnect_and_unset.", client_id);
+				disconnect_and_unset(client_id);
 			}
 
 			if (!removed_someone_already) {

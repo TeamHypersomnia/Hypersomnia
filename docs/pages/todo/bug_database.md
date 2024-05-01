@@ -5,6 +5,24 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- bug: fake "DataChannel closed" kick message.
+    - ok i know what happens
+        - "kick" CANNOT be called inside receive packet override!!!
+            - the message could be queued to an already freed client id if an actual yojimbo disconnect packet arrived right before it!!
+
+    - Server doesnt even kick the player, it looks like there are some pending goodbye packets that get sent while we reconnect?
+    - maybe we should timestamp those kick messages
+        - no, lets fix this properly
+    - HAPPENS EVEN ON NATIVE CLIENT CONNECTING TO A SERVER
+        - HOW THE HELL does a packet meant for a webrtc client and up sent to a native client?!!!
+    - wouldn't execute_async prolong the existence of dc even long after its disconnected?
+        - no we're only passing packets vector
+
+
+- latent bug: new client can take slot of a freshly disconnected client and a character will be orphaned forever
+	- can amortize by assigning consecutive client indices even when server is empty
+		- check how it works now
+
 - Space station crash on web 
 	- Had to decrease texture sizes. Maybe we should have some scaling fallback
 	- Or just increase memory 
