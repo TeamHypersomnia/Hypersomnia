@@ -6938,3 +6938,5 @@ This will discard your redo history."
 - browser adjustments for web servers
     - show webrtc instead of id
     - dont try to ping and show as active
+- fix clipboard
+

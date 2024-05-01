@@ -11,10 +11,49 @@
 #include "augs/window_framework/window.h"
 
 #include "augs/window_framework/platform_utils.h"
+#include "augs/templates/main_thread_queue.h"
 
 using namespace ImGui;
 
 #if PLATFORM_WEB
+
+#include <emscripten_browser_clipboard.h>
+static std::string web_clipboard;
+
+/* 
+	Idk it deadlocked for some reason randomly so better safe than sorry and use recursive
+*/
+
+static std::recursive_mutex clipboard_lk;
+
+static const char* web_GetClipboardText(void*) {
+	thread_local std::string clip_storage;
+
+	LOG("web_GetClipboardText");
+	{
+		std::scoped_lock lk(clipboard_lk);
+		clip_storage = web_clipboard;
+	}
+
+    return clip_storage.c_str();
+}
+
+static void web_SetClipboardText(void*, const char* text) {
+	LOG("web_SetClipboardText");
+
+	{
+		std::scoped_lock lk(clipboard_lk);
+		web_clipboard = text;
+	}
+
+	const auto clip = std::string(text);
+
+	main_thread_queue::execute_async(
+		[clip]() {
+			emscripten_browser_clipboard::copy(clip);
+		}
+	);
+}
 
 #elif PLATFORM_LINUX
 #include "augs/window_framework/shell.h"
@@ -89,8 +128,17 @@ namespace augs {
 			io.LogFilename = log_path;
 
 #if PLATFORM_WEB
-			io.SetClipboardTextFn = nullptr;
-			io.GetClipboardTextFn = nullptr;
+			io.SetClipboardTextFn = web_SetClipboardText;
+			io.GetClipboardTextFn = web_GetClipboardText;
+
+			emscripten_browser_clipboard::paste([](const std::string &paste_data, void *callback_data [[maybe_unused]]){
+				LOG("emscripten_browser_clipboard::paste");
+
+				{
+					std::scoped_lock lk(clipboard_lk);
+					web_clipboard = paste_data;
+				}
+			});
 #elif PLATFORM_LINUX
 			io.SetClipboardTextFn = augs_SetClipboardText;
 			io.GetClipboardTextFn = augs_GetClipboardText;

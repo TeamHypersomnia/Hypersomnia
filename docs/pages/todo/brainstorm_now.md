@@ -110,8 +110,6 @@ summary: That which we are brainstorming at the moment.
             - just a simple message back through websocket, maybe json
         - Let MS resolve official addresses
 
-- fix clipboard
-
 - hide settings in web that can crash the app like number of threads
 - resolve_address -> address_utils
 - consider having short ids for peers so links don't take much space and are easily transferred without copying (e.g. in school)
@@ -148,6 +146,15 @@ summary: That which we are brainstorming at the moment.
       if (!isFinite(src.bufOffset)) {
         // Just in case any calculations go wrong
         src.bufOffset = 0.0;
+      }
+    - library_html5.js:
+      if ({{{ makeDynCall('iipp', 'callbackfunc') }}}(eventTypeId, keyEventData, userData)) e.preventDefault();
+    ->
+       
+      if ({{{ makeDynCall('iipp', 'callbackfunc') }}}(eventTypeId, keyEventData, userData)) {
+        if(!((event.ctrlKey || event.metaKey) && event.key == 'v')) {
+          e.preventDefault();
+        }
       }
 
 - remove periodic entries from server logs so they only contain meaningful information
