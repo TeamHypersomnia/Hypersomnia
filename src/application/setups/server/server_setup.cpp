@@ -1398,15 +1398,17 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 
 	};
 
-	if (!post_to(
-		private_vars.report_ranked_match_url, 
-		private_vars.report_ranked_match_api_key
-	)) {
-		LOG("report_ranked_match_url was not set.");
-	}
+	if (is_ranked_server()) {
+		if (!post_to(
+			private_vars.report_ranked_match_url, 
+			private_vars.report_ranked_match_api_key
+		)) {
+			LOG("report_ranked_match_url was not set.");
+		}
 
-	for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
-		post_to(aux_endpoint.url, aux_endpoint.api_key);
+		for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
+			post_to(aux_endpoint.url, aux_endpoint.api_key);
+		}
 	}
 }
 
