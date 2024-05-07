@@ -17,7 +17,7 @@ namespace augs {
 	};
 
 	struct network_raii {
-		network_raii();
+		network_raii(bool rtc_errors);
 		~network_raii();
 
 		network_raii(const network_raii&) = delete;

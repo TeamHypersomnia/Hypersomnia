@@ -56,6 +56,8 @@ return {
 	cert_pem_path = "",
 	key_pem_path = "",
 
+	report_rtc_errors_to_webhook = true,
+
 	official_hosts = {
 	      "arena.hypersomnia.xyz",
 	      "arena-us.hypersomnia.xyz",

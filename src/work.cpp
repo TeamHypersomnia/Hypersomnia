@@ -604,7 +604,12 @@ work_result work(
 #if BUILD_NETWORKING
 	LOG("Initializing network RAII.");
 
-	WEBSTATIC auto network_raii = augs::network_raii();
+	const bool report_rtc_errors = 
+		params.type == app_type::MASTERSERVER
+		&& config.masterserver.report_rtc_errors_to_webhook
+	;
+
+	WEBSTATIC auto network_raii = augs::network_raii(report_rtc_errors);
 
 #if PLATFORM_WEB
 	const auto random_seed = EM_ASM_INT_V({

@@ -52,6 +52,17 @@ namespace telegram_webhooks {
 		};
 	}
 
+	inline httplib::MultipartFormDataItems form_error_report(
+		const std::string& channel_id,
+		const std::string& error
+	) {
+		return {
+			{ "chat_id", channel_id, "", "" },
+			{ "parse_mode", "Markdown", "", "" },
+			{ "text", error, "", "" }
+		};
+	}
+
 	inline httplib::MultipartFormDataItems form_new_community_server(
 		const std::string& channel_id,
 		const std::string& new_server_name,
@@ -151,6 +162,51 @@ namespace discord_webhooks {
 		return result;
 	}
 
+	inline httplib::MultipartFormDataItems form_error_report(
+		const std::string& username,
+		const std::string& error_title,
+		const std::string& error
+	) {
+		const auto payload = [&]()
+		{
+			using namespace rapidjson;
+
+			const auto embed_color = 16763904;
+
+			StringBuffer s;
+			Writer<StringBuffer> writer(s);
+
+			writer.StartObject();
+			writer.Key("username");
+			writer.String(username);
+			writer.Key("embeds");
+			writer.StartArray();
+			{
+				writer.StartObject();
+				{
+					writer.Key("title");
+					writer.String(error_title);
+
+					writer.Key("color");
+					writer.Uint(embed_color);
+
+					writer.Key("description");
+					writer.String(error);
+				}
+				writer.EndObject();
+			}
+			writer.EndArray();
+			writer.EndObject();
+
+			return std::string(s.GetString());
+		}();
+
+		LOG("Generated payload: %x", payload);
+
+		return {
+			{ "payload_json", payload, "", "" }
+		};
+	}
 	inline httplib::MultipartFormDataItems form_new_community_server(
 		const std::string& hook_username,
 		const std::string& new_server_name,

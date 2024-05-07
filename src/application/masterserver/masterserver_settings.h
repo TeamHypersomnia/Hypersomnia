@@ -25,6 +25,8 @@ struct masterserver_settings {
 
 	float sleep_ms = 8;
 
+	bool report_rtc_errors_to_webhook = false;
+
 	std::vector<std::string> official_hosts;
 	// END GEN INTROSPECTOR
 

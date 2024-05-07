@@ -30,8 +30,19 @@ return 0;
 }
 
 #if BUILD_WEBRTC && !PLATFORM_WEB
-void rtc_log_callback(rtc::LogLevel, std::string message) {
+std::mutex rtc_errors_lk;
+bool track_rtc_errors = false;
+std::vector<std::string> rtc_errors;
+
+void rtc_log_callback(rtc::LogLevel level, std::string message) {
 	LOG_NOFORMAT(message);
+
+	if (track_rtc_errors) {
+		if (level <= rtc::LogLevel::Error) {
+			std::scoped_lock lk(rtc_errors_lk);
+			rtc_errors.push_back(message);
+		}
+	}
 }
 #endif
 
@@ -41,7 +52,9 @@ namespace augs {
 			yojimbo_log_level(flag ? YOJIMBO_LOG_LEVEL_DEBUG : YOJIMBO_LOG_LEVEL_INFO);
 		}
 
-		bool init() {
+		bool init(bool rtc_errors) {
+			track_rtc_errors = rtc_errors;
+
 			LOG("Initializing the network library.");
 			const bool result = InitializeYojimbo();
 
@@ -51,11 +64,12 @@ namespace augs {
 
 #if BUILD_WEBRTC
 #if !PLATFORM_WEB
-#if IS_PRODUCTION_BUILD
-			rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
-#else
-			rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
-#endif
+			if (track_rtc_errors) {
+				rtc::InitLogger(rtc::LogLevel::Debug, rtc_log_callback);
+			}
+			else {
+				rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
+			}
 #endif
 			rtc::Preload();
 #endif

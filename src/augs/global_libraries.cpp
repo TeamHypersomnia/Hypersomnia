@@ -35,8 +35,8 @@ namespace augs {
 #endif
 
 #if BUILD_NETWORKING
-	network_raii::network_raii() {
-		network::init();
+	network_raii::network_raii(bool rtc_errors) {
+		network::init(rtc_errors);
 	}
 
 	network_raii::~network_raii() {

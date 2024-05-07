@@ -107,7 +107,7 @@ namespace yojimbo {
 
 namespace augs {
 	namespace network {
-		bool init();
+		bool init(bool rtc_errors);
 		bool deinit();
 		void enable_detailed_logs(bool);
 	}

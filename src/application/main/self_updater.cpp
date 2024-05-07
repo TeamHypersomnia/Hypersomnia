@@ -79,7 +79,6 @@ self_update_result check_and_apply_updates(
 
 	self_update_result result;
 
-	const auto ca_path = CA_CERT_PATH;
 	const auto& host_url = http_settings.self_update_host;
 
 	LOG("Checking for updates at %x.", host_url);

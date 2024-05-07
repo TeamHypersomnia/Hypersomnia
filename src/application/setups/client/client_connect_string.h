@@ -18,6 +18,10 @@ inline std::string find_webrtc_id(client_connect_string s) {
 	return s;
 #endif
 
+	if (::is_official_webrtc_id(s)) {
+		return s;
+	}
+
 	if (begins_with(s, "localhost")) {
 		return "";
 	}

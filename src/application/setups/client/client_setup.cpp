@@ -120,6 +120,8 @@ struct webrtc_client_detail {
     }
 
     static void setup_websocket(this_sptr self, const std::string& url) {
+		self->set_message(typesafe_sprintf("Connecting to:\n%x", url));
+
 		auto& ws = self->ws;
 
 		ws.onOpen([wself = std::weak_ptr(self)]() {

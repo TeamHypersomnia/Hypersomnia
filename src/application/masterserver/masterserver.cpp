@@ -34,6 +34,10 @@
 #include "application/network/network_adapters.h"
 #include "augs/string/typesafe_sscanf.h"
 
+extern std::mutex rtc_errors_lk;
+extern bool track_rtc_errors;
+extern std::vector<std::string> rtc_errors;
+
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
 
@@ -499,6 +503,61 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
 	};
 
+	auto push_error_webhook = [&](std::string err) {
+		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
+			MSR_LOG("Posting a discord webhook job");
+
+			push_webhook_job(
+				[err, discord_webhook_url]() -> std::string {
+					auto client = httplib_utils::make_client(discord_webhook_url);
+
+					auto items = discord_webhooks::form_error_report(
+						"Signalling server",
+						"WebSocket Server message",
+						err
+					);
+
+					client->Post(discord_webhook_url.location.c_str(), items);
+
+					return "";
+				}
+			);
+		}
+		else {
+			if (cfg.server_private.discord_webhook_url.size() > 0) {
+				MSR_LOG("Discord webhook url was invalid.");
+			}
+		}
+
+		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
+			MSR_LOG("Posting a telegram webhook job");
+
+			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
+
+			push_webhook_job(
+				[err, telegram_webhook_url, telegram_channel_id]() -> std::string {
+					auto client = httplib_utils::make_client(telegram_webhook_url);
+
+					auto items = telegram_webhooks::form_error_report(
+						telegram_channel_id,
+						err
+					);
+
+					const auto location = telegram_webhook_url.location + "/sendMessage";
+
+					client->Post(location.c_str(), items);
+
+					return "";
+				}
+			);
+		}
+		else {
+			if (cfg.server_private.telegram_webhook_url.size() > 0) {
+				MSR_LOG("Telegram webhook url was invalid.");
+			}
+		}
+	};
+
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
 		const auto ip_str = ::ToString(from);
 
@@ -523,7 +582,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			push_webhook_job(
 				[ip_str, data, discord_webhook_url]() -> std::string {
-					const auto ca_path = CA_CERT_PATH;
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
 					const auto game_mode_name = std::string(data.game_mode);
@@ -560,7 +618,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			push_webhook_job(
 				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
-					const auto ca_path = CA_CERT_PATH;
 					auto client = httplib_utils::make_client(telegram_webhook_url);
 
 					auto items = telegram_webhooks::form_new_community_server(
@@ -653,6 +710,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			fallback_http_ptr->listen(in_settings.ip.c_str(), in_settings.fallback_http_server_list_port);
 			LOG("The fallback HTTP listening thread has quit.");
 		});
+	}
+
+	if (track_rtc_errors) {
+		push_error_webhook("Server list restarted.");
 	}
 
 	while (true) {
@@ -906,6 +967,18 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 		if (signalling.should_reserialize()) {
 			reserialize_list();
+		}
+
+		if (track_rtc_errors) {
+			std::scoped_lock lk(rtc_errors_lk);
+
+			if (!rtc_errors.empty()) {
+				for (const auto& err : rtc_errors) {
+					push_error_webhook(err);
+				}
+
+				rtc_errors.clear();
+			}
 		}
 
 		augs::sleep(settings.sleep_ms / 1000);
