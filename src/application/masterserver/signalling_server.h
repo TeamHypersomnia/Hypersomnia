@@ -55,7 +55,7 @@ class signalling_server {
 
 	void setup_server_callbacks() {
 		server.onClient([this](std::shared_ptr<rtc::WebSocket> client) {
-			LOG("New client connected.");
+			LOG("New client connected from address: %x", client->remoteAddress());
 
 			{
 				std::scoped_lock lk(active_connections_mutex);
@@ -76,7 +76,7 @@ class signalling_server {
 
 			client->onClosed([this, wclient = std::weak_ptr(client)]() {
 				if (auto client = wclient.lock()) {
-					LOG("client->onClosed");
+					LOG("(onClosed) Address: %x", client->remoteAddress());
 					std::scoped_lock lk(peers_mutex);
 					remove_web_peer(client);
 				}
@@ -86,6 +86,7 @@ class signalling_server {
 				LOG("Client WebSocket error: %x", err);
 
 				if (auto client = wclient.lock()) {
+					LOG("(onError) Address: %x", client->remoteAddress());
 					std::scoped_lock lk(peers_mutex);
 					remove_web_peer(client);
 				}
@@ -205,6 +206,9 @@ class signalling_server {
 
 			peers.erase(id);
 			dirty = true;
+		}
+		else {
+			LOG("remove_web_peer: Peer '%x' was not found in the map.", id);
 		}
 	}
 
