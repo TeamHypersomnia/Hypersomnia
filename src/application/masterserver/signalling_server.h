@@ -76,6 +76,7 @@ class signalling_server {
 
 			client->onClosed([this, wclient = std::weak_ptr(client)]() {
 				if (auto client = wclient.lock()) {
+					LOG("client->onClosed");
 					std::scoped_lock lk(peers_mutex);
 					remove_web_peer(client);
 				}

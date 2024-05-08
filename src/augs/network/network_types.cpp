@@ -52,7 +52,7 @@ namespace augs {
 			yojimbo_log_level(flag ? YOJIMBO_LOG_LEVEL_DEBUG : YOJIMBO_LOG_LEVEL_INFO);
 		}
 
-		bool init(bool rtc_errors) {
+		bool init(bool rtc_errors, bool verbose_rtc) {
 			track_rtc_errors = rtc_errors;
 
 			LOG("Initializing the network library.");
@@ -64,7 +64,7 @@ namespace augs {
 
 #if BUILD_WEBRTC
 #if !PLATFORM_WEB
-			if (track_rtc_errors) {
+			if (verbose_rtc) {
 				rtc::InitLogger(rtc::LogLevel::Debug, rtc_log_callback);
 			}
 			else {

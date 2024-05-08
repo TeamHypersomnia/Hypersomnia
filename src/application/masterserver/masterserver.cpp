@@ -504,6 +504,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	};
 
 	auto push_error_webhook = [&](std::string err) {
+#if 0
 		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
 			MSR_LOG("Posting a discord webhook job");
 
@@ -528,6 +529,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				MSR_LOG("Discord webhook url was invalid.");
 			}
 		}
+#endif
 
 		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
 			MSR_LOG("Posting a telegram webhook job");
@@ -651,7 +653,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			set_cors(res);
 
 			if (serialized_list.size() > 0) {
-				MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
+				// MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
 
 				res.set_content_provider(
 					serialized_list.size(),
@@ -667,7 +669,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			set_cors(res);
 
 			if (serialized_list_json.size() > 0) {
-				MSR_LOG("JSON list request arrived. Sending list of size: %x", serialized_list_json.size());
+				// MSR_LOG("JSON list request arrived. Sending list of size: %x", serialized_list_json.size());
 
 				res.set_content_provider(
 					serialized_list_json.size(),
@@ -829,7 +831,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 								}
 							}
 
-							MSR_LOG("Packet (%x bytes) from %x. New: %x. Heartbeat changed: %x.", packet_bytes, ::ToString(from), is_new_server, heartbeats_mismatch);
+							// MSR_LOG("Packet (%x bytes) from %x. New: %x. Heartbeat changed: %x.", packet_bytes, ::ToString(from), is_new_server, heartbeats_mismatch);
 
 							if (is_new_server || heartbeats_mismatch) {
 								reserialize_list();
