@@ -310,22 +310,7 @@ public:
 	auto make_ws_config() {
 		rtc::WebSocketConfiguration config;
 
-		const auto ca_path = CA_CERT_PATH;
-		/*
-			TODO_SECURITY:
-			For the life of me, can't get this to work otherwise.
-			It keeps spitting  
-
-			[23:22:59] rtc::impl::TlsTransport::InfoCallback@823: TLS alert: unknown CA
-			[23:22:59] rtc::impl::TlsTransport::doRecv@792: TLS recv: Handshake failed: error:0A000086:SSL routines::certificate verify failed
-			[23:22:59] rtc::impl::TlsTransport::doRecv@800: TLS handshake failed
-			
-			Even though the same damn file is used in cpp-httplib for https connections.
-			And even though it works when the web client is trying to connect.
-
-			WTF?!!!!
-		*/
-		config.disableTlsVerification = true;
+		config.caCertificatePemFile = CA_CERT_PATH;
 
 		return config;
 	}
