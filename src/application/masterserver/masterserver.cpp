@@ -504,37 +504,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	};
 
 	auto push_error_webhook = [&](std::string err) {
-#if 0
-		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
-			MSR_LOG("Posting a discord webhook job");
-
-			push_webhook_job(
-				[err, discord_webhook_url]() -> std::string {
-					auto client = httplib_utils::make_client(discord_webhook_url);
-
-					auto items = discord_webhooks::form_error_report(
-						"Signalling server",
-						"WebSocket Server message",
-						err
-					);
-
-					client->Post(discord_webhook_url.location.c_str(), items);
-
-					return "";
-				}
-			);
-		}
-		else {
-			if (cfg.server_private.discord_webhook_url.size() > 0) {
-				MSR_LOG("Discord webhook url was invalid.");
-			}
-		}
-#endif
-
-		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
+		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_logs_webhook_url); telegram_webhook_url.valid()) {
 			MSR_LOG("Posting a telegram webhook job");
 
-			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
+			auto telegram_channel_id = cfg.server_private.telegram_logs_channel_id;
 
 			push_webhook_job(
 				[err, telegram_webhook_url, telegram_channel_id]() -> std::string {
@@ -554,8 +527,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			);
 		}
 		else {
-			if (cfg.server_private.telegram_webhook_url.size() > 0) {
-				MSR_LOG("Telegram webhook url was invalid.");
+			if (cfg.server_private.telegram_logs_webhook_url.size() > 0) {
+				MSR_LOG("Telegram logs webhook url was invalid.");
 			}
 		}
 	};

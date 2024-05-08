@@ -65,7 +65,7 @@ namespace augs {
 #if BUILD_WEBRTC
 #if !PLATFORM_WEB
 			if (verbose_rtc) {
-				rtc::InitLogger(rtc::LogLevel::Debug, rtc_log_callback);
+				rtc::InitLogger(rtc::LogLevel::Verbose, rtc_log_callback);
 			}
 			else {
 				rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
