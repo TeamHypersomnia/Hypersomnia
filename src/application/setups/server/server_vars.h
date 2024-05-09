@@ -195,8 +195,8 @@ struct server_private_vars {
 	std::string telegram_webhook_url = "";
 	std::string telegram_channel_id = "@hypersomnia_monitor";
 
-	std::string telegram_logs_channel_id = "@hypersomnia_server_logs";
-	std::string telegram_logs_webhook_url;
+	std::string telegram_alerts_channel_id = "@hypersomnia_server_logs";
+	std::string telegram_alerts_webhook_url;
 
 	std::string steam_web_api_key = "";
 

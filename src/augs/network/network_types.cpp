@@ -38,7 +38,7 @@ void rtc_log_callback(rtc::LogLevel level, std::string message) {
 	LOG_NOFORMAT(message);
 
 	if (track_rtc_errors) {
-		if (level <= rtc::LogLevel::Error) {
+		if (level <= rtc::LogLevel::Fatal) {
 			std::scoped_lock lk(rtc_errors_lk);
 			rtc_errors.push_back(message);
 		}

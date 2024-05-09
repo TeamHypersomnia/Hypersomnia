@@ -503,11 +503,11 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
 	};
 
-	auto push_error_webhook = [&](std::string err) {
-		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_logs_webhook_url); telegram_webhook_url.valid()) {
+	auto push_alert_webhook = [&](std::string err) {
+		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_alerts_webhook_url); telegram_webhook_url.valid()) {
 			MSR_LOG("Posting a telegram webhook job");
 
-			auto telegram_channel_id = cfg.server_private.telegram_logs_channel_id;
+			auto telegram_channel_id = cfg.server_private.telegram_alerts_channel_id;
 
 			push_webhook_job(
 				[err, telegram_webhook_url, telegram_channel_id]() -> std::string {
@@ -527,7 +527,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			);
 		}
 		else {
-			if (cfg.server_private.telegram_logs_webhook_url.size() > 0) {
+			if (cfg.server_private.telegram_alerts_webhook_url.size() > 0) {
 				MSR_LOG("Telegram logs webhook url was invalid.");
 			}
 		}
@@ -688,7 +688,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	}
 
 	if (track_rtc_errors) {
-		push_error_webhook("Server list restarted.");
+		push_alert_webhook("Server list restarted.");
 	}
 
 	while (true) {
@@ -949,7 +949,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			if (!rtc_errors.empty()) {
 				for (const auto& err : rtc_errors) {
-					push_error_webhook(err);
+					push_alert_webhook(err);
 				}
 
 				rtc_errors.clear();
