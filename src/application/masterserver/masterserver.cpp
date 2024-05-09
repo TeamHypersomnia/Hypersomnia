@@ -757,7 +757,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::webrtc_signalling_payload>) {
-						signalling.relay_message(
+						signalling.relay_message_from_native(
 							typed_request,
 							::ToString(from)
 						);

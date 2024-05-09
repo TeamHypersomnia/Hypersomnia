@@ -8,34 +8,7 @@
 void yojimbo_random_bytes( uint8_t * data, int bytes );
 
 class signalling_server {
-	std::mutex peers_mutex;
-	std::mutex active_connections_mutex;
-
-	double peer_timeout;
-	rtc::WebSocketServer server;
-
-	/*
-		To prevent them going out of scope.
-	*/
-
-    std::unordered_set<std::shared_ptr<rtc::WebSocket>> active_connections;
-
-	std::mutex aliases_mutex;
-	std::unordered_map<std::string, std::string> webrtc_id_aliases;
-
-	std::atomic<bool> dirty = false;
-
-	struct pending_signalling_packet {
-		uint64_t guid = 0;
-		std::string message;
-		int times = 5;
-		netcode_address_t target;
-	};
-
-	double when_last_processed_timeouts = -1;
-	double when_last_sent_packets = -1;
-	std::vector<pending_signalling_packet> pending_packets;
-
+public:
 	struct signalling_peer {
 		std::shared_ptr<rtc::WebSocket> ws;
 		netcode_address_t ip_informational = {};
@@ -53,6 +26,53 @@ class signalling_server {
 		}
 	};
 
+	using peer_map = std::unordered_map<
+		std::string,
+		signalling_peer
+	>;
+
+private:
+	std::mutex peers_mutex;
+	std::mutex active_connections_mutex;
+	std::mutex aliases_mutex;
+
+	double peer_timeout;
+	rtc::WebSocketServer server;
+
+	peer_map peers_unsafe;
+
+	template <class F>
+	decltype(auto) on_peers(F callback) {
+		std::scoped_lock lk(peers_mutex);
+		return callback(peers_unsafe);
+	}
+
+	template <class F>
+	decltype(auto) on_peers(F callback) const {
+		std::scoped_lock lk(peers_mutex);
+		return callback(peers_unsafe);
+	}
+
+	/*
+		active_connections is kept to prevent sockets going out of scope until assigned an id.
+	*/
+
+    std::unordered_set<std::shared_ptr<rtc::WebSocket>> active_connections;
+	std::unordered_map<std::string, std::string> webrtc_id_aliases;
+
+	std::atomic<bool> dirty = false;
+
+	struct pending_signalling_packet {
+		uint64_t guid = 0;
+		std::string message;
+		int times = 5;
+		netcode_address_t target;
+	};
+
+	double when_last_processed_timeouts = -1;
+	double when_last_sent_packets = -1;
+	std::vector<pending_signalling_packet> pending_packets;
+
 	void setup_server_callbacks() {
 		server.onClient([this](std::shared_ptr<rtc::WebSocket> client) {
 			LOG("New client connected from address: %x", client->remoteAddress());
@@ -64,21 +84,24 @@ class signalling_server {
 
 			client->onOpen([this, wclient = std::weak_ptr(client)]() {
 				if(auto client = wclient.lock()) {
-					std::scoped_lock lk(peers_mutex);
-
-					register_web_peer(
-						client,
-						client->path(),
-						client->remoteAddress()
-					);
+					on_peers([&](auto& peers) {
+						register_web_peer(
+							peers,
+							client,
+							client->path(),
+							client->remoteAddress()
+						);
+					});
 				}
 			});
 
 			client->onClosed([this, wclient = std::weak_ptr(client)]() {
 				if (auto client = wclient.lock()) {
 					LOG("(onClosed) Address: %x", client->remoteAddress());
-					std::scoped_lock lk(peers_mutex);
-					remove_web_peer(client);
+
+					on_peers([&](auto& peers) {
+						remove_web_peer(peers, client);
+					});
 				}
 			});
 
@@ -87,8 +110,10 @@ class signalling_server {
 
 				if (auto client = wclient.lock()) {
 					LOG("(onError) Address: %x", client->remoteAddress());
-					std::scoped_lock lk(peers_mutex);
-					remove_web_peer(client);
+
+					on_peers([&](auto& peers) {
+						remove_web_peer(peers, client);
+					});
 				}
 			});
 
@@ -98,7 +123,12 @@ class signalling_server {
 						try {
 							const auto str = std::get<std::string>(data);
 							auto json_message = nlohmann::json::parse(str);
-							relay_message(json_message, get_webrtc_id(client));
+
+							on_peers(
+								[&](auto& peers) {
+									relay_message(peers, json_message, get_webrtc_id(peers, client));
+								}
+							);
 						}
 						catch (...) {
 
@@ -109,28 +139,30 @@ class signalling_server {
 							const auto bytes = std::get<rtc::binary>(data);
 							const auto hb = augs::from_bytes<server_heartbeat>(bytes);
 
-							std::scoped_lock lk(peers_mutex);
+							on_peers(
+								[&](auto& peers) {
+									const auto webrtc_id = get_webrtc_id(peers, client);
 
-							const auto webrtc_id = get_webrtc_id(client);
+									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
+										const auto unix_time = augs::date_time::secs_since_epoch();
 
-							if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-								const auto unix_time = augs::date_time::secs_since_epoch();
+										LOG("Received heartbeat from Web peer: %x", webrtc_id);
 
-								LOG("Received heartbeat from Web peer: %x", webrtc_id);
+										if (!peer->is_server()) {
+											peer->time_hosted = unix_time;
+										}
 
-								if (!peer->is_server()) {
-									peer->time_hosted = unix_time;
+										peer->last_heartbeat = hb;
+										peer->time_last_heartbeat = unix_time;
+										peer->time_last_correct_message = augs::high_precision_secs();
+
+										dirty = true;
+									}
+									else {
+										LOG("Wrong peer id: %x", webrtc_id);
+									}
 								}
-
-								peer->last_heartbeat = hb;
-								peer->time_last_heartbeat = unix_time;
-								peer->time_last_correct_message = augs::high_precision_secs();
-
-								dirty = true;
-							}
-							else {
-								LOG("Wrong peer id: %x", webrtc_id);
-							}
+							);
 						}
 						catch (...) {
 
@@ -140,11 +172,6 @@ class signalling_server {
 			});
 		});
 	}
-
-	using peer_map = std::unordered_map<
-		std::string,
-		signalling_peer
-	>;
 
 	static std::string formatHex(int number, int width) {
 		std::stringstream ss;
@@ -183,9 +210,10 @@ class signalling_server {
 		return "";
 	}
 
-	peer_map peers;
-
-	webrtc_id_type get_webrtc_id(const std::shared_ptr<rtc::WebSocket>& ws) {
+	webrtc_id_type get_webrtc_id(
+		const peer_map& peers,
+		const std::shared_ptr<rtc::WebSocket>& ws
+	) {
 		for (auto& s : peers) {
 			if (s.second.ws == ws) {
 				return s.first;
@@ -195,28 +223,43 @@ class signalling_server {
 		return "";
 	}
 
-	void remove_web_peer(const webrtc_id_type& id) {
+	void release_socket(const std::shared_ptr<rtc::WebSocket>& ws) {
+		std::scoped_lock lk(active_connections_mutex);
+		active_connections.erase(ws);
+	}
+
+	bool remove_web_peer(
+		peer_map& peers,
+		const webrtc_id_type& id
+	) {
 		if (const auto p = mapped_or_nullptr(peers, id)) {
 			LOG("Erasing peer: %x", id);
 
-			{
-				std::scoped_lock lk2(active_connections_mutex);
-				active_connections.erase(p->ws);
-			}
+			release_socket(p->ws);
 
 			peers.erase(id);
 			dirty = true;
+
+			return true;
 		}
-		else {
-			LOG("remove_web_peer: Peer '%x' was not found in the map.", id);
+
+		LOG("remove_web_peer: Peer '%x' was not found in the map.", id);
+		return false;
+	}
+
+	void remove_web_peer(
+		peer_map& peers,
+		const std::shared_ptr<rtc::WebSocket>& ws
+	) {
+		if (!remove_web_peer(peers, get_webrtc_id(peers, ws))) {
+			release_socket(ws);
 		}
 	}
 
-	void remove_web_peer(const std::shared_ptr<rtc::WebSocket>& ws) {
-		remove_web_peer(get_webrtc_id(ws));
-	}
-
-	webrtc_id_type choose_webrtc_id(std::optional<std::string> maybe_requested) {
+	webrtc_id_type choose_webrtc_id(
+		peer_map& peers,
+		std::optional<std::string> maybe_requested
+	) {
 		if (maybe_requested == std::nullopt) {
 			return find_free_id(peers);
 		}
@@ -249,13 +292,14 @@ class signalling_server {
 	}
 
 	void register_web_peer(
+		peer_map& peers,
 		std::shared_ptr<rtc::WebSocket> ws,
 		std::optional<std::string> path,
 		std::optional<std::string> addr
 	) {
 		dirty = true;
 
-		const auto chosen_webrtc_id = choose_webrtc_id(path);
+		const auto chosen_webrtc_id = choose_webrtc_id(peers, path);
 
 		auto& p = peers[chosen_webrtc_id];
 		p.ws = ws;
@@ -284,7 +328,7 @@ class signalling_server {
 		ws->send(message.dump());
 	}
 
-	void relay_message(nlohmann::json message, webrtc_id_type source_id) {
+	void relay_message(peer_map& peers, nlohmann::json message, webrtc_id_type source_id) {
 		if (message.contains("id") && message["id"].is_string()) {
 			std::string dest_id = message["id"];
 
@@ -320,8 +364,6 @@ class signalling_server {
 				pending_packets.emplace_back(std::move(packet));
 			}
 			else {
-				std::scoped_lock lk(peers_mutex);
-
 				LOG("Relaying to peer with id %x", dest_id);
 
 				if (const auto target = mapped_or_nullptr(peers, dest_id)) {
@@ -365,36 +407,21 @@ class signalling_server {
 	void process_timeouts(double now) {
 		std::vector<webrtc_id_type> to_erase;
 
-		std::scoped_lock lk(peers_mutex);
-
-		for (auto& p : peers) {
-			if (now - p.second.time_last_correct_message >= peer_timeout) {
-				to_erase.push_back(p.first);
+		on_peers([&](auto& peers) {
+			for (auto& p : peers) {
+				if (now - p.second.time_last_correct_message >= peer_timeout) {
+					to_erase.push_back(p.first);
+				}
 			}
-		}
 
-		for (const auto& t : to_erase) {
-			LOG("Timing out peer: %x", t);
-			remove_web_peer(t);
-		}
+			for (const auto& t : to_erase) {
+				LOG("Timing out peer: %x", t);
+				remove_web_peer(peers, t);
+			}
+		});
 	}
 
-public:
-	auto get_new_peers_map() {
-		peer_map cp;
-
-		{
-			std::scoped_lock lk(peers_mutex);
-			cp = peers;
-			dirty = false;
-		}
-
-		return cp;
-	}
-
-	bool try_receive_guid(const std::string& dest_id, const uint64_t guid) {
-		std::scoped_lock lk(peers_mutex);
-
+	bool try_receive_guid(peer_map& peers, const std::string& dest_id, const uint64_t guid) {
 		if (const auto target = mapped_or_nullptr(peers, dest_id)) {
 			auto& recvd_messages = target->recvd_messages;
 
@@ -408,7 +435,21 @@ public:
 		return false;
 	}
 
-	void relay_message(
+public:
+	auto get_new_peers_map() {
+		peer_map cp;
+
+		{
+			on_peers([&](const auto& peers) { 
+				cp = peers; 
+				dirty = false;
+			});
+		}
+
+		return cp;
+	}
+
+	void relay_message_from_native(
 		const masterserver_out::webrtc_signalling_payload& p,
 		const std::string& source_webrtc_id
 	) {
@@ -418,9 +459,11 @@ public:
 			auto json_message = nlohmann::json::parse(p.message);
 
 			if (json_message.contains("id") && json_message["id"].is_string()) {
-				if (try_receive_guid(std::string(json_message["id"]), guid)) {
-					relay_message(json_message, source_webrtc_id);
-				}
+				on_peers([&](auto& peers) {
+					if (try_receive_guid(peers, std::string(json_message["id"]), guid)) {
+						relay_message(peers, json_message, source_webrtc_id);
+					}
+				});
 			}
 		}
 		catch (...) {
