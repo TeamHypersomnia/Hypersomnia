@@ -4231,6 +4231,10 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 }
 
 setup_escape_result server_setup::escape() {
+	if (integrated_client_gui.chat.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
 	if (!is_gameplay_on()) {
 		return quit_playtesting_or(setup_escape_result::GO_TO_MAIN_MENU);
 	}

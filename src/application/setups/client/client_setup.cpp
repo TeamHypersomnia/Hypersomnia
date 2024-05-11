@@ -2012,6 +2012,10 @@ setup_escape_result client_setup::escape() {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
+	if (client_gui.chat.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
 	if (client_gui.rcon.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}

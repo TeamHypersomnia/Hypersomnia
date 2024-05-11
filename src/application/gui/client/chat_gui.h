@@ -72,6 +72,8 @@ struct chat_gui_state {
 
 	void open_input_bar(chat_target_type);
 
+	bool escape();
+
 	void draw_recent_messages(
 		augs::drawer_with_default,
 		const client_chat_settings&, 

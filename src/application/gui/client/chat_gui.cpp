@@ -208,6 +208,16 @@ static int InputTextCallback(ImGuiInputTextCallbackData* data) {
 	return 0;
 }
 
+bool chat_gui_state::escape() {
+	if (show) {
+		show = false;
+
+		return true;
+	}
+
+	return false;
+}
+
 bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 	using namespace augs::imgui;
 
@@ -276,7 +286,11 @@ bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 	{
 		auto scope = augs::imgui::scoped_item_width(size.x);
 
-		if (input_text(buf, "##ChatInput", current_message, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways, InputTextCallback)) {
+		if (input_text(buf, "###ChatInput", current_message, ImGuiInputTextFlags_CallbackAlways, InputTextCallback)) {
+
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsItemDeactivatedAfterEdit()) {
 			show = false;
 
 			if (current_message.size() > 0) {
