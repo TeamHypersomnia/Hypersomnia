@@ -35,6 +35,9 @@ namespace augs {
 	}
 
 	void open_text_editor(const std::string& on_file) {
+#if HEADLESS
+		(void)on_file;
+#else
 		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
 
 #if PLATFORM_MACOS
@@ -44,6 +47,7 @@ namespace augs {
 #endif
 
 		augs::shell(command.string());
+#endif
 	}
 }
 #else

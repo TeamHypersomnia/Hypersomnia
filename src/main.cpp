@@ -302,6 +302,13 @@ int main(const int argc, const char* const * const argv) {
 				return augs::restart_application(argc, argv, exe_path.string(), { "--suppress-server-webhook" });
 			}
 
+			case work_result::RELAUNCH_MASTERSERVER: {
+				LOG("main: Masterserver requested relaunch.");
+				save_failure_logs();
+
+				return augs::restart_application(argc, argv, exe_path.string(), {});
+			}
+
 			case work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER: {
 				LOG("main: Dedicated server detected available updates.");
 				save_success_logs();

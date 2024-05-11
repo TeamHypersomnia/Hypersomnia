@@ -801,9 +801,7 @@ work_result work(
 			masterserver.get_last_udp_command_port()
 		);
 
-		perform_masterserver(adjusted_config);
-
-		return work_result::SUCCESS;
+		return perform_masterserver(adjusted_config);
 	}
 #endif
 

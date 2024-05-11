@@ -5,6 +5,7 @@
 #include "application/masterserver/nat_traversal_step_payload.h"
 #include "application/masterserver/gameserver_commands.h"
 #include "application/masterserver/masterserver_commands.h"
+#include "work_result.h"
 
 struct config_lua_table;
 struct server_heartbeat;
@@ -25,4 +26,4 @@ using masterserver_response = std::variant<
 	masterserver_out::stun_result_info
 >;
 
-void perform_masterserver(const config_lua_table&);
+work_result perform_masterserver(const config_lua_table&);

@@ -129,7 +129,7 @@ static auto to_webrtc_alias(
 	return location_id;
 }
 
-void perform_masterserver(const config_lua_table& cfg) try {
+work_result perform_masterserver(const config_lua_table& cfg) try {
 	using namespace httplib;
 
 	const auto& settings = cfg.masterserver;
@@ -179,7 +179,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		}
 		else {
 			LOG("There was a problem binding masterserver to %x:%x! Quitting.", settings.ip, new_port);
-			return;
+			return work_result::FAILURE;
 		}
 
 		LOG("Created masterserver socket at: %x", ::ToString(udp_command_sockets.back().socket.address));
@@ -283,7 +283,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	const auto masterserver_dump_path = USER_DIR / "masterserver.dump";
 
 	auto reserialize_list = [&]() {
-		MSR_LOG("Reserializing the server list.");
+		// MSR_LOG("Reserializing the server list.");
 
 		const auto peer_map = signalling.get_new_peers_map();
 
@@ -691,6 +691,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		push_alert_webhook("Server list restarted.");
 	}
 
+	std::optional<work_result> ms_work_result;
+
 	while (true) {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
@@ -953,6 +955,9 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				}
 
 				rtc_errors.clear();
+
+				ms_work_result = work_result::RELAUNCH_MASTERSERVER;
+				break;
 			}
 		}
 
@@ -975,7 +980,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	}
 
 	dump_server_list_to_file();
+
+	if (ms_work_result.has_value()) {
+		return *ms_work_result;
+	}
+
+	return work_result::SUCCESS;
 }
 catch (const netcode_socket_raii_error& err) {
 	LOG(err.what());
+	return work_result::FAILURE;
 }
