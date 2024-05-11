@@ -98,6 +98,7 @@
 #endif
 #include "application/gui/map_catalogue_gui.h"
 #include "application/gui/leaderboards_gui.h"
+#include "application/gui/social_sign_in_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 #include "application/setups/editor/editor_paths.h"
 
@@ -1459,6 +1460,36 @@ work_result work(
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 
+	WEBSTATIC social_sign_in_state social_sign_in = std::string("Login");
+	social_sign_in.guest_nickname = config.client.nickname;
+
+	WEBSTATIC auto should_ask_for_social_sign_in = [&]() {
+#if PLATFORM_WEB
+		if (config.chosen_play_as_guest) {
+			return false;
+		}
+
+		return true;
+#else
+		return false;
+#endif
+	};
+
+	WEBSTATIC auto perform_social_sign_in_popup = [&]() {
+		const bool play_as_guest = social_sign_in.perform({
+			streaming.necessary_images_in_atlas
+		});
+
+		if (play_as_guest) {
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.client.nickname = social_sign_in.guest_nickname;
+					cfg.chosen_play_as_guest = true;
+				}
+			);
+		}
+	};
+
 	WEBSTATIC auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
 	};
@@ -1534,6 +1565,10 @@ work_result work(
 	};
 
 	WEBSTATIC auto setup_requires_cursor = [&]() {
+		if (should_ask_for_social_sign_in()) {
+			return true;
+		}
+
 		return visit_current_setup([&](const auto& s) {
 			return s.requires_cursor();
 		});
@@ -2242,7 +2277,6 @@ work_result work(
 			steam_id,
 
 			config.main_menu.leaderboards_provider_url,
-			get_general_renderer(),
 			streaming.necessary_images_in_atlas,
 			streaming.avatar_preview_tex,
 
@@ -2868,6 +2902,17 @@ work_result work(
 
 				if (const bool show_leaderboards = !has_current_setup()) {
 					perform_leaderboards();
+				}
+
+				if (should_ask_for_social_sign_in()) {
+					if (streaming.completed_all_loading()) {
+						if (!social_sign_in.opened_once) {
+							social_sign_in.open();
+							social_sign_in.opened_once = true;
+						}
+					}
+
+					perform_social_sign_in_popup();
 				}
 
 				if (!has_current_setup()) {

@@ -53,8 +53,6 @@ namespace augs {
 		}
 
 		bool init(bool rtc_errors, bool verbose_rtc) {
-			track_rtc_errors = rtc_errors;
-
 			LOG("Initializing the network library.");
 			const bool result = InitializeYojimbo();
 
@@ -64,12 +62,17 @@ namespace augs {
 
 #if BUILD_WEBRTC
 #if !PLATFORM_WEB
+			track_rtc_errors = rtc_errors;
+
 			if (verbose_rtc) {
 				rtc::InitLogger(rtc::LogLevel::Verbose, rtc_log_callback);
 			}
 			else {
 				rtc::InitLogger(rtc::LogLevel::Info, rtc_log_callback);
 			}
+#else
+			(void)rtc_errors;
+			(void)verbose_rtc;
 #endif
 			rtc::Preload();
 #endif

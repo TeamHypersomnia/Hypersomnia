@@ -146,6 +146,7 @@ public:
 	bool finished_generating_atlas() const;
 	bool general_atlas_in_progress() const;
 	void display_loading_progress() const;
+	bool completed_all_loading() const;
 
 	void request_rescan();
 	void recompress_demos();

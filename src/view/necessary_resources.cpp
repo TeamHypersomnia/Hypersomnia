@@ -203,7 +203,13 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 			}
 		}
 
-		if (const auto image_path = typesafe_sprintf("%x/%x.png", directory, stem);
+		std::string preffix;
+
+		if (begins_with(stem, "social")) {
+			preffix = "social/";
+		}
+
+		if (auto image_path = typesafe_sprintf("%x/%x%x.png", directory, preffix, stem);
 			augs::exists(image_path)
 		) {
 			source_image.path = image_path;

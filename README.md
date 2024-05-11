@@ -41,6 +41,8 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
 
 # Press
 
+<h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" height=50> <b>/ Blog</b> </a></h3>
+
 <a href="https://pubhtml5.com/mxdt/dbwn/Linux_USA_10.2023_downmagaz.net/89"> <img src="https://upload.wikimedia.org/wikipedia/en/0/05/Linux_Magazine_international_logo.png" alt="Issue 275, page 89"> </a>
 
 <a href="https://news.ycombinator.com/item?id=36469297"> <img src="https://upload.wikimedia.org/wikipedia/en/b/bf/Hackernews_logo.png"> </a>

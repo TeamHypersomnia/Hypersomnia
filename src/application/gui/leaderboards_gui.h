@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/misc/imgui/standard_window_mixin.h"
-#include "augs/graphics/renderer.h"
 #include "augs/graphics/texture.h"
 #include "view/necessary_resources.h"
 
@@ -12,7 +11,6 @@ struct leaderboards_input {
 
 	const std::string provider_url;
 
-	augs::renderer& renderer;
 	const necessary_images_in_atlas_map& necessary_images;
 	augs::graphics::texture& avatar_preview_tex;
 

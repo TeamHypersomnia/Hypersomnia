@@ -205,6 +205,9 @@ namespace assets {
 		RANK_11,
 		RANK_12,
 
+		SOCIAL_GOOGLE,
+		SOCIAL_DISCORD,
+
 		COUNT
 		// END GEN INTROSPECTOR
 	};
