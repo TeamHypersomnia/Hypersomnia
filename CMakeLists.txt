@@ -623,6 +623,7 @@ if(HAS_HEAD)
 	"src/application/gui/client/chat_gui.cpp"
 	"src/application/gui/client/client_gui_state.cpp"
 	"src/application/gui/leaderboards_gui.cpp"
+	"src/application/gui/social_sign_in_gui.cpp"
 	"src/view/hud_messages/hud_messages_gui.cpp"
 	"src/application/gui/map_catalogue_gui.cpp"
 
