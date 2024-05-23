@@ -778,7 +778,6 @@ work_result perform_masterserver(const config_lua_table& cfg) try {
 							const auto heartbeat_before = server_entry.last_heartbeat;
 							server_entry.last_heartbeat = typed_request;
 							server_entry.time_last_heartbeat = current_time;
-							server_entry.meta.time_hosted = current_time;
 							server_entry.meta.official_url = find_official_url(from);
 
 							const auto ip_str = ::ToString(from);
@@ -797,6 +796,8 @@ work_result perform_masterserver(const config_lua_table& cfg) try {
 							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
 							if (is_new_server) {
+								server_entry.meta.time_hosted = current_time;
+
 								if (!typed_request.suppress_new_community_server_webhook) {
 									MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
 									push_new_server_webhook(from, typed_request);
