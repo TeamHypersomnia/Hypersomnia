@@ -20,7 +20,7 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v3
@@ -52,6 +52,9 @@ jobs:
         cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=ON
         make
         sudo make install
+
+    - name: Install OpenSSL3
+      run: cmake/linux_actions/install_openssl3.sh
 
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
