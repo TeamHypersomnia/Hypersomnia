@@ -340,6 +340,13 @@ work_result perform_masterserver(const config_lua_table& cfg) try {
 			next.ip = ::ToString(ip);
 			next.webrtc_id = meta.webrtc_id;
 
+			if (!next.webrtc_id.empty()) {
+				next.browser_connect_string = next.webrtc_id;
+			}
+			else {
+				next.browser_connect_string = next.ip;
+			}
+
 			next.time_hosted = meta.time_hosted;
 			next.time_last_heartbeat = time_last_heartbeat;
 			next.arena = data.current_arena;
