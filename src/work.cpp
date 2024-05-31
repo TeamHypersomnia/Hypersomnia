@@ -170,6 +170,8 @@
 #include "augs/string/parse_url.h"
 #endif
 
+#include "application/gui/make_random_nickname.hpp"
+
 #if BUILD_WEBRTC
 #include "rtc/rtc.hpp"
 #endif
@@ -541,20 +543,11 @@ work_result work(
 			result->server.autoupdate_delay = *params.autoupdate_delay;
 		}
 
+#if !PLATFORM_WEB
 		if (result->client.nickname.empty()) {
-			const auto system_user_name = augs::get_user_name();
-
-#if PLATFORM_WEB
-			if (!params.guest.empty()) {
-				result->client.nickname = typesafe_sprintf("[%x] %x", params.guest, system_user_name);
-			}
-			else {
-				result->client.nickname = system_user_name;
-			}
-#else
-			result->client.nickname = system_user_name;
-#endif
+			result->client.nickname = augs::get_user_name();
 		}
+#endif
 
 		if (is_steam_client) {
 			if (result->client.use_account_nickname) {
@@ -632,6 +625,20 @@ work_result work(
 	LOG("Random seed for this run: %x", random_seed);
 
 	netcode_rng = randomization(random_seed);
+
+	if (config.client.nickname.empty()) {
+		const auto rng_name = ::make_random_nickname(netcode_rng);
+
+		if (!params.guest.empty()) {
+			config.client.nickname = typesafe_sprintf("[%x] %x", params.guest, rng_name);
+		}
+		else {
+			config.client.nickname = rng_name;
+		}
+
+		LOG("Generated guest nickname: %x", config.client.nickname);
+	}
+
 #endif
 #endif
 

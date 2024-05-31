@@ -111,6 +111,12 @@ void leaderboards_gui_state::refresh_leaderboards(const leaderboards_input in) {
 void leaderboards_gui_state::perform(const leaderboards_input in) {
 	using namespace httplib_utils;
 
+#if PLATFORM_WEB
+	const bool logged_in = in.is_logged_in;
+#else
+	const bool logged_in = true;
+#endif
+
 	/* Always visible */
 	show = true;
 
@@ -247,7 +253,11 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 		const auto mmr_w = ImGui::CalcTextSize("MMR: 9.99999999").x;
 		ImGui::PopFont();
-		const auto col_w = std::max(nick_w, mmr_w);
+		auto col_w = std::max(nick_w, mmr_w);
+
+		if (!logged_in) {
+			col_w = std::max(col_w, ImGui::CalcTextSize("Sign in to compete on Leaderboards.").x + one_letter.x*4);
+		}
 
 		ImGui::SetColumnWidth(1, col_w);
 	}
@@ -314,23 +324,36 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PopFont();
 	}
 	else {
-		text("No matches yet!");
+		if (!logged_in) {
+			const auto alpha_sin = (std::sin(augs::steady_secs()*4) + 1) / 2;
 
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+			auto darkened_selectables = scoped_selectable_colors({
+				rgba(255, 255, 255, alpha_sin*25+10),
+				rgba(255, 255, 255, 40),
+				rgba(255, 255, 255, 60)
+			});
 
-		text(mmr_text);
-		ImGui::SameLine();
-		text_disabled(mmr_num_text);
-		ImGui::PopFont();
+			text_disabled("(Guest)");
+
+			if (ImGui::Selectable("Sign in to compete on Leaderboards.", true)) {
+				wants_sign_in = true;
+			}
+		}
+		else {
+			text("No matches yet!");
+
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+			text(mmr_text);
+			ImGui::SameLine();
+			text_disabled(mmr_num_text);
+			ImGui::PopFont();
+		}
 	}
 
 	ImGui::NextColumn();
 
-	bool show_rank = true;
-
-#if PLATFORM_WEB
-	show_rank = in.is_logged_in;
-#endif
+	const bool show_rank = logged_in;
 
 	if (show_rank) {
 		{
@@ -360,24 +383,10 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PopFont();
 	}
 	else {
-#if PLATFORM_WEB
-		if (!in.is_logged_in) {
-			auto darkened_selectables = scoped_selectable_colors({
-				rgba(255, 255, 255, 20),
-				rgba(255, 255, 255, 30),
-				rgba(255, 255, 255, 60)
-			});
-
-			if (ImGui::Selectable("Sign in to compete on Leaderboards.", false)) {
-				wants_sign_in = true;
-			}
-		}
-#endif
+		// text_disabled("No rank yet.");
 	}
 
-
-#if PLATFORM_WEB
-	if (in.is_logged_in) {
+	if (logged_in) {
 		ImGui::SameLine();
 		const auto avail = ImGui::GetContentRegionAvail();
 
@@ -397,7 +406,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 	}
 
-#endif
 
 	ImGui::NextColumn();
 

@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/window_framework/shell.h"
 
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/misc/imgui/imgui_controls.h"
 
 void sign_in_with_google();
@@ -129,7 +130,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 			auto comfier_frame_padding = scoped_style_var(ImGuiStyleVar_FramePadding, final_frame_padding);
 
 			base::acquire_keyboard_once();
-			input_text("##NicknameChooser", guest_nickname);
+			input_text<max_nickname_length_v>("##NicknameChooser", guest_nickname);
 		}
 	}
 
@@ -153,6 +154,8 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		ok = ImGui::Selectable("Cancel##ConfirmCancel", true);
 	}
 	else {
+		auto scope = maybe_disabled_cols({}, guest_nickname.size() < min_nickname_length_v);
+
 		ok = ImGui::Selectable("OK##ConfirmGuest", true);
 	}
 
