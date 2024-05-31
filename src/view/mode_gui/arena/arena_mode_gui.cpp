@@ -1169,8 +1169,8 @@ void arena_gui_state::draw_mode_gui(
 			if (is_ranked_server) {
 				const auto secs = augs::steady_secs();
 
-				const auto left_col = rgba::get_bright_wave(secs / 8.f + 0.3f);
-				const auto right_col = rgba::get_bright_wave(secs / 4.f);
+				const auto left_col = rgba::get_bright_wave(secs / 8.0 + 0.3);
+				const auto right_col = rgba::get_bright_wave(secs / 4.0);
 
 				const auto one_sixth_t = in.screen_size.y / 6;
 
@@ -1316,7 +1316,7 @@ void arena_gui_state::draw_mode_gui(
 
 				if (is_ranked_server) {
 					const auto secs = augs::steady_secs();
-					const auto right_col = rgba::get_bright_wave(secs / 4.f);
+					const auto right_col = rgba::get_bright_wave(secs / 4.0);
 
 					if (c > 0.f) {
 						draw_warmup_indicator(larger_colored("RANKED MATCH STARTING IN", right_col), larger_colored(format_mins_secs(match_begins_in_seconds)+"\n", yellow));

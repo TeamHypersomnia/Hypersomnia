@@ -547,7 +547,8 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto wave_color = rgba::get_bright_wave(augs::steady_secs() / 4.0f, 0.55);
+		const auto wave_time = augs::steady_secs() / 4.0;
+		const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
 
 		{
 			if (s.is_official_server() ) {

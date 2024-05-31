@@ -115,7 +115,7 @@ public:
 		auto color = this_id->colorize;
 		auto secondary_color = color;
 
-		auto secs = augs::steady_secs() / 4.0f;
+		auto secs = augs::steady_secs() / 4.0;
 
 		const auto& detector = this_id->detector;
 
@@ -125,7 +125,7 @@ public:
 
 		if (this_id->color_wave) {
 			color = rgba::get_bright_wave(secs, 0.55);
-			secondary_color = rgba::get_bright_wave(secs + 0.4f, 0.55);
+			secondary_color = rgba::get_bright_wave(secs + 0.4, 0.55);
 		}
 
 		rgba inside_col = white;

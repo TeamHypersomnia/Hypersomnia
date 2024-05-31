@@ -289,9 +289,9 @@ rgba& rgba::mult_brightness(const float mult) {
 
 rgba rgba::zero = rgba(0, 0, 0, 0);
 
-rgba rgba::get_bright_wave(const float secs, const float upperLimit1, const float lowerLimit2) {
-	const float cycleTime = std::fmod(secs, 1.f); 
-	const float wave = std::sin(cycleTime * 2 * PI<double>);
+rgba rgba::get_bright_wave(const double secs, const double upperLimit1, const double lowerLimit2) {
+	const auto cycleTime = std::fmod(secs, 1.0); 
+	const auto wave = std::sin(cycleTime * 2 * PI<double>);
 	float hue;
 
 	if (wave > 0) {
