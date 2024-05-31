@@ -47,6 +47,8 @@ struct client_vars {
 	bool use_account_avatar = true;
 
 	client_nickname_type nickname = "Player";
+	client_nickname_type nickname_before_sign_in = "Player";
+
 	client_net_vars net;
 
 	bool suppress_webhooks = false;

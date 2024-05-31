@@ -165,6 +165,9 @@
 #include "augs/string/parse_url.h"
 #if PLATFORM_WEB
 #include "augs/templates/main_thread_queue.h"
+#include "augs/misc/httplib_utils.h"
+#include "augs/readwrite/json_readwrite.h"
+#include "augs/string/parse_url.h"
 #endif
 
 #if BUILD_WEBRTC
@@ -213,6 +216,9 @@ extern std::string open_url_on_main;
 EM_JS(void, call_openUrl, (const char* newPath), {
 	openUrl(newPath);
 });
+
+#include "application/main/auth_providers.h"
+
 #endif
 
 #include "augs/persistent_filesystem.hpp"
@@ -559,10 +565,9 @@ work_result work(
 
 			if (result->client.use_account_avatar) {
 				if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-					const auto cached_file_path = USER_DIR / "cached_avatar.png";
-					avatar.save_as_png(cached_file_path);
+					avatar.save_as_png(CACHED_AVATAR);
 
-					result->client.avatar_image_path = cached_file_path;
+					result->client.avatar_image_path = CACHED_AVATAR;
 				}
 			}
 		}
@@ -957,7 +962,7 @@ work_result work(
 		if (sync) {
 			const auto& provider = config.server.external_arena_files_provider;
 
-			if (const auto parsed = parsed_url(provider); parsed.valid()) {
+			if (parsed_url(provider).valid()) {
 				LOG("External arena provider: %x", provider);
 
 				headless_map_catalogue headless;
@@ -1449,6 +1454,60 @@ work_result work(
 	WEBSTATIC auto streaming_ptr = std::make_unique<viewables_streaming>();
 	WEBSTATIC viewables_streaming& streaming = *streaming_ptr;
 
+	WEBSTATIC social_sign_in_state social_sign_in = std::string("Login");
+
+#if PLATFORM_WEB
+	WEBSTATIC auto social_log_out = [&]() {
+		social_sign_in.cached_auth.log_out();
+
+		streaming.requested_avatar_preview = BLANK_AVATAR;
+
+		augs::remove_file(CACHED_AUTH_PATH);
+		augs::remove_file(CACHED_AVATAR);
+
+		change_with_save(
+			[&](auto& cfg) {
+				cfg.client.avatar_image_path = augs::path_type();
+				cfg.client.nickname = cfg.client.nickname_before_sign_in;
+			}
+		);
+	};
+
+	WEBSTATIC auto perform_social_sign_in_popup = [&](const bool prompted_once) {
+		const bool confirmed = social_sign_in.perform({
+			streaming.necessary_images_in_atlas,
+			prompted_once
+		});
+
+		if (confirmed) {
+			const bool play_as_guest = !prompted_once;
+			social_sign_in.close();
+
+			if (play_as_guest) {
+				change_with_save(
+					[&](auto& cfg) {
+						cfg.client.nickname = social_sign_in.guest_nickname;
+						cfg.prompted_for_sign_in_once = true;
+					}
+				);
+			}
+		}
+	};
+
+	try {
+		social_sign_in.cached_auth = augs::from_json_file<auth_data>(CACHED_AUTH_PATH);
+	}
+	catch (...) {
+		social_sign_in.cached_auth = {};
+	}
+
+	if (social_sign_in.cached_auth.expired()) {
+		social_log_out();
+	}
+
+	social_sign_in.guest_nickname = config.client.nickname;
+#endif
+
 	try {
 		augs::image avatar;
 		avatar.from_file(config.client.avatar_image_path);
@@ -1456,39 +1515,9 @@ work_result work(
 	}
 	catch (...) {
 		augs::image avatar;
-		avatar.from_file("content/gfx/necessary/blank_avatar.png");
+		avatar.from_file(BLANK_AVATAR);
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
-
-	WEBSTATIC social_sign_in_state social_sign_in = std::string("Login");
-	social_sign_in.guest_nickname = config.client.nickname;
-
-	WEBSTATIC auto should_ask_for_social_sign_in = [&]() {
-#if PLATFORM_WEB
-		if (config.chosen_play_as_guest) {
-			return false;
-		}
-
-		return true;
-#else
-		return false;
-#endif
-	};
-
-	WEBSTATIC auto perform_social_sign_in_popup = [&]() {
-		const bool play_as_guest = social_sign_in.perform({
-			streaming.necessary_images_in_atlas
-		});
-
-		if (play_as_guest) {
-			change_with_save(
-				[&](auto& cfg) {
-					cfg.client.nickname = social_sign_in.guest_nickname;
-					cfg.chosen_play_as_guest = true;
-				}
-			);
-		}
-	};
 
 	WEBSTATIC auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
@@ -1565,7 +1594,7 @@ work_result work(
 	};
 
 	WEBSTATIC auto setup_requires_cursor = [&]() {
-		if (should_ask_for_social_sign_in()) {
+		if (social_sign_in.is_open()) {
 			return true;
 		}
 
@@ -2281,6 +2310,9 @@ work_result work(
 			streaming.avatar_preview_tex,
 
 			menu_ltrb
+#if PLATFORM_WEB
+			, social_sign_in.cached_auth.is_signed_in()
+#endif
 		});
 	};
 
@@ -2902,18 +2934,97 @@ work_result work(
 
 				if (const bool show_leaderboards = !has_current_setup()) {
 					perform_leaderboards();
+#if PLATFORM_WEB
+					if (social_sign_in.cached_auth.expired()) {
+						social_log_out();
+					}
+
+					if (leaderboards_gui.wants_sign_in) {
+						leaderboards_gui.wants_sign_in = false;
+
+						social_sign_in.open();
+					}
+
+					if (leaderboards_gui.wants_log_out) {
+						leaderboards_gui.wants_log_out = false;
+
+						social_log_out();
+					}
+#endif
 				}
 
-				if (should_ask_for_social_sign_in()) {
-					if (streaming.completed_all_loading()) {
-						if (!social_sign_in.opened_once) {
-							social_sign_in.open();
-							social_sign_in.opened_once = true;
+
+#if PLATFORM_WEB
+				const bool should_prompt_for_social_sign_in = [&]() {
+					if (!streaming.completed_all_loading()) {
+						return false;
+					}
+
+					if (config.prompted_for_sign_in_once) {
+						return false;
+					}
+
+					return true;
+				}();
+
+				if (should_prompt_for_social_sign_in) {
+					if (!social_sign_in.is_open()) {
+						social_sign_in.open();
+					}
+				}
+
+				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
+
+				if (const auto new_auth = get_new_auth_data()) { 
+					social_sign_in.cached_auth = *new_auth;
+					social_sign_in.close();
+
+					augs::save_as_json(*new_auth, CACHED_AUTH_PATH);
+
+					const auto before_sign_in = config.client.nickname;
+
+					bool downloaded = false;
+
+					if (auto parsed = parsed_url(new_auth->avatar_url); parsed.valid()) {
+						LOG("Downloading avatar from: %x", new_auth->avatar_url);
+
+						auto cli = httplib_utils::make_client(parsed);
+
+						if (auto resp = cli->Get(parsed.location)) {
+							try {
+								augs::image avatar;
+								avatar.from_png_bytes(augs::string_to_byte_vector(resp->body), parsed.location);
+
+								const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+								avatar.scale(vec2u::square(max_s));
+								avatar.save_as_png(CACHED_AVATAR);
+
+								streaming.requested_avatar_preview = CACHED_AVATAR;
+								downloaded = true;
+							}
+							catch (...) {
+								LOG("Failed to load the downloaded avatar.");
+							}
+						}
+						else {
+							LOG("Failed GET the avatar.");
 						}
 					}
 
-					perform_social_sign_in_popup();
+					change_with_save(
+						[&](auto& cfg) {
+							cfg.client.nickname_before_sign_in = before_sign_in;
+							cfg.client.nickname = social_sign_in.cached_auth.profile_name;
+							cfg.prompted_for_sign_in_once = true;
+
+							if (downloaded) {
+								cfg.client.avatar_image_path = CACHED_AVATAR;
+							}
+						}
+					);
 				}
+#endif
+			
 
 				if (!has_current_setup()) {
 					perform_last_exit_incorrect();

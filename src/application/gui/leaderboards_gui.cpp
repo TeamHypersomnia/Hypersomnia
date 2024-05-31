@@ -326,31 +326,78 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	ImGui::NextColumn();
 
-	{
-		auto crs = scoped_preserve_cursor();
+	bool show_rank = true;
 
-		const auto entry = in.necessary_images.at(assets::necessary_image_id::RANK_BACKGROUND);
+#if PLATFORM_WEB
+	show_rank = in.is_logged_in;
+#endif
 
-		auto cols = colors_nha {
-			our_rank.name_color,
-			rgba(our_rank.name_color).mult_luminance(1.1f),
-			rgba(our_rank.name_color).mult_luminance(1.2f)
-		};
+	if (show_rank) {
+		{
+			auto crs = scoped_preserve_cursor();
 
-		augs::imgui::game_image_button("##RankBg", entry, entry.get_original_size(), cols, augs::imgui_atlas_type::GAME);
+			const auto entry = in.necessary_images.at(assets::necessary_image_id::RANK_BACKGROUND);
+
+			auto cols = colors_nha {
+				our_rank.name_color,
+				rgba(our_rank.name_color).mult_luminance(1.1f),
+				rgba(our_rank.name_color).mult_luminance(1.2f)
+			};
+
+			augs::imgui::game_image_button("##RankBg", entry, entry.get_original_size(), cols, augs::imgui_atlas_type::GAME);
+		}
+
+		{
+			const auto entry = in.necessary_images.at(our_rank.icon);
+
+			augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
+		}
+
+		ImGui::SameLine();
+
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+		text_color(our_rank.name, our_rank.name_color);
+		ImGui::PopFont();
+	}
+	else {
+#if PLATFORM_WEB
+		if (!in.is_logged_in) {
+			auto darkened_selectables = scoped_selectable_colors({
+				rgba(255, 255, 255, 20),
+				rgba(255, 255, 255, 30),
+				rgba(255, 255, 255, 60)
+			});
+
+			if (ImGui::Selectable("Sign in to compete on Leaderboards.", false)) {
+				wants_sign_in = true;
+			}
+		}
+#endif
 	}
 
-	{
-		const auto entry = in.necessary_images.at(our_rank.icon);
 
-		augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
+#if PLATFORM_WEB
+	if (in.is_logged_in) {
+		ImGui::SameLine();
+		const auto avail = ImGui::GetContentRegionAvail();
+
+		float offset_x = avail.x - ImGui::CalcTextSize("Sign in 9").x;
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset_x);
+
+		auto darkened_selectables = scoped_selectable_colors({
+			rgba(255, 255, 255, 20),
+			rgba(255, 255, 255, 30),
+			rgba(255, 255, 255, 60)
+		});
+
+		//auto sc = scoped_text_color(rgba(255, 255, 255, 200));
+
+		if (ImGui::Selectable("Log out", false, 0, ImVec2(100, 0))) {
+			wants_log_out = true;
+		}
 	}
 
-	ImGui::SameLine();
-
-	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-	text_color(our_rank.name, our_rank.name_color);
-	ImGui::PopFont();
+#endif
 
 	ImGui::NextColumn();
 

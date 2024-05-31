@@ -59,10 +59,8 @@ struct avatar_loading_result_info {
 			}
 		}
 
-		const auto cached_file_path = USER_DIR / "cached_avatar.png";
-		loaded_image.save_as_png(cached_file_path);
-
-		new_path = cached_file_path;
+		loaded_image.save_as_png(CACHED_AVATAR);
+		new_path = CACHED_AVATAR;
 	}
 };
 
@@ -370,16 +368,19 @@ bool start_client_gui_state::perform(
 				text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
 			}
 
+#if PLATFORM_WEB
+			bool avatar_choice_active = false;
+#else
 			bool avatar_choice_active = true;
+#endif
 
 			if (is_steam_client) {
 				if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
 					if (into_vars.use_account_avatar) {
 						if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-							const auto cached_file_path = USER_DIR / "cached_avatar.png";
-							avatar.save_as_png(cached_file_path);
+							avatar.save_as_png(CACHED_AVATAR);
 
-							p = cached_file_path;
+							p = CACHED_AVATAR;
 							reload_avatar(p);
 						}
 					}

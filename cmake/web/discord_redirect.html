@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OAuth2 Redirect</title>
+  <style>
+    body, html {
+      background-color: #111; /* Dark gray background */
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrollbars */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-text {
+      color: white; /* White text color */
+      font-size: 48px; /* Increased font size */
+    }
+    .close-text2 {
+      color: white; /* White text color */
+      font-size: 30px; /* Increased font size */
+    }
+    .center-container {
+      position: absolute;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+<script>
+window.onload = function() {
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const access_token = params.get('access_token');
+    const expires_in = params.get('expires_in');
+    const token_type = params.get('token_type');
+
+    if (access_token) {
+        const channel = new BroadcastChannel('token_bridge');
+
+        channel.postMessage({
+            type: 'authentication',
+            access_token: access_token,
+            expires_in: expires_in,
+            token_type: token_type
+        });
+
+        channel.close();
+    }
+};
+</script>
+</head>
+<body>
+
+  <div class="center-container">
+<span class="close-text">Signed in.</span><br>
+<br>
+<span class="close-text2">You can close this tab now.</span>
+  </div>
+</body>
+</html>

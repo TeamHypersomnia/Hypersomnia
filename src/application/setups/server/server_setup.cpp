@@ -4045,8 +4045,6 @@ message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type
 void server_setup::kick(const client_id_type& kicked_id, const std::string& reason) {
 	auto& c = clients[kicked_id];
 
-	LOG_NVPS(reason);
-
 	if (!c.is_set()) {
 		return;
 	}
@@ -4054,6 +4052,8 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 	if (c.when_kicked.has_value()) {
 		return;
 	}
+
+	LOG_NVPS(reason);
 
 	c.when_kicked = server_time;
 

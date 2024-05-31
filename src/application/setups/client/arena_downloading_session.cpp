@@ -404,6 +404,11 @@ std::optional<std::string> arena_downloading_session::final_rearrange_directorie
 		}
 	}
 
+#if PLATFORM_WEB
+	/* To save space */
+	try_remove(old_dir_path);
+#endif
+
 	return result;
 }
 

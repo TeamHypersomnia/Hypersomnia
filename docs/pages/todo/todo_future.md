@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- singleplayer leaderboards for speedrunning stages with enemies like in ror
+
 - We should actually freeze the match on afk
 
 - MacOS fix: make non-raw input work

@@ -55,5 +55,6 @@ namespace augs {
 	};
 
 	double steady_secs();
+	double secs_since_epoch();
 	void sleep(double);
 }

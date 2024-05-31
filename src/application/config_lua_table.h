@@ -93,9 +93,7 @@ struct config_lua_table {
 	bool log_to_live_file = false;
 	bool remove_live_log_file_on_start = true;
 
-#if PLATFORM_WEB
-	bool chosen_play_as_guest = false;
-#endif
+	bool prompted_for_sign_in_once = false;
 
 	std::string log_timestamp_format = std::string("[%m-%d-%y %H:%M:%S] ");
 

@@ -94,3 +94,6 @@ extern augs::path_type USER_DIR;
 #define DEMOS_DIR (USER_DIR / "demos")
 #define EDITOR_PROJECTS_DIR (USER_DIR / "projects")
 
+#define CACHED_AUTH_PATH (USER_DIR / "cached_auth.json")
+#define CACHED_AVATAR (USER_DIR / "cached_avatar.png")
+#define BLANK_AVATAR ("content/gfx/necessary/blank_avatar.png")

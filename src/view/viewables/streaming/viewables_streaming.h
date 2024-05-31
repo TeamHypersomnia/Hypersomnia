@@ -115,6 +115,7 @@ class viewables_streaming {
 
 public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
+	std::optional<augs::path_type> requested_avatar_preview;
 
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;

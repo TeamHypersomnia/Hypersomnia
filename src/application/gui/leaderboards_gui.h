@@ -15,6 +15,9 @@ struct leaderboards_input {
 	augs::graphics::texture& avatar_preview_tex;
 
 	const ltrb menu_ltrb;
+#if PLATFORM_WEB
+	const bool is_logged_in;
+#endif
 };
 
 struct leaderboards_entry {
@@ -63,6 +66,8 @@ class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_sta
 	bool refreshed_once = false;
 
 public:
+	bool wants_sign_in = false;
+	bool wants_log_out = false;
 
 	using base = standard_window_mixin<leaderboards_gui_state>;
 

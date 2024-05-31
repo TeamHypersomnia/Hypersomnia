@@ -644,7 +644,23 @@ void settings_gui_state::perform(
 				}
 
 				if (ImGui::Button("Reset all settings to factory defaults")) {
+					auto saved_is_guest = config.prompted_for_sign_in_once;
+					auto cvars = config.client;
+
 					config = config_lua_table(lua, augs::path_type("default_config.lua"));
+
+#if IS_PRODUCTION_BUILD
+					/* Don't break the identity */
+					config.client.nickname = cvars.nickname;
+					config.client.nickname_before_sign_in = cvars.nickname_before_sign_in;
+					config.client.avatar_image_path = cvars.avatar_image_path;
+
+					/* Otherwise the popup would show instantly again */
+					config.prompted_for_sign_in_once = saved_is_guest;
+#else
+					(void)saved_is_guest;
+					(void)cvars;
+#endif
 				}
 
 				break;

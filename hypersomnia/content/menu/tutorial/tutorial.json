@@ -11243,7 +11243,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Running costs Stamina.\nWalk or stand still to regenerate faster."
+            "context_tip": "Running costs Stamina.\nWalk or stand still to regenerate Stamina faster."
         },
         {
             "id": "tip3_1",
@@ -11272,7 +11272,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "{WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the blue floor!"
+            "context_tip": "{WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk silently over the blue floor!"
         },
         {
             "id": "entry3",
@@ -11799,7 +11799,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold two numbers to dual-wield. E.g. {HOTBAR_0} and {HOTBAR_1}.\nTry killing both enemies at the same time."
+            "context_tip": "Hold two numbers to dual-wield. E.g. {HOTBAR_0} and {HOTBAR_1}.\nThen press {SHOOT_SECONDARY} to shoot the second weapon.\nNow kill both enemies at the same time."
         },
         {
             "id": "hazard (7)",

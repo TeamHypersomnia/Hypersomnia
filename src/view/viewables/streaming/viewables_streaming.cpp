@@ -365,6 +365,18 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		future_compressed_demos.get();
 	}
 
+	if (requested_avatar_preview.has_value()) {
+		augs::image avatar;
+		avatar.from_file(*requested_avatar_preview);
+
+		avatar_preview_tex.texImage2D(in.renderer, std::move(avatar));
+		avatar_preview_tex.set_filtering(in.renderer, augs::filtering_type::LINEAR);
+
+		augs::graphics::texture::set_current_to_previous(in.renderer);
+
+		requested_avatar_preview = std::nullopt;
+	}
+
 	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 

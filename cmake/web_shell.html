@@ -7,8 +7,6 @@
   <title>Hypersomnia</title>
   <base href="/">
   <meta name="description" content="Free and open-source competitive 2D shooter on the Web.">
-
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://hypersomnia.io/">
   <meta property="og:title" content="Hypersomnia">
@@ -231,6 +229,73 @@
       Module.setStatus('Exception thrown, see JavaScript console');
       document.getElementById('spinner').style.display = 'none';
     };
+
+    const clientIdDiscord = '1189671952479158403';
+
+    function fetchUserProfile(accessToken, expiresIn) {
+      fetch('https://discord.com/api/users/@me', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+      .then(response => response.json())
+      .then(profile => {
+        const profileName = profile.username;
+        const avatarUrl = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
+
+        // Pass data to C++ side
+        passAuthDataToCpp('discord', profileName, avatarUrl, accessToken, expiresIn);
+      })
+      .catch(error => {
+        console.error('Error fetching Discord user profile:', error);
+      });
+    }
+
+    function passAuthDataToCpp(provider, profileName, avatarUrl, authToken, expiresIn) {
+      Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'number'],
+        [provider, profileName, avatarUrl, authToken, expiresIn]);
+    }
+
+    const site_origin = 'http://localhost:6931';
+    const revoke_origin = 'http://localhost:3000';
+
+    const channel = new BroadcastChannel('token_bridge');
+
+    channel.addEventListener('message', event => {
+      // console.log('Received access token:', event.data.access_token);
+      console.log('Expires in:', event.data.expires_in);
+      console.log('Token type:', event.data.token_type);
+
+      fetchUserProfile(event.data.access_token, event.data.expires_in);
+    });
+
+    function revokeDiscord(accessToken) {
+      fetch(revoke_origin + '/revoke_discord', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Response from server:', data);
+        })
+        .catch(error => console.error('Error revoking token:', error));
+    }
+
+    function loginDiscord() {
+      const redirect = site_origin + '/discord_redirect.html';
+      const redirectUri = encodeURIComponent(redirect); // Use localhost for testing
+
+      const scope = 'identify';
+      const authUrl = `https://discord.com/oauth2/authorize?response_type=token&client_id=${clientIdDiscord}&redirect_uri=${redirectUri}&scope=${scope}`;
+
+      window.open(authUrl, '_blank');
+    }
+
+    Module.loginDiscord = loginDiscord;
+    Module.revokeDiscord = revokeDiscord;
   </script>
   {{{ SCRIPT }}}
 </body>

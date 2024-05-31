@@ -5,6 +5,11 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- some random connectivity problem
+	- restarting servers helped
+	- we had empty space under "webrtc state", as if there was no message set yet?
+- SOLUTION: we didn't clear the websocket from active_connections map if the webrtc id was not yet assigned.
+
 - bug: fake "DataChannel closed" kick message.
     - ok i know what happens
         - "kick" CANNOT be called inside receive packet override!!!

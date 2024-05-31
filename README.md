@@ -55,7 +55,7 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
 
 [ifun.de](https://www.ifun.de/hypersomnia-freier-multiplayer-shooter-fuer-mac-win-und-linux-212657/) | [GAMINGDEPUTY](https://www.gamingdeputy.com/hypersomnia-is-a-free-multiplayer-shooter-for-mac-win-and-linux/)
 
-# [📰 Press Kit](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
+# [📰 Are you a journalist? Click here!](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
 
 # Watch gameplay
 

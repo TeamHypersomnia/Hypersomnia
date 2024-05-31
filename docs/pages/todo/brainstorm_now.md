@@ -6,6 +6,79 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We could have login with steam instead of linking but im not convinced
+    - let's have a page for linking, it will be trivial
+    - I think we can always link to steam account, just transfer the data from the discord to steam account if it has better MMR
+    - the real question is what happens when you unlink but it's not a problem
+    - we could even link multiple discord accounts
+    
+
+- Add a github button next to steam button to the main menu in the web too
+    - github button can be in the native too
+
+- use discord after all
+    - especially since well ping everyone on discord lol
+    - people will be more likely to use it and itll be their gaming persona likely too
+    - gmail will be an option on crazygames
+
+- would be good to announce the web port even before crazygames.com
+    - we just need the editor, maybe super simple auth with gmail at least? forget discord for now
+    - note though it's best if people play rankeds on their crazygames.com account already
+    - so let's just complete the editor and all the for-announcement work
+    - maybe some profiling would come in handy
+
+- fall back to using webrtc for servers behind nat
+
+- do something about people afking post ranked match and entering another ranked
+    - maybe automove everybody to spectators
+    - just have a sensible afk timer like 10-15 secs
+
+- for some reason nat webrtc nat traversal works better...
+    - i think we'll just use webrtc for all nat traversals
+
+- remove throw knives step from web or provide an alternative keybind
+    - or make it optional by providing another portal
+
+- we could look into saving all idbfs data into a single file to support editing in crazygames
+    - how others do it?
+        - krunker redirects to its own page, makes sense, maybe we should too
+
+- kick web users after inactivity, despite timeout
+
+- Web: Authentication.
+    - We'll also have to use separate crazygames api for this
+    - we could start with auth0 to just start up with something
+        - will let us focus on all of the collateral work
+        - which is:
+            - UI for login
+                - Likely just a simple imgui modal window that redirects
+            - SIGN IN TO PLAY RANKEDS
+                - Login
+                - or play as guest:
+                    - this one could have a random name generated
+                - [ENTER]
+            - That imgui window could already provide buttons to not redirect to another website needlessly
+            - use big font like for mmr
+    - if we want to use hello.js, we'll have to implement discord anyway
+        - so we might as well begin with discord
+    - problem: We'll need to pass avatar data to our cpp application.
+        - ok from what I can see we'll always retrieve avatar from a link, so we can wget it later
+
+    - Reasons to use a *somewhat*, hybrid custom-built solution
+        - auth0 doesn't support steam and matrix and we'd love to have both as login options, matrix to facilitate oss
+        - hello.js doesnt have discord/steam as well
+        - still we can use hello.js to facilitate all others for the future, and to have github/gmail/twitter out of the box
+        - kirka uses custom buttons too which redirect straight to the page, no other middlemen
+            - use icons from zocial like in hello js
+    - we can first go with hello js and integrate gmail as it might be simplest
+        
+
+- implement "(WEB)" postfix when the client connects through web
+    
+
+
+
+
 - simple user browser folder in settings?
 
 - use ip to determine closest server? (just like we get it from peerconnection somehow or the sites like whatisyourip)

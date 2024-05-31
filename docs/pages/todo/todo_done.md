@@ -6940,3 +6940,5 @@ This will discard your redo history."
     - dont try to ping and show as active
 - fix clipboard
 
+- dont do anything if all abandon match
+

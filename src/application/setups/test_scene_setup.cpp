@@ -609,6 +609,10 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 }
 
 void test_scene_setup::pre_solve(const logic_step step) {
+	if (const auto h = scene.world[viewed_character_id]) {
+		cosmic::set_specific_name(h, nickname);
+	}
+
 	do_tutorial_logic(step);
 }
 
@@ -692,6 +696,8 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	if (speed < 1.0f) {
 		//config.interpolation.method = interpolation_method::NONE;
 	}
+
+	nickname = config.client.nickname;
 
 	if (is_tutorial()) {
 		auto& mult = config.session.camera_query_aabb_mult;

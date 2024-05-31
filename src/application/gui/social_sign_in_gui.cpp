@@ -4,6 +4,9 @@
 
 #include "augs/misc/imgui/imgui_controls.h"
 
+void sign_in_with_google();
+void sign_in_with_discord();
+
 social_sign_in_state::social_sign_in_state(const std::string& title)
     : standard_window_mixin<social_sign_in_state>(title) 
 {}
@@ -17,7 +20,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	center_next_window(ImGuiCond_Always);
 
-	ImGui::SetNextWindowSize(ImVec2(450, 385), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(450, in.prompted_once ? 260 : 335), ImGuiCond_Always);
 
     const auto flags = 
         ImGuiWindowFlags_NoSavedSettings |
@@ -98,12 +101,16 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	using N = assets::necessary_image_id;
 
+#if 0
 	if (login_option(N::SOCIAL_GOOGLE, "Sign in with Google")) {
-
+		::sign_in_with_google();
 	}
+#endif
 
 	if (login_option(N::SOCIAL_DISCORD, "Sign in with Discord")) {
-
+#if PLATFORM_WEB
+		::sign_in_with_discord();
+#endif
 	}
 
 	ImGui::PopFont();
@@ -112,16 +119,18 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 
-	centered_text("...or play as Guest:");
+	if (!in.prompted_once) {
+		centered_text("...or play as Guest:");
 
-	{
-		auto sc = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,10));
+		{
+			auto sc = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,10));
 
-		ImGui::SetNextItemWidth(-0.0001f);
-		auto comfier_frame_padding = scoped_style_var(ImGuiStyleVar_FramePadding, final_frame_padding);
+			ImGui::SetNextItemWidth(-0.0001f);
+			auto comfier_frame_padding = scoped_style_var(ImGuiStyleVar_FramePadding, final_frame_padding);
 
-		base::acquire_keyboard_once();
-		input_text("##NicknameChooser", guest_nickname);
+			base::acquire_keyboard_once();
+			input_text("##NicknameChooser", guest_nickname);
+		}
 	}
 
 	ImGui::Separator();
@@ -137,7 +146,15 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
 	auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 16));
-	const bool ok = ImGui::Selectable("OK##ConfirmGuest", true);
+
+	bool ok = false;
+
+	if (in.prompted_once) {
+		ok = ImGui::Selectable("Cancel##ConfirmCancel", true);
+	}
+	else {
+		ok = ImGui::Selectable("OK##ConfirmGuest", true);
+	}
 
 	ImGui::PopStyleVar();
 

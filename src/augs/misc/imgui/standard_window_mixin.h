@@ -29,6 +29,10 @@ struct standard_window_mixin {
 		show = !show;
 	}
 
+	bool is_open() const {
+		return show;
+	}
+
 	template <class... Args>
 	auto make_scoped_window(Args&&... args) {
 		if (show) {

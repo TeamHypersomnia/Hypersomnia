@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- requesting immediate heartbeat for some reason multiple times a second
+	- only thing that comes to mind is a mode notification
+
+
+
 - map catalogue crash
 	- happens when atlas is loaded simultaneously
 		- try debugging with

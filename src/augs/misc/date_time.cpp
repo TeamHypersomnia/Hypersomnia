@@ -210,6 +210,10 @@ double augs::steady_secs() {
     return elapsed.count();
 }
 
+double augs::secs_since_epoch() {
+	return augs::date_time::secs_since_epoch();
+}
+
 double augs::date_time::secs_since_epoch() {
 	return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

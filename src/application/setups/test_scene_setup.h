@@ -55,7 +55,7 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	all_rulesets_variant ruleset;
 	all_modes_variant current_mode_state;
 
-	std::string nickname;
+	mutable std::string nickname;
 
 	cosmos_solvable_significant dummy_clean_round_state;
 	synced_dynamic_vars dummy_dynamic_vars;
