@@ -1464,6 +1464,14 @@ work_result work(
 	WEBSTATIC social_sign_in_state social_sign_in = std::string("Login");
 
 #if PLATFORM_WEB
+	WEBSTATIC auto is_signed_in = [&]() {
+		return social_sign_in.cached_auth.is_signed_in();
+	};
+
+	WEBSTATIC auto is_auth_expired = [&]() {
+		return social_sign_in.cached_auth.expired();
+	};
+
 	WEBSTATIC auto social_log_out = [&]() {
 		social_sign_in.cached_auth.log_out();
 
@@ -1508,7 +1516,7 @@ work_result work(
 		social_sign_in.cached_auth = {};
 	}
 
-	if (social_sign_in.cached_auth.expired()) {
+	if (is_auth_expired()) {
 		social_log_out();
 	}
 
@@ -1827,6 +1835,19 @@ work_result work(
 		bool public_internet = false;
 		auto connect_string = config.client_connect;
 		std::string official_url;
+
+		const bool requires_sign_in = connect_string.find("ranked") != std::string::npos;
+
+		if (requires_sign_in) {
+			if (is_auth_expired()) {
+				social_log_out();
+			}
+
+			if (!is_signed_in()) {
+				social_sign_in.open("play ranked matches");
+				return false;
+			}
+		}
 
 		LOG("Launching client setup with connect string: %x", connect_string);
 
@@ -2318,7 +2339,7 @@ work_result work(
 
 			menu_ltrb
 #if PLATFORM_WEB
-			, social_sign_in.cached_auth.is_signed_in()
+			, is_signed_in()
 #endif
 		});
 	};

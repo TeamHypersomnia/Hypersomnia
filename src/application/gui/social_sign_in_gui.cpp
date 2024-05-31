@@ -55,7 +55,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-	auto centered_text = [&](auto str) {
+	auto centered_text = [&](const std::string& str) {
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 
 		auto colored_selectable = scoped_selectable_colors({
@@ -64,12 +64,18 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 			rgba(255, 255, 255, 0)
 		});
 
-		ImGui::Selectable(str, false);
+		ImGui::Selectable(str.c_str(), false);
 
 		ImGui::PopStyleVar();
 	};
 
-	centered_text("Sign in to compete on Leaderboards:");
+	auto reason = last_reason;
+
+	if (reason.empty()) {
+		reason = "compete on Leaderboards";
+	}
+
+	centered_text(typesafe_sprintf("Sign in to %x:", reason));
 
 	ImGui::Separator();
 
