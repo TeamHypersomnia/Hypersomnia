@@ -212,6 +212,13 @@ EM_JS(void, call_setLocation, (const char* newPath), {
 	setLocation(newPath);
 });
 
+double web_get_secs_until_next_weekend_evening(const char* locationId) {
+	return EM_ASM_DOUBLE({
+		const locationIdStr = UTF8ToString($0);
+		return get_secs_until_next_weekend_evening(locationIdStr);
+	}, locationId);
+}
+
 extern std::mutex open_url_on_main_lk;
 extern std::string open_url_on_main;
 
@@ -260,6 +267,7 @@ work_result work(
 
 #if PLATFORM_WEB
 	WEBSTATIC const bool is_steam_client = false;
+	WEBSTATIC const bool ranked_servers_enabled = true;
 	WEBSTATIC const auto steam_id = std::string("0");
 #else
 	WEBSTATIC const bool is_cli_tool = params.is_cli_tool();
@@ -312,6 +320,7 @@ work_result work(
 	});
 
 	WEBSTATIC const bool is_steam_client = steam_initialized;
+	WEBSTATIC const bool ranked_servers_enabled = is_steam_client;
 
 	LOG_NVPS(is_steam_client);
 
@@ -1797,7 +1806,7 @@ work_result work(
 	WEBSTATIC auto launch_main_menu = [&]() {
 		if (!has_main_menu()) {
 			main_menu_gui = {};
-			main_menu_gui.has_play_ranked_button = is_steam_client;
+			main_menu_gui.has_play_ranked_button = ranked_servers_enabled;
 			
 			setup_launcher([&]() {
 				emplace_main_menu(lua, *official, config.main_menu);
@@ -2228,7 +2237,8 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_browse_servers = [&]() {
-		browse_servers_gui.allow_ranked_servers = is_steam_client;
+		browse_servers_gui.allow_ranked_servers = ranked_servers_enabled;
+
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
@@ -2237,7 +2247,7 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_start_client_gui = [&](const auto frame_num) {
-		const auto best_server = browse_servers_gui.find_best_server(is_steam_client);
+		const auto best_server = browse_servers_gui.find_best_server(ranked_servers_enabled);
 
 		const bool perform_result = start_client_gui.perform(
 			best_server,

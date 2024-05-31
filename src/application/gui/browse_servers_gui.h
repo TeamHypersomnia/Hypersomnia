@@ -53,6 +53,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::string displayed_connecting_server_name;
 
 	net_time_t when_last_started_refreshing_server_list = 0;
+	net_time_t when_last_updated_time_to_events = 0;
 
 	std::string error_message;
 

@@ -383,7 +383,16 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
     }
 }
 #else
+
+#if PLATFORM_WEB
+double web_get_secs_until_next_weekend_evening(const char*);
+#endif
+
 double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+#if PLATFORM_WEB
+	return web_get_secs_until_next_weekend_evening(locationId.c_str());
+#endif
+
 #if 0
 	(void)locationId;
 	return -1.0;
@@ -422,9 +431,7 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
 
 #endif
 
-std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
-	const auto secs = get_secs_until_next_weekend_evening(location_id);
-
+std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const double secs) {
 	if (secs == -1) {
 		return std::nullopt;
 	}
@@ -434,6 +441,11 @@ std::optional<std::string> augs::date_time::format_time_until_weekend_evening(co
 	}
 
 	return format_countdown_letters(secs);
+}
+
+std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
+	const auto secs = get_secs_until_next_weekend_evening(location_id);
+	return format_time_until_weekend_evening(secs);
 }
 
 #if BUILD_NETWORKING

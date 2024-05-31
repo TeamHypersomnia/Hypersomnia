@@ -46,6 +46,7 @@ namespace augs {
 
 		static double get_secs_until_next_weekend_evening(const std::string& location_id);
 		static std::optional<std::string> format_time_until_weekend_evening(const std::string& location_id);
+		static std::optional<std::string> format_time_until_weekend_evening(const double seconds_left);
 #if 0
 		static std::optional<std::chrono::system_clock::time_point> from_utc_timestamp(const std::string& s);
 #endif

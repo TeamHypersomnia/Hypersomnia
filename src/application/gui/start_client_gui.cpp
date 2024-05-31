@@ -251,7 +251,11 @@ bool start_client_gui_state::perform(
 
 				//const auto col = best_server->progress.get_ping_color();
 
+#if PLATFORM_WEB
+				text_disabled("?");
+#else
 				text(best_server ? best_server->progress.get_ping_string() : std::string("?"));
+#endif
 			}
 
 			text_color("Players: 99  Ping: 999", rgba(0,0,0,0));
@@ -265,10 +269,13 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			/* No need to encourage editing the nickname if we don't have it from Steam */
-			const bool is_nonsteam = !is_steam_client;
+#if PLATFORM_WEB
+			const bool focus_nickname_edit = false;
+#else
+			const bool focus_nickname_edit = !is_steam_client;
+#endif
 
-			if (is_nonsteam) {
+			if (focus_nickname_edit) {
 				base::acquire_keyboard_once();
 			}
 		}

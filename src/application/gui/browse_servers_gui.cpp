@@ -18,6 +18,7 @@
 #include "augs/misc/to_hex_str.h"
 
 #include "application/network/resolve_address.h"
+#include "augs/templates/main_thread_queue.h"
 
 #if BUILD_NATIVE_SOCKETS
 #include "augs/network/netcode_utils.h"
@@ -142,6 +143,21 @@ browse_servers_gui_state::browse_servers_gui_state(const std::string& title)
 
 }
 
+template <class T>
+void update_cached_time_to_event(T& server_list) {
+	main_thread_queue::execute(
+		[&]() {
+			for (auto& s : server_list) {
+				s.heartbeat.cached_time_to_event = 
+					s.heartbeat.is_ranked_server()
+					? augs::date_time::get_secs_until_next_weekend_evening(s.heartbeat.get_location_id()) 
+					: std::numeric_limits<double>::max()
+				;
+			}
+		}
+	);
+}
+
 static std::vector<server_list_entry> to_server_list(std::optional<httplib_result> result, std::string& error_message) {
     using namespace httplib_utils;
 
@@ -185,14 +201,6 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
         error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
         new_server_list.clear();
     }
-
-	for (auto& s : new_server_list) {
-		s.heartbeat.cached_time_to_event = 
-			s.heartbeat.is_ranked_server()
-			? augs::date_time::get_secs_until_next_weekend_evening(s.heartbeat.get_location_id()) 
-			: std::numeric_limits<double>::max()
-		;
-	}
 
     return new_server_list;
 }
@@ -639,7 +647,11 @@ void browse_servers_gui_state::show_server_list(
 			if (s.heartbeat.is_ranked_server()) {
 				const auto location_id = s.heartbeat.get_location_id();
 
+#if PLATFORM_WEB
+				if (const auto result = augs::date_time::format_time_until_weekend_evening(s.heartbeat.cached_time_to_event)) {
+#else
 				if (const auto result = augs::date_time::format_time_until_weekend_evening(location_id)) {
+#endif
 					if (const bool ongoing = *result == "") {
 						text_color("2X EXP", wave_color);
 					}
@@ -700,6 +712,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	if (valid_and_is_ready(data->future_response)) {
 		server_list = ::to_server_list(data->future_response.get(), error_message);
+		when_last_updated_time_to_events = 0;
 	}
 
 	if (!show) {
@@ -707,6 +720,16 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	using namespace augs::imgui;
+
+	{
+		const auto current_time = augs::steady_secs();
+
+		if (current_time - when_last_updated_time_to_events > 1.0) {
+			when_last_updated_time_to_events = current_time;
+
+			update_cached_time_to_event(server_list);
+		}
+	}
 
 	centered_size_mult = vec2(0.8f, 0.7f);
 
@@ -1117,13 +1140,13 @@ const server_list_entry* browse_servers_gui_state::find_best_server() const {
 	return &minimum_of(server_list, compare_servers);
 }
 
-const server_list_entry* browse_servers_gui_state::find_best_server(const bool ranked) const {
+const server_list_entry* browse_servers_gui_state::find_best_server(const bool find_ranked) const {
 	auto filtered = server_list;
 
 	erase_if(
 		filtered,
 		[&](auto& f) {
-			const bool good = f.is_official_server() && (ranked && f.heartbeat.is_still_joinable_ranked());
+			const bool good = f.is_official_server() && (find_ranked && f.heartbeat.is_still_joinable_ranked());
 
 			return !good;
 		}

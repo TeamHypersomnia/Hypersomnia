@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show avatar in test scene setup
+- Would be good to finally implement the server details
+
 - We could have login with steam instead of linking but im not convinced
     - let's have a page for linking, it will be trivial
     - I think we can always link to steam account, just transfer the data from the discord to steam account if it has better MMR

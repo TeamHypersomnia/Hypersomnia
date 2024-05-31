@@ -85,6 +85,7 @@
     <div class="progress-mb" id="progress-mb">0 MB</div>
   </div>
   <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2/build/global/luxon.min.js"></script>
   <script type='text/javascript'>
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
@@ -118,6 +119,59 @@
       window.history.pushState("object or string", "Title", locStr);
     }
 
+    const timeZoneMap = {
+      'au': 'Australia/Sydney',
+      'ru': 'Europe/Moscow',
+      'de': 'Europe/Berlin',
+      'us-central': 'America/Chicago',
+      'pl': 'Europe/Warsaw',
+      'ch': 'Europe/Zurich'
+    };
+
+    function getTimeZoneName(locationId) {
+      return timeZoneMap[locationId] || '';
+    }
+
+    function get_secs_until_next_weekend_evening(locationId) {
+      const timeZoneName = getTimeZoneName(locationId);
+      if (!timeZoneName) {
+        return -1; // Invalid locationId
+      }
+
+      try {
+        const DateTime = luxon.DateTime;
+        const now = DateTime.now().setZone(timeZoneName);
+
+        const weekendEvenings = [
+          now.set({ weekday: 5, hour: 19, minute: 0, second: 0, millisecond: 0 }), // Friday 19:00
+          now.set({ weekday: 6, hour: 19, minute: 0, second: 0, millisecond: 0 }), // Saturday 19:00
+          now.set({ weekday: 7, hour: 19, minute: 0, second: 0, millisecond: 0 })  // Sunday 19:00
+        ];
+
+        let closestDistance = Infinity;
+
+        for (let evening of weekendEvenings) {
+          if (evening < now) {
+            evening = evening.plus({ weeks: 1 }); // Move to next week
+          }
+
+          const durationUntilEvening = evening.diff(now, 'seconds').seconds;
+
+          if (durationUntilEvening < closestDistance) {
+            closestDistance = durationUntilEvening;
+          }
+
+          if (durationUntilEvening <= 2 * 60 * 60 && durationUntilEvening >= 0) {
+            return 0.0; // Ongoing event
+          }
+        }
+
+        return closestDistance;
+      } catch (error) {
+        console.error(error);
+        return -1;
+      }
+    }
     var urlPath = window.location.pathname;
     var queryString = window.location.search;
     console.log("urlPath:", urlPath);
