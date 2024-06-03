@@ -10,7 +10,7 @@ sudo apt update
 sudo apt install -y build-essential checkinstall zlib1g-dev
 
 # Define OpenSSL version
-OPENSSL_VERSION="openssl-3.2.1"
+OPENSSL_VERSION="openssl-3.3.0"
 
 # Download OpenSSL from the official source
 sudo wget "https://github.com/openssl/openssl/releases/download/${OPENSSL_VERSION}/${OPENSSL_VERSION}.tar.gz"
