@@ -85,6 +85,10 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 
 	std::optional<custom_imgui_result> special_result;
 
+	std::vector<std::byte> avatar_bytes;
+	arena_player_metas player_metas;
+	bool rebuild_player_meta_viewables = true;
+
 	template <class H, class S>
 	static decltype(auto) get_arena_handle_impl(S& self) {
 		return H {
@@ -105,6 +109,7 @@ public:
 
 	test_scene_setup(
 		std::string nickname,
+		std::vector<std::byte> avatar_bytes,
 		const packaged_official_content&,
 		const test_scene_type type
 	);
@@ -271,16 +276,17 @@ public:
 		return get_viewed_character_id();
 	}
 
-	std::nullopt_t get_new_player_metas() {
-		return std::nullopt;
-	}
 
 	std::nullopt_t get_new_ad_hoc_images() {
 		return std::nullopt;
 	}
 
+	std::optional<arena_player_metas> get_new_player_metas();
+
+	void set_new_avatar(std::vector<std::byte>);
+
 	const arena_player_metas* find_player_metas() const {
-		return nullptr;
+		return std::addressof(player_metas);
 	}
 
 	void after_all_drawcalls(game_frame_buffer&) {}

@@ -176,6 +176,7 @@
 #include "rtc/rtc.hpp"
 #endif
 
+#include "augs/readwrite/file_to_bytes.h"
 #include "work_result.h"
 
 namespace augs {
@@ -1553,6 +1554,23 @@ work_result work(
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 
+	WEBSTATIC auto get_my_avatar_bytes = [&]() {
+		std::vector<std::byte> avatar;
+
+		try {
+			const auto& path = config.client.avatar_image_path;
+
+			if (!path.empty()) {
+				return augs::file_to_bytes(path);
+			}
+		}
+		catch (...) {
+
+		}
+
+		return std::vector<std::byte>();
+	};
+
 	WEBSTATIC auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
 	};
@@ -2154,6 +2172,7 @@ work_result work(
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
 						config.client.nickname,
+						get_my_avatar_bytes(),
 						*official,
 						test_scene_type::SHOOTING_RANGE
 					);
@@ -2165,6 +2184,7 @@ work_result work(
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
 						config.client.nickname,
+						get_my_avatar_bytes(),
 						*official,
 						test_scene_type::TUTORIAL
 					);
@@ -3068,7 +3088,13 @@ work_result work(
 						if (auto resp = cli->Get(parsed.location)) {
 							try {
 								augs::image avatar;
-								avatar.from_png_bytes(augs::string_to_bytes(resp->body), parsed.location);
+
+								auto avatar_bytes = augs::string_to_bytes(resp->body);
+								avatar.from_png_bytes(avatar_bytes, parsed.location);
+
+								on_specific_setup([&](test_scene_setup& setup) {
+									setup.set_new_avatar(avatar_bytes);
+								});
 
 								const auto max_s = static_cast<unsigned>(max_avatar_side_v);
 								avatar.scale(vec2u::square(max_s));

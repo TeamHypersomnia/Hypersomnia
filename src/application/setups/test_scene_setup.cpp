@@ -25,10 +25,11 @@ using portal_marker = editor_area_marker_node;
 
 test_scene_setup::test_scene_setup(
 	std::string nickname,
+	std::vector<std::byte> avatar_bytes,
 	const packaged_official_content& official,
 	//const input_recording_type recording_type,
 	const test_scene_type type
-) : official(official), nickname(nickname), type(type) {
+	) : official(official), nickname(nickname), type(type), avatar_bytes(avatar_bytes) {
 	init(type);
 }
 
@@ -342,6 +343,9 @@ void test_scene_setup::restart_mode() {
 	get_arena_handle().on_mode_with_input(
 		[&]<typename M>(M& mode, const auto& input) {
 			if constexpr(std::is_same_v<test_mode, M>) {
+				local_player_id = mode.add_player(input, nickname, player_faction);
+				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
+
 				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
 					if (p.scene_entity_id.is_set() && p.editable.faction == faction_type::RESISTANCE) {
 						const auto new_id = mode.add_player(input, nickname, enemy_faction);
@@ -357,9 +361,6 @@ void test_scene_setup::restart_mode() {
 						opponents[p.unique_name] = opponent_id;
 					}
 				}
-
-				local_player_id = mode.add_player(input, nickname, player_faction);
-				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 
 				const auto new_id = local_player_id;
 				auto player = mode.find(new_id);
@@ -611,6 +612,14 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 void test_scene_setup::pre_solve(const logic_step step) {
 	if (const auto h = scene.world[viewed_character_id]) {
 		cosmic::set_specific_name(h, nickname);
+
+		get_arena_handle().on_mode_with_input(
+			[&]<typename M>(M& mode, const auto&) {
+				if constexpr(std::is_same_v<test_mode, M>) {
+					mode.players[local_player_id].session.nickname = nickname;
+				}
+			}
+		);
 	}
 
 	do_tutorial_logic(step);
@@ -806,4 +815,22 @@ void test_scene_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& 
 	else {
 		pairs.push_back({ "steam_display", "#Status_ShootingRange" });
 	}
+}
+
+void test_scene_setup::set_new_avatar(std::vector<std::byte> bytes) {
+	avatar_bytes = std::move(bytes);
+	rebuild_player_meta_viewables = true;
+}
+
+std::optional<arena_player_metas> test_scene_setup::get_new_player_metas() {
+	if (rebuild_player_meta_viewables) {
+		auto& metas = player_metas;
+		
+		metas[mode_player_id::first().value].avatar.image_bytes = avatar_bytes;
+
+		rebuild_player_meta_viewables = false;
+		return metas;
+	}
+
+	return std::nullopt;
 }
