@@ -16,6 +16,17 @@ enum class faction_type {
 	// END GEN INTROSPECTOR
 };
 
+inline bool is_actual_faction(const faction_type f) {
+	switch(f) {
+		case faction_type::METROPOLIS:
+		case faction_type::ATLANTIS:
+		case faction_type::RESISTANCE:
+			return true;
+		default:
+			return false;
+	}
+}
+
 namespace augs {
 	template <class T, class _enum>
 	class enum_array;

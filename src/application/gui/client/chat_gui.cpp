@@ -89,6 +89,14 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 					break;
 
+				case N::SHORT_MATCH:
+					do_entry(
+						"This will be a short match - we have browser players.",
+						orange
+					);
+
+					break;
+
 				default:
 					break;
 			}
@@ -288,6 +296,10 @@ bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 
 		if (input_text(buf, "###ChatInput", current_message, ImGuiInputTextFlags_CallbackAlways, InputTextCallback)) {
 
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+			show = false;
 		}
 
 		if (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsItemDeactivatedAfterEdit()) {

@@ -12,7 +12,9 @@ namespace messages {
 		PLAYER_READY_FOR_RANKED,
 
 		RANKED_STARTING,
-		RANKED_STARTED
+		RANKED_STARTED,
+
+		SHORT_MATCH
 	};
 
 	enum class joined_or_left {

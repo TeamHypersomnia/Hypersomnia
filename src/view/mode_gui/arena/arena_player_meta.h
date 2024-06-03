@@ -20,7 +20,7 @@ struct arena_player_network_stats {
 
 struct synced_player_meta {
 	public_client_settings public_settings;
-	bool authenticated = false;
+	bool is_web_client = false;
 };
 
 struct arena_player_meta {

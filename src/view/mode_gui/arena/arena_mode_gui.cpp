@@ -436,6 +436,9 @@ void arena_gui_state::draw_mode_gui(
 	else {
 		using namespace augs::gui::text;
 
+		const bool is_short_match = typed_mode.should_match_be_short(mode_input);
+		const auto ranked_name = is_short_match ? "SHORT RANKED" : "RANKED";
+
 		const bool is_ranked_server = mode_input.is_ranked_server();
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
@@ -1188,7 +1191,7 @@ void arena_gui_state::draw_mode_gui(
 					draw_text_indicator_at(val2, one_sixth_t + font.metrics.get_height());
 				}
 				else {
-					const auto val = larger_colored("RANKED MATCH", left_col) + larger_colored(" COUNTDOWN", right_col);
+					const auto val = larger_colored(ranked_name, left_col) + larger_colored(" COUNTDOWN", right_col);
 					const auto val2 = larger_colored(format_mins_secs(c), white);
 					 
 					draw_text_indicator_at(val, one_sixth_t);
@@ -1319,10 +1322,10 @@ void arena_gui_state::draw_mode_gui(
 					const auto right_col = rgba::get_bright_wave(secs / 4.0);
 
 					if (c > 0.f) {
-						draw_warmup_indicator(larger_colored("RANKED MATCH STARTING IN", right_col), larger_colored(format_mins_secs(match_begins_in_seconds)+"\n", yellow));
+						draw_warmup_indicator(larger_colored(typesafe_sprintf("%x STARTING IN", ranked_name), right_col), larger_colored(format_mins_secs(match_begins_in_seconds)+"\n", yellow));
 					}
 					else {
-						draw_warmup_indicator(larger_colored("RANKED MATCH HAS BEGUN!", right_col));
+						draw_warmup_indicator(larger_colored(typesafe_sprintf("%x HAS BEGUN!", ranked_name), right_col));
 					}
 				}
 				else {

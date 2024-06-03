@@ -10,6 +10,7 @@ struct synced_dynamic_vars {
 	bool all_authenticated = false;
 	bool all_not_banned = false;
 	bool friendly_fire = true;
+	bool force_short_match = false;
 	server_ranked_vars ranked;
 	// END GEN INTROSPECTOR
 

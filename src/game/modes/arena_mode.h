@@ -202,8 +202,8 @@ struct arena_mode_player {
 		return arena_player_order_info { get_nickname(), stats.calc_score(), stats.level };
 	}
 
-	bool suspend_limit_exceeded(const server_ranked_vars&) const;
-	float suspended_time_until_kick(const server_ranked_vars&) const;
+	bool suspend_limit_exceeded(const server_ranked_vars&, bool) const;
+	float suspended_time_until_kick(const server_ranked_vars&, bool) const;
 };
 
 struct arena_mode_round_state {
@@ -480,6 +480,8 @@ private:
 	ranked_state_type ranked_state = ranked_state_type::NONE;
 	float unfreezing_match_in_secs = -1.0f;
 	float secs_when_warmup_ended = 0.0f;
+
+	bool short_match = false;
 	// END GEN INTROSPECTOR
 
 	/*
@@ -737,6 +739,8 @@ public:
 
 	float get_warmup_seconds(const const_input in) const;
 
+	uint32_t get_num_rounds(const const_input in) const;
+
 	bool is_halftime_summary(const const_input in) const;
 	bool is_last_summary(const const_input in) const;
 
@@ -761,4 +765,6 @@ public:
 	bool is_idle() const;
 
 	bool team_choice_allowed(const const_input in) const;
+
+	bool should_match_be_short(const const_input in) const;
 };

@@ -677,6 +677,7 @@ public:
 		return get_integrated_player_id();
 	}
 
+	faction_type get_assigned_faction(mode_player_id) const;
 	faction_type get_assigned_faction() const;
 
 	bool is_gameplay_on() const;

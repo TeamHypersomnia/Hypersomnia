@@ -77,6 +77,14 @@ struct server_ranked_vars {
 
 	bool operator==(const server_ranked_vars&) const = default;
 
+	uint16_t get_rejoin_time_limit(bool is_short) const {
+		if (is_short) {
+			return rejoin_time_limit / 2;
+		}
+
+		return rejoin_time_limit;
+	}
+
 	bool is_ranked_server() const {
 		return autostart_when != ranked_autostart_type::NEVER;
 	}

@@ -237,7 +237,7 @@ namespace net_messages {
 			return false;
 		}
 
-		serialize_bool(stream, payload.authenticated);
+		serialize_bool(stream, payload.is_web_client);
 
 		return true;
 	}

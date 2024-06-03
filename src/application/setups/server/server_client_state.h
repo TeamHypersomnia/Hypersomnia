@@ -198,7 +198,7 @@ struct server_client_state {
 		synced_player_meta new_meta;
 
 		new_meta.public_settings = settings.public_settings;
-		new_meta.authenticated = is_authenticated();
+		new_meta.is_web_client = is_web_client();
 
 		return new_meta;
 	}

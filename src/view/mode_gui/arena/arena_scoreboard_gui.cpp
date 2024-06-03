@@ -142,7 +142,7 @@ void arena_scoreboard_gui::draw_gui(
 	};
 	(void)text;
 
-	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, augs::ralign_flags flags = {}) {
+	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, augs::ralign_flags flags = {}, formatted_string preffix = formatted_string()) {
 		where += pen;
 
 		auto stroke_col = black;
@@ -151,7 +151,7 @@ void arena_scoreboard_gui::draw_gui(
 		print_stroked(
 			o,
 			where,
-			fmt(ss, col),
+			preffix + fmt(ss, col),
 			flags,
 			stroke_col
 		);
@@ -246,14 +246,14 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	}
 
-	auto print_col_text = [&](const column& c, const auto& text, const auto& col, bool force_right_align = false) {
+	auto print_col_text = [&](const column& c, const auto& text, const auto& col, bool force_right_align = false, formatted_string preffix = formatted_string()) {
 		const auto& pp = cell_pad;
 
 		if (force_right_align || c.align_right) {
-			text_stroked(text, col, vec2i(c.r - pp.x - calc_size(text).x, pp.y));
+			text_stroked(text, col, vec2i(c.r - pp.x - calc_size(text).x, pp.y), {}, preffix);
 		}
 		else {
-			text_stroked(text, col, vec2i(c.l + pp.x, pp.y));
+			text_stroked(text, col, vec2i(c.l + pp.x, pp.y), {}, preffix);
 		}
 	};
 
@@ -557,8 +557,8 @@ void arena_scoreboard_gui::draw_gui(
 				++current_column;
 			};
 
-			auto col_text = [&](const auto& text) {
-				print_col_text(*current_column, text, faction_text_col);
+			auto col_text = [&](const auto& text, formatted_string preffix = formatted_string()) {
+				print_col_text(*current_column, text, faction_text_col, false, preffix);
 			};
 
 			if (in.player_metas != nullptr) {
@@ -723,7 +723,22 @@ void arena_scoreboard_gui::draw_gui(
 			}
 
 			next_col();
-			col_text(get_nickname_str(player_id, player_data));
+
+			const bool is_web = [&]() {
+				if (in.player_metas != nullptr) {
+					return (*in.player_metas)[player_id.value].synced.is_web_client;
+				}
+
+				return false;
+			}();
+
+			auto pref_col = rgba(255, 255, 120, 255);
+
+			if (!is_conscious) {
+				pref_col = pref_col.mult_luminance(cfg.dead_player_text_lumi_mult).mult_alpha(cfg.dead_player_text_alpha_mult);
+			}
+			
+			col_text(get_nickname_str(player_id, player_data), is_web ? fmt(" (Web) ", pref_col) : formatted_string());
 			next_col();
 
 			const auto& stats = player_data.stats;

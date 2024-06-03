@@ -1610,7 +1610,19 @@ void server_setup::finalize_webhook_jobs() {
 						break;
 
 					case job_type::AUTH: {
+#if IS_PRODUCTION_BUILD
 						const auto new_id = webhook_result;
+#else
+						auto new_id = webhook_result;
+
+						if (begins_with(new_id, "steam_")) {
+							/*
+								For testing so we can use just a single steam account
+							*/
+
+							new_id = std::string("steam_") + client->get_nickname();
+						}
+#endif
 
 						if (new_id.empty()) {
 							LOG(
@@ -2276,10 +2288,20 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 }
 
 synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
+	bool has_web_clients_playing = false;
+
 	bool all_authenticated = true;
 	bool all_not_banned = true;
 
-	for_each_id_and_client([&all_authenticated, &all_not_banned](const auto, const auto& c) {
+	for_each_id_and_client([this, &all_authenticated, &all_not_banned, &has_web_clients_playing](const auto id, const auto& c) {
+		if (c.is_web_client()) {
+			const auto faction = get_assigned_faction(to_mode_player_id(id));
+
+			if (::is_actual_faction(faction)) {
+				has_web_clients_playing = true;
+			}
+		}
+
 		if (!c.is_authenticated()) {
 			all_authenticated = false;
 		}
@@ -2317,6 +2339,8 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	out.friendly_fire = vars.friendly_fire;
 	out.ranked = vars.ranked;
+
+	out.force_short_match = has_web_clients_playing;
 
 	return out;
 }
@@ -4665,16 +4689,20 @@ bool server_setup::has_assigned_teams() const {
 	return !assigned_teams.id_to_faction.empty();
 }
 
-faction_type server_setup::get_assigned_faction() const { 
+faction_type server_setup::get_assigned_faction(const mode_player_id id) const { 
 	return get_arena_handle().on_mode(
 		[&](const auto& mode) {
-			if (const auto p = mode.find(get_local_player_id())) {
+			if (const auto p = mode.find(id)) {
 				return p->get_faction();
 			}
 
 			return faction_type::COUNT;
 		}
 	);
+}
+
+faction_type server_setup::get_assigned_faction() const { 
+	return get_assigned_faction(get_local_player_id());
 }
 
 std::string server_heartbeat::get_location_id() const {

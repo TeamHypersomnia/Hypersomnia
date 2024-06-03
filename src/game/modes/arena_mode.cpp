@@ -510,7 +510,7 @@ void arena_mode::remove_player(input_type in, const logic_step step, const mode_
 		if (const auto entry = find(id)) {
 			++entry->stats.times_suspended;
 
-			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked)) {
+			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked, short_match)) {
 				LOG("%x exceeded suspension limits. Kicking right away.", id.value);
 				notify_ranked_banned(*entry, id, entry->get_nickname(), step);
 				erase_player(in, step, id, false);
@@ -1623,8 +1623,26 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 	}
 }
 
+uint32_t arena_mode::get_num_rounds(const const_input_type in) const {
+	if (short_match) {
+		auto half = in.rules.get_num_rounds() / 2;
+
+		if (half < 2) {
+			return 2;
+		}
+
+		if (half % 2 == 1) {
+			return half + 1;
+		}
+
+		return half;
+	}
+
+	return in.rules.get_num_rounds();
+}
+
 bool arena_mode::is_halfway_round(const const_input_type in) const {
-	const auto max_rounds = in.rules.get_num_rounds();
+	const auto max_rounds = get_num_rounds(in);
 	const auto current_round = get_current_round_number();
 
 	return current_round == max_rounds / 2;
@@ -1639,7 +1657,7 @@ bool arena_mode::is_final_round(const const_input_type in) const {
 		return true;
 	}
 
-	const auto max_rounds = in.rules.get_num_rounds();
+	const auto max_rounds = get_num_rounds(in);
 	const auto current_round = get_current_round_number();
 
 	bool someone_has_over_half = false;
@@ -2808,6 +2826,14 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 		}
 	}
 
+	short_match = should_match_be_short(in);
+
+	if (short_match) {
+		messages::mode_notification notification;
+		notification.payload = messages::no_arg_mode_notification::SHORT_MATCH;
+		step.post_message(std::move(notification));
+	}
+
 	match_start_timestamp = augs::date_time::get_utc_timestamp_iso8601();
 
 	state = arena_mode_state::LIVE;
@@ -3023,16 +3049,16 @@ mode_player_id arena_mode::find_suspended_player_id(const std::string& account_i
 	return mode_player_id::dead();
 }
 
-float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars) const {
-	return std::max(0.0f, vars.rejoin_time_limit - stats.total_time_suspended);
+float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars, const bool is_short) const {
+	return std::max(0.0f, vars.get_rejoin_time_limit(is_short) - stats.total_time_suspended);
 }
 
-bool arena_mode_player::suspend_limit_exceeded(const server_ranked_vars& vars) const {
+bool arena_mode_player::suspend_limit_exceeded(const server_ranked_vars& vars, const bool is_short) const {
 	if (stats.times_suspended > vars.max_rejoins) {
 		return true;
 	}
 
-	if (stats.total_time_suspended > vars.rejoin_time_limit) {
+	if (stats.total_time_suspended > vars.get_rejoin_time_limit(is_short)) {
 		return true;
 	}
 
@@ -3053,7 +3079,7 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 			}
 		}
 
-		if (p.second.suspend_limit_exceeded(in.dynamic_vars.ranked)) {
+		if (p.second.suspend_limit_exceeded(in.dynamic_vars.ranked, short_match)) {
 			LOG("%x exceeded suspension limits. Kicking for good.", p.first.value);
 			notify_ranked_banned(p.second, p.first, p.second.get_nickname(), step);
 			to_erase.push_back(p.first);
@@ -3088,7 +3114,7 @@ float arena_mode::find_suspended_time_left(const const_input in) const {
 	float shortest_time_until_kick = 100000.0f;
 
 	for (auto& s : suspended_players) {
-		shortest_time_until_kick = std::min(s.second.suspended_time_until_kick(in.dynamic_vars.ranked), shortest_time_until_kick);
+		shortest_time_until_kick = std::min(s.second.suspended_time_until_kick(in.dynamic_vars.ranked, short_match), shortest_time_until_kick);
 	}
 
 	return shortest_time_until_kick;
@@ -3220,10 +3246,18 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 						ranked_state = ranked_state_type::STARTING;
 						play_ranked_starting_sound(in, step);
 
-						messages::mode_notification notification;
-						notification.payload = messages::no_arg_mode_notification::RANKED_STARTING;
+						{
+							messages::mode_notification notification;
+							notification.payload = messages::no_arg_mode_notification::RANKED_STARTING;
 
-						step.post_message(std::move(notification));
+							step.post_message(std::move(notification));
+						}
+
+						if (should_match_be_short(in)) {
+							messages::mode_notification notification;
+							notification.payload = messages::no_arg_mode_notification::SHORT_MATCH;
+							step.post_message(std::move(notification));
+						}
 					}
 				}
 				else {
@@ -4158,4 +4192,12 @@ bool arena_mode::team_choice_allowed(const const_input_type in) const {
 	}
 
 	return true;
+}
+
+bool arena_mode::should_match_be_short(const const_input_type in) const {
+	if (in.rules.is_ffa()) {
+		return false;
+	}
+
+	return in.dynamic_vars.force_short_match;
 }
