@@ -233,6 +233,8 @@ struct arena_mode_match_result {
 	int winner_score = 0;
 	int loser_score  = 0;
 
+	bool losers_abandoned = false;
+
 	/*
 		Not necessarily equivalent to winner_score == loser_score,
 		since the match could've been abandoned.
@@ -248,6 +250,10 @@ struct arena_mode_match_result {
 	}
 
 	bool is_tie() const {
+		if (losers_abandoned) {
+			return false;
+		}
+
 		return tied;
 	}
 };

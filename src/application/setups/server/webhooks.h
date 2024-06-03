@@ -439,7 +439,7 @@ namespace discord_webhooks {
 				mvp_notice_suffix
 			);
 
-			const auto first_team_name = std::string(info.is_tie() ? "First team:" : "Winning team:");
+			const auto first_team_name = std::string (info.is_tie() ? "First team:" : "Winning team:");
 			const auto second_team_name = std::string(info.is_tie() ? "Second team:" : "Losing team:");
 
 			std::size_t num_width = 2;

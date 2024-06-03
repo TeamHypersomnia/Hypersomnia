@@ -2842,10 +2842,9 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	const auto p = calc_participating_factions(in);
 
 	const auto result = calc_match_result(in);
-	const bool tied = result.is_tie();
 
-	const auto first_team  = tied ? p.defusing  : result.winner;
-	const auto second_team = tied ? p.bombing   : result.loser;
+	const auto first_team  = result.is_tie() ? p.defusing  : result.winner;
+	const auto second_team = result.is_tie() ? p.bombing   : result.loser;
 
 	LOG("Posting a match summary. First team: %x. Second team: %x", first_team, second_team);
 
@@ -2879,6 +2878,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 
 	messages::match_summary_message summary;
 	summary.match_start_timestamp = match_start_timestamp;
+	summary.losers_abandoned = result.losers_abandoned;
 
 	if (in.rules.is_ffa()) {
 		for_each_player_best_to_worst_in(
@@ -2947,12 +2947,12 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 
 	if (strongest_1 && strongest_2) {
 		const auto stronger_of_the_two = (*strongest_1 < *strongest_2) ? strongest_in_first : strongest_in_second;
-		summary.mvp_player_id = result.is_tie() ? stronger_of_the_two : strongest_in_first;
+		summary.mvp_player_id          = result.is_tie() ? stronger_of_the_two : strongest_in_first;
 
 		if (result.is_tie() && stronger_of_the_two == strongest_in_second) {
 			/* 
-				Note this doesn't matter for a ranked.
 				Flip teams so that the first is where the mvp is.
+				Note is_tie returns false if there was an abandon, in which case the order of teams matters.
 			*/
 
 			summary.flip_teams();
@@ -3688,6 +3688,8 @@ arena_mode_match_result arena_mode::calc_match_result(const const_input_type in)
 
 	if (abandoned_team != faction_type::COUNT) {
 		arena_mode_match_result result;
+
+		result.losers_abandoned = true;
 
 		result.loser = abandoned_team;
 		result.winner = p.get_opposing(result.loser);

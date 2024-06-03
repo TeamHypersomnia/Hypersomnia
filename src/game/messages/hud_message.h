@@ -76,6 +76,8 @@ namespace messages {
 			int abandoned_at_score = -1;
 		};
 
+		bool losers_abandoned = false;
+
 		int first_team_score = 0;
 		int second_team_score = 0;
 
@@ -86,6 +88,10 @@ namespace messages {
 		std::string match_start_timestamp;
 
 		bool is_tie() const {
+			if (losers_abandoned) {
+				return false;
+			}
+
 			return first_team_score == second_team_score;
 		}
 

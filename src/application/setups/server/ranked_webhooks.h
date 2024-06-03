@@ -32,6 +32,9 @@ namespace ranked_webhooks {
 		writer.Key("lose_score");
 		writer.Int(info.second_team_score);
 
+		writer.Key("losers_abandoned");
+		writer.Bool(info.losers_abandoned);
+
 		writer.Key("player_infos");
 
 		{
