@@ -31,9 +31,21 @@ jobs:
     - name: Update packages
       run: sudo apt-get update
 
+    - name: Install packages
+      run: sudo apt-get install --fix-missing cmake ninja-build
+
+    - name: Install OpenSSL3
+      run: cmake/linux_actions/install_openssl3.sh
+
+    - name: Install LLVM
+      run: . cmake/linux_actions/install_llvm.sh
+
+    - name: Install Libsodium
+      run: . cmake/linux_actions/install_libsodium.sh
+
     # Install dependencies for building GLFW with X11 and Wayland support
     - name: Install build dependencies
-      run: sudo apt-get install --fix-missing cmake ninja-build alsa-oss osspd-alsa osspd libasound2 libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev xorg-dev
+      run: sudo apt-get install --fix-missing alsa-oss osspd-alsa osspd libasound2 libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev xorg-dev
 
     - name: Add PipeWire PPA
       run: |
@@ -42,9 +54,6 @@ jobs:
 
     - name: Install OpenAL soft dependencies
       run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev libpipewire-0.3-dev
-
-    - name: Install LLVM
-      run: . cmake/linux_actions/install_llvm.sh
 
     - name: Clone GLFW
       run: git clone https://github.com/glfw/glfw.git
@@ -57,12 +66,6 @@ jobs:
         cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=ON
         make
         sudo make install
-
-    - name: Install OpenSSL3
-      run: cmake/linux_actions/install_openssl3.sh
-
-    - name: Install Libsodium
-      run: . cmake/linux_actions/install_libsodium.sh
 
     - name: Backup Steam lib
       run: cp cmake/steam_integration/bin/linux/libsteam_integration.so libsteam_integration.so.bak
