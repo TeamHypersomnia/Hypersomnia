@@ -207,6 +207,7 @@ namespace assets {
 
 		SOCIAL_GOOGLE,
 		SOCIAL_DISCORD,
+		ASSOCIATE,
 
 		COUNT
 		// END GEN INTROSPECTOR

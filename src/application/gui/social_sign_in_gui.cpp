@@ -21,7 +21,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	center_next_window(ImGuiCond_Always);
 
-	ImGui::SetNextWindowSize(ImVec2(450, in.prompted_once ? 260 : 335), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(450, in.prompted_once ? 260+40 : 335+40), ImGuiCond_Always);
 
     const auto flags = 
         ImGuiWindowFlags_NoSavedSettings |
@@ -85,7 +85,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	auto& imgs = in.necessary_images;
 
-	auto login_option = [&](const auto icon, const auto label) {
+	auto login_option = [&](const auto icon, const auto label, const float sz_mult = 1.0f, const vec2 pad = vec2(0.5, 0.2), float alpha=1.0f) {
 		const bool even = int(icon) % 2 == 0;
 
 		auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 24));
@@ -93,13 +93,13 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		const auto result = selectable_with_icon(
 			imgs[icon],
 			label,
-			1.0f,
-			vec2(0.5, 0.2),
+			sz_mult,
+			pad,
 			white,
 			{
-				rgba(255, 255, 255, even ? 15 : 15),
-				rgba(255, 255, 255, 30),
-				rgba(255, 255, 255, 60)
+				rgba(255, 255, 255, alpha*(even ? 15 : 15)),
+				rgba(255, 255, 255, alpha*30),
+				rgba(255, 255, 255, alpha*60)
 			}
 		);
 
@@ -121,6 +121,15 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	}
 
 	ImGui::PopFont();
+
+	{
+		auto sc = scoped_text_color(rgba(255, 255, 255, 230));
+
+		if (login_option(N::ASSOCIATE, "Link Discord with Steam", 0.8f, vec2(0.5f, 0.1f), 0.5f)) {
+			augs::open_url("https://hypersomnia.xyz/profile");
+		}
+	}
+
 	text(" ");
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 

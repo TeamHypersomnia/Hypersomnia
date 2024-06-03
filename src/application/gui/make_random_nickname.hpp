@@ -138,7 +138,7 @@ inline std::string make_random_nickname(randomization& rng) {
 		"Triarchus", // Short for Triarchus
 		"Navarchus", // Short for Navarchus
 		"Hypaspist", // Short for Hypaspist
-		"Lochagos" // Short for Lochagos,
+		"Lochagos", // Short for Lochagos,
 		"Caesar"
 	};
 
