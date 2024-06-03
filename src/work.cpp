@@ -321,6 +321,7 @@ work_result work(
 
 	WEBSTATIC const bool is_steam_client = steam_initialized;
 	WEBSTATIC const bool ranked_servers_enabled = is_steam_client;
+	(void)ranked_servers_enabled;
 
 	LOG_NVPS(is_steam_client);
 
