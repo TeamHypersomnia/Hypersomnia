@@ -48,6 +48,7 @@
 #include "application/setups/client/direct_file_download.h"
 #include "application/setups/client/bandwidth_monitor.h"
 #include "steam_integration_callbacks.h"
+#include "application/main/auth_provider_type.h"
 
 #include "steam_rich_presence_pairs.h"
 
@@ -95,7 +96,9 @@ class client_setup :
 	all_modes_variant predicted_mode;
 
 	std::vector<special_client_request> pending_requests;
+
 	std::optional<steam_auth_ticket> pending_steam_auth;
+	std::optional<web_auth_data> pending_web_auth;
 
 	bool now_resyncing = false;
 	bool schedule_disconnect = false;
@@ -906,6 +909,7 @@ public:
 	std::string get_steam_join_command_line() const;
 
 	void send_auth_ticket(const steam_auth_ticket&);
+	void send_auth_ticket(const web_auth_data&);
 
 	bool is_ranked_live_or_starting() const;
 	bool would_abandon_match() const;

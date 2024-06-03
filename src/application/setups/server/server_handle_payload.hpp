@@ -29,7 +29,7 @@ message_handler_result server_setup::handle_payload(
 
 	ensure(c.is_set());
 
-	if constexpr (std::is_same_v<T, steam_auth_request_payload>) {
+	if constexpr (std::is_same_v<T, auth_request_payload>) {
 		if (c.auth_requested) {
 			kick(client_id, "Client requested authentication twice.");
 
@@ -40,7 +40,7 @@ message_handler_result server_setup::handle_payload(
 			return continue_v;
 		}
 
-		LOG("steam_auth_request_payload from: %x. Took %x secs.", c.get_nickname(), server_time - c.when_connected);
+		LOG("auth_request_payload from: %x. Took %x secs.", c.get_nickname(), server_time - c.when_connected);
 
 		c.auth_requested = true;
 		c.when_sent_auth_ticket = server_time;

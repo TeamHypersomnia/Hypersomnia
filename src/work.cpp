@@ -634,20 +634,6 @@ work_result work(
 	LOG("Random seed for this run: %x", random_seed);
 
 	netcode_rng = randomization(random_seed);
-
-	if (config.client.nickname.empty()) {
-		const auto rng_name = ::make_random_nickname(netcode_rng);
-
-		if (!params.guest.empty()) {
-			config.client.nickname = typesafe_sprintf("[%x] %x", params.guest, rng_name);
-		}
-		else {
-			config.client.nickname = rng_name;
-		}
-
-		LOG("Generated guest nickname: %x", config.client.nickname);
-	}
-
 #endif
 #endif
 
@@ -783,6 +769,25 @@ work_result work(
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 	(void)change_with_save;
+
+#if PLATFORM_WEB
+	if (config.client.nickname.empty() || config.client.nickname == "web_user") {
+		const auto rng_name = ::make_random_nickname(netcode_rng);
+		const auto final_nickname = 
+			!params.guest.empty() ?
+			typesafe_sprintf("[%x] %x", params.guest, rng_name) :
+			rng_name
+		;
+
+		change_with_save(
+			[&](auto& cfg) {
+				cfg.client.nickname = final_nickname;
+			}
+		);
+
+		LOG("Generated guest nickname: %x", final_nickname);
+	}
+#endif
 
 #if HEADLESS
 #else
@@ -1489,10 +1494,14 @@ work_result work(
 		augs::remove_file(CACHED_AUTH_PATH);
 		augs::remove_file(CACHED_AVATAR);
 
+		const auto before_sign_in = config.client.nickname_before_sign_in;
+
+		LOG("Restoring nickname before sign in: %x", before_sign_in);
+
 		change_with_save(
 			[&](auto& cfg) {
 				cfg.client.avatar_image_path = augs::path_type();
-				cfg.client.nickname = cfg.client.nickname_before_sign_in;
+				cfg.client.nickname = before_sign_in;
 			}
 		);
 	};
@@ -1519,7 +1528,7 @@ work_result work(
 	};
 
 	try {
-		social_sign_in.cached_auth = augs::from_json_file<auth_data>(CACHED_AUTH_PATH);
+		social_sign_in.cached_auth = augs::from_json_file<web_auth_data>(CACHED_AUTH_PATH);
 	}
 	catch (...) {
 		social_sign_in.cached_auth = {};
@@ -1845,7 +1854,9 @@ work_result work(
 		auto connect_string = config.client_connect;
 		std::string official_url;
 
-		const bool requires_sign_in = connect_string.find("ranked") != std::string::npos;
+#if PLATFORM_WEB
+		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
+		const bool requires_sign_in = is_official_connect_string && begins_with(connect_string, "ranked");
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
@@ -1857,6 +1868,7 @@ work_result work(
 				return false;
 			}
 		}
+#endif
 
 		LOG("Launching client setup with connect string: %x", connect_string);
 
@@ -1965,10 +1977,28 @@ work_result work(
 			);
 		});
 
+#if PLATFORM_WEB
+#if IS_PRODUCTION_BUILD
+		if (requires_sign_in)
+#endif
+		{
+			/*
+				At this point we verified we're signed in.
+			*/
+
+			on_specific_setup([&](client_setup& setup) {
+				LOG("Server requires_sign_in. Calling send_auth_ticket.");
+
+				auto& cached_auth = social_sign_in.cached_auth;
+				setup.send_auth_ticket(cached_auth);
+			});
+		}
+#endif
+
 		displayed_connecting_server_name.clear();
 
 #if PLATFORM_WEB
-		if (is_official_webrtc_id(connect_string)) {
+		if (is_official_connect_string) {
 			official_url = connect_string;
 		}
 #endif
@@ -3014,12 +3044,18 @@ work_result work(
 				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
 
 				if (const auto new_auth = get_new_auth_data()) { 
+					const auto before_sign_in = 
+						is_signed_in() ?
+						config.client.nickname_before_sign_in :
+						config.client.nickname
+					;
+
+					LOG_NVPS(is_signed_in(), before_sign_in);
+
 					social_sign_in.cached_auth = *new_auth;
 					social_sign_in.close();
 
 					augs::save_as_json(*new_auth, CACHED_AUTH_PATH);
-
-					const auto before_sign_in = config.client.nickname;
 
 					bool downloaded = false;
 
@@ -3031,7 +3067,7 @@ work_result work(
 						if (auto resp = cli->Get(parsed.location)) {
 							try {
 								augs::image avatar;
-								avatar.from_png_bytes(augs::string_to_byte_vector(resp->body), parsed.location);
+								avatar.from_png_bytes(augs::string_to_bytes(resp->body), parsed.location);
 
 								const auto max_s = static_cast<unsigned>(max_avatar_side_v);
 								avatar.scale(vec2u::square(max_s));
@@ -3052,6 +3088,7 @@ work_result work(
 					change_with_save(
 						[&](auto& cfg) {
 							cfg.client.nickname_before_sign_in = before_sign_in;
+							LOG("Saving nickname before sign in: %x", cfg.client.nickname_before_sign_in);
 							cfg.client.nickname = social_sign_in.cached_auth.profile_name;
 							cfg.prompted_for_sign_in_once = true;
 

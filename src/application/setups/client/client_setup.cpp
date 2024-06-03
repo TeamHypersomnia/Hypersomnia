@@ -1324,7 +1324,7 @@ void client_setup::send_pending_commands() {
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
 	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
 
-	auto send_pending_auth = [&]() {
+	auto send_pending_steam_auth = [&]() {
 		if (!pending_steam_auth.has_value()) {
 			return;
 		}
@@ -1347,10 +1347,35 @@ void client_setup::send_pending_commands() {
 
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
-			steam_auth_request_payload({ ticket.ticket_bytes })
+
+			auth_request_payload({ 
+				auth_provider_type::STEAM_NATIVE,
+				ticket.ticket_bytes 
+			})
 		);
 
 		pending_steam_auth.reset();
+	};
+
+	auto send_pending_web_auth = [&]() {
+		if (!pending_web_auth.has_value()) {
+			return;
+		}
+
+		auto& ticket = *pending_web_auth;
+
+		LOG("Sending %x web auth ticket to server.", ticket.type);
+
+		send_payload(
+			game_channel_type::RELIABLE_MESSAGES,
+
+			auth_request_payload({ 
+				ticket.type,
+				augs::string_to_bytes(ticket.auth_token)
+			})
+		);
+
+		pending_web_auth.reset();
 	};
 
 	auto send_settings = [&]() {
@@ -1371,7 +1396,8 @@ void client_setup::send_pending_commands() {
 		current_requested_settings = requested_settings;
 	};
 
-	send_pending_auth();
+	send_pending_steam_auth();
+	send_pending_web_auth();
 
 	if (!is_connected()) {
 		return;
@@ -2240,6 +2266,10 @@ netcode_address_t client_setup::get_server_address_for_others_to_join() const {
 
 void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
 	pending_steam_auth = ticket;
+}
+
+void client_setup::send_auth_ticket(const web_auth_data& ticket) {
+	pending_web_auth = ticket;
 }
 
 bool client_setup::is_ranked_live_or_starting() const {

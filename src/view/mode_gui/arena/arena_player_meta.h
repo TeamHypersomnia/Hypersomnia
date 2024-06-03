@@ -2,8 +2,10 @@
 #include <array>
 #include "augs/network/network_types.h"
 #include "application/network/requested_client_settings.h"
+#include "application/main/auth_provider_type.h"
 
-struct steam_auth_request_payload {
+struct auth_request_payload {
+	auth_provider_type type = auth_provider_type::COUNT;
 	std::vector<std::byte> ticket_bytes;
 };
 

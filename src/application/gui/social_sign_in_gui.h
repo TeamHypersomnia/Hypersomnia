@@ -12,7 +12,7 @@ struct social_sign_in_state : public standard_window_mixin<social_sign_in_state>
 	using base = standard_window_mixin<social_sign_in_state>;
 
 	std::string last_reason;
-	auth_data cached_auth;
+	web_auth_data cached_auth;
 	std::string guest_nickname;
 
 	void open(std::string reason = "") {

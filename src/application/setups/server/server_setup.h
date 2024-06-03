@@ -252,7 +252,7 @@ class server_setup :
 	template <class F>
 	void push_auth_job(mode_player_id player_id, F&& f);
 
-	void request_auth(mode_player_id player_id, const steam_auth_request_payload&);
+	void request_auth(mode_player_id player_id, const auth_request_payload&);
 
 	void finalize_webhook_jobs();
 

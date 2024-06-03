@@ -22,7 +22,6 @@ struct steam_change_server_request {
 
 struct steam_auth_ticket {
 	static constexpr uint32_t index = 3;
-	static constexpr int ticket_max_length = 2560;
 
 	uint32_t request_id;
 	int result;

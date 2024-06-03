@@ -264,18 +264,18 @@ namespace net_messages {
 		);
 	};
 
-	struct steam_auth_request : only_block_message {
+	struct auth_request : only_block_message {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
 
 		bool read_payload(
-			steam_auth_request_payload&
+			auth_request_payload&
 		);
 
 		template <class F>
 		bool write_payload(
 			F block_allocator,
-			const steam_auth_request_payload&
+			const auth_request_payload&
 		);
 	};
 
@@ -347,7 +347,7 @@ namespace net_messages {
 		file_download_link*,
 		download_progress_message*,
 		file_chunks_request*,
-		steam_auth_request*
+		auth_request*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

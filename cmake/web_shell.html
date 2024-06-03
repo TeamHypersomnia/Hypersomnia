@@ -12,6 +12,7 @@
   <meta property="og:title" content="Hypersomnia">
   <meta property="og:description" content="Free and open-source competitive 2D shooter on the Web.">
   <meta property="og:image" content="https://raw.githubusercontent.com/TeamHypersomnia/PressKit/main/assets/logos/github_card.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
   <style>
     body, html {
@@ -87,6 +88,8 @@
   <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2/build/global/luxon.min.js"></script>
   <script type='text/javascript'>
+    const revoke_origin = 'https://hypersomnia.xyz';
+
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
       const dpr = window.devicePixelRatio || 1;
@@ -310,9 +313,6 @@
         [provider, profileName, avatarUrl, authToken, expiresIn]);
     }
 
-    const site_origin = 'http://localhost:6931';
-    const revoke_origin = 'http://localhost:3000';
-
     const channel = new BroadcastChannel('token_bridge');
 
     channel.addEventListener('message', event => {
@@ -339,8 +339,9 @@
     }
 
     function loginDiscord() {
+      const site_origin = window.location.origin; // Dynamically get the origin of the current site
       const redirect = site_origin + '/discord_redirect.html';
-      const redirectUri = encodeURIComponent(redirect); // Use localhost for testing
+      const redirectUri = encodeURIComponent(redirect);
 
       const scope = 'identify';
       const authUrl = `https://discord.com/oauth2/authorize?response_type=token&client_id=${clientIdDiscord}&redirect_uri=${redirectUri}&scope=${scope}`;

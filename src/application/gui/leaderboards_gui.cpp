@@ -386,6 +386,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		// text_disabled("No rank yet.");
 	}
 
+#if PLATFORM_WEB
 	if (logged_in) {
 		ImGui::SameLine();
 		const auto avail = ImGui::GetContentRegionAvail();
@@ -405,6 +406,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			wants_log_out = true;
 		}
 	}
+#endif
 
 
 	ImGui::NextColumn();

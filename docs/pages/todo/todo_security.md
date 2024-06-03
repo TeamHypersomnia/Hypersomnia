@@ -5,8 +5,14 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- OAuth
+	- likely use authorization code instead of implicit grant
+
 - TODO: Check if the previous file transfer is complete, for security.
 Should probably check if the channel is empty, and if it's not, just kick.
+
+- prevent dangling users on ranked servers due to various edge conditions
+	- e.g. can linger unauthenticated while downloading the map
 
 - Think what happens when the server loads an incorrect arena or just fails to load it for whatever reason
 	- currently a default one is loaded instead

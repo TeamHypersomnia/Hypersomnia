@@ -10,14 +10,6 @@
 
 #include "game/messages/hud_message.h"
 
-inline std::string bytes_to_string(const std::vector<std::byte>& bytes) {
-	std::string result;
-	result.resize(bytes.size());
-	std::memcpy(result.data(), bytes.data(), bytes.size());
-
-	return result;
-}
-
 namespace telegram_webhooks {
 	inline std::string escaped_nick(const std::string& n) {
 		std::string result;
@@ -710,7 +702,7 @@ namespace discord_webhooks {
 
 		return {
 			{ "payload_json", payload, "", "" },
-			{ "file1", bytes_to_string(avatar), "av.png", "application/octet-stream" }
+			{ "file1", augs::bytes_to_string(avatar), "av.png", "application/octet-stream" }
 		};
 	}
 

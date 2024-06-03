@@ -14,7 +14,7 @@ EM_JS(void, call_login_discord, (), {
 });
 
 std::mutex pending_auth_datas_lk;
-std::optional<auth_data> new_auth_data;
+std::optional<web_auth_data> new_auth_data;
 
 void sign_in_with_google() {
 	main_thread_queue::execute([&]() {
@@ -36,11 +36,15 @@ EM_JS(void, call_revokeDiscord, (const char* access_token), {
 	Module.revokeDiscord(access_token);
 });
 
-inline void auth_data::log_out() {
+inline void web_auth_data::log_out() {
+	if (!is_set()) {
+		return;
+	}
+
 	LOG("Logging out at timestamp: %x", augs::secs_since_epoch());
 
 	switch(type) {
-		case auth_provider::DISCORD:
+		case auth_provider_type::DISCORD:
 			main_thread_queue::execute([&]() {
 				call_revokeDiscord(auth_token.c_str());
 			});
@@ -55,7 +59,7 @@ inline void auth_data::log_out() {
 }
 
 auto get_new_auth_data() {
-	std::optional<auth_data> new_auth;
+	std::optional<web_auth_data> new_auth;
 
 	{
 		std::scoped_lock lk(pending_auth_datas_lk);
@@ -93,7 +97,7 @@ extern "C" {
 
 		std::scoped_lock lk(pending_auth_datas_lk);
 
-		new_auth_data.emplace(auth_data {
+		new_auth_data.emplace(web_auth_data {
 			::get_auth_provider_type(provider),
 			profile_name,
 			avatar_url,

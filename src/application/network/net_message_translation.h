@@ -133,29 +133,44 @@ namespace net_messages {
 		return read_standard_block_message(output);
 	}
 
-	inline bool steam_auth_request::read_payload(
-		steam_auth_request_payload& payload
+	inline bool auth_request::read_payload(
+		auth_request_payload& payload
 	) {
-		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
-		auto size = static_cast<std::size_t>(GetBlockSize());
+		const auto data = reinterpret_cast<const std::byte*>(GetBlockData());
+		const auto size = static_cast<std::size_t>(GetBlockSize());
+
+		if (size < 1) {
+			return false;
+		}
+
+		auto pts = augs::make_ptr_read_stream(data, size);
+
+		{
+			uint8_t type;
+			augs::read_bytes(pts, type);
+			payload.type = static_cast<auth_provider_type>(type);
+		}
 
 		auto& ticket = payload.ticket_bytes;
+		ticket.resize(size - 1);
 
-		ticket.resize(size);
-		std::memcpy(ticket.data(), data, size);
+		augs::detail::read_raw_bytes(pts, ticket.data(), ticket.size());
 
 		return true;
 	}
 
 	template <class F>
-	inline bool steam_auth_request::write_payload(
+	inline bool auth_request::write_payload(
 		F block_allocator,
-		const steam_auth_request_payload& payload
+		const auth_request_payload& payload
 	) {
 		const auto& ticket = payload.ticket_bytes;
-		auto block = block_allocator(ticket.size());
+		const auto sz = ticket.size() + 1;
+		const auto block = reinterpret_cast<std::byte*>(block_allocator(sz));
+		auto pts = augs::make_ptr_write_stream(block, sz);
 
-		std::memcpy(block, ticket.data(), ticket.size());
+		augs::write_bytes(pts, static_cast<uint8_t>(payload.type));
+		augs::detail::write_raw_bytes(pts, ticket.data(), ticket.size());
 
 		return true;
 	}

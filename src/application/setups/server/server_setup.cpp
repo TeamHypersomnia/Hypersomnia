@@ -955,74 +955,135 @@ std::optional<T> GetIf(F& from, const std::string& label) {
 	return augs::json_find<T>(from, label);
 }
 
-void server_setup::request_auth(mode_player_id player_id, const steam_auth_request_payload& payload) {
+void server_setup::request_auth(mode_player_id player_id, const auth_request_payload& payload) {
 #if PLATFORM_WEB
 	(void)player_id;
 	(void)payload;
 #else
-	const auto api_key = private_vars.steam_web_api_key;
-	const auto& ticket = payload.ticket_bytes;
-	const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
+	auto push_steam_native_auth_job = [&]() {
+		const auto api_key = private_vars.steam_web_api_key;
+		const auto& ticket = payload.ticket_bytes;
+		const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
 
-	push_auth_job(
-		player_id,
+		push_auth_job(
+			player_id,
 
-		[api_key, ticket_hex]() {
-			auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
+			[api_key, ticket_hex]() {
+				auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
 
-			const auto appid = std::to_string(::steam_get_appid());
-			const auto identity = "hypersomnia_gameserver";
+				const auto appid = std::to_string(::steam_get_appid());
+				const auto identity = "hypersomnia_gameserver";
 
-			httplib::Params params;
-			params.emplace("key", api_key);
-			params.emplace("appid", appid);
-			params.emplace("ticket", ticket_hex);
-			params.emplace("identity", identity);
+				httplib::Params params;
+				params.emplace("key", api_key);
+				params.emplace("appid", appid);
+				params.emplace("ticket", ticket_hex);
+				params.emplace("identity", identity);
 
-			const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
+				const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
 
-			if (result) {
-				if (httplib_utils::successful(result->status)) {
-					LOG("Steam auth response: %x", result->body);
+				if (result) {
+					if (httplib_utils::successful(result->status)) {
+						LOG("Steam auth response: %x", result->body);
 
-					try {
-						auto doc = augs::json_document_from(result->body);
+						try {
+							auto doc = augs::json_document_from(result->body);
 
-						if (doc.HasMember("response") && doc["response"].HasMember("params")) {
-							auto& params = doc["response"]["params"];
+							if (doc.HasMember("response") && doc["response"].HasMember("params")) {
+								auto& params = doc["response"]["params"];
 
-							if (GetIf<bool>(params, "publisherbanned") == true) {
-								LOG("Banned by the publisher.");
-								return std::string("publisherbanned");
-							}
+								if (GetIf<bool>(params, "publisherbanned") == true) {
+									LOG("Banned by the publisher.");
+									return std::string("publisherbanned");
+								}
 
-							if (GetIf(params, "result") == "OK") {
-								if (auto steamid = GetIf(params, "steamid")) {
-									LOG("Detected Steam ID: %x", *steamid);
-									return std::string("steam_") + *steamid;
+								if (GetIf(params, "result") == "OK") {
+									if (auto steamid = GetIf(params, "steamid")) {
+										LOG("Detected Steam ID: %x", *steamid);
+										return std::string("steam_") + *steamid;
+									}
 								}
 							}
-						}
 
-						LOG("Failed to deserialize Steam auth response. Schema is out of date.");
-						return std::string("");
+							LOG("Failed to deserialize Steam auth response. Schema is out of date.");
+							return std::string("");
+						}
+						catch (const augs::json_deserialization_error& err ) {
+							LOG("Failed to deserialize Steam auth response. Reason: %x", err.what());
+							return std::string("");
+						}
 					}
-					catch (const augs::json_deserialization_error& err ) {
-						LOG("Failed to deserialize Steam auth response. Reason: %x", err.what());
+					else {
+						LOG("Steam auth failed, http code: %x", result->status);
 						return std::string("");
 					}
 				}
 				else {
-					LOG("Steam auth failed, http code: %x", result->status);
+					LOG("Steam auth failed: no HTTPS response!");
 					return std::string("");
 				}
 			}
-			else {
-				LOG("Steam auth failed: no HTTPS response!");
+		);
+	};
+
+	auto push_web_auth_job = [&]() {
+		push_auth_job(
+			player_id,
+
+			[payload]() {
+				if (payload.type == auth_provider_type::DISCORD) {
+					auto http_client = httplib_utils::make_client("discord.com", 4);
+
+					httplib::Headers headers = {
+						{"Authorization", "Bearer " + augs::bytes_to_string(payload.ticket_bytes) }
+					};
+
+					const auto result = http_client->Get("/api/v10/users/@me", headers);
+
+					if (result) {
+						if (httplib_utils::successful(result->status)) {
+							LOG("Discord auth response: %x", result->body);
+
+							try {
+								auto doc = augs::json_document_from(result->body);
+
+								if (doc.IsObject()) {
+									if (auto id = GetIf(doc, "id")) {
+										return std::string("discord_") + *id;
+									}
+								}
+
+								LOG("Failed to deserialize Discord auth response. Schema is out of date.");
+								return std::string("");
+							}
+							catch (const augs::json_deserialization_error& err) {
+								LOG("Failed to deserialize Discord auth response. Reason: %x", err.what());
+								return std::string("");
+							}
+						}
+						else {
+							LOG("Discord auth failed, http code: %x", result->status);
+							return std::string("");
+						}
+					}
+					else {
+						LOG("Discord auth failed: no HTTPS response!");
+						return std::string("");
+					}
+				}
+
+				LOG("Unknown auth type: %x", payload.type);
 				return std::string("");
 			}
-		}
-	);
+		);
+	};
+
+	if (payload.type == auth_provider_type::STEAM_NATIVE) {
+		push_steam_native_auth_job();
+	}
+	else {
+		push_web_auth_job();
+	}
 #endif
 }
 
@@ -1546,14 +1607,7 @@ void server_setup::finalize_webhook_jobs() {
 						break;
 
 					case job_type::AUTH: {
-#if IS_PRODUCTION_BUILD
 						const auto new_id = webhook_result;
-#else
-						/*
-							For testing so we can use just a single steam account
-						*/
-						const auto new_id = std::string("steam_") + client->get_nickname();
-#endif
 
 						if (new_id.empty()) {
 							LOG(

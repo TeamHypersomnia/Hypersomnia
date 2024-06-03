@@ -4,11 +4,13 @@ namespace augs {
 	double secs_since_epoch();
 }
 
-enum class auth_provider {
-	// GEN INTROSPECTOR enum class auth_provider
+enum class auth_provider_type {
+	// GEN INTROSPECTOR enum class auth_provider_type
 	GOOGLE,
 	CRAZYGAMES,
 	DISCORD,
+
+	STEAM_NATIVE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -16,23 +18,23 @@ enum class auth_provider {
 
 inline auto get_auth_provider_type(std::string p) {
 	if (p == "google") {
-		return auth_provider::GOOGLE;
+		return auth_provider_type::GOOGLE;
 	}
 
 	if (p == "discord") {
-		return auth_provider::DISCORD;
+		return auth_provider_type::DISCORD;
 	}
 
 	if (p == "crazygames") {
-		return auth_provider::CRAZYGAMES;
+		return auth_provider_type::CRAZYGAMES;
 	}
 
-	return auth_provider::GOOGLE;
+	return auth_provider_type::GOOGLE;
 }
 
-struct auth_data {
-	// GEN INTROSPECTOR struct auth_data
-	auth_provider type = auth_provider::COUNT;
+struct web_auth_data {
+	// GEN INTROSPECTOR struct web_auth_data
+	auth_provider_type type = auth_provider_type::COUNT;
 
 	std::string profile_name;
 	std::string avatar_url;
@@ -41,7 +43,7 @@ struct auth_data {
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {
-		return type != auth_provider::COUNT;
+		return type != auth_provider_type::COUNT;
 	}
 
 	bool expired() const {

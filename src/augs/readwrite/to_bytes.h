@@ -94,8 +94,16 @@ namespace augs {
 
 	void from_bytes(const std::vector<std::byte>& bytes, trivial_type_marker& object);
 
-	inline std::vector<std::byte> string_to_byte_vector(const std::string& bytes) {
+	inline std::vector<std::byte> string_to_bytes(const std::string& bytes) {
 		std::vector<std::byte> result;
+		result.resize(bytes.size());
+		std::memcpy(result.data(), bytes.data(), bytes.size());
+
+		return result;
+	}
+
+	inline std::string bytes_to_string(const std::vector<std::byte>& bytes) {
+		std::string result;
 		result.resize(bytes.size());
 		std::memcpy(result.data(), bytes.data(), bytes.size());
 
