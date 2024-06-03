@@ -35,8 +35,13 @@ jobs:
     - name: Install build dependencies
       run: sudo apt-get install --fix-missing cmake ninja-build alsa-oss osspd-alsa osspd libasound2 libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev xorg-dev
 
+    - name: Add PipeWire PPA
+      run: |
+        sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
+        sudo apt-get update
+
     - name: Install OpenAL soft dependencies
-      run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev libpipewire-0.2-dev
+      run: sudo apt-get install --fix-missing libpulse-dev portaudio19-dev libasound2-dev libjack-dev libdbus-1-dev libpipewire-0.3-dev
 
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
