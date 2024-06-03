@@ -148,10 +148,24 @@ void arena_scoreboard_gui::draw_gui(
 		auto stroke_col = black;
 		stroke_col.mult_alpha(cfg.text_stroke_lumi_mult);
 
+		if (!preffix.empty()) {
+			auto w = where;
+
+			w.x += print_stroked(
+				o,
+				w,
+				preffix,
+				flags,
+				stroke_col
+			).x + 1;
+
+			where = w;
+		}
+
 		print_stroked(
 			o,
 			where,
-			preffix + fmt(ss, col),
+			fmt(ss, col),
 			flags,
 			stroke_col
 		);
@@ -246,10 +260,14 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	}
 
-	auto print_col_text = [&](const column& c, const auto& text, const auto& col, bool force_right_align = false, formatted_string preffix = formatted_string()) {
-		const auto& pp = cell_pad;
+	auto print_col_text = [&](const column& c, const auto& text, const auto& col, formatted_string preffix = formatted_string()) {
+		auto pp = cell_pad;
 
-		if (force_right_align || c.align_right) {
+		if (&c == &player_col) {
+			pp.x += 2;
+		}
+
+		if (c.align_right) {
 			text_stroked(text, col, vec2i(c.r - pp.x - calc_size(text).x, pp.y), {}, preffix);
 		}
 		else {
@@ -558,7 +576,7 @@ void arena_scoreboard_gui::draw_gui(
 			};
 
 			auto col_text = [&](const auto& text, formatted_string preffix = formatted_string()) {
-				print_col_text(*current_column, text, faction_text_col, false, preffix);
+				print_col_text(*current_column, text, faction_text_col, preffix);
 			};
 
 			if (in.player_metas != nullptr) {
@@ -732,13 +750,13 @@ void arena_scoreboard_gui::draw_gui(
 				return false;
 			}();
 
-			auto pref_col = rgba(255, 255, 120, 255);
+			auto pref_col = rgba(255, 255, 100, 255);
 
 			if (!is_conscious) {
 				pref_col = pref_col.mult_luminance(cfg.dead_player_text_lumi_mult).mult_alpha(cfg.dead_player_text_alpha_mult);
 			}
 			
-			col_text(get_nickname_str(player_id, player_data), is_web ? fmt(" (Web) ", pref_col) : formatted_string());
+			col_text(get_nickname_str(player_id, player_data), is_web ? fmt("[Web]", pref_col) : formatted_string());
 			next_col();
 
 			const auto& stats = player_data.stats;

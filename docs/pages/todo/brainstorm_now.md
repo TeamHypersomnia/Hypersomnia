@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Show avatar in test scene setup
+- lets launch a connection after signin after all
 - Would be good to finally implement the server details
 
 - We could have login with steam instead of linking but im not convinced

@@ -6942,3 +6942,4 @@ This will discard your redo history."
 
 - dont do anything if all abandon match
 
+- Show avatar in test scene setup

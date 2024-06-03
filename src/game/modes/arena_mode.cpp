@@ -1625,6 +1625,18 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 
 uint32_t arena_mode::get_num_rounds(const const_input_type in) const {
 	if (short_match) {
+		const auto num = in.rules.get_num_rounds();
+
+		if (num == 30) {
+			/* 
+				Special case:
+				Instead of playing "to 16" (with tie 15:15),
+				play "to 10" (with tie 9:9) as it's a nicer number
+			*/
+
+			return 18;
+		}
+
 		auto half = in.rules.get_num_rounds() / 2;
 
 		if (half < 2) {
