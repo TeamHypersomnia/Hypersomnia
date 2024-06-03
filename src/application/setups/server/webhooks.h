@@ -33,9 +33,11 @@ namespace telegram_webhooks {
 
 	inline httplib::MultipartFormDataItems form_player_connected(
 		const std::string& channel_id,
-		const std::string& connected_player
+		const std::string& connected_player,
+		const bool from_the_web
 	) {
-		const auto connected_notice = typesafe_sprintf("`%x` connected.", escaped_nick(connected_player));
+		const auto from_web = from_the_web ? std::string(" from the Web.") : std::string("");
+		const auto connected_notice = typesafe_sprintf("`%x` connected%x.", escaped_nick(connected_player), from_web);
 
 		return {
 			{ "chat_id", channel_id, "", "" },
@@ -618,7 +620,8 @@ namespace discord_webhooks {
 		const std::string& hook_username,
 		const std::string& connected_player,
 		std::vector<std::string> other_players,
-		const std::string& current_map
+		const std::string& current_map,
+		const bool from_the_web
 	) {
 		erase_element(other_players, connected_player);
 
@@ -626,7 +629,8 @@ namespace discord_webhooks {
 		{
 			using namespace rapidjson;
 
-			const auto connected_notice = typesafe_sprintf("%x connected.", escaped_nick(connected_player));
+			const auto from_web = from_the_web ? std::string(" from the Web.") : std::string("");
+			const auto connected_notice = typesafe_sprintf("%x connected%x.", escaped_nick(connected_player), from_web);
 			const auto embed_color = 52224;
 			const auto num_others = other_players.size();
 

@@ -1522,10 +1522,11 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		auto all_nicknames = get_all_nicknames();
 		auto current_arena_name = get_current_arena_name();
 		auto priv_vars = private_vars;
+		const bool from_web = find_client_state(id) && find_client_state(id)->is_web_client();
 
 		push_avatar_job(
 			id,
-			[priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+			[from_web, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
 				if (telegram_webhook_url.valid()) {
 					auto telegram_channel_id = priv_vars.telegram_channel_id;
 
@@ -1533,7 +1534,8 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 					auto items = telegram_webhooks::form_player_connected(
 						telegram_channel_id,
-						connected_player_nickname
+						connected_player_nickname,
+						from_web
 					);
 
 					const auto location = telegram_webhook_url.location + "/sendMessage";
@@ -1555,7 +1557,8 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 						server_name,
 						connected_player_nickname,
 						all_nicknames,
-						current_arena_name
+						current_arena_name,
+						from_web
 					);
 
 					auto response = client->Post(discord_webhook_url.location.c_str(), items);
