@@ -920,4 +920,10 @@ public:
 	client_arena_type get_viewed_arena_type() const;
 
 	std::string get_browser_location() const;
+
+	std::string get_current_arena_name() const {
+		return sv_public_vars.arena;
+	}
+
+	std::string get_scoreboard_caption() const;
 };

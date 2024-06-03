@@ -4573,6 +4573,7 @@ work_result work(
 					is_replaying_demo(),
 					new_viewing_config.streamer_mode,
 					new_viewing_config.streamer_mode_flags,
+					visit_current_setup([&](auto& setup) { return setup.get_scoreboard_caption(); })
 				};
 			};
 

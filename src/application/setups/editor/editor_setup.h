@@ -835,4 +835,8 @@ public:
 	std::string get_browser_location() const {
 		return "editor";
 	}
+
+	std::string get_current_arena_name() const {
+		return get_arena_name();
+	}
 };

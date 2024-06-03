@@ -351,4 +351,5 @@ public:
 	void set_tutorial_surfing_challenge();
 
 	std::string get_browser_location() const;
+	std::string get_scoreboard_caption() const;
 };

@@ -90,7 +90,7 @@ void arena_scoreboard_gui::draw_gui(
 	const auto font_h = in.gui_fonts.gui.metrics.get_height();
 	const auto cell_h = font_h + cell_pad.y * 2;
 
-	const auto window_name = "Scoreboard";
+	const auto window_name = in.scoreboard_caption;
 	const auto window_name_size = calc_size(window_name);
 
 	const int num_participating_factions = 2;
@@ -187,7 +187,13 @@ void arena_scoreboard_gui::draw_gui(
 
 
 	{
-		text_stroked(window_name, white, { sz.x / 2 - window_name_size.x / 2, 0 });
+		auto col = white;
+
+		if (begins_with(window_name, "Ranked")) {
+			col = yellow;
+		}
+
+		text_stroked(window_name, col, { sz.x / 2 - window_name_size.x / 2, 0 });
 	}
 
 	pen.y += window_name_size.y;

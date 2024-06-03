@@ -175,4 +175,8 @@ public:
 	std::string get_browser_location() const {
 		return "editor";
 	}
+
+	std::string get_scoreboard_caption() const {
+		return "Project Selector";
+	}
 };

@@ -38,6 +38,7 @@ struct draw_setup_gui_input {
 	const bool demo_replay_mode;
 	const bool streamer_mode;
 	const streamer_mode_flags_data streamer_mode_flags;
+	const std::string scoreboard_caption;
 
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };

@@ -224,4 +224,12 @@ public:
 			}
 		);
 	}
+
+	game_mode_name_type get_current_game_mode_name() const {
+		return on_mode_with_input(
+			[&](const auto& mode, const auto& input) {
+				return mode.get_name(input);
+			}
+		);
+	}
 };

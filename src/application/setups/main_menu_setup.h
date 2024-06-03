@@ -214,4 +214,8 @@ public:
 	std::string get_browser_location() const {
 		return "";
 	}
+
+	std::string get_scoreboard_caption() const {
+		return "Main Menu";
+	}
 };

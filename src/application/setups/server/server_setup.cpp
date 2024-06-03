@@ -1960,11 +1960,7 @@ bool server_setup::is_playtesting_server() const {
 }
 
 game_mode_name_type server_setup::get_current_game_mode_name() const {
-	return get_arena_handle().on_mode_with_input(
-		[&](const auto& mode, const auto& input) {
-			return mode.get_name(input);
-		}
-	);
+	return get_arena_handle().get_current_game_mode_name();
 }
 
 bool server_setup::is_ranked_server() const {

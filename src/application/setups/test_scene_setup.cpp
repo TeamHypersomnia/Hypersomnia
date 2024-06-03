@@ -694,6 +694,15 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 	return false;
 }
 
+std::string test_scene_setup::get_scoreboard_caption() const {
+	if (is_tutorial()) {
+		return typesafe_sprintf("Tutorial: Level %x of %x", tutorial.level, max_tutorial_level);
+	}
+	else {
+		return "Shooting Range";
+	}
+}
+
 void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	if (is_tutorial()) {
 		config.window.name = "Hypersomnia - Tutorial";

@@ -27,6 +27,8 @@ struct arena_gui_mixin {
 	entity_id get_viewed_character_id() const;
 
 	vec2 get_viewed_player_nonzoomedout_visible_world_area() const;
+
+	std::string get_scoreboard_caption() const;
 };
 
 #include "view/mode_gui/arena/arena_gui_mixin.hpp"

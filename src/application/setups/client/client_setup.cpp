@@ -2299,3 +2299,11 @@ faction_type client_setup::get_assigned_faction() const {
 		}
 	);
 }
+
+std::string client_setup::get_scoreboard_caption() const {
+	if (is_ranked_live_or_starting()) {
+		return std::string("Ranked: ") + arena_gui_base::get_scoreboard_caption();
+	}
+
+	return arena_gui_base::get_scoreboard_caption();
+}

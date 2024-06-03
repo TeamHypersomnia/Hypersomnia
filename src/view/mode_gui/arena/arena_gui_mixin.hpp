@@ -164,6 +164,18 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 	}
 }
 
+
+template <class D>
+std::string arena_gui_mixin<D>::get_scoreboard_caption() const {
+	const auto& self = static_cast<const D&>(*this);
+
+	return typesafe_sprintf(
+		"%x - %x",
+		self.get_current_arena_name(),
+		self.get_arena_handle().get_current_game_mode_name()
+	);
+}
+
 template <class D>
 bool arena_gui_mixin<D>::requires_cursor() const {
 	if (arena_gui.requires_cursor()) {
