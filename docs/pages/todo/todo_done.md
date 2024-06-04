@@ -6950,3 +6950,4 @@ This will discard your redo history."
     - both should be at the top in server browser server details too, should be the focus
     - and show those ips by default cause it's annoying, just hide by default in streamer mode
 
+- Would be good to finally implement the server details

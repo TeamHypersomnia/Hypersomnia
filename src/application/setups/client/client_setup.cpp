@@ -1673,6 +1673,49 @@ float client_setup::get_total_download_percent_complete(const bool smooth) const
 	return downloading->get_total_percent_complete(smooth ? get_current_file_percent_complete() : 0.0f);
 }
 
+void client_setup::do_rcon_gui(const bool force) {
+	auto on_new_payload = [&]<typename P>(const P& new_payload) {
+		if constexpr(std::is_same_v<P, server_vars>) {
+			send_payload(
+				game_channel_type::RELIABLE_MESSAGES,
+				new_payload
+			);
+		}
+		else {
+			rcon_command_variant payload;
+			payload = new_payload;
+
+			send_payload(
+				game_channel_type::RELIABLE_MESSAGES,
+				payload
+			);
+		}
+	};
+
+	auto& rcon_gui = client_gui.rcon;
+
+	if (!is_replaying()) {
+		if (is_connected()) {
+			if (force || (!arena_gui.scoreboard.show && rcon_gui.show)) {
+				const bool is_remote_server = true;
+				const bool during_ranked = is_ranked_live_or_starting();
+
+				::perform_rcon_gui(
+					rcon_gui,
+					is_remote_server,
+					during_ranked,
+					on_new_payload
+				);
+			}
+		}
+	}
+
+	::do_pending_rcon_payloads(
+		rcon_gui,
+		on_new_payload
+	);
+}
+
 custom_imgui_result client_setup::perform_custom_imgui(
 	const perform_custom_imgui_input in
 ) {
@@ -1694,43 +1737,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		rcon_gui.show = false;
 	}
 
-	{
-		auto on_new_payload = [&]<typename P>(const P& new_payload) {
-			if constexpr(std::is_same_v<P, server_vars>) {
-				send_payload(
-					game_channel_type::RELIABLE_MESSAGES,
-					new_payload
-				);
-			}
-			else {
-				rcon_command_variant payload;
-				payload = new_payload;
-
-				send_payload(
-					game_channel_type::RELIABLE_MESSAGES,
-					payload
-				);
-			}
-		};
-
-		if (!arena_gui.scoreboard.show && rcon_gui.show) {
-			const bool is_remote_server = true;
-			const bool during_ranked = is_ranked_live_or_starting();
-
-			::perform_rcon_gui(
-				rcon_gui,
-				is_remote_server,
-				during_ranked,
-				on_new_payload
-			);
-		}
-
-		::do_pending_rcon_payloads(
-			rcon_gui,
-			on_new_payload
-		);
-	}
-
+	do_rcon_gui();
 	perform_chat_input_bar();
 
 	if (is_replaying()) {

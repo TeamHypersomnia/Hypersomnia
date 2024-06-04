@@ -12,7 +12,6 @@ summary: That which we are brainstorming at the moment.
     - because then we're trusting discord it's not returning wrong steam accounts
 
 - lets launch a connection after signin after all
-- Would be good to finally implement the server details
 
 - We could have login with steam instead of linking but im not convinced
     - let's have a page for linking, it will be trivial

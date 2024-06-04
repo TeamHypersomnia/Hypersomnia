@@ -2747,7 +2747,7 @@ work_result work(
 		visit_current_setup([&](auto& setup) {
 			streaming.ad_hoc.in_atlas.animation_time = ad_hoc_animation_timer.get<std::chrono::seconds>();
 
-			const auto result = setup.perform_custom_imgui({ 
+			auto imgui_in = perform_custom_imgui_input {
 				lua,
 				window,
 				streaming.images_in_atlas,
@@ -2755,7 +2755,9 @@ work_result work(
 				streaming.necessary_images_in_atlas,
 				config,
 				is_replaying_demo()
-			});
+			};
+
+			const auto result = setup.perform_custom_imgui(imgui_in);
 
 			using S = remove_cref<decltype(setup)>;
 
@@ -3014,6 +3016,26 @@ work_result work(
 					do_nat_detection_logic();
 				}
 #endif
+				if (ingame_menu.show) {
+					on_specific_setup([&](server_setup& server) {
+						server.do_integrated_rcon_gui(true);
+
+						if (!server.is_running()) {
+							ingame_menu.show = false;
+						}
+					});
+
+					on_specific_setup([&](client_setup& client) {
+						if (client.get_rcon_level() != rcon_level_type::DENIED) {
+							client.do_rcon_gui(true);
+
+							if (!client.is_connected()) {
+								ingame_menu.show = false;
+							}
+						}
+					});
+				}
+
 
 #if BUILD_NETWORKING
 				if (start_client_gui.show) {

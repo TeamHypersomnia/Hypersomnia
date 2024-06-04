@@ -845,4 +845,6 @@ public:
 
 	std::string get_browser_location() const;
 	std::string get_connect_string() const;
+
+	void do_integrated_rcon_gui(bool force = false);
 };

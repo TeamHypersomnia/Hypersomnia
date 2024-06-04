@@ -926,4 +926,5 @@ public:
 	}
 
 	std::string get_scoreboard_caption() const;
+	void do_rcon_gui(bool force = false);
 };

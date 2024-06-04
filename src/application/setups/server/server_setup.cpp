@@ -4244,6 +4244,41 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	arena_gui_base::draw_custom_gui(in);
 }
 
+void server_setup::do_integrated_rcon_gui(const bool force) {
+	if (!server->is_running()) {
+		return;
+	}
+
+	if (!is_integrated()) {
+		return;
+	}
+
+	auto& rcon_gui = integrated_client_gui.rcon;
+
+	auto on_new_payload = [&](const auto& new_payload) {
+		handle_rcon_payload(get_integrated_client_id(), rcon_level_type::MASTER, new_payload);
+	};
+
+	if (force || (!arena_gui.scoreboard.show && rcon_gui.show)) {
+		const bool has_maintenance = false;
+		const bool during_ranked = false;
+
+		rcon_gui.level = rcon_level_type::MASTER;
+
+		::perform_rcon_gui(
+			rcon_gui,
+			has_maintenance,
+			during_ranked,
+			on_new_payload
+		);
+	}
+
+	::do_pending_rcon_payloads(
+		rcon_gui,
+		on_new_payload
+	);
+}
+
 custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	if (!server->is_running()) {
 		using namespace augs::imgui;
@@ -4288,32 +4323,9 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 				chat.current_message.clear();
 			}
-
-			auto& rcon_gui = integrated_client_gui.rcon;
-
-			auto on_new_payload = [&](const auto& new_payload) {
-				handle_rcon_payload(get_integrated_client_id(), rcon_level_type::MASTER, new_payload);
-			};
-
-			if (!arena_gui.scoreboard.show && rcon_gui.show) {
-				const bool has_maintenance = false;
-				const bool during_ranked = false;
-
-				rcon_gui.level = rcon_level_type::MASTER;
-
-				::perform_rcon_gui(
-					rcon_gui,
-					has_maintenance,
-					during_ranked,
-					on_new_payload
-				);
-			}
-
-			::do_pending_rcon_payloads(
-				rcon_gui,
-				on_new_payload
-			);
 		}
+
+		do_integrated_rcon_gui();
 	}
 
 	return quit_playtesting_or(arena_gui_base::perform_custom_imgui(in));
