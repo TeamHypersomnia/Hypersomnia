@@ -49,6 +49,7 @@
 #include "application/setups/client/bandwidth_monitor.h"
 #include "steam_integration_callbacks.h"
 #include "application/main/auth_provider_type.h"
+#include "application/gui/ingame_menu_button_type.h"
 
 #include "steam_rich_presence_pairs.h"
 
@@ -165,6 +166,8 @@ class client_setup :
 	bool was_demo_meta_written = false;
 
 	client_demo_player demo_player;
+	std::optional<ingame_menu_button_type> post_abandon_op;
+	bool abandon_confirmed = false;
 	/* No client state follows later in code. */
 
 	bool is_webrtc() const;
@@ -927,4 +930,7 @@ public:
 
 	std::string get_scoreboard_caption() const;
 	void do_rcon_gui(bool force = false);
+
+	void request_abandon_ranked_match(ingame_menu_button_type);
+	std::optional<ingame_menu_button_type> pending_menu_operation() const;
 };

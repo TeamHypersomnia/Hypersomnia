@@ -125,7 +125,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	{
 		auto sc = scoped_text_color(rgba(255, 255, 255, 230));
 
-		if (login_option(N::ASSOCIATE, "Link Discord with Steam", 0.8f, vec2(0.5f, 0.1f), 0.5f)) {
+		if (login_option(N::ASSOCIATE, "Associate Discord with Steam", 0.8f, vec2(0.5f, 0.1f), 0.5f)) {
 			augs::open_url("https://hypersomnia.xyz/profile");
 		}
 	}

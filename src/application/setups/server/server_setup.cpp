@@ -1168,6 +1168,25 @@ void server_setup::lock_ranked_roster_if_started(const const_logic_step step) {
 	}
 }
 
+void server_setup::handle_abandon_requests(const const_logic_step step) {
+	const auto& notifications = step.get_queue<messages::mode_notification>();
+
+	for (const auto& n : notifications) {
+		using J = messages::no_arg_mode_notification;
+
+		if (n.payload == decltype(n.payload)(J::PLAYER_REQUESTED_ABANDON)) {
+			/* Tell the client they can now disconnect */
+
+			server->send_payload(
+				to_client_id(n.subject_mode_id), 
+				game_channel_type::RELIABLE_MESSAGES, 
+
+				special_client_request::REQUEST_ABANDON_RANKED_MATCH
+			);
+		}
+	}
+}
+
 void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::mode_notification>();
 
@@ -2698,38 +2717,43 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 }
 
 void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
-	/*
-		Three things: server public vars, client public settings, and the full state snapshot.
-	*/
-
-	server->send_payload(
-		client_id, 
-		game_channel_type::RELIABLE_MESSAGES, 
-
-		last_broadcast_public_vars
-	);
-
-	send_full_arena_snapshot_to(client_id);
-
-	auto send_player_synced_meta = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
-		const auto new_meta = make_synced_meta_update_from(cc, client_id_of_settings);
-
+	auto send_public_vars = [&]() {
 		server->send_payload(
-			recipient_client_id,
-			game_channel_type::RELIABLE_MESSAGES,
+			client_id, 
+			game_channel_type::RELIABLE_MESSAGES, 
 
-			new_meta
+			last_broadcast_public_vars
 		);
 	};
 
-	for_each_id_and_client(send_player_synced_meta, connected_and_integrated_v);
+	auto send_dynamic_vars = [&]() {
+		server->send_payload(
+			client_id, 
+			game_channel_type::RELIABLE_MESSAGES, 
 
-	server->send_payload(
-		client_id, 
-		game_channel_type::RELIABLE_MESSAGES, 
+			last_broadcast_dynamic_vars
+		);
+	};
 
-		last_broadcast_dynamic_vars
-	);
+	auto send_synced_meta_of_all = [&]() {
+		auto send_player_synced_meta = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
+			const auto new_meta = make_synced_meta_update_from(cc, client_id_of_settings);
+
+			server->send_payload(
+				recipient_client_id,
+				game_channel_type::RELIABLE_MESSAGES,
+
+				new_meta
+			);
+		};
+
+		for_each_id_and_client(send_player_synced_meta, connected_and_integrated_v);
+	};
+	
+	send_public_vars();
+	send_dynamic_vars();
+	send_full_arena_snapshot_to(client_id);
+	send_synced_meta_of_all();
 }
 
 faction_type server_setup::get_assigned_team(const std::string& authenticated_id) const {

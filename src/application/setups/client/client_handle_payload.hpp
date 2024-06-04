@@ -219,6 +219,10 @@ message_handler_result client_setup::handle_payload(
 			now_resyncing = true;
 			receiver.clear();
 		}
+		else if (payload == special_client_request::REQUEST_ABANDON_RANKED_MATCH) {
+			abandon_confirmed = true;
+			return abort_v;
+		}
 	}
 	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {
 		if (pause_solvable_stream) {

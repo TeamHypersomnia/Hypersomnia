@@ -7,6 +7,7 @@ enum class special_mode_request {
 	// GEN INTROSPECTOR enum class special_mode_request
 	REBUY_PREVIOUS,
 	READY_FOR_RANKED,
+	ABANDON_RANKED,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -15,5 +16,5 @@ enum class special_mode_request {
 namespace mode_commands {
 	using spell_purchase = spell_id;
 	using item_purchase = item_flavour_id;
-	using special_request = special_mode_request;
+	using special_mode_request = ::special_mode_request;
 }

@@ -1239,7 +1239,7 @@ work_result work(
 			if (result) {
 				abandon_are_you_sure_popup = std::nullopt;
 
-				if (result == 2) {
+				if (const bool cancelled = result == 2) {
 					abandon_pending_op = std::nullopt;
 				}
 			}
@@ -3026,7 +3026,7 @@ work_result work(
 					});
 
 					on_specific_setup([&](client_setup& client) {
-						if (client.get_rcon_level() != rcon_level_type::DENIED) {
+						if (client.get_rcon_level() > rcon_level_type::DENIED) {
 							client.do_rcon_gui(true);
 
 							if (!client.is_connected()) {
@@ -4404,8 +4404,11 @@ work_result work(
 							control_main_menu();
 							control_ingame_menu();
 
-							if (abandon_pending_op.has_value() && !abandon_are_you_sure_popup.has_value()) {
-								do_ingame_menu_option(*abandon_pending_op, false);
+							if (const bool abandon_pressed = abandon_pending_op.has_value() && !abandon_are_you_sure_popup.has_value()) {
+								on_specific_setup([&](client_setup& client) {
+									client.request_abandon_ranked_match(*abandon_pending_op);
+								});
+
 								abandon_pending_op = std::nullopt;
 							}
 						}
@@ -4515,6 +4518,16 @@ work_result work(
 							}
 						}
 					}
+				}
+
+				std::optional<ingame_menu_button_type> requested_op;
+
+				on_specific_setup([&](client_setup& client) {
+					requested_op = client.pending_menu_operation();
+				});
+
+				if (requested_op.has_value()) {
+					do_ingame_menu_option(*requested_op, false);
 				}
 
 				/* 

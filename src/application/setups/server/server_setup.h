@@ -557,6 +557,7 @@ public:
 
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
+						handle_abandon_requests(step);
 						ban_players_who_left_for_good(step);
 						lock_ranked_roster_if_started(step);
 
@@ -787,6 +788,7 @@ public:
 
 	void default_server_post_solve(const const_logic_step step);
 	void ban_players_who_left_for_good(const const_logic_step step);
+	void handle_abandon_requests(const const_logic_step step);
 	void lock_ranked_roster_if_started(const const_logic_step step);
 
 	void log_match_end_json(const messages::match_summary_message&);

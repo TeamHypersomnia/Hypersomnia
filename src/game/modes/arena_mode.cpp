@@ -2345,8 +2345,26 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 				using namespace mode_commands;
 				using C = remove_cref<decltype(typed_command)>;
 
-				if constexpr(std::is_same_v<C, special_request>) {
+				if constexpr(std::is_same_v<C, special_mode_request>) {
 					switch (typed_command) {
+						case special_mode_request::ABANDON_RANKED:
+							if (should_suspend_instead_of_remove(in)) {
+								/* Will immediately be removed on next kick */
+								player_data->stats.total_time_suspended = std::numeric_limits<float>::max();
+								player_data->stats.times_suspended = std::numeric_limits<uint16_t>::max();
+
+								messages::mode_notification notification;
+								notification.subject_mode_id = id;
+								notification.payload = messages::no_arg_mode_notification::PLAYER_REQUESTED_ABANDON;
+
+								step.post_message(notification);
+							}
+							else {
+								/* Non-effective otherwise */
+							}
+
+							break;
+
 						case special_mode_request::READY_FOR_RANKED: {
 							if (in.is_ranked_server() && ranked_state == ranked_state_type::NONE && teams_viable_for_match(in)) {
 								if (!player_data->ready_for_ranked) {
@@ -2382,7 +2400,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 				if constexpr(is_monostate_v<C>) {
 
 				}
-				else if constexpr(is_one_of_v<C, item_purchase, spell_purchase, special_request>) {
+				else if constexpr(is_one_of_v<C, item_purchase, spell_purchase, special_mode_request>) {
 					if (get_buy_seconds_left(in) <= 0.f) {
 						return;
 					}

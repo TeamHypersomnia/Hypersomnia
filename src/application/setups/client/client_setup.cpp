@@ -1590,7 +1590,7 @@ void client_setup::perform_chat_input_bar() {
 		message.message = chat.current_message;
 
 		if (message.message == "/go") {
-			control(mode_player_entropy(mode_commands::special_request::READY_FOR_RANKED));
+			control(mode_player_entropy(special_mode_request::READY_FOR_RANKED));
 		}
 
 		send_payload(
@@ -2317,4 +2317,17 @@ std::string client_setup::get_scoreboard_caption() const {
 	}
 
 	return arena_gui_base::get_scoreboard_caption();
+}
+
+void client_setup::request_abandon_ranked_match(ingame_menu_button_type op) {
+	post_abandon_op = op;
+	control(mode_player_entropy(special_mode_request::ABANDON_RANKED));
+}
+
+std::optional<ingame_menu_button_type> client_setup::pending_menu_operation() const {
+	if (abandon_confirmed) {
+		return post_abandon_op;
+	}
+
+	return std::nullopt;
 }

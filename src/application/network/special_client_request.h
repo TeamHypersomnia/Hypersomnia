@@ -10,6 +10,8 @@ enum class special_client_request {
 
 	UNPAUSE_WEB_CLIENT,
 
+	REQUEST_ABANDON_RANKED_MATCH,
+
 	COUNT
 };
 

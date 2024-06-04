@@ -258,7 +258,7 @@ namespace net_messages {
 	}
 
 	template <class Stream>
-	bool serialize(Stream& s, mode_commands::special_request& c) {
+	bool serialize(Stream& s, special_mode_request& c) {
 		return serialize_enum(s, c);
 	}
 
