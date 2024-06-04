@@ -902,7 +902,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     log_performance_once_every_secs = 0,
 
     move_to_spectators_if_afk_for_secs = 120,
-    kick_if_afk_for_secs = 2 * 3600,
+    kick_if_afk_for_secs = 120,
     time_limit_to_enter_game_since_connection = 15,
 
     send_packets_once_every_tick = 1,
