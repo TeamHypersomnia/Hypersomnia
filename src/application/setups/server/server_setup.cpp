@@ -3721,6 +3721,18 @@ void server_setup::refresh_available_direct_download_bandwidths() {
 	for_each_id_and_client(refresh_chunks, connected_and_integrated_v);
 }
 
+std::string server_setup::get_connect_string() const {
+#if PLATFORM_WEB
+	return resolved_this_server_webrtc_id;
+#else
+	if (external_address.has_value()) {
+		return ::ToString(*external_address);
+	}
+
+	return "";
+#endif
+}
+
 std::string server_setup::get_browser_location() const {
 #if PLATFORM_WEB
 	if (!resolved_this_server_webrtc_id.empty()) {

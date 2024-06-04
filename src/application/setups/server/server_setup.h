@@ -844,4 +844,5 @@ public:
 	faction_type get_assigned_team(const std::string&) const;
 
 	std::string get_browser_location() const;
+	std::string get_connect_string() const;
 };

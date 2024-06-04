@@ -1444,7 +1444,7 @@ work_result work(
 	WEBSTATIC browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 
 	WEBSTATIC auto find_chosen_server_info = [&]() {
-		return browse_servers_gui.find_entry(config.client_connect);
+		return browse_servers_gui.find_entry_by_connect_string(config.client_connect);
 	};
 
 	(void)find_chosen_server_info;
@@ -1618,6 +1618,26 @@ work_result work(
 		if (has_current_setup()) {
 			if (const auto setup = std::get_if<test_scene_setup>(std::addressof(*current_setup))) {
 				return setup->is_tutorial();
+			}
+		}
+
+		return false;
+	};
+
+	WEBSTATIC auto is_shooting_range = [&]() {
+		if (has_current_setup()) {
+			if (const auto setup = std::get_if<test_scene_setup>(std::addressof(*current_setup))) {
+				return !setup->is_tutorial();
+			}
+		}
+
+		return false;
+	};
+
+	WEBSTATIC auto still_querying_server_info = [&]() {
+		if (has_current_setup()) {
+			if (const auto setup = std::get_if<server_setup>(std::addressof(*current_setup))) {
+				return setup->get_connect_string() == "";
 			}
 		}
 
@@ -2451,6 +2471,8 @@ work_result work(
 			background_setup != nullptr,
 			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup),
 			is_during_tutorial(),
+			is_shooting_range(),
+			still_querying_server_info(),
 			would_abandon_ranked_match()
 		};
 	};
@@ -3385,10 +3407,30 @@ work_result work(
 		using T = decltype(t);
 
 		switch (t) {
-			case T::SERVER_DETAILS:
+			case T::INVITE_TO_JOIN:
 				if (is_during_tutorial()) {
 					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();
 					ingame_menu.show = false;
+				}
+				else if (is_shooting_range()) {
+					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();
+					ingame_menu.show = false;
+				}
+				else {
+					visit_current_setup([&]<typename T>(const T& setup) {
+						if constexpr(is_one_of_v<T, server_setup, client_setup>) {
+							const auto address = setup.get_connect_string();
+
+							if (address == "") {
+								return;
+							}
+
+							browse_servers_gui.open_matching_server_entry(
+								get_browse_servers_input(),
+								setup.get_connect_string()
+							);
+						}
+					});
 				}
 
 				break;

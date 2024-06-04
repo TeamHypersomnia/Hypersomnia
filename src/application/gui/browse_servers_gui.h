@@ -31,8 +31,16 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 
 	bool show_ips = false;
 
+	void open() {
+		show_ips = false;
+		base::open();
+	}
+
 	bool perform(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
 	void perform_online_players(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
+
+private:
+	using base::open;
 };
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
@@ -107,7 +115,7 @@ public:
 
 	void reping_all_servers();
 
-	const server_list_entry* find_entry(const client_connect_string& in) const;
+	const server_list_entry* find_entry_by_connect_string(const client_connect_string& in) const;
 	const server_list_entry* find_best_server() const;
 	const server_list_entry* find_best_server(bool is_ranked) const;
 	void refresh_server_list(browse_servers_input);
@@ -117,4 +125,9 @@ public:
 	void select_server(const server_list_entry&);
 
 	bool refresh_in_progress() const;
+
+	void open_matching_server_entry(
+		const browse_servers_input in,
+		const client_connect_string& server
+	);
 };

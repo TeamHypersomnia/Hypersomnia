@@ -905,7 +905,7 @@ public:
 
 	void get_steam_rich_presence_pairs(steam_rich_presence_pairs&) const;
 
-	netcode_address_t get_server_address_for_others_to_join() const;
+	std::string get_connect_string() const;
 	std::string get_steam_join_command_line() const;
 
 	void send_auth_ticket(const steam_auth_ticket&);

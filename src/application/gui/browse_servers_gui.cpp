@@ -123,7 +123,7 @@ static bool compare_servers(
 }
 
 bool server_list_entry::is_set() const {
-	return heartbeat.server_name.size() > 0;
+	return unlisted || heartbeat.server_name.size() > 0;
 }
 
 struct browse_servers_gui_internal {
@@ -205,6 +205,38 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
     return new_server_list;
 }
 
+void browse_servers_gui_state::open_matching_server_entry(
+	const browse_servers_input in,
+	const client_connect_string& server
+) {
+	sync_download_server_entry(in, server);
+
+	if (const auto entry = find_entry_by_connect_string(server)) {
+		open();
+
+		select_server(*entry);
+		server_details.open();
+
+		return;
+	}
+	else {
+		select_server(server_list_entry());
+
+		if (const auto connected_address = ::find_netcode_addr(server)) {
+			selected_server.address = *connected_address;
+		}
+		else {
+			selected_server.meta.webrtc_id = server;
+		}
+
+		selected_server.unlisted = true;
+
+		server_details.open();
+
+		return;
+	}
+}
+
 void browse_servers_gui_state::sync_download_server_entry(
 	const browse_servers_input in,
 	const client_connect_string& server
@@ -277,6 +309,41 @@ void browse_servers_gui_state::refresh_server_pings() {
 	for (auto& s : server_list) {
 		s.progress = {};
 	}
+}
+
+std::string get_steam_join_link(
+	const masterserver_entry_meta& meta,
+	const netcode_address_t& fallback_ip
+) {
+	const auto suffix = [&]() -> std::string {
+		if (meta.type == server_type::WEB) {
+			return meta.webrtc_id;
+		}
+
+		/* For native, prefer official, if not then fallback ip */
+		if (!meta.official_url.empty()) {
+			return meta.official_url;
+		}
+
+		return ::ToString(fallback_ip);
+	}();
+
+	return typesafe_sprintf("steam://run/2660970//%x/", suffix);
+}
+
+std::string get_browser_join_link(
+	const masterserver_entry_meta& meta,
+	const netcode_address_t& fallback_ip
+) {
+	const auto suffix = [&]() -> std::string {
+		if (!meta.webrtc_id.empty()) {
+			return meta.webrtc_id;
+		}
+
+		return ::ToString(fallback_ip);
+	}();
+
+	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
 }
 
 std::string server_list_entry::get_connect_string() const {
@@ -715,6 +782,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		when_last_updated_time_to_events = 0;
 	}
 
+	if (selected_server.unlisted) {
+		server_details.perform(selected_server, in.faction_view, in.streamer_mode);
+	}
+
 	if (!show) {
 		return false;
 	}
@@ -1118,8 +1189,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
-	if (server_details.perform(selected_server, in.faction_view, in.streamer_mode)) {
-		refresh_server_list(in);
+	if (const bool listed = !selected_server.unlisted) {
+		if (server_details.perform(selected_server, in.faction_view, in.streamer_mode)) {
+			refresh_server_list(in);
+		}
 	}
 
 	if (requested_connection.has_value()) {
@@ -1159,19 +1232,39 @@ const server_list_entry* browse_servers_gui_state::find_best_server(const bool f
 	return &minimum_of(filtered, compare_servers);
 }
 
-const server_list_entry* browse_servers_gui_state::find_entry(const client_connect_string& in) const {
+const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& in) const {
+	LOG("Finding the server entry by: %x", in);
+	LOG("Number of servers in the browser: %x", server_list.size());
+
 	if (const auto connected_address = ::find_netcode_addr(in)) {
-		LOG("Finding the server entry by: %x", in);
-		LOG("Number of servers in the browser: %x", server_list.size());
+		LOG("%x is an IP address.", in);
 
 		for (auto& s : server_list) {
 			if (s.address == *connected_address) {
 				return &s;
 			}
 		}
+
+		if (is_internal(*connected_address)) {
+			for (auto& s : server_list) {
+				if (s.heartbeat.internal_network_address == *connected_address) {
+					return &s;
+				}
+			}
+		}
 	}
 	else {
-		LOG("find_entry: Not an IP address: %x.", in);
+		LOG("%x is either a webrtc id or an official domain address.", in);
+
+		for (auto& s : server_list) {
+			if (s.meta.webrtc_id == in) {
+				return &s;
+			}
+
+			if (s.meta.official_url == in) {
+				return &s;
+			}
+		}
 	}
 
 	return nullptr;
@@ -1324,6 +1417,8 @@ bool server_details_gui_state::perform(
 	//ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
 	auto window = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking);
 
+	const auto rdonly_flags = ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_AutoSelectAll;
+
 	if (!window) {
 		return false;
 	}
@@ -1333,8 +1428,16 @@ bool server_details_gui_state::perform(
 		return false;
 	}
 
-	if (ImGui::Button("Refresh")) {
-		return true;
+	const bool listed = !entry.unlisted;
+
+	auto steam_link = ::get_steam_join_link(entry.meta, entry.address);
+
+	auto sid = scoped_id(steam_link.c_str());
+
+	if (listed) {
+		if (ImGui::Button("Refresh")) {
+			return true;
+		}
 	}
 
 	ImGui::Separator();
@@ -1345,35 +1448,72 @@ bool server_details_gui_state::perform(
 	auto external_address = ::ToString(entry.address);
 	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
-	acquire_keyboard_once();
+	text_disabled("Join:");
 
-	auto official_url = entry.meta.official_url;
+	auto do_steam_join_link = [&](bool acquire) {
+		auto link = steam_link;
 
-	if (!official_url.empty()) {
-		input_text("Official URL", official_url, ImGuiInputTextFlags_ReadOnly);
+		if (acquire) {
+			acquire_keyboard_once();
+		}
 
-		ImGui::Separator();
+		input_text("##Steam join link", link, rdonly_flags);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##SteJoin")) {
+			ImGui::SetClipboardText(link.c_str());
+		}
+
+		ImGui::SameLine();
+
+		text_color("Steam join link", green);
+	};
+
+	auto do_browser_join_link = [&](bool acquire) {
+		auto link = ::get_browser_join_link(entry.meta, entry.address);
+
+		if (acquire) {
+			acquire_keyboard_once();
+		}
+
+		input_text("##Browser join link", link, rdonly_flags);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##BroJoin")) {
+			ImGui::SetClipboardText(link.c_str());
+		}
+
+		ImGui::SameLine();
+		text_color("Browser join link", green);
+	};
+
+	if (listed) {
+		do_browser_join_link(true);
+		do_steam_join_link(false);
+	}
+	else {
+		/*
+			Browser can't get to an unlisted server
+			as it requires a webrtc handshake with the server list as the middleman.
+		*/
+
+		do_steam_join_link(true);
 	}
 
-	auto webrtc_id = std::string(entry.meta.webrtc_id);
+	text_disabled("Details:");
 
-	if (webrtc_id != "") {
-		auto link = "https://hypersomnia.io/game/" + webrtc_id;
-		input_text("WebRTC id", webrtc_id, ImGuiInputTextFlags_ReadOnly);
-		input_text("Link", link, ImGuiInputTextFlags_ReadOnly);
+	ImGui::Separator();
 
-		ImGui::Separator();
+	bool do_show_ips = true;
+
+	if (streamer_mode) {
+		checkbox("Show IPs", show_ips);
+		do_show_ips = show_ips;
 	}
 
-#if IS_PRODUCTION_BUILD
-	const bool censor_ips = true;
-#else
-	const bool censor_ips = false;
-#endif
-
-	checkbox("Show IPs", show_ips);
-
-	if (censor_ips && !show_ips) {
+	if (!do_show_ips) {
 		if (ImGui::Button("Copy External IP address to clipboard")) {
 			ImGui::SetClipboardText(external_address.c_str());
 		}
@@ -1383,8 +1523,72 @@ bool server_details_gui_state::perform(
 		}
 	}
 	else {
-		input_text("External IP address", external_address, ImGuiInputTextFlags_ReadOnly);
-		input_text("Internal IP address", internal_address, ImGuiInputTextFlags_ReadOnly);
+		input_text("##IP address", external_address, rdonly_flags);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##ExtIp")) {
+			ImGui::SetClipboardText(external_address.c_str());
+		}
+
+		ImGui::SameLine();
+
+		text("IP address");
+
+		if (external_address != internal_address && heartbeat.internal_network_address.has_value()) {
+			input_text("##IP address (internal)", internal_address, rdonly_flags);
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Copy##IntIp")) {
+				ImGui::SetClipboardText(internal_address.c_str());
+			}
+
+			ImGui::SameLine();
+
+			text("IP address (internal)");
+		}
+	}
+
+	auto official_url = entry.meta.official_url;
+
+	if (!official_url.empty()) {
+		input_text("##Official Domain", official_url, rdonly_flags);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##OffDom")) {
+			ImGui::SetClipboardText(official_url.c_str());
+		}
+
+		ImGui::SameLine();
+
+		text("Official Domain");
+	}
+
+	{
+		auto webrtc_id = entry.meta.webrtc_id;
+
+		if (!webrtc_id.empty()) {
+			input_text("##WebRTC id", webrtc_id, rdonly_flags);
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Copy##WebId")) {
+				ImGui::SetClipboardText(webrtc_id.c_str());
+			}
+
+			ImGui::SameLine();
+
+			text("WebRTC id");
+		}
+	}
+
+	if (!listed) {
+		ImGui::Separator();
+		text_color("Server is unlisted.\nLimited information available.", orange);
+
+		return false;
 	}
 
 	auto name = heartbeat.server_name;
@@ -1396,20 +1600,20 @@ bool server_details_gui_state::perform(
 		arena = "Community arena";
 	}
 
-	input_text("Server name", name, ImGuiInputTextFlags_ReadOnly);
+	input_text("Server name", name, rdonly_flags);
 
-	input_text("Arena", arena, ImGuiInputTextFlags_ReadOnly);
+	input_text("Arena", arena, rdonly_flags);
 
 	auto nat = nat_type_to_string(heartbeat.nat.type); 
 
-	input_text("NAT type", nat, ImGuiInputTextFlags_ReadOnly);
+	input_text("NAT type", nat, rdonly_flags);
 	auto delta = std::to_string(heartbeat.nat.port_delta);
 
 	if (heartbeat.nat.type != nat_type::PUBLIC_INTERNET) {
-		input_text("Port delta", delta, ImGuiInputTextFlags_ReadOnly);
+		input_text("Port delta", delta, rdonly_flags);
 	}
 
-	input_text("Server version", version, ImGuiInputTextFlags_ReadOnly);
+	input_text("Server version", version, rdonly_flags);
 
 	perform_online_players(entry, faction_view, streamer_mode);
 	return false;

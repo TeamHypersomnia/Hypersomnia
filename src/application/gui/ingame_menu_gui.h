@@ -65,7 +65,7 @@ struct ingame_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(ingame_menu_button_type::SERVER_DETAILS);
+			button_callback(ingame_menu_button_type::INVITE_TO_JOIN);
 			return true;
 		}
 
@@ -128,9 +128,17 @@ struct ingame_menu_gui {
 			}
 #endif
 
-			if (e == ingame_menu_button_type::SERVER_DETAILS) {
+			if (e == ingame_menu_button_type::INVITE_TO_JOIN) {
 				if (context.deps.is_tutorial) {
 					root.buttons[i].set_complete_caption("Restart from last checkpoint");
+				}
+
+				if (context.deps.is_range) {
+					root.buttons[i].set_complete_caption("Restart range");
+				}
+
+				if (context.deps.still_querying_server_info) {
+					root.buttons[i].set_complete_caption("Querying server info...");
 				}
 			}
 		}

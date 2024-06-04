@@ -17,6 +17,8 @@ struct menu_context_dependencies {
 	const bool will_quit_to_editor;
 	const bool will_quit_to_projects;
 	const bool is_tutorial;
+	const bool is_range;
+	const bool still_querying_server_info;
 	const bool will_abandon_match;
 };
 

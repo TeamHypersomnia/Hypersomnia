@@ -6943,3 +6943,10 @@ This will discard your redo history."
 - dont do anything if all abandon match
 
 - Show avatar in test scene setup
+- server details should mostly have
+    - links to copy paste:
+        - steam invite link
+        - browser play link
+    - both should be at the top in server browser server details too, should be the focus
+    - and show those ips by default cause it's annoying, just hide by default in streamer mode
+

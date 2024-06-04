@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- polish characters in web
+
+- dont use third party connections list from discord although it's tempting
+    - because then we're trusting discord it's not returning wrong steam accounts
+
 - lets launch a connection after signin after all
 - Would be good to finally implement the server details
 

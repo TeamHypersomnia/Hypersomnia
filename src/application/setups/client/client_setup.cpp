@@ -2238,7 +2238,7 @@ void client_setup::wait_for_demo_flush() {
 }
 
 std::string client_setup::get_steam_join_command_line() const {
-	return typesafe_sprintf("%x", ::ToString(get_server_address_for_others_to_join()));
+	return get_connect_string();
 }
 
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
@@ -2256,12 +2256,16 @@ void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 	pairs.push_back({ "connect", get_steam_join_command_line() });
 }
 
-netcode_address_t client_setup::get_server_address_for_others_to_join() const {
-	if (before_traversal_server_address.has_value()) {
-		return *before_traversal_server_address;
+std::string client_setup::get_connect_string() const {
+	if (const auto webrtc_id = find_webrtc_id(connect_string); webrtc_id != "") {
+		return webrtc_id;
 	}
 
-	return adapter->get_connected_ip_address();
+	if (before_traversal_server_address.has_value()) {
+		return ::ToString(*before_traversal_server_address);
+	}
+
+	return ::ToString(adapter->get_connected_ip_address());
 }
 
 void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {

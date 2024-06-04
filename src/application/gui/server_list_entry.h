@@ -65,6 +65,8 @@ struct server_list_entry {
 
 	ping_progress progress;
 
+	bool unlisted = false;
+
 	bool is_community_server() const {
 		return meta.is_community_server();
 	}
