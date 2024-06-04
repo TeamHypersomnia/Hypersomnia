@@ -820,6 +820,9 @@ work_result perform_masterserver(const config_lua_table& cfg) try {
 								reserialize_list();
 							}
 						}
+						else {
+							// MSR_LOG("Invalid request (%x bytes) from %x.", packet_bytes, ::ToString(from));
+						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
 						masterserver_out::tell_me_my_address response;

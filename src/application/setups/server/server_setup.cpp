@@ -921,7 +921,7 @@ bool server_heartbeat::is_valid() const {
 		return false;
 	}
 
-	return max_online >= 2 && !server_name.empty() && !current_arena.empty() && !game_mode.empty();
+	return !server_name.empty() && !current_arena.empty() && !game_mode.empty();
 }
 
 template <class F>
@@ -2073,6 +2073,11 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.validate();
+
+	if (!heartbeat.is_valid()) {
+		LOG("THE SERVER HAS SENT AN INVALID HEARTBEAT!!!");
+	}
+
 	heartbeat_buffer.clear();
 
 #if PLATFORM_WEB
@@ -2136,7 +2141,7 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 		return;
 	}
 
-	const int times_to_send_first_time = 4;
+	const int times_to_send_first_time = 3;
 #endif
 
 	auto& when_last = when_last_sent_heartbeat_to_server_list;
