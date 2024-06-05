@@ -1661,6 +1661,7 @@ work_result work(
 			);
 		}
 		else {
+			ensure(main_menu != nullptr);
 			return callback(*main_menu);
 		}
 	};
@@ -2099,6 +2100,10 @@ work_result work(
 				const bool ignore_nat_check = false;
 
 				if (!launch_client_setup(ignore_nat_check)) {
+					if (!has_main_menu()) {
+						launch_main_menu();
+					}
+
 					return;
 				}
 
