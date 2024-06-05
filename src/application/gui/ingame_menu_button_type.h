@@ -2,6 +2,8 @@
 
 enum class ingame_menu_button_type {
 	// GEN INTROSPECTOR enum class ingame_menu_button_type
+	JOIN_DISCORD,
+
 	RESUME,
 	INVITE_TO_JOIN,
 	BROWSE_SERVERS,

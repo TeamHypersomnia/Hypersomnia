@@ -3267,6 +3267,16 @@ work_result work(
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
+			case T::AVAILABLE_ON_GITHUB:
+				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
+				break;
+
+#if PLATFORM_WEB
+			case T::DOWNLOAD_ON_STEAM:
+				augs::open_url("https://store.steampowered.com/app/2660970/Hypersomnia/");
+				break;
+#endif
+
 			case T::DOWNLOAD_MAPS:
 				map_catalogue_gui.open();
 				break;
@@ -3348,6 +3358,10 @@ work_result work(
 		using T = decltype(t);
 
 		switch (t) {
+			case T::JOIN_DISCORD:
+				augs::open_url("https://discord.com/invite/YC49E4G");
+				break;
+
 			case T::INVITE_TO_JOIN:
 				if (is_during_tutorial()) {
 					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();

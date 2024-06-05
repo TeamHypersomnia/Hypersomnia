@@ -6955,3 +6955,5 @@ This will discard your redo history."
 
 - lets launch a connection after signin after all
 
+- kick web users after inactivity, despite timeout
+

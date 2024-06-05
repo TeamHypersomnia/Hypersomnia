@@ -51,8 +51,6 @@ summary: That which we are brainstorming at the moment.
     - how others do it?
         - krunker redirects to its own page, makes sense, maybe we should too
 
-- kick web users after inactivity, despite timeout
-
 - Web: Authentication.
     - We'll also have to use separate crazygames api for this
     - we could start with auth0 to just start up with something

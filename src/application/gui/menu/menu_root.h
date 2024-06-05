@@ -38,7 +38,7 @@ public:
 				buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f - buttons[i].rc.h()));
 			}
 			else {
-				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - 22 - buttons[i].rc.h()));
+				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - 20 - buttons[i].rc.h()));
 			}
 		}
 	}
@@ -50,8 +50,8 @@ public:
 		const vec2i size
 	) {
 		for (size_t i = 0; i < buttons.size(); ++i) {
-			if (buttons[i].is_discord) {
-				buttons[i].rc.set_size(manager.at(assets::necessary_image_id::DISCORD_BUTTON).get_original_size());
+			if (buttons[i].special_image.has_value()) {
+				buttons[i].rc.set_size(manager.at(*buttons[i].special_image).get_original_size());
 				continue;
 			}
 

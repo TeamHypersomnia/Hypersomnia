@@ -146,7 +146,12 @@ struct main_menu_gui {
 			root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].set_complete_caption("Quick play");
 		}
 
-		root.buttons[0].is_discord = true;
+		root.buttons[0].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		root.buttons[1].special_image = assets::necessary_image_id::GITHUB_BUTTON;
+
+#if PLATFORM_WEB
+		root.buttons[2].special_image = assets::necessary_image_id::STEAM_BUTTON;
+#endif
 
 		world.advance_elements(context, vdt);
 		world.rebuild_layouts(context);

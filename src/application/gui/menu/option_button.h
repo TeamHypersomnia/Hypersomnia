@@ -37,14 +37,14 @@ public:
 
 	rgba colorize = white;
 	bool click_callback_required = false;
-	bool is_discord = false;
+	std::optional<assets::necessary_image_id> special_image;
 	bool color_wave = false;
 	pad_bytes<1> pad;
 
 	template <class M>
 	vec2i get_target_button_size(const M& manager, const augs::baked_font& gui_font) const {
-		if (is_discord) {
-			return manager.at(assets::necessary_image_id::DISCORD_BUTTON).get_original_size();
+		if (special_image.has_value()) {
+			return manager.at(*special_image).get_original_size();
 		}
 
 		return corners.internal_size_to_cornered_size(
@@ -128,6 +128,21 @@ public:
 			secondary_color = rgba::get_bright_wave(secs + 0.4, 0.55);
 		}
 
+		if (this_id->special_image == assets::necessary_image_id::STEAM_BUTTON) {
+			color = white;
+			secondary_color = white;
+		}
+
+		if (this_id->special_image == assets::necessary_image_id::DISCORD_BUTTON) {
+			color = rgba(84, 243, 255, 255);
+			secondary_color = rgba(84, 243, 255, 255);
+		}
+
+		if (this_id->special_image == assets::necessary_image_id::GITHUB_BUTTON) {
+			color = white;
+			secondary_color = white;
+		}
+
 		rgba inside_col = white;
 		rgba border_col = white;
 
@@ -208,8 +223,8 @@ public:
 			{ gui_font , secondary_color }
 		);
 
-		if (this_id->is_discord) {
-			output.aabb(necessarys.at(assets::necessary_image_id::DISCORD_BUTTON), this_tree_entry.get_absolute_rect(), white);
+		if (this_id->special_image.has_value()) {
+			output.aabb(necessarys.at(*this_id->special_image), this_tree_entry.get_absolute_rect(), white);
 		}
 	}
 };
