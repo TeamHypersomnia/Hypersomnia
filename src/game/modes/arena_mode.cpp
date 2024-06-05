@@ -4225,9 +4225,5 @@ bool arena_mode::team_choice_allowed(const const_input_type in) const {
 }
 
 bool arena_mode::should_match_be_short(const const_input_type in) const {
-	if (in.rules.is_ffa()) {
-		return false;
-	}
-
 	return in.dynamic_vars.force_short_match;
 }

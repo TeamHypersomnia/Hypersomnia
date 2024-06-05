@@ -6953,3 +6953,5 @@ This will discard your redo history."
 - Would be good to finally implement the server details
 - polish characters in web
 
+- lets launch a connection after signin after all
+

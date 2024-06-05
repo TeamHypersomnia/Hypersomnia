@@ -6,12 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- polish characters in web
+- i think we'll just do association without merging after all
+    - This will avoid data loss and will be easier to unlink a discord account later, relink it, and link more than one
+    - We could even allow to link either way
+        - Or not merge but link automatically in the direction of the account that has more matches
 
 - dont use third party connections list from discord although it's tempting
     - because then we're trusting discord it's not returning wrong steam accounts
-
-- lets launch a connection after signin after all
 
 - We could have login with steam instead of linking but im not convinced
     - let's have a page for linking, it will be trivial
