@@ -33,6 +33,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/window_framework/platform_utils.h"
+#include "make_canon_config.hpp"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -648,6 +649,7 @@ void settings_gui_state::perform(
 					auto cvars = config.client;
 
 					config = config_lua_table(lua, augs::path_type("default_config.lua"));
+					::make_canon_config(config, false);
 
 #if IS_PRODUCTION_BUILD
 					/* Don't break the identity */

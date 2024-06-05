@@ -91,6 +91,8 @@ main_menu_setup::main_menu_setup(
 	const packaged_official_content& official,
 	const main_menu_settings settings
 ) {
+	LOG("main_menu_setup ctor");
+
 	if (!settings.menu_theme_path.empty()) {
 		try {
 			menu_theme.emplace(settings.menu_theme_path);
@@ -105,7 +107,9 @@ main_menu_setup::main_menu_setup(
 	const auto menu_config_patch_path = "content/menu/config.lua";
 
 	try {
-		auto pfr = lua.do_string(augs::file_to_string(menu_config_patch_path));
+		LOG("Reading from %x", menu_config_patch_path);
+		const auto menu_cfg_str = augs::file_to_string(menu_config_patch_path);
+		auto pfr = lua.do_string(menu_cfg_str);
 		
 		if (pfr.valid()) {
 			menu_config_patch = pfr;
