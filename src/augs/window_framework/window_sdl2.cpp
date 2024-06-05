@@ -8,6 +8,8 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
 EM_JS(int, get_canvas_width, (), { return canvas.width; });
 EM_JS(int, get_canvas_height, (), { return canvas.height; });
 
@@ -217,7 +219,9 @@ namespace augs {
                     {
                         event::change ch;
                         ch.msg = event::message::character;
-                        ch.data.character.code_point = static_cast<unsigned int>(*event.text.text);
+						
+						ImTextCharFromUtf8(&ch.data.character.code_point, event.text.text, NULL);
+
 						handle_event(ch);
                     }
                     break;

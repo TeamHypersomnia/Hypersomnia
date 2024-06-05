@@ -6951,3 +6951,5 @@ This will discard your redo history."
     - and show those ips by default cause it's annoying, just hide by default in streamer mode
 
 - Would be good to finally implement the server details
+- polish characters in web
+
