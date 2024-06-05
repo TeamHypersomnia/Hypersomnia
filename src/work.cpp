@@ -1809,7 +1809,7 @@ work_result work(
 			}
 
 			if (!is_signed_in()) {
-				social_sign_in.open("play ranked matches");
+				social_sign_in.open("play ranked matches", connect_string);
 				return false;
 			}
 		}
@@ -3078,6 +3078,15 @@ work_result work(
 							}
 						}
 					);
+
+					auto& connect_string = social_sign_in.connect_string_post_sign_in;
+
+					if (!connect_string.empty()) {
+						config.client_connect = connect_string;
+
+						connect_string.clear();
+						start_client_setup();
+					}
 				}
 #endif
 			
