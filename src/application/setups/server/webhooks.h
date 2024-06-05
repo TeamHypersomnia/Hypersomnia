@@ -36,7 +36,7 @@ namespace telegram_webhooks {
 		const std::string& connected_player,
 		const bool from_the_web
 	) {
-		const auto from_web = from_the_web ? std::string(" from the Web.") : std::string("");
+		const auto from_web = from_the_web ? std::string(" from the Web") : std::string("");
 		const auto connected_notice = typesafe_sprintf("`%x` connected%x.", escaped_nick(connected_player), from_web);
 
 		return {
@@ -629,7 +629,7 @@ namespace discord_webhooks {
 		{
 			using namespace rapidjson;
 
-			const auto from_web = from_the_web ? std::string(" from the Web.") : std::string("");
+			const auto from_web = from_the_web ? std::string(" from the Web") : std::string("");
 			const auto connected_notice = typesafe_sprintf("%x connected%x.", escaped_nick(connected_player), from_web);
 			const auto embed_color = 52224;
 			const auto num_others = other_players.size();
