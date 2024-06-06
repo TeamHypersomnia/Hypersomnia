@@ -17,7 +17,7 @@ Challenge your friend to an intense duel, or gather two clans to fight a spectac
 Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
 
-*Comes with an [in-game map Editor!](https://www.youtube.com/watch?v=q1rfIy06_xo)*
+*Comes with an [in-game map Editor!](https://hypersomnia.io/editor/official)*
 
 ### Join us:
 

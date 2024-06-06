@@ -179,4 +179,8 @@ public:
 	std::string get_scoreboard_caption() const {
 		return "Project Selector";
 	}
+
+	void set(const project_tab_type type) {
+		gui.projects_view.current_tab = type;
+	}
 };

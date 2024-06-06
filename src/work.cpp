@@ -3906,6 +3906,14 @@ work_result work(
 						}
 					});
 				}
+
+				if (params.launch_activity == activity_type::EDITOR_PROJECT_SELECTOR) {
+					if (params.project_selector_official) {
+						on_specific_setup([&](project_selector_setup& setup) {
+							setup.set(project_tab_type::OFFICIAL_ARENAS);
+						});
+					}
+				}
 			}
 			else {
 				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {

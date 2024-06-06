@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- have linking steam and discord after all and then ping @everyone
+    - we can do editor later as we go
+
+- determine closest servers using lat/longitude
+
+- #server-monitor should @ping me to play and also provide links
+    - although if someone wants to play with just their friend then it's pointless to @ping me to play
+    - a link would be handy though
+
 - i think we'll just do association without merging after all
     - This will avoid data loss and will be easier to unlink a discord account later, relink it, and link more than one
     - We could even allow to link either way

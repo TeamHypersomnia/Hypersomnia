@@ -62,6 +62,7 @@ struct cmd_line_params {
 	std::optional<activity_type> launch_activity;
 	std::optional<int> tutorial_level;
 	bool tutorial_challenge = false;
+	bool project_selector_official = false;
 
 	std::string guest;
 
@@ -126,6 +127,10 @@ struct cmd_line_params {
 				}
 				else if (begins_with(loc, "/menu")) {
 					launch_activity = activity_type::MAIN_MENU;
+				}
+				else if (begins_with(loc, "/editor/official")) {
+					launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
+					project_selector_official = true;
 				}
 				else if (begins_with(loc, "/editor")) {
 					launch_activity = activity_type::EDITOR_PROJECT_SELECTOR;
