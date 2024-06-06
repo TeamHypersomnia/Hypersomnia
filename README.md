@@ -96,6 +96,7 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
     - [File dialogs integration](#file-dialogs-integration)
   - [MacOS instructions](#macos-instructions)
 - [Contributing](#contributing)
+- [Credits 🇵🇱](https://teamhypersomnia.github.io/PressKit/credits)
 
 # Introduction
 
@@ -612,15 +613,13 @@ Refer to [MacOS_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/m
 
 # Contributing
 
-To understand the repository's folder structure, make sure to read the [documentation](https://wiki.hypersomnia.xyz/folder_structure).
-
-Pull requests are welcomed, should they even be typo fixes, missing const guarantees or changes in nomenclature.
-If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
+Pull requests are welcomed, should they even be typo fixes or missing const guarantees.
+If you plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
 A WIP documentation can be found at [wiki](https://wiki.hypersomnia.xyz).
 
 Make sure to check out [TeamHypersomnia](https://github.com/TeamHypersomnia) for other repositories that are useful when setting up your own custom servers.
 
-If you have questions or you fail to build *Hypersomnia*, create an [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues).
+If you have questions or you fail to build *Hypersomnia*, reach out on [Discord](https://discord.gg/YC49E4G).
 Or if you just can't wait to utter some brilliant ideas with regard to the game, please do so, too!
