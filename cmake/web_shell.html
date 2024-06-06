@@ -77,7 +77,7 @@
   </style>
 </head>
 <body>
-  <div oncontextmenu="return false;" class="center-container">
+  <div oncontextmenu="return false;" class="center-container" id="progress-container">
     <div class="spinner" id="spinner"></div>
     <div class="downloading-text" id="downloading-text">Downloading... 0%</div>
     <div class="progress-bar" id="progress-bar">
@@ -108,11 +108,16 @@
     }
 
     function hideProgress() {
-      document.getElementById('spinner').style.display = 'none';
-      document.getElementById('progress-bar-inner').style.display = 'none';
-      document.getElementById('downloading-text').style.display = 'none';
-      document.getElementById('downloading-text').style.display = 'none';
-      document.getElementById('progress-mb').style.display = 'none'; // Hide MB progress text when download is complete
+      const elementsToRemove = [
+        'progress-container'
+      ];
+      
+      elementsToRemove.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.remove(); // Remove the element from the DOM
+        }
+      });
     }
 
     function setLocation(newLocation) {

@@ -210,6 +210,7 @@ namespace assets {
 
 		SOCIAL_GOOGLE,
 		SOCIAL_DISCORD,
+		SOCIAL_STEAM,
 		ASSOCIATE,
 
 		COUNT

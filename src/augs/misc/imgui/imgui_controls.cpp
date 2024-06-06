@@ -32,7 +32,7 @@ namespace augs {
 				auto colored_selectable = scoped_selectable_colors(bg_cols);
 				auto id = scoped_id(label.c_str());
 
-				result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);
+				result = ImGui::Selectable("##SelectableButton", true, ImGuiSelectableFlags_None, button_size);
 
 				if (after_cb) {
 					after_cb();

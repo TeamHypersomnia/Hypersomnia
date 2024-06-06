@@ -38,7 +38,7 @@ public:
 				buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f - buttons[i].rc.h()));
 			}
 			else {
-				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - 20 - buttons[i].rc.h()));
+				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - 18 - buttons[i].rc.h()));
 			}
 		}
 	}
