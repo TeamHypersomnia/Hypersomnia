@@ -3,6 +3,8 @@
 
 ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/8ccf0d22-317d-459d-8c19-3b4830968545)
 
+# [Play in the Browser!](https://hypersomnia.io/)
+
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 [![Build Status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Linux%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
 [![Build MacOS binary](https://github.com/TeamHypersomnia/Hypersomnia/workflows/MacOS%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
@@ -14,6 +16,8 @@ Challenge your friend to an intense duel, or gather two clans to fight a spectac
 
 Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
+
+*Comes with an [in-game map Editor!](https://www.youtube.com/watch?v=q1rfIy06_xo)*
 
 ### Join us:
 
