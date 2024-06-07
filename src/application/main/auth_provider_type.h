@@ -55,4 +55,6 @@ struct web_auth_data {
 	}
 
 	void log_out();
+
+	bool check_token_still_valid() const;
 };

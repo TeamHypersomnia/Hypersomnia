@@ -432,8 +432,10 @@ void settings_gui_state::perform(
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
+#if !PLATFORM_WEB
 				text("At startup, launch.."); ImGui::SameLine();
 				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
+#endif
 
 				const auto streamer_hotkey = [&]() -> std::string {
 					const auto found_k = key_or_default(config.app_controls, app_intent_type::TOGGLE_STREAMER_MODE);

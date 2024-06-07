@@ -252,6 +252,11 @@ extern "C" {
 }
 #endif
 
+#if PLATFORM_WEB
+#include "application/main/check_token_still_valid.hpp"
+std::future<bool> token_still_valid_check;
+#endif
+
 work_result work(
 	const cmd_line_params& parsed_params,
 	const bool log_directory_existed,
@@ -873,7 +878,7 @@ work_result work(
 		bool sync = false;
 		bool quit_after_sync = false;
 
-		if (config.server.sync_all_external_arenas_on_startup) {
+		if (params.type == app_type::DEDICATED_SERVER && config.server.sync_all_external_arenas_on_startup) {
 			LOG("sync_all_external_arenas_on_startup specified.");
 			sync = true;
 		}
@@ -1441,8 +1446,13 @@ work_result work(
 		social_sign_in.cached_auth = {};
 	}
 
-	if (is_auth_expired()) {
-		social_log_out();
+	if (social_sign_in.cached_auth.is_set()) {
+		if (is_auth_expired()) {
+			social_log_out();
+		}
+		else {
+			token_still_valid_check = launch_async([ch = social_sign_in.cached_auth]() { return ch.check_token_still_valid(); });
+		}
 	}
 
 	social_sign_in.guest_nickname = config.client.nickname;
@@ -1806,6 +1816,12 @@ work_result work(
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
 				social_log_out();
+			}
+
+			if (token_still_valid_check.valid()) {
+				if (!token_still_valid_check.get()) {
+					social_log_out();
+				}
 			}
 
 			if (!is_signed_in()) {
@@ -2243,6 +2259,10 @@ work_result work(
 		);
 
 		if (perform_result || client_start_requested) {
+			if (client_start_requested) {
+				LOG("Launch client due to client_start_requested.");
+			}
+
 			start_client_setup();
 		}
 
@@ -3088,6 +3108,11 @@ work_result work(
 						start_client_setup();
 					}
 				}
+				else if (valid_and_is_ready(token_still_valid_check)) {
+					if (!token_still_valid_check.get()) {
+						social_log_out();
+					}
+				}
 #endif
 			
 
@@ -3871,7 +3896,14 @@ work_result work(
 				});
 			}
 
+#if PLATFORM_WEB
+			/* Defer it to worker thread */
+			launch_setup(activity_type::MAIN_MENU);
+			client_start_requested = true;
+			LOG("Requesting client start.");
+#else
 			launch_setup(activity_type::CLIENT);
+#endif
 		};
 
 		const auto steam_cli = steam_get_launch_command_line_string();
@@ -3916,6 +3948,9 @@ work_result work(
 				}
 			}
 			else {
+#if PLATFORM_WEB
+				launch_setup(activity_type::MAIN_MENU);
+#else
 				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
 					if (!config.skip_tutorial) {
 						launch_setup(activity_type::TUTORIAL);
@@ -3927,6 +3962,7 @@ work_result work(
 				else {
 					launch_setup(activity_type::MAIN_MENU);
 				}
+#endif
 			}
 		}
 	}
