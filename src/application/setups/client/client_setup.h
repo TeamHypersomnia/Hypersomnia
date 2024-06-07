@@ -221,6 +221,7 @@ class client_setup :
 	}
 
 	void handle_incoming_payloads();
+	void send_pending_auth_tickets();
 	void send_pending_commands();
 	void send_packets();
 	void exchange_file_packets();
@@ -745,6 +746,8 @@ public:
 		}
 
 		if (downloading) {
+			send_pending_auth_tickets();
+
 			if (is_trying_external_download()) {
 				if (send_keepalive_download_progress()) {
 					handle_incoming_payloads();

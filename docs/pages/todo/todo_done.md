@@ -6957,3 +6957,15 @@ This will discard your redo history."
 
 - kick web users after inactivity, despite timeout
 
+- we should try downloading the avatar on initialization to see if the token is still valid
+    - because we can't rely on that expiry time
+
+- how the hell can a mode and ruleset be divergent?
+    - is it due to transfer all solvables?
+        - technically there could be a misprediction and a state of different mode could be assigned
+        - but why wouldn't we assign the ruleset then?
+    - why arent we setting both mode state and ruleset atomically?
+    - yeah i think it's dangerous to be able to set any mode state without setting subsequent rulesets
+        - the only problem is we don't know at this point which ruleset should be set
+    - maybe all this is related to why we see shorter time limit for a split second on connection
+

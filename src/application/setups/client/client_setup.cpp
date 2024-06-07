@@ -1323,14 +1323,7 @@ void client_setup::advance_demo_recorder() {
 #endif
 }
 
-void client_setup::send_pending_commands() {
-	using C = client_state_type;
-
-	const bool init_send = state == C::NETCODE_NEGOTIATING_CONNECTION;
-
-	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
-	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
-
+void client_setup::send_pending_auth_tickets() { 
 	auto send_pending_steam_auth = [&]() {
 		if (!pending_steam_auth.has_value()) {
 			return;
@@ -1385,6 +1378,18 @@ void client_setup::send_pending_commands() {
 		pending_web_auth.reset();
 	};
 
+	send_pending_steam_auth();
+	send_pending_web_auth();
+}
+
+void client_setup::send_pending_commands() {
+	using C = client_state_type;
+
+	const bool init_send = state == C::NETCODE_NEGOTIATING_CONNECTION;
+
+	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
+	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
+
 	auto send_settings = [&]() {
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
@@ -1403,8 +1408,7 @@ void client_setup::send_pending_commands() {
 		current_requested_settings = requested_settings;
 	};
 
-	send_pending_steam_auth();
-	send_pending_web_auth();
+	send_pending_auth_tickets();
 
 	if (!is_connected()) {
 		return;

@@ -5,6 +5,24 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Dangling clients
+	- Doesn't react to afk/network timeouts - likely downloading maps?
+	- When pressing Scramble teams, it automoves them to spectators again?
+	- Even with afk limits set to massive
+	- Was because of clients crashed while downloading, the download disabled afk and all network timeouts
+	- we don't even need to prevent timeout kicks during download because
+		- a) we're sending keepalives every 0.5s if it's external
+		- b) every chunk request resets the last payload time
+
+
+- web port for some reason downloads vrt3 and hyperactive over UDP, is this a file size issue? maybe some http request gets rejected
+	- One US server actually had broken external arenas provider link - it was empty
+
+- vrt 3 -> hyperactive ensure vars != null crash
+	- get_scoreboard_caption was trying to get a caption when no mode was in existence
+	- This points us to other probable instances of this error
+	- some view logic might be trying to get the mode information even when none exists
+
 - some random connectivity problem
 	- restarting servers helped
 	- we had empty space under "webrtc state", as if there was no message set yet?

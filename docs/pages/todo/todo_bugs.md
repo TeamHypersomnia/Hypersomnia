@@ -5,6 +5,10 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- we shouldn't be disconnecting if custom port is bound
+    - idk maybe disable that option by default
+        - yeah thankfully it is
+
 - requesting immediate heartbeat for some reason multiple times a second
 	- only thing that comes to mind is a mode notification
 
