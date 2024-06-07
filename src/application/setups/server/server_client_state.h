@@ -87,10 +87,6 @@ struct server_client_state {
 	}
 
 	bool should_move_to_spectators_due_to_afk(const server_vars& v, const net_time_t server_time) const {
-		if (downloading_status != downloading_type::NONE) {
-			return true;
-		}
-
 		const auto diff = server_time - last_keyboard_activity_time;
 		const auto bare_minimum_afk = 10u;
 
@@ -98,10 +94,6 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_afk(const server_vars& v, const net_time_t server_time) const {
-		if (downloading_status != downloading_type::NONE) {
-			return false;
-		}
-
 		const auto diff = server_time - last_keyboard_activity_time;
 		const auto bare_minimum_afk = 10u;
 
@@ -113,10 +105,6 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_network_timeout(const server_vars& v, const net_time_t server_time) const {
-		if (downloading_status != downloading_type::NONE) {
-			return false;
-		}
-
 		const auto diff = server_time - last_valid_payload_time;
 
 		if (state == type::IN_GAME) {
@@ -165,10 +153,6 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_unauthenticated(const server_vars& v, const net_time_t server_time) const {
-		if (downloading_status != downloading_type::NONE) {
-			return false;
-		}
-
 		if (!v.requires_authentication()) {
 			return false;
 		}
