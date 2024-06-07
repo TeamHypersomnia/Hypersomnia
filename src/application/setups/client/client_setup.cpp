@@ -1047,6 +1047,17 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 	LOG("Trying to load arena: %x (game_mode: %x)", new_arena, new_vars.game_mode.empty() ? "default" : new_vars.game_mode.c_str());
 	LOG("Required arena hash: %x", new_vars.required_arena_hash);
 
+	auto sync_predicted = augs::scope_guard([&]() {
+		/* 
+			Prediction was carried out under the assumption of previous map.
+		*/
+
+		predicted_cosmos = scene.world;
+		predicted_mode = current_mode_state;
+
+		receiver.schedule_reprediction = true;
+	});
+
 	try {
 		const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
 
@@ -1144,10 +1155,6 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 
 		return false;
 	}
-
-	/* Prepare the predicted cosmos. */
-	predicted_cosmos = scene.world;
-	predicted_mode = current_mode_state;
 
 	return true;
 }
