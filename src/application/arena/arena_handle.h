@@ -76,10 +76,30 @@ public:
 	const cosmos_solvable_significant& clean_round_state;
 	const synced_dynamic_vars& dynamic_vars;
 
+	void verify_mode_hasnt_changed() {
+		on_mode(
+			[&](auto& typed_mode) -> decltype(auto) {
+				using M = remove_cref<decltype(typed_mode)>;
+				using R = typename M::ruleset_type;
+
+				const auto vars = std::get_if<R>(std::addressof(ruleset));
+
+				if (vars == nullptr) {
+					LOG_NVPS(current_mode_state.index(), ruleset.index());
+					LOG("WARNING!!! RULESET DOES NO LONGER MATCH THE MODE!!! Setting a default ruleset.");
+
+					ruleset = R();
+				}
+			}
+		);
+	};
+
 	template <class T>
 	void transfer_all_solvables(T& from) {
 		advanced_cosm.assign_solvable(from.advanced_cosm);
 		current_mode_state = from.current_mode_state;
+
+		verify_mode_hasnt_changed();
 	}
 
 	template <class... Args>

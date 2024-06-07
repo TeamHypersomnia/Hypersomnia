@@ -6969,3 +6969,6 @@ This will discard your redo history."
         - the only problem is we don't know at this point which ruleset should be set
     - maybe all this is related to why we see shorter time limit for a split second on connection
 
+- audit all uses of on_mode and on_mode_with_input
+    - not necessary when we have the invariant that ruleset is always with the rule
+
