@@ -172,7 +172,7 @@ namespace augs {
 				Match the background for the first frame before the game loads
 			*/
 
-			set_clear_color(rgba(17, 17, 17, 255));
+			set_clear_color(rgba(0, 8, 5, 255));
 			clear_current_fbo();
 #endif
 		}

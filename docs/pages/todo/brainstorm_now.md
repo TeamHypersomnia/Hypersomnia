@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- tutorial fixes
+    - move double-tap R tip to the end
+    - you can skip this if you have no mouse wheel
+
 - describe browser features in tech highlights
     - the determinism
     - the sign in with discord/steam etc
