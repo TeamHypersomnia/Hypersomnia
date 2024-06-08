@@ -257,6 +257,7 @@ namespace augs {
 #endif
 
 		AL_CHECK(alEnable(AL_SOURCE_DISTANCE_MODEL));
+		LOG_NVPS(alIsEnabled(AL_SOURCE_DISTANCE_MODEL));
 
 		device.log_hrtf_status();
 

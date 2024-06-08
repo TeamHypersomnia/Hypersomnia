@@ -86,7 +86,7 @@ return {
     F1 = "SHOW_PERFORMANCE",
     --F9 = "TOGGLE_STREAMER_MODE",
     --F10 = "TOGGLE_CINEMATIC_MODE",
-    F2 = "SHOW_LOGS"
+    F3 = "SHOW_LOGS"
   },
 
   game_controls = {

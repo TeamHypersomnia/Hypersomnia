@@ -247,6 +247,24 @@ summary: That which we are brainstorming at the moment.
         }
       }
 
+
+    - Another audio bug, have to add a guard like this
+      if (src.bufsProcessed < src.bufQueue.length) {
+        if (src.bufQueue[src.bufsProcessed].audioBuf !== null) {
+          src.bufsProcessed = 0;
+          while (offset > src.bufQueue[src.bufsProcessed].audioBuf.duration) {
+            offset -= src.bufQueue[src.bufsProcessed].audioBuf.duration;
+            src.bufsProcessed++;
+          }
+
+          src.bufOffset = offset;
+        }
+      }
+      else {
+        console.warn("bufsProcessed index out of bounds:", src.bufsProcessed);
+        console.warn("bufQueue length:", src.bufQueue.length);
+      }
+
 - remove periodic entries from server logs so they only contain meaningful information
 
 - fix steam_76561198118088474 profile on the web
