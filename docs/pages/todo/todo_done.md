@@ -6980,3 +6980,7 @@ This will discard your redo history."
 
 - determine closest servers using lat/longitude
 
+- describe browser features in tech highlights
+    - the determinism
+    - the sign in with discord/steam etc
+

@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Known browser settings issues when web build doesnt work
+	- Disabled WebRTC
+	- Disabled hardware acceleration - Low performance
+	- Chrome has ANGLE backend set to D3D9?
+
+
+
 - we shouldn't be disconnecting if custom port is bound
     - idk maybe disable that option by default
         - yeah thankfully it is

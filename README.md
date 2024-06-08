@@ -175,6 +175,8 @@ Or will you join the underground civilization that awaits the end of war in this
     - Even the silliest details like bullet shells are fully synchronized *without* paying for it with network traffic.
   - As a bonus, lag is hidden exceptionally well as the game doesn't just mindlessly "extrapolate" frames visually - rather, it simulates the entire game world forward *offscreen* to accurately predict the future.
   - For the very curious - here's an [article from my old abandoned blog](https://teamhypersomnia.github.io/newscast/full-blown-networking-with-latency-hiding-for-physics), showing how I achieved this as early as in 2016.
+- In the browser version, you can **sign in with Discord** and play ranked matches to compete on the [global Leaderboards](https://hypersomnia.xyz/leaderboards)!
+  - You can also [associate your Discord account with Steam account](https://hypersomnia.xyz/profile) so that the Steam version and web version **share the same rating!**
 - You can host a working game server *from the main menu* - the game is able to **forward ports out of the box!**
   - The algorithm requires a third party server - in this case, the masterserver (server list keeper) facilitates the traversal.
   - Very simple in principle. Using Google STUN servers, we first detect the NAT type for both the client and the server (conic, symmetric or no NAT), as well as the difference in ports between packets outgoing to two different addresses ("port delta").

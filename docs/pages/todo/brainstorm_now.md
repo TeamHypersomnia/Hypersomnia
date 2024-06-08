@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- describe browser features in tech highlights
-    - the determinism
-    - the sign in with discord/steam etc
-
 - preparing for large traffic from crazygames
     - show full servers in gray
         - also non-full servers during ranked (waiting for deserters)

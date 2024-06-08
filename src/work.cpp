@@ -241,11 +241,12 @@ std::optional<double> player_longitude;
 extern "C" {
 	EMSCRIPTEN_KEEPALIVE
 	void on_geolocation_received(double lat, double lon) {
+		LOG("on_geolocation_received: lat: %x, lon: %x", lat, lon);
+
 		std::scoped_lock lk(lat_lon_mutex);
 
 		player_latitude = lat;
 		player_longitude = lon;
-		LOG("on_geolocation_received: %x, %x", lat, lon);
 	}
 }
 
