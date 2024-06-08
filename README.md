@@ -144,7 +144,10 @@ Or will you join the underground civilization that awaits the end of war in this
   - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers.](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=)
 - My Entity-Component-System **[idea from 2013](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)** describes techniques similar to **[Unity Engine patent from 2018.](https://patents.google.com/patent/US10599560B2/en)**
   - **[See this discussion.](https://github.com/TeamHypersomnia/Hypersomnia/issues/264)**
-- Networking is based on **cross-platform simulation determinism**. 
+- Browser clients and native clients **can play on the same servers**, thanks to [libdatachannel](https://github.com/paullouisageneau/libdatachannel) and [datachannel-wasm](https://github.com/paullouisageneau/datachannel-wasm).
+  - You can [host a server in the browser](https://hypersomnia.xyz/host) and connect to it with a native client...
+  - ...and vice versa: host a server in the native client and send anyone the link to join from the browser!
+- Networking is based on **cross-platform simulation determinism**. It's 100% deterministic **even across browser** ***and*** **native clients** (Windows, Linux, MacOS).
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
     - It is impractical to continuously update every single one of them through the network. 
     - Instead, only the player inputs are transmitted ("I moved mouse here", "I pressed this button") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
