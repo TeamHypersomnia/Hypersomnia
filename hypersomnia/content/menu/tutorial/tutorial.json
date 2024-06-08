@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-11-28 17:08:18.430557 UTC"
+        "version_timestamp": "2024-06-08 19:54:34.872179 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1311,7 +1311,6 @@
         },
         {
             "id": "Level11",
-            "is_open_in_editor": false,
             "nodes": [
                 "vent (45)",
                 "vent (46)",
@@ -1387,8 +1386,12 @@
         },
         {
             "id": "Level9",
-            "is_open_in_editor": false,
             "nodes": [
+                "point_light (139)",
+                "point_light (138)",
+                "point_light (136)",
+                "arrow (190)",
+                "arrow (188)",
                 "obs12 (5)",
                 "obs12 (1)",
                 "obs12 (6)",
@@ -1470,6 +1473,7 @@
                 "tip3_1 (29)",
                 "tip3_1 (25)",
                 "tip3_1 (24)",
+                "tip3_1 (71)",
                 "tip3_1 (13)",
                 "dev_floor_256 (67)",
                 "dev_floor_256 (58)",
@@ -1480,10 +1484,15 @@
                 "tip3_1 (21)",
                 "tip3_1 (22)",
                 "entry9",
+                "exit_skip",
                 "exit9",
                 "vent (39)",
                 "vent (40)",
                 "vent (41)",
+                "vent (108)",
+                "vent (110)",
+                "vent (111)",
+                "vent (109)",
                 "vent (42)",
                 "dev_floor_256 (47)",
                 "dev_floor_256 (54)",
@@ -1495,6 +1504,7 @@
         },
         {
             "id": "Level8",
+            "is_open_in_editor": false,
             "nodes": [
                 "tip3_1 (12)",
                 "dev_floor_256 (52)",
@@ -1533,6 +1543,7 @@
         },
         {
             "id": "Level7",
+            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (7)",
                 "obs6 (4)",
@@ -1586,6 +1597,7 @@
         },
         {
             "id": "Level6",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (7)",
                 "floor_right (14)",
@@ -1612,6 +1624,7 @@
         },
         {
             "id": "Level5",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1642,6 +1655,7 @@
         },
         {
             "id": "Level4",
+            "is_open_in_editor": false,
             "nodes": [
                 "tip4_1 (2)",
                 "tip4_1 (18)",
@@ -1875,6 +1889,7 @@
         },
         {
             "id": "Floors",
+            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (9)",
                 "floor_right (7)",
@@ -2377,15 +2392,15 @@
         {
             "id": "dev_floor_256 (19)",
             "type": "dev_floor_256",
-            "pos": [2304.0, 44160.0],
-            "size": [256, 768],
+            "pos": [2176.0, 44160.0],
+            "size": [512, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall",
             "type": "hard_wooden_wall",
-            "pos": [3840.000244140625, 44800.0],
-            "size": [6400, 512]
+            "pos": [3775.999755859375, 44800.0],
+            "size": [6272, 512]
         },
         {
             "id": "hard_wooden_wall (1)",
@@ -2484,32 +2499,32 @@
         {
             "id": "dev_floor_256 (25)",
             "type": "dev_floor_256",
-            "pos": [8320.0, 44800.0],
-            "size": [512, 1024],
+            "pos": [8000.0, 44800.0],
+            "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (5)",
             "type": "hard_wooden_wall",
-            "pos": [8256.0, 44160.0],
-            "size": [2432, 256]
+            "pos": [8192.0, 44160.0],
+            "size": [2560, 256]
         },
         {
             "id": "hard_wooden_wall (6)",
             "type": "hard_wooden_wall",
-            "pos": [6783.99951171875, 45440.0],
-            "size": [512, 768]
+            "pos": [6719.99951171875, 45440.0],
+            "size": [384, 768]
         },
         {
             "id": "hard_wooden_wall (7)",
             "type": "hard_wooden_wall",
-            "pos": [8896.0, 45568.0],
-            "size": [3712, 512]
+            "pos": [8832.0, 45568.0],
+            "size": [3840, 512]
         },
         {
             "id": "floor_right (10)",
             "type": "@water_room_floor",
-            "pos": [7552.0, 44800.0],
+            "pos": [7424.0, 44800.0],
             "size": [768, 768],
             "color": [255, 132, 132, 255]
         },
@@ -2522,8 +2537,8 @@
         {
             "id": "dev_floor_256 (26)",
             "type": "dev_floor_256",
-            "pos": [1856.0, 44160.0],
-            "size": [256, 768],
+            "pos": [8448.0, 44800.0],
+            "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
@@ -2535,8 +2550,8 @@
         {
             "id": "hard_wooden_wall (9)",
             "type": "hard_wooden_wall",
-            "pos": [6912.00048828125, 44288.0],
-            "size": [256, 512]
+            "pos": [6848.00048828125, 44288.0],
+            "size": [128, 512]
         },
         {
             "id": "hard_wooden_wall (10)",
@@ -3047,21 +3062,21 @@
         {
             "id": "floor_right (15)",
             "type": "@water_room_floor",
-            "pos": [38400.0, 6464.0],
+            "pos": [38400.0, 5952.0],
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
         },
         {
             "id": "dev_floor_256 (53)",
             "type": "dev_floor_256",
-            "pos": [38400.0, 9472.0],
+            "pos": [38400.0, 8960.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "vent (39)",
             "type": "@materials/vent.png",
-            "pos": [38400.0, 5823.99609375],
+            "pos": [38400.0, 5311.99609375],
             "rotation": 90.0,
             "size": [256, 2304]
         },
@@ -3075,14 +3090,14 @@
         {
             "id": "vent (41)",
             "type": "@materials/vent.png",
-            "pos": [39360.0, 10496.0],
-            "size": [384, 9088]
+            "pos": [39360.0, 10240.0],
+            "size": [384, 9600]
         },
         {
             "id": "vent (42)",
             "type": "@materials/vent.png",
-            "pos": [37440.0, 10496.0],
-            "size": [384, 9088]
+            "pos": [37440.0, 12512.0],
+            "size": [384, 5056]
         },
         {
             "id": "dev_floor_256 (54)",
@@ -3139,42 +3154,42 @@
         {
             "id": "obs9 (1)",
             "type": "@yellow_barrier",
-            "pos": [38400.00390625, 9184.0],
+            "pos": [38400.00390625, 8671.9990234375],
             "rotation": 90.0,
             "size": [64, 1536]
         },
         {
             "id": "dev_floor_256 (57)",
             "type": "dev_floor_256",
-            "pos": [38400.0, 8832.0],
+            "pos": [38400.0, 8320.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "obs10 (1)",
             "type": "@yellow_barrier",
-            "pos": [38400.00390625, 8160.00048828125],
+            "pos": [38400.00390625, 7648.00048828125],
             "rotation": 90.0,
             "size": [64, 1536]
         },
         {
             "id": "dev_floor_256 (58)",
             "type": "dev_floor_256",
-            "pos": [38400.0, 8320.0],
+            "pos": [38400.0, 7808.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "obs10 (2)",
             "type": "@yellow_barrier",
-            "pos": [37952.00390625, 8064.00048828125],
+            "pos": [37952.00390625, 7552.00048828125],
             "rotation": 90.0,
             "size": [128, 640]
         },
         {
             "id": "obs10 (3)",
             "type": "@yellow_barrier",
-            "pos": [38848.00390625, 8064.00048828125],
+            "pos": [38848.00390625, 7552.00048828125],
             "rotation": 90.0,
             "size": [128, 640]
         },
@@ -3395,60 +3410,60 @@
         {
             "id": "obs9",
             "type": "@materials/glass.png",
-            "pos": [38400.0, 8992.0],
+            "pos": [38400.0, 8480.0],
             "size": [1536, 64]
         },
         {
             "id": "obs10",
             "type": "@materials/glass.png",
-            "pos": [38400.0, 7968.0],
+            "pos": [38400.0, 7456.0],
             "size": [1536, 64]
         },
         {
             "id": "dev_floor_256 (67)",
             "type": "dev_floor_256",
-            "pos": [38400.0, 7808.0],
+            "pos": [38400.0, 7296.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "obs12",
             "type": "@materials/glass.png",
-            "pos": [38912.0, 7232.0],
+            "pos": [38912.0, 6719.99951171875],
             "size": [128, 384]
         },
         {
             "id": "obs12 (1)",
             "type": "@materials/glass.png",
-            "pos": [39008.0, 7616.00048828125],
+            "pos": [39008.0, 7104.0],
             "rotation": 90.0,
             "size": [128, 320]
         },
         {
             "id": "obs12 (2)",
             "type": "@materials/glass.png",
-            "pos": [39072.0, 7104.0],
+            "pos": [39072.0, 6592.0],
             "rotation": 90.0,
             "size": [128, 192]
         },
         {
             "id": "obs12 (3)",
             "type": "@yellow_barrier",
-            "pos": [38912.0, 7487.99951171875],
+            "pos": [38912.0, 6975.99951171875],
             "rotation": -180.0,
             "size": [128, 128]
         },
         {
             "id": "obs12 (4)",
             "type": "@yellow_barrier",
-            "pos": [38400.0, 7071.99951171875],
+            "pos": [38400.0, 6559.9990234375],
             "rotation": -90.0,
             "size": [64, 896]
         },
         {
             "id": "obs12 (5)",
             "type": "@materials/glass.png",
-            "pos": [37792.0, 7616.00048828125],
+            "pos": [37792.0, 7104.0],
             "rotation": -90.0,
             "size": [128, 320],
             "flip_horizontally": true
@@ -3456,7 +3471,7 @@
         {
             "id": "obs12 (6)",
             "type": "@materials/glass.png",
-            "pos": [37728.0, 7104.0],
+            "pos": [37728.0, 6592.0],
             "rotation": -90.0,
             "size": [128, 192],
             "flip_horizontally": true
@@ -3464,14 +3479,14 @@
         {
             "id": "obs12 (7)",
             "type": "@materials/glass.png",
-            "pos": [37888.0, 7232.0],
+            "pos": [37888.0, 6719.99951171875],
             "size": [128, 384],
             "flip_horizontally": true
         },
         {
             "id": "obs12 (8)",
             "type": "@yellow_barrier",
-            "pos": [37888.0, 7487.99951171875],
+            "pos": [37888.0, 6975.99951171875],
             "rotation": -180.0,
             "size": [128, 128],
             "flip_horizontally": true
@@ -6548,6 +6563,42 @@
             "size": [250, 125]
         },
         {
+            "id": "vent (108)",
+            "type": "@materials/vent.png",
+            "pos": [37440.0, 7456.0],
+            "size": [384, 4032]
+        },
+        {
+            "id": "vent (109)",
+            "type": "@materials/vent.png",
+            "pos": [36928.0, 10144.0],
+            "size": [640, 320]
+        },
+        {
+            "id": "vent (110)",
+            "type": "@materials/vent.png",
+            "pos": [36928.0, 9312.0],
+            "size": [640, 320]
+        },
+        {
+            "id": "vent (111)",
+            "type": "@materials/vent.png",
+            "pos": [36288.0, 9728.0],
+            "size": [640, 1152]
+        },
+        {
+            "id": "arrow (188)",
+            "type": "@arrow",
+            "pos": [38394.0, 9725.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (190)",
+            "type": "@arrow",
+            "pos": [37370.0, 9725.0],
+            "rotation": -180.0
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -9105,6 +9156,33 @@
             }
         },
         {
+            "id": "point_light (136)",
+            "type": "point_light",
+            "pos": [37633.0, 9727.0],
+            "color": [255, 0, 255, 255],
+            "falloff": {
+                "radius": 340.4259948730469
+            }
+        },
+        {
+            "id": "point_light (138)",
+            "type": "point_light",
+            "pos": [38847.0, 9729.0],
+            "color": [255, 0, 255, 74],
+            "falloff": {
+                "radius": 658.8330078125
+            }
+        },
+        {
+            "id": "point_light (139)",
+            "type": "point_light",
+            "pos": [38143.0, 9729.0],
+            "color": [255, 0, 255, 74],
+            "falloff": {
+                "radius": 658.8330078125
+            }
+        },
+        {
             "id": "force_grenade",
             "type": "force_grenade",
             "pos": [16947.0, 22121.0]
@@ -9959,122 +10037,122 @@
         {
             "id": "poseidon",
             "type": "poseidon",
-            "pos": [37716.0, 9928.0]
+            "pos": [37716.0, 9416.0]
         },
         {
             "id": "poseidon (1)",
             "type": "poseidon",
-            "pos": [37716.0, 9864.0]
+            "pos": [37716.0, 9352.0]
         },
         {
             "id": "poseidon (2)",
             "type": "poseidon",
-            "pos": [37716.0, 9800.0]
+            "pos": [37716.0, 9288.0]
         },
         {
             "id": "poseidon (3)",
             "type": "poseidon",
-            "pos": [37804.0, 9800.0]
+            "pos": [37804.0, 9288.0]
         },
         {
             "id": "poseidon (4)",
             "type": "poseidon",
-            "pos": [37804.0, 9864.0]
+            "pos": [37804.0, 9352.0]
         },
         {
             "id": "poseidon (5)",
             "type": "poseidon",
-            "pos": [37804.0, 9928.0]
+            "pos": [37804.0, 9416.0]
         },
         {
             "id": "poseidon (6)",
             "type": "poseidon",
-            "pos": [37996.0, 9800.0]
+            "pos": [37996.0, 9288.0]
         },
         {
             "id": "poseidon (7)",
             "type": "poseidon",
-            "pos": [37996.0, 9864.0]
+            "pos": [37996.0, 9352.0]
         },
         {
             "id": "poseidon (8)",
             "type": "poseidon",
-            "pos": [37996.0, 9928.0]
+            "pos": [37996.0, 9416.0]
         },
         {
             "id": "poseidon (9)",
             "type": "poseidon",
-            "pos": [38100.0, 9800.0]
+            "pos": [38100.0, 9288.0]
         },
         {
             "id": "poseidon (10)",
             "type": "poseidon",
-            "pos": [38100.0, 9864.0]
+            "pos": [38100.0, 9352.0]
         },
         {
             "id": "poseidon (11)",
             "type": "poseidon",
-            "pos": [38100.0, 9928.0]
+            "pos": [38100.0, 9416.0]
         },
         {
             "id": "yellow_dagger",
             "type": "yellow_dagger",
-            "pos": [37781.0, 8314.0]
+            "pos": [37781.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (1)",
             "type": "yellow_dagger",
-            "pos": [37781.0, 8378.0]
+            "pos": [37781.0, 7866.00048828125]
         },
         {
             "id": "yellow_dagger (2)",
             "type": "yellow_dagger",
-            "pos": [37909.0, 8378.0]
+            "pos": [37909.0, 7866.00048828125]
         },
         {
             "id": "yellow_dagger (3)",
             "type": "yellow_dagger",
-            "pos": [37845.0, 8378.0]
+            "pos": [37845.0, 7866.00048828125]
         },
         {
             "id": "yellow_dagger (4)",
             "type": "yellow_dagger",
-            "pos": [37845.0, 8314.0]
+            "pos": [37845.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (5)",
             "type": "yellow_dagger",
-            "pos": [37909.0, 8314.0]
+            "pos": [37909.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (6)",
             "type": "yellow_dagger",
-            "pos": [37973.0, 8314.0]
+            "pos": [37973.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (7)",
             "type": "yellow_dagger",
-            "pos": [38037.0, 8314.0]
+            "pos": [38037.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (8)",
             "type": "yellow_dagger",
-            "pos": [38101.0, 8314.0]
+            "pos": [38101.0, 7801.99951171875]
         },
         {
             "id": "yellow_dagger (9)",
             "type": "yellow_dagger",
-            "pos": [37973.0, 8378.0]
+            "pos": [37973.0, 7866.00048828125]
         },
         {
             "id": "yellow_dagger (10)",
             "type": "yellow_dagger",
-            "pos": [38101.0, 8378.0]
+            "pos": [38101.0, 7866.00048828125]
         },
         {
             "id": "yellow_dagger (11)",
             "type": "yellow_dagger",
-            "pos": [38037.0, 8378.0]
+            "pos": [38037.0, 7866.00048828125]
         },
         {
             "id": "fury_thrower (1)",
@@ -10124,133 +10202,133 @@
         {
             "id": "electric_rapier",
             "type": "electric_rapier",
-            "pos": [38164.0, 7640.0]
+            "pos": [38164.0, 7128.0]
         },
         {
             "id": "electric_rapier (1)",
             "type": "electric_rapier",
-            "pos": [38268.0, 7640.0]
+            "pos": [38268.0, 7128.0]
         },
         {
             "id": "electric_rapier (2)",
             "type": "electric_rapier",
-            "pos": [38164.0, 7560.0]
+            "pos": [38164.0, 7048.00048828125]
         },
         {
             "id": "electric_rapier (3)",
             "type": "electric_rapier",
-            "pos": [38268.0, 7560.0]
+            "pos": [38268.0, 7048.00048828125]
         },
         {
             "id": "electric_rapier-right",
             "type": "electric_rapier",
-            "pos": [38636.0, 7640.0],
+            "pos": [38636.0, 7128.0],
             "rotation": 180.0
         },
         {
             "id": "electric_rapier (1)-right",
             "type": "electric_rapier",
-            "pos": [38531.99609375, 7640.0],
+            "pos": [38531.99609375, 7128.0],
             "rotation": 180.0
         },
         {
             "id": "electric_rapier (2)-right",
             "type": "electric_rapier",
-            "pos": [38636.0, 7560.00048828125],
+            "pos": [38636.0, 7048.00048828125],
             "rotation": 180.0
         },
         {
             "id": "electric_rapier (3)-right",
             "type": "electric_rapier",
-            "pos": [38531.99609375, 7560.00048828125],
+            "pos": [38531.99609375, 7048.00048828125],
             "rotation": 180.0
         },
         {
             "id": "electric_rapier-up",
             "type": "electric_rapier",
-            "pos": [38164.0, 7464.0]
+            "pos": [38164.0, 6951.99951171875]
         },
         {
             "id": "electric_rapier (1)-up",
             "type": "electric_rapier",
-            "pos": [38268.0, 7464.0]
+            "pos": [38268.0, 6951.99951171875]
         },
         {
             "id": "electric_rapier (2)-up",
             "type": "electric_rapier",
-            "pos": [38164.0, 7544.0]
+            "pos": [38164.0, 7032.0]
         },
         {
             "id": "electric_rapier (3)-up",
             "type": "electric_rapier",
-            "pos": [38268.0, 7544.0]
+            "pos": [38268.0, 7032.0]
         },
         {
             "id": "electric_rapier-up-up",
             "type": "electric_rapier",
-            "pos": [38164.0, 7448.00048828125]
+            "pos": [38164.0, 6936.0]
         },
         {
             "id": "electric_rapier (1)-up-up",
             "type": "electric_rapier",
-            "pos": [38268.0, 7448.00048828125]
+            "pos": [38268.0, 6936.0]
         },
         {
             "id": "electric_rapier (2)-up-up",
             "type": "electric_rapier",
-            "pos": [38164.0, 7368.0]
+            "pos": [38164.0, 6856.0]
         },
         {
             "id": "electric_rapier (3)-up-up",
             "type": "electric_rapier",
-            "pos": [38268.0, 7368.0]
+            "pos": [38268.0, 6856.0]
         },
         {
             "id": "electric_rapier-right-up",
             "type": "electric_rapier",
-            "pos": [38636.0, 7464.0],
+            "pos": [38636.0, 6951.99951171875],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (1)-right-up",
             "type": "electric_rapier",
-            "pos": [38532.0, 7464.0],
+            "pos": [38532.0, 6951.99951171875],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (2)-right-up",
             "type": "electric_rapier",
-            "pos": [38636.0, 7544.0],
+            "pos": [38636.0, 7032.0],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (3)-right-up",
             "type": "electric_rapier",
-            "pos": [38532.0, 7544.0],
+            "pos": [38532.0, 7032.0],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier-right-up-up",
             "type": "electric_rapier",
-            "pos": [38636.0, 7448.00048828125],
+            "pos": [38636.0, 6936.0],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (1)-right-up-up",
             "type": "electric_rapier",
-            "pos": [38532.0, 7448.00048828125],
+            "pos": [38532.0, 6936.0],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (2)-right-up-up",
             "type": "electric_rapier",
-            "pos": [38636.0, 7368.0],
+            "pos": [38636.0, 6856.0],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (3)-right-up-up",
             "type": "electric_rapier",
-            "pos": [38532.0, 7368.0],
+            "pos": [38532.0, 6856.0],
             "rotation": -180.0
         },
         {
@@ -10510,25 +10588,25 @@
         {
             "id": "kill9",
             "type": "team_spawn",
-            "pos": [38145.0, 9089.0],
+            "pos": [38145.0, 8577.0],
             "rotation": 90.0
         },
         {
             "id": "kill9 (1)",
             "type": "team_spawn",
-            "pos": [38657.0, 9089.0],
+            "pos": [38657.0, 8577.0],
             "rotation": 90.0
         },
         {
             "id": "kill10 (1)",
             "type": "team_spawn",
-            "pos": [38463.0, 8063.0],
+            "pos": [38463.0, 7551.0],
             "rotation": 90.0
         },
         {
             "id": "kill10",
             "type": "team_spawn",
-            "pos": [38335.0, 8063.0],
+            "pos": [38335.0, 7551.0],
             "rotation": 90.0
         },
         {
@@ -10552,13 +10630,13 @@
         {
             "id": "kill12 (1)",
             "type": "team_spawn",
-            "pos": [39039.0, 7295.0],
+            "pos": [39039.0, 6783.0],
             "rotation": 90.0
         },
         {
             "id": "kill12",
             "type": "team_spawn",
-            "pos": [37761.0, 7295.0],
+            "pos": [37761.0, 6783.0],
             "rotation": 90.0
         },
         {
@@ -11385,7 +11463,7 @@
         {
             "id": "exit4",
             "type": "portal",
-            "pos": [7551.99951171875, 44799.9921875],
+            "pos": [7424.0, 44799.9921875],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -11468,8 +11546,8 @@
             "id": "tip4_1 (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [2304.0, 44160.0],
-            "size": [256, 768],
+            "pos": [2176.0, 44160.0],
+            "size": [512, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -11613,8 +11691,8 @@
             "id": "tip4_1 (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [8320.0, 44800.0],
-            "size": [512, 1024],
+            "pos": [8000.0, 44800.0],
+            "size": [256, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -11642,8 +11720,8 @@
             "id": "tip4_1 (8)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1856.0, 44160.0],
-            "size": [256, 768],
+            "pos": [9344.0, 44800.0],
+            "size": [256, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -12049,7 +12127,7 @@
             "id": "tip4_1 (11)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [9344.0, 44800.0],
+            "pos": [8448.0, 44800.0],
             "size": [256, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -12546,9 +12624,10 @@
             "id": "tip3_1 (13)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [38400.0, 9472.0],
-            "size": [1536, 512],
-            "color_preset": "GREEN",
+            "pos": [38144.0, 9728.0],
+            "rotation": -180.0,
+            "size": [2048, 512],
+            "color_preset": "PINK",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
@@ -12569,7 +12648,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Knives can be thrown quickly.\nAim at the enemy and spam {THROW_KNIFE}."
+            "context_tip": "You can skip this part if you have no mouse wheel.\nIn that case enter the portal to the left."
         },
         {
             "id": "tip3_1 (16)",
@@ -12684,7 +12763,7 @@
         {
             "id": "exit9",
             "type": "portal",
-            "pos": [38400.0, 6463.9931640625],
+            "pos": [38400.0, 5951.9931640625],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -12738,7 +12817,7 @@
             "id": "tip3_1 (24)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [38400.0, 8832.0],
+            "pos": [38400.0, 8320.0],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -12767,7 +12846,7 @@
             "id": "tip3_1 (25)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [38400.0, 8320.0],
+            "pos": [38400.0, 7808.0],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -13092,7 +13171,7 @@
             "id": "tip3_1 (29)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [38400.0, 7808.0],
+            "pos": [38400.0, 7296.0],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -16287,6 +16366,59 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Now take as many as you want!"
+        },
+        {
+            "id": "exit_skip",
+            "type": "portal",
+            "pos": [36864.0, 9728.0],
+            "size": [512, 512],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry11",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (71)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 8960.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Knives can be thrown quickly.\nAim at the enemy and spam {THROW_KNIFE}."
         }
     ]
 }

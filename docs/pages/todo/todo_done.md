@@ -6972,3 +6972,11 @@ This will discard your redo history."
 - audit all uses of on_mode and on_mode_with_input
     - not necessary when we have the invariant that ruleset is always with the rule
 
+- tutorial fixes
+    - move double-tap R tip to the end
+    - you can skip this if you have no mouse wheel
+
+- estimate ping using speed of light and put ~ next to the value on the web
+
+- determine closest servers using lat/longitude
+

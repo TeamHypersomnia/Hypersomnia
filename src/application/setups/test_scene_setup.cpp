@@ -198,6 +198,13 @@ void test_scene_setup::restart_arena() {
 				}
 
 				l.editable.active = layer_level == tutorial.level || layer_level == get_next(tutorial.level);
+
+				if (tutorial.level == 9) {
+					if (layer_level == 11) {
+						/* We need this for the mouse wheel skip portal */
+						l.editable.active = true;
+					}
+				}
 			}
 		}
 

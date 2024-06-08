@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- tutorial fixes
-    - move double-tap R tip to the end
-    - you can skip this if you have no mouse wheel
-
 - describe browser features in tech highlights
     - the determinism
     - the sign in with discord/steam etc
@@ -18,12 +14,8 @@ summary: That which we are brainstorming at the moment.
     - show full servers in gray
         - also non-full servers during ranked (waiting for deserters)
 
-- estimate ping using speed of light and put ~ next to the value on the web
-
 - have linking steam and discord after all and then ping @everyone
     - we can do editor later as we go
-
-- determine closest servers using lat/longitude
 
 - #server-monitor should @ping me to play and also provide links
     - although if someone wants to play with just their friend then it's pointless to @ping me to play
