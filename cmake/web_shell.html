@@ -98,6 +98,20 @@
   <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2/build/global/luxon.min.js"></script>
   <script type='text/javascript'>
     const revoke_origin = 'https://hypersomnia.xyz';
+    const ipinfo_endpoint = 'https://hypersomnia.xyz/geolocation';
+
+    function getUserGeolocation() {
+      fetch(ipinfo_endpoint)
+        .then(response => response.json())
+        .then(data => {
+            const [latitude, longitude] = data.loc.split(',');
+            console.log("User's geolocation: ", latitude, longitude);
+            Module.ccall('on_geolocation_received', 'void', ['double', 'double'], [parseFloat(latitude), parseFloat(longitude)]);
+        })
+        .catch(error => {
+            console.error("Error getting geolocation: ", error);
+        });
+    }
 
     function resizeCanvas() {
       var canvas = document.getElementById('canvas');
@@ -367,6 +381,7 @@
 
     Module.loginDiscord = loginDiscord;
     Module.revokeDiscord = revokeDiscord;
+    Module.getUserGeolocation = getUserGeolocation;
   </script>
   {{{ SCRIPT }}}
 </body>

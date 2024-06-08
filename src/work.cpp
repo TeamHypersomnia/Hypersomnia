@@ -214,6 +214,10 @@ EM_JS(void, call_setLocation, (const char* newPath), {
 	setLocation(newPath);
 });
 
+EM_JS(void, call_get_user_geolocation, (), {
+	Module.getUserGeolocation();
+});
+
 double web_get_secs_until_next_weekend_evening(const char* locationId) {
 	return EM_ASM_DOUBLE({
 		const locationIdStr = UTF8ToString($0);
@@ -229,6 +233,21 @@ EM_JS(void, call_openUrl, (const char* newPath), {
 });
 
 #include "application/main/auth_providers.h"
+
+std::mutex lat_lon_mutex;
+std::optional<double> player_latitude;
+std::optional<double> player_longitude;
+
+extern "C" {
+	EMSCRIPTEN_KEEPALIVE
+	void on_geolocation_received(double lat, double lon) {
+		std::scoped_lock lk(lat_lon_mutex);
+
+		player_latitude = lat;
+		player_longitude = lon;
+		LOG("on_geolocation_received: %x, %x", lat, lon);
+	}
+}
 
 #endif
 
@@ -273,6 +292,8 @@ work_result work(
 	(void)log_directory_existed;
 
 #if PLATFORM_WEB
+	call_get_user_geolocation();
+
 	WEBSTATIC const bool is_steam_client = false;
 	WEBSTATIC const bool ranked_servers_enabled = true;
 	WEBSTATIC const auto steam_id = std::string("0");

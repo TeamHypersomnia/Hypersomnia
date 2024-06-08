@@ -1,18 +1,6 @@
 #pragma once
 #include "application/main/auth_provider_type.h"
 
-EM_JS(void, call_login_google, (), {
-	LOG("Calling loginGoogle");
-
-	Module.loginGoogle();
-});
-
-EM_JS(void, call_login_discord, (), {
-	LOG("Calling loginDiscord");
-
-	Module.loginDiscord();
-});
-
 std::mutex pending_auth_datas_lk;
 std::optional<web_auth_data> new_auth_data;
 

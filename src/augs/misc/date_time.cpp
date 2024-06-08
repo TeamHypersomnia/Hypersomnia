@@ -332,6 +332,8 @@ std::string getTimeZoneName(const std::string& locationId) {
         return "Europe/Warsaw";
 	} else if (locationId == "ch") {
 		return "Europe/Zurich";
+	} else if (locationId == "nl") {
+		return "Europe/Amsterdam";
 	}
 
     return ""; // Return an empty string for unknown locationIds

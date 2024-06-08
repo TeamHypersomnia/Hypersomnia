@@ -20,6 +20,10 @@
 #include "application/network/resolve_address.h"
 #include "augs/templates/main_thread_queue.h"
 
+#if PLATFORM_WEB
+#include "application/gui/calculate_server_distance.hpp"
+#endif
+
 #if BUILD_NATIVE_SOCKETS
 #include "augs/network/netcode_utils.h"
 #include "augs/network/netcode_sockets.h"
@@ -201,6 +205,15 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
         error_message = "There was a problem deserializing the server list:\n" + std::string(err.what()) + "\n\nTry restarting the game and updating your client!";
         new_server_list.clear();
     }
+
+#if PLATFORM_WEB
+	for (auto& n : new_server_list) {
+		if (const auto ping = get_estimated_ping_to_server(n.heartbeat.get_location_id())) {
+			n.progress.state = server_entry_state::PING_MEASURED;
+			n.progress.ping = static_cast<uint32_t>(*ping);
+		}
+	}
+#endif
 
     return new_server_list;
 }
@@ -607,7 +620,11 @@ void browse_servers_gui_state::show_server_list(
 					do_text("999>");
 				}
 				else {
+#if PLATFORM_WEB
+					do_text(typesafe_sprintf("~%x", ping));
+#else
 					do_text(typesafe_sprintf("%x", ping));
+#endif
 				}
 			}
 			else {
