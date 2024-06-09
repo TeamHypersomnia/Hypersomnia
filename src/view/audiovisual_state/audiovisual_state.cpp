@@ -318,6 +318,12 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			return false;
 		}
 
+		int num_bufs = input.audio_renderer->num_currently_processed_buffers;
+
+		if (num_bufs > 0) {
+			return false;
+		}
+
 		if (sound_freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {
 			return true;
 		}

@@ -109,7 +109,7 @@ namespace augs {
 
 		audio_command_buffers& operator=(audio_command_buffers&&) = delete;
 		audio_command_buffers& operator=(const audio_command_buffers&) = delete;
-		
+
 		void request_quit() {
 			{
 				auto lk = lock_queue();
@@ -138,6 +138,16 @@ namespace augs {
 			}
 
 			return buffers.data() + write_index;
+		}
+
+		int num_currently_processed_buffers() {
+			auto lk = lock_queue();
+
+			if (write_index >= read_index) {
+				return write_index - read_index;
+			}
+
+			return (write_index + num_audio_buffers_v) - read_index;
 		}
 
 		auto submit_write_buffer() {

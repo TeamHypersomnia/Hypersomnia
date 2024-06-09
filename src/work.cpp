@@ -4945,7 +4945,10 @@ work_result work(
 			auto audio_renderer = std::optional<augs::audio_renderer>();
 
 			if (const auto audio_buffer = audio_buffers.map_write_buffer()) {
-				audio_renderer.emplace(augs::audio_renderer { *audio_buffer });
+				audio_renderer.emplace(augs::audio_renderer { 
+					audio_buffers.num_currently_processed_buffers(),
+					*audio_buffer 
+				});
 			}
 
 			advance_current_setup(

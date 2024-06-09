@@ -6984,3 +6984,6 @@ This will discard your redo history."
     - the determinism
     - the sign in with discord/steam etc
 
+- The high frequency shouldnt honestly cause such a drop
+    - although it does even prevent first bullets or dashes from playing
+

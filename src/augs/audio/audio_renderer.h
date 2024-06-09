@@ -4,6 +4,7 @@
 namespace augs {
 	class audio_renderer {
 	public:
+		int num_currently_processed_buffers = 0;
 		audio_command_buffer& commands;
 
 		template <class T>
