@@ -81,7 +81,6 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	ImGui::PopFont();
 	text(" ");
-	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
 	auto& imgs = in.necessary_images;
 
@@ -117,18 +116,20 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	}
 #endif
 
+	{
+		auto sc = scoped_text_color(rgba(255, 255, 255, 230));
+
+		if (login_option(N::SOCIAL_STEAM, "(opt.) Connect Discord with Steam", 1.0f, vec2(0.5, 0.2), 0.6f, "(Optional)\nMatches played with Discord account\nwill count towards your Steam account.\n\nYou may later disconnect the two accounts\nwithout losing any progress.")) {
+			augs::open_url("https://hypersomnia.xyz/profile");
+		}
+	}
+
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
 	if (login_option(N::SOCIAL_DISCORD, "Sign in with Discord")) {
 #if PLATFORM_WEB
 		::sign_in_with_discord();
 #endif
-	}
-
-	{
-		auto sc = scoped_text_color(rgba(255, 255, 255, 230));
-
-		if (login_option(N::SOCIAL_STEAM, "Connect Discord with Steam", 1.0f, vec2(0.5, 0.2), 1.0f, "Matches played with Discord account\nwill count towards your Steam account.\n\nYou may later disconnect the two accounts\nwithout losing any progress.")) {
-			augs::open_url("https://hypersomnia.xyz/profile");
-		}
 	}
 
 	ImGui::PopFont();

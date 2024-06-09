@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Test on opera
+- Enable gzip compression
+
 - preparing for large traffic from crazygames
     - show full servers in gray
         - also non-full servers during ranked (waiting for deserters)
