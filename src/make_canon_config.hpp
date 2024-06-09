@@ -71,7 +71,6 @@ inline void make_canon_config(config_lua_table& result, bool is_dedicated_server
 
 		result.window.fullscreen = false;
 		result.window.border = false;
-		result.sound.processing_frequency = sound_processing_frequency::EVERY_SINGLE_FRAME;
 		result.sound.max_short_sounds = 32;
 
 		result.game_controls.erase(augs::event::keys::key::LCTRL);

@@ -190,7 +190,7 @@ return {
     music = 0.55
   },
   sound = {
-    processing_frequency = "EVERY_SIMULATION_STEP",
+    processing_frequency = "EVERY_SINGLE_FRAME",
 	sync_sounds_longer_than_secs = 5,
 treat_as_music_sounds_longer_than_secs = 5,
     max_speed_for_doppler_calculation = 5000,
