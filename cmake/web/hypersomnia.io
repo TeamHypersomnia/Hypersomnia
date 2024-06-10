@@ -12,6 +12,7 @@ server {
     # MIME types for WebAssembly (.wasm) files
     types {
         application/wasm     wasm;
+        application/octet-stream data;
         text/html            html;
         text/javascript      js;
     }
@@ -20,6 +21,12 @@ server {
     add_header Cross-Origin-Resource-Policy "same-site";
     add_header Cross-Origin-Opener-Policy "same-origin";
     add_header Cross-Origin-Embedder-Policy "require-corp";
+
+    gzip on;
+    gzip_types application/wasm application/octet-stream;
+    gzip_min_length 10240;
+    gzip_comp_level 9;
+    gzip_proxied no-cache no-store private expired auth;
 
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/hypersomnia.io/fullchain.pem; # managed by Certbot

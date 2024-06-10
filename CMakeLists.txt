@@ -266,6 +266,8 @@ if (BUILD_FOR_WEB)
 	set(BUILD_MASTERSERVER OFF)
 	set(BUILD_NATIVE_SOCKETS OFF)
 	set(BUILD_UNIT_TESTS OFF)
+
+	set(USE_O3 ON)
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -1322,9 +1324,11 @@ if (NOT USE_O3)
 	message("Forcing use of O2.")
 
 	string(REPLACE "O3" "O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O3" "O2" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 else()
 	message("Forcing use of O3.")
 	string(REPLACE "O2" "O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O2" "O3" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
 if (LINK_TIME_OPTIMIZATION)
