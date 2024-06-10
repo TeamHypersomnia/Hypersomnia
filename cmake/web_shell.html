@@ -95,7 +95,6 @@
     <div class="progress-mb" id="progress-mb">0 MB</div>
   </div>
   <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
-  <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2/build/global/luxon.min.js"></script>
   <script type='text/javascript'>
     const revoke_origin = 'https://hypersomnia.xyz';
     const ipinfo_endpoint = 'https://hypersomnia.xyz/geolocation';
@@ -172,23 +171,40 @@
       }
 
       try {
-        const DateTime = luxon.DateTime;
-        const now = DateTime.now().setZone(timeZoneName);
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: timeZoneName,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+
+        // Format current date-time in the given time zone
+        const parts = formatter.formatToParts(now).reduce((acc, part) => {
+          acc[part.type] = part.value;
+          return acc;
+        }, {});
+
+        const nowInZone = new Date(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`);
 
         const weekendEvenings = [
-          now.set({ weekday: 5, hour: 19, minute: 0, second: 0, millisecond: 0 }), // Friday 19:00
-          now.set({ weekday: 6, hour: 19, minute: 0, second: 0, millisecond: 0 }), // Saturday 19:00
-          now.set({ weekday: 7, hour: 19, minute: 0, second: 0, millisecond: 0 })  // Sunday 19:00
+          new Date(nowInZone.getFullYear(), nowInZone.getMonth(), nowInZone.getDate() + (5 - nowInZone.getDay()), 19, 0, 0, 0), // Friday 19:00
+          new Date(nowInZone.getFullYear(), nowInZone.getMonth(), nowInZone.getDate() + (6 - nowInZone.getDay()), 19, 0, 0, 0), // Saturday 19:00
+          new Date(nowInZone.getFullYear(), nowInZone.getMonth(), nowInZone.getDate() + (7 - nowInZone.getDay()), 19, 0, 0, 0)  // Sunday 19:00
         ];
 
         let closestDistance = Infinity;
 
         for (let evening of weekendEvenings) {
-          if (evening < now) {
-            evening = evening.plus({ weeks: 1 }); // Move to next week
+          if (evening < nowInZone) {
+            evening.setDate(evening.getDate() + 7); // Move to next week
           }
 
-          const durationUntilEvening = evening.diff(now, 'seconds').seconds;
+          const durationUntilEvening = (evening - nowInZone) / 1000; // Difference in seconds
 
           if (durationUntilEvening < closestDistance) {
             closestDistance = durationUntilEvening;
@@ -205,6 +221,7 @@
         return -1;
       }
     }
+
     var urlPath = window.location.pathname;
     var queryString = window.location.search;
     console.log("urlPath:", urlPath);
