@@ -28,7 +28,7 @@ server {
     gzip_comp_level 9;
     gzip_proxied no-cache no-store private expired auth;
 
-    listen 443 ssl; # managed by Certbot
+    listen 443 ssl http2;
     ssl_certificate /etc/letsencrypt/live/hypersomnia.io/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/hypersomnia.io/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
