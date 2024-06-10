@@ -3,6 +3,9 @@
 enum class ingame_menu_button_type {
 	// GEN INTROSPECTOR enum class ingame_menu_button_type
 	JOIN_DISCORD,
+#if PLATFORM_WEB
+	AVAILABLE_ON_GITHUB,
+#endif
 
 	RESUME,
 	INVITE_TO_JOIN,

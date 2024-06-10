@@ -3409,6 +3409,12 @@ work_result work(
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
+#if PLATFORM_WEB
+			case T::AVAILABLE_ON_GITHUB:
+				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
+				break;
+#endif
+
 			case T::INVITE_TO_JOIN:
 				if (is_during_tutorial()) {
 					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();

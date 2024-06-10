@@ -8,7 +8,7 @@ summary: Just a hidden scratchpad.
 - Known browser settings issues when web build doesnt work
 	- Disabled WebRTC
 	- Disabled hardware acceleration - Low performance
-	- Chrome has ANGLE backend set to D3D9?
+	- Chrome has ANGLE backend set to D3D9
 
 
 
