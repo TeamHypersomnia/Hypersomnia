@@ -17,8 +17,6 @@ COPY cmake/dockerfile_server_config.lua /root/.config/Hypersomnia/user/config.fo
 
 CMD ["./Hypersomnia-Headless.AppImage"]
 
-EXPOSE 8412/tcp
 EXPOSE 8412/udp
-EXPOSE 9000-9100/tcp
-EXPOSE 9000-9100/udp
+EXPOSE 9000-9010/udp
 
