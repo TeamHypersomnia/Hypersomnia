@@ -4,7 +4,7 @@ return {
   },
   last_activity = "MAIN_MENU",
   server = {
-    server_name = "Server"
+    server_name = "Server",
 
     webrtc_udp_mux = true,
     webrtc_port_range_begin = 9000
