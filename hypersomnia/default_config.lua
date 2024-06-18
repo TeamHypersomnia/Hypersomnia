@@ -790,8 +790,12 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     allow_webrtc_clients = true,
 
+    -- If true, connections will use only single UDP port.
+    -- In that case set webrtc_port_range_begin and webrtc_port_range_end to the same value.
+    webrtc_udp_mux = false,
+
     webrtc_port_range_begin = 9000,
-    webrtc_port_range_end = 9100,
+    webrtc_port_range_end = 9010,
 
     -- If > 0, kicks players who do not provide either a Steam or Discord (TODO) session ticket upon connection.
     -- Will happen on all ranked servers by default.

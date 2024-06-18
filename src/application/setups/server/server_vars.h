@@ -111,8 +111,10 @@ struct server_vars {
 	std::optional<arena_playtesting_context> playtesting_context;
 
 	bool allow_webrtc_clients = true;
+
+	bool webrtc_udp_mux = false;
 	port_type webrtc_port_range_begin = 9000;
-	port_type webrtc_port_range_end = 9100;
+	port_type webrtc_port_range_end = 9010;
 
 	server_name_type server_name;
 	address_string_type notified_server_list;

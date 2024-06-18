@@ -6987,3 +6987,5 @@ This will discard your redo history."
 - The high frequency shouldnt honestly cause such a drop
     - although it does even prevent first bullets or dashes from playing
 
+- Enable gzip compression
+- Test on opera

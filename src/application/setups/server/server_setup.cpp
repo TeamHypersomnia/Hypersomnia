@@ -401,7 +401,8 @@ public:
 		const std::string& signaling_server_url,
 		const std::vector<rtc::IceServer>& iceServers,
 		const port_type ports_begin,
-		const port_type ports_end
+		const port_type ports_end,
+		const bool udp_mux
 	) {
 		LOG("Web port range: %x-%x", ports_begin, ports_end);
 		self->config.iceServers = iceServers;
@@ -411,6 +412,7 @@ public:
 #else
 		self->config.portRangeBegin = { ports_begin };
 		self->config.portRangeEnd = { ports_end };
+		self->config.enableIceUdpMux = udp_mux;
 #endif
 
 #if USE_WEBSOCKET
@@ -715,7 +717,8 @@ server_setup::server_setup(
 			webrtc_signalling_server_url,
 			::get_ice_servers(),
 			vars.webrtc_port_range_begin,
-			vars.webrtc_port_range_end
+			vars.webrtc_port_range_end,
+			vars.webrtc_udp_mux
 		);
 	}
 
