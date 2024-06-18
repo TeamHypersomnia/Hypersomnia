@@ -15,6 +15,11 @@ summary: Notable bugs.
 		- b) every chunk request resets the last payload time
 
 
+- Known browser settings issues when web build doesnt work
+	- Disabled WebRTC
+	- Disabled hardware acceleration - Low performance
+	- Chrome has ANGLE backend set to D3D9
+
 - web port for some reason downloads vrt3 and hyperactive over UDP, is this a file size issue? maybe some http request gets rejected
 	- One US server actually had broken external arenas provider link - it was empty
 

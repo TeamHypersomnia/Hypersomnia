@@ -5,10 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- Known browser settings issues when web build doesnt work
-	- Disabled WebRTC
-	- Disabled hardware acceleration - Low performance
-	- Chrome has ANGLE backend set to D3D9
+- why is timeout limit wrongly shown for a split second for the player that connects to a ranked after disconnect?
+
+- identify the "1" added to nicknames, might be indicative of some issue
+
+- [web] is shown wrong when on the integrated server
+	- ping is likely too but we never noticed it
+	- wrong indexing likely
 
 
 

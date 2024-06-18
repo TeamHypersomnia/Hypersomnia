@@ -421,8 +421,10 @@ Irrespectively of the OS, you will need the following software in order to build
 	- For Linux, use your distro-specific package. Make sure to install ```libc++```, ```libc++abi``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
-  - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-3_2_1.msi
-    - It needs to be this version specifically, otherwise CMake will fail to find static libraries.
+  - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-3_2_2.msi
+    - Link broken? Other OpenSSL versions can be found here: https://slproweb.com/products/Win32OpenSSL.html
+      - The game should generally build with any OpenSSL version 3.0 or later.
+    - If CMake can't find OpenSSL (despite passing proper ``-DOPENSSL_ROOT_DIR=C:\OpenSSL-v32-Win64``, **make sure to update CMake**. There were recently many issues with CMake not finding OpenSSL libraries, but newest CMake should already work fine.
 
 Once dependencies are installed, go to the directory where you wish to have your *Hypersomnia* project downloaded,
 open git bash and paste:

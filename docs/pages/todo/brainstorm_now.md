@@ -6,8 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Test on opera
-- Enable gzip compression
+- fix mmr not showing correctly for current user
+- update emscripten
+- make maps changeable on match summary
 
 - preparing for large traffic from crazygames
     - show full servers in gray
