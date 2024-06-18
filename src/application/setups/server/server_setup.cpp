@@ -711,28 +711,30 @@ server_setup::server_setup(
 	const bool use_webrtc = false;
 #endif
 
-	if (use_webrtc && vars.allow_webrtc_clients) {
-		webrtc_server = std::make_shared<webrtc_server_detail>();
-		webrtc_server->listen(
-			webrtc_server,
-			webrtc_signalling_server_url,
-			::get_ice_servers(),
-			vars.webrtc_port_range_begin,
-			vars.webrtc_port_range_end,
-			vars.webrtc_udp_mux
-		);
-	}
-
 	{
 		auto initial_vars_modified = initial_vars;
 		auto source_server_name = std::string(initial_vars_modified.server_name);
 		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
 		initial_vars_modified.server_name = source_server_name;
 
+		LOG("Server name: %x", source_server_name);
+
 		apply(initial_vars_modified, true);
 	}
 
 	apply(private_initial_vars);
+
+	if (use_webrtc && initial_vars.allow_webrtc_clients) {
+		webrtc_server = std::make_shared<webrtc_server_detail>();
+		webrtc_server->listen(
+			webrtc_server,
+			webrtc_signalling_server_url,
+			::get_ice_servers(),
+			initial_vars.webrtc_port_range_begin,
+			initial_vars.webrtc_port_range_end,
+			initial_vars.webrtc_udp_mux
+		);
+	}
 
 	if (private_initial_vars.master_rcon_password.empty()) {
 		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
