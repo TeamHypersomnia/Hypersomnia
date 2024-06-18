@@ -42,7 +42,7 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
-To be able to manage your server, remember to set the ``master_rcon_password`` in ``~/.config/Hypersomnia/user/config.force.lua`` - see ``default_config.lua`` for reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+To be able to manage your server, remember to set the ``master_rcon_password`` in ``~/.config/Hypersomnia/user/config.force.lua`` - see ``default_config.lua`` for complete reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
 ``--daily-autoupdate`` flag causes the server to update itself every 24 hours at 03:00 AM (your local time), if a newer game version is available. This flag is highly recommended so you don't have to keep up with frequent game updates (the game is in active development). You can also set the flag in RCON settings (press F8 and go to Vars tab).
 
@@ -70,9 +70,11 @@ With these values, you will only need to expose UDP ports ``8412`` and ``9000``.
 
 ## Setup folders for many server instances
 
-The server will use ``~/.config/Hypersomnia/user`` as its "AppData" folder by default, but this is problematic if you want to run several server instances using a single user.
+The server will use ``~/.config/Hypersomnia`` as its "AppData" folder by default - this is where it will store its ``user``, ``cache`` and ``logs`` folders.
 
-``--appdata-dir`` parameter comes to the rescue.
+This is problematic if you want to run several server instances as a single Linux user.
+
+``--appdata-dir`` parameter comes to the rescue!
 
 Let's first create appdata folders for every server instance we want to run.
 I recommend no more than 2 servers per vCore, with no more than 10 slots per server.
