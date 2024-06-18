@@ -59,7 +59,7 @@ For example:
   server = {
     webrtc_udp_mux = true,
     webrtc_port_range_begin = 9000
-    -- , webrtc_port_range_begin = 9020 -- only matters if webrtc_udp_mux = false
+    -- , webrtc_port_range_end = 9020 -- only matters if webrtc_udp_mux = false
   },
   server_start = {
     port = 8412
@@ -70,7 +70,11 @@ With these values, you will only need to expose UDP ports ``8412`` and ``9000``.
 
 ## Setup folders for many server instances
 
-Let's create appdata folders for every server instance we want to run.
+The server will use ``~/.config/Hypersomnia/user`` as its "AppData" folder by default, but this is problematic if you want to run several server instances using a single user.
+
+``--appdata-dir`` parameter comes to the rescue.
+
+Let's first create appdata folders for every server instance we want to run.
 I recommend no more than 2 servers per vCore, with no more than 10 slots per server.
 
 ```sh
