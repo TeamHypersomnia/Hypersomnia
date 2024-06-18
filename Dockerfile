@@ -13,7 +13,7 @@ RUN chmod +x Hypersomnia-Headless.AppImage
 RUN mkdir /root/.config
 RUN mkdir /root/.config/Hypersomnia
 RUN mkdir /root/.config/Hypersomnia/user
-COPY cmake/dockerfile_server_config.lua /root/.config/Hypersomnia/user/config.lua
+COPY cmake/dockerfile_server_config.lua /root/.config/Hypersomnia/user/config.force.lua
 
 CMD ["./Hypersomnia-Headless.AppImage"]
 
