@@ -4579,9 +4579,9 @@ bool server_setup::is_idle() const {
 }
 
 bool server_setup::can_use_map_command_now() const {
-	return get_arena_handle().on_mode(
-		[&](const auto& mode) {
-			return mode.can_use_map_command_now();
+	return get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			return mode.can_use_map_command_now(in);
 		}
 	);
 }

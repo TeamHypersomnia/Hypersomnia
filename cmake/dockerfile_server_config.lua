@@ -12,7 +12,7 @@ return {
   },
   server_start = {
     port = 8412,
-    slots = 20
+    slots = 10
   },
   skip_tutorial = true
 }

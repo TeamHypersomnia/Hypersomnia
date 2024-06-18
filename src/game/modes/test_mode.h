@@ -304,7 +304,7 @@ public:
 		return mode_player_id::dead();
 	}
 
-	bool can_use_map_command_now() const {
+	bool can_use_map_command_now(const const_input) const {
 		return true;
 	}
 

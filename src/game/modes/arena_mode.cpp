@@ -4204,12 +4204,20 @@ bool arena_mode::is_ranked_live() const {
 	return ranked_state == ranked_state_type::LIVE;
 }
 
-bool arena_mode::can_use_map_command_now() const { 
-	return state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
+bool arena_mode::can_use_map_command_now(const const_input_type in) const { 
+	if (is_last_summary(in)) {
+		return true;
+	}
+
+	const bool is_warmup = state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
+
+	return is_warmup;
 }
 
 bool arena_mode::is_idle() const {
-	return can_use_map_command_now() && players.empty() && suspended_players.empty() && abandoned_players.empty();
+	const bool is_warmup = state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
+
+	return is_warmup && players.empty() && suspended_players.empty() && abandoned_players.empty();
 }
 
 bool arena_mode::team_choice_allowed(const const_input_type in) const {
