@@ -791,7 +791,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     allow_webrtc_clients = true,
 
     -- If true, connections will use only single UDP port.
-    -- In that case set webrtc_port_range_begin and webrtc_port_range_end to the same value.
+    -- In that case, the chosen port will be set to webrtc_port_range_begin.
     webrtc_udp_mux = false,
 
     webrtc_port_range_begin = 9000,

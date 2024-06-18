@@ -401,11 +401,19 @@ public:
 		const std::string& signaling_server_url,
 		const std::vector<rtc::IceServer>& iceServers,
 		const port_type ports_begin,
-		const port_type ports_end,
+		port_type ports_end,
 		const bool udp_mux
 	) {
-		LOG("Web port range: %x-%x", ports_begin, ports_end);
-		LOG("Web UDP port mux: %x", udp_mux);
+		LOG("Web UDP port muxing: %x", udp_mux);
+
+		if (udp_mux) {
+			ports_end = ports_begin;
+			LOG("Web port range: %x (UDP muxing was enabled)", ports_begin);
+		}
+		else {
+			LOG("Web port range: %x-%x", ports_begin, ports_end);
+		}
+
 		self->config.iceServers = iceServers;
 #if PLATFORM_WEB
 		(void)ports_begin;

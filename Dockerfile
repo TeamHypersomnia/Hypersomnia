@@ -14,6 +14,9 @@ COPY cmake/dockerfile_server_config.lua /root/.config/Hypersomnia/user/config.fo
 
 CMD ["./Hypersomnia-Headless.AppImage", "--appimage-extract-and-run"]
 
+# For native clients via POSIX sockets
 EXPOSE 8412/udp
-EXPOSE 9000-9010/udp
+
+# For Web clients via WebRTC
+EXPOSE 9000/udp
 
