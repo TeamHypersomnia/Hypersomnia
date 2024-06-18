@@ -297,7 +297,6 @@ work_result work(
 
 	WEBSTATIC const bool is_steam_client = false;
 	WEBSTATIC const bool ranked_servers_enabled = true;
-	WEBSTATIC const auto steam_id = std::string("0");
 #else
 	WEBSTATIC const bool is_cli_tool = params.is_cli_tool();
 
@@ -360,12 +359,16 @@ work_result work(
 	WEBSTATIC const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
 #endif
 
+#if PLATFORM_WEB
+	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
+#else
 	if (is_steam_client) {
 		::USER_DIR = APPDATA_DIR / steam_id;
 	}
 	else {
 		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 	}
+#endif
 
 	/*
 		On Web, ::USER_DIR will be CWD/user,
@@ -2364,7 +2367,11 @@ work_result work(
 	WEBSTATIC auto perform_leaderboards = [&]() {
 		leaderboards_gui.perform({
 			config.client.nickname,
-			steam_id,
+#if PLATFORM_WEB
+			social_sign_in.cached_auth.profile_id,
+#else
+			typesafe_sprintf("steam_%x", steam_id),
+#endif
 
 			config.main_menu.leaderboards_provider_url,
 			streaming.necessary_images_in_atlas,

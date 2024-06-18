@@ -7,7 +7,7 @@ struct leaderboards_gui_internal;
 
 struct leaderboards_input {
 	const std::string nickname;
-	const std::string steam_id;
+	const std::string our_id;
 
 	const std::string provider_url;
 
@@ -50,6 +50,7 @@ enum class leaderboards_type {
 class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_state> {
 	std::unique_ptr<leaderboards_gui_internal> data;
 
+	std::string last_checked_id;
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
 

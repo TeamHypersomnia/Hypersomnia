@@ -62,6 +62,7 @@ extern "C" {
 	EMSCRIPTEN_KEEPALIVE
 	void on_auth_data_received(
 		const char* provider,
+		const char* profile_id,
 		const char* profile_name,
 		const char* avatar_url,
 		const char* auth_token,
@@ -70,7 +71,7 @@ extern "C" {
 		LOG("on_auth_data_received");
 
 #if !IS_PRODUCTION_BUILD
-		LOG_NVPS(provider, profile_name, avatar_url, auth_token, expires_in);
+		LOG_NVPS(provider, profile_id, profile_name, avatar_url, auth_token, expires_in);
 #endif
 
 		const auto now = augs::secs_since_epoch();
@@ -85,9 +86,12 @@ extern "C" {
 
 		std::scoped_lock lk(pending_auth_datas_lk);
 
+		const auto type = ::get_auth_provider_type(provider);
+
 		new_auth_data.emplace(web_auth_data {
-			::get_auth_provider_type(provider),
+			type,
 			profile_name,
+			typesafe_sprintf("%x%x", get_provider_preffix(type), profile_id),
 			avatar_url,
 			auth_token,
 			expire_timestamp

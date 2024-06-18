@@ -409,6 +409,7 @@ public:
 #if PLATFORM_WEB
 		(void)ports_begin;
 		(void)ports_end;
+		(void)udp_mux;
 #else
 		self->config.portRangeBegin = { ports_begin };
 		self->config.portRangeEnd = { ports_end };
@@ -1052,7 +1053,7 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 
 								if (doc.IsObject()) {
 									if (auto id = GetIf(doc, "id")) {
-										return std::string("discord_") + *id;
+										return get_provider_preffix(payload.type) + *id;
 									}
 								}
 

@@ -112,7 +112,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	using namespace httplib_utils;
 
 #if PLATFORM_WEB
-	const bool logged_in = in.is_logged_in;
+	const bool logged_in = in.is_logged_in && !in.our_id.empty();
 #else
 	const bool logged_in = true;
 #endif
@@ -127,20 +127,25 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	if (valid_and_is_ready(data->future_response)) {
 		all = ::to_players_list(data->future_response.get(), error_message);
-
-		for (auto& s : all.leaderboards_team) {
-			s.is_us = typesafe_sprintf("steam_%x", in.steam_id) == s.account_id;
-		}
-
-		for (auto& s : all.leaderboards_ffa) {
-			s.is_us = typesafe_sprintf("steam_%x", in.steam_id) == s.account_id;
-		}
+		last_checked_id = "";
 
 		refreshed_once = true;
 	}
 
 	if (!show) {
 		return;
+	}
+
+	if (last_checked_id != in.our_id) {
+		last_checked_id = in.our_id;
+
+		for (auto& s : all.leaderboards_team) {
+			s.is_us = logged_in && in.our_id == s.account_id;
+		}
+
+		for (auto& s : all.leaderboards_ffa) {
+			s.is_us = logged_in && in.our_id == s.account_id;
+		}
 	}
 
 	using namespace augs::imgui;
@@ -458,7 +463,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 				continue;
 			}
 
-			const bool is_us = typesafe_sprintf("steam_%x", in.steam_id) == s.account_id;
+			const bool is_us = logged_in && in.our_id == s.account_id;
+
 			const auto place_str = std::to_string(place);
 
 			auto sc = scoped_text_color(col);

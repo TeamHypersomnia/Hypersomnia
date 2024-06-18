@@ -348,16 +348,16 @@
         const avatarUrl = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
 
         // Pass data to C++ side
-        passAuthDataToCpp('discord', profileName, avatarUrl, accessToken, expiresIn);
+        passAuthDataToCpp('discord', profile.id, profileName, avatarUrl, accessToken, expiresIn);
       })
       .catch(error => {
         console.error('Error fetching Discord user profile:', error);
       });
     }
 
-    function passAuthDataToCpp(provider, profileName, avatarUrl, authToken, expiresIn) {
-      Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'number'],
-        [provider, profileName, avatarUrl, authToken, expiresIn]);
+    function passAuthDataToCpp(provider, profileId, profileName, avatarUrl, authToken, expiresIn) {
+      Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'string', 'number'],
+        [provider, profileId, profileName, avatarUrl, authToken, expiresIn]);
     }
 
     const channel = new BroadcastChannel('token_bridge');
