@@ -405,6 +405,7 @@ public:
 		const bool udp_mux
 	) {
 		LOG("Web port range: %x-%x", ports_begin, ports_end);
+		LOG("Web UDP port mux: %x", udp_mux);
 		self->config.iceServers = iceServers;
 #if PLATFORM_WEB
 		(void)ports_begin;

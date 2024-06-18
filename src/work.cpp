@@ -423,7 +423,7 @@ work_result work(
 	LOG("Creating lua state.");
 	WEBSTATIC auto lua = augs::create_lua_state();
 
-	LOG("Loading the config.");
+	LOG("Loading %x.", canon_config_path);
 
 	WEBSTATIC const auto canon_config_ptr = [&]() {
 		auto result_ptr = std::make_unique<config_lua_table>(
@@ -438,42 +438,27 @@ work_result work(
 
 	WEBSTATIC auto& canon_config = *canon_config_ptr;
 
-	if (!params.assign_teams.empty()) {
-		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
-	}
-
-#if BUILD_NETWORKING
-	WEBSTATIC const auto assigned_teams = 
-		params.assign_teams.empty() ? 
-		server_assigned_teams() :
-		server_assigned_teams(CALLING_CWD / params.assign_teams)
-	;
-
-	if (params.type == app_type::DEDICATED_SERVER && params.assign_teams.empty()) {
-		LOG("No players were assigned to teams for this dedicated server session.");
-	}
-	else {
-		LOG("Assigned teams: %x", assigned_teams.id_to_faction);
-	}
-#endif
-
 	WEBSTATIC auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
 
 		if (augs::exists(local_config_path)) {
+			LOG("Applying config: %x", local_config_path);
 			result->load_patch(lua, local_config_path);
 		}
 
 		if (!params.apply_config.empty()) {
 			const auto cli_config_path = CALLING_CWD / params.apply_config;
+			LOG("Applying config: %x", cli_config_path);
 			result->load_patch(lua, cli_config_path);
 		}
 
 		if (augs::exists(force_config_path)) {
+			LOG("Applying config: %x", force_config_path);
 			result->load_patch(lua, force_config_path);
 		}
 
 		if (augs::exists(private_config_path)) {
+			LOG("Applying config: %x", private_config_path);
 			result->load_patch(lua, private_config_path);
 		}
 
@@ -514,7 +499,26 @@ work_result work(
 		return result;
 	}();
 
-	LOG("Loaded user configs.");
+	LOG("Loaded all user configs.");
+
+	if (!params.assign_teams.empty()) {
+		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
+	}
+
+#if BUILD_NETWORKING
+	WEBSTATIC const auto assigned_teams = 
+		params.assign_teams.empty() ? 
+		server_assigned_teams() :
+		server_assigned_teams(CALLING_CWD / params.assign_teams)
+	;
+
+	if (params.type == app_type::DEDICATED_SERVER && params.assign_teams.empty()) {
+		LOG("No players were assigned to teams for this dedicated server session.");
+	}
+	else {
+		LOG("Assigned teams: %x", assigned_teams.id_to_faction);
+	}
+#endif
 
 	WEBSTATIC auto& config = *config_ptr;
 
