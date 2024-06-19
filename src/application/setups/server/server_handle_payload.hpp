@@ -69,7 +69,11 @@ message_handler_result server_setup::handle_payload(
 			new_nick = "Player";
 		}
 
-		if (find_client_state(new_nick) != nullptr) {
+		const bool nickname_changed = 
+			new_nick != c.settings.chosen_nickname
+		;
+
+		if (nickname_changed && find_client_state(new_nick) != nullptr) {
 			{
 				auto candidate = std::string(new_nick);
 
@@ -99,6 +103,12 @@ message_handler_result server_setup::handle_payload(
 
 				kick(client_id, reason);
 				return abort_v;
+			}
+		}
+
+		if (!c.settings.chosen_nickname.empty()) {
+			if (new_nick != c.settings.chosen_nickname) {
+				LOG("Nickname changed: %x to %x", c.settings.chosen_nickname, new_nick);
 			}
 		}
 

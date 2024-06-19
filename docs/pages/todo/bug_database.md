@@ -5,6 +5,10 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- identify the "1" added to nicknames, might be indicative of some issue
+	- nickname can be re-stated with requested_client_settings, but this wrongly detected the need for "1" once the player was already connected.
+	- requested_client_settings could be triggered even if the screen size changed even to change the nonzoomed area
+
 - Dangling clients
 	- Doesn't react to afk/network timeouts - likely downloading maps?
 	- When pressing Scramble teams, it automoves them to spectators again?
