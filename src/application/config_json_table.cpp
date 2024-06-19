@@ -7,6 +7,7 @@
 #include "application/config_json_table.h"
 #include "application/nat/stun_server_provider.h"
 
+#if !HEADLESS
 bool operator==(const ImVec2& a, const ImVec2& b) {
 	return a.x == b.x && a.y == b.y;
 }
@@ -30,6 +31,7 @@ bool operator==(const ImGuiStyle& a, const ImGuiStyle& b) {
 
 	return all_eq;
 }
+#endif
 
 namespace augs {
 	double steady_secs();

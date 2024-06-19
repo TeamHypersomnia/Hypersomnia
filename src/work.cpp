@@ -3971,7 +3971,12 @@ work_result work(
 			}
 			else {
 #if PLATFORM_WEB
-				launch_setup(activity_type::MAIN_MENU);
+				if (!config.skip_tutorial) {
+					launch_setup(activity_type::TUTORIAL);
+				}
+				else {
+					launch_setup(activity_type::MAIN_MENU);
+				}
 #else
 				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
 					if (!config.skip_tutorial) {
