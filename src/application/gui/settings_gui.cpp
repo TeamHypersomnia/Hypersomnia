@@ -285,7 +285,6 @@ std::string get_custom_binding_name(const app_intent_type) {
 
 void settings_gui_state::perform(
 	augs::window& window,
-	sol::state& lua,
 	const augs::audio_context& audio,
 	const augs::path_type& config_path_for_saving,
 	const config_lua_table& canon_config,
@@ -636,7 +635,7 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				if (ImGui::Button("Open user folder in explorer")) {
-					const auto config_path = USER_DIR / "config.lua";
+					const auto config_path = USER_DIR / "config.json";
 
 					if (!augs::exists(config_path)) {
 						LOG("%x doesn't exist, create a stub", config_path);
@@ -650,7 +649,7 @@ void settings_gui_state::perform(
 					auto saved_is_guest = config.prompted_for_sign_in_once;
 					auto cvars = config.client;
 
-					config = config_lua_table(lua, augs::path_type("default_config.lua"));
+					config = config_lua_table(augs::path_type("default_config.json"));
 					::make_canon_config(config, false);
 
 #if IS_PRODUCTION_BUILD
@@ -1732,13 +1731,13 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				{
-					auto& scope_cfg = config.http_client;
+					auto& scope_cfg = config.self_update;
 
 					revertable_checkbox("Automatically update when the game starts", scope_cfg.update_on_launch);
 					revertable_slider(SCOPE_CFG_NVP(update_connection_timeout_secs), 1, 3600);
 
-					input_text<100>(SCOPE_CFG_NVP(self_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_host);
-					input_text<100>(SCOPE_CFG_NVP(self_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_path);
+					input_text<100>(SCOPE_CFG_NVP(update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.self_update.update_host);
+					input_text<100>(SCOPE_CFG_NVP(update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.self_update.update_path);
 
 					ImGui::Separator();
 
@@ -1958,7 +1957,7 @@ void settings_gui_state::perform(
 			if (ImGui::Button("Save settings")) {
 				augs::timer save_timer;
 				last_saved_config = config;
-				config.save_patch(lua, canon_config, config_path_for_saving);
+				config.save_patch(canon_config, config_path_for_saving);
 				LOG("Saved new config in: %x ms", save_timer.get<std::chrono::milliseconds>());
 			}
 

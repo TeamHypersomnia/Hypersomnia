@@ -42,7 +42,7 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
-To be able to manage your server, remember to set the ``master_rcon_password`` in ``~/.config/Hypersomnia/user/config.force.lua`` - see ``default_config.lua`` for complete reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+To be able to manage your server, remember to set the ``master_rcon_password`` in ``~/.config/Hypersomnia/user/config.force.json`` - see ``default_config.json`` for complete reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
 ``--daily-autoupdate`` flag causes the server to update itself every 24 hours at 03:00 AM (your local time), if a newer game version is available. This flag is highly recommended so you don't have to keep up with frequent game updates (the game is in active development). You can also set the flag in RCON settings (press F8 and go to Vars tab).
 
@@ -102,8 +102,8 @@ nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appda
 nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appdata-dir ./servers/4 --daily-autoupdate > /dev/null 2>&1 &
 ```
 
-The servers will share ``config.common.lua`` and *later* apply their server-specific config in e.g. ``./servers/2/user/config.force.lua``.
+The servers will share ``config.common.lua`` and *later* apply their server-specific config in e.g. ``./servers/2/user/config.force.json``.
 
 They will also share the community maps so as to not have to download them again.
 
-**Make sure ./servers/2/user/config.force.lua, ./servers/3/user/config.force.lua etc. specify different ports!**
+**Make sure ./servers/2/user/config.force.json, ./servers/3/user/config.force.json etc. specify different ports!**

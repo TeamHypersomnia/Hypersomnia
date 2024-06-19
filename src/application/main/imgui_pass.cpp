@@ -20,7 +20,6 @@ void perform_imgui_pass(
 	const augs::path_type& path_for_saving_config,
 	settings_gui_state& settings_gui,
 	const augs::audio_context& audio,
-	sol::state& lua,
 	std::function<void()> custom_imgui_logic,
 	std::function<void()> custom_imgui_logic_hide_in_menu,
 
@@ -60,7 +59,6 @@ void perform_imgui_pass(
 	) {
 		settings_gui.perform(
 			window,
-			lua,
 			audio,
 			path_for_saving_config,
 			canon_config,
@@ -97,7 +95,7 @@ void perform_imgui_pass(
 					config.float_consistency_test.passes = 0;
 					last_saved_config.float_consistency_test.passes = 0;
 
-					last_saved_config.save_patch(lua, canon_config, path_for_saving_config);
+					last_saved_config.save_patch(canon_config, path_for_saving_config);
 				}
 			}
 		}

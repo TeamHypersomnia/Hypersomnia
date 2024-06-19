@@ -8,4 +8,6 @@ struct content_regeneration_settings {
 	unsigned atlas_blitting_threads = 2;
 	unsigned neon_regeneration_threads = 2;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const content_regeneration_settings& b) const = default;
 };

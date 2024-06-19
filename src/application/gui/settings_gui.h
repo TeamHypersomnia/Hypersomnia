@@ -100,7 +100,6 @@ public:
 
 	void perform(
 		augs::window& window,
-		sol::state& lua,
 		const augs::audio_context& audio,
 		const augs::path_type& path_for_saving,
 		const config_lua_table& canon_config,

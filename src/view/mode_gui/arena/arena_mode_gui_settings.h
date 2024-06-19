@@ -11,6 +11,8 @@ struct buy_menu_gui_settings {
 	rgba already_owns_other_type_bg = rgba(0, 170, 0, 90);
 	rgba already_owns_other_type_active_bg = rgba(0, 180, 0, 150);
 	// END GEN INTROSPECTOR
+	
+	bool operator==(const buy_menu_gui_settings& b) const = default;
 };
 
 struct scoreboard_gui_settings {
@@ -40,6 +42,8 @@ struct scoreboard_gui_settings {
 	float avatar_alpha = 1.f;
 	bool dark_color_overlay_under_score = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const scoreboard_gui_settings& b) const = default;
 };
 
 struct arena_context_tip_settings {
@@ -49,6 +53,8 @@ struct arena_context_tip_settings {
 	rgba bound_key_color = yellow;
 	rgba item_name_color = yellow;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const arena_context_tip_settings& b) const = default;
 };
 
 struct arena_mode_gui_settings {
@@ -77,5 +83,7 @@ struct arena_mode_gui_settings {
 
 	bool show_spectator_overlay = true;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const arena_mode_gui_settings& b) const = default;
 };
 

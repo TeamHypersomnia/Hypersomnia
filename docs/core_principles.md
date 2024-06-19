@@ -41,7 +41,7 @@ In particular, most of the tweaks will be possible almost exclusively by direct 
 That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
 - hardcoded C++ enumerations of [render layers](render_layer) with well-defined roles;
 - a very game-specific, natively coded [rendering routine](illuminated_rendering) in C++ that uses these render layers and speaks directly to OpenGL without any kind of general rendering framework;
-- little to none script support (except configuration files, e.g. [``config.lua``](config_lua)), at least not until there is such a demand in the community.
+- little to none script support (except configuration files, e.g. [``config.json``](config.json)), at least not until there is such a demand in the community.
 
 To reach out to the non-tech-savvy audience, a full-flegded [editor](editor) is developed. 
 

@@ -25,6 +25,8 @@ struct world_camera_settings {
 	float edge_zoom_in_cutoff_mult = 0.03f;
 	float edge_zoom_in_zone_expansion = 5.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const world_camera_settings& b) const = default;
 };
 
 struct world_camera {

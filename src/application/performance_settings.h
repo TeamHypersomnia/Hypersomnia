@@ -20,6 +20,8 @@ struct performance_settings {
 	swap_buffers_moment swap_window_buffers_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const performance_settings& b) const = default;
+
 	int get_num_pool_workers() const;
 	static int get_default_num_pool_workers();
 };

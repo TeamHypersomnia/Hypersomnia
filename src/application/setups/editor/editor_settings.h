@@ -22,6 +22,8 @@ struct editor_autosave_settings {
 	bool alert_when_loaded_autosave = true;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const editor_autosave_settings& b) const = default;
+
 	bool interval_changed(const editor_autosave_settings b) const {
 		return once_every_min != b.once_every_min || periodically != b.periodically;
 	}
@@ -32,6 +34,8 @@ struct editor_go_to_settings {
 	unsigned dialog_width = 400;
 	unsigned num_lines = 15;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_go_to_settings& b) const = default;
 };
 
 struct editor_entity_selector_settings {
@@ -41,18 +45,24 @@ struct editor_entity_selector_settings {
 	rgba hovered_color = { 255, 255, 255, 80 };
 	rgba hovered_dashed_line_color = { 255, 255, 255, 140 };
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_entity_selector_settings& b) const = default;
 };
 
 struct editor_camera_settings {
 	// GEN INTROSPECTOR struct editor_camera_settings
 	float panning_speed = 1.f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_camera_settings& b) const = default;
 };
 
 struct editor_grid_settings {
 	// GEN INTROSPECTOR struct editor_grid_settings
 	grid_render_settings render;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_grid_settings& b) const = default;
 };
 
 struct editor_action_notification_settings {
@@ -67,6 +77,8 @@ struct editor_action_notification_settings {
 	vec2i text_padding = vec2i(5, 5);
 	vec2i offset = vec2i(80, 80);
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_action_notification_settings& b) const = default;
 };
 
 struct editor_settings {
@@ -90,4 +102,6 @@ struct editor_settings {
 	std::string upload_api_key;
 	std::string upload_url;
 	// END GEN INTROSPECTOR
+	
+	bool operator==(const editor_settings& b) const = default;
 };

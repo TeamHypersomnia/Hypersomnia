@@ -74,13 +74,11 @@ struct config_read_error : public std::runtime_error {
 	{}
 };
 
-namespace sol {
-	class state;
-}
+bool operator==(const ImGuiStyle& a, const ImGuiStyle& b);
 
 struct config_lua_table {
 	config_lua_table() = default;
-	config_lua_table(sol::state&, const augs::path_type& config_lua_path);
+	config_lua_table(const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
 	bool streamer_mode = false;
@@ -105,11 +103,9 @@ struct config_lua_table {
 	nat_detection_settings nat_detection;
 	nat_traversal_settings nat_traversal;
 
-	host_with_default_port extra_address_resolution_port;
-
 	masterserver_settings masterserver;
 
-	http_client_settings http_client;
+	http_client_settings self_update;
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
 	augs::renderer_settings renderer;
@@ -141,7 +137,9 @@ struct config_lua_table {
 	session_settings session;
 	test_scene_settings test_scene;
 	editor_settings editor;
+#if BUILD_DEBUGGER_SETUP
 	debugger_settings debugger;
+#endif
 	all_gui_fonts_inputs gui_fonts;
 	input_settings input;
 
@@ -173,14 +171,11 @@ struct config_lua_table {
 
 	// END GEN INTROSPECTOR
 
-	bool operator==(const config_lua_table& b) const;
-	bool operator!=(const config_lua_table& b) const;
+	bool operator==(const config_lua_table& b) const = default;
 
 	activity_type get_last_activity() const;
 	input_recording_type get_input_recording_mode() const;
 
-	void save_patch(sol::state&, const config_lua_table& source, const augs::path_type& target_path) const;
-
-	void load(sol::state&, const augs::path_type& config_lua_path);
-	void load_patch(sol::state&, const augs::path_type& config_lua_path);
+	void save_patch(const config_lua_table& source, const augs::path_type& target_path) const;
+	void load_patch(const augs::path_type& config_lua_path);
 };

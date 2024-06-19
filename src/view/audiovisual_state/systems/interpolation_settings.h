@@ -17,6 +17,8 @@ struct interpolation_settings {
 	float speed = 525.f;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const interpolation_settings& b) const = default;
+
 	bool enabled() const {
 		return method != interpolation_method::NONE;
 	}

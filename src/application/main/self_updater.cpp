@@ -79,7 +79,7 @@ self_update_result check_and_apply_updates(
 
 	self_update_result result;
 
-	const auto& host_url = http_settings.self_update_host;
+	const auto& host_url = http_settings.update_host;
 
 	LOG("Checking for updates at %x.", host_url);
 
@@ -88,7 +88,7 @@ self_update_result check_and_apply_updates(
 		http_settings.update_connection_timeout_secs
 	);
 
-	const auto& update_path = http_settings.self_update_path;
+	const auto& update_path = http_settings.update_path;
 
 #if PLATFORM_LINUX
 	const bool is_appimage = !current_appimage_path.empty();

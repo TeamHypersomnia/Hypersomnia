@@ -8,4 +8,6 @@ struct input_settings {
 	bool swap_mouse_buttons_in_akimbo = true;
 	game_gui_input_settings game_gui;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const input_settings& b) const = default;
 };

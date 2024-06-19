@@ -14,5 +14,7 @@ struct hud_message_settings {
 	vec2 box_padding = vec2(32, 4);
 	float box_separation = 1.f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const hud_message_settings& b) const = default;
 };
 

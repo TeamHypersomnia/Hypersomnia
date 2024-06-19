@@ -7,4 +7,6 @@ struct session_settings {
 	bool hide_settings_ingame = false;
 	float camera_query_aabb_mult = 0.1f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const session_settings& b) const = default;
 };

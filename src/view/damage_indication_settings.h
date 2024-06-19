@@ -24,4 +24,6 @@ struct damage_indication_settings {
 	float white_damage_highlight_secs = 0.11f;
 	float character_silhouette_damage_highlight_secs = 0.11f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const damage_indication_settings& b) const = default;
 };

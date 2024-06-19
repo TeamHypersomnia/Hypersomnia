@@ -41,6 +41,8 @@ struct debug_drawing_settings {
 	bool draw_camera_query = false;
 	bool draw_headshot_detection = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const debug_drawing_settings& b) const = default;
 };
 
 extern debug_drawing_settings DEBUG_DRAWING;

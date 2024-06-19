@@ -14,4 +14,6 @@ struct hotbar_settings {
 	rgba primary_selected_color = rgba(0, 255, 255, 255);
 	rgba secondary_selected_color = rgba(86, 156, 214, 255);
 	// END GEN INTROSPECTOR
+
+	bool operator==(const hotbar_settings& b) const = default;
 };

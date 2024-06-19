@@ -44,6 +44,8 @@ struct effect_prediction_settings {
 	bool predict_death_particles = false;
 	bool predict_death_sounds = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const effect_prediction_settings& b) const = default;
 };
 
 struct predictability_info {

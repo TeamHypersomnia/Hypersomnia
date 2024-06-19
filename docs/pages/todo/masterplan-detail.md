@@ -399,7 +399,7 @@ Chyba jednak nie robimy osobno pliku resources.
 				- bo i tak bym trzymal chyba wszystko na jednym poziomie
 
 - Uzywamy LUA:
-	- Do user configow (default_config.lua i user/config.lua) 
+	- Do user configow (default_config.json i user/config.json) 
 		- bo one sa trusted i przydaja sie takie rzeczy jak pobieranie rcon passworda
 
 - Uzywamy SANDBOXED LUA (pozniej). Jednym slowem dokakszamy sandboxing ZEBY NAWET NIE TRZEBA BYLO OSTRZEGAC.

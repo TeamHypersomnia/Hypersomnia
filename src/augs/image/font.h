@@ -43,6 +43,8 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::font_settings
 		pad_bytes<4> pad;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const font_settings& b) const = default;
 	};
 
 	struct font_metrics {
@@ -128,19 +130,7 @@ namespace augs {
 		ranges_add_condition add_cyrillic_ranges = ranges_add_condition::NEVER;
 		// END GEN INTROSPECTOR
 
-		bool operator==(const font_loading_input& b) const {
-			return 
-				source_font_path == b.source_font_path 
-				&& unicode_ranges == b.unicode_ranges 
-				&& size_in_pixels == b.size_in_pixels
-				&& add_japanese_ranges == b.add_japanese_ranges
-				&& add_cyrillic_ranges == b.add_cyrillic_ranges
-			;
-		}
-
-		bool operator!=(const font_loading_input& b) const {
-			return !operator==(b);
-		}
+		bool operator==(const font_loading_input& b) const = default;
 	};
 
 	struct font {

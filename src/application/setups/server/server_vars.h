@@ -194,6 +194,8 @@ struct url_and_key_pair {
 	std::string url;
 	std::string api_key;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const url_and_key_pair& b) const = default;
 };
 
 struct server_private_vars {
@@ -217,4 +219,6 @@ struct server_private_vars {
 
 	std::string check_ban_url = "https://hypersomnia.xyz/check_ban";
 	// END GEN INTROSPECTOR
+
+	bool operator==(const server_private_vars& b) const = default;
 };

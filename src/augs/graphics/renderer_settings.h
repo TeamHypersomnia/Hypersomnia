@@ -13,5 +13,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::renderer_settings
 		filtering_type default_filtering = filtering_type::NEAREST_NEIGHBOR;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const renderer_settings& b) const = default;
 	};
 }

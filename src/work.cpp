@@ -51,7 +51,6 @@
 
 #include "augs/misc/date_time.h"
 #include "augs/misc/imgui/imgui_utils.h"
-#include "augs/misc/lua/lua_utils.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
@@ -142,8 +141,6 @@
 #if BUILD_DEBUGGER_SETUP
 #include "application/setups/debugger/debugger_player.hpp"
 #endif
-
-#include "augs/misc/lua/lua_utils.h"
 
 #include "application/nat/nat_detection_session.h"
 #include "application/nat/nat_traversal_session.h"
@@ -415,21 +412,15 @@ work_result work(
 		}
 	}
 
-	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.lua");
-	WEBSTATIC const auto local_config_path = USER_DIR / "config.lua";
-	WEBSTATIC const auto force_config_path = USER_DIR / "config.force.lua";
-	WEBSTATIC const auto private_config_path = USER_DIR / "config.private.lua";
-
-	LOG("Creating lua state.");
-	WEBSTATIC auto lua = augs::create_lua_state();
+	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.json");
+	WEBSTATIC const auto local_config_path = USER_DIR / "config.json";
+	WEBSTATIC const auto force_config_path = USER_DIR / "config.force.json";
+	WEBSTATIC const auto private_config_path = USER_DIR / "config.private.json";
 
 	LOG("Loading %x.", canon_config_path);
 
 	WEBSTATIC const auto canon_config_ptr = [&]() {
-		auto result_ptr = std::make_unique<config_lua_table>(
-			lua,
-			canon_config_path
-		);
+		auto result_ptr = std::make_unique<config_lua_table>(canon_config_path);
 
 		::make_canon_config(*result_ptr, params.type == app_type::DEDICATED_SERVER);
 
@@ -443,23 +434,23 @@ work_result work(
 
 		if (augs::exists(local_config_path)) {
 			LOG("Applying config: %x", local_config_path);
-			result->load_patch(lua, local_config_path);
+			result->load_patch(local_config_path);
 		}
 
 		if (!params.apply_config.empty()) {
 			const auto cli_config_path = CALLING_CWD / params.apply_config;
 			LOG("Applying config: %x", cli_config_path);
-			result->load_patch(lua, cli_config_path);
+			result->load_patch(cli_config_path);
 		}
 
 		if (augs::exists(force_config_path)) {
 			LOG("Applying config: %x", force_config_path);
-			result->load_patch(lua, force_config_path);
+			result->load_patch(force_config_path);
 		}
 
 		if (augs::exists(private_config_path)) {
 			LOG("Applying config: %x", private_config_path);
-			result->load_patch(lua, private_config_path);
+			result->load_patch(private_config_path);
 		}
 
 		if (params.no_router) {
@@ -620,7 +611,7 @@ work_result work(
 	WEBSTATIC const bool should_run_self_updater = 
 		params.update_once_now ||
 		params.only_check_update_availability_and_quit ||
-		(config.http_client.update_on_launch && !params.no_update_on_launch)
+		(config.self_update.update_on_launch && !params.no_update_on_launch)
 	;
 
 	if (should_run_self_updater) {
@@ -636,7 +627,7 @@ work_result work(
 			params.appimage_path,
 			only_check,
 			imgui_atlas_image.get(),
-			config.http_client,
+			config.self_update,
 			config.window,
 			should_update_headless
 		);
@@ -707,7 +698,7 @@ work_result work(
 		setter(config);
 		setter(last_saved_config);
 
-		last_saved_config.save_patch(lua, canon_config, local_config_path);
+		last_saved_config.save_patch(canon_config, local_config_path);
 	};
 	(void)change_with_save;
 
@@ -1093,7 +1084,7 @@ work_result work(
 			if (server.should_check_for_updates_once()) {
 				LOG("Launching an async check for updates.");
 
-				auto config_http_client = config.http_client;
+				auto config_http_client = config.self_update;
 
 				/* Give it a little longer, it's async anyway. */
 				config_http_client.update_connection_timeout_secs = 10;
@@ -1345,7 +1336,7 @@ work_result work(
 		}
 
 		if (update) {
-			last_saved_config.save_patch(lua, canon_config, local_config_path);
+			last_saved_config.save_patch(canon_config, local_config_path);
 		}
 	});
 
@@ -1800,7 +1791,7 @@ work_result work(
 			main_menu_gui.has_play_ranked_button = ranked_servers_enabled;
 			
 			setup_launcher([&]() {
-				emplace_main_menu(lua, *official, config.main_menu);
+				emplace_main_menu(*official, config.main_menu);
 			});
 
 			map_catalogue_gui.request_refresh();
@@ -2101,7 +2092,7 @@ work_result work(
 #endif
 
 			case activity_type::DEBUGGER:
-				launch_debugger(lua);
+				launch_debugger();
 
 				break;
 
@@ -2707,7 +2698,6 @@ work_result work(
 			streaming.ad_hoc.in_atlas.animation_time = ad_hoc_animation_timer.get<std::chrono::seconds>();
 
 			auto imgui_in = perform_custom_imgui_input {
-				lua,
 				window,
 				streaming.images_in_atlas,
 				streaming.ad_hoc.in_atlas,
@@ -2931,7 +2921,6 @@ work_result work(
 			local_config_path,
 			settings_gui,
 			audio,
-			lua,
 			[&]() {
 #if BUILD_NATIVE_SOCKETS
 				auto do_nat_detection_logic = [&]() {
@@ -3950,7 +3939,7 @@ work_result work(
 			LOG("No Steam CLI detected.");
 
 			if (!params.debugger_target.empty()) {
-				launch_debugger(lua, params.debugger_target);
+				launch_debugger(params.debugger_target);
 			}
 			else if (params.start_server) {
 				launch_setup(activity_type::SERVER);
@@ -5583,10 +5572,6 @@ catch (const necessary_resource_loading_error& err) {
 	return work_result::FAILURE;
 }
 #endif
-catch (const augs::lua_state_creation_error& err) {
-	LOG("Failed to create a lua state for the game!\n%x", err.what());
-	return work_result::FAILURE;
-}
 catch (const augs::unit_test_session_error& err) {
 	LOG("Unit test session failure:\n%x\ncout:%x\ncerr:%x\nclog:%x\n", 
 		err.what(), err.cout_content, err.cerr_content, err.clog_content

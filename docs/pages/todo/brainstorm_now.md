@@ -216,7 +216,7 @@ summary: That which we are brainstorming at the moment.
 - optimize de_rambo
 - Editor: copy path to clipboard
 
-- allow changing rcon pass from rcon? won't work with config.force.lua tho
+- allow changing rcon pass from rcon? won't work with config.force.json tho
 - fix that masterserver dump vs banlist or just dont use dump at all
 - rcon command to sync maps would be good
 
@@ -273,7 +273,7 @@ summary: That which we are brainstorming at the moment.
     - Config organization
         - Current system is not so bad
             - How to make RCON changes persistent?
-                - config.lua could store it
+                - config.json could store it
     - Auto-updating
         - Broadcasting on-demand might be tempting but scheduled periodic checks will feel better/safer for people
             - It will also allow for controllable server maintenance periods
@@ -411,7 +411,7 @@ summary: That which we are brainstorming at the moment.
 
 - maybe migrate server to appimage after all
     - but we'll still have a problem with syncing the new config force lua from the repo
-        - maybe we can sync only this file and have our own config.lua
+        - maybe we can sync only this file and have our own config.json
     - just prepare one with -g for the server
     - will still require less space than tar.gz + sfx
     - just find out how to not strip debug symbols from the appimage 
@@ -2303,7 +2303,7 @@ Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 
 - The aborted sounds end abruplty if we have less than 1.0 master/sfx gain in settings
 
-- (Update script) Sync config.lua against the user folder in the home dir, not in hypersomnia dir
+- (Update script) Sync config.json against the user folder in the home dir, not in hypersomnia dir
     - otherwise we have to call vim_build AND vim_run later
 
 - Post-map-format-fixes

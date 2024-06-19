@@ -24,6 +24,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "application/config_lua_table.h"
+#include "augs/readwrite/json_readwrite.h"
 
 #include "application/setups/main_menu_setup.h"
 
@@ -32,7 +33,6 @@
 #include "application/gui/menu/appearing_text.h"
 #include "application/gui/menu/creators_screen.h"
 
-#include "augs/readwrite/lua_readwrite.h"
 #include "hypersomnia_version.h"
 #include "application/main/self_updater.h"
 
@@ -47,9 +47,13 @@ entity_id main_menu_setup::get_viewed_character_id() const {
 	return viewed_character_id;
 }
 
+struct main_menu_setup_detail {
+	rapidjson::Document patch;
+};
+
 void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;
-	augs::read_lua(menu_config_patch, config);
+	augs::read_json(detail->patch, config);
 	
 	/* Treat new volume as a multiplier */
 
@@ -87,10 +91,9 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 }
 
 main_menu_setup::main_menu_setup(
-	sol::state& lua,
 	const packaged_official_content& official,
 	const main_menu_settings settings
-) {
+) : detail(std::make_unique<main_menu_setup_detail>()) {
 	LOG("main_menu_setup ctor");
 
 	if (!settings.menu_theme_path.empty()) {
@@ -104,19 +107,15 @@ main_menu_setup::main_menu_setup(
 
 	//query_latest_news(settings.latest_news_url);
 
-	const auto menu_config_patch_path = "content/menu/config.lua";
+	const auto menu_config_patch_path = augs::path_type("content/menu/config.json");
 
 	try {
 		LOG("Reading from %x", menu_config_patch_path);
-		const auto menu_cfg_str = augs::file_to_string(menu_config_patch_path);
-		auto pfr = lua.do_string(menu_cfg_str);
-		
-		if (pfr.valid()) {
-			menu_config_patch = pfr;
-		}
-		else {
-			LOG("Warning: problem loading %x: \n%x.", menu_config_patch_path, pfr.operator std::string());
-		}
+
+		detail->patch = augs::json_document_from(menu_config_patch_path);
+	}
+	catch (const augs::json_deserialization_error& err) {
+		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
 	}
 	catch (const augs::file_open_error& err) {
 		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
@@ -210,6 +209,8 @@ main_menu_setup::main_menu_setup(
 		}
 	}
 }
+
+main_menu_setup::~main_menu_setup() = default;
 
 void main_menu_setup::draw_overlays(
 	const self_update_result& last_update_result,

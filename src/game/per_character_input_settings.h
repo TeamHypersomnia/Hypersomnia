@@ -7,14 +7,5 @@ struct per_character_input_settings {
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const per_character_input_settings& b) const {
-		return 
-			crosshair_sensitivity == b.crosshair_sensitivity 
-			&& forward_moves_towards_crosshair == b.forward_moves_towards_crosshair
-		;
-	}
-
-	bool operator!=(const per_character_input_settings& b) const {
-		return !operator==(b);
-	}
+	bool operator==(const per_character_input_settings& b) const = default;
 };

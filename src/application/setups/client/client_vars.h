@@ -39,6 +39,8 @@ struct client_chat_settings {
 	float keep_recent_chat_messages_for_seconds = 8.f;
 	float chat_messages_fade_last_seconds = 2.f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const client_chat_settings& b) const = default;
 };
 
 struct client_vars {
@@ -68,4 +70,6 @@ struct client_vars {
 
 	float max_direct_file_bandwidth = 2.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const client_vars& b) const = default;
 };

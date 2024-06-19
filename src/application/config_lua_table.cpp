@@ -1,26 +1,56 @@
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/templates/corresponding_field.h"
 
-#include "augs/misc/lua/lua_utils.h"
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #include "augs/window_framework/window.h"
 
 #include "application/config_lua_table.h"
 #include "application/nat/stun_server_provider.h"
 
+bool operator==(const ImVec2& a, const ImVec2& b) {
+	return a.x == b.x && a.y == b.y;
+}
+
+bool operator==(const ImVec4& a, const ImVec4& b) {
+	return rgba(a) == rgba(b);
+}
+
+bool operator==(const ImGuiStyle& a, const ImGuiStyle& b) {
+	bool all_eq = true;
+
+	augs::introspect(
+		[&all_eq](const auto&, const auto& aa, const auto& bb) {
+			if (!(aa == bb)) {
+				all_eq = false;
+			}
+		},
+		a,
+		b
+	);
+
+	return all_eq;
+}
+
 namespace augs {
 	double steady_secs();
 }
 
-config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
-	load(lua, config_lua_path);
+config_lua_table::config_lua_table(const augs::path_type& config_lua_path) {
+	load_patch(config_lua_path);
 }
 
-void config_lua_table::load_patch(sol::state& lua, const augs::path_type& config_lua_path) {
+void config_lua_table::load_patch(const augs::path_type& config_lua_path) {
 	try {
-		augs::load_from_lua_patch(lua, *this, config_lua_path);
+		constexpr auto rapidjson_flags = 
+			rapidjson::kParseDefaultFlags |
+			rapidjson::kParseCommentsFlag | 
+			rapidjson::kParseTrailingCommasFlag
+		;
+
+		auto doc = augs::json_document_from<rapidjson_flags>(augs::file_to_string(config_lua_path));
+		augs::read_json(doc, *this);
 	}
-	catch (const augs::lua_deserialization_error& err) {
+	catch (const augs::json_deserialization_error& err) {
 		throw config_read_error(config_lua_path, err.what());
 	}
 	catch (const augs::file_open_error& err) {
@@ -28,20 +58,8 @@ void config_lua_table::load_patch(sol::state& lua, const augs::path_type& config
 	}
 }
 
-void config_lua_table::load(sol::state& lua, const augs::path_type& config_lua_path) {
-	try {
-		augs::load_from_lua_table(lua, *this, config_lua_path);
-	}
-	catch (const augs::lua_deserialization_error& err) {
-		throw config_read_error(config_lua_path, err.what());
-	}
-	catch (const augs::file_open_error& err) {
-		throw config_read_error(config_lua_path, err.what());
-	}
-}
-
-void config_lua_table::save_patch(sol::state& lua, const config_lua_table& source, const augs::path_type& target_path) const {
-	augs::save_as_lua_patch(lua, source, *this, target_path);
+void config_lua_table::save_patch(const config_lua_table& source, const augs::path_type& target_path) const {
+	augs::save_as_json_diff(target_path, *this, source);
 }
 
 activity_type config_lua_table::get_last_activity() const {
@@ -50,14 +68,6 @@ activity_type config_lua_table::get_last_activity() const {
 
 input_recording_type config_lua_table::get_input_recording_mode() const {
 	return debug.input_recording_mode;
-}
-
-bool config_lua_table::operator==(const config_lua_table& b) const {
-	return augs::introspective_equal(*this, b);
-}
-
-bool config_lua_table::operator!=(const config_lua_table& b) const {
-	return !operator==(b);
 }
 
 stun_server_provider::stun_server_provider(const augs::path_type& list_file) {

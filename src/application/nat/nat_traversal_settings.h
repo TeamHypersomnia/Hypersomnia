@@ -10,5 +10,7 @@ struct nat_traversal_settings {
 
 	double traversal_attempt_timeout_secs = 5;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const nat_traversal_settings& b) const = default;
 };
 

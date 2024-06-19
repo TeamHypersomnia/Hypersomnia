@@ -13,41 +13,13 @@ struct ImVec4;
 
 namespace augs {
 	template <class T>
-	inline void to_json_value(T& out, const ImVec4& in) {
-		auto* from = reinterpret_cast<const float*>(&in);
-
-		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
-		out.StartArray();
-		out.Float(from[0]);
-		out.Float(from[1]);
-		out.Float(from[2]);
-		out.Float(from[3]);
-		out.EndArray();
-		out.SetFormatOptions(rapidjson::kFormatDefault);
-	}
-
-	template <class T>
-	void from_json_value(T& from, ImVec4& in) {
-		auto* out = reinterpret_cast<float*>(&in);
-
-		if (from.IsArray()) {
-			if (from.Size() == 4 && from[0].IsNumber() && from[1].IsNumber() && from[2].IsNumber() && from[3].IsNumber()) {
-				out[0] = from[0].GetFloat();
-				out[1] = from[1].GetFloat();
-				out[2] = from[2].GetFloat();
-				out[3] = from[3].GetFloat();
-			}
-		}
-	}
-
-	template <class T>
 	inline void to_json_value(T& out, const ImVec2& in) {
 		auto* from = reinterpret_cast<const float*>(&in);
 
 		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 		out.StartArray();
-		out.Float(from[0]);
-		out.Float(from[1]);
+		out.Double(from[0]);
+		out.Double(from[1]);
 		out.EndArray();
 		out.SetFormatOptions(rapidjson::kFormatDefault);
 	}
@@ -161,6 +133,31 @@ namespace augs {
 				if (from[0].IsNumber() && from[1].IsNumber()) {
 					out.set(static_cast<unsigned>(from[0].GetDouble()), static_cast<unsigned>(from[1].GetDouble()));
 				}
+			}
+		}
+	}
+
+	template <class T>
+	inline void to_json_value(T& out, const ImVec4& in) {
+		auto* from = reinterpret_cast<const float*>(&in);
+
+		to_json_value(out, rgba(vec4{from[0], from[1], from[2], from[3]}));
+	}
+
+	template <class T>
+	void from_json_value(T& from, ImVec4& in) {
+		auto* out = reinterpret_cast<float*>(&in);
+
+		if (from.IsArray()) {
+			if (from.Size() == 4 && from[0].IsNumber() && from[1].IsNumber() && from[2].IsNumber() && from[3].IsNumber()) {
+				rgba rr;
+				from_json_value(from, rr);
+				auto v = rr.operator vec4();
+
+				out[0] = v[0];
+				out[1] = v[1];
+				out[2] = v[2];
+				out[3] = v[3];
 			}
 		}
 	}

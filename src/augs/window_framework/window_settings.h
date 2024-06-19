@@ -46,5 +46,7 @@ namespace augs {
 		}
 
 		bool draws_own_cursor() const;
+
+		bool operator==(const window_settings& b) const = default;
 	};
 }

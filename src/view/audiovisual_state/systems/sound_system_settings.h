@@ -39,4 +39,6 @@ struct sound_system_settings {
 	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
 	int custom_processing_frequency = 10;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const sound_system_settings& b) const = default;
 };

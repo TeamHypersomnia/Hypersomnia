@@ -3891,7 +3891,7 @@ Say the game is in ``C:\hyp`` folder, so e.g. the executable is at ``C:\hyp\Hype
 
 Old client does:
 - Unpack the new, downloaded game to a new folder: ``C:\hyp\NEW``
-- Copy the player preferences from ``C:\hyp\user\config.lua`` to ``C:\hyp\NEW\user\config.lua``
+- Copy the player preferences from ``C:\hyp\user\config.json`` to ``C:\hyp\NEW\user\config.json``
 - Launch ``C:\hyp\NEW\Hypersomnia.exe --upgrade`` and exit
 
 New client does:
@@ -3986,8 +3986,8 @@ Advantages:
 		- though with this everything could be preserved
 		- generated file checking should be pretty safe
 		- we have an option to get factory defaults
-		- one could easily delete the user_config.lua
-		- kay what if we only store the modified settings in the user_config.lua?
+		- one could easily delete the user_config.json
+		- kay what if we only store the modified settings in the user_config.json?
 		- like a delta
 		- we'll then always have defaults updated
 		- fix these imgui layouts though, "choose team" shouldn't be resized as well as maybe shop
@@ -6677,7 +6677,7 @@ This will discard your redo history."
         - %APPDATA%/Roaming//847329847
     - Linux also has to consider the steam id
 - "open user folder" should highlight a file inside
-    - just highlight a "config.lua" or create if it doesn't exist
+    - just highlight a "config.json" or create if it doesn't exist
 
 - use Application Support folder on MacOS
 

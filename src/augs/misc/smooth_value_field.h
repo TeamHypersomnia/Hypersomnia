@@ -9,6 +9,8 @@ namespace augs {
 		T averages_per_sec = static_cast<T>(1.0);
 		T average_factor = static_cast<T>(0.5);
 		// END GEN INTROSPECTOR
+
+		bool operator==(const smoothing_settings<T>& b) const = default;
 	};
 
 	struct smooth_value_field {

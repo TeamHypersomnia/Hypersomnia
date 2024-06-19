@@ -16,4 +16,6 @@ struct debug_settings {
 	bool measure_atlas_uploading = false;
 	bool log_solvable_hashes = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const debug_settings& b) const = default;
 };

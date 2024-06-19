@@ -12,5 +12,7 @@ struct streamer_mode_flags_data {
 	bool community_servers = true;
 	bool map_catalogue = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const streamer_mode_flags_data& b) const = default;
 };
 

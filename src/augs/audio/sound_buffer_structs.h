@@ -15,13 +15,7 @@ namespace augs {
 		bool dummy = true;
 		// END GEN INTROSPECTOR
 
-		bool operator==(const sound_buffer_loading_settings& b) const {
-			return dummy == b.dummy;
-		}
-
-		bool operator!=(const sound_buffer_loading_settings& b) const {
-			return !operator==(b);
-		}
+		bool operator==(const sound_buffer_loading_settings& b) const = default;
 	};
 
 	struct sound_buffer_loading_input {

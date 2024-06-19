@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Gamepad controls
+	- Just make full analog range for sneak/walk/sprint
+		- Up to 1/4th or 1/3th of the way would always sneak at full speed so we don't have to hit the exact intensity to sneak as fast as keyboard players
+	- Dash could be just pressing the left stick
+
 - singleplayer leaderboards for speedrunning stages with enemies like in ror
 
 - We should actually freeze the match on afk

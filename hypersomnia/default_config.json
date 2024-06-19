@@ -1,0 +1,953 @@
+{
+    "skip_tutorial": false,
+    "launch_at_startup": "LAST_ACTIVITY", // or: "MAIN_MENU"
+    "last_activity": "TUTORIAL",
+
+    "log_timestamp_format": "[%H:%M:%S] ",
+    // "log_timestamp_format": "[%d-%m-%y %H:%M:%S] ",
+    // "log_timestamp_format": "",
+
+    "server_list_provider": "http://masterserver.hypersomnia.xyz:8410",
+    "webrtc_signalling_server_url": "wss://masterserver.hypersomnia.xyz:8000",
+
+    "streamer_mode": false,
+    "streamer_mode_flags": {
+        "chat": true,
+        "chat_open": false,
+        "inworld_hud": true,
+        "scoreboard": true,
+        "spectator_ui": true,
+        "kill_notifications": true,
+        "death_summary": true,
+        "community_servers": true,
+        "map_catalogue": false
+    },
+
+    "window": {
+        "name": "Hypersomnia",
+        "app_icon_path": "content/gfx/necessary/app.ico",
+        "fullscreen": true,
+        "border": true,
+        "position": [40, 40],
+        "bpp": 32,
+        "size": [1200, 700],
+        "draw_own_cursor_in_fullscreen": false,
+        "log_keystrokes": false,
+        "vsync_mode": "OFF",
+        "max_fps": 400,
+        "max_fps_method": "YIELD",
+
+        /*
+            Looks like GLFW disables X mappings.
+            This is for Linux users (like me)
+            who are likely to have bound CAPS LOCK to ESC through e.g. xmodmap -e "keysym Caps_Lock = Escape"
+            GLFW will not recognize these mappings.
+        */
+        "map_caps_lock_to_esc": false
+    },
+
+    "renderer": {
+        "default_filtering": "NEAREST_NEIGHBOR" // or: "LINEAR"
+    },
+
+    "audio": {
+        "mute_main_menu_background": true,
+        "output_mode": "STEREO_HRTF",
+        "output_device_name": "",
+        "max_number_of_sound_sources": 4200,
+        "sound_meters_per_second": 150.0
+    },
+
+    "audio_volume": {
+        "master": 1.0,
+        "sound_effects": 0.75,
+        "music": 0.55
+    },
+
+    "input": {
+        "character": {
+            "crosshair_sensitivity": [3.0, 3.0],
+            "forward_moves_towards_crosshair": false
+        },
+        "swap_mouse_buttons_in_akimbo": false,
+        "game_gui": {
+            "allow_switching_to_bare_hands_as_previous_wielded_weapon": true,
+            "reset_lefthanded_to_righthanded": true
+        }
+    },
+
+    "interpolation": {
+        "method": "LINEAR",
+        "speed": 1000.0 // only for EXPONENTIAL method
+    },
+
+    "app_controls": {
+        "F1": "SHOW_PERFORMANCE",
+        "F3": "SHOW_LOGS",
+        // "F9": "TOGGLE_STREAMER_MODE",
+        // "F10": "TOGGLE_CINEMATIC_MODE"
+    },
+
+    "game_controls": {
+        "LeftMouseButton": "SHOOT",
+        "RightMouseButton": "SHOOT_SECONDARY",
+        "MiddleMouseButton": "THROW_FORCE_GRENADE",
+        "MouseButton4": "THROW_PED_GRENADE",
+        "MouseButton5": "THROW_FLASHBANG",
+        "Backspace": "SWITCH_CAMERA_MODE",
+        "Space": "DASH",
+        "A": "MOVE_LEFT",
+        "C": "WIELD_BOMB",
+        "D": "MOVE_RIGHT",
+        "E": "INTERACT",
+        "G": "DROP",
+        "J": "THROW_INTERFERENCE_GRENADE",
+        "R": "RELOAD",
+        "S": "MOVE_BACKWARD",
+        "W": "MOVE_FORWARD",
+        "LeftShift": "SPRINT",
+        "LeftControl": "WALK_SILENTLY",
+        "WheelUp": "THROW_TWO_KNIVES",
+        "WheelDown": "THROW_KNIFE"
+        // "LeftShift": "TOGGLE_SPRINT",
+        // "LeftControl": "TOGGLE_WALK_SILENTLY"
+    },
+
+    "general_gui_controls": {
+        "LeftMouseButton": "SPECTATE_NEXT",
+        "RightMouseButton": "SPECTATE_PREVIOUS",
+        "Tab": "SCOREBOARD",
+        "F8": "SERVER_ADMIN_PANEL",
+        "F10": "EXECUTE_RCON_GAME_COMMANDS",
+        "B": "BUY_MENU",
+        "F": "TOGGLE_WEAPON_LASER",
+        "M": "CHOOSE_TEAM",
+        "U": "TEAM_CHAT",
+        "Y": "CHAT",
+        "Slash": "CHAT_COMMAND",
+        "Tilde": "TOGGLE_MOUSE_CURSOR"
+    },
+
+    "inventory_gui_controls": {
+        "H": "HOLSTER",
+        "N": "SPECIAL_ACTION_BUTTON_4",
+        "O": "SPECIAL_ACTION_BUTTON_5",
+        "P": "SPECIAL_ACTION_BUTTON_6",
+        "Q": "LAST_USED_WEAPON",
+        "V": "SPECIAL_ACTION_BUTTON_3",
+        "X": "SPECIAL_ACTION_BUTTON_2",
+        "Z": "SPECIAL_ACTION_BUTTON_1",
+        "0": "HOTBAR_9",
+        "1": "HOTBAR_0",
+        "2": "HOTBAR_1",
+        "3": "HOTBAR_2",
+        "4": "HOTBAR_3",
+        "5": "HOTBAR_4",
+        "6": "HOTBAR_5",
+        "7": "HOTBAR_6",
+        "8": "HOTBAR_7",
+        "9": "HOTBAR_8"
+    },
+
+    "camera": {
+        "additional_position_smoothing": {
+            "averages_per_sec": 0.0,
+            "average_factor": 0.5
+        },
+        "smoothing": {
+            "averages_per_sec": 30.0,
+            "average_factor": 0.5
+        },
+        "angled_look_length": 100.0,
+        "look_bound_expand": 0.5,
+        "surfing_zoom_out": 2.0,
+        "enable_smoothing": true,
+        "edge_zoom_out_zone": 0.005,
+        "edge_zoom_in_cutoff_mult": 0.2,
+        "edge_zoom_in_zone_expansion": 1.0
+    },
+
+    "drawing": {
+        "snap_zoom_to_fov_size": true,
+        "snap_zoom_to_multiple_if_different_by_pixels": 100,
+        // "custom_zoom": 4,
+        "custom_zoom": 1.0,
+        "draw_enemy_silhouettes_in_spectator": true,
+        "draw_crosshairs": true,
+        "draw_weapon_laser": true,
+        "draw_aabb_highlighter": true,
+        "draw_inventory": true,
+        "draw_hotbar": true,
+        "draw_area_markers": 1.0,
+        "OFF_draw_callout_indicators": 1.0,
+        "enemy_hud_mode": "SMALL_HEALTH_BAR",
+        "draw_hp_bar": true,
+        "draw_cp_bar": true,
+        "draw_pe_bar": false,
+        "draw_character_status": true,
+        "draw_remaining_ammo": true,
+        "draw_offscreen_indicators": true,
+        "draw_offscreen_callouts": true,
+        "draw_nicknames": true,
+        "draw_small_health_bars": true,
+        "draw_health_numbers": true,
+        "draw_damage_indicators": true,
+        "occlude_neons_under_sentiences": true,
+        "cinematic_mode": false,
+        "offscreen_reference_mode": "CHARACTER_POSITION",
+        "draw_teammate_indicators": 1.0,
+        "draw_danger_indicators": [255, 50, 50, 255],
+        "draw_tactical_indicators": 1.0,
+        "show_danger_indicator_for_seconds": 10.0,
+        "fade_danger_indicator_for_seconds": 2.0,
+        "show_death_indicator_for_seconds": 5.0,
+        "fade_death_indicator_for_seconds": 2.0,
+        "radar_pos": [-201.0, 84.0],
+        "print_current_character_callout": true,
+        "nickname_characters_for_offscreen_indicators": 4,
+        "fog_of_war": {
+            "angle": 165.0,
+            "size": [1920.0, 1080.0]
+        },
+        "fog_of_war_appearance": {
+            "overlay_color_on_visible": false,
+            "overlay_color": [0, 0, 0, 40]
+        },
+        "crosshair": {
+            "scale": 3,
+            "border_width": 1,
+            "show_dot": true,
+            "dot_size": 1.0,
+            "segment_length": 10.0,
+            "recoil_expansion_base": 5.0,
+            "recoil_expansion_mult": 1.0,
+            "inside_color": [255, 255, 255, 255],
+            "border_color": [0, 0, 0, 255]
+        },
+        "teammates_are_enemies": false,
+        "stencil_before_light_pass": false
+    },
+
+    // Client and Server settings.
+
+    "client_connect": "127.0.0.1",
+
+    "client": {
+        "use_account_nickname": true,
+        "use_account_avatar": true,
+        "nickname": "",
+        "nickname_before_sign_in": "",
+        "net": {
+            "jitter": {
+                "buffer_at_least_steps": 3,
+                "buffer_at_least_ms": 20,
+                "max_commands_to_squash_at_once": 255
+            }
+        },
+        "suppress_webhooks": false,
+        "OFF_network_simulator": {
+            "latency_ms": 70.0,
+            "jitter_ms": 15.0,
+            "loss_percent": 1.0,
+            "duplicates_percent": 1.0
+        },
+        "max_buffered_server_commands": 10000,
+        "max_predicted_client_commands": 1500,
+        "flush_demo_to_disk_once_every_secs": 10,
+        "spectated_arena_type": "REFERENTIAL",
+        "rcon_password": "",
+        "client_chat": {
+            "chat_window_width": 600,
+            "chat_window_offset": [10, 300],
+            "background_color": [15, 15, 15, 200],
+            "border_color": [109, 109, 127, 100],
+            "show_recent_chat_messages_num": 30,
+            "keep_recent_chat_messages_for_seconds": 22.0,
+            "chat_messages_fade_last_seconds": 2.0
+        },
+        "avatar_image_path": "",
+        "record_demo": true,
+        "max_direct_file_bandwidth": 2.0
+    },
+
+    "server_start": {
+        "ip": "127.0.0.1",
+        "port": 0,
+        "slots": 10
+    },
+
+    "server": {
+        "arena": "de_cyberaqua",
+        "game_mode": "",
+        "ranked": {
+            /*
+                Note you can always host a "ranked" match locally -
+                even if you don't report winners/losers to the MMR database.
+
+                It will still make the match behave like a proper tournament match.
+                For example:
+                - The server becomes unjoinable after starting the match.
+                - Match will be frozen for a while when someone disonnects mid-way, allowing them to rejoin.
+                You may absolutely use it on some LAN torunaments.
+            */
+            "autostart_when": "NEVER",
+            // "TEAMS_EQUAL | SERVER_FULL | SERVER_FULL_EQUAL_TEAMS | ALWAYS"
+            // Only "NEVER" and "ALWAYS" are implemented right now.
+            "countdown_time": 81,
+            "rejoin_time_limit": 120,
+            "max_rejoins": 5,
+            "match_unfreezes_in_secs": 5,
+            "freeze_match_on_disconnect": true,
+            "client_network_timeout_secs": 1.5
+        },
+        "friendly_fire": true,
+        "cycle": "REPEAT_CURRENT", // or: "LIST" | "ALL_ON_DISK"
+        "cycle_list": [
+            "de_cyberaqua",
+            "fy_minilab bomb_defusal",
+            "de_silo"
+        ],
+        "cycle_always_game_mode": "",
+        "cycle_randomize_order": true,
+        "allow_webrtc_clients": true,
+        "webrtc_udp_mux": false,
+        "webrtc_port_range_begin": 9000,
+        "webrtc_port_range_end": 9020,
+        "server_name": "${MY_NICKNAME}'s server",
+        "notified_server_list": "masterserver.hypersomnia.xyz:8430",
+        "suppress_new_community_server_webhook": false,
+        "allow_nat_traversal": true,
+        "allow_direct_arena_file_downloads": true,
+        "external_arena_files_provider": "https://hypersomnia.xyz/arenas",
+        "autoupdate_delay": 0,
+        "daily_autoupdate": false,
+        "daily_autoupdate_hour": "03:00",
+        "when_idle_change_maps_once_every_mins": 15.0,
+        "send_heartbeat_to_server_list_once_every_secs": 10,
+        "resolve_server_list_address_once_every_secs": 3600,
+        "resolve_internal_address_once_every_secs": 600,
+        "move_to_spectators_if_afk_for_secs": 120,
+        "kick_if_afk_for_secs": 120,
+        "web_client_network_timeout_secs": 1.5,
+        "client_network_timeout_secs": 5.0,
+        "kick_if_unauthenticated_for_secs": 6.0,
+        "time_limit_to_enter_game_since_connection": 15,
+        "reset_resync_timer_once_every_secs": 4,
+        "max_client_resyncs": 30,
+        "send_packets_once_every_tick": 1,
+        "max_buffered_client_commands": 1280,
+        "state_hash_once_every_tick": 1,
+        "send_net_statistics_update_once_every_secs": 0.5,
+        "max_kick_ban_linger_secs": 2.0,
+        "OFF_network_simulator": {
+            "latency_ms": 50.0,
+            "jitter_ms": 10.0,
+            "loss_percent": 1.0,
+            "duplicates_percent": 1.0
+        },
+        "auto_authorize_loopback_for_rcon": true,
+        "auto_authorize_internal_for_rcon": false,
+        "max_unauthorized_rcon_commands": 100,
+        "max_bots": 0,
+        "log_performance_once_every_secs": 0.0,
+        "sleep_mult": 0.10000000149011612,
+        "max_direct_file_bandwidth": 6.0,
+        "webhooks": {
+            "duel_of_honor_pic_link_pattern": "https://hypersomnia.xyz/assets/images/duels/%x.jpg",
+            "duel_victory_pic_link_pattern": "https://hypersomnia.xyz/assets/images/duels/victory.jpg",
+            "fled_pic_link": "https://hypersomnia.xyz/assets/images/duels/shameful.jpg",
+            "reconsidered_pic_link": "https://hypersomnia.xyz/assets/images/duels/reconsidered.jpg",
+            "num_duel_pics": 6
+        },
+        "shutdown_after_first_match": false,
+        "sync_all_external_arenas_on_startup": false
+    },
+
+    // Private vars aren't known to any clients.
+
+    "server_private": {
+        "master_rcon_password": "",
+        "rcon_password": "",
+        "discord_webhook_url": "",
+        "telegram_webhook_url": "",
+        "telegram_channel_id": "@hypersomnia_monitor",
+        "telegram_alerts_channel_id": "@hypersomnia_server_logs",
+        "telegram_alerts_webhook_url": "",
+        "steam_web_api_key": "",
+        "report_ranked_match_api_key": "",
+        "report_ranked_match_url": "https://hypersomnia.xyz/report_match",
+        "report_ranked_match_aux_endpoints": []
+        // [ { "url": "example.com", "api_key": "example" }, { ... } ]
+    },
+
+    "dedicated_server": {
+        "dummy": false
+    },
+
+    // Advanced settings.
+
+    "log_to_live_file": false,
+    "remove_live_log_file_on_start": true,
+    "prompted_for_sign_in_once": false,
+
+    "sound": {
+        "allow_sounds_without_character_listener": true,
+        "sync_sounds_longer_than_secs": 5.0,
+        "max_divergence_before_sync_secs": 1.0,
+        "treat_as_music_sounds_longer_than_secs": 5.0,
+        "max_speed_for_doppler_calculation": 5000.0,
+        "missile_impact_sound_cooldown_duration": 60.0,
+        "missile_impact_occurences_before_cooldown": 1,
+        "listener_reference": "CHARACTER_POSITION",
+        "set_listener_orientation_to_character_orientation": false,
+        "max_simultaneous_bullet_trace_sounds": 5,
+        "gain_threshold_for_bullet_trace_sounds": 0.012,
+        "max_short_sounds": 80,
+        "processing_frequency": "EVERY_SINGLE_FRAME",
+        "custom_processing_frequency": 10
+    },
+
+    // self_update will be used by non-steam processes,
+    // in particular dedicated server and masterserver processes.
+    // It is disabled for Web and Steam builds.
+
+    "self_update": {
+        "update_on_launch": true,
+        "update_connection_timeout_secs": 2,
+        "update_host": "https://hypersomnia.xyz",
+        "update_path": "/builds/latest"
+    },
+
+    "masterserver": {
+        "ip": "0.0.0.0",
+        "ssl_cert_path": "",
+        "ssl_private_key_path": "",
+        "signalling_ssl_cert_path": "",
+        "signalling_ssl_private_key_path": "",
+        "server_entry_timeout_secs": 65,
+        "suppress_community_server_webhooks_after_launch_for_secs": 20,
+        "signalling_peer_timeout_secs": 25,
+        "signalling_server_bind_address": "0.0.0.0",
+        "signalling_server_port": 8000,
+        "first_udp_command_port": 8430,
+        "num_udp_command_ports": 30,
+        "server_list_port": 8420,
+        "fallback_http_server_list_port": 8410,
+        "cert_pem_path": "",
+        "key_pem_path": "",
+        "sleep_ms": 8.0,
+        "report_rtc_errors_to_webhook": true,
+        "official_hosts": [
+            "arena.hypersomnia.xyz",
+            "arena-us.hypersomnia.xyz",
+            "arena-de.hypersomnia.xyz",
+            "arena-au.hypersomnia.xyz",
+            "arena-ru.hypersomnia.xyz",
+            "arena-ch.hypersomnia.xyz",
+            "arena-nl.hypersomnia.xyz"
+        ]
+    },
+
+    "nat_detection": {
+        "port_probing": {
+            "host": {
+                "address": "masterserver.hypersomnia.xyz",
+                "default_port": 8430
+            },
+            "num_available": 30,
+            "num_probed_for_detection": 3
+        },
+        "stun_server_list": "detail/web/stun_server_list.txt",
+        "num_stun_hosts_used_for_detection": 2,
+        "nat_translation_entry_timeout_secs": 30.0,
+        "stun_session_timeout_ms": 1000,
+        "request_interval_ms": 200,
+        "packet_interval_ms": 5
+    },
+
+    "nat_traversal": {
+        "OFF_short_ttl": 3,
+        "num_brute_force_packets": 1,
+        "traversal_attempt_timeout_secs": 2.0
+    },
+
+    "float_consistency_test": {
+        "passes": 5000,
+        "report_filename": ""
+        // "report_filename": "report.bin"
+    },
+
+    "unit_tests": {
+        "run": false,
+        "log_successful": false,
+        "break_on_failure": true,
+        "redirect_log_to_path": ""
+    },
+
+    "debug_drawing": {
+        "enabled": false,
+        "draw_penetration": false,
+        "draw_collinearization": false,
+        "draw_melee_info": false,
+        "draw_forces": false,
+        "draw_friction_field_collisions_of_entering": false,
+        "draw_explosion_forces": false,
+        "draw_triangle_edges": false,
+        "draw_cast_rays": false,
+        "draw_discontinuities": false,
+        "draw_visible_walls": false,
+        "draw_memorised_walls": false,
+        "draw_undiscovered_locations": false,
+        "draw_npo_tree_nodes": false,
+        "draw_camera_query": false,
+        "draw_headshot_detection": false
+    },
+
+    "hotbar": {
+        "increase_inside_alpha_when_selected": false,
+        "colorize_inside_when_selected": true,
+        "hide_unassigned_hotbar_buttons": true,
+        "autocollapse_hotbar_buttons": true,
+        "primary_selected_color": [0, 255, 255, 255],
+        "secondary_selected_color": [86, 156, 214, 255]
+    },
+
+    "game_gui": {
+        "autodrop_holstered_armed_explosives": true,
+        "autodrop_magazines_of_dropped_weapons": true
+    },
+
+    "simulation_receiver": {
+        "misprediction_smoothing_multiplier": 1.2
+    },
+
+    "lag_compensation": {
+        "confirm_local_character_death": true,
+        "effect_prediction": {
+            "predict_death_particles": true,
+            "predict_death_sounds": false
+        },
+        "simulate_decorative_organisms_during_reconciliation": false
+    },
+
+    "content_regeneration": {
+        "regenerate_every_time": false,
+        "rescan_assets_on_window_focus": true,
+        "atlas_blitting_threads": 3,
+        "neon_regeneration_threads": 3
+    },
+
+    "main_menu": {
+        "leaderboards_provider_url": "https://hypersomnia.xyz/leaderboards",
+        "menu_intro_scene_entropy_path": "abc",
+        "menu_background_arena_path": "content/menu/menu",
+        "menu_theme_path": "",
+        "rewind_intro_scene_by_secs": 3.5,
+        "start_menu_music_at_secs": 0.0,
+        "skip_credits": true,
+        "latest_news_url": ""
+    },
+
+    "gui_style": {
+        "Alpha": 1.0,
+        "DisabledAlpha": 0.6000000238418579,
+        "WindowPadding": [8.0, 8.0],
+        "WindowRounding": 0.0,
+        "WindowBorderSize": 1.0,
+        "WindowMinSize": [32.0, 32.0],
+        "WindowTitleAlign": [0.0, 0.5],
+        "WindowMenuButtonPosition": 0,
+        "ChildRounding": 0.0,
+        "ChildBorderSize": 1.0,
+        "PopupRounding": 0.0,
+        "PopupBorderSize": 1.0,
+        "FramePadding": [4.0, 3.0],
+        "FrameRounding": 0.0,
+        "FrameBorderSize": 0.0,
+        "ItemSpacing": [8.0, 4.0],
+        "ItemInnerSpacing": [4.0, 4.0],
+        "CellPadding": [4.0, 2.0],
+        "TouchExtraPadding": [0.0, 0.0],
+        "IndentSpacing": 21.0,
+        "ColumnsMinSpacing": 6.0,
+        "ScrollbarSize": 16.0,
+        "ScrollbarRounding": 0.0,
+        "GrabMinSize": 10.0,
+        "GrabRounding": 0.0,
+        "LogSliderDeadzone": 4.0,
+        "TabRounding": 4.0,
+        "TabBorderSize": 0.0,
+        "TabMinWidthForCloseButton": 0.0,
+        "ColorButtonPosition": 1,
+        "ButtonTextAlign": [0.5, 0.5],
+        "SelectableTextAlign": [0.0, 0.0],
+        "DisplayWindowPadding": [22.0, 22.0],
+        "DisplaySafeAreaPadding": [4.0, 4.0],
+        "MouseCursorScale": 1.0,
+        "AntiAliasedLines": true,
+        "AntiAliasedLinesUseTex": true,
+        "AntiAliasedFill": true,
+        "CurveTessellationTol": 1.25,
+        "CircleTessellationMaxError": 0.30000001192092896,
+        "ImGuiCol_Text": [255, 255, 255, 255],
+        "ImGuiCol_TextDisabled": [127, 127, 127, 255],
+        "ImGuiCol_WindowBg": [15, 15, 15, 239],
+        "ImGuiCol_ChildBg": [0, 0, 0, 0],
+        "ImGuiCol_PopupBg": [20, 20, 20, 239],
+        "ImGuiCol_Border": [109, 109, 127, 127],
+        "ImGuiCol_BorderShadow": [0, 0, 0, 0],
+        "ImGuiCol_FrameBg": [40, 73, 122, 137],
+        "ImGuiCol_FrameBgHovered": [66, 150, 249, 102],
+        "ImGuiCol_FrameBgActive": [66, 150, 249, 170],
+        "ImGuiCol_TitleBg": [10, 10, 10, 255],
+        "ImGuiCol_TitleBgActive": [40, 73, 122, 255],
+        "ImGuiCol_TitleBgCollapsed": [0, 0, 0, 130],
+        "ImGuiCol_MenuBarBg": [35, 35, 35, 255],
+        "ImGuiCol_ScrollbarBg": [5, 5, 5, 135],
+        "ImGuiCol_ScrollbarGrab": [79, 79, 79, 255],
+        "ImGuiCol_ScrollbarGrabHovered": [104, 104, 104, 255],
+        "ImGuiCol_ScrollbarGrabActive": [130, 130, 130, 255],
+        "ImGuiCol_CheckMark": [66, 150, 249, 255],
+        "ImGuiCol_SliderGrab": [61, 132, 224, 255],
+        "ImGuiCol_SliderGrabActive": [66, 150, 249, 255],
+        "ImGuiCol_Button": [66, 150, 249, 102],
+        "ImGuiCol_ButtonHovered": [66, 150, 249, 255],
+        "ImGuiCol_ButtonActive": [15, 135, 249, 255],
+        "ImGuiCol_Header": [66, 150, 249, 79],
+        "ImGuiCol_HeaderHovered": [66, 150, 249, 204],
+        "ImGuiCol_HeaderActive": [66, 150, 249, 255],
+        "ImGuiCol_Separator": [109, 109, 127, 127],
+        "ImGuiCol_SeparatorHovered": [25, 102, 191, 198],
+        "ImGuiCol_SeparatorActive": [25, 102, 191, 255],
+        "ImGuiCol_ResizeGrip": [66, 150, 249, 51],
+        "ImGuiCol_ResizeGripHovered": [66, 150, 249, 170],
+        "ImGuiCol_ResizeGripActive": [66, 150, 249, 242],
+        "ImGuiCol_Tab": [45, 89, 147, 219],
+        "ImGuiCol_TabHovered": [66, 150, 249, 204],
+        "ImGuiCol_TabActive": [50, 104, 173, 255],
+        "ImGuiCol_TabUnfocused": [17, 26, 37, 247],
+        "ImGuiCol_TabUnfocusedActive": [34, 66, 108, 255],
+        "ImGuiCol_DockingPreview": [66, 150, 249, 178],
+        "ImGuiCol_DockingEmptyBg": [51, 51, 51, 255],
+        "ImGuiCol_PlotLines": [155, 155, 155, 255],
+        "ImGuiCol_PlotLinesHovered": [255, 109, 89, 255],
+        "ImGuiCol_PlotHistogram": [229, 178, 0, 255],
+        "ImGuiCol_PlotHistogramHovered": [255, 153, 0, 255],
+        "ImGuiCol_TableHeaderBg": [48, 48, 51, 255],
+        "ImGuiCol_TableBorderStrong": [79, 79, 89, 255],
+        "ImGuiCol_TableBorderLight": [58, 58, 63, 255],
+        "ImGuiCol_TableRowBg": [0, 0, 0, 0],
+        "ImGuiCol_TableRowBgAlt": [255, 255, 255, 15],
+        "ImGuiCol_TextSelectedBg": [66, 150, 249, 89],
+        "ImGuiCol_DragDropTarget": [255, 255, 0, 229],
+        "ImGuiCol_NavHighlight": [66, 150, 249, 255],
+        "ImGuiCol_NavWindowingHighlight": [255, 255, 255, 178],
+        "ImGuiCol_NavWindowingDimBg": [204, 204, 204, 51],
+        "ImGuiCol_ModalWindowDimBg": [204, 204, 204, 89]
+    },
+    "debug": {
+        "determinism_test_cloned_cosmoi_count": 0,
+        "input_recording_mode": "DISABLED",
+        "measure_atlas_uploading": false,
+        "log_solvable_hashes": false
+    },
+
+    "session": {
+        "show_performance": false,
+        "show_logs": false,
+        "hide_settings_ingame": true,
+        "camera_query_aabb_mult": 1.0
+    },
+
+    "test_scene": {
+        "create_minimal": false,
+        "scene_tickrate": 60
+    },
+
+    "editor": {
+        "autosave": {
+            "on_lost_focus": true,
+            "periodically": true,
+            "once_every_min": 2.0,
+            "if_loaded_autosave_show": "AUTOSAVED_VERSION",
+            "alert_when_loaded_autosave": true
+        },
+        "warp_cursor_when_moving_nodes": false,
+        "keep_source_nodes_selected_on_mirroring": false,
+        "grid": {
+            "render": {
+                "maximum_power_of_two": 12,
+                "line_colors": [[255, 0, 0, 255], [255, 0, 255, 255], [255, 165, 0, 255], [255, 255, 0, 100], [0, 255, 0, 100], [0, 255, 255, 100], [255, 255, 255, 100], [177, 177, 177, 100], [75, 74, 74, 100], [54, 54, 54, 100]],
+                "alpha_multiplier": 0.5,
+                "hide_grids_smaller_than": 16
+            }
+        },
+        "camera": {
+            "panning_speed": 1.0
+        },
+        "entity_selector": {
+            "held_color": [65, 131, 196, 6],
+            "selected_color": [65, 131, 196, 3],
+            "hovered_color": [255, 255, 255, 0],
+            "hovered_dashed_line_color": [255, 255, 255, 140]
+        },
+        "matched_entity_color": [0, 255, 0, 80],
+        "rectangular_selection_color": [65, 131, 196, 60],
+        "rectangular_selection_border_color": [65, 131, 196, 120],
+        "action_notification": {
+            "enabled": true,
+            "bg_color": [0, 0, 0, 200],
+            "bg_border_color": [255, 255, 255, 15],
+            "max_width": 1000,
+            "show_for_ms": 3000,
+            "text_padding": [10, 10],
+            "offset": [80, 80]
+        },
+        "upload_api_key": "",
+        "upload_url": "https://hypersomnia.xyz/upload"
+    },
+
+    "gui_fonts": {
+        "gui": {
+            "settings": {},
+            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "unicode_ranges": [
+                {
+                    "first": 32,
+                    "second": 255
+                },
+                {
+                    "first": 256,
+                    "second": 383
+                }
+            ],
+            "size_in_pixels": 22.0,
+            "add_japanese_ranges": "NEVER",
+            "add_cyrillic_ranges": "ONLY_IN_PRODUCTION"
+        },
+        "larger_gui": {
+            "settings": {},
+            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "unicode_ranges": [
+                {
+                    "first": 32,
+                    "second": 255
+                },
+                {
+                    "first": 256,
+                    "second": 383
+                }
+            ],
+            "size_in_pixels": 32.0,
+            "add_japanese_ranges": "NEVER",
+            "add_cyrillic_ranges": "ONLY_IN_PRODUCTION"
+        },
+        "medium_numbers": {
+            "settings": {},
+            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "unicode_ranges": [
+                {
+                    "first": 48,
+                    "second": 57
+                }
+            ],
+            "size_in_pixels": 42.0,
+            "add_japanese_ranges": "NEVER",
+            "add_cyrillic_ranges": "NEVER"
+        },
+        "large_numbers": {
+            "settings": {},
+            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "unicode_ranges": [
+                {
+                    "first": 48,
+                    "second": 57
+                }
+            ],
+            "size_in_pixels": 52.0,
+            "add_japanese_ranges": "NEVER",
+            "add_cyrillic_ranges": "NEVER"
+        },
+        "very_large_numbers": {
+            "settings": {},
+            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "unicode_ranges": [
+                {
+                    "first": 48,
+                    "second": 57
+                }
+            ],
+            "size_in_pixels": 64.0,
+            "add_japanese_ranges": "NEVER",
+            "add_cyrillic_ranges": "NEVER"
+        }
+    },
+
+    "arena_mode_gui": {
+        "between_knockout_boxes_pad": 8,
+        "inside_knockout_box_pad": 6,
+        "weapon_icon_horizontal_pad": 14,
+        "show_recent_knockouts_num": 7,
+        "keep_recent_knockouts_for_seconds": 8.0,
+        "max_weapon_icon_height": 0,
+        "scoreboard_settings": {
+            "player_row_inner_padding": [4, 4],
+            "window_padding": [4, 8],
+            "background_color": [15, 15, 15, 200],
+            "border_color": [109, 109, 127, 100],
+            "cell_bg_alpha": 0.56,
+            "bg_lumi_mult": 0.7,
+            "text_lumi_mult": 1.7,
+            "text_stroke_lumi_mult": 0.5,
+            "current_player_bg_lumi_mult": 1.5,
+            "current_player_text_lumi_mult": 1.7,
+            "dead_player_bg_lumi_mult": 0.5,
+            "dead_player_text_lumi_mult": 0.45,
+            "dead_player_bg_alpha_mult": 0.3,
+            "dead_player_text_alpha_mult": 0.6,
+            "faction_logo_alpha": 0.8,
+            "icon_alpha": 0.8,
+            "avatar_alpha": 1.0,
+            "dark_color_overlay_under_score": true
+        },
+        "buy_menu_settings": {
+            "disabled_bg": [75, 0, 0, 180],
+            "disabled_active_bg": [90, 0, 0, 220],
+            "already_owns_bg": [0, 76, 0, 91],
+            "already_owns_active_bg": [0, 130, 0, 150],
+            "already_owns_other_type_bg": [94, 12, 255, 91],
+            "already_owns_other_type_active_bg": [94, 101, 255, 120]
+        },
+        "money_indicator_color": [255, 249, 133, 255],
+        "award_indicator_color": [255, 255, 0, 255],
+        "money_indicator_pos": [-50, 148],
+        "show_recent_awards_num": 8,
+        "keep_recent_awards_for_seconds": 3.0,
+        "show_client_resyncing_notifier": true,
+        "death_summary_offset_mult": 0.5,
+        "context_tip_settings": {
+            "tip_offset_mult": 0.75,
+            "tip_text_color": [255, 255, 255, 255],
+            "bound_key_color": [255, 255, 0, 255],
+            "item_name_color": [255, 255, 0, 255]
+        },
+        "show_spectator_overlay": true
+    },
+
+    "faction_view": {
+        "colors": {
+            "SPECTATOR": {
+                "standard": [200, 200, 200, 255],
+                "current_player_text": [215, 215, 215, 255],
+                "current_player_dead_text": [0, 0, 0, 0],
+                "player_dead_text": [0, 0, 0, 0],
+                "background": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_current": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_dark": [0, 0, 0, 0]
+            },
+            "METROPOLIS": {
+                "standard": [40, 230, 255, 255],
+                "current_player_text": [70, 240, 255, 255],
+                "current_player_dead_text": [0, 0, 0, 0],
+                "player_dead_text": [0, 0, 0, 0],
+                "background": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_current": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_dark": [0, 20, 75, 255]
+            },
+            "ATLANTIS": {
+                "standard": [0, 255, 0, 255],
+                "current_player_text": [0, 0, 0, 0],
+                "current_player_dead_text": [0, 0, 0, 0],
+                "player_dead_text": [0, 0, 0, 0],
+                "background": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_current": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_dark": [0, 0, 0, 0]
+            },
+            "RESISTANCE": {
+                "standard": [255, 37, 0, 255],
+                "current_player_text": [255, 80, 0, 255],
+                "current_player_dead_text": [0, 0, 0, 0],
+                "player_dead_text": [0, 0, 0, 0],
+                "background": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_current": {
+                    "normal": [0, 0, 0, 0],
+                    "hovered": [0, 0, 0, 0],
+                    "active": [0, 0, 0, 0]
+                },
+                "background_dark": [47, 10, 0, 255]
+            }
+        }
+    },
+
+    "damage_indication": {
+        "numbers_accumulation_speed": 1000.0,
+        "critical_color": [255, 255, 60, 255],
+        "friendly_damage_border_color": [255, 40, 40, 255],
+        "indicator_fading_duration_secs": 0.5,
+        "single_indicator_lifetime_secs": 1.0,
+        "accumulative_indicator_idle_lifetime_secs": 0.0,
+        "indicator_rising_speed": 50,
+        "small_damage_threshold": 25,
+        "medium_damage_threshold": 61,
+        "accumulative_indicator_offset": [0.0, -80.0],
+        "single_indicator_offsets": [[0.0, 0.0], [-25.0, 25.0], [45.0, -25.0], [-45.0, -55.0], [15.0, -75.0], [0.0, 25.0], [35.0, 25.0]],
+        "white_damage_highlight_secs": 0.25,
+        "character_silhouette_damage_highlight_secs": 0.11999999731779099
+    },
+
+    "performance": {
+        "special_effects": {
+            "explosions": {
+                "sparkle_amount": 1.0,
+                "thunder_amount": 1.0,
+                "smoke_amount": 0.699999988079071
+            },
+            "particle_stream_amount": 1.0,
+            "particle_burst_amount": 1.0
+        },
+        "max_particles_in_single_job": 2500,
+        "OFF_custom_num_pool_workers": 0,
+        "wall_light_drawing_precision": "EXACT",
+        "swap_window_buffers_when": "AFTER_HELPING_LOGIC_THREAD"
+    },
+
+    "hud_messages": {
+        "offset_mult": 0.8199999928474426,
+        "text_color": [255, 255, 255, 255],
+        "message_lifetime_secs": 4.0,
+        "message_fading_secs": 0.5,
+        "max_simultaneous_messages": 3,
+        "background_color": [255, 255, 255, 10],
+        "background_border_color": [255, 255, 255, 40],
+        "box_padding": [32.0, 6.0],
+        "box_separation": 1.0499999523162842
+    }
+}

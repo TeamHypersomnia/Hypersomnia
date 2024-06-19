@@ -62,6 +62,8 @@ namespace augs {
 		float get_music_volume() const {
 			return convert_audio_volume(std::clamp(master * music, 0.f, 1.f));
 		}
+
+		bool operator==(const audio_volume_settings& b) const = default;
 	};
 
 	struct audio_settings {
@@ -72,5 +74,7 @@ namespace augs {
 		unsigned max_number_of_sound_sources = 4096u;
 		float sound_meters_per_second = 180.f;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const audio_settings& b) const = default;
 	};
 }

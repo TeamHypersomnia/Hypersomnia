@@ -15,4 +15,6 @@ struct main_menu_settings {
 	bool skip_credits = false;
 	std::string latest_news_url;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const main_menu_settings& b) const = default;
 };

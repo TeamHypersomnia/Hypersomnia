@@ -7,4 +7,6 @@ struct game_gui_settings {
 	bool autodrop_holstered_armed_explosives = true;
 	bool autodrop_magazines_of_dropped_weapons = true;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const game_gui_settings& b) const = default;
 };

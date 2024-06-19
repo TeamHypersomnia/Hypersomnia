@@ -6,6 +6,8 @@ struct float_consistency_test_settings {
 	int passes = 5000;
 	augs::path_type report_filename;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const float_consistency_test_settings& b) const = default;
 };
 
 void setup_float_flags();

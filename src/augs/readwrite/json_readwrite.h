@@ -149,6 +149,23 @@ namespace augs {
 				}
 			}
 		}
+		else if constexpr(is_enum_array_v<T>) {
+			if (from.IsObject()) {
+				augs::for_each_enum_except_bounds([&](typename T::enum_type e) {
+					const auto key = augs::enum_to_string(e);
+
+					if (from.HasMember(key)) {
+						read_json(from[key], out[e]);
+					}
+				});
+			}
+			else {
+				throw json_deserialization_error(
+					"Not an enum array! %x", 
+					get_type_name_strip_namespace<T>()
+				);
+			}
+		}
 		else if constexpr(is_container_v<T>) {
 			using Container = T;
 
@@ -176,7 +193,22 @@ namespace augs {
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
 
-						if constexpr(std::is_arithmetic_v<typename Container::key_type>) {
+						bool read = true;
+
+						if constexpr(std::is_enum_v<typename Container::key_type>) {
+							if (
+								const auto* enumized = mapped_or_nullptr(
+									get_string_to_enum_map<typename Container::key_type>(), 
+									it.name.GetString()
+								)
+							) {
+								key = *enumized;
+							}
+							else {
+								read = false;
+							}
+						}
+						else if constexpr(std::is_arithmetic_v<typename Container::key_type>) {
 							auto is = std::istringstream(it.name.GetString());
 							is >> key;
 						}
@@ -184,25 +216,33 @@ namespace augs {
 							key = it.name.GetString();
 						}
 
-						read_json(it.value, mapped);
+						if (read) {
+							read_json(it.value, mapped);
 
-						out.emplace(std::move(key), std::move(mapped));
+							out.emplace(std::move(key), std::move(mapped));
+						}
 					}
 				}
-
 			}
 			else {
 				if (from.IsArray()) {
 					const auto max_size = out.max_size();
 					const auto& from_array = from.GetArray();
 
-					if (out.size() + from_array.Size() > max_size) {
+					if constexpr(!is_std_array_v<Container>) {
+						ensure(out.size() == 0);
+					}
+
+					if (from_array.Size() > max_size) {
 						throw json_deserialization_error(
-							"Too many elements in a container!\nElements passed: %x\nMax size: %x", 
+							"Too many elements in a container (%x)!\nElements passed: %x\nMax size: %x", 
+							get_type_name_strip_namespace<Container>(),
 							from_array.Size(),
 							max_size
 						);
 					}
+
+					std::size_t idx = 0;
 
 					for (auto& it : from_array) {
 						typename Container::value_type val;
@@ -211,6 +251,11 @@ namespace augs {
 
 						if constexpr(can_emplace_back_v<Container>) {
 							out.emplace_back(std::move(val));
+						}
+						else if constexpr(is_std_array_v<Container>) {
+							if (idx < out.size()) {
+								out[idx++] = std::move(val);
+							}
 						}
 						else {
 							out.emplace(std::move(val));
@@ -282,6 +327,21 @@ namespace augs {
 		}
 
 		return out;
+	}
+
+	template <unsigned parse_flags>
+	inline rapidjson::Document json_document_from(const std::string& json) {
+		rapidjson::Document document;
+
+		if (document.Parse<parse_flags>(json.c_str()).HasParseError()) {
+			throw json_deserialization_error(
+				"Couldn't parse JSON: %x\nOffset: %x", 
+				GetParseError_En(document.GetParseError()),
+				document.GetErrorOffset()
+			);
+		}
+
+		return document;
 	}
 
 	inline rapidjson::Document json_document_from(const std::string& json) {
@@ -383,7 +443,7 @@ namespace augs {
 		if constexpr(std::is_enum_v<T>) {
 			return enum_to_string(val);
 		}
-		if constexpr(std::is_arithmetic_v<T>) {
+		else if constexpr(std::is_arithmetic_v<T>) {
 			return std::to_string(val);
 		}
 		else {
@@ -420,6 +480,18 @@ namespace augs {
 				}, 
 				from
 			);
+
+			to.EndObject();
+		}
+		else if constexpr(is_enum_array_v<T>) {
+			to.StartObject();
+
+			augs::for_each_enum_except_bounds([&](typename T::enum_type e) {
+				for (const auto& it : from) {
+					to.Key(json_stringize(e));
+					write_json(to, it);
+				}
+			});
 
 			to.EndObject();
 		}
@@ -519,6 +591,26 @@ namespace augs {
 		else if constexpr(is_variant_v<T>) {
 			static_assert(always_false_v<T>, "Not implemented");
 		}
+		else if constexpr(is_enum_array_v<T>) {
+			if (write_object_delimiters) {
+				to.StartObject();
+			}
+
+			augs::for_each_enum_except_bounds([&](typename T::enum_type e) {
+				for (const auto& it : from) {
+					const auto defaults = reference_object[e];
+
+					if (!(defaults == it)) {
+						to.Key(json_stringize(e));
+						write_json_diff(to, it, defaults, true);
+					}
+				}
+			});
+
+			if (write_object_delimiters) {
+				to.EndObject();
+			}
+		}
 		else if constexpr(is_container_v<T>) {
 			using Container = T;
 
@@ -566,7 +658,16 @@ namespace augs {
 					using Field = remove_cref<decltype(field)>;
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
 						if constexpr(is_optional_v<Field>) {
-							static_assert(always_false_v<T>, "Not implemented");
+							if (field == reference_field) {
+								return;
+							}
+
+							if (field) {
+								auto ref = reference_field.has_value() ? *reference_field : typename Field::value_type();
+
+								to.Key(label);
+								write_json_diff(to, *field, ref, true);
+							}
 						}
 						else if constexpr(is_maybe_v<Field>) {
 							if (field == reference_field) {
@@ -607,6 +708,16 @@ namespace augs {
 				to.EndObject();
 			}
 		}
+	}
+
+	template <class T>
+	void save_as_json_diff(const path_type& path, const T& from, const T& reference_object) {
+		rapidjson::StringBuffer s;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+
+		write_json_diff(writer, from, reference_object, true);
+
+		save_as_text(path, s.GetString());
 	}
 }
 

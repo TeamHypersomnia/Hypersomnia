@@ -30,6 +30,7 @@ namespace augs {
 	template <class T>
 	constexpr bool representable_as_json_value_v =
 		std::is_same_v<T, std::string>
+		|| std::is_same_v<T, augs::path_type>
 		|| is_constant_size_string_v<T>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>

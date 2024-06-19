@@ -10,6 +10,8 @@ struct fog_of_war_appearance_settings {
 	bool overlay_color_on_visible = true;
 	rgba overlay_color = rgba(255, 255, 255, 2);
 	// END GEN INTROSPECTOR
+
+	bool operator==(const fog_of_war_appearance_settings& b) const = default;
 };
 
 enum class offscreen_reference_type {
@@ -32,6 +34,8 @@ struct crosshair_drawing_settings {
 	rgba inside_color = white;
 	rgba border_color = black;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const crosshair_drawing_settings& b) const = default;
 };
 
 struct game_drawing_settings {
@@ -91,4 +95,6 @@ struct game_drawing_settings {
 	bool teammates_are_enemies = false;
 	bool stencil_before_light_pass = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const game_drawing_settings& b) const = default;
 };

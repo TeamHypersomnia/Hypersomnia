@@ -3,7 +3,7 @@
 inline void make_canon_config(config_lua_table& result, bool is_dedicated_server) {
 #if !IS_PRODUCTION_BUILD
 		/* Some developer-friendly options */
-		result.http_client.update_on_launch = false;
+		result.self_update.update_on_launch = false;
 		result.client.suppress_webhooks = true;
 		result.server.suppress_new_community_server_webhook = true;
 		result.unit_tests.run = true;

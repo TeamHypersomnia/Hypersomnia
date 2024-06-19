@@ -33,4 +33,6 @@ struct masterserver_settings {
 	port_type get_last_udp_command_port() const {
 		return first_udp_command_port + num_udp_command_ports - 1;
 	}
+
+	bool operator==(const masterserver_settings& b) const = default;
 };

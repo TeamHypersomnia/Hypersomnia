@@ -11,6 +11,8 @@ struct unit_tests_settings {
 
 	augs::path_type redirect_log_to_path = "";
 	// END GEN INTROSPECTOR
+
+	bool operator==(const unit_tests_settings& b) const = default;
 };
 
 namespace augs {

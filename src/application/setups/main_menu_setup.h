@@ -5,8 +5,6 @@
 #include <string>
 #include <optional>
 
-#include <sol/sol.hpp>
-
 #include "augs/math/camera_cone.h"
 #include "augs/templates/thread_templates.h"
 
@@ -41,11 +39,9 @@ struct self_update_result;
 struct config_lua_table;
 struct draw_setup_gui_input;
 
-namespace sol {
-	class state;
-}
-
 struct packaged_official_content;
+
+struct main_menu_setup_detail;
 
 class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::string> latest_news;
@@ -59,7 +55,9 @@ class main_menu_setup : public default_setup_settings {
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
-	sol::table menu_config_patch;
+	std::unique_ptr<main_menu_setup_detail> detail;
+
+	std::string menu_config_patch;
 
 	augs::sound_source menu_theme_source;
 	std::optional<augs::single_sound_buffer> menu_theme;
@@ -81,7 +79,8 @@ class main_menu_setup : public default_setup_settings {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
-	main_menu_setup(sol::state&, const packaged_official_content&, const main_menu_settings);
+	main_menu_setup(const packaged_official_content&, const main_menu_settings);
+	~main_menu_setup();
 
 	void query_latest_news(const std::string& url);
 
