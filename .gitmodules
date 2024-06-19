@@ -1,9 +1,6 @@
 [submodule "3rdparty/polypartition"]
 	path = src/3rdparty/polypartition
 	url = https://github.com/ivanfratric/polypartition.git
-[submodule "3rdparty/lua"]
-	path = src/3rdparty/lua
-	url = https://github.com/lua/lua.git
 [submodule "3rdparty/rectpack2D"]
 	path = src/3rdparty/rectpack2D
 	url = https://github.com/TeamHypersomnia/rectpack2D.git
@@ -16,9 +13,6 @@
 [submodule "3rdparty/Catch"]
 	path = src/3rdparty/Catch
 	url = https://github.com/philsquared/Catch.git
-[submodule "src/3rdparty/sol2"]
-	path = src/3rdparty/sol2
-	url = https://github.com/ThePhD/sol2.git
 [submodule "cmake/Introspector-generator"]
 	path = cmake/Introspector-generator
 	url = https://github.com/TeamHypersomnia/Introspector-generator.git
