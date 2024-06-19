@@ -877,7 +877,7 @@ work_result work(
 	};
 #endif
 
-	WEBSTATIC const auto official = std::make_unique<packaged_official_content>(lua);
+	WEBSTATIC const auto official = std::make_unique<packaged_official_content>();
 
 #if !PLATFORM_WEB
 
@@ -1040,7 +1040,6 @@ work_result work(
 		start.port = bound_port;
 
 		auto server_ptr = std::make_unique<server_setup>(
-			lua,
 			*official,
 			start,
 			config.server,
@@ -1954,7 +1953,6 @@ work_result work(
 			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
-				lua,
 				*official,
 				connect_string,
 				displayed_connecting_server_name,
@@ -2083,7 +2081,6 @@ work_result work(
 
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
-						lua,
 						*official,
 						start,
 						config.server,
@@ -2790,7 +2787,6 @@ work_result work(
 
 						setup_launcher([&]() {
 							emplace_current_setup(std::in_place_type_t<server_setup>(),
-								lua,
 								*official,
 								start,
 								playtest_vars,

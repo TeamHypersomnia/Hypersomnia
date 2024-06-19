@@ -19,11 +19,8 @@ void create_official_resources(
 	editor_resource_pools& pools
 );
 
-packaged_official_content::packaged_official_content(sol::state& lua) {
-	built_content.populate_official_content(
-		lua,
-		60
-	);
+packaged_official_content::packaged_official_content() {
+	built_content.populate_official_content(60);
 
 	::create_official_resources(built_content, resources);
 

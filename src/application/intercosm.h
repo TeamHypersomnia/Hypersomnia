@@ -28,12 +28,10 @@ struct intercosm {
 	// END GEN INTROSPECTOR
 
 	void make_test_scene(
-		sol::state&, 
 		test_scene_settings
 	);
 
 	void populate_official_content(
-		sol::state&, 
 		unsigned tickrate
 	);
 

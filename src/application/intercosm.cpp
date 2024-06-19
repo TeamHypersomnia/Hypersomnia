@@ -40,12 +40,11 @@ void intercosm::clear() {
 }
 
 void intercosm::populate_official_content(
-	sol::state& lua, 
 	const unsigned tickrate
 ) {
 	clear();
 
-	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
+	const auto caches = populate_test_scene_images_and_sounds(viewables);
 
 	world.change_common_significant([&](cosmos_common_significant& common){
 		auto& logicals = common.logical_assets;
@@ -66,13 +65,12 @@ void intercosm::populate_official_content(
 }
 
 void intercosm::make_test_scene(
-	sol::state& lua, 
 	const test_scene_settings settings
 ) {
 	clear();
 
 #if BUILD_TEST_SCENES
-	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
+	const auto caches = populate_test_scene_images_and_sounds(viewables);
 
 	auto reloader = [&](auto populator) {
 		world.change_common_significant([&](cosmos_common_significant& common){

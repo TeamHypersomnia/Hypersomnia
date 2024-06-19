@@ -174,9 +174,7 @@ public:
 		return std::visit(std::forward<F>(f), current_mode_state);
 	}
 
-	template <class S>
 	void make_default(
-		S& lua,
 		cosmos_solvable_significant& target_clean_round_state
 	) const {
 		{
@@ -185,7 +183,7 @@ public:
 			test_scene_settings settings;
 			settings.scene_tickrate = 60;
 
-			scene.make_test_scene(lua, settings);
+			scene.make_test_scene(settings);
 		}
 
 		target_clean_round_state = advanced_cosm.get_solvable().significant;

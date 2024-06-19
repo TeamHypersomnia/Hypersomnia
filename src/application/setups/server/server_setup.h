@@ -119,7 +119,6 @@ class server_setup :
 	augs::path_type current_arena_folder;
 	augs::secure_hash_type current_arena_hash;
 
-	sol::state& lua;
 	const packaged_official_content& official;
 
 	std::unique_ptr<editor_project> last_loaded_project;
@@ -380,7 +379,6 @@ public:
 	static constexpr bool has_additional_highlights = false;
 
 	server_setup(
-		sol::state& lua,
 		const packaged_official_content& official,
 		const augs::server_listen_input&,
 		const server_vars&,

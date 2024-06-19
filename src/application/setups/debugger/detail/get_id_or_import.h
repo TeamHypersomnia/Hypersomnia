@@ -2,7 +2,7 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "augs/misc/maybe_official_path.h"
 
-#include "view/load_meta_lua.h"
+#include "view/load_meta_json.h"
 #include "application/setups/debugger/debugger_history.h"
 #include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/debugger_history.hpp"
@@ -29,7 +29,7 @@ I get_id_or_import(
 
 		const auto resolved = def.get_loadable_path().resolve(project_path);
 
-		::load_meta_lua_if_exists(in.lua, def.meta, resolved);
+		::load_meta_json_if_exists(def.meta, resolved);
 
 		auto cmd = create_pathed_asset_id_command<I>(std::move(def));
 		cmd.common.has_parent = has_parent;

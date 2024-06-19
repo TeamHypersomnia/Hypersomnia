@@ -13,7 +13,6 @@
 struct choose_arena_input {
 	editor_project_readwrite::reading_settings settings;
 
-	sol::state& lua;
 	online_arena_handle<false> handle;
 	const packaged_official_content& official;
 	const arena_identifier& name;
@@ -30,7 +29,7 @@ struct choose_arena_input {
 	void make_default() {
 		LOG_NOFORMAT("Couldn't find arena with a matching hash.\nCreating default scene until another one is chosen.");
 
-		handle.make_default(lua, clean_round_state);
+		handle.make_default(clean_round_state);
 		handle.choose_mode(test_mode_ruleset());
 	}
 };

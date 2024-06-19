@@ -18,7 +18,7 @@ struct packaged_official_content {
 	mutable editor_resource_pools resources;
 	editor_official_resource_map resource_map;
 
-	packaged_official_content(sol::state& lua);
+	packaged_official_content();
 
 private:
 	template <class R, class F>

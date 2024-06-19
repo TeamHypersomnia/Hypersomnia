@@ -109,7 +109,6 @@ class client_setup :
 	/* The rest is client-specific */
 	bool connect_called = false;
 
-	sol::state& lua;
 	const packaged_official_content& official;
 
 	simulation_receiver receiver;
@@ -605,7 +604,6 @@ public:
 	static constexpr bool has_additional_highlights = false;
 
 	client_setup(
-		sol::state& lua,
 		const packaged_official_content& official,
 		const client_connect_string&,
 		const std::string& displayed_connecting_server_name,
@@ -705,7 +703,6 @@ public:
 				client_demo_player player_backup = std::move(demo_player);
 
 				{
-					auto& l = lua;
 					const auto disp_backup = displayed_connecting_server_name;
 					const auto& official = this->official;
 
@@ -713,7 +710,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt, "");
+					new (this) client_setup(official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt, "");
 				}
 
 				demo_player = std::move(player_backup);

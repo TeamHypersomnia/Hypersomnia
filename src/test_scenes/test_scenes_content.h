@@ -29,7 +29,6 @@ namespace sol {
 }
 
 void load_test_scene_images(
-	sol::state& lua,
 	image_definitions_map&
 );
 
@@ -46,7 +45,6 @@ void load_test_scene_sentience_properties(cosmos_common_significant&);
 /* Top-level populators */
 
 loaded_image_caches_map populate_test_scene_images_and_sounds(
-	sol::state& lua,
 	all_viewables_defs& output_sources
 ); 
 

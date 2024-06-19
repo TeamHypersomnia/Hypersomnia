@@ -23,7 +23,6 @@ struct debugger_settings;
 class debugger_player;
 
 struct debugger_command_input {
-	sol::state& lua;
 	const debugger_settings& settings;
 	debugger_folder& folder;
 	debugger_entity_selector& selector;

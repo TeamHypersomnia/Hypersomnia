@@ -36,7 +36,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 	test_mode_ruleset offi_tt;
 	arena_mode_ruleset offi_bt;
 
-	test->make_test_scene(cmd_in.lua, test_scene_settings(), offi_tt, &offi_bt);
+	test->make_test_scene(test_scene_settings(), offi_tt, &offi_bt);
 
 	std::vector<std::string> added_names;
 

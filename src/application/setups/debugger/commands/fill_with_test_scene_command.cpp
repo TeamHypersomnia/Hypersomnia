@@ -54,7 +54,7 @@ void fill_with_test_scene_command::redo(const debugger_command_input in) {
 
 	const auto& settings = in.settings.test_scene;
 
-	work.make_test_scene(in.lua, { minimal, settings.scene_tickrate });
+	work.make_test_scene({ minimal, settings.scene_tickrate });
 
 	auto& all = rulesets.all;
 	all.clear();

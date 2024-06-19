@@ -665,7 +665,6 @@ std::vector<rtc::IceServer> get_ice_servers() {
 }
 
 server_setup::server_setup(
-	sol::state& lua,
 	const packaged_official_content& official,
 	const augs::server_listen_input& in,
 	const server_vars& initial_vars,
@@ -680,7 +679,6 @@ server_setup::server_setup(
 	const std::string& webrtc_signalling_server_url
 ) : 
 	integrated_client_vars(integrated_client_vars),
-	lua(lua),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
@@ -2578,7 +2576,6 @@ void server_setup::rechoose_arena() {
 	{
 		const auto result = ::choose_arena_server({
 			editor_project_readwrite::reading_settings(),
-			lua,
 			arena,
 			official,
 			vars.arena,
@@ -4814,9 +4811,6 @@ bool server_client_state::is_web_client() const {
 #undef BUILD_UNIT_TESTS
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
-#include "augs/misc/lua/lua_utils.h"
-#include <sol/sol.hpp>
-#include "augs/readwrite/lua_file.h"
 
 TEST_CASE("NetSerialization EmptyEntropies") {
 	{
@@ -4891,10 +4885,8 @@ TEST_CASE("NetSerialization ClientEntropy") {
 	const auto naively_received = augs::from_bytes<total_client_entropy>(naive_bytes);
 
 	if (!(received == sent) || !(received == naively_received)) {
-		auto lua = augs::create_lua_state();
-
-		augs::save_as_lua_table(lua, sent, "sent.lua");
-		augs::save_as_lua_table(lua, received, "received.lua");
+		augs::save_as_json(sent, "sent.json");
+		augs::save_as_json(received, "received.json");
 	}
 
 	REQUIRE(received.cosmic.motions.at(game_motion_type::MOVE_CROSSHAIR) == naively_received.cosmic.motions.at(game_motion_type::MOVE_CROSSHAIR));
@@ -4944,10 +4936,8 @@ TEST_CASE("NetSerialization ServerEntropy") {
 	REQUIRE(ss.read_payload(received));
 
 	if (!(received == sent) || !(received == naively_received)) {
-		auto lua = augs::create_lua_state();
-
-		augs::save_as_lua_table(lua, sent, "sent.lua");
-		augs::save_as_lua_table(lua, received, "received.lua");
+		augs::save_as_json(sent, "sent.json");
+		augs::save_as_json(received, "received.json");
 	}
 
 	REQUIRE(received == naively_received);
@@ -5010,10 +5000,8 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 	REQUIRE(ss.read_payload(received));
 
 	if (!(received == sent) || !(received == naively_received)) {
-		auto lua = augs::create_lua_state();
-
-		augs::save_as_lua_table(lua, sent, "sent.lua");
-		augs::save_as_lua_table(lua, received, "received.lua");
+		augs::save_as_json(sent, "sent.json");
+		augs::save_as_json(received, "received.json");
 	}
 
 	REQUIRE(received == naively_received);

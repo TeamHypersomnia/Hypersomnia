@@ -691,7 +691,6 @@ bool client_setup::pending_pre_connection_handshake() const {
 std::vector<rtc::IceServer> get_ice_servers();
 
 client_setup::client_setup(
-	sol::state& lua,
 	const packaged_official_content& official,
 	const client_connect_string& connect_string,
 	const std::string& displayed,
@@ -702,7 +701,6 @@ client_setup::client_setup(
 
 	const std::string& webrtc_signalling_server_url
 ) : 
-	lua(lua),
 	official(official),
 	connect_string(connect_string),
 	before_traversal_server_address(before_traversal_server_address),
@@ -1068,7 +1066,6 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 		const auto choice_result = ::choose_arena_client(
 			{
 				editor_project_readwrite::reading_settings(),
-				lua,
 				referential_arena,
 				official,
 				new_vars.arena,
@@ -1627,7 +1624,7 @@ void client_setup::snap_interpolations() {
 }
 
 #if DEBUG_SOLVABLES
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #endif
 
 void client_setup::perform_demo_player_imgui(augs::window& window) {
@@ -1646,7 +1643,7 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 #if DEBUG_DESYNCS
 		LOG_BYTE_SERIALIZE = true;
 		augs::save_as_bytes(clean_round_state, "/tmp/crs.solv");
-		augs::save_as_lua_table(lua, clean_round_state, "/tmp/crs.lua");
+		augs::save_as_json(clean_round_state, "/tmp/crs.json");
 		LOG_BYTE_SERIALIZE = false;
 #endif
 	}

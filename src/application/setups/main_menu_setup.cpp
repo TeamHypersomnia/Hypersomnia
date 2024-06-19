@@ -159,7 +159,6 @@ main_menu_setup::main_menu_setup(
 		::load_arena_from_path(
 			{
 				editor_project_readwrite::reading_settings(),
-				lua,
 				handle,
 				official,
 				"",

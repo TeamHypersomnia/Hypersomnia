@@ -12,7 +12,7 @@
 
 #include "test_scenes/test_enum_to_path.h"
 #include "augs/readwrite/lua_readwrite_errors.h"
-#include "view/load_meta_lua.h"
+#include "view/load_meta_json.h"
 
 #include "augs/log_direct.h"
 #include "augs/filesystem/find_path.h"
@@ -22,25 +22,23 @@ struct test_image_does_not_exist {
 };
 
 void load_test_scene_images(
-	sol::state& lua,
 	image_definitions_map& all_definitions
 ) {
 	using test_id_type = test_scene_image_id;
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
-	auto setup_with_path = [&all_definitions, &lua](const augs::path_type& final_path) {
+	auto setup_with_path = [&all_definitions](const augs::path_type& final_path) {
 		image_definition new_def;
 		new_def.set_source_path({ final_path.string(), true });
 
 		try {
-			load_meta_lua_if_exists(
-				lua, 
+			load_meta_json_if_exists(
 				new_def.meta, 
 				image_definition_view({}, new_def).get_source_image_path()
 			);
 		}
-		catch (const augs::lua_deserialization_error& err) {
+		catch (const augs::json_deserialization_error& err) {
 			throw test_scene_asset_loading_error(
 				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
 				final_path,

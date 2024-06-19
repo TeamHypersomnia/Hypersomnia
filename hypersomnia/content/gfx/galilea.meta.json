@@ -1,0 +1,146 @@
+{
+    "extra_loadables": {
+        "generate_neon_map": {
+            "standard_deviation": 6.0,
+            "radius": [
+                80,
+                80
+            ],
+            "amplification": 90.0,
+            "alpha_multiplier": 1.0,
+            "light_colors": [[254, 127, 0, 255], [255, 255, 255, 255], [122, 122, 122, 255]
+            ]
+        },
+        "generate_desaturation": false
+    },
+    "usage_as_button": {
+        "flip": {
+            "horizontally": false,
+            "vertically": false
+        },
+        "bbox_expander": [0.0, 0.0]
+    },
+    "offsets": {
+        "torso": {
+            "primary_hand": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "secondary_hand": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "back": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "head": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "legs": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shoulder": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "secondary_shoulder": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "strafe_facing_offset": 0.0,
+            "is_akimbo": false
+        },
+        "legs": {
+            "foot": [0, 0]
+        },
+        "gun": {
+            "bullet_spawn": [0, -3],
+            "detachable_magazine": {
+                "pos": [-17, 3],
+                "rotation": 0.0
+            },
+            "chamber": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "chamber_magazine": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shell_spawn": {
+                "pos": [-17, -6],
+                "rotation": -90.0
+            },
+            "rail": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            }
+        },
+        "item": {
+            "hand_anchor": {
+                "pos": [-28, 0],
+                "rotation": 0.0
+            },
+            "back_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shoulder_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "head_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "attachment_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "akimbo_offset": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            }
+        },
+        "non_standard_shape": {
+            "source_polygon": [[-58.0, -8.0], [-34.0, -5.0], [-32.0, -8.0], [57.0, -6.0], [57.0, 2.0], [34.0, 0.0], [33.0, 3.0], [0.0, 6.0], [-10.0, 5.0], [-11.0, 0.0], [-20.0, 0.0], [-22.0, 3.0], [-28.0, 4.0], [-35.0, 1.0], [-58.0, 2.0]
+            ],
+            "convex_partition": [
+                14,
+                0,
+                1,
+                13,
+                14,
+                3,
+                4,
+                5,
+                2,
+                3,
+                2,
+                5,
+                6,
+                9,
+                2,
+                11,
+                12,
+                13,
+                1,
+                2,
+                10,
+                11,
+                7,
+                8,
+                9,
+                6,
+                7,
+                10,
+                2,
+                9,
+                10
+            ]
+        }
+    }
+}

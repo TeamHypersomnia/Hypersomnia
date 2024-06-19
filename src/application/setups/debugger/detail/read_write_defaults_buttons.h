@@ -2,7 +2,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 
-#include "view/load_meta_lua.h"
+#include "view/load_meta_json.h"
 
 #include "application/setups/debugger/property_debugger/property_debugger_settings.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
@@ -29,20 +29,20 @@ void read_write_defaults_buttons(
 	const auto resolved = view.get_resolved_source_path();
 
 	{
-		const auto meta_lua_path = get_meta_lua_path(resolved);
-		auto cols = maybe_disabled_cols(settings, !augs::exists(meta_lua_path));
+		const auto meta_json_path = get_meta_json_path(resolved);
+		auto cols = maybe_disabled_cols(settings, !augs::exists(meta_json_path));
 
 		if (ImGui::Button("Read defaults")) {
 			try {
 				decltype(definition_object.meta) new_meta;
-				load_meta_lua_if_exists(cmd_in.lua, new_meta, resolved);
+				load_meta_json_if_exists(new_meta, resolved);
 
 				cmd_type cmd;
 
 				cmd.affected_assets = { id };
 				cmd.property_id.field = make_field_address<field_type_id>(definition_object, definition_object.meta);
 				augs::assign_bytes(cmd.value_after_change, new_meta);
-				cmd.built_description = "Read defaults from " + augs::filename_first(meta_lua_path);
+				cmd.built_description = "Read defaults from " + augs::filename_first(meta_json_path);
 
 				post_debugger_command(cmd_in, std::move(cmd));
 			}
@@ -52,7 +52,7 @@ void read_write_defaults_buttons(
 		}
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("Read defaults from:\n%x", meta_lua_path);
+			text_tooltip("Read defaults from:\n%x", meta_json_path);
 		}
 
 		ImGui::SameLine();
@@ -61,7 +61,7 @@ void read_write_defaults_buttons(
 	{
 		if (ImGui::Button("Write defaults")) {
 			if (!is_current_ticked) {
-				save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
+				save_meta_json(definition_object.meta, resolved);
 			}
 			else {
 				for (const auto& t : ticked_in_range) {
@@ -69,7 +69,7 @@ void read_write_defaults_buttons(
 					const auto& ticked_view = asset_definition_view<const D>(project_path, ticked_definition_object);
 					const auto ticked_resolved = ticked_view.get_resolved_source_path();
 
-					save_meta_lua(cmd_in.lua, ticked_definition_object.meta, ticked_resolved);
+					save_meta_json(ticked_definition_object.meta, ticked_resolved);
 				}
 			}
 		}
@@ -86,7 +86,7 @@ void read_write_defaults_buttons(
 			};
 
 			auto print_path = [&](const augs::path_type& ticked_resolved) {
-				const auto meta_path = get_meta_lua_path(ticked_resolved);
+				const auto meta_path = get_meta_json_path(ticked_resolved);
 				return meta_path.string() + " " + get_lwt(meta_path);
 			};
 
