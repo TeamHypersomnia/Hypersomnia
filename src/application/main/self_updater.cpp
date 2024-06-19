@@ -64,7 +64,7 @@ self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	const bool only_check_availability_and_quit,
 	const augs::image* imgui_atlas_image,
-	const http_client_settings& http_settings,
+	const self_update_settings& http_settings,
 	augs::window_settings window_settings,
 	bool headless
 ) {

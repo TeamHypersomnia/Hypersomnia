@@ -48,7 +48,7 @@
 #include "application/network/simulation_receiver_settings.h"
 #include "application/network/host_with_default_port.h"
 #include "application/performance_settings.h"
-#include "application/http_client/http_client_settings.h"
+#include "application/http_client/self_update_settings.h"
 #include "application/masterserver/masterserver_settings.h"
 #include "application/nat/nat_detection_settings.h"
 #include "application/nat/nat_traversal_settings.h"
@@ -105,7 +105,7 @@ struct config_lua_table {
 
 	masterserver_settings masterserver;
 
-	http_client_settings self_update;
+	self_update_settings self_update;
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
 	augs::renderer_settings renderer;

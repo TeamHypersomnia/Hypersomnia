@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "augs/window_framework/window_settings.h"
-#include "application/http_client/http_client_settings.h"
+#include "application/http_client/self_update_settings.h"
 #include "augs/image/image.h"
 
 enum class self_update_result_type {
@@ -41,7 +41,7 @@ self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	bool only_check_availability_and_quit,
 	const augs::image* imgui_atlas_image,
-	const http_client_settings& settings,
+	const self_update_settings& settings,
 	augs::window_settings window_settings,
 	bool headless
 );

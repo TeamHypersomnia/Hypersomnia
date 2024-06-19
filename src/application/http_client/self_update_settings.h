@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 
-struct http_client_settings {
-	// GEN INTROSPECTOR struct http_client_settings
+struct self_update_settings {
+	// GEN INTROSPECTOR struct self_update_settings
 	bool update_on_launch = true;
 
 	int update_connection_timeout_secs = 5;
@@ -10,5 +10,5 @@ struct http_client_settings {
 	std::string update_path = "/builds/latest";
 	// END GEN INTROSPECTOR
 
-	bool operator==(const http_client_settings& b) const = default;
+	bool operator==(const self_update_settings& b) const = default;
 };
