@@ -105,7 +105,7 @@ To ensure that gameplay recordings are replayed deterministically,
 NONE of the above should be deleted during a playtest (more on that later).
 
 - Folder: ``Project-export``. 
-	- An empty folder created for your convenience when you decide to export the project to portable lua files.
+	- An empty folder created for your convenience when you decide to export the project to portable json files.
 	  This way, you won't have to create this folder yourself and a nice convention on locating the exports is established.
 	- Can be safely deleted at any time.
 

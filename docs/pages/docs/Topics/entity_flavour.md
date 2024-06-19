@@ -154,6 +154,6 @@ It maps flavour identifiers found in the [flavour component](flavour_component) 
 Preferably, the container should be a constant size vector as the flavour ids will just be consecutive integers.  
 
 Care must be taken that the storage is not treated like trivially copyable types during byte readwrite:
-A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according invariants;  
+A custom readwrite overloads will be in order, both for json and binary, which will take note of which initial component values are set, and serialize only the according invariants;  
 At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.
 

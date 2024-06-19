@@ -3,7 +3,7 @@
 namespace augs {
 /*	
 	We generate introspectors for the pool and its internal structures,
-	becasuse it will be very useful to be able to dump the values to lua files,
+	as it will be very useful to be able to dump the values to json files,
 	if some debugging is necessary.
 */
 

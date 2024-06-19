@@ -661,7 +661,7 @@ we consider whole type overrides too complex architeciturally:
 				- Flavours will very often share logical assets though, by their definition, so it makes sense to have them identified
 			- Architecturally, the flavours will store only identificators anyway.
 				- So in case if shit hits the fan, we can provide the user with a textbox to change the broken paths
-			- Proposition: the editor shall perform i/o upon the extras.lua and meta.lua
+			- Proposition: the editor shall perform i/o upon the extras.lua and meta.json
 				- Because if we consider the game image's path to be an identificator, what happens if it gets moved?
 				- It's a pain though because we will have duplicate state
 			- Behaviour in sprite invariant

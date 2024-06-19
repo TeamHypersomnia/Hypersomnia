@@ -388,7 +388,7 @@ Chyba jednak nie robimy osobno pliku resources.
 		- Nawet jesli sandboxujemy skrypty to przynajmniej jeden mniej wektor ataku bedzie jak przynajmniej te nieskryptowe dane porobimy w jakims jsonie.
 		- Json bedzie mega szybszy do parsowania i mniej error prone
 		- Json bedzie latwiej wczytac w jakims toolu webowym czy tam katalogu mapek
-			- A tak to by taki tool tez musial sandboxowac lua albo konwertowac se, bez sensu
+			- A tak to by taki tool tez musial sandboxowac json albo konwertowac se, bez sensu
 	- Czemu nie TOML
 		- Owszem to była dobra rozkmina żeby już używać tylko jednego poziomu głębokości ale to już zależy tylko od nas
 			- a w razie czego mamy taką możliwość
@@ -398,7 +398,7 @@ Chyba jednak nie robimy osobno pliku resources.
 				- wall_attenuation_quadratic zamiast wall: attenutation: { quadratic = 2 } itp
 				- bo i tak bym trzymal chyba wszystko na jednym poziomie
 
-- Uzywamy LUA:
+- Uzywamy json:
 	- Do user configow (default_config.json i user/config.json) 
 		- bo one sa trusted i przydaja sie takie rzeczy jak pobieranie rcon passworda
 

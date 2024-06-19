@@ -15,12 +15,12 @@ debugger_recent_paths::debugger_recent_paths(sol::state& lua) {
 void debugger_recent_paths::add(sol::state& lua, augs::path_type path) {
 	erase_element(paths, path);
 	paths.insert(paths.begin(), path);
-	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
+	augs::save_as_json(*this, get_recent_paths_path());
 }
 
 void debugger_recent_paths::clear(sol::state& lua) {
 	paths.clear();
-	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
+	augs::save_as_json(*this, get_recent_paths_path());
 }
 
 bool debugger_recent_paths::empty() const {

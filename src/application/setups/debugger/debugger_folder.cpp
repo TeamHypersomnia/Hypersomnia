@@ -253,8 +253,8 @@ void debugger_folder::export_folder(sol::state& lua, const augs::path_type& to) 
 	const auto name = ::get_project_name(to);
 	const auto paths = debugger_paths(to, name);
 
-	commanded->work.save_as_lua({ lua, paths.int_lua_file });
-	augs::save_as_lua_table(lua, commanded->rulesets, paths.rulesets_lua_file);
+	commanded->work.save_as_json({ paths.int_lua_file });
+	augs::save_as_json(commanded->rulesets, paths.rulesets_json_file);
 }
 
 void debugger_folder::import_folder(sol::state& lua, const augs::path_type& from) {
@@ -266,7 +266,7 @@ void debugger_folder::import_folder(sol::state& lua, const augs::path_type& from
 	commanded->work.load_from_lua({ lua, int_lua_path });
 
 	try {
-		augs::load_from_lua_table(lua, commanded->rulesets, paths.rulesets_lua_file);
+		augs::load_from_lua_table(lua, commanded->rulesets, paths.rulesets_json_file);
 	}
 	catch (...) {
 		/* It's not necessary that we have the modes. */

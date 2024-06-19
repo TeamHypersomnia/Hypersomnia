@@ -34,7 +34,7 @@ extern augs::path_type APPDATA_DIR;
 #define OFFICIAL_CONTENT_FOLDER_NAME "content"
 
 /*
-	Some essentials lua scripts, ssh-keygen, and internal data files needed by the executable.
+	Some internal data files needed by the executable like STUN server list.
 */
 
 #define DETAIL_FOLDER_NAME "detail"

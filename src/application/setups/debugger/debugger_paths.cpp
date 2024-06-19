@@ -23,7 +23,7 @@ debugger_paths::debugger_paths(
 
 	int_lua_file = in_folder(".int.lua");
 	json_export_file = in_folder(".json");
-	rulesets_lua_file = in_folder(".rulesets.lua");
+	rulesets_json_file = in_folder(".rulesets.json");
 
 	default_export_path = target_folder / (project_name + "-export");
 	imported_folder_path = target_folder / (project_name + "-imported");

@@ -335,7 +335,7 @@ summary: Just a hidden scratchpad.
 		- For now expose transfer GUI?
 
 - enum_boolset begin and end should probably return enums
-	- simpler lua i/o
+	- simpler json i/o
 	- no need for for-eaches
 	- nice exercise for iterators
 

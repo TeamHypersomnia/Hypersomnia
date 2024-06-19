@@ -3,17 +3,17 @@ In the Images GUI, you can:
 - Edit properties of imported images.
 	- You can check multiple images for editing.
 	  The same rules apply as when editing multiple flavours.
-- Export properties of images to a neighboring ``.meta.lua`` file.
+- Export properties of images to a neighboring ``.meta.json`` file.
 	- Any time that an editor imports an ``path/to/img/image.png`` for its first use, 
-	  it will check if a ``path/to/img/image.meta.lua`` exists. If it does,
+	  it will check if a ``path/to/img/image.meta.json`` exists. If it does,
 	  the default settings will be loaded from that file.
-	- Almost all official images have a ``.meta.lua`` file. 
+	- Almost all official images have a ``.meta.json`` file. 
 	  Naturally, they will be used whenever you fill your project with a test scene.
-- Manually import properties of images from a neighbouring ``.meta.lua`` file. 
+- Manually import properties of images from a neighbouring ``.meta.json`` file. 
 - Forget the orphaned images - those that are not used anywhere anymore.
 	- Simply press "F" next to the orphaned image name.
 		- Warning: this will cause the image properties to be deleted from the project.
-		  Only the ``.meta.lua`` file will, of course, survive.
+		  Only the ``.meta.json`` file will, of course, survive.
 
 ## Renamed, moved or deleted images
 

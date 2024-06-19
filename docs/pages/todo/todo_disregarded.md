@@ -232,7 +232,7 @@ summary: Just a hidden scratchpad.
 	- applicable: quick invariant copies
 		- what about byte readwrite?
 			- it anyway reinterpret casts to mutable bytes
-		- what about lua readwrite?
+		- what about json readwrite?
 			- it anyways creates and destroys entities
 		- what about delta?
 			- it anyways creates and destroys entities
@@ -273,7 +273,7 @@ summary: Just a hidden scratchpad.
 
 - add "direct_construction_access" for entity handles
 	- wtf?
-- let meta.lua have convex partitions and let author just define those convex partitions for simplicity
+- let meta.json have convex partitions and let author just define those convex partitions for simplicity
 	- let invariants::polygon have vector to not make things overly complicated
 	- polygon component makes triangulation anyway
 
@@ -324,7 +324,7 @@ summary: Just a hidden scratchpad.
 					- ...in which case being explicit is better
 				- The artist's intervention will almost always be required anywany, especially for setting new durations et cetera
 			- **So we're gonna go with the literal format, at least for now**
-				- Nothing stops us from manually writing lua files for official resources to later have no need to re-import and re-export in editor
+				- Nothing stops us from manually writing json files for official resources to later have no need to re-import and re-export in editor
 <!--
 		- Semi-literal format: literal if there is a need, don't store filenames if the use corresponds directly to the frames on disk
 			- Con: quite complicated workflow? Simplicity sometimes beats the automation?
@@ -414,7 +414,7 @@ summary: Just a hidden scratchpad.
 	- Or do we assume that there won't be any flavour ids specifiable?
 		- Well actually even requested initial eq has flavour ids, so it's a no-go.
 
-	- lua vs binary files
+	- json vs binary files
 		- The write time will be negligible for such small amounts of information
 		- Well... anyway let's store it as binary for now, because flavour ids won't be human readable anyway
 			- Predefined configs might as well be edited in editor instead of a text file
@@ -696,8 +696,8 @@ summary: Just a hidden scratchpad.
     - Each instance will have the same config directory
         - Except they will have differing configs for map cycles, no?
             - We can make a --config CLI to read another config from the cwd that works like config.force.json
-                - server1.force.lua
-                - server2.force.lua (all can be next to config.force.json)
+                - server1.force.json
+                - server2.force.json (all can be next to config.force.json)
                 - etc.
             - Otherwise they'll all just read from .config/Hypersomnia or local folder
 

@@ -1,6 +1,6 @@
 # arena.project.yml Format
 
-- Using YAML might make it easier to the extent that we won't need to pass around the lua state, probably
+- Using YAML might make it easier to the extent that we won't need to pass around the json state, probably
 
 ## Project settings
 

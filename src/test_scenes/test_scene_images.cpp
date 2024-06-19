@@ -39,7 +39,7 @@ void load_test_scene_images(
 		}
 		catch (const augs::json_deserialization_error& err) {
 			throw test_scene_asset_loading_error(
-				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
+				"Failed to load additional properties for %x:\nNot a valid json table.\n%x",
 				final_path,
 				err.what()
 			);

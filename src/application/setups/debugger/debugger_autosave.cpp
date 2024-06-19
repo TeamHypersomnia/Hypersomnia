@@ -26,7 +26,7 @@ static void save_last_folders(
 		last_folders.paths.push_back(f.current_path);
 	}
 
-	augs::save_as_lua_table(lua, last_folders, get_last_folders_path());
+	augs::save_as_json(last_folders, get_last_folders_path());
 }
 
 void debugger_autosave::save(

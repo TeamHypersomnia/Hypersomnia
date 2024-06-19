@@ -55,14 +55,14 @@ You'll need:
 
 For example:
 
-```lua
-  server = {
-    webrtc_udp_mux = true,
-    webrtc_port_range_begin = 9000
-    -- , webrtc_port_range_end = 9020 -- only matters if webrtc_udp_mux = false
+```json
+  "server": {
+    "webrtc_udp_mux": true,
+    "webrtc_port_range_begin": 9000,
+    -- , "webrtc_port_range_end": 9020 -- only matters if webrtc_udp_mux = false
   },
-  server_start = {
-    port = 8412
+  "server_start": {
+    "port": 8412
   }
 ```
 
@@ -96,13 +96,13 @@ make_server_dir "4"
 You can then run several server instances like this:
 
 ```sh
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appdata-dir ./servers/2 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appdata-dir ./servers/3 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.lua --appdata-dir ./servers/4 --daily-autoupdate > /dev/null 2>&1 &
+nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
+nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/2 --daily-autoupdate > /dev/null 2>&1 &
+nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/3 --daily-autoupdate > /dev/null 2>&1 &
+nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/4 --daily-autoupdate > /dev/null 2>&1 &
 ```
 
-The servers will share ``config.common.lua`` and *later* apply their server-specific config in e.g. ``./servers/2/user/config.force.json``.
+The servers will share ``config.common.json`` and *later* apply their server-specific config in e.g. ``./servers/2/user/config.force.json``.
 
 They will also share the community maps so as to not have to download them again.
 

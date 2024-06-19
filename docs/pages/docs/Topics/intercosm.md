@@ -26,11 +26,11 @@ An intercosm can currently be read or written to disk in two different ways:
 		- In practice, the game is continuously versioned, so there will always be a way to do this, unless the Hypersomnia repositories themselves are wiped out of the face of the universe.
 		- Additionally, ``.int`` files are always stamped with the version they were created with (which in turn can always be read by any version of Hypersomnia), so it will be possible to know which version of the game is required to export it to a more portable format.
 
-- As a ``.lua`` file, which contains a textual, human-readable representation of the entire content.
+- As a ``.json`` file, which contains a textual, human-readable representation of the entire content.
 	- **Purpose:** to have an intercosm that **may be later ported** to newer versions of Hypersomnia.
-		- Note: if you save to a ``.lua`` file, it does not automatically become usable by newer versions of Hypersomnia. The format itself just **makes it possible** to port an intercosm to a newer version, unlike the binary representation. Effort still must be made to possibly rename some important fields, remove unused ones, or fill in the fields that had not existed by the time of creating the intercosm.
+		- Note: if you save to a ``.json`` file, it does not automatically become usable by newer versions of Hypersomnia. The format itself just **makes it possible** to port an intercosm to a newer version, unlike the binary representation. Effort still must be made to possibly rename some important fields, remove unused ones, or fill in the fields that had not existed by the time of creating the intercosm.
 	- **Drawbacks:** an order of magnitude slower saving and loading than a plain binary ``.int`` file.
 
 As an [author](author), you will most often use only the ``.int`` format because of its performance, especially when targeting only a particular Hypersomnia version or mod.  
 
-The only use-case you would have for the ``.lua`` format as an author is when you actually want to port your work to a different version of Hypersomnia.  
+The only use-case you would have for the ``.json`` format as an author is when you actually want to port your work to a different version of Hypersomnia.  
