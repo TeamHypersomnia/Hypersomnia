@@ -98,7 +98,6 @@ struct necessary_image_definitions_map :
 	public augs::enum_map<assets::necessary_image_id, image_definition>
 {
 	necessary_image_definitions_map(
-		sol::state& lua,
 		const augs::path_type& directory,
 		const bool force_regenerate
 	);

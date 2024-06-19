@@ -1305,7 +1305,6 @@ work_result work(
 
 	LOG("Initializing the necessary image definitions.");
 	WEBSTATIC const necessary_image_definitions_map necessary_image_definitions(
-		lua,
 		"content/gfx/necessary",
 		config.content_regeneration.regenerate_every_time
 	);

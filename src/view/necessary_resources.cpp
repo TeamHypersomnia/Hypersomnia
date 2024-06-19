@@ -13,7 +13,7 @@
 #include "view/viewables/regeneration/images_from_commands.h"
 #include "view/viewables/regeneration/procedural_image_definition.h"
 
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #include "augs/graphics/renderer_command.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.hpp"
@@ -158,7 +158,6 @@ augs::path_type get_procedural_image_path(const augs::path_type& from_source_pat
 }
 
 necessary_image_definitions_map::necessary_image_definitions_map(
-	sol::state& lua,
 	const augs::path_type& directory,
 	const bool force_regenerate
 ) {
@@ -174,35 +173,6 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 		image_definition definition_template;
 		auto& source_image = definition_template.source_image;
 
-		if (
-			const auto additional_properties_path = typesafe_sprintf("%x/%x.lua", directory, stem);
-			augs::exists(additional_properties_path)
-		) {
-			try {
-				augs::load_from_lua_table(
-					lua,
-					definition_template,
-					additional_properties_path
-				);
-			}
-			catch (const augs::lua_deserialization_error& err) {
-				throw necessary_resource_loading_error(
-					"Failed to load additional properties for %x (%x).\nNot a valid lua table.\n%x",
-					stem, 
-					additional_properties_path,
-					err.what()
-				);
-			}
-			catch (const augs::file_open_error& err) {
-				throw necessary_resource_loading_error(
-					"Failed to load additional properties for %x (%x).\nFile might be corrupt.\n%x",
-					stem,
-					additional_properties_path,
-					err.what()
-				);
-			}
-		}
-
 		std::string preffix;
 
 		if (begins_with(stem, "social")) {
@@ -216,17 +186,22 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 			emplace(id, definition_template);
 		}
 		else if (
-			const auto procedural_definition_path = typesafe_sprintf("%x/procedural/%x.lua", directory, stem);
+			const auto procedural_definition_path = typesafe_sprintf("%x/procedural/%x.json", directory, stem);
 			augs::exists(procedural_definition_path)
 		) {
 			procedural_image_definition def;
 
 			try {
-				augs::load_from_lua_table(lua, def, procedural_definition_path);
+				LOG("Reading %x", procedural_definition_path);
+
+				augs::from_json_file(
+					procedural_definition_path,
+					def
+				);
 			}
-			catch (const augs::lua_deserialization_error& err) {
+			catch (const augs::json_deserialization_error& err) {
 				throw necessary_resource_loading_error(
-					"Failed to load procedural image definition for %x (%x).\nNot a valid lua table.\n%x",
+					"Failed to load procedural image definition for %x (%x).\nNot a valid json table.\n%x",
 					stem,
 					procedural_definition_path,
 					err.what()

@@ -123,6 +123,32 @@ namespace augs {
 		if constexpr(representable_as_json_value_v<T>) {
 			general_read_json_value(from, out);
 		}
+		else if constexpr(is_variant_v<T>) {
+			if (from.IsObject() && from.HasMember("type") && from["type"].IsString()) {
+				std::string variant_type = from["type"].GetString();
+
+				if (variant_type == "std_monostate") {
+					return;
+				}
+
+				if (from.HasMember("fields")) {
+					for_each_type_in_list<T>(
+						[variant_type, &from, &out](const auto& resolved){
+							if constexpr(!is_monostate_v<decltype(resolved)>) {
+								const auto this_type_name = get_type_name_strip_namespace(resolved);
+
+								if (this_type_name == variant_type) {
+									using O = remove_cref<decltype(resolved)>;
+									O object{};
+									read_json(from["fields"], object);
+									out.template emplace<O>(std::move(object));
+								}
+							}
+						}
+					);
+				}
+			}
+		}
 		else if constexpr(is_container_v<T>) {
 			using Container = T;
 
@@ -192,7 +218,15 @@ namespace augs {
 					[&from](const auto& label, auto& field) {
 						using Field = remove_cref<decltype(field)>;
 
-						if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
+						if constexpr(is_optional_v<Field>) {
+							if (from.HasMember(label)) {
+								field.reset();
+								field.emplace();
+
+								read_json(from[label], *field);
+							}
+						}
+						else if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
 							if constexpr(is_maybe_v<Field>) {
 								if (from.HasMember(label)) {
 									read_json(from[label], field.value);
@@ -292,6 +326,11 @@ namespace augs {
 		return from_json_string<T>(file_to_string(path));
 	}
 
+	template <class T>
+	void from_json_file(const path_type& path, T& into) {
+		from_json_string(file_to_string(path), into);
+	}
+
 	template <class F, class T>
 	void general_write_json_value(F& to, const T& from) {
 		if constexpr(has_custom_to_json_value_v<T>) {
@@ -346,6 +385,33 @@ namespace augs {
 	void write_json(F& to, const T& from) {
 		if constexpr(representable_as_json_value_v<T>) {
 			general_write_json_value(to, from);
+		}
+		else if constexpr(is_variant_v<T>) {
+			to.StartObject();
+
+			std::visit(
+				[&](const auto& resolved) mutable {
+					const auto variant_type_label = "type";
+					const auto variant_fields_label = "fields";
+
+					if constexpr(is_monostate_v<decltype(resolved)>) {
+						to.Key(variant_type_label);
+						to.String("std_monostate");
+					}
+					else {
+						const auto this_type_name = get_type_name_strip_namespace(resolved);
+
+						to.Key(variant_type_label);
+						to.String(this_type_name);
+
+						to.Key(variant_fields_label);
+						write_json(to, resolved);
+					}
+				}, 
+				from
+			);
+
+			to.EndObject();
 		}
 		else if constexpr(is_container_v<T>) {
 			using Container = T;
@@ -440,6 +506,9 @@ namespace augs {
 		if constexpr(representable_as_json_value_v<T>) {
 			general_write_json_value(to, from);
 		}
+		else if constexpr(is_variant_v<T>) {
+			static_assert(always_false_v<T>, "Not implemented");
+		}
 		else if constexpr(is_container_v<T>) {
 			using Container = T;
 
@@ -486,7 +555,10 @@ namespace augs {
 				[&to](const auto& label, const auto& field, const auto& reference_field) {
 					using Field = remove_cref<decltype(field)>;
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
-						if constexpr(is_maybe_v<Field>) {
+						if constexpr(is_optional_v<Field>) {
+							static_assert(always_false_v<T>, "Not implemented");
+						}
+						else if constexpr(is_maybe_v<Field>) {
 							if (field == reference_field) {
 								return;
 							}
