@@ -66,7 +66,7 @@ public:
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const type_in_list_id<List> x) {
-		return out << x.index;
+		return out << std::to_string(x.index);
 	}
 
 	bool is_set() const {

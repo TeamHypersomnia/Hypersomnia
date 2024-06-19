@@ -1206,6 +1206,10 @@ if(CLANG)
 		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra -Wcast-align -Wover-aligned")
 	endif()
 
+	if (BUILD_FOR_WEB)
+		set(CHOSEN_WARNINGS "${CHOSEN_WARNINGS} -Wno-unused-but-set-variable")
+	endif()
+
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
