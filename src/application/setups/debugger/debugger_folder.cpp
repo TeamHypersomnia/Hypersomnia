@@ -8,7 +8,7 @@
 #include "augs/misc/maybe_official_path.h"
 
 #include "augs/readwrite/byte_file.h"
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #include "game/cosmos/entity_handle.h"
 
 #include "hypersomnia_version.h"

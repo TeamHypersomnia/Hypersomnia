@@ -32,7 +32,7 @@
 #include "game/detail/calc_render_layer.h"
 
 #include "augs/readwrite/byte_file.h"
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #include "augs/filesystem/find_path.h"
 
 std::optional<ltrb> debugger_setup::find_screen_space_rect_selection(

@@ -297,8 +297,6 @@ set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS OFF CACHE STRING "Statically allocate en
 ## Internal build flags for programmers' use. 
 ## Don't set them manually without a good reason.
 
-set (BUILD_LUA_AS_CPP OFF)
-
 if (UNIX)
 	set(OpenGL_GL_PREFERENCE "LEGACY")
 endif()
@@ -331,44 +329,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 #####################################################
 ### SPECIFICATION OF ALL SOURCE FILES BEGINS HERE ###
-
-# We will be building Lua manually as there is no up-to-date CMakeLists for Lua.
-
-set(LUA_CPPS
-	"src/3rdparty/lua/lapi.c"
-	"src/3rdparty/lua/lauxlib.c"
-	"src/3rdparty/lua/lbaselib.c"
-	"src/3rdparty/lua/lbitlib.c"
-	"src/3rdparty/lua/lcode.c"
-	"src/3rdparty/lua/lcorolib.c"
-	"src/3rdparty/lua/lctype.c"
-	"src/3rdparty/lua/ldblib.c"
-	"src/3rdparty/lua/ldebug.c"
-	"src/3rdparty/lua/ldo.c"
-	"src/3rdparty/lua/ldump.c"
-	"src/3rdparty/lua/lfunc.c"
-	"src/3rdparty/lua/lgc.c"
-	"src/3rdparty/lua/linit.c"
-	"src/3rdparty/lua/liolib.c"
-	"src/3rdparty/lua/llex.c"
-	"src/3rdparty/lua/lmathlib.c"
-	"src/3rdparty/lua/lmem.c"
-	"src/3rdparty/lua/loadlib.c"
-	"src/3rdparty/lua/lobject.c"
-	"src/3rdparty/lua/lopcodes.c"
-	"src/3rdparty/lua/loslib.c"
-	"src/3rdparty/lua/lparser.c"
-	"src/3rdparty/lua/lstate.c"
-	"src/3rdparty/lua/lstring.c"
-	"src/3rdparty/lua/lstrlib.c"
-	"src/3rdparty/lua/ltable.c"
-	"src/3rdparty/lua/ltablib.c"
-	"src/3rdparty/lua/ltm.c"
-	"src/3rdparty/lua/lundump.c"
-	"src/3rdparty/lua/lutf8lib.c"
-	"src/3rdparty/lua/lvm.c"
-	"src/3rdparty/lua/lzio.c"
-)
 
 # We will be building Box2D manually, as it is hacked to the utmost.
 
@@ -816,7 +776,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/spells/ultimate_wrath_of_the_aeons.cpp"
 	"src/game/detail/spells/exaltation.cpp"
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
-	"src/augs/misc/lua/lua_utils.cpp"
 	"src/test_scenes/test_scenes_content.cpp"
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/unit_tests.cpp"
@@ -1021,10 +980,6 @@ endif()
 ### SPECIFICATION OF ALL SOURCE FILES END HERE ###
 ##################################################
 
-if(BUILD_LUA_AS_CPP)
-	set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
-endif()
-
 # We arrange the directories for the generated sources paths.
 
 set(GENERATORS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/generators_output")
@@ -1157,8 +1112,6 @@ set(HYPERSOMNIA_HEADERS
 set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode"
@@ -1480,15 +1433,6 @@ add_definitions(-DLIBM_COMPILING_FLT32)
 add_definitions(-DIMGUI_USER_CONFIG="3rdparty/imconfig.h")
 add_definitions(-D_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
 
-if(UNIX)
-	add_definitions(-DLUA_USE_LINUX)
-endif()
-
-if(BUILD_LUA_AS_CPP)
-	# Lua is configured to compile as C++, of which sol2 library must necessarily know.
-	add_definitions(-DSOL_USING_CXX_LUA)
-endif()
-
 # We must wait till SOL will fixes these warnings.
 
 add_definitions(-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
@@ -1597,10 +1541,6 @@ endif()
 
 include(configure_runtime_library)
 configure_msvc_runtime()
-
-# We build Lua manually as there is no up-to-date CMakeLists for Lua.
-
-add_library(lua ${LUA_CPPS})
 
 # As some libraries do not use the preferred target_include_directories,
 # we must manually acquire the directories that they add via include_directories.
@@ -1872,7 +1812,7 @@ endif()
 
 # We define libraries upon which Hypersomnia depends.
 
-set(HYPERSOMNIA_LIBS lua streflop blake3)
+set(HYPERSOMNIA_LIBS streflop blake3)
 
 include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
 

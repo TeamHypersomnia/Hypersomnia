@@ -1,7 +1,7 @@
 #include "augs/templates/container_templates.h"
 #include "application/setups/debugger/debugger_recent_paths.h"
 #include "application/setups/debugger/debugger_paths.h"
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 
 debugger_recent_paths::debugger_recent_paths(sol::state& lua) {
 	try {

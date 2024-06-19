@@ -1,5 +1,4 @@
 #pragma once
-#include <sol/sol.hpp>
 #include "augs/misc/pool/pool_io.hpp"
 #include "game/cosmos/per_entity_type.h"
 #include "augs/templates/for_each_type.h"

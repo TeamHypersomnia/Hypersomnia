@@ -7,7 +7,7 @@
 #include "application/setups/debugger/debugger_paths.h"
 #include "application/setups/debugger/debugger_significant.h"
 
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 
 static void save_last_folders(
 	sol::state& lua,

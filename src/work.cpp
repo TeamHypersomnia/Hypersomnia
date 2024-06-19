@@ -27,7 +27,6 @@
 #include <csignal>
 #endif
 
-#include <sol/sol.hpp>
 #include <functional>
 
 #include "augs/templates/enum_introspect.h"

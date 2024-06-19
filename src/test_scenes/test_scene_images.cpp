@@ -11,7 +11,6 @@
 #include "test_scenes/test_scene_images.h"
 
 #include "test_scenes/test_enum_to_path.h"
-#include "augs/readwrite/lua_readwrite_errors.h"
 #include "view/load_meta_json.h"
 
 #include "augs/log_direct.h"
