@@ -176,7 +176,14 @@ namespace augs {
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
 
-						key = it.name.GetString();
+						if constexpr(std::is_arithmetic_v<typename Container::key_type>) {
+							auto is = std::istringstream(it.name.GetString());
+							is >> key;
+						}
+						else {
+							key = it.name.GetString();
+						}
+
 						read_json(it.value, mapped);
 
 						out.emplace(std::move(key), std::move(mapped));
@@ -375,6 +382,9 @@ namespace augs {
 	decltype(auto) json_stringize(const T& val) {
 		if constexpr(std::is_enum_v<T>) {
 			return enum_to_string(val);
+		}
+		if constexpr(std::is_arithmetic_v<T>) {
+			return std::to_string(val);
 		}
 		else {
 			return val;

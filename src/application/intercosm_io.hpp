@@ -5,7 +5,7 @@
 #include "augs/templates/for_each_type.h"
 #include "augs/readwrite/memory_stream.h"
 
-#if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
+#if READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
 
@@ -67,45 +67,6 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void write_object_lua(Archive& into, const cosmos& cosm) {
-		{
-			auto solvable_table = into.create();
-			write_lua(solvable_table, cosm.get_solvable().significant);
-
-			into["solvable"] = solvable_table;
-		}
-
-		{
-			auto common_table = into.create();
-			write_lua(common_table, cosm.get_common_significant());
-			into["common"] = common_table;
-		}
-	}
-
-	template <class Archive>
-	void read_object_lua(const Archive& from, cosmos& cosm) {
-		cosm.change_common_significant([&](cosmos_common_significant& common) {
-			auto common_table = from["common"];
-
-			if (common_table.valid()) {
-				augs::read_lua(common_table, common);
-			}
-
-			return changer_callback_result::DONT_REFRESH;
-		});
-
-		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
-			auto solvable_table = from["solvable"];
-
-			if (solvable_table.valid()) {
-				augs::read_lua(solvable_table, significant);
-			}
-
-			return changer_callback_result::DONT_REFRESH;
-		});
-	}
-
-	template <class Archive>
 	void write_object_bytes(Archive& ar, const intercosm& ic) {
 		augs::write_bytes_no_overload(ar, ic);
 	}
@@ -115,50 +76,6 @@ namespace augs {
 		ic.clear();
 		augs::read_bytes_no_overload(ar, ic);
 		ic.post_load_state_correction();
-	}
-
-	template <class Archive>
-	void write_object_lua(Archive& table, const intercosm& ic) {
-		augs::write_lua_no_overload(table, ic);
-	}
-
-	template <class Archive>
-	void read_object_lua(const Archive& table, intercosm& ic) {
-		ic.clear();
-		augs::read_lua_no_overload(table, ic);
-		ic.post_load_state_correction();
-	}
-
-	template <class Archive, class List, template <class> class Mod>
-	void write_object_lua(Archive& archive, const per_type_container<List, Mod>& ptc) {
-		for_each_type_in_list<List>(
-			[&](auto t) {
-				using T = decltype(t);
-				const auto label = get_type_name_strip_namespace<T>();
-				const auto& container = ptc.template get_for<T>();
-
-				write_table_or_field(archive, container, label);
-			}
-		);
-	}
-
-	template <class Archive, class List, template <class> class Mod>
-	void read_object_lua(const Archive& archive, per_type_container<List, Mod>& ptc) {
-		for_each_type_in_list<List>(
-			[&](auto t) {
-				using T = decltype(t);
-				const auto label = get_type_name_strip_namespace<T>();
-
-				sol::object maybe_field = archive[label];
-
-				const bool field_specified = maybe_field.valid();
-
-				if (field_specified) {
-					auto& container = ptc.template get_for<T>();
-					read_lua(maybe_field, container);
-				}
-			}
-		);
 	}
 }
 
@@ -171,9 +88,6 @@ template void augs::read_object_bytes(augs::cref_memory_stream&, cosmos&);
 template void augs::write_object_bytes(std::ofstream&, const cosmos&);
 template void augs::read_object_bytes(std::ifstream&, cosmos&);
 
-template void augs::write_object_lua(sol::table&, const cosmos&);
-template void augs::read_object_lua(const sol::table&, cosmos&);
-
 
 template void augs::write_object_bytes(augs::memory_stream&, const intercosm&);
 template void augs::read_object_bytes(augs::memory_stream&, intercosm&);
@@ -183,6 +97,3 @@ template void augs::read_object_bytes(augs::cref_memory_stream&, intercosm&);
 
 template void augs::write_object_bytes(std::ofstream&, const intercosm&);
 template void augs::read_object_bytes(std::ifstream&, intercosm&);
-
-template void augs::write_object_lua(sol::table&, const intercosm&);
-template void augs::read_object_lua(const sol::table&, intercosm&);

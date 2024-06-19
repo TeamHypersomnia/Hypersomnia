@@ -7,10 +7,10 @@
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"
 #include "augs/templates/logically_empty.h"
-#include "augs/readwrite/custom_lua_representations.h"
 #include "augs/readwrite/custom_json_representations.h"
 
 #include "augs/readwrite/memory_stream.h"
+#include "augs/templates/enum_introspect.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/organization/all_component_includes.h"
@@ -31,8 +31,9 @@
 
 #include "augs/templates/introspection_utils/types_in.h"
 #include "augs/templates/filter_types.h"
+#include "augs/templates/traits/function_traits.h"
+#include "augs/readwrite/json_traits.h"
 
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "view/viewables/all_viewables_defs.h"
 
@@ -250,8 +251,6 @@ struct tests_of_traits {
 
 	static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::path_type>);
 	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, cosmos>);
-	static_assert(!augs::has_lua_readwrite_overloads_v<cosmos>);
-	static_assert(!augs::has_lua_readwrite_overloads_v<value_meter>);
 
 	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, value_meter>);
 
@@ -375,11 +374,11 @@ struct tests_of_traits {
 
 	static_assert(is_introspective_leaf_v<activity_type>);
 
-	static_assert(augs::has_custom_to_lua_value_v<augs::path_type>);
-	static_assert(augs::has_custom_to_lua_value_v<rgba>);
-	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);
-	static_assert(!augs::has_custom_to_lua_value_v<int>);
-	static_assert(!augs::has_custom_to_lua_value_v<std::map<int, int>>);
+	static_assert(augs::has_custom_to_json_value_v<rgba>);
+	static_assert(augs::has_custom_to_json_value_v<ImVec4>);
+	static_assert(augs::has_custom_to_json_value_v<ImVec2>);
+	static_assert(!augs::has_custom_to_json_value_v<int>);
+	static_assert(!augs::has_custom_to_json_value_v<std::map<int, int>>);
 
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");

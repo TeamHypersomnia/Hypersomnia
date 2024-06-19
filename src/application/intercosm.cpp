@@ -24,7 +24,6 @@
 #if BUILD_INTERCOSM_IO
 #include "application/intercosm_io.hpp"
 
-#include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 #include "application/arena/arena_paths.h"
 #endif
@@ -104,7 +103,6 @@ void intercosm::make_test_scene(
 		reloader(test_scenes::testbed());
 	}
 #else
-	(void)lua;
 	(void)settings;
 #endif
 }
@@ -139,13 +137,6 @@ void intercosm::update_offsets_of(const assets::image_id& id, const changer_call
 }
 
 #if BUILD_INTERCOSM_IO
-void intercosm::save_as_lua(const intercosm_path_op op) const {
-	augs::save_as_lua_table(op.lua, *this, op.path);
-}
-
-void intercosm::load_from_lua(const intercosm_path_op op) {
-	augs::load_from_lua_table(op.lua, *this, op.path);
-}
 
 #if DEBUG_DESYNCS
 bool LOG_BYTE_SERIALIZE = false;
@@ -186,8 +177,6 @@ static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
 static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
-static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned>>);
-static_assert(augs::has_lua_readwrite_overloads_v<make_entity_pool<controlled_character>>);
 
 #endif
 

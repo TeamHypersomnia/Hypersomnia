@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/filesystem/path.h"
-#include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/json_readwrite.h"
 
 inline auto get_meta_json_path(augs::path_type resolved) {

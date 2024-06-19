@@ -257,9 +257,7 @@ TEST_CASE("Byte readwrite Pointers") {
 	readwrite_test_cycle(abcde);
 }
 
-TEST_CASE("Lua readwrite General") {
-	auto lua = augs::create_lua_state();
-	
+TEST_CASE("JSON readwrite General") {
 	using E = detail::dummy_enum;
 	augs::enum_boolset<E> bb;
 	readwrite_test_cycle(bb);
@@ -270,17 +268,15 @@ TEST_CASE("Lua readwrite General") {
 	augs::simple_pair<int, bool> dm = { 4325, true };
 	std::vector<int> abc = { 23, 4, 523 };
 
-	REQUIRE(try_to_reload_with_lua(lua, bb));
-	REQUIRE(try_to_reload_with_lua(lua, dm));
-	REQUIRE(try_to_reload_with_lua(lua, abc));
-	REQUIRE(try_to_reload_with_lua(lua, bb));
+	REQUIRE(try_to_reload_with_json(dm));
+	REQUIRE(try_to_reload_with_json(abc));
 
 	{
 		using map_type = std::unordered_map<int, std::string>;
 		using T = std::variant<std::monostate, int, std::string, map_type, std::pair<std::string, int>>;
 
 		T with_monostate;
-		REQUIRE(try_to_reload_with_lua(lua, with_monostate));
+		REQUIRE(try_to_reload_with_json(with_monostate));
 
 		map_type mm;
 		mm[4] = "2.0";
@@ -288,43 +284,8 @@ TEST_CASE("Lua readwrite General") {
 		mm[16445] = "4.0";
 		T v = mm;
 
-		REQUIRE(try_to_reload_with_lua(lua, mm));
-		REQUIRE(try_to_reload_with_lua(lua, v));
-
-		using P = augs::pool<T, of_size<300>::make_nontrivial_constant_vector, unsigned short>;
-		P pp;
-		pp.reserve(300);
-
-		pp.allocate(T());
-		pp.allocate(T());
-		pp.allocate(v);
-		pp.free(pp.allocate(T()));
-
-		const auto before = pp;
-		REQUIRE(try_to_reload_with_lua(lua, pp));
-		REQUIRE(try_to_reload_with_lua(lua, pp));
-		REQUIRE(try_to_reload_with_lua(lua, pp));
-
-		auto make_pool_bytes = [&](const auto& from) {
-			std::vector<std::byte> b;
-			auto ss = augs::ref_memory_stream(b);
-
-			from.for_each_id_and_object(
-				[&](const auto& a, const auto& b){
-					augs::write_bytes(ss, a);
-					augs::write_bytes(ss, b);
-				}
-			);
-
-			return b;
-		};
-
-		{
-			const auto ba = make_pool_bytes(before);
-			const auto bb = make_pool_bytes(pp);
-
-			REQUIRE(ba == bb);
-		}
+		REQUIRE(try_to_reload_with_json(mm));
+		REQUIRE(try_to_reload_with_json(v));
 	}
 }
 

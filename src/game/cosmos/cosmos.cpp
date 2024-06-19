@@ -11,7 +11,6 @@
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/change_solvable_significant.h"
 
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "game/cosmos/for_each_entity.h"

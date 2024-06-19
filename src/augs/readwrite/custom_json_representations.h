@@ -8,7 +8,62 @@
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
 
+struct ImVec2;
+struct ImVec4;
+
 namespace augs {
+	template <class T>
+	inline void to_json_value(T& out, const ImVec4& in) {
+		auto* from = reinterpret_cast<const float*>(&in);
+
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+		out.StartArray();
+		out.Float(from[0]);
+		out.Float(from[1]);
+		out.Float(from[2]);
+		out.Float(from[3]);
+		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
+	}
+
+	template <class T>
+	void from_json_value(T& from, ImVec4& in) {
+		auto* out = reinterpret_cast<float*>(&in);
+
+		if (from.IsArray()) {
+			if (from.Size() == 4 && from[0].IsNumber() && from[1].IsNumber() && from[2].IsNumber() && from[3].IsNumber()) {
+				out[0] = from[0].GetFloat();
+				out[1] = from[1].GetFloat();
+				out[2] = from[2].GetFloat();
+				out[3] = from[3].GetFloat();
+			}
+		}
+	}
+
+	template <class T>
+	inline void to_json_value(T& out, const ImVec2& in) {
+		auto* from = reinterpret_cast<const float*>(&in);
+
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+		out.StartArray();
+		out.Float(from[0]);
+		out.Float(from[1]);
+		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
+	}
+
+	template <class T>
+	void from_json_value(T& from, ImVec2& in) {
+		auto* out = reinterpret_cast<float*>(&in);
+
+		if (from.IsArray()) {
+			if (from.Size() == 2 && from[0].IsNumber() && from[1].IsNumber()) {
+				out[0] = from[0].GetFloat();
+				out[1] = from[1].GetFloat();
+			}
+		}
+	}
+
 	template <class T>
 	inline void to_json_value(T& out, const rgba& from) {
 		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);

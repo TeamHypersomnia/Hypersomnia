@@ -3,7 +3,7 @@
 #include "augs/misc/pool/pool_declaration.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_file.h"
-#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/json_readwrite.h"
 #include "augs/templates/can_stream.h"
 #include "augs/readwrite/to_bytes.h"
 #include "all_paths.h"
@@ -12,8 +12,8 @@ inline auto test_file_path() {
 	return CACHE_DIR / "test_byte_readwrite.bin";
 }
 
-inline auto test_lua_file_path() {
-	return CACHE_DIR / "test_lua_readwrite.lua"; 
+inline auto test_json_file_path() {
+	return CACHE_DIR / "test_json_readwrite.json"; 
 }
 
 namespace detail {
@@ -149,19 +149,19 @@ bool try_to_reload_with_bytes(T& v) {
 }
 
 template <class T>
-bool try_to_reload_with_lua(sol::state& lua, T& v) {
+bool try_to_reload_with_json(T& v) {
 	if constexpr(!augs::is_pool_v<T>) {
 		if (!(v == v)) {
 			return false;
 		}
 	}
 
-	const auto& path = test_lua_file_path();
+	const auto& path = test_json_file_path();
 
 	const auto tmp = ref_or_get(v);
 
-	augs::save_as_lua_table(lua, v, path);
-	augs::load_from_lua_table(lua, v, path);
+	augs::save_as_json(v, path);
+	augs::from_json_file(path, v);
 	augs::remove_file(path);
 
 	if constexpr(augs::is_pool_v<T>) {
