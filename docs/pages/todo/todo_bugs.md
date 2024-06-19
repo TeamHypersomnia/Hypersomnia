@@ -421,7 +421,7 @@ Solved:
 	#1  augs::scope_guard<visible_entities::acquire_physical(visible_entities_query)::$_1>::~scope_guard() ()
 	#2  visible_entities::acquire_physical(visible_entities_query) ()
 	#3  visible_entities::reacquire_all(visible_entities_query) ()
-	#4  work(int, char const* const*)::$_34::operator()(augs::audio_renderer const*, augs::delta, double, config_lua_table const&) const ()
+	#4  work(int, char const* const*)::$_34::operator()(augs::audio_renderer const*, augs::delta, double, config_json_table const&) const ()
 	#5  _ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm1EEE10__dispatchB6v15007IONS1_9__variant15__value_visitorIZZ4workiPKPKcENK3$_2clIZZ4workiS
 	B_ENK4$_36clEPKN4augs14audio_rendererENSF_5deltaERK17input_pass_resultEUlRT_E_EEDcSN_EUlSO_E_EEJRNS0_6__baseILNS0_6_TraitE1EJ16test_scene_setup12editor_setup22p
 	roject_selector_setup12client_setup12server_setupEEEEEEDcSN_DpT0_ ()

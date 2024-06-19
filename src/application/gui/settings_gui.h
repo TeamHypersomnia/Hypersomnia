@@ -11,7 +11,7 @@
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
 
-struct config_lua_table;
+struct config_json_table;
 
 namespace augs {
 	class audio_context;
@@ -102,9 +102,9 @@ public:
 		augs::window& window,
 		const augs::audio_context& audio,
 		const augs::path_type& path_for_saving,
-		const config_lua_table& canon_config,
-		config_lua_table& into,
-		config_lua_table& last_saved,
+		const config_json_table& canon_config,
+		config_json_table& into,
+		config_json_table& last_saved,
 		vec2i screen_size
 	);
 };
@@ -127,8 +127,8 @@ struct configuration_subscribers {
 	const necessary_image_definitions_map& images;
 #endif
 
-	void apply(const config_lua_table&) const;
+	void apply(const config_json_table&) const;
 
 	void apply_main_thread(const augs::window_settings&) const;
-	void sync_back_into(config_lua_table&) const;
+	void sync_back_into(config_json_table&) const;
 };

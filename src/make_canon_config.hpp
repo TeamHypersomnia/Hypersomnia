@@ -1,6 +1,6 @@
 #pragma once
 
-inline void make_canon_config(config_lua_table& result, bool is_dedicated_server) {
+inline void make_canon_config(config_json_table& result, bool is_dedicated_server) {
 #if !IS_PRODUCTION_BUILD
 		/* Some developer-friendly options */
 		result.self_update.update_on_launch = false;

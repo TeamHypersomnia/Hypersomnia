@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 
-struct config_lua_table;
+struct config_json_table;
 
 struct session_report {
 	struct MHD_Daemon *d = nullptr;
@@ -18,7 +18,7 @@ struct session_report {
 
 	void fetch_stats(std::string new_stats);
 
-	bool start_daemon(const config_lua_table& cfg);
+	bool start_daemon(const config_json_table& cfg);
 	void stop_daemon();
 };
 

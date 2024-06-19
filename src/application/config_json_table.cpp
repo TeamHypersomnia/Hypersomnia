@@ -4,7 +4,7 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/window_framework/window.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/nat/stun_server_provider.h"
 
 bool operator==(const ImVec2& a, const ImVec2& b) {
@@ -35,11 +35,11 @@ namespace augs {
 	double steady_secs();
 }
 
-config_lua_table::config_lua_table(const augs::path_type& config_lua_path) {
+config_json_table::config_json_table(const augs::path_type& config_lua_path) {
 	load_patch(config_lua_path);
 }
 
-void config_lua_table::load_patch(const augs::path_type& config_lua_path) {
+void config_json_table::load_patch(const augs::path_type& config_lua_path) {
 	try {
 		constexpr auto rapidjson_flags = 
 			rapidjson::kParseDefaultFlags |
@@ -58,15 +58,15 @@ void config_lua_table::load_patch(const augs::path_type& config_lua_path) {
 	}
 }
 
-void config_lua_table::save_patch(const config_lua_table& source, const augs::path_type& target_path) const {
+void config_json_table::save_patch(const config_json_table& source, const augs::path_type& target_path) const {
 	augs::save_as_json_diff(target_path, *this, source);
 }
 
-activity_type config_lua_table::get_last_activity() const {
+activity_type config_json_table::get_last_activity() const {
 	return last_activity;
 }
 
-input_recording_type config_lua_table::get_input_recording_mode() const {
+input_recording_type config_json_table::get_input_recording_mode() const {
 	return debug.input_recording_mode;
 }
 

@@ -5,7 +5,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "view/viewables/images_in_atlas_map.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 
 #include "application/app_intent_type.h"
 

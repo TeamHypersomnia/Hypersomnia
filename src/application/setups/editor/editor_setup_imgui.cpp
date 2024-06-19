@@ -3,7 +3,7 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/setups/editor/editor_setup.h"
 
 #include "augs/misc/imgui/imgui_utils.h"

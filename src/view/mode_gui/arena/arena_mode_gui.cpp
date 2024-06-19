@@ -4,7 +4,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/chrono_templates.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "game/modes/mode_player_id.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"

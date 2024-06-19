@@ -3,7 +3,7 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/setups/test_scene_setup.h"
 
 #include "application/setups/editor/packaged_official_content.h"
@@ -710,7 +710,7 @@ std::string test_scene_setup::get_scoreboard_caption() const {
 	}
 }
 
-void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
+void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 	if (is_tutorial()) {
 		config.window.name = "Hypersomnia - Tutorial";
 	}

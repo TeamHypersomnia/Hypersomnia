@@ -99,7 +99,7 @@ namespace sol {
 	class state;
 }
 
-struct config_lua_table;
+struct config_json_table;
 class images_in_atlas_map;
 
 #if !HEADLESS
@@ -108,7 +108,7 @@ struct perform_custom_imgui_input {
 	const images_in_atlas_map& game_atlas;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
-	const config_lua_table& config;
+	const config_json_table& config;
 
 	const bool demo_replay_mode;
 };

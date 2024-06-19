@@ -4,7 +4,7 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/setups/project_selector/project_selector_setup.h"
 
 #include "augs/readwrite/byte_readwrite.h"
@@ -191,7 +191,7 @@ void project_selector_setup::scan_for_all_arenas() {
 	rebuild_miniatures = true;
 }
 
-void project_selector_setup::customize_for_viewing(config_lua_table& config) const {
+void project_selector_setup::customize_for_viewing(config_json_table& config) const {
 	config.window.name = "Hypersomnia Editor - Project Selector";
 }
 

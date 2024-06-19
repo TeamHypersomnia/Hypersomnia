@@ -53,7 +53,7 @@
 
 #include "steam_rich_presence_pairs.h"
 
-struct config_lua_table;
+struct config_json_table;
 
 class https_file_downloader;
 
@@ -658,9 +658,9 @@ public:
 
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
-	void customize_for_viewing(config_lua_table&) const;
+	void customize_for_viewing(config_json_table&) const;
 
-	void apply(const config_lua_table&);
+	void apply(const config_json_table&);
 
 	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;

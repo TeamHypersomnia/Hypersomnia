@@ -2,7 +2,7 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/timing/delta.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/gui/settings_gui.h"
 #include "application/main/imgui_pass.h"
 
@@ -14,9 +14,9 @@ void perform_imgui_pass(
 	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
-	const config_lua_table& canon_config,
-	config_lua_table& config,
-	config_lua_table& last_saved_config,
+	const config_json_table& canon_config,
+	config_json_table& config,
+	config_json_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,
 	settings_gui_state& settings_gui,
 	const augs::audio_context& audio,

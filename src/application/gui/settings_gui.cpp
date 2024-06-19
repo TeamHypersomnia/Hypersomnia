@@ -23,7 +23,7 @@
 
 #include "view/necessary_resources.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
 #include "augs/audio/sound_sizes.h"
@@ -35,11 +35,11 @@
 #include "augs/window_framework/platform_utils.h"
 #include "make_canon_config.hpp"
 
-void configuration_subscribers::sync_back_into(config_lua_table& into) const {
+void configuration_subscribers::sync_back_into(config_json_table& into) const {
 	window.sync_back_into(into.window);
 }
 
-void configuration_subscribers::apply(const config_lua_table& new_config) const {
+void configuration_subscribers::apply(const config_json_table& new_config) const {
 	DEBUG_DRAWING = new_config.debug_drawing;
 	
 	audio_context.apply(new_config.audio);
@@ -287,9 +287,9 @@ void settings_gui_state::perform(
 	augs::window& window,
 	const augs::audio_context& audio,
 	const augs::path_type& config_path_for_saving,
-	const config_lua_table& canon_config,
-	config_lua_table& config,
-	config_lua_table& last_saved_config,
+	const config_json_table& canon_config,
+	config_json_table& config,
+	config_json_table& last_saved_config,
 	vec2i screen_size
 ) {
 #if BUILD_NETWORKING
@@ -649,7 +649,7 @@ void settings_gui_state::perform(
 					auto saved_is_guest = config.prompted_for_sign_in_once;
 					auto cvars = config.client;
 
-					config = config_lua_table(augs::path_type("default_config.json"));
+					config = config_json_table(augs::path_type("default_config.json"));
 					::make_canon_config(config, false);
 
 #if IS_PRODUCTION_BUILD

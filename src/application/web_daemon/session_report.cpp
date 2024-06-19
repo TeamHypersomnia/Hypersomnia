@@ -15,7 +15,7 @@
 #include "augs/string/string_templates.h"
 #include <fstream>
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 
 int get_origin(void *cls, enum MHD_ValueKind kind,
 	const char *key, const char *value)
@@ -75,7 +75,7 @@ ahc_echo(void *cls,
 	return ret;
 }
 
-bool session_report::start_daemon(const config_lua_table& cfg) {
+bool session_report::start_daemon(const config_json_table& cfg) {
 	std::string contents = augs::file_to_string(cfg.server_http_daemon_html_file_path);
 	
 	const std::string survey_num_token = "%survey_num%";
@@ -141,7 +141,7 @@ void session_report::fetch_stats(const std::string new_stats) {
 }
 
 #else
-bool session_report::start_daemon(const config_lua_table&) {
+bool session_report::start_daemon(const config_json_table&) {
 	return false;
 }
 

@@ -6,7 +6,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/modes/arena_mode.hpp"
 #include "application/setups/draw_setup_gui_input.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "game/modes/mode_helpers.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "game/detail/sentience/sentience_getters.h"

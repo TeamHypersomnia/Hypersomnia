@@ -6,7 +6,7 @@
 #include "3rdparty/include_httplib.h"
 #include "augs/log.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/readwrite/memory_stream.h"
@@ -129,7 +129,7 @@ static auto to_webrtc_alias(
 	return location_id;
 }
 
-work_result perform_masterserver(const config_lua_table& cfg) try {
+work_result perform_masterserver(const config_json_table& cfg) try {
 	using namespace httplib;
 
 	const auto& settings = cfg.masterserver;

@@ -42,7 +42,7 @@
 #include "steam_rich_presence_pairs.h"
 
 struct netcode_socket_t;
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 struct synced_meta_update;
 
@@ -431,9 +431,9 @@ public:
 		return scene.viewables;
 	}
 
-	void customize_for_viewing(config_lua_table&) const;
+	void customize_for_viewing(config_json_table&) const;
 
-	void apply(const config_lua_table&);
+	void apply(const config_json_table&);
 	bool apply(const server_vars&, bool first_time = false);
 	void apply(const server_private_vars&);
 

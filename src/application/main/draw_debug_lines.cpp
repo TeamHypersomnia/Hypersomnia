@@ -3,7 +3,7 @@
 #include "game/debug_drawing_settings.h"
 #include "game/cosmos/cosmos.h"
 #include "augs/math/camera_cone.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "augs/drawing/drawing.h"
 
 void draw_debug_lines(
@@ -11,7 +11,7 @@ void draw_debug_lines(
 	augs::renderer& renderer,
 	const real32 interpolation_ratio,
 	const augs::atlas_entry default_texture,
-	const config_lua_table& cfg,
+	const config_json_table& cfg,
 	const camera_cone cone
 ) {
 	if (DEBUG_DRAWING.draw_npo_tree_nodes) {

@@ -6,7 +6,7 @@
 #include "augs/string/parse_url.h"
 
 #include "application/setups/server/server_setup.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 
 #include "application/network/server_adapter.hpp"
 
@@ -2305,7 +2305,7 @@ net_time_t server_setup::get_current_time() {
 	return augs::high_precision_secs();
 }
 
-void server_setup::customize_for_viewing(config_lua_table& config) const {
+void server_setup::customize_for_viewing(config_json_table& config) const {
 #if !IS_PRODUCTION_BUILD
 	config.window.name = "Hypersomnia - Server";
 #endif
@@ -2526,7 +2526,7 @@ void server_setup::try_apply(const public_client_settings& requested_settings) {
 	}
 }
 
-void server_setup::apply(const config_lua_table& cfg) {
+void server_setup::apply(const config_json_table& cfg) {
 	/* 
 		If we just applied the changes from game settings,
 		RCON would not work on the integrated server and it would be confusing.

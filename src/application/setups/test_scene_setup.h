@@ -25,7 +25,7 @@
 
 #include "application/arena/synced_dynamic_vars.h"
 
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 
 namespace sol {
@@ -152,9 +152,9 @@ public:
 		return custom_imgui_result::NONE;
 	}
 
-	void customize_for_viewing(config_lua_table&) const;
+	void customize_for_viewing(config_json_table&) const;
 
-	void apply(const config_lua_table&) {
+	void apply(const config_json_table&) {
 		return;
 	}
 

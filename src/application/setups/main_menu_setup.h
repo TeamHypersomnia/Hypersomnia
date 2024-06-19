@@ -36,7 +36,7 @@
 #include "steam_rich_presence_pairs.h"
 
 struct self_update_result;
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 
 struct packaged_official_content;
@@ -120,8 +120,8 @@ public:
 
 	void launch_creators_screen();
 
-	void customize_for_viewing(config_lua_table& config) const;
-	void apply(const config_lua_table& config);
+	void customize_for_viewing(config_json_table& config) const;
+	void apply(const config_json_table& config);
 
 	auto get_inv_tickrate() const {
 		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();

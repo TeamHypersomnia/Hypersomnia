@@ -16,7 +16,7 @@
 #include "game/detail/visible_entities.h"
 #include "view/viewables/images_in_atlas_map.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/setups/debugger/debugger_setup.hpp"
 #include "application/setups/debugger/debugger_paths.h"
 #include "application/setups/debugger/debugger_camera.h"
@@ -237,7 +237,7 @@ void debugger_setup::accept_game_gui_events(const game_gui_entropy_type& entropy
 	control(entropy);
 }
 
-void debugger_setup::customize_for_viewing(config_lua_table& config) const {
+void debugger_setup::customize_for_viewing(config_json_table& config) const {
 	if (anything_opened()) {
 		config.window.name = "Hypersomnia Debugger - " + folder().get_display_path();
 	}
@@ -266,7 +266,7 @@ void debugger_setup::customize_for_viewing(config_lua_table& config) const {
 	return;
 }
 
-void debugger_setup::apply(const config_lua_table& cfg) {
+void debugger_setup::apply(const config_json_table& cfg) {
 	settings = cfg.debugger;
 
 	if (cfg.debugger.save_entropies_to_live_file) {

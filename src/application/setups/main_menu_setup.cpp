@@ -23,7 +23,7 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "augs/readwrite/json_readwrite.h"
 
 #include "application/setups/main_menu_setup.h"
@@ -51,7 +51,7 @@ struct main_menu_setup_detail {
 	rapidjson::Document patch;
 };
 
-void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
+void main_menu_setup::customize_for_viewing(config_json_table& config) const {
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;
 	augs::read_json(detail->patch, config);
 	
@@ -61,7 +61,7 @@ void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	config.drawing.cinematic_mode = true;
 }
 
-void main_menu_setup::apply(const config_lua_table& config) {
+void main_menu_setup::apply(const config_json_table& config) {
 	menu_theme_source.set_gain(config.audio_volume.music);
 }
 

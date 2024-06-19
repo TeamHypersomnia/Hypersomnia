@@ -4,7 +4,7 @@
 #include "augs/misc/machine_entropy.h"
 
 class settings_gui_state;
-struct config_lua_table;
+struct config_json_table;
 
 namespace sol {
 	class state;
@@ -20,9 +20,9 @@ void perform_imgui_pass(
 	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
-	const config_lua_table& canon_config,
-	config_lua_table& config,
-	config_lua_table& last_saved_config,
+	const config_json_table& canon_config,
+	config_json_table& config,
+	config_json_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,
 	settings_gui_state& settings_gui,
 	const augs::audio_context& audio,

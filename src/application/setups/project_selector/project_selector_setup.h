@@ -26,7 +26,7 @@
 #include "application/setups/editor/project/editor_project_about.h"
 #include "steam_rich_presence_pairs.h"
 
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 
 class project_selector_setup : public default_setup_settings {
@@ -46,7 +46,7 @@ public:
 	~project_selector_setup();
 
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
-	void customize_for_viewing(config_lua_table&) const;
+	void customize_for_viewing(config_json_table&) const;
 
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 	augs::path_type get_selected_project_path() const;
@@ -91,7 +91,7 @@ public:
 		return zero_viewables;
 	}
 
-	void apply(const config_lua_table&) {
+	void apply(const config_json_table&) {
 		return;
 	}
 

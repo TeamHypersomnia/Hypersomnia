@@ -11,7 +11,7 @@
 
 class images_in_atlas_map;
 class visible_entities;
-struct config_lua_table;
+struct config_json_table;
 
 namespace augs {
 	struct baked_font;
@@ -22,7 +22,7 @@ struct draw_setup_gui_input {
 	const visible_entities& all_visible;
 	const camera_cone cone;
 	const augs::atlas_entry blank_texture;
-	const config_lua_table& config;
+	const config_json_table& config;
 	const necessary_images_in_atlas_map& necessary_images;
 	const augs::graphics::texture* general_atlas;
 	const augs::graphics::texture* avatar_atlas;

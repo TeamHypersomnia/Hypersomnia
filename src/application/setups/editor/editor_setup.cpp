@@ -7,7 +7,7 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
@@ -624,7 +624,7 @@ vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 	return camera_cone(eye, screen_size).to_world_space(mouse_pos);
 }
 
-void editor_setup::customize_for_viewing(config_lua_table& config) const {
+void editor_setup::customize_for_viewing(config_json_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", get_arena_name_with_star());
 
 	if (is_playtesting()) {
@@ -2453,7 +2453,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 	}
 }
 
-void editor_setup::apply(const config_lua_table& cfg) {
+void editor_setup::apply(const config_json_table& cfg) {
 	settings = cfg.editor;
 	faction_view = cfg.faction_view;
 	simulated_client = cfg.client;

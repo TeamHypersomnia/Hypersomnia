@@ -711,7 +711,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/graphics/rgba.cpp"
 	"src/augs/misc/secure_hash.cpp"
 	"src/augs/string/path_sanitization.cpp"
-	"src/application/config_lua_table.cpp"
+	"src/application/config_json_table.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
 	"src/game/stateless_systems/demolitions_system.cpp"
 	"src/game/stateless_systems/melee_system.cpp"

@@ -3,7 +3,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 #include "application/setups/client/client_setup.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 
 #include "application/network/client_adapter.hpp"
 #include "application/network/net_message_translation.h"
@@ -1181,7 +1181,7 @@ entity_id client_setup::get_controlled_character_id() const {
 	);
 }
 
-void client_setup::customize_for_viewing(config_lua_table& config) const {
+void client_setup::customize_for_viewing(config_json_table& config) const {
 #if !IS_PRODUCTION_BUILD
 	config.window.name = "Hypersomnia - Client";
 #endif
@@ -1987,7 +1987,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	return custom_imgui_result::NONE;
 }
 
-void client_setup::apply(const config_lua_table& cfg) {
+void client_setup::apply(const config_json_table& cfg) {
 	vars = cfg.client;
 
 	if (is_replaying()) {

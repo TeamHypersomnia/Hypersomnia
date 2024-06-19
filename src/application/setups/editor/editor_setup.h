@@ -58,7 +58,7 @@
 #include "application/arena/synced_dynamic_vars.h"
 #include "steam_rich_presence_pairs.h"
 
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 
 template <class E>
@@ -276,7 +276,7 @@ public:
 		handle_input_before_game_input
 	);
 
-	void customize_for_viewing(config_lua_table&) const;
+	void customize_for_viewing(config_json_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
 	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
@@ -631,7 +631,7 @@ public:
 	void perform_main_menu_bar(perform_custom_imgui_input);
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
-	void apply(const config_lua_table&);
+	void apply(const config_json_table&);
 
 	setup_escape_result escape();
 

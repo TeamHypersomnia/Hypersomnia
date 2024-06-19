@@ -7,7 +7,7 @@
 #include "application/masterserver/masterserver_commands.h"
 #include "work_result.h"
 
-struct config_lua_table;
+struct config_json_table;
 struct server_heartbeat;
 
 using masterserver_request = std::variant<
@@ -26,4 +26,4 @@ using masterserver_response = std::variant<
 	masterserver_out::stun_result_info
 >;
 
-work_result perform_masterserver(const config_lua_table&);
+work_result perform_masterserver(const config_json_table&);

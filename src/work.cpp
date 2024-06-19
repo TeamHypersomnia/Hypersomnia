@@ -61,7 +61,7 @@
 #include "game/cosmos/cosmos.h"
 
 #include "application/session_profiler.h"
-#include "application/config_lua_table.h"
+#include "application/config_json_table.h"
 
 #include "application/gui/headless_map_catalogue.h"
 
@@ -420,7 +420,7 @@ work_result work(
 	LOG("Loading %x.", canon_config_path);
 
 	WEBSTATIC const auto canon_config_ptr = [&]() {
-		auto result_ptr = std::make_unique<config_lua_table>(canon_config_path);
+		auto result_ptr = std::make_unique<config_json_table>(canon_config_path);
 
 		::make_canon_config(*result_ptr, params.type == app_type::DEDICATED_SERVER);
 
@@ -430,7 +430,7 @@ work_result work(
 	WEBSTATIC auto& canon_config = *canon_config_ptr;
 
 	WEBSTATIC auto config_ptr = [&]() {
-		auto result = std::make_unique<config_lua_table>(canon_config);
+		auto result = std::make_unique<config_json_table>(canon_config);
 
 		if (augs::exists(local_config_path)) {
 			LOG("Applying config: %x", local_config_path);
@@ -691,7 +691,7 @@ work_result work(
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	WEBSTATIC auto last_saved_config_ptr = std::make_unique<config_lua_table>(config);
+	WEBSTATIC auto last_saved_config_ptr = std::make_unique<config_json_table>(config);
 	WEBSTATIC auto& last_saved_config = *last_saved_config_ptr;
 
 	WEBSTATIC auto change_with_save = [&](auto setter) {
@@ -1779,7 +1779,7 @@ work_result work(
 
 	WEBSTATIC auto save_last_activity = [&](const activity_type mode) {
 		if (mode != activity_type::CLIENT) {
-			change_with_save([mode](config_lua_table& cfg) {
+			change_with_save([mode](config_json_table& cfg) {
 				cfg.last_activity = mode;
 			});
 		}
@@ -2400,7 +2400,7 @@ work_result work(
 		});
 	};
 
-	WEBSTATIC auto create_game_gui_deps = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto create_game_gui_deps = [&](const config_json_table& viewing_config) {
 		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
@@ -2412,7 +2412,7 @@ work_result work(
 		};
 	};
 
-	WEBSTATIC auto create_menu_context_deps = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto create_menu_context_deps = [&](const config_json_table& viewing_config) {
 		return menu_context_dependencies{
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
@@ -2528,7 +2528,7 @@ work_result work(
 		return result;
 	};
 
-	WEBSTATIC auto get_camera_eye = [&](const config_lua_table& viewing_config, bool with_edge_zoomout = true) {		
+	WEBSTATIC auto get_camera_eye = [&](const config_json_table& viewing_config, bool with_edge_zoomout = true) {		
 		auto logic_eye = get_logic_eye(with_edge_zoomout);
 
 		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
@@ -2574,15 +2574,15 @@ work_result work(
 		return logic_eye;
 	};
 
-	WEBSTATIC auto get_camera_cone = [&](const config_lua_table& viewing_config) {		
+	WEBSTATIC auto get_camera_cone = [&](const config_json_table& viewing_config) {		
 		return camera_cone(get_camera_eye(viewing_config), logic_get_screen_size());
 	};
 
-	WEBSTATIC auto get_nonzoomedout_visible_world_area = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto get_nonzoomedout_visible_world_area = [&](const config_json_table& viewing_config) {
 		return vec2(logic_get_screen_size()) / get_camera_eye(viewing_config, no_edge_zoomout_v).zoom;
 	};
 
-	WEBSTATIC auto get_queried_cone = [&](const config_lua_table& viewing_config) {		
+	WEBSTATIC auto get_queried_cone = [&](const config_json_table& viewing_config) {		
 		const auto query_mult = viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = [&]() {
@@ -3217,7 +3217,7 @@ work_result work(
 
 		switch (intent) {
 			case T::SHOW_PERFORMANCE: {
-				change_with_save([&](config_lua_table& cfg) {
+				change_with_save([&](config_json_table& cfg) {
 					bool& f = cfg.session.show_performance;
 					f = !f;
 
@@ -3230,7 +3230,7 @@ work_result work(
 			}
 
 			case T::SHOW_LOGS: {
-				change_with_save([&](config_lua_table& cfg) {
+				change_with_save([&](config_json_table& cfg) {
 					bool& f = cfg.session.show_logs;
 					f = !f;
 
@@ -3499,14 +3499,14 @@ work_result work(
 
 	WEBSTATIC visible_entities all_visible;
 
-	WEBSTATIC auto get_character_camera = [&](const config_lua_table& viewing_config) -> character_camera {
+	WEBSTATIC auto get_character_camera = [&](const config_json_table& viewing_config) -> character_camera {
 		return { get_viewed_character(), { get_camera_eye(viewing_config), logic_get_screen_size() } };
 	};
 
 	WEBSTATIC auto reacquire_visible_entities = [&](
 		const vec2i& screen_size,
 		const const_entity_handle& viewed_character,
-		const config_lua_table& viewing_config
+		const config_json_table& viewing_config
 	) {
 		auto scope = measure_scope(game_thread_performance.camera_visibility_query);
 
@@ -3529,7 +3529,7 @@ work_result work(
 		game_thread_performance.num_visible_entities.measure(all_visible.count_all());
 	};
 
-	WEBSTATIC auto calc_pre_step_crosshair_displacement = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto calc_pre_step_crosshair_displacement = [&](const config_json_table& viewing_config) {
 		if (get_viewed_character() != get_controlled_character()) {
 			return vec2::zero;
 		}
@@ -3567,7 +3567,7 @@ work_result work(
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		const double speed_multiplier,
-		const config_lua_table& viewing_config
+		const config_json_table& viewing_config
 	) {
 		const auto screen_size = logic_get_screen_size();
 		const auto viewed_character = get_viewed_character();
@@ -3714,7 +3714,7 @@ work_result work(
 	WEBSTATIC auto setup_post_solve = [&](
 		const const_logic_step step, 
 		const augs::audio_renderer* audio_renderer,
-		const config_lua_table& viewing_config,
+		const config_json_table& viewing_config,
 		const audiovisual_post_solve_settings settings
 	) {
 		pending_new_state_sample = true;
@@ -3768,7 +3768,7 @@ work_result work(
 		auto& setup,
 		const input_pass_result& result
 	) {
-		const config_lua_table& viewing_config = result.viewing_config;
+		const config_json_table& viewing_config = result.viewing_config;
 
 		setup.control(result.motions);
 		setup.control(result.intents);
@@ -3914,7 +3914,7 @@ work_result work(
 	{
 		auto connect_to = [&](const auto& target) {
 			if (!target.empty()) {
-				change_with_save([&](config_lua_table& cfg) {
+				change_with_save([&](config_json_table& cfg) {
 					cfg.client_connect = target;
 				});
 			}
@@ -3998,7 +3998,7 @@ work_result work(
 	
 	WEBSTATIC release_flags releases;
 
-	WEBSTATIC auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto make_create_game_gui_context = [&](const config_json_table& viewing_config) {
 		return [&]() {
 			return game_gui.create_context(
 				logic_get_screen_size(),
@@ -4009,7 +4009,7 @@ work_result work(
 		};
 	};
 
-	WEBSTATIC auto make_create_menu_context = [&](const config_lua_table& viewing_config) {
+	WEBSTATIC auto make_create_menu_context = [&](const config_json_table& viewing_config) {
 		return [&](auto& gui) {
 			return gui.create_context(
 				logic_get_screen_size(),
@@ -4569,7 +4569,7 @@ work_result work(
 				});
 			};
 
-			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
+			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
 				return viewing_game_gui_context {
 					make_create_game_gui_context(viewing_config)(),
 
@@ -4602,7 +4602,7 @@ work_result work(
 				chosen_renderer.clear_current_fbo();
 			};
 
-			auto draw_debug_lines = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+			auto draw_debug_lines = [&](augs::renderer& chosen_renderer, const config_json_table& new_viewing_config) {
 				if (DEBUG_DRAWING.enabled) {
 					auto scope = measure_scope(game_thread_performance.debug_lines);
 
@@ -4623,13 +4623,13 @@ work_result work(
 				necessary_shaders.standard->set_projection(chosen_renderer, augs::orthographic_projection(vec2(screen_size)));
 			};
 
-			auto draw_game_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
+			auto draw_game_gui = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
 				auto scope = measure_scope(game_thread_performance.draw_game_gui);
 
 				game_gui.world.draw(create_viewing_game_gui_context(chosen_renderer, viewing_config));
 			};
 
-			auto make_draw_setup_gui_input = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+			auto make_draw_setup_gui_input = [&](augs::renderer& chosen_renderer, const config_json_table& new_viewing_config) {
 				return draw_setup_gui_input {
 					all_visible,
 					get_camera_cone(new_viewing_config),
@@ -4654,7 +4654,7 @@ work_result work(
 				};
 			};
 
-			auto draw_setup_custom_gui_over_imgui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+			auto draw_setup_custom_gui_over_imgui = [&](augs::renderer& chosen_renderer, const config_json_table& new_viewing_config) {
 				visit_current_setup([&]<typename S>(S& setup) {
 					if constexpr(std::is_same_v<editor_setup, remove_cref<S>>) {
 						setup.draw_custom_gui_over_imgui(make_draw_setup_gui_input(chosen_renderer, new_viewing_config));
@@ -4663,7 +4663,7 @@ work_result work(
 				});
 			};
 
-			auto draw_mode_and_setup_custom_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+			auto draw_mode_and_setup_custom_gui = [&](augs::renderer& chosen_renderer, const config_json_table& new_viewing_config) {
 				auto scope = measure_scope(game_thread_performance.draw_setup_custom_gui);
 
 				visit_current_setup([&](auto& setup) {
@@ -4734,7 +4734,7 @@ work_result work(
 				}
 			};
 
-			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
+			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
 				const bool should_draw_our_cursor = viewing_config.window.draws_own_cursor() && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
@@ -4768,7 +4768,7 @@ work_result work(
 				}
 			};
 
-			auto make_illuminated_rendering_input = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
+			auto make_illuminated_rendering_input = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
 				thread_local std::vector<additional_highlight> highlights;
 				highlights.clear();
 

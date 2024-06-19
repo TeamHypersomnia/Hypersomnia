@@ -53,7 +53,7 @@
 #include "application/main/miniature_generator.h"
 
 class visible_entities;
-struct config_lua_table;
+struct config_json_table;
 struct draw_setup_gui_input;
 struct game_frame_buffer;
 struct renderer_backend_result;
@@ -231,8 +231,8 @@ public:
 
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
-	void customize_for_viewing(config_lua_table& cfg) const;
-	void apply(const config_lua_table& cfg);
+	void customize_for_viewing(config_json_table& cfg) const;
+	void apply(const config_json_table& cfg);
 
 	template <class C>
 	void advance(

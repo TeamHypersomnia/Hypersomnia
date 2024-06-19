@@ -10,7 +10,7 @@ template <class E, class M, class I>
 inline void draw_context_tip(
 	const M& typed_mode,
 	const I& mode_input,
-	const config_lua_table& config,
+	const config_json_table& config,
 	const augs::drawer_with_default out,
 	const vec2i screen_size,
 	const augs::baked_font& font,
