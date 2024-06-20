@@ -3097,6 +3097,12 @@ void server_setup::advance_clients_state() {
 			}
 		};
 
+		if (c.state == client_state_type::PENDING_RECEIVING_INITIAL_SNAPSHOT) {
+			send_state_for_the_first_time();
+
+			c.state = client_state_type::RECEIVING_INITIAL_SNAPSHOT;
+		}
+
 		if (!added_someone_already) {
 			if (c.state > client_state_type::PENDING_WELCOME) {
 				if (!player_added_to_mode(mode_id)) {
@@ -3122,9 +3128,12 @@ void server_setup::advance_clients_state() {
 
 						if (add_client_to_mode()) {
 							if (c.state == S::WELCOME_ARRIVED) {
-								send_state_for_the_first_time();
+								/*
+									Send the initial snapshot on the next step,
+									once the client's character is added already.
+								*/
 
-								c.state = S::RECEIVING_INITIAL_SNAPSHOT;
+								c.state = S::PENDING_RECEIVING_INITIAL_SNAPSHOT;
 							}
 						}
 						else {
