@@ -2355,6 +2355,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 	auto& cosm = in.cosm;
 
 	bool should_restart = false;
+	bool spawn_for_recently_assigned = false;
 
 	for (const auto& p : entropy.players) {
 		const auto& command_variant = p.second;
@@ -2646,6 +2647,8 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 							should_restart = true;
 						}
 
+						spawn_for_recently_assigned = true;
+
 						/* 
 							Note: moving to AFK is also implemented in terms of mode_commands::team choice,
 							so in practice, there are no more ways to defect the duel.
@@ -2682,6 +2685,15 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 
 	if (should_restart) {
 		restart_match(in, step);
+	}
+
+	if (spawn_for_recently_assigned) {
+		/* 
+			To have a character on the scene right away.
+			Will be more responsive this way.
+		*/
+
+		spawn_characters_for_recently_assigned(in, step);
 	}
 }
 
@@ -2731,7 +2743,7 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 		const auto& player_data = it.second;
 		const auto id = it.first;
 
-		if (player_data.controlled_character_id.is_set()) {
+		if (const bool has_character_already = player_data.controlled_character_id.is_set()) {
 			continue;
 		}
 
@@ -2740,7 +2752,7 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 		};
 
 		if (state == arena_mode_state::WARMUP) {
-			/* Always spawn in warmup */
+			/* Always try to spawn in warmup */
 			do_spawn();
 		}
 		else if (state == arena_mode_state::LIVE) {

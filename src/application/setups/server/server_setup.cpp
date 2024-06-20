@@ -2989,15 +2989,30 @@ void server_setup::advance_clients_state() {
 
 				c.num_entropies_accepted = [&]() {
 					if (should_squash) {
-						const auto num_squashed = static_cast<uint8_t>(
+						const auto num_to_squash = static_cast<uint8_t>(
 							std::min(
 								num_pending,
 								static_cast<std::size_t>(c.settings.net.jitter.max_commands_to_squash_at_once)
 							)
 						);
 
-						for (std::size_t i = 0; i < num_squashed; ++i) {
+						std::size_t num_squashed = 0;
+
+						for (std::size_t i = 0; i < num_to_squash; ++i) {
+							if (i > 0) {
+								if (auto choice = std::get_if<mode_commands::team_choice>(std::addressof(entropy.mode))) {
+									/*
+										Prevent squashing team_choice with movement as it will invalidate the intents
+										if they are applied in the same step.
+									*/
+
+									break;
+								}
+							}
+
 							entropy += inputs[i];
+
+							++num_squashed;
 						}
 
 						if (num_squashed == num_pending) {
