@@ -132,6 +132,7 @@ class client_setup :
 	net_time_t when_sent_client_settings = -1;
 	net_time_t when_sent_nat_punch_request = -1;
 	net_time_t when_sent_last_keepalive = 0;
+	net_time_t when_sent_last_referential_step = 0;
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
@@ -387,6 +388,8 @@ class client_setup :
 				auto scope = measure_scope(performance.unpacking_remote_steps);
 
 				auto referential_post_solve = [&](const const_logic_step step) {
+					when_sent_last_referential_step = get_current_time();
+
 					audiovisual_post_solve_settings settings;
 
 					if (is_spectating_referential()) {
@@ -618,6 +621,10 @@ public:
 
 	const cosmos& get_viewed_cosmos() const;
 
+	bool is_viewing_referential() const {
+		return get_viewed_arena_type() == client_arena_type::REFERENTIAL;
+	}
+
 	auto get_interpolation_ratio() const {
 		if (pause_solvable_stream) {
 			return 0.0;
@@ -627,6 +634,10 @@ public:
 
 		if (is_replaying()) {
 			return demo_player.timer.next_step_progress_fraction(dt_secs);
+		}
+
+		if (is_viewing_referential()) {
+			return std::min(1.0, (get_current_time() - when_sent_last_referential_step) / dt_secs);
 		}
 
 		/* 

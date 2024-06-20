@@ -29,7 +29,7 @@ public:
 		const double interpolation_ratio
 	);
 
-	void update_desired_transforms(const cosmos&);
+	void update_desired_transforms(const cosmos&, bool use_current_as_previous);
 
 	template <class E>
 	transformr get_interpolated(const E& handle) const {

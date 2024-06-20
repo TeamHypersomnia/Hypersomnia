@@ -16,7 +16,6 @@
 #include "application/network/interpolation_transfer.h"
 #include "application/arena/synced_dynamic_vars.h"
 
-/* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION 1
 #define TEST_DESYNC_DETECTION 0
 

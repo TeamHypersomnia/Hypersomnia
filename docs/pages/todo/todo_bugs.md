@@ -5,9 +5,6 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- interpolation bug (STILL!!!)
-	- happens not just on connection but also when resycing on the web after switching tabs
-
 
 - why is timeout limit wrongly shown for a split second for the player that connects to a ranked after disconnect?
 

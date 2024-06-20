@@ -5,6 +5,22 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+
+- interpolation bug (STILL!!!)
+	- happens not just on connection but also when resycing on the web after switching tabs
+
+	- The problem is that 
+		The interpolation ratio formula for the client:
+	
+		const auto at_0 = client_time - dt_secs;
+		return std::min(1.0, (get_current_time() - at_0) / dt_secs);
+		
+		Will wrap around every 16ms - even though the referential steps can come in different intervals due to jitter.
+		This will cause the character to go back and forth.
+
+		We fixed this by introducing a separate timestamp for when we last received a referential step.
+
+
 - identify the "1" added to nicknames, might be indicative of some issue
 	- nickname can be re-stated with requested_client_settings, but this wrongly detected the need for "1" once the player was already connected.
 	- requested_client_settings could be triggered even if the screen size changed even to change the nonzoomed area

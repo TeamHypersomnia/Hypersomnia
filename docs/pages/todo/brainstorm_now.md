@@ -7,6 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - update emscripten
+    - wait until they update the emsdk cause building it will be a pain
 
 - preparing for large traffic from crazygames
     - show full servers in gray

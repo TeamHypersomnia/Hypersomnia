@@ -3580,7 +3580,15 @@ work_result work(
 			auto scope = measure_scope(get_audiovisuals().performance.interpolation);
 
 			if (pending_new_state_sample) {
-				interp.update_desired_transforms(cosm);
+				bool use_current_as_previous = false; 
+
+				on_specific_setup([&](client_setup& client) {
+					if (client.is_viewing_referential()) {
+						use_current_as_previous = true;
+					}
+				});
+
+				interp.update_desired_transforms(cosm, use_current_as_previous);
 			}
 
 			interp.integrate_interpolated_transforms(

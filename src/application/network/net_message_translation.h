@@ -46,6 +46,8 @@ bool write_standard_block_message(
 	augs::byte_counter_stream s;
 	augs::write_bytes(s, input);
 
+	LOG("Write %x: %x bytes", get_type_name_strip_namespace<T>(), s.size());
+
 	auto block = block_allocator(s.size());
 	auto pts = augs::make_ptr_write_stream(reinterpret_cast<std::byte*>(block), s.size());
 

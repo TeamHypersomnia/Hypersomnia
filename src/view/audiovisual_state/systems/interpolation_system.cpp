@@ -4,6 +4,11 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
+#define LOG_INTERPOLATION 0
+
+#if LOG_INTERPOLATION
+#include "augs/log.h"
+#endif
 
 void interpolation_system::set_interpolation_enabled(const bool flag) {
 	enabled = flag;
@@ -19,16 +24,29 @@ void snap_interpolated_to_logical(cosmos& cosm) {
 	);
 }
 
-void interpolation_system::update_desired_transforms(const cosmos& cosm) {
-	cosm.for_each_having<invariants::interpolation>( 
-		[&](const auto& e) {
-			if (const auto current = e.find_logic_transform()) {
-				const auto& info = get_corresponding<components::interpolation>(e);
-				info.previous_transform = info.desired_transform;
-				info.desired_transform = *current;
+void interpolation_system::update_desired_transforms(const cosmos& cosm, const bool use_current_as_previous) {
+	if (use_current_as_previous) {
+		cosm.for_each_having<invariants::interpolation>( 
+			[&](const auto& e) {
+				if (const auto current = e.find_logic_transform()) {
+					const auto& info = get_corresponding<components::interpolation>(e);
+					info.previous_transform = info.interpolated_transform;
+					info.desired_transform = *current;
+				}
 			}
-		}
-	);
+		);
+	}
+	else {
+		cosm.for_each_having<invariants::interpolation>( 
+			[&](const auto& e) {
+				if (const auto current = e.find_logic_transform()) {
+					const auto& info = get_corresponding<components::interpolation>(e);
+					info.previous_transform = info.desired_transform;
+					info.desired_transform = *current;
+				}
+			}
+		);
+	}
 }
 
 void interpolation_system::integrate_interpolated_transforms(
@@ -48,6 +66,7 @@ void interpolation_system::integrate_interpolated_transforms(
 	}
 	
 	const auto seconds = delta.in_seconds();
+	//const auto seconds = std::min(0.001f, delta.in_seconds());
 
 	if (seconds < 0.00001f) {
 		return;
@@ -67,6 +86,12 @@ void interpolation_system::integrate_interpolated_transforms(
 				cache.positional_slowdown_multiplier > 1.0f
 				|| cache.rotational_slowdown_multiplier > 1.0f
 			;
+
+#if 0
+			if (e.template has<components::sentience>()) {
+				LOG_NVPS(compensating_lag, cache.positional_slowdown_multiplier);
+			}
+#endif
 
 			if (compensating_lag || settings.method == interpolation_method::EXPONENTIAL) {
 				const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
@@ -91,13 +116,35 @@ void interpolation_system::integrate_interpolated_transforms(
 				const auto positional_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_positional_speed * seconds));
 				const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_rotational_speed * seconds));
 
+#if LOG_INTERPOLATION
+				const auto prev = info.interpolated_transform;
+#endif
+
 				auto& integrated = info.interpolated_transform;
 				integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant * speed, rotational_averaging_constant);
+
+#if LOG_INTERPOLATION
+				const auto diff = (prev.pos-integrated.pos).length();
+
+				if (e.template has<components::sentience>()) {
+					if (diff > 0.1) {
+						LOG_NVPS(seconds, diff, integrated.pos, info.desired_transform.pos);
+					}
+				}
+#endif
 			}
 			else {
 				auto& integrated = info.interpolated_transform;
 
 				auto ratio = static_cast<float>(interpolation_ratio);
+
+#if LOG_INTERPOLATION
+				if (e.template has<components::sentience>()) {
+					if (info.desired_transform != info.previous_transform) {
+						LOG_NVPS(ratio, info.previous_transform.pos, info.desired_transform.pos);
+					}
+				}
+#endif
 
 				if (settings.method == interpolation_method::LINEAR_EXTRAPOLATE) {
 					ratio += 1.0f;
@@ -108,7 +155,7 @@ void interpolation_system::integrate_interpolated_transforms(
 				if (info.desired_transform == info.previous_transform) {
 					/* 
 						For numerical stability when bodies are asleep.
-						0.3*previous + 0.7*desired would be numerically different than
+						e.g. 0.3*previous + 0.7*desired would be numerically different than
 						just "desired" even though previous == desired.
 					*/
 
