@@ -3094,13 +3094,6 @@ void server_setup::advance_clients_state() {
 
 					vars
 				);
-
-				server->send_payload(
-					client_id, 
-					game_channel_type::RELIABLE_MESSAGES, 
-
-					runtime_info
-				);
 			}
 		};
 
