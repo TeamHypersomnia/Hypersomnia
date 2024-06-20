@@ -54,8 +54,8 @@ game_connection_config::game_connection_config() {
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::RELIABLE_MESSAGES)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		solvable_stream.maxBlockSize = max_block_size_v;
-		solvable_stream.sentPacketBufferSize = 1024 * 4;
-		solvable_stream.maxMessagesPerPacket = 32;
+		solvable_stream.sentPacketBufferSize = 1024 * 2;
+		solvable_stream.maxMessagesPerPacket = 256;
 		solvable_stream.messageResendTime = 0.f;
 		solvable_stream.messageSendQueueSize = 1024 * 8;
 		solvable_stream.messageReceiveQueueSize = 1024 * 8;
