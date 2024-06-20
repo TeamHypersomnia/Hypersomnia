@@ -173,13 +173,6 @@ namespace net_messages {
 
 	//struct initial_steps_correction : only_block_message {};
 
-#if CONTEXTS_SEPARATE
-	struct prestep_client_context : net_message_with_payload<::prestep_client_context> {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-	};
-#endif
-
 	struct server_step_entropy : net_message_with_payload<networked_server_step_entropy> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
@@ -330,9 +323,6 @@ namespace net_messages {
 		new_server_runtime_info*,
 		full_arena_snapshot*,
 		//initial_steps_correction*,
-#if CONTEXTS_SEPARATE
-		prestep_client_context*,
-#endif
 		server_step_entropy*,
 		client_entropy*,
 		special_client_request*,

@@ -3595,19 +3595,10 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 		{
 			{
-				prestep_client_context context;
+				auto context = prestep_client_context();
 				context.num_entropies_accepted = c.num_entropies_accepted;
 
-#if CONTEXTS_SEPARATE
-				server->send_payload(
-					client_id, 
-					game_channel_type::RELIABLE_MESSAGES,
-
-					context
-				);
-#else
 				total.context = context;
-#endif
 			}
 
 			/* Reset the counter */

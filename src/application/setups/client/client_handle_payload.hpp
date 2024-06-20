@@ -302,16 +302,6 @@ message_handler_result client_setup::handle_payload(
 			snap_interpolated_to_logical(referential.advanced_cosm);
 		}
 	}
-#if CONTEXTS_SEPARATE
-	else if constexpr (std::is_same_v<T, prestep_client_context>) {
-		if (state != client_state_type::IN_GAME) {
-			set_disconnect_reason(typesafe_sprintf("The server has sent prestep context too early (state: %x). Disconnecting.", state));
-			return abort_v;
-		}
-
-		receiver.acquire_next_server_entropy(payload);
-	}
-#endif
 	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
 		if (pause_solvable_stream) {
 			/* 

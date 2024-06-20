@@ -573,11 +573,9 @@ namespace net_messages {
 		auto& i = total_networked.payload;
 		auto& g = i.general;
 
-#if !CONTEXTS_SEPARATE
 		if (!serialize(s, total_networked.context)) {
 			return false;
 		}
-#endif
 
 		auto& state_hash = total_networked.meta.state_hash;
 		bool has_state_hash = logically_set(state_hash);
