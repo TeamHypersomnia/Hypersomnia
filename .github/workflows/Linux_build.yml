@@ -49,7 +49,7 @@ jobs:
 
     - name: Add PipeWire PPA
       run: |
-        sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
+        sudo add-apt-repository -y ppa:pipewire-debian/pipewire-upstream
         sudo apt-get update
 
     - name: Install OpenAL soft dependencies

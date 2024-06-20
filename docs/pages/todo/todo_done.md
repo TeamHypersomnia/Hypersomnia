@@ -7126,3 +7126,4 @@ This will discard your redo history."
             - to generate correct links when someone hosts a server via /host (without specified id)
             - just a simple message back through websocket, maybe json
         - Let MS resolve official addresses
+- resolve_address -> address_utils
