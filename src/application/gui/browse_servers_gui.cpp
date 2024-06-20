@@ -17,7 +17,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "augs/misc/to_hex_str.h"
 
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/templates/main_thread_queue.h"
 
 #if PLATFORM_WEB

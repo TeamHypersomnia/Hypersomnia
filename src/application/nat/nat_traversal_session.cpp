@@ -6,7 +6,7 @@
 #include "application/masterserver/masterserver_requests.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/to_bytes.h"
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "application/nat/stun_request.h"
 #include "augs/network/netcode_utils.h"

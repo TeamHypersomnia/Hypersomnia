@@ -38,7 +38,7 @@
 
 #include "application/setups/client/https_file_downloader.h"
 #include "application/setups/client/client_handle_payload.hpp"
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/network/resolve_address_result.h"
 #include "augs/network/netcode_utils.h"

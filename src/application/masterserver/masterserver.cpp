@@ -15,7 +15,7 @@
 #include "augs/misc/date_time.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/network/netcode_socket_raii.h"
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"

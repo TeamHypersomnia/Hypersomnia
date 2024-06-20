@@ -144,7 +144,7 @@
 #include "application/nat/nat_detection_session.h"
 #include "application/nat/nat_traversal_session.h"
 
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/network/netcode_socket_raii.h"
 
 #include "cmd_line_params.h"

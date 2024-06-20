@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- resolve_address -> address_utils
+- hide settings in web that can crash the app like number of threads
+
 - update emscripten
     - wait until they update the emsdk cause building it will be a pain
 
@@ -52,25 +55,10 @@ summary: That which we are brainstorming at the moment.
 - diagnose why web cant connect to native local servers but first add TURN servers maybe
 - memory problem with hyperactive space station
 
-- fix tip order in tutorial about fast reloads etc move it to later
-
 - setup stun/ice/turn servers
 
 - wtf is that crosshair glitch when hosting via 'srv'
     - have to move mouse right away somewhere far
-
-- we could implement a pause mode when we detect no packets from the server for more than 1 sec
-
-- mapping can be done in signalling server easily, only use this map during relay when mapping dest id to peer
-    - native servers should be able to specify a webrtc "alias" in their heartbeat
-        - can be honored just on init for simplicity
-        - will be useful for official servers and other new dedicated ones
-        - /game/us though could pick the best US server
-        - /game might just choose the best one always
-    - we can do aliasing later, for now it's enough to have ad hoc aliases for official servers on startup
-
-- for correct destructions, we may capture not "this" but a shared ptr to callback contexts.
-    - likely the entire struct should be in shared ptr. then we should lock in all callbacks
 
 - hide the counter on runtime errors
 
@@ -78,64 +66,6 @@ summary: That which we are brainstorming at the moment.
     - throw them from the right hand instead of left (the hand holding the weapon)
     - zero the recoil
 
-- server list nuance with web clients
-    - native servers must still use sending udp packets 
-        - we can later easy implement challenge responses via "heartbeat tickets"
-            - just send back a ticket every time a heartbeat is requested, first one won't pass but that's okay because we'll get a response instantly and we can act on it too
-        - so still resolve and dont forget to check if its resolved
-        - use parsed_url
-    - native servers can't prove their webrtc id
-        - but that's not much of a problem, if they give a fake one nobody will be able to connect to them
-        - we're not identifying by it
-    - web clients will show a different port with every http request
-        - we'll need a separate server list
-        - or encode webrtc id as port!!! hell yea
-            - now they can spoof but only within their own addr
-        - no.. they might overshadow native servers under their address
-        - so a separate server list after all
-        - cant show a reliable ip/port (port doesnt make sense here) on site so just show webrtc id
-    - if nat is non-public, we may default to using webrtc-only connections on servers too
-    - opt out of webrtc support on native servers by providing empty signalling server url
-    - by definition it's only WEB clients that will use the http route.
-        - and they have to have the constant connection to it.
-        - So we should just send all server heartbeats through the websocket
-        - and have the masterserver recognize them by correct webrtc id
-    - we'll have to send the web client info in server list as 0.0.0.0 because there's no point even pinging them since we dont know the port anyway
-    - permalinks
-        - hypersomnia.io/game/gns should join "gns" game or create it if one doesnt exist
-    - note this means all servers native or not might as well use http
-    - NO! Note native clients dont need websocket connection!
-        - They can simply exchange udp packets with the signalling server!!!
-
-    - Let's make it as simple as possible
-        - Native server has no websocket. Data goes through udp to the same port as heartbeats.
-        - Native client can always use websocket since it's temporary.
-        - Every server, native or web, has a webrtc id.
-            - Native server doesnt request an id - no point. Will just be allocated automatically
-            - Web server requests through wss:// location.
-            - So no point holding it in the heartbeat.
-        - Only web client and server use websockets.
-        - Masterserver: 
-            - Knows that http connection list is strictly separate from udp heartbeat list.
-            - has to have a map from webrtc id to either udp address or socket.. to know how to send data 
-        - note: native servers dont need a werbtc id. They can be identified through the source ip address, and web clients can send this ip as the "destination id" to the signalling server.
-            - for native clients wanting to use webrtc anyway (to get around nat) we can still use that ip as webrtc id or use link web://4.4.4.4 etc. The decision happens on the client when they choose to either open websocket to the signal server or go to straight udp connection right away.
-    
-
-    - TO SUMMARIZE
-        - MS keeps a map of native servers as usual; handles them as usual (dont even extract that lambda, no point)
-        - SS has a separate map of web rtc to web peer; which might be a server or not
-            - Whenever a heartbeat occurs or a peer is removed it sets an atomic that it needs to be reserialized
-            - Check for this atomic in the main loop then set a mutex and reserialize
-            - Or SS can just cal a callback directly to reserialize everything since serialized lists are mutexed already with serialized_list_mutex 
-                - just make sure to properly lock the web peer list then and AVOID RECURSIVE LOCK becuase reserializer might want to lock it too
-        - Web servers need to know what id they are
-            - to generate correct links when someone hosts a server via /host (without specified id)
-            - just a simple message back through websocket, maybe json
-        - Let MS resolve official addresses
-
-- hide settings in web that can crash the app like number of threads
-- resolve_address -> address_utils
 - consider having short ids for peers so links don't take much space and are easily transferred without copying (e.g. in school)
 
 - how about using server->config.override_send_and_receive

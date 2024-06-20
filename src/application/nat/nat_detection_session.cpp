@@ -3,7 +3,7 @@
 #include "application/nat/nat_detection_session.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/log.h"
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/netcode_utils.h"

@@ -27,7 +27,7 @@
 #include "application/gui/client/rcon_gui.hpp"
 #include "application/arena/arena_handle.hpp"
 #include "application/masterserver/server_heartbeat.h"
-#include "application/network/resolve_address.h"
+#include "application/network/address_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "application/masterserver/masterserver.h"
 #include "augs/network/netcode_utils.h"
