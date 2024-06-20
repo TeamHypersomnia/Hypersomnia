@@ -209,6 +209,10 @@ namespace augs {
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                     {
+						if (event.key.repeat != 0) {
+							break;
+						}
+
                         event::change ch;
                         ch.msg = event.type == SDL_KEYDOWN ? event::message::keydown : event::message::keyup;
                         ch.data.key.key = translate_sdl2_key(event.key.keysym.sym);
