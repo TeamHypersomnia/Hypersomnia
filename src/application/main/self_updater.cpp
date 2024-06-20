@@ -127,6 +127,8 @@ self_update_result check_and_apply_updates(
 	const auto current_version = hypersomnia_version().get_version_string();
 
 	{
+		LOG("Downloading version file at: %x", version_path);
+
 		const auto response = launch_download(*client, version_path); 
 
 		if (response == nullptr) {

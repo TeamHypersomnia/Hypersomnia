@@ -127,19 +127,31 @@ faction_type arena_mode::get_opposing_faction(const const_input_type in, const f
 faction_type arena_mode::calc_weakest_faction(const const_input_type in) const {
 	const auto participating = calc_participating_factions(in);
 
-	struct {
+	struct weak_faction {
 		faction_type type;
+		std::size_t score;
 		std::size_t count;
+
+		bool operator<(const weak_faction& b) const {
+			if (score == b.score) {
+				return count < b.count;
+			}
+
+			return score < b.score;
+		}
 	} weakest { 
 		participating.bombing,
+		factions[participating.bombing].score,
 		num_players_in(participating.bombing)
 	};
 
 	participating.for_each([&](const auto f) { 
+		const auto s = factions[f].score;
 		const auto n = num_players_in(f);
+		const auto candidate = weak_faction { f, s, n };
 
-		if (n < weakest.count) {
-			weakest = { f, n };
+		if (candidate < weakest) {
+			weakest = candidate;
 		}
 	});
 
@@ -702,6 +714,14 @@ faction_choice_result arena_mode::auto_assign_faction(const input_type in, const
 	if (const auto entry = find(id)) {
 		auto& f = entry->session.faction;
 		const auto previous_faction = f;
+
+		if (1 == num_players_in(previous_faction)) {
+			if (is_actual_faction(previous_faction)) {
+				/* Can't really make this better */
+				return faction_choice_result::BEST_BALANCE_ALREADY;
+			}
+		}
+
 		f = faction_type::SPECTATOR;
 
 		/* Now if factions were all even, it will assign to the same faction and return false for "no change" */
