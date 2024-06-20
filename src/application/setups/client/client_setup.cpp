@@ -2020,6 +2020,14 @@ bool client_setup::is_connected() const {
 void client_setup::send_to_server(
 	total_client_entropy& new_local_entropy
 ) {
+#if 0
+	LOG("Sending new_local_entropy");
+
+	if (new_local_entropy.cosmic.length() > 0 || new_local_entropy.mode.index() > 0) {
+		LOG_NVPS(get_viewed_cosmos().get_total_steps_passed(), new_local_entropy.cosmic.length(), new_local_entropy.mode.index());
+	}
+#endif
+
 	send_payload(
 		game_channel_type::RELIABLE_MESSAGES,
 		new_local_entropy

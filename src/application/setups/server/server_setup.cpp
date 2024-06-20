@@ -3031,6 +3031,12 @@ void server_setup::advance_clients_state() {
 					return static_cast<uint8_t>(1);
 				}();
 
+#if 0
+				if (entropy.cosmic.length() > 0 || entropy.mode.index() > 0) {
+					LOG_NVPS(c.num_entropies_accepted, scene.world.get_total_steps_passed(), entropy.cosmic.length(), entropy.mode.index());
+				}
+#endif
+
 				accept_entropy_of_client(mode_id, entropy);
 			}
 		};

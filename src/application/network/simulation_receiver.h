@@ -108,6 +108,7 @@ public:
 		const server_step_entropy_meta& meta,
 		const received_entropy_type& payload
 	) {
+		// LOG_NVPS(context.num_entropies_accepted);
 		incoming_contexts.push_back(context);
 		incoming_entropies.push_back({meta, payload, next_dynamic_vars});
 

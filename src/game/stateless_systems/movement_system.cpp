@@ -29,6 +29,12 @@
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/get_hovered_world_entity.h"
 
+#define LOG_INTENTS 0
+
+#if LOG_INTENTS
+#include "augs/log.h"
+#endif
+
 using namespace augs;
 
 namespace augs {
@@ -62,6 +68,10 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
+#if LOG_INTENTS
+		LOG_NVPS(it.was_pressed(), cosm.get_total_steps_passed(), int(it.intent));
+#endif
+
 		cosm(
 			it.subject,
 			[&](const auto subject) {

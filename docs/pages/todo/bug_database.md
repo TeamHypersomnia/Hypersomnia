@@ -5,6 +5,14 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Initial handshake&interpolation issues
+    - RCON slowed down the initial handshake
+	- The map list was sent twice
+        - in the future, the block message should be sent more aggressively
+    - maxMessagesPerPacket was only 32 - that's why the number of predicted steps kept rising past 500ms latency.
+        - and it catched up for a while on connect even with ~200 ms ping
+    - The glitch on spawn is because team choice + button presses were squashed which made movement commands ineffective
+
 
 - interpolation bug (STILL!!!)
 	- happens not just on connection but also when resycing on the web after switching tabs

@@ -5,6 +5,27 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- WebRTC crash on dedicated server disconnect (happened when browser was connecting though)
+	[20:27:54] server disconnected client 0
+
+	[20:27:54] Calling unset_client from disconnect callback.
+	[20:27:54] Client disconnected. Details:
+	Id: 0
+	Nickname: : Dentatus Triarchus VII
+	IP:127.255.255.255:5
+	[20:27:54] It's a WebRTC client. Closing the PeerConnection and DataChannel.
+	[20:27:54] WebRTC: Disconnected client: 5
+	[20:27:54] rtc::impl::PeerConnection::changeIceState@1254: Changed ICE state to closed
+	[20:27:54] rtc::impl::PeerConnection::changeState@1236: Changed state to closed
+	[20:27:54] WebRTC: PeerConnection state change: closed
+	[20:27:54] WebRTC: Empty disconnect: 5
+	[20:27:54] WebRTC: DataChannel closed: 5
+	[20:27:54] WebRTC: Empty disconnect: 5
+	[20:27:54] Sending new dynamic vars at step: 4536. 0 0
+	[20:27:54] rtc::impl::DtlsTransport::doRecv@991: DTLS closed
+	libc++abi: terminating due to uncaught exception of type std::runtime_error
+	[1]    78093 IOT instruction (core dumped)  ../build/current/Hypersomnia --dedicated-server
+	~/Hypersomnia
 
 - why is timeout limit wrongly shown for a split second for the player that connects to a ranked after disconnect?
 
