@@ -313,7 +313,7 @@
         "webrtc_udp_mux": false,
         "webrtc_port_range_begin": 9000,
         "webrtc_port_range_end": 9020,
-        "server_name": "${MY_NICKNAME}'s server",
+        "server_name": "", // Will be "Nickname's server" by default.
         "notified_server_list": "masterserver.hypersomnia.xyz:8430",
         "suppress_new_community_server_webhook": false,
         "allow_nat_traversal": true,
@@ -362,6 +362,17 @@
         "shutdown_after_first_match": false,
         "sync_all_external_arenas_on_startup": false
     },
+
+    /*
+        For spawning multiple server instances within a single process.
+        Applies only to the dedicated server.
+
+        If both 0, will just create a single instance according to the config.
+        For casual server instances, "ranked" fields will just be reset.
+    */
+
+	"num_ranked_servers": 0,
+	"num_casual_servers": 0,
 
     // Private vars aren't known to any clients.
 

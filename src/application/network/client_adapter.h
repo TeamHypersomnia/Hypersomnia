@@ -19,6 +19,7 @@ class client_adapter {
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
+	yojimbo::DefaultAllocator yojimbo_allocator;
 	yojimbo::Client client;
 	client_auxiliary_command_callback_type auxiliary_command_callback;
 	send_packet_override_type send_packet_override;
@@ -51,6 +52,10 @@ public:
 		send_packet_override_type,
 		receive_packet_override_type
 	);
+
+	auto& get_allocator() {
+		return yojimbo_allocator;
+	}
 
 	resolve_address_result connect(const client_connect_string&);
 

@@ -210,7 +210,7 @@ class server_setup :
 	std::string failure_reason;
 
 #if BUILD_NATIVE_SOCKETS
-	server_nat_traversal nat_traversal;
+	std::optional<server_nat_traversal> nat_traversal;
 #endif
 	bool suppress_community_server_webhook_this_run = false;
 
@@ -387,7 +387,7 @@ public:
 		std::optional<augs::dedicated_server_input>,
 
 #if BUILD_NATIVE_SOCKETS
-		const server_nat_traversal_input& nat_traversal_input,
+		const std::optional<server_nat_traversal_input> nat_traversal_input,
 #endif
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
@@ -458,17 +458,14 @@ public:
 		}
 
 #if BUILD_NATIVE_SOCKETS
-		if (vars.allow_nat_traversal) {
-			nat_traversal.last_detected_nat = in.last_detected_nat;
+		if (nat_traversal) {
+			nat_traversal->last_detected_nat = in.last_detected_nat;
 
 			if (auto socket = find_underlying_socket()) {
-				nat_traversal.send_packets(*socket);
+				nat_traversal->send_packets(*socket);
 			}
 
-			nat_traversal.advance();
-		}
-		else {
-			nat_traversal.last_detected_nat = nat_detection_result();
+			nat_traversal->advance();
 		}
 #endif
 

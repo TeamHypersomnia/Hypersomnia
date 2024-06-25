@@ -63,13 +63,14 @@ namespace fs = std::filesystem;
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	const bool only_check_availability_and_quit,
-	const augs::image* imgui_atlas_image,
 	const self_update_settings& http_settings,
-	augs::window_settings window_settings,
-	bool headless
+	const augs::image* imgui_atlas_image,
+	std::optional<augs::window_settings> window_settings
 ) {
 	(void)window_settings;
 	(void)imgui_atlas_image;
+
+	bool headless = !window_settings.has_value();
 
 #if HEADLESS
 	headless = true;
@@ -221,9 +222,11 @@ self_update_result check_and_apply_updates(
 
 	const auto window_size = vec2i(600, line_height * num_lines);
 
-	window_settings.size = window_size;
-	window_settings.fullscreen = false;
-	window_settings.border = false;
+	if (window_settings) {
+		window_settings->size = window_size;
+		window_settings->fullscreen = false;
+		window_settings->border = false;
+	}
 
 	std::optional<augs::window> window;
 	std::optional<augs::graphics::renderer_backend> renderer_backend;
@@ -239,11 +242,13 @@ self_update_result check_and_apply_updates(
 #if !HEADLESS
 	else {
 		try {
-			window.emplace(window_settings);
+			ensure(window_settings.has_value());
+
+			window.emplace(*window_settings);
 			const auto disp = window->get_display();
 
-			window_settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
-			window->apply(window_settings);
+			window_settings->position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
+			window->apply(*window_settings);
 
 			renderer_backend.emplace();
 

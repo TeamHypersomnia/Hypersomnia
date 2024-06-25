@@ -3348,7 +3348,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(900);
 			gun_def.recoil_multiplier = 0.17f;
 			gun_def.buy_type = buy_menu_type::SUBMACHINE_GUNS;
 
@@ -4315,7 +4315,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1500.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5000.f, 5000.f};
+			gun_def.muzzle_velocity = {5100.f, 5100.f};
 			gun_def.shot_cooldown_ms = 380.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};

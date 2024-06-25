@@ -174,6 +174,9 @@
 #endif
 
 #include "augs/readwrite/file_to_bytes.h"
+#if !PLATFORM_WEB
+#include "application/main/dedicated_server_worker.hpp"
+#endif
 #include "work_result.h"
 
 namespace augs {
@@ -452,10 +455,6 @@ work_result work(
 			result->load_patch(private_config_path);
 		}
 
-		if (params.no_router) {
-			result->server.allow_nat_traversal = false;
-		}
-
 		if (params.daily_autoupdate) {
 			result->server.daily_autoupdate = true;
 		}
@@ -622,14 +621,22 @@ work_result work(
 
 		const bool only_check = is_steam_client || params.only_check_update_availability_and_quit;
 
-		last_update_result = check_and_apply_updates(
-			params.appimage_path,
-			only_check,
-			imgui_atlas_image.get(),
-			config.self_update,
-			config.window,
-			should_update_headless
-		);
+		if (should_update_headless) {
+			last_update_result = check_and_apply_updates(
+				params.appimage_path,
+				only_check,
+				config.self_update
+			);
+		}
+		else {
+			last_update_result = check_and_apply_updates(
+				params.appimage_path,
+				only_check,
+				config.self_update,
+				imgui_atlas_image.get(),
+				config.window
+			);
+		}
 
 		LOG_NVPS(last_update_result.type);
 
@@ -763,9 +770,10 @@ work_result work(
 	}
 #endif
 
+#if !HEADLESS
+#if BUILD_NATIVE_SOCKETS
 	WEBSTATIC auto last_requested_local_port = port_type(0);
 
-#if BUILD_NATIVE_SOCKETS
 	WEBSTATIC auto chosen_server_port = [&](){
 		if (params.server_port.has_value()) {
 			return *params.server_port;
@@ -788,6 +796,10 @@ work_result work(
 	};
 
 	WEBSTATIC auto recreate_auxiliary_socket = [&](std::optional<port_type> temporary_port = std::nullopt) {
+		if (params.is_cli_server()) {
+			return;
+		}
+
 		const auto preferred_port = temporary_port.has_value() ? *temporary_port : chosen_server_port();
 		last_requested_local_port = preferred_port;
 
@@ -822,6 +834,10 @@ work_result work(
 	};
 
 	WEBSTATIC auto restart_nat_detection = [&]() {
+		if (params.is_cli_server()) {
+			return;
+		}
+
 		nat_detection.reset();
 		nat_detection.emplace(config.nat_detection, stun_provider);
 	};
@@ -865,6 +881,7 @@ work_result work(
 	WEBSTATIC auto get_bound_local_port = [&]() {
 		return 0;
 	};
+#endif
 #endif
 
 	WEBSTATIC const auto official = std::make_unique<packaged_official_content>();
@@ -1001,138 +1018,195 @@ work_result work(
 
 	if (params.type == app_type::DEDICATED_SERVER) {
 #if BUILD_NETWORKING
-		LOG("Starting the dedicated server at port: %x", chosen_server_port());
+		LOG("Starting the dedicated server.");
 
-		if (config.server.allow_nat_traversal) {
-			if (nat_detection.has_value()) {
-				if (auxiliary_socket.has_value()) {
-					LOG("Waiting for NAT detection to complete...");
+		enum instance_type {
+			RANKED,
+			CASUAL,
+			SINGLE
+		};
 
-					while (!nat_detection_complete()) {
-						nat_detection->advance(auxiliary_socket->socket);
+		const auto config_pattern = config;
+		const auto original_port = config_pattern.server_start.port;
 
-						if (handle_sigint()) {
-							return work_result::SUCCESS;
-						}
+		auto port_counter = original_port;
 
-						augs::sleep(1.0 / 1000);
-					}
-				}
-			}
-		}
+		auto write_vars_to_disk = [&](const server_vars& new_vars) {
+			LOG("Writing server_vars to disk.");
 
-		const auto bound_port = get_bound_local_port();
-		delete_auxiliary_socket();
-
-		LOG("Starting a dedicated server. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
-
-		auto start = config.server_start;
-		start.port = bound_port;
-
-		auto server_ptr = std::make_unique<server_setup>(
-			*official,
-			start,
-			config.server,
-			config.server_private,
-			config.client,
-			config.dedicated_server,
-
-			make_server_nat_traversal_input(),
-			params.suppress_server_webhook,
-			assigned_teams,
-			config.webrtc_signalling_server_url
-		);
-
-		auto& server = *server_ptr;
-
-		std::future<self_update_result> availability_check;
-
-		auto write_vars_to_disk = [&]() {
 			change_with_save([&](auto& cfg) {
-				cfg.server = server.get_current_vars();
+				cfg.server = new_vars;
 			});
 		};
 
-		auto save_config = augs::scope_guard([&]() {
-			write_vars_to_disk();
-		});
+		auto make_next_worker_input = [&](const uint16_t index, const instance_type type) {
+			const bool first_server = port_counter == original_port;
+			const bool later_server = !first_server;
 
-		while (server.is_running()) {
-			const auto zoom = 1.f;
+			const auto instance_log_label = typesafe_sprintf("#%x%x", index, type == RANKED ? "R" : "c");
+			const auto name_suffix = typesafe_sprintf("#%x%x", index, type == RANKED ? " R" : "");
 
-			if (handle_sigint()) {
-				return work_result::SUCCESS;
+			const auto server_name_suffix = type == SINGLE ? std::string("") : std::string(" ") + name_suffix;
+
+			const auto label = [type]() {
+				if (type == RANKED) {
+					return "ranked";
+				}
+
+				if (type == CASUAL) {
+					return "casual";
+				}
+
+				return "single";
+			}();
+
+			const auto instance_label = std::string(label) + server_name_suffix;
+
+			auto this_config = config_pattern;
+
+			if (type == CASUAL) {
+				this_config.server.ranked.autostart_when = ranked_autostart_type::NEVER;
 			}
 
-			server.advance(
-				{
-					vec2i(),
-					config.input,
-					zoom,
-					get_detected_nat(),
-					network_performance,
-					server_stats
-				},
-				solver_callbacks()
+			LOG_NVPS(this_config.server.server_name, server_name_suffix);
+
+			this_config.server.server_name += server_name_suffix;
+			this_config.server_start.port = port_counter++;
+
+			LOG(
+				"Starting %x server instance. Binding to a port: %x",
+				instance_label,
+				this_config.server_start.port
 			);
 
-			if (server.should_write_vars_to_disk_once()) {
-				write_vars_to_disk();
+			auto write_or_not = std::function<void(const server_vars&)>(write_vars_to_disk);
+			bool should_suppress_webhook = params.suppress_server_webhook;
+			
+			const bool pick_random_map = later_server && this_config.server.cycle_randomize_order;
+
+			if (later_server) {
+				/*
+					To prevent concurrent downloads,
+					only one instance should check for autoupdates.
+				*/
+				this_config.server.daily_autoupdate = false;
+
+				should_suppress_webhook = true;
+				write_or_not = nullptr;
 			}
 
-			if (server.should_check_for_updates_once()) {
-				LOG("Launching an async check for updates.");
-
-				auto config_http_client = config.self_update;
-
-				/* Give it a little longer, it's async anyway. */
-				config_http_client.update_connection_timeout_secs = 10;
-
-				const auto config_window = config.window;
-
-				auto imgui_atlas_ptr = imgui_atlas_image.get();
-
-				availability_check = launch_async(
-					[imgui_atlas_ptr, params=params, config_http_client, config_window]() {
-						const bool only_check_update_availability_and_quit = true;
-
-						return check_and_apply_updates(
-							params.appimage_path,
-							only_check_update_availability_and_quit,
-							imgui_atlas_ptr,
-							config_http_client,
-							config_window,
-							true // should_update_headless
-						);
-					}
-				);
+			if (pick_random_map) {
+				this_config.server.arena = "";
 			}
 
-			if (valid_and_is_ready(availability_check)) {
-				LOG("Finished the async check for updates.");
+			auto server_ptr = std::make_unique<server_setup>(
+				*official,
+				this_config.server_start,
+				this_config.server,
+				this_config.server_private,
+				this_config.client,
+				this_config.dedicated_server,
 
-				using update_result = self_update_result_type;
+				std::nullopt,
+				should_suppress_webhook,
+				type == SINGLE ? assigned_teams : server_assigned_teams(),
 
-				const auto result = availability_check.get();
+				this_config.webrtc_signalling_server_url
+			);
 
-				if (result.type == update_result::UPDATE_AVAILABLE) {
-					return work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER;
-				}
-				else {
-					LOG("The dedicated server is up to date.");
-				}
+			if (pick_random_map) {
+				server_ptr->choose_next_map_from_cycle();
 			}
 
-			server.sleep_until_next_tick();
+			return dedicated_server_worker_input { 
+				std::move(server_ptr),
+				params.appimage_path,
+				this_config.self_update,
+				write_or_not,
+				instance_label,
+				"[" + instance_log_label + "] "
+			};
+		};
+
+		const auto num_ranked = std::min(uint16_t(20u), config_pattern.num_ranked_servers);
+		const auto num_casual = std::min(uint16_t(20u), config_pattern.num_casual_servers);
+
+		const auto num_total = num_ranked + num_casual;
+
+		if (num_total == 0) {
+			LOG("This is a single-instance dedicated server.");
+
+			const auto worker_in = make_next_worker_input(1, SINGLE);
+			const auto result = dedicated_server_worker(worker_in, handle_sigint);
+			write_vars_to_disk(worker_in.server_ptr->get_current_vars());
+
+			LOG("Quitting the single-dedicated server with: %x", ::describe_work_result(result));
+
+			return result;
 		}
+		else {
+			LOG("This is a multi-instance dedicated server.");
 
-		if (server.server_restart_requested()) {
-			return work_result::RELAUNCH_DEDICATED_SERVER;
+			LOG("Casual instances: %x", num_casual);
+			LOG("Ranked instances: %x", num_ranked);
+			LOG("Total  instances: %x", num_total);
+
+			std::mutex result_lk;
+			std::atomic<bool> one_shutdown_already = false;
+			work_result result = work_result::SUCCESS;
+
+			auto should_interrupt = [&one_shutdown_already, handle_sigint]() {
+				if (one_shutdown_already.load()) {
+					return true;
+				}
+
+				return handle_sigint();
+			};
+
+			auto on_instance_exit = [&](const work_result this_result) {
+				/* All need to exit. */
+				one_shutdown_already.store(true);
+
+				if (this_result != work_result::SUCCESS) {
+					std::scoped_lock lk(result_lk);
+
+					/*
+						In extreme edge cases multiple instances could set different non-SUCCESS results
+						(e.g. autonomous RELAUNCH_AND_UPDATE_DEDICATED_SERVER
+						and manually-induced RELAUNCH_DEDICATED_SERVER)
+
+						Thus, we need to arbitrarily choose just one result.
+						It will not really break anything if we do.
+					*/
+
+					result = this_result;
+				}
+			};
+
+			auto make_worker = [&](const uint16_t i, const instance_type type) {
+				return make_server_worker(make_next_worker_input(i + 1, type), should_interrupt, on_instance_exit);
+			};
+
+			std::vector<std::thread> instances;
+			instances.reserve(num_total);
+
+			for (uint16_t i = 0; i < num_ranked; ++i) {
+				instances.emplace_back(make_worker(i, RANKED));
+			}
+
+			for (uint16_t i = 0; i < num_casual; ++i) {
+				instances.emplace_back(make_worker(i, CASUAL));
+			}
+
+			for (auto& t : instances) {
+				t.join();
+			}
+
+			LOG("Quitting the multi-dedicated server with: %x", ::describe_work_result(result));
+
+			return result;
 		}
 #endif
-
-		LOG("Quitting the dedicated server with success.");
-		return work_result::SUCCESS;
 	}
 
 #endif // #if !PLATFORM_WEB
@@ -1931,6 +2005,7 @@ work_result work(
 #endif
 
 		setup_launcher([&]() {
+#if BUILD_NATIVE_SOCKETS
 			auto bound_port = get_bound_local_port();
 			delete_auxiliary_socket();
 
@@ -1940,6 +2015,9 @@ work_result work(
 			}
 
 			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+#else
+			const auto bound_port = 0;
+#endif
 
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				*official,
@@ -2058,7 +2136,6 @@ work_result work(
 						return;
 					}
 				}
-#endif
 
 				const auto bound_port = get_bound_local_port();
 				delete_auxiliary_socket();
@@ -2067,7 +2144,9 @@ work_result work(
 
 				auto start = config.server_start;
 				start.port = bound_port;
-
+#else
+				auto start = config.server_start;
+#endif
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
 						*official,
@@ -2315,7 +2394,7 @@ work_result work(
 				}
 			);
 
-			if (start_server_gui.instance_type == server_instance_type::INTEGRATED) {
+			if (start_server_gui.type == dedicated_or_integrated::INTEGRATED) {
 				launch_setup(activity_type::SERVER);
 			}
 			else {
@@ -2756,7 +2835,6 @@ work_result work(
 								break;
 							}
 						}
-#endif
 
 						const auto bound_port = get_bound_local_port();
 						delete_auxiliary_socket();
@@ -2765,6 +2843,9 @@ work_result work(
 
 						auto start = config.server_start;
 						start.port = bound_port;
+#else
+						auto start = config.server_start;
+#endif
 
 						auto playtest_vars = config.server;
 						playtest_vars.server_name = "${MY_NICKNAME} is creating " + setup.get_arena_name();

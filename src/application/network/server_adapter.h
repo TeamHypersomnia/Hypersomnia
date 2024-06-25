@@ -20,6 +20,7 @@ class server_adapter {
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
+	yojimbo::DefaultAllocator yojimbo_allocator;
 	yojimbo::Server server;
 	auxiliary_command_callback_type auxiliary_command_callback;
 	send_packet_override_type send_packet_override;

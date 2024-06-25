@@ -149,6 +149,11 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
+std::string& LOG_THREAD_PREFFIX() {
+	thread_local std::string preffix;
+	return preffix;
+}
+
 void LOG_NOFORMAT(const std::string& s) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
@@ -166,10 +171,10 @@ void LOG_NOFORMAT(const std::string& s) {
 	};
 
 	if (log_timestamp_format.empty()) {
-		lg(s);
+		lg(LOG_THREAD_PREFFIX() + s);
 	}
 	else {
-		lg(augs::date_time().get_readable_format(::log_timestamp_format.c_str()) + s);
+		lg(augs::date_time().get_readable_format(::log_timestamp_format.c_str()) + LOG_THREAD_PREFFIX() + s);
 	}
 #else
 	(void)s;

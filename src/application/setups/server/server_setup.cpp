@@ -672,7 +672,7 @@ server_setup::server_setup(
 	const client_vars& integrated_client_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
 #if BUILD_NATIVE_SOCKETS
-	const server_nat_traversal_input& nat_traversal_input,
+	const std::optional<server_nat_traversal_input> nat_traversal_input,
 #endif
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
@@ -701,12 +701,11 @@ server_setup::server_setup(
 		)
 	),
 	server_time(server_setup::get_current_time()),
-#if BUILD_NATIVE_SOCKETS
-	nat_traversal(nat_traversal_input, resolved_server_list_addr),
-#endif
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
+
+	refresh_runtime_info_for_rcon();
 
 #if BUILD_WEBRTC
 	/* 
@@ -718,16 +717,36 @@ server_setup::server_setup(
 	const bool use_webrtc = false;
 #endif
 
+#if BUILD_NATIVE_SOCKETS
+	if (nat_traversal_input && initial_vars.allow_nat_traversal) {
+		nat_traversal.emplace(*nat_traversal_input, resolved_server_list_addr);
+	}
+#endif
+
 	{
 		auto initial_vars_modified = initial_vars;
-		auto source_server_name = std::string(initial_vars_modified.server_name);
-		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
-		initial_vars_modified.server_name = source_server_name;
 
-		LOG("Server name: %x", source_server_name);
+		const auto default_name = "${MY_NICKNAME}'s server";
+		
+		if (initial_vars_modified.server_name.empty()) {
+			initial_vars_modified.server_name = default_name;
+		}
+
+		if (is_dedicated()) {
+			if (initial_vars_modified.server_name == default_name) {
+				initial_vars_modified.server_name = "Dedicated server";
+			}
+		}
+		else {
+			auto source_server_name = std::string(initial_vars_modified.server_name);
+			str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
+			initial_vars_modified.server_name = source_server_name;
+		}
 
 		apply(initial_vars_modified, true);
 	}
+
+	LOG("Server name: %x", vars.server_name);
 
 	apply(private_initial_vars);
 
@@ -800,7 +819,6 @@ server_setup::server_setup(
 	}
 
 	resolve_server_list();
-	refresh_runtime_info_for_rcon();
 }
 
 bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n) {
@@ -819,10 +837,12 @@ bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const
 		return true;
 	}
 
-	return nat_traversal.handle_auxiliary_command(from, packet, n); 
-#else
-	return false;
+	if (nat_traversal) {
+		return nat_traversal->handle_auxiliary_command(from, packet, n); 
+	}
 #endif
+
+	return false;
 }
 
 bool server_setup::send_packet_override(
@@ -2009,11 +2029,13 @@ void server_setup::send_heartbeat_to_server_list() {
 	server_heartbeat heartbeat;
 
 #if BUILD_NATIVE_SOCKETS
-	heartbeat.nat = nat_traversal.last_detected_nat;
+	if (nat_traversal) {
+		heartbeat.nat = nat_traversal->last_detected_nat;
+	}
+	else
 #endif
-
-	if (!vars.allow_nat_traversal) {
-		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
+	{
+		heartbeat.nat = nat_detection_result();
 	}
 
 	heartbeat.require_authentication = vars.requires_authentication();

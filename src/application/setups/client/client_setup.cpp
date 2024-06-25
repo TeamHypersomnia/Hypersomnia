@@ -484,7 +484,7 @@ void client_setup::demo_replay_server_messages_from(const demo_step& step) {
 		};
 
 		try {
-			const auto result = ::replay_serialized_net_message(serialized_bytes, replay_message);
+			const auto result = ::replay_serialized_net_message(adapter->get_allocator(), serialized_bytes, replay_message);
 
 			if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 				disconnect();

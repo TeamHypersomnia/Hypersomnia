@@ -2,7 +2,7 @@
 #include "application/setups/server/server_listen_input.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
-#include "application/setups/server/server_instance_type.h"
+#include "application/setups/server/dedicated_or_integrated.h"
 #include "augs/misc/timing/timer.h"
 
 struct server_vars;
@@ -16,7 +16,7 @@ public:
 
 	port_type previous_chosen_port = DEFAULT_GAME_PORT_V;
 
-	server_instance_type instance_type = server_instance_type::INTEGRATED;
+	dedicated_or_integrated type = dedicated_or_integrated::INTEGRATED;
 
 	bool is_steam_client = false;
 	bool show_help = false;

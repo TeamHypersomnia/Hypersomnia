@@ -3,8 +3,8 @@
 template <class T>
 constexpr bool is_block_message_v = std::is_base_of_v<only_block_message, T>;
 
-template <class F>
-decltype(auto) replay_serialized_net_message(std::vector<std::byte>& demo_bytes, F&& callback) {
+template <class A, class F>
+decltype(auto) replay_serialized_net_message(A& allocator, std::vector<std::byte>& demo_bytes, F&& callback) {
 	using Id = type_in_list_id<server_message_variant>;
 
 	auto ar = augs::cref_memory_stream(demo_bytes);
@@ -18,8 +18,6 @@ decltype(auto) replay_serialized_net_message(std::vector<std::byte>& demo_bytes,
 	if (id.get_index() >= Id::max_index_v) {
 		throw augs::stream_read_error("message type (%x) is out of range! It should be less than %x.", id.get_index(), Id::max_index_v);
 	}
-
-	auto& allocator = yojimbo::GetDefaultAllocator();
 
 	return id.dispatch(
 		[&](auto* e) -> decltype(auto) {

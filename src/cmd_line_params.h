@@ -42,7 +42,6 @@ struct cmd_line_params {
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
-	bool no_router = false;
 	bool as_service = false;
 
 	bool suppress_server_webhook = false;
@@ -183,9 +182,6 @@ struct cmd_line_params {
 			else if (a == "--server-port") {
 				server_port = std::atoi(get_next());
 			}
-			else if (a == "--no-router") {
-				no_router = true;
-			}
 			else if (a == "--no-update-on-launch") {
 				no_update_on_launch = true;
 			}
@@ -264,7 +260,11 @@ struct cmd_line_params {
 		parse(argc, argv, 1);
 	}
 
-	bool is_cli_tool() const {
+	bool is_cli_server() const {
 		return type == app_type::MASTERSERVER || type == app_type::DEDICATED_SERVER;
+	}
+
+	bool is_cli_tool() const {
+		return is_cli_server();
 	}
 };

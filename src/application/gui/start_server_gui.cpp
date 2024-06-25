@@ -117,7 +117,7 @@ as well as to test your skills in a laggy environment.
 
 		// auto& scope_cfg = into;
 
-		input_text("Server name", into_vars.server_name);
+		input_text_with_hint("Server name", "(default)", into_vars.server_name);
 
 		if (perform_arena_chooser(into_vars.arena)) {
 			into_vars.game_mode = "";
@@ -239,7 +239,7 @@ as well as to test your skills in a laggy environment.
 				show_help = true;
 			}
 
-			enum_radio(instance_type, true);
+			enum_radio(type, true);
 			ImGui::Separator();
 		}
 
@@ -255,7 +255,9 @@ as well as to test your skills in a laggy environment.
 		ImGui::Separator();
 
 		{
-			auto scope = maybe_disabled_cols({}, !is_nickname_valid_characters(into_vars.server_name));
+			const bool valid = into_vars.server_name.empty() || is_nickname_valid_characters(into_vars.server_name);
+
+			auto scope = maybe_disabled_cols({}, !valid);
 
 			if (ImGui::Button("Launch!")) {
 				result = true;

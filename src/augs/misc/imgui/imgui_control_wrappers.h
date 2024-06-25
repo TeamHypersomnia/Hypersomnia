@@ -67,6 +67,27 @@ namespace augs {
 			return false;
 		}
 
+		template <std::size_t buffer_size, class S, class... Args>
+		bool input_text_with_hint(std::array<char, buffer_size>& buf, const std::string& label, const char* hint, S& value, Args&&... args) {
+			static_assert(buffer_size > 1, "Array length must be at least 2 to hold the null character");
+
+			const auto considered_n = std::min(buffer_size - 1, value.size());
+			std::copy(value.data(), value.data() + considered_n + 1, buf.data());
+
+			if (ImGui::InputTextWithHint(label.c_str(), hint, buf.data(), buffer_size, std::forward<Args>(args)...)) {
+				value = std::string(buf.data());
+				return true;
+			}
+
+			return false;
+		}
+
+		template <unsigned buffer_size, class... Args>
+		bool input_text_with_hint(const std::string& label, const char* hint, constant_size_string<buffer_size>& value, Args&&... args) {
+			typename remove_cref<decltype(value)>::array_type buf;
+			return input_text_with_hint(buf, label, hint, value, std::forward<Args>(args)...);
+		}
+
 		template <std::size_t buffer_size = 1000, class... Args>
 		bool input_text(const std::string& label, std::string& value, Args&&... args) {
 			std::array<char, buffer_size> buf;

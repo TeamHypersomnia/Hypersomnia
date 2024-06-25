@@ -270,19 +270,15 @@ int main(const int argc, const char* const * const argv) {
 			mark_as_controlled_crash();
 		};
 
+		LOG(::describe_work_result(completed_work_result));
+
 		switch (completed_work_result) {
 			case work_result::STEAM_RESTART: 
-				LOG("Game was started without Steam client. Restarting.");
-				save_success_logs();
-				return 1;
-
 			case work_result::REPORT_UPDATE_AVAILABLE: 
-				LOG("Update available.");
 				save_success_logs();
 				return 1;
 
 			case work_result::REPORT_UPDATE_UNAVAILABLE: 
-				LOG("Update unavailable.");
 				save_success_logs();
 				return 0;
 
@@ -296,28 +292,21 @@ int main(const int argc, const char* const * const argv) {
 			}
 
 			case work_result::RELAUNCH_DEDICATED_SERVER: {
-				LOG("main: Dedicated server requested relaunch.");
 				save_success_logs();
-
 				return augs::restart_application(argc, argv, exe_path.string(), { "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_MASTERSERVER: {
-				LOG("main: Masterserver requested relaunch.");
 				save_failure_logs();
-
 				return augs::restart_application(argc, argv, exe_path.string(), {});
 			}
 
 			case work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER: {
-				LOG("main: Dedicated server detected available updates.");
 				save_success_logs();
-
 				return augs::restart_application(argc, argv, exe_path.string(), { "--update-once-now --suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-				LOG("main: Application requested relaunch due to a successful upgrade.");
 				return augs::restart_application(argc, argv, exe_path.string(), { "--upgraded-successfully" });
 			}
 

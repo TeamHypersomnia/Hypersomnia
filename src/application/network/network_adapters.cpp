@@ -202,7 +202,7 @@ server_adapter::server_adapter(
 	connection_config(in),
 	adapter(this),
 	server(
-		yojimbo::GetDefaultAllocator(), 
+		yojimbo_allocator, 
 		privateKey.data(), 
 		yojimbo::Address(in.ip.c_str(), in.port), 
 		connection_config, 
@@ -274,7 +274,7 @@ client_adapter::client_adapter(
 	connection_config(),
 	adapter(nullptr),
 	client(
-		yojimbo::GetDefaultAllocator(), 
+		yojimbo_allocator, 
 		preferred_binding_port ? yojimbo::Address("0.0.0.0", *preferred_binding_port) : yojimbo::Address("0.0.0.0"), 
 		connection_config, 
 		adapter, 

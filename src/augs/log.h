@@ -76,3 +76,5 @@ std::ostream& write_nvps(
 #else
 #define DEBUG_LOG(...)
 #endif
+
+std::string& LOG_THREAD_PREFFIX();

@@ -40,8 +40,7 @@ namespace augs {
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	bool only_check_availability_and_quit,
-	const augs::image* imgui_atlas_image,
 	const self_update_settings& settings,
-	augs::window_settings window_settings,
-	bool headless
+	const augs::image* imgui_atlas_image = nullptr,
+	std::optional<augs::window_settings> window_settings = std::nullopt
 );

@@ -148,6 +148,10 @@ struct config_json_table {
 	damage_indication_settings damage_indication;
 
 	server_listen_input server_start;
+
+	uint16_t num_ranked_servers = 0;
+	uint16_t num_casual_servers = 0;
+
 	server_vars server;
 	server_private_vars server_private;
 	augs::dedicated_server_input dedicated_server;

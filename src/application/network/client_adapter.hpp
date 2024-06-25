@@ -114,7 +114,7 @@ bool client_adapter::send_payload(
 
 			auto allocate_block = [&](const std::size_t requested_size) {
 				allocated_size = requested_size;
-				allocated_block = (uint8_t*)YOJIMBO_ALLOCATE(yojimbo::GetDefaultAllocator(), requested_size);;
+				allocated_block = (uint8_t*)YOJIMBO_ALLOCATE(yojimbo_allocator, requested_size);;
 
 				return allocated_block;
 			};
@@ -125,7 +125,7 @@ bool client_adapter::send_payload(
 			);
 
 			if (translation_result && allocated_block != nullptr) {
-				new_message->AttachBlock( yojimbo::GetDefaultAllocator(), allocated_block, allocated_size );
+				new_message->AttachBlock( yojimbo_allocator, allocated_block, allocated_size );
 				send_it();
 				return true;
 			}
