@@ -4,7 +4,7 @@ The dedicated server is known to work on Ubuntu 20.04 or later.
 
 You should easily be able to run it on other distributions like Arch Linux.
 
-**Make sure to check out the [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile) for an up-to-date working server setup.**
+We also have a [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile).
 
 - [Basic setup](#basic-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
