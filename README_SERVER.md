@@ -11,7 +11,10 @@ You should easily be able to run it on other distributions like Arch Linux.
   * [libfuse](#libfuse)
 - [Configuration](#configuration)
   * [Ports](#ports)
-  * [Setup folders for many server instances](#setup-folders-for-many-server-instances)
+  * [CLI flags](#cli-flags)
+    - [--daily-autoupdate](#--daily-autoupdate)
+    - [--appdata-dir](#--appdata-dir)
+    - [--apply-config](#--apply-config)
 
 # Basic setup
 
@@ -42,13 +45,26 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
-To be able to manage your server, remember to set the ``master_rcon_password`` in ``~/.config/Hypersomnia/user/config.force.json`` - see ``default_config.json`` for complete reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+Create a ``~/.config/Hypersomnia/user/config.force.json`` file. This will be your server configuration.
 
-``--daily-autoupdate`` flag causes the server to update itself every 24 hours at 03:00 AM (your local time), if a newer game version is available. This flag is highly recommended so you don't have to keep up with frequent game updates (the game is in active development). You can also set the flag in RCON settings (press F8 and go to Vars tab).
+The reason the config file is called ``config.force.json`` is because it will *never* be modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
+
+To be able to access the administration panel of your server, setup ``master_rcon_password`` - see ``default_config.json`` for complete config vars reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+
+
+## Config loading order:
+
+1) ``default_config.json``, comes with the game
+2) ``~/.config/Hypersomnia/user/config.json``, if any
+3) Config specified by ``--apply-config`` flag, if any
+4) ``~/.config/Hypersomnia/user/config.force.json``, if any
+    - This means that if the vars you later tweak from the administration panel are already specified in ``config.force.json``, *they will be overridden every time the server starts.*
+5) ``~/.config/Hypersomnia/user/config.private.json``, if any
+    - This one is helpful if you want to store confidential vars like API keys separately from ``config.force.json``.
 
 ## Ports
 
-You'll need:
+You'll need these ports open:
 - One UDP port for native clients (``8412`` is recommended).
 - One or more UDP ports for [Web clients](https://hypersomnia.io).
 	- ``9000-9020`` by default, but you can use just a single port with *UDP multiplexing*.
@@ -59,51 +75,78 @@ For example:
   "server": {
     "webrtc_udp_mux": true,
     "webrtc_port_range_begin": 9000,
-    -- , "webrtc_port_range_end": 9020 -- only matters if webrtc_udp_mux = false
+    // "webrtc_port_range_end": 9020 // only matters if "webrtc_udp_mux": false
   },
   "server_start": {
     "port": 8412
   }
 ```
 
-With these values, you will only need to expose UDP ports ``8412`` and ``9000``.
+With these settings, you will only need to expose UDP ports ``8412`` and ``9000``.
 
-## Setup folders for many server instances
+## Many server instances
+
+By default there will be only one server instance and it will exactly match your ``config.force.json`` file.
+
+However, you can easily manage multiple server instances by adding:
+
+```json
+"num_ranked_servers": 4,
+"num_casual_servers": 1
+```
+
+This will result in:
+
+![last_region_select](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/345beed2-f66b-4a8a-a507-55d108c1909e)
+
+The instances will get incrementing ports, starting from the specified ``port`` in ``server_start``.
+
+They'll also get unique server names - with added ``#1``, ``#2``, etc. suffixes.
+
+The process first creates Ranked servers, then Casual server instances, so in case of US servers, Ranked ones will have ports ``8000-8004`` and the Casual one will be at ``8005``.
+
+Casual server instances will be run with exactly the same configuration as Ranked instances, except their ``server.ranked.autostart_when`` variable will be set to ``"NEVER"``. This disables the entire ranked logistics.
+
+If you restart/shutdown just one server instance from the panel, all servers will follow.
+So that the runtime changes to config vars propagate to the ``config.json`` file, connect to the first ranked server to tweak them - or first Casual server instance if there are no Ranked servers. Changes to other instances will be ephemeral and only persist for the current server run.
+
+## CLI flags
+
+Additionally to the config vars, you can tweak the server behavior from the CLI.
+
+### --daily-autoupdate
+
+Causes the server to update itself every 24 hours at 03:00 AM (your local time), if a newer game version is available. This flag is highly recommended so you don't have to keep up with frequent game updates (the game is in active development). You can change the autoupdate hour with ``daily_autoupdate_hour`` var in config.
+
+### --appdata-dir
 
 The server will use ``~/.config/Hypersomnia`` as its "AppData" folder by default - this is where it will store its ``user``, ``cache`` and ``logs`` folders.
+This is important as it determines where to store your ``config.force.json`` file.
 
-This is problematic if you want to run several server instances as a single Linux user.
+If the default ``~/.config/Hypersomnia`` folder is unavailable for some reason, ``--appdata-dir`` parameter comes to the rescue.
 
-``--appdata-dir`` parameter comes to the rescue!
-
-Let's first create appdata folders for every server instance we want to run.
-I recommend no more than 2 servers per vCore, with no more than 10 slots per server.
+You can easily:
 
 ```sh
-make_server_dir() {
-	name="servers/$1"
-	mkdir -p $name
-
-	ln -s ~/.config/Hypersomnia/user/downloads/arenas $name/user/downloads/arenas
-}
-
-make_server_dir "1"
-make_server_dir "2"
-make_server_dir "3"
-make_server_dir "4"
+nohup ./Hypersomnia-Headless.AppImage --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
 ```
 
-You can then run several server instances like this:
+This will use ``./servers/1`` instead of ``~/.config/Hypersomnia`` and will thus apply the config file at ``./servers/1/user/config.force.json``.
+
+### --apply-config 
+
+Applies another config file *after* ``config.json``, but *before* ``config.force.json``. **Can only use this flag once in the whole command.**
+
+E.g. this:
 
 ```sh
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/2 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/3 --daily-autoupdate > /dev/null 2>&1 &
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./config.common.json --appdata-dir ./servers/4 --daily-autoupdate > /dev/null 2>&1 &
+nohup ./Hypersomnia-Headless.AppImage --apply-config ./some_config.json --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
 ```
 
-The servers will share ``config.common.json`` and *later* apply their server-specific config in e.g. ``./servers/2/user/config.force.json``.
+will read:
 
-They will also share the community maps so as to not have to download them again.
+- ``./servers/1/user/config.json``
+- ``./some_config.json``k
+- ``./servers/1/user/config.force.json``
 
-**Make sure ./servers/2/user/config.force.json, ./servers/3/user/config.force.json etc. specify different ports!**
+In this order.
