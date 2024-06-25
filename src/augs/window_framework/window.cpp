@@ -78,6 +78,16 @@ namespace augs {
 			|| ch.msg == message::click_activate
 		) {
 			active = true;
+
+#if PLATFORM_LINUX
+			/*
+				Refresh to fix cursor misbehaving
+				after focusing the window back on my Arch i3.
+			*/
+
+			set_cursor_clipping_impl(cursor_clipping);
+			set_cursor_visible_impl(cursor_visible);
+#endif
 		}
 		
 		if (ch.msg == message::deactivate) {

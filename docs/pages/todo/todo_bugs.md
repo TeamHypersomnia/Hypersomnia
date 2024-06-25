@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- strange glitch that doesnt allow moving mouse when button pressed on linux
+    - happens when changing tab/workspace, but mostly tab
+    - need to reinvoke clip cursor on activate likely
+    - somehow fixed when we press escape or even tilde (!!) so maybe it's enough to call set_cursor_clipping_impl again
+
 - WebRTC crash on dedicated server disconnect (happened when browser was connecting though)
 	[20:27:54] server disconnected client 0
 
