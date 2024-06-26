@@ -12,6 +12,7 @@ We also have a [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/
 - [Configuration](#configuration)
   * [Ports](#ports)
   * [CLI flags](#cli-flags)
+    - [--as-service](#--as-service)
     - [--daily-autoupdate](#--daily-autoupdate)
     - [--appdata-dir](#--appdata-dir)
     - [--apply-config](#--apply-config)
@@ -113,6 +114,17 @@ So that the runtime changes to config vars propagate to the ``config.json`` file
 ## CLI flags
 
 Additionally to the config vars, you can tweak the server behavior from the CLI.
+
+### --as-service
+
+Adjusts server restarting behavior so the server is suitable to be run as a **systemd service**.
+
+- Prevents spawning another process when the server is about to restart (e.g. in order to apply updates).
+  - A non-service process restarted itself by spawning a separate process right before shutting down.
+  - In case of a systemd service however, it is the **systemd** that is responsible for restarting the service process.
+- Allows to propagade all CLI flags like e.g. ``--appdata-dir`` across server restarts.
+  - A non-service process was able to do this by respecifying them in the CLI of the newly spawned process.
+  - A service-based server has to save its CLI flags in a temporary file in ``logs/launch.flags`` before shutting down - this file will be read on subsequent server launch. Among others, this will e.g. suppress "new server" Telegram/Discord notifications from being posted whenever the server restarts.
 
 ### --daily-autoupdate
 
