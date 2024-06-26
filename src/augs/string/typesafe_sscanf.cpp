@@ -254,6 +254,9 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 		REQUIRE(3 == id);
 		REQUIRE(2 == test_scanf("[US] arena-us.hypersomnia.xyz #1", "%x#%x", rest, id));
 		REQUIRE(1 == id);
+
+		REQUIRE(2 == test_scanf("[CH] Switzerland #8 R", "%x#%x", rest, id));
+		REQUIRE(8 == id);
 	}
 }
 

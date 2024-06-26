@@ -709,6 +709,8 @@ work_result work(
 	(void)change_with_save;
 
 #if PLATFORM_WEB
+	LOG_NVPS(config.client.nickname);
+
 	if (config.client.nickname.empty() || config.client.nickname == "web_user") {
 		const auto rng_name = ::make_random_nickname(netcode_rng);
 		const auto final_nickname = 

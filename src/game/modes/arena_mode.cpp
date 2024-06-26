@@ -133,7 +133,7 @@ faction_type arena_mode::calc_weakest_faction(const const_input_type in) const {
 		std::size_t count;
 
 		bool operator<(const weak_faction& b) const {
-			if (score == b.score) {
+			if (score == b.score || count == 0 || b.count == 0) {
 				return count < b.count;
 			}
 
