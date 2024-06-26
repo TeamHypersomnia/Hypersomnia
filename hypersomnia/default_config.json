@@ -387,7 +387,8 @@
         "steam_web_api_key": "",
         "report_ranked_match_api_key": "",
         "report_ranked_match_url": "https://hypersomnia.xyz/report_match",
-        "report_ranked_match_aux_endpoints": []
+        "report_ranked_match_aux_endpoints": [],
+        "check_ban_url": ""
         // [ { "url": "example.com", "api_key": "example" }, { ... } ]
     },
 
