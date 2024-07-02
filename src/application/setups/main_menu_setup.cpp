@@ -78,18 +78,6 @@ void main_menu_setup::launch_creators_screen() {
 #endif
 }
 
-void main_menu_setup::query_latest_news(const std::string& url) {
-	// TODO: FIX THIS!!!
-	if (latest_news.valid()) {
-		latest_news.wait();
-	}
-
-	latest_news = launch_async([&url]() noexcept {
-		(void)url;
-		return std::string("");
-	});
-}
-
 main_menu_setup::main_menu_setup(
 	const packaged_official_content& official,
 	const main_menu_settings settings
@@ -104,8 +92,6 @@ main_menu_setup::main_menu_setup(
 			// LOG("Warning: could not load the main menu theme:\n%x", err.what());
 		}
 	}
-
-	//query_latest_news(settings.latest_news_url);
 
 	const auto menu_config_patch_path = augs::path_type("content/menu/config.json");
 

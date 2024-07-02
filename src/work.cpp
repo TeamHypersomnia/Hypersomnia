@@ -50,6 +50,8 @@
 
 #include "augs/misc/date_time.h"
 #include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/mutex.h"
+#include "augs/misc/future.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
@@ -188,7 +190,7 @@ namespace augs {
 
 std::function<void()> ensure_handler;
 
-extern std::mutex log_mutex;
+extern augs::mutex log_mutex;
 extern std::string log_timestamp_format;
 
 #if PLATFORM_UNIX
@@ -227,7 +229,7 @@ double web_get_secs_until_next_weekend_evening(const char* locationId) {
 	}, locationId);
 }
 
-extern std::mutex open_url_on_main_lk;
+extern augs::mutex open_url_on_main_lk;
 extern std::string open_url_on_main;
 
 EM_JS(void, call_openUrl, (const char* newPath), {
@@ -236,19 +238,23 @@ EM_JS(void, call_openUrl, (const char* newPath), {
 
 #include "application/main/auth_providers.h"
 
-std::mutex lat_lon_mutex;
-std::optional<double> player_latitude;
-std::optional<double> player_longitude;
+extern augs::mutex lat_lon_mutex;
+extern std::optional<double> player_latitude;
+extern std::optional<double> player_longitude;
 
 extern "C" {
 	EMSCRIPTEN_KEEPALIVE
 	void on_geolocation_received(double lat, double lon) {
 		LOG("on_geolocation_received: lat: %x, lon: %x", lat, lon);
 
-		std::scoped_lock lk(lat_lon_mutex);
+		{
+			augs::scoped_lock lk(lat_lon_mutex);
 
-		player_latitude = lat;
-		player_longitude = lon;
+			player_latitude = lat;
+			player_longitude = lon;
+		}
+
+		LOG("on_geolocation_received end.");
 	}
 }
 
@@ -264,11 +270,11 @@ extern "C" {
 
 #if PLATFORM_WEB
 randomization netcode_rng;
-std::mutex rng_lk;
+augs::mutex rng_lk;
 
 extern "C" {
 	uint32_t randombytes_external(void) {
-		std::scoped_lock lk(rng_lk);
+		augs::scoped_lock lk(rng_lk);
 		return netcode_rng.random<uint32_t>();
 	}
 }
@@ -276,7 +282,7 @@ extern "C" {
 
 #if PLATFORM_WEB
 #include "application/main/check_token_still_valid.hpp"
-std::future<bool> token_still_valid_check;
+augs::future<bool> token_still_valid_check;
 #endif
 
 work_result work(
@@ -515,7 +521,7 @@ work_result work(
 	WEBSTATIC auto& config = *config_ptr;
 
 	{
-		std::unique_lock<std::mutex> lock(log_mutex);
+		augs::unique_lock<augs::mutex> lock(log_mutex);
 		::log_timestamp_format = config.log_timestamp_format;
 	}
 
@@ -3129,6 +3135,10 @@ work_result work(
 						return false;
 					}
 
+					if (params.is_crazygames) {
+						return false;
+					}
+
 					return true;
 				}();
 
@@ -3138,7 +3148,9 @@ work_result work(
 					}
 				}
 
-				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
+				if (!params.is_crazygames) {
+					perform_social_sign_in_popup(config.prompted_for_sign_in_once);
+				}
 
 				if (const auto new_auth = get_new_auth_data()) { 
 					const auto before_sign_in = 
@@ -5244,7 +5256,11 @@ work_result work(
 			place_final_drawcalls_synchronously();
 		};
 
-		while (!should_quit) {
+#if WEB_SINGLETHREAD
+#else
+		while (!should_quit) 
+#endif
+		{
 			auto extract_num_total_drawn_triangles = [&]() {
 				return get_write_buffer().renderers.extract_num_total_triangles_drawn();
 			};
@@ -5260,6 +5276,8 @@ work_result work(
 
 				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
 
+#if WEB_SINGLETHREAD
+#else
 				{
 					/*
 						On the web, it is the wait_swap that correctly reports the effective FPS,
@@ -5271,12 +5289,8 @@ work_result work(
 					buffer_swapper.wait_swap();
 				}
 
-				{
-					auto& write_buffer = get_write_buffer();
-
-					write_buffer.renderers.next_frame();
-					write_buffer.particle_buffers.clear();
-				}
+				get_write_buffer().clear_frame();
+#endif
 			};
 
 			{
@@ -5325,11 +5339,18 @@ work_result work(
 		}
 	};
 
+#if WEB_SINGLETHREAD
+#else
 	LOG("Starting game_thread_worker");
 	WEBSTATIC auto game_thread = std::thread(game_thread_worker);
+#endif
 
 	WEBSTATIC auto audio_thread_joiner = augs::scope_guard([&]() { LOG("audio_thread_joiner"); audio_buffers.quit(); });
+
+#if WEB_SINGLETHREAD
+#else
 	WEBSTATIC auto game_thread_joiner = augs::scope_guard([&]() { LOG("game_thread_joiner"); game_thread.join(); });
+#endif
 
 	request_quit = [&]() {
 		get_write_buffer().should_quit = true;
@@ -5482,13 +5503,18 @@ work_result work(
 		auto scope = measure_scope(render_thread_performance.fps);
 
 		collect_window_entropy();
+
+#if WEB_SINGLETHREAD
+		game_thread_worker();
+#endif
+
 		buffer_swapper.swap_buffers(game_main_thread_synced_op);
 
 		{
 			std::string url_to_open;
 
 			{
-				std::scoped_lock lk(open_url_on_main_lk);
+				augs::scoped_lock lk(open_url_on_main_lk);
 
 				if (!open_url_on_main.empty()) {
 					url_to_open = open_url_on_main;
@@ -5502,7 +5528,7 @@ work_result work(
 		}
 
 		{
-			auto& read_buffer = get_read_buffer();
+			const auto& read_buffer = get_read_buffer();
 			const auto location = "/" + read_buffer.browser_location;
 
 			if (current_browser_location != location) {
@@ -5545,6 +5571,8 @@ work_result work(
 						r.dedicated
 					);
 				}
+
+				read_buffer.clear_frame();
 
 				current_frame.fetch_add(1, std::memory_order_relaxed);
 			}
@@ -5631,7 +5659,12 @@ work_result work(
 
 	LOG("Calling emscripten_set_main_loop_arg.");
 
+#if WEB_SINGLETHREAD
+	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 1);
+#else
 	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 0);
+#endif
+
 #else
 	for (;;) {
 		if (!main_loop_iter(main_loop_in_ptr)) {

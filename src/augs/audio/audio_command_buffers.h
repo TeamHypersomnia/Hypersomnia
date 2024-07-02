@@ -8,9 +8,56 @@
 #include "augs/audio/audio_command.h"
 #include "augs/audio/audio_backend.h"
 
+#if WEB_SINGLETHREAD
+
+#else
 static constexpr int num_audio_buffers_v = 10;
+#endif
 
 namespace augs {
+#if WEB_SINGLETHREAD
+	class audio_command_buffers {
+		audio_command_buffer buffer;
+		audio_backend backend;
+
+	public:
+		audio_command_buffers(thread_pool&) {}
+
+		void quit() {
+			stop_all_sources();
+		}
+
+		audio_command_buffer* map_write_buffer() {
+			return &buffer;
+		}
+
+		int num_currently_processed_buffers() {
+			return 0;
+		}
+
+		auto submit_write_buffer() {
+			backend.perform(
+				buffer.data(),
+				buffer.size()
+			);
+
+			buffer.clear();
+		}
+
+		void finish() {
+
+		}
+
+		template <class F>
+		void stop_sources_if(F&& pred) {
+			backend.stop_sources_if(std::forward<F>(pred));
+		}
+
+		void stop_all_sources() {
+			backend.stop_sources_if([&](auto&&...) { return true; });
+		}
+	};
+#else
 	class audio_command_buffers {
 		thread_pool& pool_to_help_when_idle;
 		audio_backend backend;
@@ -177,4 +224,5 @@ namespace augs {
 			backend.stop_sources_if([&](auto&&...) { return true; });
 		}
 	};
+#endif
 }

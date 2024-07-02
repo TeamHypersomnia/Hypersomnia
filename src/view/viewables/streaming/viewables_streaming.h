@@ -19,6 +19,7 @@
 #include "augs/graphics/frame_num_type.h"
 
 #include "augs/filesystem/file_time_type.h"
+#include "augs/misc/future.h"
 
 class sound_system;
 
@@ -52,7 +53,7 @@ struct viewables_finalize_input {
 template <class output_type>
 struct texture_in_progress {
 	std::vector<rgba> pbo_fallback;
-	std::future<output_type> future_output;
+	augs::future<output_type> future_output;
 	std::optional<augs::frame_num_type> submitted_when;
 	augs::graphics::texture texture = augs::image::white_pixel();
 
@@ -78,7 +79,7 @@ struct texture_in_progress {
 };
 
 class viewables_streaming {
-	std::future<bool> future_compressed_demos;
+	augs::future<bool> future_compressed_demos;
 
 	std::vector<rgba> general_atlas_pbo_fallback;
 
@@ -87,7 +88,7 @@ class viewables_streaming {
 	image_definitions_map future_image_definitions;
 	all_gui_fonts_inputs future_gui_fonts;
 
-	std::future<general_atlas_output> future_general_atlas;
+	augs::future<general_atlas_output> future_general_atlas;
 
 	all_viewables_defs now_loaded_viewables_defs;
 	all_gui_fonts_inputs now_loaded_gui_font_defs;
@@ -96,7 +97,7 @@ class viewables_streaming {
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
 	std::vector<augs::path_type> sound_paths_info;
 
-	std::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
+	augs::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 
 	std::vector<augs::file_time_type> image_write_times;
 	std::vector<augs::file_time_type> sound_write_times;

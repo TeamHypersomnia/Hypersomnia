@@ -7,6 +7,29 @@
 #include <functional>
 
 namespace augs {
+#if WEB_SINGLETHREAD
+	class thread_pool {
+	public:
+		thread_pool(const std::size_t) {}
+
+		void resize(const std::size_t) {}
+
+		template <class F>
+		void enqueue(F&& f) {
+			f();
+		}
+
+		void submit() {}
+
+		std::size_t size() const {
+			return 0;
+		}
+
+		void help_until_no_tasks() {}
+
+		void wait_for_all_tasks_to_complete() {}
+	};
+#else
 	class thread_pool {
 		std::vector<std::thread> workers;
 		std::vector<std::function<void()>> tasks;
@@ -156,5 +179,6 @@ namespace augs {
 			completion_variable.wait(lock, [this]{ return tasks_posted == tasks_completed; });
 		}
 	};
+#endif
 }
 

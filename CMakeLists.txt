@@ -212,6 +212,8 @@ option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it."
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
 
+option(BUILD_CRAZYGAMES "Use CrazyGames web shell." OFF)
+
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
 ## Build optimization switches.
@@ -1310,7 +1312,7 @@ if(BUILD_FOR_WEB)
 	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -mbulk-memory")
 endif()
 
-if(UNIX)
+if(UNIX AND NOT BUILD_FOR_WEB)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
@@ -1319,6 +1321,19 @@ if(LINUX)
 endif()
 
 if(BUILD_FOR_WEB)
+	if (BUILD_CRAZYGAMES)
+		set(WEB_MULTITHREADING OFF)
+	else()
+		set(WEB_MULTITHREADING ON)
+	endif()
+
+	if (WEB_MULTITHREADING)
+		message("Web build will be multithreaded.")
+	else()
+		message("Web build will be singlethreaded.")
+	endif()
+
+
 	# Note if USE_NATIVE_EXCEPTIONS is ON,
 	# the CMake targets (tests, run) will fail as the emsdk's nodejs
 	# needs --experimental-wasm-eh flag for this to work.
@@ -1360,7 +1375,10 @@ if(BUILD_FOR_WEB)
 	# There are some huge functions that can cause us to overflow with debug symbols
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=${STACK_SIZE}")
 
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	if (WEB_MULTITHREADING)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	endif()
+
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=${INITIAL_MEMORY}")
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mbulk-memory")
@@ -1391,10 +1409,19 @@ if(BUILD_FOR_WEB)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM_BIGINT")
 	endif()
 
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file ${PROJECT_SOURCE_DIR}/cmake/web/web_shell.html")
+	if (BUILD_CRAZYGAMES)
+		message("Building for crazygames")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file ${PROJECT_SOURCE_DIR}/cmake/web/web_shell_cg.html")
+	else()
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file ${PROJECT_SOURCE_DIR}/cmake/web/web_shell.html")
+	endif()
 
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
-	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -pthread ${ADDITIONAL_WEB_FLAGS}")
+	if (WEB_MULTITHREADING)
+		set(ADDITIONAL_WEB_FLAGS "${ADDITIONAL_WEB_FLAGS} -pthread")
+	endif()
+
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${ADDITIONAL_WEB_FLAGS}")
+	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} ${ADDITIONAL_WEB_FLAGS}")
 endif()
 
 # We configure additional flags for linker.
@@ -1468,6 +1495,10 @@ endif()
 
 if(BUILD_FOR_WEB)
 	add_definitions(-DPLATFORM_WEB=1)
+
+	if (NOT WEB_MULTITHREADING)
+		add_definitions(-DWEB_SINGLETHREAD=1)
+	endif()
 endif()
 
 add_definitions(-DYOJIMBO_WITH_MBEDTLS=0)
@@ -2179,6 +2210,13 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "
 		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 endif()	
+
+if (BUILD_FOR_WEB)
+	set(SOURCE_LINK "${PROJECT_SOURCE_DIR}/cmake/web/assets")
+	set(TARGET_LINK "${CMAKE_BINARY_DIR}/assets")
+
+	file(CREATE_LINK ${SOURCE_LINK} ${TARGET_LINK} SYMBOLIC)
+endif()
 
 get_target_property(OUT Hypersomnia LINK_LIBRARIES)
 message("ALL linked libraries: ${OUT}")

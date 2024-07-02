@@ -7127,3 +7127,4 @@ This will discard your redo history."
             - just a simple message back through websocket, maybe json
         - Let MS resolve official addresses
 - resolve_address -> address_utils
+- update weapon stats page

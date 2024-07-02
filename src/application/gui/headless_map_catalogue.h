@@ -1,5 +1,5 @@
 #pragma once
-#include <future>
+#include "augs/misc/future.h"
 #include <unordered_set>
 #include "augs/network/network_types.h"
 #include "augs/string/parse_url.h"
@@ -100,7 +100,7 @@ public:
 
 class headless_map_catalogue {
 	std::vector<map_catalogue_entry> map_list;
-	std::future<std::vector<map_catalogue_entry>> future_response;
+	augs::future<std::vector<map_catalogue_entry>> future_response;
 
 	std::string list_catalogue_error;
 

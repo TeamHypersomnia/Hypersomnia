@@ -10,6 +10,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/log_path_getters.h"
 #include "augs/misc/date_time.h"
+#include "augs/misc/mutex.h"
 #include "all_paths.h"
 
 #if PLATFORM_UNIX
@@ -26,7 +27,7 @@
 #include <iostream>
 #endif
 
-std::mutex log_mutex;
+augs::mutex log_mutex;
 
 bool log_to_live_file = false;
 std::string log_timestamp_format;
@@ -122,13 +123,13 @@ void program_log::push_entry(const log_entry& new_entry) {
 }
 
 void program_log::mark_last_init_log() {
-	std::unique_lock<std::mutex> lock(log_mutex);
+	augs::scoped_lock lock(log_mutex);
 
 	init_logs_count = all_entries.size();
 }
 
 std::size_t program_log::get_init_logs_count() const {
-	std::unique_lock<std::mutex> lock(log_mutex);
+	augs::scoped_lock lock(log_mutex);
 
 	return init_logs_count;
 }
@@ -138,7 +139,7 @@ std::size_t program_log::get_init_logs_count_nomutex() const {
 }
 
 std::string program_log::get_complete() const {
-	std::unique_lock<std::mutex> lock(log_mutex);
+	augs::scoped_lock lock(log_mutex);
 
 	auto logs = std::string();
 
@@ -156,7 +157,7 @@ std::string& LOG_THREAD_PREFFIX() {
 
 void LOG_NOFORMAT(const std::string& s) {
 #if ENABLE_LOG 
-	std::unique_lock<std::mutex> lock(log_mutex);
+	augs::scoped_lock lock(log_mutex);
 
 	auto lg = [&](const auto& f) {
 		program_log::get_current().push_entry({ f });

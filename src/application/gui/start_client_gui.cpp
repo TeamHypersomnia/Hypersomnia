@@ -311,7 +311,7 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			thread_local std::future<avatar_loading_result_info> avatar_loading_result;
+			thread_local augs::future<avatar_loading_result_info> avatar_loading_result;
 
 			auto reload_avatar = [&](const augs::path_type& from_path) {
 				const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);

@@ -57,11 +57,38 @@ struct game_frame_buffer {
 
 	all_game_renderers renderers;
 	particle_triangle_buffers particle_buffers;
+
+	void clear_frame() {
+		renderers.next_frame();
+		particle_buffers.clear();
+	}
 };
 
 #define SWAP_BUFFERS_BY_POINTERS 1
 
 class game_frame_buffer_swapper {
+#if WEB_SINGLETHREAD
+	game_frame_buffer rw_buffer;
+
+public:
+	game_frame_buffer& get_read_buffer() {
+		return rw_buffer;
+	}
+
+	game_frame_buffer& get_write_buffer() {
+		return rw_buffer;
+	}
+
+	bool can_swap_buffers() {
+		return true;
+	}
+
+	template <class T>
+	void swap_buffers(T&& synchronized_op) {
+		synchronized_op();
+	}
+
+#else
 	std::atomic<bool> already_waiting = false;
 	std::atomic<bool> swap_complete = false;
 
@@ -157,5 +184,6 @@ public:
 			waiter_cv.wait(lk, [this]{ return swap_complete.load(); });
 		}
 	}
+#endif
 };
 

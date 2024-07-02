@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_set>
+#include "augs/misc/future.h"
 #include "augs/network/network_types.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
@@ -31,7 +32,7 @@ struct parsed_url;
 class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_state> {
 	headless_map_catalogue headless;
 
-	std::future<void> future_downloaded_miniatures;
+	augs::future<void> future_downloaded_miniatures;
 
 	std::atomic<uint32_t> has_next_miniature = 0;
 	std::vector<ad_hoc_atlas_subject> completed_miniatures;

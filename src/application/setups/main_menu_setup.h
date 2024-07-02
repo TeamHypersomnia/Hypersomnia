@@ -44,7 +44,6 @@ struct packaged_official_content;
 struct main_menu_setup_detail;
 
 class main_menu_setup : public default_setup_settings {
-	std::shared_future<std::string> latest_news;
 	vec2 latest_news_pos = { 1920.f, 0.f };
 
 	intercosm scene;
@@ -81,8 +80,6 @@ public:
 
 	main_menu_setup(const packaged_official_content&, const main_menu_settings);
 	~main_menu_setup();
-
-	void query_latest_news(const std::string& url);
 
 	auto get_audiovisual_speed() const {
 		return 1.0;

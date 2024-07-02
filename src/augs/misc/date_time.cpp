@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <filesystem>
-#include <mutex>
+#include "augs/misc/mutex.h"
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/date_time.h"
@@ -162,13 +162,13 @@ std::optional<std::chrono::system_clock::time_point> augs::date_time::from_utc_t
 }
 #endif
 
-std::mutex localtime_mutex;
+augs::mutex localtime_mutex;
 
 std::string augs::date_time::get_readable_format(const char* fmt) const {
 	std::string result;
 
 	{
-		std::unique_lock<std::mutex> lock(localtime_mutex);
+		augs::scoped_lock lock(localtime_mutex);
 		std::tm local_time = *std::localtime(&t);
 		result = typesafe_sprintf("%x", std::put_time(&local_time, fmt));
 	}

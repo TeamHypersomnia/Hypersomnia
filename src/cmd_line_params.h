@@ -65,6 +65,8 @@ struct cmd_line_params {
 
 	std::string guest;
 
+	bool is_crazygames = false;
+
 	void parse(const int argc, const char* const * const argv, const int start_i) {
 		for (int i = start_i; i < argc; ++i) {
 			const auto a = std::string(argv[i]);
@@ -98,7 +100,11 @@ struct cmd_line_params {
 					loc = a;
 				}
 
-				if (begins_with(loc, "/game")) {
+				if (loc == "/crazygames") {
+					LOG("We're running from crazygames.");
+					is_crazygames = true;
+				}
+				else if (begins_with(loc, "/game")) {
 					std::string webrtc_id;
 
 					if (1 == typesafe_sscanf(loc, "/game/%x", webrtc_id)) {

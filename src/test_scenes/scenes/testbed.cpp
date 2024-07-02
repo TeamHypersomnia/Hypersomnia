@@ -466,10 +466,10 @@ arena_mode_ruleset::arena_mode_ruleset() {
 		add_streak(4,  "Mega-Kill!", test_scene_sound_id::ANNOUNCE_MEGAKILL);
 		add_streak(5,  "Ultra-Kill!", test_scene_sound_id::ANNOUNCE_ULTRAKILL);
 		add_streak(6,  "Monster-Kill!", test_scene_sound_id::ANNOUNCE_MONSTERKILL);
-		add_streak(7,  "Killing Spree!", test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
-		add_streak(8,  "Wicked Sick!", test_scene_sound_id::ANNOUNCE_WICKEDSICK);
-		add_streak(9,  "Rampage!", test_scene_sound_id::ANNOUNCE_RAMPAGE);
-		add_streak(10, "Ludacriss-Kill!", test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
+		add_streak(7,  "Ludacriss-Kill!", test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
+		add_streak(8,  "Killing Spree!", test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
+		add_streak(9, "Rampage!", test_scene_sound_id::ANNOUNCE_RAMPAGE);
+		add_streak(10,  "Wicked Sick!", test_scene_sound_id::ANNOUNCE_WICKEDSICK);
 		add_streak(11, "Unstoppable!", test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
 		add_streak(12, "Godlike!", test_scene_sound_id::ANNOUNCE_GODLIKE);
 		add_streak(13, "Holy Shit!", test_scene_sound_id::ANNOUNCE_HOLYSHIT);

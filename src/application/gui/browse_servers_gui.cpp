@@ -1,4 +1,4 @@
-#include <future>
+#include "augs/misc/future.h"
 
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
@@ -131,7 +131,7 @@ bool server_list_entry::is_set() const {
 }
 
 struct browse_servers_gui_internal {
-	std::future<std::optional<httplib_result>> future_response;
+	augs::future<std::optional<httplib_result>> future_response;
 	netcode_socket_t socket;
 
 	bool refresh_op_in_progress() const {

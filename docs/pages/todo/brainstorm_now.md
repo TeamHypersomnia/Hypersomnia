@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- update weapon stats page
 - hide settings in web that can crash the app like number of threads
 
 - update emscripten

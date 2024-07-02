@@ -1,5 +1,5 @@
 #pragma once
-#include <future>
+#include "augs/misc/future.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/client/client_connect_string.h"
@@ -162,7 +162,7 @@ class client_setup :
 
 	std::vector<demo_step> unflushed_demo_steps;
 	std::vector<demo_step> demo_steps_being_flushed;
-	std::future<void> future_flushed_demo;
+	augs::future<void> future_flushed_demo;
 	bool was_demo_meta_written = false;
 
 	client_demo_player demo_player;

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <string>
-#include <mutex>
+#include "augs/misc/mutex.h"
 #include <optional>
 
 // Define constants
@@ -51,16 +51,16 @@ double calculate_ping(double distance) {
     return (distance / SPEED_OF_LIGHT_KM_PER_MS) * quality_mult * 2; // Multiply by 2 to account for round trip
 }
 
-extern std::mutex lat_lon_mutex;
-extern std::optional<double> player_latitude;
-extern std::optional<double> player_longitude;
+augs::mutex lat_lon_mutex;
+std::optional<double> player_latitude;
+std::optional<double> player_longitude;
 
 std::optional<double> get_estimated_ping_to_server(const std::string& loc_id) {
     if (const auto latlon = server_locations.find(loc_id); latlon != server_locations.end()) {
         double server_lat = latlon->second.latitude;
         double server_lon = latlon->second.longitude;
 
-        std::scoped_lock lk(lat_lon_mutex);
+        augs::scoped_lock lk(lat_lon_mutex);
 
         if (player_latitude.has_value() && player_longitude.has_value()) {
             const auto ping = calculate_ping(calculate_distance(*player_latitude, *player_longitude, server_lat, server_lon));

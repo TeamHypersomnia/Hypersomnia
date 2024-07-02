@@ -4,6 +4,7 @@
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/create_process.h"
 #include "augs/string/string_templates.h"
+#include "augs/misc/mutex.h"
 #include "all_paths.h"
 
 #if PLATFORM_WINDOWS
@@ -57,7 +58,7 @@ namespace augs {
 
 #if PLATFORM_WEB
 
-std::mutex open_url_on_main_lk;
+augs::mutex open_url_on_main_lk;
 std::string open_url_on_main;
 
 #endif
@@ -69,7 +70,7 @@ namespace augs {
 	}
 #elif PLATFORM_WEB
 	void open_url(const std::string& url) {
-		std::scoped_lock lk(open_url_on_main_lk);
+		augs::scoped_lock lk(open_url_on_main_lk);
 		open_url_on_main = url;
 	}
 #elif PLATFORM_LINUX

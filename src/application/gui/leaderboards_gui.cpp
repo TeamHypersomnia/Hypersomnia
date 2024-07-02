@@ -23,7 +23,7 @@
 #include "view/ranks_info.h"
 
 struct leaderboards_gui_internal {
-	std::future<std::optional<httplib_result>> future_response;
+	augs::future<std::optional<httplib_result>> future_response;
 
 	bool refresh_op_in_progress() const {
 		return future_response.valid();

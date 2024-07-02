@@ -1,7 +1,7 @@
 #if PLATFORM_WEB
 #include <iostream>
 #include <thread>
-#include <mutex>
+#include "augs/misc/mutex.h"
 #include <queue>
 #include <functional>
 #include <future>
@@ -43,7 +43,7 @@ public:
 
         // Lock and copy tasks to local queue, then unlock
         {
-            std::scoped_lock lock(queueMutex);
+            augs::scoped_lock lock(queueMutex);
             if (tasks.empty()) {
                 return;  // No tasks to execute, return immediately
             }
@@ -60,7 +60,7 @@ public:
 
 private:
 	std::optional<std::thread::id> main_thread_id;
-    std::mutex queueMutex;
+    augs::mutex queueMutex;
     std::queue<std::function<void()>> tasks;
 
     template<typename Func>
@@ -88,7 +88,7 @@ private:
 
     template<typename Func>
     void enqueue_task(Func&& func) {
-        std::scoped_lock lock(queueMutex);
+        augs::scoped_lock lock(queueMutex);
         tasks.emplace(std::forward<Func>(func));
     }
 };

@@ -1,15 +1,17 @@
 #pragma once
 #if PLATFORM_WEB
+#include "augs/misc/mutex.h"
+
 EM_JS(void, call_syncFileSystem, (), {
   Module.sync_idbfs();
 });
 
-std::mutex persistent_filesystem_lk;
+augs::mutex persistent_filesystem_lk;
 int persistent_filesystem_holders = 0;
 
 void persistent_filesystem_sync() {
 	{
-		std::scoped_lock lk(persistent_filesystem_lk);
+		augs::scoped_lock lk(persistent_filesystem_lk);
 
 		if (persistent_filesystem_holders > 0) {
 			return;
@@ -26,7 +28,7 @@ void persistent_filesystem_sync() {
 }
 
 void persistent_filesystem_hold() {
-	std::scoped_lock lk(persistent_filesystem_lk);
+	augs::scoped_lock lk(persistent_filesystem_lk);
 	++persistent_filesystem_holders;
 	LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
 }
@@ -35,7 +37,7 @@ void persistent_filesystem_flush() {
 	bool run = false;
 
 	{
-		std::scoped_lock lk(persistent_filesystem_lk);
+		augs::scoped_lock lk(persistent_filesystem_lk);
 		--persistent_filesystem_holders;
 
 		LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
