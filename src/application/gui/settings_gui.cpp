@@ -89,7 +89,7 @@ int performance_settings::get_num_pool_workers() const {
 	return get_default_num_pool_workers();
 }
 
-#if BUILD_NETWORKING
+#if BUILD_NATIVE_SOCKETS
 #include "augs/network/netcode_utils.h"
 #include "augs/templates/container_templates.h"
 
@@ -292,7 +292,7 @@ void settings_gui_state::perform(
 	config_json_table& last_saved_config,
 	vec2i screen_size
 ) {
-#if BUILD_NETWORKING
+#if BUILD_NATIVE_SOCKETS
 	stun_manager.perform();
 #endif
 
@@ -1933,7 +1933,7 @@ void settings_gui_state::perform(
 				ImGui::SameLine();
 
 				if (ImGui::Button("Open STUN manager")) {
-#if BUILD_NETWORKING
+#if BUILD_NATIVE_SOCKETS
 					stun_manager.open();
 #endif
 				}

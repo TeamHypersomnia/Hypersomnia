@@ -446,10 +446,6 @@ yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
 	return yojimbo::Address(t.data.ipv6, t.port);
 }
 
-std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in) {
-	return launch_async([in]() { return resolve_address(in); });
-}
-
 std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
@@ -471,6 +467,11 @@ std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port&
 	}
 
 	return std::nullopt;
+}
+
+#if BUILD_NATIVE_SOCKETS
+std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in) {
+	return launch_async([in]() { return resolve_address(in); });
 }
 
 resolve_address_result resolve_address(const host_with_default_port& in) {
@@ -541,7 +542,6 @@ resolve_address_result resolve_address(const host_with_default_port& in) {
 	return out;
 }
 
-#if BUILD_NATIVE_SOCKETS
 std::optional<netcode_address_t> get_internal_network_address() {
 	const char* google_dns_server = "8.8.8.8";
 	int dns_port = 53;
@@ -602,10 +602,16 @@ int client_receive_packet_override(void* context, netcode_address_t* from, uint8
 }
 
 resolve_address_result client_adapter::connect(const client_connect_string& str) {
+	auto resolved_addr = resolve_address_result();
+
+#if PLATFORM_WEB
+	(void)str;
+
+	const bool use_webrtc = true;
+	connected_ip_address = ::make_internal_webrtc_address(DEFAULT_GAME_PORT_V);
+#else
 	const auto webrtc_id = find_webrtc_id(str);
 	const bool use_webrtc = webrtc_id != "";
-
-	auto resolved_addr = resolve_address_result();
 
 	if (!use_webrtc) {
 		host_with_default_port in;
@@ -629,6 +635,7 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 	else {
 		connected_ip_address = resolved_addr.addr;
 	}
+#endif
 
 	const auto target_addr = to_yojimbo_addr(connected_ip_address);
 

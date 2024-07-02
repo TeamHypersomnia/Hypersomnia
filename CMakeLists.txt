@@ -488,17 +488,22 @@ endmacro()
 
 if(BUILD_NETWORKING)
 	set(HYPERSOMNIA_NETWORKING_CPPS
-		"src/application/setups/server/server_setup.cpp"
-		"src/application/network/network_adapters.cpp"
-		"src/augs/network/network_types.cpp"
+	"src/application/setups/server/server_setup.cpp"
+	"src/application/network/network_adapters.cpp"
+	"src/augs/network/network_types.cpp"
+	)
+
+	if (BUILD_NATIVE_SOCKETS)
+		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/nat/nat_detection_session.cpp"
 		"src/application/nat/nat_traversal_session.cpp"
 		"src/application/setups/server/server_nat_traversal.cpp"
-	)
+		)
+	endif()
 
 	if (BUILD_MASTERSERVER)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
-			"src/application/masterserver/masterserver.cpp"
+		"src/application/masterserver/masterserver.cpp"
 		)
 	endif()
 

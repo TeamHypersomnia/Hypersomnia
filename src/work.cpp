@@ -121,7 +121,10 @@
 
 #include "steam_integration_callbacks.h"
 
+#if BUILD_NATIVE_SOCKETS
 #include "application/main/nat_traversal_details_window.h"
+#endif
+
 #endif
 
 #include "steam_integration.h"
@@ -1270,9 +1273,9 @@ work_result work(
 		}
 	};
 
+#if BUILD_NATIVE_SOCKETS
 	WEBSTATIC auto nat_traversal_details = nat_traversal_details_window();
 
-#if BUILD_NATIVE_SOCKETS
 	WEBSTATIC auto do_traversal_details_popup = [&](auto& window) {
 		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
 			nat_traversal.reset();

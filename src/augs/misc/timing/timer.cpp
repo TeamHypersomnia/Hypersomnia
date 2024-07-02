@@ -1,6 +1,12 @@
 #include "augs/misc/timing/timer.h"
 
+#if BUILD_NETWORKING
 double yojimbo_time();
+#else
+double yojimbo_time() {
+	return 0.0;
+}
+#endif
 
 namespace augs {
 	timer::timer() {

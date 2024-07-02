@@ -1,7 +1,7 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
-#include "application/nat/nat_detection_session.h"
+#include "application/nat/nat_type.h"
 #include "hypersomnia_version.h"
 
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);

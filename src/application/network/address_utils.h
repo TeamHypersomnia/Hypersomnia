@@ -29,10 +29,10 @@ std::optional<augs::path_type> find_demo_path(const client_connect_string&);
 std::optional<netcode_address_t> find_netcode_addr(const client_connect_string& ip);
 std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port& in);
 
+#if BUILD_NATIVE_SOCKETS
 resolve_address_result resolve_address(const host_with_default_port& in);
 std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in);
 
-#if BUILD_NATIVE_SOCKETS
 std::optional<netcode_address_t> get_internal_network_address();
 std::future<std::optional<netcode_address_t>> async_get_internal_network_address();
 #endif

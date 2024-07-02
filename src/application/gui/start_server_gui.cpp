@@ -98,6 +98,7 @@ as well as to test your skills in a laggy environment.
 		}
 	}
 
+#if BUILD_NATIVE_SOCKETS
 	if (show_nat_details && nat_detection != nullptr) {
 		auto result = augs::imgui::cond_scoped_window(show_nat_details, "NAT detection details", &show_nat_details, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -110,6 +111,9 @@ as well as to test your skills in a laggy environment.
 		const auto log_color = rgba(210, 210, 210, 255);
 		text_color(::censor_ips(log_text), log_color);
 	}
+#else
+	(void)nat_detection;
+#endif
 
 	{
 		auto child = scoped_child("host view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));

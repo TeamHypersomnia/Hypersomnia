@@ -957,6 +957,7 @@ bool server_heartbeat::is_valid() const {
 	return !server_name.empty() && !current_arena.empty() && !game_mode.empty();
 }
 
+#if !PLATFORM_WEB
 template <class F>
 void server_setup::push_notification_job(F&& f) {
 	push_session_webhook_job(mode_player_id::dead(), job_type::NOTIFICATION, std::forward<F>(f));
@@ -980,6 +981,7 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 
 	pending_jobs.emplace_back(webhook_job{ player_id, find_session_id(player_id), type, std::move(ptr) });
 }
+#endif
 
 std::string get_hex_representation(const std::byte*, size_t length);
 

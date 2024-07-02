@@ -222,6 +222,12 @@ class server_setup :
 		REPORT_MATCH
 	};
 
+
+#if PLATFORM_WEB
+	webrtc_id_type resolved_this_server_webrtc_id;
+#else
+	uint32_t duel_pic_counter = 0;
+
 	struct webhook_job {
 		mode_player_id player_id;
 		std::optional<server_client_session_id> client_session_id;
@@ -232,12 +238,7 @@ class server_setup :
 	};
 
 	std::vector<webhook_job> pending_jobs;
-
-#if PLATFORM_WEB
-	webrtc_id_type resolved_this_server_webrtc_id;
 #endif
-
-	uint32_t duel_pic_counter = 0;
 
 	template <class F>
 	void push_session_webhook_job(mode_player_id player_id, job_type type, F&& f);
