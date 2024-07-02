@@ -150,12 +150,22 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	using namespace augs::imgui;
 
+#if WEB_LOWEND
+	const auto menu_bottom_margin_v = 30.0f;
+#else
+	const auto menu_bottom_margin_v = 70.0f;
+#endif
+
 	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
 	const auto w = screen_size.x/2.5f;
 	//const auto h = screen_size.y/1.3f;
-	const auto padding = vec2i(70-14, 70-10);
+	const auto padding = vec2i(70-14, menu_bottom_margin_v-10);
 
+#if WEB_LOWEND
+	const auto h = std::min(int(screen_size.y-padding.y*7), 766);//;in.menu_ltrb.h();
+#else
 	const auto h = std::min(int(screen_size.y-padding.y*2), 766);//;in.menu_ltrb.h();
+#endif
 
 	const auto rb_pos = ImVec2(screen_size.x - w - padding.x,screen_size.y - h - padding.y);
 	const auto menu_pos = ImVec2(in.menu_ltrb.r, in.menu_ltrb.t);

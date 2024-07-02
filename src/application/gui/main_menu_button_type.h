@@ -2,8 +2,11 @@
 
 enum class main_menu_button_type {
 	// GEN INTROSPECTOR enum class main_menu_button_type
+#if !WEB_LOWEND
 	JOIN_DISCORD,
 	AVAILABLE_ON_GITHUB,
+#endif
+
 #if PLATFORM_WEB
 	DOWNLOAD_ON_STEAM,
 #endif
@@ -11,12 +14,16 @@ enum class main_menu_button_type {
 	PLAY_RANKED,
 	BROWSE_SERVERS,
 	HOST_SERVER,
+#if !WEB_LOWEND
 	CONNECT_TO_SERVER,
+#endif
 	SHOOTING_RANGE,
 	TUTORIAL,
 	EDITOR,
 	SETTINGS,
+#if !WEB_LOWEND
 	CREDITS,
+#endif
 #if !PLATFORM_WEB
 	QUIT,
 #endif

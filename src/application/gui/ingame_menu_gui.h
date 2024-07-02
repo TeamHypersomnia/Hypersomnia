@@ -99,9 +99,12 @@ struct ingame_menu_gui {
 	) {
 		const auto& gui_font = context.get_gui_font();
 
-		root.buttons[0].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		int bi = 0;
+
+		root.buttons[bi++].special_image = assets::necessary_image_id::DISCORD_BUTTON;
 #if PLATFORM_WEB
-		root.buttons[1].special_image = assets::necessary_image_id::GITHUB_BUTTON;
+		root.buttons[bi++].special_image = assets::necessary_image_id::GITHUB_BUTTON;
+		root.buttons[bi++].special_image = assets::necessary_image_id::STEAM_BUTTON;
 #endif
 
 		root.set_menu_buttons_colors(cyan);

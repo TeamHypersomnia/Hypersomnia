@@ -33,12 +33,24 @@ public:
 	) {
 		set_menu_buttons_sizes(manager, gui_font, get_max_menu_button_size(manager, gui_font));
 
+#if WEB_LOWEND
+		const auto menu_bottom_margin_v = 30.0f;
+#else
+		const auto menu_bottom_margin_v = 70.0f;
+#endif
+
 		for (size_t i = buttons.size() - 1; i != size_t(-1); --i) {
 			if (i == buttons.size() - 1) {
-				buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f - buttons[i].rc.h()));
+				buttons[i].rc.set_position(vec2(70.f, screen_size.y - menu_bottom_margin_v - buttons[i].rc.h()));
 			}
 			else {
-				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - 18 - buttons[i].rc.h()));
+#if WEB_LOWEND
+				const auto padding = 8;
+#else
+				const auto padding = 18;
+#endif
+
+				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - padding - buttons[i].rc.h()));
 			}
 		}
 	}

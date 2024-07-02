@@ -93,5 +93,17 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 
 		result.inventory_gui_controls[augs::event::keys::key::B] = inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3;
 		result.inventory_gui_controls.erase(augs::event::keys::key::V);
+
+		result.sound.max_simultaneous_bullet_trace_sounds = 0;
+#endif
+
+#if WEB_LOWEND
+		result.gui_fonts.gui.size_in_pixels = 18.0f;
+
+		result.audio.output_mode = audio_output_mode::AUTO;
+
+		result.sound.max_short_sounds = 16;
+		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;
+		result.sound.custom_processing_frequency = 2;
 #endif
 }

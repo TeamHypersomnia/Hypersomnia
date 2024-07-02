@@ -3402,6 +3402,7 @@ work_result work(
 		using T = decltype(t);
 
 		switch (t) {
+#if !WEB_LOWEND
 			case T::JOIN_DISCORD:
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
@@ -3409,6 +3410,7 @@ work_result work(
 			case T::AVAILABLE_ON_GITHUB:
 				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
 				break;
+#endif
 
 #if PLATFORM_WEB
 			case T::DOWNLOAD_ON_STEAM:
@@ -3440,6 +3442,7 @@ work_result work(
 
 				break;
 
+#if !WEB_LOWEND
 			case T::CONNECT_TO_SERVER:
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 #if !IS_PRODUCTION_BUILD
@@ -3452,6 +3455,7 @@ work_result work(
 				}
 
 				break;
+#endif
 				
 			case T::HOST_SERVER:
 				start_server_gui.open();
@@ -3471,16 +3475,23 @@ work_result work(
 				break;
 
 			case T::EDITOR:
+#if WEB_LOWEND
+				augs::open_url("https://hypersomnia.io/editor");
+#else
 				launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
+#endif
+
 				break;
 
 			case T::SETTINGS:
 				settings_gui.open();
 				break;
 
+#if !WEB_LOWEND
 			case T::CREDITS:
 				augs::open_url("https://hypersomnia.xyz/credits");
 				break;
+#endif
 
 #if !PLATFORM_WEB
 			case T::QUIT:
@@ -3504,6 +3515,10 @@ work_result work(
 #if PLATFORM_WEB
 			case T::AVAILABLE_ON_GITHUB:
 				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
+				break;
+
+			case T::DOWNLOAD_ON_STEAM:
+				augs::open_url("https://store.steampowered.com/app/2660970/Hypersomnia/");
 				break;
 #endif
 

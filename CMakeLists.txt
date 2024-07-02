@@ -1499,6 +1499,10 @@ if(BUILD_FOR_WEB)
 	if (NOT WEB_MULTITHREADING)
 		add_definitions(-DWEB_SINGLETHREAD=1)
 	endif()
+
+	if (BUILD_CRAZYGAMES)
+		add_definitions(-DWEB_LOWEND=1)
+	endif()
 endif()
 
 add_definitions(-DYOJIMBO_WITH_MBEDTLS=0)

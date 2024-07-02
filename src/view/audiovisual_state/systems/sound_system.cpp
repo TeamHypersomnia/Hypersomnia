@@ -748,6 +748,9 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 	}
 
+#if WEB_LOWEND
+
+#else
 	cosm.for_each_having<components::gun>(
 		[&](const auto gun_entity) {
 			const auto id = gun_entity.get_id().to_unversioned();
@@ -785,6 +788,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			}
 		}
 	);
+#endif
 
 	cosm.for_each_having<invariants::continuous_sound>(
 		[&](const auto sound_entity) {

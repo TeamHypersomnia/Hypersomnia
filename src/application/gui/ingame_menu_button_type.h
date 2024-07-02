@@ -5,6 +5,7 @@ enum class ingame_menu_button_type {
 	JOIN_DISCORD,
 #if PLATFORM_WEB
 	AVAILABLE_ON_GITHUB,
+	DOWNLOAD_ON_STEAM,
 #endif
 
 	RESUME,

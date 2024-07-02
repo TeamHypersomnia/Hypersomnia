@@ -76,10 +76,12 @@ struct main_menu_gui {
 			return true;
 		}
 
+#if !WEB_LOWEND
 		if (change.was_pressed(augs::event::keys::key::U)) {
 			button_callback(main_menu_button_type::CONNECT_TO_SERVER);
 			return true;
 		}
+#endif
 
 		if (change.was_pressed(augs::event::keys::key::B)) {
 			button_callback(main_menu_button_type::BROWSE_SERVERS);
@@ -146,11 +148,15 @@ struct main_menu_gui {
 			root.buttons[std::size_t(main_menu_button_type::PLAY_RANKED)].set_complete_caption("Quick play");
 		}
 
-		root.buttons[0].special_image = assets::necessary_image_id::DISCORD_BUTTON;
-		root.buttons[1].special_image = assets::necessary_image_id::GITHUB_BUTTON;
+		int bi = 0;
+
+#if !WEB_LOWEND
+		root.buttons[bi++].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		root.buttons[bi++].special_image = assets::necessary_image_id::GITHUB_BUTTON;
+#endif
 
 #if PLATFORM_WEB
-		root.buttons[2].special_image = assets::necessary_image_id::STEAM_BUTTON;
+		root.buttons[bi++].special_image = assets::necessary_image_id::STEAM_BUTTON;
 #endif
 
 		world.advance_elements(context, vdt);
