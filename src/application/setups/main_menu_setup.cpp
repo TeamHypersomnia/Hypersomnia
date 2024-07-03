@@ -39,6 +39,8 @@
 #include "application/arena/choose_arena.h"
 #include "application/setups/editor/packaged_official_content.h"
 
+#include "augs/misc/web_sdk_events.h"
+
 using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
@@ -82,6 +84,8 @@ main_menu_setup::main_menu_setup(
 	const packaged_official_content& official,
 	const main_menu_settings settings
 ) : detail(std::make_unique<main_menu_setup_detail>()) {
+	auto loading_raii = web_sdk_loading_raii();
+
 	LOG("main_menu_setup ctor");
 
 	if (!settings.menu_theme_path.empty()) {

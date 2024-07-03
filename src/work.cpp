@@ -260,6 +260,45 @@ extern "C" {
 
 #endif
 
+#if PLATFORM_WEB
+void web_sdk_gameplay_start() {
+	main_thread_queue::execute([&]() {
+		EM_ASM({
+			Module.sdk_gameplay_start();
+		});
+	});
+}
+
+void web_sdk_gameplay_stop() {
+	main_thread_queue::execute([&]() {
+		EM_ASM({
+			Module.sdk_gameplay_stop();
+		});
+	});
+}
+
+void web_sdk_loading_start() {
+	main_thread_queue::execute([&]() {
+		EM_ASM({
+			Module.sdk_loading_start();
+		});
+	});
+}
+
+void web_sdk_loading_stop() {
+	main_thread_queue::execute([&]() {
+		EM_ASM({
+			Module.sdk_loading_stop();
+		});
+	});
+}
+#else
+void web_sdk_gameplay_start() {}
+void web_sdk_gameplay_stop() {}
+void web_sdk_loading_start() {}
+void web_sdk_loading_stop() {}
+#endif
+
 #include "augs/persistent_filesystem.hpp"
 
 #if PLATFORM_WEB
@@ -294,6 +333,8 @@ work_result work(
 #if PLATFORM_WEB
 	main_thread_queue::get_instance().save_main_thread_id();
 #endif
+
+	web_sdk_loading_start();
 
 	WEBSTATIC const auto params = parsed_params;
 	(void)argc;
@@ -1543,16 +1584,20 @@ work_result work(
 
 	try {
 		social_sign_in.cached_auth = augs::from_json_file<web_auth_data>(CACHED_AUTH_PATH);
+		LOG("Loaded some cached auth from %x", CACHED_AUTH_PATH);
 	}
 	catch (...) {
 		social_sign_in.cached_auth = {};
+		LOG("No cached auth found in %x", CACHED_AUTH_PATH);
 	}
 
 	if (social_sign_in.cached_auth.is_set()) {
 		if (is_auth_expired()) {
+			LOG("Auth expired. Logging out.");
 			social_log_out();
 		}
 		else {
+			LOG("Starting token_still_valid_check");
 			token_still_valid_check = launch_async([ch = social_sign_in.cached_auth]() { return ch.check_token_still_valid(); });
 		}
 	}
@@ -3107,6 +3152,7 @@ work_result work(
 					perform_leaderboards();
 #if PLATFORM_WEB
 					if (social_sign_in.cached_auth.expired()) {
+						LOG("Leaderboards: uuth expired. Logging out.");
 						social_log_out();
 					}
 
@@ -4210,6 +4256,7 @@ work_result work(
 	WEBSTATIC debug_details_summaries debug_summaries;
 
 	WEBSTATIC auto game_thread_result = work_result::SUCCESS;
+	WEBSTATIC bool sdk_in_gameplay_state = false;
 
 	WEBSTATIC auto game_thread_worker = [&]() {
 		auto prepare_next_game_frame = [&]() {
@@ -4302,6 +4349,24 @@ work_result work(
 						common_input_state.mouse.pos = ImGui::GetIO().MousePos;
 					}
 				});
+
+				{
+					const bool sdk_in_gameplay = 
+						has_current_setup()
+						&& !ingame_menu.show
+					;
+
+					if (sdk_in_gameplay_state != sdk_in_gameplay) {
+						sdk_in_gameplay_state = sdk_in_gameplay;
+
+						if (sdk_in_gameplay) {
+							web_sdk_gameplay_start();
+						}
+						else {
+							web_sdk_gameplay_stop();
+						}
+					}
+				}
 
 				if (get_viewed_character().dead()) {
 					game_gui_mode = true;
@@ -5673,6 +5738,8 @@ work_result work(
 	};
 
 	LOG("Calling emscripten_set_main_loop_arg.");
+
+	web_sdk_loading_stop();
 
 #if WEB_SINGLETHREAD
 	emscripten_set_main_loop_arg(main_loop_iter_em, main_loop_in_ptr, 0, 1);

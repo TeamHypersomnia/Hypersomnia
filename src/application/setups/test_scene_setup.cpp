@@ -19,6 +19,8 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/calc_ammo_info.hpp"
 
+#include "augs/misc/web_sdk_events.h"
+
 void snap_interpolated_to_logical(cosmos& cosm);
 
 using portal_marker = editor_area_marker_node;
@@ -34,6 +36,8 @@ test_scene_setup::test_scene_setup(
 }
 
 void test_scene_setup::init(const test_scene_type new_type) {
+	auto loading_raii = web_sdk_loading_raii();
+
 	type = new_type;
 
 	if (type == test_scene_type::TUTORIAL) {

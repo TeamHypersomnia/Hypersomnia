@@ -17,6 +17,10 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
 #include "application/setups/client/demo_file_meta.h"
+#include "augs/misc/scope_guard.h"
+
+void web_sdk_loading_start();
+void web_sdk_loading_stop();
 
 void viewables_streaming::request_rescan() {
 	if (!general_atlas.empty()) {
@@ -232,6 +236,9 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			future_general_atlas = launch_async(
 				[general_atlas_in, this]() { 
+					web_sdk_loading_start();
+					auto scoped_stop = augs::scope_guard([]() { web_sdk_loading_stop(); });
+
 					if (!rescan_for_modified_images) {
 						/* 
 							The request was not due to source image modification, 
@@ -310,6 +317,9 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			future_loaded_buffers = launch_async(
 				[&](){
+					web_sdk_loading_start();
+					auto scoped_stop = augs::scope_guard([]() { web_sdk_loading_stop(); });
+
 					using value_type = decltype(future_loaded_buffers.get());
 
 					value_type result;

@@ -171,6 +171,7 @@ function resizeCanvas() {
 }
 
 async function pre_run_cg() {
+  Module.addRunDependency('cginit');
   console.log("pre_run_cg");
 
   if (window.CrazyGames) {
@@ -181,6 +182,7 @@ async function pre_run_cg() {
   }
 
   console.log("pre_run_cg finished");
+  Module.removeRunDependency('cginit');
 }
 
 function pre_run() {
@@ -297,6 +299,34 @@ function fetchUserProfile(accessToken, expiresIn) {
     });
 }
 
+function sdk_gameplay_start() {
+  if (window.CrazyGames) {
+    console.log("Crazygames: gameplayStart");
+    window.CrazyGames.SDK.game.gameplayStart();
+  }
+}
+
+function sdk_gameplay_stop() {
+  if (window.CrazyGames) {
+    console.log("Crazygames: gameplayStop");
+    window.CrazyGames.SDK.game.gameplayStop();
+  }
+}
+
+function sdk_loading_start() {
+  if (window.CrazyGames) {
+    console.log("Crazygames: loadingStart");
+    window.CrazyGames.SDK.game.loadingStart();
+  }
+}
+
+function sdk_loading_stop() {
+  if (window.CrazyGames) {
+    console.log("Crazygames: loadingStop");
+    window.CrazyGames.SDK.game.loadingStop();
+  }
+}
+
 function create_module(for_cg) {
   const for_io = !for_cg;
 
@@ -356,6 +386,11 @@ function create_module(for_cg) {
       document.getElementById('spinner').style.display = 'none';
     }
   };
+
+  Module.sdk_gameplay_start = sdk_gameplay_start;
+  Module.sdk_gameplay_stop = sdk_gameplay_stop;
+  Module.sdk_loading_start = sdk_loading_start;
+  Module.sdk_loading_stop = sdk_loading_stop;
 
   return Module;
 }

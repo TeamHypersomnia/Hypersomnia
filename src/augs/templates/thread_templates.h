@@ -7,10 +7,10 @@ template <class F>
 decltype(auto) launch_async(F&& func) {
 	if constexpr(std::is_same_v<decltype(func()), void>) {
 		func();
-		return augs::future<void>();
+		return augs::future<void> { true };
 	}
 	else {
-		return augs::future<decltype(func())> { func() };
+		return augs::future<decltype(func())> { func(), true };
 	}
 }
 

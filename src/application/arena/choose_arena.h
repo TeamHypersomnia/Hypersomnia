@@ -10,6 +10,8 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/network/network_common.h"
 
+#include "augs/misc/web_sdk_events.h"
+
 struct choose_arena_input {
 	editor_project_readwrite::reading_settings settings;
 
@@ -110,6 +112,8 @@ struct server_choose_arena_result {
 inline server_choose_arena_result choose_arena_server(
 	choose_arena_input in
 ) {
+	auto loading_raii = web_sdk_loading_raii();
+
 	const auto emigrated_session = in.handle.emigrate_mode_session();
 
 	auto result = server_choose_arena_result();
@@ -142,6 +146,8 @@ inline client_find_arena_result choose_arena_client(
 	choose_arena_input in,
 	const augs::secure_hash_type& required_hash
 ) {
+	auto loading_raii = web_sdk_loading_raii();
+
 	const auto emigrated_session = in.handle.emigrate_mode_session();
 
 	client_find_arena_result result;

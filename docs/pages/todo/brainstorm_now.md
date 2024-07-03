@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- crazygames audio perf: we can measure total time elapsed for processed commands and break out after 10 ms
+    - will be crucial to preserve responsiveness
+    - and just append commands to the single vector
+    - finish can process all
+    - ofc i'd still keep lowend fixes like no engine sound but at least then we can increase proc freq a bit and maybe even go with hrtf?
+    
+
+- On dedicated server, use port 8412 by default to simplify instructions
+    - but it'd be good to leave 0 an option
+    - specify it with --server-port 0 then because it will be rare tbh
+        - use std optional in cmd line params
+        - alias --port
+    
+
 - hide settings in web that can crash the app like number of threads
 
 - update emscripten

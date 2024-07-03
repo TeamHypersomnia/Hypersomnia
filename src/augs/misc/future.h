@@ -9,7 +9,7 @@ namespace augs {
 	template <class T>
 	struct future {
 		T obj;
-		bool v = true;
+		bool v = false;
 
 		bool valid() const {
 			return v;
@@ -26,7 +26,7 @@ namespace augs {
 
 	template <>
 	struct future<void> {
-		bool v = true;
+		bool v = false;
 
 		bool valid() const {
 			return v;
