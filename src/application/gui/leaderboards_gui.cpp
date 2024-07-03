@@ -403,22 +403,27 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 #if PLATFORM_WEB
 	if (logged_in) {
-		ImGui::SameLine();
-		const auto avail = ImGui::GetContentRegionAvail();
+		if (in.is_crazygames) {
+			/* No Log Out button. */
+		}
+		else {
+			ImGui::SameLine();
+			const auto avail = ImGui::GetContentRegionAvail();
 
-		float offset_x = avail.x - ImGui::CalcTextSize("Sign in 9").x;
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset_x);
+			float offset_x = avail.x - ImGui::CalcTextSize("Sign in 9").x;
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset_x);
 
-		auto darkened_selectables = scoped_selectable_colors({
-			rgba(255, 255, 255, 20),
-			rgba(255, 255, 255, 30),
-			rgba(255, 255, 255, 60)
-		});
+			auto darkened_selectables = scoped_selectable_colors({
+				rgba(255, 255, 255, 20),
+				rgba(255, 255, 255, 30),
+				rgba(255, 255, 255, 60)
+			});
 
-		//auto sc = scoped_text_color(rgba(255, 255, 255, 200));
+			//auto sc = scoped_text_color(rgba(255, 255, 255, 200));
 
-		if (ImGui::Selectable("Log out", false, 0, ImVec2(100, 0))) {
-			wants_log_out = true;
+			if (ImGui::Selectable("Log out", false, 0, ImVec2(100, 0))) {
+				wants_log_out = true;
+			}
 		}
 	}
 #endif

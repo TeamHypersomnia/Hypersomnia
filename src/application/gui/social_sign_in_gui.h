@@ -6,6 +6,7 @@
 struct social_sign_in_input {
 	const necessary_images_in_atlas_map& necessary_images;
 	const bool prompted_once;
+	const bool is_crazygames;
 };
 
 struct social_sign_in_state : public standard_window_mixin<social_sign_in_state> {

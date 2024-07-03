@@ -4,10 +4,10 @@
 std::mutex pending_auth_datas_lk;
 std::optional<web_auth_data> new_auth_data;
 
-void sign_in_with_google() {
+void sign_in_with_crazygames() {
 	main_thread_queue::execute([&]() {
 		EM_ASM({
-			Module.loginGoogle();
+			Module.loginCrazyGames();
 		});
 	});
 }
@@ -44,6 +44,11 @@ inline void web_auth_data::log_out() {
 	}
 
 	*this = {};
+}
+
+auto has_new_auth_data() {
+	std::scoped_lock lk(pending_auth_datas_lk);
+	return new_auth_data.has_value();
 }
 
 auto get_new_auth_data() {

@@ -17,6 +17,7 @@ struct leaderboards_input {
 	const ltrb menu_ltrb;
 #if PLATFORM_WEB
 	const bool is_logged_in;
+	const bool is_crazygames;
 #endif
 };
 

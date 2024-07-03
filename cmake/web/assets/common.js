@@ -2,6 +2,11 @@ const ipinfo_endpoint = 'https://hypersomnia.xyz/geolocation';
 const clientIdDiscord = '1189671952479158403';
 const revoke_origin = 'https://hypersomnia.xyz';
 
+function passAuthDataToCpp(provider, profileId, profileName, avatarUrl, authToken, expiresIn) {
+  Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'string', 'number'],
+    [provider, profileId, profileName, avatarUrl, authToken, expiresIn]);
+}
+
 function getUserGeolocation() {
   fetch(ipinfo_endpoint)
     .then(response => response.json())
@@ -175,14 +180,49 @@ async function pre_run_cg() {
   console.log("pre_run_cg");
 
   if (window.CrazyGames) {
-    await window.CrazyGames.SDK.init();
-  }
-  else {
+    try {
+      await window.CrazyGames.SDK.init();
+
+      const available = window.CrazyGames.SDK.user.isUserAccountAvailable;
+      console.log("User account system available", available);
+
+      if (available) {
+        try {
+          const token = await window.CrazyGames.SDK.user.getUserToken();
+          console.log("Get token result", token);
+
+          const payloadBase64 = token.split('.')[1];
+          const payloadDecoded = atob(payloadBase64);
+          const payload = JSON.parse(payloadDecoded);
+
+          console.log("Decoded token payload", payload);
+
+          Module.initial_user = {
+            userId: payload.userId,
+            username: payload.username,
+            profilePictureUrl: payload.profilePictureUrl,
+            token: token
+          };
+        } catch (e) {
+          console.log("getUserToken failed:", e);
+        }
+      }
+    } catch (e) {
+      console.log("CG SDK init error: ", e);
+    }
+  } else {
     console.log("window.CrazyGames is undefined!");
   }
 
   console.log("pre_run_cg finished");
   Module.removeRunDependency('cginit');
+}
+
+function try_fetch_initial_user() {
+  if (Module.initial_user) {
+    const u = Module.initial_user;
+    passAuthDataToCpp('crazygames', u.userId, u.username, u.profilePictureUrl, u.token, 3600);
+  }
 }
 
 function pre_run() {
@@ -275,9 +315,30 @@ function loginDiscord() {
   window.open(authUrl, '_blank');
 }
 
-function passAuthDataToCpp(provider, profileId, profileName, avatarUrl, authToken, expiresIn) {
-  Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'string', 'number'],
-    [provider, profileId, profileName, avatarUrl, authToken, expiresIn]);
+function loginCrazyGames() {
+  if (window.CrazyGames) {
+    window.CrazyGames.SDK.user.showAuthPrompt()
+      .then(user => {
+        if (user) {
+          return window.CrazyGames.SDK.user.getUserToken();
+        } else {
+          throw new Error('User cancelled login or already signed in');
+        }
+      })
+      .then(token => {
+        const payloadBase64 = token.split('.')[1];
+        const payloadDecoded = atob(payloadBase64);
+        const payload = JSON.parse(payloadDecoded);
+        console.log("Decoded token payload", payload);
+
+        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, 3600);
+      })
+      .catch(e => {
+        console.log("Auth prompt or token retrieval failed:", e);
+      });
+  } else {
+    console.log("window.CrazyGames is undefined!");
+  }
 }
 
 function fetchUserProfile(accessToken, expiresIn) {
@@ -346,9 +407,13 @@ function create_module(for_cg) {
 
   Module.getUserGeolocation = getUserGeolocation;
 
+  Module.try_fetch_initial_user = try_fetch_initial_user;
+
   if (for_cg) {
     Module.sync_idbfs = sync_idbfs_cg;
     Module['preRun'].push(pre_run_cg);
+
+    Module.loginCrazyGames = loginCrazyGames;
   }
 
   if (for_io) {

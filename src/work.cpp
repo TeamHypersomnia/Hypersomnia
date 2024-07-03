@@ -211,7 +211,11 @@ constexpr bool no_edge_zoomout_v = false;
 #include <emscripten/html5.h>
 
 EM_JS(void, call_hideProgress, (), {
-  hideProgress();
+	hideProgress();
+});
+
+EM_JS(void, call_try_fetch_initial_user, (), {
+  try_fetch_initial_user();
 });
 
 EM_JS(void, call_setLocation, (const char* newPath), {
@@ -1564,7 +1568,8 @@ work_result work(
 	WEBSTATIC auto perform_social_sign_in_popup = [&](const bool prompted_once) {
 		const bool confirmed = social_sign_in.perform({
 			streaming.necessary_images_in_atlas,
-			prompted_once
+			prompted_once,
+			params.is_crazygames
 		});
 
 		if (confirmed) {
@@ -1582,13 +1587,22 @@ work_result work(
 		}
 	};
 
-	try {
-		social_sign_in.cached_auth = augs::from_json_file<web_auth_data>(CACHED_AUTH_PATH);
-		LOG("Loaded some cached auth from %x", CACHED_AUTH_PATH);
+	if (params.is_crazygames) {
+		call_try_fetch_initial_user();
+
+		if (::has_new_auth_data()) {
+			config.prompted_for_sign_in_once = true;
+		}
 	}
-	catch (...) {
-		social_sign_in.cached_auth = {};
-		LOG("No cached auth found in %x", CACHED_AUTH_PATH);
+	else {
+		try {
+			social_sign_in.cached_auth = augs::from_json_file<web_auth_data>(CACHED_AUTH_PATH);
+			LOG("Loaded some cached auth from %x", CACHED_AUTH_PATH);
+		}
+		catch (...) {
+			social_sign_in.cached_auth = {};
+			LOG("No cached auth found in %x", CACHED_AUTH_PATH);
+		}
 	}
 
 	if (social_sign_in.cached_auth.is_set()) {
@@ -2504,7 +2518,8 @@ work_result work(
 
 			menu_ltrb
 #if PLATFORM_WEB
-			, is_signed_in()
+			, is_signed_in(),
+			params.is_crazygames
 #endif
 		});
 	};
@@ -3181,10 +3196,6 @@ work_result work(
 						return false;
 					}
 
-					if (params.is_crazygames) {
-						return false;
-					}
-
 					return true;
 				}();
 
@@ -3194,9 +3205,7 @@ work_result work(
 					}
 				}
 
-				if (!params.is_crazygames) {
-					perform_social_sign_in_popup(config.prompted_for_sign_in_once);
-				}
+				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
 
 				if (const auto new_auth = get_new_auth_data()) { 
 					const auto before_sign_in = 

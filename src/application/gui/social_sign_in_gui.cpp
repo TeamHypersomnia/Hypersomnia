@@ -5,8 +5,8 @@
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/misc/imgui/imgui_controls.h"
 
-void sign_in_with_google();
 void sign_in_with_discord();
+void sign_in_with_crazygames();
 
 social_sign_in_state::social_sign_in_state(const std::string& title)
     : standard_window_mixin<social_sign_in_state>(title) 
@@ -21,7 +21,13 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	center_next_window(ImGuiCond_Always);
 
-	ImGui::SetNextWindowSize(ImVec2(450, in.prompted_once ? 260+60 : 335+60), ImGuiCond_Always);
+	auto h = in.prompted_once ? 260+60 : 335+60;
+
+	if (in.is_crazygames) {
+		h -= 60;
+	}
+
+	ImGui::SetNextWindowSize(ImVec2(450, h), ImGuiCond_Always);
 
     const auto flags = 
         ImGuiWindowFlags_NoSavedSettings |
@@ -110,27 +116,33 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	using N = assets::necessary_image_id;
 
-#if 0
-	if (login_option(N::SOCIAL_GOOGLE, "Sign in with Google")) {
-		::sign_in_with_google();
-	}
+	if (in.is_crazygames) {
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+		if (login_option(N::SOCIAL_CRAZYGAMES, "Sign in with CrazyGames")) {
+#if PLATFORM_WEB
+			::sign_in_with_crazygames();
 #endif
+		}
+	}
+	else {
+		{
+			auto sc = scoped_text_color(rgba(255, 255, 255, 230));
 
-	{
-		auto sc = scoped_text_color(rgba(255, 255, 255, 230));
+			if (login_option(N::SOCIAL_STEAM, "(opt.) Connect Discord to Steam", 1.0f, vec2(0.5, 0.2), 0.6f, "(Optional)\nUseful if you sometimes play Steam version\nand don't want a duplicate Web account.\n\nMatches played with Discord account\nwill count towards your Steam account.")) {
+				augs::open_url("https://hypersomnia.xyz/profile");
+			}
+		}
 
-		if (login_option(N::SOCIAL_STEAM, "(opt.) Connect Discord to Steam", 1.0f, vec2(0.5, 0.2), 0.6f, "(Optional)\nUseful if you sometimes play Steam version\nand don't want a duplicate Web account.\n\nMatches played with Discord account\nwill count towards your Steam account.")) {
-			augs::open_url("https://hypersomnia.xyz/profile");
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+		if (login_option(N::SOCIAL_DISCORD, "Sign in with Discord")) {
+#if PLATFORM_WEB
+			::sign_in_with_discord();
+#endif
 		}
 	}
 
-	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-
-	if (login_option(N::SOCIAL_DISCORD, "Sign in with Discord")) {
-#if PLATFORM_WEB
-		::sign_in_with_discord();
-#endif
-	}
 
 	ImGui::PopFont();
 
