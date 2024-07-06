@@ -21,12 +21,13 @@
 
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "view/ranks_info.h"
+#include "augs/misc/async_get.h"
 
 struct leaderboards_gui_internal {
-	augs::future<std::optional<httplib_result>> future_response;
+	augs::async_response_ptr future_response;
 
 	bool refresh_op_in_progress() const {
-		return future_response.valid();
+		return augs::in_progress(future_response);
 	}
 };
 
@@ -38,16 +39,16 @@ leaderboards_gui_state::leaderboards_gui_state(const std::string& title)
 
 }
 
-static all_leaderboards to_players_list(std::optional<httplib_result> result, std::string& error_message) {
+static all_leaderboards to_players_list(const augs::http_response& response, std::string& error_message) {
     using namespace httplib_utils;
 
-    if (result == std::nullopt || result.value() == nullptr) {
+	const auto status = response.status;
+	const auto& json = response.body;
+
+    if (status == -1) {
         error_message = "Couldn't connect to the server list host.";
         return {};
     }
-
-    const auto& response = result.value();
-    const auto status = response->status;
 
     LOG("Leaderboards response status: %x", status);
 
@@ -57,8 +58,6 @@ static all_leaderboards to_players_list(std::optional<httplib_result> result, st
         error_message = couldnt_download + "HTTP response: " + std::to_string(status);
         return {};
     }
-
-    const auto& json = response->body;
 
     LOG("Leaderboards response json length: %x", json.size());
 
@@ -91,14 +90,9 @@ void leaderboards_gui_state::refresh_leaderboards(const leaderboards_input in) {
 	LOG("Launching future_response");
 
 	if (const auto parsed = parsed_url(in.provider_url); parsed.valid()) {
-		data->future_response = launch_async(
-			[parsed]() -> std::optional<httplib_result> {
-				auto http_client = httplib_utils::make_client(parsed);
-
-				const auto final_location = parsed.location + "?format=json";
-
-				return httplib_utils::launch_download(*http_client, final_location.c_str());
-			}
+		data->future_response = augs::async_get(
+			parsed.get_base_url(),
+			parsed.location + "?format=json"
 		);
 	}
 	else {
@@ -125,8 +119,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		refresh_leaderboards(in);
 	}
 
-	if (valid_and_is_ready(data->future_response)) {
-		all = ::to_players_list(data->future_response.get(), error_message);
+	if (augs::is_ready(data->future_response)) {
+		all = ::to_players_list(augs::get_once(data->future_response), error_message);
 		last_checked_id = "";
 
 		refreshed_once = true;

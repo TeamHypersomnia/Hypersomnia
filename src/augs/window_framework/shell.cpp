@@ -70,7 +70,7 @@ namespace augs {
 	}
 #elif PLATFORM_WEB
 	void open_url(const std::string& url) {
-		augs::scoped_lock lk(open_url_on_main_lk);
+		auto lock = augs::scoped_lock(open_url_on_main_lk);
 		open_url_on_main = url;
 	}
 #elif PLATFORM_LINUX

@@ -168,7 +168,7 @@ std::string augs::date_time::get_readable_format(const char* fmt) const {
 	std::string result;
 
 	{
-		augs::scoped_lock lock(localtime_mutex);
+		auto lock = augs::scoped_lock(localtime_mutex);
 		std::tm local_time = *std::localtime(&t);
 		result = typesafe_sprintf("%x", std::put_time(&local_time, fmt));
 	}

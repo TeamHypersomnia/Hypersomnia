@@ -27,7 +27,7 @@ https_file_uploader::https_file_uploader(
 void https_file_uploader::worker_func() {
 	auto client = httplib_utils::make_client(parsed, 3);
 
-	LOG("Uploading to: %x, location: %x", parsed.get_scheme_host_port(), parsed.location);
+	LOG("Uploading to: %x, location: %x", parsed.get_base_url(), parsed.location);
 	client->set_keep_alive(true);
 
 	std::vector<std::byte> file_buffer;

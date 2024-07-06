@@ -11,7 +11,7 @@ struct parsed_url {
     std::string location;
     std::string query;
 
-	auto get_scheme_host_port() const {
+	auto get_base_url() const {
 		auto protocol_part = std::string("");
 		auto port_part = std::string("");
 

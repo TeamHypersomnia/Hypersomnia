@@ -23,6 +23,8 @@ namespace augs {
         using result = std::unique_ptr<response>;
         using Headers = std::unordered_map<std::string, std::string>;
 
+#if 0
+		/* dont care about this for now */
         result Post(const std::string& location, const Headers& headers, const char* body, size_t content_length, const std::string& content_type) {
             emscripten_fetch_attr_t attr;
             emscripten_fetch_attr_init(&attr);
@@ -61,6 +63,7 @@ namespace augs {
 
             return std::make_unique<response>(std::move(resp));
         }
+#endif
 
         auto Get(const std::string& location, std::function<void(std::size_t, std::size_t)> on_progress = nullptr, const Headers& headers = {}) {
 			(void)on_progress;

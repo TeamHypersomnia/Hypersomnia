@@ -60,7 +60,7 @@ std::optional<double> get_estimated_ping_to_server(const std::string& loc_id) {
         double server_lat = latlon->second.latitude;
         double server_lon = latlon->second.longitude;
 
-        augs::scoped_lock lk(lat_lon_mutex);
+        auto lock = augs::scoped_lock(lat_lon_mutex);
 
         if (player_latitude.has_value() && player_longitude.has_value()) {
             const auto ping = calculate_ping(calculate_distance(*player_latitude, *player_longitude, server_lat, server_lon));

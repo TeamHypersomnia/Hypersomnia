@@ -19,6 +19,7 @@
 
 #include "application/network/address_utils.h"
 #include "augs/templates/main_thread_queue.h"
+#include "augs/misc/async_get.h"
 
 #if PLATFORM_WEB
 #include "application/gui/calculate_server_distance.hpp"
@@ -131,11 +132,11 @@ bool server_list_entry::is_set() const {
 }
 
 struct browse_servers_gui_internal {
-	augs::future<std::optional<httplib_result>> future_response;
+	augs::async_response_ptr future_response;
 	netcode_socket_t socket;
 
 	bool refresh_op_in_progress() const {
-		return future_response.valid();
+		return augs::in_progress(future_response);
 	}
 };
 
@@ -162,16 +163,15 @@ void update_cached_time_to_event(T& server_list) {
 	);
 }
 
-static std::vector<server_list_entry> to_server_list(std::optional<httplib_result> result, std::string& error_message) {
+static std::vector<server_list_entry> to_server_list(const augs::http_response& response, std::string& error_message) {
     using namespace httplib_utils;
 
-    if (result == std::nullopt || result.value() == nullptr) {
-        error_message = "Couldn't connect to the server list host.";
-        return {};
-    }
+    const auto status = response.status;
 
-    const auto& response = result.value();
-    const auto status = response->status;
+	if (status == -1) {
+		error_message = "Couldn't connect to the server list host.";
+		return {};
+	}
 
     LOG("Server list response status: %x", status);
 
@@ -182,7 +182,7 @@ static std::vector<server_list_entry> to_server_list(std::optional<httplib_resul
         return {};
     }
 
-    const auto& bytes = response->body;
+    const auto& bytes = response.body;
 
     LOG("Server list response bytes: %x", bytes.size());
 
@@ -262,6 +262,7 @@ void browse_servers_gui_state::sync_download_server_entry(
 	*/
 
 	(void)server;
+	(void)in;
 
 	/* Todo: make async */
 	auto lbd = 
@@ -304,13 +305,9 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	LOG("Launching future_response");
 
-	data->future_response = launch_async(
-		[address = in.server_list_provider]() -> std::optional<httplib_result> {
-			LOG("Connecting to server list at: %x", address);
-
-			auto cli = httplib_utils::make_client(address);
-			return cli->Get("/server_list_binary");
-		}
+	data->future_response = augs::async_get(
+		in.server_list_provider,
+		"/server_list_binary"
 	);
 
 	LOG("refresh_server_list returns.");
@@ -794,8 +791,8 @@ void browse_servers_gui_state::show_server_list(
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
-	if (valid_and_is_ready(data->future_response)) {
-		server_list = ::to_server_list(data->future_response.get(), error_message);
+	if (augs::is_ready(data->future_response)) {
+		server_list = ::to_server_list(augs::get_once(data->future_response), error_message);
 		when_last_updated_time_to_events = 0;
 	}
 
@@ -1112,7 +1109,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			disable_content_view = true;
 		}
 
-		if (data->future_response.valid()) {
+		if (refresh_in_progress()) {
 			text_disabled("Downloading the server list...");
 			disable_content_view = true;
 		}

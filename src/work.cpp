@@ -252,7 +252,7 @@ extern "C" {
 		LOG("on_geolocation_received: lat: %x, lon: %x", lat, lon);
 
 		{
-			augs::scoped_lock lk(lat_lon_mutex);
+			auto lock = augs::scoped_lock(lat_lon_mutex);
 
 			player_latitude = lat;
 			player_longitude = lon;
@@ -317,7 +317,7 @@ augs::mutex rng_lk;
 
 extern "C" {
 	uint32_t randombytes_external(void) {
-		augs::scoped_lock lk(rng_lk);
+		auto lock = augs::scoped_lock(rng_lk);
 		return netcode_rng.random<uint32_t>();
 	}
 }
@@ -5603,7 +5603,7 @@ work_result work(
 			std::string url_to_open;
 
 			{
-				augs::scoped_lock lk(open_url_on_main_lk);
+				auto lock = augs::scoped_lock(open_url_on_main_lk);
 
 				if (!open_url_on_main.empty()) {
 					url_to_open = open_url_on_main;

@@ -43,7 +43,7 @@ public:
 
         // Lock and copy tasks to local queue, then unlock
         {
-            augs::scoped_lock lock(queueMutex);
+            auto lock = augs::scoped_lock(queueMutex);
             if (tasks.empty()) {
                 return;  // No tasks to execute, return immediately
             }
@@ -88,7 +88,7 @@ private:
 
     template<typename Func>
     void enqueue_task(Func&& func) {
-        augs::scoped_lock lock(queueMutex);
+        auto lock = augs::scoped_lock(queueMutex);
         tasks.emplace(std::forward<Func>(func));
     }
 };

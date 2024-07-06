@@ -5,6 +5,7 @@
 #include "augs/string/parse_url.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/persistent_filesystem.h"
+#include "augs/misc/async_response.h"
 
 using ad_hoc_entry_id = uint32_t;
 
@@ -100,6 +101,7 @@ public:
 
 class headless_map_catalogue {
 	std::vector<map_catalogue_entry> map_list;
+	augs::async_response_ptr future_get;
 	augs::future<std::vector<map_catalogue_entry>> future_response;
 
 	std::string list_catalogue_error;

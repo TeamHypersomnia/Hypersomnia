@@ -27,6 +27,7 @@
 #include "application/setups/editor/project/editor_project_readwrite.h"
 #include "augs/string/path_sanitization.h"
 #include "application/gui/headless_map_catalogue.hpp"
+#include "augs/misc/async_get.h"
 
 using S = map_catalogue_entry::state;
 
@@ -108,7 +109,7 @@ bool headless_map_catalogue::finalize_download() {
 }
 
 bool headless_map_catalogue::list_refresh_in_progress() const {
-	return future_response.valid();
+	return augs::in_progress(future_get) || future_response.valid();
 }
 
 void headless_map_catalogue::request_rescan() {
@@ -169,49 +170,16 @@ headless_catalogue_result headless_map_catalogue::advance(const headless_map_cat
 		downloading->advance();
 	}
 
-	if (valid_and_is_ready(future_response)) {
-		map_list = future_response.get();
-
-		should_rescan = false;
-		result = headless_catalogue_result::LIST_REFRESH_COMPLETE;
-	}
-
-	return result;
-}
-
-void headless_map_catalogue::refresh(const address_string_type address) {
-	using namespace httplib;
-	using namespace httplib_utils;
-
-	if (downloading.has_value() || list_refresh_in_progress()) {
-		return;
-	}
-
-	map_list.clear();
-	list_catalogue_error = {};
-
-	future_response = launch_async(
-		[&last_error = this->list_catalogue_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
-			if (const auto parsed = parsed_url(address); parsed.valid()) {
-				auto client = httplib_utils::make_client(parsed, 3);
-				client->set_keep_alive(true);
-
-				const auto location = parsed.location + "?format=json";
-
-				auto response = client->Get(location.c_str());
-
-				if (response == nullptr) {
-					last_error = "Response was null.";
-					return {};
-				}
-
-				if (!successful(response->status)) {
-					last_error = typesafe_sprintf("Request failed with status: %x", response->status);
+	if (augs::is_ready(future_get)) {
+		future_response = launch_async(
+			[response = augs::get_once(this->future_get), &last_error = this->list_catalogue_error, officials = this->official_names]() -> std::vector<map_catalogue_entry> {
+				if (!httplib_utils::successful(response.status)) {
+					last_error = typesafe_sprintf("Request failed with status: %x", response.status);
 					return {};
 				}
 
 				try {
-					auto result = augs::from_json_string<std::vector<map_catalogue_entry>>(response->body);
+					auto result = augs::from_json_string<std::vector<map_catalogue_entry>>(response.body);
 
 					erase_if(result, [&](const auto& e) { 
 						const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
@@ -245,11 +213,48 @@ void headless_map_catalogue::refresh(const address_string_type address) {
 
 				return {};
 			}
+		);
+	}
 
-			last_error = typesafe_sprintf("Couldn't parse URL: %x", address);
-			return {};
-		}
-	);
+	if (valid_and_is_ready(future_response)) {
+		map_list = future_response.get();
+
+		sort_range(
+			map_list,
+
+			[&](const auto& a, const auto& b) {
+				return a.version_timestamp > b.version_timestamp;
+			}
+		);
+
+		should_rescan = false;
+		result = headless_catalogue_result::LIST_REFRESH_COMPLETE;
+	}
+
+	return result;
+}
+
+void headless_map_catalogue::refresh(const address_string_type address) {
+	using namespace httplib;
+	using namespace httplib_utils;
+
+	if (downloading.has_value() || list_refresh_in_progress()) {
+		return;
+	}
+
+	map_list.clear();
+	list_catalogue_error = {};
+
+	if (const auto parsed = parsed_url(address); parsed.valid()) {
+		future_get = augs::async_get(
+			parsed.get_base_url(),
+			parsed.location + "?format=json"
+		);
+	}
+	else {
+		list_catalogue_error = typesafe_sprintf("Couldn't parse URL: %x", address);
+	}
+
 }
 
 struct multi_arena_synchronizer_internal {
@@ -279,11 +284,11 @@ multi_arena_synchronizer::multi_arena_synchronizer(
 multi_arena_synchronizer::~multi_arena_synchronizer() = default;
 
 float multi_arena_synchronizer::get_current_file_percent_complete() const {
-	if (data->external.get_total_bytes() == 0) {
+	if (data->external.get_current_total_bytes() == 0) {
 		return 0.0f;
 	}
 
-	return float(data->external.get_downloaded_bytes()) / data->external.get_total_bytes();
+	return float(data->external.get_current_downloaded_bytes()) / data->external.get_current_total_bytes();
 }
 
 void multi_arena_synchronizer::init_next_session() {

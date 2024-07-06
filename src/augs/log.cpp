@@ -123,13 +123,13 @@ void program_log::push_entry(const log_entry& new_entry) {
 }
 
 void program_log::mark_last_init_log() {
-	augs::scoped_lock lock(log_mutex);
+	auto lock = augs::scoped_lock(log_mutex);
 
 	init_logs_count = all_entries.size();
 }
 
 std::size_t program_log::get_init_logs_count() const {
-	augs::scoped_lock lock(log_mutex);
+	auto lock = augs::scoped_lock(log_mutex);
 
 	return init_logs_count;
 }
@@ -139,7 +139,7 @@ std::size_t program_log::get_init_logs_count_nomutex() const {
 }
 
 std::string program_log::get_complete() const {
-	augs::scoped_lock lock(log_mutex);
+	auto lock = augs::scoped_lock(log_mutex);
 
 	auto logs = std::string();
 
@@ -157,7 +157,7 @@ std::string& LOG_THREAD_PREFFIX() {
 
 void LOG_NOFORMAT(const std::string& s) {
 #if ENABLE_LOG 
-	augs::scoped_lock lock(log_mutex);
+	auto lock = augs::scoped_lock(log_mutex);
 
 	auto lg = [&](const auto& f) {
 		program_log::get_current().push_entry({ f });

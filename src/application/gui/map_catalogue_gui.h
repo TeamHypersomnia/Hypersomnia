@@ -9,6 +9,8 @@
 #include "augs/misc/imgui/simple_popup.h"
 #include "application/gui/headless_map_catalogue.h"
 
+#include "application/setups/client/https_file_downloader.h"
+
 namespace augs {
 	class window;
 }
@@ -32,12 +34,9 @@ struct parsed_url;
 class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_state> {
 	headless_map_catalogue headless;
 
-	augs::future<void> future_downloaded_miniatures;
-
-	std::atomic<uint32_t> has_next_miniature = 0;
-	std::vector<ad_hoc_atlas_subject> completed_miniatures;
-
+	std::optional<https_file_downloader> miniature_downloader;
 	std::vector<ad_hoc_atlas_subject> last_miniatures;
+
 	bool mark_rebuild_miniatures = false;
 
 	bool focus_on_filter_once = true;

@@ -11,7 +11,7 @@ int persistent_filesystem_holders = 0;
 
 void persistent_filesystem_sync() {
 	{
-		augs::scoped_lock lk(persistent_filesystem_lk);
+		auto lock = augs::scoped_lock(persistent_filesystem_lk);
 
 		if (persistent_filesystem_holders > 0) {
 			return;
@@ -28,7 +28,7 @@ void persistent_filesystem_sync() {
 }
 
 void persistent_filesystem_hold() {
-	augs::scoped_lock lk(persistent_filesystem_lk);
+	auto lock = augs::scoped_lock(persistent_filesystem_lk);
 	++persistent_filesystem_holders;
 	LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);
 }
@@ -37,7 +37,7 @@ void persistent_filesystem_flush() {
 	bool run = false;
 
 	{
-		augs::scoped_lock lk(persistent_filesystem_lk);
+		auto lock = augs::scoped_lock(persistent_filesystem_lk);
 		--persistent_filesystem_holders;
 
 		LOG("persistent_filesystem_hold: %x", persistent_filesystem_holders);

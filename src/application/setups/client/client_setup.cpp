@@ -1652,8 +1652,8 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 client_setup::download_progress client_setup::get_current_file_download_progress() const {
 	if (external_downloader != nullptr) {
 		return {
-			uint32_t(external_downloader->get_downloaded_bytes()),
-			uint32_t(external_downloader->get_total_bytes())
+			uint32_t(external_downloader->get_current_downloaded_bytes()),
+			uint32_t(external_downloader->get_current_total_bytes())
 		};
 	}
 

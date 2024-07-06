@@ -25,6 +25,8 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/gui/headless_map_catalogue.hpp"
 
+static const auto miniatures_directory = CACHE_DIR / "miniatures";
+
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
@@ -38,76 +40,23 @@ std::mutex miniature_mutex;
 void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 	using namespace httplib_utils;
 
-	completed_miniatures.clear();
-	completed_miniatures.resize(headless.get_map_list().size());
+	last_miniatures.clear();
+	miniature_downloader.reset();
 
-	has_next_miniature.store(0);
+	if (const auto parsed = parsed_url(in.external_arena_files_provider); parsed.valid()) {
+		augs::create_directories(miniatures_directory);
 
-	future_downloaded_miniatures = launch_async([
-		&miniature_counter = this->has_next_miniature,
-		&result = this->completed_miniatures,
-		&for_maps = this->headless.get_map_list(),
-		address = in.external_arena_files_provider
-	]() {
-			if (const auto parsed = parsed_url(address); parsed.valid()) {
-				auto client = httplib_utils::make_client(parsed, 3);
-				client->set_keep_alive(true);
+		miniature_downloader.emplace(parsed);
 
-				const auto miniatures_directory = CACHE_DIR / "miniatures";
+		for (const auto& m : headless.get_map_list()) {
+			m.miniature_id = 0;
 
-				augs::create_directories(miniatures_directory);
-
-				auto download_miniature = [&](const auto& m) {
-					/* 0 marks no miniature */
-					const auto index = index_in(for_maps, m);
-					const auto this_id = static_cast<ad_hoc_entry_id>(1 + index);
-
-					const auto miniature_filename = typesafe_sprintf("%x.png", this_id);
-
-					const auto next_path = miniatures_directory / miniature_filename;
-
-					auto set_result = [&](const ad_hoc_entry_id id) {
-						std::unique_lock<std::mutex> lock(miniature_mutex);
-						result[index] = { id, next_path };
-						++miniature_counter;
-					};
-
-					const auto location = typesafe_sprintf("%x/%x/miniature.png", parsed.location, m.name);
-
-					auto response = client->Get(location.c_str());
-
-					if (response == nullptr) {
-						set_result(0);
-						return;
-					}
-
-					if (!successful(response->status)) {
-						set_result(0);
-						return;
-					}
-
-					try {
-						augs::save_string_as_bytes(response->body, next_path);
-						set_result(this_id);
-					}
-					catch (...) {
-						set_result(0);
-					}
-				};
-
-				::in_order_of(
-					for_maps,
-					[&](const auto& entry) {
-						return entry.version_timestamp;
-					},
-					[&](const auto& a, const auto& b) {
-						return a > b;
-					},
-					download_miniature
-				);
-			}
+			const auto location = typesafe_sprintf("%x/miniature.png", m.name);
+			miniature_downloader->download_file(location);
 		}
-	);
+
+		rebuild_miniatures();
+	}
 }
 
 void map_catalogue_gui_state::rebuild_miniatures() {
@@ -117,36 +66,6 @@ void map_catalogue_gui_state::rebuild_miniatures() {
 std::optional<std::vector<ad_hoc_atlas_subject>> map_catalogue_gui_state::get_new_ad_hoc_images() {
 	if (mark_rebuild_miniatures) {
 		mark_rebuild_miniatures = false;
-		return last_miniatures;
-	}
-
-	if (has_next_miniature > 0) {
-		--has_next_miniature;
-
-		{
-			std::unique_lock<std::mutex> lock(miniature_mutex);
-			last_miniatures = completed_miniatures;
-		}
-
-		const auto& map_list = headless.get_map_list();
-
-		if (last_miniatures.size() != map_list.size()) {
-			LOG_NVPS(last_miniatures.size(), map_list.size());
-		}
-
-		ensure(last_miniatures.size() == map_list.size());
-
-		for (std::size_t i = 0; i < map_list.size(); ++i) {
-			if (i < last_miniatures.size()) {
-				map_list[i].miniature_id = last_miniatures[i].id;
-			}
-			else {
-				map_list[i].miniature_id = 0;
-			}
-		}
-
-		erase_if(last_miniatures, [](const auto& e) { return e.id == 0; });
-
 		return last_miniatures;
 	}
 
@@ -554,8 +473,48 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		}
 	}
 
-	if (valid_and_is_ready(future_downloaded_miniatures)) {
-		future_downloaded_miniatures.get();
+	if (miniature_downloader && !miniature_downloader->is_running()) {
+		miniature_downloader.reset();
+		rebuild_miniatures();
+	}
+
+	if (miniature_downloader) {
+		if (auto next_miniature = miniature_downloader->get_downloaded_file()) {
+			const auto& map_list = headless.get_map_list();
+
+			const auto current_miniature_index = last_miniatures.size();
+
+			if (current_miniature_index < map_list.size()) {
+				LOG("Finished downloading miniature %x.", current_miniature_index);
+
+				const auto this_id = static_cast<ad_hoc_entry_id>(1 + current_miniature_index);
+
+				const auto miniature_filename = typesafe_sprintf("%x.png", this_id);
+				const auto next_path = miniatures_directory / miniature_filename;
+
+				const auto new_subject = ad_hoc_atlas_subject { this_id, next_path };
+				last_miniatures.push_back(new_subject);
+
+				augs::save_string_as_bytes(next_miniature->second, next_path);
+
+				map_list[current_miniature_index].miniature_id = this_id;
+
+#if WEB_LOWEND
+				if (current_miniature_index == 7) {
+					/* Only rebuild the first few visible and then wait until completion */
+					rebuild_miniatures();
+				}
+#else
+				rebuild_miniatures();
+#endif
+			}
+
+			if (last_miniatures.size() == map_list.size()) {
+				LOG("Finished downloading all miniatures.");
+				miniature_downloader.reset();
+				rebuild_miniatures();
+			}
+		}
 	}
 
 	bool address_modified = false;
@@ -875,7 +834,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 }
 
 bool map_catalogue_gui_state::refresh_in_progress() const {
-	return headless.list_refresh_in_progress() || future_downloaded_miniatures.valid();
+	return headless.list_refresh_in_progress() || miniature_downloader.has_value();
 }
 
 void map_catalogue_gui_state::refresh(const address_string_type address) {

@@ -46,7 +46,7 @@ namespace augs {
 			) {
 				formatted_string result;
 
-				augs::scoped_lock lock(log_mutex);
+				auto lock = augs::scoped_lock(log_mutex);
 
 				const auto& current = program_log::get_current();
 				auto& entries = current.all_entries;

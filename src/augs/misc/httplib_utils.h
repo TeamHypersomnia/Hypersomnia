@@ -46,6 +46,6 @@ namespace httplib_utils {
 	}
 
 	inline auto make_client(const parsed_url& parsed, const int io_timeout = 5) {
-		return make_client(parsed.get_scheme_host_port(), io_timeout);
+		return make_client(parsed.get_base_url(), io_timeout);
 	}
 }

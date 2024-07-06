@@ -166,7 +166,7 @@ int main(const int argc, const char* const * const argv) {
 	augs::create_directories(LOGS_DIR);
 
 	{
-		augs::scoped_lock lock(log_mutex);
+		auto lock = augs::scoped_lock(log_mutex);
 
 		::current_app_type = params.type;
 

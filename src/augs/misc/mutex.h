@@ -6,12 +6,16 @@ namespace augs {
 	struct lock_dummy {
 		template <class... T>
 		lock_dummy(T...) {}
+
+		~lock_dummy() {}
 	};
 
 	template <class... A>
 	struct unique_lock {
 		template <class... T>
 		unique_lock(T...) {}
+
+		~unique_lock() {}
 	};
 
 	using mutex = int;
@@ -20,7 +24,9 @@ namespace augs {
 	using mutex = std::mutex;
 
 	template <class... A>
-	using scoped_lock = std::scoped_lock<A...>;
+	auto scoped_lock(A&&... args) {
+		return std::scoped_lock(std::forward<A>(args)...);
+	}
 
 	template <class... A>
 	using unique_lock = std::unique_lock<A...>;
