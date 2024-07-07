@@ -2117,10 +2117,14 @@ work_result work(
 		});
 
 #if PLATFORM_WEB
+
 #if IS_PRODUCTION_BUILD
-		if (requires_sign_in)
+		const bool send_auth = requires_sign_in;
+#else
+		const bool send_auth = true;
 #endif
-		{
+
+		if (send_auth) {
 			/*
 				At this point we verified we're signed in.
 			*/
@@ -2131,6 +2135,9 @@ work_result work(
 				auto& cached_auth = social_sign_in.cached_auth;
 				setup.send_auth_ticket(cached_auth);
 			});
+		}
+		else {
+			LOG("Server doesn't require sign in.");
 		}
 #endif
 

@@ -39,15 +39,21 @@ inline std::string fetch_crazygames_public_key() {
     return doc["publicKey"].GetString();
 }
 
-inline std::string base64_decode(const std::string& in) {
+inline std::string base64_url_decode(const std::string& in) {
+    std::string modified_in = in;
+    std::replace(modified_in.begin(), modified_in.end(), '-', '+');
+    std::replace(modified_in.begin(), modified_in.end(), '_', '/');
+    while (modified_in.size() % 4) {
+        modified_in.push_back('=');
+    }
     std::string out;
     std::vector<unsigned char> decoded_data;
     BIO* b64 = BIO_new(BIO_f_base64());
-    BIO* bio = BIO_new_mem_buf(in.data(), static_cast<int>(in.size()));
+    BIO* bio = BIO_new_mem_buf(modified_in.data(), static_cast<int>(modified_in.size()));
     bio = BIO_push(b64, bio);
     BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
-    decoded_data.resize(in.size());
-    int len = BIO_read(bio, decoded_data.data(), static_cast<int>(in.size()));
+    decoded_data.resize(modified_in.size());
+    int len = BIO_read(bio, decoded_data.data(), static_cast<int>(modified_in.size()));
     BIO_free_all(bio);
     out.assign(decoded_data.begin(), decoded_data.begin() + len);
     return out;
@@ -71,7 +77,14 @@ bool verify_jwt_rs256(const std::string& token, const std::string& public_key) {
     }
 
     std::string header_and_payload = parts[0] + "." + parts[1];
-    std::string signature = base64_decode(parts[2]);
+    std::string signature = base64_url_decode(parts[2]);
+
+	LOG("Token: %x", token);
+#if 0
+    LOG("Header and Payload: %x", header_and_payload.c_str());
+	LOG("Signature: %x", parts[2]);
+    LOG("Signature (Base64 decoded): %x", signature.c_str());
+#endif
 
     BIO* keybio = BIO_new_mem_buf(public_key.data(), -1);
     EVP_PKEY* evp_key = PEM_read_bio_PUBKEY(keybio, nullptr, nullptr, nullptr);
@@ -111,7 +124,9 @@ std::string verify_crazygames_token(const std::string& token) {
 
         if (verify_jwt_rs256(token, public_key)) {
             auto parts = split_jwt(token);
-            std::string decoded_payload = base64_decode(parts[1]);
+            const auto decoded_payload = base64_url_decode(parts[1]);
+
+            LOG("Decoded payload: %x", decoded_payload);
 
             rapidjson::Document payload_json;
             payload_json.Parse(decoded_payload.c_str());
@@ -120,6 +135,28 @@ std::string verify_crazygames_token(const std::string& token) {
                 LOG("Failed to parse token payload: %x", rapidjson::GetParseError_En(payload_json.GetParseError()));
                 return "";
             }
+
+			// Check the token expiration time
+			if (!payload_json.HasMember("exp") || !payload_json["exp"].IsInt64()) {
+				LOG("Token has no valid expiration claim");
+				return "";
+			}
+
+			int64_t exp = payload_json["exp"].GetInt64();
+			int64_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+
+			if (current_time >= exp) {
+				LOG("Token has expired");
+				return "";
+			}
+
+			if (payload_json.HasMember("userId") && payload_json["userId"].IsString()) {
+				return payload_json["userId"].GetString();
+			}
+			else {
+				LOG("userId not found in token payload");
+				return "";
+			}
 
             if (payload_json.HasMember("userId") && payload_json["userId"].IsString()) {
                 return payload_json["userId"].GetString();

@@ -55,7 +55,10 @@
 #include "steam_integration.h"
 #include <queue>
 
+#if !PLATFORM_WEB
 #include "augs/misc/verify_token.hpp"
+#endif
+
 #include "augs/templates/bit_cast.h"
 #include "augs/templates/main_thread_queue.h"
 
