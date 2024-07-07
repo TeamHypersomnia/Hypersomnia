@@ -7128,3 +7128,12 @@ This will discard your redo history."
         - Let MS resolve official addresses
 - resolve_address -> address_utils
 - update weapon stats page
+
+- port sync download sever entry
+    - need it anyway for invite link
+        - or do we? crazygames version should likely just show CG invite link
+- port avatar downloading
+- port https downloader
+
+- okay i think i get why shared ptr is required
+    - its so we can overwrite that async response if we no longer need it

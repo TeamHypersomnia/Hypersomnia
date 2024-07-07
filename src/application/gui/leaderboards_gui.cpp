@@ -144,14 +144,16 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	using namespace augs::imgui;
 
+	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+
 #if WEB_LOWEND
 	const auto menu_bottom_margin_v = 30.0f;
+	const auto w = std::min(1920/2.5f, screen_size.x/2.f);
 #else
 	const auto menu_bottom_margin_v = 70.0f;
+	const auto w = screen_size.x/2.5f;
 #endif
 
-	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
-	const auto w = screen_size.x/2.5f;
 	//const auto h = screen_size.y/1.3f;
 	const auto padding = vec2i(70-14, menu_bottom_margin_v-10);
 
@@ -379,7 +381,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
 		}
 
+#if !WEB_LOWEND
 		ImGui::SameLine();
+#endif
 
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 		text_color(our_rank.name, our_rank.name_color);
@@ -432,8 +436,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		const auto avail_x = ImGui::GetContentRegionAvail().x;
 
+#if WEB_LOWEND
+#define MMR_label "MMR"
+#else
+#define MMR_label "MMR (OpenSkill)"
+#endif
 		const auto col0_w = ImGui::CalcTextSize("Place 99").x;
-		const auto col2_w = ImGui::CalcTextSize("MMR (OpenSkill) 99999").x;
+		const auto col2_w = ImGui::CalcTextSize(MMR_label " 99999").x;
 		const auto col1_w = avail_x - col0_w - col2_w;
 
 		const auto approx_contwidth = col0_w + col1_w + col2_w;
@@ -451,7 +460,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::NextColumn();
 		text_disabled("Name");
 		ImGui::NextColumn();
-		text_disabled("MMR (OpenSkill)");
+		text_disabled(MMR_label);
 		ImGui::NextColumn();
 
 		ImGui::Separator();
@@ -521,7 +530,10 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 					const auto entry = in.necessary_images.at(this_rank.icon);
 
 					augs::imgui::game_image_button("##RankIcon", entry, entry.get_original_size(), {}, augs::imgui_atlas_type::GAME);
+
+#if !WEB_LOWEND
 					ImGui::SameLine();
+#endif
 
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 					text_color(this_rank.name, this_rank.name_color);

@@ -291,9 +291,17 @@ void main_menu_setup::draw_overlays(
 
 	print_stroked(
 		output,
+#if WEB_LOWEND
+		vec2i(screen_size.x - padding.x, padding.y),
+#else
 		vec2i(screen_size.x, screen_size.y) - padding,
+#endif
 		description + build_number_text,
+#if WEB_LOWEND
+		{ augs::ralign::R, augs::ralign::T }
+#else
 		{ augs::ralign::R, augs::ralign::B }
+#endif
 	);
 }
 

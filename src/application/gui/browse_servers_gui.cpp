@@ -822,7 +822,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
+#if WEB_LOWEND
+	centered_size_mult = vec2(0.97f, 0.96f);
+#else
 	centered_size_mult = vec2(0.8f, 0.7f);
+#endif
 
 	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking);
 
@@ -995,20 +999,37 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	auto do_list_view = [&](bool disable_content_view) {
-		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
+		const auto max_sname = 35;
+
+		const auto avail_x = ImGui::GetContentRegionAvail().x;
+
+		float col_1 = ImGui::CalcTextSize("9999999").x;
+		float col_3 = ImGui::CalcTextSize("99h 99m 9").x;
+		float col_4 = ImGui::CalcTextSize("Players  9").x;
+		float col_5 = ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2);
+		float col_6 = ImGui::CalcTextSize("Capture the flag 9").x;
+		float col_7 = ImGui::CalcTextSize("9").x * 25;
+
+		float total_width = col_1 + col_3 + col_4 + col_5 + col_6 + col_7;
+
+		float col_2 = std::max(ImGui::CalcTextSize("9").x * (max_sname - 5) - 4, avail_x - total_width);
+		total_width += col_2;
+
+		auto child = scoped_child("list view", ImVec2(total_width, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)), false, ImGuiWindowFlags_HorizontalScrollbar);
 
 		if (disable_content_view) {
 			return;
 		}
 
 		ImGui::Columns(num_columns);
-		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
-		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * (max_server_name_length_v-5) - 4);
-		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9d 99h 99m 99s 9").x);
-		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2));
-		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("Capture the fla(FFA)").x);
-		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
+
+		ImGui::SetColumnWidth(0, col_1);
+		ImGui::SetColumnWidth(1, col_2);
+		ImGui::SetColumnWidth(2, col_3);
+		ImGui::SetColumnWidth(3, col_4);
+		ImGui::SetColumnWidth(4, col_5);
+		ImGui::SetColumnWidth(5, col_6);
+		ImGui::SetColumnWidth(6, col_7);
 
 		int current_col = 0;
 
@@ -1051,7 +1072,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			do_column("Players");
 			do_column("Arena");
 			do_column("Game mode");
-			do_column("First appeared");
+			do_column("Appeared");
 
 			ImGui::Separator();
 		};
@@ -1140,7 +1161,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			ImGui::SameLine();
 			auto input = std::to_string(val);
-			input_text(val == 1 ? "player###numbox" : "players###numbox", input);
+			input_text(val == 1 ? "player###playernumbox" : "players###playernumbox", input);
 			val = std::clamp(std::atoi(input.c_str()), 1, int(max_incoming_connections_v));
 		}
 
@@ -1156,7 +1177,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			ImGui::SameLine();
 			auto input = std::to_string(val);
-			input_text(val == 1 ? "ping###numbox" : "ping###numbox", input);
+			input_text(val == 1 ? "ping###pingnumbox" : "ping###pingnumbox", input);
 			val = std::clamp(std::atoi(input.c_str()), 0, int(999));
 		}
 

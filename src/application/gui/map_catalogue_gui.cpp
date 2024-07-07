@@ -28,7 +28,11 @@
 static const auto miniatures_directory = CACHE_DIR / "miniatures";
 
 constexpr auto miniature_size_v = 80;
+#if WEB_LOWEND
+constexpr auto preview_size_v = 150;
+#else
 constexpr auto preview_size_v = 400;
+#endif
 
 editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
 
@@ -122,7 +126,11 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	ImGui::Columns(num_columns);
 
 	if (num_columns > 1) {
-		ImGui::SetColumnWidth(0, avail.x * 0.8f);
+		const auto max_w = ImGui::CalcTextSize("999 days ago 99").x;
+		const auto ago_col_w = std::max(max_w, avail.x * 0.2f);
+		const auto first_col_w = avail.x - ago_col_w;
+
+		ImGui::SetColumnWidth(0, first_col_w);
 	}
 
 	do_column("Name");
@@ -356,15 +364,19 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		text(arena_name);
 		ImGui::SameLine();
 
+#if !WEB_LOWEND
 		if (!in.streamer_mode) {
 			text_disabled("- by " + entry.author);
 		}
+#endif
 
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
 		if (!in.streamer_mode) {
+			ImGui::PushTextWrapPos();
 			text_disabled(entry.short_description);
+			ImGui::PopTextWrapPos();
 		}
 
 		ImGui::SetCursorPos(after_pos);
@@ -455,7 +467,11 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		return false;
 	}
 
+#if WEB_LOWEND
+	centered_size_mult = vec2(0.95f, 0.95f);
+#else
 	centered_size_mult = vec2(0.9f, 0.8f);
+#endif
 
 	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
 
@@ -645,11 +661,6 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 						auto scope = scoped_child("descview", ImVec2(0, 0), true);
 
 						text(std::string(entry.name));
-						ImGui::SameLine();
-
-						if (!in.streamer_mode) {
-							text_disabled(std::string("- by ") + entry.author);
-						}
 
 						ImGui::Separator();
 
@@ -667,6 +678,8 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 						ImGui::PushTextWrapPos();
 
 						if (!in.streamer_mode) {
+							text_disabled(std::string("By: ") + entry.author);
+
 							text_color(entry.short_description, rgba(210, 210, 210, 255));
 						}
 

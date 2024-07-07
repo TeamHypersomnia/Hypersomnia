@@ -260,19 +260,32 @@ std::string augs::date_time::format_countdown_letters(const int64_t secs) {
 
 	std::stringstream ss;
 
+	int n = 0;
+
 	if (days > 0) {
 		ss << days << "d ";
+		++n;
 	}
 
 	// Include hours if days > 0 or hours > 0. If days > 0 but hours == 0, include "0h "
 	if (days > 0 || hours > 0) {
 		ss << hours << "h ";
+		++n;
+	}
+
+	if (n >= 2) {
+		return ss.str();
 	}
 
 	// Include minutes if hours > 0, days > 0 or minutes > 0. 
 	// If days > 0 or hours > 0 but minutes == 0, include "0m "
 	if (hours > 0 || days > 0 || minutes > 0) {
 		ss << minutes << "m ";
+		++n;
+	}
+
+	if (n >= 2) {
+		return ss.str();
 	}
 
 	// Seconds are always included, as they are the smallest unit of time here

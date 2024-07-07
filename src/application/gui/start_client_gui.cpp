@@ -81,7 +81,11 @@ bool start_client_gui_state::perform(
 	
 	using namespace augs::imgui;
 
+#if WEB_LOWEND
+	centered_size_mult = vec2(0.55f, 0.7f);
+#else
 	centered_size_mult = vec2(0.55f, 0.4f);
+#endif
 	
 	auto imgui_window = make_scoped_window();
 

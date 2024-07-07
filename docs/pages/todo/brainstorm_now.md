@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- maybe dont show the social login screen until we know for sure
+
+- update presskit with all pepper/reddit/liam links etc
+
+
+- refresh crazygames token on connect or make aggressive timeout assumption
+    - use 30 secs margin instead of 5 eg
+
 - crazygames audio perf: we can measure total time elapsed for processed commands and break out after 10 ms
     - will be crucial to preserve responsiveness
     - and just append commands to the single vector
