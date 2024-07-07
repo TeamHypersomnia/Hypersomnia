@@ -65,7 +65,7 @@ namespace augs {
         }
 #endif
 
-        auto Get(const std::string& location, std::function<void(std::size_t, std::size_t)> on_progress = nullptr, const Headers& headers = {}) {
+        result Get(const std::string& location, std::function<void(std::size_t, std::size_t)> on_progress = nullptr, const Headers& headers = {}) {
 			(void)on_progress;
 
             emscripten_fetch_attr_t attr;
@@ -109,7 +109,7 @@ namespace augs {
             return std::make_unique<response>(std::move(resp));
         }
 
-		auto Get(const std::string& location, const Headers& headers, std::function<void(std::size_t, std::size_t)> on_progress = nullptr) {
+		result Get(const std::string& location, const Headers& headers, std::function<void(std::size_t, std::size_t)> on_progress = nullptr) {
 			return Get(location, on_progress, headers);
 		}
 

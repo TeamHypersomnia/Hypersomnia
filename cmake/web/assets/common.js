@@ -2,9 +2,26 @@ const ipinfo_endpoint = 'https://hypersomnia.xyz/geolocation';
 const clientIdDiscord = '1189671952479158403';
 const revoke_origin = 'https://hypersomnia.xyz';
 
+function downloadAvatar(avatarUrl, callback) {
+  fetch(avatarUrl)
+    .then(response => response.arrayBuffer())
+    .then(buffer => {
+      const byteArray = new Uint8Array(buffer);
+      callback(byteArray);
+    })
+    .catch(error => {
+      console.error('Error downloading avatar:', error);
+      callback(new Uint8Array());
+    });
+}
+
 function passAuthDataToCpp(provider, profileId, profileName, avatarUrl, authToken, expiresIn) {
-  Module.ccall('on_auth_data_received', 'void', ['string', 'string', 'string', 'string', 'string', 'number'],
-    [provider, profileId, profileName, avatarUrl, authToken, expiresIn]);
+  downloadAvatar(avatarUrl, (avatarByteArray) => {
+    Module.ccall('on_auth_data_received', 'void', 
+      ['string', 'string', 'string', 'array', 'number', 'string', 'number'],
+      [provider, profileId, profileName, avatarByteArray, avatarByteArray.length, authToken, expiresIn]
+    );
+  });
 }
 
 function getUserGeolocation() {

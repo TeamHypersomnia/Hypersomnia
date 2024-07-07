@@ -20,7 +20,7 @@ void persistent_filesystem_sync() {
 
 	LOG("persistent_filesystem_sync");
 
-	main_thread_queue::get_instance().execute(
+	main_thread_queue::execute(
 		[]() {
 			call_syncFileSystem();
 		}

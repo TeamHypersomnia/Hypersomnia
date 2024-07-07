@@ -1,4 +1,6 @@
-#if PLATFORM_WEB
+#pragma once
+
+#if PLATFORM_WEB && !WEB_SINGLETHREAD
 #include <iostream>
 #include <thread>
 #include "augs/misc/mutex.h"
@@ -14,8 +16,8 @@ public:
         return instance;
     }
 
-	void save_main_thread_id() {
-		main_thread_id = std::this_thread::get_id();
+	static void save_main_thread_id() {
+		get_instance().main_thread_id = std::this_thread::get_id();
 	}
 
     template<typename Func>
@@ -38,16 +40,18 @@ public:
         }
     }
 
-    void process_tasks() {
+    static void process_tasks() {
+		auto& self = get_instance();
+
         std::queue<std::function<void()>> localTasks;
 
         // Lock and copy tasks to local queue, then unlock
         {
-            auto lock = augs::scoped_lock(queueMutex);
-            if (tasks.empty()) {
+            auto lock = augs::scoped_lock(self.queueMutex);
+            if (self.tasks.empty()) {
                 return;  // No tasks to execute, return immediately
             }
-            std::swap(tasks, localTasks);
+            std::swap(self.tasks, localTasks);
         }
 
         // Process all tasks in the local queue without holding the mutex
@@ -104,5 +108,13 @@ public:
     static void execute_async(Func&& func) {
         func();
     }
+
+	static void save_main_thread_id() {
+
+	}
+
+    static void process_tasks() {
+
+	}
 };
 #endif

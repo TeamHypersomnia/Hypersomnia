@@ -46,10 +46,11 @@ struct web_auth_data {
 
 	std::string profile_name;
 	std::string profile_id;
-	std::string avatar_url;
 	std::string auth_token;
 	double expire_timestamp = 0.0;
 	// END GEN INTROSPECTOR
+
+	std::vector<std::byte> avatar_bytes;
 
 	bool is_set() const {
 		return type != auth_provider_type::COUNT;

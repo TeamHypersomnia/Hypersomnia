@@ -218,6 +218,7 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
     return new_server_list;
 }
 
+#if !WEB_SINGLETHREAD
 void browse_servers_gui_state::open_matching_server_entry(
 	const browse_servers_input in,
 	const client_connect_string& server
@@ -279,8 +280,13 @@ void browse_servers_gui_state::sync_download_server_entry(
 		}
 	;
 
-	server_list = ::to_server_list(lbd(), error_message);
+	auto result = lbd();
+
+	if (result.has_value() && *result != nullptr) {
+		server_list = ::to_server_list( { (*result)->status, (*result)->body } , error_message);
+	}
 }
+#endif
 
 bool browse_servers_gui_state::refreshed_at_least_once() const {
 	return when_last_started_refreshing_server_list != 0;

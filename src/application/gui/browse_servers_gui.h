@@ -106,7 +106,14 @@ public:
 
 	bool perform(browse_servers_input);
 
+#if !WEB_SINGLETHREAD
 	void sync_download_server_entry(browse_servers_input, const client_connect_string& in);
+
+	void open_matching_server_entry(
+		const browse_servers_input in,
+		const client_connect_string& server
+	);
+#endif
 
 #if BUILD_NATIVE_SOCKETS
 	void advance_ping_logic();
@@ -124,9 +131,4 @@ public:
 	void select_server(const server_list_entry&);
 
 	bool refresh_in_progress() const;
-
-	void open_matching_server_entry(
-		const browse_servers_input in,
-		const client_connect_string& server
-	);
 };

@@ -1,7 +1,8 @@
 #pragma once
 #include "application/main/auth_provider_type.h"
+#include "augs/misc/mutex.h"
 
-std::mutex pending_auth_datas_lk;
+augs::mutex pending_auth_datas_lk;
 std::optional<web_auth_data> new_auth_data;
 
 void sign_in_with_crazygames() {
@@ -47,7 +48,7 @@ inline void web_auth_data::log_out() {
 }
 
 auto has_new_auth_data() {
-	std::scoped_lock lk(pending_auth_datas_lk);
+	auto lock = augs::scoped_lock(pending_auth_datas_lk);
 	return new_auth_data.has_value();
 }
 
@@ -55,7 +56,7 @@ auto get_new_auth_data() {
 	std::optional<web_auth_data> new_auth;
 
 	{
-		std::scoped_lock lk(pending_auth_datas_lk);
+		auto lock = augs::scoped_lock(pending_auth_datas_lk);
 		new_auth = new_auth_data;
 		new_auth_data.reset();
 	}
@@ -69,14 +70,15 @@ extern "C" {
 		const char* provider,
 		const char* profile_id,
 		const char* profile_name,
-		const char* avatar_url,
+		const uint8_t* avatar_byte_array,
+		int avatar_byte_array_length,
 		const char* auth_token,
 		int expires_in
 	) {
 		LOG("on_auth_data_received");
 
 #if !IS_PRODUCTION_BUILD
-		LOG_NVPS(provider, profile_id, profile_name, avatar_url, auth_token, expires_in);
+		LOG_NVPS(provider, profile_id, profile_name, avatar_byte_array_length, auth_token, expires_in);
 #endif
 
 		const auto now = augs::secs_since_epoch();
@@ -89,17 +91,22 @@ extern "C" {
 
 		LOG_NVPS(long(now), long(expire_timestamp));
 
-		std::scoped_lock lk(pending_auth_datas_lk);
+		auto lock = augs::scoped_lock(pending_auth_datas_lk);
 
 		const auto type = ::get_auth_provider_type(provider);
+
+		const auto ptr = reinterpret_cast<const std::byte*>(avatar_byte_array);
+
+		auto avatar_data = std::vector<std::byte>(ptr, ptr + avatar_byte_array_length);
 
 		new_auth_data.emplace(web_auth_data {
 			type,
 			profile_name,
 			typesafe_sprintf("%x%x", get_provider_preffix(type), profile_id),
-			avatar_url,
 			auth_token,
-			expire_timestamp
+			expire_timestamp,
+
+			std::move(avatar_data)
 		});
 	}
 }

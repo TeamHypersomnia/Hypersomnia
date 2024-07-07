@@ -265,6 +265,15 @@ extern "C" {
 #endif
 
 #if PLATFORM_WEB
+
+EM_JS(void, call_sdk_invite_link, (const char* connect_string), {
+	Module.sdk_invite_link(connect_string);
+});
+
+void web_sdk_invite_link(const std::string& connect_string) {
+	call_sdk_invite_link(connect_string.c_str());
+}
+
 void web_sdk_gameplay_start() {
 	main_thread_queue::execute([&]() {
 		EM_ASM({
@@ -301,6 +310,7 @@ void web_sdk_gameplay_start() {}
 void web_sdk_gameplay_stop() {}
 void web_sdk_loading_start() {}
 void web_sdk_loading_stop() {}
+void web_sdk_invite_link(const std::string&) {}
 #endif
 
 #include "augs/persistent_filesystem.hpp"
@@ -335,7 +345,7 @@ work_result work(
 	const char* const * const argv
 ) try {
 #if PLATFORM_WEB
-	main_thread_queue::get_instance().save_main_thread_id();
+	main_thread_queue::save_main_thread_id();
 #endif
 
 	web_sdk_loading_start();
@@ -3221,38 +3231,26 @@ work_result work(
 
 					augs::save_as_json(*new_auth, CACHED_AUTH_PATH);
 
-					bool downloaded = false;
+					bool has_avatar = false;
 
-					if (auto parsed = parsed_url(new_auth->avatar_url); parsed.valid()) {
-						LOG("Downloading avatar from: %x", new_auth->avatar_url);
+					try {
+						augs::image avatar;
 
-						auto cli = httplib_utils::make_client(parsed);
+						avatar.from_png_bytes(new_auth->avatar_bytes, "new_auth->avatar_bytes");
 
-						if (auto resp = cli->Get(parsed.location)) {
-							try {
-								augs::image avatar;
+						on_specific_setup([&](test_scene_setup& setup) {
+							setup.set_new_avatar(new_auth->avatar_bytes);
+						});
 
-								auto avatar_bytes = augs::string_to_bytes(resp->body);
-								avatar.from_png_bytes(avatar_bytes, parsed.location);
+						const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+						avatar.scale(vec2u::square(max_s));
+						avatar.save_as_png(CACHED_AVATAR);
 
-								on_specific_setup([&](test_scene_setup& setup) {
-									setup.set_new_avatar(avatar_bytes);
-								});
-
-								const auto max_s = static_cast<unsigned>(max_avatar_side_v);
-								avatar.scale(vec2u::square(max_s));
-								avatar.save_as_png(CACHED_AVATAR);
-
-								streaming.requested_avatar_preview = CACHED_AVATAR;
-								downloaded = true;
-							}
-							catch (...) {
-								LOG("Failed to load the downloaded avatar.");
-							}
-						}
-						else {
-							LOG("Failed GET the avatar.");
-						}
+						streaming.requested_avatar_preview = CACHED_AVATAR;
+						has_avatar = true;
+					}
+					catch (...) {
+						LOG("Failed to load the downloaded avatar.");
 					}
 
 					change_with_save(
@@ -3262,7 +3260,7 @@ work_result work(
 							cfg.client.nickname = social_sign_in.cached_auth.profile_name;
 							cfg.prompted_for_sign_in_once = true;
 
-							if (downloaded) {
+							if (has_avatar) {
 								cfg.client.avatar_image_path = CACHED_AVATAR;
 							}
 						}
@@ -3595,10 +3593,17 @@ work_result work(
 								return;
 							}
 
-							browse_servers_gui.open_matching_server_entry(
-								get_browse_servers_input(),
-								setup.get_connect_string()
-							);
+							if (params.is_crazygames) {
+								web_sdk_invite_link(setup.get_connect_string());
+							}
+							else {
+#if !WEB_SINGLETHREAD
+								browse_servers_gui.open_matching_server_entry(
+									get_browse_servers_input(),
+									setup.get_connect_string()
+								);
+#endif
+							}
 						}
 					});
 				}
@@ -5583,7 +5588,7 @@ work_result work(
 #if PLATFORM_WEB
 		(void)thread_pool;
 
-		main_thread_queue::get_instance().process_tasks();
+		main_thread_queue::process_tasks();
 
 		if (!buffer_swapper.can_swap_buffers()) {
 			return true;

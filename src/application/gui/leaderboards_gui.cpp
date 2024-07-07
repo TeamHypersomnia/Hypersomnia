@@ -166,12 +166,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	(void)rb_pos;
 	(void)menu_pos;
 
-	const auto col0_w = ImGui::CalcTextSize("Place 99").x;
-	const auto col1_w = ImGui::CalcTextSize("9").x * max_nickname_length_v;
-	const auto col2_w = ImGui::CalcTextSize("MMR (OpenSkill) 99999").x;
-
-	const auto approx_contwidth = col0_w + col1_w + col2_w;
-
 	ImGui::SetNextWindowSize(ImVec2(w,h), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(rb_pos, ImGuiCond_Always);
 
@@ -436,9 +430,17 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			filter_with_hint(filter, "##HierarchyFilter", "Search players...");
 		}
 
+		const auto avail_x = ImGui::GetContentRegionAvail().x;
+
+		const auto col0_w = ImGui::CalcTextSize("Place 99").x;
+		const auto col2_w = ImGui::CalcTextSize("MMR (OpenSkill) 99999").x;
+		const auto col1_w = avail_x - col0_w - col2_w;
+
+		const auto approx_contwidth = col0_w + col1_w + col2_w;
+
 		ImGui::SetNextWindowContentSize(ImVec2(approx_contwidth, 0));
 
-		auto child = scoped_child("players view", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
+		auto child = scoped_child("players view", ImVec2(0,0), false);
 
 		ImGui::Columns(3);
 		ImGui::SetColumnWidth(0, col0_w);
