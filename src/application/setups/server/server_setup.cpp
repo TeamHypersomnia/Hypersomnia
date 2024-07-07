@@ -55,6 +55,7 @@
 #include "steam_integration.h"
 #include <queue>
 
+#include "augs/misc/verify_token.hpp"
 #include "augs/templates/bit_cast.h"
 #include "augs/templates/main_thread_queue.h"
 
@@ -985,11 +986,6 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 
 std::string get_hex_representation(const std::byte*, size_t length);
 
-template <class T=std::string, class F>
-std::optional<T> GetIf(F& from, const std::string& label) {
-	return augs::json_find<T>(from, label);
-}
-
 void server_setup::request_auth(mode_player_id player_id, const auth_request_payload& payload) {
 #if PLATFORM_WEB
 	(void)player_id;
@@ -1004,59 +1000,13 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 			player_id,
 
 			[api_key, ticket_hex]() {
-				auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
+				const auto result = verify_steam_token(api_key, ticket_hex);
 
-				const auto appid = std::to_string(::steam_get_appid());
-				const auto identity = "hypersomnia_gameserver";
-
-				httplib::Params params;
-				params.emplace("key", api_key);
-				params.emplace("appid", appid);
-				params.emplace("ticket", ticket_hex);
-				params.emplace("identity", identity);
-
-				const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
-
-				if (result) {
-					if (httplib_utils::successful(result->status)) {
-						LOG("Steam auth response: %x", result->body);
-
-						try {
-							auto doc = augs::json_document_from(result->body);
-
-							if (doc.HasMember("response") && doc["response"].HasMember("params")) {
-								auto& params = doc["response"]["params"];
-
-								if (GetIf<bool>(params, "publisherbanned") == true) {
-									LOG("Banned by the publisher.");
-									return std::string("publisherbanned");
-								}
-
-								if (GetIf(params, "result") == "OK") {
-									if (auto steamid = GetIf(params, "steamid")) {
-										LOG("Detected Steam ID: %x", *steamid);
-										return std::string("steam_") + *steamid;
-									}
-								}
-							}
-
-							LOG("Failed to deserialize Steam auth response. Schema is out of date.");
-							return std::string("");
-						}
-						catch (const augs::json_deserialization_error& err ) {
-							LOG("Failed to deserialize Steam auth response. Reason: %x", err.what());
-							return std::string("");
-						}
-					}
-					else {
-						LOG("Steam auth failed, http code: %x", result->status);
-						return std::string("");
-					}
+				if (result.empty() || result == "publisherbanned") {
+					return result;
 				}
-				else {
-					LOG("Steam auth failed: no HTTPS response!");
-					return std::string("");
-				}
+
+				return std::string("steam_") + result;
 			}
 		);
 	};
@@ -1066,49 +1016,24 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 			player_id,
 
 			[payload]() {
-				if (payload.type == auth_provider_type::DISCORD) {
-					auto http_client = httplib_utils::make_client("discord.com", 4);
-
-					httplib::Headers headers = {
-						{"Authorization", "Bearer " + augs::bytes_to_string(payload.ticket_bytes) }
-					};
-
-					const auto result = http_client->Get("/api/v10/users/@me", headers);
-
-					if (result) {
-						if (httplib_utils::successful(result->status)) {
-							LOG("Discord auth response: %x", result->body);
-
-							try {
-								auto doc = augs::json_document_from(result->body);
-
-								if (doc.IsObject()) {
-									if (auto id = GetIf(doc, "id")) {
-										return get_provider_preffix(payload.type) + *id;
-									}
-								}
-
-								LOG("Failed to deserialize Discord auth response. Schema is out of date.");
-								return std::string("");
-							}
-							catch (const augs::json_deserialization_error& err) {
-								LOG("Failed to deserialize Discord auth response. Reason: %x", err.what());
-								return std::string("");
-							}
-						}
-						else {
-							LOG("Discord auth failed, http code: %x", result->status);
-							return std::string("");
-						}
+				const auto token_str = augs::bytes_to_string(payload.ticket_bytes);
+				const auto result_id = [&]() {
+					if (payload.type == auth_provider_type::CRAZYGAMES) {
+						return verify_crazygames_token(token_str);
 					}
-					else {
-						LOG("Discord auth failed: no HTTPS response!");
-						return std::string("");
+					else if (payload.type == auth_provider_type::DISCORD) {
+						return verify_discord_token(token_str);
 					}
+
+					LOG("Unknown auth type: %x", payload.type);
+					return std::string("");
+				}();
+
+				if (result_id.empty()) {
+					return result_id;
 				}
 
-				LOG("Unknown auth type: %x", payload.type);
-				return std::string("");
+				return ::get_provider_preffix(payload.type) + result_id;
 			}
 		);
 	};

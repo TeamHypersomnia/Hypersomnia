@@ -7137,3 +7137,5 @@ This will discard your redo history."
 
 - okay i think i get why shared ptr is required
     - its so we can overwrite that async response if we no longer need it
+- maybe dont show the social login screen until we know for sure
+
