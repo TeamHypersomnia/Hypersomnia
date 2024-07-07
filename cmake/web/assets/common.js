@@ -239,7 +239,11 @@ function try_fetch_initial_user() {
   if (Module.initial_user) {
     const u = Module.initial_user;
     passAuthDataToCpp('crazygames', u.userId, u.username, u.profilePictureUrl, u.token, 3600);
+
+    return true;
   }
+
+  return false;
 }
 
 function pre_run() {

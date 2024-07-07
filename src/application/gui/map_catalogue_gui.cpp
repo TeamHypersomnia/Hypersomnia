@@ -468,7 +468,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	}
 
 #if WEB_LOWEND
-	centered_size_mult = vec2(0.95f, 0.95f);
+	centered_size_mult = vec2(0.97f, 0.97f);
 #else
 	centered_size_mult = vec2(0.9f, 0.8f);
 #endif

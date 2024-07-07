@@ -214,8 +214,8 @@ EM_JS(void, call_hideProgress, (), {
 	hideProgress();
 });
 
-EM_JS(void, call_try_fetch_initial_user, (), {
-  try_fetch_initial_user();
+EM_JS(bool, call_try_fetch_initial_user, (), {
+  return try_fetch_initial_user();
 });
 
 EM_JS(void, call_setLocation, (const char* newPath), {
@@ -1598,10 +1598,14 @@ work_result work(
 	};
 
 	if (params.is_crazygames) {
-		call_try_fetch_initial_user();
+		LOG("call_try_fetch_initial_user");
 
-		if (::has_new_auth_data()) {
+		if (call_try_fetch_initial_user()) {
+			LOG("Fetched initial user");
 			config.prompted_for_sign_in_once = true;
+		}
+		else {
+			LOG("No initial user");
 		}
 	}
 	else {
