@@ -39,7 +39,7 @@ public:
 	bool click_callback_required = false;
 	std::optional<assets::necessary_image_id> special_image;
 	bool color_wave = false;
-	pad_bytes<1> pad;
+	bool hide = false;
 
 	template <class M>
 	vec2i get_target_button_size(const M& manager, const augs::baked_font& gui_font) const {

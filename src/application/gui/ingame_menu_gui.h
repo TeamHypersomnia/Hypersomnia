@@ -99,6 +99,8 @@ struct ingame_menu_gui {
 	) {
 		const auto& gui_font = context.get_gui_font();
 
+		root.buttons[int(ingame_menu_button_type::INVITE_TO_JOIN)].hide = context.deps.hide_invite_to_join;
+
 		int bi = 0;
 
 		root.buttons[bi++].special_image = assets::necessary_image_id::DISCORD_BUTTON;

@@ -1742,6 +1742,21 @@ work_result work(
 		return false;
 	};
 
+	WEBSTATIC auto should_hide_invite_to_join = [&]() {
+		if (has_current_setup()) {
+			if (params.is_crazygames) {
+				return 
+					std::holds_alternative<client_setup>(*current_setup) ||
+					std::holds_alternative<server_setup>(*current_setup)
+				;
+			}
+
+			return std::holds_alternative<editor_setup>(*current_setup);
+		}
+		
+		return false;
+	};
+
 	WEBSTATIC auto restore_background_setup = [&]() {
 		current_setup = std::move(background_setup);
 		background_setup = std::unique_ptr<setup_variant>();
@@ -1994,7 +2009,7 @@ work_result work(
 
 #if PLATFORM_WEB
 		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
-#if 0
+#if 1
 		/* Test */
 		(void)is_official_connect_string;
 		const bool requires_sign_in = true;
@@ -2611,7 +2626,8 @@ work_result work(
 			is_during_tutorial(),
 			is_shooting_range(),
 			still_querying_server_info(),
-			would_abandon_ranked_match()
+			would_abandon_ranked_match(),
+			should_hide_invite_to_join()
 		};
 	};
 
@@ -3626,17 +3642,14 @@ work_result work(
 								return;
 							}
 
-							if (params.is_crazygames) {
-								web_sdk_invite_link(setup.get_connect_string());
-							}
-							else {
-#if !WEB_SINGLETHREAD
-								browse_servers_gui.open_matching_server_entry(
-									get_browse_servers_input(),
-									setup.get_connect_string()
-								);
+#if WEB_SINGLETHREAD
+							return;
+#else
+							browse_servers_gui.open_matching_server_entry(
+								get_browse_servers_input(),
+								setup.get_connect_string()
+							);
 #endif
-							}
 						}
 					});
 				}

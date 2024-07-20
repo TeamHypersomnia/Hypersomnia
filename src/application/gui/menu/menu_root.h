@@ -40,6 +40,17 @@ public:
 #endif
 
 		for (size_t i = buttons.size() - 1; i != size_t(-1); --i) {
+			if (buttons[i].hide) {
+				if (i < buttons.size() - 1) {
+					buttons[i].rc = buttons[i + 1].rc;
+				}
+				else {
+					buttons[i].rc = {};
+				}
+
+				continue;
+			}
+
 			if (i == buttons.size() - 1) {
 				buttons[i].rc.set_position(vec2(70.f, screen_size.y - menu_bottom_margin_v - buttons[i].rc.h()));
 			}
@@ -62,6 +73,10 @@ public:
 		const vec2i size
 	) {
 		for (size_t i = 0; i < buttons.size(); ++i) {
+			if (buttons[i].hide) {
+				continue;
+			}
+
 			if (buttons[i].special_image.has_value()) {
 				buttons[i].rc.set_size(manager.at(*buttons[i].special_image).get_original_size());
 				continue;
@@ -86,6 +101,10 @@ public:
 		vec2i s;
 
 		for (size_t i = 0; i < buttons.size(); ++i) {
+			if (buttons[i].hide) {
+				continue;
+			}
+
 			const auto bbox = buttons[i].get_target_button_size(manager, gui_font);
 
 			s.x = std::max(bbox.x, s.x);
@@ -116,6 +135,10 @@ public:
 		option_button_in_menu<Enum, option_button<Enum>> loc;
 
 		for (std::size_t i = 0; i < this_id->buttons.size(); ++i) {
+			if (this_id->buttons[i].hide) {
+				continue;
+			}
+
 			loc.type = static_cast<Enum>(i);
 
 			generic_call(make_dereferenced_location(this_id->buttons.data() + i, loc));
