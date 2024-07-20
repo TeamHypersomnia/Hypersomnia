@@ -1555,6 +1555,14 @@ work_result work(
 		return social_sign_in.cached_auth.expired();
 	};
 
+	WEBSTATIC auto auth_self_refresh = [&]() {
+		return social_sign_in.cached_auth.self_refresh();
+	};
+
+	WEBSTATIC auto auth_can_self_refresh = [&]() {
+		return social_sign_in.cached_auth.can_self_refresh();
+	};
+
 	WEBSTATIC auto social_log_out = [&]() {
 		social_sign_in.cached_auth.log_out();
 
@@ -1617,16 +1625,16 @@ work_result work(
 			social_sign_in.cached_auth = {};
 			LOG("No cached auth found in %x", CACHED_AUTH_PATH);
 		}
-	}
 
-	if (social_sign_in.cached_auth.is_set()) {
-		if (is_auth_expired()) {
-			LOG("Auth expired. Logging out.");
-			social_log_out();
-		}
-		else {
-			LOG("Starting token_still_valid_check");
-			token_still_valid_check = launch_async([ch = social_sign_in.cached_auth]() { return ch.check_token_still_valid(); });
+		if (social_sign_in.cached_auth.is_set()) {
+			if (is_auth_expired()) {
+				LOG("Auth expired. Logging out.");
+				social_log_out();
+			}
+			else {
+				LOG("Starting token_still_valid_check");
+				token_still_valid_check = launch_async([ch = social_sign_in.cached_auth]() { return ch.check_token_still_valid(); });
+			}
 		}
 	}
 
@@ -1986,10 +1994,25 @@ work_result work(
 
 #if PLATFORM_WEB
 		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
+#if 0
+		/* Test */
+		(void)is_official_connect_string;
+		const bool requires_sign_in = true;
+#else
 		const bool requires_sign_in = is_official_connect_string && begins_with(connect_string, "ranked");
+#endif
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
+				LOG("Trying to connect with an expired auth.");
+
+				if (auth_self_refresh()) {
+					LOG("Requested self-refresh. Delaying connect. connect_string: %x", connect_string);
+
+					social_sign_in.connect_string_post_sign_in = connect_string;
+					return false;
+				}
+
 				social_log_out();
 			}
 
@@ -2117,12 +2140,7 @@ work_result work(
 		});
 
 #if PLATFORM_WEB
-
-#if IS_PRODUCTION_BUILD
 		const bool send_auth = requires_sign_in;
-#else
-		const bool send_auth = true;
-#endif
 
 		if (send_auth) {
 			/*
@@ -3187,9 +3205,11 @@ work_result work(
 				if (const bool show_leaderboards = !has_current_setup()) {
 					perform_leaderboards();
 #if PLATFORM_WEB
-					if (social_sign_in.cached_auth.expired()) {
-						LOG("Leaderboards: uuth expired. Logging out.");
-						social_log_out();
+					if (is_auth_expired()) {
+						if (!auth_can_self_refresh()) {
+							LOG("Leaderboards: auth expired. Logging out.");
+							social_log_out();
+						}
 					}
 
 					if (leaderboards_gui.wants_sign_in) {
@@ -3280,6 +3300,8 @@ work_result work(
 					auto& connect_string = social_sign_in.connect_string_post_sign_in;
 
 					if (!connect_string.empty()) {
+						LOG("Triggering client connect post-auth: %x", connect_string);
+
 						config.client_connect = connect_string;
 
 						connect_string.clear();

@@ -2,6 +2,19 @@ const ipinfo_endpoint = 'https://hypersomnia.xyz/geolocation';
 const clientIdDiscord = '1189671952479158403';
 const revoke_origin = 'https://hypersomnia.xyz';
 
+function decodeCrazyGamesToken(token) {
+  const payloadBase64 = token.split('.')[1];
+  const payloadDecoded = atob(payloadBase64);
+  const payload = JSON.parse(payloadDecoded);
+  console.log("Decoded token payload", payload);
+
+  const currentTime = Math.floor(Date.now() / 1000);
+  payload.expiresIn = payload.exp - currentTime;
+  console.log(currentTime, payload.exp);
+
+  return payload;
+}
+
 function downloadAvatar(avatarUrl, callback) {
   fetch(avatarUrl)
     .then(response => response.arrayBuffer())
@@ -208,17 +221,14 @@ async function pre_run_cg() {
           const token = await window.CrazyGames.SDK.user.getUserToken();
           console.log("Get token result", token);
 
-          const payloadBase64 = token.split('.')[1];
-          const payloadDecoded = atob(payloadBase64);
-          const payload = JSON.parse(payloadDecoded);
-
-          console.log("Decoded token payload", payload);
+          const payload = decodeCrazyGamesToken(token);
 
           Module.initial_user = {
             userId: payload.userId,
             username: payload.username,
             profilePictureUrl: payload.profilePictureUrl,
-            token: token
+            token: token,
+            expiresIn: token.expiresIn
           };
         } catch (e) {
           console.log("getUserToken failed:", e);
@@ -238,12 +248,34 @@ async function pre_run_cg() {
 function try_fetch_initial_user() {
   if (Module.initial_user) {
     const u = Module.initial_user;
-    passAuthDataToCpp('crazygames', u.userId, u.username, u.profilePictureUrl, u.token, 3600);
+    passAuthDataToCpp('crazygames', u.userId, u.username, u.profilePictureUrl, u.token, u.expiresIn);
 
     return true;
   }
 
   return false;
+}
+
+function request_fresh_auth_token() {
+  if (window.CrazyGames) {
+    window.CrazyGames.SDK.user.getUserToken()
+      .then(token => {
+        const payload = decodeCrazyGamesToken(token);
+
+        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, payload.expiresIn);
+        return true;
+      })
+      .catch(e => {
+        console.log("Failed to refresh auth token:", e);
+        return false;
+      });
+
+    return true;
+  }
+  else {
+    console.log("window.CrazyGames is undefined!");
+    return false;
+  }
 }
 
 function pre_run() {
@@ -347,17 +379,15 @@ function loginCrazyGames() {
         }
       })
       .then(token => {
-        const payloadBase64 = token.split('.')[1];
-        const payloadDecoded = atob(payloadBase64);
-        const payload = JSON.parse(payloadDecoded);
-        console.log("Decoded token payload", payload);
+        const payload = decodeCrazyGamesToken(token);
 
-        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, 3600);
+        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, payload.expiresIn);
       })
       .catch(e => {
         console.log("Auth prompt or token retrieval failed:", e);
       });
-  } else {
+  }
+  else {
     console.log("window.CrazyGames is undefined!");
   }
 }
@@ -429,6 +459,7 @@ function create_module(for_cg) {
   Module.getUserGeolocation = getUserGeolocation;
 
   Module.try_fetch_initial_user = try_fetch_initial_user;
+  Module.request_fresh_auth_token = request_fresh_auth_token;
 
   if (for_cg) {
     Module.sync_idbfs = sync_idbfs_cg;

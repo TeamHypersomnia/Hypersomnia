@@ -5,6 +5,16 @@
 augs::mutex pending_auth_datas_lk;
 std::optional<web_auth_data> new_auth_data;
 
+bool request_fresh_auth_token() {
+	return main_thread_queue::execute([&]() {
+		int result = EM_ASM_INT({
+			return Module.request_fresh_auth_token() ? 1 : 0;
+		});
+
+		return result != 0;
+	});
+}
+
 void sign_in_with_crazygames() {
 	main_thread_queue::execute([&]() {
 		EM_ASM({
@@ -47,6 +57,22 @@ inline void web_auth_data::log_out() {
 	*this = {};
 }
 
+bool can_self_refresh(const auth_provider_type type) {
+	return type == auth_provider_type::CRAZYGAMES;
+}
+
+bool web_auth_data::can_self_refresh() const {
+	return ::can_self_refresh(type);
+}
+
+bool web_auth_data::self_refresh() {
+	if (!can_self_refresh()) {
+		return false;
+	}
+
+	return request_fresh_auth_token();
+}
+
 auto has_new_auth_data() {
 	auto lock = augs::scoped_lock(pending_auth_datas_lk);
 	return new_auth_data.has_value();
@@ -85,8 +111,8 @@ extern "C" {
 
 		const double expire_timestamp = 
 			now
-			/* Let's have a 5 seconds leeway */
-			+ std::max(1, expires_in - 5)
+			/* Let's have a 30 seconds leeway since tokens usually have hour-long lifetimes */
+			+ std::max(1, expires_in - 30)
 		;
 
 		LOG_NVPS(long(now), long(expire_timestamp));
