@@ -292,6 +292,8 @@ void settings_gui_state::perform(
 	config_json_table& last_saved_config,
 	vec2i screen_size
 ) {
+	(void)window;
+
 #if BUILD_NATIVE_SOCKETS
 	stun_manager.perform();
 #endif
@@ -377,6 +379,7 @@ void settings_gui_state::perform(
 			drag(l, f, std::forward<decltype(args)>(args)...);
 			revert(f);
 		};
+		(void)revertable_drag;
 
 		auto revertable_drag_vec2 = [&](auto l, auto& f, auto&&... args) {
 			drag_vec2(l, f, std::forward<decltype(args)>(args)...);
@@ -390,6 +393,15 @@ void settings_gui_state::perform(
 
 		auto revertable_enum = [&](auto l, auto& f, auto&&... args) {
 			enum_combo(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
+		auto revertable_enum_rev = [&](auto l, auto& f, auto&&... args) {
+			text(l);
+			ImGui::SameLine();
+
+			auto scope = scoped_item_width(150);
+			enum_combo(std::string("###") + l, f, std::forward<decltype(args)>(args)...);
 			revert(f);
 		};
 
@@ -428,6 +440,77 @@ void settings_gui_state::perform(
 			(void)sim;
 			//#endif
 		};
+
+		auto do_server_settings = [&]() {
+			/* This goes to Advanced */
+			ImGui::Separator();
+
+			text_color("Arenas", yellow);
+
+			ImGui::Separator();
+
+			do_server_vars(
+				config.server,
+				last_saved_config.server,
+				rcon_pane::ARENAS
+			);
+
+			ImGui::Separator();
+
+			do_server_vars(
+				config.server,
+				last_saved_config.server,
+				rcon_pane::VARS
+			);
+
+#if !PLATFORM_WEB
+			if (auto node = scoped_tree_node("API keys")) {
+				auto& scope_cfg = config.server_private;
+
+				thread_local bool show = false;
+				const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+				input_text(SCOPE_CFG_NVP(steam_web_api_key), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.steam_web_api_key);
+				
+				if (ImGui::Button("Get your Steam API Key")) {
+					 augs::open_url("https://steamcommunity.com/dev/apikey");
+				}
+				
+				text_disabled("For authenticating Steam users on your server.");
+			}
+#endif
+
+			
+			if (auto node = scoped_tree_node("RCON")) {
+				auto& scope_cfg = config.server_private;
+
+				{
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+					input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
+					text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
+				}
+
+#if !PLATFORM_WEB
+				{
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+					input_text(SCOPE_CFG_NVP(master_rcon_password), flags); revert(scope_cfg.master_rcon_password);
+					text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
+				}
+
+				{
+					auto& scope_cfg = config.server;
+					revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
+					revertable_checkbox("Auto authorize internal network clients for rcon", scope_cfg.auto_authorize_internal_for_rcon);
+					tooltip_on_hover("Use cautiously. This will authorize clients coming from addresses\nlike 192.168.0.1 for total control over the server.\n\nUse only in trusted settings like in your home network.");
+				}
+#endif
+			}
+		};
+		(void)do_server_settings;
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
@@ -490,7 +573,6 @@ void settings_gui_state::perform(
 
 #if !PLATFORM_WEB
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
-#endif
 
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();
@@ -598,7 +680,7 @@ void settings_gui_state::perform(
 
 					revertable_checkbox("Border", config.window.border);
 				}
-
+#endif
 
 				//input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
@@ -614,8 +696,9 @@ void settings_gui_state::perform(
 				}
 #endif
 
-				revertable_enum_radio("Vsync:", config.window.vsync_mode);
+				revertable_enum_rev("Vsync:", config.window.vsync_mode);
 
+#if !PLATFORM_WEB
 				{
 					auto& mf = config.window.max_fps;
 
@@ -628,12 +711,14 @@ void settings_gui_state::perform(
 						revertable_enum("Method", config.window.max_fps_method);
 					}
 				}
+#endif
 
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
 
 				text("\n");
 				ImGui::Separator();
 
+#if !PLATFORM_WEB
 				if (ImGui::Button("Open user folder in explorer")) {
 					const auto config_path = USER_DIR / "config.json";
 
@@ -644,26 +729,38 @@ void settings_gui_state::perform(
 
 					window.reveal_in_explorer(config_path);
 				}
+#endif
 
-				if (ImGui::Button("Reset all settings to factory defaults")) {
-					auto saved_is_guest = config.prompted_for_sign_in_once;
-					auto cvars = config.client;
+				{
+					auto bcol = rgba(200, 80, 0, 255);
+					auto bincrement = rgba(25, 20, 0, 255);
 
-					config = config_json_table(augs::path_type("default_config.json"));
-					::make_canon_config(config, false);
+					const auto cols = std::make_tuple(
+						scoped_style_color(ImGuiCol_Button, bcol),
+						scoped_style_color(ImGuiCol_ButtonHovered, bcol + bincrement), 
+						scoped_style_color(ImGuiCol_ButtonActive, bcol + bincrement + bincrement)
+					);
+
+					if (ImGui::Button("Reset all settings to factory defaults")) {
+						auto saved_is_guest = config.prompted_for_sign_in_once;
+						auto cvars = config.client;
+
+						config = config_json_table(augs::path_type("default_config.json"));
+						::make_canon_config(config, false);
 
 #if IS_PRODUCTION_BUILD
-					/* Don't break the identity */
-					config.client.nickname = cvars.nickname;
-					config.client.nickname_before_sign_in = cvars.nickname_before_sign_in;
-					config.client.avatar_image_path = cvars.avatar_image_path;
+						/* Don't break the identity */
+						config.client.nickname = cvars.nickname;
+						config.client.nickname_before_sign_in = cvars.nickname_before_sign_in;
+						config.client.avatar_image_path = cvars.avatar_image_path;
 
-					/* Otherwise the popup would show instantly again */
-					config.prompted_for_sign_in_once = saved_is_guest;
+						/* Otherwise the popup would show instantly again */
+						config.prompted_for_sign_in_once = saved_is_guest;
 #else
-					(void)saved_is_guest;
-					(void)cvars;
+						(void)saved_is_guest;
+						(void)cvars;
 #endif
+					}
 				}
 
 				break;
@@ -1333,18 +1430,6 @@ void settings_gui_state::perform(
 				}
 #endif
 
-				if (auto node = scoped_tree_node("Chat window")) {
-					auto& scope_cfg = config.client.client_chat;
-
-					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
-#if 0
-					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
-#endif
-
-					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
-					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
-				}
-
 #if 0
 				if (auto node = scoped_tree_node("Advanced")) {
 					revertable_enum_radio("Spectate:", scope_cfg.spectated_arena_type, true);
@@ -1406,72 +1491,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::SERVER: {
-				ImGui::Separator();
-
-				text_color("Arenas", yellow);
-
-				ImGui::Separator();
-
-				do_server_vars(
-					config.server,
-					last_saved_config.server,
-					rcon_pane::ARENAS
-				);
-
-				ImGui::Separator();
-
-				do_server_vars(
-					config.server,
-					last_saved_config.server,
-					rcon_pane::VARS
-				);
-
-				if (auto node = scoped_tree_node("API keys")) {
-					auto& scope_cfg = config.server_private;
-
-					thread_local bool show = false;
-					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
-
-					input_text(SCOPE_CFG_NVP(steam_web_api_key), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.steam_web_api_key);
-					
-					if (ImGui::Button("Get your Steam API Key")) {
-						 augs::open_url("https://steamcommunity.com/dev/apikey");
-					}
-					
-					text_disabled("For authenticating Steam users on your server.");
-				}
-
-				
-				if (auto node = scoped_tree_node("RCON")) {
-					auto& scope_cfg = config.server_private;
-
-					{
-						thread_local bool show = false;
-						const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
-
-						input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
-						text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
-					}
-
-					{
-						thread_local bool show = false;
-						const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
-
-						input_text(SCOPE_CFG_NVP(master_rcon_password), flags); revert(scope_cfg.master_rcon_password);
-						text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
-					}
-
-					{
-						auto& scope_cfg = config.server;
-						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
-						revertable_checkbox("Auto authorize internal network clients for rcon", scope_cfg.auto_authorize_internal_for_rcon);
-						tooltip_on_hover("Use cautiously. This will authorize clients coming from addresses\nlike 192.168.0.1 for total control over the server.\n\nUse only in trusted settings like in your home network.");
-					}
-				}
-
-				break;
-			}
+#if !WEB_LOWEND
 			case settings_pane::EDITOR: {
 				if (auto node = scoped_tree_node("Autosave")) {
 					revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
@@ -1631,99 +1651,125 @@ void settings_gui_state::perform(
 
 				break;
 			}
+#endif
+
 			case settings_pane::INTERFACE: {
 				revertable_slider("UI Font size", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
 
-				if (auto node = scoped_tree_node("In-game HUD skin")) {
-					if (auto node = scoped_tree_node("Scoreboard")) {
-						auto scope = scoped_indent();
-						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
+				if (auto node = scoped_tree_node("Chat window")) {
+					auto& scope_cfg = config.client.client_chat;
 
-						revertable_slider(SCOPE_CFG_NVP(cell_bg_alpha), 0.f, 1.f);
-						
-						revertable_drag_vec2(SCOPE_CFG_NVP(player_row_inner_padding), 1.f, 0, 20);
+					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+#if 0
+					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
+#endif
 
-						revertable_color_edit(SCOPE_CFG_NVP(background_color));
-						revertable_color_edit(SCOPE_CFG_NVP(border_color));
-
-						revertable_slider(SCOPE_CFG_NVP(bg_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(text_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(current_player_bg_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(current_player_text_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_lumi_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_alpha_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_text_alpha_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
-
-						revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha), 0.f, 1.f);
-						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
-					}
-
-					if (auto node = scoped_tree_node("Buy menu")) {
-						auto scope = scoped_indent();
-						auto& scope_cfg = config.arena_mode_gui.buy_menu_settings;
-
-						revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
-
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_active_bg));
-
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_active_bg));
-					}
-
-					auto& scope_cfg = config.arena_mode_gui;
-
-					if (auto node = scoped_tree_node("Knockouts indicators")) {
-						auto scope = scoped_indent();
-
-						revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(keep_recent_knockouts_for_seconds), 0.f, 20.f);
-						revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
-					}
-
-					if (auto node = scoped_tree_node("Money indicator")) {
-						auto scope = scoped_indent();
-
-						drag("Money indicator position X", scope_cfg.money_indicator_pos.x, 0.3f, -vec2i(screen_size).x, vec2i(screen_size).x);
-						drag("Money indicator position Y", scope_cfg.money_indicator_pos.y, 0.3f, -vec2i(screen_size).y, vec2i(screen_size).y);
-
-						revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
-						revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
-						revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);
-					}
+					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
+					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
 				}
 
-				if (auto node = scoped_tree_node("ImGUI style editor (Advanced)")) {
-					text(
-						"This is the ImGUI-provided style tweaker.\n"
-						"To save your changes to the local configuration file,\n"
-						"You need to push Save Ref and only then Save settings at the bottom."
-					);
+				if (auto node = scoped_tree_node("Advanced")) {
+					if (auto node = scoped_tree_node("In-game HUD skin")) {
+						if (auto node = scoped_tree_node("Scoreboard")) {
+							auto scope = scoped_indent();
+							auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
 
-					ImGui::Separator();
-					ImGui::ShowStyleEditor(&config.gui_style);
+							revertable_slider(SCOPE_CFG_NVP(cell_bg_alpha), 0.f, 1.f);
+							
+							revertable_drag_vec2(SCOPE_CFG_NVP(player_row_inner_padding), 1.f, 0, 20);
+
+							revertable_color_edit(SCOPE_CFG_NVP(background_color));
+							revertable_color_edit(SCOPE_CFG_NVP(border_color));
+
+							revertable_slider(SCOPE_CFG_NVP(bg_lumi_mult), 0.f, 5.f);
+							revertable_slider(SCOPE_CFG_NVP(text_lumi_mult), 0.f, 5.f);
+							revertable_slider(SCOPE_CFG_NVP(current_player_bg_lumi_mult), 0.f, 5.f);
+							revertable_slider(SCOPE_CFG_NVP(current_player_text_lumi_mult), 0.f, 5.f);
+							revertable_slider(SCOPE_CFG_NVP(dead_player_bg_lumi_mult), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(dead_player_bg_alpha_mult), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(dead_player_text_alpha_mult), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
+
+							revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha), 0.f, 1.f);
+							revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
+						}
+
+						if (auto node = scoped_tree_node("Buy menu")) {
+							auto scope = scoped_indent();
+							auto& scope_cfg = config.arena_mode_gui.buy_menu_settings;
+
+							revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
+							revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
+
+							revertable_color_edit(SCOPE_CFG_NVP(already_owns_bg));
+							revertable_color_edit(SCOPE_CFG_NVP(already_owns_active_bg));
+
+							revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_bg));
+							revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_active_bg));
+						}
+
+						auto& scope_cfg = config.arena_mode_gui;
+
+						if (auto node = scoped_tree_node("Knockouts indicators")) {
+							auto scope = scoped_indent();
+
+							revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
+							revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
+							revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
+							revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
+							revertable_slider(SCOPE_CFG_NVP(keep_recent_knockouts_for_seconds), 0.f, 20.f);
+							revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+						}
+
+						if (auto node = scoped_tree_node("Money indicator")) {
+							auto scope = scoped_indent();
+
+							drag("Money indicator position X", scope_cfg.money_indicator_pos.x, 0.3f, -vec2i(screen_size).x, vec2i(screen_size).x);
+							drag("Money indicator position Y", scope_cfg.money_indicator_pos.y, 0.3f, -vec2i(screen_size).y, vec2i(screen_size).y);
+
+							revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
+							revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
+							revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
+							revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);
+						}
+					}
+
+					if (auto node = scoped_tree_node("ImGUI style editor")) {
+						text(
+							"This is the ImGUI-provided style tweaker.\n"
+							"To save your changes to the local configuration file,\n"
+							"You need to push Save Ref and only then Save settings at the bottom."
+						);
+
+						ImGui::Separator();
+						ImGui::ShowStyleEditor(&config.gui_style);
+					}
 				}
 
 				break;
 			}
 
 			case settings_pane::ADVANCED: {
+#if !WEB_LOWEND
+				if (auto node = scoped_tree_node("Server settings")) {
+					do_server_settings();
+				}
+#endif
+
+#if !PLATFORM_WEB
 				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
 
 				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
+
+#endif
 
 #if PLATFORM_UNIX
 				revertable_checkbox("Map CAPS LOCK to ESC", config.window.map_caps_lock_to_esc);
 #endif
 
 
+#if !PLATFORM_WEB
 				ImGui::Separator();
 
 				text_color("Automatic updates", yellow);
@@ -1750,6 +1796,7 @@ void settings_gui_state::perform(
 					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
 				}
 
+#endif
 				ImGui::Separator();
 
 				text_color("Rendering", yellow);
@@ -1787,6 +1834,7 @@ void settings_gui_state::perform(
 #endif
 				ImGui::Separator();
 
+#if BUILD_NATIVE_SOCKETS
 				{
 					auto& scope_cfg = config.nat_traversal;
 					auto& st = scope_cfg.short_ttl;
@@ -1804,6 +1852,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.debug;
 					revertable_checkbox(SCOPE_CFG_NVP(log_solvable_hashes));
 				}
+#endif
 
 				revertable_checkbox("Show performance", config.session.show_performance);
 				revertable_checkbox("Show logs", config.session.show_logs);
@@ -1855,8 +1904,7 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(regenerate_every_time));
 					revertable_checkbox(SCOPE_CFG_NVP(rescan_assets_on_window_focus));
 
-					ImGui::SameLine();
-
+#if !PLATFORM_WEB
 					const auto concurrency = std::thread::hardware_concurrency();
 					const auto t_max = concurrency * 2;
 
@@ -1865,8 +1913,10 @@ void settings_gui_state::perform(
 
 					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 1u, t_max);
 					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 1u, t_max);
+#endif
 				}
 
+#if !PLATFORM_WEB
 				ImGui::Separator();
 
 				text_color("Multithreading", yellow);
@@ -1931,13 +1981,13 @@ void settings_gui_state::perform(
 				}
 
 				ImGui::SameLine();
-
-				if (ImGui::Button("Open STUN manager")) {
-#if BUILD_NATIVE_SOCKETS
-					stun_manager.open();
 #endif
-				}
 
+#if BUILD_NATIVE_SOCKETS
+				if (ImGui::Button("Open STUN manager")) {
+					stun_manager.open();
+				}
+#endif
 
 				break;
 			}
@@ -1954,7 +2004,7 @@ void settings_gui_state::perform(
 		ImGui::Separator();
 
 		if (config != last_saved_config) {
-			if (ImGui::Button("Save settings")) {
+			if (ImGui::Button("Save changes")) {
 				augs::timer save_timer;
 				last_saved_config = config;
 				config.save_patch(canon_config, config_path_for_saving);
@@ -1963,7 +2013,7 @@ void settings_gui_state::perform(
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Revert settings")) {
+			if (ImGui::Button("Undo changes")) {
 				config = last_saved_config;
 				ImGui::GetStyle() = config.gui_style;
 			}

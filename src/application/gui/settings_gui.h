@@ -28,8 +28,9 @@ enum class settings_pane {
 	GRAPHICS,
 	AUDIO,
 	CLIENT,
-	SERVER,
+#if !WEB_LOWEND
 	EDITOR,
+#endif
 	INTERFACE,
 	ADVANCED,
 
