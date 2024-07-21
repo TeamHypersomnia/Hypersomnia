@@ -218,8 +218,8 @@ EM_JS(bool, call_try_fetch_initial_user, (), {
   return try_fetch_initial_user();
 });
 
-EM_JS(void, call_setLocation, (const char* newPath), {
-	setLocation(newPath);
+EM_JS(void, call_setBrowserLocation, (const char* newPath), {
+	Module.setBrowserLocation(newPath);
 });
 
 EM_JS(void, call_get_user_geolocation, (), {
@@ -265,6 +265,13 @@ extern "C" {
 #endif
 
 #if PLATFORM_WEB
+EM_JS(char*, crazygames_get_invite_link, (), {
+    var gameLink = Module.cg_game_link || "";
+    var length = lengthBytesUTF8(gameLink) + 1;
+    var buffer = _malloc(length);
+    stringToUTF8(gameLink, buffer, length);
+    return buffer;
+});
 
 EM_JS(void, call_sdk_invite_link, (const char* connect_string), {
 	Module.sdk_invite_link(connect_string);
@@ -306,6 +313,7 @@ void web_sdk_loading_stop() {
 	});
 }
 #else
+const char* crazygames_get_invite_link() { return nullptr; }
 void web_sdk_gameplay_start() {}
 void web_sdk_gameplay_stop() {}
 void web_sdk_loading_start() {}
@@ -350,7 +358,30 @@ work_result work(
 
 	web_sdk_loading_start();
 
-	WEBSTATIC const auto params = parsed_params;
+	WEBSTATIC const auto params = [&parsed_params]() {
+		auto p = parsed_params;
+
+#if PLATFORM_WEB
+		if (p.is_crazygames) {
+			const auto invite_link = crazygames_get_invite_link();
+
+			if (invite_link) {
+				LOG_NVPS(invite_link);
+
+				const auto link = std::string(invite_link);
+
+				if (!link.empty()) {
+					p.set_connect(link);
+				}
+			}
+
+			free(invite_link);
+		}
+#endif
+
+		return p;
+	}();
+
 	(void)argc;
 	(void)argv;
 	(void)log_directory_existed;
@@ -5576,6 +5607,10 @@ work_result work(
 
 	WEBSTATIC bool swapped_once = false;
 	WEBSTATIC std::string current_browser_location = "/";
+
+	if (params.is_crazygames) {
+		current_browser_location = "";
+	}
 #endif
 
 	static auto main_loop_iter = [](void* arg) -> bool {
@@ -5669,16 +5704,34 @@ work_result work(
 
 		{
 			const auto& read_buffer = get_read_buffer();
-			const auto location = "/" + read_buffer.browser_location;
+
+			const auto location = [&]() {
+				if (params.is_crazygames) {
+					auto location = read_buffer.browser_location;
+
+					if (begins_with(location, "game/")) {
+						cut_preffix(location, "game/");
+					}
+					else {
+						location = "";
+					}
+
+					return location;
+				}
+				else {
+					return "/" + read_buffer.browser_location;
+				}
+			}();
 
 			if (current_browser_location != location) {
 				current_browser_location = location;
 
 				LOG("Setting browser location to: \"%x\"", current_browser_location);
 
-				call_setLocation(current_browser_location.c_str());
+				call_setBrowserLocation(current_browser_location.c_str());
 			}
 		}
+
 #else
 		auto scope = measure_scope(render_thread_performance.fps);
 #endif

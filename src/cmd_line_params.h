@@ -67,6 +67,11 @@ struct cmd_line_params {
 
 	bool is_crazygames = false;
 
+	void set_connect(const std::string& address) {
+		connect_address = address;
+		should_connect = true;
+	}
+
 	void parse(const int argc, const char* const * const argv, const int start_i) {
 		for (int i = start_i; i < argc; ++i) {
 			const auto a = std::string(argv[i]);
@@ -108,8 +113,7 @@ struct cmd_line_params {
 					std::string webrtc_id;
 
 					if (1 == typesafe_sscanf(loc, "/game/%x", webrtc_id)) {
-						should_connect = true;
-						connect_address = webrtc_id;
+						set_connect(webrtc_id);
 					}
 				}
 				else if (begins_with(loc, "/host")) {
@@ -235,8 +239,7 @@ struct cmd_line_params {
 				verified_signature = get_next();
 			}
 			else if (a == "--connect") {
-				should_connect = true;
-				connect_address = get_next();
+				set_connect(get_next());
 			}
 			else if (a == "--live-log") {
 				live_log_path = get_next();

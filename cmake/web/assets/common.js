@@ -70,11 +70,23 @@ function hideProgress() {
   document.body.style.backgroundImage = 'none';
 }
 
-function setLocation(newLocation) {
+function setBrowserLocation(newLocation) {
   const locStr = UTF8ToString(newLocation);
 
   console.log("New location: ", locStr);
   window.history.pushState("object or string", "Title", locStr);
+}
+
+function setBrowserLocation_cg(newLocation) {
+  const locStr = UTF8ToString(newLocation);
+
+  if (locStr === "") {
+    window.CrazyGames.SDK.game.hideInviteButton();
+  }
+  else {
+    const link = window.CrazyGames.SDK.game.showInviteButton({ game: locStr });
+    console.log("Invite button link", link);
+  }
 }
 
 const timeZoneMap = {
@@ -212,6 +224,17 @@ async function pre_run_cg() {
   if (window.CrazyGames) {
     try {
       await window.CrazyGames.SDK.init();
+
+      {
+        const invite_link = window.CrazyGames.SDK.game.getInviteParam("game");
+
+        if (invite_link) {
+          Module.cg_invite_link = invite_link;
+        }
+        else {
+          Module.cg_invite_link = "";
+        }
+      }
 
       const available = window.CrazyGames.SDK.user.isUserAccountAvailable;
       console.log("User account system available", available);
@@ -453,7 +476,8 @@ function create_module(for_cg) {
     postRun: [],
     setStatus: set_status,
     totalDependencies: 0,
-    monitorRunDependencies: monitor_run_dependencies
+    monitorRunDependencies: monitor_run_dependencies,
+    cg_invite_link: ""
   };
 
   Module.getUserGeolocation = getUserGeolocation;
@@ -466,6 +490,7 @@ function create_module(for_cg) {
     Module['preRun'].push(pre_run_cg);
 
     Module.loginCrazyGames = loginCrazyGames;
+    Module.setBrowserLocation = setBrowserLocation_cg;
   }
 
   if (for_io) {
@@ -486,6 +511,7 @@ function create_module(for_cg) {
 
     Module.loginDiscord = loginDiscord;
     Module.revokeDiscord = revokeDiscord;
+    Module.setBrowserLocation = setBrowserLocation;
   }
 
   window.addEventListener('resize', resizeCanvas);
