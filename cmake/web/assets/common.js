@@ -364,7 +364,7 @@ function sync_idbfs() {
 }
 
 function sync_idbfs_cg() {
-
+  sync_idbfs();
 }
 
 function revokeDiscord(accessToken) {
@@ -490,6 +490,9 @@ function create_module(for_cg) {
   if (for_cg) {
     Module.sync_idbfs = sync_idbfs_cg;
     Module['preRun'].push(pre_run_cg);
+
+    // We're using idbfs after all, just for a single file
+    Module['preRun'].push(pre_run);
 
     Module.loginCrazyGames = loginCrazyGames;
     Module.setBrowserLocation = setBrowserLocation_cg;
