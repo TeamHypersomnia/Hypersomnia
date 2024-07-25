@@ -39,6 +39,7 @@ struct viewables_load_input {
 	const unsigned max_atlas_size;
 	std::optional<arena_player_metas>& new_player_metas;
 	std::optional<ad_hoc_atlas_subjects> ad_hoc_subjects;
+	augs::audio_command_buffers& audio_buffers;
 };
 
 struct viewables_finalize_input {
@@ -149,6 +150,7 @@ public:
 	bool general_atlas_in_progress() const;
 	void display_loading_progress() const;
 	bool completed_all_loading() const;
+	bool is_loading_sounds() const;
 
 	void request_rescan();
 	void recompress_demos();

@@ -19,6 +19,10 @@
 #include "application/setups/client/demo_file_meta.h"
 #include "augs/misc/scope_guard.h"
 
+#if PLATFORM_WEB && !WEB_SINGLETHREAD
+#include "augs/templates/main_thread_queue.h"
+#endif
+
 void web_sdk_loading_start();
 void web_sdk_loading_stop();
 
@@ -315,36 +319,51 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			sounds_progress->max_sounds.store(sound_paths_info.size());
 
-			future_loaded_buffers = launch_async(
-				[&](){
-					web_sdk_loading_start();
-					auto scoped_stop = augs::scope_guard([]() { web_sdk_loading_stop(); });
+			auto buffer_loader = [&](){
+				web_sdk_loading_start();
+				auto scoped_stop = augs::scope_guard([]() { web_sdk_loading_stop(); });
 
-					using value_type = decltype(future_loaded_buffers.get());
+				using value_type = decltype(future_loaded_buffers.get());
 
-					value_type result;
+				value_type result;
 
-					for (const auto& r : sound_requests) {
-						if (r.second.source_sound.empty()) {
-							/* A request to unload. */
-							result.push_back(std::nullopt);
-							continue;
-						}
-
-						try {
-							augs::sound_buffer b = r.second;
-							result.emplace_back(std::move(b));
-						}
-						catch (...) {
-							result.push_back(std::nullopt);
-						}
-
-						sounds_progress->current_sound_num += 1;
+				for (const auto& r : sound_requests) {
+					if (r.second.source_sound.empty()) {
+						/* A request to unload. */
+						result.push_back(std::nullopt);
+						continue;
 					}
 
-					return result;
+					try {
+						augs::sound_buffer b = r.second;
+						result.emplace_back(std::move(b));
+					}
+					catch (...) {
+						result.push_back(std::nullopt);
+					}
+
+					sounds_progress->current_sound_num += 1;
 				}
-			);
+
+				return result;
+			};
+
+			in.audio_buffers.finish();
+
+#if PLATFORM_WEB && !WEB_SINGLETHREAD
+			using V = decltype(future_loaded_buffers.get());
+
+			std::optional<V> result;
+
+			main_thread_queue::execute([&]() {
+				result.emplace(buffer_loader());
+			});
+
+			future_loaded_buffers = launch_async([&result]() { return std::move(*result); });
+			future_loaded_buffers.wait();
+#else
+			future_loaded_buffers = launch_async(buffer_loader);
+#endif
 
 			future_sound_definitions = new_all_defs.sounds;
 		}
@@ -553,6 +572,10 @@ void viewables_streaming::recompress_demos() {
 
 		return true;
 	});
+}
+
+bool viewables_streaming::is_loading_sounds() const {
+	return sounds_progress.has_value();
 }
 
 bool viewables_streaming::completed_all_loading() const {
