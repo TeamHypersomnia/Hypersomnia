@@ -19,7 +19,6 @@
 class https_file_downloader {
     parsed_url parsed;
 
-	std::size_t num_downloaded_files = 0;
 	std::atomic_size_t totalBytes = 0;
 	std::atomic_size_t downloadedBytes = 0;
 
