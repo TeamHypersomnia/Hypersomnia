@@ -5227,13 +5227,11 @@ work_result work(
 
 			auto audio_renderer = std::optional<augs::audio_renderer>();
 
-			if (!streaming.is_loading_sounds()) {
-				if (const auto audio_buffer = audio_buffers.map_write_buffer()) {
-					audio_renderer.emplace(augs::audio_renderer { 
-						audio_buffers.num_currently_processed_buffers(),
-						*audio_buffer 
-					});
-				}
+			if (const auto audio_buffer = audio_buffers.map_write_buffer()) {
+				audio_renderer.emplace(augs::audio_renderer { 
+					audio_buffers.num_currently_processed_buffers(),
+					*audio_buffer 
+				});
 			}
 
 			advance_current_setup(
