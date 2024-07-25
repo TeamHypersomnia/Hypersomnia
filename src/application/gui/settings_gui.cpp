@@ -846,7 +846,7 @@ void settings_gui_state::perform(
 
 				revertable_enum("Output mode", config.audio.output_mode);
 
-				text_disabled("Set to Auto for speakers.\nFor headphones, HRTF is the best.");
+				text("Disable this for speakers!\nFor headphones, HRTF is the best.");
 
 				{
 					auto scope = scoped_indent(); 
@@ -865,7 +865,9 @@ void settings_gui_state::perform(
 #endif
 				}
 
+#if !PLATFORM_WEB
 				text_disabled("If you experience a drop in sound quality with HRTF,\ntry setting the sample rate of your audio device to 44.1 kHz,\nor consider providing your own presets in detail/hrtf.");
+#endif
 
 				{
 
@@ -894,6 +896,9 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.sound;
 
+#if WEB_LOWEND
+					revertable_slider(SCOPE_CFG_NVP(max_audio_commands_per_frame_ms), 0.5f, 10.f);
+#endif
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
 
 					if (scope_cfg.processing_frequency == sound_processing_frequency::PERIODIC) {
@@ -1895,16 +1900,15 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(measure_atlas_uploading));
 				}
 
+#if !PLATFORM_WEB
 				text("Content regeneration");
 
 				{
 					auto indent = scoped_indent();
 					auto& scope_cfg = config.content_regeneration;
-
 					revertable_checkbox(SCOPE_CFG_NVP(regenerate_every_time));
 					revertable_checkbox(SCOPE_CFG_NVP(rescan_assets_on_window_focus));
 
-#if !PLATFORM_WEB
 					const auto concurrency = std::thread::hardware_concurrency();
 					const auto t_max = concurrency * 2;
 
@@ -1913,8 +1917,8 @@ void settings_gui_state::perform(
 
 					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 1u, t_max);
 					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 1u, t_max);
-#endif
 				}
+#endif
 
 #if !PLATFORM_WEB
 				ImGui::Separator();

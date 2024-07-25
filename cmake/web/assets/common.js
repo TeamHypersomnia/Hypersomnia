@@ -78,14 +78,16 @@ function setBrowserLocation(newLocation) {
 }
 
 function setBrowserLocation_cg(newLocation) {
-  const locStr = UTF8ToString(newLocation);
+  if (window.CrazyGames) {
+    const locStr = UTF8ToString(newLocation);
 
-  if (locStr === "") {
-    window.CrazyGames.SDK.game.hideInviteButton();
-  }
-  else {
-    const link = window.CrazyGames.SDK.game.showInviteButton({ game: locStr });
-    console.log("Invite button link", link);
+    if (locStr === "") {
+      window.CrazyGames.SDK.game.hideInviteButton();
+    }
+    else {
+      const link = window.CrazyGames.SDK.game.showInviteButton({ game: locStr });
+      console.log("Invite button link", link);
+    }
   }
 }
 

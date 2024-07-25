@@ -95,12 +95,18 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		result.inventory_gui_controls.erase(augs::event::keys::key::V);
 
 		result.sound.max_simultaneous_bullet_trace_sounds = 0;
+		result.content_regeneration.rescan_assets_on_window_focus = false;
 #endif
 
 #if WEB_LOWEND
 		result.gui_fonts.gui.size_in_pixels = 18.0f;
 
-		result.audio.output_mode = audio_output_mode::AUTO;
+		/*
+			Should be fine as we're limiting the rate of audio commands
+			to avoid hiccups.
+		*/
+
+		result.audio.output_mode = audio_output_mode::STEREO_HRTF;
 
 		result.sound.max_short_sounds = 16;
 		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;

@@ -391,7 +391,11 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 
 		if (input.audio_renderer != nullptr) {
-			input.command_buffers.submit_write_buffer();
+			input.command_buffers.submit_write_buffer(
+#if WEB_LOWEND
+				input.sound_settings.max_audio_commands_per_frame_ms
+#endif
+			);
 		}
 	};
 

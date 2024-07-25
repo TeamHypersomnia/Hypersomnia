@@ -7,6 +7,7 @@
 #include "augs/templates/thread_pool.h"
 #include "augs/audio/audio_command.h"
 #include "augs/audio/audio_backend.h"
+#include "augs/log.h"
 
 #if WEB_SINGLETHREAD
 
@@ -32,20 +33,40 @@ namespace augs {
 		}
 
 		int num_currently_processed_buffers() {
-			return 0;
+			if (buffer.empty()) {
+				return 0;
+			}
+
+			return 1;
 		}
 
-		auto submit_write_buffer() {
+		auto submit_write_buffer(const float max_processing_time_ms_v) {
+			augs::timer tm;
+
+			std::size_t i = 0;
+
+			for (; i < buffer.size(); ++i) {
+				backend.perform(
+					buffer.data() + i,
+					1
+				);
+
+				if (tm.get<std::chrono::milliseconds>() >= max_processing_time_ms_v) {
+					// LOG("Sound overload (p: %x all: %x)", i, buffer.size());
+					break;
+				}
+			}
+
+			erase_first_n(buffer, i);
+		}
+
+		void finish() {
 			backend.perform(
 				buffer.data(),
 				buffer.size()
 			);
 
 			buffer.clear();
-		}
-
-		void finish() {
-
 		}
 
 		template <class F>

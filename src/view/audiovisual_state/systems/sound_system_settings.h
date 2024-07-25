@@ -38,6 +38,9 @@ struct sound_system_settings {
 
 	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
 	int custom_processing_frequency = 10;
+#if WEB_LOWEND
+	float max_audio_commands_per_frame_ms = 4.0f;
+#endif
 	// END GEN INTROSPECTOR
 
 	bool operator==(const sound_system_settings& b) const = default;

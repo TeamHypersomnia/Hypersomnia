@@ -2040,7 +2040,7 @@ work_result work(
 
 #if PLATFORM_WEB
 		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
-#if 1
+#if 0
 		/* Test */
 		(void)is_official_connect_string;
 		const bool requires_sign_in = true;

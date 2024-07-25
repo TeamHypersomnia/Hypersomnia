@@ -51,7 +51,7 @@
     },
 
     "audio": {
-        "mute_main_menu_background": true,
+        "mute_main_menu_background": false,
         "output_mode": "STEREO_HRTF",
         "output_device_name": "",
         "max_number_of_sound_sources": 4200,
@@ -416,7 +416,8 @@
         "gain_threshold_for_bullet_trace_sounds": 0.012,
         "max_short_sounds": 80,
         "processing_frequency": "EVERY_SINGLE_FRAME",
-        "custom_processing_frequency": 10
+        "custom_processing_frequency": 10,
+        "max_audio_commands_per_frame_ms": 4.0
     },
 
     // self_update will be used by non-steam processes,
