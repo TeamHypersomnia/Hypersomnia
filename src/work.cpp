@@ -1579,6 +1579,14 @@ work_result work(
 
 #if PLATFORM_WEB
 	WEBSTATIC auto is_signed_in = [&]() {
+		if (social_sign_in.cached_auth.can_self_refresh()) {
+			/*
+				Will always self-refresh if there is such a need.
+			*/
+
+			return true;
+		}
+
 		return social_sign_in.cached_auth.is_signed_in();
 	};
 
