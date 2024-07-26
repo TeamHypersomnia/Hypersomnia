@@ -21,6 +21,7 @@
 
 #include "augs/misc/web_sdk_events.h"
 
+void web_sdk_happy_time();
 void snap_interpolated_to_logical(cosmos& cosm);
 
 using portal_marker = editor_area_marker_node;
@@ -173,6 +174,10 @@ void test_scene_setup::set_tutorial_level(uint32_t level) {
 
 void test_scene_setup::restart_arena() {
 	LOG("Setting up tutorial level: %x.", tutorial.level);
+
+	if (const bool completed = tutorial.level == 20) {
+		web_sdk_happy_time();
+	}
 
 	auto& cosm = scene.world;
 

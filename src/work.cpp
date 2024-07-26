@@ -281,6 +281,14 @@ void web_sdk_invite_link(const std::string& connect_string) {
 	call_sdk_invite_link(connect_string.c_str());
 }
 
+void web_sdk_happy_time() {
+	main_thread_queue::execute([&]() {
+		EM_ASM({
+			Module.sdk_happy_time();
+		});
+	});
+}
+
 void web_sdk_gameplay_start() {
 	main_thread_queue::execute([&]() {
 		EM_ASM({
@@ -315,6 +323,7 @@ void web_sdk_loading_stop() {
 #else
 const char* crazygames_get_invite_link() { return nullptr; }
 void web_sdk_gameplay_start() {}
+void web_sdk_happy_time() { LOG("web_sdk_happy_time"); }
 void web_sdk_gameplay_stop() {}
 void web_sdk_loading_start() {}
 void web_sdk_loading_stop() {}

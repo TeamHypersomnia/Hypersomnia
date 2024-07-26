@@ -463,6 +463,16 @@ function fetchUserProfile(accessToken, expiresIn) {
     });
 }
 
+function sdk_happy_time() {
+  if (window.CrazyGames) {
+    console.log("Crazygames: happytime");
+    window.CrazyGames.SDK.game.happytime();
+  }
+  else {
+    console.log("happytime (no SDK)");
+  }
+}
+
 function sdk_gameplay_start() {
   if (window.CrazyGames) {
     console.log("Crazygames: gameplayStart");
@@ -559,6 +569,7 @@ function create_module(for_cg) {
     }
   };
 
+  Module.sdk_happy_time = sdk_happy_time;
   Module.sdk_gameplay_start = sdk_gameplay_start;
   Module.sdk_gameplay_stop = sdk_gameplay_stop;
   Module.sdk_loading_start = sdk_loading_start;
