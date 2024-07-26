@@ -525,7 +525,9 @@ void client_setup::flush_demo_steps() {
 
 	future_flushed_demo = launch_async(
 		[&]() {
+#if !WEB_LOWEND
 			auto hold_fs = hold_persistent_filesystem_raii();
+#endif
 
 			auto out = augs::open_binary_output_stream_append(recorded_demo_path);
 

@@ -105,6 +105,8 @@ extern "C" {
 
 #if !IS_PRODUCTION_BUILD
 		LOG_NVPS(provider, profile_id, profile_name, avatar_byte_array_length, auth_token, expires_in);
+#else
+		LOG_NVPS(provider, profile_id, profile_name, avatar_byte_array_length, expires_in);
 #endif
 
 #if 0 

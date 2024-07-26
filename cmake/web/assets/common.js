@@ -219,6 +219,30 @@ function resizeCanvas() {
   canvas.height = displayHeight;
 }
 
+const user_config_path = 'user/config.json';
+
+function init_config_cg() {
+  const fileContent = window.CrazyGames.SDK.data.getItem('config.json');
+  if (fileContent) {
+    FS.writeFile(user_config_path, fileContent, { encoding: 'utf8' });
+  }
+  else {
+    console.warn('config.json has not yet been created. Nothing to load.');
+  }
+}
+
+function save_config_cg() {
+  if (window.CrazyGames) {
+    if (FS.analyzePath(user_config_path).exists) {
+      const fileContent = FS.readFile(user_config_path, { encoding: 'utf8' });
+      window.CrazyGames.SDK.data.setItem('config.json', fileContent);
+    }
+    else {
+      console.error(`File ${user_config_path} does not exist.`);
+    }
+  }
+}
+
 async function pre_run_cg() {
   Module.addRunDependency('cginit');
   console.log("pre_run_cg");
@@ -226,6 +250,9 @@ async function pre_run_cg() {
   if (window.CrazyGames) {
     try {
       await window.CrazyGames.SDK.init();
+
+      FS.mkdir('/user');
+      init_config_cg();
 
       {
         const invite_link = window.CrazyGames.SDK.game.getInviteParam("game");
@@ -364,7 +391,7 @@ function sync_idbfs() {
 }
 
 function sync_idbfs_cg() {
-  sync_idbfs();
+  save_config_cg();
 }
 
 function revokeDiscord(accessToken) {
@@ -490,9 +517,6 @@ function create_module(for_cg) {
   if (for_cg) {
     Module.sync_idbfs = sync_idbfs_cg;
     Module['preRun'].push(pre_run_cg);
-
-    // We're using idbfs after all, just for a single file
-    Module['preRun'].push(pre_run);
 
     Module.loginCrazyGames = loginCrazyGames;
     Module.setBrowserLocation = setBrowserLocation_cg;

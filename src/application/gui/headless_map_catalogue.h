@@ -58,7 +58,9 @@ struct arena_synchronizer_input_entry {
 using arena_synchronizer_input = std::vector<arena_synchronizer_input_entry>;
 
 class multi_arena_synchronizer {
+#if !WEB_LOWEND
 	hold_persistent_filesystem_raii hold_fs;
+#endif
 
 	arena_synchronizer_input input;
 	std::unique_ptr<multi_arena_synchronizer_internal> data;
