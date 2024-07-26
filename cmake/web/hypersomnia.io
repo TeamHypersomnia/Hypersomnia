@@ -9,12 +9,18 @@ server {
         try_files $uri $uri/ /Hypersomnia.html;
     }
 
+    location /assets/ {
+        alias /var/www/html/assets/;
+        autoindex on;  # This is optional; it allows directory listing if no index file is found
+    }
+
     # MIME types for WebAssembly (.wasm) files
     types {
         application/wasm     wasm;
         application/octet-stream data;
         text/html            html;
         text/javascript      js;
+        text/css      css;
     }
 
     # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
