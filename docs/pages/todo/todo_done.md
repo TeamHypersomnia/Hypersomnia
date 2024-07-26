@@ -7139,3 +7139,18 @@ This will discard your redo history."
     - its so we can overwrite that async response if we no longer need it
 - maybe dont show the social login screen until we know for sure
 
+- sync config user json
+
+- before release 
+    - check if that getusertoken self-refresh works in case of an expired token
+        - just make the initial token expired? to force refresh once
+	- done, works
+
+- one last settings simplification pass?
+    - disable threading options
+
+
+- masterserver failing on web: renew web certs again in 90 days if im still alive (have to copy fullchan/privkey)
+    - or just handle it correctly somehow, a hook?
+    - NOTE You'll have to restart the masterserver either way!!!! so it loads the new ssl file
+- added a deploy hook

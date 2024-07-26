@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- loading screen?
+    - screw it
+    - maybe just render "Loading..." on black screen using imgui atlas since it doesnt change
+
 - low prio - web server could also pause when we switch tabs
     - but the clients will stay there for 25 seconds by default so it's good enough
         - if you don't play that long as the host what're you even doing

@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- update emscripten
+    - there's a new version
+
 - update presskit with all pepper/reddit/liam links etc
 
 - refresh crazygames token on connect or make aggressive timeout assumption
@@ -26,9 +29,6 @@ summary: That which we are brainstorming at the moment.
     
 
 - hide settings in web that can crash the app like number of threads
-
-- update emscripten
-    - wait until they update the emsdk cause building it will be a pain
 
 - preparing for large traffic from crazygames
     - show full servers in gray

@@ -107,7 +107,16 @@ extern "C" {
 		LOG_NVPS(provider, profile_id, profile_name, avatar_byte_array_length, auth_token, expires_in);
 #endif
 
+#if 0 
+		// TEST EXPIRED
+		auto now = augs::secs_since_epoch();
+
+		if (const bool test_expired = expires_in == -1) {
+			now = 0.0;
+		}
+#else
 		const auto now = augs::secs_since_epoch();
+#endif
 
 		const double expire_timestamp = 
 			now
