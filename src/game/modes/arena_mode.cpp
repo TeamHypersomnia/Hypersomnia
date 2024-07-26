@@ -2971,6 +2971,8 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.was_ranked = is_ranked_live();
 
 	if (in.rules.is_ffa()) {
+		summary.was_ffa = true;
+
 		for_each_player_best_to_worst_in(
 			faction_type::FFA,
 			[&](const auto& id, const auto& player) {

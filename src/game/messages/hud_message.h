@@ -79,6 +79,7 @@ namespace messages {
 
 		bool losers_abandoned = false;
 		bool was_ranked = false;
+		bool was_ffa = false;
 
 		int first_team_score = 0;
 		int second_team_score = 0;
@@ -90,6 +91,10 @@ namespace messages {
 		std::string match_start_timestamp;
 
 		bool is_tie() const {
+			if (was_ffa) {
+				return false;
+			}
+
 			if (losers_abandoned) {
 				return false;
 			}
