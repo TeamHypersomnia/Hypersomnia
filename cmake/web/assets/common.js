@@ -253,7 +253,7 @@ async function pre_run_cg() {
             username: payload.username,
             profilePictureUrl: payload.profilePictureUrl,
             token: token,
-            expiresIn: token.expiresIn
+            expiresIn: payload.expiresIn
           };
         } catch (e) {
           console.log("getUserToken failed:", e);
