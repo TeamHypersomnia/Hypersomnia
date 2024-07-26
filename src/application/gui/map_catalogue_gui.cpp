@@ -25,7 +25,9 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/gui/headless_map_catalogue.hpp"
 
-static const auto miniatures_directory = CACHE_DIR / "miniatures";
+auto get_miniatures_directory() { 
+	return CACHE_DIR / "miniatures";
+}
 
 constexpr auto miniature_size_v = 80;
 #if WEB_LOWEND
@@ -48,7 +50,7 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 	miniature_downloader.reset();
 
 	if (const auto parsed = parsed_url(in.external_arena_files_provider); parsed.valid()) {
-		augs::create_directories(miniatures_directory);
+		augs::create_directories(get_miniatures_directory());
 
 		miniature_downloader.emplace(parsed);
 
@@ -506,7 +508,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 				const auto this_id = static_cast<ad_hoc_entry_id>(1 + current_miniature_index);
 
 				const auto miniature_filename = typesafe_sprintf("%x.png", this_id);
-				const auto next_path = miniatures_directory / miniature_filename;
+				const auto next_path = get_miniatures_directory() / miniature_filename;
 
 				const auto new_subject = ad_hoc_atlas_subject { this_id, next_path };
 				last_miniatures.push_back(new_subject);
