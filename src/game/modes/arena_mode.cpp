@@ -2950,9 +2950,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		return out;
 	}();
 
-	auto make_entry = [](const mode_player_id, const auto& player) {
+	auto make_entry = [](const mode_player_id id, const auto& player) {
 		messages::match_summary_message::player_entry new_entry;
 
+		new_entry.id = id;
 		new_entry.kills = player.stats.knockouts;
 		new_entry.assists = player.stats.assists;
 		new_entry.deaths = player.stats.deaths;
@@ -2967,6 +2968,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	messages::match_summary_message summary;
 	summary.match_start_timestamp = match_start_timestamp;
 	summary.losers_abandoned = result.losers_abandoned;
+	summary.was_ranked = is_ranked_live();
 
 	if (in.rules.is_ffa()) {
 		for_each_player_best_to_worst_in(

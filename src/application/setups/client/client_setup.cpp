@@ -2349,3 +2349,22 @@ std::optional<ingame_menu_button_type> client_setup::pending_menu_operation() co
 
 	return std::nullopt;
 }
+
+void web_sdk_happy_time();
+
+void client_setup::detect_our_victory(const messages::match_summary_message& msg) {
+	if (msg.is_tie()) {
+		return;
+	}
+
+	if (!msg.was_ranked) {
+		return;
+	}
+
+	for (auto& e : msg.first_faction) {
+		if (e.id == get_local_player_id()) {
+			web_sdk_happy_time();
+			return;
+		}
+	}
+}

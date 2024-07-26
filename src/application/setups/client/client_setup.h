@@ -50,6 +50,7 @@
 #include "steam_integration_callbacks.h"
 #include "application/main/auth_provider_type.h"
 #include "application/gui/ingame_menu_button_type.h"
+#include "game/messages/hud_message.h"
 
 #include "steam_rich_presence_pairs.h"
 
@@ -265,6 +266,8 @@ class client_setup :
 
 	void advance_demo_recorder();
 
+	void detect_our_victory(const messages::match_summary_message&);
+
 	template <class Callbacks, class ServerPayloadProvider, class TotalLocalEntropyProvider>
 	auto advance_single_step(
 		const client_advance_input& in,
@@ -419,6 +422,14 @@ class client_setup :
 						erase_if(notifications, [this, current_time](const auto& msg) {
 							return client_gui.chat.add_entry_from_mode_notification(current_time, msg, get_local_player_id());
 						});
+					}
+
+					{
+						const auto& summaries = step.get_queue<messages::match_summary_message>();
+
+						for (const auto& s : summaries) {
+							detect_our_victory(s);
+						}
 					}
 
 					audiovisual_post_solve(step, settings);

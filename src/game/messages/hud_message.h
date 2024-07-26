@@ -74,9 +74,11 @@ namespace messages {
 			std::string account_id;
 
 			int abandoned_at_score = -1;
+			mode_player_id id;
 		};
 
 		bool losers_abandoned = false;
+		bool was_ranked = false;
 
 		int first_team_score = 0;
 		int second_team_score = 0;
