@@ -63,6 +63,7 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 
 		if (is_dedicated_server) {
 			result.server.allow_nat_traversal = false;
+			result.server_start.port = 8412;
 		}
 
 #if PLATFORM_WEB
