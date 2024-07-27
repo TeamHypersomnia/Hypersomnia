@@ -680,6 +680,10 @@ void settings_gui_state::perform(
 
 					revertable_checkbox("Border", config.window.border);
 				}
+
+				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+
+				tooltip_on_hover("Try this if the cursor malfunctions for any reason.\nE.g. sometimes the system cursor disappears in fullscreen on Windows,\nor it breaks with fractional scaling on Wayland.");
 #endif
 
 				//input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
@@ -1760,13 +1764,6 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("Server settings")) {
 					do_server_settings();
 				}
-#endif
-
-#if !PLATFORM_WEB
-				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
-
-				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
-
 #endif
 
 #if PLATFORM_UNIX

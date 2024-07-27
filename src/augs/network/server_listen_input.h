@@ -6,7 +6,7 @@
 namespace augs {
 	struct server_listen_input {
 		// GEN INTROSPECTOR struct augs::server_listen_input
-		std::string ip = "127.0.0.1";
+		std::string ip = "0.0.0.0";
 		port_type port = 0;
 		int slots = 64;
 		// END GEN INTROSPECTOR
