@@ -36,17 +36,6 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 			result.audio.output_mode = audio_output_mode::AUTO;
 		}
 
-#if PLATFORM_LINUX
-		/* 
-			We don't yet properly implement detecting whether the app is in fs or not. 
-			So better use the system cursor so that we don't clip it accidentally. 
-		*/
-
-		result.window.draw_own_cursor_in_fullscreen = false;
-#else
-		result.window.draw_own_cursor_in_fullscreen = true;
-#endif
-
 #if PLATFORM_MACOS
 		result.window.fullscreen = true;
 #endif

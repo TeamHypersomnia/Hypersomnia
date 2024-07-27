@@ -683,7 +683,12 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
 
+#if 0
 				tooltip_on_hover("Try this if the cursor malfunctions for any reason.\nE.g. sometimes the system cursor disappears in fullscreen on Windows,\nor it breaks with fractional scaling on Wayland.");
+#else
+				tooltip_on_hover("Disable if the cursor malfunctions for any reason.");
+#endif
+
 #endif
 
 				//input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);

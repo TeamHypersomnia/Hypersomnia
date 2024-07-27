@@ -31,7 +31,7 @@
         "position": [40, 40],
         "bpp": 32,
         "size": [1200, 700],
-        "draw_own_cursor_in_fullscreen": false,
+        "draw_own_cursor_in_fullscreen": true,
         "log_keystrokes": false,
         "vsync_mode": "OFF",
         "max_fps": 400,
