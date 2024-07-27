@@ -604,7 +604,7 @@ void browse_servers_gui_state::show_server_list(
 		const auto& d = s.heartbeat;
 
 		const bool given_up = progress.state == server_entry_state::GIVEN_UP;
-		const auto color = rgba(given_up ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
+		const auto color = rgba(given_up || d.is_full() ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
 
 		auto do_text = [&](const auto& t) {
 			text_color(t, color);
@@ -647,8 +647,14 @@ void browse_servers_gui_state::show_server_list(
 
 		{
 			if (s.is_official_server() ) {
-				if (s.heartbeat.is_ranked_server()) {
-					text_color("RANKED", wave_color);
+				if (d.is_ranked_server()) {
+					if (d.is_full()) {
+						text_color("RANKED", color);
+					}
+					else {
+						text_color("RANKED", wave_color);
+					}
+
 					ImGui::SameLine();
 				}
 				else {
@@ -681,11 +687,11 @@ void browse_servers_gui_state::show_server_list(
 		if (ImGui::IsItemHovered()) {
 			auto tool = scoped_tooltip();
 
-			if (s.heartbeat.num_online == 0) {
+			if (d.num_online == 0) {
 				text_disabled("No players online.");
 			}
 			else {
-				text_color(typesafe_sprintf("%x players online:", s.heartbeat.num_online), green);
+				text_color(typesafe_sprintf("%x players online:", d.num_online), green);
 
 				auto do_faction_summary = [&](auto faction, auto& entries) {
 					if (entries.empty()) {
@@ -707,9 +713,9 @@ void browse_servers_gui_state::show_server_list(
 					}
 				};
 
-				do_faction_summary(faction_type::RESISTANCE, s.heartbeat.players_resistance);
-				do_faction_summary(faction_type::METROPOLIS, s.heartbeat.players_metropolis);
-				do_faction_summary(faction_type::SPECTATOR, s.heartbeat.players_spectating);
+				do_faction_summary(faction_type::RESISTANCE, d.players_resistance);
+				do_faction_summary(faction_type::METROPOLIS, d.players_metropolis);
+				do_faction_summary(faction_type::SPECTATOR, d.players_spectating);
 			}
 		}
 		
@@ -717,7 +723,7 @@ void browse_servers_gui_state::show_server_list(
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
-				displayed_connecting_server_name = s.heartbeat.server_name;
+				displayed_connecting_server_name = d.server_name;
 
 				requested_connection = s.get_connect_string();
 			}
@@ -731,11 +737,11 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 		if (s.is_official_server() ) {
-			if (s.heartbeat.is_ranked_server()) {
-				const auto location_id = s.heartbeat.get_location_id();
+			if (d.is_ranked_server()) {
+				const auto location_id = d.get_location_id();
 
 #if PLATFORM_WEB
-				if (const auto result = augs::date_time::format_time_until_weekend_evening(s.heartbeat.cached_time_to_event)) {
+				if (const auto result = augs::date_time::format_time_until_weekend_evening(d.cached_time_to_event)) {
 #else
 				if (const auto result = augs::date_time::format_time_until_weekend_evening(location_id)) {
 #endif
@@ -754,7 +760,14 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		do_text(typesafe_sprintf("%x/%x", d.num_online, d.max_online));
+		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online);
+
+		if (d.num_online == 0) {
+			text_disabled(players_text);
+		}
+		else {
+			do_text(players_text);
+		}
 
 		ImGui::NextColumn();
 
