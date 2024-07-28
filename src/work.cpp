@@ -2538,7 +2538,7 @@ work_result work(
 
 			browse_servers_gui.open();
 
-			if (best_server != nullptr) {
+			if (best_server.has_value()) {
 				browse_servers_gui.select_server(*best_server);
 			}
 		}

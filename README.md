@@ -55,7 +55,7 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
 
 <!-- *(270 votes, 40+ comments)* -->
 
-**[Open Source Friend](https://t.me/open_source_friend/2483)** <sub>(200 votes, 16.5k views)</sub>
+**[Open Source Friend](https://t.me/open_source_friend/2483)** <sub>(200 votes, 20k views)</sub>
 
 <!-- *(200 votes, 16.5k views)*  -->
 

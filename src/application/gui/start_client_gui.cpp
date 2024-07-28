@@ -65,7 +65,7 @@ struct avatar_loading_result_info {
 };
 
 bool start_client_gui_state::perform(
-	const server_list_entry* best_server,
+	const std::optional<server_list_entry>& best_server,
 	const bool refresh_in_progress,
 	const augs::frame_num_type current_frame,
 	augs::renderer& renderer,
@@ -205,7 +205,7 @@ bool start_client_gui_state::perform(
 			checkbox("Show", show);
 		}
 		else if (current_tab == start_client_tab_type::BEST_RANKED) {
-			if (best_server == nullptr) {
+			if (!best_server.has_value()) {
 				auto cs = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,0));
 
 				auto sname = std::string("Finding the best ranked server...");
@@ -246,7 +246,7 @@ bool start_client_gui_state::perform(
 
 				text_color("Players:", green);
 				ImGui::SameLine();
-				text(best_server ? std::to_string(best_server->heartbeat.num_online) : std::string("?"));
+				text(best_server.has_value() ? std::to_string(best_server->heartbeat.num_online) : std::string("?"));
 
 				ImGui::SameLine();
 
@@ -258,7 +258,7 @@ bool start_client_gui_state::perform(
 #if PLATFORM_WEB
 				text_disabled("?");
 #else
-				text(best_server ? best_server->progress.get_ping_string() : std::string("?"));
+				text(best_server.has_value() ? best_server->progress.get_ping_string() : std::string("?"));
 #endif
 			}
 
@@ -558,7 +558,7 @@ bool start_client_gui_state::perform(
 
 			const bool best_still_unresolved = 
 				current_tab == start_client_tab_type::BEST_RANKED
-				&& best_server == nullptr
+				&& best_server == std::nullopt
 			;
 
 			auto scope = maybe_disabled_cols({}, best_still_unresolved || custom_addr_empty || !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));

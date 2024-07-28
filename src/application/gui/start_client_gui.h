@@ -57,7 +57,7 @@ public:
 	void clear_demo_choice();
 
 	bool perform(
-		const server_list_entry* best_server,
+		const std::optional<server_list_entry>& best_server,
 		const bool refresh_in_progress,
 		augs::frame_num_type current_frame,
 		augs::renderer& renderer,

@@ -1259,15 +1259,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	return false;
 }
 
-const server_list_entry* browse_servers_gui_state::find_best_server() const {
+std::optional<server_list_entry> browse_servers_gui_state::find_best_server() const {
 	if (server_list.empty()) {
-		return nullptr;
+		return std::nullopt;
 	}
 
-	return &minimum_of(server_list, compare_servers);
+	return minimum_of(server_list, compare_servers);
 }
 
-const server_list_entry* browse_servers_gui_state::find_best_server(const bool find_ranked) const {
+std::optional<server_list_entry> browse_servers_gui_state::find_best_server(const bool find_ranked) const {
 	auto filtered = server_list;
 
 	erase_if(
@@ -1280,10 +1280,10 @@ const server_list_entry* browse_servers_gui_state::find_best_server(const bool f
 	);
 
 	if (filtered.empty()) {
-		return nullptr;
+		return std::nullopt;
 	}
 
-	return &minimum_of(filtered, compare_servers);
+	return minimum_of(filtered, compare_servers);
 }
 
 const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& in) const {
