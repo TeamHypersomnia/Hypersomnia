@@ -45,7 +45,9 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
 
 # Press
 
-<h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" height=50> <b>/ Blog</b> </a></h3>
+<h3><a href="https://mastodon.social/@gamingonlinux/112609228144158828"> <img src="https://github.com/user-attachments/assets/636af823-a54e-4d1a-9974-d2903e0ecf22" height=50> Liam @ GamingOnLinux</a></h3>
+
+<h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" height=50> <b>GitHub Blog</b> </a></h3>
 
 <a href="https://pubhtml5.com/mxdt/dbwn/Linux_USA_10.2023_downmagaz.net/89"> <img src="https://upload.wikimedia.org/wikipedia/en/0/05/Linux_Magazine_international_logo.png" alt="Issue 275, page 89"> </a>
 
@@ -56,8 +58,6 @@ Download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.App
 **[Open Source Friend](https://t.me/open_source_friend/2483)** <sub>(200 votes, 16.5k views)</sub>
 
 <!-- *(200 votes, 16.5k views)*  -->
-
-[ifun.de](https://www.ifun.de/hypersomnia-freier-multiplayer-shooter-fuer-mac-win-und-linux-212657/) | [GAMINGDEPUTY](https://www.gamingdeputy.com/hypersomnia-is-a-free-multiplayer-shooter-for-mac-win-and-linux/)
 
 # [📰 Are you a journalist? Click here!](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
 
