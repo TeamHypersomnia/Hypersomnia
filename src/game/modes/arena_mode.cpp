@@ -493,8 +493,12 @@ void arena_mode::erase_player(input_type in, const logic_step step, const mode_p
 	}
 }
 
-bool arena_mode::should_suspend_instead_of_remove(const const_input_type in) const {
+bool arena_mode::is_ranked_live_and_not_summary(const const_input_type in) const {
 	return is_ranked_live() && !is_last_summary(in);
+}
+
+bool arena_mode::should_suspend_instead_of_remove(const const_input_type in) const {
+	return is_ranked_live_and_not_summary(in);
 }
 
 void arena_mode::notify_ranked_banned(

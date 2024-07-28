@@ -2398,6 +2398,8 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	vars = new_vars;
 
 	if (reload_arena) {
+		dont_check_timeouts_until = server_time + 6.0;
+
 		write_vars_to_disk_once = true;
 
 		try {
@@ -2847,20 +2849,22 @@ void server_setup::advance_clients_state() {
 				automove_to_spectators_if_afk(client_id, c);
 			}
 
-			if (c.should_kick_due_to_network_timeout(vars, server_time)) {
-				if (!c.is_web_client_paused()) {
-					const auto timeout_secs = c.get_client_network_timeout_secs(vars);
-					LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
+			if (server_time >= dont_check_timeouts_until) {
+				if (c.should_kick_due_to_network_timeout(vars, server_time)) {
+					if (!c.is_web_client_paused()) {
+						const auto timeout_secs = c.get_client_network_timeout_secs(vars);
+						LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
 
-					if (c.is_web_client()) {
-						LOG("Pausing the web client due to timeout.");
-						c.web_client_paused = client_pause_state::PAUSED;
-						c.entropies_since_pause = 0;
-						c.reset_solvable_stream();
-					}
-					else {
-						kick(client_id, "Connection timed out!");
-						c.kick_no_linger = true;
+						if (c.is_web_client()) {
+							LOG("Pausing the web client due to timeout.");
+							c.web_client_paused = client_pause_state::PAUSED;
+							c.entropies_since_pause = 0;
+							c.reset_solvable_stream();
+						}
+						else {
+							kick(client_id, "Connection timed out!");
+							c.kick_no_linger = true;
+						}
 					}
 				}
 			}

@@ -754,6 +754,7 @@ public:
 		return suspended_players.size();
 	};
 
+	bool is_ranked_live_and_not_summary(const const_input in) const;
 	bool should_suspend_instead_of_remove(const const_input in) const;
 	float find_suspended_time_left(const const_input in) const;
 	float get_match_unfreezes_in_secs() const;

@@ -174,6 +174,8 @@ class server_setup :
 	net_time_t when_last_used_map_command = 0;
 	net_time_t when_last_changed_map_due_to_idle = 0;
 
+	net_time_t dont_check_timeouts_until = 0;
+
 	double tell_me_my_address_stamp = 0;
 
 	static bool is_webrtc_only();
