@@ -75,6 +75,14 @@ struct server_client_state {
 	uint32_t entropies_since_pause = 0;
 	net_time_t when_last_zeroed_entropy_counter = 0;
 
+	auto from_where() const {
+		return ::describe_welcome_type(settings.get_welcome_type());
+	}
+
+	bool should_post_webhooks() const {
+		return settings.get_welcome_type() != client_welcome_type::SUPPRESSED;
+	}
+
 	bool is_web_client_paused() const {
 		return web_client_paused != client_pause_state::LIVE;
 	}

@@ -359,7 +359,7 @@ message_handler_result server_setup::handle_payload(
 			if (read_payload(dummy_id, payload)) {
 				if (payload.image_bytes.empty()) {
 					/* We interpret it as a signal that there won't be any avatar. */
-					if (!c.settings.suppress_webhooks) {
+					if (c.should_post_webhooks()) {
 						push_connected_webhook(to_mode_player_id(client_id));
 					}
 				}
@@ -374,7 +374,7 @@ message_handler_result server_setup::handle_payload(
 						else {
 							c.meta.avatar = std::move(payload);
 
-							if (!c.settings.suppress_webhooks) {
+							if (c.should_post_webhooks()) {
 								push_connected_webhook(to_mode_player_id(client_id));
 							}
 
