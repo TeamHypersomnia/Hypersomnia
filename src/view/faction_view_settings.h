@@ -4,9 +4,9 @@
 
 struct button_colors_nha {
 	// GEN INTROSPECTOR struct button_colors_nha
-	rgba normal;
-	rgba hovered;
-	rgba active;
+	rgba normal = white;
+	rgba hovered = white;
+	rgba active = white;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const button_colors_nha& b) const = default;
@@ -14,15 +14,15 @@ struct button_colors_nha {
 
 struct faction_color_settings {
 	// GEN INTROSPECTOR struct faction_color_settings
-	rgba standard;
-	rgba current_player_text;
-	rgba current_player_dead_text;
-	rgba player_dead_text;
+	rgba standard = white;
+	rgba current_player_text = white;
+	rgba current_player_dead_text = white;
+	rgba player_dead_text = white;
 
 	button_colors_nha background;
 	button_colors_nha background_current;
 
-	rgba background_dark;
+	rgba background_dark = black;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const faction_color_settings& b) const = default;

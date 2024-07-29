@@ -487,10 +487,8 @@ namespace augs {
 			to.StartObject();
 
 			augs::for_each_enum_except_bounds([&](typename T::enum_type e) {
-				for (const auto& it : from) {
-					to.Key(json_stringize(e));
-					write_json(to, it);
-				}
+				to.Key(json_stringize(e));
+				write_json(to, from[e]);
 			});
 
 			to.EndObject();
@@ -597,13 +595,12 @@ namespace augs {
 			}
 
 			augs::for_each_enum_except_bounds([&](typename T::enum_type e) {
-				for (const auto& it : from) {
-					const auto defaults = reference_object[e];
+				const auto defaults = reference_object[e];
+				const auto& it = from[e];
 
-					if (!(defaults == it)) {
-						to.Key(json_stringize(e));
-						write_json_diff(to, it, defaults, true);
-					}
+				if (!(defaults == it)) {
+					to.Key(json_stringize(e));
+					write_json_diff(to, it, defaults, true);
 				}
 			});
 
