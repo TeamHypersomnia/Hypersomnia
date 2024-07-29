@@ -296,6 +296,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		for (auto& server : server_list) {
 			const auto address = server.first;
 
+			if (!server.second.last_heartbeat.show_on_server_list) {
+				continue;
+			}
+
 			augs::write_bytes(ss, address);
 			augs::write_bytes(ss, server.second.meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
@@ -303,6 +307,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		for (auto& server : peer_map) {
 			if (!server.second.is_server()) {
+				continue;
+			}
+
+			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
 
@@ -390,6 +398,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		};
 
 		for (const auto& server : server_list) {
+			if (!server.second.last_heartbeat.show_on_server_list) {
+				continue;
+			}
+
 			write_json_entry(
 				server.second.last_heartbeat,
 				server.second.meta,
@@ -400,6 +412,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		for (const auto& server : peer_map) {
 			if (!server.second.is_server()) {
+				continue;
+			}
+
+			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
 
@@ -805,12 +821,17 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							if (is_new_server) {
 								server_entry.meta.time_hosted = current_time;
 
-								if (!typed_request.suppress_new_community_server_webhook) {
-									MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
-									push_new_server_webhook(from, typed_request);
+								if (typed_request.show_on_server_list) {
+									if (!typed_request.suppress_new_community_server_webhook) {
+										MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
+										push_new_server_webhook(from, typed_request);
+									}
+									else {
+										MSR_LOG("New server sent a heartbeat from %x. Skipping notification due to a flag.", ip_str);
+									}
 								}
 								else {
-									MSR_LOG("New server sent a heartbeat from %x. Skipping notification due to a flag.", ip_str);
+									MSR_LOG("New server sent a heartbeat from %x. Skipping notification due show_on_server_list = false.", ip_str);
 								}
 							}
 

@@ -119,6 +119,7 @@ struct server_vars {
 	server_name_type server_name;
 	address_string_type notified_server_list;
 	bool suppress_new_community_server_webhook = false;
+	bool show_on_server_list = true;
 
 	bool allow_nat_traversal = true;
 	bool allow_direct_arena_file_downloads = true;

@@ -1991,6 +1991,8 @@ void server_setup::send_heartbeat_to_server_list() {
 		vars.suppress_new_community_server_webhook
 	;
 
+	heartbeat.show_on_server_list = vars.show_on_server_list;
+
 #if BUILD_NATIVE_SOCKETS
 	heartbeat.internal_network_address = internal_address;
 #endif

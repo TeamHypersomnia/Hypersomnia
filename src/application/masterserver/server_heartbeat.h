@@ -39,6 +39,7 @@ struct server_heartbeat {
 	std::optional<netcode_address_t> internal_network_address;
 	nat_detection_result nat;
 	bool suppress_new_community_server_webhook = false;
+	bool show_on_server_list = true;
 	game_version_identifier server_version = "Unknown";
 	bool is_editor_playtesting_server = false;
 

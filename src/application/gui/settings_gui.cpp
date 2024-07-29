@@ -1775,6 +1775,18 @@ void settings_gui_state::perform(
 				revertable_checkbox("Map CAPS LOCK to ESC", config.window.map_caps_lock_to_esc);
 #endif
 
+				ImGui::Separator();
+
+				text_color("Masterserver", yellow);
+
+				ImGui::Separator();
+
+				input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
+				input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
+
+#if 0
+				input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
+#endif
 
 #if !PLATFORM_WEB
 				ImGui::Separator();
@@ -1792,15 +1804,6 @@ void settings_gui_state::perform(
 					input_text<100>(SCOPE_CFG_NVP(update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.self_update.update_host);
 					input_text<100>(SCOPE_CFG_NVP(update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.self_update.update_path);
 
-					ImGui::Separator();
-
-					text_color("Masterserver", yellow);
-
-					ImGui::Separator();
-
-					input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
-					input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
-					input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
 				}
 
 #endif
@@ -2239,6 +2242,7 @@ void do_server_vars(
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
 
+		revertable_checkbox("Show on server list", vars.show_on_server_list);
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list));
 
 #if !IS_PRODUCTION_BUILD
