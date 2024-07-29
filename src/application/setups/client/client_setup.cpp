@@ -2004,7 +2004,7 @@ static uint8_t get_client_welcome_type(const bool suppress) {
 #elif PLATFORM_LINUX
 		return client_welcome_type::LINUX;
 #elif PLATFORM_MACOS
-		return client_welcome_type::MAC;
+		return client_welcome_type::MACOS;
 #else
 		return client_welcome_type::UNKNOWN;
 #endif
