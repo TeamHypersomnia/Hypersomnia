@@ -15,6 +15,7 @@ struct map_catalogue_entry {
 	std::string author;
 	std::string short_description;
 	version_timestamp_string version_timestamp;
+	bool playable = true;
 	// END GEN INTROSPECTOR
 
 	mutable std::optional<std::string> version_on_disk;

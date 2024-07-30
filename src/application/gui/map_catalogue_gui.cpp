@@ -166,6 +166,11 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		const auto arena_name = entry.name;
 		const auto arena_folder_path = downloads_directory / arena_name;
 
+		if (only_playable && !entry.playable) {
+			entry.passed_filter = false;
+			return;
+		}
+
 		if (filter.IsActive() && !filter.PassFilter(arena_name.c_str()) && !filter.PassFilter(entry.author.c_str())) {
 			entry.passed_filter = false;
 			return;
@@ -558,6 +563,9 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		if (ImGui::Button("Refresh")) {
 			refresh(in.external_arena_files_provider);
 		}
+
+		ImGui::SameLine();
+		ImGui::Checkbox("Only playable", &only_playable);
 	}
 
 	if (headless.list_refresh_in_progress()) {

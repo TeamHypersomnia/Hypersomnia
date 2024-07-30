@@ -1867,7 +1867,7 @@ void settings_gui_state::perform(
 				revertable_checkbox("Show performance", config.session.show_performance);
 				revertable_checkbox("Show logs", config.session.show_logs);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
-#if PLATFORM_WEB
+#if PLATFORM_WEB || !IS_PRODUCTION_BUILD
 				revertable_checkbox("Suppress client webhooks", config.client.suppress_webhooks);
 #endif
 				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);

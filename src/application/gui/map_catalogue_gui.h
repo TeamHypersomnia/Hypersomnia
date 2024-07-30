@@ -57,6 +57,7 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 	bool refresh_in_progress() const;
 
 	bool launch_download_on_last_selected = false;
+	bool only_playable = true;
 
 
 public:
