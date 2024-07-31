@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- 
+
 - show hn again
     - Show HN: Esports shooter on the Web based on floating-point determinism in C++
     - best to do after we finish pushing new versions to prod

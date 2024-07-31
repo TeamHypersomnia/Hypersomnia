@@ -5,8 +5,6 @@ enum class rcon_pane {
 	ARENAS,
 	MATCH,
 	VARS,
-	RULESETS,
-	USERS,
 	MAINTENANCE,
 
 	COUNT

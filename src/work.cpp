@@ -3627,7 +3627,7 @@ work_result work(
 
 			case T::EDITOR:
 #if WEB_LOWEND
-				augs::open_url("https://hypersomnia.io/editor");
+				augs::open_url("https://hypersomnia.io/editor/official");
 #else
 				launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
 #endif

@@ -30,9 +30,9 @@ void perform_rcon_gui(
 
 	const bool has_maintenance_tab = is_remote_server;
 
-	const auto window_name = "Remote Control (RCON)";
+	const auto window_name = is_remote_server ? "Server Control (RCON)" : "Server Control";
 
-	center_next_window(vec2::square(0.7f), ImGuiCond_Once);
+	center_next_window(vec2::square(0.55f), ImGuiCond_Once);
 
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
 	centered_text(window_name);
@@ -153,13 +153,6 @@ void perform_rcon_gui(
 					}
 				}
 
-				break;
-
-
-			case rcon_pane::RULESETS:
-				break;
-
-			case rcon_pane::USERS:
 				break;
 
 			case rcon_pane::MAINTENANCE:
