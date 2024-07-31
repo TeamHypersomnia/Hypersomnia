@@ -14,7 +14,7 @@ namespace augs {
 		void set_as_current(Rr& r) {
 			auto& self = static_cast<derived&>(*this);
 
-			r.template push_object_command(
+			r.push_object_command(
 				self,
 				op_type::SET
 			);
@@ -24,7 +24,7 @@ namespace augs {
 		void set_as_current(Rr& r) const {
 			const auto& self = static_cast<const derived&>(*this);
 
-			r.template push_object_command(
+			r.push_object_command(
 				self,
 				op_type::SET
 			);

@@ -7189,3 +7189,6 @@ This will discard your redo history."
 
 - optimize rambo map
 
+- update emscripten
+    - there's a new version
+
