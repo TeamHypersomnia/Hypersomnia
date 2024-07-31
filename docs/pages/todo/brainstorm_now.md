@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- optimize rambo map
-
 - update emscripten
     - there's a new version
 

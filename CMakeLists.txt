@@ -1376,7 +1376,13 @@ if(BUILD_FOR_WEB)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=${STACK_SIZE}")
 
 	if (WEB_MULTITHREADING)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+		# Threads:
+		# - Game thread
+		# - Audio thread
+		# - Worker helper thread
+		# - Occasional atlas generation thread 
+		# - 2 for occasional launch_async 
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=6")
 	endif()
 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s INITIAL_MEMORY=${INITIAL_MEMORY}")

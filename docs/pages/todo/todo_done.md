@@ -7187,3 +7187,5 @@ This will discard your redo history."
 - connected from CG
     - suppress_webhooks -> welcome_type
 
+- optimize rambo map
+

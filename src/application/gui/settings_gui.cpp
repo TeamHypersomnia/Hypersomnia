@@ -61,6 +61,10 @@ void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
 }
 
 int performance_settings::get_default_num_pool_workers() {
+#if PLATFORM_WEB
+	return 1;
+#endif
+
 	const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
 	const auto audio_threads = 1;
@@ -73,9 +77,6 @@ int performance_settings::get_default_num_pool_workers() {
 		+ rendering_threads
 		+ main_threads
 		+ openal_threads
-#if PLATFORM_WEB
-		+ 4 // to be on the safe side so we don't deadlock because of new threads created
-#endif
 	;
 
 	return std::max(0, concurrency - total_other_threads);
