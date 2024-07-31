@@ -4639,6 +4639,7 @@ work_result work(
 						if (has_current_setup()) {
 							if (ingame_menu.show) {
 								ingame_menu.show = false;
+								browse_servers_gui.close();
 							}
 							else if (!visit_current_setup([&](auto& setup) {
 								switch (setup.escape()) {

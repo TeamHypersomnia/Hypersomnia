@@ -474,13 +474,16 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		return false;
 	}
 
-#if WEB_LOWEND
-	centered_size_mult = vec2(0.97f, 0.97f);
-#else
-	centered_size_mult = vec2(0.9f, 0.8f);
-#endif
+	center_flag = ImGuiCond_Always;
 
-	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
+	if (ImGui::GetIO().DisplaySize.x <= 1200) {
+		centered_size_mult = vec2(0.97f, 0.97f);
+	}
+	else {
+		centered_size_mult = vec2(0.9f, 0.8f);
+	}
+
+	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 	if (!imgui_window) {
 		return false;

@@ -37,7 +37,7 @@ struct standard_window_mixin {
 	auto make_scoped_window(Args&&... args) {
 		if (show) {
 			if (centered_size_mult.has_value()) {
-				augs::imgui::center_next_window(*centered_size_mult, ImGuiCond_FirstUseEver);
+				augs::imgui::center_next_window(*centered_size_mult, center_flag);
 			}
 			else {
 				ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
@@ -76,6 +76,7 @@ struct standard_window_mixin {
 
 protected:
 	std::optional<vec2> centered_size_mult;
+	int center_flag = ImGuiCond_FirstUseEver;
 
 private:
 	std::string title;

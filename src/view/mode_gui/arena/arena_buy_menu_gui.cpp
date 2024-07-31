@@ -206,10 +206,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return {};
 	}
 
-	center_next_window(vec2::square(0.9f), ImGuiCond_Once);
+	center_next_window(vec2::square(0.95f), ImGuiCond_Always);
 
 	const auto window_name = "Buy menu";
-	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
+	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 	centered_text(window_name);
 

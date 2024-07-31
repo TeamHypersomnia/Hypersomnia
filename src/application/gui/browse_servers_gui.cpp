@@ -835,13 +835,16 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
-#if WEB_LOWEND
-	centered_size_mult = vec2(0.97f, 0.96f);
-#else
-	centered_size_mult = vec2(0.8f, 0.7f);
-#endif
+	center_flag = ImGuiCond_Always;
 
-	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking);
+	if (ImGui::GetIO().DisplaySize.x <= 1200) {
+		centered_size_mult = vec2(0.97f, 0.96f);
+	}
+	else {
+		centered_size_mult = vec2(0.8f, 0.7f);
+	}
+
+	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
 	if (!imgui_window) {
 		return false;
