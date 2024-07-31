@@ -800,6 +800,10 @@ client_setup::client_setup(
 }
 
 std::string client_setup::get_browser_location() const {
+	if (is_ranked_live_or_starting()) {
+		return "";
+	}
+
 	return typesafe_sprintf("game/%x", connect_string);
 }
 
