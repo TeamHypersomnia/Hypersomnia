@@ -7154,3 +7154,36 @@ This will discard your redo history."
     - or just handle it correctly somehow, a hook?
     - NOTE You'll have to restart the masterserver either way!!!! so it loads the new ssl file
 - added a deploy hook
+- refresh crazygames token on connect or make aggressive timeout assumption
+    - use 30 secs margin instead of 5 eg
+
+- crazygames audio perf: we can measure total time elapsed for processed commands and break out after 10 ms
+    - will be crucial to preserve responsiveness
+    - and just append commands to the single vector
+    - finish can process all
+    - ofc i'd still keep lowend fixes like no engine sound but at least then we can increase proc freq a bit and maybe even go with hrtf?
+    
+
+- hide settings in web that can crash the app like number of threads
+
+- preparing for large traffic from crazygames
+    - show full servers in gray
+        - also non-full servers during ranked (waiting for deserters)
+    - show empty servers in gray
+    - full should have name grayed out, empty just the counter
+
+- setup the server as a service to fix those stupid ass restarts
+
+
+- On dedicated server, use port 8412 by default to simplify instructions
+    - but it'd be good to leave 0 an option
+    - specify it with --server-port 0 then because it will be rare tbh
+        - use std optional in cmd line params
+        - alias --port
+- update presskit with all pepper/reddit/liam links etc
+
+- update deploy_hypersomnia.sh for onfoss
+
+- connected from CG
+    - suppress_webhooks -> welcome_type
+

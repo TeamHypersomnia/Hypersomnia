@@ -6,33 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- optimize rambo map
+
 - update emscripten
     - there's a new version
 
-- update presskit with all pepper/reddit/liam links etc
-
-- refresh crazygames token on connect or make aggressive timeout assumption
-    - use 30 secs margin instead of 5 eg
-
-- crazygames audio perf: we can measure total time elapsed for processed commands and break out after 10 ms
-    - will be crucial to preserve responsiveness
-    - and just append commands to the single vector
-    - finish can process all
-    - ofc i'd still keep lowend fixes like no engine sound but at least then we can increase proc freq a bit and maybe even go with hrtf?
-    
-
-- On dedicated server, use port 8412 by default to simplify instructions
-    - but it'd be good to leave 0 an option
-    - specify it with --server-port 0 then because it will be rare tbh
-        - use std optional in cmd line params
-        - alias --port
-    
-
-- hide settings in web that can crash the app like number of threads
-
-- preparing for large traffic from crazygames
-    - show full servers in gray
-        - also non-full servers during ranked (waiting for deserters)
+- show hn again
+    - Show HN: Esports shooter on the Web based on floating-point determinism in C++
+    - best to do after we finish pushing new versions to prod
 
 - #server-monitor should @ping me to play and also provide links
     - although if someone wants to play with just their friend then it's pointless to @ping me to play

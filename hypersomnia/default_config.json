@@ -59,7 +59,7 @@
     },
 
     "audio_volume": {
-        "master": 1.0,
+        "master": 0.8,
         "sound_effects": 0.75,
         "music": 0.55
     },

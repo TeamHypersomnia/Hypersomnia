@@ -5,6 +5,11 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- fix fucking menu crash in web again
+    - when aborting after opening through /game/blahblah link
+    - I think that was a false alarm, perhaps we were running an old version in the browser
+    - cant reproduce it for the life of me
+
 - Initial handshake&interpolation issues
     - RCON slowed down the initial handshake
 	- The map list was sent twice

@@ -1302,7 +1302,6 @@ void editor_setup::save_project_file_as(const augs::path_type& path) {
 		auto pos = std::strlen("2023-08-26 10:22:38.");
 		auto new_stamp = str.substr(0, pos) + ms_s + " UTC";
 		project.meta.version_timestamp = new_stamp;
-		fdlskfjsdl
 	}
 #else
 	project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
