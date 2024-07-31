@@ -121,6 +121,14 @@ message_handler_result server_setup::handle_payload(
 
 		c.rebroadcast_synced_meta = true;
 		c.last_keyboard_activity_time = server_time;
+
+#if 0
+#if !IS_PRODUCTION_BUILD
+		/* Test rankeds without real accounts */
+		c.verified_has_no_ban = true;
+		c.authenticated_id = new_nick;
+#endif
+#endif
 	}
 	else if constexpr (is_one_of_v<T, rcon_command_variant, server_vars>) {
 		const auto level = get_rcon_level(client_id);

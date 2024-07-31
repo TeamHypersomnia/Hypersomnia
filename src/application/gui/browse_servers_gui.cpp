@@ -868,9 +868,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const auto& arena = s.heartbeat.current_arena;
 		const auto effective_name = std::string(name) + " " + std::string(arena);
 
+		const bool is_internal = s.progress.found_on_internal_network;
+
 		auto push_if_passes = [&](auto& target_list) {
-			if (!allow_ranked_servers && s.heartbeat.is_ranked_server()) {
-				return;
+			const bool is_internal = s.progress.found_on_internal_network;
+
+			if (!is_internal) {
+				if (!allow_ranked_servers && s.heartbeat.is_ranked_server()) {
+					return;
+				}
 			}
 
 			if (only_responding) {
@@ -897,8 +903,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			target_list.push_back(&s);
 		};
-
-		const bool is_internal = s.progress.found_on_internal_network;
 
 		if (is_internal) {
 			has_local_servers = true;
