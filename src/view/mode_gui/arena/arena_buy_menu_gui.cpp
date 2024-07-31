@@ -123,7 +123,7 @@ bool arena_buy_menu_gui::control(general_gui_intent_input in) {
 				key_opened = key;
 
 				if (show) {
-					hide();
+					escape();
 				}
 				else {
 					show = true;
@@ -770,7 +770,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			const auto hotkey = "(" + key_to_string(key_opened) + ")";
 
-			if (category_button(hotkey.c_str(), "Cancel")) {
+			if (category_button(hotkey.c_str(), "Close")) {
 				hide();
 				return result;
 			}
@@ -832,7 +832,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::Separator();
 				}
 
-				if (category_button("(ESC)", "Cancel")) {
+				const auto hotkey = "(" + key_to_string(key_opened) + ")";
+
+				if (category_button(hotkey.c_str(), "Go back")) {
 					next_requested_menu = buy_menu_type::MAIN;
 				}
 			};
@@ -872,7 +874,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::Separator();
 				}
 
-				if (category_button("(ESC)", "Cancel")) {
+				const auto hotkey = "(" + key_to_string(key_opened) + ")";
+
+				if (category_button(hotkey.c_str(), "Go back")) {
 					next_requested_menu = buy_menu_type::MAIN;
 				}
 			};
