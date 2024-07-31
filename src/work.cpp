@@ -5689,6 +5689,8 @@ work_result work(
 
 		main_thread_queue::process_tasks();
 
+		thread_pool.help_until_no_tasks();
+
 		if (!buffer_swapper.can_swap_buffers()) {
 			return true;
 		}
