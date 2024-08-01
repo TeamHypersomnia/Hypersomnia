@@ -3625,11 +3625,13 @@ work_result work(
 				launch_setup(activity_type::TUTORIAL);
 				break;
 
+#if !WEB_LOWEND
 			case T::EDITOR:
 #if WEB_LOWEND
 				augs::open_url("https://hypersomnia.io/editor/official");
 #else
 				launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
+#endif
 #endif
 
 				break;

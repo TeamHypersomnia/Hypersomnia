@@ -19,7 +19,9 @@ enum class main_menu_button_type {
 #endif
 	SHOOTING_RANGE,
 	TUTORIAL,
+#if !WEB_LOWEND
 	EDITOR,
+#endif
 	SETTINGS,
 #if !WEB_LOWEND
 	CREDITS,

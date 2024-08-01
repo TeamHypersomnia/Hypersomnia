@@ -51,10 +51,12 @@ struct main_menu_gui {
 			return true;
 		}
 
+#if !WEB_LOWEND
 		if (change.was_pressed(augs::event::keys::key::E)) {
 			button_callback(main_menu_button_type::EDITOR);
 			return true;
 		}
+#endif
 
 		if (change.was_pressed(augs::event::keys::key::L)) {
 			button_callback(main_menu_button_type::SHOOTING_RANGE);

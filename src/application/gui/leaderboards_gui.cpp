@@ -470,7 +470,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		for (const auto& s : list) {
 			auto open_url = [&]() {
+#if !WEB_LOWEND
 				augs::open_url(typesafe_sprintf("https://hypersomnia.xyz/user/%x", s.account_id));
+#endif
 			};
 
 			const auto place = 1 + index_in(list, s);
