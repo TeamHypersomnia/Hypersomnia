@@ -125,8 +125,7 @@ namespace augs {
         return false;
 	}
 
-    bool has_profanity(const std::string& in_orig) {
-		auto cleaned = insert_space_before_caseness_change(limit_repetitions(in_orig));
+	bool has_profanity_base_check2(std::string cleaned) {
 		cleaned = ::to_lowercase(cleaned);
 
 		/* Case: words delimited by punctuations aaa.bbb */
@@ -164,5 +163,14 @@ namespace augs {
 		}
 
 		return false;
+	}
+
+    bool has_profanity(const std::string& in_orig) {
+		auto cleaned = limit_repetitions(in_orig);
+
+		return
+			has_profanity_base_check2(cleaned) ||
+			has_profanity_base_check2(insert_space_before_caseness_change(cleaned))
+		;
     }
 }

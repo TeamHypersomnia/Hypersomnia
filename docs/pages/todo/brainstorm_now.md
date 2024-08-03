@@ -6,22 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- show hn again
-    - Show HN: Esports shooter on the Web based on floating-point determinism in C++
-    - best to do after we finish pushing new versions to prod
+- unbind f1 and f3 on web cause someone might do it accidentally
 
-- #server-monitor should @ping me to play and also provide links
-    - although if someone wants to play with just their friend then it's pointless to @ping me to play
-    - a link would be handy though
+- Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
 
-- i think we'll just do association without merging after all
-    - This will avoid data loss and will be easier to unlink a discord account later, relink it, and link more than one
-    - We could even allow to link either way
-        - Or not merge but link automatically in the direction of the account that has more matches
+- for better grenade/knife accuracy:
+    - throw them from the right hand instead of left (the hand holding the weapon)
+    - zero the recoil
 
-- dont use third party connections list from discord although it's tempting
-    - because then we're trusting discord it's not returning wrong steam accounts
-    - github button can be in the native too
+- clicking outside should close buy menu too
+
+- always allow changing maps when alone on the server
+
+- Less round time on small maps to increase tension on T side
+    - e.g. on duel practice
 
 - fall back to using webrtc for servers behind nat
 
@@ -36,19 +34,7 @@ summary: That which we are brainstorming at the moment.
     - how others do it?
         - krunker redirects to its own page, makes sense, maybe we should too
 
-
-- simple user browser folder in settings?
-
-- run a memory profiler to detect leaks
-
 - also handle the web server being alt tabbed
-- lets encrypt certs?
-- assign random nicknames, or just ask for one
-    - will later take them from accounts once we have authentication
-
-- diagnose why web cant connect to native local servers but first add TURN servers maybe
-- memory problem with hyperactive space station
-
 - setup stun/ice/turn servers
 
 - wtf is that crosshair glitch when hosting via 'srv'
@@ -56,37 +42,6 @@ summary: That which we are brainstorming at the moment.
 
 - hide the counter on runtime errors
 
-- for better grenade/knife accuracy:
-    - throw them from the right hand instead of left (the hand holding the weapon)
-    - zero the recoil
-
-- consider having short ids for peers so links don't take much space and are easily transferred without copying (e.g. in school)
-
-- how about using server->config.override_send_and_receive
-    - but on server doing BOTH! This function will send and receive packets using NETCODE but will also handle webrtc queues
-
-    - ultimately:
-        - on server, impl. aux_receive_packet, aux_send_packet and call them *in addition*
-            - except if on web, dont use aux, just use override, but that can be controlled setup-side
-        - on client using override *(or not using it)* is enough since we'll use only one medium
-
-- server will be the hardest as it needs to know which clients are from webrtc
-
-    - we'll have to assign a random ip, or a localhost one
-    - look for networkSimulator->IsActive() to find good entry points
-    - we can use "override
-
-- fix spawn prediction on connect to prevent the unpleasant glitch
-    - might just have to make it predictable instead of dependent on cosmos step?
-
-- "download native client" in the right top
-
-- clicking outside should close buy menu too
-
-- always allow changing maps when alone on the server
-
-- we can't just omit posting commands as we might skip existential ones?
-    - actually no because then the existential commands won't be posted
 
 - OpenAL fixes to emscripten
     - case 0x200 /* AL_SOURCE_DISTANCE_MODEL */:
@@ -127,30 +82,12 @@ summary: That which we are brainstorming at the moment.
 
 - fix steam_76561198118088474 profile on the web
 
-- after we debug the web:
-    - fix number of worker threads
-    - reduce stack size to a reasonable amount
-    - save fullscreen=false always to config
-
 - consider enabling freetype for imgui
-- check auto-vectorization if determinism breaks
-- --embed-file
 
-- we'll have to update to the latest version of yojimbo at some point
-
-- optimize de_rambo
 - Editor: copy path to clipboard
 
 - allow changing rcon pass from rcon? won't work with config.force.json tho
 - fix that masterserver dump vs banlist or just dont use dump at all
-- rcon command to sync maps would be good
-
-- Host multiple official servers to accomodate a potential spike in the number of players
-    - Each instance will have its own config directory
-    - Autoupdating mulitple servers
-        - Not our problem: We'll trigger autoupdates manually anyway
-        - But for other people doing this, they'll just need to set daily autoupdates by a minute away per instance at least
-            - Or two minutes after the first one completes
 
 - Fix Steam invites over LAN
     - 1) Connecting to a server that is actually over lan
@@ -167,65 +104,18 @@ summary: That which we are brainstorming at the moment.
 
 - GIFs for Steam description
 
-- Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
-
-# REST
-
 - /skip command
     - with 60 sec timeout
 - /restart maybe too
     - with 60 sec timeout
-    
-- Lower the audio delay in OpenAL esp for Windows
-    - use WASAPI Exclusive mode vs Shared? https://github.com/kcat/openal-soft/issues/682
 
 - Server monitor notifications might work funky if a player connected with suppress_webhooks = true
+    - cause avatar is skipped
 
 - CI should publish appimage with -g, then the deployment script should strip and repack it
     - The only problem is the self-updater will download the non-debug version again unless we can check but that's a lot of work for now
-
-- we can upload macos too, in the worst case it doesnt work lol
-
-- Welcome widget at the top-left showing the nickname and avatar, e.g. Welcome Pythagoras
-    - Use an ImGui popup for this
-
-- Less round time on small maps to increase tension on T side
-    - e.g. on duel practice
     
 - Net stats not measured for some reason
-
-- Server administration
-    - Config organization
-        - Current system is not so bad
-            - How to make RCON changes persistent?
-                - config.json could store it
-    - Auto-updating
-        - Broadcasting on-demand might be tempting but scheduled periodic checks will feel better/safer for people
-            - It will also allow for controllable server maintenance periods
-            - And def easier to implement
-        - Note the updates will already be distributed in time if we read the e.g. "2:30" as if it's in the local timezone
-    - Map-cycling
-        - A var so we don't yet have to make overriding rulesets for this
-            - A list of string pairs: { map, mode }, if mode is empty it means default
-            - Actually let's have them in a single string e.g. 
-                {
-                    "de_cyberaqua bomb_defusal",
-                    "fy_minilab gun_game",
-                    "de_silo"
-                }
-            - arena_and_mode_identifier
-            - shouldn't this be serialized as a block? along with all vars
-                - maybe let's send the entire server_vars as a block always so it's not a problem
-                - this struct can easily get big and doesn't need to be responsive at all
-        - Purely server-side state
-        - The only problem will be mispredicted delay, the clients will see beginning of the new round for a fraction of a second
-
-
-    - The flag has to be effectively transmitted through the network, as a byte
-        - Otherwise it'd have to be a separate mode which we don't want in case we want to apply FFA modifier to other modes (e.g. construction?)
-        - Then it needs to be passed with ruleset
-    - Modifier bitset?
-    - Actually maybe make it a separate mode?
 
 - Editor: Show selection AABB and size somewhere
 - Throw grenades further when zooming out
@@ -352,57 +242,12 @@ summary: That which we are brainstorming at the moment.
         - Then the servers will know it's legit, even if it's spoofed it literally only helps
         - We don't even have to download the entire archive then. We'll just have one more thing to sign, the new version message.
 
-- Map catalogue
-    - Note external arena provider and ingame catalogue source are conceptually two different links
-        - even though they'll coincide for the official server
-        - BUT After all let's make the catalogue read from the server vars.
-            - Why? Because if the end-user chooses a different provider they'll expect that hosting a server will take the same link as provider too.
-
-    - Problems to solve
-        - What if we update maps while the servers already have them loaded?
-            - The existing clients still need a way to download the correct ones
-            - The custom servers will likely have tcp/ip file downloads enabled so it should still work as a backstop
-            - Whereas we can take care to restart the official server when we update maps
-        - The server has to know whether the arena it hosts is actually available to download or it will constantly send wrong links
-            - But the link it sends is the same anyway; why not just send the host in the settings and let the client figure it out on their own?
-                - let the client figure out whether the map is on the external provider and just send requests if its not
-
-            - Why not just query the json file at the host every time the map is hosted/chosen by the server?
-                - If it differs, or can't reach the host, only allow direct transfers
-                - Can even query every time someone wants to download
-                    - the client waits anyway for a file payload so they can wait until we query the host too no prob
-                    - anyways if it's hosted from user/projects than we always disallow anyway, we only check with user/downloads
-
-            - btw we'll just send the download link once which will be the arena root and the client will download the rest on its own
-
-            - Plus the dedicated servers with public ip can actually make server's file coincide with what is served over https 
-
-            - How about we determine it by whether it's in user/projects or in downloaded arenas?
-                - though downloaded arenas might be from somewhere else too
-            - if user/projects - always direct
-            - 
-    - First let's replace udp downloads with direct http downloads
-        - Idea: server could provide a link instead of an actual file
-        - This is tempting because it's the server's responsibility then to provide up to date files and we can preserve the whole flow
-    - Generally, the client asks for hash - it gets either the block message (or tcp/ip connection request) or the external link message
-- Maybe it's easier to just skip the bullshit with optional links and just start tcp ip connection
-    - Most of the time arena files will be hosted on the same server
-        - Well they have to have these files anyway to run the simulation
-    - yea i think it'll be better for now
-- Unless we autoupload any map to the host
-    - Yeah I think it's bad to assume tcp will also work after punching
-- In any case, if we're not doing tcp/ip, we need the file_download_link payload regardless if we're doing uploads or some relay
-
 
 - post external fixing
     - nah it's something with hashes actually, probably autosaves at work again, or clrfs, see the downloaded logs
 
     - maybe increase http timeout to 3? if there were problems with externals we'd see it on our own
     - send stat keepalives more often because they get stuck or just not stop sending packets at all
-    
-- We could also use UDT later, looks legit
-    - just send the list of all hashes once and send it in a single chunk?
-    - per file is okay too I guess
 
 - guess for now we could leave a conservative number like 1mb and focus on ingame map catalogue
 
@@ -429,8 +274,6 @@ summary: That which we are brainstorming at the moment.
     - The server can check for a specific map update *before* launching the map.
         - The previous map can simply be on indefinitely
         - Could even be precached during match summary
-
-- add player lists to server browser
 
 - map statistics from server_list_json
     - counted only when >= 2 players are fighting

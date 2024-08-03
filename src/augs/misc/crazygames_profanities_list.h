@@ -956,6 +956,7 @@ std::vector<const char*> profanities_list = {
 	"niggas",
 	"niggaz",
 	"nigger",
+	"niggerr",
 	"niggers",
 	"niggle",
 	"niglet",

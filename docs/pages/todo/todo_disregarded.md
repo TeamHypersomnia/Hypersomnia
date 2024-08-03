@@ -722,3 +722,18 @@ summary: Just a hidden scratchpad.
 - Add gamer role to discord to be pinged by server-monitor
     - only new server/connect notifs
 
+- check auto-vectorization if determinism breaks
+- #server-monitor should @ping me to play and also provide links
+    - although if someone wants to play with just their friend then it's pointless to @ping me to play
+    - a link would be handy though
+
+- simple user browser folder in settings?
+
+- rcon command to sync maps would be good
+    
+- Lower the audio delay in OpenAL esp for Windows
+    - use WASAPI Exclusive mode vs Shared? https://github.com/kcat/openal-soft/issues/682
+    
+- We could also use UDT later, looks legit
+    - just send the list of all hashes once and send it in a single chunk?
+    - per file is okay too I guess

@@ -7192,3 +7192,145 @@ This will discard your redo history."
 - update emscripten
     - there's a new version
 
+- lets encrypt certs?
+- assign random nicknames, or just ask for one
+    - will later take them from accounts once we have authentication
+
+- diagnose why web cant connect to native local servers but first add TURN servers maybe
+- memory problem with hyperactive space station
+
+- how about using server->config.override_send_and_receive
+    - but on server doing BOTH! This function will send and receive packets using NETCODE but will also handle webrtc queues
+
+    - ultimately:
+        - on server, impl. aux_receive_packet, aux_send_packet and call them *in addition*
+            - except if on web, dont use aux, just use override, but that can be controlled setup-side
+        - on client using override *(or not using it)* is enough since we'll use only one medium
+
+- server will be the hardest as it needs to know which clients are from webrtc
+
+    - we'll have to assign a random ip, or a localhost one
+    - look for networkSimulator->IsActive() to find good entry points
+    - we can use "override
+
+- fix spawn prediction on connect to prevent the unpleasant glitch
+    - might just have to make it predictable instead of dependent on cosmos step?
+
+- "download native client" in the right top
+
+- we can't just omit posting commands as we might skip existential ones?
+    - actually no because then the existential commands won't be posted
+
+
+- after we debug the web:
+    - fix number of worker threads
+    - reduce stack size to a reasonable amount
+    - save fullscreen=false always to config
+- --embed-file
+
+- Host multiple official servers to accomodate a potential spike in the number of players
+    - Each instance will have its own config directory
+    - Autoupdating mulitple servers
+        - Not our problem: We'll trigger autoupdates manually anyway
+        - But for other people doing this, they'll just need to set daily autoupdates by a minute away per instance at least
+            - Or two minutes after the first one completes
+- show hn again
+    - Show HN: Esports shooter on the Web based on floating-point determinism in C++
+    - best to do after we finish pushing new versions to prod
+
+- i think we'll just do association without merging after all
+    - This will avoid data loss and will be easier to unlink a discord account later, relink it, and link more than one
+    - We could even allow to link either way
+        - Or not merge but link automatically in the direction of the account that has more matches
+
+- dont use third party connections list from discord although it's tempting
+    - because then we're trusting discord it's not returning wrong steam accounts
+    - github button can be in the native too
+
+- run a memory profiler to detect leaks
+
+- consider having short ids for peers so links don't take much space and are easily transferred without copying (e.g. in school)
+
+- optimize de_rambo
+- we'll have to update to the latest version of yojimbo at some point
+
+- Welcome widget at the top-left showing the nickname and avatar, e.g. Welcome Pythagoras
+    - Use an ImGui popup for this
+
+
+- Server administration
+    - Config organization
+        - Current system is not so bad
+            - How to make RCON changes persistent?
+                - config.json could store it
+    - Auto-updating
+        - Broadcasting on-demand might be tempting but scheduled periodic checks will feel better/safer for people
+            - It will also allow for controllable server maintenance periods
+            - And def easier to implement
+        - Note the updates will already be distributed in time if we read the e.g. "2:30" as if it's in the local timezone
+    - Map-cycling
+        - A var so we don't yet have to make overriding rulesets for this
+            - A list of string pairs: { map, mode }, if mode is empty it means default
+            - Actually let's have them in a single string e.g. 
+                {
+                    "de_cyberaqua bomb_defusal",
+                    "fy_minilab gun_game",
+                    "de_silo"
+                }
+            - arena_and_mode_identifier
+            - shouldn't this be serialized as a block? along with all vars
+                - maybe let's send the entire server_vars as a block always so it's not a problem
+                - this struct can easily get big and doesn't need to be responsive at all
+        - Purely server-side state
+        - The only problem will be mispredicted delay, the clients will see beginning of the new round for a fraction of a second
+
+
+    - The flag has to be effectively transmitted through the network, as a byte
+        - Otherwise it'd have to be a separate mode which we don't want in case we want to apply FFA modifier to other modes (e.g. construction?)
+        - Then it needs to be passed with ruleset
+    - Modifier bitset?
+    - Actually maybe make it a separate mode?
+
+- Map catalogue
+    - Note external arena provider and ingame catalogue source are conceptually two different links
+        - even though they'll coincide for the official server
+        - BUT After all let's make the catalogue read from the server vars.
+            - Why? Because if the end-user chooses a different provider they'll expect that hosting a server will take the same link as provider too.
+
+    - Problems to solve
+        - What if we update maps while the servers already have them loaded?
+            - The existing clients still need a way to download the correct ones
+            - The custom servers will likely have tcp/ip file downloads enabled so it should still work as a backstop
+            - Whereas we can take care to restart the official server when we update maps
+        - The server has to know whether the arena it hosts is actually available to download or it will constantly send wrong links
+            - But the link it sends is the same anyway; why not just send the host in the settings and let the client figure it out on their own?
+                - let the client figure out whether the map is on the external provider and just send requests if its not
+
+            - Why not just query the json file at the host every time the map is hosted/chosen by the server?
+                - If it differs, or can't reach the host, only allow direct transfers
+                - Can even query every time someone wants to download
+                    - the client waits anyway for a file payload so they can wait until we query the host too no prob
+                    - anyways if it's hosted from user/projects than we always disallow anyway, we only check with user/downloads
+
+            - btw we'll just send the download link once which will be the arena root and the client will download the rest on its own
+
+            - Plus the dedicated servers with public ip can actually make server's file coincide with what is served over https 
+
+            - How about we determine it by whether it's in user/projects or in downloaded arenas?
+                - though downloaded arenas might be from somewhere else too
+            - if user/projects - always direct
+            - 
+    - First let's replace udp downloads with direct http downloads
+        - Idea: server could provide a link instead of an actual file
+        - This is tempting because it's the server's responsibility then to provide up to date files and we can preserve the whole flow
+    - Generally, the client asks for hash - it gets either the block message (or tcp/ip connection request) or the external link message
+- Maybe it's easier to just skip the bullshit with optional links and just start tcp ip connection
+    - Most of the time arena files will be hosted on the same server
+        - Well they have to have these files anyway to run the simulation
+    - yea i think it'll be better for now
+- Unless we autoupload any map to the host
+    - Yeah I think it's bad to assume tcp will also work after punching
+- In any case, if we're not doing tcp/ip, we need the file_download_link payload regardless if we're doing uploads or some relay
+
+- add player lists to server browser
+
