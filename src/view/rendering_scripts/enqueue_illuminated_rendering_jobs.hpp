@@ -11,7 +11,8 @@ void enqueue_illuminated_rendering_jobs(
 	using D = augs::dedicated_buffer;
 	using DV = augs::dedicated_buffer_vector;
 
-	const bool draw_enemy_silhouettes = in.can_draw_enemy_silhouettes && in.drawing.draw_enemy_silhouettes_in_spectator;
+	const bool viewer_is_spectator = in.viewer_is_spectator;
+	const bool draw_enemy_silhouettes = viewer_is_spectator && in.drawing.draw_enemy_silhouettes_in_spectator;
 	const bool streamer_mode = in.streamer_mode;
 	const auto& necessarys = in.necessary_images;
 
@@ -82,7 +83,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [draw_enemy_silhouettes, &cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [viewer_is_spectator, draw_enemy_silhouettes, &cosm, considered_fov, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		(void)fog_of_war_effective;
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
@@ -182,7 +183,8 @@ void enqueue_illuminated_rendering_jobs(
 			color_indicator_angle,
 			indicator_meta,
 			is_reasonably_in_view,
-			streamer_mode
+			streamer_mode,
+			viewer_is_spectator
 		};
 
 		draw_sentiences_hud(input);

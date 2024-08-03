@@ -2919,7 +2919,7 @@ work_result work(
 		return result;
 	};
 
-	WEBSTATIC auto can_show_enemy_silhouettes = [&]() {
+	WEBSTATIC auto viewer_is_spectator = [&]() {
 		if (is_replaying_demo()) {
 			return true;
 		}
@@ -5126,7 +5126,7 @@ work_result work(
 					calc_pre_step_crosshair_displacement(viewing_config),
 					get_audiovisuals(),
 					viewing_config.drawing,
-					can_show_enemy_silhouettes(),
+					viewer_is_spectator(),
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,

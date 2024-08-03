@@ -33,6 +33,7 @@
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "augs/misc/profanity_filter.h"
 
 using namespace augs::gui::text;
 
@@ -551,8 +552,15 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				auto nickname = get_bbcoded_entity_name(drawn_character);
 
-				if (in.streamer_mode && watched_character != drawn_character) {
-					nickname = "Player";
+				const bool watching_our_character = 
+					watched_character == drawn_character
+					&& !in.viewer_is_spectator 
+				;
+
+				if (!watching_our_character) {
+					if (in.streamer_mode || augs::has_profanity(nickname)) {
+						nickname = "Player";
+					}
 				}
 
 				push_textual_info({

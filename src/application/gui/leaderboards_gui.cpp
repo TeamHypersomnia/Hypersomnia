@@ -18,6 +18,7 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
 #include "augs/window_framework/shell.h"
+#include "augs/misc/profanity_filter.h"
 
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "view/ranks_info.h"
@@ -133,8 +134,14 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	if (last_checked_id != in.our_id) {
 		last_checked_id = in.our_id;
 
+		/* Post-process new leaderboards */
+
 		for (auto& s : all.leaderboards_team) {
 			s.is_us = logged_in && in.our_id == s.account_id;
+
+			if (augs::has_profanity(s.nickname)) {
+				s.nickname = "(censored)";
+			}
 		}
 
 		for (auto& s : all.leaderboards_ffa) {

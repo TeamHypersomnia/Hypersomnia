@@ -338,7 +338,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const bool is_me = player_id == draw_in.local_player_id;
 
-		if (streamer_mode && !is_me) {
+		if ((streamer_mode || augs::has_profanity(str)) && !is_me) {
 			str = "Player";
 		}
 

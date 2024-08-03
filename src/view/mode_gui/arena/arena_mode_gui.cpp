@@ -512,7 +512,7 @@ void arena_gui_state::draw_mode_gui(
 						killer_origin = k.origin;
 						killer_name = k.knockouter.name;
 
-						if (streamer_mode) {
+						if (streamer_mode || augs::has_profanity(killer_name)) {
 							killer_name = "Player";
 						}
 
@@ -574,7 +574,7 @@ void arena_gui_state::draw_mode_gui(
 					if (const auto owner_data = typed_mode.find(tool_owner)) {
 						auto nickname = owner_data->get_nickname();
 
-						if (streamer_mode) {
+						if (streamer_mode || augs::has_profanity(nickname)) {
 							nickname = "Player";
 						}
 

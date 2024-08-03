@@ -1,4 +1,9 @@
 #pragma once
+/*
+	To not have to include it everywhere because we're using the checks in the same places
+*/
+
+#include "augs/misc/profanity_filter.h"
 
 struct streamer_mode_flags_data {
 	// GEN INTROSPECTOR struct streamer_mode_flags_data

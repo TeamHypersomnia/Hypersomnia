@@ -3,7 +3,7 @@
 std::string chat_gui_entry::get_author_string(const bool streamer_mode) const {
 	auto result = author;
 
-	if (streamer_mode && result.size() > 0) {
+	if ((streamer_mode || augs::has_profanity(result)) && result.size() > 0) {
 		result = "Player";
 	}
 
@@ -42,7 +42,14 @@ chat_gui_entry chat_gui_entry::from(
 	const auto message_str = std::string(payload.message);
 
 	new_entry.author = author;
-	new_entry.message = message_str;
+
+	if (augs::has_profanity(message_str)) {
+		new_entry.message = "(censored)";
+	}
+	else {
+		new_entry.message = message_str;
+	}
+
 	new_entry.is_my_message = is_my_message;
 
 	if (author.empty()) {

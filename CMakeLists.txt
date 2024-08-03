@@ -833,6 +833,11 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/client/https_file_downloader.cpp"
 )
 
+if (BUILD_CRAZYGAMES)
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"src/augs/misc/profanity_filter.cpp"
+	)
+endif()
 # The rest of 3rdparty libraries with minimal amount of source files.
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
@@ -1508,6 +1513,7 @@ if(BUILD_FOR_WEB)
 
 	if (BUILD_CRAZYGAMES)
 		add_definitions(-DWEB_LOWEND=1)
+		add_definitions(-DWEB_CRAZYGAMES=1)
 	endif()
 endif()
 

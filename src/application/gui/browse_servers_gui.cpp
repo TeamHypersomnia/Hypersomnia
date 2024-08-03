@@ -21,6 +21,8 @@
 #include "augs/templates/main_thread_queue.h"
 #include "augs/misc/async_get.h"
 
+#include "augs/misc/profanity_filter.h"
+
 #if PLATFORM_WEB
 #include "application/gui/calculate_server_distance.hpp"
 #endif
@@ -211,6 +213,10 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 		if (const auto ping = get_estimated_ping_to_server(n.heartbeat.get_location_id())) {
 			n.progress.state = server_entry_state::PING_MEASURED;
 			n.progress.ping = static_cast<uint32_t>(*ping);
+		}
+
+		if (augs::has_profanity(n.heartbeat.server_name)) {
+			n.heartbeat.server_name = "(censored)";
 		}
 	}
 #endif
@@ -705,7 +711,7 @@ void browse_servers_gui_state::show_server_list(
 					for (auto& e : entries) {
 						auto nickname = e.nickname;
 
-						if (streamer_mode) {
+						if (streamer_mode || augs::has_profanity(nickname)) {
 							nickname = "Player";
 						}
 
