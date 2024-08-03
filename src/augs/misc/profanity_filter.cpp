@@ -4,6 +4,8 @@
 #include "augs/templates/container_templates.h"
 
 struct profanities_init {
+	std::unordered_set<std::string> cached;
+
     std::unordered_set<std::string> words;
     std::vector<std::string> with_spaces;
 
@@ -165,12 +167,26 @@ namespace augs {
 		return false;
 	}
 
-    bool has_profanity(const std::string& in_orig) {
+    bool has_profanity(const std::string& in_orig, const bool cache) {
+		if (cache) {
+			if (found_in(profanities.cached, in_orig)) {
+				return true;
+			}
+		}
+
 		auto cleaned = limit_repetitions(in_orig);
 
-		return
+		if (
 			has_profanity_base_check2(cleaned) ||
 			has_profanity_base_check2(insert_space_before_caseness_change(cleaned))
-		;
+		) {
+			if (cache) {
+				profanities.cached.emplace(in_orig);
+			}
+
+			return true;
+		}
+
+		return false;
     }
 }

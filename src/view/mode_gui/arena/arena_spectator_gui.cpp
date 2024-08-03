@@ -122,7 +122,7 @@ void arena_spectator_gui::draw_gui(
 
 	auto nickname = spectated->get_nickname();
 
-	if (streamer_mode || augs::has_profanity(nickname)) {
+	if (streamer_mode || augs::has_profanity(nickname, true)) {
 		nickname = "Player";
 	}
 

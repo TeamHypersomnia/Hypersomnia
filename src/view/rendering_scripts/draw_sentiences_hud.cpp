@@ -558,7 +558,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				;
 
 				if (!watching_our_character) {
-					if (in.streamer_mode || augs::has_profanity(nickname)) {
+					if (in.streamer_mode || augs::has_profanity(nickname, true)) {
 						nickname = "Player";
 					}
 				}
