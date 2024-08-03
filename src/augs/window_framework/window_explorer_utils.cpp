@@ -8,6 +8,43 @@
 #if PLATFORM_WINDOWS
 #include "augs/window_framework/explorer_utils_winapi.hpp"
 
+#elif PLATFORM_WEB
+
+namespace augs {
+	std::optional<path_type> window::open_file_dialog(
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
+	) {
+		return std::nullopt;
+	}
+
+	std::optional<path_type> window::save_file_dialog(
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
+	) {
+		return std::nullopt;
+	}
+
+	std::optional<path_type> window::choose_directory_dialog(
+		const std::string& /* custom_title */
+	) {
+		return std::nullopt;
+	}
+
+	message_box_button window::retry_cancel(
+		const std::string& caption,
+		const std::string& text
+	) {
+		LOG("RETRY CANCEL!!");
+		LOG_NVPS(caption, text);
+		return message_box_button::CANCEL;
+	}
+
+	void window::reveal_in_explorer(const augs::path_type& full_path) {
+		(void)full_path;
+	}
+}
+
 #elif PLATFORM_LINUX
 #include <thread>
 

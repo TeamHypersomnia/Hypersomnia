@@ -330,6 +330,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 						}
 					}
 
+#if !PLATFORM_WEB
 					ImGui::Separator();
 
 					auto scope = maybe_disabled_cols({}, entry.get_state() == S::NOT_FOUND);
@@ -337,6 +338,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 					if (ImGui::Selectable("Reveal in explorer")) {
 						in.window.reveal_in_explorer(arena_folder_path);
 					}
+#endif
 				}
 
 				ImGui::EndPopup();

@@ -120,6 +120,7 @@ bool start_client_gui_state::perform(
 				}
 			);
 
+#if !PLATFORM_WEB
 			{
 				auto scope = maybe_disabled_cols({}, demo_path.empty());
 
@@ -133,6 +134,7 @@ bool start_client_gui_state::perform(
 			if (ImGui::Button("Demo folder in explorer")) {
 				window.reveal_in_explorer(DEMOS_DIR);
 			}
+#endif
 
 			if (!demo_path.empty() && demo_choice_result == D::SHOULD_ANALYZE) {
 				try {

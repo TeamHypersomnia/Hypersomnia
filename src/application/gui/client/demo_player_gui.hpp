@@ -71,6 +71,7 @@ inline void demo_player_gui::perform(
 	text_disabled("Replaying:");
 	ImGui::SameLine();
 
+#if !PLATFORM_WEB
 	{
 		const auto demo_path = player.source_path.string();
 		text_color(demo_path, cyan);
@@ -81,6 +82,9 @@ inline void demo_player_gui::perform(
 			window.reveal_in_explorer(demo_path);
 		}
 	}
+#else
+	(void)window;
+#endif
 
 	const auto current = player.get_current_secs();
 
