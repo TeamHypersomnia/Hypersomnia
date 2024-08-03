@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- unbind f1 and f3 on web cause someone might do it accidentally
-
 - Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
 
 - for better grenade/knife accuracy:

@@ -7334,3 +7334,5 @@ This will discard your redo history."
 
 - add player lists to server browser
 
+- unbind f1 and f3 on web cause someone might do it accidentally
+

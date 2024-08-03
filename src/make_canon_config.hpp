@@ -1,6 +1,8 @@
 #pragma once
 
 inline void make_canon_config(config_json_table& result, bool is_dedicated_server) {
+	using key_type = augs::event::keys::key;
+
 #if !IS_PRODUCTION_BUILD
 		/* Some developer-friendly options */
 		result.self_update.update_on_launch = false;
@@ -63,26 +65,26 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		result.window.border = false;
 		result.sound.max_short_sounds = 32;
 
-		result.game_controls.erase(augs::event::keys::key::LCTRL);
+		result.game_controls.erase(key_type::LCTRL);
 
 		/* Some rebinding is necessary for the Web */
-		result.game_controls[augs::event::keys::key::C] = game_intent_type::TOGGLE_WALK_SILENTLY;
-		result.game_controls[augs::event::keys::key::V] = game_intent_type::WIELD_BOMB;
+		result.game_controls[key_type::C] = game_intent_type::TOGGLE_WALK_SILENTLY;
+		result.game_controls[key_type::V] = game_intent_type::WIELD_BOMB;
 
-		result.game_controls[augs::event::keys::key::K] = game_intent_type::THROW_PED_GRENADE;
-		result.game_controls[augs::event::keys::key::L] = game_intent_type::THROW_FLASHBANG;
+		result.game_controls[key_type::K] = game_intent_type::THROW_PED_GRENADE;
+		result.game_controls[key_type::L] = game_intent_type::THROW_FLASHBANG;
 
-		result.game_controls.erase(augs::event::keys::key::MOUSE4);
-		result.game_controls.erase(augs::event::keys::key::MOUSE5);
+		result.game_controls.erase(key_type::MOUSE4);
+		result.game_controls.erase(key_type::MOUSE5);
 
-		result.general_gui_controls[augs::event::keys::key::T] = general_gui_intent_type::BUY_MENU;
-		result.general_gui_controls.erase(augs::event::keys::key::B);
+		result.general_gui_controls[key_type::T] = general_gui_intent_type::BUY_MENU;
+		result.general_gui_controls.erase(key_type::B);
 
-		result.general_gui_controls.erase(augs::event::keys::key::TILDE);
-		result.general_gui_controls[augs::event::keys::key::HOME] = general_gui_intent_type::TOGGLE_MOUSE_CURSOR;
+		result.general_gui_controls.erase(key_type::TILDE);
+		result.general_gui_controls[key_type::HOME] = general_gui_intent_type::TOGGLE_MOUSE_CURSOR;
 
-		result.inventory_gui_controls[augs::event::keys::key::B] = inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3;
-		result.inventory_gui_controls.erase(augs::event::keys::key::V);
+		result.inventory_gui_controls[key_type::B] = inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3;
+		result.inventory_gui_controls.erase(key_type::V);
 
 		result.sound.max_simultaneous_bullet_trace_sounds = 0;
 		result.content_regeneration.rescan_assets_on_window_focus = false;
@@ -101,5 +103,17 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		result.sound.max_short_sounds = 16;
 		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;
 		result.sound.custom_processing_frequency = 2;
+#endif
+
+#if WEB_CRAZYGAMES
+		auto& app_controls = result.app_controls;
+
+		if (const auto k = key_or_default(app_controls, app_intent_type::SHOW_PERFORMANCE); k != key_type()) {
+			app_controls.erase(k);
+		}
+
+		if (const auto k = key_or_default(app_controls, app_intent_type::SHOW_LOGS); k != key_type()) {
+			app_controls.erase(k);
+		}
 #endif
 }
