@@ -264,6 +264,12 @@ extern "C" {
 
 #endif
 
+enum class ad_state_type {
+	NONE,
+	REQUESTING,
+	PLAYING
+} ad_state = ad_state_type::NONE;
+
 #if PLATFORM_WEB
 EM_JS(char*, crazygames_get_invite_link, (), {
     var gameLink = Module.cg_game_link || "";
@@ -320,6 +326,37 @@ void web_sdk_loading_stop() {
 		});
 	});
 }
+
+extern "C" {
+	EMSCRIPTEN_KEEPALIVE
+	void on_ad_started() {
+		ad_state = ad_state_type::PLAYING;
+	}
+
+	EMSCRIPTEN_KEEPALIVE
+	void on_ad_ended() {
+		ad_state = ad_state_type::NONE;
+	}
+}
+
+EM_JS(bool, call_sdk_request_ad, (), {
+	return Module.sdk_request_ad();
+});
+
+void web_sdk_request_ad() {
+	if (ad_state != ad_state_type::NONE) {
+		return;
+	}
+
+	ad_state = ad_state_type::REQUESTING;
+
+	main_thread_queue::execute([&]() {
+		if (!call_sdk_request_ad()) {
+			ad_state = ad_state_type::NONE;
+		}
+	});
+}
+
 #else
 const char* crazygames_get_invite_link() { return nullptr; }
 void web_sdk_gameplay_start() {}
@@ -328,6 +365,7 @@ void web_sdk_gameplay_stop() {}
 void web_sdk_loading_start() {}
 void web_sdk_loading_stop() {}
 void web_sdk_invite_link(const std::string&) {}
+void web_sdk_request_ad() {}
 #endif
 
 #include "augs/persistent_filesystem.hpp"
@@ -1967,6 +2005,11 @@ work_result work(
 	WEBSTATIC auto setup_launcher = [&](auto&& setup_init_callback) {
 		setup_just_launched = 1;
 
+#if WEB_CRAZYGAMES
+		const bool skip_ad = is_during_tutorial() || (!has_main_menu() && !has_current_setup());
+		LOG_NVPS(skip_ad);
+#endif
+
 		::steam_clear_rich_presence();
 		set_rich_presence_now = true;
 		
@@ -2006,6 +2049,14 @@ work_result work(
 				load_all(setup.get_viewable_defs());
 			}
 		});
+
+#if WEB_CRAZYGAMES
+		if (!skip_ad) {
+			on_specific_setup([&](const main_menu_setup&) {
+				web_sdk_request_ad();
+			});
+		}
+#endif
 
 #if BUILD_NETWORKING
 		if (main_menu != nullptr) {
@@ -2954,6 +3005,10 @@ work_result work(
 				config_copy.drawing.draw_inventory = false;
 			}
 
+			if (ad_state == ad_state_type::PLAYING) {
+				config_copy.audio_volume.master = 0.0f;
+			}
+
 			return config_copy;
 		});
 	};
@@ -3730,6 +3785,8 @@ work_result work(
 					ingame_menu.show = false;
 				}
 				else if (is_shooting_range()) {
+					web_sdk_request_ad();
+
 					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();
 					ingame_menu.show = false;
 				}
@@ -4504,7 +4561,9 @@ work_result work(
 				releases.append_releases(new_window_entropy, common_input_state);
 				releases = {};
 
-				concatenate(new_window_entropy, write_buffer.new_window_entropy);
+				if (ad_state == ad_state_type::NONE) {
+					concatenate(new_window_entropy, write_buffer.new_window_entropy);
+				}
 
 				on_specific_setup([&](editor_setup& editor) {
 					if (editor.warp_cursor_once) {
@@ -5499,7 +5558,7 @@ work_result work(
 				auto overlay_col = rgba(0, 8, 5, 220);
 
 				on_specific_setup([&](main_menu_setup&) {
-					overlay_col = rgba(0, 8, 5, 255);
+					overlay_col = rgba(8, 21, 4, 255);
 					setup_just_launched = 0;
 				});
 
@@ -5516,7 +5575,14 @@ work_result work(
 				);
 			}
 			else {
-				thread_pool.enqueue(post_game_gui_job);
+				if (ad_state != ad_state_type::NONE) {
+					auto overlay_col = rgba(0, 8, 5, 200);
+
+					fallback_overlay_color(post_game_gui_renderer, overlay_col);
+				}
+				else {
+					thread_pool.enqueue(post_game_gui_job);
+				}
 			}
 #else
 			thread_pool.enqueue(post_game_gui_job);

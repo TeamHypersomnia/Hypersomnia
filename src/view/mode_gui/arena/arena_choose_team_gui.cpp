@@ -70,10 +70,10 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 		return std::nullopt;
 	}
 
-	center_next_window(vec2::square(0.4f), ImGuiCond_Once);
+	center_next_window(vec2::square(0.4f), ImGuiCond_Always);
 
 	const auto window_name = "Choose your faction";
-	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
+	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	centered_text(window_name);
 
 	const auto n = in.available_factions.size();
@@ -136,7 +136,6 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 		;
 
 		text_color(faction_label, is_full ? rgba(255, 255, 255, 70) : info.color);
-		ImGui::SameLine();
 
 		if (is_full) {
 			text_color(numbers, red);

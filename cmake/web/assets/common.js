@@ -501,6 +501,31 @@ function sdk_loading_stop() {
   }
 }
 
+function sdk_request_ad() {
+  if (window.CrazyGames) {
+    const callbacks = {
+      adFinished: () => {
+        console.log("End midgame ad");
+        Module.ccall('on_ad_ended', 'void', [], []);
+      },
+      adError: (error) => {
+        console.log("Error midgame ad", error);
+        Module.ccall('on_ad_ended', 'void', [], []);
+      },
+      adStarted: () => {
+        console.log("Start midgame ad");
+        Module.ccall('on_ad_started', 'void', [], []);
+      },
+    };
+
+    window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+
+    return true;
+  }
+
+  return false;
+}
+
 function create_module(for_cg) {
   const for_io = !for_cg;
 
@@ -574,6 +599,7 @@ function create_module(for_cg) {
   Module.sdk_gameplay_stop = sdk_gameplay_stop;
   Module.sdk_loading_start = sdk_loading_start;
   Module.sdk_loading_stop = sdk_loading_stop;
+  Module.sdk_request_ad = sdk_request_ad;
 
   return Module;
 }
