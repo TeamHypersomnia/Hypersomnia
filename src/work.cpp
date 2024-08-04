@@ -821,6 +821,7 @@ work_result work(
 		change_with_save(
 			[&](auto& cfg) {
 				cfg.client.nickname = final_nickname;
+				cfg.client.nickname_before_sign_in = final_nickname;
 			}
 		);
 
