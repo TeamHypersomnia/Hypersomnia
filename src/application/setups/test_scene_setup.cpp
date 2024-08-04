@@ -108,6 +108,14 @@ void test_scene_setup::init(const test_scene_type new_type) {
 
 	restart_arena();
 
+	if (!is_tutorial()) {
+		if (const auto portal = find<portal_marker>("portal")) {
+			range_entry_portal = portal->scene_entity_id;
+		}
+	}
+
+	auto& cosm = scene.world;
+	snap_interpolated_to_logical(cosm);
 	//if (recording_type != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session(USER_DIR / "sessions/", "recorded.inputs")) {
 		//
@@ -174,6 +182,8 @@ void test_scene_setup::set_tutorial_level(uint32_t level) {
 
 void test_scene_setup::restart_arena() {
 	LOG("Setting up tutorial level: %x.", tutorial.level);
+
+	range_entry_portal = {};
 
 	if (const bool completed = tutorial.level == 20) {
 		web_sdk_happy_time();
@@ -264,6 +274,25 @@ const T* test_scene_setup::find(const editor_node_id& generic_id) const {
 template <class T>
 const T* test_scene_setup::find(const std::string& name) const {
 	if (const auto generic_id = mapped_or_nullptr(name_to_node, name)) {
+		return find<T>(*generic_id);
+	}
+
+	return nullptr;
+}
+
+template <class T>
+T* test_scene_setup::find(const entity_id& id) {
+	return find<T>(::entity_to_node_id(entity_to_node, id));
+}
+
+template <class T>
+T* test_scene_setup::find(const editor_node_id& generic_id) {
+	return project.find_node<T>(generic_id);
+}
+
+template <class T>
+T* test_scene_setup::find(const std::string& name) {
+	if (auto generic_id = mapped_or_nullptr(name_to_node, name)) {
 		return find<T>(*generic_id);
 	}
 
@@ -644,14 +673,22 @@ void test_scene_setup::pre_solve(const logic_step step) {
 bool test_scene_setup::post_solve(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::game_notification>();
 
+	if (range_entry_portal.is_set()) {
+		snap_interpolated_to_logical(scene.world);
+	}
+
+	auto& cosm = scene.world;
+
+	if (cosm.get_total_steps_passed() >= 4) {
+		range_entry_portal = {};
+	}
+
 	if (restart_requested) {
 		restart_requested = false;
 
 		restart_arena();
 		return true;
 	}
-
-	auto& cosm = scene.world;
 
 	if (cosm.get_total_steps_passed() <= clean_step_number + 1) {
 		/* Otherwise we'd have an infinite loop. */

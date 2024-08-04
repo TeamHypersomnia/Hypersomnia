@@ -1964,9 +1964,13 @@ work_result work(
 	};
 
 	WEBSTATIC bool set_rich_presence_now = true;
+	WEBSTATIC int setup_just_launched = 0;
+
 	(void)set_rich_presence_now;
 
 	WEBSTATIC auto setup_launcher = [&](auto&& setup_init_callback) {
+		setup_just_launched = 1;
+
 		::steam_clear_rich_presence();
 		set_rich_presence_now = true;
 		
@@ -5044,13 +5048,13 @@ work_result work(
 				}
 			};
 
-			auto fallback_overlay_gray_color = [&](augs::renderer& chosen_renderer) {
+			auto fallback_overlay_color = [&](augs::renderer& chosen_renderer, const rgba col = darkgray) {
 				streaming.get_general_atlas().set_as_current(chosen_renderer);
 
 				necessary_shaders.standard->set_as_current(chosen_renderer);
 				setup_standard_projection(chosen_renderer);
 
-				get_drawer_for(chosen_renderer).color_overlay(screen_size, darkgray);
+				get_drawer_for(chosen_renderer).color_overlay(screen_size, col);
 			};
 
 			auto draw_and_choose_menu_cursor = [&](augs::renderer& chosen_renderer, auto&& create_menu_context) {
@@ -5439,7 +5443,7 @@ work_result work(
 					draw_mode_and_setup_custom_gui(chosen_renderer, new_viewing_config);
 				}
 				else {
-					fallback_overlay_gray_color(chosen_renderer);
+					fallback_overlay_color(chosen_renderer);
 				}
 
 				/* #5 */
@@ -5489,7 +5493,38 @@ work_result work(
 				::enqueue_illuminated_rendering_jobs(thread_pool, illuminated_input);
 			}
 
+#if WEB_SINGLETHREAD
+			/* Prevent UI flashing while loading */
+			const bool now_loading = setup_just_launched > 0;
+
+			if (now_loading) {
+				--setup_just_launched;
+
+				auto overlay_col = rgba(0, 8, 5, 220);
+
+				on_specific_setup([&](main_menu_setup&) {
+					overlay_col = rgba(0, 8, 5, 255);
+					setup_just_launched = 0;
+				});
+
+				fallback_overlay_color(post_game_gui_renderer, overlay_col);
+
+				using namespace augs::gui::text;
+
+				print_stroked(
+					get_drawer_for(post_game_gui_renderer),
+					screen_size / 2,
+					formatted_string("Loading...", style(streaming.get_loaded_gui_fonts().medium_numbers, white)),
+					{ augs::ralign::CX , augs::ralign::CY },
+					black
+				);
+			}
+			else {
+				thread_pool.enqueue(post_game_gui_job);
+			}
+#else
 			thread_pool.enqueue(post_game_gui_job);
+#endif
 
 			thread_pool.submit();
 

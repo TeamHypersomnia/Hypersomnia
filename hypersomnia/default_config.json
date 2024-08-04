@@ -762,6 +762,39 @@
                 {
                     "first": 48,
                     "second": 57
+                },
+                // "Loading..." characters
+                {
+                    "first": 46,
+                    "second": 46
+                },
+                {
+                    "first": 76,
+                    "second": 76
+                },
+                {
+                    "first": 97,
+                    "second": 97
+                },
+                {
+                    "first": 100,
+                    "second": 100
+                },
+                {
+                    "first": 103,
+                    "second": 103
+                },
+                {
+                    "first": 105,
+                    "second": 105
+                },
+                {
+                    "first": 110,
+                    "second": 110
+                },
+                {
+                    "first": 111,
+                    "second": 111
                 }
             ],
             "size_in_pixels": 42.0,

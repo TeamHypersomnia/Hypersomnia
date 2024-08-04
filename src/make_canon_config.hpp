@@ -120,4 +120,9 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 			app_controls.erase(k);
 		}
 #endif
+
+#if !WEB_SINGLETHREAD
+		/* The subsequent ones are for the "Loading..." screen which is only needed in singlethreaded build */
+		result.gui_fonts.medium_numbers.unicode_ranges.resize(1);
+#endif
 }

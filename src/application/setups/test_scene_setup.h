@@ -61,6 +61,8 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	synced_dynamic_vars dummy_dynamic_vars;
 	uint32_t clean_step_number = 0;
 
+	entity_id range_entry_portal;
+
 	intercosm scene;
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -129,6 +131,10 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
+		if (range_entry_portal.is_set()) {
+			return range_entry_portal;
+		}
+
 		return viewed_character_id;
 	}
 
@@ -177,6 +183,10 @@ public:
 		timer.advance(dt);
 
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
+
+		if (range_entry_portal.is_set()) {
+			steps = std::min(steps, 1u);
+		}
 
 		auto get_solve_settings = [&]() {
 			solve_settings settings;
@@ -322,6 +332,15 @@ public:
 	void restart_arena();
 
 	void do_tutorial_logic(logic_step);
+
+	template <class T>
+	T* find(const std::string& name);
+
+	template <class T>
+	T* find(const editor_node_id& id);
+
+	template <class T>
+	T* find(const entity_id& id);
 
 	template <class T>
 	const T* find(const std::string& name) const;
