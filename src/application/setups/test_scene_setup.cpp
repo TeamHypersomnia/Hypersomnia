@@ -687,7 +687,13 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 		}
 	}
 
-	if (cosm.get_total_steps_passed() >= 4) {
+#if PLATFORM_WEB
+	const auto steps_until_start_watching_player = 4;
+#else
+	const auto steps_until_start_watching_player = 1;
+#endif
+
+	if (cosm.get_total_steps_passed() >= steps_until_start_watching_player) {
 		range_entry_portal = {};
 	}
 
