@@ -1693,6 +1693,8 @@ work_result work(
 		}
 		else {
 			LOG("No initial user");
+			social_log_out();
+			config.prompted_for_sign_in_once = false;
 		}
 	}
 	else {
