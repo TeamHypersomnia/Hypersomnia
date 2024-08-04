@@ -48,7 +48,13 @@ void render_text_with_hotkeys_line(const std::string& input, T&& text, H&& hotke
 }
 
 template <class T, class L, class H>
-void render_text_with_hotkeys(const std::string& input, T&& text, L&& break_line, H&& hotkey) {
+void render_text_with_hotkeys(std::string input, T&& text, L&& break_line, H&& hotkey) {
+#if WEB_CRAZYGAMES
+	str_ops(input).replace_all("{ESCAPE}", "Tab");
+#else
+	str_ops(input).replace_all("{ESCAPE}", "Escape");
+#endif
+
     std::istringstream iss(input);
     std::string line;
     bool firstLine = true;

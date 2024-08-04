@@ -1446,7 +1446,7 @@ work_result work(
 	WEBSTATIC augs::timer when_last_gui_fonts_ratio_changed;
 
 	WEBSTATIC auto get_gui_fonts_ratio = [&]() {
-		auto scale = std::clamp(config.ui_scale, 0.3f, 3.0f);
+		auto scale = std::clamp(config.ui_scale, 1.0f, 4.0f);
 
 #if WEB_CRAZYGAMES
 		/*
@@ -4684,7 +4684,13 @@ work_result work(
 					common_input_state.apply(e);
 
 #if PLATFORM_WEB
-					const bool ESC_pressed = e.was_released(key::ESC);
+					bool ESC_pressed = e.was_released(key::ESC);
+
+#if WEB_CRAZYGAMES
+					on_specific_setup([&](test_scene_setup&) {
+						ESC_pressed = e.was_pressed(key::TAB) || e.was_released(key::ESC);
+					});
+#endif
 #else
 					const bool ESC_pressed = e.was_pressed(key::ESC);
 #endif
