@@ -673,11 +673,19 @@ void test_scene_setup::pre_solve(const logic_step step) {
 bool test_scene_setup::post_solve(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::game_notification>();
 
+	auto& cosm = scene.world;
+
 	if (range_entry_portal.is_set()) {
 		snap_interpolated_to_logical(scene.world);
-	}
 
-	auto& cosm = scene.world;
+		for (auto& s : step.get_queue<messages::start_sound_effect>()) {
+			if (const auto portal = cosm[range_entry_portal]) {
+				if (s.payload.input.id == portal.get<components::portal>().exit_sound.id) {
+					s.payload.input.modifier.always_direct_listener = true;
+				}
+			}
+		}
+	}
 
 	if (cosm.get_total_steps_passed() >= 4) {
 		range_entry_portal = {};
