@@ -8,7 +8,3 @@ std::string get_ensure_failed_path();
 std::string get_exit_success_path();
 std::string get_exit_failure_path();
 std::string get_dumped_log_path();
-std::string get_crashed_controllably_path();
-void mark_as_controlled_crash();
-
-std::optional<std::string> find_last_incorrect_exit();

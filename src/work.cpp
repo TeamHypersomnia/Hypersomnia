@@ -834,9 +834,6 @@ work_result work(
 	WEBSTATIC auto last_exit_incorrect_popup = std::optional<simple_popup>();
 #endif
 
-	augs::remove_file(get_crashed_controllably_path());
-	augs::remove_file(get_exit_success_path());
-
 	WEBSTATIC auto freetype_library = std::optional<augs::freetype_raii>();
 
 	WEBSTATIC auto pending_launch = std::optional<activity_type>();

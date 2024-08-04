@@ -32,7 +32,6 @@ void save_log_and_terminate() {
 	const auto logs = program_log::get_current().get_complete();
 	const auto failure_log_path = augs::path_type(get_ensure_failed_path());
 
-	mark_as_controlled_crash();
 	augs::save_as_text(failure_log_path, logs);
 
 	augs::open_text_editor(failure_log_path.string());
