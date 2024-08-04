@@ -140,6 +140,7 @@ struct config_json_table {
 #if BUILD_DEBUGGER_SETUP
 	debugger_settings debugger;
 #endif
+	float ui_scale = 1.0f;
 	all_gui_fonts_inputs gui_fonts;
 	input_settings input;
 

@@ -240,8 +240,10 @@ namespace augs {
 			release_mouse_buttons();
 		}
 		
-		image create_atlas_image(const font_loading_input& in) {
+		image create_atlas_image(const font_loading_input& in, float ratio) {
 			auto& io = GetIO();
+
+			io.Fonts->Clear();
 
 			unsigned char* pixels = nullptr;
 			int width = 0;
@@ -255,11 +257,11 @@ namespace augs {
 				auto unicode_ranges = in.unicode_ranges;
 
 				if (_should(in.add_japanese_ranges)) {
-					concat_ranges(unicode_ranges, ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+					concat_ranges(unicode_ranges, io.Fonts->GetGlyphRangesJapanese());
 				}
 
 				if (_should(in.add_cyrillic_ranges)) {
-					concat_ranges(unicode_ranges, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+					concat_ranges(unicode_ranges, io.Fonts->GetGlyphRangesCyrillic());
 				}
 
 				for (const auto& r : unicode_ranges) {
@@ -270,21 +272,14 @@ namespace augs {
 				ranges.push_back(0);
 			}
 
-#if TODO_MANY_FONTS
-			io.Fonts->AddFontDefault();
-
-			ImFontConfig config;
-			config.MergeMode = true;
-#endif
-
 			if (!augs::exists(in.source_font_path)) {
 				throw imgui_init_error("Failed to load %x for reading.", augs::filename_first(in.source_font_path));
 			}
 
 			const auto str_path = in.source_font_path.string();
 
-			io.Fonts->AddFontFromFileTTF(str_path.c_str(), in.size_in_pixels, nullptr, ranges.data());
-			io.Fonts->AddFontFromFileTTF(str_path.c_str(), in.size_in_pixels * 1.2f, nullptr, io.Fonts->GetGlyphRangesDefault());
+			io.Fonts->AddFontFromFileTTF(str_path.c_str(), ratio * in.size_in_pixels, nullptr, ranges.data());
+			io.Fonts->AddFontFromFileTTF(str_path.c_str(), ratio * in.size_in_pixels * 1.2f, nullptr, io.Fonts->GetGlyphRangesDefault());
 			io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
 			LOG("IMGUI FONT ATLAS SIZE: %xx%x", width, height);
@@ -294,8 +289,8 @@ namespace augs {
 			return { pixels, vec2i{ width, height } };
 		}
 
-		graphics::texture create_atlas(const font_loading_input& in) {
-			return create_atlas_image(in);
+		graphics::texture create_atlas(const font_loading_input& in, float ratio) {
+			return create_atlas_image(in, ratio);
 		}
 
 		bool is_hovered_with_hand_cursor() {

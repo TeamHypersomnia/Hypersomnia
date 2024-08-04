@@ -32,6 +32,7 @@ struct viewables_load_input {
 	const all_viewables_defs& new_defs;
 	const necessary_image_definitions_map& necessary_image_definitions;
 	const all_gui_fonts_inputs& gui_fonts;
+	const float gui_fonts_ratio;
 	const content_regeneration_settings settings;
 	const augs::path_type& unofficial_content_dir;
 
@@ -88,11 +89,13 @@ class viewables_streaming {
 
 	image_definitions_map future_image_definitions;
 	all_gui_fonts_inputs future_gui_fonts;
+	float future_gui_font_ratio = 1.0f;
 
 	augs::future<general_atlas_output> future_general_atlas;
 
 	all_viewables_defs now_loaded_viewables_defs;
 	all_gui_fonts_inputs now_loaded_gui_font_defs;
+	float now_loaded_gui_font_ratio = 1.0f;
 
 	sound_definitions_map future_sound_definitions;
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;

@@ -217,14 +217,15 @@ public:
 			}
 		}
 
-		this_id->appearing_caption.draw(
-			output, 
-			internal_rc.left_top(),
-			{ gui_font , secondary_color }
-		);
-
 		if (this_id->special_image.has_value()) {
 			output.aabb(necessarys.at(*this_id->special_image), this_tree_entry.get_absolute_rect(), white);
+		}
+		else {
+			this_id->appearing_caption.draw(
+				output, 
+				internal_rc.left_top(),
+				{ gui_font , secondary_color }
+			);
 		}
 	}
 };

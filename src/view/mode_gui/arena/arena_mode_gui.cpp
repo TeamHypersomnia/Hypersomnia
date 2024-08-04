@@ -1234,7 +1234,7 @@ void arena_gui_state::draw_mode_gui(
 					populator->on_update(warmup.current, warmup.requested, dt);
 
 					const auto one_fourth_t = in.screen_size.y / 6;
-					const auto t = one_fourth_t + line_height * 3;
+					const auto t = one_fourth_t + line_height * 4;
 					const auto s = in.screen_size;
 					const auto target_pos = vec2i { s.x / 2, static_cast<int>(t) };
 
@@ -1284,28 +1284,28 @@ void arena_gui_state::draw_mode_gui(
 			const auto& win = typed_mode.get_current_round().last_win;
 
 			if (win.was_set()) {
-				auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
-
 				if (typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-					if (typed_mode.is_halftime_summary(mode_input)) {
-						indicator_text += larger_colored("\n\nFIRST HALF ENDED.", white);
-						indicator_text += larger_colored(" DO NOT LEAVE YET!!!", orange);
+					const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);
+					const auto c = std::ceil(summary_secs_left);
+					auto secs_left_text = larger_colored(format_mins_secs(c), white);
 
-						indicator_text += larger_colored("\nSWAPPING TEAMS IN:\n", white);
+					if (typed_mode.is_halftime_summary(mode_input)) {
+						auto first = larger_colored("FIRST HALF ENDED.", white) + larger_colored(" DO NOT LEAVE YET!!!", orange);
+						auto second = larger_colored("SWAPPING TEAMS IN:\n", white) + secs_left_text;
+
+						draw_warmup_indicator(first, second);
 					}
 					else {
-						indicator_text += larger_colored("\n\nMATCH ENDED.\nYou can now leave the match.\n", white);
-					}
-
-					{
-						const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);
-						const auto c = std::ceil(summary_secs_left);
-
-						indicator_text += larger_colored(format_mins_secs(c), white);
+						draw_warmup_indicator(
+							larger_colored("RANKED MATCH ENDED.", white),
+							secs_left_text
+						);
 					}
 				}
-
-				draw_info_indicator(indicator_text);
+				else {
+					auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
+					draw_info_indicator(indicator_text);
+				}
 
 				return true;
 			}

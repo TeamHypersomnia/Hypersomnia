@@ -1,8 +1,6 @@
 #pragma once
 
 inline void make_canon_config(config_json_table& result, bool is_dedicated_server) {
-	using key_type = augs::event::keys::key;
-
 #if !IS_PRODUCTION_BUILD
 		/* Some developer-friendly options */
 		result.self_update.update_on_launch = false;
@@ -58,6 +56,8 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		}
 
 #if PLATFORM_WEB
+		using key_type = augs::event::keys::key;
+
 		/* Point to HTTPS one */
 		result.server_list_provider = "https://masterserver.hypersomnia.xyz:8420";
 
@@ -91,7 +91,11 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 #endif
 
 #if WEB_LOWEND
-		result.gui_fonts.gui.size_in_pixels = 18.0f;
+		const auto canon_sz  = result.gui_fonts.gui.size_in_pixels;
+		const auto target_sz = 18.0f;
+
+		result.gui_fonts *= target_sz / canon_sz;
+		result.gui_fonts.gui.size_in_pixels = target_sz;
 
 		/*
 			Should be fine as we're limiting the rate of audio commands

@@ -84,7 +84,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto& new_all_defs = in.new_defs;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
-	const auto& gui_fonts = in.gui_fonts;
+	auto gui_fonts = in.gui_fonts;
 	const auto& necessary_image_definitions = in.necessary_image_definitions;
 	const auto settings = in.settings;
 	const auto& unofficial_content_dir = in.unofficial_content_dir;
@@ -175,6 +175,10 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			if (gui_fonts != now_loaded_gui_font_defs) {
 				new_atlas_required = true;
 			}
+
+			if (in.gui_fonts_ratio != now_loaded_gui_font_ratio) {
+				new_atlas_required = true;
+			}
 		}
 
 		if (necessary_images_in_atlas.empty()) {
@@ -221,12 +225,15 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			general_atlas_progress.emplace();
 
+			auto in_gui_fonts = gui_fonts;
+			in_gui_fonts *= in.gui_fonts_ratio;
+
 			auto general_atlas_in = general_atlas_input {
 				{
 					settings,
 					necessary_image_definitions,
 					new_defs,
-					gui_fonts,
+					in_gui_fonts,
 					unofficial_content_dir,
 
 					std::addressof(*general_atlas_progress)
@@ -261,6 +268,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			future_image_definitions = new_defs;
 			future_gui_fonts = gui_fonts;
+			future_gui_font_ratio = in.gui_fonts_ratio;
 		}
 	}
 
@@ -424,6 +432,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		loaded_gui_fonts = std::move(result.gui_fonts);
 
 		now_loaded_gui_font_defs = future_gui_fonts;
+		now_loaded_gui_font_ratio = future_gui_font_ratio;
 
 		auto& now_loaded_defs = now_all_defs.image_definitions;
 		auto& new_loaded_defs = future_image_definitions;

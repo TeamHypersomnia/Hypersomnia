@@ -19,15 +19,19 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		return false;
 	}
 
+	const float ratio = ImGui::GetTextLineHeight() / 22.0f;
+
 	center_next_window(ImGuiCond_Always);
 
-	auto h = in.prompted_once ? 260+60 : 335+60;
+	{
+		auto h = in.prompted_once ? 260+60 : 335+60;
 
-	if (in.is_crazygames) {
-		h -= 60;
+		if (in.is_crazygames) {
+			h -= 60;
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(450 * ratio, h * ratio), ImGuiCond_Always);
 	}
-
-	ImGui::SetNextWindowSize(ImVec2(450, h), ImGuiCond_Always);
 
     const auto flags = 
         ImGuiWindowFlags_NoSavedSettings |
@@ -93,7 +97,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	auto login_option = [&](const auto icon, const auto label, const float sz_mult = 1.0f, const vec2 pad = vec2(0.5, 0.2), float alpha=1.0f, std::string tooltip="") {
 		const bool even = int(icon) % 2 == 0;
 
-		auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 24));
+		auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 24 * ratio));
 
 		const auto result = selectable_with_icon(
 			imgs[icon],
@@ -177,7 +181,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	text(" ");
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-	auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 16));
+	auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 16 * ratio));
 
 	bool ok = false;
 

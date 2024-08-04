@@ -64,11 +64,11 @@ self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	const bool only_check_availability_and_quit,
 	const self_update_settings& http_settings,
-	const augs::image* imgui_atlas_image,
+	const augs::font_loading_input* font_in,
 	std::optional<augs::window_settings> window_settings
 ) {
 	(void)window_settings;
-	(void)imgui_atlas_image;
+	(void)font_in;
 
 	bool headless = !window_settings.has_value();
 
@@ -252,8 +252,10 @@ self_update_result check_and_apply_updates(
 
 			renderer_backend.emplace();
 
-			if (imgui_atlas_image != nullptr) {
-				imgui_atlas.emplace(*imgui_atlas_image);
+			LOG("Creating the ImGui atlas image.");
+
+			if (font_in != nullptr) {
+				imgui_atlas.emplace(augs::imgui::create_atlas_image(*font_in, 1.0f));
 			}
 
 			LOG("Initializing the standard shader.");

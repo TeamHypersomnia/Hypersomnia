@@ -42,8 +42,8 @@ namespace augs {
 			context_raii& operator=(context_raii&&) = delete;
 		};
 
-		image create_atlas_image(const font_loading_input&);
-		graphics::texture create_atlas(const font_loading_input&);
+		image create_atlas_image(const font_loading_input&, float ratio);
+		graphics::texture create_atlas(const font_loading_input&, float ratio);
 
 		void setup_io_settings(
 			const decltype(ImGuiIO::DeltaTime) delta_seconds,

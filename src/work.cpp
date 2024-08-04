@@ -689,9 +689,7 @@ work_result work(
 
 	LOG("Initializing ImGui.");
 
-#if HEADLESS
-	WEBSTATIC const auto imgui_atlas_image = std::unique_ptr<augs::image>(nullptr);
-#else
+#if !HEADLESS
 	WEBSTATIC const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
 	WEBSTATIC const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
@@ -700,9 +698,6 @@ work_result work(
 		imgui_log_path.c_str(),
 		config.gui_style
 	);
-
-	LOG("Creating the ImGui atlas image.");
-	WEBSTATIC const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
 #endif
 
 	WEBSTATIC auto last_update_result = self_update_result();
@@ -737,7 +732,7 @@ work_result work(
 				params.appimage_path,
 				only_check,
 				config.self_update,
-				imgui_atlas_image.get(),
+				&config.gui_fonts.gui,
 				config.window
 			);
 		}
@@ -1448,6 +1443,40 @@ work_result work(
 		return get_write_buffer().screen_size;
 	};
 
+	WEBSTATIC augs::timer when_last_gui_fonts_ratio_changed;
+
+	WEBSTATIC auto get_gui_fonts_ratio = [&]() {
+		auto scale = std::clamp(config.ui_scale, 0.3f, 3.0f);
+
+#if WEB_CRAZYGAMES
+		/*
+			Up to 1080, increase only a little bit,
+			because we've already adjusted everything in the game to look good with this res.
+
+			Then increase proportionally.
+		*/
+
+		const auto real_size = logic_get_screen_size();
+
+		if (real_size.y <= 1080) {
+			const auto orig_size = vec2(922, 487);
+			const auto ratio = real_size.y / orig_size.y;
+
+			return scale * std::min(1.333333333f, ratio);
+		}
+		else {
+			const auto orig_size = vec2(1920, 1080);
+			const auto ratio = real_size.y / orig_size.y;
+
+			return scale * 1.333333333f * ratio;
+		}
+#else
+		return scale;
+#endif
+	};
+
+	WEBSTATIC float last_gui_fonts_ratio = get_gui_fonts_ratio();
+
 	WEBSTATIC auto get_general_renderer = [&]() -> augs::renderer& {
 		return get_write_buffer().renderers.all[renderer_type::GENERAL];
 	};
@@ -1479,8 +1508,10 @@ work_result work(
 		config.content_regeneration.regenerate_every_time
 	);
 
+	WEBSTATIC auto loaded_gui_fonts_ratio = get_gui_fonts_ratio();
+
 	LOG("Creating the ImGui atlas.");
-	WEBSTATIC auto imgui_atlas = augs::graphics::texture(*imgui_atlas_image);
+	WEBSTATIC auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui, loaded_gui_fonts_ratio);
 
 	WEBSTATIC const auto configurables = configuration_subscribers {
 		window,
@@ -1898,11 +1929,26 @@ work_result work(
 			}
 		}
 
+#if WEB_CRAZYGAMES
+		auto in_fonts = config.gui_fonts;
+
+		if (is_during_tutorial()) {
+			/*
+				Bring back the default because it looked good
+				for context tips.
+			*/
+			in_fonts.larger_gui.size_in_pixels = 32.0f;
+		}
+#else
+		const auto& in_fonts = config.gui_fonts;
+#endif
+
 		streaming.load_all({
 			frame_num,
 			new_defs,
 			necessary_image_definitions,
-			config.gui_fonts,
+			in_fonts,
+			loaded_gui_fonts_ratio,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
 			get_general_renderer(),
@@ -4387,6 +4433,10 @@ work_result work(
 			/* Setup variables required by the lambdas */
 
 			const auto screen_size = logic_get_screen_size();
+
+			ingame_menu.root.scale = get_gui_fonts_ratio();
+			main_menu_gui.root.scale = get_gui_fonts_ratio();
+
 			const auto frame_delta = frame_timer.extract_delta();
 			const auto current_frame_num = current_frame.load();
 			auto game_gui_mode = game_gui_mode_flag;
@@ -5561,6 +5611,31 @@ work_result work(
 	
 		window.handle_pending_requests();
 		configurables.apply_main_thread(get_read_buffer().new_settings);
+
+		/*
+			Update fonts only after the new requested size
+			doesn't change for 0.2 or more.
+
+			This is to accomodate a gradually changing window size.
+		*/
+
+		{
+			auto new_ratio = get_gui_fonts_ratio();
+
+			if (new_ratio != last_gui_fonts_ratio) {
+				when_last_gui_fonts_ratio_changed.reset();
+				last_gui_fonts_ratio = new_ratio;
+			}
+
+			if (loaded_gui_fonts_ratio != new_ratio) {
+				if (when_last_gui_fonts_ratio_changed.get<std::chrono::seconds>() > 0.2) {
+					LOG_NVPS(loaded_gui_fonts_ratio, new_ratio);
+					loaded_gui_fonts_ratio = new_ratio;
+
+					imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui, new_ratio);
+				}
+			}
+		}
 
 		if (config.session.show_performance) {
 			const auto viewed_character = get_viewed_character();

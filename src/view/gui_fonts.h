@@ -16,6 +16,21 @@ struct per_gui_font {
 	What very_large_numbers;
 	// END GEN INTROSPECTOR
 
+	auto& operator*=(const float v) {
+		auto mm = [&](auto& val) {
+			val *= v;
+			val = std::floor(val);
+		};
+
+		mm(gui.size_in_pixels);
+		mm(larger_gui.size_in_pixels);
+		mm(medium_numbers.size_in_pixels);
+		mm(large_numbers.size_in_pixels);
+		mm(very_large_numbers.size_in_pixels);
+
+		return *this;
+	}
+
 	bool operator==(const per_gui_font<What>&) const = default;
 };
 

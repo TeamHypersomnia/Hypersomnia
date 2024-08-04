@@ -17,6 +17,8 @@ public:
 		Enum
 	> buttons;
 
+	float scale = 1.0f;
+
 	menu_root() {
 		unset_flag(augs::gui::flag::CLIP);
 		set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
@@ -61,7 +63,7 @@ public:
 				const auto padding = 18;
 #endif
 
-				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - padding - buttons[i].rc.h()));
+				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - (padding * scale) - buttons[i].rc.h()));
 			}
 		}
 	}

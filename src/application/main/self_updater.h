@@ -35,12 +35,13 @@ struct self_update_result {
 
 namespace augs {
 	class image;
+	struct font_loading_input;
 }
 
 self_update_result check_and_apply_updates(
 	const augs::path_type& current_appimage_path,
 	bool only_check_availability_and_quit,
 	const self_update_settings& settings,
-	const augs::image* imgui_atlas_image = nullptr,
+	const augs::font_loading_input* in = nullptr,
 	std::optional<augs::window_settings> window_settings = std::nullopt
 );

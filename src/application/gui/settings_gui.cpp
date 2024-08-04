@@ -1669,7 +1669,8 @@ void settings_gui_state::perform(
 #endif
 
 			case settings_pane::INTERFACE: {
-				revertable_slider("UI Font size", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
+				revertable_slider("UI scale", config.ui_scale, 0.3f, 3.0f);
+				config.ui_scale = std::clamp(config.ui_scale, 0.3f, 3.0f);
 
 				if (auto node = scoped_tree_node("Chat window")) {
 					auto& scope_cfg = config.client.client_chat;
