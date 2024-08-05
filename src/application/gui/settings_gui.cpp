@@ -752,22 +752,20 @@ void settings_gui_state::perform(
 					);
 
 					if (ImGui::Button("Reset all settings to factory defaults")) {
-						auto saved_is_guest = config.prompted_for_sign_in_once;
 						auto cvars = config.client;
 
 						config = config_json_table(augs::path_type("default_config.json"));
 						::make_canon_config(config, false);
 
 #if IS_PRODUCTION_BUILD
-						/* Don't break the identity */
-						config.client.nickname = cvars.nickname;
-						config.client.nickname_before_sign_in = cvars.nickname_before_sign_in;
+						/*
+							Don't break the currently signed in identity,
+							although that is reassigned every frame.
+						*/
+						config.client.signed_in = cvars.signed_in;
 						config.client.avatar_image_path = cvars.avatar_image_path;
 
-						/* Otherwise the popup would show instantly again */
-						config.prompted_for_sign_in_once = saved_is_guest;
 #else
-						(void)saved_is_guest;
 						(void)cvars;
 #endif
 					}
@@ -1417,9 +1415,17 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
+#if PLATFORM_WEB
+				const auto label = "Nickname (guest)";
+#else
 				const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+#endif
 
 				revertable_input_text(label, scope_cfg.nickname);
+
+				if (scope_cfg.nickname.length() < min_nickname_length_v) {
+					scope_cfg.nickname = "Player";
+				}
 
 				{
 					thread_local bool show = false;

@@ -289,6 +289,12 @@ bool start_client_gui_state::perform(
 		if (current_tab != start_client_tab_type::REPLAY_DEMO) {
 			bool nickname_choice_active = true;
 
+			auto signed_in_name = into_vars.signed_in_nickname();
+
+			if (!signed_in_name.empty()) {
+				nickname_choice_active = false;
+			}
+
 			if (is_steam_client && into_vars.use_account_nickname) {
 				nickname_choice_active = false;
 			}
@@ -302,7 +308,12 @@ bool start_client_gui_state::perform(
 			{
 				auto scope = maybe_disabled_with_clear_text_cols({}, !nickname_choice_active);
 
-				input_text(label, into_vars.nickname);
+				if (!signed_in_name.empty()) {
+					input_text(label, signed_in_name);
+				}
+				else {
+					input_text(label, into_vars.nickname);
+				}
 			}
 
 			if (is_steam_client) {

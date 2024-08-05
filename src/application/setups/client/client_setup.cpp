@@ -692,6 +692,10 @@ bool client_setup::pending_pre_connection_handshake() const {
 
 std::vector<rtc::IceServer> get_ice_servers();
 
+client_nickname_type client_setup::get_nickname() const {
+	return vars.get_nickname();
+}
+
 client_setup::client_setup(
 	const packaged_official_content& official,
 	const client_connect_string& connect_string,
@@ -774,7 +778,7 @@ client_setup::client_setup(
 		}
 	}
 	else {
-		if (!nickname_len_in_range(vars.nickname.length())) {
+		if (!nickname_len_in_range(get_nickname().length())) {
 			const auto reason = typesafe_sprintf(
 				"The nickname should be between %x and %x bytes.", 
 				min_nickname_length_v,
@@ -783,10 +787,10 @@ client_setup::client_setup(
 
 			set_disconnect_reason(reason);
 		}
-		else if (!is_nickname_valid_characters(vars.nickname)) {
+		else if (!is_nickname_valid_characters(get_nickname())) {
 			const auto reason = typesafe_sprintf(
 				"The nickname '%x' has invalid characters.", 
-				vars.nickname
+				get_nickname()
 			);
 
 			set_disconnect_reason(reason);
@@ -2024,7 +2028,7 @@ void client_setup::apply(const config_json_table& cfg) {
 	}
 
 	auto& r = requested_settings;
-	r.chosen_nickname = vars.nickname;
+	r.chosen_nickname = get_nickname();
 	r.welcome_type = ::get_client_welcome_type(vars.suppress_webhooks);
 	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;

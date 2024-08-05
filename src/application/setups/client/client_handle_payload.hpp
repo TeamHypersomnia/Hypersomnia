@@ -132,7 +132,7 @@ message_handler_result client_setup::handle_payload(
 
 		if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
 			/* Has to set it as we have potentially no mode properly setup yet. */
-			sender_player_nickname = vars.nickname;
+			sender_player_nickname = get_nickname();
 		}
 
 		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(

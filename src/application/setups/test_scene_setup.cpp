@@ -782,7 +782,7 @@ void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 		//config.interpolation.method = interpolation_method::NONE;
 	}
 
-	nickname = config.client.nickname;
+	nickname = config.client.get_nickname();
 
 	if (is_tutorial()) {
 		auto& mult = config.session.camera_query_aabb_mult;

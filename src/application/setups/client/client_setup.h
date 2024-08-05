@@ -612,6 +612,7 @@ class client_setup :
 	void send_download_progress();
 	bool send_keepalive_download_progress();
 
+	client_nickname_type get_nickname() const;
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

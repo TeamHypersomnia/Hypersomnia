@@ -48,11 +48,11 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	const auto ItemSpacing = ImGui::GetStyle().ItemSpacing;
 
 	const auto final_padding = [&]() {
-		return ImVec2(WinPadding.x * 2.8f, WinPadding.y * 2.8f);
+		return ImVec2(WinPadding.x * 2.8f * ratio, WinPadding.y * 2.8f * ratio);
 	}();
 
 	const auto final_frame_padding = [&]() {
-		return ImVec2(FramePadding.x * 2.f, FramePadding.y * 2.f);
+		return ImVec2(FramePadding.x * 2.f * ratio, FramePadding.y * 2.f * ratio);
 	}();
 
 	auto comfier_padding = scoped_style_var(ImGuiStyleVar_WindowPadding, final_padding);
@@ -97,7 +97,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	auto login_option = [&](const auto icon, const auto label, const float sz_mult = 1.0f, const vec2 pad = vec2(0.5, 0.2), float alpha=1.0f, std::string tooltip="") {
 		const bool even = int(icon) % 2 == 0;
 
-		auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 24 * ratio));
+		auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x * ratio, 24 * ratio));
 
 		const auto result = selectable_with_icon(
 			imgs[icon],
@@ -181,7 +181,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	text(" ");
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-	auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x, 16 * ratio));
+	auto pd = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(ItemSpacing.x * ratio, 16 * ratio));
 
 	bool ok = false;
 

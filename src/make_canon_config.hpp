@@ -88,6 +88,8 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 
 		result.sound.max_simultaneous_bullet_trace_sounds = 0;
 		result.content_regeneration.rescan_assets_on_window_focus = false;
+
+		result.client.nickname = "Guest";
 #endif
 
 #if WEB_LOWEND

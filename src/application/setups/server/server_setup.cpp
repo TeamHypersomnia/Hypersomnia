@@ -743,7 +743,7 @@ server_setup::server_setup(
 		}
 		else {
 			auto source_server_name = std::string(initial_vars_modified.server_name);
-			str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
+			str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.get_nickname()));
 			initial_vars_modified.server_name = source_server_name;
 		}
 
@@ -777,7 +777,7 @@ server_setup::server_setup(
 	if (dedicated == std::nullopt) {
 		integrated_client.init(server_time, next_session_id++, yojimbo::Address("0.0.0.0", 0));
 		integrated_client.state = client_state_type::IN_GAME;
-		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
+		integrated_client.settings.chosen_nickname = integrated_client_vars.get_nickname();
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
 			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
@@ -803,7 +803,7 @@ server_setup::server_setup(
 
 	const bool conditions_fulfilled = [&]() {
 		if (dedicated == std::nullopt) {
-			if (!nickname_len_in_range(integrated_client_vars.nickname.length())) {
+			if (!nickname_len_in_range(integrated_client_vars.get_nickname().length())) {
 				failure_reason = typesafe_sprintf(
 					"The nickname should have between %x and %x bytes.", 
 					min_nickname_length_v,
@@ -2583,7 +2583,7 @@ void server_setup::rechoose_arena() {
 
 			cmd.added_player = add_player_input {
 				get_integrated_player_id(),
-				integrated_client_vars.nickname,
+				integrated_client_vars.get_nickname(),
 				admin_faction
 			};
 

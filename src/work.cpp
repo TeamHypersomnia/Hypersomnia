@@ -848,7 +848,7 @@ work_result work(
 #if PLATFORM_WEB
 	LOG_NVPS(config.client.nickname);
 
-	if (config.client.nickname.empty() || config.client.nickname == "web_user") {
+	WEBSTATIC auto gen_random_nickname = [&]() {
 		const auto rng_name = ::make_random_nickname(netcode_rng);
 		const auto final_nickname = 
 			!params.guest.empty() ?
@@ -856,14 +856,19 @@ work_result work(
 			rng_name
 		;
 
+		LOG("Generated guest nickname: %x", final_nickname);
+
+		return final_nickname;
+	};
+
+	if (config.client.nickname.empty() || config.client.nickname == "web_user" || config.client.nickname == "Guest") {
+		const auto final_nickname = gen_random_nickname();
+
 		change_with_save(
 			[&](auto& cfg) {
 				cfg.client.nickname = final_nickname;
-				cfg.client.nickname_before_sign_in = final_nickname;
 			}
 		);
-
-		LOG("Generated guest nickname: %x", final_nickname);
 	}
 #endif
 
@@ -1686,14 +1691,11 @@ work_result work(
 		augs::remove_file(CACHED_AUTH_PATH);
 		augs::remove_file(CACHED_AVATAR);
 
-		const auto before_sign_in = config.client.nickname_before_sign_in;
-
-		LOG("Restoring nickname before sign in: %x", before_sign_in);
+		config.client.signed_in.nickname = "";
 
 		change_with_save(
 			[&](auto& cfg) {
 				cfg.client.avatar_image_path = augs::path_type();
-				cfg.client.nickname = before_sign_in;
 			}
 		);
 	};
@@ -2484,7 +2486,7 @@ work_result work(
 			case activity_type::SHOOTING_RANGE:
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
-						config.client.nickname,
+						config.client.get_nickname(),
 						get_my_avatar_bytes(),
 						*official,
 						test_scene_type::SHOOTING_RANGE
@@ -2496,7 +2498,7 @@ work_result work(
 			case activity_type::TUTORIAL:
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
-						config.client.nickname,
+						config.client.get_nickname(),
 						get_my_avatar_bytes(),
 						*official,
 						test_scene_type::TUTORIAL
@@ -2708,7 +2710,7 @@ work_result work(
 
 	WEBSTATIC auto perform_leaderboards = [&]() {
 		leaderboards_gui.perform({
-			config.client.nickname,
+			config.client.get_nickname(),
 #if PLATFORM_WEB
 			social_sign_in.cached_auth.profile_id,
 #else
@@ -3007,6 +3009,10 @@ work_result work(
 
 			if (ad_state == ad_state_type::PLAYING) {
 				config_copy.audio_volume.master = 0.0f;
+			}
+
+			if (social_sign_in.is_open()) {
+				config_copy.arena_mode_gui.context_tip_settings.is_enabled = false;
 			}
 
 			return config_copy;
@@ -3397,34 +3403,9 @@ work_result work(
 
 
 #if PLATFORM_WEB
-				const bool should_prompt_for_social_sign_in = [&]() {
-					if (!streaming.completed_all_loading()) {
-						return false;
-					}
-
-					if (config.prompted_for_sign_in_once) {
-						return false;
-					}
-
-					return true;
-				}();
-
-				if (should_prompt_for_social_sign_in) {
-					if (!social_sign_in.is_open()) {
-						social_sign_in.open();
-					}
-				}
-
-				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
 
 				if (const auto new_auth = get_new_auth_data()) { 
-					const auto before_sign_in = 
-						is_signed_in() ?
-						config.client.nickname_before_sign_in :
-						config.client.nickname
-					;
-
-					LOG_NVPS(is_signed_in(), before_sign_in);
+					LOG("new_auth. is_signed_in() = %x", is_signed_in());
 
 					social_sign_in.cached_auth = *new_auth;
 					social_sign_in.close();
@@ -3455,9 +3436,6 @@ work_result work(
 
 					change_with_save(
 						[&](auto& cfg) {
-							cfg.client.nickname_before_sign_in = before_sign_in;
-							LOG("Saving nickname before sign in: %x", cfg.client.nickname_before_sign_in);
-							cfg.client.nickname = social_sign_in.cached_auth.profile_name;
 							cfg.prompted_for_sign_in_once = true;
 
 							if (has_avatar) {
@@ -3482,6 +3460,34 @@ work_result work(
 						social_log_out();
 					}
 				}
+
+				const bool should_prompt_for_social_sign_in = [&]() {
+					if (!streaming.completed_all_loading()) {
+						return false;
+					}
+
+					if (config.prompted_for_sign_in_once) {
+						return false;
+					}
+
+					if (is_signed_in()) {
+						return false;
+					}
+
+					return true;
+				}();
+
+				config.client.signed_in.nickname = social_sign_in.cached_auth.profile_name;
+
+				if (should_prompt_for_social_sign_in) {
+					if (!social_sign_in.is_open()) {
+						config.client.nickname = gen_random_nickname();
+						social_sign_in.guest_nickname = config.client.nickname;
+						social_sign_in.open();
+					}
+				}
+
+				perform_social_sign_in_popup(config.prompted_for_sign_in_once);
 #endif
 			
 

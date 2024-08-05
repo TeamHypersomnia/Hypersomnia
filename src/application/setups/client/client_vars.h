@@ -43,13 +43,17 @@ struct client_chat_settings {
 	bool operator==(const client_chat_settings& b) const = default;
 };
 
+struct override_holder {
+	mutable client_nickname_type nickname = "";
+	bool operator==(const override_holder&) const { return true; };
+};
+
 struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
 	bool use_account_nickname = true;
 	bool use_account_avatar = true;
 
 	client_nickname_type nickname = "";
-	client_nickname_type nickname_before_sign_in = "";
 
 	client_net_vars net;
 
@@ -70,6 +74,20 @@ struct client_vars {
 
 	float max_direct_file_bandwidth = 2.0f;
 	// END GEN INTROSPECTOR
+
+	override_holder signed_in;
+
+	client_nickname_type signed_in_nickname() const {
+		return signed_in.nickname;
+	}
+
+	client_nickname_type get_nickname() const {
+		if (!signed_in_nickname().empty()) {
+			return signed_in_nickname();
+		}
+
+		return nickname;
+	}
 
 	bool operator==(const client_vars& b) const = default;
 };
