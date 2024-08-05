@@ -438,28 +438,26 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x += cell_pad.x * 2;
 
 			if constexpr(!std::is_same_v<M, test_mode>) {
-				if (sorted_players.size() > 0) {
-					if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
-						if (const auto& entry = draw_in.images_in_atlas.find_or(head_image).diffuse; entry.exists()) {
-							const auto size = entry.get_original_size();
-							auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
+				if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
+					if (const auto& entry = draw_in.images_in_atlas.find_or(head_image).diffuse; entry.exists()) {
+						const auto size = entry.get_original_size();
+						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
 
-							head_orig.l = 0;
-							head_orig.r = size.x;
+						head_orig.l = 0;
+						head_orig.r = size.x;
 
-							/* if (!on_top) { */
-							/* 	head_orig.t = faction_bg_orig.b - size.y - cell_pad.y * 2; */
-							/* 	head_orig.b = head_orig.t + size.y; */
-							/* } */
-							/* else { */
-							/* 	head_orig.t = faction_bg_orig.t + cell_pad.y * 2; */
-							/* 	head_orig.b = head_orig.t + size.y; */
-							/* } */
+						/* if (!on_top) { */
+						/* 	head_orig.t = faction_bg_orig.b - size.y - cell_pad.y * 2; */
+						/* 	head_orig.b = head_orig.t + size.y; */
+						/* } */
+						/* else { */
+						/* 	head_orig.t = faction_bg_orig.t + cell_pad.y * 2; */
+						/* 	head_orig.b = head_orig.t + size.y; */
+						/* } */
 
-							aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha));
+						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha));
 
-							pen.x += size.x + cell_pad.x * 2;
-						}
+						pen.x += size.x + cell_pad.x * 2;
 					}
 				}
 			}
