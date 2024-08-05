@@ -112,9 +112,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 	const bool logged_in = true;
 #endif
 
-	/* Always visible */
-	show = true;
-
 	if (refresh_requested) {
 		refresh_requested = false;
 		refresh_leaderboards(in);
@@ -125,10 +122,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		last_checked_id = "";
 
 		refreshed_once = true;
-	}
-
-	if (!show) {
-		return;
 	}
 
 	if (last_checked_id != in.our_id) {
@@ -147,6 +140,10 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		for (auto& s : all.leaderboards_ffa) {
 			s.is_us = logged_in && in.our_id == s.account_id;
 		}
+	}
+
+	if (!show) {
+		return;
 	}
 
 	using namespace augs::imgui;

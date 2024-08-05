@@ -2709,6 +2709,8 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_leaderboards = [&]() {
+		leaderboards_gui.show = !browse_servers_gui.show;
+
 		leaderboards_gui.perform({
 			config.client.get_nickname(),
 #if PLATFORM_WEB

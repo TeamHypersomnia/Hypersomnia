@@ -805,7 +805,7 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 		const auto secs_ago = augs::date_time::secs_since_epoch() - s.meta.time_hosted;
-		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
+		text_disabled(augs::date_time::format_countdown_letters(secs_ago));
 
 		ImGui::NextColumn();
 	}
@@ -847,7 +847,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		centered_size_mult = vec2(0.97f, 0.96f);
 	}
 	else {
-		centered_size_mult = vec2(0.8f, 0.7f);
+		centered_size_mult = vec2(0.85f, 0.8f);
 	}
 
 	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -1098,7 +1098,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			do_column("Players");
 			do_column("Arena");
 			do_column("Game mode");
-			do_column("Appeared");
+			do_column("Uptime");
 
 			ImGui::Separator();
 		};
