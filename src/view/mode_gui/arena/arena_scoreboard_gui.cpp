@@ -95,8 +95,10 @@ void arena_scoreboard_gui::draw_gui(
 
 	const int num_participating_factions = 2;
 
-	const bool compact = in.screen_size.y <= 700;
-	const auto num_headline_cells = compact ? 2 : 3;
+	const bool compact_h = in.screen_size.y <= 700;
+	const bool compact_w = in.screen_size.x <= 1200;
+	const auto num_headline_cells = compact_h ? 2 : 3;
+	const auto w_mult = compact_w ? 0.8f : 0.6f;
 
 	auto estimated_window_height = [&]() {
 		auto num_players = uint32_t(0);
@@ -125,7 +127,7 @@ void arena_scoreboard_gui::draw_gui(
 		;
 	}();
 
-	const auto window_bg_rect = ltrbi::center_and_size(in.screen_size / 2, vec2i(in.screen_size.x * 0.5f, estimated_window_height));
+	const auto window_bg_rect = ltrbi::center_and_size(in.screen_size / 2, vec2i(in.screen_size.x * w_mult, estimated_window_height));
 	o.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
 
 	const auto sz = window_bg_rect.get_size() - content_pad * 2;

@@ -1090,7 +1090,7 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_info_indicator = [&](const auto& val) {
-			const auto one_sixth_t = in.screen_size.y / 6;
+			const auto one_sixth_t = in.screen_size.y / 10;
 			draw_text_indicator_at(val, one_sixth_t);
 		};
 
@@ -1111,7 +1111,7 @@ void arena_gui_state::draw_mode_gui(
 
 		/* Synonym */
 		auto draw_warmup_indicator = [&](const auto& val, const formatted_string& val2 = {}, const rgba stroke_col = black) {
-			const auto one_sixth_t = in.screen_size.y / 6;
+			const auto one_sixth_t = in.screen_size.y / 10;
 
 			auto& font = val.empty() ? in.gui_fonts.gui : *val[0].format.font;
 
@@ -1175,7 +1175,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto left_col = rgba::get_bright_wave(secs / 8.0 + 0.3);
 				const auto right_col = rgba::get_bright_wave(secs / 4.0);
 
-				const auto one_sixth_t = in.screen_size.y / 6;
+				const auto one_sixth_t = in.screen_size.y / 10;
 
 				auto& font = in.gui_fonts.larger_gui;
 
@@ -1233,7 +1233,7 @@ void arena_gui_state::draw_mode_gui(
 				{
 					populator->on_update(warmup.current, warmup.requested, dt);
 
-					const auto one_fourth_t = in.screen_size.y / 6;
+					const auto one_fourth_t = in.screen_size.y / 9;
 					const auto t = one_fourth_t + line_height * 4;
 					const auto s = in.screen_size;
 					const auto target_pos = vec2i { s.x / 2, static_cast<int>(t) };
@@ -1368,7 +1368,7 @@ void arena_gui_state::draw_mode_gui(
 			if (cfg.show_client_resyncing_notifier && resyncing_notifier) {
 				const auto warning = colored("WARNING! Resynchronizing client with the server.", orange);
 
-				const auto where = in.screen_size.y / 8;
+				const auto where = in.screen_size.y / 6;
 				draw_text_indicator_at(warning, where);
 			}
 
@@ -1411,7 +1411,7 @@ void arena_gui_state::draw_mode_gui(
 			draw_knockouts();
 
 			if (!is_game_commencing()) {
-				if (now_is_warmup && !spectator_gui_drawn) {
+				if (now_is_warmup && !spectator_gui_drawn && !scoreboard.show) {
 					draw_warmup_welcome();
 				}
 				else {

@@ -30,6 +30,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "augs/templates/logically_empty.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "3rdparty/imgui/imgui.h"
 
 template <class E>
 bool should_fill_hotbar_from_right(const E& handle) {
@@ -555,6 +556,8 @@ void game_gui_system::advance(
 void game_gui_system::rebuild_layouts(
 	const game_gui_context context
 ) {
+	const auto scale = ImGui::GetTextLineHeight() / 22.0f;
+
 	const auto root_entity = context.get_subject_entity();
 
 	ensure(root_entity.alive());
@@ -604,7 +607,7 @@ void game_gui_system::rebuild_layouts(
 
 				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
 
-				hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+				hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50 * scale, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
 
 				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
 			};
@@ -644,7 +647,7 @@ void game_gui_system::rebuild_layouts(
 				const auto bbox = action_button_size;
 
 				hb.rc = xywh(xywhi(
-					current_x, screen_size.y - action_button_size.y - 9 - max_hotbar_height - 50, 
+					current_x, screen_size.y - action_button_size.y - 9 - max_hotbar_height - 50 * scale, 
 					bbox.x + left_rc_spacing + right_rc_spacing, 
 					action_button_size.y));
 
