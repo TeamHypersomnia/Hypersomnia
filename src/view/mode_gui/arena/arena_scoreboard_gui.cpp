@@ -95,6 +95,9 @@ void arena_scoreboard_gui::draw_gui(
 
 	const int num_participating_factions = 2;
 
+	const bool compact = in.screen_size.y <= 700;
+	const auto num_headline_cells = compact ? 2 : 3;
+
 	auto estimated_window_height = [&]() {
 		auto num_players = uint32_t(0);
 
@@ -105,7 +108,7 @@ void arena_scoreboard_gui::draw_gui(
 		}
 
 		const auto player_cells_h = cell_h * num_players;
-		const auto headline_cells_h = cell_h * 3 * num_participating_factions;
+		const auto headline_cells_h = cell_h * num_headline_cells * num_participating_factions;
 
 		const auto num_spectators = typed_mode.num_players_in(faction_type::SPECTATOR);
 
@@ -122,7 +125,7 @@ void arena_scoreboard_gui::draw_gui(
 		;
 	}();
 
-	const auto window_bg_rect = ltrbi::center_and_size(in.screen_size / 2, vec2i(in.screen_size.x * 0.6f, estimated_window_height));
+	const auto window_bg_rect = ltrbi::center_and_size(in.screen_size / 2, vec2i(in.screen_size.x * 0.5f, estimated_window_height));
 	o.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
 
 	const auto sz = window_bg_rect.get_size() - content_pad * 2;
@@ -385,7 +388,7 @@ void arena_scoreboard_gui::draw_gui(
 			const auto& colors = get_colors(faction);
 			const auto& bg_dark = colors.background_dark;
 
-			const auto bg_height = cell_h * 3;
+			const auto bg_height = cell_h * num_headline_cells;
 			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
 
 			if (cfg.dark_color_overlay_under_score) {
