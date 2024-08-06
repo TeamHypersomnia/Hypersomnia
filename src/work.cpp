@@ -2007,11 +2007,6 @@ work_result work(
 	WEBSTATIC auto setup_launcher = [&](auto&& setup_init_callback) {
 		setup_just_launched = 1;
 
-#if WEB_CRAZYGAMES
-		const bool skip_ad = is_during_tutorial() || (!has_main_menu() && !has_current_setup());
-		LOG_NVPS(skip_ad);
-#endif
-
 		::steam_clear_rich_presence();
 		set_rich_presence_now = true;
 		
@@ -2051,14 +2046,6 @@ work_result work(
 				load_all(setup.get_viewable_defs());
 			}
 		});
-
-#if WEB_CRAZYGAMES
-		if (!skip_ad) {
-			on_specific_setup([&](const main_menu_setup&) {
-				web_sdk_request_ad();
-			});
-		}
-#endif
 
 #if BUILD_NETWORKING
 		if (main_menu != nullptr) {
@@ -3554,7 +3541,7 @@ work_result work(
 	};
 
 	WEBSTATIC auto decide_on_cursor_clipping = [&](const bool in_direct_gameplay, const auto& cfg) {
-		get_write_buffer().should_clip_cursor = (
+		get_write_buffer().should_clip_cursor = ad_state == ad_state_type::NONE && (
 			in_direct_gameplay
 			|| cfg.window.draws_own_cursor()
 		);
@@ -3847,6 +3834,15 @@ work_result work(
 						launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
 					}
 					else {
+#if WEB_CRAZYGAMES
+						const bool skip_ad = is_during_tutorial();
+						LOG_NVPS(skip_ad);
+
+						if (!skip_ad) {
+							web_sdk_request_ad();
+						}
+#endif
+
 						launch_setup(activity_type::MAIN_MENU);
 					}
 				}

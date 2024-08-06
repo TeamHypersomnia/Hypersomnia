@@ -85,6 +85,9 @@ function setBrowserLocation_cg(newLocation) {
       window.CrazyGames.SDK.game.hideInviteButton();
     }
     else {
+      const inviteLink = window.CrazyGames.SDK.game.inviteLink({ game: locStr });
+      console.log("Invite link", inviteLink);
+
       const link = window.CrazyGames.SDK.game.showInviteButton({ game: locStr });
       console.log("Invite button link", link);
     }
@@ -350,15 +353,18 @@ function pre_run() {
 }
 
 function get_cli_args(for_cg) {
-  if (for_cg) {
-    return "/crazygames";
-  }
-
   var urlPath = window.location.pathname;
   var queryString = window.location.search;
 
   console.log("urlPath:", urlPath);
   console.log("queryString:", queryString);
+
+  var urlParams = new URLSearchParams(queryString);
+  var instantJoin = urlParams.get('instantJoin');
+
+  if (instantJoin === 'true') {
+    return "/host";
+  }
 
   return urlPath + queryString;
 }

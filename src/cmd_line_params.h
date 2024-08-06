@@ -65,7 +65,11 @@ struct cmd_line_params {
 
 	std::string guest;
 
+#if WEB_CRAZYGAMES
+	bool is_crazygames = true;
+#else
 	bool is_crazygames = false;
+#endif
 
 	void set_connect(const std::string& address) {
 		connect_address = address;
@@ -105,11 +109,7 @@ struct cmd_line_params {
 					loc = a;
 				}
 
-				if (loc == "/crazygames") {
-					LOG("We're running from crazygames.");
-					is_crazygames = true;
-				}
-				else if (begins_with(loc, "/game")) {
+				if (begins_with(loc, "/game")) {
 					std::string webrtc_id;
 
 					if (1 == typesafe_sscanf(loc, "/game/%x", webrtc_id)) {
