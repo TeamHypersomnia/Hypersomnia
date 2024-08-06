@@ -23,6 +23,7 @@ canvas {
   width: 100%;
   height: 100%;
 }
+
 .center-container {
   position: absolute;
   text-align: center;
@@ -65,4 +66,12 @@ canvas {
 @keyframes rotation {
   from {transform: rotate(0deg);}
   to {transform: rotate(360deg);}
+}
+
+canvas:focus {
+    outline: none;
+}
+
+* {
+    outline: none !important;
 }

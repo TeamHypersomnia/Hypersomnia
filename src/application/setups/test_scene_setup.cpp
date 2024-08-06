@@ -754,8 +754,15 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 
 		init(test_scene_type::SHOOTING_RANGE);
 
-		character().get<components::crosshair>() = pre_crosshair;
-		character().get<components::movement>().flags = pre_movement_flags;
+		if (const auto ch = character()) {
+			if (const auto cr = ch.find<components::crosshair>()) {
+				*cr = pre_crosshair;
+			}
+
+			if (const auto mv = ch.find<components::movement>()) {
+				mv->flags = pre_movement_flags;
+			}
+		}
 	}
 
 	return false;

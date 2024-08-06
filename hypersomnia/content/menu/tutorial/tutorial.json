@@ -13558,7 +13558,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Yellow ones are the cheapest - they only drain stamina and throw enemies away.\nThey also force gun ignition  - good for trolling rocket launcher users."
+            "context_tip": "Yellow ones drain stamina and throw enemies away.\nThey also force gun ignition - great against rocket launchers."
         },
         {
             "id": "entry13",
