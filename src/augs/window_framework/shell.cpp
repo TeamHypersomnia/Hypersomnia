@@ -7,7 +7,13 @@
 #include "augs/misc/mutex.h"
 #include "all_paths.h"
 
-#if PLATFORM_WINDOWS
+#if PLATFORM_WEB
+namespace augs {
+	int shell(const std::string&) { return 0; }
+
+	void open_text_editor(const std::string&) {}
+}
+#elif PLATFORM_WINDOWS
 #include <Windows.h>
 #undef min
 #undef max

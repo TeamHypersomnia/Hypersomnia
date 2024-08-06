@@ -3630,11 +3630,17 @@ work_result work(
 	};
  
 	WEBSTATIC auto main_ensure_handler = [&]() {
-		visit_current_setup(
-			[&](auto& setup) {
-				setup.ensure_handler();
-			}
-		);
+		if (has_current_setup() || has_main_menu()) {
+			/*
+				ensures could be called in the middle of constructing a setup,
+				which is why we need to check if a setup exists.
+			*/
+			visit_current_setup(
+				[&](auto& setup) {
+					setup.ensure_handler();
+				}
+			);
+		}
 	};
 
 	::ensure_handler = main_ensure_handler;

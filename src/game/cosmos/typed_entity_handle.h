@@ -1,4 +1,6 @@
 #pragma once
+#define DO_ENSURES 1
+
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/for_each_std_get.h"
 
@@ -147,7 +149,7 @@ public:
 	}
 
 	void ensure_alive() const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(subject != nullptr);
 #endif
 	}

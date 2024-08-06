@@ -1,4 +1,6 @@
 #pragma once
+#define DO_ENSURES 1
+
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/build_settings/compiler_defines.h"
@@ -117,21 +119,21 @@ public:
 	{}
 
 	const auto& get_meta() const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(alive());
 #endif
 		return *reinterpret_cast<const entity_solvable_meta*>(ptr);
 	}
 
 	auto& get(cosmos_solvable_access) const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(alive());
 #endif
 		return *ptr;
 	}
 
 	const auto& get() const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(alive());
 #endif
 		return *ptr;
@@ -221,7 +223,7 @@ public:
 
 	template <class List, class F>
 	FORCE_INLINE decltype(auto) constrained_dispatch_ret(F&& callback) const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(alive());
 #endif
 
@@ -285,7 +287,7 @@ public:
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {
-#if !IS_PRODUCTION_BUILD
+#if DO_ENSURES
 		ensure(alive());
 #endif
 
@@ -326,14 +328,22 @@ public:
 	template<class T>
 	decltype(auto) get() const {
 		if constexpr(is_invariant_v<T>) {
-			return *find_invariant_ptr<T>();
+			const auto inv = find_invariant_ptr<T>();
+#if DO_ENSURES
+			ensure(inv);
+#endif
+			return *inv;
 		}
 		else {
 			if constexpr(is_synchronized_v<T>) {
 				return component_synchronizer<this_handle_type, T>(find_component_ptr<T>(), *this);
 			}
 			else {
-				return *find_component_ptr<T>();
+				const auto comp = find_component_ptr<T>();
+#if DO_ENSURES
+				ensure(comp);
+#endif
+				return *comp;
 			}
 		}
 	}
