@@ -7,7 +7,7 @@ void log_ensure(const char* expr, const char* function, const char* file, int li
 #if ENABLE_ENSURE && !FORCE_DISABLE_ENSURE
 #define ensure(x) if(Unlikely(!(x)))\
 {\
-	log_ensure(#x, __FUNCTION__, __FILE__, __LINE__ ); \
+	log_ensure(#x, __PRETTY_FUNCTION__, __FILE__, __LINE__ ); \
 }
 #else
 #define ensure(x)
