@@ -67,7 +67,7 @@ struct server_ranked_vars {
 
 	// GEN INTROSPECTOR struct server_ranked_vars
 	ranked_autostart_type autostart_when = ranked_autostart_type::NEVER;
-	uint16_t countdown_time = 81;
+	uint16_t countdown_time = 40;
 	uint16_t rejoin_time_limit = 150;
 	uint8_t max_rejoins = 1;
 	uint8_t match_unfreezes_in_secs = 5;
@@ -114,7 +114,7 @@ struct server_vars {
 
 	bool webrtc_udp_mux = false;
 	port_type webrtc_port_range_begin = 9000;
-	port_type webrtc_port_range_end = 9020;
+	port_type webrtc_port_range_end = 9050;
 
 	server_name_type server_name;
 	address_string_type notified_server_list;

@@ -292,7 +292,7 @@
             "autostart_when": "NEVER",
             // "TEAMS_EQUAL | SERVER_FULL | SERVER_FULL_EQUAL_TEAMS | ALWAYS"
             // Only "NEVER" and "ALWAYS" are implemented right now.
-            "countdown_time": 81,
+            "countdown_time": 40,
             "rejoin_time_limit": 120,
             "max_rejoins": 5,
             "match_unfreezes_in_secs": 5,
@@ -311,7 +311,7 @@
         "allow_webrtc_clients": true,
         "webrtc_udp_mux": false,
         "webrtc_port_range_begin": 9000,
-        "webrtc_port_range_end": 9020,
+        "webrtc_port_range_end": 9050,
         "server_name": "", // Will be "Nickname's server" by default.
         "notified_server_list": "masterserver.hypersomnia.xyz:8430",
         "suppress_new_community_server_webhook": false,
