@@ -11,7 +11,7 @@ enum class main_menu_button_type {
 	DOWNLOAD_ON_STEAM,
 #endif
 	DOWNLOAD_MAPS,
-	PLAY_RANKED,
+	QUICK_PLAY,
 	BROWSE_SERVERS,
 	HOST_SERVER,
 #if !WEB_LOWEND

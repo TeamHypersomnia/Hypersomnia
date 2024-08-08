@@ -2,7 +2,7 @@
 
 enum class start_client_tab_type {
 	// GEN INTROSPECTOR enum class start_client_tab_type
-	BEST_RANKED,
+	BEST_SERVER,
 	CUSTOM_ADDRESS,
 	REPLAY_DEMO,
 
