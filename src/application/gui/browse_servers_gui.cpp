@@ -742,6 +742,16 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
+		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online);
+
+		if (d.num_online == 0) {
+			text_disabled(players_text);
+		}
+		else {
+			do_text(players_text);
+		}
+		ImGui::NextColumn();
+
 		if (s.is_official_server() ) {
 			if (d.is_ranked_server()) {
 				const auto location_id = d.get_location_id();
@@ -762,17 +772,6 @@ void browse_servers_gui_state::show_server_list(
 			else {
 				text_disabled("None");
 			}
-		}
-
-		ImGui::NextColumn();
-
-		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online);
-
-		if (d.num_online == 0) {
-			text_disabled(players_text);
-		}
-		else {
-			do_text(players_text);
 		}
 
 		ImGui::NextColumn();
@@ -996,10 +995,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					return sort_by(by_name, by_ping, by_appeared);
 
 				case 2: 
-					return sort_by(by_time_to_event, by_ping, by_appeared);
+					return sort_by(by_players, by_ping, by_appeared);
 
 				case 3: 
-					return sort_by(by_players, by_ping, by_appeared);
+					return sort_by(by_time_to_event, by_ping, by_appeared);
 
 				case 4: 
 					return sort_by(by_arena, by_ping, by_appeared);
@@ -1094,8 +1093,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		auto do_column_labels = [&](const auto& with_label, const auto& col) {
 			do_column("Ping");
 			do_column(with_label, col);
-			do_column("Event");
 			do_column("Players");
+			do_column("Event");
 			do_column("Arena");
 			do_column("Game mode");
 			do_column("Uptime");
@@ -1272,21 +1271,19 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	return false;
 }
 
-std::optional<server_list_entry> browse_servers_gui_state::find_best_server() const {
-	if (server_list.empty()) {
-		return std::nullopt;
-	}
-
-	return minimum_of(server_list, compare_servers);
-}
-
 std::optional<server_list_entry> browse_servers_gui_state::find_best_server(const bool find_ranked) const {
 	auto filtered = server_list;
 
 	erase_if(
 		filtered,
 		[&](auto& f) {
-			const bool good = f.is_official_server() && (find_ranked && f.heartbeat.is_still_joinable_ranked());
+			if (const bool casual = !find_ranked) {
+				const bool is_ranked = f.is_official_server() && f.heartbeat.is_ranked_server();
+
+				return is_ranked;
+			}
+
+			const bool good = f.is_official_server() && f.heartbeat.is_still_joinable_ranked();
 
 			return !good;
 		}

@@ -79,8 +79,8 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 	augs::maybe<uint32_t> at_most_ping = augs::maybe<uint32_t>(100, false);
 
-	int sort_by_column = 0;
-	bool ascending = true;
+	int sort_by_column = 2;
+	bool ascending = false;
 	std::string loading_dots;
 	uint64_t ping_sequence_counter = 0;
 
@@ -122,7 +122,6 @@ public:
 	void reping_all_servers();
 
 	const server_list_entry* find_entry_by_connect_string(const client_connect_string& in) const;
-	std::optional<server_list_entry> find_best_server() const;
 	std::optional<server_list_entry> find_best_server(bool is_ranked) const;
 	void refresh_server_list(browse_servers_input);
 
