@@ -7,11 +7,25 @@ server {
     location / {
         # Try to serve file directly, then directories, then fall back to Hypersomnia.html
         try_files $uri $uri/ /Hypersomnia.html;
+
+        # Add security headers to prevent embedding
+        add_header X-Frame-Options "DENY";
+        add_header Content-Security-Policy "frame-ancestors 'self'";
+
+        # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
+        add_header Cross-Origin-Resource-Policy "same-site";
+        add_header Cross-Origin-Opener-Policy "same-origin";
+        add_header Cross-Origin-Embedder-Policy "require-corp";
     }
 
     location /assets/ {
         alias /var/www/html/assets/;
         autoindex on;  # This is optional; it allows directory listing if no index file is found
+
+        # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
+        add_header Cross-Origin-Resource-Policy "same-site";
+        add_header Cross-Origin-Opener-Policy "same-origin";
+        add_header Cross-Origin-Embedder-Policy "require-corp";
     }
 
     # MIME types for WebAssembly (.wasm) files

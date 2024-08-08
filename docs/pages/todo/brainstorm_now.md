@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- major: remove/audit get<>
+
+- shorten warmup/countdown times
+    - but only for rankeds as its a dynamic var and i dont trust it will be the same build if i upload it now, so it could break casual matches
+
+- if muxing, we should assign consecutive ports for the web too
+
+- hide cg servers from the list
+- hide invite button when the server is full
+    (server has to send the number of slots)
+
 - Reimplement this damn hotbar, assign just by flavour, the index should be passed to the getter function always
 
 - for better grenade/knife accuracy:
