@@ -309,7 +309,7 @@
         "cycle_always_game_mode": "",
         "cycle_randomize_order": true,
         "allow_webrtc_clients": true,
-        "webrtc_udp_mux": false,
+        "webrtc_udp_mux": true,
         "webrtc_port_range_begin": 9000,
         "webrtc_port_range_end": 9050,
         "server_name": "", // Will be "Nickname's server" by default.

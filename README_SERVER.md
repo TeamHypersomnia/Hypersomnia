@@ -67,8 +67,9 @@ To be able to access the administration panel of your server, setup ``master_rco
 
 You'll need these ports open:
 - One UDP port for native clients (``8412`` is recommended).
-- One or more UDP ports for [Web clients](https://hypersomnia.io).
-	- ``9000-9020`` by default, but you can use just a single port with *UDP multiplexing*.
+- One or UDP port for [Web clients](https://hypersomnia.io).
+	- ``9000`` by default - multiple web clients will be multiplexed.
+	  - Optionally, you can disable UDP multiplexing and use multiple UDP ports.
 
 For example:
 
@@ -101,6 +102,7 @@ This will result in:
 ![last_region_select](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/345beed2-f66b-4a8a-a507-55d108c1909e)
 
 The instances will get incrementing ports, starting from the specified ``port`` in ``server_start``.
+Analogously for the web, the ports will be incrementing by 1 starting from ``webrtc_port_range_begin``, with UDP muxing force-enabled for every instance.
 
 They'll also get unique server names - with added ``#1``, ``#2``, etc. suffixes.
 

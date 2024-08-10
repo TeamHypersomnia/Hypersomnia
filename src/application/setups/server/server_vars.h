@@ -112,7 +112,7 @@ struct server_vars {
 
 	bool allow_webrtc_clients = true;
 
-	bool webrtc_udp_mux = false;
+	bool webrtc_udp_mux = true;
 	port_type webrtc_port_range_begin = 9000;
 	port_type webrtc_port_range_end = 9050;
 

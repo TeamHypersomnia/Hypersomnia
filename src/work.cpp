@@ -1172,6 +1172,7 @@ work_result work(
 		const auto original_port = config_pattern.server_start.port;
 
 		auto port_counter = original_port;
+		auto webrtc_port_counter = config_pattern.server.webrtc_port_range_begin;
 
 		auto write_vars_to_disk = [&](const server_vars& new_vars) {
 			LOG("Writing server_vars to disk.");
@@ -1215,6 +1216,13 @@ work_result work(
 			this_config.server.server_name += server_name_suffix;
 			this_config.server_start.port = port_counter++;
 
+			if (type != SINGLE) {
+				/* Force muxing on consecutive ports */
+				this_config.server.webrtc_udp_mux = true;
+				this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
+				this_config.server.webrtc_port_range_end = this_config.server.webrtc_port_range_begin;
+			}
+
 			LOG(
 				"Starting %x server instance. Binding to a port: %x",
 				instance_label,
@@ -1224,7 +1232,11 @@ work_result work(
 			auto write_or_not = std::function<void(const server_vars&)>(write_vars_to_disk);
 			bool should_suppress_webhook = params.suppress_server_webhook;
 			
-			const bool pick_random_map = later_server && this_config.server.cycle_randomize_order;
+			const bool pick_random_map = 
+				later_server && 
+				this_config.server.cycle_randomize_order &&
+				this_config.server.cycle != arena_cycle_type::REPEAT_CURRENT
+			;
 
 			if (later_server) {
 				/*
