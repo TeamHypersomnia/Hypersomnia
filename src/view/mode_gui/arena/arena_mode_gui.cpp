@@ -1296,10 +1296,18 @@ void arena_gui_state::draw_mode_gui(
 						draw_warmup_indicator(first, second);
 					}
 					else {
-						draw_warmup_indicator(
-							larger_colored("RANKED MATCH ENDED.", white),
-							secs_left_text
-						);
+						if (is_ranked_server) {
+							draw_warmup_indicator(
+								larger_colored("RANKED MATCH ENDED.", white),
+								secs_left_text
+							);
+						}
+						else {
+							draw_warmup_indicator(
+								larger_colored("MATCH ENDED.", white),
+								secs_left_text
+							);
+						}
 					}
 				}
 				else {
