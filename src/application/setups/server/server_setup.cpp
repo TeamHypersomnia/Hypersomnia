@@ -128,6 +128,7 @@ class webrtc_server_detail {
 
 	/* We need this since yojimbo can only identify clients by slot (port) */
     std::unordered_map<std::string, client_id> id_map;
+	client_id next_client_id = 0;
 
 	auto set_this_server_id(const std::string& new_id) {
 		std::scoped_lock lk(this_server_id_lk);
@@ -142,8 +143,11 @@ class webrtc_server_detail {
 
 	client_id assign_client_id() {
 		for (client_id i = 0; i < max_clients; ++i) {
-			if (pcs.find(i) == pcs.end()) {
-				return i;
+			const auto id = (next_client_id + i) % max_clients;
+
+			if (pcs.find(id) == pcs.end()) {
+				next_client_id = (id + 1) % max_clients;
+				return id;
 			}
 		}
 
