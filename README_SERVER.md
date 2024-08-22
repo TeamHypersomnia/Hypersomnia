@@ -36,7 +36,7 @@ This will run the server in the background.
 ```
 
 The maps will be saved to ``~/.config/Hypersomnia/user/downloads/arenas``.
-Anyone who connects will be able to play them - the server will send the player any custom map currently played on the server.
+Anyone who connects will be able to play them - upon connection, the player will download the custom map from the same catalogue (over HTTPS) or directly from your server over UDP should the map catalogue be offline.
 
 ## libfuse
 
@@ -69,7 +69,7 @@ To be able to access the administration panel of your server, setup ``master_rco
 
 You'll need these ports open:
 - One UDP port for native clients (``8412`` is recommended).
-- One or UDP port for [Web clients](https://hypersomnia.io).
+- One UDP port for [Web clients](https://hypersomnia.io).
 	- ``9000`` by default - multiple web clients will be multiplexed.
 	  - Optionally, you can disable UDP multiplexing and use multiple UDP ports.
 
