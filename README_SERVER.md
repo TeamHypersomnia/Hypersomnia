@@ -6,6 +6,8 @@ You should easily be able to run it on other distributions like Arch Linux.
 
 We also have a [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile).
 
+Check out this [handy script to quickly deploy the server as a service](https://git.libregaming.org/hyperdev/Gameserver/src/branch/main/scripts/deploy_hypersomnia.sh), used for onFOSS events.
+
 - [Basic setup](#basic-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
