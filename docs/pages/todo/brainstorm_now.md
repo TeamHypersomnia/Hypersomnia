@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- optimize maps since they're downloaded so much
+- fix bogosbinted?
 - major: remove/audit get<>
 
 - shorten warmup/countdown times

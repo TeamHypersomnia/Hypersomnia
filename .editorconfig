@@ -1,0 +1,7 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+root = true
+
+[*.cpp]
+indent_style = tab
+indent_size = 4
