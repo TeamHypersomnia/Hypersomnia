@@ -5,3 +5,7 @@ root = true
 [*.cpp]
 indent_style = tab
 indent_size = 4
+
+[*.md]
+indent_style = tab
+indent_size = 4
