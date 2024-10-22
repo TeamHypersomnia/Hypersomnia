@@ -23,7 +23,7 @@ Forever free and open-source :heart:
 
 <a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
 
-<h3><a href="https://mastodon.social/@gamingonlinux/112609228144158828">Official Telegram channel (RU)<br/><br/><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" height=100></a></h3>
+<h3><a href="https://t.me/hypersomnia_io">Official Telegram channel (RU)<br/><br/><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" height=100></a></h3>
 
 # Get it on Steam!
 
