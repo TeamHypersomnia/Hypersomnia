@@ -39,7 +39,7 @@ jobs:
     - name: Generate downloadable archives
       run: cmake/generate_archives.sh MacOS
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: MacOS-binaries
         path: |
