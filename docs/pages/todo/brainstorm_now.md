@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- no bs: use webrtc for all connections behind nat 
+	- pros:
+		- simplifies nat traversal code
+			- especially that dumbass shit in work.cpp
+		- we can leave stun detection for host a server menu, just make sure to unbind this shit
+		- is more bulletproof
+- 
+
 - optimize maps since they're downloaded so much
 - fix bogosbinted?
 - major: remove/audit get<>
