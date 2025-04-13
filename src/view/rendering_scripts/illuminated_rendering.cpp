@@ -111,18 +111,22 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		sh->set_uniform(renderer, std::forward<decltype(args)>(args)...);
 	};
 
-	auto set_shader_with_matrix = [&](auto& shader) {
+	auto set_shader = [&](auto& shader) {
 		shader->set_as_current(renderer);
+	};
+
+	auto set_shader_with_matrix = [&](auto& shader) {
+		set_shader(shader);
 		shader->set_projection(renderer, matrix);
 	};
 
 	auto set_shader_with_non_zoomed_matrix = [&](auto& shader) {
-		shader->set_as_current(renderer);
+		set_shader(shader);
 		shader->set_projection(renderer, non_zoomed_matrix);
 	};
 
 	auto set_shader_with_custom_matrix = [&](auto& shader, auto& custom_matrix) {
-		shader->set_as_current(renderer);
+		set_shader(shader);
 		shader->set_projection(renderer, custom_matrix);
 	};
 
@@ -252,7 +256,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		if (fog_of_war_effective) {
 			renderer.stencil_positive_test();
 
-			shader.set_as_current(renderer);
+			set_shader(shader);
 
 			renderer.set_stencil(true);
 			renderer.call_triangles(D::ENEMY_SENTIENCES);
@@ -463,7 +467,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_pure_color_highlights = [&]() {
-		shaders.pure_color_highlight->set_as_current(renderer);
+		set_shader(shaders.pure_color_highlight);
 
 		auto drawing_input = make_drawing_input();
 		highlights.draw_highlights(cosm, drawing_input);
@@ -485,7 +489,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		if (!is_foreground) {
 			if (settings.occlude_neons_under_sentiences) {
-				draw_sentiences(*shader);
+				draw_sentiences(shader);
 			}
 		}
 	};
@@ -556,7 +560,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
 				renderer.set_active_texture(0);
 
-				shaders.illuminating_smoke->set_as_current(renderer);
+				set_shader(shaders.illuminating_smoke);
 
 				if (strict_fow) {
 					renderer.set_stencil(true);
@@ -569,7 +573,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					renderer.set_stencil(false);
 				}
 
-				shaders.standard->set_as_current(renderer);
+				set_shader(shaders.standard);
 
 				exploding_rings.draw_highlights_of_explosions(
 					get_drawer(),
@@ -604,7 +608,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		bind_and_update_filtering(fbos.smoke->get_texture());
 		renderer.set_active_texture(0);
 
-		shaders.smoke->set_as_current(renderer);
+		set_shader(shaders.smoke);
 
 		if (strict_fow) {
 			renderer.set_stencil(true);
@@ -676,11 +680,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.stencil_positive_test();
 	}
 
+	set_shader(shaders.standard);
+
 	renderer.call_triangles(D::MISSILES);
 
 	if (strict_fow) {
 		renderer.set_stencil(false);
 	}
+
+	set_shader_with_matrix(shaders.illuminated);
 
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 
@@ -694,7 +702,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.call_and_clear_lines();
 	}
 
-	shaders.illuminated->set_as_current(renderer);
+	set_shader(shaders.illuminated);
 
 	renderer.call_triangles(D::SOLID_OBSTACLES);
 
@@ -722,13 +730,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.illuminated);
 
 	draw_fog_of_war_overlay();
-	draw_sentiences(*shaders.illuminated);
-
+	draw_sentiences(shaders.illuminated);
+	set_shader_with_matrix(shaders.illuminated);
 	renderer.call_triangles(D::FOREGROUND);
 
 	overlay_smoke_texture();
 	
-	shaders.standard->set_as_current(renderer);
+	set_shader(shaders.standard);
 	renderer.call_triangles(D::FOREGROUND_GLOWS);
 
 	draw_crosshairs();
@@ -773,7 +781,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_pure_color_highlights();
 	renderer.call_triangles(D::THUNDERS);
 
-	shaders.standard->set_as_current(renderer);
+	set_shader(shaders.standard);
 
 	auto is_reasonably_in_view = [&](const const_entity_handle character) {
 		if (!fog_of_war_effective) {
