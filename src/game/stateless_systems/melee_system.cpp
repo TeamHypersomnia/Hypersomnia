@@ -572,6 +572,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 											damage_msg.origin = damage_origin(typed_weapon);
 											damage_msg.subject = victim;
 											damage_msg.impact_velocity = impact_velocity;
+											damage_msg.normal = impact_velocity;
 											damage_msg.point_of_impact = point_of_impact;
 
 											if (victim_sentient) {

@@ -19,6 +19,7 @@ namespace messages {
 		damage_origin origin;
 		vec2 impact_velocity;
 		vec2 point_of_impact;
+		vec2 normal = vec2::zero;
 		adverse_element_type type = adverse_element_type::FORCE;
 
 		b2Fixture_indices indices;

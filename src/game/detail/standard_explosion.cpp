@@ -238,6 +238,7 @@ void standard_explosion_input::instantiate(
 						damage_msg.subject = victim;
 						damage_msg.damage = damage;
 						damage_msg.impact_velocity = (point_b - explosion_pos).normalize();
+						damage_msg.normal = damage_msg.impact_velocity;
 						damage_msg.point_of_impact = point_b;
 
 						if (type == adverse_element_type::INTERFERENCE) {

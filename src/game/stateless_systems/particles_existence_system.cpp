@@ -124,11 +124,19 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		const auto impact_transform = [&]() {
 			auto result = transformr(d.point_of_impact);			
 
+			auto impact_dir = d.impact_velocity;
+
+#if PARTICLES_PERPENDICULAR_TO_WALLS
+			if (d.normal != vec2::zero) {
+				impact_dir = -d.normal;
+			}
+#endif
+
 			if (d.damage.base > 0) {
-				result.rotation = (-d.impact_velocity).degrees();
+				result.rotation = (-impact_dir).degrees();
 			}
 			else {
-				result.rotation = (d.impact_velocity).degrees();
+				result.rotation = (impact_dir).degrees();
 			}
 
 			return result;

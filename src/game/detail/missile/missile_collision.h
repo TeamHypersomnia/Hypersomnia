@@ -164,6 +164,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		damage_msg.origin = damage_origin(typed_missile);
 		damage_msg.subject = surface_handle;
 		damage_msg.impact_velocity = impact_velocity;
+		damage_msg.normal = collision_normal;
 		damage_msg.point_of_impact = point;
 
 		if (dist_remaining != dist_starting && dist_starting != 0.0f) {
