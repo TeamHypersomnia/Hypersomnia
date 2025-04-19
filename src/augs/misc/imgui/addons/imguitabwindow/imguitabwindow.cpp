@@ -593,8 +593,10 @@ void AddTextVertical(ImDrawList* drawList,const ImFont* font, float font_size, c
     // Might just move Font/FontSize to ImDrawList?
     if (font == NULL)
         font = GImGui->Font;
-    if (font_size == 0.0f)
+
+    if (font_size == 0.0f) {
         font_size = GImGui->FontSize;
+	}
 
 	if (font && font->ContainerAtlas) {
 		IM_ASSERT(drawList && font->ContainerAtlas->TexID == drawList->_TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.

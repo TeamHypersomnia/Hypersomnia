@@ -271,7 +271,13 @@ struct webrtc_client_detail {
 		});
 
 		{
-			dc = pc->createDataChannel("dataChannel");
+			{
+				rtc::Reliability unreliable;
+				unreliable.unordered = true;
+				unreliable.maxRetransmits = 0;
+
+				dc = pc->createDataChannel("dataChannel", { unreliable });
+			}
 
 			dc->onOpen([wself = std::weak_ptr(self)]() {
 				auto self = wself.lock();
