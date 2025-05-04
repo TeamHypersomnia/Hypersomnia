@@ -1,6 +1,6 @@
 # Hypersomnia dedicated server guide 
 
-The dedicated server is known to work on Ubuntu 20.04 or later.
+The dedicated server is known to work on Ubuntu 22.04 or later.
 
 You should easily be able to run it on other distributions like Arch Linux.
 
@@ -40,7 +40,7 @@ Anyone who connects will be able to play them - upon connection, the player will
 
 ## libfuse
 
-Note you can skip the ``--appimage-extract-and-run`` flag if you have [fuse](https://packages.ubuntu.com/focal/fuse) installed. It's ``fuse2`` on Arch.
+Note you can skip the ``--appimage-extract-and-run`` flag if you have [fuse](https://packages.ubuntu.com/jammy/fuse) installed. It's ``fuse2`` on Arch.
 
 ``--appimage-extract-and-run`` will work out-of-the-box but involves an extraction step into ``/tmp``.
 
