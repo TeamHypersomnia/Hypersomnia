@@ -680,6 +680,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.stencil_positive_test();
 	}
 
+	set_shader_with_matrix(shaders.pure_color_highlight);
+	renderer.call_triangles(D::MISSILES_SHADOWS);
+
 	set_shader(shaders.standard);
 
 	renderer.call_triangles(D::MISSILES);

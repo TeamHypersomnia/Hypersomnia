@@ -4,6 +4,12 @@
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
 #include "game/detail/use_interaction_logic.h"
 
+const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 80);
+const vec2 CHARACTER_SHADOW_OFFSET = vec2(7, 7);
+const rgba MISSILE_SHADOW_COLOR = rgba(0, 0, 0, 140);
+const vec2 MISSILE_SHADOW_OFFSET = vec2(20, 25);
+const vec2 MISSILE_SHADOW_SCALE = vec2(1.4f, 1.8f);
+
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 
 	const illuminated_rendering_input& in
@@ -498,7 +504,13 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h1 = make_helper(D::GROUND), h2 = make_helper(D::MISSILES)]() {
+			auto job = [
+				&visible,
+				&cosm,
+				h1 = make_helper(D::GROUND),
+				h2 = make_helper(D::MISSILES),
+				missiles_shadows  = make_drawing_input(D::MISSILES_SHADOWS)
+			]() {
 				h1.draw<
 					render_layer::GROUND,
 					render_layer::PLANTED_ITEMS,
@@ -508,6 +520,20 @@ void enqueue_illuminated_rendering_jobs(
 				h2.draw<
 					render_layer::MISSILES
 				>();
+
+				visible.for_each<render_layer::MISSILES>(
+					cosm,
+					[&](const auto& handle) {
+						auto make_offset_input = [](auto offset_input) {
+							offset_input.renderable_transform += MISSILE_SHADOW_OFFSET;
+							return offset_input;
+						};
+
+						handle.template dispatch_on_having_all<invariants::missile>([&](const auto& typed_item) {
+							::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, missiles_shadows, make_offset_input, MISSILE_SHADOW_SCALE);
+						});
+					}
+				);
 			};
 
 			pool.enqueue(job);
@@ -576,25 +602,22 @@ void enqueue_illuminated_rendering_jobs(
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					const bool is_local = typed_handle == fog_of_war_character;
 
-					const rgba SHADOW_COLOR = rgba(0, 0, 0, 80);
-					const auto shadow_input_customizer = 
-						[](auto modified_input) {
-							const vec2 SHADOW_OFFSET = vec2(7, 7);
-							modified_input.renderable_transform += SHADOW_OFFSET;
-							return modified_input;
+					const auto shadow_input_customizer = [](auto modified_input) {
+						modified_input.renderable_transform += CHARACTER_SHADOW_OFFSET;
+						return modified_input;
 					};
 
 					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction)) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
-						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
+						::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
 						::specific_draw_entity(typed_handle, friendly_drawing_in);
 						::specific_draw_border(typed_handle, borders_friendly_drawing_in, standard_border_provider);
 					}
 					else {
 						draw_lights_for(neons_enemy_drawing_in, typed_handle);
 
-						::specific_draw_color_highlight(typed_handle, SHADOW_COLOR, enemy_drawing_in, shadow_input_customizer);
+						::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, enemy_drawing_in, shadow_input_customizer);
 						::specific_draw_entity(typed_handle, enemy_drawing_in);
 						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
 

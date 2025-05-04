@@ -612,10 +612,12 @@ FORCE_INLINE void specific_draw_color_highlight(
 	const cref_typed_entity_handle<E> typed_handle,
 	const rgba color,
 	const draw_renderable_input& in,
-	F&& customize_input = default_customize_input()
+	F&& customize_input = default_customize_input(),
+	vec2 size_mult = vec2(1.0f, 1.0f)
 ) {
-	auto highlight_maker = [color, &customize_input](auto renderable, const auto& manager, const auto& input) {
+	auto highlight_maker = [color, &customize_input, size_mult](auto renderable, const auto& manager, const auto& input) {
 		renderable.set_color(color);
+		renderable.size *= size_mult;
 		augs::draw(renderable, manager, customize_input(input));
 	};
 
