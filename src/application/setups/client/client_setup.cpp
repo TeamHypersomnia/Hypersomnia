@@ -1458,7 +1458,7 @@ void client_setup::send_pending_commands() {
 					payload.image_bytes.clear();
 				}
 
-				if (payload.image_bytes.size() > 0 && payload.image_bytes.size() <= max_avatar_bytes_v) {
+				if (payload.image_bytes.size() <= max_avatar_bytes_v) {
 					const auto dummy_client_id = mode_player_id::dead();
 
 					send_payload(
