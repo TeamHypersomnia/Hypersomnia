@@ -1009,7 +1009,8 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 					return result;
 				}
 
-				return std::string("steam_") + result;
+				const auto type = auth_provider_type::STEAM_NATIVE;
+				return ::get_provider_preffix(type) + result;
 			}
 		);
 	};
@@ -1625,7 +1626,18 @@ void server_setup::finalize_webhook_jobs() {
 								client->secs_since_connected(server_time)
 							);
 
-							kick(to_client_id(webhook_job.player_id), "Duplicate connection.");
+							auto duplicate_message = std::string("Duplicate client.");
+
+							if (vars.authenticate_with_nicknames) {
+								const auto chosen_nick = cut_preffix(std::string(new_id), "nick_");
+
+								duplicate_message = 
+									typesafe_sprintf("Your nickname: '%x'\nis already taken!", chosen_nick)
+								;
+							}
+
+							kick(to_client_id(webhook_job.player_id), duplicate_message);
+
 							break;
 						}
 

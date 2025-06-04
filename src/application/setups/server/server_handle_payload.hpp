@@ -52,7 +52,9 @@ message_handler_result server_setup::handle_payload(
 			even outside of the PENDING_WELCOME state
 		*/
 
+		const auto client_chosen_nickname = payload.chosen_nickname;
 		auto& new_nick = payload.chosen_nickname;
+
 		LOG("Received requested_client_settings from %x. Client state: %x", new_nick, c.state);
 
 		if (!is_nickname_valid_characters(new_nick)) {
@@ -117,6 +119,27 @@ message_handler_result server_setup::handle_payload(
 		if (c.state == S::PENDING_WELCOME) {
 			LOG("Client %x requested nickname: %x", client_id, c.get_nickname());
 			c.state = S::WELCOME_ARRIVED;
+
+			if (vars.authenticate_with_nicknames) {
+				/*
+					Authenticate by originally chosen nickname,
+					instead of the apparent one (so after adding potential indices like Player1, Player2)
+					in order to actually force people to chose unique nickname
+				*/
+
+				LOG(
+					"authenticate_with_nicknames is set.\nAuthenticating client with nickname: %x",
+					client_chosen_nickname
+				);
+
+				push_auth_job(
+					to_mode_player_id(client_id),
+
+					[client_chosen_nickname]() {
+						return std::string("nick_") + std::string(client_chosen_nickname);
+					}
+				);
+			}
 		}
 
 		c.rebroadcast_synced_meta = true;

@@ -140,6 +140,7 @@ struct server_vars {
 	uint32_t kick_if_afk_for_secs = 7200;
 	float web_client_network_timeout_secs = 1.5f;
 	float client_network_timeout_secs = 3.0f;
+	bool authenticate_with_nicknames = false;
 	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
 
