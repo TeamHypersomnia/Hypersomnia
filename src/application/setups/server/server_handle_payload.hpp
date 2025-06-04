@@ -120,6 +120,7 @@ message_handler_result server_setup::handle_payload(
 			LOG("Client %x requested nickname: %x", client_id, c.get_nickname());
 			c.state = S::WELCOME_ARRIVED;
 
+#if !PLATFORM_WEB
 			if (vars.authenticate_with_nicknames) {
 				/*
 					Authenticate by originally chosen nickname,
@@ -140,6 +141,9 @@ message_handler_result server_setup::handle_payload(
 					}
 				);
 			}
+#else
+			(void)client_chosen_nickname;
+#endif
 		}
 
 		c.rebroadcast_synced_meta = true;
