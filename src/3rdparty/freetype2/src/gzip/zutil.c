@@ -10,6 +10,8 @@
 #  include "gzguts.h"
 #endif
 
+#ifndef Z_FREETYPE
+
 z_const char * const z_errmsg[10] = {
     (z_const char *)"need dictionary",     /* Z_NEED_DICT       2  */
     (z_const char *)"stream end",          /* Z_STREAM_END      1  */
@@ -24,13 +26,11 @@ z_const char * const z_errmsg[10] = {
 };
 
 
-const char * ZEXPORT zlibVersion()
-{
+const char * ZEXPORT zlibVersion(void) {
     return ZLIB_VERSION;
 }
 
-uLong ZEXPORT zlibCompileFlags()
-{
+uLong ZEXPORT zlibCompileFlags(void) {
     uLong flags;
 
     flags = 0;
@@ -61,9 +61,11 @@ uLong ZEXPORT zlibCompileFlags()
 #ifdef ZLIB_DEBUG
     flags += 1 << 8;
 #endif
+    /*
 #if defined(ASMV) || defined(ASMINF)
     flags += 1 << 9;
 #endif
+     */
 #ifdef ZLIB_WINAPI
     flags += 1 << 10;
 #endif
@@ -119,9 +121,7 @@ uLong ZEXPORT zlibCompileFlags()
 #  endif
 int ZLIB_INTERNAL z_verbose = verbose;
 
-void ZLIB_INTERNAL z_error (
-    char *m)
-{
+void ZLIB_INTERNAL z_error(char *m) {
     fprintf(stderr, "%s\n", m);
     exit(1);
 }
@@ -130,11 +130,11 @@ void ZLIB_INTERNAL z_error (
 /* exported to allow conversion of error code to string for compress() and
  * uncompress()
  */
-const char * ZEXPORT zError(
-    int err)
-{
+const char * ZEXPORT zError(int err) {
     return ERR_MSG(err);
 }
+
+#endif  /* !Z_FREETYPE */
 
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
     /* The older Microsoft C Run-Time Library for Windows CE doesn't have
@@ -146,22 +146,15 @@ const char * ZEXPORT zError(
 
 #ifndef HAVE_MEMCPY
 
-void ZLIB_INTERNAL zmemcpy(
-    Bytef* dest,
-    const Bytef* source,
-    uInt  len)
-{
+void ZLIB_INTERNAL zmemcpy(Bytef* dest, const Bytef* source, uInt len) {
     if (len == 0) return;
     do {
         *dest++ = *source++; /* ??? to be unrolled */
     } while (--len != 0);
 }
 
-int ZLIB_INTERNAL zmemcmp(
-    const Bytef* s1,
-    const Bytef* s2,
-    uInt  len)
-{
+#ifndef Z_FREETYPE
+int ZLIB_INTERNAL zmemcmp(const Bytef* s1, const Bytef* s2, uInt len) {
     uInt j;
 
     for (j = 0; j < len; j++) {
@@ -170,15 +163,13 @@ int ZLIB_INTERNAL zmemcmp(
     return 0;
 }
 
-void ZLIB_INTERNAL zmemzero(
-    Bytef* dest,
-    uInt  len)
-{
+void ZLIB_INTERNAL zmemzero(Bytef* dest, uInt len) {
     if (len == 0) return;
     do {
         *dest++ = 0;  /* ??? to be unrolled */
     } while (--len != 0);
 }
+#endif  /* !Z_FREETYPE */
 #endif
 
 #ifndef Z_SOLO
@@ -214,8 +205,7 @@ local ptr_table table[MAX_PTR];
  * a protected system like OS/2. Use Microsoft C instead.
  */
 
-voidpf ZLIB_INTERNAL zcalloc (voidpf opaque, unsigned items, unsigned size)
-{
+voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned items, unsigned size) {
     voidpf buf;
     ulg bsize = (ulg)items*size;
 
@@ -240,8 +230,7 @@ voidpf ZLIB_INTERNAL zcalloc (voidpf opaque, unsigned items, unsigned size)
     return buf;
 }
 
-void ZLIB_INTERNAL zcfree (voidpf opaque, voidpf ptr)
-{
+void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr) {
     int n;
 
     (void)opaque;
@@ -277,14 +266,12 @@ void ZLIB_INTERNAL zcfree (voidpf opaque, voidpf ptr)
 #  define _hfree   hfree
 #endif
 
-voidpf ZLIB_INTERNAL zcalloc (voidpf opaque, uInt items, uInt size)
-{
+voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, uInt items, uInt size) {
     (void)opaque;
     return _halloc((long)items, size);
 }
 
-void ZLIB_INTERNAL zcfree (voidpf opaque, voidpf ptr)
-{
+void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr) {
     (void)opaque;
     _hfree(ptr);
 }
@@ -297,25 +284,18 @@ void ZLIB_INTERNAL zcfree (voidpf opaque, voidpf ptr)
 #ifndef MY_ZCALLOC /* Any system without a special alloc function */
 
 #ifndef STDC
-extern voidp  malloc OF((uInt size));
-extern voidp  calloc OF((uInt items, uInt size));
-extern void   free   OF((voidpf ptr));
+extern voidp malloc(uInt size);
+extern voidp calloc(uInt items, uInt size);
+extern void free(voidpf ptr);
 #endif
 
-voidpf ZLIB_INTERNAL zcalloc (
-    voidpf opaque,
-    unsigned items,
-    unsigned size)
-{
+voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned items, unsigned size) {
     (void)opaque;
     return sizeof(uInt) > 2 ? (voidpf)malloc(items * size) :
                               (voidpf)calloc(items, size);
 }
 
-void ZLIB_INTERNAL zcfree (
-    voidpf opaque,
-    voidpf ptr)
-{
+void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr) {
     (void)opaque;
     free(ptr);
 }

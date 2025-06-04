@@ -1,6 +1,6 @@
 # CMakeLists.txt
 #
-# Copyright (C) 2013-2022 by
+# Copyright (C) 2013-2024 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # Written originally by John Cary <cary@txcorp.com>
@@ -61,6 +61,8 @@
 #
 # Some notes.
 #
+# - Say `cmake -LAH` to see all configuration options.
+#
 # - `cmake' creates configuration files in
 #
 #     <build-directory>/include/freetype/config
@@ -108,7 +110,7 @@
 
 # To minimize the number of cmake_policy() workarounds,
 # CMake >= 3 is requested.
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.5)
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.3)
   # Allow symbol visibility settings also on static libraries. CMake < 3.3
@@ -121,7 +123,6 @@ endif ()
 
 include(CheckIncludeFile)
 include(CMakeDependentOption)
-include(FindPkgConfig)
 
 # CMAKE_TOOLCHAIN_FILE must be set before `project' is called, which
 # configures the base build environment and references the toolchain file
@@ -162,8 +163,8 @@ endif ()
 project(freetype C)
 
 set(VERSION_MAJOR "2")
-set(VERSION_MINOR "12")
-set(VERSION_PATCH "1")
+set(VERSION_MINOR "13")
+set(VERSION_PATCH "3")
 
 # Generate LIBRARY_VERSION and LIBRARY_SOVERSION.
 set(LIBTOOL_REGEX "version_info='([0-9]+):([0-9]+):([0-9]+)'")
@@ -187,35 +188,37 @@ set(LIBRARY_VERSION "${LIBRARY_SOVERSION}.${LIBTOOL_AGE}.${LIBTOOL_REVISION}")
 # External dependency library detection is automatic.  See the notes at the
 # top of this file, for how to force or disable dependencies completely.
 option(FT_DISABLE_ZLIB
-  "Disable use of system zlib and use internal zlib library instead." ON)
+  "Disable use of system zlib and use internal zlib library instead." OFF)
 cmake_dependent_option(FT_REQUIRE_ZLIB
   "Require system zlib instead of internal zlib library." OFF
   "NOT FT_DISABLE_ZLIB" OFF)
 
 option(FT_DISABLE_BZIP2
-  "Disable support of bzip2 compressed fonts." ON)
+  "Disable support of bzip2 compressed fonts." OFF)
 cmake_dependent_option(FT_REQUIRE_BZIP2
   "Require support of bzip2 compressed fonts." OFF
   "NOT FT_DISABLE_BZIP2" OFF)
 
 option(FT_DISABLE_PNG
-  "Disable support of PNG compressed OpenType embedded bitmaps." ON)
+  "Disable support of PNG compressed OpenType embedded bitmaps." OFF)
 cmake_dependent_option(FT_REQUIRE_PNG
   "Require support of PNG compressed OpenType embedded bitmaps." OFF
   "NOT FT_DISABLE_PNG" OFF)
 
 option(FT_DISABLE_HARFBUZZ
-  "Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." ON)
+  "Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." OFF)
 cmake_dependent_option(FT_REQUIRE_HARFBUZZ
   "Require HarfBuzz for improving auto-hinting of OpenType fonts." OFF
   "NOT FT_DISABLE_HARFBUZZ" OFF)
 
 option(FT_DISABLE_BROTLI
-  "Disable support of compressed WOFF2 fonts." ON)
+  "Disable support of compressed WOFF2 fonts." OFF)
 cmake_dependent_option(FT_REQUIRE_BROTLI
   "Require support of compressed WOFF2 fonts." OFF
   "NOT FT_DISABLE_BROTLI" OFF)
 
+option(FT_ENABLE_ERROR_STRINGS
+  "Enable support for meaningful error descriptions." OFF)
 
 # Disallow in-source builds
 if ("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
@@ -245,6 +248,8 @@ endif ()
 
 
 # Find dependencies
+include(FindPkgConfig)
+
 if (NOT FT_DISABLE_HARFBUZZ)
   set(HARFBUZZ_MIN_VERSION "2.0.0")
   if (FT_REQUIRE_HARFBUZZ)
@@ -260,6 +265,8 @@ if (NOT FT_DISABLE_PNG)
   else ()
     find_package(PNG)
   endif ()
+  # FreePNG calls FindZLIB so unset ZLIB_FOUND to respect FT_DISABLE_ZLIB
+  unset(ZLIB_FOUND)
 endif ()
 
 if (NOT FT_DISABLE_ZLIB)
@@ -292,7 +299,7 @@ if (NOT FT_DISABLE_BROTLI)
 endif ()
 
 # Create the configuration file
-if (UNIX)
+if (UNIX AND NOT WIN32)
   check_include_file("unistd.h" HAVE_UNISTD_H)
   check_include_file("fcntl.h" HAVE_FCNTL_H)
 
@@ -350,6 +357,12 @@ endif ()
 if (BROTLIDEC_FOUND)
   string(REGEX REPLACE
     "/\\* +(#define +FT_CONFIG_OPTION_USE_BROTLI) +\\*/" "\\1"
+    FTOPTION_H "${FTOPTION_H}")
+endif ()
+
+if (FT_ENABLE_ERROR_STRINGS)
+  string(REGEX REPLACE
+    "/\\* +(#define +FT_CONFIG_OPTION_ERROR_STRINGS) +\\*/" "\\1"
     FTOPTION_H "${FTOPTION_H}")
 endif ()
 
@@ -412,10 +425,10 @@ set(BASE_SRCS
   src/winfonts/winfnt.c
 )
 
-if (UNIX)
-  list(APPEND BASE_SRCS "builds/unix/ftsystem.c")
-elseif (WIN32)
+if (WIN32)
   list(APPEND BASE_SRCS "builds/windows/ftsystem.c")
+elseif (UNIX)
+  list(APPEND BASE_SRCS "builds/unix/ftsystem.c")
 else ()
   list(APPEND BASE_SRCS "src/base/ftsystem.c")
 endif ()
@@ -497,6 +510,13 @@ if (BUILD_FRAMEWORK)
   )
 endif ()
 
+# 'freetype-interface' is an interface library, to be accessed with
+# `EXPORT_NAME Freetype::Freetype`.  This is the target name provided by
+# CMake's `FindFreetype.cmake`, so we provide it for compatibility.
+add_library(freetype-interface INTERFACE)
+set_target_properties(freetype-interface PROPERTIES
+  EXPORT_NAME Freetype::Freetype
+  INTERFACE_LINK_LIBRARIES freetype)
 
 set(PKGCONFIG_REQUIRES "")
 set(PKGCONFIG_REQUIRES_PRIVATE "")
@@ -614,7 +634,7 @@ if (NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     COMPATIBILITY SameMajorVersion)
 
   install(
-    TARGETS freetype
+    TARGETS freetype freetype-interface
       EXPORT freetype-targets
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

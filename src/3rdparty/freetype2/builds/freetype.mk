@@ -3,7 +3,7 @@
 #
 
 
-# Copyright (C) 1996-2022 by
+# Copyright (C) 1996-2024 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -299,7 +299,7 @@ refdoc:
                   $(PUBLIC_DIR)/config/*.h \
                   $(PUBLIC_DIR)/cache/*.h
 	@echo Building static site...
-	cd $(DOC_DIR) && mkdocs build
+	cd $(DOC_DIR) && $(PYTHON) -m mkdocs build
 	@echo Done.
 
 # Variables for running `refdoc' with Python's `virtualenv'.  The
