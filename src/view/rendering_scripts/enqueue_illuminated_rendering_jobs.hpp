@@ -504,7 +504,10 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
+			const bool draw_bullet_shadows = in.drawing.draw_bullet_shadows;
+
 			auto job = [
+				draw_bullet_shadows,
 				&visible,
 				&cosm,
 				h1 = make_helper(D::GROUND),
@@ -521,19 +524,21 @@ void enqueue_illuminated_rendering_jobs(
 					render_layer::MISSILES
 				>();
 
-				visible.for_each<render_layer::MISSILES>(
-					cosm,
-					[&](const auto& handle) {
-						auto make_offset_input = [](auto offset_input) {
-							offset_input.renderable_transform += MISSILE_SHADOW_OFFSET;
-							return offset_input;
-						};
+				if (draw_bullet_shadows) {
+					visible.for_each<render_layer::MISSILES>(
+						cosm,
+						[&](const auto& handle) {
+							auto make_offset_input = [](auto offset_input) {
+								offset_input.renderable_transform += MISSILE_SHADOW_OFFSET;
+								return offset_input;
+							};
 
-						handle.template dispatch_on_having_all<invariants::missile>([&](const auto& typed_item) {
-							::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, missiles_shadows, make_offset_input, MISSILE_SHADOW_SCALE);
-						});
-					}
-				);
+							handle.template dispatch_on_having_all<invariants::missile>([&](const auto& typed_item) {
+								::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, missiles_shadows, make_offset_input, MISSILE_SHADOW_SCALE);
+							});
+						}
+					);
+				}
 			};
 
 			pool.enqueue(job);

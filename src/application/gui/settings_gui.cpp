@@ -807,6 +807,8 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
+				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
+
 				{
 					auto& scope_cfg = config.performance.special_effects;
 					revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
