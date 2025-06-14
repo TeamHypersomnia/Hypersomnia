@@ -315,4 +315,8 @@ public:
 	bool team_choice_allowed(const_input) const {
 		return true;
 	}
+
+	uint32_t continuous_sounds_clock(const_input in) const {
+		return in.cosm.get_total_steps_passed();
+	}
 };

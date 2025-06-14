@@ -1925,6 +1925,21 @@ work_result work(
 		});
 	};
 
+	WEBSTATIC auto continuous_sounds_clock = [&]() {
+		return visit_current_setup([&]<typename S>(S& setup) {
+			if constexpr(S::has_game_mode) {
+				return setup.on_mode_with_input(
+					[&](const auto& typed_mode, const auto& mode_input) {
+						return typed_mode.continuous_sounds_clock(mode_input);
+					}
+				);
+			}
+			else {
+				return uint32_t(0);
+			}
+		});
+	};
+
 	WEBSTATIC auto on_specific_setup = [&](auto callback) -> decltype(auto) {
 		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
@@ -4103,6 +4118,7 @@ work_result work(
 			frame_delta,
 			speed_multiplier,
 			inv_tickrate,
+			continuous_sounds_clock(),
 			get_interpolation_ratio(),
 
 			get_character_camera(viewing_config),

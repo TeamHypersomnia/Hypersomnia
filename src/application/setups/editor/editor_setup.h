@@ -716,7 +716,9 @@ public:
 	}
 
 	template <class F>
-	void on_mode_with_input(F&&) const {}
+	decltype(auto) on_mode_with_input(F&& callback) const {
+		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
+	}
 
 	std::nullopt_t get_new_player_metas() {
 		return std::nullopt;

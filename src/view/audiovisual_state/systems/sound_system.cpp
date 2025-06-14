@@ -912,8 +912,9 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 		if (const auto buf = source.buffer_meta; buf.is_set()) {
 			const auto secs = buf.computed_length_in_seconds;
+			const bool looping = m.repetitions == -1;
 
-			if (secs > in.settings.sync_sounds_longer_than_secs) {
+			if (looping || secs > in.settings.sync_sounds_longer_than_secs) {
 				const auto& cosm = subject.get_cosmos();
 
 				const auto when_born = subject.when_born().step;
@@ -923,11 +924,18 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					return;
 				}
 
-				const auto total_secs_passed = cosm.get_total_seconds_passed(in.interpolation_ratio);
-				const auto born_at_secs = when_born * in.inv_tickrate;
+				auto born_at_secs = when_born * in.inv_tickrate;
+				auto total_secs_passed = cosm.get_total_seconds_passed(in.interpolation_ratio);
+
+				if (looping) {
+					born_at_secs = 0;
+
+					const auto total_steps = in.continuous_sounds_clock;
+					total_secs_passed = double(total_steps + in.interpolation_ratio) * in.inv_tickrate;
+				}
+
 				const auto total_lived_secs = std::max(0.0, (total_secs_passed - born_at_secs) * in.speed_multiplier * m.pitch);
 				const auto total_lived_cycles = total_lived_secs / secs;
-				const bool looping = m.repetitions == -1;
 
 				const auto expected_secs = [&]() {
 					if (looping) {

@@ -7,7 +7,7 @@ namespace augs {
 
 	struct stepped_timestamp {
 		// GEN INTROSPECTOR struct augs::stepped_timestamp
-		unsigned step = static_cast<unsigned>(-1);
+		uint32_t step = static_cast<uint32_t>(-1);
 		// END GEN INTROSPECTOR
 
 		stepped_timestamp operator-(const stepped_timestamp b) const;

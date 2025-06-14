@@ -574,6 +574,8 @@ public:
 	) {
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
+		++continuous_sounds_clock(in);
+
 		return standard_solver()(
 			step_input, 
 			solver_callbacks(
@@ -768,4 +770,14 @@ public:
 	bool team_choice_allowed(const const_input in) const;
 
 	bool should_match_be_short(const const_input in) const;
+
+	uint32_t& continuous_sounds_clock(const const_input) {
+		/* Double-purpose */
+		return scramble_counter;
+	}
+
+	uint32_t continuous_sounds_clock(const const_input) const {
+		/* Double-purpose */
+		return scramble_counter;
+	}
 };

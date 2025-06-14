@@ -63,6 +63,7 @@ class sound_system {
 		const augs::delta dt;
 		const double speed_multiplier;
 		const double inv_tickrate;
+		const uint32_t continuous_sounds_clock;
 		const double interpolation_ratio;
 
 		const cosmos& get_cosmos() const;

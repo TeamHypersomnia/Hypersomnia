@@ -42,6 +42,8 @@ class project_selector_setup : public default_setup_settings {
 	bool create_new_project_files();
 
 public:
+	static constexpr bool has_game_mode = false;
+
 	project_selector_setup();
 	~project_selector_setup();
 

@@ -182,8 +182,8 @@ public:
 	bool requires_cursor() const { return false; }
 
 	template <class F>
-	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { dummy_dynamic_vars, ruleset, scene.world });
+	decltype(auto) on_mode_with_input(F&& callback) const {
+		return callback(mode, test_mode::const_input { dummy_dynamic_vars, ruleset, scene.world });
 	}
 
 	auto get_game_gui_subject_id() const {

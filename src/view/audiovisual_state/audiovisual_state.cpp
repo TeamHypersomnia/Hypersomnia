@@ -378,6 +378,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 						chosen_update_dt,
 						input.speed_multiplier,
 						input.inv_tickrate,
+						input.continuous_sounds_clock,
 						input.interpolation_ratio
 					}
 				);
@@ -535,6 +536,7 @@ void audiovisual_state::standard_post_solve(
 					augs::delta::zero,
 					1.0,
 					0.0,
+					0u,
 					0.0
 				}
 			);
