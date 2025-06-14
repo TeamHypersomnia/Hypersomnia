@@ -141,6 +141,7 @@ namespace augs {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		LOG("GLFW: calling glfwCreateWindow.");
+		LOG("Note: OpenGL 3.2 or newer is required to run Hypersomnia!");
 
 		if (settings.fullscreen) {
 			GLFWmonitor* primary = glfwGetPrimaryMonitor();
