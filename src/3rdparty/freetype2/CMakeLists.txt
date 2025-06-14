@@ -188,31 +188,31 @@ set(LIBRARY_VERSION "${LIBRARY_SOVERSION}.${LIBTOOL_AGE}.${LIBTOOL_REVISION}")
 # External dependency library detection is automatic.  See the notes at the
 # top of this file, for how to force or disable dependencies completely.
 option(FT_DISABLE_ZLIB
-  "Disable use of system zlib and use internal zlib library instead." OFF)
+  "Disable use of system zlib and use internal zlib library instead." ON)
 cmake_dependent_option(FT_REQUIRE_ZLIB
   "Require system zlib instead of internal zlib library." OFF
   "NOT FT_DISABLE_ZLIB" OFF)
 
 option(FT_DISABLE_BZIP2
-  "Disable support of bzip2 compressed fonts." OFF)
+  "Disable support of bzip2 compressed fonts." ON)
 cmake_dependent_option(FT_REQUIRE_BZIP2
   "Require support of bzip2 compressed fonts." OFF
   "NOT FT_DISABLE_BZIP2" OFF)
 
 option(FT_DISABLE_PNG
-  "Disable support of PNG compressed OpenType embedded bitmaps." OFF)
+  "Disable support of PNG compressed OpenType embedded bitmaps." ON)
 cmake_dependent_option(FT_REQUIRE_PNG
   "Require support of PNG compressed OpenType embedded bitmaps." OFF
   "NOT FT_DISABLE_PNG" OFF)
 
 option(FT_DISABLE_HARFBUZZ
-  "Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." OFF)
+  "Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." ON)
 cmake_dependent_option(FT_REQUIRE_HARFBUZZ
   "Require HarfBuzz for improving auto-hinting of OpenType fonts." OFF
   "NOT FT_DISABLE_HARFBUZZ" OFF)
 
 option(FT_DISABLE_BROTLI
-  "Disable support of compressed WOFF2 fonts." OFF)
+  "Disable support of compressed WOFF2 fonts." ON)
 cmake_dependent_option(FT_REQUIRE_BROTLI
   "Require support of compressed WOFF2 fonts." OFF
   "NOT FT_DISABLE_BROTLI" OFF)
@@ -249,54 +249,6 @@ endif ()
 
 # Find dependencies
 include(FindPkgConfig)
-
-if (NOT FT_DISABLE_HARFBUZZ)
-  set(HARFBUZZ_MIN_VERSION "2.0.0")
-  if (FT_REQUIRE_HARFBUZZ)
-    find_package(HarfBuzz ${HARFBUZZ_MIN_VERSION} REQUIRED)
-  else ()
-    find_package(HarfBuzz ${HARFBUZZ_MIN_VERSION})
-  endif ()
-endif ()
-
-if (NOT FT_DISABLE_PNG)
-  if (FT_REQUIRE_PNG)
-    find_package(PNG REQUIRED)
-  else ()
-    find_package(PNG)
-  endif ()
-  # FreePNG calls FindZLIB so unset ZLIB_FOUND to respect FT_DISABLE_ZLIB
-  unset(ZLIB_FOUND)
-endif ()
-
-if (NOT FT_DISABLE_ZLIB)
-  if (FT_REQUIRE_ZLIB)
-    find_package(ZLIB REQUIRED)
-  else ()
-    find_package(ZLIB)
-  endif ()
-endif ()
-
-if (NOT FT_DISABLE_BZIP2)
-  # Genuine BZip2 does not provide bzip2.pc, but some platforms have it.
-  # For better dependency in freetype2.pc, bzip2.pc is searched
-  # regardless of the availability of libbz2. If bzip2.pc is found,
-  # Requires.private is used instead of Libs.private.
-  if (FT_REQUIRE_BZIP2)
-    find_package(BZip2 REQUIRED)
-  else ()
-    find_package(BZip2)
-  endif ()
-  pkg_check_modules(PC_BZIP2 bzip2)
-endif ()
-
-if (NOT FT_DISABLE_BROTLI)
-  if (FT_REQUIRE_BROTLI)
-    find_package(BrotliDec REQUIRED)
-  else ()
-    find_package(BrotliDec)
-  endif ()
-endif ()
 
 # Create the configuration file
 if (UNIX AND NOT WIN32)
