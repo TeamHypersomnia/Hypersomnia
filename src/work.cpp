@@ -3449,7 +3449,7 @@ work_result work(
 					try {
 						augs::image avatar;
 
-						avatar.from_png_bytes(new_auth->avatar_bytes, "new_auth->avatar_bytes");
+						avatar.from_bytes_stbi(new_auth->avatar_bytes, "new_auth->avatar_bytes");
 
 						on_specific_setup([&](test_scene_setup& setup) {
 							setup.set_new_avatar(new_auth->avatar_bytes);
