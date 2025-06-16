@@ -57,38 +57,6 @@ void lodepng_free(void* ptr)
   free(ptr);
 }
 
-unsigned decode_rgba(
-	std::vector<rgba>& out,
-	unsigned& w,
-	unsigned& h,
-	const unsigned char* in,
-    const std::size_t insize,
-	const LodePNGColorType colortype = LCT_RGBA,
-	const unsigned bitdepth = 8
-) {
-	using namespace lodepng;
-	unsigned char* buffer;
-	unsigned error = lodepng_decode_memory(&buffer, &w, &h, in, insize, colortype, bitdepth);
-
-	if(buffer && !error) {
-		State state;
-		state.info_raw.colortype = colortype;
-		state.info_raw.bitdepth = bitdepth;
-		std::size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
-
-		const auto pixels_written = buffersize / sizeof(rgba);
-		out.resize(out.size() + pixels_written);
-		std::memcpy(&out[out.size() - pixels_written], buffer, buffersize);
-		lodepng_free(buffer);
-	}
-
-	return error;
-}
-
-unsigned decode_rgba(std::vector<rgba>& out, unsigned& w, unsigned& h, const std::vector<std::byte>& from) {
-	return decode_rgba(out, w, h, reinterpret_cast<const unsigned char*>(from.data()), from.size());
-}
-
 unsigned encode_rgba(std::vector<std::byte>& out, const std::vector<rgba>& in_v, unsigned w, unsigned h,
                 LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8)
 {
@@ -398,7 +366,7 @@ namespace augs {
 
 		if (result == nullptr) {
 			throw image_loading_error(
-				"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
+				"Failed to load image %x (earlier loaded into memory). stbi returned NULL", reported_path
 			);
 		}
 
@@ -451,21 +419,7 @@ namespace augs {
 		const std::vector<std::byte>& from, 
 		const path_type& reported_path
 	) {
-		v.clear();
-
-		unsigned width;
-		unsigned height;
-
-		if (const auto lodepng_result = decode_rgba(v, width, height, from)) {
-			throw image_loading_error(
-				"Failed to load image %x (earlier loaded into memory):\nlodepng returned %x", reported_path, lodepng_result
-			);
-		}
-
-		size.x = width;
-		size.y = height;
-
-		throw_if_zero_size(reported_path, size);
+		from_bytes_stbi(from, reported_path);
 	}
 
 	void image::execute(const paint_command_variant& in) {
