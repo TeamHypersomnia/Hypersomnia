@@ -65,6 +65,7 @@ public:
 		augs::window& window,
 		client_connect_string&,
 		std::string& into_displayed_connecting_server_name,
-		client_vars&
+		client_vars&,
+		const bool streamer_mode
 	);
 };

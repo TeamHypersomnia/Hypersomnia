@@ -2653,7 +2653,8 @@ work_result work(
 			window, 
 			config.client_connect, 
 			displayed_connecting_server_name,
-			config.client
+			config.client,
+			config.streamer_mode
 		);
 
 		if (perform_result || client_start_requested) {

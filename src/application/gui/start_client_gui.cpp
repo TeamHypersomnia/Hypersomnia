@@ -73,7 +73,8 @@ bool start_client_gui_state::perform(
 	augs::window& window,
 	client_connect_string& into_connect_string,
 	std::string& into_displayed_connecting_server_name,
-	client_vars& into_vars
+	client_vars& into_vars,
+	const bool streamer_mode
 ) {
 	if (!show) {
 		return false;
@@ -192,19 +193,8 @@ bool start_client_gui_state::perform(
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
-#if IS_PRODUCTION_BUILD
-			thread_local bool show = false;
-#else
-			thread_local bool show = true;
-#endif
-
-			const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
-
+			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
 			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
-
-			ImGui::SameLine();
-
-			checkbox("Show", show);
 		}
 		else if (current_tab == start_client_tab_type::BEST_SERVER) {
 			if (!best_server.has_value()) {
