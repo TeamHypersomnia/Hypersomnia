@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r hypersomniac && useradd -r -g hypersomniac hypersomniac && \
-    mkdir -p /home/hypersomniac/.config/Hypersomnia/user && \
+    mkdir -p /home/hypersomniac/.config/Hypersomnia/user/conf.d && \
     chown -R hypersomniac:hypersomniac /home/hypersomniac
 
 COPY --from=downloader --chown=hypersomniac:hypersomniac \
