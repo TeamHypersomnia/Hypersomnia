@@ -70,8 +70,7 @@ jobs:
 
     - name: Run tests and package
       run: |
-        cd hypersomnia
-        cmake/test_pack_upload.ps1 -configuration $env:HYPERSOMNIA_BUILD_TYPE -console_mode 0
+        ../cmake/test_pack_upload.ps1 -configuration $env:HYPERSOMNIA_BUILD_TYPE -console_mode 0
       working-directory: hypersomnia
       shell: pwsh
 
