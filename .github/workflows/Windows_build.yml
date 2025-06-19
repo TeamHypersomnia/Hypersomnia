@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[ds only]') && !contains(github.event.head_commit.message, '[lin only]') && !contains(github.event.head_commit.message, '[mac only]')"
-
     runs-on: windows-2025
     env:
       HYPERSOMNIA_BUILD_TYPE: Release
