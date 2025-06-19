@@ -72,7 +72,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
+      IMAGE_NAME: hypersomnia-server
       TAG_NAME: "latest"
 
     steps:
