@@ -100,7 +100,7 @@ jobs:
         id: build-and-push
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: ${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}
+          image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.TAG_NAME }}
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
