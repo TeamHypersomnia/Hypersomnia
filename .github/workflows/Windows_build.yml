@@ -20,10 +20,16 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Prepare folders for tools
+      run: |
+        mkdir "${{ github.workspace }}\tools"
+        mkdir "${{ github.workspace }}\tools\deps"
+      shell: cmd
+
     - name: Install CMake
       run: |
         $url = "https://github.com/Kitware/CMake/releases/download/v$env:CMAKE_VERSION/cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
-        $dest = "C:\projects\cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
+        $dest = "${{ github.workspace }}\tools\cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
         Invoke-WebRequest -Uri $url -OutFile $dest
         Start-Process msiexec -ArgumentList "/i", $dest, "/quiet", "/qn", "/norestart", "/log", "install.log", "ADD_CMAKE_TO_PATH=System" -Wait
       shell: pwsh
@@ -33,12 +39,11 @@ jobs:
 
     - name: Setup Ninja
       run: |
-        mkdir C:\projects\deps
-        cd C:\projects\deps
+        cd "${{ github.workspace }}\tools\deps"
         $ninjaUrl = "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
         Invoke-WebRequest -Uri $ninjaUrl -OutFile ninja.zip
-        7z x ninja.zip -oC:\projects\deps\ninja | Out-Null
-        echo "C:\projects\deps\ninja" >> $env:GITHUB_PATH
+        7z x ninja.zip -o"${{ github.workspace }}\tools\deps\ninja" | Out-Null
+        echo "${{ github.workspace }}\tools\deps\ninja" >> $env:GITHUB_PATH
         ninja --version
       shell: pwsh
 
