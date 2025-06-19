@@ -24,7 +24,7 @@ These have been established too long ago, when the project wasn't thought of qui
     - The latest stable GCC release (at the time of this writing, 7.2).
     - MSVC that ships with the latest Visual Studio Preview.
 
-    Worry not though, if you mess up with either, we will know thanks to AppVeyor and TravisCI integration.
+    Worry not though, if you mess up with either, we will know thanks to CI/CD.
 
 - Prefer initialization with ``auto`` or ``const auto``.
     - Except if you need [default initialization](https://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
