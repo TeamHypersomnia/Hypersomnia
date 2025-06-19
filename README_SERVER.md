@@ -162,7 +162,7 @@ This will result in:
 The instances will get incrementing ports, starting from the specified ``port`` in ``server_start``.
 Analogously for the web, the ports will be incrementing by 1 starting from ``webrtc_port_range_begin``, with UDP muxing force-enabled for every instance.
 
-It's worth mentioning, that docker compose **does not** support range mappings, so you have to explexplicitly list each port mapping in the `ports:` section.
+It's worth mentioning, that docker compose **does not** support range mappings, so you have to explicitly list each port mapping in the `ports:` section.
 
 For example:
 ```yaml
