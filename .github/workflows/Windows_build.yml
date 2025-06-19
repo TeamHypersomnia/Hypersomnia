@@ -49,7 +49,7 @@ jobs:
       shell: cmd
 
     - name: Setup MSVC environment
-      run: '"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64'
+      run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64'
       shell: cmd
 
     - name: Build steam_integration without Steam
