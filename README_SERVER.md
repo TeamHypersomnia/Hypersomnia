@@ -4,11 +4,15 @@ The dedicated server is known to work on Ubuntu 22.04 or later.
 
 You should easily be able to run it on other distributions like Arch Linux.
 
-We also have a [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile).
+We also have a container built with [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile).
 
 Check out this [handy script to quickly deploy the server as a service](https://git.libregaming.org/hyperdev/Gameserver/src/branch/main/scripts/deploy_hypersomnia.sh), used for onFOSS events.
 
-- [Basic setup](#basic-setup)
+- [Docker setup](#docker-setup)
+  * [Prerequisites](#prerequisites)
+  * [Docker CLI](#docker-cli)
+  * [Docker Compose](#docker-compose)
+- [Manual setup](#manual-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
 - [Configuration](#configuration)
@@ -19,7 +23,60 @@ Check out this [handy script to quickly deploy the server as a service](https://
     - [--appdata-dir](#--appdata-dir)
     - [--apply-config](#--apply-config)
 
-# Basic setup
+# Docker setup
+
+You can build this image yourself or use the official image:
+`docker pull ghcr.io/teamhypersomnia/hypersomnia-server:latest`
+
+The use of official server is beneficial in the way that you can very easily keep it up-to-date in docker compose by setting up the tag latest with [pull policy set on daily](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy).
+
+## Prerequisites
+
+- [Docker engine](https://docs.docker.com/engine/install/) - or any OCI engine capable of running OCI containers
+- Hypersomnia server directory with permissions for user `999`
+
+Example on how to set permissions:
+```bash
+mkdir /opt/hypersomnia
+chown 999:999 /opt/hypersomnia
+```
+For the rest of the examples I will assume our working directory is `/opt/hypersomnia`
+
+## Docker CLI
+
+Assuming you created `/opt/hypersomnia` directory with proper permissions the one-liner to run a server is:
+```bash
+docker run \
+  --detach \
+  --restart unless-stopped \
+  --volume /opt/hypersomnia:/home/hypersomniac/.config/Hypersomnia/user \
+  ghcr.io/teamhypersomnia/hypersomnia-server:latest
+```
+
+## Docker compose
+
+As for now, you can't modify the config via environment variables. We also recommend you leave the tag as latest and use with [pull policy set on daily](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for pure convenience.
+
+```bash
+wget https://github.com/TeamHypersomnia/Hypersomnia/blob/master/docker-compose.yaml
+docker compose up -d
+```
+
+For the record, the compose file can be also found in [docker-compose.yaml](/docker-compose.yaml)
+```yaml
+services:
+  hypersomnia-server:
+    image: ghcr.io/teamhypersomnia/hypersomnia-server:latest
+    pull_policy: daily
+    volumes:
+      - /opt/hypersomnia:/home/hypersomniac/.config/Hypersomnia/user
+    ports:
+      - '8412:8412/udp'
+      - '9000:9000/udp'
+    restart: unless-stopped
+```
+
+# Manual setup
 
 ```sh
 wget https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage
@@ -105,7 +162,18 @@ This will result in:
 The instances will get incrementing ports, starting from the specified ``port`` in ``server_start``.
 Analogously for the web, the ports will be incrementing by 1 starting from ``webrtc_port_range_begin``, with UDP muxing force-enabled for every instance.
 
-They'll also get unique server names - with added ``#1``, ``#2``, etc. suffixes.
+It's worth mentioning, that docker compose **does not** support range mappings, so you have to explexplicitly list each port mapping in the `ports:` section.
+
+For example:
+```yaml
+ports:
+  - '8412:8412/udp'
+  - '8413:8413/udp'
+  - '9000:9000/udp'
+  - '9001:9001/udp'
+```
+
+The server instances will also get unique server names - with added ``#1``, ``#2``, etc. suffixes.
 
 The process first creates Ranked servers, then Casual server instances, so in case of US servers, Ranked ones will have ports ``8000-8004`` and the Casual one will be at ``8005``.
 
