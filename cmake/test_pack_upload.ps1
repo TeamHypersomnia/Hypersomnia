@@ -20,8 +20,10 @@ else {
 	& $target_exe --unit-tests-only --test-fp-consistency 20000000 | Out-Null
 }
 
-if ($LastExitCode -ne 0) { 
-	$mesg = "Test " + $configuration + " launch failed with result: " + $LastExitCode
+$exitCode = $LastExitCode
+
+if ($exitCode -ne 0) { 
+	$mesg = "Test " + $configuration + " launch failed with result: " + $exitCode
 	Write-Host $mesg -ForegroundColor red
 	
 	Write-Host "Ensure failed log:" -ForegroundColor red
@@ -29,14 +31,15 @@ if ($LastExitCode -ne 0) {
 	
 	Write-Host "Failure log:" -ForegroundColor red
 	cat $fail_log -ErrorAction SilentlyContinue
-	# $host.SetShouldExit($LastExitCode) 
+	$host.SetShouldExit($exitCode) 
+	exit
 }
 else {
 	$mesg = "Test " + $configuration + " launch succeeded."
 	Write-Host $mesg -ForegroundColor green
 
 	Write-Host "Good log:" -ForegroundColor green
-	cat $good_log -ErrorAction SilentlyContinue
+	cat $good_log
 }
 
 Write-Host "Archiving the binary." -ForegroundColor yellow
