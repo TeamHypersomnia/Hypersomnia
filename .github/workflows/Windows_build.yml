@@ -26,17 +26,6 @@ jobs:
         mkdir "${{ github.workspace }}\tools\deps"
       shell: cmd
 
-    - name: Install CMake
-      run: |
-        $url = "https://github.com/Kitware/CMake/releases/download/v$env:CMAKE_VERSION/cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
-        $dest = "${{ github.workspace }}\tools\cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
-        Invoke-WebRequest -Uri $url -OutFile $dest
-        Start-Process msiexec -ArgumentList "/i", $dest, "/quiet", "/qn", "/norestart", "/log", "install.log", "ADD_CMAKE_TO_PATH=System" -Wait
-      shell: pwsh
-
-    - name: Add CMake to PATH
-      run: echo "C:\\Program Files\\CMake\\bin" >> $GITHUB_PATH
-
     - name: Setup Ninja
       run: |
         cd "${{ github.workspace }}\tools\deps"
