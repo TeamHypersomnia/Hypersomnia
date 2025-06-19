@@ -326,7 +326,7 @@
         "resolve_server_list_address_once_every_secs": 3600,
         "resolve_internal_address_once_every_secs": 600,
         "move_to_spectators_if_afk_for_secs": 120,
-        "kick_if_afk_for_secs": 120,
+        "kick_if_afk_for_secs": 86400,
         "web_client_network_timeout_secs": 1.5,
         "client_network_timeout_secs": 5.0,
         "authenticate_with_nicknames": false, // only use for LAN parties
@@ -457,6 +457,7 @@
             "arena-au.hypersomnia.xyz",
             "arena-ru.hypersomnia.xyz",
             "arena-ch.hypersomnia.xyz",
+            "arena-fi.hypersomnia.xyz",
             "arena-nl.hypersomnia.xyz"
         ]
     },
