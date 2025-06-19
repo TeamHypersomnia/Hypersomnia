@@ -64,8 +64,7 @@ wget https://github.com/TeamHypersomnia/Hypersomnia/blob/master/docker-compose.y
 docker compose up -d
 ```
 
-The [latest `docker-compose.yaml`](/docker-compose.yaml) file will be used.
-Example:
+The [latest `docker-compose.yaml`](/docker-compose.yaml) file will be used, for example:
 
 ```yaml
 services:
@@ -82,7 +81,15 @@ services:
 
 It is recommended to use the `latest` tag and [`pull_policy` set to `daily`](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for the server to keep up with frequent updates.
 
-It is currently impossible to configure the server via environment variables - [`.json` files](#configuration) are the only option.
+It is currently impossible to configure the server via environment variables.
+
+Since we're mounting a volume:
+
+```bash
+mkdir /opt/hypersomnia/conf.d
+```
+
+This is now the folder for your [`.json` configuration files](#configuration).
 
 # Manual setup
 
@@ -113,10 +120,10 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
-Create a ``server.json`` file in ``~/.config/Hypersomnia/user/conf.d/``. This will be your server configuration.
-You can put any number of files in that folder and they will be applied in lexicographic (natural) order.
+Create a ``server.json`` file in ``~/.config/Hypersomnia/user/conf.d/`` (or in `/opt/hypersomnia/conf.d`, wherever you mounted your container). This will be your server configuration.
+You can put any number of files in the `conf.d` folder - they will be applied in lexicographic (natural) order.
 
-The files in ``conf.d/`` are *never* modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
+The files in ``conf.d/`` are *never* modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
 
 To be able to access the administration panel of your server, setup ``master_rcon_password`` - see ``default_config.json`` for complete config vars reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
