@@ -96,7 +96,7 @@ jobs:
         shell: powershell
 
       - name: Upload release notes artifact
-      - uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: release_notes
           path: hypersomnia/release_notes.txt
