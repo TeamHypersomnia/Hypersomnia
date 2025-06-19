@@ -127,8 +127,6 @@ A good start would be:
 
 ```json
 {
-  "num_casual_servers": 1, // explained later
-
   "server_start": {
     "slots": 10
   },
@@ -154,7 +152,9 @@ A good start would be:
   "server_private": {
     // "discord_webhook_url": "https://discord.com/api/webhooks/put_your/secret_here",
     "master_rcon_password": "...",
-  }
+  },
+
+  "num_casual_servers": 1, // explained later
 }
 ```
 
