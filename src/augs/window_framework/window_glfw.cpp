@@ -54,7 +54,6 @@ namespace augs {
 		vec2d last_mouse_pos_for_dt;
 		bool mouse_pos_initialized = false;
 		int clips_called = 0;
-		bool has_x11 = false;
 
 		std::vector<unhandled_key> unhandled_keys;
 		std::vector<unhandled_char> unhandled_characters;
@@ -66,6 +65,9 @@ namespace augs {
 		std::vector<unhandled_window_size> unhandled_window_sizes;
 		std::vector<unhandled_focus> unhandled_focuses;
 
+#if PLATFORM_LINUX
+		bool has_x11 = false;
+
 		int (*XGrabPointer_ptr)(Display*, Window, Bool, unsigned int, int, int, Window, Cursor, Time) = nullptr;
 		int (*XUngrabPointer_ptr)(Display*, Time) = nullptr;
 		int (*XSync_ptr)(Display*, Bool) = nullptr;
@@ -76,7 +78,6 @@ namespace augs {
 		void (*XFreePixmap_ptr)(Display*, Pixmap) = nullptr;
 
 		bool init_x11_functions() {
-#if PLATFORM_LINUX
 			void* handle = nullptr;
 
 #if defined(__CYGWIN__)
@@ -113,10 +114,8 @@ namespace augs {
 			LOG("X11 library found.");
 
 			return true;
-#else
-			return false;
-#endif
 		}
+#endif
 
 	};
 
@@ -188,7 +187,9 @@ namespace augs {
 
 		LOG("Calling init_x11_functions.");
 
+#if PLATFORM_LINUX
 		platform->has_x11 = platform->init_x11_functions();
+#endif
 		
 		std::filesystem::current_path(previous_path);
 
