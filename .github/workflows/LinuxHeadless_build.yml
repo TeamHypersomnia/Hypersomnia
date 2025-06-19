@@ -73,7 +73,9 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
+      ORG_NAME: teamhypersomnia
       IMAGE_NAME: hypersomnia-server
+      FULL_IMAGE_NAME: ${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}
       TAG_NAME: "latest"
 
     steps:
@@ -108,7 +110,7 @@ jobs:
       - name: Save digest
         id: digest-saver
         run: |
-          echo "digest=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }} | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
+          echo "digest=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.FULL_IMAGE_NAME }}:${{ env.TAG_NAME }} | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
 
       - name: Sign the published Docker image
         env:
