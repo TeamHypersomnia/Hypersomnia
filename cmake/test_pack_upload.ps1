@@ -5,7 +5,7 @@ param(
 
 ls
 
-$target_exe = "Hypersomnia.exe"
+$target_exe = ".\Hypersomnia.exe"
 
 $good_log = "logs/exit_success_debug_log.txt"
 $fail_log = "logs/exit_failure_debug_log.txt"
