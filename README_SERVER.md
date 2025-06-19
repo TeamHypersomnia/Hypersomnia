@@ -64,7 +64,7 @@ wget https://github.com/TeamHypersomnia/Hypersomnia/blob/master/docker-compose.y
 docker compose up -d
 ```
 
-The [latest `docker-compose.yaml`](/docker-compose.yaml) file will be used, for example:
+The [latest `docker-compose.yaml`](/docker-compose.yaml) will be used, for example:
 
 ```yaml
 services:
