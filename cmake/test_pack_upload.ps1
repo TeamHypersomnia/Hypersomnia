@@ -1,5 +1,4 @@
 param(
-	[String]$artifact_upload_key="Unknown",
 	[String]$configuration="Unknown",
 	[Int32]$console_mode=0
 )
@@ -38,10 +37,8 @@ else {
 
 Write-Host "Archiving the binary." -ForegroundColor yellow
 
-$platform = "Windows"
-$uploadUrl = "https://hypersomnia.xyz/upload_artifact.php"
-$apiKey = $artifact_upload_key
-$filePath = "Hypersomnia-for-$platform.exe"
+$stem = "Hypersomnia-for-Windows"
+$filePath = "$stem.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
@@ -53,16 +50,8 @@ $releaseNotesPath = "release_notes.txt"
 "$version`n$commitHash`n$commitMessage" | out-file -filepath $releaseNotesPath
 dos2unix $releaseNotesPath
 
-# Push-AppveyorArtifact $releaseNotesPath
-
 cd ../
 7z a -sfx $filePath hypersomnia
 
-# Push-AppveyorArtifact $filePath
-# curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
-
-$filePath = "Hypersomnia-for-$platform.zip"
+$filePath = "$stem.zip"
 7z a $filePath hypersomnia
-
-# Push-AppveyorArtifact $filePath
-# curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
