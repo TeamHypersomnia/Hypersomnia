@@ -7,7 +7,7 @@ FROM docker.io/library/debian:bookworm-20250610-slim
 WORKDIR /home/hypersomniac
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates libfuse2 libpsl5 libssl3 && \
+    ca-certificates libpsl5 libssl3 && \
     rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r hypersomniac && useradd -r -g hypersomniac hypersomniac && \
