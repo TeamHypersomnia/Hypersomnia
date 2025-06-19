@@ -96,11 +96,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Convert image name to lowercase
+        run: echo "IMAGE_NAME_LC=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         id: build-and-push
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.IMAGE_NAME_LC }}
           tags: ${{ env.TAG_NAME }}
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -109,12 +112,12 @@ jobs:
       - name: Save digest
         id: digest-saver
         run: |
-          echo "digest=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }} | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
+          echo "digest=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:${{ env.TAG_NAME }} | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
 
       - name: Sign the published Docker image
         if: github.event_name != 'pull_request'
         env:
-          TAGS: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+          TAGS: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:${{ env.TAG_NAME }}
           DIGEST: ${{ steps.digest-saver.outputs.digest }}
         run: |
           echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
