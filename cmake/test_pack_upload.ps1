@@ -7,9 +7,11 @@ ls
 
 $target_exe = ".\Hypersomnia.exe"
 
-$good_log = "logs/exit_success_debug_log.txt"
-$fail_log = "logs/exit_failure_debug_log.txt"
-$ensr_log = "logs/ensure_failed_debug_log.txt"
+$base_path = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "My Games\Hypersomnia\logs"
+
+$good_log = Join-Path $base_path "exit_success_debug_log.txt"
+$fail_log = Join-Path $base_path "exit_failure_debug_log.txt"
+$ensr_log = Join-Path $base_path "ensure_failed_debug_log.txt"
 
 if ($console_mode -eq 1) { 
 	& $target_exe --unit-tests-only --test-fp-consistency 20000000
@@ -47,7 +49,11 @@ $commitMessage = $(git log -1 --pretty=%B)
 $version = "1.2.$commitNumber"
 
 Get-ChildItem
-Remove-item -Recurse -Force cache, logs, user
+
+Remove-Item -Recurse -Force cache, logs, user -ErrorAction SilentlyContinue
+
+ls
+
 $releaseNotesPath = "release_notes.txt"
 "$version`n$commitHash`n$commitMessage" | out-file -filepath $releaseNotesPath
 dos2unix $releaseNotesPath
