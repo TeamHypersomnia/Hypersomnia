@@ -100,7 +100,7 @@ jobs:
         id: build-and-push
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.TAG_NAME }}
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -114,7 +114,7 @@ jobs:
 
       - name: Sign the published Docker image
         env:
-          TAGS: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+          TAGS: ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
           DIGEST: ${{ steps.digest-saver.outputs.digest }}
         run: |
           echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
