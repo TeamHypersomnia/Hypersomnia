@@ -11,7 +11,7 @@ Check out this [handy script to quickly deploy the server as a service](https://
 - [Docker setup](#docker-setup)
   * [Prerequisites](#prerequisites)
   * [Example with `docker run`](#example-with-docker-run)
-  * [Example with `docker-compose`](#example-with-docker-compose)
+  * [Example with `docker compose`](#example-with-docker-compose)
 - [Manual setup](#manual-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
@@ -55,7 +55,7 @@ docker run \
 
 This already creates `/opt/hypersomnia` directory with proper permissions. Any other directory may be chosen.
 
-## Example with `docker-compose`
+## Example with `docker compose`
 
 Simply run:
 
