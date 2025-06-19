@@ -118,13 +118,53 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
+See [``default_config.json``](./hypersomnia/default_config.json) for the complete configuration variables reference.
+- You will be interested in `server_start`, `server` and `server_private` sections.
+
 Create a ``server.json`` file in ``~/.config/Hypersomnia/user/conf.d/`` (or in `/opt/hypersomnia/conf.d`, wherever you mounted your container). This will be your server configuration.
+
+A good start would be:
+
+```json
+{
+  "num_casual_servers": 1, // explained later
+
+  "server_start": {
+    "slots": 10
+  },
+
+  "server": {
+    "server_name": "[PL] Warsaw"
+
+    "sync_all_external_arenas_on_startup": true,
+    "daily_autoupdate": true,
+
+    "arena": "de_cyberaqua",
+
+    "cycle": "LIST",
+    "cycle_list": [
+      "de_cyberaqua",
+      "de_silo",
+      "de_metro",
+      "de_duel_practice",
+      "de_facing_worlds"
+    ]
+  },
+
+  "server_private": {
+    // "discord_webhook_url": "https://discord.com/api/webhooks/put_your/secret_here",
+    "master_rcon_password": "...",
+  }
+}
+```
+
 You can put any number of files in the `conf.d` folder - they will be applied in lexicographic (natural) order.
 
 The files in ``conf.d/`` are *never* modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
 
-To be able to access the administration panel of your server, setup ``master_rcon_password`` - see ``default_config.json`` for complete config vars reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+To be able to access the administration panel of your server, make sure to setup ``master_rcon_password`` - . Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
+If you have a Discord server, you might want to setup a [Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) and set `discord_webhook_url` to the webhook URL. This will notify your community whenever someone connects, as well as report all match results.
 
 ## Config loading order:
 
