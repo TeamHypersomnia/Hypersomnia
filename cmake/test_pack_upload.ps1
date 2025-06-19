@@ -25,10 +25,10 @@ if ($LastExitCode -ne 0) {
 	Write-Host $mesg -ForegroundColor red
 	
 	Write-Host "Ensure failed log:" -ForegroundColor red
-	cat $ensr_log
+	cat $ensr_log -ErrorAction SilentlyContinue
 	
 	Write-Host "Failure log:" -ForegroundColor red
-	cat $fail_log
+	cat $fail_log -ErrorAction SilentlyContinue
 	# $host.SetShouldExit($LastExitCode) 
 }
 else {
@@ -36,7 +36,7 @@ else {
 	Write-Host $mesg -ForegroundColor green
 
 	Write-Host "Good log:" -ForegroundColor green
-	cat $good_log
+	cat $good_log -ErrorAction SilentlyContinue
 }
 
 Write-Host "Archiving the binary." -ForegroundColor yellow
@@ -53,6 +53,8 @@ Get-ChildItem
 Remove-Item -Recurse -Force cache, logs, user -ErrorAction SilentlyContinue
 
 ls
+
+Write-Host "Generating release notes and archiving..." -ForegroundColor yellow
 
 $releaseNotesPath = "release_notes.txt"
 "$version`n$commitHash`n$commitMessage" | out-file -filepath $releaseNotesPath
