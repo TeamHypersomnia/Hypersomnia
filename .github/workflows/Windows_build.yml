@@ -73,20 +73,10 @@ jobs:
       run: cmake --version
       shell: cmd
 
-    - name: Upload release notes artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
-        name: release_notes
-        path: hypersomnia/release_notes.txt
-
-    - name: Upload SFX artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Hypersomnia-sfx
-        path: Hypersomnia-for-Windows.exe
-
-    - name: Upload ZIP artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Hypersomnia-zip
-        path: Hypersomnia-for-Windows.zip
+        name: Windows-binaries
+        path: |
+          Hypersomnia-for-Windows.exe
+          Hypersomnia-for-Windows.zip
+          hypersomnia/release_notes.txt
