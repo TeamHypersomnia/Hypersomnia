@@ -96,19 +96,19 @@ jobs:
         shell: powershell
 
       - name: Upload release notes artifact
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: release_notes
           path: hypersomnia/release_notes.txt
 
       - name: Upload SFX artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Hypersomnia-sfx
           path: Hypersomnia-for-Windows.exe
 
       - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Hypersomnia-zip
           path: Hypersomnia-for-Windows.zip
