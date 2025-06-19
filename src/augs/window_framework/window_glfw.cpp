@@ -1,3 +1,5 @@
+#include <dlfcn.h>
+
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
@@ -50,6 +52,7 @@ namespace augs {
 		vec2d last_mouse_pos_for_dt;
 		bool mouse_pos_initialized = false;
 		int clips_called = 0;
+		bool has_x11 = false;
 
 		std::vector<unhandled_key> unhandled_keys;
 		std::vector<unhandled_char> unhandled_characters;
@@ -60,6 +63,55 @@ namespace augs {
 		std::vector<unhandled_window_position> unhandled_window_positions;
 		std::vector<unhandled_window_size> unhandled_window_sizes;
 		std::vector<unhandled_focus> unhandled_focuses;
+
+		int (*XGrabPointer_ptr)(Display*, Window, Bool, unsigned int, int, int, Window, Cursor, Time) = nullptr;
+		int (*XUngrabPointer_ptr)(Display*, Time) = nullptr;
+		int (*XSync_ptr)(Display*, Bool) = nullptr;
+		int (*XUndefineCursor_ptr)(Display*, Window) = nullptr;
+		int (*XDefineCursor_ptr)(Display*, Window, Cursor) = nullptr;
+		Pixmap (*XCreateBitmapFromData_ptr)(Display*, Drawable, const char*, unsigned int, unsigned int) = nullptr;
+		Cursor (*XCreatePixmapCursor_ptr)(Display*, Pixmap, Pixmap, XColor*, XColor*, unsigned int, unsigned int) = nullptr;
+		void (*XFreePixmap_ptr)(Display*, Pixmap) = nullptr;
+
+		bool init_x11_functions() {
+			void* handle = nullptr;
+
+#if defined(__CYGWIN__)
+			handle = dlopen("libX11-6.so", RTLD_LAZY | RTLD_LOCAL);
+#elif defined(__OpenBSD__) || defined(__NetBSD__)
+			handle = dlopen("libX11.so", RTLD_LAZY | RTLD_LOCAL);
+#else
+			handle = dlopen("libX11.so.6", RTLD_LAZY | RTLD_LOCAL);
+#endif
+
+			if (!handle) {
+				LOG("X11 library not found.");
+				return false;
+			}
+
+			XGrabPointer_ptr = (decltype(XGrabPointer_ptr))dlsym(handle, "XGrabPointer");
+			XUngrabPointer_ptr = (decltype(XUngrabPointer_ptr))dlsym(handle, "XUngrabPointer");
+			XSync_ptr = (decltype(XSync_ptr))dlsym(handle, "XSync");
+			XUndefineCursor_ptr = (decltype(XUndefineCursor_ptr))dlsym(handle, "XUndefineCursor");
+			XDefineCursor_ptr = (decltype(XDefineCursor_ptr))dlsym(handle, "XDefineCursor");
+			XCreateBitmapFromData_ptr = (decltype(XCreateBitmapFromData_ptr))dlsym(handle, "XCreateBitmapFromData");
+			XCreatePixmapCursor_ptr = (decltype(XCreatePixmapCursor_ptr))dlsym(handle, "XCreatePixmapCursor");
+			XFreePixmap_ptr = (decltype(XFreePixmap_ptr))dlsym(handle, "XFreePixmap");
+
+			// Check that all are loaded
+			if (!XGrabPointer_ptr || !XUngrabPointer_ptr || !XSync_ptr ||
+				!XUndefineCursor_ptr || !XDefineCursor_ptr ||
+				!XCreateBitmapFromData_ptr || !XCreatePixmapCursor_ptr || !XFreePixmap_ptr) {
+				LOG("Failed to load one or more X11 functions");
+				dlclose(handle);
+				return false;
+			}
+
+			LOG("X11 library found.");
+
+			return true;
+		}
+
 	};
 
 	GLFWwindow* get_glfw_window(const window::platform_data& d) {
@@ -110,7 +162,7 @@ struct glfw_callbacks {
 };
 
 static void error_callback(int error, const char* description) {
-	LOG("Error %x: %x\n", error, description);
+	LOG("GLFW Error %x: %x\n", error, description);
 }
 
 namespace augs {
@@ -127,6 +179,10 @@ namespace augs {
 			std::filesystem::current_path(previous_path);
 			throw window_error("glfwInit failed.");
 		}
+
+		LOG("Calling init_x11_functions.");
+
+		platform->has_x11 = platform->init_x11_functions();
 		
 		std::filesystem::current_path(previous_path);
 
@@ -164,6 +220,7 @@ namespace augs {
 			throw window_error("glfwCreateWindow failed.");
 		}
 
+		glfwSetErrorCallback(error_callback);
 		glfwSetWindowUserPointer(window, this);
 
 		glfwSetKeyCallback(window, glfw_callbacks::key_callback);
@@ -448,8 +505,10 @@ namespace augs {
 	}
 
 	bool window::set_cursor_clipping_impl(const bool flag) {
-		Display* display = glfwGetX11Display(); 
+		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr;
 		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
+
+		// LOG("set_cursor_clipping_impl: %x. has x11: %x", flag, display != nullptr);
 
 		if (!display) {
 			// Wayland or unknown backend fallback
@@ -466,7 +525,7 @@ namespace augs {
 		}
 
 		if (flag) {
-			if (GrabSuccess != XGrabPointer(
+			auto result = platform->XGrabPointer_ptr(
 				display,
 				window_id,
 				True,
@@ -476,23 +535,27 @@ namespace augs {
 				window_id,
 				None,
 				CurrentTime
-			)) {
+			);
+
+			// LOG("Grab result: %x", result);
+
+			if (result != GrabSuccess) {
 				return false;
 			}
 
-			XSync(display, False);
+			platform->XSync_ptr(display, False);
 		}
 		else {
-			XUngrabPointer(display, CurrentTime);
+			platform->XUngrabPointer_ptr(display, CurrentTime);
 
-			XSync(display, False);
+			platform->XSync_ptr(display, False);
 		}
 
 		return true;
 	}
 
 	void window::set_cursor_visible_impl(const bool flag) {
-		Display* display = glfwGetX11Display(); 
+		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr; 
 		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
 
 		if (!display) {
@@ -511,9 +574,9 @@ namespace augs {
 				static char noData[] = { 0,0,0,0,0,0,0,0 };
 				black.red = black.green = black.blue = 0;
 
-				bitmapNoData = XCreateBitmapFromData(display, window_id, noData, 8, 8);
+				bitmapNoData = platform->XCreateBitmapFromData_ptr(display, window_id, noData, 8, 8);
 
-				invisibleCursor = XCreatePixmapCursor(
+				invisibleCursor = platform->XCreatePixmapCursor_ptr(
 					display,
 				   	bitmapNoData, 
 					bitmapNoData, 
@@ -523,16 +586,16 @@ namespace augs {
 					0
 				);
 				
-				XFreePixmap(display, bitmapNoData);
+				platform->XFreePixmap_ptr(display, bitmapNoData);
 				return invisibleCursor;
 			}();
 
-			XDefineCursor(display,window_id, sharedInvisibleCursor);
-			XSync(display, False);
+			platform->XDefineCursor_ptr(display,window_id, sharedInvisibleCursor);
+			platform->XSync_ptr(display, False);
 		}
 		else {
-			XUndefineCursor(display,window_id);
-			XSync(display, False);
+			platform->XUndefineCursor_ptr(display,window_id);
+			platform->XSync_ptr(display, False);
 		}
 	}
 

@@ -2028,11 +2028,6 @@ if(BUILD_WINDOW_FRAMEWORK)
 		prefer_shared_libraries()
 
 		include_directories("${GLFW_ROOT}/include")
-
-		find_package(X11 REQUIRED)
-		prefer_shared_libraries()
-		include_directories(${X11_INCLUDE_DIR})
-		list(APPEND HYPERSOMNIA_LIBS ${X11_LIBRARIES})
 	elseif(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
