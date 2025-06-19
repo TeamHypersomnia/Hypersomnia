@@ -12,7 +12,6 @@ jobs:
     runs-on: windows-2025
     env:
       CMAKE_VERSION: "3.29.2"
-      OPENSSL_ROOT_DIR: ${{ env.ProgramFiles }}\OpenSSL
       CONFIGURATION: Release
 
     steps:
@@ -66,6 +65,7 @@ jobs:
 
       - name: Call Ninja
         run: |
+          $env:OPENSSL_ROOT_DIR = "$env:ProgramFiles\OpenSSL"
           mkdir nin
           cd nin
           mkdir $env:CONFIGURATION
