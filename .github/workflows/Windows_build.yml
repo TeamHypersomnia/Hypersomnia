@@ -47,11 +47,7 @@ jobs:
         dir /S "C:\Program Files\OpenSSL\lib"
       shell: cmd
 
-    - name: Setup MSVC environment
-      run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64'
-      shell: cmd
-
-    - name: Build steam_integration without Steam
+    - name: Build
       run: |
         cd cmake\steam_integration
         mkdir build
