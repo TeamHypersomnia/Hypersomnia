@@ -10,8 +10,8 @@ Check out this [handy script to quickly deploy the server as a service](https://
 
 - [Docker setup](#docker-setup)
   * [Prerequisites](#prerequisites)
-  * [Docker CLI](#docker-cli)
-  * [Docker Compose](#docker-compose)
+  * [Example with `docker run`](#example-with-docker-run)
+  * [Example with `docker-compose`](#example-with-docker-compose)
 - [Manual setup](#manual-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
