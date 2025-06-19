@@ -47,26 +47,26 @@ jobs:
         dir /S "C:\Program Files\OpenSSL\lib"
       shell: cmd
 
-    - name: Setup MSVC environment
-      run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64'
-      shell: cmd
-
-    - name: Build steam_integration without Steam
+    - name: Build Hypersomnia
       run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+        rem Build steam_integration without Steam
         cd cmake\steam_integration
         mkdir build
         cd build
         cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
         ninja install
-      shell: cmd
 
-    - name: Build Hypersomnia
-      run: |
+        rem Back to repo root
+        cd ..\..\
+
+        rem Build Hypersomnia
         mkdir build
         cd build
         cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
         ninja
-      shell: cmd
+    shell: cmd
 
     - name: Run tests and package
       run: |
