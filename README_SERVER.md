@@ -25,27 +25,27 @@ Check out this [handy script to quickly deploy the server as a service](https://
 
 # Docker setup
 
-You can build this image yourself or use the official image:
-`docker pull ghcr.io/teamhypersomnia/hypersomnia-server:latest`
+You can build it yourself or use the official image:
 
-The use of official server is beneficial in the way that you can very easily keep it up-to-date in docker compose by setting up the tag latest with [pull policy set on daily](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy).
+```bash
+docker pull ghcr.io/teamhypersomnia/hypersomnia-server:latest
+```
 
 ## Prerequisites
 
-- [Docker engine](https://docs.docker.com/engine/install/) - or any OCI engine capable of running OCI containers
-- Hypersomnia server directory with permissions for user `999`
+- [Docker engine](https://docs.docker.com/engine/install/) - or any OCI engine capable of running OCI containers.
+- Hypersomnia server directory with permissions for the user `999`.
 
-Example on how to set permissions:
+## Example with `docker run`
+
+Simply run:
+
 ```bash
-mkdir /opt/hypersomnia
-chown 999:999 /opt/hypersomnia
-```
-For the rest of the examples I will assume our working directory is `/opt/hypersomnia`
+SERVER_DIR=/opt/hypersomnia
+mkdir $SERVER_DIR
+chown 999:999 $SERVER_DIR
+cd $SERVER_DIR
 
-## Docker CLI
-
-Assuming you created `/opt/hypersomnia` directory with proper permissions the one-liner to run a server is:
-```bash
 docker run \
   --detach \
   --restart unless-stopped \
@@ -53,16 +53,20 @@ docker run \
   ghcr.io/teamhypersomnia/hypersomnia-server:latest
 ```
 
-## Docker compose
+This already creates `/opt/hypersomnia` directory with proper permissions. Any other directory may be chosen.
 
-As for now, you can't modify the config via environment variables. We also recommend you leave the tag as latest and use with [pull policy set on daily](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for pure convenience.
+## Example with `docker-compose`
+
+Simply run:
 
 ```bash
 wget https://github.com/TeamHypersomnia/Hypersomnia/blob/master/docker-compose.yaml
 docker compose up -d
 ```
 
-For the record, the compose file can be also found in [docker-compose.yaml](/docker-compose.yaml)
+The [latest `docker-compose.yaml`](/docker-compose.yaml) file will be used.
+Example:
+
 ```yaml
 services:
   hypersomnia-server:
@@ -75,6 +79,10 @@ services:
       - '9000:9000/udp'
     restart: unless-stopped
 ```
+
+It is recommended to use the `latest` tag and [`pull_policy` set to `daily`](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for the server to keep up with frequent updates.
+
+It is currently impossible to configure the server via environment variables - [`.json` files](#configuration) are the only option.
 
 # Manual setup
 
