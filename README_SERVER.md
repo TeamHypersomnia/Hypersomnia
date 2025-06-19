@@ -1,18 +1,16 @@
 # Hypersomnia dedicated server guide 
 
-The dedicated server is known to work on Ubuntu 22.04 or later.
+You can either use the server [`AppImage`](#manual-appimage-setup) or the [docker container](#docker-setup). 
 
-You should easily be able to run it on other distributions like Arch Linux.
+The server `AppImage` is known to work on Ubuntu 22.04 or later.
 
-We also have a container built with [Dockerfile](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/Dockerfile).
-
-Check out this [handy script to quickly deploy the server as a service](https://git.libregaming.org/hyperdev/Gameserver/src/branch/main/scripts/deploy_hypersomnia.sh), used for onFOSS events.
+Check out this [handy script to quickly deploy the `AppImage` as a service](https://git.libregaming.org/hyperdev/Gameserver/src/branch/main/scripts/deploy_hypersomnia.sh), used for onFOSS events.
 
 - [Docker setup](#docker-setup)
   * [Prerequisites](#prerequisites)
   * [Example with `docker run`](#example-with-docker-run)
   * [Example with `docker compose`](#example-with-docker-compose)
-- [Manual setup](#manual-setup)
+- [Manual `AppImage` setup](#manual-appimage-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
 - [Configuration](#configuration)
@@ -25,7 +23,7 @@ Check out this [handy script to quickly deploy the server as a service](https://
 
 # Docker setup
 
-You can build it yourself or use the official image:
+You can build the [`Dockerfile`](./Dockerfile) yourself, or use the official image:
 
 ```bash
 docker pull ghcr.io/teamhypersomnia/hypersomnia-server:latest
@@ -91,7 +89,7 @@ mkdir /opt/hypersomnia/conf.d
 
 This is now the folder for your [`.json` configuration files](#configuration).
 
-# Manual setup
+# Manual `AppImage` setup
 
 ```sh
 wget https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage
