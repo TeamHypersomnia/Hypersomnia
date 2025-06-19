@@ -3,6 +3,8 @@ param(
 	[Int32]$console_mode=0
 )
 
+ls
+
 $target_exe = "Hypersomnia.exe"
 
 $good_log = "logs/exit_success_debug_log.txt"
