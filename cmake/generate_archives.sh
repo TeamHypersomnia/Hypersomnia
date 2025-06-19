@@ -44,6 +44,9 @@ if [ -f "$EXE_PATH" ]; then
 		echo "Generating a highly compressed .sfx archive for updates on MacOS."
 		7z a -sfx $SFX_PATH $APP_PATH
 
+		mount | grep Hypersomnia
+		ls /Volumes/
+
 		echo "Generating a .dmg for first-time downloads on MacOS."
 		create-dmg $DMG_PATH $APP_PATH
 	fi
