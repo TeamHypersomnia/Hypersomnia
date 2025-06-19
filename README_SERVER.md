@@ -1,6 +1,6 @@
 # Hypersomnia dedicated server guide 
 
-You can either use the server [`AppImage`](#manual-appimage-setup) or the [docker container](#docker-setup). 
+You can either use the *headless* server [`AppImage`](#manual-appimage-setup) or the [docker container](#docker-setup). 
 
 The server `AppImage` is known to work on Ubuntu 22.04 or later.
 

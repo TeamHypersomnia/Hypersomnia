@@ -42,7 +42,7 @@ Only 29 MB!
 
 The game will start with an **interactive Tutorial!**
 
-Run the [<img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" height=25 hspace=1 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)
+Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" height=25 hspace=5 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)
 
 Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" height=25 hspace=1 vspace=20><b>Server AppImage</b></a>
 
