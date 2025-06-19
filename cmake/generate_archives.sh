@@ -47,6 +47,8 @@ if [ -f "$EXE_PATH" ]; then
 		mount | grep Hypersomnia
 		ls /Volumes/
 
+		hdiutil info
+
 		echo "Generating a .dmg for first-time downloads on MacOS."
 		create-dmg $DMG_PATH $APP_PATH
 	fi
