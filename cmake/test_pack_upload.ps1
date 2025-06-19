@@ -53,6 +53,7 @@ $version = "1.2.$commitNumber"
 
 Get-ChildItem
 
+# just in case
 Remove-Item -Recurse -Force cache, logs, user -ErrorAction SilentlyContinue
 
 ls
