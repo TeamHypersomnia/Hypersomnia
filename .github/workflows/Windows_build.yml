@@ -11,7 +11,6 @@ jobs:
 
     runs-on: windows-2025
     env:
-      CMAKE_VERSION: "3.29.2"
       CONFIGURATION: Release
 
     steps:
@@ -54,7 +53,7 @@ jobs:
 
     - name: Build steam_integration without Steam
       run: |
-        cd hypersomnia\cmake\steam_integration
+        cd cmake\steam_integration
         mkdir build
         cd build
         cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
@@ -63,15 +62,16 @@ jobs:
 
     - name: Build nin project with Steam integration and clang-cl
       run: |
-        cd hypersomnia\nin
-        mkdir %CONFIGURATION%
-        cd %CONFIGURATION%
-        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ../..
+        mkdir build
+        cd build
+        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
         ninja
       shell: cmd
 
-    - name: Run tests
-      run: powershell -File ../cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0
+    - name: Run tests and package
+      run: |
+        cd hypersomnia
+        cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0
       working-directory: hypersomnia
       shell: pwsh
 
