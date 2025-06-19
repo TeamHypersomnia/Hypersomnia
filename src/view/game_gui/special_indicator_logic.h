@@ -25,11 +25,18 @@ void gather_special_indicators(
 					const auto capability = bomb.get_owning_transfer_capability();
 					meta.bomb_owner = capability;
 
-					if (viewer_faction == participants.bombing) {
-						if (capability.dead() || capability.get_official_faction() != viewer_faction) {
-							if (const auto fuse = bomb.template find<components::hand_fuse>()) {
+					if (const auto fuse = bomb.template find<components::hand_fuse>()) {
+						const bool armed = fuse->armed();
+
+						const bool mt_stole_bomb = capability.alive() && capability.get_official_faction() != viewer_faction;
+						if (capability.dead() || mt_stole_bomb) {
+							/* 
+								If bomb is armed, draw for MT as well.
+								If unarmed, only Resistance sees it. 
+							*/
+
+							if (viewer_faction == participants.bombing || armed) {
 								/* Draw the bomb icon on screen only if it is unarmed yet. */
-								const bool armed = fuse->armed();
 								const bool draw_onscreen = !armed;
 
 								auto col = white;
