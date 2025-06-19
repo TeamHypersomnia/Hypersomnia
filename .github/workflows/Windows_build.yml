@@ -64,21 +64,6 @@ jobs:
         ninja
       shell: cmd
 
-    - name: Debug Hypersomnia.exe location
-      run: |
-        echo CURRENT DIR:
-        cd
-        echo ==========================
-        echo ==== List build/ recursively ====
-        dir build /S
-        echo ==========================
-        echo List contents of ../hypersomnia/
-        dir ..\hypersomnia
-        echo ==========================
-        echo List recursively from root
-        dir /S /B .. | findstr /I Hypersomnia.exe
-      shell: cmd
-
     - name: Run tests and package
       run: |
         ../cmake/test_pack_upload.ps1 -configuration $env:HYPERSOMNIA_BUILD_TYPE -console_mode 0
