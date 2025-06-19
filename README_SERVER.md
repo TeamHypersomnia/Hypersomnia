@@ -48,22 +48,21 @@ Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB
 
 # Configuration
 
-Create a ``~/.config/Hypersomnia/user/config.force.json`` file. This will be your server configuration.
+Create a ``server.json`` file in ``~/.config/Hypersomnia/user/conf.d/``. This will be your server configuration.
+You can put any number of files in that folder and they will be applied in lexicographic (natural) order.
 
-The reason the config file is called ``config.force.json`` is because it will *never* be modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
+The files in ``conf.d/`` are *never* modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
 
 To be able to access the administration panel of your server, setup ``master_rcon_password`` - see ``default_config.json`` for complete config vars reference. Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
 
 ## Config loading order:
 
-1) ``default_config.json``, comes with the game
-2) ``~/.config/Hypersomnia/user/config.json``, if any
-3) Config specified by ``--apply-config`` flag, if any
-4) ``~/.config/Hypersomnia/user/config.force.json``, if any
-    - This means that if the vars you later tweak from the administration panel are already specified in ``config.force.json``, *they will be overridden every time the server starts.*
-5) ``~/.config/Hypersomnia/user/config.private.json``, if any
-    - This one is helpful if you want to store confidential vars like API keys separately from ``config.force.json``.
+1) ``default_config.json``, comes with the game.
+2) ``~/.config/Hypersomnia/user/config.json``, if any.
+3) All configs inside ``~/.config/Hypersomnia/user/conf.d/``, in lexicographical order, if any.
+    - This means that if the vars you later tweak from the administration panel are already specified in ``conf.d/``, *they will be overridden every time the server starts.*
+4) Config specified by ``--apply-config`` flag, if any.
 
 ## Ports
 
@@ -90,7 +89,7 @@ With these settings, you will only need to expose UDP ports ``8412`` and ``9000`
 
 ## Many server instances
 
-By default there will be only one server instance and it will exactly match your ``config.force.json`` file.
+By default there will be only one server instance and it will exactly match your ``conf.d/`` files.
 
 However, you can easily manage multiple server instances by adding:
 
@@ -137,7 +136,7 @@ Causes the server to update itself every 24 hours at 03:00 AM (your local time),
 ### --appdata-dir
 
 The server will use ``~/.config/Hypersomnia`` as its "AppData" folder by default - this is where it will store its ``user``, ``cache`` and ``logs`` folders.
-This is important as it determines where to store your ``config.force.json`` file.
+This is important as it determines where to store your config files.
 
 If the default ``~/.config/Hypersomnia`` folder is unavailable for some reason, ``--appdata-dir`` parameter comes to the rescue.
 
@@ -147,11 +146,11 @@ You can easily:
 nohup ./Hypersomnia-Headless.AppImage --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
 ```
 
-This will use ``./servers/1`` instead of ``~/.config/Hypersomnia`` and will thus apply the config file at ``./servers/1/user/config.force.json``.
+This will use ``./servers/1`` instead of ``~/.config/Hypersomnia`` and will thus apply the config files at ``./servers/1/user/conf.d/``.
 
 ### --apply-config 
 
-Applies another config file *after* ``config.json``, but *before* ``config.force.json``. **Can only use this flag once in the whole command.**
+Applies another config file *after* ``config.json`` and ``conf.d/``. **Can only use this flag once in the whole command.**
 
 E.g. this:
 
@@ -162,7 +161,7 @@ nohup ./Hypersomnia-Headless.AppImage --apply-config ./some_config.json --appdat
 will read:
 
 - ``./servers/1/user/config.json``
-- ``./some_config.json``k
-- ``./servers/1/user/config.force.json``
+- ``./servers/1/user/conf.d/``
+- ``./some_config.json``
 
 In this order.

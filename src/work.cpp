@@ -543,6 +543,7 @@ work_result work(
 			CACHE_DIR,
 			USER_DIR,
 			DEMOS_DIR,
+			CONFD_DIR,
 
 			DOWNLOADED_ARENAS_DIR,
 			EDITOR_PROJECTS_DIR
@@ -558,8 +559,6 @@ work_result work(
 
 	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.json");
 	WEBSTATIC const auto local_config_path = USER_DIR / "config.json";
-	WEBSTATIC const auto force_config_path = USER_DIR / "config.force.json";
-	WEBSTATIC const auto private_config_path = USER_DIR / "config.private.json";
 
 	LOG("Loading %x.", canon_config_path);
 
@@ -581,20 +580,21 @@ work_result work(
 			result->load_patch(local_config_path);
 		}
 
+		augs::for_each_in_directory_sorted(
+			CONFD_DIR,
+			[&](auto...) { return callback_result::CONTINUE; },
+			[&](const augs::path_type& config_file) {
+				LOG("Applying config: %x", config_file);
+				result->load_patch(config_file);
+
+				return callback_result::CONTINUE;
+			}
+		);
+
 		if (!params.apply_config.empty()) {
 			const auto cli_config_path = CALLING_CWD / params.apply_config;
 			LOG("Applying config: %x", cli_config_path);
 			result->load_patch(cli_config_path);
-		}
-
-		if (augs::exists(force_config_path)) {
-			LOG("Applying config: %x", force_config_path);
-			result->load_patch(force_config_path);
-		}
-
-		if (augs::exists(private_config_path)) {
-			LOG("Applying config: %x", private_config_path);
-			result->load_patch(private_config_path);
 		}
 
 		if (params.daily_autoupdate) {

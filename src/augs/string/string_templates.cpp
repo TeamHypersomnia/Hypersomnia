@@ -2,6 +2,7 @@
 
 #include "augs/string/string_templates.h"
 #include "augs/string/get_type_name.h"
+#include "augs/templates/algorithm_templates.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b) {
@@ -196,6 +197,14 @@ namespace dummy_nmsp {
 	struct dummy_b {
 
 	};
+}
+
+TEST_CASE("Natural order") {
+	std::vector<std::string> v{ "3_server.json", "20_server.json" };
+	sort_range(v, augs::natural_order);
+
+	REQUIRE(v[0] == "3_server.json");
+	REQUIRE(augs::natural_order("3_server.json", "20_server.json"));
 }
 
 TEST_CASE("Getting type's name") {
