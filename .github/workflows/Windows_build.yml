@@ -1,4 +1,4 @@
-name: Windows build
+name: Windows Build
 
 on:
   push:
@@ -15,100 +15,90 @@ jobs:
       CONFIGURATION: Release
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
-      - name: Install CMake
-        run: |
-          $url = "https://github.com/Kitware/CMake/releases/download/v${env:CMAKE_VERSION}/cmake-${env:CMAKE_VERSION}-windows-x86_64.msi"
-          $destination = "C:\projects\cmake-${env:CMAKE_VERSION}-windows-x86_64.msi"
-          Invoke-WebRequest -Uri $url -OutFile $destination
-          Start-Process msiexec -ArgumentList "/i", $destination, "/quiet", "/qn", "/norestart", "/log", "install.log", "ADD_CMAKE_TO_PATH=System" -Wait
-        shell: powershell
+    - name: Install CMake
+      run: |
+        $url = "https://github.com/Kitware/CMake/releases/download/v$env:CMAKE_VERSION/cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
+        $dest = "C:\projects\cmake-$env:CMAKE_VERSION-windows-x86_64.msi"
+        Invoke-WebRequest -Uri $url -OutFile $dest
+        Start-Process msiexec -ArgumentList "/i", $dest, "/quiet", "/qn", "/norestart", "/log", "install.log", "ADD_CMAKE_TO_PATH=System" -Wait
+      shell: pwsh
 
-      - name: Add CMake to PATH
-        run: echo "::add-path::C:\\Program Files\\CMake\\bin"
+    - name: Add CMake to PATH
+      run: echo "C:\\Program Files\\CMake\\bin" >> $GITHUB_PATH
 
-      - name: Install Ninja
-        run: |
-          mkdir C:\projects\deps
-          cd C:\projects\deps
-          $ninjaUrl = "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
-          Invoke-WebRequest -Uri $ninjaUrl -OutFile ninja.zip
-          Expand-Archive ninja.zip -DestinationPath C:\projects\deps\ninja
-          echo "::add-path::C:\\projects\\deps\\ninja"
-          ninja --version
-        shell: powershell
+    - name: Setup Ninja
+      run: |
+        mkdir C:\projects\deps
+        cd C:\projects\deps
+        $ninjaUrl = "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+        Invoke-WebRequest -Uri $ninjaUrl -OutFile ninja.zip
+        7z x ninja.zip -oC:\projects\deps\ninja | Out-Null
+        echo "C:\projects\deps\ninja" >> $env:GITHUB_PATH
+        ninja --version
+      shell: pwsh
 
-      - name: Install LLVM 17.0.6
-        run: |
-          $llvmUrl = "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-win64.exe"
-          Invoke-WebRequest -Uri $llvmUrl -OutFile llvm-installer.exe
-          Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
-        shell: powershell
+    - name: Install LLVM
+      run: |
+        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-win64.exe -OutFile llvm-installer.exe
+        Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
+      shell: pwsh
 
-      - name: Setup Visual Studio Environment
-        run: '"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64'
-        shell: cmd
+    - name: Display OpenSSL directory info
+      run: |
+        dir "C:\Program Files\OpenSSL"
+        dir /S "C:\Program Files\OpenSSL\lib"
+      shell: cmd
 
-      - name: Configure and Build steam_integration
-        run: |
-          cd cmake/steam_integration
-          mkdir build
-          cd build
-          cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
-          ninja install
-          cd ../../..
-        shell: powershell
+    - name: Setup MSVC environment
+      run: '"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64'
+      shell: cmd
 
-      - name: Call Ninja
-        run: |
-          $env:OPENSSL_ROOT_DIR = "$env:ProgramFiles\OpenSSL"
-          mkdir nin
-          cd nin
-          mkdir $env:CONFIGURATION
-          cd $env:CONFIGURATION
-          cmake -G Ninja `
-            -DLINK_STEAM_INTEGRATION=1 `
-            -DCMAKE_C_COMPILER=clang-cl `
-            -DCMAKE_CXX_COMPILER=clang-cl `
-            -DCMAKE_LINKER=lld-link `
-            -DARCHITECTURE="x64" `
-            -DCMAKE_BUILD_TYPE=$env:CONFIGURATION `
-            -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 `
-            -DOPENSSL_ROOT_DIR="$env:OPENSSL_ROOT_DIR" `
-            ../..
-          ninja
-        shell: powershell
+    - name: Build steam_integration without Steam
+      run: |
+        cd hypersomnia\cmake\steam_integration
+        mkdir build
+        cd build
+        cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+        ninja install
+      shell: cmd
 
-      - name: Run tests
-        run: |
-          cd ../../hypersomnia
-          & ../cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0
-        shell: powershell
+    - name: Build nin project with Steam integration and clang-cl
+      run: |
+        cd hypersomnia\nin
+        mkdir %CONFIGURATION%
+        cd %CONFIGURATION%
+        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ../..
+        ninja
+      shell: cmd
 
-      - name: Run tests and package
-        run: |
-          cd hypersomnia
-          pwsh ../cmake/test_pack_upload.ps1 -configuration ${{ env.CONFIGURATION }} -console_mode 0
-        shell: powershell
+    - name: Run tests
+      run: powershell -File ../cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0
+      working-directory: hypersomnia
+      shell: pwsh
 
-      - name: Upload release notes artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release_notes
-          path: hypersomnia/release_notes.txt
+    - name: Show CMake version
+      run: cmake --version
+      shell: cmd
 
-      - name: Upload SFX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Hypersomnia-sfx
-          path: Hypersomnia-for-Windows.exe
+    - name: Upload release notes artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release_notes
+        path: hypersomnia/release_notes.txt
 
-      - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Hypersomnia-zip
-          path: Hypersomnia-for-Windows.zip
+    - name: Upload SFX artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Hypersomnia-sfx
+        path: Hypersomnia-for-Windows.exe
+
+    - name: Upload ZIP artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Hypersomnia-zip
+        path: Hypersomnia-for-Windows.zip
