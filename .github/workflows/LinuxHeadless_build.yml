@@ -113,7 +113,7 @@ jobs:
 
       - name: Sign the published Docker image
         env:
-          TAGS: ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+          TAGS: ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
           DIGEST: ${{ steps.digest-saver.outputs.digest }}
         run: |
           echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
