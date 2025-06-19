@@ -11,7 +11,7 @@ jobs:
 
     runs-on: windows-2025
     env:
-      CONFIGURATION: Release
+      HYPERSOMNIA_BUILD_TYPE: Release
 
     steps:
     - name: Checkout repository with submodules
@@ -60,18 +60,18 @@ jobs:
         ninja install
       shell: cmd
 
-    - name: Build nin project with Steam integration and clang-cl
+    - name: Build Hypersomnia
       run: |
         mkdir build
         cd build
-        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
+        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:HYPERSOMNIA_BUILD_TYPE -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
         ninja
       shell: cmd
 
     - name: Run tests and package
       run: |
         cd hypersomnia
-        cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0
+        cmake/test_pack_upload.ps1 -configuration $env:HYPERSOMNIA_BUILD_TYPE -console_mode 0
       working-directory: hypersomnia
       shell: pwsh
 
