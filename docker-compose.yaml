@@ -1,0 +1,10 @@
+services:
+  hypersomnia-server:
+    image: ghcr.io/teamhypersomnia/hypersomnia-server:latest
+    pull_policy: daily
+    volumes:
+      - /opt/hypersomnia:/home/hypersomniac/.config/Hypersomnia/user
+    ports:
+      - '8412:8412/udp'
+      - '9000:9000/udp'
+    restart: unless-stopped
