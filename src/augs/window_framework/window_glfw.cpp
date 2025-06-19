@@ -1,9 +1,11 @@
-#include <dlfcn.h>
-
 #include <GLFW/glfw3.h>
+
+#if PLATFORM_LINUX
+#include <dlfcn.h>
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
 #include <X11/Xlib.h>
+#endif
 
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
@@ -74,6 +76,7 @@ namespace augs {
 		void (*XFreePixmap_ptr)(Display*, Pixmap) = nullptr;
 
 		bool init_x11_functions() {
+#if PLATFORM_LINUX
 			void* handle = nullptr;
 
 #if defined(__CYGWIN__)
@@ -110,6 +113,9 @@ namespace augs {
 			LOG("X11 library found.");
 
 			return true;
+#else
+			return false;
+#endif
 		}
 
 	};
@@ -504,7 +510,13 @@ namespace augs {
 
 	}
 
+#if PLATFORM_LINUX
 	bool window::set_cursor_clipping_impl(const bool flag) {
+		if (flag && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
+			platform->mouse_pos_initialized = false;
+			platform->clips_called = 1;
+		}
+
 		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr;
 		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
 
@@ -598,6 +610,21 @@ namespace augs {
 			platform->XSync_ptr(display, False);
 		}
 	}
+#else
+	void window::set_cursor_visible_impl(bool) {
+		/* Implemented with GLFW_CURSOR_DISABLED */
+	}
+
+	bool window::set_cursor_clipping_impl(bool clip) {
+		if (clip && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
+			platform->mouse_pos_initialized = false;
+			platform->clips_called = 1;
+		}
+
+		glfwSetInputMode(platform->window, GLFW_CURSOR, clip ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+		return true;
+	}
+#endif
 
 	void window::set(const vsync_type mode) {
 		switch (mode) {
