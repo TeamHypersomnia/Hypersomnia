@@ -109,12 +109,11 @@ jobs:
       - name: Save digest
         id: digest-saver
         run: |
-          FULL_IMAGE_NAME="$REGISTRY/$ORG_NAME/$IMAGE_NAME:$TAG_NAME"
-          echo "digest=$(docker manifest inspect $FULL_IMAGE_NAME | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
+          echo "digest=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }} | jq -r '.config.digest')" >> "$GITHUB_OUTPUT"
 
       - name: Sign the published Docker image
         env:
-          TAGS: ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+          TAGS: ${{ env.REGISTRY }}/${{ env.ORG_NAME }}/${{ env.ORG_NAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
           DIGEST: ${{ steps.digest-saver.outputs.digest }}
         run: |
           echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
