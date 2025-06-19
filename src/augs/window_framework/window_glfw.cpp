@@ -1,4 +1,7 @@
 #include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_X11
+#include <GLFW/glfw3native.h>
+#include <X11/Xlib.h>
 
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
@@ -444,18 +447,93 @@ namespace augs {
 
 	}
 
-	void window::set_cursor_visible_impl(bool) {
-		/* Implemented with GLFW_CURSOR_DISABLED */
-	}
+	bool window::set_cursor_clipping_impl(const bool flag) {
+		Display* display = glfwGetX11Display(); 
+		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
 
-	bool window::set_cursor_clipping_impl(bool clip) {
-		if (clip && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
-			platform->mouse_pos_initialized = false;
-			platform->clips_called = 1;
+		if (!display) {
+			// Wayland or unknown backend fallback
+			glfwSetInputMode(platform->window, GLFW_CURSOR, flag ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+			if (flag && glfwRawMouseMotionSupported()) {
+				glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+			}
+			else {
+				glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+			}
+
+			return true;
 		}
 
-		glfwSetInputMode(platform->window, GLFW_CURSOR, clip ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+		if (flag) {
+			if (GrabSuccess != XGrabPointer(
+				display,
+				window_id,
+				True,
+				0,
+				GrabModeAsync, 
+				GrabModeAsync,
+				window_id,
+				None,
+				CurrentTime
+			)) {
+				return false;
+			}
+
+			XSync(display, False);
+		}
+		else {
+			XUngrabPointer(display, CurrentTime);
+
+			XSync(display, False);
+		}
+
 		return true;
+	}
+
+	void window::set_cursor_visible_impl(const bool flag) {
+		Display* display = glfwGetX11Display(); 
+		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
+
+		if (!display) {
+			// Wayland or unknown backend fallback
+			return;
+		}
+
+		if (!flag) {
+			static const auto sharedInvisibleCursor = [&](){
+				// Thanks to:
+				// https://stackoverflow.com/a/664528/503776
+
+				Cursor invisibleCursor;
+				Pixmap bitmapNoData;
+				XColor black;
+				static char noData[] = { 0,0,0,0,0,0,0,0 };
+				black.red = black.green = black.blue = 0;
+
+				bitmapNoData = XCreateBitmapFromData(display, window_id, noData, 8, 8);
+
+				invisibleCursor = XCreatePixmapCursor(
+					display,
+				   	bitmapNoData, 
+					bitmapNoData, 
+					&black, 
+					&black, 
+					0, 
+					0
+				);
+				
+				XFreePixmap(display, bitmapNoData);
+				return invisibleCursor;
+			}();
+
+			XDefineCursor(display,window_id, sharedInvisibleCursor);
+			XSync(display, False);
+		}
+		else {
+			XUndefineCursor(display,window_id);
+			XSync(display, False);
+		}
 	}
 
 	void window::set(const vsync_type mode) {
