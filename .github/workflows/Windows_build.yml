@@ -38,7 +38,7 @@ jobs:
 
     - name: Install LLVM
       run: |
-        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-win64.exe -OutFile llvm-installer.exe
+        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe -OutFile llvm-installer.exe
         Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
       shell: pwsh
 
@@ -70,10 +70,6 @@ jobs:
         ../cmake/test_pack_upload.ps1 -configuration $env:HYPERSOMNIA_BUILD_TYPE -console_mode 0
       working-directory: hypersomnia
       shell: pwsh
-
-    - name: Show CMake version
-      run: cmake --version
-      shell: cmd
 
     - uses: actions/upload-artifact@v4
       with:
