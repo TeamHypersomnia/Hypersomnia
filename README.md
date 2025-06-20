@@ -5,9 +5,9 @@
 
 # [Play in the Browser!](https://hypersomnia.io/)
 
-[![Windows build status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Windows%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
-[![Linux build status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Linux%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
-[![MacOS build status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/MacOS%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
+[![Windows Build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml)
+[![Linux build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml)
+[![MacOS build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/MacOS_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/MacOS_build.yml)
 
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
