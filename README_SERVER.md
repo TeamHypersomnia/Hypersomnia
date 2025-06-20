@@ -81,10 +81,10 @@ It is recommended to use the `latest` tag and [`pull_policy` set to `daily`](htt
 
 It is currently impossible to configure the server via environment variables.
 
-Since we're mounting a volume:
+Since we're mounting a volume, the server will create the `conf.d/` directory at:
 
 ```bash
-mkdir /opt/hypersomnia/conf.d
+/opt/hypersomnia/conf.d/
 ```
 
 This is now the folder for your [`.json` configuration files](#configuration).
@@ -135,7 +135,7 @@ A good start would be:
     "server_name": "[PL] Warsaw"
 
     "sync_all_external_arenas_on_startup": true,
-    "daily_autoupdate": true,
+    "daily_autoupdate": true, // set to false for the docker build, managed by pull_policy
 
     "arena": "de_cyberaqua",
 
