@@ -132,7 +132,7 @@ A good start would be:
   },
 
   "server": {
-    "server_name": "[PL] Warsaw"
+    "server_name": "[VA] Vatican City",
 
     "sync_all_external_arenas_on_startup": true,
     "daily_autoupdate": true, // set to false for the docker build, managed by pull_policy
