@@ -58,7 +58,7 @@ This already creates `/opt/hypersomnia` directory with proper permissions. Any o
 Simply run:
 
 ```bash
-wget https://github.com/TeamHypersomnia/Hypersomnia/blob/master/docker-compose.yaml
+wget https://raw.githubusercontent.com/TeamHypersomnia/Hypersomnia/refs/heads/master/docker-compose.yaml
 docker compose up -d
 ```
 
