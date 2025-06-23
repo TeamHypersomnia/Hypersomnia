@@ -513,9 +513,8 @@ namespace augs {
 
 #if PLATFORM_LINUX
 	bool window::set_cursor_clipping_impl(const bool flag) {
-		if (flag && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
+		if (flag) {
 			platform->mouse_pos_initialized = false;
-			platform->clips_called = 1;
 		}
 
 		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr;
@@ -523,19 +522,23 @@ namespace augs {
 
 		// LOG("set_cursor_clipping_impl: %x. has x11: %x", flag, display != nullptr);
 
+		glfwSetInputMode(platform->window, GLFW_CURSOR, flag ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+		if (flag && glfwRawMouseMotionSupported()) {
+			glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		}
+		else {
+			glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+		}
+
 		if (!display) {
-			// Wayland or unknown backend fallback
-			glfwSetInputMode(platform->window, GLFW_CURSOR, flag ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-
-			if (flag && glfwRawMouseMotionSupported()) {
-				glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-			}
-			else {
-				glfwSetInputMode(platform->window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
-			}
-
 			return true;
 		}
+
+		/*
+			If we're on X11, we need to properly grab the dumbass pointer
+			by force
+		*/
 
 		if (flag) {
 			auto result = platform->XGrabPointer_ptr(
@@ -567,49 +570,10 @@ namespace augs {
 		return true;
 	}
 
-	void window::set_cursor_visible_impl(const bool flag) {
-		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr; 
-		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
-
-		if (!display) {
-			// Wayland or unknown backend fallback
-			return;
-		}
-
-		if (!flag) {
-			static const auto sharedInvisibleCursor = [&](){
-				// Thanks to:
-				// https://stackoverflow.com/a/664528/503776
-
-				Cursor invisibleCursor;
-				Pixmap bitmapNoData;
-				XColor black;
-				static char noData[] = { 0,0,0,0,0,0,0,0 };
-				black.red = black.green = black.blue = 0;
-
-				bitmapNoData = platform->XCreateBitmapFromData_ptr(display, window_id, noData, 8, 8);
-
-				invisibleCursor = platform->XCreatePixmapCursor_ptr(
-					display,
-				   	bitmapNoData, 
-					bitmapNoData, 
-					&black, 
-					&black, 
-					0, 
-					0
-				);
-				
-				platform->XFreePixmap_ptr(display, bitmapNoData);
-				return invisibleCursor;
-			}();
-
-			platform->XDefineCursor_ptr(display,window_id, sharedInvisibleCursor);
-			platform->XSync_ptr(display, False);
-		}
-		else {
-			platform->XUndefineCursor_ptr(display,window_id);
-			platform->XSync_ptr(display, False);
-		}
+	void window::set_cursor_visible_impl(const bool) {
+		/*
+			Handled by glfwSetInputMode
+		*/
 	}
 #else
 	void window::set_cursor_visible_impl(bool) {
