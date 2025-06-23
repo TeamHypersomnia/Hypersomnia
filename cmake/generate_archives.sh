@@ -50,7 +50,18 @@ if [ -f "$EXE_PATH" ]; then
 		hdiutil info
 
 		echo "Generating a .dmg for first-time downloads on MacOS."
-		create-dmg $DMG_PATH $APP_PATH
+
+		i=0
+		until [[ -e "${DMG_PATH}" ]]; do
+		  echo "Attempt $((i+1)): Running create-dmg..."
+		  create-dmg "${DMG_PATH}" "${APP_PATH}" || true
+		  if [[ $i -eq 30 ]]; then
+			echo 'Error: create-dmg did not succeed even after 30 tries.'
+			exit 1
+		  fi
+		  sleep 2
+		  i=$((i+1))
+		done
 	fi
 else
 	echo "No exe found. Nothing to archivize."
