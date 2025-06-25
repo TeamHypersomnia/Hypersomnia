@@ -4346,6 +4346,11 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 				broadcast(message);
 
+				handle_client_chat_command(
+					get_integrated_client_id(),
+					{ chat.target, message.message }
+				);
+
 				chat.current_message.clear();
 			}
 		}
