@@ -79,8 +79,10 @@ namespace augs {
 		) {
 			active = true;
 
+#if PLATFORM_LINUX
 #if USE_GLFW
 			refresh_clipboard_snapshot();
+#endif
 #endif
 
 #if PLATFORM_LINUX
