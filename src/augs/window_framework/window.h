@@ -43,6 +43,7 @@ typedef struct _XCBKeySymbols xcb_key_symbols_t;
 #include "augs/window_framework/window_settings.h"
 
 struct glfw_callbacks;
+struct GLFWwindow;
 
 namespace augs {
 	struct window_error : error_with_typesafe_sprintf {
@@ -57,6 +58,7 @@ namespace augs {
 	class window : public settable_as_current_mixin<window> {
 #if USE_GLFW
 		friend glfw_callbacks;
+		void refresh_clipboard_snapshot();
 #endif
 
 #if PLATFORM_WINDOWS || USE_GLFW || USE_SDL2
@@ -64,6 +66,7 @@ namespace augs {
 		struct platform_data;
 	private:
 		std::unique_ptr<platform_data> platform;
+		friend GLFWwindow* get_glfw_window(const window&);
 
 		local_entropy wndproc_queue;
 

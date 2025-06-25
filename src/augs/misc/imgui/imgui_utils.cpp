@@ -56,6 +56,34 @@ static void web_SetClipboardText(void*, const char* text) {
 }
 
 #elif PLATFORM_LINUX
+#if USE_GLFW
+#include <GLFW/glfw3.h>
+
+namespace augs {
+	GLFWwindow* get_glfw_window(const window& d);
+}
+
+extern std::mutex clipboard_mutex;
+extern std::optional<std::string> set_clipboard_op;
+extern std::string clipboard_snapshot;
+
+static const char* augs_GetClipboardText(void*) {
+	thread_local std::string sss;
+
+	{
+		std::lock_guard<std::mutex> lock(clipboard_mutex);
+		sss = clipboard_snapshot;
+	}
+
+	return sss.c_str();
+}
+
+static void augs_SetClipboardText(void*, const char* text) {
+    std::lock_guard<std::mutex> lock(clipboard_mutex);
+    set_clipboard_op = text;
+}
+
+#else
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/exec.h"
 
@@ -78,6 +106,7 @@ static const char* augs_GetClipboardText(void*) {
 static void augs_SetClipboardText(void*, const char* text) {
 	unix_set_clipboard_data(text);
 }
+#endif
 #endif
 
 namespace augs {

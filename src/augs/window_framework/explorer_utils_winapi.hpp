@@ -9,6 +9,7 @@
 #include "augs/misc/scope_guard.h"
 
 namespace augs {
+	GLFWwindow* get_glfw_window(const window& d);
 	GLFWwindow* get_glfw_window(const window::platform_data& d);
 
 	HWND get_hwnd(const window::platform_data& d) {

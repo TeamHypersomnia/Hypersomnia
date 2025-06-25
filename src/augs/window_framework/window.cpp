@@ -79,6 +79,10 @@ namespace augs {
 		) {
 			active = true;
 
+#if USE_GLFW
+			refresh_clipboard_snapshot();
+#endif
+
 #if PLATFORM_LINUX
 			/*
 				Refresh to fix cursor misbehaving
