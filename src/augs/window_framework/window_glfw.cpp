@@ -12,9 +12,13 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
+#if PLATFORM_LINUX
+#include <mutex>
+
 std::mutex clipboard_mutex;
 std::optional<std::string> set_clipboard_op;
 std::string clipboard_snapshot;
+#endif
 
 augs::event::keys::key translate_glfw_key(int);
 augs::event::keys::key translate_glfw_mouse_key(int);
@@ -435,6 +439,7 @@ namespace augs {
 
 		platform->unhandled_focuses.clear();
 
+#if PLATFORM_LINUX
 		std::lock_guard<std::mutex> lock(clipboard_mutex);
 
 		if (set_clipboard_op) {
@@ -442,8 +447,10 @@ namespace augs {
 			glfwSetClipboardString(platform->window, set_clipboard_op->c_str());
 			set_clipboard_op.reset();
 		}
+#endif
 	}
 
+#if PLATFORM_LINUX
 	void window::refresh_clipboard_snapshot() {
 		if (platform == nullptr || platform->window == nullptr) {
 			return;
@@ -457,6 +464,7 @@ namespace augs {
 			clipboard_snapshot = std::string(clip);
 		}
 	}
+#endif
 
 	void window::set_window_rect(const xywhi r) {
 		auto& window = platform->window;

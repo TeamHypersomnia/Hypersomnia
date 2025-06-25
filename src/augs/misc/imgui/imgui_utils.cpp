@@ -58,6 +58,7 @@ static void web_SetClipboardText(void*, const char* text) {
 #elif PLATFORM_LINUX
 #if USE_GLFW
 #include <GLFW/glfw3.h>
+#include <mutex>
 
 namespace augs {
 	GLFWwindow* get_glfw_window(const window& d);
