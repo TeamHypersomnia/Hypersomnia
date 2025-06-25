@@ -4251,6 +4251,27 @@ bool arena_mode::can_use_map_command_now(const const_input_type in) const {
 		return true;
 	}
 
+	const bool all_in_same_team = [&]() {
+		if (in.rules.is_ffa()) {
+			return get_num_active_players() == 1;
+		}
+		else {
+			int nonempty_factions = 0;
+
+			for_each_faction([&](const auto faction) {
+				if (num_players_in(faction) > 0) {
+					++nonempty_factions;
+				}
+			});
+
+			return nonempty_factions == 1;
+		}
+	}();
+
+	if (all_in_same_team) {
+		return true;
+	}
+
 	const bool is_warmup = state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
 
 	return is_warmup;
