@@ -237,7 +237,7 @@ namespace net_messages {
 			return false;
 		}
 
-		serialize_bool(stream, payload.is_web_client);
+		serialize_bits(stream, payload.platform_type, 8);
 
 		return true;
 	}
@@ -367,7 +367,7 @@ namespace net_messages {
 		serialize_bits(stream, payload.net.jitter.buffer_at_least_steps, 32);
 		serialize_bits(stream, payload.net.jitter.buffer_at_least_ms, 32);
 		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
-		serialize_bits(stream, payload.welcome_type, 8);
+		serialize_bits(stream, payload.platform_type, 8);
 
 		return true;
 	}

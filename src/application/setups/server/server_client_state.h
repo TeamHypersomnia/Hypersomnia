@@ -76,11 +76,11 @@ struct server_client_state {
 	net_time_t when_last_zeroed_entropy_counter = 0;
 
 	auto from_where() const {
-		return ::describe_welcome_type(settings.get_welcome_type());
+		return ::describe_from_where(settings.get_platform_type());
 	}
 
 	bool should_post_webhooks() const {
-		return settings.get_welcome_type() != client_welcome_type::SUPPRESSED;
+		return settings.get_platform_type() != client_platform_type::SUPPRESSED;
 	}
 
 	bool is_web_client_paused() const {
@@ -190,7 +190,7 @@ struct server_client_state {
 		synced_player_meta new_meta;
 
 		new_meta.public_settings = settings.public_settings;
-		new_meta.is_web_client = is_web_client();
+		new_meta.platform_type = settings.platform_type;
 
 		return new_meta;
 	}

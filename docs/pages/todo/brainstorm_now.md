@@ -6,6 +6,29 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bots
+	- when someone specifies /bots 4 0, dont commence game when someone joins the opposite side
+		- ie fallback to original commencing logic
+	- path correction
+		- note this is the same problem as..
+		- ..starting the navigation at all!
+		- because navigation might start wherever, not even on the path
+		- what if we assume there's ALWAYS at least one visible waypoint?
+	- generating waypoint graph
+		- instead of raycasting we may query a rectangle the width of a character + some leeway
+		-
+	- special waypoints
+		- "hiding"
+		- "aggressive guard"
+			- for guarding unplanted bombsite (CT)
+			- for guarding planted bomb (TT)
+			- aggressive guards can be automatically determined from normal waypoints depending if they have LoS with bs/bomb
+			- tho they can at least have bombsite assigned
+			- this is why some waypoints might want a direction
+			- those directions might still be used for movement
+			- so they are more like a double-ended arrow
+
+
 - no bs: use webrtc for all connections behind nat 
 	- pros:
 		- simplifies nat traversal code

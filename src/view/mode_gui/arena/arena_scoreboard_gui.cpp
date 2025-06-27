@@ -753,7 +753,11 @@ void arena_scoreboard_gui::draw_gui(
 
 			const bool is_web = [&]() {
 				if (in.player_metas != nullptr) {
-					return (*in.player_metas)[player_id.value].synced.is_web_client;
+					const auto p = static_cast<client_platform_type>(
+						(*in.player_metas)[player_id.value].synced.platform_type
+					);
+
+					return ::is_web_platform(p);
 				}
 
 				return false;

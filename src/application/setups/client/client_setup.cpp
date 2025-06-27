@@ -2003,26 +2003,13 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	return custom_imgui_result::NONE;
 }
 
-static uint8_t get_client_welcome_type(const bool suppress) {
+static uint8_t u8_get_client_platform_type(const bool suppress) {
 	return static_cast<uint8_t>([&]() {
 		if (suppress) {
-			return client_welcome_type::SUPPRESSED;
+			return client_platform_type::SUPPRESSED;
 		}
 
-#if WEB_LOWEND
-		return client_welcome_type::CRAZYGAMES;
-#elif PLATFORM_WEB
-		return client_welcome_type::WEB;
-#elif PLATFORM_WINDOWS
-		return client_welcome_type::WINDOWS;
-#elif PLATFORM_LINUX
-		return client_welcome_type::LINUX;
-#elif PLATFORM_MACOS
-		return client_welcome_type::MACOS;
-#else
-		return client_welcome_type::UNKNOWN;
-#endif
-
+		return ::get_client_platform_type();
 	}());
 }
 
@@ -2035,7 +2022,7 @@ void client_setup::apply(const config_json_table& cfg) {
 
 	auto& r = requested_settings;
 	r.chosen_nickname = get_nickname();
-	r.welcome_type = ::get_client_welcome_type(vars.suppress_webhooks);
+	r.platform_type = ::u8_get_client_platform_type(vars.suppress_webhooks);
 	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;

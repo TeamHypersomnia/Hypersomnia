@@ -3,7 +3,7 @@
 #include "augs/misc/constant_size_string.h"
 #include "application/setups/client/client_vars.h"
 #include "game/per_character_input_settings.h"
-#include "application/network/client_welcome_type.h"
+#include "application/network/client_platform_type.h"
 
 struct public_client_settings {
 	// GEN INTROSPECTOR struct public_client_settings
@@ -34,11 +34,11 @@ struct requested_client_settings {
 	public_client_settings public_settings;
 	client_net_vars net;
 
-	uint8_t welcome_type = 0;
+	uint8_t platform_type = 0;
 	// END GEN INTROSPECTOR
 
-	client_welcome_type get_welcome_type() const {
-		return static_cast<client_welcome_type>(welcome_type);
+	client_platform_type get_platform_type() const {
+		return static_cast<client_platform_type>(platform_type);
 	}
 
 	bool operator==(const requested_client_settings&) const = default;

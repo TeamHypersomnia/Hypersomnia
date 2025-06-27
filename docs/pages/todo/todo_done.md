@@ -7185,7 +7185,7 @@ This will discard your redo history."
 - update deploy_hypersomnia.sh for onfoss
 
 - connected from CG
-    - suppress_webhooks -> welcome_type
+    - suppress_webhooks -> platform_type
 
 - optimize rambo map
 

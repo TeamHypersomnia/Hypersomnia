@@ -778,6 +778,8 @@ server_setup::server_setup(
 		integrated_client.init(server_time, next_session_id++, yojimbo::Address("0.0.0.0", 0));
 		integrated_client.state = client_state_type::IN_GAME;
 		integrated_client.settings.chosen_nickname = integrated_client_vars.get_nickname();
+		integrated_client.settings.platform_type = static_cast<uint8_t>(get_client_platform_type());
+		integrated_client.rebroadcast_synced_meta = true;
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
 			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
@@ -3487,6 +3489,10 @@ void server_setup::rebroadcast_player_synced_metas() {
 		};
 
 		for_each_id_and_client(update_for_client, only_connected_v);
+
+		/* Also update for the integrated client */
+		auto& payload = broadcasted_update;
+		integrated_player_metas[payload.subject_id.value].synced = payload.new_meta;
 	};
 
 	for_each_id_and_client(rebroadcast_if_needed, connected_and_integrated_v);
