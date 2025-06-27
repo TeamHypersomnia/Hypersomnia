@@ -63,9 +63,8 @@ jobs:
           hypersomnia/release_notes.txt
 
   container-publish:
-    if: "!contains(github.event.head_commit.message, '[docker skip]')"
+    if: "!contains(github.event.head_commit.message, '[docker skip]') && github.event_name != 'pull_request'"
     needs: build
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-22.04
     permissions:
       contents: read
