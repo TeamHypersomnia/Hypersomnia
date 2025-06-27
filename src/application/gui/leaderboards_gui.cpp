@@ -362,7 +362,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	ImGui::NextColumn();
 
-	const bool show_rank = logged_in;
+	const bool show_rank = logged_in && played;
 
 	if (show_rank) {
 		{
@@ -394,7 +394,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::PopFont();
 	}
 	else {
-		// text_disabled("No rank yet.");
+		if (!played) {
+			text_disabled("No rank yet.");
+		}
 	}
 
 #if PLATFORM_WEB
