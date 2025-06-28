@@ -404,33 +404,38 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
 #else
     using namespace std::chrono;
 
-    const auto& timeZoneName = getTimeZoneName(locationId);
-    if (timeZoneName.empty()) {
-        return -1; // Invalid locationId
-    }
+	try {
+		const auto& timeZoneName = getTimeZoneName(locationId);
+		if (timeZoneName.empty()) {
+			return -1; // Invalid locationId
+		}
 
-    auto timeZone = date::locate_zone(timeZoneName);
-    auto now = date::make_zoned(timeZone, system_clock::now());
-    auto localTime = now.get_local_time();
-    auto localDayPoint = floor<days>(localTime);
+		auto timeZone = date::locate_zone(timeZoneName);
+		auto now = date::make_zoned(timeZone, system_clock::now());
+		auto localTime = now.get_local_time();
+		auto localDayPoint = floor<days>(localTime);
 
-    std::array<system_clock::time_point, 3> weekendEvenings{
-        date::make_zoned(timeZone, localDayPoint + days((date::Friday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
-        date::make_zoned(timeZone, localDayPoint + days((date::Saturday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
-        date::make_zoned(timeZone, localDayPoint + days((date::Sunday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
-    };
+		std::array<system_clock::time_point, 3> weekendEvenings{
+			date::make_zoned(timeZone, localDayPoint + days((date::Friday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+			date::make_zoned(timeZone, localDayPoint + days((date::Saturday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+			date::make_zoned(timeZone, localDayPoint + days((date::Sunday - date::weekday{localDayPoint}).count()) + hours(19)).get_sys_time(),
+		};
 
-    double closestDistance = std::numeric_limits<double>::max();
-    for (const auto& evening : weekendEvenings) {
-        auto durationUntilEvening = evening - system_clock::now();
-        if (durationUntilEvening.count() >= 0) { // Future event
-            closestDistance = std::min(closestDistance, static_cast<double>(duration_cast<seconds>(durationUntilEvening).count()));
-        } else if (duration_cast<seconds>(-durationUntilEvening) < 2h) { // Ongoing event
-            return 0.0;
-        }
-    }
+		double closestDistance = std::numeric_limits<double>::max();
+		for (const auto& evening : weekendEvenings) {
+			auto durationUntilEvening = evening - system_clock::now();
+			if (durationUntilEvening.count() >= 0) { // Future event
+				closestDistance = std::min(closestDistance, static_cast<double>(duration_cast<seconds>(durationUntilEvening).count()));
+			} else if (duration_cast<seconds>(-durationUntilEvening) < 2h) { // Ongoing event
+				return 0.0;
+			}
+		}
 
-    return closestDistance;
+		return closestDistance;
+	}
+	catch (...) {
+		return -1;
+	}
 #endif
 }
 
