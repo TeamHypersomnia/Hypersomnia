@@ -523,6 +523,16 @@ bool edit_property(
 				return false;
 			}
 		}
+		else if constexpr(std::is_same_v<uint8_t, T>) {
+			if (label.find("bot quota") != std::string::npos) {
+				if (slider(label, property, uint8_t(0u), uint8_t(20u))) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+		}
 		else if constexpr(std::is_same_v<uint16_t, T>) {
 			if (label.find("Num particles") != std::string::npos) {
 				if (slider(label, property, uint16_t(0u), MAX_WANDERING_PIXELS)) { 
@@ -2198,7 +2208,11 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 	PROPERTY("Skip warmup", skip_warmup);
 	PROPERTY("Skip freeze time", skip_freeze_time);
 	PROPERTY("Unlimited money", unlimited_money);
-	PROPERTY("Bots (static)", bots);
+	PROPERTY("Spawn bots", spawn_bots);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Only in Bomb Defusal and Gun Game.");
+	}
 
 	return result;
 }
@@ -2385,6 +2399,12 @@ EDIT_FUNCTION(
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			MULTIPROPERTY("Max team score", bomb_defusal.max_team_score);
 
+			MULTIPROPERTY("Default bot quota", bomb_defusal.default_bot_quota);
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("Only in Bomb Defusal and Gun Game.");
+			}
+
 			MULTIPROPERTY("Warmup time", bomb_defusal.warmup_time);
 			MULTIPROPERTY("Freeze time", bomb_defusal.freeze_time);
 			MULTIPROPERTY("Buy time", bomb_defusal.buy_time);
@@ -2408,6 +2428,12 @@ EDIT_FUNCTION(
 		}
 		else if constexpr(std::is_same_v<I, editor_gun_game_mode>) {
 			MULTIPROPERTY("Free for all", gun_game.free_for_all);
+
+			MULTIPROPERTY("Default bot quota", gun_game.default_bot_quota);
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("Only in Bomb Defusal and Gun Game.");
+			}
 
 			force_show_extra_ammo = true;
 			FACTION_EQUIPMENT_PROPERTY("Basic equipment", gun_game.basic_equipment);

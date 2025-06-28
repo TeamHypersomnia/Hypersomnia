@@ -22,6 +22,7 @@ struct server_list_entry_json {
 	std::string arena;
 	std::string game_mode;
 
+	uint8_t num_online_humans = 0;
 	uint8_t num_playing = 0;
 	uint8_t num_spectating = 0;
 	uint8_t slots = 0;

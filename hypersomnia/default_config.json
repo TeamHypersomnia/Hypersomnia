@@ -300,6 +300,7 @@
             "client_network_timeout_secs": 1.5
         },
         "friendly_fire": true,
+        "bots": true, // Can override with "/bots 0" in-game.
         "cycle": "REPEAT_CURRENT", // or: "LIST" | "ALL_ON_DISK"
         "cycle_list": [
             "de_cyberaqua",

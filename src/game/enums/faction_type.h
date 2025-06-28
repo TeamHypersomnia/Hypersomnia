@@ -43,6 +43,20 @@ struct per_actual_faction {
 	T resistance;
 	// END GEN INTROSPECTOR
 
+	template <class F>
+	void for_each(F&& callback) {
+		callback(metropolis);
+		callback(atlantis);
+		callback(resistance);
+	}
+
+	template <class F>
+	void for_each(F&& callback) const {
+		callback(metropolis);
+		callback(atlantis);
+		callback(resistance);
+	}
+
 	T& operator[](const faction_type t) {
 		switch (t) {
 			case faction_type::METROPOLIS:

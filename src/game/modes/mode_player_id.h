@@ -17,7 +17,11 @@ struct mode_player_id {
 	}
 
 	static auto machine_admin() {
-		return mode_player_id(static_cast<id_value_type>(max_mode_players_v - 1));
+		return mode_player_id(static_cast<id_value_type>(integrated_client_id_v));
+	}
+
+	static auto first_bot() {
+		return mode_player_id(static_cast<id_value_type>(integrated_client_id_v) + 1);
 	}
 
 	mode_player_id() = default;

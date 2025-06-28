@@ -15,7 +15,7 @@ struct editor_playtesting_settings {
 	bool skip_warmup = true;
 	bool skip_freeze_time = true;
 	bool unlimited_money = true;
-	uint8_t bots = 0;
+	bool spawn_bots = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_playtesting_settings&) const = default;

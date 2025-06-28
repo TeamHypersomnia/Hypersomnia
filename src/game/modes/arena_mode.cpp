@@ -470,7 +470,22 @@ mode_player_id arena_mode::add_player(const input_type in, const client_nickname
 	return {};
 }
 
+mode_player_id arena_mode::add_bot_player(const input_type in, const client_nickname_type& nickname) {
+	if (const auto new_id = find_first_free_bot(); new_id.is_set()) {
+		const auto result = add_player_custom(in, { new_id, nickname });
+		(void)result;
+		ensure(result);
+
+		players.at(new_id).is_bot = true;
+		return new_id;
+	}
+
+	return {};
+}
+
 void arena_mode::erase_player(input_type in, const logic_step step, const mode_player_id& id, const bool suspended) {
+	LOG("Erasing player: %x", id.value);
+
 	if (const auto entry = suspended ? find_suspended(id) : find(id)) {
 		if (!suspended) {
 			handle_duel_desertion(in, step, id);
@@ -615,6 +630,18 @@ std::size_t arena_mode::num_conscious_players_in(const cosmos& cosm, const facti
 
 	for_each_player_handle_in(cosm, faction, [&](const auto& handle) {
 		if (handle.template get<components::sentience>().is_conscious()) {
+			++total;
+		}
+	});
+
+	return total;
+}
+
+std::size_t arena_mode::num_human_players_in(const faction_type faction) const {
+	auto total = std::size_t(0);
+
+	for_each_player_in(faction, [&](const auto&, const auto& data) {
+		if (!data.is_bot) {
 			++total;
 		}
 	});
@@ -2338,6 +2365,7 @@ bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 			step.post_message(std::move(notification));
 		}
 
+		LOG("Removing player %x due to input request.", g.removed_player.value);
 		remove_player(in, step, g.removed_player);
 	}
 
@@ -2350,6 +2378,10 @@ bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 
 mode_player_id arena_mode::find_first_free_player() const {
 	return first_free_key(players, mode_player_id::first());
+}
+
+mode_player_id arena_mode::find_first_free_bot() const {
+	return first_free_key(players, mode_player_id::first_bot());
 }
 
 void arena_mode::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
@@ -2701,43 +2733,128 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 	}
 }
 
+per_actual_faction<uint8_t> verify_max_quota(const per_actual_faction<uint8_t> q) {
+	std::size_t total = 0;
+
+	q.for_each([&total](const auto n) { total += n; });
+
+	if (total > max_bot_quota_v) {
+		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
+	}
+
+	return q;
+}
+
+per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
+	const const_input_type in,
+	const int8_t first_quota,
+	const int8_t second_quota,
+	const mode_player_id& requester_player
+) const {
+	const auto factions = calc_participating_factions(in);
+	const auto player = find(requester_player);
+
+	per_actual_faction<uint8_t> result = { 0u, 0u, 0u };
+
+	if (const bool custom_split = second_quota > -1 && player != nullptr) {
+		const auto requester_faction = player->get_faction();
+
+		result[requester_faction] = first_quota;
+		result[factions.get_opposing(requester_faction)] = second_quota;
+	}
+	else {
+		const auto rem = first_quota % factions.size();
+		const auto per_fact = first_quota / factions.size() + rem;
+
+		factions.for_each(
+			[&](const auto faction) {
+				const auto max_bots_here = int(per_fact);
+				const auto num_humans = int(num_human_players_in(faction));
+
+				result[faction] = uint8_t(std::max(0, max_bots_here - num_humans));
+			}
+		);
+	}
+
+	return verify_max_quota(result);
+}
+
+per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
+	if (in.dynamic_vars.bots_override.is_enabled) {
+		return verify_max_quota(in.dynamic_vars.bots_override.value);
+	}
+
+	return calc_requested_bots_from_quotas(
+		in,
+		in.rules.default_bot_quota
+	);
+}
+
+per_actual_faction<uint8_t> arena_mode::get_current_num_bots_per_faction() const {
+	per_actual_faction<uint8_t> result = {};
+
+	for (const auto& p : players) {
+		if (p.second.is_bot) {
+			result[p.second.get_faction()]++;
+		}
+	}
+
+	return result;
+}
+
 void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step) {
 	const auto& names = in.rules.bot_names;
-	const auto requested_bots = std::min(
-		in.rules.bot_quota,
-		static_cast<unsigned>(names.size())
-	);
+	const auto requested_bots = calc_requested_bots(in);
+	const auto current_num_bots = get_current_num_bots_per_faction();
 
 	if (current_num_bots == requested_bots) {
 		return;
 	}
 
-	if (current_num_bots > requested_bots) {
-		std::vector<mode_player_id> to_erase;
+	LOG("Requested bots: %xm %xr %xa", requested_bots.metropolis, requested_bots.resistance, requested_bots.atlantis);
+	LOG("Current bots: %xm %xr %xa", current_num_bots.metropolis, current_num_bots.resistance, current_num_bots.atlantis);
 
-		for (const auto& p : reverse(players)) {
-			if (p.second.is_bot) {
-				to_erase.push_back(p.first);
+	int bot_name_counter = int(get_num_bot_players());
 
-				if (to_erase.size() == current_num_bots - requested_bots) {
-					break;
+	const auto p = calc_participating_factions(in);
+
+	p.for_each([&](const faction_type faction) {
+		auto current = current_num_bots[faction];
+		auto requested = requested_bots[faction];
+
+		if (current > requested) {
+			const auto num_to_erase = std::size_t(current - requested);
+			std::vector<mode_player_id> to_erase;
+
+			for (const auto& p : reverse(players)) {
+				if (p.second.is_bot && p.second.get_faction() == faction) {
+					to_erase.push_back(p.first);
+
+					if (to_erase.size() == num_to_erase) {
+						break;
+					}
 				}
+			}
+
+			for (const auto& t : to_erase) {
+				LOG("Removing superfluous bot: %x", t.value);
+				remove_player(in, step, t);
+				--bot_name_counter;
 			}
 		}
 
-		for (const auto& t : to_erase) {
-			remove_player(in, step, t);
+		while (current < requested) {
+			const auto new_id = add_bot_player(in, "BOT " + names[(bot_name_counter++) % names.size()]);
+			choose_faction(in, new_id, faction);
+			++current;
 		}
+	});
 
-		current_num_bots = requested_bots;
-	}
-
-	while (current_num_bots < requested_bots) {
-		const auto new_id = add_player(in, names[current_num_bots++]);
-		auto_assign_faction(in, new_id);
-		
-		players.at(new_id).is_bot = true;
-	}
+	LOG_NVPS(
+		get_num_players(),
+		get_num_bot_players(),
+		get_num_human_players()
+	);
 }
 
 void arena_mode::spawn_characters_for_recently_assigned(const input_type in, const logic_step step) {
@@ -4156,6 +4273,20 @@ augs::maybe<rgba> arena_mode::get_current_fallback_color_for(const const_input_t
 
 uint32_t arena_mode::get_num_players() const {
 	return players.size();
+}
+
+uint32_t arena_mode::get_num_bot_players() const {
+	auto total = std::size_t(0);
+
+	const auto current_num_bots = get_current_num_bots_per_faction();
+
+	current_num_bots.for_each([&](const auto n) { total += n; });
+
+	return total;
+}
+
+uint32_t arena_mode::get_num_human_players() const {
+	return get_num_players() - get_num_bot_players();
 }
 
 uint32_t arena_mode::get_num_active_players() const {

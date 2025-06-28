@@ -40,7 +40,7 @@ struct arena_mode_ruleset {
 	rgba default_player_color = orange;
 
 	bool enable_player_colors = true;
-	uint32_t bot_quota = 8;
+	int8_t default_bot_quota = 0;
 
 	uint32_t respawn_after_ms = 0;
 	uint32_t spawn_protection_ms = 0;
@@ -428,6 +428,7 @@ private:
 
 	void remove_player(input, logic_step, const mode_player_id&);
 	mode_player_id add_player(input, const client_nickname_type& nickname);
+	mode_player_id add_bot_player(input, const client_nickname_type& nickname);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
 	faction_choice_result choose_faction(const_input, const mode_player_id&, const faction_type faction);
@@ -464,7 +465,6 @@ private:
 	bool should_commence_when_ready = false;
 	faction_type abandoned_team = faction_type::COUNT;
 
-	uint32_t current_num_bots = 0;
 	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
 	uint32_t scramble_counter = 0;
@@ -534,6 +534,7 @@ public:
 	unsigned calc_max_faction_score() const;
 
 	mode_player_id find_first_free_player() const;
+	mode_player_id find_first_free_bot() const;
 
 	arena_mode_match_result calc_match_result(const_input) const;
 
@@ -698,9 +699,15 @@ public:
 
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
+	std::size_t num_human_players_in(faction_type) const;
 
 	uint32_t get_num_players() const;
 	uint32_t get_num_active_players() const;
+
+	uint32_t get_num_bot_players() const;
+	uint32_t get_num_human_players() const;
+
+	per_actual_faction<uint8_t> get_current_num_bots_per_faction() const;
 
 	uint32_t get_max_num_active_players(const_input) const;
 
@@ -780,4 +787,12 @@ public:
 		/* Double-purpose */
 		return scramble_counter;
 	}
+
+	per_actual_faction<uint8_t> calc_requested_bots(const const_input in) const;
+	per_actual_faction<uint8_t> calc_requested_bots_from_quotas(
+		const const_input in,
+		int8_t first_quota,
+		int8_t second_quota = -1,
+		const mode_player_id& requester_player = mode_player_id()
+	) const;
 };

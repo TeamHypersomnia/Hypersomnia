@@ -33,6 +33,7 @@ struct server_heartbeat {
 	arena_identifier current_arena;
 	game_mode_name_type game_mode;
 
+	uint8_t num_online_humans;
 	uint8_t num_online;
 	uint8_t max_online;
 

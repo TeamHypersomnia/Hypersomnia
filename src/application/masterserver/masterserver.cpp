@@ -362,6 +362,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 			next.num_spectating = data.get_num_spectators();
 			next.num_playing = data.num_online - next.num_spectating;
+			next.num_online_humans = data.num_online_humans;
 
 			next.slots = data.max_online;
 

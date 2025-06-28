@@ -356,7 +356,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 
 			cust_rulesets = offi_bt;
 
-			cust_rulesets.bot_quota = previous.bot_quota;
+			cust_rulesets.default_bot_quota = previous.default_bot_quota;
 			cust_rulesets.max_players_per_team = previous.max_players_per_team;
 			cust_rulesets.freeze_secs = previous.freeze_secs;
 			cust_rulesets.warmup_secs = previous.warmup_secs;

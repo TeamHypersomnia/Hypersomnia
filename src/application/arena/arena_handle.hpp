@@ -25,7 +25,7 @@ bool is_spectator(const A& handle, const mode_player_id& id) {
 }
 
 template <bool C, class M, class I>
-bool found_in(const basic_arena_handle<C, M, I>& handle, const mode_player_id& id) {
+bool player_found_in(const basic_arena_handle<C, M, I>& handle, const mode_player_id& id) {
 	return handle.on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.find(id) != nullptr;

@@ -53,6 +53,7 @@
 #include "application/gui/client/chat_gui_entry.hpp"
 #include "application/setups/server/server_assigned_teams.hpp"
 #include "steam_integration.h"
+#include "augs/string/typesafe_sscanf.h"
 #include <queue>
 
 #if !PLATFORM_WEB
@@ -1936,17 +1937,17 @@ uint32_t server_setup::get_num_connected() const {
 
 	return arena.on_mode_with_input(
 		[&](const auto& mode, const auto&) {
-			return mode.get_num_players();
+			return mode.get_num_human_players();
 		}
 	);
 }
 
-uint32_t server_setup::get_num_active_players() const {
+uint32_t server_setup::get_num_bots() const {
 	const auto& arena = get_arena_handle();
 
 	return arena.on_mode_with_input(
 		[&](const auto& mode, const auto&) {
-			return mode.get_num_active_players();
+			return mode.get_num_bot_players();
 		}
 	);
 }
@@ -2011,7 +2012,8 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.internal_network_address = internal_address;
 #endif
 
-	heartbeat.num_online = get_num_connected();
+	heartbeat.num_online_humans = get_num_connected();
+	heartbeat.num_online = heartbeat.num_online_humans + get_num_bots();
 
 	if (is_joinable()) {
 		heartbeat.max_online = get_num_slots();
@@ -2342,6 +2344,14 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.ranked = vars.ranked;
 
 	out.force_short_match = has_web_clients_playing;
+
+	if (!vars.bots) {
+		out.bots_override.set( { 0u, 0u, 0u } );
+	}
+
+	if (overrides.bots) {
+		out.bots_override.set(*overrides.bots);
+	}
 
 	return out;
 }
@@ -4425,7 +4435,7 @@ void server_setup::log_performance() {
 }
 
 bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {
-	return found_in(get_arena_handle(), mode_id);
+	return player_found_in(get_arena_handle(), mode_id);
 }
 
 const netcode_socket_t* server_setup::find_underlying_socket() const {
@@ -4633,7 +4643,60 @@ void server_setup::handle_client_chat_command(
 	};
 
 	if (chat.target == chat_target_type::GENERAL) {
-		if (chat.message == "/next") {
+		if (begins_with(chat.message, "/bots")) {
+			if (chat.message == "/bots" || chat.message == "/bots ") {
+				overrides.bots.reset();
+				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
+			}
+			else {
+				unsigned first = -1;
+				unsigned second = -1;
+
+				typesafe_sscanf(chat.message, "/bots %x %x", first, second);
+				LOG("Bots: %x, %x", first, second);
+
+				if (first == unsigned(-1)) {
+					broadcast_info("Wrong command format.", chat_target_type::INFO_CRITICAL);
+				}
+				else if (
+					first > max_bot_quota_v
+					|| (second != unsigned(-1) && second > max_bot_quota_v)
+					|| (second != unsigned(-1) && first + second > max_bot_quota_v)
+				) {
+					broadcast_info("Cannot exceed " + std::to_string(max_bot_quota_v) + " bots.", chat_target_type::INFO_CRITICAL);
+				}
+				else if (first != unsigned(-1)) {
+					get_arena_handle().on_mode_with_input(
+						[&]<typename T>(const T& mode, const auto& in) {
+							if constexpr(std::is_same_v<T, test_mode>) {
+
+							}
+							else {
+								const auto requested_bots = mode.calc_requested_bots_from_quotas(
+									in,
+									first,
+									second,
+									to_mode_player_id(id)
+								);
+
+								auto total = std::size_t(0);
+								requested_bots.for_each([&](const auto n) { total += n; });
+
+								std::string suff = " (equal teams)";
+
+								if (second != unsigned(-1)) {
+									suff = " (custom teams)";
+								}
+
+								broadcast_info("Total bots now: " + std::to_string(total) + suff, chat_target_type::INFO);
+								overrides.bots = requested_bots;
+							}
+						}
+					);
+				}
+			}
+		}
+		else if (chat.message == "/next") {
 			if (!can_use_map_command_now()) {
 				broadcast_only_warmup();
 				return;

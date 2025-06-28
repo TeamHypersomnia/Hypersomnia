@@ -77,6 +77,10 @@ struct client_requested_chat;
 
 class webrtc_server_detail;
 
+struct server_var_temp_overrides {
+	std::optional<per_actual_faction<uint8_t>> bots;
+};
+
 class server_setup : 
 	public default_setup_settings
 #if !HEADLESS
@@ -103,6 +107,7 @@ class server_setup :
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
+	server_var_temp_overrides overrides;
 
 	server_runtime_info runtime_info;
 
@@ -762,7 +767,7 @@ public:
 
 	uint32_t get_num_slots() const;
 	uint32_t get_num_connected() const;
-	uint32_t get_num_active_players() const;
+	uint32_t get_num_bots() const;
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}

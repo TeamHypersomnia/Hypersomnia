@@ -12,6 +12,7 @@ struct synced_dynamic_vars {
 	bool friendly_fire = true;
 	bool force_short_match = false;
 	server_ranked_vars ranked;
+	augs::maybe<per_actual_faction<uint8_t>> bots_override;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const synced_dynamic_vars&) const = default;

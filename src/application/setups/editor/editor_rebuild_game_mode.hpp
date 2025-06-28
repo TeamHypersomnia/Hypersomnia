@@ -75,7 +75,7 @@ auto setup_ruleset_from_editor_mode(
 	const editor_game_mode_resource& game_mode,
 	F find_resource,
 	const editor_arena_settings& settings,
-	const editor_playtesting_settings* overrides
+	const editor_playtesting_settings* playtesting_overrides
 ) {
 	auto to_flavour = [&]<typename R>(const editor_typed_resource_id<R> typed_id) -> 
 		remove_cref<decltype(std::get<0>(std::declval<R>().scene_flavour_id))> 
@@ -109,10 +109,10 @@ auto setup_ruleset_from_editor_mode(
 		}
 	};
 
-	auto apply_overrides = [&]<typename T>(T& rules) {
+	auto apply_playtesting_overrides = [&]<typename T>(T& rules) {
 		apply_global_settings(rules);
 
-		if (overrides == nullptr) {
+		if (playtesting_overrides == nullptr) {
 			return;
 		}
 
@@ -120,20 +120,22 @@ auto setup_ruleset_from_editor_mode(
 
 		}
 		else {
-			if (overrides->skip_warmup) {
+			if (playtesting_overrides->skip_warmup) {
 				rules.warmup_secs = 0;
 			}
 
-			if (overrides->skip_freeze_time) {
+			if (playtesting_overrides->skip_freeze_time) {
 				rules.freeze_secs = 0;
 			}
 
-			if (overrides->unlimited_money) {
+			if (playtesting_overrides->unlimited_money) {
 				rules.economy.initial_money = 40000;
 				rules.economy.maximum_money = 40000;
 			}
 
-			rules.bot_quota = overrides->bots;
+			if (!playtesting_overrides->spawn_bots) {
+				rules.default_bot_quota = 0;
+			}
 		}
 	};
 
@@ -144,6 +146,7 @@ auto setup_ruleset_from_editor_mode(
 
 		auto rules = typename T::ruleset_type();
 
+		rules.default_bot_quota = vars.default_bot_quota;
 		rules.warmup_secs = vars.warmup_time;
 		rules.freeze_secs = vars.freeze_time;
 		rules.round_secs = vars.round_time;
@@ -210,7 +213,7 @@ auto setup_ruleset_from_editor_mode(
 		}
 
 		rules.subrules = subrules;
-		apply_overrides(rules);
+		apply_playtesting_overrides(rules);
 		result = rules;
 	};
 
@@ -231,7 +234,7 @@ auto setup_ruleset_from_editor_mode(
 				}
 			);
 
-			apply_overrides(rules);
+			apply_playtesting_overrides(rules);
 
 			result = rules;
 		}

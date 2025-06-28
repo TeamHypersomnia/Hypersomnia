@@ -40,8 +40,8 @@ void debugger_player::force_add_bots_if_quota_zero(debugger_folder& folder) {
 		if constexpr(std::is_same_v<arena_mode, E>) {
 			auto& rs = current->rulesets.all.get_for<E>()[playtest_default.raw];
 
-			if (rs.bot_quota == 0) {
-				rs.bot_quota = rs.bot_names.size();
+			if (rs.default_bot_quota == 0) {
+				rs.default_bot_quota = rs.bot_names.size();
 			}
 		}
 	});

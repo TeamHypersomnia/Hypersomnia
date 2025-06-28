@@ -102,6 +102,7 @@ struct server_vars {
 	server_ranked_vars ranked;
 
 	bool friendly_fire = true;
+	bool bots = true;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;

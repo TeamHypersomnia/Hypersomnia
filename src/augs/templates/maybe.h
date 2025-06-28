@@ -28,6 +28,11 @@ namespace augs {
 		maybe(const T& value) : value(value), is_enabled(true) {}
 		maybe(const T& value, const bool is_enabled) : value(value), is_enabled(is_enabled) {}
 
+		void set(const T& a) {
+			value = a;
+			is_enabled = true;
+		}
+
 		template <class A>
 		void emplace(A&& a) {
 			value = std::forward<A>(a);

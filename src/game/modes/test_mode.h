@@ -319,4 +319,12 @@ public:
 	uint32_t continuous_sounds_clock(const_input in) const {
 		return in.cosm.get_total_steps_passed();
 	}
+
+	uint32_t get_num_bot_players() const {
+		return 0u;
+	}
+
+	uint32_t get_num_human_players() const {
+		return get_num_players() - get_num_bot_players();
+	}
 };

@@ -357,16 +357,29 @@ arena_mode_ruleset::arena_mode_ruleset() {
 	auto& rs = *this;
 
 	rs.bot_names = {
-		"daedalus",
-		"icarus",
-		"geneotech",
-		"pbc",
-		"adam.jensen",
-		"Spicmir",
-		"Pythagoras",
-		"Billan",
-		"Billans",
-		"bilmik"
+		"Ferris",
+		"Sorbet",
+		"Bilon",
+		"Dedal",
+		"Ikar",
+		"Fajfer",
+		"Vincent",
+		"Lipa",
+		"Poeta",
+		"Neron",
+		"Orlen",
+		"Corvin",
+		"Tyrone",
+		"Marik",
+		"Arkon",
+		"Elric",
+		"Kaelin",
+		"Vertek",
+		"Mirell",
+		"Eland",
+		"Centaur",
+		"Jensen",
+		"Zenith"
 	};
 
 	rs.player_colors = {
@@ -390,7 +403,7 @@ arena_mode_ruleset::arena_mode_ruleset() {
 	rs.excess_player_color = rgba(210, 210, 210, 255);
 	rs.default_player_color = rgba(255, 255, 0, 255);
 
-	rs.bot_quota = 0;
+	rs.default_bot_quota = 0;
 
 	rs.economy.initial_money = 2000;
 

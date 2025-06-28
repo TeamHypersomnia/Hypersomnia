@@ -49,6 +49,7 @@ struct editor_bomb_defusal_mode {
 
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
 	uint32_t max_team_score = 16;
+	uint8_t default_bot_quota = 8;
 
 	uint32_t warmup_time = 16;
 	uint32_t freeze_time = 10;
@@ -80,6 +81,7 @@ struct editor_gun_game_mode {
 
 	// GEN INTROSPECTOR struct editor_gun_game_mode
 	bool free_for_all = true;
+	uint8_t default_bot_quota = 8;
 	uint32_t max_team_score = 2;
 
 	uint32_t warmup_time = 16;

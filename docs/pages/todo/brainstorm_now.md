@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- remaining bot spawning logic
+	- take control of alive bot
+		- also when joining a team, dont just annihilate existing bot
+	- handle commencing
+	- kick on ranked start
+	- kick when players on opposite teams already
+	- overrides reset when nobody playing?
+
+- rename config.json to something like cached.json
+
 - bots
 	- when someone specifies /bots 4 0, dont commence game when someone joins the opposite side
 		- ie fallback to original commencing logic
