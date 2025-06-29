@@ -28,7 +28,9 @@ constexpr std::size_t integrated_client_id_v = max_incoming_connections_v;
 constexpr std::size_t max_bot_quota_v = 20u;
 
 /* One for the integrated_client_id_v admin */
-constexpr std::size_t max_mode_players_v = max_incoming_connections_v + 1 + max_bot_quota_v;
+constexpr std::size_t max_mode_humans_v = max_incoming_connections_v + 1;
+
+constexpr std::size_t max_mode_players_v = max_mode_humans_v + max_bot_quota_v;
 
 constexpr std::size_t max_rcon_password_length_v = 30;
 constexpr std::size_t max_chat_message_length_v = 180;
