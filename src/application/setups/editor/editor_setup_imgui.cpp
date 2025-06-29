@@ -202,7 +202,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				auto colored_selectable = scoped_selectable_colors(remove_bgs);
 				auto colored_col = scoped_text_color(remove_tint);
 
-				if (item_if(node_or_layer_inspected, "Delete", "D")) {
+				if (item_if(node_or_layer_inspected, "Delete", "CTRL+D")) {
 					delete_selection();
 				}
 			}
