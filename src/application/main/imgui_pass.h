@@ -21,6 +21,7 @@ void perform_imgui_pass(
 	const vec2i screen_size,
 	const augs::delta delta,
 	const config_json_table& canon_config,
+	const config_json_table& canon_config_with_confd,
 	config_json_table& config,
 	config_json_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,

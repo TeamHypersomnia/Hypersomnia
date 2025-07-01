@@ -104,6 +104,7 @@ public:
 		const augs::audio_context& audio,
 		const augs::path_type& path_for_saving,
 		const config_json_table& canon_config,
+		const config_json_table& canon_config_with_confd,
 		config_json_table& into,
 		config_json_table& last_saved,
 		vec2i screen_size

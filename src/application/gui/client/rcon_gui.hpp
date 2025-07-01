@@ -25,6 +25,12 @@ void perform_rcon_gui(
 	const bool during_ranked,
 	F&& on_new_payload
 ) {
+	const server_runtime_info* runtime_info = nullptr;
+
+	if (is_remote_server) {
+		runtime_info = &state.runtime_info;
+	}
+
 	(void)during_ranked;
 	using namespace augs::imgui;
 
@@ -78,11 +84,6 @@ void perform_rcon_gui(
 				auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 				auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
-				const server_runtime_info* runtime_info = nullptr;
-
-				if (is_remote_server) {
-					runtime_info = &state.runtime_info;
-				}
 
 				do_server_vars(
 					edited,
@@ -181,6 +182,17 @@ void perform_rcon_gui(
 						}
 
 						do_command_button("Download logs", RS::DOWNLOAD_LOGS); 
+
+						if (runtime_info) {
+							ImGui::Separator();
+							text_color("Changed RCON settings", yellow);
+							ImGui::Separator();
+
+							auto prefs = runtime_info->runtime_prefs;
+							input_multiline_text("##RconJson", prefs, 10, ImGuiInputTextFlags_ReadOnly);
+
+							do_command_button("Clear all", RS::CLEAR_RUNTIME_PREFS); 
+						}
 					}
 					else {
 						text_color("Nothing to maintain on an integrated server!", orange);

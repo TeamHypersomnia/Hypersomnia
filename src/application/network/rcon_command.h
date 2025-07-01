@@ -10,6 +10,7 @@ enum class server_maintenance_command : unsigned char {
 	CHECK_FOR_UPDATES_NOW,
 	REQUEST_RUNTIME_INFO,
 	DOWNLOAD_LOGS,
+	CLEAR_RUNTIME_PREFS,
 
 	COUNT
 };

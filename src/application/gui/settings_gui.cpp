@@ -289,6 +289,7 @@ void settings_gui_state::perform(
 	const augs::audio_context& audio,
 	const augs::path_type& config_path_for_saving,
 	const config_json_table& canon_config,
+	const config_json_table& canon_config_with_confd,
 	config_json_table& config,
 	config_json_table& last_saved_config,
 	vec2i screen_size
@@ -2029,7 +2030,7 @@ void settings_gui_state::perform(
 			if (ImGui::Button("Save changes")) {
 				augs::timer save_timer;
 				last_saved_config = config;
-				config.save_patch(canon_config, config_path_for_saving);
+				config.save_patch(canon_config_with_confd, config_path_for_saving, true);
 				LOG("Saved new config in: %x ms", save_timer.get<std::chrono::milliseconds>());
 			}
 

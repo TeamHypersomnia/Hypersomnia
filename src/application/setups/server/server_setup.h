@@ -102,6 +102,7 @@ class server_setup :
 
 	client_vars integrated_client_vars;
 
+	server_vars canon_with_confd_vars;
 	server_vars vars;
 	server_private_vars private_vars;
 
@@ -220,6 +221,7 @@ class server_setup :
 	std::optional<server_nat_traversal> nat_traversal;
 #endif
 	bool suppress_community_server_webhook_this_run = false;
+	std::string name_suffix;
 
 	enum class job_type {
 		AVATAR,
@@ -390,6 +392,7 @@ public:
 		const packaged_official_content& official,
 		const augs::server_listen_input&,
 		const server_vars&,
+		const server_vars& canon_with_confd_vars,
 		const server_private_vars&,
 		const client_vars& integrated_client_vars,
 		std::optional<augs::dedicated_server_input>,
@@ -399,7 +402,8 @@ public:
 #endif
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
-		const std::string& webrtc_signalling_server_url
+		const std::string& webrtc_signalling_server_url,
+		const std::string& name_suffix = ""
 	);
 
 	~server_setup();
@@ -785,7 +789,7 @@ public:
 
 	std::vector<std::string> get_all_nicknames() const;
 
-	const server_name_type& get_server_name() const;
+	server_name_type get_server_name() const;
 	std::string get_current_arena_name() const;
 	game_mode_name_type get_current_game_mode_name() const;
 
@@ -803,6 +807,9 @@ public:
 
 	void broadcast_shutdown_message();
 
+	void rescan_runtime_prefs();
+	void rescan_arenas_on_disk();
+	void broadcast_runtime_info_for_rcon();
 	void refresh_runtime_info_for_rcon();
 
 	void set_client_is_downloading_files(client_id_type, server_client_state& c, downloading_type);

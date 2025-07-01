@@ -313,7 +313,7 @@
         "allow_webrtc_clients": true,
         "webrtc_udp_mux": true,
         "webrtc_port_range_begin": 9000,
-        "webrtc_port_range_end": 9050,
+        "webrtc_port_range_end": 9050, // only matters if "webrtc_udp_mux": false
         "server_name": "", // Will be "Nickname's server" by default.
         "notified_server_list": "masterserver.hypersomnia.xyz:8430",
         "suppress_new_community_server_webhook": false,

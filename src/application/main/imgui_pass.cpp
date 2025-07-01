@@ -15,6 +15,7 @@ void perform_imgui_pass(
 	const vec2i screen_size,
 	const augs::delta delta,
 	const config_json_table& canon_config,
+	const config_json_table& canon_config_with_confd,
 	config_json_table& config,
 	config_json_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,
@@ -62,6 +63,7 @@ void perform_imgui_pass(
 			audio,
 			path_for_saving_config,
 			canon_config,
+			canon_config_with_confd,
 			config,
 			last_saved_config,
 			screen_size
@@ -95,7 +97,7 @@ void perform_imgui_pass(
 					config.float_consistency_test.passes = 0;
 					last_saved_config.float_consistency_test.passes = 0;
 
-					last_saved_config.save_patch(canon_config, path_for_saving_config);
+					last_saved_config.save_patch(canon_config, path_for_saving_config, true);
 				}
 			}
 		}

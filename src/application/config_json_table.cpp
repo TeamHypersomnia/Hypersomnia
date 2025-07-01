@@ -60,8 +60,26 @@ void config_json_table::load_patch(const augs::path_type& config_lua_path) {
 	}
 }
 
-void config_json_table::save_patch(const config_json_table& source, const augs::path_type& target_path) const {
-	augs::save_as_json_diff(target_path, *this, source);
+void config_json_table::save_patch(
+	const config_json_table& source,
+	const augs::path_type& target_path,
+	const bool ephemeral_preamble
+) const {
+	std::string preamble = "";
+
+	if (ephemeral_preamble) {
+		preamble = R"(
+/*
+    This file will be OVERWRITTEN the next time Hypersomnia quits.
+    Put your persistent settings in the conf.d/ directory!
+
+    These are the settings changed at RUNTIME,
+    e.g. through Server RCON or Settings in Main Menu.
+*/
+)";
+	}
+
+	augs::save_as_json_diff(target_path, *this, source, preamble);
 }
 
 activity_type config_json_table::get_last_activity() const {

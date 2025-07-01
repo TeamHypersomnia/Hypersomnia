@@ -558,7 +558,8 @@ work_result work(
 	}
 
 	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.json");
-	WEBSTATIC const auto local_config_path = USER_DIR / "config.json";
+	WEBSTATIC const auto legacy_local_config_path = USER_DIR / "config.json";
+	WEBSTATIC const auto runtime_prefs_path       = USER_DIR / "runtime-prefs.json";
 
 	LOG("Loading %x.", canon_config_path);
 
@@ -570,14 +571,23 @@ work_result work(
 		return result_ptr;
 	}();
 
+	WEBSTATIC const auto canon_config_with_confd_ptr = std::make_unique<config_json_table>();
+
 	WEBSTATIC auto& canon_config = *canon_config_ptr;
+	WEBSTATIC auto& canon_config_with_confd = *canon_config_with_confd_ptr;
 
 	WEBSTATIC auto config_ptr = [&]() {
 		auto result = std::make_unique<config_json_table>(canon_config);
 
-		if (augs::exists(local_config_path)) {
-			LOG("Applying config: %x", local_config_path);
-			result->load_patch(local_config_path);
+		if (augs::exists(legacy_local_config_path)) {
+			if (!augs::exists(runtime_prefs_path)) {
+				LOG("RENAMING LEGACY CONFIG:\n%x\n->\n%x", legacy_local_config_path, runtime_prefs_path);
+
+				std::filesystem::rename(
+					legacy_local_config_path,
+					runtime_prefs_path
+				);
+			}
 		}
 
 		augs::for_each_in_directory_sorted(
@@ -590,6 +600,13 @@ work_result work(
 				return callback_result::CONTINUE;
 			}
 		);
+
+		canon_config_with_confd = *result;
+
+		if (augs::exists(runtime_prefs_path)) {
+			LOG("Applying config: %x", runtime_prefs_path);
+			result->load_patch(runtime_prefs_path);
+		}
 
 		if (!params.apply_config.empty()) {
 			const auto cli_config_path = CALLING_CWD / params.apply_config;
@@ -841,7 +858,7 @@ work_result work(
 		setter(config);
 		setter(last_saved_config);
 
-		last_saved_config.save_patch(canon_config, local_config_path);
+		last_saved_config.save_patch(canon_config_with_confd, runtime_prefs_path, true);
 	};
 	(void)change_with_save;
 
@@ -1213,14 +1230,12 @@ work_result work(
 
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
 
-			this_config.server.server_name += server_name_suffix;
 			this_config.server_start.port = port_counter++;
 
 			if (type != SINGLE) {
 				/* Force muxing on consecutive ports */
 				this_config.server.webrtc_udp_mux = true;
 				this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
-				this_config.server.webrtc_port_range_end = this_config.server.webrtc_port_range_begin;
 			}
 
 			LOG(
@@ -1257,6 +1272,7 @@ work_result work(
 				*official,
 				this_config.server_start,
 				this_config.server,
+				canon_config_with_confd.server,
 				this_config.server_private,
 				this_config.client,
 				this_config.dedicated_server,
@@ -1265,7 +1281,8 @@ work_result work(
 				should_suppress_webhook,
 				type == SINGLE ? assigned_teams : server_assigned_teams(),
 
-				this_config.webrtc_signalling_server_url
+				this_config.webrtc_signalling_server_url,
+				server_name_suffix
 			);
 
 			if (pick_random_map) {
@@ -1599,7 +1616,7 @@ work_result work(
 		}
 
 		if (update) {
-			last_saved_config.save_patch(canon_config, local_config_path);
+			last_saved_config.save_patch(canon_config_with_confd, runtime_prefs_path, true);
 		}
 	});
 
@@ -2440,6 +2457,7 @@ work_result work(
 						*official,
 						start,
 						config.server,
+						canon_config_with_confd.server,
 						config.server_private,
 						config.client,
 						std::nullopt,
@@ -3176,6 +3194,7 @@ work_result work(
 								*official,
 								start,
 								playtest_vars,
+								canon_config_with_confd.server,
 								config.server_private,
 								config.client,
 								std::nullopt,
@@ -3313,9 +3332,10 @@ work_result work(
 			logic_get_screen_size(),
 			frame_delta,
 			canon_config,
+			canon_config_with_confd,
 			config,
 			last_saved_config,
-			local_config_path,
+			runtime_prefs_path,
 			settings_gui,
 			audio,
 			[&]() {

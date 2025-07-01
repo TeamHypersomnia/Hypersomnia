@@ -708,13 +708,23 @@ namespace augs {
 	}
 
 	template <class T>
-	void save_as_json_diff(const path_type& path, const T& from, const T& reference_object) {
+	std::string to_json_diff_string(const T& from, const T& reference_object) {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
 		write_json_diff(writer, from, reference_object, true);
 
-		save_as_text(path, s.GetString());
+		return s.GetString();
+	}
+
+	template <class T>
+	void save_as_json_diff(
+		const path_type& path,
+		const T& from,
+		const T& reference_object,
+		std::string preamble = ""
+	) {
+		save_as_text(path, preamble + to_json_diff_string(from, reference_object));
 	}
 }
 

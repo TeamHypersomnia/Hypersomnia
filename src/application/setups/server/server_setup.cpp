@@ -673,6 +673,7 @@ server_setup::server_setup(
 	const packaged_official_content& official,
 	const augs::server_listen_input& in,
 	const server_vars& initial_vars,
+	const server_vars& canon_with_confd_vars,
 	const server_private_vars& private_initial_vars,
 	const client_vars& integrated_client_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
@@ -681,9 +682,11 @@ server_setup::server_setup(
 #endif
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
-	const std::string& webrtc_signalling_server_url
+	const std::string& webrtc_signalling_server_url,
+	const std::string& name_suffix
 ) : 
 	integrated_client_vars(integrated_client_vars),
+	canon_with_confd_vars(canon_with_confd_vars),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
@@ -706,11 +709,10 @@ server_setup::server_setup(
 		)
 	),
 	server_time(server_setup::get_current_time()),
-	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
+	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run),
+	name_suffix(name_suffix)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
-
-	refresh_runtime_info_for_rcon();
 
 #if BUILD_WEBRTC
 	/* 
@@ -750,6 +752,8 @@ server_setup::server_setup(
 
 		apply(initial_vars_modified, true);
 	}
+
+	refresh_runtime_info_for_rcon();
 
 	LOG("Server name: %x", vars.server_name);
 
@@ -3400,6 +3404,17 @@ message_handler_result server_setup::handle_rcon_payload(
 
 				return continue_v;
 
+			case command::CLEAR_RUNTIME_PREFS:
+				notification("reset the RCON settings to defaults");
+
+				apply(canon_with_confd_vars);
+				write_vars_to_disk_once = true;
+
+				rescan_runtime_prefs();
+				broadcast_runtime_info_for_rcon();
+
+				return continue_v;
+
 			default:
 				LOG("Unsupported rcon command.");
 				return continue_v;
@@ -3420,6 +3435,9 @@ message_handler_result server_setup::handle_rcon_payload(
 
 		apply(typed_payload);
 		write_vars_to_disk_once = true;
+
+		rescan_runtime_prefs();
+		broadcast_runtime_info_for_rcon();
 
 		return continue_v;
 	}
@@ -3962,8 +3980,8 @@ std::vector<std::string> server_setup::get_all_nicknames() const {
 	return nicknames;
 }
 
-const server_name_type& server_setup::get_server_name() const {
-	return vars.server_name;
+server_name_type server_setup::get_server_name() const {
+	return vars.server_name + name_suffix;
 }
 
 std::string server_setup::get_current_arena_name() const {
@@ -4449,7 +4467,11 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 	return server->find_underlying_socket();
 }
 
-void server_setup::refresh_runtime_info_for_rcon() {
+void server_setup::rescan_runtime_prefs() {
+	runtime_info.runtime_prefs = augs::to_json_diff_string(vars, canon_with_confd_vars);
+}
+
+void server_setup::rescan_arenas_on_disk() {
 	auto& out_entries = runtime_info.arenas_on_disk;
 	out_entries.clear();
 
@@ -4478,8 +4500,12 @@ void server_setup::refresh_runtime_info_for_rcon() {
 	add_from(DOWNLOADED_ARENAS_DIR);
 	add_from(EDITOR_PROJECTS_DIR);
 
-	sort_range(out_entries, augs::natural_order);
+	LOG("Rescanned arenas on disk: %x", out_entries.size());
 
+	sort_range(out_entries, augs::natural_order);
+}
+
+void server_setup::broadcast_runtime_info_for_rcon() {
 	auto broadcast_new_info_to_rcons = [&](const auto recipient_id, auto&) {
 		const auto rcon_level = get_rcon_level(recipient_id);
 
@@ -4493,9 +4519,14 @@ void server_setup::refresh_runtime_info_for_rcon() {
 		}
 	};
 
-	LOG("Refreshed runtime info. Arenas on disk: %x", out_entries.size());
-
 	for_each_id_and_client(broadcast_new_info_to_rcons, only_connected_v);
+}
+
+void server_setup::refresh_runtime_info_for_rcon() {
+	rescan_runtime_prefs();
+	rescan_arenas_on_disk();
+
+	broadcast_runtime_info_for_rcon();
 }
 
 void server_setup::set_client_is_downloading_files(const client_id_type client_id, server_client_state& c, const downloading_type type) {

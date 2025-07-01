@@ -181,6 +181,11 @@ struct config_json_table {
 	activity_type get_last_activity() const;
 	input_recording_type get_input_recording_mode() const;
 
-	void save_patch(const config_json_table& source, const augs::path_type& target_path) const;
+	void save_patch(
+		const config_json_table& source,
+		const augs::path_type& target_path,
+		bool ephemeral_preamble
+	) const;
+
 	void load_patch(const augs::path_type& config_lua_path);
 };
