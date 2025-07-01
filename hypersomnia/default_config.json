@@ -236,6 +236,7 @@
         "use_account_nickname": true,
         "use_account_avatar": true,
         "nickname": "",
+        "clan": "",
         "net": {
             "jitter": {
                 "buffer_at_least_steps": 3,

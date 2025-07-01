@@ -9,6 +9,7 @@ struct public_client_settings {
 	// GEN INTROSPECTOR struct public_client_settings
 	per_character_input_settings character_input;
 	vec2 nonzoomedout_visible_world_area = vec2::zero;
+	clan_name_type clan;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const public_client_settings&) const = default;

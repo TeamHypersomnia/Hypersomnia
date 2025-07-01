@@ -1424,6 +1424,9 @@ void settings_gui_state::perform(
 #endif
 
 				revertable_input_text(label, scope_cfg.nickname);
+				revertable_input_text("Clan", scope_cfg.clan);
+
+				tooltip_on_hover("Displayed e.g. in scoreboard.\nWill be more useful in the future.");
 
 				if (scope_cfg.nickname.length() < min_nickname_length_v) {
 					scope_cfg.nickname = "Player";

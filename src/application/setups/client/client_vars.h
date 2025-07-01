@@ -8,6 +8,7 @@
 #include "view/client_arena_type.h"
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
+using clan_name_type = augs::constant_size_string<max_nickname_length_v>;
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
@@ -54,6 +55,7 @@ struct client_vars {
 	bool use_account_avatar = true;
 
 	client_nickname_type nickname = "";
+	clan_name_type clan = "";
 
 	client_net_vars net;
 

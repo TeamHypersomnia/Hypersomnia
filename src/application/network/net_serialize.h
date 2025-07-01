@@ -228,6 +228,10 @@ namespace net_messages {
 		serialize_float(s, p.nonzoomedout_visible_world_area.x);
 		serialize_float(s, p.nonzoomedout_visible_world_area.y);
 
+		if (!serialize_fixed_size_str(s, p.clan)) {
+			return false;
+		}
+
 		return true;
 	}
 

@@ -2026,6 +2026,7 @@ void client_setup::apply(const config_json_table& cfg) {
 	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;
+	r.public_settings.clan = cfg.client.clan;
 
 	adapter->set(vars.network_simulator);
 }

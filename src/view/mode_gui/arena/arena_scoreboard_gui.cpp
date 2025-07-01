@@ -769,7 +769,35 @@ void arena_scoreboard_gui::draw_gui(
 				pref_col = pref_col.mult_luminance(cfg.dead_player_text_lumi_mult).mult_alpha(cfg.dead_player_text_alpha_mult);
 			}
 			
-			col_text(get_nickname_str(player_id, player_data), is_web ? fmt("[Web]", pref_col) : formatted_string());
+			auto clan = std::string("");
+
+			if (in.player_metas) {
+				clan = (*in.player_metas)[player_id.value].synced.public_settings.clan;
+
+				if (!clan.empty()) {
+					clan = "[" + clan + "]";
+				}
+			}
+
+			auto preffix = formatted_string();
+
+			if (is_web) {
+				preffix = fmt("[Web]", pref_col);
+			}
+
+			if (!clan.empty()) {
+				if (!preffix.empty()) {
+					clan = " " + clan;
+				}
+
+				preffix += fmt(clan, pref_col);
+			}
+
+			col_text(
+				get_nickname_str(player_id, player_data), 
+				preffix
+			);
+
 			next_col();
 
 			const auto& stats = player_data.stats;
