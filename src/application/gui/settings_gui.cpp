@@ -1418,16 +1418,21 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
+				{
 #if PLATFORM_WEB
-				const auto label = "Nickname (guest)";
+					const auto label = "Nickname (guest)";
 #else
-				const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+					const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 #endif
 
-				revertable_input_text(label, scope_cfg.nickname);
-				revertable_input_text("Clan", scope_cfg.clan);
+					revertable_input_text(label, scope_cfg.nickname);
+				}
 
-				tooltip_on_hover("Displayed e.g. in scoreboard.\nWill be more useful in the future.");
+				{
+					//const auto clan_label = typesafe_sprintf("Clan (0-20 characters)", 0, max_clan_length_v);
+					revertable_input_text("Clan", scope_cfg.clan);
+					tooltip_on_hover("Displayed e.g. in scoreboard.\nWill be more useful in the future.\n\nUp to 20 characters.");
+				}
 
 				if (scope_cfg.nickname.length() < min_nickname_length_v) {
 					scope_cfg.nickname = "Player";

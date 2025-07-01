@@ -8,7 +8,7 @@
 #include "view/client_arena_type.h"
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
-using clan_name_type = augs::constant_size_string<max_nickname_length_v>;
+using clan_name_type = augs::constant_size_string<max_clan_length_v>;
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars

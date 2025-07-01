@@ -13,6 +13,7 @@ summary: That which we are brainstorming at the moment.
 	- kick on ranked start
 	- kick when players on opposite teams already
 	- overrides reset when nobody playing?
+	- remember to autoassign by player count not bot count otherwise everyone will end up in same team
 
 - rename config.json to something like cached.json
 
