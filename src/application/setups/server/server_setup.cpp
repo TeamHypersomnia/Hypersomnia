@@ -1413,7 +1413,14 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 				server_name,
 				get_current_arena_name(),
 				get_current_game_mode_name(),
-				summary
+				summary,
+				[this](const mode_player_id id) -> std::string {
+					if (auto c = find_client_state(id)) {
+						return c->settings.public_settings.clan;
+					}
+
+					return "";
+				}
 			);
 
 			LOG("Match report JSON: %x", json_body);

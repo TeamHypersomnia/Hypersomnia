@@ -1,11 +1,13 @@
 #pragma once
 
 namespace ranked_webhooks {
-	inline std::string json_report_match(
+	template <class F>
+	std::string json_report_match(
 		const std::string& server_name,
 		const std::string& arena,
 		const std::string& game_mode,
-		const messages::match_summary_message& info
+		const messages::match_summary_message& info,
+		F get_clan_of
 	) {
 		using namespace rapidjson;
 
@@ -48,6 +50,8 @@ namespace ranked_webhooks {
 						writer.StartObject();
 						writer.Key("nickname");
 						writer.String(f.nickname.c_str());
+						writer.Key("clan");
+						writer.String(get_clan_of(f.id));
 
 						if (f.abandoned_at_score != -1) {
 							writer.Key("abandoned_at_score");
