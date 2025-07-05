@@ -1390,9 +1390,10 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 
 		auto fled = vars.webhooks.fled_pic_link;
 		auto reconsidered = vars.webhooks.reconsidered_pic_link;
+		const auto arena_name = get_current_arena_name();
 
 		push_notification_job(
-			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info, priv_vars, deserter_clan, opponent_clan]() -> std::string {
+			[arena_name, discord_webhook_url, server_name, fled, reconsidered, interrupt_info, priv_vars, deserter_clan, opponent_clan]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto http_client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1425,7 +1426,8 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 
 					const auto webhook_message = custom_webhooks::message_duel_interrupted(
 						server_name,
-						interrupt_info
+						interrupt_info,
+						arena_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1475,8 +1477,10 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 
 		LOG("pushing match summary webhook.");
 
+		const auto arena_name = get_current_arena_name();
+
 		push_notification_job(
-			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
+			[arena_name, discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1512,7 +1516,8 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 					const auto webhook_message = custom_webhooks::message_match_summary(
 						server_name,
 						mvp_nickname,
-						summary
+						summary,
+						arena_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1605,8 +1610,10 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 
 		LOG("pushing duel webhook with %x versus %x", first, second);
 
+		const auto arena_name = get_current_arena_name();
+
 		push_notification_job(
-			[first, second, discord_webhook_url, server_name, priv_vars, first_clan, second_clan, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+			[arena_name, first, second, discord_webhook_url, server_name, priv_vars, first_clan, second_clan, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1640,7 +1647,8 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 					const auto webhook_message = custom_webhooks::message_duel_of_honor(
 						server_name,
 						first,
-						second
+						second,
+						arena_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);

@@ -233,17 +233,17 @@ namespace custom_webhooks {
 
 		const auto now_playing_notice = [&]() {
 			if (num_others == 0) {
-				return typesafe_sprintf("Now playing `%x`.", current_map);
+				return typesafe_sprintf("");
 			}
 
 			if (num_others == 1) {
-				return typesafe_sprintf("Now playing `%x` with **%x**.", current_map, matrix_escaped_nick(other_players[0]));
+				return typesafe_sprintf("Now playing with **%x**.", matrix_escaped_nick(other_players[0]));
 			}
 
-			return typesafe_sprintf("Now playing `%x` with:", current_map);
+			return typesafe_sprintf("Now playing with:");
 		}();
 			
-		auto result = typesafe_sprintf("### `%x`\n%x  \n%x  ", server_name, connected_notice, now_playing_notice);
+		auto result = typesafe_sprintf("### `%x: %x`\n%x  \n%x  ", current_map, server_name, connected_notice, now_playing_notice);
 
 		if (num_others > 1) {
 			std::string footer_content;
@@ -265,11 +265,12 @@ namespace custom_webhooks {
 	inline std::string message_duel_of_honor(
 		const std::string& server_name,
 		const std::string& first_player,
-		const std::string& second_player
+		const std::string& second_player,
+		const std::string& current_map
 	) {
 		const auto duel_notice = typesafe_sprintf("**%x** and **%x** have agreed to a duel of honor.", matrix_escaped_nick(first_player), matrix_escaped_nick(second_player));
 		
-		auto result = typesafe_sprintf("### `%x`\n%x", server_name, duel_notice);
+		auto result = typesafe_sprintf("### `%x: %x`\n%x", current_map, server_name, duel_notice);
 
 		return result;
 	}
@@ -277,7 +278,8 @@ namespace custom_webhooks {
 	inline std::string message_match_summary(
 		const std::string& server_name,
 		const std::string& mvp_nickname,
-		const messages::match_summary_message& summary
+		const messages::match_summary_message& summary,
+		const std::string& current_map
 	) {
 		const bool was_mvp_alone = summary.first_faction.size() == 1;
 		const int num_against_mvp = summary.second_faction.size();
@@ -366,14 +368,15 @@ namespace custom_webhooks {
 		total_description += make_team_members(summary.second_faction);
 		total_description += "</pre></code>";
 
-		auto result = typesafe_sprintf("### `%x`\n**%x**  \n%x", server_name, summary_notice, total_description);
+		auto result = typesafe_sprintf("### `%x: %x`\n**%x**  \n%x", current_map, server_name, summary_notice, total_description);
 
 		return result;
 	}
 
 	inline std::string message_duel_interrupted(
 		const std::string& server_name,
-		const messages::duel_interrupted_message& info
+		const messages::duel_interrupted_message& info,
+		const std::string& current_map
 	) {
 		using discord_webhooks::escaped_nick;
 
@@ -412,7 +415,7 @@ namespace custom_webhooks {
 			);
 		}();
 
-		auto result = typesafe_sprintf("### `%x`\n**%x**\n%x", server_name, result_notice, detail_notice);
+		auto result = typesafe_sprintf("### `%x - %x`**%x**\n%x", current_map, server_name, result_notice, detail_notice);
 
 		return result;
 	}
