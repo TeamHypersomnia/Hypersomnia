@@ -76,6 +76,11 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	server_details_gui_state server_details = std::string("Server details");
 
 	bool only_responding = false;
+#if IS_PRODUCTION_BUILD
+	bool show_incompatible = false;
+#else
+	bool show_incompatible = true;
+#endif
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 	augs::maybe<uint32_t> at_most_ping = augs::maybe<uint32_t>(100, false);
 
