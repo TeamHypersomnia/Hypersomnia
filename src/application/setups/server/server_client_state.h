@@ -156,6 +156,10 @@ struct server_client_state {
 		return settings.chosen_nickname;
 	}
 
+	std::string get_clan() const {
+		return settings.public_settings.clan;
+	}
+
 	bool is_authenticated() const {
 		return !authenticated_id.empty();
 	}

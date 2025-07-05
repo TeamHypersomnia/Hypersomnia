@@ -386,6 +386,20 @@
         "telegram_channel_id": "@hypersomnia_monitor",
         "telegram_alerts_channel_id": "@hypersomnia_server_logs",
         "telegram_alerts_webhook_url": "",
+
+        /*
+        You can target multiple webhooks simultaneously.
+        They can also filter by the player's clan name.
+
+        "custom_webhook_urls": [
+            {
+                "url": "",
+                "header_authorization": "",
+                "clan": "FOSSGralnia"
+            }
+        ],
+        */
+
         "steam_web_api_key": "",
         "report_ranked_match_api_key": "",
         "report_ranked_match_url": "https://hypersomnia.xyz/report_match",

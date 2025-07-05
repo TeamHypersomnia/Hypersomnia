@@ -10,6 +10,100 @@
 
 #include "game/messages/hud_message.h"
 
+namespace webhooks_common {
+	inline std::string format_num(int num, std::size_t num_width = 2) {
+		// todo: support larger numbers
+		num = std::clamp(num, -9, 99);
+
+		auto s = std::to_string(num);
+
+		if (s.length() < num_width) {
+			const auto n = num_width - s.length();
+			auto preffix = std::string(n, ' ');
+
+			s = preffix + s;
+		}
+
+		return s;
+	}
+
+	template<typename T>
+	inline std::string make_stat_str(const T& entry) {
+		const auto k = format_num(entry.kills);
+		const auto a = format_num(entry.assists);
+		const auto d = format_num(entry.deaths);
+
+		return typesafe_sprintf("%x|%x|%x", k, a, d);
+	}
+
+	template<typename T>
+	inline std::size_t get_longest_nickname_length(const T& members) {
+		if (members.empty()) {
+			return 0;
+		}
+
+		auto length_of = [](const auto& a, const auto& b) {
+			return a.nickname.length() < b.nickname.length();
+		};
+
+		return maximum_of(members, length_of).nickname.length();
+	}
+
+	template<typename T, typename E>
+	inline std::string make_team_members(const T& members, E&& escape_func, std::size_t nick_col_width = 0) {
+		std::string output;
+
+		for (const auto& m : members) {
+			if (nick_col_width > 0) {
+				// Discord webhook version with padding
+				const auto padding = nick_col_width - m.nickname.length();
+				output += escape_func(m.nickname) + std::string(padding, ' ') + make_stat_str(m) + "\n";
+			} else {
+				// Custom webhook version without padding
+				output += escape_func(m.nickname) + " " + make_stat_str(m) + "\n";
+			}
+		}
+
+		if (output.size() > 0) {
+			output.pop_back();
+		}
+
+		return output;
+	}
+}
+
+namespace discord_webhooks {
+	inline std::string escaped_nick(const std::string& n) {
+		std::string result;
+
+		for (auto c : n) {
+			if (c == '\n' || c == '\t' || c == '\r') {
+				result += '?';
+				continue;
+			}
+
+			switch(c) {
+				case '\\':
+				case '*':
+				case '_':
+				case '~':
+				case '>':
+				case '`':
+					result += '\\';
+					break;
+				default:
+					break;
+
+			}
+
+			result += c;
+		}
+
+		return result;
+	}
+
+}
+
 namespace telegram_webhooks {
 	inline std::string escaped_nick(const std::string& n) {
 		std::string result;
@@ -81,6 +175,226 @@ namespace telegram_webhooks {
 	}
 }
 
+namespace custom_webhooks {
+	inline httplib::Headers headers(const custom_webhook_data& data) {
+		if (!data.header_authorization.empty()) {
+			return {
+				{"Authorization", data.header_authorization},
+				{"Content-Type", "application/json"}
+			};
+		}
+		else {
+			return {
+				{"Content-Type", "application/json"}
+			};
+		}
+	}
+
+	inline std::string message_player_connected(
+		const std::string& server_name,
+		const std::string& connected_player,
+		std::vector<std::string> other_players,
+		const std::string& current_map,
+		const std::string& from_where
+	) {
+		using discord_webhooks::escaped_nick;
+
+		erase_element(other_players, connected_player);
+
+		const auto connected_notice = typesafe_sprintf("**%x** connected%x.", escaped_nick(connected_player), from_where);
+		const auto num_others = other_players.size();
+
+		const auto now_playing_notice = [&]() {
+			if (num_others == 0) {
+				return typesafe_sprintf("Now playing `%x`.", current_map);
+			}
+
+			if (num_others == 1) {
+				return typesafe_sprintf("Now playing `%x` with **%x**.", current_map, escaped_nick(other_players[0]));
+			}
+
+			return typesafe_sprintf("Now playing `%x` with:", current_map);
+		}();
+			
+		auto result = typesafe_sprintf("### `%x`\n%x\n%x", server_name, connected_notice, now_playing_notice);
+
+		if (num_others > 1) {
+			std::string footer_content;
+
+			for (const auto& p : other_players) {
+				footer_content += "**" + escaped_nick(p) + "**\n";
+			}
+
+			if (footer_content.size() > 0) {
+				footer_content.pop_back();
+			}
+
+			result += "\n" + footer_content;
+		}
+
+		return result;
+	}
+
+	inline std::string message_duel_of_honor(
+		const std::string& server_name,
+		const std::string& first_player,
+		const std::string& second_player
+	) {
+		using discord_webhooks::escaped_nick;
+
+		const auto duel_notice = typesafe_sprintf("**%x** and **%x** have agreed to a duel of honor.", escaped_nick(first_player), escaped_nick(second_player));
+		
+		auto result = typesafe_sprintf("### `%x`\n%x", server_name, duel_notice);
+
+		return result;
+	}
+
+	inline std::string message_match_summary(
+		const std::string& server_name,
+		const std::string& mvp_nickname,
+		const messages::match_summary_message& summary
+	) {
+		using discord_webhooks::escaped_nick;
+
+		const bool was_mvp_alone = summary.first_faction.size() == 1;
+		const int num_against_mvp = summary.second_faction.size();
+		const bool is_duel = was_mvp_alone && num_against_mvp == 1;
+
+		const auto summary_notice = [&]() {
+			const auto preffix = is_duel ? "Duel" : "Match";
+
+			if (summary.is_tie()) {
+				return typesafe_sprintf(
+					"%x ended with a tie.",
+					preffix
+				);
+			}
+
+			return typesafe_sprintf(
+				"%x ended with %x:%x.",
+				preffix,
+				summary.first_team_score,
+				summary.second_team_score
+			);
+		}();
+
+		const auto mvp_notice_suffix = [&]() -> std::string {
+			if (summary.is_tie()) {
+				if (was_mvp_alone) {
+					if (num_against_mvp > 1) {
+						return "tied against overwhelming odds.";
+					}
+
+					if (num_against_mvp == 1) {
+						/* If tied in a duel, no MVPs. */
+						return "";
+					}
+				}
+				else {
+					return "was the strongest of them all.";
+				}
+			}
+
+			if (was_mvp_alone) {
+				if (num_against_mvp > 1) {
+					return "won against overwhelming odds.";
+				}
+
+				if (num_against_mvp == 1) {
+					return "has upheld his honor.";
+				}
+			}
+
+			return "led his team to victory.";
+		}();
+
+		const auto mvp_notice = mvp_notice_suffix == "" ? "They stand on equal ground." : typesafe_sprintf(
+			"**%x** %x",
+			escaped_nick(mvp_nickname),
+			mvp_notice_suffix
+		);
+
+		const auto first_team_name = std::string(summary.is_tie() ? "First team:" : "Winning team:");
+		const auto second_team_name = std::string(summary.is_tie() ? "Second team:" : "Losing team:");
+
+		const auto longest_nick_len = std::max(
+			webhooks_common::get_longest_nickname_length(summary.first_faction),
+			webhooks_common::get_longest_nickname_length(summary.second_faction)
+		);
+
+		std::size_t nick_stat_padding = 8;
+		std::size_t min_nick_col_width = 20;
+
+		const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+		auto make_team_members = [&](const auto& members) {
+			return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
+		};
+
+		std::string total_description;
+		total_description += mvp_notice;
+		total_description += "\n\n";
+		total_description += "**" + first_team_name + "**\n";
+		total_description += "```\n";
+		total_description += make_team_members(summary.first_faction);
+		total_description += "\n```\n\n";
+		total_description += "**" + second_team_name + "**\n";
+		total_description += "```\n";
+		total_description += make_team_members(summary.second_faction);
+		total_description += "\n```";
+
+		auto result = typesafe_sprintf("### `%x`\n**%x**\n%x", server_name, summary_notice, total_description);
+
+		return result;
+	}
+
+	inline std::string message_duel_interrupted(
+		const std::string& server_name,
+		const messages::duel_interrupted_message& info
+	) {
+		using discord_webhooks::escaped_nick;
+
+		const bool is_truce = info.is_truce();
+		const bool was_winning = info.was_winning();
+
+		const auto deserter = escaped_nick(info.deserter_nickname);
+		const auto opponent = escaped_nick(info.opponent_nickname);
+
+		const auto result_notice = [&]() -> std::string {
+			if (is_truce) {
+				return "Duel ended with a truce.";
+			}
+
+			return typesafe_sprintf("%x has surrendered.", deserter);
+		}();
+			
+		const auto detail_notice = [&]() {
+			if (is_truce) {
+				return typesafe_sprintf(
+					"**%x** %x %x:%x and no longer wants to fight **%x**.",
+					deserter,
+					was_winning ? "wins" : "ties",
+					info.deserter_score,
+					info.opponent_score,
+					opponent
+				);
+			}
+
+			return typesafe_sprintf(
+				"**%x** was winning %x:%x...\nbut **%x** shamefully left the duel.",
+				opponent,
+				info.opponent_score,
+				info.deserter_score,
+				deserter
+			);
+		}();
+
+		auto result = typesafe_sprintf("### `%x`\n**%x**\n%x", server_name, result_notice, detail_notice);
+
+		return result;
+	}
+}
+
 namespace discord_webhooks {
 	inline std::string find_attachment_url(const std::string& response) {
 		rapidjson::Document d;
@@ -118,35 +432,6 @@ namespace discord_webhooks {
 			if (c == '`') {
 				result += "'";
 				continue;
-			}
-
-			result += c;
-		}
-
-		return result;
-	}
-
-	inline std::string escaped_nick(const std::string& n) {
-		std::string result;
-
-		for (auto c : n) {
-			if (c == '\n' || c == '\t' || c == '\r') {
-				result += '?';
-				continue;
-			}
-
-			switch(c) {
-				case '\\':
-				case '*':
-				case '_':
-				case '~':
-				case '>':
-				case '`':
-					result += '\\';
-					break;
-				default:
-					break;
-
 			}
 
 			result += c;
@@ -443,38 +728,9 @@ namespace discord_webhooks {
 			const auto first_team_name = std::string (info.is_tie() ? "First team:" : "Winning team:");
 			const auto second_team_name = std::string(info.is_tie() ? "Second team:" : "Losing team:");
 
-			std::size_t num_width = 2;
-			auto format_num = [&](auto num){
-				// todo: support larger numbers
-				num = std::clamp(num, -9, 99);
-
-				auto s = std::to_string(num);
-
-				if (s.length() < num_width) {
-					const auto n = num_width - s.length();
-					auto preffix = std::string(n, ' ');
-
-					s = preffix + s;
-				}
-
-				return s;
-			};
-
-			auto make_stat_str = [&](const auto& entry) {
-				const auto k = format_num(entry.kills);
-				const auto a = format_num(entry.assists);
-				const auto d = format_num(entry.deaths);
-
-				return typesafe_sprintf("%x|%x|%x", k, a, d);
-			};
-
-			auto length_of = [](const auto& a, const auto& b) {
-				return a.nickname.length() < b.nickname.length();
-			};
-
 			const auto longest_nick_len = std::max(
-				info.first_faction.empty() ? std::size_t(0) : (maximum_of(info.first_faction,  length_of).nickname.length()),
-				info.second_faction.empty() ? std::size_t(0) : (maximum_of(info.second_faction, length_of).nickname.length())
+				webhooks_common::get_longest_nickname_length(info.first_faction),
+				webhooks_common::get_longest_nickname_length(info.second_faction)
 			);
 
 			std::size_t nick_stat_padding = 8;
@@ -483,18 +739,7 @@ namespace discord_webhooks {
 			const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
 
 			auto make_team_members = [&](const auto& members) {
-				std::string output;
-
-				for (const auto& m : members) {
-					const auto padding = nick_col_width - m.nickname.length();
-					output += code_escaped_nick(m.nickname) + std::string(padding, ' ') + make_stat_str(m) + "\n";
-				}
-
-				if (output.size() > 0) {
-					output.pop_back();
-				}
-
-				return output;
+				return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
 			};
 
 			std::string total_description;

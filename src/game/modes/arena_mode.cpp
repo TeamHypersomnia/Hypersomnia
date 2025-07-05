@@ -3200,8 +3200,8 @@ void arena_mode::check_duel_of_honor(const input_type in, const logic_step step)
 	LOG("Checking if there is a duel of honor.");
 
 	if (p.size() == 2) {
-		if (num_players_in(p.bombing) == 1) {
-			if (num_players_in(p.defusing) == 1) {
+		if (num_players_in(p.bombing) == 1 && num_human_players_in(p.bombing) == 1) {
+			if (num_players_in(p.bombing) == 1 && num_human_players_in(p.defusing) == 1) {
 				LOG("There is a duel indeed.");
 				const auto first_id = find_best_player_in(p.bombing);
 				const auto second_id = find_best_player_in(p.defusing);

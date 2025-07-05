@@ -196,10 +196,20 @@ struct server_vars {
 struct url_and_key_pair {
 	// GEN INTROSPECTOR struct url_and_key_pair
 	std::string url;
-	std::string api_key;
+	std::string header_apikey;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const url_and_key_pair& b) const = default;
+};
+
+struct custom_webhook_data {
+	// GEN INTROSPECTOR struct custom_webhook_data
+	std::string url;
+	std::string header_authorization;
+	std::string clan;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const custom_webhook_data& b) const = default;
 };
 
 struct server_private_vars {
@@ -213,6 +223,8 @@ struct server_private_vars {
 
 	std::string telegram_alerts_channel_id = "@hypersomnia_server_logs";
 	std::string telegram_alerts_webhook_url;
+
+	std::vector<custom_webhook_data> custom_webhook_urls;
 
 	std::string steam_web_api_key = "";
 

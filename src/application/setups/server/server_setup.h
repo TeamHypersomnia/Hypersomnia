@@ -859,4 +859,6 @@ public:
 	std::string get_connect_string() const;
 
 	void do_integrated_rcon_gui(bool force = false);
+
+	static void send_custom_webhook(const custom_webhook_data& webhook, const std::string& message);
 };

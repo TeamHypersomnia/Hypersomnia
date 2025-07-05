@@ -1327,6 +1327,43 @@ void server_setup::resolve_server_list() {}
 void server_setup::resolve_heartbeat_host_if_its_time() {}
 void server_setup::resolve_internal_address_if_its_time() {}
 #else
+void server_setup::send_custom_webhook(const custom_webhook_data& webhook, const std::string& message) {
+	auto custom_webhook_url = parsed_url(webhook.url);
+
+	if (!custom_webhook_url.valid()) {
+		LOG("Skipping webhook with invalid url: ", webhook.url);
+		return;
+	}
+
+	rapidjson::StringBuffer s;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+	writer.StartObject();
+	writer.Key("text");
+	writer.String(message.c_str());
+	LOG_NVPS(message);
+	writer.EndObject();
+
+	std::string json_body = s.GetString();
+
+	auto headers = custom_webhooks::headers(webhook);
+	auto client = httplib_utils::make_client(custom_webhook_url);
+
+	auto response = client->Post(
+		custom_webhook_url.location.c_str(),
+		headers,
+		json_body,
+		"application/json"
+	);
+
+	if (response) {
+		LOG("Custom webhook response: %x", response->status);
+	}
+	else {
+		LOG("Custom webhook: No response");
+	}
+}
+
 std::string server_setup::get_next_duel_pic_link() {
 	auto pattern = vars.webhooks.duel_of_honor_pic_link_pattern;
 	auto duel_pic_i = duel_pic_counter % vars.webhooks.num_duel_pics;
@@ -1338,8 +1375,16 @@ std::string server_setup::get_next_duel_pic_link() {
 void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupted_message& interrupt_info) {
 	finalize_webhook_jobs();
 
-	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
+	
+	if (discord_webhook_url.valid() || !private_vars.custom_webhook_urls.empty()) {
 		auto server_name = get_server_name();
+		auto priv_vars = private_vars;
+
+		const auto deserter_player_state = find_client_state(interrupt_info.deserter_nickname);
+		const auto opponent_player_state = find_client_state(interrupt_info.opponent_nickname);
+		const auto deserter_clan = deserter_player_state ? deserter_player_state->get_clan() : "";
+		const auto opponent_clan = opponent_player_state ? opponent_player_state->get_clan() : "";
 
 		LOG("pushing duel interrupted webhook.");
 
@@ -1347,17 +1392,44 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 		auto reconsidered = vars.webhooks.reconsidered_pic_link;
 
 		push_notification_job(
-			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
-				auto http_client = httplib_utils::make_client(discord_webhook_url);
+			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info, priv_vars, deserter_clan, opponent_clan]() -> std::string {
+				if (discord_webhook_url.valid()) {
+					auto http_client = httplib_utils::make_client(discord_webhook_url);
 
-				auto items = discord_webhooks::form_duel_interrupted(
-					server_name,
-					fled,
-					reconsidered,
-					interrupt_info
-				);
+					auto items = discord_webhooks::form_duel_interrupted(
+						server_name,
+						fled,
+						reconsidered,
+						interrupt_info
+					);
 
-				http_client->Post(discord_webhook_url.location.c_str(), items);
+					http_client->Post(discord_webhook_url.location.c_str(), items);
+				}
+
+				for (auto& c : priv_vars.custom_webhook_urls) {
+					bool clan_matches = false;
+					
+					if (c.clan.empty()) {
+						clan_matches = true;
+					}
+					else {
+						if (c.clan == deserter_clan || c.clan == opponent_clan) {
+							clan_matches = true;
+						}
+					}
+					
+					if (!clan_matches) {
+						LOG("Skipping webhook for clan: %x (duel interrupted between %x and %x)", c.clan, interrupt_info.deserter_nickname, interrupt_info.opponent_nickname);
+						continue;
+					}
+
+					const auto webhook_message = custom_webhooks::message_duel_interrupted(
+						server_name,
+						interrupt_info
+					);
+
+					server_setup::send_custom_webhook(c, webhook_message);
+				}
 
 				return "";
 			}
@@ -1368,8 +1440,11 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 void server_setup::push_match_summary_webhook(const messages::match_summary_message& summary) {
 	finalize_webhook_jobs();
 
-	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
+	
+	if (discord_webhook_url.valid() || !private_vars.custom_webhook_urls.empty()) {
 		auto server_name = get_server_name();
+		auto priv_vars = private_vars;
 
 		const auto mvp_state = find_client_state(summary.mvp_player_id);
 
@@ -1382,21 +1457,66 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 		const auto this_duel_index = (duel_pic_counter - 1) % vars.webhooks.num_duel_pics;
 		auto duel_victory_pic_link = typesafe_sprintf(vars.webhooks.duel_victory_pic_link_pattern, this_duel_index);
 
+		std::unordered_set<std::string> match_player_clans;
+		
+		match_player_clans.insert(mvp_state->get_clan());
+		
+		for (const auto& player : summary.first_faction) {
+			if (auto player_state = find_client_state(player.id)) {
+				match_player_clans.insert(player_state->get_clan());
+			}
+		}
+		
+		for (const auto& player : summary.second_faction) {
+			if (auto player_state = find_client_state(player.id)) {
+				match_player_clans.insert(player_state->get_clan());
+			}
+		}
+
 		LOG("pushing match summary webhook.");
 
 		push_notification_job(
-			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
-				auto client = httplib_utils::make_client(discord_webhook_url);
+			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
+				if (discord_webhook_url.valid()) {
+					auto client = httplib_utils::make_client(discord_webhook_url);
 
-				auto items = discord_webhooks::form_match_summary(
-					server_name,
-					mvp_nickname,
-					mvp_player_avatar_url,
-					duel_victory_pic_link,
-					summary
-				);
+					auto items = discord_webhooks::form_match_summary(
+						server_name,
+						mvp_nickname,
+						mvp_player_avatar_url,
+						duel_victory_pic_link,
+						summary
+					);
 
-				client->Post(discord_webhook_url.location.c_str(), items);
+					client->Post(discord_webhook_url.location.c_str(), items);
+				}
+
+				for (auto& c : priv_vars.custom_webhook_urls) {
+					bool clan_matches = false;
+					
+					if (c.clan.empty()) {
+						clan_matches = true; // No clan filter, send to all
+					}
+					else {
+						// Check if any player's clan matches the webhook's clan
+						if (match_player_clans.find(c.clan) != match_player_clans.end()) {
+							clan_matches = true;
+						}
+					}
+					
+					if (!clan_matches) {
+						LOG("Skipping webhook for clan: %x (match summary)", c.clan);
+						continue;
+					}
+
+					const auto webhook_message = custom_webhooks::message_match_summary(
+						server_name,
+						mvp_nickname,
+						summary
+					);
+
+					server_setup::send_custom_webhook(c, webhook_message);
+				}
 
 				return "";
 			}
@@ -1407,7 +1527,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 void server_setup::push_report_match_webhook(const messages::match_summary_message& summary) {
 	finalize_webhook_jobs();
 
-	auto post_to = [&](const auto& url, const auto& api_key) {
+	auto post_to = [&](const auto& url, const auto& header_apikey) {
 		if (const auto report_webhook_url = parsed_url(url); report_webhook_url.valid()) {
 			const auto server_name = get_server_name();
 
@@ -1430,11 +1550,11 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 			LOG("Match report JSON: %x", json_body);
 
 			push_notification_job(
-				[report_webhook_url, api_key, json_body]() -> std::string {
+				[report_webhook_url, header_apikey, json_body]() -> std::string {
 					auto http_client = httplib_utils::make_client(report_webhook_url, 60 * 3);
 
 					httplib::Headers headers;
-					headers.emplace("apikey", api_key);
+					headers.emplace("apikey", header_apikey);
 
 					auto result = http_client->Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
 
@@ -1465,29 +1585,66 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		}
 
 		for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
-			post_to(aux_endpoint.url, aux_endpoint.api_key);
+			post_to(aux_endpoint.url, aux_endpoint.header_apikey);
 		}
 	}
 }
 
 void server_setup::push_duel_of_honor_webhook(const std::string& first, const std::string& second) {
-	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
+	
+	if (discord_webhook_url.valid() || !private_vars.custom_webhook_urls.empty()) {
 		auto server_name = get_server_name();
+		auto priv_vars = private_vars;
+
+		// Extract player clans before the lambda
+		const auto first_player_state = find_client_state(first);
+		const auto second_player_state = find_client_state(second);
+		const std::string first_clan = first_player_state ? first_player_state->get_clan() : "";
+		const std::string second_clan = second_player_state ? second_player_state->get_clan() : "";
 
 		LOG("pushing duel webhook with %x versus %x", first, second);
 
 		push_notification_job(
-			[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
-				auto client = httplib_utils::make_client(discord_webhook_url);
+			[first, second, discord_webhook_url, server_name, priv_vars, first_clan, second_clan, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+				if (discord_webhook_url.valid()) {
+					auto client = httplib_utils::make_client(discord_webhook_url);
 
-				auto items = discord_webhooks::form_duel_of_honor(
-					server_name,
-					first,
-					second,
-					duel_pic_link
-				);
+					auto items = discord_webhooks::form_duel_of_honor(
+						server_name,
+						first,
+						second,
+						duel_pic_link
+					);
 
-				client->Post(discord_webhook_url.location.c_str(), items);
+					client->Post(discord_webhook_url.location.c_str(), items);
+				}
+
+				for (auto& c : priv_vars.custom_webhook_urls) {
+					bool clan_matches = false;
+					
+					if (c.clan.empty()) {
+						clan_matches = true;
+					}
+					else {
+						if (c.clan == first_clan || c.clan == second_clan) {
+							clan_matches = true;
+						}
+					}
+					
+					if (!clan_matches) {
+						LOG("Skipping webhook for clan: %x (duel between %x and %x)", c.clan, first, second);
+						continue;
+					}
+
+					const auto webhook_message = custom_webhooks::message_duel_of_honor(
+						server_name,
+						first,
+						second
+					);
+
+					server_setup::send_custom_webhook(c, webhook_message);
+				}
 
 				return "";
 			}
@@ -1509,11 +1666,12 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 	client_state->pushed_connected_webhook = true;
 
 	auto connected_player_nickname = client_state->get_nickname();
+	auto connected_player_clan = client_state->get_clan();
 
 	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url);
 
-	if (discord_webhook_url.valid() || telegram_webhook_url.valid()) {
+	if (discord_webhook_url.valid() || telegram_webhook_url.valid() || !private_vars.custom_webhook_urls.empty()) {
 		auto server_name = get_server_name();
 		auto avatar = client_state->meta.avatar.image_bytes;
 		auto all_nicknames = get_all_nicknames();
@@ -1523,7 +1681,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 		push_avatar_job(
 			id,
-			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name]() -> std::string {
 				if (telegram_webhook_url.valid()) {
 					auto telegram_channel_id = priv_vars.telegram_channel_id;
 
@@ -1572,10 +1730,29 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 					}
 				}
 
+				for (auto& c : priv_vars.custom_webhook_urls) {
+					if (!c.clan.empty() && c.clan != connected_player_clan) {
+						LOG("Skipping webhook for clan: %x", c.clan);
+						continue;
+					}
+
+					const auto webhook_message = custom_webhooks::message_player_connected(
+						server_name,
+						connected_player_nickname,
+						all_nicknames,
+						current_arena_name,
+						from_where
+					);
+
+					server_setup::send_custom_webhook(c, webhook_message);
+				}
+
 				return "";
 			}
 		);
 	}
+
+
 }
 
 void server_setup::finalize_webhook_jobs() {
