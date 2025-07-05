@@ -1682,6 +1682,8 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		push_avatar_job(
 			id,
 			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name]() -> std::string {
+				std::string avatar_url = "";
+
 				if (telegram_webhook_url.valid()) {
 					auto telegram_channel_id = priv_vars.telegram_channel_id;
 
@@ -1723,7 +1725,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 					if (response) {
 						LOG_NVPS(response->body);
 
-						return discord_webhooks::find_attachment_url(response->body);
+						avatar_url = discord_webhooks::find_attachment_url(response->body);
 					}
 					else {
 						LOG("Response was null");
@@ -1747,7 +1749,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 					server_setup::send_custom_webhook(c, webhook_message);
 				}
 
-				return "";
+				return avatar_url;
 			}
 		);
 	}
