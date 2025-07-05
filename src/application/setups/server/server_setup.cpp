@@ -2544,11 +2544,11 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.force_short_match = has_web_clients_playing;
 
 	if (!vars.bots) {
-		out.bots_override.set( { 0u, 0u, 0u } );
+		out.bots_override = { {}, 0u, 0u };
 	}
 
-	if (overrides.bots) {
-		out.bots_override.set(*overrides.bots);
+	if (overrides.bots.is_set()) {
+		out.bots_override = overrides.bots;
 	}
 
 	return out;
@@ -2840,6 +2840,10 @@ void server_setup::init_client(const client_id_type& id) {
 }
 
 void server_setup::unset_client(const client_id_type& id) {
+	if (overrides.bots.requester == to_mode_player_id(id)) {
+		overrides.bots = {};
+	}
+
 	if (clients[id].is_set()) {
 		LOG("Client disconnected. Details:\n%x", describe_client(id));
 
@@ -3656,6 +3660,12 @@ void server_setup::handle_client_messages() {
 
 void server_setup::rebroadcast_synced_dynamic_vars() {
 	const auto current_dynamic_vars = make_synced_dynamic_vars();
+
+	if (overrides.bots.requester.is_set()) {
+		if (!get_client_state(overrides.bots.requester).is_set()) {
+			overrides.bots = {};
+		}
+	}
 
 	if (current_dynamic_vars != last_broadcast_dynamic_vars) {
 		LOG(
@@ -4870,7 +4880,7 @@ void server_setup::handle_client_chat_command(
 	if (chat.target == chat_target_type::GENERAL) {
 		if (begins_with(chat.message, "/bots")) {
 			if (chat.message == "/bots" || chat.message == "/bots ") {
-				overrides.bots.reset();
+				overrides.bots = {};
 				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
 			}
 			else {
@@ -4891,33 +4901,13 @@ void server_setup::handle_client_chat_command(
 					broadcast_info("Cannot exceed " + std::to_string(max_bot_quota_v) + " bots.", chat_target_type::INFO_CRITICAL);
 				}
 				else if (first != unsigned(-1)) {
-					get_arena_handle().on_mode_with_input(
-						[&]<typename T>(const T& mode, const auto& in) {
-							if constexpr(std::is_same_v<T, test_mode>) {
+					overrides.bots = {
+						to_mode_player_id(id),
+						uint8_t(first),
+						second == unsigned(-1) ? uint8_t(-1) : uint8_t(second)
+					};
 
-							}
-							else {
-								const auto requested_bots = mode.calc_requested_bots_from_quotas(
-									in,
-									first,
-									second,
-									to_mode_player_id(id)
-								);
-
-								auto total = std::size_t(0);
-								requested_bots.for_each([&](const auto n) { total += n; });
-
-								std::string suff = " (equal teams)";
-
-								if (second != unsigned(-1)) {
-									suff = " (custom teams)";
-								}
-
-								broadcast_info("Total bots now: " + std::to_string(total) + suff, chat_target_type::INFO);
-								overrides.bots = requested_bots;
-							}
-						}
-					);
+					broadcast_info("Bots adjusted.", chat_target_type::INFO);
 				}
 			}
 		}

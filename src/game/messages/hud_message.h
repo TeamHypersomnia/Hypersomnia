@@ -60,6 +60,10 @@ namespace messages {
 
 	struct match_summary_ended {
 		bool is_final = false;
+
+		bool factions_swapped() const {
+			return !is_final;
+		}
 	};
 
 	struct match_summary_message {

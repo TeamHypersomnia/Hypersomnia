@@ -78,7 +78,7 @@ struct client_requested_chat;
 class webrtc_server_detail;
 
 struct server_var_temp_overrides {
-	std::optional<per_actual_faction<uint8_t>> bots;
+	bots_request bots;
 };
 
 class server_setup : 

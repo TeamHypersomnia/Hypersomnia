@@ -2259,6 +2259,10 @@ arena_migrated_session arena_mode::emigrate() const {
 	arena_migrated_session session;
 
 	for (const auto& emigrated_player : players) {
+		if (emigrated_player.second.is_bot) {
+			continue;
+		}
+
 		arena_migrated_player_entry entry;
 		entry.mode_id = emigrated_player.first;
 		entry.data = emigrated_player.second.session;
@@ -2780,8 +2784,15 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 }
 
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
-	if (in.dynamic_vars.bots_override.is_enabled) {
-		return verify_max_quota(in.dynamic_vars.bots_override.value);
+	const auto& over = in.dynamic_vars.bots_override;
+
+	if (over.is_set()) {
+		return calc_requested_bots_from_quotas(
+			in,
+			over.first,
+			over.second,
+			over.requester
+		);
 	}
 
 	return calc_requested_bots_from_quotas(

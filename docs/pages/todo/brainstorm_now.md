@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- refactor arena mode so match and round state is in its own structs properly
+
 - remaining bot spawning logic
 	- take control of alive bot
 		- also when joining a team, dont just annihilate existing bot
