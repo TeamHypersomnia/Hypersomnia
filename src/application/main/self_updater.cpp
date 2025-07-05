@@ -505,12 +505,6 @@ self_update_result check_and_apply_updates(
 		const auto version_info_string = [&]() {
 			const auto current_version = hypersomnia_version().get_version_string();
 
-			int major = 0;
-			int minor = 0;
-			int commit = 0;
-
-			typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
-
 			text(current_version);
 			ImGui::SameLine();
 
@@ -528,10 +522,7 @@ self_update_result check_and_apply_updates(
 			text(new_version);
 			ImGui::SameLine();
 
-			const auto num_revs = std::abs(static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number));
-			const auto revision_str = num_revs == 1 ? "revision" : "revisions";
-
-			return typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str);
+			return typesafe_sprintf("\n\n");
 		}();
 
 		text_disabled(version_info_string);

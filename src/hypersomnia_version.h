@@ -17,7 +17,7 @@ using game_version_identifier = augs::constant_size_string<20>;
 struct hypersomnia_version {
 	hypersomnia_version();
 	// GEN INTROSPECTOR struct hypersomnia_version
-	unsigned commit_number;
+	std::string commit_tag;
 	std::string commit_message;
 	std::string commit_date;
 	std::string commit_hash;

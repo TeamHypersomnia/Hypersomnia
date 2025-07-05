@@ -8,9 +8,16 @@ if [ -f "$EXE_PATH" ]; then
 	echo "Executable exists. Generating archives."
 
 	COMMIT_HASH=$(git rev-parse HEAD)
-	COMMIT_NUMBER=$(git rev-list --count master)
 	COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-	VERSION="1.2.$COMMIT_NUMBER"
+	
+	GIT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null || echo "")
+	
+	if [ ! -z "$GIT_TAG" ] && [[ ! "$GIT_TAG" =~ fatal ]]; then
+		VERSION="$GIT_TAG"
+	else
+		VERSION="0.0.0"
+	fi
+	
 	RELEASE_NOTES_FILENAME="release_notes.txt"
 
 	pushd hypersomnia

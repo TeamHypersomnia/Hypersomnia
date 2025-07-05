@@ -47,9 +47,16 @@ Write-Host "Archiving the binary." -ForegroundColor yellow
 $stem = "Hypersomnia-for-Windows"
 $filePath = "$stem.exe"
 $commitHash = $(git rev-parse HEAD)
-$commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
-$version = "1.2.$commitNumber"
+
+$gitTag = $(git describe --exact-match --tags HEAD 2>$null) | Out-String
+$gitTag = $gitTag.Trim()
+
+if ($gitTag -and -not $gitTag.Contains("fatal")) {
+	$version = $gitTag
+} else {
+	$version = "0.0.0"
+}
 
 Get-ChildItem
 

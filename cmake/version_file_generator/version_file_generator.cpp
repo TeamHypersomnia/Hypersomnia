@@ -54,7 +54,16 @@ int main(int argc, char** argv) {
 
 	debug_argv_content += "\n";
 
-	const auto git_commit_number = augs::exec(git_executable_path.string() + " rev-list --count master");
+	const auto git_tag = augs::exec(git_executable_path.string() + " describe --exact-match --tags HEAD 2>/dev/null || echo \"\"");
+	
+	std::string version_string;
+
+	if (!git_tag.empty() && git_tag.find("fatal") == std::string::npos) {
+		version_string = git_tag;
+	}
+	else {
+		version_string = "0.0.0";
+	}
 	
 	auto git_commit_message = augs::exec(git_executable_path.string() + " log -1 --format=%s");
 	// We shall add the backslash both before \ and " to avoid compilation errors
@@ -79,7 +88,7 @@ int main(int argc, char** argv) {
 		"[disabled]",//augs::date_time().get_timestamp(),
 		argc,
 		debug_argv_content,
-		git_commit_number,
+		version_string,
 		git_commit_message,
 		git_commit_date,
 		git_commit_hash,

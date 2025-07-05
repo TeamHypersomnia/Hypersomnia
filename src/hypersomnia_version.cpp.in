@@ -11,7 +11,7 @@
 #include "augs/string/typesafe_sscanf.h"
 
 hypersomnia_version::hypersomnia_version() :
-	commit_number(%x),
+	commit_tag("%x"),
 	commit_message("%x"),
 	commit_date("%x"),
 	commit_hash("%x"),
@@ -23,25 +23,22 @@ hypersomnia_version::hypersomnia_version() :
 std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
 		"Hypersomnia version %x\n"
-		"Revision no.: %x %x\n"
 		"Build date: %x\n"
 		"Commit message:\n%x\n",
 		get_version_string(),
-		commit_number ? std::to_string(commit_number) : "Unknown",
-		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 		commit_date,
 		commit_message.size() < 30 ? commit_message : commit_message.substr(0, 30) + "(...)"
 	);
 }
 
 std::string hypersomnia_version::get_version_string() const {
-	return typesafe_sprintf("1.2.%x", commit_number);
+	return commit_tag;
 }
 
 #else
 
 hypersomnia_version::hypersomnia_version() :
-	commit_number(0),
+	commit_tag(""),
 	commit_message("Unknown"),
 	commit_date("Unknown"),
 	commit_hash("Unknown"),
