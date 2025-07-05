@@ -243,13 +243,13 @@ namespace custom_webhooks {
 			return typesafe_sprintf("Now playing `%x` with:", current_map);
 		}();
 			
-		auto result = typesafe_sprintf("### `%x`\n%x\n%x", server_name, connected_notice, now_playing_notice);
+		auto result = typesafe_sprintf("### `%x`\n%x  \n%x  ", server_name, connected_notice, now_playing_notice);
 
 		if (num_others > 1) {
 			std::string footer_content;
 
 			for (const auto& p : other_players) {
-				footer_content += "**" + matrix_escaped_nick(p) + "**\n";
+				footer_content += "**" + matrix_escaped_nick(p) + "**  \n";
 			}
 
 			if (footer_content.size() > 0) {
@@ -366,7 +366,7 @@ namespace custom_webhooks {
 		total_description += make_team_members(summary.second_faction);
 		total_description += "</pre></code>";
 
-		auto result = typesafe_sprintf("### `%x`\n**%x**\n%x", server_name, summary_notice, total_description);
+		auto result = typesafe_sprintf("### `%x`\n**%x**  \n%x", server_name, summary_notice, total_description);
 
 		return result;
 	}
