@@ -77,6 +77,8 @@ if(UNIX)
 		message("Building for x64 architecture.")
 	elseif(${ARCHITECTURE} STREQUAL "native")
 		message("Building for native architecture.")
+	elseif(${ARCHITECTURE} STREQUAL "ARM64")
+		message("Building for ARM64 architecture.")
 	elseif(${ARCHITECTURE} STREQUAL "Web")
 		message("Building for Web.")
 		set(BUILD_FOR_WEB ON)
@@ -1159,6 +1161,11 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
 
+	if(${ARCHITECTURE} STREQUAL "ARM64")
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -ffp-contract=off -ffp-model=strict")
+		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-contract=off -ffp-model=strict")
+	endif()
+
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${XCLANG_STR} -fno-threadsafe-statics")
 
 	message("-O0 will be specified for Debug build.")
@@ -1173,7 +1180,11 @@ endif()
 
 if(CLANG)
 	if(NOT MSVC)
-		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra -Wcast-align -Wover-aligned")
+		if(${ARCHITECTURE} STREQUAL "ARM64")
+			set(CHOSEN_WARNINGS "-Wall -Wextra -Wcast-align -Wover-aligned")
+		else()
+			set(CHOSEN_WARNINGS "-Wall -Werror -Wextra -Wcast-align -Wover-aligned")
+		endif()
 	endif()
 
 	if (BUILD_FOR_WEB)
@@ -1522,6 +1533,10 @@ if(BUILD_FOR_WEB)
 	endif()
 endif()
 
+if(${ARCHITECTURE} STREQUAL "ARM64")
+	add_definitions(-DPLATFORM_ARM64=1)
+endif()
+
 add_definitions(-DYOJIMBO_WITH_MBEDTLS=0)
 
 # Additionally, we mark Release as the production build.
@@ -1667,6 +1682,13 @@ set(BLAKE3_SRC
     ${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
     ${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
     ${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
+)
+ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
+set(BLAKE3_SRC
+    ${BLAKE3_PATH}/blake3.c
+    ${BLAKE3_PATH}/blake3_portable.c
+    ${BLAKE3_PATH}/blake3_dispatch.c
+    ${BLAKE3_PATH}/blake3_neon.c
 )
 ELSE()
 set(BLAKE3_SRC
