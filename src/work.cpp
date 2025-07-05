@@ -559,7 +559,7 @@ work_result work(
 
 	WEBSTATIC const auto canon_config_path = augs::path_type("default_config.json");
 	WEBSTATIC const auto legacy_local_config_path = USER_DIR / "config.json";
-	WEBSTATIC const auto runtime_prefs_path       = USER_DIR / "runtime-prefs.json";
+	WEBSTATIC const auto runtime_prefs_path       = USER_DIR / "runtime_prefs.json";
 
 	LOG("Loading %x.", canon_config_path);
 

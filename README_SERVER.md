@@ -160,7 +160,7 @@ A good start would be:
 
 You can put any number of files in the `conf.d` folder - they will be applied in lexicographic (natural) order.
 
-The files in ``conf.d/`` are *never* modified and will *always* override changes to configuration done at runtime. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/config.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON).
+The files in ``conf.d/`` are *never* modified. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/runtime_prefs.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON). **It will override** the changes in ``conf.d``.
 
 To be able to access the administration panel of your server, make sure to setup ``master_rcon_password`` - . Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
@@ -169,9 +169,9 @@ If you have a Discord server, you might want to setup a [Webhook](https://suppor
 ## Config loading order:
 
 1) ``default_config.json``, comes with the game.
-2) ``~/.config/Hypersomnia/user/config.json``, if any.
-3) All configs inside ``~/.config/Hypersomnia/user/conf.d/``, in lexicographical order, if any.
+2) All configs inside ``~/.config/Hypersomnia/user/conf.d/``, in lexicographical order, if any.
     - This means that if the vars you later tweak from the administration panel are already specified in ``conf.d/``, *they will be overridden every time the server starts.*
+3) ``~/.config/Hypersomnia/user/runtime_prefs.json``, if any.
 4) Config specified by ``--apply-config`` flag, if any.
 
 ## Ports
@@ -281,8 +281,8 @@ nohup ./Hypersomnia-Headless.AppImage --apply-config ./some_config.json --appdat
 
 will read:
 
-- ``./servers/1/user/config.json``
 - ``./servers/1/user/conf.d/``
+- ``./servers/1/user/runtime_prefs.json``
 - ``./some_config.json``
 
 In this order.

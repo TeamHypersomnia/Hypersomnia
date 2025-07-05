@@ -222,7 +222,7 @@ function resizeCanvas() {
   canvas.height = displayHeight;
 }
 
-const user_config_path = 'user/config.json';
+const user_config_path = 'user/runtime_prefs.json';
 
 function init_config_cg() {
   const fileContent = window.CrazyGames.SDK.data.getItem('config.json');
