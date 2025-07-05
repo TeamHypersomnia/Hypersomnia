@@ -208,6 +208,7 @@ option(BUILD_TEST_SCENES "Build built-in official content (legacy flag - should 
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ON)
 
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
+option(USE_SYSTEM_OPENAL "Use system OpenAL library instead of building it." OFF)
 
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
@@ -1602,34 +1603,43 @@ configure_msvc_runtime()
 include(add_include_dirs_of)
 
 if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
-	# We build OpenAL Soft. We need to set some variables beforehand.
-	
-	set(LIBTYPE "STATIC")
-	set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
-	
-	# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+	if(USE_SYSTEM_OPENAL)
+		message("Looking for system OpenAL")
+		find_package(OpenAL REQUIRED)
 
-	add_definitions(-DAL_LIBTYPE_STATIC)
+		if (OPENAL_FOUND)
+			message("Found the system OpenAL at: ${OPENAL_LIBRARY}")
+		endif()
+	else()
+		# We build OpenAL Soft. We need to set some variables beforehand.
 
-	set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
-	set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
-	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
+		set(LIBTYPE "STATIC")
+		set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
 
-	if(CLANG AND NOT MSVC)
-		string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+
+		add_definitions(-DAL_LIBTYPE_STATIC)
+
+		set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
+		set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
+		set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
+
+		if(CLANG AND NOT MSVC)
+			string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		endif()
+
+		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
+
+		if(CLANG AND NOT MSVC)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+		endif()
+
+		if(ADD_MCMODEL_LARGE_FLAG)
+			target_compile_options(OpenAL PUBLIC -mcmodel=large -no-pie)
+		endif()
+
+		add_include_dirs_of("OpenAL")
 	endif()
-
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
-
-	if(CLANG AND NOT MSVC)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-	endif()
-
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(OpenAL PUBLIC -mcmodel=large -no-pie)
-	endif()
-
-	add_include_dirs_of("OpenAL")
 endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/streflop")
