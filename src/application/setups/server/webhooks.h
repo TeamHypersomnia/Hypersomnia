@@ -104,6 +104,35 @@ namespace discord_webhooks {
 
 }
 
+inline std::string matrix_escaped_nick(const std::string& n, bool also_discord = true) {
+	std::string result;
+
+	for (auto c : n) {
+		if (c == '\\' || c == '/') {
+			result += '|';
+			continue;
+		}
+
+		if (c == '<') {
+			result += '{';
+			continue;
+		}
+
+		if (c == '>') {
+			result += '}';
+			continue;
+		}
+
+		result += c;
+	}
+
+	if (also_discord) {
+		return discord_webhooks::escaped_nick(result);
+	}
+
+	return result;
+}
+
 namespace telegram_webhooks {
 	inline std::string escaped_nick(const std::string& n) {
 		std::string result;
@@ -197,11 +226,9 @@ namespace custom_webhooks {
 		const std::string& current_map,
 		const std::string& from_where
 	) {
-		using discord_webhooks::escaped_nick;
-
 		erase_element(other_players, connected_player);
 
-		const auto connected_notice = typesafe_sprintf("**%x** connected%x.", escaped_nick(connected_player), from_where);
+		const auto connected_notice = typesafe_sprintf("**%x** connected%x.", matrix_escaped_nick(connected_player), from_where);
 		const auto num_others = other_players.size();
 
 		const auto now_playing_notice = [&]() {
@@ -210,7 +237,7 @@ namespace custom_webhooks {
 			}
 
 			if (num_others == 1) {
-				return typesafe_sprintf("Now playing `%x` with **%x**.", current_map, escaped_nick(other_players[0]));
+				return typesafe_sprintf("Now playing `%x` with **%x**.", current_map, matrix_escaped_nick(other_players[0]));
 			}
 
 			return typesafe_sprintf("Now playing `%x` with:", current_map);
@@ -222,7 +249,7 @@ namespace custom_webhooks {
 			std::string footer_content;
 
 			for (const auto& p : other_players) {
-				footer_content += "**" + escaped_nick(p) + "**\n";
+				footer_content += "**" + matrix_escaped_nick(p) + "**\n";
 			}
 
 			if (footer_content.size() > 0) {
@@ -240,9 +267,7 @@ namespace custom_webhooks {
 		const std::string& first_player,
 		const std::string& second_player
 	) {
-		using discord_webhooks::escaped_nick;
-
-		const auto duel_notice = typesafe_sprintf("**%x** and **%x** have agreed to a duel of honor.", escaped_nick(first_player), escaped_nick(second_player));
+		const auto duel_notice = typesafe_sprintf("**%x** and **%x** have agreed to a duel of honor.", matrix_escaped_nick(first_player), matrix_escaped_nick(second_player));
 		
 		auto result = typesafe_sprintf("### `%x`\n%x", server_name, duel_notice);
 
@@ -254,8 +279,6 @@ namespace custom_webhooks {
 		const std::string& mvp_nickname,
 		const messages::match_summary_message& summary
 	) {
-		using discord_webhooks::escaped_nick;
-
 		const bool was_mvp_alone = summary.first_faction.size() == 1;
 		const int num_against_mvp = summary.second_faction.size();
 		const bool is_duel = was_mvp_alone && num_against_mvp == 1;
@@ -310,7 +333,7 @@ namespace custom_webhooks {
 
 		const auto mvp_notice = mvp_notice_suffix == "" ? "They stand on equal ground." : typesafe_sprintf(
 			"**%x** %x",
-			escaped_nick(mvp_nickname),
+			matrix_escaped_nick(mvp_nickname),
 			mvp_notice_suffix
 		);
 
@@ -328,20 +351,20 @@ namespace custom_webhooks {
 		const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
 
 		auto make_team_members = [&](const auto& members) {
-			return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
+			return webhooks_common::make_team_members(members, [](auto s) { return matrix_escaped_nick(s, false); }, nick_col_width);
 		};
 
 		std::string total_description;
 		total_description += mvp_notice;
 		total_description += "\n\n";
 		total_description += "**" + first_team_name + "**\n";
-		total_description += "```\n";
+		total_description += "<pre><code>";
 		total_description += make_team_members(summary.first_faction);
-		total_description += "\n```\n\n";
+		total_description += "</pre></code>\n\n";
 		total_description += "**" + second_team_name + "**\n";
-		total_description += "```\n";
+		total_description += "<pre><code>";
 		total_description += make_team_members(summary.second_faction);
-		total_description += "\n```";
+		total_description += "</pre></code>";
 
 		auto result = typesafe_sprintf("### `%x`\n**%x**\n%x", server_name, summary_notice, total_description);
 
