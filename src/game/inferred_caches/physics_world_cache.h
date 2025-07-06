@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/propagate_const.h"
