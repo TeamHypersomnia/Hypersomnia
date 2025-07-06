@@ -1482,9 +1482,10 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 
 		const auto arena_name = get_current_arena_name();
 		const auto game_mode_name = get_current_game_mode_name();
+		const auto external_addr = external_address != std::nullopt ? ::ToString(*external_address) : std::string("");
 
 		push_notification_job(
-			[arena_name, game_mode_name, discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
+			[arena_name, game_mode_name, discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans, external_addr]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1522,7 +1523,8 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 						mvp_nickname,
 						summary,
 						arena_name,
-						game_mode_name
+						game_mode_name,
+						external_addr
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);

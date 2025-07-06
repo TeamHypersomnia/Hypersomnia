@@ -308,7 +308,8 @@ namespace custom_webhooks {
 		const std::string& mvp_nickname,
 		const messages::match_summary_message& summary,
 		const std::string& current_map,
-		const std::string& current_game_mode
+		const std::string& current_game_mode,
+		const std::string& external_addr
 	) {
 		const bool was_mvp_alone = summary.first_faction.size() == 1;
 		const int num_against_mvp = summary.second_faction.size();
@@ -316,7 +317,11 @@ namespace custom_webhooks {
 
 		const auto summary_notice = [&]() -> std::string {
 			if (summary.was_ffa) {
-				return "Free for-all ended.";
+				if (is_duel) {
+					return "Duel has concluded.";
+				}
+
+				return "Free-for-all ended.";
 			}
 
 			const auto preffix = is_duel ? "Duel" : "Match";
@@ -338,6 +343,9 @@ namespace custom_webhooks {
 
 		const auto mvp_notice_suffix = [&]() -> std::string {
 			if (summary.was_ffa) {
+				if (is_duel) {
+					return "has upheld his honor.";
+				}
 				return "was the strongest of them all.";
 			}
 
@@ -430,6 +438,12 @@ namespace custom_webhooks {
 		}
 
 		auto result = typesafe_sprintf("### `%x - %x (%x)`\n**%x**  \n%x", current_map, current_game_mode, server_name, summary_notice, total_description);
+
+		if (!external_addr.empty()) {
+			result += "\n\n";
+			result += "[Join via Web](" + ::get_browser_join_link(external_addr) + ") or _Steam_:  \n";
+			result += "<pre><code>" + ::get_steam_join_link(external_addr) + "</pre></code>";
+		}
 
 		return result;
 	}
@@ -753,6 +767,10 @@ namespace discord_webhooks {
 
 			const auto summary_notice = [&]() -> std::string {
 				if (info.was_ffa) {
+					if (is_duel) {
+						return "Duel has concluded.";
+					}
+
 					return "Free-for-all ended.";
 				}
 
@@ -775,6 +793,10 @@ namespace discord_webhooks {
 
 			const auto mvp_notice_suffix = [&]() -> std::string {
 				if (info.was_ffa) {
+					if (is_duel) {
+						return "has upheld his honor.";
+					}
+
 					return "was the strongest of them all.";
 				}
 
