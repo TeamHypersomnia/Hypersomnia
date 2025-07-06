@@ -4403,28 +4403,28 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 			author_clan = client_state->get_clan();
 		}
 
-		if (!author_clan.empty()) {
-			const auto webhooks = private_vars.custom_webhook_urls;
+		const auto webhooks = private_vars.custom_webhook_urls;
 
-			const auto webhook_message = custom_webhooks::message_chat(
-				sender_player_nickname,
-				payload.message
-			);
+		const auto webhook_message = custom_webhooks::message_chat(
+			sender_player_nickname,
+			payload.message
+		);
 
-			push_notification_job(
-				[webhooks, author_clan, webhook_message]() -> std::string {
-					for (auto& c : webhooks) {
+		push_notification_job(
+			[webhooks, author_clan, webhook_message]() -> std::string {
+				for (auto& c : webhooks) {
+					if (!c.clan.empty()) {
 						if (c.clan != author_clan) {
 							continue;
 						}
-
-						server_setup::send_custom_webhook(c, webhook_message);
 					}
 
-					return "";
+					server_setup::send_custom_webhook(c, webhook_message);
 				}
-			);
-		}
+
+				return "";
+			}
+		);
 	}
 }
 
