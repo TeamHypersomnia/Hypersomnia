@@ -25,35 +25,35 @@ Forever free and open-source :heart:
 
 <a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
 
-<h3><a href="https://t.me/hypersomnia_io">Official Telegram channel (RU)<br/><br/><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" height=100></a></h3>
+<h3><a href="https://t.me/hypersomnia_io">Official Telegram channel (RU)<br/><br/><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width=100></a></h3>
 
 # Get it on Steam!
 
-<a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" height=140 hspace=1> </a>
+<a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=140 hspace=1> </a>
 
 # Download the game
 
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" height=70 hspace=1> </a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a>
 <br undefined>
 
 Only 29 MB!
 
 The game will start with an **interactive Tutorial!**
 
-Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" height=25 hspace=5 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)
+Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=25 hspace=8 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)
 
-Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" height=25 hspace=1 vspace=20><b>Server AppImage</b></a>
+Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=30 hspace=5 vspace=15><b>Server AppImage</b></a>
 
 *All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 <br undefined>
 
 # Press
 
-<h3><a href="https://mastodon.social/@gamingonlinux/112609228144158828"> <img src="https://github.com/user-attachments/assets/636af823-a54e-4d1a-9974-d2903e0ecf22" height=50> Liam @ GamingOnLinux</a></h3>
+<h3><a href="https://mastodon.social/@gamingonlinux/112609228144158828"> <img src="https://github.com/user-attachments/assets/636af823-a54e-4d1a-9974-d2903e0ecf22" width=50> Liam @ GamingOnLinux</a></h3>
 
-<h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" height=50> <b>GitHub Blog</b> </a></h3>
+<h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" width=50> <b>GitHub Blog</b> </a></h3>
 
 <a href="https://pubhtml5.com/mxdt/dbwn/Linux_USA_10.2023_downmagaz.net/89"> <img src="https://upload.wikimedia.org/wikipedia/en/0/05/Linux_Magazine_international_logo.png" alt="Issue 275, page 89"> </a>
 
