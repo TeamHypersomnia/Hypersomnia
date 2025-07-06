@@ -1,4 +1,5 @@
 #pragma once
+#include <cstring>
 #include <unordered_map>
 #include "augs/templates/hash_templates.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"

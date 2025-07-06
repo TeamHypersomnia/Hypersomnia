@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cstring>
 #include <iterator>
 #include <new>
 #include <utility>
