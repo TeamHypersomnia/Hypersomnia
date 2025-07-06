@@ -1391,9 +1391,10 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 		auto fled = vars.webhooks.fled_pic_link;
 		auto reconsidered = vars.webhooks.reconsidered_pic_link;
 		const auto arena_name = get_current_arena_name();
+		const auto game_mode_name = get_current_game_mode_name();
 
 		push_notification_job(
-			[arena_name, discord_webhook_url, server_name, fled, reconsidered, interrupt_info, priv_vars, deserter_clan, opponent_clan]() -> std::string {
+			[arena_name, game_mode_name, discord_webhook_url, server_name, fled, reconsidered, interrupt_info, priv_vars, deserter_clan, opponent_clan]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto http_client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1427,7 +1428,8 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 					const auto webhook_message = custom_webhooks::message_duel_interrupted(
 						server_name,
 						interrupt_info,
-						arena_name
+						arena_name,
+						game_mode_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1479,9 +1481,10 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 		LOG("pushing match summary webhook.");
 
 		const auto arena_name = get_current_arena_name();
+		const auto game_mode_name = get_current_game_mode_name();
 
 		push_notification_job(
-			[arena_name, discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
+			[arena_name, game_mode_name, discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary, priv_vars, match_player_clans]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1518,7 +1521,8 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 						server_name,
 						mvp_nickname,
 						summary,
-						arena_name
+						arena_name,
+						game_mode_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1612,9 +1616,10 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 		LOG("pushing duel webhook with %x versus %x", first, second);
 
 		const auto arena_name = get_current_arena_name();
+		const auto game_mode_name = get_current_game_mode_name();
 
 		push_notification_job(
-			[arena_name, first, second, discord_webhook_url, server_name, priv_vars, first_clan, second_clan, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+			[arena_name, game_mode_name, first, second, discord_webhook_url, server_name, priv_vars, first_clan, second_clan, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
 				if (discord_webhook_url.valid()) {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
@@ -1649,7 +1654,8 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 						server_name,
 						first,
 						second,
-						arena_name
+						arena_name,
+						game_mode_name
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1685,12 +1691,14 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		auto avatar = client_state->meta.avatar.image_bytes;
 		auto all_nicknames = get_all_nicknames();
 		auto current_arena_name = get_current_arena_name();
+		auto game_mode = get_current_game_mode_name();
+
 		auto priv_vars = private_vars;
 		const std::string from_where = find_client_state(id) ? find_client_state(id)->from_where() : std::string();
 
 		push_avatar_job(
 			id,
-			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name]() -> std::string {
+			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name, game_mode]() -> std::string {
 				std::string avatar_url = "";
 
 				if (telegram_webhook_url.valid()) {
@@ -1752,6 +1760,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 						connected_player_nickname,
 						all_nicknames,
 						current_arena_name,
+						game_mode,
 						from_where
 					);
 

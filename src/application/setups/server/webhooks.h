@@ -224,6 +224,7 @@ namespace custom_webhooks {
 		const std::string& connected_player,
 		std::vector<std::string> other_players,
 		const std::string& current_map,
+		const std::string& current_game_mode,
 		const std::string& from_where
 	) {
 		erase_element(other_players, connected_player);
@@ -243,7 +244,7 @@ namespace custom_webhooks {
 			return typesafe_sprintf("Now playing with:");
 		}();
 			
-		auto result = typesafe_sprintf("### `%x: %x`\n%x  \n%x  ", current_map, server_name, connected_notice, now_playing_notice);
+		auto result = typesafe_sprintf("### `%x - %x (%x)`\n%x  \n%x  ", current_map, current_game_mode, server_name, connected_notice, now_playing_notice);
 
 		if (num_others > 1) {
 			std::string footer_content;
@@ -266,11 +267,12 @@ namespace custom_webhooks {
 		const std::string& server_name,
 		const std::string& first_player,
 		const std::string& second_player,
-		const std::string& current_map
+		const std::string& current_map,
+		const std::string& current_game_mode
 	) {
 		const auto duel_notice = typesafe_sprintf("**%x** and **%x** have agreed to a duel of honor.", matrix_escaped_nick(first_player), matrix_escaped_nick(second_player));
 		
-		auto result = typesafe_sprintf("### `%x: %x`\n%x", current_map, server_name, duel_notice);
+		auto result = typesafe_sprintf("### `%x - %x (%x)`\n%x", current_map, current_game_mode, server_name, duel_notice);
 
 		return result;
 	}
@@ -279,13 +281,18 @@ namespace custom_webhooks {
 		const std::string& server_name,
 		const std::string& mvp_nickname,
 		const messages::match_summary_message& summary,
-		const std::string& current_map
+		const std::string& current_map,
+		const std::string& current_game_mode
 	) {
 		const bool was_mvp_alone = summary.first_faction.size() == 1;
 		const int num_against_mvp = summary.second_faction.size();
 		const bool is_duel = was_mvp_alone && num_against_mvp == 1;
 
-		const auto summary_notice = [&]() {
+		const auto summary_notice = [&]() -> std::string {
+			if (summary.was_ffa) {
+				return "Free-for-all ended.";
+			}
+
 			const auto preffix = is_duel ? "Duel" : "Match";
 
 			if (summary.is_tie()) {
@@ -396,7 +403,7 @@ namespace custom_webhooks {
 			total_description += "</pre></code>";
 		}
 
-		auto result = typesafe_sprintf("### `%x: %x`\n**%x**  \n%x", current_map, server_name, summary_notice, total_description);
+		auto result = typesafe_sprintf("### `%x - %x (%x)`\n**%x**  \n%x", current_map, current_game_mode, server_name, summary_notice, total_description);
 
 		return result;
 	}
@@ -404,7 +411,8 @@ namespace custom_webhooks {
 	inline std::string message_duel_interrupted(
 		const std::string& server_name,
 		const messages::duel_interrupted_message& info,
-		const std::string& current_map
+		const std::string& current_map,
+		const std::string& current_game_mode
 	) {
 		using discord_webhooks::escaped_nick;
 
@@ -443,7 +451,7 @@ namespace custom_webhooks {
 			);
 		}();
 
-		auto result = typesafe_sprintf("### `%x - %x`\n**%x**\n%x", current_map, server_name, result_notice, detail_notice);
+		auto result = typesafe_sprintf("### `%x - %x (%x)`\n**%x**\n%x", current_map, current_game_mode, server_name, result_notice, detail_notice);
 
 		return result;
 	}
@@ -723,7 +731,11 @@ namespace discord_webhooks {
 			const bool is_duel = was_mvp_alone && num_against_mvp == 1;
 			const bool is_duel_victory = is_duel && !info.is_tie();
 
-			const auto summary_notice = [&]() {
+			const auto summary_notice = [&]() -> std::string {
+				if (info.was_ffa) {
+					return "Free-for-all ended.";
+				}
+
 				const auto preffix = is_duel ? "Duel" : "Match";
 
 				if (info.is_tie()) {
