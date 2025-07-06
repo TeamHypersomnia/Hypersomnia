@@ -23,7 +23,8 @@ std::unordered_map<std::string, lat_long> server_locations = {
     {"us-central", { 41.8781, -87.6298 }},// Chicago, USA
     {"pl", { 52.2297, 21.0122 }},         // Warsaw, Poland
     {"ch", { 47.3769, 8.5417 }},          // Zurich, Switzerland
-    {"nl", { 50.8746, 6.0580 }}           // Eygelshoven, Netherlands
+    {"nl", { 50.8746, 6.0580 }},           // Eygelshoven, Netherlands
+    {"fi", { 60.1695, 24.9354 }}          // Helsinki, Finland
 };
 
 // Function to convert degrees to radians

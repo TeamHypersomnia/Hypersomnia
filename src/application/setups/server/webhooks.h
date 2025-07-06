@@ -73,6 +73,21 @@ namespace webhooks_common {
 
 		return output;
 	}
+
+	inline std::string code_escaped_nick(const std::string& n) {
+		std::string result;
+
+		for (auto c : n) {
+			if (c == '`') {
+				result += "'";
+				continue;
+			}
+
+			result += c;
+		}
+
+		return result;
+	}
 }
 
 namespace discord_webhooks {
@@ -301,7 +316,7 @@ namespace custom_webhooks {
 
 		const auto summary_notice = [&]() -> std::string {
 			if (summary.was_ffa) {
-				return "Free-for-all ended.";
+				return "Free for-all ended.";
 			}
 
 			const auto preffix = is_duel ? "Duel" : "Match";
@@ -466,6 +481,14 @@ namespace custom_webhooks {
 
 		return result;
 	}
+
+	inline std::string message_chat(
+		const std::string& author,
+		const std::string& message
+	) {
+		using webhooks_common::code_escaped_nick;
+		return typesafe_sprintf("`%x: %x`", code_escaped_nick(author), code_escaped_nick(message));
+	}
 }
 
 namespace discord_webhooks {
@@ -496,21 +519,6 @@ namespace discord_webhooks {
 		}
 
 		return "";
-	}
-
-	inline std::string code_escaped_nick(const std::string& n) {
-		std::string result;
-
-		for (auto c : n) {
-			if (c == '`') {
-				result += "'";
-				continue;
-			}
-
-			result += c;
-		}
-
-		return result;
 	}
 
 	inline httplib::MultipartFormDataItems form_error_report(
@@ -571,6 +579,7 @@ namespace discord_webhooks {
 		const auto payload = [&]()
 		{
 			using namespace rapidjson;
+			using webhooks_common::code_escaped_nick;
 
 			const auto embed_color = 16763904;
 

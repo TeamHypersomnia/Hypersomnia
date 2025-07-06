@@ -4393,6 +4393,37 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 	if (is_dedicated() || integrated_received) {
 		LOG("Server: %x", new_entry.to_string());
 	}
+
+	if (payload.target == chat_target_type::GENERAL && !sender_player_nickname.empty()) {
+		std::string author_clan;
+
+		if (const auto client_state = find_client_state(payload.author)) {
+			author_clan = client_state->get_clan();
+		}
+
+		if (!author_clan.empty()) {
+			const auto webhooks = private_vars.custom_webhook_urls;
+
+			const auto webhook_message = custom_webhooks::message_chat(
+				sender_player_nickname,
+				payload.message
+			);
+
+			push_notification_job(
+				[webhooks, author_clan, webhook_message]() -> std::string {
+					for (auto& c : webhooks) {
+						if (c.clan != author_clan) {
+							continue;
+						}
+
+						server_setup::send_custom_webhook(c, webhook_message);
+					}
+
+					return "";
+				}
+			);
+		}
+	}
 }
 
 message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type& id, const std::string& reason) {
