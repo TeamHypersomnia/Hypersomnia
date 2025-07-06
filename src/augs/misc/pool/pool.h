@@ -1,4 +1,5 @@
 #pragma once
+#include <cstring>
 #include <optional>
 
 #if !IS_PRODUCTION_BUILD
