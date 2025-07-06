@@ -304,6 +304,10 @@ namespace custom_webhooks {
 		}();
 
 		const auto mvp_notice_suffix = [&]() -> std::string {
+			if (summary.was_ffa) {
+				return "was the strongest of them all.";
+			}
+
 			if (summary.is_tie()) {
 				if (was_mvp_alone) {
 					if (num_against_mvp > 1) {
@@ -339,34 +343,58 @@ namespace custom_webhooks {
 			mvp_notice_suffix
 		);
 
-		const auto first_team_name = std::string(summary.is_tie() ? "First team:" : "Winning team:");
-		const auto second_team_name = std::string(summary.is_tie() ? "Second team:" : "Losing team:");
-
-		const auto longest_nick_len = std::max(
-			webhooks_common::get_longest_nickname_length(summary.first_faction),
-			webhooks_common::get_longest_nickname_length(summary.second_faction)
-		);
-
-		std::size_t nick_stat_padding = 8;
-		std::size_t min_nick_col_width = 20;
-
-		const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
-
-		auto make_team_members = [&](const auto& members) {
-			return webhooks_common::make_team_members(members, [](auto s) { return matrix_escaped_nick(s, false); }, nick_col_width);
-		};
-
 		std::string total_description;
 		total_description += mvp_notice;
 		total_description += "\n\n";
-		total_description += "**" + first_team_name + "**\n";
-		total_description += "<pre><code>";
-		total_description += make_team_members(summary.first_faction);
-		total_description += "</pre></code>\n\n";
-		total_description += "**" + second_team_name + "**\n";
-		total_description += "<pre><code>";
-		total_description += make_team_members(summary.second_faction);
-		total_description += "</pre></code>";
+
+		if (summary.was_ffa) {
+			// For FFA matches, combine all players into one list
+			std::vector<messages::match_summary_message::player_entry> all_players;
+			all_players.insert(all_players.end(), summary.first_faction.begin(), summary.first_faction.end());
+			all_players.insert(all_players.end(), summary.second_faction.begin(), summary.second_faction.end());
+
+			const auto longest_nick_len = webhooks_common::get_longest_nickname_length(all_players);
+			std::size_t nick_stat_padding = 8;
+			std::size_t min_nick_col_width = 20;
+			const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+			auto make_team_members = [&](const auto& members) {
+				return webhooks_common::make_team_members(members, [](auto s) { return matrix_escaped_nick(s, false); }, nick_col_width);
+			};
+
+			total_description += "**Players:**\n";
+			total_description += "<pre><code>";
+			total_description += make_team_members(all_players);
+			total_description += "</pre></code>";
+		}
+		else {
+			// For team matches, show two separate teams
+			const auto first_team_name = std::string(summary.is_tie() ? "First team:" : "Winning team:");
+			const auto second_team_name = std::string(summary.is_tie() ? "Second team:" : "Losing team:");
+
+			const auto longest_nick_len = std::max(
+				webhooks_common::get_longest_nickname_length(summary.first_faction),
+				webhooks_common::get_longest_nickname_length(summary.second_faction)
+			);
+
+			std::size_t nick_stat_padding = 8;
+			std::size_t min_nick_col_width = 20;
+
+			const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+			auto make_team_members = [&](const auto& members) {
+				return webhooks_common::make_team_members(members, [](auto s) { return matrix_escaped_nick(s, false); }, nick_col_width);
+			};
+
+			total_description += "**" + first_team_name + "**\n";
+			total_description += "<pre><code>";
+			total_description += make_team_members(summary.first_faction);
+			total_description += "</pre></code>\n\n";
+			total_description += "**" + second_team_name + "**\n";
+			total_description += "<pre><code>";
+			total_description += make_team_members(summary.second_faction);
+			total_description += "</pre></code>";
+		}
 
 		auto result = typesafe_sprintf("### `%x: %x`\n**%x**  \n%x", current_map, server_name, summary_notice, total_description);
 
@@ -415,7 +443,7 @@ namespace custom_webhooks {
 			);
 		}();
 
-		auto result = typesafe_sprintf("### `%x - %x`**%x**\n%x", current_map, server_name, result_notice, detail_notice);
+		auto result = typesafe_sprintf("### `%x - %x`\n**%x**\n%x", current_map, server_name, result_notice, detail_notice);
 
 		return result;
 	}
@@ -714,6 +742,9 @@ namespace discord_webhooks {
 			}();
 
 			const auto mvp_notice_suffix = [&]() -> std::string {
+				if (info.was_ffa) {
+					return "was the strongest of them all.";
+				}
 
 				if (info.is_tie()) {
 					if (was_mvp_alone) {
@@ -751,31 +782,53 @@ namespace discord_webhooks {
 				mvp_notice_suffix
 			);
 
-			const auto first_team_name = std::string (info.is_tie() ? "First team:" : "Winning team:");
-			const auto second_team_name = std::string(info.is_tie() ? "Second team:" : "Losing team:");
-
-			const auto longest_nick_len = std::max(
-				webhooks_common::get_longest_nickname_length(info.first_faction),
-				webhooks_common::get_longest_nickname_length(info.second_faction)
-			);
-
-			std::size_t nick_stat_padding = 8;
-			std::size_t min_nick_col_width = 20;
-
-			const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
-
-			auto make_team_members = [&](const auto& members) {
-				return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
-			};
-
 			std::string total_description;
 			total_description += mvp_notice;
 			total_description += "\n\n";
-			total_description += "**" + first_team_name + "**";
-			total_description += "```" + make_team_members(info.first_faction) + "```";
-			total_description += "\n";
-			total_description += "**" + second_team_name + "**";
-			total_description += "```" + make_team_members(info.second_faction) + "```";
+
+			if (info.was_ffa) {
+				// For FFA matches, combine all players into one list
+				std::vector<messages::match_summary_message::player_entry> all_players;
+				all_players.insert(all_players.end(), info.first_faction.begin(), info.first_faction.end());
+				all_players.insert(all_players.end(), info.second_faction.begin(), info.second_faction.end());
+
+				const auto longest_nick_len = webhooks_common::get_longest_nickname_length(all_players);
+				std::size_t nick_stat_padding = 8;
+				std::size_t min_nick_col_width = 20;
+				const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+				auto make_team_members = [&](const auto& members) {
+					return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
+				};
+
+				total_description += "**Players:**";
+				total_description += "```" + make_team_members(all_players) + "```";
+			}
+			else {
+				// For team matches, show two separate teams
+				const auto first_team_name = std::string (info.is_tie() ? "First team:" : "Winning team:");
+				const auto second_team_name = std::string(info.is_tie() ? "Second team:" : "Losing team:");
+
+				const auto longest_nick_len = std::max(
+					webhooks_common::get_longest_nickname_length(info.first_faction),
+					webhooks_common::get_longest_nickname_length(info.second_faction)
+				);
+
+				std::size_t nick_stat_padding = 8;
+				std::size_t min_nick_col_width = 20;
+
+				const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+				auto make_team_members = [&](const auto& members) {
+					return webhooks_common::make_team_members(members, escaped_nick, nick_col_width);
+				};
+
+				total_description += "**" + first_team_name + "**";
+				total_description += "```" + make_team_members(info.first_faction) + "```";
+				total_description += "\n";
+				total_description += "**" + second_team_name + "**";
+				total_description += "```" + make_team_members(info.second_faction) + "```";
+			}
 
 			StringBuffer s;
 			Writer<StringBuffer> writer(s);

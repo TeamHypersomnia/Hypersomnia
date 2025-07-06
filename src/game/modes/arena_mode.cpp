@@ -3133,7 +3133,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 			summary.second_faction = summary.first_faction;
 			summary.second_faction.erase(summary.second_faction.begin());
 
-			summary.first_faction = { summary.first_faction[0] };
+			const auto winner = summary.first_faction[0];
+
+			summary.first_faction = { winner };
+			summary.mvp_player_id = winner.id;
 		}
 
 		step.post_message(summary);

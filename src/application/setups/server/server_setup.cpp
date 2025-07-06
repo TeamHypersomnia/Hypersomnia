@@ -1451,6 +1451,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 		const auto mvp_state = find_client_state(summary.mvp_player_id);
 
 		if (mvp_state == nullptr) {
+			LOG("No mvp. Skipping webhook.");
 			return;
 		}
 
