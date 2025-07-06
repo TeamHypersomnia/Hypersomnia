@@ -42,6 +42,7 @@ struct arena_mode_ruleset {
 	bool enable_player_colors = true;
 	int8_t default_bot_quota = 0;
 
+	uint32_t respawn_as_bot_after_ms = 2000;
 	uint32_t respawn_after_ms = 0;
 	uint32_t spawn_protection_ms = 0;
 
@@ -379,6 +380,7 @@ private:
 	void release_triggers_of_weapons_of_players(input in);
 
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
+	void respawn_the_dead_as_bots(input, logic_step, unsigned after_ms);
 
 	bool bomb_exploded(const const_input) const;
 	entity_id get_character_who_defused_bomb(const_input) const;

@@ -16,6 +16,7 @@
 #include "game/detail/economy/money_type.h"
 
 void unset_input_flags_of_orphaned_entity(const entity_handle&);
+void transfer_input_flags_of_orphaned_entity(const entity_handle& to, const entity_handle& from);
 
 template <class E>
 vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position = true);

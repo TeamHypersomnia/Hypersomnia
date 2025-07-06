@@ -8,6 +8,7 @@
 
 real32 assess_projectile_velocity_of_weapon(const const_entity_handle& weapon);
 
+void unset_weapon_triggers(const entity_handle&);
 void unset_input_flags_of_orphaned_entity(const entity_handle&);
 
 struct identified_danger {

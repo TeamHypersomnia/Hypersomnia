@@ -13,7 +13,7 @@
 #include "augs/templates/logically_empty.h"
 #include "augs/drawing/drawing.hpp"
 
-const auto secs_before_accepting_inputs_after_death = 1.0;
+const auto secs_before_accepting_inputs_after_death = 3.0;
 const auto secs_until_switching_dead_teammate = 1.0;
 
 bool arena_spectator_gui::control(const general_gui_intent_input in) {

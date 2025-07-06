@@ -1659,6 +1659,15 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 			s->deaths += 1;
 			announce_death(s);
 		}
+
+		if (const auto victim_info = find(ko.victim.id)) {
+			if (!victim_info->is_bot) {
+				if (in.rules.has_bomb_mechanics() && state != arena_mode_state::WARMUP) {
+					if (const bool would_wait_for_respawn = in.rules.respawn_after_ms == 0) {
+					}
+				}
+			}
+		}
 	}
 
 	if (ko.assist.id.is_set()) {
@@ -3495,6 +3504,17 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 			respawn_the_dead(in, step, in.rules.respawn_after_ms);
 		}
 
+		{
+			const bool would_wait = 
+				in.rules.respawn_after_ms == 0 &&
+				state == arena_mode_state::LIVE
+			;
+
+			if (would_wait && in.rules.respawn_as_bot_after_ms > 0) {
+				respawn_the_dead_as_bots(in, step, in.rules.respawn_as_bot_after_ms);
+			}
+		}
+
 		if (get_freeze_seconds_left(in) <= 0.f) {
 			if (current_round.cache_players_frozen) {
 				play_start_round_sound(in, step);
@@ -3676,6 +3696,89 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 
 					if (changed_identities.changes.size() > 0) {
 						step.post_message(changed_identities);
+					}
+				}
+			}
+		});
+	}
+}
+
+void arena_mode::respawn_the_dead_as_bots(const input_type in, const logic_step step, const unsigned after_ms) {
+	(void)step;
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+
+	for (auto& it : players) {
+		const auto id = it.first;
+		auto& victim_info = it.second;
+
+		if (victim_info.is_bot) {
+			continue;
+		}
+
+		on_player_handle(cosm, id, [&](const auto& player_handle) {
+			if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+				const auto& sentience = player_handle.template get<components::sentience>();
+
+				if (sentience.when_knocked_out.was_set() && clk.is_ready(
+					after_ms,
+					sentience.when_knocked_out
+				)) {
+					const auto victim_faction = victim_info.get_faction();
+					
+					auto bot_to_control = mode_player_id::dead();
+					float bot_dist = -1.0;
+					
+					for (auto& it : players) {
+						const auto& player_data = it.second;
+						
+						if (player_data.is_bot && player_data.get_faction() == victim_faction) {
+							if (const auto bot_character = in.cosm[player_data.controlled_character_id]) {
+								if (sentient_and_conscious(bot_character)) {
+									const auto tr1 = player_handle.find_logic_transform();
+									const auto tr2 = bot_character.find_logic_transform();
+
+									if (tr1 && tr2) {
+										const auto dist = (tr1->pos - tr2->pos).length_sq();
+
+										if (dist < bot_dist || bot_dist == -1) {
+											bot_to_control = it.first;
+											bot_dist = dist;
+										}
+									}
+									else if (bot_dist == -1) {
+										bot_to_control = it.first;
+									}
+								}
+							}
+						}
+					}
+					
+					if (bot_to_control.is_set()) {
+						const auto victim_character_id = victim_info.controlled_character_id;
+						const auto bot_character_id = players[bot_to_control].controlled_character_id;
+						
+						const auto victim_name = player_handle.get_name();
+						const auto bot_character = cosm[bot_character_id];
+
+						LOG_NVPS(bot_character.get_name(), victim_name);
+
+						cosmic::set_specific_name(bot_character, victim_name);
+
+						victim_info.controlled_character_id = bot_character_id;
+						players[bot_to_control].controlled_character_id = victim_character_id;
+
+						::transfer_input_flags_of_orphaned_entity(bot_character, player_handle);
+
+						bot_character.for_each_contained_item_recursive(
+							[&](const auto contained_item) {
+								// This will stop arming the grenade and just throw it just in case
+								unset_input_flags_of_orphaned_entity(contained_item);
+							}
+						);
+
+						::unset_weapon_triggers(bot_character);
+						::unset_input_flags_of_orphaned_entity(player_handle);
 					}
 				}
 			}

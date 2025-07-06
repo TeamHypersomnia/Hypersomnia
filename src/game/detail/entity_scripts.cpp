@@ -18,6 +18,45 @@
 #include "game/cosmos/cosmos.h"
 #include "game/detail/sentience/sentience_getters.h"
 
+void transfer_input_flags_of_orphaned_entity(
+	const entity_handle& to,
+	const entity_handle& from
+) {
+#if TODO_CARS
+	if (auto* const to_car = to.find<components::car>()) {
+		if (const auto* const from_car = from.find<components::car>()) {
+			to_car->movement_flags = from_car->movement_flags;
+		}
+	}
+#endif
+
+	if (auto* const to_movement = to.find<components::movement>()) {
+		if (const auto* const from_movement = from.find<components::movement>()) {
+			to_movement->flags = from_movement->flags;
+		}
+	}
+
+	if (auto* const to_hand_fuse = to.find<components::hand_fuse>()) {
+		if (const auto* const from_hand_fuse = from.find<components::hand_fuse>()) {
+			to_hand_fuse->arming_requested = from_hand_fuse->arming_requested;
+		}
+	}
+
+	if (auto* const to_sentience = to.find<components::sentience>()) {
+		if (const auto* const from_sentience = from.find<components::sentience>()) {
+			to_sentience->hand_flags = from_sentience->hand_flags;
+			to_sentience->block_flag = from_sentience->block_flag;
+		}
+	}
+}
+
+void unset_weapon_triggers(const entity_handle& e) {
+	if (auto* const sentience = e.find<components::sentience>()) {
+		sentience->hand_flags = {};
+		sentience->block_flag = false;
+	}
+}
+
 void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 	if (auto* const car = e.find<components::car>()) {
 		car->reset_movement_flags();
@@ -31,10 +70,7 @@ void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 		hand_fuse->arming_requested = false;
 	}
 
-	if (auto* const sentience = e.find<components::sentience>()) {
-		sentience->hand_flags = {};
-		sentience->block_flag = false;
-	}
+	unset_weapon_triggers(e);
 }
 
 identified_danger assess_danger(
