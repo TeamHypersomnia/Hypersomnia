@@ -4,7 +4,7 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [1.3.0] - 2025-07-06
+## [unreleased] - 2025-07-06
 
 ### Added
 
