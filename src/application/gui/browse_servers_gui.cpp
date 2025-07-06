@@ -335,13 +335,8 @@ void browse_servers_gui_state::refresh_server_pings() {
 	}
 }
 
-std::string get_steam_join_link(const std::string& suffix) {
-	return typesafe_sprintf("steam://run/2660970//%x/", suffix);
-}
-
-std::string get_browser_join_link(const std::string& suffix) {
-	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
-}
+std::string get_steam_join_link(const std::string& addr);
+std::string get_browser_join_link(const std::string& addr);
 
 std::string get_steam_join_link(
 	const masterserver_entry_meta& meta,

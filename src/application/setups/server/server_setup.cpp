@@ -5121,6 +5121,14 @@ std::string server_heartbeat::get_location_id() const {
 	return "";
 }
 
+std::string get_steam_join_link(const std::string& suffix) {
+	return typesafe_sprintf("steam://run/2660970//%x/", suffix);
+}
+
+std::string get_browser_join_link(const std::string& suffix) {
+	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
+}
+
 bool server_client_state::is_web_client() const {
 	return ::is_internal_webrtc_address(to_netcode_addr(address));
 }
