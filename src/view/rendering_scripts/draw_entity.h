@@ -77,7 +77,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			auto result = typed_handle.template get<invariants::sprite>();
 
 			if constexpr(H::template has<components::overridden_geo>()) {
-				const auto& s = typed_handle.template get<components::overridden_geo>().get();
+				const auto geo = typed_handle.template get<components::overridden_geo>();
+				const auto& s = geo.get();
 
 				if (s.is_enabled) {
 					result.size = s.value;
