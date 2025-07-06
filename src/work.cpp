@@ -594,8 +594,13 @@ work_result work(
 			CONFD_DIR,
 			[&](auto...) { return callback_result::CONTINUE; },
 			[&](const augs::path_type& config_file) {
-				LOG("Applying config: %x", config_file);
-				result->load_patch(config_file);
+				if (config_file.extension() == ".json") {
+					LOG("Applying config: %x", config_file);
+					result->load_patch(config_file);
+				}
+				else {
+					LOG("Skipping non-json file: %x", config_file);
+				}
 
 				return callback_result::CONTINUE;
 			}
