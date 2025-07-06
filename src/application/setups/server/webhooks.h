@@ -10,6 +10,9 @@
 
 #include "game/messages/hud_message.h"
 
+std::string get_steam_join_link(const std::string& addr);
+std::string get_browser_join_link(const std::string& addr);
+
 namespace webhooks_common {
 	inline std::string format_num(int num, std::size_t num_width = 2) {
 		// todo: support larger numbers
@@ -225,7 +228,8 @@ namespace custom_webhooks {
 		std::vector<std::string> other_players,
 		const std::string& current_map,
 		const std::string& current_game_mode,
-		const std::string& from_where
+		const std::string& from_where,
+		const std::string& external_addr
 	) {
 		erase_element(other_players, connected_player);
 
@@ -258,6 +262,13 @@ namespace custom_webhooks {
 			}
 
 			result += "\n" + footer_content;
+		}
+
+		// Add join links if external address is available
+		if (!external_addr.empty()) {
+			result += "\n\n";
+			result += "[Join via Web](" + ::get_browser_join_link(external_addr) + ") or _Steam_:  \n";
+			result += "<pre><code>" + ::get_steam_join_link(external_addr) + "</pre></code>";
 		}
 
 		return result;

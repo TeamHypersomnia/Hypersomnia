@@ -1694,11 +1694,13 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		auto game_mode = get_current_game_mode_name();
 
 		auto priv_vars = private_vars;
+		const auto external_addr = external_address != std::nullopt ? ::ToString(*external_address) : "";
+
 		const std::string from_where = find_client_state(id) ? find_client_state(id)->from_where() : std::string();
 
 		push_avatar_job(
 			id,
-			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name, game_mode]() -> std::string {
+			[from_where, priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, connected_player_clan, all_nicknames, current_arena_name, game_mode, external_addr]() -> std::string {
 				std::string avatar_url = "";
 
 				if (telegram_webhook_url.valid()) {
@@ -1761,7 +1763,8 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 						all_nicknames,
 						current_arena_name,
 						game_mode,
-						from_where
+						from_where,
+						external_addr
 					);
 
 					server_setup::send_custom_webhook(c, webhook_message);
@@ -1924,17 +1927,18 @@ bool server_setup::handle_masterserver_response(
 }
 
 void server_setup::send_tell_me_my_address_if_its_time() {
-	if (is_dedicated()) {
-		/* 
-			This is only useful for integrated servers
-			to get a correct Steam rich presence string.
-		*/
+	auto& when_last = when_last_sent_tell_me_my_address;
 
-		return;
-	}
+	const auto since_last = server_time - when_last;
 
 	if (external_address.has_value()) {
-		return;
+		if (since_last > 3600 * 24) {
+			external_address = std::nullopt;
+			LOG("Resolving the external address again - once a day.");
+		}
+		else {
+			return;
+		}
 	}
 
 	if (!server_list_enabled()) {
@@ -1945,9 +1949,6 @@ void server_setup::send_tell_me_my_address_if_its_time() {
 		return;
 	}
 
-	auto& when_last = when_last_sent_tell_me_my_address;
-
-	const auto since_last = server_time - when_last;
 	const auto send_every = 0.5;
 
 	const bool send_for_the_first_time = when_last == 0;
@@ -5078,6 +5079,10 @@ std::string server_heartbeat::get_location_id() const {
 
 	if (begins_with(n, "[CH]")) {
 		return "ch";
+	}
+
+	if (begins_with(n, "[FI]")) {
+		return "fi";
 	}
 
 	return "";

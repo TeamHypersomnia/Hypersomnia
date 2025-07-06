@@ -335,6 +335,14 @@ void browse_servers_gui_state::refresh_server_pings() {
 	}
 }
 
+std::string get_steam_join_link(const std::string& suffix) {
+	return typesafe_sprintf("steam://run/2660970//%x/", suffix);
+}
+
+std::string get_browser_join_link(const std::string& suffix) {
+	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
+}
+
 std::string get_steam_join_link(
 	const masterserver_entry_meta& meta,
 	const netcode_address_t& fallback_ip
@@ -352,7 +360,7 @@ std::string get_steam_join_link(
 		return ::ToString(fallback_ip);
 	}();
 
-	return typesafe_sprintf("steam://run/2660970//%x/", suffix);
+	return get_steam_join_link(suffix);
 }
 
 std::string get_browser_join_link(
@@ -367,7 +375,7 @@ std::string get_browser_join_link(
 		return ::ToString(fallback_ip);
 	}();
 
-	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
+	return get_browser_join_link(suffix);
 }
 
 std::string server_list_entry::get_connect_string() const {
