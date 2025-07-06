@@ -16,7 +16,7 @@
 	- E.g. if a player from a given _Clan_ connects to the server, only their _Clan_ will be notified.
 	- This also relays chat messages now.
 - Basic bot spawning/kicking logistics.
-	- `/bots` command.
+	- `/bots m [y]` command. `/bots 4` sets total quota, `/bots 1 4` specifies a custom split.
 	- Taking control of the bot upon player death.
 	- Reporting number of online bots/humans in the server list.
 	- Bots are still stationary.
@@ -36,7 +36,7 @@
 - Finally fix the goddamn clipboard in Linux Steam builds.
 - FFA/gun game match results now report correctly through the webhooks.
 - `user/conf.d` will only consider `.json` files from now to prevent crash when a non-json file is accidentally put there.
-- `[Web]` was incorrectly added to a native client nickname when connecting to a server hosted in the browser.
+- `[Web]` was incorrectly added to the native client's nickname when connecting to a server hosted in the browser.
 
 ### Notes
 
