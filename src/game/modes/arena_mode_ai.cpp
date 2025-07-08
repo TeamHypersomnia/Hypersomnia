@@ -329,6 +329,21 @@ arena_ai_result update_arena_mode_ai(
 		if (player.ai_state.purchase_decision_countdown <= 0.0f) {
 			player.ai_state.already_tried_to_buy = true;
 
+			// Check wielded items to see if we have only one pistol
+			const auto wielded_items = character_handle.get_wielded_items();
+			bool has_only_one_pistol = false;
+			
+			if (wielded_items.size() == 1) {
+				const auto wielded_item = cosm[wielded_items[0]];
+				if (wielded_item.alive()) {
+					if (const auto gun = wielded_item.template find<invariants::gun>()) {
+						if (gun->buy_type == buy_menu_type::PISTOLS) {
+							has_only_one_pistol = true;
+						}
+					}
+				}
+			}
+
 			int weapon_count = 0;
 			std::vector<item_flavour_id> owned_guns;
 			
@@ -341,22 +356,38 @@ arena_ai_result update_arena_mode_ai(
 				}
 			);
 
-			// Try to buy a gun if we have only one weapon
-			if (weapon_count <= 1) {
-				std::vector<item_flavour_id> affordable_guns;
+			// Try to buy a gun if we have only one weapon or if we have only one pistol
+			if (weapon_count <= 1 || has_only_one_pistol) {
+				std::vector<item_flavour_id> affordable_pistols;
+				std::vector<item_flavour_id> affordable_non_pistols;
 				
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto&) {
+				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
 					const auto price = *::find_price_of(cosm, item_flavour_id(id));
 
 					if (price <= money) {
-						affordable_guns.push_back(item_flavour_id(id));
+						const auto buy_type = flavour.template get<invariants::gun>().buy_type;
+						
+						if (buy_type == buy_menu_type::PISTOLS) {
+							affordable_pistols.push_back(item_flavour_id(id));
+						}
+						else {
+							affordable_non_pistols.push_back(item_flavour_id(id));
+						}
 					}
 				});
 
-				if (!affordable_guns.empty()) {
-					// Pick a random affordable gun
-					const auto random_index = stable_rng.randval(0u, static_cast<unsigned>(affordable_guns.size() - 1));
-					const auto bought = affordable_guns[random_index];
+				std::vector<item_flavour_id>* weapons_to_choose_from = nullptr;
+				
+				if (!affordable_non_pistols.empty()) {
+					weapons_to_choose_from = &affordable_non_pistols;
+				}
+				else if (!affordable_pistols.empty()) {
+					weapons_to_choose_from = &affordable_pistols;
+				}
+
+				if (weapons_to_choose_from != nullptr && !weapons_to_choose_from->empty()) {
+					const auto random_index = stable_rng.randval(0u, static_cast<unsigned>(weapons_to_choose_from->size() - 1));
+					const auto bought = (*weapons_to_choose_from)[random_index];
 
 					if (!found_in(owned_guns, bought)) {
 						result.item_purchase = bought;
