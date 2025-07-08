@@ -4113,7 +4113,9 @@ void server_setup::update_stats(server_network_info& info) const {
 
 server_client_state* server_setup::find_client_state(const mode_player_id id) {
 	if (id.is_set()) {
-		return std::addressof(get_client_state(id));
+		if (id.value < clients.size()) {
+			return std::addressof(get_client_state(id));
+		}
 	}
 
 	return nullptr;
@@ -4159,8 +4161,10 @@ const server_client_state* server_setup::find_client_state(const mode_player_id 
 	if (id.is_set()) {
 		auto& c = get_client_state(id);
 
-		if (c.is_set()) {
-			return std::addressof(c);
+		if (id.value < clients.size()) {
+			if (c.is_set()) {
+				return std::addressof(c);
+			}
 		}
 	}
 
@@ -4172,6 +4176,7 @@ server_client_state& server_setup::get_client_state(const mode_player_id id) {
 		return integrated_client;
 	}
 
+	ensure(id.value < clients.size());
 	return clients[id.value];
 }
 
@@ -4180,6 +4185,7 @@ const server_client_state& server_setup::get_client_state(const mode_player_id i
 		return integrated_client;
 	}
 
+	ensure(id.value < clients.size());
 	return clients[id.value];
 }
 

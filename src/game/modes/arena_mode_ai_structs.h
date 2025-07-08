@@ -24,7 +24,6 @@ struct arena_mode_ai_state {
 	bool already_tried_to_buy = false;
 	float purchase_decision_countdown = -1.0f;
 
-	// Track if we've already dashed for the current last_seen_target
 	bool has_dashed_for_last_seen_target = false;
 	// END GEN INTROSPECTOR
 
