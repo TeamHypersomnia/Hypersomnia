@@ -3715,6 +3715,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.042f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil_multiplier = 0.5f;
@@ -3759,6 +3760,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.040;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
@@ -3914,6 +3916,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 4.0f;
@@ -4195,6 +4198,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::CALICO_SHOT);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::CALICO_CHAMBERING);
@@ -4238,6 +4242,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BULWARK_SHOT);
+			gun_def.buy_type = buy_menu_type::PISTOLS;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);

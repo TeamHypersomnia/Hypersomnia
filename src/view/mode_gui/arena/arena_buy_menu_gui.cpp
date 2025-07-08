@@ -907,7 +907,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_pistol = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (price_of(item_flavour_id(id)) <= 1500 || flavour.template get<invariants::gun>().buy_type == buy_menu_type::PISTOLS) {
+					if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::PISTOLS) {
 						callback(id, flavour);
 					}
 				});

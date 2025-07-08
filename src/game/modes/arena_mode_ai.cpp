@@ -334,19 +334,7 @@ arena_ai_result update_arena_mode_ai(
 			player.ai_state.already_tried_to_buy = true;
 
 			// Check wielded items to see if we have only one pistol
-			const auto wielded_items = character_handle.get_wielded_items();
-			bool has_only_one_pistol = false;
-			
-			if (wielded_items.size() == 1) {
-				const auto wielded_item = cosm[wielded_items[0]];
-				if (wielded_item.alive()) {
-					if (const auto gun = wielded_item.template find<invariants::gun>()) {
-						if (gun->buy_type == buy_menu_type::PISTOLS) {
-							has_only_one_pistol = true;
-						}
-					}
-				}
-			}
+			bool has_only_pistols = true;
 
 			int weapon_count = 0;
 			std::vector<item_flavour_id> owned_guns;
@@ -356,16 +344,24 @@ arena_ai_result update_arena_mode_ai(
 					if (const auto gun = item.template find<invariants::gun>()) {
 						weapon_count++;
 						owned_guns.push_back(item.get_flavour_id());
+
+						if (gun->buy_type != buy_menu_type::PISTOLS) {
+							has_only_pistols = false;
+						}
 					}
 				}
 			);
 
 			// Try to buy a gun if we have only one weapon or if we have only one pistol
-			if (weapon_count <= 1 || has_only_one_pistol) {
+			if (weapon_count <= 1 || has_only_pistols) {
 				std::vector<item_flavour_id> affordable_pistols;
 				std::vector<item_flavour_id> affordable_non_pistols;
 				
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+					if (!factions_compatible(character_handle, id)) {
+						return;
+					}
+
 					const auto price = *::find_price_of(cosm, item_flavour_id(id));
 
 					if (price <= money) {
