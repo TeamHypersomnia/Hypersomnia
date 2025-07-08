@@ -21,6 +21,7 @@
 #include "game/modes/session_id.h"
 #include "game/modes/arena_submodes.h"
 #include "game/modes/ranked_state_type.h"
+#include "game/modes/arena_mode_ai_structs.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -155,6 +156,7 @@ struct arena_mode_player {
 	bool is_bot = false;
 	bool unset_inputs_once = false;
 	bool ready_for_ranked = false;
+	arena_mode_ai_state ai_state;
 	// END GEN INTROSPECTOR
 
 	/*
@@ -414,7 +416,7 @@ private:
 
 	void end_warmup_and_go_live(input, logic_step);
 
-	void execute_player_commands(input, mode_entropy&, logic_step);
+	void execute_player_commands(input, const mode_entropy&, logic_step);
 	bool add_or_remove_players(input, const mode_entropy&, logic_step);
 	void handle_special_commands(input, const mode_entropy&, logic_step);
 	void spawn_characters_for_recently_assigned(input, logic_step);
@@ -469,7 +471,9 @@ private:
 
 	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
-	uint32_t scramble_counter = 0;
+
+	uint32_t sound_clock = 0;
+	uint32_t total_mode_steps_passed = 0;
 	uint32_t prepare_to_fight_counter = 0;
 
 	client_nickname_type victorious_player_nickname = {};
@@ -484,6 +488,7 @@ private:
 	float secs_when_warmup_ended = 0.0f;
 
 	bool short_match = false;
+	xorshift_state stable_round_rng;
 	// END GEN INTROSPECTOR
 
 	/*
@@ -577,7 +582,7 @@ public:
 	) {
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
-		++continuous_sounds_clock(in);
+		++total_mode_steps_passed;
 
 		return standard_solver()(
 			step_input, 
@@ -781,13 +786,11 @@ public:
 	bool should_match_be_short(const const_input in) const;
 
 	uint32_t& continuous_sounds_clock(const const_input) {
-		/* Double-purpose */
-		return scramble_counter;
+		return sound_clock;
 	}
 
 	uint32_t continuous_sounds_clock(const const_input) const {
-		/* Double-purpose */
-		return scramble_counter;
+		return sound_clock;
 	}
 
 	per_actual_faction<uint8_t> calc_requested_bots(const const_input in) const;

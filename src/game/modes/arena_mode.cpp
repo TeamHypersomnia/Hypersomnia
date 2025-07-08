@@ -39,6 +39,7 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "augs/misc/date_time.h"
+#include "game/modes/arena_mode_ai.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -464,6 +465,8 @@ mode_player_id arena_mode::add_player(const input_type in, const client_nickname
 		const auto result = add_player_custom(in, { new_id, nickname });
 		(void)result;
 		ensure(result);
+		ensure(new_id.value != integrated_client_id_v);
+		ensure(new_id.value < max_mode_players_v);
 		return new_id;
 	}
 
@@ -477,6 +480,8 @@ mode_player_id arena_mode::add_bot_player(const input_type in, const client_nick
 		ensure(result);
 
 		players.at(new_id).is_bot = true;
+		ensure(new_id.value != integrated_client_id_v);
+		ensure(new_id.value < max_mode_players_v);
 		return new_id;
 	}
 
@@ -1040,6 +1045,14 @@ void arena_mode::setup_round(
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 	round_speeds = in.rules.speeds;
+
+	stable_round_rng = randomization(total_mode_steps_passed).generator;
+
+	LOG_NVPS(total_mode_steps_passed);
+	LOG_NVPS(stable_round_rng.s_0);
+	LOG_NVPS(stable_round_rng.s_1);
+	LOG_NVPS(stable_round_rng.s_2);
+	LOG_NVPS(stable_round_rng.s_3);
 
 	cosm.set(in.clean_round_state);
 
@@ -2054,7 +2067,7 @@ void arena_mode::swap_assigned_factions(const arena_mode::participating_factions
 }
 
 void arena_mode::scramble_assigned_factions(const arena_mode::participating_factions& p) {
-	auto rng = randomization(scramble_counter++);
+	auto rng = randomization(total_mode_steps_passed);
 
 	std::vector<arena_mode_player*> ptrs;
 	ptrs.reserve(players.size());
@@ -2397,14 +2410,27 @@ mode_player_id arena_mode::find_first_free_bot() const {
 	return first_free_key(players, mode_player_id::first_bot());
 }
 
-void arena_mode::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
+void arena_mode::execute_player_commands(const input_type in, const mode_entropy& en, const logic_step step) {
 	auto access = allocate_new_entity_access();
+	auto entropy = en;
 
 	const auto current_round = get_current_round_number();
 	auto& cosm = in.cosm;
 
 	bool should_restart = false;
 	bool spawn_for_recently_assigned = false;
+
+	for (auto& it : players) {
+		auto& player = it.second;
+
+		if (player.is_bot) {
+			const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng);
+			
+			if (ai_result.item_purchase.has_value()) {
+				entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
+			}
+		}
+	}
 
 	for (const auto& p : entropy.players) {
 		const auto& command_variant = p.second;
@@ -2862,6 +2888,11 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 				--bot_name_counter;
 			}
 		}
+	});
+
+	p.for_each([&](const faction_type faction) {
+		auto current = current_num_bots[faction];
+		auto requested = requested_bots[faction];
 
 		while (current < requested) {
 			const auto new_id = add_bot_player(in, "BOT " + names[(bot_name_counter++) % names.size()]);
@@ -4178,6 +4209,7 @@ void arena_mode::clear_players_round_state(const input_type in) {
 
 	for (auto& it : players) {
 		it.second.stats.round_state = {};
+		it.second.ai_state.round_reset();
 	}
 
 	set_players_level_to_initial(in);

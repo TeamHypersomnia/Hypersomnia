@@ -9,7 +9,7 @@ uint64_t rol64(uint64_t x, int k)
 
 uint64_t xoshiro256ss(struct xoshiro256ss_state *state)
 {
-	uint64_t *s = state->s;
+	uint64_t *s = &state->s_0;
 	uint64_t const result = rol64(s[1] * 5, 7) * 9;
 	uint64_t const t = s[1] << 17;
 
