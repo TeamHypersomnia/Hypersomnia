@@ -143,12 +143,12 @@ faction_type arena_mode::calc_weakest_faction(const const_input_type in) const {
 	} weakest { 
 		participating.bombing,
 		factions[participating.bombing].score,
-		num_players_in(participating.bombing)
+		num_human_players_in(participating.bombing)
 	};
 
 	participating.for_each([&](const auto f) { 
 		const auto s = factions[f].score;
-		const auto n = num_players_in(f);
+		const auto n = num_human_players_in(f);
 		const auto candidate = weak_faction { f, s, n };
 
 		if (candidate < weakest) {
@@ -751,7 +751,7 @@ faction_choice_result arena_mode::auto_assign_faction(const input_type in, const
 		auto& f = entry->session.faction;
 		const auto previous_faction = f;
 
-		if (1 == num_players_in(previous_faction)) {
+		if (1 == num_human_players_in(previous_faction)) {
 			if (is_actual_faction(previous_faction)) {
 				/* Can't really make this better */
 				return faction_choice_result::BEST_BALANCE_ALREADY;
@@ -4566,7 +4566,7 @@ bool arena_mode::can_use_map_command_now(const const_input_type in) const {
 			int nonempty_factions = 0;
 
 			for_each_faction([&](const auto faction) {
-				if (num_players_in(faction) > 0) {
+				if (num_human_players_in(faction) > 0) {
 					++nonempty_factions;
 				}
 			});
