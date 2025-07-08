@@ -9,7 +9,6 @@ struct arena_ai_result {
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
 	float movement_timer_remaining = 0.0f;
-	vec2 current_movement_direction = vec2::zero;
 	float movement_duration_secs = 0.0f;
 	
 	float shooting_timer_remaining = 0.0f;
@@ -21,6 +20,7 @@ struct arena_mode_ai_state {
 	float chase_remaining_time = 0.0f;
 	vec2 last_target_position = vec2::zero;
 	vec2 target_crosshair_offset = vec2::zero;
+	vec2 random_movement_target = vec2::zero;
 	bool already_tried_to_buy = false;
 	float purchase_decision_countdown = -1.0f;
 	// END GEN INTROSPECTOR
