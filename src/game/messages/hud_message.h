@@ -110,5 +110,7 @@ namespace messages {
 			std::swap(first_team_score, second_team_score);
 			std::swap(first_faction, second_faction);
 		}
+
+		bool all_bots = false;
 	};
 }

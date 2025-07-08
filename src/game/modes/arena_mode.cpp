@@ -2821,6 +2821,10 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
 	const auto& over = in.dynamic_vars.bots_override;
 
+	if (ranked_state == ranked_state_type::STARTING) {
+		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
+	}
+
 	if (over.is_set()) {
 		return calc_requested_bots_from_quotas(
 			in,
@@ -2947,7 +2951,7 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([this, &info](const faction_type f) {
-		info.total_playing += num_players_in(f);
+		info.total_playing += num_human_players_in(f);
 	});
 
 	info.each_team_has_at_least_one = [this, in, &info, &p]() {
@@ -2958,7 +2962,7 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 		bool all_have = true;
 
 		p.for_each([&](const faction_type f) {
-			if (num_players_in(f) == 0) {
+			if (num_human_players_in(f) == 0) {
 				all_have = false;
 				info.missing_faction = f;
 			}
@@ -3180,7 +3184,13 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.first_team_score = result.winner_score;
 	summary.second_team_score = result.loser_score;
 
+	summary.all_bots = true;
+
 	auto add_to_first = [&](const auto& id, const auto& player) {
+		if (!player.is_bot) {
+			summary.all_bots = false;
+		}
+
 		if (strongest_in_first == mode_player_id::dead()) {
 			strongest_in_first = id;
 		}
@@ -3189,6 +3199,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	};
 
 	auto add_to_second = [&](const auto& id, const auto& player) {
+		if (!player.is_bot) {
+			summary.all_bots = false;
+		}
+
 		if (strongest_in_second == mode_player_id::dead()) {
 			strongest_in_second = id;
 		}

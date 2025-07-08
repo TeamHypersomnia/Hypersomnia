@@ -7338,3 +7338,7 @@ This will discard your redo history."
 
 - use disjoint port ranges for web, or just use muxing and successive ports
 - fix 'RANKED MATCH ENDED'
+
+- dash when close to last seen pos to you know surprise
+- Kick bots when ranked starts (about to) 
+- different verti and hori fow
