@@ -189,15 +189,13 @@ arena_ai_result update_arena_mode_ai(
 		// Check if we've reached the current movement target (within 100 units)
 		const auto distance_to_target = (player.ai_state.random_movement_target - character_pos).length();
 
-		DEBUG_LOGIC_STEP_LINES.emplace_back(white, player.ai_state.random_movement_target, character_pos);
-
 		if (distance_to_target < 140.0f) {
 			// Force a new movement direction by resetting the timer
 			player.ai_state.movement_timer_remaining = 0.0f;
 		}
 	}
 
-	const bool target_in_range = has_target && closest_distance < 500.0f;
+	const bool target_in_range = has_target && closest_distance < 1000.0f;
 
 	bool trigger = false;
 
@@ -213,7 +211,7 @@ arena_ai_result update_arena_mode_ai(
 			const auto target_aim = vec2(aim_direction).normalize();
 			const auto angle_diff = current_aim.degrees_between(target_aim);
 			
-			trigger = (angle_diff <= 4.0f) && target_in_range;
+			trigger = (angle_diff <= 15.0f) && target_in_range;
 		}
 	}
 
@@ -224,7 +222,7 @@ arena_ai_result update_arena_mode_ai(
 	// Smoothly interpolate crosshair towards target offset
 	if (auto crosshair = character_handle.find_crosshair()) {
 		const float average_factor = 0.5f;
-		const float averages_per_sec = has_target ? 20.0f : 4.0f;
+		const float averages_per_sec = has_target ? 5.0f : 4.0f;
 		const float averaging_constant = 1.0f - static_cast<real32>(repro::pow(average_factor, averages_per_sec * dt_secs));
 		
 		crosshair->base_offset = augs::interp(crosshair->base_offset, player.ai_state.target_crosshair_offset, averaging_constant);
