@@ -18,6 +18,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/debug_drawing_settings.h"
 #include "game/messages/gunshot_message.h"
+#include "game/detail/inventory/weapon_reloading.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	const arena_mode::input& in,
@@ -88,7 +89,7 @@ arena_ai_result update_arena_mode_ai(
 	float closest_distance = std::numeric_limits<float>::max();
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
-	const auto filter = predefined_queries::pathfinding();
+	const auto filter = predefined_queries::line_of_sight();
 
 	// Get current aim direction from actual crosshair for line of sight
 	vec2 current_aim_direction = vec2::zero;
@@ -183,11 +184,22 @@ arena_ai_result update_arena_mode_ai(
 	
 	player.ai_state.alertness_time = std::min(reaction_threshold_secs + 0.2f, player.ai_state.alertness_time);
 
+	const bool reloading = ::is_currently_reloading(character_handle);
+
 	if (player.ai_state.chase_timeout > 0.0f) {
 		player.ai_state.chase_timeout -= dt_secs;
 	}
 
-	if (!(player.ai_state.chase_timeout > 0.0f) && player.ai_state.last_seen_target.is_set()) {
+	const bool pause_chase = player.ai_state.chase_timeout > 0.0f || reloading;
+
+	if (pause_chase) {
+		player.ai_state.chase_remaining_time -= dt_secs;
+	}
+
+	movement.flags.sprinting = false;
+	movement.flags.dashing = false;
+
+	if (!pause_chase && player.ai_state.last_seen_target.is_set()) {
 		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
 		const auto reached_threshold = 20.0f;
 		
@@ -217,6 +229,18 @@ arena_ai_result update_arena_mode_ai(
 			else {
 				actual_movement_direction = (player.ai_state.last_target_position - character_pos).normalize();
 				player.ai_state.target_crosshair_offset = player.ai_state.last_target_position - character_pos;
+
+				movement.flags.sprinting = true;
+
+				const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
+				if (distance_to_last_seen < 400.0f && !player.ai_state.has_dashed_for_last_seen_target) {
+					movement.flags.dashing = true;
+					player.ai_state.has_dashed_for_last_seen_target = true;
+				}
+
+				if (DEBUG_DRAWING.draw_ai_info) {
+					DEBUG_LOGIC_STEP_LINES.emplace_back(orange, character_pos, player.ai_state.last_target_position);
+				}
 			}
 		}
 		else {
@@ -237,8 +261,7 @@ arena_ai_result update_arena_mode_ai(
 		const auto distance_to_target = (player.ai_state.random_movement_target - character_pos).length();
 
 		if (DEBUG_DRAWING.draw_ai_info) {
-			const bool timeout = player.ai_state.chase_timeout > 0.0f;
-			DEBUG_LOGIC_STEP_LINES.emplace_back(timeout ? cyan : white, character_pos, player.ai_state.random_movement_target);
+			DEBUG_LOGIC_STEP_LINES.emplace_back(pause_chase ? cyan : white, character_pos, player.ai_state.random_movement_target);
 		}
 
 		if (distance_to_target < 140.0f) {
@@ -254,24 +277,6 @@ arena_ai_result update_arena_mode_ai(
 
 	// Set movement direction flags at the very end, but before custom sprint/dash logic
 	movement.flags.set_from_closest_direction(actual_movement_direction);
-
-	// --- SPRINT/DASH LOGIC ---
-	movement.flags.sprinting = false;
-	movement.flags.dashing = false;
-
-	if (player.ai_state.last_seen_target.is_set() && player.ai_state.chase_remaining_time > 0.0f) {
-		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
-		if (!has_target) {
-			if (difficulty > difficulty_type::EASY) {
-				movement.flags.sprinting = true;
-			}
-
-			if (distance_to_last_seen < 400.0f && !player.ai_state.has_dashed_for_last_seen_target) {
-				movement.flags.dashing = true;
-				player.ai_state.has_dashed_for_last_seen_target = true;
-			}
-		}
-	}
 
 	const bool target_in_range = has_target;
 
@@ -401,7 +406,7 @@ void post_solve_arena_mode_ai(const arena_mode::input& in, arena_mode_player& pl
 	const bool is_ffa = in.rules.is_ffa();
 	const auto character_pos = character_handle.get_logic_transform().pos;
 	const auto& physics = cosm.get_solvable_inferred().physics;
-	const auto filter = predefined_queries::pathfinding();
+	const auto filter = predefined_queries::line_of_sight();
 
 	float current_target_distance = std::numeric_limits<float>::max();
 
