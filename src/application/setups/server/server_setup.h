@@ -79,6 +79,7 @@ class webrtc_server_detail;
 
 struct server_var_temp_overrides {
 	bots_request bots;
+	bot_difficulty_request bot_difficulty;
 };
 
 class server_setup : 

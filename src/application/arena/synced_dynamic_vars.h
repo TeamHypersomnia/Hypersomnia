@@ -15,6 +15,15 @@ struct bots_request {
 	bool operator==(const bots_request&) const = default;
 };
 
+struct bot_difficulty_request {
+	mode_player_id requester;
+	difficulty_type difficulty = difficulty_type::EASY;
+
+	bool is_set() const {
+		return requester.is_set();
+	}
+};
+
 struct synced_dynamic_vars {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -27,6 +36,7 @@ struct synced_dynamic_vars {
 	bool force_short_match = false;
 	server_ranked_vars ranked;
 	bots_request bots_override;
+	difficulty_type bot_difficulty = difficulty_type::EASY;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const synced_dynamic_vars&) const = default;

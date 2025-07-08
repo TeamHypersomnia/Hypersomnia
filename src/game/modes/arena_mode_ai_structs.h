@@ -1,6 +1,7 @@
 #pragma once
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/modes/difficulty_type.h"
 
 struct arena_ai_result {
 	std::optional<item_flavour_id> item_purchase;
@@ -26,6 +27,7 @@ struct arena_mode_ai_state {
 	float purchase_decision_countdown = -1.0f;
 
 	bool has_dashed_for_last_seen_target = false;
+	float alertness_time = 0.0f;
 	// END GEN INTROSPECTOR
 
 	void round_reset() {

@@ -2560,12 +2560,18 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	out.force_short_match = has_web_clients_playing;
 
+	out.bot_difficulty = vars.bot_difficulty;
+
 	if (!vars.bots) {
 		out.bots_override = { {}, 0u, 0u };
 	}
 
 	if (overrides.bots.is_set()) {
 		out.bots_override = overrides.bots;
+	}
+
+	if (overrides.bot_difficulty.is_set()) {
+		out.bot_difficulty = overrides.bot_difficulty.difficulty;
 	}
 
 	return out;
@@ -3682,6 +3688,12 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 	if (overrides.bots.requester.is_set()) {
 		if (!get_client_state(overrides.bots.requester).is_set()) {
 			overrides.bots = {};
+		}
+	}
+
+	if (overrides.bot_difficulty.requester.is_set()) {
+		if (!get_client_state(overrides.bot_difficulty.requester).is_set()) {
+			overrides.bot_difficulty = {};
 		}
 	}
 
@@ -4940,7 +4952,32 @@ void server_setup::handle_client_chat_command(
 		if (begins_with(chat.message, "/bots")) {
 			if (chat.message == "/bots" || chat.message == "/bots ") {
 				overrides.bots = {};
+				overrides.bot_difficulty = {};
 				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
+			}
+			else if (begins_with(chat.message, "/bots hard") || chat.message == "/bots h") {
+				overrides.bot_difficulty = {
+					to_mode_player_id(id),
+					difficulty_type::HARD
+				};
+
+				broadcast_info("Bots difficulty set to HARD.", chat_target_type::INFO);
+			}
+			else if (begins_with(chat.message, "/bots med") || chat.message == "/bots m") {
+				overrides.bot_difficulty = {
+					to_mode_player_id(id),
+					difficulty_type::MEDIUM
+				};
+
+				broadcast_info("Bots difficulty set to MEDIUM.", chat_target_type::INFO);
+			}
+			else if (begins_with(chat.message, "/bots easy") || chat.message == "/bots e") {
+				overrides.bot_difficulty = {
+					to_mode_player_id(id),
+					difficulty_type::EASY
+				};
+
+				broadcast_info("Bots difficulty set to EASY.", chat_target_type::INFO);
 			}
 			else {
 				unsigned first = -1;

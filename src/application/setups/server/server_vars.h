@@ -8,6 +8,7 @@
 #include "application/setups/server/server_webhook_vars.h"
 #include "augs/misc/secure_hash.h"
 #include "application/arena/arena_playtesting_context.h"
+#include "game/modes/difficulty_type.h"
 
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
@@ -104,6 +105,7 @@ struct server_vars {
 
 	bool friendly_fire = true;
 	bool bots = true;
+	difficulty_type bot_difficulty = difficulty_type::EASY;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;

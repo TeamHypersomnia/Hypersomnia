@@ -24,7 +24,8 @@ arena_ai_result update_arena_mode_ai(
 	const logic_step step,
 	arena_mode_player& player,
 	const bool is_ffa,
-	xorshift_state& stable_round_rng
+	xorshift_state& stable_round_rng,
+	const difficulty_type difficulty
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -150,20 +151,43 @@ arena_ai_result update_arena_mode_ai(
 		}
 	);
 
-	if (closest_enemy.is_set()) {
-		player.ai_state.last_seen_target = closest_enemy;
-		player.ai_state.chase_remaining_time = 5.0f; // 5 second chase timeout
-		player.ai_state.last_target_position = cosm[closest_enemy].get_logic_transform().pos;
-		player.ai_state.has_dashed_for_last_seen_target = false; // Reset dash flag for new target
+	const bool sees_target = closest_enemy.is_set();
+
+	if (sees_target) {
+		player.ai_state.alertness_time += dt_secs;
+	}
+	else {
+		player.ai_state.alertness_time -= dt_secs;
+		player.ai_state.alertness_time = std::max(0.0f, player.ai_state.alertness_time);
 	}
 
-	const bool has_target = closest_enemy.is_set();
+	const auto reaction_threshold_secs = [&]() {
+		switch (difficulty) {
+			case difficulty_type::HARD: return 0.25f;
+			case difficulty_type::MEDIUM: return 0.8f;
+			case difficulty_type::EASY: return 1.5f;
+			default: return 1.0f;
+		}
+	}();
+	
+	const bool should_react = player.ai_state.alertness_time >= reaction_threshold_secs;
+	const bool has_target = sees_target && should_react;
+
+	if (sees_target) {
+		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
+		player.ai_state.last_seen_target = closest_enemy;
+		player.ai_state.chase_remaining_time = 5.0f; // 5 second chase timeout
+		player.ai_state.last_target_position = target_pos;
+		player.ai_state.has_dashed_for_last_seen_target = false; // Reset dash flag for new target
+	}
+	
+	player.ai_state.alertness_time = std::min(reaction_threshold_secs + 0.2f, player.ai_state.alertness_time);
 
 	if (player.ai_state.chase_timeout > 0.0f) {
 		player.ai_state.chase_timeout -= dt_secs;
 	}
 
-	if (player.ai_state.chase_timeout <= 0.0f && player.ai_state.last_seen_target.is_set()) {
+	if (!(player.ai_state.chase_timeout > 0.0f) && player.ai_state.last_seen_target.is_set()) {
 		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
 		const auto reached_threshold = 20.0f;
 		
@@ -185,7 +209,7 @@ arena_ai_result update_arena_mode_ai(
 					}
 				}
 				else {
-					player.ai_state.chase_timeout = 300.0f;
+					player.ai_state.chase_timeout = 3.0f;
 					actual_movement_direction = (player.ai_state.random_movement_target - character_pos).normalize();
 					player.ai_state.target_crosshair_offset = player.ai_state.random_movement_target - character_pos;
 				}
@@ -213,7 +237,7 @@ arena_ai_result update_arena_mode_ai(
 		const auto distance_to_target = (player.ai_state.random_movement_target - character_pos).length();
 
 		if (DEBUG_DRAWING.draw_ai_info) {
-			const bool timeout = player.ai_state.chase_timeout > 0;
+			const bool timeout = player.ai_state.chase_timeout > 0.0f;
 			DEBUG_LOGIC_STEP_LINES.emplace_back(timeout ? cyan : white, character_pos, player.ai_state.random_movement_target);
 		}
 
@@ -238,7 +262,10 @@ arena_ai_result update_arena_mode_ai(
 	if (player.ai_state.last_seen_target.is_set() && player.ai_state.chase_remaining_time > 0.0f) {
 		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
 		if (!has_target) {
-			movement.flags.sprinting = true;
+			if (difficulty > difficulty_type::EASY) {
+				movement.flags.sprinting = true;
+			}
+
 			if (distance_to_last_seen < 400.0f && !player.ai_state.has_dashed_for_last_seen_target) {
 				movement.flags.dashing = true;
 				player.ai_state.has_dashed_for_last_seen_target = true;
@@ -262,7 +289,7 @@ arena_ai_result update_arena_mode_ai(
 			const auto target_aim = vec2(aim_direction).normalize();
 			const auto angle_diff = current_aim.degrees_between(target_aim);
 			
-			trigger = (angle_diff <= 15.0f) && target_in_range;
+			trigger = (angle_diff <= 25.0f) && target_in_range;
 		}
 	}
 
@@ -273,7 +300,12 @@ arena_ai_result update_arena_mode_ai(
 	// Smoothly interpolate crosshair towards target offset
 	if (auto crosshair = character_handle.find_crosshair()) {
 		const float average_factor = 0.5f;
-		const float averages_per_sec = has_target ? 5.0f : 4.0f;
+		float averages_per_sec = has_target ? 4.0f : 3.0f;
+
+		if (difficulty == difficulty_type::EASY) {
+			averages_per_sec = 2.0f;
+		}
+
 		const float averaging_constant = 1.0f - static_cast<real32>(repro::pow(average_factor, averages_per_sec * dt_secs));
 		
 		crosshair->base_offset = augs::interp(crosshair->base_offset, player.ai_state.target_crosshair_offset, averaging_constant);

@@ -2424,7 +2424,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 		auto& player = it.second;
 
 		if (player.is_bot) {
-			const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng);
+			const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng, in.dynamic_vars.bot_difficulty);
 			
 			if (ai_result.item_purchase.has_value()) {
 				entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
