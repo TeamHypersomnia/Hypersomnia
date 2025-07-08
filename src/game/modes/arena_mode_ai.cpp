@@ -298,8 +298,12 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
+	if (character_handle.is_frozen()) {
+		trigger = false;
+	}
+
 	if (auto sentience = character_handle.find<components::sentience>()) {
-		sentience->hand_flags[0] = trigger;
+		sentience->hand_flags[0] = sentience->hand_flags[1] = trigger;
 	}
 
 	// Smoothly interpolate crosshair towards target offset
