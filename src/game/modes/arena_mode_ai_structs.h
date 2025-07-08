@@ -18,6 +18,7 @@ struct arena_mode_ai_state {
 	
 	entity_id last_seen_target = entity_id::dead();
 	float chase_remaining_time = 0.0f;
+	float chase_timeout = 0.0f;
 	vec2 last_target_position = vec2::zero;
 	vec2 target_crosshair_offset = vec2::zero;
 	vec2 random_movement_target = vec2::zero;

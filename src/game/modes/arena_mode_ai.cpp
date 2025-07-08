@@ -159,7 +159,11 @@ arena_ai_result update_arena_mode_ai(
 
 	const bool has_target = closest_enemy.is_set();
 
-	if (player.ai_state.last_seen_target.is_set()) {
+	if (player.ai_state.chase_timeout > 0.0f) {
+		player.ai_state.chase_timeout -= dt_secs;
+	}
+
+	if (player.ai_state.chase_timeout <= 0.0f && player.ai_state.last_seen_target.is_set()) {
 		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
 		const auto reached_threshold = 20.0f;
 		
@@ -171,9 +175,25 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		if (player.ai_state.chase_remaining_time > 0.0f) {
-			// Chase to last seen position
-			actual_movement_direction = (player.ai_state.last_target_position - character_pos).normalize();
-			player.ai_state.target_crosshair_offset = player.ai_state.last_target_position - character_pos;
+			if (has_target) {
+				if (distance_to_last_seen > 200.0f) {
+					actual_movement_direction = (player.ai_state.last_target_position - character_pos).normalize();
+					player.ai_state.target_crosshair_offset = player.ai_state.last_target_position - character_pos;
+
+					if (DEBUG_DRAWING.draw_ai_info) {
+						DEBUG_LOGIC_STEP_LINES.emplace_back(yellow, character_pos, player.ai_state.last_target_position);
+					}
+				}
+				else {
+					player.ai_state.chase_timeout = 300.0f;
+					actual_movement_direction = (player.ai_state.random_movement_target - character_pos).normalize();
+					player.ai_state.target_crosshair_offset = player.ai_state.random_movement_target - character_pos;
+				}
+			}
+			else {
+				actual_movement_direction = (player.ai_state.last_target_position - character_pos).normalize();
+				player.ai_state.target_crosshair_offset = player.ai_state.last_target_position - character_pos;
+			}
 		}
 		else {
 			player.ai_state.last_seen_target = entity_id::dead();
@@ -191,6 +211,11 @@ arena_ai_result update_arena_mode_ai(
 		
 		// Check if we've reached the current movement target (within 100 units)
 		const auto distance_to_target = (player.ai_state.random_movement_target - character_pos).length();
+
+		if (DEBUG_DRAWING.draw_ai_info) {
+			const bool timeout = player.ai_state.chase_timeout > 0;
+			DEBUG_LOGIC_STEP_LINES.emplace_back(timeout ? cyan : white, character_pos, player.ai_state.random_movement_target);
+		}
 
 		if (distance_to_target < 140.0f) {
 			// Force a new movement direction by resetting the timer
@@ -214,7 +239,7 @@ arena_ai_result update_arena_mode_ai(
 		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
 		if (!has_target) {
 			movement.flags.sprinting = true;
-			if (distance_to_last_seen < 200.0f && !player.ai_state.has_dashed_for_last_seen_target) {
+			if (distance_to_last_seen < 400.0f && !player.ai_state.has_dashed_for_last_seen_target) {
 				movement.flags.dashing = true;
 				player.ai_state.has_dashed_for_last_seen_target = true;
 			}

@@ -22,6 +22,7 @@ struct debug_drawing_settings {
 	// GEN INTROSPECTOR struct debug_drawing_settings
 	bool enabled = false;
 
+	bool draw_ai_info = false;
 	bool draw_penetration = false;
 	bool draw_collinearization = false;
 	bool draw_melee_info = false;
