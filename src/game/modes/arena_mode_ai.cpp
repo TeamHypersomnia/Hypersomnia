@@ -17,6 +17,7 @@
 #include "augs/misc/scope_guard.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/debug_drawing_settings.h"
+#include "game/messages/gunshot_message.h"
 
 arena_ai_result update_arena_mode_ai(
 	const arena_mode::input& in,
@@ -33,7 +34,7 @@ arena_ai_result update_arena_mode_ai(
 
 	const auto money = player.stats.money;
 	auto& cosm = in.cosm;
-	const auto character_handle = cosm[player.controlled_character_id];
+	const entity_handle character_handle = cosm[player.controlled_character_id];
 	
 	if (!character_handle.alive()) {
 		return arena_ai_result{};
@@ -121,9 +122,10 @@ arena_ai_result update_arena_mode_ai(
 				return;
 			}
 
-			const auto distance = (entity.get_logic_transform().pos - character_pos).length();
+			const auto offset = entity.get_logic_transform().pos - character_pos;
+			const auto distance = (offset).length();
 			
-			if (distance < closest_distance && distance < 1080.0f * 2) {
+			if (distance < closest_distance && repro::fabs(offset.y) < 1080.0f && repro::fabs(offset.x) < 1920.0f) {
 				const auto direction_to_enemy = (entity.get_logic_transform().pos - character_pos).normalize();
 				const auto angle_to_enemy = current_aim_direction.degrees_between(direction_to_enemy);
 				
@@ -152,6 +154,7 @@ arena_ai_result update_arena_mode_ai(
 		player.ai_state.last_seen_target = closest_enemy;
 		player.ai_state.chase_remaining_time = 5.0f; // 5 second chase timeout
 		player.ai_state.last_target_position = cosm[closest_enemy].get_logic_transform().pos;
+		player.ai_state.has_dashed_for_last_seen_target = false; // Reset dash flag for new target
 	}
 
 	const bool has_target = closest_enemy.is_set();
@@ -195,7 +198,30 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
-	const bool target_in_range = has_target && closest_distance < 1000.0f;
+	if (has_target) {
+		// If target is in POV, reset dash flag
+		player.ai_state.has_dashed_for_last_seen_target = false;
+	}
+
+	// Set movement direction flags at the very end, but before custom sprint/dash logic
+	movement.flags.set_from_closest_direction(actual_movement_direction);
+
+	// --- SPRINT/DASH LOGIC ---
+	movement.flags.sprinting = false;
+	movement.flags.dashing = false;
+
+	if (player.ai_state.last_seen_target.is_set() && player.ai_state.chase_remaining_time > 0.0f) {
+		const auto distance_to_last_seen = (player.ai_state.last_target_position - character_pos).length();
+		if (!has_target) {
+			movement.flags.sprinting = true;
+			if (distance_to_last_seen < 200.0f && !player.ai_state.has_dashed_for_last_seen_target) {
+				movement.flags.dashing = true;
+				player.ai_state.has_dashed_for_last_seen_target = true;
+			}
+		}
+	}
+
+	const bool target_in_range = has_target;
 
 	bool trigger = false;
 
@@ -297,8 +323,77 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
-	// Set movement flags at the very end
-	movement.flags.set_from_closest_direction(actual_movement_direction);
-
 	return result;
+} 
+
+void post_solve_arena_mode_ai(const arena_mode::input& in, arena_mode_player& player, const logic_step step) {
+	if (!player.controlled_character_id.is_set()) {
+		return;
+	}
+
+	auto& cosm = in.cosm;
+	const auto character_handle = cosm[player.controlled_character_id];
+
+	if (!character_handle.alive()) {
+		return;
+	}
+
+	// --- GUNSHOT REACTION LOGIC ---
+	const auto& gunshots = step.get_queue<messages::gunshot_message>();
+	const auto bot_faction = character_handle.get_official_faction();
+	const bool is_ffa = in.rules.is_ffa();
+	const auto character_pos = character_handle.get_logic_transform().pos;
+	const auto& physics = cosm.get_solvable_inferred().physics;
+	const auto filter = predefined_queries::pathfinding();
+
+	float current_target_distance = std::numeric_limits<float>::max();
+
+	if (player.ai_state.last_seen_target.is_set()) {
+		current_target_distance = (player.ai_state.last_target_position - character_pos).length();
+	}
+
+	for (const auto& shot : gunshots) {
+		if (!shot.capability.is_set()) continue;
+		const auto shooter = cosm[shot.capability];
+		if (!shooter.alive()) continue;
+		if (shooter == character_handle) continue;
+
+		const auto shooter_faction = shooter.get_official_faction();
+		bool is_enemy = false;
+
+		if (is_ffa) {
+			is_enemy = bot_faction != shooter_faction;
+		}
+		else {
+			is_enemy = bot_faction != shooter_faction && shooter_faction != faction_type::SPECTATOR;
+		}
+
+		if (!is_enemy) continue;
+
+		const auto muzzle_pos = shot.muzzle_transform.pos;
+		const auto raycast = physics.ray_cast_px(
+			cosm.get_si(),
+			character_pos,
+			muzzle_pos,
+			filter,
+			character_handle
+		);
+
+		if (!raycast.hit) {
+			const float dist = (muzzle_pos - character_pos).length();
+
+			if (!player.ai_state.last_seen_target.is_set() || dist < current_target_distance) {
+				player.ai_state.last_seen_target = shot.capability;
+				player.ai_state.chase_remaining_time = 5.0f;
+				player.ai_state.last_target_position = muzzle_pos;
+				player.ai_state.has_dashed_for_last_seen_target = false;
+				current_target_distance = dist;
+			}
+		}
+	}
+
+	if (auto* movement = character_handle.find<components::movement>()) {
+		movement->flags.sprinting = false;
+		movement->flags.dashing = false;
+	}
 } 

@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Dont report webhooks if only bots
+- Kick bots when ranked starts (about to) and control the number of items there on ranked warmup
+- remember to honor freezes because ai sets stuff directly
+- different verti and hori fow
+- move perpendicularly sometimes when shooting
+- dash when close to last seen pos to you know surprise
+- find out wtf with those debug lines on cyberaqua
+- also buy if they only have pistols
+- dont give bomb to bots if players available
+
 - refactor arena mode so match and round state is in its own structs properly
 
 - remaining bot spawning logic

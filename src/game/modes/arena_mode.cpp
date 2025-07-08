@@ -2895,7 +2895,7 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 		auto requested = requested_bots[faction];
 
 		while (current < requested) {
-			const auto new_id = add_bot_player(in, "BOT " + names[(bot_name_counter++) % names.size()]);
+			const auto new_id = add_bot_player(in, names[(bot_name_counter++) % names.size()]);
 			choose_faction(in, new_id, faction);
 			++current;
 		}
@@ -3701,6 +3701,13 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 					}
 				}
 			}
+		}
+	}
+
+	// At the end of mode_post_solve, reset bot sprint/dash flags
+	for (auto& it : players) {
+		if (it.second.is_bot) {
+			post_solve_arena_mode_ai(in, it.second, step);
 		}
 	}
 }
