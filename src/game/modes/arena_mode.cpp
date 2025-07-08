@@ -621,7 +621,7 @@ void arena_mode::for_each_player_handle_in(C& cosm, const faction_type faction, 
 					return callback_result::CONTINUE;
 				}
 				else {
-					return continue_or_callback_result(std::forward<F>(callback), typed_player);
+					return continue_or_callback_result(std::forward<F>(callback), typed_player, data);
 				}
 			});
 		}
@@ -633,7 +633,7 @@ void arena_mode::for_each_player_handle_in(C& cosm, const faction_type faction, 
 std::size_t arena_mode::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
 	auto total = std::size_t(0);
 
-	for_each_player_handle_in(cosm, faction, [&](const auto& handle) {
+	for_each_player_handle_in(cosm, faction, [&](const auto& handle, auto&) {
 		if (handle.template get<components::sentience>().is_conscious()) {
 			++total;
 		}
@@ -876,7 +876,13 @@ bool arena_mode::give_bomb_to_random_player(const input_type in, const logic_ste
 	const auto viable_players = [&]() {
 		std::vector<typed_entity_id<player_character_type>> result;
 
-		for_each_player_handle_in(cosm, p.bombing, [&](const auto& typed_player) {
+		const bool exclude_bots = num_human_players_in(p.bombing) > 0;
+
+		for_each_player_handle_in(cosm, p.bombing, [&](const auto& typed_player, const auto& data) {
+			if (data.is_bot && exclude_bots) {
+				return;
+			}
+
 			for (const auto& t : tried_slots) {
 				if (typed_player[t].is_empty_slot()) {
 					result.push_back(typed_player.get_id());
@@ -892,7 +898,7 @@ bool arena_mode::give_bomb_to_random_player(const input_type in, const logic_ste
 		return false;
 	}
 
-	const auto chosen_bomber_idx = get_step_rng_seed(cosm) % viable_players.size();
+	const auto chosen_bomber_idx = total_mode_steps_passed % viable_players.size();
 	const auto typed_player = cosm[viable_players[chosen_bomber_idx]];
 
 	for (const auto& t : tried_slots) {
@@ -1460,7 +1466,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 				std::optional<int> victim_faction_hp;
 				std::optional<mode_player_id> victim_faction_id;
 
-				for_each_player_handle_in(in.cosm, victim_faction, [&](const auto& handle) {
+				for_each_player_handle_in(in.cosm, victim_faction, [&](const auto& handle, auto&) {
 					if (sentient_and_conscious(handle)) {
 						victim_faction_hp = std::max(1, static_cast<int>(handle.template get<components::sentience>().template get<health_meter_instance>().value));
 						victim_faction_id = lookup(handle.get_id());
@@ -1487,7 +1493,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 						}
 
 						if (n == 1) {
-							for_each_player_handle_in(in.cosm, faction, [&](const auto& handle) {
+							for_each_player_handle_in(in.cosm, faction, [&](const auto& handle, auto&) {
 								if (sentient_and_conscious(handle)) {
 									enemy_hp = std::max(1, static_cast<int>(handle.template get<components::sentience>().template get<health_meter_instance>().value));
 									enemy_id = lookup(handle.get_id());

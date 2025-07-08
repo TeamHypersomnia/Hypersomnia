@@ -7342,3 +7342,7 @@ This will discard your redo history."
 - dash when close to last seen pos to you know surprise
 - Kick bots when ranked starts (about to) 
 - different verti and hori fow
+- Dont report webhooks if only bots
+- and control the number of items there on ranked warmup
+- remember to honor freezes because ai sets stuff directly
+- also buy if they only have pistols
