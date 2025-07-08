@@ -2733,6 +2733,7 @@ void server_setup::apply(const config_json_table& cfg) {
 
 	auto requested_settings = integrated_client.settings.public_settings;
 	requested_settings.character_input = cfg.input.character;
+	requested_settings.clan = cfg.client.clan;
 
 	try_apply(requested_settings);
 }
@@ -4909,9 +4910,13 @@ void server_setup::handle_client_chat_command(
 ) {
 	const auto& cli = get_client_state(to_mode_player_id(id));
 
-	if (vars.requires_authentication() && !cli.is_authenticated()) {
-		LOG("Unauthenticated for a chat command.");
-		return;
+	const bool integrated = is_integrated() && id == get_integrated_client_id();
+
+	if (!integrated) {
+		if (vars.requires_authentication() && !cli.is_authenticated()) {
+			LOG("Unauthenticated for a chat command.");
+			return;
+		}
 	}
 
 	auto broadcast_only_warmup = [&]() {
