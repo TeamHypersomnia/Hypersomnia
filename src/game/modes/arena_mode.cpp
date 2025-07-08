@@ -3464,6 +3464,8 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	if (state == arena_mode_state::WARMUP) {
 		respawn_the_dead(in, step, in.rules.warmup_respawn_after_ms);
 
+		remove_old_lying_items(in, step);
+
 		bool all_ready_for_ranked = false;
 
 		if (
@@ -4598,4 +4600,35 @@ bool arena_mode::team_choice_allowed(const const_input_type in) const {
 
 bool arena_mode::should_match_be_short(const const_input_type in) const {
 	return in.dynamic_vars.force_short_match;
+}
+
+void arena_mode::remove_old_lying_items(const input_type in, const logic_step) {
+	const auto max_age_ms = 7000;
+
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+
+	deletion_queue q;
+
+	cosm.for_each_having<invariants::item>([&](const auto typed_handle) {
+		if (typed_handle.get_current_slot().alive()) {
+			return;
+		}
+
+		const auto when_dropped = typed_handle.when_last_transferred();
+
+		if (when_dropped.was_set()) {
+			if (clk.is_ready(max_age_ms, when_dropped)) {
+				q.push_back(entity_id(typed_handle.get_id()));
+
+				typed_handle.for_each_contained_item_recursive(
+					[&](const auto& contained) {
+						q.push_back(entity_id(contained.get_id()));
+					}
+				);
+			}
+		}
+	});
+
+	::reverse_perform_deletions(q, cosm);
 }

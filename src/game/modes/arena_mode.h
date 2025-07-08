@@ -800,4 +800,6 @@ public:
 		int8_t second_quota = -1,
 		const mode_player_id& requester_player = mode_player_id()
 	) const;
+
+	void remove_old_lying_items(const input in, const logic_step step);
 };
