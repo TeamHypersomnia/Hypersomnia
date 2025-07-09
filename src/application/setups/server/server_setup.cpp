@@ -2937,6 +2937,8 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 			get_rcon_level(client_id)
 		}
 	);
+
+	reinference_necessary = true;
 }
 
 void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
@@ -3887,9 +3889,9 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 	for_each_id_and_client(send_total_entropy, only_connected_v);
 }
 
-void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& entropy) {
-	if (reinference_necessary || logically_set(entropy.general.added_player)) {
-		LOG("Server: Added player or reinference_necessary. Will reinfer to sync.");
+void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy&) {
+	if (reinference_necessary) {
+		LOG("Server: reinference_necessary. Will reinfer to sync.");
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
 		reinference_necessary = false;
 	}
@@ -4421,6 +4423,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		LOG("Server: %x", new_entry.to_string());
 	}
 
+#if !PLATFORM_WEB
 	if (payload.target == chat_target_type::GENERAL && !sender_player_nickname.empty()) {
 		std::string author_clan;
 
@@ -4451,6 +4454,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 			}
 		);
 	}
+#endif
 }
 
 message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type& id, const std::string& reason) {

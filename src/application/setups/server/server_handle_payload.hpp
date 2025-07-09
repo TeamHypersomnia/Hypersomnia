@@ -379,8 +379,6 @@ message_handler_result server_setup::handle_payload(
 					send_full_arena_snapshot_to(client_id);
 				}
 
-				reinference_necessary = true;
-
 				break;
 
 			default: return abort_v;

@@ -1054,12 +1054,6 @@ void arena_mode::setup_round(
 
 	stable_round_rng = randomization(total_mode_steps_passed).generator;
 
-	LOG_NVPS(total_mode_steps_passed);
-	LOG_NVPS(stable_round_rng.s_0);
-	LOG_NVPS(stable_round_rng.s_1);
-	LOG_NVPS(stable_round_rng.s_2);
-	LOG_NVPS(stable_round_rng.s_3);
-
 	cosm.set(in.clean_round_state);
 
 	/* 

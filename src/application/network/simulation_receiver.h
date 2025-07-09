@@ -221,10 +221,10 @@ public:
 				}
 
 				{
-					const bool shall_reinfer = meta.reinference_necessary || logically_set(actual_server_step.payload.general.added_player);
+					const bool shall_reinfer = meta.reinference_necessary;
 
 					if (shall_reinfer) {
-						LOG("Added player in the next entropy. Will reinfer to sync.");
+						LOG("Received reinference_necessary from the server.");
 						cosmic::reinfer_solvable(referential_arena.get_cosmos());
 					}
 

@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- dont do game commencing on casual when someone joins
 - bots checkmark in host a server
 - max slots to 16 maybe
 - implement max bots
@@ -15,7 +16,6 @@ summary: That which we are brainstorming at the moment.
 - ban blunaz for bots to not confuse people
 - fix web too
 - fix no of slots and reporting in browser gui
-- why resynchro 
 
 - on hard/medium throw knives if reloading
 - move perpendicularly sometimes when shooting
