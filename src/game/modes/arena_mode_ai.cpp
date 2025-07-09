@@ -362,6 +362,10 @@ arena_ai_result update_arena_mode_ai(
 						return;
 					}
 
+					if (flavour.get<invariants::gun>().bots_ban) {
+						return;
+					}
+
 					const auto price = *::find_price_of(cosm, item_flavour_id(id));
 
 					if (price <= money) {

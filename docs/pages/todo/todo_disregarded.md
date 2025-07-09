@@ -737,3 +737,4 @@ summary: Just a hidden scratchpad.
 - We could also use UDT later, looks legit
     - just send the list of all hashes once and send it in a single chunk?
     - per file is okay too I guess
+- ban blunaz for bots to not confuse people
