@@ -4966,7 +4966,7 @@ void server_setup::handle_client_chat_command(
 				const auto current_difficulty = last_broadcast_dynamic_vars.bot_difficulty;
 				
 				if (current_difficulty == target_difficulty) {
-					broadcast_info(typesafe_sprintf("Bots are already %x.", target_difficulty), chat_target_type::INFO);
+					broadcast_info(typesafe_sprintf("Bots are already %x.", augs::enum_to_string(target_difficulty)), chat_target_type::INFO);
 				}
 				else {
 					overrides.bot_difficulty = {
@@ -4974,7 +4974,7 @@ void server_setup::handle_client_chat_command(
 						target_difficulty
 					};
 
-					const auto notice = typesafe_sprintf("Bots difficulty changed from %x to %x.", current_difficulty, target_difficulty);
+					const auto notice = typesafe_sprintf("Bots difficulty changed from %x to %x.", augs::enum_to_string(current_difficulty), augs::enum_to_string(target_difficulty));
 
 					broadcast_info(notice, chat_target_type::INFO);
 				}
