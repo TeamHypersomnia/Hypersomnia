@@ -583,6 +583,7 @@ public:
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
 		++total_mode_steps_passed;
+		++sound_clock;
 
 		return standard_solver()(
 			step_input, 

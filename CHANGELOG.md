@@ -34,7 +34,8 @@
 ### Fixed
 
 - **Balance:** `ao44` and `covert` prices have been swapped.
-- Finally fix the goddamn clipboard in Linux Steam builds.
+- (Likely) NixOS crash in the server browser.
+- Broken clipboard in Linux Steam builds.
 - FFA/gun game match results now report correctly through the webhooks.
 - `user/conf.d` will only consider `.json` files from now to prevent crash when a non-json file is accidentally put there.
 - `[Web]` was incorrectly added to the native client's nickname when connecting to a server hosted in the browser.

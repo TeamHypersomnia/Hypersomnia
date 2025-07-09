@@ -4199,7 +4199,7 @@ const arena_mode::player_entry_type* arena_mode::find_player_by(const client_nic
 }
 
 void arena_mode::restart_match(const input_type in, const logic_step step) {
-	continuous_sounds_clock(in) = 0;
+	sound_clock = 0;
 
 	match_start_timestamp.clear();
 

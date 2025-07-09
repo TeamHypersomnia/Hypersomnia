@@ -7347,3 +7347,5 @@ This will discard your redo history."
 - remember to honor freezes because ai sets stuff directly
 - also buy if they only have pistols
 - dont give bomb to bots if players available
+
+- rozjebana muza znowu
