@@ -3685,15 +3685,17 @@ void server_setup::handle_client_messages() {
 void server_setup::rebroadcast_synced_dynamic_vars() {
 	const auto current_dynamic_vars = make_synced_dynamic_vars();
 
+	auto defaults = server_var_temp_overrides();
+
 	if (overrides.bots.requester.is_set()) {
 		if (!get_client_state(overrides.bots.requester).is_set()) {
-			overrides.bots = {};
+			overrides.bots = defaults.bots;
 		}
 	}
 
 	if (overrides.bot_difficulty.requester.is_set()) {
 		if (!get_client_state(overrides.bot_difficulty.requester).is_set()) {
-			overrides.bot_difficulty = {};
+			overrides.bot_difficulty = defaults.bot_difficulty;
 		}
 	}
 
@@ -4125,7 +4127,7 @@ void server_setup::update_stats(server_network_info& info) const {
 
 server_client_state* server_setup::find_client_state(const mode_player_id id) {
 	if (id.is_set()) {
-		if (id.value < clients.size()) {
+		if (id.value < clients.size() || id == get_integrated_player_id()) {
 			return std::addressof(get_client_state(id));
 		}
 	}
@@ -4171,9 +4173,9 @@ mode_player_id server_setup::find_client_by_account_id(const std::string& accoun
 
 const server_client_state* server_setup::find_client_state(const mode_player_id id) const {
 	if (id.is_set()) {
-		auto& c = get_client_state(id);
+		if (id.value < clients.size() || id == get_integrated_player_id()) {
+			auto& c = get_client_state(id);
 
-		if (id.value < clients.size()) {
 			if (c.is_set()) {
 				return std::addressof(c);
 			}
@@ -4950,6 +4952,10 @@ void server_setup::handle_client_chat_command(
 
 	if (chat.target == chat_target_type::GENERAL) {
 		if (begins_with(chat.message, "/bots")) {
+			if (is_ranked_live_or_starting()) {
+				return;
+			}
+
 			if (chat.message == "/bots" || chat.message == "/bots ") {
 				overrides.bots = {};
 				overrides.bot_difficulty = {};

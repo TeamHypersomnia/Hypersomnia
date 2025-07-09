@@ -2475,6 +2475,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 									int players_left = 0;
 
 									for (auto& p : players) {
+										if (p.second.is_bot) {
+											continue;
+										}
+
 										if (!p.second.ready_for_ranked) {
 											++players_left;
 										}
@@ -2827,7 +2831,7 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
 	const auto& over = in.dynamic_vars.bots_override;
 
-	if (ranked_state == ranked_state_type::STARTING) {
+	if (ranked_state != ranked_state_type::NONE) {
 		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
 	}
 

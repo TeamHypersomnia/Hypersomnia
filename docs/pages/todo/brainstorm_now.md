@@ -9,7 +9,6 @@ summary: That which we are brainstorming at the moment.
 - on hard/medium throw knives if reloading
 - move perpendicularly sometimes when shooting
 - find out wtf with those debug lines on cyberaqua
-- dont give bomb to bots if players available
 
 - refactor arena mode so match and round state is in its own structs properly
 

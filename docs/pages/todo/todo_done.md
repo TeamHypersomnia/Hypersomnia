@@ -7346,3 +7346,4 @@ This will discard your redo history."
 - and control the number of items there on ranked warmup
 - remember to honor freezes because ai sets stuff directly
 - also buy if they only have pistols
+- dont give bomb to bots if players available
