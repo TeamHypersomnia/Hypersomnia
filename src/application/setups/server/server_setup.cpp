@@ -4961,29 +4961,33 @@ void server_setup::handle_client_chat_command(
 				overrides.bot_difficulty = {};
 				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
 			}
-			else if (begins_with(chat.message, "/bots hard") || chat.message == "/bots h") {
-				overrides.bot_difficulty = {
-					to_mode_player_id(id),
-					difficulty_type::HARD
-				};
 
-				broadcast_info("Bots difficulty set to HARD.", chat_target_type::INFO);
+			auto set_difficulty = [&](const difficulty_type target_difficulty) {
+				const auto current_difficulty = last_broadcast_dynamic_vars.bot_difficulty;
+				
+				if (current_difficulty == target_difficulty) {
+					broadcast_info(typesafe_sprintf("Bots are already %x.", target_difficulty), chat_target_type::INFO);
+				}
+				else {
+					overrides.bot_difficulty = {
+						to_mode_player_id(id),
+						target_difficulty
+					};
+
+					const auto notice = typesafe_sprintf("Bots difficulty changed from %x to %x.", current_difficulty, target_difficulty);
+
+					broadcast_info(notice, chat_target_type::INFO);
+				}
+			};
+
+			if (begins_with(chat.message, "/bots hard") || chat.message == "/bots h") {
+				set_difficulty(difficulty_type::HARD);
 			}
 			else if (begins_with(chat.message, "/bots med") || chat.message == "/bots m") {
-				overrides.bot_difficulty = {
-					to_mode_player_id(id),
-					difficulty_type::MEDIUM
-				};
-
-				broadcast_info("Bots difficulty set to MEDIUM.", chat_target_type::INFO);
+				set_difficulty(difficulty_type::MEDIUM);
 			}
 			else if (begins_with(chat.message, "/bots easy") || chat.message == "/bots e") {
-				overrides.bot_difficulty = {
-					to_mode_player_id(id),
-					difficulty_type::EASY
-				};
-
-				broadcast_info("Bots difficulty set to EASY.", chat_target_type::INFO);
+				set_difficulty(difficulty_type::EASY);
 			}
 			else {
 				unsigned first = -1;
