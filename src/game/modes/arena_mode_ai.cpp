@@ -362,7 +362,7 @@ arena_ai_result update_arena_mode_ai(
 						return;
 					}
 
-					if (flavour.get<invariants::gun>().bots_ban) {
+					if (flavour.template get<invariants::gun>().bots_ban) {
 						return;
 					}
 

@@ -358,11 +358,11 @@ arena_mode_ruleset::arena_mode_ruleset() {
 
 	rs.bot_names = {
 		"Ferris",
+		"Pheiffer",
+		"Car Tonic",
 		"Sorbet",
 		"Bilon",
-		"Dedal",
 		"Ikar",
-		"Fajfer",
 		"Vincent",
 		"Lipa",
 		"Poeta",

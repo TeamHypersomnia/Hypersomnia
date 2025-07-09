@@ -7351,3 +7351,4 @@ This will discard your redo history."
 - rozjebana muza znowu
 - why resynchro 
 	- was wrong reinference
+- i chuj i jeszcze nie respawnuje

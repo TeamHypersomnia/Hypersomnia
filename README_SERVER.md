@@ -233,7 +233,7 @@ The process first creates Ranked servers, then Casual server instances, so in ca
 Casual server instances will be run with exactly the same configuration as Ranked instances, except their ``server.ranked.autostart_when`` variable will be set to ``"NEVER"``. This disables the entire ranked logistics.
 
 If you restart/shutdown just one server instance from the panel, all servers will follow.
-So that the runtime changes to config vars propagate to the ``config.json`` file, connect to the first ranked server to tweak them - or first Casual server instance if there are no Ranked servers. Changes to other instances will be ephemeral and only persist for the current server run.
+So that the runtime changes to config vars propagate to the ``config.json`` file, connect to the first Casual server to tweak them - or first Ranked server instance if there are no Casual servers. Changes to other instances will be ephemeral and only persist for the current server run.
 
 ## CLI flags
 
