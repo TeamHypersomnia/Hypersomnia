@@ -7349,6 +7349,5 @@ This will discard your redo history."
 - dont give bomb to bots if players available
 
 - rozjebana muza znowu
-- why resynchro 
-	- was wrong reinference
 - i chuj i jeszcze nie respawnuje
+

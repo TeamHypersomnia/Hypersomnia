@@ -10,8 +10,6 @@ summary: That which we are brainstorming at the moment.
 - bots checkmark in host a server
 - max slots to 16 maybe
 - implement max bots
-- cos sie PIERDOLI z tymi nazwami serwerow znowu
-- clear all is FUCKED again
 - fix web too
 - fix no of slots and reporting in browser gui
 

@@ -3690,13 +3690,13 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 	auto defaults = server_var_temp_overrides();
 
 	if (overrides.bots.requester.is_set()) {
-		if (!get_client_state(overrides.bots.requester).is_set()) {
+		if (const bool disconnected_already = !get_client_state(overrides.bots.requester).is_set()) {
 			overrides.bots = defaults.bots;
 		}
 	}
 
 	if (overrides.bot_difficulty.requester.is_set()) {
-		if (!get_client_state(overrides.bot_difficulty.requester).is_set()) {
+		if (const bool disconnected_already = !get_client_state(overrides.bot_difficulty.requester).is_set()) {
 			overrides.bot_difficulty = defaults.bot_difficulty;
 		}
 	}

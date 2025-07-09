@@ -351,7 +351,6 @@
         "auto_authorize_loopback_for_rcon": true,
         "auto_authorize_internal_for_rcon": false,
         "max_unauthorized_rcon_commands": 100,
-        "max_bots": 0,
         "log_performance_once_every_secs": 0.0,
         "sleep_mult": 0.10000000149011612,
         "max_direct_file_bandwidth": 6.0,

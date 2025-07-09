@@ -5,6 +5,14 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- why resynchro 
+	- was wrong reinference
+- cos sie PIERDOLI z tymi nazwami serwerow znowu
+	- casuals were ephemeral, we were clearing all there
+- clear all is FUCKED again
+	- because ranked state (never) was reverted back to (always)
+	- and then it detected im not there
+
 - fix fucking menu crash in web again
     - when aborting after opening through /game/blahblah link
     - I think that was a false alarm, perhaps we were running an old version in the browser
