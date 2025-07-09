@@ -4,10 +4,16 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [unreleased] - 2025-07-06
+## [1.3.0] - 2025-07-09
 
 ### Added
 
+- **Basic bots.**
+	- `/bots [x] [y]` command. `/bots 4` sets total quota, `/bots 1 4` specifies a custom split. `/bots` resets to default.
+	- `/bots e|m|h` sets bot difficulty to either easy, medium or hard.
+	- Taking control of the bot upon player death.
+	- Reporting number of online bots/humans in the server list.
+	- Bots are still not perfect - they can't plant/defuse bombs etc, don't have pathfinding - they only walk randomly and shoot at the player, chasing him as well.
 - Clients can set their *Clan* in addition to their Nickname (`Settings -> Client`).
 	- The *Clan* will appear in the scoreboard (Tab).
 - `server_private.custom_webhook_urls` - Matrix-friendly webhooks.
@@ -15,11 +21,6 @@
 	- A single server keep multiple communities up-to-date with events only relevant to them.
 	- E.g. if a player from a given _Clan_ connects to the server, only their _Clan_ will be notified.
 	- This also relays chat messages now.
-- Basic bot spawning/kicking logistics.
-	- `/bots m [y]` command. `/bots 4` sets total quota, `/bots 1 4` specifies a custom split.
-	- Taking control of the bot upon player death.
-	- Reporting number of online bots/humans in the server list.
-	- Bots are still stationary.
 
 ### Changed
 
