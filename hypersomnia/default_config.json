@@ -273,7 +273,7 @@
     "server_start": {
         "ip": "0.0.0.0",
         "port": 0, // default is 8412 for a dedicated server
-        "slots": 10
+        "slots": 16
     },
 
     "server": {

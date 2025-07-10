@@ -949,7 +949,7 @@ server_setup::~server_setup() {
 }
 
 bool server_heartbeat::is_full() const {
-	return num_online == max_online;
+	return num_online == max_online();
 }
 
 void server_heartbeat::validate() {
@@ -2233,10 +2233,10 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.num_online = heartbeat.num_online_humans + get_num_bots();
 
 	if (is_joinable()) {
-		heartbeat.max_online = get_num_slots();
+		heartbeat.server_slots = get_num_slots();
 	}
 	else {
-		heartbeat.max_online = heartbeat.num_online;
+		heartbeat.server_slots = heartbeat.num_online;
 	}
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();

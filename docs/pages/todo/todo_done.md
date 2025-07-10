@@ -7352,3 +7352,5 @@ This will discard your redo history."
 - i chuj i jeszcze nie respawnuje
 
 - bots checkmark in host a server
+- dont do game commencing on casual when someone joins
+- max slots to 16 maybe

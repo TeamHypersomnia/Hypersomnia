@@ -364,7 +364,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.num_playing = data.num_online - next.num_spectating;
 			next.num_online_humans = data.num_online_humans;
 
-			next.slots = data.max_online;
+			next.slots = data.server_slots;
 
 			next.nat = data.nat.type;
 
@@ -591,7 +591,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						ip_str,
 						data.current_arena,
 						game_mode_name,
-						data.max_online,
+						data.server_slots,
 						nat_type_to_string(data.nat.type),
 						data.is_editor_playtesting_server
 					);

@@ -35,7 +35,7 @@ struct server_heartbeat {
 
 	uint8_t num_online_humans;
 	uint8_t num_online;
-	uint8_t max_online;
+	uint8_t server_slots;
 
 	std::optional<netcode_address_t> internal_network_address;
 	nat_detection_result nat;
@@ -56,6 +56,18 @@ struct server_heartbeat {
 	// END GEN INTROSPECTOR
 
 	double cached_time_to_event = 0.0;
+
+	bool any_human() const {
+		return num_online_humans > 0;
+	}
+
+	uint8_t num_online_bots() const {
+		return num_online - num_online_humans;
+	}
+
+	uint8_t max_online() const {
+		return server_slots + num_online_bots();
+	}
 
 	bool is_ranked_server() const {
 		return ranked_state >= 1;

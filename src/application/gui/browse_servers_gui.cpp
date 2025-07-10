@@ -90,15 +90,15 @@ static uint32_t order_category(
 		return 0;
 	}
 
-	if (a.num_online > 0 		&& a.nat.type == nat_type::PUBLIC_INTERNET) {
+	if (a.num_online_humans > 0 		&& a.nat.type == nat_type::PUBLIC_INTERNET) {
 		/* Non-empty public, best category */
 		return 1; 
 	}
-	else if (a.num_online > 0) {
+	else if (a.num_online_humans > 0) {
 		/* Non-empty NAT */
 		return 1 + static_cast<uint32_t>(a.nat.type); /* 2-5 */
 	}
-	else if (a.num_online == 0 && a.nat.type == nat_type::PUBLIC_INTERNET) {
+	else if (a.num_online_humans == 0 && a.nat.type == nat_type::PUBLIC_INTERNET) {
 		/* Empty public */
 		return 10 + static_cast<uint32_t>(a.nat.type); /* 10-14 */
 	}
@@ -747,14 +747,15 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online);
+		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online());
 
-		if (d.num_online == 0) {
+		if (d.any_human() == 0) {
 			text_disabled(players_text);
 		}
 		else {
 			do_text(players_text);
 		}
+
 		ImGui::NextColumn();
 
 		if (s.is_official_server() ) {
@@ -896,7 +897,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (at_least_players.is_enabled) {
-				if (s.heartbeat.num_online < at_least_players.value) {
+				if (s.heartbeat.num_online_humans < at_least_players.value) {
 					return;
 				}
 			}
@@ -971,7 +972,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto by_players = [](const T& a, const T& b) {
-			return a->heartbeat.num_online < b->heartbeat.num_online;
+			if (a->heartbeat.num_online_humans == b->heartbeat.num_online_humans) {
+				return a->heartbeat.num_online < b->heartbeat.num_online;
+			}
+
+			return a->heartbeat.num_online_humans < b->heartbeat.num_online_humans;
 		};
 
 		auto by_arena = [](const T& a, const T& b) {
@@ -1215,7 +1220,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			ImGui::SameLine();
 			auto input = std::to_string(val);
-			input_text(val == 1 ? "player###playernumbox" : "players###playernumbox", input);
+			input_text(val == 1 ? "human player###playernumbox" : "human players###playernumbox", input);
 			val = std::clamp(std::atoi(input.c_str()), 1, int(max_incoming_connections_v));
 		}
 
