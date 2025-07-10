@@ -250,6 +250,7 @@ void damage_indication_system::draw_indicators(
 					return shield_color;
 				}
 		}
+		return rgba(0, 0, 0, 0); // fully transparent
 	};
 
 	const auto indicator_offsets = settings.single_indicator_offsets;
