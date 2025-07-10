@@ -1094,6 +1094,17 @@ else()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
+# Print version at configure time (for human visibility)
+execute_process(
+  COMMAND ${VERSION_FILE_GENERATOR_PATH} ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
+  OUTPUT_VARIABLE _vergen_output
+  ERROR_VARIABLE _vergen_error
+  RESULT_VARIABLE _vergen_result
+)
+message(STATUS "Version generator STDOUT:\n${_vergen_output}")
+message(STATUS "Version generator STDERR:\n${_vergen_error}")
+message(STATUS "Version generator exit code: ${_vergen_result}")
+
 macro(prefer_static_libraries)
 	if (UNIX)
 		message("These libraries will be linked statically.")

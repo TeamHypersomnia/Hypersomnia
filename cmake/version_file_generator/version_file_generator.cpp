@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 
 	debug_argv_content += "\n";
 
-	const auto git_tag = augs::exec(git_executable_path.string() + " describe --exact-match --tags HEAD 2>/dev/null || echo \"\"");
+	const auto git_tag = augs::exec(git_executable_path.string() + " describe --exact-match --tags HEAD");
 	
 	std::string version_string;
 
@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
 	else {
 		version_string = "0.0.0";
 	}
+	std::cout << "Detected version: " << version_string << std::endl;
 	
 	auto git_commit_message = augs::exec(git_executable_path.string() + " log -1 --format=%s");
 	// We shall add the backslash both before \ and " to avoid compilation errors

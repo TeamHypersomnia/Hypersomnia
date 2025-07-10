@@ -182,7 +182,7 @@ int main(const int argc, const char* const * const argv) {
 		we can start logging.
 	*/
 
-	LOG("Started at %x", augs::date_time().get_readable());
+	LOG("Version %x\nStarted at %x", hypersomnia_version().get_version_string(), augs::date_time().get_readable());
 
 	if (is_appimage) {
 		LOG("AppImage called from directory: \"%x\"", CALLING_CWD);

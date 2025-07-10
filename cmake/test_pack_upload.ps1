@@ -13,6 +13,10 @@ $good_log = Join-Path $base_path "exit_success_debug_log.txt"
 $fail_log = Join-Path $base_path "exit_failure_debug_log.txt"
 $ensr_log = Join-Path $base_path "ensure_failed_debug_log.txt"
 
+Write-Host "Running $target_exe --version"
+
+& $target_exe --version
+
 if ($console_mode -eq 1) { 
 	& $target_exe --unit-tests-only --test-fp-consistency 20000000
 }
