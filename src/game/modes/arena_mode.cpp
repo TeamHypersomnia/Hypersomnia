@@ -2953,16 +2953,24 @@ void arena_mode::spawn_characters_for_recently_assigned(const input_type in, con
 	}
 }
 
-arena_mode::composition_info arena_mode::get_team_composition_info(const_input_type in) const {
+arena_mode::composition_info arena_mode::get_team_composition_info(const_input_type in, const bool count_bots) const {
 	composition_info info;
+
+	auto num_in = [&](const faction_type f) {
+		if (count_bots) {
+			return num_players_in(f); 
+		}
+
+		return num_human_players_in(f);
+	};
 
 	const auto p = calc_participating_factions(in);
 
-	p.for_each([this, &info](const faction_type f) {
-		info.total_playing += num_human_players_in(f);
+	p.for_each([&info, num_in](const faction_type f) {
+		info.total_playing += num_in(f);
 	});
 
-	info.each_team_has_at_least_one = [this, in, &info, &p]() {
+	info.each_team_has_at_least_one = [in, &info, &p, num_in]() {
 		if (in.rules.is_ffa()) {
 			return info.total_playing > 1;
 		}
@@ -2970,7 +2978,7 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 		bool all_have = true;
 
 		p.for_each([&](const faction_type f) {
-			if (num_human_players_in(f) == 0) {
+			if (num_in(f) == 0) {
 				all_have = false;
 				info.missing_faction = f;
 			}
@@ -2983,7 +2991,8 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 }
 
 bool arena_mode::teams_viable_for_match(const_input_type in) const {
-	if (!get_team_composition_info(in).each_team_has_at_least_one) {
+	const bool count_bots = !in.is_ranked_server();
+	if (!get_team_composition_info(in, count_bots).each_team_has_at_least_one) {
 		return false;
 	}
 

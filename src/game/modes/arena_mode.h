@@ -751,7 +751,7 @@ public:
 		//bool teams_equal = false;
 	};
 
-	composition_info get_team_composition_info(const_input) const;
+	composition_info get_team_composition_info(const_input, bool count_bots = false) const;
 	bool teams_viable_for_match(const_input) const;
 
 	float get_warmup_seconds(const const_input in) const;
