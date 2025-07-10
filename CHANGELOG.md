@@ -4,6 +4,24 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.3.1] - 2025-07-10
+
+### Added
+
+- "Bots" checkmark in `Host server` window.
+
+  ![bots_check](docs/images/bots.png)
+
+### Fixed
+
+Most bugs were introduced by bots in `1.3.0`:
+
+- **Netcode:** new connections reinferred the world at 1 step too late, this shift causing resyncs in the beginning.
+- Don't show servers with bots as full in server browser.
+- Player didn't immediately spawn in place of a bot when joining for the first time.
+- Prevent _Game commencing_ when someone joins the opposite team that already has bots.
+- Broken music clock after `1.3.0`.
+
 ## [1.3.0] - 2025-07-09
 
 ### Added

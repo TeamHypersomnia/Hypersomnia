@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- implement map and game mode params in hypersomnia.io/host/map/mode
 - fix web too
 	- i dont remember what was that
 
