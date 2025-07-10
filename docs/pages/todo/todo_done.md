@@ -7351,3 +7351,4 @@ This will discard your redo history."
 - rozjebana muza znowu
 - i chuj i jeszcze nie respawnuje
 
+- bots checkmark in host a server

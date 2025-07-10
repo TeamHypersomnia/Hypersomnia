@@ -7,6 +7,8 @@
 #include "application/gui/do_server_vars.h"
 #include "application/setups/server/server_vars.h"
 #include "application/nat/nat_detection_session.h"
+#include "augs/misc/imgui/imgui_enum_combo.h"
+#include "augs/misc/date_time.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -18,6 +20,24 @@ bool perform_arena_chooser(
 );
 
 bool perform_game_mode_chooser(game_mode_name_type& current_arena, const std::string& caption = "Game mode");
+
+server_temp_var_overrides start_server_gui_state::get_initial_overrides() const {
+	auto result = server_temp_var_overrides();
+
+	if (!enable_bots) {
+		result.bots = { {}, 0u, 0u };
+	}
+	else {
+		result.bots = { {}, uint8_t(bot_allies), uint8_t(bot_enemies) };
+	}
+
+	result.bot_difficulty.difficulty = bot_difficulty;
+
+	result.bots.requester = mode_player_id::machine_admin();
+	result.bot_difficulty.requester = mode_player_id::machine_admin();
+
+	return result;
+}
 
 bool start_server_gui_state::perform(
 	server_listen_input& into,
@@ -130,6 +150,40 @@ as well as to test your skills in a laggy environment.
 		perform_game_mode_chooser(into_vars.game_mode);
 
 		slider("Slots", into.slots, 2, 64);
+
+		{
+			const auto wave_time = augs::steady_secs() / 4.0;
+			const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
+			auto scope = scoped_text_color(wave_color);
+			checkbox("Bots (NEW!)", enable_bots);
+		}
+
+		if (enable_bots) {
+			auto ind = scoped_indent();
+
+			enum_combo("Difficulty", bot_difficulty);
+
+			text_disabled("Sending \"/bots hard\" in chat chagnes difficulty.");
+
+			slider("Num allies", bot_allies, 0, 20);
+			slider("Num enemies", bot_enemies, 0, 20);
+
+			if (bot_allies + bot_enemies > 20) {
+				auto dt = bot_allies + bot_enemies - 20;
+
+				if (bot_allies < bot_enemies) {
+					bot_allies -= dt;
+				}
+				else {
+					bot_enemies -= dt;
+				}
+			}
+
+			bot_allies = std::max(bot_allies, 0);
+			bot_enemies = std::max(bot_enemies, 0);
+
+			text_disabled("Sending \"/bots 2 5\" in chat changes bot quotas.");
+		}
 
 		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");

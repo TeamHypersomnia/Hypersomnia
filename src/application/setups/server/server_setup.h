@@ -39,6 +39,7 @@
 #include "game/messages/mode_notification.h"
 #include "application/setups/server/file_chunk_packet.h"
 #include "application/arena/synced_dynamic_vars.h"
+#include "application/setups/server/server_temp_var_overrides.h"
 #include "steam_rich_presence_pairs.h"
 
 struct netcode_socket_t;
@@ -77,11 +78,6 @@ struct client_requested_chat;
 
 class webrtc_server_detail;
 
-struct server_var_temp_overrides {
-	bots_request bots;
-	bot_difficulty_request bot_difficulty;
-};
-
 class server_setup : 
 	public default_setup_settings
 #if !HEADLESS
@@ -109,7 +105,6 @@ class server_setup :
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
-	server_var_temp_overrides overrides;
 
 	server_runtime_info runtime_info;
 
@@ -223,6 +218,7 @@ class server_setup :
 #endif
 	bool suppress_community_server_webhook_this_run = false;
 	std::string name_suffix;
+	server_temp_var_overrides overrides;
 
 	enum class job_type {
 		AVATAR,
@@ -404,7 +400,8 @@ public:
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
 		const std::string& webrtc_signalling_server_url,
-		const std::string& name_suffix = ""
+		const std::string& name_suffix = "",
+		const server_temp_var_overrides& initial_overrides = server_temp_var_overrides()
 	);
 
 	~server_setup();

@@ -55,6 +55,10 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 			result.server_start.port = 8412;
 		}
 
+#if !IS_PRODUCTION_BUILD
+		result.server_start.port = 8412;
+#endif
+
 #if PLATFORM_WEB
 		using key_type = augs::event::keys::key;
 

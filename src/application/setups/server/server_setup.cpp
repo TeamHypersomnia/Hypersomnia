@@ -683,7 +683,8 @@ server_setup::server_setup(
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
 	const std::string& webrtc_signalling_server_url,
-	const std::string& name_suffix
+	const std::string& name_suffix,
+	const server_temp_var_overrides& initial_overrides
 ) : 
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
@@ -710,7 +711,8 @@ server_setup::server_setup(
 	),
 	server_time(server_setup::get_current_time()),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run),
-	name_suffix(name_suffix)
+	name_suffix(name_suffix),
+	overrides(initial_overrides)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
 
@@ -3687,7 +3689,7 @@ void server_setup::handle_client_messages() {
 void server_setup::rebroadcast_synced_dynamic_vars() {
 	const auto current_dynamic_vars = make_synced_dynamic_vars();
 
-	auto defaults = server_var_temp_overrides();
+	auto defaults = server_temp_var_overrides();
 
 	if (overrides.bots.requester.is_set()) {
 		if (const bool disconnected_already = !get_client_state(overrides.bots.requester).is_set()) {

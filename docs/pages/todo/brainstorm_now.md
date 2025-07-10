@@ -7,12 +7,11 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - dont do game commencing on casual when someone joins
-- bots checkmark in host a server
 - max slots to 16 maybe
-- implement max bots
 - fix web too
 - fix no of slots and reporting in browser gui
 
+- implement max bots
 - on hard/medium throw knives if reloading
 - move perpendicularly sometimes when shooting
 - find out wtf with those debug lines on cyberaqua

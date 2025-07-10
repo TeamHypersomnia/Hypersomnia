@@ -2800,7 +2800,11 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 	per_actual_faction<uint8_t> result = { 0u, 0u, 0u };
 
 	if (const bool custom_split = second_quota > -1 && player != nullptr) {
-		const auto requester_faction = player->get_faction();
+		auto requester_faction = player->get_faction();
+
+		if (requester_faction == faction_type::SPECTATOR) {
+			requester_faction = factions.bombing;
+		}
 
 		result[requester_faction] = first_quota;
 		result[factions.get_opposing(requester_faction)] = second_quota;
