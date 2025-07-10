@@ -355,6 +355,9 @@ message_handler_result server_setup::handle_payload(
 				if (c.is_web_client_paused()) {
 					break;
 				}
+				else {
+					[[fallthrough]];
+				}
 
 			case special_client_request::UNPAUSE_WEB_CLIENT:
 				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {

@@ -2493,6 +2493,7 @@ work_result work(
 			case activity_type::EDITOR:
 				if (!params.editor_target.empty()) {
 					launch_editor(params.editor_target);
+					break;
 				}
 				else {
 					try {
@@ -2513,6 +2514,7 @@ work_result work(
 					catch (...) {
 						LOG("No %x detected. Launching the project selector.", get_editor_last_project_path());
 					}
+					[[fallthrough]];
 				}
 
 			case activity_type::EDITOR_PROJECT_SELECTOR:
@@ -6090,6 +6092,7 @@ work_result work(
 							const auto to_sleep_ms = target_delay_ms - passed_ms;
 
 							std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
+							break;
 						}
 						case augs::max_fps_type::SLEEP_ZERO:
 							augs::sleep(0);
