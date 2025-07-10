@@ -5865,8 +5865,8 @@ work_result work(
 		renderer_backend_result& rendering_result;
 		std::atomic<augs::frame_num_type>& current_frame;
 
-		decltype(get_read_buffer)& get_read_buffer;
-		decltype(game_main_thread_synced_op)& game_main_thread_synced_op;
+		decltype(get_read_buffer)& get_read_buffer_fun;
+		decltype(game_main_thread_synced_op)& game_main_thread_synced_op_fun;
 	};
 
 	WEBSTATIC auto main_loop_in = main_loop_input {
@@ -5902,7 +5902,7 @@ work_result work(
 		auto& mi = *reinterpret_cast<main_loop_input*>(arg);
 
 		auto& buffer_swapper = mi.buffer_swapper;
-		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op;
+		auto& game_main_thread_synced_op = mi.game_main_thread_synced_op_fun;
 		auto& thread_pool = mi.thread_pool;
 		auto& renderer_backend = mi.renderer_backend;
 		auto& window = mi.window;
@@ -5915,7 +5915,7 @@ work_result work(
 		auto& rendering_result = mi.rendering_result;
 		auto& current_frame = mi.current_frame;
 
-		auto& get_read_buffer = mi.get_read_buffer;
+		auto& get_read_buffer = mi.get_read_buffer_fun;
 
 		auto collect_window_entropy = [&]() {
 			auto& read_buffer = get_read_buffer();
