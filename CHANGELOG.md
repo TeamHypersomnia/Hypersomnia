@@ -4,6 +4,12 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.3.2] - 2025-07-11
+
+### Fixed
+
+- Windows builds weren't properly tagged.
+
 ## [1.3.1] - 2025-07-10
 
 ### Added
