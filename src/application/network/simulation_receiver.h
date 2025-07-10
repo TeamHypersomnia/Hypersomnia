@@ -253,16 +253,14 @@ public:
 						const bool already_found_reason_to_repredict = repredict;
 
 						if (!already_found_reason_to_repredict) {
-							if (num_total_accepted_entropies < predicted_entropies.size())
-							{
+							if (num_total_accepted_entropies < predicted_entropies.size()) {
 								const auto& predicted_server_entropy = predicted_entropies[num_total_accepted_entropies];
 
 								if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
 									repredict = true;
 								}
 							}
-							else
-							{
+							else {
 								LOG("The client has fallen back behind the server. Repredicting the world just in case.");
 								repredict = true;
 							}
