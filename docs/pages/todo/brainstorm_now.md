@@ -7,10 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - fix web too
-- fix no of slots and reporting in browser gui
-
-- bots on easy are too sticky
-- bots on easy should better react to gunshots
+	- i dont remember what was that
 
 - implement max bots
 - on hard/medium throw knives if reloading

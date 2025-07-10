@@ -7354,3 +7354,7 @@ This will discard your redo history."
 - bots checkmark in host a server
 - dont do game commencing on casual when someone joins
 - max slots to 16 maybe
+- fix no of slots and reporting in browser gui
+
+- bots on easy are too sticky
+- bots on easy should better react to gunshots

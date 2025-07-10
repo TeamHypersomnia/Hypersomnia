@@ -56,7 +56,16 @@ arena_ai_result update_arena_mode_ai(
 		const auto seed = cosm.get_rng_seed_for(player.controlled_character_id);
 		auto rng = randomization(seed);
 		
-		const auto random_direction = rng.random_point_in_unit_circle<real32>();
+		vec2 random_direction;
+
+		if (player.ai_state.chase_timeout > 0.0f) {
+			const auto rot = rng.randval(-135, 135);
+			random_direction = (character_pos - player.ai_state.last_target_position).normalize().rotate(rot);
+		}
+		else {
+			random_direction = rng.random_point_on_unit_circle<real32>();
+		}
+
 		const auto raycast_distance = 1500.0f; // Reasonable distance for movement target
 		const auto raycast_end = character_pos + random_direction * raycast_distance;
 		
@@ -206,24 +215,28 @@ arena_ai_result update_arena_mode_ai(
 		// Update chase timer using delta time
 		player.ai_state.chase_remaining_time -= dt_secs;
 		
-		if (distance_to_last_seen < reached_threshold && !has_target) {
+		if (distance_to_last_seen < reached_threshold && !sees_target) {
 			player.ai_state.chase_remaining_time = 0.0f;
 		}
 
 		if (player.ai_state.chase_remaining_time > 0.0f) {
-			if (has_target) {
-				if (distance_to_last_seen > 200.0f) {
+			if (sees_target) {
+				if (distance_to_last_seen < 250.0f) {
+					if (player.ai_state.chase_timeout < 0.0f) {
+						player.ai_state.movement_timer_remaining = 0.0f;
+					}
+
+					player.ai_state.chase_timeout = 1.0f;
+					actual_movement_direction = (player.ai_state.random_movement_target - character_pos).normalize();
+					player.ai_state.target_crosshair_offset = player.ai_state.random_movement_target - character_pos;
+				}
+				else {
 					actual_movement_direction = (player.ai_state.last_target_position - character_pos).normalize();
 					player.ai_state.target_crosshair_offset = player.ai_state.last_target_position - character_pos;
 
 					if (DEBUG_DRAWING.draw_ai_info) {
 						DEBUG_LOGIC_STEP_LINES.emplace_back(yellow, character_pos, player.ai_state.last_target_position);
 					}
-				}
-				else {
-					player.ai_state.chase_timeout = 3.0f;
-					actual_movement_direction = (player.ai_state.random_movement_target - character_pos).normalize();
-					player.ai_state.target_crosshair_offset = player.ai_state.random_movement_target - character_pos;
 				}
 			}
 			else {
@@ -237,6 +250,7 @@ arena_ai_result update_arena_mode_ai(
 					movement.flags.dashing = true;
 					player.ai_state.has_dashed_for_last_seen_target = true;
 				}
+
 
 				if (DEBUG_DRAWING.draw_ai_info) {
 					DEBUG_LOGIC_STEP_LINES.emplace_back(orange, character_pos, player.ai_state.last_target_position);
@@ -270,7 +284,7 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
-	if (has_target) {
+	if (sees_target) {
 		// If target is in POV, reset dash flag
 		player.ai_state.has_dashed_for_last_seen_target = false;
 	}
@@ -312,7 +326,7 @@ arena_ai_result update_arena_mode_ai(
 		float averages_per_sec = has_target ? 4.0f : 3.0f;
 
 		if (difficulty == difficulty_type::EASY) {
-			averages_per_sec = 2.0f;
+			averages_per_sec = 1.5f;
 		}
 
 		const float averaging_constant = 1.0f - static_cast<real32>(repro::pow(average_factor, averages_per_sec * dt_secs));
