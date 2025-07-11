@@ -131,6 +131,15 @@ int main(const int argc, const char* const * const argv) {
 		::CALLING_CWD = params.calling_cwd.value();
 	}
 
+#ifdef SET_CWD_TO
+	{
+		const auto new_cwd = augs::path_type(SET_CWD_TO);
+
+		std::cout << "CHANGING CWD TO: " << new_cwd.string() << std::endl;
+		std::filesystem::current_path(new_cwd);
+		std::cout << "CHANGED CWD TO: " << new_cwd.string() << std::endl;
+	}
+#else
 	bool set_cwd_to_exe_path = false;
 
 #if PLATFORM_MACOS
@@ -153,6 +162,8 @@ int main(const int argc, const char* const * const argv) {
 			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
 		}
 	}
+#endif
+
 
 	if (!params.appdata_dir.empty()) {
 		if (params.appdata_dir.is_absolute()) {

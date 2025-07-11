@@ -434,6 +434,11 @@ if (SET_CWD_TO_EXE_PATH)
 	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_DEFINITIONS "SET_CWD_TO_EXE_PATH=1")
 endif()
 
+if (SET_CWD_TO)
+	message("SET_CWD_TO was specified: ${SET_CWD_TO}")
+	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_DEFINITIONS "SET_CWD_TO=\"${SET_CWD_TO}\"")
+endif()
+
 set(HYPERSOMNIA_SELF_UPDATER_CPP
 	"src/application/main/self_updater.cpp"
 )
