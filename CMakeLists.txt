@@ -218,6 +218,7 @@ option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
 
 option(BUILD_CRAZYGAMES "Use CrazyGames web shell." OFF)
+option(SET_CWD_TO_EXE_PATH "Explicitly set the CWD to the folder with the executable." OFF)
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
@@ -427,6 +428,11 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	"src/main.cpp"
 	"src/work.cpp"
 )
+
+if (SET_CWD_TO_EXE_PATH)
+	message("SET_CWD_TO_EXE_PATH was specified.")
+	set_source_files_properties(src/main.cpp PROPERTIES COMPILE_DEFINITIONS "SET_CWD_TO_EXE_PATH=1")
+endif()
 
 set(HYPERSOMNIA_SELF_UPDATER_CPP
 	"src/application/main/self_updater.cpp"

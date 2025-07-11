@@ -131,10 +131,21 @@ int main(const int argc, const char* const * const argv) {
 		::CALLING_CWD = params.calling_cwd.value();
 	}
 
-#if PLATFORM_MACOS
-	const bool force_keep_cwd = params.unit_tests_only;
+	bool set_cwd_to_exe_path = false;
 
-	if (!force_keep_cwd) {
+#if PLATFORM_MACOS
+	set_cwd_to_exe_path = true;
+#endif
+
+#if SET_CWD_TO_EXE_PATH
+	set_cwd_to_exe_path = true;
+#endif
+
+	if (params.unit_tests_only) {
+		set_cwd_to_exe_path = false;
+	}
+
+	if (set_cwd_to_exe_path) {
 		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
 			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
@@ -142,7 +153,6 @@ int main(const int argc, const char* const * const argv) {
 			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
 		}
 	}
-#endif
 
 	if (!params.appdata_dir.empty()) {
 		if (params.appdata_dir.is_absolute()) {
