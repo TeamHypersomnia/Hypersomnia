@@ -147,8 +147,8 @@ namespace editor_detail {
 				case key::Z: 
 					if (!has_shift && !has_ctrl) {
 						panned_camera.zoom = 1.0f;
-						return true;
 					}
+					return true;
 
 				case key::PLUS: 
 				case key::ADD: 
