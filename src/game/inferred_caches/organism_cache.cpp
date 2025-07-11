@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/inferred_caches/organism_cache.h"
 #include "augs/templates/container_templates.h"
 #include "game/inferred_caches/organism_cache.hpp"

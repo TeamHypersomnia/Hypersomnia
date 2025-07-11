@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 
 #define NETCODE_AUXILIARY_COMMAND_PACKET 200
 

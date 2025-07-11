@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/resources/editor_particle_effect.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
 #include "application/setups/editor/nodes/editor_typed_node_id.h"

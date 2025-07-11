@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <class T, class F>
 message_handler_result server_setup::handle_payload(

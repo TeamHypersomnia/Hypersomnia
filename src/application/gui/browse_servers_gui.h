@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/misc/timing/timer.h"

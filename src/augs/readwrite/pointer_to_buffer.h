@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/ensure_rel.h"
 
 namespace augs {

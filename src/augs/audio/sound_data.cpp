@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #if PLATFORM_UNIX
 /* Necessary for some stuff in ogg library */
 #pragma GCC diagnostic ignored "-Wunused-variable"

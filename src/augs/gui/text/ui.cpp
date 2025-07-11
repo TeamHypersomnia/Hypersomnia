@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <algorithm>
 #include "augs/gui/text/ui.h"
 #include "augs/window_framework/window.h"

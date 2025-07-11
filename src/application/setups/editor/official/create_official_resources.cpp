@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/setups/editor/official/create_official_resources.h"
 #include "augs/string/string_templates.h"
 #include "augs/templates/type_map.h"

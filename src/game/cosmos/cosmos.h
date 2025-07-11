@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/misc/randomization_declaration.h"
 

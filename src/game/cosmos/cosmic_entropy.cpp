@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/templates/logically_empty.h"
 #include "augs/templates/container_templates.h"
 #include "cosmic_entropy.h"

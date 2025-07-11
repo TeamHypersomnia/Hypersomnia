@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/to_game_effect.hpp"
 #include "augs/misc/enum/enum_bitset.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"

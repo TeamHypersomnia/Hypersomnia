@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include "augs/templates/identity_templates.h"
 

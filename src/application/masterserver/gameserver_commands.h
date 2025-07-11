@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/masterserver/nat_traversal_step.h"
 

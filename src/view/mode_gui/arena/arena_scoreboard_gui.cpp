@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "augs/log.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"

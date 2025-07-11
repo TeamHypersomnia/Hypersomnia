@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <array>
 #include "augs/network/network_types.h"
 #include "application/network/requested_client_settings.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <memory>
 #include "augs/graphics/renderer_command_enums.h"
 #include "augs/graphics/rgba.h"

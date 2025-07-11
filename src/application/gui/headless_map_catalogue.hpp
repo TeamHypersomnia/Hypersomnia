@@ -1,3 +1,4 @@
+#include <cstddef>
 template <class F>
 void multi_arena_synchronizer::for_each_with_progress(F callback) const {
 	/* 

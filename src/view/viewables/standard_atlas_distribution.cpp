@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <unordered_set>
 
 #include "view/viewables/atlas_distributions.h"

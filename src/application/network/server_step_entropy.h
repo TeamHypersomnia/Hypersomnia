@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/templates/logically_empty.h"
 #include "game/modes/mode_entropy.h"
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/log.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/nat/nat_type.h"

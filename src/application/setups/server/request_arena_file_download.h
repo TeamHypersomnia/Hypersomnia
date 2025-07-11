@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/secure_hash.h"
 #include "application/setups/server/file_chunk_packet.h"
 

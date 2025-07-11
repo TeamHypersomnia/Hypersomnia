@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 struct session_id_type {
 	using id_value_type = uint32_t;

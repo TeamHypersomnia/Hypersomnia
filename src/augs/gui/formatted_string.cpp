@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/mutex.h"
 #include "augs/log.h"
 

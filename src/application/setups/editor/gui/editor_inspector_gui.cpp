@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_setup.hpp"

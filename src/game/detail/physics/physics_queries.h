@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <type_traits>
 
 #include <Box2D/Common/b2Math.h>

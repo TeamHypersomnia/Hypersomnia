@@ -1,3 +1,4 @@
+#include <cstdint>
 /** Opcode for xcb_input_raw_motion. */
 #define XCB_INPUT_RAW_MOTION 17
 

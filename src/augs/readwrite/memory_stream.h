@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 #include <algorithm>
 #include "augs/readwrite/memory_stream_declaration.h"

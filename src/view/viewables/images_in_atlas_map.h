@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/container_templates.h"
 #include "game/container_sizes.h"
 #include "game/assets/ids/asset_ids.h"

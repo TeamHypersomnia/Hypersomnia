@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "intent_contextualization_system.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/motion_message.h"

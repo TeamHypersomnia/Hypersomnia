@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/logically_empty.h"
 
 #define LOG_WIELDING 0

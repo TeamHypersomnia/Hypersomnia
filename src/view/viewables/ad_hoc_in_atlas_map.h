@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <unordered_map>
 #include "view/viewables/image_in_atlas.h"
 #include "game/assets/animation_math.h"

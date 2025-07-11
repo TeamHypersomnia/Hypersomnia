@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #if PLATFORM_WINDOWS
 #pragma warning(disable : 4503)
 #endif

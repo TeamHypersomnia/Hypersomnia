@@ -1,3 +1,4 @@
+#include <cstddef>
 #define INCLUDE_TYPES_IN 1
 
 #include "game/cosmos/cosmos.h"

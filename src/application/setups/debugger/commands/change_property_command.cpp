@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/enums/callback_result.h"
 
 #include "game/cosmos/typed_entity_handle.h"

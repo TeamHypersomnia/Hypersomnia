@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/debugger/debugger_selection_groups.h"
 
 template <class C, class F>

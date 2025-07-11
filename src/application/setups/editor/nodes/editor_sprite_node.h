@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 #include "application/setups/editor/nodes/editor_node_base.h"

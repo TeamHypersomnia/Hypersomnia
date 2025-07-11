@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/setups/debugger/commands/change_grouping_command.h"
 #include "application/setups/debugger/debugger_folder.h"
 #include "application/setups/debugger/debugger_selection_groups.hpp"

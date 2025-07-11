@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <type_traits>
 #include <compare>
 #include "augs/misc/pool/pooled_object_id.h"

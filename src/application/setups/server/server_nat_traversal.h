@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <unordered_map>
 #include "application/nat/stun_session.h"
 #include "application/nat/nat_detection_settings.h"

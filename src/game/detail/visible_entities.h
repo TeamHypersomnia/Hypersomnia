@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/enum/enum_array.h"
 
 #include "augs/templates/maybe.h"

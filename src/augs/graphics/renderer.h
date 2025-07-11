@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "augs/templates/object_command.h"
 

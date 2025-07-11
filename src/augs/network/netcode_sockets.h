@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "augs/network/port_type.h"
 #include "augs/log.h"

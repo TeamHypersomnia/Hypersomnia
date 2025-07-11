@@ -1,3 +1,5 @@
+#include <cstring>
+#include <cstddef>
 #include "event.h"
 #include "augs/ensure.h"
 #include "augs/templates/traits/triviality_traits.h"

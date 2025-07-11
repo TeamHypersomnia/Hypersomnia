@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/resources/editor_pathed_resource.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 

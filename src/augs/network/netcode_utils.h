@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include "augs/network/netcode_sockets.h"
 #include "augs/network/network_types.h"

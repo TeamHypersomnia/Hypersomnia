@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/declare_containers.h"
 
 template <class T>

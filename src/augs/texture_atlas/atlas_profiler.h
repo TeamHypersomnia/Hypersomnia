@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/measurements.h"
 #include "augs/misc/profiler_mixin.h"
 #include "augs/math/vec2.h"

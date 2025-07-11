@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/network/port_type.h"
 #include "augs/graphics/rgba.h"
 

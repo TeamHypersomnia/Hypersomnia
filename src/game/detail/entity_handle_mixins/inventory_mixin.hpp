@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/components/item_sync.h"

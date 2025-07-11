@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/templates/remove_cref.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "game/modes/all_mode_includes.h"

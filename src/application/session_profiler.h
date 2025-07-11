@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/profiler_mixin.h"
 #include "augs/texture_atlas/atlas_profiler.h"
 

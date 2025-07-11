@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 inline void vis_response_to_triangles(
 	const visibility_response& response, 

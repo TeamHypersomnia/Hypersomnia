@@ -1,3 +1,4 @@
+#include <cstddef>
 #if !IS_PRODUCTION_BUILD
 #if BUILD_UNIT_TESTS
 #include "augs/log_direct.h"

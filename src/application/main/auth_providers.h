@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/main/auth_provider_type.h"
 #include "augs/misc/mutex.h"
 

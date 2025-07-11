@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "missile_system.h"
 #include "augs/math/steering.h"
 #include "game/cosmos/cosmos.h"

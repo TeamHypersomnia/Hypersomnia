@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/misc/date_time.h"
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"

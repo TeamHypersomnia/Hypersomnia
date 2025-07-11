@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/log.h"
 #include "application/network/network_adapters.hpp"
 #include "application/network/server_adapter.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/cosmos/per_entity_type.h"
 #include "application/setups/editor/project/editor_project.hpp"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"

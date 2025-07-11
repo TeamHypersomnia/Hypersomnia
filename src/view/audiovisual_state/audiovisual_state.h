@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/entity_system/storage_for_systems.h"
 #include "augs/math/camera_cone.h"
 

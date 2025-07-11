@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <type_traits>
 #include "generated/introspectors.h"
 #include "augs/templates/traits/introspection_traits.h"

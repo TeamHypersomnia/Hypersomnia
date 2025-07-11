@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #define INCLUDE_TYPES_IN 1
 #include <fstream>
 #include "augs/filesystem/path.h"

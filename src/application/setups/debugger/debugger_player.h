@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <memory>
 #include <map>
 #include "augs/misc/timing/fixed_delta_timer.h"

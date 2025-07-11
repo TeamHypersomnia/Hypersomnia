@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #define RAPIDJSON_HAS_STDSTRING 1
 
 #include "augs/string/string_to_enum.h"

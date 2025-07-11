@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "application/arena/choose_arena.h"
 
 using initial_snapshot_payload = full_arena_snapshot_payload<false>;

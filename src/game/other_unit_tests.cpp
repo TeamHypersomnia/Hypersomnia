@@ -1,3 +1,4 @@
+#include <cstddef>
 #if __FAST_MATH__
 #error "Don't do this"
 #endif

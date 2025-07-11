@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/hash_fwd.h"
 
 class hotbar_button;

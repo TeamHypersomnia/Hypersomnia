@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "test_scenes/test_scene_flavour_ids.h"

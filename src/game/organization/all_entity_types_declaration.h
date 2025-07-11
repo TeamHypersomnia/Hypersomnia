@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/folded_finders.h"
 

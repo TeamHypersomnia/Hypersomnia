@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/randomization.h"
 #include "augs/math/steering.h"
 #include "augs/math/make_rect_points.h"

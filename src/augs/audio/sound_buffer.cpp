@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/log.h"
 
 #if BUILD_OPENAL

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/math/declare_math.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/enums/faction_type.h"

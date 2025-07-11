@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #define TRACE_PARAMETERS 0
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
 #define Y_IS_Z 1

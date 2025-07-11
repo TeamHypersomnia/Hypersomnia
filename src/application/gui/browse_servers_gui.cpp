@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/misc/future.h"
 
 #include "application/gui/browse_servers_gui.h"

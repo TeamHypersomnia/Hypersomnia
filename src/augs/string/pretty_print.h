@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/templates/can_stream.h"
 #include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_optional.h"

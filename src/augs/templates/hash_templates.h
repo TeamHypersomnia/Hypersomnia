@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/portable_hash.h"
 
 namespace augs {

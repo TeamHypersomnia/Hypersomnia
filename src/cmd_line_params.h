@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/filesystem/path.h"
 #include "augs/app_type.h"
 #include "augs/network/network_types.h"

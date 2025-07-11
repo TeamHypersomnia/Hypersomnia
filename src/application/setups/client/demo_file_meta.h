@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "hypersomnia_version.h"
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/network_types.h"

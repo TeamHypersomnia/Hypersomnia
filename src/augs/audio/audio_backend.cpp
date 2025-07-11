@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/audio/audio_backend.h"
 #include "augs/log.h"
 #include "augs/audio/sound_source.h"

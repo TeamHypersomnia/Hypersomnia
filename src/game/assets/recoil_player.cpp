@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/randomization.h"
 #include "game/assets/recoil_player.h"
 

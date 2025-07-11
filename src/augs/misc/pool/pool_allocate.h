@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/pool/pool.h"
 #include "augs/ensure_rel.h"
 

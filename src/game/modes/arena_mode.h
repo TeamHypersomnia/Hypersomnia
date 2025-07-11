@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <unordered_map>
 
 #include "augs/math/declare_math.h"

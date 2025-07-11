@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/assets/ids/asset_ids.h"
 
 template <class P, class T>

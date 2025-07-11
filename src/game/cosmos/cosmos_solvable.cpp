@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "game/cosmos/cosmos_solvable.h"
 
 #include "augs/templates/introspect.h"

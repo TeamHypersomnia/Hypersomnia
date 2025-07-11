@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "application/gui/start_server_gui.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"

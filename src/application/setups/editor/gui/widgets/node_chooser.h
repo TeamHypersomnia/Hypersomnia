@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include <optional>
 #include "augs/filesystem/file.h"

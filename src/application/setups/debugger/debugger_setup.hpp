@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/debugger/debugger_setup.h"
 #include "application/setups/debugger/detail/make_command_from_selections.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"

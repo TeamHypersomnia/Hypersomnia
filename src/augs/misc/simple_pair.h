@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/can_stream.h"
 

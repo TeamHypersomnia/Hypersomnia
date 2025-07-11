@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/masterserver/server_heartbeat.h"
 
 struct server_list_entry_json {

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/constant_size_vector.h"
 #include "view/view_container_sizes.h"
 #include "augs/pad_bytes.h"

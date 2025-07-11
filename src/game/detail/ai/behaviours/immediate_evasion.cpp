@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/detail/ai/behaviours.h"
 #include "game/cosmos/entity_id.h"
 

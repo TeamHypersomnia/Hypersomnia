@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include <random>
 
 #include "augs/math/repro_math.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <optional>
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/math/camera_cone.h"

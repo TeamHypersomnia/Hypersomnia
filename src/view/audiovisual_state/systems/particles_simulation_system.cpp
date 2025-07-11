@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/templates/container_templates.h"
 #include "game/detail/physics/physics_queries.h"
 

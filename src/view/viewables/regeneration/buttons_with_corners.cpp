@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/log.h"
 #include "augs/gui/button_corners.h"
 

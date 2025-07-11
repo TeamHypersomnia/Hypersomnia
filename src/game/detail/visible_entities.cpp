@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/math/math.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/container_templates.h"

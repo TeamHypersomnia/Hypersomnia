@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/audio/audio_renderer.h"
 #include "augs/audio/sound_source_proxy_id.h"
 

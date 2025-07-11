@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #define RAPIDJSON_HAS_STDSTRING 1
 
 #include "3rdparty/include_httplib.h"

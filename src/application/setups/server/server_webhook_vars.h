@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/network/network_types.h"
 
 struct server_webhook_vars {

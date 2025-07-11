@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/type_list.h"
 
 #include "game/organization/all_components_declaration.h"

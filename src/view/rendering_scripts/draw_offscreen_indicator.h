@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/math/math.h"
 #include "augs/drawing/drawing.hpp"
 

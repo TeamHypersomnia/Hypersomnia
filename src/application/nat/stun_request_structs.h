@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <array>
 
 // RFC 5389 Section 6 STUN Message Structure

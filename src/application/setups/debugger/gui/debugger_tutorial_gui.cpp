@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <thread>
 #include "application/setups/debugger/gui/debugger_tutorial_gui.h"
 #include "augs/templates/enum_introspect.h"

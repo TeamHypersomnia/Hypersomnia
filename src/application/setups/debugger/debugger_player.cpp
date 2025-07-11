@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/setups/debugger/debugger_player.h"
 #include "application/setups/debugger/debugger_folder.h"
 #include "application/setups/debugger/debugger_player.hpp"

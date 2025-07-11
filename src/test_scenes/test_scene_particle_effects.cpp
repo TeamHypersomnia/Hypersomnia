@@ -1,3 +1,4 @@
+#include <cstddef>
 /*
 	Disable float/int warnings, this is just a content script
 */

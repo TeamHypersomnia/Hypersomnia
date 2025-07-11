@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

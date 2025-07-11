@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <bool C, class ModeVariant, class RulesVariant>
 class basic_arena_handle;

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/misc/future.h"
 #include <unordered_set>
 #include "augs/network/network_types.h"

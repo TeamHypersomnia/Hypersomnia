@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/string/string_templates.h"
 #include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/sprite.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/components/explosive_component.h"
 #include "game/detail/explosive/detonate.h"
 #include "game/cosmos/logic_step.h"

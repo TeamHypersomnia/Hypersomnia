@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/graphics/renderer_command_enums.h"
 #include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/vertex.h"

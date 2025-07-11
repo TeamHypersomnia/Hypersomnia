@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/network/network_types.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "application/masterserver/masterserver_client.h"

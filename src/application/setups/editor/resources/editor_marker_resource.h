@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/enums/marker_type.h"

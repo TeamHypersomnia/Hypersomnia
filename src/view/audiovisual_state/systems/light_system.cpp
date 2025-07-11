@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"

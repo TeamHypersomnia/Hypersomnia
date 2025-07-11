@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/bound.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/graphics/rgba.h"

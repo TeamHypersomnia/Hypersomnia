@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <limits>
 
 #include "augs/templates/filter_types.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <sstream>
 
 #include "augs/filesystem/file.h"

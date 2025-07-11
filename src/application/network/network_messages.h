@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "3rdparty/yojimbo/include/yojimbo.h"
 #undef write_bytes
 #undef read_bytes

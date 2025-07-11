@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/weapon_like.h"
 #include "game/detail/gun/ammo_logic.h"

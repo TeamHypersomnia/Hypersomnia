@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/inferred_caches/inferred_cache_common.h"
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"

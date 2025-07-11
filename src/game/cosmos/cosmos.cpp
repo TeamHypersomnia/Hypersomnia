@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "augs/ensure_rel.h"
 #include "3rdparty/crc32/crc32.h"
 

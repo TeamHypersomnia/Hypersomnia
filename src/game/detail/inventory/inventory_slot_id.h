@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/enums/slot_function.h"
 #include "game/cosmos/entity_id.h"
 

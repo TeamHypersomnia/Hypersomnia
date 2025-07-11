@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/log.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/log_path_getters.h"

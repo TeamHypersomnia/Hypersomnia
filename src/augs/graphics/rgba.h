@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <array>
 #include <sstream>
 #include <algorithm>

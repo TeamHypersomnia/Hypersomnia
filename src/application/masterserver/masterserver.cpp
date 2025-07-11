@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #if PLATFORM_UNIX
 #include <csignal>
 #endif

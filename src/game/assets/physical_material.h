@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include "game/assets/ids/asset_ids.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/convex_partitioned_shape.h"
 
 template <

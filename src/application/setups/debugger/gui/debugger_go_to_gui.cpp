@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/log.h"
 #include "application/setups/debugger/gui/debugger_go_to_gui.h"
 

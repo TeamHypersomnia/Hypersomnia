@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 constexpr std::size_t MAX_EXPLODING_RINGS = 300;
 

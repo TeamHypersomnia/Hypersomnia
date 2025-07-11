@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "application/masterserver/gameserver_commands.h"
 
 inline std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {

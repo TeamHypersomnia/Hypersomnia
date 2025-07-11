@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 struct net_statistics_entry {
 	uint8_t ping;

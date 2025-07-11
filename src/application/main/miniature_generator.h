@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/filesystem/path_declaration.h"
 #include "augs/math/camera_cone.h"
 #include "augs/graphics/renderer.h"

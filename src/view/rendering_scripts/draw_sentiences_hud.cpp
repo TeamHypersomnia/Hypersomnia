@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "rendering_scripts.h"
 #include "game/cosmos/cosmos.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_type.h"

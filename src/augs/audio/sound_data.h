@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include "augs/filesystem/path.h"
 #include "augs/templates/exception_templates.h"

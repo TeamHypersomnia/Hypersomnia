@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 #include "augs/math/declare_math.h"
 #include "augs/graphics/debug_line.h"

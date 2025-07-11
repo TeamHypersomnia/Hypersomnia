@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include "application/network/host_with_default_port.h"
 #include "augs/filesystem/path_declaration.h"

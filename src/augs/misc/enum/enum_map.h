@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/is_comparable.h"

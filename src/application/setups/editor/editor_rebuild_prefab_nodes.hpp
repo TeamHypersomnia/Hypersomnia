@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/templates/traits/has_rotation.h"
 #include "augs/templates/traits/has_size.h"

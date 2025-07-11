@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/organization/all_entity_types.h"
 #include "game/components/attitude_component.h"
 #include "game/common_state/entity_flavours.h"

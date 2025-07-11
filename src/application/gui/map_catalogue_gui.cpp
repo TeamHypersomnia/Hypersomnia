@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <future>
 #include <mutex>
 #include "application/setups/client/arena_downloading_session.h"

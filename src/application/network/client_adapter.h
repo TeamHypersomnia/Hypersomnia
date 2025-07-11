@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"

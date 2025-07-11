@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/simple_popup.h"

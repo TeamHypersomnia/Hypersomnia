@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/client/direct_file_download.h"
 
 direct_file_download::direct_file_download(

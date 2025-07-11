@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/ensure_rel.h"
 #include "augs/graphics/renderer.h"
 #include "3rdparty/imgui/imgui.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/ensure.h"
 #include "augs/log.h"
 #include "view/game_gui/game_gui_element_location.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/enum_introspect.h"
 #include "game/detail/visible_entities.hpp"
 

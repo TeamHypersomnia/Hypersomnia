@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 
 enum class audio_output_mode {

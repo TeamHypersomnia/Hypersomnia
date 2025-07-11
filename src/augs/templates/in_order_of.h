@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <class T, class P, class Cmp, class F, class S>
 void in_order_of(T& container, P get_property, Cmp comparator, F order_callback, S& sorted_cache) {

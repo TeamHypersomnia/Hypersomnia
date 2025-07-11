@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/readwrite/memory_stream.h"

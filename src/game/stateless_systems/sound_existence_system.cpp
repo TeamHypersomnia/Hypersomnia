@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "sound_existence_system.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/cosmos.h"
