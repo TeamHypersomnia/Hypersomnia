@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "view/rendering_scripts/vis_response_to_triangles.h"
 #include "game/enums/filters.h"
 

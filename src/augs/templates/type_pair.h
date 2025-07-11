@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <class A, class B>
 struct type_pair {

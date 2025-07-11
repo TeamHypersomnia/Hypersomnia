@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/main/miniature_generator.h"
 #include "augs/log.h"
 

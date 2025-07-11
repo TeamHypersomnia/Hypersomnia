@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 struct drag_and_drop_target_drop_item;
 

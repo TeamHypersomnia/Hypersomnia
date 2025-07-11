@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/drawing/polygon.h"
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/drawing/drawing.h"

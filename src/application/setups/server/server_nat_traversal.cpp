@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/masterserver/netcode_address_hash.h"
 #include "application/setups/server/server_nat_traversal.h"
 #include "application/nat/stun_session.h"

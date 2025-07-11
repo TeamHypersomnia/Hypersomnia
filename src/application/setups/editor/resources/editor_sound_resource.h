@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/resources/editor_pathed_resource.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
 

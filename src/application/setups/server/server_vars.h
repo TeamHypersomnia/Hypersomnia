@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include "augs/network/network_simulator_settings.h"
 #include "augs/misc/constant_size_string.h"

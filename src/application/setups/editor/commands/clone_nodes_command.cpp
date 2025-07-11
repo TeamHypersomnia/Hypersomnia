@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_setup.hpp"

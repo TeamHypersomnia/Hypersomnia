@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/assets/ids/asset_ids.h"
 #include "augs/misc/enum/enum_array.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/editor/commands/reorder_layers_command.h"
 #include "augs/templates/reversion_wrapper.h"
 

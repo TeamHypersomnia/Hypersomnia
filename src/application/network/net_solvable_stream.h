@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <class V>
 constexpr bool never_changes_in_game = is_one_of_v<V,

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "3rdparty/yojimbo/serialize/serialize.h"
 #include "augs/log.h"
 #include "augs/readwrite/byte_readwrite_traits.h"

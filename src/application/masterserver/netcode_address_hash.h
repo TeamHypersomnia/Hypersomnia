@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <unordered_map>
 #include "augs/templates/hash_templates.h"

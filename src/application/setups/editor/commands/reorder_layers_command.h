@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/editor/commands/editor_command_meta.h"
 #include "application/setups/editor/project/editor_layers.h"
 #include "application/setups/editor/project/editor_layers.h"

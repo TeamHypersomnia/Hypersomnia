@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #ifndef ENUM_INTROSPECT_INCLUDED
 #define ENUM_INTROSPECT_INCLUDED 1
 #endif

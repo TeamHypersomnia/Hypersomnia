@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 
 #define BUILD_IMAGE 1

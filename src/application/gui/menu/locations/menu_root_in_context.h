@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 template <class Enum>
 class menu_root;

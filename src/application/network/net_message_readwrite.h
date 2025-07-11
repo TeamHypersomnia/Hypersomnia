@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 template <class T>
 constexpr bool is_block_message_v = std::is_base_of_v<only_block_message, T>;

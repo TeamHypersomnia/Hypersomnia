@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/cosmos/cosmic_functions.h"
 #include "game/organization/for_each_entity_type.h"
 

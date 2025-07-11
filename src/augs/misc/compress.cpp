@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/compress.h"
 #include "3rdparty/lz4/lz4.c"
 #include "augs/log.h"

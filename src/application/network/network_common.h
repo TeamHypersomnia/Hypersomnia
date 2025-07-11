@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/arena/arena_handle.h"
 #include "game/modes/all_mode_includes.h"
 

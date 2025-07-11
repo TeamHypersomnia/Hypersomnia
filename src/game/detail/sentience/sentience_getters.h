@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/components/sentience_component.h"
 #include "game/detail/sentience/tool_getters.h"
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 #include "augs/templates/traits/triviality_traits.h"
 #include "augs/templates/get_index_type_for_size_of.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #define DEBUG_PHYSICS_SYSTEM_COPY 0
 #include "3rdparty/Box2D/Box2D.h"
 

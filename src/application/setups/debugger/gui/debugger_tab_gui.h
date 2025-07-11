@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
 

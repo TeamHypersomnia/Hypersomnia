@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "view/audiovisual_state/systems/wandering_pixels_system.h"
 #include "game/components/sprite_component.h"
 #include "game/enums/render_layer.h"

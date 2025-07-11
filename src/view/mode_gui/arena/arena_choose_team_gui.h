@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 #include <optional>
 #include "game/enums/faction_type.h"

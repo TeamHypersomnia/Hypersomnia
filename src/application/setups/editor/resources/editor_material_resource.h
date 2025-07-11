@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "game/assets/ids/asset_ids.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/string/path_sanitization.h"
 #include "augs/network/network_types.h"
 #include "application/arena/arena_paths.h"

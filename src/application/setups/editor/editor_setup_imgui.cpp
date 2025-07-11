@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/cosmos/logic_step.h"
 #include "game/organization/all_messages_includes.h"
 

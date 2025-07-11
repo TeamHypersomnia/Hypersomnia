@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <future>
 #include <mutex>
 #include "application/gui/headless_map_catalogue.h"

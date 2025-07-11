@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 #include "game/organization/for_each_entity_type.h"

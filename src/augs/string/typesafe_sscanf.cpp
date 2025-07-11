@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "augs/string/typesafe_sscanf.h"
 
 bool is_more_recent(const std::string& next_version, const std::string& current_version) {

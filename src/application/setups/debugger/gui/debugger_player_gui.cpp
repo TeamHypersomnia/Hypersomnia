@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/setups/debugger/gui/debugger_player_gui.h"
 #include "application/setups/debugger/debugger_player.h"
 #include "application/setups/debugger/debugger_command_input.h"

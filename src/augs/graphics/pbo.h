@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/math/vec2.h"
 #include "augs/templates/settable_as_current_mixin.h"
 #include "augs/graphics/texture.h"

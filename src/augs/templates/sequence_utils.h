@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/identity_templates.h"
 
 template <size_t, class>

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/server/server_vars.h"
 #include "game/modes/mode_player_id.h"
 

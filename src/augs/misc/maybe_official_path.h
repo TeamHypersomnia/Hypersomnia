@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/filesystem/path.h"
 #include "all_paths.h"
 

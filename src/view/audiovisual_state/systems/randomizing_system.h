@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/timing/delta.h"
 #include "augs/drawing/sprite.h"
 #include "augs/misc/randomization.h"

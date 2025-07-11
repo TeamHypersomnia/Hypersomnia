@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/misc/future.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"

@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "sentience_system.h"
 
 #include "augs/templates/get_by_dynamic_id.h"

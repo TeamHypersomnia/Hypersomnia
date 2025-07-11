@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/type_list.h"
 
 #include "game/detail/all_sentience_meters.h"

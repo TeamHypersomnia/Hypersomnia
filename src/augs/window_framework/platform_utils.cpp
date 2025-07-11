@@ -1,3 +1,4 @@
+#include <cstring>
 #include "augs/window_framework/platform_utils.h"
 #include "augs/string/string_templates.h"
 

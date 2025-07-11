@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "view/necessary_image_id.h"
 
 struct rank_info {

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/log_path_getters.h"
 #include "augs/filesystem/file.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"

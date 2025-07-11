@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <string>
 #include "augs/templates/hash_templates.h"
 #include "augs/string/string_templates_declaration.h"

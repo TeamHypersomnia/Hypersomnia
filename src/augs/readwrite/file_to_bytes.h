@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 namespace augs {
 	inline auto file_to_bytes(const path_type& path, std::vector<std::byte>& output) {

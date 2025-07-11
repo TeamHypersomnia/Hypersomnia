@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/log.h"
 #include "augs/ensure_rel.h"
 #include "game/cosmos/solvers/standard_solver.h"

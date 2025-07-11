@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "application/gui/leaderboards_gui.h"
 
 #include "application/gui/leaderboards_gui.h"

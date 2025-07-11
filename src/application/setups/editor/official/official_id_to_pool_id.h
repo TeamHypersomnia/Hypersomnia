@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/official/official_resource_id_enums.h"
 

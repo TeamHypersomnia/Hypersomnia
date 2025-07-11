@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/templates/container_templates.h"
 #include "augs/templates/enum_introspect.h"
 

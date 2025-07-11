@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/templates/identity_templates.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/cosmos/entity_handle_declaration.h"

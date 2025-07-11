@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/ensure_rel_util.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <future>
 #include "application/masterserver/netcode_address_hash.h"
 #include "augs/math/camera_cone.h"

@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include "augs/image/font.h"
 #include "augs/log.h"

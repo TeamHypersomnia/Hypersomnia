@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <unordered_map>
 #include "augs/misc/pool/pool.h"
 #include "application/setups/editor/nodes/all_editor_node_types.h"

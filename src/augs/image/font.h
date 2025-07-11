@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <unordered_map>
 #include "augs/math/vec2.h"
 #include "augs/templates/exception_templates.h"

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "application/setups/server/file_chunk_packet.h"
 #include "augs/misc/randomization.h"
 

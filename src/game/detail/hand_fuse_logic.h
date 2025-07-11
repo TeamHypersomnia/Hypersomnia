@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/step_declaration.h"

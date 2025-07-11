@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "application/network/network_adapters.h"
 #include "augs/enums/callback_result.h"
 #include "augs/templates/traits/function_traits.h"

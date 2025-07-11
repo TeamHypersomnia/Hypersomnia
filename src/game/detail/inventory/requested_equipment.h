@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "game/organization/special_flavour_id_types.h"
 #include "augs/misc/simple_pair.h"
 #include "game/cosmos/step_declaration.h"

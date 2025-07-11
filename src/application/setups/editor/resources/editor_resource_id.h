@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <compare>
 #include "augs/templates/type_in_list_id.h"
 #include "augs/misc/pool/pooled_object_id.h"

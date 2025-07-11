@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <algorithm>
 #include <cstring>
 #include <vector>

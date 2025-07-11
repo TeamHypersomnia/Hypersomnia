@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/network_types.h"
 #include "game/modes/mode_player_id.h"

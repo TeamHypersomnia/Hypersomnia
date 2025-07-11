@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/math/repro_math.h"
 
 #include <string>

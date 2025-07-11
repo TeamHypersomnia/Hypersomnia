@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "game/enums/faction_type.h"
 #include "augs/templates/type_in_list_id.h"

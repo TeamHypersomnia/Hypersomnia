@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/misc/randomization.h"
 #include "augs/network/netcode_socket_includes.h"
 #include "application/nat/stun_request_structs.h"

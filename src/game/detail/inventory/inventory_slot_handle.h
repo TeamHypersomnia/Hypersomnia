@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <optional>
 #include "augs/templates/maybe_const.h"
 #include "augs/misc/enum/enum_boolset.h"

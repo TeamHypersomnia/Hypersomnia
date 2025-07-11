@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/pool/pooled_object_id.h"
 #include "application/setups/editor/resources/editor_resource_id.h"
 #include "augs/ensure.h"

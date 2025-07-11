@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "melee_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"

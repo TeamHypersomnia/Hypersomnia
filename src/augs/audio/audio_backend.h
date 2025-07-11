@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/audio/sound_source.h"
 #include "augs/audio/sound_sizes.h"
 

@@ -48,6 +48,8 @@ enum-arg-format:
 enum-to-args-body-format:
 generated-file-format:
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include <tuple>
 #include <string>
 

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "interpolation_system.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "game/components/interpolation_component.h"

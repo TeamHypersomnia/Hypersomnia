@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/math/repro_math.h"
 
 #include "augs/log.h"

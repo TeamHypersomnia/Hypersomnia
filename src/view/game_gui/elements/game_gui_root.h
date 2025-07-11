@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "view/game_gui/game_gui_element_location.h"
 #include "view/game_gui/elements/item_button.h"
 

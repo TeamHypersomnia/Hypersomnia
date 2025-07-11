@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <sstream>
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/hash_fwd.h"

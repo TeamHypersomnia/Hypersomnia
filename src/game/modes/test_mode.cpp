@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/test_mode.h"
 #include "game/modes/mode_entropy.h"

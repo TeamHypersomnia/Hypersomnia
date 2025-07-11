@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/enums/slot_function.h"
 #include "game/cosmos/just_create_entity.h"

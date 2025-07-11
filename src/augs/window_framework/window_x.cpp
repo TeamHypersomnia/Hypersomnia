@@ -1,3 +1,6 @@
+#include <cstring>
+#include <cstddef>
+#include <cstdint>
 #include <thread>
 
 #include <unistd.h>

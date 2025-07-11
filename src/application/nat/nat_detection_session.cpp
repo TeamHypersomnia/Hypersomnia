@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include <random>
 #include <numeric>
 #include "application/nat/nat_detection_session.h"

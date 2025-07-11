@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "3rdparty/imgui/imgui.h"
 #include "augs/string/typesafe_sprintf.h"
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 #include "application/masterserver/nat_traversal_step_payload.h"
 #include "augs/network/port_type.h"

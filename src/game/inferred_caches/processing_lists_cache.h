@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <vector>
 
 #include "augs/misc/enum/enum_boolset.h"

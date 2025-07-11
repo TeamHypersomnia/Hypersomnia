@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/drawing/drawing.h"
 #include "augs/math/vec2.h"
 #include "view/viewables/particle_types_declaration.h"

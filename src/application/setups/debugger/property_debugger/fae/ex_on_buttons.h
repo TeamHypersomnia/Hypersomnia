@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <string>
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "game/cosmos/entity_flavour_id.h"

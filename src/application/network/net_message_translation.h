@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/serialization_buffers.h"
 #include "augs/misc/compress.h"

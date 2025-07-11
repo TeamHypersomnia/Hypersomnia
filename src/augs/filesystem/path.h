@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/filesystem/path_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/string/string_templates.h"

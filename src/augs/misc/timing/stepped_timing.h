@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/misc/timing/delta.h"
 #include "augs/pad_bytes.h"
 

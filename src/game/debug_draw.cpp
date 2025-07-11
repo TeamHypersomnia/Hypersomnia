@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/debug_draw.h"
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
 

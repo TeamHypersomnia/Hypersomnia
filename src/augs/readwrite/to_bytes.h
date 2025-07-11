@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/readwrite/byte_readwrite_traits.h"

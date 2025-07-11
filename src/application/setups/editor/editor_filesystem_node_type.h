@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "view/asset_funcs.h"
 
 enum class editor_filesystem_node_type : uint8_t {

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "augs/audio/distance_model.h"
 #include "augs/math/declare_math.h"

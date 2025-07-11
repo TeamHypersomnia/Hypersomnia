@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <array>
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/algorithm_templates.h"

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/build_settings/setting_build_http_daemon.h"
 #include "session_report.h"
 

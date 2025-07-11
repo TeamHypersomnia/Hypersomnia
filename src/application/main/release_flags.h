@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/machine_entropy.h"
 
 struct ImGuiIO;

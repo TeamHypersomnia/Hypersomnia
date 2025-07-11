@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "game/cosmos/per_entity_type.h"
 #include "augs/misc/constant_size_vector.h"
 

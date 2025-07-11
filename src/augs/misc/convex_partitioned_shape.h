@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 

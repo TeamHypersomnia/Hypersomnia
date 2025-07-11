@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/httplib_utils.h"
 #include "application/detail_file_paths.h"

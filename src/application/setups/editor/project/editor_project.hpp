@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/setups/editor/project/editor_project.h"
 
 template <class S, class Officials, class F>

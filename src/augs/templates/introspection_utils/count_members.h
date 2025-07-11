@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/pad_bytes.h"
 #include "augs/templates/introspect_declaration.h"
 

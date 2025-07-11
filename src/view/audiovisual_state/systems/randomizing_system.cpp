@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "augs/log.h"
 

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/string/typesafe_sprintf.h"
 #include "application/setups/debugger/debugger_selection_groups.h"
 #include "game/cosmos/cosmos.h"

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 namespace augs {
 	using frame_num_type = std::size_t;

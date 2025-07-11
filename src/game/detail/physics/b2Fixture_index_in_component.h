@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 struct b2Fixture_index_in_component {
 	std::size_t convex_shape_index = 0xdeadbeef;

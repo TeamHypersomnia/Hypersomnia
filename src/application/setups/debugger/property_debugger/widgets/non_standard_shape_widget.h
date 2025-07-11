@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "view/viewables/images_in_atlas_map.h"
 #include "application/setups/debugger/property_debugger/tweaker_type.h"
 

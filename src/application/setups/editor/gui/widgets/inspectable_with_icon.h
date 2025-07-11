@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace editor_widgets {
 	template <class F>

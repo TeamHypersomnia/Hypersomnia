@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
 #include "augs/network/network_types.h"
 #include "augs/templates/hash_templates.h"
 

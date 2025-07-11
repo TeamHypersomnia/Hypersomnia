@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"

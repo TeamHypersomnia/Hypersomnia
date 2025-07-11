@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "audio_context.h"
 
 #include "augs/audio/OpenAL_error.h"

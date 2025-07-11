@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 #include "augs/audio/sound_buffer.h"

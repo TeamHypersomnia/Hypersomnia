@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/profiler_mixin.h"
 
 struct frame_profiler : public augs::profiler_mixin<frame_profiler> {

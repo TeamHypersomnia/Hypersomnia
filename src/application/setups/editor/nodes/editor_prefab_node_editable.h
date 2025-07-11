@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/graphics/rgba.h"
 #include "augs/math/vec2.h"
 

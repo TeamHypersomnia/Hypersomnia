@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/resources/editor_resource_id.h"

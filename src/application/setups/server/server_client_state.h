@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "application/setups/server/server_vars.h"
 #include "augs/network/jitter_buffer.h"
 #include "augs/network/network_types.h"

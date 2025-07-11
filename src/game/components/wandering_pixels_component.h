@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "game/components/sprite_component.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/pad_bytes.h"

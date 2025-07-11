@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "3rdparty/polypartition/src/polypartition.h"
 #include "augs/graphics/vertex.h"
 #include "augs/drawing/polygon.h"

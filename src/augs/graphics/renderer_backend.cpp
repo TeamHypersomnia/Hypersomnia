@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/log_direct.h"
 #include "augs/graphics/renderer_backend.h"
 #include "augs/graphics/OpenGL_includes.h"

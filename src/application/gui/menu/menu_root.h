@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/option_button.h"
 #include "augs/gui/dereferenced_location.h"

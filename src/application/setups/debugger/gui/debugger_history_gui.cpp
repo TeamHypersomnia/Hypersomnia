@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/templates/history.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"

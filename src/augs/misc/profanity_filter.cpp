@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <unordered_set>
 #include "augs/misc/profanity_filter.h"
 #include "augs/misc/crazygames_profanities_list.h"

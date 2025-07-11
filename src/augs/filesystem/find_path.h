@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/file.h"
 

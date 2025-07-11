@@ -1,3 +1,6 @@
+#include <cstring>
+#include <cstddef>
+#include <cstdint>
 #include "application/network/address_utils.h"
 #include "application/network/server_adapter.h"
 #include "application/network/client_adapter.h"

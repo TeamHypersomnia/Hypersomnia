@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <emscripten/fetch.h>
 #include <string>
 #include <iostream>

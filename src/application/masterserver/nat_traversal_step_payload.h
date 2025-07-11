@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 using nat_session_guid_type = double;
 

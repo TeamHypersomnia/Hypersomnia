@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/graphics/rgba.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"

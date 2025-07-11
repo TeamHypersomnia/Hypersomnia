@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <array>
 #include "game/cosmos/entity_id.h"
 

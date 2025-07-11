@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "augs/misc/randomization.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/gui/text/printer.h"

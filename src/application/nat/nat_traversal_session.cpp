@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdint>
 #include "augs/network/netcode_utils.h"
 #include "augs/network/netcode_sockets.h"
 
