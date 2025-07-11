@@ -41,14 +41,7 @@ augs::date_time::date_time(
 {
 }
 
-#if defined(__clang__) && defined(PLATFORM_UNIX) 
-augs::date_time::date_time(
-	const augs::file_time_type& tp
-) : 
-	date_time(std::chrono::time_point_cast<std::chrono::system_clock::duration>(std::chrono::file_clock::to_sys(tp))) 
-	{
-}
-#else
+#if PLATFORM_WINDOWS
 
 static time_t filetime_to_timet(FILETIME const& ft) {
     ULARGE_INTEGER ull;
@@ -64,7 +57,17 @@ augs::date_time::date_time(
 	std::memcpy(&ft, &input_filetime, sizeof(FILETIME));
 	t = filetime_to_timet(ft);
 }
-#endif
+
+#else // PLATFORM_WINDOWS
+
+augs::date_time::date_time(
+	const augs::file_time_type& tp
+) : 
+	date_time(std::chrono::time_point_cast<std::chrono::system_clock::duration>(std::chrono::file_clock::to_sys(tp))) 
+	{
+}
+
+#endif // PLATFORM_WINDOWS
 
 std::string augs::date_time::format_time_point_utc_iso8601(const std::chrono::system_clock::time_point& tp) {
 	// Convert system_clock::time_point to utc tm structure
