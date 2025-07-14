@@ -2493,7 +2493,6 @@ work_result work(
 			case activity_type::EDITOR:
 				if (!params.editor_target.empty()) {
 					launch_editor(params.editor_target);
-					break;
 				}
 				else {
 					try {
