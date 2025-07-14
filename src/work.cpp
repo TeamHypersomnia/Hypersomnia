@@ -2513,7 +2513,7 @@ work_result work(
 					catch (...) {
 						LOG("No %x detected. Launching the project selector.", get_editor_last_project_path());
 					}
-					[[fallthrough]];
+					break;
 				}
 
 			case activity_type::EDITOR_PROJECT_SELECTOR:
