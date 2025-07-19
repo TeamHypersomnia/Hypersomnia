@@ -57,7 +57,7 @@ class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_sta
 
 	std::string error_message;
 
-	bool scroll_once_to_selected = false;
+	// bool scroll_once_to_selected = false;
 	bool refresh_requested = true;
 	bool refresh_in_progress() const;
 

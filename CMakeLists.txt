@@ -1210,10 +1210,8 @@ if(CLANG)
 		endif()
 	endif()
 
-	if (BUILD_FOR_WEB)
-		set(CHOSEN_WARNINGS "${CHOSEN_WARNINGS} -Wno-unused-but-set-variable")
-	endif()
-
+	set(SUPPRESSED_WARNINGS "-Wno-nontrivial-memcall -Wno-unused-but-set-variable -Wno-deprecated-literal-operator")
+	set(CHOSEN_WARNINGS "${CHOSEN_WARNINGS} ${SUPPRESSED_WARNINGS}")
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
@@ -1242,6 +1240,7 @@ if(CLANG)
 	file_flag("src/application/network/network_adapters.cpp" "-Wno-cast-align")
 	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error=deprecated-declarations")
 	file_flag("src/3rdparty/Box2D/Common/b2BlockAllocator.cpp" "-Wno-cast-align")
+	file_flag("src/augs/audio/sound_data.cpp" "-Wno-tautological-compare")
 endif()
 
 if(APPLE)
