@@ -33,7 +33,8 @@ then
 	ADDITIONAL_FLAGS="-D_CMAKE_TOOLCHAIN_PREFIX=llvm-"
 fi
 
-ADDITIONAL_FLAGS="$ADDITIONAL_FLAGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+POLICY_FLAG="-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+ADDITIONAL_FLAGS="$ADDITIONAL_FLAGS $POLICY_FLAG"
 
 BUILD_DIR="build"
 TARGET_FOLDER_NAME="${CONFIGURATION}-${ARCHITECTURE}-${C_COMPILER}"
@@ -64,13 +65,13 @@ then
 	echo "SRCPWD: $SRCPWD"
 
 	pushd prebuilt-version
-		cmake -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/version_file_generator -G Ninja
+		cmake $POLICY_FLAG -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/version_file_generator -G Ninja
 		ninja
 		VERSION_FILE_GENERATOR_PATH=$(pwd)/version_file_generator
 	popd
 
 	pushd prebuilt-introspector
-		cmake -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/Introspector-generator -G Ninja
+		cmake $POLICY_FLAG -DCMAKE_BUILD_TYPE=Release $SRCPWD/cmake/Introspector-generator -G Ninja
 		ninja
 		INTROSPECTOR_GENERATOR_PATH=$(pwd)/Introspector-generator
 	popd

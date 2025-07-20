@@ -4,6 +4,7 @@
 # Unless you are indeed releasing a binary, use Debug or RelWithDebInfo.
 
 cmake_minimum_required(VERSION 3.2)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 project(Hypersomnia)
 enable_language(C ASM)
@@ -1210,7 +1211,14 @@ if(CLANG)
 		endif()
 	endif()
 
-	set(SUPPRESSED_WARNINGS "-Wno-nontrivial-memcall -Wno-unused-but-set-variable -Wno-deprecated-literal-operator")
+	set(SUPPRESSED_WARNINGS "-Wno-unused-but-set-variable -Wno-deprecated-literal-operator")
+
+	if(BUILD_FOR_WEB)
+		set(SUPPRESSED_WARNINGS "${SUPPRESSED_WARNINGS} -Wno-nontrivial-memaccess")
+	else()
+		set(SUPPRESSED_WARNINGS "${SUPPRESSED_WARNINGS} -Wno-nontrivial-memcall")
+	endif()
+
 	set(CHOSEN_WARNINGS "${CHOSEN_WARNINGS} ${SUPPRESSED_WARNINGS}")
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
