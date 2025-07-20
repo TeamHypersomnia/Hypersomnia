@@ -15,11 +15,11 @@
 - Deep netcode bug most evident when playing alone with bots on any map with fish/insects. Could happen with players as well.
 	- Player was sometimes teleported, or getting randomly killed by bots even though it still walked on the screen. The footstep smokes were there but no bot was visible. What's happening?
 		- This was because of the decorative organisms (e.g. fish on `de_cyberaqua`) mistakenly using the same RNG as the simulation logic.
-		- Normally when state desyncs, it is detected by the client - a state hash that differs from the servers' is seen and a resync from the server is requested.
-		- Not this time - this bug was apparent only on the predicted game world which only exists on the client.
-		- When the client is alone on the server, their predicted game world is usually spot on and could never get corrected for a long time until a random spike in lag which affects which simulation step their inputs might get applied to.
+		- Normally when state desyncs, it is detected by the client - a state hash that differs from the server's is seen and a resync from the server is requested.
+		- Not this time - this bug was apparent on the predicted game world which only exists on the client.
+		- When the client is alone on the server, their predicted game world is usually spot on and might never get corrected for a long time until a random spike in lag (latency affects which simulation step your inputs might get applied to, so the **more stable your connection was, the more often this happened** as the predicted world was corrected more rarely).
 		- However if that predicted game world has a different advance logic, the predicted and the referential server world might start diverging exponentially.
-		- This is what happened here - within the predicted world, purposely disable simulating fish during prediction to save processing time thinking that will not break determinism of the rest of the simulation, but I haven't realized the fish are using the same RNG as the logic, so them using it completely influences the calculaitons later down the road.
+		- This is what happened here - within the predicted world, I purposely disable simulating fish to save processing time, assuming that will not break determinism of the rest of the simulation, but I haven't realized the fish are using the same RNG as the logic. Fish requesting next random values from the RNG causes the next requests to be different for the other simulation logic later down the road.
 
 ## [1.3.2] - 2025-07-11
 
