@@ -1211,13 +1211,8 @@ if(CLANG)
 		endif()
 	endif()
 
-	set(SUPPRESSED_WARNINGS "-Wno-unused-but-set-variable -Wno-deprecated-literal-operator")
-
-	if(BUILD_FOR_WEB)
-		set(SUPPRESSED_WARNINGS "${SUPPRESSED_WARNINGS} -Wno-nontrivial-memaccess")
-	else()
-		set(SUPPRESSED_WARNINGS "${SUPPRESSED_WARNINGS} -Wno-nontrivial-memcall")
-	endif()
+	set(SUPPRESSED_WARNINGS "-Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-deprecated-literal-operator")
+	set(SUPPRESSED_WARNINGS "${SUPPRESSED_WARNINGS} -Wno-nontrivial-memcall")
 
 	set(CHOSEN_WARNINGS "${CHOSEN_WARNINGS} ${SUPPRESSED_WARNINGS}")
 	# -Wall and -Wextra cover everything already
