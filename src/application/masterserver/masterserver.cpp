@@ -284,6 +284,116 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	const auto masterserver_dump_path = USER_DIR / "masterserver.dump";
 
+	struct webhook_job {
+		std::unique_ptr<std::future<std::string>> job;
+	};
+
+	std::vector<webhook_job> pending_jobs;
+
+	auto finalize_webhook_jobs = [&]() {
+		auto finalize = [&](auto& webhook_job) {
+			return is_ready(*webhook_job.job);
+		};
+
+		erase_if(pending_jobs, finalize);
+	};
+
+	auto push_webhook_job = [&](auto&& f) {
+		auto ptr = std::make_unique<std::future<std::string>>(
+			std::async(std::launch::async, std::forward<decltype(f)>(f))
+		);
+
+		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
+	};
+
+	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
+		const auto ip_str = ::ToString(from);
+
+		if (is_banned_notifications(from)) {
+			return;
+		}
+
+		if (is_banned_notifications_name(data.server_name)) {
+			return;
+		}
+
+		const auto passed = since_launch.get<std::chrono::seconds>();
+		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
+
+		if (passed < mute_for_secs) {
+			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", passed, mute_for_secs);
+			return;
+		}
+
+		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
+			MSR_LOG("Posting a discord webhook job");
+
+			push_webhook_job(
+				[ip_str, data, discord_webhook_url]() -> std::string {
+					auto client = httplib_utils::make_client(discord_webhook_url);
+
+					const auto game_mode_name = std::string(data.game_mode);
+
+					auto items = discord_webhooks::form_new_community_server(
+						"Server list",
+						data.server_name,
+						ip_str,
+						data.current_arena,
+						game_mode_name,
+						data.server_slots,
+						nat_type_to_string(data.nat.type),
+						data.is_editor_playtesting_server
+					);
+
+					MSR_LOG("Sending a discord notification for %x", data.server_name);
+
+					client->Post(discord_webhook_url.location.c_str(), items);
+
+					return "";
+				}
+			);
+		}
+		else {
+			if (cfg.server_private.discord_webhook_url.size() > 0) {
+				MSR_LOG("Discord webhook url was invalid.");
+			}
+		}
+
+		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
+			MSR_LOG("Posting a telegram webhook job");
+
+			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
+
+			push_webhook_job(
+				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
+					auto client = httplib_utils::make_client(telegram_webhook_url);
+
+					auto items = telegram_webhooks::form_new_community_server(
+						telegram_channel_id,
+						data.server_name,
+						ip_str,
+						data.is_editor_playtesting_server
+					);
+
+					const auto location = telegram_webhook_url.location + "/sendMessage";
+
+					MSR_LOG("Sending a telegram notification for %x", data.server_name);
+
+					client->Post(location.c_str(), items);
+
+					return "";
+				}
+			);
+		}
+		else {
+			if (cfg.server_private.telegram_webhook_url.size() > 0) {
+				MSR_LOG("Telegram webhook url was invalid.");
+			}
+		}
+	};
+
+	auto previous_peers = signalling_server::peer_map();
+
 	auto reserialize_list = [&]() {
 		// MSR_LOG("Reserializing the server list.");
 
@@ -326,7 +436,16 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, ip_address);
 			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
+
+			if (!found_in(previous_peers, server.first)) {
+				push_new_server_webhook(
+					ip_address,
+					server.second.last_heartbeat
+				);
+			}
 		}
+
+		previous_peers = peer_map;
 
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
@@ -507,28 +626,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		reserialize_list();
 	};
 
-	struct webhook_job {
-		std::unique_ptr<std::future<std::string>> job;
-	};
-
-	std::vector<webhook_job> pending_jobs;
-
-	auto finalize_webhook_jobs = [&]() {
-		auto finalize = [&](auto& webhook_job) {
-			return is_ready(*webhook_job.job);
-		};
-
-		erase_if(pending_jobs, finalize);
-	};
-
-	auto push_webhook_job = [&](auto&& f) {
-		auto ptr = std::make_unique<std::future<std::string>>(
-			std::async(std::launch::async, std::forward<decltype(f)>(f))
-		);
-
-		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
-	};
-
 	auto push_alert_webhook = [&](std::string err) {
 		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_alerts_webhook_url); telegram_webhook_url.valid()) {
 			MSR_LOG("Posting a telegram webhook job");
@@ -555,92 +652,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		else {
 			if (cfg.server_private.telegram_alerts_webhook_url.size() > 0) {
 				MSR_LOG("Telegram logs webhook url was invalid.");
-			}
-		}
-	};
-
-	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
-		const auto ip_str = ::ToString(from);
-
-		if (is_banned_notifications(from)) {
-			return;
-		}
-
-		if (is_banned_notifications_name(data.server_name)) {
-			return;
-		}
-
-		const auto passed = since_launch.get<std::chrono::seconds>();
-		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
-
-		if (passed < mute_for_secs) {
-			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", passed, mute_for_secs);
-			return;
-		}
-
-		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
-			MSR_LOG("Posting a discord webhook job");
-
-			push_webhook_job(
-				[ip_str, data, discord_webhook_url]() -> std::string {
-					auto client = httplib_utils::make_client(discord_webhook_url);
-
-					const auto game_mode_name = std::string(data.game_mode);
-
-					auto items = discord_webhooks::form_new_community_server(
-						"Server list",
-						data.server_name,
-						ip_str,
-						data.current_arena,
-						game_mode_name,
-						data.server_slots,
-						nat_type_to_string(data.nat.type),
-						data.is_editor_playtesting_server
-					);
-
-					MSR_LOG("Sending a discord notification for %x", data.server_name);
-
-					client->Post(discord_webhook_url.location.c_str(), items);
-
-					return "";
-				}
-			);
-		}
-		else {
-			if (cfg.server_private.discord_webhook_url.size() > 0) {
-				MSR_LOG("Discord webhook url was invalid.");
-			}
-		}
-
-		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
-			MSR_LOG("Posting a telegram webhook job");
-
-			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
-
-			push_webhook_job(
-				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
-					auto client = httplib_utils::make_client(telegram_webhook_url);
-
-					auto items = telegram_webhooks::form_new_community_server(
-						telegram_channel_id,
-						data.server_name,
-						ip_str,
-						data.is_editor_playtesting_server
-					);
-
-					const auto location = telegram_webhook_url.location + "/sendMessage";
-
-					MSR_LOG("Sending a telegram notification for %x", data.server_name);
-
-					client->Post(location.c_str(), items);
-
-					return "";
-				}
-			);
-		}
-		else {
-			if (cfg.server_private.telegram_webhook_url.size() > 0) {
-				MSR_LOG("Telegram webhook url was invalid.");
 			}
 		}
 	};
