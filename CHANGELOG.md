@@ -6,6 +6,10 @@
 
 ## [1.3.3] - 2025-07-20
 
+### Added
+
+- Webhooks also report servers hosted on the Web now (hypersomnia.io or CrazyGames).
+
 ### Fixed
 
 - Deep netcode bug most evident when playing alone with bots on any map with fish/insects. Could happen with players as well.

@@ -306,7 +306,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
 	};
 
-	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
+	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data, const bool is_web) {
 		const auto ip_str = ::ToString(from);
 
 		if (is_banned_notifications(from)) {
@@ -329,7 +329,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			MSR_LOG("Posting a discord webhook job");
 
 			push_webhook_job(
-				[ip_str, data, discord_webhook_url]() -> std::string {
+				[ip_str, data, discord_webhook_url, is_web]() -> std::string {
 					auto client = httplib_utils::make_client(discord_webhook_url);
 
 					const auto game_mode_name = std::string(data.game_mode);
@@ -342,7 +342,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						game_mode_name,
 						data.server_slots,
 						nat_type_to_string(data.nat.type),
-						data.is_editor_playtesting_server
+						data.is_editor_playtesting_server,
+						is_web
 					);
 
 					MSR_LOG("Sending a discord notification for %x", data.server_name);
@@ -365,14 +366,15 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
 
 			push_webhook_job(
-				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
+				[ip_str, data, telegram_webhook_url, telegram_channel_id, is_web]() -> std::string {
 					auto client = httplib_utils::make_client(telegram_webhook_url);
 
 					auto items = telegram_webhooks::form_new_community_server(
 						telegram_channel_id,
 						data.server_name,
 						ip_str,
-						data.is_editor_playtesting_server
+						data.is_editor_playtesting_server,
+						is_web
 					);
 
 					const auto location = telegram_webhook_url.location + "/sendMessage";
@@ -437,10 +439,22 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 
+			bool push_webhook = false;
+
 			if (!found_in(previous_peers, server.first)) {
+				push_webhook = true;
+			}
+			else {
+				if (!previous_peers[server.first].is_server()) {
+					push_webhook = true;
+				}
+			}
+
+			if (push_webhook) {
 				push_new_server_webhook(
 					ip_address,
-					server.second.last_heartbeat
+					server.second.last_heartbeat,
+					true
 				);
 			}
 		}
@@ -838,7 +852,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								if (typed_request.show_on_server_list) {
 									if (!typed_request.suppress_new_community_server_webhook) {
 										MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
-										push_new_server_webhook(from, typed_request);
+										push_new_server_webhook(from, typed_request, false);
 									}
 									else {
 										MSR_LOG("New server sent a heartbeat from %x. Skipping notification due to a flag.", ip_str);

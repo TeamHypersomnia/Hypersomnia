@@ -202,18 +202,23 @@ namespace telegram_webhooks {
 		const std::string& channel_id,
 		const std::string& new_server_name,
 		const std::string& new_server_ip,
-		const bool is_editor_playtesting_session
+		const bool is_editor_playtesting_session,
+		const bool is_web
 	) {
 #define SHOW_IPS_IN_WEBHOOKS 0
 
 #if SHOW_IPS_IN_WEBHOOKS
 		const std::string hosted_at = is_editor_playtesting_session ? " at " : " hosted at ";
-		const std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted_at + "*" + new_server_ip + "*";
+		std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted_at + "*" + new_server_ip + "*";
 #else
 		const std::string hosted = is_editor_playtesting_session ? "." : " hosted.";
-		const std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted;
+		std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted;
 		(void)new_server_ip;
 #endif
+
+		if (is_web) {
+			full_description += " (Web)";
+		}
 
 		return {
 			{ "chat_id", channel_id, "", "" },
@@ -589,7 +594,8 @@ namespace discord_webhooks {
 		const std::string& game_mode,
 		const int num_slots,
 		const std::string& nat_type,
-		const bool is_editor_playtesting_session
+		const bool is_editor_playtesting_session,
+		const bool is_web
 	) {
 		const auto payload = [&]()
 		{
@@ -628,12 +634,20 @@ namespace discord_webhooks {
 					{
 						writer.Key("name");
 
+						auto name = std::string();
+
 						if (is_editor_playtesting_session) {
-							writer.String("New editor session!");
+							name = "New editor session!";
 						}
 						else {
-							writer.String("New community server!");
+							name = "New community server!";
 						}
+
+						if (is_web) {
+							name += " (Web)";
+						}
+
+						writer.String(name.c_str());
 					}
 					writer.EndObject();
 

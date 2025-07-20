@@ -302,7 +302,7 @@
         },
         "friendly_fire": true,
         "bots": true, // Can override with "/bots 0" in-game.
-        "bot_difficulty": "EASY", // or: "MEDIUM" | "HARD"
+        "bot_difficulty": "HARD", // or: "MEDIUM" | "EASY"
         "cycle": "REPEAT_CURRENT", // or: "LIST" | "ALL_ON_DISK"
         "cycle_list": [
             "de_cyberaqua",
