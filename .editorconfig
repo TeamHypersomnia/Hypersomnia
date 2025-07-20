@@ -2,10 +2,26 @@
 
 root = true
 
+[*.h]
+indent_style = tab
+indent_size = 4
+
+[*.hpp]
+indent_style = tab
+indent_size = 4
+
 [*.cpp]
 indent_style = tab
 indent_size = 4
 
+[*.c]
+indent_style = tab
+indent_size = 4
+
 [*.md]
+indent_style = tab
+indent_size = 4
+
+[*.sh]
 indent_style = tab
 indent_size = 4
