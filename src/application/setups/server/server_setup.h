@@ -185,8 +185,8 @@ class server_setup :
 	static bool is_webrtc_only();
 
 	bool handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n);
-    bool send_packet_override(const netcode_address_t&,const std::byte*,int);
-    int receive_packet_override(netcode_address_t&,std::byte*,int);
+	bool send_packet_override(const netcode_address_t&,const std::byte*,int);
+	int receive_packet_override(netcode_address_t&,std::byte*,int);
 
 	std::chrono::system_clock::time_point when_to_check_for_updates;
 	hour_and_minute_str when_to_check_for_updates_last_var;

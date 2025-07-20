@@ -27,7 +27,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	auto& step_rng = step.step_rng;
+	auto step_rng = randomization(cosm.get_total_steps_passed());
 
 	auto& grids = cosm.get_solvable_inferred({}).organisms;
 

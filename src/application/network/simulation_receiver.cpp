@@ -7,7 +7,7 @@
 #include "application/network/simulation_receiver.h"
 
 void simulation_receiver::predict_intents_of_remote_entities(
-	simulation_receiver::simulated_entropy_type& adjusted_entropy, 
+	simulated_entropy_type& adjusted_entropy, 
 	const entity_id locally_controlled_entity, 
 	const cosmos& predicted_cosmos
 ) {

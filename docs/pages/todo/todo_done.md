@@ -7358,3 +7358,14 @@ This will discard your redo history."
 
 - bots on easy are too sticky
 - bots on easy should better react to gunshots
+
+- remaining bot spawning logic
+	- take control of alive bot
+		- also when joining a team, dont just annihilate existing bot
+	- handle commencing
+	- kick on ranked start
+	- kick when players on opposite teams already
+	- overrides reset when nobody playing?
+	- remember to autoassign by player count not bot count otherwise everyone will end up in same team
+
+- rename config.json to something like cached.json

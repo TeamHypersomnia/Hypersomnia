@@ -5,6 +5,24 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- if predicted world is not repredicted long enough it might desync if the logic there is nondeterministic
+	- thats how it might've evaded detection
+	- when popping (accepting) predicted entropies we need to check solvable hashes and if they differ, repredict
+		- we should first check for obvious ones like state_inconsistent because we disabled knockouts
+		- and if these are not set, the solvables MUST be identical
+		- otherwise its a real problem with nondeterminism
+	- if (!predicted_entropies.empty()) {
+		- maybe this was the culprit?
+- WE CAN ACTUALLY REPRODUCE IT!
+	- Referential vs predicted
+	- on the 1.3.0 playtest as well, exactly what we see
+	- so our replay system is actually designed well
+- SOLUTION:
+	use separate RNG for movement path system
+	This would otherwise break reprediction when simulate_decorative_organisms was false,
+	because it was using the step's rng.
+	This means the organisms (fish etc) logic could make state further inconsistent later down the run since rng for the organism logic is the same rng used for other systems like e.g. calculating shakes in sentience_system::regenerate_values_and_advance_spell_logic
+
 - why resynchro 
 	- was wrong reinference
 - cos sie PIERDOLI z tymi nazwami serwerow znowu

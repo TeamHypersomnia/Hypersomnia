@@ -33,10 +33,16 @@ struct steps_unpacking_result {
 	std::size_t total_accepted = static_cast<std::size_t>(-1);
 };
 
+using simulated_entropy_type = server_step_entropy;
+
+struct predicted_step_record {
+    simulated_entropy_type entropy;
+	uint32_t state_hash = 0u;
+};
+
 class simulation_receiver {
 public:
 	using received_entropy_type = compact_server_step_entropy;
-	using simulated_entropy_type = server_step_entropy;
 private:
 
 	template <class H>
@@ -84,7 +90,7 @@ public:
 
 	std::vector<prestep_client_context> incoming_contexts;
 	std::vector<incoming_entropy_entry> incoming_entropies;
-	std::vector<simulated_entropy_type> predicted_entropies;
+	std::vector<predicted_step_record> predicted_entropies;
 	interpolation_transfer_caches transfer_caches;
 
 	bool schedule_reprediction = false;
@@ -203,10 +209,7 @@ public:
 						}
 #endif
 
-						const auto client_state_hash = 
-							referential_cosmos.template calculate_solvable_signi_hash<uint32_t>()
-						;
-
+						const auto client_state_hash = referential_arena.solvable_hash();
 						const auto step_number = referential_cosmos.get_total_steps_passed();
 
 						if (*received_hash != client_state_hash) {
@@ -256,10 +259,21 @@ public:
 
 						if (!already_found_reason_to_repredict) {
 							if (num_total_accepted_entropies < predicted_entropies.size()) {
-								const auto& predicted_server_entropy = predicted_entropies[num_total_accepted_entropies];
+								const auto& predicted_step = predicted_entropies[num_total_accepted_entropies];
 
-								if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
+								if (shall_reinfer) { 
 									repredict = true;
+								}
+								
+								if (!(actual_server_entropy == predicted_step.entropy)){
+									repredict = true;
+								}
+
+								if (meta.state_hash.has_value()) {
+									if (const bool hash_mismatch = (*meta.state_hash != predicted_step.state_hash)) {
+										LOG("repredict: hash_mismatch");
+										repredict = true;
+									}
 								}
 							}
 							else {
@@ -305,6 +319,7 @@ public:
 #if USE_CLIENT_PREDICTION
 		if (repredict) {
 			auto& predicted_cosmos = predicted_arena.get_cosmos();
+			//LOG("REPREDICT at step R: %x P: %x", referential_arena.get_cosmos().get_total_steps_passed(), predicted_cosmos.get_total_steps_passed());
 
 			const auto potential_mispredictions = acquire_potential_mispredictions(
 				past.infected_entities, 
@@ -316,13 +331,16 @@ public:
 			predicted_arena.transfer_all_solvables(referential_arena);
 
 			for (auto& predicted_step_entropy : predicted_entropies) {
+				auto& entropy = predicted_step_entropy.entropy;
+
 				predict_intents_of_remote_entities(
-					predicted_step_entropy,
+					entropy,
 					locally_controlled_entity, 
 					predicted_cosmos
 				);
 
-				advance_predicted(predicted_step_entropy);
+				predicted_step_entropy.state_hash = predicted_arena.solvable_hash();
+				advance_predicted(entropy);
 			}
 
 			::restore_interpolations(transfer_caches, predicted_cosmos);

@@ -3849,8 +3849,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 			ticks_remaining = vars.state_hash_once_every_tick;
 			--ticks_remaining;
 
-			const auto calculated_hash = get_arena_handle().get_cosmos().calculate_solvable_signi_hash<uint32_t>();
-			return calculated_hash;
+			return get_arena_handle().solvable_hash();
 		}
 
 		return std::nullopt;

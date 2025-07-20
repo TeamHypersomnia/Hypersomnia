@@ -250,4 +250,8 @@ public:
 			}
 		);
 	}
+
+	auto solvable_hash() const {
+		return get_cosmos().template calculate_solvable_signi_hash<uint32_t>();
+	}
 };

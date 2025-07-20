@@ -519,10 +519,10 @@ class client_setup :
 				auto scope = measure_scope(performance.stepping_forward);
 
 				{
-					auto& p = receiver.predicted_entropies;
+					auto& predicted = receiver.predicted_entropies;
 
 					const auto& max_commands = vars.max_predicted_client_commands;
-					const auto num_commands = p.size();
+					const auto num_commands = predicted.size();
 
 					if (!is_replaying()) {
 						if (num_commands > max_commands) {
@@ -537,7 +537,7 @@ class client_setup :
 
 					performance.predicted_steps.measure(num_commands);
 
-					p.push_back(*new_local_entropy);
+					predicted.push_back({ *new_local_entropy, predicted_arena.solvable_hash() });
 				}
 
 				auto predicted_post_solve = [&](const const_logic_step step) {

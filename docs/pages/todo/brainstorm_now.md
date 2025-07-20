@@ -6,19 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- if predicted world is not repredicted long enough it might desync if the logic there is nondeterministic
-	- thats how it might've evaded detection
-	- when popping (accepting) predicted entropies we need to check solvable hashes and if they differ, repredict
-		- we should first check for obvious ones like state_inconsistent because we disabled knockouts
-		- and if these are not set, the solvables MUST be identical
-		- otherwise its a real problem with nondeterminism
-	- if (!predicted_entropies.empty()) {
-		- maybe this was the culprit?
-- WE CAN ACTUALLY REPRODUCE IT!
-	- Referential vs predicted
-	- on the 1.3.0 playtest as well, exactly what we see
-	- so our replay system is actually designed well
-
 - implement map and game mode params in hypersomnia.io/host/map/mode
 - fix web too
 	- i dont remember what was that
@@ -29,17 +16,6 @@ summary: That which we are brainstorming at the moment.
 - find out wtf with those debug lines on cyberaqua
 
 - refactor arena mode so match and round state is in its own structs properly
-
-- remaining bot spawning logic
-	- take control of alive bot
-		- also when joining a team, dont just annihilate existing bot
-	- handle commencing
-	- kick on ranked start
-	- kick when players on opposite teams already
-	- overrides reset when nobody playing?
-	- remember to autoassign by player count not bot count otherwise everyone will end up in same team
-
-- rename config.json to something like cached.json
 
 - bots
 	- when someone specifies /bots 4 0, dont commence game when someone joins the opposite side
