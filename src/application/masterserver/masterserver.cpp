@@ -934,9 +934,15 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				const auto request = augs::from_bytes<masterserver_request>(packet_buffer, packet_bytes);
 				std::visit(handle, request);
 			}
+			catch (const std::exception& err) {
+				if (const auto entry = mapped_or_nullptr(server_list, from)) {
+					LOG("The server at %x (%x) has sent invalid data: %x", ::ToString(from), entry->last_heartbeat.server_name, err.what());
+					remove_from_list(from);
+				}
+			}
 			catch (...) {
 				if (const auto entry = mapped_or_nullptr(server_list, from)) {
-					LOG("The server at %x (%x) has sent invalid data.", ::ToString(from), entry->last_heartbeat.server_name);
+					LOG("The server at %x (%x) has sent invalid data: unknown error.", ::ToString(from), entry->last_heartbeat.server_name);
 					remove_from_list(from);
 				}
 			}

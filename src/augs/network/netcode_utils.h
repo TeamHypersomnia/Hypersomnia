@@ -14,13 +14,15 @@ bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
 bool try_fire_interval(double interval, net_time_t& when_last);
 bool try_fire_interval(double interval, net_time_t& when_last, double current_time);
 
+constexpr std::size_t max_heartbeat_bytes_v = NETCODE_MAX_PACKET_BYTES * 2;
+
 template <bool pass_socket = false, class F>
 void receive_netcode_packets(netcode_socket_t socket, F&& callback) {
 	netcode_address_t from;
-	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
+	uint8_t packet_buffer[max_heartbeat_bytes_v];
 
 	while (true) {
-		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
+		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, max_heartbeat_bytes_v);
 
 		if (packet_bytes < 1) {
 			break;
