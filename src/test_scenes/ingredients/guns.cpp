@@ -3286,7 +3286,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.0f;
-			gun_def.head_radius_multiplier = 0.6f;
+			gun_def.head_radius_multiplier = 0.85f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 1.f;

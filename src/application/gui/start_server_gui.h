@@ -25,7 +25,7 @@ public:
 	bool show_nat_details = false;
 
 	bool enable_bots = true;
-	difficulty_type bot_difficulty = difficulty_type::EASY;
+	difficulty_type bot_difficulty = difficulty_type::HARD;
 
 	int bot_allies = 2;
 	int bot_enemies = 5;
