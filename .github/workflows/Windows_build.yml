@@ -21,28 +21,6 @@ jobs:
         submodules: recursive
         fetch-depth: 0
 
-    - name: Prepare folders for tools
-      run: |
-        mkdir "${{ github.workspace }}\tools"
-        mkdir "${{ github.workspace }}\tools\deps"
-      shell: cmd
-
-    - name: Setup Ninja
-      run: |
-        cd "${{ github.workspace }}\tools\deps"
-        $ninjaUrl = "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
-        Invoke-WebRequest -Uri $ninjaUrl -OutFile ninja.zip
-        7z x ninja.zip -o"${{ github.workspace }}\tools\deps\ninja" | Out-Null
-        echo "${{ github.workspace }}\tools\deps\ninja" >> $env:GITHUB_PATH
-        ninja --version
-      shell: pwsh
-
-    - name: Install LLVM
-      run: |
-        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe -OutFile llvm-installer.exe
-        Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
-      shell: pwsh
-
     - name: Display OpenSSL directory info
       run: |
         dir "C:\Program Files\OpenSSL"
@@ -52,8 +30,11 @@ jobs:
     - name: Generate Visual Studio solution files
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        echo "where clang-cl:"
         where clang-cl
+        echo "clang-cl --version"
         clang-cl --version
+        echo "Now building"
         mkdir sln
         cd sln
         cmake -G "Visual Studio 17 2022" -A x64 -T ClangCL ^
@@ -77,6 +58,34 @@ jobs:
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
         msbuild sln/Hypersomnia.sln /p:Configuration=Release /p:Platform=x64 /m
       shell: cmd
+
+    - name: Upload Visual Studio build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Hypersomnia-sln-exe
+        path: hypersomnia
+
+    - name: Prepare folders for tools
+      run: |
+        mkdir "${{ github.workspace }}\tools"
+        mkdir "${{ github.workspace }}\tools\deps"
+      shell: cmd
+
+    - name: Setup Ninja
+      run: |
+        cd "${{ github.workspace }}\tools\deps"
+        $ninjaUrl = "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+        Invoke-WebRequest -Uri $ninjaUrl -OutFile ninja.zip
+        7z x ninja.zip -o"${{ github.workspace }}\tools\deps\ninja" | Out-Null
+        echo "${{ github.workspace }}\tools\deps\ninja" >> $env:GITHUB_PATH
+        ninja --version
+      shell: pwsh
+
+    - name: Install LLVM
+      run: |
+        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe -OutFile llvm-installer.exe
+        Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
+      shell: pwsh
 
     - name: Build
       run: |

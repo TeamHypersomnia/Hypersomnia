@@ -1516,6 +1516,7 @@ add_definitions(-DSTREFLOP_SSE)
 add_definitions(-DLIBM_COMPILING_FLT32)
 add_definitions(-DIMGUI_USER_CONFIG="3rdparty/imconfig.h")
 add_definitions(-D_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
+add_definitions(-D_SILENCE_CXX23_ALIGNED_STORAGE_DEPRECATION_WARNING)
 
 # We must wait till SOL will fixes these warnings.
 
