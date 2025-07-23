@@ -38,7 +38,7 @@ jobs:
         mkdir sln
         cd sln
         cmake -G "Visual Studio 17 2022" -A x64 -T ClangCL ^
-          -DLINK_STEAM_INTEGRATION=1 ^
+          -DLINK_STEAM_INTEGRATION=0 ^
           -DBUILD_STEAM=0 ^
           -DBLAKE_PORTABLE=1 ^
           -DARCHITECTURE="x64" ^
