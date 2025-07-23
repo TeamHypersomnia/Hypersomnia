@@ -66,16 +66,17 @@ jobs:
           ..
       shell: cmd
 
-    - name: Zip Visual Studio solution build folder
-      run: |
-        7z a Hypersomnia-sln.zip .\sln
-      shell: cmd
-
     - name: Upload Visual Studio solution artifact
       uses: actions/upload-artifact@v4
       with:
         name: Hypersomnia-sln
-        path: Hypersomnia-sln.zip
+        path: sln
+
+    - name: Build Hypersomnia.sln with MSBuild
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        msbuild sln/Hypersomnia.sln /p:Configuration=Release /p:Platform=x64 /m
+      shell: cmd
 
     - name: Build
       run: |
