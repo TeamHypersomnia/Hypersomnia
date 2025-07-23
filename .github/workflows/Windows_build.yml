@@ -39,7 +39,6 @@ jobs:
         cd sln
         cmake -G "Visual Studio 17 2022" -A x64 -T ClangCL ^
           -DLINK_STEAM_INTEGRATION=0 ^
-          -DBUILD_STEAM=0 ^
           -DBLAKE_PORTABLE=1 ^
           -DARCHITECTURE="x64" ^
           -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% ^
