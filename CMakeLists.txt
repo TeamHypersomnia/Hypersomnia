@@ -205,6 +205,7 @@ option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_NET_OPT})
 option(BUILD_SOUND_FORMAT_DECODERS "Build stb_vorbis. If this is off, ogg files won't be loaded." ${DEFAULT_OPT})
+option(BLAKE_PORTABLE "Build BLAKE3 in portable mode (no SIMD)." OFF)
 
 ## Switches for functionality originating from the Hypersomnia codebase.
 
@@ -1693,42 +1694,63 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/streflop")
 
 set(BLAKE3_PATH "${PROJECT_SOURCE_DIR}/src/3rdparty/blake3")
 
-IF (MSVC)
-set(BLAKE3_SRC
-    ${BLAKE3_PATH}/blake3.c
-    ${BLAKE3_PATH}/blake3_portable.c
-    ${BLAKE3_PATH}/blake3_dispatch.c
-    ${BLAKE3_PATH}/blake3_avx2_x86-64_windows_gnu.S
-    ${BLAKE3_PATH}/blake3_avx512_x86-64_windows_gnu.S
-    ${BLAKE3_PATH}/blake3_sse41_x86-64_windows_gnu.S
-    ${BLAKE3_PATH}/blake3_sse2_x86-64_windows_gnu.S
-)
-ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
-set(BLAKE3_SRC
-    ${BLAKE3_PATH}/blake3.c
-    ${BLAKE3_PATH}/blake3_portable.c
-    ${BLAKE3_PATH}/blake3_dispatch.c
-    ${BLAKE3_PATH}/blake3_avx2_x86-64_unix.S
-    ${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
-    ${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
-    ${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
-)
-ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
-set(BLAKE3_SRC
-    ${BLAKE3_PATH}/blake3.c
-    ${BLAKE3_PATH}/blake3_portable.c
-    ${BLAKE3_PATH}/blake3_dispatch.c
-    ${BLAKE3_PATH}/blake3_neon.c
-)
+set(BLAKE3_DEFINES)
+set(BLAKE3_NO_SIMD -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512)
+
+IF (BLAKE_PORTABLE)
+    message("BLAKE_PORTABLE was set. Disabling SIMD.")
+
+    set(BLAKE3_SRC
+        ${BLAKE3_PATH}/blake3.c
+        ${BLAKE3_PATH}/blake3_portable.c
+        ${BLAKE3_PATH}/blake3_dispatch.c
+    )
+
+    list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
 ELSE()
-set(BLAKE3_SRC
-    ${BLAKE3_PATH}/blake3.c
-    ${BLAKE3_PATH}/blake3_portable.c
-    ${BLAKE3_PATH}/blake3_dispatch.c
-)
+    IF (MSVC)
+        set(BLAKE3_SRC
+            ${BLAKE3_PATH}/blake3.c
+            ${BLAKE3_PATH}/blake3_portable.c
+            ${BLAKE3_PATH}/blake3_dispatch.c
+            ${BLAKE3_PATH}/blake3_avx2_x86-64_windows_gnu.S
+            ${BLAKE3_PATH}/blake3_avx512_x86-64_windows_gnu.S
+            ${BLAKE3_PATH}/blake3_sse41_x86-64_windows_gnu.S
+            ${BLAKE3_PATH}/blake3_sse2_x86-64_windows_gnu.S
+        )
+    ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
+        set(BLAKE3_SRC
+            ${BLAKE3_PATH}/blake3.c
+            ${BLAKE3_PATH}/blake3_portable.c
+            ${BLAKE3_PATH}/blake3_dispatch.c
+            ${BLAKE3_PATH}/blake3_avx2_x86-64_unix.S
+            ${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
+            ${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
+            ${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
+        )
+    ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
+        set(BLAKE3_SRC
+            ${BLAKE3_PATH}/blake3.c
+            ${BLAKE3_PATH}/blake3_portable.c
+            ${BLAKE3_PATH}/blake3_dispatch.c
+            ${BLAKE3_PATH}/blake3_neon.c
+        )
+    ELSE()
+        set(BLAKE3_SRC
+            ${BLAKE3_PATH}/blake3.c
+            ${BLAKE3_PATH}/blake3_portable.c
+            ${BLAKE3_PATH}/blake3_dispatch.c
+        )
+
+        list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
+    ENDIF()
 ENDIF()
 
 add_library(blake3 STATIC ${BLAKE3_SRC})
+
+if (BLAKE3_DEFINES)
+    target_compile_options(blake3 PRIVATE ${BLAKE3_DEFINES})
+endif()
 
 # We build the remaining libraries.
 
