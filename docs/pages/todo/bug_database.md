@@ -5,6 +5,17 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Ranked servers stopped accepting connections
+	- Primary issue: bots were just playing the same round in perpetuity
+		- This is because when bots play, is_idle was false - this was fixed
+	- Playing the same round in perpetuity caused the world state to bloat
+		- Leaks:
+			- cosmic::set_specific_name wasn't cleared when an entity was deleted
+			- knockouts history was growing indefinitely as it is only cleared on round restart
+			- awards history as well
+
+
+
 - if predicted world is not repredicted long enough it might desync if the logic there is nondeterministic
 	- thats how it might've evaded detection
 	- when popping (accepting) predicted entropies we need to check solvable hashes and if they differ, repredict

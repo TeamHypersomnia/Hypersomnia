@@ -59,6 +59,8 @@ constexpr std::size_t max_address_string_length_v = 255;
 constexpr std::size_t default_max_std_string_length_v = 1024 * 8;
 
 constexpr std::size_t max_signalling_udp_message_length_v = 1024 * 4;
+constexpr std::size_t max_knockouts_in_history_v = 15;
+constexpr std::size_t max_awards_in_history_v = 15;
 
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length_v>;

@@ -282,6 +282,29 @@ namespace net_messages {
 		augs::read_bytes(s, in.client_id);
 		augs::read_bytes(s, in.rcon);
 
+		LOG_NVPS(in.signi.entity_pools.size());
+
+		in.signi.entity_pools.for_each_container(
+			[&]<typename T>(const T& p) {
+				LOG_NVPS(get_type_name<typename T::value_type>(), p.size());
+			}
+		);
+
+#if DEBUG_WORLD_SIZE
+		LOG_NVPS(in.signi.specific_names.size());
+		LOG_NVPS(in.signi.global.pending_item_mounts.size());
+
+		LOG_NVPS(augs::to_bytes(in.signi.entity_pools).size());
+		LOG_NVPS(augs::to_bytes(in.signi.specific_names).size());
+
+		LOG_NVPS(augs::to_bytes(in.mode).size());
+		LOG_NVPS(augs::to_bytes(std::get<arena_mode>(in.mode).players).size());
+		LOG_NVPS(augs::to_bytes(std::get<arena_mode>(in.mode).suspended_players).size());
+		LOG_NVPS(augs::to_bytes(std::get<arena_mode>(in.mode).abandoned_players).size());
+		LOG_NVPS(augs::to_bytes(std::get<arena_mode>(in.mode).factions).size());
+		LOG_NVPS(augs::to_bytes(std::get<arena_mode>(in.mode).current_round.knockouts).size());
+#endif
+
 		NSR_LOG_NVPS(in.client_id);
 
 		return true;

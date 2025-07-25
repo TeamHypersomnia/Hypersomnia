@@ -1364,7 +1364,13 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 }
 
 void arena_mode::count_knockout(const logic_step step, const input_type in, const arena_mode_knockout ko) {
-	current_round.knockouts.push_back(ko);
+	auto& kos = current_round.knockouts;
+
+	kos.push_back(ko);
+
+	if (kos.size() > max_knockouts_in_history_v) {
+		kos.erase(kos.begin());
+	}
 
 	auto announce_knockout = [&](const auto stats, const auto knockouts_dt) {
 		const auto controlled_character_id = lookup(ko.knockouter.id);
@@ -4328,7 +4334,12 @@ void arena_mode::give_monetary_award(const input_type in, const mode_player_id i
 				in.cosm.get_clock(), id, amount 
 			};
 
-			stats->round_state.awards.emplace_back(award);
+			auto& awards = stats->round_state.awards;
+			awards.emplace_back(award);
+
+			if (awards.size() > max_awards_in_history_v) {
+				awards.erase(awards.begin());
+			}
 		}
 	}
 }
@@ -4629,7 +4640,7 @@ bool arena_mode::can_use_map_command_now(const const_input_type in) const {
 bool arena_mode::is_idle() const {
 	const bool is_warmup = state == arena_mode_state::WARMUP && ranked_state == ranked_state_type::NONE;
 
-	return is_warmup && players.empty() && suspended_players.empty() && abandoned_players.empty();
+	return is_warmup && get_num_human_players() == 0 && suspended_players.empty() && abandoned_players.empty();
 }
 
 bool arena_mode::team_choice_allowed(const const_input_type in) const {

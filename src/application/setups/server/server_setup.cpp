@@ -3707,10 +3707,11 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 
 	if (current_dynamic_vars != last_broadcast_dynamic_vars) {
 		LOG(
-			"Sending new dynamic vars at step: %x. %x %x",
+			"Sending new dynamic vars at step: %x. %x %x %x",
 			scene.world.get_total_steps_passed(),
 			current_dynamic_vars.preassigned_factions,
-			current_dynamic_vars.all_assigned_present
+			current_dynamic_vars.all_assigned_present,
+			current_dynamic_vars.all_authenticated
 		);
 
 		auto rebroadcast = [&](const auto recipient_client_id, auto& c) {
