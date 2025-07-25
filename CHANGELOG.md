@@ -19,6 +19,10 @@
 		- `awards` history as well.
 		- All of these are transmitted through the network on new connections - but the limit is only `2 MB`.
 
+### Changed
+
+- **Balance:** buff `pro90` headshot radius multiplier from `0.6` to `0.85`.
+
 ## [1.3.3] - 2025-07-20
 
 ### Added
