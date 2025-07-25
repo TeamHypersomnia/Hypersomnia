@@ -5,14 +5,16 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
-- Ranked servers stopped accepting connections
-	- Primary issue: bots were just playing the same round in perpetuity
-		- This is because when bots play, is_idle was false - this was fixed
-	- Playing the same round in perpetuity caused the world state to bloat
-		- Leaks:
-			- cosmic::set_specific_name wasn't cleared when an entity was deleted
-			- knockouts history was growing indefinitely as it is only cleared on round restart
-			- awards history as well
+- Fix broken ranked servers not letting in any clients.
+	- Indirect cause: bots were just playing warmup in perpetuity, causing world state to bloat.
+		- This is because when bots play, `is_idle()` is mistakenly reported `false`.
+		- This caused the maps (and thus the current round) to never change once `when_idle_change_maps_once_every_mins`.
+		- Maps now correctly cycle once every 15 minutes on ranked servers so this will never have a chance to happen again.
+	- Direct cause: the world and game mode round state growing in perpetuity as bots continue to play the same "warmup" round indefinitely.
+		- `cosmic::set_specific_name` wasn't cleared when a bot entity was deleted.
+		- `knockouts` history (the list of kills) was growing indefinitely as it is only cleared on round restart.
+		- `awards` history as well.
+		- All of these are transmitted through the network on new connections - but the limit is only `2 MB`.
 
 
 
