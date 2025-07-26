@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta name="theme-color" content="#00aa00">
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Hypersomnia</title>
+  <meta name="description" content="Free and open-source competitive 2D shooter on the Web.">
+  <link rel="stylesheet" href="./assets/common.css">
+
+</head>
+<body>
+  <div oncontextmenu="return false;" class="center-container" id="progress-container">
+    <div class="spinner" id="spinner"></div>
+    <div class="downloading-text" id="downloading-text">Downloading... 0%</div>
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-bar-inner" id="progress-bar-inner"></div>
+    </div>
+    <div class="progress-mb" id="progress-mb">0 MB</div>
+  </div>
+  <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
+  <script src="./assets/common.js"></script>
+  <script type='text/javascript'>
+    const crazygames = false;
+    var Module = create_module(crazygames);
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

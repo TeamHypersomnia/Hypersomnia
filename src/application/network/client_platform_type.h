@@ -11,6 +11,7 @@ enum class client_platform_type : uint8_t {
 
 	WEB,
 	CRAZYGAMES,
+	ITCH,
 
 	COUNT
 };
@@ -27,6 +28,8 @@ inline std::string describe_from_where(const client_platform_type t) {
 			return " from Web";
 		case client_platform_type::CRAZYGAMES:
 			return " from CrazyGames";
+		case client_platform_type::ITCH:
+			return " from itch.io";
 		default:
 			return "";
 	}
@@ -35,6 +38,7 @@ inline std::string describe_from_where(const client_platform_type t) {
 inline bool is_web_platform(const client_platform_type t) {
 	switch (t) {
 		case client_platform_type::WEB:
+		case client_platform_type::ITCH:
 		case client_platform_type::CRAZYGAMES:
 			return true;
 		default:
@@ -43,7 +47,9 @@ inline bool is_web_platform(const client_platform_type t) {
 }
 
 inline client_platform_type get_client_platform_type() {
-#if WEB_LOWEND
+#if WEB_ITCH
+		return client_platform_type::ITCH;
+#elif WEB_CRAZYGAMES
 		return client_platform_type::CRAZYGAMES;
 #elif PLATFORM_WEB
 		return client_platform_type::WEB;

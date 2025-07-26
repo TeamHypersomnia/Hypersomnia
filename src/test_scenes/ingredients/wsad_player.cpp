@@ -150,6 +150,7 @@ namespace test_flavours {
 			invariants::rigid_body body;
 			invariants::fixtures fixtures_invariant;
 
+			// body.bullet = false;
 			body.angled_damping = true;
 			body.allow_sleep = false;
 

@@ -909,7 +909,7 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.sound;
 
-#if WEB_LOWEND
+#if WEB_SINGLETHREAD
 					revertable_slider(SCOPE_CFG_NVP(max_audio_commands_per_frame_ms), 0.5f, 10.f);
 #endif
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));

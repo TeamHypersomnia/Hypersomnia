@@ -1526,7 +1526,7 @@ work_result work(
 	WEBSTATIC auto get_gui_fonts_ratio = [&]() {
 		auto scale = std::clamp(config.ui_scale, 1.0f, 4.0f);
 
-#if WEB_CRAZYGAMES
+#if WEB_LOWEND
 		/*
 			Up to 1080, increase only a little bit,
 			because we've already adjusted everything in the game to look good with this res.
@@ -2020,7 +2020,7 @@ work_result work(
 			}
 		}
 
-#if WEB_CRAZYGAMES
+#if WEB_LOWEND
 		auto in_fonts = config.gui_fonts;
 
 		if (is_during_tutorial()) {
@@ -3804,7 +3804,7 @@ work_result work(
 				launch_setup(activity_type::TUTORIAL);
 				break;
 
-#if !WEB_LOWEND
+#if !WEB_CRAZYGAMES
 			case T::EDITOR:
 #if WEB_LOWEND
 				augs::open_url("https://hypersomnia.io/editor/official");

@@ -18,7 +18,7 @@ struct arena_downloading_session {
 private:
 	using file_requester_type = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
 
-#if !WEB_LOWEND
+#if !WEB_SINGLETHREAD
 	hold_persistent_filesystem_raii hold_fs;
 #endif
 

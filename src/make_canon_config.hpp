@@ -127,6 +127,10 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		}
 #endif
 
+#if WEB_ITCH
+		result.prompted_for_sign_in_once = true;
+#endif
+
 #if !WEB_SINGLETHREAD
 		/* The subsequent ones are for the "Loading..." screen which is only needed in singlethreaded build */
 		result.gui_fonts.medium_numbers.unicode_ranges.resize(1);

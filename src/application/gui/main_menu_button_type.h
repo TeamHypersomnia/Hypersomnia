@@ -19,7 +19,7 @@ enum class main_menu_button_type {
 #endif
 	SHOOTING_RANGE,
 	TUTORIAL,
-#if !WEB_LOWEND
+#if !WEB_CRAZYGAMES
 	EDITOR,
 #endif
 	SETTINGS,
