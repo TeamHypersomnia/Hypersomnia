@@ -1,7 +1,7 @@
 <a name="intro">
 <div align="center">
 
-# **Online 2D shooter with relentless dynamics.** <br><br> [![Hypersomnia_github](https://github.com/ArtistDev44/Hypersomnia/blob/master/Hypersomnia_Github.png)](https://hypersomnia.io/)
+# **Online 2D shooter with relentless dynamics** <br><br> [![Hypersomnia_github](https://github.com/ArtistDev44/Hypersomnia/blob/master/Hypersomnia_Github.png)](https://hypersomnia.io/)
 
 <!-- Changed the image -->
 
@@ -26,9 +26,9 @@ It is written in modern C++, **without any game engine** and *comes with an [in-
 3. [Background](#background-)
 4. [Tech highlights](#tech-highlights-)
 5. [Links](#links-)
-	1. [Project](#links)
-	2. [Community](#links)
-	3. [Game](#links)
+	1. [Project](#links-)
+	2. [Community](#links-)
+	3. [Game](#links-)
 	4. [Hosting Downloads](#links-)
 6. [Credits 🇵🇱](https://teamhypersomnia.github.io/PressKit/credits)
 
@@ -36,10 +36,10 @@ It is written in modern C++, **without any game engine** and *comes with an [in-
 
 Hypersomnia has been online and playable since 2017. It brings together:
 
-- the tactics of ***Counter-Strike***,
+- the tactics of **Counter-Strike**,
 - the dynamics of **Hotline Miami**,
-- the pixel art nostalgia of oldschool RPGs,
-- and the potential for endless creativity thanks to an in-game map editor!
+- the **pixel art nostalgia** of oldschool RPGs,
+- and the potential for endless creativity thanks to an **in-game map editor!**
 
 **Today, it contains :**
 
@@ -47,7 +47,7 @@ Hypersomnia has been online and playable since 2017. It brings together:
 - **[24 unique firearms!](https://hypersomnia.xyz/weapons)**
   - And an extra 4 grenade types, 7 melee weapons as well as 6 magic spells!
 - **[10 community maps](https://hypersomnia.xyz/arenas)** and counting!
-- an **in-game map editor** 
+- an **[in-game map editor](https://hypersomnia.io/editor/official)** 
 	- that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router** after your friends downloaded your map and this resources.
     *(like in CS 1.6)*
 
@@ -72,10 +72,8 @@ Hypersomnia has been online and playable since 2017. It brings together:
 > *All archives are [digitally signed](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) with [verified signatures.](https://hypersomnia.xyz/builds/latest/)*
 
 
-
 ## Background 🕗
 
-> [!NOTE]  
 *Hypersomnia* has been in development **since 2013**.
 
 It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money to be able to work less and focus on *Hypersomnia*. My financial decisions now let me develop the game full-time.
@@ -85,10 +83,12 @@ Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scrat
 
 Many believe that writing games without an engine is no more than *reinventing the wheel*, or put more bluntly, a complete waste of time.
 
-**I hope this project serves as a great testament to the opposite.**
+> **I hope this project serves as a great testament to the opposite.**
 
 Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](###tech-highlights)
 Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
+
+Patryk Czachurski alias 
 
 ## Tech highlights 🖧
 
@@ -143,12 +143,12 @@ Video game internals are just so vast and interdisciplinary that they have limit
 ## Links 🔗
 
 <div align="center">
-	
+
 ***Project*** | ***Community*** | ***Game*** | ***Hosting downloads***
 |---|---|---|---|
-[PressKit](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro) | [Discord](https://discord.gg/YC49E4G) | [Universe](https://wiki.hypersomnia.xyz/universe) | [Docker Server](https://www.docker.com/app/uploads/2022/03/Moby-logo.png)
-[Website](https://hypersomnia.xyz/)| [Telegram](https://t.me/hypersomnia_io) | [Servers](https://hypersomnia.xyz/servers) | [Linux Server AppImage](https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage)
-[Wiki](https://wiki.hypersomnia.xyz/index.html) | [Documentation](https://wiki.hypersomnia.xyz/docs) | [Commands](linktoanew.mdfile)
-[**Contribute :heart:**](linktoanother.mddocument) | [Tutorial map editor](https://www.youtube.com/watch?v=q1rfIy06_xo) | [Build the game](newlink) | 
+[**Contribute :heart:**](linktoanother.mddocument) | [Discord](https://discord.gg/YC49E4G) | [Build the game](newlink) | [Docker Server](https://www.docker.com/app/uploads/2022/03/Moby-logo.png)
+[Website](https://hypersomnia.xyz/) | [Telegram](https://t.me/hypersomnia_io) | [Commands](linktoanew.mdfile)  | [Linux Server AppImage](https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage)
+[Wiki](https://wiki.hypersomnia.xyz/index.html) | [Documentation](https://wiki.hypersomnia.xyz/docs) | [Servers](https://hypersomnia.xyz/servers)
+[PressKit](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro) | [Tutorial map editor](https://www.youtube.com/watch?v=q1rfIy06_xo) | [Universe](https://wiki.hypersomnia.xyz/universe) | 
 
 </div>
