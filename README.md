@@ -1,9 +1,7 @@
 <a name="intro">
 <div align="center">
 
-# Online shooter with relentless dynamics.
-
-[![Hypersomnia](https://github.com/ArtistDev44/Hypersomnia/blob/master/Hypersomnia_Github.png)](https://hypersomnia.io/)
+# **Online shooter with relentless dynamics.**  <br><br> [![Hypersomnia](https://github.com/ArtistDev44/Hypersomnia/blob/master/Hypersomnia_Github.png)](https://hypersomnia.io/)
 
 <!-- Changed the image -->
 
