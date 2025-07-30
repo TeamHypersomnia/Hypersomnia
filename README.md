@@ -22,6 +22,7 @@ This project aims to be **the ultimate open-source 2D shooter** - a grand commun
 
 </div>
 
+---
 
 ## Contents
 
@@ -33,6 +34,8 @@ This project aims to be **the ultimate open-source 2D shooter** - a grand commun
 - [Links](#links)
 - [Credits 🇵🇱](https://teamhypersomnia.github.io/PressKit/credits)
 
+---
+
 ## Introduction
 
 Hypersomnia has been online and playable since 2017. It brings together:
@@ -41,6 +44,8 @@ Hypersomnia has been online and playable since 2017. It brings together:
 - the dynamics of *Hotline Miami*,
 - the pixel art nostalgia of oldschool RPGs,
 - and the potential for endless creativity thanks to an in-game map editor!
+
+---
 
 **Today, it contains :**
 
@@ -51,6 +56,8 @@ Hypersomnia has been online and playable since 2017. It brings together:
 - An **in-game map editor** 
 	- that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router** after your friends downloaded your map and this ressources.
     *(like in CS 1.6)*
+
+---
 
 ## Downloads
 
@@ -71,6 +78,8 @@ Hypersomnia has been online and playable since 2017. It brings together:
 
 </div>
 
+---
+
 ## Background
 
 *Hypersomnia* has been in development **since 2013**.
@@ -85,6 +94,8 @@ Many believe that writing games without an engine is no more than *reinventing t
 
 Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](###tech-highlights)
 Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
+
+---
 
 ## Tech highlights
 
@@ -142,6 +153,8 @@ Video game internals are just so vast and interdisciplinary that they have limit
     - ESC will let you stop the session and go back to the Editor **exactly as you left it**, enabling ultra-efficient iteration cycles.
     - This is possible because the server, the game and the editor are **all within the same executable.**
     - The official Discord will also be notified that you're playtesting a map, so others can join in on the fun!
+   
+---
 
 ## FAQ
 
@@ -150,6 +163,8 @@ Video game internals are just so vast and interdisciplinary that they have limit
 - [Where are the "hosting servers" downloads ?](linktoanother.mddocument)
 - [How to link my progression to Discord or a Steam account](link)
 - [**How to contribute to this project ?:heart:**](linktoanother.mddocument)
+
+---
 
 ## Links
 
