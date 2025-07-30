@@ -3,7 +3,7 @@
 
 # Online shooter with relentless dynamics.
 
-[![Hypersomnia](./img/image1-1.jpg)](https://hypersomnia.io/)
+[![Hypersomnia](https://github.com/ArtistDev44/Hypersomnia/blob/master/Hypersomnia_Github.png)](https://hypersomnia.io/)
 
 <!-- Changed the image -->
 
