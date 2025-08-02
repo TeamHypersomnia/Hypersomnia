@@ -19,7 +19,7 @@
 **The community-driven multiplayer shooter.**  
 Challenge your friend to an intense duel, or gather two clans to fight a spectacular war.  
 
-### [Watch Trailer](https://www.youtube.com/watch?v=L4zSA34fD_E "Video Title")
+### [▶ Watch Trailer](https://www.youtube.com/watch?v=L4zSA34fD_E "Video Title")
 
 Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
