@@ -68,6 +68,16 @@
 		something :
 		else
 	;
+	
+	if (long_clause
+		&& other_long_clause
+		&& another_long_clause
+	) {
+
+	}
+	else {
+
+	}
 	```
 
 - If the initial variable value depends on several conditions, you can sometimes employ this trick to make the variable const:
@@ -107,6 +117,22 @@
 	```
 	This makes it easier to later add lines to that comment.
 
+- Use this if-scoping mechanism for variables:
+	```cpp
+	if (const auto stack_target = cosm[stack_target_id]) {
+		// ...
+	}
+	```
+
+	This combines dereferencing the handle and checking if it is set in one go, and constrains visibility of `stack_target` only to the scope where it's needed.
+
+- If there is a very complex if clause, prefer to name the condition with a bool for clarity:
+	```cpp
+	if (const bool something_happened = something && happened) {
+
+	} 
+	```
+
 - Cache the operation results in variables aggressively near the beginning of the function, e.g.:
 	```cpp
 	const auto character_handle = in.cosm[character_id];
@@ -114,6 +140,8 @@
 	if (character_handle) {
 		const auto character_transform = character_handle.get_logic_transform().pos;
 		const auto pos = character_transform.pos;
+
+		// ...
 	}
 	```
 	
