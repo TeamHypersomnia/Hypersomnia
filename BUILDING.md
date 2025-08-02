@@ -1,6 +1,8 @@
 # Building Hypersomnia
 
 - [Windows instructions](#windows-instructions)
+	- [Method 1: Visual Studio project files](#visual-studio-project-files)
+	- [Method 2: CMake with ninja](#cmake-with-ninja)
 - [Linux instructions](#linux-instructions)
 - [Distribution-specific dependencies](#distribution-specific-dependencies)
 - [One-shot launch](#one-shot-launch)
@@ -23,8 +25,10 @@ Your operating system must be 64-bit.
 
 Irrespectively of the OS, you will need the following software in order to build *Hypersomnia*:  
 
-- The newest **CMake**.
+*(Note that if you want to use the [convenient method with the Windows `.sln` files](#visual-studio-project-files), you may **skip installing CMake, LLVM and Ninja.**)*
+
 - **git** to clone the respository and later generate version information.
+- The newest **CMake**.
 - [**ninja**](https://ninja-build.org/) to carry out the build.
 - [LLVM](https://releases.llvm.org/) toolchain version 17.0.6.
 	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/LLVM-17.0.6-win64.exe), or a newer one. 
@@ -59,10 +63,21 @@ On all platforms, you can choose among three building configurations:
 
 ## Windows instructions
 
-Refer to [appveyor.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/appveyor.yml) file for up-to-date building procedure. A short overview of the process now follows.
+**If it doesn't work, refer to [Windows_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/Windows_build.yml) file for the up-to-date building procedure.**
 
 Prerequisites:
 - **Visual Studio 2022 Community** or newer.
+
+### Visual Studio project files
+
+For convenience, the CI/CD now includes pre-generated `.sln` and `.vcxproj` files for building Hypersomnia.
+You can download them here:
+
+https://nightly.link/TeamHypersomnia/Hypersomnia/workflows/Windows_build/master/Hypersomnia-sln.zip
+
+If the link is dead, this means there was no commit in the last 90 days - you might want to just fork the project and run the GitHub action yourself.
+
+### CMake with ninja
 
 Open up the standard Windows ``cmd`` prompt (it **won't work** with PowerShell or others). Setup the environment:
 
