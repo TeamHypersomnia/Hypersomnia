@@ -87,7 +87,7 @@
 	
 	I.e. you define a lambda and call it in the same expression (note the `();` at the end of the assignment).
 
-- When declaring new structs related to state synchronized through the network, write `// GEN INTROSPECTOR struct struct_name`:
+- When declaring new structs that are meant to be synchronized through the network or serialized to the disk, write `// GEN INTROSPECTOR struct struct_name`:
 	```cpp
 	struct arena_mode_ai_state {
 		// GEN INTROSPECTOR struct arena_mode_ai_state
@@ -107,8 +107,23 @@
 	```
 	This makes it easier to later add lines to that comment.
 
-- Avoid dereferencing entity ids too much, prefer caching them like this:
-	- ```const auto  
+- Cache the operation results in variables aggressively near the beginning of the function, e.g.:
+	```cpp
+	const auto character_handle = in.cosm[character_id];
+
+	if (character_handle) {
+		const auto character_transform = character_handle.get_logic_transform().pos;
+		const auto pos = character_transform.pos;
+	}
+	```
+	
+	instead of writing
+
+	```cpp
+	in.cosm[character_id].get_logic_transform().pos
+	```
+
+	every time you need the character's position.
 
 - Try to avoid repeating yourself. When writing a lot of code, use lambdas extensively and then call them in a facade:
 	```cpp
