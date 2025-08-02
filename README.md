@@ -104,28 +104,28 @@ Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.
 # Table of contents
 
 - [Introduction](#introduction)
-- [Features](#features)
 - [Tech highlights](#tech-highlights)
-- [Background](#background)
 - [Game guide](#game-guide)
 - [How to build](#how-to-build)
 - [Contributing](#contributing)
 - [Credits 🇵🇱](https://teamhypersomnia.github.io/PressKit/credits)
+- [The story behind the code](#the-story-behind-the-code)
 
 # Introduction
 
 ![Hypersomnia_discordthread](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/1365f4a0-a517-4257-8148-8d01c3231635)
 
-*Hypersomnia* is a competitive arena released as free software.
-
-The game has been online and playable since 2017. It brings together:
+Hypersomnia has been online and playable **since 2017**. It brings together:
 
 - the tactics of *Counter-Strike*, 
 - the dynamics of *Hotline Miami*,
-- the pixel art nostalgia of oldschool RPGs..
-- ..and the potential for endless creativity thanks to an in-game map editor!
+- the pixel art nostalgia of oldschool RPGs...
+- ...and an **in-game map editor** lets you instantly playtest a **work-in-progress map** with your friends, **even behind a router!** 
+	- Want to learn to make maps? [▶ We have a video guide!](https://www.youtube.com/watch?v=q1rfIy06_xo)
 
-*Hypersomnia* aims to be **the ultimate open-source 2D shooter** - a grand community project extensible without limit.
+Today, we have **[24 unique firearms](https://hypersomnia.xyz/weapons)**, **[10 community maps](https://hypersomnia.xyz/arenas)**, and two game modes: *Bomb defusal* and *Gun game*.
+
+We aim to become ***the ultimate open-source shooter*** - a grand community project extensible without limit.
 
 Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence:
 
@@ -134,23 +134,6 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 Will you take revenge for the unethical simulation of an inferior universe?
 Will you support the cruel experiments to win total control over metempsychosis? 
 Or will you join the underground civilization that awaits the end of war in this dangerous afterlife reality?
-
-# Features
-
-- **[24 unique firearms!](https://hypersomnia.xyz/weapons)**
-  - And an extra 4 grenade types, 7 melee weapons as well as 6 magic spells!
-- **[10 community maps](https://hypersomnia.xyz/arenas)** and counting!
-- **2 game modes**: *Bomb defusal* and *Gun game*.
-- An **in-game map editor** that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router!**
-
-    ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/1744ed72-612a-4af1-afbc-1a9d0c5750b3)
-
-  - Your friends will **automatically download your map** with all its custom resources!
-
-    *(like in CS 1.6)*
-
-    ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/daeb96d1-0ea5-41c6-89f8-3ef25013570d)
-
 
 # Tech highlights
 
@@ -354,7 +337,7 @@ Or will you join the underground civilization that awaits the end of war in this
       ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/3d8dbd53-3f84-40fe-9847-1c3ac0df1780)
 
     - You will enter the game as the host.
-    - The connecting clients will automatically download the map in its current version with all its custom resources.
+    - The connecting clients will automatically download the map in its current version with all its custom resources *(like in CS 1.6)*.
       - And they can later **create their own remake** - maps are saved in JSON, after all!
     - ESC will let you stop the session and go back to the Editor **exactly as you left it**, enabling ultra-efficient iteration cycles.
     - This is possible because the server, the game and the editor are **all within the same executable.**
@@ -362,21 +345,6 @@ Or will you join the underground civilization that awaits the end of war in this
 
   - The Editor took well over a year to implement.
   - It paid off big time - there is now a neat [catalogue of community maps](https://hypersomnia.xyz/arenas) - every one of them downloadable.
-
-# Background
-
-*Hypersomnia* has been in development **since 2013** (as seen in the commit history).
-
-It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money to be able to work less and focus on *Hypersomnia*. My financial decisions now let me develop the game full-time.
-
-I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
-
-Many believe that writing games without an engine is no more than *reinventing the wheel*, or put more bluntly, a complete waste of time.
-
-**I hope this project serves as a great testament to the opposite.**
-
-Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
-Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
 
 # Game guide
 
@@ -398,3 +366,19 @@ Make sure to check out [TeamHypersomnia](https://github.com/TeamHypersomnia) for
 
 If you have questions or you fail to build *Hypersomnia*, reach out on [Discord](https://discord.gg/YC49E4G).
 Or if you just can't wait to utter some brilliant ideas with regard to the game, please do so, too!
+
+# The story behind the code
+
+*Hypersomnia* has been in development **since 2013** (as seen in the commit history).
+
+It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. I saved money to be able to work less and focus on *Hypersomnia*. My financial decisions now let me develop the game full-time.
+
+I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
+
+Many believe that writing games without an engine is no more than *reinventing the wheel*, or put more bluntly, a complete waste of time.
+
+**I hope this project serves as a great testament to the opposite.**
+
+Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
+Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
+
