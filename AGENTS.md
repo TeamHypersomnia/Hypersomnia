@@ -8,14 +8,15 @@
 
 - ```const``` wherever possible even at the cost of readability. 
 	- In particular, ```const``` every possible function argument.
-	- But don't ```const``` arguments taken by copy in the function declarations as this is redundant, though this must still be corrected for much of the existing code.
+	- But don't ```const``` arguments taken by copy in the function declarations as this is redundant.
 
 - Use tabs for indentation.
 
 - Use uncapitalized ```snake_case``` everywhere.
 	- Except for template parameters: use CamelCase for them.
 		- `template <class T, class... Rest>`
-		- Prefer just "T" if there's one template argument.
+		- `template <class T, class... Args>` for variadic functions, with `args...` as the argument name.
+		- Prefer a descriptive name instead `T` if there's one template argument.
 
 - [Linux kernel indentation style](https://en.wikipedia.org/wiki/Indentation_style#K.26R).
 	- But ALWAYS use brackets after ``if``/``else``/``for`` and the like! Too much life has been wasted on the illusion that this line is really a single expression...
@@ -68,6 +69,23 @@
 		else
 	;
 	```
+
+- If the initial variable value depends on several conditions, you can employ this trick to make the variable const:
+	```cpp
+	const auto complex_variable_made_const = [&]() {
+		if (foo) {
+			if (bar) {
+				return 2;
+			}
+
+			return 1;
+		}
+
+		return 0;
+	}();
+	```
+	
+	I.e. you define a lambda and call it in the same expression (note the `();` at the end of the assignment).
 
 - When declaring new structs related to state synchronized through the network, write `// GEN INTROSPECTOR struct struct_name`:
 	```cpp
