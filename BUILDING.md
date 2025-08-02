@@ -25,7 +25,8 @@ Your operating system must be 64-bit.
 
 Irrespectively of the OS, you will need the following software in order to build *Hypersomnia*:  
 
-*(Note that if you want to use the [convenient method with the Windows `.sln` files](#visual-studio-project-files), you may **skip installing CMake, LLVM and Ninja.**)*
+> [!TIP]
+> You may skip installing CMake, LLVM and Ninja if you choose the [convenient method with the Windows `.sln` files](#visual-studio-project-files)
 
 - **git** to clone the respository and later generate version information.
 - The newest **CMake**.

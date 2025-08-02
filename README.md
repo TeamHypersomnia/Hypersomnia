@@ -1,56 +1,77 @@
 <a name="intro"></a>
 <div align="center">
 
-![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/8ccf0d22-317d-459d-8c19-3b4830968545)
+# ![image](hypersomnia/content/menu/menu/menu_game_logo.png)
 
-# [Play in the Browser!](https://hypersomnia.io/)
+<!-- ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/8ccf0d22-317d-459d-8c19-3b4830968545) -->
+
+<img width="828" height="678" alt="image" src="https://github.com/user-attachments/assets/333a515f-1523-49c1-a97f-a4c3f46b8fc1" />
+
+# [▶ Play in the Browser!](https://hypersomnia.io/)
 
 [![Windows Build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml)
 [![Linux build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml)
 [![MacOS build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/MacOS_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/MacOS_build.yml)
-
-
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 <a href="https://discord.gg/YC49E4G"><img src="https://discordapp.com/api/guilds/284464744411430912/embed.png"></img></a>
+[![Telegram](https://img.shields.io/badge/Telegram-Join%20Chat-blue?logo=telegram)](https://t.me/hypersomnia_io)
 
-Online shooter with relentless dynamics.  
+**The community-driven multiplayer shooter.**  
 Challenge your friend to an intense duel, or gather two clans to fight a spectacular war.  
+
+### [Watch Trailer](https://www.youtube.com/watch?v=L4zSA34fD_E "Video Title")
 
 Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
 
 *Comes with an [in-game map Editor!](https://hypersomnia.io/editor/official)*
 
-### Join us:
-
-<a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
-
-<h3><a href="https://t.me/hypersomnia_io">Official Telegram channel (RU)<br/><br/><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width=100></a></h3>
-
-# Get it on Steam!
-
-<a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=140 hspace=1> </a>
-
 # Download the game
+
+
+| <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=100 hspace=1> </a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=0 vspace=20></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
+|:--:|:--:|:--:|:--:|
+| [Steam](https://store.steampowered.com/app/2660970/Hypersomnia) | [Windows](https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip) | [Linux](https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage) | [macOS](https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg) |
+
+<!--
+alternative with separate steam row
+
+| <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=140 hspace=1> </a> |
+|:--:|
+| **[Play on Steam](https://store.steampowered.com/app/2660970/Hypersomnia)** |
+
+| <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
+|:--:|:--:|:--:|
+| **Windows** | **Linux** | **macOS** |
+
+-->
+
+<!--
+<a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=140 hspace=1> </a>
 
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a>
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a>
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a>
 <br undefined>
+-->
 
 Only 29 MB!
 
 The game will start with an **interactive Tutorial!**
 
-Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=25 hspace=8 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)
-
+Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=25 hspace=8 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)  
 Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=30 hspace=5 vspace=15><b>Server AppImage</b></a>
 
-*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
-<br undefined>
+<sup>*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*</sup>
 
 # Press
 
+
+| [<img src="https://github.com/user-attachments/assets/636af823-a54e-4d1a-9974-d2903e0ecf22" width=50>](https://mastodon.social/@gamingonlinux/112609228144158828) | [<img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" width=50>](https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam) | [<img src="https://upload.wikimedia.org/wikipedia/en/0/05/Linux_Magazine_international_logo.png" width=150>](https://www.scribd.com/document/763273177/Linux-Magazine-October-2023-USA#page=89) | [<img src="https://upload.wikimedia.org/wikipedia/en/b/bf/Hackernews_logo.png" width=150>](https://news.ycombinator.com/item?id=36469297) |
+|:--:|:--:|:--:|:--:|
+| [Liam @ GamingOnLinux](https://mastodon.social/@gamingonlinux/112609228144158828) | [GitHub Blog](https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam) | [Linux Magazine, Issue 275](https://www.scribd.com/document/763273177/Linux-Magazine-October-2023-USA#page=89) | [Hacker News Discussion](https://news.ycombinator.com/item?id=36469297) |
+
+<!--
 <h3><a href="https://mastodon.social/@gamingonlinux/112609228144158828"> <img src="https://github.com/user-attachments/assets/636af823-a54e-4d1a-9974-d2903e0ecf22" width=50> Liam @ GamingOnLinux</a></h3>
 
 <h3><a href=https://github.blog/2024-01-18-game-bytes-january-2024/#hypersomnia-release-on-steam> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/2558677d-3e11-444a-bb85-8f5275434404" alt="GitHub Blog" width=50> <b>GitHub Blog</b> </a></h3>
@@ -59,30 +80,24 @@ Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.
 
 <a href="https://news.ycombinator.com/item?id=36469297"> <img src="https://upload.wikimedia.org/wikipedia/en/b/bf/Hackernews_logo.png"> </a>
 
+-->
+
 <!-- *(270 votes, 40+ comments)* -->
-
+<!--
 **[Open Source Friend](https://t.me/open_source_friend/2483)** <sub>(200 votes, 20k views)</sub>
-
+-->
 <!-- *(200 votes, 16.5k views)*  -->
 
-# [📰 Are you a journalist? Click here!](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)
-
-# Watch gameplay
-
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/L4zSA34fD_E/0.jpg)](https://www.youtube.com/watch?v=L4zSA34fD_E "Video Title")
-
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/CHLPzZqANlM/0.jpg)](https://www.youtube.com/watch?v=CHLPzZqANlM "Video Title")
-
-# Learn to make maps!
-
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/q1rfIy06_xo/0.jpg)](https://www.youtube.com/watch?v=q1rfIy06_xo "Video Title")
+#### *📰 Are you a journalist? [Click here!](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)*
 
 ## Latest developer journals
 
+| <a href="https://www.youtube.com/watch?v=Nlh_dyd_V7w" title="Portals"><img src="https://img.youtube.com/vi/Nlh_dyd_V7w/0.jpg" width="300"></a> | <a href="https://www.youtube.com/watch?v=URWjNtUArDo" title="Wallbangs"><img src="https://img.youtube.com/vi/URWjNtUArDo/0.jpg" width="300"></a> |
+|:--:|:--:|
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/Nlh_dyd_V7w/0.jpg)](https://www.youtube.com/watch?v=Nlh_dyd_V7w "Video Title")
+## Join the community!
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/URWjNtUArDo/0.jpg)](https://www.youtube.com/watch?v=URWjNtUArDo "Video Title")
+<a href="https://discord.gg/YC49E4G"> <img src="https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/727d2858-8bf0-4198-8cc0-dfdff938a182"> </a>
 
 </div>
 
