@@ -1,0 +1,129 @@
+- Basic cpp footguns
+	- Avoid `using namespace std;`
+	- Use `static_cast<>` and the like instead of `(type)obj;`
+
+- Prefer initialization with ``auto`` or ``const auto``.
+	- `const auto abc = 2;` instead of `int abc = 2;`
+	- Likewise with classes: `auto object = some_class(2, 3);`
+
+- ```const``` wherever possible even at the cost of readability. 
+	- In particular, ```const``` every possible function argument.
+	- But don't ```const``` arguments taken by copy in the function declarations as this is redundant, though this must still be corrected for much of the existing code.
+
+- Use tabs for indentation.
+
+- Use uncapitalized ```snake_case``` everywhere.
+	- Except for template parameters: use CamelCase for them.
+		- `template <class T, class... Rest>`
+		- Prefer just "T" if there's one template argument.
+
+- [Linux kernel indentation style](https://en.wikipedia.org/wiki/Indentation_style#K.26R).
+	- But ALWAYS use brackets after ``if``/``else``/``for`` and the like! Too much life has been wasted on the illusion that this line is really a single expression...
+	- Example:
+		```cpp
+		if constexpr(std::is_same_v<T, int>) {
+			// ...
+		}
+		else {
+			// ...
+		}
+		```
+	- In particular don't ever do this atrocity: `} else {`
+
+- Put a single space after ``if``, ``while``, ``for``, etc. Like so:
+	- ```if (expression)``` 
+	- ```if constexpr(expression)```
+	- ```do { ... } while (expression);```
+
+- Put a single space between the operator and each operand, e.g. ``const auto abc = 2 + 2;``
+
+- There isn't really a fixed maximum for the line's length, but keep it around 125 characters.
+
+- Break the lines like so
+	```cpp
+	void something::long_function_definition(
+		const int arg1,
+		const double arg2
+	) const {
+
+	}
+
+	long_function_call(
+		a,
+		b
+		c
+	);
+	
+	complex_call_with_lambda(other_func(hey_there(
+		a,
+		[](){
+			return 1337;
+		},
+		c
+	)));
+
+	const auto long_assignment_with_ternary = 
+		abc == 2 ?
+		something :
+		else
+	;
+	```
+
+- When declaring new structs related to state synchronized through the network, write `// GEN INTROSPECTOR struct struct_name`:
+	```cpp
+	struct arena_mode_ai_state {
+		// GEN INTROSPECTOR struct arena_mode_ai_state
+		float movement_timer_remaining = 0.0f;
+		float movement_duration_secs = 0.0f;
+		...
+		// END GEN INTROSPECTOR
+	};
+	``` 
+	Take care to not put function declarations between these comments, only member field definitions.
+
+- Write comments like this, even if they are single-line:
+	```cpp
+	/*
+		This is a very long comment.
+	*/
+	```
+	This makes it easier to later add lines to that comment.
+
+- Avoid dereferencing entity ids too much, prefer caching them like this:
+	- ```const auto  
+
+- Try to avoid repeating yourself. When writing a lot of code, use lambdas extensively and then call them in a facade:
+	```cpp
+	auto complex_condition = [&]() {
+		if (something) {
+			return foo;
+		}
+		
+		return bar;
+	};
+
+	auto complex_operation = [&]() {
+		// ...
+	};
+
+	auto complex_else = [&]() {
+		// ...
+	};
+
+	if (complex_condition()) {
+		complex_operation();
+	}
+	else {
+		complex_else();
+	}
+	```
+
+- use `a.has_value()` instead of `a` when checking `std::optional` to know it's not a boolean.
+
+- use `a != nullptr` instead of `a` when checking pointers.
+
+- To log values, use the type-safe log functions:
+	- `LOG("some value: %x", some_value)` where "%x" stands for argument of any type.
+	- `LOG_NVPS(var1, var2)`
+
+- Some of the existing code might not follow the above principles, do not edit it to make it consistent unless explicitly asked.
