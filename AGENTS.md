@@ -40,7 +40,7 @@
 
 - There isn't really a fixed maximum for the line's length, but keep it around 125 characters.
 
-- Break the lines like so
+- Break the lines like so:
 	```cpp
 	void something::long_function_definition(
 		const int arg1,
@@ -117,7 +117,7 @@
 	```
 	This makes it easier to later add lines to that comment.
 
-- Use this if-scoping mechanism for variables:
+- Where appropriate, use this if-scoping mechanism for variables:
 	```cpp
 	if (const auto stack_target = cosm[stack_target_id]) {
 		// ...
