@@ -382,3 +382,9 @@ Many believe that writing games without an engine is no more than *reinventing t
 Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
 Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
 
+### Contact
+
+[Email](mailto:patryk.czachurski@gmail.com)
+
+To reach me on **Matrix**, you can hop onto [FOSSGralnia chat](https://matrix.to/#/#FOSSGralnia.gamedev:noevil.pl) (I'm friends with them) and ping `@pythagoras`.
+
