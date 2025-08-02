@@ -70,7 +70,7 @@
 	;
 	```
 
-- If the initial variable value depends on several conditions, you can employ this trick to make the variable const:
+- If the initial variable value depends on several conditions, you can sometimes employ this trick to make the variable const:
 	```cpp
 	const auto complex_variable_made_const = [&]() {
 		if (foo) {
@@ -125,7 +125,7 @@
 
 	every time you need the character's position.
 
-- Try to avoid repeating yourself. When writing a lot of code, use lambdas extensively and then call them in a facade:
+- Try to avoid repeating yourself. When writing a lot of code, use lambdas generously and then call them in a facade:
 	```cpp
 	auto complex_condition = [&]() {
 		if (something) {
