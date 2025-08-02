@@ -121,7 +121,7 @@ Hypersomnia has been online and playable **since 2017**. It brings together:
 - the dynamics of *Hotline Miami*,
 - the pixel art nostalgia of oldschool RPGs...
 - ...and an **in-game map editor** lets you instantly playtest a **work-in-progress map** with your friends, **even behind a router!** 
-	- Want to learn to make maps? [▶ We have a video guide!](https://www.youtube.com/watch?v=q1rfIy06_xo)
+	- [▶ Learn how to make maps!](https://www.youtube.com/watch?v=q1rfIy06_xo)
 
 Today, we have **[24 unique firearms](https://hypersomnia.xyz/weapons)**, **[10 community maps](https://hypersomnia.xyz/arenas)**, and two game modes: *Bomb defusal* and *Gun game*.
 
@@ -348,7 +348,7 @@ Or will you join the underground civilization that awaits the end of war in this
 
 # Game guide
 
-*(Main article: [BUILDING.md](GUIDE.md))*
+*(Main article: [GUIDE.md](GUIDE.md))*
 
 # How to build
 
