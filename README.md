@@ -356,6 +356,8 @@ Or will you join the underground civilization that awaits the end of war in this
 
 # Contributing
 
+*(Also check out the [AGENTS.md](AGENTS.md) file - while a guide for the machines, humans should respect it just as well!)*
+
 Pull requests are welcomed, should they even be typo fixes or missing const guarantees.
 If you plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
