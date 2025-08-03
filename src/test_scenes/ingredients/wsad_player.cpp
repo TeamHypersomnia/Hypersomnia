@@ -241,6 +241,12 @@ namespace test_flavours {
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
+			sentience.coin_flavours = {
+				to_entity_flavour_id(test_touch_collectibles::GOLD_COIN),
+				to_entity_flavour_id(test_touch_collectibles::PLATINUM_COIN),
+				to_entity_flavour_id(test_touch_collectibles::CRYSTAL_COIN)
+			};
+
 			sentience.interaction_hitbox_range = 180;
 
 			sentience.shake_settings.max_duration_ms = 1800.f;

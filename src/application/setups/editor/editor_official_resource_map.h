@@ -29,6 +29,7 @@ struct editor_official_resource_map {
 	Map<test_melee_weapons, editor_melee_resource> melees;
 	Map<test_hand_explosives, editor_explosive_resource> explosives;
 	Map<test_tool_items, editor_tool_resource> tools;
+	Map<test_touch_collectibles, editor_touch_collectible_resource> touch_collectibles;
 
 	Map<test_scene_physical_material_id, editor_material_resource> materials;
 

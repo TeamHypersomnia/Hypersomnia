@@ -13,6 +13,7 @@ using entities_with_render_layer = entity_types_having_any_of<
 	invariants::continuous_sound,
 	invariants::point_marker,
 	invariants::area_marker,
+	invariants::touch_collectible,
 	invariants::wandering_pixels
 >;
 

@@ -25,6 +25,9 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<invariants::item>()) {
 			return render_layer::ITEMS_ON_GROUND;
 		}
+		else if constexpr(H::template has<invariants::touch_collectible>()) {
+			return render_layer::ITEMS_ON_GROUND;
+		}
 		else if constexpr(H::template has<invariants::remnant>()) {
 			return render_layer::REMNANTS;
 		}

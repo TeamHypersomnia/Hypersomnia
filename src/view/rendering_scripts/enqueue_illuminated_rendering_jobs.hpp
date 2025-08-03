@@ -436,11 +436,18 @@ void enqueue_illuminated_rendering_jobs(
 				visible.for_each<render_layer::ITEMS_ON_GROUND>(
 					cosm,
 					[&](const auto& handle) {
-						handle.template dispatch_on_having_all<invariants::item>([&](const auto& typed_item) {
+						handle.template dispatch_on_having_any<invariants::item, invariants::touch_collectible>([&](const auto& typed_item) {
 							const auto is_laying_on_ground = [&]() {
+								if (typed_item.template has<invariants::touch_collectible>()) {
+									return true;
+								}
+
 								if (const auto cache = find_colliders_cache(typed_item)) {
 									if (cache->constructed_fixtures.size() > 0) {
-										if (cache->constructed_fixtures[0]->GetFilterData() == filters[predefined_filter_type::LYING_ITEM]) {
+										const auto current_filter = cache->constructed_fixtures[0]->GetFilterData();
+										const auto lying_item = filters[predefined_filter_type::LYING_ITEM];
+
+										if (current_filter == lying_item) {
 											return true;
 										}
 									}

@@ -16,6 +16,7 @@ struct editor_ammunition_resource;
 struct editor_melee_resource;
 struct editor_explosive_resource;
 struct editor_tool_resource;
+struct editor_touch_collectible_resource;
 
 struct editor_material_resource;
 
@@ -39,6 +40,7 @@ using internal_editor_resource_types = type_list<
 	editor_melee_resource,
 	editor_explosive_resource,
 	editor_tool_resource,
+	editor_touch_collectible_resource,
 
 	editor_material_resource,
 

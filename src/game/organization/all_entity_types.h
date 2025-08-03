@@ -515,6 +515,34 @@ struct explosion_body {
 	>;
 };
 
+struct touch_collectible {
+	static constexpr std::size_t statically_allocated_entities = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
+
+	using invariant_list = type_list<
+		invariants::sprite,
+		invariants::animation,
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::touch_collectible,
+
+		invariants::interpolation
+	>;
+
+	using component_list = type_list<
+		components::animation,
+		components::rigid_body,
+		components::sender
+	>;
+
+	using synchronized_arrays = type_list<
+		components::interpolation,
+		items_of_slots_cache,
+		rigid_body_cache,
+		colliders_cache
+	>;
+};
+
 struct tool_item {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;

@@ -763,6 +763,11 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 	});
 }
 
+void item_system::handle_touch_collectibles(const logic_step step) {
+	(void)step;
+
+}
+
 void item_system::handle_throw_item_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& requests = step.get_queue<messages::intent_message>();

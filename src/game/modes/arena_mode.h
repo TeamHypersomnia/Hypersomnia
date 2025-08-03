@@ -446,7 +446,7 @@ private:
 	void set_players_level_to_initial(input);
 	void clear_players_round_state(input);
 
-	void give_monetary_award(input, mode_player_id, money_type amount);
+	void give_monetary_award(input, mode_player_id knockouter, mode_player_id victim, money_type amount);
 
 	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;

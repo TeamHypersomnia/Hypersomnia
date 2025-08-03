@@ -174,6 +174,9 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 	if (handle.template has<components::missile>()) {
 		def.fixedRotation = true;
 	}
+	else {
+		def.fixedRotation = physics_def.fixed_rotation;
+	}
 
 	def.active = true;
 

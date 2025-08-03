@@ -15,6 +15,7 @@ struct editor_ammunition_node;
 struct editor_melee_node;
 struct editor_explosive_node;
 struct editor_tool_node;
+struct editor_touch_collectible_node;
 
 struct editor_prefab_node;
 
@@ -35,6 +36,7 @@ using all_editor_node_types = type_list<
 	editor_ammunition_node,
 	editor_firearm_node,
 	editor_tool_node,
+	editor_touch_collectible_node,
 
 	editor_prefab_node,
 

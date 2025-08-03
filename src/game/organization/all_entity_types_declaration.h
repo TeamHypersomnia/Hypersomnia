@@ -23,6 +23,7 @@ struct point_marker;
 struct area_marker;
 struct explosion_body;
 struct tool_item;
+struct touch_collectible;
 struct area_sensor;
 
 using all_entity_types = type_list<
@@ -46,6 +47,7 @@ using all_entity_types = type_list<
 	area_marker,
 	explosion_body,
 	tool_item,
+	touch_collectible,
 	area_sensor
 >;
 
@@ -70,6 +72,7 @@ using all_entity_types = type_list<
 	MACRO(area_marker) \
 	MACRO(explosion_body) \
 	MACRO(tool_item) \
+	MACRO(touch_collectible) \
 	MACRO(area_sensor)
 
 using entity_type_id = type_in_list_id<all_entity_types>;

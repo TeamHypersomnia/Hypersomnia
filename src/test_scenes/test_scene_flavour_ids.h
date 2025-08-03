@@ -455,3 +455,13 @@ enum class test_tool_items {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_touch_collectibles {
+	// GEN INTROSPECTOR enum class test_touch_collectibles
+	GOLD_COIN,
+	PLATINUM_COIN,
+	CRYSTAL_COIN,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+

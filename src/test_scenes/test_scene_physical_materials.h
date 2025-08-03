@@ -11,6 +11,7 @@ enum class test_scene_physical_material_id {
 	KNIFE,
 	VENT,
 	CHARACTER,
+	COIN,
 	COUNT
 	// END GEN INTROSPECTOR
 };

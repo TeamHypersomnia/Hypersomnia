@@ -403,5 +403,56 @@ namespace test_flavours {
 			f.density *= 2.5;
 			f.restitution *= 2.;
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_touch_collectibles::GOLD_COIN);
+
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::GOLD_COIN_1, white);
+
+			invariants::animation anim;
+			anim.id = to_animation_id(test_scene_plain_animation_id::GOLD_COIN);
+			meta.set(anim);
+
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.density *= 0.3f;
+			fixtures.filter = filters[predefined_filter_type::SHELL];
+			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
+			meta.get<invariants::rigid_body>().fixed_rotation = true;
+			meta.get<invariants::touch_collectible>().money_value = 100;
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_touch_collectibles::PLATINUM_COIN);
+
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::PLATINUM_COIN_1, white);
+
+			invariants::animation anim;
+			anim.id = to_animation_id(test_scene_plain_animation_id::PLATINUM_COIN);
+			meta.set(anim);
+
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.density *= 0.3f;
+			fixtures.filter = filters[predefined_filter_type::SHELL];
+			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
+			meta.get<invariants::rigid_body>().fixed_rotation = true;
+			meta.get<invariants::touch_collectible>().money_value = 500;
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_touch_collectibles::CRYSTAL_COIN);
+
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::CRYSTAL_COIN_1, white);
+
+			invariants::animation anim;
+			anim.id = to_animation_id(test_scene_plain_animation_id::CRYSTAL_COIN);
+			meta.set(anim);
+
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.density *= 0.3f;
+			fixtures.filter = filters[predefined_filter_type::SHELL];
+			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
+			meta.get<invariants::rigid_body>().fixed_rotation = true;
+			meta.get<invariants::touch_collectible>().money_value = 2500;
+		}
 	}
 }

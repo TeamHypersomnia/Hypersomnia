@@ -2,6 +2,7 @@
 #include "game/components/explosive_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/adversarial_meta.h"
+#include "game/detail/damage_origin.hpp"
 
 template <class E>
 const adversarial_meta* find_adversarial_meta(const E& from) {
@@ -30,3 +31,26 @@ auto get_knockout_award(const cosmos& cosm, const F& flavour_id) {
 		return std::nullopt;
 	});
 }
+
+inline std::optional<money_type> get_knockout_award(const cosmos& cosm, const damage_origin origin) {
+	const auto award = origin.on_tool_used(cosm, [&cosm](const auto& tool) -> std::optional<money_type> {
+		if constexpr(is_spell_v<decltype(tool)>) {
+			return tool.common.adversarial.knockout_award;
+		}
+		else if constexpr(is_nullopt_v<decltype(tool)>) {
+			return std::nullopt;
+		}
+		else {
+			return ::get_knockout_award(cosm, tool);
+		}
+	});
+
+	if (award) {
+		const auto bonus = money_type(origin.circumstances.headshot ? 500 : 0);
+
+		return *award + bonus;
+	}
+
+	return std::nullopt;
+}
+

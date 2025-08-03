@@ -3,9 +3,11 @@
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/missile_system.h"
 #include "game/stateless_systems/trace_system.h"
+#include "game/stateless_systems/sentience_system.h"
 
 struct allocation_system;
 class gun_system;
+class sentience_system;
 struct build_arena_input;
 
 namespace test_scenes {
@@ -88,6 +90,12 @@ class allocate_new_entity_access {
 	*/
 
 	friend void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step);
+
+	/*
+		Will generate dropped coins.
+	*/
+
+	friend void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const;
 
 	/* 
 		Rationale: missile system will allocate a lot of remnants from missilesand shells,

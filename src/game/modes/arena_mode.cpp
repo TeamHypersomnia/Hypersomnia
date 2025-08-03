@@ -1549,26 +1549,20 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 		}
 		else if (!in.rules.is_ffa() && ko.knockouter.faction == ko.victim.faction) {
 			knockouts_dt = -1;
-			give_monetary_award(in, ko.knockouter.id, in.rules.economy.team_kill_penalty * -1);
+
+			give_monetary_award(
+				in,
+				ko.knockouter.id,
+				ko.victim.id,
+				in.rules.economy.team_kill_penalty * -1
+			);
 		}
 
 		if (knockouts_dt > 0) {
 			auto& cosm = in.cosm;
 
-			const auto award = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> std::optional<money_type> {
-				if constexpr(is_spell_v<decltype(tool)>) {
-					return tool.common.adversarial.knockout_award;
-				}
-				else if constexpr(is_nullopt_v<decltype(tool)>) {
-					return std::nullopt;
-				}
-				else {
-					return ::get_knockout_award(cosm, tool);
-				}
-			});
-
-			if (award.has_value()) {
-				give_monetary_award(in, ko.knockouter.id, *award);
+			if (const auto award = ::get_knockout_award(cosm, ko.origin); award.has_value()) {
+				give_monetary_award(in, ko.knockouter.id, ko.victim.id, *award);
 			}
 		}
 
@@ -1810,7 +1804,7 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 		const auto& player_id = p.first;
 		const auto faction = p.second.get_faction();
 
-		give_monetary_award(in, player_id, faction == winner ? winner_award : loser_award);
+		give_monetary_award(in, player_id, {}, faction == winner ? winner_award : loser_award);
 	}
 
 	if (is_halfway_round(in) || is_final_round(in)) {
@@ -1990,7 +1984,7 @@ void arena_mode::process_win_conditions(const input_type in, const logic_step st
 				s->bomb_explosions += 1;
 			}
 
-			give_monetary_award(in, planting_player, in.rules.economy.bomb_explosion_award);
+			give_monetary_award(in, planting_player, {}, in.rules.economy.bomb_explosion_award);
 			victory_for(p.bombing);
 			return;
 		}
@@ -2004,7 +1998,7 @@ void arena_mode::process_win_conditions(const input_type in, const logic_step st
 				s->bomb_defuses += 1;
 			}
 
-			give_monetary_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
+			give_monetary_award(in, defusing_player, {}, in.rules.economy.bomb_defuse_award);
 			standard_victory(in, step, winner, false);
 			play_bomb_defused_sound(in, step, winner);
 			return;
@@ -3727,7 +3721,7 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 						s->bomb_plants += 1;
 					}
 
-					give_monetary_award(in, planter, in.rules.economy.bomb_plant_award);
+					give_monetary_award(in, planter, {}, in.rules.economy.bomb_plant_award);
 				}
 			}
 		});
@@ -4318,20 +4312,25 @@ void arena_mode::reset_players_stats(const input_type in) {
 	set_players_money_to_initial(in);
 }
 
-void arena_mode::give_monetary_award(const input_type in, const mode_player_id id, money_type amount) {
+void arena_mode::give_monetary_award(
+	const input_type in,
+	const mode_player_id knockouter_id,
+	const mode_player_id victim_id,
+	money_type amount
+) {
 	if (state == arena_mode_state::WARMUP) {
 		return;
 	}
 
-	if (const auto stats = stats_of(id)) {
+	if (const auto stats = stats_of(knockouter_id)) {
 		auto& current_money = stats->money;
 		amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
 
-		if (amount != 0) {
+		if (amount < 0 || !victim_id.is_set()) {
 			current_money += amount;
 
 			const auto award = arena_mode_award {
-				in.cosm.get_clock(), id, amount 
+				in.cosm.get_clock(), knockouter_id, amount 
 			};
 
 			auto& awards = stats->round_state.awards;
@@ -4340,6 +4339,13 @@ void arena_mode::give_monetary_award(const input_type in, const mode_player_id i
 			if (awards.size() > max_awards_in_history_v) {
 				awards.erase(awards.begin());
 			}
+		}
+		else if (amount > 0) {
+			on_player_handle(in.cosm, victim_id, [&](const auto& player_handle) {
+				if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+					player_handle.template get<components::sentience>().coins_on_body += amount;
+				}
+			});
 		}
 	}
 }

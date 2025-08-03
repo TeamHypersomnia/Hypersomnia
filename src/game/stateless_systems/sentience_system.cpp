@@ -41,6 +41,7 @@
 #include "augs/templates/logically_empty.h"
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/spawn_collectibles.hpp"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -151,10 +152,28 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		return std::max(1u, static_cast<uint32_t>(1 / delta.in_milliseconds() * m.regeneration_interval_ms));
 	};
 
+	cosm.for_each_having<invariants::touch_collectible>(
+		[&](const auto& subject) {
+			DEBUG_LOGIC_STEP_LINES.emplace_back(white, vec2(0,0), subject.get_logic_transform().pos);
+		}
+	);
+
 	cosm.for_each_having<components::sentience>(
 		[&](const auto& subject) {
 			const auto& sentience_def = subject.template get<invariants::sentience>();
 			components::sentience& sentience = subject.template get<components::sentience>();
+
+			if (sentience.has_exploded && sentience.coins_on_body > 0) {
+				::spawn_coins(
+					allocate_new_entity_access(),
+					sentience.coins_on_body,
+					subject.get_logic_transform().pos,
+					step,
+					sentience_def.coin_flavours
+				);
+
+				sentience.coins_on_body = 0;
+			}
 
 			::handle_corpse_detonation(
 				step,

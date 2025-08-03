@@ -1,3 +1,5 @@
+# General programming rules
+
 - Basic cpp footguns
 	- Avoid `using namespace std;`
 	- Use `static_cast<>` and the like instead of `(type)obj;`
@@ -188,3 +190,7 @@
 	- `LOG_NVPS(var1, var2)`
 
 - Some of the existing code might not follow the above principles, do not edit it to make it consistent unless explicitly asked.
+
+# Game architecture specific
+
+- To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.

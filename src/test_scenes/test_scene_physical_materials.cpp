@@ -98,6 +98,16 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	{
 		collision_sound_def def;
+		def.pitch_bound = bound(0.9f, 1.25f);
+		def.collision_sound_sensitivity = 5.0f;
+
+		def.mute_after_playing_times = 1;
+
+		set_default(test_scene_physical_material_id::COIN, test_scene_sound_id::COLLISION_COIN, def);
+	}
+
+	{
+		collision_sound_def def;
 		def.mute_after_playing_times = 1;
 		def.effect.modifier.gain *= 0.6f;
 

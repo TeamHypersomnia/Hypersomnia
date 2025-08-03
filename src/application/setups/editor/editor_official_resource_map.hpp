@@ -45,6 +45,9 @@ auto& editor_official_resource_map::get_container(S& self, const T& id) {
 	else if constexpr(std::is_same_v<T, test_tool_items>) {
 		return self.tools;
 	}
+	else if constexpr(std::is_same_v<T, test_touch_collectibles>) {
+		return self.touch_collectibles;
+	}
 	else if constexpr(std::is_same_v<T, test_melee_weapons>) {
 		return self.melees;
 	}

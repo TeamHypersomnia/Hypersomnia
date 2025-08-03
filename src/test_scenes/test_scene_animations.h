@@ -101,6 +101,10 @@ enum class test_scene_plain_animation_id {
 	ASSAULT_RATTLE,
 	COVERT_SHOT,
 
+	GOLD_COIN,
+	PLATINUM_COIN,
+	CRYSTAL_COIN,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

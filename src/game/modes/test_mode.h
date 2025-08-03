@@ -198,11 +198,16 @@ public:
 					callbacks.pre_solve(step);
 					mode_pre_solve(in, entropy, step);
 				},
-				callbacks.post_solve,
+				[&](const logic_step step) {
+					mode_post_solve(in, entropy, step);
+					callbacks.post_solve(const_logic_step(step));
+				},
 				callbacks.post_cleanup
 			)
 		);
 	}
+
+	void mode_post_solve(input, const mode_entropy&, logic_step);
 
 	bool add_player_custom(input, const add_player_input&);
 	void add_or_remove_players(input, const mode_entropy&, logic_step);

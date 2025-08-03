@@ -47,6 +47,7 @@ namespace invariants {
 	struct area_marker;
 	struct cascade_explosion;
 	struct tool;
+	struct touch_collectible;
 	struct melee;
 	struct melee_fighter;
 }
@@ -211,6 +212,7 @@ using invariant_list_t = List<
 	invariants::area_marker,
 	invariants::cascade_explosion,
 	invariants::tool,
+	invariants::touch_collectible,
 	invariants::melee,
 	invariants::melee_fighter
 >;

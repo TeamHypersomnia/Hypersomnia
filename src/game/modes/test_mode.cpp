@@ -12,6 +12,8 @@
 #include "augs/templates/logically_empty.h"
 #include "game/modes/detail/delete_with_held_items.hpp"
 #include "game/messages/hud_message.h"
+#include "game/messages/health_event.h"
+#include "game/detail/get_knockout_award.h"
 
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/cosmos/create_entity.hpp"
@@ -360,6 +362,32 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				eq.num_given_ammo_pieces = 1;
 				eq.perform_recoils = false;
 				eq.generate_for(access, character, step, 0);
+			}
+		}
+	}
+}
+
+void test_mode::mode_post_solve(const input_type, const mode_entropy&, const logic_step step) {
+	{
+		auto& cosm = step.get_cosmos();
+		const auto& events = step.get_queue<messages::health_event>();
+
+		for (const auto& e : events) {
+			if (const auto victim = cosm[e.subject]) {
+				auto make_it_count = [&]() {
+					auto& sentience = victim.get<components::sentience>();
+
+					if (const auto award = ::get_knockout_award(cosm, sentience.knockout_origin); award.has_value()) {
+						sentience.coins_on_body += *award;
+						LOG("sentience.coins_on_body");
+					}
+				};
+
+				if (e.special_result == messages::health_event::result_type::DEATH) {
+					if (e.was_conscious) {
+						make_it_count();
+					}
+				}
 			}
 		}
 	}

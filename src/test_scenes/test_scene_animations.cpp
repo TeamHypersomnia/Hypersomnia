@@ -886,6 +886,24 @@ void load_test_scene_animations(
 			30.0f
 		);
 
+		make_plain(
+			test_id_type::GOLD_COIN,
+			test_scene_image_id::GOLD_COIN_1,
+			60.0f
+		);
+
+		make_plain(
+			test_id_type::PLATINUM_COIN,
+			test_scene_image_id::PLATINUM_COIN_1,
+			60.0f
+		);
+
+		make_plain(
+			test_id_type::CRYSTAL_COIN,
+			test_scene_image_id::CRYSTAL_COIN_1,
+			60.0f
+		);
+
 		{
 			auto& anim = make_plain(
 				test_id_type::ASSAULT_RATTLE,

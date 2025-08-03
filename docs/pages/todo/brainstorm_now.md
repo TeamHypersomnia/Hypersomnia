@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- rename .meta.json to just .json cause its prone to errors
+- automate itch release
+	- and possibly web too
+- launch a job for all if commit message is in v.1.3.4 format or just has [release]
+
 - implement map and game mode params in hypersomnia.io/host/map/mode
 - fix web too
 	- i dont remember what was that

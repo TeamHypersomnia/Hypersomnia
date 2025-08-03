@@ -101,7 +101,7 @@ namespace invariants {
 		bool bullet = false;
 		bool angled_damping = false;
 		bool allow_sleep = true;
-		pad_bytes<1> pad;
+		bool fixed_rotation = false;
 
 		damping_mults damping;
 		// END GEN INTROSPECTOR

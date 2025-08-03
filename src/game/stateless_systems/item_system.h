@@ -3,6 +3,7 @@
 
 class item_system {
 public:
+	void handle_touch_collectibles(const logic_step step);
 	void handle_throw_item_intents(const logic_step step);
 
 	void handle_reload_intents(const logic_step step);

@@ -58,7 +58,9 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STANDARD_PERSONAL_DEPOSIT, white);
-			test_flavours::add_lying_item_dynamic_body(meta);
+			auto& fixtures_invariant = test_flavours::add_lying_item_dynamic_body(meta);
+
+			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::COIN);
 
 			invariants::container container; 
 			inventory_slot slot_def;

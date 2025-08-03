@@ -195,6 +195,7 @@ void standard_solve(const logic_step step) {
 	item_system().advance_reloading_contexts(step);
 	global.solve_item_mounting(step);
 	item_system().handle_wielding_requests(step);
+	item_system().handle_touch_collectibles(step);
 
 	{
 		auto scope = measure_scope(performance.explosives);
