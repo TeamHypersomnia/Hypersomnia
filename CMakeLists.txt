@@ -1779,7 +1779,6 @@ if(BUILD_FREETYPE)
 
 		if (FREETYPE_FOUND)
 			message("Found the system freetype at: ${FREETYPE_LIBRARIES}")
-
 		endif()
 	endif()
 
@@ -2185,7 +2184,12 @@ if(BUILD_NETWORKING)
 endif()
 
 if(BUILD_FREETYPE)
-	list(APPEND HYPERSOMNIA_LIBS freetype)
+	if(USE_SYSTEM_FREETYPE AND FREETYPE_FOUND)
+		list(APPEND HYPERSOMNIA_LIBS ${FREETYPE_LIBRARIES})
+		target_include_directories(Hypersomnia PUBLIC ${FREETYPE_INCLUDE_DIRS})
+	else()
+		list(APPEND HYPERSOMNIA_LIBS freetype)
+	endif()
 endif()
 
 if(DEVELOP_STEAM_INTEGRATION)
