@@ -12,9 +12,11 @@
 #include "view/damage_indication_settings.h"
 
 #include "augs/drawing/sprite_helpers.h"
+#include "augs/log.h"
 
 void damage_indication_system::clear() {
 	streaks.clear();
+	awards.clear();
 }
 
 void damage_indication_system::add_white_highlight(
@@ -64,6 +66,18 @@ void damage_indication_system::add(const entity_id subject, const damage_event::
 	active_white_highlights[subject].time_of_occurence_seconds = global_time_seconds;
 }
 
+void damage_indication_system::add_award(const entity_id, const vec2 pos, const money_type value, const rgba col) {
+	award new_award;
+	new_award.pos = pos;
+	new_award.value = value;
+	new_award.time_of_occurence_seconds = global_time_seconds;
+	new_award.displayed_amount = static_cast<real32>(value);
+	new_award.offset_slot = awards.size();
+	new_award.color = col;
+
+	awards.push_back(new_award);
+}
+
 std::optional<damage_indication_system::white_highlight> damage_indication_system::find_white_highlight(const entity_id id, const damage_indication_settings& settings) const {
 	if (const auto found = mapped_or_nullptr(active_white_highlights, id)) {
 		const auto passed = global_time_seconds - found->time_of_occurence_seconds;
@@ -100,6 +114,7 @@ void damage_indication_system::advance(
 		[&](auto& entry) {
 			auto& streak = entry.second;
 
+			// Only update displayed total for damage events, not award events
 			if (streak.total_damage_events > 1) {
 				if (accum_speed.is_enabled) {
 					streak.displayed_total += accum_speed.value * secs;
@@ -153,6 +168,20 @@ void damage_indication_system::advance(
 			}
 
 			return false;
+		}
+	);
+
+	// Handle awards separately
+	erase_if(
+		awards,
+		[&](auto& a) {
+			const auto passed = global_time_seconds - a.time_of_occurence_seconds;
+			const auto max_lifetime = 
+				settings.indicator_fading_duration_secs 
+				+ settings.single_indicator_lifetime_secs
+			;
+
+			return passed >= max_lifetime;
 		}
 	);
 }
@@ -229,6 +258,18 @@ void damage_indication_system::draw_indicators(
 		}
 
 		return fonts.large_numbers;
+	};
+
+	auto get_award_font = [&](const int award_amount) -> auto& {
+		if (award_amount <= 100) {
+			return fonts.gui;
+		}
+
+		if (award_amount <= 500) {
+			return fonts.larger_gui;
+		}
+
+		return fonts.medium_numbers;
 	};
 
 	auto get_indicator_color = [&](const auto& in) {
@@ -411,5 +452,56 @@ void damage_indication_system::draw_indicators(
 				}
 			}
 		}
+	}
+
+	// Render awards separately
+	for (const auto& a : awards) {
+		const auto passed = global_time_seconds - a.time_of_occurence_seconds;
+		const auto current_offset = indicator_offsets[a.offset_slot % indicator_offsets.size()];
+		const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
+
+		const auto round_amount = static_cast<int>(a.displayed_amount);
+
+		if (round_amount == 0) {
+			continue;
+		}
+
+		const auto award_text = "+$" + std::to_string(round_amount);
+		const auto& award_font = get_award_font(round_amount);
+		const auto offset_mult = 0.5f * static_cast<float>(award_font.metrics.get_height()) / fonts.gui.metrics.get_height();
+
+		// Awards are detached - don't follow player movement
+		auto world_pos = a.pos;
+
+		auto text_pos = cone.to_screen_space(world_pos + current_offset * offset_mult);
+		auto text_color = a.color;
+
+		// Awards move immediately - no delay
+		const auto rising_offset = passed * settings.indicator_rising_speed;
+		text_pos.y -= rising_offset;
+
+		// Add glowing effect with sine wave variation
+		const auto glow_variation_secs = 2.0 * static_cast<double>(a.offset_slot);
+		const auto glow_progress = static_cast<float>((1.0 + std::sin(4 * (global_time_seconds + glow_variation_secs) * PI<double>)) / 2.0);
+		const auto glow_brightness = 1.0f + 0.25f * glow_progress; // Varies between 1.0 and 1.5
+		text_color.mult_brightness(glow_brightness);
+
+		if (fading_progress >= 0.0f) {
+			const auto fading_mult = std::sqrt(fading_progress / settings.indicator_fading_duration_secs);
+			text_color.mult_alpha(1 - fading_mult);
+		}
+
+		auto border = black;
+		border.a = text_color.a;
+
+		const auto pixel_perfect_text_pos = vec2i(text_pos);
+
+		augs::gui::text::print_stroked(
+			output,
+			pixel_perfect_text_pos,
+			{ award_text, { award_font, text_color } },
+			{ augs::ralign::R },
+			border
+		);
 	}
 }

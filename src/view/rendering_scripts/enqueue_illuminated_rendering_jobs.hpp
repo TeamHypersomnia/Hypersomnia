@@ -437,8 +437,10 @@ void enqueue_illuminated_rendering_jobs(
 					cosm,
 					[&](const auto& handle) {
 						handle.template dispatch_on_having_any<invariants::item, invariants::touch_collectible>([&](const auto& typed_item) {
+							const bool touch_collectible = typed_item.template has<invariants::touch_collectible>();
+
 							const auto is_laying_on_ground = [&]() {
-								if (typed_item.template has<invariants::touch_collectible>()) {
+								if (touch_collectible) {
 									return true;
 								}
 
@@ -464,8 +466,8 @@ void enqueue_illuminated_rendering_jobs(
 								return;
 							}
 
-							const auto bounce_dir = vec2(-1, -1);
-							const auto bounce_height = 8.f;
+							const auto bounce_dir = touch_collectible ? vec2(0, -1) : vec2(-1, -1);
+							const auto bounce_height = touch_collectible ? 10.0f : 8.f;
 							const auto bounce_variation_secs = 2.0 * double(typed_item.get_id().raw.indirection_index);
 							const auto bounce_progress = static_cast<float>((1.0 + std::sin(1.5 * (global_time_seconds + bounce_variation_secs) * PI<double>)) / 2.0);
 
@@ -481,7 +483,7 @@ void enqueue_illuminated_rendering_jobs(
 							auto shadow_color = rgba(0, 0, 0, 120);
 							shadow_color.mult_alpha(shadow_alpha);
 
-							auto overlay_color = rgba(255, 255, 255, 40);
+							auto overlay_color = rgba(255, 255, 255, touch_collectible ? 100 : 40);
 							overlay_color.mult_alpha(overlay_alpha);
 
 							const bool pickable = typed_item.get_id() == pickable_item_to_highlight;

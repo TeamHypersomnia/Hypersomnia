@@ -7,6 +7,7 @@ struct damage_indication_settings {
 
 	rgba critical_color = yellow;
 	rgba friendly_damage_border_color = red;
+	rgba award_color = yellow;
 
 	float indicator_fading_duration_secs = 0.5f;
 

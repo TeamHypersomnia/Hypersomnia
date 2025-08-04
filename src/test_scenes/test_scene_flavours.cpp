@@ -419,6 +419,8 @@ namespace test_flavours {
 			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
 			meta.get<invariants::rigid_body>().fixed_rotation = true;
 			meta.get<invariants::touch_collectible>().money_value = 100;
+			meta.get<invariants::touch_collectible>().collect_sound.id = to_sound_id(test_scene_sound_id::COLLECT_COINS_SMALL);
+			meta.get<invariants::touch_collectible>().associated_col = rgba(255, 220, 0, 255); 
 		}
 
 		{
@@ -436,6 +438,8 @@ namespace test_flavours {
 			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
 			meta.get<invariants::rigid_body>().fixed_rotation = true;
 			meta.get<invariants::touch_collectible>().money_value = 500;
+			meta.get<invariants::touch_collectible>().collect_sound.id = to_sound_id(test_scene_sound_id::COLLECT_COINS_MEDIUM);
+			meta.get<invariants::touch_collectible>().associated_col = rgba(153, 153, 255, 255); 
 		}
 
 		{
@@ -453,6 +457,9 @@ namespace test_flavours {
 			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
 			meta.get<invariants::rigid_body>().fixed_rotation = true;
 			meta.get<invariants::touch_collectible>().money_value = 2500;
+			meta.get<invariants::touch_collectible>().collect_sound.id = to_sound_id(test_scene_sound_id::COLLECT_COINS_BIG);
+			//meta.get<invariants::touch_collectible>().associated_col = rgba(15, 174, 239, 255); 
+			meta.get<invariants::touch_collectible>().associated_col = rgba(15, 174, 239, 255).mult_brightness(1.15f); 
 		}
 	}
 }

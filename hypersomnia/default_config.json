@@ -780,6 +780,15 @@
                     "first": 48,
                     "second": 57
                 },
+                // plus and $
+                {
+                    "first": 36,
+                    "second": 36
+                },
+                {
+                    "first": 43,
+                    "second": 43
+                },
                 // "Loading..." characters
                 {
                     "first": 46,

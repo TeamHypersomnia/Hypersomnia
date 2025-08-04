@@ -21,8 +21,9 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 		}
 		
 		const auto subject = cosm[it.subject];
+		const auto collider = cosm[it.collider];
 
-		if (subject.dead()) {
+		if (subject.dead() || collider.dead()) {
 			continue;
 		}
 
@@ -32,13 +33,6 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 
 		if (data_indices.is_set() && fixtures.is_destructible()) {
 			//LOG("Destructible fixture was hit.");
-
-			const auto collider = cosm[it.collider];
-
-			if (collider.dead()) {
-				continue;
-			}
-
 			messages::damage_message damage_msg;
 			damage_msg.indices = it.indices;
 

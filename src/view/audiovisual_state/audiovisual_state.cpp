@@ -32,6 +32,7 @@
 #include "game/detail/visible_entities.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/damage_indication_settings.h"
+#include "game/messages/collected_message.h"
 //#include "augs/log.h"
 
 template <class E>
@@ -413,7 +414,7 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_of_colliders();
 		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_of_colliders();
 
-		if (collider_owner_body.dead()) {
+		if (collider_owner_body.dead() || subject_owner_body.dead()) {
 			continue;
 		}
 
@@ -440,6 +441,7 @@ void audiovisual_state::standard_post_solve(
 
 	const auto correct_interpolations = always_predictable_v;
 	const auto acquire_damage_indication = never_predictable_v;
+	const auto acquire_collectibles = always_predictable_v;
 	const auto acquire_highlights = always_predictable_v;
 
 	if (correct_interpolations.should_play(settings.prediction)) {
@@ -665,6 +667,16 @@ void audiovisual_state::standard_post_solve(
 
 		for (const auto& h : pure_color_highlights) {
 			highlights.add(h.subject, h.input);
+		}
+	}
+
+	if (acquire_collectibles.should_play(settings.prediction)) {
+		auto& damage_indication = get<damage_indication_system>();
+
+		const auto& collected = step.get_queue<messages::collected_message>();
+
+		for (const auto& c : collected) {
+			damage_indication.add_award(c.subject, c.pos, c.value, c.associated_col);
 		}
 	}
 }

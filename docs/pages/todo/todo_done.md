@@ -7369,3 +7369,8 @@ This will discard your redo history."
 	- remember to autoassign by player count not bot count otherwise everyone will end up in same team
 
 - rename config.json to something like cached.json
+- remember to trim to in.rules.economy.maximum_money when collecting
+- we should transfer coins_on_body at the end of the round to keep things in sync
+	- then a message to just show +100$ above where it was collected
+	- the normal awards will still be shown to the right but this does not have to
+

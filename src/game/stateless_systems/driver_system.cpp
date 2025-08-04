@@ -36,6 +36,11 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 		}
 
 		const auto driver = cosm[e.subject];
+		const auto collider = cosm[e.collider];
+
+		if (driver.dead() || collider.dead()) {
+			continue;
+		}
 
 		if (const auto maybe_driver = driver.find<components::driver>();
 			maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched
@@ -44,7 +49,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 				continue;
 			}
 
-			const auto car = cosm[e.collider].get_owner_of_colliders();
+			const auto car = collider.get_owner_of_colliders();
 			const auto maybe_car = car.find<components::car>();
 
 			if(maybe_car != nullptr) {

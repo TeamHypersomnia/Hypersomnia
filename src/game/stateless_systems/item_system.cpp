@@ -56,6 +56,7 @@
 #include "game/detail/explosive/like_explosive.h"
 #include "game/cosmos/might_allocate_entities_having.hpp"
 #include "game/detail/inventory/wield_same_as.hpp"
+#include "game/messages/collected_message.h"
 
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
@@ -766,6 +767,70 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 void item_system::handle_touch_collectibles(const logic_step step) {
 	(void)step;
 
+	auto& cosm = step.get_cosmos();
+	auto& events = step.get_queue<messages::collision_message>();
+	const auto& common_assets = cosm.get_common_assets();
+
+	for (auto& it : events) {
+		{
+			const bool interested = 
+				it.type == messages::collision_message::event_type::BEGIN_CONTACT ||
+				it.type == messages::collision_message::event_type::PRE_SOLVE ||
+				it.type == messages::collision_message::event_type::POST_SOLVE
+			;
+
+			if (!interested || it.one_is_sensor) {
+				continue;
+			}
+		}
+
+		const auto surface_handle = cosm[it.subject];
+		const auto collectible_handle = cosm[it.collider];
+
+		if (surface_handle.dead() || collectible_handle.dead()) {
+			continue;
+		}
+
+		if (auto collectible = collectible_handle.find<invariants::touch_collectible>()) {
+			if (auto sentience = surface_handle.find<components::sentience>()) {
+				const auto predictability = predictable_only_by(it.subject);
+				const auto collectible_transform = collectible_handle.get_logic_transform();
+				const auto collector_transform = surface_handle.get_logic_transform();
+
+				if (sentience->is_conscious()) {
+					if (collectible->money_value != 0) {
+						sentience->coins_on_body += collectible->money_value;
+
+						messages::collected_message collected;
+						collected.pos = collectible_transform.pos;
+						collected.subject = it.subject;
+						collected.value = collectible->money_value;
+						collected.associated_col = collectible->associated_col;
+
+						step.post_message(collected);
+
+						packaged_particle_effect particles;
+						particles.input = common_assets.item_pickup_particles;
+						//particles.input.modifier.color = collectible->associated_col;
+						//particles.input.modifier.scale_amounts = collectible->money_value / 100.0f;
+
+						auto effect_transform = collectible_transform;
+						effect_transform.rotation = (effect_transform.pos - collector_transform.pos).degrees();
+
+						particles.start = particle_effect_start_input::fire_and_forget(effect_transform);
+						particles.post(step, predictability);
+
+						packaged_sound_effect sound;
+						sound.input = collectible->collect_sound;
+						sound.start = sound_effect_start_input::at_listener(surface_handle);
+						sound.post(step, predictability);
+					}
+
+					cosmic::delete_entity(collectible_handle);
+				}
+			}
+		}
+	}
 }
 
 void item_system::handle_throw_item_intents(const logic_step step) {

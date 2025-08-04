@@ -21,6 +21,7 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::touch_collectible
 		money_type money_value = 100;
 		sound_effect_input collect_sound;
+		rgba associated_col = white;
 		// END GEN INTROSPECTOR
 	};
 }

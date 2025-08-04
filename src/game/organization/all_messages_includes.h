@@ -21,5 +21,6 @@
 #include "game/messages/game_notification.h"
 #include "game/messages/mode_notification.h"
 #include "game/messages/hud_message.h"
+#include "game/messages/collected_message.h"
 
 #include "game/messages/create_entity_message.h"

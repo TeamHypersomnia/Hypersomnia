@@ -23,6 +23,6 @@ namespace messages {
 			PRE_SOLVE,
 			POST_SOLVE,
 			END_CONTACT
-		} type;
+		} type = event_type::BEGIN_CONTACT;
 	};
 }

@@ -351,6 +351,10 @@ void missile_system::ricochet_missiles(const logic_step step) {
 		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
+		if (surface_handle.dead() || missile_handle.dead()) {
+			continue;
+		}
+
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto& typed_missile) {
 			::ricochet_missile_against_surface(
 				step,
@@ -394,6 +398,10 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
+
+		if (surface_handle.dead() || missile_handle.dead()) {
+			continue;
+		}
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto& typed_missile) {
 			auto& missile = typed_missile.template get<components::missile>();

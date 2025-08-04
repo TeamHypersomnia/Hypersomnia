@@ -13,6 +13,13 @@
 
 inventory_space_type to_space_units(const std::string& s);
 
+/* 
+	Increase awards due to having to walk for them,
+	now that there are physical coins.
+*/
+
+const auto award_mult = 1.5f;
+
 namespace test_flavours {
 	void populate_melee_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
@@ -57,7 +64,7 @@ namespace test_flavours {
 
 			{
 				invariants::melee melee;
-				melee.adversarial.knockout_award = static_cast<money_type>(award);
+				melee.adversarial.knockout_award = static_cast<money_type>(award * award_mult);
 
 				{
 					auto& t = melee.throw_def;
@@ -302,7 +309,7 @@ namespace test_flavours {
 				a.head_radius_multiplier = 0.7f;
 			}
 
-			melee.adversarial.knockout_award = static_cast<money_type>(700); 
+			melee.adversarial.knockout_award = static_cast<money_type>(700 * award_mult); 
 
 			{
 				auto& a = melee.actions[weapon_action_type::PRIMARY];

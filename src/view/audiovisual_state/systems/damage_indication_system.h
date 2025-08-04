@@ -15,6 +15,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/constant_size_string.h"
 #include "view/gui_fonts.h"
+#include "game/detail/economy/money_type.h"
 
 class images_in_atlas_map;
 class interpolation_system;
@@ -76,6 +77,15 @@ private:
 		mutable std::optional<vec2> last_visible_pos;
 	};
 
+	struct award {
+		vec2 pos;
+		money_type value;
+		double time_of_occurence_seconds = 0.0;
+		real32 displayed_amount = 0.0f;
+		uint32_t offset_slot = 0;
+		rgba color;
+	};
+
 	double global_time_seconds = 0.0;
 
 	struct active_white_highlight {
@@ -88,6 +98,7 @@ private:
 
 	std::unordered_map<entity_id, damage_streak> streaks;
 	std::unordered_map<entity_id, active_white_highlight> active_white_highlights;
+	std::vector<award> awards;
 
 public:
 
@@ -105,6 +116,13 @@ public:
 		const entity_id subject,
 		const damage_event::input,
 		bool merge
+	);
+
+	void add_award(
+		entity_id subject,
+		vec2 pos,
+		money_type value,
+		rgba
 	);
 
 	void add_white_highlight(

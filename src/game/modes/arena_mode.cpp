@@ -42,6 +42,7 @@
 #include "application/arena/synced_dynamic_vars.h"
 #include "augs/misc/date_time.h"
 #include "game/modes/arena_mode_ai.h"
+#include "game/messages/collected_message.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -3677,6 +3678,18 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 	}
 
 	{
+		const auto& events = step.get_queue<messages::collected_message>();
+
+		for (const auto& e : events) {
+			if (const auto subject = cosm[e.subject]) {
+				if (const auto mode_id = lookup(subject.get_id()); mode_id.is_set()) {
+					give_monetary_award(in, mode_id, {}, e.value);
+				}
+			}
+		}
+	}
+
+	{
 		const auto& events = step.get_queue<messages::health_event>();
 
 		for (const auto& e : events) {
@@ -4324,26 +4337,45 @@ void arena_mode::give_monetary_award(
 
 	if (const auto stats = stats_of(knockouter_id)) {
 		auto& current_money = stats->money;
-		amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
 
 		if (amount < 0 || !victim_id.is_set()) {
-			current_money += amount;
+			amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
 
-			const auto award = arena_mode_award {
-				in.cosm.get_clock(), knockouter_id, amount 
-			};
+			if (amount != 0) {
+				current_money += amount;
 
-			auto& awards = stats->round_state.awards;
-			awards.emplace_back(award);
+				const auto award = arena_mode_award {
+					in.cosm.get_clock(), knockouter_id, amount 
+				};
 
-			if (awards.size() > max_awards_in_history_v) {
-				awards.erase(awards.begin());
+				auto& awards = stats->round_state.awards;
+				awards.emplace_back(award);
+
+				if (awards.size() > max_awards_in_history_v) {
+					awards.erase(awards.begin());
+				}
 			}
 		}
 		else if (amount > 0) {
+			/* Victim is set */
 			on_player_handle(in.cosm, victim_id, [&](const auto& player_handle) {
 				if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-					player_handle.template get<components::sentience>().coins_on_body += amount;
+					auto& coins = player_handle.template get<components::sentience>().coins_on_body;
+
+					if (coins > 0) {
+						/* Subtract whatever they collected to keep things in sync */
+						give_monetary_award(
+							in,
+							victim_id,
+							{},
+							-coins
+						);
+					}
+
+					/*
+						Save coins to be extracted from the exploded body
+					*/
+					coins += amount;
 				}
 			});
 		}

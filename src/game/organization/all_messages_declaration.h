@@ -38,6 +38,7 @@ namespace messages {
 	struct duel_interrupted_message;
 	struct team_match_start_message;
 	struct match_summary_ended;
+	struct collected_message;
 
 	template <class T>
 	struct create_entity_message;
@@ -90,5 +91,6 @@ using all_message_queues = augs::storage_for_message_queues<
 
 	FOR_ALL_ENTITY_TYPES(MAKE_CREATE_ENTITY_MESSAGE)
 
-	messages::match_summary_ended
+	messages::match_summary_ended,
+	messages::collected_message
 >;
