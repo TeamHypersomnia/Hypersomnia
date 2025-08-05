@@ -3657,7 +3657,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 4.0f;
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
-			gun_def.recoil_multiplier = 0.55f;
+			gun_def.recoil_multiplier = 0.5f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(600 * award_mult);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
@@ -3669,7 +3669,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.80f);
+			set_density_mult(meta, 0.75f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1600.f);
 
 			meta.get<invariants::item>().standard_price = 2500;
