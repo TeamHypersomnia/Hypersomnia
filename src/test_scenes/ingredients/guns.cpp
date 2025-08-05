@@ -3340,9 +3340,9 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.5f);
+			set_density_mult(meta, 1.3f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
-			meta.get<invariants::item>().standard_price = 2600;
+			meta.get<invariants::item>().standard_price = 2700;
 			set_chambering_duration_ms(meta, 600.f);
 
 			auto& item = meta.get<invariants::item>();
@@ -3618,7 +3618,7 @@ namespace test_flavours {
 			set_density_mult(meta, 2.f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1750.f, 0.f);
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
-			meta.get<invariants::item>().standard_price = 2100;
+			meta.get<invariants::item>().standard_price = 2200;
 			set_chambering_duration_ms(meta, 700.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::GALILEA_MAGAZINE);
@@ -3646,7 +3646,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 35.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 30.f;
 
 			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::HEAVY_HEAT_START);
 			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::LIGHT_HEAT_START);
@@ -3664,13 +3664,12 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BAKA47_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
-			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.85f);
+			set_density_mult(meta, 0.80f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1600.f);
 
 			meta.get<invariants::item>().standard_price = 2500;
@@ -3678,6 +3677,7 @@ namespace test_flavours {
 
 			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
 			meta.get<invariants::text_details>().name = "Vindicator";
+			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 		}
 
 		{
