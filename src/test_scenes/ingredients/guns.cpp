@@ -2544,9 +2544,38 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.23");
+			charge_deposit_def.space_available = to_space_units("0.21");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::GALILEA_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.4");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 100;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::VINDICATOR_MAGAZINE);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.30");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::LEWSII_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -3597,6 +3626,61 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
+
+			meta.get<invariants::text_details>().description =
+				"Standard issue sample rifle."
+			;
+
+			auto& gun_def = meta.get<invariants::gun>();
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4400.f, 4400.f};
+			gun_def.shot_cooldown_ms = 100.f;
+
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 3.0f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = kickback_mult * 35.f;
+
+			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::HEAVY_HEAT_START);
+			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::LIGHT_HEAT_START);
+
+			gun_def.steam_burst_schedule_mult = 1.f;
+			gun_def.heat_cooldown_speed_mult = 4.f;
+
+			gun_def.maximum_heat = 4.0f;
+			gun_def.gunshot_adds_heat = 0.2f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
+			gun_def.recoil_multiplier = 0.55f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(600 * award_mult);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BAKA47_SHOT);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
+			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 0.85f);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1600.f);
+
+			meta.get<invariants::item>().standard_price = 2500;
+			set_chambering_duration_ms(meta, 700.f);
+
+			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
+			meta.get<invariants::text_details>().name = "Vindicator";
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWS);
 
 			meta.get<invariants::text_details>().description =
@@ -4461,6 +4545,7 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::GALILEA:        return 110.0f;
 		case W::BILMER2000:     return 110.0f;
 		case W::BAKA47:         return 110.0f;
+		case W::VINDICATOR:     return 110.0f;
 		case W::SZTURM:         return 110.0f;
 		case W::DATUM:          return 110.0f;
 		case W::LEWS:           return 110.0f;

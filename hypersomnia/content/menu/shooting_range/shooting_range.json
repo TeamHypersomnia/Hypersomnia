@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2024-01-06 00:52:03.546828 UTC"
+        "version_timestamp": "2025-08-04 23:29:27.582951 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -12,8 +12,7 @@
         "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
-        "mode": "quick_test",
-        "bots": 53
+        "mode": "quick_test"
     },
     "game_modes": {
         "quick_test": {
@@ -192,6 +191,13 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 13",
+            "nodes": [
+                "vindicator (1)",
+                "vindicator"
+            ]
+        },
         {
             "id": "Layer 10",
             "nodes": [
@@ -1807,6 +1813,16 @@
             "id": "szczur (1)",
             "type": "szczur",
             "pos": [1357.0, 4000.0]
+        },
+        {
+            "id": "vindicator",
+            "type": "vindicator",
+            "pos": [-947.0, 4100.0]
+        },
+        {
+            "id": "vindicator (1)",
+            "type": "vindicator",
+            "pos": [1357.0, 4100.0]
         },
         {
             "id": "electric_armor",
