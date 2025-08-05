@@ -4335,6 +4335,10 @@ void arena_mode::give_monetary_award(
 		return;
 	}
 
+	if (!in.rules.has_economy()) {
+		return;
+	}
+
 	if (const auto stats = stats_of(knockouter_id)) {
 		auto& current_money = stats->money;
 
