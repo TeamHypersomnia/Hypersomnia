@@ -4445,6 +4445,10 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		push_notification_job(
 			[webhooks, author_clan, webhook_message]() -> std::string {
 				for (auto& c : webhooks) {
+					if (!c.chat) {
+						continue;
+					}
+
 					if (!c.clan.empty()) {
 						if (c.clan != author_clan) {
 							continue;

@@ -210,6 +210,8 @@ struct custom_webhook_data {
 	std::string url;
 	std::string header_authorization;
 	std::string clan;
+
+	bool chat = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const custom_webhook_data& b) const = default;
