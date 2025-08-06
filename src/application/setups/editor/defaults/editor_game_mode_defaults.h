@@ -41,6 +41,7 @@ inline void setup_game_mode_defaults(
 		o[test_shootable_weapons::BAKA47],
 		o[test_shootable_weapons::SZTURM],
 		o[test_shootable_weapons::BILMER2000],
+		o[test_shootable_weapons::VINDICATOR],
 		o[test_shootable_weapons::GALILEA],
 
 		o[test_shootable_weapons::PRO90],
