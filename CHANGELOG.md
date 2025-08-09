@@ -8,7 +8,7 @@
 
 ### Added
 
-- New weapon: Bilmik
+- New weapon: Bilmik - the same as Bilmer 2000, just cheaper, without silencer, and with bigger recoil.
 
 ### Fixed
 
