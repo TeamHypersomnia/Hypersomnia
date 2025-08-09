@@ -1708,7 +1708,6 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url);
 
-	LOG("CHUJ4");
 	if (discord_webhook_url.valid() || telegram_webhook_url.valid() || !private_vars.custom_webhook_urls.empty()) {
 		auto server_name = get_server_name();
 		auto avatar = client_state->meta.avatar.image_bytes;
@@ -1720,7 +1719,6 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		const auto external_addr = external_address != std::nullopt ? ::ToString(*external_address) : "";
 
 		const std::string from_where = find_client_state(id) ? find_client_state(id)->from_where() : std::string();
-		LOG("CHUJ3");
 
 		push_avatar_job(
 			id,
@@ -1775,13 +1773,11 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 					}
 				}
 
-				LOG("CHUJ2");
 				for (auto& c : priv_vars.custom_webhook_urls) {
 					if (!c.connected) {
 						continue;
 					}
 
-					LOG("CHUJ");
 					if (!c.clan.empty() && c.clan != connected_player_clan) {
 						LOG("Skipping webhook for clan: %x", c.clan);
 						continue;
