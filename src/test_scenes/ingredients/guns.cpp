@@ -3238,7 +3238,7 @@ namespace test_flavours {
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.recoil_multiplier = 0.5;
+			gun_def.recoil_multiplier = 0.32;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -3255,6 +3255,53 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.4");
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BILMIK);
+
+			meta.get<invariants::text_details>().description =
+				"Standard issue silenced rifle."
+			;
+
+			auto& gun_def = meta.get<invariants::gun>();
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4500.f, 4500.f};
+			gun_def.shot_cooldown_ms = 90.f;
+
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 3.3f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
+			gun_def.low_ammo_cue_sound.modifier.reference_distance = 300.f;
+			gun_def.low_ammo_cue_sound.modifier.max_distance = 500.f;
+
+			gun_def.kickback_towards_wielder = kickback_mult * 20.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(500 * award_mult);
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.recoil_multiplier = 0.55;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BILMER_CHAMBERING);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMIK, white);
+			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
+			set_density_mult(meta, 1.35);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
+			meta.get<invariants::item>().standard_price = 2700;
+			set_chambering_duration_ms(meta, 450.f);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
+			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.0");
 		}
 
 		{
@@ -4543,6 +4590,7 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::CALICO:         return 60.0f;
 		case W::BULWARK:        return 60.0f;
 		case W::GALILEA:        return 110.0f;
+		case W::BILMIK:         return 110.0f;
 		case W::BILMER2000:     return 110.0f;
 		case W::BAKA47:         return 110.0f;
 		case W::VINDICATOR:     return 110.0f;

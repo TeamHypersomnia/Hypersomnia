@@ -107,6 +107,7 @@ enum class test_plain_sprited_bodies {
 enum class test_shootable_weapons {
 	// GEN INTROSPECTOR enum class test_shootable_weapons
 	BILMER2000,
+	BILMIK,
 	BAKA47,
 	LEWS,
 	KEK9,

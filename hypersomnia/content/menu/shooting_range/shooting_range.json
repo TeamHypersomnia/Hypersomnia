@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2025-08-04 23:29:27.582951 UTC"
+        "version_timestamp": "2025-08-09 16:22:48.139244 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -191,6 +191,15 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 15",
+            "nodes": [
+                "bilmik"
+            ]
+        },
+        {
+            "id": "Layer 14"
+        },
         {
             "id": "Layer 13",
             "nodes": [
@@ -1823,6 +1832,11 @@
             "id": "vindicator (1)",
             "type": "vindicator",
             "pos": [1357.0, 4100.0]
+        },
+        {
+            "id": "bilmik",
+            "type": "bilmik",
+            "pos": [-929.0, 4171.0]
         },
         {
             "id": "electric_armor",

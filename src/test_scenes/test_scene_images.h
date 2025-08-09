@@ -31,6 +31,7 @@ enum class test_scene_image_id {
 
 	ASSAULT_RIFLE,
 	BILMER2000,
+	BILMIK,
 	KEK9,
 	SN69,
 	AO44,
