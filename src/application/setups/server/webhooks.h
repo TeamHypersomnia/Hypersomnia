@@ -250,12 +250,47 @@ namespace custom_webhooks {
 		const std::string& current_map,
 		const std::string& current_game_mode,
 		const std::string& from_where,
-		const std::string& external_addr
+		const std::string& external_addr,
+		const bool compact
 	) {
 		erase_element(other_players, connected_player);
 
-		const auto connected_notice = typesafe_sprintf("**%x** connected%x.", matrix_escaped_nick(connected_player), from_where);
 		const auto num_others = other_players.size();
+
+		if (compact) {
+			std::string result;
+			if (num_others == 0) {
+				// Alone
+				result = typesafe_sprintf(
+					"**%x** is playing.",
+					matrix_escaped_nick(connected_player)
+				);
+			}
+			else if (num_others == 1) {
+				// One other player → show name
+				result = typesafe_sprintf(
+					"**%x** is playing with **%x**.",
+					matrix_escaped_nick(connected_player),
+					matrix_escaped_nick(other_players[0])
+				);
+			}
+			else {
+				// More than one other player → show count
+				result = typesafe_sprintf(
+					"**%x** is playing. **Total players: %x**.",
+					matrix_escaped_nick(connected_player),
+					num_others + 1
+				);
+			}
+
+			if (!external_addr.empty()) {
+				result += " [Join via Web](" + ::get_browser_join_link(external_addr) + ").";
+			}
+
+			return result;
+		}
+
+		const auto connected_notice = typesafe_sprintf("**%x** connected%x.", matrix_escaped_nick(connected_player), from_where);
 
 		const auto now_playing_notice = [&]() {
 			if (num_others == 0) {

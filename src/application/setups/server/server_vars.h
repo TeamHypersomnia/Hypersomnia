@@ -211,7 +211,12 @@ struct custom_webhook_data {
 	std::string header_authorization;
 	std::string clan;
 
+	bool compact = false;
+
 	bool chat = false;
+	bool connected = true;
+	bool duels = true;
+	bool match_summaries = true;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const custom_webhook_data& b) const = default;
