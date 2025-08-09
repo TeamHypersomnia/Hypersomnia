@@ -3296,7 +3296,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			set_density_mult(meta, 1.35);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
-			meta.get<invariants::item>().standard_price = 2700;
+			meta.get<invariants::item>().standard_price = 2800;
 			set_chambering_duration_ms(meta, 450.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);

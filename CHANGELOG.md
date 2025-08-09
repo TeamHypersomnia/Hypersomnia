@@ -4,6 +4,30 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.5.0] - 2025-08-09
+
+### Added
+
+- New weapon: Bilmik
+
+### Fixed
+
+- Coins don't drop in Gun Game
+
+## [1.4.0] - 2025-08-05
+
+### Added
+
+- Enemies now drop coins from exploded corpses! You have to physically touch them to collect your reward. Watch out though - you will drop the coins you collected if you die before the end of the round!
+- Resurrected unused gun: Vindicator. An economy rifle ($2500) specific to Resistance. Has 35 bullets, so more than Galilea, but less damage than Baka47 (32 vs 40) and is as slow firing as Baka47. It is however way lighter and has almost non-existent recoil.
+
+### Changed
+
+- **Balance:** to account for the fact that you now have to walk to get the kill awards, all awards are now multiplied by 1.5, as well as dropping an additional $500 for a headshot.
+- **Balance:** SMGs are more affordable now.
+- **Balance:** Galilea: 34 -> 24 bullets, price: $2100 -> $2200
+
+
 ## [1.3.4] - 2025-07-25
 
 ### Fixed

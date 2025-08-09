@@ -230,7 +230,7 @@ namespace test_flavours {
 			1.f,
 			cyan,
 			1.f,
-			static_cast<money_type>(2000)
+			static_cast<money_type>(3000)
 		);
 
 		make_knife(
@@ -241,7 +241,7 @@ namespace test_flavours {
 			1.f,
 			yellow,
 			1.f,
-			static_cast<money_type>(2000)
+			static_cast<money_type>(3000)
 		);
 
 		{
