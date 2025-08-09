@@ -461,5 +461,25 @@ namespace test_flavours {
 			//meta.get<invariants::touch_collectible>().associated_col = rgba(15, 174, 239, 255); 
 			meta.get<invariants::touch_collectible>().associated_col = rgba(15, 174, 239, 255).mult_brightness(1.15f); 
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_touch_collectibles::GREEN_COIN);
+
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::GREEN_COIN_1, white);
+
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.density *= 0.3f;
+			fixtures.filter = filters[predefined_filter_type::SHELL];
+			fixtures.material = to_physical_material_id(test_scene_physical_material_id::COIN);
+			meta.get<invariants::rigid_body>().fixed_rotation = true;
+			meta.get<invariants::touch_collectible>().money_value = 5000;
+			meta.get<invariants::touch_collectible>().collect_sound.id = to_sound_id(test_scene_sound_id::FIRE_DAMAGE);
+			meta.get<invariants::touch_collectible>().collect_sound.modifier.pitch = 0.8f;
+			meta.get<invariants::touch_collectible>().collect_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PORTAL_EXIT);
+			meta.get<invariants::touch_collectible>().collect_particles.modifier.color = rgba(255, 102, 0, 255);
+
+			//meta.get<invariants::touch_collectible>().associated_col = rgba(15, 174, 239, 255); 
+			meta.get<invariants::touch_collectible>().associated_col = rgba(77, 252, 141, 255).mult_brightness(1.15f); 
+		}
 	}
 }

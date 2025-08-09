@@ -811,6 +811,11 @@ void item_system::handle_touch_collectibles(const logic_step step) {
 
 						packaged_particle_effect particles;
 						particles.input = common_assets.item_pickup_particles;
+
+						if (collectible->collect_particles.id.is_set()) {
+							particles.input = collectible->collect_particles;
+						}
+
 						//particles.input.modifier.color = collectible->associated_col;
 						//particles.input.modifier.scale_amounts = collectible->money_value / 100.0f;
 

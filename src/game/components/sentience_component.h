@@ -256,7 +256,7 @@ namespace invariants {
 
 		corpse_remnant_flavour_vector corpse_remnant_defs;
 
-		std::array<constrained_entity_flavour_id<invariants::touch_collectible>, 3> coin_flavours;
+		augs::constant_size_vector<constrained_entity_flavour_id<invariants::touch_collectible>, 4> coin_flavours;
 		// END GEN INTROSPECTOR
 	};
 }

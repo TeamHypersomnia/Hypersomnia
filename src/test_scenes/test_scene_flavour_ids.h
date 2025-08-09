@@ -462,6 +462,7 @@ enum class test_touch_collectibles {
 	GOLD_COIN,
 	PLATINUM_COIN,
 	CRYSTAL_COIN,
+	GREEN_COIN,
 
 	COUNT
 	// END GEN INTROSPECTOR

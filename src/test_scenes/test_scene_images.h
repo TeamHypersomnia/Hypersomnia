@@ -375,6 +375,8 @@ enum class test_scene_image_id {
 	CRYSTAL_COIN_7,
 	CRYSTAL_COIN_8,
 
+	GREEN_COIN_1,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

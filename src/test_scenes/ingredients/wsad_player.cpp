@@ -242,9 +242,10 @@ namespace test_flavours {
 			components::sentience sentience_inst;
 
 			sentience.coin_flavours = {
-				to_entity_flavour_id(test_touch_collectibles::GOLD_COIN),
+				to_entity_flavour_id(test_touch_collectibles::GREEN_COIN),
+				to_entity_flavour_id(test_touch_collectibles::CRYSTAL_COIN),
 				to_entity_flavour_id(test_touch_collectibles::PLATINUM_COIN),
-				to_entity_flavour_id(test_touch_collectibles::CRYSTAL_COIN)
+				to_entity_flavour_id(test_touch_collectibles::GOLD_COIN)
 			};
 
 			sentience.interaction_hitbox_range = 180;
