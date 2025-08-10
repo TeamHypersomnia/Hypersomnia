@@ -911,23 +911,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (!show_incompatible) {
-				const auto client_version = hypersomnia_version().get_version_string();
-				const auto server_version = s.heartbeat.server_version;
-
-				int client_major = 0;
-				int client_minor = 0;
-				int client_patch = 0;
-				int server_major = 0;
-				int server_minor = 0;
-				int server_patch = 0;
-
-				if (
-					typesafe_sscanf(client_version, "%x.%x.%x", client_major, client_minor, client_patch) &&
-					typesafe_sscanf(server_version, "%x.%x.%x", server_major, server_minor, server_patch)
-				) {
-					if (client_major != server_major || client_minor != server_minor) {
-						return;
-					}
+				if (!s.heartbeat.versions_compatible()) {
+					return;
 				}
 			}
 
@@ -1313,6 +1298,10 @@ std::optional<server_list_entry> browse_servers_gui_state::find_best_server(cons
 	erase_if(
 		filtered,
 		[&](auto& f) {
+			if (!f.heartbeat.versions_compatible()) {
+				return true;
+			}
+
 			if (const bool casual = !find_ranked) {
 				const bool is_ranked = f.is_official_server() && f.heartbeat.is_ranked_server();
 

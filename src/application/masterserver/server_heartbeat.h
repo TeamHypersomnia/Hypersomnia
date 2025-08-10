@@ -94,4 +94,5 @@ struct server_heartbeat {
 	}
 
 	std::string get_location_id() const;
+	bool versions_compatible() const;
 };

@@ -56,6 +56,7 @@
 #include "application/setups/server/server_assigned_teams.hpp"
 #include "steam_integration.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "hypersomnia_version.h"
 #include <queue>
 
 #if !PLATFORM_WEB
@@ -5172,6 +5173,26 @@ faction_type server_setup::get_assigned_faction(const mode_player_id id) const {
 
 faction_type server_setup::get_assigned_faction() const { 
 	return get_assigned_faction(get_local_player_id());
+}
+
+bool server_heartbeat::versions_compatible() const {
+	const auto client_version = hypersomnia_version().get_version_string();
+
+	int client_major = 0;
+	int client_minor = 0;
+	int client_patch = 0;
+	int server_major = 0;
+	int server_minor = 0;
+	int server_patch = 0;
+
+	if (
+		typesafe_sscanf(client_version, "%x.%x.%x", client_major, client_minor, client_patch) &&
+		typesafe_sscanf(server_version, "%x.%x.%x", server_major, server_minor, server_patch)
+	) {
+		return client_major == server_major && client_minor == server_minor;
+	}
+
+	return false;
 }
 
 std::string server_heartbeat::get_location_id() const {

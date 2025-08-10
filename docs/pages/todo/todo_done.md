@@ -7374,3 +7374,5 @@ This will discard your redo history."
 	- then a message to just show +100$ above where it was collected
 	- the normal awards will still be shown to the right but this does not have to
 
+- does play ranked filter for incompatible?
+
