@@ -1,7 +1,7 @@
 <a name="intro"></a>
 <div align="center">
 
-# ![image](hypersomnia/content/menu/menu/menu_game_logo.png)
+# ![Hypersomnia](hypersomnia/content/gfx/necessary/menu_game_logo.png)
 
 <!-- ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/8ccf0d22-317d-459d-8c19-3b4830968545) -->
 

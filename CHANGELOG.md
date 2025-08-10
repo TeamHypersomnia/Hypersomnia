@@ -4,6 +4,13 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.5.1] - 2025-08-010
+
+### Changed
+
+- Overhauled the main menu.
+- Changed the font from `LiberationSans-Regular.ttf` to `Ubuntu-Regular.ttf`.
+
 ## [1.5.0] - 2025-08-09
 
 ### Added

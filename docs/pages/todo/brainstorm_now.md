@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- we can fill pngs and ogg/wavs with empty content for the headless dedicated server, will save plenty of space
+
+
 - rename .meta.json to just .json cause its prone to errors
 - automate itch release
 	- and possibly web too
