@@ -77,9 +77,6 @@ public:
 		auto menu_b = 104 + 70;
 
 		if constexpr(std::is_same_v<Enum, ingame_menu_button_type>) {
-			s_rc.l += 313;
-			s_rc.r += 313;
-
 			menu_b = 20;
 		}
 		else {

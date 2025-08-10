@@ -911,6 +911,8 @@ namespace test_scenes {
 
 		give_weapon(transformr(vec2(280, -150)), test_shootable_weapons::BAKA47);
 		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::BILMER2000);
+		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::BILMIK);
+		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::VINDICATOR);
 		give_weapon(transformr(vec2(450, -250)), test_shootable_weapons::SZTURM);
 
 		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWS);
