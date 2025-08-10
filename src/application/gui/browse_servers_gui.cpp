@@ -585,7 +585,11 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 }
 #endif
 
+#if WEB_LOWEND
+constexpr auto num_columns = 6;
+#else
 constexpr auto num_columns = 7;
+#endif
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
 	selected_server = s;
@@ -1074,7 +1078,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::SetColumnWidth(3, col_4);
 		ImGui::SetColumnWidth(4, col_5);
 		ImGui::SetColumnWidth(5, col_6);
+#if WEB_LOWEND
+		(void)col_7;
+#else
 		ImGui::SetColumnWidth(6, col_7);
+#endif
 
 		int current_col = 0;
 

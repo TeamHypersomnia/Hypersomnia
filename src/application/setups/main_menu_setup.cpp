@@ -45,7 +45,11 @@ using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
+#if WEB_ITCH
+#define MENU_LOGO_IN_GUI 0
+#else
 #define MENU_LOGO_IN_GUI 1
+#endif
 
 entity_id main_menu_setup::get_viewed_character_id() const {
 	return viewed_character_id;

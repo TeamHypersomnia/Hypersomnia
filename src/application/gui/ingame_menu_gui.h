@@ -141,7 +141,7 @@ struct ingame_menu_gui {
 
 			if (e == ingame_menu_button_type::INVITE_TO_JOIN) {
 				if (context.deps.is_tutorial) {
-					root.buttons[i].set_complete_caption("Restart from last checkpoint");
+					root.buttons[i].set_complete_caption("Restart stage");
 				}
 
 				if (context.deps.is_range) {
