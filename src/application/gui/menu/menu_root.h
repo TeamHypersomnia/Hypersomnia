@@ -2,6 +2,7 @@
 #include <cstddef>
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/option_button.h"
+#include "application/gui/main_menu_button_type.h"
 #include "augs/gui/dereferenced_location.h"
 #include "augs/misc/enum/enum_array.h"
 
@@ -67,6 +68,38 @@ public:
 				buttons[i].rc.set_position(vec2(70.f, buttons[i + 1].rc.t - (padding * scale) - buttons[i].rc.h()));
 			}
 		}
+
+		auto& s_rc = buttons[int(Enum::STEAM)].rc;
+		auto& d_rc = buttons[int(Enum::DISCORD)].rc;
+		auto& g_rc = buttons[int(Enum::GITHUB)].rc;
+
+
+		auto menu_b = 104 + 70;
+
+		if constexpr(std::is_same_v<Enum, ingame_menu_button_type>) {
+			s_rc.l += 313;
+			s_rc.r += 313;
+
+			menu_b = 20;
+		}
+		else {
+			s_rc.l += 415;
+			s_rc.r += 415;
+		}
+
+		auto t = menu_b + 10;
+		auto b = t + g_rc.h();
+
+		d_rc = s_rc;
+		d_rc.l = s_rc.r + 10;
+		d_rc.w(s_rc.w());
+
+		g_rc = d_rc;
+		g_rc.l = d_rc.r + 10;
+		g_rc.w(d_rc.w());
+
+		g_rc.t = s_rc.t = d_rc.t = t;
+		g_rc.b = s_rc.b = d_rc.b = b;
 	}
 
 	template <class M>
@@ -168,9 +201,19 @@ public:
 		rgba border_col = slightly_visible_white
 	) const {
 		ltrb buttons_bg;
-		buttons_bg.set_position(buttons.front().rc.left_top());
+		buttons_bg.set_position(buttons.back().rc.left_top());
 		buttons_bg.b = buttons.back().rc.b;
 		buttons_bg.w(static_cast<float>(get_max_menu_button_size(context.get_necessary_images(), context.get_gui_font()).x));
+#if WEB_LOWEND
+		buttons_bg.r += buttons_bg.l + 18;
+#else
+		buttons_bg.r += buttons_bg.l + 8;
+#endif
+		buttons_bg.l = 0;
+		buttons_bg.t = 0;
+		buttons_bg.b = (context.get_screen_size().y);
+
+		border_col.a = 35;
 
 		context.get_output().aabb_with_border(
 			buttons_bg.expand_from_center(expand),

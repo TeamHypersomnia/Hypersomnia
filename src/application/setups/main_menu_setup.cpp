@@ -45,6 +45,8 @@ using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
+#define MENU_LOGO_IN_GUI 1
+
 entity_id main_menu_setup::get_viewed_character_id() const {
 	return viewed_character_id;
 }
@@ -61,6 +63,7 @@ void main_menu_setup::customize_for_viewing(config_json_table& config) const {
 
 	config.audio_volume.sound_effects *= previous_sfx_volume;
 	config.drawing.cinematic_mode = true;
+	config.drawing.custom_zoom = 3.0f;
 }
 
 void main_menu_setup::apply(const config_json_table& config) {
@@ -214,10 +217,10 @@ void main_menu_setup::draw_overlays(
 	const auto game_logo_size = game_logo.get_original_size();
 
 	ltrb game_logo_rect;
-	game_logo_rect.set_position({ screen_size.x / 2.f - game_logo_size.x / 2.f, 50.f });
+	game_logo_rect.set_position({ 70.0f, 50.f });
 	game_logo_rect.set_size(game_logo_size);
 
-	const bool draw_menu_logo = false;
+	const bool draw_menu_logo = true;
 
 	if (draw_menu_logo) {
 		output.aabb(game_logo, game_logo_rect);

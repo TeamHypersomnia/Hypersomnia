@@ -102,16 +102,16 @@ struct ingame_menu_gui {
 
 		root.buttons[int(ingame_menu_button_type::INVITE_TO_JOIN)].hide = context.deps.hide_invite_to_join;
 
-		int bi = 0;
-
-		root.buttons[bi++].special_image = assets::necessary_image_id::DISCORD_BUTTON;
-#if PLATFORM_WEB
-		root.buttons[bi++].special_image = assets::necessary_image_id::GITHUB_BUTTON;
-		root.buttons[bi++].special_image = assets::necessary_image_id::STEAM_BUTTON;
-#endif
+		root.buttons[int(ingame_menu_button_type::STEAM)].special_image = assets::necessary_image_id::STEAM_BUTTON;
+		root.buttons[int(ingame_menu_button_type::DISCORD)].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		root.buttons[int(ingame_menu_button_type::GITHUB)].special_image = assets::necessary_image_id::GITHUB_BUTTON;
 
 		root.set_menu_buttons_colors(cyan);
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
+
+		root.buttons[int(ingame_menu_button_type::STEAM)].colorize = white;
+		root.buttons[int(ingame_menu_button_type::DISCORD)].colorize = white;
+		root.buttons[int(ingame_menu_button_type::GITHUB)].colorize = white;
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {
 			const auto e = static_cast<ingame_menu_button_type>(i);

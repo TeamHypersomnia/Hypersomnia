@@ -2,16 +2,11 @@
 
 enum class main_menu_button_type {
 	// GEN INTROSPECTOR enum class main_menu_button_type
-#if !WEB_LOWEND
-	JOIN_DISCORD,
-	AVAILABLE_ON_GITHUB,
-#endif
-
-#if PLATFORM_WEB
-	DOWNLOAD_ON_STEAM,
-#endif
-	DOWNLOAD_MAPS,
+	STEAM,
+	DISCORD,
+	GITHUB,
 	QUICK_PLAY,
+	DOWNLOAD_MAPS,
 	BROWSE_SERVERS,
 	HOST_SERVER,
 #if !WEB_LOWEND

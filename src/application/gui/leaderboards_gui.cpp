@@ -154,7 +154,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 #if WEB_LOWEND
 	const auto menu_bottom_margin_v = 30.0f;
-	const auto w = std::min(1920/2.5f, screen_size.x/2.f);
+	const auto w = std::min(1920/2.5f, screen_size.x/2.5f);
 #else
 	const auto menu_bottom_margin_v = 70.0f;
 	const auto w = screen_size.x/2.5f;
@@ -444,11 +444,8 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		const auto avail_x = ImGui::GetContentRegionAvail().x;
 
-#if WEB_LOWEND
 #define MMR_label "MMR"
-#else
-#define MMR_label "MMR (OpenSkill)"
-#endif
+
 		const auto col0_w = ImGui::CalcTextSize("Place 99").x;
 		const auto col2_w = ImGui::CalcTextSize(MMR_label " 99999").x;
 		const auto col1_w = avail_x - col0_w - col2_w;

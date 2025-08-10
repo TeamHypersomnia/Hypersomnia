@@ -811,10 +811,12 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
+#if !WEB_LOWEND
 		const auto secs_ago = augs::date_time::secs_since_epoch() - s.meta.time_hosted;
 		text_disabled(augs::date_time::format_countdown_letters(secs_ago));
 
 		ImGui::NextColumn();
+#endif
 	}
 
 	scroll_once_to_selected = false;
@@ -1115,7 +1117,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			do_column("Event");
 			do_column("Arena");
 			do_column("Game mode");
+#if !WEB_LOWEND
 			do_column("Uptime");
+#endif
 
 			ImGui::Separator();
 		};

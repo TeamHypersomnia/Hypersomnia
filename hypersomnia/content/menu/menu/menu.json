@@ -1,69 +1,84 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2023-07-03 23:44:10.519497 UTC"
+        "version_timestamp": "2025-08-10 16:28:08.350301 UTC"
     },
     "about": {
         "author": "Pythagoras",
-        "welcome_message": ""
+        "short_description": "Underwater biotech lab is under attack.\nDon't let them lay hands on any expensive equipment."
     },
     "settings": {
         "default_server_mode": "quick_test",
-        "include_disabled_nodes": false,
-        "ambient_light_color": [0, 67, 90, 255]
+        "ambient_light_color": [0, 67, 90, 255],
+        "warmup_theme": {
+            "id": "arabesque"
+        }
     },
     "playtesting": {
         "mode": "quick_test"
     },
     "game_modes": {
+        "bomb_defusal": {
+            "warmup_time": 81,
+            "round_time": 100,
+            "warmup_equipment": {
+                "resistance": {
+                    "firearm": "bilmer2000"
+                }
+            }
+        },
+        "gun_game": {
+            "warmup_time": 81
+        },
         "quick_test": {
             "equipment": {
                 "metropolis": {
-                    "firearm": "awka",
-                    "melee": "cyan_scythe"
-                },
-                "resistance": {
-                    "firearm": null,
-                    "melee": null,
-                    "backpack": false,
-                    "electric_armor": true
+                    "firearm": "covert",
+                    "melee": "assault_rattle",
+                    "electric_armor": true,
+                    "haste_time": 600.0
                 }
             }
         }
     },
     "external_resources": [
         {
-            "path": "gfx/blanks/blank4.png",
-            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
-            "id": "@blank4",
-            "domain": "FOREGROUND",
-            "size": [1, 1],
-            "stretch_when_resized": true
+            "path": "gfx/aquarium/aquarium_pump.png",
+            "file_hash": "3eac2e64cd61240742e07dc819983893565b4140a739bae1178f18c3ea2ff651",
+            "id": "@aquarium_pump",
+            "domain": "PHYSICAL",
+            "size": [244, 119],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "is_static": true,
+                "density": 100.0,
+                "cover_background_neons": false
+            }
         },
         {
-            "path": "gfx/garden/bush.png",
-            "file_hash": "c2175c5d0915e83fe56616ce31a5b19257a4cb295d8158df90420dfac7062324",
-            "id": "@bush",
+            "path": "gfx/aquarium/generatorconnector.png",
+            "file_hash": "e4765400e269e4408a2ffdb3331e1be6ff5b26c3617dddd875954535f3fc30b2",
+            "id": "@generatorconnector",
             "neon_map": {
-                "standard_deviation": 9.0,
-                "amplification": 190.0,
-                "light_colors": [[133, 196, 112, 255], [127, 178, 109, 255], [115, 166, 101, 255], [108, 158, 93, 255], [91, 130, 80, 255], [114, 165, 100, 255], [112, 161, 98, 255]
+                "light_colors": [[48, 96, 130, 255], [136, 39, 39, 255]
                 ]
             },
-            "color": [255, 211, 105, 255],
-            "neon_color": [255, 255, 86, 212],
-            "size": [121, 121],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0
+            "size": [26, 35],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
         },
         {
-            "path": "gfx/garden/donic2.png",
-            "file_hash": "853b1fccf37395f29727bd0deb9308e7288e124257d7e092fe9d1ce072c6502d",
-            "id": "@donic2",
-            "neon_map": {
-                "light_colors": [[0, 211, 255, 255]
-                ]
-            },
-            "size": [272, 128],
+            "path": "gfx/aquarium/generatorconsole.png",
+            "file_hash": "03b463d03c84bd6ec1a7f4a84a1c33cde0787d1e46d95345b5660aff09a451e3",
+            "id": "@generatorconsole",
+            "size": [54, 192],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "custom_footstep": {
@@ -76,43 +91,17 @@
             }
         },
         {
-            "path": "gfx/garden/donicv2.png",
-            "file_hash": "22d30ca2311a08f44fca570fbcbdeb9776d92edcf34a2ec664cdf63cb87bef30",
-            "id": "@donicv2",
+            "path": "gfx/aquarium/generatorconsolelight.png",
+            "file_hash": "744629c9c1768e769b0ebec443ddba30c25d6a056c3530b734a9f17abf5459e1",
+            "id": "@generatorconsolelight",
             "neon_map": {
-                "amplification": 120.0,
-                "light_colors": [[0, 255, 0, 255], [0, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255]
                 ]
             },
-            "size": [518, 160],
+            "neon_color": [0, 255, 255, 255],
+            "size": [23, 174],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.4000000059604645
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/fern.png",
-            "file_hash": "1ac8d8c8d9a11dce236c6e5c2264d0aedf7d59427551f77544837ee599fadf08",
-            "id": "@fern",
-            "domain": "FOREGROUND",
-            "neon_map": {
-                "standard_deviation": 8.0,
-                "amplification": 140.0,
-                "light_colors": [[107, 219, 197, 255], [51, 166, 130, 255]
-                ]
-            },
-            "color": [255, 255, 106, 255],
-            "size": [126, 121],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "full_illumination": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -122,118 +111,423 @@
             }
         },
         {
-            "path": "gfx/garden/grass_1.png",
-            "file_hash": "6175d6eccd2f2c8d95dccc75189a821feb7da9f2953a9f5539269cd73c8ceb4c",
-            "id": "@grass_1",
-            "color": [255, 254, 254, 255],
-            "neon_color": [255, 255, 255, 212],
-            "size": [128, 128],
+            "path": "gfx/aquarium/generatorrightcab.png",
+            "file_hash": "3db5ec3001e9fc76e373761c8669efbef9bb61d28c44c1b9b30861d11573c7b9",
+            "id": "@generatorrightcab",
+            "neon_map": {
+                "standard_deviation": 7.0,
+                "amplification": 80.0,
+                "light_colors": [[153, 229, 80, 255], [206, 79, 0, 255], [251, 242, 54, 255], [144, 73, 25, 255], [55, 148, 110, 255], [160, 155, 35, 255], [160, 155, 35, 255]
+                ]
+            },
+            "size": [162, 178],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
+                        "pitch": 0.8999999761581421
                     },
-                    "walking_speed": 0.9399999976158142
+                    "walking_speed": 0.699999988079071
                 }
             }
         },
         {
-            "path": "gfx/garden/grass_2.png",
-            "file_hash": "65d723d28f8837e5a1de1b30064a28188814c1b7bcadc007b9537a7da43e8e16",
-            "id": "@grass_2",
-            "color": [255, 254, 254, 255],
-            "neon_color": [255, 255, 255, 212],
-            "size": [128, 128],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.8999999761581421
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/grass_dune_1.png",
-            "file_hash": "17db41626adf3ba75069323a748b32526fd841b76f77604b86d049776f93faf8",
-            "id": "@grass_dune_1",
-            "color": [255, 254, 254, 255],
-            "neon_color": [255, 255, 255, 212],
-            "size": [136, 110],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.8999999761581421
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/grass_dune_2.png",
-            "file_hash": "18dce67fa4468737edb9ea7c719be588dd5da28355ec3764f5be58b5c30758b4",
-            "id": "@grass_dune_2",
-            "color": [255, 254, 254, 255],
-            "neon_color": [255, 255, 255, 212],
-            "size": [137, 126],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.8999999761581421
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/kratka.png",
-            "file_hash": "66cec44e55bab8beaed67f6868f34051a5ff4ebac50c076573cf86b98ddacc99",
-            "id": "@kratka",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
+            "path": "gfx/blanks/blank7.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank7",
+            "color": [129, 129, 129, 0],
+            "neon_color": [129, 129, 129, 255],
             "size": [128, 32],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "pitch": 1.100000023841858,
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/blanks/blank8.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank8",
+            "color": [0, 67, 90, 0],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "cover_background_neons": true,
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/blanks/blank9.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank9",
+            "color": [0, 0, 0, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [1, 1],
+            "stretch_when_resized": true,
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
-                        "pitch": 0.800000011920929,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/blanks/blank10.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank10",
+            "domain": "PHYSICAL",
+            "color": [0, 255, 255, 255],
+            "neon_color": [255, 255, 254, 0],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "is_throw_through": true,
+                "density": 100.0,
+                "cover_background_neons": false
+            }
+        },
+        {
+            "path": "gfx/blanks/blank11.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank11",
+            "domain": "PHYSICAL",
+            "color": [175, 175, 175, 0],
+            "neon_color": [255, 254, 254, 255],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "is_static": true,
+                "density": 100.0,
+                "material": "vent",
+                "cover_background_neons": false,
+                "illuminate_like_wall": false
+            }
+        },
+        {
+            "path": "gfx/blanks/blank12.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank12",
+            "color": [129, 129, 129, 0],
+            "neon_color": [129, 129, 129, 255],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "pitch": 0.8500000238418579,
                         "id": "footstep_fence"
                     }
                 }
             }
         },
         {
-            "path": "gfx/garden/monstera.png",
-            "file_hash": "7ce3aa85907930464331868ac27cac89ecb887bf866fbd88a0b7c146e401445e",
-            "id": "@monstera",
+            "path": "gfx/decorations/electronics/noweustrojstwo.png",
+            "file_hash": "618d2981ec1e77bf151303b1d3f2ece06944c891296b5b5d2d0f3a91bf92acfb",
+            "id": "@noweustrojstwo",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[155, 203, 63, 255], [126, 188, 229, 255], [193, 73, 147, 255], [121, 148, 172, 255], [45, 87, 125, 255]
+                ]
+            },
+            "size": [212, 196],
+            "stretch_when_resized": true,
+            "color_wave_speed": 0.05000000074505806,
+            "OFF_rotate_continuously_degrees_per_sec": 197.0,
+            "as_physical": {
+                "is_static": true,
+                "density": 5.5,
+                "bounciness": 0.800000011920929,
+                "custom_shape": {
+                    "source_polygon": [[-105.0, -59.0], [-87.0, -98.0], [-37.0, -98.0], [-2.0, -77.0], [52.0, -63.0], [59.0, -67.0], [75.0, -68.0], [105.0, -38.0], [105.0, 38.0], [75.0, 68.0], [60.0, 68.0], [53.0, 64.0], [-1.0, 78.0], [-36.0, 97.0], [-86.0, 97.0], [-106.0, 58.0]
+                    ],
+                    "convex_partition": [
+                        15,
+                        0,
+                        1,
+                        2,
+                        3,
+                        12,
+                        13,
+                        14,
+                        15,
+                        12,
+                        3,
+                        4,
+                        11,
+                        12,
+                        11,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11
+                    ]
+                }
+            }
+        },
+        {
+            "path": "gfx/decorations/electronics/ustrojstwo_grid.png",
+            "file_hash": "b58d4c84b43610b20f79c60581108e61599cba194305520b41f2b1976d712947",
+            "id": "@ustrojstwo_grid",
+            "domain": "FOREGROUND",
+            "size": [106, 106],
+            "color_wave_speed": 1.0,
+            "rotate_continuously_degrees_per_sec": 360.0
+        },
+        {
+            "path": "gfx/decorations/fotel.png",
+            "file_hash": "adce7524885cb25f9dfaa62ccef1f9e6c9aa5bc686e68816e79ac6423d058682",
+            "id": "@fotel",
+            "neon_map": {
+                "standard_deviation": 7.0,
+                "amplification": 120.0,
+                "light_colors": [[95, 205, 228, 255], [95, 205, 228, 255], [18, 214, 255, 255], [91, 114, 135, 255]
+                ]
+            },
+            "size": [118, 92],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "OFF_neon_alpha_vibration": {
+                "change_per_second": 30.0,
+                "lower": 220
+            },
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    },
+                    "walking_speed": 0.5
+                }
+            }
+        },
+        {
+            "path": "gfx/decorations/garden.png",
+            "file_hash": "902c0218f42f3dc333205b309381aa401d9af3f43ac0955a47e4a64ccc0bae5a",
+            "id": "@garden",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "light_colors": [[75, 255, 0, 255]
+                ]
+            },
+            "size": [152, 36],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
+            "path": "gfx/decorations/rc.png",
+            "file_hash": "32c513dcafcd345bb98f5334844ba330c4dfe046226e4bb8a36b8df00edc6720",
+            "id": "@rc",
             "domain": "FOREGROUND",
             "neon_map": {
                 "standard_deviation": 8.0,
-                "radius": [
-                    100,
-                    100
-                ],
-                "amplification": 140.0,
-                "light_colors": [[212, 248, 110, 255], [129, 165, 35, 255]
+                "amplification": 120.0,
+                "light_colors": [[255, 255, 0, 255]
                 ]
             },
-            "color": [132, 255, 200, 255],
-            "neon_color": [129, 255, 209, 255],
-            "size": [136, 154],
+            "size": [152, 36],
+            "stretch_when_resized": true,
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
+            "path": "gfx/decorations/szkicstracja2.png",
+            "file_hash": "fe0298bb7e4ce3d0d684361a9b3837cee1bc5ce64a7ece0e401bac917a250c3b",
+            "id": "@szkicstracja2",
+            "neon_map": {
+                "light_colors": [[99, 155, 255, 255], [249, 0, 255, 255]
+                ]
+            },
+            "color": [255, 255, 223, 255],
+            "size": [178, 180],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "illuminate_like_wall": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/floor_connectors/floor_connector_2.png",
+            "file_hash": "c81fcc7259e67a70f06decb61d238e5831063e0023a362c902cc0c689e1c3ca6",
+            "id": "@floor_connector_2",
+            "neon_map": {},
+            "size": [128, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/floors/neteee.png",
+            "file_hash": "bbbc3583938871a903c442b6981a2776c76cee72eae36f96e5c05cf10cee13e4",
+            "id": "@neteee",
+            "neon_map": {
+                "light_colors": [[0, 255, 233, 255]
+                ]
+            },
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/floors/tile1.png",
+            "file_hash": "90598cf795877bcf3c3c5de9a99a29bd916c3c095718b94ed0dd1306d4919cc6",
+            "id": "@tile1",
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/floors/water_room_floor_2.png",
+            "file_hash": "9d7d4e14d04d6bda52e7c7b59ed0f177caadf5e3a486fde33f1fce82883e0826",
+            "id": "@water_room_floor_2",
+            "color": [255, 132, 132, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [64, 64],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/generator/generatorleftcab.png",
+            "file_hash": "b9921b5ae7b48ab395ae4ccd46300568b85711a058d262c8707680dfabfdb4d0",
+            "id": "@generatorleftcab",
+            "neon_map": {
+                "standard_deviation": 7.0,
+                "amplification": 80.0,
+                "light_colors": [[153, 229, 80, 255], [206, 79, 0, 255], [251, 242, 54, 255], [144, 73, 25, 255], [55, 148, 110, 255], [160, 155, 35, 255], [160, 155, 35, 255]
+                ]
+            },
+            "size": [249, 385],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    },
+                    "walking_speed": 0.699999988079071
+                }
+            }
+        },
+        {
+            "path": "gfx/generator/generatormainpart.png",
+            "file_hash": "b533c3f32029ed9648cccb693d14dc7a67a016b3324b3721bde0ce2b0734747c",
+            "id": "@generatormainpart",
+            "domain": "PHYSICAL",
+            "size": [540, 450],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "is_static": true,
+                "density": 5.5,
+                "bounciness": 0.800000011920929,
+                "cover_background_neons": false,
+                "custom_shape": {
+                    "source_polygon": [[-267.0, -136.0], [-86.0, -137.0], [38.0, -177.0], [133.0, -144.0], [181.0, -117.0], [253.0, -117.0], [269.0, -20.0], [253.0, 86.0], [182.0, 85.0], [133.0, 112.0], [37.0, 145.0], [-87.0, 104.0], [-267.0, 105.0]
+                    ],
+                    "convex_partition": [
+                        11,
+                        12,
+                        0,
+                        1,
+                        11,
+                        6,
+                        7,
+                        8,
+                        4,
+                        5,
+                        6,
+                        9,
+                        10,
+                        11,
+                        1,
+                        2,
+                        3,
+                        4,
+                        8,
+                        9
+                    ]
+                }
+            }
+        },
+        {
+            "path": "gfx/generator/generatormainpartlight.png",
+            "file_hash": "3b70e060e0a059b6b7533620940993ce10e04ead1d7dfe2c289b34d708ec64b3",
+            "id": "@generatormainpartlight",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [83, 255, 255, 255],
+            "neon_color": [255, 255, 253, 255],
+            "size": [215, 293],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "neon_alpha_vibration": {
+                "change_per_second": 99.0,
+                "lower": 174
+            },
             "as_nonphysical": {
                 "full_illumination": true,
                 "custom_footstep": {
@@ -245,60 +539,215 @@
             }
         },
         {
-            "path": "gfx/garden/monstera_donica.png",
-            "file_hash": "3d25cb4a690e2b5c8d79e9d414c28dc8203eafd7c3cb869bbf3d00c64d262191",
-            "id": "@monstera_donica",
+            "path": "gfx/generator/generatorpart1.png",
+            "file_hash": "74f05679f9c33af4dbf88333710ec7459630a70098fbf900240d4266a01ac0d9",
+            "id": "@generatorpart1",
             "neon_map": {
-                "standard_deviation": 8.0,
-                "amplification": 220.0,
-                "alpha_multiplier": 0.699999988079071,
-                "light_colors": [[210, 121, 121, 255], [198, 85, 85, 255], [116, 108, 109, 255], [38, 32, 32, 255]
+                "light_colors": [[255, 255, 255, 255]
                 ]
             },
-            "size": [96, 96],
+            "neon_color": [0, 0, 255, 255],
+            "size": [410, 129],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "neon_alpha_vibration": {},
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/lab_wall.png",
+            "file_hash": "383b53ebdd3d55a3a5cdfedc79f41bc1655923b4cc73a3c69690326173eb5a89",
+            "id": "@lab_wall",
+            "domain": "FOREGROUND",
+            "size": [128, 32],
             "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "cover_background_neons": true,
+                "illuminate_like_wall": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/lab_wall_a2.png",
+            "file_hash": "76e61c7e932dee1f70df85fb181e9cb42fd8d27f8a031a29b2df2c65a3b44ef9",
+            "id": "@lab_wall_a2",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "standard_deviation": 5.0,
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "size": [128, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0
+        },
+        {
+            "path": "gfx/lab_wall_corner_cut_foreground.png",
+            "file_hash": "cd06cbaa10b86a87d54e2d9cc8cfbc74cac8a76dc1bf9e57e192913e52cad76b",
+            "id": "@lab_wall_corner_cut_foreground",
+            "domain": "FOREGROUND",
+            "size": [32, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "illuminate_like_wall": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/lab_wall_corner_square.png",
+            "file_hash": "b9278788be1e0efdc73d8a2301e405ca374e4c2051ca85d425477d72e52eed31",
+            "id": "@lab_wall_corner_square",
+            "domain": "FOREGROUND",
+            "size": [32, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "illuminate_like_wall": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/lab_wall_corner_square_2.png",
+            "file_hash": "e4941805c5e0e77e5f6c5a9eaf4d51fe459fea25bd86e8c7b3e024179c021845",
+            "id": "@lab_wall_corner_square_2",
+            "domain": "FOREGROUND",
+            "size": [32, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "illuminate_like_wall": true,
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/lab_wall_smooth_end.png",
+            "file_hash": "01c79fa2062798313835d4fb2aad4e891802c65f0f3e33539015c7d74ed9a361",
+            "id": "@lab_wall_smooth_end",
+            "domain": "FOREGROUND",
+            "size": [46, 32],
+            "as_nonphysical": {
+                "illuminate_like_wall": true
+            }
+        },
+        {
+            "path": "gfx/obstacles/steel_crate.png",
+            "file_hash": "ac18db3b8941e28dabf2faa3c0bd8c7c7d8201544ac762f16dc5e147c3973e2f",
+            "id": "@steel_crate",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "standard_deviation": 9.0,
+                "amplification": 80.0,
+                "light_colors": [[0, 234, 255, 255]
+                ]
+            },
+            "size": [128, 128],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "density": 4.0,
+                "bounciness": 0.800000011920929,
+                "custom_shape": {
+                    "source_polygon": [[-64.0, 50.0], [-56.0, 34.0], [-56.0, -36.0], [-63.0, -50.0], [-51.0, -64.0], [-1.0, -38.0], [50.0, -64.0], [63.0, -51.0], [56.0, -35.0], [56.0, 34.0], [63.0, 50.0], [50.0, 63.0], [0.0, 38.0], [-52.0, 63.0]
+                    ],
+                    "convex_partition": [
+                        3,
+                        4,
+                        5,
+                        2,
+                        3,
+                        12,
+                        1,
+                        2,
+                        5,
+                        8,
+                        9,
+                        12,
+                        12,
+                        13,
+                        0,
+                        1,
+                        12,
+                        5,
+                        6,
+                        7,
+                        8,
+                        5,
+                        11,
+                        12,
+                        9,
+                        10,
+                        11
+                    ]
+                }
+            }
+        },
+        {
+            "path": "gfx/obstacles/violet_box.png",
+            "file_hash": "639d683b727d53b72e7e3b8db4756cd65273626e6fc0c7dbc93db00d641ad053",
+            "id": "@violet_box",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[96, 225, 1, 255], [35, 211, 213, 255], [35, 211, 213, 255], [32, 90, 77, 255]
+                ]
+            },
+            "size": [128, 128],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_physical": {
+                "density": 1.0,
+                "bounciness": 0.800000011920929
+            }
+        },
+        {
+            "path": "gfx/obstacles/yellow_barrier.png",
+            "file_hash": "476d3f37c8629632a11f7b5102840f4e54629ab285299588ce8550538ee0d177",
+            "id": "@yellow_barrier",
+            "neon_map": {
+                "light_colors": [[232, 199, 65, 255]
+                ]
+            },
+            "size": [32, 128],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.699999988079071
+                        "pitch": 0.8999999761581421
+                    }
                 }
             }
         },
         {
-            "path": "gfx/garden/orange_flowerpot.png",
-            "file_hash": "97dc12901c389a466551f1ba598b14706d72c4bddbe24b6c885cbc95da6124f2",
-            "id": "@orange_flowerpot",
+            "path": "gfx/pale_cyan_floor/pale_cyan_floor_1.png",
+            "file_hash": "ae0b55b4b5618660c96384d743f415f8604bc83a957f1e3139da7d6a7f5150a2",
+            "id": "@pale_cyan_floor_1",
             "neon_map": {
-                "standard_deviation": 8.0,
-                "amplification": 220.0,
-                "alpha_multiplier": 0.5,
-                "light_colors": [[255, 185, 38, 255], [61, 39, 28, 255]
+                "light_colors": [[28, 255, 246, 255]
                 ]
             },
-            "size": [84, 84],
-            "stretch_when_resized": true,
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_dirt"
-                    },
-                    "walking_speed": 0.699999988079071
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement.png",
-            "file_hash": "81de681ab55711a1b704e642c52d35d2aa379049a289ce8e6789b65d1c4f63d3",
-            "id": "@stone_pavement",
-            "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
             "size": [128, 128],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -306,2784 +755,1570 @@
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
+                        "pitch": 0.8999999761581421
                     }
                 }
             }
         },
         {
-            "path": "gfx/garden/stone_pavement_bottom.png",
-            "file_hash": "ee30bf0ee6a7b29e387b01548e62216136f5e8696687a5fc451b7eff5b81fe64",
-            "id": "@stone_pavement_bottom",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [128, 22],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_bottom_right.png",
-            "file_hash": "f7b98b2febe51505f4cfb917d9d182c0706cb3a80d70ddd87c40eff94155498e",
-            "id": "@stone_pavement_bottom_right",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [14, 10],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_left.png",
-            "file_hash": "c85e4b18c8cd90ddecbe2974f98e23ef779bee6b320d99ffc42e3fb18131c019",
-            "id": "@stone_pavement_left",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [27, 128],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_right.png",
-            "file_hash": "e6dfa1ddcfbfa6f14cf7fce3d750e5e2a645b620721034f12abdc9fe46ceeb7c",
-            "id": "@stone_pavement_right",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [24, 128],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_top.png",
-            "file_hash": "bee9dc49f444ef59d8df6d129486dde1fd1895a893db1eeb55ef7764973ee673",
-            "id": "@stone_pavement_top",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [128, 32],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_top_left.png",
-            "file_hash": "11380283c92a15a7ddedc397146aa4981d57a29f81d7221e6e8f159d2ae5b47e",
-            "id": "@stone_pavement_top_left",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [14, 15],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/garden/stone_pavement_top_right.png",
-            "file_hash": "c6c626d99367ed6d2ac63ad781975a2b01ddb8b87e7b91d97dec4014f559e70c",
-            "id": "@stone_pavement_top_right",
-            "color": [255, 255, 162, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [20, 15],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421,
-                        "id": "footstep_standard"
-                    }
-                }
-            }
-        },
-        {
-            "path": "menu_game_logo.png",
-            "file_hash": "421db1f8f65dcf1008fd1ad1cb1e2593eaa75531dd7d5030f49104416561d794",
-            "id": "@menu_game_logo",
-            "domain": "FOREGROUND",
+            "path": "gfx/sub/sub_chair_brown.png",
+            "file_hash": "6e9534f9908d80dc52a480217f4a6500d4d59260636bf1bfefb9f7a1fc55ac2b",
+            "id": "@sub_chair_brown",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "standard_deviation": 8.0,
+                "amplification": 350.0,
+                "light_colors": [[85, 72, 72, 255], [128, 51, 51, 255], [85, 72, 72, 255], [58, 47, 47, 255]
                 ]
             },
-            "color": [225, 254, 225, 255],
-            "neon_color": [0, 255, 32, 255],
-            "size": [585, 104],
+            "size": [78, 48],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
-                "full_illumination": true
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    },
+                    "walking_speed": 0.6000000238418579
+                }
             }
         },
         {
-            "path": "sfx/garden_ambience.ogg",
-            "file_hash": "9d78d3277628418a8b205970fd79a0d8d79814fa1158cb5d3462823f0bc06e38",
-            "id": "@garden_ambience",
-            "spatialize": false,
-            "loop": true
+            "path": "gfx/warning_line/warning_line.png",
+            "file_hash": "b8a25c02bf96c7247da78e090f475ce1e22cbb2a67e2adf9c8b0877d86b8c308",
+            "id": "@warning_line",
+            "neon_map": {
+                "light_colors": [[213, 167, 56, 255], [212, 196, 80, 255]
+                ]
+            },
+            "size": [128, 33],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/warning_line/warning_line_corner.png",
+            "file_hash": "2c482e04e9ffcf4bbff1dd93952196d9866de16e1fb40c5237e51545ee395884",
+            "id": "@warning_line_corner",
+            "neon_map": {
+                "light_colors": [[213, 167, 56, 255], [212, 196, 80, 255]
+                ]
+            },
+            "size": [90, 90],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/water_room_floor.png",
+            "file_hash": "67c17418dc25e164ebf0265d50490fd9388da8ff0e37ae4d7838b2a9d8a4b7ed",
+            "id": "@water_room_floor",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "amplification": 10.0,
+                "light_colors": [[95, 205, 228, 255]
+                ]
+            },
+            "neon_color": [255, 255, 255, 106],
+            "size": [64, 64],
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "id": "footstep_floor"
+                    }
+                }
+            }
         }
     ],
     "layers": [
         {
-            "id": "Layer 5",
-            "nodes": [
-                "menu_game_logo"
-            ]
-        },
-        {
-            "id": "Layer 11",
-            "nodes": [
-                "mota (4)",
-                "mota (3)",
-                "mota (6)",
-                "mota (5)",
-                "mota (2)",
-                "mota (1)",
-                "mota",
-                "Mota (5)",
-                "Mota (9)",
-                "Mota (8)",
-                "Mota (7)",
-                "Mota (6)",
-                "Mota (4)",
-                "Mota (10)",
-                "Mota (3)",
-                "Mota (2)",
-                "Mota (1)",
-                "Mota"
-            ]
-        },
-        {
-            "id": "Layer 14",
-            "nodes": [
-                "cicada (15)",
-                "cicada (14)",
-                "cicada (13)",
-                "cicada (12)",
-                "cicada (11)",
-                "cicada (10)",
-                "cicada (9)",
-                "cicada (8)",
-                "cicada (7)",
-                "cicada (18)",
-                "cicada (17)",
-                "cicada (16)",
-                "cicada (6)",
-                "cicada (5)",
-                "cicada (4)",
-                "cicada (3)",
-                "cicada (2)",
-                "cicada (1)",
-                "cicada"
-            ]
-        },
-        {
-            "id": "Layer 4",
+            "id": "colliders",
             "is_open_in_editor": false,
-            "nodes": [
-                "crate (5)",
-                "crate (4)",
-                "crate (3)",
-                "crate (2)",
-                "crate (1)",
-                "crate"
-            ]
-        },
-        {
-            "id": "Layer 3",
-            "is_open_in_editor": false,
-            "nodes": [
-                "portal_circle"
-            ]
-        },
-        {
-            "id": "Layer 1",
-            "is_open_in_editor": false,
-            "nodes": [
-                "Wandering pixels (16)",
-                "Wandering pixels (6)",
-                "monstera_donica (7)",
-                "monstera_donica (6)",
-                "monstera_donica (23)",
-                "monstera_donica (22)",
-                "monstera_donica (21)",
-                "monstera_donica (20)",
-                "monstera_donica (4)",
-                "Monstera (16)",
-                "Monstera",
-                "Monstera (17)",
-                "Monstera (10)",
-                "Grass dune 2 (11)",
-                "Monstera (18)",
-                "Monstera (9)"
-            ]
-        },
-        {
-            "id": "Layer 13",
-            "is_open_in_editor": false,
-            "nodes": [
-                "garden_ambience"
-            ]
-        },
-        {
-            "id": "Layer 12",
+            "opacity": 0.0,
             "nodes": [
                 "spawn"
             ]
         },
         {
-            "id": "Layer 9",
+            "id": "walle a2",
             "nodes": [
-                "donic2-up-up (1)",
-                "donic2-up-up",
-                "donic2-up",
-                "donic2"
-            ]
-        },
-        {
-            "id": "garden lights",
-            "is_open_in_editor": false,
-            "nodes": [
-                "Strong lamp (2)",
-                "Strong lamp (31)",
-                "Strong lamp (32)",
-                "Strong lamp (33)",
-                "Strong lamp (35)"
+                "Lab wall a2",
+                "Lab wall a2 (12)"
             ]
         },
         {
             "id": "New layer",
             "nodes": [
-                "Wandering pixels",
-                "Wandering pixels (1)",
-                "Wandering pixels (17)",
-                "Wandering pixels (3)",
-                "Wandering pixels (4)",
-                "Wandering pixels (15)",
-                "flower_cyan (15)",
-                "flower_cyan (14)",
-                "flower_cyan (13)",
-                "flower_cyan (17)",
-                "flower_cyan (16)",
-                "flower_cyan (12)",
-                "flower_cyan (11)",
-                "Wandering pixels (10)",
-                "Wandering pixels (2)",
-                "Wandering pixels (5)",
-                "Wandering pixels (9)",
-                "Wandering pixels (7)",
-                "Wandering pixels (11)",
-                "Wandering pixels (14)",
-                "Wandering pixels (13)",
-                "Wandering pixels (12)",
-                "Wandering pixels (8)",
-                "Organism area",
-                "Monstera (12)",
-                "Fern (26)",
-                "Fern (27)",
-                "Fern (25)",
-                "Fern (24)",
-                "Fern (23)",
-                "donicv2 (1)",
-                "Fern (14)",
-                "Monstera (14)",
-                "Monstera (13)",
-                "Monstera (11)",
-                "Monstera (8)",
-                "Monstera (19)",
-                "Monstera (2)",
-                "Monstera (1)",
-                "Monstera (15)",
-                "Monstera (3)",
-                "monstera_donica (10)",
-                "monstera_donica (9)",
-                "monstera_donica (8)",
-                "monstera_donica (5)",
-                "monstera_donica (3)",
-                "monstera_donica (24)",
-                "monstera_donica (2)",
-                "monstera_donica (1)",
-                "monstera_donica",
-                "orange_flowerpot (2)",
-                "orange_flowerpot (9)",
-                "orange_flowerpot (1)",
-                "orange_flowerpot",
-                "Monstera (4)",
-                "monstera_donica (17)",
-                "monstera_donica (16)",
-                "monstera_donica (15)",
-                "monstera_donica (18)-up-right-up",
-                "Fern (32)-up-right-up",
-                "monstera_donica (18)-up-right",
-                "Fern (32)-up-right",
-                "monstera_donica (18)-up",
-                "Fern (32)-up",
-                "monstera_donica (18)",
-                "Fern (32)",
-                "monstera_donica (14)",
-                "monstera_donica (13)",
-                "monstera_donica (12)",
-                "Fern",
-                "Fern (2)",
-                "Fern (1)",
-                "Fern (31)",
-                "Fern (30)",
-                "Fern (29)",
-                "Fern (28)",
-                "Fern (3)",
-                "Monstera (5)",
-                "Monstera (20)",
-                "Monstera (6)",
-                "Monstera (7)",
-                "Fern (16)",
-                "Fern (13)",
-                "Fern (19)",
-                "orange_flowerpot (8)",
-                "Fern (20)",
-                "Fern (22)",
-                "Fern (21)",
-                "Fern (17)",
-                "Fern (15)",
-                "Fern (11)",
-                "Fern (10)",
-                "flower_pink (7)",
-                "flower_pink (6)",
-                "flower_pink (5)",
-                "flower_pink (4)",
-                "flower_pink (3)",
-                "flower_pink (2)",
-                "flower_pink (1)",
-                "flower_cyan (8)",
-                "flower_cyan (18)",
-                "flower_cyan (19)",
-                "flower_cyan (7)",
-                "flower_cyan (6)",
-                "flower_cyan (9)",
-                "flower_cyan (10)",
-                "flower_cyan (5)",
-                "flower_cyan (4)",
-                "flower_cyan (3)",
-                "flower_cyan (2)",
-                "flower_cyan (1)",
-                "flower_cyan",
-                "donicv2",
-                "orange_flowerpot (7)",
-                "orange_flowerpot (6)",
-                "orange_flowerpot (5)",
-                "orange_flowerpot (4)",
-                "flower_pink (8)",
-                "flower_pink",
-                "monstera_donica (11)",
-                "Fern (12)",
-                "Fern (9)",
-                "Fern (6)",
-                "Fern (8)",
-                "Fern (7)",
-                "Fern (5)",
-                "Fern (4)",
-                "Bush (4)",
-                "Bush (3)",
-                "Grass dune 1 (1)",
-                "Grass dune 2",
-                "Grass dune 1 (17)",
-                "Grass dune 2 (20)",
-                "Grass dune 2 (19)",
-                "Grass dune 1 (3)",
-                "Grass dune 2 (1)",
-                "Grass dune 2 (2)",
-                "Grass dune 2 (3)",
-                "Grass dune 2 (4)",
-                "Grass dune 1 (4)",
-                "Grass dune 2 (21)",
-                "Grass dune 2 (5)",
-                "Grass dune 2 (6)",
-                "Grass dune 2 (7)",
-                "Grass dune 2 (8)",
-                "Grass dune 1 (5)",
-                "Grass dune 2 (9)",
-                "Grass dune 2 (10)",
-                "Grass dune 2 (12)",
-                "Grass dune 1 (6)",
-                "Grass dune 1 (7)",
-                "Grass dune 1 (8)",
-                "Grass dune 1 (9)",
-                "Grass dune 1 (10)",
-                "Grass dune 2 (13)",
-                "Grass dune 1 (11)",
-                "Grass dune 1 (12)",
-                "Grass dune 1 (13)",
-                "Grass dune 1 (21)",
-                "Grass dune 1 (20)",
-                "Orange flowerpot (12)-up (2)",
-                "Grass dune 1 (19)",
-                "Grass dune 1 (18)",
-                "Orange flowerpot (12)-up (1)",
-                "Grass dune 1 (14)",
-                "Grass dune 1 (15)",
-                "Grass dune 2 (14)",
-                "Grass dune 2 (15)",
-                "Grass dune 2 (16)",
-                "Grass dune 2 (17)",
-                "Grass dune 2 (18)",
-                "Grass dune 1 (16)",
-                "monstera_donica (19)",
-                "bush (6)",
-                "bush (10)",
-                "bush (9)",
-                "bush (5)",
-                "bush (4)",
-                "bush (13)",
-                "bush (12)",
-                "bush (3)",
-                "bush",
-                "bush (14)",
-                "bush (2)",
-                "bush (1)",
-                "bush (8)",
-                "bush (11)",
-                "bush (7)",
-                "Kratka (1)",
-                "Orange flowerpot (12)-up",
-                "Grass dune 1",
-                "Kratka (4)",
-                "Grass dune 1 (2)",
-                "Stone pavement top",
-                "Stone pavement top (7)",
-                "Stone pavement bottom (6)",
-                "Stone pavement (13)",
-                "Stone pavement (12)",
-                "Stone pavement left (7)",
-                "Stone pavement right (5)",
-                "Stone pavement bottom right (1)",
-                "Stone pavement bottom (5)",
-                "Stone pavement top (6)",
-                "Stone pavement bottom (4)",
-                "Stone pavement top right (1)",
-                "Stone pavement top right",
-                "Stone pavement top (8)-down",
-                "Stone pavement top (8)",
-                "Stone pavement top (5)",
-                "Stone pavement right (4)",
-                "Stone pavement bottom (3)",
-                "Stone pavement left (6)",
-                "Stone pavement bottom (2)",
-                "Stone pavement top (4)",
-                "Stone pavement left (5)",
-                "Stone pavement top (3)",
-                "Stone pavement left (4)",
-                "Stone pavement left (3)",
-                "Stone pavement right (7)",
-                "Stone pavement right (6)",
-                "Stone pavement right (3)",
-                "Stone pavement right (2)",
-                "Stone pavement bottom (1)",
-                "Stone pavement left (2)",
-                "Stone pavement left (1)",
-                "Stone pavement left",
-                "Stone pavement bottom right",
-                "Stone pavement top (2)-left",
-                "Stone pavement top (2)",
-                "Stone pavement right (1)",
-                "Stone pavement top (1)",
-                "Stone pavement top left",
-                "Stone pavement right",
-                "Stone pavement bottom",
-                "Stone pavement (10)",
-                "Stone pavement (11)",
-                "Stone pavement (9)",
-                "Stone pavement (8)",
-                "Stone pavement (7)",
-                "Stone pavement",
-                "Stone pavement (6)",
-                "Stone pavement (5)",
-                "wandering_smoke (1)",
-                "Stone pavement (4)",
-                "Stone pavement (3)",
-                "Stone pavement (2)",
-                "Stone pavement (1)",
-                "Grass 1",
-                "Grass 1 (2)",
-                "Grass 1 (3)",
-                "Grass 1 (4)",
-                "Grass 1 (5)",
-                "Grass 1 (1)",
-                "Grass 1 (6)",
-                "Strong lamp",
-                "Strong lamp (34)"
+                "Wandering smoke (2)",
+                "Wandering smoke (3)",
+                "Wandering smoke (4)",
+                "Wandering smoke (7)",
+                "Bombsite c",
+                "GeneratorMAINPARTlight",
+                "Rc (1)",
+                "Rc",
+                "Rc (5)",
+                "Ustrojstwo grid",
+                "Garden (1)",
+                "Lab wall corner square 2 (7)",
+                "Lab wall corner square 2 (8)",
+                "Lab wall corner square (54)",
+                "Lab wall corner square (55)",
+                "Lab wall corner square (28)",
+                "Lab wall corner square (29)",
+                "Lab wall corner square (53)",
+                "Lab wall corner square 2 (3)",
+                "Lab wall corner square (56)",
+                "Lab wall corner square 2 (4)",
+                "Lab wall corner square 2 (5)",
+                "Lab wall corner square (57)",
+                "Lab wall corner square (52)",
+                "Lab wall corner square 2 (6)",
+                "Lab wall corner square (51)",
+                "Lab wall corner square (50)",
+                "Lab wall corner square (49)",
+                "Lab wall corner square (12)",
+                "Lab wall corner square (42)",
+                "Lab wall corner square (43)",
+                "Lab wall corner square (44)",
+                "Lab wall corner square (45)",
+                "Lab wall corner square (46)",
+                "Lab wall corner square (47)",
+                "Lab wall corner square (48)",
+                "Violet box (1)",
+                "Noweustrojstwo",
+                "Violet box (11)",
+                "Violet box (10)",
+                "Steel crate (2)",
+                "Violet box (9)",
+                "Violet box (8)",
+                "Steel crate (1)",
+                "Steel crate",
+                "Lab wall (135)",
+                "Lab wall (134)",
+                "Lab wall (133)",
+                "Lab wall (136)",
+                "Lab wall (137)",
+                "Lab wall (138)",
+                "Lab wall (139)",
+                "Lab wall (140)",
+                "Lab wall (132)",
+                "Lab wall (131)",
+                "Lab wall (141)",
+                "Lab wall (130)",
+                "Lab wall (129)",
+                "Lab wall (128)",
+                "Lab wall (127)",
+                "Lab wall (126)",
+                "Lab wall (125)",
+                "Lab wall corner cut",
+                "Lab wall (124)",
+                "Lab wall (123)",
+                "Aquarium pump",
+                "Lab wall (122)",
+                "Lab wall corner cut (1)",
+                "Lab wall (121)",
+                "Lab wall (120)",
+                "Lab wall corner cut (2)",
+                "Lab wall (84)",
+                "Lab wall corner cut (64)",
+                "Lab wall (105)",
+                "Lab wall (104)",
+                "Lab wall (103)",
+                "Lab wall (102)",
+                "Lab wall smooth end (5)",
+                "Lab wall (100)",
+                "Lab wall (6)",
+                "Szkicstracja2",
+                "Lab wall corner cut foreground",
+                "Lab wall (36)",
+                "Lab wall (37)",
+                "GeneratorMAINPART",
+                "Floor neon overlay (17)",
+                "Floor neon overlay (5)",
+                "Floor neon overlay (18)",
+                "Yellow barrier",
+                "Yellow barrier (1)",
+                "GeneratorCONNECTOR (3)",
+                "GeneratorCONNECTOR (4)",
+                "GeneratorRIGHTCAB (1)",
+                "GeneratorCONNECTOR (5)",
+                "GeneratorCONNECTOR (6)",
+                "GeneratorCONNECTOR (7)",
+                "GeneratorCONNECTOR (8)",
+                "GeneratorLEFTCAB",
+                "GeneratorCONNECTOR (9)",
+                "GeneratorCONNECTOR (10)",
+                "GeneratorCONNECTOR (11)",
+                "GeneratorCONNECTOR (12)",
+                "GeneratorCONNECTOR (13)",
+                "GeneratorCONNECTOR (14)",
+                "GeneratorCONSOLElight (3)",
+                "Fotel (9)",
+                "Fotel (8)",
+                "Rotating fan-on-floor (1)",
+                "Fotel (3)",
+                "Fotel (4)",
+                "Fotel",
+                "Fotel (1)",
+                "Console light (7)",
+                "Warning line corner",
+                "Warning line",
+                "Console light (5)",
+                "Console light (4)",
+                "Console light (3)",
+                "Console light (1)",
+                "Console light",
+                "Floor connector 2 (1)",
+                "Warning line (2)",
+                "GeneratorCONSOLE (1)",
+                "black on floor (2)",
+                "GeneratorPART1 (1)-left",
+                "GeneratorPART1 (1)",
+                "black on floor (1)",
+                "Warning line (1)",
+                "Pale cyan floor 1 (13)",
+                "Water room floor 2",
+                "Water room floor-brighter",
+                "Water room floor 2 (1)",
+                "Water room floor 2 (2)",
+                "Water room floor 2 (3)",
+                "Water room floor-brighter (1)",
+                "Water room floor 2 (4)",
+                "Water room floor 2 (5)",
+                "Water room floor-brighter (2)",
+                "Water room floor 2 (6)",
+                "Water room floor-brighter (3)",
+                "Water room floor 2 (7)",
+                "Water room floor 2 (8)",
+                "Water room floor-brighter (4)",
+                "Water room floor-brighter (5)",
+                "Water room floor-brighter (6)",
+                "Water room floor 2 (9)",
+                "Water room floor 2 (10)",
+                "Water room floor-brighter (7)",
+                "Water room floor 2 (11)",
+                "Water room floor 2 (12)",
+                "Water room floor 2 (13)",
+                "Water room floor 2 (14)",
+                "Water room floor 2 (15)",
+                "Water room floor 2 (16)",
+                "Water room floor 2 (17)",
+                "Water room floor-brighter (8)",
+                "Water room floor-brighter (9)",
+                "Water room floor-brighter (10)",
+                "Water room floor-brighter (11)",
+                "Water room floor-brighter (12)",
+                "Water room floor 2 (18)",
+                "Water room floor-brighter (13)",
+                "Water room floor-brighter (14)",
+                "Water room floor 2 (19)",
+                "Water room floor 2 (20)",
+                "Water room floor 2 (21)",
+                "Water room floor-brighter (15)",
+                "Water room floor 2 (22)",
+                "Neteee (2)",
+                "Tile1 (1)",
+                "Tile1",
+                "Strong lamp (39)",
+                "Strong lamp (7)",
+                "Strong lamp (42)",
+                "Strong lamp (44)",
+                "Strong lamp (45)",
+                "Strong lamp (46)",
+                "Strong lamp (43)",
+                "Strong lamp (3)",
+                "Strong lamp (40)"
             ]
         }
     ],
     "nodes": [
         {
-            "id": "Monstera (12)",
-            "type": "@monstera",
-            "pos": [3308.0, -355.0],
+            "id": "GeneratorMAINPARTlight",
+            "type": "@generatormainpartlight",
+            "pos": [855.0, 2097.0]
+        },
+        {
+            "id": "Rc (1)",
+            "type": "@rc",
+            "pos": [332.0, 782.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Rc",
+            "type": "@rc",
+            "pos": [20.0, 1362.0]
+        },
+        {
+            "id": "Rc (5)",
+            "type": "@rc",
+            "pos": [2604.0, 1330.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Ustrojstwo grid",
+            "type": "@ustrojstwo_grid",
+            "pos": [1312.0, 1118.0],
+            "rotation": 6.000000476837158
+        },
+        {
+            "id": "Garden (1)",
+            "type": "@garden",
+            "pos": [2900.0, 1330.0]
+        },
+        {
+            "id": "Lab wall corner square 2 (7)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [1456.0, 3504.0]
+        },
+        {
+            "id": "Lab wall corner square 2 (8)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [464.0, 3504.0],
+            "rotation": -360.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall corner square (54)",
+            "type": "@lab_wall_corner_square",
+            "pos": [784.0, 3056.0],
+            "rotation": -270.0
+        },
+        {
+            "id": "Lab wall corner square (55)",
+            "type": "@lab_wall_corner_square",
+            "pos": [784.0, 3248.0],
             "rotation": -360.0
         },
         {
-            "id": "Fern (14)",
-            "type": "@fern",
-            "pos": [1607.697998046875, 241.89846801757813],
-            "rotation": -142.84759521484375,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (14)",
-            "type": "@monstera",
-            "pos": [1532.0, -290.0],
-            "rotation": -360.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (13)",
-            "type": "@monstera",
-            "pos": [2707.0, 316.0],
+            "id": "Lab wall corner square (28)",
+            "type": "@lab_wall_corner_square",
+            "pos": [2512.0, 1296.0],
             "rotation": 90.0,
-            "color": [0, 216, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall corner square (29)",
+            "type": "@lab_wall_corner_square",
+            "pos": [240.0, 400.0],
+            "rotation": -450.0,
             "flip_horizontally": true
         },
         {
-            "id": "Monstera (11)",
-            "type": "@monstera",
-            "pos": [3213.0, -708.0],
-            "rotation": -90.0
-        },
-        {
-            "id": "Monstera",
-            "type": "@monstera",
-            "pos": [2166.0, -772.0],
-            "rotation": -345.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (10)",
-            "type": "@monstera",
-            "pos": [2425.0, -778.0],
-            "rotation": 165.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (9)",
-            "type": "@monstera",
-            "pos": [2522.0, -775.0],
-            "rotation": -105.0
-        },
-        {
-            "id": "Monstera (8)",
-            "type": "@monstera",
-            "pos": [1939.0, -124.0],
-            "rotation": -90.0
-        },
-        {
-            "id": "Monstera (2)",
-            "type": "@monstera",
-            "pos": [1820.0, -755.0],
-            "rotation": -180.0
-        },
-        {
-            "id": "Monstera (3)",
-            "type": "@monstera",
-            "pos": [1729.0, -589.0],
-            "rotation": 75.0,
-            "flip_horizontally": true
-        },
-        {
-            "id": "Monstera (4)",
-            "type": "@monstera",
-            "pos": [3156.0, -600.0],
-            "rotation": 105.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern",
-            "type": "@fern",
-            "pos": [2011.95263671875, 547.0064697265625],
-            "rotation": -174.58001708984375,
-            "size": [126, 121]
-        },
-        {
-            "id": "Fern (1)",
-            "type": "@fern",
-            "pos": [3169.973388671875, -479.991943359375],
-            "rotation": -176.96287536621094,
-            "size": [126, 121]
-        },
-        {
-            "id": "Fern (3)",
-            "type": "@fern",
-            "pos": [2522.94970703125, 578.0025634765625],
-            "rotation": -5.796356201171875,
-            "size": [126, 121]
-        },
-        {
-            "id": "Monstera (5)",
-            "type": "@monstera",
-            "pos": [1689.0, -306.0],
-            "rotation": -78.0333251953125,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (6)",
-            "type": "@monstera",
-            "pos": [2001.0, -512.0],
-            "rotation": -75.0,
-            "flip_horizontally": true
-        },
-        {
-            "id": "Monstera (7)",
-            "type": "@monstera",
-            "pos": [2236.0, -81.0],
-            "rotation": -165.0
-        },
-        {
-            "id": "Fern (13)",
-            "type": "@fern",
-            "pos": [2141.42041015625, 219.229736328125],
-            "rotation": 57.269561767578125,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (11)",
-            "type": "@fern",
-            "pos": [1279.99462890625, 98.00015258789063],
-            "rotation": -0.60821533203125,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (10)",
-            "type": "@fern",
-            "pos": [2595.95947265625, 574.0017700195313],
-            "rotation": -4.65435791015625,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (8)",
-            "type": "@fern",
-            "pos": [2028.6744384765625, 226.1204833984375],
-            "rotation": 40.59162902832031,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (4)",
-            "type": "@fern",
-            "pos": [1791.0, 248.0],
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Bush (4)",
-            "type": "@bush",
-            "pos": [1962.0, 1092.0],
-            "rotation": -90.0,
-            "size": [121, 121]
-        },
-        {
-            "id": "Bush (3)",
-            "type": "@bush",
-            "pos": [2278.5, 1220.0],
-            "rotation": -90.0,
-            "size": [121, 242]
-        },
-        {
-            "id": "Grass dune 1 (1)",
-            "type": "@grass_dune_1",
-            "pos": [2805.0, -394.0]
-        },
-        {
-            "id": "Grass dune 2",
-            "type": "@grass_dune_2",
-            "pos": [2717.059326171875, -108.76368713378906],
-            "rotation": -28.20489501953125
-        },
-        {
-            "id": "Grass dune 1 (3)",
-            "type": "@grass_dune_1",
-            "pos": [1909.0, 532.0],
-            "rotation": -44.24205017089844
-        },
-        {
-            "id": "Grass dune 2 (1)",
-            "type": "@grass_dune_2",
-            "pos": [2491.0, -458.0]
-        },
-        {
-            "id": "Grass dune 2 (2)",
-            "type": "@grass_dune_2",
-            "pos": [2629.045654296875, -702.7910766601563],
-            "rotation": -24.69830322265625
-        },
-        {
-            "id": "Grass dune 2 (3)",
-            "type": "@grass_dune_2",
-            "pos": [2246.045654296875, -435.79107666015625],
-            "rotation": -24.69830322265625
-        },
-        {
-            "id": "Grass dune 2 (4)",
-            "type": "@grass_dune_2",
-            "pos": [2215.112548828125, -74.68396759033203],
-            "rotation": -39.19889831542969
-        },
-        {
-            "id": "Grass dune 1 (4)",
-            "type": "@grass_dune_1",
-            "pos": [2080.0, -42.0],
-            "rotation": -52.539886474609375
-        },
-        {
-            "id": "Grass dune 2 (5)",
-            "type": "@grass_dune_2",
-            "pos": [2057.0166015625, 399.128173828125],
-            "rotation": -14.853683471679688
-        },
-        {
-            "id": "Grass dune 2 (6)",
-            "type": "@grass_dune_2",
-            "pos": [2025.11865234375, 511.3235778808594],
-            "rotation": -40.3289794921875,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (7)",
-            "type": "@grass_dune_2",
-            "pos": [2893.118896484375, 491.3235778808594],
-            "rotation": -40.3289794921875
-        },
-        {
-            "id": "Grass dune 2 (8)",
-            "type": "@grass_dune_2",
-            "pos": [2936.8203125, 573.3839721679688],
-            "rotation": -129.82081604003906
-        },
-        {
-            "id": "Grass dune 1 (5)",
-            "type": "@grass_dune_1",
-            "pos": [2933.0, 531.0],
-            "rotation": -20.970291137695313
-        },
-        {
-            "id": "Grass dune 2 (9)",
-            "type": "@grass_dune_2",
-            "pos": [2938.572509765625, 632.4946899414063],
-            "rotation": -98.3333740234375
-        },
-        {
-            "id": "Grass dune 2 (10)",
-            "type": "@grass_dune_2",
-            "pos": [1597.0, 369.0]
-        },
-        {
-            "id": "Grass dune 2 (12)",
-            "type": "@grass_dune_2",
-            "pos": [1358.0926513671875, 396.28985595703125],
-            "rotation": -35.43267822265625
-        },
-        {
-            "id": "Grass dune 1 (6)",
-            "type": "@grass_dune_1",
-            "pos": [2784.0, 201.0],
-            "rotation": -37.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (7)",
-            "type": "@grass_dune_1",
-            "pos": [2567.0, 719.0],
-            "rotation": -37.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (8)",
-            "type": "@grass_dune_1",
-            "pos": [1675.0, -263.0],
-            "rotation": -32.974639892578125
-        },
-        {
-            "id": "Grass dune 1 (9)",
-            "type": "@grass_dune_1",
-            "pos": [1741.0, -205.0],
-            "rotation": -122.97463989257813
-        },
-        {
-            "id": "Grass dune 1 (10)",
-            "type": "@grass_dune_1",
-            "pos": [1674.0, -134.0],
-            "rotation": -212.97463989257813
-        },
-        {
-            "id": "Grass dune 2 (13)",
-            "type": "@grass_dune_2",
-            "pos": [2123.208740234375, 511.4065246582031],
-            "rotation": -54.381988525390625
-        },
-        {
-            "id": "Grass dune 1 (11)",
-            "type": "@grass_dune_1",
-            "pos": [2857.0, -85.0],
-            "rotation": -142.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (12)",
-            "type": "@grass_dune_1",
-            "pos": [2829.0, 44.0],
-            "rotation": -67.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (13)",
-            "type": "@grass_dune_1",
-            "pos": [2089.0, -171.0],
-            "rotation": -142.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (14)",
-            "type": "@grass_dune_1",
-            "pos": [1303.0, -388.0],
-            "rotation": -322.11639404296875
-        },
-        {
-            "id": "Grass dune 1 (15)",
-            "type": "@grass_dune_1",
-            "pos": [1340.0, -373.0],
-            "rotation": -295.53900146484375
-        },
-        {
-            "id": "Grass dune 2 (14)",
-            "type": "@grass_dune_2",
-            "pos": [2300.11865234375, 1124.3236083984375],
-            "rotation": -40.3289794921875,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (15)",
-            "type": "@grass_dune_2",
-            "pos": [2332.0166015625, 1012.128173828125],
-            "rotation": -14.853683471679688
-        },
-        {
-            "id": "Grass dune 2 (16)",
-            "type": "@grass_dune_2",
-            "pos": [2398.208740234375, 1124.406494140625],
-            "rotation": -54.381988525390625
-        },
-        {
-            "id": "Grass dune 2 (17)",
-            "type": "@grass_dune_2",
-            "pos": [1948.11865234375, 860.3236083984375],
-            "rotation": -40.3289794921875,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (18)",
-            "type": "@grass_dune_2",
-            "pos": [2019.8233642578125, 1085.381103515625],
-            "rotation": -130.3289794921875,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 1 (16)",
-            "type": "@grass_dune_1",
-            "pos": [2057.0, 809.0],
-            "rotation": -44.24205017089844
-        },
-        {
-            "id": "Kratka (1)",
-            "type": "@kratka",
-            "pos": [2896.0, -672.0],
-            "rotation": -90.0,
-            "size": [2432, 32]
-        },
-        {
-            "id": "Grass dune 1",
-            "type": "@grass_dune_1",
-            "pos": [1352.0, -470.0],
-            "rotation": -322.11639404296875
-        },
-        {
-            "id": "Kratka (4)",
-            "type": "@kratka",
-            "pos": [2304.0, 1264.0001220703125],
-            "rotation": -360.0,
-            "size": [2560, 32]
-        },
-        {
-            "id": "Grass dune 1 (2)",
-            "type": "@grass_dune_1",
-            "pos": [2551.0, 282.0],
-            "rotation": -20.970291137695313
-        },
-        {
-            "id": "Stone pavement top",
-            "type": "@stone_pavement_top",
-            "pos": [1856.0, -16.0],
-            "size": [896, 32]
-        },
-        {
-            "id": "Stone pavement top (7)",
-            "type": "@stone_pavement_top",
-            "pos": [2707.0, 981.0],
-            "size": [768, 32]
-        },
-        {
-            "id": "Stone pavement bottom (6)",
-            "type": "@stone_pavement_bottom",
-            "pos": [2707.0, 1136.0],
-            "size": [768, 22]
-        },
-        {
-            "id": "Stone pavement (13)",
-            "type": "@stone_pavement",
-            "pos": [2707.0, 1061.0],
-            "size": [768, 128]
-        },
-        {
-            "id": "Stone pavement (12)",
-            "type": "@stone_pavement",
-            "pos": [3163.0, 960.0],
-            "size": [128, 640]
-        },
-        {
-            "id": "Stone pavement left (7)",
-            "type": "@stone_pavement_left",
-            "pos": [3085.0, 960.0],
-            "size": [27, 640]
-        },
-        {
-            "id": "Stone pavement right (5)",
-            "type": "@stone_pavement_right",
-            "pos": [3239.0, 960.0],
-            "size": [24, 640]
-        },
-        {
-            "id": "Stone pavement bottom right (1)",
-            "type": "@stone_pavement_bottom_right",
-            "pos": [1543.0, 645.0]
-        },
-        {
-            "id": "Stone pavement bottom (5)",
-            "type": "@stone_pavement_bottom",
-            "pos": [1344.0, 651.0],
-            "size": [384, 22]
-        },
-        {
-            "id": "Stone pavement top (6)",
-            "type": "@stone_pavement_top",
-            "pos": [1280.0, 496.0],
-            "size": [256, 32]
-        },
-        {
-            "id": "Stone pavement bottom (4)",
-            "type": "@stone_pavement_bottom",
-            "pos": [1600.0, -373.0],
-            "size": [384, 22]
-        },
-        {
-            "id": "Stone pavement top right (1)",
-            "type": "@stone_pavement_top_right",
-            "pos": [1930.0, -520.0]
-        },
-        {
-            "id": "Stone pavement top right",
-            "type": "@stone_pavement_top_right",
-            "pos": [2826.0, 376.0]
-        },
-        {
-            "id": "Stone pavement top (5)",
-            "type": "@stone_pavement_top",
-            "pos": [3136.0, 496.0],
-            "size": [640, 32]
-        },
-        {
-            "id": "Stone pavement right (4)",
-            "type": "@stone_pavement_right",
-            "pos": [2828.0, 448.0],
-            "size": [24, 128]
-        },
-        {
-            "id": "Stone pavement bottom (3)",
-            "type": "@stone_pavement_bottom",
-            "pos": [3072.0, 651.0],
-            "size": [768, 22]
-        },
-        {
-            "id": "Stone pavement left (6)",
-            "type": "@stone_pavement_left",
-            "pos": [2674.0, 576.0],
-            "size": [27, 128]
-        },
-        {
-            "id": "Stone pavement bottom (2)",
-            "type": "@stone_pavement_bottom",
-            "pos": [2368.0, 523.0],
-            "size": [640, 22]
-        },
-        {
-            "id": "Stone pavement top (4)",
-            "type": "@stone_pavement_top",
-            "pos": [2432.0, 368.0],
-            "size": [768, 32]
-        },
-        {
-            "id": "Stone pavement left (5)",
-            "type": "@stone_pavement_left",
-            "pos": [1778.0, -192.0],
-            "size": [27, 384]
-        },
-        {
-            "id": "Stone pavement top (3)",
-            "type": "@stone_pavement_top",
-            "pos": [1664.0, -528.0],
-            "size": [512, 32]
-        },
-        {
-            "id": "Stone pavement left (4)",
-            "type": "@stone_pavement_left",
-            "pos": [1394.0, -448.0],
-            "size": [27, 128]
-        },
-        {
-            "id": "Stone pavement left (3)",
-            "type": "@stone_pavement_left",
-            "pos": [1394.0, 256.0],
-            "size": [27, 512]
-        },
-        {
-            "id": "Stone pavement right (3)",
-            "type": "@stone_pavement_right",
-            "pos": [1548.0, 384.0],
-            "size": [24, 512]
-        },
-        {
-            "id": "Stone pavement right (2)",
-            "type": "@stone_pavement_right",
-            "pos": [1932.0, -256.0],
-            "size": [24, 512]
-        },
-        {
-            "id": "Stone pavement bottom (1)",
-            "type": "@stone_pavement_bottom",
-            "pos": [1920.0, 139.0],
-            "size": [768, 22]
-        },
-        {
-            "id": "Stone pavement left (2)",
-            "type": "@stone_pavement_left",
-            "pos": [2034.0, 448.0],
-            "size": [27, 128]
-        },
-        {
-            "id": "Stone pavement left (1)",
-            "type": "@stone_pavement_left",
-            "pos": [2290.0, -128.0],
-            "size": [27, 1024]
-        },
-        {
-            "id": "Stone pavement left",
-            "type": "@stone_pavement_left",
-            "pos": [2674.0, -768.0],
-            "size": [27, 256]
-        },
-        {
-            "id": "Stone pavement bottom right",
-            "type": "@stone_pavement_bottom_right",
-            "pos": [2823.0, -507.0]
-        },
-        {
-            "id": "Stone pavement top (2)",
-            "type": "@stone_pavement_top",
-            "pos": [3088.0, -192.0],
-            "rotation": -270.0,
-            "size": [1408, 32]
-        },
-        {
-            "id": "Stone pavement right (1)",
-            "type": "@stone_pavement_right",
-            "pos": [2444.0, -64.0],
-            "size": [24, 896]
-        },
-        {
-            "id": "Stone pavement top (1)",
-            "type": "@stone_pavement_top",
-            "pos": [2496.0, -656.0],
-            "size": [384, 32]
-        },
-        {
-            "id": "Stone pavement top left",
-            "type": "@stone_pavement_top_left",
-            "pos": [2297.0, -648.0]
-        },
-        {
-            "id": "Stone pavement right",
-            "type": "@stone_pavement_right",
-            "pos": [2828.0, -704.0],
-            "size": [24, 384]
-        },
-        {
-            "id": "Stone pavement bottom",
-            "type": "@stone_pavement_bottom",
-            "pos": [2624.0, -501.0],
-            "size": [384, 22]
-        },
-        {
-            "id": "Stone pavement (11)",
-            "type": "@stone_pavement",
-            "pos": [3072.0, 576.0],
-            "rotation": -90.0,
-            "size": [128, 768]
-        },
-        {
-            "id": "Stone pavement (9)",
-            "type": "@stone_pavement",
-            "pos": [3008.0, -192.0],
-            "rotation": -270.0,
-            "size": [1408, 128],
-            "color": [255, 255, 181, 255]
-        },
-        {
-            "id": "Stone pavement (8)",
-            "type": "@stone_pavement",
-            "pos": [2432.0, 448.0],
-            "size": [768, 128]
-        },
-        {
-            "id": "Stone pavement (7)",
-            "type": "@stone_pavement",
-            "pos": [1280.0, 576.0],
-            "rotation": -90.0,
-            "size": [128, 256]
-        },
-        {
-            "id": "Stone pavement (1)",
-            "type": "@stone_pavement",
-            "pos": [1600.0, -448.0],
-            "size": [384, 128]
-        },
-        {
-            "id": "Stone pavement",
-            "type": "@stone_pavement",
-            "pos": [1856.0, -256.0],
-            "size": [128, 512]
-        },
-        {
-            "id": "Stone pavement (6)",
-            "type": "@stone_pavement",
-            "pos": [1472.0, 384.0],
-            "size": [128, 512]
-        },
-        {
-            "id": "Stone pavement (5)",
-            "type": "@stone_pavement",
-            "pos": [1856.0, 64.0],
-            "size": [896, 128]
-        },
-        {
-            "id": "Stone pavement (4)",
-            "type": "@stone_pavement",
-            "pos": [2368.0, -64.0],
-            "size": [128, 896]
-        },
-        {
-            "id": "Stone pavement (3)",
-            "type": "@stone_pavement",
-            "pos": [2496.0, -576.0],
-            "size": [384, 128]
-        },
-        {
-            "id": "Stone pavement (2)",
-            "type": "@stone_pavement",
-            "pos": [2752.0, -704.0],
-            "size": [128, 384]
-        },
-        {
-            "id": "Grass 1",
-            "type": "@grass_1",
-            "pos": [2432.0, -1216.0],
-            "size": [1024, 3968],
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass 1 (1)",
-            "type": "@grass_1",
-            "pos": [-1280.0, -1408.0],
-            "size": [6656, 3584]
-        },
-        {
-            "id": "Grass 1 (2)",
-            "type": "@grass_1",
-            "pos": [-1600.0, 576.0],
-            "size": [6016, 384],
-            "flip_horizontally": true
-        },
-        {
-            "id": "Grass 1 (3)",
-            "type": "@grass_1",
-            "pos": [1728.0, 576.0],
-            "size": [640, 384]
-        },
-        {
-            "id": "Grass 1 (4)",
-            "type": "@grass_1",
-            "pos": [5184.0, -1536.0],
-            "size": [4480, 3328],
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass 1 (5)",
-            "type": "@grass_1",
-            "pos": [5120.0, 448.0],
-            "size": [4608, 640],
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass 1 (6)",
-            "type": "@grass_1",
-            "pos": [1408.0, 2752.0],
-            "size": [12032, 3968],
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (19)",
-            "type": "@grass_dune_2",
-            "pos": [2094.82177734375, 958.5745849609375],
-            "rotation": -160.3289794921875,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (20)",
-            "type": "@grass_dune_2",
-            "pos": [1981.708740234375, 987.0479125976563],
-            "rotation": -134.8536834716797
-        },
-        {
-            "id": "Grass dune 1 (17)",
-            "type": "@grass_dune_1",
-            "pos": [2170.787353515625, 1048.798095703125],
-            "rotation": -164.24205017089844
-        },
-        {
-            "id": "Orange flowerpot (12)-up",
-            "type": "@orange_flowerpot",
-            "pos": [1363.0, -353.342529296875],
-            "rotation": -34.50810241699219,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (15)",
-            "type": "@fern",
-            "pos": [1726.501708984375, 220.5406494140625],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (17)",
-            "type": "@fern",
-            "pos": [1872.5191650390625, 484.6370849609375],
-            "rotation": -105.90418243408203,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Stone pavement top (2)-left",
-            "type": "@stone_pavement_top",
-            "pos": [2928.0, -192.0],
-            "rotation": -90.0,
-            "size": [1408, 32],
-            "flip_horizontally": true
-        },
-        {
-            "id": "orange_flowerpot",
-            "type": "@orange_flowerpot",
-            "pos": [2710.0, 310.0]
-        },
-        {
-            "id": "orange_flowerpot (1)",
-            "type": "@orange_flowerpot",
-            "pos": [2602.0, 566.0]
-        },
-        {
-            "id": "orange_flowerpot (2)",
-            "type": "@orange_flowerpot",
-            "pos": [2006.0, 554.0]
-        },
-        {
-            "id": "monstera_donica",
-            "type": "@monstera_donica",
-            "pos": [3161.0, -590.0]
-        },
-        {
-            "id": "monstera_donica (1)",
-            "type": "@monstera_donica",
-            "pos": [1680.0, -304.0]
-        },
-        {
-            "id": "monstera_donica (2)",
-            "type": "@monstera_donica",
-            "pos": [2233.0, -91.0]
-        },
-        {
-            "id": "monstera_donica (3)",
-            "type": "@monstera_donica",
-            "pos": [2020.0, -498.0]
-        },
-        {
-            "id": "monstera_donica (4)",
-            "type": "@monstera_donica",
-            "pos": [2164.0, -780.0]
-        },
-        {
-            "id": "monstera_donica (5)",
-            "type": "@monstera_donica",
-            "pos": [1810.0, -752.0]
-        },
-        {
-            "id": "monstera_donica (6)",
-            "type": "@monstera_donica",
-            "pos": [2442.0, -771.0]
-        },
-        {
-            "id": "monstera_donica (7)",
-            "type": "@monstera_donica",
-            "pos": [2521.0, -778.0]
-        },
-        {
-            "id": "monstera_donica (8)",
-            "type": "@monstera_donica",
-            "pos": [3219.0, -711.0]
-        },
-        {
-            "id": "monstera_donica (9)",
-            "type": "@monstera_donica",
-            "pos": [3324.0, -342.0]
-        },
-        {
-            "id": "monstera_donica (10)",
-            "type": "@monstera_donica",
-            "pos": [1530.0, -297.0]
-        },
-        {
-            "id": "Fern (5)",
-            "type": "@fern",
-            "pos": [2223.791748046875, 161.04541015625],
-            "rotation": -24.606735229492188,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (7)",
-            "type": "@fern",
-            "pos": [2696.1884765625, -61.963134765625],
-            "rotation": 22.149200439453125,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "monstera_donica (11)",
-            "type": "@monstera_donica",
-            "pos": [1944.0, -129.0]
-        },
-        {
-            "id": "flower_pink",
-            "type": "flower_pink",
-            "pos": [1986.0, -305.0],
-            "starting_animation_frame": 3
-        },
-        {
-            "id": "flower_cyan",
-            "type": "flower_cyan",
-            "pos": [2216.0, -97.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (1)",
-            "type": "flower_cyan",
-            "pos": [2593.0, 332.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (2)",
-            "type": "flower_cyan",
-            "pos": [2565.0, 267.0],
-            "rotation": -64.60137176513672,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (3)",
-            "type": "flower_cyan",
-            "pos": [2512.0, 182.0],
-            "rotation": 70.16033935546875,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (1)",
-            "type": "flower_pink",
-            "pos": [2023.0, -230.0],
-            "rotation": 38.14488220214844,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (2)",
-            "type": "flower_pink",
-            "pos": [2149.0, -113.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (3)",
-            "type": "flower_pink",
-            "pos": [1963.0, -40.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (4)",
-            "type": "flower_pink",
-            "pos": [1961.0, -228.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "donic2",
-            "type": "@donic2",
-            "pos": [2816.0, 96.0],
-            "rotation": 90.0,
-            "size": [544, 128]
-        },
-        {
-            "id": "Monstera (1)",
-            "type": "@monstera",
-            "pos": [1913.0, -588.0],
-            "rotation": 75.0,
-            "flip_horizontally": true
-        },
-        {
-            "id": "Monstera (15)",
-            "type": "@monstera",
-            "pos": [1456.0, -581.0],
-            "rotation": 75.0,
-            "flip_horizontally": true
-        },
-        {
-            "id": "flower_pink (5)",
-            "type": "flower_pink",
-            "pos": [2042.0, -77.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (6)",
-            "type": "flower_pink",
-            "pos": [2061.0, -159.0],
-            "rotation": 90.0,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_pink (7)",
-            "type": "flower_pink",
-            "pos": [2149.0, -50.0],
-            "rotation": 61.368499755859375,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (4)",
-            "type": "flower_cyan",
-            "pos": [2498.0, 312.0],
-            "rotation": -13.030609130859375,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "Fern (19)",
-            "type": "@fern",
-            "pos": [1893.501708984375, 251.5406494140625],
-            "rotation": 94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (20)",
-            "type": "@fern",
-            "pos": [2209.501708984375, 221.5406494140625],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (21)",
-            "type": "@fern",
-            "pos": [3312.767333984375, 139.83895874023438],
-            "rotation": 60.808380126953125,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (22)",
-            "type": "@fern",
-            "pos": [1964.290283203125, -400.4154052734375],
-            "rotation": -4.65435791015625,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "flower_cyan (5)",
-            "type": "flower_cyan",
-            "pos": [2508.344970703125, -58.997642517089844],
-            "rotation": 39.39556884765625,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (6)",
-            "type": "flower_cyan",
-            "pos": [2571.3212890625, -91.38802337646484],
-            "rotation": 103.9969482421875,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (7)",
-            "type": "flower_cyan",
-            "pos": [2719.225830078125, 153.56298828125],
-            "rotation": -30.7647705078125,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (8)",
-            "type": "flower_cyan",
-            "pos": [2609.53759765625, -186.08987426757813],
-            "rotation": 127.051025390625,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "orange_flowerpot (4)",
-            "type": "@orange_flowerpot",
-            "pos": [1883.0, 493.0]
-        },
-        {
-            "id": "orange_flowerpot (5)",
-            "type": "@orange_flowerpot",
-            "pos": [2699.0, -53.0]
-        },
-        {
-            "id": "orange_flowerpot (6)",
-            "type": "@orange_flowerpot",
-            "pos": [1988.0, -393.0],
-            "rotation": 4.6759490966796875
-        },
-        {
-            "id": "orange_flowerpot (7)",
-            "type": "@orange_flowerpot",
-            "pos": [1899.0, 595.0],
-            "rotation": 4.822540283203125
-        },
-        {
-            "id": "donicv2",
-            "type": "@donicv2",
-            "pos": [1853.0, 209.0]
-        },
-        {
-            "id": "Fern (16)",
-            "type": "@fern",
-            "pos": [2156.42041015625, 157.229736328125],
-            "rotation": 57.269561767578125,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "orange_flowerpot (8)",
-            "type": "@orange_flowerpot",
-            "pos": [2196.0, 202.0],
-            "size": [168, 168]
-        },
-        {
-            "id": "donic2-up",
-            "type": "@donic2",
-            "pos": [2816.0, -312.0],
-            "rotation": -90.0,
-            "size": [272, 128],
-            "flip_vertically": true
-        },
-        {
-            "id": "flower_cyan (9)",
-            "type": "flower_cyan",
-            "pos": [2470.344970703125, -133.99765014648438],
-            "rotation": 39.39556884765625,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "donicv2 (1)",
-            "type": "@donicv2",
-            "pos": [1507.0, -132.0],
-            "flip_horizontally": true
-        },
-        {
-            "id": "Fern (23)",
-            "type": "@fern",
-            "pos": [1441.75048828125, -161.4593505859375],
-            "rotation": 94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (24)",
-            "type": "@fern",
-            "pos": [1562.74365234375, -145.4593505859375],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (25)",
-            "type": "@fern",
-            "pos": [1486.74365234375, -67.4593505859375],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (26)",
-            "type": "@fern",
-            "pos": [1685.94677734375, -131.10153198242188],
-            "rotation": 142.84759521484375,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (27)",
-            "type": "@fern",
-            "pos": [1312.74365234375, -131.4593505859375],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "neon_color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "flower_cyan (10)",
-            "type": "flower_cyan",
-            "pos": [2588.344970703125, 162.00234985351563],
-            "rotation": -20.60443115234375,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "orange_flowerpot (9)",
-            "type": "@orange_flowerpot",
-            "pos": [2518.0, 566.0]
-        },
-        {
-            "id": "bush (1)",
-            "type": "@bush",
-            "pos": [2684.0, -157.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (2)",
-            "type": "@bush",
-            "pos": [2684.0, 99.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (4)",
-            "type": "@bush",
-            "pos": [2588.0, 285.0],
-            "size": [121, 121],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (5)",
-            "type": "@bush",
-            "pos": [2716.0, 227.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (6)",
-            "type": "@bush",
-            "active": false,
-            "pos": [2563.0, 3.0],
-            "color": [181, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Orange flowerpot (12)-up (1)",
-            "type": "@orange_flowerpot",
-            "pos": [1612.9609375, 385.24493408203125],
-            "rotation": 145.49188232421875,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 1 (18)",
-            "type": "@grass_dune_1",
-            "pos": [1635.9609375, 404.90240478515625],
-            "rotation": -115.53900146484375
-        },
-        {
-            "id": "Grass dune 1 (19)",
-            "type": "@grass_dune_1",
-            "pos": [1672.9609375, 419.90240478515625],
-            "rotation": -142.11639404296875
-        },
-        {
-            "id": "Orange flowerpot (12)-up (2)",
-            "type": "@orange_flowerpot",
-            "pos": [2003.7626953125, 399.69354248046875],
-            "rotation": 100.49188232421875,
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 1 (20)",
-            "type": "@grass_dune_1",
-            "pos": [2033.926025390625, 397.33001708984375],
-            "rotation": -160.53900146484375
-        },
-        {
-            "id": "Grass dune 1 (21)",
-            "type": "@grass_dune_1",
-            "pos": [2070.695556640625, 381.7736511230469],
-            "rotation": -187.11639404296875
-        },
-        {
-            "id": "monstera_donica (12)",
-            "type": "@monstera_donica",
-            "pos": [1904.0, 368.0]
-        },
-        {
-            "id": "monstera_donica (13)",
-            "type": "@monstera_donica",
-            "pos": [2117.0, 595.0]
-        },
-        {
-            "id": "monstera_donica (14)",
-            "type": "@monstera_donica",
-            "pos": [2377.0, 584.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (28)",
-            "type": "@fern",
-            "pos": [2365.94970703125, 619.0025634765625],
-            "rotation": -5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (29)",
-            "type": "@fern",
-            "pos": [2217.94970703125, 586.0025634765625],
-            "rotation": -5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "monstera_donica (15)",
-            "type": "@monstera_donica",
-            "pos": [2220.0, 581.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (30)",
-            "type": "@fern",
-            "pos": [1203.05078125, 419.99737548828125],
-            "rotation": 174.20364379882813,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (31)",
-            "type": "@fern",
-            "pos": [1337.05078125, 433.99737548828125],
-            "rotation": 174.20364379882813,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "monstera_donica (16)",
-            "type": "@monstera_donica",
-            "pos": [1335.0, 431.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "monstera_donica (17)",
-            "type": "@monstera_donica",
-            "pos": [1211.0, 425.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (32)",
-            "type": "@fern",
-            "pos": [3141.94970703125, 443.0025634765625],
-            "rotation": -5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "monstera_donica (18)",
-            "type": "@monstera_donica",
-            "pos": [3153.0, 408.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Fern (32)-up",
-            "type": "@fern",
-            "pos": [3165.94970703125, 277.8590087890625],
-            "rotation": 5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "monstera_donica (18)-up",
-            "type": "@monstera_donica",
-            "pos": [3153.0, 276.861572265625],
-            "rotation": 30.0,
-            "color": [0, 255, 255, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (32)-up-right",
-            "type": "@fern",
-            "pos": [3157.18896484375, 133.8590087890625],
-            "rotation": -5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "monstera_donica (18)-up-right",
-            "type": "@monstera_donica",
-            "pos": [3158.138671875, 141.861572265625],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (32)-up-right-up",
-            "type": "@fern",
-            "pos": [3173.18896484375, 18.7474365234375],
-            "rotation": 5.796356201171875,
-            "size": [126, 121],
-            "color": [0, 255, 255, 255],
-            "flip_horizontally": true
-        },
-        {
-            "id": "monstera_donica (18)-up-right-up",
-            "type": "@monstera_donica",
-            "pos": [3169.138671875, 15.744873046875],
-            "rotation": 30.0,
-            "color": [0, 255, 255, 255],
-            "flip_horizontally": true
-        },
-        {
-            "id": "monstera_donica (19)",
-            "type": "@monstera_donica",
-            "pos": [2695.0, -164.0],
-            "rotation": -30.0,
-            "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "Stone pavement right (6)",
-            "type": "@stone_pavement_right",
-            "pos": [1140.0, 576.0],
-            "rotation": -180.0,
-            "size": [24, 128]
-        },
-        {
-            "id": "Fern (2)",
-            "type": "@fern",
-            "pos": [3171.973388671875, -378.991943359375],
-            "rotation": -176.96287536621094,
-            "size": [126, 121]
-        },
-        {
-            "id": "bush (7)",
-            "type": "@bush",
-            "pos": [2476.81689453125, 589.3170166015625],
-            "rotation": -30.0,
-            "color": [181, 255, 0, 255],
-            "flip_horizontally": true
-        },
-        {
-            "id": "bush (8)",
-            "type": "@bush",
-            "pos": [3185.81689453125, -370.6830139160156],
-            "rotation": -30.0,
-            "color": [181, 255, 0, 255],
-            "flip_horizontally": true
-        },
-        {
-            "id": "bush (9)",
-            "type": "@bush",
-            "pos": [2211.0, 291.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (10)",
-            "type": "@bush",
-            "pos": [3235.0, -548.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (11)",
-            "type": "@bush",
-            "pos": [3180.81689453125, -466.6829833984375],
-            "rotation": -30.0,
-            "color": [181, 255, 0, 255],
-            "flip_horizontally": true
-        },
-        {
-            "id": "Stone pavement right (7)",
-            "type": "@stone_pavement_right",
-            "pos": [3468.0, 576.0],
-            "rotation": -180.0,
-            "size": [24, 128],
-            "flip_horizontally": true
-        },
-        {
-            "id": "Stone pavement (10)",
-            "type": "@stone_pavement",
-            "pos": [3712.0, -144.00001525878906],
-            "rotation": -90.0,
-            "size": [256, 1280]
-        },
-        {
-            "id": "Stone pavement top (8)",
-            "type": "@stone_pavement_top",
-            "pos": [3728.0, -288.0],
-            "size": [1280, 32]
-        },
-        {
-            "id": "Stone pavement top (8)-down",
-            "type": "@stone_pavement_top",
-            "pos": [3728.0, 0.0],
-            "size": [1280, 32],
-            "flip_vertically": true
-        },
-        {
-            "id": "Grass dune 2 (11)",
-            "type": "@grass_dune_2",
-            "pos": [2121.0166015625, 595.128173828125],
-            "rotation": -14.853683471679688
-        },
-        {
-            "id": "flower_cyan (11)",
-            "type": "flower_cyan",
-            "pos": [3238.0, 290.0],
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (12)",
-            "type": "flower_cyan",
-            "pos": [3266.0, 415.0],
-            "rotation": -64.60137176513672,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (13)",
-            "type": "flower_cyan",
-            "pos": [3224.0, 51.0],
-            "rotation": 70.16033935546875,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (14)",
-            "type": "flower_cyan",
-            "pos": [3210.0, 181.0],
-            "rotation": -13.030609130859375,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (15)",
-            "type": "flower_cyan",
-            "pos": [3300.344970703125, 31.002349853515625],
-            "rotation": -20.60443115234375,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (16)",
-            "type": "flower_cyan",
-            "pos": [3298.0, 242.0],
-            "rotation": -64.60137176513672,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "flower_cyan (17)",
-            "type": "flower_cyan",
-            "pos": [3328.0, 334.0],
-            "rotation": -136.23199462890625,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "bush (12)",
-            "type": "@bush",
-            "pos": [3288.0, 119.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (13)",
-            "type": "@bush",
-            "active": false,
-            "pos": [3281.7978515625, 345.41571044921875],
-            "rotation": -38.15415954589844,
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (14)",
-            "type": "@bush",
-            "pos": [2580.840087890625, 8.753982543945313],
-            "rotation": -66.04985046386719,
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "crate",
-            "type": "crate",
-            "pos": [3327.00048828125, 734.9999389648438],
-            "rotation": -4.419008731842041
-        },
-        {
-            "id": "crate (1)",
-            "type": "crate",
-            "pos": [2562.000244140625, 746.9999389648438],
-            "rotation": 8.839943885803223
-        },
-        {
-            "id": "crate (2)",
-            "type": "crate",
-            "pos": [1358.000244140625, 571.9998168945313],
-            "rotation": -0.7043184638023376
-        },
-        {
-            "id": "crate (3)",
-            "type": "crate",
-            "pos": [3003.0, 709.9999389648438],
-            "rotation": 6.038854598999023
-        },
-        {
-            "id": "crate (4)",
-            "type": "crate",
-            "pos": [2857.000244140625, 709.9998779296875],
-            "rotation": -1.1782230138778687
-        },
-        {
-            "id": "crate (5)",
-            "type": "crate",
-            "pos": [2713.0, 723.9998779296875],
-            "rotation": -0.8967928290367126
-        },
-        {
-            "id": "Grass dune 2 (21)",
-            "type": "@grass_dune_2",
-            "pos": [1726.034912109375, 513.1837158203125],
-            "rotation": -21.559661865234375
-        },
-        {
-            "id": "menu_game_logo",
-            "type": "@menu_game_logo",
-            "pos": [2396.0, -307.0]
-        },
-        {
-            "id": "Monstera (16)",
-            "type": "@monstera",
-            "pos": [1856.0, 758.0],
-            "rotation": -345.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (17)",
-            "type": "@monstera",
-            "pos": [2115.0, 752.0],
-            "rotation": 165.0,
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Monstera (18)",
-            "type": "@monstera",
-            "pos": [2212.0, 755.0],
-            "rotation": -105.0
-        },
-        {
-            "id": "Monstera (19)",
-            "type": "@monstera",
-            "pos": [1510.0, 775.0],
-            "rotation": -180.0
-        },
-        {
-            "id": "monstera_donica (20)",
-            "type": "@monstera_donica",
-            "pos": [1859.0, 744.0]
-        },
-        {
-            "id": "monstera_donica (21)",
-            "type": "@monstera_donica",
-            "pos": [1502.0, 763.0]
-        },
-        {
-            "id": "monstera_donica (22)",
-            "type": "@monstera_donica",
-            "pos": [2124.0, 753.0]
-        },
-        {
-            "id": "monstera_donica (23)",
-            "type": "@monstera_donica",
-            "pos": [2222.0, 738.0]
-        },
-        {
-            "id": "flower_cyan (18)",
-            "type": "flower_cyan",
-            "pos": [2662.225830078125, 202.56298828125],
-            "rotation": -30.7647705078125,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "Monstera (20)",
-            "type": "@monstera",
-            "active": false,
-            "pos": [2159.0, -469.0],
-            "rotation": -94.2947998046875,
-            "flip_vertically": true
-        },
-        {
-            "id": "monstera_donica (24)",
-            "type": "@monstera_donica",
-            "active": false,
-            "pos": [2154.0, -488.0]
-        },
-        {
-            "id": "flower_pink (8)",
-            "type": "flower_pink",
-            "active": false,
-            "pos": [1979.0, -353.0]
-        },
-        {
-            "id": "donic2-up-up",
-            "type": "@donic2",
-            "pos": [2816.0, -584.0],
-            "rotation": 90.0,
-            "size": [272, 128]
-        },
-        {
-            "id": "flower_cyan (19)",
-            "type": "flower_cyan",
-            "pos": [2541.225830078125, -178.43701171875],
-            "rotation": -83.21295166015625,
-            "flip_horizontally": true,
-            "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "donic2-up-up (1)",
-            "type": "@donic2",
-            "active": false,
-            "pos": [1704.0, 592.0],
-            "rotation": -180.0,
-            "size": [272, 128]
-        },
-        {
-            "id": "Fern (6)",
-            "type": "@fern",
-            "active": false,
-            "pos": [2120.67431640625, -505.8795166015625],
-            "rotation": 40.59162902832031,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "bush",
-            "type": "@bush",
-            "active": false,
-            "pos": [2112.840087890625, -511.24603271484375],
-            "rotation": -66.04985046386719,
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (3)",
-            "type": "@bush",
-            "active": false,
-            "pos": [2207.840087890625, -528.2460327148438],
-            "rotation": -66.04985046386719,
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "Fern (9)",
-            "type": "@fern",
-            "active": false,
-            "pos": [2233.06640625, -506.9122009277344],
-            "rotation": -34.40837097167969,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (12)",
-            "type": "@fern",
-            "active": false,
-            "pos": [2172.310791015625, -513.998291015625],
-            "rotation": 4.4083709716796875,
-            "size": [126, 121],
-            "color": [0, 255, 0, 255],
-            "flip_vertically": true
-        },
-        {
-            "id": "Mota (5)",
-            "type": "mota",
-            "pos": [1850.80126953125, -199.4820098876953],
-            "rotation": 43.717926025390625
-        },
-        {
-            "id": "Mota (4)",
-            "type": "mota",
-            "pos": [1711.6077880859375, -353.9517822265625],
-            "rotation": 23.220458984375
-        },
-        {
-            "id": "Mota (3)",
-            "type": "mota",
-            "pos": [1766.20068359375, -204.494873046875],
-            "rotation": -19.78094482421875
-        },
-        {
-            "id": "Mota (2)",
-            "type": "mota",
-            "pos": [1444.80419921875, 221.9898681640625],
-            "rotation": -0.943389892578125
-        },
-        {
-            "id": "Mota (1)",
-            "type": "mota",
-            "pos": [1477.60791015625, 30.05133056640625],
-            "rotation": -1.27630615234375
-        },
-        {
-            "id": "Mota",
-            "type": "mota",
-            "pos": [2031.51171875, -336.2264404296875],
-            "rotation": -31.099599838256836
-        },
-        {
-            "id": "Mota (6)",
-            "type": "mota",
-            "pos": [1772.60791015625, -453.9520263671875],
-            "rotation": -23.220458984375
-        },
-        {
-            "id": "Mota (7)",
-            "type": "mota",
-            "pos": [1818.8702392578125, -484.2950134277344],
-            "rotation": -66.779541015625
-        },
-        {
-            "id": "Mota (8)",
-            "type": "mota",
-            "pos": [1847.60791015625, -372.9520263671875],
-            "rotation": -23.220458984375
-        },
-        {
-            "id": "Mota (9)",
-            "type": "mota",
-            "pos": [1808.60791015625, -269.9520263671875],
-            "rotation": -23.220458984375
-        },
-        {
-            "id": "mota",
-            "type": "mota",
-            "pos": [1565.0, 278.0],
+            "id": "Lab wall corner square (53)",
+            "type": "@lab_wall_corner_square",
+            "pos": [80.0, 1392.0],
+            "rotation": -450.0
+        },
+        {
+            "id": "Lab wall corner square 2 (3)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [2576.0, 2896.0],
             "rotation": 90.0
         },
         {
-            "id": "mota (1)",
-            "type": "mota",
-            "pos": [1663.0, -78.0]
+            "id": "Lab wall corner square (56)",
+            "type": "@lab_wall_corner_square",
+            "pos": [1136.0, 3248.0],
+            "rotation": 90.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
         },
         {
-            "id": "mota (2)",
-            "type": "mota",
-            "pos": [1442.0, 471.0]
+            "id": "Lab wall corner square 2 (4)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [3440.0, 2544.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
         },
         {
-            "id": "mota (3)",
-            "type": "mota",
-            "pos": [1594.0, -386.0]
+            "id": "Lab wall corner square 2 (5)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [2960.0, 1328.0],
+            "rotation": -180.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
         },
         {
-            "id": "mota (4)",
-            "type": "mota",
-            "pos": [2097.0, -400.0]
+            "id": "Lab wall corner square (57)",
+            "type": "@lab_wall_corner_square",
+            "pos": [1136.0, 3056.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada",
-            "type": "cicada",
-            "pos": [2247.0, 94.0]
+            "id": "Lab wall corner square (52)",
+            "type": "@lab_wall_corner_square",
+            "pos": [80.0, 1360.0],
+            "rotation": -450.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (1)",
-            "type": "cicada",
-            "pos": [2422.0, -336.0]
+            "id": "Lab wall corner square 2 (6)",
+            "type": "@lab_wall_corner_square_2",
+            "pos": [2544.0, 2896.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (2)",
-            "type": "cicada",
-            "pos": [2353.0, -268.0]
+            "id": "Lab wall corner square (51)",
+            "type": "@lab_wall_corner_square",
+            "pos": [2544.0, 2512.0],
+            "rotation": -270.0
         },
         {
-            "id": "cicada (3)",
-            "type": "cicada",
-            "pos": [2339.0, -330.0]
+            "id": "Lab wall corner square (50)",
+            "type": "@lab_wall_corner_square",
+            "pos": [2544.0, 2544.0],
+            "rotation": -270.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (4)",
-            "type": "cicada",
-            "pos": [2361.0, -333.0]
+            "id": "Lab wall corner square (49)",
+            "type": "@lab_wall_corner_square",
+            "pos": [2544.0, 1712.0],
+            "rotation": -270.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (5)",
-            "type": "cicada",
-            "pos": [2393.0, -296.0]
+            "id": "Lab wall corner square (12)",
+            "type": "@lab_wall_corner_square",
+            "pos": [240.0, 432.0],
+            "rotation": -450.0
         },
         {
-            "id": "cicada (6)",
-            "type": "cicada",
-            "pos": [2351.60400390625, -44.19944381713867],
-            "rotation": 53.46833801269531
+            "id": "Lab wall corner square (42)",
+            "type": "@lab_wall_corner_square",
+            "pos": [272.0, 816.0],
+            "rotation": -270.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (7)",
-            "type": "cicada",
-            "pos": [2075.0, 126.0]
+            "id": "Lab wall corner square (43)",
+            "type": "@lab_wall_corner_square",
+            "pos": [272.0, 784.0],
+            "rotation": -270.0
         },
         {
-            "id": "cicada (8)",
-            "type": "cicada",
-            "pos": [2410.3310546875, -32.1866569519043],
-            "rotation": 31.18670654296875
+            "id": "Lab wall corner square (44)",
+            "type": "@lab_wall_corner_square",
+            "pos": [752.0, 1296.0],
+            "rotation": -360.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (9)",
-            "type": "cicada",
-            "pos": [2316.962890625, 99.04010009765625],
-            "rotation": -4.428436279296875
+            "id": "Lab wall corner square (45)",
+            "type": "@lab_wall_corner_square",
+            "pos": [688.0, 1296.0],
+            "rotation": -360.0
         },
         {
-            "id": "cicada (10)",
-            "type": "cicada",
-            "pos": [2307.274169921875, -123.17003631591797],
-            "rotation": 26.364837646484375
+            "id": "Lab wall corner square (46)",
+            "type": "@lab_wall_corner_square",
+            "pos": [-432.0, 2896.0],
+            "rotation": -360.0
         },
         {
-            "id": "cicada (11)",
-            "type": "cicada",
-            "pos": [2409.582763671875, -180.20225524902344],
-            "rotation": 51.71485900878906
+            "id": "Lab wall corner square (47)",
+            "type": "@lab_wall_corner_square",
+            "pos": [-400.0, 2896.0],
+            "rotation": -360.0,
+            "flip_horizontally": true
         },
         {
-            "id": "cicada (12)",
-            "type": "cicada",
-            "pos": [2274.31298828125, 250.81808471679688],
-            "rotation": 29.659225463867188
+            "id": "Lab wall corner square (48)",
+            "type": "@lab_wall_corner_square",
+            "pos": [2544.0, 1680.0],
+            "rotation": -270.0
         },
         {
-            "id": "cicada (13)",
-            "type": "cicada",
-            "pos": [2369.50244140625, -124.20710754394531],
-            "rotation": 45.204833984375
+            "id": "Violet box (1)",
+            "type": "@violet_box",
+            "pos": [1102.0003662109375, 2669.999755859375],
+            "rotation": -165.00003051757813
         },
         {
-            "id": "cicada (14)",
-            "type": "cicada",
-            "pos": [2592.185546875, 22.3267822265625],
-            "rotation": 120.8177490234375
+            "id": "Noweustrojstwo",
+            "type": "@noweustrojstwo",
+            "pos": [1310.0, 1126.0],
+            "rotation": -270.0
         },
         {
-            "id": "cicada (15)",
-            "type": "cicada",
-            "pos": [2612.19091796875, 37.34954833984375],
-            "rotation": -237.28330993652344
+            "id": "Violet box (11)",
+            "type": "@violet_box",
+            "pos": [-174.00001525878906, 2626.0],
+            "rotation": -15.000000953674316
         },
         {
-            "id": "mota (5)",
-            "type": "mota",
-            "pos": [1501.0, 562.0]
+            "id": "Violet box (10)",
+            "type": "@violet_box",
+            "pos": [2048.0, 2752.0]
         },
         {
-            "id": "mota (6)",
-            "type": "mota",
-            "pos": [1597.0, 408.0]
+            "id": "Steel crate (2)",
+            "type": "@steel_crate",
+            "pos": [2880.0, 2112.0]
         },
         {
-            "id": "cicada (16)",
-            "type": "cicada",
-            "pos": [2120.0, 50.0]
+            "id": "Violet box (9)",
+            "type": "@violet_box",
+            "pos": [2815.999755859375, 1824.0001220703125],
+            "rotation": -90.0
         },
         {
-            "id": "cicada (17)",
-            "type": "cicada",
-            "pos": [2092.0, -17.0]
+            "id": "Violet box (8)",
+            "type": "@violet_box",
+            "pos": [2706.0, 2368.0],
+            "rotation": -90.0
         },
         {
-            "id": "cicada (18)",
-            "type": "cicada",
-            "pos": [2132.0, 0.0],
+            "id": "Steel crate (1)",
+            "type": "@steel_crate",
+            "pos": [1282.0001220703125, 1550.0],
+            "rotation": -75.0
+        },
+        {
+            "id": "Steel crate",
+            "type": "@steel_crate",
+            "pos": [2368.0, 1952.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "Lab wall (135)",
+            "type": "@lab_wall",
+            "pos": [1456.0, 3184.0],
+            "rotation": -90.0,
+            "size": [608, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (134)",
+            "type": "@lab_wall",
+            "pos": [464.0, 3200.0],
+            "rotation": 90.0,
+            "size": [576, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (133)",
+            "type": "@lab_wall",
+            "pos": [2000.0, 2896.0],
+            "size": [1056, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (136)",
+            "type": "@lab_wall",
+            "pos": [960.0, 3504.0],
+            "size": [960, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (137)",
+            "type": "@lab_wall",
+            "pos": [2000.0, 2864.0],
+            "size": [1056, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (138)",
+            "type": "@lab_wall",
+            "pos": [784.0, 3152.0],
+            "rotation": -90.0,
+            "size": [160, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (139)",
+            "type": "@lab_wall",
+            "pos": [960.0, 3248.0],
+            "size": [320, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (140)",
+            "type": "@lab_wall",
+            "pos": [960.0, 3056.0],
+            "size": [320, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (132)",
+            "type": "@lab_wall",
+            "pos": [-160.0, 1360.0],
+            "rotation": -360.0,
+            "size": [448, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (131)",
+            "type": "@lab_wall",
+            "pos": [-160.0, 1392.0],
+            "rotation": -180.0,
+            "size": [448, 32]
+        },
+        {
+            "id": "Lab wall (141)",
+            "type": "@lab_wall",
+            "pos": [1136.0, 3152.0],
+            "rotation": 90.0,
+            "size": [160, 32]
+        },
+        {
+            "id": "Lab wall (130)",
+            "type": "@lab_wall",
+            "pos": [32.0, 2896.0],
+            "size": [832, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (129)",
+            "type": "@lab_wall",
+            "pos": [2544.0, 2720.0],
+            "rotation": 90.0,
+            "size": [320, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (128)",
+            "type": "@lab_wall",
+            "pos": [2992.0, 2544.0],
+            "rotation": -180.0,
+            "size": [864, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (127)",
+            "type": "@lab_wall",
+            "pos": [2992.0, 2512.0],
+            "size": [864, 32]
+        },
+        {
+            "id": "Lab wall (126)",
+            "type": "@lab_wall",
+            "pos": [2992.0, 1712.0],
+            "rotation": -180.0,
+            "size": [864, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (125)",
+            "type": "@lab_wall",
+            "pos": [2992.0, 1680.0],
+            "size": [864, 32]
+        },
+        {
+            "id": "Lab wall corner cut",
+            "type": "lab_wall_corner_cut",
+            "pos": [1456.0, 2864.0],
+            "rotation": -270.0
+        },
+        {
+            "id": "Lab wall (124)",
+            "type": "@lab_wall",
+            "pos": [-400.0, 1664.0],
+            "rotation": -270.0,
+            "size": [2432, 32]
+        },
+        {
+            "id": "Lab wall (123)",
+            "type": "@lab_wall",
+            "pos": [-432.0, 1584.0],
+            "rotation": -270.0,
+            "size": [2592, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Aquarium pump",
+            "type": "@aquarium_pump",
+            "pos": [805.0, 1832.0001220703125],
             "rotation": -180.0
         },
         {
-            "id": "Mota (10)",
-            "type": "mota",
-            "pos": [1855.501953125, -440.1345520019531],
-            "rotation": 70.21907043457031
+            "id": "Lab wall (122)",
+            "type": "@lab_wall",
+            "pos": [-80.0, 432.0],
+            "size": [608, 32],
+            "flip_vertically": true
         },
         {
-            "id": "garden_ambience",
-            "type": "@garden_ambience",
-            "pos": [2540.0, -5.0]
+            "id": "Lab wall corner cut (1)",
+            "type": "lab_wall_corner_cut",
+            "pos": [464.0, 2896.0],
+            "rotation": -180.0
         },
         {
-            "id": "Strong lamp",
+            "id": "Lab wall (121)",
+            "type": "@lab_wall",
+            "pos": [480.0, 784.0],
+            "size": [384, 32]
+        },
+        {
+            "id": "Lab wall (120)",
+            "type": "@lab_wall",
+            "pos": [480.0, 816.0],
+            "rotation": -180.0,
+            "size": [384, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall corner cut (2)",
+            "type": "lab_wall_corner_cut",
+            "pos": [1871.9998779296875, 1296.0]
+        },
+        {
+            "id": "Lab wall (84)",
+            "type": "@lab_wall",
+            "pos": [1312.0, 784.0],
+            "size": [1088, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall corner cut (64)",
+            "type": "lab_wall_corner_cut",
+            "pos": [2512.0, 1328.0]
+        },
+        {
+            "id": "Lab wall (105)",
+            "type": "@lab_wall",
+            "pos": [1872.0, 1040.0],
+            "rotation": 90.0,
+            "size": [480, 32]
+        },
+        {
+            "id": "Lab wall (104)",
+            "type": "@lab_wall",
+            "pos": [2192.0, 1296.0],
+            "size": [608, 32]
+        },
+        {
+            "id": "Lab wall (103)",
+            "type": "@lab_wall",
+            "pos": [2576.0, 2720.0],
+            "rotation": -90.0,
+            "size": [320, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall (102)",
+            "type": "@lab_wall",
+            "pos": [2736.0, 1328.0],
+            "rotation": -180.0,
+            "size": [416, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall smooth end (5)",
+            "type": "@lab_wall_smooth_end",
+            "pos": [1879.0, 784.0],
+            "rotation": -180.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "Lab wall (100)",
+            "type": "@lab_wall",
+            "pos": [1312.0, 816.0],
+            "size": [1088, 32]
+        },
+        {
+            "id": "Lab wall (6)",
+            "type": "@lab_wall",
+            "pos": [720.0, 1296.0],
+            "rotation": -180.0,
+            "size": [32, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Szkicstracja2",
+            "type": "@szkicstracja2",
+            "pos": [-103.0, 2118.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "Lab wall corner cut foreground",
+            "type": "@lab_wall_corner_cut_foreground",
+            "pos": [-3216.0, -368.0]
+        },
+        {
+            "id": "Lab wall (36)",
+            "type": "@lab_wall",
+            "pos": [-400.0, 368.0],
+            "rotation": 90.0,
+            "size": [160, 32]
+        },
+        {
+            "id": "Lab wall (37)",
+            "type": "@lab_wall",
+            "pos": [-80.0, 400.0],
+            "size": [608, 32]
+        },
+        {
+            "id": "Lab wall a2",
+            "type": "@lab_wall_a2",
+            "pos": [976.0, 3504.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "Lab wall a2 (12)",
+            "type": "@lab_wall_a2",
+            "pos": [-400.0, 2080.0],
+            "rotation": -450.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "GeneratorMAINPART",
+            "type": "@generatormainpart",
+            "pos": [818.0, 2111.0]
+        },
+        {
+            "id": "Floor neon overlay (17)",
+            "type": "@blank8",
+            "pos": [720.0, 1012.0],
+            "size": [96, 600]
+        },
+        {
+            "id": "Floor neon overlay (5)",
+            "type": "@blank8",
+            "pos": [2592.0, 1696.0],
+            "size": [128, 64]
+        },
+        {
+            "id": "Floor neon overlay (18)",
+            "type": "@blank8",
+            "pos": [625.0, 800.0],
+            "size": [96, 63]
+        },
+        {
+            "id": "Yellow barrier",
+            "type": "@yellow_barrier",
+            "pos": [960.0, 1680.0],
+            "rotation": -90.0,
+            "size": [32, 1536]
+        },
+        {
+            "id": "Yellow barrier (1)",
+            "type": "@yellow_barrier",
+            "pos": [960.0, 2544.0],
+            "rotation": -90.0,
+            "size": [32, 1536]
+        },
+        {
+            "id": "GeneratorCONNECTOR (3)",
+            "type": "@generatorconnector",
+            "pos": [944.125, 1868.875],
+            "rotation": -270.0
+        },
+        {
+            "id": "GeneratorCONNECTOR (4)",
+            "type": "@generatorconnector",
+            "pos": [944.125, 1834.875],
+            "rotation": -270.0
+        },
+        {
+            "id": "GeneratorRIGHTCAB (1)",
+            "type": "@generatorrightcab",
+            "pos": [1041.0, 1873.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "GeneratorCONNECTOR (5)",
+            "type": "@generatorconnector",
+            "pos": [944.125, 1800.875],
+            "rotation": -270.0
+        },
+        {
+            "id": "GeneratorCONNECTOR (6)",
+            "type": "@generatorconnector",
+            "pos": [990.125, 1976.875],
+            "rotation": -360.0
+        },
+        {
+            "id": "GeneratorCONNECTOR (7)",
+            "type": "@generatorconnector",
+            "pos": [1024.125, 1976.875],
+            "rotation": -360.0
+        },
+        {
+            "id": "GeneratorCONNECTOR (8)",
+            "type": "@generatorconnector",
+            "pos": [1059.125, 1976.875],
+            "rotation": -360.0
+        },
+        {
+            "id": "GeneratorLEFTCAB",
+            "type": "@generatorleftcab",
+            "pos": [592.0, 1980.0]
+        },
+        {
+            "id": "GeneratorCONNECTOR (9)",
+            "type": "@generatorconnector",
+            "pos": [665.0, 1801.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONNECTOR (10)",
+            "type": "@generatorconnector",
+            "pos": [665.0, 1869.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONNECTOR (11)",
+            "type": "@generatorconnector",
+            "pos": [665.0, 1835.0],
+            "rotation": -90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONNECTOR (12)",
+            "type": "@generatorconnector",
+            "pos": [711.0, 1957.0],
+            "rotation": -360.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONNECTOR (13)",
+            "type": "@generatorconnector",
+            "pos": [536.5, 2028.5],
+            "rotation": -450.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONNECTOR (14)",
+            "type": "@generatorconnector",
+            "pos": [536.5, 2167.5],
+            "rotation": -450.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "GeneratorCONSOLElight (3)",
+            "type": "@generatorconsolelight",
+            "pos": [1114.0, 2097.0],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fotel (8)",
+            "type": "@fotel",
+            "pos": [1179.0, 2098.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "Rotating fan-on-floor (1)",
+            "type": "rotating_fan",
+            "pos": [871.0, 1831.0],
+            "rotation": 24.000001907348633
+        },
+        {
+            "id": "Fotel (3)",
+            "type": "@fotel",
+            "pos": [885.75, 1109.25],
+            "rotation": -360.0
+        },
+        {
+            "id": "Fotel (4)",
+            "type": "@fotel",
+            "pos": [1313.0, 1295.0],
+            "rotation": -270.0
+        },
+        {
+            "id": "Fotel",
+            "type": "@fotel",
+            "pos": [1739.0, 1106.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Fotel (1)",
+            "type": "@fotel",
+            "pos": [1309.0, 958.0],
+            "rotation": -90.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "Console light (7)",
+            "type": "cyber_panel",
+            "pos": [796.0, 1236.0]
+        },
+        {
+            "id": "Warning line corner",
+            "type": "@warning_line_corner",
+            "pos": [653.0, 1331.0],
+            "rotation": -270.0
+        },
+        {
+            "id": "Warning line",
+            "type": "@warning_line",
+            "pos": [352.0, 1359.0],
+            "rotation": -360.0,
+            "size": [512, 33]
+        },
+        {
+            "id": "Console light (5)",
+            "type": "cyber_panel",
+            "pos": [796.0, 932.0]
+        },
+        {
+            "id": "Console light (4)",
+            "type": "cyber_panel",
+            "pos": [1828.0, 1084.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Console light (3)",
+            "type": "cyber_panel",
+            "pos": [796.25, 1083.75],
+            "rotation": -360.0
+        },
+        {
+            "id": "Console light (1)",
+            "type": "cyber_panel",
+            "pos": [1828.0, 932.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Console light",
+            "type": "cyber_panel",
+            "pos": [1828.0, 1236.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Floor connector 2 (1)",
+            "type": "@floor_connector_2",
+            "pos": [192.0, 751.9999389648438],
+            "rotation": -360.0,
+            "size": [1152, 32]
+        },
+        {
+            "id": "Warning line (2)",
+            "type": "@warning_line",
+            "pos": [682.5, 1031.5],
+            "rotation": -450.0,
+            "size": [512, 33]
+        },
+        {
+            "id": "GeneratorCONSOLE (1)",
+            "type": "@generatorconsole",
+            "pos": [1101.0, 2096.0],
+            "rotation": -360.0,
+            "size": [54, 192]
+        },
+        {
+            "id": "black on floor (2)",
+            "type": "@blank9",
+            "pos": [805.0, 1832.0],
+            "rotation": -90.0,
+            "size": [118, 243]
+        },
+        {
+            "id": "GeneratorPART1 (1)",
+            "type": "@generatorpart1",
+            "pos": [1664.0, 2106.0],
+            "rotation": -90.0,
+            "size": [820, 129]
+        },
+        {
+            "id": "black on floor (1)",
+            "type": "@blank9",
+            "pos": [804.0, 1832.0],
+            "rotation": -90.0,
+            "size": [118, 243]
+        },
+        {
+            "id": "Warning line (1)",
+            "type": "@warning_line",
+            "pos": [2544.0, 1536.0],
+            "rotation": -90.0,
+            "size": [384, 33]
+        },
+        {
+            "id": "Pale cyan floor 1 (13)",
+            "type": "@pale_cyan_floor_1",
+            "pos": [-64.0, 576.0],
+            "rotation": -90.0,
+            "size": [384, 640],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Water room floor 2",
+            "type": "@water_room_floor_2",
+            "pos": [-64.0, 800.0],
+            "size": [640, 64]
+        },
+        {
+            "id": "Water room floor-brighter",
+            "type": "@water_room_floor",
+            "pos": [768.0, 1056.0],
+            "size": [2176, 448],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (1)",
+            "type": "@water_room_floor_2",
+            "pos": [1536.0, 1312.0],
+            "size": [3840, 64]
+        },
+        {
+            "id": "Water room floor 2 (2)",
+            "type": "@water_room_floor_2",
+            "pos": [-352.0, 1056.0],
+            "size": [64, 448]
+        },
+        {
+            "id": "Water room floor 2 (3)",
+            "type": "@water_room_floor_2",
+            "pos": [-352.0, 2080.0],
+            "size": [64, 1472]
+        },
+        {
+            "id": "Water room floor-brighter (1)",
+            "type": "@water_room_floor",
+            "pos": [3008.0, 1472.0],
+            "size": [896, 256],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (4)",
+            "type": "@water_room_floor_2",
+            "pos": [3008.0, 1632.0],
+            "size": [896, 64]
+        },
+        {
+            "id": "Water room floor 2 (5)",
+            "type": "@water_room_floor_2",
+            "pos": [2528.0, 2112.0],
+            "size": [64, 1536]
+        },
+        {
+            "id": "Water room floor-brighter (2)",
+            "type": "@water_room_floor",
+            "pos": [-64.0, 2144.0],
+            "size": [512, 1344],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (6)",
+            "type": "@water_room_floor_2",
+            "pos": [3008.0, 2464.0],
+            "size": [896, 64]
+        },
+        {
+            "id": "Water room floor-brighter (3)",
+            "type": "@water_room_floor",
+            "pos": [3008.0, 2112.0],
+            "size": [896, 640],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (7)",
+            "type": "@water_room_floor_2",
+            "pos": [3008.0, 1760.0],
+            "size": [896, 64]
+        },
+        {
+            "id": "Water room floor 2 (8)",
+            "type": "@water_room_floor_2",
+            "pos": [64.0, 2848.0],
+            "size": [896, 64]
+        },
+        {
+            "id": "Water room floor-brighter (4)",
+            "type": "@water_room_floor",
+            "pos": [1344.0, 1504.0],
+            "size": [2304, 320],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (5)",
+            "type": "@water_room_floor",
+            "pos": [2112.0, 2240.0],
+            "size": [768, 1152],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (6)",
+            "type": "@water_room_floor",
+            "pos": [960.0, 2688.0],
+            "size": [1536, 256],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (9)",
+            "type": "@water_room_floor_2",
+            "pos": [-96.0, 1440.0],
+            "size": [448, 64]
+        },
+        {
+            "id": "Water room floor 2 (10)",
+            "type": "@water_room_floor_2",
+            "pos": [96.0, 1376.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "Water room floor-brighter (7)",
+            "type": "@water_room_floor",
+            "pos": [160.0, 1408.0],
+            "size": [64, 128],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (11)",
+            "type": "@water_room_floor_2",
+            "pos": [224.0, 2112.0],
+            "size": [64, 896]
+        },
+        {
+            "id": "Water room floor 2 (12)",
+            "type": "@water_room_floor_2",
+            "pos": [992.0, 1696.0],
+            "rotation": -90.0,
+            "size": [64, 1472]
+        },
+        {
+            "id": "Water room floor 2 (13)",
+            "type": "@water_room_floor_2",
+            "pos": [992.0, 2528.0],
+            "rotation": -90.0,
+            "size": [64, 1472]
+        },
+        {
+            "id": "Water room floor 2 (14)",
+            "type": "@water_room_floor_2",
+            "pos": [1696.0, 2112.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "Water room floor 2 (15)",
+            "type": "@water_room_floor_2",
+            "pos": [480.0, 3168.0],
+            "size": [64, 576]
+        },
+        {
+            "id": "Water room floor 2 (16)",
+            "type": "@water_room_floor_2",
+            "pos": [1440.0, 3168.0],
+            "size": [64, 576]
+        },
+        {
+            "id": "Water room floor 2 (17)",
+            "type": "@water_room_floor_2",
+            "pos": [960.0, 3488.0],
+            "rotation": -90.0,
+            "size": [64, 1024]
+        },
+        {
+            "id": "Water room floor-brighter (8)",
+            "type": "@water_room_floor",
+            "pos": [960.0, 3168.0],
+            "size": [384, 192],
+            "color": [255, 0, 30, 255]
+        },
+        {
+            "id": "Water room floor-brighter (9)",
+            "type": "@water_room_floor",
+            "pos": [608.0, 3168.0],
+            "size": [192, 576],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (10)",
+            "type": "@water_room_floor",
+            "pos": [1312.0, 3168.0],
+            "size": [192, 576],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (11)",
+            "type": "@water_room_floor",
+            "pos": [960.0, 3392.0],
+            "size": [384, 128],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (12)",
+            "type": "@water_room_floor",
+            "pos": [960.0, 2944.0],
+            "size": [512, 128],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (18)",
+            "type": "@water_room_floor_2",
+            "pos": [1952.0, 2848.0],
+            "size": [1088, 64]
+        },
+        {
+            "id": "Water room floor-brighter (13)",
+            "type": "@water_room_floor",
+            "pos": [960.0, 2848.0],
+            "size": [896, 64],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor-brighter (14)",
+            "type": "@water_room_floor",
+            "pos": [1184.0, 3392.0],
+            "size": [64, 128],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (19)",
+            "type": "@water_room_floor_2",
+            "pos": [1184.0, 3168.0],
+            "rotation": -90.0,
+            "size": [320, 64]
+        },
+        {
+            "id": "Water room floor 2 (20)",
+            "type": "@water_room_floor_2",
+            "pos": [960.0, 3296.0],
+            "size": [384, 64]
+        },
+        {
+            "id": "Water room floor 2 (21)",
+            "type": "@water_room_floor_2",
+            "pos": [736.0, 3168.0],
+            "rotation": -90.0,
+            "size": [320, 64]
+        },
+        {
+            "id": "Water room floor-brighter (15)",
+            "type": "@water_room_floor",
+            "pos": [736.0, 3392.0],
+            "size": [64, 128],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (22)",
+            "type": "@water_room_floor_2",
+            "pos": [960.0, 3040.0],
+            "size": [384, 64]
+        },
+        {
+            "id": "Neteee (2)",
+            "type": "@neteee",
+            "pos": [1216.0, 2112.0],
+            "size": [256, 768],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Tile1 (1)",
+            "type": "@tile1",
+            "pos": [1472.0, 2112.0],
+            "size": [256, 768]
+        },
+        {
+            "id": "Tile1",
+            "type": "@tile1",
+            "pos": [704.0, 2112.0],
+            "size": [768, 768]
+        },
+        {
+            "id": "Fotel (9)",
+            "type": "@fotel",
+            "pos": [507.0, 2094.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "GeneratorPART1 (1)-left",
+            "type": "@generatorpart1",
+            "pos": [256.0, 2106.0],
+            "rotation": 90.0,
+            "size": [820, 129],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Strong lamp (39)",
             "type": "point_light",
-            "pos": [2225.0, -975.0],
-            "color": [0, 255, 195, 83],
+            "pos": [-224.0, 2106.0],
+            "color": [255, 255, 255, 133],
             "falloff": {
-                "radius": 1234.47705078125,
-                "strength": 9
+                "constant": 0.6290000081062317,
+                "linear": 0.3709999918937683,
+                "radius": 1358.6500244140625,
+                "strength": 11
             },
-            "wall_falloff": {}
+            "wall_falloff": {},
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
         },
         {
-            "id": "Strong lamp (2)",
+            "id": "Strong lamp (40)",
             "type": "point_light",
-            "pos": [3185.0, 1281.0],
-            "color": [80, 255, 71, 94],
+            "pos": [1665.0, 2305.0],
+            "color": [27, 255, 255, 254],
             "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 1244.7550048828125,
+                "strength": 6
             },
             "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
+                "radius": 1082.5179443359375
             }
         },
         {
-            "id": "Strong lamp (31)",
+            "id": "Strong lamp (42)",
             "type": "point_light",
-            "pos": [2503.0, -491.0],
-            "color": [80, 255, 71, 77],
+            "pos": [1665.0, 1889.0],
+            "color": [27, 255, 255, 254],
             "falloff": {
-                "radius": 576.2490234375,
-                "strength": 19
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 1244.7550048828125,
+                "strength": 6
             },
             "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
+                "radius": 1082.5179443359375
             }
         },
         {
-            "id": "Strong lamp (32)",
+            "id": "Strong lamp (3)",
             "type": "point_light",
-            "pos": [1951.0, -481.0],
-            "color": [80, 255, 71, 91],
+            "pos": [897.0, 2209.0],
+            "color": [44, 255, 255, 254],
             "falloff": {
-                "radius": 1141.2740478515625,
-                "strength": 9
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 251.7480010986328,
+                "strength": 15
             },
             "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            },
-            "positional_vibration": 0.0
-        },
-        {
-            "id": "Strong lamp (33)",
-            "type": "point_light",
-            "pos": [1343.0, 255.0],
-            "color": [80, 255, 71, 100],
-            "falloff": {
-                "radius": 593.1265258789063,
-                "strength": 22
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
+                "radius": 1082.5179443359375
             }
         },
         {
-            "id": "Strong lamp (34)",
+            "id": "Strong lamp (43)",
             "type": "point_light",
-            "pos": [3295.0, -129.0],
-            "color": [70, 255, 0, 164],
+            "pos": [289.0, 1889.0],
+            "color": [0, 15, 255, 53],
             "falloff": {
-                "radius": 512.8584594726563
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 314.68499755859375,
+                "strength": 15
             },
-            "wall_falloff": {}
-        },
-        {
-            "id": "Strong lamp (35)",
-            "type": "point_light",
-            "pos": [1919.0, 609.0],
-            "color": [80, 255, 71, 126],
-            "falloff": {
-                "radius": 1233.0579833984375,
-                "strength": 8
-            },
-            "wall_falloff": {
-                "radius": 1569.6199951171875,
-                "strength": 24
+            "OFF_wall_falloff": {
+                "radius": 1082.5179443359375
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
-            "id": "wandering_smoke (1)",
+            "id": "Strong lamp (44)",
+            "type": "point_light",
+            "pos": [1217.0, 1793.0],
+            "color": [0, 15, 255, 254],
+            "falloff": {
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 447.552001953125,
+                "strength": 14
+            },
+            "wall_falloff": {
+                "radius": 545.4550170898438
+            }
+        },
+        {
+            "id": "Strong lamp (45)",
+            "type": "point_light",
+            "pos": [1215.0, 2431.0],
+            "color": [0, 15, 255, 78],
+            "falloff": {
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 314.68499755859375,
+                "strength": 15
+            },
+            "wall_falloff": {
+                "radius": 1082.5179443359375
+            }
+        },
+        {
+            "id": "Strong lamp (46)",
+            "type": "point_light",
+            "pos": [289.0, 2305.0],
+            "color": [0, 15, 255, 53],
+            "falloff": {
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 314.68499755859375,
+                "strength": 15
+            },
+            "OFF_wall_falloff": {
+                "radius": 1082.5179443359375
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "Strong lamp (7)",
+            "type": "point_light",
+            "pos": [976.0, 3467.0],
+            "color": [27, 255, 255, 106],
+            "falloff": {
+                "constant": 0.7829673886299133,
+                "linear": 0.21699999272823334,
+                "quadratic": 0.00003265999839641154,
+                "radius": 1244.7550048828125,
+                "strength": 6
+            },
+            "wall_falloff": {
+                "radius": 1082.5179443359375
+            }
+        },
+        {
+            "id": "Wandering smoke (2)",
             "type": "wandering_smoke",
-            "color": [0, 255, 0, 255],
-            "scale_amounts": 0.5,
-            "scale_lifetimes": 4.0,
-            "pos": [4186.0, -155.0],
-            "rotation": -180.0
+            "pos": [33.0, 2111.0]
         },
         {
-            "id": "portal_circle",
-            "type": "portal_circle",
-            "color": [0, 255, 0, 255],
-            "pos": [3535.0, -136.0],
-            "rotation": -180.0
+            "id": "Wandering smoke (3)",
+            "type": "wandering_smoke",
+            "pos": [257.0, 2593.0]
         },
         {
-            "id": "Wandering pixels",
-            "type": "wandering_pixels",
-            "color": [80, 255, 71, 101],
-            "illuminate": false,
-            "pos": [2064.0, 96.0],
-            "size": [1728, 1344]
+            "id": "Wandering smoke (4)",
+            "type": "wandering_smoke",
+            "pos": [1761.0, 2079.0]
         },
         {
-            "id": "Wandering pixels (1)",
-            "type": "aquarium_pixels_dim",
-            "color": [80, 255, 71, 255],
-            "num_particles": 50,
-            "force_particles_within_bounds": false,
-            "pos": [2080.0, 96.0],
-            "size": [1728, 1344]
-        },
-        {
-            "id": "Wandering pixels (3)",
-            "type": "wandering_pixels",
-            "color": [0, 255, 255, 255],
-            "num_particles": 345,
-            "pos": [2848.0, -192.0],
-            "size": [128, 1088]
-        },
-        {
-            "id": "Wandering pixels (4)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "illuminate": false,
-            "pos": [1352.0, 720.0],
-            "size": [400, 128]
-        },
-        {
-            "id": "Wandering pixels (5)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "pos": [2203.0, -296.0],
-            "size": [165, 512]
-        },
-        {
-            "id": "Wandering pixels (6)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "illuminate": false,
-            "pos": [2440.0, -768.0],
-            "size": [400, 128]
-        },
-        {
-            "id": "Wandering pixels (7)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "illuminate": false,
-            "pos": [1608.0, 528.0],
-            "size": [112, 512]
-        },
-        {
-            "id": "Wandering pixels (8)",
-            "type": "wandering_pixels",
-            "color": [255, 0, 212, 255],
-            "num_particles": 97,
-            "pos": [2084.0, -110.0],
-            "size": [310, 128]
-        },
-        {
-            "id": "Wandering pixels (9)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "illuminate": false,
-            "pos": [1824.0, 320.0],
-            "size": [352, 512]
-        },
-        {
-            "id": "Wandering pixels (11)",
-            "type": "wandering_pixels",
-            "color": [255, 0, 212, 255],
-            "num_particles": 97,
-            "pos": [1984.0, -336.0],
-            "size": [128, 288]
-        },
-        {
-            "id": "Wandering pixels (12)",
-            "type": "wandering_pixels",
-            "color": [255, 222, 0, 255],
-            "num_particles": 97,
-            "pos": [2144.0, 208.0],
-            "size": [192, 160]
-        },
-        {
-            "id": "Wandering pixels (13)",
-            "type": "wandering_pixels",
-            "color": [43, 255, 0, 255],
-            "num_particles": 97,
-            "pos": [1520.0, -128.0],
-            "size": [544, 128]
-        },
-        {
-            "id": "Wandering pixels (14)",
-            "type": "wandering_pixels",
-            "color": [43, 255, 0, 255],
-            "num_particles": 97,
-            "pos": [1840.0, 192.0],
-            "size": [544, 128]
-        },
-        {
-            "id": "Wandering pixels (2)",
-            "type": "wandering_pixels",
-            "color": [0, 131, 255, 255],
-            "num_particles": 290,
-            "pos": [2539.0, -122.0],
-            "size": [257, 195]
-        },
-        {
-            "id": "Wandering pixels (10)",
-            "type": "wandering_pixels",
-            "color": [0, 131, 255, 255],
-            "num_particles": 226,
-            "pos": [2608.0, 242.0],
-            "size": [278, 227]
-        },
-        {
-            "id": "Wandering pixels (15)",
-            "type": "wandering_pixels",
-            "color": [0, 131, 255, 255],
-            "num_particles": 226,
-            "pos": [3259.0, 237.0],
-            "size": [228, 445]
-        },
-        {
-            "id": "Wandering pixels (16)",
-            "type": "wandering_pixels",
-            "color": [107, 219, 82, 255],
-            "illuminate": false,
-            "pos": [2130.0, 762.0],
-            "size": [400, 128]
-        },
-        {
-            "id": "Wandering pixels (17)",
-            "type": "wandering_pixels",
-            "active": false,
-            "color": [0, 255, 255, 255],
-            "num_particles": 43,
-            "pos": [1696.0, 600.0],
-            "size": [288, 144]
+            "id": "Wandering smoke (7)",
+            "type": "wandering_smoke",
+            "pos": [319.0, 1761.0]
         },
         {
             "id": "spawn",
             "type": "team_spawn",
             "faction": "METROPOLIS",
-            "pos": [2497.0, 81.0],
-            "rotation": -171.9368896484375
+            "pos": [111.0, 2305.0]
         },
         {
-            "id": "Organism area",
-            "type": "organism_area",
-            "pos": [2295.0, 8.0],
-            "size": [1941, 1132]
+            "id": "Bombsite c",
+            "type": "bombsite",
+            "pos": [832.0, 2096.0],
+            "size": [896, 224]
         }
     ]
 }

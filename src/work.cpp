@@ -3732,21 +3732,17 @@ work_result work(
 		using T = decltype(t);
 
 		switch (t) {
-#if !WEB_LOWEND
-			case T::JOIN_DISCORD:
+			case T::DISCORD:
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
-			case T::AVAILABLE_ON_GITHUB:
+			case T::GITHUB:
 				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
 				break;
-#endif
 
-#if PLATFORM_WEB
-			case T::DOWNLOAD_ON_STEAM:
+			case T::STEAM:
 				augs::open_url("https://store.steampowered.com/app/2660970/Hypersomnia/");
 				break;
-#endif
 
 			case T::DOWNLOAD_MAPS:
 				map_catalogue_gui.open();
@@ -3840,19 +3836,17 @@ work_result work(
 		using T = decltype(t);
 
 		switch (t) {
-			case T::JOIN_DISCORD:
+			case T::DISCORD:
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
-#if PLATFORM_WEB
-			case T::AVAILABLE_ON_GITHUB:
+			case T::GITHUB:
 				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
 				break;
 
-			case T::DOWNLOAD_ON_STEAM:
+			case T::STEAM:
 				augs::open_url("https://store.steampowered.com/app/2660970/Hypersomnia/");
 				break;
-#endif
 
 			case T::INVITE_TO_JOIN:
 				if (is_during_tutorial()) {

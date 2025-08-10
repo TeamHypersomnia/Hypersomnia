@@ -64,7 +64,7 @@ void test_mode::teleport_to_next_spawn(const input_type in, const mode_player_id
 			::snap_interpolated_to(typed_handle, spawn_transform);
 
 			if (const auto crosshair = typed_handle.find_crosshair()) {
-				crosshair->base_offset = spawn_transform.get_direction() * 200;
+				crosshair->base_offset = vec2i(spawn_transform.get_direction() * 200);
 			}
 		};
 

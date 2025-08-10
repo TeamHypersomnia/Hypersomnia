@@ -128,30 +128,18 @@ public:
 			secondary_color = rgba::get_bright_wave(secs + 0.4, 0.55);
 		}
 
-		if (this_id->special_image == assets::necessary_image_id::STEAM_BUTTON) {
-			color = white;
-			secondary_color = white;
-		}
-
-		if (this_id->special_image == assets::necessary_image_id::DISCORD_BUTTON) {
-			color = rgba(84, 243, 255, 255);
-			secondary_color = rgba(84, 243, 255, 255);
-		}
-
-		if (this_id->special_image == assets::necessary_image_id::GITHUB_BUTTON) {
-			color = white;
-			secondary_color = white;
-		}
-
+		auto special_image_color = white;
 		rgba inside_col = white;
 		rgba border_col = white;
 
 		inside_col.a = 20;
 		border_col.a = 190;
+		special_image_color.a = 190;
 
 		if (detector.is_hovered) {
 			inside_col.a = 30;
 			border_col.a = 220;
+			special_image_color.a = 220;
 		}
 
 		const bool pushed = detector.current_appearance == augs::gui::appearance_detector::appearance::pushed;
@@ -159,24 +147,31 @@ public:
 		if (pushed) {
 			inside_col.a = 60;
 			border_col.a = 255;
+			special_image_color.a = 255;
 		}
 
-		inside_col *= color;
-		border_col *= color;
+		if (!this_id->special_image.has_value()) {
+			inside_col *= color;
+			border_col *= color;
+		}
+
+		//special_image_color *= color;
 
 		const auto flip = this_id->corners.flip;
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(necessarys, this_tree_entry.get_absolute_rect());
 
 		{
-			this_id->corners.for_each_button_corner(
-				necessarys,
-				internal_rc, 
-				[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
-					if (is_lb_complement(type)) { return; }
-					const auto col = is_button_border(type) ? border_col : inside_col;
-					output.aabb(necessarys.at(id), drawn_rc, col, flip);
-				}
-			);
+			if (!this_id->special_image.has_value()) {
+				this_id->corners.for_each_button_corner(
+					necessarys,
+					internal_rc, 
+					[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
+						if (is_lb_complement(type)) { return; }
+						const auto col = is_button_border(type) ? border_col : inside_col;
+						output.aabb(necessarys.at(id), drawn_rc, col, flip);
+					}
+				);
+			}
 
 			if (this_id->detector.is_hovered) {
 				auto hover_effect_rc = internal_rc;
@@ -218,7 +213,8 @@ public:
 		}
 
 		if (this_id->special_image.has_value()) {
-			output.aabb(necessarys.at(*this_id->special_image), this_tree_entry.get_absolute_rect(), white);
+			auto rc = this_tree_entry.get_absolute_rect();
+			output.aabb(necessarys.at(*this_id->special_image), rc, special_image_color);
 		}
 		else {
 			this_id->appearing_caption.draw(
