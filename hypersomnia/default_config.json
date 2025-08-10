@@ -740,7 +740,7 @@
     "gui_fonts": {
         "gui": {
             "settings": {},
-            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "source_font_path": "content/fonts/Ubuntu-Regular.ttf",
             "unicode_ranges": [
                 {
                     "first": 32,
@@ -757,7 +757,7 @@
         },
         "larger_gui": {
             "settings": {},
-            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "source_font_path": "content/fonts/Ubuntu-Regular.ttf",
             "unicode_ranges": [
                 {
                     "first": 32,
@@ -774,7 +774,7 @@
         },
         "medium_numbers": {
             "settings": {},
-            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "source_font_path": "content/fonts/Ubuntu-Regular.ttf",
             "unicode_ranges": [
                 {
                     "first": 48,
@@ -829,7 +829,7 @@
         },
         "large_numbers": {
             "settings": {},
-            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "source_font_path": "content/fonts/Ubuntu-Regular.ttf",
             "unicode_ranges": [
                 {
                     "first": 48,
@@ -842,7 +842,7 @@
         },
         "very_large_numbers": {
             "settings": {},
-            "source_font_path": "content/fonts/LiberationSans-Regular.ttf",
+            "source_font_path": "content/fonts/Ubuntu-Regular.ttf",
             "unicode_ranges": [
                 {
                     "first": 48,
