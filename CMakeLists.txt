@@ -215,6 +215,7 @@ option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled
 
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
 option(USE_SYSTEM_OPENAL "Use system OpenAL library instead of building it." OFF)
+option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library instead of building it." OFF)
 
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
@@ -1153,6 +1154,15 @@ set(HYPERSOMNIA_HEADERS
 
 # We configure include directories for Hypersomnia codebase.
 
+if(USE_SYSTEM_RAPIDJSON)
+	message("Looking for system RapidJSON")
+	find_package(RapidJSON REQUIRED)
+
+	message("Found the system RapidJSON at: ${RAPIDJSON_INCLUDE_DIRS}")
+else()
+	set(RAPIDJSON_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include")
+endif()
+
 set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
@@ -1163,7 +1173,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/serialize"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
+	"${RAPIDJSON_INCLUDE_DIRS}"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel/deps/json/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/date/include"
