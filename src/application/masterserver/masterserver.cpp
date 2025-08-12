@@ -26,7 +26,7 @@
 #include "application/detail_file_paths.h"
 #include "application/setups/server/webhooks.h"
 #include "application/masterserver/server_list_entry_json.h"
-#include "3rdparty/rapidjson/include/rapidjson/prettywriter.h"
+#include "rapidjson/prettywriter.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/network/netcode_utils.h"
 #include "augs/misc/httplib_utils.h"
