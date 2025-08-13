@@ -214,6 +214,7 @@ option(BUILD_TEST_SCENES "Build built-in official content (legacy flag - should 
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ON)
 
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
+option(USE_SYSTEM_LIBDATACHANNEL "Use system LibDataChannel library instead of building it." OFF)
 option(USE_SYSTEM_OPENAL "Use system OpenAL library instead of building it." OFF)
 option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library instead of building it." OFF)
 
@@ -2175,6 +2176,11 @@ if(BUILD_WEBRTC)
 		target_compile_options(datachannel-wasm PRIVATE -Wno-unused-parameter)
 
 		list(APPEND HYPERSOMNIA_LIBS datachannel-wasm)
+	elseif(USE_SYSTEM_LIBDATACHANNEL)
+		message("Looking for system LibDataChannel...")
+		find_package(LibDataChannel REQUIRED)
+
+		list(APPEND HYPERSOMNIA_LIBS LibDataChannel::LibDataChannel)
 	else()
 		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel" EXCLUDE_FROM_ALL)
 
