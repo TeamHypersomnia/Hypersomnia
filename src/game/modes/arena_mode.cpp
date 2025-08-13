@@ -3166,8 +3166,6 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.losers_abandoned = result.losers_abandoned;
 	summary.was_ranked = is_ranked_live();
 
-	summary.all_bots = true;
-
 	if (in.rules.is_ffa()) {
 		summary.was_ffa = true;
 
@@ -3175,7 +3173,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 			faction_type::FFA,
 			[&](const auto& id, const auto& player) {
 				if (!player.is_bot) {
-					summary.all_bots = false;
+					summary.non_bots++;
 				}
 
 				summary.first_faction.emplace_back(make_entry(id, player));
@@ -3212,7 +3210,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 
 	auto add_to_first = [&](const auto& id, const auto& player) {
 		if (!player.is_bot) {
-			summary.all_bots = false;
+			summary.non_bots++;
 		}
 
 		if (strongest_in_first == mode_player_id::dead()) {
@@ -3224,7 +3222,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 
 	auto add_to_second = [&](const auto& id, const auto& player) {
 		if (!player.is_bot) {
-			summary.all_bots = false;
+			summary.non_bots++;
 		}
 
 		if (strongest_in_second == mode_player_id::dead()) {

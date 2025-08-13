@@ -111,6 +111,10 @@ namespace messages {
 			std::swap(first_faction, second_faction);
 		}
 
-		bool all_bots = false;
+		int non_bots = 0;
+
+		bool alone_or_all_bots() const {
+			return non_bots < 2;
+		}
 	};
 }

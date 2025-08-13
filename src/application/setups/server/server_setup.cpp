@@ -1276,7 +1276,7 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		for (const auto& summary : summaries) {
 			request_immediate_heartbeat();
 
-			if (summary.all_bots) {
+			if (summary.alone_or_all_bots()) {
 				continue;
 			}
 
