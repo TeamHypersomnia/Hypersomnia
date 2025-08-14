@@ -4,11 +4,11 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
+int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
 #if PLATFORM_WEB
 #include <emscripten.h>
 #include <emscripten/html5.h>
-
-int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
 
 EM_JS(int, get_canvas_width, (), { return canvas.width; });
 EM_JS(int, get_canvas_height, (), { return canvas.height; });
