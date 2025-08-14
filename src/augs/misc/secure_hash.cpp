@@ -4,7 +4,7 @@
 #include <iomanip>
 
 #include "augs/misc/secure_hash.h"
-#include "3rdparty/blake3/blake3.h"
+#include "blake3.h"
 
 std::string get_hex_representation(const uint8_t *Bytes, const size_t Length) {
 	std::ostringstream os;

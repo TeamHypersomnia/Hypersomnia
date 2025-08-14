@@ -213,6 +213,7 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_TEST_SCENES "Build built-in official content (legacy flag - should always be on)" ON)
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ON)
 
+option(USE_SYSTEM_BLAKE3 "Use system blake3 library instead of building it." OFF)
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
 option(USE_SYSTEM_LIBDATACHANNEL "Use system LibDataChannel library instead of building it." OFF)
 option(USE_SYSTEM_OPENAL "Use system OpenAL library instead of building it." OFF)
@@ -1711,64 +1712,71 @@ endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/streflop")
 
-set(BLAKE3_PATH "${PROJECT_SOURCE_DIR}/src/3rdparty/blake3")
+if (NOT USE_SYSTEM_BLAKE3)
+	set(BLAKE3_PATH "${PROJECT_SOURCE_DIR}/src/3rdparty/blake3")
 
-set(BLAKE3_DEFINES)
-set(BLAKE3_NO_SIMD -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512)
+	set(BLAKE3_DEFINES)
+	set(BLAKE3_NO_SIMD -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512)
 
-IF (BLAKE_PORTABLE)
-    message("BLAKE_PORTABLE was set. Disabling SIMD.")
+	IF (BLAKE_PORTABLE)
+		message("BLAKE_PORTABLE was set. Disabling SIMD.")
 
-    set(BLAKE3_SRC
-        ${BLAKE3_PATH}/blake3.c
-        ${BLAKE3_PATH}/blake3_portable.c
-        ${BLAKE3_PATH}/blake3_dispatch.c
-    )
+		set(BLAKE3_SRC
+			${BLAKE3_PATH}/blake3.c
+			${BLAKE3_PATH}/blake3_portable.c
+			${BLAKE3_PATH}/blake3_dispatch.c
+		)
 
-    list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
-ELSE()
-    IF (MSVC)
-        set(BLAKE3_SRC
-            ${BLAKE3_PATH}/blake3.c
-            ${BLAKE3_PATH}/blake3_portable.c
-            ${BLAKE3_PATH}/blake3_dispatch.c
-            ${BLAKE3_PATH}/blake3_avx2_x86-64_windows_gnu.S
-            ${BLAKE3_PATH}/blake3_avx512_x86-64_windows_gnu.S
-            ${BLAKE3_PATH}/blake3_sse41_x86-64_windows_gnu.S
-            ${BLAKE3_PATH}/blake3_sse2_x86-64_windows_gnu.S
-        )
-    ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
-        set(BLAKE3_SRC
-            ${BLAKE3_PATH}/blake3.c
-            ${BLAKE3_PATH}/blake3_portable.c
-            ${BLAKE3_PATH}/blake3_dispatch.c
-            ${BLAKE3_PATH}/blake3_avx2_x86-64_unix.S
-            ${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
-            ${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
-            ${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
-        )
-    ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
-        set(BLAKE3_SRC
-            ${BLAKE3_PATH}/blake3.c
-            ${BLAKE3_PATH}/blake3_portable.c
-            ${BLAKE3_PATH}/blake3_dispatch.c
-            ${BLAKE3_PATH}/blake3_neon.c
-        )
-    ELSE()
-        set(BLAKE3_SRC
-            ${BLAKE3_PATH}/blake3.c
-            ${BLAKE3_PATH}/blake3_portable.c
-            ${BLAKE3_PATH}/blake3_dispatch.c
-        )
+		list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
+	ELSE()
+		IF (MSVC)
+			set(BLAKE3_SRC
+				${BLAKE3_PATH}/blake3.c
+				${BLAKE3_PATH}/blake3_portable.c
+				${BLAKE3_PATH}/blake3_dispatch.c
+				${BLAKE3_PATH}/blake3_avx2_x86-64_windows_gnu.S
+				${BLAKE3_PATH}/blake3_avx512_x86-64_windows_gnu.S
+				${BLAKE3_PATH}/blake3_sse41_x86-64_windows_gnu.S
+				${BLAKE3_PATH}/blake3_sse2_x86-64_windows_gnu.S
+			)
+		ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
+			set(BLAKE3_SRC
+				${BLAKE3_PATH}/blake3.c
+				${BLAKE3_PATH}/blake3_portable.c
+				${BLAKE3_PATH}/blake3_dispatch.c
+				${BLAKE3_PATH}/blake3_avx2_x86-64_unix.S
+				${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
+				${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
+				${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
+			)
+		ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
+			set(BLAKE3_SRC
+				${BLAKE3_PATH}/blake3.c
+				${BLAKE3_PATH}/blake3_portable.c
+				${BLAKE3_PATH}/blake3_dispatch.c
+				${BLAKE3_PATH}/blake3_neon.c
+			)
+		ELSE()
+			set(BLAKE3_SRC
+				${BLAKE3_PATH}/blake3.c
+				${BLAKE3_PATH}/blake3_portable.c
+				${BLAKE3_PATH}/blake3_dispatch.c
+			)
 
-        list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
-    ENDIF()
-ENDIF()
+			list(APPEND BLAKE3_DEFINES ${BLAKE3_NO_SIMD})
+		ENDIF()
+	ENDIF()
 
-add_library(blake3 STATIC ${BLAKE3_SRC})
+	add_library(blake3 STATIC ${BLAKE3_SRC})
 
-if (BLAKE3_DEFINES)
-    target_compile_options(blake3 PRIVATE ${BLAKE3_DEFINES})
+	if (BLAKE3_DEFINES)
+		target_compile_options(blake3 PRIVATE ${BLAKE3_DEFINES})
+	endif()
+
+	list(APPEND HYPERSOMNIA_INCLUDE_DIRS "${BLAKE3_PATH}")
+else()
+	message("Looking for system BLAKE3")
+	find_package(BLAKE3 REQUIRED)
 endif()
 
 # We build the remaining libraries.
@@ -1979,7 +1987,13 @@ endif()
 
 # We define libraries upon which Hypersomnia depends.
 
-set(HYPERSOMNIA_LIBS streflop blake3)
+set(HYPERSOMNIA_LIBS streflop)
+
+if (USE_SYSTEM_BLAKE3)
+	list(APPEND HYPERSOMNIA_LIBS BLAKE3::blake3)
+else()
+	list(APPEND HYPERSOMNIA_LIBS blake3)
+endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
 
