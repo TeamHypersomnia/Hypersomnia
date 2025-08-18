@@ -3,7 +3,7 @@
 #include <sstream>
 #include <numeric>
 
-#include "3rdparty/rectpack2D/src/finders_interface.h"
+#include "3rdparty/rectpack2D/src/rectpack2D/finders_interface.h"
 
 #include "augs/ensure.h"
 #include "augs/log.h"
