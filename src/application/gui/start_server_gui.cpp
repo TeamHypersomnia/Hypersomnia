@@ -164,7 +164,7 @@ as well as to test your skills in a laggy environment.
 
 			enum_combo("Difficulty", bot_difficulty);
 
-			text_disabled("Sending \"/bots hard\" in chat chagnes difficulty.");
+			text_disabled("Sending \"/bots hard\" in chat changes difficulty.");
 
 			slider("Num allies", bot_allies, 0, 20);
 			slider("Num enemies", bot_enemies, 0, 20);
