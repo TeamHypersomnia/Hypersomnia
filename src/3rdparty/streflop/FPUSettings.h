@@ -131,22 +131,22 @@ enum FPU_RoundMode {
 */
 
 // plan for portability
-#if defined(_MSC_VER)
-#define STREFLOP_FSTCW(cw) do { short tmp; __asm { fstcw tmp }; (cw) = tmp; } while (0)
-#define STREFLOP_FLDCW(cw) do { short tmp = (cw); __asm { fclex }; __asm { fldcw tmp }; } while (0)
-#define STREFLOP_STMXCSR(cw) do { int tmp; __asm { stmxcsr tmp }; (cw) = tmp; } while (0)
-#define STREFLOP_LDMXCSR(cw) do { int tmp = (cw); __asm { ldmxcsr tmp }; } while (0)
-#elif PLATFORM_WEB || PLATFORM_ARM64
-#define STREFLOP_FSTCW(cw) (cw=0);
-#define STREFLOP_FLDCW(cw) ((void)cw);
-#define STREFLOP_STMXCSR(cw) (cw=0);
-#define STREFLOP_LDMXCSR(cw) ((void)cw);
-#else
+#if defined(__i386__) || defined(__x86_64__)
 #define STREFLOP_FSTCW(cw) do { asm volatile ("fstcw %0" : "=m" (cw) : ); } while (0)
 #define STREFLOP_FLDCW(cw) do { asm volatile ("fclex \n fldcw %0" : : "m" (cw)); } while (0)
 #define STREFLOP_STMXCSR(cw) do { asm volatile ("stmxcsr %0" : "=m" (cw) : ); } while (0)
 #define STREFLOP_LDMXCSR(cw) do { asm volatile ("ldmxcsr %0" : : "m" (cw) ); } while (0)
-#endif // defined(_MSC_VER)
+#elif defined(_M_IX86) || defined(_M_AMD64)
+#define STREFLOP_FSTCW(cw) do { short tmp; __asm { fstcw tmp }; (cw) = tmp; } while (0)
+#define STREFLOP_FLDCW(cw) do { short tmp = (cw); __asm { fclex }; __asm { fldcw tmp }; } while (0)
+#define STREFLOP_STMXCSR(cw) do { int tmp; __asm { stmxcsr tmp }; (cw) = tmp; } while (0)
+#define STREFLOP_LDMXCSR(cw) do { int tmp = (cw); __asm { ldmxcsr tmp }; } while (0)
+#else
+#define STREFLOP_FSTCW(cw) (cw=0);
+#define STREFLOP_FLDCW(cw) ((void)cw);
+#define STREFLOP_STMXCSR(cw) (cw=0);
+#define STREFLOP_LDMXCSR(cw) ((void)cw);
+#endif
 
 // Subset of all C99 functions
 

@@ -1,4 +1,7 @@
 # Spring supplied CMake build file
+# Patched to avoid using SSE compiler flags on platforms that don't support SSE.
+
+include(CheckCXXCompilerFlag)
 
 add_definitions(-DSTREFLOP_SSE)
 
@@ -75,7 +78,12 @@ SET(libm_flt32_source
 SET(cxxflags "-DLIBM_COMPILING_FLT32 -Wno-unused-parameter -I\"${CMAKE_CURRENT_SOURCE_DIR}/libm/headers\"")
 
 if (CLANG OR GCC)
-	SET(cxxflags "${cxxflags} -fno-strict-aliasing -msse -msse2")
+	SET(cxxflags "${cxxflags} -fno-strict-aliasing")
+
+	check_cxx_compiler_flag("-msse;-msse2" SSE2_SUPPORTED)
+	if (SSE2_SUPPORTED)
+		SET(cxxflags "${cxxflags} -msse -msse2")
+	endif()
 
 	if (BUILD_FOR_WEB)
 		SET(cxxflags "${cxxflags} -msimd128")
