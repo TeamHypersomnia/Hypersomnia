@@ -267,7 +267,7 @@ enum class ad_state_type {
 
 #if PLATFORM_WEB
 EM_JS(char*, crazygames_get_invite_link, (), {
-    var gameLink = Module.cg_game_link || "";
+    var gameLink = Module.cg_invite_link || "";
     var length = lengthBytesUTF8(gameLink) + 1;
     var buffer = _malloc(length);
     stringToUTF8(gameLink, buffer, length);
@@ -432,7 +432,13 @@ work_result work(
 	call_get_user_geolocation();
 
 	WEBSTATIC const bool is_steam_client = false;
+
+#if WEB_ITCH
+	WEBSTATIC const bool ranked_servers_enabled = false;
+#else
 	WEBSTATIC const bool ranked_servers_enabled = true;
+#endif
+
 #else
 	WEBSTATIC const bool is_cli_tool = params.is_cli_tool();
 

@@ -7376,3 +7376,6 @@ This will discard your redo history."
 
 - does play ranked filter for incompatible?
 
+- implement (actually just set them up) TURN servers
+	- all official servers can be TURN servers
+

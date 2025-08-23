@@ -1,4 +1,0 @@
-stun:stun.l.google.com:19302
-stun:stun.1und1.de:3479
-turn:somnia:Re8Iefei@arena-us.hypersomnia.xyz:3478
-turn:somnia:Re8Iefei@arena-pl.hypersomnia.xyz:3478

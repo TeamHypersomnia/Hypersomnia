@@ -6,9 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- implement (actually just set them up) TURN servers
-	- all official servers can be TURN servers
-
+- reduce recoil by half
 - compactize match summaries and remove join by web maybe there
 
 - we can fill pngs and ogg/wavs with empty content for the headless dedicated server, will save plenty of space

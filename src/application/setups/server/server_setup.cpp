@@ -660,14 +660,17 @@ bool server_setup::is_webrtc_only() {
 }
 
 std::vector<rtc::IceServer> get_ice_servers() {
-	const auto path = DETAIL_DIR / "web/webrtc_ice_servers.txt";
-	const auto lines = augs::file_to_lines(path);
-
 	std::vector<rtc::IceServer> out;
 
-	for (const auto& l : lines) {
-		out.emplace_back(l);
-	}
+	/*
+		Have to add manually for now,
+		as the datachannel-wasm doesn't correctly parse it and we get errors.
+	*/
+
+	out.emplace_back(rtc::IceServer("stun.l.google.com", 19302));
+	out.emplace_back(rtc::IceServer("stun.1und1.de", 3479));
+	out.emplace_back(rtc::IceServer("arena-us.hypersomnia.xyz", 3478, "somnia", "Re8Iefei"));
+	out.emplace_back(rtc::IceServer("arena-pl.hypersomnia.xyz", 3478, "somnia", "Re8Iefei"));
 
 	return out;
 }
