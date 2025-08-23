@@ -67,6 +67,16 @@ namespace augs {
 augs::mutex open_url_on_main_lk;
 std::string open_url_on_main;
 
+#elif PLATFORM_UNIX
+
+#include <thread>
+/*
+ * This function exists because std::system takes a "const char*" argument,
+ * We want something that we can take std::string by-value.
+ */
+static void run_command(std::string command) {
+	std::system(command.c_str());
+}
 #endif
 
 namespace augs {
@@ -79,15 +89,16 @@ namespace augs {
 		auto lock = augs::scoped_lock(open_url_on_main_lk);
 		open_url_on_main = url;
 	}
-#elif PLATFORM_LINUX
+#elif PLATFORM_UNIX
 	void open_url(const std::string& url) {
-		std::string command = "xdg-open " + url;
-		std::system(command.c_str());
-	}
-#elif PLATFORM_MACOS
-	void open_url(const std::string& url) {
-        std::string command = "open " + url;
-		std::system(command.c_str());
+		std::string command =
+#if PLATFORM_LINUX
+			"xdg-open " + url;
+#else
+			"open " + url;
+#endif
+		std::thread th(run_command, command);
+		th.detach();
 	}
 #endif
 }
