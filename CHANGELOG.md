@@ -4,7 +4,21 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [1.5.1] - 2025-08-010
+## [1.5.2] - 2025-08-24
+
+### Added
+
+- TURN servers: people can now connect to a
+
+### Fixed
+
+- CrazyGames invite links fix.
+
+### Removed
+
+- Removed legacy NAT traversal code, simplifying `work.cpp`. Now always using libjuice.
+
+## [1.5.1] - 2025-08-10
 
 ### Changed
 
