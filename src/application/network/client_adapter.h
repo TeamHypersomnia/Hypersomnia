@@ -4,10 +4,10 @@
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"
+#include "application/network/resolve_address_result.h"
 #include "application/network/game_channel_type.h"
 
 struct netcode_socket_t;
-struct resolve_address_result;
 
 using client_auxiliary_command_callback_type = std::function<bool (std::byte*, std::size_t n)>;
 using send_packet_override_type = std::function<bool (const netcode_address_t&,const std::byte*,int)>;

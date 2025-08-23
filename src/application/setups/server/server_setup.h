@@ -42,6 +42,7 @@
 #include "application/arena/synced_dynamic_vars.h"
 #include "application/setups/server/server_temp_var_overrides.h"
 #include "steam_rich_presence_pairs.h"
+#include "application/network/resolve_address_result.h"
 
 struct netcode_socket_t;
 struct config_json_table;
@@ -61,7 +62,6 @@ struct add_to_arena_input {
 
 class server_adapter;
 
-struct resolve_address_result;
 struct editor_project;
 
 struct arena_files_database_entry {
