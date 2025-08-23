@@ -70,10 +70,7 @@ std::string open_url_on_main;
 #elif PLATFORM_UNIX
 
 #include <thread>
-/*
- * This function exists because std::system takes a "const char*" argument,
- * We want something that we can take std::string by-value.
- */
+
 static void run_command(std::string command) {
 	std::system(command.c_str());
 }
@@ -91,12 +88,12 @@ namespace augs {
 	}
 #elif PLATFORM_UNIX
 	void open_url(const std::string& url) {
-		std::string command =
 #if PLATFORM_LINUX
-			"xdg-open " + url;
+		std::string command = "xdg-open " + url;
 #else
-			"open " + url;
+		std::string command = "open " + url;
 #endif
+
 		std::thread th(run_command, command);
 		th.detach();
 	}
