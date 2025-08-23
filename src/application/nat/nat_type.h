@@ -8,7 +8,8 @@ enum class nat_type : uint8_t {
 	PORT_PRESERVING_CONE,
 	CONE,
 	ADDRESS_SENSITIVE,
-	PORT_SENSITIVE
+	PORT_SENSITIVE,
+	UNKNOWN
 };
 
 namespace augs {

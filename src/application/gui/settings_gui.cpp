@@ -1865,25 +1865,10 @@ void settings_gui_state::perform(
 #endif
 				ImGui::Separator();
 
-#if BUILD_NATIVE_SOCKETS
-				{
-					auto& scope_cfg = config.nat_traversal;
-					auto& st = scope_cfg.short_ttl;
-					revertable_checkbox("Enable short TTL for traversal packets", st.is_enabled);
-
-					if (st.is_enabled) {
-						auto indent = scoped_indent();
-						revertable_slider("TTL", st.value, 1, 255);
-					}
-
-					revertable_slider("Num brute-force packets during NAT traversal", scope_cfg.num_brute_force_packets, 0, 25);
-				}
-
 				{
 					auto& scope_cfg = config.debug;
 					revertable_checkbox(SCOPE_CFG_NVP(log_solvable_hashes));
 				}
-#endif
 
 				revertable_checkbox("Show performance", config.session.show_performance);
 				revertable_checkbox("Show logs", config.session.show_logs);
@@ -2278,7 +2263,7 @@ void do_server_vars(
 			revertable_input_text(SCOPE_CFG_NVP(daily_autoupdate_hour));
 		}
 
-		revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
+		revertable_checkbox("I'm behind router", scope_cfg.is_behind_nat);
 
 		revertable_input_text(SCOPE_CFG_NVP(external_arena_files_provider));
 		tooltip_on_hover("Clients will first try to download missing files from this URL.\nIf for any reason the download fails or the files are out of date,\nthe clients will request a direct UDP transfer.");

@@ -384,26 +384,47 @@ std::string server_list_entry::get_connect_string() const {
 		- Web connects to Web - can only use webrtc id.
 		- Native connects to Web - can only use webrtc id.
 		- Web connects to Native - prefer alias, then ip as webrtc id.
-		- Native connects to Native - only ip. No point taking webrtc id.
+		- Native connects to Native:
+			- Target behind NAT: use IP as WebRTC id.
+			- Target without NAT: use public IP directly.
 	
 	*/
 
 	const auto& webrtc_id = meta.webrtc_id;
+	const auto connect_string = ::ToString(get_connect_address());
 
 	if (meta.type == server_type::WEB) {
 		return webrtc_id;
 	}
+
 #if PLATFORM_WEB
-	else if (meta.type == server_type::NATIVE && !webrtc_id.empty()) {
+	if (meta.type == server_type::NATIVE && !webrtc_id.empty()) {
 		return webrtc_id;
 	}
-#endif
 
-	return ::ToString(get_connect_address());
+	const auto ip_as_webrtc_id = connect_string;
+	return ip_as_webrtc_id;
+#else
+	/* Native-to-native case */
+
+	if (is_internal_network()) {
+		return connect_string;
+	}
+
+	if (is_behind_nat()) {
+		return std::string("rtc://") + connect_string;
+	}
+
+	return connect_string;
+#endif
+}
+
+bool server_list_entry::is_internal_network() const {
+	return progress.found_on_internal_network && heartbeat.internal_network_address.has_value();
 }
 
 netcode_address_t server_list_entry::get_connect_address() const {
-	if (progress.found_on_internal_network && heartbeat.internal_network_address.has_value()) {
+	if (is_internal_network()) {
 		return *heartbeat.internal_network_address;
 	}
 

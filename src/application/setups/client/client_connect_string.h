@@ -13,6 +13,10 @@ inline bool is_official_webrtc_id(const client_connect_string& s) {
 }
 
 inline std::string find_webrtc_id(client_connect_string s) {
+	if (begins_with(s, "rtc://")) {
+		return cut_preffix(s, "rtc://");
+	}
+
 #if PLATFORM_WEB
 	/* IP or not, it's always webrtc id */
 	return s;

@@ -52,7 +52,6 @@
 #include "application/http_client/self_update_settings.h"
 #include "application/masterserver/masterserver_settings.h"
 #include "application/nat/nat_detection_settings.h"
-#include "application/nat/nat_traversal_settings.h"
 #include "application/activity_type.h"
 #include "fp_consistency_tests.h"
 
@@ -102,7 +101,6 @@ struct config_json_table {
 	std::string webrtc_signalling_server_url;
 
 	nat_detection_settings nat_detection;
-	nat_traversal_settings nat_traversal;
 
 	masterserver_settings masterserver;
 

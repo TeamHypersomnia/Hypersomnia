@@ -123,11 +123,6 @@
 #include "application/setups/client/demo_paths.h"
 
 #include "steam_integration_callbacks.h"
-
-#if BUILD_NATIVE_SOCKETS
-#include "application/main/nat_traversal_details_window.h"
-#endif
-
 #endif
 
 #include "steam_integration.h"
@@ -148,7 +143,6 @@
 #endif
 
 #include "application/nat/nat_detection_session.h"
-#include "application/nat/nat_traversal_session.h"
 
 #include "application/network/address_utils.h"
 #include "augs/network/netcode_socket_raii.h"
@@ -947,9 +941,6 @@ work_result work(
 		return config.server_start.port;
 	};
 
-	WEBSTATIC auto chosen_server_nat = nat_detection_result();
-	(void)chosen_server_nat;
-
 	WEBSTATIC auto auxiliary_socket = std::optional<netcode_socket_raii>();
 
 	auto delete_auxiliary_socket = [&]() {
@@ -1020,16 +1011,6 @@ work_result work(
 	};
 
 	restart_nat_detection();
-
-	WEBSTATIC auto nat_traversal = std::optional<nat_traversal_session>();
-	WEBSTATIC auto make_server_nat_traversal_input = [&]() {
-		return server_nat_traversal_input {
-			config.nat_detection,
-			config.nat_traversal,
-
-			stun_provider
-		};
-	};
 #else
 	WEBSTATIC auto get_detected_nat = [&]() {
 		return nat_detection_result();
@@ -1285,7 +1266,6 @@ work_result work(
 				this_config.client,
 				this_config.dedicated_server,
 
-				std::nullopt,
 				should_suppress_webhook,
 				type == SINGLE ? assigned_teams : server_assigned_teams(),
 
@@ -1446,42 +1426,6 @@ work_result work(
 			}
 		}
 	};
-
-#if BUILD_NATIVE_SOCKETS
-	WEBSTATIC auto nat_traversal_details = nat_traversal_details_window();
-
-	WEBSTATIC auto do_traversal_details_popup = [&](auto& window) {
-		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
-			nat_traversal.reset();
-			pending_launch = std::nullopt;
-
-			if (chosen_server_port() == 0) {
-				const auto next_port = get_bound_local_port();
-				recreate_auxiliary_socket(next_port + 1);
-			}
-		}
-	};
-
-	WEBSTATIC auto nat_detection_popup = abortable_popup_state();
-
-	WEBSTATIC auto do_detection_details_popup = [&]() {
-		const auto message = 
-			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
-		;
-
-		const bool should_be_open = 
-			pending_launch.has_value() 
-			&& !nat_detection_complete()
-		;
-
-		const auto title = "Launching setup...";
-
-		if (const bool aborted = nat_detection_popup.perform(should_be_open, title, message)) {
-			pending_launch = std::nullopt;
-		}
-	};
-
-#endif
 
 	LOG("Initializing the audio context.");
 
@@ -2181,18 +2125,7 @@ work_result work(
 		};
 	};
 
-	WEBSTATIC auto launch_client_setup = [&](
-		const bool ignore_nat_check,
-
-		/* 
-			NAT traversal could make us connect to a different server port, 
-			so for Steam Rich Presence to provide a correct Join Game server address,
-			we need to keep track of what address we wanted to connect to originally.
-		*/
-
-		const std::optional<netcode_address_t> before_traversal_server_address = std::nullopt
-	) {
-		bool public_internet = false;
+	WEBSTATIC auto launch_client_setup = [&]() {
 		auto connect_string = config.client_connect;
 		std::string official_url;
 
@@ -2237,76 +2170,6 @@ work_result work(
 
 		streaming.wait_demos_compressed();
 
-		if (ignore_nat_check) {
-			LOG("Finished NAT traversal. Connecting immediately.");
-		}
-		else {
-#if BUILD_NATIVE_SOCKETS
-			const bool is_webrtc_id = ::uses_webrtc(connect_string);
-			const auto parsed_netcode_addr = find_netcode_addr(connect_string);
-			const bool is_ip_address = !is_webrtc_id && parsed_netcode_addr.has_value();
-
-			/* 
-				On native, we can connect directly if given:
-			   	- webrtc id, then we'll connect using webrtc id. 
-				- if we're given a domain name. Then we connect directly and natively.
-
-				Only time we need to query is when given an external ip address.
-			*/
-			const bool should_query_server_list = is_ip_address && !is_internal(*parsed_netcode_addr);
-
-			if (should_query_server_list) {
-				/* 
-					If we're connecting to a specific IP address - as opposed to e.g. a domain -
-					either via Steam API, CLI flag or relaunching with last remembered activity -
-					we need to ask the server list to know if the server is behind NAT.
-				*/
-
-				if (find_chosen_server_info() == nullptr) {
-					browse_servers_gui.sync_download_server_entry(
-						get_browse_servers_input(),
-						connect_string
-					);
-				}
-				else {
-					LOG("Already have this server entry, no need to download info about this server.");
-				}
-
-				if (auto info = find_chosen_server_info()) {
-					LOG("Found the chosen server in the browser list.");
-					if (info->is_official_server()) {
-						official_url = info->meta.official_url;
-
-						LOG("It's an official server at %x. Connecting directly.", official_url);
-					}
-					else if (info->heartbeat.is_behind_nat()) {
-						LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
-
-						chosen_server_nat = info->heartbeat.nat;
-						pending_launch = activity_type::CLIENT;
-						launch_main_menu();
-						return false;
-					}
-					else {
-						LOG("The chosen server is in the public internet. Connecting immediately.");
-						public_internet = true;
-					}
-				}
-				else {
-					LOG("The chosen server was not found in the browser list.");
-					public_internet = true;
-				}
-			}
-			else {
-				LOG("No need to query; the server is in public internet or we're connecting through WebRTC.");
-				public_internet = true;
-			}
-#else
-			public_internet = true;
-			LOG("Will connect using signalling server. No need to query the server list for info.");
-#endif
-		}
-
 #if !PLATFORM_WEB
 		if (is_steam_client) {
 			LOG("Calling steam_request_auth_ticket.");
@@ -2316,28 +2179,14 @@ work_result work(
 #endif
 
 		setup_launcher([&]() {
-#if BUILD_NATIVE_SOCKETS
-			auto bound_port = get_bound_local_port();
-			delete_auxiliary_socket();
-
-			if (public_internet) {
-				LOG("Connecting without a specific port requirement.");
-				bound_port = 0;
-			}
-
-			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
-#else
-			const auto bound_port = 0;
-#endif
+			const auto preferred_binding_port = 0;
 
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				*official,
 				connect_string,
 				displayed_connecting_server_name,
 				config.client,
-				config.nat_detection,
-				bound_port,
-				before_traversal_server_address,
+				preferred_binding_port,
 
 				config.webrtc_signalling_server_url
 			);
@@ -2375,7 +2224,7 @@ work_result work(
 			[&](auto& cfg) {
 				cfg.client = config.client;
 
-				if (!official_url.empty()) {
+				if (const bool to_official = !official_url.empty()) {
 					cfg.client_connect = official_url;
 					cfg.last_activity = activity_type::CLIENT;
 				}
@@ -2425,9 +2274,7 @@ work_result work(
 
 #if BUILD_NETWORKING
 			case activity_type::CLIENT: {
-				const bool ignore_nat_check = false;
-
-				if (!launch_client_setup(ignore_nat_check)) {
+				if (!launch_client_setup()) {
 					if (!has_main_menu()) {
 						launch_main_menu();
 					}
@@ -2440,16 +2287,6 @@ work_result work(
 
 			case activity_type::SERVER: {
 #if BUILD_NATIVE_SOCKETS
-				if (config.server.allow_nat_traversal) {
-					if (!nat_detection_complete()) {
-						LOG("NAT detection in progress. Delaying the server launch.");
-
-						pending_launch = activity_type::SERVER;
-						launch_main_menu();
-						return;
-					}
-				}
-
 				const auto bound_port = get_bound_local_port();
 				delete_auxiliary_socket();
 
@@ -2469,10 +2306,6 @@ work_result work(
 						config.server_private,
 						config.client,
 						std::nullopt,
-
-#if BUILD_NATIVE_SOCKETS
-						make_server_nat_traversal_input(),
-#endif
 						params.suppress_server_webhook,
 						assigned_teams,
 						config.webrtc_signalling_server_url,
@@ -2554,88 +2387,18 @@ work_result work(
 				break;
 		}
 
-		save_last_activity(mode);
+		if (mode == activity_type::SERVER) {
+			save_last_activity(activity_type::MAIN_MENU);
+		}
+		else {
+			save_last_activity(mode);
+		}
 	};
 
 	WEBSTATIC bool client_start_requested = false;
 	WEBSTATIC bool server_start_requested = false;
 	(void)client_start_requested;
 	(void)server_start_requested;
-
-#if BUILD_NATIVE_SOCKETS
-	WEBSTATIC auto finalize_pending_launch = [&](std::optional<netcode_address_t> before_addr = std::nullopt) {
-		if (pending_launch == activity_type::CLIENT) {
-			const bool ignore_nat_check = true;
-			launch_client_setup(ignore_nat_check, before_addr);
-		}
-		else {
-			launch_setup(*pending_launch);
-		}
-
-		pending_launch = std::nullopt;
-	};
-
-	WEBSTATIC auto next_nat_traversal_attempt = [&]() {
-		const auto& server_nat = chosen_server_nat;
-		const auto& client_connect = config.client_connect;
-		const auto traversed_address = find_netcode_addr(client_connect);
-
-		ensure(traversed_address.has_value());
-		ensure(nat_detection_complete());
-
-		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
-
-		ensure(masterserver_address.has_value());
-
-		nat_traversal_details.next_attempt();
-
-		nat_traversal.reset();
-		nat_traversal.emplace(nat_traversal_input {
-			*masterserver_address,
-			*traversed_address,
-
-			get_detected_nat(),
-			server_nat,
-			config.nat_detection,
-			config.nat_traversal
-		}, stun_provider);
-	};
-
-	WEBSTATIC auto start_nat_traversal = [&]() {
-		nat_traversal_details.reset();
-
-		next_nat_traversal_attempt();
-	};
-	
-	WEBSTATIC auto advance_nat_traversal = [&]() {
-		if (nat_traversal_details.aborted) {
-			return;
-		}
-
-		if (nat_traversal.has_value()) {
-			if (auxiliary_socket.has_value()) {
-				nat_traversal->advance(auxiliary_socket->socket);
-			}
-		}
-	};
-
-	WEBSTATIC auto check_nat_traversal_result = [&]() {
-		const auto state = nat_traversal->get_current_state();
-
-		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
-			const auto before_traversal_server_address = ::find_netcode_addr(config.client_connect);
-			config.client_connect = ::ToString(nat_traversal->get_opened_address());
-			nat_traversal.reset();
-
-			finalize_pending_launch(before_traversal_server_address);
-		}
-		else if (state == nat_traversal_session::state::TIMED_OUT) {
-			const auto next_port = get_bound_local_port();
-			recreate_auxiliary_socket(next_port + 1);
-			next_nat_traversal_attempt();
-		}
-	};
-#endif
 
 #if BUILD_NETWORKING
 	WEBSTATIC auto start_client_setup = [&]() {
@@ -3175,13 +2938,6 @@ work_result work(
 						setup.prepare_for_online_playtesting();
 
 #if BUILD_NATIVE_SOCKETS
-						if (config.server.allow_nat_traversal) {
-							if (!nat_detection_complete()) {
-								setup.set_recent_message("NAT detection in progress. Please try again in a few seconds.");
-								break;
-							}
-						}
-
 						const auto bound_port = get_bound_local_port();
 						delete_auxiliary_socket();
 
@@ -3209,10 +2965,6 @@ work_result work(
 								config.server_private,
 								config.client,
 								std::nullopt,
-
-#if BUILD_NATIVE_SOCKETS
-								make_server_nat_traversal_input(),
-#endif
 								params.suppress_server_webhook,
 								assigned_teams,
 								config.webrtc_signalling_server_url
@@ -3383,13 +3135,7 @@ work_result work(
 					}
 				};
 
-				/* 
-					Prevent nat detection from tampering with traversal logic, 
-					as we'll rebind the local port frequently 
-				*/
-				if (nat_traversal == std::nullopt) {
-					do_nat_detection_logic();
-				}
+				do_nat_detection_logic();
 #endif
 				if (ingame_menu.show) {
 					on_specific_setup([&](server_setup& server) {
@@ -3566,32 +3312,6 @@ work_result work(
 				perform_abandon_are_you_sure_popup();
 
 				streaming.display_loading_progress();
-
-#if BUILD_NATIVE_SOCKETS
-				advance_nat_traversal();
-				do_traversal_details_popup(window);
-				do_detection_details_popup();
-
-				if (pending_launch.has_value()) {
-					const auto l = pending_launch;
-
-					if (l == activity_type::SERVER) {
-						if (nat_detection_complete()) {
-							finalize_pending_launch();
-						}
-					}
-
-					if (l == activity_type::CLIENT) {
-						if (nat_detection_complete()) {
-							if (nat_traversal == std::nullopt) {
-								start_nat_traversal();
-							}
-
-							check_nat_traversal_result();
-						}
-					}
-				}
-#endif
 			},
 
 			[&]() {

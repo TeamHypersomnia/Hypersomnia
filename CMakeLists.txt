@@ -519,8 +519,6 @@ if(BUILD_NETWORKING)
 	if (BUILD_NATIVE_SOCKETS)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/nat/nat_detection_session.cpp"
-		"src/application/nat/nat_traversal_session.cpp"
-		"src/application/setups/server/server_nat_traversal.cpp"
 		)
 	endif()
 

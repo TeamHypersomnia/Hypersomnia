@@ -199,12 +199,6 @@ as well as to test your skills in a laggy environment.
 			val = static_cast<unsigned short>(std::clamp(chosen_port, 0, 65535));
 		};
 
-		checkbox("I'm behind router", into_vars.allow_nat_traversal);
-
-		if (ImGui::IsItemHovered()) {
-			text_tooltip("Enables NAT traversal. If you're behind a router, leave this on.\n\nThis technique lets your friends establish a direct connection with your PC -\nwithout port forwarding necessary.\n\nYou can disable this if you plan to only play over LAN.");
-		}
-
 		{
 			const bool has_custom_port = into.port != 0;
 			bool ticked = has_custom_port;
@@ -245,36 +239,48 @@ as well as to test your skills in a laggy environment.
 			text_color(std::to_string(currently_bound_port), green);
 		}
 
-		if (nat_detection == nullptr) {
-			text_color("NAT detection and traversal was disabled for this launch.", red);
+		checkbox("I'm behind router", into_vars.is_behind_nat);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If you're behind a router, leave this on.\n\nThis technique lets your friends establish a connection \nwithout port forwarding necessary, possibly using relay servers.\n\nYou can disable this if you plan to only play over LAN.");
 		}
-		else {
-			if (const auto result = nat_detection->query_result()) {
-				const auto color = nat_type_to_color(result->type);
 
-				if (color == green) {
-					text_color("No port forwarding necessary.", color);
-				}
-				else if (color == orange && result->port_delta != 1) {
-					text_color("Port forwarding might be necessary.", color);
-				}
-				else {
-					text_color("Consider port forwarding if others can't connect.", color);
-				}
-
-				text_color(result->describe(), color);
+		if (into_vars.is_behind_nat) {
+			if (nat_detection == nullptr) {
+				text_color("NAT detection and traversal was disabled for this launch.", red);
 			}
 			else {
-				text_color(typesafe_sprintf("NAT detection for port %x in progress...", currently_bound_port), red);
-			}
+				if (const auto result = nat_detection->query_result()) {
+					const auto color = nat_type_to_color(result->type);
 
-			ImGui::SameLine();
+					text_color(result->describe(), color);
 
-			if (ImGui::Button("Details")) {
-				show_nat_details = true;
+					ImGui::SameLine();
+
+					if (ImGui::Button("Details")) {
+						show_nat_details = true;
+					}
+
+					if (color == green) {
+						text_color("No port forwarding necessary.", color);
+					}
+					else {
+						text_color("Relay servers might be used.\nConsider port forwarding.", color);
+					}
+				}
+				else {
+					text_color(typesafe_sprintf("NAT detection for port %x in progress...", currently_bound_port), red);
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Details")) {
+						show_nat_details = true;
+					}
+				}
 			}
 		}
 
+#if 0
 #if IS_PRODUCTION_BUILD
 		const bool choose_instance = !is_steam_client;
 #else
@@ -303,6 +309,8 @@ as well as to test your skills in a laggy environment.
 		}
 
 #endif
+#endif
+
 		text_disabled("See Settings->Server for more options to tweak.\n\n");
 
 		//text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");

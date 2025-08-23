@@ -666,7 +666,7 @@ std::vector<rtc::IceServer> get_ice_servers() {
 	std::vector<rtc::IceServer> out;
 
 	for (const auto& l : lines) {
-		out.emplace_back(std::string("stun:") + l);
+		out.emplace_back(l);
 	}
 
 	return out;
@@ -680,9 +680,6 @@ server_setup::server_setup(
 	const server_private_vars& private_initial_vars,
 	const client_vars& integrated_client_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
-#if BUILD_NATIVE_SOCKETS
-	const std::optional<server_nat_traversal_input> nat_traversal_input,
-#endif
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
 	const std::string& webrtc_signalling_server_url,
@@ -729,12 +726,6 @@ server_setup::server_setup(
 	const bool use_webrtc = false;
 #endif
 
-#if BUILD_NATIVE_SOCKETS
-	if (nat_traversal_input && initial_vars.allow_nat_traversal) {
-		nat_traversal.emplace(*nat_traversal_input, resolved_server_list_addr);
-	}
-#endif
-
 	{
 		auto initial_vars_modified = initial_vars;
 
@@ -765,6 +756,16 @@ server_setup::server_setup(
 	apply(private_initial_vars);
 
 	if (use_webrtc && initial_vars.allow_webrtc_clients) {
+		bool udp_mux = initial_vars.webrtc_udp_mux;
+
+		if (vars.is_behind_nat) {
+			if (udp_mux) {
+				LOG("WebRTC UDP muxing is incompatible with NAT traversal. Disabling muxing.");
+			}
+
+			udp_mux = false;
+		}
+
 		webrtc_server = std::make_shared<webrtc_server_detail>();
 		webrtc_server->listen(
 			webrtc_server,
@@ -772,7 +773,7 @@ server_setup::server_setup(
 			::get_ice_servers(),
 			initial_vars.webrtc_port_range_begin,
 			initial_vars.webrtc_port_range_end,
-			initial_vars.webrtc_udp_mux
+			udp_mux
 		);
 	}
 
@@ -851,10 +852,6 @@ bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const
 #if BUILD_NATIVE_SOCKETS
 	if (handle_gameserver_command(from, packet, n)) {
 		return true;
-	}
-
-	if (nat_traversal) {
-		return nat_traversal->handle_auxiliary_command(from, packet, n); 
 	}
 #endif
 
@@ -2131,9 +2128,6 @@ bool server_setup::handle_gameserver_command(
 
 			return true;
 		}
-		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
-			// handled elsewhere
-		}
 		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
 			LOG("webrtc_signalling_payload: %x", typed_request.message);
 
@@ -2141,7 +2135,10 @@ bool server_setup::handle_gameserver_command(
 				webrtc_server->handle_message(webrtc_server, typed_request);
 			}
 		}
-		else {
+		else if constexpr(std::is_arithmetic_v<T>) {
+			// dummy
+		}
+		else { 
 			static_assert(always_false_v<T>, "Non-exhaustive");
 		}
 
@@ -2211,8 +2208,17 @@ void server_setup::send_heartbeat_to_server_list() {
 	server_heartbeat heartbeat;
 
 #if BUILD_NATIVE_SOCKETS
-	if (nat_traversal) {
-		heartbeat.nat = nat_traversal->last_detected_nat;
+	if (vars.is_behind_nat) {
+		heartbeat.nat = last_detected_nat;
+
+		if (heartbeat.nat.type == nat_type::PUBLIC_INTERNET) {
+			/*
+				Something went wrong with NAT detection - 
+				force traversal.
+			*/
+
+			heartbeat.nat.type = nat_type::UNKNOWN;
+		}	
 	}
 	else
 #endif

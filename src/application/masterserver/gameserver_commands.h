@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
 #include "3rdparty/yojimbo/netcode/netcode.h"
-#include "application/masterserver/nat_traversal_step.h"
+#include "application/masterserver/webrtc_signalling_payload.h"
+#include "augs/network/port_type.h"
 
 #define NETCODE_AUXILIARY_COMMAND_PACKET 200
 
@@ -13,19 +14,9 @@ struct gameserver_ping_response {
 	uint64_t sequence = -1;
 };
 
-struct gameserver_nat_traversal_response_packet {
-	uint64_t magic_cookie = 0xad9b310678ed11ea;
-	double session_guid = 0;
-
-	bool valid() const {
-		gameserver_nat_traversal_response_packet g;
-		return magic_cookie == g.magic_cookie;
-	}
-};
-
 using gameserver_command = std::variant<
 	gameserver_ping_request,
-	masterserver_out::nat_traversal_step,
+	int, // dummy for backwards compat
 	masterserver_out::webrtc_signalling_payload
 >;
 

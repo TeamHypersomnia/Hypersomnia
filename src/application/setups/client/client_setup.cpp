@@ -708,15 +708,11 @@ client_setup::client_setup(
 	const client_connect_string& connect_string,
 	const std::string& displayed,
 	const client_vars& initial_vars,
-	const nat_detection_settings& nat_detection,
 	const port_type preferred_binding_port,
-	const std::optional<netcode_address_t> before_traversal_server_address,
-
 	const std::string& webrtc_signalling_server_url
 ) : 
 	official(official),
 	connect_string(connect_string),
-	before_traversal_server_address(before_traversal_server_address),
 	displayed_connecting_server_name(displayed.empty() ? connect_string : displayed),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(
@@ -746,8 +742,6 @@ client_setup::client_setup(
 	}
 #endif
 
-	(void)nat_detection;
-
 	const auto input_demo_path = ::find_demo_path(connect_string);
 	const bool is_opening_demo = input_demo_path.has_value();
 
@@ -755,6 +749,8 @@ client_setup::client_setup(
 	const bool use_webrtc = !is_opening_demo && webrtc_id != "";
 
 	if (use_webrtc) {
+		LOG("Using WebRTC for this connection. Will use a signalling server.");
+
 		webrtc_client = std::make_shared<webrtc_client_detail>();
 		webrtc_client->connect(
 			webrtc_client,
@@ -762,6 +758,9 @@ client_setup::client_setup(
 			webrtc_id,
 			::get_ice_servers()
 		);
+	}
+	else {
+		LOG("Connecting directly without WebRTC.");
 	}
 
 	LOG("Initializing connection with %x", connect_string);
@@ -2308,15 +2307,7 @@ void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 }
 
 std::string client_setup::get_connect_string() const {
-	if (const auto webrtc_id = find_webrtc_id(connect_string); webrtc_id != "") {
-		return webrtc_id;
-	}
-
-	if (before_traversal_server_address.has_value()) {
-		return ::ToString(*before_traversal_server_address);
-	}
-
-	return ::ToString(adapter->get_connected_ip_address());
+	return connect_string;
 }
 
 void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {

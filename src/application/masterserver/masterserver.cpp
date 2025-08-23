@@ -197,6 +197,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		return nullptr;
 	};
+	(void)find_socket_by_port;
 
 	auto banlist_to_set = [](const auto& path) {
 		std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> out;
@@ -880,79 +881,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
-					}
-					else if constexpr(std::is_same_v<R, masterserver_in::stun_result_info>) {
-						/* Just relay this */
-
-						const auto session_guid = typed_request.session_guid;
-
-						auto response = masterserver_out::stun_result_info();
-						response.session_guid = session_guid;
-
-						{
-							const auto resolved_port = typed_request.resolved_external_port;
-
-							if (resolved_port == 0) {
-								/* Let masterserver resolve it */
-								const auto masterserver_visible_port = from.port;
-								response.resolved_external_port = masterserver_visible_port;
-							}
-							else {
-								/* Result of server STUNning on its own */
-								response.resolved_external_port = resolved_port;
-							}
-						}
-
-						const auto& recipient = typed_request.client_origin;
-						const auto client_used_probe = recipient.probe;
-
-						MSR_LOG("Received stun_result_info from a gameserver (session guid: %f, resolved port: %x). Relaying this to: %x (original probe port: %x)", session_guid, response.resolved_external_port, ::ToString(recipient.address), client_used_probe);
-
-						if (const auto socket = find_socket_by_port(client_used_probe)) {
-							send_to_with_socket(socket->socket, recipient.address, response);
-						}
-						else {
-							MSR_LOG("Invalid client_used_probe: %x", client_used_probe); 
-						}
-					}
-					else if constexpr(std::is_same_v<R, masterserver_in::nat_traversal_step>) {
-						auto punched_server = typed_request.target_server;
-
-						const auto address_string = ::ToString(punched_server);
-						MSR_LOG("A request arrived from %x to traverse %x", ::ToString(from), address_string);
-
-						const bool should_send_request = [&]() {
-							if (address_string == "NONE" || punched_server.type == NETCODE_ADDRESS_NONE) {
-								MSR_LOG("The target address was invalid. Dropping the request.");
-								return false;
-							}
-
-							if (const auto entry = mapped_or_nullptr(server_list, punched_server)) {
-								MSR_LOG("Found the requested server.");
-
-								const bool is_behind_nat = entry->last_heartbeat.is_behind_nat();
-
-								if (is_behind_nat) {
-									MSR_LOG("The requested server is behind NAT. Deciding to send the request.");
-									return true;
-								}
-
-								MSR_LOG("The requested server is not behind NAT. Ignoring the request.");
-								return false;
-							}
-
-							MSR_LOG("The requested server was not found.");
-							return false;
-						}();
-
-						if (should_send_request) {
-							auto step_request = masterserver_out::nat_traversal_step();
-
-							step_request.client_origin = { from, socket.address.port };
-							step_request.payload = typed_request.payload;
-
-							send_to_gameserver(step_request, punched_server);
-						}
 					}
 				};
 

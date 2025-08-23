@@ -318,7 +318,7 @@
         "server_name": "", // Will be "Nickname's server" by default.
         "notified_server_list": "masterserver.hypersomnia.xyz:8430",
         "suppress_new_community_server_webhook": false,
-        "allow_nat_traversal": true,
+        "is_behind_nat": true,
         "allow_direct_arena_file_downloads": true,
         "external_arena_files_provider": "https://hypersomnia.xyz/arenas",
         "autoupdate_delay": 0,
@@ -493,12 +493,6 @@
         "stun_session_timeout_ms": 1000,
         "request_interval_ms": 200,
         "packet_interval_ms": 5
-    },
-
-    "nat_traversal": {
-        "OFF_short_ttl": 3,
-        "num_brute_force_packets": 1,
-        "traversal_attempt_timeout_secs": 2.0
     },
 
     "float_consistency_test": {

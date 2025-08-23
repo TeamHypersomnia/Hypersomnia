@@ -47,11 +47,11 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 #endif
 
 #if HEADLESS
-		result.server.allow_nat_traversal = false;
+		result.server.is_behind_nat = false;
 #endif
 
 		if (is_dedicated_server) {
-			result.server.allow_nat_traversal = false;
+			result.server.is_behind_nat = false;
 			result.server_start.port = 8412;
 		}
 

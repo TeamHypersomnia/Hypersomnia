@@ -93,7 +93,6 @@
 - Gameserver commands
 	- stunned_ping
 	- ah, let's just have a single struct with flags anyways
-	- nat_traversal_step
 
 - Coordination of server operations
 	- What the client needs from the server for its traversal logic?

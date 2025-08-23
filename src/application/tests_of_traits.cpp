@@ -5,6 +5,7 @@
 #include "augs/filesystem/path.h"
 #include "augs/templates/type_templates.h"
 #include "augs/templates/maybe.h"
+#include "application/masterserver/webrtc_signalling_payload.h"
 
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"
@@ -43,7 +44,6 @@
 
 #include "3rdparty/imgui/imgui.h"
 #include "augs/network/netcode_sockets.h"
-#include "application/masterserver/nat_traversal_step.h"
 
 #include "augs/misc/constant_size_string.h"
 /* Define several other traits which will validate properties of some other types. */

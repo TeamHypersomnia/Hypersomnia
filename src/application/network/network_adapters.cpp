@@ -613,8 +613,7 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 	const bool use_webrtc = true;
 	connected_ip_address = ::make_internal_webrtc_address(DEFAULT_GAME_PORT_V);
 #else
-	const auto webrtc_id = find_webrtc_id(str);
-	const bool use_webrtc = webrtc_id != "";
+	const bool use_webrtc = ::uses_webrtc(str);
 
 	if (!use_webrtc) {
 		host_with_default_port in;

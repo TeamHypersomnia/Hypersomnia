@@ -81,4 +81,5 @@ struct server_list_entry {
 
 	bool is_set() const;
 	bool is_behind_nat() const;
+	bool is_internal_network() const;
 };

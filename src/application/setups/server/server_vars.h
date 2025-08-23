@@ -126,7 +126,7 @@ struct server_vars {
 	bool suppress_new_community_server_webhook = false;
 	bool show_on_server_list = true;
 
-	bool allow_nat_traversal = true;
+	bool is_behind_nat = true;
 	bool allow_direct_arena_file_downloads = true;
 	address_string_type external_arena_files_provider = "";
 

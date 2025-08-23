@@ -44,7 +44,6 @@
 #include "application/setups/client/demo_step.h"
 #include "application/gui/client/demo_player_gui.h"
 #include "application/setups/client/client_demo_player.h"
-#include "application/nat/nat_detection_settings.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/setups/client/arena_downloading_session.h"
 #include "application/setups/client/direct_file_download.h"
@@ -117,7 +116,6 @@ class client_setup :
 	simulation_receiver receiver;
 	client_connect_string connect_string;
 
-	std::optional<netcode_address_t> before_traversal_server_address;
 	std::string displayed_connecting_server_name;
 
 	client_state_type state = client_state_type::NETCODE_NEGOTIATING_CONNECTION;
@@ -133,7 +131,6 @@ class client_setup :
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
 	net_time_t when_sent_client_settings = -1;
-	net_time_t when_sent_nat_punch_request = -1;
 	net_time_t when_sent_last_keepalive = 0;
 	net_time_t when_sent_last_referential_step = 0;
 
@@ -626,9 +623,7 @@ public:
 		const client_connect_string&,
 		const std::string& displayed_connecting_server_name,
 		const client_vars& initial_vars,
-		const nat_detection_settings& nat_detection,
 		port_type preferred_binding_port,
-		const std::optional<netcode_address_t> before_traversal_server_address,
 		const std::string& webrtc_signalling_server_url
 	);
 
@@ -736,7 +731,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(official, in_string, disp_backup, vars_backup, nat_detection_settings(), port_type(0), std::nullopt, "");
+					new (this) client_setup(official, in_string, disp_backup, vars_backup, port_type(0), "");
 				}
 
 				demo_player = std::move(player_backup);

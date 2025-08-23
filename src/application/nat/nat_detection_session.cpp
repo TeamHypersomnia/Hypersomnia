@@ -17,6 +17,7 @@
 #include "application/nat/stun_request.h"
 #include "application/nat/stun_server_provider.h"
 #include "augs/misc/date_time.h"
+#include "application/nat/stun_session.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;
@@ -499,3 +500,122 @@ void netcode_packet_queue::send_some(netcode_socket_t socket, const double inter
 		send_one(socket, log_sink);
 	}
 }
+
+std::string nat_type_to_string(const nat_type type);
+
+stun_session::stun_session(
+	const host_with_default_port& host,
+	log_function log_info
+) : 
+	future_stun_host(async_resolve_address(host)), 
+	when_began(augs::steady_secs()),
+	log_info(log_info),
+	host(host)
+{
+
+}
+
+std::optional<netcode_queued_packet> stun_session::advance(const double request_interval_secs, randomization& rng) {
+	if (stun_host.has_value()) {
+		return std::nullopt;
+	}
+
+	auto& future = future_stun_host;
+
+	if (valid_and_is_ready(future)) {
+		auto result = future.get();
+
+		log_info(result.report());
+
+		if (result.result == resolve_result_type::OK) {
+			stun_host = result.addr;
+			log_info("Preparing STUN request headers.");
+			source_request = make_stun_request(rng);
+		}
+	}
+
+	if (stun_host.has_value()) {
+		if (try_fire_interval(request_interval_secs, when_generated_last_packet)) {
+			when_sent_first_request = augs::steady_secs();
+			return netcode_queued_packet { *stun_host, augs::to_bytes(source_request) };
+		}
+	}
+
+	return std::nullopt;
+}
+
+stun_session::state stun_session::get_current_state() const {
+	if (external_address.has_value()) {
+		return state::COMPLETED;
+	}
+
+	if (!future_stun_host.valid()) {
+		if (stun_host.has_value()) {
+			return state::SENDING_REQUEST_PACKETS;
+		}
+		else {
+			return state::COULD_NOT_RESOLVE_STUN_HOST;
+		}
+	}
+	else {
+		return state::RESOLVING_STUN_HOST;
+	}
+}
+
+bool stun_session::has_timed_out(const double timeout_secs) const { 
+	if (get_current_state() == stun_session::state::SENDING_REQUEST_PACKETS) {
+		return augs::steady_secs() - when_began >= timeout_secs;
+	}
+
+	return false;
+}
+
+std::optional<netcode_address_t> stun_session::query_result() const {
+	return external_address;
+}
+
+bool stun_session::handle_packet(const std::byte* const packet_buffer, const int num_bytes_received) {
+	if (const auto translated = read_stun_response(source_request, packet_buffer, num_bytes_received)) {
+		if (stun_host.has_value()) {
+			log_info(typesafe_sprintf("received STUN response: <%x> -> <%x>", ::ToString(*stun_host), ::ToString(*translated)));
+		}
+
+		when_completed = augs::steady_secs();
+		external_address = *translated;
+
+		return true;
+	}
+
+	return false;
+}
+
+const std::optional<netcode_address_t>& stun_session::get_resolved_stun_host() const {
+	return stun_host;
+}
+
+double stun_session::get_ping_seconds() const {
+	return when_completed - when_sent_first_request;
+}
+
+std::string censor_ips(std::string text) {
+#if !IS_PRODUCTION_BUILD
+	return text;
+#endif
+
+	bool censoring = false;
+
+	for (std::size_t i = 0; i < text.size(); ++i) {
+		if (text[i] == '<') {
+			censoring = true;
+		}
+		else if (text[i] == '>') {
+			censoring = false;
+		}
+		else if (censoring) {
+			text[i] = '*';
+		}
+	}
+
+	return text;
+}
+

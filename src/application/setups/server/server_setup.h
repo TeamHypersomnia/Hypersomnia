@@ -35,7 +35,6 @@
 #include "application/setups/server/server_profiler.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_type.h"
-#include "application/setups/server/server_nat_traversal.h"
 
 #include "application/setups/server/rcon_level.h"
 #include "game/messages/mode_notification.h"
@@ -216,7 +215,7 @@ class server_setup :
 	std::string failure_reason;
 
 #if BUILD_NATIVE_SOCKETS
-	std::optional<server_nat_traversal> nat_traversal;
+	nat_detection_result last_detected_nat;
 #endif
 	bool suppress_community_server_webhook_this_run = false;
 	std::string name_suffix;
@@ -395,10 +394,6 @@ public:
 		const server_private_vars&,
 		const client_vars& integrated_client_vars,
 		std::optional<augs::dedicated_server_input>,
-
-#if BUILD_NATIVE_SOCKETS
-		const std::optional<server_nat_traversal_input> nat_traversal_input,
-#endif
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
 		const std::string& webrtc_signalling_server_url,
@@ -470,15 +465,7 @@ public:
 		}
 
 #if BUILD_NATIVE_SOCKETS
-		if (nat_traversal) {
-			nat_traversal->last_detected_nat = in.last_detected_nat;
-
-			if (auto socket = find_underlying_socket()) {
-				nat_traversal->send_packets(*socket);
-			}
-
-			nat_traversal->advance();
-		}
+		last_detected_nat = in.last_detected_nat;
 #endif
 
 		const auto current_time = get_current_time();
