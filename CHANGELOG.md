@@ -8,7 +8,7 @@
 
 ### Added
 
-- TURN servers: people can now connect to a
+- TURN servers: people can now connect to any server behind a router regardless if it's Symmetric etc. Works for web and native.
 
 ### Fixed
 
