@@ -262,9 +262,11 @@ async function pre_run_cg() {
 
         if (invite_link) {
           Module.cg_invite_link = invite_link;
+          console.log("invite link: ", invite_link);
         }
         else {
           Module.cg_invite_link = "";
+          console.log("no invite link");
         }
       }
 

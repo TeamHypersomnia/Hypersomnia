@@ -902,9 +902,6 @@ work_result work(
 
 	WEBSTATIC auto freetype_library = std::optional<augs::freetype_raii>();
 
-	WEBSTATIC auto pending_launch = std::optional<activity_type>();
-	(void)pending_launch;
-
 	if (params.type == app_type::GAME_CLIENT) {
 		LOG("Initializing freetype");
 
