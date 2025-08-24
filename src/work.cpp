@@ -2130,17 +2130,10 @@ work_result work(
 
 	WEBSTATIC auto launch_client_setup = [&]() {
 		auto connect_string = config.client_connect;
-		std::string official_url;
 
 #if PLATFORM_WEB
 		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
-#if 0
-		/* Test */
-		(void)is_official_connect_string;
-		const bool requires_sign_in = true;
-#else
 		const bool requires_sign_in = is_official_connect_string && begins_with(connect_string, "ranked");
-#endif
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
@@ -2217,9 +2210,11 @@ work_result work(
 
 		displayed_connecting_server_name.clear();
 
-#if PLATFORM_WEB
-		if (is_official_connect_string) {
-			official_url = connect_string;
+		std::string saved_for_next_launch;
+
+#if !PLATFORM_WEB
+		if (const auto found = find_chosen_server_info(); found && found->is_official_server()) {
+			saved_for_next_launch = found->meta.official_url;
 		}
 #endif
 
@@ -2227,12 +2222,17 @@ work_result work(
 			[&](auto& cfg) {
 				cfg.client = config.client;
 
-				if (const bool to_official = !official_url.empty()) {
-					cfg.client_connect = official_url;
+				if (const bool should_save = !saved_for_next_launch.empty()) {
+					cfg.client_connect = saved_for_next_launch;
 					cfg.last_activity = activity_type::CLIENT;
 				}
 				else {
-					cfg.last_activity = activity_type::MAIN_MENU;
+					if (const bool same_as_last_launch = cfg.client_connect == connect_string) {
+						cfg.last_activity = activity_type::CLIENT;
+					}
+					else {
+						cfg.last_activity = activity_type::MAIN_MENU;
+					}
 				}
 			}
 		);

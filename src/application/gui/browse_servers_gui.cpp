@@ -387,9 +387,10 @@ std::string server_list_entry::get_native_connect_string(const bool for_sending)
 			return meta.official_url;
 		}
 	}
-
-	if (is_internal_network()) {
-		return ip_address;
+	else {
+		if (is_internal_network()) {
+			return ip_address;
+		}
 	}
 
 	if (is_behind_nat()) {
