@@ -570,7 +570,7 @@ bool start_client_gui_state::perform(
 				switch (current_tab) {
 					case start_client_tab_type::BEST_SERVER:
 						if (best_server) {
-							into_connect_string = std::string(best_server->get_connect_string());
+							into_connect_string = std::string(best_server->get_my_connect_string());
 							into_displayed_connecting_server_name = best_server->heartbeat.server_name;
 						}
 

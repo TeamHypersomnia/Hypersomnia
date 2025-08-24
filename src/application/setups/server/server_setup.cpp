@@ -2005,11 +2005,7 @@ void server_setup::send_tell_me_my_address() {
 }
 
 std::string server_setup::get_steam_join_command_line() const {
-	if (external_address.has_value()) {
-		return typesafe_sprintf("%x", ::ToString(*external_address));
-	}
-
-	return "";
+	return get_native_server_connect_string();
 }
 
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
@@ -4049,15 +4045,27 @@ void server_setup::refresh_available_direct_download_bandwidths() {
 	for_each_id_and_client(refresh_chunks, connected_and_integrated_v);
 }
 
+#if PLATFORM_WEB
+#else
+std::string server_setup::get_native_server_connect_string() const {
+	if (external_address.has_value()) {
+		if (vars.is_behind_nat) {
+			return std::string("rtc:") + ::ToString(*external_address);
+		}
+		else {
+			return ::ToString(*external_address);
+		}
+	}
+
+	return "";
+}
+#endif
+
 std::string server_setup::get_connect_string() const {
 #if PLATFORM_WEB
 	return resolved_this_server_webrtc_id;
 #else
-	if (external_address.has_value()) {
-		return ::ToString(*external_address);
-	}
-
-	return "";
+	return get_native_server_connect_string();
 #endif
 }
 

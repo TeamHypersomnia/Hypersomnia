@@ -845,6 +845,11 @@ public:
 	std::string get_browser_location() const;
 	std::string get_connect_string() const;
 
+#if PLATFORM_WEB
+#else
+	std::string get_native_server_connect_string() const;
+#endif
+
 	void do_integrated_rcon_gui(bool force = false);
 
 	static void send_custom_webhook(const custom_webhook_data& webhook, const std::string& message);

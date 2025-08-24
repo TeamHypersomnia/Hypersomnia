@@ -340,42 +340,7 @@ void browse_servers_gui_state::refresh_server_pings() {
 std::string get_steam_join_link(const std::string& addr);
 std::string get_browser_join_link(const std::string& addr);
 
-std::string get_steam_join_link(
-	const masterserver_entry_meta& meta,
-	const netcode_address_t& fallback_ip
-) {
-	const auto suffix = [&]() -> std::string {
-		if (meta.type == server_type::WEB) {
-			return meta.webrtc_id;
-		}
-
-		/* For native, prefer official, if not then fallback ip */
-		if (!meta.official_url.empty()) {
-			return meta.official_url;
-		}
-
-		return ::ToString(fallback_ip);
-	}();
-
-	return get_steam_join_link(suffix);
-}
-
-std::string get_browser_join_link(
-	const masterserver_entry_meta& meta,
-	const netcode_address_t& fallback_ip
-) {
-	const auto suffix = [&]() -> std::string {
-		if (!meta.webrtc_id.empty()) {
-			return meta.webrtc_id;
-		}
-
-		return ::ToString(fallback_ip);
-	}();
-
-	return get_browser_join_link(suffix);
-}
-
-std::string server_list_entry::get_connect_string() const {
+std::string server_list_entry::get_my_connect_string() const {
 	/*
 		Cases:
 		Web server will always have a WebRTC id.
@@ -390,42 +355,59 @@ std::string server_list_entry::get_connect_string() const {
 	
 	*/
 
+#if PLATFORM_WEB
+	return get_web_connect_string();
+#else
+	const bool for_sending = false;
+	return get_native_connect_string(for_sending);
+#endif
+}
+
+std::string server_list_entry::get_web_connect_string() const {
+	if (!meta.webrtc_id.empty()) {
+		return meta.webrtc_id;
+	}
+
+	const auto external_ip_as_webrtc_id = ::ToString(address);
+	return external_ip_as_webrtc_id;
+}
+
+std::string server_list_entry::get_native_connect_string(const bool for_sending) const {
 	const auto& webrtc_id = meta.webrtc_id;
-	const auto connect_string = ::ToString(get_connect_address());
+	const auto ip_address = ::ToString(get_ip_address(for_sending));
 
 	if (meta.type == server_type::WEB) {
 		return webrtc_id;
 	}
 
-#if PLATFORM_WEB
-	if (meta.type == server_type::NATIVE && !webrtc_id.empty()) {
-		return webrtc_id;
-	}
-
-	const auto ip_as_webrtc_id = connect_string;
-	return ip_as_webrtc_id;
-#else
 	/* Native-to-native case */
 
+	if (for_sending) {
+		if (is_official_server()) {
+			return meta.official_url;
+		}
+	}
+
 	if (is_internal_network()) {
-		return connect_string;
+		return ip_address;
 	}
 
 	if (is_behind_nat()) {
-		return std::string("rtc:") + connect_string;
+		return std::string("rtc:") + ip_address;
 	}
 
-	return connect_string;
-#endif
+	return ip_address;
 }
 
 bool server_list_entry::is_internal_network() const {
 	return progress.found_on_internal_network && heartbeat.internal_network_address.has_value();
 }
 
-netcode_address_t server_list_entry::get_connect_address() const {
-	if (is_internal_network()) {
-		return *heartbeat.internal_network_address;
+netcode_address_t server_list_entry::get_ip_address(bool for_sending) const {
+	if (!for_sending) {
+		if (is_internal_network()) {
+			return *heartbeat.internal_network_address;
+		}
 	}
 
 	return address;
@@ -763,7 +745,7 @@ void browse_servers_gui_state::show_server_list(
 
 				displayed_connecting_server_name = d.server_name;
 
-				requested_connection = s.get_connect_string();
+				requested_connection = s.get_my_connect_string();
 			}
 		}
 
@@ -1270,7 +1252,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				displayed_connecting_server_name = s.heartbeat.server_name;
 
-				requested_connection = s.get_connect_string();
+				requested_connection = s.get_my_connect_string();
 			}
 
 			ImGui::SameLine();
@@ -1379,11 +1361,11 @@ const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(
 		LOG("%x is either a webrtc id or an official domain address.", in);
 
 		for (auto& s : server_list) {
-			if (s.meta.webrtc_id == in) {
+			if (s.get_web_connect_string() == in) {
 				return &s;
 			}
 
-			if (s.meta.official_url == in) {
+			if (s.get_native_connect_string(true) == in) {
 				return &s;
 			}
 		}
@@ -1552,7 +1534,7 @@ bool server_details_gui_state::perform(
 
 	const bool listed = !entry.unlisted;
 
-	auto steam_link = ::get_steam_join_link(entry.meta, entry.address);
+	auto steam_link = ::get_steam_join_link(entry.get_native_connect_string(true));
 
 	auto sid = scoped_id(steam_link.c_str());
 
@@ -1593,7 +1575,7 @@ bool server_details_gui_state::perform(
 	};
 
 	auto do_browser_join_link = [&](bool acquire) {
-		auto link = ::get_browser_join_link(entry.meta, entry.address);
+		auto link = ::get_browser_join_link(entry.get_web_connect_string());
 
 		if (acquire) {
 			acquire_keyboard_once();

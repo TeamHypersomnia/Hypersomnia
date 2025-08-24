@@ -76,8 +76,12 @@ struct server_list_entry {
 		return meta.is_official_server();
 	}
 
-	std::string get_connect_string() const;
-	netcode_address_t get_connect_address() const;
+	std::string get_my_connect_string() const;
+
+	std::string get_web_connect_string() const;
+	std::string get_native_connect_string(bool for_sending) const;
+
+	netcode_address_t get_ip_address(bool for_sending) const;
 
 	bool is_set() const;
 	bool is_behind_nat() const;
