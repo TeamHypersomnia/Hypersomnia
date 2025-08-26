@@ -1,6 +1,6 @@
 #include <cstddef>
 #include "augs/misc/compress.h"
-#include "3rdparty/lz4/lz4.c"
+#include "lz4.h"
 #include "augs/log.h"
 #include "augs/templates/container_templates.h"
 
