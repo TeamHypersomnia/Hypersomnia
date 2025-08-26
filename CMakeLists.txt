@@ -216,6 +216,7 @@ option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled
 option(USE_SYSTEM_BLAKE3 "Use system blake3 library instead of building it." OFF)
 option(USE_SYSTEM_FREETYPE "Use system FreeType library instead of building it." OFF)
 option(USE_SYSTEM_LIBDATACHANNEL "Use system LibDataChannel library instead of building it." OFF)
+option(USE_SYSTEM_LZ4 "Use system lz4 library instead of building it." OFF)
 option(USE_SYSTEM_OPENAL "Use system OpenAL library instead of building it." OFF)
 option(USE_SYSTEM_RAPIDJSON "Use system RapidJSON library instead of building it." OFF)
 
@@ -1154,6 +1155,17 @@ set(HYPERSOMNIA_HEADERS
 
 # We configure include directories for Hypersomnia codebase.
 
+if(USE_SYSTEM_LZ4)
+	message("Looking for pkg-config...")
+	find_package(PkgConfig REQUIRED)
+
+	message("Looking for system lz4 using pkg-config...")
+	pkg_check_modules(LZ4 REQUIRED liblz4)
+else()
+	set(LZ4_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/3rdparty/lz4/")
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS "${PROJECT_SOURCE_DIR}/src/3rdparty/lz4/lz4.c")
+endif()
+
 if(USE_SYSTEM_RAPIDJSON)
 	message("Looking for system RapidJSON")
 	find_package(RapidJSON REQUIRED)
@@ -1173,6 +1185,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/serialize"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo"
+	"${LZ4_INCLUDE_DIRS}"
 	"${RAPIDJSON_INCLUDE_DIRS}"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/libdatachannel/deps/json/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
@@ -1991,6 +2004,10 @@ if (USE_SYSTEM_BLAKE3)
 	list(APPEND HYPERSOMNIA_LIBS BLAKE3::blake3)
 else()
 	list(APPEND HYPERSOMNIA_LIBS blake3)
+endif()
+
+if (USE_SYSTEM_LZ4)
+	list(APPEND HYPERSOMNIA_LIBS ${LZ4_LIBRARIES})
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/cmake/steam_integration)
