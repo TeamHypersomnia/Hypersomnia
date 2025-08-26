@@ -684,11 +684,11 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 		const auto taken_reason = setup.is_project_name_taken(std::string(name));
 
 		auto describe_reason_taken = [this](const project_tab_type reason) {
-			switch (reason) {
-				if (name == arena_identifier("autosave")) {
-					return "Forbidden name.";
-				}
+			if (name == arena_identifier("autosave")) {
+				return "Forbidden name.";
+			}
 
+			switch (reason) {
 				case project_tab_type::MY_PROJECTS:
 					return "Project with this name already exists.";
 				case project_tab_type::OFFICIAL_ARENAS:
