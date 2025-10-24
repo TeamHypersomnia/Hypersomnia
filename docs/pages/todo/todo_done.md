@@ -7379,3 +7379,6 @@ This will discard your redo history."
 - implement (actually just set them up) TURN servers
 	- all official servers can be TURN servers
 
+- ban amplifier/blunaz in bots
+	- maybe just remove amplifier arm altogether
+

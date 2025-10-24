@@ -4511,6 +4511,7 @@ namespace test_flavours {
 			gun_def.shot_cooldown_ms = 500.f;
 			gun_def.headshot_multiplier = 2.0f;
 			gun_def.head_radius_multiplier = 0.2f;
+			gun_def.bots_ban = true;
 
 			gun_def.damage_multiplier = 3.2f;
 
@@ -4553,7 +4554,7 @@ namespace test_flavours {
 			gun_def.kickback_towards_wielder = kickback_mult * 150.f;
 			gun_def.recoil_multiplier = 3.25f;
 			gun_def.buy_type = buy_menu_type::TOOLS;
-			// gun_def.bots_ban = true;
+			gun_def.bots_ban = true;
 
 			default_gun_props(meta);
 			set_density_mult(meta, 0.7f);
