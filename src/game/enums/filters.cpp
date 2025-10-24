@@ -38,6 +38,20 @@ static auto standard_participation_except(C... c) {
 }
 
 namespace predefined_queries {
+	b2Filter light() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = make_flags(C::WALL);
+		return out;
+	}
+
+	b2Filter muzzle_light() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = make_flags(C::WALL, C::CHARACTER, C::CHARACTER_WEAPON);
+		return out;
+	}
+
 	b2Filter line_of_sight() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);

@@ -24,6 +24,8 @@ enum class filter_category {
 };
 
 namespace predefined_queries {
+	filter_type light();
+	filter_type muzzle_light();
 	filter_type line_of_sight();
 	filter_type melee_query();
 	filter_type melee_solid_obstacle_query();

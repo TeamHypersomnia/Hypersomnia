@@ -1,7 +1,7 @@
 #pragma once
 
 template <class F, class C>
-void for_each_vis_request(
+void for_each_light_vis_request(
 	F callback,
 
 	const cosmos& cosm,
@@ -39,7 +39,7 @@ void for_each_vis_request(
 					request.queried_rect = {};
 				}
 
-				request.filter = predefined_queries::line_of_sight();
+				request.filter = predefined_queries::light();
 				request.subject = light_entity;
 				request.color = light.color;
 

@@ -5229,7 +5229,7 @@ work_result work(
 				auto& light_requests = cached_visibility.light_requests;
 				light_requests.clear();
 
-				::for_each_vis_request(
+				::for_each_light_vis_request(
 					[&](const visibility_request& request) {
 						light_requests.emplace_back(request);
 					},
