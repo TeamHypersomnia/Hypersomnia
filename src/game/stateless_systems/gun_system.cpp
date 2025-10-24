@@ -1032,6 +1032,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							in.angular *= gun_def.burst_recoil_mult;
 						}
 
+						if (auto c = owning_capability.template find<components::crosshair>()) {
+							if (c->base_offset.x > 0) {
+								in.angular = -in.angular;
+							}
+						}
+
 						owning_capability.apply_crosshair_recoil(in);
 					}
 

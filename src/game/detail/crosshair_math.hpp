@@ -14,8 +14,7 @@ vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position) {
 			considered_base_offset.set(4, 0);
 		}
 
-		if (consider_recoil_position)
-		{
+		if (consider_recoil_position) {
 			considered_base_offset += recoil.position;
 		}
 		

@@ -12,10 +12,9 @@ real32 recoil_player_instance::shoot_and_get_impulse(
 		pattern_progress += def.pattern_progress_per_shot * 0.01;
 
 		auto rng = randomization(static_cast<rng_seed_type>(pattern_progress * 1000));
-		return rng.randval(-1.f, 1.f);
+		return rng.randval(0.9f, 1.3f);
 	}
-	else
-	{
+	else {
 		pattern_progress += def.pattern_progress_per_shot;
 	}
 
