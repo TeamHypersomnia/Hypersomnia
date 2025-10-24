@@ -6,6 +6,42 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- abandonow nie raportuje?
+- positional instead of rotational recoil
+- binted
+
+- singleplayer campaign
+	- Enter UI
+		- Downloadable from the catalogue
+		- likely
+	- simple knytt-like story of returning to the home planet
+	- soulslike spirit mechanics
+		- you have to buy an item for summoning
+		- then your session appears on the server list and you can even invite friends like on crazygames with a button
+			- all singleplayer campaigns will be servers after all, just joinable or not depending on if someone can invite
+	- metroidvania like mechanics for a start
+		- can press P or something to show the closest item
+		- enemies i think shouldnt respawn
+	- some rain areas
+		- just entities that diffract the floor
+	- initial scene
+		- strong wind that moves the character (force field)
+		- some desolate place with storm ambience and broken spaceship
+		- can immediately enter the cave, possibly some entrance to a desolate cyberaqua, dead fish
+			- make known maps desolate so they make a strong impression on people who already know them
+	- death screen similar to knytt
+		- screen freezes like in flashbang but without the white
+		- sound glitches out
+		- screen turns to noise
+		- pitch black silent screen for a second
+		- then back the last checkpoint without fade, just abrupt back to life
+	- bot mechanics
+		- must always walk silent whenever they hear character's footsteps unless in fighting mode
+		- should actually walk/sprint loudly very rarely, maybe once every 10-20s
+
+		
+	
+
 - reduce recoil by half
 - compactize match summaries and remove join by web maybe there
 
