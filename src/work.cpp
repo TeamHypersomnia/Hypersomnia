@@ -5239,7 +5239,8 @@ work_result work(
 
 					get_audiovisuals().get<light_system>().per_entity_cache,
 					interp,
-					get_queried_cone(new_viewing_config).get_visible_world_rect_aabb()
+					get_queried_cone(new_viewing_config).get_visible_world_rect_aabb(),
+					std::addressof(get_audiovisuals().get<particles_simulation_system>())
 				);
 
 				auto fog_of_war = new_viewing_config.drawing.fog_of_war;

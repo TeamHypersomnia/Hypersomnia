@@ -136,6 +136,10 @@ namespace invariants {
 
 		real32 basic_penetration_distance = 15.0f;
 		buy_menu_type buy_type = buy_menu_type::COUNT;
+
+		real32 muzzle_light_radius = 300.0f;
+		real32 muzzle_light_duration = 50.0f;
+		rgba muzzle_light_color = yellow;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

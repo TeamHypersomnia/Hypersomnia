@@ -11,8 +11,10 @@
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/gun_component.h"
 
 #include "game/messages/start_particle_effect.h"
+#include "game/messages/gunshot_message.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
@@ -20,6 +22,8 @@
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "view/audiovisual_state/systems/light_attenuation.h"
+#include "view/audiovisual_state/systems/legacy_light_mults.h"
 #include "augs/templates/traits/is_nullopt.h"
 #include "game/detail/gun/firearm_engine.h"
 #include "augs/templates/enum_introspect.h"
@@ -172,6 +176,7 @@ void particles_simulation_system::clear() {
 
 	firearm_engine_caches.clear();
 	continuous_particles_caches.clear();
+	temporary_lights.clear();
 }
 
 void particles_simulation_system::add_particle(const particle_layer l, const general_particle& p) {
@@ -871,4 +876,141 @@ void particles_simulation_system::advance_visible_streams(
 		},
 		settings
 	);
+
+	/*
+		Update temporary lights lifetime.
+	*/
+
+	const auto dt_ms = delta.in_milliseconds();
+
+	for (auto& light : temporary_lights) {
+		light.current_lifetime_ms += dt_ms;
+	}
+
+	erase_if(temporary_lights, [](const auto& light) {
+		return light.is_dead();
+	});
+}
+
+real32 particles_simulation_system::temporary_light::get_attenuation_mult() const {
+	/*
+		Calculate dynamic attenuation based on remaining lifetime.
+		Light fades out as it approaches the end of its lifetime.
+	*/
+
+	if (max_lifetime_ms <= 0.0f) {
+		return 1.0f;
+	}
+
+	const auto progress = current_lifetime_ms / max_lifetime_ms;
+	const auto fade_progress = std::min(1.0f, progress);
+
+	/*
+		Apply smooth fade-out in the last portion of the lifetime.
+		We'll fade starting from 50% of lifetime.
+	*/
+
+	const auto fade_start = 0.0f;
+
+	if (fade_progress < fade_start) {
+		return 1.0f;
+	}
+
+	const auto fade_amount = (fade_progress - fade_start) / (1.0f - fade_start);
+	return 1.0f - fade_amount;
+}
+
+components::light particles_simulation_system::temporary_light::to_light_component() const {
+	/*
+		Construct a proper components::light from the temporary light parameters.
+		Similar to how editor_light_node constructs lights from falloff parameters.
+	*/
+
+	components::light light;
+
+	/*
+		Use standard falloff parameters for temporary lights.
+		constant=0, linear=1, quadratic=0 gives a linear falloff.
+	*/
+
+	const real32 falloff_constant = 0.0f;
+	const real32 falloff_linear = 1.0f;
+	const real32 falloff_quadratic = 0.0f;
+	const rgba_channel strength = 30;
+
+	const auto fade_mult = 1.0f - get_attenuation_mult();
+	const auto effective_radius = radius * fade_mult;
+
+	const auto mult = ::calc_attenuation_mult_for_requested_radius(
+		falloff_constant,
+		falloff_linear,
+		falloff_quadratic,
+		effective_radius,
+		strength
+	);
+
+	light.attenuation.constant = falloff_constant * mult * CONST_MULT;
+	light.attenuation.linear = falloff_linear * mult * LINEAR_MULT;
+	light.attenuation.quadratic = falloff_quadratic * mult * QUADRATIC_MULT;
+	light.attenuation.trim_alpha = strength;
+
+	const auto wall_effective_radius = effective_radius / 1.3f;
+	const auto wall_mult = ::calc_attenuation_mult_for_requested_radius(
+		falloff_constant,
+		falloff_linear,
+		falloff_quadratic,
+		wall_effective_radius,
+		strength
+	);
+
+	light.wall_attenuation.constant = falloff_constant * wall_mult * CONST_MULT;
+	light.wall_attenuation.linear = falloff_linear * wall_mult * LINEAR_MULT;
+	light.wall_attenuation.quadratic = falloff_quadratic * wall_mult * QUADRATIC_MULT;
+	light.wall_attenuation.trim_alpha = strength;
+
+	/*
+		No variations for temporary lights (no flickering).
+	*/
+
+	light.variation.is_enabled = false;
+	light.wall_variation.is_enabled = false;
+	light.position_variations.is_enabled = false;
+
+	light.color = color;
+
+	return light;
+}
+
+void particles_simulation_system::spawn_temporary_lights(
+	const const_logic_step step,
+	const cosmos& cosm
+) {
+	const auto& events = step.get_queue<messages::gunshot_message>();
+
+	for (const auto& gunshot : events) {
+		const auto gun_entity = cosm[gunshot.subject];
+
+		if (gun_entity.dead()) {
+			continue;
+		}
+
+		const auto* const gun = gun_entity.template find<invariants::gun>();
+
+		if (gun == nullptr) {
+			continue;
+		}
+
+		/*
+			Create a temporary light at the muzzle position.
+		*/
+
+		temporary_light light;
+		light.pos = gunshot.muzzle_transform.pos;
+		light.color = gun->muzzle_light_color;
+		light.radius = gun->muzzle_light_radius;
+		light.max_lifetime_ms = gun->muzzle_light_duration;
+		light.current_lifetime_ms = 0.0f;
+
+		temporary_lights.push_back(light);
+	}
 }

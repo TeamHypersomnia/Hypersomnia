@@ -510,6 +510,7 @@ void audiovisual_state::standard_post_solve(
 		{
 			auto& particles = get<particles_simulation_system>();
 			particles.update_effects_from_messages(rng, step, input.particle_effects, interp, input.performance.special_effects);
+			particles.spawn_temporary_lights(step, step.get_cosmos());
 		}
 
 		const auto audio_renderer = input.audio_renderer;

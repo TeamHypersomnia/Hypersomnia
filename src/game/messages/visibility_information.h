@@ -2,9 +2,12 @@
 #include <cstddef>
 #include "message.h"
 #include <vector>
+#include <optional>
+#include <array>
 #include "augs/graphics/rgba.h"
 #include "augs/misc/simple_pair.h"
 #include "game/components/transform_component.h"
+#include "game/components/light_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/math/vec2.h"
 #include "augs/pad_bytes.h"
@@ -27,6 +30,19 @@ namespace messages {
 		}
 
 		transformr eye_transform;
+
+		/*
+			Light data stored directly in the request instead of requiring entity lookup.
+			For entity-based lights: filled from components::light
+			For temporary lights: constructed on-the-fly
+		*/
+		components::light light_data;
+
+		/*
+			Variation cache values for light flickering/animation.
+			Only present for entity-based lights that have cache entries.
+		*/
+		std::optional<std::array<float, 10>> variation_cache;
 
 		bool valid() const;
 	};

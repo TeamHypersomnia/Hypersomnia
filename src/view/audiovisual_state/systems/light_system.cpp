@@ -145,18 +145,19 @@ void light_system::render_all_lights(const light_system_input in) const {
 	auto overlay_light_polygons = [&]() {
 		for (std::size_t i = 0; i < light_requests.size(); ++i) {
 			const auto& request = light_requests[i];
-			const auto& light_entity = cosm[request.subject];
-			const auto maybe_light = light_entity.find<components::light>();
 
-			if (maybe_light == nullptr) {
-				continue;
-			}
+			/*
+				Use light data from request instead of entity lookup.
+			*/
 
-			const auto& light = *maybe_light;
+			const auto& light = request.light_data;
 			const auto world_light_pos = request.eye_transform.pos;
-			
-			const auto& cache = per_entity_cache.at(light_entity);
-			const auto& variation_vals = cache.all_variation_values;
+
+			/*
+				Use variation cache if present, otherwise use zero values.
+			*/
+
+			const auto variation_vals = request.variation_cache.value_or(std::array<float, 10>{});
 
 			{
 				const auto light_frag_pos = [&]() {
@@ -222,19 +223,19 @@ void light_system::render_all_lights(const light_system_input in) const {
 	auto overlay_wall_lights = [&]() {
 		for (size_t i = 0; i < light_requests.size(); ++i) {
 			const auto& request = light_requests[i];
-			const auto& light_entity = cosm[request.subject];
-			const auto maybe_light = light_entity.find<components::light>();
 
-			if (maybe_light == nullptr) {
-				continue;
-			}
+			/*
+				Use light data from request instead of entity lookup.
+			*/
 
-			const auto& light = *maybe_light;
-
+			const auto& light = request.light_data;
 			const auto world_light_pos = request.eye_transform.pos;
 
-			const auto& cache = per_entity_cache.at(light_entity);
-			const auto& variation_vals = cache.all_variation_values;
+			/*
+				Use variation cache if present, otherwise use zero values.
+			*/
+
+			const auto variation_vals = request.variation_cache.value_or(std::array<float, 10>{});
 
 			const auto wall_light_aabb = [&]() {
 				const bool exact = in.perf_settings.wall_light_drawing_precision == accuracy_type::EXACT;

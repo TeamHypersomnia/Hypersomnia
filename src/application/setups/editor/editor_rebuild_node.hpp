@@ -3,6 +3,7 @@
 #include "application/setups/editor/to_game_effect.hpp"
 #include "augs/misc/enum/enum_bitset.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
+#include "view/audiovisual_state/systems/light_attenuation.h"
 #include "game/enums/filters.h"
 #include "augs/templates/traits/has_flip.h"
 
@@ -300,35 +301,13 @@ void setup_entity_from_node_post_construct(
 }
 
 inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius() const {
-	/*
-		Taking component defaults is kinda stupid but we have to bear with it until we can remove legacy maps
-		Ultimately vibration might scale with the values itself
-		Or we'll just have hardcoded percentage like 10% and it will scale that
-
-		Update:
-		Let's actually not consider vibration in light range calculations
-		vibration is meant to be minor
-		also it should vibrate to the smaller side (so more attenuation)
-
-		(void)vibration;
-	*/
-
-	const auto atten_at_edge = 
-		constant +
-		linear * radius +
-		quadratic * radius * radius
-	;
-
-	if (atten_at_edge == 0.0f) {
-		return 1.0f;
-	}
-
-	/*
-		Strength is just another name for cutoff alpha.
-	*/
-
-	const auto cutoff_alpha = strength;
-	return 255.f / (atten_at_edge * float(std::max(rgba_channel(1), cutoff_alpha)));
+	return ::calc_attenuation_mult_for_requested_radius(
+		constant,
+		linear,
+		quadratic,
+		radius,
+		strength
+	);
 }
 
 inline uint16_t editor_filter_flags::get_mask_bits() const {

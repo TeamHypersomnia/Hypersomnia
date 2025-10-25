@@ -26,6 +26,13 @@
 #include "test_scenes/ingredients/ingredients.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
+constexpr auto smg_light_mult = 0.8f;
+constexpr auto small_pistol_light_mult = 0.7f;
+
+const auto muzzle_cyan = rgba(cyan).mult_brightness(1.1);
+const auto muzzle_red = rgba(red).mult_brightness(1.4);
+const auto muzzle_pink = rgba(pink).mult_brightness(1.4);
+
 inventory_space_type to_space_units(const std::string& s);
 
 /* 
@@ -3217,6 +3224,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 0.75f;
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BILMER2000_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 300.f;
 			gun_def.muzzle_shot_sound.modifier.max_distance = 500.f;
@@ -3266,6 +3275,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3313,6 +3323,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZTURM_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3359,6 +3370,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = orange;
+			gun_def.muzzle_light_radius *= smg_light_mult;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3414,6 +3427,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= smg_light_mult * 0.9f;
+			gun_def.muzzle_light_color = muzzle_pink;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZCZUR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
 			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
@@ -3476,6 +3491,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
+			gun_def.muzzle_light_radius *= 0.85f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3533,6 +3550,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
+			gun_def.muzzle_light_radius *= smg_light_mult;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3681,6 +3700,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = white;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3738,6 +3758,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
 
+			gun_def.muzzle_light_color = yellow;
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 60.f;
@@ -3792,6 +3813,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PLASMA_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3835,6 +3857,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= small_pistol_light_mult;
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
@@ -3880,6 +3904,8 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
+			gun_def.muzzle_light_radius *= small_pistol_light_mult;
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
 			gun_def.shot_cooldown_ms = 90.f;
@@ -3920,6 +3946,9 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.4f;
+			gun_def.muzzle_light_color = muzzle_cyan;
+			gun_def.muzzle_light_duration *= 1.35f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HPSR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
@@ -3973,6 +4002,9 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.2f;
+			gun_def.muzzle_light_color = yellow;
+			//gun_def.muzzle_light_duration *= 1.2f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HUNTER_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
@@ -4026,6 +4058,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.15f;
+			gun_def.muzzle_light_color = orange;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
 
 			gun_def.delay_shell_spawn_until_chambering = true;
@@ -4084,6 +4118,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.5f;
+			gun_def.muzzle_light_duration *= 1.2f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 6000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
@@ -4156,6 +4192,7 @@ namespace test_flavours {
 			meta.template get<invariants::text_details>().name = "BullDup 2000";
 
 			auto& gun_def = meta.get<invariants::gun>();
+			gun_def.muzzle_light_radius *= 1.25f;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 5500.f;
@@ -4204,6 +4241,9 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.2f;
+			gun_def.muzzle_light_color = muzzle_red;
+			gun_def.muzzle_light_duration *= 1.2f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -4250,6 +4290,9 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
+			gun_def.muzzle_light_radius *= 1.2f;
+			gun_def.muzzle_light_duration *= 1.2f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
@@ -4317,9 +4360,11 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
 
+			gun_def.muzzle_light_color = yellow;
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4150.f, 4150.f};
 			gun_def.shot_cooldown_ms = 125.f;
+			gun_def.muzzle_light_radius *= 0.9f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
@@ -4359,6 +4404,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = white;
+			gun_def.muzzle_light_radius *= 0.9f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULWARK_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -4404,6 +4451,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_color = muzzle_cyan;
+			gun_def.muzzle_light_radius *= 0.75f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::COVERT_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
 			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
@@ -4453,6 +4502,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_light_radius *= 1.35f;
+			gun_def.muzzle_light_color = orange;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::DEAGLE_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 7000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1500.f;
@@ -4506,6 +4557,8 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
+			gun_def.muzzle_light_radius *= 0.8f;
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {1800.f, 1800.f};
 			gun_def.shot_cooldown_ms = 500.f;
@@ -4540,6 +4593,8 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BLUNAZ_MUZZLE);
 
+			gun_def.muzzle_light_radius *= 0.8f;
+			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5000.f, 5000.f};
 			gun_def.shot_cooldown_ms = 1800.f;

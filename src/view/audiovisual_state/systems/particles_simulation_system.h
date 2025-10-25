@@ -39,6 +39,21 @@ struct integrate_and_draw_all_particles_input {
 
 class particles_simulation_system {
 public:
+	struct temporary_light {
+		vec2 pos;
+		rgba color;
+		real32 radius = 0.0f;
+		real32 max_lifetime_ms = 0.0f;
+		real32 current_lifetime_ms = 0.0f;
+
+		bool is_dead() const {
+			return current_lifetime_ms >= max_lifetime_ms;
+		}
+
+		real32 get_attenuation_mult() const;
+		components::light to_light_component() const;
+	};
+
 	struct emission_instance {
 		using bound = augs::bound<float>;
 
@@ -179,6 +194,9 @@ public:
 	audiovisual_cache_map<continuous_particles_cache> firearm_engine_caches;
 	audiovisual_cache_map<continuous_particles_cache> continuous_particles_caches;
 
+	/* Temporary lights for muzzle flashes etc. */
+	std::vector<temporary_light> temporary_lights;
+
 	void clear();
 
 	void add_particle(const particle_layer, const general_particle&);
@@ -258,6 +276,11 @@ public:
 		const plain_animations_pool&,
 		const augs::delta& dt,
 		const interpolation_system&
+	);
+
+	void spawn_temporary_lights(
+		const_logic_step step,
+		const cosmos& cosm
 	);
 
 	void update_effects_from_messages(

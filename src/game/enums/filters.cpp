@@ -48,7 +48,7 @@ namespace predefined_queries {
 	b2Filter muzzle_light() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::WALL, C::CHARACTER, C::CHARACTER_WEAPON);
+		out.maskBits = make_flags(C::WALL, C::CHARACTER);
 		return out;
 	}
 
