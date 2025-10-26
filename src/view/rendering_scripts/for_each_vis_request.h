@@ -84,11 +84,11 @@ void for_each_light_vis_request(
 				request.queried_rect = {};
 			}
 
-			if (temp_light.radius < 260.0f) {
-				request.filter = predefined_queries::light();
+			if (temp_light.cast_shadow) {
+				request.filter = predefined_queries::muzzle_light();
 			}
 			else {
-				request.filter = predefined_queries::muzzle_light();
+				request.filter = predefined_queries::light();
 			}
 
 			request.subject = entity_id();

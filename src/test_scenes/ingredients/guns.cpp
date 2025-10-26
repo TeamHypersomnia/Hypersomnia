@@ -3224,6 +3224,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_light_radius *= 0.75f;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BILMER2000_MUZZLE);
@@ -3372,6 +3373,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_light_color = orange;
 			gun_def.muzzle_light_radius *= smg_light_mult;
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3428,6 +3430,7 @@ namespace test_flavours {
 			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_light_radius *= smg_light_mult * 0.9f;
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_light_color = muzzle_pink;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZCZUR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
@@ -3494,6 +3497,7 @@ namespace test_flavours {
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_light_radius *= 0.85f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
+			gun_def.muzzle_cast_shadow = false;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5250.f, 5300.f};
@@ -3552,6 +3556,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_light_radius *= smg_light_mult;
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
@@ -3860,6 +3865,7 @@ namespace test_flavours {
 			gun_def.muzzle_light_radius *= small_pistol_light_mult;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
+			gun_def.muzzle_cast_shadow = false;
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
@@ -3904,6 +3910,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_light_radius *= small_pistol_light_mult;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
@@ -4451,6 +4458,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
+			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_light_radius *= 0.75f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::COVERT_MUZZLE);

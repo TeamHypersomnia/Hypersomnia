@@ -140,6 +140,8 @@ namespace invariants {
 		real32 muzzle_light_radius = 300.0f;
 		real32 muzzle_light_duration = 50.0f;
 		rgba muzzle_light_color = yellow;
+		bool muzzle_cast_shadow = true;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

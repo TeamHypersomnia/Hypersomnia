@@ -983,8 +983,13 @@ components::light particles_simulation_system::temporary_light::to_light_compone
 
 void particles_simulation_system::spawn_temporary_lights(
 	const const_logic_step step,
-	const cosmos& cosm
+	const cosmos& cosm,
+	const special_effects_settings& settings
 ) {
+	if (settings.muzzle_flash_intensity <= 0.0f) {
+		return;
+	}
+
 	const auto& events = step.get_queue<messages::gunshot_message>();
 
 	for (const auto& gunshot : events) {
@@ -1005,9 +1010,10 @@ void particles_simulation_system::spawn_temporary_lights(
 		*/
 
 		temporary_light light;
+		light.cast_shadow = gun->muzzle_cast_shadow;
 		light.pos = gunshot.muzzle_transform.pos;
 		light.color = gun->muzzle_light_color;
-		light.radius = gun->muzzle_light_radius;
+		light.radius = settings.muzzle_flash_intensity * gun->muzzle_light_radius;
 		light.max_lifetime_ms = gun->muzzle_light_duration;
 		light.current_lifetime_ms = 0.0f;
 

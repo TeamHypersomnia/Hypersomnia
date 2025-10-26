@@ -45,6 +45,7 @@ public:
 		real32 radius = 0.0f;
 		real32 max_lifetime_ms = 0.0f;
 		real32 current_lifetime_ms = 0.0f;
+		bool cast_shadow = true;
 
 		bool is_dead() const {
 			return current_lifetime_ms >= max_lifetime_ms;
@@ -280,7 +281,8 @@ public:
 
 	void spawn_temporary_lights(
 		const_logic_step step,
-		const cosmos& cosm
+		const cosmos& cosm,
+		const special_effects_settings& settings
 	);
 
 	void update_effects_from_messages(

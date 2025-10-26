@@ -814,6 +814,7 @@ void settings_gui_state::perform(
 
 				{
 					auto& scope_cfg = config.performance.special_effects;
+					revertable_slider(SCOPE_CFG_NVP(muzzle_flash_intensity), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
 				}
