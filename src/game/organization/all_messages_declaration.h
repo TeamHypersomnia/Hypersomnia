@@ -19,6 +19,7 @@ namespace messages {
 	struct health_event;
 	struct visibility_information_request;
 	struct performed_transfer_message;
+	struct start_temporary_light;
 	struct start_particle_effect;
 	struct stop_particle_effect;
 	struct start_sound_effect;
@@ -68,6 +69,7 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::interpolation_correction_request,
 
 	/* Purely effect messages. The only recipient is the audiovisual state. */
+	messages::start_temporary_light,
 	messages::start_particle_effect,
 	messages::stop_particle_effect,
 

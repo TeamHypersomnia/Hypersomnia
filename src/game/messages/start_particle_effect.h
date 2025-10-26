@@ -7,8 +7,14 @@
 #include "game/components/transform_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/assets/ids/asset_ids.h"
+#include "game/detail/view_input/temporary_light.h"
 
 namespace messages {
+	struct start_temporary_light : predicted_message {
+		using predicted_message::predicted_message;
+		temporary_light light;
+	};
+
 	struct start_particle_effect : predicted_message {
 		using predicted_message::predicted_message;
 		packaged_particle_effect payload;

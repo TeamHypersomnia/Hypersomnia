@@ -4,6 +4,12 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.6.1] - 2025-10-26
+
+### Fixed
+
+- Netcode for the muzzle flashes was missing.
+
 ## [1.6.0] - 2025-10-26
 
 ### Added

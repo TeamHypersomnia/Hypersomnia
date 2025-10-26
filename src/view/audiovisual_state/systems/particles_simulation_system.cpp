@@ -892,7 +892,7 @@ void particles_simulation_system::advance_visible_streams(
 	});
 }
 
-real32 particles_simulation_system::temporary_light::get_attenuation_mult() const {
+real32 temporary_light::get_attenuation_mult() const {
 	/*
 		Calculate dynamic attenuation based on remaining lifetime.
 		Light fades out as it approaches the end of its lifetime.
@@ -920,7 +920,7 @@ real32 particles_simulation_system::temporary_light::get_attenuation_mult() cons
 	return 1.0f - fade_amount;
 }
 
-components::light particles_simulation_system::temporary_light::to_light_component() const {
+components::light temporary_light::to_light_component() const {
 	/*
 		Construct a proper components::light from the temporary light parameters.
 		Similar to how editor_light_node constructs lights from falloff parameters.
@@ -983,40 +983,16 @@ components::light particles_simulation_system::temporary_light::to_light_compone
 
 void particles_simulation_system::spawn_temporary_lights(
 	const const_logic_step step,
-	const cosmos& cosm,
 	const special_effects_settings& settings
 ) {
 	if (settings.muzzle_flash_intensity <= 0.0f) {
 		return;
 	}
 
-	const auto& events = step.get_queue<messages::gunshot_message>();
+	const auto& events = step.get_queue<messages::start_temporary_light>();
 
-	for (const auto& gunshot : events) {
-		const auto gun_entity = cosm[gunshot.subject];
-
-		if (gun_entity.dead()) {
-			continue;
-		}
-
-		const auto* const gun = gun_entity.template find<invariants::gun>();
-
-		if (gun == nullptr) {
-			continue;
-		}
-
-		/*
-			Create a temporary light at the muzzle position.
-		*/
-
-		temporary_light light;
-		light.cast_shadow = gun->muzzle_cast_shadow;
-		light.pos = gunshot.muzzle_transform.pos;
-		light.color = gun->muzzle_light_color;
-		light.radius = settings.muzzle_flash_intensity * gun->muzzle_light_radius;
-		light.max_lifetime_ms = gun->muzzle_light_duration;
-		light.current_lifetime_ms = 0.0f;
-
-		temporary_lights.push_back(light);
+	for (auto event : events) {
+		event.light.radius *= settings.muzzle_flash_intensity;
+		temporary_lights.push_back(event.light);
 	}
 }

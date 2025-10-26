@@ -85,6 +85,36 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	for (const auto& g : gunshots) {
 		const auto predictability = predictable_only_by(g.capability);
 
+		{
+			const auto gun_entity = cosm[g.subject];
+
+			if (gun_entity.dead()) {
+				continue;
+			}
+
+			const auto* const gun = gun_entity.template find<invariants::gun>();
+
+			if (gun == nullptr) {
+				continue;
+			}
+
+			/*
+				Create a temporary light at the muzzle position.
+			*/
+
+			auto event = messages::start_temporary_light(predictability);
+			auto& light = event.light;
+
+			light.cast_shadow = gun->muzzle_cast_shadow;
+			light.pos = g.muzzle_transform.pos;
+			light.color = gun->muzzle_light_color;
+			light.radius = gun->muzzle_light_radius;
+			light.max_lifetime_ms = gun->muzzle_light_duration;
+			light.current_lifetime_ms = 0.0f;
+
+			step.post_message(std::move(event));
+		}
+
 		for (auto& r : g.spawned_rounds) {
 			const auto spawned_round = cosm[r];
 

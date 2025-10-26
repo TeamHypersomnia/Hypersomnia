@@ -17,6 +17,7 @@
 #include "view/viewables/particle_effect.h"
 #include "view/audiovisual_state/special_effects_settings.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
+#include "game/detail/view_input/temporary_light.h"
 
 class interpolation_system;
 struct randomization;
@@ -39,22 +40,6 @@ struct integrate_and_draw_all_particles_input {
 
 class particles_simulation_system {
 public:
-	struct temporary_light {
-		vec2 pos;
-		rgba color;
-		real32 radius = 0.0f;
-		real32 max_lifetime_ms = 0.0f;
-		real32 current_lifetime_ms = 0.0f;
-		bool cast_shadow = true;
-
-		bool is_dead() const {
-			return current_lifetime_ms >= max_lifetime_ms;
-		}
-
-		real32 get_attenuation_mult() const;
-		components::light to_light_component() const;
-	};
-
 	struct emission_instance {
 		using bound = augs::bound<float>;
 
@@ -281,7 +266,6 @@ public:
 
 	void spawn_temporary_lights(
 		const_logic_step step,
-		const cosmos& cosm,
 		const special_effects_settings& settings
 	);
 

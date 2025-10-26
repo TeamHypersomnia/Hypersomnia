@@ -375,6 +375,7 @@ class client_setup :
 
 				auto& q = step.transient.messages;
 
+				callback(q.get_queue<M::start_temporary_light>());
 				callback(q.get_queue<M::start_particle_effect>());
 				callback(q.get_queue<M::stop_particle_effect>());
 
