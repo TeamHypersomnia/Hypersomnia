@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2023-09-22 08:37:09.757126 UTC"
+        "version_timestamp": "2025-10-26 21:11:32.045620 UTC"
     },
     "about": {
         "author": "lia",
@@ -17,7 +17,8 @@
         }
     },
     "playtesting": {
-        "mode": "gun_game"
+        "mode": "quick_test",
+        "starting_faction": "RESISTANCE"
     },
     "game_modes": {
         "bomb_defusal": {
@@ -442,20 +443,6 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0
         },
         {
-            "path": "gfx/tile5.png",
-            "file_hash": "65f9719add3e7b20dc0c7810c434feb59071b5f8dfbdafc81a3807b62072903b",
-            "id": "@tile5",
-            "size": [128, 128],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0
-        },
-        {
-            "path": "gfx/tile6.png",
-            "file_hash": "73fb13b02c6bbbf97ccbd41dd2332845a1cc817c175d886b12e786e7595c06fe",
-            "id": "@tile6",
-            "size": [512, 512],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0
-        },
-        {
             "path": "gfx/tile7.png",
             "file_hash": "b0488a4f05721fc1b9772af797aca9777cb57ff59eda48b5d480be2a358c8873",
             "id": "@tile7",
@@ -678,7 +665,28 @@
             ]
         },
         {
+            "id": "lights",
+            "nodes": [
+                "\t",
+                "\t (1)",
+                "\t (2)",
+                "\t (3)",
+                "\t (4)",
+                "\t (5)",
+                "\t (6)",
+                "\t (7)",
+                "\t (8)",
+                "\t (9)",
+                "\t (10)",
+                "\t (14)",
+                "\t (11)",
+                "\t (12)",
+                "\t (13)"
+            ]
+        },
+        {
             "id": "New layer",
+            "is_open_in_editor": false,
             "nodes": [
                 "Metal2 (16)",
                 "Metal2",
@@ -817,7 +825,6 @@
                 "Black (10)",
                 "Black (11)",
                 "Blacksilo (1)",
-                "Blacksilo",
                 "Decal1y (1)",
                 "Decal1 (13)",
                 "Dirt2 (3)",
@@ -1162,21 +1169,7 @@
                 "Silo ambience left",
                 "Silo ambience left (1)",
                 "Silo ambience right",
-                "Silo ambience right (1)",
-                "\t",
-                "\t (1)",
-                "\t (2)",
-                "\t (3)",
-                "\t (4)",
-                "\t (5)",
-                "\t (6)",
-                "\t (7)",
-                "\t (8)",
-                "\t (9)",
-                "\t (10)",
-                "\t (11)",
-                "\t (12)",
-                "\t (13)"
+                "Silo ambience right (1)"
             ]
         }
     ],
@@ -2029,12 +2022,6 @@
             "type": "@blacksilo",
             "pos": [1408.0, 3200.0],
             "size": [768, 768]
-        },
-        {
-            "id": "Blacksilo",
-            "type": "@blacksilo",
-            "pos": [1552.0, 3200.0],
-            "size": [768, 0]
         },
         {
             "id": "Decal1y (1)",
@@ -3188,8 +3175,8 @@
         {
             "id": "Dirt4 (1)",
             "type": "@dirt4",
-            "pos": [-1349.7760009765625, 2921.087646484375],
-            "rotation": -176.85726928710938,
+            "pos": [-1279.7760009765625, 2919.087646484375],
+            "rotation": -180.0,
             "size": [512, 1330]
         },
         {
@@ -4537,6 +4524,22 @@
             "falloff": {
                 "radius": 1000.0,
                 "strength": 29
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "\t (14)",
+            "type": "point_light",
+            "pos": [1409.0, 3201.0],
+            "color": [255, 0, 0, 255],
+            "falloff": {
+                "radius": 0.0,
+                "strength": 29
+            },
+            "wall_falloff": {
+                "radius": 234.5679931640625,
+                "strength": 52
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
