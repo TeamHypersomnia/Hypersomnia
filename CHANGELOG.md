@@ -4,6 +4,17 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.6.0] - 2025-10-26
+
+### Added
+
+- Muzzle flash now spawns a legitimate light source.
+
+### Changed
+
+- Recoil is now simple and controllable. The pattern now only goes up. Additionally, recoil now goes up when aiming right instead of down - since it was always clock-wise.
+- Bots will not buy Amplifier arm or Blunaz.
+
 ## [1.5.2] - 2025-08-24
 
 ### Added

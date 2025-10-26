@@ -7382,3 +7382,8 @@ This will discard your redo history."
 - ban amplifier/blunaz in bots
 	- maybe just remove amplifier arm altogether
 
+- positional instead of rotational recoil
+- binted
+- reduce recoil by half
+- compactize match summaries and remove join by web maybe there
+

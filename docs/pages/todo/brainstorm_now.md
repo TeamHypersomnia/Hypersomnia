@@ -7,8 +7,6 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - abandonow nie raportuje?
-- positional instead of rotational recoil
-- binted
 
 - singleplayer campaign
 	- Enter UI
@@ -38,12 +36,6 @@ summary: That which we are brainstorming at the moment.
 	- bot mechanics
 		- must always walk silent whenever they hear character's footsteps unless in fighting mode
 		- should actually walk/sprint loudly very rarely, maybe once every 10-20s
-
-		
-	
-
-- reduce recoil by half
-- compactize match summaries and remove join by web maybe there
 
 - we can fill pngs and ogg/wavs with empty content for the headless dedicated server, will save plenty of space
 
