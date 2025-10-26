@@ -3948,7 +3948,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_light_radius *= 1.4f;
 			gun_def.muzzle_light_color = muzzle_cyan;
-			gun_def.muzzle_light_duration *= 1.35f;
+			gun_def.muzzle_light_duration *= 1.45f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HPSR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
