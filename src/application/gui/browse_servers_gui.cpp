@@ -1308,7 +1308,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	return false;
 }
 
-std::optional<server_list_entry> browse_servers_gui_state::find_best_server(const bool find_ranked) const {
+std::optional<server_list_entry> browse_servers_gui_state::find_best_server(const bool allow_ranked) const {
 	auto filtered = server_list;
 
 	erase_if(
@@ -1318,7 +1318,7 @@ std::optional<server_list_entry> browse_servers_gui_state::find_best_server(cons
 				return true;
 			}
 
-			if (const bool casual = !find_ranked) {
+			if (const bool filter_rankeds = !allow_ranked) {
 				const bool is_ranked = f.is_official_server() && f.heartbeat.is_ranked_server();
 
 				return is_ranked;

@@ -2422,25 +2422,9 @@ work_result work(
 
 	WEBSTATIC auto perform_start_client_gui = [&](const auto frame_num) {
 		auto best_casual = browse_servers_gui.find_best_server(false);
-		auto best_ranked = browse_servers_gui.find_best_server(ranked_servers_enabled);
-
-		if (ranked_servers_enabled) {
-			const bool has_casual_with_players = best_casual && best_casual->heartbeat.num_online > 0;
-			const bool no_ranked_with_players = !best_ranked.has_value() || best_ranked->heartbeat.num_online == 0;
-
-			if (has_casual_with_players && no_ranked_with_players) {
-				best_ranked = best_casual;
-			}
-		}
-
-#if PLATFORM_WEB
-		if (!is_signed_in()) {
-			best_ranked = best_casual;
-		}
-#endif
 
 		const bool perform_result = start_client_gui.perform(
-			best_ranked,
+			best_casual,
 			browse_servers_gui.refresh_in_progress(),
 			frame_num,
 			get_general_renderer(), 
@@ -2465,8 +2449,8 @@ work_result work(
 
 			browse_servers_gui.open();
 
-			if (best_ranked.has_value()) {
-				browse_servers_gui.select_server(*best_ranked);
+			if (best_casual.has_value()) {
+				browse_servers_gui.select_server(*best_casual);
 			}
 		}
 	};

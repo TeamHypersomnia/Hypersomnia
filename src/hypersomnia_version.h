@@ -30,6 +30,10 @@ struct hypersomnia_version {
 	bool operator==(const hypersomnia_version& b) const {
 		return commit_hash == b.commit_hash;
 	}
+
+	bool is_development_build() const {
+		return get_version_string() == "0.0.0";
+	}
 };
 
 bool is_more_recent(const std::string& next_version, const std::string& current_version);

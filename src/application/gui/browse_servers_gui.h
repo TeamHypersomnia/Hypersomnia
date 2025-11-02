@@ -129,7 +129,7 @@ public:
 	void reping_all_servers();
 
 	const server_list_entry* find_entry_by_connect_string(const client_connect_string& in) const;
-	std::optional<server_list_entry> find_best_server(bool is_ranked) const;
+	std::optional<server_list_entry> find_best_server(bool allow_ranked) const;
 	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;

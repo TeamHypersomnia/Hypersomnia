@@ -5195,6 +5195,10 @@ faction_type server_setup::get_assigned_faction() const {
 bool server_heartbeat::versions_compatible() const {
 	const auto client_version = hypersomnia_version().get_version_string();
 
+	if (hypersomnia_version().is_development_build()) {
+		return true;
+	}
+
 	int client_major = 0;
 	int client_minor = 0;
 	int client_patch = 0;
