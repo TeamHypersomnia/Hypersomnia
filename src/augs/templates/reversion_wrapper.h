@@ -1,16 +1,8 @@
 #pragma once
-#include <iterator>
+#include <ranges>
+#include <utility>
 
-/* Thanks to https://stackoverflow.com/a/28139075/503776 */
-
-template <typename T>
-struct reversion_wrapper { T& iterable; };
-
-template <typename T>
-auto begin(reversion_wrapper<T> w) { return std::rbegin(w.iterable); }
-
-template <typename T>
-auto end(reversion_wrapper<T> w) { return std::rend(w.iterable); }
-
-template <typename T>
-reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
+template <std::ranges::bidirectional_range R>
+auto reverse(R&& r) {
+    return std::forward<R>(r) | std::views::reverse;
+}

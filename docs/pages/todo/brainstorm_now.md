@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bots prevent starting ranked
+- thinks its web on hosted servers
 - abandonow nie raportuje?
 
 - singleplayer campaign

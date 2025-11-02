@@ -2033,10 +2033,10 @@ void arena_mode::process_win_conditions(const input_type in, const logic_step st
 		if (get_round_seconds_left(in) <= 0.f) {
 			bool all_spectators = true;
 
-			for (const auto& it : players) {
+			for (const auto& it : only_human(players)) {
 				const auto& p = it.second;
 
-				if (!p.is_bot && p.get_faction() != faction_type::SPECTATOR) {
+				if (p.get_faction() != faction_type::SPECTATOR) {
 					all_spectators = false;
 				}
 			}
@@ -2283,11 +2283,7 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 arena_migrated_session arena_mode::emigrate() const {
 	arena_migrated_session session;
 
-	for (const auto& emigrated_player : players) {
-		if (emigrated_player.second.is_bot) {
-			continue;
-		}
-
+	for (const auto& emigrated_player : only_human(players)) {
 		arena_migrated_player_entry entry;
 		entry.mode_id = emigrated_player.first;
 		entry.data = emigrated_player.second.session;
@@ -2423,15 +2419,13 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	bool should_restart = false;
 	bool spawn_for_recently_assigned = false;
 
-	for (auto& it : players) {
+	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 
-		if (player.is_bot) {
-			const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng, in.dynamic_vars.bot_difficulty);
-			
-			if (ai_result.item_purchase.has_value()) {
-				entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
-			}
+		const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng, in.dynamic_vars.bot_difficulty);
+		
+		if (ai_result.item_purchase.has_value()) {
+			entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
 		}
 	}
 
@@ -2471,11 +2465,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 									int players_left = 0;
 
-									for (auto& p : players) {
-										if (p.second.is_bot) {
-											continue;
-										}
-
+									for (auto& p : only_human(players)) {
 										if (!p.second.ready_for_ranked) {
 											++players_left;
 										}
@@ -2854,10 +2844,8 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 per_actual_faction<uint8_t> arena_mode::get_current_num_bots_per_faction() const {
 	per_actual_faction<uint8_t> result = {};
 
-	for (const auto& p : players) {
-		if (p.second.is_bot) {
-			result[p.second.get_faction()]++;
-		}
+	for (const auto& p : only_bot(players)) {
+		result[p.second.get_faction()]++;
 	}
 
 	return result;
@@ -2887,8 +2875,8 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 			const auto num_to_erase = std::size_t(current - requested);
 			std::vector<mode_player_id> to_erase;
 
-			for (const auto& p : reverse(players)) {
-				if (p.second.is_bot && p.second.get_faction() == faction) {
+			for (const auto& p : reverse(only_bot(players))) {
+				if (p.second.get_faction() == faction) {
 					to_erase.push_back(p.first);
 
 					if (to_erase.size() == num_to_erase) {
@@ -3497,7 +3485,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		) {
 			all_ready_for_ranked = true;
 
-			for (auto& p : players) {
+			for (auto& p : only_human(players)) {
 				if (!p.second.ready_for_ranked) {
 					all_ready_for_ranked = false;
 					break;
@@ -3755,10 +3743,8 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 	}
 
 	// At the end of mode_post_solve, reset bot sprint/dash flags
-	for (auto& it : players) {
-		if (it.second.is_bot) {
-			post_solve_arena_mode_ai(in, it.second, step);
-		}
+	for (auto& it : only_bot(players)) {
+		post_solve_arena_mode_ai(in, it.second, step);
 	}
 }
 
@@ -3799,12 +3785,8 @@ void arena_mode::respawn_the_dead_as_bots(const input_type in, const logic_step 
 	auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 
-	for (auto& it : players) {
+	for (auto& it : only_human(players)) {
 		auto& victim_info = it.second;
-
-		if (victim_info.is_bot) {
-			continue;
-		}
 
 		const auto player_handle = cosm[victim_info.controlled_character_id];
 		bool needs_character = false;
@@ -3830,10 +3812,10 @@ void arena_mode::respawn_the_dead_as_bots(const input_type in, const logic_step 
 		auto bot_to_control = mode_player_id::dead();
 		float bot_dist = -1.0;
 		
-		for (auto& it : players) {
+		for (auto& it : only_bot(players)) {
 			const auto& player_data = it.second;
 			
-			if (player_data.is_bot && player_data.get_faction() == victim_faction) {
+			if (player_data.get_faction() == victim_faction) {
 				if (const auto bot_character = in.cosm[player_data.controlled_character_id]) {
 					if (sentient_and_conscious(bot_character)) {
 						if (player_handle.dead()) {
