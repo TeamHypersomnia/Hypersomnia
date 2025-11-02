@@ -7387,3 +7387,4 @@ This will discard your redo history."
 - reduce recoil by half
 - compactize match summaries and remove join by web maybe there
 
+- bots prevent starting ranked

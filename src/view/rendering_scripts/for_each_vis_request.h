@@ -70,12 +70,14 @@ void for_each_light_vis_request(
 
 			const auto light_component = temp_light.to_light_component();
 			const auto reach = light_component.calc_reach_trimmed();
-			const auto light_aabb = xywh::center_and_size(temp_light.pos, reach);
 
 			messages::visibility_information_request request;
 
-			request.eye_transform.pos = temp_light.pos;
-			request.eye_transform.rotation = 0.0f;
+			if (const auto transform = temp_light.positioning.find_transform(cosm, interp)) {
+				request.eye_transform = *transform;
+			}
+
+			const auto light_aabb = xywh::center_and_size(request.eye_transform.pos, reach);
 
 			if (queried_camera_aabb.hover(light_aabb)) {
 				request.queried_rect = reach;

@@ -894,8 +894,9 @@ void particles_simulation_system::advance_visible_streams(
 
 real32 temporary_light::get_attenuation_mult() const {
 	/*
-		Calculate dynamic attenuation based on remaining lifetime.
-		Light fades out as it approaches the end of its lifetime.
+		Calculate attenuation multiplier over lifetime:
+		- 0.0 → 1.0 over first half of lifetime
+		- 1.0 → 0.0 over second half
 	*/
 
 	if (max_lifetime_ms <= 0.0f) {
@@ -903,21 +904,15 @@ real32 temporary_light::get_attenuation_mult() const {
 	}
 
 	const auto progress = current_lifetime_ms / max_lifetime_ms;
-	const auto fade_progress = std::min(1.0f, progress);
+	const auto clamped = std::clamp(progress, 0.0f, 1.0f);
 
-	/*
-		Apply smooth fade-out in the last portion of the lifetime.
-		We'll fade starting from 50% of lifetime.
-	*/
-
-	const auto fade_start = 0.0f;
-
-	if (fade_progress < fade_start) {
-		return 1.0f;
+	if (clamped < 0.5f) {
+		return clamped / 0.5f;
 	}
-
-	const auto fade_amount = (fade_progress - fade_start) / (1.0f - fade_start);
-	return 1.0f - fade_amount;
+	else {
+		const auto mult = 1.0f - ((clamped - 0.5f) / 0.5f);
+		return mult * mult;
+	}
 }
 
 components::light temporary_light::to_light_component() const {
@@ -938,7 +933,7 @@ components::light temporary_light::to_light_component() const {
 	const real32 falloff_quadratic = 0.0f;
 	const rgba_channel strength = 30;
 
-	const auto fade_mult = 1.0f - get_attenuation_mult();
+	const auto fade_mult = get_attenuation_mult();
 	const auto effective_radius = radius * fade_mult;
 
 	const auto mult = ::calc_attenuation_mult_for_requested_radius(

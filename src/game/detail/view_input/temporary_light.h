@@ -2,7 +2,7 @@
 #include "game/components/light_component.h"
 
 struct temporary_light {
-	vec2 pos;
+	absolute_or_local positioning;
 	rgba color;
 	real32 radius = 0.0f;
 	real32 max_lifetime_ms = 0.0f;

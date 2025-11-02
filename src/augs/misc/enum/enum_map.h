@@ -91,9 +91,14 @@ namespace augs {
 			friend class enum_map_base<Enum, T>;
 
 		public:
-			using iterator_category = std::forward_iterator_tag;
-			using value_type = maybe_const_t<is_const, T>;
+			using iterator_category = std::bidirectional_iterator_tag;
+			using iterator_concept = std::bidirectional_iterator_tag;
+			using value_type = pair_type;
+			using difference_type = std::ptrdiff_t;
+			using reference = pair_type;
+			using pointer = void;
 
+			basic_iterator() = default;
 			basic_iterator(const owner_ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
 
 			basic_iterator& operator++() {
@@ -107,9 +112,26 @@ namespace augs {
 				return *this;
 			}
 
-			const basic_iterator operator++(int) {
-				const iterator temp = *this;
+			basic_iterator operator++(int) {
+				auto temp = *this;
 				++*this;
+				return temp;
+			}
+
+			basic_iterator& operator--() {
+				if constexpr(R) {
+					idx = ptr->find_first_set_index(idx) + 1;
+				}
+				else {
+					idx = ptr->reverse_find_first_set_index(idx - 1);
+				}
+
+				return *this;
+			}
+
+			basic_iterator operator--(int) {
+				auto temp = *this;
+				--*this;
 				return temp;
 			}
 

@@ -138,7 +138,7 @@ namespace invariants {
 		buy_menu_type buy_type = buy_menu_type::COUNT;
 
 		real32 muzzle_light_radius = 300.0f;
-		real32 muzzle_light_duration = 50.0f;
+		real32 muzzle_light_duration = 87.0f;
 		rgba muzzle_light_color = yellow;
 		bool muzzle_cast_shadow = true;
 		pad_bytes<3> pad;

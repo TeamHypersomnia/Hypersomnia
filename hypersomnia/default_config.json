@@ -996,7 +996,7 @@
                 "thunder_amount": 1.0,
                 "smoke_amount": 0.699999988079071
             },
-            "muzzle_flash_intensity": 1.0,
+            "muzzle_flash_intensity": 0.9,
             "particle_stream_amount": 1.0,
             "particle_burst_amount": 1.0
         },
