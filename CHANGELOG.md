@@ -4,6 +4,16 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.6.2] - 2025-10-26
+
+### Changed
+
+- Quick play always directs to casual servers.
+
+### Fixed
+
+- Muzzle flashes now ease out instead of disappearing at once to reduce tearing.
+
 ## [1.6.1] - 2025-10-26
 
 ### Fixed
