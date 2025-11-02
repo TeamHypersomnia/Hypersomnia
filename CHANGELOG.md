@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Quick play always directs to casual servers.
+- Quick play always connects to casual servers.
 
 ### Fixed
 
