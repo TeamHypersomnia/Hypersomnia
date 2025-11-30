@@ -179,12 +179,12 @@ struct server_vars {
 	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR
 
-	float get_client_network_timeout_secs(const bool is_web) const {
+	float get_client_network_timeout_secs(const bool is_browser) const {
 		if (ranked.is_ranked_server()) {
 			return ranked.client_network_timeout_secs;
 		}
 
-		if (is_web) {
+		if (is_browser) {
 			return web_client_network_timeout_secs;
 		}
 

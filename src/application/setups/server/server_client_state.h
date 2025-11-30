@@ -110,7 +110,7 @@ struct server_client_state {
 	}
 
 	auto get_client_network_timeout_secs(const server_vars& v) const {
-		return v.get_client_network_timeout_secs(is_web_client());
+		return v.get_client_network_timeout_secs(is_browser_client());
 	}
 
 	bool should_kick_due_to_network_timeout(const server_vars& v, const net_time_t server_time) const {
@@ -200,5 +200,15 @@ struct server_client_state {
 		return new_meta;
 	}
 
-	bool is_web_client() const;
+	/*
+		Note this is true also for native clients
+		who had to traverse the NAT.
+
+		This thus does not determine if it's a "Web" player.
+	*/
+	bool is_webrtc_client() const;
+
+	bool is_browser_client() const {
+		return ::is_browser_platform(settings.get_platform_type());
+	}
 };

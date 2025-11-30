@@ -7388,3 +7388,12 @@ This will discard your redo history."
 - compactize match summaries and remove join by web maybe there
 
 - bots prevent starting ranked
+
+- "we have browser players"
+	- on science man's server, everyone was playing from linux, 4 players
+	- server was 1.6.2 too
+	- but ME connecting there (ctrl+h, nonsteam build) triggered it
+	- when i was gone it was back to normal
+	- likely because of traversal through webrtc
+		- yeah is_web_client reported true then
+

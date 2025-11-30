@@ -2533,17 +2533,17 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 }
 
 synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
-	bool has_web_clients_playing = false;
+	bool has_browser_clients_playing = false;
 
 	bool all_authenticated = true;
 	bool all_not_banned = true;
 
-	for_each_id_and_client([this, &all_authenticated, &all_not_banned, &has_web_clients_playing](const auto id, const auto& c) {
-		if (c.is_web_client()) {
+	for_each_id_and_client([this, &all_authenticated, &all_not_banned, &has_browser_clients_playing](const auto id, const auto& c) {
+		if (c.is_browser_client()) {
 			const auto faction = get_assigned_faction(to_mode_player_id(id));
 
 			if (::is_actual_faction(faction)) {
-				has_web_clients_playing = true;
+				has_browser_clients_playing = true;
 			}
 		}
 
@@ -2585,7 +2585,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.friendly_fire = vars.friendly_fire;
 	out.ranked = vars.ranked;
 
-	out.force_short_match = has_web_clients_playing;
+	out.force_short_match = has_browser_clients_playing;
 
 	out.bot_difficulty = vars.bot_difficulty;
 
@@ -2899,7 +2899,7 @@ void server_setup::unset_client(const client_id_type& id) {
 		LOG("Client disconnected. Details:\n%x", describe_client(id));
 
 		if (webrtc_server) {
-			if (clients[id].is_web_client()) {
+			if (clients[id].is_webrtc_client()) {
 				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
 
 				const auto client_webrtc_id = get_client_address(id).GetPort();
@@ -3136,8 +3136,8 @@ void server_setup::advance_clients_state() {
 						const auto timeout_secs = c.get_client_network_timeout_secs(vars);
 						LOG_NVPS(c.last_valid_payload_time, server_time, timeout_secs);
 
-						if (c.is_web_client()) {
-							LOG("Pausing the web client due to timeout.");
+						if (c.is_webrtc_client()) {
+							LOG("Pausing the webrtc client due to timeout.");
 							c.web_client_paused = client_pause_state::PAUSED;
 							c.entropies_since_pause = 0;
 							c.reset_solvable_stream();
@@ -4354,8 +4354,8 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 
 	const auto& c = clients[id];
 
-	if (c.is_web_client()) {
-		LOG("Avoiding loopback/internal RCON check since it's a Web client.");
+	if (c.is_webrtc_client()) {
+		LOG("Avoiding loopback/internal RCON check since it's a webrtc client.");
 	}
 	else {
 		if (vars.auto_authorize_loopback_for_rcon) {
@@ -5262,7 +5262,7 @@ std::string get_browser_join_link(const std::string& suffix) {
 	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
 }
 
-bool server_client_state::is_web_client() const {
+bool server_client_state::is_webrtc_client() const {
 	return ::is_internal_webrtc_address(to_netcode_addr(address));
 }
 

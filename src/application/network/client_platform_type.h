@@ -35,7 +35,7 @@ inline std::string describe_from_where(const client_platform_type t) {
 	}
 }
 
-inline bool is_web_platform(const client_platform_type t) {
+inline bool is_browser_platform(const client_platform_type t) {
 	switch (t) {
 		case client_platform_type::WEB:
 		case client_platform_type::ITCH:

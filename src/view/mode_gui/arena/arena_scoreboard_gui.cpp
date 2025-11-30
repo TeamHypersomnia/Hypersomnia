@@ -752,13 +752,13 @@ void arena_scoreboard_gui::draw_gui(
 
 			next_col();
 
-			const bool is_web = [&]() {
+			const bool is_browser = [&]() {
 				if (in.player_metas != nullptr) {
 					const auto p = static_cast<client_platform_type>(
 						(*in.player_metas)[player_id.value].synced.platform_type
 					);
 
-					return ::is_web_platform(p);
+					return ::is_browser_platform(p);
 				}
 
 				return false;
@@ -782,7 +782,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			auto preffix = formatted_string();
 
-			if (is_web) {
+			if (is_browser) {
 				preffix = fmt("[Web]", pref_col);
 			}
 
