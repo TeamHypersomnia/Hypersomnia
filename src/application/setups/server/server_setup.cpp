@@ -5259,7 +5259,7 @@ std::string get_steam_join_link(const std::string& suffix) {
 }
 
 std::string get_browser_join_link(const std::string& suffix) {
-	return typesafe_sprintf("https://hypersomnia.io/game/%x", suffix);
+	return typesafe_sprintf("https://play.hypersomnia.io/game/%x", suffix);
 }
 
 bool server_client_state::is_webrtc_client() const {

@@ -7,7 +7,7 @@
 
 <img width="828" height="678" alt="image" src="https://github.com/user-attachments/assets/333a515f-1523-49c1-a97f-a4c3f46b8fc1" />
 
-# [▶ Play in the Browser!](https://hypersomnia.io/)
+# [▶ Play in the Browser!](https://play.hypersomnia.io/)
 
 [![Windows Build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Windows_build.yml)
 [![Linux build](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions/workflows/Linux_build.yml)
@@ -24,7 +24,7 @@ Challenge your friend to an intense duel, or gather two clans to fight a spectac
 Written in modern C++, **without a game engine!**  
 Forever free and open-source :heart:
 
-*Comes with an [in-game map Editor!](https://hypersomnia.io/editor/official)*
+*Comes with an [in-game map Editor!](https://play.hypersomnia.io/editor/official)*
 
 # Download the game
 

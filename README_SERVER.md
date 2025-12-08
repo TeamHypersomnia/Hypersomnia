@@ -178,7 +178,7 @@ If you have a Discord server, you might want to setup a [Webhook](https://suppor
 
 You'll need these ports open:
 - One UDP port for native clients (``8412`` is recommended).
-- One UDP port for [Web clients](https://hypersomnia.io).
+- One UDP port for [Web clients](https://play.hypersomnia.io).
 	- ``9000`` by default - multiple web clients will be multiplexed.
 	  - Optionally, you can disable UDP multiplexing and use multiple UDP ports.
 

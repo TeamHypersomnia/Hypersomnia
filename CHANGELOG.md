@@ -99,7 +99,7 @@
 
 ### Added
 
-- Webhooks also report servers hosted on the Web now (hypersomnia.io or CrazyGames).
+- Webhooks also report servers hosted on the Web now (play.hypersomnia.io or CrazyGames).
 
 ### Fixed
 

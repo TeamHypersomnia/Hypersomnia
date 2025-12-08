@@ -1,5 +1,5 @@
 server {
-    server_name hypersomnia.io www.hypersomnia.io;
+    server_name play.hypersomnia.io www.play.hypersomnia.io;
 
     root /var/www/html;
     index Hypersomnia.html;
@@ -49,23 +49,23 @@ server {
     gzip_proxied no-cache no-store private expired auth;
 
     listen 443 ssl http2;
-    ssl_certificate /etc/letsencrypt/live/hypersomnia.io/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/hypersomnia.io/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/play.hypersomnia.io/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/play.hypersomnia.io/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 
 # HTTP server block for redirecting to HTTPS
 server {
-    if ($host = www.hypersomnia.io) {
+    if ($host = www.play.hypersomnia.io) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
-    if ($host = hypersomnia.io) {
+    if ($host = play.hypersomnia.io) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
     listen 80;
-    server_name hypersomnia.io www.hypersomnia.io;
+    server_name play.hypersomnia.io www.play.hypersomnia.io;
     return 404; # managed by Certbot
 }

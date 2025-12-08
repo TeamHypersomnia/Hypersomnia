@@ -7095,7 +7095,7 @@ This will discard your redo history."
         - and have the masterserver recognize them by correct webrtc id
     - we'll have to send the web client info in server list as 0.0.0.0 because there's no point even pinging them since we dont know the port anyway
     - permalinks
-        - hypersomnia.io/game/gns should join "gns" game or create it if one doesnt exist
+        - play.hypersomnia.io/game/gns should join "gns" game or create it if one doesnt exist
     - note this means all servers native or not might as well use http
     - NO! Note native clients dont need websocket connection!
         - They can simply exchange udp packets with the signalling server!!!
@@ -7397,3 +7397,4 @@ This will discard your redo history."
 	- likely because of traversal through webrtc
 		- yeah is_web_client reported true then
 
+- server thinks its web and forces short match on hosted servers sometimes?

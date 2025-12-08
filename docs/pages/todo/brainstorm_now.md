@@ -6,7 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- server thinks its web and forces short match on hosted servers sometimes?
+- refresh server browser every time it is opened as sometimes it shows nonexistent servers already
+
+- unlockable skins
+	- aura points instead of leaderboards
+
+- Aura system
+	- simple aura leaderboard, dont have to have ranks there, let ranks be unique to rankeds
+	- need to have some id system for nonsteam builds, we can have a private/public key pair
+		- now we can get id'd on casual servers too
+	- hosting a server could respect aura (default) or not
+
 - abandonow nie raportuje?
 
 - singleplayer campaign
@@ -45,7 +55,7 @@ summary: That which we are brainstorming at the moment.
 	- and possibly web too
 - launch a job for all if commit message is in v.1.3.4 format or just has [release]
 
-- implement map and game mode params in hypersomnia.io/host/map/mode
+- implement map and game mode params in play.hypersomnia.io/host/map/mode
 - fix web too
 	- i dont remember what was that
 

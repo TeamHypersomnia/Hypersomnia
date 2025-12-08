@@ -459,7 +459,7 @@
         "signalling_server_bind_address": "0.0.0.0",
         "signalling_server_port": 8000,
         "first_udp_command_port": 8430,
-        "num_udp_command_ports": 30,
+        "num_udp_command_ports": 4,
         "server_list_port": 8420,
         "fallback_http_server_list_port": 8410,
         "cert_pem_path": "",
