@@ -4,6 +4,12 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [1.6.3] - 2025-10-26
+
+### Changed
+
+- hypersomnia.xyz -> hypersomnia.io
+
 ## [1.6.2] - 2025-10-26
 
 ### Changed
