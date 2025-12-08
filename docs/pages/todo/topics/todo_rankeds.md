@@ -19,7 +19,7 @@ summary: That which we are brainstorming at the moment.
         - this is actually just in prod
         - (was #if 0 in server setup)
     - && is_ranked_server in find best ranked
-    - default_config.json: uncomment check_ban_url = "https://hypersomnia.xyz/check_ban"
+    - default_config.json: uncomment check_ban_url = "https://hypersomnia.io/check_ban"
     - multiple api keys, one per official server
     - disable "Play ranked" button in non-steam clients
     - Look at "TODO_RANKED"

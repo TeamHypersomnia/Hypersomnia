@@ -6628,7 +6628,7 @@ This will discard your redo history."
 
 - Determining if game runs steam
     - No point in having config var, why?
-        - We'll anyway ship a non-steam lib to hypersomnia.xyz to have no proprietary soft in foss distributions
+        - We'll anyway ship a non-steam lib to hypersomnia.io to have no proprietary soft in foss distributions
         - So when we have a non-steam lib, a config var like this would not work anyway
         - And when you're launching from steam, there's no advantage disabling it
     - Just return true/false from steam_init

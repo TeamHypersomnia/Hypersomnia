@@ -476,7 +476,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		for (const auto& s : list) {
 			auto open_url = [&]() {
 #if !WEB_CRAZYGAMES
-				augs::open_url(typesafe_sprintf("https://hypersomnia.xyz/user/%x", s.account_id));
+				augs::open_url(typesafe_sprintf("https://hypersomnia.io/user/%x", s.account_id));
 #endif
 			};
 

@@ -1,6 +1,6 @@
 # Game controls
 
-From: https://hypersomnia.xyz/guide
+From: https://hypersomnia.io/guide
 
 You can reconfigure all bindings by going to Settings->Controls tab.
 

@@ -92,7 +92,7 @@ This is now the folder for your [`.json` configuration files](#configuration).
 # Manual `AppImage` setup
 
 ```sh
-wget https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage
+wget https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage
 chmod +x Hypersomnia-Headless.AppImage
 nohup ./Hypersomnia-Headless.AppImage --appimage-extract-and-run --daily-autoupdate > /dev/null 2>&1 &
 ```

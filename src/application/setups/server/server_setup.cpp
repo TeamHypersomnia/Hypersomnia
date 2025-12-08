@@ -669,8 +669,8 @@ std::vector<rtc::IceServer> get_ice_servers() {
 
 	out.emplace_back(rtc::IceServer("stun.l.google.com", 19302));
 	out.emplace_back(rtc::IceServer("stun.1und1.de", 3479));
-	out.emplace_back(rtc::IceServer("arena-us.hypersomnia.xyz", 3478, "somnia", "Re8Iefei"));
-	out.emplace_back(rtc::IceServer("arena-pl.hypersomnia.xyz", 3478, "somnia", "Re8Iefei"));
+	out.emplace_back(rtc::IceServer("arena-us.hypersomnia.io", 3478, "somnia", "Re8Iefei"));
+	out.emplace_back(rtc::IceServer("arena-pl.hypersomnia.io", 3478, "somnia", "Re8Iefei"));
 
 	return out;
 }

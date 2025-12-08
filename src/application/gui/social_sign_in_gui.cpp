@@ -134,7 +134,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 			auto sc = scoped_text_color(rgba(255, 255, 255, 230));
 
 			if (login_option(N::SOCIAL_STEAM, "(opt.) Connect Discord to Steam", 1.0f, vec2(0.5, 0.2), 0.6f, "(Optional)\nUseful if you sometimes play Steam version\nand don't want a duplicate Web account.\n\nMatches played with Discord account\nwill count towards your Steam account.")) {
-				augs::open_url("https://hypersomnia.xyz/profile");
+				augs::open_url("https://hypersomnia.io/profile");
 			}
 		}
 

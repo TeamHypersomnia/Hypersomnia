@@ -29,9 +29,9 @@ Forever free and open-source :heart:
 # Download the game
 
 
-| <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=100 hspace=1> </a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=0 vspace=20></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
+| <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=100 hspace=1> </a> | <a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.io/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.io/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=100 hspace=0 vspace=20></a> | <a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
 |:--:|:--:|:--:|:--:|
-| [Steam](https://store.steampowered.com/app/2660970/Hypersomnia) | [Windows](https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip) | [Linux](https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage) | [macOS](https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg) |
+| [Steam](https://store.steampowered.com/app/2660970/Hypersomnia) | [Windows](https://hypersomnia.io/builds/latest/Hypersomnia-for-Windows.zip) | [Linux](https://hypersomnia.io/builds/latest/Hypersomnia.AppImage) | [macOS](https://hypersomnia.io/builds/latest/Hypersomnia-for-MacOS.dmg) |
 
 <!--
 alternative with separate steam row
@@ -40,7 +40,7 @@ alternative with separate steam row
 |:--:|
 | **[Play on Steam](https://store.steampowered.com/app/2660970/Hypersomnia)** |
 
-| <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a> | <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
+| <a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.io/assets/images/windows_icon.svg" width=75 hspace=1></a> | <a href="https://hypersomnia.io/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a> | <a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a> |
 |:--:|:--:|:--:|
 | **Windows** | **Linux** | **macOS** |
 
@@ -49,9 +49,9 @@ alternative with separate steam row
 <!--
 <a href="https://store.steampowered.com/app/2660970/Hypersomnia"> <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" width=140 hspace=1> </a>
 
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/assets/images/windows_icon.svg" width=75 hspace=1></a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a>
+<a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.io/assets/images/windows_icon.svg" width=75 hspace=1></a>
+<a href="https://hypersomnia.io/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=100 hspace=1 vspace=20></a>
+<a href="https://hypersomnia.io/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" width=80 hspace=1 vspace=20></a>
 <br undefined>
 -->
 
@@ -60,9 +60,9 @@ Only 29 MB!
 The game will start with an **interactive Tutorial!**
 
 Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=25 hspace=8 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)  
-Or download <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.xyz/assets/images/linux_icon.svg" width=30 hspace=5 vspace=15><b>Server AppImage</b></a>
+Or download <a href="https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=30 hspace=5 vspace=15><b>Server AppImage</b></a>
 
-<sup>*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*</sup>
+<sup>*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.io/builds/latest/)*</sup>
 
 # Press
 
@@ -123,7 +123,7 @@ Hypersomnia has been online and playable **since 2017**. It brings together:
 - ...and an **in-game map editor** lets you instantly playtest a **work-in-progress map** with your friends, **even behind a router!** 
 	- [▶ Learn how to make maps!](https://www.youtube.com/watch?v=q1rfIy06_xo)
 
-Today, we have **[24 unique firearms](https://hypersomnia.xyz/weapons)**, **[10 community maps](https://hypersomnia.xyz/arenas)**, and two game modes: *Bomb defusal* and *Gun game*.
+Today, we have **[24 unique firearms](https://hypersomnia.io/weapons)**, **[10 community maps](https://hypersomnia.io/arenas)**, and two game modes: *Bomb defusal* and *Gun game*.
 
 We aim to become ***the ultimate open-source shooter*** - a grand community project extensible without limit.
 
@@ -165,17 +165,17 @@ Or will you join the underground civilization that awaits the end of war in this
     - My solution was one of the greatest stroke of epiphany I ever experienced:
       - When a new client connects, **force already connected clients to completely rebuild the physics state from the positions, rotations and velocities as if they have just connected themselves.** *drops the mic*
       - As long as building the internal physics data from pos/vel/rotation data is deterministic, the in-game clients will have the *exact same state* as the newly connected client.
-      - I apply the same principle in many other areas of networking. Throughout my codebase, I call this process *[cache reinference.](https://wiki.hypersomnia.xyz/reinference)*
+      - I apply the same principle in many other areas of networking. Throughout my codebase, I call this process *[cache reinference.](https://wiki.hypersomnia.io/reinference)*
   - All this would be very hard to pull off in a commercial engine, or straight impossible in a closed source one.
   - Yet in *Hypersomnia*, you can have thousands of dynamic crates or bullets on the map - as long as there are e.g. two player-controlled characters, the traffic will be around ``40 kbit/s (= 5 KB/s)`` under a tickrate of 60 Hz. **Only player-controlled characters** contribute to traffic. 
     - Even the silliest details like bullet shells are fully synchronized *without* paying for it with network traffic.
   - As a bonus, lag is hidden exceptionally well as the game doesn't just mindlessly "extrapolate" frames visually - rather, it simulates the entire game world forward *offscreen* to accurately predict the future.
   - For the very curious - here's an [article from my old abandoned blog](https://teamhypersomnia.github.io/newscast/full-blown-networking-with-latency-hiding-for-physics), showing how I achieved this as early as in 2016.
 - Browser clients and native clients **can play on the same servers**, thanks to [libdatachannel](https://github.com/paullouisageneau/libdatachannel) and [datachannel-wasm](https://github.com/paullouisageneau/datachannel-wasm).
-  - You can [host a server in the browser](https://hypersomnia.xyz/host) and connect to it with a native client...
+  - You can [host a server in the browser](https://play.hypersomnia.io/host) and connect to it with a native client...
   - ...and vice versa: host a server in the native client and send anyone the link to join from the browser!
-- In the browser version, you can **sign in with Discord** and play ranked matches to compete on the [global Leaderboards](https://hypersomnia.xyz/leaderboards)!
-  - You can also [associate your Discord account with Steam account](https://hypersomnia.xyz/profile) so that the Steam version and web version **share the same rating!**
+- In the browser version, you can **sign in with Discord** and play ranked matches to compete on the [global Leaderboards](https://hypersomnia.io/leaderboards)!
+  - You can also [associate your Discord account with Steam account](https://hypersomnia.io/profile) so that the Steam version and web version **share the same rating!**
 - You can host a working game server *from the main menu* - the game is able to **forward ports out of the box!**
 - Cute fish and insect AI **[with flocking behaviors.](https://www.youtube.com/watch?v=0vlUOO5l0jw)** Full source: [movement_path_system.cpp.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/game/stateless_systems/movement_path_system.cpp)
   - These too are synchronized through the network!
@@ -220,7 +220,7 @@ Or will you join the underground civilization that awaits the end of war in this
     ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/0479fca0-f836-4f6a-b5a5-dc2317bb4b95)
 
     - Not only that, [it will verify](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/application/main/verify_signature.h) that the update came from the hardcoded [developer public key](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h), with a call to ``ssh-keygen``.
-      - If the [build hosting](https://hypersomnia.xyz/builds/latest/) were hacked and a malicious game version uploaded, the existing game clients **will refuse** to apply the updates.
+      - If the [build hosting](https://hypersomnia.io/builds/latest/) were hacked and a malicious game version uploaded, the existing game clients **will refuse** to apply the updates.
 - ..and I'm signing builds **offline with a [Trezor hardware wallet](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell/blob/master/developer_sign_file.sh).**
   This is how *every* update looks like on my end:
 
@@ -339,7 +339,7 @@ Or will you join the underground civilization that awaits the end of war in this
     - The official Discord will also be notified that you're playtesting a map, so others can join in on the fun!
 
   - The Editor took well over a year to implement.
-  - It paid off big time - there is now a neat [catalogue of community maps](https://hypersomnia.xyz/arenas) - every one of them downloadable.
+  - It paid off big time - there is now a neat [catalogue of community maps](https://hypersomnia.io/arenas) - every one of them downloadable.
 
 # Game guide
 
@@ -357,7 +357,7 @@ Pull requests are welcomed, should they even be typo fixes or missing const guar
 If you plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-A WIP documentation can be found at [wiki](https://wiki.hypersomnia.xyz).
+A WIP documentation can be found at [wiki](https://wiki.hypersomnia.io).
 
 Make sure to check out [TeamHypersomnia](https://github.com/TeamHypersomnia) for other repositories that are useful when setting up your own custom servers.
 

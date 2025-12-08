@@ -1,7 +1,7 @@
 body, html {
   background-image: 
 	linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgb(0, 8, 5) 60%),
-	url('https://hypersomnia.xyz/assets/images/horizontal_banner.png');
+	url('https://hypersomnia.io/assets/images/horizontal_banner.png');
   background-size: 100% auto;
   background-position: top center;
   background-repeat: no-repeat;

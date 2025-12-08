@@ -133,7 +133,7 @@ public:
 				ImGui::SetColumnWidth(0, ImGui::CalcTextSize("99.99.99999 at 99-99-99.dem").x);
 				ImGui::SetColumnWidth(1, ImGui::CalcTextSize("999999 years ago").x);
 				ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9999999999999 MB").x);
-				ImGui::SetColumnWidth(3, ImGui::CalcTextSize("arena-blahblah.hypersomnia.xyz").x);
+				ImGui::SetColumnWidth(3, ImGui::CalcTextSize("arena-blahblah.hypersomnia.io").x);
 
 				text_disabled("Filename");
 				ImGui::NextColumn();

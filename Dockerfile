@@ -1,6 +1,6 @@
 FROM docker.io/library/debian:bookworm-20250610-slim AS downloader
 RUN apt-get update && apt-get install -y wget && \
-    wget -q https://hypersomnia.xyz/builds/latest/Hypersomnia-Headless.AppImage && \
+    wget -q https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage && \
     chmod +x Hypersomnia-Headless.AppImage
 
 FROM docker.io/library/debian:bookworm-20250610-slim

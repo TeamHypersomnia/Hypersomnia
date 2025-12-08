@@ -297,7 +297,7 @@ summary: That which we are brainstorming at the moment.
         - symlink user/downloads to ~/community_arenas per each update
         - page with all downloads etc. should point to ~/community_arenas and say "Community Arenas
     - ultimately
-        - 1) Separate official/custom maps on hypersomnia.xyz
+        - 1) Separate official/custom maps on hypersomnia.io
         - 2) Keep official ones immutably in content/arenas (done)
         - 3) Keep custom ones in .config/user/downloads/arenas and point the php page to it (works with .tar.gz too just have to symlink each time)
         - For custom servers it sorta works out of the box since they don't serve the php page
@@ -2278,7 +2278,7 @@ Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 - Leaderboards
     - Columns: Avatar, Nickname, Kills, Assists, Deaths, Hours played
 
-- Setup a simple dev journal at hypersomnia.xyz
+- Setup a simple dev journal at hypersomnia.io
 
 - Advanced RCON functionality
     - Kicking and banning users

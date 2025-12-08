@@ -3524,7 +3524,7 @@ work_result work(
 
 #if !WEB_LOWEND
 			case T::CREDITS:
-				augs::open_url("https://hypersomnia.xyz/credits");
+				augs::open_url("https://hypersomnia.io/credits");
 				break;
 #endif
 

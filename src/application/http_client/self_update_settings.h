@@ -6,7 +6,7 @@ struct self_update_settings {
 	bool update_on_launch = true;
 
 	int update_connection_timeout_secs = 5;
-	std::string update_host = "hypersomnia.xyz";
+	std::string update_host = "hypersomnia.io";
 	std::string update_path = "/builds/latest";
 	// END GEN INTROSPECTOR
 

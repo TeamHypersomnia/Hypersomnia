@@ -7,7 +7,7 @@ of how Hypersomnia manages its game state.
 
 ## Theory: Flavour vs Entity
 
-Summarizing from http://wiki.hypersomnia.xyz/entity_flavour
+Summarizing from http://wiki.hypersomnia.io/entity_flavour
 
 So that working with content is easier, and so that less memory is wasted,  
 each game object is divided into two kinds of data:
@@ -87,7 +87,7 @@ If you want to see the history of changes for a specific field,
 simply open up the History GUI (Alt+H) and write the property's name into the filter box.
 
 The documentation of the purpose and behaviour of all properties of invariants and components 
-will eventually be documented on wiki.hypersomnia.xyz.  
+will eventually be documented on wiki.hypersomnia.io.  
 The names should, however, be more or less self-explanatory,
 and you will probably learn most of this by way of experimentation.
 

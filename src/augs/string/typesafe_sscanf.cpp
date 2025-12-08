@@ -251,9 +251,9 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	{
 		int id = -1;
 		std::string rest;
-		REQUIRE(2 == test_scanf("[CH] arena-ch.hypersomnia.xyz (non-ranked) #3", "%x#%x", rest, id));
+		REQUIRE(2 == test_scanf("[CH] arena-ch.hypersomnia.io (non-ranked) #3", "%x#%x", rest, id));
 		REQUIRE(3 == id);
-		REQUIRE(2 == test_scanf("[US] arena-us.hypersomnia.xyz #1", "%x#%x", rest, id));
+		REQUIRE(2 == test_scanf("[US] arena-us.hypersomnia.io #1", "%x#%x", rest, id));
 		REQUIRE(1 == id);
 
 		REQUIRE(2 == test_scanf("[CH] Switzerland #8 R", "%x#%x", rest, id));

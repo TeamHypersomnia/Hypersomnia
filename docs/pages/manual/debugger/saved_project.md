@@ -217,5 +217,5 @@ Congratulations!
 You should now be fluent in all editor features.  
 The learning doesn't end here, however.  
 
-Visit http://wiki.hypersomnia.xyz/content_guides 
+Visit http://wiki.hypersomnia.io/content_guides 
 to read some very important guides on actually creating meaningful content. 
