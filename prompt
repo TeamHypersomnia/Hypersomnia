@@ -1,0 +1,34 @@
+i need to implement navmeshes for my arena_mode_ai.
+
+- the navmesh struct must be in a header in game/common_state/cosmos_navmesh.h, it will be held in cosmos_common_significant class
+- that navmesh must be generated in build_arena_from_editor_project (src/application/arena/build_arena_from_editor_project.hpp), and is subsequently saved next to the project's .json file with the same name, .nav extension, as a binary file
+- that file has a corresponding struct: editor_arena_navmesh which is just cosmos_navmesh + the hash field before it, this struct can be in src/application/setups/editor/editor_arena_navmesh.h
+- so the .nav file first has the arena hash written to it (editor_project_readwrite::read_project_json outputs the arena's hash), to see if build_arena_from_editor_project needs to regenerate it
+
+for now just write this save/load boilerplate, cosmos navmesh can have no fields rn, will implement it next
+
+
+
+the cosmos navmesh will have a std::vector of 
+
+
+
+
+
+
+
+upon loading the arena, so editor_project_readwrite::read_project_json - you can pass a pointer to the generated navmesh 
+- anyone who calls editor_project_readwrite::read_project_json can later copy-write that navmesh into cosmos_common_solvable e.g. by passing it to 
+
+the generated navmesh will be saved/loaded in a file next to the arena json in the loaded arena folder every
+
+so every time you load an arena with
+editor_project_readwrite::read_project_json
+you can actually take . 
+editor_project_readwrite::read_project_json
+build_arena_from_editor_project should probably load the navmesh or build it and save it in .nav file if it doesn't exist yet.
+
+
+make it future-proof for islands
+- because otherwise we cant connect portals
+- so a vector of grids
