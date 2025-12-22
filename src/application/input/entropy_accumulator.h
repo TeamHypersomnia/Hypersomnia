@@ -33,8 +33,18 @@ struct entropy_accumulator {
 		if (handle) {
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, motion_type)) {
 				if (const auto crosshair = handle.find_crosshair()) {
-					const auto total_bound = in.visible_world_area / max_zoom_out_at_edges_v;
-					return to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.character.crosshair_sensitivity, total_bound);
+					auto total_bound = in.visible_world_area;
+
+					if (crosshair->zoom_out_mode || in.settings.auto_zoom_out_near_screen_edges) {
+						total_bound /= max_zoom_out_at_edges_v;
+					}
+
+					return to_game_motion(
+						*crosshair_motion,
+						crosshair->base_offset,
+						in.settings.character.crosshair_sensitivity,
+						total_bound
+					);
 				}
 			}
 		}
@@ -82,6 +92,15 @@ struct entropy_accumulator {
 						}
 					}
 				}
+			}
+
+			if (in.settings.auto_zoom_out_near_screen_edges) {
+				erase_if(
+					new_intents,
+					[&](const auto& i) {
+						return i.intent == game_intent_type::TOGGLE_ZOOM_OUT;
+					}
+				);
 			}
 
 			concatenate(player.intents, new_intents);

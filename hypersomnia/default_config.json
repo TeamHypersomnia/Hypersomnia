@@ -91,6 +91,7 @@
     "game_controls": {
         "LeftMouseButton": "SHOOT",
         "RightMouseButton": "SHOOT_SECONDARY",
+        //"RightMouseButton": "TOGGLE_ZOOM_OUT",
         "MiddleMouseButton": "THROW_FORCE_GRENADE",
         "MouseButton4": "THROW_PED_GRENADE",
         "MouseButton5": "THROW_FLASHBANG",

@@ -56,6 +56,8 @@ enum class game_intent_type {
 	DROP_SECONDARY,
 	THROW_SECONDARY,
 
+	TOGGLE_ZOOM_OUT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

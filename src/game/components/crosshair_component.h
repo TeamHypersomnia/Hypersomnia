@@ -22,6 +22,8 @@ namespace components {
 		crosshair_orbit_type orbit_mode = crosshair_orbit_type::LOOK;
 		simple_body recoil;
 		vec2 base_offset;
+		bool zoom_out_mode = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

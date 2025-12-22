@@ -9,6 +9,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
+#include "application/input/input_settings.h"
 
 extern float max_zoom_out_at_edges_v;
 
@@ -47,7 +48,8 @@ void world_camera::tick(
 	const augs::delta dt,
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase,
-	const vec2 mid_step_crosshair_displacement
+	const vec2 mid_step_crosshair_displacement,
+	const input_settings& input_cfg
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
@@ -266,7 +268,8 @@ void world_camera::tick(
 		settings,
 		nonzoomedout_visible_world_area,
 		mid_step_crosshair_displacement,
-		current_edge_zoomout_mult
+		current_edge_zoomout_mult,
+		input_cfg
 	);
 
 	interp_zoom(current_eye.zoom, target_zoom);
@@ -289,9 +292,20 @@ float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
 	const world_camera_settings& settings,
 	const vec2 nonzoomedout_visible_world_area,
 	const vec2 mid_step_crosshair_displacement,
-	const float current_edge_zoomout_mult
+	const float current_edge_zoomout_mult,
+	const input_settings& input_cfg
 ) {
 	if (entity_to_chase.dead()) {
+		return 0.0f;
+	}
+
+	if (const bool manual_zoom = !input_cfg.auto_zoom_out_near_screen_edges) {
+		if (const auto crosshair = entity_to_chase.find_crosshair()) {
+			if (crosshair->zoom_out_mode) {
+				return 1.0f;
+			}
+		}
+
 		return 0.0f;
 	}
 

@@ -48,3 +48,8 @@ vec2 position_rectangle_around_a_circle(
 	const vec2 rectangle_size,
 	const real32 position_at_degrees
 );
+
+vec2 clamp_with_raycast(
+	const vec2 point,
+	const vec2 rectangle_size
+);

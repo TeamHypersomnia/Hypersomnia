@@ -14,6 +14,8 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/modes/detail/fog_of_war_settings.h"
+#include "augs/math/math.h"
 
 void crosshair_system::handle_crosshair_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
@@ -32,6 +34,26 @@ void crosshair_system::handle_crosshair_intents(const logic_step step) {
 				}
 				else {
 					mode = crosshair_orbit_type::LOOK;
+				}
+			}
+
+			if (it.intent == game_intent_type::TOGGLE_ZOOM_OUT && it.was_pressed()) {
+				auto& mode = crosshair->zoom_out_mode;
+
+				mode = !mode;
+
+				if (!mode) {
+					/*
+						When exiting zoom-out,
+						clamp crosshair to the default Fog of War size.
+					*/
+
+					const auto default_fow_size = fog_of_war_settings().size;
+
+					crosshair->base_offset = ::clamp_with_raycast(
+						crosshair->base_offset,
+						default_fow_size * 2
+					);
 				}
 			}
 		}

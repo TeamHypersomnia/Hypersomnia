@@ -3781,7 +3781,8 @@ work_result work(
 			frame_delta,
 			viewing_config.camera,
 			viewed_character,
-			calc_pre_step_crosshair_displacement(viewing_config)
+			calc_pre_step_crosshair_displacement(viewing_config),
+			get_current_input_settings(viewing_config)
 		);
 
 		hud_messages.advance(viewing_config.hud_messages.value);

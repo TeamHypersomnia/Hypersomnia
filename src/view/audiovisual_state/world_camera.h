@@ -9,6 +9,8 @@ namespace augs {
 	class delta;
 }
 
+struct input_settings;
+
 class interpolation_system;
 
 struct world_camera_settings {
@@ -51,7 +53,8 @@ struct world_camera {
 		augs::delta dt,
 		world_camera_settings settings,
 		const_entity_handle entity_to_chase,
-		const vec2 mid_step_crosshair_displacement
+		const vec2 mid_step_crosshair_displacement,
+		const input_settings& input_cfg
 	);
 
 	auto get_effective_flash_mult() const {
@@ -85,6 +88,7 @@ private:
 		const world_camera_settings&,
 		const vec2 nonzoomedout_visible_world_area,
 		const vec2 crosshair_displacement,
-		const float current_edge_zoomout_mult
+		const float current_edge_zoomout_mult,
+		const input_settings& input_cfg
 	);
 };

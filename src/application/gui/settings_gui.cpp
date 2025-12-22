@@ -964,6 +964,9 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(forward_moves_towards_crosshair));
 				}
 
+				revertable_checkbox(SCOPE_CFG_NVP(auto_zoom_out_near_screen_edges));
+				tooltip_on_hover("If on, camera will zoom out on its own\nwhen you move the crosshair beyond the screen.\n\nIf disabled, remember to setup\n\"Toggle camera zoom\" keybinding below.");
+
 				if (auto node = scoped_tree_node("Advanced")) {
 					{
 						auto& scope_cfg = config.hotbar;

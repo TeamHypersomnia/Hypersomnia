@@ -174,3 +174,31 @@ vec2 position_rectangle_around_a_circle(
 	//ensure(false);
 	return vec2(0, 0);
 }
+
+
+vec2 clamp_with_raycast(
+	const vec2 point,
+	const vec2 rectangle_size
+) {
+	const auto raycasted_aabb = ltrb::center_and_size(vec2::zero, rectangle_size);
+
+	const auto raycast_a = vec2::zero;
+	const auto raycast_b = point;
+
+	const auto edges = raycasted_aabb.make_edges();
+
+	for (std::size_t e = 0; e < edges.size(); ++e) {
+		const auto intersection = ::segment_segment_intersection(
+			raycast_a,
+			raycast_b,
+			edges[e][0],
+			edges[e][1]
+		);
+
+		if (intersection.hit) {
+			return intersection.intersection;
+		}
+	}
+
+	return point;
+}
