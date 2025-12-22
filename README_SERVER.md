@@ -47,7 +47,7 @@ cd $SERVER_DIR
 docker run \
   --detach \
   --restart unless-stopped \
-  --volume /opt/hypersomnia:/home/hypersomniac/.config/Hypersomnia/user \
+  --volume $SERVER_DIR:/home/hypersomniac/.config/Hypersomnia/user \
   ghcr.io/teamhypersomnia/hypersomnia-server:latest
 ```
 
