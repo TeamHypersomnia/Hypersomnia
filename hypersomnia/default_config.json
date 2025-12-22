@@ -115,8 +115,6 @@
     },
 
     "general_gui_controls": {
-        "LeftMouseButton": "SPECTATE_NEXT",
-        "RightMouseButton": "SPECTATE_PREVIOUS",
         "Tab": "SCOREBOARD",
         "F8": "SERVER_ADMIN_PANEL",
         "F10": "EXECUTE_RCON_GAME_COMMANDS",

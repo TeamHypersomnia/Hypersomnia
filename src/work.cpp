@@ -4644,9 +4644,15 @@ work_result work(
 									/* Viewables reloading happens later so it might not be ready yet */
 
 									const auto& general_gui_controls = viewing_config.general_gui_controls;
+									const auto& game_control = viewing_config.game_controls;
 
 									return setup.handle_input_before_game({
-										general_gui_controls, streaming.necessary_images_in_atlas, common_input_state, e, window
+										general_gui_controls,
+										game_control,
+										streaming.necessary_images_in_atlas,
+										common_input_state,
+										e,
+										window
 									});
 								}
 							}

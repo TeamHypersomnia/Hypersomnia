@@ -119,7 +119,7 @@ bool arena_gui_mixin<D>::handle_input_before_game(
 		return false;
 	}
 
-	if (arena_gui.control({ in.app_controls, in.common_input_state, in.e })) { 
+	if (arena_gui.control({ in.app_controls, in.game_controls, in.common_input_state, in.e })) { 
 		return true;
 	}
 

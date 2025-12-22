@@ -122,6 +122,7 @@ struct handle_input_before_imgui_input {
 
 struct handle_input_before_game_input {
 	const general_gui_intent_map& app_controls;
+	const game_intent_map& game_controls;
 	const necessary_images_in_atlas_map& sizes_for_icons;
 
 	const augs::event::state& common_input_state;

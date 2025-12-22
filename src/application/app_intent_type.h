@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/enum/enum_map.h"
 #include "augs/window_framework/event.h"
+#include "game/enums/game_intent_type.h"
 
 enum class app_intent_type {
 	// GEN INTROSPECTOR enum class app_intent_type
@@ -33,9 +34,6 @@ enum class general_gui_intent_type {
 
 	SCOREBOARD,
 
-	SPECTATE_PREVIOUS,
-	SPECTATE_NEXT,
-
 	TOGGLE_MOUSE_CURSOR,
 	CLEAR_DEBUG_LINES,
 
@@ -55,6 +53,7 @@ using general_gui_intent_map = augs::enum_map<
 
 struct general_gui_intent_input {
 	const general_gui_intent_map& controls;
+	const game_intent_map& game_controls;
 	const augs::event::state& common_input_state;
 	const augs::event::change e;
 };

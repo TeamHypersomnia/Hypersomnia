@@ -29,16 +29,14 @@ bool arena_spectator_gui::control(const general_gui_intent_input in) {
 	if (ch == key_change::PRESSED) {
 		const auto key = in.e.get_key();
 
-		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == general_gui_intent_type::SPECTATE_NEXT) {
-				key_requested_offset = 1;
-				return true;
-			}
+		if (key == key::LMOUSE) {
+			key_requested_offset = 1;
+			return true;
+		}
 
-			if (*it == general_gui_intent_type::SPECTATE_PREVIOUS) {
-				key_requested_offset = -1;
-				return true;
-			}
+		if (key == key::RMOUSE) {
+			key_requested_offset = -1;
+			return true;
 		}
 	}
 
@@ -128,10 +126,11 @@ void arena_spectator_gui::draw_gui(
 
 	const auto name_text = formatted_string(nickname, style(in.gui_fonts.larger_gui, white));
 
-	const auto& key_map = in.config.general_gui_controls;
+	const auto& key_map = in.config.game_controls;
+	(void)key_map;
 
-	const auto bound_left = key_or_default(key_map, general_gui_intent_type::SPECTATE_PREVIOUS);
-	const auto bound_right = key_or_default(key_map, general_gui_intent_type::SPECTATE_NEXT);
+	const auto bound_left = augs::event::keys::key::RMOUSE;
+	const auto bound_right = augs::event::keys::key::LMOUSE;
 
 	const auto instructions_text = 
 		fmt("<<< ", white)
