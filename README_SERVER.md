@@ -45,7 +45,6 @@ chown 999:999 $SERVER_DIR
 cd $SERVER_DIR
 
 docker run \
-  --detach \
   --restart unless-stopped \
   --volume $SERVER_DIR:/home/hypersomniac/.config/Hypersomnia/user \
   ghcr.io/teamhypersomnia/hypersomnia-server:latest
@@ -59,7 +58,7 @@ Simply run:
 
 ```bash
 wget https://raw.githubusercontent.com/TeamHypersomnia/Hypersomnia/refs/heads/master/docker-compose.yaml
-docker compose up -d
+docker compose up
 ```
 
 The [latest `docker-compose.yaml`](/docker-compose.yaml) will be used, for example:
