@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[ds only]') && !contains(github.event.head_commit.message, '[lin only]') && !contains(github.event.head_commit.message, '[win only]')"
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v3
