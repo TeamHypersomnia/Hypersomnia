@@ -538,7 +538,14 @@ struct game_state_checks {
 	/* This will also fail if pointers or references are present */
 
 	static_assert(!can_type_contain_v<cosmos_solvable_significant, blabla>);
-	static_assert(!can_type_contain_v<cosmos_common_significant, blabla>);
+
+	/*
+		We allow pointers in cosmos_common_significant now,
+		because of pathfinding structs.
+
+		static_assert(!can_type_contain_v<cosmos_common_significant, blabla>);
+		static_assert(can_type_contain_constructible_from_v<cosmos_common_significant, typed_entity_flavour_id<shootable_charge>>);
+	*/
 
 	/* Invariants should not hold any ids because ids are subject to invalidation */
 
@@ -586,7 +593,6 @@ struct game_state_checks {
 	static_assert(!can_type_contain_v<all_viewables_defs, entity_id_base>);
 
 	static_assert(can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<shootable_charge>>);
-	static_assert(can_type_contain_constructible_from_v<cosmos_common_significant, typed_entity_flavour_id<shootable_charge>>);
 	static_assert(!can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<static_light>>);
 
 	static_assert(!can_type_contain_constructible_from_v<invariants::fixtures, typed_entity_flavour_id<plain_missile>>);

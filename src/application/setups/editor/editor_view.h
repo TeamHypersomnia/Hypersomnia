@@ -9,6 +9,7 @@ struct editor_view {
 	bool show_grid = true;
 	bool snapping_enabled = true;
 	bool ignore_groups = false;
+	bool show_navmesh = false;
 	camera_eye panned_camera;
 
 	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;

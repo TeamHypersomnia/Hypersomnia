@@ -115,6 +115,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	};
 
 	project_json = in_folder(arena_name + ".json");
+	project_nav = in_folder(arena_name + ".nav");
 	legacy_autosave_json = in_folder("autosave.json");
 	last_saved_json = in_folder("last_saved.json");
 	editor_view = in_folder("editor_view.json");
@@ -136,6 +137,7 @@ bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) 
 
 	return 
 		path == project_json
+		|| path == project_nav
 		|| path == legacy_autosave_json
 		|| path == last_saved_json
 		|| path == editor_view

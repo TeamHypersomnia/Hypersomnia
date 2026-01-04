@@ -16,6 +16,10 @@ summary: That which we are brainstorming at the moment.
 	- need to have some id system for nonsteam builds, we can have a private/public key pair
 		- now we can get id'd on casual servers too
 	- hosting a server could respect aura (default) or not
+	- exploits
+		- have to disable accumulating cash when spectating
+		- have to start with 0$ or amount that doesn't let purchase yet
+		- after disconnect, have to count the loss if the round was lost otherwise people will disconnect after loss is certain
 
 - abandonow nie raportuje?
 

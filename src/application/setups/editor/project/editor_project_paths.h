@@ -11,6 +11,7 @@ struct editor_project_paths {
 	augs::path_type editor_view;
 
 	augs::path_type project_json;
+	augs::path_type project_nav;
 
 	augs::path_type last_saved_json;
 	augs::path_type legacy_autosave_json;

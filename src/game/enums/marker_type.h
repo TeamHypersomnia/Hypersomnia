@@ -32,6 +32,7 @@ enum class area_marker_type {
 
 	CALLOUT,
 	PREFAB,
+	NAV_ISLAND,
 	COUNT
 	// END GEN INTROSPECTOR
 };

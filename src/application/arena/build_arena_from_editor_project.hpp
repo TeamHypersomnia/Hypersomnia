@@ -16,6 +16,12 @@
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
 
+#include "application/setups/editor/editor_arena_navmesh.h"
+#include "augs/readwrite/byte_file.h"
+#include "augs/misc/secure_hash.h"
+#include "application/setups/editor/project/editor_project_paths.h"
+#include "augs/log.h"
+
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
 	auto access = allocate_new_entity_access();
@@ -26,6 +32,13 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	auto find_resource = project.make_find_resource_lambda(official.resources);
 
 	auto& scene = arena_handle.scene;
+
+	/*
+		This is where the empty world is assigned from.
+		built_content has an intercosm with only official common resources,
+		no nodes yet.
+	*/
+
 	scene = official.built_content;
 
 	if (in.scene_entity_to_node) {
@@ -89,6 +102,49 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
+
+	{
+		const auto project_dir = in.project_resources_parent_folder;
+		editor_project_paths paths(project_dir);
+		const auto nav_path = paths.project_nav;
+
+		/* Derive a reusable secure hash from the version_timestamp */
+		const auto timestamp_str = static_cast<std::string>(project.meta.version_timestamp);
+		const auto derived_hash = augs::secure_hash(timestamp_str);
+
+		bool loaded_existing = false;
+
+		if (augs::exists(nav_path)) {
+			try {
+				editor_arena_navmesh nav;
+				augs::load_from_bytes(nav, nav_path);
+
+				if (nav.arena_hash == derived_hash) {
+					common.navmesh = std::move(nav.navmesh);
+					loaded_existing = true;
+				}
+			}
+			catch (...) {
+				/* Ignore and regenerate */
+			}
+		}
+
+		if (!loaded_existing) {
+			/* TODO: generate actual navmesh. For now leave empty. */
+			editor_arena_navmesh nav;
+			nav.arena_hash = derived_hash;
+			nav.navmesh = cosmos_navmesh();
+			common.navmesh = nav.navmesh;
+
+			try {
+				LOG("Regenerated navmesh. Saving to %x.", nav_path);
+				augs::save_as_bytes(nav, nav_path);
+			}
+			catch (...) {
+				/* Silently ignore save errors for now */
+			}
+		}
+	}
 
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
 		lbd(official.resources.get_pool_for<editor_point_marker_resource>());

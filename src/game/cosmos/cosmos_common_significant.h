@@ -17,6 +17,7 @@
 #include "game/detail/all_sentience_meters.h"
 
 #include "game/assets/all_logical_assets.h"
+#include "game/common_state/cosmos_navmesh.h"
 
 using meter_tuple = meter_list_t<std::tuple>;
 using spell_tuple = spell_list_t<std::tuple>;
@@ -59,6 +60,7 @@ struct cosmos_common_significant {
 	cosmos_light_settings light;
 
 	default_sound_properties_info default_sound_properties;
+	cosmos_navmesh navmesh;
 	// END GEN INTROSPECTOR
 
 private:
