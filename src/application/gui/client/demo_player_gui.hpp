@@ -1,6 +1,6 @@
 #pragma once
 #include "application/gui/client/demo_player_gui.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 #include "augs/templates/chrono_templates.h"
 #include "augs/window_framework/window.h"
 #include "augs/misc/imgui/imgui_enum_radio.h"

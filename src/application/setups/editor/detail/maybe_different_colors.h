@@ -1,10 +1,10 @@
 #pragma once
 #include <tuple>
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
-#include "application/setups/debugger/property_debugger/property_debugger_settings.h"
+#include "application/setups/editor/gui/property_editor/property_editor_settings.h"
 
 inline auto maybe_different_value_cols(
-	const property_debugger_settings& settings,
+	const property_editor_settings& settings,
 	const bool values_different
 ) {
 	using namespace augs::imgui;

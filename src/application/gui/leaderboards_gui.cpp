@@ -12,7 +12,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/setups/client/client_connect_string.h"
 #include "augs/log.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 #include "augs/misc/date_time.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"

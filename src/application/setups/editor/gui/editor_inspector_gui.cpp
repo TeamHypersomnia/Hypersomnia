@@ -25,7 +25,7 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
-#include "application/setups/debugger/property_debugger/widgets/non_standard_shape_widget.h"
+#include "application/setups/editor/gui/property_editor/widgets/non_standard_shape_widget.h"
 #include "augs/misc/from_concave_polygon.h"
 
 #include "application/setups/editor/defaults/editor_game_mode_defaults.h"

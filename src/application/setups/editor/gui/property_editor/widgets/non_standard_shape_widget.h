@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "view/viewables/images_in_atlas_map.h"
-#include "application/setups/debugger/property_debugger/tweaker_type.h"
+#include "application/setups/editor/gui/property_editor/tweaker_type.h"
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_drawers.h"

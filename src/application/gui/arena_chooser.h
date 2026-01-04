@@ -5,12 +5,12 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/imgui/simple_browse_path_tree.h"
 #include "augs/misc/imgui/path_tree_structs.h"
-#include "application/setups/debugger/property_debugger/browsed_path_entry_base.h"
-#include "application/setups/debugger/property_debugger/widgets/keyboard_acquiring_popup.h"
+#include "application/setups/editor/gui/property_editor/browsed_path_entry_base.h"
+#include "application/setups/editor/gui/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
 #include "augs/log.h"
 #include "augs/string/path_sanitization.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 
 class arena_chooser : keyboard_acquiring_popup {
 	using I = std::string;

@@ -10,7 +10,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/byte_file.h"

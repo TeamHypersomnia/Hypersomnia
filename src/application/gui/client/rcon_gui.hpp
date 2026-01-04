@@ -3,7 +3,7 @@
 #include "application/gui/client/rcon_gui.h"
 #include "application/gui/pretty_tabs.h"
 #include "augs/misc/imgui/imgui_utils.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 
 template <class F>
 void do_pending_rcon_payloads(

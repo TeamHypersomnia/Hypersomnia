@@ -1649,7 +1649,7 @@ void settings_gui_state::perform(
 #if 0
 				if (auto node = scoped_tree_node("Appearance")) {
 					if (auto node = scoped_tree_node("Property editor")) {
-						auto& scope_cfg = config.editor.property_debugger;
+						auto& scope_cfg = config.editor.property_editor;
 
 						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
 						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));

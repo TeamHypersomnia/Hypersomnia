@@ -1,6 +1,6 @@
 #include <cstddef>
 #include "game/cosmos/logic_step.h"
-#include "application/setups/debugger/property_debugger/widgets/asset_sane_default_provider.h"
+#include "application/setups/editor/gui/property_editor/widgets/asset_sane_default_provider.h"
 #include "game/organization/all_messages_includes.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/secure_hash.h"

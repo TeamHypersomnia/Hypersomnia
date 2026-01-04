@@ -8,7 +8,7 @@
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "augs/filesystem/path_declaration.h"
 
-#include "application/setups/debugger/property_debugger/widgets/image_color_picker_widget.h"
+#include "application/setups/editor/gui/property_editor/widgets/image_color_picker_widget.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "application/setups/editor/gui/inspected_project_tab_type.h"
 #include "view/necessary_resources.h"
@@ -52,7 +52,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	editor_tweaked_widget_tracker tweaked_widget;
 
-	debugger_image_preview neon_map_picker_preview;
+	editor_image_preview neon_map_picker_preview;
 	std::size_t num_last_resources_last_time = 0;
 
 	int max_full_screenshot_size = 10000;

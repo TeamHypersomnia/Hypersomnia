@@ -1,7 +1,7 @@
 #pragma once
 #include "view/viewables/all_viewables_declaration.h"
-#include "application/setups/debugger/detail/debugger_image_preview.h"
-#include "application/setups/debugger/property_debugger/tweaker_type.h"
+#include "application/setups/editor/gui/property_editor/detail/editor_image_preview.h"
+#include "application/setups/editor/gui/property_editor/tweaker_type.h"
 
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/image_definition.h"
@@ -14,7 +14,7 @@ struct image_color_picker_widget {
 	const assets::image_id id;
 	const images_in_atlas_map& game_atlas;
 	const image_definitions_map& defs;
-	debugger_image_preview& current_preview;
+	editor_image_preview& current_preview;
 	const augs::path_type& project_path;
 	const bool nodeize;
 

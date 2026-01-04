@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 #include "3rdparty/imgui/imgui.h"
-#include "application/setups/debugger/property_debugger/widgets/widget_common.h"
 
 struct keyboard_acquiring_popup {
 	int acquire_keyboard_times = 2;

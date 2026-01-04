@@ -2,7 +2,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/window_framework/shell.h"
 
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
 #include "augs/misc/imgui/imgui_controls.h"
 
 void sign_in_with_discord();
