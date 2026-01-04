@@ -338,8 +338,6 @@ inline void process_portals_for_navmesh(
 		return;
 	}
 
-	const auto& physics = cosm.get_solvable_inferred().physics;
-	const auto& b2w = physics.get_b2world();
 	const auto si = cosm.get_si();
 
 	/*
@@ -489,7 +487,7 @@ inline cosmos_navmesh generate_navmesh(
 	cosmos_navmesh navmesh;
 
 	std::vector<ltrbi> island_bounds;
-	collect_navmesh_island_bounds(cosm, island_bounds, cell_size);
+	::collect_navmesh_island_bounds(cosm, island_bounds, cell_size);
 
 	for (const auto& bounds : island_bounds) {
 		/* Align bounds to cell_size grid */
