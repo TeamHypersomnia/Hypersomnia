@@ -1,6 +1,6 @@
 #pragma once
 #include "view/viewables/all_viewables_declaration.h"
-#include "application/setups/editor/gui/property_editor/detail/editor_image_preview.h"
+#include "application/setups/editor/gui/property_editor/editor_image_preview.h"
 #include "application/setups/editor/gui/property_editor/tweaker_type.h"
 
 #include "view/viewables/images_in_atlas_map.h"

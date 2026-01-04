@@ -8,7 +8,7 @@
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "augs/filesystem/path_declaration.h"
 
-#include "application/setups/editor/gui/property_editor/widgets/image_color_picker_widget.h"
+#include "application/setups/editor/gui/property_editor/image_color_picker_widget.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "application/setups/editor/gui/inspected_project_tab_type.h"
 #include "view/necessary_resources.h"
