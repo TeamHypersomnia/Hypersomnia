@@ -22,6 +22,8 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "augs/log.h"
 
+#include "game/detail/navmesh_generation.hpp"
+
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
 	auto access = allocate_new_entity_access();
@@ -103,48 +105,19 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
 
-	{
-		const auto project_dir = in.project_resources_parent_folder;
-		editor_project_paths paths(project_dir);
-		const auto nav_path = paths.project_nav;
+	/*
+		Navmesh loading/regeneration logic is deferred to the end of this function,
+		after all physics entities have been created.
+		We only need to prepare the hash and paths here.
+	*/
 
-		/* Derive a reusable secure hash from the version_timestamp */
-		const auto timestamp_str = static_cast<std::string>(project.meta.version_timestamp);
-		const auto derived_hash = augs::secure_hash(timestamp_str);
+	const auto project_dir = in.project_resources_parent_folder;
+	editor_project_paths paths_for_nav(project_dir);
+	const auto nav_path = paths_for_nav.project_nav;
 
-		bool loaded_existing = false;
-
-		if (augs::exists(nav_path)) {
-			try {
-				editor_arena_navmesh nav;
-				augs::load_from_bytes(nav, nav_path);
-
-				if (nav.arena_hash == derived_hash) {
-					common.navmesh = std::move(nav.navmesh);
-					loaded_existing = true;
-				}
-			}
-			catch (...) {
-				/* Ignore and regenerate */
-			}
-		}
-
-		if (!loaded_existing) {
-			/* TODO: generate actual navmesh. For now leave empty. */
-			editor_arena_navmesh nav;
-			nav.arena_hash = derived_hash;
-			nav.navmesh = cosmos_navmesh();
-			common.navmesh = nav.navmesh;
-
-			try {
-				LOG("Regenerated navmesh. Saving to %x.", nav_path);
-				augs::save_as_bytes(nav, nav_path);
-			}
-			catch (...) {
-				/* Silently ignore save errors for now */
-			}
-		}
-	}
+	/* Derive a reusable secure hash from the version_timestamp */
+	const auto timestamp_str = static_cast<std::string>(project.meta.version_timestamp);
+	const auto derived_hash = augs::secure_hash(timestamp_str);
 
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
 		lbd(official.resources.get_pool_for<editor_point_marker_resource>());
@@ -534,5 +507,72 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	if (in.target_clean_round_state) {
 		*in.target_clean_round_state = scene.world.get_solvable().significant;
+	}
+
+	/*
+		Navmesh generation - must happen after physics world is built.
+	*/
+
+	{
+		/*
+			Determine whether to regenerate the navmesh:
+			- Always regenerate if not playtesting (for_playtesting == false)
+			- If playtesting (for_playtesting == true):
+			  - Only regenerate if spawn_bots is true in playtesting settings, OR
+			  - showing_navmesh is true (user wants to see an up-to-date navmesh)
+			- Otherwise, try loading from cache if hash matches
+		*/
+
+		const bool should_always_regenerate = !in.for_playtesting;
+		const bool spawn_bots_enabled = project.playtesting.spawn_bots;
+		const bool should_regenerate_for_playtesting = in.for_playtesting && (spawn_bots_enabled || in.showing_navmesh);
+
+		bool needs_regeneration = should_always_regenerate || should_regenerate_for_playtesting;
+		bool loaded_existing = false;
+
+		if (!needs_regeneration) {
+			/*
+				Skip generating navmesh entirely - no bots, no navmesh display, no need.
+			*/
+			loaded_existing = true;
+		}
+		else if (augs::exists(nav_path)) {
+			try {
+				editor_arena_navmesh nav;
+				augs::load_from_bytes(nav, nav_path);
+
+				if (nav.arena_hash == derived_hash) {
+					common.navmesh = std::move(nav.navmesh);
+					loaded_existing = true;
+				}
+			}
+			catch (...) {
+				/* Ignore and regenerate */
+			}
+		}
+
+		if (!loaded_existing) {
+			/*
+				Generate actual navmesh from the physics world using the helper.
+			*/
+
+			const auto cell_size = std::max(16, project.settings.navmesh_cell_size);
+			const auto new_navmesh = generate_navmesh(scene.world, cell_size);
+
+			common.navmesh = new_navmesh;
+
+			/* Save to file */
+			editor_arena_navmesh nav;
+			nav.arena_hash = derived_hash;
+			nav.navmesh = new_navmesh;
+
+			try {
+				LOG("Regenerated navmesh with %x island(s). Saving to %x.", new_navmesh.islands.size(), nav_path);
+				augs::save_as_bytes(nav, nav_path);
+			}
+			catch (...) {
+				/* Silently ignore save errors for now */
+			}
+		}
 	}
 }

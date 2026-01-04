@@ -469,7 +469,10 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		const auto total_rotation = additional_rotation + connection.shape_offset.rotation;
 
 		for (auto& v : verts) {
-			v.rotate(total_rotation);
+			if (total_rotation != 0.0f) {
+				v.rotate(total_rotation);
+			}
+
 			v += off_meters;
 		}
 

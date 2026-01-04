@@ -498,6 +498,7 @@ bool editor_setup::handle_input_before_game(
 				case key::SPACE: start_playtesting(); return true;
 				case key::G: toggle_grid(); return true;
 				case key::S: toggle_snapping(); return true;
+				case key::V: toggle_navmesh(); return true;
 				case key::OPEN_SQUARE_BRACKET: sparser_grid(); return true;
 				case key::CLOSE_SQUARE_BRACKET: denser_grid(); return true;
 
@@ -2114,6 +2115,46 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		);
 	}
 
+	if (view.show_navmesh) {
+		/*
+			Draw the navmesh: free cells in cyan, occupied cells in red, with opacity.
+		*/
+
+		const auto& navmesh = scene.world.get_common_significant().navmesh;
+		const auto free_color = project.settings.debug_navmesh_free_color;
+		const auto occupied_color = project.settings.debug_navmesh_occupied_color;
+		const auto blank_tex = triangles.default_texture;
+
+		for (const auto& island : navmesh.islands) {
+			const auto cell_size = island.cell_size;
+
+			if (cell_size <= 0) {
+				continue;
+			}
+
+			const auto size_in_cells = island.get_size_in_cells();
+
+			for (int cy = 0; cy < size_in_cells.y; ++cy) {
+				for (int cx = 0; cx < size_in_cells.x; ++cx) {
+					const auto world_x = island.bound.l + cx * cell_size;
+					const auto world_y = island.bound.t + cy * cell_size;
+
+					const auto cell_value = island.get_cell({ cx, cy });
+					const auto color = (cell_value == 0) ? free_color : occupied_color;
+
+					const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));
+					const auto screen_rb = on_screen(vec2(static_cast<float>(world_x + cell_size), static_cast<float>(world_y + cell_size)));
+
+					triangles.aabb(
+						blank_tex,
+						ltrb(screen_lt.x, screen_lt.y, screen_rb.x, screen_rb.y),
+						color
+					);
+				}
+			}
+		}
+	}
+
 	::for_each_iconed_entity(
 		scene.world, 
 		in.all_visible,
@@ -3083,6 +3124,24 @@ void editor_setup::toggle_snapping() {
 	else {
 		recent_message.set("Disabled grid snapping (%x px)", get_current_grid_size());
 	}
+}
+
+void editor_setup::toggle_navmesh() {
+	view.toggle_navmesh();
+
+	if (view.show_navmesh) {
+		recent_message.set("Showing navmesh");
+
+		/* Regenerate arena to update navmesh if needed */
+		rebuild_arena(true);
+	}
+	else {
+		recent_message.set("Hiding navmesh");
+	}
+}
+
+bool editor_setup::is_navmesh_enabled() const {
+	return view.show_navmesh;
 }
 
 void editor_setup::clamp_units() {

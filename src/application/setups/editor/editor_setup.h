@@ -568,8 +568,10 @@ public:
 
 	void toggle_grid();
 	void toggle_snapping();
+	void toggle_navmesh();
 	bool is_grid_enabled() const;
 	bool is_snapping_enabled() const;
+	bool is_navmesh_enabled() const;
 
 	void sparser_grid();
 	void denser_grid();

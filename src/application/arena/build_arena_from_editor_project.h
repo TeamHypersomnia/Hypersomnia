@@ -18,6 +18,7 @@ struct build_arena_input {
 	cosmos_solvable_significant* target_clean_round_state;
 	const bool for_playtesting;
 	const bool editor_preview;
+	const bool showing_navmesh = false;
 };
 
 template <class A>

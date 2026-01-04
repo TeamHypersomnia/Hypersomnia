@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
+#include "augs/math/vec2.h"
 
 /*
-    Placeholder navmesh for arena_mode_ai.
-    Will be expanded with actual data structures.
+	Navmesh for arena_mode_ai.
+	A simple square grid where cells are marked as free or occupied.
 */
 
 struct cosmos_navmesh_island {
@@ -12,6 +14,90 @@ struct cosmos_navmesh_island {
 	ltrbi bound;
 	int cell_size = 0;
 	// END GEN INTROSPECTOR
+
+	vec2i get_size_in_cells() const {
+		if (cell_size <= 0) {
+			return vec2i::zero;
+		}
+
+		return vec2i((bound.r - bound.l) / cell_size,
+		(bound.b - bound.t) / cell_size);
+	}
+
+	void resize_to_bounds() {
+		const auto size = get_size_in_cells();
+
+		occupied.clear();
+		occupied.resize(static_cast<std::size_t>(size.x * size.y), 0);
+	}
+
+	/*
+		Grid-cell coordinate access (cell_pos is an index into the grid).
+	*/
+
+	uint8_t get_cell(const vec2i cell_pos) const {
+		const auto size = get_size_in_cells();
+
+		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
+		cell_pos.y >= size.y) {
+			return 1;
+		}
+
+		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
+
+		if (idx >= occupied.size()) {
+			return 1;
+		}
+
+		return occupied[idx];
+	}
+
+	void set_cell(const vec2i cell_pos, const uint8_t value) {
+		const auto size = get_size_in_cells();
+
+		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
+		cell_pos.y >= size.y) {
+			return;
+		}
+
+		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
+
+		if (idx >= occupied.size()) {
+			return;
+		}
+
+		occupied[idx] = value;
+	}
+
+	/*
+		World-coordinate access (x, y are in pixels/world units).
+	*/
+
+	uint8_t get(const int x, const int y) const {
+		if (cell_size <= 0) {
+			return 1;
+		}
+
+		const auto cell_pos = vec2i(
+			(x - bound.l) / cell_size,
+			(y - bound.t) / cell_size
+		);
+
+		return get_cell(cell_pos);
+	}
+
+	void set(const int x, const int y, const uint8_t value) {
+		if (cell_size <= 0) {
+			return;
+		}
+
+		const auto cell_pos = vec2i(
+			(x - bound.l) / cell_size,
+			(y - bound.t) / cell_size
+		);
+
+		set_cell(cell_pos, value);
+	}
 };
 
 struct cosmos_navmesh {
