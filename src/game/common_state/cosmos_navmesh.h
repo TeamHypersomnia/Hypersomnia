@@ -7,9 +7,17 @@
 	A simple square grid where cells are marked as free or occupied.
 */
 
+struct navmesh_portal {
+	// GEN INTROSPECTOR struct navmesh_portal
+	vec2i out_cell_pos = vec2i::zero;
+	int out_island_index = 0;
+	// END GEN INTROSPECTOR
+};
+
 struct cosmos_navmesh_island {
 	// GEN INTROSPECTOR struct cosmos_navmesh_island
 	std::vector<uint8_t> occupied;
+	std::vector<navmesh_portal> portals;
 
 	ltrbi bound;
 	int cell_size = 0;
