@@ -329,6 +329,12 @@ struct b2Rot
 		return b2Vec2(-s, c);
 	}
 
+	/// Check if rotation is approximately zero (identity rotation)
+	bool IsNearZero() const
+	{
+		return c > 1.0f - b2_epsilon && s > -b2_epsilon && s < b2_epsilon;
+	}
+
 	/// Sine and cosine
 	// GEN INTROSPECTOR struct b2Rot
 	float32 s;

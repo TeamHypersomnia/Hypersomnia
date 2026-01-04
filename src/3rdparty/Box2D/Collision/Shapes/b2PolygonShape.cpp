@@ -63,29 +63,26 @@ void b2PolygonShape::SetAsBox(float32 hx, float32 hy, const b2Vec2& center, floa
 	const bool angle_is_zero = (angle > -b2_epsilon && angle < b2_epsilon);
 	is_aabb = angle_is_zero;
 
-	if (!is_aabb) {
+	const bool center_is_nonzero =
+		(center.x < -b2_epsilon || center.x > b2_epsilon) ||
+		(center.y < -b2_epsilon || center.y > b2_epsilon)
+	;
+
+	if (is_aabb) {
+		if (center_is_nonzero) {
+			for (int32 i = 0; i < m_count; ++i) {
+				m_vertices[i] = m_vertices[i] + center;
+			}
+		}
+	}
+	else {
 		b2Transform xf;
 		xf.p = center;
 		xf.q.Set(angle);
 
-		// Transform vertices and normals.
-		for (int32 i = 0; i < m_count; ++i)
-		{
+		for (int32 i = 0; i < m_count; ++i) {
 			m_vertices[i] = b2Mul(xf, m_vertices[i]);
 			m_normals[i] = b2Mul(xf.q, m_normals[i]);
-		}
-	}
-	else {
-		const bool center_is_nonzero = 
-			(center.x < -b2_epsilon || center.x > b2_epsilon) ||
-			(center.y < -b2_epsilon || center.y > b2_epsilon);
-
-		if (center_is_nonzero) {
-			// Just translate vertices, no rotation needed
-			for (int32 i = 0; i < m_count; ++i)
-			{
-				m_vertices[i] = m_vertices[i] + center;
-			}
 		}
 	}
 }

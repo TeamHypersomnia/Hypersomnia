@@ -83,6 +83,15 @@
 		something :
 		else
 	;
+
+	/*
+		For multi-line boolean expressions and assignments,
+		put the semicolon on its own line:
+	*/
+	const bool complex_check =
+		(some_condition && other_condition) ||
+		(another_condition && yet_another)
+	;
 	
 	if (long_clause
 		&& other_long_clause
@@ -204,6 +213,11 @@
 
 - Some of the existing code might not follow the above principles, do not edit it to make it consistent unless explicitly asked.
 
+- Use `::` prefix for all global function calls that are defined in the same file but outside of any namespace. This makes it clear the function is global and not a member of any class or namespace.
+	```cpp
+	const auto result = ::my_global_function(arg1, arg2);
+	```
+
 # Game architecture specific
 
 - To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.
@@ -217,4 +231,16 @@
 
 	```cpp
 	uint8_t get_cell(vec2i cell_pos) const;
+	```
+
+- Use vec2/vec2i arithmetic operations instead of operating on x and y separately:
+	```cpp
+	/* Good */
+	const auto offset = (pos - bound_lt) / cell_size;
+	
+	/* Bad */
+	const auto offset = vec2i(
+		(pos.x - bound_lt.x) / cell_size,
+		(pos.y - bound_lt.y) / cell_size
+	);
 	```
