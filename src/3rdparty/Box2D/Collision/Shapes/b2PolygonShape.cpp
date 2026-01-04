@@ -58,9 +58,10 @@ void b2PolygonShape::SetAsBox(float32 hx, float32 hy, const b2Vec2& center, floa
 	m_centroid = center;
 
 	/*
-		is_aabb is true only when angle is 0.
+		is_aabb is true only when angle is approximately 0.
 	*/
-	is_aabb = (angle == 0.0f);
+	const bool angle_is_zero = (angle > -b2_epsilon && angle < b2_epsilon);
+	is_aabb = angle_is_zero;
 
 	if (!is_aabb) {
 		b2Transform xf;
@@ -74,11 +75,17 @@ void b2PolygonShape::SetAsBox(float32 hx, float32 hy, const b2Vec2& center, floa
 			m_normals[i] = b2Mul(xf.q, m_normals[i]);
 		}
 	}
-	else if (center.x != 0.0f || center.y != 0.0f) {
-		// Just translate vertices, no rotation needed
-		for (int32 i = 0; i < m_count; ++i)
-		{
-			m_vertices[i] = m_vertices[i] + center;
+	else {
+		const bool center_is_nonzero = 
+			(center.x < -b2_epsilon || center.x > b2_epsilon) ||
+			(center.y < -b2_epsilon || center.y > b2_epsilon);
+
+		if (center_is_nonzero) {
+			// Just translate vertices, no rotation needed
+			for (int32 i = 0; i < m_count; ++i)
+			{
+				m_vertices[i] = m_vertices[i] + center;
+			}
 		}
 	}
 }
