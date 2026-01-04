@@ -2299,6 +2299,12 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		text_tooltip("Color used to display occupied (blocked) navmesh cells in the editor.");
 	}
 
+	PROPERTY("Debug navmesh portal color", debug_navmesh_portal_color);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Color used to display portal cells in the navmesh.");
+	}
+
 	return result;
 }
 

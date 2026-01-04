@@ -2117,12 +2117,13 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 
 	if (view.show_navmesh) {
 		/*
-			Draw the navmesh: free cells in cyan, occupied cells in red, with opacity.
+			Draw the navmesh: free cells in cyan, occupied cells in red, portals in green.
 		*/
 
 		const auto& navmesh = scene.world.get_common_significant().navmesh;
 		const auto free_color = project.settings.debug_navmesh_free_color;
 		const auto occupied_color = project.settings.debug_navmesh_occupied_color;
+		const auto portal_color = project.settings.debug_navmesh_portal_color;
 		const auto blank_tex = triangles.default_texture;
 
 		for (const auto& island : navmesh.islands) {
@@ -2140,7 +2141,24 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					const auto world_y = island.bound.t + cy * cell_size;
 
 					const auto cell_value = island.get_cell({ cx, cy });
-					const auto color = (cell_value == 0) ? free_color : occupied_color;
+
+					/*
+						Cell value meanings:
+						0 = free
+						1 = occupied
+						2+ = portal (2 + portal_index)
+					*/
+					const auto color = [&]() {
+						if (cell_value == 0) {
+							return free_color;
+						}
+						else if (cell_value == 1) {
+							return occupied_color;
+						}
+						else {
+							return portal_color;
+						}
+					}();
 
 					const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));
 					const auto screen_rb = on_screen(vec2(static_cast<float>(world_x + cell_size), static_cast<float>(world_y + cell_size)));

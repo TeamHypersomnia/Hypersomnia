@@ -3,6 +3,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
 #include "game/components/marker_component.h"
+#include "game/components/portal_component.h"
 #include "game/enums/filters.h"
 #include "game/cosmos/cosmos_solvable_inferred.h"
 
@@ -11,6 +12,20 @@
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "3rdparty/Box2D/Collision/b2Collision.h"
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
+
+/*
+	Computes exact AABB from the shape, avoiding the potentially fattened proxy AABB.
+*/
+
+inline b2AABB compute_exact_fixture_aabb(
+	const b2Fixture* fixture,
+	const b2Transform& body_xf,
+	const int child_idx
+) {
+	b2AABB aabb;
+	fixture->GetShape()->ComputeAABB(&aabb, body_xf, child_idx);
+	return aabb;
+}
 
 /*
 	Collects navmesh island bounds from the cosmos.
@@ -63,6 +78,8 @@ inline void collect_navmesh_island_bounds(
 	bool first = true;
 
 	for (const b2Body* body = b2w.GetBodyList(); body != nullptr; body = body->GetNext()) {
+		const auto& body_xf = body->GetTransform();
+
 		for (const b2Fixture* fixture = body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
 			const auto& filter = fixture->GetFilterData();
 
@@ -79,7 +96,11 @@ inline void collect_navmesh_island_bounds(
 			const auto child_count = shape->GetChildCount();
 
 			for (int child_idx = 0; child_idx < child_count; ++child_idx) {
-				const auto& fixture_aabb = fixture->GetAABB(child_idx);
+				/*
+					Compute exact AABB from the shape instead of using the proxy AABB
+					which might be fattened.
+				*/
+				const auto fixture_aabb = compute_exact_fixture_aabb(fixture, body_xf, child_idx);
 
 				/* Convert from meters to pixels */
 				const auto l = static_cast<int>(si.get_pixels(fixture_aabb.lowerBound.x));
@@ -114,6 +135,112 @@ inline void collect_navmesh_island_bounds(
 }
 
 /*
+	Fills the navmesh grid for a given fixture AABB with the specified value.
+	Can use an optimized path for axis-aligned boxes when applicable.
+*/
+
+inline void fill_navmesh_grid_from_fixture(
+	cosmos_navmesh_island& island,
+	const b2Fixture* fixture,
+	const b2Body* body,
+	const si_scaling& si,
+	b2PolygonShape& cell_shape,
+	const uint8_t fill_value
+) {
+	const auto cell_size = island.cell_size;
+	const auto& aligned = island.bound;
+	const auto& body_xf = body->GetTransform();
+	const auto* shape = fixture->GetShape();
+	const auto child_count = shape->GetChildCount();
+
+	for (int child_idx = 0; child_idx < child_count; ++child_idx) {
+		/*
+			Compute exact AABB from the shape instead of using the proxy AABB.
+		*/
+		const auto fixture_aabb = compute_exact_fixture_aabb(fixture, body_xf, child_idx);
+
+		/* Convert from meters to pixels */
+		const auto lower_px = vec2(
+			si.get_pixels(fixture_aabb.lowerBound.x),
+			si.get_pixels(fixture_aabb.lowerBound.y)
+		);
+		const auto upper_px = vec2(
+			si.get_pixels(fixture_aabb.upperBound.x),
+			si.get_pixels(fixture_aabb.upperBound.y)
+		);
+
+		/* Align to grid (expand outward) */
+		const auto grid_l = static_cast<int>(std::floor(lower_px.x / cell_size)) * cell_size;
+		const auto grid_t = static_cast<int>(std::floor(lower_px.y / cell_size)) * cell_size;
+		const auto grid_r = static_cast<int>(std::ceil(upper_px.x / cell_size)) * cell_size;
+		const auto grid_b = static_cast<int>(std::ceil(upper_px.y / cell_size)) * cell_size;
+
+		/*
+			Check if we can use the optimized AABB path:
+			- The shape must be a polygon with is_aabb flag set
+			- The body's rotation must be 0
+		*/
+		const bool body_has_no_rotation = (body_xf.q.c == 1.0f && body_xf.q.s == 0.0f);
+
+		bool use_aabb_optimization = false;
+
+		if (body_has_no_rotation && shape->GetType() == b2Shape::e_polygon) {
+			const auto* poly = static_cast<const b2PolygonShape*>(shape);
+			use_aabb_optimization = poly->is_aabb;
+		}
+
+		if (use_aabb_optimization) {
+			/*
+				Optimized path: simply fill the grid cells covered by the AABB
+				without per-cell collision testing.
+				Iterate in y, x order for cache-friendliness.
+			*/
+			for (int cy = grid_t; cy < grid_b; cy += cell_size) {
+				for (int cx = grid_l; cx < grid_r; cx += cell_size) {
+					if (cx < aligned.l || cx >= aligned.r || cy < aligned.t || cy >= aligned.b) {
+						continue;
+					}
+
+					island.set(cx, cy, fill_value);
+				}
+			}
+		}
+		else {
+			/*
+				Standard path: test each cell for overlap with the fixture.
+			*/
+			for (int cy = grid_t; cy < grid_b; cy += cell_size) {
+				for (int cx = grid_l; cx < grid_r; cx += cell_size) {
+					if (cx < aligned.l || cx >= aligned.r || cy < aligned.t || cy >= aligned.b) {
+						continue;
+					}
+
+					const auto cell_center_x = cx + cell_size / 2.0f;
+					const auto cell_center_y = cy + cell_size / 2.0f;
+
+					b2Transform cell_xf;
+					cell_xf.Set(
+						b2Vec2(si.get_meters(cell_center_x), si.get_meters(cell_center_y)),
+						0.0f
+					);
+
+					const auto overlaps = b2TestOverlap(
+						shape, child_idx,
+						&cell_shape, 0,
+						body_xf,
+						cell_xf
+					);
+
+					if (overlaps) {
+						island.set(cx, cy, fill_value);
+					}
+				}
+			}
+		}
+	}
+}
+
+/*
 	Rebuilds the occupied grid for this island by testing each cell 
 	against fixtures in the physics world that match the pathfinding filter.
 */
@@ -134,7 +261,6 @@ inline void rebuild_navmesh_island_occupied(
 	const auto si = cosm.get_si();
 
 	const auto cell_size = island.cell_size;
-	const auto& aligned = island.bound;
 
 	/*
 		Pre-create the cell shape for collision testing.
@@ -162,65 +288,178 @@ inline void rebuild_navmesh_island_occupied(
 				continue;
 			}
 
-			const auto* shape = fixture->GetShape();
-			const auto child_count = shape->GetChildCount();
-			const auto& body_xf = body->GetTransform();
+			fill_navmesh_grid_from_fixture(island, fixture, body, si, cell_shape, 1);
+		}
+	}
+}
 
-			for (int child_idx = 0; child_idx < child_count; ++child_idx) {
-				const auto& fixture_aabb = fixture->GetAABB(child_idx);
+/*
+	Finds which island index contains the given world position.
+	Returns -1 if the position is not within any island bounds.
+*/
 
-				/* Convert from meters to pixels */
-				const auto lower_px = vec2(
-					si.get_pixels(fixture_aabb.lowerBound.x),
-					si.get_pixels(fixture_aabb.lowerBound.y)
-				);
-				const auto upper_px = vec2(
-					si.get_pixels(fixture_aabb.upperBound.x),
-					si.get_pixels(fixture_aabb.upperBound.y)
-				);
+inline int find_island_index_for_position(
+	const cosmos_navmesh& navmesh,
+	const vec2 world_pos
+) {
+	const auto pos_i = vec2i(static_cast<int>(world_pos.x), static_cast<int>(world_pos.y));
 
-				/* Align to grid (expand outward) */
-				const auto grid_l = static_cast<int>(std::floor(lower_px.x / cell_size)) * cell_size;
-				const auto grid_t = static_cast<int>(std::floor(lower_px.y / cell_size)) * cell_size;
-				const auto grid_r = static_cast<int>(std::ceil(upper_px.x / cell_size)) * cell_size;
-				const auto grid_b = static_cast<int>(std::ceil(upper_px.y / cell_size)) * cell_size;
+	for (std::size_t i = 0; i < navmesh.islands.size(); ++i) {
+		const auto& island = navmesh.islands[i];
+		const auto& bound = island.bound;
 
-				/* Iterate each cell in the grid-aligned AABB */
-				for (int cy = grid_t; cy < grid_b; cy += cell_size) {
-					for (int cx = grid_l; cx < grid_r; cx += cell_size) {
-						/* Check if this cell is within the island bounds */
-						if (cx < aligned.l || cx >= aligned.r || cy < aligned.t || cy >= aligned.b) {
-							continue;
+		if (pos_i.x >= bound.l && pos_i.x < bound.r &&
+			pos_i.y >= bound.t && pos_i.y < bound.b) {
+			return static_cast<int>(i);
+		}
+	}
+
+	return -1;
+}
+
+/*
+	Processes portals and adds them to the navmesh.
+	- Portals with hazard field enabled are marked as occupied (value 1)
+	- Portals with valid exits are marked with special values (2 + portal_index)
+*/
+
+inline void process_portals_for_navmesh(
+	cosmos_navmesh& navmesh,
+	const cosmos& cosm
+) {
+	if (navmesh.islands.empty()) {
+		return;
+	}
+
+	const auto& physics = cosm.get_solvable_inferred().physics;
+	const auto& b2w = physics.get_b2world();
+	const auto si = cosm.get_si();
+
+	/*
+		Pre-create cell shapes for each island for collision testing.
+	*/
+	std::vector<b2PolygonShape> cell_shapes;
+	cell_shapes.reserve(navmesh.islands.size());
+
+	for (auto& island : navmesh.islands) {
+		b2PolygonShape cell_shape;
+		const auto half_cell_meters = si.get_meters(static_cast<float>(island.cell_size) / 2.0f);
+		cell_shape.SetAsBox(half_cell_meters, half_cell_meters);
+		cell_shapes.push_back(cell_shape);
+	}
+
+	cosm.for_each_having<components::portal>(
+		[&](const auto& typed_portal_handle) {
+			const auto& portal = typed_portal_handle.template get<components::portal>();
+
+			/*
+				Skip disabled portals.
+			*/
+			if (portal.custom_filter.maskBits == 0) {
+				return;
+			}
+
+			const bool has_hazard = portal.hazard.is_enabled;
+			const bool has_valid_exit = portal.portal_exit.is_set() && cosm[portal.portal_exit].alive();
+
+			/*
+				If hazard field is enabled, mark as occupied regardless of exit.
+			*/
+			if (has_hazard) {
+				if (const auto rigid_body = typed_portal_handle.template find<components::rigid_body>()) {
+					if (const auto b2body = rigid_body.find_body()) {
+						for (const b2Fixture* fixture = b2body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
+							for (std::size_t island_idx = 0; island_idx < navmesh.islands.size(); ++island_idx) {
+								fill_navmesh_grid_from_fixture(
+									navmesh.islands[island_idx],
+									fixture,
+									b2body,
+									si,
+									cell_shapes[island_idx],
+									1
+								);
+							}
 						}
+					}
+				}
+				return;
+			}
 
-						/*
-							Test overlap with the fixture using the pre-created cell shape.
-						*/
+			/*
+				Process portals with valid exits.
+			*/
+			if (!has_valid_exit) {
+				return;
+			}
 
-						const auto cell_center_x = cx + cell_size / 2.0f;
-						const auto cell_center_y = cy + cell_size / 2.0f;
+			/*
+				Find which island this portal belongs to based on its position.
+			*/
+			const auto portal_pos = typed_portal_handle.get_logic_transform().pos;
+			const auto source_island_idx = find_island_index_for_position(navmesh, portal_pos);
 
-						b2Transform cell_xf;
-						cell_xf.Set(
-							b2Vec2(si.get_meters(cell_center_x), si.get_meters(cell_center_y)),
-							0.0f
+			if (source_island_idx < 0) {
+				return;
+			}
+
+			auto& source_island = navmesh.islands[source_island_idx];
+			const auto portal_index = source_island.portals.size();
+
+			/*
+				Limit to 255 - 2 = 253 portals per island (values 2-255).
+			*/
+			if (portal_index >= 253) {
+				return;
+			}
+
+			const auto fill_value = static_cast<uint8_t>(2 + portal_index);
+
+			/*
+				Find exit portal position and island.
+			*/
+			const auto exit_handle = cosm[portal.portal_exit];
+			const auto exit_pos = exit_handle.get_logic_transform().pos;
+			const auto exit_island_idx = find_island_index_for_position(navmesh, exit_pos);
+
+			/*
+				Compute exit cell position in the target island.
+			*/
+			vec2i out_cell_pos = vec2i::zero;
+			if (exit_island_idx >= 0) {
+				const auto& exit_island = navmesh.islands[exit_island_idx];
+				out_cell_pos = vec2i(
+					(static_cast<int>(exit_pos.x) - exit_island.bound.l) / exit_island.cell_size,
+					(static_cast<int>(exit_pos.y) - exit_island.bound.t) / exit_island.cell_size
+				);
+			}
+
+			/*
+				Create portal entry.
+			*/
+			navmesh_portal portal_entry;
+			portal_entry.out_cell_pos = out_cell_pos;
+			portal_entry.out_island_index = exit_island_idx;
+			source_island.portals.push_back(portal_entry);
+
+			/*
+				Fill the grid cells covered by this portal's fixtures.
+			*/
+			if (const auto rigid_body = typed_portal_handle.template find<components::rigid_body>()) {
+				if (const auto b2body = rigid_body.find_body()) {
+					for (const b2Fixture* fixture = b2body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
+						fill_navmesh_grid_from_fixture(
+							source_island,
+							fixture,
+							b2body,
+							si,
+							cell_shapes[source_island_idx],
+							fill_value
 						);
-
-						const auto overlaps = b2TestOverlap(
-							shape, child_idx,
-							&cell_shape, 0,
-							body_xf,
-							cell_xf
-						);
-
-						if (overlaps) {
-							island.set(cx, cy, 1);
-						}
 					}
 				}
 			}
 		}
-	}
+	);
 }
 
 /*
@@ -228,6 +467,7 @@ inline void rebuild_navmesh_island_occupied(
 	1. Collects island bounds from NAV_ISLAND markers or fixture AABBs
 	2. Creates islands with aligned bounds
 	3. Rebuilds occupied cells for each island
+	4. Processes portals and adds them to the navmesh
 */
 
 inline cosmos_navmesh generate_navmesh(
@@ -255,6 +495,11 @@ inline cosmos_navmesh generate_navmesh(
 
 		navmesh.islands.push_back(std::move(island));
 	}
+
+	/*
+		Process portals as the last step of navmesh generation.
+	*/
+	process_portals_for_navmesh(navmesh, cosm);
 
 	return navmesh;
 }

@@ -41,6 +41,7 @@ void b2PolygonShape::SetAsBox(float32 hx, float32 hy)
 	m_normals[2].Set(0.0f, 1.0f);
 	m_normals[3].Set(-1.0f, 0.0f);
 	m_centroid.SetZero();
+	is_aabb = true;
 }
 
 void b2PolygonShape::SetAsBox(float32 hx, float32 hy, const b2Vec2& center, float32 angle)
@@ -56,15 +57,29 @@ void b2PolygonShape::SetAsBox(float32 hx, float32 hy, const b2Vec2& center, floa
 	m_normals[3].Set(-1.0f, 0.0f);
 	m_centroid = center;
 
-	b2Transform xf;
-	xf.p = center;
-	xf.q.Set(angle);
+	/*
+		is_aabb is true only when angle is 0.
+	*/
+	is_aabb = (angle == 0.0f);
 
-	// Transform vertices and normals.
-	for (int32 i = 0; i < m_count; ++i)
-	{
-		m_vertices[i] = b2Mul(xf, m_vertices[i]);
-		m_normals[i] = b2Mul(xf.q, m_normals[i]);
+	if (!is_aabb) {
+		b2Transform xf;
+		xf.p = center;
+		xf.q.Set(angle);
+
+		// Transform vertices and normals.
+		for (int32 i = 0; i < m_count; ++i)
+		{
+			m_vertices[i] = b2Mul(xf, m_vertices[i]);
+			m_normals[i] = b2Mul(xf.q, m_normals[i]);
+		}
+	}
+	else if (center.x != 0.0f || center.y != 0.0f) {
+		// Just translate vertices, no rotation needed
+		for (int32 i = 0; i < m_count; ++i)
+		{
+			m_vertices[i] = m_vertices[i] + center;
+		}
 	}
 }
 
@@ -133,6 +148,7 @@ bool b2PolygonShape::Set(const vec2* vertices, const int32 n)
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 #endif
 	m_count = n;
+	is_aabb = false;
 
 	for (int32 i = 0; i < n; ++i) {
 		m_vertices[i] = vertices[i].operator b2Vec2();
@@ -174,6 +190,7 @@ bool b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 #endif
 	m_count = n;
+	is_aabb = false;
 
 	for (int32 i = 0; i < n; ++i) {
 		m_vertices[i] = vertices[i];
