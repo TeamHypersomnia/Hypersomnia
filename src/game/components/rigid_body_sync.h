@@ -16,12 +16,19 @@ struct b2ContactEdge;
 template <class E, class B>
 void infer_damping(const E& handle, B& b);
 
+struct cosmos_navmesh;
+
 template <class E>
 class component_synchronizer<E, components::rigid_body> 
 	: public synchronizer_base<E, components::rigid_body> 
 {
 	friend ::physics_world_cache;
 	friend ::physics_system;
+
+	friend void process_portals_for_navmesh(
+		cosmos_navmesh& navmesh,
+		const cosmos& cosm
+	);
 
 	auto find_cache() const {
 		return find_rigid_body_cache(handle);
