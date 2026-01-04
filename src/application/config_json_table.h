@@ -38,7 +38,9 @@
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
+#if BUILD_DEBUGGER_SETUP
 #include "application/setups/debugger/debugger_settings.h"
+#endif
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/server/server_listen_input.h"
 #include "application/setups/server/server_vars.h"
