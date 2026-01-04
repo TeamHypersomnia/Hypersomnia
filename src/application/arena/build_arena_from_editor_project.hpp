@@ -675,6 +675,15 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				const auto height_in_cells = island.get_height_in_cells();
 
 				/*
+					Pre-create the cell shape for collision testing.
+					We reuse this for all cells, just updating the transform.
+				*/
+
+				b2PolygonShape cell_shape;
+				const auto half_cell_meters = si.get_meters(static_cast<float>(cell_size) / 2.0f);
+				cell_shape.SetAsBox(half_cell_meters, half_cell_meters);
+
+				/*
 					Iterate all fixtures in the b2World and mark occupied cells.
 				*/
 
@@ -697,6 +706,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 						const auto* shape = fixture->GetShape();
 						const auto child_count = shape->GetChildCount();
+						const auto& body_xf = body->GetTransform();
 
 						for (int child_idx = 0; child_idx < child_count; ++child_idx) {
 							const auto& fixture_aabb = fixture->GetAABB(child_idx);
@@ -726,15 +736,11 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 									}
 
 									/*
-										Create a box shape for the cell and test overlap with the fixture.
+										Test overlap with the fixture using the pre-created cell shape.
 									*/
 
 									const auto cell_center_x = cx + cell_size / 2.0f;
 									const auto cell_center_y = cy + cell_size / 2.0f;
-
-									b2PolygonShape cell_shape;
-									const auto half_cell_meters = si.get_meters(static_cast<float>(cell_size) / 2.0f);
-									cell_shape.SetAsBox(half_cell_meters, half_cell_meters);
 
 									b2Transform cell_xf;
 									cell_xf.Set(
@@ -745,7 +751,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 									const auto overlaps = b2TestOverlap(
 										shape, child_idx,
 										&cell_shape, 0,
-										body->GetTransform(),
+										body_xf,
 										cell_xf
 									);
 
