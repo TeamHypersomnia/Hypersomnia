@@ -1,7 +1,20 @@
 # General programming rules
 
+- **Do not change formatting style like tabs or other spacing conventions in the files you are editing.**
+
+- Include order
+	- Standard libraries first
+	- Then in the order of basic to specific: augs -> game -> view -> application, e.g.:
+		```cpp
+		#include <vector>
+		#include "augs/math/vec2.h"
+		#include "game/cosmos/logic_step.h"
+		#include "view/viewables/viewables_loading_type.h"
+		#include "application/config_json_table.h"
+		```
+
 - Basic cpp footguns
-	- Avoid `using namespace std;`
+	- Do not use `using namespace std;`
 	- Use `static_cast<>` and the like instead of `(type)obj;`
 
 - Prefer initialization with ``auto`` or ``const auto``.
@@ -194,3 +207,14 @@
 # Game architecture specific
 
 - To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.
+
+- Prefer using vec2 (float) and vec2i (int) for coordinates so e.g.
+	```cpp
+	uint8_t get_cell(int cell_x, int cell_y) const;
+	```
+
+	would better be written as
+
+	```cpp
+	uint8_t get_cell(vec2i cell_pos) const;
+	```

@@ -2132,15 +2132,14 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				continue;
 			}
 
-			const auto width_in_cells = island.get_width_in_cells();
-			const auto height_in_cells = island.get_height_in_cells();
+			const auto size_in_cells = island.get_size_in_cells();
 
-			for (int cy = 0; cy < height_in_cells; ++cy) {
-				for (int cx = 0; cx < width_in_cells; ++cx) {
+			for (int cy = 0; cy < size_in_cells.y; ++cy) {
+				for (int cx = 0; cx < size_in_cells.x; ++cx) {
 					const auto world_x = island.bound.l + cx * cell_size;
 					const auto world_y = island.bound.t + cy * cell_size;
 
-					const auto cell_value = island.get_cell(cx, cy);
+					const auto cell_value = island.get_cell({ cx, cy });
 					const auto color = (cell_value == 0) ? free_color : occupied_color;
 
 					const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));

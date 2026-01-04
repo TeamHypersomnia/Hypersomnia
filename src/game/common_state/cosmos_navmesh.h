@@ -15,43 +15,35 @@ struct cosmos_navmesh_island {
 	int cell_size = 0;
 	// END GEN INTROSPECTOR
 
-	int get_width_in_cells() const {
+	vec2i get_size_in_cells() const {
 		if (cell_size <= 0) {
-			return 0;
+			return vec2i::zero;
 		}
 
-		return (bound.r - bound.l) / cell_size;
-	}
-
-	int get_height_in_cells() const {
-		if (cell_size <= 0) {
-			return 0;
-		}
-
-		return (bound.b - bound.t) / cell_size;
+		return vec2i((bound.r - bound.l) / cell_size,
+		(bound.b - bound.t) / cell_size);
 	}
 
 	void resize_to_bounds() {
-		const auto w = get_width_in_cells();
-		const auto h = get_height_in_cells();
+		const auto size = get_size_in_cells();
 
 		occupied.clear();
-		occupied.resize(static_cast<std::size_t>(w * h), 0);
+		occupied.resize(static_cast<std::size_t>(size.x * size.y), 0);
 	}
 
 	/*
-		Grid-cell coordinate access (cell_x, cell_y are indices into the grid).
+		Grid-cell coordinate access (cell_pos is an index into the grid).
 	*/
 
-	uint8_t get_cell(const int cell_x, const int cell_y) const {
-		const auto w = get_width_in_cells();
-		const auto h = get_height_in_cells();
+	uint8_t get_cell(const vec2i cell_pos) const {
+		const auto size = get_size_in_cells();
 
-		if (cell_x < 0 || cell_y < 0 || cell_x >= w || cell_y >= h) {
+		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
+		cell_pos.y >= size.y) {
 			return 1;
 		}
 
-		const auto idx = static_cast<std::size_t>(cell_y * w + cell_x);
+		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
 
 		if (idx >= occupied.size()) {
 			return 1;
@@ -60,15 +52,15 @@ struct cosmos_navmesh_island {
 		return occupied[idx];
 	}
 
-	void set_cell(const int cell_x, const int cell_y, const uint8_t value) {
-		const auto w = get_width_in_cells();
-		const auto h = get_height_in_cells();
+	void set_cell(const vec2i cell_pos, const uint8_t value) {
+		const auto size = get_size_in_cells();
 
-		if (cell_x < 0 || cell_y < 0 || cell_x >= w || cell_y >= h) {
+		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
+		cell_pos.y >= size.y) {
 			return;
 		}
 
-		const auto idx = static_cast<std::size_t>(cell_y * w + cell_x);
+		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
 
 		if (idx >= occupied.size()) {
 			return;
@@ -86,10 +78,12 @@ struct cosmos_navmesh_island {
 			return 1;
 		}
 
-		const auto cell_x = (x - bound.l) / cell_size;
-		const auto cell_y = (y - bound.t) / cell_size;
+		const auto cell_pos = vec2i(
+			(x - bound.l) / cell_size,
+			(y - bound.t) / cell_size
+		);
 
-		return get_cell(cell_x, cell_y);
+		return get_cell(cell_pos);
 	}
 
 	void set(const int x, const int y, const uint8_t value) {
@@ -97,10 +91,12 @@ struct cosmos_navmesh_island {
 			return;
 		}
 
-		const auto cell_x = (x - bound.l) / cell_size;
-		const auto cell_y = (y - bound.t) / cell_size;
+		const auto cell_pos = vec2i(
+			(x - bound.l) / cell_size,
+			(y - bound.t) / cell_size
+		);
 
-		set_cell(cell_x, cell_y, value);
+		set_cell(cell_pos, value);
 	}
 };
 
