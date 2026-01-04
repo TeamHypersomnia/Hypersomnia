@@ -12,6 +12,7 @@
 void editor_setup::rebuild_arena(const bool editor_preview) {
 	const bool for_playtesting = true;
 	const auto override_game_mode = game_mode_name_type("");
+	const bool showing_navmesh = view.show_navmesh;
 
 	::build_arena_from_editor_project<editor_arena_handle<false>>(
 		get_arena_handle(),
@@ -23,7 +24,8 @@ void editor_setup::rebuild_arena(const bool editor_preview) {
 			std::addressof(scene_entity_to_node),
 			std::addressof(clean_round_state),
 			for_playtesting,
-			editor_preview
+			editor_preview,
+			showing_navmesh
 		}
 	);
 

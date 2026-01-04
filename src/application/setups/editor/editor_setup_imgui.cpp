@@ -259,6 +259,12 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				toggle_snapping();
 			}
 
+			const bool navmesh_enabled = is_navmesh_enabled();
+
+			if (ImGui::MenuItem("Navmesh", "V", navmesh_enabled, true)) {
+				toggle_navmesh();
+			}
+
 			ImGui::Separator();
 
 			const bool is_centered = is_view_centered_at_selection();
