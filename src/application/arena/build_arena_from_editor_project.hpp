@@ -515,43 +515,52 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	{
 		/*
-			Determine whether to regenerate the navmesh:
-			- Always regenerate if not playtesting (for_playtesting == false)
-			- If playtesting (for_playtesting == true):
-			  - Only regenerate if spawn_bots is true in playtesting settings, OR
-			  - showing_navmesh is true (user wants to see an up-to-date navmesh)
-			- Otherwise, try loading from cache if hash matches
+			Determine whether we need a navmesh:
+
+			- Always need if in real gameplay (for_playtesting == false)
+			- Always need if showing_navmesh is true (user wants to see an up-to-date navmesh)
+			- If playtesting in editor (for_playtesting == true):
+			  - Only need if spawn_bots is true in playtesting settings
+			- Otherwise, no need to load or generate the navmesh.
+
+			Additionally, *always* regenerate if we need the navmesh in editor,
+			instead of loading from a file, because the timestamp might not change too often.
 		*/
 
-		const bool should_always_regenerate = !in.for_playtesting;
+		const bool not_playtesting = !in.for_playtesting;
 		const bool spawn_bots_enabled = project.playtesting.spawn_bots;
-		const bool should_regenerate_for_playtesting = in.for_playtesting && (spawn_bots_enabled || in.showing_navmesh);
 
-		bool needs_regeneration = should_always_regenerate || should_regenerate_for_playtesting;
+		const bool playtesting_with_bots = in.for_playtesting && spawn_bots_enabled;
+		const bool want_to_see_up_to_date = in.for_playtesting && in.showing_navmesh;
+
+		const bool needs_a_navmesh = 
+			not_playtesting || 
+			playtesting_with_bots || 
+			want_to_see_up_to_date
+		;
+
+		const bool allow_loading_cached = not_playtesting;
+
 		bool loaded_existing = false;
 
-		if (!needs_regeneration) {
-			/*
-				Skip generating navmesh entirely - no bots, no navmesh display, no need.
-			*/
-			loaded_existing = true;
-		}
-		else if (augs::exists(nav_path)) {
-			try {
-				editor_arena_navmesh nav;
-				augs::load_from_bytes(nav, nav_path);
+		if (needs_a_navmesh) {
+			if (allow_loading_cached && augs::exists(nav_path)) {
+				try {
+					editor_arena_navmesh nav;
+					augs::load_from_bytes(nav, nav_path);
 
-				if (nav.arena_hash == derived_hash) {
-					common.navmesh = std::move(nav.navmesh);
-					loaded_existing = true;
+					if (nav.arena_hash == derived_hash) {
+						common.navmesh = std::move(nav.navmesh);
+						loaded_existing = true;
+					}
+				}
+				catch (...) {
+					/* Ignore and regenerate */
 				}
 			}
-			catch (...) {
-				/* Ignore and regenerate */
-			}
 		}
 
-		if (!loaded_existing) {
+		if (needs_a_navmesh && !loaded_existing) {
 			/*
 				Generate actual navmesh from the physics world using the helper.
 			*/
