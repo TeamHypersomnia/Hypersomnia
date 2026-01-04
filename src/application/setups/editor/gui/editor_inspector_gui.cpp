@@ -21,7 +21,7 @@
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
 
-#include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/misc/imgui/maybe_different.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"

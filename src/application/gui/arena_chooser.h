@@ -10,7 +10,7 @@
 #include "view/asset_funcs.h"
 #include "augs/log.h"
 #include "augs/string/path_sanitization.h"
-#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
+#include "augs/misc/imgui/maybe_different.h"
 
 class arena_chooser : keyboard_acquiring_popup {
 	using I = std::string;

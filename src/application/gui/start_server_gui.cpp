@@ -3,7 +3,7 @@
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
-#include "application/setups/editor/gui/property_editor/detail/maybe_different_colors.h"
+#include "augs/misc/imgui/maybe_different.h"
 #include "augs/misc/imgui/imgui_enum_radio.h"
 #include "application/gui/do_server_vars.h"
 #include "application/setups/server/server_vars.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/misc/imgui/maybe_different.h"
 
 namespace editor_widgets {
 	template <class F>
