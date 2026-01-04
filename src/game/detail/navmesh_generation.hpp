@@ -178,9 +178,11 @@ inline void fill_navmesh_grid_from_fixture(
 		/*
 			Check if we can use the optimized AABB path:
 			- The shape must be a polygon with is_aabb flag set
-			- The body's rotation must be 0
+			- The body's rotation must be approximately 0
 		*/
-		const bool body_has_no_rotation = (body_xf.q.c == 1.0f && body_xf.q.s == 0.0f);
+		const bool body_has_no_rotation = 
+			(body_xf.q.c > 1.0f - b2_epsilon) && 
+			(body_xf.q.s > -b2_epsilon && body_xf.q.s < b2_epsilon);
 
 		bool use_aabb_optimization = false;
 
