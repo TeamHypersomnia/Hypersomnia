@@ -2266,6 +2266,39 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	PROPERTY("Ambient light color", ambient_light_color);
 	THEME_PROPERTY("Warmup theme", warmup_theme);
 
+	ImGui::Separator();
+	text_color("Navmesh", yellow);
+	ImGui::Separator();
+
+	{
+		auto& val = insp.navmesh_cell_size;
+		const auto old_val = val;
+
+		if (ImGui::SliderInt("Navmesh cell size", &val, 16, 256)) {
+			val = std::max(16, val);
+
+			if (val != old_val) {
+				result = "Set navmesh cell size";
+			}
+		}
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Size of each navmesh grid cell in pixels.\nSmaller values give more precision but larger navmesh files.");
+		}
+	}
+
+	PROPERTY("Debug navmesh free color", debug_navmesh_free_color);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Color used to display free (walkable) navmesh cells in the editor.");
+	}
+
+	PROPERTY("Debug navmesh occupied color", debug_navmesh_occupied_color);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Color used to display occupied (blocked) navmesh cells in the editor.");
+	}
+
 	return result;
 }
 

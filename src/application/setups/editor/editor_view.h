@@ -30,6 +30,11 @@ struct editor_view {
 		f = !f;
 	}
 
+	void toggle_navmesh() {
+		auto& f = show_navmesh;
+		f = !f;
+	}
+
 	void reset_zoom() {
 		panned_camera.zoom = 1.f;
 	}
