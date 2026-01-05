@@ -9,6 +9,7 @@ summary: That which we are brainstorming at the moment.
 - align maps to 128 boundary later, 
 	- fy minilab and 
 	- the entry on cyberaqua
+	- jedrula too
 
 - refresh server browser every time it is opened as sometimes it shows nonexistent servers already
 
