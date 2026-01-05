@@ -144,6 +144,11 @@ namespace test_flavours {
 
 			{
 				invariants::hand_fuse fuse; 
+
+				fuse.beep_color = yellow;
+				fuse.beep_color.a = 150;
+				fuse.beep_time_mult = 0.5f;
+
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
@@ -293,6 +298,10 @@ namespace test_flavours {
 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+
+				fuse.beep_color = cyan;
+				fuse.beep_color.a = 150;
+				fuse.beep_time_mult = 0.50f;
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
