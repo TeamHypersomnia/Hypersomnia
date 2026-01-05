@@ -131,7 +131,7 @@ bool b2PolygonShape::Set(const vec2* vertices, const int32 n)
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 #endif
 	m_count = n;
-	is_aabb = false;
+	m_is_aabb = false;
 
 	for (int32 i = 0; i < n; ++i) {
 		m_vertices[i] = vertices[i].operator b2Vec2();
@@ -173,7 +173,7 @@ bool b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 #endif
 	m_count = n;
-	is_aabb = false;
+	m_is_aabb = false;
 
 	for (int32 i = 0; i < n; ++i) {
 		m_vertices[i] = vertices[i];
