@@ -14,6 +14,17 @@
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
 
 /*
+	We make aabb's of the fixtures a tiny bit thinner,
+	so they don't bleed out into neighboring grid cells.
+
+	This is required even though we compute AABBs directly:
+	2 pixels are necessary since Box2D also adds
+	a radius of a pixel to all polygons. 
+*/
+
+constexpr int fattening_epsilon_v = -2;
+
+/*
 	Maximum number of portals per island.
 	Cell values: 0 = free, 1 = occupied, 2-255 = portal index + 2.
 	So we can have 255 - 2 = 253 portals per island.
@@ -168,12 +179,12 @@ inline void fill_navmesh_grid_from_fixture(
 
 		/* Convert from meters to pixels */
 		const auto lower_px = vec2(
-			si.get_pixels(fixture_aabb.lowerBound.x),
-			si.get_pixels(fixture_aabb.lowerBound.y)
+			si.get_pixels(fixture_aabb.lowerBound.x) - fattening_epsilon_v,
+			si.get_pixels(fixture_aabb.lowerBound.y) - fattening_epsilon_v
 		);
 		const auto upper_px = vec2(
-			si.get_pixels(fixture_aabb.upperBound.x),
-			si.get_pixels(fixture_aabb.upperBound.y)
+			si.get_pixels(fixture_aabb.upperBound.x) + fattening_epsilon_v,
+			si.get_pixels(fixture_aabb.upperBound.y) + fattening_epsilon_v
 		);
 
 		/*
