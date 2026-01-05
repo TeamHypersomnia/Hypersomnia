@@ -178,23 +178,39 @@ inline void fill_navmesh_grid_from_fixture(
 		const auto fixture_aabb = ::compute_exact_fixture_aabb(fixture, body_xf, child_idx);
 
 		/* Convert from meters to pixels */
-		const auto lower_px = vec2(
+		auto lower_px = vec2(
 			si.get_pixels(fixture_aabb.lowerBound.x) - fattening_epsilon_v,
 			si.get_pixels(fixture_aabb.lowerBound.y) - fattening_epsilon_v
 		);
-		const auto upper_px = vec2(
+
+		auto upper_px = vec2(
 			si.get_pixels(fixture_aabb.upperBound.x) + fattening_epsilon_v,
 			si.get_pixels(fixture_aabb.upperBound.y) + fattening_epsilon_v
 		);
+
+		/*
+			Don't overcompensate, just in case
+		*/
+		if (lower_px.x > upper_px.x) {
+			lower_px.x = upper_px.x = (lower_px.x + upper_px.x) / 2;
+			lower_px.x -= 1;
+			upper_px.x += 1;
+		}
+
+		if (lower_px.y > upper_px.y) {
+			lower_px.y = upper_px.y = (lower_px.y + upper_px.y) / 2;
+			lower_px.y -= 1;
+			upper_px.y += 1;
+		}
 
 		/*
 			Early out if the fixture's AABB doesn't overlap with the island bounds.
 		*/
 		const bool outside_island =
 			upper_px.x < aligned.l ||
-			lower_px.x >= aligned.r ||
+			lower_px.x > aligned.r ||
 			upper_px.y < aligned.t ||
-			lower_px.y >= aligned.b
+			lower_px.y > aligned.b
 		;
 
 		if (outside_island) {

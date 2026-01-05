@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- during pathfinding remember to navigate towards the portal center otherwise the bot might stand on the edge where there is yyet no collision with the portal
+	- and to treat portals as obstacles otherwise, dont walk there when just going around
+- we can honestly first traverse the island graph separately, you can quickly retrieve which island a given destination belongs to, and IF it is in a different island, ONLY then try to look for portals during pathfinding otherwise treat them as obstacle
+	- hmmm... what about shortcuts?
+	- in that case we might want two pathfindings upon detecting a portal
+		- "oh, its a portal" - we know the index, try to traverse to the portal's center and take only that path as candidate
+		- the other candidate is not touching the portal at all, no intermediate paths otherwise bot will get teleported
+
 - align maps to 128 boundary later, 
 	- fy minilab and 
 	- the entry on cyberaqua
