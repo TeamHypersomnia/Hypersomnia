@@ -84,7 +84,7 @@ public:
 	b2Vec2 m_vertices[b2_maxPolygonVertices];
 	b2Vec2 m_normals[b2_maxPolygonVertices];
 	int16 m_count;
-	bool is_aabb = false;
+	bool m_is_aabb = false;
 };
 
 FORCE_INLINE bool b2PolygonShape::RayCast(

@@ -14,16 +14,6 @@
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
 
 /*
-	We make aabb's of the fixtures a tiny bit thinner,
-	so they don't bleed out into neighboring grid cells.
-
-	2 pixels are necessary since Box2D also adds
-	a radius of a pixel to all polygons.
-*/
-
-constexpr int fattening_epsilon_v = -2;
-
-/*
 	Maximum number of portals per island.
 	Cell values: 0 = free, 1 = occupied, 2-255 = portal index + 2.
 	So we can have 255 - 2 = 253 portals per island.
@@ -178,13 +168,27 @@ inline void fill_navmesh_grid_from_fixture(
 
 		/* Convert from meters to pixels */
 		const auto lower_px = vec2(
-			si.get_pixels(fixture_aabb.lowerBound.x) - fattening_epsilon_v,
-			si.get_pixels(fixture_aabb.lowerBound.y) - fattening_epsilon_v
+			si.get_pixels(fixture_aabb.lowerBound.x),
+			si.get_pixels(fixture_aabb.lowerBound.y)
 		);
 		const auto upper_px = vec2(
-			si.get_pixels(fixture_aabb.upperBound.x) + fattening_epsilon_v,
-			si.get_pixels(fixture_aabb.upperBound.y) + fattening_epsilon_v
+			si.get_pixels(fixture_aabb.upperBound.x),
+			si.get_pixels(fixture_aabb.upperBound.y)
 		);
+
+		/*
+			Early out if the fixture's AABB doesn't overlap with the island bounds.
+		*/
+		const bool outside_island =
+			upper_px.x < aligned.l ||
+			lower_px.x >= aligned.r ||
+			upper_px.y < aligned.t ||
+			lower_px.y >= aligned.b
+		;
+
+		if (outside_island) {
+			continue;
+		}
 
 		/* Align to grid (expand outward) */
 		const auto grid_l = static_cast<int>(std::floor(lower_px.x / cell_size)) * cell_size;
@@ -194,7 +198,7 @@ inline void fill_navmesh_grid_from_fixture(
 
 		/*
 			Check if we can use the optimized AABB path:
-			- The shape must be a polygon with is_aabb flag set
+			- The shape must be a polygon with m_is_aabb flag set
 			- The body's rotation must be approximately 0
 		*/
 		const bool body_has_no_rotation = body_xf.q.IsNearZero();
@@ -203,7 +207,7 @@ inline void fill_navmesh_grid_from_fixture(
 
 		if (body_has_no_rotation && shape->GetType() == b2Shape::e_polygon) {
 			const auto* poly = static_cast<const b2PolygonShape*>(shape);
-			use_aabb_optimization = poly->is_aabb;
+			use_aabb_optimization = poly->m_is_aabb;
 		}
 
 		if (use_aabb_optimization) {
@@ -383,6 +387,37 @@ inline void process_portals_for_navmesh(
 				return;
 			}
 
+			/*
+				Find which island this portal belongs to based on its position.
+			*/
+			const auto portal_pos = typed_portal_handle.get_logic_transform().pos;
+			const auto island_idx = ::find_island_index_for_position(navmesh, portal_pos);
+
+			if (island_idx < 0) {
+				return;
+			}
+
+			auto& island = navmesh.islands[island_idx];
+
+			/*
+				Helper to fill grid cells for all fixtures of this portal.
+			*/
+			auto fill_portal_fixtures = [&](const uint8_t fill_value) {
+				if (const auto rigid_body = typed_portal_handle.template find<components::rigid_body>()) {
+					if (const auto b2body = rigid_body.find_body()) {
+						for (const b2Fixture* fixture = b2body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
+							::fill_navmesh_grid_from_fixture(
+								island,
+								fixture,
+								si,
+								cell_shapes[island_idx],
+								fill_value
+							);
+						}
+					}
+				}
+			};
+
 			const bool has_hazard = portal.hazard.is_enabled;
 			const bool has_valid_exit = portal.portal_exit.is_set() && cosm[portal.portal_exit].alive();
 
@@ -390,21 +425,7 @@ inline void process_portals_for_navmesh(
 				If hazard field is enabled, mark as occupied regardless of exit.
 			*/
 			if (has_hazard) {
-				if (const auto rigid_body = typed_portal_handle.template find<components::rigid_body>()) {
-					if (const auto b2body = rigid_body.find_body()) {
-						for (const b2Fixture* fixture = b2body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
-							for (std::size_t island_idx = 0; island_idx < navmesh.islands.size(); ++island_idx) {
-								::fill_navmesh_grid_from_fixture(
-									navmesh.islands[island_idx],
-									fixture,
-									si,
-									cell_shapes[island_idx],
-									1
-								);
-							}
-						}
-					}
-				}
+				fill_portal_fixtures(1);
 				return;
 			}
 
@@ -415,18 +436,7 @@ inline void process_portals_for_navmesh(
 				return;
 			}
 
-			/*
-				Find which island this portal belongs to based on its position.
-			*/
-			const auto portal_pos = typed_portal_handle.get_logic_transform().pos;
-			const auto source_island_idx = ::find_island_index_for_position(navmesh, portal_pos);
-
-			if (source_island_idx < 0) {
-				return;
-			}
-
-			auto& source_island = navmesh.islands[source_island_idx];
-			const auto portal_index = source_island.portals.size();
+			const auto portal_index = island.portals.size();
 
 			if (portal_index >= max_portals_per_island_v) {
 				return;
@@ -460,24 +470,12 @@ inline void process_portals_for_navmesh(
 			navmesh_portal portal_entry;
 			portal_entry.out_cell_pos = out_cell_pos;
 			portal_entry.out_island_index = exit_island_idx;
-			source_island.portals.push_back(portal_entry);
+			island.portals.push_back(portal_entry);
 
 			/*
 				Fill the grid cells covered by this portal's fixtures.
 			*/
-			if (const auto rigid_body = typed_portal_handle.template find<components::rigid_body>()) {
-				if (const auto b2body = rigid_body.find_body()) {
-					for (const b2Fixture* fixture = b2body->GetFixtureList(); fixture != nullptr; fixture = fixture->GetNext()) {
-						::fill_navmesh_grid_from_fixture(
-							source_island,
-							fixture,
-							si,
-							cell_shapes[source_island_idx],
-							fill_value
-						);
-					}
-				}
-			}
+			fill_portal_fixtures(fill_value);
 		}
 	);
 }
