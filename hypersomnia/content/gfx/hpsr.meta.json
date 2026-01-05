@@ -57,7 +57,7 @@
             "foot": [0, 0]
         },
         "gun": {
-            "bullet_spawn": [-33, -8],
+            "bullet_spawn": [0, -8],
             "detachable_magazine": {
                 "pos": [-15, 3],
                 "rotation": 0.0

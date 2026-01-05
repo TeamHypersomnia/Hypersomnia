@@ -13,6 +13,7 @@ summary: That which we are brainstorming at the moment.
 	- in that case we might want two pathfindings upon detecting a portal
 		- "oh, its a portal" - we know the index, try to traverse to the portal's center and take only that path as candidate
 		- the other candidate is not touching the portal at all, no intermediate paths otherwise bot will get teleported
+- duel practice has a bombsite outside of path, so always have this clause that line of sight = going directly in line, but line of sight should be more restrictive with regards to collision i.e. cast actual box 
 
 - align maps to 128 boundary later, 
 	- fy minilab and 

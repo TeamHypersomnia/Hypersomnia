@@ -4665,7 +4665,7 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::BULLDUP2000:    return 120.0f;
 		case W::DEAGLE:         return 130.0f;
 		case W::HUNTER:         return 140.0f;
-		case W::AWKA:           return 150.0f;
+		case W::AWKA:           return 170.0f;
 		default: return 0.0f;
 	}
 }
