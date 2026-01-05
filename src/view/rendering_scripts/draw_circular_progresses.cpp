@@ -273,6 +273,8 @@ void draw_beep_lights::operator()() {
 
 				if (beep_col.a) {
 					const auto beep = beep_math { fuse, fuse_def, clk };
+					const bool first_beep = fuse.when_last_beep == fuse.when_armed;
+					(void)first_beep; // could optionally skip
 
 					if (const auto mult = beep.get_beep_light_mult(); mult > AUGS_EPSILON<real32>) {
 						beep_col.mult_alpha(mult);

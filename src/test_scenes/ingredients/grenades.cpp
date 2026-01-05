@@ -47,6 +47,12 @@ namespace test_flavours {
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 
+				fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
+				fuse.beep_sound.modifier.doppler_factor = 0.75f;
+				fuse.beep_sound.modifier.pitch = 1.05f;
+				fuse.beep_color = red;
+				fuse.beep_time_mult = 0.20f;
+
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
