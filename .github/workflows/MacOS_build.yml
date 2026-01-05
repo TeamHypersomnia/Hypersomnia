@@ -29,6 +29,8 @@ jobs:
       run: brew install create-dmg
     - name: Install ninja
       run: brew install ninja
+    - name: Install GLFW
+      run: brew install glfw
     - name: Install sodium
       run: brew install libsodium
     - name: Build Non-Steam libsteam_integration

@@ -1760,7 +1760,7 @@ if (NOT USE_SYSTEM_BLAKE3)
 				${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
 				${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
 			)
-		ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
+		ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL arm64)
 			set(BLAKE3_SRC
 				${BLAKE3_PATH}/blake3.c
 				${BLAKE3_PATH}/blake3_portable.c
@@ -2154,8 +2154,15 @@ if(BUILD_WINDOW_FRAMEWORK)
 
 		if(APPLE)
 			set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/glfw/macos")
-			set(GLFW_HINTS "${GLFW_ROOT}/lib-x86_64")
-			find_library(GLFW NAMES glfw3 HINTS ${GLFW_HINTS})
+			if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+				set(GLFW_HINTS "/opt/homebrew/opt/glfw/lib" "/opt/homebrew/lib" "/usr/local/lib")
+				set(GLFW_INCLUDE_HINTS "/opt/homebrew/include" "/usr/local/include" "${GLFW_ROOT}/include")
+				find_library(GLFW NAMES glfw3 glfw HINTS ${GLFW_HINTS})
+			else()
+				set(GLFW_HINTS "${GLFW_ROOT}/lib-x86_64")
+				find_library(GLFW NAMES glfw3 HINTS ${GLFW_HINTS})
+				set(GLFW_INCLUDE_HINTS "${GLFW_ROOT}/include")
+			endif()
 		elseif(MSVC)
 			set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/glfw/win")
 			set(GLFW_HINTS "${GLFW_ROOT}/lib-vc2022")
@@ -2169,7 +2176,9 @@ if(BUILD_WINDOW_FRAMEWORK)
 
 		prefer_shared_libraries()
 
-		include_directories("${GLFW_ROOT}/include")
+		if(GLFW_INCLUDE_HINTS)
+			include_directories(${GLFW_INCLUDE_HINTS})
+		endif()
 	elseif(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
