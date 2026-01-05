@@ -478,6 +478,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 		polygon_shape.Set(verts.data(), verts.size());
 
+		/*
+			Set m_is_aabb for navmesh optimization:
+			the shape is axis-aligned if there is no rotation.
+		*/
+		polygon_shape.m_is_aabb = (total_rotation == 0.0f);
+
 		fixdef.shape = &polygon_shape;
 		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
