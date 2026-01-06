@@ -7398,3 +7398,5 @@ This will discard your redo history."
 		- yeah is_web_client reported true then
 
 - server thinks its web and forces short match on hosted servers sometimes?
+- nades shouldnt bounce
+

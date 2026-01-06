@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- pathfinding
+	- portals preprocessing
+		- with simple euclidean distance, check if dist to any portal + dist from its exit to destination is shorter than just euclidean to destination
+		- doesnt always have to work, will most of the time
+		- linear
 - during pathfinding remember to navigate towards the portal center otherwise the bot might stand on the edge where there is yyet no collision with the portal
 	- and to treat portals as obstacles otherwise, dont walk there when just going around
 - we can honestly first traverse the island graph separately, you can quickly retrieve which island a given destination belongs to, and IF it is in a different island, ONLY then try to look for portals during pathfinding otherwise treat them as obstacle

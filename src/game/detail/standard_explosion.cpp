@@ -147,6 +147,11 @@ void standard_explosion_input::instantiate(
 		startle_nearby_organisms(cosm, explosion_pos, effective_radius * 1.8f, 60.f, startle_type::IMMEDIATE);
 	}
 
+	const bool causes_chain_reaction = 
+		this->type == adverse_element_type::FORCE ||
+		this->type == adverse_element_type::INTERFERENCE
+	;
+
 	messages::visibility_information_request request;
 	request.eye_transform = explosion_location;
 	request.filter = predefined_queries::pathfinding();
@@ -211,6 +216,22 @@ void standard_explosion_input::instantiate(
 
 				if (is_explosion_body) {
 					return callback_result::CONTINUE;
+				}
+
+				if (causes_chain_reaction) {
+					if (const auto fuse = victim.find<components::hand_fuse>()) {
+						if (fuse->armed()) {
+							fuse->fuse_delay_ms = 0.0f;
+						}
+
+						return callback_result::CONTINUE;
+					}
+
+					if (const auto missile = victim.find<components::missile>()) {
+						/* Trigger detonation */
+						missile->penetration_distance_remaining = -1;
+						return callback_result::CONTINUE;
+					}
 				}
 
 				const bool in_range = [&]() {
