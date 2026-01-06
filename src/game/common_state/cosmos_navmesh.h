@@ -48,6 +48,15 @@ struct cosmos_navmesh_island {
 	}
 
 	/*
+		Convert cell position to linear index.
+	*/
+
+	std::size_t cell_index(const vec2i cell_pos) const {
+		const auto size = get_size_in_cells();
+		return static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
+	}
+
+	/*
 		Grid-cell coordinate access (cell_pos is an index into the grid).
 	*/
 
@@ -59,7 +68,7 @@ struct cosmos_navmesh_island {
 			return 1;
 		}
 
-		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
+		const auto idx = cell_index(cell_pos);
 
 		if (idx >= occupied.size()) {
 			return 1;
@@ -76,7 +85,7 @@ struct cosmos_navmesh_island {
 			return;
 		}
 
-		const auto idx = static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
+		const auto idx = cell_index(cell_pos);
 
 		if (idx >= occupied.size()) {
 			return;

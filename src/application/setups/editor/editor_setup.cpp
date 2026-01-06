@@ -2228,15 +2228,15 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					*/
 					for (std::size_t i = 0; i < path.nodes.size(); ++i) {
 						const auto& node = path.nodes[i];
-						const auto world_x = island.bound.l + node.cell_xy.x * cell_size;
-						const auto world_y = island.bound.t + node.cell_xy.y * cell_size;
+						const auto world_lt = vec2(island.bound.lt()) + vec2(node.cell_xy) * static_cast<float>(cell_size);
+						const auto world_rb = world_lt + vec2::square(static_cast<float>(cell_size));
 
-						const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));
-						const auto screen_rb = on_screen(vec2(static_cast<float>(world_x + cell_size), static_cast<float>(world_y + cell_size)));
+						const auto screen_lt = on_screen(world_lt);
+						const auto screen_rb = on_screen(world_rb);
 
 						triangles.aabb(
 							blank_tex,
-							ltrb(screen_lt.x, screen_lt.y, screen_rb.x, screen_rb.y),
+							ltrb(screen_lt, screen_rb - screen_lt),
 							pathfinding_color
 						);
 
@@ -2245,21 +2245,15 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 						*/
 						if (i + 1 < path.nodes.size()) {
 							const auto& next_node = path.nodes[i + 1];
-							const auto dir = vec2(
-								static_cast<float>(next_node.cell_xy.x - node.cell_xy.x),
-								static_cast<float>(next_node.cell_xy.y - node.cell_xy.y)
-							);
+							const auto dir = vec2(next_node.cell_xy - node.cell_xy);
 
-							const auto center_world = vec2(
-								static_cast<float>(world_x + cell_size / 2),
-								static_cast<float>(world_y + cell_size / 2)
-							);
+							const auto center_world = world_lt + vec2::square(static_cast<float>(cell_size) / 2);
 							const auto center_screen = on_screen(center_world);
 
 							/*
 								Compute rotation angle from direction.
 							*/
-							const auto angle = std::atan2(dir.y, dir.x) * RAD_TO_DEG<float>;
+							const auto angle = dir.degrees();
 
 							augs::detail_sprite(
 								triangles.output_buffer,

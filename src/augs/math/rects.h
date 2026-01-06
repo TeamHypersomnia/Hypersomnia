@@ -251,6 +251,26 @@ struct basic_ltrb {
 		return { l, b };
 	}
 
+	/*
+		Shorthand aliases for corner accessors.
+	*/
+
+	basic_vec2<T> lt() const {
+		return left_top();
+	}
+
+	basic_vec2<T> rb() const {
+		return right_bottom();
+	}
+
+	basic_vec2<T> rt() const {
+		return right_top();
+	}
+
+	basic_vec2<T> lb() const {
+		return left_bottom();
+	}
+
 	basic_vec2<T> get_center() const {
 		return (left_top() + right_bottom()) / 2;
 	}

@@ -500,8 +500,7 @@ inline void process_portals_for_navmesh(
 				Compute in_cell_pos from the portal's own position.
 			*/
 			const auto portal_pos_i = vec2i(portal_pos);
-			const auto bound_lt = vec2i(island.bound.l, island.bound.t);
-			portal_entry.in_cell_pos = (portal_pos_i - bound_lt) / island.cell_size;
+			portal_entry.in_cell_pos = (portal_pos_i - island.bound.lt()) / island.cell_size;
 
 			portal_entry.out_cell_pos = out_cell_pos;
 			portal_entry.out_island_index = exit_island_idx;

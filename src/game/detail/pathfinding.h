@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include "game/common_state/cosmos_navmesh.h"
+#include "augs/enums/callback_result.h"
 
 /*
 	Pathfinding algorithms using A* for navmesh.
@@ -36,7 +37,7 @@ float world_distance(const vec2 a, const vec2 b);
 	Returns std::nullopt if position is not within any island.
 */
 
-std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos);
+std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos);
 
 /*
 	BFS on islands to find path from source island to target island.
@@ -44,10 +45,10 @@ std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const
 	If source == target, returns source.
 */
 
-std::optional<int> find_islands_connection(
+std::optional<std::size_t> find_islands_connection(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -59,10 +60,10 @@ std::optional<int> find_islands_connection(
 	Returns std::nullopt if no suitable portal found.
 */
 
-std::optional<int> find_best_portal_from_to(
+std::optional<std::size_t> find_best_portal_from_to(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	const vec2 from_pos,
 	const vec2 to_pos
 );
@@ -70,19 +71,18 @@ std::optional<int> find_best_portal_from_to(
 /*
 	A* pathfinding within a single island.
 	
-	target_portal_index: if >= 0, we're navigating to a specific portal.
+	target_portal_index: if set, we're navigating to a specific portal.
 	                     Its cells are walkable; other portal cells are blocked.
-	                     If -1, we're navigating to a regular cell.
+	                     If nullopt, we're navigating to a regular cell.
 
-	Returns empty optional if no path found.
+	Returns a vector of pathfinding nodes, or nullopt if no path found.
 */
 
-std::optional<pathfinding_path> find_path_within_island(
-	const cosmos_navmesh& navmesh,
-	const int island_index,
+std::optional<std::vector<pathfinding_node>> find_path_within_island(
+	const cosmos_navmesh_island& island,
 	const vec2i start_cell,
 	const vec2i target_cell,
-	const int target_portal_index = -1,
+	const std::optional<std::size_t> target_portal_index = std::nullopt,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -93,8 +93,8 @@ std::optional<pathfinding_path> find_path_within_island(
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
 	pathfinding_context* ctx = nullptr

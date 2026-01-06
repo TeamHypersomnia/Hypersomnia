@@ -3,6 +3,9 @@
 #include <queue>
 #include <vector>
 #include <functional>
+#include "augs/enums/callback_result.h"
+
+namespace augs {
 
 /*
 	Generic A* algorithm.
@@ -14,6 +17,7 @@
 		GetVisited - Lambda: (Id) -> bool, returns true if node was visited
 		SetVisited - Lambda: (Id) -> void, marks node as visited
 		ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
+		                  Callback should return callback_result::CONTINUE or ABORT
 		Heuristic - Lambda: (Id) -> float, returns estimated distance to target
 		IsTarget - Lambda: (Id) -> bool, returns true if this is the target node
 		GetParent - Lambda: (Id) -> std::optional<Id>, returns parent of node (for path reconstruction)
@@ -35,8 +39,12 @@ struct astar_queue_node {
 	}
 };
 
+template <class Id>
+using astar_queue_type = std::priority_queue<astar_queue_node<Id>, std::vector<astar_queue_node<Id>>, std::greater<astar_queue_node<Id>>>;
+
 template <
 	class Id,
+	class Queue,
 	class GetVisited,
 	class SetVisited,
 	class ForEachNeighbor,
@@ -48,6 +56,7 @@ template <
 	class SetGCost
 >
 bool astar_find_path(
+	Queue& open_set,
 	const Id start,
 	GetVisited&& get_visited,
 	SetVisited&& set_visited,
@@ -59,8 +68,12 @@ bool astar_find_path(
 	GetGCost&& get_g_cost,
 	SetGCost&& set_g_cost
 ) {
-	using node_type = astar_queue_node<Id>;
-	std::priority_queue<node_type, std::vector<node_type>, std::greater<node_type>> open_set;
+	/*
+		Clear the queue for reuse.
+	*/
+	while (!open_set.empty()) {
+		open_set.pop();
+	}
 
 	const auto start_h = heuristic(start);
 	set_g_cost(start, 0.0f);
@@ -95,7 +108,7 @@ bool astar_find_path(
 		*/
 		for_each_neighbor(current_id, [&](const Id neighbor) {
 			if (get_visited(neighbor)) {
-				return;
+				return callback_result::CONTINUE;
 			}
 
 			/*
@@ -110,8 +123,12 @@ bool astar_find_path(
 				const auto h = heuristic(neighbor);
 				open_set.push({ neighbor, tentative_g + h });
 			}
+
+			return callback_result::CONTINUE;
 		});
 	}
 
 	return false;
 }
+
+} /* namespace augs */
