@@ -47,7 +47,7 @@ namespace components {
 
 		bool during_penetration = false;
 		bool deleted_already = false;
-		pad_bytes<2> pad;
+		uint16_t force_detonate_in_ms = -1;
 		// END GEN INTROSPECTOR
 	};
 }

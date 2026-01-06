@@ -20,6 +20,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::hand_fuse
 		real32 fuse_delay_ms = 800.f;
+		real32 force_detonate_in_ms = -1.0f;
 		augs::stepped_timestamp when_armed;
 
 		real32 amount_defused = -1.f;
@@ -30,7 +31,7 @@ namespace components {
 		bool arming_requested = false;
 		uint8_t arming_source = arming_source_type::NONE;
 		pad_bytes<2> pad;
-		float damping_mult = 1.0f;
+		real32 damping_mult = 1.0f;
 
 		signi_entity_id character_now_defusing;
 		slot_function slot_when_armed = slot_function::INVALID;

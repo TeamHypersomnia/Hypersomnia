@@ -60,6 +60,15 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 				if (clk.is_ready(fuse.fuse_delay_ms, when_armed)) {
 					detonate_if(it, step);
 				}
+				else {
+					if (fuse.force_detonate_in_ms >= 0.0f) {
+						fuse.force_detonate_in_ms -= clk.dt.in_milliseconds();
+
+						if (fuse.force_detonate_in_ms <= 0.0f) {
+							detonate_if(it, step);
+						}
+					}
+				}
 			}
 		}
 	);

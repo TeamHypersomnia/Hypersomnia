@@ -221,15 +221,25 @@ void standard_explosion_input::instantiate(
 				if (causes_chain_reaction) {
 					if (const auto fuse = victim.find<components::hand_fuse>()) {
 						if (fuse->armed()) {
-							fuse->fuse_delay_ms = 0.0f;
+							if (fuse->force_detonate_in_ms == -1.f) {
+								fuse->force_detonate_in_ms = 200.0f;
+
+								if (type == adverse_element_type::INTERFERENCE) {
+									fuse->force_detonate_in_ms = 0.0f;
+								}
+							}
 						}
 
 						return callback_result::CONTINUE;
 					}
 
 					if (const auto missile = victim.find<components::missile>()) {
-						/* Trigger detonation */
-						missile->penetration_distance_remaining = -1;
+						missile->force_detonate_in_ms = 100;
+
+						if (type == adverse_element_type::INTERFERENCE) {
+							missile->force_detonate_in_ms = 0.0f;
+						}
+
 						return callback_result::CONTINUE;
 					}
 				}

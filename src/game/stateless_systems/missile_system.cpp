@@ -668,7 +668,20 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					const auto fuse_delay_steps = static_cast<uint32_t>(considered_lifetime / delta.in_milliseconds());
 					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
-					if (missile.penetration_distance_remaining == -1 || now.step >= when_detonates) {
+					bool force_detonate = false;
+
+					if (missile.force_detonate_in_ms != uint16_t(-1)) {
+						const auto u_dt = uint16_t(delta.in_milliseconds());
+
+						if (missile.force_detonate_in_ms > u_dt) {
+							missile.force_detonate_in_ms -= u_dt;
+						}
+						else {
+							force_detonate = true;
+						}
+					}
+
+					if (force_detonate || now.step >= when_detonates) {
 						const auto current_tr = it.get_logic_transform();
 
 						missile.saved_point_of_impact_before_death = current_tr;
