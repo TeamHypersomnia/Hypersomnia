@@ -1,62 +1,47 @@
-#pragma once
-#include <optional>
 #include <queue>
 #include <cmath>
 #include <limits>
-#include "game/common_state/cosmos_navmesh.h"
+#include "game/detail/pathfinding.h"
 
 /*
-	Pathfinding algorithms using A* for navmesh.
+	A* node for priority queue.
 */
 
-/*
-	Convert cell coordinates to world position (center of cell).
-*/
+struct astar_node {
+	vec2i cell;
+	float g_cost;
+	float f_cost;
 
-inline vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy) {
+	bool operator>(const astar_node& other) const {
+		return f_cost > other.f_cost;
+	}
+};
+
+vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy) {
 	const auto cell_size = island.cell_size;
 	const auto world_x = static_cast<float>(island.bound.l + cell_xy.x * cell_size + cell_size / 2);
 	const auto world_y = static_cast<float>(island.bound.t + cell_xy.y * cell_size + cell_size / 2);
 	return vec2(world_x, world_y);
 }
 
-/*
-	Convert world position to cell coordinates.
-*/
-
-inline vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
+vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
 	const auto cell_size = island.cell_size;
 	const auto cell_x = (static_cast<int>(world_pos.x) - island.bound.l) / cell_size;
 	const auto cell_y = (static_cast<int>(world_pos.y) - island.bound.t) / cell_size;
 	return vec2i(cell_x, cell_y);
 }
 
-/*
-	Euclidean distance between two cells within an island.
-*/
-
-inline float cell_distance(const vec2i a, const vec2i b) {
-	const auto dx = static_cast<float>(a.x - b.x);
-	const auto dy = static_cast<float>(a.y - b.y);
-	return std::sqrt(dx * dx + dy * dy);
+int cell_distance(const vec2i a, const vec2i b) {
+	return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
-/*
-	Euclidean distance between two world positions.
-*/
-
-inline float world_distance(const vec2 a, const vec2 b) {
+float world_distance(const vec2 a, const vec2 b) {
 	const auto dx = a.x - b.x;
 	const auto dy = a.y - b.y;
 	return std::sqrt(dx * dx + dy * dy);
 }
 
-/*
-	Find which island index contains a given world position.
-	Returns -1 if position is not within any island.
-*/
-
-inline int find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
+std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
 	const auto pos_i = vec2i(static_cast<int>(world_pos.x), static_cast<int>(world_pos.y));
 
 	for (std::size_t i = 0; i < navmesh.islands.size(); ++i) {
@@ -69,64 +54,27 @@ inline int find_island_for_position(const cosmos_navmesh& navmesh, const vec2 wo
 		}
 	}
 
-	return -1;
+	return std::nullopt;
 }
 
-/*
-	Find the center cell of a portal within an island.
-	Returns the first cell that has the portal value.
-*/
-
-inline std::optional<vec2i> find_portal_center_cell(
-	const cosmos_navmesh_island& island,
-	const int portal_index
-) {
-	const auto portal_value = static_cast<uint8_t>(2 + portal_index);
-	const auto size = island.get_size_in_cells();
-
-	vec2i sum = vec2i::zero;
-	int count = 0;
-
-	for (int cy = 0; cy < size.y; ++cy) {
-		for (int cx = 0; cx < size.x; ++cx) {
-			if (island.get_cell(vec2i(cx, cy)) == portal_value) {
-				sum.x += cx;
-				sum.y += cy;
-				++count;
-			}
-		}
-	}
-
-	if (count == 0) {
-		return std::nullopt;
-	}
-
-	return vec2i(sum.x / count, sum.y / count);
-}
-
-/*
-	BFS on islands to find path from source island to target island.
-	Returns the next island index to go to (-1 if no path found or same island).
-*/
-
-inline int find_islands_connection(
+std::optional<int> find_islands_connection(
 	const cosmos_navmesh& navmesh,
 	const int source_island_index,
 	const int target_island_index,
-	pathfinding_context* ctx = nullptr
+	pathfinding_context* ctx
 ) {
 	if (source_island_index == target_island_index) {
 		return source_island_index;
 	}
 
 	if (source_island_index < 0 || target_island_index < 0) {
-		return -1;
+		return std::nullopt;
 	}
 
 	const auto num_islands = static_cast<int>(navmesh.islands.size());
 
 	if (source_island_index >= num_islands || target_island_index >= num_islands) {
-		return -1;
+		return std::nullopt;
 	}
 
 	/*
@@ -197,18 +145,10 @@ inline int find_islands_connection(
 	/*
 		No path found.
 	*/
-	return -1;
+	return std::nullopt;
 }
 
-/*
-	Find best portal from source island to target island.
-	Returns portal index on source island that minimizes:
-	  euclidean_distance(from_pos -> portal_center) + euclidean_distance(portal_exit -> to_pos)
-	
-	Returns -1 if no suitable portal found.
-*/
-
-inline int find_best_portal_from_to(
+std::optional<int> find_best_portal_from_to(
 	const cosmos_navmesh& navmesh,
 	const int source_island_index,
 	const int target_island_index,
@@ -216,12 +156,12 @@ inline int find_best_portal_from_to(
 	const vec2 to_pos
 ) {
 	if (source_island_index < 0 || source_island_index >= static_cast<int>(navmesh.islands.size())) {
-		return -1;
+		return std::nullopt;
 	}
 
 	const auto& source_island = navmesh.islands[source_island_index];
 
-	int best_portal_index = -1;
+	std::optional<int> best_portal_index;
 	auto best_distance = std::numeric_limits<float>::max();
 
 	for (std::size_t p = 0; p < source_island.portals.size(); ++p) {
@@ -236,15 +176,9 @@ inline int find_best_portal_from_to(
 		}
 
 		/*
-			Find center of this portal.
+			Use pre-computed in_cell_pos for this portal.
 		*/
-		const auto portal_center_opt = ::find_portal_center_cell(source_island, static_cast<int>(p));
-
-		if (!portal_center_opt.has_value()) {
-			continue;
-		}
-
-		const auto portal_center_world = ::cell_to_world(source_island, portal_center_opt.value());
+		const auto portal_center_world = ::cell_to_world(source_island, portal.in_cell_pos);
 
 		/*
 			Compute exit position in target island.
@@ -272,37 +206,13 @@ inline int find_best_portal_from_to(
 	return best_portal_index;
 }
 
-/*
-	A* node for priority queue.
-*/
-
-struct astar_node {
-	vec2i cell;
-	float g_cost;
-	float f_cost;
-
-	bool operator>(const astar_node& other) const {
-		return f_cost > other.f_cost;
-	}
-};
-
-/*
-	A* pathfinding within a single island.
-	
-	target_portal_index: if >= 0, we're navigating to a specific portal.
-	                     Its cells are walkable; other portal cells are blocked.
-	                     If -1, we're navigating to a regular cell.
-
-	Returns empty optional if no path found.
-*/
-
-inline std::optional<pathfinding_path> find_path_within_island(
+std::optional<pathfinding_path> find_path_within_island(
 	const cosmos_navmesh& navmesh,
 	const int island_index,
 	const vec2i start_cell,
 	const vec2i target_cell,
-	const int target_portal_index = -1,
-	pathfinding_context* ctx = nullptr
+	const int target_portal_index,
+	pathfinding_context* ctx
 ) {
 	if (island_index < 0 || island_index >= static_cast<int>(navmesh.islands.size())) {
 		return std::nullopt;
@@ -348,7 +258,7 @@ inline std::optional<pathfinding_path> find_path_within_island(
 
 	/*
 		Parent tracking for path reconstruction.
-		Store parent as (x * 65536 + y + 1), where +1 avoids confusion with 0.
+		Store parent as (y * size.x + x + 1), where +1 avoids confusion with 0.
 	*/
 	std::vector<int> parent(grid_size, 0);
 	std::vector<float> g_costs(grid_size, std::numeric_limits<float>::max());
@@ -410,24 +320,19 @@ inline std::optional<pathfinding_path> find_path_within_island(
 	*/
 	std::priority_queue<astar_node, std::vector<astar_node>, std::greater<astar_node>> open_set;
 
-	const auto start_h = ::cell_distance(start_cell, target_cell);
+	const auto start_h = static_cast<float>(::cell_distance(start_cell, target_cell));
 
 	open_set.push({ start_cell, 0.0f, start_h });
 	g_costs[cell_index(start_cell)] = 0.0f;
 
 	/*
-		8-directional neighbors.
+		4-directional neighbors (up, down, left, right only).
 	*/
-	const vec2i directions[8] = {
-		{ -1, -1 }, { 0, -1 }, { 1, -1 },
-		{ -1,  0 },            { 1,  0 },
-		{ -1,  1 }, { 0,  1 }, { 1,  1 }
-	};
-
-	const float dir_costs[8] = {
-		1.41421356f, 1.0f, 1.41421356f,
-		1.0f,              1.0f,
-		1.41421356f, 1.0f, 1.41421356f
+	const vec2i directions[4] = {
+		{ 0, -1 },
+		{ 0,  1 },
+		{ -1, 0 },
+		{ 1,  0 }
 	};
 
 	while (!open_set.empty()) {
@@ -485,9 +390,9 @@ inline std::optional<pathfinding_path> find_path_within_island(
 		}
 
 		/*
-			Explore neighbors.
+			Explore neighbors (4-directional).
 		*/
-		for (int d = 0; d < 8; ++d) {
+		for (int d = 0; d < 4; ++d) {
 			const auto neighbor = current.cell + directions[d];
 
 			if (!is_walkable(neighbor)) {
@@ -500,26 +405,13 @@ inline std::optional<pathfinding_path> find_path_within_island(
 				continue;
 			}
 
-			/*
-				For diagonal moves, check if both adjacent cells are walkable.
-				This prevents cutting corners.
-			*/
-			if (directions[d].x != 0 && directions[d].y != 0) {
-				const auto adj1 = current.cell + vec2i(directions[d].x, 0);
-				const auto adj2 = current.cell + vec2i(0, directions[d].y);
-
-				if (!is_walkable(adj1) || !is_walkable(adj2)) {
-					continue;
-				}
-			}
-
-			const auto tentative_g = current.g_cost + dir_costs[d];
+			const auto tentative_g = current.g_cost + 1.0f;
 
 			if (tentative_g < g_costs[neighbor_idx]) {
 				g_costs[neighbor_idx] = tentative_g;
 				parent[neighbor_idx] = current.cell.y * size.x + current.cell.x + 1;
 
-				const auto h = ::cell_distance(neighbor, target_cell);
+				const auto h = static_cast<float>(::cell_distance(neighbor, target_cell));
 				open_set.push({ neighbor, tentative_g, tentative_g + h });
 			}
 		}
@@ -531,24 +423,19 @@ inline std::optional<pathfinding_path> find_path_within_island(
 	return std::nullopt;
 }
 
-/*
-	Find path across islands with direct connection.
-	Uses find_best_portal_from_to to find the best portal.
-*/
-
-inline std::optional<pathfinding_path> find_path_across_islands_direct(
+std::optional<pathfinding_path> find_path_across_islands_direct(
 	const cosmos_navmesh& navmesh,
 	const int source_island_index,
 	const int target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
-	pathfinding_context* ctx = nullptr
+	pathfinding_context* ctx
 ) {
 	if (source_island_index < 0 || source_island_index >= static_cast<int>(navmesh.islands.size())) {
 		return std::nullopt;
 	}
 
-	const auto best_portal = ::find_best_portal_from_to(
+	const auto best_portal_opt = ::find_best_portal_from_to(
 		navmesh,
 		source_island_index,
 		target_island_index,
@@ -556,23 +443,18 @@ inline std::optional<pathfinding_path> find_path_across_islands_direct(
 		target_pos
 	);
 
-	if (best_portal < 0) {
+	if (!best_portal_opt.has_value()) {
 		return std::nullopt;
 	}
 
+	const auto best_portal = best_portal_opt.value();
 	const auto& source_island = navmesh.islands[source_island_index];
 	const auto& portal = source_island.portals[best_portal];
 
 	/*
-		Find portal center cell.
+		Use pre-computed in_cell_pos for portal center.
 	*/
-	const auto portal_center_opt = ::find_portal_center_cell(source_island, best_portal);
-
-	if (!portal_center_opt.has_value()) {
-		return std::nullopt;
-	}
-
-	const auto portal_center = portal_center_opt.value();
+	const auto portal_center = portal.in_cell_pos;
 	const auto start_cell = ::world_to_cell(source_island, source_pos);
 
 	/*
@@ -602,23 +484,21 @@ inline std::optional<pathfinding_path> find_path_across_islands_direct(
 	return path_result;
 }
 
-/*
-	Find path across multiple islands (unknown number on path).
-	First does BFS on islands, then uses find_path_across_islands_direct.
-*/
-
-inline std::optional<pathfinding_path> find_path_across_islands_many(
+std::optional<pathfinding_path> find_path_across_islands_many(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
-	pathfinding_context* ctx = nullptr
+	pathfinding_context* ctx
 ) {
-	const auto source_island = ::find_island_for_position(navmesh, source_pos);
-	const auto target_island = ::find_island_for_position(navmesh, target_pos);
+	const auto source_island_opt = ::find_island_for_position(navmesh, source_pos);
+	const auto target_island_opt = ::find_island_for_position(navmesh, target_pos);
 
-	if (source_island < 0 || target_island < 0) {
+	if (!source_island_opt.has_value() || !target_island_opt.has_value()) {
 		return std::nullopt;
 	}
+
+	const auto source_island = source_island_opt.value();
+	const auto target_island = target_island_opt.value();
 
 	/*
 		Same island case.
@@ -633,7 +513,7 @@ inline std::optional<pathfinding_path> find_path_across_islands_many(
 		*/
 		const auto direct_dist = ::world_distance(source_pos, target_pos);
 
-		const auto best_same_island_portal = ::find_best_portal_from_to(
+		const auto best_same_island_portal_opt = ::find_best_portal_from_to(
 			navmesh,
 			source_island,
 			source_island,
@@ -641,37 +521,35 @@ inline std::optional<pathfinding_path> find_path_across_islands_many(
 			target_pos
 		);
 
-		if (best_same_island_portal >= 0) {
+		if (best_same_island_portal_opt.has_value()) {
+			const auto best_same_island_portal = best_same_island_portal_opt.value();
 			const auto& portal = island.portals[best_same_island_portal];
-			const auto portal_center_opt = ::find_portal_center_cell(island, best_same_island_portal);
 
-			if (portal_center_opt.has_value()) {
-				const auto portal_center_world = ::cell_to_world(island, portal_center_opt.value());
-				const auto exit_world = ::cell_to_world(island, portal.out_cell_pos);
+			const auto portal_center_world = ::cell_to_world(island, portal.in_cell_pos);
+			const auto exit_world = ::cell_to_world(island, portal.out_cell_pos);
 
-				const auto portal_route_dist = ::world_distance(source_pos, portal_center_world) +
-				                               ::world_distance(exit_world, target_pos);
+			const auto portal_route_dist = ::world_distance(source_pos, portal_center_world) +
+			                               ::world_distance(exit_world, target_pos);
 
-				if (portal_route_dist < direct_dist) {
-					/*
-						Use portal route.
-					*/
-					auto path_result = ::find_path_within_island(
-						navmesh,
+			if (portal_route_dist < direct_dist) {
+				/*
+					Use portal route.
+				*/
+				auto path_result = ::find_path_within_island(
+					navmesh,
+					source_island,
+					start_cell,
+					portal.in_cell_pos,
+					best_same_island_portal,
+					ctx
+				);
+
+				if (path_result.has_value()) {
+					path_result->final_portal_node = cell_on_island{
 						source_island,
-						start_cell,
-						portal_center_opt.value(),
-						best_same_island_portal,
-						ctx
-					);
-
-					if (path_result.has_value()) {
-						path_result->final_portal_node = cell_on_island{
-							source_island,
-							pathfinding_node{ portal.out_cell_pos }
-						};
-						return path_result;
-					}
+						pathfinding_node{ portal.out_cell_pos }
+					};
+					return path_result;
 				}
 			}
 		}
@@ -692,11 +570,13 @@ inline std::optional<pathfinding_path> find_path_across_islands_many(
 	/*
 		Cross-island case: find next island to go to.
 	*/
-	const auto next_island = ::find_islands_connection(navmesh, source_island, target_island, ctx);
+	const auto next_island_opt = ::find_islands_connection(navmesh, source_island, target_island, ctx);
 
-	if (next_island < 0) {
+	if (!next_island_opt.has_value()) {
 		return std::nullopt;
 	}
+
+	const auto next_island = next_island_opt.value();
 
 	/*
 		Find path to portal leading to next island.
@@ -711,17 +591,11 @@ inline std::optional<pathfinding_path> find_path_across_islands_many(
 	);
 }
 
-/*
-	Helper function that repeatedly calls the main pathfinding function
-	until final_portal_node is empty.
-	Returns all paths concatenated for visualization.
-*/
-
-inline std::vector<pathfinding_path> find_path_across_islands_many_full(
+std::vector<pathfinding_path> find_path_across_islands_many_full(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
-	pathfinding_context* ctx = nullptr
+	pathfinding_context* ctx
 ) {
 	std::vector<pathfinding_path> all_paths;
 	auto current_pos = source_pos;
