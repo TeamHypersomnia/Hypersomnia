@@ -469,7 +469,7 @@ inline std::optional<pathfinding_path> find_path_within_island(
 					break;
 				}
 
-				c = vec2i((p - 1) / size.y, (p - 1) % size.y);
+				c = vec2i((p - 1) % size.x, (p - 1) / size.x);
 			}
 
 			path_cells.push_back(start_cell);
@@ -517,7 +517,7 @@ inline std::optional<pathfinding_path> find_path_within_island(
 
 			if (tentative_g < g_costs[neighbor_idx]) {
 				g_costs[neighbor_idx] = tentative_g;
-				parent[neighbor_idx] = current.cell.x * size.y + current.cell.y + 1;
+				parent[neighbor_idx] = current.cell.y * size.x + current.cell.x + 1;
 
 				const auto h = ::cell_distance(neighbor, target_cell);
 				open_set.push({ neighbor, tentative_g, tentative_g + h });
