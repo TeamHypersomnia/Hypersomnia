@@ -70,6 +70,10 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = white;
 		}
+		else if (p.type == point_marker_type::DEBUG_PATHFINDING_START || p.type == point_marker_type::DEBUG_PATHFINDING_END) {
+			result.id = I::EDITOR_ICON_SPAWN;
+			result.col = green;
+		}
 
 		return result;
 	}

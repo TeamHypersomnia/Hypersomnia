@@ -12,6 +12,7 @@ struct editor_arena_settings {
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);
 	rgba debug_navmesh_occupied_color = rgba(255, 0, 0, 60);
 	rgba debug_navmesh_portal_color = rgba(0, 255, 0, 60);
+	rgba debug_pathfinding_color = rgba(0, 255, 0, 220);
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_arena_settings&) const = default;

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include "game/cosmos/logic_step.h"
 #include "game/organization/all_messages_includes.h"
@@ -70,6 +71,7 @@
 
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
+#include "game/detail/pathfinding.hpp"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
@@ -2168,6 +2170,106 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 						ltrb(screen_lt.x, screen_lt.y, screen_rb.x, screen_rb.y),
 						color
 					);
+				}
+			}
+		}
+
+		/*
+			Draw pathfinding debug visualization.
+			Iterate over DEBUG_PATHFINDING_START and DEBUG_PATHFINDING_END point markers
+			and draw paths between them.
+		*/
+
+		const auto pathfinding_color = project.settings.debug_pathfinding_color;
+		const auto arrow_image_id = assets::necessary_image_id::EDITOR_TOOL_PLAIN_ARROW;
+
+		/*
+			Collect start and end positions.
+		*/
+		std::vector<vec2> pathfinding_starts;
+		std::vector<vec2> pathfinding_ends;
+
+		scene.world.for_each_having<invariants::point_marker>(
+			[&](const auto& typed_handle) {
+				const auto& marker = typed_handle.template get<invariants::point_marker>();
+
+				if (marker.type == point_marker_type::DEBUG_PATHFINDING_START) {
+					pathfinding_starts.push_back(typed_handle.get_logic_transform().pos);
+				}
+				else if (marker.type == point_marker_type::DEBUG_PATHFINDING_END) {
+					pathfinding_ends.push_back(typed_handle.get_logic_transform().pos);
+				}
+			}
+		);
+
+		/*
+			For each start, find path to each end.
+		*/
+		pathfinding_context pf_ctx;
+
+		for (const auto& start_pos : pathfinding_starts) {
+			for (const auto& end_pos : pathfinding_ends) {
+				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, &pf_ctx);
+
+				for (const auto& path : all_paths) {
+					if (path.island_index < 0 || path.island_index >= static_cast<int>(navmesh.islands.size())) {
+						continue;
+					}
+
+					const auto& island = navmesh.islands[path.island_index];
+					const auto cell_size = island.cell_size;
+
+					if (cell_size <= 0) {
+						continue;
+					}
+
+					/*
+						Draw path cells.
+					*/
+					for (std::size_t i = 0; i < path.nodes.size(); ++i) {
+						const auto& node = path.nodes[i];
+						const auto world_x = island.bound.l + node.cell_xy.x * cell_size;
+						const auto world_y = island.bound.t + node.cell_xy.y * cell_size;
+
+						const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));
+						const auto screen_rb = on_screen(vec2(static_cast<float>(world_x + cell_size), static_cast<float>(world_y + cell_size)));
+
+						triangles.aabb(
+							blank_tex,
+							ltrb(screen_lt.x, screen_lt.y, screen_rb.x, screen_rb.y),
+							pathfinding_color
+						);
+
+						/*
+							Draw direction arrow at center of tile.
+						*/
+						if (i + 1 < path.nodes.size()) {
+							const auto& next_node = path.nodes[i + 1];
+							const auto dir = vec2(
+								static_cast<float>(next_node.cell_xy.x - node.cell_xy.x),
+								static_cast<float>(next_node.cell_xy.y - node.cell_xy.y)
+							);
+
+							const auto center_world = vec2(
+								static_cast<float>(world_x + cell_size / 2),
+								static_cast<float>(world_y + cell_size / 2)
+							);
+							const auto center_screen = on_screen(center_world);
+
+							/*
+								Compute rotation angle from direction.
+							*/
+							const auto angle = std::atan2(dir.y, dir.x) * (180.0f / 3.14159265f);
+
+							augs::detail_sprite(
+								triangles.output_buffer,
+								in.necessary_images.at(arrow_image_id),
+								center_screen,
+								angle,
+								white
+							);
+						}
+					}
 				}
 			}
 		}
