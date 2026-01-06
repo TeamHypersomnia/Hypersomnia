@@ -244,3 +244,23 @@
 		(pos.y - bound_lt.y) / cell_size
 	);
 	```
+
+- Whenever performing 2D vector math, check if there's a function in `augs/math/vec2.h`:
+	```cpp
+	/* Good: use vec2::length() */
+	const auto dist = (a - b).length();
+	
+	/* Bad: manual euclidean distance calculation */
+	const auto dx = a.x - b.x;
+	const auto dy = a.y - b.y;
+	const auto dist = std::sqrt(dx * dx + dy * dy);
+	```
+
+- Whenever checking if a point is inside a rectangle, use `ltrb::hover()` from `augs/math/rects.h`:
+	```cpp
+	/* Good */
+	if (bound.hover(pos)) { ... }
+	
+	/* Bad */
+	if (pos.x >= bound.l && pos.x < bound.r && pos.y >= bound.t && pos.y < bound.b) { ... }
+	```

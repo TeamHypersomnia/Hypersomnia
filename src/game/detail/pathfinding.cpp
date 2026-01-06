@@ -1,21 +1,7 @@
-#include <queue>
-#include <cmath>
 #include <limits>
 #include "game/detail/pathfinding.h"
-
-/*
-	A* node for priority queue.
-*/
-
-struct astar_node {
-	vec2i cell;
-	float g_cost;
-	float f_cost;
-
-	bool operator>(const astar_node& other) const {
-		return f_cost > other.f_cost;
-	}
-};
+#include "augs/algorithm/bfs.hpp"
+#include "augs/algorithm/a_star.hpp"
 
 vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy) {
 	const auto cell_size = island.cell_size;
@@ -32,13 +18,12 @@ vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
 }
 
 int cell_distance(const vec2i a, const vec2i b) {
-	return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+	const auto diff = a - b;
+	return std::abs(diff.x) + std::abs(diff.y);
 }
 
 float world_distance(const vec2 a, const vec2 b) {
-	const auto dx = a.x - b.x;
-	const auto dy = a.y - b.y;
-	return std::sqrt(dx * dx + dy * dy);
+	return (a - b).length();
 }
 
 std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
@@ -46,10 +31,8 @@ std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const
 
 	for (std::size_t i = 0; i < navmesh.islands.size(); ++i) {
 		const auto& island = navmesh.islands[i];
-		const auto& bound = island.bound;
 
-		if (pos_i.x >= bound.l && pos_i.x < bound.r &&
-			pos_i.y >= bound.t && pos_i.y < bound.b) {
+		if (island.bound.hover(pos_i)) {
 			return static_cast<int>(i);
 		}
 	}
@@ -86,66 +69,37 @@ std::optional<int> find_islands_connection(
 	context.islands_pathfinding_visited.clear();
 	context.islands_pathfinding_visited.resize(static_cast<std::size_t>(num_islands), 0);
 
-	/*
-		BFS queue: pair of (island_index, first_step_island_index)
-		first_step_island_index tracks what island we went to first from source.
-	*/
-	std::queue<std::pair<int, int>> bfs_queue;
+	auto get_visited = [&](const int island_idx) {
+		return context.islands_pathfinding_visited[island_idx] != 0;
+	};
 
-	/*
-		Mark source as visited.
-	*/
-	context.islands_pathfinding_visited[source_island_index] = 1;
+	auto set_visited = [&](const int island_idx) {
+		context.islands_pathfinding_visited[island_idx] = 1;
+	};
 
-	/*
-		Add all islands reachable from source via portals.
-	*/
-	const auto& source_island = navmesh.islands[source_island_index];
-
-	for (const auto& portal : source_island.portals) {
-		const auto next_island = portal.out_island_index;
-
-		if (next_island >= 0 && next_island < num_islands &&
-			context.islands_pathfinding_visited[next_island] == 0) {
-			context.islands_pathfinding_visited[next_island] = 1;
-
-			if (next_island == target_island_index) {
-				return next_island;
-			}
-
-			bfs_queue.push({ next_island, next_island });
-		}
-	}
-
-	/*
-		BFS.
-	*/
-	while (!bfs_queue.empty()) {
-		const auto [current_island, first_step] = bfs_queue.front();
-		bfs_queue.pop();
-
-		const auto& island = navmesh.islands[current_island];
+	auto for_each_neighbor = [&](const int island_idx, auto&& callback) {
+		const auto& island = navmesh.islands[island_idx];
 
 		for (const auto& portal : island.portals) {
 			const auto next_island = portal.out_island_index;
 
-			if (next_island >= 0 && next_island < num_islands &&
-				context.islands_pathfinding_visited[next_island] == 0) {
-				context.islands_pathfinding_visited[next_island] = 1;
-
-				if (next_island == target_island_index) {
-					return first_step;
-				}
-
-				bfs_queue.push({ next_island, first_step });
+			if (next_island >= 0 && next_island < num_islands) {
+				callback(next_island);
 			}
 		}
-	}
+	};
 
-	/*
-		No path found.
-	*/
-	return std::nullopt;
+	auto on_node_visit = [&](const int island_idx, const int) {
+		return island_idx == target_island_index;
+	};
+
+	return ::bfs_find_path<int>(
+		source_island_index,
+		get_visited,
+		set_visited,
+		for_each_neighbor,
+		on_node_visit
+	);
 }
 
 std::optional<int> find_best_portal_from_to(
@@ -225,14 +179,16 @@ std::optional<pathfinding_path> find_path_within_island(
 		return std::nullopt;
 	}
 
+	const auto bounds = ltrbi(0, 0, size.x, size.y);
+
 	/*
 		Check start and target are within bounds.
 	*/
-	if (start_cell.x < 0 || start_cell.y < 0 || start_cell.x >= size.x || start_cell.y >= size.y) {
+	if (!bounds.hover(start_cell)) {
 		return std::nullopt;
 	}
 
-	if (target_cell.x < 0 || target_cell.y < 0 || target_cell.x >= size.x || target_cell.y >= size.y) {
+	if (!bounds.hover(target_cell)) {
 		return std::nullopt;
 	}
 
@@ -270,7 +226,7 @@ std::optional<pathfinding_path> find_path_within_island(
 	};
 
 	auto is_walkable = [&](const vec2i c) {
-		if (c.x < 0 || c.y < 0 || c.x >= size.x || c.y >= size.y) {
+		if (!bounds.hover(c)) {
 			return false;
 		}
 
@@ -316,16 +272,6 @@ std::optional<pathfinding_path> find_path_within_island(
 	}
 
 	/*
-		A* priority queue.
-	*/
-	std::priority_queue<astar_node, std::vector<astar_node>, std::greater<astar_node>> open_set;
-
-	const auto start_h = static_cast<float>(::cell_distance(start_cell, target_cell));
-
-	open_set.push({ start_cell, 0.0f, start_h });
-	g_costs[cell_index(start_cell)] = 0.0f;
-
-	/*
 		4-directional neighbors (up, down, left, right only).
 	*/
 	const vec2i directions[4] = {
@@ -335,92 +281,102 @@ std::optional<pathfinding_path> find_path_within_island(
 		{ 1,  0 }
 	};
 
-	while (!open_set.empty()) {
-		const auto current = open_set.top();
-		open_set.pop();
+	auto get_visited = [&](const vec2i c) {
+		return context.cells_pathfinding_visited[cell_index(c)] != 0;
+	};
 
-		const auto current_idx = cell_index(current.cell);
+	auto set_visited = [&](const vec2i c) {
+		context.cells_pathfinding_visited[cell_index(c)] = 1;
+	};
 
-		/*
-			Skip if already visited with better cost.
-		*/
-		if (context.cells_pathfinding_visited[current_idx] != 0) {
-			continue;
-		}
-
-		context.cells_pathfinding_visited[current_idx] = 1;
-
-		/*
-			Reached target.
-		*/
-		if (current.cell == target_cell) {
-			/*
-				Reconstruct path.
-			*/
-			pathfinding_path result;
-			result.island_index = island_index;
-
-			std::vector<vec2i> path_cells;
-			auto c = target_cell;
-
-			while (c != start_cell) {
-				path_cells.push_back(c);
-				const auto p = parent[cell_index(c)];
-
-				if (p == 0) {
-					/*
-						Should not happen if algorithm is correct.
-					*/
-					break;
-				}
-
-				c = vec2i((p - 1) % size.x, (p - 1) / size.x);
-			}
-
-			path_cells.push_back(start_cell);
-
-			/*
-				Reverse to get start -> target order.
-			*/
-			for (auto it = path_cells.rbegin(); it != path_cells.rend(); ++it) {
-				result.nodes.push_back(pathfinding_node{ *it });
-			}
-
-			return result;
-		}
-
-		/*
-			Explore neighbors (4-directional).
-		*/
+	auto for_each_neighbor = [&](const vec2i c, auto&& callback) {
 		for (int d = 0; d < 4; ++d) {
-			const auto neighbor = current.cell + directions[d];
+			const auto neighbor = c + directions[d];
 
-			if (!is_walkable(neighbor)) {
-				continue;
-			}
-
-			const auto neighbor_idx = cell_index(neighbor);
-
-			if (context.cells_pathfinding_visited[neighbor_idx] != 0) {
-				continue;
-			}
-
-			const auto tentative_g = current.g_cost + 1.0f;
-
-			if (tentative_g < g_costs[neighbor_idx]) {
-				g_costs[neighbor_idx] = tentative_g;
-				parent[neighbor_idx] = current.cell.y * size.x + current.cell.x + 1;
-
-				const auto h = static_cast<float>(::cell_distance(neighbor, target_cell));
-				open_set.push({ neighbor, tentative_g, tentative_g + h });
+			if (is_walkable(neighbor)) {
+				callback(neighbor);
 			}
 		}
+	};
+
+	auto heuristic = [&](const vec2i c) {
+		return static_cast<float>(::cell_distance(c, target_cell));
+	};
+
+	auto is_target = [&](const vec2i c) {
+		return c == target_cell;
+	};
+
+	auto get_parent = [&](const vec2i c) -> std::optional<vec2i> {
+		const auto p = parent[cell_index(c)];
+		if (p == 0) {
+			return std::nullopt;
+		}
+		return vec2i((p - 1) % size.x, (p - 1) / size.x);
+	};
+
+	auto set_parent = [&](const vec2i child, const vec2i parent_cell) {
+		parent[cell_index(child)] = parent_cell.y * size.x + parent_cell.x + 1;
+	};
+
+	auto get_g_cost = [&](const vec2i c) {
+		return g_costs[cell_index(c)];
+	};
+
+	auto set_g_cost = [&](const vec2i c, const float cost) {
+		g_costs[cell_index(c)] = cost;
+	};
+
+	const auto found = ::astar_find_path<vec2i>(
+		start_cell,
+		get_visited,
+		set_visited,
+		for_each_neighbor,
+		heuristic,
+		is_target,
+		get_parent,
+		set_parent,
+		get_g_cost,
+		set_g_cost
+	);
+
+	if (!found) {
+		return std::nullopt;
 	}
 
 	/*
-		No path found.
+		Reconstruct path.
 	*/
-	return std::nullopt;
+	pathfinding_path result;
+	result.island_index = island_index;
+
+	std::vector<vec2i> path_cells;
+	auto c = target_cell;
+
+	while (c != start_cell) {
+		path_cells.push_back(c);
+		const auto p = get_parent(c);
+
+		if (!p.has_value()) {
+			/*
+				Should not happen if algorithm is correct.
+			*/
+			break;
+		}
+
+		c = p.value();
+	}
+
+	path_cells.push_back(start_cell);
+
+	/*
+		Reverse to get start -> target order.
+	*/
+	for (auto it = path_cells.rbegin(); it != path_cells.rend(); ++it) {
+		result.nodes.push_back(pathfinding_node{ *it });
+	}
+
+	return result;
 }
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
