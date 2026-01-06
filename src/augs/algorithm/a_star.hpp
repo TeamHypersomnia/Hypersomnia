@@ -132,5 +132,4 @@ namespace augs {
 
 		return false;
 	}
-
-} /* namespace augs */
+}
