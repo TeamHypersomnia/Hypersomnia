@@ -54,7 +54,7 @@ inline b2AABB compute_exact_fixture_aabb(
 inline void collect_navmesh_island_bounds(
 	const cosmos& cosm,
 	std::vector<ltrbi>& island_bounds,
-	const int cell_size
+	const uint32_t cell_size
 ) {
 	island_bounds.clear();
 
@@ -142,7 +142,7 @@ inline void collect_navmesh_island_bounds(
 
 	if (!first) {
 		/* Expand the bounding box a bit for navigation */
-		const auto margin = cell_size * 2;
+		const auto margin = static_cast<int>(cell_size * 2);
 		total_aabb.l -= margin;
 		total_aabb.t -= margin;
 		total_aabb.r += margin;
@@ -218,10 +218,11 @@ inline void fill_navmesh_grid_from_fixture(
 		}
 
 		/* Align to grid (expand outward) */
-		const auto grid_l = static_cast<int>(std::floor(lower_px.x / cell_size)) * cell_size;
-		const auto grid_t = static_cast<int>(std::floor(lower_px.y / cell_size)) * cell_size;
-		const auto grid_r = static_cast<int>(std::ceil(upper_px.x / cell_size)) * cell_size;
-		const auto grid_b = static_cast<int>(std::ceil(upper_px.y / cell_size)) * cell_size;
+		const auto cs = static_cast<int>(cell_size);
+		const auto grid_l = static_cast<int>(std::floor(lower_px.x / cs)) * cs;
+		const auto grid_t = static_cast<int>(std::floor(lower_px.y / cs)) * cs;
+		const auto grid_r = static_cast<int>(std::ceil(upper_px.x / cs)) * cs;
+		const auto grid_b = static_cast<int>(std::ceil(upper_px.y / cs)) * cs;
 
 		/*
 			Check if we can use the optimized AABB path:
@@ -243,8 +244,8 @@ inline void fill_navmesh_grid_from_fixture(
 				without per-cell collision testing.
 				Iterate in y, x order for cache-friendliness.
 			*/
-			for (int cy = grid_t; cy < grid_b; cy += cell_size) {
-				for (int cx = grid_l; cx < grid_r; cx += cell_size) {
+			for (int cy = grid_t; cy < grid_b; cy += cs) {
+				for (int cx = grid_l; cx < grid_r; cx += cs) {
 					if (cx < aligned.l || cx >= aligned.r || cy < aligned.t || cy >= aligned.b) {
 						continue;
 					}
@@ -257,14 +258,14 @@ inline void fill_navmesh_grid_from_fixture(
 			/*
 				Standard path: test each cell for overlap with the fixture.
 			*/
-			for (int cy = grid_t; cy < grid_b; cy += cell_size) {
-				for (int cx = grid_l; cx < grid_r; cx += cell_size) {
+			for (int cy = grid_t; cy < grid_b; cy += cs) {
+				for (int cx = grid_l; cx < grid_r; cx += cs) {
 					if (cx < aligned.l || cx >= aligned.r || cy < aligned.t || cy >= aligned.b) {
 						continue;
 					}
 
-					const auto cell_center_x = cx + cell_size / 2.0f;
-					const auto cell_center_y = cy + cell_size / 2.0f;
+					const auto cell_center_x = cx + cs / 2.0f;
+					const auto cell_center_y = cy + cs / 2.0f;
 
 					b2Transform cell_xf;
 					cell_xf.Set(
@@ -297,7 +298,7 @@ inline void rebuild_navmesh_island_occupied(
 	cosmos_navmesh_island& island,
 	const cosmos& cosm
 ) {
-	if (island.cell_size <= 0) {
+	if (island.cell_size == 0) {
 		return;
 	}
 
@@ -481,14 +482,16 @@ inline void process_portals_for_navmesh(
 			/*
 				Compute exit cell position in the target island.
 			*/
-			auto out_cell_pos = vec2i::zero;
+			auto out_cell_pos = vec2u::zero;
 
 			if (exit_island_idx >= 0) {
 				const auto& exit_island = navmesh.islands[exit_island_idx];
-				const auto exit_pos_i = vec2i(exit_pos);
-				const auto bound_lt = vec2i(exit_island.bound.l, exit_island.bound.t);
+				const auto exit_offset = exit_pos - vec2(exit_island.bound.lt());
 
-				out_cell_pos = (exit_pos_i - bound_lt) / exit_island.cell_size;
+				out_cell_pos = vec2u(
+					static_cast<uint32_t>(std::max(0.0f, exit_offset.x) / static_cast<float>(exit_island.cell_size)),
+					static_cast<uint32_t>(std::max(0.0f, exit_offset.y) / static_cast<float>(exit_island.cell_size))
+				);
 			}
 
 			/*
@@ -499,8 +502,11 @@ inline void process_portals_for_navmesh(
 			/*
 				Compute in_cell_pos from the portal's own position.
 			*/
-			const auto portal_pos_i = vec2i(portal_pos);
-			portal_entry.in_cell_pos = (portal_pos_i - island.bound.lt()) / island.cell_size;
+			const auto portal_offset = portal_pos - vec2(island.bound.lt());
+			portal_entry.in_cell_pos = vec2u(
+				static_cast<uint32_t>(std::max(0.0f, portal_offset.x) / static_cast<float>(island.cell_size)),
+				static_cast<uint32_t>(std::max(0.0f, portal_offset.y) / static_cast<float>(island.cell_size))
+			);
 
 			portal_entry.out_cell_pos = out_cell_pos;
 			portal_entry.out_island_index = exit_island_idx;
@@ -524,7 +530,7 @@ inline void process_portals_for_navmesh(
 
 inline cosmos_navmesh generate_navmesh(
 	const cosmos& cosm,
-	const int cell_size
+	const uint32_t cell_size
 ) {
 	cosmos_navmesh navmesh;
 
@@ -534,10 +540,11 @@ inline cosmos_navmesh generate_navmesh(
 	for (const auto& bounds : island_bounds) {
 		/* Align bounds to cell_size grid */
 		auto aligned = bounds;
-		aligned.l = (aligned.l / cell_size) * cell_size;
-		aligned.t = (aligned.t / cell_size) * cell_size;
-		aligned.r = ((aligned.r + cell_size - 1) / cell_size) * cell_size;
-		aligned.b = ((aligned.b + cell_size - 1) / cell_size) * cell_size;
+		const auto cs = static_cast<int>(cell_size);
+		aligned.l = (aligned.l / cs) * cs;
+		aligned.t = (aligned.t / cs) * cs;
+		aligned.r = ((aligned.r + cs - 1) / cs) * cs;
+		aligned.b = ((aligned.b + cs - 1) / cs) * cs;
 
 		cosmos_navmesh_island island;
 		island.bound = aligned;

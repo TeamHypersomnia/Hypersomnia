@@ -6,17 +6,15 @@
 namespace augs {
 
 	/*
-		Generic BFS algorithm.
-		Accepts lambdas for all graph-specific operations.
-
+		BFS algorithm for finding next edge to target.
+		
 		Template parameters:
-		Id - The type of node identifier (transparent to this algorithm)
-		GetVisited - Lambda: (Id) -> bool, returns true if node was visited
-		SetVisited - Lambda: (Id) -> void, marks node as visited
-		ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
-		Callback should return callback_result::CONTINUE or ABORT
-		OnNodeVisit - Lambda: (Id, Id) -> bool, called when visiting a node (current, first_step_from_start)
-		returns true to stop BFS early (target found)
+			Id - The type of node identifier (transparent to this algorithm)
+			Queue - The queue type (typically bfs_queue_type<Id>)
+			GetVisited - Lambda: (Id) -> bool, returns true if node was visited
+			SetVisited - Lambda: (Id) -> void, marks node as visited
+			ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
+			                  Callback should return callback_result::CONTINUE or ABORT
 
 		Returns: std::optional<Id> - the first step from start towards target, or nullopt if not found
 	*/
@@ -29,16 +27,15 @@ namespace augs {
 		class Queue,
 		class GetVisited,
 		class SetVisited,
-		class ForEachNeighbor,
-		class OnNodeVisit
+		class ForEachNeighbor
 	>
-	std::optional<Id> bfs_find_path(
+	std::optional<Id> bfs_find_next_edge(
 		Queue& bfs_queue,
 		const Id start,
+		const Id target,
 		GetVisited&& get_visited,
 		SetVisited&& set_visited,
-		ForEachNeighbor&& for_each_neighbor,
-		OnNodeVisit&& on_node_visit
+		ForEachNeighbor&& for_each_neighbor
 	) {
 		/*
 			Clear the queue for reuse.
@@ -48,46 +45,50 @@ namespace augs {
 		}
 
 		/*
+			Check if start is already the target.
+		*/
+		if (start == target) {
+			return start;
+		}
+
+		/*
 			Mark start as visited.
 		*/
 		set_visited(start);
 
 		/*
-			Check if start itself is the target.
+			Process neighbors and BFS loop.
 		*/
-		if (on_node_visit(start, start)) {
-			return start;
-		}
+		std::optional<Id> result;
 
-		/*
-			Add all neighbors of start to the queue.
-		*/
-		std::optional<Id> early_result;
-
-		for_each_neighbor(start, [&](const Id neighbor) {
-			if (early_result.has_value()) {
+		auto process_neighbor = [&](const Id first_step, const Id neighbor) {
+			if (result.has_value()) {
 				return callback_result::ABORT;
 			}
 
 			if (!get_visited(neighbor)) {
 				set_visited(neighbor);
 
-				if (on_node_visit(neighbor, neighbor)) {
-					/*
-						Target found at first step.
-					*/
-					early_result = neighbor;
+				if (neighbor == target) {
+					result = first_step;
 					return callback_result::ABORT;
 				}
 
-				bfs_queue.push({ neighbor, neighbor });
+				bfs_queue.push({ neighbor, first_step });
 			}
 
 			return callback_result::CONTINUE;
+		};
+
+		/*
+			Process start's neighbors (first_step == neighbor for direct neighbors of start).
+		*/
+		for_each_neighbor(start, [&](const Id neighbor) {
+			return process_neighbor(neighbor, neighbor);
 		});
 
-		if (early_result.has_value()) {
-			return early_result;
+		if (result.has_value()) {
+			return result;
 		}
 
 		/*
@@ -97,32 +98,16 @@ namespace augs {
 			const auto [current, first_step] = bfs_queue.front();
 			bfs_queue.pop();
 
-			std::optional<Id> found_result;
-
 			for_each_neighbor(current, [&](const Id neighbor) {
-				if (found_result.has_value()) {
-					return callback_result::ABORT;
-				}
-
-				if (!get_visited(neighbor)) {
-					set_visited(neighbor);
-
-					if (on_node_visit(neighbor, first_step)) {
-						found_result = first_step;
-						return callback_result::ABORT;
-					}
-
-					bfs_queue.push({ neighbor, first_step });
-				}
-
-				return callback_result::CONTINUE;
+				return process_neighbor(first_step, neighbor);
 			});
 
-			if (found_result.has_value()) {
-				return found_result;
+			if (result.has_value()) {
+				return result;
 			}
 		}
 
 		return std::nullopt;
 	}
-}
+
+} /* namespace augs */

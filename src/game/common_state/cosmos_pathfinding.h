@@ -12,7 +12,7 @@
 
 struct pathfinding_node {
 	// GEN INTROSPECTOR struct pathfinding_node
-	vec2i cell_xy = vec2i::zero;
+	vec2u cell_xy = vec2u::zero;
 	// END GEN INTROSPECTOR
 };
 
@@ -48,6 +48,6 @@ struct pathfinding_context {
 	/*
 		Reusable queues for pathfinding algorithms.
 	*/
-	augs::astar_queue_type<vec2i> astar_queue;
+	augs::astar_queue_type<vec2u> astar_queue;
 	augs::bfs_queue_type<std::size_t> bfs_queue;
 };

@@ -2229,7 +2229,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					for (std::size_t i = 0; i < path.nodes.size(); ++i) {
 						const auto& node = path.nodes[i];
 						const auto world_lt = vec2(island.bound.lt()) + vec2(node.cell_xy) * static_cast<float>(cell_size);
-						const auto world_rb = world_lt + vec2::square(cell_size);
+						const auto world_rb = world_lt + vec2::square(static_cast<float>(cell_size));
 
 						const auto screen_lt = on_screen(world_lt);
 						const auto screen_rb = on_screen(world_rb);
@@ -2245,7 +2245,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 						*/
 						if (i + 1 < path.nodes.size()) {
 							const auto& next_node = path.nodes[i + 1];
-							const auto dir = vec2(next_node.cell_xy - node.cell_xy);
+							const auto dir = vec2i(next_node.cell_xy) - vec2i(node.cell_xy);
 
 							const auto center_world = world_lt + vec2::square(static_cast<float>(cell_size) / 2);
 							const auto center_screen = on_screen(center_world);
@@ -2253,7 +2253,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 							/*
 								Compute rotation angle from direction.
 							*/
-							const auto angle = dir.degrees();
+							const auto angle = vec2(dir).degrees();
 
 							augs::detail_sprite(
 								triangles.output_buffer,

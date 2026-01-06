@@ -565,7 +565,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				Generate actual navmesh from the physics world using the helper.
 			*/
 
-			const auto cell_size = std::max(16, project.settings.navmesh_cell_size);
+			const auto cell_size = std::max(16u, project.settings.navmesh_cell_size);
 			const auto new_navmesh = generate_navmesh(scene.world, cell_size);
 
 			common.navmesh = new_navmesh;
