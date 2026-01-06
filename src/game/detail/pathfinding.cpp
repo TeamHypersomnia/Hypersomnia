@@ -329,7 +329,6 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		for_each_neighbor,
 		heuristic,
 		is_target,
-		get_parent,
 		set_parent,
 		get_g_cost,
 		set_g_cost
