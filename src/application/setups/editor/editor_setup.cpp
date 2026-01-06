@@ -71,7 +71,7 @@
 
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
-#include "game/detail/pathfinding.hpp"
+#include "game/detail/pathfinding.h"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"

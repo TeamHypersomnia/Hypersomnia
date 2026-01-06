@@ -751,6 +751,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/physics/physics_friction_fields.cpp"
 	"src/game/detail/physics/ray_casts.cpp"
 	"src/game/detail/physics/physics_scripts.cpp"
+	"src/game/detail/pathfinding.cpp"
 	"src/game/detail/visible_entities.cpp"
 	"src/game/detail/inventory/wielding_result.cpp"
 	"src/game/enums/attitude_type.cpp"

@@ -44,6 +44,7 @@ struct pathfinding_context {
 
 struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
+	vec2i in_cell_pos = vec2i::zero;
 	vec2i out_cell_pos = vec2i::zero;
 	int out_island_index = 0;
 	// END GEN INTROSPECTOR
