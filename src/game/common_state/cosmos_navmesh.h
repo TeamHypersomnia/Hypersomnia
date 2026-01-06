@@ -15,6 +15,12 @@ struct navmesh_portal {
 };
 
 struct cosmos_navmesh_island {
+	/*
+		0  - free
+		1  - occupied
+		>2 - portals, identified (2 + portal_index) 
+			 considered occupied, EXCEPT when targeting this exact portal.
+	*/
 	// GEN INTROSPECTOR struct cosmos_navmesh_island
 	std::vector<uint8_t> occupied;
 	std::vector<navmesh_portal> portals;
