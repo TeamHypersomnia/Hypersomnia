@@ -20,13 +20,12 @@ namespace augs {
 		Callback should return callback_result::CONTINUE or ABORT
 		Heuristic - Lambda: (Id) -> float, returns estimated distance to target
 		IsTarget - Lambda: (Id) -> bool, returns true if this is the target node
-		GetParent - Lambda: (Id) -> std::optional<Id>, returns parent of node (for path reconstruction)
 		SetParent - Lambda: (Id, Id) -> void, sets parent of first arg to second arg
 		GetGCost - Lambda: (Id) -> float, returns g-cost (distance from start)
 		SetGCost - Lambda: (Id, float) -> void, sets g-cost
 
 		Returns: bool - true if path was found, false otherwise
-		Path can be reconstructed using GetParent starting from target.
+		Path can be reconstructed using GetParent (that you implement yourself) starting from target.
 	*/
 
 	template <class Id>
