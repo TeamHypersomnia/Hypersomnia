@@ -43,16 +43,30 @@ std::optional<Id> bfs_find_path(
 	set_visited(start);
 
 	/*
+		Check if start itself is the target.
+	*/
+	if (on_node_visit(start, start)) {
+		return start;
+	}
+
+	/*
 		Add all neighbors of start to the queue.
 	*/
+	std::optional<Id> early_result;
+
 	for_each_neighbor(start, [&](const Id neighbor) {
+		if (early_result.has_value()) {
+			return;
+		}
+
 		if (!get_visited(neighbor)) {
 			set_visited(neighbor);
 
 			if (on_node_visit(neighbor, neighbor)) {
 				/*
-					Early exit signal - target found at first step.
+					Target found at first step.
 				*/
+				early_result = neighbor;
 				return;
 			}
 
@@ -60,11 +74,8 @@ std::optional<Id> bfs_find_path(
 		}
 	});
 
-	/*
-		If the queue is empty and we got here, check if start was the target.
-	*/
-	if (bfs_queue.empty()) {
-		return std::nullopt;
+	if (early_result.has_value()) {
+		return early_result;
 	}
 
 	/*
@@ -74,11 +85,10 @@ std::optional<Id> bfs_find_path(
 		const auto [current, first_step] = bfs_queue.front();
 		bfs_queue.pop();
 
-		bool found = false;
-		Id found_first_step = first_step;
+		std::optional<Id> found_result;
 
 		for_each_neighbor(current, [&](const Id neighbor) {
-			if (found) {
+			if (found_result.has_value()) {
 				return;
 			}
 
@@ -86,8 +96,7 @@ std::optional<Id> bfs_find_path(
 				set_visited(neighbor);
 
 				if (on_node_visit(neighbor, first_step)) {
-					found = true;
-					found_first_step = first_step;
+					found_result = first_step;
 					return;
 				}
 
@@ -95,8 +104,8 @@ std::optional<Id> bfs_find_path(
 			}
 		});
 
-		if (found) {
-			return found_first_step;
+		if (found_result.has_value()) {
+			return found_result;
 		}
 	}
 
