@@ -2259,7 +2259,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 							/*
 								Compute rotation angle from direction.
 							*/
-							const auto angle = std::atan2(dir.y, dir.x) * (180.0f / 3.14159265f);
+							const auto angle = std::atan2(dir.y, dir.x) * RAD_TO_DEG<float>;
 
 							augs::detail_sprite(
 								triangles.output_buffer,
