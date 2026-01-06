@@ -264,3 +264,63 @@
 	/* Bad */
 	if (pos.x >= bound.l && pos.x < bound.r && pos.y >= bound.t && pos.y < bound.b) { ... }
 	```
+
+- You can cast between `vec2` (float) and `vec2i` (int) freely:
+	```cpp
+	const auto float_vec = vec2(int_vec);
+	const auto int_vec = vec2i(float_vec);
+	```
+
+- Use `vec2::square(side)` for creating square vectors instead of `vec2(side, side)`:
+	```cpp
+	/* Good */
+	const auto cell_size_vec = vec2::square(cell_size);
+	
+	/* Bad */
+	const auto cell_size_vec = vec2(cell_size, cell_size);
+	```
+
+- Use `reverse()` wrapper from `augs/templates/reversion_wrapper.h` for reverse iteration:
+	```cpp
+	/* Good */
+	for (const auto& item : reverse(container)) { ... }
+	
+	/* Bad */
+	for (auto it = container.rbegin(); it != container.rend(); ++it) { ... }
+	```
+
+- Use `callback_result::CONTINUE` or `callback_result::ABORT` from `augs/enums/callback_result.h` for callbacks that can continue or abort:
+	```cpp
+	for_each_item([&](const auto& item) {
+		if (should_stop) {
+			return callback_result::ABORT;
+		}
+		// process item
+		return callback_result::CONTINUE;
+	});
+	```
+
+- When implementing new functionality in the `augs/` folder, always put it in the `augs::` namespace.
+
+## Common vec2 and ltrb functions (from augs/math/vec2.h and augs/math/rects.h)
+
+- `float vec2::length()` - get the length of a vector
+- `float vec2::degrees()` - get the angle of a vector in degrees
+- `float vec2::radians()` - get the angle of a vector in radians
+- `vec2 vec2::normalize()` - normalize the vector
+- `type vec2::dot(vec2)` - dot product
+- `type vec2::cross(vec2)` - cross product
+- `type vec2::area()` - area (x * y)
+- `static vec2 vec2::square(side)` - create a square vector (side, side)
+- `static vec2 vec2::from_degrees(deg)` - create unit vector from degrees
+- `vec2 ltrb::lt()` - left-top corner (alias for left_top())
+- `vec2 ltrb::rb()` - right-bottom corner (alias for right_bottom())
+- `vec2 ltrb::rt()` - right-top corner (alias for right_top())
+- `vec2 ltrb::lb()` - left-bottom corner (alias for left_bottom())
+- `vec2 ltrb::get_center()` - center of the rectangle
+- `vec2 ltrb::get_size()` - size of the rectangle (width, height)
+- `bool ltrb::hover(vec2)` - check if point is inside the rectangle
+- `bool ltrb::hover(ltrb)` - check if rectangles overlap
+- `T ltrb::w()` - width of the rectangle
+- `T ltrb::h()` - height of the rectangle
+- `T ltrb::area()` - area of the rectangle (w * h)

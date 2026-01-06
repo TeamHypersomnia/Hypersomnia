@@ -2,19 +2,15 @@
 #include "game/detail/pathfinding.h"
 #include "augs/algorithm/bfs.hpp"
 #include "augs/algorithm/a_star.hpp"
+#include "augs/templates/reversion_wrapper.h"
 
 vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy) {
-	const auto cell_size = island.cell_size;
-	const auto world_x = static_cast<float>(island.bound.l + cell_xy.x * cell_size + cell_size / 2);
-	const auto world_y = static_cast<float>(island.bound.t + cell_xy.y * cell_size + cell_size / 2);
-	return vec2(world_x, world_y);
+	const auto cell_size = static_cast<float>(island.cell_size);
+	return vec2(island.bound.lt()) + vec2(cell_xy) * cell_size + vec2::square(cell_size / 2);
 }
 
 vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
-	const auto cell_size = island.cell_size;
-	const auto cell_x = (static_cast<int>(world_pos.x) - island.bound.l) / cell_size;
-	const auto cell_y = (static_cast<int>(world_pos.y) - island.bound.t) / cell_size;
-	return vec2i(cell_x, cell_y);
+	return vec2i((world_pos - vec2(island.bound.lt())) / static_cast<float>(island.cell_size));
 }
 
 int cell_distance(const vec2i a, const vec2i b) {
@@ -26,35 +22,31 @@ float world_distance(const vec2 a, const vec2 b) {
 	return (a - b).length();
 }
 
-std::optional<int> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
-	const auto pos_i = vec2i(static_cast<int>(world_pos.x), static_cast<int>(world_pos.y));
+std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
+	const auto pos_i = vec2i(world_pos);
 
 	for (std::size_t i = 0; i < navmesh.islands.size(); ++i) {
 		const auto& island = navmesh.islands[i];
 
 		if (island.bound.hover(pos_i)) {
-			return static_cast<int>(i);
+			return i;
 		}
 	}
 
 	return std::nullopt;
 }
 
-std::optional<int> find_islands_connection(
+std::optional<std::size_t> find_islands_connection(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	pathfinding_context* ctx
 ) {
 	if (source_island_index == target_island_index) {
 		return source_island_index;
 	}
 
-	if (source_island_index < 0 || target_island_index < 0) {
-		return std::nullopt;
-	}
-
-	const auto num_islands = static_cast<int>(navmesh.islands.size());
+	const auto num_islands = navmesh.islands.size();
 
 	if (source_island_index >= num_islands || target_island_index >= num_islands) {
 		return std::nullopt;
@@ -67,33 +59,36 @@ std::optional<int> find_islands_connection(
 	pathfinding_context& context = ctx != nullptr ? *ctx : local_ctx;
 
 	context.islands_pathfinding_visited.clear();
-	context.islands_pathfinding_visited.resize(static_cast<std::size_t>(num_islands), 0);
+	context.islands_pathfinding_visited.resize(num_islands, 0);
 
-	auto get_visited = [&](const int island_idx) {
+	auto get_visited = [&](const std::size_t island_idx) {
 		return context.islands_pathfinding_visited[island_idx] != 0;
 	};
 
-	auto set_visited = [&](const int island_idx) {
+	auto set_visited = [&](const std::size_t island_idx) {
 		context.islands_pathfinding_visited[island_idx] = 1;
 	};
 
-	auto for_each_neighbor = [&](const int island_idx, auto&& callback) {
+	auto for_each_neighbor = [&](const std::size_t island_idx, auto&& callback) {
 		const auto& island = navmesh.islands[island_idx];
 
 		for (const auto& portal : island.portals) {
-			const auto next_island = portal.out_island_index;
+			const auto next_island = static_cast<std::size_t>(portal.out_island_index);
 
-			if (next_island >= 0 && next_island < num_islands) {
-				callback(next_island);
+			if (portal.out_island_index >= 0 && next_island < num_islands) {
+				if (callback(next_island) == callback_result::ABORT) {
+					return;
+				}
 			}
 		}
 	};
 
-	auto on_node_visit = [&](const int island_idx, const int) {
+	auto on_node_visit = [&](const std::size_t island_idx, const std::size_t) {
 		return island_idx == target_island_index;
 	};
 
-	return ::bfs_find_path<int>(
+	return augs::bfs_find_path(
+		context.bfs_queue,
 		source_island_index,
 		get_visited,
 		set_visited,
@@ -102,20 +97,20 @@ std::optional<int> find_islands_connection(
 	);
 }
 
-std::optional<int> find_best_portal_from_to(
+std::optional<std::size_t> find_best_portal_from_to(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	const vec2 from_pos,
 	const vec2 to_pos
 ) {
-	if (source_island_index < 0 || source_island_index >= static_cast<int>(navmesh.islands.size())) {
+	if (source_island_index >= navmesh.islands.size()) {
 		return std::nullopt;
 	}
 
 	const auto& source_island = navmesh.islands[source_island_index];
 
-	std::optional<int> best_portal_index;
+	std::optional<std::size_t> best_portal_index;
 	auto best_distance = std::numeric_limits<float>::max();
 
 	for (std::size_t p = 0; p < source_island.portals.size(); ++p) {
@@ -125,7 +120,7 @@ std::optional<int> find_best_portal_from_to(
 			For same-island portals: out_island_index == source_island_index
 			For cross-island portals: out_island_index == target_island_index
 		*/
-		if (portal.out_island_index != target_island_index) {
+		if (static_cast<std::size_t>(portal.out_island_index) != target_island_index) {
 			continue;
 		}
 
@@ -139,7 +134,7 @@ std::optional<int> find_best_portal_from_to(
 		*/
 		vec2 exit_pos = to_pos;
 
-		if (target_island_index >= 0 && target_island_index < static_cast<int>(navmesh.islands.size())) {
+		if (target_island_index < navmesh.islands.size()) {
 			const auto& target_island = navmesh.islands[target_island_index];
 			exit_pos = ::cell_to_world(target_island, portal.out_cell_pos);
 		}
@@ -153,26 +148,20 @@ std::optional<int> find_best_portal_from_to(
 
 		if (total_dist < best_distance) {
 			best_distance = total_dist;
-			best_portal_index = static_cast<int>(p);
+			best_portal_index = p;
 		}
 	}
 
 	return best_portal_index;
 }
 
-std::optional<pathfinding_path> find_path_within_island(
-	const cosmos_navmesh& navmesh,
-	const int island_index,
+std::optional<std::vector<pathfinding_node>> find_path_within_island(
+	const cosmos_navmesh_island& island,
 	const vec2i start_cell,
 	const vec2i target_cell,
-	const int target_portal_index,
+	const std::optional<std::size_t> target_portal_index,
 	pathfinding_context* ctx
 ) {
-	if (island_index < 0 || island_index >= static_cast<int>(navmesh.islands.size())) {
-		return std::nullopt;
-	}
-
-	const auto& island = navmesh.islands[island_index];
 	const auto size = island.get_size_in_cells();
 
 	if (size.x <= 0 || size.y <= 0) {
@@ -196,9 +185,8 @@ std::optional<pathfinding_path> find_path_within_island(
 		Same cell.
 	*/
 	if (start_cell == target_cell) {
-		pathfinding_path result;
-		result.island_index = island_index;
-		result.nodes.push_back(pathfinding_node{ start_cell });
+		std::vector<pathfinding_node> result;
+		result.push_back(pathfinding_node{ start_cell });
 		return result;
 	}
 
@@ -208,21 +196,25 @@ std::optional<pathfinding_path> find_path_within_island(
 	pathfinding_context local_ctx;
 	pathfinding_context& context = ctx != nullptr ? *ctx : local_ctx;
 
-	const auto grid_size = static_cast<std::size_t>(size.x * size.y);
+	const auto grid_size = static_cast<std::size_t>(size.area());
 	context.cells_pathfinding_visited.clear();
 	context.cells_pathfinding_visited.resize(grid_size, 0);
 
 	/*
 		Parent tracking for path reconstruction.
-		Store parent as (y * size.x + x + 1), where +1 avoids confusion with 0.
+		-1 means unset, 0 is the first valid cell.
 	*/
-	std::vector<int> parent(grid_size, 0);
-	std::vector<float> g_costs(grid_size, std::numeric_limits<float>::max());
+	context.cells_parent.clear();
+	context.cells_parent.resize(grid_size, -1);
+	context.cells_g_costs.clear();
+	context.cells_g_costs.resize(grid_size, std::numeric_limits<float>::max());
 
-	const auto target_portal_value = target_portal_index >= 0 ? static_cast<uint8_t>(2 + target_portal_index) : static_cast<uint8_t>(0);
+	const auto target_portal_value = target_portal_index.has_value() 
+		? static_cast<uint8_t>(2 + target_portal_index.value()) 
+		: static_cast<uint8_t>(0);
 
-	auto cell_index = [&](const vec2i c) {
-		return static_cast<std::size_t>(c.y * size.x + c.x);
+	auto get_cell_index = [&](const vec2i c) {
+		return island.cell_index(c);
 	};
 
 	auto is_walkable = [&](const vec2i c) {
@@ -250,7 +242,7 @@ std::optional<pathfinding_path> find_path_within_island(
 			>= 2 = portal cells.
 			Only walkable if it's the target portal.
 		*/
-		if (target_portal_index >= 0 && value == target_portal_value) {
+		if (target_portal_index.has_value() && value == target_portal_value) {
 			return true;
 		}
 
@@ -282,11 +274,11 @@ std::optional<pathfinding_path> find_path_within_island(
 	};
 
 	auto get_visited = [&](const vec2i c) {
-		return context.cells_pathfinding_visited[cell_index(c)] != 0;
+		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
 	};
 
 	auto set_visited = [&](const vec2i c) {
-		context.cells_pathfinding_visited[cell_index(c)] = 1;
+		context.cells_pathfinding_visited[get_cell_index(c)] = 1;
 	};
 
 	auto for_each_neighbor = [&](const vec2i c, auto&& callback) {
@@ -294,7 +286,9 @@ std::optional<pathfinding_path> find_path_within_island(
 			const auto neighbor = c + directions[d];
 
 			if (is_walkable(neighbor)) {
-				callback(neighbor);
+				if (callback(neighbor) == callback_result::ABORT) {
+					return;
+				}
 			}
 		}
 	};
@@ -308,26 +302,27 @@ std::optional<pathfinding_path> find_path_within_island(
 	};
 
 	auto get_parent = [&](const vec2i c) -> std::optional<vec2i> {
-		const auto p = parent[cell_index(c)];
-		if (p == 0) {
+		const auto p = context.cells_parent[get_cell_index(c)];
+		if (p < 0) {
 			return std::nullopt;
 		}
-		return vec2i((p - 1) % size.x, (p - 1) / size.x);
+		return vec2i(p % size.x, p / size.x);
 	};
 
 	auto set_parent = [&](const vec2i child, const vec2i parent_cell) {
-		parent[cell_index(child)] = parent_cell.y * size.x + parent_cell.x + 1;
+		context.cells_parent[get_cell_index(child)] = parent_cell.y * size.x + parent_cell.x;
 	};
 
 	auto get_g_cost = [&](const vec2i c) {
-		return g_costs[cell_index(c)];
+		return context.cells_g_costs[get_cell_index(c)];
 	};
 
 	auto set_g_cost = [&](const vec2i c, const float cost) {
-		g_costs[cell_index(c)] = cost;
+		context.cells_g_costs[get_cell_index(c)] = cost;
 	};
 
-	const auto found = ::astar_find_path<vec2i>(
+	const auto found = augs::astar_find_path(
+		context.astar_queue,
 		start_cell,
 		get_visited,
 		set_visited,
@@ -347,9 +342,6 @@ std::optional<pathfinding_path> find_path_within_island(
 	/*
 		Reconstruct path.
 	*/
-	pathfinding_path result;
-	result.island_index = island_index;
-
 	std::vector<vec2i> path_cells;
 	auto c = target_cell;
 
@@ -372,8 +364,9 @@ std::optional<pathfinding_path> find_path_within_island(
 	/*
 		Reverse to get start -> target order.
 	*/
-	for (auto it = path_cells.rbegin(); it != path_cells.rend(); ++it) {
-		result.nodes.push_back(pathfinding_node{ *it });
+	std::vector<pathfinding_node> result;
+	for (const auto& cell : reverse(path_cells)) {
+		result.push_back(pathfinding_node{ cell });
 	}
 
 	return result;
@@ -381,13 +374,13 @@ std::optional<pathfinding_path> find_path_within_island(
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
 	const cosmos_navmesh& navmesh,
-	const int source_island_index,
-	const int target_island_index,
+	const std::size_t source_island_index,
+	const std::size_t target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
 	pathfinding_context* ctx
 ) {
-	if (source_island_index < 0 || source_island_index >= static_cast<int>(navmesh.islands.size())) {
+	if (source_island_index >= navmesh.islands.size()) {
 		return std::nullopt;
 	}
 
@@ -416,28 +409,31 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	/*
 		Find path to portal center.
 	*/
-	auto path_result = ::find_path_within_island(
-		navmesh,
-		source_island_index,
+	auto path_nodes = ::find_path_within_island(
+		source_island,
 		start_cell,
 		portal_center,
 		best_portal,
 		ctx
 	);
 
-	if (!path_result.has_value()) {
+	if (!path_nodes.has_value()) {
 		return std::nullopt;
 	}
+
+	pathfinding_path result;
+	result.island_index = source_island_index;
+	result.nodes = std::move(path_nodes.value());
 
 	/*
 		Set final_portal_node to indicate teleportation destination.
 	*/
-	path_result->final_portal_node = cell_on_island{
-		portal.out_island_index,
+	result.final_portal_node = cell_on_island{
+		static_cast<std::size_t>(portal.out_island_index),
 		pathfinding_node{ portal.out_cell_pos }
 	};
 
-	return path_result;
+	return result;
 }
 
 std::optional<pathfinding_path> find_path_across_islands_many(
@@ -491,21 +487,23 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 				/*
 					Use portal route.
 				*/
-				auto path_result = ::find_path_within_island(
-					navmesh,
-					source_island,
+				auto path_nodes = ::find_path_within_island(
+					island,
 					start_cell,
 					portal.in_cell_pos,
 					best_same_island_portal,
 					ctx
 				);
 
-				if (path_result.has_value()) {
-					path_result->final_portal_node = cell_on_island{
+				if (path_nodes.has_value()) {
+					pathfinding_path result;
+					result.island_index = source_island;
+					result.nodes = std::move(path_nodes.value());
+					result.final_portal_node = cell_on_island{
 						source_island,
 						pathfinding_node{ portal.out_cell_pos }
 					};
-					return path_result;
+					return result;
 				}
 			}
 		}
@@ -513,14 +511,22 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 		/*
 			Direct path within island.
 		*/
-		return ::find_path_within_island(
-			navmesh,
-			source_island,
+		auto path_nodes = ::find_path_within_island(
+			island,
 			start_cell,
 			target_cell,
-			-1,
+			std::nullopt,
 			ctx
 		);
+
+		if (!path_nodes.has_value()) {
+			return std::nullopt;
+		}
+
+		pathfinding_path result;
+		result.island_index = source_island;
+		result.nodes = std::move(path_nodes.value());
+		return result;
 	}
 
 	/*
@@ -583,7 +589,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 		const auto& portal_node = path_result->final_portal_node.value();
 		const auto exit_island_idx = portal_node.island_index;
 
-		if (exit_island_idx < 0 || exit_island_idx >= static_cast<int>(navmesh.islands.size())) {
+		if (exit_island_idx >= navmesh.islands.size()) {
 			break;
 		}
 

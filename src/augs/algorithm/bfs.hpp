@@ -1,6 +1,9 @@
 #pragma once
 #include <optional>
 #include <queue>
+#include "augs/enums/callback_result.h"
+
+namespace augs {
 
 /*
 	Generic BFS algorithm.
@@ -11,20 +14,26 @@
 		GetVisited - Lambda: (Id) -> bool, returns true if node was visited
 		SetVisited - Lambda: (Id) -> void, marks node as visited
 		ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
+		                  Callback should return callback_result::CONTINUE or ABORT
 		OnNodeVisit - Lambda: (Id, Id) -> bool, called when visiting a node (current, first_step_from_start)
 		              returns true to stop BFS early (target found)
 
 	Returns: std::optional<Id> - the first step from start towards target, or nullopt if not found
 */
 
+template <class Id>
+using bfs_queue_type = std::queue<std::pair<Id, Id>>;
+
 template <
 	class Id,
+	class Queue,
 	class GetVisited,
 	class SetVisited,
 	class ForEachNeighbor,
 	class OnNodeVisit
 >
 std::optional<Id> bfs_find_path(
+	Queue& bfs_queue,
 	const Id start,
 	GetVisited&& get_visited,
 	SetVisited&& set_visited,
@@ -32,10 +41,11 @@ std::optional<Id> bfs_find_path(
 	OnNodeVisit&& on_node_visit
 ) {
 	/*
-		BFS queue: pair of (current_id, first_step_id)
-		first_step_id tracks what node we went to first from start.
+		Clear the queue for reuse.
 	*/
-	std::queue<std::pair<Id, Id>> bfs_queue;
+	while (!bfs_queue.empty()) {
+		bfs_queue.pop();
+	}
 
 	/*
 		Mark start as visited.
@@ -56,7 +66,7 @@ std::optional<Id> bfs_find_path(
 
 	for_each_neighbor(start, [&](const Id neighbor) {
 		if (early_result.has_value()) {
-			return;
+			return callback_result::ABORT;
 		}
 
 		if (!get_visited(neighbor)) {
@@ -67,11 +77,13 @@ std::optional<Id> bfs_find_path(
 					Target found at first step.
 				*/
 				early_result = neighbor;
-				return;
+				return callback_result::ABORT;
 			}
 
 			bfs_queue.push({ neighbor, neighbor });
 		}
+
+		return callback_result::CONTINUE;
 	});
 
 	if (early_result.has_value()) {
@@ -89,7 +101,7 @@ std::optional<Id> bfs_find_path(
 
 		for_each_neighbor(current, [&](const Id neighbor) {
 			if (found_result.has_value()) {
-				return;
+				return callback_result::ABORT;
 			}
 
 			if (!get_visited(neighbor)) {
@@ -97,11 +109,13 @@ std::optional<Id> bfs_find_path(
 
 				if (on_node_visit(neighbor, first_step)) {
 					found_result = first_step;
-					return;
+					return callback_result::ABORT;
 				}
 
 				bfs_queue.push({ neighbor, first_step });
 			}
+
+			return callback_result::CONTINUE;
 		});
 
 		if (found_result.has_value()) {
@@ -111,3 +125,5 @@ std::optional<Id> bfs_find_path(
 
 	return std::nullopt;
 }
+
+} /* namespace augs */

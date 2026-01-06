@@ -1,7 +1,10 @@
 #pragma once
 #include <optional>
+#include <queue>
 #include <vector>
 #include "augs/math/vec2.h"
+#include "augs/algorithm/a_star.hpp"
+#include "augs/algorithm/bfs.hpp"
 
 /*
 	Pathfinding structures.
@@ -15,14 +18,14 @@ struct pathfinding_node {
 
 struct cell_on_island {
 	// GEN INTROSPECTOR struct cell_on_island
-	int island_index = 0;
+	std::size_t island_index = 0;
 	pathfinding_node node;
 	// END GEN INTROSPECTOR
 };
 
 struct pathfinding_path {
 	// GEN INTROSPECTOR struct pathfinding_path
-	int island_index = 0;
+	std::size_t island_index = 0;
 	std::vector<pathfinding_node> nodes;
 	std::optional<cell_on_island> final_portal_node;
 	// END GEN INTROSPECTOR
@@ -35,4 +38,16 @@ struct pathfinding_path {
 struct pathfinding_context {
 	std::vector<uint8_t> islands_pathfinding_visited;
 	std::vector<uint8_t> cells_pathfinding_visited;
+
+	/*
+		Reusable allocations for A* within-island pathfinding.
+	*/
+	std::vector<int> cells_parent;
+	std::vector<float> cells_g_costs;
+
+	/*
+		Reusable queues for pathfinding algorithms.
+	*/
+	augs::astar_queue_type<vec2i> astar_queue;
+	augs::bfs_queue_type<std::size_t> bfs_queue;
 };
