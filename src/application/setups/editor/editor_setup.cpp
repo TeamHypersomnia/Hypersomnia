@@ -2212,7 +2212,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, &pf_ctx);
 
 				for (const auto& path : all_paths) {
-					if (path.island_index < 0 || path.island_index >= static_cast<int>(navmesh.islands.size())) {
+					if (path.island_index >= navmesh.islands.size()) {
 						continue;
 					}
 
@@ -2229,7 +2229,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					for (std::size_t i = 0; i < path.nodes.size(); ++i) {
 						const auto& node = path.nodes[i];
 						const auto world_lt = vec2(island.bound.lt()) + vec2(node.cell_xy) * static_cast<float>(cell_size);
-						const auto world_rb = world_lt + vec2::square(static_cast<float>(cell_size));
+						const auto world_rb = world_lt + vec2::square(cell_size);
 
 						const auto screen_lt = on_screen(world_lt);
 						const auto screen_rb = on_screen(world_rb);
