@@ -4,18 +4,24 @@
 #include "augs/algorithm/a_star.hpp"
 #include "augs/templates/reversion_wrapper.h"
 
-vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy) {
+vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2u cell_xy) {
 	const auto cell_size = static_cast<float>(island.cell_size);
 	return vec2(island.bound.lt()) + vec2(cell_xy) * cell_size + vec2::square(cell_size / 2);
 }
 
-vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
-	return vec2i((world_pos - vec2(island.bound.lt())) / static_cast<float>(island.cell_size));
+vec2u world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos) {
+	const auto offset = world_pos - vec2(island.bound.lt());
+	const auto cell_size = static_cast<float>(island.cell_size);
+	return vec2u(
+		static_cast<uint32_t>(std::max(0.0f, offset.x) / cell_size),
+		static_cast<uint32_t>(std::max(0.0f, offset.y) / cell_size)
+	);
 }
 
-int cell_distance(const vec2i a, const vec2i b) {
-	const auto diff = a - b;
-	return std::abs(diff.x) + std::abs(diff.y);
+uint32_t cell_distance(const vec2u a, const vec2u b) {
+	const auto dx = a.x > b.x ? a.x - b.x : b.x - a.x;
+	const auto dy = a.y > b.y ? a.y - b.y : b.y - a.y;
+	return dx + dy;
 }
 
 float world_distance(const vec2 a, const vec2 b) {
@@ -83,17 +89,13 @@ std::optional<std::size_t> find_islands_connection(
 		}
 	};
 
-	auto on_node_visit = [&](const std::size_t island_idx, const std::size_t) {
-		return island_idx == target_island_index;
-	};
-
-	return augs::bfs_find_path(
+	return augs::bfs_find_next_edge(
 		context.bfs_queue,
 		source_island_index,
+		target_island_index,
 		get_visited,
 		set_visited,
-		for_each_neighbor,
-		on_node_visit
+		for_each_neighbor
 	);
 }
 
@@ -157,27 +159,25 @@ std::optional<std::size_t> find_best_portal_from_to(
 
 std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	const cosmos_navmesh_island& island,
-	const vec2i start_cell,
-	const vec2i target_cell,
+	const vec2u start_cell,
+	const vec2u target_cell,
 	const std::optional<std::size_t> target_portal_index,
 	pathfinding_context* ctx
 ) {
 	const auto size = island.get_size_in_cells();
 
-	if (size.x <= 0 || size.y <= 0) {
+	if (size.x == 0 || size.y == 0) {
 		return std::nullopt;
 	}
-
-	const auto bounds = ltrbi(0, 0, size.x, size.y);
 
 	/*
 		Check start and target are within bounds.
 	*/
-	if (!bounds.hover(start_cell)) {
+	if (start_cell.x >= size.x || start_cell.y >= size.y) {
 		return std::nullopt;
 	}
 
-	if (!bounds.hover(target_cell)) {
+	if (target_cell.x >= size.x || target_cell.y >= size.y) {
 		return std::nullopt;
 	}
 
@@ -213,12 +213,12 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		? static_cast<uint8_t>(2 + target_portal_index.value()) 
 		: static_cast<uint8_t>(0);
 
-	auto get_cell_index = [&](const vec2i c) {
+	auto get_cell_index = [&](const vec2u c) {
 		return island.cell_index(c);
 	};
 
-	auto is_walkable = [&](const vec2i c) {
-		if (!bounds.hover(c)) {
+	auto is_walkable = [&](const vec2u c) {
+		if (c.x >= size.x || c.y >= size.y) {
 			return false;
 		}
 
@@ -265,6 +265,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 	/*
 		4-directional neighbors (up, down, left, right only).
+		Use signed offsets to handle going left/up.
 	*/
 	const vec2i directions[4] = {
 		{ 0, -1 },
@@ -273,17 +274,32 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		{ 1,  0 }
 	};
 
-	auto get_visited = [&](const vec2i c) {
+	auto get_visited = [&](const vec2u c) {
 		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
 	};
 
-	auto set_visited = [&](const vec2i c) {
+	auto set_visited = [&](const vec2u c) {
 		context.cells_pathfinding_visited[get_cell_index(c)] = 1;
 	};
 
-	auto for_each_neighbor = [&](const vec2i c, auto&& callback) {
-		for (int d = 0; d < 4; ++d) {
-			const auto neighbor = c + directions[d];
+	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
+		for (uint32_t d = 0; d < 4; ++d) {
+			const auto dir = directions[d];
+
+			/*
+				Check for underflow when going left/up.
+			*/
+			if (dir.x < 0 && c.x == 0) {
+				continue;
+			}
+			if (dir.y < 0 && c.y == 0) {
+				continue;
+			}
+
+			const auto neighbor = vec2u(
+				static_cast<uint32_t>(static_cast<int>(c.x) + dir.x),
+				static_cast<uint32_t>(static_cast<int>(c.y) + dir.y)
+			);
 
 			if (is_walkable(neighbor)) {
 				if (callback(neighbor) == callback_result::ABORT) {
@@ -293,31 +309,31 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		}
 	};
 
-	auto heuristic = [&](const vec2i c) {
+	auto heuristic = [&](const vec2u c) {
 		return static_cast<float>(::cell_distance(c, target_cell));
 	};
 
-	auto is_target = [&](const vec2i c) {
+	auto is_target = [&](const vec2u c) {
 		return c == target_cell;
 	};
 
-	auto get_parent = [&](const vec2i c) -> std::optional<vec2i> {
+	auto get_parent = [&](const vec2u c) -> std::optional<vec2u> {
 		const auto p = context.cells_parent[get_cell_index(c)];
 		if (p < 0) {
 			return std::nullopt;
 		}
-		return vec2i(p % size.x, p / size.x);
+		return vec2u(static_cast<uint32_t>(p) % size.x, static_cast<uint32_t>(p) / size.x);
 	};
 
-	auto set_parent = [&](const vec2i child, const vec2i parent_cell) {
-		context.cells_parent[get_cell_index(child)] = parent_cell.y * size.x + parent_cell.x;
+	auto set_parent = [&](const vec2u child, const vec2u parent_cell) {
+		context.cells_parent[get_cell_index(child)] = static_cast<int>(parent_cell.y * size.x + parent_cell.x);
 	};
 
-	auto get_g_cost = [&](const vec2i c) {
+	auto get_g_cost = [&](const vec2u c) {
 		return context.cells_g_costs[get_cell_index(c)];
 	};
 
-	auto set_g_cost = [&](const vec2i c, const float cost) {
+	auto set_g_cost = [&](const vec2u c, const float cost) {
 		context.cells_g_costs[get_cell_index(c)] = cost;
 	};
 
@@ -341,7 +357,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	/*
 		Reconstruct path.
 	*/
-	std::vector<vec2i> path_cells;
+	std::vector<vec2u> path_cells;
 	auto c = target_cell;
 
 	while (c != start_cell) {

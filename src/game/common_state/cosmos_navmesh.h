@@ -10,8 +10,8 @@
 
 struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
-	vec2i in_cell_pos = vec2i::zero;
-	vec2i out_cell_pos = vec2i::zero;
+	vec2u in_cell_pos = vec2u::zero;
+	vec2u out_cell_pos = vec2u::zero;
 	int out_island_index = 0;
 	// END GEN INTROSPECTOR
 };
@@ -28,16 +28,18 @@ struct cosmos_navmesh_island {
 	std::vector<navmesh_portal> portals;
 
 	ltrbi bound;
-	int cell_size = 0;
+	uint32_t cell_size = 0;
 	// END GEN INTROSPECTOR
 
-	vec2i get_size_in_cells() const {
-		if (cell_size <= 0) {
-			return vec2i::zero;
+	vec2u get_size_in_cells() const {
+		if (cell_size == 0) {
+			return vec2u::zero;
 		}
 
-		return vec2i((bound.r - bound.l) / cell_size,
-		(bound.b - bound.t) / cell_size);
+		return vec2u(
+			static_cast<uint32_t>(bound.r - bound.l) / cell_size,
+			static_cast<uint32_t>(bound.b - bound.t) / cell_size
+		);
 	}
 
 	void resize_to_bounds() {
@@ -51,7 +53,7 @@ struct cosmos_navmesh_island {
 		Convert cell position to linear index.
 	*/
 
-	std::size_t cell_index(const vec2i cell_pos) const {
+	std::size_t cell_index(const vec2u cell_pos) const {
 		const auto size = get_size_in_cells();
 		return static_cast<std::size_t>(cell_pos.y * size.x + cell_pos.x);
 	}
@@ -60,11 +62,10 @@ struct cosmos_navmesh_island {
 		Grid-cell coordinate access (cell_pos is an index into the grid).
 	*/
 
-	uint8_t get_cell(const vec2i cell_pos) const {
+	uint8_t get_cell(const vec2u cell_pos) const {
 		const auto size = get_size_in_cells();
 
-		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
-		cell_pos.y >= size.y) {
+		if (cell_pos.x >= size.x || cell_pos.y >= size.y) {
 			return 1;
 		}
 
@@ -77,11 +78,10 @@ struct cosmos_navmesh_island {
 		return occupied[idx];
 	}
 
-	void set_cell(const vec2i cell_pos, const uint8_t value) {
+	void set_cell(const vec2u cell_pos, const uint8_t value) {
 		const auto size = get_size_in_cells();
 
-		if (cell_pos.x < 0 || cell_pos.y < 0 || cell_pos.x >= size.x ||
-		cell_pos.y >= size.y) {
+		if (cell_pos.x >= size.x || cell_pos.y >= size.y) {
 			return;
 		}
 
@@ -99,26 +99,34 @@ struct cosmos_navmesh_island {
 	*/
 
 	uint8_t get(const int x, const int y) const {
-		if (cell_size <= 0) {
+		if (cell_size == 0) {
 			return 1;
 		}
 
-		const auto cell_pos = vec2i(
-			(x - bound.l) / cell_size,
-			(y - bound.t) / cell_size
+		if (x < bound.l || y < bound.t) {
+			return 1;
+		}
+
+		const auto cell_pos = vec2u(
+			static_cast<uint32_t>(x - bound.l) / cell_size,
+			static_cast<uint32_t>(y - bound.t) / cell_size
 		);
 
 		return get_cell(cell_pos);
 	}
 
 	void set(const int x, const int y, const uint8_t value) {
-		if (cell_size <= 0) {
+		if (cell_size == 0) {
 			return;
 		}
 
-		const auto cell_pos = vec2i(
-			(x - bound.l) / cell_size,
-			(y - bound.t) / cell_size
+		if (x < bound.l || y < bound.t) {
+			return;
+		}
+
+		const auto cell_pos = vec2u(
+			static_cast<uint32_t>(x - bound.l) / cell_size,
+			static_cast<uint32_t>(y - bound.t) / cell_size
 		);
 
 		set_cell(cell_pos, value);

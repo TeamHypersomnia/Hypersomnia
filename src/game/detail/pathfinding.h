@@ -12,19 +12,19 @@
 	Convert cell coordinates to world position (center of cell).
 */
 
-vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2i cell_xy);
+vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2u cell_xy);
 
 /*
 	Convert world position to cell coordinates.
 */
 
-vec2i world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos);
+vec2u world_to_cell(const cosmos_navmesh_island& island, const vec2 world_pos);
 
 /*
 	Manhattan distance between two cells (for 4-directional A*).
 */
 
-int cell_distance(const vec2i a, const vec2i b);
+uint32_t cell_distance(const vec2u a, const vec2u b);
 
 /*
 	Euclidean distance between two world positions.
@@ -80,8 +80,8 @@ std::optional<std::size_t> find_best_portal_from_to(
 
 std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	const cosmos_navmesh_island& island,
-	const vec2i start_cell,
-	const vec2i target_cell,
+	const vec2u start_cell,
+	const vec2u target_cell,
 	const std::optional<std::size_t> target_portal_index = std::nullopt,
 	pathfinding_context* ctx = nullptr
 );
