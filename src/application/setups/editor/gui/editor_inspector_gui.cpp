@@ -2274,8 +2274,9 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		auto& val = insp.navmesh_cell_size;
 		const auto old_val = val;
 
-		if (ImGui::SliderInt("Navmesh cell size", &val, 16, 256)) {
-			val = std::max(16, val);
+		int vv = val;
+		if (ImGui::SliderInt("Navmesh cell size", &vv, 16, 256)) {
+			val = std::max(16, vv);
 
 			if (val != old_val) {
 				result = "Set navmesh cell size";

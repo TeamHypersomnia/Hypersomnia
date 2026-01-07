@@ -2137,8 +2137,8 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 
 			const auto size_in_cells = island.get_size_in_cells();
 
-			for (int cy = 0; cy < size_in_cells.y; ++cy) {
-				for (int cx = 0; cx < size_in_cells.x; ++cx) {
+			for (uint32_t cy = 0; cy < size_in_cells.y; ++cy) {
+				for (uint32_t cx = 0; cx < size_in_cells.x; ++cx) {
 					const auto world_x = island.bound.l + cx * cell_size;
 					const auto world_y = island.bound.t + cy * cell_size;
 

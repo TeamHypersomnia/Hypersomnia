@@ -230,7 +230,7 @@
 	would better be written as
 
 	```cpp
-	uint8_t get_cell(vec2i cell_pos) const;
+	uint8_t get_cell(vec2u cell_pos) const;
 	```
 
 - Use vec2/vec2i arithmetic operations instead of operating on x and y separately:
@@ -254,15 +254,6 @@
 	const auto dx = a.x - b.x;
 	const auto dy = a.y - b.y;
 	const auto dist = std::sqrt(dx * dx + dy * dy);
-	```
-
-- Whenever checking if a point is inside a rectangle, use `ltrb::hover()` from `augs/math/rects.h`:
-	```cpp
-	/* Good */
-	if (bound.hover(pos)) { ... }
-	
-	/* Bad */
-	if (pos.x >= bound.l && pos.x < bound.r && pos.y >= bound.t && pos.y < bound.b) { ... }
 	```
 
 - You can cast between `vec2` (float) and `vec2i` (int) freely:
