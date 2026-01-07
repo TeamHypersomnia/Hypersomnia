@@ -217,6 +217,12 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return island.cell_index(c);
 	};
 
+	std::optional<std::size_t> source_portal_index;
+
+	if (const auto start_type = island.get_cell(start_cell); start_type >= 2) {
+		source_portal_index = start_type;
+	}
+
 	auto is_walkable = [&](const vec2u c) {
 		if (c.x >= size.x || c.y >= size.y) {
 			return false;
@@ -243,6 +249,10 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 			Only walkable if it's the target portal.
 		*/
 		if (target_portal_index.has_value() && value == target_portal_value) {
+			return true;
+		}
+
+		if (value == source_portal_index) {
 			return true;
 		}
 
