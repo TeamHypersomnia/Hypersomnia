@@ -2139,10 +2139,9 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 
 			for (uint32_t cy = 0; cy < size_in_cells.y; ++cy) {
 				for (uint32_t cx = 0; cx < size_in_cells.x; ++cx) {
-					const auto world_x = float(island.bound.l) + cx * cell_size;
-					const auto world_y = float(island.bound.t) + cy * cell_size;
-
-					const auto cell_value = island.get_cell({ cx, cy });
+					const auto cell_xy = vec2u(cx, cy);
+					const auto world_xy = vec2(island.bound.lt()) + cell_xy * cell_size;
+					const auto cell_value = island.get_cell(cell_xy);
 
 					/*
 						Cell value meanings:
@@ -2162,12 +2161,12 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 						}
 					}();
 
-					const auto screen_lt = on_screen(vec2(static_cast<float>(world_x), static_cast<float>(world_y)));
-					const auto screen_rb = on_screen(vec2(static_cast<float>(world_x + cell_size), static_cast<float>(world_y + cell_size)));
+					const auto screen_lt = on_screen(world_xy);
+					const auto screen_rb = on_screen(world_xy + vec2::square(cell_size));
 
 					triangles.aabb(
 						blank_tex,
-						ltrb(screen_lt.x, screen_lt.y, screen_rb.x, screen_rb.y),
+						ltrb::from_points(screen_lt, screen_rb),
 						color
 					);
 				}
