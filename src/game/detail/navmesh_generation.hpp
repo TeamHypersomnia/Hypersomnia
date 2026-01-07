@@ -104,7 +104,8 @@ inline void collect_navmesh_island_bounds(
 			/* Check if this fixture matches the pathfinding filter */
 			const bool should_collide = 
 				(filter.categoryBits & pathfinding_filter.maskBits) != 0 &&
-				(pathfinding_filter.categoryBits & filter.maskBits) != 0;
+				(pathfinding_filter.categoryBits & filter.maskBits) != 0
+			;
 
 			if (!should_collide) {
 				continue;

@@ -37,8 +37,8 @@ struct cosmos_navmesh_island {
 		}
 
 		return vec2u(
-			static_cast<uint32_t>(bound.r - bound.l) / cell_size,
-			static_cast<uint32_t>(bound.b - bound.t) / cell_size
+			static_cast<uint32_t>(bound.w()) / cell_size,
+			static_cast<uint32_t>(bound.h()) / cell_size
 		);
 	}
 
@@ -46,7 +46,7 @@ struct cosmos_navmesh_island {
 		const auto size = get_size_in_cells();
 
 		occupied.clear();
-		occupied.resize(static_cast<std::size_t>(size.x * size.y), 0);
+		occupied.resize(size.area(), 0);
 	}
 
 	/*
