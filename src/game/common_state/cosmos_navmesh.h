@@ -107,11 +107,7 @@ struct cosmos_navmesh_island {
 			return 1;
 		}
 
-		const auto cell_pos = vec2u(
-			static_cast<uint32_t>(x - bound.l) / cell_size,
-			static_cast<uint32_t>(y - bound.t) / cell_size
-		);
-
+		const auto cell_pos = vec2u(vec2i(x, y) - bound.lt()) / cell_size;
 		return get_cell(cell_pos);
 	}
 
@@ -124,11 +120,7 @@ struct cosmos_navmesh_island {
 			return;
 		}
 
-		const auto cell_pos = vec2u(
-			static_cast<uint32_t>(x - bound.l) / cell_size,
-			static_cast<uint32_t>(y - bound.t) / cell_size
-		);
-
+		const auto cell_pos = vec2u(vec2i(x, y) - bound.lt()) / cell_size;
 		set_cell(cell_pos, value);
 	}
 };
