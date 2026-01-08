@@ -376,8 +376,11 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				if (has_target) {
 					/*
 						Check for FLoS first - if we have direct line of sight, clear pathfinding.
+						FAT_LOS_WIDTH is 100.0f, defined in ai_pathfinding.hpp
 					*/
-					if (::fat_line_of_sight(physics, cosm.get_si(), character_pos, target_pos, FAT_LOS_WIDTH, character_id)) {
+					constexpr float local_fat_los_width = 100.0f;
+
+					if (::fat_line_of_sight(physics, cosm.get_si(), character_pos, target_pos, local_fat_los_width, character_id)) {
 						first_player.debug_pathfinding.clear();
 					}
 					else {
