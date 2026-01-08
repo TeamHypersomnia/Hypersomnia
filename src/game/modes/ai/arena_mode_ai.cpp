@@ -19,6 +19,7 @@
 #include "game/debug_drawing_settings.h"
 #include "game/messages/gunshot_message.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
+#include "game/detail/pathfinding.h"
 
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/update_random_movement_target.hpp"
@@ -30,6 +31,8 @@
 #include "game/modes/ai/tasks/handle_aiming_and_trigger.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
+#include "game/modes/ai/tasks/listen_for_footsteps.hpp"
+#include "game/modes/ai/tasks/ai_pathfinding.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	const cosmos& cosm,
@@ -77,6 +80,11 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		High-level AI flow.
 	*/
+
+	/*
+		Listen for footsteps before checking for visible enemies.
+	*/
+	::listen_for_footsteps(ctx, step, is_ffa);
 
 	::update_random_movement_target(ctx, dt_secs);
 
