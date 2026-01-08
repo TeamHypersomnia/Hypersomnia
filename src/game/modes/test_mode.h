@@ -16,6 +16,7 @@
 #include "game/modes/ranked_state_type.h"
 
 #include "application/arena/arena_playtesting_context.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 
 using mode_entity_id = entity_id;
 
@@ -92,6 +93,11 @@ struct test_mode_player {
 
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;
+
+	/*
+		Pathfinding state for debug testing.
+	*/
+	ai_pathfinding_state debug_pathfinding;
 	// END GEN INTROSPECTOR
 
 	/* Dummy field for compatibility */

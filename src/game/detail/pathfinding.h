@@ -177,3 +177,21 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 	randomization& rng,
 	pathfinding_context* ctx = nullptr
 );
+
+/*
+	Find pathfinding target for a bomb.
+	Returns the closest walkable cell that the bomb touches.
+	If no walkable cell is found, teleports the bomb to the closest walkable cell.
+*/
+
+struct bomb_pathfinding_target {
+	vec2 target_position;
+	bool bomb_was_teleported = false;
+};
+
+template <class E>
+std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
+	const E& bomb_entity,
+	const cosmos_navmesh& navmesh,
+	const vec2 source_pos
+);

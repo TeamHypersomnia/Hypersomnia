@@ -18,6 +18,11 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/cosmos/create_entity.hpp"
 
+#include "game/components/movement_component.h"
+#include "game/detail/pathfinding.h"
+#include "game/modes/ai/tasks/ai_pathfinding.hpp"
+#include "game/detail/pathfinding_bomb.hpp"
+
 using input_type = test_mode::input;
 
 mode_entity_id test_mode::lookup(const mode_player_id& id) const {
@@ -319,6 +324,115 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	});
 
 	remove_old_lying_items(in, step);
+
+	/*
+		Debug pathfinding for playtesting.
+		Run AI pathfinding on the first player if debug_pathfinding_end is set.
+	*/
+	if (playtesting_context.has_value()) {
+		const bool has_debug_target = 
+			playtesting_context->debug_pathfinding_end.has_value() ||
+			playtesting_context->debug_pathfinding_to_bomb;
+
+		if (has_debug_target && !players.empty()) {
+			auto& first_player = players.begin()->second;
+			const auto character_id = first_player.controlled_character_id;
+			const auto character = cosm[character_id];
+
+			if (character.alive()) {
+				const auto character_pos = character.get_logic_transform().pos;
+				const auto& navmesh = cosm.get_solvable_inferred().navmesh;
+				const auto& physics = cosm.get_solvable_inferred().physics;
+
+				vec2 target_pos = vec2::zero;
+				bool has_target = false;
+
+				if (playtesting_context->debug_pathfinding_end.has_value()) {
+					target_pos = *playtesting_context->debug_pathfinding_end;
+					has_target = true;
+				}
+				else if (playtesting_context->debug_pathfinding_to_bomb) {
+					/*
+						Find a planted bomb on the ground.
+					*/
+					cosm.for_each_having<invariants::hand_fuse>(
+						[&](const auto& typed_handle) {
+							if (!typed_handle.get_owning_transfer_capability().alive()) {
+								const auto bomb_target = ::find_bomb_pathfinding_target(
+									typed_handle,
+									navmesh,
+									character_pos
+								);
+
+								if (bomb_target.has_value()) {
+									target_pos = bomb_target->target_position;
+									has_target = true;
+								}
+							}
+						}
+					);
+				}
+
+				if (has_target) {
+					/*
+						Check for FLoS first - if we have direct line of sight, clear pathfinding.
+					*/
+					if (::fat_line_of_sight(physics, cosm.get_si(), character_pos, target_pos, FAT_LOS_WIDTH, character_id)) {
+						first_player.debug_pathfinding.clear();
+					}
+					else {
+						/*
+							Start pathfinding if not already pathfinding to this target.
+						*/
+						::start_pathfinding_to(
+							first_player.debug_pathfinding,
+							character_pos,
+							target_pos,
+							navmesh,
+							physics,
+							cosm.get_si(),
+							character_id,
+							nullptr
+						);
+					}
+
+					/*
+						Navigate along the path.
+					*/
+					if (first_player.debug_pathfinding.is_active) {
+						::advance_path_if_reached(first_player.debug_pathfinding, character_pos, navmesh);
+						::check_path_deviation(first_player.debug_pathfinding, character_pos, navmesh, nullptr);
+
+						vec2 crosshair_target;
+						const auto movement_dir = ::get_pathfinding_movement_direction(
+							first_player.debug_pathfinding,
+							character_pos,
+							navmesh,
+							crosshair_target
+						);
+
+						if (movement_dir.has_value()) {
+							if (auto* movement = character.template find<components::movement>()) {
+								movement->flags.set_from_closest_direction(*movement_dir);
+							}
+						}
+
+						::debug_draw_pathfinding(first_player.debug_pathfinding, character_pos, navmesh);
+					}
+					else {
+						/*
+							Direct navigation to target.
+						*/
+						const auto dir = (target_pos - character_pos).normalize();
+
+						if (auto* movement = character.template find<components::movement>()) {
+							movement->flags.set_from_closest_direction(dir);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	if (auto character = in.cosm[infinite_ammo_for]) {
 		auto guns = character.get_wielded_guns();
