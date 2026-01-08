@@ -127,25 +127,22 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 );
 
 /*
-	BFS to find the closest walkable cell from a given cell that may be occupied.
-	Returns the walkable cell closest to the world position (Euclidean distance).
+	BFS to find the closest unoccupied cell from a given cell that may be occupied.
+	Returns the unoccupied cell closest to the world position (Euclidean distance).
 	Used when pathfinding source is on an occupied cell.
-
-	A cell is "walkable" for this purpose if:
-	  - It is unoccupied (value == 0), OR
-	  - It is the target portal cell (if target_portal_index is provided)
+	
+	Only finds cells with value == 0 (unoccupied). Does not handle portals.
 */
 
-struct walkable_cell_result {
+struct unoccupied_cell_result {
 	vec2u cell;
 	std::vector<pathfinding_node> path_through_occupied;
 };
 
-std::optional<walkable_cell_result> find_closest_walkable_cell(
+std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
-	const std::optional<std::size_t> target_portal_index = std::nullopt,
 	pathfinding_context* ctx = nullptr
 );
 

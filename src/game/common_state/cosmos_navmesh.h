@@ -14,7 +14,7 @@
 */
 
 /*
-	Global helper functions for cell type checks.
+	Global helper functions for cell type checks (for use outside island context).
 */
 
 inline bool is_cell_walkable(const uint8_t cell_value) {
@@ -163,6 +163,37 @@ struct cosmos_navmesh_island {
 
 		const auto cell_pos = vec2u(vec2i(x, y) - bound.lt()) / cell_size;
 		set_cell(cell_pos, value);
+	}
+
+	/*
+		Cell type check methods with bounds checking.
+		These check if cell_pos is within bounds before checking cell type.
+	*/
+
+	bool is_cell_walkable(const vec2u cell_pos) const {
+		return ::is_cell_walkable(get_cell(cell_pos));
+	}
+
+	bool is_cell_unoccupied(const vec2u cell_pos) const {
+		const auto size = get_size_in_cells();
+
+		if (cell_pos.x >= size.x || cell_pos.y >= size.y) {
+			return false;
+		}
+
+		return ::is_cell_unoccupied(get_cell(cell_pos));
+	}
+
+	bool is_cell_occupied(const vec2u cell_pos) const {
+		return ::is_cell_occupied(get_cell(cell_pos));
+	}
+
+	bool is_cell_portal(const vec2u cell_pos) const {
+		return ::is_cell_portal(get_cell(cell_pos));
+	}
+
+	bool is_cell_unwalkable(const vec2u cell_pos) const {
+		return ::is_cell_unwalkable(get_cell(cell_pos));
 	}
 };
 
