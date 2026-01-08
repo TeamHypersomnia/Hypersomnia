@@ -779,7 +779,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/ai/behaviours/navigate_to_last_seen_position_of_target.cpp"
 	"src/game/detail/ai/behaviours/pull_trigger.cpp"
 	"src/game/detail/ai/behaviours/target_closest_enemy.cpp"
-	"src/game/modes/arena_mode_ai.cpp"
+	"src/game/modes/ai/arena_mode_ai.cpp"
 	"src/game/detail/entity_scripts.cpp"
 	"src/game/enums/filters.cpp"
 	"src/game/cosmos/cosmos_solvable_significant.cpp"

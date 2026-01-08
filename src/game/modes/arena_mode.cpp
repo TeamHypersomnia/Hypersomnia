@@ -2422,7 +2422,16 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 
-		const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng, in.dynamic_vars.bot_difficulty);
+		const auto ai_result = update_arena_mode_ai(
+			cosm,
+			step,
+			player.ai_state,
+			player.controlled_character_id,
+			player.stats.money,
+			in.rules.is_ffa(),
+			stable_round_rng,
+			in.dynamic_vars.bot_difficulty
+		);
 		
 		if (ai_result.item_purchase.has_value()) {
 			entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
@@ -3744,7 +3753,13 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 
 	// At the end of mode_post_solve, reset bot sprint/dash flags
 	for (auto& it : only_bot(players)) {
-		post_solve_arena_mode_ai(in, it.second, step);
+		post_solve_arena_mode_ai(
+			cosm,
+			step,
+			it.second.ai_state,
+			it.second.controlled_character_id,
+			in.rules.is_ffa()
+		);
 	}
 }
 
