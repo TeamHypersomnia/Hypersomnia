@@ -1,6 +1,7 @@
 #include <limits>
 #include <queue>
 #include "game/detail/pathfinding.h"
+#include "game/detail/pathfinding_graph_view.h"
 #include "augs/algorithm/bfs.hpp"
 #include "augs/algorithm/a_star.hpp"
 #include "augs/templates/reversion_wrapper.h"
@@ -201,22 +202,8 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	pathfinding_context local_ctx;
 	pathfinding_context& context = ctx != nullptr ? *ctx : local_ctx;
 
-	const auto grid_size = static_cast<std::size_t>(size.area());
-	context.cells_pathfinding_visited.clear();
-	context.cells_pathfinding_visited.resize(grid_size, 0);
-
-	/*
-		Parent tracking for path reconstruction.
-		-1 means unset, 0 is the first valid cell.
-	*/
-	context.cells_parent.clear();
-	context.cells_parent.resize(grid_size, -1);
-	context.cells_g_costs.clear();
-	context.cells_g_costs.resize(grid_size, std::numeric_limits<float>::max());
-
-	auto get_cell_index = [&](const vec2u c) {
-		return island.cell_index(c);
-	};
+	pathfinding_graph_view graph(context, island);
+	graph.init_all();
 
 	std::optional<uint8_t> source_portal_value;
 
@@ -225,7 +212,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	}
 
 	auto is_walkable = [&](const vec2u c) {
-		if (c.x >= size.x || c.y >= size.y) {
+		if (c.x >= graph.size.x || c.y >= graph.size.y) {
 			return false;
 		}
 
@@ -241,7 +228,6 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 		/*
 			Portal cells (>= 2) are walkable only if it's the target or source portal.
-			Use direct optional comparison - returns false if target_portal_index is nullopt.
 		*/
 		if (::is_cell_target_portal(value, target_portal_index)) {
 			return true;
@@ -268,31 +254,6 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return std::nullopt;
 	}
 
-	auto get_visited = [&](const vec2u c) {
-		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
-	};
-
-	auto set_visited = [&](const vec2u c) {
-		context.cells_pathfinding_visited[get_cell_index(c)] = 1;
-	};
-
-	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
-		for (uint32_t d = 0; d < 4; ++d) {
-			const auto dir = CELL_DIRECTIONS[d];
-
-			/*
-				Underflow is handled by is_walkable which returns false for out-of-bounds cells.
-			*/
-			const auto neighbor = vec2u(vec2i(c) + dir);
-
-			if (is_walkable(neighbor)) {
-				if (callback(neighbor) == callback_result::ABORT) {
-					return;
-				}
-			}
-		}
-	};
-
 	auto heuristic = [&](const vec2u c) {
 		return static_cast<float>(::cell_distance(c, target_cell));
 	};
@@ -301,74 +262,24 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return c == target_cell;
 	};
 
-	auto get_parent = [&](const vec2u c) -> std::optional<vec2u> {
-		const auto p = context.cells_parent[get_cell_index(c)];
-		if (p < 0) {
-			return std::nullopt;
-		}
-		return vec2u(static_cast<uint32_t>(p) % size.x, static_cast<uint32_t>(p) / size.x);
-	};
-
-	auto set_parent = [&](const vec2u child, const vec2u parent_cell) {
-		context.cells_parent[get_cell_index(child)] = static_cast<int>(parent_cell.y * size.x + parent_cell.x);
-	};
-
-	auto get_g_cost = [&](const vec2u c) {
-		return context.cells_g_costs[get_cell_index(c)];
-	};
-
-	auto set_g_cost = [&](const vec2u c, const float cost) {
-		context.cells_g_costs[get_cell_index(c)] = cost;
-	};
-
 	const auto found = augs::astar_find_path(
 		context.astar_queue,
 		start_cell,
-		get_visited,
-		set_visited,
-		for_each_neighbor,
+		graph.make_get_visited(),
+		graph.make_set_visited(),
+		graph.make_for_each_neighbor(is_walkable),
 		heuristic,
 		is_target,
-		set_parent,
-		get_g_cost,
-		set_g_cost
+		graph.make_set_parent(),
+		graph.make_get_g_cost(),
+		graph.make_set_g_cost()
 	);
 
 	if (!found) {
 		return std::nullopt;
 	}
 
-	/*
-		Reconstruct path.
-	*/
-	std::vector<vec2u> path_cells;
-	auto c = target_cell;
-
-	while (c != start_cell) {
-		path_cells.push_back(c);
-		const auto p = get_parent(c);
-
-		if (!p.has_value()) {
-			/*
-				Should not happen if algorithm is correct.
-			*/
-			break;
-		}
-
-		c = p.value();
-	}
-
-	path_cells.push_back(start_cell);
-
-	/*
-		Reverse to get start -> target order.
-	*/
-	std::vector<pathfinding_node> result;
-	for (const auto& cell : reverse(path_cells)) {
-		result.push_back(pathfinding_node{ cell });
-	}
-
-	return result;
+	return graph.reconstruct_path(start_cell, target_cell);
 }
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
@@ -683,49 +594,9 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 	pathfinding_context local_ctx;
 	pathfinding_context& context = ctx != nullptr ? *ctx : local_ctx;
 
-	const auto grid_size = static_cast<std::size_t>(size.area());
-	context.cells_pathfinding_visited.clear();
-	context.cells_pathfinding_visited.resize(grid_size, 0);
-
-	context.cells_parent.clear();
-	context.cells_parent.resize(grid_size, -1);
-
-	auto get_cell_index = [&](const vec2u c) {
-		return island.cell_index(c);
-	};
-
-	auto get_visited = [&](const vec2u c) {
-		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
-	};
-
-	auto set_visited = [&](const vec2u c) {
-		context.cells_pathfinding_visited[get_cell_index(c)] = 1;
-	};
-
-	auto get_parent = [&](const vec2u c) -> std::optional<vec2u> {
-		const auto p = context.cells_parent[get_cell_index(c)];
-		if (p < 0) {
-			return std::nullopt;
-		}
-		return vec2u(static_cast<uint32_t>(p) % size.x, static_cast<uint32_t>(p) / size.x);
-	};
-
-	auto set_parent = [&](const vec2u child, const vec2u parent_cell) {
-		context.cells_parent[get_cell_index(child)] = static_cast<int>(parent_cell.y * size.x + parent_cell.x);
-	};
-
-	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
-		for (uint32_t d = 0; d < 4; ++d) {
-			const auto dir = CELL_DIRECTIONS[d];
-			const auto neighbor = vec2u(vec2i(c) + dir);
-
-			if (is_walkable(neighbor)) {
-				if (callback(neighbor) == callback_result::ABORT) {
-					return;
-				}
-			}
-		}
-	};
+	pathfinding_graph_view graph(context, island);
+	graph.init_visited();
+	graph.init_parent();
 
 	/*
 		Use BFS to find up to MAX_WALKABLE_CANDIDATES walkable cells,
@@ -736,10 +607,10 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 
 	augs::bfs_full(
 		start_cell,
-		get_visited,
-		set_visited,
-		set_parent,
-		for_each_neighbor,
+		graph.make_get_visited(),
+		graph.make_set_visited(),
+		graph.make_set_parent(),
+		graph.make_for_each_neighbor(is_walkable),
 		is_target_cell,
 		[&](const vec2u cell) {
 			candidates.push_back(cell);
@@ -772,31 +643,9 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		}
 	}
 
-	/*
-		Reconstruct path from start_cell to best_cell.
-	*/
-	std::vector<vec2u> path_cells;
-	auto c = best_cell;
-
-	while (c != start_cell) {
-		path_cells.push_back(c);
-		const auto p = get_parent(c);
-
-		if (!p.has_value()) {
-			break;
-		}
-
-		c = p.value();
-	}
-
-	path_cells.push_back(start_cell);
-
 	walkable_cell_result result;
 	result.cell = best_cell;
-
-	for (const auto& cell : reverse(path_cells)) {
-		result.path_through_occupied.push_back(pathfinding_node{ cell });
-	}
+	result.path_through_occupied = graph.reconstruct_path(start_cell, best_cell);
 
 	return result;
 }
