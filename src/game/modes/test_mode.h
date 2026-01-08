@@ -94,9 +94,6 @@ struct test_mode_player {
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;
 
-	/*
-		Pathfinding state for debug testing.
-	*/
 	ai_pathfinding_state debug_pathfinding;
 	// END GEN INTROSPECTOR
 
