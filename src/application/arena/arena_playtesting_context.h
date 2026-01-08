@@ -2,6 +2,7 @@
 #include <optional>
 #include "augs/math/vec2.h"
 #include "game/enums/faction_type.h"
+#include "game/cosmos/entity_id.h"
 
 struct arena_playtesting_context {
 	// GEN INTROSPECTOR struct arena_playtesting_context
@@ -12,7 +13,7 @@ struct arena_playtesting_context {
 		For pathfinding debug testing.
 	*/
 	std::optional<vec2> debug_pathfinding_end;
-	bool debug_pathfinding_to_bomb = false;
+	entity_id debug_pathfinding_bomb_target;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const arena_playtesting_context&) const = default;

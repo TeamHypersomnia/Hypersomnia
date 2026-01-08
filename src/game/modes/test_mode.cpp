@@ -351,26 +351,20 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					target_pos = *playtesting_context->debug_pathfinding_end;
 					has_target = true;
 				}
-				else if (playtesting_context->debug_pathfinding_to_bomb) {
+				else if (const auto bomb_handle = cosm[playtesting_context->debug_pathfinding_bomb_target]) {
 					/*
-						Find a planted bomb on the ground.
+						Use the stored bomb entity for pathfinding.
 					*/
-					cosm.for_each_having<invariants::hand_fuse>(
-						[&](const auto& typed_handle) {
-							if (!typed_handle.get_owning_transfer_capability().alive()) {
-								const auto bomb_target = ::find_bomb_pathfinding_target(
-									typed_handle,
-									navmesh,
-									character_pos
-								);
-
-								if (bomb_target.has_value()) {
-									target_pos = bomb_target->target_position;
-									has_target = true;
-								}
-							}
-						}
+					const auto bomb_target = ::find_bomb_pathfinding_target(
+						bomb_handle,
+						navmesh,
+						character_pos
 					);
+
+					if (bomb_target.has_value()) {
+						target_pos = bomb_target->target_position;
+						has_target = true;
+					}
 				}
 
 				if (has_target) {

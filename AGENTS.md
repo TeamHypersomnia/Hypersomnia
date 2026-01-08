@@ -293,6 +293,8 @@
 
 - When implementing new functionality in the `augs/` folder, always put it in the `augs::` namespace.
 
+- Separate generic algorithmic logic (BFS, A*, sorting, etc.) into `augs/algorithm/` headers. Game-specific code should call these generic functions with appropriate parameters. This keeps algorithms reusable and testable independent of game code.
+
 ## Common vec2 and ltrb functions (from augs/math/vec2.h and augs/math/rects.h)
 
 - `float vec2::length()` - get the length of a vector

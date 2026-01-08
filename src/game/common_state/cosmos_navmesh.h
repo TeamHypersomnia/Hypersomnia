@@ -5,8 +5,37 @@
 
 /*
 	Navmesh for arena_mode_ai.
-	A simple square grid where cells are marked as free or occupied.
+	A simple square grid where cells are marked as walkable or occupied.
+
+	Cell value meanings:
+		0  - cell is *walkable* and *unoccupied*
+		1  - cell is *unwalkable* and *occupied*
+		>=2 - cell is *walkable* but *occupied* (portals, identified as 2 + portal_index)
 */
+
+/*
+	Global helper functions for cell type checks.
+*/
+
+inline bool is_cell_walkable(const uint8_t cell_value) {
+	return cell_value != 1;
+}
+
+inline bool is_cell_unoccupied(const uint8_t cell_value) {
+	return cell_value == 0;
+}
+
+inline bool is_cell_occupied(const uint8_t cell_value) {
+	return cell_value != 0;
+}
+
+inline bool is_cell_portal(const uint8_t cell_value) {
+	return cell_value >= 2;
+}
+
+inline bool is_cell_unwalkable(const uint8_t cell_value) {
+	return cell_value == 1;
+}
 
 struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
@@ -18,10 +47,10 @@ struct navmesh_portal {
 
 struct cosmos_navmesh_island {
 	/*
-		0  - free
-		1  - occupied
-		>2 - portals, identified (2 + portal_index) 
-			 considered occupied, EXCEPT when targeting this exact portal.
+		Cell values - see helper functions above:
+			0  - walkable and unoccupied
+			1  - unwalkable and occupied
+			>=2 - walkable but occupied (portals, 2 + portal_index)
 	*/
 	// GEN INTROSPECTOR struct cosmos_navmesh_island
 	std::vector<uint8_t> occupied;

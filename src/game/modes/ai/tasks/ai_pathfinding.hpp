@@ -25,8 +25,10 @@ inline bool is_within_cell(
 	const auto cell_world = ::cell_to_world(island, cell_xy);
 	const auto half_size = cell_size / 2.0f;
 
-	return repro::fabs(bot_pos.x - cell_world.x) <= half_size &&
-	       repro::fabs(bot_pos.y - cell_world.y) <= half_size;
+	return 
+		repro::fabs(bot_pos.x - cell_world.x) <= half_size &&
+		repro::fabs(bot_pos.y - cell_world.y) <= half_size
+	;
 }
 
 /*
