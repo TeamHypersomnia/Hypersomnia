@@ -43,7 +43,7 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 	*/
 	auto get_bomb_aabb = [&]() -> ltrb {
 		if (const auto* rigid = bomb_entity.template find<components::rigid_body>()) {
-			if (const auto aabb = rigid.find_aabb()) {
+			if (const auto aabb = rigid->find_aabb()) {
 				return *aabb;
 			}
 		}
