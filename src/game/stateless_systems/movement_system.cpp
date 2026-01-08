@@ -2,6 +2,7 @@
 #include "movement_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/messages/intent_message.h"
+#include "game/messages/sound_cue_message.h"
 
 #include "game/components/gun_component.h"
 
@@ -501,6 +502,19 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					sound_effect_start_input::at_listener(it.get_id()),
 					predictability
 				);
+
+				/*
+					Post sound cue message for AI to hear footsteps.
+					Use 3/4 of max_distance as the hearing range.
+				*/
+				{
+					messages::sound_cue_message cue;
+					cue.position = transform.pos;
+					cue.max_distance = sound.modifier.max_distance * 0.75f;
+					cue.source_entity = it.get_id();
+
+					step.post_message(cue);
+				}
 
 				const auto scale = std::max(0.8f, speed_mult);
 
