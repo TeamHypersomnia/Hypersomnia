@@ -3573,10 +3573,57 @@ const editor_official_resource_map& editor_setup::get_official_resource_map() co
 }
 
 arena_playtesting_context editor_setup::make_playtesting_context() const {
-	return { 
-		get_camera_eye().transform.pos,
-		project.playtesting.starting_faction
-	};
+	arena_playtesting_context ctx;
+	ctx.initial_spawn_pos = get_camera_eye().transform.pos;
+	ctx.first_player_faction = project.playtesting.starting_faction;
+
+	/*
+		Look for DEBUG_PATHFINDING_START and DEBUG_PATHFINDING_END markers.
+		If DEBUG_PATHFINDING_START exists, spawn at that position.
+		If DEBUG_PATHFINDING_END exists, store it for AI pathfinding testing.
+	*/
+	std::optional<vec2> pathfinding_start;
+	std::optional<vec2> pathfinding_end;
+
+	scene.world.for_each_having<invariants::point_marker>(
+		[&](const auto& typed_handle) {
+			const auto& marker = typed_handle.template get<invariants::point_marker>();
+
+			if (marker.type == point_marker_type::DEBUG_PATHFINDING_START) {
+				pathfinding_start = typed_handle.get_logic_transform().pos;
+			}
+			else if (marker.type == point_marker_type::DEBUG_PATHFINDING_END) {
+				pathfinding_end = typed_handle.get_logic_transform().pos;
+			}
+		}
+	);
+
+	if (pathfinding_start.has_value()) {
+		ctx.initial_spawn_pos = *pathfinding_start;
+	}
+
+	if (pathfinding_end.has_value()) {
+		ctx.debug_pathfinding_end = pathfinding_end;
+	}
+	else {
+		/*
+			Check if there's a bomb on the ground to use as pathfinding target.
+		*/
+		scene.world.for_each_having<invariants::hand_fuse>(
+			[&](const auto& typed_handle) {
+				if (const auto fuse = typed_handle.template find<components::hand_fuse>()) {
+					/*
+						Check if it's a planted bomb (not in inventory).
+					*/
+					if (!typed_handle.get_owning_transfer_capability().alive()) {
+						ctx.debug_pathfinding_to_bomb = true;
+					}
+				}
+			}
+		);
+	}
+
+	return ctx;
 }
 
 #include "application/main/game_frame_buffer.h"
