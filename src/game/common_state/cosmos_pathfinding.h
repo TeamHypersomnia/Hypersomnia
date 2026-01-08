@@ -32,6 +32,27 @@ struct pathfinding_path {
 };
 
 /*
+	Progress through a single pathfinding_path.
+	Consolidates path + current node index into one struct.
+*/
+
+struct pathfinding_progress {
+	// GEN INTROSPECTOR struct pathfinding_progress
+	std::optional<pathfinding_path> path;
+	std::size_t node_index = 0;
+	// END GEN INTROSPECTOR
+
+	void clear() {
+		path.reset();
+		node_index = 0;
+	}
+
+	bool is_active() const {
+		return path.has_value();
+	}
+};
+
+/*
 	Context for reusing allocations across pathfinding sessions.
 */
 
@@ -69,10 +90,3 @@ inline constexpr vec2i CELL_DIRECTIONS[4] = {
 */
 
 inline constexpr std::size_t MAX_WALKABLE_CANDIDATES = 4;
-
-/*
-	Sentinel value for "no target portal" comparison.
-	Used with value_or() to ensure portal cell value comparison always fails for nullopt.
-*/
-
-inline constexpr std::size_t NO_TARGET_PORTAL = 255;

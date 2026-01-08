@@ -243,7 +243,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 			Portal cells (>= 2) are walkable only if it's the target or source portal.
 			Use direct optional comparison - returns false if target_portal_index is nullopt.
 		*/
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
+		if (::is_cell_target_portal(value, target_portal_index)) {
 			return true;
 		}
 
@@ -643,7 +643,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		/*
 			Portal cells are walkable if it's the target or source portal.
 		*/
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
+		if (::is_cell_target_portal(value, target_portal_index)) {
 			return true;
 		}
 
@@ -664,7 +664,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 			return true;
 		}
 
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
+		if (::is_cell_target_portal(value, target_portal_index)) {
 			return true;
 		}
 
@@ -734,7 +734,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 	std::vector<vec2u> candidates;
 	candidates.reserve(MAX_WALKABLE_CANDIDATES);
 
-	augs::bfs_for_each_matching(
+	augs::bfs_full(
 		start_cell,
 		get_visited,
 		set_visited,
