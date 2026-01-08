@@ -175,12 +175,6 @@ struct cosmos_navmesh_island {
 	}
 
 	bool is_cell_unoccupied(const vec2u cell_pos) const {
-		const auto size = get_size_in_cells();
-
-		if (cell_pos.x >= size.x || cell_pos.y >= size.y) {
-			return false;
-		}
-
 		return ::is_cell_unoccupied(get_cell(cell_pos));
 	}
 
