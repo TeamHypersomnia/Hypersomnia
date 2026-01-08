@@ -51,3 +51,14 @@ struct pathfinding_context {
 	augs::astar_queue_type<vec2u> astar_queue;
 	augs::bfs_queue_type<std::size_t> bfs_queue;
 };
+
+/*
+	4-directional cell navigation constants.
+*/
+
+inline constexpr vec2i CELL_DIRECTIONS[4] = {
+	{ 0, -1 },
+	{ 0,  1 },
+	{ -1, 0 },
+	{ 1,  0 }
+};

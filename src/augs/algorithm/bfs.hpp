@@ -115,8 +115,8 @@ namespace augs {
 namespace augs {
 
 	/*
-		Generic BFS algorithm that finds all nodes matching a predicate,
-		tracking parent nodes for path reconstruction.
+		Generic BFS traversal that calls a callback for each node matching a predicate.
+		Supports early abort via callback return value.
 
 		Template parameters:
 			Id - The type of node identifier
@@ -125,8 +125,10 @@ namespace augs {
 			SetParent - Lambda: (Id child, Id parent) -> void, records parent for path reconstruction
 			ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
 			IsTarget - Lambda: (Id) -> bool, returns true if node matches the search criteria
+			OnMatch - Lambda: (Id) -> callback_result, called when a matching node is found.
+			          Return ABORT to stop traversal, CONTINUE to keep searching.
 
-		Returns: std::vector<Id> - all matching nodes found
+		Returns: nothing (results are handled via OnMatch callback)
 	*/
 
 	template <
@@ -135,27 +137,33 @@ namespace augs {
 		class SetVisited,
 		class SetParent,
 		class ForEachNeighbor,
-		class IsTarget
+		class IsTarget,
+		class OnMatch
 	>
-	std::vector<Id> bfs_find_all_matching(
+	void bfs_for_each_matching(
 		const Id start,
 		GetVisited&& get_visited,
 		SetVisited&& set_visited,
 		SetParent&& set_parent,
 		ForEachNeighbor&& for_each_neighbor,
-		IsTarget&& is_target
+		IsTarget&& is_target,
+		OnMatch&& on_match
 	) {
 		std::queue<Id> queue;
-		std::vector<Id> results;
+		bool should_abort = false;
 
 		set_visited(start);
 		queue.push(start);
 
-		while (!queue.empty()) {
+		while (!queue.empty() && !should_abort) {
 			const auto current = queue.front();
 			queue.pop();
 
 			for_each_neighbor(current, [&](const Id neighbor) {
+				if (should_abort) {
+					return callback_result::ABORT;
+				}
+
 				if (get_visited(neighbor)) {
 					return callback_result::CONTINUE;
 				}
@@ -164,7 +172,10 @@ namespace augs {
 				set_parent(neighbor, current);
 
 				if (is_target(neighbor)) {
-					results.push_back(neighbor);
+					if (on_match(neighbor) == callback_result::ABORT) {
+						should_abort = true;
+						return callback_result::ABORT;
+					}
 				}
 				else {
 					queue.push(neighbor);
@@ -173,8 +184,6 @@ namespace augs {
 				return callback_result::CONTINUE;
 			});
 		}
-
-		return results;
 	}
 
 }

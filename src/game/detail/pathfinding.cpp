@@ -214,18 +214,14 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	context.cells_g_costs.clear();
 	context.cells_g_costs.resize(grid_size, std::numeric_limits<float>::max());
 
-	const auto target_portal_value = target_portal_index.has_value() 
-		? static_cast<uint8_t>(2 + target_portal_index.value()) 
-		: static_cast<uint8_t>(0);
-
 	auto get_cell_index = [&](const vec2u c) {
 		return island.cell_index(c);
 	};
 
-	std::optional<std::size_t> source_portal_index;
+	std::optional<uint8_t> source_portal_value;
 
-	if (const auto start_type = island.get_cell(start_cell); start_type >= 2) {
-		source_portal_index = start_type;
+	if (const auto start_value = island.get_cell(start_cell); ::is_cell_portal(start_value)) {
+		source_portal_value = start_value;
 	}
 
 	auto is_walkable = [&](const vec2u c) {
@@ -245,12 +241,13 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 		/*
 			Portal cells (>= 2) are walkable only if it's the target or source portal.
+			Use direct optional comparison - returns false if target_portal_index is nullopt.
 		*/
-		if (target_portal_index.has_value() && value == target_portal_value) {
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
 			return true;
 		}
 
-		if (value == source_portal_index) {
+		if (value == source_portal_value) {
 			return true;
 		}
 
@@ -271,17 +268,6 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return std::nullopt;
 	}
 
-	/*
-		4-directional neighbors (up, down, left, right only).
-		Use signed offsets to handle going left/up.
-	*/
-	const vec2i directions[4] = {
-		{ 0, -1 },
-		{ 0,  1 },
-		{ -1, 0 },
-		{ 1,  0 }
-	};
-
 	auto get_visited = [&](const vec2u c) {
 		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
 	};
@@ -292,7 +278,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
 		for (uint32_t d = 0; d < 4; ++d) {
-			const auto dir = directions[d];
+			const auto dir = CELL_DIRECTIONS[d];
 
 			/*
 				Underflow is handled by is_walkable which returns false for out-of-bounds cells.
@@ -613,60 +599,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	return all_paths;
 }
 
-bool fat_line_of_sight(
-	const physics_world_cache& physics,
-	const si_scaling& si,
-	const vec2 source_pos,
-	const vec2 target_pos,
-	const float width,
-	const entity_id ignore_entity
-) {
-	const auto direction = target_pos - source_pos;
-	const auto length = direction.length();
-
-	if (length < 0.001f) {
-		return true;
-	}
-
-	const auto dir_normalized = direction / length;
-	const auto perpendicular = dir_normalized.perpendicular_cw();
-	const auto half_width = width / 2.0f;
-
-	/*
-		Build a rectangle with short ends at source and target.
-		The rectangle is "width" wide and "length" long.
-	*/
-	std::array<vec2, 4> rectangle_vertices = {
-		source_pos - perpendicular * half_width,
-		source_pos + perpendicular * half_width,
-		target_pos + perpendicular * half_width,
-		target_pos - perpendicular * half_width
-	};
-
-	const auto filter = predefined_queries::pathfinding();
-
-	bool has_intersection = false;
-
-	physics.for_each_intersection_with_polygon(
-		si,
-		rectangle_vertices,
-		filter,
-		[&](const b2Fixture& fixture, const vec2, const vec2) {
-			const auto entity_id = ::get_body_entity_that_owns(fixture);
-
-			if (entity_id == ignore_entity) {
-				return callback_result::CONTINUE;
-			}
-
-			has_intersection = true;
-			return callback_result::ABORT;
-		}
-	);
-
-	return !has_intersection;
-}
-
-std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
+std::optional<walkable_cell_result> find_closest_walkable_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
@@ -683,34 +616,15 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 		return std::nullopt;
 	}
 
-	const auto target_portal_value = target_portal_index.has_value() 
-		? static_cast<uint8_t>(2 + target_portal_index.value()) 
-		: static_cast<uint8_t>(0);
+	std::optional<uint8_t> source_portal_value;
 
-	std::optional<std::size_t> source_portal_index;
-
-	if (const auto start_type = island.get_cell(start_cell); ::is_cell_portal(start_type)) {
-		source_portal_index = start_type;
+	if (const auto start_value = island.get_cell(start_cell); ::is_cell_portal(start_value)) {
+		source_portal_value = start_value;
 	}
 
-	auto is_unoccupied = [&](const vec2u c) {
-		if (c.x >= size.x || c.y >= size.y) {
-			return false;
-		}
-
-		const auto value = island.get_cell(c);
-
-		if (::is_cell_unoccupied(value)) {
-			return true;
-		}
-
-		if (target_portal_index.has_value() && value == target_portal_value) {
-			return true;
-		}
-
-		return false;
-	};
-
+	/*
+		A cell is walkable if it's unoccupied or the target portal.
+	*/
 	auto is_walkable = [&](const vec2u c) {
 		if (c.x >= size.x || c.y >= size.y) {
 			return false;
@@ -726,11 +640,14 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 			return false;
 		}
 
-		if (target_portal_index.has_value() && value == target_portal_value) {
+		/*
+			Portal cells are walkable if it's the target or source portal.
+		*/
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
 			return true;
 		}
 
-		if (value == source_portal_index) {
+		if (value == source_portal_value) {
 			return true;
 		}
 
@@ -738,10 +655,27 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	};
 
 	/*
-		If start cell is already unoccupied, return it immediately.
+		A cell is a valid target if it's unoccupied OR it's the target portal.
 	*/
-	if (is_unoccupied(start_cell)) {
-		unoccupied_cell_result result;
+	auto is_target_cell = [&](const vec2u c) {
+		const auto value = island.get_cell(c);
+
+		if (::is_cell_unoccupied(value)) {
+			return true;
+		}
+
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
+			return true;
+		}
+
+		return false;
+	};
+
+	/*
+		If start cell is already a valid target, return it immediately.
+	*/
+	if (is_target_cell(start_cell)) {
+		walkable_cell_result result;
 		result.cell = start_cell;
 		return result;
 	}
@@ -755,13 +689,6 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 
 	context.cells_parent.clear();
 	context.cells_parent.resize(grid_size, -1);
-
-	const vec2i directions[4] = {
-		{ 0, -1 },
-		{ 0,  1 },
-		{ -1, 0 },
-		{ 1,  0 }
-	};
 
 	auto get_cell_index = [&](const vec2u c) {
 		return island.cell_index(c);
@@ -789,7 +716,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 
 	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
 		for (uint32_t d = 0; d < 4; ++d) {
-			const auto dir = directions[d];
+			const auto dir = CELL_DIRECTIONS[d];
 			const auto neighbor = vec2u(vec2i(c) + dir);
 
 			if (is_walkable(neighbor)) {
@@ -801,15 +728,27 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	};
 
 	/*
-		Use augs::bfs_find_all_matching to find all unoccupied cells.
+		Use BFS to find up to 4 walkable cells, tracking the closest one by Euclidean distance.
 	*/
-	auto candidates = augs::bfs_find_all_matching(
+	std::vector<vec2u> candidates;
+	candidates.reserve(4);
+
+	augs::bfs_for_each_matching(
 		start_cell,
 		get_visited,
 		set_visited,
 		set_parent,
 		for_each_neighbor,
-		is_unoccupied
+		is_target_cell,
+		[&](const vec2u cell) {
+			candidates.push_back(cell);
+
+			if (candidates.size() >= 4) {
+				return callback_result::ABORT;
+			}
+
+			return callback_result::CONTINUE;
+		}
 	);
 
 	if (candidates.empty()) {
@@ -851,7 +790,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 
 	path_cells.push_back(start_cell);
 
-	unoccupied_cell_result result;
+	walkable_cell_result result;
 	result.cell = best_cell;
 
 	for (const auto& cell : reverse(path_cells)) {
@@ -898,24 +837,14 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 
 	if (!is_unoccupied(current)) {
 		const auto world_pos = ::cell_to_world(island, start_cell);
-		const auto unoccupied = ::find_closest_unoccupied_cell(island, start_cell, world_pos, std::nullopt, ctx);
+		const auto walkable = ::find_closest_walkable_cell(island, start_cell, world_pos, std::nullopt, ctx);
 
-		if (!unoccupied.has_value()) {
+		if (!walkable.has_value()) {
 			return std::nullopt;
 		}
 
-		current = unoccupied->cell;
+		current = walkable->cell;
 	}
-
-	/*
-		4-directional movement.
-	*/
-	const vec2i directions[4] = {
-		{ 0, -1 },
-		{ 0,  1 },
-		{ -1, 0 },
-		{ 1,  0 }
-	};
 
 	int came_from_dir = -1;
 
@@ -930,7 +859,7 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 				continue;
 			}
 
-			const auto dir = directions[d];
+			const auto dir = CELL_DIRECTIONS[d];
 			const auto neighbor = vec2u(vec2i(current) + dir);
 
 			if (is_unoccupied(neighbor)) {
@@ -945,7 +874,7 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 		const auto chosen_idx = rng.randval(0u, static_cast<unsigned>(valid_dirs.size() - 1));
 		const auto chosen_dir = valid_dirs[chosen_idx];
 
-		const auto dir = directions[chosen_dir];
+		const auto dir = CELL_DIRECTIONS[chosen_dir];
 		current = vec2u(vec2i(current) + dir);
 
 		/*
@@ -955,4 +884,30 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 	}
 
 	return current;
+}
+
+std::optional<vec2> find_random_unoccupied_position_within_steps(
+	const cosmos_navmesh& navmesh,
+	const vec2 world_pos,
+	const uint32_t max_steps,
+	randomization& rng,
+	pathfinding_context* ctx
+) {
+	const auto island_opt = ::find_island_for_position(navmesh, world_pos);
+
+	if (!island_opt.has_value()) {
+		return std::nullopt;
+	}
+
+	const auto island_index = *island_opt;
+	const auto& island = navmesh.islands[island_index];
+	const auto start_cell = ::world_to_cell(island, world_pos);
+
+	const auto result_cell = ::find_random_unoccupied_cell_within_steps(island, start_cell, max_steps, rng, ctx);
+
+	if (!result_cell.has_value()) {
+		return std::nullopt;
+	}
+
+	return ::cell_to_world(island, *result_cell);
 }

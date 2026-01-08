@@ -332,7 +332,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	if (playtesting_context.has_value()) {
 		const bool has_debug_target = 
 			playtesting_context->debug_pathfinding_end.has_value() ||
-			playtesting_context->debug_pathfinding_to_bomb;
+			playtesting_context->debug_pathfinding_bomb_target.is_set();
 
 		if (has_debug_target && !players.empty()) {
 			auto& first_player = players.begin()->second;
@@ -342,7 +342,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 			if (character.alive()) {
 				const auto character_pos = character.get_logic_transform().pos;
 				const auto& navmesh = cosm.get_solvable_inferred().navmesh;
-				const auto& physics = cosm.get_solvable_inferred().physics;
 
 				vec2 target_pos = vec2::zero;
 				bool has_target = false;
@@ -369,29 +368,16 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 				if (has_target) {
 					/*
-						Check for FLoS first - if we have direct line of sight, clear pathfinding.
-						FAT_LOS_WIDTH is 100.0f, defined in ai_pathfinding.hpp
+						Start pathfinding if not already pathfinding to this target.
+						Always use pathfinding - no FLoS shortcut.
 					*/
-					constexpr float local_fat_los_width = 100.0f;
-
-					if (::fat_line_of_sight(physics, cosm.get_si(), character_pos, target_pos, local_fat_los_width, character_id)) {
-						first_player.debug_pathfinding.clear();
-					}
-					else {
-						/*
-							Start pathfinding if not already pathfinding to this target.
-						*/
-						::start_pathfinding_to(
-							first_player.debug_pathfinding,
-							character_pos,
-							target_pos,
-							navmesh,
-							physics,
-							cosm.get_si(),
-							character_id,
-							nullptr
-						);
-					}
+					::start_pathfinding_to(
+						first_player.debug_pathfinding,
+						character_pos,
+						target_pos,
+						navmesh,
+						nullptr
+					);
 
 					/*
 						Navigate along the path.
@@ -418,7 +404,8 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					}
 					else {
 						/*
-							Direct navigation to target.
+							Not on active path (maybe on portal cell, waiting for teleport).
+							Use simple direct movement towards target as fallback.
 						*/
 						const auto dir = (target_pos - character_pos).normalize();
 

@@ -3,14 +3,12 @@
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/debug_drawing_settings.h"
-#include "game/inferred_caches/physics_world_cache.h"
 
 /*
 	Epsilon for determining when bot has reached a cell center.
 */
 
 static constexpr float CELL_REACH_EPSILON = 15.0f;
-static constexpr float FAT_LOS_WIDTH = 100.0f;
 
 /*
 	Check if bot is within the given cell bounds.
@@ -82,6 +80,7 @@ inline std::optional<vec2> get_current_path_target(
 
 /*
 	Advance along the current path when reaching cell centers.
+	When reaching a portal cell, clears pathfinding state to allow teleportation.
 */
 
 inline void advance_path_if_reached(
@@ -97,21 +96,21 @@ inline void advance_path_if_reached(
 		std::size_t& path_idx,
 		std::size_t& node_idx,
 		const std::vector<pathfinding_path>& paths
-	) {
+	) -> bool {
 		if (path_idx >= paths.size()) {
-			return;
+			return false;
 		}
 
 		const auto& path = paths[path_idx];
 
 		if (path.island_index >= navmesh.islands.size()) {
-			return;
+			return false;
 		}
 
 		const auto& island = navmesh.islands[path.island_index];
 
 		if (node_idx >= path.nodes.size()) {
-			return;
+			return false;
 		}
 
 		const auto& node = path.nodes[node_idx];
@@ -122,42 +121,53 @@ inline void advance_path_if_reached(
 			++node_idx;
 
 			/*
-				If we've finished this path segment, move to next path.
+				If we've finished this path segment:
+				- If it ends at a portal, clear pathfinding to allow teleportation.
+				  After teleportation, a new path will be calculated.
+				- If no portal (same island path), we're done.
 			*/
 			if (node_idx >= path.nodes.size()) {
 				if (path.final_portal_node.has_value()) {
 					/*
-						Teleport through portal - move to next path segment.
+						Reached portal cell - clear pathfinding state.
+						Bot will recalculate path after teleportation.
 					*/
-					++path_idx;
-					node_idx = 0;
+					return true;
 				}
 			}
 		}
+
+		return false;
 	};
+
+	bool should_clear = false;
 
 	if (pathfinding.rerouting_paths.has_value()) {
 		auto& rerouting = *pathfinding.rerouting_paths;
-		try_advance(pathfinding.rerouting_path_index, pathfinding.rerouting_node_index, rerouting);
+		should_clear = try_advance(pathfinding.rerouting_path_index, pathfinding.rerouting_node_index, rerouting);
 
 		/*
 			If we've finished rerouting, we're back on the main path.
 		*/
-		if (pathfinding.rerouting_path_index >= rerouting.size()) {
+		if (!should_clear && pathfinding.rerouting_path_index >= rerouting.size()) {
 			pathfinding.rerouting_paths.reset();
 			pathfinding.rerouting_path_index = 0;
 			pathfinding.rerouting_node_index = 0;
 		}
 	}
 	else {
-		try_advance(pathfinding.current_path_index, pathfinding.current_node_index, pathfinding.paths);
+		should_clear = try_advance(pathfinding.current_path_index, pathfinding.current_node_index, pathfinding.paths);
 
 		/*
 			If we've finished all paths, clear pathfinding state.
 		*/
-		if (pathfinding.current_path_index >= pathfinding.paths.size()) {
-			pathfinding.clear();
+		if (!should_clear && pathfinding.current_path_index >= pathfinding.paths.size()) {
+			should_clear = true;
 		}
+	}
+
+	if (should_clear) {
+		pathfinding.clear();
 	}
 }
 
@@ -194,10 +204,10 @@ inline void check_path_deviation(
 		const auto target_cell = main_path.nodes[pathfinding.current_node_index].cell_xy;
 		const auto target_world = ::cell_to_world(target_island, target_cell);
 
-		auto new_rerouting = ::find_path_across_islands_many_full(navmesh, bot_pos, target_world, ctx);
+		auto new_rerouting = ::find_path_across_islands_many(navmesh, bot_pos, target_world, ctx);
 
-		if (!new_rerouting.empty()) {
-			pathfinding.rerouting_paths = std::move(new_rerouting);
+		if (new_rerouting.has_value()) {
+			pathfinding.rerouting_paths = std::vector<pathfinding_path>{ std::move(*new_rerouting) };
 			pathfinding.rerouting_path_index = 0;
 			pathfinding.rerouting_node_index = 0;
 		}
@@ -266,10 +276,10 @@ inline void check_path_deviation(
 	}
 
 	const auto reroute_target_world = ::cell_to_world(island, nodes[reroute_target_idx].cell_xy);
-	auto rerouting_path = ::find_path_across_islands_many_full(navmesh, bot_pos, reroute_target_world, ctx);
+	auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
 
-	if (!rerouting_path.empty()) {
-		pathfinding.rerouting_paths = std::move(rerouting_path);
+	if (rerouting_path.has_value()) {
+		pathfinding.rerouting_paths = std::vector<pathfinding_path>{ std::move(*rerouting_path) };
 		pathfinding.rerouting_path_index = 0;
 		pathfinding.rerouting_node_index = 0;
 		pathfinding.current_node_index = reroute_target_idx;
@@ -277,8 +287,32 @@ inline void check_path_deviation(
 }
 
 /*
+	Check if the bot is currently standing on a portal cell.
+*/
+
+inline bool is_on_portal_cell(
+	const vec2 bot_pos,
+	const cosmos_navmesh& navmesh
+) {
+	const auto island_opt = ::find_island_for_position(navmesh, bot_pos);
+
+	if (!island_opt.has_value()) {
+		return false;
+	}
+
+	const auto& island = navmesh.islands[*island_opt];
+	const auto cell = ::world_to_cell(island, bot_pos);
+	const auto cell_value = island.get_cell(cell);
+
+	return ::is_cell_portal(cell_value);
+}
+
+/*
 	Start pathfinding to a target position.
-	Returns true if pathfinding was initiated or FLoS exists.
+	Returns true if pathfinding was initiated.
+	
+	Note: Does not initiate pathfinding if bot is standing on a portal cell
+	(to allow portal teleportation to complete first).
 */
 
 inline bool start_pathfinding_to(
@@ -286,18 +320,15 @@ inline bool start_pathfinding_to(
 	const vec2 bot_pos,
 	const vec2 target_pos,
 	const cosmos_navmesh& navmesh,
-	const physics_world_cache& physics,
-	const si_scaling& si,
-	const entity_id bot_entity,
 	pathfinding_context* ctx
 ) {
 	/*
-		Check for direct FLoS first.
+		Don't initiate new pathfinding while standing on a portal cell.
+		Existing pathfinding sessions can continue, but new ones should wait
+		until the bot has teleported through the portal.
 	*/
-	if (::fat_line_of_sight(physics, si, bot_pos, target_pos, FAT_LOS_WIDTH, bot_entity)) {
-		pathfinding.clear();
-		pathfinding.target_position = target_pos;
-		return true;
+	if (!pathfinding.is_active && ::is_on_portal_cell(bot_pos, navmesh)) {
+		return false;
 	}
 
 	/*
@@ -323,16 +354,17 @@ inline bool start_pathfinding_to(
 	}
 
 	/*
-		Calculate new path.
+		Calculate path to next portal or directly to destination.
+		Using find_path_across_islands_many which only returns path to the next portal.
 	*/
-	auto paths = ::find_path_across_islands_many_full(navmesh, bot_pos, target_pos, ctx);
+	auto path = ::find_path_across_islands_many(navmesh, bot_pos, target_pos, ctx);
 
-	if (paths.empty()) {
+	if (!path.has_value()) {
 		return false;
 	}
 
 	pathfinding.clear();
-	pathfinding.paths = std::move(paths);
+	pathfinding.paths.push_back(std::move(*path));
 	pathfinding.current_path_index = 0;
 	pathfinding.current_node_index = 0;
 	pathfinding.target_position = target_pos;
