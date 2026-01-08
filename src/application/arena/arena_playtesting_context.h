@@ -9,9 +9,6 @@ struct arena_playtesting_context {
 	vec2 initial_spawn_pos;
 	faction_type first_player_faction = faction_type::SPECTATOR;
 
-	/*
-		For pathfinding debug testing.
-	*/
 	std::optional<vec2> debug_pathfinding_end;
 	entity_id debug_pathfinding_bomb_target;
 	// END GEN INTROSPECTOR
