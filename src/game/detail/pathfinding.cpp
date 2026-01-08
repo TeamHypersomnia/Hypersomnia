@@ -243,7 +243,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 			Portal cells (>= 2) are walkable only if it's the target or source portal.
 			Use direct optional comparison - returns false if target_portal_index is nullopt.
 		*/
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
 			return true;
 		}
 
@@ -643,7 +643,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		/*
 			Portal cells are walkable if it's the target or source portal.
 		*/
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
 			return true;
 		}
 
@@ -664,7 +664,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 			return true;
 		}
 
-		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(255))) {
+		if (value == static_cast<uint8_t>(2 + target_portal_index.value_or(NO_TARGET_PORTAL))) {
 			return true;
 		}
 
@@ -728,10 +728,11 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 	};
 
 	/*
-		Use BFS to find up to 4 walkable cells, tracking the closest one by Euclidean distance.
+		Use BFS to find up to MAX_WALKABLE_CANDIDATES walkable cells,
+		tracking the closest one by Euclidean distance.
 	*/
 	std::vector<vec2u> candidates;
-	candidates.reserve(4);
+	candidates.reserve(MAX_WALKABLE_CANDIDATES);
 
 	augs::bfs_for_each_matching(
 		start_cell,
@@ -743,7 +744,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		[&](const vec2u cell) {
 			candidates.push_back(cell);
 
-			if (candidates.size() >= 4) {
+			if (candidates.size() >= MAX_WALKABLE_CANDIDATES) {
 				return callback_result::ABORT;
 			}
 

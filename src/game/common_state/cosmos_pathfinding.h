@@ -62,3 +62,17 @@ inline constexpr vec2i CELL_DIRECTIONS[4] = {
 	{ -1, 0 },
 	{ 1,  0 }
 };
+
+/*
+	Maximum number of candidate cells to consider when finding closest walkable cell.
+	Abort BFS after finding this many matches to avoid traversing entire graph.
+*/
+
+inline constexpr std::size_t MAX_WALKABLE_CANDIDATES = 4;
+
+/*
+	Sentinel value for "no target portal" comparison.
+	Used with value_or() to ensure portal cell value comparison always fails for nullopt.
+*/
+
+inline constexpr std::size_t NO_TARGET_PORTAL = 255;
