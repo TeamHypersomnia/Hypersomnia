@@ -37,45 +37,31 @@ inline std::optional<vec2> get_current_path_target(
 	const ai_pathfinding_state& pathfinding,
 	const cosmos_navmesh& navmesh
 ) {
-	if (!pathfinding.is_active || pathfinding.paths.empty()) {
+	if (!pathfinding.is_active) {
 		return std::nullopt;
 	}
 
 	/*
 		If rerouting, use rerouting path.
 	*/
-	if (pathfinding.rerouting_paths.has_value()) {
-		const auto& rerouting = *pathfinding.rerouting_paths;
+	const auto& progress = pathfinding.rerouting.is_active() 
+		? pathfinding.rerouting 
+		: pathfinding.main;
 
-		if (pathfinding.rerouting_path_index < rerouting.size()) {
-			const auto& path = rerouting[pathfinding.rerouting_path_index];
-
-			if (path.island_index < navmesh.islands.size() && 
-			    pathfinding.rerouting_node_index < path.nodes.size()) {
-				const auto& island = navmesh.islands[path.island_index];
-				const auto& node = path.nodes[pathfinding.rerouting_node_index];
-				return ::cell_to_world(island, node.cell_xy);
-			}
-		}
-
+	if (!progress.path.has_value()) {
 		return std::nullopt;
 	}
 
-	/*
-		Use main path.
-	*/
-	if (pathfinding.current_path_index < pathfinding.paths.size()) {
-		const auto& path = pathfinding.paths[pathfinding.current_path_index];
+	const auto& path = *progress.path;
 
-		if (path.island_index < navmesh.islands.size() && 
-		    pathfinding.current_node_index < path.nodes.size()) {
-			const auto& island = navmesh.islands[path.island_index];
-			const auto& node = path.nodes[pathfinding.current_node_index];
-			return ::cell_to_world(island, node.cell_xy);
-		}
+	if (path.island_index >= navmesh.islands.size() ||
+	    progress.node_index >= path.nodes.size()) {
+		return std::nullopt;
 	}
 
-	return std::nullopt;
+	const auto& island = navmesh.islands[path.island_index];
+	const auto& node = path.nodes[progress.node_index];
+	return ::cell_to_world(island, node.cell_xy);
 }
 
 /*
@@ -92,16 +78,12 @@ inline void advance_path_if_reached(
 		return;
 	}
 
-	auto try_advance = [&](
-		std::size_t& path_idx,
-		std::size_t& node_idx,
-		const std::vector<pathfinding_path>& paths
-	) -> bool {
-		if (path_idx >= paths.size()) {
+	auto try_advance = [&](pathfinding_progress& progress) -> bool {
+		if (!progress.path.has_value()) {
 			return false;
 		}
 
-		const auto& path = paths[path_idx];
+		const auto& path = *progress.path;
 
 		if (path.island_index >= navmesh.islands.size()) {
 			return false;
@@ -109,16 +91,16 @@ inline void advance_path_if_reached(
 
 		const auto& island = navmesh.islands[path.island_index];
 
-		if (node_idx >= path.nodes.size()) {
+		if (progress.node_index >= path.nodes.size()) {
 			return false;
 		}
 
-		const auto& node = path.nodes[node_idx];
+		const auto& node = path.nodes[progress.node_index];
 		const auto cell_center = ::cell_to_world(island, node.cell_xy);
 		const auto dist_to_center = (bot_pos - cell_center).length();
 
 		if (dist_to_center < CELL_REACH_EPSILON) {
-			++node_idx;
+			++progress.node_index;
 
 			/*
 				If we've finished this path segment:
@@ -126,7 +108,7 @@ inline void advance_path_if_reached(
 				  After teleportation, a new path will be calculated.
 				- If no portal (same island path), we're done.
 			*/
-			if (node_idx >= path.nodes.size()) {
+			if (progress.node_index >= path.nodes.size()) {
 				if (path.final_portal_node.has_value()) {
 					/*
 						Reached portal cell - clear pathfinding state.
@@ -142,26 +124,25 @@ inline void advance_path_if_reached(
 
 	bool should_clear = false;
 
-	if (pathfinding.rerouting_paths.has_value()) {
-		auto& rerouting = *pathfinding.rerouting_paths;
-		should_clear = try_advance(pathfinding.rerouting_path_index, pathfinding.rerouting_node_index, rerouting);
+	if (pathfinding.rerouting.is_active()) {
+		should_clear = try_advance(pathfinding.rerouting);
 
 		/*
 			If we've finished rerouting, we're back on the main path.
 		*/
-		if (!should_clear && pathfinding.rerouting_path_index >= rerouting.size()) {
-			pathfinding.rerouting_paths.reset();
-			pathfinding.rerouting_path_index = 0;
-			pathfinding.rerouting_node_index = 0;
+		if (!should_clear && pathfinding.rerouting.path.has_value() &&
+		    pathfinding.rerouting.node_index >= pathfinding.rerouting.path->nodes.size()) {
+			pathfinding.rerouting.clear();
 		}
 	}
 	else {
-		should_clear = try_advance(pathfinding.current_path_index, pathfinding.current_node_index, pathfinding.paths);
+		should_clear = try_advance(pathfinding.main);
 
 		/*
-			If we've finished all paths, clear pathfinding state.
+			If we've finished main path, clear pathfinding state.
 		*/
-		if (!should_clear && pathfinding.current_path_index >= pathfinding.paths.size()) {
+		if (!should_clear && pathfinding.main.path.has_value() &&
+		    pathfinding.main.node_index >= pathfinding.main.path->nodes.size()) {
 			should_clear = true;
 		}
 	}
@@ -181,35 +162,34 @@ inline void check_path_deviation(
 	const cosmos_navmesh& navmesh,
 	pathfinding_context* ctx
 ) {
-	if (!pathfinding.is_active || pathfinding.paths.empty()) {
+	if (!pathfinding.is_active || !pathfinding.main.path.has_value()) {
 		return;
 	}
+
+	const auto& main_path = *pathfinding.main.path;
 
 	/*
 		If already rerouting, check if we fell off the rerouting path.
 	*/
-	if (pathfinding.rerouting_paths.has_value()) {
+	if (pathfinding.rerouting.is_active()) {
 		/*
 			Recalculate rerouting to the main path cell.
 		*/
-		const auto& main_path = pathfinding.paths[pathfinding.current_path_index];
-
 		if (main_path.island_index >= navmesh.islands.size() ||
-		    pathfinding.current_node_index >= main_path.nodes.size()) {
+		    pathfinding.main.node_index >= main_path.nodes.size()) {
 			pathfinding.clear();
 			return;
 		}
 
 		const auto& target_island = navmesh.islands[main_path.island_index];
-		const auto target_cell = main_path.nodes[pathfinding.current_node_index].cell_xy;
+		const auto target_cell = main_path.nodes[pathfinding.main.node_index].cell_xy;
 		const auto target_world = ::cell_to_world(target_island, target_cell);
 
 		auto new_rerouting = ::find_path_across_islands_many(navmesh, bot_pos, target_world, ctx);
 
 		if (new_rerouting.has_value()) {
-			pathfinding.rerouting_paths = std::vector<pathfinding_path>{ std::move(*new_rerouting) };
-			pathfinding.rerouting_path_index = 0;
-			pathfinding.rerouting_node_index = 0;
+			pathfinding.rerouting.path = std::move(*new_rerouting);
+			pathfinding.rerouting.node_index = 0;
 		}
 
 		return;
@@ -218,16 +198,14 @@ inline void check_path_deviation(
 	/*
 		Check if we're on any of the nearby path cells.
 	*/
-	const auto& current_path = pathfinding.paths[pathfinding.current_path_index];
-
-	if (current_path.island_index >= navmesh.islands.size()) {
+	if (main_path.island_index >= navmesh.islands.size()) {
 		pathfinding.clear();
 		return;
 	}
 
-	const auto& island = navmesh.islands[current_path.island_index];
-	const auto& nodes = current_path.nodes;
-	const auto current_idx = pathfinding.current_node_index;
+	const auto& island = navmesh.islands[main_path.island_index];
+	const auto& nodes = main_path.nodes;
+	const auto current_idx = pathfinding.main.node_index;
 
 	/*
 		Check nodes[index - 5 .. index + 5] to find the closest one.
@@ -255,7 +233,7 @@ inline void check_path_deviation(
 		/*
 			We're still on the path, update index if necessary.
 		*/
-		pathfinding.current_node_index = *closest_within_bounds;
+		pathfinding.main.node_index = *closest_within_bounds;
 		return;
 	}
 
@@ -279,10 +257,9 @@ inline void check_path_deviation(
 	auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
 
 	if (rerouting_path.has_value()) {
-		pathfinding.rerouting_paths = std::vector<pathfinding_path>{ std::move(*rerouting_path) };
-		pathfinding.rerouting_path_index = 0;
-		pathfinding.rerouting_node_index = 0;
-		pathfinding.current_node_index = reroute_target_idx;
+		pathfinding.rerouting.path = std::move(*rerouting_path);
+		pathfinding.rerouting.node_index = 0;
+		pathfinding.main.node_index = reroute_target_idx;
 	}
 }
 
@@ -364,9 +341,8 @@ inline bool start_pathfinding_to(
 	}
 
 	pathfinding.clear();
-	pathfinding.paths.push_back(std::move(*path));
-	pathfinding.current_path_index = 0;
-	pathfinding.current_node_index = 0;
+	pathfinding.main.path = std::move(*path);
+	pathfinding.main.node_index = 0;
 	pathfinding.target_position = target_pos;
 	pathfinding.target_island = target_island;
 	pathfinding.target_cell = target_cell;
@@ -391,9 +367,9 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 	}
 
 	/*
-		If we have direct FLoS (no paths but active), navigate directly.
+		If we have direct path (no paths but active), navigate directly.
 	*/
-	if (pathfinding.paths.empty()) {
+	if (!pathfinding.main.path.has_value()) {
 		const auto dir = pathfinding.target_position - bot_pos;
 		target_crosshair_offset = dir;
 		return dir.normalize();
@@ -414,24 +390,18 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 	*/
 	vec2 look_ahead_target = current_target;
 
-	const auto* active_paths = pathfinding.rerouting_paths.has_value() 
-		? &(*pathfinding.rerouting_paths) 
-		: &pathfinding.paths;
-	const auto active_path_idx = pathfinding.rerouting_paths.has_value()
-		? pathfinding.rerouting_path_index
-		: pathfinding.current_path_index;
-	const auto active_node_idx = pathfinding.rerouting_paths.has_value()
-		? pathfinding.rerouting_node_index
-		: pathfinding.current_node_index;
+	const auto& active_progress = pathfinding.rerouting.is_active() 
+		? pathfinding.rerouting 
+		: pathfinding.main;
 
-	if (active_path_idx < active_paths->size()) {
-		const auto& path = (*active_paths)[active_path_idx];
+	if (active_progress.path.has_value()) {
+		const auto& path = *active_progress.path;
 
 		if (path.island_index < navmesh.islands.size()) {
 			const auto& island = navmesh.islands[path.island_index];
 
-			if (active_node_idx + 1 < path.nodes.size()) {
-				const auto next_target = ::cell_to_world(island, path.nodes[active_node_idx + 1].cell_xy);
+			if (active_progress.node_index + 1 < path.nodes.size()) {
+				const auto next_target = ::cell_to_world(island, path.nodes[active_progress.node_index + 1].cell_xy);
 
 				/*
 					Interpolate between current and next target based on distance.
@@ -465,13 +435,15 @@ inline void debug_draw_pathfinding(
 		return;
 	}
 
-	const auto* active_paths = pathfinding.rerouting_paths.has_value() 
-		? &(*pathfinding.rerouting_paths) 
-		: &pathfinding.paths;
+	auto draw_path = [&](const pathfinding_progress& progress) {
+		if (!progress.path.has_value()) {
+			return;
+		}
 
-	for (const auto& path : *active_paths) {
+		const auto& path = *progress.path;
+
 		if (path.island_index >= navmesh.islands.size()) {
-			continue;
+			return;
 		}
 
 		const auto& island = navmesh.islands[path.island_index];
@@ -482,6 +454,12 @@ inline void debug_draw_pathfinding(
 
 			DEBUG_LOGIC_STEP_LINES.emplace_back(green, from, to);
 		}
+	};
+
+	draw_path(pathfinding.main);
+
+	if (pathfinding.rerouting.is_active()) {
+		draw_path(pathfinding.rerouting);
 	}
 
 	if (const auto target = ::get_current_path_target(pathfinding, navmesh)) {

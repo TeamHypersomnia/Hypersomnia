@@ -10,35 +10,27 @@ struct arena_ai_result {
 
 /*
 	State for pathfinding navigation.
+	Uses pathfinding_progress for main path and optional rerouting path.
 */
 
 struct ai_pathfinding_state {
 	// GEN INTROSPECTOR struct ai_pathfinding_state
-	std::vector<pathfinding_path> paths;
-	std::size_t current_path_index = 0;
-	std::size_t current_node_index = 0;
+	pathfinding_progress main;
+	pathfinding_progress rerouting;
 
 	vec2 target_position = vec2::zero;
 	std::size_t target_island = 0;
 	vec2u target_cell = vec2u::zero;
 
-	std::optional<std::vector<pathfinding_path>> rerouting_paths;
-	std::size_t rerouting_path_index = 0;
-	std::size_t rerouting_node_index = 0;
-
 	bool is_active = false;
 	// END GEN INTROSPECTOR
 
 	void clear() {
-		paths.clear();
-		current_path_index = 0;
-		current_node_index = 0;
+		main.clear();
+		rerouting.clear();
 		target_position = vec2::zero;
 		target_island = 0;
 		target_cell = vec2u::zero;
-		rerouting_paths.reset();
-		rerouting_path_index = 0;
-		rerouting_node_index = 0;
 		is_active = false;
 	}
 };

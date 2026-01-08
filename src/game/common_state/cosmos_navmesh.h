@@ -37,6 +37,19 @@ inline bool is_cell_unwalkable(const uint8_t cell_value) {
 	return cell_value == 1;
 }
 
+/*
+	Check if a cell value matches a specific portal index.
+	If target_portal_index is nullopt, always returns false.
+	Per C++ standard, comparing std::optional<T> with a value when nullopt returns false.
+*/
+
+inline bool is_cell_target_portal(const uint8_t cell_value, const std::optional<std::size_t> target_portal_index) {
+	if (!target_portal_index.has_value()) {
+		return false;
+	}
+	return cell_value == static_cast<uint8_t>(2 + *target_portal_index);
+}
+
 struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
 	vec2u in_cell_pos = vec2u::zero;

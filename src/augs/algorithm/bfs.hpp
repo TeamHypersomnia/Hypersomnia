@@ -117,6 +117,7 @@ namespace augs {
 	/*
 		Generic BFS traversal that calls a callback for each node matching a predicate.
 		Supports early abort via callback return value.
+		Named "full" because it can potentially iterate the entire graph.
 
 		Template parameters:
 			Id - The type of node identifier
@@ -140,7 +141,7 @@ namespace augs {
 		class IsTarget,
 		class OnMatch
 	>
-	void bfs_for_each_matching(
+	void bfs_full(
 		const Id start,
 		GetVisited&& get_visited,
 		SetVisited&& set_visited,
