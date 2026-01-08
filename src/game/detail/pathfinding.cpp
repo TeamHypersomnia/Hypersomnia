@@ -249,9 +249,34 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 	/*
 		Check if start is walkable.
+		If not, find the closest unoccupied cell and prepend the path through occupied cells.
 	*/
+	std::vector<pathfinding_node> prefix_path;
+	vec2u actual_start = start_cell;
+
 	if (!is_walkable(start_cell)) {
-		return std::nullopt;
+		const auto start_world = ::cell_to_world(island, start_cell);
+		const auto unoccupied_result = ::find_closest_unoccupied_cell(island, start_cell, start_world, ctx);
+
+		if (!unoccupied_result.has_value()) {
+			return std::nullopt;
+		}
+
+		prefix_path = unoccupied_result->path_through_occupied;
+		actual_start = unoccupied_result->cell;
+
+		/*
+			Re-initialize graph since find_closest_unoccupied_cell may have modified context.
+		*/
+		graph.init_all();
+	}
+
+	/*
+		If actual_start == target, return prefix path + target.
+	*/
+	if (actual_start == target_cell) {
+		prefix_path.push_back(pathfinding_node{ target_cell });
+		return prefix_path;
 	}
 
 	auto heuristic = [&](const vec2u c) {
@@ -264,7 +289,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 	const auto found = augs::astar_find_path(
 		context.astar_queue,
-		start_cell,
+		actual_start,
 		graph.make_get_visited(),
 		graph.make_set_visited(),
 		graph.make_for_each_neighbor(is_walkable),
@@ -279,7 +304,21 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return std::nullopt;
 	}
 
-	return graph.reconstruct_path(start_cell, target_cell);
+	auto main_path = graph.reconstruct_path(actual_start, target_cell);
+
+	/*
+		Prepend the path through occupied cells if any.
+	*/
+	if (!prefix_path.empty()) {
+		/*
+			Remove the last element of prefix_path since it's the same as first of main_path.
+		*/
+		prefix_path.pop_back();
+		prefix_path.insert(prefix_path.end(), main_path.begin(), main_path.end());
+		return prefix_path;
+	}
+
+	return main_path;
 }
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
@@ -510,11 +549,10 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	return all_paths;
 }
 
-std::optional<walkable_cell_result> find_closest_walkable_cell(
+std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
-	const std::optional<std::size_t> target_portal_index,
 	pathfinding_context* ctx
 ) {
 	const auto size = island.get_size_in_cells();
@@ -527,66 +565,11 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		return std::nullopt;
 	}
 
-	std::optional<uint8_t> source_portal_value;
-
-	if (const auto start_value = island.get_cell(start_cell); ::is_cell_portal(start_value)) {
-		source_portal_value = start_value;
-	}
-
 	/*
-		A cell is walkable if it's unoccupied or the target portal.
+		If start cell is already unoccupied, return it immediately.
 	*/
-	auto is_walkable = [&](const vec2u c) {
-		if (c.x >= size.x || c.y >= size.y) {
-			return false;
-		}
-
-		const auto value = island.get_cell(c);
-
-		if (::is_cell_unoccupied(value)) {
-			return true;
-		}
-
-		if (::is_cell_unwalkable(value)) {
-			return false;
-		}
-
-		/*
-			Portal cells are walkable if it's the target or source portal.
-		*/
-		if (::is_cell_target_portal(value, target_portal_index)) {
-			return true;
-		}
-
-		if (value == source_portal_value) {
-			return true;
-		}
-
-		return false;
-	};
-
-	/*
-		A cell is a valid target if it's unoccupied OR it's the target portal.
-	*/
-	auto is_target_cell = [&](const vec2u c) {
-		const auto value = island.get_cell(c);
-
-		if (::is_cell_unoccupied(value)) {
-			return true;
-		}
-
-		if (::is_cell_target_portal(value, target_portal_index)) {
-			return true;
-		}
-
-		return false;
-	};
-
-	/*
-		If start cell is already a valid target, return it immediately.
-	*/
-	if (is_target_cell(start_cell)) {
-		walkable_cell_result result;
+	if (island.is_cell_unoccupied(start_cell)) {
+		unoccupied_cell_result result;
 		result.cell = start_cell;
 		return result;
 	}
@@ -599,7 +582,21 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 	graph.init_parent();
 
 	/*
-		Use BFS to find up to MAX_WALKABLE_CANDIDATES walkable cells,
+		A cell is walkable for BFS traversal if it's walkable (not == 1).
+	*/
+	auto is_walkable = [&](const vec2u c) {
+		return island.is_cell_walkable(c);
+	};
+
+	/*
+		A cell is a valid target if it's unoccupied (value == 0).
+	*/
+	auto is_target_cell = [&](const vec2u c) {
+		return island.is_cell_unoccupied(c);
+	};
+
+	/*
+		Use BFS to find up to MAX_WALKABLE_CANDIDATES unoccupied cells,
 		tracking the closest one by Euclidean distance.
 	*/
 	std::vector<vec2u> candidates;
@@ -643,7 +640,7 @@ std::optional<walkable_cell_result> find_closest_walkable_cell(
 		}
 	}
 
-	walkable_cell_result result;
+	unoccupied_cell_result result;
 	result.cell = best_cell;
 	result.path_through_occupied = graph.reconstruct_path(start_cell, best_cell);
 
@@ -667,33 +664,20 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 		return std::nullopt;
 	}
 
-	auto is_unoccupied = [&](const vec2u c) {
-		if (c.x >= size.x || c.y >= size.y) {
-			return false;
-		}
-
-		const auto value = island.get_cell(c);
-
-		/*
-			Only allow unoccupied cells (0), disallow portals.
-		*/
-		return ::is_cell_unoccupied(value);
-	};
-
 	/*
 		First, find an unoccupied starting cell if the start is occupied.
 	*/
 	vec2u current = start_cell;
 
-	if (!is_unoccupied(current)) {
+	if (!island.is_cell_unoccupied(start_cell)) {
 		const auto world_pos = ::cell_to_world(island, start_cell);
-		const auto walkable = ::find_closest_walkable_cell(island, start_cell, world_pos, std::nullopt, ctx);
+		const auto unoccupied = ::find_closest_unoccupied_cell(island, start_cell, world_pos, ctx);
 
-		if (!walkable.has_value()) {
+		if (!unoccupied.has_value()) {
 			return std::nullopt;
 		}
 
-		current = walkable->cell;
+		current = unoccupied->cell;
 	}
 
 	int came_from_dir = -1;
@@ -712,7 +696,7 @@ std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 			const auto dir = CELL_DIRECTIONS[d];
 			const auto neighbor = vec2u(vec2i(current) + dir);
 
-			if (is_unoccupied(neighbor)) {
+			if (island.is_cell_unoccupied(neighbor)) {
 				valid_dirs.push_back(d);
 			}
 		}

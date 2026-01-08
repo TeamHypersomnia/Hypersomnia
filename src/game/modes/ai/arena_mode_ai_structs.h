@@ -15,23 +15,24 @@ struct arena_ai_result {
 
 struct ai_pathfinding_state {
 	// GEN INTROSPECTOR struct ai_pathfinding_state
-	pathfinding_progress main;
-	pathfinding_progress rerouting;
+	std::optional<pathfinding_progress> main;
+	std::optional<pathfinding_progress> rerouting;
 
 	vec2 target_position = vec2::zero;
 	std::size_t target_island = 0;
 	vec2u target_cell = vec2u::zero;
-
-	bool is_active = false;
 	// END GEN INTROSPECTOR
 
+	bool is_active() const {
+		return main.has_value();
+	}
+
 	void clear() {
-		main.clear();
-		rerouting.clear();
+		main.reset();
+		rerouting.reset();
 		target_position = vec2::zero;
 		target_island = 0;
 		target_cell = vec2u::zero;
-		is_active = false;
 	}
 };
 
