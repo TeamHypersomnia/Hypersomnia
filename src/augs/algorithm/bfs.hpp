@@ -115,7 +115,8 @@ namespace augs {
 namespace augs {
 
 	/*
-		Generic BFS traversal that calls a callback for each node matching a predicate.
+		Generic BFS traversal with predicate-based target detection.
+		Calls a callback for each node matching IsTarget predicate.
 		Supports early abort via callback return value.
 		Named "full" because it can potentially iterate the entire graph.
 

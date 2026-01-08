@@ -39,8 +39,7 @@ inline bool is_cell_unwalkable(const uint8_t cell_value) {
 
 /*
 	Check if a cell value matches a specific portal index.
-	If target_portal_index is nullopt, always returns false.
-	Per C++ standard, comparing std::optional<T> with a value when nullopt returns false.
+	If target_portal_index is nullopt, returns false.
 */
 
 inline bool is_cell_target_portal(const uint8_t cell_value, const std::optional<std::size_t> target_portal_index) {
