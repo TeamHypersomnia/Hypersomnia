@@ -164,13 +164,14 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 );
 
 /*
-	Random walkable cell within n steps using BFS with random direction choices.
+	Random unoccupied cell within n steps using random walk with random direction choices.
 	Uses stable_rng for deterministic random directions.
+	Only walks through unoccupied cells (value == 0), avoiding portals.
 */
 
 class randomization;
 
-std::optional<vec2u> find_random_walkable_cell_within_steps(
+std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const uint32_t max_steps,

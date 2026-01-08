@@ -235,23 +235,16 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 		const auto value = island.get_cell(c);
 
-		/*
-			0 = free, always walkable.
-		*/
-		if (value == 0) {
+		if (::is_cell_unoccupied(value)) {
 			return true;
 		}
 
-		/*
-			1 = occupied, never walkable.
-		*/
-		if (value == 1) {
+		if (::is_cell_unwalkable(value)) {
 			return false;
 		}
 
 		/*
-			>= 2 = portal cells.
-			Only walkable if it's the target portal.
+			Portal cells (>= 2) are walkable only if it's the target or source portal.
 		*/
 		if (target_portal_index.has_value() && value == target_portal_value) {
 			return true;
@@ -304,10 +297,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 			/*
 				Underflow is handled by is_walkable which returns false for out-of-bounds cells.
 			*/
-			const auto neighbor = vec2u(
-				static_cast<uint32_t>(static_cast<int>(c.x) + dir.x),
-				static_cast<uint32_t>(static_cast<int>(c.y) + dir.y)
-			);
+			const auto neighbor = vec2u(vec2i(c) + dir);
 
 			if (is_walkable(neighbor)) {
 				if (callback(neighbor) == callback_result::ABORT) {
@@ -699,18 +689,18 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 
 	std::optional<std::size_t> source_portal_index;
 
-	if (const auto start_type = island.get_cell(start_cell); start_type >= 2) {
+	if (const auto start_type = island.get_cell(start_cell); ::is_cell_portal(start_type)) {
 		source_portal_index = start_type;
 	}
 
-	auto is_cell_unoccupied = [&](const vec2u c) {
+	auto is_unoccupied = [&](const vec2u c) {
 		if (c.x >= size.x || c.y >= size.y) {
 			return false;
 		}
 
 		const auto value = island.get_cell(c);
 
-		if (value == 0) {
+		if (::is_cell_unoccupied(value)) {
 			return true;
 		}
 
@@ -728,11 +718,11 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 
 		const auto value = island.get_cell(c);
 
-		if (value == 0) {
+		if (::is_cell_unoccupied(value)) {
 			return true;
 		}
 
-		if (value == 1) {
+		if (::is_cell_unwalkable(value)) {
 			return false;
 		}
 
@@ -750,7 +740,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	/*
 		If start cell is already unoccupied, return it immediately.
 	*/
-	if (is_cell_unoccupied(start_cell)) {
+	if (is_unoccupied(start_cell)) {
 		unoccupied_cell_result result;
 		result.cell = start_cell;
 		return result;
@@ -797,46 +787,30 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 		context.cells_parent[get_cell_index(child)] = static_cast<int>(parent_cell.y * size.x + parent_cell.x);
 	};
 
-	/*
-		BFS to find all unoccupied cells reachable from start.
-		Track the one with minimum Euclidean distance to world_pos.
-	*/
-	std::vector<vec2u> candidates;
-	std::queue<vec2u> queue;
-
-	queue.push(start_cell);
-	set_visited(start_cell);
-
-	while (!queue.empty()) {
-		const auto current = queue.front();
-		queue.pop();
-
+	auto for_each_neighbor = [&](const vec2u c, auto&& callback) {
 		for (uint32_t d = 0; d < 4; ++d) {
 			const auto dir = directions[d];
-			const auto neighbor = vec2u(
-				static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
-				static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
-			);
+			const auto neighbor = vec2u(vec2i(c) + dir);
 
-			if (!is_walkable(neighbor)) {
-				continue;
-			}
-
-			if (get_visited(neighbor)) {
-				continue;
-			}
-
-			set_visited(neighbor);
-			set_parent(neighbor, current);
-
-			if (is_cell_unoccupied(neighbor)) {
-				candidates.push_back(neighbor);
-			}
-			else {
-				queue.push(neighbor);
+			if (is_walkable(neighbor)) {
+				if (callback(neighbor) == callback_result::ABORT) {
+					return;
+				}
 			}
 		}
-	}
+	};
+
+	/*
+		Use augs::bfs_find_all_matching to find all unoccupied cells.
+	*/
+	auto candidates = augs::bfs_find_all_matching(
+		start_cell,
+		get_visited,
+		set_visited,
+		set_parent,
+		for_each_neighbor,
+		is_unoccupied
+	);
 
 	if (candidates.empty()) {
 		return std::nullopt;
@@ -887,7 +861,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	return result;
 }
 
-std::optional<vec2u> find_random_walkable_cell_within_steps(
+std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const uint32_t max_steps,
@@ -904,7 +878,7 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 		return std::nullopt;
 	}
 
-	auto is_walkable = [&](const vec2u c) {
+	auto is_unoccupied = [&](const vec2u c) {
 		if (c.x >= size.x || c.y >= size.y) {
 			return false;
 		}
@@ -912,9 +886,9 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 		const auto value = island.get_cell(c);
 
 		/*
-			Only allow free cells (0), disallow portals.
+			Only allow unoccupied cells (0), disallow portals.
 		*/
-		return value == 0;
+		return ::is_cell_unoccupied(value);
 	};
 
 	/*
@@ -922,7 +896,7 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 	*/
 	vec2u current = start_cell;
 
-	if (!is_walkable(current)) {
+	if (!is_unoccupied(current)) {
 		const auto world_pos = ::cell_to_world(island, start_cell);
 		const auto unoccupied = ::find_closest_unoccupied_cell(island, start_cell, world_pos, std::nullopt, ctx);
 
@@ -947,7 +921,7 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 
 	for (uint32_t step = 0; step < max_steps; ++step) {
 		/*
-			Collect valid directions (walkable and not the direction we came from).
+			Collect valid directions (unoccupied and not the direction we came from).
 		*/
 		std::vector<int> valid_dirs;
 
@@ -957,12 +931,9 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 			}
 
 			const auto dir = directions[d];
-			const auto neighbor = vec2u(
-				static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
-				static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
-			);
+			const auto neighbor = vec2u(vec2i(current) + dir);
 
-			if (is_walkable(neighbor)) {
+			if (is_unoccupied(neighbor)) {
 				valid_dirs.push_back(d);
 			}
 		}
@@ -975,10 +946,7 @@ std::optional<vec2u> find_random_walkable_cell_within_steps(
 		const auto chosen_dir = valid_dirs[chosen_idx];
 
 		const auto dir = directions[chosen_dir];
-		current = vec2u(
-			static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
-			static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
-		);
+		current = vec2u(vec2i(current) + dir);
 
 		/*
 			Calculate the opposite direction.

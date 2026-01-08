@@ -111,3 +111,70 @@ namespace augs {
 	}
 
 } /* namespace augs */
+
+namespace augs {
+
+	/*
+		Generic BFS algorithm that finds all nodes matching a predicate,
+		tracking parent nodes for path reconstruction.
+
+		Template parameters:
+			Id - The type of node identifier
+			GetVisited - Lambda: (Id) -> bool, returns true if node was visited
+			SetVisited - Lambda: (Id) -> void, marks node as visited
+			SetParent - Lambda: (Id child, Id parent) -> void, records parent for path reconstruction
+			ForEachNeighbor - Lambda: (Id, Callback) -> void, calls callback with each neighbor's Id
+			IsTarget - Lambda: (Id) -> bool, returns true if node matches the search criteria
+
+		Returns: std::vector<Id> - all matching nodes found
+	*/
+
+	template <
+		class Id,
+		class GetVisited,
+		class SetVisited,
+		class SetParent,
+		class ForEachNeighbor,
+		class IsTarget
+	>
+	std::vector<Id> bfs_find_all_matching(
+		const Id start,
+		GetVisited&& get_visited,
+		SetVisited&& set_visited,
+		SetParent&& set_parent,
+		ForEachNeighbor&& for_each_neighbor,
+		IsTarget&& is_target
+	) {
+		std::queue<Id> queue;
+		std::vector<Id> results;
+
+		set_visited(start);
+		queue.push(start);
+
+		while (!queue.empty()) {
+			const auto current = queue.front();
+			queue.pop();
+
+			for_each_neighbor(current, [&](const Id neighbor) {
+				if (get_visited(neighbor)) {
+					return callback_result::CONTINUE;
+				}
+
+				set_visited(neighbor);
+				set_parent(neighbor, current);
+
+				if (is_target(neighbor)) {
+					results.push_back(neighbor);
+				}
+				else {
+					queue.push(neighbor);
+				}
+
+				return callback_result::CONTINUE;
+			});
+		}
+
+		return results;
+	}
+
+}

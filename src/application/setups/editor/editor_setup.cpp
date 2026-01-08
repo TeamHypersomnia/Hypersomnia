@@ -72,6 +72,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
 #include "game/detail/pathfinding.h"
+#include "game/detail/explosive/like_explosive.h"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
@@ -3607,16 +3608,16 @@ arena_playtesting_context editor_setup::make_playtesting_context() const {
 	}
 	else {
 		/*
-			Check if there's a bomb on the ground to use as pathfinding target.
+			Check if there's a planted bomb on the ground to use as pathfinding target.
 		*/
 		scene.world.for_each_having<invariants::hand_fuse>(
 			[&](const auto& typed_handle) {
-				if (const auto fuse = typed_handle.template find<components::hand_fuse>()) {
+				if (::is_like_plantable_bomb(typed_handle)) {
 					/*
-						Check if it's a planted bomb (not in inventory).
+						Check if it's on the ground (not in inventory).
 					*/
 					if (!typed_handle.get_owning_transfer_capability().alive()) {
-						ctx.debug_pathfinding_to_bomb = true;
+						ctx.debug_pathfinding_bomb_target = typed_handle.get_id();
 					}
 				}
 			}
