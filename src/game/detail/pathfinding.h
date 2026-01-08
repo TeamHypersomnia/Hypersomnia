@@ -103,6 +103,7 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 /*
 	Find path across multiple islands (unknown number on path).
 	First does BFS on islands, then uses find_path_across_islands_direct.
+	Only returns path to the next portal (or directly to destination if same island).
 */
 
 std::optional<pathfinding_path> find_path_across_islands_many(
@@ -126,36 +127,21 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 );
 
 /*
-	Fat Line of Sight (FLoS) check.
-	Uses a rectangle query instead of a raycast to ensure nothing stands in the character's way.
-	The rectangle's short ends touch the source and destination, with a configurable width.
-	Uses predefined_queries::pathfinding() filter.
-*/
-
-class physics_world_cache;
-class si_scaling;
-
-bool fat_line_of_sight(
-	const physics_world_cache& physics,
-	const si_scaling& si,
-	const vec2 source_pos,
-	const vec2 target_pos,
-	const float width,
-	const entity_id ignore_entity = entity_id()
-);
-
-/*
-	BFS to find the closest unoccupied cell from a given cell that may be occupied.
-	Returns the unoccupied cell closest to the world position (Euclidean distance).
+	BFS to find the closest walkable cell from a given cell that may be occupied.
+	Returns the walkable cell closest to the world position (Euclidean distance).
 	Used when pathfinding source is on an occupied cell.
+
+	A cell is "walkable" for this purpose if:
+	  - It is unoccupied (value == 0), OR
+	  - It is the target portal cell (if target_portal_index is provided)
 */
 
-struct unoccupied_cell_result {
+struct walkable_cell_result {
 	vec2u cell;
 	std::vector<pathfinding_node> path_through_occupied;
 };
 
-std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
+std::optional<walkable_cell_result> find_closest_walkable_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
@@ -174,6 +160,19 @@ class randomization;
 std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
+	const uint32_t max_steps,
+	randomization& rng,
+	pathfinding_context* ctx = nullptr
+);
+
+/*
+	Overload that accepts world coordinates and navmesh.
+	Finds the island for the position and delegates to the cell-based version.
+*/
+
+std::optional<vec2> find_random_unoccupied_position_within_steps(
+	const cosmos_navmesh& navmesh,
+	const vec2 world_pos,
 	const uint32_t max_steps,
 	randomization& rng,
 	pathfinding_context* ctx = nullptr

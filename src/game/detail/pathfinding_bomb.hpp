@@ -108,13 +108,13 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 		BFS from bomb center to find closest walkable tile.
 	*/
 	const auto bomb_cell = ::world_to_cell(island, bomb_pos);
-	const auto unoccupied_opt = ::find_closest_unoccupied_cell(island, bomb_cell, bomb_pos, std::nullopt, nullptr);
+	const auto walkable_opt = ::find_closest_walkable_cell(island, bomb_cell, bomb_pos, std::nullopt, nullptr);
 
-	if (!unoccupied_opt.has_value()) {
+	if (!walkable_opt.has_value()) {
 		return std::nullopt;
 	}
 
-	const auto closest_walkable_world = ::cell_to_world(island, unoccupied_opt->cell);
+	const auto closest_walkable_world = ::cell_to_world(island, walkable_opt->cell);
 
 	/*
 		Teleport bomb to the closest walkable cell center.
