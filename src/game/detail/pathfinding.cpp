@@ -1,8 +1,13 @@
 #include <limits>
+#include <queue>
 #include "game/detail/pathfinding.h"
 #include "augs/algorithm/bfs.hpp"
 #include "augs/algorithm/a_star.hpp"
 #include "augs/templates/reversion_wrapper.h"
+#include "augs/misc/randomization.h"
+#include "game/inferred_caches/physics_world_cache.h"
+#include "game/enums/filters.h"
+#include "game/detail/physics/physics_queries.h"
 
 vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2u cell_xy) {
 	const auto cell_size = static_cast<float>(island.cell_size);
@@ -297,15 +302,8 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 			const auto dir = directions[d];
 
 			/*
-				Check for underflow when going left/up.
+				Underflow is handled by is_walkable which returns false for out-of-bounds cells.
 			*/
-			if (dir.x < 0 && c.x == 0) {
-				continue;
-			}
-			if (dir.y < 0 && c.y == 0) {
-				continue;
-			}
-
 			const auto neighbor = vec2u(
 				static_cast<uint32_t>(static_cast<int>(c.x) + dir.x),
 				static_cast<uint32_t>(static_cast<int>(c.y) + dir.y)
@@ -623,4 +621,370 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	}
 
 	return all_paths;
+}
+
+bool fat_line_of_sight(
+	const physics_world_cache& physics,
+	const si_scaling& si,
+	const vec2 source_pos,
+	const vec2 target_pos,
+	const float width,
+	const entity_id ignore_entity
+) {
+	const auto direction = target_pos - source_pos;
+	const auto length = direction.length();
+
+	if (length < 0.001f) {
+		return true;
+	}
+
+	const auto dir_normalized = direction / length;
+	const auto perpendicular = dir_normalized.perpendicular_cw();
+	const auto half_width = width / 2.0f;
+
+	/*
+		Build a rectangle with short ends at source and target.
+		The rectangle is "width" wide and "length" long.
+	*/
+	std::array<vec2, 4> rectangle_vertices = {
+		source_pos - perpendicular * half_width,
+		source_pos + perpendicular * half_width,
+		target_pos + perpendicular * half_width,
+		target_pos - perpendicular * half_width
+	};
+
+	const auto filter = predefined_queries::pathfinding();
+
+	bool has_intersection = false;
+
+	physics.for_each_intersection_with_polygon(
+		si,
+		rectangle_vertices,
+		filter,
+		[&](const b2Fixture& fixture, const vec2, const vec2) {
+			const auto entity_id = ::get_body_entity_that_owns(fixture);
+
+			if (entity_id == ignore_entity) {
+				return callback_result::CONTINUE;
+			}
+
+			has_intersection = true;
+			return callback_result::ABORT;
+		}
+	);
+
+	return !has_intersection;
+}
+
+std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const vec2 world_pos,
+	const std::optional<std::size_t> target_portal_index,
+	pathfinding_context* ctx
+) {
+	const auto size = island.get_size_in_cells();
+
+	if (size.x == 0 || size.y == 0) {
+		return std::nullopt;
+	}
+
+	if (start_cell.x >= size.x || start_cell.y >= size.y) {
+		return std::nullopt;
+	}
+
+	const auto target_portal_value = target_portal_index.has_value() 
+		? static_cast<uint8_t>(2 + target_portal_index.value()) 
+		: static_cast<uint8_t>(0);
+
+	std::optional<std::size_t> source_portal_index;
+
+	if (const auto start_type = island.get_cell(start_cell); start_type >= 2) {
+		source_portal_index = start_type;
+	}
+
+	auto is_cell_unoccupied = [&](const vec2u c) {
+		if (c.x >= size.x || c.y >= size.y) {
+			return false;
+		}
+
+		const auto value = island.get_cell(c);
+
+		if (value == 0) {
+			return true;
+		}
+
+		if (target_portal_index.has_value() && value == target_portal_value) {
+			return true;
+		}
+
+		return false;
+	};
+
+	auto is_walkable = [&](const vec2u c) {
+		if (c.x >= size.x || c.y >= size.y) {
+			return false;
+		}
+
+		const auto value = island.get_cell(c);
+
+		if (value == 0) {
+			return true;
+		}
+
+		if (value == 1) {
+			return false;
+		}
+
+		if (target_portal_index.has_value() && value == target_portal_value) {
+			return true;
+		}
+
+		if (value == source_portal_index) {
+			return true;
+		}
+
+		return false;
+	};
+
+	/*
+		If start cell is already unoccupied, return it immediately.
+	*/
+	if (is_cell_unoccupied(start_cell)) {
+		unoccupied_cell_result result;
+		result.cell = start_cell;
+		return result;
+	}
+
+	pathfinding_context local_ctx;
+	pathfinding_context& context = ctx != nullptr ? *ctx : local_ctx;
+
+	const auto grid_size = static_cast<std::size_t>(size.area());
+	context.cells_pathfinding_visited.clear();
+	context.cells_pathfinding_visited.resize(grid_size, 0);
+
+	context.cells_parent.clear();
+	context.cells_parent.resize(grid_size, -1);
+
+	const vec2i directions[4] = {
+		{ 0, -1 },
+		{ 0,  1 },
+		{ -1, 0 },
+		{ 1,  0 }
+	};
+
+	auto get_cell_index = [&](const vec2u c) {
+		return island.cell_index(c);
+	};
+
+	auto get_visited = [&](const vec2u c) {
+		return context.cells_pathfinding_visited[get_cell_index(c)] != 0;
+	};
+
+	auto set_visited = [&](const vec2u c) {
+		context.cells_pathfinding_visited[get_cell_index(c)] = 1;
+	};
+
+	auto get_parent = [&](const vec2u c) -> std::optional<vec2u> {
+		const auto p = context.cells_parent[get_cell_index(c)];
+		if (p < 0) {
+			return std::nullopt;
+		}
+		return vec2u(static_cast<uint32_t>(p) % size.x, static_cast<uint32_t>(p) / size.x);
+	};
+
+	auto set_parent = [&](const vec2u child, const vec2u parent_cell) {
+		context.cells_parent[get_cell_index(child)] = static_cast<int>(parent_cell.y * size.x + parent_cell.x);
+	};
+
+	/*
+		BFS to find all unoccupied cells reachable from start.
+		Track the one with minimum Euclidean distance to world_pos.
+	*/
+	std::vector<vec2u> candidates;
+	std::queue<vec2u> queue;
+
+	queue.push(start_cell);
+	set_visited(start_cell);
+
+	while (!queue.empty()) {
+		const auto current = queue.front();
+		queue.pop();
+
+		for (uint32_t d = 0; d < 4; ++d) {
+			const auto dir = directions[d];
+			const auto neighbor = vec2u(
+				static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
+				static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
+			);
+
+			if (!is_walkable(neighbor)) {
+				continue;
+			}
+
+			if (get_visited(neighbor)) {
+				continue;
+			}
+
+			set_visited(neighbor);
+			set_parent(neighbor, current);
+
+			if (is_cell_unoccupied(neighbor)) {
+				candidates.push_back(neighbor);
+			}
+			else {
+				queue.push(neighbor);
+			}
+		}
+	}
+
+	if (candidates.empty()) {
+		return std::nullopt;
+	}
+
+	/*
+		Find the candidate with minimum Euclidean distance to world_pos.
+	*/
+	vec2u best_cell = candidates[0];
+	float best_dist_sq = (::cell_to_world(island, best_cell) - world_pos).length_sq();
+
+	for (std::size_t i = 1; i < candidates.size(); ++i) {
+		const auto cell_world = ::cell_to_world(island, candidates[i]);
+		const auto dist_sq = (cell_world - world_pos).length_sq();
+
+		if (dist_sq < best_dist_sq) {
+			best_dist_sq = dist_sq;
+			best_cell = candidates[i];
+		}
+	}
+
+	/*
+		Reconstruct path from start_cell to best_cell.
+	*/
+	std::vector<vec2u> path_cells;
+	auto c = best_cell;
+
+	while (c != start_cell) {
+		path_cells.push_back(c);
+		const auto p = get_parent(c);
+
+		if (!p.has_value()) {
+			break;
+		}
+
+		c = p.value();
+	}
+
+	path_cells.push_back(start_cell);
+
+	unoccupied_cell_result result;
+	result.cell = best_cell;
+
+	for (const auto& cell : reverse(path_cells)) {
+		result.path_through_occupied.push_back(pathfinding_node{ cell });
+	}
+
+	return result;
+}
+
+std::optional<vec2u> find_random_walkable_cell_within_steps(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const uint32_t max_steps,
+	randomization& rng,
+	pathfinding_context* ctx
+) {
+	const auto size = island.get_size_in_cells();
+
+	if (size.x == 0 || size.y == 0) {
+		return std::nullopt;
+	}
+
+	if (start_cell.x >= size.x || start_cell.y >= size.y) {
+		return std::nullopt;
+	}
+
+	auto is_walkable = [&](const vec2u c) {
+		if (c.x >= size.x || c.y >= size.y) {
+			return false;
+		}
+
+		const auto value = island.get_cell(c);
+
+		/*
+			Only allow free cells (0), disallow portals.
+		*/
+		return value == 0;
+	};
+
+	/*
+		First, find an unoccupied starting cell if the start is occupied.
+	*/
+	vec2u current = start_cell;
+
+	if (!is_walkable(current)) {
+		const auto world_pos = ::cell_to_world(island, start_cell);
+		const auto unoccupied = ::find_closest_unoccupied_cell(island, start_cell, world_pos, std::nullopt, ctx);
+
+		if (!unoccupied.has_value()) {
+			return std::nullopt;
+		}
+
+		current = unoccupied->cell;
+	}
+
+	/*
+		4-directional movement.
+	*/
+	const vec2i directions[4] = {
+		{ 0, -1 },
+		{ 0,  1 },
+		{ -1, 0 },
+		{ 1,  0 }
+	};
+
+	int came_from_dir = -1;
+
+	for (uint32_t step = 0; step < max_steps; ++step) {
+		/*
+			Collect valid directions (walkable and not the direction we came from).
+		*/
+		std::vector<int> valid_dirs;
+
+		for (int d = 0; d < 4; ++d) {
+			if (step > 0 && d == came_from_dir) {
+				continue;
+			}
+
+			const auto dir = directions[d];
+			const auto neighbor = vec2u(
+				static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
+				static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
+			);
+
+			if (is_walkable(neighbor)) {
+				valid_dirs.push_back(d);
+			}
+		}
+
+		if (valid_dirs.empty()) {
+			break;
+		}
+
+		const auto chosen_idx = rng.randval(0u, static_cast<unsigned>(valid_dirs.size() - 1));
+		const auto chosen_dir = valid_dirs[chosen_idx];
+
+		const auto dir = directions[chosen_dir];
+		current = vec2u(
+			static_cast<uint32_t>(static_cast<int>(current.x) + dir.x),
+			static_cast<uint32_t>(static_cast<int>(current.y) + dir.y)
+		);
+
+		/*
+			Calculate the opposite direction.
+		*/
+		came_from_dir = (chosen_dir + 2) % 4;
+	}
+
+	return current;
 }
