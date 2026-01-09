@@ -152,7 +152,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	Only walks through unoccupied cells (value == 0), avoiding portals.
 */
 
-class randomization;
+struct randomization;
 
 std::optional<vec2u> find_random_unoccupied_cell_within_steps(
 	const cosmos_navmesh_island& island,
