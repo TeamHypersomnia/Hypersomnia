@@ -79,7 +79,7 @@ struct basic_vec2 {
 
 	basic_vec2() = default;
 
-	basic_vec2(const type x, const type y) : 
+	constexpr basic_vec2(const type x, const type y) : 
 		x(x), 
 		y(y) 
 	{}
