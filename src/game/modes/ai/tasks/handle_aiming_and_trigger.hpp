@@ -1,7 +1,7 @@
 #pragma once
 #include "game/components/sentience_component.h"
 #include "game/modes/ai/ai_character_context.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 
 inline void handle_aiming_and_trigger(
 	const ai_character_context& ctx,

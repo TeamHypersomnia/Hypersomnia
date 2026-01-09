@@ -1,5 +1,5 @@
 #pragma once
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/difficulty_type.h"
 
 inline bool update_alertness(

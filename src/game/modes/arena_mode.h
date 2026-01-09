@@ -23,7 +23,7 @@
 #include "game/modes/session_id.h"
 #include "game/modes/arena_submodes.h"
 #include "game/modes/ranked_state_type.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/only_human.hpp"
 
 class cosmos;
