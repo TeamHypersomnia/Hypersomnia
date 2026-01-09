@@ -18,6 +18,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/debug_drawing_settings.h"
 #include "game/messages/gunshot_message.h"
+#include "game/messages/game_notification.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/detail/pathfinding.h"
 
@@ -42,7 +43,8 @@ arena_ai_result update_arena_mode_ai(
 	const money_type money,
 	const bool is_ffa,
 	xorshift_state& stable_round_rng,
-	const difficulty_type difficulty
+	const difficulty_type difficulty,
+	const cosmos_navmesh& navmesh
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -86,7 +88,7 @@ arena_ai_result update_arena_mode_ai(
 	*/
 	::listen_for_footsteps(ctx, step, is_ffa);
 
-	::update_random_movement_target(ctx, dt_secs);
+	::update_random_movement_target(ctx, dt_secs, navmesh);
 
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
 	const bool sees_target = closest_enemy.is_set();
@@ -113,8 +115,77 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.sprinting = false;
 	movement.flags.dashing = false;
 
+	/*
+		Process pathfinding navigation.
+	*/
+	if (ai_state.is_pathfinding_active()) {
+		auto& pathfinding = *ai_state.pathfinding;
+
+		/*
+			Advance along path and check for deviation.
+		*/
+		bool path_completed = false;
+		::advance_path_if_reached(pathfinding, character_pos, navmesh, path_completed);
+
+		if (path_completed) {
+			ai_state.clear_pathfinding();
+		}
+		else {
+			::check_path_deviation(pathfinding, character_pos, navmesh, nullptr);
+
+			/*
+				Get movement direction from pathfinding.
+			*/
+			const auto pathfinding_dir = ::get_pathfinding_movement_direction(
+				pathfinding, 
+				character_pos, 
+				navmesh, 
+				ai_state.target_crosshair_offset
+			);
+
+			if (pathfinding_dir.has_value()) {
+				movement.flags.set_from_closest_direction(*pathfinding_dir);
+				::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+
+				::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+				::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+				arena_ai_result result;
+				result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+				return result;
+			}
+		}
+	}
+
+	/*
+		Handle chase logic with pathfinding.
+	*/
 	const auto actual_movement_direction = [&]() {
 		if (!pause_chase && ai_state.last_seen_target.is_set()) {
+			/*
+				Start pathfinding to last known target position.
+			*/
+			const auto target_pos = ai_state.last_target_position;
+
+			if (::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr)) {
+				if (ai_state.is_pathfinding_active()) {
+					const auto dir = ::get_pathfinding_movement_direction(
+						*ai_state.pathfinding,
+						character_pos,
+						navmesh,
+						ai_state.target_crosshair_offset
+					);
+
+					if (dir.has_value()) {
+						::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+						return *dir;
+					}
+				}
+			}
+
+			/*
+				Fallback to direct chase if pathfinding fails.
+			*/
 			return ::handle_active_chase(ctx, sees_target, dt_secs, set_movement_target);
 		}
 		else {
@@ -144,6 +215,24 @@ void post_solve_arena_mode_ai(
 
 	if (!character_handle.alive()) {
 		return;
+	}
+
+	/*
+		Check for teleportation messages - clear pathfinding if this bot was teleported.
+	*/
+	const auto& game_notifications = step.get_queue<messages::game_notification>();
+
+	for (const auto& notification : game_notifications) {
+		if (const auto* tp = std::get_if<messages::teleportation>(&notification.payload)) {
+			if (tp->teleported == controlled_character_id) {
+				/*
+					Bot was teleported - clear pathfinding state.
+					New pathfinding will be initiated on next update.
+				*/
+				ai_state.clear_pathfinding();
+				break;
+			}
+		}
 	}
 
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();

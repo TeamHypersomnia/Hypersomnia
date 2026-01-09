@@ -11,11 +11,12 @@ struct arena_ai_result {
 /*
 	State for pathfinding navigation.
 	Uses pathfinding_progress for main path and optional rerouting path.
+	Existence of this object implies an active pathfinding session.
 */
 
 struct ai_pathfinding_state {
 	// GEN INTROSPECTOR struct ai_pathfinding_state
-	std::optional<pathfinding_progress> main;
+	pathfinding_progress main;
 	std::optional<pathfinding_progress> rerouting;
 
 	vec2 target_position = vec2::zero;
@@ -23,16 +24,8 @@ struct ai_pathfinding_state {
 	vec2u target_cell = vec2u::zero;
 	// END GEN INTROSPECTOR
 
-	bool is_active() const {
-		return main.has_value();
-	}
-
-	void clear() {
-		main.reset();
+	void clear_rerouting() {
 		rerouting.reset();
-		target_position = vec2::zero;
-		target_island = 0;
-		target_cell = vec2u::zero;
 	}
 };
 
@@ -58,12 +51,20 @@ struct arena_mode_ai_state {
 	bool has_dashed_for_last_seen_target = false;
 	float alertness_time = 0.0f;
 
-	ai_pathfinding_state pathfinding;
+	std::optional<ai_pathfinding_state> pathfinding;
 	// END GEN INTROSPECTOR
+
+	bool is_pathfinding_active() const {
+		return pathfinding.has_value();
+	}
+
+	void clear_pathfinding() {
+		pathfinding.reset();
+	}
 
 	void round_reset() {
 		already_tried_to_buy = false;
 		purchase_decision_countdown = -1.0f;
-		pathfinding.clear();
+		pathfinding.reset();
 	}
 };
