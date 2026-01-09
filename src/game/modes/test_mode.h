@@ -94,7 +94,7 @@ struct test_mode_player {
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;
 
-	ai_pathfinding_state debug_pathfinding;
+	std::optional<ai_pathfinding_state> debug_pathfinding;
 	// END GEN INTROSPECTOR
 
 	/* Dummy field for compatibility */

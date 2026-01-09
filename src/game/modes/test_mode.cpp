@@ -341,7 +341,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 			if (character.alive()) {
 				const auto character_pos = character.get_logic_transform().pos;
-				const auto& navmesh = cosm.get_solvable_inferred().navmesh;
+				const auto& navmesh = cosm.get_common_significant().navmesh;
 
 				vec2 target_pos = vec2::zero;
 				bool has_target = false;
@@ -382,25 +382,33 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					/*
 						Navigate along the path.
 					*/
-					if (first_player.debug_pathfinding.is_active) {
-						::advance_path_if_reached(first_player.debug_pathfinding, character_pos, navmesh);
-						::check_path_deviation(first_player.debug_pathfinding, character_pos, navmesh, nullptr);
+					if (first_player.debug_pathfinding.has_value()) {
+						auto& pathfinding = *first_player.debug_pathfinding;
+						bool path_completed = false;
+						::advance_path_if_reached(pathfinding, character_pos, navmesh, path_completed);
 
-						vec2 crosshair_target;
-						const auto movement_dir = ::get_pathfinding_movement_direction(
-							first_player.debug_pathfinding,
-							character_pos,
-							navmesh,
-							crosshair_target
-						);
-
-						if (movement_dir.has_value()) {
-							if (auto* movement = character.template find<components::movement>()) {
-								movement->flags.set_from_closest_direction(*movement_dir);
-							}
+						if (path_completed) {
+							first_player.debug_pathfinding.reset();
 						}
+						else {
+							::check_path_deviation(pathfinding, character_pos, navmesh, nullptr);
 
-						::debug_draw_pathfinding(first_player.debug_pathfinding, character_pos, navmesh);
+							vec2 crosshair_target;
+							const auto movement_dir = ::get_pathfinding_movement_direction(
+								pathfinding,
+								character_pos,
+								navmesh,
+								crosshair_target
+							);
+
+							if (movement_dir.has_value()) {
+								if (auto* movement = character.template find<components::movement>()) {
+									movement->flags.set_from_closest_direction(*movement_dir);
+								}
+							}
+
+							::debug_draw_pathfinding(first_player.debug_pathfinding, character_pos, navmesh);
+						}
 					}
 					else {
 						/*

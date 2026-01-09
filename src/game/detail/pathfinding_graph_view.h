@@ -85,15 +85,15 @@ struct pathfinding_graph_view {
 
 	/*
 		Iterate over 4-directional neighbors of cell c,
-		calling callback for each that passes the is_walkable predicate.
+		calling callback for each that passes the filter predicate.
 	*/
-	template <class IsWalkable, class Callback>
-	void for_each_neighbor(const vec2u c, IsWalkable&& is_walkable, Callback&& callback) const {
+	template <class Filter, class Callback>
+	void for_each_neighbor(const vec2u c, Filter&& filter, Callback&& callback) const {
 		for (uint32_t d = 0; d < 4; ++d) {
 			const auto dir = CELL_DIRECTIONS[d];
 			const auto neighbor = vec2u(vec2i(c) + dir);
 
-			if (is_walkable(neighbor)) {
+			if (filter(neighbor)) {
 				if (callback(neighbor) == callback_result::ABORT) {
 					return;
 				}
@@ -159,29 +159,20 @@ struct pathfinding_graph_view {
 		return [this](const vec2u c, const float cost) { set_g_cost(c, cost); };
 	}
 
-	template <class IsWalkable>
-	auto make_for_each_neighbor(IsWalkable&& is_walkable) {
-		return [this, is_walkable = std::forward<IsWalkable>(is_walkable)](const vec2u c, auto&& callback) {
-			for_each_neighbor(c, is_walkable, callback);
+	template <class Filter>
+	auto make_for_each_neighbor(Filter&& filter) {
+		return [this, filter = std::forward<Filter>(filter)](const vec2u c, auto&& callback) {
+			for_each_neighbor(c, filter, callback);
 		};
 	}
 
 	/*
-		Iterate over 4-directional neighbors that are within bounds (no walkability check).
+		Iterate over 4-directional neighbors that are within bounds (no other filtering).
 		Used for BFS that needs to traverse all cells regardless of walkability.
 	*/
 	auto make_for_each_neighbor_all() {
-		return [this](const vec2u c, auto&& callback) {
-			for (uint32_t d = 0; d < 4; ++d) {
-				const auto dir = CELL_DIRECTIONS[d];
-				const auto neighbor = vec2u(vec2i(c) + dir);
-
-				if (island.is_within_bounds(neighbor)) {
-					if (callback(neighbor) == callback_result::ABORT) {
-						return;
-					}
-				}
-			}
-		};
+		return make_for_each_neighbor([this](const vec2u c) {
+			return island.is_within_bounds(c);
+		});
 	}
 };

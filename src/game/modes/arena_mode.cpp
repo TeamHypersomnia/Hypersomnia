@@ -2430,7 +2430,8 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			player.stats.money,
 			in.rules.is_ffa(),
 			stable_round_rng,
-			in.dynamic_vars.bot_difficulty
+			in.dynamic_vars.bot_difficulty,
+			cosm.get_common_significant().navmesh
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
