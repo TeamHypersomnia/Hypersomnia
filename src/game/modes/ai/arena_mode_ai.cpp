@@ -36,7 +36,7 @@
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
 
 arena_ai_result update_arena_mode_ai(
-	const cosmos& cosm,
+	cosmos& cosm,
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
@@ -52,7 +52,7 @@ arena_ai_result update_arena_mode_ai(
 		stable_round_rng = stable_rng.generator;
 	});
 
-	const entity_handle character_handle = cosm[controlled_character_id];
+	const auto character_handle = cosm[controlled_character_id];
 
 	if (!character_handle.alive()) {
 		return arena_ai_result{};
@@ -205,7 +205,7 @@ arena_ai_result update_arena_mode_ai(
 }
 
 void post_solve_arena_mode_ai(
-	const cosmos& cosm,
+	cosmos& cosm,
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
