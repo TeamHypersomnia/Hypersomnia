@@ -37,7 +37,7 @@ float world_distance(const vec2 a, const vec2 b);
 	Returns std::nullopt if position is not within any island.
 */
 
-std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos);
+std::optional<island_id_type> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos);
 
 /*
 	BFS on islands to find path from source island to target island.
@@ -45,10 +45,10 @@ std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmes
 	If source == target, returns source.
 */
 
-std::optional<std::size_t> find_islands_connection(
+std::optional<island_id_type> find_islands_connection(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -62,8 +62,8 @@ std::optional<std::size_t> find_islands_connection(
 
 std::optional<std::size_t> find_best_portal_from_to(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	const vec2 from_pos,
 	const vec2 to_pos
 );
@@ -93,8 +93,8 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
 	pathfinding_context* ctx = nullptr

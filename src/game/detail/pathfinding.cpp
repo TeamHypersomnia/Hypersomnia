@@ -34,10 +34,10 @@ float world_distance(const vec2 a, const vec2 b) {
 	return (a - b).length();
 }
 
-std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
+std::optional<island_id_type> find_island_for_position(const cosmos_navmesh& navmesh, const vec2 world_pos) {
 	const auto pos_i = vec2i(world_pos);
 
-	for (std::size_t i = 0; i < navmesh.islands.size(); ++i) {
+	for (island_id_type i = 0; i < navmesh.islands.size(); ++i) {
 		const auto& island = navmesh.islands[i];
 
 		if (island.bound.hover(pos_i)) {
@@ -48,17 +48,17 @@ std::optional<std::size_t> find_island_for_position(const cosmos_navmesh& navmes
 	return std::nullopt;
 }
 
-std::optional<std::size_t> find_islands_connection(
+std::optional<island_id_type> find_islands_connection(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	pathfinding_context* ctx
 ) {
 	if (source_island_index == target_island_index) {
 		return source_island_index;
 	}
 
-	const auto num_islands = navmesh.islands.size();
+	const auto num_islands = static_cast<island_id_type>(navmesh.islands.size());
 
 	if (source_island_index >= num_islands || target_island_index >= num_islands) {
 		return std::nullopt;
@@ -73,19 +73,19 @@ std::optional<std::size_t> find_islands_connection(
 	context.islands_pathfinding_visited.clear();
 	context.islands_pathfinding_visited.resize(num_islands, 0);
 
-	auto get_visited = [&](const std::size_t island_idx) {
+	auto get_visited = [&](const island_id_type island_idx) {
 		return context.islands_pathfinding_visited[island_idx] != 0;
 	};
 
-	auto set_visited = [&](const std::size_t island_idx) {
+	auto set_visited = [&](const island_id_type island_idx) {
 		context.islands_pathfinding_visited[island_idx] = 1;
 	};
 
-	auto for_each_neighbor = [&](const std::size_t island_idx, auto&& callback) {
+	auto for_each_neighbor = [&](const island_id_type island_idx, auto&& callback) {
 		const auto& island = navmesh.islands[island_idx];
 
 		for (const auto& portal : island.portals) {
-			const auto next_island = static_cast<std::size_t>(portal.out_island_index);
+			const auto next_island = static_cast<island_id_type>(portal.out_island_index);
 
 			if (portal.out_island_index >= 0 && next_island < num_islands) {
 				if (callback(next_island) == callback_result::ABORT) {
@@ -107,8 +107,8 @@ std::optional<std::size_t> find_islands_connection(
 
 std::optional<std::size_t> find_best_portal_from_to(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	const vec2 from_pos,
 	const vec2 to_pos
 ) {
@@ -128,7 +128,7 @@ std::optional<std::size_t> find_best_portal_from_to(
 			For same-island portals: out_island_index == source_island_index
 			For cross-island portals: out_island_index == target_island_index
 		*/
-		if (static_cast<std::size_t>(portal.out_island_index) != target_island_index) {
+		if (static_cast<island_id_type>(portal.out_island_index) != target_island_index) {
 			continue;
 		}
 
@@ -323,8 +323,8 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 
 std::optional<pathfinding_path> find_path_across_islands_direct(
 	const cosmos_navmesh& navmesh,
-	const std::size_t source_island_index,
-	const std::size_t target_island_index,
+	const island_id_type source_island_index,
+	const island_id_type target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
 	pathfinding_context* ctx
@@ -378,7 +378,7 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 		Set final_portal_node to indicate teleportation destination.
 	*/
 	result.final_portal_node = cell_on_island{
-		static_cast<std::size_t>(portal.out_island_index),
+		static_cast<island_id_type>(portal.out_island_index),
 		pathfinding_node{ portal.out_cell_pos }
 	};
 
@@ -582,13 +582,6 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	graph.init_parent();
 
 	/*
-		A cell is walkable for BFS traversal if it's walkable (not == 1).
-	*/
-	auto is_walkable = [&](const vec2u c) {
-		return island.is_cell_walkable(c);
-	};
-
-	/*
 		A cell is a valid target if it's unoccupied (value == 0).
 	*/
 	auto is_target_cell = [&](const vec2u c) {
@@ -598,6 +591,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	/*
 		Use BFS to find up to MAX_WALKABLE_CANDIDATES unoccupied cells,
 		tracking the closest one by Euclidean distance.
+		BFS iterates all in-bounds neighbors (regardless of walkability).
 	*/
 	std::vector<vec2u> candidates;
 	candidates.reserve(MAX_WALKABLE_CANDIDATES);
@@ -607,7 +601,7 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 		graph.make_get_visited(),
 		graph.make_set_visited(),
 		graph.make_set_parent(),
-		graph.make_for_each_neighbor(is_walkable),
+		graph.make_for_each_neighbor_all(),
 		is_target_cell,
 		[&](const vec2u cell) {
 			candidates.push_back(cell);

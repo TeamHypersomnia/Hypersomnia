@@ -10,6 +10,13 @@
 	Pathfinding structures.
 */
 
+/*
+	Type alias for island identification.
+	Use this instead of std::size_t for island indices.
+*/
+
+using island_id_type = uint32_t;
+
 struct pathfinding_node {
 	// GEN INTROSPECTOR struct pathfinding_node
 	vec2u cell_xy = vec2u::zero;
@@ -18,14 +25,14 @@ struct pathfinding_node {
 
 struct cell_on_island {
 	// GEN INTROSPECTOR struct cell_on_island
-	std::size_t island_index = 0;
+	island_id_type island_index = 0;
 	pathfinding_node node;
 	// END GEN INTROSPECTOR
 };
 
 struct pathfinding_path {
 	// GEN INTROSPECTOR struct pathfinding_path
-	std::size_t island_index = 0;
+	island_id_type island_index = 0;
 	std::vector<pathfinding_node> nodes;
 	std::optional<cell_on_island> final_portal_node;
 	// END GEN INTROSPECTOR
@@ -63,7 +70,7 @@ struct pathfinding_context {
 		Reusable queues for pathfinding algorithms.
 	*/
 	augs::astar_queue_type<vec2u> astar_queue;
-	augs::bfs_queue_type<std::size_t> bfs_queue;
+	augs::bfs_queue_type<island_id_type> bfs_queue;
 };
 
 /*
