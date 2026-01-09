@@ -165,4 +165,23 @@ struct pathfinding_graph_view {
 			for_each_neighbor(c, is_walkable, callback);
 		};
 	}
+
+	/*
+		Iterate over 4-directional neighbors that are within bounds (no walkability check).
+		Used for BFS that needs to traverse all cells regardless of walkability.
+	*/
+	auto make_for_each_neighbor_all() {
+		return [this](const vec2u c, auto&& callback) {
+			for (uint32_t d = 0; d < 4; ++d) {
+				const auto dir = CELL_DIRECTIONS[d];
+				const auto neighbor = vec2u(vec2i(c) + dir);
+
+				if (island.is_within_bounds(neighbor)) {
+					if (callback(neighbor) == callback_result::ABORT) {
+						return;
+					}
+				}
+			}
+		};
+	}
 };

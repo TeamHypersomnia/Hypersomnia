@@ -91,6 +91,15 @@ struct cosmos_navmesh_island {
 	}
 
 	/*
+		Check if cell is within island bounds.
+	*/
+
+	bool is_within_bounds(const vec2u cell_pos) const {
+		const auto size = get_size_in_cells();
+		return cell_pos.x < size.x && cell_pos.y < size.y;
+	}
+
+	/*
 		Convert cell position to linear index.
 	*/
 
@@ -166,8 +175,8 @@ struct cosmos_navmesh_island {
 	}
 
 	/*
-		Cell type check methods with bounds checking.
-		These check if cell_pos is within bounds before checking cell type.
+		Cell type check methods.
+		get_cell returns 1 for out-of-bounds, so no explicit bounds check needed.
 	*/
 
 	bool is_cell_walkable(const vec2u cell_pos) const {

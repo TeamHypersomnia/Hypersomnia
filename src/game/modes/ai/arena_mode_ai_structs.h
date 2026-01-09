@@ -19,7 +19,7 @@ struct ai_pathfinding_state {
 	std::optional<pathfinding_progress> rerouting;
 
 	vec2 target_position = vec2::zero;
-	std::size_t target_island = 0;
+	island_id_type target_island = 0;
 	vec2u target_cell = vec2u::zero;
 	// END GEN INTROSPECTOR
 
