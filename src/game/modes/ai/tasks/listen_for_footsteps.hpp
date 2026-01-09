@@ -16,7 +16,6 @@ inline void listen_for_footsteps(
 ) {
 	const auto& sound_cues = step.get_queue<messages::sound_cue_message>();
 	const auto bot_faction = ctx.character_handle.get_official_faction();
-	const auto filter = predefined_queries::line_of_sight();
 
 	auto is_enemy_faction = [&](const faction_type source_faction) {
 		if (is_ffa) {

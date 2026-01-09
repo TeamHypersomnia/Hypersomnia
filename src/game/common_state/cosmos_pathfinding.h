@@ -48,7 +48,7 @@ struct pathfinding_path {
 struct pathfinding_progress {
 	// GEN INTROSPECTOR struct pathfinding_progress
 	pathfinding_path path;
-	std::size_t node_index = 0;
+	uint32_t node_index = 0;
 	// END GEN INTROSPECTOR
 };
 

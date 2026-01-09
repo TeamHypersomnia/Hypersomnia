@@ -5,7 +5,7 @@
 struct cosmos_navmesh;
 
 arena_ai_result update_arena_mode_ai(
-	const cosmos& cosm,
+	cosmos& cosm,
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
@@ -17,7 +17,7 @@ arena_ai_result update_arena_mode_ai(
 );
 
 void post_solve_arena_mode_ai(
-	const cosmos& cosm,
+	cosmos& cosm,
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,

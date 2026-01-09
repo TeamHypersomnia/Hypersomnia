@@ -90,7 +90,6 @@ inline void advance_path_if_reached(
 		const auto& node = path.nodes[progress.node_index];
 		const auto cell_center = ::cell_to_world(island, node.cell_xy);
 		const auto dist_to_center = (bot_pos - cell_center).length();
-		const auto cell_size = static_cast<float>(island.cell_size);
 
 		bool should_advance = false;
 
@@ -219,7 +218,7 @@ inline void check_path_deviation(
 		Check nodes[index - 5 .. index + 5] to find the closest one.
 	*/
 	const auto start_check = current_idx >= 5 ? current_idx - 5 : 0;
-	const auto end_check = std::min(current_idx + 5, nodes.size() - 1);
+	const auto end_check = std::min(current_idx + 5, uint32_t(nodes.size()) - 1);
 
 	std::optional<std::size_t> closest_within_bounds;
 	float closest_dist_sq = std::numeric_limits<float>::max();
@@ -493,7 +492,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 
 	target_crosshair_offset = look_ahead_target - bot_pos;
 
-	return dir.normalize();
+	return vec2(dir).normalize();
 }
 
 /*
