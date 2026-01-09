@@ -1,6 +1,6 @@
 #pragma once
 #include "game/modes/ai/ai_character_context.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 
 inline void update_target_tracking(
 	const ai_character_context& ctx,

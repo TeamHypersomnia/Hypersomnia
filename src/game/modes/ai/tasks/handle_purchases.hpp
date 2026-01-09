@@ -6,7 +6,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/modes/ai/ai_character_context.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 
 inline std::optional<item_flavour_id> handle_purchases(
 	const ai_character_context& ctx,

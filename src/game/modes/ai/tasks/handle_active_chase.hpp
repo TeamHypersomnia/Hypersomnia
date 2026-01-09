@@ -1,7 +1,7 @@
 #pragma once
 #include "game/debug_drawing_settings.h"
 #include "game/modes/ai/ai_character_context.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 
 template <class SetMovementTarget>
 inline vec2 handle_active_chase(

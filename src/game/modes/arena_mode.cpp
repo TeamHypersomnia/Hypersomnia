@@ -41,7 +41,7 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "augs/misc/date_time.h"
-#include "game/modes/arena_mode_ai.h"
+#include "game/modes/ai/arena_mode_ai.h"
 #include "game/messages/collected_message.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {

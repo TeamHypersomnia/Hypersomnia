@@ -2,7 +2,7 @@
 #include "augs/misc/simple_pair.h"
 #include "game/components/crosshair_component.h"
 #include "game/modes/ai/ai_character_context.h"
-#include "game/modes/arena_mode_ai_structs.h"
+#include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/difficulty_type.h"
 
 inline void interpolate_crosshair(
