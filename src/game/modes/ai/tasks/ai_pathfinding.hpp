@@ -717,7 +717,7 @@ inline void debug_draw_pathfinding(
 		}
 
 		const auto& island = navmesh.islands[path.island_index];
-		const auto half_cell_size = static_cast<float>(island.cell_size) / 2.0f;
+		const auto cell_size = static_cast<float>(island.cell_size);
 
 		for (std::size_t i = 0; i < path.nodes.size(); ++i) {
 			const auto& node = path.nodes[i];
@@ -734,12 +734,8 @@ inline void debug_draw_pathfinding(
 				cell_color = i < progress.node_index ? rgba(255, 0, 0, 40) : rgba(0, 255, 0, 40);
 			}
 
-			const auto tl = cell_center + vec2(-half_cell_size, -half_cell_size);
-			const auto tr = cell_center + vec2(half_cell_size, -half_cell_size);
-			const auto br = cell_center + vec2(half_cell_size, half_cell_size);
-			const auto bl = cell_center + vec2(-half_cell_size, half_cell_size);
-
-			DEBUG_LOGIC_STEP_RECTS.emplace_back(cell_color, std::array<vec2, 4>{ tl, tr, br, bl });
+			const auto cell_size_vec = vec2(cell_size, cell_size);
+			DEBUG_LOGIC_STEP_RECTS.emplace_back(cell_color, cell_center, cell_size_vec, 0.0f);
 
 			/*
 				Draw line to next cell.
