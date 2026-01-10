@@ -222,20 +222,15 @@ inline void check_path_deviation(
 		const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
 		const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
 
-		std::optional<std::size_t> found_cell_idx;
-		float closest_dist_sq = std::numeric_limits<float>::max();
-
-		for (std::size_t i = start_check; i <= end_check; ++i) {
-			if (::is_within_cell(bot_pos, island, nodes[i].cell_xy)) {
-				const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
-				const auto dist_sq = (bot_pos - cell_world).length_sq();
-
-				if (dist_sq < closest_dist_sq) {
-					closest_dist_sq = dist_sq;
-					found_cell_idx = i;
+		const auto found_cell_idx = [&]() -> std::optional<uint32_t> {
+			for (std::size_t i = start_check; i <= end_check; ++i) {
+				if (::is_within_cell(bot_pos, island, nodes[i].cell_xy)) {
+					return i;
 				}
 			}
-		}
+
+			return std::nullopt;
+		}();
 
 		if (found_cell_idx.has_value()) {
 			/*
