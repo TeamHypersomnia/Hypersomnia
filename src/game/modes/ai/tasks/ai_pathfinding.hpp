@@ -206,7 +206,7 @@ inline void check_path_deviation(
 		auto new_rerouting = ::find_path_across_islands_many(navmesh, bot_pos, target_world, ctx);
 
 		if (new_rerouting.has_value()) {
-			pathfinding.rerouting = pathfinding_progress{
+			pathfinding.rerouting = pathfinding_progress {
 				std::move(*new_rerouting),
 				0
 			};
@@ -363,7 +363,7 @@ inline bool start_pathfinding_to(
 		return false;
 	}
 
-	ai_state.pathfinding = ai_pathfinding_state{
+	ai_state.pathfinding = ai_pathfinding_state {
 		pathfinding_progress{ std::move(*path), 0 },
 		std::nullopt,
 		target_pos,
@@ -521,7 +521,7 @@ inline void debug_draw_pathfinding(
 
 	const auto& pathfinding = *pathfinding_opt;
 
-	auto draw_path = [&](const pathfinding_progress& progress) {
+	auto draw_path = [&](const pathfinding_progress& progress, bool rerouting) {
 		const auto& path = progress.path;
 
 		if (path.island_index >= navmesh.islands.size()) {
@@ -534,14 +534,19 @@ inline void debug_draw_pathfinding(
 			const auto from = ::cell_to_world(island, path.nodes[i].cell_xy);
 			const auto to = ::cell_to_world(island, path.nodes[i + 1].cell_xy);
 
-			DEBUG_LOGIC_STEP_LINES.emplace_back(green, from, to);
+			if (rerouting) {
+				DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? orange : yellow, from, to);
+			}
+			else {
+				DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? red : green, from, to);
+			}
 		}
 	};
 
-	draw_path(pathfinding.main);
+	draw_path(pathfinding.main, false);
 
 	if (pathfinding.rerouting.has_value()) {
-		draw_path(*pathfinding.rerouting);
+		draw_path(*pathfinding.rerouting, true);
 	}
 
 	if (const auto target = ::get_current_path_target(pathfinding, navmesh)) {
