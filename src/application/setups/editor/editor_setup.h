@@ -132,6 +132,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	mode_player_id local_player_id;
 
 	bool playtesting = false;
+	double playtest_speed = 1.0;
 
 	scene_entity_to_node_map scene_entity_to_node;
 
@@ -610,7 +611,7 @@ public:
 	/*********************************************************/
 
 	auto get_audiovisual_speed() const {
-		return 1.0;
+		return is_playtesting() ? playtest_speed : 1.0;
 	}
 
 	const auto& get_viewed_cosmos() const {

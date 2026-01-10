@@ -23,9 +23,11 @@
 #include "game/detail/pathfinding.h"
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
 #include "game/modes/ai/tasks/navigate_pathfinding.hpp"
+#include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/detail/pathfinding_bomb.hpp"
 #include "game/messages/game_notification.h"
 #include "augs/math/repro_math.h"
+#include "game/modes/difficulty_type.h"
 
 using input_type = test_mode::input;
 
@@ -391,16 +393,20 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 					/*
 						Apply crosshair interpolation with HARD difficulty.
+						Use snapping (is_pathfinding=true) since we're navigating a path.
 					*/
 					const float dt_secs = in.cosm.get_fixed_delta().in_seconds();
-					const auto average_factor = 0.5f;
-					const auto averages_per_sec = 4.0f;  /* HARD difficulty */
-					const auto averaging_constant = 1.0f - static_cast<real32>(repro::pow(average_factor, averages_per_sec * dt_secs));
+					const bool has_target = true;
+					const bool is_pathfinding = first_player.debug_pathfinding.has_value();
 
-					if (auto crosshair = character.find_crosshair()) {
-						crosshair->base_offset = augs::interp(crosshair->base_offset, crosshair_target, averaging_constant);
-						crosshair->base_offset = crosshair_target;
-					}
+					::interpolate_crosshair(
+						character.find_crosshair(),
+						crosshair_target,
+						has_target,
+						dt_secs,
+						difficulty_type::HARD,
+						is_pathfinding
+					);
 				}
 			}
 		}

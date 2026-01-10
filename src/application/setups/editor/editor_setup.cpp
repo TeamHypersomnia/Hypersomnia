@@ -396,6 +396,31 @@ bool editor_setup::handle_input_before_game(
 	}
 
 	if (is_playtesting()) {
+		/*
+			Handle numpad speed control during playtesting.
+		*/
+		const auto& e = in.e;
+
+		if (e.was_any_key_pressed()) {
+			const auto k = e.data.key.key;
+
+			auto set_speed = [&](const double s) {
+				playtest_speed = s;
+			};
+
+			switch (k) {
+				case key::NUMPAD0: set_speed(1.0); return true;
+				case key::NUMPAD1: set_speed(0.01); return true;
+				case key::NUMPAD2: set_speed(0.05); return true;
+				case key::NUMPAD3: set_speed(0.1); return true;
+				case key::NUMPAD4: set_speed(0.5); return true;
+				case key::NUMPAD5: set_speed(2.0); return true;
+				case key::NUMPAD6: set_speed(4.0); return true;
+				case key::NUMPAD7: set_speed(10.0); return true;
+				default: break;
+			}
+		}
+
 		return false;
 	}
 

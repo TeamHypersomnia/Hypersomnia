@@ -173,9 +173,14 @@ inline void advance_path_if_cell_reached(
 /*
 	Check if bot has fallen off the path and needs rerouting.
 	
-	Note: We only update node_index to a different cell if we're NOT on either
-	node_index or node_index-1 cell. This is because we may advance node_index
-	while still physically on the previous cell.
+	The logic is:
+	1. BEFORE looking for the closest tile, check O(1) if we're on current or previous node_index.
+	2. ONLY if we're outside those two cells, look for the closest one in ±DEVIATION_CHECK_RANGE_V range.
+	3. If found within bounds, update node_index (unless it's current or current-1).
+	4. If not found, initialize rerouting path to the closest cell.
+	
+	This applies the same way to both the rerouting and main paths - when out of bounds
+	on either path, recalculate the rerouting path.
 */
 
 inline void check_path_deviation(
@@ -184,112 +189,159 @@ inline void check_path_deviation(
 	const cosmos_navmesh& navmesh,
 	pathfinding_context* ctx
 ) {
-	const auto& main_path = pathfinding.main.path;
+	/*
+		Lambda to check if we've deviated from a path and need rerouting.
+		Returns true if we're still on the path and can continue.
+		Returns false if we need to recalculate rerouting.
+	*/
+	auto check_path_out_of_bounds = [&](
+		pathfinding_progress& progress,
+		const cosmos_navmesh_island& island
+	) -> bool {
+		const auto& nodes = progress.path.nodes;
+		const auto current_idx = progress.node_index;
+
+		if (nodes.empty() || current_idx >= nodes.size()) {
+			return false;
+		}
+
+		/*
+			O(1) check: are we on the current or previous cell?
+		*/
+		if (::is_within_cell(bot_pos, island, nodes[current_idx].cell_xy)) {
+			return true;
+		}
+
+		if (current_idx > 0 && ::is_within_cell(bot_pos, island, nodes[current_idx - 1].cell_xy)) {
+			return true;
+		}
+
+		/*
+			We're not on current or previous cell - search nearby cells.
+		*/
+		const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
+		const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
+
+		std::optional<std::size_t> found_cell_idx;
+		float closest_dist_sq = std::numeric_limits<float>::max();
+
+		for (std::size_t i = start_check; i <= end_check; ++i) {
+			if (::is_within_cell(bot_pos, island, nodes[i].cell_xy)) {
+				const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
+				const auto dist_sq = (bot_pos - cell_world).length_sq();
+
+				if (dist_sq < closest_dist_sq) {
+					closest_dist_sq = dist_sq;
+					found_cell_idx = i;
+				}
+			}
+		}
+
+		if (found_cell_idx.has_value()) {
+			/*
+				We're still on the path at a different cell.
+				Only update if NOT on current or current-1 (already checked above).
+			*/
+			const auto found_idx = *found_cell_idx;
+			const bool on_current = (found_idx == current_idx);
+			const bool on_previous = (current_idx > 0 && found_idx == current_idx - 1);
+
+			if (!on_current && !on_previous) {
+				progress.node_index = found_idx;
+			}
+
+			return true;
+		}
+
+		/*
+			Not on any nearby cell - we've deviated.
+		*/
+		return false;
+	};
 
 	/*
-		If already rerouting, check if we fell off the rerouting path.
+		Calculate rerouting target cell.
 	*/
-	if (pathfinding.rerouting.has_value()) {
-		/*
-			Recalculate rerouting to the main path cell.
-		*/
-		if (main_path.island_index >= navmesh.islands.size() ||
-		    pathfinding.main.node_index >= main_path.nodes.size()
-		) {
+	auto calculate_rerouting = [&](const pathfinding_progress& main_progress) {
+		const auto& nodes = main_progress.path.nodes;
+		const auto current_idx = main_progress.node_index;
+
+		if (main_progress.path.island_index >= navmesh.islands.size() || nodes.empty()) {
 			return;
 		}
 
-		const auto& target_island = navmesh.islands[main_path.island_index];
-		const auto target_cell = main_path.nodes[pathfinding.main.node_index].cell_xy;
-		const auto target_world = ::cell_to_world(target_island, target_cell);
+		const auto& island = navmesh.islands[main_progress.path.island_index];
 
-		auto new_rerouting = ::find_path_across_islands_many(navmesh, bot_pos, target_world, ctx);
+		const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
+		const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
 
-		if (new_rerouting.has_value()) {
-			pathfinding.rerouting = pathfinding_progress {
-				std::move(*new_rerouting),
-				0
-			};
+		std::size_t reroute_target_idx = current_idx < nodes.size() ? current_idx : nodes.size() - 1;
+		float reroute_closest_dist_sq = std::numeric_limits<float>::max();
+
+		for (std::size_t i = start_check; i <= end_check; ++i) {
+			const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
+			const auto dist_sq = (bot_pos - cell_world).length_sq();
+
+			if (dist_sq < reroute_closest_dist_sq) {
+				reroute_closest_dist_sq = dist_sq;
+				reroute_target_idx = i;
+			}
 		}
 
-		return;
-	}
+		const auto reroute_target_world = ::cell_to_world(island, nodes[reroute_target_idx].cell_xy);
+		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
 
-	/*
-		Check if we're on any of the nearby path cells.
-	*/
+		if (rerouting_path.has_value()) {
+			pathfinding.rerouting = pathfinding_progress{
+				std::move(*rerouting_path),
+				0
+			};
+			pathfinding.main.node_index = reroute_target_idx;
+		}
+	};
+
+	const auto& main_path = pathfinding.main.path;
+
 	if (main_path.island_index >= navmesh.islands.size()) {
 		return;
 	}
 
-	const auto& island = navmesh.islands[main_path.island_index];
-	const auto& nodes = main_path.nodes;
-	const auto current_idx = pathfinding.main.node_index;
+	const auto& main_island = navmesh.islands[main_path.island_index];
 
 	/*
-		Check nodes[index - DEVIATION_CHECK_RANGE_V .. index + DEVIATION_CHECK_RANGE_V] to find the closest one.
+		Check if rerouting path is active.
 	*/
-	const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
-	const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
+	if (pathfinding.rerouting.has_value()) {
+		auto& rerouting = *pathfinding.rerouting;
 
-	std::optional<std::size_t> closest_within_bounds;
-	float closest_dist_sq = std::numeric_limits<float>::max();
-
-	for (std::size_t i = start_check; i <= end_check; ++i) {
-		const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
-		const auto dist_sq = (bot_pos - cell_world).length_sq();
-
-		if (dist_sq < closest_dist_sq) {
-			closest_dist_sq = dist_sq;
-
-			if (::is_within_cell(bot_pos, island, nodes[i].cell_xy)) {
-				closest_within_bounds = i;
-			}
+		if (rerouting.path.island_index >= navmesh.islands.size()) {
+			/*
+				Invalid rerouting path - recalculate.
+			*/
+			calculate_rerouting(pathfinding.main);
+			return;
 		}
-	}
 
-	if (closest_within_bounds.has_value()) {
-		/*
-			We're still on the path.
-			Only update node_index if we're NOT on either current_idx or current_idx-1.
-			This prevents resetting progress when we've advanced but are still physically
-			on the previous cell.
-		*/
-		const auto found_idx = *closest_within_bounds;
-		const bool on_current = (found_idx == current_idx);
-		const bool on_previous = (current_idx > 0 && found_idx == current_idx - 1);
+		const auto& rerouting_island = navmesh.islands[rerouting.path.island_index];
 
-		if (!on_current && !on_previous) {
-			pathfinding.main.node_index = found_idx;
+		if (!check_path_out_of_bounds(rerouting, rerouting_island)) {
+			/*
+				Fell off rerouting path - recalculate rerouting to main path.
+			*/
+			calculate_rerouting(pathfinding.main);
 		}
+
 		return;
 	}
 
 	/*
-		We've fallen off - begin rerouting to the closest cell.
+		Check main path.
 	*/
-	std::size_t reroute_target_idx = current_idx;
-	float reroute_closest_dist_sq = std::numeric_limits<float>::max();
-
-	for (std::size_t i = start_check; i <= end_check; ++i) {
-		const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
-		const auto dist_sq = (bot_pos - cell_world).length_sq();
-
-		if (dist_sq < reroute_closest_dist_sq) {
-			reroute_closest_dist_sq = dist_sq;
-			reroute_target_idx = i;
-		}
-	}
-
-	const auto reroute_target_world = ::cell_to_world(island, nodes[reroute_target_idx].cell_xy);
-	auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
-
-	if (rerouting_path.has_value()) {
-		pathfinding.rerouting = pathfinding_progress{
-			std::move(*rerouting_path),
-			0
-		};
-		pathfinding.main.node_index = reroute_target_idx;
+	if (!check_path_out_of_bounds(pathfinding.main, main_island)) {
+		/*
+			Fell off main path - begin rerouting.
+		*/
+		calculate_rerouting(pathfinding.main);
 	}
 }
 
