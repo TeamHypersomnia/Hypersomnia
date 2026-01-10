@@ -648,9 +648,10 @@ public:
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
-		global_time_seconds += in.frame_delta.in_seconds();
-
-		timer.advance(in.frame_delta);
+		auto dt = in.frame_delta;
+		dt *= playtest_speed;
+		global_time_seconds += dt.in_seconds();
+		timer.advance(dt);
 
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
