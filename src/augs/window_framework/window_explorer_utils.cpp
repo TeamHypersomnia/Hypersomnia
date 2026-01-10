@@ -96,6 +96,34 @@ namespace augs {
 		return result;
 	}
 
+	static std::optional<path_type> run_ranger_dialog(const std::string& ranger_flag) {
+		const char* terminal = std::getenv("TERMINAL");
+		if (!terminal || !command_exists("ranger")) {
+			return std::nullopt;
+		}
+
+		const auto temp_result = CACHE_DIR / "last_file_path.txt";
+		const auto temp_result_escaped = shell_escape(temp_result.string());
+
+		const std::string cmd = std::string(terminal) + " -e ranger " + ranger_flag + "=" + temp_result_escaped;
+		augs::shell(cmd);
+
+		try {
+			const auto result = file_to_string(temp_result);
+			remove_file(temp_result);
+
+			std::string trimmed = result;
+			while (!trimmed.empty() && (trimmed.back() == '\n' || trimmed.back() == '\r')) {
+				trimmed.pop_back();
+			}
+
+			return trimmed.empty() ? std::nullopt : std::optional<path_type>(trimmed);
+		}
+		catch (const augs::file_open_error&) {
+			return std::nullopt;
+		}
+	}
+
 	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title
@@ -120,7 +148,11 @@ namespace augs {
 			return run_dialog_command(cmd);
 		}
 
-		LOG("WARNING! Neither zenity nor kdialog found. Cannot show file dialog.");
+		if (auto result = run_ranger_dialog("--choosefile")) {
+			return result;
+		}
+
+		LOG("WARNING! No file dialog tool found (zenity, kdialog, or ranger with $TERMINAL).");
 		return std::nullopt;
 	}
 
@@ -148,7 +180,12 @@ namespace augs {
 			return run_dialog_command(cmd);
 		}
 
-		LOG("WARNING! Neither zenity nor kdialog found. Cannot show file dialog.");
+		/* For ranger, use :touch to create the file and select it */
+		if (auto result = run_ranger_dialog("--choosefile")) {
+			return result;
+		}
+
+		LOG("WARNING! No file dialog tool found (zenity, kdialog, or ranger with $TERMINAL).");
 		return std::nullopt;
 	}
 
@@ -167,13 +204,25 @@ namespace augs {
 			return run_dialog_command(cmd);
 		}
 
-		LOG("WARNING! Neither zenity nor kdialog found. Cannot show directory dialog.");
+		if (auto result = run_ranger_dialog("--choosedir")) {
+			return result;
+		}
+
+		LOG("WARNING! No directory dialog tool found (zenity, kdialog, or ranger with $TERMINAL).");
 		return std::nullopt;
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		const auto parent_dir = p.parent_path();
-		const auto shell_command = "xdg-open " + shell_escape(parent_dir.string());
+		std::string shell_command;
+
+		const char* terminal = std::getenv("TERMINAL");
+		if (terminal && command_exists("ranger")) {
+			shell_command = std::string(terminal) + " -e ranger --selectfile=" + shell_escape(p.string());
+		}
+		else {
+			const auto parent_dir = p.parent_path();
+			shell_command = "xdg-open " + shell_escape(parent_dir.string());
+		}
 
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
