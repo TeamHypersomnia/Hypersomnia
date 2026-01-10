@@ -18,6 +18,17 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/cosmos/create_entity.hpp"
 
+#include "game/components/movement_component.h"
+#include "game/components/crosshair_component.h"
+#include "game/detail/pathfinding.h"
+#include "game/modes/ai/tasks/ai_pathfinding.hpp"
+#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
+#include "game/modes/ai/tasks/interpolate_crosshair.hpp"
+#include "game/detail/pathfinding_bomb.hpp"
+#include "game/messages/game_notification.h"
+#include "augs/math/repro_math.h"
+#include "game/modes/difficulty_type.h"
+
 using input_type = test_mode::input;
 
 mode_entity_id test_mode::lookup(const mode_player_id& id) const {
@@ -320,6 +331,89 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 	remove_old_lying_items(in, step);
 
+	/*
+		Debug pathfinding for playtesting.
+		Run AI pathfinding on the first player if debug_pathfinding_end is set.
+	*/
+	if (playtesting_context.has_value()) {
+		const bool has_debug_target = 
+			playtesting_context->debug_pathfinding_end.has_value() ||
+			playtesting_context->debug_pathfinding_bomb_target.is_set()
+		;
+
+		if (has_debug_target && !players.empty()) {
+			auto& first_player = players.begin()->second;
+			const auto character_id = first_player.controlled_character_id;
+			const auto character = cosm[character_id];
+
+			if (character.alive()) {
+				const auto character_pos = character.get_logic_transform().pos;
+				const auto& navmesh = cosm.get_common_significant().navmesh;
+
+				vec2 target_pos = vec2::zero;
+				bool has_pathfinding_target = false;
+
+				if (playtesting_context->debug_pathfinding_end.has_value()) {
+					target_pos = *playtesting_context->debug_pathfinding_end;
+					has_pathfinding_target = true;
+				}
+				else if (const auto bomb_handle = cosm[playtesting_context->debug_pathfinding_bomb_target]) {
+					/*
+						Use the stored bomb entity for pathfinding.
+					*/
+					const auto bomb_target = ::find_bomb_pathfinding_target(
+						bomb_handle,
+						navmesh,
+						character_pos
+					);
+
+					if (bomb_target.has_value()) {
+						target_pos = bomb_target->target_position;
+						has_pathfinding_target = true;
+					}
+				}
+
+				if (has_pathfinding_target) {
+					::start_pathfinding_to(
+						first_player.debug_pathfinding,
+						character_pos,
+						target_pos,
+						navmesh,
+						nullptr
+					);
+
+					/*
+						Apply crosshair interpolation with HARD difficulty.
+						Use snapping (is_pathfinding=true) since we're navigating a path.
+					*/
+					const real32 dt_secs = in.cosm.get_fixed_delta().in_seconds();
+
+					vec2 crosshair_target;
+					::navigate_pathfinding(
+						first_player.debug_pathfinding,
+						character_pos,
+						navmesh,
+						character,
+						crosshair_target,
+						dt_secs
+					);
+
+					const bool has_target = true;
+					const bool is_pathfinding = first_player.debug_pathfinding.has_value();
+
+					::interpolate_crosshair(
+						character.find_crosshair(),
+						crosshair_target,
+						has_target,
+						dt_secs,
+						difficulty_type::HARD,
+						is_pathfinding
+					);
+				}
+			}
+		}
+	}
+
 	if (auto character = in.cosm[infinite_ammo_for]) {
 		auto guns = character.get_wielded_guns();
 
@@ -386,6 +480,29 @@ void test_mode::mode_post_solve(const input_type, const mode_entropy&, const log
 				if (e.special_result == messages::health_event::result_type::DEATH) {
 					if (e.was_conscious) {
 						make_it_count();
+					}
+				}
+			}
+		}
+	}
+
+	/*
+		Clear pathfinding on teleportation.
+	*/
+	{
+		const auto& notifications = step.get_queue<messages::game_notification>();
+
+		for (const auto& n : notifications) {
+			if (std::holds_alternative<messages::teleportation>(n.payload)) {
+				const auto& teleport = std::get<messages::teleportation>(n.payload);
+
+				/*
+					Find player with this character and clear their pathfinding.
+				*/
+				for (auto& [player_id, player] : players) {
+					if (player.controlled_character_id == teleport.teleported) {
+						player.debug_pathfinding.reset();
+						break;
 					}
 				}
 			}

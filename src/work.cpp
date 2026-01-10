@@ -3655,6 +3655,7 @@ work_result work(
 	WEBSTATIC auto setup_pre_solve = [&](auto...) {
 		get_general_renderer().save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
 		DEBUG_LOGIC_STEP_LINES.clear();
+		DEBUG_LOGIC_STEP_RECTS.clear();
 	};
 
 	WEBSTATIC visible_entities all_visible;

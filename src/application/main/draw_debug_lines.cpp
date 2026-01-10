@@ -30,6 +30,7 @@ void draw_debug_lines(
 
 	renderer.draw_debug_lines(
 		DEBUG_LOGIC_STEP_LINES,
+		DEBUG_LOGIC_STEP_RECTS,
 		DEBUG_PERSISTENT_LINES,
 		DEBUG_FRAME_LINES,
 
@@ -38,6 +39,7 @@ void draw_debug_lines(
 	);
 
 	renderer.call_and_clear_lines();
+	renderer.call_and_clear_triangles();
 
 	DEBUG_FRAME_LINES.clear();
 

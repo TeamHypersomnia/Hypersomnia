@@ -22,6 +22,7 @@
 #include "game/detail/buy_area_in_range.h"
 #include "game/cosmos/delete_entity.h"
 #include "augs/templates/logically_empty.h"
+#include "game/detail/entity_scripts.h"
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
@@ -41,7 +42,7 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "augs/misc/date_time.h"
-#include "game/modes/arena_mode_ai.h"
+#include "game/modes/ai/arena_mode_ai.h"
 #include "game/messages/collected_message.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
@@ -2422,7 +2423,17 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 
-		const auto ai_result = update_arena_mode_ai(in, step, player, in.rules.is_ffa(), stable_round_rng, in.dynamic_vars.bot_difficulty);
+		const auto ai_result = update_arena_mode_ai(
+			cosm,
+			step,
+			player.ai_state,
+			player.controlled_character_id,
+			player.stats.money,
+			in.rules.is_ffa(),
+			stable_round_rng,
+			in.dynamic_vars.bot_difficulty,
+			cosm.get_common_significant().navmesh
+		);
 		
 		if (ai_result.item_purchase.has_value()) {
 			entropy.players[it.first] = mode_commands::item_purchase(*ai_result.item_purchase);
@@ -3744,7 +3755,13 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 
 	// At the end of mode_post_solve, reset bot sprint/dash flags
 	for (auto& it : only_bot(players)) {
-		post_solve_arena_mode_ai(in, it.second, step);
+		post_solve_arena_mode_ai(
+			cosm,
+			step,
+			it.second.ai_state,
+			it.second.controlled_character_id,
+			in.rules.is_ffa()
+		);
 	}
 }
 

@@ -8,7 +8,6 @@
 #include "augs/templates/get_by_dynamic_id.h"
 
 #include "game/common_state/visibility_settings.h"
-#include "game/common_state/pathfinding_settings.h"
 #include "game/common_state/common_assets.h"
 #include "game/common_state/entity_flavours.h"
 
@@ -47,7 +46,6 @@ struct cosmos_common_significant {
 	all_logical_assets logical_assets;
 
 	visibility_settings visibility;
-	pathfinding_settings pathfinding;
 	si_scaling si;
 
 	all_entity_flavours flavours;

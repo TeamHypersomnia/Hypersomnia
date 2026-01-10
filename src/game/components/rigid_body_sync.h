@@ -136,6 +136,10 @@ public:
 		return get_special().get_teleport_alpha();
 	}
 
+	auto is_inside_portal() const {
+		return get_special().inside_portal.is_set();
+	}
+
 	const b2ContactEdge* get_contact_list() const { 
 		if (auto cache = find_cache()) {
 			return cache->body.get()->GetContactList();

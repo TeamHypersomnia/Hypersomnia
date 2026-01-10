@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/modes/detail/flavour_getters.h"
 #include "game/modes/detail/spell_getters.h"
+#include "game/cosmos/logic_step.h"
 #include "game/enums/filters.h"
 
 template <class E>

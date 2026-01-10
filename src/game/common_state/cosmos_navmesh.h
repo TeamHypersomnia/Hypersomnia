@@ -5,8 +5,49 @@
 
 /*
 	Navmesh for arena_mode_ai.
-	A simple square grid where cells are marked as free or occupied.
+	A simple square grid where cells are marked as walkable or occupied.
+
+	Cell value meanings:
+		0  - cell is *walkable* and *unoccupied*
+		1  - cell is *unwalkable* and *occupied*
+		>=2 - cell is *walkable* but *occupied* (portals, identified as 2 + portal_index)
 */
+
+/*
+	Global helper functions for cell type checks (for use outside island context).
+*/
+
+inline bool is_cell_walkable(const uint8_t cell_value) {
+	return cell_value != 1;
+}
+
+inline bool is_cell_unoccupied(const uint8_t cell_value) {
+	return cell_value == 0;
+}
+
+inline bool is_cell_occupied(const uint8_t cell_value) {
+	return cell_value != 0;
+}
+
+inline bool is_cell_portal(const uint8_t cell_value) {
+	return cell_value >= 2;
+}
+
+inline bool is_cell_unwalkable(const uint8_t cell_value) {
+	return cell_value == 1;
+}
+
+/*
+	Check if a cell value matches a specific portal index.
+	If target_portal_index is nullopt, returns false.
+*/
+
+inline bool is_cell_target_portal(const uint8_t cell_value, const std::optional<std::size_t> target_portal_index) {
+	if (!target_portal_index.has_value()) {
+		return false;
+	}
+	return cell_value == static_cast<uint8_t>(2 + *target_portal_index);
+}
 
 struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
@@ -18,10 +59,10 @@ struct navmesh_portal {
 
 struct cosmos_navmesh_island {
 	/*
-		0  - free
-		1  - occupied
-		>2 - portals, identified (2 + portal_index) 
-			 considered occupied, EXCEPT when targeting this exact portal.
+		Cell values - see helper functions above:
+			0  - walkable and unoccupied
+			1  - unwalkable and occupied
+			>=2 - walkable but occupied (portals, 2 + portal_index)
 	*/
 	// GEN INTROSPECTOR struct cosmos_navmesh_island
 	std::vector<uint8_t> occupied;
@@ -47,6 +88,15 @@ struct cosmos_navmesh_island {
 
 		occupied.clear();
 		occupied.resize(size.area(), 0);
+	}
+
+	/*
+		Check if cell is within island bounds.
+	*/
+
+	bool is_within_bounds(const vec2u cell_pos) const {
+		const auto size = get_size_in_cells();
+		return cell_pos.x < size.x && cell_pos.y < size.y;
 	}
 
 	/*
@@ -122,6 +172,31 @@ struct cosmos_navmesh_island {
 
 		const auto cell_pos = vec2u(vec2i(x, y) - bound.lt()) / cell_size;
 		set_cell(cell_pos, value);
+	}
+
+	/*
+		Cell type check methods.
+		get_cell returns 1 for out-of-bounds, so no explicit bounds check needed.
+	*/
+
+	bool is_cell_walkable(const vec2u cell_pos) const {
+		return ::is_cell_walkable(get_cell(cell_pos));
+	}
+
+	bool is_cell_unoccupied(const vec2u cell_pos) const {
+		return ::is_cell_unoccupied(get_cell(cell_pos));
+	}
+
+	bool is_cell_occupied(const vec2u cell_pos) const {
+		return ::is_cell_occupied(get_cell(cell_pos));
+	}
+
+	bool is_cell_portal(const vec2u cell_pos) const {
+		return ::is_cell_portal(get_cell(cell_pos));
+	}
+
+	bool is_cell_unwalkable(const vec2u cell_pos) const {
+		return ::is_cell_unwalkable(get_cell(cell_pos));
 	}
 };
 

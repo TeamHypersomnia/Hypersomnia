@@ -82,7 +82,7 @@
 		abc == 2 ?
 		something :
 		else
-	;
+	; // take care to always have the ; a separate line!!!
 
 	/*
 		For multi-line boolean expressions and assignments,
@@ -96,12 +96,20 @@
 	if (long_clause
 		&& other_long_clause
 		&& another_long_clause
-	) {
+	) { // take care to always have these two characters in a separate line!!!
 
 	}
 	else {
 
 	}
+
+	/*
+		Long initialization:
+	*/
+	pathfinding.rerouting = pathfinding_progress {
+		std::move(*new_rerouting),
+		0
+	};
 	```
 
 - If the initial variable value depends on several conditions, you can sometimes employ this trick to make the variable const:
@@ -292,6 +300,8 @@
 	```
 
 - When implementing new functionality in the `augs/` folder, always put it in the `augs::` namespace.
+
+- Separate generic algorithmic logic (BFS, A*, sorting, etc.) into `augs/algorithm/` headers. Game-specific code should call these generic functions with appropriate parameters. This keeps algorithms reusable and testable independent of game code.
 
 ## Common vec2 and ltrb functions (from augs/math/vec2.h and augs/math/rects.h)
 

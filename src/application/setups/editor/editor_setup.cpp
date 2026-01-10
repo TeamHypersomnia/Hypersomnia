@@ -72,6 +72,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
 #include "game/detail/pathfinding.h"
+#include "game/detail/explosive/like_explosive.h"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
@@ -395,6 +396,31 @@ bool editor_setup::handle_input_before_game(
 	}
 
 	if (is_playtesting()) {
+		/*
+			Handle numpad speed control during playtesting.
+		*/
+		const auto& e = in.e;
+
+		if (e.was_any_key_pressed()) {
+			const auto k = e.data.key.key;
+
+			auto set_speed = [&](const double s) {
+				playtest_speed = s;
+			};
+
+			switch (k) {
+				case key::NUMPAD0: set_speed(1.0); return true;
+				case key::NUMPAD1: set_speed(0.01); return true;
+				case key::NUMPAD2: set_speed(0.05); return true;
+				case key::NUMPAD3: set_speed(0.1); return true;
+				case key::NUMPAD4: set_speed(0.5); return true;
+				case key::NUMPAD5: set_speed(2.0); return true;
+				case key::NUMPAD6: set_speed(4.0); return true;
+				case key::NUMPAD7: set_speed(10.0); return true;
+				default: break;
+			}
+		}
+
 		return false;
 	}
 
@@ -3573,10 +3599,52 @@ const editor_official_resource_map& editor_setup::get_official_resource_map() co
 }
 
 arena_playtesting_context editor_setup::make_playtesting_context() const {
-	return { 
-		get_camera_eye().transform.pos,
-		project.playtesting.starting_faction
-	};
+	arena_playtesting_context ctx;
+	ctx.initial_spawn_pos = get_camera_eye().transform.pos;
+	ctx.first_player_faction = project.playtesting.starting_faction;
+
+	/*
+		Look for DEBUG_PATHFINDING_START and DEBUG_PATHFINDING_END markers.
+		If DEBUG_PATHFINDING_START exists, spawn at that position.
+		If DEBUG_PATHFINDING_END exists, store it for AI pathfinding testing.
+	*/
+	std::optional<vec2> pathfinding_start;
+	std::optional<vec2> pathfinding_end;
+
+	scene.world.for_each_having<invariants::point_marker>(
+		[&](const auto& typed_handle) {
+			const auto& marker = typed_handle.template get<invariants::point_marker>();
+
+			if (marker.type == point_marker_type::DEBUG_PATHFINDING_START) {
+				pathfinding_start = typed_handle.get_logic_transform().pos;
+			}
+			else if (marker.type == point_marker_type::DEBUG_PATHFINDING_END) {
+				pathfinding_end = typed_handle.get_logic_transform().pos;
+			}
+		}
+	);
+
+	if (pathfinding_start.has_value()) {
+		ctx.initial_spawn_pos = *pathfinding_start;
+	}
+
+	if (pathfinding_end.has_value()) {
+		ctx.debug_pathfinding_end = pathfinding_end;
+	}
+	else {
+		/*
+			Check if there's a planted bomb on the ground to use as pathfinding target.
+		*/
+		scene.world.for_each_having<invariants::hand_fuse>(
+			[&](const auto& typed_handle) {
+				if (::is_like_plantable_bomb(typed_handle)) {
+					ctx.debug_pathfinding_bomb_target = typed_handle.get_id();
+				}
+			}
+		);
+	}
+
+	return ctx;
 }
 
 #include "application/main/game_frame_buffer.h"
