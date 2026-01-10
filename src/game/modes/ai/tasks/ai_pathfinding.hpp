@@ -664,7 +664,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 					This preserves continuity when transitioning from rerouting back to main path.
 				*/
 				const auto& main_path = pathfinding.main.path;
-				const auto main_idx = pathfinding.main.node_index;
+				const auto main_idx = pathfinding.main.node_index + 1;
 
 				if (main_path.island_index < navmesh.islands.size() &&
 				    main_idx < main_path.nodes.size()
@@ -748,7 +748,7 @@ inline void debug_draw_pathfinding(
 				const auto to = ::cell_to_world(island, path.nodes[i + 1].cell_xy);
 
 				if (rerouting) {
-					DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? orange : yellow, cell_center, to);
+					DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? red : yellow, cell_center, to);
 				}
 				else {
 					DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? red : green, cell_center, to);
