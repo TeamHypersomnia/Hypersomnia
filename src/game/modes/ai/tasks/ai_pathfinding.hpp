@@ -333,7 +333,8 @@ inline bool start_pathfinding_to(
 
 	if (ai_state.is_pathfinding_active() &&
 	    ai_state.pathfinding->target_island == target_island &&
-	    ai_state.pathfinding->target_cell == target_cell) {
+	    ai_state.pathfinding->target_cell == target_cell
+	) {
 		/*
 			Already navigating to the same destination.
 		*/
@@ -443,7 +444,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		*/
 		const auto dir = pathfinding.target_position - bot_pos;
 		target_crosshair_offset = dir;
-		return dir.normalize();
+		return vec2(dir).normalize();
 	}
 
 	const auto current_target = *current_target_opt;

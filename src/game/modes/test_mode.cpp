@@ -344,11 +344,11 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				const auto& navmesh = cosm.get_common_significant().navmesh;
 
 				vec2 target_pos = vec2::zero;
-				bool has_target = false;
+				bool has_pathfinding_target = false;
 
 				if (playtesting_context->debug_pathfinding_end.has_value()) {
 					target_pos = *playtesting_context->debug_pathfinding_end;
-					has_target = true;
+					has_pathfinding_target = true;
 				}
 				else if (const auto bomb_handle = cosm[playtesting_context->debug_pathfinding_bomb_target]) {
 					/*
@@ -362,15 +362,11 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 					if (bomb_target.has_value()) {
 						target_pos = bomb_target->target_position;
-						has_target = true;
+						has_pathfinding_target = true;
 					}
 				}
 
-				if (has_target) {
-					/*
-						Start pathfinding if not already pathfinding to this target.
-						Always use pathfinding - no FLoS shortcut.
-					*/
+				if (has_pathfinding_target) {
 					::start_pathfinding_to(
 						first_player.debug_pathfinding,
 						character_pos,
@@ -379,9 +375,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						nullptr
 					);
 
-					/*
-						Navigate along the path.
-					*/
 					if (first_player.debug_pathfinding.has_value()) {
 						auto& pathfinding = *first_player.debug_pathfinding;
 						bool path_completed = false;
@@ -408,17 +401,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 							}
 
 							::debug_draw_pathfinding(first_player.debug_pathfinding, character_pos, navmesh);
-						}
-					}
-					else {
-						/*
-							Not on active path (maybe on portal cell, waiting for teleport).
-							Use simple direct movement towards target as fallback.
-						*/
-						const auto dir = (target_pos - character_pos).normalize();
-
-						if (auto* movement = character.template find<components::movement>()) {
-							movement->flags.set_from_closest_direction(dir);
 						}
 					}
 				}

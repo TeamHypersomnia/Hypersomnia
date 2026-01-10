@@ -162,7 +162,7 @@ struct pathfinding_graph_view {
 	template <class Filter>
 	auto make_for_each_neighbor(Filter&& filter) {
 		return [this, filter = std::forward<Filter>(filter)](const vec2u c, auto&& callback) {
-			for_each_neighbor(c, filter, callback);
+			this->for_each_neighbor(c, filter, callback);
 		};
 	}
 
