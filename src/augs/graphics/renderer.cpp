@@ -216,6 +216,7 @@ namespace augs {
 
 	void renderer::draw_debug_lines(
 		const debug_lines& logic_step_lines,
+		const debug_rects& logic_step_rects,
 		const debug_lines& persistent_lines,
 		const debug_lines& frame_lines,
 
@@ -247,6 +248,37 @@ namespace augs {
 
 		for_each_in(persistent_lines, line_lambda);
 		for_each_in(frame_lines, line_lambda);
+
+		/*
+			Draw debug rects as filled quads (2 triangles each).
+		*/
+		const auto drawer_output = augs::drawer_with_default({ get_triangle_buffer(), tex });
+
+		for (const auto& rect : logic_step_rects) {
+			auto p = std::array<augs::vertex, 4>();
+
+			for (std::size_t i = 0; i < 4; ++i) {
+				p[i].pos = rect.corners[i];
+				p[i].color = rect.col;
+				p[i].texcoord = tex.get_atlas_space_uv({ 0.5f, 0.5f });
+			}
+
+			{
+				auto out = augs::vertex_triangle();
+				out.vertices[0] = p[0];
+				out.vertices[1] = p[1];
+				out.vertices[2] = p[2];
+				get_triangle_buffer().push_back(out);
+			}
+
+			{
+				auto out = augs::vertex_triangle();
+				out.vertices[0] = p[2];
+				out.vertices[1] = p[3];
+				out.vertices[2] = p[0];
+				get_triangle_buffer().push_back(out);
+			}
+		}
 	}
 
 	void renderer::fullscreen_quad() {

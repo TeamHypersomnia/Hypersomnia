@@ -709,16 +709,42 @@ inline void debug_draw_pathfinding(
 		}
 
 		const auto& island = navmesh.islands[path.island_index];
+		const auto half_cell_size = static_cast<float>(island.cell_size) / 2.0f;
 
-		for (std::size_t i = 0; i + 1 < path.nodes.size(); ++i) {
-			const auto from = ::cell_to_world(island, path.nodes[i].cell_xy);
-			const auto to = ::cell_to_world(island, path.nodes[i + 1].cell_xy);
+		for (std::size_t i = 0; i < path.nodes.size(); ++i) {
+			const auto& node = path.nodes[i];
+			const auto cell_center = ::cell_to_world(island, node.cell_xy);
 
+			/*
+				Draw cell AABB with smaller alpha.
+			*/
+			rgba cell_color;
 			if (rerouting) {
-				DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? orange : yellow, from, to);
+				cell_color = i < progress.node_index ? rgba(255, 165, 0, 40) : rgba(255, 255, 0, 40);
 			}
 			else {
-				DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? red : green, from, to);
+				cell_color = i < progress.node_index ? rgba(255, 0, 0, 40) : rgba(0, 255, 0, 40);
+			}
+
+			const auto tl = cell_center + vec2(-half_cell_size, -half_cell_size);
+			const auto tr = cell_center + vec2(half_cell_size, -half_cell_size);
+			const auto br = cell_center + vec2(half_cell_size, half_cell_size);
+			const auto bl = cell_center + vec2(-half_cell_size, half_cell_size);
+
+			DEBUG_LOGIC_STEP_RECTS.emplace_back(cell_color, std::array<vec2, 4>{ tl, tr, br, bl });
+
+			/*
+				Draw line to next cell.
+			*/
+			if (i + 1 < path.nodes.size()) {
+				const auto to = ::cell_to_world(island, path.nodes[i + 1].cell_xy);
+
+				if (rerouting) {
+					DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? orange : yellow, cell_center, to);
+				}
+				else {
+					DEBUG_LOGIC_STEP_LINES.emplace_back(i < progress.node_index ? red : green, cell_center, to);
+				}
 			}
 		}
 	};
