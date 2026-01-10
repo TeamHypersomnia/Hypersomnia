@@ -25,7 +25,7 @@
 #include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 #include "game/detail/pathfinding_bomb.hpp"
 #include "game/messages/game_notification.h"
-#include "augs/misc/repro_math.h"
+#include "augs/math/repro_math.h"
 
 using input_type = test_mode::input;
 
@@ -336,7 +336,8 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	if (playtesting_context.has_value()) {
 		const bool has_debug_target = 
 			playtesting_context->debug_pathfinding_end.has_value() ||
-			playtesting_context->debug_pathfinding_bomb_target.is_set();
+			playtesting_context->debug_pathfinding_bomb_target.is_set()
+		;
 
 		if (has_debug_target && !players.empty()) {
 			auto& first_player = players.begin()->second;
@@ -490,7 +491,7 @@ void test_mode::mode_post_solve(const input_type, const mode_entropy&, const log
 					Find player with this character and clear their pathfinding.
 				*/
 				for (auto& [player_id, player] : players) {
-					if (player.controlled_character_id == teleport.subject) {
+					if (player.controlled_character_id == teleport.teleported) {
 						player.debug_pathfinding.reset();
 						break;
 					}

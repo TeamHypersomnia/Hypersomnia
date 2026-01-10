@@ -44,7 +44,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		Advance along path and check for deviation.
 	*/
 	bool path_completed = false;
-	::advance_path_if_reached(pathfinding, bot_pos, navmesh, path_completed);
+	::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, path_completed);
 
 	if (path_completed) {
 		pathfinding_opt.reset();
