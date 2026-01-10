@@ -124,7 +124,8 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		navmesh,
 		character_handle,
-		ai_state.target_crosshair_offset
+		ai_state.target_crosshair_offset,
+		dt_secs
 	);
 
 	if (nav_result.is_navigating) {
