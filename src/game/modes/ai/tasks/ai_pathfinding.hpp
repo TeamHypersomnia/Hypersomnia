@@ -586,18 +586,21 @@ inline bool start_pathfinding_to(
 }
 
 /*
-	Calculate crosshair target position from pathfinding state.
-	Returns un-normalized vector (the actual crosshair offset from bot_pos).
+	Calculate movement direction from pathfinding state.
+	Also handles crosshair smoothing toward the next cell.
 	
-	Handles crosshair smoothing by looking ahead on the path.
+	Returns normalized direction for movement.
+	Outputs un-normalized crosshair offset via target_crosshair_offset parameter.
+	
 	When on a rerouting path, correctly eases between the last node of the
 	rerouting path and the target node of the main path for crosshair continuity.
 */
 
-inline std::optional<vec2> get_pathfinding_crosshair(
+inline std::optional<vec2> get_pathfinding_movement_direction(
 	const ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
-	const cosmos_navmesh& navmesh
+	const cosmos_navmesh& navmesh,
+	vec2& target_crosshair_offset
 ) {
 	const auto current_target_opt = ::get_current_path_target(pathfinding, navmesh);
 
@@ -605,10 +608,13 @@ inline std::optional<vec2> get_pathfinding_crosshair(
 		/*
 			No valid current target, navigate directly to final target.
 		*/
-		return pathfinding.target_position - bot_pos;
+		const auto dir = pathfinding.target_position - bot_pos;
+		target_crosshair_offset = dir;
+		return vec2(dir).normalize();
 	}
 
 	const auto current_target = *current_target_opt;
+	const auto dir = current_target - bot_pos;
 
 	/*
 		Calculate smoothed crosshair target by looking ahead on the path.
@@ -683,7 +689,9 @@ inline std::optional<vec2> get_pathfinding_crosshair(
 		}
 	}
 
-	return look_ahead_target - bot_pos;
+	target_crosshair_offset = look_ahead_target - bot_pos;
+
+	return vec2(dir).normalize();
 }
 
 /*
