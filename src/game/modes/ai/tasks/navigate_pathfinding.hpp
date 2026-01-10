@@ -67,31 +67,31 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	}
 
 	/*
-		Get movement direction and crosshair target from pathfinding.
+		Get crosshair target from pathfinding.
+		The result is un-normalized - used directly for crosshair offset.
 	*/
-	vec2 crosshair_target;
-	const auto movement_dir = ::get_pathfinding_movement_direction(
+	const auto crosshair_offset = ::get_pathfinding_crosshair(
 		pathfinding,
 		bot_pos,
-		navmesh,
-		crosshair_target
+		navmesh
 	);
 
-	if (!movement_dir.has_value()) {
+	if (!crosshair_offset.has_value()) {
 		return result;
 	}
 
 	/*
-		Apply movement flags.
+		Apply movement flags - need to normalize for direction.
 	*/
 	if (auto* movement = character.template find<components::movement>()) {
-		movement->flags.set_from_closest_direction(*movement_dir);
+		const auto movement_dir = vec2(*crosshair_offset).normalize();
+		movement->flags.set_from_closest_direction(movement_dir);
 	}
 
 	/*
-		Apply crosshair offset.
+		Apply crosshair offset - use un-normalized value directly.
 	*/
-	target_crosshair_offset = crosshair_target;
+	target_crosshair_offset = *crosshair_offset;
 
 	/*
 		Debug draw the path.
