@@ -219,27 +219,19 @@ If the game fails to launch, it should automatically open a log file with the re
 
 ### File dialogs integration
 
-You might want to follow some additional configuration to make the experience better on Linux.
+On Linux, the *Hypersomnia* editor uses standard tools for file dialogs and revealing files in the file manager:
 
-#### Opening and revealing files
+- **File dialogs** (open file, save file, choose directory): Uses ``zenity`` (GTK) or ``kdialog`` (KDE) if available. Most desktop environments include at least one of these.
+- **Reveal in file manager**: Uses ``xdg-open`` to open the parent directory of a file.
 
-The *Hypersomnia* editor can reveal files in explorer.
-Also, the game may prompt you to select a file, e.g. to choose the avatar.
-On Windows, this is accomplished through an ``IFileDialog``.  
-Needless to say, such a class does not exist on Linux.  
-*Hypersomnia* provides shell scripts for common file managers in ``hypersomnia/detail/unix/managers``.  
-You'll need one for choosing a file to open and one for revealing files in explorer.  
-``cd`` to ``hypersomnia/detail/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such:  
-
+To ensure file dialogs work, install at least one of the following:
 ```
-ln -s managers/reveal_file_ranger.zsh reveal_file.local 
-ln -s managers/open_file_ranger.zsh open_file.local
+# For GNOME/GTK-based desktops:
+sudo apt install zenity
+
+# For KDE-based desktops:
+sudo apt install kdialog
 ```
-
-None of the symlinks will be tracked by git.  
-
-Currently, the following file managers are supported:
-- [ranger](https://github.com/ranger/ranger) through ``--choosefile`` and ``--selectfile`` options
 
 ## MacOS instructions
 
