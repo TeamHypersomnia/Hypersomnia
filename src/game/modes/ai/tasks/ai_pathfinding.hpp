@@ -722,15 +722,21 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 					Rotate the crosshair offset by 90 degrees for every 2-second interval.
 				*/
 				const int rotation_count = static_cast<int>(pathfinding.stuck_time / STUCK_ROTATION_INTERVAL_SECS);
-				const float rotation_radians = static_cast<float>(rotation_count) * (3.14159265f / 2.0f);
+				const float target_rotation = static_cast<float>(rotation_count) * (3.14159265f / 2.0f);
 
-				target_crosshair_offset = target_crosshair_offset.rotate_radians(rotation_radians);
+				const float ROTATION_SMOOTH_TIME = 0.5f;
+				const float alpha = std::min(dt / ROTATION_SMOOTH_TIME, 1.0f);
+
+				pathfinding.stuck_rotation += (target_rotation - pathfinding.stuck_rotation) * alpha;
+
+				target_crosshair_offset = target_crosshair_offset.rotate_radians(pathfinding.stuck_rotation);
 			}
 		}
 		else {
 			/*
 				Changed cells - reset stuck timer.
 			*/
+			pathfinding.stuck_rotation = 0.0f;
 			pathfinding.stuck_cell = current_cell_xy;
 			pathfinding.stuck_time = 0.0f;
 		}
