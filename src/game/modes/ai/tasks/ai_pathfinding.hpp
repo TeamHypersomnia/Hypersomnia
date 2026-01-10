@@ -586,15 +586,18 @@ inline bool start_pathfinding_to(
 }
 
 /*
-	Calculate movement direction from pathfinding state.
-	Also handles crosshair smoothing toward the next cell.
+	Calculate crosshair target position from pathfinding state.
+	Returns un-normalized vector (the actual crosshair offset from bot_pos).
+	
+	Handles crosshair smoothing by looking ahead on the path.
+	When on a rerouting path, correctly eases between the last node of the
+	rerouting path and the target node of the main path for crosshair continuity.
 */
 
-inline std::optional<vec2> get_pathfinding_movement_direction(
+inline std::optional<vec2> get_pathfinding_crosshair(
 	const ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
-	const cosmos_navmesh& navmesh,
-	vec2& target_crosshair_offset
+	const cosmos_navmesh& navmesh
 ) {
 	const auto current_target_opt = ::get_current_path_target(pathfinding, navmesh);
 
@@ -602,13 +605,10 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		/*
 			No valid current target, navigate directly to final target.
 		*/
-		const auto dir = pathfinding.target_position - bot_pos;
-		target_crosshair_offset = dir;
-		return vec2(dir).normalize();
+		return pathfinding.target_position - bot_pos;
 	}
 
 	const auto current_target = *current_target_opt;
-	const auto dir = current_target - bot_pos;
 
 	/*
 		Calculate smoothed crosshair target by looking ahead on the path.
@@ -617,12 +617,17 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		
 		The interpolated point lies on the imaginary line from current cell center to next cell center,
 		with progress determined by bot's distance to the current cell center.
+		
+		When on a rerouting path, at the last node of rerouting we ease towards the
+		target node on the main path to preserve continuity.
 	*/
 	vec2 look_ahead_target = current_target;
 
+	const bool is_rerouting = pathfinding.rerouting.has_value();
+
 	const pathfinding_progress* active_progress_ptr = nullptr;
 
-	if (pathfinding.rerouting.has_value()) {
+	if (is_rerouting) {
 		active_progress_ptr = &*pathfinding.rerouting;
 	}
 	else {
@@ -636,24 +641,49 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		const auto& island = navmesh.islands[path.island_index];
 		const auto cell_size = static_cast<float>(island.cell_size);
 
-		if (cell_size > 0.0f && active_progress.node_index + 1 < path.nodes.size()) {
-			const auto next_target = ::cell_to_world(island, path.nodes[active_progress.node_index + 1].cell_xy);
+		if (cell_size > 0.0f) {
+			vec2 next_target;
+			bool has_next_target = false;
 
-			/*
-				Calculate progress as how close we are to the current cell center.
-				At center of current cell (progress = 1.0): look fully at next cell.
-				Far from current cell (progress = 0.0): look at current cell.
-			*/
-			const auto dist_to_current = (bot_pos - current_target).length();
-			const auto t = std::clamp(1.0f - dist_to_current / cell_size, 0.0f, 1.0f);
+			if (active_progress.node_index + 1 < path.nodes.size()) {
+				/*
+					Normal case: look ahead to next cell on current path.
+				*/
+				next_target = ::cell_to_world(island, path.nodes[active_progress.node_index + 1].cell_xy);
+				has_next_target = true;
+			}
+			else if (is_rerouting) {
+				/*
+					At the last node of rerouting path - ease towards the target node on main path.
+					This preserves continuity when transitioning from rerouting back to main path.
+				*/
+				const auto& main_path = pathfinding.main.path;
+				const auto main_idx = pathfinding.main.node_index;
 
-			look_ahead_target = current_target + (next_target - current_target) * t;
+				if (main_path.island_index < navmesh.islands.size() &&
+				    main_idx < main_path.nodes.size()
+				) {
+					const auto& main_island = navmesh.islands[main_path.island_index];
+					next_target = ::cell_to_world(main_island, main_path.nodes[main_idx].cell_xy);
+					has_next_target = true;
+				}
+			}
+
+			if (has_next_target) {
+				/*
+					Calculate progress as how close we are to the current cell center.
+					At center of current cell (progress = 1.0): look fully at next cell.
+					Far from current cell (progress = 0.0): look at current cell.
+				*/
+				const auto dist_to_current = (bot_pos - current_target).length();
+				const auto t = std::clamp(1.0f - dist_to_current / cell_size, 0.0f, 1.0f);
+
+				look_ahead_target = current_target + (next_target - current_target) * t;
+			}
 		}
 	}
 
-	target_crosshair_offset = look_ahead_target - bot_pos;
-
-	return vec2(dir).normalize();
+	return look_ahead_target - bot_pos;
 }
 
 /*
