@@ -108,9 +108,11 @@ inline void advance_path_if_cell_reached(
 		else if (::is_within_cell(bot_pos, island, node.cell_xy)) {
 			/*
 				We're in the cell but outside epsilon.
-				Check if we're in the half facing away from the previous cell.
 			*/
 			if (progress.node_index > 0) {
+				/*
+					Check if we're in the half facing away from the previous cell.
+				*/
 				const auto& prev_node = path.nodes[progress.node_index - 1];
 				const auto prev_center = ::cell_to_world(island, prev_node.cell_xy);
 				const auto to_prev = prev_center - cell_center;
@@ -120,6 +122,22 @@ inline void advance_path_if_cell_reached(
 					If dot product is negative, we're on the side opposite to prev_center.
 				*/
 				if (to_prev.dot(bot_offset) < 0.0f) {
+					should_advance = true;
+				}
+			}
+			else if (progress.node_index + 1 < path.nodes.size()) {
+				/*
+					node_index == 0: Check if we're in the half facing towards the next cell.
+				*/
+				const auto& next_node = path.nodes[progress.node_index + 1];
+				const auto next_center = ::cell_to_world(island, next_node.cell_xy);
+				const auto to_next = next_center - cell_center;
+				const auto bot_offset = bot_pos - cell_center;
+
+				/*
+					If dot product is positive, we're on the side towards next_center.
+				*/
+				if (to_next.dot(bot_offset) > 0.0f) {
 					should_advance = true;
 				}
 			}
@@ -256,6 +274,13 @@ inline void check_path_deviation(
 
 	/*
 		Calculate rerouting target cell.
+		
+		Only allows rerouting to:
+		- Unoccupied cells (value == 0)
+		- The target portal cell (if the main path ends at a portal)
+		
+		After calculating the rerouting path, trims it if any of its nodes
+		coincide with unoccupied cells on the main path within deviation range.
 	*/
 	auto calculate_rerouting = [&](const pathfinding_progress& main_progress) {
 		const auto& nodes = main_progress.path.nodes;
@@ -270,11 +295,35 @@ inline void check_path_deviation(
 		const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
 		const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
 
-		std::size_t reroute_target_idx = current_idx < nodes.size() ? current_idx : nodes.size() - 1;
+		/*
+			Determine the target portal cell value if the main path ends at a portal.
+		*/
+		const auto target_portal_index = main_progress.path.final_portal_node;
+
+		/*
+			Find the closest valid rerouting target cell within deviation range.
+			Only allow unoccupied cells OR the target portal cell.
+		*/
+		std::optional<std::size_t> reroute_target_idx;
 		float reroute_closest_dist_sq = std::numeric_limits<float>::max();
 
 		for (std::size_t i = start_check; i <= end_check; ++i) {
-			const auto cell_world = ::cell_to_world(island, nodes[i].cell_xy);
+			const auto& cell_xy = nodes[i].cell_xy;
+			const auto cell_value = island.get_cell(cell_xy);
+
+			/*
+				Only allow unoccupied cells or target portal cells.
+			*/
+			const bool is_valid_target = 
+				::is_cell_unoccupied(cell_value) ||
+				::is_cell_target_portal(cell_value, target_portal_index)
+			;
+
+			if (!is_valid_target) {
+				continue;
+			}
+
+			const auto cell_world = ::cell_to_world(island, cell_xy);
 			const auto dist_sq = (bot_pos - cell_world).length_sq();
 
 			if (dist_sq < reroute_closest_dist_sq) {
@@ -283,16 +332,78 @@ inline void check_path_deviation(
 			}
 		}
 
-		const auto reroute_target_world = ::cell_to_world(island, nodes[reroute_target_idx].cell_xy);
+		if (!reroute_target_idx.has_value()) {
+			/*
+				No valid rerouting target found.
+			*/
+			return;
+		}
+
+		const auto reroute_target_world = ::cell_to_world(island, nodes[*reroute_target_idx].cell_xy);
 		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
 
-		if (rerouting_path.has_value()) {
-			pathfinding.rerouting = pathfinding_progress{
-				std::move(*rerouting_path),
-				0
-			};
-			pathfinding.main.node_index = reroute_target_idx;
+		if (!rerouting_path.has_value()) {
+			return;
 		}
+
+		/*
+			Trim the rerouting path if any of its nodes coincide with unoccupied cells
+			on the main path within deviation range. Keep the furthest matching node.
+		*/
+		std::size_t trim_to_idx = rerouting_path->nodes.size();
+		std::size_t best_main_idx = *reroute_target_idx;
+
+		for (std::size_t reroute_i = 0; reroute_i < rerouting_path->nodes.size(); ++reroute_i) {
+			const auto& reroute_cell = rerouting_path->nodes[reroute_i].cell_xy;
+
+			for (std::size_t main_i = start_check; main_i <= end_check; ++main_i) {
+				if (main_i >= nodes.size()) {
+					break;
+				}
+
+				const auto& main_cell = nodes[main_i].cell_xy;
+				const auto main_cell_value = island.get_cell(main_cell);
+
+				/*
+					Only match unoccupied cells on the main path.
+				*/
+				if (!::is_cell_unoccupied(main_cell_value)) {
+					continue;
+				}
+
+				if (reroute_cell == main_cell) {
+					/*
+						Found a match. If this main path index is further in progress,
+						trim the rerouting path here.
+					*/
+					if (main_i > best_main_idx) {
+						best_main_idx = main_i;
+						trim_to_idx = reroute_i + 1;
+					}
+					else if (main_i == best_main_idx && reroute_i + 1 < trim_to_idx) {
+						trim_to_idx = reroute_i + 1;
+					}
+				}
+			}
+		}
+
+		if (trim_to_idx < rerouting_path->nodes.size()) {
+			rerouting_path->nodes.resize(trim_to_idx);
+		}
+
+		if (rerouting_path->nodes.empty()) {
+			/*
+				Rerouting path trimmed to nothing - we're already on the main path.
+			*/
+			pathfinding.main.node_index = best_main_idx;
+			return;
+		}
+
+		pathfinding.rerouting = pathfinding_progress{
+			std::move(*rerouting_path),
+			0
+		};
+		pathfinding.main.node_index = best_main_idx;
 	};
 
 	const auto& main_path = pathfinding.main.path;
