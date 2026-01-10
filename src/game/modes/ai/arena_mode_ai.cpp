@@ -34,6 +34,7 @@
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
+#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -118,43 +119,21 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		Process pathfinding navigation.
 	*/
-	if (ai_state.is_pathfinding_active()) {
-		auto& pathfinding = *ai_state.pathfinding;
+	const auto nav_result = ::navigate_pathfinding(
+		ai_state.pathfinding,
+		character_pos,
+		navmesh,
+		character_handle,
+		ai_state.target_crosshair_offset
+	);
 
-		/*
-			Advance along path and check for deviation.
-		*/
-		bool path_completed = false;
-		::advance_path_if_reached(pathfinding, character_pos, navmesh, path_completed);
+	if (nav_result.is_navigating) {
+		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
 
-		if (path_completed) {
-			ai_state.clear_pathfinding();
-		}
-		else {
-			::check_path_deviation(pathfinding, character_pos, navmesh, nullptr);
-
-			/*
-				Get movement direction from pathfinding.
-			*/
-			const auto pathfinding_dir = ::get_pathfinding_movement_direction(
-				pathfinding, 
-				character_pos, 
-				navmesh, 
-				ai_state.target_crosshair_offset
-			);
-
-			if (pathfinding_dir.has_value()) {
-				movement.flags.set_from_closest_direction(*pathfinding_dir);
-				::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
-
-				::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
-				::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
-
-				arena_ai_result result;
-				result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
-				return result;
-			}
-		}
+		arena_ai_result result;
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+		return result;
 	}
 
 	/*
