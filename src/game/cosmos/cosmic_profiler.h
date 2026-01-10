@@ -26,7 +26,6 @@ struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 	augs::time_measurements physics_readback;
 	augs::time_measurements particles;
 	augs::time_measurements ai;
-	augs::time_measurements pathfinding;
 	augs::time_measurements movement_paths;
 	augs::time_measurements movement;
 	augs::time_measurements stateful_animations;
