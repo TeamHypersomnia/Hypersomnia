@@ -586,6 +586,13 @@ inline bool start_pathfinding_to(
 }
 
 /*
+	Stuck rotation interval in seconds.
+	When stuck on the same cell for this long, rotate crosshair by 90 degrees.
+*/
+
+static constexpr float STUCK_ROTATION_INTERVAL_SECS = 2.0f;
+
+/*
 	Calculate movement direction from pathfinding state.
 	Also handles crosshair smoothing toward the next cell.
 	
@@ -594,13 +601,18 @@ inline bool start_pathfinding_to(
 	
 	When on a rerouting path, correctly eases between the last node of the
 	rerouting path and the target node of the main path for crosshair continuity.
+	
+	If stuck on the same cell for 2+ seconds, rotates the crosshair offset
+	by 90 degrees to help the bot escape corners. The angle increases by
+	90 degrees every 2 seconds.
 */
 
 inline std::optional<vec2> get_pathfinding_movement_direction(
-	const ai_pathfinding_state& pathfinding,
+	ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
-	vec2& target_crosshair_offset
+	vec2& target_crosshair_offset,
+	const float dt
 ) {
 	const auto current_target_opt = ::get_current_path_target(pathfinding, navmesh);
 
@@ -690,6 +702,40 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 	}
 
 	target_crosshair_offset = look_ahead_target - bot_pos;
+
+	/*
+		Track stuck time on the same cell.
+		If the bot is within the current target cell, track time.
+		Rotate crosshair by 90 degrees every STUCK_ROTATION_INTERVAL_SECS.
+	*/
+	if (path.island_index < navmesh.islands.size() && active_progress.node_index < path.nodes.size()) {
+		const auto& island = navmesh.islands[path.island_index];
+		const auto current_cell_xy = path.nodes[active_progress.node_index].cell_xy;
+
+		if (current_cell_xy == pathfinding.stuck_cell) {
+			/*
+				Still on the same cell - accumulate time.
+			*/
+			pathfinding.stuck_time += dt;
+
+			if (pathfinding.stuck_time >= STUCK_ROTATION_INTERVAL_SECS) {
+				/*
+					Rotate the crosshair offset by 90 degrees for every 2-second interval.
+				*/
+				const int rotation_count = static_cast<int>(pathfinding.stuck_time / STUCK_ROTATION_INTERVAL_SECS);
+				const float rotation_radians = static_cast<float>(rotation_count) * (3.14159265f / 2.0f);
+
+				target_crosshair_offset = target_crosshair_offset.rotate_radians(rotation_radians);
+			}
+		}
+		else {
+			/*
+				Changed cells - reset stuck timer.
+			*/
+			pathfinding.stuck_cell = current_cell_xy;
+			pathfinding.stuck_time = 0.0f;
+		}
+	}
 
 	return vec2(dir).normalize();
 }

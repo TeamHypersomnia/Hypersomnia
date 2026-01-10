@@ -21,10 +21,21 @@ struct ai_pathfinding_state {
 
 	vec2 target_position = vec2::zero;
 	navmesh_cell_id target_cell_id;
+
+	/*
+		Track time spent on the same cell for stuck detection.
+		When stuck on a cell for 2+ seconds, rotate crosshair offset by 90 degrees.
+	*/
+	vec2u stuck_cell = vec2u::zero;
+	float stuck_time = 0.0f;
 	// END GEN INTROSPECTOR
 
 	void clear_rerouting() {
 		rerouting.reset();
+	}
+
+	void reset_stuck_timer() {
+		stuck_time = 0.0f;
 	}
 };
 

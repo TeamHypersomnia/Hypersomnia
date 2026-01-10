@@ -30,7 +30,8 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
-	vec2& target_crosshair_offset
+	vec2& target_crosshair_offset,
+	const float dt
 ) {
 	navigate_pathfinding_result result;
 
@@ -74,7 +75,8 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		pathfinding,
 		bot_pos,
 		navmesh,
-		target_crosshair_offset
+		target_crosshair_offset,
+		dt
 	);
 
 	if (!movement_dir.has_value()) {
