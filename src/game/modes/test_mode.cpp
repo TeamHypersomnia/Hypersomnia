@@ -19,10 +19,13 @@
 #include "game/cosmos/create_entity.hpp"
 
 #include "game/components/movement_component.h"
+#include "game/components/crosshair_component.h"
 #include "game/detail/pathfinding.h"
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
 #include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 #include "game/detail/pathfinding_bomb.hpp"
+#include "game/messages/game_notification.h"
+#include "augs/misc/repro_math.h"
 
 using input_type = test_mode::input;
 
@@ -385,8 +388,16 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						crosshair_target
 					);
 
+					/*
+						Apply crosshair interpolation with HARD difficulty.
+					*/
+					const float dt_secs = in.cosm.get_fixed_delta().in_seconds();
+					const auto average_factor = 0.5f;
+					const auto averages_per_sec = 4.0f;  /* HARD difficulty */
+					const auto averaging_constant = 1.0f - static_cast<real32>(repro::pow(average_factor, averages_per_sec * dt_secs));
+
 					if (auto crosshair = character.find_crosshair()) {
-						crosshair->base_offset = crosshair_target;
+						crosshair->base_offset = augs::interp(crosshair->base_offset, crosshair_target, averaging_constant);
 					}
 				}
 			}
@@ -459,6 +470,29 @@ void test_mode::mode_post_solve(const input_type, const mode_entropy&, const log
 				if (e.special_result == messages::health_event::result_type::DEATH) {
 					if (e.was_conscious) {
 						make_it_count();
+					}
+				}
+			}
+		}
+	}
+
+	/*
+		Clear pathfinding on teleportation.
+	*/
+	{
+		const auto& notifications = step.get_queue<messages::game_notification>();
+
+		for (const auto& n : notifications) {
+			if (std::holds_alternative<messages::teleportation>(n.payload)) {
+				const auto& teleport = std::get<messages::teleportation>(n.payload);
+
+				/*
+					Find player with this character and clear their pathfinding.
+				*/
+				for (auto& [player_id, player] : players) {
+					if (player.controlled_character_id == teleport.subject) {
+						player.debug_pathfinding.reset();
+						break;
 					}
 				}
 			}

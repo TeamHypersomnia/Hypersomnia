@@ -17,6 +17,28 @@
 
 using island_id_type = uint32_t;
 
+/*
+	Combined island + cell identifier for simple destination comparison.
+*/
+
+struct navmesh_cell_id {
+	// GEN INTROSPECTOR struct navmesh_cell_id
+	island_id_type island = 0;
+	vec2u cell = vec2u::zero;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const navmesh_cell_id& other) const {
+		return 
+			island == other.island &&
+			cell == other.cell
+		;
+	}
+
+	bool operator!=(const navmesh_cell_id& other) const {
+		return !(*this == other);
+	}
+};
+
 struct pathfinding_node {
 	// GEN INTROSPECTOR struct pathfinding_node
 	vec2u cell_xy = vec2u::zero;

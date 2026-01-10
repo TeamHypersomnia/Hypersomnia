@@ -11,6 +11,12 @@
 static constexpr float CELL_REACH_EPSILON = 15.0f;
 
 /*
+	Deviation check bounds: check nodes[index - DEVIATION_CHECK_RANGE_V .. index + DEVIATION_CHECK_RANGE_V].
+*/
+
+static constexpr std::size_t DEVIATION_CHECK_RANGE_V = 5;
+
+/*
 	Check if bot is within the given cell bounds.
 */
 
@@ -165,6 +171,10 @@ inline void advance_path_if_reached(
 
 /*
 	Check if bot has fallen off the path and needs rerouting.
+	
+	Note: We only update node_index to a different cell if we're NOT on either
+	node_index or node_index-1 cell. This is because we may advance node_index
+	while still physically on the previous cell.
 */
 
 inline void check_path_deviation(
@@ -215,10 +225,10 @@ inline void check_path_deviation(
 	const auto current_idx = pathfinding.main.node_index;
 
 	/*
-		Check nodes[index - 5 .. index + 5] to find the closest one.
+		Check nodes[index - DEVIATION_CHECK_RANGE_V .. index + DEVIATION_CHECK_RANGE_V] to find the closest one.
 	*/
-	const auto start_check = current_idx >= 5 ? current_idx - 5 : 0;
-	const auto end_check = std::min(current_idx + 5, uint32_t(nodes.size()) - 1);
+	const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
+	const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
 
 	std::optional<std::size_t> closest_within_bounds;
 	float closest_dist_sq = std::numeric_limits<float>::max();
@@ -238,9 +248,18 @@ inline void check_path_deviation(
 
 	if (closest_within_bounds.has_value()) {
 		/*
-			We're still on the path, update index if necessary.
+			We're still on the path.
+			Only update node_index if we're NOT on either current_idx or current_idx-1.
+			This prevents resetting progress when we've advanced but are still physically
+			on the previous cell.
 		*/
-		pathfinding.main.node_index = *closest_within_bounds;
+		const auto found_idx = *closest_within_bounds;
+		const bool on_current = (found_idx == current_idx);
+		const bool on_previous = (current_idx > 0 && found_idx == current_idx - 1);
+
+		if (!on_current && !on_previous) {
+			pathfinding.main.node_index = found_idx;
+		}
 		return;
 	}
 
@@ -330,10 +349,10 @@ inline bool start_pathfinding_to(
 	const auto target_island = *target_island_opt;
 	const auto& island = navmesh.islands[target_island];
 	const auto target_cell = ::world_to_cell(island, target_pos);
+	const auto new_target_cell_id = navmesh_cell_id{ target_island, target_cell };
 
 	if (ai_state.is_pathfinding_active() &&
-	    ai_state.pathfinding->target_island == target_island &&
-	    ai_state.pathfinding->target_cell == target_cell
+	    ai_state.pathfinding->target_cell_id == new_target_cell_id
 	) {
 		/*
 			Already navigating to the same destination.
@@ -355,8 +374,7 @@ inline bool start_pathfinding_to(
 		pathfinding_progress{ std::move(*path), 0 },
 		std::nullopt,
 		target_pos,
-		target_island,
-		target_cell
+		new_target_cell_id
 	};
 
 	return true;
@@ -394,10 +412,10 @@ inline bool start_pathfinding_to(
 	const auto target_island = *target_island_opt;
 	const auto& island = navmesh.islands[target_island];
 	const auto target_cell = ::world_to_cell(island, target_pos);
+	const auto new_target_cell_id = navmesh_cell_id{ target_island, target_cell };
 
 	if (pathfinding_opt.has_value() &&
-	    pathfinding_opt->target_island == target_island &&
-	    pathfinding_opt->target_cell == target_cell) {
+	    pathfinding_opt->target_cell_id == new_target_cell_id) {
 		/*
 			Already navigating to the same destination.
 		*/
@@ -418,8 +436,7 @@ inline bool start_pathfinding_to(
 		pathfinding_progress{ std::move(*path), 0 },
 		std::nullopt,
 		target_pos,
-		target_island,
-		target_cell
+		new_target_cell_id
 	};
 
 	return true;
