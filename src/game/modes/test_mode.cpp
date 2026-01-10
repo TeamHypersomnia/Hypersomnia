@@ -21,6 +21,7 @@
 #include "game/components/movement_component.h"
 #include "game/detail/pathfinding.h"
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
+#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 #include "game/detail/pathfinding_bomb.hpp"
 
 using input_type = test_mode::input;
@@ -375,34 +376,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						nullptr
 					);
 
-					if (first_player.debug_pathfinding.has_value()) {
-						auto& pathfinding = *first_player.debug_pathfinding;
-						bool path_completed = false;
-						::advance_path_if_reached(pathfinding, character_pos, navmesh, path_completed);
-
-						if (path_completed) {
-							first_player.debug_pathfinding.reset();
-						}
-						else {
-							::check_path_deviation(pathfinding, character_pos, navmesh, nullptr);
-
-							vec2 crosshair_target;
-							const auto movement_dir = ::get_pathfinding_movement_direction(
-								pathfinding,
-								character_pos,
-								navmesh,
-								crosshair_target
-							);
-
-							if (movement_dir.has_value()) {
-								if (auto* movement = character.template find<components::movement>()) {
-									movement->flags.set_from_closest_direction(*movement_dir);
-								}
-							}
-
-							::debug_draw_pathfinding(first_player.debug_pathfinding, character_pos, navmesh);
-						}
-					}
+					vec2 crosshair_target;
+					::navigate_pathfinding(
+						first_player.debug_pathfinding,
+						character_pos,
+						navmesh,
+						character,
+						crosshair_target
+					);
 				}
 			}
 		}
