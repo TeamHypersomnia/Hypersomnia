@@ -53,12 +53,10 @@ namespace invariants {
 }
 
 namespace components {
-	struct behaviour_tree;
 	struct crosshair;
 	struct missile;
 	struct gun;
 	struct movement;
-	struct pathfinding;
 	struct rigid_body;
 	struct car;
 	struct driver;
@@ -136,12 +134,10 @@ using always_present_invariants = type_list<
 template <template <class...> class List>
 using component_list_t = List<
 	components::sprite,
-	components::behaviour_tree,
 	components::crosshair,
 	components::missile,
 	components::gun,
 	components::movement,
-	components::pathfinding,
 	components::rigid_body,
 	components::specific_colliders_connection,
 	components::transform,

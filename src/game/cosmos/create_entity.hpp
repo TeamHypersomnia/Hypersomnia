@@ -4,6 +4,7 @@
 #include "game/cosmos/cosmic_functions.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
 #include "game/cosmos/entity_creation_error.h"
+#include "game/cosmos/logic_step.h"
 #include "game/messages/create_entity_message.h"
 
 template <class E, class C, class I, class P>

@@ -22,6 +22,7 @@
 #include "game/detail/buy_area_in_range.h"
 #include "game/cosmos/delete_entity.h"
 #include "augs/templates/logically_empty.h"
+#include "game/detail/entity_scripts.h"
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
