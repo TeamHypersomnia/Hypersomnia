@@ -39,6 +39,7 @@ void draw_debug_lines(
 	);
 
 	renderer.call_and_clear_lines();
+	renderer.call_and_clear_triangles();
 
 	DEBUG_FRAME_LINES.clear();
 
