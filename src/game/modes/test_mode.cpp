@@ -384,6 +384,10 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						character,
 						crosshair_target
 					);
+
+					if (auto crosshair = character.find_crosshair()) {
+						crosshair->base_offset = crosshair_target;
+					}
 				}
 			}
 		}

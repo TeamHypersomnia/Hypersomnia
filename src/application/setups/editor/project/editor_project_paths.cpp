@@ -115,7 +115,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	};
 
 	project_json = in_folder(arena_name + ".json");
-	project_nav = in_folder(arena_name + ".nav");
+	project_nav = in_folder("navmesh.nav");
 	legacy_autosave_json = in_folder("autosave.json");
 	last_saved_json = in_folder("last_saved.json");
 	editor_view = in_folder("editor_view.json");
