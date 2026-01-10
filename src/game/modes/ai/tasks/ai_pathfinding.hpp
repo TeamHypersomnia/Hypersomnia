@@ -14,7 +14,7 @@ static constexpr float CELL_REACH_EPSILON = 15.0f;
 	Deviation check bounds: check nodes[index - DEVIATION_CHECK_RANGE_V .. index + DEVIATION_CHECK_RANGE_V].
 */
 
-static constexpr std::size_t DEVIATION_CHECK_RANGE_V = 5;
+static constexpr std::size_t DEVIATION_CHECK_RANGE_V = 30;
 
 /*
 	Check if bot is within the given cell bounds.

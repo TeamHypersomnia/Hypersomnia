@@ -44,7 +44,17 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		Advance along path and check for deviation.
 	*/
 	bool path_completed = false;
-	::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, path_completed);
+	bool is_inert = false;
+
+	if (auto* movement = character.template find<components::movement>()) {
+		if (movement->get_max_inertia() > 50.0f) {
+			is_inert = true;
+		}
+	}
+
+	if (!is_inert) {
+		::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, path_completed);
+	}
 
 	if (path_completed) {
 		pathfinding_opt.reset();
@@ -52,7 +62,9 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		return result;
 	}
 
-	::check_path_deviation(pathfinding, bot_pos, navmesh, nullptr);
+	if (!is_inert) {
+		::check_path_deviation(pathfinding, bot_pos, navmesh, nullptr);
+	}
 
 	/*
 		Get movement direction and crosshair target from pathfinding.
