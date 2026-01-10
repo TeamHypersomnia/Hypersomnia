@@ -13,14 +13,12 @@
 
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
-#include "game/stateless_systems/pathfinding_system.h"
 #include "game/stateless_systems/input_system.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/crosshair_system.h"
 #include "game/stateless_systems/missile_system.h"
 #include "game/stateless_systems/deletion_system.h"
 #include "game/stateless_systems/particles_existence_system.h"
-#include "game/stateless_systems/behaviour_tree_system.h"
 #include "game/stateless_systems/car_system.h"
 #include "game/stateless_systems/driver_system.h"
 #include "game/stateless_systems/item_system.h"
@@ -262,20 +260,6 @@ void standard_solve(const logic_step step) {
 		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(step);
 	}
 #endif
-
-	{
-		auto scope = measure_scope(performance.ai);
-		behaviour_tree_system().evaluate_trees(step);
-	}
-
-	{
-		auto pathfinding_raycasts_scope = cosm.measure_raycasts(performance.pathfinding_raycasts);
-
-#if TODO_PATHFINDING
-		auto scope = measure_scope(performance.pathfinding);
-		pathfinding_system().advance_pathfinding_sessions(step);
-#endif
-	}
 
 	{
 		auto& transfers = step.get_queue<item_slot_transfer_request>();

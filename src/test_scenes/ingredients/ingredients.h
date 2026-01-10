@@ -25,8 +25,7 @@
 #include "view/viewables/image_cache.h"
 
 namespace ingredients {
-	void add_standard_pathfinding_capability(entity_handle);
-	void add_soldier_intelligence(entity_handle);
+
 }
 
 namespace prefabs {

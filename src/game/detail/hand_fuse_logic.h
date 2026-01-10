@@ -11,6 +11,7 @@
 #include "game/messages/battle_event_message.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/physics/infer_damping.hpp"
+#include "game/cosmos/logic_step.h"
 #include "augs/log.h"
 
 template <class E>

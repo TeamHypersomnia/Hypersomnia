@@ -1,5 +1,6 @@
 #include "augs/templates/container_templates.h"
 #include "augs/audio/sound_buffer.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

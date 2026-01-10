@@ -24,7 +24,6 @@
 
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/traits/is_enum_map.h"
-#include "game/components/pathfinding_component.h"
 #include "game/organization/for_each_entity_type.h"
 #include "game/organization/for_each_component_type.h"
 #include "game/cosmos/entity_handle.h"
@@ -302,7 +301,6 @@ struct tests_of_traits {
 	static_assert(is_container_v<std::vector<int>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<vec2>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<cosmos>>, "Trait has failed");
-	static_assert(is_container_v<std::vector<pathfinding_session>>, "Trait has failed");
 
 	static_assert(can_access_data_v<std::string>, "Trait has failed");
 	static_assert(can_access_data_v<std::vector<int>>, "Trait has failed");
