@@ -72,7 +72,7 @@ inline std::optional<vec2> get_current_path_target(
 	- OR when outside epsilon but in the half of the cell facing away from previous cell
 */
 
-inline void advance_path_if_reached(
+inline void advance_path_if_cell_reached(
 	ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
@@ -149,7 +149,8 @@ inline void advance_path_if_reached(
 			If we've finished rerouting, we're back on the main path.
 		*/
 		if (finished || 
-		    pathfinding.rerouting->node_index >= pathfinding.rerouting->path.nodes.size()) {
+		    pathfinding.rerouting->node_index >= pathfinding.rerouting->path.nodes.size()
+		) {
 			pathfinding.clear_rerouting();
 		}
 	}
@@ -193,7 +194,8 @@ inline void check_path_deviation(
 			Recalculate rerouting to the main path cell.
 		*/
 		if (main_path.island_index >= navmesh.islands.size() ||
-		    pathfinding.main.node_index >= main_path.nodes.size()) {
+		    pathfinding.main.node_index >= main_path.nodes.size()
+		) {
 			return;
 		}
 
@@ -328,15 +330,6 @@ inline bool start_pathfinding_to(
 	const cosmos_navmesh& navmesh,
 	pathfinding_context* ctx
 ) {
-	/*
-		Don't initiate new pathfinding while standing on a portal cell.
-		Existing pathfinding sessions can continue, but new ones should wait
-		until the bot has teleported through the portal.
-	*/
-	if (!ai_state.is_pathfinding_active() && ::is_on_portal_cell(bot_pos, navmesh)) {
-		return false;
-	}
-
 	/*
 		Check if we're already pathfinding to this destination.
 	*/
