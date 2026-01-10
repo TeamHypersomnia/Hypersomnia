@@ -47,61 +47,120 @@ namespace augs {
 
 #elif PLATFORM_LINUX
 #include <thread>
+#include <cstdio>
+#include <array>
 
 namespace augs {
-	static std::optional<path_type> read_chosen_path(const augs::path_type& script_path) {
-		const auto& temp_result = CACHE_DIR / "last_file_path.txt";
-
-		try {
-			const auto result = file_to_string(temp_result);
-			remove_file(temp_result);
-			return result;
-		}
-		catch (const augs::file_open_error&) {
-			LOG("Error: %x did not produce %x", script_path, temp_result);
-			return std::nullopt;
-		}
+	static bool command_exists(const std::string& cmd) {
+		const auto check_cmd = "command -v " + cmd + " > /dev/null 2>&1";
+		return std::system(check_cmd.c_str()) == 0;
 	}
 
-	static std::optional<path_type> choose_path(const augs::path_type& script_path) {
-		if (!augs::exists(script_path)) {
-			LOG("WARNING! Could not find the script file: %x.", script_path);
+	static std::optional<path_type> run_dialog_command(const std::string& command) {
+		std::array<char, 4096> buffer;
+		std::string result;
+
+		FILE* pipe = popen(command.c_str(), "r");
+		if (!pipe) {
+			LOG("Failed to run command: %x", command);
 			return std::nullopt;
 		}
 
-		augs::shell(script_path);
-		return read_chosen_path(script_path);
+		while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+			result += buffer.data();
+		}
+
+		const int exit_code = pclose(pipe);
+		if (exit_code != 0 || result.empty()) {
+			return std::nullopt;
+		}
+
+		/* Remove trailing newline */
+		while (!result.empty() && (result.back() == '\n' || result.back() == '\r')) {
+			result.pop_back();
+		}
+
+		return result;
 	}
 
 	std::optional<path_type> window::open_file_dialog(
-		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& /* custom_title */
+		const std::vector<file_dialog_filter>& filters,
+		const std::string& custom_title
 	) {
-		return choose_path(DETAIL_DIR / "unix/open_file.local");
+		const auto title = custom_title.empty() ? "Open File" : custom_title;
+
+		if (command_exists("zenity")) {
+			std::string cmd = "zenity --file-selection --title=\"" + title + "\"";
+			for (const auto& f : filters) {
+				cmd += " --file-filter=\"" + f.description + " | *." + f.extension + "\"";
+			}
+			return run_dialog_command(cmd);
+		}
+
+		if (command_exists("kdialog")) {
+			std::string filter_str;
+			for (const auto& f : filters) {
+				if (!filter_str.empty()) filter_str += " ";
+				filter_str += "*." + f.extension;
+			}
+			std::string cmd = "kdialog --getopenfilename . \"" + filter_str + "\" --title \"" + title + "\"";
+			return run_dialog_command(cmd);
+		}
+
+		LOG("WARNING! Neither zenity nor kdialog found. Cannot show file dialog.");
+		return std::nullopt;
 	}
 
 	std::optional<path_type> window::save_file_dialog(
-		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& /* custom_title */
+		const std::vector<file_dialog_filter>& filters,
+		const std::string& custom_title
 	) {
-		return choose_path(DETAIL_DIR / "unix/save_file.local");
+		const auto title = custom_title.empty() ? "Save File" : custom_title;
+
+		if (command_exists("zenity")) {
+			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=\"" + title + "\"";
+			for (const auto& f : filters) {
+				cmd += " --file-filter=\"" + f.description + " | *." + f.extension + "\"";
+			}
+			return run_dialog_command(cmd);
+		}
+
+		if (command_exists("kdialog")) {
+			std::string filter_str;
+			for (const auto& f : filters) {
+				if (!filter_str.empty()) filter_str += " ";
+				filter_str += "*." + f.extension;
+			}
+			std::string cmd = "kdialog --getsavefilename . \"" + filter_str + "\" --title \"" + title + "\"";
+			return run_dialog_command(cmd);
+		}
+
+		LOG("WARNING! Neither zenity nor kdialog found. Cannot show file dialog.");
+		return std::nullopt;
 	}
 
 	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& /* custom_title */
+		const std::string& custom_title
 	) {
-		return choose_path(DETAIL_DIR / "unix/choose_directory.local");
+		const auto title = custom_title.empty() ? "Choose Directory" : custom_title;
+
+		if (command_exists("zenity")) {
+			std::string cmd = "zenity --file-selection --directory --title=\"" + title + "\"";
+			return run_dialog_command(cmd);
+		}
+
+		if (command_exists("kdialog")) {
+			std::string cmd = "kdialog --getexistingdirectory . --title \"" + title + "\"";
+			return run_dialog_command(cmd);
+		}
+
+		LOG("WARNING! Neither zenity nor kdialog found. Cannot show directory dialog.");
+		return std::nullopt;
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		const auto script_path = DETAIL_DIR / "unix/reveal_file.local";
-
-		if (!augs::exists(script_path)) {
-			LOG("WARNING! Could not find the script file: %x.", script_path);
-			return;
-		}
-
-		const auto shell_command = typesafe_sprintf("%x \"%x\"", script_path, p.string());
+		const auto parent_dir = p.parent_path();
+		const auto shell_command = typesafe_sprintf("xdg-open \"%x\"", parent_dir.string());
 
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
