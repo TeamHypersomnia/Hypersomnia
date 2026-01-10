@@ -221,8 +221,8 @@ If the game fails to launch, it should automatically open a log file with the re
 
 On Linux, the *Hypersomnia* editor uses standard tools for file dialogs and revealing files in the file manager:
 
-- **File dialogs** (open file, save file, choose directory): Uses ``zenity`` (GTK) or ``kdialog`` (KDE) if available. Most desktop environments include at least one of these.
-- **Reveal in file manager**: Uses ``xdg-open`` to open the parent directory of a file.
+- **File dialogs** (open file, save file, choose directory): Uses ``zenity`` (GTK) or ``kdialog`` (KDE) if available. Falls back to ``ranger`` with ``$TERMINAL`` if neither is available.
+- **Reveal in file manager**: Uses ``ranger`` with ``$TERMINAL`` if available (``$TERMINAL -e ranger --selectfile=<path>``), otherwise falls back to ``xdg-open`` to open the parent directory.
 
 To ensure file dialogs work, install at least one of the following:
 ```
@@ -231,6 +231,9 @@ sudo apt install zenity
 
 # For KDE-based desktops:
 sudo apt install kdialog
+
+# For terminal-based file management (requires $TERMINAL env var):
+sudo apt install ranger
 ```
 
 ## MacOS instructions
