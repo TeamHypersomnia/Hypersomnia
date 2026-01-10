@@ -29,6 +29,7 @@ struct ai_pathfinding_state {
 
 	vec2u stuck_cell = vec2u::zero;
 	float stuck_time = 0.0f;
+	float stuck_rotation = 0.0f;
 	// END GEN INTROSPECTOR
 
 	void clear_rerouting() {
