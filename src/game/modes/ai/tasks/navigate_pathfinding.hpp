@@ -48,7 +48,13 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	bool is_inert = false;
 
 	if (auto* movement = character.template find<components::movement>()) {
-		if (movement->get_max_inertia() > 50.0f) {
+		if (movement->portal_inertia_ms > 50.0f) {
+			is_inert = true;
+		}
+	}
+
+	if (const auto rigid_body = character.template find<components::rigid_body>()) {
+		if (rigid_body.is_inside_portal()) {
 			is_inert = true;
 		}
 	}

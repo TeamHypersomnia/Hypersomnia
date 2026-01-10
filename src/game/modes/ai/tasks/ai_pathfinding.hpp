@@ -179,7 +179,7 @@ inline void advance_path_if_cell_reached(
 			If we've finished main path and there's no portal,
 			signal path completion (destination reached).
 		*/
-		if (main_path_finished && !pathfinding.main.path.final_portal_node.has_value()) {
+		if (main_path_finished) {
 			path_completed = true;
 		}
 		/*
@@ -774,7 +774,7 @@ inline void debug_draw_pathfinding(
 			*/
 			rgba cell_color;
 			if (rerouting) {
-				cell_color = i < progress.node_index ? rgba(255, 165, 0, 40) : rgba(255, 255, 0, 40);
+				cell_color = i < progress.node_index ? rgba(255, 0, 0, 40) : rgba(255, 255, 0, 40);
 			}
 			else {
 				cell_color = i < progress.node_index ? rgba(255, 0, 0, 40) : rgba(0, 255, 0, 40);
