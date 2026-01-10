@@ -3638,12 +3638,7 @@ arena_playtesting_context editor_setup::make_playtesting_context() const {
 		scene.world.for_each_having<invariants::hand_fuse>(
 			[&](const auto& typed_handle) {
 				if (::is_like_plantable_bomb(typed_handle)) {
-					/*
-						Check if it's on the ground (not in inventory).
-					*/
-					if (!typed_handle.get_owning_transfer_capability().alive()) {
-						ctx.debug_pathfinding_bomb_target = typed_handle.get_id();
-					}
+					ctx.debug_pathfinding_bomb_target = typed_handle.get_id();
 				}
 			}
 		);

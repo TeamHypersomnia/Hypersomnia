@@ -18,6 +18,8 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 		return std::nullopt;
 	}
 
+	(void)source_pos;
+
 	const auto bomb_transform = bomb_entity.get_logic_transform();
 	const auto bomb_pos = bomb_transform.pos;
 
@@ -42,10 +44,8 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 		Get bomb AABB to determine which cells it touches.
 	*/
 	auto get_bomb_aabb = [&]() -> ltrb {
-		if (const auto rigid = bomb_entity.template find<components::rigid_body>()) {
-			if (const auto aabb = rigid.find_aabb()) {
-				return *aabb;
-			}
+		if (const auto aabb = bomb_entity.find_aabb()) {
+			return *aabb;
 		}
 
 		/*
@@ -85,11 +85,11 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 			Find the walkable cell closest to source_pos.
 		*/
 		vec2u best_cell = walkable_cells[0];
-		float best_dist_sq = (::cell_to_world(island, best_cell) - source_pos).length_sq();
+		float best_dist_sq = (::cell_to_world(island, best_cell) - bomb_pos).length_sq();
 
 		for (std::size_t i = 1; i < walkable_cells.size(); ++i) {
 			const auto cell_world = ::cell_to_world(island, walkable_cells[i]);
-			const auto dist_sq = (cell_world - source_pos).length_sq();
+			const auto dist_sq = (cell_world - bomb_pos).length_sq();
 
 			if (dist_sq < best_dist_sq) {
 				best_dist_sq = dist_sq;
