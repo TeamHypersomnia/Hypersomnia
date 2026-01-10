@@ -296,11 +296,6 @@ inline void check_path_deviation(
 		const auto end_check = std::min(current_idx + DEVIATION_CHECK_RANGE_V, static_cast<std::size_t>(nodes.size()) - 1);
 
 		/*
-			Determine the target portal cell value if the main path ends at a portal.
-		*/
-		const auto target_portal_index = main_progress.path.final_portal_node;
-
-		/*
 			Find the closest valid rerouting target cell within deviation range.
 			Only allow unoccupied cells OR the target portal cell.
 		*/
@@ -309,15 +304,12 @@ inline void check_path_deviation(
 
 		for (std::size_t i = start_check; i <= end_check; ++i) {
 			const auto& cell_xy = nodes[i].cell_xy;
-			const auto cell_value = island.get_cell(cell_xy);
 
 			/*
-				Only allow unoccupied cells or target portal cells.
+				Only allow unoccupied cells.
 			*/
-			const bool is_valid_target = 
-				::is_cell_unoccupied(cell_value) ||
-				::is_cell_target_portal(cell_value, target_portal_index)
-			;
+
+			const bool is_valid_target = island.is_cell_unoccupied(cell_xy);
 
 			if (!is_valid_target) {
 				continue;
