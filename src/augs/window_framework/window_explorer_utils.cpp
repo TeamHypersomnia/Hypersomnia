@@ -51,6 +51,19 @@ namespace augs {
 #include <array>
 
 namespace augs {
+	static std::string shell_escape(const std::string& s) {
+		std::string result = "'";
+		for (const char c : s) {
+			if (c == '\'') {
+				result += "'\\''";
+			} else {
+				result += c;
+			}
+		}
+		result += "'";
+		return result;
+	}
+
 	static bool command_exists(const std::string& cmd) {
 		const auto check_cmd = "command -v " + cmd + " > /dev/null 2>&1";
 		return std::system(check_cmd.c_str()) == 0;
@@ -90,9 +103,9 @@ namespace augs {
 		const auto title = custom_title.empty() ? "Open File" : custom_title;
 
 		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --title=\"" + title + "\"";
+			std::string cmd = "zenity --file-selection --title=" + shell_escape(title);
 			for (const auto& f : filters) {
-				cmd += " --file-filter=\"" + f.description + " | *." + f.extension + "\"";
+				cmd += " --file-filter=" + shell_escape(f.description + " | *." + f.extension);
 			}
 			return run_dialog_command(cmd);
 		}
@@ -103,7 +116,7 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += "*." + f.extension;
 			}
-			std::string cmd = "kdialog --getopenfilename . \"" + filter_str + "\" --title \"" + title + "\"";
+			std::string cmd = "kdialog --getopenfilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -118,9 +131,9 @@ namespace augs {
 		const auto title = custom_title.empty() ? "Save File" : custom_title;
 
 		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=\"" + title + "\"";
+			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
 			for (const auto& f : filters) {
-				cmd += " --file-filter=\"" + f.description + " | *." + f.extension + "\"";
+				cmd += " --file-filter=" + shell_escape(f.description + " | *." + f.extension);
 			}
 			return run_dialog_command(cmd);
 		}
@@ -131,7 +144,7 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += "*." + f.extension;
 			}
-			std::string cmd = "kdialog --getsavefilename . \"" + filter_str + "\" --title \"" + title + "\"";
+			std::string cmd = "kdialog --getsavefilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -145,12 +158,12 @@ namespace augs {
 		const auto title = custom_title.empty() ? "Choose Directory" : custom_title;
 
 		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --directory --title=\"" + title + "\"";
+			std::string cmd = "zenity --file-selection --directory --title=" + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 
 		if (command_exists("kdialog")) {
-			std::string cmd = "kdialog --getexistingdirectory . --title \"" + title + "\"";
+			std::string cmd = "kdialog --getexistingdirectory . --title " + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -160,7 +173,7 @@ namespace augs {
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
 		const auto parent_dir = p.parent_path();
-		const auto shell_command = typesafe_sprintf("xdg-open \"%x\"", parent_dir.string());
+		const auto shell_command = "xdg-open " + shell_escape(parent_dir.string());
 
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
