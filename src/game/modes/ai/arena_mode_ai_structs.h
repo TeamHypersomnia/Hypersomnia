@@ -14,6 +14,11 @@ struct arena_ai_result {
 	Existence of this object implies an active pathfinding session.
 */
 
+/*
+	This also tracks time spent on the same cell for stuck detection.
+	When stuck on a cell for 2+ seconds, rotate crosshair offset by 90 degrees.
+*/
+
 struct ai_pathfinding_state {
 	// GEN INTROSPECTOR struct ai_pathfinding_state
 	pathfinding_progress main;
@@ -22,10 +27,6 @@ struct ai_pathfinding_state {
 	vec2 target_position = vec2::zero;
 	navmesh_cell_id target_cell_id;
 
-	/*
-		Track time spent on the same cell for stuck detection.
-		When stuck on a cell for 2+ seconds, rotate crosshair offset by 90 degrees.
-	*/
 	vec2u stuck_cell = vec2u::zero;
 	float stuck_time = 0.0f;
 	// END GEN INTROSPECTOR

@@ -590,7 +590,7 @@ inline bool start_pathfinding_to(
 	When stuck on the same cell for this long, rotate crosshair by 90 degrees.
 */
 
-static constexpr float STUCK_ROTATION_INTERVAL_SECS = 2.0f;
+static constexpr float STUCK_ROTATION_INTERVAL_SECS = 1.0f;
 
 /*
 	Calculate movement direction from pathfinding state.
@@ -709,7 +709,6 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		Rotate crosshair by 90 degrees every STUCK_ROTATION_INTERVAL_SECS.
 	*/
 	if (path.island_index < navmesh.islands.size() && active_progress.node_index < path.nodes.size()) {
-		const auto& island = navmesh.islands[path.island_index];
 		const auto current_cell_xy = path.nodes[active_progress.node_index].cell_xy;
 
 		if (current_cell_xy == pathfinding.stuck_cell) {

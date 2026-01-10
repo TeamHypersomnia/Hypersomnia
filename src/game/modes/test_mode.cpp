@@ -386,7 +386,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						Apply crosshair interpolation with HARD difficulty.
 						Use snapping (is_pathfinding=true) since we're navigating a path.
 					*/
-					const float dt_secs = in.cosm.get_fixed_delta().in_seconds();
+					const real32 dt_secs = in.cosm.get_fixed_delta().in_seconds();
 
 					vec2 crosshair_target;
 					::navigate_pathfinding(
