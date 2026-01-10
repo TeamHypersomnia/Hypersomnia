@@ -148,16 +148,18 @@ arena_ai_result update_arena_mode_ai(
 
 			if (::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr)) {
 				if (ai_state.is_pathfinding_active()) {
-					const auto crosshair_offset = ::get_pathfinding_crosshair(
+					vec2 crosshair_offset;
+					const auto movement_dir = ::get_pathfinding_movement_direction(
 						*ai_state.pathfinding,
 						character_pos,
-						navmesh
+						navmesh,
+						crosshair_offset
 					);
 
-					if (crosshair_offset.has_value()) {
-						ai_state.target_crosshair_offset = *crosshair_offset;
+					if (movement_dir.has_value()) {
+						ai_state.target_crosshair_offset = crosshair_offset;
 						::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
-						return vec2(*crosshair_offset).normalize();
+						return *movement_dir;
 					}
 				}
 			}
