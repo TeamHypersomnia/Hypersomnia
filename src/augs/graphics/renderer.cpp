@@ -252,8 +252,6 @@ namespace augs {
 		/*
 			Draw debug rects as filled quads (2 triangles each).
 		*/
-		const auto drawer_output = augs::drawer_with_default({ get_triangle_buffer(), tex });
-
 		for (const auto& rect : logic_step_rects) {
 			auto p = std::array<augs::vertex, 4>();
 
