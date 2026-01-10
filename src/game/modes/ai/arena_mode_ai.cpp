@@ -154,7 +154,8 @@ arena_ai_result update_arena_mode_ai(
 						*ai_state.pathfinding,
 						character_pos,
 						navmesh,
-						crosshair_offset
+						crosshair_offset,
+						dt_secs
 					);
 
 					if (movement_dir.has_value()) {

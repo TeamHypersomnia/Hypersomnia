@@ -31,7 +31,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
 	vec2& target_crosshair_offset,
-	const float dt
+	const real32 dt
 ) {
 	navigate_pathfinding_result result;
 
