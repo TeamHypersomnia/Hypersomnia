@@ -85,6 +85,7 @@ namespace augs {
 
 		void draw_debug_lines(
 			const debug_lines& logic_step_lines,
+			const debug_rects& logic_step_rects,
 			const debug_lines& persistent_lines,
 			const debug_lines& frame_lines,
 
