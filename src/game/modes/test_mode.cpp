@@ -399,6 +399,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 					if (auto crosshair = character.find_crosshair()) {
 						crosshair->base_offset = augs::interp(crosshair->base_offset, crosshair_target, averaging_constant);
+						crosshair->base_offset = crosshair_target;
 					}
 				}
 			}
