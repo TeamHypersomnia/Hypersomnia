@@ -375,12 +375,12 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	result.nodes = std::move(path_nodes.value());
 
 	/*
-		Set final_portal_node to indicate teleportation destination.
+		Set final_portal_exit to indicate teleportation destination.
 	*/
-	result.final_portal_node = cell_on_island{
+	result.final_portal_exit = cell_on_navmesh(
 		static_cast<island_id_type>(portal.out_island_index),
-		pathfinding_node{ portal.out_cell_pos }
-	};
+		portal.out_cell_pos
+	);
 
 	return result;
 }
@@ -448,10 +448,10 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 					pathfinding_path result;
 					result.island_index = source_island;
 					result.nodes = std::move(path_nodes.value());
-					result.final_portal_node = cell_on_island{
+					result.final_portal_exit = cell_on_navmesh(
 						source_island,
-						pathfinding_node{ portal.out_cell_pos }
-					};
+						portal.out_cell_pos
+					);
 					return result;
 				}
 			}
@@ -525,7 +525,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 
 		all_paths.push_back(path_result.value());
 
-		if (!path_result->final_portal_node.has_value()) {
+		if (!path_result->final_portal_exit.has_value()) {
 			/*
 				Reached target without needing to teleport.
 			*/
@@ -535,7 +535,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 		/*
 			Continue from the portal exit.
 		*/
-		const auto& portal_node = path_result->final_portal_node.value();
+		const auto& portal_node = path_result->final_portal_exit.value();
 		const auto exit_island_idx = portal_node.island_index;
 
 		if (exit_island_idx >= navmesh.islands.size()) {

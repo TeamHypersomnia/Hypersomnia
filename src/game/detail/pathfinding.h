@@ -115,7 +115,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 
 /*
 	Helper function that repeatedly calls the main pathfinding function
-	until final_portal_node is empty.
+	until final_portal_exit is empty.
 	Returns all paths concatenated for visualization.
 */
 

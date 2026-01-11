@@ -492,7 +492,7 @@ inline bool start_pathfinding_to(
 	const auto target_island = *target_island_opt;
 	const auto& island = navmesh.islands[target_island];
 	const auto target_cell = ::world_to_cell(island, target_pos);
-	const auto new_target_cell_id = navmesh_cell_id{ target_island, target_cell };
+	const auto new_target_cell_id = cell_on_navmesh(target_island, target_cell);
 
 	if (ai_state.is_pathfinding_active() &&
 	    ai_state.pathfinding->target_cell_id == new_target_cell_id
@@ -555,7 +555,7 @@ inline bool start_pathfinding_to(
 	const auto target_island = *target_island_opt;
 	const auto& island = navmesh.islands[target_island];
 	const auto target_cell = ::world_to_cell(island, target_pos);
-	const auto new_target_cell_id = navmesh_cell_id{ target_island, target_cell };
+	const auto new_target_cell_id = cell_on_navmesh(target_island, target_cell);
 
 	if (pathfinding_opt.has_value() &&
 	    pathfinding_opt->target_cell_id == new_target_cell_id) {

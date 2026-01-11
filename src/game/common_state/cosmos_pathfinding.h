@@ -17,46 +17,34 @@
 
 using island_id_type = uint32_t;
 
-/*
-	Combined island + cell identifier for simple destination comparison.
-*/
-
-struct navmesh_cell_id {
-	// GEN INTROSPECTOR struct navmesh_cell_id
-	island_id_type island = 0;
-	vec2u cell = vec2u::zero;
-	// END GEN INTROSPECTOR
-
-	bool operator==(const navmesh_cell_id& other) const {
-		return 
-			island == other.island &&
-			cell == other.cell
-		;
-	}
-
-	bool operator!=(const navmesh_cell_id& other) const {
-		return !(*this == other);
-	}
-};
-
 struct pathfinding_node {
 	// GEN INTROSPECTOR struct pathfinding_node
 	vec2u cell_xy = vec2u::zero;
 	// END GEN INTROSPECTOR
+
+	pathfinding_node() = default;
+	pathfinding_node(const vec2u xy) : cell_xy(xy) {}
+
+	bool operator==(const pathfinding_node& other) const = default;
 };
 
-struct cell_on_island {
-	// GEN INTROSPECTOR struct cell_on_island
+struct cell_on_navmesh {
+	cell_on_navmesh() = default;
+	cell_on_navmesh(const island_id_type i, const vec2u v) : island_index(i), node(v) {}
+
+	// GEN INTROSPECTOR struct cell_on_navmesh
 	island_id_type island_index = 0;
 	pathfinding_node node;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const cell_on_navmesh& other) const = default;
 };
 
 struct pathfinding_path {
 	// GEN INTROSPECTOR struct pathfinding_path
 	island_id_type island_index = 0;
 	std::vector<pathfinding_node> nodes;
-	std::optional<cell_on_island> final_portal_node;
+	std::optional<cell_on_navmesh> final_portal_exit;
 	// END GEN INTROSPECTOR
 };
 

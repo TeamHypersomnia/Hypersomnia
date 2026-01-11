@@ -25,7 +25,7 @@ struct ai_pathfinding_state {
 	std::optional<pathfinding_progress> rerouting;
 
 	vec2 target_position = vec2::zero;
-	navmesh_cell_id target_cell_id;
+	cell_on_navmesh target_cell_id;
 
 	vec2u stuck_cell = vec2u::zero;
 	float stuck_time = 0.0f;
