@@ -5033,12 +5033,12 @@ work_result work(
 				/*
 					Determine if we can draw enemies (for editor playtesting debug).
 				*/
-				const bool can_draw_enemies = visit_current_setup([&](const auto& setup) {
+				const bool see_enemies_behind_walls = visit_current_setup([&](const auto& setup) {
 					using S = remove_cref<decltype(setup)>;
 
 					if constexpr(std::is_same_v<S, editor_setup>) {
 						if (setup.is_playtesting()) {
-							return setup.get_project().playtesting.see_enemies;
+							return setup.get_project().playtesting.see_enemies_behind_walls;
 						}
 					}
 
@@ -5054,7 +5054,7 @@ work_result work(
 					get_audiovisuals(),
 					viewing_config.drawing,
 					viewer_is_spectator(),
-					can_draw_enemies,
+					see_enemies_behind_walls,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,
