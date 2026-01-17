@@ -2251,6 +2251,12 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 		text_tooltip("Only in Bomb Defusal and Gun Game.");
 	}
 
+	PROPERTY("See enemies behind walls", see_enemies_behind_walls);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("For debugging.");
+	}
+
 	return result;
 }
 

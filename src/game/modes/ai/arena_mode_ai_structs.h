@@ -6,6 +6,15 @@
 #include "game/enums/marker_type.h"
 #include "game/modes/mode_player_id.h"
 
+template <class... Args>
+void AI_LOG(Args&&... args) {
+#if LOG_AI
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
 #if !NDEBUG
 #define LOG_AI 1
 #endif
@@ -13,7 +22,7 @@
 #if LOG_AI
 #define AI_LOG_NVPS LOG_NVPS
 #else
-#define AI_LOG_NVPS MSR_LOG
+#define AI_LOG_NVPS AI_LOG
 #endif
 
 struct arena_ai_result {

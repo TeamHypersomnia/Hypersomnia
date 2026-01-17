@@ -19,7 +19,7 @@ void enqueue_illuminated_rendering_jobs(
 
 	const bool viewer_is_spectator = in.viewer_is_spectator;
 	const bool draw_enemy_silhouettes = viewer_is_spectator && in.drawing.draw_enemy_silhouettes_in_spectator;
-	const bool can_draw_enemies = in.can_draw_enemies;
+	const bool see_enemies_behind_walls = in.see_enemies_behind_walls;
 	const bool streamer_mode = in.streamer_mode;
 	const auto& necessarys = in.necessary_images;
 
@@ -565,7 +565,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [draw_enemy_silhouettes, can_draw_enemies, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	auto sentiences_job = [draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -622,7 +622,7 @@ void enqueue_illuminated_rendering_jobs(
 						return modified_input;
 					};
 
-					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction) || can_draw_enemies) {
+					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction) || see_enemies_behind_walls) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
 						::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
