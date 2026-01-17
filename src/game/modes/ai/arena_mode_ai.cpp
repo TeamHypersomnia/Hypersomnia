@@ -19,6 +19,7 @@
 #include "game/debug_drawing_settings.h"
 #include "game/messages/gunshot_message.h"
 #include "game/messages/game_notification.h"
+#include "game/messages/health_event.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/detail/pathfinding.h"
 #include "game/detail/inventory/perform_transfer.h"
@@ -765,6 +766,58 @@ void post_solve_arena_mode_ai(
 			if (!ai_state.last_seen_target.is_set() || dist < current_target_distance) {
 				update_target_from_gunshot(shot.capability, muzzle_pos, dist);
 			}
+		}
+	}
+
+	/*
+		Damage-based combat initiation.
+		Receiving damage always initiates COMBAT regardless of LoS.
+	*/
+	const auto& health_events = step.get_queue<messages::health_event>();
+
+	for (const auto& event : health_events) {
+		if (event.subject != controlled_character_id) {
+			continue;
+		}
+
+		if (!event.origin.sender.capability_of_sender.is_set()) {
+			continue;
+		}
+
+		const auto attacker_id = event.origin.sender.capability_of_sender;
+		const auto attacker = cosm[attacker_id];
+
+		if (!attacker.alive()) {
+			continue;
+		}
+
+		if (attacker == character_handle) {
+			continue;
+		}
+
+		if (!is_enemy_faction(attacker.get_official_faction())) {
+			continue;
+		}
+
+		const auto attacker_pos = attacker.get_logic_transform().pos;
+		const auto dist = (attacker_pos - character_pos).length();
+
+		/*
+			Damage always initiates combat (no LoS check needed).
+		*/
+		if (!ai_state.is_in_combat()) {
+			ai_state.start_combat(attacker_id, attacker_pos);
+			ai_state.combat_timeout = 7.5f;
+		}
+		else if (dist < current_target_distance) {
+			/*
+				Switch to closer attacker.
+			*/
+			ai_state.last_seen_target_pos = attacker_pos;
+			ai_state.last_known_target_pos = attacker_pos;
+			ai_state.combat_target = attacker_id;
+			ai_state.has_dashed_for_last_seen = false;
+			current_target_distance = dist;
 		}
 	}
 
