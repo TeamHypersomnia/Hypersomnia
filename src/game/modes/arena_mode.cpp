@@ -1104,7 +1104,7 @@ void arena_mode::setup_round(
 		::gather_waypoints_for_team(cosm, factions[faction].ai_team_state, faction);
 	});
 
-	fill_spawns(cosm, faction_type::FFA, ffa_faction);
+	fill_spawns(cosm, faction_type::ANY, ffa_faction);
 
 	messages::changed_identities_message changed_identities;
 	changed_identities.predictable = params.predictable;
@@ -1951,7 +1951,7 @@ std::optional<faction_type> arena_mode::any_team_abandoned_match(const input_typ
 
 	if (in.rules.is_ffa()) {
 		if (info.total_playing <= 1) {
-			return faction_type::FFA;
+			return faction_type::ANY;
 		}
 	}
 	else {
@@ -3187,7 +3187,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		summary.was_ffa = true;
 
 		for_each_player_best_to_worst_in(
-			faction_type::FFA,
+			faction_type::ANY,
 			[&](const auto& id, const auto& player) {
 				if (!player.is_bot) {
 					summary.non_bots++;
@@ -3433,12 +3433,12 @@ void arena_mode::run_match_abandon_logic(const input_type in, const logic_step s
 			abandoned_team = *abandoned;
 
 			if (in.rules.is_ffa()) {
-				auto f = faction_type::FFA;
+				auto f = faction_type::ANY;
 
 				for_each_player_best_to_worst_in(
-					faction_type::FFA,
+					faction_type::ANY,
 					[&](const auto&, const auto& p) {
-						if (f == faction_type::FFA) {
+						if (f == faction_type::ANY) {
 							f = p.get_faction();
 						}
 					}
