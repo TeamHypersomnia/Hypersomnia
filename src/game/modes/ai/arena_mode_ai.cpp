@@ -348,6 +348,78 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	/*
+		3.1) Resistance: Check for bomb retrieval/planting when bomb is not planted.
+		Bomb on ground (or held by Metropolis) - closest Resistance soldier pathfinds to retrieve.
+	*/
+	if (!bomb_planted && is_resistance && bomb_entity.is_set()) {
+		const auto bomb_handle = cosm[bomb_entity];
+
+		if (bomb_handle.alive()) {
+			const auto bomb_owner = bomb_handle.get_owning_transfer_capability();
+			const bool bomb_on_ground = !bomb_owner.alive();
+			const bool bomb_held_by_enemy = [&]() {
+				if (!bomb_owner.alive()) {
+					return false;
+				}
+
+				return bomb_owner.get_official_faction() == faction_type::METROPOLIS;
+			}();
+
+			/*
+				If bomb is on ground or held by enemy, closest Resistance soldier retrieves it.
+			*/
+			if (bomb_on_ground || bomb_held_by_enemy) {
+				/*
+					Check if we should be the retrieval bot.
+				*/
+				if (!team_state.bot_with_bomb_retrieval_mission.is_set()) {
+					team_state.bot_with_bomb_retrieval_mission = bot_player_id;
+				}
+
+				if (team_state.bot_with_bomb_retrieval_mission == bot_player_id) {
+					ai_state.current_state = bot_state_type::RETRIEVING_BOMB;
+
+					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
+
+					if (::start_pathfinding_to(ai_state, character_pos, bomb_pos, navmesh, nullptr)) {
+						if (ai_state.is_pathfinding_active()) {
+							vec2 crosshair_offset;
+							const auto movement_dir = ::get_pathfinding_movement_direction(
+								*ai_state.pathfinding,
+								character_pos,
+								navmesh,
+								crosshair_offset,
+								dt_secs
+							);
+
+							if (movement_dir.has_value()) {
+								ai_state.target_crosshair_offset = crosshair_offset;
+								::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+								movement.flags.set_from_closest_direction(*movement_dir);
+							}
+						}
+					}
+
+					::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+					::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+					arena_ai_result result;
+					result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+					return result;
+				}
+			}
+			else {
+				/*
+					Clear retrieval mission if bomb is now held by Resistance.
+				*/
+				if (team_state.bot_with_bomb_retrieval_mission.is_set()) {
+					team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
+				}
+			}
+		}
+	}
+
+	/*
 		3.2) If bomb planted (Metropolis-specific: defuse mission).
 	*/
 	if (bomb_planted && is_metropolis) {
@@ -385,6 +457,42 @@ arena_ai_result update_arena_mode_ai(
 			if (bomb_handle.alive()) {
 				const auto bomb_pos = bomb_handle.get_logic_transform().pos;
 
+				/*
+					If close to bomb, enter defusing state.
+					- hands are bare
+					- crosshair is exactly on the bomb
+					- no moving/twitching (otherwise defusing interrupts)
+					- sentience.is_requesting_interaction = true
+				*/
+				if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
+					ai_state.is_defusing = true;
+					ai_state.target_crosshair_offset = bomb_pos - character_pos;
+					movement.flags.set_from_closest_direction(vec2::zero);
+
+					/*
+						Bare hands for defusing.
+					*/
+					const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
+					if (!current_wielding_defuse.is_bare_hands(cosm)) {
+						::perform_wielding(
+							step,
+							character_handle,
+							wielding_setup::bare_hands()
+						);
+					}
+
+					if (auto* sentience = character_handle.find<components::sentience>()) {
+						sentience->is_requesting_interaction = true;
+					}
+
+					::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+					::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+					arena_ai_result result;
+					result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+					return result;
+				}
+
 				if (::start_pathfinding_to(ai_state, character_pos, bomb_pos, navmesh, nullptr)) {
 					if (ai_state.is_pathfinding_active()) {
 						vec2 crosshair_offset;
@@ -401,19 +509,6 @@ arena_ai_result update_arena_mode_ai(
 							::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
 							movement.flags.set_from_closest_direction(*movement_dir);
 						}
-					}
-				}
-
-				/*
-					If close to bomb, enter defusing state.
-				*/
-				if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
-					ai_state.is_defusing = true;
-					ai_state.target_crosshair_offset = bomb_pos - character_pos;
-					movement.flags.set_from_closest_direction(vec2::zero);
-
-					if (auto* sentience = character_handle.find<components::sentience>()) {
-						sentience->is_requesting_interaction = true;
 					}
 				}
 			}
