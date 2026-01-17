@@ -108,6 +108,7 @@ namespace components {
 		marker_letter_type letter = marker_letter_type::A;
 		marker_shape_type shape = marker_shape_type::BOX;
 		bool camp = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 	};
