@@ -790,6 +790,13 @@ std::optional<vec2> find_random_unoccupied_cell_within_rect(
 		);
 
 		/*
+			Skip if the cell range is invalid (min > max).
+		*/
+		if (min_cell.x > max_cell.x || min_cell.y > max_cell.y) {
+			continue;
+		}
+
+		/*
 			Iterate over cells in the range.
 		*/
 		for (uint32_t y = min_cell.y; y <= max_cell.y; ++y) {
