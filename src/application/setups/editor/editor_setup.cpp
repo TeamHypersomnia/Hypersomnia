@@ -3609,7 +3609,7 @@ arena_playtesting_context editor_setup::make_playtesting_context() const {
 		If DEBUG_PATHFINDING_END exists, store it for AI pathfinding testing.
 	*/
 	std::optional<vec2> pathfinding_start;
-	std::optional<vec2> pathfinding_end;
+	std::optional<transformr> pathfinding_end;
 
 	scene.world.for_each_having<invariants::point_marker>(
 		[&](const auto& typed_handle) {
@@ -3619,7 +3619,7 @@ arena_playtesting_context editor_setup::make_playtesting_context() const {
 				pathfinding_start = typed_handle.get_logic_transform().pos;
 			}
 			else if (marker.type == point_marker_type::DEBUG_PATHFINDING_END) {
-				pathfinding_end = typed_handle.get_logic_transform().pos;
+				pathfinding_end = typed_handle.get_logic_transform();
 			}
 		}
 	);
