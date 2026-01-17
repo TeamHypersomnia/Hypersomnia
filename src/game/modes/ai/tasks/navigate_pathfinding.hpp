@@ -21,6 +21,7 @@
 
 struct navigate_pathfinding_result {
 	bool is_navigating = false;
+	bool path_completed = false;  /* True when destination was reached and pathfinding was cleared. */
 	std::optional<vec2> movement_direction;
 	vec2 crosshair_offset = vec2::zero;
 };
@@ -72,14 +73,23 @@ inline navigate_pathfinding_result navigate_pathfinding(
 			const auto target_pos = pathfinding.target_position();
 			const float dist_to_exact = (bot_pos - target_pos).length();
 			constexpr float EXACT_REACH_EPSILON = 30.0f;
+			/* Use a larger radius for easing the crosshair. */
+			constexpr float EASE_RADIUS = 120.0f;
 
 			if (dist_to_exact > EXACT_REACH_EPSILON) {
 				/*
 					Not at exact position yet - continue navigating directly to target.
-					Use target transform's direction for crosshair.
+					Ease crosshair towards target transform's direction based on distance.
 				*/
 				const auto dir = target_pos - bot_pos;
-				result.crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
+				
+				/* Ease crosshair: as we get closer, blend towards target transform direction. */
+				const float t = std::clamp(1.0f - dist_to_exact / EASE_RADIUS, 0.0f, 1.0f);
+				const auto target_dir = pathfinding.target_transform.get_direction();
+				const auto look_at_target = vec2(dir).normalize() * 200.0f;
+				const auto look_in_target_dir = target_dir * 200.0f;
+				
+				result.crosshair_offset = look_at_target + (look_in_target_dir - look_at_target) * t;
 				result.movement_direction = vec2(dir).normalize();
 				result.is_navigating = true;
 
@@ -87,11 +97,16 @@ inline navigate_pathfinding_result navigate_pathfinding(
 				return result;
 			}
 			else {
+				/* Reached exact destination - mark as completed. */
+				result.path_completed = true;
+				result.crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
 				pathfinding_opt.reset();
 				return result;
 			}
 		}
 		else {
+			/* Non-exact mode - path completed at cell center. */
+			result.path_completed = true;
 			pathfinding_opt.reset();
 			return result;
 		}
