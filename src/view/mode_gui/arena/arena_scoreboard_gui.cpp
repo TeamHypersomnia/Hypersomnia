@@ -362,7 +362,7 @@ void arena_scoreboard_gui::draw_gui(
 	};
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
-		const bool all = faction == faction_type::FFA;
+		const bool all = faction == faction_type::ANY;
 
 		auto get_colors = [&](const auto faction) {
 			return in.config.faction_view.colors[faction];
@@ -850,7 +850,7 @@ void arena_scoreboard_gui::draw_gui(
 		const auto participants = typed_mode.calc_participating_factions(mode_input);
 
 		if (mode_input.rules.is_ffa()) {
-			print_faction(faction_type::FFA, true);
+			print_faction(faction_type::ANY, true);
 		}
 		else {
 			print_faction(participants.defusing, true);

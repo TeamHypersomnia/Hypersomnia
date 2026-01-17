@@ -555,6 +555,7 @@ bool edit_property(
 		if constexpr(std::is_same_v<T, faction_type>) {
 			if (enum_combo_constrained<
 				faction_type, 
+				faction_type::ANY,
 				faction_type::METROPOLIS,
 				faction_type::RESISTANCE
 			>(label, property)) { 
