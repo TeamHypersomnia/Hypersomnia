@@ -27,6 +27,17 @@ inline bool is_actual_faction(const faction_type f) {
 	}
 }
 
+inline bool is_waypoint_for_faction(
+	const faction_type waypoint_faction,
+	const faction_type bot_faction
+) {
+	if (waypoint_faction == faction_type::DEFAULT) {
+		return true;
+	}
+
+	return waypoint_faction == bot_faction;
+}
+
 namespace augs {
 	template <class T, class _enum>
 	class enum_array;

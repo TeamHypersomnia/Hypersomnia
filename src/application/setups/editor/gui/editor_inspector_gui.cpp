@@ -810,6 +810,9 @@ EDIT_FUNCTION(editor_wandering_pixels_node_editable& insp, T& es) {
 
 static bool has_letter(const point_marker_type type) {
 	switch (type) {
+		case point_marker_type::BOT_WAYPOINT_PATROL:
+			return true;
+
 		default:
 			return false;
 	}
@@ -818,6 +821,8 @@ static bool has_letter(const point_marker_type type) {
 static bool has_team(const point_marker_type type) {
 	switch (type) {
 		case point_marker_type::TEAM_SPAWN:
+		case point_marker_type::BOT_WAYPOINT_PUSH:
+		case point_marker_type::BOT_WAYPOINT_PATROL:
 			return true;
 		default:
 			return false;

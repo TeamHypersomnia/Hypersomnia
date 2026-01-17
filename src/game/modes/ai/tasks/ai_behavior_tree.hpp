@@ -170,23 +170,6 @@ inline bool is_within_fov(
 }
 
 /*
-	Check if a waypoint is applicable for a given faction.
-	A waypoint with faction DEFAULT applies to both factions.
-	Otherwise it only applies if factions match.
-*/
-
-inline bool is_waypoint_for_faction(
-	const faction_type waypoint_faction,
-	const faction_type bot_faction
-) {
-	if (waypoint_faction == faction_type::DEFAULT) {
-		return true;
-	}
-
-	return waypoint_faction == bot_faction;
-}
-
-/*
 	Update camp twitching behavior.
 	Bot moves randomly within a radius of 40px of the camp center
 	but keeps looking in the same direction.
