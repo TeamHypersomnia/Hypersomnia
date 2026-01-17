@@ -69,16 +69,18 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	*/
 	if (cell_path_completed) {
 		if (pathfinding.exact_destination) {
-			const float dist_to_exact = (bot_pos - pathfinding.target_position).length();
+			const auto target_pos = pathfinding.target_position();
+			const float dist_to_exact = (bot_pos - target_pos).length();
 			constexpr float EXACT_REACH_EPSILON = 30.0f;
 
 			if (dist_to_exact > EXACT_REACH_EPSILON) {
 				/*
 					Not at exact position yet - continue navigating directly to target.
+					Use target transform's direction for crosshair.
 				*/
-				const auto dir = pathfinding.target_position - bot_pos;
-				result.crosshair_offset = dir;
-				result.movement_direction = vec2(dir).normalize();
+				const auto dir = target_pos - bot_pos;
+				result.crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
+				result.movement_direction = dir.normalize();
 				result.is_navigating = true;
 
 				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);

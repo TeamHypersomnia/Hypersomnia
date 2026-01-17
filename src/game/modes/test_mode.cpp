@@ -377,7 +377,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					::start_pathfinding_to(
 						first_player.debug_pathfinding,
 						character_pos,
-						target_pos,
+						transformr(target_pos, 0.0f),
 						navmesh,
 						nullptr
 					);
