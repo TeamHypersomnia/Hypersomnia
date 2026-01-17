@@ -21,6 +21,9 @@
 #include "game/messages/game_notification.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/detail/pathfinding.h"
+#include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/inventory/perform_wielding.hpp"
 
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/update_random_movement_target.hpp"
@@ -35,6 +38,8 @@
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
 #include "game/modes/ai/tasks/navigate_pathfinding.hpp"
+#include "game/modes/ai/tasks/ai_behavior_tree.hpp"
+#include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -52,12 +57,6 @@ arena_ai_result update_arena_mode_ai(
 	const bool bomb_planted,
 	const entity_id bomb_entity
 ) {
-	(void)team_state;
-	(void)bot_player_id;
-	(void)bot_faction;
-	(void)bomb_planted;
-	(void)bomb_entity;
-
 	auto stable_rng = randomization(stable_round_rng);
 
 	auto scope = augs::scope_guard([&]() {
@@ -91,6 +90,57 @@ arena_ai_result update_arena_mode_ai(
 		return offset.normalize();
 	};
 
+	(void)bomb_entity;
+	(void)team_state;
+	(void)bot_player_id;
+	(void)bot_faction;
+	(void)bomb_planted;
+
+	/*
+		Combat timeout management.
+	*/
+	if (ai_state.combat_timeout > 0.0f) {
+		ai_state.combat_timeout -= dt_secs;
+
+		if (ai_state.combat_timeout <= 0.0f) {
+			ai_state.end_combat();
+		}
+	}
+
+	/*
+		Weapon management based on behavior state.
+	*/
+	const bool should_holster = ::should_holster_weapons(ai_state);
+	const auto current_wielding = wielding_setup::from_current(character_handle);
+	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
+
+	if (should_holster && !has_bare_hands) {
+		::perform_wielding(
+			step,
+			character_handle,
+			wielding_setup::bare_hands()
+		);
+	}
+	else if (!should_holster && has_bare_hands) {
+		const auto best_weapon = ::find_best_weapon(character_handle);
+
+		if (best_weapon.is_set()) {
+			auto requested_wield = wielding_setup::bare_hands();
+			requested_wield.hand_selections[0] = best_weapon;
+
+			::perform_wielding(
+				step,
+				character_handle,
+				requested_wield
+			);
+		}
+	}
+
+	/*
+		Movement mode based on state.
+	*/
+	movement.flags.walking = ::should_walk_silently(ai_state);
+
 	/*
 		High-level AI flow.
 	*/
@@ -107,7 +157,35 @@ arena_ai_result update_arena_mode_ai(
 	const bool should_react = ::update_alertness(ai_state, sees_target, dt_secs, difficulty);
 	const bool has_target = sees_target && should_react;
 
-	if (sees_target) {
+	/*
+		COMBAT initiation: Only SIGHTING initiates combat.
+	*/
+	if (sees_target && should_react) {
+		const auto enemy_handle = cosm[closest_enemy];
+		const auto enemy_pos = enemy_handle.get_logic_transform().pos;
+
+		if (!ai_state.is_in_combat()) {
+			/*
+				Initiate combat with random duration 5-10 seconds.
+			*/
+			ai_state.combat_timeout = stable_rng.randval(5.0f, 10.0f);
+			ai_state.start_combat(closest_enemy, enemy_pos);
+		}
+		else {
+			/*
+				Update last_known and last_seen positions since we can see them.
+			*/
+			const auto current_dist = (enemy_pos - character_pos).length();
+			const auto known_dist = (ai_state.last_known_target_pos - character_pos).length();
+
+			if (current_dist < known_dist) {
+				ai_state.last_seen_target_pos = enemy_pos;
+				ai_state.last_known_target_pos = enemy_pos;
+				ai_state.combat_target = closest_enemy;
+				ai_state.has_dashed_for_last_seen = false;
+			}
+		}
+
 		::update_target_tracking(ctx, closest_enemy);
 		ai_state.has_dashed_for_last_seen_target = false;
 	}
@@ -124,7 +202,10 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.chase_remaining_time -= dt_secs;
 	}
 
-	movement.flags.sprinting = false;
+	/*
+		Set movement flags based on current state.
+	*/
+	movement.flags.sprinting = ::should_sprint(ai_state);
 	movement.flags.dashing = false;
 
 	/*
