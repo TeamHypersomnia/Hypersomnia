@@ -142,6 +142,20 @@ struct basic_randomization {
 	auto choose_from(C& container) {
 		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
 	}
+
+	/*
+		Select a random element from a container.
+		Container must not be empty.
+	*/
+	template <class C>
+	auto& rand_element(C& container) {
+		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
+	}
+
+	template <class C>
+	const auto& rand_element(const C& container) {
+		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
+	}
 };
 
 struct randomization : basic_randomization<xorshift_state> {

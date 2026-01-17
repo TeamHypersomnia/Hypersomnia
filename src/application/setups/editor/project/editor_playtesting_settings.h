@@ -16,6 +16,7 @@ struct editor_playtesting_settings {
 	bool skip_freeze_time = true;
 	bool unlimited_money = true;
 	bool spawn_bots = false;
+	bool see_enemies = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_playtesting_settings&) const = default;

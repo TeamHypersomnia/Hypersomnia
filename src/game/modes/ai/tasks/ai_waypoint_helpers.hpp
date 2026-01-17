@@ -45,46 +45,6 @@ inline void gather_waypoints_for_team(
 }
 
 /*
-	Find an unassigned waypoint of a specific letter for patrolling.
-	Returns entity_id::dead() if none found.
-*/
-
-inline entity_id find_unassigned_patrol_waypoint(
-	const cosmos& cosm,
-	arena_mode_ai_team_state& team_state,
-	const marker_letter_type letter,
-	const mode_player_id& bot_id
-) {
-	for (auto& wp : team_state.patrol_waypoints) {
-		const auto waypoint_handle = cosm[wp.waypoint_id];
-
-		if (!waypoint_handle.alive()) {
-			continue;
-		}
-
-		const auto& marker_comp = waypoint_handle.template get<components::marker>();
-
-		if (marker_comp.letter != letter) {
-			continue;
-		}
-
-		if (wp.is_assigned()) {
-			const auto assigned_bot = wp.assigned_bot;
-
-			if (assigned_bot == bot_id) {
-				return wp.waypoint_id;
-			}
-
-			continue;
-		}
-
-		return wp.waypoint_id;
-	}
-
-	return entity_id::dead();
-}
-
-/*
 	Find a random unassigned patrol waypoint of a specific letter.
 	Returns entity_id::dead() if none found.
 */
@@ -120,8 +80,7 @@ inline entity_id find_random_unassigned_patrol_waypoint(
 		return entity_id::dead();
 	}
 
-	const auto idx = rng.randval(0u, static_cast<unsigned>(available.size() - 1));
-	return available[idx];
+	return rng.rand_element(available);
 }
 
 /*
@@ -170,23 +129,6 @@ inline void unassign_bot_from_waypoints(
 }
 
 /*
-	Find an unassigned push waypoint.
-	Returns entity_id::dead() if none found.
-*/
-
-inline entity_id find_unassigned_push_waypoint(
-	arena_mode_ai_team_state& team_state
-) {
-	for (auto& wp : team_state.push_waypoints) {
-		if (!wp.is_assigned()) {
-			return wp.waypoint_id;
-		}
-	}
-
-	return entity_id::dead();
-}
-
-/*
 	Find a random unassigned push waypoint.
 	Returns entity_id::dead() if none found.
 */
@@ -207,8 +149,7 @@ inline entity_id find_random_unassigned_push_waypoint(
 		return entity_id::dead();
 	}
 
-	const auto idx = rng.randval(0u, static_cast<unsigned>(available.size() - 1));
-	return available[idx];
+	return rng.rand_element(available);
 }
 
 /*
