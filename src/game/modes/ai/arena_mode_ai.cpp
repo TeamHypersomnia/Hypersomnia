@@ -37,6 +37,8 @@
 #include "game/modes/ai/tasks/ai_behavior_tree.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/modes/ai/tasks/navigate_pathfinding.hpp"
+#include "game/modes/ai/tasks/calc_pathfinding_request.hpp"
+#include "game/modes/ai/tasks/calc_movement_direction.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -87,96 +89,9 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		LAMBDAS: Reusable behavior blocks.
+		HELPER LAMBDAS: Condensed behavior blocks for state transitions.
 		===========================================================================
 	*/
-
-	/*
-		Stateless calculation of movement direction.
-		Returns the direction from navigate_pathfinding if pathfinding is active,
-		or from camp twitching if camping, or nullopt if no movement needed.
-	*/
-	std::optional<vec2> current_movement_direction;
-	bool is_currently_navigating = false;
-
-	/* Result of pathfinding operations. */
-	struct pathfind_result {
-		bool is_navigating = false;
-		bool path_completed = false;
-	};
-
-	/* Pathfind to target transform. 
-	   Uses navigate_pathfinding for proper path following with advancement and deviation checks.
-	   Sets current_movement_direction and is_currently_navigating as side effects. 
-	   Returns is_navigating=true while path is being followed.
-	   Returns path_completed=true when destination was reached (only once, on the frame it completed). */
-	auto pathfind_to_transform = [&](const transformr target_transform, const bool exact = false) -> pathfind_result {
-		pathfind_result result;
-
-		/* Start pathfinding if not already active or if target changed. */
-		::start_pathfinding_to(ai_state, character_pos, target_transform, navmesh, nullptr);
-
-		if (!ai_state.is_pathfinding_active()) {
-			return result;
-		}
-
-		/* Set exact flag if requested (for waypoints). */
-		ai_state.pathfinding->exact_destination = exact;
-
-		/* Use navigate_pathfinding for proper path following. */
-		const auto nav_result = ::navigate_pathfinding(
-			ai_state.pathfinding,
-			character_pos,
-			navmesh,
-			character_handle,
-			dt_secs
-		);
-
-		result.path_completed = nav_result.path_completed;
-
-		if (nav_result.is_navigating) {
-			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
-			current_movement_direction = nav_result.movement_direction;
-			is_currently_navigating = true;
-			result.is_navigating = true;
-		}
-		else if (nav_result.path_completed) {
-			/* Path completed - update crosshair offset to face target direction. */
-			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
-		}
-
-		return result;
-	};
-
-	/* Convenience overload for position-only pathfinding (combat, bomb retrieval). */
-	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> pathfind_result {
-		return pathfind_to_transform(transformr(target_pos, 0.0f), exact);
-	};
-
-	/* Finalize frame: apply movement, handle aiming, crosshair, and purchases. */
-	auto finalize_frame = [&](const bool has_target, const entity_id closest_enemy) -> arena_ai_result {
-		/* Apply movement direction and flags. */
-		movement.flags.walking = ::should_walk_silently(ai_state);
-		movement.flags.sprinting = ::should_sprint(ai_state);
-		movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
-
-		if (current_movement_direction.has_value()) {
-			LOG_NVPS(current_movement_direction);
-			movement.flags.set_from_closest_direction(*current_movement_direction);
-		}
-		else {
-			movement.flags.set_from_closest_direction(vec2::zero);
-		}
-
-		AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
-
-		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
-		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, is_currently_navigating);
-
-		arena_ai_result result;
-		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
-		return result;
-	};
 
 	/* Manage weapon holstering/drawing based on state. */
 	auto manage_weapons = [&]() {
@@ -330,194 +245,10 @@ arena_ai_result update_arena_mode_ai(
 		}
 	};
 
-	/* Handle COMBAT state. */
-	auto handle_combat = [&](const bool has_target, const entity_id closest_enemy) -> std::optional<arena_ai_result> {
-		if (!ai_state.is_in_combat()) {
-			return std::nullopt;
-		}
-
-		AI_LOG("In COMBAT state");
-		AI_LOG_NVPS(ai_state.last_known_target_pos, ai_state.combat_timeout);
-
-		pathfind_to(ai_state.last_known_target_pos);
-		return finalize_frame(has_target, closest_enemy);
-	};
-
-	/* Handle Resistance bomb retrieval mission. */
-	auto handle_bomb_retrieval = [&](const bool has_target, const entity_id closest_enemy) -> std::optional<arena_ai_result> {
-		if (bomb_planted || !is_resistance || !bomb_entity.is_set()) {
-			return std::nullopt;
-		}
-
-		const auto bomb_handle = cosm[bomb_entity];
-
-		if (!bomb_handle.alive()) {
-			return std::nullopt;
-		}
-
-		const auto bomb_owner = bomb_handle.get_owning_transfer_capability();
-		const bool bomb_on_ground = !bomb_owner.alive();
-		const bool bomb_held_by_enemy = bomb_owner.alive() && 
-			bomb_owner.get_official_faction() == faction_type::METROPOLIS;
-
-		if (!bomb_on_ground && !bomb_held_by_enemy) {
-			/* Bomb is held by Resistance - clear mission. */
-			if (team_state.bot_with_bomb_retrieval_mission.is_set()) {
-				AI_LOG("Clearing bomb retrieval mission - bomb secured");
-				team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
-			}
-
-			return std::nullopt;
-		}
-
-		/* Assign retrieval mission if not assigned. */
-		if (!team_state.bot_with_bomb_retrieval_mission.is_set()) {
-			team_state.bot_with_bomb_retrieval_mission = bot_player_id;
-			AI_LOG("Assigned to bomb retrieval mission");
-		}
-
-		if (team_state.bot_with_bomb_retrieval_mission != bot_player_id) {
-			return std::nullopt;
-		}
-
-		AI_LOG("RETRIEVING_BOMB state");
-		ai_state.current_state = bot_state_type::RETRIEVING_BOMB;
-
-		const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-		AI_LOG_NVPS(bomb_pos);
-
-		pathfind_to(bomb_pos);
-		return finalize_frame(has_target, closest_enemy);
-	};
-
-	/* Handle Metropolis defuse mission when bomb is planted. */
-	auto handle_defuse_mission = [&](const bool has_target, const entity_id closest_enemy) -> std::optional<arena_ai_result> {
-		if (!bomb_planted || !is_metropolis) {
-			return std::nullopt;
-		}
-
-		AI_LOG("Bomb planted - Metropolis defuse logic");
-		ai_state.patrol_letter = team_state.chosen_bombsite;
-
-		/* Assign defuse mission if not assigned. */
-		if (!team_state.bot_with_defuse_mission.is_set()) {
-			team_state.bot_with_defuse_mission = bot_player_id;
-			AI_LOG("Assigned to defuse mission");
-		}
-
-		if (team_state.bot_with_defuse_mission != bot_player_id) {
-			return std::nullopt;
-		}
-
-		AI_LOG("DEFUSING state");
-		ai_state.current_state = bot_state_type::DEFUSING;
-
-		const auto bomb_handle = cosm[bomb_entity];
-
-		if (!bomb_handle.alive()) {
-			return std::nullopt;
-		}
-
-		const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-
-		/* If close to bomb, enter defusing state. */
-		if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
-			AI_LOG("Close to bomb - starting defuse");
-			ai_state.is_defusing = true;
-			ai_state.target_crosshair_offset = bomb_pos - character_pos;
-			/* Stop moving - use nullopt to indicate no movement needed. */
-			current_movement_direction = std::nullopt;
-
-			/* Bare hands for defusing. */
-			const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
-
-			if (!current_wielding_defuse.is_bare_hands(cosm)) {
-				::perform_wielding(step, character_handle, wielding_setup::bare_hands());
-			}
-
-			if (auto* sentience = character_handle.find<components::sentience>()) {
-				sentience->is_requesting_interaction = true;
-			}
-
-			return finalize_frame(has_target, closest_enemy);
-		}
-
-		AI_LOG_NVPS(bomb_pos);
-		pathfind_to(bomb_pos);
-		return finalize_frame(has_target, closest_enemy);
-	};
-
-	/* Handle PUSHING state. */
-	auto handle_pushing = [&](const bool has_target, const entity_id closest_enemy) -> std::optional<arena_ai_result> {
-		if (ai_state.current_state != bot_state_type::PUSHING) {
-			return std::nullopt;
-		}
-
-		AI_LOG("PUSHING state");
-
-		const auto wp_handle = cosm[ai_state.current_waypoint];
-
-		if (!wp_handle.alive()) {
-			AI_LOG("Push waypoint gone - switching to PATROLLING");
-			ai_state.current_state = bot_state_type::PATROLLING;
-			ai_state.going_to_first_waypoint = true;
-			return std::nullopt;
-		}
-
-		const auto wp_transform = wp_handle.get_logic_transform();
-		const auto wp_pos = wp_transform.pos;
-
-		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
-		const auto path_result = pathfind_to_transform(wp_transform, true);
-
-		/* Pathfinding completed means we reached the waypoint.
-		   path_completed is set only once, on the frame the destination was reached. */
-		if (path_result.path_completed) {
-			AI_LOG("Reached push waypoint - switching to PATROLLING");
-
-			if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
-				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
-				ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
-				ai_state.camp_duration = ai_state.camp_timer;
-				ai_state.camp_center = wp_pos;
-				ai_state.camp_twitch_target = wp_pos;
-				ai_state.camp_look_direction = wp_transform.get_direction();
-				AI_LOG("Camp waypoint - setting up camp");
-			}
-
-			::unassign_bot_from_waypoints(team_state, bot_player_id);
-			ai_state.current_waypoint = entity_id::dead();
-			ai_state.current_state = bot_state_type::PATROLLING;
-			ai_state.going_to_first_waypoint = true;
-			ai_state.patrol_letter = is_resistance ? team_state.chosen_bombsite : ::find_least_assigned_bombsite(cosm, team_state);
-			return std::nullopt;
-		}
-
-		AI_LOG_NVPS(wp_pos);
-		return finalize_frame(has_target, closest_enemy);
-	};
-
-	/* Handle PATROLLING state. */
-	auto handle_patrolling = [&](const bool has_target, const entity_id closest_enemy) -> std::optional<arena_ai_result> {
+	/* Find or pick next patrol waypoint if we don't have one. */
+	auto ensure_patrol_waypoint = [&]() {
 		if (ai_state.current_state != bot_state_type::PATROLLING) {
-			return std::nullopt;
-		}
-
-		AI_LOG("PATROLLING state");
-		AI_LOG_NVPS(ai_state.patrol_letter, ai_state.current_waypoint, ai_state.camp_timer);
-
-		/* If camping, do camp twitching. */
-		const bool camping = ::is_camping(ai_state);
-
-		if (camping) {
-			AI_LOG("Camping - twitching");
-			const auto twitch_dir = ::update_camp_twitch(ai_state, character_pos, stable_rng);
-			current_movement_direction = twitch_dir;
-
-			/* Look in the direction of the waypoint transform while camping. */
-			ai_state.target_crosshair_offset = ai_state.camp_look_direction * 200.0f;
-
-			return finalize_frame(has_target, closest_enemy);
+			return;
 		}
 
 		/* Check if camp timer just expired - need to pick next waypoint. */
@@ -551,46 +282,126 @@ arena_ai_result update_arena_mode_ai(
 				}
 			}
 		}
+	};
 
-		const auto wp_handle = cosm[ai_state.current_waypoint];
+	/* Assign bomb retrieval or defuse missions. */
+	auto assign_missions = [&]() {
+		/* Resistance bomb retrieval. */
+		if (!bomb_planted && is_resistance && bomb_entity.is_set()) {
+			const auto bomb_handle = cosm[bomb_entity];
 
-		if (!wp_handle.alive()) {
-			AI_LOG("Waypoint doesn't exist - clearing");
-			ai_state.current_waypoint = entity_id::dead();
-			return finalize_frame(has_target, closest_enemy);
+			if (bomb_handle.alive()) {
+				const auto bomb_owner = bomb_handle.get_owning_transfer_capability();
+				const bool bomb_on_ground = !bomb_owner.alive();
+				const bool bomb_held_by_enemy = bomb_owner.alive() && 
+					bomb_owner.get_official_faction() == faction_type::METROPOLIS;
+
+				if (bomb_on_ground || bomb_held_by_enemy) {
+					if (!team_state.bot_with_bomb_retrieval_mission.is_set()) {
+						team_state.bot_with_bomb_retrieval_mission = bot_player_id;
+						ai_state.current_state = bot_state_type::RETRIEVING_BOMB;
+						AI_LOG("Assigned to bomb retrieval mission");
+					}
+				}
+				else if (team_state.bot_with_bomb_retrieval_mission.is_set()) {
+					AI_LOG("Clearing bomb retrieval mission - bomb secured");
+					team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
+				}
+			}
 		}
 
-		const auto wp_transform = wp_handle.get_logic_transform();
-		const auto wp_pos = wp_transform.pos;
+		/* Metropolis defuse mission. */
+		if (bomb_planted && is_metropolis) {
+			ai_state.patrol_letter = team_state.chosen_bombsite;
 
-		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
-		const auto path_result = pathfind_to_transform(wp_transform, true);
-
-		/* Pathfinding completed means we reached the waypoint.
-		   path_completed is set only once, on the frame the destination was reached. */
-		if (path_result.path_completed) {
-			AI_LOG("Reached waypoint (pathfinding completed)");
-			ai_state.going_to_first_waypoint = false;
-
-			if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
-				AI_LOG("Camp waypoint - setting up camp");
-				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
-				ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
-				ai_state.camp_duration = ai_state.camp_timer;
-				ai_state.camp_center = wp_pos;
-				ai_state.camp_twitch_target = wp_pos;
-				/* Store the waypoint's facing direction for looking while camping. */
-				ai_state.camp_look_direction = wp_transform.get_direction();
-				AI_LOG_NVPS(ai_state.camp_timer, ai_state.camp_look_direction);
+			if (!team_state.bot_with_defuse_mission.is_set()) {
+				team_state.bot_with_defuse_mission = bot_player_id;
+				ai_state.current_state = bot_state_type::DEFUSING;
+				AI_LOG("Assigned to defuse mission");
 			}
-			else {
-				AI_LOG("Non-camp waypoint - picking next");
+		}
+	};
+
+	/* Handle path completion - advance state machines when pathfinding completes. */
+	auto on_path_completed = [&]() {
+		AI_LOG("Path completed - handling state advancement");
+
+		switch (ai_state.current_state) {
+			case bot_state_type::PUSHING: {
+				AI_LOG("Reached push waypoint - switching to PATROLLING");
+				const auto wp_handle = cosm[ai_state.current_waypoint];
+
+				if (wp_handle.alive()) {
+					const auto wp_transform = wp_handle.get_logic_transform();
+					const auto wp_pos = wp_transform.pos;
+
+					if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
+						const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
+						ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
+						ai_state.camp_duration = ai_state.camp_timer;
+						ai_state.camp_center = wp_pos;
+						ai_state.camp_twitch_target = wp_pos;
+						ai_state.camp_look_direction = wp_transform.get_direction();
+						AI_LOG("Camp waypoint - setting up camp");
+					}
+				}
+
 				::unassign_bot_from_waypoints(team_state, bot_player_id);
 				ai_state.current_waypoint = entity_id::dead();
+				ai_state.current_state = bot_state_type::PATROLLING;
+				ai_state.going_to_first_waypoint = true;
+				ai_state.patrol_letter = is_resistance ? team_state.chosen_bombsite : ::find_least_assigned_bombsite(cosm, team_state);
+				break;
 			}
-		}
 
-		return finalize_frame(has_target, closest_enemy);
+			case bot_state_type::PATROLLING: {
+				AI_LOG("Reached patrol waypoint (pathfinding completed)");
+				ai_state.going_to_first_waypoint = false;
+
+				const auto wp_handle = cosm[ai_state.current_waypoint];
+
+				if (wp_handle.alive()) {
+					const auto wp_transform = wp_handle.get_logic_transform();
+					const auto wp_pos = wp_transform.pos;
+
+					if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
+						AI_LOG("Camp waypoint - setting up camp");
+						const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
+						ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
+						ai_state.camp_duration = ai_state.camp_timer;
+						ai_state.camp_center = wp_pos;
+						ai_state.camp_twitch_target = wp_pos;
+						ai_state.camp_look_direction = wp_transform.get_direction();
+						AI_LOG_NVPS(ai_state.camp_timer, ai_state.camp_look_direction);
+					}
+					else {
+						AI_LOG("Non-camp waypoint - picking next");
+						::unassign_bot_from_waypoints(team_state, bot_player_id);
+						ai_state.current_waypoint = entity_id::dead();
+					}
+				}
+				break;
+			}
+
+			case bot_state_type::DEFUSING: {
+				AI_LOG("Reached bomb - starting defuse");
+				ai_state.is_defusing = true;
+
+				const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
+
+				if (!current_wielding_defuse.is_bare_hands(cosm)) {
+					::perform_wielding(step, character_handle, wielding_setup::bare_hands());
+				}
+
+				if (auto* sentience = character_handle.find<components::sentience>()) {
+					sentience->is_requesting_interaction = true;
+				}
+				break;
+			}
+
+			default:
+				break;
+		}
 	};
 
 	/*
@@ -602,9 +413,6 @@ arena_ai_result update_arena_mode_ai(
 	/* Update timers. */
 	update_combat_timeout();
 	update_camp_timer();
-
-	/* Manage weapons based on state. */
-	manage_weapons();
 
 	/* Check for hearing-initiated combat. */
 	check_hearing_initiates_combat();
@@ -621,37 +429,120 @@ arena_ai_result update_arena_mode_ai(
 	/* Check if sighting initiates combat. */
 	check_sighting_initiates_combat(closest_enemy, sees_target, should_react);
 
-	/* Priority 1: COMBAT overrides everything. */
-	if (auto result = handle_combat(has_target, closest_enemy)) {
-		return *result;
-	}
-
 	/* Initialize patrol from IDLE if needed. */
 	init_patrol_from_idle();
 
-	/* Priority 2: Bomb retrieval (Resistance, bomb not planted). */
-	if (auto result = handle_bomb_retrieval(has_target, closest_enemy)) {
-		return *result;
+	/* Assign missions (bomb retrieval, defuse). */
+	assign_missions();
+
+	/* Ensure patrol waypoint is set. */
+	ensure_patrol_waypoint();
+
+	/*
+		===========================================================================
+		STATELESS PATHFINDING: Calculate request, check if changed, reinit if needed.
+		===========================================================================
+	*/
+
+	/* Calculate the current pathfinding request based on state. */
+	const auto new_request = ::calc_current_pathfinding_request(
+		cosm,
+		ai_state,
+		team_state,
+		bot_player_id,
+		bot_faction,
+		character_pos,
+		bomb_planted,
+		bomb_entity
+	);
+
+	AI_LOG_NVPS(new_request.has_request, new_request.exact, new_request.is_bomb_target);
+
+	/* Check if request changed - reinitialize pathfinding. */
+	if (new_request != ai_state.current_pathfinding_request) {
+		AI_LOG("Pathfinding request changed - reinitializing");
+		ai_state.current_pathfinding_request = new_request;
+		ai_state.clear_pathfinding();
+
+		if (new_request.has_request) {
+			::start_pathfinding_to(ai_state, character_pos, new_request.target, navmesh, nullptr);
+
+			if (ai_state.is_pathfinding_active()) {
+				ai_state.pathfinding->exact_destination = new_request.exact;
+			}
+		}
 	}
 
-	/* Priority 3: Defuse mission (Metropolis, bomb planted). */
-	if (auto result = handle_defuse_mission(has_target, closest_enemy)) {
-		return *result;
+	/*
+		===========================================================================
+		STATELESS MOVEMENT: Calculate direction from pathfinding or camping.
+		===========================================================================
+	*/
+
+	const auto move_result = ::calc_current_movement_direction(
+		ai_state,
+		character_pos,
+		navmesh,
+		character_handle,
+		dt_secs,
+		stable_rng
+	);
+
+	AI_LOG_NVPS(move_result.is_navigating, move_result.path_completed);
+
+	/* If path just completed, advance state machines. */
+	if (move_result.path_completed) {
+		on_path_completed();
 	}
 
-	/* Priority 4: PUSHING state. */
-	if (auto result = handle_pushing(has_target, closest_enemy)) {
-		return *result;
+	/* Update crosshair offset from movement calculation. */
+	if (move_result.crosshair_offset != vec2::zero) {
+		ai_state.target_crosshair_offset = move_result.crosshair_offset;
 	}
 
-	/* Priority 5: PATROLLING state. */
-	if (auto result = handle_patrolling(has_target, closest_enemy)) {
-		return *result;
+	/* Handle defusing: aim at bomb, request interaction. */
+	if (ai_state.is_defusing && bomb_entity.is_set()) {
+		const auto bomb_handle = cosm[bomb_entity];
+
+		if (bomb_handle.alive()) {
+			const auto bomb_pos = bomb_handle.get_logic_transform().pos;
+			ai_state.target_crosshair_offset = bomb_pos - character_pos;
+
+			if (auto* sentience = character_handle.find<components::sentience>()) {
+				sentience->is_requesting_interaction = true;
+			}
+		}
 	}
 
-	/* Fallback: finalize frame with no specific behavior. */
-	AI_LOG("Fallback - no specific state matched");
-	return finalize_frame(has_target, closest_enemy);
+	/* Manage weapons based on state. */
+	manage_weapons();
+
+	/*
+		===========================================================================
+		FINALIZE FRAME: Apply movement, aiming, crosshair, purchases.
+		===========================================================================
+	*/
+
+	/* Apply movement direction and flags. */
+	movement.flags.walking = ::should_walk_silently(ai_state);
+	movement.flags.sprinting = ::should_sprint(ai_state);
+	movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
+
+	if (move_result.direction.has_value()) {
+		movement.flags.set_from_closest_direction(*move_result.direction);
+	}
+	else {
+		movement.flags.set_from_closest_direction(vec2::zero);
+	}
+
+	AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
+
+	::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+	::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, move_result.is_navigating);
+
+	arena_ai_result result;
+	result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+	return result;
 }
 
 void post_solve_arena_mode_ai(
