@@ -70,6 +70,64 @@ struct ai_pathfinding_state {
 };
 
 /*
+	Pathfinding request - describes WHERE the bot wants to pathfind.
+	This is a stateless calculation based on current game state.
+	The actual pathfinding only reinitializes when this request changes.
+*/
+
+struct ai_pathfinding_request {
+	// GEN INTROSPECTOR struct ai_pathfinding_request
+	transformr target;
+	bool exact = false;
+	bool is_bomb_target = false;
+	bool has_request = false;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const ai_pathfinding_request& other) const {
+		if (!has_request && !other.has_request) {
+			return true;
+		}
+		if (has_request != other.has_request) {
+			return false;
+		}
+		return target == other.target && 
+		       exact == other.exact && 
+		       is_bomb_target == other.is_bomb_target;
+	}
+
+	bool operator!=(const ai_pathfinding_request& other) const {
+		return !(*this == other);
+	}
+
+	static ai_pathfinding_request none() {
+		return ai_pathfinding_request{};
+	}
+
+	static ai_pathfinding_request to_position(const vec2 pos) {
+		ai_pathfinding_request req;
+		req.target = transformr(pos, 0.0f);
+		req.has_request = true;
+		return req;
+	}
+
+	static ai_pathfinding_request to_transform(const transformr t, const bool exact_flag = false) {
+		ai_pathfinding_request req;
+		req.target = t;
+		req.exact = exact_flag;
+		req.has_request = true;
+		return req;
+	}
+
+	static ai_pathfinding_request to_bomb(const vec2 pos) {
+		ai_pathfinding_request req;
+		req.target = transformr(pos, 0.0f);
+		req.is_bomb_target = true;
+		req.has_request = true;
+		return req;
+	}
+};
+
+/*
 	Bot high-level behavioral state.
 */
 
@@ -172,6 +230,7 @@ struct arena_mode_ai_state {
 	bool is_planting = false;
 
 	std::optional<ai_pathfinding_state> pathfinding;
+	ai_pathfinding_request current_pathfinding_request;
 	// END GEN INTROSPECTOR
 
 	bool is_pathfinding_active() const {
@@ -217,6 +276,7 @@ struct arena_mode_ai_state {
 		already_tried_to_buy = false;
 		purchase_decision_countdown = -1.0f;
 		pathfinding.reset();
+		current_pathfinding_request = ai_pathfinding_request::none();
 
 		current_state = bot_state_type::IDLE;
 		current_waypoint = entity_id::dead();
