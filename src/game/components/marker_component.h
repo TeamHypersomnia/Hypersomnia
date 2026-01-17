@@ -104,9 +104,10 @@ namespace components {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct components::marker
-		faction_type faction = faction_type::METROPOLIS;
+		faction_type faction = faction_type::DEFAULT;
 		marker_letter_type letter = marker_letter_type::A;
 		marker_shape_type shape = marker_shape_type::BOX;
+		bool camp = false;
 		// END GEN INTROSPECTOR
 
 	};

@@ -110,12 +110,17 @@ struct arena_mode_faction_state {
 	uint32_t score = 0;
 	uint32_t consecutive_losses = 0;
 	std::vector<mode_entity_id> shuffled_spawns;
+	arena_mode_ai_team_state ai_team_state;
 	// END GEN INTROSPECTOR
 
 	void clear_for_next_half() {
 		current_spawn_index = 0;
 		consecutive_losses = 0;
 		shuffled_spawns.clear();
+	}
+
+	void round_reset_ai() {
+		ai_team_state.round_reset();
 	}
 };
 
