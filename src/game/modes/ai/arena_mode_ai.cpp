@@ -407,8 +407,8 @@ arena_ai_result update_arena_mode_ai(
 			AI_LOG("Close to bomb - starting defuse");
 			ai_state.is_defusing = true;
 			ai_state.target_crosshair_offset = bomb_pos - character_pos;
-			/* Stop moving - set direction to zero via current_movement_direction. */
-			current_movement_direction = vec2::zero;
+			/* Stop moving - use nullopt to indicate no movement needed. */
+			current_movement_direction = std::nullopt;
 
 			/* Bare hands for defusing. */
 			const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
@@ -452,7 +452,9 @@ arena_ai_result update_arena_mode_ai(
 		/* Use pathfinding with exact=true for waypoints. */
 		const bool still_pathfinding = pathfind_to(wp_pos, true);
 
-		/* Pathfinding completed means we reached the waypoint. */
+		/* Pathfinding completed means we reached the waypoint. 
+		   When pathfind_to returns false, it can mean: path completed, or couldn't start.
+		   We check is_pathfinding_active to ensure path actually completed vs failed to start. */
 		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
 			AI_LOG("Reached push waypoint - switching to PATROLLING");
 
@@ -547,7 +549,9 @@ arena_ai_result update_arena_mode_ai(
 		/* Use pathfinding with exact=true for waypoints so completion is detected by reaching exact point. */
 		const bool still_pathfinding = pathfind_to(wp_pos, true);
 
-		/* Pathfinding completed means we reached the waypoint. */
+		/* Pathfinding completed means we reached the waypoint.
+		   When pathfind_to returns false, it can mean: path completed, or couldn't start.
+		   We check is_pathfinding_active to ensure path actually completed vs failed to start. */
 		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
 			AI_LOG("Reached waypoint (pathfinding completed)");
 			ai_state.going_to_first_waypoint = false;
