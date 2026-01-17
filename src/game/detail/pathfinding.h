@@ -3,6 +3,7 @@
 #include <vector>
 #include "game/common_state/cosmos_navmesh.h"
 #include "augs/enums/callback_result.h"
+#include "augs/math/transform.h"
 
 /*
 	Pathfinding algorithms using A* for navmesh.
@@ -173,6 +174,25 @@ std::optional<vec2> find_random_unoccupied_position_within_steps(
 	const uint32_t max_steps,
 	randomization& rng,
 	pathfinding_context* ctx = nullptr
+);
+
+/*
+	Find a random unoccupied cell within a (potentially rotated) rectangle.
+	Used for picking random points on bombsites.
+	
+	Steps:
+	1) Take AABB of the zone
+	2) Match the grid subsection
+	3) For every unoccupied cell, check if point hovers the rotated rectangle
+	4) Return random one of these cell centers as destination
+*/
+
+std::optional<vec2> find_random_unoccupied_cell_within_rect(
+	const cosmos_navmesh& navmesh,
+	const ltrb& aabb,
+	const transformr& rect_transform,
+	const vec2 rect_size,
+	randomization& rng
 );
 
 /*

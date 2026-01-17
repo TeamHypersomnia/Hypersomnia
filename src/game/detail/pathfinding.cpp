@@ -9,6 +9,20 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/physics/physics_queries.h"
+#include "augs/math/transform.h"
+
+/*
+	Helper function to check if a point is inside a rotated rectangle.
+*/
+
+static bool point_in_rotated_rect(
+	const vec2 point,
+	const transformr& rect_transform,
+	const vec2 rect_half_size
+) {
+	const auto local_point = (point - rect_transform.pos).rotate(-rect_transform.rotation, vec2::zero);
+	return repro::fabs(local_point.x) <= rect_half_size.x && repro::fabs(local_point.y) <= rect_half_size.y;
+}
 
 vec2 cell_to_world(const cosmos_navmesh_island& island, const vec2u cell_xy) {
 	const auto cell_size = static_cast<float>(island.cell_size);
@@ -738,4 +752,67 @@ std::optional<vec2> find_random_unoccupied_position_within_steps(
 	}
 
 	return ::cell_to_world(island, *result_cell);
+}
+
+std::optional<vec2> find_random_unoccupied_cell_within_rect(
+	const cosmos_navmesh& navmesh,
+	const ltrb& aabb,
+	const transformr& rect_transform,
+	const vec2 rect_size,
+	randomization& rng
+) {
+	/*
+		Find which island(s) the AABB overlaps and collect candidate cells.
+	*/
+	const auto rect_half_size = rect_size / 2.0f;
+	std::vector<vec2> candidate_cells;
+
+	for (island_id_type island_idx = 0; island_idx < navmesh.islands.size(); ++island_idx) {
+		const auto& island = navmesh.islands[island_idx];
+
+		/*
+			Check if island overlaps with AABB.
+		*/
+		if (!island.bound.hover(ltrbi(aabb))) {
+			continue;
+		}
+
+		const auto island_size = island.get_size_in_cells();
+
+		/*
+			Calculate cell range that overlaps with AABB.
+		*/
+		const auto min_cell = ::world_to_cell(island, vec2(aabb.l, aabb.t));
+		const auto max_cell_raw = ::world_to_cell(island, vec2(aabb.r, aabb.b));
+		const auto max_cell = vec2u(
+			std::min(max_cell_raw.x, island_size.x > 0 ? island_size.x - 1 : 0),
+			std::min(max_cell_raw.y, island_size.y > 0 ? island_size.y - 1 : 0)
+		);
+
+		/*
+			Iterate over cells in the range.
+		*/
+		for (uint32_t y = min_cell.y; y <= max_cell.y; ++y) {
+			for (uint32_t x = min_cell.x; x <= max_cell.x; ++x) {
+				const auto cell_pos = vec2u(x, y);
+
+				if (!island.is_cell_unoccupied(cell_pos)) {
+					continue;
+				}
+
+				const auto world_pos = ::cell_to_world(island, cell_pos);
+
+				if (::point_in_rotated_rect(world_pos, rect_transform, rect_half_size)) {
+					candidate_cells.push_back(world_pos);
+				}
+			}
+		}
+	}
+
+	if (candidate_cells.empty()) {
+		return std::nullopt;
+	}
+
+	const auto random_index = rng.randval(0u, static_cast<unsigned>(candidate_cells.size() - 1));
+	return candidate_cells[random_index];
 }
