@@ -84,6 +84,10 @@ inline navigate_pathfinding_result navigate_pathfinding(
 				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
 				return result;
 			}
+			else {
+				pathfinding_opt.reset();
+				return result;
+			}
 		}
 		else {
 			pathfinding_opt.reset();

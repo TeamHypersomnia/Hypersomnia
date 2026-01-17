@@ -97,11 +97,11 @@ arena_ai_result update_arena_mode_ai(
 		or from camp twitching if camping, or nullopt if no movement needed.
 	*/
 	std::optional<vec2> current_movement_direction;
-	bool is_actively_pathfinding = false;
+	bool is_currently_navigating = false;
 
 	/* Pathfind to target position. 
 	   Uses navigate_pathfinding for proper path following with advancement and deviation checks.
-	   Sets current_movement_direction and is_actively_pathfinding as side effects. */
+	   Sets current_movement_direction and is_currently_navigating as side effects. */
 	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> bool {
 		/* Start pathfinding if not already active or if target changed. */
 		::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr);
@@ -125,7 +125,7 @@ arena_ai_result update_arena_mode_ai(
 		if (nav_result.is_navigating) {
 			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
 			current_movement_direction = nav_result.movement_direction;
-			is_actively_pathfinding = true;
+			is_currently_navigating = true;
 			return true;
 		}
 
@@ -140,6 +140,7 @@ arena_ai_result update_arena_mode_ai(
 		movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
 
 		if (current_movement_direction.has_value()) {
+			LOG_NVPS(current_movement_direction);
 			movement.flags.set_from_closest_direction(*current_movement_direction);
 		}
 		else {
@@ -149,7 +150,7 @@ arena_ai_result update_arena_mode_ai(
 		AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
 
 		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
-		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, is_actively_pathfinding);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, is_currently_navigating);
 
 		arena_ai_result result;
 		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);

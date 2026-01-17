@@ -8,7 +8,7 @@
 /*
 	Core implementation that takes a crosshair pointer and target offset.
 	
-	If is_pathfinding is true, snaps the crosshair immediately instead of interpolating.
+	If is_navigating is true, snaps the crosshair immediately instead of interpolating.
 	This is useful when the bot is navigating a path and needs to look in the movement direction.
 */
 
@@ -19,10 +19,10 @@ inline void interpolate_crosshair(
 	const bool has_target,
 	const float dt_secs,
 	const difficulty_type difficulty,
-	const bool is_pathfinding = false
+	const bool is_navigating = false
 ) {
 	if (crosshair) {
-		if (is_pathfinding) {
+		if (is_navigating) {
 			/*
 				When pathfinding, snap the crosshair to face the movement direction.
 			*/
@@ -52,7 +52,7 @@ inline void interpolate_crosshair(
 	const bool has_target,
 	const float dt_secs,
 	const difficulty_type difficulty,
-	const bool is_pathfinding = false
+	const bool is_navigating = false
 ) {
 	::interpolate_crosshair(
 		ctx.character_handle.find_crosshair(),
@@ -60,6 +60,6 @@ inline void interpolate_crosshair(
 		has_target,
 		dt_secs,
 		difficulty,
-		is_pathfinding
+		is_navigating
 	);
 }
