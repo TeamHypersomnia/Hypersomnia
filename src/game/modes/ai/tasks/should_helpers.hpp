@@ -57,6 +57,16 @@ inline bool should_sprint(const arena_mode_ai_state& ai_state) {
 }
 
 /*
+	Determines if the bot is currently camping on a waypoint.
+*/
+
+inline bool is_camping(const arena_mode_ai_state& ai_state) {
+	return ai_state.current_state == bot_state_type::PATROLLING &&
+	       ai_state.camp_timer > 0.0f &&
+	       !ai_state.going_to_first_waypoint
+	;
+}
+/*
 	Determines if the bot should walk silently.
 	Only when patrolling (and not going to first waypoint).
 	85% chance to walk silently when choosing next waypoint.
@@ -78,16 +88,6 @@ inline bool should_walk_silently(const arena_mode_ai_state& ai_state) {
 	}
 
 	return ai_state.walk_silently_to_next_waypoint;
-}
-
-/*
-	Determines if the bot is currently camping on a waypoint.
-*/
-
-inline bool is_camping(const arena_mode_ai_state& ai_state) {
-	return ai_state.current_state == bot_state_type::PATROLLING &&
-	       ai_state.camp_timer > 0.0f &&
-	       !ai_state.going_to_first_waypoint;
 }
 
 /*
