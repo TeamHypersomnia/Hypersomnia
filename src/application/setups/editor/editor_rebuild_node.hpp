@@ -245,6 +245,9 @@ bool setup_entity_from_node(
 				marker->shape = editable.shape;
 			}
 		}
+		else {
+			marker.camp = editable.camp;
+		}
 	}
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
