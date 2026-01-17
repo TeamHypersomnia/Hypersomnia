@@ -396,6 +396,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							agg
 						);
 
+#if !NDEBUG
+						cosmic::set_specific_name(handle, typed_node.get_display_name());
+#endif
+
 						if (dependent_on_other_nodes) {
 							nodes_dependent_on_nodes.push_back(node_id.operator editor_node_id());
 						}
