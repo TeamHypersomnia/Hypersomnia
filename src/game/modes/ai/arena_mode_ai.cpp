@@ -36,6 +36,7 @@
 #include "game/modes/ai/tasks/ai_pathfinding.hpp"
 #include "game/modes/ai/tasks/ai_behavior_tree.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
+#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -90,26 +91,30 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	/* Pathfind to target position and set movement direction. */
+	/* Pathfind to target position and set movement direction. 
+	   Uses navigate_pathfinding for proper path following with advancement and deviation checks. */
 	auto pathfind_to = [&](const vec2 target_pos) -> bool {
-		if (::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr)) {
-			if (ai_state.is_pathfinding_active()) {
-				vec2 crosshair_offset;
-				const auto movement_dir = ::get_pathfinding_movement_direction(
-					*ai_state.pathfinding,
-					character_pos,
-					navmesh,
-					crosshair_offset,
-					dt_secs
-				);
+		/* Start pathfinding if not already active or if target changed. */
+		::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr);
 
-				if (movement_dir.has_value()) {
-					ai_state.target_crosshair_offset = crosshair_offset;
-					::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
-					movement.flags.set_from_closest_direction(*movement_dir);
-					return true;
-				}
-			}
+		if (!ai_state.is_pathfinding_active()) {
+			return false;
+		}
+
+		/* Use navigate_pathfinding for proper path following. */
+		vec2 crosshair_offset;
+		const auto nav_result = ::navigate_pathfinding(
+			ai_state.pathfinding,
+			character_pos,
+			navmesh,
+			character_handle,
+			crosshair_offset,
+			dt_secs
+		);
+
+		if (nav_result.is_navigating) {
+			ai_state.target_crosshair_offset = crosshair_offset;
+			return true;
 		}
 
 		return false;
