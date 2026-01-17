@@ -99,12 +99,12 @@ arena_ai_result update_arena_mode_ai(
 	std::optional<vec2> current_movement_direction;
 	bool is_currently_navigating = false;
 
-	/* Pathfind to target position. 
+	/* Pathfind to target transform. 
 	   Uses navigate_pathfinding for proper path following with advancement and deviation checks.
 	   Sets current_movement_direction and is_currently_navigating as side effects. */
-	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> bool {
+	auto pathfind_to_transform = [&](const transformr target_transform, const bool exact = false) -> bool {
 		/* Start pathfinding if not already active or if target changed. */
-		::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr);
+		::start_pathfinding_to(ai_state, character_pos, target_transform, navmesh, nullptr);
 
 		if (!ai_state.is_pathfinding_active()) {
 			return false;
@@ -130,6 +130,11 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		return false;
+	};
+
+	/* Convenience overload for position-only pathfinding (combat, bomb retrieval). */
+	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> bool {
+		return pathfind_to_transform(transformr(target_pos, 0.0f), exact);
 	};
 
 	/* Finalize frame: apply movement, handle aiming, crosshair, and purchases. */
@@ -446,8 +451,8 @@ arena_ai_result update_arena_mode_ai(
 		const auto wp_transform = wp_handle.get_logic_transform();
 		const auto wp_pos = wp_transform.pos;
 
-		/* Use pathfinding with exact=true for waypoints. */
-		const bool still_pathfinding = pathfind_to(wp_pos, true);
+		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
+		const bool still_pathfinding = pathfind_to_transform(wp_transform, true);
 
 		/* Pathfinding completed means we reached the waypoint. 
 		   When pathfind_to returns false, it can mean: path completed, or couldn't start.
@@ -543,8 +548,8 @@ arena_ai_result update_arena_mode_ai(
 		const auto wp_transform = wp_handle.get_logic_transform();
 		const auto wp_pos = wp_transform.pos;
 
-		/* Use pathfinding with exact=true for waypoints so completion is detected by reaching exact point. */
-		const bool still_pathfinding = pathfind_to(wp_pos, true);
+		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
+		const bool still_pathfinding = pathfind_to_transform(wp_transform, true);
 
 		/* Pathfinding completed means we reached the waypoint.
 		   When pathfind_to returns false, it can mean: path completed, or couldn't start.

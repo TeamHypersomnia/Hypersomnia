@@ -220,8 +220,16 @@ inline void check_path_deviation(
 		const auto& nodes = progress.path.nodes;
 		const auto current_idx = progress.node_index;
 
-		if (nodes.empty() || current_idx >= nodes.size()) {
+		if (nodes.empty()) {
 			return false;
+		}
+
+		/*
+			Path is completed - we're past all nodes.
+			This is not a deviation, so return true.
+		*/
+		if (current_idx >= nodes.size()) {
+			return true;
 		}
 
 		/*
@@ -477,13 +485,14 @@ inline bool is_on_portal_cell(
 inline bool start_pathfinding_to(
 	arena_mode_ai_state& ai_state,
 	const vec2 bot_pos,
-	const vec2 target_pos,
+	const transformr target_transform,
 	const cosmos_navmesh& navmesh,
 	pathfinding_context* ctx
 ) {
 	/*
 		Check if we're already pathfinding to this destination.
 	*/
+	const auto target_pos = target_transform.pos;
 	const auto target_island_opt = ::find_island_for_position(navmesh, target_pos);
 
 	if (!target_island_opt.has_value()) {
@@ -517,7 +526,7 @@ inline bool start_pathfinding_to(
 	ai_state.pathfinding = ai_pathfinding_state {
 		pathfinding_progress{ std::move(*path), 0 },
 		std::nullopt,
-		target_pos,
+		target_transform,
 		new_target_cell_id
 	};
 
@@ -531,7 +540,7 @@ inline bool start_pathfinding_to(
 inline bool start_pathfinding_to(
 	std::optional<ai_pathfinding_state>& pathfinding_opt,
 	const vec2 bot_pos,
-	const vec2 target_pos,
+	const transformr target_transform,
 	const cosmos_navmesh& navmesh,
 	pathfinding_context* ctx
 ) {
@@ -547,6 +556,7 @@ inline bool start_pathfinding_to(
 	/*
 		Check if we're already pathfinding to this destination.
 	*/
+	const auto target_pos = target_transform.pos;
 	const auto target_island_opt = ::find_island_for_position(navmesh, target_pos);
 
 	if (!target_island_opt.has_value()) {
@@ -579,7 +589,7 @@ inline bool start_pathfinding_to(
 	pathfinding_opt = ai_pathfinding_state{
 		pathfinding_progress{ std::move(*path), 0 },
 		std::nullopt,
-		target_pos,
+		target_transform,
 		new_target_cell_id
 	};
 
@@ -616,14 +626,16 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 	const float dt
 ) {
 	const auto current_target_opt = ::get_current_path_target(pathfinding, navmesh);
+	const auto target_pos = pathfinding.target_position();
 
 	if (!current_target_opt.has_value()) {
 		/*
 			No valid current target, navigate directly to final target.
+			Use target transform's direction for crosshair.
 		*/
-		const auto dir = pathfinding.target_position - bot_pos;
-		target_crosshair_offset = dir;
-		return vec2(dir).normalize();
+		const auto dir = target_pos - bot_pos;
+		target_crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
+		return dir.normalize();
 	}
 
 	const auto current_target = *current_target_opt;
@@ -639,6 +651,8 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		
 		When on a rerouting path, at the last node of rerouting we ease towards the
 		target node on the main path to preserve continuity.
+		
+		On the penultimate tile (no next cell), ease towards the target transform's rotation.
 	*/
 	vec2 look_ahead_target = current_target;
 
@@ -663,6 +677,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		if (cell_size > 0.0f) {
 			vec2 next_target;
 			bool has_next_target = false;
+			bool ease_to_target_rotation = false;
 
 			if (active_progress.node_index + 1 < path.nodes.size()) {
 				/*
@@ -687,6 +702,13 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 					has_next_target = true;
 				}
 			}
+			else {
+				/*
+					On penultimate tile (no next cell) - ease towards target rotation.
+					This helps the bot face the correct direction when reaching a waypoint.
+				*/
+				ease_to_target_rotation = true;
+			}
 
 			if (has_next_target) {
 				/*
@@ -698,6 +720,19 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 				const auto t = std::clamp(1.0f - dist_to_current / cell_size, 0.0f, 1.0f);
 
 				look_ahead_target = current_target + (next_target - current_target) * t;
+			}
+			else if (ease_to_target_rotation) {
+				/*
+					Ease towards the target transform's facing direction.
+					Use progress based on distance to current cell center.
+				*/
+				const auto dist_to_current = (bot_pos - current_target).length();
+				const auto t = std::clamp(1.0f - dist_to_current / cell_size, 0.0f, 1.0f);
+
+				const auto target_dir = pathfinding.target_transform.get_direction();
+				const auto final_look_point = target_pos + target_dir * 200.0f;
+
+				look_ahead_target = current_target + (final_look_point - current_target) * t;
 			}
 		}
 	}
@@ -816,6 +851,6 @@ inline void debug_draw_pathfinding(
 	}
 
 	if (pathfinding.exact_destination) {
-		DEBUG_LOGIC_STEP_LINES.emplace_back(cyan, bot_pos, pathfinding.target_position);
+		DEBUG_LOGIC_STEP_LINES.emplace_back(cyan, bot_pos, pathfinding.target_position());
 	}
 }

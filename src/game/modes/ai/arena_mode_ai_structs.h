@@ -5,6 +5,7 @@
 #include "game/common_state/cosmos_pathfinding.h"
 #include "game/enums/marker_type.h"
 #include "game/modes/mode_player_id.h"
+#include "augs/math/transform.h"
 #include "augs/log.h"
 
 #if !NDEBUG
@@ -46,7 +47,7 @@ struct ai_pathfinding_state {
 	pathfinding_progress main;
 	std::optional<pathfinding_progress> rerouting;
 
-	vec2 target_position = vec2::zero;
+	transformr target_transform;
 	cell_on_navmesh target_cell_id;
 
 	vec2u stuck_cell = vec2u::zero;
@@ -54,6 +55,10 @@ struct ai_pathfinding_state {
 	float stuck_rotation = 0.0f;
 	bool exact_destination = false;
 	// END GEN INTROSPECTOR
+
+	vec2 target_position() const {
+		return target_transform.pos;
+	}
 
 	void clear_rerouting() {
 		rerouting.reset();
