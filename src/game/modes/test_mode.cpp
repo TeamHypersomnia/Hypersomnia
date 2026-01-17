@@ -350,7 +350,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				const auto character_pos = character.get_logic_transform().pos;
 				const auto& navmesh = cosm.get_common_significant().navmesh;
 
-				transformr target_transform = transformr::zero;
+				auto target_transform = transformr();
 				bool has_pathfinding_target = false;
 				bool use_exact_destination = false;
 
