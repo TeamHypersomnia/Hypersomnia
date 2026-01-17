@@ -122,10 +122,6 @@ arena_ai_result update_arena_mode_ai(
 			dt_secs
 		);
 
-		if (nav_result.path_completed) {
-			return false;
-		}
-
 		if (nav_result.is_navigating) {
 			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
 			current_movement_direction = nav_result.movement_direction;

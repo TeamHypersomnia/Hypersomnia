@@ -48,7 +48,8 @@ inline std::optional<vec2> get_current_path_target(
 	*/
 	const auto& progress = pathfinding.rerouting.has_value() 
 		? *pathfinding.rerouting 
-		: pathfinding.main;
+		: pathfinding.main
+	;
 
 	const auto& path = progress.path;
 
@@ -76,9 +77,9 @@ inline void advance_path_if_cell_reached(
 	ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
-	bool& path_completed
+	bool& cell_path_completed
 ) {
-	path_completed = false;
+	cell_path_completed = false;
 
 	auto try_advance = [&](pathfinding_progress& progress) -> bool {
 		const auto& path = progress.path;
@@ -180,7 +181,7 @@ inline void advance_path_if_cell_reached(
 			signal path completion (destination reached).
 		*/
 		if (main_path_finished) {
-			path_completed = true;
+			cell_path_completed = true;
 		}
 		/*
 			If path has portal, don't clear - wait for teleportation message.
@@ -812,5 +813,9 @@ inline void debug_draw_pathfinding(
 
 	if (const auto target = ::get_current_path_target(pathfinding, navmesh)) {
 		DEBUG_LOGIC_STEP_LINES.emplace_back(cyan, bot_pos, *target);
+	}
+
+	if (pathfinding.exact_destination) {
+		DEBUG_LOGIC_STEP_LINES.emplace_back(cyan, bot_pos, pathfinding.target_position);
 	}
 }
