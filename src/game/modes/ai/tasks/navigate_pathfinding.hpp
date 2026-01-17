@@ -21,7 +21,6 @@
 
 struct navigate_pathfinding_result {
 	bool is_navigating = false;
-	bool path_completed = false;
 	std::optional<vec2> movement_direction;
 	vec2 crosshair_offset = vec2::zero;
 };
@@ -45,7 +44,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	/*
 		Advance along path and check for deviation.
 	*/
-	bool path_completed = false;
+	bool cell_path_completed = false;
 	bool is_inert = false;
 
 	if (auto* movement = character.template find<components::movement>()) {
@@ -61,36 +60,35 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	}
 
 	if (!is_inert) {
-		::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, path_completed);
+		::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, cell_path_completed);
 	}
 
 	/*
 		Check for exact destination mode: path is only completed when
 		the bot reaches the exact target position, not just the target cell center.
 	*/
-	if (path_completed && pathfinding.exact_destination) {
-		const float dist_to_exact = (bot_pos - pathfinding.target_position).length();
-		constexpr float EXACT_REACH_EPSILON = 30.0f;
+	if (cell_path_completed) {
+		if (pathfinding.exact_destination) {
+			const float dist_to_exact = (bot_pos - pathfinding.target_position).length();
+			constexpr float EXACT_REACH_EPSILON = 30.0f;
 
-		if (dist_to_exact > EXACT_REACH_EPSILON) {
-			/*
-				Not at exact position yet - continue navigating directly to target.
-			*/
-			path_completed = false;
-			const auto dir = pathfinding.target_position - bot_pos;
-			result.crosshair_offset = dir;
-			result.movement_direction = vec2(dir).normalize();
-			result.is_navigating = true;
+			if (dist_to_exact > EXACT_REACH_EPSILON) {
+				/*
+					Not at exact position yet - continue navigating directly to target.
+				*/
+				const auto dir = pathfinding.target_position - bot_pos;
+				result.crosshair_offset = dir;
+				result.movement_direction = vec2(dir).normalize();
+				result.is_navigating = true;
 
-			::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
+				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
+				return result;
+			}
+		}
+		else {
+			pathfinding_opt.reset();
 			return result;
 		}
-	}
-
-	if (path_completed) {
-		pathfinding_opt.reset();
-		result.path_completed = true;
-		return result;
 	}
 
 	if (!is_inert) {
