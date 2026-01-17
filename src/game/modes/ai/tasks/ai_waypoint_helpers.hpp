@@ -4,6 +4,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/enums/marker_type.h"
 #include "game/components/marker_component.h"
+#include "augs/misc/randomization.h"
 
 /*
 	Gather all waypoints of a specific type for a faction and store them in the team state.
@@ -88,6 +89,46 @@ inline entity_id find_unassigned_patrol_waypoint(
 }
 
 /*
+	Find a random unassigned patrol waypoint of a specific letter.
+	Returns entity_id::dead() if none found.
+*/
+
+inline entity_id find_random_unassigned_patrol_waypoint(
+	const cosmos& cosm,
+	arena_mode_ai_team_state& team_state,
+	const marker_letter_type letter,
+	const mode_player_id& bot_id,
+	randomization& rng
+) {
+	std::vector<entity_id> available;
+
+	for (auto& wp : team_state.patrol_waypoints) {
+		const auto waypoint_handle = cosm[wp.waypoint_id];
+
+		if (!waypoint_handle.alive()) {
+			continue;
+		}
+
+		const auto& marker_comp = waypoint_handle.template get<components::marker>();
+
+		if (marker_comp.letter != letter) {
+			continue;
+		}
+
+		if (!wp.is_assigned() || wp.assigned_bot == bot_id) {
+			available.push_back(wp.waypoint_id);
+		}
+	}
+
+	if (available.empty()) {
+		return entity_id::dead();
+	}
+
+	const auto idx = rng.randval(0u, static_cast<unsigned>(available.size() - 1));
+	return available[idx];
+}
+
+/*
 	Assign a waypoint to a bot.
 */
 
@@ -147,6 +188,31 @@ inline entity_id find_unassigned_push_waypoint(
 	}
 
 	return entity_id::dead();
+}
+
+/*
+	Find a random unassigned push waypoint.
+	Returns entity_id::dead() if none found.
+*/
+
+inline entity_id find_random_unassigned_push_waypoint(
+	arena_mode_ai_team_state& team_state,
+	randomization& rng
+) {
+	std::vector<entity_id> available;
+
+	for (auto& wp : team_state.push_waypoints) {
+		if (!wp.is_assigned()) {
+			available.push_back(wp.waypoint_id);
+		}
+	}
+
+	if (available.empty()) {
+		return entity_id::dead();
+	}
+
+	const auto idx = rng.randval(0u, static_cast<unsigned>(available.size() - 1));
+	return available[idx];
 }
 
 /*
@@ -211,4 +277,51 @@ inline marker_letter_type find_least_assigned_bombsite(
 	});
 
 	return best_letter;
+}
+
+/*
+	Check if a waypoint has the camp flag set.
+*/
+
+inline bool is_camp_waypoint(
+	const cosmos& cosm,
+	const entity_id waypoint_id
+) {
+	const auto waypoint_handle = cosm[waypoint_id];
+
+	if (!waypoint_handle.alive()) {
+		return false;
+	}
+
+	const auto& marker_comp = waypoint_handle.template get<components::marker>();
+	return marker_comp.camp;
+}
+
+/*
+	Get the transform of a waypoint.
+*/
+
+inline transformr get_waypoint_transform(
+	const cosmos& cosm,
+	const entity_id waypoint_id
+) {
+	const auto waypoint_handle = cosm[waypoint_id];
+
+	if (!waypoint_handle.alive()) {
+		return transformr();
+	}
+
+	return waypoint_handle.get_logic_transform();
+}
+
+/*
+	Check if the bot has reached the waypoint within a threshold.
+*/
+
+inline bool has_reached_waypoint(
+	const vec2 bot_pos,
+	const vec2 waypoint_pos,
+	const float threshold = 50.0f
+) {
+	return (bot_pos - waypoint_pos).length() <= threshold;
 }

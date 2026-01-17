@@ -11,6 +11,7 @@
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/weapon_like.h"
 #include "game/enums/item_category.h"
+#include "augs/misc/randomization.h"
 
 /*
 	Find the most expensive weapon in the bot's inventory.
@@ -116,6 +117,16 @@ inline bool should_walk_silently(const arena_mode_ai_state& ai_state) {
 }
 
 /*
+	Determines if the bot is currently camping on a waypoint.
+*/
+
+inline bool is_camping(const arena_mode_ai_state& ai_state) {
+	return ai_state.current_state == bot_state_type::PATROLLING &&
+	       ai_state.camp_timer > 0.0f &&
+	       !ai_state.going_to_first_waypoint;
+}
+
+/*
 	Check if a position is within line of sight from another position.
 	Uses the physics system for raycasting.
 */
@@ -173,4 +184,67 @@ inline bool is_waypoint_for_faction(
 	}
 
 	return waypoint_faction == bot_faction;
+}
+
+/*
+	Update camp twitching behavior.
+	Bot moves randomly within a radius of 40px of the camp center
+	but keeps looking in the same direction.
+*/
+
+inline vec2 update_camp_twitch(
+	arena_mode_ai_state& ai_state,
+	const vec2 bot_pos,
+	randomization& rng
+) {
+	constexpr float TWITCH_RADIUS = 40.0f;
+	constexpr float CENTER_EPSILON = 10.0f;
+
+	const auto offset_from_center = bot_pos - ai_state.camp_center;
+	const auto dist_from_center = offset_from_center.length();
+
+	/*
+		If we've exceeded the twitch radius, go back to center.
+	*/
+	if (dist_from_center > TWITCH_RADIUS) {
+		ai_state.camp_twitch_target = ai_state.camp_center;
+	}
+	/*
+		If we're close to the center, choose a new random direction.
+	*/
+	else if ((bot_pos - ai_state.camp_twitch_target).length() < CENTER_EPSILON) {
+		const auto random_angle = rng.randval(0.0f, 360.0f);
+		const auto random_offset = vec2::from_degrees(random_angle) * TWITCH_RADIUS * 0.8f;
+		ai_state.camp_twitch_target = ai_state.camp_center + random_offset;
+	}
+
+	return (ai_state.camp_twitch_target - bot_pos).normalize();
+}
+
+/*
+	Check if we should dash when crossing last_seen_target_pos.
+	Only applies in COMBAT state.
+*/
+
+inline bool should_dash_for_combat(
+	arena_mode_ai_state& ai_state,
+	const vec2 bot_pos
+) {
+	if (ai_state.current_state != bot_state_type::COMBAT) {
+		return false;
+	}
+
+	if (ai_state.has_dashed_for_last_seen) {
+		return false;
+	}
+
+	constexpr float DASH_RADIUS = 100.0f;
+	const auto dist_to_last_seen = (bot_pos - ai_state.last_seen_target_pos).length();
+
+	if (dist_to_last_seen < DASH_RADIUS) {
+		ai_state.has_dashed_for_last_seen = true;
+		return true;
+	}
+
+	return false;
 }
