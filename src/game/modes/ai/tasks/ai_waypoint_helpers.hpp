@@ -25,11 +25,7 @@ inline void gather_waypoints_for_team(
 			const auto& marker_comp = typed_handle.template get<components::marker>();
 
 			const auto waypoint_faction = marker_comp.faction;
-
-			const bool faction_matches =
-				waypoint_faction == faction_type::DEFAULT ||
-				waypoint_faction == faction
-			;
+			const bool faction_matches = ::is_waypoint_for_faction(waypoint_faction, faction);
 
 			if (!faction_matches) {
 				return;

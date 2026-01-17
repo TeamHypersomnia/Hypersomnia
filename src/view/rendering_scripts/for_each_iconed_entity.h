@@ -74,6 +74,10 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = green;
 		}
+		else if (p.type == point_marker_type::BOT_WAYPOINT_PATROL || p.type == point_marker_type::BOT_WAYPOINT_PUSH) {
+			result.id = I::EDITOR_TOOL_PLAIN_ARROW;
+			result.col = get_faction_color(meta.faction);
+		}
 
 		return result;
 	}
