@@ -5,6 +5,16 @@
 #include "augs/math/repro_math.h"
 
 /*
+	Field of view constants.
+	Normal FOV: 1920x1080 (standard resolution)
+	Extended FOV (camping): 2688x1560 (40% larger in each dimension)
+*/
+constexpr float AI_FOV_NORMAL_X = 1920.0f;
+constexpr float AI_FOV_NORMAL_Y = 1080.0f;
+constexpr float AI_FOV_EXTENDED_X = 2688.0f;
+constexpr float AI_FOV_EXTENDED_Y = 1560.0f;
+
+/*
 	Check if a position is within line of sight from another position.
 	Uses the physics system for raycasting.
 */
@@ -31,8 +41,6 @@ inline bool is_in_line_of_sight(
 
 /*
 	Check if a position is within the bot's field of view.
-	Normal FOV: 1920x1080
-	Extended FOV (camping): 2688x1560
 */
 
 inline bool is_within_fov(
@@ -41,8 +49,8 @@ inline bool is_within_fov(
 	const bool camping
 ) {
 	const auto offset = target_pos - from_pos;
-	const float fov_x = camping ? 2688.0f : 1920.0f;
-	const float fov_y = camping ? 1560.0f : 1080.0f;
+	const float fov_x = camping ? AI_FOV_EXTENDED_X : AI_FOV_NORMAL_X;
+	const float fov_y = camping ? AI_FOV_EXTENDED_Y : AI_FOV_NORMAL_Y;
 
 	return repro::fabs(offset.x) < fov_x && repro::fabs(offset.y) < fov_y;
 }
