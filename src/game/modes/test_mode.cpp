@@ -388,22 +388,29 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					*/
 					const real32 dt_secs = in.cosm.get_fixed_delta().in_seconds();
 
-					vec2 crosshair_target;
-					::navigate_pathfinding(
+					const auto nav_result = ::navigate_pathfinding(
 						first_player.debug_pathfinding,
 						character_pos,
 						navmesh,
 						character,
-						crosshair_target,
 						dt_secs
 					);
+
+					/*
+						Apply movement direction if pathfinding is active.
+					*/
+					if (nav_result.is_navigating && nav_result.movement_direction.has_value()) {
+						if (auto* movement = character.find<components::movement>()) {
+							movement->flags.set_from_closest_direction(*nav_result.movement_direction);
+						}
+					}
 
 					const bool has_target = true;
 					const bool is_pathfinding = first_player.debug_pathfinding.has_value();
 
 					::interpolate_crosshair(
 						character.find_crosshair(),
-						crosshair_target,
+						nav_result.crosshair_offset,
 						has_target,
 						dt_secs,
 						difficulty_type::HARD,

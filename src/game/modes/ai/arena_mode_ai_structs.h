@@ -160,6 +160,7 @@ struct arena_mode_ai_state {
 	float camp_duration = 0.0f;
 	vec2 camp_center = vec2::zero;
 	vec2 camp_twitch_target = vec2::zero;
+	vec2 camp_look_direction = vec2(1.0f, 0.0f);
 	bool walk_silently_to_next_waypoint = true;
 
 	bool is_defusing = false;

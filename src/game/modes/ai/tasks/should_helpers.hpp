@@ -60,11 +60,17 @@ inline bool should_sprint(const arena_mode_ai_state& ai_state) {
 	Determines if the bot should walk silently.
 	Only when patrolling (and not going to first waypoint).
 	85% chance to walk silently when choosing next waypoint.
+	Always walk silently when camping.
 */
 
 inline bool should_walk_silently(const arena_mode_ai_state& ai_state) {
 	if (ai_state.current_state != bot_state_type::PATROLLING) {
 		return false;
+	}
+
+	/* Always walk silently when camping (twitching). */
+	if (::is_camping(ai_state)) {
+		return true;
 	}
 
 	if (ai_state.going_to_first_waypoint) {

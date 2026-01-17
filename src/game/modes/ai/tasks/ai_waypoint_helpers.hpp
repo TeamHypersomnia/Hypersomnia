@@ -243,6 +243,25 @@ inline bool is_camp_waypoint(
 }
 
 /*
+	Get camp duration range from a waypoint marker.
+	Returns (min, max) pair. Defaults to (5.0, 15.0) if not a valid waypoint.
+*/
+
+inline std::pair<float, float> get_waypoint_camp_duration_range(
+	const cosmos& cosm,
+	const entity_id waypoint_id
+) {
+	const auto waypoint_handle = cosm[waypoint_id];
+
+	if (!waypoint_handle.alive()) {
+		return { 5.0f, 15.0f };
+	}
+
+	const auto& marker_comp = waypoint_handle.template get<components::marker>();
+	return { marker_comp.camp_secs_min, marker_comp.camp_secs_max };
+}
+
+/*
 	Get the transform of a waypoint.
 */
 

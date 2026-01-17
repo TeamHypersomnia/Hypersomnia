@@ -109,6 +109,8 @@ namespace components {
 		marker_shape_type shape = marker_shape_type::BOX;
 		bool camp = false;
 		pad_bytes<3> pad;
+		float camp_secs_min = 5.0f;
+		float camp_secs_max = 15.0f;
 		// END GEN INTROSPECTOR
 
 	};

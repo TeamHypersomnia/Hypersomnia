@@ -871,6 +871,12 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 		MULTIPROPERTY("Camp", camp);
 
 		tooltip_on_hover("After reaching this waypoint,\nbot will stay and camp here for a random duration.");
+
+		if (insp.camp) {
+			auto ind = scoped_indent();
+			MULTIPROPERTY("Camp min (secs)", camp_secs_min);
+			MULTIPROPERTY("Camp max (secs)", camp_secs_max);
+		}
 	}
 
 	return result;
