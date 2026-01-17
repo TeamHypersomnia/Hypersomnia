@@ -8,6 +8,7 @@
 #include "augs/misc/bound.h"
 #include "augs/math/vec2.h"
 #include "augs/templates/variated.h"
+#include "augs/ensure.h"
 
 #include "augs/misc/xorshift_state.h"
 
@@ -149,11 +150,13 @@ struct basic_randomization {
 	*/
 	template <class C>
 	auto& rand_element(C& container) {
+		ensure(!container.empty());
 		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
 	}
 
 	template <class C>
 	const auto& rand_element(const C& container) {
+		ensure(!container.empty());
 		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
 	}
 };

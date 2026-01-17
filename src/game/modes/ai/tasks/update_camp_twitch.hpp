@@ -34,5 +34,12 @@ inline vec2 update_camp_twitch(
 		ai_state.camp_twitch_target = ai_state.camp_center + random_offset;
 	}
 
-	return (ai_state.camp_twitch_target - bot_pos).normalize();
+	const auto direction = ai_state.camp_twitch_target - bot_pos;
+
+	if (direction.is_nonzero()) {
+		auto result = direction;
+		return result.normalize();
+	}
+
+	return vec2::zero;
 }
