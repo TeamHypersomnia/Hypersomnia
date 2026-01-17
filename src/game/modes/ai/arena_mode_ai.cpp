@@ -99,15 +99,25 @@ arena_ai_result update_arena_mode_ai(
 	std::optional<vec2> current_movement_direction;
 	bool is_currently_navigating = false;
 
+	/* Result of pathfinding operations. */
+	struct pathfind_result {
+		bool is_navigating = false;
+		bool path_completed = false;
+	};
+
 	/* Pathfind to target transform. 
 	   Uses navigate_pathfinding for proper path following with advancement and deviation checks.
-	   Sets current_movement_direction and is_currently_navigating as side effects. */
-	auto pathfind_to_transform = [&](const transformr target_transform, const bool exact = false) -> bool {
+	   Sets current_movement_direction and is_currently_navigating as side effects. 
+	   Returns is_navigating=true while path is being followed.
+	   Returns path_completed=true when destination was reached (only once, on the frame it completed). */
+	auto pathfind_to_transform = [&](const transformr target_transform, const bool exact = false) -> pathfind_result {
+		pathfind_result result;
+
 		/* Start pathfinding if not already active or if target changed. */
 		::start_pathfinding_to(ai_state, character_pos, target_transform, navmesh, nullptr);
 
 		if (!ai_state.is_pathfinding_active()) {
-			return false;
+			return result;
 		}
 
 		/* Set exact flag if requested (for waypoints). */
@@ -122,18 +132,24 @@ arena_ai_result update_arena_mode_ai(
 			dt_secs
 		);
 
+		result.path_completed = nav_result.path_completed;
+
 		if (nav_result.is_navigating) {
 			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
 			current_movement_direction = nav_result.movement_direction;
 			is_currently_navigating = true;
-			return true;
+			result.is_navigating = true;
+		}
+		else if (nav_result.path_completed) {
+			/* Path completed - update crosshair offset to face target direction. */
+			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
 		}
 
-		return false;
+		return result;
 	};
 
 	/* Convenience overload for position-only pathfinding (combat, bomb retrieval). */
-	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> bool {
+	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> pathfind_result {
 		return pathfind_to_transform(transformr(target_pos, 0.0f), exact);
 	};
 
@@ -452,12 +468,11 @@ arena_ai_result update_arena_mode_ai(
 		const auto wp_pos = wp_transform.pos;
 
 		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
-		const bool still_pathfinding = pathfind_to_transform(wp_transform, true);
+		const auto path_result = pathfind_to_transform(wp_transform, true);
 
-		/* Pathfinding completed means we reached the waypoint. 
-		   When pathfind_to returns false, it can mean: path completed, or couldn't start.
-		   We check is_pathfinding_active to ensure path actually completed vs failed to start. */
-		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
+		/* Pathfinding completed means we reached the waypoint.
+		   path_completed is set only once, on the frame the destination was reached. */
+		if (path_result.path_completed) {
 			AI_LOG("Reached push waypoint - switching to PATROLLING");
 
 			if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
@@ -549,12 +564,11 @@ arena_ai_result update_arena_mode_ai(
 		const auto wp_pos = wp_transform.pos;
 
 		/* Use pathfinding with exact=true for waypoints, with transform for rotation. */
-		const bool still_pathfinding = pathfind_to_transform(wp_transform, true);
+		const auto path_result = pathfind_to_transform(wp_transform, true);
 
 		/* Pathfinding completed means we reached the waypoint.
-		   When pathfind_to returns false, it can mean: path completed, or couldn't start.
-		   We check is_pathfinding_active to ensure path actually completed vs failed to start. */
-		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
+		   path_completed is set only once, on the frame the destination was reached. */
+		if (path_result.path_completed) {
 			AI_LOG("Reached waypoint (pathfinding completed)");
 			ai_state.going_to_first_waypoint = false;
 
