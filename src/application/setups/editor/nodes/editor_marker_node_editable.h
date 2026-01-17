@@ -100,6 +100,7 @@ struct editor_point_marker_node_editable {
 	// GEN INTROSPECTOR struct editor_point_marker_node_editable
 	faction_type faction = faction_type::RESISTANCE;
 	marker_letter_type letter = marker_letter_type::A;
+	bool camp = false;
 
 	vec2 pos;
 	real32 rotation = 0.0f;

@@ -867,6 +867,12 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 		MULTIPROPERTY("Letter", letter);
 	}
 
+	if (type == point_marker_type::BOT_WAYPOINT_PUSH || type == point_marker_type::BOT_WAYPOINT_PATROL) {
+		MULTIPROPERTY("Camp", camp);
+
+		tooltip_on_hover("After reaching this waypoint,\nbot will stay and camp here for a random duration.");
+	}
+
 	return result;
 }
 
