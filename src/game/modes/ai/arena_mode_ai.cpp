@@ -91,9 +91,18 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	/* Pathfind to target position and set movement direction. 
-	   Uses navigate_pathfinding for proper path following with advancement and deviation checks. */
-	auto pathfind_to = [&](const vec2 target_pos) -> bool {
+	/*
+		Stateless calculation of movement direction.
+		Returns the direction from navigate_pathfinding if pathfinding is active,
+		or from camp twitching if camping, or nullopt if no movement needed.
+	*/
+	std::optional<vec2> current_movement_direction;
+	bool is_actively_pathfinding = false;
+
+	/* Pathfind to target position. 
+	   Uses navigate_pathfinding for proper path following with advancement and deviation checks.
+	   Sets current_movement_direction and is_actively_pathfinding as side effects. */
+	auto pathfind_to = [&](const vec2 target_pos, const bool exact = false) -> bool {
 		/* Start pathfinding if not already active or if target changed. */
 		::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr);
 
@@ -101,29 +110,50 @@ arena_ai_result update_arena_mode_ai(
 			return false;
 		}
 
+		/* Set exact flag if requested (for waypoints). */
+		ai_state.pathfinding->exact_destination = exact;
+
 		/* Use navigate_pathfinding for proper path following. */
-		vec2 crosshair_offset;
 		const auto nav_result = ::navigate_pathfinding(
 			ai_state.pathfinding,
 			character_pos,
 			navmesh,
 			character_handle,
-			crosshair_offset,
 			dt_secs
 		);
 
+		if (nav_result.path_completed) {
+			return false;
+		}
+
 		if (nav_result.is_navigating) {
-			ai_state.target_crosshair_offset = crosshair_offset;
+			ai_state.target_crosshair_offset = nav_result.crosshair_offset;
+			current_movement_direction = nav_result.movement_direction;
+			is_actively_pathfinding = true;
 			return true;
 		}
 
 		return false;
 	};
 
-	/* Finalize frame: handle aiming, crosshair, and purchases. */
+	/* Finalize frame: apply movement, handle aiming, crosshair, and purchases. */
 	auto finalize_frame = [&](const bool has_target, const entity_id closest_enemy) -> arena_ai_result {
+		/* Apply movement direction and flags. */
+		movement.flags.walking = ::should_walk_silently(ai_state);
+		movement.flags.sprinting = ::should_sprint(ai_state);
+		movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
+
+		if (current_movement_direction.has_value()) {
+			movement.flags.set_from_closest_direction(*current_movement_direction);
+		}
+		else {
+			movement.flags.set_from_closest_direction(vec2::zero);
+		}
+
+		AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
+
 		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
-		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, is_actively_pathfinding);
 
 		arena_ai_result result;
 		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
@@ -150,15 +180,6 @@ arena_ai_result update_arena_mode_ai(
 				::perform_wielding(step, character_handle, requested_wield);
 			}
 		}
-	};
-
-	/* Update movement flags based on state. */
-	auto update_movement_flags = [&]() {
-		movement.flags.walking = ::should_walk_silently(ai_state);
-		movement.flags.sprinting = ::should_sprint(ai_state);
-		movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
-
-		AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
 	};
 
 	/* Handle combat timeout expiration. */
@@ -386,7 +407,8 @@ arena_ai_result update_arena_mode_ai(
 			AI_LOG("Close to bomb - starting defuse");
 			ai_state.is_defusing = true;
 			ai_state.target_crosshair_offset = bomb_pos - character_pos;
-			movement.flags.set_from_closest_direction(vec2::zero);
+			/* Stop moving - set direction to zero via current_movement_direction. */
+			current_movement_direction = vec2::zero;
 
 			/* Bare hands for defusing. */
 			const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
@@ -424,15 +446,23 @@ arena_ai_result update_arena_mode_ai(
 			return std::nullopt;
 		}
 
-		const auto wp_pos = wp_handle.get_logic_transform().pos;
+		const auto wp_transform = wp_handle.get_logic_transform();
+		const auto wp_pos = wp_transform.pos;
 
-		if (::has_reached_waypoint(character_pos, wp_pos)) {
+		/* Use pathfinding with exact=true for waypoints. */
+		const bool still_pathfinding = pathfind_to(wp_pos, true);
+
+		/* Pathfinding completed means we reached the waypoint. */
+		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
 			AI_LOG("Reached push waypoint - switching to PATROLLING");
 
 			if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
-				ai_state.camp_timer = stable_rng.randval(5.0f, 15.0f);
+				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
+				ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
+				ai_state.camp_duration = ai_state.camp_timer;
 				ai_state.camp_center = wp_pos;
 				ai_state.camp_twitch_target = wp_pos;
+				ai_state.camp_look_direction = wp_transform.get_direction();
 				AI_LOG("Camp waypoint - setting up camp");
 			}
 
@@ -445,7 +475,6 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		AI_LOG_NVPS(wp_pos);
-		pathfind_to(wp_pos);
 		return finalize_frame(has_target, closest_enemy);
 	};
 
@@ -456,7 +485,7 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		AI_LOG("PATROLLING state");
-		AI_LOG_NVPS(ai_state.patrol_letter, ai_state.current_waypoint);
+		AI_LOG_NVPS(ai_state.patrol_letter, ai_state.current_waypoint, ai_state.camp_timer);
 
 		/* If camping, do camp twitching. */
 		const bool camping = ::is_camping(ai_state);
@@ -464,9 +493,20 @@ arena_ai_result update_arena_mode_ai(
 		if (camping) {
 			AI_LOG("Camping - twitching");
 			const auto twitch_dir = ::update_camp_twitch(ai_state, character_pos, stable_rng);
-			movement.flags.set_from_closest_direction(twitch_dir);
-			movement.flags.walking = true;
+			current_movement_direction = twitch_dir;
+
+			/* Look in the direction of the waypoint transform while camping. */
+			ai_state.target_crosshair_offset = ai_state.camp_look_direction * 200.0f;
+
 			return finalize_frame(has_target, closest_enemy);
+		}
+
+		/* Check if camp timer just expired - need to pick next waypoint. */
+		if (ai_state.current_waypoint.is_set() && ai_state.camp_duration > 0.0f && ai_state.camp_timer <= 0.0f) {
+			AI_LOG("Camp duration expired - picking next waypoint");
+			::unassign_bot_from_waypoints(team_state, bot_player_id);
+			ai_state.current_waypoint = entity_id::dead();
+			ai_state.camp_duration = 0.0f;
 		}
 
 		/* Find a waypoint if we don't have one. */
@@ -501,27 +541,33 @@ arena_ai_result update_arena_mode_ai(
 			return finalize_frame(has_target, closest_enemy);
 		}
 
-		const auto wp_pos = wp_handle.get_logic_transform().pos;
+		const auto wp_transform = wp_handle.get_logic_transform();
+		const auto wp_pos = wp_transform.pos;
 
-		if (::has_reached_waypoint(character_pos, wp_pos)) {
-			AI_LOG("Reached waypoint");
+		/* Use pathfinding with exact=true for waypoints so completion is detected by reaching exact point. */
+		const bool still_pathfinding = pathfind_to(wp_pos, true);
+
+		/* Pathfinding completed means we reached the waypoint. */
+		if (!still_pathfinding && !ai_state.is_pathfinding_active()) {
+			AI_LOG("Reached waypoint (pathfinding completed)");
 			ai_state.going_to_first_waypoint = false;
 
 			if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
 				AI_LOG("Camp waypoint - setting up camp");
-				ai_state.camp_timer = stable_rng.randval(5.0f, 15.0f);
+				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, ai_state.current_waypoint);
+				ai_state.camp_timer = stable_rng.randval(min_secs, max_secs);
 				ai_state.camp_duration = ai_state.camp_timer;
 				ai_state.camp_center = wp_pos;
 				ai_state.camp_twitch_target = wp_pos;
+				/* Store the waypoint's facing direction for looking while camping. */
+				ai_state.camp_look_direction = wp_transform.get_direction();
+				AI_LOG_NVPS(ai_state.camp_timer, ai_state.camp_look_direction);
 			}
 			else {
 				AI_LOG("Non-camp waypoint - picking next");
 				::unassign_bot_from_waypoints(team_state, bot_player_id);
 				ai_state.current_waypoint = entity_id::dead();
 			}
-		}
-		else {
-			pathfind_to(wp_pos);
 		}
 
 		return finalize_frame(has_target, closest_enemy);
@@ -539,9 +585,6 @@ arena_ai_result update_arena_mode_ai(
 
 	/* Manage weapons based on state. */
 	manage_weapons();
-
-	/* Update movement flags. */
-	update_movement_flags();
 
 	/* Check for hearing-initiated combat. */
 	check_hearing_initiates_combat();

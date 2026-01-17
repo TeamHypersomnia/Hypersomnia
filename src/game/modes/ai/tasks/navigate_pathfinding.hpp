@@ -11,17 +11,19 @@
 	Handles all path following logic in one reusable function:
 	- Advances path when bot reaches cell centers
 	- Checks for path deviation and reroutes if needed
-	- Sets movement flags from pathfinding direction
+	- Calculates movement direction (does NOT apply it - caller must do that)
 	- Updates crosshair offset with look-ahead smoothing
 	- Debug draws the path
 	
-	Returns true if the path is still being followed.
-	Returns false if path was completed or pathfinding state should be cleared.
+	Returns the movement direction if the path is still being followed.
+	The caller is responsible for applying the movement direction.
 */
 
 struct navigate_pathfinding_result {
 	bool is_navigating = false;
 	bool path_completed = false;
+	std::optional<vec2> movement_direction;
+	vec2 crosshair_offset = vec2::zero;
 };
 
 template <typename CharacterHandle>
@@ -30,7 +32,6 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
-	vec2& target_crosshair_offset,
 	const real32 dt
 ) {
 	navigate_pathfinding_result result;
@@ -63,6 +64,29 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		::advance_path_if_cell_reached(pathfinding, bot_pos, navmesh, path_completed);
 	}
 
+	/*
+		Check for exact destination mode: path is only completed when
+		the bot reaches the exact target position, not just the target cell center.
+	*/
+	if (path_completed && pathfinding.exact_destination) {
+		const float dist_to_exact = (bot_pos - pathfinding.target_position).length();
+		constexpr float EXACT_REACH_EPSILON = 30.0f;
+
+		if (dist_to_exact > EXACT_REACH_EPSILON) {
+			/*
+				Not at exact position yet - continue navigating directly to target.
+			*/
+			path_completed = false;
+			const auto dir = pathfinding.target_position - bot_pos;
+			result.crosshair_offset = dir;
+			result.movement_direction = vec2(dir).normalize();
+			result.is_navigating = true;
+
+			::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
+			return result;
+		}
+	}
+
 	if (path_completed) {
 		pathfinding_opt.reset();
 		result.path_completed = true;
@@ -75,13 +99,13 @@ inline navigate_pathfinding_result navigate_pathfinding(
 
 	/*
 		Get movement direction from pathfinding.
-		Also sets target_crosshair_offset as an output parameter (un-normalized).
+		Also calculates crosshair offset (un-normalized).
 	*/
 	const auto movement_dir = ::get_pathfinding_movement_direction(
 		pathfinding,
 		bot_pos,
 		navmesh,
-		target_crosshair_offset,
+		result.crosshair_offset,
 		dt
 	);
 
@@ -89,12 +113,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		return result;
 	}
 
-	/*
-		Apply movement flags using normalized direction.
-	*/
-	if (auto* movement = character.template find<components::movement>()) {
-		movement->flags.set_from_closest_direction(*movement_dir);
-	}
+	result.movement_direction = *movement_dir;
 
 	/*
 		Debug draw the path.

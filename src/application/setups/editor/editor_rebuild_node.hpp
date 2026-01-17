@@ -247,6 +247,8 @@ bool setup_entity_from_node(
 		}
 		else {
 			marker.camp = editable.camp;
+			marker.camp_secs_min = editable.camp_secs_min;
+			marker.camp_secs_max = editable.camp_secs_max;
 		}
 	}
 
