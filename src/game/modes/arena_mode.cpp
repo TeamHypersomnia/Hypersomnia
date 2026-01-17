@@ -2428,19 +2428,29 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	bool should_restart = false;
 	bool spawn_for_recently_assigned = false;
 
+	const bool is_bomb_planted = bomb_planted(in);
+	const auto current_bomb_entity = bomb_entity;
+
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
+		const auto player_faction = player.get_faction();
+		auto& faction_state = factions[player_faction];
 
 		const auto ai_result = update_arena_mode_ai(
 			cosm,
 			step,
 			player.ai_state,
+			faction_state.ai_team_state,
 			player.controlled_character_id,
+			it.first,
+			player_faction,
 			player.stats.money,
 			in.rules.is_ffa(),
 			stable_round_rng,
 			in.dynamic_vars.bot_difficulty,
-			cosm.get_common_significant().navmesh
+			cosm.get_common_significant().navmesh,
+			is_bomb_planted,
+			current_bomb_entity
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
