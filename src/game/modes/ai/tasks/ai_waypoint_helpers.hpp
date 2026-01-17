@@ -178,6 +178,18 @@ inline std::size_t count_assigned_waypoints_for_letter(
 }
 
 /*
+	Helper to iterate over all marker letters.
+*/
+
+template <class F>
+inline void for_each_marker_letter(F callback) {
+	callback(marker_letter_type::A);
+	callback(marker_letter_type::B);
+	callback(marker_letter_type::C);
+	callback(marker_letter_type::D);
+}
+
+/*
 	Find the bombsite letter with the least assigned soldiers.
 	Used for distributing bots evenly at round start.
 */
@@ -189,15 +201,14 @@ inline marker_letter_type find_least_assigned_bombsite(
 	marker_letter_type best_letter = marker_letter_type::A;
 	std::size_t least_assigned = std::numeric_limits<std::size_t>::max();
 
-	for (int i = 0; i < static_cast<int>(marker_letter_type::COUNT); ++i) {
-		const auto letter = static_cast<marker_letter_type>(i);
+	::for_each_marker_letter([&](const auto letter) {
 		const auto assigned = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
 
 		if (assigned < least_assigned) {
 			least_assigned = assigned;
 			best_letter = letter;
 		}
-	}
+	});
 
 	return best_letter;
 }
