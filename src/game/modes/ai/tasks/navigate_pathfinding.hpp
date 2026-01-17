@@ -80,7 +80,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 				*/
 				const auto dir = target_pos - bot_pos;
 				result.crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
-				result.movement_direction = dir.normalize();
+				result.movement_direction = vec2(dir).normalize();
 				result.is_navigating = true;
 
 				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
