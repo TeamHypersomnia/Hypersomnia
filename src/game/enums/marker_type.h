@@ -54,3 +54,13 @@ inline bool is_portal_based(const area_marker_type t) {
 inline bool is_bombsite(const area_marker_type t) {
 	return t == area_marker_type::BOMBSITE;
 }
+
+inline bool is_waypoint(const point_marker_type t) {
+	switch (t) {
+		case point_marker_type::BOT_WAYPOINT_PATROL:
+		case point_marker_type::BOT_WAYPOINT_PUSH:
+			return true;
+		default:
+			return false;
+	}
+}

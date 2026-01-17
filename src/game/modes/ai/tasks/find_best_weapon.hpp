@@ -19,7 +19,7 @@ inline entity_id find_best_weapon(const E& character_handle) {
 
 	character_handle.for_each_contained_item_recursive(
 		[&](const auto& item) {
-			if (!::is_weapon_like(item)) {
+			if (!item.template has<components::gun>()) {
 				return;
 			}
 
