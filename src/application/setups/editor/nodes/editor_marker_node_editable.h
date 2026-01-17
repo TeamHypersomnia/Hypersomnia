@@ -98,7 +98,7 @@ struct editor_portal_info {
 
 struct editor_point_marker_node_editable {
 	// GEN INTROSPECTOR struct editor_point_marker_node_editable
-	faction_type faction = faction_type::RESISTANCE;
+	faction_type faction = faction_type::ANY;
 	marker_letter_type letter = marker_letter_type::A;
 	bool camp = false;
 
