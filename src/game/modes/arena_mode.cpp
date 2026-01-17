@@ -44,6 +44,7 @@
 #include "augs/misc/date_time.h"
 #include "game/modes/ai/arena_mode_ai.h"
 #include "game/messages/collected_message.h"
+#include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -1094,6 +1095,13 @@ void arena_mode::setup_round(
 
 	for_each_faction([&](const auto faction) {
 		fill_spawns(cosm, faction, factions[faction]);
+	});
+
+	/*
+		Gather waypoints for AI teams at round start.
+	*/
+	for_each_faction([&](const auto faction) {
+		::gather_waypoints_for_team(cosm, factions[faction].ai_team_state, faction);
 	});
 
 	fill_spawns(cosm, faction_type::FFA, ffa_faction);
@@ -4290,6 +4298,13 @@ void arena_mode::clear_players_round_state(const input_type in) {
 		it.second.stats.round_state = {};
 		it.second.ai_state.round_reset();
 	}
+
+	/*
+		Reset team AI state for each faction.
+	*/
+	for_each_faction([&](const auto faction) {
+		factions[faction].round_reset_ai();
+	});
 
 	set_players_level_to_initial(in);
 }
