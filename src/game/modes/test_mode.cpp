@@ -384,7 +384,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 					/*
 						Apply crosshair interpolation with HARD difficulty.
-						Use snapping (is_pathfinding=true) since we're navigating a path.
+						Use snapping (is_navigating=true) since we're navigating a path.
 					*/
 					const real32 dt_secs = in.cosm.get_fixed_delta().in_seconds();
 
@@ -406,7 +406,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					}
 
 					const bool has_target = true;
-					const bool is_pathfinding = first_player.debug_pathfinding.has_value();
+					const bool is_navigating = first_player.debug_pathfinding.has_value();
 
 					::interpolate_crosshair(
 						character.find_crosshair(),
@@ -414,7 +414,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						has_target,
 						dt_secs,
 						difficulty_type::HARD,
-						is_pathfinding
+						is_navigating
 					);
 				}
 			}
