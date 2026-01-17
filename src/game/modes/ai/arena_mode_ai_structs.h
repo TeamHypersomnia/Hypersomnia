@@ -5,6 +5,11 @@
 #include "game/common_state/cosmos_pathfinding.h"
 #include "game/enums/marker_type.h"
 #include "game/modes/mode_player_id.h"
+#include "augs/log.h"
+
+#if !NDEBUG
+#define LOG_AI 1
+#endif
 
 template <class... Args>
 void AI_LOG(Args&&... args) {
@@ -14,10 +19,6 @@ void AI_LOG(Args&&... args) {
 	((void)args, ...);
 #endif
 }
-
-#if !NDEBUG
-#define LOG_AI 1
-#endif
 
 #if LOG_AI
 #define AI_LOG_NVPS LOG_NVPS

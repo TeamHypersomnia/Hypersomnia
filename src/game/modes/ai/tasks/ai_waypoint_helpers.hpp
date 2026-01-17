@@ -24,11 +24,19 @@ inline void gather_waypoints_for_team(
 			const auto& marker_inv = typed_handle.template get<invariants::point_marker>();
 			const auto& marker_comp = typed_handle.template get<components::marker>();
 
+			if (!::is_waypoint(marker_inv.type)) {
+				return;
+			}
+
 			const auto waypoint_faction = marker_comp.faction;
 			const bool faction_matches = ::is_waypoint_for_faction(waypoint_faction, faction);
 
 			if (!faction_matches) {
+				AI_LOG("WAYPOINT (%x) MATCHES: %x %x", typed_handle.get_id(), waypoint_faction, faction);
 				return;
+			}
+			else {
+				AI_LOG("WAYPOINT (%x) MISMATCH: %x %x", typed_handle.get_id(), waypoint_faction, faction);
 			}
 
 			ai_waypoint_state wp_state;
