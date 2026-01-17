@@ -90,11 +90,8 @@ arena_ai_result update_arena_mode_ai(
 		return offset.normalize();
 	};
 
-	(void)bomb_entity;
-	(void)team_state;
-	(void)bot_player_id;
-	(void)bot_faction;
-	(void)bomb_planted;
+	const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
+	const bool is_resistance = (bot_faction == faction_type::RESISTANCE);
 
 	/*
 		Combat timeout management.
@@ -104,7 +101,20 @@ arena_ai_result update_arena_mode_ai(
 
 		if (ai_state.combat_timeout <= 0.0f) {
 			ai_state.end_combat();
+			/*
+				After combat expires, unassign waypoint but keep patrol letter.
+			*/
+			::unassign_bot_from_waypoints(team_state, bot_player_id);
+			ai_state.current_waypoint = entity_id::dead();
+			ai_state.going_to_first_waypoint = true;
 		}
+	}
+
+	/*
+		Camp timer management.
+	*/
+	if (ai_state.camp_timer > 0.0f) {
+		ai_state.camp_timer -= dt_secs;
 	}
 
 	/*
@@ -142,16 +152,30 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.walking = ::should_walk_silently(ai_state);
 
 	/*
-		High-level AI flow.
-	*/
-
-	/*
 		Listen for footsteps before checking for visible enemies.
+		If hearing event point is in LoS, it can initiate combat.
 	*/
 	::listen_for_footsteps(ctx, step, is_ffa);
 
+	/*
+		If we heard something and can see that point, initiate combat.
+	*/
+	if (ai_state.last_seen_target.is_set() && ai_state.current_state != bot_state_type::COMBAT) {
+		const auto heard_pos = ai_state.last_target_position;
+
+		if (::is_in_line_of_sight(character_pos, heard_pos, physics, cosm, character_handle)) {
+			ai_state.combat_timeout = stable_rng.randval(5.0f, 10.0f);
+			ai_state.start_combat(ai_state.last_seen_target, heard_pos);
+		}
+	}
+
 	::update_random_movement_target(ctx, dt_secs, navmesh);
 
+	/*
+		Check for closest visible enemy.
+		Use extended FOV if camping.
+	*/
+	const bool camping = ::is_camping(ai_state);
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
 	const bool sees_target = closest_enemy.is_set();
 	const bool should_react = ::update_alertness(ai_state, sees_target, dt_secs, difficulty);
@@ -170,10 +194,12 @@ arena_ai_result update_arena_mode_ai(
 			*/
 			ai_state.combat_timeout = stable_rng.randval(5.0f, 10.0f);
 			ai_state.start_combat(closest_enemy, enemy_pos);
+			::unassign_bot_from_waypoints(team_state, bot_player_id);
 		}
 		else {
 			/*
 				Update last_known and last_seen positions since we can see them.
+				Only override if closer.
 			*/
 			const auto current_dist = (enemy_pos - character_pos).length();
 			const auto known_dist = (ai_state.last_known_target_pos - character_pos).length();
@@ -203,13 +229,382 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	/*
+		Dash once when crossing last_seen_target_pos in combat.
+	*/
+	const bool should_dash = ::should_dash_for_combat(ai_state, character_pos);
+
+	/*
 		Set movement flags based on current state.
 	*/
 	movement.flags.sprinting = ::should_sprint(ai_state);
-	movement.flags.dashing = false;
+	movement.flags.dashing = should_dash;
 
 	/*
-		Process pathfinding navigation.
+		===========================================================================
+		BEHAVIOR TREE: Evaluate entire tree every step.
+		===========================================================================
+	*/
+
+	/*
+		1) COMBAT state overrides all other pathfindings/patrols/objectives.
+	*/
+	if (ai_state.is_in_combat()) {
+		/*
+			Pathfind to last_known_target_pos.
+		*/
+		const auto target_pos = ai_state.last_known_target_pos;
+
+		if (::start_pathfinding_to(ai_state, character_pos, target_pos, navmesh, nullptr)) {
+			if (ai_state.is_pathfinding_active()) {
+				vec2 crosshair_offset;
+				const auto movement_dir = ::get_pathfinding_movement_direction(
+					*ai_state.pathfinding,
+					character_pos,
+					navmesh,
+					crosshair_offset,
+					dt_secs
+				);
+
+				if (movement_dir.has_value()) {
+					ai_state.target_crosshair_offset = crosshair_offset;
+					::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+					movement.flags.set_from_closest_direction(*movement_dir);
+				}
+			}
+		}
+
+		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+		arena_ai_result result;
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+		return result;
+	}
+
+	/*
+		2) If not in combat, continue with map-objective pathfinding logic.
+	*/
+
+	/*
+		Initialize patrol if not done yet.
+	*/
+	if (ai_state.current_state == bot_state_type::IDLE) {
+		/*
+			Metropolis: 20% chance to choose push waypoint if available.
+		*/
+		if (is_metropolis) {
+			const bool choose_push = stable_rng.randval(0, 99) < 20;
+
+			if (choose_push) {
+				const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, stable_rng);
+
+				if (push_wp.is_set()) {
+					ai_state.current_waypoint = push_wp;
+					ai_state.current_state = bot_state_type::PUSHING;
+					ai_state.going_to_first_waypoint = true;
+					::assign_waypoint(team_state, push_wp, bot_player_id);
+				}
+			}
+
+			if (ai_state.current_state == bot_state_type::IDLE) {
+				/*
+					Choose bombsite with least assigned soldiers.
+				*/
+				ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state);
+				ai_state.current_state = bot_state_type::PATROLLING;
+				ai_state.going_to_first_waypoint = true;
+			}
+		}
+		/*
+			Resistance: Choose push waypoint first.
+		*/
+		else if (is_resistance) {
+			const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, stable_rng);
+
+			if (push_wp.is_set()) {
+				ai_state.current_waypoint = push_wp;
+				ai_state.current_state = bot_state_type::PUSHING;
+				ai_state.going_to_first_waypoint = true;
+				::assign_waypoint(team_state, push_wp, bot_player_id);
+			}
+			else {
+				/*
+					Fallback to patrol of team's chosen_bombsite.
+				*/
+				ai_state.patrol_letter = team_state.chosen_bombsite;
+				ai_state.current_state = bot_state_type::PATROLLING;
+				ai_state.going_to_first_waypoint = true;
+			}
+		}
+		else {
+			/*
+				FFA or other: Just patrol.
+			*/
+			ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state);
+			ai_state.current_state = bot_state_type::PATROLLING;
+			ai_state.going_to_first_waypoint = true;
+		}
+	}
+
+	/*
+		3.2) If bomb planted (Metropolis-specific: defuse mission).
+	*/
+	if (bomb_planted && is_metropolis) {
+		/*
+			Switch to patrol the planted bombsite letter.
+		*/
+		ai_state.patrol_letter = team_state.chosen_bombsite;
+
+		/*
+			Check if we should be the defuse bot.
+		*/
+		const bool defuse_bot_alive = [&]() {
+			if (!team_state.bot_with_defuse_mission.is_set()) {
+				return false;
+			}
+
+			return true;
+		}();
+
+		if (!defuse_bot_alive) {
+			/*
+				Assign closest bot to defuse mission.
+			*/
+			team_state.bot_with_defuse_mission = bot_player_id;
+		}
+
+		if (team_state.bot_with_defuse_mission == bot_player_id) {
+			ai_state.current_state = bot_state_type::DEFUSING;
+
+			/*
+				Pathfind to bomb instead of waypoint.
+			*/
+			const auto bomb_handle = cosm[bomb_entity];
+
+			if (bomb_handle.alive()) {
+				const auto bomb_pos = bomb_handle.get_logic_transform().pos;
+
+				if (::start_pathfinding_to(ai_state, character_pos, bomb_pos, navmesh, nullptr)) {
+					if (ai_state.is_pathfinding_active()) {
+						vec2 crosshair_offset;
+						const auto movement_dir = ::get_pathfinding_movement_direction(
+							*ai_state.pathfinding,
+							character_pos,
+							navmesh,
+							crosshair_offset,
+							dt_secs
+						);
+
+						if (movement_dir.has_value()) {
+							ai_state.target_crosshair_offset = crosshair_offset;
+							::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+							movement.flags.set_from_closest_direction(*movement_dir);
+						}
+					}
+				}
+
+				/*
+					If close to bomb, enter defusing state.
+				*/
+				if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
+					ai_state.is_defusing = true;
+					ai_state.target_crosshair_offset = bomb_pos - character_pos;
+					movement.flags.set_from_closest_direction(vec2::zero);
+
+					if (auto* sentience = character_handle.find<components::sentience>()) {
+						sentience->is_requesting_interaction = true;
+					}
+				}
+			}
+
+			::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+			::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+			arena_ai_result result;
+			result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+			return result;
+		}
+	}
+
+	/*
+		PUSHING state: pathfind to push waypoint.
+	*/
+	if (ai_state.current_state == bot_state_type::PUSHING) {
+		const auto wp_handle = cosm[ai_state.current_waypoint];
+
+		if (wp_handle.alive()) {
+			const auto wp_pos = wp_handle.get_logic_transform().pos;
+
+			if (::has_reached_waypoint(character_pos, wp_pos)) {
+				/*
+					Finished push, check if camp.
+				*/
+				if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
+					ai_state.camp_timer = stable_rng.randval(5.0f, 15.0f);
+					ai_state.camp_center = wp_pos;
+					ai_state.camp_twitch_target = wp_pos;
+				}
+
+				/*
+					Switch to patrolling.
+				*/
+				::unassign_bot_from_waypoints(team_state, bot_player_id);
+				ai_state.current_waypoint = entity_id::dead();
+				ai_state.current_state = bot_state_type::PATROLLING;
+				ai_state.going_to_first_waypoint = true;
+				ai_state.patrol_letter = is_resistance ? team_state.chosen_bombsite : ::find_least_assigned_bombsite(cosm, team_state);
+			}
+			else {
+				/*
+					Continue pathfinding to waypoint.
+				*/
+				if (::start_pathfinding_to(ai_state, character_pos, wp_pos, navmesh, nullptr)) {
+					if (ai_state.is_pathfinding_active()) {
+						vec2 crosshair_offset;
+						const auto movement_dir = ::get_pathfinding_movement_direction(
+							*ai_state.pathfinding,
+							character_pos,
+							navmesh,
+							crosshair_offset,
+							dt_secs
+						);
+
+						if (movement_dir.has_value()) {
+							ai_state.target_crosshair_offset = crosshair_offset;
+							::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+							movement.flags.set_from_closest_direction(*movement_dir);
+						}
+					}
+				}
+			}
+		}
+		else {
+			/*
+				Waypoint gone, switch to patrolling.
+			*/
+			ai_state.current_state = bot_state_type::PATROLLING;
+			ai_state.going_to_first_waypoint = true;
+		}
+
+		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+		arena_ai_result result;
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+		return result;
+	}
+
+	/*
+		PATROLLING state.
+	*/
+	if (ai_state.current_state == bot_state_type::PATROLLING) {
+		/*
+			If camping, do camp twitching.
+		*/
+		if (camping) {
+			const auto twitch_dir = ::update_camp_twitch(ai_state, character_pos, stable_rng);
+			movement.flags.set_from_closest_direction(twitch_dir);
+			movement.flags.walking = true;
+
+			::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+			::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+			arena_ai_result result;
+			result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+			return result;
+		}
+
+		/*
+			Need to find a waypoint if we don't have one.
+		*/
+		if (!ai_state.current_waypoint.is_set()) {
+			auto new_wp = ::find_random_unassigned_patrol_waypoint(
+				cosm,
+				team_state,
+				ai_state.patrol_letter,
+				bot_player_id,
+				stable_rng
+			);
+
+			if (new_wp.is_set()) {
+				ai_state.current_waypoint = new_wp;
+				::assign_waypoint(team_state, new_wp, bot_player_id);
+
+				/*
+					85% chance to walk silently when not going to first waypoint.
+				*/
+				if (!ai_state.going_to_first_waypoint) {
+					ai_state.walk_silently_to_next_waypoint = stable_rng.randval(0, 99) < 85;
+				}
+			}
+		}
+
+		const auto wp_handle = cosm[ai_state.current_waypoint];
+
+		if (wp_handle.alive()) {
+			const auto wp_pos = wp_handle.get_logic_transform().pos;
+
+			if (::has_reached_waypoint(character_pos, wp_pos)) {
+				ai_state.going_to_first_waypoint = false;
+
+				/*
+					Check if camp waypoint.
+				*/
+				if (::is_camp_waypoint(cosm, ai_state.current_waypoint)) {
+					ai_state.camp_timer = stable_rng.randval(5.0f, 15.0f);
+					ai_state.camp_duration = ai_state.camp_timer;
+					ai_state.camp_center = wp_pos;
+					ai_state.camp_twitch_target = wp_pos;
+				}
+				else {
+					/*
+						Pick next waypoint immediately.
+					*/
+					::unassign_bot_from_waypoints(team_state, bot_player_id);
+					ai_state.current_waypoint = entity_id::dead();
+				}
+			}
+			else {
+				/*
+					Pathfind to current waypoint.
+				*/
+				if (::start_pathfinding_to(ai_state, character_pos, wp_pos, navmesh, nullptr)) {
+					if (ai_state.is_pathfinding_active()) {
+						vec2 crosshair_offset;
+						const auto movement_dir = ::get_pathfinding_movement_direction(
+							*ai_state.pathfinding,
+							character_pos,
+							navmesh,
+							crosshair_offset,
+							dt_secs
+						);
+
+						if (movement_dir.has_value()) {
+							ai_state.target_crosshair_offset = crosshair_offset;
+							::debug_draw_pathfinding(ai_state.pathfinding, character_pos, navmesh);
+							movement.flags.set_from_closest_direction(*movement_dir);
+						}
+					}
+				}
+			}
+		}
+		else {
+			/*
+				Waypoint doesn't exist, find another.
+			*/
+			ai_state.current_waypoint = entity_id::dead();
+		}
+
+		::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+		::interpolate_crosshair(ctx, has_target, dt_secs, difficulty);
+
+		arena_ai_result result;
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+		return result;
+	}
+
+	/*
+		Fallback: process pathfinding navigation.
 	*/
 	const auto nav_result = ::navigate_pathfinding(
 		ai_state.pathfinding,
@@ -230,7 +625,7 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	/*
-		Handle chase logic with pathfinding.
+		Handle chase logic with pathfinding (legacy fallback).
 	*/
 	const auto actual_movement_direction = [&]() {
 		if (!pause_chase && ai_state.last_seen_target.is_set()) {
