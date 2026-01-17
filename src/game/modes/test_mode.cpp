@@ -350,12 +350,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				const auto character_pos = character.get_logic_transform().pos;
 				const auto& navmesh = cosm.get_common_significant().navmesh;
 
-				vec2 target_pos = vec2::zero;
+				transformr target_transform = transformr::zero;
 				bool has_pathfinding_target = false;
+				bool use_exact_destination = false;
 
 				if (playtesting_context->debug_pathfinding_end.has_value()) {
-					target_pos = *playtesting_context->debug_pathfinding_end;
+					target_transform = *playtesting_context->debug_pathfinding_end;
 					has_pathfinding_target = true;
+					use_exact_destination = true;
 				}
 				else if (const auto bomb_handle = cosm[playtesting_context->debug_pathfinding_bomb_target]) {
 					/*
@@ -368,7 +370,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					);
 
 					if (bomb_target.has_value()) {
-						target_pos = bomb_target->target_position;
+						target_transform = transformr(bomb_target->target_position, 0.0f);
 						has_pathfinding_target = true;
 					}
 				}
@@ -377,10 +379,17 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					::start_pathfinding_to(
 						first_player.debug_pathfinding,
 						character_pos,
-						transformr(target_pos, 0.0f),
+						target_transform,
 						navmesh,
 						nullptr
 					);
+
+					/*
+						Set exact_destination for DEBUG_PATHFINDING_END markers.
+					*/
+					if (use_exact_destination && first_player.debug_pathfinding.has_value()) {
+						first_player.debug_pathfinding->exact_destination = true;
+					}
 
 					/*
 						Apply crosshair interpolation with HARD difficulty.
@@ -402,6 +411,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					if (nav_result.is_navigating && nav_result.movement_direction.has_value()) {
 						if (auto* movement = character.find<components::movement>()) {
 							movement->flags.set_from_closest_direction(*nav_result.movement_direction);
+						}
+					}
+					else if (nav_result.path_completed) {
+						/*
+							Pathfinding completed - stop movement.
+						*/
+						if (auto* movement = character.find<components::movement>()) {
+							movement->flags.set_from_closest_direction(vec2::zero);
 						}
 					}
 

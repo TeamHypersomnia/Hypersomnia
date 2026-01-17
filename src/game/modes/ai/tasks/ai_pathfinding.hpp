@@ -514,6 +514,15 @@ inline bool start_pathfinding_to(
 	}
 
 	/*
+		Check if we're already at the target cell.
+		If so, don't start pathfinding - we've already arrived.
+		This prevents restarting pathfinding after path completed.
+	*/
+	if (::is_within_cell(bot_pos, island, target_cell)) {
+		return false;
+	}
+
+	/*
 		Calculate path to next portal or directly to destination.
 		Using find_path_across_islands_many which only returns path to the next portal.
 	*/
@@ -574,6 +583,15 @@ inline bool start_pathfinding_to(
 			Already navigating to the same destination.
 		*/
 		return true;
+	}
+
+	/*
+		Check if we're already at the target cell.
+		If so, don't start pathfinding - we've already arrived.
+		This prevents restarting pathfinding after path completed.
+	*/
+	if (::is_within_cell(bot_pos, island, target_cell)) {
+		return false;
 	}
 
 	/*
