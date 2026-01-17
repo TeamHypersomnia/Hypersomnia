@@ -2,10 +2,15 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/components/item_component.h"
+#include "game/components/gun_component.h"
+#include "game/components/hand_fuse_component.h"
+#include "game/components/melee_component.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory/wielding_setup.h"
+#include "game/detail/weapon_like.h"
+#include "game/enums/item_category.h"
 
 /*
 	Find the most expensive weapon in the bot's inventory.
@@ -19,15 +24,11 @@ inline entity_id find_best_weapon(const E& character_handle) {
 
 	character_handle.for_each_contained_item_recursive(
 		[&](const auto& item) {
+			if (!::is_weapon_like(item)) {
+				return;
+			}
+
 			if (const auto item_def = item.template find<invariants::item>()) {
-				if (item_def->categories_for_slot_compatibility.test(item_category::HAND_HOLDABLE_MAGAZINE)) {
-					return;
-				}
-
-				if (item_def->categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
-					return;
-				}
-
 				const auto price = item_def->standard_price;
 
 				if (price > best_price) {
