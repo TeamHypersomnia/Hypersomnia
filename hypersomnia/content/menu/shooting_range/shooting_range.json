@@ -1868,212 +1868,247 @@
             "id": "team_spawn",
             "type": "team_spawn",
             "pos": [-195.0, 3903.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (2)",
             "type": "team_spawn",
             "pos": [-195.0, 4289.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (9)",
             "type": "team_spawn",
             "pos": [-197.0, 4161.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (10)",
             "type": "team_spawn",
             "pos": [-197.0, 4031.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
             "pos": [-193.0, 3393.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (3)",
             "type": "team_spawn",
             "pos": [-195.0, 3521.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (4)",
             "type": "team_spawn",
             "pos": [-193.0, 3779.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (5)",
             "type": "team_spawn",
             "pos": [-195.0, 3651.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (6)",
             "type": "team_spawn",
             "pos": [-197.0, 4413.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (7)",
             "type": "team_spawn",
             "pos": [-199.0, 4541.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (8)",
             "type": "team_spawn",
             "pos": [-197.0, 4799.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (11)",
             "type": "team_spawn",
             "pos": [-199.0, 4671.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (12)",
             "type": "team_spawn",
             "pos": [-197.0, 4925.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (13)",
             "type": "team_spawn",
             "pos": [-199.0, 5053.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (14)",
             "type": "team_spawn",
             "pos": [-197.0, 5311.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (15)",
             "type": "team_spawn",
             "pos": [-199.0, 5183.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (16)",
             "type": "team_spawn",
             "faction": "METROPOLIS",
             "pos": [1231.0, 5753.0],
-            "rotation": 90.0
+            "rotation": 90.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (17)",
             "type": "team_spawn",
             "pos": [453.0, 3903.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (18)",
             "type": "team_spawn",
             "pos": [451.0, 4031.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (19)",
             "type": "team_spawn",
             "pos": [453.0, 4289.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (20)",
             "type": "team_spawn",
             "pos": [451.0, 4161.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (21)",
             "type": "team_spawn",
             "pos": [455.0, 3393.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (22)",
             "type": "team_spawn",
             "pos": [453.0, 3521.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (23)",
             "type": "team_spawn",
             "pos": [455.0, 3779.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (24)",
             "type": "team_spawn",
             "pos": [453.0, 3651.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (25)",
             "type": "team_spawn",
             "pos": [451.0, 4413.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (26)",
             "type": "team_spawn",
             "pos": [449.0, 4541.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (27)",
             "type": "team_spawn",
             "pos": [451.0, 4799.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (28)",
             "type": "team_spawn",
             "pos": [449.0, 4671.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (29)",
             "type": "team_spawn",
             "pos": [451.0, 4925.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (30)",
             "type": "team_spawn",
             "pos": [449.0, 5053.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (31)",
             "type": "team_spawn",
             "pos": [451.0, 5311.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (32)",
             "type": "team_spawn",
             "pos": [449.0, 5183.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (33)",
             "type": "team_spawn",
             "pos": [-193.0, 3201.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "team_spawn (34)",
             "type": "team_spawn",
             "pos": [449.0, 3201.0],
-            "rotation": -180.0
+            "rotation": -180.0,
+            "faction": "RESISTANCE"
         },
         {
             "id": "portal",
