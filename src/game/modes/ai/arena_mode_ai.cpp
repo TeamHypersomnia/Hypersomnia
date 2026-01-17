@@ -94,6 +94,8 @@ arena_ai_result update_arena_mode_ai(
 	const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
 	const bool is_resistance = (bot_faction == faction_type::RESISTANCE);
 
+	AI_LOG_NVPS(controlled_character_id, ai_state.current_state, is_metropolis, is_resistance);
+
 	/*
 		Combat timeout management.
 	*/
@@ -101,6 +103,7 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.combat_timeout -= dt_secs;
 
 		if (ai_state.combat_timeout <= 0.0f) {
+			AI_LOG_NVPS(controlled_character_id, "Combat timeout expired");
 			ai_state.end_combat();
 			/*
 				After combat expires, unassign waypoint but keep patrol letter.
@@ -126,6 +129,7 @@ arena_ai_result update_arena_mode_ai(
 	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
 
 	if (should_holster && !has_bare_hands) {
+		AI_LOG_NVPS(controlled_character_id, "Holstering weapons");
 		::perform_wielding(
 			step,
 			character_handle,
@@ -136,6 +140,7 @@ arena_ai_result update_arena_mode_ai(
 		const auto best_weapon = ::find_best_weapon(character_handle);
 
 		if (best_weapon.is_set()) {
+			AI_LOG_NVPS(controlled_character_id, "Drawing weapon", best_weapon);
 			auto requested_wield = wielding_setup::bare_hands();
 			requested_wield.hand_selections[0] = best_weapon;
 
@@ -165,6 +170,7 @@ arena_ai_result update_arena_mode_ai(
 		const auto heard_pos = ai_state.last_target_position;
 
 		if (::is_in_line_of_sight(character_pos, heard_pos, physics, cosm, character_handle)) {
+			AI_LOG_NVPS(controlled_character_id, "Heard sound in LoS, initiating combat");
 			ai_state.combat_timeout = stable_rng.randval(5.0f, 10.0f);
 			ai_state.start_combat(ai_state.last_seen_target, heard_pos);
 		}
@@ -182,6 +188,8 @@ arena_ai_result update_arena_mode_ai(
 	const bool should_react = ::update_alertness(ai_state, sees_target, dt_secs, difficulty);
 	const bool has_target = sees_target && should_react;
 
+	AI_LOG_NVPS(controlled_character_id, sees_target, should_react, camping);
+
 	/*
 		COMBAT initiation: Only SIGHTING initiates combat.
 	*/
@@ -193,6 +201,7 @@ arena_ai_result update_arena_mode_ai(
 			/*
 				Initiate combat with random duration 5-10 seconds.
 			*/
+			AI_LOG_NVPS(controlled_character_id, "Initiating COMBAT", closest_enemy, enemy_pos);
 			ai_state.combat_timeout = stable_rng.randval(5.0f, 10.0f);
 			ai_state.start_combat(closest_enemy, enemy_pos);
 			::unassign_bot_from_waypoints(team_state, bot_player_id);
@@ -206,6 +215,7 @@ arena_ai_result update_arena_mode_ai(
 			const auto known_dist = (ai_state.last_known_target_pos - character_pos).length();
 
 			if (current_dist < known_dist) {
+				AI_LOG_NVPS(controlled_character_id, "Updating combat target", closest_enemy, enemy_pos);
 				ai_state.last_seen_target_pos = enemy_pos;
 				ai_state.last_known_target_pos = enemy_pos;
 				ai_state.combat_target = closest_enemy;
@@ -290,6 +300,7 @@ arena_ai_result update_arena_mode_ai(
 		Initialize patrol if not done yet.
 	*/
 	if (ai_state.current_state == bot_state_type::IDLE) {
+		AI_LOG_NVPS(controlled_character_id, "Initializing patrol from IDLE");
 		/*
 			Metropolis: 20% chance to choose push waypoint if available.
 		*/
@@ -300,6 +311,7 @@ arena_ai_result update_arena_mode_ai(
 				const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, stable_rng);
 
 				if (push_wp.is_set()) {
+					AI_LOG_NVPS(controlled_character_id, "Metropolis chose PUSH waypoint", push_wp);
 					ai_state.current_waypoint = push_wp;
 					ai_state.current_state = bot_state_type::PUSHING;
 					ai_state.going_to_first_waypoint = true;
@@ -314,6 +326,7 @@ arena_ai_result update_arena_mode_ai(
 				ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state);
 				ai_state.current_state = bot_state_type::PATROLLING;
 				ai_state.going_to_first_waypoint = true;
+				AI_LOG_NVPS(controlled_character_id, "Metropolis starting PATROL", ai_state.patrol_letter);
 			}
 		}
 		/*
@@ -323,6 +336,7 @@ arena_ai_result update_arena_mode_ai(
 			const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, stable_rng);
 
 			if (push_wp.is_set()) {
+				AI_LOG_NVPS(controlled_character_id, "Resistance chose PUSH waypoint", push_wp);
 				ai_state.current_waypoint = push_wp;
 				ai_state.current_state = bot_state_type::PUSHING;
 				ai_state.going_to_first_waypoint = true;
@@ -335,6 +349,7 @@ arena_ai_result update_arena_mode_ai(
 				ai_state.patrol_letter = team_state.chosen_bombsite;
 				ai_state.current_state = bot_state_type::PATROLLING;
 				ai_state.going_to_first_waypoint = true;
+				AI_LOG_NVPS(controlled_character_id, "Resistance starting PATROL", ai_state.patrol_letter);
 			}
 		}
 		else {
@@ -344,6 +359,7 @@ arena_ai_result update_arena_mode_ai(
 			ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state);
 			ai_state.current_state = bot_state_type::PATROLLING;
 			ai_state.going_to_first_waypoint = true;
+			AI_LOG_NVPS(controlled_character_id, "FFA starting PATROL", ai_state.patrol_letter);
 		}
 	}
 
@@ -377,6 +393,7 @@ arena_ai_result update_arena_mode_ai(
 				}
 
 				if (team_state.bot_with_bomb_retrieval_mission == bot_player_id) {
+					AI_LOG_NVPS(controlled_character_id, "Assigned to RETRIEVING_BOMB mission");
 					ai_state.current_state = bot_state_type::RETRIEVING_BOMB;
 
 					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
@@ -413,6 +430,7 @@ arena_ai_result update_arena_mode_ai(
 					Clear retrieval mission if bomb is now held by Resistance.
 				*/
 				if (team_state.bot_with_bomb_retrieval_mission.is_set()) {
+					AI_LOG_NVPS(controlled_character_id, "Clearing bomb retrieval mission");
 					team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
 				}
 			}
@@ -423,6 +441,7 @@ arena_ai_result update_arena_mode_ai(
 		3.2) If bomb planted (Metropolis-specific: defuse mission).
 	*/
 	if (bomb_planted && is_metropolis) {
+		AI_LOG_NVPS(controlled_character_id, "Bomb planted, Metropolis switching to defuse");
 		/*
 			Switch to patrol the planted bombsite letter.
 		*/
