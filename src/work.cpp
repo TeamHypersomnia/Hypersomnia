@@ -5030,6 +5030,21 @@ work_result work(
 					cone.eye.transform.pos.y -= 0.5f;
 				}
 
+				/*
+					Determine if we can draw enemies (for editor playtesting debug).
+				*/
+				const bool can_draw_enemies = visit_current_setup([&](const auto& setup) {
+					using S = remove_cref<decltype(setup)>;
+
+					if constexpr(std::is_same_v<S, editor_setup>) {
+						if (setup.is_playtesting()) {
+							return setup.get_project().playtesting.see_enemies;
+						}
+					}
+
+					return false;
+				});
+
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
 					get_camera_requested_fov_expansion(),
@@ -5039,6 +5054,7 @@ work_result work(
 					get_audiovisuals(),
 					viewing_config.drawing,
 					viewer_is_spectator(),
+					can_draw_enemies,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,
