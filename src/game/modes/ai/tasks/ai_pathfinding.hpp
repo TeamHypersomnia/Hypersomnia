@@ -635,7 +635,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 		*/
 		const auto dir = target_pos - bot_pos;
 		target_crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
-		return dir.normalize();
+		return vec2(dir).normalize();
 	}
 
 	const auto current_target = *current_target_opt;
