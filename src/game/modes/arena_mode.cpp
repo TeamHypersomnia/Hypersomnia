@@ -2432,27 +2432,23 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	const bool is_bomb_planted = bomb_planted(in);
 	const auto current_bomb_entity = bomb_entity;
 
-	/*
-		Recalculate waypoint assignments statelessly before updating AI.
-		Clear all assignments first, then reassign based on current behavior state.
-	*/
-	for (auto& faction_pair : factions) {
-		faction_pair.second.ai_team_state.clear_waypoint_assignments();
-	}
-
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 		const auto player_faction = player.get_faction();
 		auto& faction_state = factions[player_faction];
 
-		const auto assigned = ::calc_assigned_waypoint(player.ai_state.last_behavior);
-		::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, it.first);
-	}
+		/*
+			Recalculate waypoint assignments statelessly before updating AI.
+			Clear all assignments first, then reassign based on current behavior state.
+		*/
+		faction_state.ai_team_state.clear_waypoint_assignments();
 
-	for (auto& it : only_bot(players)) {
-		auto& player = it.second;
-		const auto player_faction = player.get_faction();
-		auto& faction_state = factions[player_faction];
+		for (auto& other_bot : only_bot(players)) {
+			if (player_faction == other_bot.second.get_faction()) {
+				const auto assigned = ::calc_assigned_waypoint(other_bot.second.ai_state.last_behavior);
+				::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, other_bot.first);
+			}
+		}
 
 		const auto ai_result = update_arena_mode_ai(
 			cosm,

@@ -109,6 +109,24 @@ inline void update_camp_twitch(
 	- Waypoint picking when path completes
 */
 
+inline assigned_waypoint_result ai_behavior_patrol::calc_assigned_waypoint() const {
+	assigned_waypoint_result result;
+	/*
+		Push waypoint takes priority over patrol waypoint.
+	*/
+
+	if (push_waypoint.is_set()) {
+		result.waypoint_id = push_waypoint;
+		result.is_push_waypoint = true;
+	}
+	else if (current_waypoint.is_set()) {
+		result.waypoint_id = current_waypoint;
+		result.is_push_waypoint = false;
+	}
+
+	return result;
+}
+
 inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
 	auto& ai_state = ctx.ai_state;

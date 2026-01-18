@@ -20,6 +20,11 @@ struct ai_behavior_process_ctx;
 	- Camp state if the current waypoint is a camp waypoint
 */
 
+struct assigned_waypoint_result {
+	entity_id waypoint_id;
+	bool is_push_waypoint = false;
+};
+
 struct ai_behavior_patrol {
 	// GEN INTROSPECTOR struct ai_behavior_patrol
 	/*
@@ -63,6 +68,8 @@ struct ai_behavior_patrol {
 	bool is_pushing() const {
 		return push_waypoint.is_set();
 	}
+
+	assigned_waypoint_result calc_assigned_waypoint() const;
 
 	bool operator==(const ai_behavior_patrol&) const = default;
 
