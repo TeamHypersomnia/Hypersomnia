@@ -32,8 +32,8 @@ struct ai_behavior_patrol {
 		Once reached, this is cleared and we fall back to normal patrolling.
 	*/
 	entity_id push_waypoint;
+	entity_id patrol_waypoint;
 
-	entity_id current_waypoint;
 	bool going_to_first_waypoint = true;
 	bool walk_silently_to_next_waypoint = true;
 

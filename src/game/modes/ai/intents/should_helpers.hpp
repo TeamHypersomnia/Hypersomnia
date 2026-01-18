@@ -18,7 +18,6 @@ inline bool should_sprint(const ai_behavior_variant& behavior, const bool nav_ca
 			return true;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
-			/* Sprint when pushing or going to first waypoint. */
 			return nav_can_sprint && b.is_going_far();
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
