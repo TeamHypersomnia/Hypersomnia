@@ -24,6 +24,7 @@ struct ai_behavior_process_ctx {
 	arena_mode_ai_team_state& team_state;
 	const mode_player_id& bot_player_id;
 	const faction_type bot_faction;
+	const entity_id controlled_character_id;
 	const vec2 character_pos;
 	const real32 dt_secs;
 	const real32 global_time_secs;

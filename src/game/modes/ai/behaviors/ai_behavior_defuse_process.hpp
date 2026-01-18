@@ -20,17 +20,11 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	auto& target_crosshair_offset = ctx.ai_state.target_crosshair_offset;
 	const bool pathfinding_just_completed = ctx.pathfinding_just_completed;
 
-	/*
-		We need a character handle - get it from the bot's controlled character.
-	*/
-	const auto& players = cosm.get_common_significant().mode_players;
-	entity_id character_id;
+	const auto character_handle = cosm[ctx.controlled_character_id];
 
-	/*
-		For now, we'll need to get character_id from ai_state or pass it differently.
-		Since we're in the defuse behavior, the bomb entity should be set.
-	*/
-	(void)players;
+	if (!character_handle.alive()) {
+		return;
+	}
 
 	/*
 		Handle path completion - start defusing.
@@ -38,6 +32,16 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	if (pathfinding_just_completed && !is_defusing) {
 		AI_LOG("Reached bomb - starting defuse");
 		is_defusing = true;
+
+		const auto current_wielding = wielding_setup::from_current(character_handle);
+
+		if (!current_wielding.is_bare_hands(cosm)) {
+			::perform_wielding(step, character_handle, wielding_setup::bare_hands());
+		}
+
+		if (auto* sentience = character_handle.find<components::sentience>()) {
+			sentience->is_requesting_interaction = true;
+		}
 	}
 
 	/*
@@ -49,8 +53,10 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 		if (bomb_handle.alive()) {
 			const auto bomb_pos = bomb_handle.get_logic_transform().pos;
 			target_crosshair_offset = bomb_pos - character_pos;
+
+			if (auto* sentience = character_handle.find<components::sentience>()) {
+				sentience->is_requesting_interaction = true;
+			}
 		}
 	}
-
-	(void)step;
 }
