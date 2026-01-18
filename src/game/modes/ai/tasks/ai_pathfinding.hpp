@@ -645,6 +645,41 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 ) {
 	const auto current_target_opt = ::get_current_path_target(pathfinding, navmesh);
 	const auto target_pos = pathfinding.target_position();
+	
+	/*
+		Lambda for calculating eased crosshair offset.
+		
+		t interpolates between:
+		- t = 0: looking at look_at_point
+		- t = 1: looking in target transform's direction
+		
+		Uses augs::interp for smooth interpolation.
+	*/
+	const auto calc_eased_crosshair = [&](const vec2 look_at_point, const float t) -> vec2 {
+		return augs::interp(look_at_point - bot_pos, pathfinding.target_transform.get_direction() * 200.0f, t);
+	};
+	
+	/*
+		Get total ease distance - the path from the penultimate cell edge
+		to the final destination (cell center or exact destination).
+		
+		This is used for continuous t calculation across both branches:
+		- While on penultimate cell approaching its center
+		- While past cell center approaching exact destination
+	*/
+	auto get_total_ease_distance = [&](const float cell_size, const vec2 final_cell_center) -> float {
+		if (pathfinding.exact_destination) {
+			/* 
+				For exact mode: cell_size + distance from cell center to exact destination
+				So t goes from 0 (at cell edge) to 1 (at exact destination).
+			*/
+			return cell_size + (target_pos - final_cell_center).length();
+		}
+		else {
+			/* For non-exact mode: just the cell size. t = 1 at cell center. */
+			return cell_size;
+		}
+	};
 
 	if (!current_target_opt.has_value()) {
 		/*
@@ -653,49 +688,46 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 			
 			For exact destination mode, continue easing the crosshair based on
 			distance to exact destination. This continues the easing that started
-			on the penultimate tile.
+			on the penultimate tile, with the same t calculation.
 		*/
 		const auto dir = target_pos - bot_pos;
 		const auto dist_to_exact = dir.length();
 		
-		/*
-			The easing continues from where the penultimate tile left off.
-			When we're at the cell center, t was already somewhere in (0, 1).
-			As we approach the exact destination, t approaches 1.0.
-			
-			Use the distance from the last cell center to exact destination
-			as the "remaining" easing distance. When dist_to_exact = 0, t = 1.
-		*/
 		if (pathfinding.exact_destination && dist_to_exact > 0.0f) {
 			/*
-				Get the last cell center (if available) to calculate proper easing.
-				If no cells, just use a reasonable ease radius.
+				Get the last cell info (if available) to calculate proper easing.
+				The t value must be continuous with what we calculated on the penultimate tile.
 			*/
 			const auto& main_path = pathfinding.main.path;
-			float ease_distance = 120.0f; /* Default ease radius */
 			
 			if (main_path.island_index < navmesh.islands.size() && !main_path.nodes.empty()) {
 				const auto& island = navmesh.islands[main_path.island_index];
+				const auto cell_size = static_cast<float>(island.cell_size);
 				const auto last_cell = main_path.nodes.back().cell_xy;
 				const auto last_cell_center = ::cell_to_world(island, last_cell);
-				ease_distance = (target_pos - last_cell_center).length();
-			}
-			
-			if (ease_distance > 0.0f) {
-				const auto t = std::clamp(1.0f - dist_to_exact / ease_distance, 0.0f, 1.0f);
 				
-				const auto target_direction = pathfinding.target_transform.get_direction();
-				const auto look_at_target = vec2(dir).normalize() * 200.0f;
-				const auto look_in_target_dir = target_direction * 200.0f;
+				/*
+					Total ease distance = cell_size + dist(cell_center, exact_destination)
+					Remaining distance = dist(bot_pos, exact_destination)
+					t = 1 - remaining / total
+					
+					When at cell center: remaining = dist(cell_center, exact_destination)
+					When at exact: remaining = 0, t = 1
+				*/
+				const auto dist_cell_to_exact = (target_pos - last_cell_center).length();
+				const auto total_ease_distance = cell_size + dist_cell_to_exact;
 				
-				target_crosshair_offset = look_at_target + (look_in_target_dir - look_at_target) * t;
-				return vec2(dir).normalize();
+				if (total_ease_distance > 0.0f) {
+					const auto t = std::clamp(1.0f - dist_to_exact / total_ease_distance, 0.0f, 1.0f);
+					target_crosshair_offset = calc_eased_crosshair(target_pos, t);
+					return dir.normalize();
+				}
 			}
 		}
 		
 		/* Default: just look in target direction */
 		target_crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
-		return vec2(dir).normalize();
+		return dir.normalize();
 	}
 
 	const auto current_target = *current_target_opt;
@@ -786,36 +818,25 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 				/*
 					Ease towards the target transform's facing direction.
 					
-					For exact destination mode, we need to "concatenate" the distance:
-					- From the current position to the final cell center
-					- Plus from the final cell center to the exact destination
+					Total ease distance: cell_size + distance from cell center to exact destination.
+					Remaining distance: distance from bot to cell center + distance from cell center to exact.
 					
-					So t = 0 at start of penultimate cell, and t = 1 at exact destination.
-					This makes the easing continuous rather than completing at cell center.
+					t = 1 - remaining / total
+					
+					This ensures continuity:
+					- When entering penultimate cell (at cell edge): t = 0
+					- When at cell center: t = cell_size / total
+					- When at exact destination: t = 1
 				*/
 				const auto dist_to_current = (bot_pos - current_target).length();
-				
-				/*
-					Calculate total distance to ease over:
-					- Distance from cell edge (cell_size away) to cell center
-					- Plus distance from cell center to exact destination (if exact mode)
-				*/
 				const auto dist_cell_to_exact = (target_pos - current_target).length();
 				const auto total_ease_distance = cell_size + dist_cell_to_exact;
-				
-				/*
-					Current progress: how far we've traveled from cell_size away to exact destination.
-					At cell_size away from cell center: t = 0
-					At exact destination: t = 1
-				*/
 				const auto remaining_distance = dist_to_current + dist_cell_to_exact;
+				
 				const auto t = std::clamp(1.0f - remaining_distance / total_ease_distance, 0.0f, 1.0f);
-
-				const auto target_dir = pathfinding.target_transform.get_direction();
-				const auto final_look_point = target_pos + target_dir * 200.0f;
-				(void)final_look_point;
-
-				target_crosshair_offset = augs::interp(current_target - bot_pos, pathfinding.target_transform.get_direction() * 200, t);
+				
+				/* Use the same calc_eased_crosshair lambda as the post-cell-path branch */
+				target_crosshair_offset = calc_eased_crosshair(current_target, t);
 				set_already = true;
 			}
 		}
