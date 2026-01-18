@@ -133,6 +133,18 @@ inline void ai_behavior_patrol::clear_waypoint() {
 	camp_duration = 0.0f;
 }
 
+inline bool ai_behavior_patrol::is_going_far() const {
+	if (is_camping()) {
+		return false;
+	}
+
+	if (is_pushing()) {
+		return true;
+	}
+
+	return going_to_first_waypoint;
+}
+
 inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
 	auto& ai_state = ctx.ai_state;
@@ -179,7 +191,18 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 				AI_LOG("Camp waypoint - setting up camp");
 				const auto wp_transform = wp_handle.get_logic_transform();
 				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, current_waypoint);
+
 				camp_timer = rng.randval(min_secs, max_secs);
+
+				if (!walk_silently_to_next_waypoint) {
+					/*
+						If we were loud coming here,
+						stay only a moment.
+					*/
+					camp_timer /= 5.0f;
+					camp_timer = std::min(camp_timer, 2.0f);
+				}
+
 				camp_duration = camp_timer;
 				camp_center = wp_transform.pos;
 				camp_twitch_target = wp_transform.pos;
@@ -202,8 +225,6 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		   	sprint back to the actual patrol waypoint.
 		*/
 
-		going_to_first_waypoint = now_waypoint.is_push_waypoint;
-
 		const auto new_wp = ::find_random_unassigned_patrol_waypoint(
 			cosm,
 			team_state,
@@ -214,6 +235,9 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		);
 
 		if (new_wp.is_set()) {
+			going_to_first_waypoint = now_waypoint.is_push_waypoint || !now_waypoint.waypoint_id.is_set();
+			walk_silently_to_next_waypoint = rng.randval(0, 99) > 18;
+
 			AI_LOG("Found new patrol waypoint");
 			current_waypoint = new_wp;
 		}
