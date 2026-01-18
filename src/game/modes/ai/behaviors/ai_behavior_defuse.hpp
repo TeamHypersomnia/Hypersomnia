@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/math/vec2.h"
-#include "game/cosmos/entity_id.h"
+
+struct ai_behavior_process_ctx;
 
 /*
 	Defuse behavior.
@@ -20,13 +20,5 @@ struct ai_behavior_defuse {
 		Process defuse behavior for this frame.
 		Handles path completion by starting defuse.
 	*/
-	template <typename CharacterHandle, typename Step>
-	void process(
-		CharacterHandle character_handle,
-		Step& step,
-		const vec2 character_pos,
-		const entity_id bomb_entity,
-		vec2& target_crosshair_offset,
-		const bool pathfinding_just_completed
-	);
+	void process(ai_behavior_process_ctx& ctx);
 };

@@ -10,7 +10,7 @@
 	Stateless calculation of the current pathfinding request.
 	
 	This function determines WHERE the bot wants to pathfind based on:
-	- Current behavior type (COMBAT, PATROLLING, PUSHING, etc.)
+	- Current behavior type (COMBAT, PATROLLING, etc.)
 	- Persistent state (combat_target, etc.)
 	- Team state (bomb retrieval, defuse missions)
 	- Game state (bomb planted, etc.)
@@ -18,6 +18,8 @@
 	The actual pathfinding is only reinitialized when the request changes.
 	This centralizes all pathfinding target decisions in one place.
 	Uses std::visit on the behavior variant.
+	
+	Note: Push waypoints are now handled inside patrol behavior.
 */
 
 inline ai_pathfinding_request calc_current_pathfinding_request(
@@ -88,12 +90,19 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 
 			return ai_pathfinding_request::none();
 		}
-		else if constexpr (std::is_same_v<T, ai_behavior_push>) {
+		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
 			/*
-				PUSHING state - pathfind to push waypoint.
+				PATROL state - push_waypoint takes priority over current_waypoint.
 			*/
-			if (b.target_waypoint.is_set()) {
-				const auto wp_handle = cosm[b.target_waypoint];
+			if (b.is_camping()) {
+				return ai_pathfinding_request::none();
+			}
+
+			/*
+				Push waypoint has priority.
+			*/
+			if (b.push_waypoint.is_set()) {
+				const auto wp_handle = cosm[b.push_waypoint];
 
 				if (wp_handle.alive()) {
 					const auto wp_transform = wp_handle.get_logic_transform();
@@ -101,16 +110,9 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 				}
 			}
 
-			return ai_pathfinding_request::none();
-		}
-		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
 			/*
-				PATROLLING state - pathfind to patrol waypoint.
+				Normal patrol waypoint.
 			*/
-			if (b.is_camping()) {
-				return ai_pathfinding_request::none();
-			}
-
 			if (b.current_waypoint.is_set()) {
 				const auto wp_handle = cosm[b.current_waypoint];
 

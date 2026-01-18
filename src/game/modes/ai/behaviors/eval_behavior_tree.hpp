@@ -32,6 +32,9 @@ struct ai_round_state {
 	
 	Returns a variant containing the desired behavior with its initial
 	parameters set in case we need to transition to it.
+	
+	Note: Push waypoints are now set in ai_behavior_patrol::push_waypoint
+	instead of returning a separate ai_behavior_push.
 */
 
 inline ai_behavior_variant eval_behavior_tree(
@@ -125,61 +128,60 @@ inline ai_behavior_variant eval_behavior_tree(
 	}
 
 	/*
-		Priority 4: Check if we have a PUSH waypoint assigned.
-		This is determined by persistent state (has_pushed_already = false).
-	*/
-	if (!ai_state.has_pushed_already) {
-		if (is_resistance) {
-			/*
-				Resistance: try to get a push waypoint.
-			*/
-			const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
-
-			if (push_wp.is_set()) {
-				ai_behavior_push push_behavior;
-				push_behavior.target_waypoint = push_wp;
-				return push_behavior;
-			}
-		}
-		else if (is_metropolis) {
-			/*
-				Metropolis: 20% chance to choose push waypoint.
-			*/
-			const bool choose_push = rng.randval(0, 99) < 20;
-
-			if (choose_push) {
-				const auto push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
-
-				if (push_wp.is_set()) {
-					ai_behavior_push push_behavior;
-					push_behavior.target_waypoint = push_wp;
-					return push_behavior;
-				}
-			}
-		}
-	}
-
-	/*
-		Priority 5: PATROL - default behavior for assigned patrol area.
+		Priority 4: PATROL behavior (with optional push_waypoint).
+		
+		If has_pushed_already == false, we'll set the push_waypoint in the patrol behavior.
+		The patrol::process() will handle clearing it once reached.
 	*/
 	{
 		ai_behavior_patrol patrol_behavior;
 		patrol_behavior.going_to_first_waypoint = true;
 
 		/*
-			Find an unassigned patrol waypoint in the assigned area.
+			If not pushed yet, try to assign a push waypoint.
 		*/
-		const auto new_wp = ::find_random_unassigned_patrol_waypoint(
-			cosm,
-			team_state,
-			ai_state.patrol_letter,
-			bot_player_id,
-			entity_id::dead(),
-			rng
-		);
+		if (!ai_state.has_pushed_already) {
+			entity_id push_wp;
 
-		if (new_wp.is_set()) {
-			patrol_behavior.current_waypoint = new_wp;
+			if (is_resistance) {
+				/*
+					Resistance: try to get a push waypoint.
+				*/
+				push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
+			}
+			else if (is_metropolis) {
+				/*
+					Metropolis: 20% chance to choose push waypoint.
+				*/
+				const bool choose_push = rng.randval(0, 99) < 20;
+
+				if (choose_push) {
+					push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
+				}
+			}
+
+			if (push_wp.is_set()) {
+				patrol_behavior.push_waypoint = push_wp;
+			}
+		}
+
+		/*
+			Find an unassigned patrol waypoint in the assigned area.
+			Only if we don't have a push waypoint.
+		*/
+		if (!patrol_behavior.push_waypoint.is_set()) {
+			const auto new_wp = ::find_random_unassigned_patrol_waypoint(
+				cosm,
+				team_state,
+				ai_state.patrol_letter,
+				bot_player_id,
+				entity_id::dead(),
+				rng
+			);
+
+			if (new_wp.is_set()) {
+				patrol_behavior.current_waypoint = new_wp;
+			}
 		}
 
 		return patrol_behavior;
@@ -192,16 +194,14 @@ inline ai_behavior_variant eval_behavior_tree(
 	Called when the behavior type changes (new behavior different from last).
 	Performs cleanup/setup operations needed when switching behaviors.
 	
-	For simplicity, this function always unassigns waypoints and clears
-	common transition state, regardless of which behaviors are involved.
+	Note: Waypoint assignments are now handled statelessly via calc_assigned_waypoint,
+	so we don't need to assign/unassign waypoints here.
 */
 
 inline void behavior_state_transition(
 	const ai_behavior_variant& last_behavior,
 	const ai_behavior_variant& new_behavior,
-	arena_mode_ai_state& ai_state,
-	arena_mode_ai_team_state& team_state,
-	const mode_player_id& bot_player_id
+	arena_mode_ai_state& ai_state
 ) {
 	/*
 		If behavior type is the same, no transition needed.
@@ -211,38 +211,19 @@ inline void behavior_state_transition(
 	}
 
 	/*
-		Always unassign waypoints on any behavior change.
-		This ensures clean slate for the new behavior.
+		If transitioning FROM patrol with push_waypoint, mark push as done.
 	*/
-	::unassign_bot_from_waypoints(team_state, bot_player_id);
-
-	/*
-		If transitioning to PUSH, assign the push waypoint.
-	*/
-	if (const auto* push = ::get_behavior_if<ai_behavior_push>(new_behavior)) {
-		if (push->target_waypoint.is_set()) {
-			::assign_waypoint(team_state, push->target_waypoint, bot_player_id);
+	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(last_behavior)) {
+		if (patrol->push_waypoint.is_set()) {
+			ai_state.has_pushed_already = true;
 		}
-	}
-
-	/*
-		If transitioning to PATROL, assign the patrol waypoint.
-	*/
-	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(new_behavior)) {
-		if (patrol->current_waypoint.is_set()) {
-			::assign_waypoint(team_state, patrol->current_waypoint, bot_player_id);
-		}
-	}
-
-	/*
-		If transitioning FROM push, mark push as done.
-	*/
-	if (::is_behavior<ai_behavior_push>(last_behavior)) {
-		ai_state.has_pushed_already = true;
 	}
 
 	/*
 		NOTE: We do NOT reset pathfinding here.
 		Pathfinding resets itself when the calc_pathfinding_request changes.
+		
+		NOTE: We do NOT assign/unassign waypoints here.
+		Waypoint assignments are handled statelessly via calc_assigned_waypoint.
 	*/
 }

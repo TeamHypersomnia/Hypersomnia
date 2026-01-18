@@ -5,11 +5,15 @@
 /*
 	Stateless intent calculations that std::visit the behavior variant.
 	These functions centralize the logic for determining bot intents.
+	
+	Note: ai_behavior_push has been merged into ai_behavior_patrol.
+	The patrol's push_waypoint field now indicates push state.
 */
 
 /*
 	Determines if the bot should holster weapons.
 	Returns true when patrolling/traveling to first waypoint without combat.
+	Returns true when pushing (patrol with push_waypoint set).
 	Always false in COMBAT.
 */
 
@@ -21,10 +25,8 @@ inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
 			return false;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
-			return b.going_to_first_waypoint;
-		}
-		else if constexpr (std::is_same_v<T, ai_behavior_push>) {
-			return true;
+			/* Holster when pushing or going to first waypoint. */
+			return b.is_pushing() || b.going_to_first_waypoint;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_plant>) {
 			return true;
@@ -38,11 +40,11 @@ inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
 /*
 	Determines if the bot should sprint.
 	- First/switching waypoint in patrol
-	- Going to PUSH waypoint
+	- Pushing (patrol with push_waypoint set)
 	- In COMBAT (chasing)
 	- Retrieving bomb
 	
-	Additionally, for patrol/push states, sprinting is only allowed when
+	Additionally, for patrol states, sprinting is only allowed when
 	the movement direction is mostly parallel to the pathfinding direction
 	(can_sprint from navigation result).
 */
@@ -55,10 +57,11 @@ inline bool should_sprint(const ai_behavior_variant& behavior, const bool nav_ca
 			return true;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
+			/* Sprint when pushing or going to first waypoint. */
+			if (b.is_pushing()) {
+				return nav_can_sprint;
+			}
 			return b.going_to_first_waypoint && nav_can_sprint;
-		}
-		else if constexpr (std::is_same_v<T, ai_behavior_push>) {
-			return nav_can_sprint;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
 			return true;
@@ -83,13 +86,18 @@ inline bool is_camping(const ai_behavior_variant& behavior) {
 
 /*
 	Determines if the bot should walk silently.
-	Only when patrolling (and not going to first waypoint).
+	Only when patrolling (and not going to first waypoint or pushing).
 	85% chance to walk silently when choosing next waypoint.
 	Always walk silently when camping.
 */
 
 inline bool should_walk_silently(const ai_behavior_variant& behavior) {
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
+		/* Never walk silently when pushing. */
+		if (patrol->is_pushing()) {
+			return false;
+		}
+
 		/* Always walk silently when camping (twitching). */
 		if (patrol->is_camping()) {
 			return true;
