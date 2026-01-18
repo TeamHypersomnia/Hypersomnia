@@ -182,17 +182,9 @@ struct arena_mode_ai_team_state {
 
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
-	/*
-		New behavior tree architecture.
-		last_behavior holds the current behavior state as a variant.
-		combat_target is persistent target tracking.
-	*/
 	ai_behavior_variant last_behavior = ai_behavior_idle();
 	ai_target_tracking combat_target;
 
-	/*
-		Persistent state that survives behavior transitions.
-	*/
 	marker_letter_type patrol_letter = marker_letter_type::A;
 	bool has_pushed_already = false;
 

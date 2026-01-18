@@ -1,3 +1,4 @@
+#pragma once
 #include <cstddef>
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/weapon_like.h"

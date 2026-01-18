@@ -48,6 +48,8 @@ inline ai_behavior_variant eval_behavior_tree(
 	const bool is_resistance = (bot_faction == faction_type::RESISTANCE);
 	const auto global_time_secs = round_state.global_time_secs;
 
+	(void)character_pos;
+
 	/*
 		Priority 1: COMBAT if we have an active combat target.
 	*/

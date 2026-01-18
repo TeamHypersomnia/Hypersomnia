@@ -77,7 +77,7 @@ arena_ai_result update_arena_mode_ai(
 	auto& movement = character_handle.get<components::movement>();
 	const auto character_pos = character_handle.get_logic_transform().pos;
 	const auto dt_secs = step.get_delta().in_seconds();
-	const auto global_time_secs = cosm.get_total_seconds_passed();
+	const auto global_time_secs = static_cast<real32>(cosm.get_total_seconds_passed());
 	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	const auto ctx = ai_character_context{
