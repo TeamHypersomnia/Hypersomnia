@@ -3,6 +3,10 @@
 void movement_flags::set_from_closest_direction(vec2 d) {
 	left = right = forward = backward = false;
 
+	if (d == vec2::zero) {
+		return;
+	}
+
 	static const vec2 dirs[] = {
 		vec2::from_degrees(0),
 		vec2::from_degrees(45 * 1),
