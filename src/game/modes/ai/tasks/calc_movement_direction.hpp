@@ -15,6 +15,7 @@ struct movement_direction_result {
 	vec2 crosshair_offset = vec2::zero;
 	bool path_completed = false;
 	bool is_navigating = false;
+	bool can_sprint = false;  /* True when movement direction is mostly parallel to path direction (within ~15 degrees). */
 };
 
 /*
@@ -50,7 +51,7 @@ inline movement_direction_result calc_current_movement_direction(
 		If camping (patrolling with camp timer > 0), do camp twitching.
 	*/
 	if (::is_camping(ai_state)) {
-		const auto twitch_dir = ::update_camp_twitch(ai_state, character_pos, rng);
+		const auto twitch_dir = ::update_camp_twitch(ai_state, character_pos, dt, rng);
 		result.direction = twitch_dir;
 		/*
 			Look in the direction of the waypoint transform while camping.
@@ -74,6 +75,7 @@ inline movement_direction_result calc_current_movement_direction(
 		result.path_completed = nav_result.path_completed;
 		result.is_navigating = nav_result.is_navigating;
 		result.crosshair_offset = nav_result.crosshair_offset;
+		result.can_sprint = nav_result.can_sprint;
 
 		if (nav_result.is_navigating) {
 			result.direction = nav_result.movement_direction;

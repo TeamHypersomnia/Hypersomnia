@@ -34,19 +34,23 @@ inline bool should_holster_weapons(const arena_mode_ai_state& ai_state) {
 	- First/switching waypoint in patrol
 	- Going to PUSH waypoint
 	- In COMBAT (chasing)
+	
+	Additionally, for patrol/push states, sprinting is only allowed when
+	the movement direction is mostly parallel to the pathfinding direction
+	(can_sprint from navigation result).
 */
 
-inline bool should_sprint(const arena_mode_ai_state& ai_state) {
+inline bool should_sprint(const arena_mode_ai_state& ai_state, const bool nav_can_sprint = true) {
 	if (ai_state.current_state == bot_state_type::COMBAT) {
 		return true;
 	}
 
 	if (ai_state.current_state == bot_state_type::PATROLLING && ai_state.going_to_first_waypoint) {
-		return true;
+		return nav_can_sprint;
 	}
 
 	if (ai_state.current_state == bot_state_type::PUSHING) {
-		return true;
+		return nav_can_sprint;
 	}
 
 	if (ai_state.current_state == bot_state_type::RETRIEVING_BOMB) {

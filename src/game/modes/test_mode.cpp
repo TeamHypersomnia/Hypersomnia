@@ -407,10 +407,12 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 					/*
 						Apply movement direction if pathfinding is active.
+						Apply sprinting if nav_result.can_sprint is true.
 					*/
 					if (nav_result.is_navigating && nav_result.movement_direction.has_value()) {
 						if (auto* movement = character.find<components::movement>()) {
 							movement->flags.set_from_closest_direction(*nav_result.movement_direction);
+							movement->flags.sprinting = nav_result.can_sprint;
 						}
 					}
 					else if (nav_result.path_completed) {
@@ -419,6 +421,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						*/
 						if (auto* movement = character.find<components::movement>()) {
 							movement->flags.set_from_closest_direction(vec2::zero);
+							movement->flags.sprinting = false;
 						}
 					}
 
