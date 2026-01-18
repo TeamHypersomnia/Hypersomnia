@@ -38,12 +38,13 @@
 #include "game/modes/ai/tasks/ai_behavior_tree.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/modes/ai/behaviors/eval_behavior_tree.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_process_ctx.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
-#include "game/modes/ai/behaviors/ai_behavior_push_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
 #include "game/modes/ai/intents/calc_pathfinding_request.hpp"
 #include "game/modes/ai/intents/calc_movement_direction.hpp"
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
+#include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 #include "game/modes/ai/intents/should_helpers.hpp"
 
 arena_ai_result update_arena_mode_ai(
@@ -148,9 +149,7 @@ arena_ai_result update_arena_mode_ai(
 		::behavior_state_transition(
 			ai_state.last_behavior,
 			desired_behavior,
-			ai_state,
-			team_state,
-			bot_player_id
+			ai_state
 		);
 		ai_state.last_behavior = desired_behavior;
 	}
@@ -212,52 +211,39 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		===========================================================================
 		PHASE 5: Process current behavior (call process() on last_behavior via std::visit).
+		All behaviors receive the same context struct.
 		===========================================================================
 	*/
 
-	const bool pathfinding_just_completed = move_result.path_completed;
+	{
+		auto process_ctx = ai_behavior_process_ctx{
+			cosm,
+			step,
+			ai_state,
+			team_state,
+			bot_player_id,
+			bot_faction,
+			character_pos,
+			dt_secs,
+			global_time_secs,
+			stable_rng,
+			bomb_entity,
+			bomb_planted,
+			move_result.path_completed
+		};
 
-	std::visit([&](auto& behavior) {
-		using T = std::decay_t<decltype(behavior)>;
+		std::visit([&](auto& behavior) {
+			using T = std::decay_t<decltype(behavior)>;
 
-		if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
-			behavior.process(
-				cosm,
-				ai_state,
-				team_state,
-				bot_player_id,
-				character_pos,
-				dt_secs,
-				stable_rng,
-				pathfinding_just_completed
-			);
-		}
-		else if constexpr (std::is_same_v<T, ai_behavior_push>) {
-			const auto new_patrol = behavior.process(
-				cosm,
-				ai_state,
-				team_state,
-				bot_player_id,
-				stable_rng,
-				pathfinding_just_completed
-			);
-
-			if (new_patrol.has_value()) {
-				ai_state.last_behavior = *new_patrol;
+			if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
+				behavior.process(process_ctx);
 			}
-		}
-		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
-			behavior.process(
-				character_handle,
-				step,
-				character_pos,
-				bomb_entity,
-				ai_state.target_crosshair_offset,
-				pathfinding_just_completed
-			);
-		}
-		/* Other behaviors (idle, combat, retrieve_bomb, plant) don't need process() yet. */
-	}, ai_state.last_behavior);
+			else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
+				behavior.process(process_ctx);
+			}
+			/* Other behaviors (idle, combat, retrieve_bomb, plant) don't need process() yet. */
+		}, ai_state.last_behavior);
+	}
 
 	/* Update crosshair offset from movement calculation. */
 	if (move_result.crosshair_offset != vec2::zero) {

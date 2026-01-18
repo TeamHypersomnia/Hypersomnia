@@ -145,8 +145,12 @@ struct ai_pathfinding_request {
 struct ai_waypoint_state {
 	// GEN INTROSPECTOR struct ai_waypoint_state
 	entity_id waypoint_id;
-	mode_player_id assigned_bot;
 	// END GEN INTROSPECTOR
+
+	/*
+		Non-introspected: Assignment cache, updated statelessly each frame.
+	*/
+	mode_player_id assigned_bot;
 
 	bool is_assigned() const {
 		return assigned_bot.is_set();
@@ -169,14 +173,22 @@ struct arena_mode_ai_team_state {
 	// END GEN INTROSPECTOR
 
 	void round_reset() {
+		/*
+			Don't clear waypoint lists - they are gathered at round start.
+			Just clear the assignments.
+		*/
+		clear_waypoint_assignments();
+		bot_with_defuse_mission = mode_player_id::dead();
+		bot_with_bomb_retrieval_mission = mode_player_id::dead();
+	}
+
+	void clear_waypoint_assignments() {
 		for (auto& wp : patrol_waypoints) {
 			wp.assigned_bot = mode_player_id::dead();
 		}
 		for (auto& wp : push_waypoints) {
 			wp.assigned_bot = mode_player_id::dead();
 		}
-		bot_with_defuse_mission = mode_player_id::dead();
-		bot_with_bomb_retrieval_mission = mode_player_id::dead();
 	}
 };
 

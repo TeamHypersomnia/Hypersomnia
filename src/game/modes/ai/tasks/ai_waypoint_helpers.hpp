@@ -53,6 +53,35 @@ inline void gather_waypoints_for_team(
 }
 
 /*
+	Assign a waypoint to a bot.
+	Used during stateless waypoint assignment update.
+*/
+
+inline void assign_waypoint(
+	arena_mode_ai_team_state& team_state,
+	const entity_id waypoint_id,
+	const mode_player_id& bot_id
+) {
+	if (!waypoint_id.is_set()) {
+		return;
+	}
+
+	for (auto& wp : team_state.patrol_waypoints) {
+		if (wp.waypoint_id == waypoint_id) {
+			wp.assigned_bot = bot_id;
+			return;
+		}
+	}
+
+	for (auto& wp : team_state.push_waypoints) {
+		if (wp.waypoint_id == waypoint_id) {
+			wp.assigned_bot = bot_id;
+			return;
+		}
+	}
+}
+
+/*
 	Find a random unassigned patrol waypoint of a specific letter.
 	Returns entity_id::dead() if none found.
 */
@@ -94,51 +123,6 @@ inline entity_id find_random_unassigned_patrol_waypoint(
 	}
 
 	return rng.rand_element(available);
-}
-
-/*
-	Assign a waypoint to a bot.
-*/
-
-inline void assign_waypoint(
-	arena_mode_ai_team_state& team_state,
-	const entity_id waypoint_id,
-	const mode_player_id& bot_id
-) {
-	for (auto& wp : team_state.patrol_waypoints) {
-		if (wp.waypoint_id == waypoint_id) {
-			wp.assigned_bot = bot_id;
-			return;
-		}
-	}
-
-	for (auto& wp : team_state.push_waypoints) {
-		if (wp.waypoint_id == waypoint_id) {
-			wp.assigned_bot = bot_id;
-			return;
-		}
-	}
-}
-
-/*
-	Unassign a bot from any waypoints they currently hold.
-*/
-
-inline void unassign_bot_from_waypoints(
-	arena_mode_ai_team_state& team_state,
-	const mode_player_id& bot_id
-) {
-	for (auto& wp : team_state.patrol_waypoints) {
-		if (wp.assigned_bot == bot_id) {
-			wp.assigned_bot = mode_player_id::dead();
-		}
-	}
-
-	for (auto& wp : team_state.push_waypoints) {
-		if (wp.assigned_bot == bot_id) {
-			wp.assigned_bot = mode_player_id::dead();
-		}
-	}
 }
 
 /*
