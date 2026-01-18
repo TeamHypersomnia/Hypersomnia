@@ -223,6 +223,7 @@ arena_ai_result update_arena_mode_ai(
 			team_state,
 			bot_player_id,
 			bot_faction,
+			controlled_character_id,
 			character_pos,
 			dt_secs,
 			global_time_secs,
