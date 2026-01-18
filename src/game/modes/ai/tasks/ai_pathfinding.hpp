@@ -685,7 +685,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 				const auto t = std::clamp(1.0f - dist_to_exact / ease_distance, 0.0f, 1.0f);
 				
 				const auto target_direction = pathfinding.target_transform.get_direction();
-				const auto look_at_target = dir.normalize() * 200.0f;
+				const auto look_at_target = vec2(dir).normalize() * 200.0f;
 				const auto look_in_target_dir = target_direction * 200.0f;
 				
 				target_crosshair_offset = look_at_target + (look_in_target_dir - look_at_target) * t;
@@ -729,6 +729,7 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 
 	const auto& active_progress = *active_progress_ptr;
 	const auto& path = active_progress.path;
+	bool set_already = false;
 
 	if (path.island_index < navmesh.islands.size()) {
 		const auto& island = navmesh.islands[path.island_index];
@@ -812,13 +813,17 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 
 				const auto target_dir = pathfinding.target_transform.get_direction();
 				const auto final_look_point = target_pos + target_dir * 200.0f;
+				(void)final_look_point;
 
-				look_ahead_target = current_target + (final_look_point - current_target) * t;
+				target_crosshair_offset = augs::interp(current_target - bot_pos, pathfinding.target_transform.get_direction() * 200, t);
+				set_already = true;
 			}
 		}
 	}
 
-	target_crosshair_offset = look_ahead_target - bot_pos;
+	if (!set_already) {
+		target_crosshair_offset = look_ahead_target - bot_pos;
+	}
 
 	/*
 		Track stuck time on the same cell.
