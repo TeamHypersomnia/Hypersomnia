@@ -198,7 +198,7 @@ struct arena_mode_ai_state {
 	ai_target_tracking combat_target;
 
 	marker_letter_type patrol_letter = marker_letter_type::A;
-	bool has_pushed_already = false;
+	bool tried_push_already = false;
 
 	vec2 target_crosshair_offset = vec2::zero;
 
@@ -228,7 +228,7 @@ struct arena_mode_ai_state {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
 		patrol_letter = marker_letter_type::A;
-		has_pushed_already = false;
+		tried_push_already = false;
 		target_crosshair_offset = vec2::zero;
 		already_tried_to_buy = false;
 		purchase_decision_countdown = -1.0f;

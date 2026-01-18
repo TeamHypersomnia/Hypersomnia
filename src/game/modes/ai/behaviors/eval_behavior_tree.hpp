@@ -130,7 +130,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	/*
 		Priority 4: PATROL behavior (with optional push_waypoint).
 		
-		If has_pushed_already == false, we'll set the push_waypoint in the patrol behavior.
+		If tried_push_already == false, we'll set the push_waypoint in the patrol behavior.
 		The patrol::process() will handle clearing it once reached.
 	*/
 	{
@@ -140,7 +140,10 @@ inline ai_behavior_variant eval_behavior_tree(
 		/*
 			If not pushed yet, try to assign a push waypoint.
 		*/
-		if (!ai_state.has_pushed_already) {
+		if (!ai_state.tried_push_already) {
+			/* Try this only once */
+			ai_state.tried_push_already = true;
+
 			entity_id push_wp;
 
 			if (is_resistance) {
@@ -193,9 +196,6 @@ inline ai_behavior_variant eval_behavior_tree(
 	
 	Called when the behavior type changes (new behavior different from last).
 	Performs cleanup/setup operations needed when switching behaviors.
-	
-	Note: Waypoint assignments are now handled statelessly via calc_assigned_waypoint,
-	so we don't need to assign/unassign waypoints here.
 */
 
 inline void behavior_state_transition(
@@ -215,7 +215,7 @@ inline void behavior_state_transition(
 	*/
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(last_behavior)) {
 		if (patrol->push_waypoint.is_set()) {
-			ai_state.has_pushed_already = true;
+			ai_state.tried_push_already = true;
 		}
 	}
 

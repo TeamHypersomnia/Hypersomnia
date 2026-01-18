@@ -233,17 +233,11 @@ arena_ai_result update_arena_mode_ai(
 			move_result.path_completed
 		};
 
-		std::visit([&](auto& behavior) {
-			using T = std::decay_t<decltype(behavior)>;
+		auto process_lbd = [auto& behavior]() {
+			behavior.process(process_ctx);
+		};
 
-			if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
-				behavior.process(process_ctx);
-			}
-			else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
-				behavior.process(process_ctx);
-			}
-			/* Other behaviors (idle, combat, retrieve_bomb, plant) don't need process() yet. */
-		}, ai_state.last_behavior);
+		std::visit(process_lbd, ai_state.last_behavior);
 	}
 
 	/* Update crosshair offset from movement calculation. */

@@ -139,7 +139,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			}
 
 			push_waypoint = entity_id::dead();
-			ai_state.has_pushed_already = true;
+			ai_state.tried_push_already = true;
 			going_to_first_waypoint = true;
 		}
 		/* Still pushing - don't process normal patrol logic. */
@@ -195,9 +195,4 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			}
 		}
 	}
-
-	/*
-		Pick a new waypoint if we don't have one (handled by calc_assigned_waypoint intent).
-		The actual assignment is done statelessly before update_arena_mode_ai.
-	*/
 }
