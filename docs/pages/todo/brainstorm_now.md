@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- contact_listener.cpp should SetEnabled(false) on a contact between teammates when one of them is defusing, will prevent from bots walking onto each other and interrupting defusal.
+
 - pathfinding
 	- portals preprocessing
 		- with simple euclidean distance, check if dist to any portal + dist from its exit to destination is shorter than just euclidean to destination
