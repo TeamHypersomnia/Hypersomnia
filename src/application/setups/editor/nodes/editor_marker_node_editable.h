@@ -113,7 +113,7 @@ struct editor_point_marker_node_editable {
 
 struct editor_area_marker_node_editable {
 	// GEN INTROSPECTOR struct editor_area_marker_node_editable
-	faction_type faction = faction_type::RESISTANCE;
+	faction_type faction = faction_type::ANY;
 	marker_letter_type letter = marker_letter_type::A;
 	marker_shape_type shape = marker_shape_type::BOX;
 

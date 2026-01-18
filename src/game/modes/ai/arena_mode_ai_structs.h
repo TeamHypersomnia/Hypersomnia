@@ -133,13 +133,15 @@ struct ai_pathfinding_request {
 
 enum class bot_state_type {
 	// GEN INTROSPECTOR enum class bot_state_type
-	IDLE,
-	PATROLLING,
-	PUSHING,
 	COMBAT,
+	PUSHING,
+	PATROLLING,
 	PLANTING,
 	DEFUSING,
 	RETRIEVING_BOMB,
+
+	IDLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
