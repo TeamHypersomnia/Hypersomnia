@@ -190,14 +190,6 @@ struct arena_mode_ai_team_state {
 
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
-	float movement_timer_remaining = 0.0f;
-	float movement_duration_secs = 0.0f;
-
-	float shooting_timer_remaining = 0.0f;
-	bool is_shooting = false;
-	float shooting_duration_secs = 0.0f;
-	float shooting_remaining_time = 0.0f;
-
 	entity_id combat_target = entity_id::dead();
 	vec2 last_seen_target_pos = vec2::zero;
 	vec2 last_known_target_pos = vec2::zero;
