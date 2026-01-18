@@ -225,12 +225,11 @@ struct arena_mode_ai_state {
 	vec2 camp_twitch_target = vec2::zero;
 	vec2 camp_look_direction = vec2(1.0f, 0.0f);
 	
-	/* Camp twitching state: twitch in breaks with randomized durations. */
-	float twitch_move_timer = 0.0f;      /* Time remaining in twitch move phase. */
-	float twitch_still_timer = 0.0f;     /* Time remaining in still (break) phase. */
-	float twitch_move_duration = 0.0f;   /* Current twitch move duration (100-300ms). */
-	float twitch_still_duration = 0.0f;  /* Current still duration (500-800ms). */
-	bool twitch_is_moving = false;       /* True if in twitch move phase, false if in still phase. */
+	float twitch_move_timer = 0.0f;
+	float twitch_still_timer = 0.0f;
+	float twitch_move_duration = 0.0f;
+	float twitch_still_duration = 0.0f;
+	bool twitch_is_moving = false;
 	
 	bool walk_silently_to_next_waypoint = true;
 
