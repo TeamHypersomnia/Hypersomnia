@@ -7,12 +7,15 @@
 
 /*
 	Check for sound cues (footsteps) from enemy players and update target tracking.
+	
+	Uses the new ai_target_tracking system instead of the old fields.
 */
 
 inline void listen_for_footsteps(
 	const ai_character_context& ctx,
 	const logic_step step,
-	const bool is_ffa
+	const bool is_ffa,
+	const real32 global_time_secs
 ) {
 	const auto& sound_cues = step.get_queue<messages::sound_cue_message>();
 	const auto bot_faction = ctx.character_handle.get_official_faction();
@@ -24,14 +27,6 @@ inline void listen_for_footsteps(
 
 		return bot_faction != source_faction && source_faction != faction_type::SPECTATOR;
 	};
-
-	auto current_target_distance = [&]() {
-		if (ctx.ai_state.last_seen_target.is_set()) {
-			return (ctx.ai_state.last_target_position - ctx.character_pos).length();
-		}
-
-		return std::numeric_limits<float>::max();
-	}();
 
 	for (const auto& cue : sound_cues) {
 		if (!cue.source_entity.is_set()) {
@@ -64,14 +59,14 @@ inline void listen_for_footsteps(
 		}
 
 		/*
-			Update target if this enemy is closer than current target.
+			Update target tracking via acquire_target_heard.
+			This updates last_known_pos if it matches current target,
+			otherwise just notes the position.
 		*/
-		if (dist < current_target_distance) {
-			ctx.ai_state.last_seen_target = cue.source_entity;
-			ctx.ai_state.chase_remaining_time = 5.0f;
-			ctx.ai_state.last_target_position = cue.position;
-			ctx.ai_state.has_dashed_for_last_seen_target = false;
-			current_target_distance = dist;
-		}
+		ctx.ai_state.combat_target.acquire_target_heard(
+			global_time_secs,
+			cue.source_entity,
+			cue.position
+		);
 	}
 }

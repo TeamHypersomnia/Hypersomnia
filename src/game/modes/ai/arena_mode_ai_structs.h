@@ -7,6 +7,8 @@
 #include "game/modes/mode_player_id.h"
 #include "augs/math/transform.h"
 #include "augs/log.h"
+#include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
+#include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 
 #if !NDEBUG
 #define LOG_AI 1
@@ -78,6 +80,7 @@ struct ai_pathfinding_state {
 struct ai_pathfinding_request {
 	// GEN INTROSPECTOR struct ai_pathfinding_request
 	transformr target;
+	cell_on_navmesh resolved_cell;
 	bool exact = false;
 	bool is_bomb_target = false;
 	bool has_request = false;
@@ -89,6 +92,14 @@ struct ai_pathfinding_request {
 		}
 		if (has_request != other.has_request) {
 			return false;
+		}
+		/*
+			If not exact, compare resolved cells since they will result
+			in the same pathfinding anyway.
+		*/
+		if (!exact && !other.exact) {
+			return resolved_cell == other.resolved_cell && 
+			       is_bomb_target == other.is_bomb_target;
 		}
 		return target == other.target && 
 		       exact == other.exact && 
@@ -125,25 +136,6 @@ struct ai_pathfinding_request {
 		req.has_request = true;
 		return req;
 	}
-};
-
-/*
-	Bot high-level behavioral state.
-*/
-
-enum class bot_state_type {
-	// GEN INTROSPECTOR enum class bot_state_type
-	COMBAT,
-	PUSHING,
-	PATROLLING,
-	PLANTING,
-	DEFUSING,
-	RETRIEVING_BOMB,
-
-	IDLE,
-
-	COUNT
-	// END GEN INTROSPECTOR
 };
 
 /*
@@ -190,45 +182,24 @@ struct arena_mode_ai_team_state {
 
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
-	entity_id combat_target = entity_id::dead();
-	vec2 last_seen_target_pos = vec2::zero;
-	vec2 last_known_target_pos = vec2::zero;
-	float combat_timeout = 0.0f;
-	bool has_dashed_for_last_seen = false;
+	/*
+		New behavior tree architecture.
+		last_behavior holds the current behavior state as a variant.
+		combat_target is persistent target tracking.
+	*/
+	ai_behavior_variant last_behavior = ai_behavior_idle();
+	ai_target_tracking combat_target;
 
-	entity_id last_seen_target = entity_id::dead();
-	float chase_remaining_time = 0.0f;
-	float chase_timeout = 0.0f;
-	vec2 last_target_position = vec2::zero;
+	/*
+		Persistent state that survives behavior transitions.
+	*/
+	marker_letter_type patrol_letter = marker_letter_type::A;
+	bool has_pushed_already = false;
 
 	vec2 target_crosshair_offset = vec2::zero;
-	vec2 random_movement_target = vec2::zero;
 
 	bool already_tried_to_buy = false;
 	float purchase_decision_countdown = -1.0f;
-
-	bool has_dashed_for_last_seen_target = false;
-
-	bot_state_type current_state = bot_state_type::IDLE;
-	marker_letter_type patrol_letter = marker_letter_type::A;
-	entity_id current_waypoint;
-	bool going_to_first_waypoint = true;
-	float camp_timer = 0.0f;
-	float camp_duration = 0.0f;
-	vec2 camp_center = vec2::zero;
-	vec2 camp_twitch_target = vec2::zero;
-	vec2 camp_look_direction = vec2(1.0f, 0.0f);
-	
-	float twitch_move_timer = 0.0f;
-	float twitch_still_timer = 0.0f;
-	float twitch_move_duration = 0.0f;
-	float twitch_still_duration = 0.0f;
-	bool twitch_is_moving = false;
-	
-	bool walk_silently_to_next_waypoint = true;
-
-	bool is_defusing = false;
-	bool is_planting = false;
 
 	std::optional<ai_pathfinding_state> pathfinding;
 	ai_pathfinding_request current_pathfinding_request;
@@ -242,54 +213,22 @@ struct arena_mode_ai_state {
 		pathfinding.reset();
 	}
 
+	/*
+		Check if we're in combat based on the behavior variant.
+	*/
 	bool is_in_combat() const {
-		return current_state == bot_state_type::COMBAT && combat_timeout > 0.0f;
-	}
-
-	void start_combat(const entity_id target, const vec2 target_pos) {
-		combat_target = target;
-		last_seen_target_pos = target_pos;
-		last_known_target_pos = target_pos;
-		current_state = bot_state_type::COMBAT;
-		has_dashed_for_last_seen = false;
-
-		/*
-			Also set legacy fields for compatibility with existing code.
-		*/
-		last_seen_target = target;
-		last_target_position = target_pos;
-		chase_remaining_time = 5.0f;
-	}
-
-	void end_combat() {
-		combat_target = entity_id::dead();
-		combat_timeout = 0.0f;
-		current_state = bot_state_type::IDLE;
-
-		/*
-			Also clear legacy fields.
-		*/
-		last_seen_target = entity_id::dead();
-		chase_remaining_time = 0.0f;
+		return ::is_behavior<ai_behavior_combat>(last_behavior);
 	}
 
 	void round_reset() {
+		last_behavior = ai_behavior_idle();
+		combat_target.clear();
+		patrol_letter = marker_letter_type::A;
+		has_pushed_already = false;
+		target_crosshair_offset = vec2::zero;
 		already_tried_to_buy = false;
 		purchase_decision_countdown = -1.0f;
 		pathfinding.reset();
 		current_pathfinding_request = ai_pathfinding_request::none();
-
-		current_state = bot_state_type::IDLE;
-		current_waypoint = entity_id::dead();
-		going_to_first_waypoint = true;
-		camp_timer = 0.0f;
-		is_defusing = false;
-		is_planting = false;
-		combat_target = entity_id::dead();
-		combat_timeout = 0.0f;
-		walk_silently_to_next_waypoint = true;
-
-		last_seen_target = entity_id::dead();
-		chase_remaining_time = 0.0f;
 	}
 };
