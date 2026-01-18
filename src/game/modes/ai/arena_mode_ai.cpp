@@ -26,6 +26,8 @@
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/inventory/perform_wielding.hpp"
 
+#include "game/detail/pathfinding/navigate_pathfinding.hpp"
+
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/find_closest_enemy.hpp"
 #include "game/modes/ai/tasks/update_alertness.hpp"
@@ -33,10 +35,8 @@
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
-#include "game/modes/ai/tasks/ai_pathfinding.hpp"
 #include "game/modes/ai/tasks/ai_behavior_tree.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
-#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 #include "game/modes/ai/tasks/calc_pathfinding_request.hpp"
 #include "game/modes/ai/tasks/calc_movement_direction.hpp"
 
