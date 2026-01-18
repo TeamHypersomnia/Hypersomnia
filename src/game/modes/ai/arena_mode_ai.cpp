@@ -252,6 +252,8 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		/* Check if camp timer just expired - need to pick next waypoint. */
+		auto ignore_waypoint_id = ai_state.current_waypoint;
+
 		if (ai_state.current_waypoint.is_set() && ai_state.camp_duration > 0.0f && ai_state.camp_timer <= 0.0f) {
 			AI_LOG("Camp duration expired - picking next waypoint");
 			::unassign_bot_from_waypoints(team_state, bot_player_id);
@@ -267,6 +269,7 @@ arena_ai_result update_arena_mode_ai(
 				team_state,
 				ai_state.patrol_letter,
 				bot_player_id,
+				ignore_waypoint_id,
 				stable_rng
 			);
 

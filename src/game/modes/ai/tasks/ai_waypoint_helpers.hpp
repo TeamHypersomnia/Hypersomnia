@@ -62,12 +62,17 @@ inline entity_id find_random_unassigned_patrol_waypoint(
 	arena_mode_ai_team_state& team_state,
 	const marker_letter_type letter,
 	const mode_player_id& bot_id,
+	const entity_id ignore_waypoint_id,
 	randomization& rng
 ) {
 	std::vector<entity_id> available;
 
 	for (auto& wp : team_state.patrol_waypoints) {
 		const auto waypoint_handle = cosm[wp.waypoint_id];
+
+		if (ignore_waypoint_id == wp.waypoint_id) {
+			continue;
+		}
 
 		if (!waypoint_handle.alive()) {
 			continue;
