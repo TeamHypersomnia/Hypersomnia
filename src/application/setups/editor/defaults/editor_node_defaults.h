@@ -1,7 +1,7 @@
 #pragma once
 
 template <class N, class R>
-void setup_node_defaults(N& new_node, const R& resource) {
+void setup_node_defaults(N& new_node, const R& resource, const bool at_instantiation = false) {
 	static constexpr bool is_resource = std::is_same_v<remove_cref<decltype(resource.get_display_name())>, std::string>;
 	static_assert(is_resource);
 
@@ -21,5 +21,18 @@ void setup_node_defaults(N& new_node, const R& resource) {
 	}
 	else if constexpr(std::is_same_v<R, editor_area_marker_resource>) {
 		new_node = resource.editable.node_defaults;
+	}
+
+	if (at_instantiation) {
+		/*
+			We force write-out of the default faction which is RESISTANCE.
+		*/
+		if constexpr(std::is_same_v<R, editor_area_marker_resource>) {
+			new_node.faction = faction_type::RESISTANCE;
+		}
+
+		if constexpr(std::is_same_v<R, editor_point_marker_resource>) {
+			new_node.faction = faction_type::RESISTANCE;
+		}
 	}
 }

@@ -208,7 +208,7 @@ public:
 		}
 
 		if (const auto marker = self.template find<components::marker>()) {
-			return marker->faction;
+			return marker->get_faction();
 		}
 
 		return faction_type::SPECTATOR;

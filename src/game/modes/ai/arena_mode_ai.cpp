@@ -421,13 +421,10 @@ arena_ai_result update_arena_mode_ai(
 	check_hearing_initiates_combat();
 
 	/* Check for visible enemies. */
-	const bool camping = ::is_camping(ai_state);
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
 	const bool sees_target = closest_enemy.is_set();
 	const bool should_react = ::update_alertness(ai_state, sees_target, dt_secs, difficulty);
 	const bool has_target = sees_target && should_react;
-
-	AI_LOG_NVPS(sees_target, should_react, has_target, camping);
 
 	/* Check if sighting initiates combat. */
 	check_sighting_initiates_combat(closest_enemy, sees_target, should_react);
