@@ -1,6 +1,8 @@
 #pragma once
 #include <variant>
 
+struct ai_behavior_process_ctx;
+
 #include "game/modes/ai/behaviors/ai_behavior_idle.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_combat.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_patrol.hpp"

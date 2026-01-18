@@ -16,4 +16,5 @@ struct ai_behavior_retrieve_bomb {
 	*/
 
 	bool operator==(const ai_behavior_retrieve_bomb&) const = default;
+	void process(ai_behavior_process_ctx&) {}
 };

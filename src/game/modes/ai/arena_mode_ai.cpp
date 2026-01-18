@@ -233,7 +233,7 @@ arena_ai_result update_arena_mode_ai(
 			move_result.path_completed
 		};
 
-		auto process_lbd = [auto& behavior]() {
+		auto process_lbd = [&process_ctx](auto& behavior) {
 			behavior.process(process_ctx);
 		};
 
