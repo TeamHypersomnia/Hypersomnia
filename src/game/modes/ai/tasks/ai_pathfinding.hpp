@@ -668,7 +668,8 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 		- t = 0: looking at look_at_point
 		- t = 1: looking in target transform's direction
 		
-		Uses augs::interp for smooth interpolation.
+		Uses augs::interp_angle for angular (rotational) interpolation.
+		This avoids abrupt rotation changes when the bot passes through the look-at point.
 		
 		Parameters:
 		- look_at_point: The point to look at when t = 0
@@ -676,11 +677,24 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 		- total_ease_distance: The total easing distance (from t=0 point to t=1 point)
 	*/
 	const auto calc_eased_crosshair = [&](const vec2 look_at_point, const float remaining_distance, const float total_ease_distance) -> vec2 {
-		if (total_ease_distance <= 0.0f) {
+		const auto look_at_dir = look_at_point - bot_pos;
+		const auto look_at_length = look_at_dir.length();
+		
+		if (look_at_length <= 0.0f || total_ease_distance <= 0.0f) {
 			return target_direction * 200.0f;
 		}
+		
 		const auto t = std::clamp(1.0f - remaining_distance / total_ease_distance, 0.0f, 1.0f);
-		return augs::interp(look_at_point - bot_pos, target_direction * 200.0f, t);
+		
+		/* Normalize both directions for angular interpolation */
+		const auto look_at_normalized = vec2(look_at_dir) / look_at_length;
+		const auto target_normalized = vec2(target_direction).normalize();
+		
+		/* Angular interpolation between the two directions */
+		const auto interpolated_direction = augs::interp_angle(look_at_normalized, target_normalized, t);
+		
+		/* Return the interpolated direction scaled by the look-at length */
+		return interpolated_direction * look_at_length;
 	};
 
 	if (!current_target_opt.has_value()) {
