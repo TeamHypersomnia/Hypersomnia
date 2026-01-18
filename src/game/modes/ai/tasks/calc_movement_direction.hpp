@@ -1,8 +1,8 @@
 #pragma once
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/pathfinding/navigate_pathfinding.hpp"
 #include "game/modes/ai/arena_mode_ai_structs.h"
-#include "game/modes/ai/tasks/navigate_pathfinding.hpp"
 #include "game/modes/ai/tasks/update_camp_twitch.hpp"
 #include "game/modes/ai/tasks/should_helpers.hpp"
 
