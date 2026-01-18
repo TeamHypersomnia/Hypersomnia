@@ -720,14 +720,14 @@ inline std::optional<vec2> get_pathfinding_movement_direction(
 				if (total_ease_distance > 0.0f) {
 					const auto t = std::clamp(1.0f - dist_to_exact / total_ease_distance, 0.0f, 1.0f);
 					target_crosshair_offset = calc_eased_crosshair(target_pos, t);
-					return dir.normalize();
+					return vec2(dir).normalize();
 				}
 			}
 		}
 		
 		/* Default: just look in target direction */
 		target_crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
-		return dir.normalize();
+		return vec2(dir).normalize();
 	}
 
 	const auto current_target = *current_target_opt;
