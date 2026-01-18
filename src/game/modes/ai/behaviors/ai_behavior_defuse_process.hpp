@@ -2,19 +2,19 @@
 #include "game/modes/ai/behaviors/ai_behavior_defuse.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_process_ctx.hpp"
 #include "game/components/sentience_component.h"
-#include "game/detail/inventory/wielding_setup.hpp"
-#include "game/detail/inventory/perform_wielding.hpp"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 
 /*
 	Implementation of ai_behavior_defuse::process().
+	
+	NOTE: Weapon holstering for defuse is handled statelessly via
+	should_holster_weapons() which checks is_defusing.
 */
 
 inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
-	const auto& step = ctx.step;
 	const auto& character_pos = ctx.character_pos;
 	const auto bomb_entity = ctx.bomb_entity;
 	auto& target_crosshair_offset = ctx.ai_state.target_crosshair_offset;
@@ -33,11 +33,10 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 		AI_LOG("Reached bomb - starting defuse");
 		is_defusing = true;
 
-		const auto current_wielding = wielding_setup::from_current(character_handle);
-
-		if (!current_wielding.is_bare_hands(cosm)) {
-			::perform_wielding(step, character_handle, wielding_setup::bare_hands());
-		}
+		/*
+			NOTE: Weapon holstering is now handled statelessly in calc_wielding_intent
+			via should_holster_weapons() checking is_defusing state.
+		*/
 
 		if (auto* sentience = character_handle.find<components::sentience>()) {
 			sentience->is_requesting_interaction = true;

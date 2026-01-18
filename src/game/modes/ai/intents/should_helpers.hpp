@@ -83,6 +83,15 @@ inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
 		return false;
 	}
 
+	/*
+		Defusing requires bare hands - holster weapons when is_defusing.
+	*/
+	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
+		if (defuse->is_defusing) {
+			return true;
+		}
+	}
+
 	return std::visit([&](const auto& b) -> bool {
 		using T = std::decay_t<decltype(b)>;
 

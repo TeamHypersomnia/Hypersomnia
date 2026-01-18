@@ -156,8 +156,26 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		PHASE 3: Calculate pathfinding request FIRST (before process()).
-		We need path_completed to pass to process().
+		PHASE 3: Calculate movement direction FIRST (to capture path_completed).
+		
+		IMPORTANT: We must calculate movement direction BEFORE checking pathfinding
+		request changes. This ensures we capture path_completed=true before the
+		pathfinding state gets cleared when the request changes.
+		===========================================================================
+	*/
+
+	const auto move_result = ::calc_current_movement_direction(
+		ai_state.last_behavior,
+		ai_state.pathfinding,
+		character_pos,
+		navmesh,
+		character_handle,
+		dt_secs
+	);
+
+	/*
+		===========================================================================
+		PHASE 4: Calculate pathfinding request (after movement calculation).
 		===========================================================================
 	*/
 
@@ -171,7 +189,8 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		bomb_planted,
 		bomb_entity,
-		global_time_secs
+		global_time_secs,
+		navmesh
 	);
 
 	/* Check if request changed - reinitialize pathfinding. */
@@ -189,21 +208,6 @@ arena_ai_result update_arena_mode_ai(
 			}
 		}
 	}
-
-	/*
-		===========================================================================
-		PHASE 4: Calculate movement direction (stateless, uses behavior variant).
-		===========================================================================
-	*/
-
-	const auto move_result = ::calc_current_movement_direction(
-		ai_state.last_behavior,
-		ai_state.pathfinding,
-		character_pos,
-		navmesh,
-		character_handle,
-		dt_secs
-	);
 
 	AI_LOG_NVPS(move_result.is_navigating, move_result.path_completed, move_result.can_sprint);
 

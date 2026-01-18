@@ -6,6 +6,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/missile_component.h"
+#include "game/components/sentience_component.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/messages/collision_message.h"
@@ -410,6 +411,34 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			contact->SetEnabled(false);
 			post_collision_messages = false;
 			break;
+		}
+
+		/*
+			Disable collision between teammates when one of them is defusing.
+			This prevents bots walking onto each other and interrupting defusal.
+		*/
+		const auto collider_capability = collider.get_owning_transfer_capability();
+
+		if (subject_capability.alive() && collider_capability.alive()) {
+			const auto subject_faction = subject_capability.get_official_faction();
+			const auto collider_faction = collider_capability.get_official_faction();
+			
+			/*
+				Only apply to teammates (same faction, not spectators).
+			*/
+			if (subject_faction == collider_faction && subject_faction != faction_type::SPECTATOR) {
+				const auto* subject_sentience = subject_capability.find<components::sentience>();
+				const auto* collider_sentience = collider_capability.find<components::sentience>();
+
+				const bool subject_is_defusing = subject_sentience && subject_sentience->is_interacting();
+				const bool collider_is_defusing = collider_sentience && collider_sentience->is_interacting();
+
+				if (subject_is_defusing || collider_is_defusing) {
+					contact->SetEnabled(false);
+					post_collision_messages = false;
+					break;
+				}
+			}
 		}
 
 		if (subject_fixtures.ignore_standard_collision_resolution() 
