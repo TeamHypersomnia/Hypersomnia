@@ -70,6 +70,7 @@ struct ai_behavior_patrol {
 	}
 
 	assigned_waypoint_result calc_assigned_waypoint() const;
+	void clear_waypoint();
 
 	bool operator==(const ai_behavior_patrol&) const = default;
 
