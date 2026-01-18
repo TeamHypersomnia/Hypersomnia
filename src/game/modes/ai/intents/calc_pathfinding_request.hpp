@@ -22,7 +22,7 @@
 	Note: Push waypoints are now handled inside patrol behavior.
 */
 
-inline ai_pathfinding_request calc_current_pathfinding_request(
+inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const cosmos& cosm,
 	const ai_behavior_variant& behavior,
 	const ai_target_tracking& combat_target,
@@ -38,7 +38,7 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 	(void)bot_player_id;
 	(void)bot_faction;
 
-	return std::visit([&](const auto& b) -> ai_pathfinding_request {
+	return std::visit([&](const auto& b) -> std::optional<ai_pathfinding_request> {
 		using T = std::decay_t<decltype(b)>;
 
 		if constexpr (std::is_same_v<T, ai_behavior_combat>) {
@@ -49,7 +49,7 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 				return ai_pathfinding_request::to_position(combat_target.last_known_pos);
 			}
 
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
 			/*
@@ -64,14 +64,14 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 				}
 			}
 
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
 			/*
 				Defuse - pathfind to bomb if not close.
 			*/
 			if (b.is_defusing) {
-				return ai_pathfinding_request::none();
+				return std::nullopt;
 			}
 
 			if (bomb_planted && bomb_entity.is_set()) {
@@ -81,60 +81,43 @@ inline ai_pathfinding_request calc_current_pathfinding_request(
 					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
 
 					if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
-						return ai_pathfinding_request::none();
+						return std::nullopt;
 					}
 
 					return ai_pathfinding_request::to_bomb(bomb_pos);
 				}
 			}
 
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
 			/*
 				PATROL state - push_waypoint takes priority over current_waypoint.
 			*/
 			if (b.is_camping()) {
-				return ai_pathfinding_request::none();
+				return std::nullopt;
 			}
 
-			/*
-				Push waypoint has priority.
-			*/
-			if (b.push_waypoint.is_set()) {
-				const auto wp_handle = cosm[b.push_waypoint];
+			const auto wp_handle = cosm[b.calc_assigned_waypoint().waypoint_id];
 
-				if (wp_handle.alive()) {
-					const auto wp_transform = wp_handle.get_logic_transform();
-					return ai_pathfinding_request::to_transform(wp_transform, true);
-				}
+			if (wp_handle.alive()) {
+				const auto wp_transform = wp_handle.get_logic_transform();
+				return ai_pathfinding_request::to_transform(wp_transform, true);
 			}
 
-			/*
-				Normal patrol waypoint.
-			*/
-			if (b.current_waypoint.is_set()) {
-				const auto wp_handle = cosm[b.current_waypoint];
-
-				if (wp_handle.alive()) {
-					const auto wp_transform = wp_handle.get_logic_transform();
-					return ai_pathfinding_request::to_transform(wp_transform, true);
-				}
-			}
-
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_plant>) {
 			/*
 				PLANTING state - no pathfinding during plant.
 			*/
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 		else {
 			/*
 				IDLE or other - no pathfinding.
 			*/
-			return ai_pathfinding_request::none();
+			return std::nullopt;
 		}
 	}, behavior);
 }

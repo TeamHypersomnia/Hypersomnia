@@ -83,16 +83,9 @@ struct ai_pathfinding_request {
 	cell_on_navmesh resolved_cell;
 	bool exact = false;
 	bool is_bomb_target = false;
-	bool has_request = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const ai_pathfinding_request& other) const {
-		if (!has_request && !other.has_request) {
-			return true;
-		}
-		if (has_request != other.has_request) {
-			return false;
-		}
 		/*
 			If not exact, compare resolved cells since they will result
 			in the same pathfinding anyway.
@@ -117,7 +110,6 @@ struct ai_pathfinding_request {
 	static ai_pathfinding_request to_position(const vec2 pos) {
 		ai_pathfinding_request req;
 		req.target = transformr(pos, 0.0f);
-		req.has_request = true;
 		return req;
 	}
 
@@ -125,7 +117,6 @@ struct ai_pathfinding_request {
 		ai_pathfinding_request req;
 		req.target = t;
 		req.exact = exact_flag;
-		req.has_request = true;
 		return req;
 	}
 
@@ -133,7 +124,6 @@ struct ai_pathfinding_request {
 		ai_pathfinding_request req;
 		req.target = transformr(pos, 0.0f);
 		req.is_bomb_target = true;
-		req.has_request = true;
 		return req;
 	}
 };
@@ -206,7 +196,7 @@ struct arena_mode_ai_state {
 	float purchase_decision_countdown = -1.0f;
 
 	std::optional<ai_pathfinding_state> pathfinding;
-	ai_pathfinding_request current_pathfinding_request;
+	std::optional<ai_pathfinding_request> current_pathfinding_request;
 	// END GEN INTROSPECTOR
 
 	bool is_pathfinding_active() const {
@@ -233,6 +223,6 @@ struct arena_mode_ai_state {
 		already_tried_to_buy = false;
 		purchase_decision_countdown = -1.0f;
 		pathfinding.reset();
-		current_pathfinding_request = ai_pathfinding_request::none();
+		current_pathfinding_request = std::nullopt;
 	}
 };

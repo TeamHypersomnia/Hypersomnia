@@ -174,19 +174,18 @@ arena_ai_result update_arena_mode_ai(
 		global_time_secs
 	);
 
-	AI_LOG_NVPS(new_request.has_request, new_request.exact, new_request.is_bomb_target);
-
 	/* Check if request changed - reinitialize pathfinding. */
 	if (new_request != ai_state.current_pathfinding_request) {
 		AI_LOG("Pathfinding request changed - reinitializing");
+
 		ai_state.current_pathfinding_request = new_request;
 		ai_state.clear_pathfinding();
 
-		if (new_request.has_request) {
-			::start_pathfinding_to(ai_state, character_pos, new_request.target, navmesh, nullptr);
+		if (new_request != std::nullopt) {
+			::start_pathfinding_to(ai_state, character_pos, new_request->target, navmesh, nullptr);
 
 			if (ai_state.is_pathfinding_active()) {
-				ai_state.pathfinding->exact_destination = new_request.exact;
+				ai_state.pathfinding->exact_destination = new_request->exact;
 			}
 		}
 	}
