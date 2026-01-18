@@ -100,8 +100,8 @@ inline std::optional<vec2> update_camp_twitch(
 				patrol.camp_twitch_target = (patrol.camp_center - bot_pos).normalize();
 			}
 			
-			/* Move towards the new target. */
-			const auto direction = patrol.camp_twitch_target - bot_pos;
+			/* Move towards the new target. camp_twitch_target is already a direction. */
+			const auto direction = patrol.camp_twitch_target;
 			if (direction.is_nonzero()) {
 				return vec2(direction).normalize();
 			}

@@ -92,6 +92,9 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
+	/* Listen for footsteps and update combat target from sound cues. */
+	::listen_for_footsteps(ctx, step, is_ffa, global_time_secs);
+
 	/* Check for visible enemies and update combat_target. */
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
 	const bool sees_target = closest_enemy.is_set();
