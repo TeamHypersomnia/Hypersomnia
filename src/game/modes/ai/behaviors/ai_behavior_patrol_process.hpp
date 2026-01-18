@@ -119,8 +119,8 @@ inline assigned_waypoint_result ai_behavior_patrol::calc_assigned_waypoint() con
 		result.waypoint_id = push_waypoint;
 		result.is_push_waypoint = true;
 	}
-	else if (current_waypoint.is_set()) {
-		result.waypoint_id = current_waypoint;
+	else if (patrol_waypoint.is_set()) {
+		result.waypoint_id = patrol_waypoint;
 		result.is_push_waypoint = false;
 	}
 
@@ -128,7 +128,7 @@ inline assigned_waypoint_result ai_behavior_patrol::calc_assigned_waypoint() con
 }
 
 inline void ai_behavior_patrol::clear_waypoint() {
-	current_waypoint = entity_id::dead();
+	patrol_waypoint = entity_id::dead();
 	push_waypoint = entity_id::dead();
 	camp_duration = 0.0f;
 }
@@ -156,6 +156,8 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	const bool pathfinding_just_completed = ctx.pathfinding_just_completed;
 
 	auto now_waypoint = calc_assigned_waypoint();
+	const auto current_waypoint_id = now_waypoint.waypoint_id;
+	const auto current_is_push = now_waypoint.is_push_waypoint;
 
 	/*
 		Update camp timer.
@@ -174,7 +176,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	/*
 		Check if camp timer just expired - need to pick next waypoint.
 	*/
-	if (now_waypoint.waypoint_id.is_set() && camp_duration > 0.0f && camp_timer <= 0.0f) {
+	if (current_waypoint_id.is_set() && camp_duration > 0.0f && camp_timer <= 0.0f) {
 		AI_LOG("Camp duration expired - clearing waypoint for next pick");
 		clear_waypoint();
 	}
@@ -184,13 +186,13 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	*/
 	if (pathfinding_just_completed) {
 		AI_LOG("Reached patrol waypoint");
-		const auto wp_handle = cosm[current_waypoint];
+		const auto wp_handle = cosm[current_waypoint_id];
 
 		if (wp_handle.alive()) {
-			if (::is_camp_waypoint(cosm, current_waypoint)) {
+			if (::is_camp_waypoint(cosm, current_waypoint_id)) {
 				AI_LOG("Camp waypoint - setting up camp");
 				const auto wp_transform = wp_handle.get_logic_transform();
-				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, current_waypoint);
+				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, current_waypoint_id);
 
 				camp_timer = rng.randval(min_secs, max_secs);
 
@@ -230,16 +232,16 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			team_state,
 			ai_state.patrol_letter,
 			bot_player_id,
-			now_waypoint.waypoint_id,
+			current_waypoint_id,
 			rng
 		);
 
 		if (new_wp.is_set()) {
-			going_to_first_waypoint = now_waypoint.is_push_waypoint || !now_waypoint.waypoint_id.is_set();
+			going_to_first_waypoint = current_is_push || !current_waypoint_id.is_set();
 			walk_silently_to_next_waypoint = rng.randval(0, 99) > 18;
 
 			AI_LOG("Found new patrol waypoint");
-			current_waypoint = new_wp;
+			patrol_waypoint = new_wp;
 		}
 	}
 }

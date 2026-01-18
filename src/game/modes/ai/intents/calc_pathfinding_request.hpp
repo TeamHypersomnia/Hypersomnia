@@ -91,9 +91,6 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
-			/*
-				PATROL state - push_waypoint takes priority over current_waypoint.
-			*/
 			if (b.is_camping()) {
 				return std::nullopt;
 			}
