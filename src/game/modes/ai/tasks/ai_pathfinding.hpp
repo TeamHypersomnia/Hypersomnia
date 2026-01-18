@@ -676,15 +676,21 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 		- remaining_distance: How far we still have to travel
 		- total_ease_distance: The total easing distance (from t=0 point to t=1 point)
 	*/
-	const auto calc_eased_crosshair = [&](const vec2 look_at_point, const float remaining_distance, const float total_ease_distance) -> vec2 {
+	const auto calc_eased_crosshair = [&](const vec2 look_at_point, const float remaining_distance, const float total_ease_distance, const float cell_size) -> vec2 {
 		const auto look_at_dir = look_at_point - bot_pos;
 		const auto look_at_length = look_at_dir.length();
 		
 		if (look_at_length <= 0.0f || total_ease_distance <= 0.0f) {
-			return target_direction * 200.0f;
+			return target_direction * cell_size;
 		}
 		
-		const auto t = std::clamp(1.0f - remaining_distance / total_ease_distance, 0.0f, 1.0f);
+		/*
+			We will never get to 1.0 exactly because
+			we will end the pathfinding within an epsilon of the target center.
+		*/
+
+		const auto shrinked_time = 0.8f;
+		const auto t = std::clamp((1.0f - remaining_distance / total_ease_distance) / shrinked_time, 0.0f, 1.0f);
 		
 		/* Normalize both directions for angular interpolation */
 		const auto look_at_normalized = vec2(look_at_dir) / look_at_length;
@@ -693,8 +699,14 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 		/* Angular interpolation between the two directions */
 		const auto interpolated_direction = augs::interp_angle(look_at_normalized, target_normalized, t);
 		
+		const auto result = interpolated_direction * cell_size;
+
+		if (DEBUG_DRAWING.draw_ai_info) {
+			DEBUG_LOGIC_STEP_LINES.emplace_back(white, bot_pos, bot_pos + look_at_dir);
+		}
+
 		/* Return the interpolated direction scaled by the look-at length */
-		return interpolated_direction * look_at_length;
+		return result;
 	};
 
 	if (!current_target_opt.has_value()) {
@@ -733,8 +745,9 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 				*/
 				const auto dist_cell_to_exact = (target_pos - last_cell_center).length();
 				const auto total_ease_distance = cell_size + dist_cell_to_exact;
+				(void)total_ease_distance;
 				
-				result.crosshair_offset = calc_eased_crosshair(target_pos, dist_to_exact, total_ease_distance);
+				result.crosshair_offset = target_direction * cell_size;
 				result.movement_direction = vec2(dir).normalize();
 				result.has_direction = true;
 				return result;
@@ -848,10 +861,11 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 				*/
 				const auto dist_to_current = (bot_pos - current_target).length();
 				const auto dist_cell_to_exact = (target_pos - current_target).length();
-				const auto total_ease_distance = cell_size + dist_cell_to_exact;
-				const auto remaining_distance = dist_to_current + dist_cell_to_exact;
+				const auto total_ease_distance = cell_size;
+				const auto remaining_distance = dist_to_current;
+				(void)dist_cell_to_exact;
 				
-				result.crosshair_offset = calc_eased_crosshair(current_target, remaining_distance, total_ease_distance);
+				result.crosshair_offset = calc_eased_crosshair(current_target, remaining_distance, total_ease_distance, cell_size);
 				crosshair_set = true;
 			}
 		}
