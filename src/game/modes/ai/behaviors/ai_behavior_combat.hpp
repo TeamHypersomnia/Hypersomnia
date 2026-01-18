@@ -32,4 +32,6 @@ struct ai_behavior_combat {
 	}
 
 	bool operator==(const ai_behavior_combat&) const = default;
+
+	void process(ai_behavior_process_ctx&) {}
 };

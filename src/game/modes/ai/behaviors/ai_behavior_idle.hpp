@@ -11,4 +11,5 @@ struct ai_behavior_idle {
 	*/
 
 	bool operator==(const ai_behavior_idle&) const = default;
+	void process(ai_behavior_process_ctx&) {}
 };

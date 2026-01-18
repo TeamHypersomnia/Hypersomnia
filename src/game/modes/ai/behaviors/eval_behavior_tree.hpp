@@ -39,7 +39,7 @@ struct ai_round_state {
 
 inline ai_behavior_variant eval_behavior_tree(
 	const cosmos& cosm,
-	const arena_mode_ai_state& ai_state,
+	arena_mode_ai_state& ai_state,
 	arena_mode_ai_team_state& team_state,
 	const mode_player_id& bot_player_id,
 	const faction_type bot_faction,

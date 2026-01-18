@@ -13,4 +13,5 @@ struct ai_behavior_plant {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const ai_behavior_plant&) const = default;
+	void process(ai_behavior_process_ctx&) {}
 };
