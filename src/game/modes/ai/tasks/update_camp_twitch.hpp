@@ -15,7 +15,7 @@
 	At the start of each twitch phase, a new random target direction is chosen.
 */
 
-inline vec2 update_camp_twitch(
+inline std::optional<vec2> update_camp_twitch(
 	arena_mode_ai_state& ai_state,
 	const vec2 bot_pos,
 	const real32 dt,
@@ -25,11 +25,11 @@ inline vec2 update_camp_twitch(
 	
 	/* Twitch move duration: 100-300ms */
 	constexpr float TWITCH_MOVE_MIN_SECS = 0.1f;
-	constexpr float TWITCH_MOVE_MAX_SECS = 0.3f;
+	constexpr float TWITCH_MOVE_MAX_SECS = 0.5f;
 	
 	/* Still (break) duration: 500-800ms */
-	constexpr float TWITCH_STILL_MIN_SECS = 0.5f;
-	constexpr float TWITCH_STILL_MAX_SECS = 0.8f;
+	constexpr float TWITCH_STILL_MIN_SECS = 0.4f;
+	constexpr float TWITCH_STILL_MAX_SECS = 3.0f;
 
 	const auto offset_from_center = bot_pos - ai_state.camp_center;
 	const auto dist_from_center = offset_from_center.length();
@@ -39,11 +39,7 @@ inline vec2 update_camp_twitch(
 		This takes priority over the twitch/still phase.
 	*/
 	if (dist_from_center > TWITCH_RADIUS) {
-		const auto direction = ai_state.camp_center - bot_pos;
-		if (direction.is_nonzero()) {
-			return vec2(direction).normalize();
-		}
-		return vec2::zero;
+		ai_state.camp_twitch_target = (ai_state.camp_center - bot_pos).normalize();
 	}
 
 	/*
@@ -58,15 +54,16 @@ inline vec2 update_camp_twitch(
 			ai_state.twitch_is_moving = false;
 			ai_state.twitch_still_duration = rng.randval(TWITCH_STILL_MIN_SECS, TWITCH_STILL_MAX_SECS);
 			ai_state.twitch_still_timer = ai_state.twitch_still_duration;
-			return vec2::zero;
+			return std::nullopt;
 		}
 		
 		/* Continue moving towards twitch target. */
-		const auto direction = ai_state.camp_twitch_target - bot_pos;
+		const auto direction = ai_state.camp_twitch_target;
+
 		if (direction.is_nonzero()) {
 			return vec2(direction).normalize();
 		}
-		return vec2::zero;
+		return std::nullopt;
 	}
 	else {
 		/* In still (break) phase. */
@@ -80,8 +77,12 @@ inline vec2 update_camp_twitch(
 			
 			/* Choose a new random twitch target direction. */
 			const auto random_angle = rng.randval(0.0f, 360.0f);
-			const auto random_offset = vec2::from_degrees(random_angle) * TWITCH_RADIUS * 0.8f;
-			ai_state.camp_twitch_target = ai_state.camp_center + random_offset;
+			const auto random_offset = vec2::from_degrees(random_angle);
+			ai_state.camp_twitch_target = random_offset;
+
+			if (dist_from_center > TWITCH_RADIUS) {
+				ai_state.camp_twitch_target = (ai_state.camp_center - bot_pos).normalize();
+			}
 			
 			/* Move towards the new target. */
 			const auto direction = ai_state.camp_twitch_target - bot_pos;
@@ -91,6 +92,6 @@ inline vec2 update_camp_twitch(
 		}
 		
 		/* Still in break phase - don't move. */
-		return vec2::zero;
+		return std::nullopt;
 	}
 }
