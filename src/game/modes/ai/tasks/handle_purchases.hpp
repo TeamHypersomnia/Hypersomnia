@@ -223,6 +223,9 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 	/*
 		If we have >=10000 money and don't need to buy anything else, buy defuse kit.
+		
+		The 10000 threshold ensures bots prioritize essential equipment first.
+		Defuse kits are useful but not critical - only buy when we have excess money.
 	*/
 	constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
 	if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {

@@ -46,6 +46,22 @@ inline cell_on_navmesh resolve_cell_for_position(
 	return cell_on_navmesh(island_idx, cell);
 }
 
+/*
+	Helper to create a pathfinding request from a bomb_pathfinding_target.
+*/
+inline std::optional<ai_pathfinding_request> create_bomb_pathfinding_request(
+	const std::optional<bomb_pathfinding_target>& bomb_target,
+	const cosmos_navmesh& navmesh
+) {
+	if (!bomb_target.has_value()) {
+		return std::nullopt;
+	}
+	
+	auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
+	req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
+	return req;
+}
+
 inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const cosmos& cosm,
 	const ai_behavior_variant& behavior,
@@ -81,19 +97,13 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
 			/*
 				Bomb retrieval - pathfind to bomb.
-				Use find_bomb_pathfinding_target to get the resolved cell.
 			*/
 			if (bomb_entity.is_set()) {
 				const auto bomb_handle = cosm[bomb_entity];
 
 				if (bomb_handle.alive()) {
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
-					
-					if (bomb_target.has_value()) {
-						auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
-						req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
-						return req;
-					}
+					return ::create_bomb_pathfinding_request(bomb_target, navmesh);
 				}
 			}
 
@@ -102,7 +112,6 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
 			/*
 				Defuse - pathfind to bomb if not close.
-				Use find_bomb_pathfinding_target to get the resolved cell.
 			*/
 			if (b.is_defusing) {
 				return std::nullopt;
@@ -119,12 +128,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 					}
 
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
-					
-					if (bomb_target.has_value()) {
-						auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
-						req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
-						return req;
-					}
+					return ::create_bomb_pathfinding_request(bomb_target, navmesh);
 				}
 			}
 
