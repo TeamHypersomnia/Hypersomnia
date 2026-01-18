@@ -91,7 +91,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 					It will handle the "penultimate tile" case with t continuing from
 					cell-center approach to exact destination approach.
 				*/
-				const auto movement_dir = ::get_pathfinding_movement_direction(
+				::get_pathfinding_movement_direction(
 					pathfinding,
 					bot_pos,
 					navmesh,
