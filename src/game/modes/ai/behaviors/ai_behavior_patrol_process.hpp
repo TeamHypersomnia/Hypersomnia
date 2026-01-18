@@ -112,6 +112,8 @@ inline void update_camp_twitch(
 inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
 	auto& ai_state = ctx.ai_state;
+	auto& team_state = ctx.team_state;
+	const auto& bot_player_id = ctx.bot_player_id;
 	const auto& character_pos = ctx.character_pos;
 	const auto dt_secs = ctx.dt_secs;
 	auto& rng = ctx.rng;
@@ -193,6 +195,26 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 				AI_LOG("Non-camp waypoint - clearing for next pick");
 				current_waypoint = entity_id::dead();
 			}
+		}
+	}
+
+	/*
+		Find a new patrol waypoint when current one is dead and we're not pushing.
+		This advances the patrol sequence.
+	*/
+	if (!is_pushing() && !current_waypoint.is_set() && !is_camping()) {
+		const auto new_wp = ::find_random_unassigned_patrol_waypoint(
+			cosm,
+			team_state,
+			ai_state.patrol_letter,
+			bot_player_id,
+			entity_id::dead(),
+			rng
+		);
+
+		if (new_wp.is_set()) {
+			AI_LOG("Found new patrol waypoint");
+			current_waypoint = new_wp;
 		}
 	}
 }

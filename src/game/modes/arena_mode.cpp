@@ -45,6 +45,7 @@
 #include "game/modes/ai/arena_mode_ai.h"
 #include "game/messages/collected_message.h"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
+#include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -2430,6 +2431,23 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 	const bool is_bomb_planted = bomb_planted(in);
 	const auto current_bomb_entity = bomb_entity;
+
+	/*
+		Recalculate waypoint assignments statelessly before updating AI.
+		Clear all assignments first, then reassign based on current behavior state.
+	*/
+	for (auto& faction_pair : factions) {
+		faction_pair.second.ai_team_state.clear_waypoint_assignments();
+	}
+
+	for (auto& it : only_bot(players)) {
+		auto& player = it.second;
+		const auto player_faction = player.get_faction();
+		auto& faction_state = factions[player_faction];
+
+		const auto assigned = ::calc_assigned_waypoint(player.ai_state.last_behavior);
+		::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, it.first);
+	}
 
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
