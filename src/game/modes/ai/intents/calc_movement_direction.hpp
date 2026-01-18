@@ -19,121 +19,29 @@ struct movement_direction_result {
 };
 
 /*
-	Update camp twitching behavior with breaks.
-	
-	Camp twitching works in phases:
-	1) Twitch phase (100-300ms): Bot moves towards a random direction within 40px radius
-	2) Still phase (500-800ms): Bot stays still
-	
-	If the bot exceeds the twitch radius boundary, it always moves back to center
-	regardless of the current phase.
-	
-	At the start of each twitch phase, a new random target direction is chosen.
-*/
-
-inline std::optional<vec2> update_camp_twitch(
-	ai_behavior_patrol& patrol,
-	const vec2 bot_pos,
-	const real32 dt,
-	randomization& rng
-) {
-	constexpr float TWITCH_RADIUS = 40.0f;
-	
-	/* Twitch move duration: 100-300ms */
-	constexpr float TWITCH_MOVE_MIN_SECS = 0.1f;
-	constexpr float TWITCH_MOVE_MAX_SECS = 0.5f;
-	
-	/* Still (break) duration: 500-800ms */
-	constexpr float TWITCH_STILL_MIN_SECS = 0.4f;
-	constexpr float TWITCH_STILL_MAX_SECS = 3.0f;
-
-	const auto offset_from_center = bot_pos - patrol.camp_center;
-	const auto dist_from_center = offset_from_center.length();
-
-	/*
-		If we've exceeded the twitch radius, always go back to center.
-		This takes priority over the twitch/still phase.
-	*/
-	if (dist_from_center > TWITCH_RADIUS) {
-		patrol.camp_twitch_target = (patrol.camp_center - bot_pos).normalize();
-	}
-
-	/*
-		Update twitch timers based on current phase.
-	*/
-	if (patrol.twitch_is_moving) {
-		/* In twitch move phase. */
-		patrol.twitch_move_timer -= dt;
-		
-		if (patrol.twitch_move_timer <= 0.0f) {
-			/* Twitch move phase ended - start still phase. */
-			patrol.twitch_is_moving = false;
-			patrol.twitch_still_duration = rng.randval(TWITCH_STILL_MIN_SECS, TWITCH_STILL_MAX_SECS);
-			patrol.twitch_still_timer = patrol.twitch_still_duration;
-			return std::nullopt;
-		}
-		
-		/* Continue moving towards twitch target. */
-		const auto direction = patrol.camp_twitch_target;
-
-		if (direction.is_nonzero()) {
-			return vec2(direction).normalize();
-		}
-		return std::nullopt;
-	}
-	else {
-		/* In still (break) phase. */
-		patrol.twitch_still_timer -= dt;
-		
-		if (patrol.twitch_still_timer <= 0.0f) {
-			/* Still phase ended - start new twitch move phase. */
-			patrol.twitch_is_moving = true;
-			patrol.twitch_move_duration = rng.randval(TWITCH_MOVE_MIN_SECS, TWITCH_MOVE_MAX_SECS);
-			patrol.twitch_move_timer = patrol.twitch_move_duration;
-			
-			/* Choose a new random twitch target direction. */
-			const auto random_angle = rng.randval(0.0f, 360.0f);
-			const auto random_offset = vec2::from_degrees(random_angle);
-			patrol.camp_twitch_target = random_offset;
-
-			if (dist_from_center > TWITCH_RADIUS) {
-				patrol.camp_twitch_target = (patrol.camp_center - bot_pos).normalize();
-			}
-			
-			/* Move towards the new target. camp_twitch_target is already a direction. */
-			const auto direction = patrol.camp_twitch_target;
-			if (direction.is_nonzero()) {
-				return vec2(direction).normalize();
-			}
-		}
-		
-		/* Still in break phase - don't move. */
-		return std::nullopt;
-	}
-}
-
-/*
 	Stateless calculation of the current movement direction.
 	
 	This function determines HOW the bot should move based on:
 	- Current behavior type
 	- Current pathfinding state (if navigating to a target)
-	- Camp twitching (if camping on a waypoint)
+	- Camp twitching result (from patrol's process())
 	- Defusing (no movement)
 	
 	Also outputs crosshair offset for aiming.
 	Uses std::visit on the behavior variant.
+	
+	NOTE: Camp twitch updates are now handled in ai_behavior_patrol::process().
+	This function just reads the twitch_direction result.
 */
 
 template <typename CharacterHandle>
 inline movement_direction_result calc_current_movement_direction(
-	ai_behavior_variant& behavior,
+	const ai_behavior_variant& behavior,
 	std::optional<ai_pathfinding_state>& pathfinding,
 	const vec2 character_pos,
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
-	const real32 dt,
-	randomization& rng
+	const real32 dt
 ) {
 	movement_direction_result result;
 
@@ -147,12 +55,11 @@ inline movement_direction_result calc_current_movement_direction(
 	}
 
 	/*
-		Check if camping (patrol with camp timer > 0) - do camp twitching.
+		Check if camping (patrol with camp timer > 0) - use twitch direction from process().
 	*/
-	if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
+	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
 		if (patrol->is_camping()) {
-			const auto twitch_dir = ::update_camp_twitch(*patrol, character_pos, dt, rng);
-			result.direction = twitch_dir;
+			result.direction = patrol->twitch_direction;
 			/*
 				Look in the direction of the waypoint transform while camping.
 			*/
