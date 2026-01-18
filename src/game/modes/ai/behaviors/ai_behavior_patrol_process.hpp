@@ -127,6 +127,12 @@ inline assigned_waypoint_result ai_behavior_patrol::calc_assigned_waypoint() con
 	return result;
 }
 
+inline void ai_behavior_patrol::clear_waypoint() {
+	current_waypoint = entity_id::dead();
+	push_waypoint = entity_id::dead();
+	camp_duration = 0.0f;
+}
+
 inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
 	auto& ai_state = ctx.ai_state;
@@ -137,34 +143,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	auto& rng = ctx.rng;
 	const bool pathfinding_just_completed = ctx.pathfinding_just_completed;
 
-	/*
-		Handle push waypoint first (has priority).
-	*/
-	if (is_pushing()) {
-		if (pathfinding_just_completed) {
-			AI_LOG("Reached push waypoint - clearing and switching to normal patrol");
-			const auto wp_handle = cosm[push_waypoint];
-
-			/*
-				Set up camp if the push waypoint is a camp waypoint.
-			*/
-			if (wp_handle.alive() && ::is_camp_waypoint(cosm, push_waypoint)) {
-				const auto wp_transform = wp_handle.get_logic_transform();
-				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, push_waypoint);
-				camp_timer = rng.randval(min_secs, max_secs);
-				camp_duration = camp_timer;
-				camp_center = wp_transform.pos;
-				camp_twitch_target = wp_transform.pos;
-				camp_look_direction = wp_transform.get_direction();
-			}
-
-			push_waypoint = entity_id::dead();
-			ai_state.tried_push_already = true;
-			going_to_first_waypoint = true;
-		}
-		/* Still pushing - don't process normal patrol logic. */
-		return;
-	}
+	auto now_waypoint = calc_assigned_waypoint();
 
 	/*
 		Update camp timer.
@@ -183,19 +162,16 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	/*
 		Check if camp timer just expired - need to pick next waypoint.
 	*/
-	if (current_waypoint.is_set() && camp_duration > 0.0f && camp_timer <= 0.0f) {
+	if (now_waypoint.waypoint_id.is_set() && camp_duration > 0.0f && camp_timer <= 0.0f) {
 		AI_LOG("Camp duration expired - clearing waypoint for next pick");
-		current_waypoint = entity_id::dead();
-		camp_duration = 0.0f;
+		clear_waypoint();
 	}
 
 	/*
-		Handle pathfinding completion for normal patrol.
+		Handle pathfinding completion.
 	*/
-	if (pathfinding_just_completed && current_waypoint.is_set()) {
+	if (pathfinding_just_completed) {
 		AI_LOG("Reached patrol waypoint");
-		going_to_first_waypoint = false;
-
 		const auto wp_handle = cosm[current_waypoint];
 
 		if (wp_handle.alive()) {
@@ -211,22 +187,29 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			}
 			else {
 				AI_LOG("Non-camp waypoint - clearing for next pick");
-				current_waypoint = entity_id::dead();
+				clear_waypoint();
 			}
 		}
 	}
 
 	/*
-		Find a new patrol waypoint when current one is dead and we're not pushing.
+		Find a new patrol waypoint if current one is dead.
 		This advances the patrol sequence.
 	*/
-	if (!is_pushing() && !current_waypoint.is_set() && !is_camping()) {
+	if (!calc_assigned_waypoint().waypoint_id.is_set()) {
+		/*
+			Might have been a push waypoint:
+		   	sprint back to the actual patrol waypoint.
+		*/
+
+		going_to_first_waypoint = now_waypoint.is_push_waypoint;
+
 		const auto new_wp = ::find_random_unassigned_patrol_waypoint(
 			cosm,
 			team_state,
 			ai_state.patrol_letter,
 			bot_player_id,
-			entity_id::dead(),
+			now_waypoint.waypoint_id,
 			rng
 		);
 
