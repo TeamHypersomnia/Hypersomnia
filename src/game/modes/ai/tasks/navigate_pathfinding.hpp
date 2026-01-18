@@ -80,24 +80,17 @@ inline navigate_pathfinding_result navigate_pathfinding(
 					
 					NOTE: We delegate crosshair easing to get_pathfinding_movement_direction
 					which handles it continuously from the final cell center to the exact destination.
-					We just need to provide the movement direction.
 				*/
-				const auto dir = target_pos - bot_pos;
-				result.movement_direction = vec2(dir).normalize();
-				result.is_navigating = true;
-
-				/*
-					Call get_pathfinding_movement_direction to get proper eased crosshair.
-					It will handle the "penultimate tile" case with t continuing from
-					cell-center approach to exact destination approach.
-				*/
-				::get_pathfinding_movement_direction(
+				const auto dir_result = ::get_pathfinding_movement_direction(
 					pathfinding,
 					bot_pos,
 					navmesh,
-					result.crosshair_offset,
 					dt
 				);
+				
+				result.movement_direction = dir_result.movement_direction;
+				result.crosshair_offset = dir_result.crosshair_offset;
+				result.is_navigating = dir_result.has_direction;
 
 				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
 				return result;
@@ -126,19 +119,19 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		Get movement direction from pathfinding.
 		Also calculates crosshair offset (un-normalized).
 	*/
-	const auto movement_dir = ::get_pathfinding_movement_direction(
+	const auto dir_result = ::get_pathfinding_movement_direction(
 		pathfinding,
 		bot_pos,
 		navmesh,
-		result.crosshair_offset,
 		dt
 	);
 
-	if (!movement_dir.has_value()) {
+	if (!dir_result.has_direction) {
 		return result;
 	}
 
-	result.movement_direction = *movement_dir;
+	result.movement_direction = dir_result.movement_direction;
+	result.crosshair_offset = dir_result.crosshair_offset;
 
 	/*
 		Debug draw the path.
