@@ -38,8 +38,12 @@
 #include "game/modes/ai/tasks/ai_behavior_tree.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/modes/ai/behaviors/eval_behavior_tree.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_push_process.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
 #include "game/modes/ai/intents/calc_pathfinding_request.hpp"
 #include "game/modes/ai/intents/calc_movement_direction.hpp"
+#include "game/modes/ai/intents/calc_wielding_intent.hpp"
 #include "game/modes/ai/intents/should_helpers.hpp"
 
 arena_ai_result update_arena_mode_ai(
@@ -153,58 +157,8 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		PHASE 3: Process current behavior (call process() on last_behavior).
-		===========================================================================
-	*/
-
-	/*
-		Update camp timer if we're in patrol behavior.
-	*/
-	if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
-		if (patrol->camp_timer > 0.0f) {
-			patrol->camp_timer -= dt_secs;
-		}
-
-		/*
-			Check if camp timer just expired - need to pick next waypoint.
-		*/
-		if (patrol->current_waypoint.is_set() && patrol->camp_duration > 0.0f && patrol->camp_timer <= 0.0f) {
-			AI_LOG("Camp duration expired - picking next waypoint");
-			::unassign_bot_from_waypoints(team_state, bot_player_id);
-			patrol->current_waypoint = entity_id::dead();
-			patrol->camp_duration = 0.0f;
-		}
-
-		/*
-			Find a waypoint if we don't have one.
-		*/
-		if (!patrol->current_waypoint.is_set()) {
-			AI_LOG("No waypoint - finding one");
-			const auto new_wp = ::find_random_unassigned_patrol_waypoint(
-				cosm,
-				team_state,
-				ai_state.patrol_letter,
-				bot_player_id,
-				entity_id::dead(),
-				stable_rng
-			);
-
-			if (new_wp.is_set()) {
-				patrol->current_waypoint = new_wp;
-				::assign_waypoint(team_state, new_wp, bot_player_id);
-				AI_LOG_NVPS(new_wp);
-
-				/* 85% chance to walk silently when not going to first waypoint. */
-				if (!patrol->going_to_first_waypoint) {
-					patrol->walk_silently_to_next_waypoint = stable_rng.randval(0, 99) < 85;
-				}
-			}
-		}
-	}
-
-	/*
-		===========================================================================
-		PHASE 4: Calculate pathfinding request (stateless, uses behavior variant).
+		PHASE 3: Calculate pathfinding request FIRST (before process()).
+		We need path_completed to pass to process().
 		===========================================================================
 	*/
 
@@ -240,7 +194,7 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		PHASE 5: Calculate movement direction (stateless, uses behavior variant).
+		PHASE 4: Calculate movement direction (stateless, uses behavior variant).
 		===========================================================================
 	*/
 
@@ -250,81 +204,60 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		navmesh,
 		character_handle,
-		dt_secs,
-		stable_rng
+		dt_secs
 	);
 
 	AI_LOG_NVPS(move_result.is_navigating, move_result.path_completed, move_result.can_sprint);
 
 	/*
-		Handle path completion - update behavior state.
+		===========================================================================
+		PHASE 5: Process current behavior (call process() on last_behavior via std::visit).
+		===========================================================================
 	*/
-	if (move_result.path_completed) {
-		AI_LOG("Path completed");
 
-		if (auto* push = ::get_behavior_if<ai_behavior_push>(ai_state.last_behavior)) {
-			AI_LOG("Reached push waypoint - transitioning to patrol");
-			const auto wp_handle = cosm[push->target_waypoint];
+	const bool pathfinding_just_completed = move_result.path_completed;
 
-			/*
-				Set up camp if the waypoint is a camp waypoint.
-			*/
-			ai_behavior_patrol new_patrol;
-			new_patrol.going_to_first_waypoint = true;
+	std::visit([&](auto& behavior) {
+		using T = std::decay_t<decltype(behavior)>;
 
-			if (wp_handle.alive() && ::is_camp_waypoint(cosm, push->target_waypoint)) {
-				const auto wp_transform = wp_handle.get_logic_transform();
-				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, push->target_waypoint);
-				new_patrol.camp_timer = stable_rng.randval(min_secs, max_secs);
-				new_patrol.camp_duration = new_patrol.camp_timer;
-				new_patrol.camp_center = wp_transform.pos;
-				new_patrol.camp_twitch_target = wp_transform.pos;
-				new_patrol.camp_look_direction = wp_transform.get_direction();
-			}
-
-			::unassign_bot_from_waypoints(team_state, bot_player_id);
-			ai_state.has_pushed_already = true;
-			ai_state.last_behavior = new_patrol;
+		if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
+			behavior.process(
+				cosm,
+				ai_state,
+				team_state,
+				bot_player_id,
+				character_pos,
+				dt_secs,
+				stable_rng,
+				pathfinding_just_completed
+			);
 		}
-		else if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
-			AI_LOG("Reached patrol waypoint");
-			patrol->going_to_first_waypoint = false;
+		else if constexpr (std::is_same_v<T, ai_behavior_push>) {
+			const auto new_patrol = behavior.process(
+				cosm,
+				ai_state,
+				team_state,
+				bot_player_id,
+				stable_rng,
+				pathfinding_just_completed
+			);
 
-			const auto wp_handle = cosm[patrol->current_waypoint];
-
-			if (wp_handle.alive()) {
-				if (::is_camp_waypoint(cosm, patrol->current_waypoint)) {
-					AI_LOG("Camp waypoint - setting up camp");
-					const auto wp_transform = wp_handle.get_logic_transform();
-					const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, patrol->current_waypoint);
-					patrol->camp_timer = stable_rng.randval(min_secs, max_secs);
-					patrol->camp_duration = patrol->camp_timer;
-					patrol->camp_center = wp_transform.pos;
-					patrol->camp_twitch_target = wp_transform.pos;
-					patrol->camp_look_direction = wp_transform.get_direction();
-				}
-				else {
-					AI_LOG("Non-camp waypoint - picking next");
-					::unassign_bot_from_waypoints(team_state, bot_player_id);
-					patrol->current_waypoint = entity_id::dead();
-				}
+			if (new_patrol.has_value()) {
+				ai_state.last_behavior = *new_patrol;
 			}
 		}
-		else if (auto* defuse = ::get_behavior_if<ai_behavior_defuse>(ai_state.last_behavior)) {
-			AI_LOG("Reached bomb - starting defuse");
-			defuse->is_defusing = true;
-
-			const auto current_wielding_defuse = wielding_setup::from_current(character_handle);
-
-			if (!current_wielding_defuse.is_bare_hands(cosm)) {
-				::perform_wielding(step, character_handle, wielding_setup::bare_hands());
-			}
-
-			if (auto* sentience = character_handle.find<components::sentience>()) {
-				sentience->is_requesting_interaction = true;
-			}
+		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
+			behavior.process(
+				character_handle,
+				step,
+				character_pos,
+				bomb_entity,
+				ai_state.target_crosshair_offset,
+				pathfinding_just_completed
+			);
 		}
-	}
+		/* Other behaviors (idle, combat, retrieve_bomb, plant) don't need process() yet. */
+	}, ai_state.last_behavior);
 
 	/* Update crosshair offset from movement calculation. */
 	if (move_result.crosshair_offset != vec2::zero) {
@@ -332,46 +265,15 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	/*
-		Handle defusing: aim at bomb, request interaction.
-	*/
-	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(ai_state.last_behavior)) {
-		if (defuse->is_defusing && bomb_entity.is_set()) {
-			const auto bomb_handle = cosm[bomb_entity];
-
-			if (bomb_handle.alive()) {
-				const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-				ai_state.target_crosshair_offset = bomb_pos - character_pos;
-
-				if (auto* sentience = character_handle.find<components::sentience>()) {
-					sentience->is_requesting_interaction = true;
-				}
-			}
-		}
-	}
-
-	/*
 		===========================================================================
-		PHASE 6: Manage weapons based on behavior state.
+		PHASE 6: Calculate and apply weapon wielding (via intent calculator).
 		===========================================================================
 	*/
 
-	const bool should_holster = ::should_holster_weapons(ai_state.last_behavior);
-	const auto current_wielding = wielding_setup::from_current(character_handle);
-	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
+	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle);
 
-	if (should_holster && !has_bare_hands) {
-		AI_LOG("Holstering weapons");
-		::perform_wielding(step, character_handle, wielding_setup::bare_hands());
-	}
-	else if (!should_holster && has_bare_hands) {
-		const auto best_weapon = ::find_best_weapon(character_handle);
-
-		if (best_weapon.is_set()) {
-			AI_LOG_NVPS("Drawing weapon", best_weapon);
-			auto requested_wield = wielding_setup::bare_hands();
-			requested_wield.hand_selections[0] = best_weapon;
-			::perform_wielding(step, character_handle, requested_wield);
-		}
+	if (wielding_intent.should_change) {
+		::perform_wielding(step, character_handle, wielding_intent.desired_wielding);
 	}
 
 	/*
