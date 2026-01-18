@@ -106,6 +106,50 @@ namespace augs {
 		return static_cast<T>(a * (static_cast<A>(1) - alpha) + b * alpha);
 	}
 
+	/*
+		Angular interpolation between two normalized direction vectors.
+		
+		Unlike linear interpolation which interpolates coordinates,
+		this rotates from direction 'a' towards direction 'b' by a fraction 'alpha'.
+		
+		The interpolation follows the shortest angular path (e.g., from 90 degrees to -180 degrees
+		goes through 180 instead of through 0 and -90).
+		
+		Parameters:
+		- a: normalized starting direction vector
+		- b: normalized target direction vector
+		- alpha: interpolation factor (0 = a, 1 = b)
+		
+		Returns: normalized direction vector interpolated angularly
+	*/
+	template <class V, class A>
+	V interp_angle(const V& a, const V& b, const A alpha) {
+		/*
+			Use cross product to determine signed angle between vectors.
+			cross = |a| * |b| * sin(angle) = sin(angle) for unit vectors
+			dot = |a| * |b| * cos(angle) = cos(angle) for unit vectors
+			atan2(cross, dot) gives the signed angle from a to b.
+		*/
+		const auto cross = a.x * b.y - a.y * b.x;  /* sin(angle) */
+		const auto dot = a.x * b.x + a.y * b.y;    /* cos(angle) */
+		
+		/* Get the signed angle from a to b (shortest path) */
+		const auto angle_between = repro::atan2(cross, dot);
+		
+		/* Rotate 'a' by alpha fraction of the angle */
+		const auto rotation_angle = angle_between * static_cast<decltype(angle_between)>(alpha);
+		
+		/* Apply rotation to 'a' */
+		real32 s = 0.f;
+		real32 c = 0.f;
+		repro::sincosf(rotation_angle, s, c);
+		
+		return V(
+			static_cast<typename V::coordinate_type>(a.x * c - a.y * s),
+			static_cast<typename V::coordinate_type>(a.x * s + a.y * c)
+		);
+	}
+
 	template <class C, class Xp, class Yp>
 	auto calc_vertices_aabb(const C& v, Xp x_pred, Yp y_pred) {
 		const auto lower_x = x_pred(minimum_of(v, [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));

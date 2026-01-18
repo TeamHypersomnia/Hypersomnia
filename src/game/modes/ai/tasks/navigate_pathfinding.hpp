@@ -116,6 +116,32 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	}
 
 	/*
+		Check if we're in the "post-cell-path" phase for exact destination mode.
+		This happens when the cell path is complete but we haven't reached
+		the exact destination yet.
+	*/
+	const auto current_target = ::get_current_path_target(pathfinding, navmesh);
+	
+	if (!current_target.has_value() && pathfinding.exact_destination) {
+		/*
+			Cell path is complete. Check if we've reached the exact destination.
+		*/
+		const auto target_pos = pathfinding.target_position();
+		const float dist_to_exact = (bot_pos - target_pos).length();
+		constexpr float EXACT_REACH_EPSILON = 30.0f;
+		
+		if (dist_to_exact <= EXACT_REACH_EPSILON) {
+			/* Reached exact destination - mark as completed. */
+			result.path_completed = true;
+			result.crosshair_offset = pathfinding.target_transform.get_direction() * 200.0f;
+			pathfinding_opt.reset();
+			return result;
+		}
+		
+		/* Not at exact position yet - continue navigating directly to target. */
+	}
+
+	/*
 		Get movement direction from pathfinding.
 		Also calculates crosshair offset (un-normalized).
 	*/
