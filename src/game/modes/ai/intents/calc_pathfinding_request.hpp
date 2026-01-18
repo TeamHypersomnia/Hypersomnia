@@ -5,6 +5,8 @@
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
+#include "game/detail/pathfinding.h"
+#include "game/detail/pathfinding_bomb.hpp"
 
 /*
 	Stateless calculation of the current pathfinding request.
@@ -20,7 +22,29 @@
 	Uses std::visit on the behavior variant.
 	
 	Note: Push waypoints are now handled inside patrol behavior.
+	
+	Now also resolves the cell_on_navmesh for efficient comparison.
+	For bomb targets, uses find_bomb_pathfinding_target to get the resolved cell.
 */
+
+/*
+	Helper to resolve a world position to a cell_on_navmesh.
+*/
+inline cell_on_navmesh resolve_cell_for_position(
+	const cosmos_navmesh& navmesh,
+	const vec2 world_pos
+) {
+	const auto island_opt = ::find_island_for_position(navmesh, world_pos);
+	if (!island_opt.has_value()) {
+		return cell_on_navmesh();
+	}
+	
+	const auto island_idx = *island_opt;
+	const auto& island = navmesh.islands[island_idx];
+	const auto cell = ::world_to_cell(island, world_pos);
+	
+	return cell_on_navmesh(island_idx, cell);
+}
 
 inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const cosmos& cosm,
@@ -32,7 +56,8 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const vec2 character_pos,
 	const bool bomb_planted,
 	const entity_id bomb_entity,
-	const real32 global_time_secs
+	const real32 global_time_secs,
+	const cosmos_navmesh& navmesh
 ) {
 	(void)team_state;
 	(void)bot_player_id;
@@ -46,7 +71,9 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 				COMBAT - pathfind to last known target position.
 			*/
 			if (combat_target.active(global_time_secs)) {
-				return ai_pathfinding_request::to_position(combat_target.last_known_pos);
+				auto req = ai_pathfinding_request::to_position(combat_target.last_known_pos);
+				req.resolved_cell = ::resolve_cell_for_position(navmesh, combat_target.last_known_pos);
+				return req;
 			}
 
 			return std::nullopt;
@@ -54,13 +81,19 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
 			/*
 				Bomb retrieval - pathfind to bomb.
+				Use find_bomb_pathfinding_target to get the resolved cell.
 			*/
 			if (bomb_entity.is_set()) {
 				const auto bomb_handle = cosm[bomb_entity];
 
 				if (bomb_handle.alive()) {
-					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-					return ai_pathfinding_request::to_bomb(bomb_pos);
+					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
+					
+					if (bomb_target.has_value()) {
+						auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
+						req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
+						return req;
+					}
 				}
 			}
 
@@ -69,6 +102,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
 			/*
 				Defuse - pathfind to bomb if not close.
+				Use find_bomb_pathfinding_target to get the resolved cell.
 			*/
 			if (b.is_defusing) {
 				return std::nullopt;
@@ -84,7 +118,13 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 						return std::nullopt;
 					}
 
-					return ai_pathfinding_request::to_bomb(bomb_pos);
+					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
+					
+					if (bomb_target.has_value()) {
+						auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
+						req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
+						return req;
+					}
 				}
 			}
 
@@ -99,7 +139,9 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 
 			if (wp_handle.alive()) {
 				const auto wp_transform = wp_handle.get_logic_transform();
-				return ai_pathfinding_request::to_transform(wp_transform, true);
+				auto req = ai_pathfinding_request::to_transform(wp_transform, true);
+				req.resolved_cell = ::resolve_cell_for_position(navmesh, wp_transform.pos);
+				return req;
 			}
 
 			return std::nullopt;

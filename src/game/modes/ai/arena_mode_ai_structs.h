@@ -75,6 +75,9 @@ struct ai_pathfinding_state {
 	Pathfinding request - describes WHERE the bot wants to pathfind.
 	This is a stateless calculation based on current game state.
 	The actual pathfinding only reinitializes when this request changes.
+	
+	The resolved_cell is set when creating the request and is used for
+	efficient comparison (two requests to the same cell are equivalent).
 */
 
 struct ai_pathfinding_request {
@@ -82,7 +85,6 @@ struct ai_pathfinding_request {
 	transformr target;
 	cell_on_navmesh resolved_cell;
 	bool exact = false;
-	bool is_bomb_target = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const ai_pathfinding_request& other) const {
@@ -91,12 +93,9 @@ struct ai_pathfinding_request {
 			in the same pathfinding anyway.
 		*/
 		if (!exact && !other.exact) {
-			return resolved_cell == other.resolved_cell && 
-			       is_bomb_target == other.is_bomb_target;
+			return resolved_cell == other.resolved_cell;
 		}
-		return target == other.target && 
-		       exact == other.exact && 
-		       is_bomb_target == other.is_bomb_target;
+		return target == other.target && exact == other.exact;
 	}
 
 	bool operator!=(const ai_pathfinding_request& other) const {
@@ -117,13 +116,6 @@ struct ai_pathfinding_request {
 		ai_pathfinding_request req;
 		req.target = t;
 		req.exact = exact_flag;
-		return req;
-	}
-
-	static ai_pathfinding_request to_bomb(const vec2 pos) {
-		ai_pathfinding_request req;
-		req.target = transformr(pos, 0.0f);
-		req.is_bomb_target = true;
 		return req;
 	}
 };
