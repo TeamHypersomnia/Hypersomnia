@@ -61,8 +61,14 @@ struct ai_behavior_patrol {
 	std::optional<vec2> twitch_direction;
 	// END GEN INTROSPECTOR
 
+	bool is_going_far() const;
+
 	bool is_camping() const {
-		return camp_timer > 0.0f && !going_to_first_waypoint;
+		return camp_timer > 0.0f;
+	}
+
+	bool in_motion() const {
+		return !is_camping();
 	}
 
 	bool is_pushing() const {

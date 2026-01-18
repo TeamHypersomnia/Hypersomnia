@@ -134,8 +134,7 @@ inline ai_behavior_variant eval_behavior_tree(
 		The patrol::process() will handle clearing it once reached.
 	*/
 	{
-		ai_behavior_patrol patrol_behavior;
-		patrol_behavior.going_to_first_waypoint = true;
+		auto patrol_behavior = ai_behavior_patrol();
 
 		/*
 			If not pushed yet, try to assign a push waypoint.
@@ -165,25 +164,6 @@ inline ai_behavior_variant eval_behavior_tree(
 
 			if (push_wp.is_set()) {
 				patrol_behavior.push_waypoint = push_wp;
-			}
-		}
-
-		/*
-			Find an unassigned patrol waypoint in the assigned area.
-			Only if we don't have a push waypoint.
-		*/
-		if (!patrol_behavior.push_waypoint.is_set()) {
-			const auto new_wp = ::find_random_unassigned_patrol_waypoint(
-				cosm,
-				team_state,
-				ai_state.patrol_letter,
-				bot_player_id,
-				entity_id::dead(),
-				rng
-			);
-
-			if (new_wp.is_set()) {
-				patrol_behavior.current_waypoint = new_wp;
 			}
 		}
 
