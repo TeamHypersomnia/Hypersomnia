@@ -488,7 +488,7 @@ arena_ai_result update_arena_mode_ai(
 		stable_rng
 	);
 
-	AI_LOG_NVPS(move_result.is_navigating, move_result.path_completed);
+	AI_LOG_NVPS(move_result.is_navigating, move_result.path_completed, move_result.can_sprint);
 
 	/* If path just completed, advance state machines. */
 	if (move_result.path_completed) {
@@ -525,7 +525,7 @@ arena_ai_result update_arena_mode_ai(
 
 	/* Apply movement direction and flags. */
 	movement.flags.walking = ::should_walk_silently(ai_state);
-	movement.flags.sprinting = ::should_sprint(ai_state);
+	movement.flags.sprinting = ::should_sprint(ai_state, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state, character_pos);
 
 	if (move_result.direction.has_value()) {
