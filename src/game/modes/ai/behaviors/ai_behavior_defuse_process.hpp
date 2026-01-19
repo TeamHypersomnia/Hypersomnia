@@ -13,13 +13,14 @@
 	
 	NOTE: Weapon holstering for defuse is handled statelessly via
 	should_holster_weapons() which checks is_defusing.
+	
+	NOTE: Crosshair offset and requested_interactions are now calculated statelessly
+	via calc_current_movement_direction() and calc_requested_interaction().
 */
 
 inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	auto& cosm = ctx.cosm;
-	const auto& character_pos = ctx.character_pos;
 	const auto bomb_entity = ctx.bomb_entity;
-	auto& target_crosshair_offset = ctx.ai_state.target_crosshair_offset;
 	const bool pathfinding_just_completed = ctx.pathfinding_just_completed;
 
 	const auto character_handle = cosm[ctx.controlled_character_id];
@@ -29,8 +30,7 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	}
 
 	/*
-		If defusing, aim at bomb and request interaction.
-		Also check if the bomb's character_now_defusing still matches this bot.
+		If defusing, check if the bomb's character_now_defusing still matches this bot.
 		If someone else took over or the defuse was interrupted, stop defusing.
 	*/
 	if (is_defusing && bomb_entity.is_set()) {
@@ -52,30 +52,11 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 					return;
 				}
 			}
-
-			const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-			target_crosshair_offset = bomb_pos - character_pos;
-
-			if (auto* sentience = character_handle.find<components::sentience>()) {
-				/*
-					AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
-				*/
-				sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
-			}
 		}
 	}
 
 	if (pathfinding_just_completed && !is_defusing) {
 		AI_LOG("Reached bomb - starting defuse");
 		is_defusing = true;
-
-
-		if (auto* sentience = character_handle.find<components::sentience>()) {
-			/*
-				AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
-				This prevents the bot from picking up items while defusing.
-			*/
-			sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
-		}
 	}
 }

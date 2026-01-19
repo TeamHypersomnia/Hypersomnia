@@ -41,15 +41,28 @@ inline movement_direction_result calc_current_movement_direction(
 	const vec2 character_pos,
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
-	const real32 dt
+	const real32 dt,
+	const cosmos& cosm,
+	const entity_id bomb_entity
 ) {
 	movement_direction_result result;
 
 	/*
-		Check if defusing - don't move at all.
+		Check if defusing - don't move, but aim at the bomb statelessly.
 	*/
 	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
 		if (defuse->is_defusing) {
+			/*
+				Statelessly calculate crosshair offset to aim at the bomb.
+			*/
+			if (bomb_entity.is_set()) {
+				const auto bomb_handle = cosm[bomb_entity];
+
+				if (bomb_handle.alive()) {
+					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
+					result.crosshair_offset = bomb_pos - character_pos;
+				}
+			}
 			return result;
 		}
 	}
