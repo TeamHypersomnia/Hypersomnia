@@ -75,7 +75,7 @@ using use_interaction_variant = std::variant<
 >;
 
 template <class E>
-std::optional<use_interaction_variant> query_use_interaction(const E& subject, const uint8_t requested_interactions) {
+std::optional<use_interaction_variant> query_use_interaction(const E& subject, const uint8_t requested_interactions = uint8_t(-1)) {
 	if (!subject.template has<invariants::sentience>()) {
 		return std::nullopt;
 	}
