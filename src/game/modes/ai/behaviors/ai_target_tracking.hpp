@@ -2,6 +2,8 @@
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_id.h"
 #include "augs/misc/randomization.h"
+#include "game/detail/sentience/sentience_getters.h"
+#include "game/cosmos/entity_handle.h"
 
 /*
 	Persistent combat target tracking.
@@ -28,13 +30,17 @@ struct ai_target_tracking {
 		- We have a valid entity id
 		- We've seen or heard them within the chosen combat timeout
 	*/
-	bool active(const real32 global_time_secs) const {
-		if (!id.is_set()) {
-			return false;
+	bool active(const cosmos& cosm, const real32 global_time_secs) const {
+		if (const auto handle = cosm[id]) {
+			if (sentient_and_conscious(handle)) {
+				return false;
+			}
+
+			const auto elapsed = global_time_secs - when_last_known_secs;
+			return elapsed <= chosen_combat_time_secs;
 		}
 
-		const auto elapsed = global_time_secs - when_last_known_secs;
-		return elapsed <= chosen_combat_time_secs;
+		return false;
 	}
 
 	/*
