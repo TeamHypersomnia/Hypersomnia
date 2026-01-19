@@ -135,6 +135,7 @@ arena_ai_result update_arena_mode_ai(
 		ai_state,
 		team_state,
 		bot_player_id,
+		controlled_character_id,
 		bot_faction,
 		character_pos,
 		round_state,
