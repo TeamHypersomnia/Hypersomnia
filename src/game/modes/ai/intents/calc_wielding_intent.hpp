@@ -3,8 +3,34 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
-#include "game/modes/ai/intents/should_helpers.hpp"
+#include "game/modes/ai/intents/calc_movement_flags.hpp"
 #include "game/modes/ai/tasks/find_best_weapon.hpp"
+
+inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
+	if (::is_camping_on_waypoint(behavior)) {
+		return false;
+	}
+
+	/*
+		Defusing requires bare hands - holster weapons when is_defusing.
+	*/
+	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
+		if (defuse->is_defusing) {
+			return true;
+		}
+	}
+
+	return std::visit([&](const auto& b) -> bool {
+		using T = std::decay_t<decltype(b)>;
+
+		if constexpr (std::is_same_v<T, ai_behavior_combat>) {
+			return false;
+		}
+		else {
+			return ::should_sprint(behavior, true);
+		}
+	}, behavior);
+}
 
 /*
 	Result of weapon wielding calculation.

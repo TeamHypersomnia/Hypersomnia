@@ -77,30 +77,3 @@ inline bool should_dash_for_combat(
 
 	return false;
 }
-
-inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
-	if (::is_camping_on_waypoint(behavior)) {
-		return false;
-	}
-
-	/*
-		Defusing requires bare hands - holster weapons when is_defusing.
-	*/
-	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
-		if (defuse->is_defusing) {
-			return true;
-		}
-	}
-
-	return std::visit([&](const auto& b) -> bool {
-		using T = std::decay_t<decltype(b)>;
-
-		if constexpr (std::is_same_v<T, ai_behavior_combat>) {
-			return false;
-		}
-		else {
-			return ::should_sprint(behavior, true);
-		}
-	}, behavior);
-}
-

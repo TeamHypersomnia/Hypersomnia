@@ -6,4 +6,4 @@
 
 #include "game/modes/ai/tasks/find_best_weapon.hpp"
 #include "game/modes/ai/tasks/line_of_sight.hpp"
-#include "game/modes/ai/intents/should_helpers.hpp"
+#include "game/modes/ai/intents/calc_movement_flags.hpp"
