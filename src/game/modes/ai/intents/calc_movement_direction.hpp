@@ -4,7 +4,7 @@
 #include "game/detail/pathfinding/navigate_pathfinding.hpp"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
-#include "game/modes/ai/intents/should_helpers.hpp"
+#include "game/modes/ai/intents/calc_movement_flags.hpp"
 
 /*
 	Result of movement direction calculation.

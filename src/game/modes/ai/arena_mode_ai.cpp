@@ -45,7 +45,7 @@
 #include "game/modes/ai/intents/calc_movement_direction.hpp"
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
-#include "game/modes/ai/intents/should_helpers.hpp"
+#include "game/modes/ai/intents/calc_movement_flags.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
