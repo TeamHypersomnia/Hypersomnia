@@ -78,6 +78,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	(void)team_state;
 	(void)bot_player_id;
 	(void)bot_faction;
+	(void)global_time_secs;
 
 	return std::visit([&](const auto& b) -> std::optional<ai_pathfinding_request> {
 		using T = std::decay_t<decltype(b)>;
