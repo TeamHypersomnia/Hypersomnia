@@ -33,11 +33,9 @@ struct ai_target_tracking {
 	bool active(const cosmos& cosm, const real32 global_time_secs) const {
 		if (const auto handle = cosm[id]) {
 			if (sentient_and_conscious(handle)) {
-				return false;
+				const auto elapsed = global_time_secs - when_last_known_secs;
+				return elapsed <= chosen_combat_time_secs;
 			}
-
-			const auto elapsed = global_time_secs - when_last_known_secs;
-			return elapsed <= chosen_combat_time_secs;
 		}
 
 		return false;

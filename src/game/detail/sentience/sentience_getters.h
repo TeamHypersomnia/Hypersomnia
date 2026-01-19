@@ -29,6 +29,10 @@ bool sentient_and_vulnerable(const E& self) {
 
 template <class E>
 bool sentient_and_alive(const E& self) {
+	if (self.dead()) {
+		return false;
+	}
+
 	if (const auto sentience = self.template find<components::sentience>()) {
 		return !sentience->is_dead();
 	}
@@ -38,6 +42,10 @@ bool sentient_and_alive(const E& self) {
 
 template <class E>
 bool sentient_and_conscious(const E& self) {
+	if (self.dead()) {
+		return false;
+	}
+
 	if (const auto sentience = self.template find<components::sentience>()) {
 		return sentience->is_conscious();
 	}
