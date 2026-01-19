@@ -266,15 +266,3 @@ inline transformr get_waypoint_transform(
 
 	return waypoint_handle.get_logic_transform();
 }
-
-/*
-	Check if the bot has reached the waypoint within a threshold.
-*/
-
-inline bool has_reached_waypoint(
-	const vec2 bot_pos,
-	const vec2 waypoint_pos,
-	const float threshold = 50.0f
-) {
-	return (bot_pos - waypoint_pos).length() <= threshold;
-}

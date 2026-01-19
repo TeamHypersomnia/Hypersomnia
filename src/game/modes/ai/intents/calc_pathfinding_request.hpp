@@ -121,12 +121,6 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 				const auto bomb_handle = cosm[bomb_entity];
 
 				if (bomb_handle.alive()) {
-					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-
-					if (::has_reached_waypoint(character_pos, bomb_pos, 100.0f)) {
-						return std::nullopt;
-					}
-
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
 					return ::create_bomb_pathfinding_request(bomb_target, navmesh);
 				}
