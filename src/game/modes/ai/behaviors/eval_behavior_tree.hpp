@@ -54,6 +54,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	const auto global_time_secs = round_state.global_time_secs;
 
 	(void)character_pos;
+	(void)bot_player_id;
 
 	/*
 		Priority 1: COMBAT if we have an active combat target.

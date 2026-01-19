@@ -7400,3 +7400,4 @@ This will discard your redo history."
 - server thinks its web and forces short match on hosted servers sometimes?
 - nades shouldnt bounce
 
+- contact_listener.cpp should SetEnabled(false) on a contact between teammates when one of them is defusing, will prevent from bots walking onto each other and interrupting defusal.

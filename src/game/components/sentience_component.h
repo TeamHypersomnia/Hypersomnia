@@ -85,7 +85,7 @@ namespace components {
 
 		uint8_t requested_interactions = 0u;
 		bool spells_drain_pe = true;
-		pad_bytes<1> pad;
+		pad_bytes<2> pad;
 		interaction_result_type last_interaction_result = interaction_result_type::NOTHING_FOUND;
 
 		damage_owners_vector damage_owners;
