@@ -29,27 +29,6 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 	}
 
 	/*
-		Handle path completion - start defusing.
-	*/
-	if (pathfinding_just_completed && !is_defusing) {
-		AI_LOG("Reached bomb - starting defuse");
-		is_defusing = true;
-
-		/*
-			NOTE: Weapon holstering is now handled statelessly in calc_wielding_intent
-			via should_holster_weapons() checking is_defusing state.
-		*/
-
-		if (auto* sentience = character_handle.find<components::sentience>()) {
-			/*
-				AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
-				This prevents the bot from picking up items while defusing.
-			*/
-			sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
-		}
-	}
-
-	/*
 		If defusing, aim at bomb and request interaction.
 		Also check if the bomb's character_now_defusing still matches this bot.
 		If someone else took over or the defuse was interrupted, stop defusing.
@@ -83,6 +62,20 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 				*/
 				sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
 			}
+		}
+	}
+
+	if (pathfinding_just_completed && !is_defusing) {
+		AI_LOG("Reached bomb - starting defuse");
+		is_defusing = true;
+
+
+		if (auto* sentience = character_handle.find<components::sentience>()) {
+			/*
+				AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
+				This prevents the bot from picking up items while defusing.
+			*/
+			sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
 		}
 	}
 }
