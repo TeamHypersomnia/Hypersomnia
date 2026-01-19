@@ -48,17 +48,18 @@ inline cell_on_navmesh resolve_cell_for_position(
 
 /*
 	Helper to create a pathfinding request from a bomb_pathfinding_target.
+	Now uses the resolved_cell from bomb_pathfinding_target directly
+	to avoid redundant recalculation.
 */
 inline std::optional<ai_pathfinding_request> create_bomb_pathfinding_request(
-	const std::optional<bomb_pathfinding_target>& bomb_target,
-	const cosmos_navmesh& navmesh
+	const std::optional<bomb_pathfinding_target>& bomb_target
 ) {
 	if (!bomb_target.has_value()) {
 		return std::nullopt;
 	}
 	
 	auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
-	req.resolved_cell = ::resolve_cell_for_position(navmesh, bomb_target->target_position);
+	req.resolved_cell = bomb_target->resolved_cell;
 	return req;
 }
 
@@ -100,7 +101,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 
 				if (bomb_handle.alive()) {
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
-					return ::create_bomb_pathfinding_request(bomb_target, navmesh);
+					return ::create_bomb_pathfinding_request(bomb_target);
 				}
 			}
 
@@ -119,7 +120,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 
 				if (bomb_handle.alive()) {
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
-					return ::create_bomb_pathfinding_request(bomb_target, navmesh);
+					return ::create_bomb_pathfinding_request(bomb_target);
 				}
 			}
 

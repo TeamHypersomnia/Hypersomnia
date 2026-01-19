@@ -99,6 +99,7 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 
 		bomb_pathfinding_target result;
 		result.target_position = ::cell_to_world(island, best_cell);
+		result.resolved_cell = cell_on_navmesh(island_idx, best_cell);
 		result.bomb_was_teleported = false;
 		return result;
 	}
@@ -123,6 +124,7 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 	*/
 	bomb_pathfinding_target result;
 	result.target_position = closest_unoccupied_world;
+	result.resolved_cell = cell_on_navmesh(island_idx, unoccupied_opt->cell);
 	result.bomb_was_teleported = true;
 	return result;
 }

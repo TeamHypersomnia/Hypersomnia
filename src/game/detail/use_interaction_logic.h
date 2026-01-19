@@ -2,10 +2,12 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "game/enums/interaction_result_type.h"
+#include "game/enums/requested_interaction_type.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/enums/filters.h"
 #include "game/inferred_caches/physics_world_cache.hpp"
+#include "augs/misc/enum/enum_bitset.h"
 
 struct bomb_defuse_interaction {
 	entity_id bomb_subject;
@@ -73,10 +75,13 @@ using use_interaction_variant = std::variant<
 >;
 
 template <class E>
-std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
+std::optional<use_interaction_variant> query_use_interaction(const E& subject, const uint8_t requested_interactions) {
 	if (!subject.template has<invariants::sentience>()) {
 		return std::nullopt;
 	}
+
+	const bool wants_defuse = augs::test_bit(requested_interactions, requested_interaction_type::DEFUSE);
+	const bool wants_pickup = augs::test_bit(requested_interactions, requested_interaction_type::PICK_UP_ITEMS);
 
 	auto& cosm = subject.get_cosmos();
 	const auto max_defuse_radius = subject.template get<invariants::sentience>().interaction_hitbox_radius;
@@ -97,7 +102,8 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 
 	std::vector<bomb_defuse_interaction> viable_defuses;
 
-	entities.for_each<render_layer::PLANTED_ITEMS>(cosm, [&](const auto& bomb_handle) {
+	if (wants_defuse) {
+		entities.for_each<render_layer::PLANTED_ITEMS>(cosm, [&](const auto& bomb_handle) {
 		bomb_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto typed_bomb) -> callback_result {
 			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
 			const auto character_now_defusing = cosm[fuse.character_now_defusing];
@@ -130,7 +136,7 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 			return callback_result::CONTINUE;
 		});
 	});
-
+	}
 
 	if (!viable_defuses.empty()) {
 		/* 
@@ -144,6 +150,10 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 
 		const auto& best_defuse = viable_defuses[0];
 		return best_defuse;
+	}
+
+	if (!wants_pickup) {
+		return std::nullopt;
 	}
 
 	thread_local auto overlaps = std::vector<b2TestOverlapOutput>();

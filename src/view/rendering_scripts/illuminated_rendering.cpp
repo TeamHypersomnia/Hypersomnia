@@ -356,7 +356,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		if (const auto sentience = viewed_character.find<components::sentience>()) {
 			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
-				if (sentience->is_requesting_interaction) {
+				if (sentience->is_requesting_any_interaction()) {
 					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
 						auto col = gray;
 

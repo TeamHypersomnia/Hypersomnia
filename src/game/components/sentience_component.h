@@ -6,6 +6,7 @@
 
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/enum/enum_map.h"
+#include "augs/misc/enum/enum_bitset.h"
 #include "augs/misc/value_meter.h"
 
 #include "augs/templates/type_list.h"
@@ -31,6 +32,7 @@
 
 #include "game/detail/sentience/detached_body_parts.h"
 #include "game/enums/interaction_result_type.h"
+#include "game/enums/requested_interaction_type.h"
 #include "game/enums/weapon_action_type.h"
 #include "game/detail/inventory/hand_count.h"
 #include "game/components/explosive_component.h"
@@ -81,9 +83,9 @@ namespace components {
 		augs::stepped_timestamp when_corpse_catched_fire;
 		sentience_shake shake = sentience_shake::zero();
 
-		bool is_requesting_interaction = false;
+		uint8_t requested_interactions = 0u;
 		bool spells_drain_pe = true;
-		pad_bytes<2> pad;
+		pad_bytes<1> pad;
 		interaction_result_type last_interaction_result = interaction_result_type::NOTHING_FOUND;
 
 		damage_owners_vector damage_owners;
@@ -109,6 +111,27 @@ namespace components {
 
 		money_type coins_on_body = 0;
 		// END GEN INTROSPECTOR
+
+		bool is_requesting_any_interaction() const {
+			return requested_interactions != 0;
+		}
+
+		bool is_requesting_interaction(const requested_interaction_type type) const {
+			return augs::test_bit(requested_interactions, type);
+		}
+
+		void set_requesting_interaction(const requested_interaction_type type, const bool value = true) {
+			augs::set_bit(requested_interactions, type, value);
+		}
+
+		void set_requesting_all_interactions(const bool value = true) {
+			if (value) {
+				requested_interactions = 0xFF;
+			}
+			else {
+				requested_interactions = 0;
+			}
+		}
 
 		bool is_interacting() const {
 			const bool just_begun = last_interaction_result == interaction_result_type::CAN_BEGIN;
