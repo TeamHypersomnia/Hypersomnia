@@ -199,10 +199,12 @@ std::optional<vec2> find_random_unoccupied_cell_within_rect(
 	Find pathfinding target for a bomb.
 	Returns the closest walkable cell that the bomb touches.
 	If no walkable cell is found, teleports the bomb to the closest walkable cell.
+	Now also includes the resolved_cell for efficient comparison.
 */
 
 struct bomb_pathfinding_target {
 	vec2 target_position;
+	cell_on_navmesh resolved_cell;
 	bool bomb_was_teleported = false;
 };
 

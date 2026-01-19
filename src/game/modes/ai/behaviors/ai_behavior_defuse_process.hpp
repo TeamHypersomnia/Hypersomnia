@@ -6,6 +6,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/enums/requested_interaction_type.h"
 
 /*
 	Implementation of ai_behavior_defuse::process().
@@ -40,7 +41,11 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 		*/
 
 		if (auto* sentience = character_handle.find<components::sentience>()) {
-			sentience->is_requesting_interaction = true;
+			/*
+				AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
+				This prevents the bot from picking up items while defusing.
+			*/
+			sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
 		}
 	}
 
@@ -73,7 +78,10 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 			target_crosshair_offset = bomb_pos - character_pos;
 
 			if (auto* sentience = character_handle.find<components::sentience>()) {
-				sentience->is_requesting_interaction = true;
+				/*
+					AI defusing only sets the DEFUSE bit, not PICK_UP_ITEMS.
+				*/
+				sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
 			}
 		}
 	}

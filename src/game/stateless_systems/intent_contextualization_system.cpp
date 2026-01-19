@@ -19,6 +19,7 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/use_interaction_logic.h"
+#include "game/enums/requested_interaction_type.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -40,7 +41,16 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 
 		if (e.intent == game_intent_type::INTERACT) {
 			if (const auto sentience = subject.find<components::sentience>()) {
-				sentience->is_requesting_interaction = e.was_pressed();
+				/*
+					Player INTERACT intent sets both DEFUSE and PICK_UP_ITEMS bits.
+				*/
+				if (e.was_pressed()) {
+					sentience->set_requesting_interaction(requested_interaction_type::DEFUSE, true);
+					sentience->set_requesting_interaction(requested_interaction_type::PICK_UP_ITEMS, true);
+				}
+				else {
+					sentience->requested_interactions = 0;
+				}
 			}
 		}
 	}
@@ -67,8 +77,8 @@ void intent_contextualization_system::advance_use_interactions(const logic_step 
 			/* Nothing found unless there is */
 			sentience.last_interaction_result = interaction_result_type::NOTHING_FOUND;
 
-			if (sentience.is_requesting_interaction) {
-				if (const auto result = ::query_use_interaction(subject)) {
+			if (sentience.is_requesting_any_interaction()) {
+				if (const auto result = ::query_use_interaction(subject, sentience.requested_interactions)) {
 					auto process_interaction = [&](const auto& typed_interaction) {
 						return typed_interaction.process(step, subject.get_id());
 					};

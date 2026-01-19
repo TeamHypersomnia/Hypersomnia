@@ -46,7 +46,7 @@ void transfer_input_flags_of_orphaned_entity(
 		if (const auto* const from_sentience = from.find<components::sentience>()) {
 			to_sentience->hand_flags = from_sentience->hand_flags;
 			to_sentience->block_flag = from_sentience->block_flag;
-			to_sentience->is_requesting_interaction = from_sentience->is_requesting_interaction;
+			to_sentience->requested_interactions = from_sentience->requested_interactions;
 		}
 	}
 }
@@ -72,7 +72,7 @@ void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 	}
 
 	if (auto* const sentience = e.find<components::sentience>()) {
-		sentience->is_requesting_interaction = false;
+		sentience->requested_interactions = 0;
 	}
 
 	unset_weapon_triggers(e);
