@@ -150,8 +150,8 @@ struct arena_mode_ai_team_state {
 	std::vector<ai_waypoint_state> push_waypoints;
 
 	marker_letter_type chosen_bombsite = marker_letter_type::A;
-	mode_player_id bot_with_defuse_mission;
-	mode_player_id bot_with_bomb_retrieval_mission;
+	entity_id bot_with_defuse_mission;
+	entity_id bot_with_bomb_retrieval_mission;
 	// END GEN INTROSPECTOR
 
 	void round_reset() {
@@ -160,8 +160,8 @@ struct arena_mode_ai_team_state {
 			Just clear the assignments.
 		*/
 		clear_waypoint_assignments();
-		bot_with_defuse_mission = mode_player_id::dead();
-		bot_with_bomb_retrieval_mission = mode_player_id::dead();
+		bot_with_defuse_mission = entity_id::dead();
+		bot_with_bomb_retrieval_mission = entity_id::dead();
 	}
 
 	void clear_waypoint_assignments() {

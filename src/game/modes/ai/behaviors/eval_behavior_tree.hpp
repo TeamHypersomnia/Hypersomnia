@@ -1,6 +1,7 @@
 #pragma once
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/sentience/sentience_getters.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
@@ -42,6 +43,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	arena_mode_ai_state& ai_state,
 	arena_mode_ai_team_state& team_state,
 	const mode_player_id& bot_player_id,
+	const entity_id controlled_character_id,
 	const faction_type bot_faction,
 	const vec2 character_pos,
 	const ai_round_state& round_state,
@@ -64,15 +66,15 @@ inline ai_behavior_variant eval_behavior_tree(
 		Priority 2: DEFUSE mission (Metropolis, bomb planted).
 	*/
 	if (round_state.bomb_planted && is_metropolis) {
-		if (team_state.bot_with_defuse_mission == bot_player_id) {
+		if (team_state.bot_with_defuse_mission == controlled_character_id) {
 			return ai_behavior_defuse{};
 		}
 
 		/*
-			Assign defuse mission if not yet assigned.
+			Assign defuse mission if no bot is assigned or previous assignee is dead/unconscious.
 		*/
-		if (!team_state.bot_with_defuse_mission.is_set()) {
-			team_state.bot_with_defuse_mission = bot_player_id;
+		if (!sentient_and_conscious(cosm[team_state.bot_with_defuse_mission])) {
+			team_state.bot_with_defuse_mission = controlled_character_id;
 			return ai_behavior_defuse{};
 		}
 	}
@@ -90,15 +92,15 @@ inline ai_behavior_variant eval_behavior_tree(
 				bomb_owner.get_official_faction() == faction_type::METROPOLIS;
 
 			if (bomb_on_ground || bomb_held_by_enemy) {
-				if (team_state.bot_with_bomb_retrieval_mission == bot_player_id) {
+				if (team_state.bot_with_bomb_retrieval_mission == controlled_character_id) {
 					return ai_behavior_retrieve_bomb{};
 				}
 
 				/*
-					Assign bomb retrieval mission if not yet assigned.
+					Assign bomb retrieval mission if no bot is assigned or previous assignee is dead/unconscious.
 				*/
-				if (!team_state.bot_with_bomb_retrieval_mission.is_set()) {
-					team_state.bot_with_bomb_retrieval_mission = bot_player_id;
+				if (!sentient_and_conscious(cosm[team_state.bot_with_bomb_retrieval_mission])) {
+					team_state.bot_with_bomb_retrieval_mission = controlled_character_id;
 					return ai_behavior_retrieve_bomb{};
 				}
 			}
@@ -108,9 +110,9 @@ inline ai_behavior_variant eval_behavior_tree(
 	/*
 		Clear bomb retrieval mission if bomb is secured.
 	*/
-	if (is_resistance && team_state.bot_with_bomb_retrieval_mission == bot_player_id) {
+	if (is_resistance && team_state.bot_with_bomb_retrieval_mission == controlled_character_id) {
 		if (!round_state.bomb_entity.is_set()) {
-			team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
+			team_state.bot_with_bomb_retrieval_mission = entity_id::dead();
 		}
 		else {
 			const auto bomb_handle = cosm[round_state.bomb_entity];
@@ -121,7 +123,7 @@ inline ai_behavior_variant eval_behavior_tree(
 					bomb_owner.get_official_faction() == faction_type::RESISTANCE;
 
 				if (bomb_secured) {
-					team_state.bot_with_bomb_retrieval_mission = mode_player_id::dead();
+					team_state.bot_with_bomb_retrieval_mission = entity_id::dead();
 				}
 			}
 		}
