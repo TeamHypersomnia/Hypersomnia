@@ -46,6 +46,7 @@
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
+#include "game/modes/ai/intents/calc_requested_interaction.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -171,7 +172,9 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		navmesh,
 		character_handle,
-		dt_secs
+		dt_secs,
+		cosm,
+		bomb_entity
 	);
 
 	/*
@@ -259,6 +262,20 @@ arena_ai_result update_arena_mode_ai(
 
 	if (wielding_intent.should_change) {
 		::perform_wielding(step, character_handle, wielding_intent.desired_wielding);
+	}
+
+	/*
+		===========================================================================
+		PHASE 6.5: Calculate and apply requested interactions (via intent calculator).
+		===========================================================================
+	*/
+
+	{
+		const auto requested_interactions = ::calc_requested_interaction(ai_state.last_behavior);
+
+		if (auto* sentience = character_handle.find<components::sentience>()) {
+			sentience->requested_interactions = requested_interactions;
+		}
 	}
 
 	/*
