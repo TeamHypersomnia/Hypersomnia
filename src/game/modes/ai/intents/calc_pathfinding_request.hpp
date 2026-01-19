@@ -86,13 +86,9 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 			/*
 				COMBAT - pathfind to last known target position.
 			*/
-			if (combat_target.active(global_time_secs)) {
-				auto req = ai_pathfinding_request::to_position(combat_target.last_known_pos);
-				req.resolved_cell = ::resolve_cell_for_position(navmesh, combat_target.last_known_pos);
-				return req;
-			}
-
-			return std::nullopt;
+			auto req = ai_pathfinding_request::to_position(combat_target.last_known_pos);
+			req.resolved_cell = ::resolve_cell_for_position(navmesh, combat_target.last_known_pos);
+			return req;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_bomb>) {
 			/*
