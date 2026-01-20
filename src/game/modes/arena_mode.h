@@ -500,6 +500,13 @@ private:
 	// END GEN INTROSPECTOR
 
 	/*
+		Non-introspected: Pathfinding context for reusing allocations across pathfinding sessions.
+		Used by all AI bots in this mode.
+	*/
+
+	pathfinding_context _pathfinding_ctx;
+
+	/*
 		Used only by the server to correctly report matches.
 	*/
 

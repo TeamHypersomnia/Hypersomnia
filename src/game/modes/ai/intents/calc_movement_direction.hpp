@@ -7,18 +7,6 @@
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
 
 /*
-	Result of movement direction calculation.
-*/
-
-struct movement_direction_result {
-	std::optional<vec2> direction;
-	vec2 crosshair_offset = vec2::zero;
-	bool path_completed = false;
-	bool is_navigating = false;
-	bool can_sprint = false;  /* True when movement direction is mostly parallel to path direction (within ~15 degrees). */
-};
-
-/*
 	Stateless calculation of the current movement direction.
 	
 	This function determines HOW the bot should move based on:
@@ -32,10 +20,18 @@ struct movement_direction_result {
 	
 	NOTE: Camp twitch updates are now handled in ai_behavior_patrol::process().
 	This function just reads the twitch_direction result.
+	
+	Returns navigate_pathfinding_result which contains:
+	- is_navigating: currently following a path
+	- path_completed: destination reached
+	- can_sprint: movement mostly parallel to path
+	- nearing_end: close to destination (use for holstering)
+	- movement_direction: direction to move
+	- crosshair_offset: where to aim
 */
 
 template <typename CharacterHandle>
-inline movement_direction_result calc_current_movement_direction(
+inline navigate_pathfinding_result calc_current_movement_direction(
 	const ai_behavior_variant& behavior,
 	std::optional<ai_pathfinding_state>& pathfinding,
 	const vec2 character_pos,
@@ -45,7 +41,7 @@ inline movement_direction_result calc_current_movement_direction(
 	const cosmos& cosm,
 	const entity_id bomb_entity
 ) {
-	movement_direction_result result;
+	navigate_pathfinding_result result;
 
 	/*
 		Check if defusing - don't move, but aim at the bomb statelessly.
@@ -73,7 +69,7 @@ inline movement_direction_result calc_current_movement_direction(
 	*/
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
 		if (patrol->is_camping()) {
-			result.direction = patrol->twitch_direction;
+			result.movement_direction = patrol->twitch_direction;
 			/*
 				Look in the direction of the waypoint transform while camping.
 			*/
@@ -86,28 +82,13 @@ inline movement_direction_result calc_current_movement_direction(
 		If pathfinding is active, use navigate_pathfinding for proper path following.
 	*/
 	if (pathfinding.has_value()) {
-		const auto nav_result = ::navigate_pathfinding(
+		result = ::navigate_pathfinding(
 			pathfinding,
 			character_pos,
 			navmesh,
 			character,
 			dt
 		);
-
-		result.path_completed = nav_result.path_completed;
-		result.is_navigating = nav_result.is_navigating;
-		result.crosshair_offset = nav_result.crosshair_offset;
-		result.can_sprint = nav_result.can_sprint;
-
-		if (nav_result.is_navigating) {
-			result.direction = nav_result.movement_direction;
-		}
-		else if (nav_result.path_completed) {
-			/*
-				Path completed - don't move, but set crosshair to face target direction.
-			*/
-			result.crosshair_offset = nav_result.crosshair_offset;
-		}
 	}
 
 	return result;

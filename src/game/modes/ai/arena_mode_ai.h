@@ -18,7 +18,8 @@ arena_ai_result update_arena_mode_ai(
 	const difficulty_type difficulty,
 	const cosmos_navmesh& navmesh,
 	const bool bomb_planted,
-	const entity_id bomb_entity
+	const entity_id bomb_entity,
+	pathfinding_context* pathfinding_ctx
 );
 
 void post_solve_arena_mode_ai(
