@@ -322,6 +322,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				cooldown_gun_heat(step, muzzle_transform, gun_entity);
 				interrupt_burst_fire();
 				interrupt_chambering();
+				gun.prev_trigger_state = {};
 			};
 
 			if (capability.dead()) {
@@ -342,7 +343,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				auto hand_index = static_cast<std::size_t>(-1);
 
 				const auto triggers = [&]() {
-					augs::enum_boolset<weapon_action_type> out;
+					augs::enum_boolset<weapon_action_type, 1> out;
 
 					for (std::size_t i = 0; i < hand_count_v; ++i) {
 						if (::get_hand_flag(owning_capability, i)) {
@@ -385,17 +386,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				interfer_once = false;
 
-				bool& primary_just_pressed = 
-					gun.just_pressed[weapon_action_type::PRIMARY]
+				bool primary_just_pressed = 
+					!gun.prev_trigger_state[weapon_action_type::PRIMARY]
+					&& primary_trigger_pressed
 				;
 
-				bool& secondary_just_pressed = 
-					gun.just_pressed[weapon_action_type::SECONDARY]
-				;
-
-				if (!secondary_trigger_pressed) {
-					secondary_just_pressed = false;
-				}
+				gun.prev_trigger_state = triggers;
 
 				auto make_gunshot_message = [&](){
 					messages::gunshot_message response;
@@ -463,10 +459,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
 									if (primary_trigger_pressed) {
 										primary_just_pressed = false;
-									}
-
-									if (secondary_trigger_pressed) {
-										secondary_just_pressed = false;
 									}
 								}
 
