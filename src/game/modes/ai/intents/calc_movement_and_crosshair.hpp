@@ -65,6 +65,29 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	}
 
 	/*
+		Check if planting - don't move, aim at cached plant target.
+	*/
+	if (const auto* plant = ::get_behavior_if<ai_behavior_plant>(behavior)) {
+		if (plant->is_planting) {
+			/*
+				Statelessly calculate crosshair offset to aim at plant target.
+			*/
+			if (plant->cached_plant_target.has_value()) {
+				const auto target_pos = plant->cached_plant_target->pos;
+				result.crosshair_offset = target_pos - character_pos;
+			}
+			else {
+				/*
+					Fallback: look forward.
+				*/
+				result.crosshair_offset = vec2(1.0f, 0.0f) * 200.0f;
+			}
+
+			return result;
+		}
+	}
+
+	/*
 		Check if camping (patrol with camp timer > 0) - use twitch direction from process().
 	*/
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {

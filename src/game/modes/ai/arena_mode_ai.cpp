@@ -42,6 +42,7 @@
 #include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_retrieve_bomb_process.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_plant_process.hpp"
 #include "game/modes/ai/intents/calc_pathfinding_request.hpp"
 #include "game/modes/ai/intents/calc_movement_and_crosshair.hpp"
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
@@ -196,7 +197,8 @@ arena_ai_result update_arena_mode_ai(
 		bomb_planted,
 		bomb_entity,
 		global_time_secs,
-		navmesh
+		navmesh,
+		stable_rng
 	);
 
 	/* Check if request changed - reinitialize pathfinding. */
@@ -300,6 +302,21 @@ arena_ai_result update_arena_mode_ai(
 	AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
 
 	::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
+
+	/*
+		Override hand_flags for planting - must be after handle_aiming_and_trigger.
+	*/
+	{
+		const auto hand_flags = ::calc_hand_flags(ai_state.last_behavior);
+
+		if (hand_flags.should_apply) {
+			if (auto* sentience = character_handle.find<components::sentience>()) {
+				sentience->hand_flags[0] = hand_flags.hand_flag_0;
+				sentience->hand_flags[1] = hand_flags.hand_flag_1;
+			}
+		}
+	}
+
 	::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, move_result.is_navigating);
 
 	arena_ai_result result;

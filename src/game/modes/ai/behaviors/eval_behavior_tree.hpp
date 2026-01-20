@@ -131,7 +131,30 @@ inline ai_behavior_variant eval_behavior_tree(
 	}
 
 	/*
-		Priority 4: PATROL behavior (with optional push_waypoint).
+		Priority 4: PLANT behavior (Resistance, bot has the bomb, already went to push point).
+		
+		If the bot has the bomb in inventory and has already tried the push waypoint,
+		then planting takes priority before combat.
+	*/
+	if (!round_state.bomb_planted && is_resistance && ai_state.tried_push_already) {
+		if (round_state.bomb_entity.is_set()) {
+			const auto bomb_handle = cosm[round_state.bomb_entity];
+
+			if (bomb_handle.alive()) {
+				const auto bomb_owner = bomb_handle.get_owning_transfer_capability();
+
+				/*
+					Check if this bot owns the bomb.
+				*/
+				if (bomb_owner == cosm[controlled_character_id]) {
+					return ai_behavior_plant{};
+				}
+			}
+		}
+	}
+
+	/*
+		Priority 5: PATROL behavior (with optional push_waypoint).
 		
 		If tried_push_already == false, we'll set the push_waypoint in the patrol behavior.
 		The patrol::process() will handle clearing it once reached.

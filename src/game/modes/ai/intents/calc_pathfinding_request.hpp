@@ -1,12 +1,14 @@
 #pragma once
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/for_each_entity.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/detail/pathfinding.h"
 #include "game/detail/pathfinding_bomb.hpp"
+#include "game/components/marker_component.h"
 
 /*
 	Stateless calculation of the current pathfinding request.
@@ -65,7 +67,7 @@ inline std::optional<ai_pathfinding_request> create_bomb_pathfinding_request(
 
 inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const cosmos& cosm,
-	const ai_behavior_variant& behavior,
+	ai_behavior_variant& behavior,
 	const ai_target_tracking& combat_target,
 	const arena_mode_ai_team_state& team_state,
 	const mode_player_id& bot_player_id,
@@ -74,14 +76,13 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const bool bomb_planted,
 	const entity_id bomb_entity,
 	const real32 global_time_secs,
-	const cosmos_navmesh& navmesh
+	const cosmos_navmesh& navmesh,
+	randomization& rng
 ) {
-	(void)team_state;
 	(void)bot_player_id;
-	(void)bot_faction;
 	(void)global_time_secs;
 
-	return std::visit([&](const auto& b) -> std::optional<ai_pathfinding_request> {
+	return std::visit([&](auto& b) -> std::optional<ai_pathfinding_request> {
 		using T = std::decay_t<decltype(b)>;
 
 		if constexpr (std::is_same_v<T, ai_behavior_combat>) {
@@ -145,7 +146,93 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_plant>) {
 			/*
 				PLANTING state - no pathfinding during plant.
+				Otherwise, pathfind to cached bombsite target.
 			*/
+			if (b.is_planting) {
+				return std::nullopt;
+			}
+
+			/*
+				If cached_plant_target is not set, find a random unoccupied cell
+				within the chosen bombsite area.
+			*/
+			if (!b.cached_plant_target.has_value()) {
+				const auto bombsite_letter = team_state.chosen_bombsite;
+
+				/*
+					Find a bombsite area marker with the chosen letter.
+				*/
+				std::optional<transformr> found_target;
+
+				cosm.for_each_having<invariants::area_marker>(
+					[&](const auto& typed_handle) {
+						if (found_target.has_value()) {
+							return;
+						}
+
+						const auto& marker_inv = typed_handle.template get<invariants::area_marker>();
+
+						if (!::is_bombsite(marker_inv.type)) {
+							return;
+						}
+
+						/*
+							Check if this bombsite matches the chosen letter.
+						*/
+						if (const auto marker_comp = typed_handle.template find<components::marker>()) {
+							if (marker_comp->letter != bombsite_letter) {
+								return;
+							}
+						}
+
+						/*
+							Check faction - bombsite should be for the bot's faction.
+						*/
+						if (typed_handle.get_official_faction() != bot_faction) {
+							return;
+						}
+
+						/*
+							Get AABB, transform, and size for the bombsite.
+						*/
+						if (const auto aabb = typed_handle.find_aabb()) {
+							const auto rect_transform = typed_handle.get_logic_transform();
+							const auto rect_size = typed_handle.get_logical_size();
+
+							const auto random_pos = ::find_random_unoccupied_cell_within_rect(
+								navmesh,
+								*aabb,
+								rect_transform,
+								rect_size,
+								rng
+							);
+
+							if (random_pos.has_value()) {
+								/*
+									Choose a random direction for the plant transform.
+								*/
+								const auto random_degrees = rng.randval(0.0f, 360.0f);
+								found_target = transformr(*random_pos, random_degrees);
+							}
+						}
+					}
+				);
+
+				if (found_target.has_value()) {
+					b.cached_plant_target = *found_target;
+				}
+			}
+
+			/*
+				Return cached target if available.
+			*/
+			if (b.cached_plant_target.has_value()) {
+				const auto& target = *b.cached_plant_target;
+				auto req = ai_pathfinding_request::to_transform(target, true);
+				req.resolved_cell = ::resolve_cell_for_position(navmesh, target.pos);
+				return req;
+			}
+
 			return std::nullopt;
 		}
 		else {
