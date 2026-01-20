@@ -22,21 +22,9 @@ inline void ai_behavior_retrieve_bomb::process(ai_behavior_process_ctx& ctx) {
 		return;
 	}
 
-	if (!bomb_entity.is_set()) {
-		return;
+	if (const auto bomb_handle = ctx.cosm[bomb_entity]) {
+		AI_LOG("Reached bomb - picking up");
+
+		item_pickup { bomb_entity }.process(ctx.step, ctx.controlled_character_id);
 	}
-
-	auto& cosm = ctx.cosm;
-	const auto bomb_handle = cosm[bomb_entity];
-
-	if (!bomb_handle.alive()) {
-		return;
-	}
-
-	AI_LOG("Reached bomb - picking up");
-
-	/*
-		Force item pickup of the bomb.
-	*/
-	item_pickup { bomb_entity }.process(ctx.step, ctx.controlled_character_id);
 }

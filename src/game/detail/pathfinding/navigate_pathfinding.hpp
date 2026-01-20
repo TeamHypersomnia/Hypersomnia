@@ -196,14 +196,14 @@ inline navigate_pathfinding_result navigate_pathfinding(
 			
 			if (angle_between <= MAX_SPRINT_ANGLE) {
 				result.can_sprint = true;
+			}
 
-				const auto nodes_n = pathfinding.main.path.nodes.size();
-				const auto nodes_i = pathfinding.main.node_index;
+			const auto nodes_n = pathfinding.main.path.nodes.size();
+			const auto nodes_i = pathfinding.main.node_index;
 
-				if (nodes_n <= 1 || nodes_i >= nodes_n - 1) {
-					result.can_sprint = false;
-					result.nearing_end = true;
-				}
+			if (nodes_n <= 1 || nodes_i >= nodes_n - 1) {
+				result.can_sprint = false;
+				result.nearing_end = true;
 			}
 		}
 	}
