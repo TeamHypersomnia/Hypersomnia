@@ -6,7 +6,7 @@
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
 #include "game/modes/ai/tasks/find_best_weapon.hpp"
 
-inline bool should_holster_weapons(const ai_behavior_variant& behavior, const bool nav_near_end = false) {
+inline bool should_holster_weapons(const ai_behavior_variant& behavior, const bool nav_nearing_end) {
 	if (::is_camping_on_waypoint(behavior)) {
 		return false;
 	}
@@ -19,7 +19,7 @@ inline bool should_holster_weapons(const ai_behavior_variant& behavior, const bo
 			return true;
 		}
 		else {
-			return nav_near_end;
+			return nav_nearing_end;
 		}
 	}
 
@@ -59,12 +59,12 @@ template <typename CharacterHandle>
 inline wielding_intent_result calc_wielding_intent(
 	const ai_behavior_variant& behavior,
 	CharacterHandle character_handle,
-	const bool nav_near_end = false
+	const bool nav_nearing_end
 ) {
 	wielding_intent_result result;
 	const auto& cosm = character_handle.get_cosmos();
 
-	const bool should_holster = ::should_holster_weapons(behavior, nav_near_end);
+	const bool should_holster = ::should_holster_weapons(behavior, nav_nearing_end);
 	const auto current_wielding = wielding_setup::from_current(character_handle);
 	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
 

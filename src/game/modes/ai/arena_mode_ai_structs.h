@@ -11,7 +11,7 @@
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 
 #if !NDEBUG
-#define LOG_AI 1
+#define LOG_AI 0
 #endif
 
 template <class... Args>

@@ -46,6 +46,7 @@
 #include "game/messages/collected_message.h"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
