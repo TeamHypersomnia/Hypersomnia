@@ -17,6 +17,9 @@ inline bool should_sprint(const ai_behavior_variant& behavior, const bool nav_ca
 		if constexpr (std::is_same_v<T, ai_behavior_combat>) {
 			return true;
 		}
+		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
+			return nav_can_sprint;
+		}
 		else if constexpr (std::is_same_v<T, ai_behavior_patrol>) {
 			return nav_can_sprint && b.is_going_far();
 		}
