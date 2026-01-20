@@ -10,13 +10,10 @@
 	
 	Cell advancement logic:
 	- Advance when within epsilon of the next cell's center
-	- OR when outside epsilon but in the half of the cell facing away from previous cell
-	
-	Diagonal cell advancement (separate logic):
-	- When the next path node is diagonal relative to the previous, the bot will pass through
-	  one of the two intermediate cardinal cells before reaching the diagonal cell.
-	- For diagonal moves, we also advance if the bot is in EITHER of the two intermediate
-	  cardinal cells (not on the path itself) and has moved past the center towards the diagonal.
+	- OR when outside epsilon but in the region "past" the cell center relative to the previous cell:
+	  - For cardinal (non-diagonal) movement: in the half facing away from previous cell
+	  - For diagonal movement: in either of the two adjacent halves (e.g., coming from bottom-left,
+	    advance if in top half OR right half - only the bottom-left quadrant is insufficient)
 */
 
 inline void advance_path_if_cell_reached(
@@ -58,18 +55,61 @@ inline void advance_path_if_cell_reached(
 			*/
 			if (progress.node_index > 0) {
 				/*
-					Check if we're in the half facing away from the previous cell.
+					Check if we're past the cell center relative to the previous cell.
+					For cardinal moves: in the half facing away from the previous cell.
+					For diagonal moves: in either of the two adjacent halves.
 				*/
 				const auto& prev_node = path.nodes[progress.node_index - 1];
-				const auto prev_center = ::cell_to_world(island, prev_node.cell_xy);
-				const auto to_prev = prev_center - cell_center;
-				const auto bot_offset = bot_pos - cell_center;
-
+				const auto prev_cell = prev_node.cell_xy;
+				const auto curr_cell = node.cell_xy;
+				
 				/*
-					If dot product is negative, we're on the side opposite to prev_center.
+					Determine if this is a diagonal move.
+					Diagonal if both x and y changed.
 				*/
-				if (to_prev.dot(bot_offset) < 0.0f) {
-					should_advance = true;
+				const int dx = static_cast<int>(curr_cell.x) - static_cast<int>(prev_cell.x);
+				const int dy = static_cast<int>(curr_cell.y) - static_cast<int>(prev_cell.y);
+				const bool is_diagonal = (dx != 0) && (dy != 0);
+				
+				const auto bot_offset = bot_pos - cell_center;
+				
+				if (is_diagonal) {
+					/*
+						For diagonal approach, advance if we're in either of the two halves
+						that are opposite to where we came from.
+						
+						Movement interpretation:
+						  dx = curr_cell.x - prev_cell.x
+						  dy = curr_cell.y - prev_cell.y
+						
+						Examples:
+						  - dx < 0: we moved left, so prev is to our right -> advance if in left half (offset.x < 0)
+						  - dx > 0: we moved right, so prev is to our left -> advance if in right half (offset.x > 0)
+						  - dy < 0: we moved up, so prev is below us -> advance if in top half (offset.y < 0)
+						  - dy > 0: we moved down, so prev is above us -> advance if in bottom half (offset.y > 0)
+						
+						For diagonal moves, if we're in EITHER opposite half (x or y), we've passed the center.
+					*/
+					bool in_opposite_half_x = (dx < 0 && bot_offset.x < 0) || (dx > 0 && bot_offset.x > 0);
+					bool in_opposite_half_y = (dy < 0 && bot_offset.y < 0) || (dy > 0 && bot_offset.y > 0);
+					
+					if (in_opposite_half_x || in_opposite_half_y) {
+						should_advance = true;
+					}
+				}
+				else {
+					/*
+						Cardinal move: use the original dot product logic.
+					*/
+					const auto prev_center = ::cell_to_world(island, prev_node.cell_xy);
+					const auto to_prev = prev_center - cell_center;
+
+					/*
+						If dot product is negative, we're on the side opposite to prev_center.
+					*/
+					if (to_prev.dot(bot_offset) < 0.0f) {
+						should_advance = true;
+					}
 				}
 			}
 			else if (progress.node_index + 1 < path.nodes.size()) {
@@ -86,82 +126,6 @@ inline void advance_path_if_cell_reached(
 				*/
 				if (to_next.dot(bot_offset) > 0.0f) {
 					should_advance = true;
-				}
-			}
-		}
-
-		/*
-			Separate diagonal navigation logic:
-			When the current node is diagonal from the previous node, the bot will traverse
-			through one of the two intermediate cardinal cells. Check if we're in one of those
-			cells and have progressed sufficiently towards the diagonal destination.
-		*/
-		if (!should_advance && progress.node_index > 0) {
-			const auto& prev_node = path.nodes[progress.node_index - 1];
-			const auto prev_cell = prev_node.cell_xy;
-			const auto curr_cell = node.cell_xy;
-			
-			/*
-				Check if this is a diagonal move (both x and y changed).
-			*/
-			const int dx = static_cast<int>(curr_cell.x) - static_cast<int>(prev_cell.x);
-			const int dy = static_cast<int>(curr_cell.y) - static_cast<int>(prev_cell.y);
-			const bool is_diagonal_move = (dx != 0) && (dy != 0);
-			
-			if (is_diagonal_move) {
-				/*
-					Calculate the two intermediate cardinal cells.
-					For a diagonal from (px, py) to (cx, cy):
-					  - intermediate1: (cx, py) - same y as prev, same x as curr
-					  - intermediate2: (px, cy) - same x as prev, same y as curr
-				*/
-				const auto intermediate1 = vec2u(curr_cell.x, prev_cell.y);
-				const auto intermediate2 = vec2u(prev_cell.x, curr_cell.y);
-				
-				/*
-					Check if bot is in one of the intermediate cells.
-				*/
-				const bool in_intermediate1 = ::is_within_cell(bot_pos, island, intermediate1);
-				const bool in_intermediate2 = ::is_within_cell(bot_pos, island, intermediate2);
-				
-				if (in_intermediate1 || in_intermediate2) {
-					/*
-						We're in an intermediate cell. Check if we've progressed past the center
-						towards the diagonal destination by checking both offset directions.
-					*/
-					const auto cell_center_intermediate = in_intermediate1 
-						? ::cell_to_world(island, intermediate1) 
-						: ::cell_to_world(island, intermediate2);
-					const auto bot_offset_from_intermediate = bot_pos - cell_center_intermediate;
-					
-					/*
-						For intermediate1 (cx, py): we need to move in the dy direction
-						For intermediate2 (px, cy): we need to move in the dx direction
-					*/
-					bool progressed_enough = false;
-					
-					if (in_intermediate1) {
-						/*
-							In intermediate1 (cx, py). Need to check y-direction progress.
-							dy > 0 means we're going down (higher y), so advance if bot_offset.y > 0
-							dy < 0 means we're going up (lower y), so advance if bot_offset.y < 0
-						*/
-						progressed_enough = (dy > 0 && bot_offset_from_intermediate.y > 0) ||
-						                    (dy < 0 && bot_offset_from_intermediate.y < 0);
-					}
-					else {
-						/*
-							In intermediate2 (px, cy). Need to check x-direction progress.
-							dx > 0 means we're going right, so advance if bot_offset.x > 0
-							dx < 0 means we're going left, so advance if bot_offset.x < 0
-						*/
-						progressed_enough = (dx > 0 && bot_offset_from_intermediate.x > 0) ||
-						                    (dx < 0 && bot_offset_from_intermediate.x < 0);
-					}
-					
-					if (progressed_enough) {
-						should_advance = true;
-					}
 				}
 			}
 		}
