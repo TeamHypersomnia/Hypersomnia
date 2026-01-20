@@ -168,12 +168,6 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		const auto callee_handle = cosm[callee];
 
 		if (callee_handle.alive()) {
-			callee_handle.dispatch_on_having_all<components::gun>(
-				[&](const auto& typed_gun) {
-					typed_gun.template get<components::gun>().just_pressed[action_type] = true;
-				}
-			);
-
 			callee_handle.dispatch_on_having_all<invariants::item>(
 				[&](const auto& typed_item) {
 					if (::is_armor_like(typed_item)) {

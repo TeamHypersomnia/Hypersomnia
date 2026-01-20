@@ -54,7 +54,7 @@ namespace components {
 
 		bool steam_burst_scheduled = false;
 		unsigned char remaining_burst_shots = 0;
-		augs::enum_boolset<weapon_action_type, 1> just_pressed;
+		augs::enum_boolset<weapon_action_type, 1> prev_trigger_state;
 
 		augs::real_cooldown fire_cooldown_object = 0.f;
 		augs::stepped_timestamp when_last_played_trigger_effect;
