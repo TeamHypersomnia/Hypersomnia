@@ -47,6 +47,7 @@
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
+#include "game/components/marker_component.h"
 
 bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
@@ -3766,6 +3767,61 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 					}
 
 					give_monetary_award(in, planter, {}, in.rules.economy.bomb_plant_award);
+
+					/*
+						Detect which bombsite the bomb was planted at and update AI team states.
+						Set chosen_bombsite for Resistance and patrol_letter for all Metropolis bots.
+					*/
+					{
+						const auto bomb_pos = typed_bomb.get_logic_transform().pos;
+						std::optional<marker_letter_type> planted_bombsite_letter;
+
+						/*
+							Find the bombsite area that contains the bomb.
+						*/
+						cosm.for_each_having<invariants::area_marker>(
+							[&](const auto& typed_area) {
+								if (planted_bombsite_letter.has_value()) {
+									return;
+								}
+
+								const auto& marker_inv = typed_area.template get<invariants::area_marker>();
+
+								if (!::is_bombsite(marker_inv.type)) {
+									return;
+								}
+
+								/*
+									Check if the bomb position is within the bombsite AABB.
+								*/
+								if (const auto aabb = typed_area.find_aabb()) {
+									if (aabb->hover(bomb_pos)) {
+										if (const auto marker_comp = typed_area.template find<components::marker>()) {
+											planted_bombsite_letter = marker_comp->letter;
+										}
+									}
+								}
+							}
+						);
+
+						if (planted_bombsite_letter.has_value()) {
+							const auto letter = *planted_bombsite_letter;
+
+							/*
+								Update chosen_bombsite for Resistance (attackers).
+							*/
+							factions[faction_type::RESISTANCE].ai_team_state.chosen_bombsite = letter;
+
+							/*
+								Update patrol_letter for all Metropolis (defenders) bots.
+							*/
+							for (auto& bot : only_bot(players)) {
+								if (bot.second.get_faction() == faction_type::METROPOLIS) {
+									bot.second.ai_state.patrol_letter = letter;
+								}
+							}
+						}
+					}
 				}
 			}
 		});
