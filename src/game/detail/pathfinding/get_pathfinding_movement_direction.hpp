@@ -20,7 +20,6 @@ static constexpr float STUCK_ROTATION_INTERVAL_SECS = 1.0f;
 struct pathfinding_direction_result {
 	vec2 movement_direction = vec2::zero;
 	vec2 crosshair_offset = vec2::zero;
-	bool has_direction = false;
 };
 
 /*
@@ -72,14 +71,12 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 			/* Use target direction directly since t >= 0.8 */
 			result.crosshair_offset = target_direction * cell_size;
 			result.movement_direction = vec2(dir).normalize();
-			result.has_direction = true;
 			return result;
 		}
 		
 		/* Default: just look in target direction */
 		result.crosshair_offset = target_direction * 200.0f;
 		result.movement_direction = vec2(dir).normalize();
-		result.has_direction = true;
 		return result;
 	}
 
@@ -251,6 +248,5 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 	}
 
 	result.movement_direction = vec2(dir).normalize();
-	result.has_direction = true;
 	return result;
 }

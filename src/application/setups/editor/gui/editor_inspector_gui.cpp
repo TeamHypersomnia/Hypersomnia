@@ -1240,6 +1240,7 @@ EDIT_FUNCTION(editor_explosive_node_editable& insp, T& es) {
 
 	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
+	MULTIPROPERTY("Armed", armed);
 
 	return result;
 }

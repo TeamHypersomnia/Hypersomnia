@@ -55,7 +55,7 @@ inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
 		}
 	}
 
-	if (pathfinding_just_completed && !is_defusing) {
+	if (!is_defusing && pathfinding_just_completed) {
 		AI_LOG("Reached bomb - starting defuse");
 		is_defusing = true;
 	}

@@ -360,6 +360,15 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 							auto new_id = r.generate_for(access, typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
+
+							if constexpr(std::is_same_v<node_type, editor_explosive_node>) {
+								if (typed_node.editable.armed) {
+									if (auto f = scene.world[new_id].template find<components::hand_fuse>()) {
+										f->when_armed = scene.world.get_timestamp();
+									}
+								}
+							}
+
 							setup_node_entity_mapping(new_id);
 							apply_layer_modifiers_on_special_entity(new_id);
 						},

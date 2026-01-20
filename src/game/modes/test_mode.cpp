@@ -369,14 +369,13 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					);
 
 					if (bomb_target.has_value()) {
-						target_transform = transformr(bomb_target->target_position, 0.0f);
+						target_transform = bomb_target->target_pathfinding_transform;
 						has_pathfinding_target = true;
 					}
 				}
 
 				if (has_pathfinding_target) {
-					::start_pathfinding_to(
-						first_player.debug_pathfinding,
+					first_player.debug_pathfinding = ::start_pathfinding_to(
 						character_pos,
 						target_transform,
 						navmesh,

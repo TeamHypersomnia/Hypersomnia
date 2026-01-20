@@ -53,7 +53,8 @@ inline std::optional<vec2> get_current_path_target(
 	const auto& path = progress.path;
 
 	if (path.island_index >= navmesh.islands.size() ||
-	    progress.node_index >= path.nodes.size()) {
+	    progress.node_index >= path.nodes.size()
+	) {
 		return std::nullopt;
 	}
 

@@ -63,6 +63,7 @@ inline movement_direction_result calc_current_movement_direction(
 					result.crosshair_offset = bomb_pos - character_pos;
 				}
 			}
+
 			return result;
 		}
 	}

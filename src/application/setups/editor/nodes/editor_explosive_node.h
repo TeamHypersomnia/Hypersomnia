@@ -9,6 +9,7 @@ struct editor_explosive_node_editable {
 	// GEN INTROSPECTOR struct editor_explosive_node_editable
 	vec2 pos;
 	real32 rotation = 0.0f;
+	bool armed = false;
 	// END GEN INTROSPECTOR
 };
 

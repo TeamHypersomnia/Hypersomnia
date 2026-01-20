@@ -203,9 +203,14 @@ std::optional<vec2> find_random_unoccupied_cell_within_rect(
 */
 
 struct bomb_pathfinding_target {
-	vec2 target_position;
+	transformr target_pathfinding_transform;
 	cell_on_navmesh resolved_cell;
 	bool bomb_was_teleported = false;
+
+	void set(const vec2 bomb_pos, const vec2 tile_pos) {
+		target_pathfinding_transform.pos = tile_pos;
+		target_pathfinding_transform.rotation = (bomb_pos - tile_pos).normalize().degrees();
+	}
 };
 
 template <class E>
