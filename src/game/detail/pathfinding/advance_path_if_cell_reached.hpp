@@ -10,7 +10,10 @@
 	
 	Cell advancement logic:
 	- Advance when within epsilon of the next cell's center
-	- OR when outside epsilon but in the half of the cell facing away from previous cell
+	- OR when outside epsilon but in the region "past" the cell center relative to the previous cell:
+	  - For cardinal (non-diagonal) movement: in the half facing away from previous cell
+	  - For diagonal movement: in either of the two adjacent halves (e.g., coming from bottom-left,
+	    advance if in top half OR right half - only the bottom-left quadrant is insufficient)
 */
 
 inline void advance_path_if_cell_reached(
@@ -52,18 +55,56 @@ inline void advance_path_if_cell_reached(
 			*/
 			if (progress.node_index > 0) {
 				/*
-					Check if we're in the half facing away from the previous cell.
+					Check if we're past the cell center relative to the previous cell.
+					For cardinal moves: in the half facing away from the previous cell.
+					For diagonal moves: in either of the two adjacent halves.
 				*/
 				const auto& prev_node = path.nodes[progress.node_index - 1];
-				const auto prev_center = ::cell_to_world(island, prev_node.cell_xy);
-				const auto to_prev = prev_center - cell_center;
-				const auto bot_offset = bot_pos - cell_center;
-
+				const auto prev_cell = prev_node.cell_xy;
+				const auto curr_cell = node.cell_xy;
+				
 				/*
-					If dot product is negative, we're on the side opposite to prev_center.
+					Determine if this is a diagonal move.
+					Diagonal if both x and y changed.
 				*/
-				if (to_prev.dot(bot_offset) < 0.0f) {
-					should_advance = true;
+				const int dx = static_cast<int>(curr_cell.x) - static_cast<int>(prev_cell.x);
+				const int dy = static_cast<int>(curr_cell.y) - static_cast<int>(prev_cell.y);
+				const bool is_diagonal = (dx != 0) && (dy != 0);
+				
+				const auto bot_offset = bot_pos - cell_center;
+				
+				if (is_diagonal) {
+					/*
+						For diagonal approach, advance if we're in either of the two adjacent halves.
+						E.g., if coming from bottom-left (dx=-1, dy=1 relative to prev):
+						  - curr cell is at (prev.x-1, prev.y+1), so prev is at bottom-left of curr
+						  - We want to advance if in top half (bot_offset.y < 0) OR right half (bot_offset.x > 0)
+						
+						dx < 0 means we moved left, so prev is to the right -> advance if left half (offset.x < 0)
+						dx > 0 means we moved right, so prev is to the left -> advance if right half (offset.x > 0)
+						dy < 0 means we moved up, so prev is below -> advance if top half (offset.y < 0)
+						dy > 0 means we moved down, so prev is above -> advance if bottom half (offset.y > 0)
+					*/
+					bool in_opposite_half_x = (dx < 0 && bot_offset.x < 0) || (dx > 0 && bot_offset.x > 0);
+					bool in_opposite_half_y = (dy < 0 && bot_offset.y < 0) || (dy > 0 && bot_offset.y > 0);
+					
+					if (in_opposite_half_x || in_opposite_half_y) {
+						should_advance = true;
+					}
+				}
+				else {
+					/*
+						Cardinal move: use the original dot product logic.
+					*/
+					const auto prev_center = ::cell_to_world(island, prev_node.cell_xy);
+					const auto to_prev = prev_center - cell_center;
+
+					/*
+						If dot product is negative, we're on the side opposite to prev_center.
+					*/
+					if (to_prev.dot(bot_offset) < 0.0f) {
+						should_advance = true;
+					}
 				}
 			}
 			else if (progress.node_index + 1 < path.nodes.size()) {

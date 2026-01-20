@@ -10,6 +10,7 @@
 #include "game/enums/filters.h"
 #include "game/detail/physics/physics_queries.h"
 #include "augs/math/transform.h"
+#include "augs/math/repro_math.h"
 
 /*
 	Helper function to check if a point is inside a rotated rectangle.
@@ -42,6 +43,16 @@ uint32_t cell_distance(const vec2u a, const vec2u b) {
 	const auto dx = a.x > b.x ? a.x - b.x : b.x - a.x;
 	const auto dy = a.y > b.y ? a.y - b.y : b.y - a.y;
 	return dx + dy;
+}
+
+/*
+	Euclidean distance between two cells (for 8-directional A*).
+*/
+
+float cell_distance_euclidean(const vec2u a, const vec2u b) {
+	const auto dx = static_cast<float>(a.x > b.x ? a.x - b.x : b.x - a.x);
+	const auto dy = static_cast<float>(a.y > b.y ? a.y - b.y : b.y - a.y);
+	return repro::sqrt(dx * dx + dy * dy);
 }
 
 float world_distance(const vec2 a, const vec2 b) {
@@ -294,19 +305,19 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	}
 
 	auto heuristic = [&](const vec2u c) {
-		return static_cast<float>(::cell_distance(c, target_cell));
+		return ::cell_distance_euclidean(c, target_cell);
 	};
 
 	auto is_target = [&](const vec2u c) {
 		return c == target_cell;
 	};
 
-	const auto found = augs::astar_find_path(
+	const auto found = augs::astar_find_path_weighted(
 		context.astar_queue,
 		actual_start,
 		graph.make_get_visited(),
 		graph.make_set_visited(),
-		graph.make_for_each_neighbor(is_walkable),
+		graph.make_for_each_neighbor_8_with_weight(is_walkable),
 		heuristic,
 		is_target,
 		graph.make_set_parent(),

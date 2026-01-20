@@ -131,4 +131,93 @@ namespace augs {
 
 		return false;
 	}
+
+	/*
+		A* algorithm with weighted edges.
+		Same as astar_find_path but ForEachNeighbor callback receives (neighbor, weight).
+	*/
+
+	template <
+		class Id,
+		class Queue,
+		class GetVisited,
+		class SetVisited,
+		class ForEachNeighborWithWeight,
+		class Heuristic,
+		class IsTarget,
+		class SetParent,
+		class GetGCost,
+		class SetGCost
+	>
+	bool astar_find_path_weighted(
+		Queue& open_set,
+		const Id start,
+		GetVisited&& get_visited,
+		SetVisited&& set_visited,
+		ForEachNeighborWithWeight&& for_each_neighbor,
+		Heuristic&& heuristic,
+		IsTarget&& is_target,
+		SetParent&& set_parent,
+		GetGCost&& get_g_cost,
+		SetGCost&& set_g_cost
+	) {
+		/*
+			Clear the queue for reuse.
+		*/
+		while (!open_set.empty()) {
+			open_set.pop();
+		}
+
+		const auto start_h = heuristic(start);
+		set_g_cost(start, 0.0f);
+		open_set.push({ start, start_h });
+
+		while (!open_set.empty()) {
+			const auto current = open_set.top();
+			open_set.pop();
+
+			const auto& current_id = current.id;
+
+			/*
+				Skip if already visited.
+			*/
+			if (get_visited(current_id)) {
+				continue;
+			}
+
+			set_visited(current_id);
+
+			/*
+				Check if target reached.
+			*/
+			if (is_target(current_id)) {
+				return true;
+			}
+
+			const auto current_g = get_g_cost(current_id);
+
+			/*
+				Explore neighbors with weights.
+			*/
+			for_each_neighbor(current_id, [&](const Id neighbor, const float edge_weight) {
+				if (get_visited(neighbor)) {
+					return callback_result::CONTINUE;
+				}
+
+				const auto tentative_g = current_g + edge_weight;
+
+				if (tentative_g < get_g_cost(neighbor)) {
+					set_g_cost(neighbor, tentative_g);
+					set_parent(neighbor, current_id);
+
+					const auto h = heuristic(neighbor);
+					open_set.push({ neighbor, tentative_g + h });
+				}
+
+				return callback_result::CONTINUE;
+			});
+		}
+
+		return false;
+	}
 }

@@ -4,6 +4,7 @@
 #include "game/detail/pathfinding/path_helpers.hpp"
 #include "game/debug_drawing_settings.h"
 #include "augs/math/arithmetical.h"
+#include "game/common_state/cosmos_pathfinding.h"
 
 /*
 	Stuck rotation interval in seconds.
@@ -124,11 +125,27 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 			bool has_next_target = false;
 			bool ease_to_target_rotation = false;
 
+			/*
+				Calculate the effective cell distance for easing.
+				For diagonal moves between cells, this is cell_size * sqrt(2).
+			*/
+			auto calc_cell_step_distance = [&](const vec2u from_cell, const vec2u to_cell) -> float {
+				const int dx = static_cast<int>(to_cell.x) - static_cast<int>(from_cell.x);
+				const int dy = static_cast<int>(to_cell.y) - static_cast<int>(from_cell.y);
+				const bool is_diagonal = (dx != 0) && (dy != 0);
+				return is_diagonal ? (cell_size * SQRT_2) : cell_size;
+			};
+
+			float effective_cell_distance = cell_size;
+
 			if (active_progress.node_index + 1 < path.nodes.size()) {
 				/*
 					Normal case: look ahead to next cell on current path.
 				*/
-				next_target = ::cell_to_world(island, path.nodes[active_progress.node_index + 1].cell_xy);
+				const auto& curr_cell = path.nodes[active_progress.node_index].cell_xy;
+				const auto& next_cell = path.nodes[active_progress.node_index + 1].cell_xy;
+				next_target = ::cell_to_world(island, next_cell);
+				effective_cell_distance = calc_cell_step_distance(curr_cell, next_cell);
 				has_next_target = true;
 			}
 			else if (is_rerouting) {
@@ -159,9 +176,11 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 					Calculate progress as how close we are to the current cell center.
 					At center of current cell (progress = 1.0): look fully at next cell.
 					Far from current cell (progress = 0.0): look at current cell.
+					
+					Use effective_cell_distance for proper interpolation on diagonal paths.
 				*/
 				const auto dist_to_current = (bot_pos - current_target).length();
-				const auto t = std::clamp(1.0f - dist_to_current / cell_size, 0.0f, 1.0f);
+				const auto t = std::clamp(1.0f - dist_to_current / effective_cell_distance, 0.0f, 1.0f);
 
 				look_ahead_target = current_target + (next_target - current_target) * t;
 			}
@@ -169,11 +188,22 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 				/*
 					Ease towards the target transform's facing direction.
 					
-					The total ease distance is just cell_size since we're on the penultimate tile.
+					The total ease distance depends on whether the last step was diagonal.
 					We finish rotation at t = 0.8 because we will never reach t = 1.0 exactly.
 				*/
+				
+				/*
+					Calculate effective distance based on previous step (if any).
+				*/
+				float total_ease_distance = cell_size;
+				
+				if (active_progress.node_index > 0 && active_progress.node_index < path.nodes.size()) {
+					const auto& prev_cell = path.nodes[active_progress.node_index - 1].cell_xy;
+					const auto& curr_cell = path.nodes[active_progress.node_index].cell_xy;
+					total_ease_distance = calc_cell_step_distance(prev_cell, curr_cell);
+				}
+				
 				const auto dist_to_current = (bot_pos - current_target).length();
-				const auto total_ease_distance = cell_size;
 				
 				/* Shrink time so we finish rotation before reaching the epsilon */
 				const auto shrinked_time = 0.8f;

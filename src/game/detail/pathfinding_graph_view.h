@@ -102,6 +102,74 @@ struct pathfinding_graph_view {
 	}
 
 	/*
+		Iterate over 8-directional neighbors of cell c with edge weights.
+		For diagonal neighbors to be valid, both adjacent cardinal neighbors must pass the filter.
+		
+		Callback receives: (neighbor, weight) where weight is 1.0 for cardinal, sqrt(2) for diagonal.
+	*/
+	template <class Filter, class Callback>
+	void for_each_neighbor_8_with_weight(const vec2u c, Filter&& filter, Callback&& callback) const {
+		/*
+			First, check which cardinal neighbors are walkable.
+			Indices match CELL_DIRECTIONS: 0=up, 1=down, 2=left, 3=right
+		*/
+		bool cardinal_walkable[4] = { false, false, false, false };
+
+		for (uint32_t d = 0; d < 4; ++d) {
+			const auto dir = CELL_DIRECTIONS[d];
+			const auto neighbor = vec2u(vec2i(c) + dir);
+			cardinal_walkable[d] = filter(neighbor);
+		}
+
+		/*
+			Iterate cardinal directions first.
+		*/
+		for (uint32_t d = 0; d < 4; ++d) {
+			if (cardinal_walkable[d]) {
+				const auto dir = CELL_DIRECTIONS[d];
+				const auto neighbor = vec2u(vec2i(c) + dir);
+
+				if (callback(neighbor, 1.0f) == callback_result::ABORT) {
+					return;
+				}
+			}
+		}
+
+		/*
+			Diagonal directions (indices 4-7 in CELL_DIRECTIONS_8).
+			A diagonal is only valid if both adjacent cardinals are walkable.
+			
+			Diagonal mapping:
+			  4 = top-left    (-1,-1) requires: up (0) and left (2)
+			  5 = top-right   ( 1,-1) requires: up (0) and right (3)
+			  6 = bottom-left (-1, 1) requires: down (1) and left (2)
+			  7 = bottom-right( 1, 1) requires: down (1) and right (3)
+		*/
+		constexpr int diagonal_required[4][2] = {
+			{ 0, 2 },  /* top-left needs up and left */
+			{ 0, 3 },  /* top-right needs up and right */
+			{ 1, 2 },  /* bottom-left needs down and left */
+			{ 1, 3 }   /* bottom-right needs down and right */
+		};
+
+		for (uint32_t d = 0; d < 4; ++d) {
+			const auto req1 = diagonal_required[d][0];
+			const auto req2 = diagonal_required[d][1];
+
+			if (cardinal_walkable[req1] && cardinal_walkable[req2]) {
+				const auto dir = CELL_DIRECTIONS_8[4 + d];
+				const auto neighbor = vec2u(vec2i(c) + dir);
+
+				if (filter(neighbor)) {
+					if (callback(neighbor, SQRT_2) == callback_result::ABORT) {
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	/*
 		Reconstruct path from start_cell to target_cell using stored parent pointers.
 		Returns path in start -> target order.
 	*/
@@ -163,6 +231,17 @@ struct pathfinding_graph_view {
 	auto make_for_each_neighbor(Filter&& filter) {
 		return [this, filter = std::forward<Filter>(filter)](const vec2u c, auto&& callback) {
 			this->for_each_neighbor(c, filter, callback);
+		};
+	}
+
+	/*
+		Create a lambda for 8-directional neighbor iteration with weights.
+		The callback receives (neighbor, weight).
+	*/
+	template <class Filter>
+	auto make_for_each_neighbor_8_with_weight(Filter&& filter) {
+		return [this, filter = std::forward<Filter>(filter)](const vec2u c, auto&& callback) {
+			this->for_each_neighbor_8_with_weight(c, filter, callback);
 		};
 	}
 
