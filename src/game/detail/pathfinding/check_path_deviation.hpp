@@ -58,6 +58,40 @@ inline void check_path_deviation(
 		}
 
 		/*
+			Diagonal navigation check:
+			When moving diagonally from prev to curr, the bot will traverse through
+			one of two intermediate cardinal cells. Check if we're in one of those.
+		*/
+		if (current_idx > 0) {
+			const auto& prev_cell = nodes[current_idx - 1].cell_xy;
+			const auto& curr_cell = nodes[current_idx].cell_xy;
+			
+			const int dx = static_cast<int>(curr_cell.x) - static_cast<int>(prev_cell.x);
+			const int dy = static_cast<int>(curr_cell.y) - static_cast<int>(prev_cell.y);
+			const bool is_diagonal_move = (dx != 0) && (dy != 0);
+			
+			if (is_diagonal_move) {
+				/*
+					Two intermediate cardinal cells for diagonal move:
+					  - intermediate1: (curr_cell.x, prev_cell.y)
+					  - intermediate2: (prev_cell.x, curr_cell.y)
+				*/
+				const auto intermediate1 = vec2u(curr_cell.x, prev_cell.y);
+				const auto intermediate2 = vec2u(prev_cell.x, curr_cell.y);
+				
+				if (::is_within_cell(bot_pos, island, intermediate1) ||
+				    ::is_within_cell(bot_pos, island, intermediate2)
+				) {
+					/*
+						Bot is in one of the valid intermediate cells during diagonal move.
+						This is not a deviation - bot is on the correct path.
+					*/
+					return true;
+				}
+			}
+		}
+
+		/*
 			We're not on current or previous cell - search nearby cells.
 		*/
 		const auto start_check = current_idx >= DEVIATION_CHECK_RANGE_V ? current_idx - DEVIATION_CHECK_RANGE_V : 0;
