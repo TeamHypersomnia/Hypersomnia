@@ -31,7 +31,6 @@
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/find_closest_enemy.hpp"
 #include "game/modes/ai/tasks/update_alertness.hpp"
-#include "game/modes/ai/intents/handle_aiming_and_trigger.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
@@ -49,6 +48,7 @@
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
 #include "game/modes/ai/intents/calc_requested_interaction.hpp"
+#include "game/modes/ai/intents/calc_hand_flags.hpp"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -177,7 +177,10 @@ arena_ai_result update_arena_mode_ai(
 		character_handle,
 		dt_secs,
 		cosm,
-		bomb_entity
+		bomb_entity,
+		has_target,
+		closest_enemy,
+		ai_state.target_crosshair_offset
 	);
 
 	/*
@@ -301,19 +304,22 @@ arena_ai_result update_arena_mode_ai(
 
 	AI_LOG_NVPS(movement.flags.walking, movement.flags.sprinting, movement.flags.dashing);
 
-	::handle_aiming_and_trigger(ctx, has_target, closest_enemy);
-
 	/*
-		Override hand_flags for planting - must be after handle_aiming_and_trigger.
+		Calculate and apply hand_flags (triggers, planting).
 	*/
 	{
-		const auto hand_flags = ::calc_hand_flags(ai_state.last_behavior);
+		const auto hand_flags = ::calc_hand_flags(
+			ai_state.last_behavior,
+			has_target,
+			closest_enemy,
+			character_pos,
+			cosm,
+			character_handle
+		);
 
-		if (hand_flags.should_apply) {
-			if (auto* sentience = character_handle.find<components::sentience>()) {
-				sentience->hand_flags[0] = hand_flags.hand_flag_0;
-				sentience->hand_flags[1] = hand_flags.hand_flag_1;
-			}
+		if (auto* sentience = character_handle.find<components::sentience>()) {
+			sentience->hand_flags[0] = hand_flags.hand_flag_0;
+			sentience->hand_flags[1] = hand_flags.hand_flag_1;
 		}
 	}
 
