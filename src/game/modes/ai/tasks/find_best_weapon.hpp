@@ -20,7 +20,7 @@ inline entity_id find_best_weapon(const E& character_handle) {
 	character_handle.for_each_contained_item_recursive(
 		[&](const auto& item) {
 			if (!item.template has<components::gun>()) {
-				return;
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
 			}
 
 			if (const auto item_def = item.template find<invariants::item>()) {
@@ -31,6 +31,8 @@ inline entity_id find_best_weapon(const E& character_handle) {
 					best_weapon = item.get_id();
 				}
 			}
+
+			return recursive_callback_result::CONTINUE_DONT_RECURSE;
 		}
 	);
 
