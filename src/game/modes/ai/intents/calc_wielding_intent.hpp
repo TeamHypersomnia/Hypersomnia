@@ -164,7 +164,7 @@ inline wielding_intent_result calc_wielding_intent(
 		result.desired_wielding = wielding_setup::bare_hands();
 		result.should_change = true;
 	}
-	else if (!should_holster && has_bare_hands) {
+	else if (!should_holster && character_handle.get_wielded_guns().empty()) {
 		const auto best_weapon = ::find_best_weapon(character_handle);
 
 		if (best_weapon.is_set()) {
