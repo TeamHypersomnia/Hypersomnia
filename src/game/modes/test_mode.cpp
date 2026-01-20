@@ -375,12 +375,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				}
 
 				if (has_pathfinding_target) {
-					first_player.debug_pathfinding = ::start_pathfinding_to(
-						character_pos,
-						target_transform,
-						navmesh,
-						nullptr
-					);
+					if (first_player.debug_pathfinding == std::nullopt) {
+						first_player.debug_pathfinding = ::start_pathfinding_to(
+							character_pos,
+							target_transform,
+							navmesh,
+							nullptr
+						);
+					}
 
 					/*
 						Set exact_destination for DEBUG_PATHFINDING_END markers.
@@ -417,6 +419,8 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						/*
 							Pathfinding completed - stop movement.
 						*/
+						first_player.debug_pathfinding = std::nullopt;
+
 						if (auto* movement = character.find<components::movement>()) {
 							movement->flags.set_from_closest_direction(vec2::zero);
 							movement->flags.sprinting = false;
