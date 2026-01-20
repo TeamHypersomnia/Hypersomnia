@@ -43,7 +43,7 @@
 #include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_retrieve_bomb_process.hpp"
 #include "game/modes/ai/intents/calc_pathfinding_request.hpp"
-#include "game/modes/ai/intents/calc_movement_direction.hpp"
+#include "game/modes/ai/intents/calc_movement_and_crosshair.hpp"
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
 #include "game/modes/ai/intents/calc_assigned_waypoint.hpp"
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
@@ -168,7 +168,7 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	const auto move_result = ::calc_current_movement_direction(
+	const auto move_result = ::calc_movement_and_crosshair(
 		ai_state.last_behavior,
 		ai_state.pathfinding,
 		character_pos,

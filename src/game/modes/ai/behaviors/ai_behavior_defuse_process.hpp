@@ -15,7 +15,7 @@
 	should_holster_weapons() which checks is_defusing.
 	
 	NOTE: Crosshair offset and requested_interactions are now calculated statelessly
-	via calc_current_movement_direction() and calc_requested_interaction().
+	via calc_movement_and_crosshair() and calc_requested_interaction().
 */
 
 inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {

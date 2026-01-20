@@ -31,7 +31,7 @@
 */
 
 template <typename CharacterHandle>
-inline navigate_pathfinding_result calc_current_movement_direction(
+inline navigate_pathfinding_result calc_movement_and_crosshair(
 	const ai_behavior_variant& behavior,
 	std::optional<ai_pathfinding_state>& pathfinding,
 	const vec2 character_pos,
