@@ -1,5 +1,5 @@
 #pragma once
-
+#include "game/detail/inventory/perform_wielding.hpp"
 
 template <class E, class C>
 auto wield_same_as(const E& similar_wielded, const logic_step step, const C& character) {

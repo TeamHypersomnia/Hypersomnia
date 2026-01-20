@@ -47,7 +47,7 @@ void demolitions_system::handle_arming_requests(const logic_step step) {
 			bool hand_flag_pressed = false;
 			weapon_action_type action_type = weapon_action_type::COUNT;
 
-			holder.dispatch_on_having_all<components::sentience>([&](const auto& typed_holder) {
+			holder.template dispatch_on_having_all<components::sentience>([&](const auto& typed_holder) {
 				for (std::size_t i = 0; i < hand_count_v; ++i) {
 					if (::get_hand_flag(typed_holder, i)) {
 						const auto action = typed_holder.calc_viable_hand_action(i);
@@ -84,7 +84,7 @@ void demolitions_system::handle_arming_requests(const logic_step step) {
 					if (source == arming_source_type::SHOOT_INTENT || source == arming_source_type::SHOOT_SECONDARY_INTENT) {
 						fuse_logic.release_explosive_if_armed();
 
-						holder.dispatch_on_having_all<components::sentience>([&](const auto& typed_holder) {
+						holder.template dispatch_on_having_all<components::sentience>([&](const auto& typed_holder) {
 							auto current_wielding = wielding_setup::from_current(typed_holder);
 
 							if (current_wielding.is_bare_hands(cosm)) {
