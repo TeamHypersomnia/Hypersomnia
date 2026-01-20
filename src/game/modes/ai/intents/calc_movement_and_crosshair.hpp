@@ -53,16 +53,6 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	navigate_pathfinding_result result;
 
 	/*
-		If has combat target, aim at the target statelessly.
-		This takes priority for crosshair aim direction.
-	*/
-	if (has_target) {
-		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
-		const auto aim_direction = target_pos - character_pos;
-		target_crosshair_offset = aim_direction;
-	}
-
-	/*
 		Check if defusing - don't move, but aim at the bomb statelessly.
 	*/
 	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
@@ -104,6 +94,16 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 
 			return result;
 		}
+	}
+
+	/*
+		If has combat target, aim at the target statelessly.
+		Only set when not in a behavior with specific aiming (defusing, planting).
+	*/
+	if (has_target) {
+		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
+		const auto aim_direction = target_pos - character_pos;
+		target_crosshair_offset = aim_direction;
 	}
 
 	/*
