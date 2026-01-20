@@ -58,12 +58,13 @@ struct wielding_intent_result {
 template <typename CharacterHandle>
 inline wielding_intent_result calc_wielding_intent(
 	const ai_behavior_variant& behavior,
-	CharacterHandle character_handle
+	CharacterHandle character_handle,
+	const bool nav_near_end = false
 ) {
 	wielding_intent_result result;
 	const auto& cosm = character_handle.get_cosmos();
 
-	const bool should_holster = ::should_holster_weapons(behavior);
+	const bool should_holster = ::should_holster_weapons(behavior, nav_near_end);
 	const auto current_wielding = wielding_setup::from_current(character_handle);
 	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
 

@@ -41,6 +41,7 @@
 #include "game/modes/ai/behaviors/ai_behavior_process_ctx.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_retrieve_bomb_process.hpp"
 #include "game/modes/ai/intents/calc_pathfinding_request.hpp"
 #include "game/modes/ai/intents/calc_movement_direction.hpp"
 #include "game/modes/ai/intents/calc_wielding_intent.hpp"
@@ -62,7 +63,8 @@ arena_ai_result update_arena_mode_ai(
 	const difficulty_type difficulty,
 	const cosmos_navmesh& navmesh,
 	const bool bomb_planted,
-	const entity_id bomb_entity
+	const entity_id bomb_entity,
+	pathfinding_context* pathfinding_ctx
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -205,7 +207,7 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.clear_pathfinding();
 
 		if (new_request != std::nullopt) {
-			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, nullptr);
+			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, pathfinding_ctx);
 
 			if (ai_state.is_pathfinding_active()) {
 				ai_state.pathfinding->exact_destination = new_request->exact;
@@ -258,7 +260,7 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle);
+	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle, move_result.nearing_end);
 
 	if (wielding_intent.should_change) {
 		::perform_wielding(step, character_handle, wielding_intent.desired_wielding);
@@ -288,8 +290,8 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
 
-	if (move_result.direction.has_value()) {
-		movement.flags.set_from_closest_direction(*move_result.direction);
+	if (move_result.movement_direction.has_value()) {
+		movement.flags.set_from_closest_direction(*move_result.movement_direction);
 	}
 	else {
 		movement.flags.set_from_closest_direction(vec2::zero);

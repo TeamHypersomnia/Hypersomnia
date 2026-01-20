@@ -2464,7 +2464,8 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			in.dynamic_vars.bot_difficulty,
 			cosm.get_common_significant().navmesh,
 			is_bomb_planted,
-			current_bomb_entity
+			current_bomb_entity,
+			&_pathfinding_ctx
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
