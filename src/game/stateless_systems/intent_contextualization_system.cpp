@@ -8,7 +8,6 @@
 #include "game/components/gun_component.h"
 #include "game/components/container_component.h"
 #include "game/components/melee_component.h"
-#include "game/components/hand_fuse_component.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
@@ -16,7 +15,6 @@
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/hand_fuse_logic.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/use_interaction_logic.h"
 #include "game/enums/requested_interaction_type.h"
@@ -26,9 +24,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/weapon_like.h"
 #include "game/detail/inventory/perform_wielding.hpp"
-#include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
-#include "game/detail/inventory/wield_same_as.hpp"
 
 using namespace augs;
 
@@ -137,8 +133,6 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			continue;
 		}
 
-		auto action_type = weapon_action_type::COUNT;
-
 		subject.dispatch_on_having_all<components::sentience>([&](const auto& typed_subject) {
 			auto requested_index = static_cast<std::size_t>(-1);
 
@@ -154,7 +148,6 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 				const auto action = subject.calc_viable_hand_action(idx);
 				callee = action.held_item;
-				action_type = action.type;
 
 				auto& sentience = typed_subject.template get<components::sentience>();
 				sentience.hand_flags[idx] = it.was_pressed();
@@ -176,41 +169,6 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 								if (it.was_pressed() && typed_item.find_mounting_progress() == nullptr) {
 									perform_transfer(item_slot_transfer_request::standard(typed_item, armor_slot), step);
 								}
-							}
-						}
-					}
-				}
-			);
-
-			callee_handle.dispatch_on_having_all<components::hand_fuse>(
-				[&](const auto typed_fused) {
-					const auto fuse_logic = fuse_logic_provider(typed_fused, step);
-
-					if (fuse_logic.fuse_def.has_delayed_arming()) {
-						fuse_logic.fuse.arming_requested = it.was_pressed();
-					}
-					else {
-						if (it.was_pressed()) {
-							const auto source = action_type == weapon_action_type::SECONDARY ?
-								arming_source_type::SHOOT_SECONDARY_INTENT : 
-								arming_source_type::SHOOT_INTENT
-							;
-
-							fuse_logic.arm_explosive(source);
-						}
-						else {
-							const auto source = fuse_logic.fuse.arming_source;
-
-							if (source == arming_source_type::SHOOT_INTENT || source == arming_source_type::SHOOT_SECONDARY_INTENT) {
-								fuse_logic.release_explosive_if_armed();
-
-								subject.dispatch_on_having_all<components::sentience>([&](const auto& typed_subject) {
-									auto current_wielding = wielding_setup::from_current(typed_subject);
-
-									if (current_wielding.is_bare_hands(cosm)) {
-										::wield_same_as(typed_fused, step, typed_subject);
-									}
-								});
 							}
 						}
 					}
