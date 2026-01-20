@@ -95,6 +95,39 @@ inline constexpr vec2i CELL_DIRECTIONS[4] = {
 };
 
 /*
+	8-directional cell navigation constants for diagonal pathfinding.
+	First 4 are cardinal directions (weight 1.0), last 4 are diagonal (weight sqrt(2)).
+*/
+
+inline constexpr float SQRT_2 = 1.41421356237f;
+
+inline constexpr vec2i CELL_DIRECTIONS_8[8] = {
+	/* Cardinal directions */
+	{ 0, -1 },   /* up */
+	{ 0,  1 },   /* down */
+	{ -1, 0 },   /* left */
+	{ 1,  0 },   /* right */
+	/* Diagonal directions */
+	{ -1, -1 },  /* top-left */
+	{ 1, -1 },   /* top-right */
+	{ -1, 1 },   /* bottom-left */
+	{ 1,  1 }    /* bottom-right */
+};
+
+inline constexpr float CELL_WEIGHTS_8[8] = {
+	/* Cardinal directions */
+	1.0f,
+	1.0f,
+	1.0f,
+	1.0f,
+	/* Diagonal directions */
+	SQRT_2,
+	SQRT_2,
+	SQRT_2,
+	SQRT_2
+};
+
+/*
 	Maximum number of candidate cells to consider when finding closest walkable cell.
 	Abort BFS after finding this many matches to avoid traversing entire graph.
 */
