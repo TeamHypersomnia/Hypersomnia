@@ -7,7 +7,7 @@
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
 
 /*
-	Stateless calculation of the current movement direction.
+	Stateless calculation of the current movement direction and crosshair aim.
 	
 	This function determines HOW the bot should move based on:
 	- Current behavior type
@@ -15,7 +15,13 @@
 	- Camp twitching result (from patrol's process())
 	- Defusing (no movement)
 	
-	Also outputs crosshair offset for aiming.
+	Also outputs crosshair offset for aiming based on:
+	- Combat targets (when has_target is true)
+	- Bomb location (when defusing)
+	- Plant target (when planting)
+	- Waypoint direction (when camping)
+	- Path direction (when navigating)
+	
 	Uses std::visit on the behavior variant.
 	
 	NOTE: Camp twitch updates are now handled in ai_behavior_patrol::process().
@@ -39,9 +45,22 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	CharacterHandle character,
 	const real32 dt,
 	const cosmos& cosm,
-	const entity_id bomb_entity
+	const entity_id bomb_entity,
+	const bool has_target,
+	const entity_id closest_enemy,
+	vec2& target_crosshair_offset
 ) {
 	navigate_pathfinding_result result;
+
+	/*
+		If has combat target, aim at the target statelessly.
+		This takes priority for crosshair aim direction.
+	*/
+	if (has_target) {
+		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
+		const auto aim_direction = target_pos - character_pos;
+		target_crosshair_offset = aim_direction;
+	}
 
 	/*
 		Check if defusing - don't move, but aim at the bomb statelessly.
