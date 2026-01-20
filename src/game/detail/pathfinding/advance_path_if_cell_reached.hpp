@@ -117,15 +117,48 @@ inline void advance_path_if_cell_reached(
 					node_index == 0: Check if we're in the half facing towards the next cell.
 				*/
 				const auto& next_node = path.nodes[progress.node_index + 1];
-				const auto next_center = ::cell_to_world(island, next_node.cell_xy);
-				const auto to_next = next_center - cell_center;
+				const auto next_cell = next_node.cell_xy;
+				const auto curr_cell = node.cell_xy;
+				const auto next_center = ::cell_to_world(island, next_cell);
 				const auto bot_offset = bot_pos - cell_center;
 
 				/*
-					If dot product is positive, we're on the side towards next_center.
+					Determine if this is a diagonal move to the next cell.
 				*/
-				if (to_next.dot(bot_offset) > 0.0f) {
-					should_advance = true;
+				const int dx = static_cast<int>(next_cell.x) - static_cast<int>(curr_cell.x);
+				const int dy = static_cast<int>(next_cell.y) - static_cast<int>(curr_cell.y);
+				const bool is_diagonal = (dx != 0) && (dy != 0);
+
+				if (is_diagonal) {
+					/*
+						For diagonal move towards next cell, advance if we're in EITHER of the two halves
+						that face towards the diagonal destination.
+						
+						Examples:
+						  - dx > 0: next cell is to the right -> advance if in right half (offset.x > 0)
+						  - dx < 0: next cell is to the left -> advance if in left half (offset.x < 0)
+						  - dy > 0: next cell is below -> advance if in bottom half (offset.y > 0)
+						  - dy < 0: next cell is above -> advance if in top half (offset.y < 0)
+					*/
+					bool in_towards_half_x = (dx > 0 && bot_offset.x > 0) || (dx < 0 && bot_offset.x < 0);
+					bool in_towards_half_y = (dy > 0 && bot_offset.y > 0) || (dy < 0 && bot_offset.y < 0);
+					
+					if (in_towards_half_x || in_towards_half_y) {
+						should_advance = true;
+					}
+				}
+				else {
+					/*
+						Cardinal move: use the original dot product logic.
+					*/
+					const auto to_next = next_center - cell_center;
+
+					/*
+						If dot product is positive, we're on the side towards next_center.
+					*/
+					if (to_next.dot(bot_offset) > 0.0f) {
+						should_advance = true;
+					}
 				}
 			}
 		}

@@ -145,7 +145,22 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 				const auto& curr_cell = path.nodes[active_progress.node_index].cell_xy;
 				const auto& next_cell = path.nodes[active_progress.node_index + 1].cell_xy;
 				next_target = ::cell_to_world(island, next_cell);
-				effective_cell_distance = calc_cell_step_distance(curr_cell, next_cell);
+				
+				/*
+					For easing, use the distance from PREVIOUS cell to CURRENT cell,
+					since that's the segment the bot is currently traveling on.
+					This ensures smooth crosshair transition without jumps.
+				*/
+				if (active_progress.node_index > 0) {
+					const auto& prev_cell = path.nodes[active_progress.node_index - 1].cell_xy;
+					effective_cell_distance = calc_cell_step_distance(prev_cell, curr_cell);
+				}
+				else {
+					/*
+						At first node - use the distance to the next cell.
+					*/
+					effective_cell_distance = calc_cell_step_distance(curr_cell, next_cell);
+				}
 				has_next_target = true;
 			}
 			else if (is_rerouting) {
