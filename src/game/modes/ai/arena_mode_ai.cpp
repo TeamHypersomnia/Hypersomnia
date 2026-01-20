@@ -31,7 +31,7 @@
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/find_closest_enemy.hpp"
 #include "game/modes/ai/tasks/update_alertness.hpp"
-#include "game/modes/ai/tasks/handle_aiming_and_trigger.hpp"
+#include "game/modes/ai/intents/handle_aiming_and_trigger.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
