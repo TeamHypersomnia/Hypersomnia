@@ -75,15 +75,20 @@ inline void advance_path_if_cell_reached(
 				
 				if (is_diagonal) {
 					/*
-						For diagonal approach, advance if we're in either of the two adjacent halves.
-						E.g., if coming from bottom-left (dx=-1, dy=1 relative to prev):
-						  - curr cell is at (prev.x-1, prev.y+1), so prev is at bottom-left of curr
-						  - We want to advance if in top half (bot_offset.y < 0) OR right half (bot_offset.x > 0)
+						For diagonal approach, advance if we're in either of the two halves
+						that are opposite to where we came from.
 						
-						dx < 0 means we moved left, so prev is to the right -> advance if left half (offset.x < 0)
-						dx > 0 means we moved right, so prev is to the left -> advance if right half (offset.x > 0)
-						dy < 0 means we moved up, so prev is below -> advance if top half (offset.y < 0)
-						dy > 0 means we moved down, so prev is above -> advance if bottom half (offset.y > 0)
+						Movement interpretation:
+						  dx = curr_cell.x - prev_cell.x
+						  dy = curr_cell.y - prev_cell.y
+						
+						Examples:
+						  - dx < 0: we moved left, so prev is to our right -> advance if in left half (offset.x < 0)
+						  - dx > 0: we moved right, so prev is to our left -> advance if in right half (offset.x > 0)
+						  - dy < 0: we moved up, so prev is below us -> advance if in top half (offset.y < 0)
+						  - dy > 0: we moved down, so prev is above us -> advance if in bottom half (offset.y > 0)
+						
+						For diagonal moves, if we're in EITHER opposite half (x or y), we've passed the center.
 					*/
 					bool in_opposite_half_x = (dx < 0 && bot_offset.x < 0) || (dx > 0 && bot_offset.x > 0);
 					bool in_opposite_half_y = (dy < 0 && bot_offset.y < 0) || (dy > 0 && bot_offset.y > 0);
