@@ -58,7 +58,7 @@ inline std::optional<ai_pathfinding_request> create_bomb_pathfinding_request(
 		return std::nullopt;
 	}
 	
-	auto req = ai_pathfinding_request::to_position(bomb_target->target_position);
+	auto req = ai_pathfinding_request::to_transform(bomb_target->target_pathfinding_transform);
 	req.resolved_cell = bomb_target->resolved_cell;
 	return req;
 }

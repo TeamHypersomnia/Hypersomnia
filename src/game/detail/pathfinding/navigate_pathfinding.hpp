@@ -28,6 +28,7 @@ struct navigate_pathfinding_result {
 	bool is_navigating = false;
 	bool path_completed = false;  /* True when destination was reached and pathfinding was cleared. */
 	bool can_sprint = false;      /* True when movement direction is mostly parallel to path direction (within ~15 degrees). */
+	bool nearing_end = false;     /* Will holster in some situations like during defuse. */
 	std::optional<vec2> movement_direction;
 	vec2 crosshair_offset = vec2::zero;
 };
@@ -96,7 +97,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 				
 				result.movement_direction = dir_result.movement_direction;
 				result.crosshair_offset = dir_result.crosshair_offset;
-				result.is_navigating = dir_result.has_direction;
+				result.is_navigating = true;
 
 				::debug_draw_pathfinding(pathfinding_opt, bot_pos, navmesh);
 				return result;
@@ -158,10 +159,6 @@ inline navigate_pathfinding_result navigate_pathfinding(
 		dt
 	);
 
-	if (!dir_result.has_direction) {
-		return result;
-	}
-
 	result.movement_direction = dir_result.movement_direction;
 	result.crosshair_offset = dir_result.crosshair_offset;
 
@@ -205,6 +202,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 
 				if (nodes_n <= 1 || nodes_i >= nodes_n - 1) {
 					result.can_sprint = false;
+					result.nearing_end = true;
 				}
 			}
 		}

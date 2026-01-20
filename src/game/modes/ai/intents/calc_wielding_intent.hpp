@@ -6,7 +6,7 @@
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
 #include "game/modes/ai/tasks/find_best_weapon.hpp"
 
-inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
+inline bool should_holster_weapons(const ai_behavior_variant& behavior, const bool nav_near_end = false) {
 	if (::is_camping_on_waypoint(behavior)) {
 		return false;
 	}
@@ -17,6 +17,9 @@ inline bool should_holster_weapons(const ai_behavior_variant& behavior) {
 	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
 		if (defuse->is_defusing) {
 			return true;
+		}
+		else {
+			return nav_near_end;
 		}
 	}
 

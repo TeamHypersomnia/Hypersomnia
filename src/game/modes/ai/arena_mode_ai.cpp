@@ -205,7 +205,7 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.clear_pathfinding();
 
 		if (new_request != std::nullopt) {
-			::start_pathfinding_to(ai_state, character_pos, new_request->target, navmesh, nullptr);
+			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, nullptr);
 
 			if (ai_state.is_pathfinding_active()) {
 				ai_state.pathfinding->exact_destination = new_request->exact;
@@ -302,6 +302,12 @@ arena_ai_result update_arena_mode_ai(
 
 	arena_ai_result result;
 	result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+
+	if (move_result.path_completed) {
+		ai_state.current_pathfinding_request = std::nullopt;
+		ai_state.clear_pathfinding();
+	}
+
 	return result;
 }
 
