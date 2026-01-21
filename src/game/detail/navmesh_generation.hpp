@@ -251,6 +251,14 @@ inline void fill_navmesh_grid_from_fixture(
 						continue;
 					}
 
+					/*
+						When filling with portal values (>=2), preserve wall cells (value 1).
+						Portal tiles that overlap walls should remain occupied/unwalkable.
+					*/
+					if (fill_value >= 2 && island.get(cx, cy) == 1) {
+						continue;
+					}
+
 					island.set(cx, cy, fill_value);
 				}
 			}
@@ -282,6 +290,14 @@ inline void fill_navmesh_grid_from_fixture(
 					);
 
 					if (overlaps) {
+						/*
+							When filling with portal values (>=2), preserve wall cells (value 1).
+							Portal tiles that overlap walls should remain occupied/unwalkable.
+						*/
+						if (fill_value >= 2 && island.get(cx, cy) == 1) {
+							continue;
+						}
+
 						island.set(cx, cy, fill_value);
 					}
 				}

@@ -234,14 +234,15 @@ inline pathfinding_direction_result get_pathfinding_movement_direction(
 					const auto target_normalized = vec2(target_direction).normalize();
 					const auto interpolated_direction = augs::interp_angle(look_at_normalized, target_normalized, t);
 					
-					result.crosshair_offset = interpolated_direction * cell_size;
+					/* Use total_ease_distance for magnitude to match diagonal approach smoothly */
+					result.crosshair_offset = interpolated_direction * total_ease_distance;
 					
 					if (DEBUG_DRAWING.draw_ai_info) {
 						DEBUG_LOGIC_STEP_LINES.emplace_back(white, bot_pos, bot_pos + look_at_dir);
 					}
 				}
 				else {
-					result.crosshair_offset = target_direction * cell_size;
+					result.crosshair_offset = target_direction * total_ease_distance;
 				}
 				
 				crosshair_set = true;
