@@ -8,6 +8,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
+#include "game/detail/physics/physics_queries.h"
 
 /*
 	Default threshold for penetration checks.
@@ -20,8 +21,11 @@ constexpr real32 AI_PENETRATION_THRESHOLD = 0.2f;
 	Simulates bullet penetration to determine if the bot's weapon can penetrate
 	through obstacles to reach the target position.
 	
-	Uses the same penetration logic as missile_system.cpp:
-	- Raycast forward and backward to find all intersected fixtures
+	Uses the same penetration logic as missile_system::advance_penetrations:
+	- p1 (character pos) is treated as the "previous tip"
+	- p2 (target pos) is treated as the "current tip"
+	- Uses b2Fixture fields: forward_point, backward_point, penetrated_forward, 
+	  penetrated_backward, penetration_processed_flag
 	- Calculate penetration cost based on fixture penetrability
 	- Return true if remaining penetration / basic_penetration_distance >= threshold
 	
@@ -75,6 +79,9 @@ inline bool can_weapon_penetrate(
 	/*
 		Perform raycasts to simulate penetration.
 		Use FLYING_BULLET filter like the missile system does.
+		
+		Interpret p1 as the "previous tip" (character pos) and p2 as "current tip" (target pos),
+		following the same logic as missile_system::advance_penetrations.
 	*/
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto si = cosm.get_si();
@@ -86,71 +93,58 @@ inline bool can_weapon_penetrate(
 	const auto p2_meters = si.get_meters(p2);
 
 	/*
-		Raycast forward (p1 -> p2) to get entry points.
-		Raycast backward (p2 -> p1) to get exit points.
-		We need to match entry/exit points for the same fixture to calculate thickness.
+		Collect all hit fixtures using the b2Fixture fields directly,
+		just like missile_system::advance_penetrations does.
 	*/
-	const auto forward_results = physics.ray_cast_all_intersections(p1_meters, p2_meters, filter, character);
-	const auto backward_results = physics.ray_cast_all_intersections(p2_meters, p1_meters, filter, character);
+	std::vector<b2Fixture*> hits;
 
-	/*
-		Build a map from fixture -> (entry, exit) points.
-		Entry points come from forward raycast, exit points from backward raycast.
-	*/
-	struct fixture_segment {
-		vec2 entry = vec2::zero;
-		vec2 exit = vec2::zero;
-		bool has_entry = false;
-		bool has_exit = false;
-		b2Fixture* fixture = nullptr;
-	};
+	/* Fill forward facing hits */
+	{
+		const auto results = physics.ray_cast_all_intersections(p1_meters, p2_meters, filter, character);
 
-	std::vector<fixture_segment> segments;
-
-	auto find_or_create_segment = [&](b2Fixture* f) -> fixture_segment& {
-		for (auto& seg : segments) {
-			if (seg.fixture == f) {
-				return seg;
-			}
+		for (const auto& result : results) {
+			auto f = result.what_fixture;
+			f->penetrated_forward = true;
+			f->forward_point = b2Vec2(si.get_pixels(result.intersection));
+			hits.push_back(f);
 		}
-		segments.push_back({});
-		segments.back().fixture = f;
-		return segments.back();
-	};
-
-	for (const auto& result : forward_results) {
-		auto& seg = find_or_create_segment(result.what_fixture);
-		seg.entry = si.get_pixels(result.intersection);
-		seg.has_entry = true;
 	}
 
-	for (const auto& result : backward_results) {
-		auto& seg = find_or_create_segment(result.what_fixture);
-		seg.exit = si.get_pixels(result.intersection);
-		seg.has_exit = true;
+	/* Fill backward facing hits */
+	{
+		const auto results = physics.ray_cast_all_intersections(p2_meters, p1_meters, filter, character);
+
+		for (const auto& result : results) {
+			auto f = result.what_fixture;
+			f->penetrated_backward = true;
+			f->backward_point = b2Vec2(si.get_pixels(result.intersection));
+			hits.push_back(f);
+		}
 	}
 
 	/*
-		Calculate total penetration cost.
-		For each segment, cost = thickness / penetrability.
-		
-		Following missile_system.cpp logic:
-		- If penetrability <= 0, the obstacle is impenetrable
-		- Otherwise, cost is proportional to thickness and inversely proportional to penetrability
+		Calculate penetration through all hit fixtures.
+		Following missile_system.cpp logic exactly.
 	*/
 	real32 penetration_remaining = basic_penetration_distance;
+	bool can_penetrate = true;
 
-	for (const auto& seg : segments) {
-		if (seg.fixture == nullptr) {
+	for (auto& fixture_ptr : hits) {
+		if (fixture_ptr == nullptr) {
 			continue;
 		}
 
-		/*
-			Get penetrability from fixtures and rigid body components.
-		*/
-		real32 penetrability = 1.0f;
+		auto& fixture = *fixture_ptr;
 
-		if (const auto handle = cosm[seg.fixture->GetUserData()]) {
+		if (fixture.penetration_processed_flag) {
+			continue;
+		}
+
+		fixture.penetration_processed_flag = true;
+
+		float penetrability = 1.0f;
+
+		if (const auto handle = cosm[fixture.GetUserData()]) {
 			if (const auto fixtures_comp = handle.template find<invariants::fixtures>()) {
 				penetrability = fixtures_comp->penetrability;
 			}
@@ -163,34 +157,40 @@ inline bool can_weapon_penetrate(
 			continue;
 		}
 
-		/*
-			If impenetrable, we cannot reach the target.
-		*/
+		const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
+		const auto considered_p2 = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
+
 		if (penetrability <= 0.0f) {
-			return false;
+			can_penetrate = false;
+			break;
+		}
+		else {
+			const auto offset = considered_p2 - considered_p1;
+			const auto full_penetrated_distance = offset.length() / penetrability;
+
+			if (penetration_remaining > full_penetrated_distance) {
+				penetration_remaining -= full_penetrated_distance;
+			}
+			else {
+				can_penetrate = false;
+				break;
+			}
+		}
+	}
+
+	/* Cleanup - reset the fixture flags we used */
+	for (auto& fixture : hits) {
+		if (fixture == nullptr) {
+			continue;
 		}
 
-		/*
-			Calculate thickness and penetration cost.
-			
-			If we have both entry and exit, use them.
-			If we only have entry (bullet starts inside), use p1 as entry.
-			If we only have exit (bullet ends inside), use p2 as exit.
-		*/
-		vec2 considered_entry = seg.has_entry ? seg.entry : p1;
-		vec2 considered_exit = seg.has_exit ? seg.exit : p2;
+		fixture->penetration_processed_flag = false;
+		fixture->penetrated_forward = false;
+		fixture->penetrated_backward = false;
+	}
 
-		const auto thickness = (considered_exit - considered_entry).length();
-		const auto penetration_cost = thickness / penetrability;
-
-		penetration_remaining -= penetration_cost;
-
-		if (penetration_remaining <= 0.0f) {
-			/*
-				Ran out of penetration - check if we've passed the threshold.
-			*/
-			return false;
-		}
+	if (!can_penetrate) {
+		return false;
 	}
 
 	/*
