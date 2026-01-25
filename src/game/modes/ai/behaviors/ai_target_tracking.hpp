@@ -118,7 +118,7 @@ struct ai_target_tracking {
 		Force acquire a target (e.g., from damage).
 		Always acquires regardless of distance.
 	*/
-	void force_acquire(
+	void full_acquire(
 		randomization& rng,
 		const real32 global_time_secs,
 		const entity_id enemy,

@@ -457,9 +457,9 @@ void post_solve_arena_mode_ai(
 
 		/*
 			Damage always initiates combat (no LoS check needed).
-			Use force_acquire since damage is always significant.
+			Use full_acquire since damage is always significant.
 		*/
-		ai_state.combat_target.force_acquire(
+		ai_state.combat_target.full_acquire(
 			rng,
 			global_time_secs,
 			attacker_id,
