@@ -379,6 +379,27 @@ arena_ai_result update_arena_mode_ai(
 		if (auto* sentience = character_handle.find<components::sentience>()) {
 			sentience->hand_flags[0] = hand_flags.hand_flag_0;
 			sentience->hand_flags[1] = hand_flags.hand_flag_1;
+
+			if (const auto crosshair = character_handle.find_crosshair()) {
+				const auto amount = repro::fabs(crosshair->recoil.rotation);
+
+				if (ai_state.recoil_cooldown) {
+					if (amount < 0.5f) {
+						ai_state.recoil_cooldown = false;
+					}
+
+				}
+				else {
+					if (amount > 5.5f) {
+						ai_state.recoil_cooldown = true;
+					}
+				}
+			}
+
+			if (ai_state.recoil_cooldown) {
+				sentience->hand_flags[0] = false;
+				sentience->hand_flags[1] = false;
+			}
 		}
 	}
 
