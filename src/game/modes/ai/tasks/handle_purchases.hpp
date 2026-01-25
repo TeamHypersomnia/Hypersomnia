@@ -15,12 +15,22 @@ inline std::optional<item_flavour_id> handle_purchases(
 	const float dt_secs,
 	randomization& stable_rng
 ) {
-	if (ctx.ai_state.already_nothing_more_to_buy || money <= 0) {
+	if (money <= 0) {
+		ctx.ai_state.already_nothing_more_to_buy = true;
+	}
+
+	if (ctx.ai_state.already_nothing_more_to_buy) {
 		return std::nullopt;
 	}
 
 	if (ctx.ai_state.purchase_decision_countdown < 0.0f) {
-		ctx.ai_state.purchase_decision_countdown = stable_rng.randval(1.0f, 3.0f);
+		if (ctx.ai_state.purchase_decision_countdown == -10000.0f) {
+			ctx.ai_state.purchase_decision_countdown = stable_rng.randval(1.0f, 2.5f);
+		}
+		else {
+			/* Make subsequent purchases quicker */
+			ctx.ai_state.purchase_decision_countdown = stable_rng.randval(0.3f, 0.7f);
+		}
 	}
 
 	ctx.ai_state.purchase_decision_countdown -= dt_secs;
@@ -170,10 +180,12 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 	const auto [weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit, has_armor] = get_owned_inventory();
 
+	const bool buy_gun = weapon_count == 0 || has_only_pistols;
+
 	/*
 		When buying a non-pistol, always buy a backpack first.
 	*/
-	if (!has_backpack && (weapon_count <= 1 || has_only_pistols)) {
+	if (!has_backpack && buy_gun) {
 		/*
 			Check if we want to buy a non-pistol and if backpack is affordable.
 		*/
@@ -217,7 +229,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 	/*
 		Buy gun if needed.
 	*/
-	if (weapon_count <= 1 || has_only_pistols) {
+	if (buy_gun) {
 		if (const auto gun = try_buy_gun(owned_guns, money)) {
 			/*
 				Countdown still delays the actual purchase.
@@ -252,17 +264,19 @@ inline std::optional<item_flavour_id> handle_purchases(
 		The 10000 threshold ensures bots prioritize essential equipment first.
 		Defuse kits are useful but not critical - only buy when we have excess money.
 	*/
-	constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
-	if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {
-		if (const auto kit = try_buy_defuse_kit(money)) {
-			/*
-				Countdown still delays the actual purchase.
-			*/
-			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
-				return std::nullopt;
-			}
+	if (ctx.character_handle.get_official_faction() == faction_type::METROPOLIS) {
+		constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
+		if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {
+			if (const auto kit = try_buy_defuse_kit(money)) {
+				/*
+					Countdown still delays the actual purchase.
+				*/
+				if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+					return std::nullopt;
+				}
 
-			return kit;
+				return kit;
+			}
 		}
 	}
 
