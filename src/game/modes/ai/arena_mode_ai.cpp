@@ -178,49 +178,27 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		PHASE 2.5: Calculate target_acquired for shooting through walls.
-		
-		target_acquired determines whether the bot should aim at and shoot the target.
-		It's true if:
-		- We see the target (sees_target), OR
-		- We're in combat behavior AND can penetrate to last_known_pos AND
-		  the target info is recent enough (within chosen_combat_time_secs/20)
-		
-		The penetration check uses last_known_pos, not the seen position, because
-		we want to know if we can penetrate the wall even when we don't see the target.
-		
-		target_enemy_pos: Always set to last_known_pos (for both seen and wall penetration).
-		target_enemy_velocity: Set only when we see the enemy (for aim prediction).
+		PHASE 2.5: Calculate target_acquired for shooting,
+	    as well as for shooting	through walls.
 		===========================================================================
 	*/
 
-	bool target_acquired = sees_target;
+	bool target_acquired = false;
 	std::optional<vec2> target_enemy_velocity = std::nullopt;
 
-	/*
-		If we see the target, get the velocity for aim prediction.
-	*/
-	if (sees_target) {
-		const auto enemy_handle = cosm[closest_enemy];
-
-		if (enemy_handle.alive()) {
-			target_enemy_velocity = enemy_handle.get_effective_velocity();
-		}
-	}
-	else if (::is_behavior<ai_behavior_combat>(ai_state.last_behavior)) {
-		/*
-			Not seeing the target but in combat mode.
-			Check if we can penetrate to the last known position.
-		*/
-		if (ai_state.combat_target.id.is_set()) {
+	if (::is_behavior<ai_behavior_combat>(ai_state.last_behavior)) {
+		if (ai_state.combat_target.active(cosm, global_time_secs)) {
 			const auto time_since_known = global_time_secs - ai_state.combat_target.when_last_known_secs;
 			const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
 
 			if (time_since_known < shoot_wall_time_limit) {
 				target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
-				/*
-					Don't set velocity - aiming directly at last_known_pos without prediction.
-				*/
+
+				if (sees_target) {
+					if (const auto enemy_handle = cosm[closest_enemy]) {
+						target_enemy_velocity = enemy_handle.get_effective_velocity();
+					}
+				}
 			}
 		}
 	}

@@ -14,7 +14,7 @@
 	A bullet must retain at least this fraction of its penetration distance
 	to be considered capable of reaching the target.
 */
-constexpr real32 AI_PENETRATION_THRESHOLD = 0.4f;
+constexpr real32 AI_PENETRATION_THRESHOLD = 0.2f;
 
 /*
 	Simulates bullet penetration to determine if the bot's weapon can penetrate

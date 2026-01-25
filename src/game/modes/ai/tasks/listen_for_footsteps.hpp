@@ -28,7 +28,6 @@ inline void listen_for_footsteps(
 ) {
 	const auto& sound_cues = step.get_queue<messages::sound_cue_message>();
 	const auto bot_faction = ctx.character_handle.get_official_faction();
-	const auto filter = predefined_queries::line_of_sight();
 
 	auto rng_state = xorshift_state{ static_cast<uint64_t>(global_time_secs * 1000.0f + 54321) };
 	auto rng = randomization(rng_state);
@@ -68,31 +67,6 @@ inline void listen_for_footsteps(
 		const auto dist = (cue.position - ctx.character_pos).length();
 
 		if (dist > cue.max_distance) {
-			continue;
-		}
-
-		/*
-			Check if we have line of sight to the heard enemy (regardless of looking angle).
-			If so, full_acquire the target.
-		*/
-		const auto raycast = ctx.physics.ray_cast_px(
-			ctx.cosm.get_si(),
-			ctx.character_pos,
-			cue.position,
-			filter,
-			ctx.character_handle
-		);
-
-		if (!raycast.hit) {
-			/*
-				Clear line of sight to heard enemy - fully acquire target.
-			*/
-			ctx.ai_state.combat_target.full_acquire(
-				rng,
-				global_time_secs,
-				cue.source_entity,
-				cue.position
-			);
 			continue;
 		}
 
