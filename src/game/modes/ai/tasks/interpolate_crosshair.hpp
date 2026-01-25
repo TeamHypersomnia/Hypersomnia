@@ -16,7 +16,7 @@ template <typename CrosshairHandle>
 inline void interpolate_crosshair(
 	CrosshairHandle crosshair,
 	const vec2 target_offset,
-	const bool has_target,
+	const bool target_acquired,
 	const float dt_secs,
 	const difficulty_type difficulty,
 	const bool is_navigating = false
@@ -30,7 +30,7 @@ inline void interpolate_crosshair(
 		}
 		else {
 			const auto average_factor = 0.5f;
-			auto averages_per_sec = has_target ? 4.0f : 3.0f;
+			auto averages_per_sec = target_acquired ? 4.0f : 3.0f;
 
 			if (difficulty == difficulty_type::EASY) {
 				averages_per_sec = 1.5f;
@@ -50,7 +50,7 @@ inline void interpolate_crosshair(
 inline void interpolate_crosshair(
 	const ai_character_context& ctx,
 	const vec2 target_crosshair_offset,
-	const bool has_target,
+	const bool target_acquired,
 	const float dt_secs,
 	const difficulty_type difficulty,
 	const bool is_navigating = false
@@ -58,7 +58,7 @@ inline void interpolate_crosshair(
 	::interpolate_crosshair(
 		ctx.character_handle.find_crosshair(),
 		target_crosshair_offset,
-		has_target,
+		target_acquired,
 		dt_secs,
 		difficulty,
 		is_navigating

@@ -17,7 +17,7 @@
 	- Defusing (no movement)
 	
 	Also outputs crosshair offset for aiming based on:
-	- Combat targets (when has_target is true)
+	- Combat targets (when target_acquired is true)
 	- Bomb location (when defusing)
 	- Plant target (when planting)
 	- Waypoint direction (when camping)
@@ -47,7 +47,7 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	const real32 dt,
 	const cosmos& cosm,
 	const entity_id bomb_entity,
-	const bool has_target,
+	const bool target_acquired,
 	const entity_id closest_enemy
 ) {
 	navigate_pathfinding_result result;
@@ -128,7 +128,7 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 		This accounts for enemy velocity and bullet travel time.
 		Only set when not in a behavior with specific aiming (defusing, planting).
 	*/
-	if (has_target) {
+	if (target_acquired) {
 		const auto enemy_handle = cosm[closest_enemy];
 
 		if (enemy_handle.alive()) {

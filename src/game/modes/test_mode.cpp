@@ -427,13 +427,12 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						}
 					}
 
-					const bool has_target = true;
 					const bool is_navigating = first_player.debug_pathfinding.has_value();
 
 					::interpolate_crosshair(
 						character.find_crosshair(),
 						nav_result.crosshair_offset,
-						has_target,
+						true,
 						dt_secs,
 						difficulty_type::HARD,
 						is_navigating

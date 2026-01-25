@@ -30,7 +30,6 @@
 
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/find_closest_enemy.hpp"
-#include "game/modes/ai/tasks/update_alertness.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_footsteps.hpp"
@@ -107,10 +106,9 @@ arena_ai_result update_arena_mode_ai(
 	/* Check for visible enemies and update combat_target. */
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
 	const bool sees_target = closest_enemy.is_set();
-	const bool should_react = ::update_alertness(ai_state, sees_target, dt_secs, difficulty);
-	const bool has_target = sees_target && should_react;
+	const bool target_acquired = sees_target;
 
-	if (has_target) {
+	if (sees_target) {
 		/*
 			Could happen at the beginning of the round,
 			prevent any buying logic in that case.
@@ -196,7 +194,7 @@ arena_ai_result update_arena_mode_ai(
 		dt_secs,
 		cosm,
 		bomb_entity,
-		has_target,
+		target_acquired,
 		closest_enemy
 	);
 
@@ -337,7 +335,7 @@ arena_ai_result update_arena_mode_ai(
 	{
 		const auto hand_flags = ::calc_hand_flags(
 			ai_state.last_behavior,
-			has_target,
+			target_acquired,
 			closest_enemy,
 			character_pos,
 			cosm,
@@ -351,7 +349,7 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	if (!is_thinking_what_to_buy) {
-		::interpolate_crosshair(ctx, move_result.crosshair_offset, has_target, dt_secs, difficulty, move_result.is_navigating);
+		::interpolate_crosshair(ctx, move_result.crosshair_offset, target_acquired, dt_secs, difficulty, move_result.is_navigating);
 	}
 
 	arena_ai_result result;

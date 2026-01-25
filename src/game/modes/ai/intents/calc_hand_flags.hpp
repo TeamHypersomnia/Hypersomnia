@@ -23,7 +23,7 @@ struct hand_flags_result {
 template <typename CharacterHandle>
 inline hand_flags_result calc_hand_flags(
 	const ai_behavior_variant& behavior,
-	const bool has_target,
+	const bool target_acquired,
 	const entity_id closest_enemy,
 	const vec2 character_pos,
 	const cosmos& cosm,
@@ -45,18 +45,20 @@ inline hand_flags_result calc_hand_flags(
 	/*
 		Combat target: trigger if aiming correctly.
 	*/
-	if (has_target) {
-		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
-		const auto aim_direction = target_pos - character_pos;
+	if (const auto* combat = ::get_behavior_if<ai_behavior_combat>(behavior)) {
+		if (target_acquired) {
+			const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
+			const auto aim_direction = target_pos - character_pos;
 
-		if (auto crosshair = character_handle.find_crosshair()) {
-			const auto current_aim = vec2(crosshair->base_offset).normalize();
-			const auto target_aim = vec2(aim_direction).normalize();
-			const auto angle_diff = current_aim.degrees_between(target_aim);
+			if (auto crosshair = character_handle.find_crosshair()) {
+				const auto current_aim = vec2(crosshair->base_offset).normalize();
+				const auto target_aim = vec2(aim_direction).normalize();
+				const auto angle_diff = current_aim.degrees_between(target_aim);
 
-			if (angle_diff <= 25.0f) {
-				result.hand_flag_0 = true;
-				result.hand_flag_1 = true;
+				if (angle_diff <= 25.0f) {
+					result.hand_flag_0 = true;
+					result.hand_flag_1 = true;
+				}
 			}
 		}
 	}
