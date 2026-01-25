@@ -183,7 +183,7 @@ struct arena_mode_ai_state {
 	bool tried_push_already = false;
 
 	bool already_nothing_more_to_buy = false;
-	float purchase_decision_countdown = -1.0f;
+	float purchase_decision_countdown = -10000.0f;
 
 	std::optional<ai_pathfinding_state> pathfinding;
 	std::optional<ai_pathfinding_request> current_pathfinding_request;
@@ -210,7 +210,7 @@ struct arena_mode_ai_state {
 		patrol_letter = marker_letter_type::A;
 		tried_push_already = false;
 		already_nothing_more_to_buy = false;
-		purchase_decision_countdown = -1.0f;
+		purchase_decision_countdown = -10000.0f;
 		pathfinding.reset();
 		current_pathfinding_request = std::nullopt;
 	}
