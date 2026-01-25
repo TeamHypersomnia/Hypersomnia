@@ -7,6 +7,7 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
+#include "game/detail/weapon_like.h"
 
 inline std::optional<item_flavour_id> handle_purchases(
 	const ai_character_context& ctx,
@@ -35,6 +36,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 		std::vector<item_flavour_id> owned_guns;
 		bool has_backpack = false;
 		bool has_defuse_kit = false;
+		bool has_armor = false;
 
 		ctx.character_handle.for_each_contained_item_recursive(
 			[&](const auto& item) {
@@ -56,10 +58,14 @@ inline std::optional<item_flavour_id> handle_purchases(
 						has_defuse_kit = true;
 					}
 				}
+
+				if (::is_armor_like(item)) {
+					has_armor = true;
+				}
 			}
 		);
 
-		return std::tuple{ weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit };
+		return std::tuple{ weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit, has_armor };
 	};
 
 	auto try_buy_backpack = [&](money_type available_money) -> std::optional<item_flavour_id> {
@@ -162,7 +168,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 		return affordable_armor[random_index];
 	};
 
-	const auto [weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit] = get_owned_inventory();
+	const auto [weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit, has_armor] = get_owned_inventory();
 
 	/*
 		When buying a non-pistol, always buy a backpack first.
@@ -225,17 +231,19 @@ inline std::optional<item_flavour_id> handle_purchases(
 	}
 
 	/*
-		Buy armor if nothing else.
+		Buy armor if nothing else and we don't already have armor.
 	*/
-	if (const auto armor = try_buy_armor(money)) {
-		/*
-			Countdown still delays the actual purchase.
-		*/
-		if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
-			return std::nullopt;
-		}
+	if (!has_armor) {
+		if (const auto armor = try_buy_armor(money)) {
+			/*
+				Countdown still delays the actual purchase.
+			*/
+			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+				return std::nullopt;
+			}
 
-		return armor;
+			return armor;
+		}
 	}
 
 	/*
