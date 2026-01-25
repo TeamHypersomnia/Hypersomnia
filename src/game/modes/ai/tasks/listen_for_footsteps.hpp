@@ -100,8 +100,7 @@ inline void listen_for_footsteps(
 			No direct line of sight. Check if we can penetrate walls to shoot them.
 			If weapon can penetrate to the target position, full_acquire.
 		*/
-		const auto threshold = 0.4f;
-		if (::can_weapon_penetrate(ctx.character_handle, cue.position, threshold)) {
+		if (::can_weapon_penetrate(ctx.character_handle, cue.position)) {
 			ctx.ai_state.combat_target.full_acquire(
 				rng,
 				global_time_secs,
