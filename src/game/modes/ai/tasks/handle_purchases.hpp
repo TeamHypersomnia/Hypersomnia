@@ -33,6 +33,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 		}
 	}
 
+	const auto buyer_faction = ctx.character_handle.get_official_faction();
 	ctx.ai_state.purchase_decision_countdown -= dt_secs;
 
 	/*
@@ -83,6 +84,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 		money_type cheapest_price = std::numeric_limits<money_type>::max();
 
 		ctx.cosm.for_each_flavour_having<invariants::item>([&](const auto& id, const auto& flavour) {
+			if (!factions_compatible(ctx.character_handle, id)) {
+				return;
+			}
+
 			if (::is_backpack_like(flavour)) {
 				const auto price_opt = ::find_price_of(ctx.cosm, item_flavour_id(id));
 				if (price_opt.has_value() && *price_opt <= available_money && *price_opt < cheapest_price) {
@@ -100,6 +105,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 		money_type cheapest_price = std::numeric_limits<money_type>::max();
 
 		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
+			if (!factions_compatible(ctx.character_handle, id)) {
+				return;
+			}
+
 			const auto& tool = flavour.template get<invariants::tool>();
 			if (tool.defusing_speed_mult > 1.f) {
 				const auto price_opt = ::find_price_of(ctx.cosm, item_flavour_id(id));
@@ -161,6 +170,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 		std::vector<item_flavour_id> affordable_armor;
 
 		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
+			if (!factions_compatible(ctx.character_handle, id)) {
+				return;
+			}
+
 			if (::is_armor_like(flavour)) {
 				const auto price = *::find_price_of(ctx.cosm, item_flavour_id(id));
 
@@ -264,7 +277,8 @@ inline std::optional<item_flavour_id> handle_purchases(
 		The 10000 threshold ensures bots prioritize essential equipment first.
 		Defuse kits are useful but not critical - only buy when we have excess money.
 	*/
-	if (ctx.character_handle.get_official_faction() == faction_type::METROPOLIS) {
+
+	if (buyer_faction == faction_type::METROPOLIS) {
 		constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
 		if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {
 			if (const auto kit = try_buy_defuse_kit(money)) {
