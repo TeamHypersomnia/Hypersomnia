@@ -466,9 +466,4 @@ void post_solve_arena_mode_ai(
 			attacker_pos
 		);
 	}
-
-	if (auto* movement = character_handle.find<components::movement>()) {
-		movement->flags.sprinting = false;
-		movement->flags.dashing = false;
-	}
 }
