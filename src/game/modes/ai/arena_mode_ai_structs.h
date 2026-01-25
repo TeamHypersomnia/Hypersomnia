@@ -181,6 +181,7 @@ struct arena_mode_ai_state {
 
 	marker_letter_type patrol_letter = marker_letter_type::A;
 	bool tried_push_already = false;
+	bool recoil_cooldown = false;
 
 	bool already_nothing_more_to_buy = false;
 	float purchase_decision_countdown = -10000.0f;

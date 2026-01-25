@@ -114,6 +114,14 @@ void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 
 			recoil.position.damp(secs, vec2::square(60.f));
 			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f * inertia_mult);
+
+			if (recoil.position.is_zero()) {
+				recoil.position = vec2::zero;
+			}
+
+			if (repro::fabs(recoil.rotation) < 0.0001f) {
+				recoil.rotation = 0.f;
+			}
 		}
 	);
 }
