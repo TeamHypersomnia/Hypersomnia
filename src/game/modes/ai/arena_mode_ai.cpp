@@ -352,6 +352,25 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
 
+	if (auto* sentience = character_handle.find<components::sentience>()) {
+		auto& consciousness = sentience->get<consciousness_meter_instance>();
+
+		if (ai_state.stamina_cooldown) {
+			if (consciousness.value < 10) {
+				ai_state.stamina_cooldown = true;
+			}
+		}
+		else {
+			if (consciousness.value > 100) {
+				ai_state.stamina_cooldown = false;
+			}
+		}
+
+		if (ai_state.stamina_cooldown) {
+			movement.flags.sprinting = false;
+		}
+	}
+
 	if (is_thinking_what_to_buy) {
 		movement.flags.set_from_closest_direction(vec2::zero);
 	}
