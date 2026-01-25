@@ -5,6 +5,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/enums/filters.h"
 #include "game/modes/ai/intents/should_acquire_target_by_hearing.hpp"
+#include "game/modes/ai/tasks/can_weapon_penetrate.hpp"
 #include "augs/misc/randomization.h"
 
 /*
@@ -14,6 +15,7 @@
 	
 	Now includes:
 	- LoS check: if we have line of sight to the heard enemy (regardless of angle), full_acquire
+	- Penetration check: if we can shoot through obstacles to the target, full_acquire
 	- should_acquire_target_by_hearing: faction-specific logic for aggressive acquisition
 */
 
@@ -95,7 +97,22 @@ inline void listen_for_footsteps(
 		}
 
 		/*
-			No line of sight. Check if faction-specific hearing aggro should kick in.
+			No direct line of sight. Check if we can penetrate walls to shoot them.
+			If weapon can penetrate to the target position, full_acquire.
+		*/
+		const auto threshold = 0.4f;
+		if (::can_weapon_penetrate(ctx.character_handle, cue.position, threshold)) {
+			ctx.ai_state.combat_target.full_acquire(
+				rng,
+				global_time_secs,
+				cue.source_entity,
+				cue.position
+			);
+			continue;
+		}
+
+		/*
+			Can't see and can't penetrate. Check if faction-specific hearing aggro should kick in.
 		*/
 		if (::should_acquire_target_by_hearing(bot_faction, bomb_planted)) {
 			ctx.ai_state.combat_target.full_acquire(
