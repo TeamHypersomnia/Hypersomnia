@@ -49,6 +49,7 @@ inline void interpolate_crosshair(
 
 inline void interpolate_crosshair(
 	const ai_character_context& ctx,
+	const vec2 target_crosshair_offset,
 	const bool has_target,
 	const float dt_secs,
 	const difficulty_type difficulty,
@@ -56,7 +57,7 @@ inline void interpolate_crosshair(
 ) {
 	::interpolate_crosshair(
 		ctx.character_handle.find_crosshair(),
-		ctx.ai_state.target_crosshair_offset,
+		target_crosshair_offset,
 		has_target,
 		dt_secs,
 		difficulty,

@@ -191,8 +191,7 @@ arena_ai_result update_arena_mode_ai(
 		cosm,
 		bomb_entity,
 		has_target,
-		closest_enemy,
-		ai_state.target_crosshair_offset
+		closest_enemy
 	);
 
 	/*
@@ -264,11 +263,6 @@ arena_ai_result update_arena_mode_ai(
 		};
 
 		std::visit(process_lbd, ai_state.last_behavior);
-	}
-
-	/* Update crosshair offset from movement calculation. */
-	if (move_result.crosshair_offset != vec2::zero) {
-		ai_state.target_crosshair_offset = move_result.crosshair_offset;
 	}
 
 	/*
@@ -350,7 +344,7 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
-	::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, move_result.is_navigating);
+	::interpolate_crosshair(ctx, move_result.crosshair_offset, has_target, dt_secs, difficulty, move_result.is_navigating);
 
 	arena_ai_result result;
 

@@ -182,8 +182,6 @@ struct arena_mode_ai_state {
 	marker_letter_type patrol_letter = marker_letter_type::A;
 	bool tried_push_already = false;
 
-	vec2 target_crosshair_offset = vec2::zero;
-
 	bool already_nothing_more_to_buy = false;
 	float purchase_decision_countdown = -1.0f;
 
@@ -211,7 +209,6 @@ struct arena_mode_ai_state {
 		combat_target.clear();
 		patrol_letter = marker_letter_type::A;
 		tried_push_already = false;
-		target_crosshair_offset = vec2::zero;
 		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -1.0f;
 		pathfinding.reset();
