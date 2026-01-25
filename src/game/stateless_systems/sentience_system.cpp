@@ -386,10 +386,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
 
-				auto& movement = subject.get<components::movement>();
-				movement.const_inertia_ms += amount * sentience_def.const_inertia_damage_ratio;
-				//movement.linear_inertia_ms += amount * sentience_def.linear_inertia_damage_ratio;
-
 				const auto prev_consciousness = consciousness.value;
 
 				if (consciousness.value > 0) {
@@ -402,6 +398,10 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				if (!health.is_positive()) {
 					if (allow_special_result()) {
 						h.special_result = messages::health_event::result_type::DEATH;
+
+						auto& movement = subject.get<components::movement>();
+						movement.const_inertia_ms += amount * sentience_def.const_inertia_damage_ratio;
+						//movement.linear_inertia_ms += amount * sentience_def.linear_inertia_damage_ratio;
 					}
 					else {
 						/* Assume previous consciousness so that the running ability is unimpaired */
@@ -733,7 +733,11 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 	const bool held_item = sentience == nullptr && owning_capability;
 
 	if (!held_item) {
-		apply_impact_impulse();
+		const bool conscious = sentience && sentience->is_conscious();
+
+		if (!conscious) {
+			apply_impact_impulse();
+		}
 	}
 }
 

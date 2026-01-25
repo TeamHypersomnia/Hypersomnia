@@ -375,6 +375,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					if (count_walk_as_exertion || movement.was_sprint_effective) {
 						sentience->time_of_last_exertion = cosm.get_timestamp();
 					}
+
+					if (sentience->time_of_last_received_damage.was_set()) {
+						if ((cosm.get_timestamp() - sentience->time_of_last_received_damage).in_milliseconds(delta) <= 250.0f) {
+							movement_force_mult *= 0.10f;
+						}	
+					}
 				}
 
 				auto applied_force = requested_by_input;
