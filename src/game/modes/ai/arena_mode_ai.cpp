@@ -66,7 +66,7 @@ arena_ai_result update_arena_mode_ai(
 	const bool bomb_planted,
 	const entity_id bomb_entity,
 	pathfinding_context* pathfinding_ctx,
-	const bool in_buy_area,
+	bool in_buy_area,
 	const bool is_freeze_time
 ) {
 	auto stable_rng = randomization(stable_round_rng);
@@ -111,6 +111,12 @@ arena_ai_result update_arena_mode_ai(
 	const bool has_target = sees_target && should_react;
 
 	if (has_target) {
+		/*
+			Could happen at the beginning of the round,
+			prevent any buying logic in that case.
+		*/
+		in_buy_area = false;
+
 		const auto enemy_handle = cosm[closest_enemy];
 		const auto enemy_pos = enemy_handle.get_logic_transform().pos;
 		ai_state.combat_target.acquire_target_seen(
