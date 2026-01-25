@@ -281,14 +281,14 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		If in buy area and not done buying, stay still to make purchases.
 	*/
-	const bool should_stay_for_buying = in_buy_area && !ai_state.already_nothing_more_to_buy;
+	const bool is_thinking_what_to_buy = in_buy_area && !ai_state.already_nothing_more_to_buy;
 
 	const auto wielding_intent = ::calc_wielding_intent(
 		ai_state.last_behavior,
 		character_handle,
 		move_result.nearing_end,
 		is_freeze_time,
-		should_stay_for_buying
+		is_thinking_what_to_buy
 	);
 
 	if (wielding_intent.should_change) {
@@ -319,7 +319,7 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
 
-	if (should_stay_for_buying) {
+	if (is_thinking_what_to_buy) {
 		movement.flags.set_from_closest_direction(vec2::zero);
 	}
 	else if (move_result.movement_direction.has_value()) {
@@ -350,7 +350,9 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
-	::interpolate_crosshair(ctx, move_result.crosshair_offset, has_target, dt_secs, difficulty, move_result.is_navigating);
+	if (!is_thinking_what_to_buy) {
+		::interpolate_crosshair(ctx, move_result.crosshair_offset, has_target, dt_secs, difficulty, move_result.is_navigating);
+	}
 
 	arena_ai_result result;
 

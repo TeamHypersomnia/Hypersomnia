@@ -36,7 +36,7 @@ inline bool should_holster_weapons(
 	const ai_behavior_variant& behavior,
 	const bool nav_nearing_end,
 	const bool is_freeze_time,
-	const bool should_stay_for_buying
+	const bool is_thinking_what_to_buy
 ) {
 	if (::is_camping_on_waypoint(behavior)) {
 		return false;
@@ -45,7 +45,7 @@ inline bool should_holster_weapons(
 	/*
 		Don't holster weapons so bots show them when buying.
 	*/
-	if (is_freeze_time || should_stay_for_buying) {
+	if (is_freeze_time || is_thinking_what_to_buy) {
 		return false;
 	}
 
@@ -118,7 +118,7 @@ inline wielding_intent_result calc_wielding_intent(
 	CharacterHandle character_handle,
 	const bool nav_nearing_end,
 	const bool is_freeze_time,
-	const bool should_stay_for_buying
+	const bool is_thinking_what_to_buy
 ) {
 	wielding_intent_result result;
 	const auto& cosm = character_handle.get_cosmos();
@@ -175,7 +175,7 @@ inline wielding_intent_result calc_wielding_intent(
 		behavior,
 		nav_nearing_end,
 		is_freeze_time,
-		should_stay_for_buying
+		is_thinking_what_to_buy
 	);
 
 	const auto current_wielding = wielding_setup::from_current(character_handle);
