@@ -47,8 +47,7 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	const cosmos& cosm,
 	const entity_id bomb_entity,
 	const bool has_target,
-	const entity_id closest_enemy,
-	vec2& target_crosshair_offset
+	const entity_id closest_enemy
 ) {
 	navigate_pathfinding_result result;
 
@@ -97,16 +96,6 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	}
 
 	/*
-		If has combat target, aim at the target statelessly.
-		Only set when not in a behavior with specific aiming (defusing, planting).
-	*/
-	if (has_target) {
-		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
-		const auto aim_direction = target_pos - character_pos;
-		target_crosshair_offset = aim_direction;
-	}
-
-	/*
 		Check if camping (patrol with camp timer > 0) - use twitch direction from process().
 	*/
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
@@ -131,6 +120,16 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 			character,
 			dt
 		);
+	}
+
+	/*
+		If has combat target, aim at the target statelessly.
+		Only set when not in a behavior with specific aiming (defusing, planting).
+	*/
+	if (has_target) {
+		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
+		const auto aim_direction = target_pos - character_pos;
+		result.crosshair_offset = aim_direction;
 	}
 
 	return result;
