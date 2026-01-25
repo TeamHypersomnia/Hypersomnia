@@ -5,6 +5,13 @@
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/line_of_sight.hpp"
 
+/*
+	Find the closest visible enemy within the bot's field of view.
+	
+	is_camping: When true, uses extended FOV (40% larger). Set this when the bot
+	is camping on a waypoint to give them better vision while stationary.
+*/
+
 inline entity_id find_closest_enemy(
 	const ai_character_context& ctx,
 	const bool is_ffa,
@@ -37,15 +44,16 @@ inline entity_id find_closest_enemy(
 			}
 
 			const auto target_pos = entity.get_logic_transform().pos;
-			const auto offset = target_pos - ctx.character_pos;
-			const auto distance = offset.length();
 
 			/*
-				Check if target is within field of view (using line_of_sight.hpp functions).
+				Check if target is within field of view first (early exit for efficiency).
 			*/
 			if (!::is_within_fov(ctx.character_pos, target_pos, is_camping)) {
 				return;
 			}
+
+			const auto offset = target_pos - ctx.character_pos;
+			const auto distance = offset.length();
 
 			if (distance < closest_distance) {
 				const auto direction_to_enemy = vec2(offset).normalize();
