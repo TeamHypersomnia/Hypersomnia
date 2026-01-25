@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"

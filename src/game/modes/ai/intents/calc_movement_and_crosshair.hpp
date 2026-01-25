@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/pathfinding/navigate_pathfinding.hpp"
