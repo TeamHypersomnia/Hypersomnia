@@ -278,7 +278,18 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle, move_result.nearing_end, is_freeze_time);
+	/*
+		If in buy area and not done buying, stay still to make purchases.
+	*/
+	const bool should_stay_for_buying = in_buy_area && !ai_state.already_nothing_more_to_buy;
+
+	const auto wielding_intent = ::calc_wielding_intent(
+		ai_state.last_behavior,
+		character_handle,
+		move_result.nearing_end,
+		is_freeze_time,
+		should_stay_for_buying
+	);
 
 	if (wielding_intent.should_change) {
 		::perform_wielding(step, character_handle, wielding_intent.desired_wielding);
@@ -307,11 +318,6 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.walking = ::should_walk_silently(ai_state.last_behavior);
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
-
-	/*
-		If in buy area and not done buying, stay still to make purchases.
-	*/
-	const bool should_stay_for_buying = in_buy_area && !ai_state.already_nothing_more_to_buy;
 
 	if (should_stay_for_buying) {
 		movement.flags.set_from_closest_direction(vec2::zero);
