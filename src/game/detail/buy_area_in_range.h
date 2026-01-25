@@ -38,7 +38,12 @@ bool buy_area_in_range(const E& subject) {
 				const auto& marker = typed_handle.template get<invariants::area_marker>();
 
 				if (area_marker_type::BUY_ZONE == marker.type) {
-					if (matched_faction == typed_handle.get_official_faction()) {
+					const auto zone_faction = typed_handle.get_official_faction();
+					const bool faction_matches = 
+						matched_faction == zone_faction || 
+						zone_faction == faction_type::ANY;
+
+					if (faction_matches) {
 						if (entity_overlaps_entity(typed_handle, subject)) {
 							found = true;
 							return callback_result::ABORT;

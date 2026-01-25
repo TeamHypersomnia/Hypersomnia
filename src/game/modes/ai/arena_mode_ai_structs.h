@@ -184,7 +184,7 @@ struct arena_mode_ai_state {
 
 	vec2 target_crosshair_offset = vec2::zero;
 
-	bool already_tried_to_buy = false;
+	bool already_nothing_more_to_buy = false;
 	float purchase_decision_countdown = -1.0f;
 
 	std::optional<ai_pathfinding_state> pathfinding;
@@ -212,7 +212,7 @@ struct arena_mode_ai_state {
 		patrol_letter = marker_letter_type::A;
 		tried_push_already = false;
 		target_crosshair_offset = vec2::zero;
-		already_tried_to_buy = false;
+		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -1.0f;
 		pathfinding.reset();
 		current_pathfinding_request = std::nullopt;
