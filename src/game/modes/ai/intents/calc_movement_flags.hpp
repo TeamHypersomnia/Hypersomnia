@@ -66,16 +66,30 @@ inline bool should_dash_for_combat(
 		return false;
 	}
 
-	if (combat->has_dashed_for_position(combat_target.last_seen_pos)) {
-		return false;
+	constexpr float DASH_RADIUS = 100.0f;
+
+	/*
+		Check if we should dash towards last_seen_pos.
+	*/
+	if (!combat->has_dashed_for_seen_position(combat_target.last_seen_pos)) {
+		const auto dist_to_last_seen = (bot_pos - combat_target.last_seen_pos).length();
+
+		if (dist_to_last_seen < DASH_RADIUS) {
+			combat->mark_dashed_for_seen_position(combat_target.last_seen_pos);
+			return true;
+		}
 	}
 
-	constexpr float DASH_RADIUS = 100.0f;
-	const auto dist_to_last_seen = (bot_pos - combat_target.last_seen_pos).length();
+	/*
+		Also check if we should dash towards last_known_pos (from footsteps).
+	*/
+	if (!combat->has_dashed_for_known_position(combat_target.last_known_pos)) {
+		const auto dist_to_last_known = (bot_pos - combat_target.last_known_pos).length();
 
-	if (dist_to_last_seen < DASH_RADIUS) {
-		combat->mark_dashed_for_position(combat_target.last_seen_pos);
-		return true;
+		if (dist_to_last_known < DASH_RADIUS) {
+			combat->mark_dashed_for_known_position(combat_target.last_known_pos);
+			return true;
+		}
 	}
 
 	return false;

@@ -2452,6 +2452,17 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			}
 		}
 
+		/*
+			Calculate if bot is in buy area and if it's freeze time.
+		*/
+		const bool is_freeze_time = get_freeze_seconds_left(in) > 0.f;
+		const bool in_buy_area = [&]() {
+			if (const auto character_handle = cosm[player.controlled_character_id]) {
+				return ::buy_area_in_range(character_handle);
+			}
+			return false;
+		}();
+
 		const auto ai_result = update_arena_mode_ai(
 			cosm,
 			step,
@@ -2467,7 +2478,9 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			cosm.get_common_significant().navmesh,
 			is_bomb_planted,
 			current_bomb_entity,
-			&_pathfinding_ctx
+			&_pathfinding_ctx,
+			in_buy_area,
+			is_freeze_time
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
@@ -3850,7 +3863,8 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 			step,
 			it.second.ai_state,
 			it.second.controlled_character_id,
-			in.rules.is_ffa()
+			in.rules.is_ffa(),
+			is_bomb_planted
 		);
 	}
 }

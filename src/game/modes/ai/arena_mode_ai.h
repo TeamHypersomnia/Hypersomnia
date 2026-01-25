@@ -19,7 +19,9 @@ arena_ai_result update_arena_mode_ai(
 	const cosmos_navmesh& navmesh,
 	const bool bomb_planted,
 	const entity_id bomb_entity,
-	pathfinding_context* pathfinding_ctx
+	pathfinding_context* pathfinding_ctx,
+	const bool in_buy_area,
+	const bool is_freeze_time
 );
 
 void post_solve_arena_mode_ai(
@@ -27,5 +29,6 @@ void post_solve_arena_mode_ai(
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
-	const bool is_ffa
+	const bool is_ffa,
+	const bool bomb_planted
 );

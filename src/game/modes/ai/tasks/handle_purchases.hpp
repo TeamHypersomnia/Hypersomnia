@@ -14,7 +14,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 	const float dt_secs,
 	randomization& stable_rng
 ) {
-	if (ctx.ai_state.already_tried_to_buy || money <= 0) {
+	if (ctx.ai_state.already_nothing_more_to_buy || money <= 0) {
 		return std::nullopt;
 	}
 
@@ -24,14 +24,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 	ctx.ai_state.purchase_decision_countdown -= dt_secs;
 
-	if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
-		return std::nullopt;
-	}
-
-	ctx.ai_state.already_tried_to_buy = true;
-
 	/*
-		Check what items the bot already owns.
+		We need to check inventory now to determine if we should buy anything.
+		This allows us to set already_nothing_more_to_buy even during countdown
+		if we determine there's nothing to purchase.
 	*/
 	auto get_owned_inventory = [&]() {
 		bool has_only_pistols = true;
@@ -200,6 +196,13 @@ inline std::optional<item_flavour_id> handle_purchases(
 			});
 
 			if (can_afford_non_pistol_after) {
+				/*
+					Countdown still delays the actual purchase.
+				*/
+				if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+					return std::nullopt;
+				}
+
 				return backpack;
 			}
 		}
@@ -210,6 +213,13 @@ inline std::optional<item_flavour_id> handle_purchases(
 	*/
 	if (weapon_count <= 1 || has_only_pistols) {
 		if (const auto gun = try_buy_gun(owned_guns, money)) {
+			/*
+				Countdown still delays the actual purchase.
+			*/
+			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+				return std::nullopt;
+			}
+
 			return gun;
 		}
 	}
@@ -218,6 +228,13 @@ inline std::optional<item_flavour_id> handle_purchases(
 		Buy armor if nothing else.
 	*/
 	if (const auto armor = try_buy_armor(money)) {
+		/*
+			Countdown still delays the actual purchase.
+		*/
+		if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+			return std::nullopt;
+		}
+
 		return armor;
 	}
 
@@ -230,9 +247,22 @@ inline std::optional<item_flavour_id> handle_purchases(
 	constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
 	if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {
 		if (const auto kit = try_buy_defuse_kit(money)) {
+			/*
+				Countdown still delays the actual purchase.
+			*/
+			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+				return std::nullopt;
+			}
+
 			return kit;
 		}
 	}
+
+	/*
+		Nothing more to buy - set flag so we don't keep checking.
+		This can be set even during countdown if we determine there's nothing to purchase.
+	*/
+	ctx.ai_state.already_nothing_more_to_buy = true;
 
 	return std::nullopt;
 }

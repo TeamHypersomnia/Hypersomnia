@@ -65,7 +65,9 @@ arena_ai_result update_arena_mode_ai(
 	const cosmos_navmesh& navmesh,
 	const bool bomb_planted,
 	const entity_id bomb_entity,
-	pathfinding_context* pathfinding_ctx
+	pathfinding_context* pathfinding_ctx,
+	const bool in_buy_area,
+	const bool is_freeze_time
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -98,11 +100,9 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		===========================================================================
 		PHASE 1: Update combat target tracking (before behavior tree evaluation).
+		NOTE: listen_for_footsteps is now called in post_solve_arena_mode_ai.
 		===========================================================================
 	*/
-
-	/* Listen for footsteps and update combat target from sound cues. */
-	::listen_for_footsteps(ctx, step, is_ffa, global_time_secs);
 
 	/* Check for visible enemies and update combat_target. */
 	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
@@ -120,6 +120,18 @@ arena_ai_result update_arena_mode_ai(
 			enemy_pos,
 			character_pos
 		);
+	}
+	else {
+		/*
+			Target can be lost: if we're in combat and have already dashed to last_known_pos
+			but still don't see the target, we've reached the last known position and the
+			enemy is gone. Clear the combat target.
+		*/
+		if (auto* combat = ::get_behavior_if<ai_behavior_combat>(ai_state.last_behavior)) {
+			if (combat->has_dashed_for_known_position(ai_state.combat_target.last_known_pos)) {
+				ai_state.combat_target.clear();
+			}
+		}
 	}
 
 	/*
@@ -262,10 +274,11 @@ arena_ai_result update_arena_mode_ai(
 	/*
 		===========================================================================
 		PHASE 6: Calculate and apply weapon wielding (via intent calculator).
+		During freeze time, don't holster so bots show their weapons.
 		===========================================================================
 	*/
 
-	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle, move_result.nearing_end);
+	const auto wielding_intent = ::calc_wielding_intent(ai_state.last_behavior, character_handle, move_result.nearing_end, is_freeze_time);
 
 	if (wielding_intent.should_change) {
 		::perform_wielding(step, character_handle, wielding_intent.desired_wielding);
@@ -295,7 +308,15 @@ arena_ai_result update_arena_mode_ai(
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
 
-	if (move_result.movement_direction.has_value()) {
+	/*
+		If in buy area and not done buying, stay still to make purchases.
+	*/
+	const bool should_stay_for_buying = in_buy_area && !ai_state.already_nothing_more_to_buy;
+
+	if (should_stay_for_buying) {
+		movement.flags.set_from_closest_direction(vec2::zero);
+	}
+	else if (move_result.movement_direction.has_value()) {
 		movement.flags.set_from_closest_direction(*move_result.movement_direction);
 	}
 	else {
@@ -326,7 +347,13 @@ arena_ai_result update_arena_mode_ai(
 	::interpolate_crosshair(ctx, has_target, dt_secs, difficulty, move_result.is_navigating);
 
 	arena_ai_result result;
-	result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+
+	/*
+		Only attempt purchases when in buy area.
+	*/
+	if (in_buy_area) {
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+	}
 
 	if (move_result.path_completed) {
 		ai_state.current_pathfinding_request = std::nullopt;
@@ -341,13 +368,32 @@ void post_solve_arena_mode_ai(
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
-	const bool is_ffa
+	const bool is_ffa,
+	const bool bomb_planted
 ) {
 	const auto character_handle = cosm[controlled_character_id];
 
 	if (!character_handle.alive()) {
 		return;
 	}
+
+	const auto bot_faction = character_handle.get_official_faction();
+	const auto character_pos = character_handle.get_logic_transform().pos;
+	const auto global_time_secs = cosm.get_total_seconds_passed();
+	const auto& physics = cosm.get_solvable_inferred().physics;
+
+	const auto ctx = ai_character_context{
+		ai_state,
+		character_pos,
+		physics,
+		cosm,
+		character_handle
+	};
+
+	/*
+		Listen for footsteps - must be done in post_solve since footstep sounds are posted here.
+	*/
+	::listen_for_footsteps(ctx, step, is_ffa, global_time_secs, bomb_planted);
 
 	/*
 		Check for teleportation messages - clear pathfinding if this bot was teleported.
@@ -368,10 +414,6 @@ void post_solve_arena_mode_ai(
 	}
 
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
-	const auto bot_faction = character_handle.get_official_faction();
-	const auto character_pos = character_handle.get_logic_transform().pos;
-	const auto global_time_secs = cosm.get_total_seconds_passed();
-	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto filter = predefined_queries::line_of_sight();
 
 	auto rng_state = xorshift_state{ static_cast<uint64_t>(global_time_secs * 1000.0f + 12345) };
