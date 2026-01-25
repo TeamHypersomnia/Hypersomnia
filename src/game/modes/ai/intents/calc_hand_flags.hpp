@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/components/sentience_component.h"
@@ -15,8 +14,7 @@
 	
 	Always returns an up-to-date state for the hands.
 	
-	target_aim_pos_override: When set, use this position for angle check instead of
-	the live enemy position. Used for wall penetration shooting.
+	target_enemy_pos: The position to aim at (last known or current enemy position).
 */
 
 struct hand_flags_result {
@@ -28,11 +26,9 @@ template <typename CharacterHandle>
 inline hand_flags_result calc_hand_flags(
 	const ai_behavior_variant& behavior,
 	const bool target_acquired,
-	const entity_id closest_enemy,
+	const vec2 target_enemy_pos,
 	const vec2 character_pos,
-	const cosmos& cosm,
-	CharacterHandle character_handle,
-	const std::optional<vec2> target_aim_pos_override = std::nullopt
+	CharacterHandle character_handle
 ) {
 	hand_flags_result result;
 
@@ -52,25 +48,7 @@ inline hand_flags_result calc_hand_flags(
 	*/
 	if (const auto* combat = ::get_behavior_if<ai_behavior_combat>(behavior)) {
 		if (target_acquired) {
-			vec2 target_pos;
-
-			if (target_aim_pos_override.has_value()) {
-				/*
-					Wall penetration case: use last known position.
-				*/
-				target_pos = *target_aim_pos_override;
-			}
-			else {
-				const auto enemy_handle = cosm[closest_enemy];
-
-				if (!enemy_handle.alive()) {
-					return result;
-				}
-
-				target_pos = enemy_handle.get_logic_transform().pos;
-			}
-
-			const auto aim_direction = target_pos - character_pos;
+			const auto aim_direction = target_enemy_pos - character_pos;
 
 			if (auto crosshair = character_handle.find_crosshair()) {
 				const auto current_aim = vec2(crosshair->base_offset).normalize();

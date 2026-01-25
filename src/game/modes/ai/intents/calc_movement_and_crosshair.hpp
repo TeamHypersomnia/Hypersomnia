@@ -37,8 +37,9 @@
 	- movement_direction: direction to move
 	- crosshair_offset: where to aim
 	
-	target_aim_pos_override: When set, aim at this position directly instead of
-	predicting from enemy position. Used for wall penetration shooting.
+	target_enemy_pos: The position to aim at (last known or current enemy position).
+	target_enemy_velocity: Optional velocity for aim prediction. If set, predict enemy
+	movement; if not set (wall penetration), aim at position directly.
 */
 
 template <typename CharacterHandle>
@@ -52,8 +53,8 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	const cosmos& cosm,
 	const entity_id bomb_entity,
 	const bool target_acquired,
-	const entity_id closest_enemy,
-	const std::optional<vec2> target_aim_pos_override = std::nullopt
+	const vec2 target_enemy_pos,
+	const std::optional<vec2> target_enemy_velocity = std::nullopt
 ) {
 	navigate_pathfinding_result result;
 
@@ -129,28 +130,23 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	}
 
 	/*
-		If has combat target, aim at the predicted target position using estimate_aiming_target.
-		This accounts for enemy velocity and bullet travel time.
-		Only set when not in a behavior with specific aiming (defusing, planting).
-		
-		If target_aim_pos_override is set (wall penetration), use it directly instead
-		of predicting from enemy position.
+		If has combat target, aim at the target position.
+		If velocity is provided, predict enemy movement using estimate_aiming_target.
+		Otherwise (wall penetration), aim at the position directly.
 	*/
 	if (target_acquired) {
-		if (target_aim_pos_override.has_value()) {
+		if (target_enemy_velocity.has_value()) {
+			/*
+				We see the enemy - predict their position based on velocity.
+			*/
+			const auto predicted_pos = ::estimate_aiming_target(character, target_enemy_pos, *target_enemy_velocity);
+			result.crosshair_offset = predicted_pos - character_pos;
+		}
+		else {
 			/*
 				Wall penetration case: aim at last known position directly.
 			*/
-			result.crosshair_offset = *target_aim_pos_override - character_pos;
-		}
-		else {
-			const auto enemy_handle = cosm[closest_enemy];
-
-			if (enemy_handle.alive()) {
-				const auto predicted_pos = ::estimate_aiming_target(character, enemy_handle);
-				const auto aim_direction = predicted_pos - character_pos;
-				result.crosshair_offset = aim_direction;
-			}
+			result.crosshair_offset = target_enemy_pos - character_pos;
 		}
 	}
 

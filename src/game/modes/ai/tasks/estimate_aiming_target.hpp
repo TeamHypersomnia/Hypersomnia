@@ -7,8 +7,8 @@
 /*
 	Estimate the aiming target position by predicting enemy movement.
 	
-	Takes aggressor and enemy handles, and returns a predicted enemy position
-	based on:
+	Takes aggressor handle, enemy position and enemy velocity, and returns 
+	a predicted enemy position based on:
 	- Enemy's current velocity
 	- Muzzle velocity of aggressor's primary hand weapon (if any)
 	- Bullet travel time from muzzle to enemy
@@ -16,18 +16,13 @@
 	If prediction is not applicable (no gun, etc.), returns enemy's current position.
 */
 
-template <typename AggressorHandle, typename EnemyHandle>
+template <typename AggressorHandle>
 inline vec2 estimate_aiming_target(
 	const AggressorHandle& aggressor,
-	const EnemyHandle& enemy
+	const vec2 enemy_pos,
+	const vec2 enemy_velocity
 ) {
 	const auto& cosm = aggressor.get_cosmos();
-	const auto enemy_pos = enemy.get_logic_transform().pos;
-
-	/*
-		Get enemy velocity using get_effective_velocity().
-	*/
-	const auto enemy_velocity = enemy.get_effective_velocity();
 
 	/*
 		If enemy isn't moving significantly, just return their current position.

@@ -10,6 +10,13 @@
 #include "game/enums/filters.h"
 
 /*
+	Default threshold for penetration checks.
+	A bullet must retain at least this fraction of its penetration distance
+	to be considered capable of reaching the target.
+*/
+constexpr real32 AI_PENETRATION_THRESHOLD = 0.4f;
+
+/*
 	Simulates bullet penetration to determine if the bot's weapon can penetrate
 	through obstacles to reach the target position.
 	
@@ -26,7 +33,7 @@ template <typename CharacterHandle>
 inline bool can_weapon_penetrate(
 	const CharacterHandle& character,
 	const vec2 target_pos,
-	const real32 threshold = 0.4f
+	const real32 threshold = AI_PENETRATION_THRESHOLD
 ) {
 	const auto& cosm = character.get_cosmos();
 	const auto character_pos = character.get_logic_transform().pos;

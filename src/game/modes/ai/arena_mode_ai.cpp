@@ -105,7 +105,8 @@ arena_ai_result update_arena_mode_ai(
 	*/
 
 	/* Check for visible enemies and update combat_target. */
-	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa);
+	const bool is_camping = ::is_camping_on_waypoint(ai_state.last_behavior);
+	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa, is_camping);
 	const bool sees_target = closest_enemy.is_set();
 
 	if (sees_target) {
@@ -188,15 +189,25 @@ arena_ai_result update_arena_mode_ai(
 		The penetration check uses last_known_pos, not the seen position, because
 		we want to know if we can penetrate the wall even when we don't see the target.
 		
-		target_aim_pos_override is set when shooting through walls (not seeing target).
-		It contains the last_known_pos to aim at instead of the live enemy position.
+		target_enemy_pos: Always set to last_known_pos (for both seen and wall penetration).
+		target_enemy_velocity: Set only when we see the enemy (for aim prediction).
 		===========================================================================
 	*/
 
 	bool target_acquired = sees_target;
-	std::optional<vec2> target_aim_pos_override = std::nullopt;
+	std::optional<vec2> target_enemy_velocity = std::nullopt;
 
-	if (!sees_target && ::is_behavior<ai_behavior_combat>(ai_state.last_behavior)) {
+	/*
+		If we see the target, get the velocity for aim prediction.
+	*/
+	if (sees_target) {
+		const auto enemy_handle = cosm[closest_enemy];
+
+		if (enemy_handle.alive()) {
+			target_enemy_velocity = enemy_handle.get_effective_velocity();
+		}
+	}
+	else if (::is_behavior<ai_behavior_combat>(ai_state.last_behavior)) {
 		/*
 			Not seeing the target but in combat mode.
 			Check if we can penetrate to the last known position.
@@ -206,18 +217,19 @@ arena_ai_result update_arena_mode_ai(
 			const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
 
 			if (time_since_known < shoot_wall_time_limit) {
-				const auto threshold = 0.4f;
-				target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos, threshold);
-
-				if (target_acquired) {
-					/*
-						Set the override to aim at last known position instead of live position.
-					*/
-					target_aim_pos_override = ai_state.combat_target.last_known_pos;
-				}
+				target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
+				/*
+					Don't set velocity - aiming directly at last_known_pos without prediction.
+				*/
 			}
 		}
 	}
+
+	/*
+		The target position is always last_known_pos from combat_target.
+		This works for both seen (updated each frame) and wall penetration cases.
+	*/
+	const auto target_enemy_pos = ai_state.combat_target.last_known_pos;
 
 	/*
 		===========================================================================
@@ -239,8 +251,8 @@ arena_ai_result update_arena_mode_ai(
 		cosm,
 		bomb_entity,
 		target_acquired,
-		closest_enemy,
-		target_aim_pos_override
+		target_enemy_pos,
+		target_enemy_velocity
 	);
 
 	/*
@@ -381,11 +393,9 @@ arena_ai_result update_arena_mode_ai(
 		const auto hand_flags = ::calc_hand_flags(
 			ai_state.last_behavior,
 			target_acquired,
-			closest_enemy,
+			target_enemy_pos,
 			character_pos,
-			cosm,
-			character_handle,
-			target_aim_pos_override
+			character_handle
 		);
 
 		if (auto* sentience = character_handle.find<components::sentience>()) {
@@ -520,8 +530,7 @@ void post_solve_arena_mode_ai(
 				No direct line of sight. Check if we can penetrate walls to shoot them.
 				If weapon can penetrate to the muzzle position, full_acquire.
 			*/
-			const auto threshold = 0.4f;
-			if (::can_weapon_penetrate(character_handle, muzzle_pos, threshold)) {
+			if (::can_weapon_penetrate(character_handle, muzzle_pos)) {
 				ai_state.combat_target.full_acquire(
 					rng,
 					global_time_secs,
