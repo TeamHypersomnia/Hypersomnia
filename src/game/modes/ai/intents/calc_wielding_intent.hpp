@@ -32,8 +32,20 @@ inline entity_id find_bomb_in_inventory(const E& character_handle) {
 	return bomb_id;
 }
 
-inline bool should_holster_weapons(const ai_behavior_variant& behavior, const bool nav_nearing_end) {
+inline bool should_holster_weapons(
+	const ai_behavior_variant& behavior,
+	const bool nav_nearing_end,
+	const bool is_freeze_time,
+	const bool should_stay_for_buying
+) {
 	if (::is_camping_on_waypoint(behavior)) {
+		return false;
+	}
+
+	/*
+		Don't holster weapons so bots show them when buying.
+	*/
+	if (is_freeze_time || should_stay_for_buying) {
 		return false;
 	}
 
@@ -105,30 +117,11 @@ inline wielding_intent_result calc_wielding_intent(
 	const ai_behavior_variant& behavior,
 	CharacterHandle character_handle,
 	const bool nav_nearing_end,
-	const bool is_freeze_time = false
+	const bool is_freeze_time,
+	const bool should_stay_for_buying
 ) {
 	wielding_intent_result result;
 	const auto& cosm = character_handle.get_cosmos();
-
-	/*
-		During freeze time, don't holster weapons so bots show them.
-	*/
-	if (is_freeze_time) {
-		/*
-			Only ensure the bot has a weapon out if it doesn't already.
-		*/
-		if (character_handle.get_wielded_guns().empty()) {
-			const auto best_weapon = ::find_best_weapon(character_handle);
-
-			if (best_weapon.is_set()) {
-				result.desired_wielding = wielding_setup::bare_hands();
-				result.desired_wielding.hand_selections[0] = best_weapon;
-				result.should_change = true;
-			}
-		}
-
-		return result;
-	}
 
 	/*
 		Special handling for plant behavior: pull out the bomb.
@@ -178,7 +171,13 @@ inline wielding_intent_result calc_wielding_intent(
 		return result;
 	}
 
-	const bool should_holster = ::should_holster_weapons(behavior, nav_nearing_end);
+	const bool should_holster = ::should_holster_weapons(
+		behavior,
+		nav_nearing_end,
+		is_freeze_time,
+		should_stay_for_buying
+	);
+
 	const auto current_wielding = wielding_setup::from_current(character_handle);
 	const bool has_bare_hands = current_wielding.is_bare_hands(cosm);
 
