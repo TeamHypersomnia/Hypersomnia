@@ -2456,7 +2456,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			Calculate if bot is in buy area and if it's freeze time.
 		*/
 		const bool is_freeze_time = get_freeze_seconds_left(in) > 0.f;
-		const bool in_buy_area = [&]() {
+		const bool in_buy_area = get_buy_seconds_left(in) > 0.0f && [&]() {
 			if (const auto character_handle = cosm[player.controlled_character_id]) {
 				return ::buy_area_in_range(character_handle);
 			}
