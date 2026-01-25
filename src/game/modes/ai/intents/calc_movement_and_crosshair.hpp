@@ -5,6 +5,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/intents/calc_movement_flags.hpp"
+#include "game/modes/ai/tasks/estimate_aiming_target.hpp"
 
 /*
 	Stateless calculation of the current movement direction and crosshair aim.
@@ -123,13 +124,18 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 	}
 
 	/*
-		If has combat target, aim at the target statelessly.
+		If has combat target, aim at the predicted target position using estimate_aiming_target.
+		This accounts for enemy velocity and bullet travel time.
 		Only set when not in a behavior with specific aiming (defusing, planting).
 	*/
 	if (has_target) {
-		const auto target_pos = cosm[closest_enemy].get_logic_transform().pos;
-		const auto aim_direction = target_pos - character_pos;
-		result.crosshair_offset = aim_direction;
+		const auto enemy_handle = cosm[closest_enemy];
+
+		if (enemy_handle.alive()) {
+			const auto predicted_pos = ::estimate_aiming_target(character, enemy_handle);
+			const auto aim_direction = predicted_pos - character_pos;
+			result.crosshair_offset = aim_direction;
+		}
 	}
 
 	return result;
