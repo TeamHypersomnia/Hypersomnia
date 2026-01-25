@@ -87,6 +87,13 @@ namespace predefined_queries {
 		return out;
 	}
 
+	b2Filter bullet_penetration_check() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::CHARACTER, C::CHARACTER_WEAPON);
+		return out;
+	}
+
 	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);

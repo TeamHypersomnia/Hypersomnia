@@ -85,7 +85,7 @@ inline bool can_weapon_penetrate(
 	*/
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto si = cosm.get_si();
-	const auto filter = filters[predefined_filter_type::FLYING_BULLET];
+	const auto filter = predefined_queries::bullet_penetration_check();
 
 	const auto p1 = character_pos;
 	const auto p2 = target_pos;
