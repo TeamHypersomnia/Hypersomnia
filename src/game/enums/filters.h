@@ -32,6 +32,7 @@ namespace predefined_queries {
 	filter_type pathfinding();
 	filter_type renderable();
 	filter_type force_explosion();
+	filter_type bullet_penetration_check();
 };
 
 enum class predefined_filter_type {
