@@ -4586,7 +4586,9 @@ void load_test_scene_particle_effects(
 			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
-			effect.emissions.push_back(em);
+			if (false) {
+				effect.emissions.push_back(em);
+			}
 		}
 	}
 
@@ -4689,7 +4691,9 @@ void load_test_scene_particle_effects(
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
-			effect.emissions.push_back(em);
+			if (false) {
+				effect.emissions.push_back(em);
+			}
 		}
 
 		{
@@ -4766,7 +4770,9 @@ void load_test_scene_particle_effects(
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
-			effect.emissions.push_back(em);
+			if (false) {
+				effect.emissions.push_back(em);
+			}
 		}
 	}
 
