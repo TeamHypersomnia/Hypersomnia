@@ -106,25 +106,25 @@ std::optional<bomb_pathfinding_target> find_bomb_pathfinding_target(
 
 	/*
 		Fallback: bomb touches no walkable tiles.
-		BFS from bomb center to find closest unoccupied tile.
+		BFS from bomb center to find closest walkable tile.
 	*/
 	const auto bomb_cell = ::world_to_cell(island, bomb_pos);
-	const auto unoccupied_opt = ::find_closest_unoccupied_cell(island, bomb_cell, bomb_pos, nullptr);
+	const auto walkable_opt = ::find_closest_walkable_cell(island, bomb_cell, bomb_pos, nullptr, nullptr);
 
-	if (!unoccupied_opt.has_value()) {
+	if (!walkable_opt.has_value()) {
 		return std::nullopt;
 	}
 
-	const auto closest_unoccupied_world = ::cell_to_world(island, unoccupied_opt->cell);
+	const auto closest_walkable_world = ::cell_to_world(island, walkable_opt->cell);
 
 	/*
-		Teleport bomb to the closest unoccupied cell center.
+		Teleport bomb to the closest walkable cell center.
 		Note: This modifies the bomb entity position.
 		The caller should handle this appropriately.
 	*/
 	bomb_pathfinding_target result;
-	result.set(bomb_pos, closest_unoccupied_world);
-	result.resolved_cell = cell_on_navmesh(island_idx, unoccupied_opt->cell);
+	result.set(bomb_pos, closest_walkable_world);
+	result.resolved_cell = cell_on_navmesh(island_idx, walkable_opt->cell);
 	result.bomb_was_teleported = true;
 	return result;
 }

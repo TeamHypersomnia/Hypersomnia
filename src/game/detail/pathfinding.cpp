@@ -11,6 +11,7 @@
 #include "game/detail/physics/physics_queries.h"
 #include "augs/math/transform.h"
 #include "augs/math/repro_math.h"
+#include "game/detail/physics_path_hints.h"
 
 /*
 	Helper function to check if a point is inside a rotated rectangle.
@@ -191,8 +192,9 @@ std::optional<std::size_t> find_best_portal_from_to(
 std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
-	const vec2u target_cell,
+	const vec2 target_pos,
 	const std::optional<std::size_t> target_portal_index,
+	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	const auto size = island.get_size_in_cells();
@@ -202,23 +204,19 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	}
 
 	/*
-		Check start and target are within bounds.
+		Check start is within bounds.
 	*/
 	if (start_cell.x >= size.x || start_cell.y >= size.y) {
 		return std::nullopt;
 	}
 
+	/*
+		Calculate target cell from target position.
+	*/
+	vec2u target_cell = ::world_to_cell(island, target_pos);
+
 	if (target_cell.x >= size.x || target_cell.y >= size.y) {
 		return std::nullopt;
-	}
-
-	/*
-		Same cell.
-	*/
-	if (start_cell == target_cell) {
-		std::vector<pathfinding_node> result;
-		result.push_back(pathfinding_node{ start_cell });
-		return result;
 	}
 
 	/*
@@ -266,50 +264,88 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	};
 
 	/*
-		Check if target is reachable.
+		Check if target is walkable.
+		If not, find the closest walkable cell and use that as the actual target.
 	*/
+	std::vector<pathfinding_node> suffix_path;
+	vec2u actual_target = target_cell;
+
 	if (!is_walkable(target_cell)) {
-		return std::nullopt;
+		const auto walkable_result = ::find_closest_walkable_cell(island, target_cell, target_pos, physics_hints, ctx);
+
+		if (!walkable_result.has_value()) {
+			return std::nullopt;
+		}
+
+		suffix_path = walkable_result->path_through_occupied;
+		actual_target = walkable_result->cell;
+
+		/*
+			Re-initialize graph since find_closest_walkable_cell may have modified context.
+		*/
+		graph.init_all();
+	}
+
+	/*
+		Same cell.
+	*/
+	if (start_cell == actual_target) {
+		std::vector<pathfinding_node> result;
+		result.push_back(pathfinding_node{ start_cell });
+		return result;
 	}
 
 	/*
 		Check if start is walkable.
-		If not, find the closest unoccupied cell and prepend the path through occupied cells.
+		If not, find the closest walkable cell and prepend the path through occupied cells.
 	*/
 	std::vector<pathfinding_node> prefix_path;
 	vec2u actual_start = start_cell;
 
 	if (!is_walkable(start_cell)) {
 		const auto start_world = ::cell_to_world(island, start_cell);
-		const auto unoccupied_result = ::find_closest_unoccupied_cell(island, start_cell, start_world, ctx);
+		const auto walkable_result = ::find_closest_walkable_cell(island, start_cell, start_world, physics_hints, ctx);
 
-		if (!unoccupied_result.has_value()) {
+		if (!walkable_result.has_value()) {
 			return std::nullopt;
 		}
 
-		prefix_path = unoccupied_result->path_through_occupied;
-		actual_start = unoccupied_result->cell;
+		prefix_path = walkable_result->path_through_occupied;
+		actual_start = walkable_result->cell;
 
 		/*
-			Re-initialize graph since find_closest_unoccupied_cell may have modified context.
+			Re-initialize graph since find_closest_walkable_cell may have modified context.
 		*/
 		graph.init_all();
 	}
 
 	/*
-		If actual_start == target, return prefix path + target.
+		If actual_start == actual_target, return prefix path + suffix path.
 	*/
-	if (actual_start == target_cell) {
-		prefix_path.push_back(pathfinding_node{ target_cell });
-		return prefix_path;
+	if (actual_start == actual_target) {
+		std::vector<pathfinding_node> result = prefix_path;
+
+		if (!suffix_path.empty()) {
+			/*
+				Reverse suffix path since it was built from target to walkable cell.
+			*/
+			for (auto it = suffix_path.rbegin(); it != suffix_path.rend(); ++it) {
+				result.push_back(*it);
+			}
+		}
+		else {
+			result.push_back(pathfinding_node{ actual_target });
+		}
+
+		return result;
 	}
 
 	auto heuristic = [&](const vec2u c) {
-		return ::cell_distance_euclidean(c, target_cell);
+		return ::cell_distance_euclidean(c, actual_target);
 	};
 
 	auto is_target = [&](const vec2u c) {
-		return c == target_cell;
+		return c == actual_target;
 	};
 
 	const auto found = augs::astar_find_path_weighted(
@@ -329,7 +365,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		return std::nullopt;
 	}
 
-	auto main_path = graph.reconstruct_path(actual_start, target_cell);
+	auto main_path = graph.reconstruct_path(actual_start, actual_target);
 
 	/*
 		Prepend the path through occupied cells if any.
@@ -340,7 +376,22 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 		*/
 		prefix_path.pop_back();
 		prefix_path.insert(prefix_path.end(), main_path.begin(), main_path.end());
-		return prefix_path;
+		main_path = std::move(prefix_path);
+	}
+
+	/*
+		Append suffix path if target was not walkable.
+	*/
+	if (!suffix_path.empty()) {
+		/*
+			Reverse suffix path and append (skip first element since it's same as last of main_path).
+		*/
+		for (auto it = suffix_path.rbegin(); it != suffix_path.rend(); ++it) {
+			if (it == suffix_path.rbegin() && !main_path.empty() && main_path.back().cell_xy == it->cell_xy) {
+				continue;
+			}
+			main_path.push_back(*it);
+		}
 	}
 
 	return main_path;
@@ -352,6 +403,7 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	const island_id_type target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	if (source_island_index >= navmesh.islands.size()) {
@@ -378,6 +430,7 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 		Use pre-computed in_cell_pos for portal center.
 	*/
 	const auto portal_center = portal.in_cell_pos;
+	const auto portal_center_world = ::cell_to_world(source_island, portal_center);
 	const auto start_cell = ::world_to_cell(source_island, source_pos);
 
 	/*
@@ -386,8 +439,9 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	auto path_nodes = ::find_path_within_island(
 		source_island,
 		start_cell,
-		portal_center,
+		portal_center_world,
 		best_portal,
+		physics_hints,
 		ctx
 	);
 
@@ -414,6 +468,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	const auto source_island_opt = ::find_island_for_position(navmesh, source_pos);
@@ -432,7 +487,6 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 	if (source_island == target_island) {
 		const auto& island = navmesh.islands[source_island];
 		const auto start_cell = ::world_to_cell(island, source_pos);
-		const auto target_cell = ::world_to_cell(island, target_pos);
 
 		/*
 			Check for same-island portals that might provide a shortcut.
@@ -464,8 +518,9 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 				auto path_nodes = ::find_path_within_island(
 					island,
 					start_cell,
-					portal.in_cell_pos,
+					portal_center_world,
 					best_same_island_portal,
+					physics_hints,
 					ctx
 				);
 
@@ -488,8 +543,9 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 		auto path_nodes = ::find_path_within_island(
 			island,
 			start_cell,
-			target_cell,
+			target_pos,
 			std::nullopt,
+			physics_hints,
 			ctx
 		);
 
@@ -523,6 +579,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 		next_island,
 		source_pos,
 		target_pos,
+		physics_hints,
 		ctx
 	);
 }
@@ -531,6 +588,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	std::vector<pathfinding_path> all_paths;
@@ -542,7 +600,7 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	const int max_iterations = 100;
 
 	for (int iteration = 0; iteration < max_iterations; ++iteration) {
-		auto path_result = ::find_path_across_islands_many(navmesh, current_pos, target_pos, ctx);
+		auto path_result = ::find_path_across_islands_many(navmesh, current_pos, target_pos, physics_hints, ctx);
 
 		if (!path_result.has_value()) {
 			break;
@@ -574,10 +632,13 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	return all_paths;
 }
 
-std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
+template <class IsViable>
+std::optional<viable_cell_result> find_closest_viable_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
+	IsViable is_viable,
+	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	const auto size = island.get_size_in_cells();
@@ -591,10 +652,10 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	}
 
 	/*
-		If start cell is already unoccupied, return it immediately.
+		If start cell is already viable, return it immediately.
 	*/
-	if (island.is_cell_unoccupied(start_cell)) {
-		unoccupied_cell_result result;
+	if (is_viable(start_cell)) {
+		viable_cell_result result;
 		result.cell = start_cell;
 		return result;
 	}
@@ -607,14 +668,14 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	graph.init_parent();
 
 	/*
-		A cell is a valid target if it's unoccupied (value == 0).
+		A cell is a valid target if it passes the is_viable check.
 	*/
 	auto is_target_cell = [&](const vec2u c) {
-		return island.is_cell_unoccupied(c);
+		return is_viable(c);
 	};
 
 	/*
-		Use BFS to find up to MAX_WALKABLE_CANDIDATES unoccupied cells,
+		Use BFS to find up to MAX_WALKABLE_CANDIDATES viable cells,
 		tracking the closest one by Euclidean distance.
 		BFS iterates all in-bounds neighbors (regardless of walkability).
 	*/
@@ -644,26 +705,81 @@ std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
 	}
 
 	/*
-		Find the candidate with minimum Euclidean distance to world_pos.
+		If physics_hints is provided, prioritize candidates with LoS to world_pos.
+		First try to find the closest with LoS, then fall back to closest without LoS.
 	*/
 	vec2u best_cell = candidates[0];
-	float best_dist_sq = (::cell_to_world(island, best_cell) - world_pos).length_sq();
+	float best_dist_sq = std::numeric_limits<float>::max();
+	bool found_with_los = false;
 
-	for (std::size_t i = 1; i < candidates.size(); ++i) {
-		const auto cell_world = ::cell_to_world(island, candidates[i]);
+	for (const auto& cell : candidates) {
+		const auto cell_world = ::cell_to_world(island, cell);
 		const auto dist_sq = (cell_world - world_pos).length_sq();
 
-		if (dist_sq < best_dist_sq) {
-			best_dist_sq = dist_sq;
-			best_cell = candidates[i];
+		if (physics_hints != nullptr) {
+			const bool has_los = physics_hints->has_line_of_sight(world_pos, cell_world);
+
+			if (has_los) {
+				if (!found_with_los || dist_sq < best_dist_sq) {
+					found_with_los = true;
+					best_dist_sq = dist_sq;
+					best_cell = cell;
+				}
+			}
+			else if (!found_with_los) {
+				/*
+					Only consider non-LoS candidates if we haven't found any with LoS.
+				*/
+				if (dist_sq < best_dist_sq) {
+					best_dist_sq = dist_sq;
+					best_cell = cell;
+				}
+			}
+		}
+		else {
+			/*
+				No physics_hints, just use distance.
+			*/
+			if (dist_sq < best_dist_sq) {
+				best_dist_sq = dist_sq;
+				best_cell = cell;
+			}
 		}
 	}
 
-	unoccupied_cell_result result;
+	viable_cell_result result;
 	result.cell = best_cell;
 	result.path_through_occupied = graph.reconstruct_path(start_cell, best_cell);
 
 	return result;
+}
+
+std::optional<viable_cell_result> find_closest_walkable_cell(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const vec2 world_pos,
+	const physics_path_hints* physics_hints,
+	pathfinding_context* ctx
+) {
+	auto is_walkable = [&](const vec2u c) {
+		const auto value = island.get_cell(c);
+		return ::is_cell_walkable(value);
+	};
+
+	return ::find_closest_viable_cell(island, start_cell, world_pos, is_walkable, physics_hints, ctx);
+}
+
+std::optional<viable_cell_result> find_closest_unoccupied_cell(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const vec2 world_pos,
+	pathfinding_context* ctx
+) {
+	auto is_unoccupied = [&](const vec2u c) {
+		return island.is_cell_unoccupied(c);
+	};
+
+	return ::find_closest_viable_cell(island, start_cell, world_pos, is_unoccupied, nullptr, ctx);
 }
 
 std::optional<vec2u> find_random_unoccupied_cell_within_steps(

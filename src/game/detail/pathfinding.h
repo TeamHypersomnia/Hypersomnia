@@ -1,9 +1,12 @@
 #pragma once
 #include <optional>
 #include <vector>
+#include <functional>
 #include "game/common_state/cosmos_navmesh.h"
 #include "augs/enums/callback_result.h"
 #include "augs/math/transform.h"
+
+struct physics_path_hints;
 
 /*
 	Pathfinding algorithms using A* for navmesh.
@@ -72,9 +75,15 @@ std::optional<std::size_t> find_best_portal_from_to(
 /*
 	A* pathfinding within a single island.
 	
+	target_pos: the actual target world position, used to recalculate target_cell
+	            and to find the closest walkable cell if target is not walkable.
+	
 	target_portal_index: if set, we're navigating to a specific portal.
 	                     Its cells are walkable; other portal cells are blocked.
 	                     If nullopt, we're navigating to a regular cell.
+	
+	physics_hints: optional hints for line-of-sight checks when finding closest
+	               walkable cell for non-walkable targets.
 
 	Returns a vector of pathfinding nodes, or nullopt if no path found.
 */
@@ -82,8 +91,9 @@ std::optional<std::size_t> find_best_portal_from_to(
 std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
-	const vec2u target_cell,
+	const vec2 target_pos,
 	const std::optional<std::size_t> target_portal_index = std::nullopt,
+	const physics_path_hints* physics_hints = nullptr,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -98,6 +108,7 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	const island_id_type target_island_index,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints = nullptr,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -111,6 +122,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints = nullptr,
 	pathfinding_context* ctx = nullptr
 );
 
@@ -124,23 +136,52 @@ std::vector<pathfinding_path> find_path_across_islands_many_full(
 	const cosmos_navmesh& navmesh,
 	const vec2 source_pos,
 	const vec2 target_pos,
+	const physics_path_hints* physics_hints = nullptr,
 	pathfinding_context* ctx = nullptr
 );
 
 /*
-	BFS to find the closest unoccupied cell from a given cell that may be occupied.
-	Returns the unoccupied cell closest to the world position (Euclidean distance).
-	Used when pathfinding source is on an occupied cell.
+	BFS to find the closest viable cell from a given cell.
+	Returns the viable cell closest to the world position (Euclidean distance).
 	
-	Only finds cells with value == 0 (unoccupied). Does not handle portals.
+	is_viable: Lambda to determine if a cell is viable (e.g., walkable, unoccupied).
+	physics_hints: Optional hints for line-of-sight checks. When provided, prioritizes
+	               cells with LoS to world_pos, then falls back to closest without LoS.
 */
 
-struct unoccupied_cell_result {
+struct viable_cell_result {
 	vec2u cell;
 	std::vector<pathfinding_node> path_through_occupied;
 };
 
-std::optional<unoccupied_cell_result> find_closest_unoccupied_cell(
+template <class IsViable>
+std::optional<viable_cell_result> find_closest_viable_cell(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const vec2 world_pos,
+	IsViable is_viable,
+	const physics_path_hints* physics_hints = nullptr,
+	pathfinding_context* ctx = nullptr
+);
+
+/*
+	Find closest walkable cell (allows portals). Used by pathfinding functions.
+*/
+
+std::optional<viable_cell_result> find_closest_walkable_cell(
+	const cosmos_navmesh_island& island,
+	const vec2u start_cell,
+	const vec2 world_pos,
+	const physics_path_hints* physics_hints = nullptr,
+	pathfinding_context* ctx = nullptr
+);
+
+/*
+	Find closest unoccupied cell (value == 0, no portals).
+	Used by find_random_unoccupied_position_within_steps.
+*/
+
+std::optional<viable_cell_result> find_closest_unoccupied_cell(
 	const cosmos_navmesh_island& island,
 	const vec2u start_cell,
 	const vec2 world_pos,
