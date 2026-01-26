@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 #include <vector>
-#include <functional>
 #include "game/common_state/cosmos_navmesh.h"
 #include "augs/enums/callback_result.h"
 #include "augs/math/transform.h"
@@ -153,16 +152,6 @@ struct viable_cell_result {
 	vec2u cell;
 	std::vector<pathfinding_node> path_through_occupied;
 };
-
-template <class IsViable>
-std::optional<viable_cell_result> find_closest_viable_cell(
-	const cosmos_navmesh_island& island,
-	const vec2u start_cell,
-	const vec2 world_pos,
-	IsViable is_viable,
-	const physics_path_hints* physics_hints = nullptr,
-	pathfinding_context* ctx = nullptr
-);
 
 /*
 	Find closest walkable cell (allows portals). Used by pathfinding functions.
