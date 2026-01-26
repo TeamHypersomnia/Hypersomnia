@@ -262,7 +262,7 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.clear_pathfinding();
 
 		if (new_request != std::nullopt) {
-			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, pathfinding_ctx);
+			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, nullptr, pathfinding_ctx);
 
 			if (ai_state.is_pathfinding_active()) {
 				ai_state.pathfinding->exact_destination = new_request->exact;

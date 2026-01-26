@@ -189,7 +189,7 @@ inline void check_path_deviation(
 		}
 
 		const auto reroute_target_world = ::cell_to_world(island, nodes[*reroute_target_idx].cell_xy);
-		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, ctx);
+		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, nullptr, ctx);
 
 		if (!rerouting_path.has_value()) {
 			return;
