@@ -2234,7 +2234,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 
 		for (const auto& start_pos : pathfinding_starts) {
 			for (const auto& end_pos : pathfinding_ends) {
-				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, &pf_ctx);
+				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, nullptr, &pf_ctx);
 
 				for (const auto& path : all_paths) {
 					if (path.island_index >= navmesh.islands.size()) {
