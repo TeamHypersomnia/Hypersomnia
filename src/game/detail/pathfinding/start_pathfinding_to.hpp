@@ -16,7 +16,8 @@ inline std::optional<ai_pathfinding_state> start_pathfinding_to(
 	const vec2 bot_pos,
 	const transformr target_transform,
 	const cosmos_navmesh& navmesh,
-	pathfinding_context* ctx
+	const physics_path_hints* physics_hints = nullptr,
+	pathfinding_context* ctx = nullptr
 ) {
 	/*
 		Don't initiate new pathfinding while standing on a portal cell.
@@ -45,7 +46,7 @@ inline std::optional<ai_pathfinding_state> start_pathfinding_to(
 		Calculate path to next portal or directly to destination.
 		Using find_path_across_islands_many which only returns path to the next portal.
 	*/
-	auto path = ::find_path_across_islands_many(navmesh, bot_pos, target_pos, ctx);
+	auto path = ::find_path_across_islands_many(navmesh, bot_pos, target_pos, physics_hints, ctx);
 
 	if (!path.has_value()) {
 		AI_LOG("start_pathfinding_to: no path");

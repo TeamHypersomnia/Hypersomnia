@@ -4,6 +4,7 @@
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/enums/filters.h"
+#include "game/detail/physics_path_hints.h"
 
 struct raycast_input : public b2RayCastCallback {
 	entity_id subject;
@@ -158,4 +159,9 @@ physics_raycast_output physics_world_cache::ray_cast_px(
 	out.intersection = si.get_pixels(out.intersection);
 
 	return out;
+}
+
+bool physics_path_hints::has_line_of_sight(const vec2 from_pos, const vec2 to_pos) const {
+	const auto raycast = physics.ray_cast_px(si, from_pos, to_pos, filter);
+	return !raycast.hit;
 }
