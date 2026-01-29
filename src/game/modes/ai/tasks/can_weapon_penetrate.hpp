@@ -71,10 +71,7 @@ inline bool can_weapon_penetrate(
 	}
 
 	const auto basic_penetration_distance = gun_invariant->basic_penetration_distance;
-
-	if (basic_penetration_distance <= 0.0f) {
-		return false;
-	}
+	const bool zero_penetration =  basic_penetration_distance <= 0.0f;
 
 	/*
 		Perform raycasts to simulate penetration.
@@ -191,6 +188,11 @@ inline bool can_weapon_penetrate(
 
 	if (!can_penetrate) {
 		return false;
+	}
+
+	if (zero_penetration) {
+		/* Avoid div by 0 */
+		return true;
 	}
 
 	/*

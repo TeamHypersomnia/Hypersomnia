@@ -192,6 +192,10 @@ arena_ai_result update_arena_mode_ai(
 			const auto time_since_known = global_time_secs - ai_state.combat_target.when_last_known_secs;
 			const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
 
+			/* 
+				This will always be true when seeing the enemy,
+				because then when_last_known_secs will is always updated to now.
+			*/
 			if (time_since_known < shoot_wall_time_limit) {
 				target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
 
