@@ -2,6 +2,7 @@
 #include <optional>
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/make_physics_path_hints.h"
 #include "game/detail/pathfinding/navigate_pathfinding.hpp"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
@@ -120,12 +121,14 @@ inline navigate_pathfinding_result calc_movement_and_crosshair(
 		If pathfinding is active, use navigate_pathfinding for proper path following.
 	*/
 	if (pathfinding.has_value()) {
+		const auto physics_hints = make_physics_path_hints(cosm);
 		result = ::navigate_pathfinding(
 			pathfinding,
 			character_pos,
 			navmesh,
 			character,
-			dt
+			dt,
+			&physics_hints
 		);
 	}
 

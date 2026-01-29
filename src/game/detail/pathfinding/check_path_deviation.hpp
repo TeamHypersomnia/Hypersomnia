@@ -20,7 +20,8 @@ inline void check_path_deviation(
 	ai_pathfinding_state& pathfinding,
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
-	pathfinding_context* ctx
+	const physics_path_hints* physics_hints = nullptr,
+	pathfinding_context* ctx = nullptr
 ) {
 	/*
 		Lambda to check if we've deviated from a path and need rerouting.
@@ -189,7 +190,7 @@ inline void check_path_deviation(
 		}
 
 		const auto reroute_target_world = ::cell_to_world(island, nodes[*reroute_target_idx].cell_xy);
-		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, nullptr, ctx);
+		auto rerouting_path = ::find_path_across_islands_many(navmesh, bot_pos, reroute_target_world, physics_hints, ctx);
 
 		if (!rerouting_path.has_value()) {
 			return;

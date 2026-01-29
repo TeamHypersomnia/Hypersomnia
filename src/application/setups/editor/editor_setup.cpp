@@ -73,6 +73,7 @@
 #include "game/detail/passes_filter.h"
 #include "game/detail/pathfinding.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/cosmos/make_physics_path_hints.h"
 #include "application/setups/client/https_file_uploader.h"
 #include "augs/misc/readable_bytesize.h"
 #include "application/setups/editor/editor_rebuild_prefab_nodes.hpp"
@@ -2231,10 +2232,11 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			For each start, find path to each end.
 		*/
 		pathfinding_context pf_ctx;
+		const auto physics_hints = make_physics_path_hints(scene.world);
 
 		for (const auto& start_pos : pathfinding_starts) {
 			for (const auto& end_pos : pathfinding_ends) {
-				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, nullptr, &pf_ctx);
+				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, &physics_hints, &pf_ctx);
 
 				for (const auto& path : all_paths) {
 					if (path.island_index >= navmesh.islands.size()) {

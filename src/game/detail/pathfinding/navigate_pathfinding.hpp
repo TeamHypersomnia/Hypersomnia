@@ -39,7 +39,8 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	const vec2 bot_pos,
 	const cosmos_navmesh& navmesh,
 	CharacterHandle character,
-	const real32 dt
+	const real32 dt,
+	const physics_path_hints* physics_hints = nullptr
 ) {
 	navigate_pathfinding_result result;
 
@@ -119,7 +120,7 @@ inline navigate_pathfinding_result navigate_pathfinding(
 	}
 
 	if (!is_inert) {
-		::check_path_deviation(pathfinding, bot_pos, navmesh, nullptr);
+		::check_path_deviation(pathfinding, bot_pos, navmesh, physics_hints, nullptr);
 	}
 
 	/*
