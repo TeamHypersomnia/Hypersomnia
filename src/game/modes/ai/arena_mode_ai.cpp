@@ -49,6 +49,7 @@
 #include "game/modes/ai/intents/calc_requested_interaction.hpp"
 #include "game/modes/ai/intents/calc_hand_flags.hpp"
 #include "game/modes/ai/tasks/can_weapon_penetrate.hpp"
+#include "game/cosmos/make_physics_path_hints.h"
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -262,7 +263,8 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.clear_pathfinding();
 
 		if (new_request != std::nullopt) {
-			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, nullptr, pathfinding_ctx);
+			const auto physics_hints = make_physics_path_hints(cosm);
+			ai_state.pathfinding = ::start_pathfinding_to(character_pos, new_request->target, navmesh, &physics_hints, pathfinding_ctx);
 
 			if (ai_state.is_pathfinding_active()) {
 				ai_state.pathfinding->exact_destination = new_request->exact;

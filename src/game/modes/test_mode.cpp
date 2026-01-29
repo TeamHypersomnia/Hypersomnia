@@ -6,6 +6,7 @@
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/make_physics_path_hints.h"
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "game/messages/mode_notification.h"
@@ -375,12 +376,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				}
 
 				if (has_pathfinding_target) {
+					const auto physics_hints = make_physics_path_hints(cosm);
+
 					if (first_player.debug_pathfinding == std::nullopt) {
 						first_player.debug_pathfinding = ::start_pathfinding_to(
 							character_pos,
 							target_transform,
 							navmesh,
-							nullptr
+							&physics_hints
 						);
 					}
 
@@ -402,7 +405,8 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 						character_pos,
 						navmesh,
 						character,
-						dt_secs
+						dt_secs,
+						&physics_hints
 					);
 
 					/*
