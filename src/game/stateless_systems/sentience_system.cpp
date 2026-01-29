@@ -734,10 +734,10 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 
 	if (!held_item) {
 		const bool conscious = sentience && sentience->is_conscious();
+		(void)conscious;
 
-		if (!conscious) {
-			apply_impact_impulse();
-		}
+		/* Always apply impact after all */
+		apply_impact_impulse();
 	}
 }
 

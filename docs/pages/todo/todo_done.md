@@ -7401,3 +7401,6 @@ This will discard your redo history."
 - nades shouldnt bounce
 
 - contact_listener.cpp should SetEnabled(false) on a contact between teammates when one of them is defusing, will prevent from bots walking onto each other and interrupting defusal.
+
+- find closest unoccupied tile if the target tile is occupied, in pathfinding
+

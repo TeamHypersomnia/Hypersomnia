@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- find closest unoccupied tile if the target tile is occupied, in pathfinding
-
 - additional bot capabilities
 	- in combat have 20-70% chance (aggressiveness, higher for resistance, lower for metropolis, higher for when trying to defuse etc) to pick the closest tile WITHOUT direct LoS (in threshold of e.g. 500 px)
 		- use especially when reloading
