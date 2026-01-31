@@ -39,7 +39,8 @@ using test_flavours_map = type_map<
 	type_pair<test_area_markers, area_marker>,
 	type_pair<test_explosion_bodies, explosion_body>,
 	type_pair<test_touch_collectibles, touch_collectible>,
-	type_pair<test_tool_items, tool_item>
+	type_pair<test_tool_items, tool_item>,
+	type_pair<test_decal_decorations, decal_decoration>
 >;
 
 #if TODO_CARS

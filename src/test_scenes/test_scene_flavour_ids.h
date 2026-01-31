@@ -471,3 +471,13 @@ enum class test_touch_collectibles {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_decal_decorations {
+	// GEN INTROSPECTOR enum class test_decal_decorations
+	BLOOD_SPLATTER_1,
+	BLOOD_SPLATTER_2,
+	BLOOD_SPLATTER_3,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
