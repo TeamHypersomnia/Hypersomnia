@@ -25,6 +25,7 @@ void spawn_blood_splatters(
 );
 
 void spawn_blood_splatters_omnidirectional(
+	allocate_new_entity_access access,
 	const logic_step step,
 	const entity_id subject,
 	const vec2 position,

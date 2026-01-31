@@ -6,7 +6,6 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/organization/all_entity_types.h"
 #include "game/components/decal_component.h"
-#include "game/components/overridden_geo_component.h"
 #include "game/components/sprite_component.h"
 
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
@@ -122,13 +121,13 @@ inline void spawn_blood_splatters(
 }
 
 inline void spawn_blood_splatters_omnidirectional(
+	allocate_new_entity_access access,
 	const logic_step step,
 	const entity_id subject,
 	const vec2 position,
 	const real32 damage_amount
 ) {
 	/* Use the same logic as normal splatters but with 360° spread and different params */
-	auto access = allocate_new_entity_access();
 	const auto direction = vec2::from_degrees(0.f); /* Starting direction doesn't matter with 360° spread */
 	
 	blood_splatter_params omni_params;
