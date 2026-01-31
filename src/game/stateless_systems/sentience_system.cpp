@@ -49,6 +49,14 @@
 
 constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 
+/* Blood splatter configuration constants */
+static constexpr real32 BLOOD_SPLATTER_DAMAGE_PER_SPLATTER = 60.f;
+static constexpr real32 BLOOD_SPLATTER_MIN_SIZE = 0.5f;
+static constexpr real32 BLOOD_SPLATTER_ANGLE_SPREAD = 25.f;
+static constexpr real32 BLOOD_SPLATTER_MIN_DISTANCE = 20.f;
+static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE = 40.f;
+static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
+
 static void spawn_blood_splatters(
 	const logic_step step,
 	const vec2 position,
@@ -58,21 +66,20 @@ static void spawn_blood_splatters(
 	auto& cosm = step.get_cosmos();
 	const auto& common_assets = cosm.get_common_assets();
 
-	/* Calculate number of splatters: 1 per 60 damage, at least 1 */
-	const auto damage_per_splatter = 60.f;
-	const auto num_full_splatters = static_cast<int>(damage_amount / damage_per_splatter);
-	const auto remainder = damage_amount - (num_full_splatters * damage_per_splatter);
-	const auto remainder_size = remainder / damage_per_splatter;
+	/* Calculate number of splatters: 1 per BLOOD_SPLATTER_DAMAGE_PER_SPLATTER damage, at least 1 */
+	const auto num_full_splatters = static_cast<int>(damage_amount / BLOOD_SPLATTER_DAMAGE_PER_SPLATTER);
+	const auto remainder = damage_amount - (num_full_splatters * BLOOD_SPLATTER_DAMAGE_PER_SPLATTER);
+	const auto remainder_size = remainder / BLOOD_SPLATTER_DAMAGE_PER_SPLATTER;
 
 	/* Total splatters: full ones + 1 partial if there's a remainder */
-	const int total_splatters = num_full_splatters + (remainder > 0.f ? 1 : 0);
+	const int num_splatters = num_full_splatters + (remainder > 0.f ? 1 : 0);
 
-	if (total_splatters <= 0) {
+	if (num_splatters <= 0) {
 		return;
 	}
 
 	/* Get available splatter flavours */
-	std::array<typed_entity_flavour_id<decal_decoration>, 3> splatter_flavours = {
+	std::array<typed_entity_flavour_id<decal_decoration>, BLOOD_SPLATTER_NUM_VARIANTS> splatter_flavours = {
 		common_assets.blood_splatter_1,
 		common_assets.blood_splatter_2,
 		common_assets.blood_splatter_3
@@ -94,16 +101,17 @@ static void spawn_blood_splatters(
 	auto access = allocate_new_entity_access();
 	const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
 
-	for (int i = 0; i < total_splatters; ++i) {
+	for (int i = 0; i < num_splatters; ++i) {
 		/* Determine size multiplier */
 		real32 size_mult = 1.f;
-		if (i == total_splatters - 1 && remainder > 0.f) {
+		if (i == num_splatters - 1 && remainder > 0.f) {
 			/* Last splatter gets partial size based on remainder */
-			size_mult = std::max(0.5f, remainder_size);
+			size_mult = std::max(BLOOD_SPLATTER_MIN_SIZE, remainder_size);
 		}
 
-		/* Choose a random splatter flavour */
-		auto splatter_idx = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i)) % 3;
+		/* Choose a random splatter flavour using bounded random */
+		auto rng = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i));
+		const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
 		auto flavour = splatter_flavours[splatter_idx];
 
 		/* Skip if this flavour is not set, try others */
@@ -120,10 +128,9 @@ static void spawn_blood_splatters(
 			continue;
 		}
 
-		/* Randomize position within 20-40 pixels of character in impact direction (±25 degrees) */
-		auto rng = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i) + 100);
-		const auto angle_offset = rng.randval(-25.f, 25.f);
-		const auto distance = rng.randval(20.f, 40.f);
+		/* Randomize position within specified distance of character in impact direction (±spread degrees) */
+		const auto angle_offset = rng.randval(-BLOOD_SPLATTER_ANGLE_SPREAD, BLOOD_SPLATTER_ANGLE_SPREAD);
+		const auto distance = rng.randval(BLOOD_SPLATTER_MIN_DISTANCE, BLOOD_SPLATTER_MAX_DISTANCE);
 		const auto rotation = rng.randval(0.f, 360.f);
 
 		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
