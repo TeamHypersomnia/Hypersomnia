@@ -52,12 +52,12 @@ constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 /* Blood splatter configuration constants */
 static constexpr real32 BLOOD_SPLATTER_DAMAGE_PER_SPLATTER = 40.f;
 static constexpr real32 BLOOD_SPLATTER_MIN_SIZE = 0.5f;
-static constexpr real32 BLOOD_SPLATTER_ANGLE_SPREAD = 60.f;
-static constexpr real32 BLOOD_SPLATTER_MIN_DISTANCE = 20.f;
-static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_BASE = 40.f;
+static constexpr real32 BLOOD_SPLATTER_ANGLE_SPREAD = 20.f;
+static constexpr real32 BLOOD_SPLATTER_MIN_DISTANCE = 0.f;
+static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_BASE = 30.f;
 /* Distance scales with damage: at 200 damage, max distance is 300px */
 static constexpr real32 BLOOD_SPLATTER_DISTANCE_DAMAGE_SCALE = 200.f;
-static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE = 300.f;
+static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE = 150.f;
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 
 void spawn_blood_splatters(
@@ -90,6 +90,8 @@ void spawn_blood_splatters(
 		common_assets.blood_splatter_3
 	};
 
+	auto rng = cosm.get_rng_for(subject);
+
 	/* Check if any splatter flavour is available */
 	bool any_set = false;
 	for (const auto& f : splatter_flavours) {
@@ -119,9 +121,10 @@ void spawn_blood_splatters(
 		}
 
 		/* Choose a random splatter flavour using bounded random */
-		auto rng = cosm.get_rng_for(subject);
 		const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
 		auto flavour = splatter_flavours[splatter_idx];
+
+		size_mult *= rng.randval(0.5f, 1.0f);
 
 		/* Skip if this flavour is not set, try others */
 		if (!flavour.is_set()) {

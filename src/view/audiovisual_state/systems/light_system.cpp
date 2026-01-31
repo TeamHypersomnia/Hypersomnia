@@ -382,6 +382,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	standard_shader.set_as_current(renderer);
 	renderer.call_triangles(D::FOREGROUND_NEONS);
+	renderer.call_triangles(D::GROUND_DECALS_NEONS);
 
 	renderer.call_and_clear_triangles();
 
