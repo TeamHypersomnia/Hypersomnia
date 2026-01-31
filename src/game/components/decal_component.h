@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/math/declare_math.h"
 #include "game/cosmos/entity_id.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 namespace invariants {
 	struct decal {
@@ -15,6 +16,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::decal
 		real32 last_size_mult = 1.f;
 		bool marked_for_deletion = false;
+		augs::stepped_timestamp when_marked_for_deletion;
 		// END GEN INTROSPECTOR
 	};
 }
