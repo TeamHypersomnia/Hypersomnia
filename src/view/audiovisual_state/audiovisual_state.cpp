@@ -573,8 +573,8 @@ void audiovisual_state::standard_post_solve(
 			}
 			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 				if (h.damage.total() > 0) {
-					number = turquoise;
-					highlight = turquoise;
+					number = rgba(100, 100, 255, 255);
+					highlight = rgba(100, 100, 255, 255);
 				}
 				else {
 					number = cyan;

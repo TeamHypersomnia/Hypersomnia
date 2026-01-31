@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-01-31 10:23:29.943500 UTC"
+        "version_timestamp": "2026-01-31 12:50:24.022018 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -490,6 +490,16 @@
                 "team_spawn (19)",
                 "team_spawn (18)",
                 "team_spawn (17)",
+                "team_spawn (43)",
+                "team_spawn (42)",
+                "team_spawn (41)",
+                "team_spawn (40)",
+                "team_spawn (39)",
+                "team_spawn (38)",
+                "team_spawn (37)",
+                "team_spawn (36)",
+                "team_spawn (35)",
+                "team_spawn (16)",
                 "team_spawn (15)",
                 "team_spawn (14)",
                 "team_spawn (13)",
@@ -565,6 +575,7 @@
                 "dev_floor_64 (1)",
                 "water_room_floor_2 (1)-right (1)",
                 "water_room_floor_2 (1)-right",
+                "water_room_floor_2 (4)",
                 "water_room_floor_2 (1)",
                 "water_room_floor_2 (2)-right",
                 "water_room_floor_2 (2)",
@@ -1188,6 +1199,12 @@
             "type": "@materials/vent.png",
             "pos": [-272.0, 4896.0],
             "size": [32, 64]
+        },
+        {
+            "id": "water_room_floor_2 (4)",
+            "type": "@water_room_floor_2",
+            "pos": [-2496.0, 3840.0],
+            "size": [192, 1280]
         },
         {
             "id": "aquarium_ambience_left",
@@ -2240,6 +2257,66 @@
             "faction": "RESISTANCE",
             "pos": [449.0, 3201.0],
             "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (16)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2493.0, 3775.0]
+        },
+        {
+            "id": "team_spawn (35)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2491.0, 3903.0]
+        },
+        {
+            "id": "team_spawn (36)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2493.0, 4161.0]
+        },
+        {
+            "id": "team_spawn (37)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2491.0, 4033.0]
+        },
+        {
+            "id": "team_spawn (38)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2495.0, 3265.0]
+        },
+        {
+            "id": "team_spawn (39)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2493.0, 3393.0]
+        },
+        {
+            "id": "team_spawn (40)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2495.0, 3651.0]
+        },
+        {
+            "id": "team_spawn (41)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2493.0, 3523.0]
+        },
+        {
+            "id": "team_spawn (42)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2491.0, 4285.0]
+        },
+        {
+            "id": "team_spawn (43)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-2489.0, 4413.0]
         },
         {
             "id": "portal",

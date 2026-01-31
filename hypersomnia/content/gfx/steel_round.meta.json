@@ -6,7 +6,7 @@
                 100,
                 100
             ],
-            "amplification": 150.0,
+            "amplification": 380.0,
             "alpha_multiplier": 1.0,
             "light_colors": [[255, 255, 255, 255], [255, 255, 255, 255]
             ]
