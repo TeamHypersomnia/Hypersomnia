@@ -561,8 +561,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					);
 				}
 
-				/* Blood footstep logic */
-				{
+				/* Blood footstep logic - only for sentient and conscious entities */
+				const bool is_sentient_and_conscious = is_sentient && sentience->is_conscious();
+
+				if (is_sentient_and_conscious) {
 					/* Radius in pixels to detect blood decals near foot position */
 					static constexpr real32 BLOOD_DETECTION_RADIUS = 20.f;
 					/* Steps added per blood splatter intersected */
