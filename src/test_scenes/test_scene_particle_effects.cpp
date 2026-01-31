@@ -4550,7 +4550,9 @@ void load_test_scene_particle_effects(
 
 			em.use_sqrt_to_ease_spawn_circle = true;
 
-			effect.emissions.push_back(em);
+			if (false) {
+				effect.emissions.push_back(em);
+			}
 		}
 
 		{
@@ -5491,13 +5493,12 @@ void load_test_scene_particle_effects(
 		{
 			particles_emission em;
 			em.spread_degrees = float_range(20, 40);
-			em.num_of_particles_to_spawn_initially.set(8, 12);
+			em.num_of_particles_to_spawn_initially.set(100, 200);
 			em.base_speed = float_range(150, 350);
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(200, 500);
 
-			/* Blood color: 192, 0, 0, 255 */
-			const auto blood_color = rgba(192, 0, 0, 255);
+			const auto blood_color = white;
 
 			/* Use the blood particle images */
 			for (int i = 0; i < 5; ++i) {
