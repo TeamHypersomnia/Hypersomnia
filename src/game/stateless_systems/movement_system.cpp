@@ -1,4 +1,5 @@
 #include "augs/math/vec2.h"
+#include "augs/log.h"
 #include "movement_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/create_entity.hpp"
@@ -595,7 +596,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					visible.for_each<render_layer::GROUND_DECALS>(cosm, [&](const auto& decal_handle) {
 						decal_handle.template dispatch_on_having_all<invariants::decal>([&](const auto& typed_decal) {
 							const auto& decal_def = typed_decal.template get<invariants::decal>();
-							if (decal_def.is_blood_decal) {
+							if (decal_def.is_blood_decal && !decal_def.is_footstep_decal) {
 								const auto decal_pos = typed_decal.get_logic_transform().pos;
 								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
 									++blood_splatters_stepped;
@@ -638,8 +639,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							footstep_flavour = common_assets.blood_footstep_3_weak;
 						}
 
-						blood_sound_pitch = 1.5f - real32(counter) / 25.0f * 0.5f;
-						blood_sound_gain = 0.5f + real32(counter) / 25.0f * 0.5f;
+						const auto r = std::clamp(real32(counter) / 25.0f, 0.0f, 1.0f);
+
+						blood_sound_pitch = 1.5f - r * 0.5f;
+						blood_sound_gain  = 0.5f + r * 0.5f;
 
 						/* Play blood footstep sound */
 						{
