@@ -5,6 +5,7 @@
 #include "game/stateless_systems/trace_system.h"
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/movement_system.h"
+#include "game/stateless_systems/sentience_system.h"
 
 struct allocation_system;
 class gun_system;

@@ -56,6 +56,7 @@ void handle_corpse_damage(
 }
 
 void handle_corpse_detonation(
+	const allocate_new_entity_access access,
 	const logic_step step,
 	const entity_handle subject,
 	components::sentience& sentience,
@@ -82,7 +83,7 @@ void handle_corpse_detonation(
 
 		/* Spawn blood splatters in all directions based on accumulated corpse damage */
 		const auto subject_pos = subject.get_logic_transform().pos;
-		::spawn_blood_splatters_omnidirectional(step, subject, subject_pos, accumulated_corpse_damage);
+		::spawn_blood_splatters_omnidirectional(access, step, subject, subject_pos, accumulated_corpse_damage);
 
 		sentience.has_exploded = true;
 

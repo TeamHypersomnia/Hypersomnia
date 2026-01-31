@@ -182,13 +182,12 @@ void spawn_blood_splatters(
 }
 
 void spawn_blood_splatters_omnidirectional(
+	allocate_new_entity_access access,
 	const logic_step step,
 	const entity_id subject,
 	const vec2 position,
 	const real32 damage_amount
 ) {
-	/* Use the same logic as normal splatters but with 360° spread */
-	auto access = allocate_new_entity_access();
 	const auto direction = vec2::from_degrees(0.f); /* Starting direction doesn't matter with 360° spread */
 	::spawn_blood_splatters_internal(access, step, subject, position, direction, damage_amount, 360.f);
 }
@@ -322,6 +321,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			::handle_corpse_detonation(
+				allocate_new_entity_access(),
 				step,
 				subject,
 				sentience,
