@@ -2,11 +2,11 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/stateless_systems/driver_system.h"
-#include "game/stateless_systems/sentience_system.h"
 #include "game/detail/inventory/drop_from_all_slots.h"
 #include "game/cosmos/create_entity.hpp"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/explosive/detonate.h"
+#include "game/detail/sentience/gore/blood_splatter.hpp"
 
 #include "augs/log.h"
 void handle_corpse_damage(

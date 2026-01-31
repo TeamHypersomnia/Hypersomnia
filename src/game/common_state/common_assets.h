@@ -25,6 +25,7 @@ struct common_assets {
 	assets::particle_effect_id thunder_remnants;
 
 	footstep_effect_input standard_footstep;
+	sound_effect_input blood_footstep_sound;
 	particle_effect_input haste_footstep_particles;
 
 	sound_effect_input standard_learnt_spell_sound;

@@ -12,7 +12,7 @@
 
 /* Soft limit: when exceeded, oldest decals are marked for deletion */
 static constexpr std::size_t SOFT_LIMIT_DECALS = 300;
-/* Hard limit: when exceeded, all marked decals are deleted immediately */
+/* Hard limit: when exceeded, oldest decal is deleted immediately */
 static constexpr std::size_t HARD_LIMIT_DECALS = 600;
 /* Maximum blood footsteps per character */
 static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 50;
@@ -30,21 +30,27 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	std::size_t unmarked_count = 0;
 	std::size_t marked_count = 0;
 	
-	/* Track oldest unmarked decal for marking */
+	/* Track oldest unmarked decal for marking (step=0 is oldest, higher step = more recent) */
 	entity_id oldest_unmarked_id;
 	augs::stepped_timestamp oldest_unmarked_timestamp;
-	oldest_unmarked_timestamp.step = 0u;
+	oldest_unmarked_timestamp.step = std::numeric_limits<unsigned>::max();
+
+	/* Track oldest marked decal for hard limit deletion */
+	entity_id oldest_marked_id;
+	augs::stepped_timestamp oldest_marked_timestamp;
+	oldest_marked_timestamp.step = std::numeric_limits<unsigned>::max();
 
 	/* Track oldest superfluous footstep to delete (across all characters) */
 	entity_id oldest_superfluous_footstep_id;
 	augs::stepped_timestamp oldest_superfluous_footstep_timestamp;
-	oldest_superfluous_footstep_timestamp.step = 0u;
+	oldest_superfluous_footstep_timestamp.step = std::numeric_limits<unsigned>::max();
 
-	/* First pass: update shrinking decals, count totals, find oldest unmarked, and track footsteps per character */
+	/* First pass: update shrinking decals, count totals, find oldest unmarked/marked, and track footsteps per character */
 	cosm.for_each_having<components::decal>(
 		[&](const auto subject) {
 			auto& state = subject.template get<components::decal>();
 			const auto& def = subject.template get<invariants::decal>();
+			const auto when_born = subject.when_born();
 
 			if (state.marked_for_deletion) {
 				/* Calculate elapsed time since marked for deletion */
@@ -62,15 +68,19 @@ void decal_system::limit_decal_count(const logic_step step) const {
 					const auto discrete_mult = static_cast<real32>(NUM_SHRINK_STEPS - current_step) / static_cast<real32>(NUM_SHRINK_STEPS);
 					state.last_size_mult = discrete_mult;
 					++marked_count;
+
+					/* Track oldest marked decal for hard limit */
+					if (when_born.step < oldest_marked_timestamp.step) {
+						oldest_marked_timestamp = when_born;
+						oldest_marked_id = subject.get_id();
+					}
 				}
 			}
 			else {
 				++unmarked_count;
 				
-				const auto when_born = subject.when_born();
-
 				/* Track oldest unmarked decal for global soft limit */
-				if (when_born.step > oldest_unmarked_timestamp.step) {
+				if (when_born.step < oldest_unmarked_timestamp.step) {
 					oldest_unmarked_timestamp = when_born;
 					oldest_unmarked_id = subject.get_id();
 				}
@@ -89,7 +99,7 @@ void decal_system::limit_decal_count(const logic_step step) const {
 
 							/* If this character is over limit, track oldest for deletion */
 							if (movement->_total_blood_steps_cache > MAX_FOOTSTEPS_PER_CHARACTER) {
-								if (when_born.step > oldest_superfluous_footstep_timestamp.step) {
+								if (when_born.step < oldest_superfluous_footstep_timestamp.step) {
 									oldest_superfluous_footstep_timestamp = when_born;
 									oldest_superfluous_footstep_id = subject.get_id();
 								}
@@ -103,18 +113,22 @@ void decal_system::limit_decal_count(const logic_step step) const {
 
 	const auto total_count = unmarked_count + marked_count;
 
-	/* Hard limit: delete all marked decals immediately if we're over 700 */
+	/* Hard limit: delete oldest decal (marked or unmarked) immediately if we're over 600 */
 	if (total_count > HARD_LIMIT_DECALS) {
-		cosm.for_each_having<components::decal>(
-			[&](const auto subject) {
-			const auto& state = subject.template get<components::decal>();
-			if (state.marked_for_deletion) {
-				step.queue_deletion_of(subject, "Decal hard limit reached");
+		/* First try to delete oldest marked decal */
+		if (oldest_marked_id.is_set()) {
+			if (const auto handle = cosm[oldest_marked_id]) {
+				step.queue_deletion_of(handle, "Decal hard limit reached");
 			}
 		}
-		);
+		/* If no marked decals, delete oldest unmarked */
+		else if (oldest_unmarked_id.is_set()) {
+			if (const auto handle = cosm[oldest_unmarked_id]) {
+				step.queue_deletion_of(handle, "Decal hard limit reached");
+			}
+		}
 	}
-	/* Soft limit: mark oldest unmarked decal for deletion if we're over 500 */
+	/* Soft limit: mark oldest unmarked decal for deletion if we're over 300 */
 	else if (unmarked_count > SOFT_LIMIT_DECALS) {
 		if (const auto handle = cosm[oldest_unmarked_id]) {
 			auto& state = handle.template get<components::decal>();

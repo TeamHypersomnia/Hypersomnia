@@ -619,19 +619,46 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						typed_entity_flavour_id<decal_decoration> footstep_flavour;
 						const auto counter = movement.blood_step_counter;
 
+						/* Blood footstep sound modifiers based on intensity */
+						real32 blood_sound_pitch = 1.0f;
+						real32 blood_sound_gain = 1.0f;
+
 						if (counter >= 20) {
 							/* Most intense - randomly choose between 1 and 2 */
 							auto rng = cosm.get_rng_for(it);
 							footstep_flavour = (rng.randval(0, 1) == 0) ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
+							blood_sound_pitch = 0.9f;
+							blood_sound_gain = 1.0f;
 						}
 						else if (counter >= 10) {
 							footstep_flavour = common_assets.blood_footstep_1_weak;
+							blood_sound_pitch = 1.0f;
+							blood_sound_gain = 0.95f;
 						}
 						else if (counter >= 5) {
 							footstep_flavour = common_assets.blood_footstep_2_weak;
+							blood_sound_pitch = 1.1f;
+							blood_sound_gain = 0.9f;
 						}
 						else if (counter > 0) {
 							footstep_flavour = common_assets.blood_footstep_3_weak;
+							blood_sound_pitch = 1.2f;
+							blood_sound_gain = 0.85f;
+						}
+
+						/* Play blood footstep sound */
+						{
+							auto blood_sound = common_assets.blood_footstep_sound;
+							blood_sound.modifier.pitch *= blood_sound_pitch;
+							blood_sound.modifier.gain *= blood_sound_gain;
+
+							const auto predictability = predictable_only_by(it);
+
+							blood_sound.start(
+								step,
+								sound_effect_start_input::at_listener(it.get_id()),
+								predictability
+							);
 						}
 
 						if (footstep_flavour.is_set()) {
