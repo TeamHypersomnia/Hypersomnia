@@ -565,9 +565,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				{
 					/* Radius in pixels to detect blood decals near foot position */
 					static constexpr real32 BLOOD_DETECTION_RADIUS = 20.f;
+					/* Steps added per blood splatter intersected */
+					static constexpr uint8_t BLOOD_STEPS_PER_SPLATTER = 10;
+					/* Maximum blood steps counter */
+					static constexpr uint8_t MAX_BLOOD_STEPS = 30;
 
-					/* Check if stepping on blood decal to pick up blood */
-					bool stepped_on_blood = false;
+					/* Count how many blood splatters are being stepped on */
+					int blood_splatters_stepped = 0;
 
 					/* Query visible decals in the ground layer */
 					const auto foot_query_pos = effect_transform.pos;
@@ -588,14 +592,19 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							if (decal_def.is_blood_decal) {
 								const auto decal_pos = typed_decal.get_logic_transform().pos;
 								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
-									stepped_on_blood = true;
+									++blood_splatters_stepped;
 								}
 							}
 						});
 					});
 
-					if (stepped_on_blood && movement.blood_step_counter < 10) {
-						movement.blood_step_counter = 10;
+					/* Add 10 steps per blood splatter stepped on, up to max 30 */
+					if (blood_splatters_stepped > 0) {
+						const auto steps_to_add = static_cast<uint8_t>(blood_splatters_stepped * BLOOD_STEPS_PER_SPLATTER);
+						movement.blood_step_counter = std::min(
+							static_cast<uint8_t>(MAX_BLOOD_STEPS),
+							static_cast<uint8_t>(movement.blood_step_counter + steps_to_add)
+						);
 					}
 
 					/* Spawn blood footstep if counter is active */

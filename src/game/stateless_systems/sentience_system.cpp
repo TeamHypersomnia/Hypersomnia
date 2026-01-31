@@ -50,11 +50,14 @@
 constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 
 /* Blood splatter configuration constants */
-static constexpr real32 BLOOD_SPLATTER_DAMAGE_PER_SPLATTER = 60.f;
+static constexpr real32 BLOOD_SPLATTER_DAMAGE_PER_SPLATTER = 40.f;
 static constexpr real32 BLOOD_SPLATTER_MIN_SIZE = 0.5f;
-static constexpr real32 BLOOD_SPLATTER_ANGLE_SPREAD = 25.f;
+static constexpr real32 BLOOD_SPLATTER_ANGLE_SPREAD = 60.f;
 static constexpr real32 BLOOD_SPLATTER_MIN_DISTANCE = 20.f;
-static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE = 40.f;
+static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_BASE = 40.f;
+/* Distance scales with damage: at 200 damage, max distance is 300px */
+static constexpr real32 BLOOD_SPLATTER_DISTANCE_DAMAGE_SCALE = 200.f;
+static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE = 300.f;
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 
 void spawn_blood_splatters(
@@ -102,6 +105,11 @@ void spawn_blood_splatters(
 
 	const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
 
+	/* Calculate max distance based on damage: scales from base (40px) to max (300px) at 200 damage */
+	const auto damage_ratio = std::min(1.f, damage_amount / BLOOD_SPLATTER_DISTANCE_DAMAGE_SCALE);
+	const auto max_distance = BLOOD_SPLATTER_MAX_DISTANCE_BASE + 
+		(BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE - BLOOD_SPLATTER_MAX_DISTANCE_BASE) * damage_ratio;
+
 	for (int i = 0; i < num_splatters; ++i) {
 		/* Determine size multiplier */
 		real32 size_mult = 1.f;
@@ -129,9 +137,9 @@ void spawn_blood_splatters(
 			continue;
 		}
 
-		/* Randomize position within specified distance of character in impact direction (±spread degrees) */
+		/* Randomize position with distance scaled by damage (slightly randomized) */
 		const auto angle_offset = rng.randval(-BLOOD_SPLATTER_ANGLE_SPREAD, BLOOD_SPLATTER_ANGLE_SPREAD);
-		const auto distance = rng.randval(BLOOD_SPLATTER_MIN_DISTANCE, BLOOD_SPLATTER_MAX_DISTANCE);
+		const auto distance = rng.randval(BLOOD_SPLATTER_MIN_DISTANCE, max_distance);
 		const auto rotation = rng.randval(0.f, 360.f);
 
 		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
