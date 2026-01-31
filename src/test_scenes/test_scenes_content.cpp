@@ -116,6 +116,10 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 
 	common_assets.flash_noise_sound.id = to_sound_id(test_scene_sound_id::FLASH_NOISE);
 
+	/* Blood burst particles: baseline damage is 20, color is blood red */
+	common_assets.blood_burst_particles.id = to_particle_effect_id(test_scene_particle_effect_id::BLOOD_BURST);
+	common_assets.blood_burst_particles.modifier.color = rgba(192, 0, 0, 255);
+
 	load_test_scene_sentience_properties(common);
 	// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 }

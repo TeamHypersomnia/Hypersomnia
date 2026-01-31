@@ -5484,4 +5484,66 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::BLOOD_BURST);
+
+		{
+			particles_emission em;
+			em.spread_degrees = float_range(20, 40);
+			em.num_of_particles_to_spawn_initially.set(8, 12);
+			em.base_speed = float_range(150, 350);
+			em.rotation_speed = float_range(0, 0);
+			em.particle_lifetime_ms = float_range(200, 500);
+
+			/* Blood color: 192, 0, 0, 255 */
+			const auto blood_color = rgba(192, 0, 0, 255);
+
+			/* Use the blood particle images */
+			for (int i = 0; i < 5; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 300;
+
+				set(
+					particle_definition,
+					to_image_id(test_scene_image_id(int(test_scene_image_id::BLOOD_PARTICLE_1) + i)),
+					blood_color
+				);
+
+				particle_definition.alpha_levels = 1;
+				particle_definition.shrink_when_ms_remaining = 150.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			/* Use cast blink animation frame as additional particle */
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 300;
+				particle_definition.acc = { 0, 50 };
+
+				set(
+					particle_definition,
+					anim.frames[2].image_id,
+					blood_color
+				);
+
+				particle_definition.alpha_levels = 1;
+				particle_definition.shrink_when_ms_remaining = 100.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.3, 0.6);
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.initial_rotation_variation = 180;
+			em.should_particles_look_towards_velocity = true;
+
+			effect.emissions.push_back(em);
+		}
+	}
 }

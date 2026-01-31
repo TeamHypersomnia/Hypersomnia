@@ -7,8 +7,11 @@
 #include "game/organization/all_entity_types.h"
 #include "game/components/decal_component.h"
 #include "game/components/sprite_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
+/* Baseline damage for blood burst particles. 100 dmg = 5x scale. */
+static constexpr real32 BLOOD_BURST_BASELINE_DAMAGE = 20.f;
 
 inline void spawn_blood_splatters(
 	allocate_new_entity_access access,
@@ -21,6 +24,24 @@ inline void spawn_blood_splatters(
 ) {
 	auto& cosm = step.get_cosmos();
 	const auto& common_assets = cosm.get_common_assets();
+
+	/* Spawn blood burst particles at point of impact in direction of splatter */
+	if (common_assets.blood_burst_particles.id.is_set()) {
+		auto burst_effect = common_assets.blood_burst_particles;
+		
+		/* Scale amounts and velocities with damage: baseline 20, 100 dmg = 5x */
+		const auto damage_scale = damage_amount / BLOOD_BURST_BASELINE_DAMAGE;
+		burst_effect.modifier.scale_amounts = damage_scale;
+		burst_effect.modifier.scale_velocities = damage_scale;
+		
+		const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
+		
+		burst_effect.start(
+			step,
+			particle_effect_start_input::fire_and_forget(transformr(position, impact_degrees)),
+			always_predictable_v
+		);
+	}
 
 	/* Calculate number of splatters: 1 per damage_per_splatter damage, at least 1 */
 	const auto num_full_splatters = static_cast<int>(damage_amount / params.damage_per_splatter);
