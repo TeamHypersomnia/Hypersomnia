@@ -6,6 +6,9 @@ namespace messages {
 }
 
 #include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/allocate_new_entity_access.h"
+#include "augs/math/vec2.h"
 
 class sentience_system {
 public:
@@ -22,3 +25,20 @@ public:
 	void regenerate_values_and_advance_spell_logic(const logic_step) const;
 	void rotate_towards_crosshairs_and_driven_vehicles(const logic_step) const;
 };
+
+/* Blood splatter spawning functions */
+void spawn_blood_splatters(
+	allocate_new_entity_access access,
+	const logic_step step,
+	const entity_id subject,
+	const vec2 position,
+	const vec2 impact_direction,
+	const real32 damage_amount
+);
+
+void spawn_blood_splatters_omnidirectional(
+	const logic_step step,
+	const entity_id subject,
+	const vec2 position,
+	const real32 damage_amount
+);

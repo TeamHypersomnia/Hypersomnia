@@ -830,5 +830,10 @@ namespace test_flavours {
 			test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK,
 			test_scene_image_id::BLOOD_FOOTSTEP_2_WEAK
 		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK,
+			test_scene_image_id::BLOOD_FOOTSTEP_3_WEAK
+		);
 	}
 }

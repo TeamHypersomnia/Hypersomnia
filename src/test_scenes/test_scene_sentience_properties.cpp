@@ -325,5 +325,6 @@ void load_test_scene_sentience_properties(
 		assets.blood_footstep_2 = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2);
 		assets.blood_footstep_1_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK);
 		assets.blood_footstep_2_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK);
+		assets.blood_footstep_3_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK);
 	}
 }
