@@ -563,6 +563,16 @@ void enqueue_illuminated_rendering_jobs(
 
 			pool.enqueue(job);
 		}
+
+		{
+			auto job = [h4 = make_helper(D::GROUND_DECALS)]() {
+				h4.draw<
+					render_layer::GROUND_DECALS
+				>();
+			};
+
+			pool.enqueue(job);
+		}
 	};
 
 	auto sentiences_job = [draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {

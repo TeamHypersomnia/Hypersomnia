@@ -4,10 +4,12 @@
 #include "game/stateless_systems/missile_system.h"
 #include "game/stateless_systems/trace_system.h"
 #include "game/stateless_systems/sentience_system.h"
+#include "game/stateless_systems/movement_system.h"
 
 struct allocation_system;
 class gun_system;
 class sentience_system;
+class movement_system;
 struct build_arena_input;
 
 namespace test_scenes {
@@ -96,6 +98,18 @@ class allocate_new_entity_access {
 	*/
 
 	friend void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const;
+
+	/*
+		Will spawn blood splatters when health damage is dealt.
+	*/
+
+	friend messages::health_event sentience_system::process_health_event(messages::health_event h, const logic_step step) const;
+
+	/*
+		Will spawn blood footsteps when stepping on blood decals.
+	*/
+
+	friend void movement_system::apply_movement_forces(const logic_step step);
 
 	/* 
 		Rationale: missile system will allocate a lot of remnants from missilesand shells,

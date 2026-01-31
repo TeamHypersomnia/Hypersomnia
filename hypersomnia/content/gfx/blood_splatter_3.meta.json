@@ -1,0 +1,112 @@
+{
+    "extra_loadables": {
+        "generate_neon_map": {
+            "standard_deviation": 6.0,
+            "radius": [
+                80,
+                80
+            ],
+            "amplification": 60.0,
+            "alpha_multiplier": 1.0,
+            "light_colors": [[192, 0, 0, 255]]
+        },
+        "generate_desaturation": false
+    },
+    "usage_as_button": {
+        "flip": {
+            "horizontally": false,
+            "vertically": false
+        },
+        "bbox_expander": [0.0, 0.0]
+    },
+    "offsets": {
+        "torso": {
+            "primary_hand": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "secondary_hand": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "back": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "head": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "legs": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shoulder": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "secondary_shoulder": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "strafe_facing_offset": 0.0,
+            "is_akimbo": false
+        },
+        "legs": {
+            "foot": [0, 0]
+        },
+        "gun": {
+            "bullet_spawn": [0, 0],
+            "detachable_magazine": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "chamber": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "chamber_magazine": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shell_spawn": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "rail": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            }
+        },
+        "item": {
+            "hand_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "back_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "shoulder_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "head_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "attachment_anchor": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            },
+            "akimbo_offset": {
+                "pos": [0, 0],
+                "rotation": 0.0
+            }
+        },
+        "non_standard_shape": {
+            "source_polygon": [],
+            "convex_partition": []
+        }
+    }
+}

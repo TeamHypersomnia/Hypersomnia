@@ -72,6 +72,9 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<invariants::continuous_sound>()) {
 			return render_layer::CONTINUOUS_SOUNDS;
 		}
+		else if constexpr(H::template has<invariants::decal>()) {
+			return render_layer::GROUND_DECALS;
+		}
 		else {
 			return render_layer::INVALID;
 		}

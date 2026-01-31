@@ -42,10 +42,107 @@
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/spawn_collectibles.hpp"
+#include "game/cosmos/create_entity.hpp"
+#include "game/components/decal_component.h"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
 constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
+
+static void spawn_blood_splatters(
+	const logic_step step,
+	const vec2 position,
+	const vec2 impact_direction,
+	const real32 damage_amount
+) {
+	auto& cosm = step.get_cosmos();
+	const auto& common_assets = cosm.get_common_assets();
+
+	/* Calculate number of splatters: 1 per 60 damage, at least 1 */
+	const auto damage_per_splatter = 60.f;
+	const auto num_full_splatters = static_cast<int>(damage_amount / damage_per_splatter);
+	const auto remainder = damage_amount - (num_full_splatters * damage_per_splatter);
+	const auto remainder_size = remainder / damage_per_splatter;
+
+	/* Total splatters: full ones + 1 partial if there's a remainder */
+	const int total_splatters = num_full_splatters + (remainder > 0.f ? 1 : 0);
+
+	if (total_splatters <= 0) {
+		return;
+	}
+
+	/* Get available splatter flavours */
+	std::array<typed_entity_flavour_id<decal_decoration>, 3> splatter_flavours = {
+		common_assets.blood_splatter_1,
+		common_assets.blood_splatter_2,
+		common_assets.blood_splatter_3
+	};
+
+	/* Check if any splatter flavour is available */
+	bool any_set = false;
+	for (const auto& f : splatter_flavours) {
+		if (f.is_set()) {
+			any_set = true;
+			break;
+		}
+	}
+
+	if (!any_set) {
+		return;
+	}
+
+	auto access = allocate_new_entity_access();
+	const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
+
+	for (int i = 0; i < total_splatters; ++i) {
+		/* Determine size multiplier */
+		real32 size_mult = 1.f;
+		if (i == total_splatters - 1 && remainder > 0.f) {
+			/* Last splatter gets partial size based on remainder */
+			size_mult = std::max(0.5f, remainder_size);
+		}
+
+		/* Choose a random splatter flavour */
+		auto splatter_idx = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i)) % 3;
+		auto flavour = splatter_flavours[splatter_idx];
+
+		/* Skip if this flavour is not set, try others */
+		if (!flavour.is_set()) {
+			for (const auto& f : splatter_flavours) {
+				if (f.is_set()) {
+					flavour = f;
+					break;
+				}
+			}
+		}
+
+		if (!flavour.is_set()) {
+			continue;
+		}
+
+		/* Randomize position within 20-40 pixels of character in impact direction (±25 degrees) */
+		auto rng = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i) + 100);
+		const auto angle_offset = rng.randval(-25.f, 25.f);
+		const auto distance = rng.randval(20.f, 40.f);
+		const auto rotation = rng.randval(0.f, 360.f);
+
+		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
+		const auto splatter_pos = position + offset_direction * distance;
+
+		cosmic::create_entity(access, cosm, flavour, [&](const auto splatter_entity, auto&&...) {
+			splatter_entity.set_logic_transform(transformr(splatter_pos, rotation));
+
+			/* Apply size multiplier through overridden_geo if needed */
+			if (size_mult < 1.f) {
+				if (auto* overridden_geo = splatter_entity.template find<components::overridden_geo>()) {
+					overridden_geo->size.emplace();
+					const auto original_size = splatter_entity.template get<invariants::sprite>().size;
+					overridden_geo->size.value = original_size * size_mult;
+				}
+			}
+		}, [&](const auto) {});
+	}
+}
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -385,6 +482,17 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
+
+				/* Spawn blood splatters for health damage */
+				const auto subject_pos = subject.get_logic_transform().pos;
+				const auto impact_dir = h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero;
+				::spawn_blood_splatters(step, subject_pos, impact_dir, amount);
+
+				/* Increment blood step counter for bloody footsteps */
+				if (auto* movement = subject.template find<components::movement>()) {
+					const auto steps_to_add = static_cast<uint8_t>(std::min(255.f, std::max(10.f, amount / 6.f)));
+					movement->blood_step_counter = static_cast<uint8_t>(std::min(255, movement->blood_step_counter + steps_to_add));
+				}
 
 				const auto prev_consciousness = consciousness.value;
 

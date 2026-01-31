@@ -675,6 +675,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::GROUND);
 
+	/* Render ground decals (blood splatters) with full illumination */
+	set_shader(shaders.standard);
+	renderer.call_triangles(D::GROUND_DECALS);
+
 	if (strict_fow) {
 		renderer.set_stencil(true);
 		renderer.stencil_positive_test();

@@ -25,6 +25,7 @@ struct explosion_body;
 struct tool_item;
 struct touch_collectible;
 struct area_sensor;
+struct decal_decoration;
 
 using all_entity_types = type_list<
 	plain_sprited_body,
@@ -48,7 +49,8 @@ using all_entity_types = type_list<
 	explosion_body,
 	tool_item,
 	touch_collectible,
-	area_sensor
+	area_sensor,
+	decal_decoration
 >;
 
 #define FOR_ALL_ENTITY_TYPES(MACRO) \
@@ -73,7 +75,8 @@ using all_entity_types = type_list<
 	MACRO(explosion_body) \
 	MACRO(tool_item) \
 	MACRO(touch_collectible) \
-	MACRO(area_sensor)
+	MACRO(area_sensor) \
+	MACRO(decal_decoration)
 
 using entity_type_id = type_in_list_id<all_entity_types>;
 

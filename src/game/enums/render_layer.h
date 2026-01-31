@@ -7,6 +7,7 @@ enum class render_layer {
 	DISABLED,
 
 	GROUND,
+	GROUND_DECALS,
 
 	PLANTED_ITEMS,
 	OBSTACLES_UNDER_MISSILES,

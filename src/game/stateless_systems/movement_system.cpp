@@ -1,10 +1,12 @@
 #include "augs/math/vec2.h"
 #include "movement_system.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/create_entity.hpp"
 #include "game/messages/intent_message.h"
 #include "game/messages/sound_cue_message.h"
 
 #include "game/components/gun_component.h"
+#include "game/components/decal_component.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/movement_component.h"
@@ -21,6 +23,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
 #include "game/detail/visible_entities.h"
+#include "game/detail/visible_entities.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 
 #include "game/detail/physics/infer_damping.hpp"
@@ -555,6 +558,70 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						particle_effect_start_input::fire_and_forget(effect_transform),
 						predictability
 					);
+				}
+
+				/* Blood footstep logic */
+				{
+					/* Check if stepping on blood decal to pick up blood */
+					bool stepped_on_blood = false;
+
+					/* Query visible decals in the ground layer */
+					const auto foot_query_pos = effect_transform.pos;
+					const auto query_radius = 20.f;
+					const auto query_cone = camera_cone(transformr(foot_query_pos), vec2i(static_cast<int>(query_radius * 2), static_cast<int>(query_radius * 2)));
+
+					auto& visible = thread_local_visible_entities();
+					visible.reacquire_all({
+						cosm,
+						query_cone,
+						accuracy_type::EXACT,
+						render_layer_filter::whitelist(render_layer::GROUND_DECALS),
+						tree_of_npo_filter::all()
+					});
+
+					visible.for_each<render_layer::GROUND_DECALS>(cosm, [&](const auto& decal_handle) {
+						decal_handle.template dispatch_on_having_all<invariants::decal>([&](const auto& typed_decal) {
+							const auto& decal_def = typed_decal.template get<invariants::decal>();
+							if (decal_def.is_blood_decal) {
+								const auto decal_pos = typed_decal.get_logic_transform().pos;
+								if ((decal_pos - foot_query_pos).length_sq() < query_radius * query_radius) {
+									stepped_on_blood = true;
+								}
+							}
+						});
+					});
+
+					if (stepped_on_blood && movement.blood_step_counter < 10) {
+						movement.blood_step_counter = 10;
+					}
+
+					/* Spawn blood footstep if counter is active */
+					if (movement.blood_step_counter > 0) {
+						const bool weak_step = movement.blood_step_counter <= 10;
+
+						/* Choose appropriate footstep flavour */
+						typed_entity_flavour_id<decal_decoration> footstep_flavour;
+
+						/* Alternate between left and right foot */
+						const bool left_foot = movement.four_ways_animation.flip;
+
+						if (weak_step) {
+							footstep_flavour = left_foot ? common_assets.blood_footstep_1_weak : common_assets.blood_footstep_2_weak;
+						}
+						else {
+							footstep_flavour = left_foot ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
+						}
+
+						if (footstep_flavour.is_set()) {
+							auto access = allocate_new_entity_access();
+
+							cosmic::create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto&&...) {
+								footstep_entity.set_logic_transform(effect_transform);
+							}, [&](const auto) {});
+						}
+
+						--movement.blood_step_counter;
+					}
 				}
 			};
 

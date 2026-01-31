@@ -100,6 +100,8 @@ namespace components {
 		real32 animation_amount = 0.f;
 
 		movement_animation_state four_ways_animation;
+
+		uint8_t blood_step_counter = 0;
 		// END GEN INTROSPECTOR
 
 		auto get_max_inertia() const {
