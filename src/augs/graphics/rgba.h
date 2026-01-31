@@ -39,6 +39,7 @@ struct rgba {
 	};
 
 	static rgba zero;
+	static rgba faction_color;
 
 	static rgba get_bright_wave(const double secs, const double upperLimit1 = 0.58, const double lowerLimit2 = 0.80);
 

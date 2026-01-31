@@ -159,6 +159,10 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 					const bool draw_shield = shield > 0.0f;
 
+					if (shield > 0.0f) {
+						return;
+					}
+
 					const auto& meter_metas = cosm.get_common_significant().meters;
 					const auto chosen_ratio = draw_shield ? shield : health;
 

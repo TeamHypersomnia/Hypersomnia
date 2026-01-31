@@ -66,6 +66,17 @@ void draw_character_glow(const E& it, const draw_character_glow_in in) {
 
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 					auto color = tool->glow_color;
+
+					if (color == rgba::faction_color) {
+						if (it.get_official_faction() == faction_type::RESISTANCE) {
+							color = rgba(255, 90, 0, 255);
+						}
+
+						if (it.get_official_faction() == faction_type::METROPOLIS) {
+							color = rgba(100, 100, 255, 255);
+						}
+					}
+
 					color.mult_alpha(teleport_alpha);
 
 					in.output.aabb_centered(
