@@ -57,8 +57,10 @@ static constexpr real32 BLOOD_SPLATTER_MIN_DISTANCE = 20.f;
 static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE = 40.f;
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 
-static void spawn_blood_splatters(
+void spawn_blood_splatters(
+	allocate_new_entity_access access,
 	const logic_step step,
+	const entity_id subject,
 	const vec2 position,
 	const vec2 impact_direction,
 	const real32 damage_amount
@@ -98,7 +100,6 @@ static void spawn_blood_splatters(
 		return;
 	}
 
-	auto access = allocate_new_entity_access();
 	const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
 
 	for (int i = 0; i < num_splatters; ++i) {
@@ -110,7 +111,7 @@ static void spawn_blood_splatters(
 		}
 
 		/* Choose a random splatter flavour using bounded random */
-		auto rng = cosm.get_rng_for(cosm.get_timestamp().step + static_cast<unsigned>(i));
+		auto rng = cosm.get_rng_for(subject);
 		const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
 		auto flavour = splatter_flavours[splatter_idx];
 
@@ -136,18 +137,17 @@ static void spawn_blood_splatters(
 		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
 		const auto splatter_pos = position + offset_direction * distance;
 
-		cosmic::create_entity(access, cosm, flavour, [&](const auto splatter_entity, auto&&...) {
+		cosmic::specific_create_entity(access, cosm, flavour, [&](auto splatter_entity, auto& agg) {
 			splatter_entity.set_logic_transform(transformr(splatter_pos, rotation));
 
 			/* Apply size multiplier through overridden_geo if needed */
 			if (size_mult < 1.f) {
-				if (auto* overridden_geo = splatter_entity.template find<components::overridden_geo>()) {
-					overridden_geo->size.emplace();
+				if (auto overridden_geo = agg.template find<components::overridden_geo>()) {
 					const auto original_size = splatter_entity.template get<invariants::sprite>().size;
-					overridden_geo->size.value = original_size * size_mult;
+					overridden_geo->size = vec2i(vec2(original_size) * size_mult);
 				}
 			}
-		}, [&](const auto) {});
+		});
 	}
 }
 
@@ -463,6 +463,8 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	const bool was_conscious = health.value > 0.f; //&& consciousness.value > 0.f;
 	const bool was_dead = health.value <= 0.f; //&& consciousness.value > 0.f;
 
+	auto access = allocate_new_entity_access();
+
 	h.was_conscious = was_conscious;
 	h.was_dead = was_dead;
 
@@ -493,7 +495,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				/* Spawn blood splatters for health damage */
 				const auto subject_pos = subject.get_logic_transform().pos;
 				const auto impact_dir = h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero;
-				::spawn_blood_splatters(step, subject_pos, impact_dir, amount);
+				::spawn_blood_splatters(access, step, subject, subject_pos, impact_dir, amount);
 
 				/* Increment blood step counter for bloody footsteps */
 				if (auto* movement = subject.template find<components::movement>()) {

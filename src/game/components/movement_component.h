@@ -102,6 +102,7 @@ namespace components {
 		movement_animation_state four_ways_animation;
 
 		uint8_t blood_step_counter = 0;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		auto get_max_inertia() const {

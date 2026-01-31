@@ -32,6 +32,7 @@
 #include "game/detail/sentience/tool_getters.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/get_hovered_world_entity.h"
+#include "game/cosmos/create_entity.hpp"
 
 #define LOG_INTENTS 0
 
@@ -617,9 +618,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						if (footstep_flavour.is_set()) {
 							auto access = allocate_new_entity_access();
 
-							cosmic::create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto&&...) {
+							cosmic::specific_create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto&&...) {
 								footstep_entity.set_logic_transform(effect_transform);
-							}, [&](const auto) {});
+							});
 						}
 
 						--movement.blood_step_counter;
