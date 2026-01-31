@@ -497,13 +497,15 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			//ensure_geq(health.value, static_cast<decltype(health.value)>(0));
 
-			if (!was_dead_already && amount > 0) {
-				sentience.time_of_last_received_damage = cosm.get_timestamp();
-
-				/* Spawn blood splatters for health damage */
+			/* Always spawn blood splatters for health damage, including corpse damage */
+			if (amount > 0) {
 				const auto subject_pos = subject.get_logic_transform().pos;
 				const auto impact_dir = h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero;
 				::spawn_blood_splatters(access, step, subject, subject_pos, impact_dir, amount);
+			}
+
+			if (!was_dead_already && amount > 0) {
+				sentience.time_of_last_received_damage = cosm.get_timestamp();
 
 				/* Increment blood step counter for bloody footsteps */
 				if (auto* movement = subject.template find<components::movement>()) {
