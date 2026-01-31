@@ -269,7 +269,7 @@ namespace test_flavours {
 			sentience.base_detached_head_speed = -4000.f;
 
 			sentience.detached_head_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DETACHED_HEAD_FIRE);
-			sentience.detached_head_particles.modifier.color = pink;
+			sentience.detached_head_particles.modifier.color = rgba(192, 0, 0, 255);
 
 			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 			sentience.health_decrease_particles.modifier.color = white;//rgba(251, 255, 181, 255);
@@ -380,7 +380,7 @@ namespace test_flavours {
 			sentience.damage_required_for_corpse_explosion = 70.f;
 			sentience.corpse_burning_seconds = 1.f;
 			sentience.corpse_catch_fire_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CORPSE_CATCH_FIRE);
-			sentience.corpse_catch_fire_particles.modifier.color = pink;
+			sentience.corpse_catch_fire_particles.modifier.color = rgba(192, 0, 0, 255);
 			sentience.corpse_catch_fire_sound.id = to_sound_id(test_scene_sound_id::CORPSE_CATCH_FIRE);
 			sentience.corpse_catch_fire_sound.modifier.max_distance = 5500.f;
 			sentience.corpse_catch_fire_sound.modifier.reference_distance = 1000.f;
@@ -446,8 +446,8 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().name = format_enum(test_controlled_characters::RESISTANCE_SOLDIER);
 
 			meta.get<invariants::sentience>().detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD);
-			meta.get<invariants::sentience>().detached_head_particles.modifier.color = red;
-			meta.get<invariants::sentience>().corpse_catch_fire_particles.modifier.color = red;
+			meta.get<invariants::sentience>().detached_head_particles.modifier.color = rgba(192, 0, 0, 255);
+			meta.get<invariants::sentience>().corpse_catch_fire_particles.modifier.color = rgba(192, 0, 0, 255);
 
 
 			{
