@@ -50,6 +50,7 @@ namespace invariants {
 	struct touch_collectible;
 	struct melee;
 	struct melee_fighter;
+	struct decal;
 }
 
 namespace components {
@@ -86,6 +87,7 @@ namespace components {
 	struct marker;
 	struct sorting_order;
 	struct portal;
+	struct decal;
 }
 
 using assert_always_together = type_list<
@@ -105,7 +107,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::animation, components::animation>,
 	type_pair<invariants::remnant, components::remnant>,
 	type_pair<invariants::cascade_explosion, components::cascade_explosion>,
-	type_pair<invariants::melee, components::melee>
+	type_pair<invariants::melee, components::melee>,
+	type_pair<invariants::decal, components::decal>
 >;
 
 using assert_first_implies_second = type_list<
@@ -167,7 +170,8 @@ using component_list_t = List<
 	components::cascade_explosion,
 	components::marker,
 	components::sorting_order,
-	components::portal
+	components::portal,
+	components::decal
 >;
 
 template <template <class...> class List>
@@ -210,7 +214,8 @@ using invariant_list_t = List<
 	invariants::tool,
 	invariants::touch_collectible,
 	invariants::melee,
-	invariants::melee_fighter
+	invariants::melee_fighter,
+	invariants::decal
 >;
 
 template <class... Types>

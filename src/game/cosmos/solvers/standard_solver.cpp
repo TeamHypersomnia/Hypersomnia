@@ -35,6 +35,7 @@
 #include "game/stateless_systems/animation_system.h"
 #include "game/stateless_systems/remnant_system.h"
 #include "game/stateless_systems/portal_system.h"
+#include "game/stateless_systems/decal_system.h"
 
 #include "game/organization/all_messages_includes.h"
 
@@ -269,6 +270,7 @@ void standard_solve(const logic_step step) {
 
 	trace_system().destroy_outdated_traces(step);
 	remnant_system().shrink_and_destroy_remnants(step);
+	decal_system().limit_decal_count(step);
 
 	const auto queued_before_marking_num = step.get_queue<messages::queue_deletion>().size();
 	(void)queued_before_marking_num;

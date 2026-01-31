@@ -602,3 +602,30 @@ struct area_sensor {
 		components::interpolation
 	>;
 };
+
+/* Blood splatters and other ground decals */
+
+struct decal_decoration {
+	static constexpr std::size_t statically_allocated_entities = 600;
+	static constexpr std::size_t statically_allocated_flavours = 50;
+
+	using invariant_list = type_list<
+		invariants::sprite,
+		invariants::animation,
+		invariants::render,
+		invariants::decal
+	>;
+
+	using component_list = type_list<
+		components::sprite,
+		components::sorting_order,
+		components::animation,
+		components::transform,
+		components::overridden_geo,
+		components::decal
+	>;
+
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
+};
