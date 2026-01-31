@@ -157,6 +157,7 @@ enum class test_shootable_charges {
 	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE,
 	PISTOL_CYAN_CHARGE,
+	KEK9_CHARGE,
 	PRO90_CHARGE,
 	STEEL_CHARGE,
 	ORANGE_CHARGE,
@@ -209,6 +210,7 @@ enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND,
 	PISTOL_CYAN_ROUND,
+	KEK9_ROUND,
 	STEEL_ROUND,
 	LEWSII_ROUND,
 	ORANGE_ROUND,
