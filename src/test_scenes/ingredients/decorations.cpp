@@ -795,6 +795,26 @@ namespace test_flavours {
 			return meta;
 		};
 
+		auto blood_footstep_flavour = [&](
+			const auto flavour_id,
+			const auto image_id
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::GROUND_DECALS;
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, image_id, white);
+
+			invariants::decal decal_def;
+			decal_def.is_blood_decal = true;
+			decal_def.is_footstep_decal = true;
+			meta.set(decal_def);
+
+			return meta;
+		};
+
 		blood_splatter_flavour(
 			test_decal_decorations::BLOOD_SPLATTER_1,
 			test_scene_image_id::BLOOD_SPLATTER_1
@@ -811,27 +831,27 @@ namespace test_flavours {
 		);
 
 		/* Blood footstep decals */
-		blood_splatter_flavour(
+		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_1,
 			test_scene_image_id::BLOOD_FOOTSTEP_1
 		);
 
-		blood_splatter_flavour(
+		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_2,
 			test_scene_image_id::BLOOD_FOOTSTEP_2
 		);
 
-		blood_splatter_flavour(
+		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK,
 			test_scene_image_id::BLOOD_FOOTSTEP_1_WEAK
 		);
 
-		blood_splatter_flavour(
+		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK,
 			test_scene_image_id::BLOOD_FOOTSTEP_2_WEAK
 		);
 
-		blood_splatter_flavour(
+		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK,
 			test_scene_image_id::BLOOD_FOOTSTEP_3_WEAK
 		);

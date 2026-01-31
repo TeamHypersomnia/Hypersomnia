@@ -60,13 +60,14 @@ static constexpr real32 BLOOD_SPLATTER_DISTANCE_DAMAGE_SCALE = 200.f;
 static constexpr real32 BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE = 150.f;
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 
-void spawn_blood_splatters(
+static void spawn_blood_splatters_internal(
 	allocate_new_entity_access access,
 	const logic_step step,
 	const entity_id subject,
 	const vec2 position,
 	const vec2 impact_direction,
-	const real32 damage_amount
+	const real32 damage_amount,
+	const real32 angle_spread
 ) {
 	auto& cosm = step.get_cosmos();
 	const auto& common_assets = cosm.get_common_assets();
@@ -112,6 +113,8 @@ void spawn_blood_splatters(
 	const auto max_distance = BLOOD_SPLATTER_MAX_DISTANCE_BASE + 
 		(BLOOD_SPLATTER_MAX_DISTANCE_AT_FULL_DAMAGE - BLOOD_SPLATTER_MAX_DISTANCE_BASE) * damage_ratio;
 
+	const auto half_spread = angle_spread / 2.f;
+
 	for (int i = 0; i < num_splatters; ++i) {
 		/* Determine size multiplier */
 		real32 size_mult = 1.f;
@@ -141,7 +144,7 @@ void spawn_blood_splatters(
 		}
 
 		/* Randomize position with distance scaled by damage (slightly randomized) */
-		const auto angle_offset = rng.randval(-BLOOD_SPLATTER_ANGLE_SPREAD, BLOOD_SPLATTER_ANGLE_SPREAD);
+		const auto angle_offset = rng.randval(-half_spread, half_spread);
 		const auto distance = rng.randval(BLOOD_SPLATTER_MIN_DISTANCE, max_distance);
 		const auto rotation = rng.randval(0.f, 360.f);
 
@@ -150,6 +153,11 @@ void spawn_blood_splatters(
 
 		cosmic::specific_create_entity(access, cosm, flavour, [&](auto splatter_entity, auto& agg) {
 			splatter_entity.set_logic_transform(transformr(splatter_pos, rotation));
+
+			/* Set spawned_by to track whose blood this is */
+			if (auto* decal_state = agg.template find<components::decal>()) {
+				decal_state->spawned_by = subject;
+			}
 
 			/* Apply size multiplier through overridden_geo if needed */
 			if (size_mult < 1.f) {
@@ -162,23 +170,27 @@ void spawn_blood_splatters(
 	}
 }
 
+void spawn_blood_splatters(
+	allocate_new_entity_access access,
+	const logic_step step,
+	const entity_id subject,
+	const vec2 position,
+	const vec2 impact_direction,
+	const real32 damage_amount
+) {
+	::spawn_blood_splatters_internal(access, step, subject, position, impact_direction, damage_amount, BLOOD_SPLATTER_ANGLE_SPREAD * 2.f);
+}
+
 void spawn_blood_splatters_omnidirectional(
 	const logic_step step,
 	const entity_id subject,
 	const vec2 position,
 	const real32 damage_amount
 ) {
-	/* Spawn splatters in multiple directions (360 degree spread) */
-	static constexpr int NUM_DIRECTIONS = 8;
+	/* Use the same logic as normal splatters but with 360° spread */
 	auto access = allocate_new_entity_access();
-
-	for (int i = 0; i < NUM_DIRECTIONS; ++i) {
-		const auto angle = (360.f / NUM_DIRECTIONS) * i;
-		const auto direction = vec2::from_degrees(angle);
-		const auto per_direction_damage = damage_amount / NUM_DIRECTIONS;
-
-		::spawn_blood_splatters(access, step, subject, position, direction, per_direction_damage);
-	}
+	const auto direction = vec2::from_degrees(0.f); /* Starting direction doesn't matter with 360° spread */
+	::spawn_blood_splatters_internal(access, step, subject, position, direction, damage_amount, 360.f);
 }
 
 damage_cause::damage_cause(const const_entity_handle& handle) {

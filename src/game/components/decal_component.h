@@ -7,7 +7,8 @@ namespace invariants {
 	struct decal {
 		// GEN INTROSPECTOR struct invariants::decal
 		bool is_blood_decal = false;
-		pad_bytes<3> pad;
+		bool is_footstep_decal = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -19,6 +20,7 @@ namespace components {
 		bool marked_for_deletion = false;
 		pad_bytes<3> pad;
 		augs::stepped_timestamp when_marked_for_deletion;
+		entity_id spawned_by;
 		// END GEN INTROSPECTOR
 	};
 }
