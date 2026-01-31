@@ -7,6 +7,7 @@ namespace invariants {
 	struct decal {
 		// GEN INTROSPECTOR struct invariants::decal
 		bool is_blood_decal = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }
