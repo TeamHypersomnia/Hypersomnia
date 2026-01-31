@@ -225,6 +225,16 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				return;
 			}
 
+			if constexpr(H::template has<components::decal>()) {
+				const auto& remnant = typed_handle.template get<components::decal>();
+
+				auto remnanted_sprite = sprite;
+				remnanted_sprite.size *= remnant.last_size_mult;
+
+				render_visitor(remnanted_sprite, in.manager, input);
+				return;
+			}
+
 			if constexpr(H::template has<components::gun>()) {
 				const auto& gun = typed_handle.template get<components::gun>();
 				const auto& gun_def = typed_handle.template get<invariants::gun>();
