@@ -953,7 +953,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 80;
 				particle_definition.acc.set(300, -300);
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(cyan.rgb(), 15));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(white.rgb(), 15));
 				particle_definition.unshrinking_time_ms = 10.f;
 				particle_definition.shrink_when_ms_remaining = 10.f;
 
