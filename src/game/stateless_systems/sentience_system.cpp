@@ -162,6 +162,25 @@ void spawn_blood_splatters(
 	}
 }
 
+void spawn_blood_splatters_omnidirectional(
+	const logic_step step,
+	const entity_id subject,
+	const vec2 position,
+	const real32 damage_amount
+) {
+	/* Spawn splatters in multiple directions (360 degree spread) */
+	static constexpr int NUM_DIRECTIONS = 8;
+	auto access = allocate_new_entity_access();
+
+	for (int i = 0; i < NUM_DIRECTIONS; ++i) {
+		const auto angle = (360.f / NUM_DIRECTIONS) * i;
+		const auto direction = vec2::from_degrees(angle);
+		const auto per_direction_damage = damage_amount / NUM_DIRECTIONS;
+
+		::spawn_blood_splatters(access, step, subject, position, direction, per_direction_damage);
+	}
+}
+
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
 	flavour = handle.get_flavour_id();

@@ -568,7 +568,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					/* Radius in pixels to detect blood decals near foot position */
 					static constexpr real32 BLOOD_DETECTION_RADIUS = 20.f;
 					/* Steps added per blood splatter intersected */
-					static constexpr uint8_t BLOOD_STEPS_PER_SPLATTER = 10;
+					static constexpr uint8_t BLOOD_STEPS_PER_SPLATTER = 4;
 					/* Maximum blood steps counter */
 					static constexpr uint8_t MAX_BLOOD_STEPS = 30;
 
@@ -600,11 +600,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						});
 					});
 
-					/* Add 10 steps per blood splatter stepped on, up to max 30 */
+					/* Add 4 steps per blood splatter stepped on, up to max 30 */
 					if (blood_splatters_stepped > 0) {
-						/* Cap splatters to avoid overflow, then calculate steps to add */
-						const int capped_splatters = std::min(blood_splatters_stepped, 3);
-						const int steps_to_add = capped_splatters * BLOOD_STEPS_PER_SPLATTER;
+						const int steps_to_add = blood_splatters_stepped * BLOOD_STEPS_PER_SPLATTER;
 						const int new_counter = std::min(
 							static_cast<int>(MAX_BLOOD_STEPS),
 							static_cast<int>(movement.blood_step_counter) + steps_to_add
@@ -614,26 +612,44 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					/* Spawn blood footstep if counter is active */
 					if (movement.blood_step_counter > 0) {
-						const bool weak_step = movement.blood_step_counter <= 10;
-
-						/* Choose appropriate footstep flavour */
+						/* 
+						 * Footstep intensity levels based on remaining steps:
+						 * >= 25: blood_footstep_1 or blood_footstep_2 (most intense)
+						 * >= 15: blood_footstep_1_weak
+						 * >= 10: blood_footstep_2_weak
+						 * >= 5:  blood_footstep_3_weak (least intense)
+						 * < 5:   no footstep
+						 */
 						typed_entity_flavour_id<decal_decoration> footstep_flavour;
+						const auto counter = movement.blood_step_counter;
 
-						/* Alternate between left and right foot */
-						const bool left_foot = movement.four_ways_animation.flip;
-
-						if (weak_step) {
-							footstep_flavour = left_foot ? common_assets.blood_footstep_1_weak : common_assets.blood_footstep_2_weak;
+						if (counter >= 25) {
+							/* Most intense - randomly choose between 1 and 2 */
+							auto rng = cosm.get_rng_for(it);
+							footstep_flavour = (rng.randval(0, 1) == 0) ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
 						}
-						else {
-							footstep_flavour = left_foot ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
+						else if (counter >= 15) {
+							footstep_flavour = common_assets.blood_footstep_1_weak;
 						}
+						else if (counter >= 10) {
+							footstep_flavour = common_assets.blood_footstep_2_weak;
+						}
+						else if (counter >= 5) {
+							footstep_flavour = common_assets.blood_footstep_3_weak;
+						}
+						/* else: counter < 5, no footstep spawned */
 
 						if (footstep_flavour.is_set()) {
 							auto access = allocate_new_entity_access();
 
+							/* Alternate between left and right foot using flip_vertically */
+							const bool left_foot = movement.four_ways_animation.flip;
+
 							cosmic::specific_create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto&&...) {
 								footstep_entity.set_logic_transform(effect_transform);
+								if (left_foot) {
+									footstep_entity.flip_vertically();
+								}
 							});
 						}
 

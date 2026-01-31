@@ -44,5 +44,6 @@ struct common_assets {
 	typed_entity_flavour_id<decal_decoration> blood_footstep_2;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_1_weak;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_2_weak;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_3_weak;
 	// END GEN INTROSPECTOR
 };

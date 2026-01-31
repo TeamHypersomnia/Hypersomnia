@@ -10,7 +10,7 @@
 
 /* Soft limit: when exceeded, oldest decals are marked for deletion */
 static constexpr std::size_t SOFT_LIMIT_DECALS = 500;
-/* Hard limit: when exceeded, oldest decals are deleted immediately regardless of shrinking */
+/* Hard limit: when exceeded, all marked decals are deleted immediately */
 static constexpr std::size_t HARD_LIMIT_DECALS = 700;
 /* Shrink in discrete 1-second steps (10% less each second) */
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
@@ -23,9 +23,15 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	const auto& clk = cosm.get_clock();
 	const auto now = clk.now;
 
-	std::vector<std::pair<augs::stepped_timestamp, entity_id>> all_decals;
-	std::vector<std::pair<augs::stepped_timestamp, entity_id>> shrinking_decals;
+	std::size_t unmarked_count = 0;
+	std::size_t marked_count = 0;
+	
+	/* Track oldest unmarked decal for marking */
+	entity_id oldest_unmarked_id;
+	augs::stepped_timestamp oldest_unmarked_timestamp;
+	oldest_unmarked_timestamp.step = std::numeric_limits<unsigned>::max();
 
+	/* First pass: update shrinking decals and count totals, find oldest unmarked */
 	cosm.for_each_having<components::decal>(
 		[&](const auto subject) {
 			auto& state = subject.template get<components::decal>();
@@ -45,59 +51,41 @@ void decal_system::limit_decal_count(const logic_step step) const {
 					/* Calculate discrete size multiplier: 100%, 90%, 80%, ... 10% */
 					const auto discrete_mult = static_cast<real32>(NUM_SHRINK_STEPS - current_step) / static_cast<real32>(NUM_SHRINK_STEPS);
 					state.last_size_mult = discrete_mult;
-					shrinking_decals.emplace_back(subject.when_born(), subject.get_id());
+					++marked_count;
 				}
 			}
 			else {
-				all_decals.emplace_back(subject.when_born(), subject.get_id());
+				++unmarked_count;
+				
+				/* Track oldest unmarked decal */
+				const auto when_born = subject.when_born();
+				if (when_born.step < oldest_unmarked_timestamp.step) {
+					oldest_unmarked_timestamp = when_born;
+					oldest_unmarked_id = subject.get_id();
+				}
 			}
 		}
 	);
 
-	const auto total_count = all_decals.size() + shrinking_decals.size();
+	const auto total_count = unmarked_count + marked_count;
 
-	/* Sort all decals by age (oldest first = smallest timestamp) */
-	std::sort(all_decals.begin(), all_decals.end(), [](const auto& a, const auto& b) {
-		return a.first < b.first;
-	});
-
-	std::sort(shrinking_decals.begin(), shrinking_decals.end(), [](const auto& a, const auto& b) {
-		return a.first < b.first;
-	});
-
-	/* Hard limit: delete oldest immediately if we're over 700 */
+	/* Hard limit: delete all marked decals immediately if we're over 700 */
 	if (total_count > HARD_LIMIT_DECALS) {
-		const auto to_delete = total_count - HARD_LIMIT_DECALS;
-		std::size_t deleted = 0;
-
-		/* First delete from shrinking decals (oldest first) */
-		for (const auto& [timestamp, id] : shrinking_decals) {
-			if (deleted >= to_delete) break;
-			if (const auto handle = cosm[id]) {
-				step.queue_deletion_of(handle, "Decal hard limit reached");
-				++deleted;
+		cosm.for_each_having<components::decal>(
+			[&](const auto subject) {
+				const auto& state = subject.template get<components::decal>();
+				if (state.marked_for_deletion) {
+					step.queue_deletion_of(subject, "Decal hard limit reached");
+				}
 			}
-		}
-
-		/* Then delete from normal decals if needed */
-		for (const auto& [timestamp, id] : all_decals) {
-			if (deleted >= to_delete) break;
-			if (const auto handle = cosm[id]) {
-				step.queue_deletion_of(handle, "Decal hard limit reached");
-				++deleted;
-			}
-		}
+		);
 	}
-	/* Soft limit: mark oldest for deletion (to start shrinking) if we're over 500 */
-	else if (all_decals.size() > SOFT_LIMIT_DECALS) {
-		const auto to_mark = all_decals.size() - SOFT_LIMIT_DECALS;
-
-		for (std::size_t i = 0; i < to_mark; ++i) {
-			if (const auto handle = cosm[all_decals[i].second]) {
-				auto& state = handle.template get<components::decal>();
-				state.marked_for_deletion = true;
-				state.when_marked_for_deletion = now;
-			}
+	/* Soft limit: mark oldest unmarked decal for deletion if we're over 500 */
+	else if (unmarked_count > SOFT_LIMIT_DECALS) {
+		if (const auto handle = cosm[oldest_unmarked_id]) {
+			auto& state = handle.template get<components::decal>();
+			state.marked_for_deletion = true;
+			state.when_marked_for_deletion = now;
 		}
 	}
 }
