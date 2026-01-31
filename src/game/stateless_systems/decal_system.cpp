@@ -12,8 +12,6 @@
 static constexpr std::size_t SOFT_LIMIT_DECALS = 500;
 /* Hard limit: when exceeded, oldest decals are deleted immediately regardless of shrinking */
 static constexpr std::size_t HARD_LIMIT_DECALS = 700;
-/* Shrinking time in milliseconds (10 seconds) */
-static constexpr real32 SHRINK_DURATION_MS = 10000.f;
 /* Shrink in discrete 1-second steps (10% less each second) */
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
 /* Number of shrink steps (10 steps for 10% each) */

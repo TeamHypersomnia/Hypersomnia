@@ -17,6 +17,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::decal
 		real32 last_size_mult = 1.f;
 		bool marked_for_deletion = false;
+		pad_bytes<3> pad;
 		augs::stepped_timestamp when_marked_for_deletion;
 		// END GEN INTROSPECTOR
 	};

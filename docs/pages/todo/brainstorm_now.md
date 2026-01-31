@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- super simple destruction system
+	- just divide the into four rectangles or even two along the axis of impact
+		- hp of smaller parts is area percentage of the bigger part
+		- we can easily implement uv offsets for the sprites
+
+- splat further the more damage is applied
+
 - additional bot capabilities
 	- in combat have 20-70% chance (aggressiveness, higher for resistance, lower for metropolis, higher for when trying to defuse etc) to pick the closest tile WITHOUT direct LoS (in threshold of e.g. 500 px)
 		- use especially when reloading
