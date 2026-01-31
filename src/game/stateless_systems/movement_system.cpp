@@ -627,24 +627,19 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							/* Most intense - randomly choose between 1 and 2 */
 							auto rng = cosm.get_rng_for(it);
 							footstep_flavour = (rng.randval(0, 1) == 0) ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
-							blood_sound_pitch = 0.9f;
-							blood_sound_gain = 1.0f;
 						}
 						else if (counter >= 10) {
 							footstep_flavour = common_assets.blood_footstep_1_weak;
-							blood_sound_pitch = 1.0f;
-							blood_sound_gain = 0.95f;
 						}
 						else if (counter >= 5) {
 							footstep_flavour = common_assets.blood_footstep_2_weak;
-							blood_sound_pitch = 1.1f;
-							blood_sound_gain = 0.9f;
 						}
 						else if (counter > 0) {
 							footstep_flavour = common_assets.blood_footstep_3_weak;
-							blood_sound_pitch = 1.2f;
-							blood_sound_gain = 0.85f;
 						}
+
+						blood_sound_pitch = 1.5f - real32(counter) / 25.0f * 0.5f;
+						blood_sound_gain = 0.5f + real32(counter) / 25.0f * 0.5f;
 
 						/* Play blood footstep sound */
 						{

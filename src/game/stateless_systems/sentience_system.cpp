@@ -391,7 +391,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			/* Always spawn blood splatters for health damage, including corpse damage */
 			if (amount > 0) {
-				const auto subject_pos = subject.get_logic_transform().pos;
 				const auto impact_dir = h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero;
 				::spawn_blood_splatters(access, step, subject, h.point_of_impact, impact_dir, amount);
 			}
