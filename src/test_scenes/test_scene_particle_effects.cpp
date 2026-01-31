@@ -5492,11 +5492,18 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.spread_degrees = float_range(20, 40);
-			em.num_of_particles_to_spawn_initially.set(100, 200);
-			em.base_speed = float_range(150, 350);
+			/* Very narrow spread for piss-like stream effect */
+			em.spread_degrees = float_range(3, 8);
+			/* Short stream duration with fast swing */
+			em.stream_lifetime_ms = float_range(30, 50);
+			em.particles_per_sec = float_range(800, 1200);
+			em.swing_spread = float_range(10, 15);
+			em.swings_per_sec = float_range(30, 50);
+			/* Initial burst for extra punch */
+			em.num_of_particles_to_spawn_initially.set(3, 5);
+			em.base_speed = float_range(400, 700);
 			em.rotation_speed = float_range(0, 0);
-			em.particle_lifetime_ms = float_range(200, 500);
+			em.particle_lifetime_ms = float_range(150, 350);
 
 			const auto blood_color = white;
 
@@ -5505,31 +5512,11 @@ void load_test_scene_particle_effects(
 				general_particle particle_definition;
 
 				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 300;
+				particle_definition.linear_damping = 500;
 
 				set(
 					particle_definition,
 					to_image_id(test_scene_image_id(int(test_scene_image_id::BLOOD_PARTICLE_1) + i)),
-					blood_color
-				);
-
-				particle_definition.alpha_levels = 1;
-				particle_definition.shrink_when_ms_remaining = 150.f;
-
-				em.add_particle_definition(particle_definition);
-			}
-
-			/* Use cast blink animation frame as additional particle */
-			{
-				general_particle particle_definition;
-
-				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 300;
-				particle_definition.acc = { 0, 50 };
-
-				set(
-					particle_definition,
-					anim.frames[2].image_id,
 					blood_color
 				);
 
@@ -5539,7 +5526,27 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = float_range(0.3, 0.6);
+			/* Use cast blink animation frame as additional particle */
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 500;
+				particle_definition.acc = { 0, 30 };
+
+				set(
+					particle_definition,
+					anim.frames[2].image_id,
+					blood_color
+				);
+
+				particle_definition.alpha_levels = 1;
+				particle_definition.shrink_when_ms_remaining = 80.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.2, 0.5);
 			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 180;
 			em.should_particles_look_towards_velocity = true;

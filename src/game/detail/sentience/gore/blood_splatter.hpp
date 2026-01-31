@@ -10,8 +10,8 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
-/* Baseline damage for blood burst particles. 100 dmg = 5x scale. */
-static constexpr real32 BLOOD_BURST_BASELINE_DAMAGE = 20.f;
+/* Baseline distance for blood burst velocity scaling */
+static constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
 
 inline void spawn_blood_splatters(
 	allocate_new_entity_access access,
@@ -24,24 +24,6 @@ inline void spawn_blood_splatters(
 ) {
 	auto& cosm = step.get_cosmos();
 	const auto& common_assets = cosm.get_common_assets();
-
-	/* Spawn blood burst particles at point of impact in direction of splatter */
-	if (common_assets.blood_burst_particles.id.is_set()) {
-		auto burst_effect = common_assets.blood_burst_particles;
-		
-		/* Scale amounts and velocities with damage: baseline 20, 100 dmg = 5x */
-		const auto damage_scale = damage_amount / BLOOD_BURST_BASELINE_DAMAGE;
-		burst_effect.modifier.scale_amounts = damage_scale;
-		burst_effect.modifier.scale_velocities = damage_scale;
-		
-		const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
-		
-		burst_effect.start(
-			step,
-			particle_effect_start_input::fire_and_forget(transformr(position, impact_degrees)),
-			always_predictable_v
-		);
-	}
 
 	/* Calculate number of splatters: 1 per damage_per_splatter damage, at least 1 */
 	const auto num_full_splatters = static_cast<int>(damage_amount / params.damage_per_splatter);
@@ -86,6 +68,8 @@ inline void spawn_blood_splatters(
 
 	const auto half_spread = params.angle_spread / 2.f;
 
+	const bool has_burst_effect = common_assets.blood_burst_particles.id.is_set();
+
 	for (int i = 0; i < num_splatters; ++i) {
 		/* Determine size multiplier */
 		real32 size_mult = 1.f;
@@ -121,6 +105,24 @@ inline void spawn_blood_splatters(
 
 		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
 		const auto splatter_pos = position + offset_direction * distance;
+
+		/* Spawn blood burst particles for this splatter: from impact towards splatter position */
+		if (has_burst_effect) {
+			auto burst_effect = common_assets.blood_burst_particles;
+			
+			/* Scale velocities based on distance to splatter */
+			const auto distance_scale = distance / BLOOD_BURST_BASELINE_DISTANCE;
+			burst_effect.modifier.scale_velocities = distance_scale;
+			
+			/* Direction from impact point towards the splatter position */
+			const auto burst_degrees = offset_direction.degrees();
+			
+			burst_effect.start(
+				step,
+				particle_effect_start_input::fire_and_forget(transformr(position, burst_degrees)),
+				always_predictable_v
+			);
+		}
 
 		cosmic::specific_create_entity(access, cosm, flavour, [&](auto splatter_entity, auto& agg) {
 			splatter_entity.set_logic_transform(transformr(splatter_pos, rotation));
