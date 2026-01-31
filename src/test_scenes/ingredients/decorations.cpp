@@ -809,5 +809,26 @@ namespace test_flavours {
 			test_decal_decorations::BLOOD_SPLATTER_3,
 			test_scene_image_id::BLOOD_SPLATTER_3
 		);
+
+		/* Blood footstep decals */
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_FOOTSTEP_1,
+			test_scene_image_id::BLOOD_FOOTSTEP_1
+		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_FOOTSTEP_2,
+			test_scene_image_id::BLOOD_FOOTSTEP_2
+		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK,
+			test_scene_image_id::BLOOD_FOOTSTEP_1_WEAK
+		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK,
+			test_scene_image_id::BLOOD_FOOTSTEP_2_WEAK
+		);
 	}
 }
