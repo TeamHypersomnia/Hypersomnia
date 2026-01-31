@@ -378,6 +378,10 @@ enum class test_scene_image_id {
 
 	GREEN_COIN_1,
 
+	BLOOD_SPLATTER_1,
+	BLOOD_SPLATTER_2,
+	BLOOD_SPLATTER_3,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

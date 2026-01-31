@@ -2,6 +2,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/decal_component.h"
 #include "test_scenes/test_scene_animations.h"
 
 namespace test_flavours {
@@ -773,5 +774,40 @@ namespace test_flavours {
 			disp.additional_radius = 10.f;
 			disp.duration_ms = { 200.f, 2000.f };
 		}
+
+		/* Blood splatter decals */
+		auto blood_splatter_flavour = [&](
+			const auto flavour_id,
+			const auto image_id
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::GROUND_DECALS;
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, image_id, white);
+
+			invariants::decal decal_def;
+			decal_def.is_blood_decal = true;
+			meta.set(decal_def);
+
+			return meta;
+		};
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_SPLATTER_1,
+			test_scene_image_id::BLOOD_SPLATTER_1
+		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_SPLATTER_2,
+			test_scene_image_id::BLOOD_SPLATTER_2
+		);
+
+		blood_splatter_flavour(
+			test_decal_decorations::BLOOD_SPLATTER_3,
+			test_scene_image_id::BLOOD_SPLATTER_3
+		);
 	}
 }

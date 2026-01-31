@@ -5,8 +5,6 @@
 namespace invariants {
 	struct decal {
 		// GEN INTROSPECTOR struct invariants::decal
-		real32 lifetime_secs = 60.f;
-		real32 start_shrinking_when_remaining_ms = 5000.f;
 		bool is_blood_decal = false;
 		// END GEN INTROSPECTOR
 	};
@@ -16,6 +14,7 @@ namespace components {
 	struct decal {
 		// GEN INTROSPECTOR struct components::decal
 		real32 last_size_mult = 1.f;
+		bool marked_for_deletion = false;
 		// END GEN INTROSPECTOR
 	};
 }
