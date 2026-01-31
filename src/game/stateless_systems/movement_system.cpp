@@ -574,7 +574,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					/* Steps added per blood splatter intersected */
 					static constexpr uint8_t BLOOD_STEPS_PER_SPLATTER = 4;
 					/* Maximum blood steps counter */
-					static constexpr uint8_t MAX_BLOOD_STEPS = 30;
+					static constexpr uint8_t MAX_BLOOD_STEPS = 25;
 
 					/* Count how many blood splatters are being stepped on */
 					int blood_splatters_stepped = 0;
@@ -616,32 +616,23 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					/* Spawn blood footstep if counter is active */
 					if (movement.blood_step_counter > 0) {
-						/* 
-						 * Footstep intensity levels based on remaining steps:
-						 * >= 25: blood_footstep_1 or blood_footstep_2 (most intense)
-						 * >= 15: blood_footstep_1_weak
-						 * >= 10: blood_footstep_2_weak
-						 * >= 5:  blood_footstep_3_weak (least intense)
-						 * < 5:   no footstep
-						 */
 						typed_entity_flavour_id<decal_decoration> footstep_flavour;
 						const auto counter = movement.blood_step_counter;
 
-						if (counter >= 25) {
+						if (counter >= 20) {
 							/* Most intense - randomly choose between 1 and 2 */
 							auto rng = cosm.get_rng_for(it);
 							footstep_flavour = (rng.randval(0, 1) == 0) ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
 						}
-						else if (counter >= 15) {
+						else if (counter >= 10) {
 							footstep_flavour = common_assets.blood_footstep_1_weak;
 						}
-						else if (counter >= 10) {
+						else if (counter >= 5) {
 							footstep_flavour = common_assets.blood_footstep_2_weak;
 						}
-						else if (counter >= 5) {
+						else if (counter > 0) {
 							footstep_flavour = common_assets.blood_footstep_3_weak;
 						}
-						/* else: counter < 5, no footstep spawned */
 
 						if (footstep_flavour.is_set()) {
 							auto access = allocate_new_entity_access();
