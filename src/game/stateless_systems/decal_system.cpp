@@ -7,11 +7,14 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/for_each_entity.h"
 #include "game/components/decal_component.h"
+#include "game/components/movement_component.h"
 
 /* Soft limit: when exceeded, oldest decals are marked for deletion */
 static constexpr std::size_t SOFT_LIMIT_DECALS = 500;
 /* Hard limit: when exceeded, all marked decals are deleted immediately */
 static constexpr std::size_t HARD_LIMIT_DECALS = 700;
+/* Maximum blood footsteps per character */
+static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 50;
 /* Shrink in discrete 1-second steps (10% less each second) */
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
 /* Number of shrink steps (10 steps for 10% each) */
@@ -31,10 +34,16 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	augs::stepped_timestamp oldest_unmarked_timestamp;
 	oldest_unmarked_timestamp.step = std::numeric_limits<unsigned>::max();
 
-	/* First pass: update shrinking decals and count totals, find oldest unmarked */
+	/* Track oldest superfluous footstep to delete (across all characters) */
+	entity_id oldest_superfluous_footstep_id;
+	augs::stepped_timestamp oldest_superfluous_footstep_timestamp;
+	oldest_superfluous_footstep_timestamp.step = std::numeric_limits<unsigned>::max();
+
+	/* First pass: update shrinking decals, count totals, find oldest unmarked, and track footsteps per character */
 	cosm.for_each_having<components::decal>(
 		[&](const auto subject) {
 			auto& state = subject.template get<components::decal>();
+			const auto& def = subject.template get<invariants::decal>();
 
 			if (state.marked_for_deletion) {
 				/* Calculate elapsed time since marked for deletion */
@@ -57,11 +66,35 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			else {
 				++unmarked_count;
 				
-				/* Track oldest unmarked decal */
 				const auto when_born = subject.when_born();
+
+				/* Track oldest unmarked decal for global soft limit */
 				if (when_born.step < oldest_unmarked_timestamp.step) {
 					oldest_unmarked_timestamp = when_born;
 					oldest_unmarked_id = subject.get_id();
+				}
+
+				/* Track footsteps per character */
+				if (def.is_footstep_decal && state.spawned_by.is_set()) {
+					if (const auto spawner = cosm[state.spawned_by]) {
+						if (auto* movement = spawner.template find<components::movement>()) {
+							++movement->_total_blood_steps_cache;
+
+							/* Track oldest footstep for this character */
+							if (!movement->_oldest_footstep_stamp.was_set() || 
+							    when_born.step < movement->_oldest_footstep_stamp.step) {
+								movement->_oldest_footstep_stamp = when_born;
+							}
+
+							/* If this character is over limit, track oldest for deletion */
+							if (movement->_total_blood_steps_cache > MAX_FOOTSTEPS_PER_CHARACTER) {
+								if (when_born.step < oldest_superfluous_footstep_timestamp.step) {
+									oldest_superfluous_footstep_timestamp = when_born;
+									oldest_superfluous_footstep_id = subject.get_id();
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -86,6 +119,17 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			auto& state = handle.template get<components::decal>();
 			state.marked_for_deletion = true;
 			state.when_marked_for_deletion = now;
+		}
+	}
+
+	/* Per-character footstep limit: mark oldest superfluous footstep for deletion */
+	if (oldest_superfluous_footstep_id.is_set()) {
+		if (const auto handle = cosm[oldest_superfluous_footstep_id]) {
+			auto& state = handle.template get<components::decal>();
+			if (!state.marked_for_deletion) {
+				state.marked_for_deletion = true;
+				state.when_marked_for_deletion = now;
+			}
 		}
 	}
 }

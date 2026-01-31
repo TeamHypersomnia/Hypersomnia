@@ -151,6 +151,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			auto& movement = it.template get<components::movement>();
 			const auto& movement_def = it.template get<invariants::movement>();
 
+			/* Reset per-frame footstep tracking cache */
+			movement._total_blood_steps_cache = 0;
+			movement._oldest_footstep_stamp = augs::stepped_timestamp();
+
 			const auto& rigid_body = it.template get<components::rigid_body>();
 
 			if (!rigid_body.is_constructed()) {
@@ -644,11 +648,16 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 							/* Alternate between left and right foot using flip_vertically */
 							const bool left_foot = movement.four_ways_animation.flip;
+							const auto stepper_id = it.get_id();
 
-							cosmic::specific_create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto&&...) {
+							cosmic::specific_create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto& agg) {
 								footstep_entity.set_logic_transform(effect_transform);
 								if (left_foot) {
 									footstep_entity.flip_vertically();
+								}
+								/* Track who spawned this footstep */
+								if (auto* decal_state = agg.template find<components::decal>()) {
+									decal_state->spawned_by = stepper_id;
 								}
 							});
 						}

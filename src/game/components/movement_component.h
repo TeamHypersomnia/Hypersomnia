@@ -5,6 +5,7 @@
 #include "game/cosmos/entity_id.h"
 
 #include "augs/pad_bytes.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
@@ -102,7 +103,9 @@ namespace components {
 		movement_animation_state four_ways_animation;
 
 		uint8_t blood_step_counter = 0;
-		pad_bytes<3> pad;
+		uint8_t _total_blood_steps_cache = 0;
+		pad_bytes<2> pad;
+		augs::stepped_timestamp _oldest_footstep_stamp;
 		// END GEN INTROSPECTOR
 
 		auto get_max_inertia() const {
