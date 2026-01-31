@@ -273,6 +273,19 @@ void exploding_ring_system::draw_rings(
 		auto considered_color = r.color;
 		considered_color.a = static_cast<rgba_channel>(considered_color.a * (1.f - ratio));
 
+		const int alpha_levels = 2;
+		const int alpha_step = 255 / alpha_levels;
+
+		float a = 1.0f - ratio;
+		int a255 = int(a * 255.0f);
+
+		a255 = alpha_step * (a255 / alpha_step) + alpha_step;
+		a = float(a255) / 255.0f;
+
+		considered_color.a = static_cast<rgba_channel>(
+			considered_color.a * a
+		);
+
 		if (vis.get_num_triangles() > 0) {
 			for (size_t t = 0; t < vis.get_num_triangles(); ++t) {
 				const auto world_light_tri = vis.get_world_triangle(t, world_explosion_center);

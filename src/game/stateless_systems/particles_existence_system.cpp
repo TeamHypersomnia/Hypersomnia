@@ -384,7 +384,12 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = cyan;
+					ring.color = pink;
+
+					if (subject.get_official_faction() == faction_type::RESISTANCE) {
+						ring.color = rgba(255, 90, 0, 255);
+					}
+
 					ring.center = h.point_of_impact;
 
 					step.post_message(std::move(msg));
@@ -405,6 +410,11 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.maximum_duration_seconds = 0.20f;
 
 					ring.color = turquoise;
+
+					if (subject.get_official_faction() == faction_type::RESISTANCE) {
+						ring.color = orange;
+					}
+
 					ring.center = h.point_of_impact;
 
 					step.post_message(std::move(msg));

@@ -272,7 +272,7 @@ void damage_indication_system::draw_indicators(
 		return fonts.medium_numbers;
 	};
 
-	auto get_indicator_color = [&](const auto& in) {
+	auto get_indicator_color = [&](const auto& in, auto faction) {
 		if (in.critical) {
 			return settings.critical_color;
 		}
@@ -284,6 +284,14 @@ void damage_indication_system::draw_indicators(
 				return settings.critical_color;
 			case damage_event::event_type::SHIELD:
 			case damage_event::event_type::SHIELD_DRAIN:
+				if (faction == faction_type::RESISTANCE) {
+					if (in.ped_destroyed) {
+						return rgba(orange).mult_brightness(1.25f);
+					}
+					else {
+						return rgba(orange);
+					}
+				}
 				if (in.ped_destroyed) {
 					return rgba(shield_color).mult_brightness(1.25f);
 				}
@@ -386,7 +394,7 @@ void damage_indication_system::draw_indicators(
 			}
 
 			auto text_pos = cone.to_screen_space(world_pos + current_offset * offset_mult);
-			auto text_color = get_indicator_color(e.in);
+			auto text_color = get_indicator_color(e.in, subject.get_official_faction());
 
 			if (fading_progress >= 0.0f) {
 				const auto fading_mult = std::sqrt(fading_progress / settings.indicator_fading_duration_secs);

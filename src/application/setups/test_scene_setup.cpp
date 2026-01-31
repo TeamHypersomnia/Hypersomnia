@@ -367,8 +367,16 @@ void test_scene_setup::restart_mode() {
 	const bool is_normal_spells_level = tutorial.level == 16;
 	const bool is_offensive_spells_level = tutorial.level == 17;
 
-	const auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
-	const auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+	auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+
+	if (!is_tutorial()) {
+		if (const auto tp = find<editor_point_marker_node>("range_spawn")) {
+			player_faction = tp->editable.faction;
+		}
+	}
+
+	auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+
 
 	if (is_planting_level) {
 		auto b1 = to_handle("bomb1");
@@ -393,17 +401,30 @@ void test_scene_setup::restart_mode() {
 				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 
 				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
-					if (p.scene_entity_id.is_set() && p.editable.faction == faction_type::RESISTANCE) {
+					if (!p.scene_entity_id.is_set()) {
+						continue;
+					}
+
+					if (p.get_display_name() == "range_spawn") {
+						continue;
+					}
+
+					if (is_tutorial()) {
 						const auto new_id = mode.add_player(input, nickname, enemy_faction);
 						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
 						mode.find(new_id)->hide_in_scoreboard = true;
 						const auto opponent_id = mode.find(new_id)->controlled_character_id;
 						mode.teleport_to_next_spawn(input, new_id, opponent_id);
-
-						if (is_tutorial()) {
-							mode.find(new_id)->allow_respawn = is_akimbo_level;
-						}
-
+						mode.find(new_id)->allow_respawn = is_akimbo_level;
+						opponents[p.unique_name] = opponent_id;
+					}
+					else {
+						const auto new_id = mode.add_player(input, nickname, p.editable.faction);
+						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
+						mode.find(new_id)->hide_in_scoreboard = true;
+						const auto opponent_id = mode.find(new_id)->controlled_character_id;
+						mode.teleport_to_next_spawn(input, new_id, opponent_id);
+						mode.find(new_id)->allow_respawn = true;
 						opponents[p.unique_name] = opponent_id;
 					}
 				}
@@ -413,9 +434,17 @@ void test_scene_setup::restart_mode() {
 
 				ensure(player != nullptr)
 
-				if (const auto tp = find<portal_marker>(current_teleport)) {
-					player->dedicated_spawn = tp->scene_entity_id;
-					mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
+				if (is_tutorial()) {
+					if (const auto tp = find<portal_marker>(current_teleport)) {
+						player->dedicated_spawn = tp->scene_entity_id;
+						mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
+					}
+				}
+				else {
+					if (const auto tp = find<editor_point_marker_node>("range_spawn")) {
+						player->dedicated_spawn = tp->scene_entity_id;
+						mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
+					}
 				}
 
 				if (!is_tutorial() || is_akimbo_level || is_duals_level || is_ricochets_level || is_try_throwing_reloading_level || is_defusing_level) {

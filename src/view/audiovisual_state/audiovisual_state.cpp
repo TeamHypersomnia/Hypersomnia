@@ -560,7 +560,7 @@ void audiovisual_state::standard_post_solve(
 		rgba number = white;
 		rgba highlight = white;
 
-		color_info(const messages::health_event& h) {
+		color_info(const messages::health_event& h, const faction_type faction) {
 			if (h.target == messages::health_event::target_type::HEALTH) {
 				if (h.damage.total() > 0) {
 					number = red;
@@ -579,6 +579,17 @@ void audiovisual_state::standard_post_solve(
 				else {
 					number = cyan;
 					highlight = cyan;
+				}
+
+				if (faction == faction_type::RESISTANCE) {
+					if (h.damage.total() > 0) {
+						number = rgba(255, 90, 0, 255);
+						highlight = rgba(255, 90, 0, 255);
+					}
+					else {
+						number = cyan;
+						highlight = cyan;
+					}
 				}
 			}
 			else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
@@ -655,7 +666,7 @@ void audiovisual_state::standard_post_solve(
 
 		for (const auto& h : healths) {
 			if (augs::is_nonzero(h.damage.total())) {
-				const auto cols = color_info(h);
+				const auto cols = color_info(h, cosm[h.subject].get_official_faction());
 
 				pure_color_highlight_input new_highlight;
 

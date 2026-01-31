@@ -289,8 +289,7 @@ rgba& rgba::mult_brightness(const float mult) {
 }
 
 rgba rgba::zero = rgba(0, 0, 0, 0);
-rgba rgba::faction_color = rgba(0, 0, 0, 0);
-rgba PE_color = turquoise;
+rgba rgba::faction_color = rgba(0, 0, 0, 1);
 
 rgba rgba::get_bright_wave(const double secs, const double upperLimit1, const double lowerLimit2) {
 	const auto cycleTime = std::fmod(secs, 1.0); 
