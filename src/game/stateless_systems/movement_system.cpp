@@ -600,11 +600,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					/* Add 10 steps per blood splatter stepped on, up to max 30 */
 					if (blood_splatters_stepped > 0) {
-						const auto steps_to_add = static_cast<uint8_t>(blood_splatters_stepped * BLOOD_STEPS_PER_SPLATTER);
-						movement.blood_step_counter = std::min(
-							static_cast<uint8_t>(MAX_BLOOD_STEPS),
-							static_cast<uint8_t>(movement.blood_step_counter + steps_to_add)
+						/* Cap splatters to avoid overflow, then calculate steps to add */
+						const int capped_splatters = std::min(blood_splatters_stepped, 3);
+						const int steps_to_add = capped_splatters * BLOOD_STEPS_PER_SPLATTER;
+						const int new_counter = std::min(
+							static_cast<int>(MAX_BLOOD_STEPS),
+							static_cast<int>(movement.blood_step_counter) + steps_to_add
 						);
+						movement.blood_step_counter = static_cast<uint8_t>(new_counter);
 					}
 
 					/* Spawn blood footstep if counter is active */
