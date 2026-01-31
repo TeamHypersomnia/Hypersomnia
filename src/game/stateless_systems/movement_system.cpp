@@ -562,13 +562,15 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				/* Blood footstep logic */
 				{
+					/* Radius in pixels to detect blood decals near foot position */
+					static constexpr real32 BLOOD_DETECTION_RADIUS = 20.f;
+
 					/* Check if stepping on blood decal to pick up blood */
 					bool stepped_on_blood = false;
 
 					/* Query visible decals in the ground layer */
 					const auto foot_query_pos = effect_transform.pos;
-					const auto query_radius = 20.f;
-					const auto query_cone = camera_cone(transformr(foot_query_pos), vec2i(static_cast<int>(query_radius * 2), static_cast<int>(query_radius * 2)));
+					const auto query_cone = camera_cone(transformr(foot_query_pos), vec2i(static_cast<int>(BLOOD_DETECTION_RADIUS * 2), static_cast<int>(BLOOD_DETECTION_RADIUS * 2)));
 
 					auto& visible = thread_local_visible_entities();
 					visible.reacquire_all({
@@ -584,7 +586,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							const auto& decal_def = typed_decal.template get<invariants::decal>();
 							if (decal_def.is_blood_decal) {
 								const auto decal_pos = typed_decal.get_logic_transform().pos;
-								if ((decal_pos - foot_query_pos).length_sq() < query_radius * query_radius) {
+								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
 									stepped_on_blood = true;
 								}
 							}
