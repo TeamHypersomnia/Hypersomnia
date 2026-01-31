@@ -133,8 +133,9 @@ inline void spawn_blood_splatters_omnidirectional(
 	blood_splatter_params omni_params;
 	omni_params.damage_per_splatter = 20.f;
 	omni_params.angle_spread = 360.f;
-	omni_params.min_distance = 50.f;
-	omni_params.max_distance_base = 80.f;
+	omni_params.min_distance = damage_amount;
+	omni_params.max_distance_base = 20.f;
+	omni_params.max_distance_at_full_damage = 0.0f;
 	
 	::spawn_blood_splatters(access, step, subject, position, direction, damage_amount, omni_params);
 }
