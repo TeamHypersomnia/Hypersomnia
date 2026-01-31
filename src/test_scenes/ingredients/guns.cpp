@@ -32,7 +32,8 @@ constexpr auto small_pistol_light_mult = 0.7f;
 const auto muzzle_red = rgba(red).mult_brightness(1.4);
 const auto muzzle_pink = rgba(pink).mult_brightness(1.4);
 
-const auto bullet_cyan = cyan;
+const auto bullet_cyan = white;//rgba(97, 221, 255, 255).mult_brightness(1.3);
+const auto bullet_cyan_neon = rgba(0, 146, 222, 255);//.mult_brightness(1.05);
 const auto bright_cyan = rgba(cyan).mult_brightness(1.1);
 const auto muzzle_cyan = bright_cyan;
 
@@ -851,7 +852,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				{
@@ -918,7 +919,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				{
@@ -1327,7 +1328,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				{
@@ -1391,7 +1392,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				{
@@ -1514,7 +1515,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::BLUNAZ_MISSILE);
 
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, bullet_cyan).neon_color = bullet_cyan_neon;
 			{
 				invariants::trace trace_def;
 
@@ -1623,7 +1624,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE);
 
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, bullet_cyan).neon_color = bullet_cyan_neon;
 			{
 				invariants::trace trace_def;
 
@@ -3085,7 +3086,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
 			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND).get<invariants::trace>());
@@ -3105,7 +3106,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
 			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::HPSR_ROUND).get<invariants::trace>());
@@ -3216,7 +3217,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, bullet_cyan).neon_color = bullet_cyan_neon;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE).get<invariants::trace>());
