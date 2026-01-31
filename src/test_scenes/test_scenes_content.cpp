@@ -85,6 +85,11 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.standard_footstep.sound.modifier.gain = 0.4;
 	common_assets.standard_footstep.sound.modifier.max_distance = 2500.f;
 	common_assets.standard_footstep.sound.modifier.reference_distance = 1000.f;
+
+	common_assets.blood_footstep_sound.id = to_sound_id(test_scene_sound_id::BLOOD_FOOTSTEP);
+	common_assets.blood_footstep_sound.modifier.max_distance = 1500.f;
+	common_assets.blood_footstep_sound.modifier.reference_distance = 800.f;
+
 	common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 	common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 	common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);

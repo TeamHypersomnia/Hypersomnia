@@ -276,6 +276,8 @@ enum class test_scene_sound_id {
 	COLLECT_COINS_MEDIUM,
 	COLLECT_COINS_BIG,
 
+	BLOOD_FOOTSTEP,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
