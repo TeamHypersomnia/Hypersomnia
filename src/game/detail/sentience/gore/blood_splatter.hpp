@@ -133,11 +133,11 @@ inline void spawn_blood_splatters(
 			if (auto* decal_state = agg.template find<components::decal>()) {
 				decal_state->spawned_by = subject;
 				
-				/* Set freshness with random initial offset (0-5000ms = 0-300 steps at 60fps) */
+				/* Set freshness with random initial offset (0-5 seconds into the past) */
 				const auto& clk = cosm.get_clock();
-				const auto random_offset_steps = static_cast<uint32_t>(rng.randval(0, 300));
-				/* Subtract steps to make it appear older (as if it existed for that time already) */
-				decal_state->freshness.step = clk.now.step - random_offset_steps;
+				const auto random_offset_secs = rng.randval(0.f, 5.f);
+				/* Subtract seconds to make it appear older (as if it existed for that time already) */
+				decal_state->freshness = clk.get_total_seconds_passed() - random_offset_secs;
 			}
 
 			/* Apply size multiplier through overridden_geo if needed */
