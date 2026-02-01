@@ -24,7 +24,6 @@ static constexpr int NUM_SHRINK_STEPS = 10;
 
 /* Freshness darkening: 20 steps, 2 second intervals */
 static constexpr int FRESHNESS_NUM_STEPS = 20;
-static constexpr real32 FRESHNESS_STEP_MS = 2000.f;
 /* Colorize multiplier: 1.0 -> 0.3 (70% reduction over 20 steps) */
 static constexpr real32 FRESHNESS_MIN_COLORIZE = 0.3f;
 /* Neon alpha: 1.0 -> 0 over 20 steps */
@@ -34,6 +33,8 @@ void decal_system::limit_decal_count(const logic_step step) const {
 
 	const auto& clk = cosm.get_clock();
 	const auto now = clk.now;
+
+	const auto now_secs = clk.get_total_seconds_passed();
 
 	std::size_t unmarked_count = 0;
 	std::size_t marked_count = 0;
@@ -53,6 +54,9 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	augs::stepped_timestamp oldest_superfluous_footstep_timestamp;
 	oldest_superfluous_footstep_timestamp.step = std::numeric_limits<unsigned>::max();
 
+	/* Freshness step interval in seconds (2 seconds per step) */
+	static constexpr real32 FRESHNESS_STEP_SECS = 2.f;
+
 	/* First pass: update shrinking decals, count totals, find oldest unmarked/marked, and track footsteps per character */
 	cosm.for_each_having<components::decal>(
 		[&](const auto subject) {
@@ -61,9 +65,9 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			const auto when_born = subject.when_born();
 
 			/* Freshness-based darkening for blood decals */
-			if (def.is_blood_decal && state.freshness.was_set()) {
-				const auto freshness_elapsed_ms = clk.get_passed_ms(state.freshness);
-				const auto freshness_step = std::min(static_cast<int>(freshness_elapsed_ms / FRESHNESS_STEP_MS), FRESHNESS_NUM_STEPS);
+			if (def.is_blood_decal && state.freshness >= 0.f) {
+				const auto freshness_elapsed_secs = now_secs - state.freshness;
+				const auto freshness_step = std::min(static_cast<int>(freshness_elapsed_secs / FRESHNESS_STEP_SECS), FRESHNESS_NUM_STEPS);
 				
 				/* Calculate multiplier: 1.0 -> 0.3 over 20 steps for colorize, 1.0 -> 0 for neon alpha */
 				const real32 progress = static_cast<real32>(freshness_step) / static_cast<real32>(FRESHNESS_NUM_STEPS);
