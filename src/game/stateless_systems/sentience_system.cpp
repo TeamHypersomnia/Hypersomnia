@@ -50,6 +50,9 @@
 
 constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 
+/* Blood drip base damage determines splatter size; set to damage_per_splatter to produce exactly 1 splatter */
+constexpr real32 blood_drip_base_damage = 40.f;
+
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
 	flavour = handle.get_flavour_id();
@@ -289,7 +292,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 						const auto direction = vec2::from_degrees(random_angle);
 
 						blood_splatter_params drip_params;
-						drip_params.damage_per_splatter = 100.f; /* Produce just 1 splatter */
+						/*
+							Use damage_per_splatter high enough to produce just 1 splatter.
+						*/
+						drip_params.damage_per_splatter = blood_drip_base_damage;
 						drip_params.angle_spread = 360.f;
 						drip_params.min_distance = 0.f;
 						drip_params.max_distance_base = 10.f * size_mult;
@@ -297,10 +303,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 						drip_params.min_size = size_mult;
 
 						/*
-							Damage amount determines splatter size:
-							Use a virtual damage value that scales with size_mult.
+							Damage amount determines splatter size.
+							Use base damage scaled by size multiplier to get appropriately sized splatters.
 						*/
-						const auto virtual_damage = 40.f * size_mult;
+						const auto virtual_damage = blood_drip_base_damage * size_mult;
 
 						::spawn_blood_splatters(
 							allocate_new_entity_access(),
