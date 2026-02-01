@@ -2,11 +2,13 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/logic_step.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/templates/introspect.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/delete_entity.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/messages/clone_entity_message.h"
 
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
 #include "game/inferred_caches/organism_cache.hpp"
@@ -175,6 +177,17 @@ entity_handle just_clone_entity(
 	return source_entity.dispatch([access](const auto typed_handle){
 		return entity_handle(cosmic::specific_clone_entity(access, typed_handle));
 	});
+}
+
+void queue_clone_entity(
+	const logic_step step,
+	const entity_id source,
+	std::function<void(entity_handle, logic_step)> post_clone
+) {
+	messages::clone_entity_message msg;
+	msg.source = source;
+	msg.post_clone = std::move(post_clone);
+	step.post_message(msg);
 }
 
 template <class F>
