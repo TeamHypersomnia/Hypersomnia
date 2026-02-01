@@ -48,8 +48,8 @@ namespace augs {
 		 * the original sprite this chunk starts, which shifts where tiles begin.
 		 */
 		const auto offset_in_tiles = vec2i(
-			tile_offset.x > 0 ? static_cast<int>(std::fmod(tile_offset.x, tile_size.x)) : 0,
-			tile_offset.y > 0 ? static_cast<int>(std::fmod(tile_offset.y, tile_size.y)) : 0
+			tile_offset.x > 0.0f ? static_cast<int>(std::fmod(tile_offset.x, static_cast<float>(tile_size.x))) : 0,
+			tile_offset.y > 0.0f ? static_cast<int>(std::fmod(tile_offset.y, static_cast<float>(tile_size.y))) : 0
 		);
 
 		const auto first_center_local = -vec2(tile_size * (times - vec2i(1, 1))) / 2 - vec2(offset_in_tiles);
