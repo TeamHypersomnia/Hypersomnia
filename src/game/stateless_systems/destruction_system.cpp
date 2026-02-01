@@ -9,7 +9,7 @@
 
 #include "game/messages/collision_message.h"
 #include "game/messages/damage_message.h"
-#include "game/messages/health_event.h"
+#include "game/messages/pure_color_highlight_message.h"
 
 #include "game/components/fixtures_component.h"
 #include "game/components/shape_circle_component.h"
@@ -141,17 +141,17 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		}
 
 		/* Linearly interpolate from 10% (at 0% ratio) to 100% (at 50%+ ratio) */
-		const auto highlight_alpha = static_cast<rgba_channel>(255 * std::min(1.0f, 0.1f + highlight_ratio * 1.8f));
-		(void)highlight_alpha;
+		const auto highlight_alpha = std::min(1.0f, 0.1f + highlight_ratio * 1.8f);
 		
-		/* Post a health event for visual feedback (white highlight) */
-		messages::health_event h;
+		/* 
+		 * Post a pure_color_highlight message for visual feedback.
+		 * Don't post health_event since we don't want damage numbers for non-sentient objects.
+		 */
+		messages::pure_color_highlight h;
 		h.subject = d.subject;
-		h.point_of_impact = d.point_of_impact;
-		h.impact_velocity = d.impact_velocity;
-		h.origin = d.origin;
-		h.target = messages::health_event::target_type::HEALTH;
-		h.damage.effective = damage_amount;
+		h.input.starting_alpha_ratio = highlight_alpha;
+		h.input.maximum_duration_seconds = 0.15f;
+		h.input.color = white;
 		
 		step.post_message(h);
 
@@ -170,23 +170,13 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const auto sprite_size = subject.get_logical_size();
 			const auto actual_width = sprite_size.x * texture_rect.w;
 			const auto actual_height = sprite_size.y * texture_rect.h;
-			const auto actual_area = actual_width * actual_height;
-
-			/* If area is less than 100 pixels, just delete */
-			if (actual_area < 100.0f) {
-				/* TODO: Spawn destruction effects here */
-				step.queue_deletion_of(subject, "Destructible too small to split");
-				continue;
-			}
 
 			/* 
 			 * Splitting logic:
-			 * 1. Always split along the LONGER edges
-			 * 2. Find closest point on either of the two longer edges
-			 * 3. Create a split line 
-			 * 4. Create smaller chunk as new entity
-			 * 5. Adjust original entity
-			 * 6. Reinfer physics
+			 * 1. If edges are roughly equal, find the closest edge
+			 * 2. Otherwise split along the LONGER edges
+			 * 3. Find closest point on either of the two longer edges
+			 * 4. Limit split ratio to at most 10% deviation from center
 			 */
 
 			const auto transform = subject.get_logic_transform();
@@ -200,41 +190,52 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const auto half_h = actual_height / 2.0f;
 
 			/* 
-			 * Determine which edges are longer.
-			 * If width >= height, the left/right edges are the longer ones (split horizontally along them).
-			 * If height > width, the top/bottom edges are the longer ones (split vertically along them).
+			 * Check if edges are roughly equal (within epsilon of 10%).
+			 * If so, find the closest edge instead of always choosing the longer one.
 			 */
-			const bool width_is_longer = actual_width >= actual_height;
+			constexpr real32 edge_epsilon = 0.1f;
+			const real32 edge_ratio = std::min(actual_width, actual_height) / std::max(actual_width, actual_height);
+			const bool edges_roughly_equal = edge_ratio >= (1.0f - edge_epsilon);
+
+			bool is_horizontal_split;
 			
-			/* 
-			 * Always split along the longer dimension.
-			 * If width_is_longer: split creates left-right pieces (horizontal split)
-			 * If height is longer: split creates top-bottom pieces (vertical split)
-			 */
-			const bool is_horizontal_split = width_is_longer;
+			if (edges_roughly_equal) {
+				/* Edges are roughly equal - find the closest edge */
+				const real32 dist_left = local_impact.x + half_w;
+				const real32 dist_right = half_w - local_impact.x;
+				const real32 dist_top = local_impact.y + half_h;
+				const real32 dist_bottom = half_h - local_impact.y;
+
+				const real32 min_h_dist = std::min(dist_left, dist_right);
+				const real32 min_v_dist = std::min(dist_top, dist_bottom);
+
+				/* If closest to left/right edge, do horizontal split (left-right pieces) */
+				is_horizontal_split = (min_h_dist < min_v_dist);
+			}
+			else {
+				/* Split along the longer dimension */
+				is_horizontal_split = (actual_width >= actual_height);
+			}
 			
-			/* Calculate split position along the longer edge (0-1 in texture space) */
+			/* Calculate split position along the edge (0-1 in texture space) */
 			real32 split_ratio;
 			if (is_horizontal_split) {
-				/* Split vertically (left-right pieces) - project impact onto the width */
+				/* Split creates left-right pieces - project impact onto the width */
 				split_ratio = (local_impact.x + half_w) / actual_width;
-			} else {
-				/* Split horizontally (top-bottom pieces) - project impact onto the height */
+			}
+			else {
+				/* Split creates top-bottom pieces - project impact onto the height */
 				split_ratio = (local_impact.y + half_h) / actual_height;
 			}
 
-			/* Limit split position: min_offset_px from corners minimum, but if edge < 2*min_offset_px, split in half */
-			const real32 edge_length = is_horizontal_split ? actual_width : actual_height;
-			const real32 min_offset_px = 10.0f;
-			const real32 min_edge_for_offset = 2.0f * min_offset_px;
-
-			if (edge_length <= min_edge_for_offset) {
-				split_ratio = 0.5f;
-			} else {
-				const real32 min_ratio = min_offset_px / edge_length;
-				const real32 max_ratio = 1.0f - min_ratio;
-				split_ratio = std::clamp(split_ratio, min_ratio, max_ratio);
-			}
+			/* 
+			 * Limit split position to at most 10% deviation from center (0.5).
+			 * This means split_ratio must be in range [0.4, 0.6].
+			 */
+			constexpr real32 max_deviation_from_center = 0.1f;
+			const real32 min_ratio = 0.5f - max_deviation_from_center;
+			const real32 max_ratio = 0.5f + max_deviation_from_center;
+			split_ratio = std::clamp(split_ratio, min_ratio, max_ratio);
 
 			/* Calculate new texture_rect for both pieces */
 			xywh original_rect = dest.texture_rect;
@@ -257,14 +258,16 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 					new_rect.x = split_x;
 					new_rect.w = dest.texture_rect.w * (1.0f - split_ratio);
-				} else {
+				}
+				else {
 					/* Right piece is larger - swap them */
 					new_rect.w = original_rect.w * split_ratio;
 					
 					original_rect.x = split_x;
 					original_rect.w = dest.texture_rect.w * (1.0f - split_ratio);
 				}
-			} else {
+			}
+			else {
 				/* Top piece = original, Bottom piece = new */
 				const real32 split_y = original_rect.y + original_rect.h * split_ratio;
 
@@ -274,7 +277,8 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 					new_rect.y = split_y;
 					new_rect.h = dest.texture_rect.h * (1.0f - split_ratio);
-				} else {
+				}
+				else {
 					/* Bottom piece is larger - swap them */
 					new_rect.h = original_rect.h * split_ratio;
 					
@@ -323,7 +327,8 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 					original_center_shift = vec2(original_center_x, 0);
 					new_center_shift = vec2(new_center_x, 0);
-				} else {
+				}
+				else {
 					const real32 original_center_y = (original_rect.y + original_rect.h / 2.0f - 0.5f) * sprite_size.y;
 					const real32 new_center_y = (new_rect.y + new_rect.h / 2.0f - 0.5f) * sprite_size.y;
 
@@ -380,7 +385,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 						pending_destruction pd;
 						pd.target = eid;
-						pd.delay_ms = 0.f;
+						pd.delay_ms = delay;
 						pd.impact_velocity = d.impact_velocity;
 
 						global.pending_destructions.push_back(pd);

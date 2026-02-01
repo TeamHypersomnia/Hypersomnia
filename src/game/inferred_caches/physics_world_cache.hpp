@@ -132,6 +132,27 @@ auto calc_filters(const E& handle) {
 		}
 	}
 
+	/* 
+	 * Check if this is a destructible chunk that is too small.
+	 * Instead of deleting it, use LYING_ITEM filter so it doesn't block characters.
+	 */
+	if (const auto* destructible = handle.template find<components::destructible>()) {
+		if (destructible->is_enabled()) {
+			const auto& texture_rect = destructible->texture_rect;
+			const auto texture_area = texture_rect.w * texture_rect.h;
+			
+			if (texture_area > 0.0f) {
+				const auto sprite_size = handle.get_logical_size();
+				const auto actual_area = sprite_size.x * texture_rect.w * sprite_size.y * texture_rect.h;
+				
+				/* If area is less than 100 pixels, treat as LYING_ITEM */
+				if (actual_area < 100.0f) {
+					return filters[predefined_filter_type::LYING_ITEM];
+				}
+			}
+		}
+	}
+
 	return colliders_data.filter;
 }
 

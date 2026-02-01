@@ -104,6 +104,14 @@ enum class test_plain_sprited_bodies {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_destructible_sprited_bodies {
+	// GEN INTROSPECTOR enum class test_destructible_sprited_bodies
+	HARD_WOODEN_WALL_DEST,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 enum class test_shootable_weapons {
 	// GEN INTROSPECTOR enum class test_shootable_weapons
 	BILMER2000,

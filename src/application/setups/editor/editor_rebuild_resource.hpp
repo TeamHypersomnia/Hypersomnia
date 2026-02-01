@@ -391,7 +391,16 @@ void setup_scene_object_from_resource(
 			rigid_body->damping.angular = physical.angular_damping;
 
 			if (physical.is_static) {
-				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
+				/* 
+				 * Use STATIC (not ALWAYS_STATIC) for destructible entities
+				 * so they can transition to DYNAMIC upon splitting.
+				 */
+				if (physical.is_destructible && physical.custom_shape.empty()) {
+					rigid_body->body_type = rigid_body_type::STATIC;
+				}
+				else {
+					rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
+				}
 			}
 		}
 

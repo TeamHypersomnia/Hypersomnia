@@ -110,10 +110,7 @@ namespace test_flavours {
 				test_scene_physical_material_id::WOOD
 			);
 			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
-			auto& crate_destructible = crate_meta.template get<components::destructible>();
-			crate_destructible.max_health = 100.0f;
-			crate_destructible.health = 100.0f;
-			/* Crate is already dynamic, so make_dynamic_below_area doesn't matter */
+			/* CRATE is no longer destructible - use test_destructible_sprited_bodies for that */
 		}
 
 		{
@@ -126,10 +123,42 @@ namespace test_flavours {
 				test_scene_physical_material_id::WOOD
 			);
 			wall_meta.template get<invariants::sprite>().tile_excess_size = true;
-			auto& wall_destructible = wall_meta.template get<components::destructible>();
-			wall_destructible.max_health = 500.0f;
-			wall_destructible.health = 500.0f;
-			wall_destructible.make_dynamic_below_area = 0.6f; /* Become dynamic when area <= 60% */
+			/* Non-destructible version */
+		}
+
+		/* 
+		 * Destructible wall flavour - requires destructible_sprited_body entity type 
+		 */
+		{
+			auto& wall_meta = get_test_flavour(in.flavours, test_destructible_sprited_bodies::HARD_WOODEN_WALL_DEST);
+
+			auto& sprite = wall_meta.template get<invariants::sprite>();
+			sprite.set(
+				to_image_id(test_scene_image_id::BRICK_WALL), 
+				caches.at(to_image_id(test_scene_image_id::BRICK_WALL)).original_image_size
+			);
+			sprite.tile_excess_size = true;
+
+			test_flavours::add_standard_static_body(wall_meta);
+
+			auto& rigid_body = wall_meta.template get<invariants::rigid_body>();
+			rigid_body.body_type = rigid_body_type::STATIC; /* STATIC, not ALWAYS_STATIC for destructibles */
+
+			auto& fixtures_def = wall_meta.template get<invariants::fixtures>();
+			fixtures_def.restitution = 0.f;
+			fixtures_def.density = 100.f;
+			fixtures_def.max_ricochet_angle = 10.f;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
+			fixtures_def.penetrability = get_material_penetrability(test_scene_physical_material_id::WOOD);
+
+			wall_meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
+			wall_meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
+			wall_meta.template get<invariants::render>().layer = render_layer::SOLID_OBSTACLES;
+
+			auto& destructible = wall_meta.template get<components::destructible>();
+			destructible.max_health = 500.0f;
+			destructible.health = 500.0f;
+			destructible.make_dynamic_below_area = 0.6f;
 		}
 
 		{
