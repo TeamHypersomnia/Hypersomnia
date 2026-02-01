@@ -163,6 +163,10 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						return;
 					}
 
+					if (!is_conscious) {
+						return;
+					}
+
 					const auto& meter_metas = cosm.get_common_significant().meters;
 					const auto chosen_ratio = draw_shield ? shield : health;
 

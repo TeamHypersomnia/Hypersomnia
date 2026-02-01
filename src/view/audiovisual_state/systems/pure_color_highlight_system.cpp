@@ -52,6 +52,12 @@ void pure_color_highlight_system::draw_highlights(
 			continue;
 		}
 
+		if (auto sentience = subject.find<components::sentience>()) {
+			if (sentience->has_exploded) {
+				continue;
+			}
+		}
+
 		float teleport_alpha = 1.0f;
 
 		if (auto rigid_body = subject.find<components::rigid_body>()) {

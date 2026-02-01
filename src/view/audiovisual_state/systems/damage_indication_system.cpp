@@ -323,6 +323,12 @@ void damage_indication_system::draw_indicators(
 			continue;
 		}
 
+		bool exploded = false;
+
+		if (auto sentience = subject.find<components::sentience>()) {
+			exploded = sentience->has_exploded;
+		}
+
 		const auto& streak = s.second;
 
 		const auto border_color = [&]() {
@@ -336,7 +342,7 @@ void damage_indication_system::draw_indicators(
 		{
 			/* Render the streak itself */
 
-			if (streak.total_damage_events > 1) {
+			if (!exploded && streak.total_damage_events > 1) {
 				if (const auto transform = subject.find_viewing_transform(interp)) {
 					if (streak.last_visible_pos == std::nullopt || is_reasonably_in_view(subject)) {
 						streak.last_visible_pos = transform->pos;
