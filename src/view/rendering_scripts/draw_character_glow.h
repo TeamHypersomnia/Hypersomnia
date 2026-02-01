@@ -73,7 +73,7 @@ void draw_character_glow(const E& it, const draw_character_glow_in in) {
 						}
 
 						if (it.get_official_faction() == faction_type::METROPOLIS) {
-							color = rgba(100, 100, 255, 255);
+							color = rgba(0, 146, 222, 255);
 						}
 					}
 

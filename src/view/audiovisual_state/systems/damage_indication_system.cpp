@@ -295,10 +295,10 @@ void damage_indication_system::draw_indicators(
 
 				if (faction == faction_type::METROPOLIS) {
 					if (in.ped_destroyed) {
-						return rgba(100, 100, 255, 255).mult_brightness(1.25f);
+						return rgba(0, 146, 222, 255).mult_brightness(1.25f);
 					}
 					else {
-						return rgba(100, 100, 255, 255).mult_brightness(1.2f);
+						return rgba(0, 146, 222, 255).mult_brightness(1.2f);
 					}
 				}
 
