@@ -6,6 +6,7 @@
 #include "game/cosmos/create_entity.hpp"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/explosive/detonate.h"
+#include "game/detail/sentience/gore/blood_splatter.hpp"
 
 #include "augs/log.h"
 void handle_corpse_damage(
@@ -55,6 +56,7 @@ void handle_corpse_damage(
 }
 
 void handle_corpse_detonation(
+	const allocate_new_entity_access access,
 	const logic_step step,
 	const entity_handle subject,
 	components::sentience& sentience,
@@ -67,6 +69,10 @@ void handle_corpse_detonation(
 	const auto& cosm = subject.get_cosmos();
 	const auto& clk = cosm.get_clock();
 
+	const auto& health = sentience.get<health_meter_instance>();
+	/* The accumulated negative damage on the corpse (health.value is negative when dead) */
+	const auto accumulated_corpse_damage = -health.value;
+
 	auto explode_corpse = [&]() {
 		::detonate({
 			step,
@@ -75,6 +81,10 @@ void handle_corpse_detonation(
 			subject.get_logic_transform()
 		}, false);
 
+		/* Spawn blood splatters in all directions based on accumulated corpse damage */
+		const auto subject_pos = subject.get_logic_transform().pos;
+		::spawn_blood_splatters_omnidirectional(access, step, subject, subject_pos, accumulated_corpse_damage);
+
 		sentience.has_exploded = true;
 
 		/* This will cause the corpse to disappear */
@@ -82,8 +92,7 @@ void handle_corpse_detonation(
 	};
 
 	const auto& when_ignited = sentience.when_corpse_catched_fire;
-	const auto& health = sentience.get<health_meter_instance>();
-	const auto damage_past_breaking_point = -health.value - sentience_def.damage_required_for_corpse_explosion;
+	const auto damage_past_breaking_point = accumulated_corpse_damage - sentience_def.damage_required_for_corpse_explosion;
 	const bool is_ignited = when_ignited.was_set();
 
 	if (is_ignited) {

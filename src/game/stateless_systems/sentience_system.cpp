@@ -42,6 +42,9 @@
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/spawn_collectibles.hpp"
+#include "game/cosmos/create_entity.hpp"
+#include "game/components/decal_component.h"
+#include "game/detail/sentience/gore/blood_splatter.hpp"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -176,6 +179,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			::handle_corpse_detonation(
+				allocate_new_entity_access(),
 				step,
 				subject,
 				sentience,
@@ -359,6 +363,8 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	const bool was_conscious = health.value > 0.f; //&& consciousness.value > 0.f;
 	const bool was_dead = health.value <= 0.f; //&& consciousness.value > 0.f;
 
+	auto access = allocate_new_entity_access();
+
 	h.was_conscious = was_conscious;
 	h.was_dead = was_dead;
 
@@ -383,8 +389,22 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			//ensure_geq(health.value, static_cast<decltype(health.value)>(0));
 
+			/* Always spawn blood splatters for health damage, including corpse damage */
+			if (amount > 0) {
+				const auto impact_dir = h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero;
+				blood_splatter_params params;
+				params.damage_per_splatter = 15;
+				::spawn_blood_splatters(access, step, subject, h.point_of_impact, impact_dir, amount, params);
+			}
+
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
+
+				/* Increment blood step counter for bloody footsteps */
+				if (auto* movement = subject.template find<components::movement>()) {
+					const auto steps_to_add = static_cast<uint8_t>(std::min(255.f, std::max(10.f, amount / 6.f)));
+					movement->blood_step_counter = static_cast<uint8_t>(std::min(255, movement->blood_step_counter + steps_to_add));
+				}
 
 				const auto prev_consciousness = consciousness.value;
 

@@ -5,6 +5,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "game/detail/footstep_effect.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
@@ -24,6 +25,7 @@ struct common_assets {
 	assets::particle_effect_id thunder_remnants;
 
 	footstep_effect_input standard_footstep;
+	sound_effect_input blood_footstep_sound;
 	particle_effect_input haste_footstep_particles;
 
 	sound_effect_input standard_learnt_spell_sound;
@@ -35,5 +37,16 @@ struct common_assets {
 
 	per_actual_faction<assets::image_id> head_icons;
 	per_actual_faction<assets::image_id> broken_head_icons;
+
+	typed_entity_flavour_id<decal_decoration> blood_splatter_1;
+	typed_entity_flavour_id<decal_decoration> blood_splatter_2;
+	typed_entity_flavour_id<decal_decoration> blood_splatter_3;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_1;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_2;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_1_weak;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_2_weak;
+	typed_entity_flavour_id<decal_decoration> blood_footstep_3_weak;
+
+	particle_effect_input blood_burst_particles;
 	// END GEN INTROSPECTOR
 };

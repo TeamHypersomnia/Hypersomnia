@@ -1,10 +1,13 @@
 #include "augs/math/vec2.h"
+#include "augs/log.h"
 #include "movement_system.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/create_entity.hpp"
 #include "game/messages/intent_message.h"
 #include "game/messages/sound_cue_message.h"
 
 #include "game/components/gun_component.h"
+#include "game/components/decal_component.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/movement_component.h"
@@ -21,6 +24,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
 #include "game/detail/visible_entities.h"
+#include "game/detail/visible_entities.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 
 #include "game/detail/physics/infer_damping.hpp"
@@ -29,6 +33,7 @@
 #include "game/detail/sentience/tool_getters.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/get_hovered_world_entity.h"
+#include "game/cosmos/create_entity.hpp"
 
 #define LOG_INTENTS 0
 
@@ -146,6 +151,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 		[&](const auto& it) {
 			auto& movement = it.template get<components::movement>();
 			const auto& movement_def = it.template get<invariants::movement>();
+
+			/* Reset per-frame footstep tracking cache */
+			movement._total_blood_steps_cache = 0;
+			movement._oldest_footstep_stamp = augs::stepped_timestamp();
 
 			const auto& rigid_body = it.template get<components::rigid_body>();
 
@@ -555,6 +564,122 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						particle_effect_start_input::fire_and_forget(effect_transform),
 						predictability
 					);
+				}
+
+				/* Blood footstep logic - only for sentient and conscious entities */
+				const bool is_sentient_and_conscious = is_sentient && sentience->is_conscious();
+
+				if (is_sentient_and_conscious) {
+					/* Radius in pixels to detect blood decals near foot position */
+					static constexpr real32 BLOOD_DETECTION_RADIUS = 20.f;
+					/* Steps added per blood splatter intersected */
+					static constexpr uint8_t BLOOD_STEPS_PER_SPLATTER = 4;
+					/* Maximum blood steps counter */
+					static constexpr uint8_t MAX_BLOOD_STEPS = 25;
+
+					/* Count how many blood splatters are being stepped on */
+					int blood_splatters_stepped = 0;
+
+					/* Query visible decals in the ground layer */
+					const auto foot_query_pos = effect_transform.pos;
+					const auto query_cone = camera_cone(transformr(foot_query_pos), vec2i(static_cast<int>(BLOOD_DETECTION_RADIUS * 2), static_cast<int>(BLOOD_DETECTION_RADIUS * 2)));
+
+					auto& visible = thread_local_visible_entities();
+					visible.reacquire_all({
+						cosm,
+						query_cone,
+						accuracy_type::EXACT,
+						render_layer_filter::whitelist(render_layer::GROUND_DECALS),
+						tree_of_npo_filter::all()
+					});
+
+					visible.for_each<render_layer::GROUND_DECALS>(cosm, [&](const auto& decal_handle) {
+						decal_handle.template dispatch_on_having_all<invariants::decal>([&](const auto& typed_decal) {
+							const auto& decal_def = typed_decal.template get<invariants::decal>();
+							if (decal_def.is_blood_decal && !decal_def.is_footstep_decal) {
+								const auto decal_pos = typed_decal.get_logic_transform().pos;
+								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
+									++blood_splatters_stepped;
+								}
+							}
+						});
+					});
+
+					/* Add 4 steps per blood splatter stepped on, up to max 30 */
+					if (blood_splatters_stepped > 0) {
+						const int steps_to_add = blood_splatters_stepped * BLOOD_STEPS_PER_SPLATTER;
+						const int new_counter = std::min(
+							static_cast<int>(MAX_BLOOD_STEPS),
+							static_cast<int>(movement.blood_step_counter) + steps_to_add
+						);
+						movement.blood_step_counter = static_cast<uint8_t>(new_counter);
+					}
+
+					/* Spawn blood footstep if counter is active */
+					if (movement.blood_step_counter > 0) {
+						typed_entity_flavour_id<decal_decoration> footstep_flavour;
+						const auto counter = movement.blood_step_counter;
+
+						/* Blood footstep sound modifiers based on intensity */
+						real32 blood_sound_pitch = 1.0f;
+						real32 blood_sound_gain = 1.0f;
+
+						if (counter >= 20) {
+							/* Most intense - randomly choose between 1 and 2 */
+							auto rng = cosm.get_rng_for(it);
+							footstep_flavour = (rng.randval(0, 1) == 0) ? common_assets.blood_footstep_1 : common_assets.blood_footstep_2;
+						}
+						else if (counter >= 10) {
+							footstep_flavour = common_assets.blood_footstep_1_weak;
+						}
+						else if (counter >= 5) {
+							footstep_flavour = common_assets.blood_footstep_2_weak;
+						}
+						else if (counter > 0) {
+							footstep_flavour = common_assets.blood_footstep_3_weak;
+						}
+
+						const auto r = std::clamp(real32(counter) / 25.0f, 0.0f, 1.0f);
+
+						blood_sound_pitch = 1.5f - r * 0.5f;
+						blood_sound_gain  = 0.5f + r * 0.5f;
+
+						/* Play blood footstep sound */
+						{
+							auto blood_sound = common_assets.blood_footstep_sound;
+							blood_sound.modifier.pitch *= blood_sound_pitch;
+							blood_sound.modifier.gain *= blood_sound_gain;
+
+							const auto predictability = predictable_only_by(it);
+
+							blood_sound.start(
+								step,
+								sound_effect_start_input::at_listener(it.get_id()),
+								predictability
+							);
+						}
+
+						if (footstep_flavour.is_set()) {
+							auto access = allocate_new_entity_access();
+
+							/* Alternate between left and right foot using flip_vertically */
+							const bool left_foot = movement.four_ways_animation.flip;
+							const auto stepper_id = it.get_id();
+
+							cosmic::specific_create_entity(access, cosm, footstep_flavour, [&](const auto footstep_entity, auto& agg) {
+								footstep_entity.set_logic_transform(effect_transform);
+								if (left_foot) {
+									footstep_entity.flip_vertically();
+								}
+								/* Track who spawned this footstep */
+								if (auto* decal_state = agg.template find<components::decal>()) {
+									decal_state->spawned_by = stepper_id;
+								}
+							});
+						}
+
+						--movement.blood_step_counter;
+					}
 				}
 			};
 

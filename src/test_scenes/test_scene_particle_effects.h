@@ -74,6 +74,8 @@ enum class test_scene_particle_effect_id {
 
 	LAVA_CIRCLE,
 
+	BLOOD_BURST,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

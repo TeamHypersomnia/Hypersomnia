@@ -817,6 +817,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/pool/pool.cpp"
 	"src/game/detail/sentience_shake.cpp"
 	"src/augs/string/get_type_name.cpp"
+	"src/game/stateless_systems/decal_system.cpp"
 	"src/game/stateless_systems/movement_path_system.cpp"
 	"src/game/stateless_systems/animation_system.cpp"
 	"src/game/detail/organisms/startle_nearbly_organisms.cpp"

@@ -266,5 +266,7 @@ T& apply_to_particle(const particle_effect_modifier& m, T& p) {
 		p.max_lifetime_ms *= m.scale_lifetimes;
 	}
 
+	p.vel *= m.scale_velocities;
+
 	return p;
 }

@@ -8,6 +8,7 @@
 #include "game/cosmos/logic_step.h"
 
 struct damage_origin;
+class allocate_new_entity_access;
 
 template <class E>
 void resurrect(const logic_step step, const E& typed_handle, const float spawn_protection_ms = 0.0f) {
@@ -48,6 +49,7 @@ void handle_corpse_damage(
 );
 
 void handle_corpse_detonation(
+	allocate_new_entity_access access,
 	const logic_step step,
 	const entity_handle subject,
 	components::sentience& sentience,

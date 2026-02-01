@@ -1,4 +1,5 @@
 #pragma once
+#include "game/cosmos/entity_handle.h"
 #include "game/cosmos/entity_construction.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "game/cosmos/cosmic_functions.h"

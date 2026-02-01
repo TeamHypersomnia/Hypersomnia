@@ -314,4 +314,17 @@ void load_test_scene_sentience_properties(
 		m.appearance.icon = to_image_id(test_scene_image_id::CONSCIOUSNESS_ICON);
 		m.appearance.bar_color = orange - rgba(30, 30, 30, 0);
 	}
+
+	/* Blood splatter flavours */
+	{
+		auto& assets = state.assets;
+		assets.blood_splatter_1 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_1);
+		assets.blood_splatter_2 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_2);
+		assets.blood_splatter_3 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_3);
+		assets.blood_footstep_1 = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1);
+		assets.blood_footstep_2 = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2);
+		assets.blood_footstep_1_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK);
+		assets.blood_footstep_2_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK);
+		assets.blood_footstep_3_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK);
+	}
 }
