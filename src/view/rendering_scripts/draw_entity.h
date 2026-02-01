@@ -127,11 +127,23 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				result.flip.vertically = !result.flip.vertically;
 			}
 
-			/* Pass texture_rect for destructible sprites */
+			/* Pass texture_rect and tile_offset for destructible sprites */
 			if constexpr(H::template has<components::destructible>()) {
 				const auto& destructible = typed_handle.template get<components::destructible>();
 				if (destructible.is_enabled()) {
 					result.texture_rect = destructible.texture_rect;
+					
+					/* 
+					 * For tiled sprites, calculate the tile offset to maintain visual continuity.
+					 * The offset is where this chunk starts within the original sprite's tile grid.
+					 */
+					if (sprite.tile_excess_size) {
+						const auto original_sprite_size = typed_handle.template get<invariants::sprite>().size;
+						result.tile_offset = vec2(
+							original_sprite_size.x * destructible.texture_rect.x,
+							original_sprite_size.y * destructible.texture_rect.y
+						);
+					}
 				}
 			}
 
