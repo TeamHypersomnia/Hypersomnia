@@ -220,7 +220,6 @@ void create_official_filesystem_from(
 
 				test_plain_sprited_bodies::HARD_WOODEN_WALL,
 				test_destructible_sprited_bodies::HARD_WOODEN_WALL_DEST,
-				test_destructible_sprited_bodies::CRATE,
 				test_plain_sprited_bodies::LAB_WALL,
 				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
 				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
