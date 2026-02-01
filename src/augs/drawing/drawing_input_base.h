@@ -38,4 +38,9 @@ struct sprite_drawing_input : drawing_input_base {
 	flip_flags flip;
 	/* For destructible sprites: the portion of the texture to render (0-1 space) */
 	xywh texture_rect = xywh(0, 0, 1.0f, 1.0f);
+	/* 
+	 * For tiled destructible sprites: pixel offset for where the tile grid should start.
+	 * This allows chunks of a tiled sprite to maintain visual continuity with the original.
+	 */
+	vec2 tile_offset = vec2::zero;
 };
