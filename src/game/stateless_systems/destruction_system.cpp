@@ -320,10 +320,22 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			dest.max_health = original_new_max_health;
 			dest.health = original_new_health;
 
+			/* 
+			 * Save the subject ID before cloning, because just_clone_entity may cause 
+			 * pool reallocation which invalidates the subject handle's internal pointer.
+			 */
+			const auto subject_id = subject.get_id();
+
 			/* Clone the entity to create the new chunk */
 			auto new_entity = just_clone_entity(allocate_new_entity_access(), subject);
 
-			if (new_entity.alive()) {
+			/* 
+			 * Re-fetch the subject handle after cloning since the pool may have reallocated.
+			 * This is critical - using the old 'subject' handle could crash!
+			 */
+			const auto subject_after_clone = cosm[subject_id];
+
+			if (new_entity.alive() && subject_after_clone.alive()) {
 				auto& new_dest = new_entity.get<components::destructible>();
 				new_dest.texture_rect = new_rect;
 				new_dest.max_health = new_piece_max_health;
@@ -357,13 +369,13 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				const auto original_new_pos = entity_pos + original_center_shift;
 				const auto new_entity_pos = entity_pos + new_center_shift;
 
-				subject.get<components::rigid_body>().set_transform(transformr(original_new_pos, transform.rotation));
+				subject_after_clone.get<components::rigid_body>().set_transform(transformr(original_new_pos, transform.rotation));
 				new_entity.get<components::rigid_body>().set_transform(transformr(new_entity_pos, transform.rotation));
 
 				/* Reinfer physics for both entities */
-				subject.infer_rigid_body();
+				subject_after_clone.infer_rigid_body();
 				new_entity.infer_rigid_body();
-				subject.infer_colliders_from_scratch();
+				subject_after_clone.infer_colliders_from_scratch();
 				new_entity.infer_colliders_from_scratch();
 
 				/* Apply separating impulse proportional to damage */
@@ -375,7 +387,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
 
 				/* Original piece gets pushed in the opposite direction of impact */
-				if (auto rigid = subject.find<components::rigid_body>()) {
+				if (auto rigid = subject_after_clone.find<components::rigid_body>()) {
 					rigid.apply_impulse(-impact_dir * impulse_magnitude * (1.0f - split_ratio));
 				}
 
@@ -405,7 +417,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 					}
 				};
 
-				queue_pending_if_negative(subject.get_id(), original_new_health, original_new_max_health);
+				queue_pending_if_negative(subject_id, original_new_health, original_new_max_health);
 				queue_pending_if_negative(new_entity.get_id(), new_piece_health, new_piece_max_health);
 			}
 		}
