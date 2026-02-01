@@ -174,9 +174,9 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 		if (surface_sentient) {
 			const auto missile_entity_id = typed_missile.get_id();
-			const bool should_ignore_bullet = sentience->ignore_bullet == entity_id(missile_entity_id);
+			const bool is_duplicate_bullet_hit = sentience->ignore_bullet == entity_id(missile_entity_id);
 
-			if (should_ignore_bullet) {
+			if (is_duplicate_bullet_hit) {
 				/*
 					This bullet already damaged this sentience entity once.
 					Ignore to prevent double damage from the same bullet.
