@@ -9,9 +9,9 @@
 #include "game/components/sprite_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
-static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
+inline constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 /* Baseline distance for blood burst velocity scaling */
-static constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
+inline constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
 
 /*
 	Spawns a single blood splatter at an exact position with specified size.

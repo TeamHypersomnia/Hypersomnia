@@ -7,20 +7,20 @@
 /*
 	Parameters for blood dripping behavior on low-HP characters and corpses.
 */
-static constexpr real32 IDLE_SPLATTER_HP_THRESHOLD = 0.3f;
+inline constexpr real32 IDLE_SPLATTER_HP_THRESHOLD = 0.3f;
 
 /* Drip interval in milliseconds */
-static constexpr real32 IDLE_SPLATTER_CORPSE_INTERVAL_MS = 500.f;
-static constexpr real32 IDLE_SPLATTER_MIN_INTERVAL_MS = 1000.f;
-static constexpr real32 IDLE_SPLATTER_MAX_INTERVAL_MS = 3000.f;
+inline constexpr real32 IDLE_SPLATTER_CORPSE_INTERVAL_MS = 500.f;
+inline constexpr real32 IDLE_SPLATTER_MIN_INTERVAL_MS = 1000.f;
+inline constexpr real32 IDLE_SPLATTER_MAX_INTERVAL_MS = 3000.f;
 
 /* Splatter size at different HP ratios */
-static constexpr real32 IDLE_SPLATTER_MIN_SIZE = 0.5f;
-static constexpr real32 IDLE_SPLATTER_MAX_SIZE = 1.0f;
+inline constexpr real32 IDLE_SPLATTER_MIN_SIZE = 0.5f;
+inline constexpr real32 IDLE_SPLATTER_MAX_SIZE = 1.0f;
 
 /* Position randomization */
-static constexpr real32 IDLE_SPLATTER_MIN_OFFSET = 10.f;
-static constexpr real32 IDLE_SPLATTER_MAX_OFFSET = 20.f;
+inline constexpr real32 IDLE_SPLATTER_MIN_OFFSET = 10.f;
+inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET = 20.f;
 
 /*
 	Handles periodic blood dripping for low-HP characters and corpses.
