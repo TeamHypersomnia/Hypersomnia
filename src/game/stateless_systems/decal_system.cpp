@@ -73,15 +73,8 @@ void decal_system::limit_decal_count(const logic_step step) const {
 				/* Update sprite colorize and colorize_neon */
 				if (auto* sprite = subject.template find<components::sprite>()) {
 					/* Get the original blood color (192, 0, 0, 255) and apply darkening */
-					sprite->colorize.r = static_cast<rgba_channel>(192 * colorize_mult);
-					sprite->colorize.g = 0;
-					sprite->colorize.b = 0;
-					sprite->colorize.a = 255;
-					
-					sprite->colorize_neon.r = static_cast<rgba_channel>(192 * colorize_mult);
-					sprite->colorize_neon.g = 0;
-					sprite->colorize_neon.b = 0;
-					sprite->colorize_neon.a = static_cast<rgba_channel>(255 * neon_alpha_mult);
+					sprite->colorize = rgba(white).multiply_rgb(colorize_mult);
+					sprite->colorize_neon = rgba(white).mult_alpha(neon_alpha_mult);
 				}
 			}
 
