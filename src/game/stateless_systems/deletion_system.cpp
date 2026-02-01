@@ -24,7 +24,7 @@ void deletion_system::reverse_perform_deletions(const logic_step step) {
 	::reverse_perform_deletions(deletions, step.get_cosmos());
 }
 
-void allocation_system::flush_pending_allocations(const logic_step step) {
+void creation_system::flush_create_entity_requests(const logic_step step) {
 	auto access = allocate_new_entity_access();
 
 	auto& cosm = step.get_cosmos();

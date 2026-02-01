@@ -8,7 +8,7 @@
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/destruction_system.h"
 
-struct allocation_system;
+struct creation_system;
 class gun_system;
 class sentience_system;
 class movement_system;
@@ -45,7 +45,7 @@ class allocate_new_entity_access {
 		in a safe, handle-free environment.
 	*/
 
-	friend allocation_system;
+	friend creation_system;
 
 	/*
 		perform_transfer might need to clone a stackable item.

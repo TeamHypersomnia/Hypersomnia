@@ -6,6 +6,6 @@ struct deletion_system {
 	void reverse_perform_deletions(const logic_step);
 };
 
-struct allocation_system {
-	void flush_pending_allocations(const logic_step);
+struct creation_system {
+	void flush_create_entity_requests(const logic_step);
 };
