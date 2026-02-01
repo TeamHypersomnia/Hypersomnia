@@ -166,10 +166,20 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				continue;
 			}
 
-			/* Get sprite size for area calculation */
-			const auto sprite_size = subject.get_logical_size();
-			const auto actual_width = sprite_size.x * texture_rect.w;
-			const auto actual_height = sprite_size.y * texture_rect.h;
+			/* 
+			 * Get the base sprite size (BEFORE texture_rect scaling).
+			 * get_logical_size() returns the size WITH texture_rect applied,
+			 * so we need to reverse that to get the original base size.
+			 */
+			const auto scaled_size = subject.get_logical_size();
+			const auto base_sprite_size = vec2(
+				texture_rect.w > 0.0f ? scaled_size.x / texture_rect.w : scaled_size.x,
+				texture_rect.h > 0.0f ? scaled_size.y / texture_rect.h : scaled_size.y
+			);
+
+			/* Now calculate actual chunk dimensions */
+			const auto actual_width = base_sprite_size.x * texture_rect.w;
+			const auto actual_height = base_sprite_size.y * texture_rect.h;
 
 			/* 
 			 * Splitting logic:
@@ -322,15 +332,15 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				vec2 new_center_shift;
 
 				if (is_horizontal_split) {
-					const real32 original_center_x = (original_rect.x + original_rect.w / 2.0f - 0.5f) * sprite_size.x;
-					const real32 new_center_x = (new_rect.x + new_rect.w / 2.0f - 0.5f) * sprite_size.x;
+					const real32 original_center_x = (original_rect.x + original_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
+					const real32 new_center_x = (new_rect.x + new_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
 
 					original_center_shift = vec2(original_center_x, 0);
 					new_center_shift = vec2(new_center_x, 0);
 				}
 				else {
-					const real32 original_center_y = (original_rect.y + original_rect.h / 2.0f - 0.5f) * sprite_size.y;
-					const real32 new_center_y = (new_rect.y + new_rect.h / 2.0f - 0.5f) * sprite_size.y;
+					const real32 original_center_y = (original_rect.y + original_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
+					const real32 new_center_y = (new_rect.y + new_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
 
 					original_center_shift = vec2(0, original_center_y);
 					new_center_shift = vec2(0, new_center_y);
