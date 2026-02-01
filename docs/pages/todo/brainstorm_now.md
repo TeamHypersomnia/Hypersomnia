@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- mozna jeszcze opoznic wybuch krwi do wybuchow tych staminowych posmiertnych
+- czemu nie dzialaja cast blinki
+
 - super simple destruction system
 	- just divide the into four rectangles or even two along the axis of impact
 		- hp of smaller parts is area percentage of the bigger part
