@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+#include <cmath>
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/sprite.hpp"
@@ -95,8 +97,12 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				const auto& destructible = typed_handle.template get<components::destructible>();
 				if (destructible.is_enabled()) {
 					const auto& tex_rect = destructible.texture_rect;
-					result.size.x = static_cast<int>(result.size.x * tex_rect.w);
-					result.size.y = static_cast<int>(result.size.y * tex_rect.h);
+					/* Use float arithmetic and round to avoid precision loss */
+					result.size.x = static_cast<int>(std::round(static_cast<float>(result.size.x) * tex_rect.w));
+					result.size.y = static_cast<int>(std::round(static_cast<float>(result.size.y) * tex_rect.h));
+					/* Ensure minimum size of 1 to prevent zero-size sprites */
+					result.size.x = std::max(1, result.size.x);
+					result.size.y = std::max(1, result.size.y);
 				}
 			}
 

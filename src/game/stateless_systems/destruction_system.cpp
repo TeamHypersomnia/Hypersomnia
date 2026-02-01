@@ -285,8 +285,20 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				new_entity.infer_colliders_from_scratch();
 
 				/* Apply separating impulse proportional to damage */
-				const auto impact_dir = d.impact_velocity.is_nonzero() ? d.impact_velocity.normalize() : vec2(1, 0);
-				const auto impulse_magnitude = damage_amount * 0.5f; /* Scale factor for impulse */
+				/* 
+				 * Use split orientation as fallback direction when impact velocity is zero.
+				 * This ensures chunks separate in a physically sensible direction.
+				 */
+				const auto split_direction = is_horizontal_split ? vec2(1, 0) : vec2(0, 1);
+				const auto fallback_dir = split_direction.rotate(transform.rotation);
+				const auto impact_dir = d.impact_velocity.is_nonzero() ? d.impact_velocity.normalize() : fallback_dir;
+				
+				/* 
+				 * Impulse scale factor: converts damage to impulse units.
+				 * Tuned to provide visible but not excessive separation.
+				 */
+				constexpr real32 damage_to_impulse_scale = 0.5f;
+				const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
 
 				/* Original piece gets pushed in the opposite direction of impact */
 				if (auto rigid = subject.find<components::rigid_body>()) {
