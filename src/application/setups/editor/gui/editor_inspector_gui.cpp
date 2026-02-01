@@ -1835,6 +1835,15 @@ EDIT_FUNCTION(
 				if (ImGui::IsItemHovered()) {
 					text_tooltip("Maximum health of this object.\nWhen health reaches zero, the object splits into chunks.\nLarger chunks inherit proportionally more health.");
 				}
+
+				/* Only show make_dynamic_below_area when the object is static */
+				if (insp.as_physical.is_static) {
+					MULTIPROPERTY("Make dynamic below area", as_physical.make_dynamic_below_area);
+
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("Fraction of original area below which split chunks become dynamic.\n0 = chunks never become dynamic (stay static until deleted).\n0.6 = chunks become dynamic when their area is 60% or less of the original.");
+					}
+				}
 			}
 		}
 	}

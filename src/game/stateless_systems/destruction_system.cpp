@@ -5,6 +5,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/just_create_entity.h"
+#include "game/cosmos/cosmos_global_solvable.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/damage_message.h"
@@ -16,6 +17,7 @@
 #include "game/components/rigid_body_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "augs/templates/container_templates.h"
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -38,7 +40,6 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 		const auto& data_indices = it.indices.subject;
 
 		if (data_indices.is_set() && fixtures.is_destructible()) {
-			//LOG("Destructible fixture was hit.");
 			messages::damage_message damage_msg;
 			damage_msg.indices = it.indices;
 
@@ -53,8 +54,48 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 	}
 }
 
+void destruction_system::generate_damages_for_pending_destructions(const logic_step step) const {
+	auto& cosm = step.get_cosmos();
+	auto& global = cosm.get_global_solvable();
+	const auto delta = step.get_delta();
+
+	erase_if(global.pending_destructions, [&](pending_destruction& pd) {
+		pd.delay_ms -= delta.in_milliseconds();
+
+		if (pd.delay_ms <= 0.0f) {
+			const auto target = cosm[pd.target];
+
+			if (target.dead()) {
+				return true;
+			}
+
+			const auto* destructible = target.find<components::destructible>();
+			if (!destructible || !destructible->is_enabled()) {
+				return true;
+			}
+
+			/* Only generate damage if health is still negative (hasn't been destroyed by another event) */
+			if (destructible->health < 0.0f) {
+				messages::damage_message damage_msg;
+				damage_msg.subject = pd.target;
+				damage_msg.damage.base = 1.0f; /* Formality - we detect negative health in apply_damages */
+				damage_msg.impact_velocity = pd.impact_velocity;
+				damage_msg.point_of_impact = target.get_logic_transform().pos; /* Center of entity */
+
+				step.post_message(damage_msg);
+			}
+
+			return true;
+		}
+
+		return false;
+	});
+}
+
 void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
+	auto& global = cosm.get_global_solvable();
+	auto& rng = step.step_rng;
 	const auto& damages = step.get_queue<messages::damage_message>();
 
 	for (const auto& d : damages) {
@@ -84,14 +125,21 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		auto& dest = subject.get<components::destructible>();
 		
 		const auto damage_amount = d.damage.base;
+		const auto health_before_damage = dest.health;
 		
 		/* Apply damage to health */
 		dest.health -= damage_amount;
 
-		/* Calculate highlight intensity based on damage ratio */
-		const auto damage_ratio = std::min(1.0f, damage_amount / dest.max_health);
-		/* Linearly interpolate from 10% (at 0% damage) to 100% (at 50%+ damage) */
-		const auto highlight_alpha = static_cast<rgba_channel>(255 * std::min(1.0f, 0.1f + damage_ratio * 1.8f));
+		/* 
+		 * Calculate highlight intensity based on damage / remaining health ratio.
+		 * 100% highlight when health is negative (pending destruction).
+		 */
+		real32 highlight_ratio = 1.0f;
+		if (health_before_damage > 0.0f) {
+			highlight_ratio = std::min(1.0f, damage_amount / health_before_damage);
+		}
+		/* Linearly interpolate from 10% (at 0% ratio) to 100% (at 50%+ ratio) */
+		const auto highlight_alpha = static_cast<rgba_channel>(255 * std::min(1.0f, 0.1f + highlight_ratio * 1.8f));
 		
 		/* Post a health event for visual feedback (white highlight) */
 		messages::health_event h;
@@ -130,11 +178,12 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 			/* 
 			 * Splitting logic:
-			 * 1. Find closest edge to point of impact
-			 * 2. Create a split line 
-			 * 3. Create smaller chunk as new entity
-			 * 4. Adjust original entity
-			 * 5. Reinfer physics
+			 * 1. Always split along the LONGER edges
+			 * 2. Find closest point on either of the two longer edges
+			 * 3. Create a split line 
+			 * 4. Create smaller chunk as new entity
+			 * 5. Adjust original entity
+			 * 6. Reinfer physics
 			 */
 
 			const auto transform = subject.get_logic_transform();
@@ -147,37 +196,35 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const auto half_w = actual_width / 2.0f;
 			const auto half_h = actual_height / 2.0f;
 
-			/* Find which edge is closest to the impact point */
-			const real32 dist_left = local_impact.x + half_w;
-			const real32 dist_right = half_w - local_impact.x;
-			const real32 dist_top = local_impact.y + half_h;
-			const real32 dist_bottom = half_h - local_impact.y;
-
-			enum class edge_type { LEFT, RIGHT, TOP, BOTTOM };
-			edge_type closest_edge = edge_type::LEFT;
-			real32 min_dist = dist_left;
-
-			if (dist_right < min_dist) { min_dist = dist_right; closest_edge = edge_type::RIGHT; }
-			if (dist_top < min_dist) { min_dist = dist_top; closest_edge = edge_type::TOP; }
-			if (dist_bottom < min_dist) { min_dist = dist_bottom; closest_edge = edge_type::BOTTOM; }
-
-			/* Calculate split position along the edge (0-1 in texture space) */
-			real32 split_ratio = 0.5f;
-			bool is_horizontal_split = (closest_edge == edge_type::TOP || closest_edge == edge_type::BOTTOM);
-
+			/* 
+			 * Determine which edges are longer.
+			 * If width >= height, the left/right edges are the longer ones (split horizontally along them).
+			 * If height > width, the top/bottom edges are the longer ones (split vertically along them).
+			 */
+			const bool width_is_longer = actual_width >= actual_height;
+			
+			/* 
+			 * Always split along the longer dimension.
+			 * If width_is_longer: split creates left-right pieces (horizontal split)
+			 * If height is longer: split creates top-bottom pieces (vertical split)
+			 */
+			const bool is_horizontal_split = width_is_longer;
+			
+			/* Calculate split position along the longer edge (0-1 in texture space) */
+			real32 split_ratio;
 			if (is_horizontal_split) {
-				/* Split vertically (left-right) */
+				/* Split vertically (left-right pieces) - project impact onto the width */
 				split_ratio = (local_impact.x + half_w) / actual_width;
 			} else {
-				/* Split horizontally (top-bottom) */
+				/* Split horizontally (top-bottom pieces) - project impact onto the height */
 				split_ratio = (local_impact.y + half_h) / actual_height;
 			}
 
-			/* Limit split position: 5px from corners minimum, but if edge < 10px, split in half */
+			/* Limit split position: 10px from corners minimum, but if edge < 20px, split in half */
 			const real32 edge_length = is_horizontal_split ? actual_width : actual_height;
-			const real32 min_offset_px = 5.0f;
+			const real32 min_offset_px = 10.0f;
 
-			if (edge_length <= 10.0f) {
+			if (edge_length <= 20.0f) {
 				split_ratio = 0.5f;
 			} else {
 				const real32 min_ratio = min_offset_px / edge_length;
@@ -191,6 +238,9 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 			/* Calculate the original max_health based on root max_health */
 			const real32 root_max_health = dest.max_health / texture_area;
+			
+			/* Calculate excessive damage to distribute to both splits */
+			const real32 excess_damage = -dest.health; /* health is negative, so -health gives excess */
 
 			if (is_horizontal_split) {
 				/* Left piece = original, Right piece = new */
@@ -236,10 +286,18 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const real32 original_new_max_health = root_max_health * original_new_area;
 			const real32 new_piece_max_health = root_max_health * new_piece_area;
 
+			/* 
+			 * Apply excess damage to both splits.
+			 * Set health = max_health - excess_damage for each split.
+			 * Negative health means the split will be destroyed in a future tick.
+			 */
+			const real32 original_new_health = original_new_max_health - excess_damage;
+			const real32 new_piece_health = new_piece_max_health - excess_damage;
+
 			/* Update original entity */
 			dest.texture_rect = original_rect;
 			dest.max_health = original_new_max_health;
-			dest.health = original_new_max_health; /* Reset health since it just split */
+			dest.health = original_new_health;
 
 			/* Clone the entity to create the new chunk */
 			auto new_entity = just_clone_entity(allocate_new_entity_access(), subject);
@@ -248,7 +306,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				auto& new_dest = new_entity.get<components::destructible>();
 				new_dest.texture_rect = new_rect;
 				new_dest.max_health = new_piece_max_health;
-				new_dest.health = new_piece_max_health;
+				new_dest.health = new_piece_health;
 
 				/* Calculate new positions for both entities */
 				/* The center of each piece shifts based on how it was split */
@@ -285,18 +343,10 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				new_entity.infer_colliders_from_scratch();
 
 				/* Apply separating impulse proportional to damage */
-				/* 
-				 * Use split orientation as fallback direction when impact velocity is zero.
-				 * This ensures chunks separate in a physically sensible direction.
-				 */
 				const auto split_direction = is_horizontal_split ? vec2(1, 0) : vec2(0, 1);
 				const auto fallback_dir = split_direction.rotate(transform.rotation);
 				const auto impact_dir = d.impact_velocity.is_nonzero() ? d.impact_velocity.normalize() : fallback_dir;
 				
-				/* 
-				 * Impulse scale factor: converts damage to impulse units.
-				 * Tuned to provide visible but not excessive separation.
-				 */
 				constexpr real32 damage_to_impulse_scale = 0.5f;
 				const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
 
@@ -309,6 +359,29 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				if (auto rigid = new_entity.find<components::rigid_body>()) {
 					rigid.apply_impulse(impact_dir * impulse_magnitude * split_ratio);
 				}
+
+				/* 
+				 * Queue pending destructions for any split with negative health.
+				 * Delay = 200ms / (excess_damage / max_health) * randval(0.5, 1.0)
+				 */
+				auto queue_pending_if_negative = [&](const entity_id eid, const real32 health, const real32 max_hp) {
+					if (health < 0.0f) {
+						const real32 local_excess = -health;
+						const real32 ratio = std::max(0.01f, local_excess / max_hp); /* Avoid division by zero */
+						real32 delay = 200.0f / ratio;
+						delay *= rng.randval(0.5f, 1.0f);
+
+						pending_destruction pd;
+						pd.target = eid;
+						pd.delay_ms = delay;
+						pd.impact_velocity = d.impact_velocity;
+
+						global.pending_destructions.push_back(pd);
+					}
+				};
+
+				queue_pending_if_negative(subject.get_id(), original_new_health, original_new_max_health);
+				queue_pending_if_negative(new_entity.get_id(), new_piece_health, new_piece_max_health);
 			}
 		}
 	}

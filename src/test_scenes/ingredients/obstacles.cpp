@@ -113,6 +113,7 @@ namespace test_flavours {
 			auto& crate_destructible = crate_meta.template get<components::destructible>();
 			crate_destructible.max_health = 150.0f;
 			crate_destructible.health = 150.0f;
+			/* Crate is already dynamic, so make_dynamic_below_area doesn't matter */
 		}
 
 		{
@@ -128,6 +129,7 @@ namespace test_flavours {
 			auto& wall_destructible = wall_meta.template get<components::destructible>();
 			wall_destructible.max_health = 500.0f;
 			wall_destructible.health = 500.0f;
+			wall_destructible.make_dynamic_below_area = 0.6f; /* Become dynamic when area <= 60% */
 		}
 
 		{

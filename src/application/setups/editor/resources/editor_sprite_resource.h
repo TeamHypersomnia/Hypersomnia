@@ -77,6 +77,7 @@ struct editor_sprite_resource_physical {
 	/* Destructibility - only works for box-based shapes (no custom_shape) */
 	bool is_destructible = false;
 	real32 max_health = 100.0f;
+	real32 make_dynamic_below_area = 0.6f; // Only relevant when is_static is true. Fraction of area below which splits become dynamic.
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sprite_resource_physical&) const = default;
