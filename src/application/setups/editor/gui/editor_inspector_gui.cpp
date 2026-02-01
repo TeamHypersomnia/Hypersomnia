@@ -1809,6 +1809,34 @@ EDIT_FUNCTION(
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, bullets and magic missiles will freely fly over this object.\nCharacters will still collide - except their weapons.\n\nNote that rockets are NOT considered bullets.\nFor these, you must tick Grenades fly over.");
 		}
+
+		/* 
+		 * Destructibility is only available for box-based shapes (no custom shape defined).
+		 */
+		{
+			const bool has_custom_shape = !insp.as_physical.custom_shape.empty();
+			auto disabled = maybe_disabled_only_cols(has_custom_shape);
+
+			MULTIPROPERTY("Destructible", as_physical.is_destructible);
+
+			if (ImGui::IsItemHovered()) {
+				if (has_custom_shape) {
+					text_tooltip("Destructibility is only available for box-based shapes.\nRemove the custom shape to enable this feature.");
+				}
+				else {
+					text_tooltip("If enabled, this object can be destroyed by damage.\nWhen health reaches zero, the object will split into chunks.");
+				}
+			}
+
+			if (insp.as_physical.is_destructible && !has_custom_shape) {
+				auto indent = scoped_indent();
+				MULTIPROPERTY("Health", as_physical.max_health);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Maximum health of this object.\nWhen health reaches zero, the object splits into chunks.\nLarger chunks inherit proportionally more health.");
+				}
+			}
+		}
 	}
 	else {
 		MULTIPROPERTY("Cover background neons", as_nonphysical.cover_background_neons);
@@ -1973,6 +2001,14 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		MULTIPROPERTY("Silence damager destruction sound", silence_damager_destruction_sound);
 		tooltip_on_hover("Tick to silence the default bullet destruction sound.");
 	}
+
+	ImGui::Separator();
+	text_color("Default destruction behavior", yellow);
+	ImGui::Separator();
+
+	text_disabled("Played when a destructible object is split.\nFalls back to damage effects if not set.");
+	SOUND_EFFECT_LEAN_MULTIPROPERTY("Destruction sound", destruction_sound);
+	PARTICLE_EFFECT_MULTIPROPERTY("Destruction particles", destruction_particles);
 
 	ImGui::Separator();
 	text_color("Default collision behavior", yellow);
