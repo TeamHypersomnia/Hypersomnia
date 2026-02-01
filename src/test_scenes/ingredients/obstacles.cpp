@@ -103,14 +103,18 @@ namespace test_flavours {
 		{
 			auto& crate_meta = dynamic_obstacle(
 				flavour_with_sprite(
-					test_plain_sprited_bodies::CRATE,
+					test_destructible_sprited_bodies::CRATE,
 					test_scene_image_id::CRATE,
 					test_obstacle_order::OPAQUE
 				),
 				test_scene_physical_material_id::WOOD
 			);
 			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
-			/* CRATE is no longer destructible - use test_destructible_sprited_bodies for that */
+
+			auto& destructible = crate_meta.template get<components::destructible>();
+			destructible.max_health = 100.0f;
+			destructible.health = 100.0f;
+			destructible.make_dynamic_below_area = 0.6f;
 		}
 
 		{
