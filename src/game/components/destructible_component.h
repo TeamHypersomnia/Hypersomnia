@@ -8,7 +8,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::destructible
 		real32 max_health = -1.0f;
 		real32 health = -1.0f;
-		xywh texture_rect = xywh(0, 0, 1.0f, 1.0f); // in 0-1 space. if 0,0,1.0f,1.0f, was never split yet. (0,0) is top-left in UV space.
+		xywh texture_rect = xywh(0, 0, 1.0f, 1.0f); // In 0-1 UV space. Defaults to (0, 0, 1.0, 1.0) when never split. Origin (0,0) is top-left.
 		// END GEN INTROSPECTOR
 
 		bool is_enabled() const {
