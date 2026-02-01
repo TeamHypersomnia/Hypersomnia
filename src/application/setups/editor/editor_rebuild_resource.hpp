@@ -157,7 +157,17 @@ void allocate_flavours_and_assets_for_resource(
 		};
 
 		if (domain == editor_sprite_domain::PHYSICAL) {
-			create_as(plain_sprited_body());
+			/* 
+			 * Use destructible_sprited_body for destructible entities, plain_sprited_body otherwise.
+			 * Destructibility only works with box-based shapes, so entities with custom_shape 
+			 * must use plain_sprited_body even if is_destructible is set.
+			 */
+			if (editable.as_physical.is_destructible && editable.as_physical.custom_shape.empty()) {
+				create_as(destructible_sprited_body());
+			}
+			else {
+				create_as(plain_sprited_body());
+			}
 		}
 		else {
 			if (n_frames > 1) {
