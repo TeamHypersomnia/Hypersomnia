@@ -220,11 +220,12 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				split_ratio = (local_impact.y + half_h) / actual_height;
 			}
 
-			/* Limit split position: 10px from corners minimum, but if edge < 20px, split in half */
+			/* Limit split position: min_offset_px from corners minimum, but if edge < 2*min_offset_px, split in half */
 			const real32 edge_length = is_horizontal_split ? actual_width : actual_height;
 			const real32 min_offset_px = 10.0f;
+			const real32 min_edge_for_offset = 2.0f * min_offset_px;
 
-			if (edge_length <= 20.0f) {
+			if (edge_length <= min_edge_for_offset) {
 				split_ratio = 0.5f;
 			} else {
 				const real32 min_ratio = min_offset_px / edge_length;
@@ -367,7 +368,8 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				auto queue_pending_if_negative = [&](const entity_id eid, const real32 health, const real32 max_hp) {
 					if (health < 0.0f) {
 						const real32 local_excess = -health;
-						const real32 ratio = std::max(0.01f, local_excess / max_hp); /* Avoid division by zero */
+						/* Clamp ratio to prevent excessively large delays from very small damage ratios */
+						const real32 ratio = std::max(0.01f, local_excess / max_hp);
 						real32 delay = 200.0f / ratio;
 						delay *= rng.randval(0.5f, 1.0f);
 
