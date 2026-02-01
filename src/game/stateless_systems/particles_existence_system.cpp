@@ -265,10 +265,14 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
-			const auto& sentience = subject.get<invariants::sentience>();
+			const auto sentience = subject.find<invariants::sentience>();
+
+			if (sentience == nullptr) {
+				continue;
+			}
 
 			if (h.damage.total() > 0) {
-				auto effect = sentience.health_decrease_particles;
+				auto effect = sentience->health_decrease_particles;
 
 				effect.modifier.scale_amounts *= std::min(1.f, h.damage.total() / 100.f);// (1.25f + h.damage.ratio_effective_to_maximum)*(1.25f + h.damage.ratio_effective_to_maximum);
 				//effect.modifier.scale_lifetimes *= std::min(1.f, h.damage.total() / 100.f);

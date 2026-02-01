@@ -18,6 +18,7 @@
 
 #include "game/detail/physics/physics_scripts.h"
 #include "augs/templates/container_templates.h"
+#include "augs/misc/randomization.h"
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -138,8 +139,10 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		if (health_before_damage > 0.0f) {
 			highlight_ratio = std::min(1.0f, damage_amount / health_before_damage);
 		}
+
 		/* Linearly interpolate from 10% (at 0% ratio) to 100% (at 50%+ ratio) */
 		const auto highlight_alpha = static_cast<rgba_channel>(255 * std::min(1.0f, 0.1f + highlight_ratio * 1.8f));
+		(void)highlight_alpha;
 		
 		/* Post a health event for visual feedback (white highlight) */
 		messages::health_event h;
@@ -340,13 +343,15 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				new_entity.get<components::rigid_body>().set_transform(transformr(new_entity_pos, transform.rotation));
 
 				/* Reinfer physics for both entities */
+				subject.infer_rigid_body();
+				new_entity.infer_rigid_body();
 				subject.infer_colliders_from_scratch();
 				new_entity.infer_colliders_from_scratch();
 
 				/* Apply separating impulse proportional to damage */
 				const auto split_direction = is_horizontal_split ? vec2(1, 0) : vec2(0, 1);
-				const auto fallback_dir = split_direction.rotate(transform.rotation);
-				const auto impact_dir = d.impact_velocity.is_nonzero() ? d.impact_velocity.normalize() : fallback_dir;
+				const auto fallback_dir = vec2(split_direction).rotate(transform.rotation);
+				const auto impact_dir = d.impact_velocity.is_nonzero() ? vec2(d.impact_velocity).normalize() : fallback_dir;
 				
 				constexpr real32 damage_to_impulse_scale = 0.5f;
 				const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
@@ -375,7 +380,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 						pending_destruction pd;
 						pd.target = eid;
-						pd.delay_ms = delay;
+						pd.delay_ms = 0.f;
 						pd.impact_velocity = d.impact_velocity;
 
 						global.pending_destructions.push_back(pd);

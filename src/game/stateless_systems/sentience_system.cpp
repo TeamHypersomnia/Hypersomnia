@@ -300,6 +300,15 @@ static void handle_special_result(const logic_step step, const messages::health_
 	const auto impact_dir = vec2(h.impact_velocity).normalize();
 
 	const auto subject = cosm[h.subject];
+
+	if (subject.dead()) {
+		return;
+
+	}
+	if (!subject.has<components::sentience>()) {
+		return;
+	}
+
 	auto& sentience = subject.get<components::sentience>();
 
 	auto& health = sentience.get<health_meter_instance>();
