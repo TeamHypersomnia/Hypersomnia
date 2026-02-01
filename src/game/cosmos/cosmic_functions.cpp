@@ -2,6 +2,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/logic_step.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/templates/introspect.h"

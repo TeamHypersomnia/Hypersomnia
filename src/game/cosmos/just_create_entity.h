@@ -2,9 +2,9 @@
 #include <functional>
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "game/cosmos/step_declaration.h"
 
 class cosmos;
-struct logic_step;
 
 /* So that we don't have to include the entire cosmic_functions for this simplest task */
 entity_handle just_create_entity(

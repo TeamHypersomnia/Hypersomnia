@@ -138,21 +138,8 @@ auto calc_filters(const E& handle) {
 	 */
 	if (const auto* destructible = handle.template find<components::destructible>()) {
 		if (destructible->is_enabled()) {
-			const auto& texture_rect = destructible->texture_rect;
-			const auto texture_area = texture_rect.w * texture_rect.h;
-			
-			if (texture_area > 0.0f) {
-				/* 
-				 * get_logical_size() already returns the size WITH texture_rect applied,
-				 * so we just multiply width * height directly.
-				 */
-				const auto sprite_size = handle.get_logical_size();
-				const auto actual_area = sprite_size.x * sprite_size.y;
-				
-				/* If area is less than 100 pixels, treat as LYING_ITEM */
-				if (actual_area < 100.0f) {
-					return filters[predefined_filter_type::LYING_ITEM];
-				}
+			if (handle.get_logical_size().area() < destructible->disable_below_area) {
+				return filters[predefined_filter_type::LYING_ITEM];
 			}
 		}
 	}

@@ -10,6 +10,7 @@
 
 #include "game/organization/for_each_entity_type.h"
 #include "game/cosmos/create_entity.hpp"
+#include "game/messages/clone_entity_message.h"
 
 void deletion_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
 	auto& cosm = step.get_cosmos();

@@ -124,6 +124,10 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		if (!destructible->is_enabled()) {
 			continue;
 		}
+		
+		if (subject.get_logical_size().area() < destructible->disable_below_area) {
+			continue;
+		}
 
 		/* Get mutable reference for modifications */
 		auto& dest = subject.get<components::destructible>();
@@ -389,7 +393,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 				pending_destruction pd;
 				pd.target = subject_id;
-				pd.delay_ms = delay;
+				pd.delay_ms = 0.0f;
 				pd.impact_velocity = d.impact_velocity;
 
 				global.pending_destructions.push_back(pd);
@@ -445,7 +449,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 						pending_destruction pd;
 						pd.target = new_entity.get_id();
-						pd.delay_ms = delay;
+						pd.delay_ms = 0.0f;
 						pd.impact_velocity = impact_velocity_copy;
 
 						global_inner.pending_destructions.push_back(pd);

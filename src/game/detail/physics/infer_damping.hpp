@@ -92,6 +92,15 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		damping.linear *= fuse.damping_mult;
 	});
 
+	handle.template dispatch_on_having_all<components::destructible>([&damping](const auto& typed_handle) {
+		const auto& destructible = typed_handle.template get<components::destructible>();
+
+		if (const auto area = destructible.texture_rect.area(); area > 0.0f) {
+			//damping.linear /= repro::sqrt(area);
+			damping.angular /= repro::sqrt(area);
+		}
+	});
+
 	return damping.sanitize();
 }
 
