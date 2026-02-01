@@ -9,6 +9,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/components/decal_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/sprite_component.h"
 
 /* Soft limit: when exceeded, oldest decals are marked for deletion */
 static constexpr std::size_t SOFT_LIMIT_DECALS = 300;
@@ -20,6 +21,13 @@ static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 50;
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
 /* Number of shrink steps (10 steps for 10% each) */
 static constexpr int NUM_SHRINK_STEPS = 10;
+
+/* Freshness darkening: 20 steps, 2 second intervals */
+static constexpr int FRESHNESS_NUM_STEPS = 20;
+static constexpr real32 FRESHNESS_STEP_MS = 2000.f;
+/* Colorize multiplier: 1.0 -> 0.3 (70% reduction over 20 steps) */
+static constexpr real32 FRESHNESS_MIN_COLORIZE = 0.3f;
+/* Neon alpha: 1.0 -> 0 over 20 steps */
 
 void decal_system::limit_decal_count(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -51,6 +59,31 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			auto& state = subject.template get<components::decal>();
 			const auto& def = subject.template get<invariants::decal>();
 			const auto when_born = subject.when_born();
+
+			/* Freshness-based darkening for blood decals */
+			if (def.is_blood_decal && state.freshness.was_set()) {
+				const auto freshness_elapsed_ms = clk.get_passed_ms(state.freshness);
+				const auto freshness_step = std::min(static_cast<int>(freshness_elapsed_ms / FRESHNESS_STEP_MS), FRESHNESS_NUM_STEPS);
+				
+				/* Calculate multiplier: 1.0 -> 0.3 over 20 steps for colorize, 1.0 -> 0 for neon alpha */
+				const real32 progress = static_cast<real32>(freshness_step) / static_cast<real32>(FRESHNESS_NUM_STEPS);
+				const real32 colorize_mult = 1.0f - progress * (1.0f - FRESHNESS_MIN_COLORIZE);
+				const real32 neon_alpha_mult = 1.0f - progress;
+				
+				/* Update sprite colorize and colorize_neon */
+				if (auto* sprite = subject.template find<components::sprite>()) {
+					/* Get the original blood color (192, 0, 0, 255) and apply darkening */
+					sprite->colorize.r = static_cast<rgba_channel>(192 * colorize_mult);
+					sprite->colorize.g = 0;
+					sprite->colorize.b = 0;
+					sprite->colorize.a = 255;
+					
+					sprite->colorize_neon.r = static_cast<rgba_channel>(192 * colorize_mult);
+					sprite->colorize_neon.g = 0;
+					sprite->colorize_neon.b = 0;
+					sprite->colorize_neon.a = static_cast<rgba_channel>(255 * neon_alpha_mult);
+				}
+			}
 
 			if (state.marked_for_deletion) {
 				/* Calculate elapsed time since marked for deletion */

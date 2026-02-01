@@ -579,6 +579,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					/* Count how many blood splatters are being stepped on */
 					int blood_splatters_stepped = 0;
+					/* Track the most fresh blood splatter stepped on */
+					augs::stepped_timestamp most_fresh_timestamp;
+					most_fresh_timestamp.step = 0;
 
 					/* Query visible decals in the ground layer */
 					const auto foot_query_pos = effect_transform.pos;
@@ -600,6 +603,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 								const auto decal_pos = typed_decal.get_logic_transform().pos;
 								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
 									++blood_splatters_stepped;
+									
+									/* Track most fresh (highest step = most recent) */
+									const auto& decal_state = typed_decal.template get<components::decal>();
+									if (decal_state.freshness.was_set() && decal_state.freshness.step > most_fresh_timestamp.step) {
+										most_fresh_timestamp = decal_state.freshness;
+									}
 								}
 							}
 						});
@@ -613,6 +622,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							static_cast<int>(movement.blood_step_counter) + steps_to_add
 						);
 						movement.blood_step_counter = static_cast<uint8_t>(new_counter);
+						
+						/* Update blood_step_freshness to the most fresh splatter we stepped on */
+						if (most_fresh_timestamp.was_set()) {
+							if (!movement.blood_step_freshness.was_set() || most_fresh_timestamp.step > movement.blood_step_freshness.step) {
+								movement.blood_step_freshness = most_fresh_timestamp;
+							}
+						}
 					}
 
 					/* Spawn blood footstep if counter is active */
@@ -671,9 +687,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 								if (left_foot) {
 									footstep_entity.flip_vertically();
 								}
-								/* Track who spawned this footstep */
+								/* Track who spawned this footstep and propagate freshness */
 								if (auto* decal_state = agg.template find<components::decal>()) {
 									decal_state->spawned_by = stepper_id;
+									/* Inherit freshness from the blood splatter we stepped on */
+									if (movement.blood_step_freshness.was_set()) {
+										decal_state->freshness = movement.blood_step_freshness;
+									}
 								}
 							});
 						}
