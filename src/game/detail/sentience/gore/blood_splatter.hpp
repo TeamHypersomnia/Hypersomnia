@@ -112,14 +112,16 @@ inline void spawn_blood_splatters(
 			
 			/* Scale velocities based on distance to splatter */
 			const auto distance_scale = distance / BLOOD_BURST_BASELINE_DISTANCE;
-			burst_effect.modifier.scale_velocities = distance_scale;
+			burst_effect.modifier.scale_velocities = distance_scale / 2.0f;
+			burst_effect.modifier.scale_amounts = std::min(15.0f, damage_amount / 5.f);
+			burst_effect.modifier.scale_lifetimes = std::min(3.0f, damage_amount / 20.f);
 			
 			/* Direction from impact point towards the splatter position */
 			const auto burst_degrees = offset_direction.degrees();
 			
 			burst_effect.start(
 				step,
-				particle_effect_start_input::fire_and_forget(transformr(position, burst_degrees)),
+				particle_effect_start_input::orbit_absolute(cosm[subject], transformr(position, burst_degrees)),
 				always_predictable_v
 			);
 		}
@@ -154,7 +156,7 @@ inline void spawn_blood_splatters_omnidirectional(
 	const auto direction = vec2::from_degrees(0.f); /* Starting direction doesn't matter with 360° spread */
 	
 	blood_splatter_params omni_params;
-	omni_params.damage_per_splatter = 20.f;
+	omni_params.damage_per_splatter = 15.f;
 	omni_params.angle_spread = 360.f;
 	omni_params.min_distance = damage_amount/4;
 	omni_params.max_distance_base = damage_amount/3;

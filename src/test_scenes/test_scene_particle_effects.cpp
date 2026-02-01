@@ -5495,15 +5495,15 @@ void load_test_scene_particle_effects(
 			/* Very narrow spread for piss-like stream effect */
 			em.spread_degrees = float_range(3, 8);
 			/* Short stream duration with fast swing */
-			em.stream_lifetime_ms = float_range(30, 50);
+			em.stream_lifetime_ms = float_range(200, 200);
 			em.particles_per_sec = float_range(800, 1200);
-			em.swing_spread = float_range(10, 15);
-			em.swings_per_sec = float_range(30, 50);
+			em.swing_spread = float_range(10, 10);
+			em.swings_per_sec = float_range(3, 3);
 			/* Initial burst for extra punch */
 			em.num_of_particles_to_spawn_initially.set(3, 5);
-			em.base_speed = float_range(400, 700);
+			em.base_speed = float_range(700, 800);
 			em.rotation_speed = float_range(0, 0);
-			em.particle_lifetime_ms = float_range(150, 350);
+			em.particle_lifetime_ms = float_range(100, 200);
 
 			const auto blood_color = white;
 
@@ -5512,7 +5512,7 @@ void load_test_scene_particle_effects(
 				general_particle particle_definition;
 
 				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 500;
+				particle_definition.linear_damping = 750;
 
 				set(
 					particle_definition,
@@ -5531,13 +5531,13 @@ void load_test_scene_particle_effects(
 				general_particle particle_definition;
 
 				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 500;
+				particle_definition.linear_damping = 750;
 				particle_definition.acc = { 0, 30 };
 
 				set(
 					particle_definition,
 					anim.frames[2].image_id,
-					blood_color
+					rgba(192, 0, 0, 255)
 				);
 
 				particle_definition.alpha_levels = 1;
@@ -5546,7 +5546,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = float_range(0.2, 0.5);
+			em.size_multiplier = float_range(0.5, 1.0);
 			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 180;
 			em.should_particles_look_towards_velocity = true;
