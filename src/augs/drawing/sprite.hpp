@@ -91,11 +91,19 @@ namespace augs {
 			target_color *= in.colorize;
 		}
 
+		/* 
+		 * For tiled sprites (where tile_size is set), use full 0-1 UV range.
+		 * For non-tiled sprites, use texture_rect for UV mapping (destructible sprites).
+		 */
+		const bool is_tiled = in.tile_size.x > 0 && in.tile_size.y > 0;
+		const auto effective_texture_rect = is_tiled ? xywh(0, 0, 1.0f, 1.0f) : in.texture_rect;
+
 		auto triangles = make_sprite_triangles(
 			considered_texture,
 			points,
 			target_color, 
-			in.flip 
+			in.flip,
+			effective_texture_rect
 		);
 
 		if (!in.disable_special_effects && spr.effect == sprite_special_effect::COLOR_WAVE) {

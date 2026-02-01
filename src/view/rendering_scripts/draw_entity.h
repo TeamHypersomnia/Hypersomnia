@@ -127,6 +127,14 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				result.flip.vertically = !result.flip.vertically;
 			}
 
+			/* Pass texture_rect for destructible sprites */
+			if constexpr(H::template has<components::destructible>()) {
+				const auto& destructible = typed_handle.template get<components::destructible>();
+				if (destructible.is_enabled()) {
+					result.texture_rect = destructible.texture_rect;
+				}
+			}
+
 			{
 				const auto& v = sprite.neon_alpha_vibration;
 
