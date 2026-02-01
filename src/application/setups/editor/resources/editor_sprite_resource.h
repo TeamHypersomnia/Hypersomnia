@@ -73,6 +73,10 @@ struct editor_sprite_resource_physical {
 	bool illuminate_like_wall = true;
 
 	image_shape_type custom_shape;
+
+	/* Destructibility - only works for box-based shapes (no custom_shape) */
+	bool is_destructible = false;
+	real32 max_health = 100.0f;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sprite_resource_physical&) const = default;

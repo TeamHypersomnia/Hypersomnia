@@ -217,6 +217,10 @@ void setup_scene_object_from_resource(
 		scene.silence_damager_impact_sound = editable.silence_damager_impact_sound;
 		scene.silence_damager_destruction_sound = editable.silence_damager_destruction_sound;
 
+		/* Destruction effects - fall back to damage effects if not set */
+		scene.standard_destruction_sound = to_game_effect(editable.destruction_sound);
+		scene.standard_destruction_particles = to_game_effect(editable.destruction_particles);
+
 		auto to_game_collision_def = [&to_game_effect](const auto& from) {
 			collision_sound_def out;
 			out.effect = to_game_effect(from.sound);
