@@ -9,6 +9,7 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
+#include "game/components/destructible_component.h"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
@@ -44,11 +45,29 @@ template <class E>
 auto calc_body_type(const E& handle) {
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
-	const auto type = 
+	auto type = 
 		is_like_planted_or_defused_bomb(handle) 
 		? rigid_body_type::STATIC 
 		: physics_def.body_type
 	;
+
+	/* 
+	 * If a plain sprited body is static and has a destructible component,
+	 * check if any split becomes <= 60% of the original area. If so, make it dynamic.
+	 */
+	if (type == rigid_body_type::STATIC) {
+		if (const auto* destructible = handle.template find<components::destructible>()) {
+			if (destructible->is_enabled()) {
+				const auto& texture_rect = destructible->texture_rect;
+				const auto current_area = texture_rect.w * texture_rect.h;
+				
+				/* If area is <= 60% of original (which is 1.0 * 1.0 = 1.0), make it dynamic */
+				if (current_area <= 0.6f) {
+					type = rigid_body_type::DYNAMIC;
+				}
+			}
+		}
+	}
 
 	return to_b2Body_type(type);
 }
@@ -450,6 +469,18 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	};
 
 	auto from_box_shape = [&](vec2 size, const real32 additional_rotation) {
+		/* 
+		 * If the entity has a destructible component with a split texture_rect,
+		 * scale the size accordingly.
+		 */
+		if (const auto* destructible = handle.template find<components::destructible>()) {
+			if (destructible->is_enabled()) {
+				const auto& tex_rect = destructible->texture_rect;
+				size.x *= tex_rect.w;
+				size.y *= tex_rect.h;
+			}
+		}
+
 		size.x = std::max(1.f, size.x);
 		size.y = std::max(1.f, size.y);
 

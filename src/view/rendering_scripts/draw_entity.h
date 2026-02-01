@@ -13,6 +13,7 @@
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
+#include "game/components/destructible_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/render_component.h"
 #include "game/components/remnant_component.h"
@@ -82,6 +83,20 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 				if (s.is_enabled) {
 					result.size = s.value;
+				}
+			}
+
+			/* 
+			 * If the entity has a destructible component with non-default texture_rect,
+			 * scale the sprite size accordingly. The texture_rect represents the portion
+			 * of the original texture that is still visible after destruction.
+			 */
+			if constexpr(H::template has<components::destructible>()) {
+				const auto& destructible = typed_handle.template get<components::destructible>();
+				if (destructible.is_enabled()) {
+					const auto& tex_rect = destructible.texture_rect;
+					result.size.x = static_cast<int>(result.size.x * tex_rect.w);
+					result.size.y = static_cast<int>(result.size.y * tex_rect.h);
 				}
 			}
 
