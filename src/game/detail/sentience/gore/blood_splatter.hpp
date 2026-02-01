@@ -13,6 +13,100 @@ static constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 /* Baseline distance for blood burst velocity scaling */
 static constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
 
+/*
+	Spawns a single blood splatter at an exact position with specified size.
+	burst_origin: where the blood burst particles originate from (e.g., the point of impact).
+	splatter_position: exact position where the blood splatter decal will be placed.
+	size_mult: size multiplier for the splatter (1.0 = full size, 0.5 = half size).
+*/
+inline void spawn_blood_splatter(
+	allocate_new_entity_access access,
+	const logic_step step,
+	const entity_id subject,
+	const vec2 splatter_position,
+	const vec2 burst_origin,
+	const real32 size_mult
+) {
+	auto& cosm = step.get_cosmos();
+	const auto& common_assets = cosm.get_common_assets();
+
+	/* Get available splatter flavours */
+	std::array<typed_entity_flavour_id<decal_decoration>, BLOOD_SPLATTER_NUM_VARIANTS> splatter_flavours = {
+		common_assets.blood_splatter_1,
+		common_assets.blood_splatter_2,
+		common_assets.blood_splatter_3
+	};
+
+	auto rng = cosm.get_rng_for(subject);
+
+	/* Choose a random splatter flavour */
+	const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
+	auto flavour = splatter_flavours[splatter_idx];
+
+	/* Skip if this flavour is not set, try others */
+	if (!flavour.is_set()) {
+		for (const auto& f : splatter_flavours) {
+			if (f.is_set()) {
+				flavour = f;
+				break;
+			}
+		}
+	}
+
+	if (!flavour.is_set()) {
+		return;
+	}
+
+	const auto final_size_mult = size_mult * rng.randval(0.5f, 1.0f);
+	const auto rotation = rng.randval(0.f, 360.f);
+
+	/* Spawn blood burst particles */
+	const bool has_burst_effect = common_assets.blood_burst_particles.id.is_set();
+	if (has_burst_effect) {
+		auto burst_effect = common_assets.blood_burst_particles;
+		
+		/* Scale velocities based on distance to splatter */
+		const auto offset = splatter_position - burst_origin;
+		const auto distance = offset.length();
+		const auto distance_scale = distance / BLOOD_BURST_BASELINE_DISTANCE;
+		burst_effect.modifier.scale_velocities = distance_scale / 2.0f;
+		burst_effect.modifier.scale_amounts = std::min(15.0f, distance / 5.f);
+		burst_effect.modifier.scale_lifetimes = std::min(3.0f, distance / 20.f);
+		
+		/* Direction from burst origin towards the splatter position */
+		const auto burst_degrees = offset.is_nonzero() ? offset.degrees() : 0.f;
+		
+		burst_effect.start(
+			step,
+			particle_effect_start_input::orbit_absolute(cosm[subject], transformr(burst_origin, burst_degrees)),
+			always_predictable_v
+		);
+	}
+
+	cosmic::specific_create_entity(access, cosm, flavour, [&](auto splatter_entity, auto& agg) {
+		splatter_entity.set_logic_transform(transformr(splatter_position, rotation));
+
+		/* Set spawned_by to track whose blood this is */
+		if (auto* decal_state = agg.template find<components::decal>()) {
+			decal_state->spawned_by = subject;
+			
+			/* Set freshness with random initial offset (0-4 seconds into the past) */
+			const auto random_offset_secs = rng.randval(0.f, 4.f);
+
+			/* Subtract seconds to make it appear older (as if it existed for that time already) */
+			decal_state->freshness = real32(cosm.get_total_seconds_passed()) - random_offset_secs;
+		}
+
+		/* Apply size multiplier through overridden_geo if needed */
+		if (final_size_mult < 1.f) {
+			if (auto overridden_geo = agg.template find<components::overridden_geo>()) {
+				const auto original_size = splatter_entity.template get<invariants::sprite>().size;
+				overridden_geo->size = vec2i(vec2(original_size) * final_size_mult);
+			}
+		}
+	});
+}
+
 inline void spawn_blood_splatters(
 	allocate_new_entity_access access,
 	const logic_step step,
@@ -23,7 +117,6 @@ inline void spawn_blood_splatters(
 	const blood_splatter_params& params
 ) {
 	auto& cosm = step.get_cosmos();
-	const auto& common_assets = cosm.get_common_assets();
 
 	/* Calculate number of splatters: 1 per damage_per_splatter damage, at least 1 */
 	const auto num_full_splatters = static_cast<int>(damage_amount / params.damage_per_splatter);
@@ -37,27 +130,7 @@ inline void spawn_blood_splatters(
 		return;
 	}
 
-	/* Get available splatter flavours */
-	std::array<typed_entity_flavour_id<decal_decoration>, BLOOD_SPLATTER_NUM_VARIANTS> splatter_flavours = {
-		common_assets.blood_splatter_1,
-		common_assets.blood_splatter_2,
-		common_assets.blood_splatter_3
-	};
-
 	auto rng = cosm.get_rng_for(subject);
-
-	/* Check if any splatter flavour is available */
-	bool any_set = false;
-	for (const auto& f : splatter_flavours) {
-		if (f.is_set()) {
-			any_set = true;
-			break;
-		}
-	}
-
-	if (!any_set) {
-		return;
-	}
 
 	const auto impact_degrees = impact_direction.is_nonzero() ? impact_direction.degrees() : 0.f;
 
@@ -68,8 +141,6 @@ inline void spawn_blood_splatters(
 
 	const auto half_spread = params.angle_spread / 2.f;
 
-	const bool has_burst_effect = common_assets.blood_burst_particles.id.is_set();
-
 	for (int i = 0; i < num_splatters; ++i) {
 		/* Determine size multiplier */
 		real32 size_mult = 1.f;
@@ -78,76 +149,22 @@ inline void spawn_blood_splatters(
 			size_mult = std::max(params.min_size, remainder_size);
 		}
 
-		/* Choose a random splatter flavour using bounded random */
-		const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
-		auto flavour = splatter_flavours[splatter_idx];
-
-		size_mult *= rng.randval(0.5f, 1.0f);
-
-		/* Skip if this flavour is not set, try others */
-		if (!flavour.is_set()) {
-			for (const auto& f : splatter_flavours) {
-				if (f.is_set()) {
-					flavour = f;
-					break;
-				}
-			}
-		}
-
-		if (!flavour.is_set()) {
-			continue;
-		}
-
-		/* Randomize position with distance scaled by damage (slightly randomized) */
+		/* Randomize position with distance scaled by damage */
 		const auto angle_offset = rng.randval(-half_spread, half_spread);
 		const auto distance = rng.randval(params.min_distance, max_distance);
-		const auto rotation = rng.randval(0.f, 360.f);
 
 		const auto offset_direction = vec2::from_degrees(impact_degrees + angle_offset);
 		const auto splatter_pos = position + offset_direction * distance;
 
-		/* Spawn blood burst particles for this splatter: from impact towards splatter position */
-		if (has_burst_effect) {
-			auto burst_effect = common_assets.blood_burst_particles;
-			
-			/* Scale velocities based on distance to splatter */
-			const auto distance_scale = distance / BLOOD_BURST_BASELINE_DISTANCE;
-			burst_effect.modifier.scale_velocities = distance_scale / 2.0f;
-			burst_effect.modifier.scale_amounts = std::min(15.0f, damage_amount / 5.f);
-			burst_effect.modifier.scale_lifetimes = std::min(3.0f, damage_amount / 20.f);
-			
-			/* Direction from impact point towards the splatter position */
-			const auto burst_degrees = offset_direction.degrees();
-			
-			burst_effect.start(
-				step,
-				particle_effect_start_input::orbit_absolute(cosm[subject], transformr(position, burst_degrees)),
-				always_predictable_v
-			);
-		}
-
-		cosmic::specific_create_entity(access, cosm, flavour, [&](auto splatter_entity, auto& agg) {
-			splatter_entity.set_logic_transform(transformr(splatter_pos, rotation));
-
-			/* Set spawned_by to track whose blood this is */
-			if (auto* decal_state = agg.template find<components::decal>()) {
-				decal_state->spawned_by = subject;
-				
-				/* Set freshness with random initial offset (0-5 seconds into the past) */
-				const auto random_offset_secs = rng.randval(0.f, 4.f);
-
-				/* Subtract seconds to make it appear older (as if it existed for that time already) */
-				decal_state->freshness = real32(cosm.get_total_seconds_passed()) - random_offset_secs;
-			}
-
-			/* Apply size multiplier through overridden_geo if needed */
-			if (size_mult < 1.f) {
-				if (auto overridden_geo = agg.template find<components::overridden_geo>()) {
-					const auto original_size = splatter_entity.template get<invariants::sprite>().size;
-					overridden_geo->size = vec2i(vec2(original_size) * size_mult);
-				}
-			}
-		});
+		/* Use the singular spawn_blood_splatter for each calculated position */
+		::spawn_blood_splatter(
+			access,
+			step,
+			subject,
+			splatter_pos,
+			position,
+			size_mult
+		);
 	}
 }
 

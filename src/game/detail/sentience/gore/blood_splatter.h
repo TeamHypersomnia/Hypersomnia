@@ -14,6 +14,19 @@ struct blood_splatter_params {
 	real32 max_distance_at_full_damage = 150.f;
 };
 
+/*
+	Spawns a single blood splatter at an exact position with specified size.
+	Use this for precise control over splatter placement.
+*/
+void spawn_blood_splatter(
+	allocate_new_entity_access access,
+	const logic_step step,
+	const entity_id subject,
+	const vec2 splatter_position,
+	const vec2 burst_origin,
+	const real32 size_mult
+);
+
 void spawn_blood_splatters(
 	allocate_new_entity_access access,
 	const logic_step step,
