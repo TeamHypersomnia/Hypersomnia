@@ -251,7 +251,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					*/
 					const auto drip_interval_ms = [&]() {
 						if (is_corpse) {
-							return 1000.f;
+							return 500.f;
 						}
 						/*
 							hp_ratio goes from 0.0 to 0.3
@@ -288,7 +288,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 						const auto pos = subject.get_logic_transform().pos;
 						auto rng = cosm.get_rng_for(subject);
-						const auto random_angle = rng.randval(0.f, 360.f);
+
+						const auto random_offset = rng.random_point_in_ring(10.0f, 20.0f);
+						const auto random_angle = rng.randval(0.0f, 360.f);
 						const auto direction = vec2::from_degrees(random_angle);
 
 						blood_splatter_params drip_params;
@@ -297,7 +299,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 						*/
 						drip_params.damage_per_splatter = blood_drip_base_damage;
 						drip_params.angle_spread = 360.f;
-						drip_params.min_distance = 0.f;
+						drip_params.min_distance = 40.f;
 						drip_params.max_distance_base = 10.f * size_mult;
 						drip_params.max_distance_at_full_damage = drip_params.max_distance_base;
 						drip_params.min_size = size_mult;
@@ -312,7 +314,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 							allocate_new_entity_access(),
 							step,
 							subject,
-							pos,
+							pos + random_offset,
 							direction,
 							virtual_damage,
 							drip_params

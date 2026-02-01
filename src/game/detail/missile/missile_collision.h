@@ -225,22 +225,13 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					from the corpse as if it was hit by that bullet yet another time.
 					This is done discreetly without showing additional damage indicators.
 				*/
-				auto& health = sentience->get<health_meter_instance>();
+				auto& health = sentience->template get<health_meter_instance>();
 				const auto additional_damage = damage_msg.damage.base * (damage_msg.origin.circumstances.headshot ? damage_msg.headshot_mult : 1.0f);
 				health.value -= additional_damage;
 			}
 
-			if (was_conscious_before) {
-				finalize_bullet();
-				damage_msg.spawn_destruction_effects = true;
-			}
-			else {
-				/*
-					Corpse was hit - finalize the bullet as well to prevent
-					repeated damage from the same bullet.
-				*/
-				finalize_bullet();
-			}
+			finalize_bullet();
+			damage_msg.spawn_destruction_effects = true;
 		}
 		else {
 			if (!info.ignore_standard_collision_resolution()) {
