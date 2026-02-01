@@ -2006,7 +2006,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	text_color("Default destruction behavior", yellow);
 	ImGui::Separator();
 
-	text_disabled("Played when a destructible object is split.\nFalls back to damage effects if not set.");
+	text_disabled("Played when a destructible object is split.\nIf not set, no destruction effects are played.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Destruction sound", destruction_sound);
 	PARTICLE_EFFECT_MULTIPROPERTY("Destruction particles", destruction_particles);
 

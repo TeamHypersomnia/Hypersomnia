@@ -100,21 +100,16 @@ namespace test_flavours {
 			return meta;
 		};
 
-		dynamic_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::CRATE,
-				test_scene_image_id::CRATE,
-				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::WOOD
-		).template get<invariants::fixtures>().penetrability *= 1.2f;
-
 		{
-			auto& crate_meta = flavour_with_sprite(
-				test_plain_sprited_bodies::CRATE,
-				test_scene_image_id::CRATE,
-				test_obstacle_order::OPAQUE
+			auto& crate_meta = dynamic_obstacle(
+				flavour_with_sprite(
+					test_plain_sprited_bodies::CRATE,
+					test_scene_image_id::CRATE,
+					test_obstacle_order::OPAQUE
+				),
+				test_scene_physical_material_id::WOOD
 			);
+			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
 			auto& crate_destructible = crate_meta.template get<components::destructible>();
 			crate_destructible.max_health = 150.0f;
 			crate_destructible.health = 150.0f;
