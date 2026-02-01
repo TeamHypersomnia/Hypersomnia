@@ -36,11 +36,14 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 			continue;
 		}
 
-		const auto& fixtures = subject.get<invariants::fixtures>();
+		const auto* fixtures = subject.find<invariants::fixtures>();
+		if (!fixtures) {
+			continue;
+		}
 
 		const auto& data_indices = it.indices.subject;
 
-		if (data_indices.is_set() && fixtures.is_destructible()) {
+		if (data_indices.is_set() && fixtures->is_destructible()) {
 			messages::damage_message damage_msg;
 			damage_msg.indices = it.indices;
 
