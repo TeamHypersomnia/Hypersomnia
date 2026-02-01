@@ -580,7 +580,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					/* Count how many blood splatters are being stepped on */
 					int blood_splatters_stepped = 0;
 					/* Track the most fresh blood splatter stepped on (higher value = more recent) */
-					real32 most_fresh_timestamp = -1.f;
+					real32 most_fresh_timestamp = std::numeric_limits<real32>::min();
 
 					/* Query visible decals in the ground layer */
 					const auto foot_query_pos = effect_transform.pos;
@@ -605,7 +605,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 									
 									/* Track most fresh (higher value = more recent) */
 									const auto& decal_state = typed_decal.template get<components::decal>();
-									if (decal_state.freshness >= 0.f && decal_state.freshness > most_fresh_timestamp) {
+									if (decal_state.freshness > most_fresh_timestamp) {
 										most_fresh_timestamp = decal_state.freshness;
 									}
 								}
@@ -689,10 +689,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 								/* Track who spawned this footstep and propagate freshness */
 								if (auto* decal_state = agg.template find<components::decal>()) {
 									decal_state->spawned_by = stepper_id;
-									/* Inherit freshness from the blood splatter we stepped on */
-									if (movement.blood_step_freshness >= 0.f) {
-										decal_state->freshness = movement.blood_step_freshness;
-									}
+									decal_state->freshness = movement.blood_step_freshness;
 								}
 							});
 						}

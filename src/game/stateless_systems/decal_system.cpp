@@ -12,16 +12,18 @@
 #include "game/components/sprite_component.h"
 
 /* Soft limit: when exceeded, oldest decals are marked for deletion */
-static constexpr std::size_t SOFT_LIMIT_DECALS = 300;
+static constexpr std::size_t SOFT_LIMIT_DECALS = 800;
 /* Hard limit: when exceeded, oldest decal is deleted immediately */
-static constexpr std::size_t HARD_LIMIT_DECALS = 600;
+static constexpr std::size_t HARD_LIMIT_DECALS = 1000;
 /* Maximum blood footsteps per character */
-static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 50;
+static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 100;
 /* Shrink in discrete 1-second steps (10% less each second) */
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
 /* Number of shrink steps (10 steps for 10% each) */
 static constexpr int NUM_SHRINK_STEPS = 10;
 
+/* Freshness step interval in seconds (2 seconds per step) */
+static constexpr real32 FRESHNESS_STEP_SECS = 2.f;
 /* Freshness darkening: 20 steps, 2 second intervals */
 static constexpr int FRESHNESS_NUM_STEPS = 20;
 /* Colorize multiplier: 1.0 -> 0.3 (70% reduction over 20 steps) */
@@ -32,9 +34,7 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 
 	const auto& clk = cosm.get_clock();
-	const auto now = clk.now;
-
-	const auto now_secs = clk.get_total_seconds_passed();
+	const auto now_secs = cosm.get_total_seconds_passed();
 
 	std::size_t unmarked_count = 0;
 	std::size_t marked_count = 0;
@@ -54,9 +54,6 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	augs::stepped_timestamp oldest_superfluous_footstep_timestamp;
 	oldest_superfluous_footstep_timestamp.step = std::numeric_limits<unsigned>::max();
 
-	/* Freshness step interval in seconds (2 seconds per step) */
-	static constexpr real32 FRESHNESS_STEP_SECS = 2.f;
-
 	/* First pass: update shrinking decals, count totals, find oldest unmarked/marked, and track footsteps per character */
 	cosm.for_each_having<components::decal>(
 		[&](const auto subject) {
@@ -65,7 +62,7 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			const auto when_born = subject.when_born();
 
 			/* Freshness-based darkening for blood decals */
-			if (def.is_blood_decal && state.freshness >= 0.f) {
+			if (def.is_blood_decal) {
 				const auto freshness_elapsed_secs = now_secs - state.freshness;
 				const auto freshness_step = std::min(static_cast<int>(freshness_elapsed_secs / FRESHNESS_STEP_SECS), FRESHNESS_NUM_STEPS);
 				
@@ -163,7 +160,7 @@ void decal_system::limit_decal_count(const logic_step step) const {
 		if (const auto handle = cosm[oldest_unmarked_id]) {
 			auto& state = handle.template get<components::decal>();
 			state.marked_for_deletion = true;
-			state.when_marked_for_deletion = now;
+			state.when_marked_for_deletion = cosm.get_timestamp();
 		}
 	}
 
@@ -173,7 +170,7 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			auto& state = handle.template get<components::decal>();
 			if (!state.marked_for_deletion) {
 				state.marked_for_deletion = true;
-				state.when_marked_for_deletion = now;
+				state.when_marked_for_deletion = cosm.get_timestamp();
 			}
 		}
 	}
