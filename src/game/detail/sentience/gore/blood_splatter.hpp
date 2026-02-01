@@ -156,10 +156,10 @@ inline void spawn_blood_splatters_omnidirectional(
 	const auto direction = vec2::from_degrees(0.f); /* Starting direction doesn't matter with 360° spread */
 	
 	blood_splatter_params omni_params;
-	omni_params.damage_per_splatter = 15.f;
+	omni_params.damage_per_splatter = 10.f;
 	omni_params.angle_spread = 360.f;
-	omni_params.min_distance = damage_amount/4;
-	omni_params.max_distance_base = damage_amount/3;
+	omni_params.min_distance = damage_amount/3;
+	omni_params.max_distance_base = damage_amount/2;
 	omni_params.max_distance_at_full_damage = omni_params.max_distance_base;
 	
 	::spawn_blood_splatters(access, step, subject, position, direction, damage_amount, omni_params);
