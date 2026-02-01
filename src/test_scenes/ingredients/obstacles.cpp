@@ -2,6 +2,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/destructible_component.h"
 
 real32 get_material_penetrability(const test_scene_physical_material_id id) {
 	using T = test_scene_physical_material_id;
@@ -108,14 +109,31 @@ namespace test_flavours {
 			test_scene_physical_material_id::WOOD
 		).template get<invariants::fixtures>().penetrability *= 1.2f;
 
-		static_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::HARD_WOODEN_WALL,
-				test_scene_image_id::BRICK_WALL,
+		{
+			auto& crate_meta = flavour_with_sprite(
+				test_plain_sprited_bodies::CRATE,
+				test_scene_image_id::CRATE,
 				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::WOOD
-		).template get<invariants::sprite>().tile_excess_size = true;
+			);
+			auto& crate_destructible = crate_meta.template get<components::destructible>();
+			crate_destructible.max_health = 150.0f;
+			crate_destructible.health = 150.0f;
+		}
+
+		{
+			auto& wall_meta = static_obstacle(
+				flavour_with_sprite(
+					test_plain_sprited_bodies::HARD_WOODEN_WALL,
+					test_scene_image_id::BRICK_WALL,
+					test_obstacle_order::OPAQUE
+				),
+				test_scene_physical_material_id::WOOD
+			);
+			wall_meta.template get<invariants::sprite>().tile_excess_size = true;
+			auto& wall_destructible = wall_meta.template get<components::destructible>();
+			wall_destructible.max_health = 500.0f;
+			wall_destructible.health = 500.0f;
+		}
 
 		{
 			auto make_dev_wall = [&](const auto fid, const auto iid) {

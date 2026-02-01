@@ -9,6 +9,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
+#include "game/components/destructible_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/item_sync.h"
@@ -146,16 +147,36 @@ public:
 	std::optional<ltrb> find_aabb(const transformr transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
+		/* Calculate base size from overridden_geo or sprite */
+		vec2 base_size = vec2::zero;
+		bool has_base_size = false;
+
 		if (const auto overridden_geo = handle.template find<components::overridden_geo>()) {
 			const auto& s = overridden_geo.get();
 
 			if (s.is_enabled) {
-				return augs::calc_sprite_aabb(transform, s.value);
+				base_size = vec2(s.value);
+				has_base_size = true;
 			}
 		}
 
-		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-			return sprite->get_aabb(transform);
+		if (!has_base_size) {
+			if (const auto* const sprite = handle.template find<invariants::sprite>()) {
+				base_size = vec2(sprite->size);
+				has_base_size = true;
+			}
+		}
+
+		/* If we have a base size and a destructible component, apply texture_rect scaling */
+		if (has_base_size) {
+			if (const auto* const destructible = handle.template find<components::destructible>()) {
+				if (destructible->is_enabled()) {
+					const auto& tex_rect = destructible->texture_rect;
+					base_size.x *= tex_rect.w;
+					base_size.y *= tex_rect.h;
+				}
+			}
+			return augs::calc_sprite_aabb(transform, vec2i(base_size));
 		}
 
 		if (const auto* const polygon = handle.template find<invariants::polygon>()) {

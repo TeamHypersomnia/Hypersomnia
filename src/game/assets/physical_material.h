@@ -43,6 +43,9 @@ struct physical_material {
 
 	particle_effect_input standard_damage_particles;
 	real32 unit_damage_for_effects = 30.f;
+
+	sound_effect_input standard_destruction_sound;
+	particle_effect_input standard_destruction_particles;
 	// END GEN INTROSPECTOR
 
 	/* Compatibility dummy */

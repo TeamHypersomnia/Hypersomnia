@@ -77,7 +77,8 @@ struct plain_sprited_body {
 		components::sorting_order,
 		components::overridden_geo,
 		components::rigid_body,
-		components::animation
+		components::animation,
+		components::destructible
 	>;
 
 	using synchronized_arrays = type_list<

@@ -88,6 +88,7 @@ namespace components {
 	struct sorting_order;
 	struct portal;
 	struct decal;
+	struct destructible;
 }
 
 using assert_always_together = type_list<
@@ -171,7 +172,8 @@ using component_list_t = List<
 	components::marker,
 	components::sorting_order,
 	components::portal,
-	components::decal
+	components::decal,
+	components::destructible
 >;
 
 template <template <class...> class List>
