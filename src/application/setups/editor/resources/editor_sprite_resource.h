@@ -122,6 +122,7 @@ struct editor_sprite_resource {
 	std::optional<std::variant<
 		test_static_decorations,
 		test_plain_sprited_bodies,
+		test_destructible_sprited_bodies,
 		test_dynamic_decorations
 	>> official_tag;
 
@@ -131,6 +132,7 @@ struct editor_sprite_resource {
 	mutable std::variant<
 		typed_entity_flavour_id<static_decoration>,
 		typed_entity_flavour_id<plain_sprited_body>,
+		typed_entity_flavour_id<destructible_sprited_body>,
 		typed_entity_flavour_id<dynamic_decoration>
 	> scene_flavour_id;
 
