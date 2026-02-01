@@ -53,16 +53,17 @@ auto calc_body_type(const E& handle) {
 
 	/* 
 	 * If a plain sprited body is static and has a destructible component,
-	 * check if any split becomes <= 60% of the original area. If so, make it dynamic.
+	 * check if split area falls below the configured threshold. If so, make it dynamic.
 	 */
 	if (type == rigid_body_type::STATIC) {
 		if (const auto* destructible = handle.template find<components::destructible>()) {
 			if (destructible->is_enabled()) {
 				const auto& texture_rect = destructible->texture_rect;
 				const auto current_area = texture_rect.w * texture_rect.h;
+				const auto threshold = destructible->make_dynamic_below_area;
 				
-				/* If area is <= 60% of original (which is 1.0 * 1.0 = 1.0), make it dynamic */
-				if (current_area <= 0.6f) {
+				/* If threshold > 0 and area <= threshold, make it dynamic */
+				if (threshold > 0.0f && current_area <= threshold) {
 					type = rigid_body_type::DYNAMIC;
 				}
 			}

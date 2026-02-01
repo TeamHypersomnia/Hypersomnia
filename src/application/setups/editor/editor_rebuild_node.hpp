@@ -71,6 +71,7 @@ bool setup_entity_from_node(
 			if (physical.is_destructible && physical.custom_shape.empty()) {
 				destructible->max_health = physical.max_health;
 				destructible->health = physical.max_health;
+				destructible->make_dynamic_below_area = physical.make_dynamic_below_area;
 			}
 		}
 	}
