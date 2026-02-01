@@ -483,17 +483,9 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	auto from_box_shape = [&](vec2 size, const real32 additional_rotation) {
 		/* 
-		 * If the entity has a destructible component with a split texture_rect,
-		 * scale the size accordingly.
+		 * Note: size already includes texture_rect scaling from get_logical_size().
+		 * Do NOT scale again here to avoid double-scaling.
 		 */
-		if (const auto* destructible = handle.template find<components::destructible>()) {
-			if (destructible->is_enabled()) {
-				const auto& tex_rect = destructible->texture_rect;
-				size.x *= tex_rect.w;
-				size.y *= tex_rect.h;
-			}
-		}
-
 		size.x = std::max(1.f, size.x);
 		size.y = std::max(1.f, size.y);
 

@@ -17,6 +17,9 @@
 #include "game/components/rigid_body_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "game/detail/physics/calc_physical_material.hpp"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
@@ -381,6 +384,56 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			/* Apply impulse to original piece */
 			if (auto rigid = subject.find<components::rigid_body>()) {
 				rigid.apply_impulse(-impact_dir * impulse_magnitude * (1.0f - split_ratio));
+			}
+
+			/* 
+			 * Spawn destruction effects (sound and particles).
+			 * Pitch and scale are based on chunk area:
+			 * - area = 1.0 → pitch = 1.0, scale = 1.0
+			 * - area = 0.5 → pitch = 1.2, scale = 0.8  
+			 * - area = 0.0 → pitch = 1.4, scale = 0.6
+			 */
+			{
+				const auto& logicals = cosm.get_logical_assets();
+				const auto material_id = calc_physical_material(subject);
+				
+				if (const auto* mat = logicals.find(material_id)) {
+					/* Calculate pitch and scale modifiers based on area */
+					const real32 pitch_mult = 1.0f + 0.4f * (1.0f - texture_area);
+					const real32 scale_mult = 0.6f + 0.4f * texture_area;
+
+					const auto effect_transform = transformr(d.point_of_impact, (-d.impact_velocity).degrees());
+
+					/* Spawn destruction sound */
+					auto destruction_sound = mat->standard_destruction_sound;
+					if (!destruction_sound.id.is_set()) {
+						/* Fall back to standard damage sound if destruction sound not set */
+						destruction_sound = mat->standard_damage_sound;
+					}
+					if (destruction_sound.id.is_set()) {
+						destruction_sound.modifier.pitch *= pitch_mult;
+						destruction_sound.start(
+							step,
+							sound_effect_start_input::fire_and_forget(effect_transform).set_listener(subject),
+							always_predictable_v
+						);
+					}
+
+					/* Spawn destruction particles */
+					auto destruction_particles = mat->standard_destruction_particles;
+					if (!destruction_particles.id.is_set()) {
+						/* Fall back to standard damage particles if destruction particles not set */
+						destruction_particles = mat->standard_damage_particles;
+					}
+					if (destruction_particles.id.is_set()) {
+						destruction_particles.modifier.scale_amounts *= scale_mult;
+						destruction_particles.start(
+							step,
+							particle_effect_start_input::orbit_absolute(subject, effect_transform),
+							always_predictable_v
+						);
+					}
+				}
 			}
 
 			/* Queue pending destruction for original if health is negative */
