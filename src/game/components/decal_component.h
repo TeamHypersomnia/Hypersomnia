@@ -21,6 +21,7 @@ namespace components {
 		pad_bytes<3> pad;
 		augs::stepped_timestamp when_marked_for_deletion;
 		entity_id spawned_by;
+		augs::stepped_timestamp freshness;
 		// END GEN INTROSPECTOR
 	};
 }

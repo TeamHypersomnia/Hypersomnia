@@ -106,6 +106,7 @@ namespace components {
 		uint8_t _total_blood_steps_cache = 0;
 		pad_bytes<2> pad;
 		augs::stepped_timestamp _oldest_footstep_stamp;
+		augs::stepped_timestamp blood_step_freshness;
 		// END GEN INTROSPECTOR
 
 		auto get_max_inertia() const {
