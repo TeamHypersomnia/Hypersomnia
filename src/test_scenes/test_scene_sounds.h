@@ -278,6 +278,8 @@ enum class test_scene_sound_id {
 
 	BLOOD_FOOTSTEP,
 
+	CASCADE_EXPLOSION,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

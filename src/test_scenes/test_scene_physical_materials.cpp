@@ -150,4 +150,32 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		glass.standard_damage_particles.modifier.color = rgba(142, 186, 197, 255);
 		glass.silence_damager_destruction_sound = true;
 	}
+
+	/* 
+	 * Set up destruction effects for all materials.
+	 * Uses EXHAUSTED_SMOKE particles and CASCADE_EXPLOSION sound.
+	 */
+	{
+		auto& wood = all_definitions[to_physical_material_id(test_scene_physical_material_id::WOOD)];
+		wood.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		wood.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+	}
+
+	{
+		auto& metal = all_definitions[to_physical_material_id(test_scene_physical_material_id::METAL)];
+		metal.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		metal.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+	}
+
+	{
+		auto& glass = all_definitions[to_physical_material_id(test_scene_physical_material_id::GLASS)];
+		glass.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		glass.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+	}
+
+	{
+		auto& vent = all_definitions[to_physical_material_id(test_scene_physical_material_id::VENT)];
+		vent.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		vent.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+	}
 }
