@@ -183,6 +183,19 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			/* Now calculate actual chunk dimensions */
 			const auto actual_width = base_sprite_size.x * texture_rect.w;
 			const auto actual_height = base_sprite_size.y * texture_rect.h;
+			const auto actual_area = actual_width * actual_height;
+
+			/* 
+			 * If the actual area is already below the minimum destructible threshold (100px²),
+			 * don't split further - just disable destructibility and let the LYING_ITEM filter
+			 * handle it in calc_filters. This prevents infinite splitting loops.
+			 */
+			constexpr real32 min_destructible_area = 100.0f;
+			if (actual_area < min_destructible_area) {
+				/* Reset health to positive to stop further destruction attempts */
+				dest.health = dest.max_health;
+				continue;
+			}
 
 			/* 
 			 * Splitting logic:
@@ -320,106 +333,125 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			dest.max_health = original_new_max_health;
 			dest.health = original_new_health;
 
-			/* 
-			 * Save the subject ID before cloning, because just_clone_entity may cause 
-			 * pool reallocation which invalidates the subject handle's internal pointer.
-			 */
+			/* Calculate position shifts needed for both entities */
+			vec2 original_center_shift;
+			vec2 new_center_shift;
+
+			if (is_horizontal_split) {
+				const real32 original_center_x = (original_rect.x + original_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
+				const real32 new_center_x = (new_rect.x + new_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
+
+				original_center_shift = vec2(original_center_x, 0);
+				new_center_shift = vec2(new_center_x, 0);
+			}
+			else {
+				const real32 original_center_y = (original_rect.y + original_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
+				const real32 new_center_y = (new_rect.y + new_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
+
+				original_center_shift = vec2(0, original_center_y);
+				new_center_shift = vec2(0, new_center_y);
+			}
+
+			/* Rotate shifts to world space */
+			original_center_shift.rotate(transform.rotation);
+			new_center_shift.rotate(transform.rotation);
+
+			/* Calculate final positions */
+			const auto original_new_pos = entity_pos + original_center_shift;
+			const auto new_entity_pos = entity_pos + new_center_shift;
+			const auto rotation = transform.rotation;
+
+			/* Reposition original entity now */
+			subject.get<components::rigid_body>().set_transform(transformr(original_new_pos, rotation));
+			subject.infer_rigid_body();
+			subject.infer_colliders_from_scratch();
+
+			/* Calculate impulse parameters for later application */
+			const auto split_direction = is_horizontal_split ? vec2(1, 0) : vec2(0, 1);
+			const auto fallback_dir = vec2(split_direction).rotate(rotation);
+			const auto impact_dir = d.impact_velocity.is_nonzero() ? vec2(d.impact_velocity).normalize() : fallback_dir;
+			
+			constexpr real32 damage_to_impulse_scale = 0.5f;
+			const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
+
+			/* Apply impulse to original piece */
+			if (auto rigid = subject.find<components::rigid_body>()) {
+				rigid.apply_impulse(-impact_dir * impulse_magnitude * (1.0f - split_ratio));
+			}
+
+			/* Queue pending destruction for original if health is negative */
 			const auto subject_id = subject.get_id();
+			if (original_new_health < 0.0f) {
+				const real32 local_excess = -original_new_health;
+				const real32 ratio = std::max(0.01f, local_excess / original_new_max_health);
+				real32 delay = 200.0f / ratio;
+				delay *= rng.randval(0.5f, 1.0f);
 
-			/* Clone the entity to create the new chunk */
-			auto new_entity = just_clone_entity(allocate_new_entity_access(), subject);
+				pending_destruction pd;
+				pd.target = subject_id;
+				pd.delay_ms = delay;
+				pd.impact_velocity = d.impact_velocity;
+
+				global.pending_destructions.push_back(pd);
+			}
 
 			/* 
-			 * Re-fetch the subject handle after cloning since the pool may have reallocated.
-			 * This is critical - using the old 'subject' handle could crash!
+			 * Queue the clone operation. The lambda captures all needed values by copy.
+			 * This is the safe approach - the clone will be created during flush_create_entity_requests,
+			 * after all immediate operations are done, preventing pool reallocation issues.
 			 */
-			const auto subject_after_clone = cosm[subject_id];
+			const auto impact_velocity_copy = d.impact_velocity;
 
-			if (new_entity.alive() && subject_after_clone.alive()) {
-				auto& new_dest = new_entity.get<components::destructible>();
-				new_dest.texture_rect = new_rect;
-				new_dest.max_health = new_piece_max_health;
-				new_dest.health = new_piece_health;
+			queue_clone_entity(
+				step,
+				subject_id,
+				[=](entity_handle new_entity, logic_step step_inner) mutable {
+					if (new_entity.dead()) {
+						return;
+					}
 
-				/* Calculate new positions for both entities */
-				/* The center of each piece shifts based on how it was split */
-				vec2 original_center_shift;
-				vec2 new_center_shift;
+					auto& cosm_inner = step_inner.get_cosmos();
+					auto& global_inner = cosm_inner.get_global_solvable();
 
-				if (is_horizontal_split) {
-					const real32 original_center_x = (original_rect.x + original_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
-					const real32 new_center_x = (new_rect.x + new_rect.w / 2.0f - 0.5f) * base_sprite_size.x;
+					/* Set up the new chunk's destructible component */
+					auto* new_dest = new_entity.find<components::destructible>();
+					if (new_dest) {
+						new_dest->texture_rect = new_rect;
+						new_dest->max_health = new_piece_max_health;
+						new_dest->health = new_piece_health;
+					}
 
-					original_center_shift = vec2(original_center_x, 0);
-					new_center_shift = vec2(new_center_x, 0);
-				}
-				else {
-					const real32 original_center_y = (original_rect.y + original_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
-					const real32 new_center_y = (new_rect.y + new_rect.h / 2.0f - 0.5f) * base_sprite_size.y;
+					/* Position the new entity */
+					if (auto rigid = new_entity.find<components::rigid_body>()) {
+						rigid.set_transform(transformr(new_entity_pos, rotation));
+					}
 
-					original_center_shift = vec2(0, original_center_y);
-					new_center_shift = vec2(0, new_center_y);
-				}
+					/* Reinfer physics */
+					new_entity.infer_rigid_body();
+					new_entity.infer_colliders_from_scratch();
 
-				/* Rotate shifts to world space */
-				original_center_shift.rotate(transform.rotation);
-				new_center_shift.rotate(transform.rotation);
+					/* Apply impulse to new piece (pushed in direction of impact) */
+					if (auto rigid = new_entity.find<components::rigid_body>()) {
+						rigid.apply_impulse(impact_dir * impulse_magnitude * split_ratio);
+					}
 
-				/* Set new transforms */
-				const auto original_new_pos = entity_pos + original_center_shift;
-				const auto new_entity_pos = entity_pos + new_center_shift;
-
-				subject_after_clone.get<components::rigid_body>().set_transform(transformr(original_new_pos, transform.rotation));
-				new_entity.get<components::rigid_body>().set_transform(transformr(new_entity_pos, transform.rotation));
-
-				/* Reinfer physics for both entities */
-				subject_after_clone.infer_rigid_body();
-				new_entity.infer_rigid_body();
-				subject_after_clone.infer_colliders_from_scratch();
-				new_entity.infer_colliders_from_scratch();
-
-				/* Apply separating impulse proportional to damage */
-				const auto split_direction = is_horizontal_split ? vec2(1, 0) : vec2(0, 1);
-				const auto fallback_dir = vec2(split_direction).rotate(transform.rotation);
-				const auto impact_dir = d.impact_velocity.is_nonzero() ? vec2(d.impact_velocity).normalize() : fallback_dir;
-				
-				constexpr real32 damage_to_impulse_scale = 0.5f;
-				const auto impulse_magnitude = damage_amount * damage_to_impulse_scale;
-
-				/* Original piece gets pushed in the opposite direction of impact */
-				if (auto rigid = subject_after_clone.find<components::rigid_body>()) {
-					rigid.apply_impulse(-impact_dir * impulse_magnitude * (1.0f - split_ratio));
-				}
-
-				/* New piece gets pushed in the direction of impact */
-				if (auto rigid = new_entity.find<components::rigid_body>()) {
-					rigid.apply_impulse(impact_dir * impulse_magnitude * split_ratio);
-				}
-
-				/* 
-				 * Queue pending destructions for any split with negative health.
-				 * Delay = 200ms / (excess_damage / max_health) * randval(0.5, 1.0)
-				 */
-				auto queue_pending_if_negative = [&](const entity_id eid, const real32 health, const real32 max_hp) {
-					if (health < 0.0f) {
-						const real32 local_excess = -health;
-						/* Clamp ratio to prevent excessively large delays from very small damage ratios */
-						const real32 ratio = std::max(0.01f, local_excess / max_hp);
+					/* Queue pending destruction if health is negative */
+					if (new_piece_health < 0.0f) {
+						const real32 local_excess = -new_piece_health;
+						const real32 ratio = std::max(0.01f, local_excess / new_piece_max_health);
 						real32 delay = 200.0f / ratio;
-						delay *= rng.randval(0.5f, 1.0f);
+						/* Use a fixed factor instead of rng inside lambda */
+						delay *= 0.75f;
 
 						pending_destruction pd;
-						pd.target = eid;
+						pd.target = new_entity.get_id();
 						pd.delay_ms = delay;
-						pd.impact_velocity = d.impact_velocity;
+						pd.impact_velocity = impact_velocity_copy;
 
-						global.pending_destructions.push_back(pd);
+						global_inner.pending_destructions.push_back(pd);
 					}
-				};
-
-				queue_pending_if_negative(subject_id, original_new_health, original_new_max_health);
-				queue_pending_if_negative(new_entity.get_id(), new_piece_health, new_piece_max_health);
-			}
+				}
+			);
 		}
 	}
 }

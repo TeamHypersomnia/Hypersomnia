@@ -6,6 +6,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/delete_entity.h"
+#include "game/cosmos/just_create_entity.h"
 
 #include "game/organization/for_each_entity_type.h"
 #include "game/cosmos/create_entity.hpp"
@@ -24,7 +25,32 @@ void deletion_system::reverse_perform_deletions(const logic_step step) {
 	::reverse_perform_deletions(deletions, step.get_cosmos());
 }
 
+void creation_system::flush_clone_entity_requests(const logic_step step) {
+	auto access = allocate_new_entity_access();
+	auto& cosm = step.get_cosmos();
+	auto& queued = step.get_queue<messages::clone_entity_message>();
+
+	for (auto& q : queued) {
+		const auto source = cosm[q.source];
+
+		if (source.dead()) {
+			continue;
+		}
+
+		const auto new_entity = just_clone_entity(access, source);
+
+		if (new_entity.alive() && q.post_clone) {
+			q.post_clone(new_entity, step);
+		}
+	}
+
+	queued.clear();
+}
+
 void creation_system::flush_create_entity_requests(const logic_step step) {
+	/* First flush any queued clone requests */
+	flush_clone_entity_requests(step);
+
 	auto access = allocate_new_entity_access();
 
 	auto& cosm = step.get_cosmos();

@@ -25,3 +25,4 @@
 #include "game/messages/sound_cue_message.h"
 
 #include "game/messages/create_entity_message.h"
+#include "game/messages/clone_entity_message.h"

@@ -7,5 +7,6 @@ struct deletion_system {
 };
 
 struct creation_system {
+	void flush_clone_entity_requests(const logic_step);
 	void flush_create_entity_requests(const logic_step);
 };
