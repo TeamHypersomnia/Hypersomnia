@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- jak za dlugi combat to lec do paki
 - mozna jeszcze opoznic wybuch krwi do wybuchow tych staminowych posmiertnych
 - czemu nie dzialaja cast blinki
 

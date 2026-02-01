@@ -21,6 +21,7 @@ inline constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
 */
 inline void spawn_blood_splatter(
 	allocate_new_entity_access access,
+	randomization& rng,
 	const logic_step step,
 	const entity_id subject,
 	const vec2 splatter_position,
@@ -36,8 +37,6 @@ inline void spawn_blood_splatter(
 		common_assets.blood_splatter_2,
 		common_assets.blood_splatter_3
 	};
-
-	auto rng = cosm.get_rng_for(subject);
 
 	/* Choose a random splatter flavour */
 	const auto splatter_idx = static_cast<std::size_t>(rng.randval(0, static_cast<int>(BLOOD_SPLATTER_NUM_VARIANTS) - 1));
@@ -159,6 +158,7 @@ inline void spawn_blood_splatters(
 		/* Use the singular spawn_blood_splatter for each calculated position */
 		::spawn_blood_splatter(
 			access,
+			rng,
 			step,
 			subject,
 			splatter_pos,

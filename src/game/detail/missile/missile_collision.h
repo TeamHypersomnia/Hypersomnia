@@ -226,8 +226,13 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					This is done discreetly without showing additional damage indicators.
 				*/
 				auto& health = sentience->template get<health_meter_instance>();
-				const auto additional_damage = damage_msg.damage.base * (damage_msg.origin.circumstances.headshot ? damage_msg.headshot_mult : 1.0f);
-				health.value -= additional_damage;
+
+				const auto additional_damage = damage_msg.damage.base; // * (damage_msg.origin.circumstances.headshot ? damage_msg.headshot_mult : 1.0f);
+
+				/* A little less after all */
+				if (true) {
+					health.value -= additional_damage / 2.0f;
+				}
 			}
 
 			finalize_bullet();

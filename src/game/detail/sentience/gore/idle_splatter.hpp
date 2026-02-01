@@ -7,7 +7,7 @@
 /*
 	Parameters for blood dripping behavior on low-HP characters and corpses.
 */
-inline constexpr real32 IDLE_SPLATTER_HP_THRESHOLD = 0.3f;
+inline constexpr real32 IDLE_SPLATTER_HP_THRESHOLD = 0.2f;
 
 /* Drip interval in milliseconds */
 inline constexpr real32 IDLE_SPLATTER_CORPSE_INTERVAL_MS = 500.f;
@@ -21,6 +21,9 @@ inline constexpr real32 IDLE_SPLATTER_MAX_SIZE = 1.0f;
 /* Position randomization */
 inline constexpr real32 IDLE_SPLATTER_MIN_OFFSET = 10.f;
 inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET = 20.f;
+
+inline constexpr real32 IDLE_SPLATTER_MIN_OFFSET_START = 20.f;
+inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET_START = 30.f;
 
 /*
 	Handles periodic blood dripping for low-HP characters and corpses.
@@ -39,6 +42,10 @@ inline void handle_idle_blood_splatter(
 	const health_meter_instance& health,
 	const augs::stepped_timestamp now
 ) {
+	if (sentience.has_exploded) {
+		return;
+	}
+
 	auto& cosm = step.get_cosmos();
 
 	const auto health_ratio = health.get_ratio();
@@ -98,8 +105,11 @@ inline void handle_idle_blood_splatter(
 	const auto pos = subject.get_logic_transform().pos;
 	auto rng = cosm.get_rng_for(subject);
 
+	const auto random_start_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET_START, IDLE_SPLATTER_MAX_OFFSET_START);
 	const auto random_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET, IDLE_SPLATTER_MAX_OFFSET);
-	const auto splatter_pos = pos + random_offset;
+
+	const auto splatter_start = pos + random_start_offset;
+	const auto splatter_pos = splatter_start + random_offset;
 
 	/*
 		Use spawn_blood_splatter directly for precise control.
@@ -107,10 +117,11 @@ inline void handle_idle_blood_splatter(
 	*/
 	::spawn_blood_splatter(
 		access,
+		rng,
 		step,
 		subject,
 		splatter_pos,
-		pos,
+		splatter_start,
 		size_mult
 	);
 }
