@@ -110,6 +110,9 @@ namespace components {
 		real32 radius_of_last_caused_danger = 0.f;
 
 		money_type coins_on_body = 0;
+
+		entity_id ignore_bullet;
+		augs::stepped_timestamp time_of_last_blood_drip;
 		// END GEN INTROSPECTOR
 
 		bool is_requesting_any_interaction() const {

@@ -173,6 +173,17 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		}
 
 		if (surface_sentient) {
+			const auto missile_entity_id = typed_missile.get_id();
+			const bool should_ignore_bullet = sentience->ignore_bullet == entity_id(missile_entity_id);
+
+			if (should_ignore_bullet) {
+				/*
+					This bullet already damaged this sentience entity once.
+					Ignore to prevent double damage from the same bullet.
+				*/
+				return std::nullopt;
+			}
+
 			const auto missile_pos = point;
 			const auto head_transform = ::calc_head_transform(surface_handle);
 			const auto head_radius = sentience_def->head_hitbox_radius * missile.head_radius_multiplier_of_sender;
@@ -194,12 +205,41 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				}
 			}
 
+			const bool was_conscious_before = sentience->is_conscious();
+
 			sentience_system().process_damage_message(damage_msg, step);
 			damage_msg.processed = true;
 
-			if (sentience->is_conscious()) {
+			const bool is_conscious_now = sentience->is_conscious();
+			const bool just_died = was_conscious_before && !is_conscious_now;
+
+			/*
+				Store this bullet in ignore_bullet so that if the bullet
+				continues to exist (e.g. character died), it won't damage again.
+			*/
+			sentience->ignore_bullet = entity_id(missile_entity_id);
+
+			if (just_died) {
+				/*
+					When character receives damage that kills him, subtract as much health
+					from the corpse as if it was hit by that bullet yet another time.
+					This is done discreetly without showing additional damage indicators.
+				*/
+				auto& health = sentience->get<health_meter_instance>();
+				const auto additional_damage = damage_msg.damage.base * (damage_msg.origin.circumstances.headshot ? damage_msg.headshot_mult : 1.0f);
+				health.value -= additional_damage;
+			}
+
+			if (was_conscious_before) {
 				finalize_bullet();
 				damage_msg.spawn_destruction_effects = true;
+			}
+			else {
+				/*
+					Corpse was hit - finalize the bullet as well to prevent
+					repeated damage from the same bullet.
+				*/
+				finalize_bullet();
 			}
 		}
 		else {

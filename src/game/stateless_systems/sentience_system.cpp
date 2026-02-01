@@ -227,6 +227,94 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				}
 			}
 
+			/*
+				Blood dripping for low-HP characters and corpses.
+				Spawn blood splatter decals under characters with less than 30% HP.
+				Interval: 3 secs at 30% HP, scaling down to 1 sec at 0% HP.
+				Also under corpses (every 1 sec).
+				Size proportional to HP loss: 50% splatter size at 30% HP, 100% at 0% HP.
+			*/
+			{
+				const auto health_ratio = health.get_ratio();
+				const bool is_corpse = !sentience.is_conscious();
+				const bool should_drip_blood = is_corpse || health_ratio < 0.3f;
+
+				if (should_drip_blood) {
+					/*
+						Calculate drip interval:
+						At 30% HP: 3000ms
+						At 0% HP (or corpse): 1000ms
+						Linear interpolation between them.
+					*/
+					const auto drip_interval_ms = [&]() {
+						if (is_corpse) {
+							return 1000.f;
+						}
+						/*
+							hp_ratio goes from 0.0 to 0.3
+							normalized goes from 0.0 (at 0% HP) to 1.0 (at 30% HP)
+							interval goes from 1000ms (at 0% HP) to 3000ms (at 30% HP)
+						*/
+						const auto normalized = std::min(1.f, health_ratio / 0.3f);
+						return 1000.f + normalized * 2000.f;
+					}();
+
+					const auto& clk = cosm.get_clock();
+
+					if (clk.is_ready(drip_interval_ms, sentience.time_of_last_blood_drip)) {
+						sentience.time_of_last_blood_drip = now;
+
+						/*
+							Calculate splatter size:
+							At 30% HP: 50% size
+							At 0% HP or corpse: 100% size
+							Linear interpolation between them.
+						*/
+						const auto size_mult = [&]() {
+							if (is_corpse) {
+								return 1.0f;
+							}
+							/*
+								hp_ratio goes from 0.0 to 0.3
+								normalized goes from 0.0 (at 0% HP) to 1.0 (at 30% HP)
+								size_mult goes from 1.0 (at 0% HP) to 0.5 (at 30% HP)
+							*/
+							const auto normalized = std::min(1.f, health_ratio / 0.3f);
+							return 1.0f - normalized * 0.5f;
+						}();
+
+						const auto pos = subject.get_logic_transform().pos;
+						auto rng = cosm.get_rng_for(subject);
+						const auto random_angle = rng.randval(0.f, 360.f);
+						const auto direction = vec2::from_degrees(random_angle);
+
+						blood_splatter_params drip_params;
+						drip_params.damage_per_splatter = 100.f; /* Produce just 1 splatter */
+						drip_params.angle_spread = 360.f;
+						drip_params.min_distance = 0.f;
+						drip_params.max_distance_base = 10.f * size_mult;
+						drip_params.max_distance_at_full_damage = drip_params.max_distance_base;
+						drip_params.min_size = size_mult;
+
+						/*
+							Damage amount determines splatter size:
+							Use a virtual damage value that scales with size_mult.
+						*/
+						const auto virtual_damage = 40.f * size_mult;
+
+						::spawn_blood_splatters(
+							allocate_new_entity_access(),
+							step,
+							subject,
+							pos,
+							direction,
+							virtual_damage,
+							drip_params
+						);
+					}
+				}
+			}
+
 			const auto since_last_shake = (now - sentience.time_of_last_shake);
 			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience_def.shake_settings.duration_unit;
 
