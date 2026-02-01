@@ -54,7 +54,6 @@ struct editor_material_resource_editable {
 	bool point_blank_ricochets = false;
 	real32 penetrability = 1.0f;
 
-	/* Destruction effects - played when a destructible object is split */
 	editor_sound_effect destruction_sound;
 	editor_particle_effect destruction_particles;
 	// END GEN INTROSPECTOR

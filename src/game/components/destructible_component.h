@@ -3,7 +3,7 @@
 
 namespace components {
 	struct destructible {
-		static constexpr bool is_synchronized = true;
+		static constexpr bool is_synchronized = false;
 
 		// GEN INTROSPECTOR struct components::destructible
 		real32 max_health = -1.0f;

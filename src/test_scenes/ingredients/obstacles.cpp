@@ -111,8 +111,8 @@ namespace test_flavours {
 			);
 			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
 			auto& crate_destructible = crate_meta.template get<components::destructible>();
-			crate_destructible.max_health = 150.0f;
-			crate_destructible.health = 150.0f;
+			crate_destructible.max_health = 100.0f;
+			crate_destructible.health = 100.0f;
 			/* Crate is already dynamic, so make_dynamic_below_area doesn't matter */
 		}
 

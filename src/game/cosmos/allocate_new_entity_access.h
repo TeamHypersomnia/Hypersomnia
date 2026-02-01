@@ -6,6 +6,7 @@
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/sentience_system.h"
+#include "game/stateless_systems/destruction_system.h"
 
 struct allocation_system;
 class gun_system;
@@ -129,6 +130,8 @@ class allocate_new_entity_access {
 	*/
 
 	friend void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step) const;
+
+	friend void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const;
 
 	/* 
 		For allocating characters. No character handles are manipulated anywhere in proximity. 
