@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- z tym wyborem bokow cos jest nie tak dalej
+- drobny lag na debugu jak spawnuje splatter przy hedzie z awki na niskim hp, moze limit jakis na ilosc tych particli, choc to bedzie sie dzialo rzadko
+- fixnac fizyke zeby monety nad remnantami
+- osobne particle tez dla mniejszych
 - naprawic particle przy rozwalaniu, lepsze
 - niech sie jeden tlyko dzwiek spawnuje przy rozwalaniu wszystkich excessive
 - zjebane jest dalej cos z iteracja ze za duzo ich tworzy

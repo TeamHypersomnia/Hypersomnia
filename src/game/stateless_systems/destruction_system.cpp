@@ -225,8 +225,9 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			 * Spawn money on FIRST split only (when texture_rect area is 1.0).
 			 * This is the original entity being split for the first time.
 			 */
-			const bool is_first_split = (texture_area >= 0.99f);
+			const bool is_first_split = texture_rect == components::destructible().texture_rect;
 			const auto& common_assets = cosm.get_common_assets();
+
 			if (is_first_split && dest_inv_ref.money_spawned_max > 0 && !common_assets.default_coin_flavours.empty()) {
 				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
 				if (money_amount > 0) {
