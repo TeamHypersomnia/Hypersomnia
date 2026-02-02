@@ -1,5 +1,8 @@
 #pragma once
 #include "augs/math/rects.h"
+#include "augs/misc/constant_size_vector.h"
+#include "game/cosmos/entity_flavour_id.h"
+#include "game/components/touch_collectible.h"
 
 using money_type = int;
 
@@ -13,6 +16,7 @@ namespace invariants {
 		real32 disable_below_area = 64.0f * 64.0f; // No longer split below this area (in pixels²)
 		money_type money_spawned_min = 0;
 		money_type money_spawned_max = 0;
+		augs::constant_size_vector<constrained_entity_flavour_id<invariants::touch_collectible>, 4> coin_flavours;
 		// END GEN INTROSPECTOR
 	};
 }

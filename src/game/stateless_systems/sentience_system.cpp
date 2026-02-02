@@ -168,8 +168,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			components::sentience& sentience = subject.template get<components::sentience>();
 
 			if (sentience.has_exploded && sentience.coins_on_body > 0) {
-				::spawn_coins(
-					allocate_new_entity_access(),
+				::spawn_coins_queued(
 					sentience.coins_on_body,
 					subject.get_logic_transform().pos,
 					step,

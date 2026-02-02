@@ -10,6 +10,7 @@
 #include "game/cosmos/delete_entity.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/messages/clone_entity_message.h"
+#include "game/messages/just_create_entity_message.h"
 
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
 #include "game/inferred_caches/organism_cache.hpp"
@@ -188,6 +189,17 @@ void queue_clone_entity(
 	messages::clone_entity_message msg;
 	msg.source = source;
 	msg.post_clone = std::move(post_clone);
+	step.post_message(msg);
+}
+
+void queue_just_create_entity(
+	const logic_step step,
+	const entity_flavour_id flavour,
+	std::function<void(entity_handle, logic_step)> post_create
+) {
+	messages::just_create_entity_message msg;
+	msg.flavour = flavour;
+	msg.post_create = std::move(post_create);
 	step.post_message(msg);
 }
 

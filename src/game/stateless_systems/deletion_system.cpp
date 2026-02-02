@@ -7,10 +7,12 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/delete_entity.h"
 #include "game/cosmos/just_create_entity.h"
+#include "game/cosmos/just_create_entity_functional.h"
 
 #include "game/organization/for_each_entity_type.h"
 #include "game/cosmos/create_entity.hpp"
 #include "game/messages/clone_entity_message.h"
+#include "game/messages/just_create_entity_message.h"
 
 void deletion_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
 	auto& cosm = step.get_cosmos();
@@ -48,9 +50,32 @@ void creation_system::flush_clone_entity_requests(const logic_step step) {
 	queued.clear();
 }
 
+void creation_system::flush_just_create_entity_requests(const logic_step step) {
+	auto access = allocate_new_entity_access();
+	auto& cosm = step.get_cosmos();
+	auto& queued = step.get_queue<messages::just_create_entity_message>();
+
+	for (auto& q : queued) {
+		if (!q.flavour.is_set()) {
+			continue;
+		}
+
+		const auto new_entity = just_create_entity(access, cosm, q.flavour);
+
+		if (new_entity.alive() && q.post_create) {
+			q.post_create(new_entity, step);
+		}
+	}
+
+	queued.clear();
+}
+
 void creation_system::flush_create_entity_requests(const logic_step step) {
 	/* First flush any queued clone requests */
 	flush_clone_entity_requests(step);
+
+	/* Then flush any queued just_create_entity requests */
+	flush_just_create_entity_requests(step);
 
 	auto access = allocate_new_entity_access();
 

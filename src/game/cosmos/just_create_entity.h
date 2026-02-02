@@ -25,3 +25,10 @@ void queue_clone_entity(
 	std::function<void(entity_handle, logic_step)> post_clone
 );
 
+/* Queue an untyped create entity request to be flushed later with flush_create_entity_requests */
+void queue_just_create_entity(
+	const logic_step step,
+	const entity_flavour_id flavour,
+	std::function<void(entity_handle, logic_step)> post_create
+);
+
