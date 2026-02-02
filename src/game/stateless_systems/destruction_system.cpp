@@ -15,7 +15,6 @@
 #include "game/components/shape_circle_component.h"
 #include "game/components/destructible_component.h"
 #include "game/components/rigid_body_component.h"
-#include "game/invariants/destructible.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/calc_physical_material.hpp"

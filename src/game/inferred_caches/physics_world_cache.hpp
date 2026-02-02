@@ -10,7 +10,6 @@
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
 #include "game/components/destructible_component.h"
-#include "game/invariants/destructible.h"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
