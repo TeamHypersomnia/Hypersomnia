@@ -90,6 +90,7 @@ void destruction_system::generate_damages_for_pending_destructions(const logic_s
 				damage_msg.damage.base = 1.0f; /* Formality - we detect negative health in apply_damages */
 				damage_msg.impact_velocity = pd.impact_velocity;
 				damage_msg.point_of_impact = target.get_logic_transform().pos; /* Center of entity */
+				damage_msg.from_pending_destruction = true; /* Mark to skip sound spawn */
 
 				step.post_message(damage_msg);
 			}
@@ -409,6 +410,9 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			 * - area = 1.0 → pitch = 1.0, scale = 1.0
 			 * - area = 0.5 → pitch = 1.2, scale = 0.8  
 			 * - area = 0.0 → pitch = 1.4, scale = 0.6
+			 *
+			 * Sound is skipped for pending destructions (recursive splits from excess damage).
+			 * First split uses standard_destruction_sound, subsequent splits use lesser_destruction_sound.
 			 */
 			{
 				const auto& logicals = cosm.get_logical_assets();
@@ -421,22 +425,40 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 					const auto effect_transform = transformr(d.point_of_impact, (-d.impact_velocity).degrees());
 
-					/* Spawn destruction sound */
-					auto destruction_sound = mat->standard_destruction_sound;
-					if (!destruction_sound.id.is_set()) {
-						/* Fall back to standard damage sound if destruction sound not set */
-						destruction_sound = mat->standard_damage_sound;
-					}
-					if (destruction_sound.id.is_set()) {
-						destruction_sound.modifier.pitch *= pitch_mult;
-						destruction_sound.start(
-							step,
-							sound_effect_start_input::fire_and_forget(effect_transform).set_listener(subject),
-							always_predictable_v
-						);
+					/* Spawn destruction sound - skip if from pending destruction */
+					if (!d.from_pending_destruction) {
+						sound_effect_input destruction_sound;
+						
+						if (is_first_split) {
+							/* First split uses standard destruction sound */
+							destruction_sound = mat->standard_destruction_sound;
+							if (!destruction_sound.id.is_set()) {
+								destruction_sound = mat->standard_damage_sound;
+							}
+						}
+						else {
+							/* Subsequent splits use lesser destruction sound */
+							destruction_sound = mat->lesser_destruction_sound;
+							if (!destruction_sound.id.is_set()) {
+								/* Fall back to standard destruction sound if lesser not set */
+								destruction_sound = mat->standard_destruction_sound;
+								if (!destruction_sound.id.is_set()) {
+									destruction_sound = mat->standard_damage_sound;
+								}
+							}
+						}
+						
+						if (destruction_sound.id.is_set()) {
+							destruction_sound.modifier.pitch *= pitch_mult;
+							destruction_sound.start(
+								step,
+								sound_effect_start_input::fire_and_forget(effect_transform).set_listener(subject),
+								always_predictable_v
+							);
+						}
 					}
 
-					/* Spawn destruction particles */
+					/* Spawn destruction particles (always spawn, even for pending destructions) */
 					auto destruction_particles = mat->standard_destruction_particles;
 					if (!destruction_particles.id.is_set()) {
 						/* Fall back to standard damage particles if destruction particles not set */
