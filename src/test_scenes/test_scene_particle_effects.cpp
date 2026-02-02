@@ -270,11 +270,11 @@ void load_test_scene_particle_effects(
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
 
-			em.base_speed = float_range(350, 400);
+			em.base_speed = float_range(650, 800);
 			em.base_speed_variation = float_range(100.f, 120.f);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(900, 900);
+			em.particle_lifetime_ms = float_range(200, 750);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -289,7 +289,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_layer = particle_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
