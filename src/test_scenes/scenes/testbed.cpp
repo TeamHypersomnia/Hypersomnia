@@ -542,7 +542,7 @@ namespace test_scenes {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
 
-		const auto crate_type = test_plain_sprited_bodies::CRATE;
+		const auto crate_type = test_destructible_sprited_bodies::CRATE;
 		const auto force_type = test_hand_explosives::FORCE_GRENADE;
 		const auto ped_type = test_hand_explosives::PED_GRENADE;
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
@@ -709,7 +709,7 @@ namespace test_scenes {
 			}
 		}
 
-		create(test_plain_sprited_bodies::CRATE, vec2(800, 1000));
+		create(test_destructible_sprited_bodies::CRATE, vec2(800, 1000));
 
 		create(test_plain_sprited_bodies::BOX_COLLIDER_GLASS, vec2(900, 300)).set_logical_size(vec2(64, 128));
 		create(test_plain_sprited_bodies::BOX_COLLIDER_WOOD, vec2(900, 300+150)).set_logical_size(vec2(64, 128));

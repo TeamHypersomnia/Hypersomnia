@@ -4,6 +4,7 @@
 #include "augs/templates/folded_finders.h"
 
 struct plain_sprited_body;
+struct destructible_sprited_body;
 struct controlled_character;
 struct plain_missile;
 struct shootable_weapon;
@@ -29,6 +30,7 @@ struct decal_decoration;
 
 using all_entity_types = type_list<
 	plain_sprited_body,
+	destructible_sprited_body,
 	controlled_character,
 	plain_missile,
 	shootable_weapon,
@@ -55,6 +57,7 @@ using all_entity_types = type_list<
 
 #define FOR_ALL_ENTITY_TYPES(MACRO) \
 	MACRO(plain_sprited_body) \
+	MACRO(destructible_sprited_body) \
 	MACRO(controlled_character) \
 	MACRO(plain_missile) \
 	MACRO(shootable_weapon) \

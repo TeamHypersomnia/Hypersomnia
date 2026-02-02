@@ -6,6 +6,8 @@
 
 #include "game/detail/footstep_effect.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "augs/misc/constant_size_vector.h"
+#include "game/components/touch_collectible.h"
 
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
@@ -48,5 +50,7 @@ struct common_assets {
 	typed_entity_flavour_id<decal_decoration> blood_footstep_3_weak;
 
 	particle_effect_input blood_burst_particles;
+
+	augs::constant_size_vector<constrained_entity_flavour_id<invariants::touch_collectible>, 4> default_coin_flavours;
 	// END GEN INTROSPECTOR
 };

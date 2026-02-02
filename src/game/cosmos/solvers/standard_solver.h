@@ -27,7 +27,7 @@ struct standard_solver {
 
 		callbacks.pre_solve(step);
 		standard_solve(step);
-		step.flush_pending_allocations();
+		step.flush_create_entity_requests();
 		callbacks.post_solve(step);
 		step.perform_deletions();
 		callbacks.post_cleanup(const_logic_step(step));

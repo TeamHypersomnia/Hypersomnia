@@ -278,6 +278,9 @@ enum class test_scene_sound_id {
 
 	BLOOD_FOOTSTEP,
 
+	CRATE_DESTRUCTION,
+	CRATE_DESTRUCTION_LESSER,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -4,6 +4,7 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/test_scene_flavour_ids.h"
 #include "test_scenes/test_scene_sounds.h"
 #include "test_scenes/test_scene_particle_effects.h"
 #include "view/viewables/image_in_atlas.h"
@@ -119,6 +120,14 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	/* Blood burst particles: baseline damage is 20, color is blood red */
 	common_assets.blood_burst_particles.id = to_particle_effect_id(test_scene_particle_effect_id::BLOOD_BURST);
 	common_assets.blood_burst_particles.modifier.color = white;
+
+	/* Default coin flavours for money spawning from destructibles */
+	common_assets.default_coin_flavours = {
+		to_entity_flavour_id(test_touch_collectibles::GREEN_COIN),
+		to_entity_flavour_id(test_touch_collectibles::CRYSTAL_COIN),
+		to_entity_flavour_id(test_touch_collectibles::PLATINUM_COIN),
+		to_entity_flavour_id(test_touch_collectibles::GOLD_COIN)
+	};
 
 	load_test_scene_sentience_properties(common);
 	// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
