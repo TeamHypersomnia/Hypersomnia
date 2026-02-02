@@ -1,6 +1,6 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
-#include "game/invariants/destructible.h"
+#include "game/components/destructible_component.h"
 
 augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
 

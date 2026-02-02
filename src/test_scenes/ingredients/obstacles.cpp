@@ -3,7 +3,6 @@
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/destructible_component.h"
-#include "game/invariants/destructible.h"
 
 real32 get_material_penetrability(const test_scene_physical_material_id id) {
 	using T = test_scene_physical_material_id;
