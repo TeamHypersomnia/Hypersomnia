@@ -14,6 +14,7 @@
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/assets/image_offsets.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
+#include "game/detail/view_input/money_type.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
@@ -77,6 +78,9 @@ struct editor_sprite_resource_physical {
 	bool is_destructible = false;
 	real32 max_health = 100.0f;
 	real32 make_dynamic_below_area = 0.6f; // Only relevant when is_static is true. Fraction of area below which splits become dynamic.
+	real32 disable_below_area = 64.0f * 64.0f; // No longer split below this area (in pixels²)
+	money_type money_spawned_min = 0;
+	money_type money_spawned_max = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sprite_resource_physical&) const = default;

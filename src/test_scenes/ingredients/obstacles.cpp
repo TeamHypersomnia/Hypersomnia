@@ -3,6 +3,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/destructible_component.h"
+#include "game/invariants/destructible.h"
 
 real32 get_material_penetrability(const test_scene_physical_material_id id) {
 	using T = test_scene_physical_material_id;
@@ -111,10 +112,17 @@ namespace test_flavours {
 			);
 			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
 
-			auto& destructible = crate_meta.template get<components::destructible>();
-			destructible.max_health = 100.0f;
-			destructible.health = 100.0f;
-			destructible.make_dynamic_below_area = 0.6f;
+			/* Set up invariant for permanent destructible properties */
+			auto& dest_inv = crate_meta.template get<invariants::destructible>();
+			dest_inv.max_health = 100.0f;
+			dest_inv.make_dynamic_below_area = 0.6f;
+			dest_inv.disable_below_area = 64.0f * 64.0f;
+			dest_inv.money_spawned_min = 500;
+			dest_inv.money_spawned_max = 1000;
+
+			/* Set up component for initial health value */
+			auto& dest_comp = crate_meta.template get<components::destructible>();
+			dest_comp.health = 100.0f;
 		}
 
 		{
@@ -159,10 +167,17 @@ namespace test_flavours {
 			wall_meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
 			wall_meta.template get<invariants::render>().layer = render_layer::SOLID_OBSTACLES;
 
-			auto& destructible = wall_meta.template get<components::destructible>();
-			destructible.max_health = 500.0f;
-			destructible.health = 500.0f;
-			destructible.make_dynamic_below_area = 0.6f;
+			/* Set up invariant for permanent destructible properties */
+			auto& dest_inv = wall_meta.template get<invariants::destructible>();
+			dest_inv.max_health = 500.0f;
+			dest_inv.make_dynamic_below_area = 0.6f;
+			dest_inv.disable_below_area = 64.0f * 64.0f;
+			dest_inv.money_spawned_min = 0;
+			dest_inv.money_spawned_max = 0;
+
+			/* Set up component for initial health value */
+			auto& dest_comp = wall_meta.template get<components::destructible>();
+			dest_comp.health = 500.0f;
 		}
 
 		{

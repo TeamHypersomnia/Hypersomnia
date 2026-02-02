@@ -99,6 +99,7 @@ struct destructible_sprited_body {
 		invariants::sprite,
 		invariants::render,
 		invariants::animation,
+		invariants::destructible,
 
 		invariants::interpolation
 	>;

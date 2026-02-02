@@ -65,13 +65,19 @@ bool setup_entity_from_node(
 			body->special.penetrability = editable.penetrability;
 		}
 
-		/* Set up destructible component if enabled in resource and custom_shape is empty */
+		/* 
+		 * Set up destructible component if enabled in resource and custom_shape is empty.
+		 * max_health, make_dynamic_below_area, etc. are in the invariant.
+		 * The component only needs health and texture_rect.
+		 */
 		if (auto destructible = agg.template find<components::destructible>()) {
 			const auto& physical = resource.editable.as_physical;
 			if (physical.is_destructible && physical.custom_shape.empty()) {
-				destructible->max_health = physical.max_health;
+				/* 
+				 * Set health equal to max_health from the invariant.
+				 * The invariant is set up in setup_scene_object_from_resource.
+				 */
 				destructible->health = physical.max_health;
-				destructible->make_dynamic_below_area = physical.make_dynamic_below_area;
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
+#include "game/invariants/destructible.h"
 
 augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
 
@@ -464,6 +465,15 @@ void setup_scene_object_from_resource(
 			}
 
 			fixtures->collision_sound_sensitivity = physical.collision_sound_sensitivity;
+		}
+
+		/* Set up invariants::destructible for destructible_sprited_body entities */
+		if (auto dest = scene.template find<invariants::destructible>()) {
+			dest->max_health = physical.max_health;
+			dest->make_dynamic_below_area = physical.make_dynamic_below_area;
+			dest->disable_below_area = physical.disable_below_area;
+			dest->money_spawned_min = physical.money_spawned_min;
+			dest->money_spawned_max = physical.money_spawned_max;
 		}
 
 		if (domain != editor_sprite_domain::PHYSICAL) {

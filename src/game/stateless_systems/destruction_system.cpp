@@ -15,11 +15,13 @@
 #include "game/components/shape_circle_component.h"
 #include "game/components/destructible_component.h"
 #include "game/components/rigid_body_component.h"
+#include "game/invariants/destructible.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/spaaawn.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
@@ -76,13 +78,14 @@ void destruction_system::generate_damages_for_pending_destructions(const logic_s
 				return true;
 			}
 
-			const auto* destructible = target.find<components::destructible>();
-			if (!destructible || !destructible->is_enabled()) {
+			const auto* dest_inv = target.find<invariants::destructible>();
+			const auto* dest_comp = target.find<components::destructible>();
+			if (!dest_inv || !dest_comp) {
 				return true;
 			}
 
 			/* Only generate damage if health is still negative (hasn't been destroyed by another event) */
-			if (destructible->health < 0.0f) {
+			if (dest_comp->health < 0.0f) {
 				messages::damage_message damage_msg;
 				damage_msg.subject = pd.target;
 				damage_msg.damage.base = 1.0f; /* Formality - we detect negative health in apply_damages */
@@ -116,19 +119,17 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			continue;
 		}
 
-		/* Check if this entity has a destructible component */
-		const auto* destructible = subject.find<components::destructible>();
+		/* Check if this entity has a destructible invariant and component */
+		const auto* dest_inv = subject.find<invariants::destructible>();
+		const auto* dest_comp_ptr = subject.find<components::destructible>();
 		
-		if (!destructible) {
+		if (!dest_inv || !dest_comp_ptr) {
 			continue;
 		}
 
-		/* Skip if destructibility is disabled (max_health == -1) */
-		if (!destructible->is_enabled()) {
-			continue;
-		}
+		const auto& dest_inv_ref = *dest_inv;
 		
-		if (subject.get_logical_size().area() < destructible->disable_below_area) {
+		if (subject.get_logical_size().area() < dest_inv_ref.disable_below_area) {
 			continue;
 		}
 
@@ -200,8 +201,22 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			constexpr real32 min_destructible_area = 100.0f;
 			if (actual_area < min_destructible_area) {
 				/* Reset health to positive to stop further destruction attempts */
-				dest.health = dest.max_health;
+				dest.health = dest_inv_ref.max_health * texture_area;
 				continue;
+			}
+
+			/* 
+			 * Spawn money on FIRST split only (when texture_rect area is 1.0).
+			 * This is the original entity being split for the first time.
+			 */
+			const bool is_first_split = (texture_area >= 0.99f);
+			if (is_first_split && dest_inv_ref.money_spawned_max > 0) {
+				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
+				if (money_amount > 0) {
+					/* Import spawn_money function - spawn coins at the split location */
+					const auto spawn_pos = transformr(d.point_of_impact, 0.0f);
+					spawn_money(step, spawn_pos, money_amount, subject);
+				}
 			}
 
 			/* 
@@ -274,8 +289,11 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			xywh original_rect = dest.texture_rect;
 			xywh new_rect = original_rect;
 
-			/* Calculate the original max_health based on root max_health */
-			const real32 root_max_health = dest.max_health / texture_area;
+			/* 
+			 * Calculate the root max_health (the invariant's max_health is the root value).
+			 * The current chunk's health should be scaled by its area.
+			 */
+			const real32 root_max_health = dest_inv_ref.max_health;
 			
 			/* Calculate excessive damage to distribute to both splits */
 			const real32 excess_damage = -dest.health; /* health is negative, so -health gives excess */
@@ -335,9 +353,8 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			const real32 original_new_health = original_new_max_health - excess_damage;
 			const real32 new_piece_health = new_piece_max_health - excess_damage;
 
-			/* Update original entity */
+			/* Update original entity - only health and texture_rect since max_health is in invariant */
 			dest.texture_rect = original_rect;
-			dest.max_health = original_new_max_health;
 			dest.health = original_new_health;
 
 			/* Calculate position shifts needed for both entities */
@@ -470,11 +487,10 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 					auto& cosm_inner = step_inner.get_cosmos();
 					auto& global_inner = cosm_inner.get_global_solvable();
 
-					/* Set up the new chunk's destructible component */
+					/* Set up the new chunk's destructible component - only health and texture_rect */
 					auto* new_dest = new_entity.find<components::destructible>();
 					if (new_dest) {
 						new_dest->texture_rect = new_rect;
-						new_dest->max_health = new_piece_max_health;
 						new_dest->health = new_piece_health;
 					}
 
