@@ -9,6 +9,7 @@ struct pending_destruction {
 	entity_id target;
 	real32 delay_ms = 0.0f;
 	vec2 impact_velocity = vec2::zero;
+	bool skip_sound = false;
 	// END GEN INTROSPECTOR
 };
 
