@@ -42,6 +42,7 @@ namespace messages {
 	struct collected_message;
 	struct sound_cue_message;
 	struct clone_entity_message;
+	struct just_create_entity_message;
 
 	template <class T>
 	struct create_entity_message;
@@ -98,5 +99,6 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::match_summary_ended,
 	messages::collected_message,
 	messages::sound_cue_message,
-	messages::clone_entity_message
+	messages::clone_entity_message,
+	messages::just_create_entity_message
 >;

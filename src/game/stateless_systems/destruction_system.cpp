@@ -20,6 +20,7 @@
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/spawn_collectibles.hpp"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
@@ -211,12 +212,11 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			 * This is the original entity being split for the first time.
 			 */
 			const bool is_first_split = (texture_area >= 0.99f);
-			if (is_first_split && dest_inv_ref.money_spawned_max > 0) {
+			if (is_first_split && dest_inv_ref.money_spawned_max > 0 && !dest_inv_ref.coin_flavours.empty()) {
 				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
 				if (money_amount > 0) {
-					/* Spawn coins at the split location */
-					const auto spawn_transform = transformr(d.point_of_impact, 0.0f);
-					spawn_money(step, spawn_transform, money_amount, subject);
+					/* Queue coin spawning at the split location */
+					spawn_coins_queued(money_amount, d.point_of_impact, step, dest_inv_ref.coin_flavours);
 				}
 			}
 

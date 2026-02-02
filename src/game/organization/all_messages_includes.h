@@ -26,3 +26,4 @@
 
 #include "game/messages/create_entity_message.h"
 #include "game/messages/clone_entity_message.h"
+#include "game/messages/just_create_entity_message.h"
