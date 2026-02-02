@@ -51,5 +51,6 @@
 #include "game/components/portal_component.h"
 #include "game/components/decal_component.h"
 #include "game/components/destructible_component.h"
+#include "game/invariants/destructible.h"
 
 #include "game/inferred_caches/physics_cache_data.h"

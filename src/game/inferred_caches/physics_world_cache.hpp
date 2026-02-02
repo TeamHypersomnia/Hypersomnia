@@ -10,6 +10,7 @@
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
 #include "game/components/destructible_component.h"
+#include "game/invariants/destructible.h"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
@@ -56,11 +57,11 @@ auto calc_body_type(const E& handle) {
 	 * check if split area falls below the configured threshold. If so, make it dynamic.
 	 */
 	if (type == rigid_body_type::STATIC) {
-		if (const auto* destructible = handle.template find<components::destructible>()) {
-			if (destructible->is_enabled()) {
-				const auto& texture_rect = destructible->texture_rect;
+		if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
+			if (const auto* dest_comp = handle.template find<components::destructible>()) {
+				const auto& texture_rect = dest_comp->texture_rect;
 				const auto current_area = texture_rect.w * texture_rect.h;
-				const auto threshold = destructible->make_dynamic_below_area;
+				const auto threshold = dest_inv->make_dynamic_below_area;
 				
 				/* If threshold > 0 and area <= threshold, make it dynamic */
 				if (threshold > 0.0f && current_area <= threshold) {
@@ -136,11 +137,9 @@ auto calc_filters(const E& handle) {
 	 * Check if this is a destructible chunk that is too small.
 	 * Instead of deleting it, use LYING_ITEM filter so it doesn't block characters.
 	 */
-	if (const auto* destructible = handle.template find<components::destructible>()) {
-		if (destructible->is_enabled()) {
-			if (handle.get_logical_size().area() < destructible->disable_below_area) {
-				return filters[predefined_filter_type::LYING_ITEM];
-			}
+	if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
+		if (handle.get_logical_size().area() < dest_inv->disable_below_area) {
+			return filters[predefined_filter_type::LYING_ITEM];
 		}
 	}
 
