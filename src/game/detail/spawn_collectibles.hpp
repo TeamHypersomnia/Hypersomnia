@@ -2,6 +2,7 @@
 #include "game/cosmos/just_create_entity.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/components/rigid_body_component.h"
+#include "augs/misc/randomization.h"
 
 /*
  * Queue-based version of spawn_coins that uses queue_just_create_entity
