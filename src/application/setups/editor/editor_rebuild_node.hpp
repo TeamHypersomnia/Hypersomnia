@@ -74,8 +74,8 @@ bool setup_entity_from_node(
 			const auto& physical = resource.editable.as_physical;
 			if (physical.is_destructible && physical.custom_shape.empty()) {
 				/* 
-				 * Set health equal to max_health from the invariant.
-				 * The invariant is set up in setup_scene_object_from_resource.
+				 * Initialize health to max_health from the resource.
+				 * This is the same value set in the invariant during flavour setup.
 				 */
 				destructible->health = physical.max_health;
 			}

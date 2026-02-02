@@ -200,7 +200,10 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			 */
 			constexpr real32 min_destructible_area = 100.0f;
 			if (actual_area < min_destructible_area) {
-				/* Reset health to positive to stop further destruction attempts */
+				/* 
+				 * Reset health to positive value scaled by the chunk's texture_rect area.
+				 * This properly represents the remaining health of this smaller chunk.
+				 */
 				dest.health = dest_inv_ref.max_health * texture_area;
 				continue;
 			}
@@ -213,9 +216,9 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			if (is_first_split && dest_inv_ref.money_spawned_max > 0) {
 				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
 				if (money_amount > 0) {
-					/* Import spawn_money function - spawn coins at the split location */
-					const auto spawn_pos = transformr(d.point_of_impact, 0.0f);
-					spawn_money(step, spawn_pos, money_amount, subject);
+					/* Spawn coins at the split location */
+					const auto spawn_transform = transformr(d.point_of_impact, 0.0f);
+					spawn_money(step, spawn_transform, money_amount, subject);
 				}
 			}
 
