@@ -95,15 +95,13 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			 */
 			if constexpr(H::template has<components::destructible>()) {
 				const auto& destructible = typed_handle.template get<components::destructible>();
-				if (destructible.is_enabled()) {
-					const auto& tex_rect = destructible.texture_rect;
-					/* Use float arithmetic and round to avoid precision loss */
-					result.size.x = static_cast<int>(std::round(static_cast<float>(result.size.x) * tex_rect.w));
-					result.size.y = static_cast<int>(std::round(static_cast<float>(result.size.y) * tex_rect.h));
-					/* Ensure minimum size of 1 to prevent zero-size sprites */
-					result.size.x = std::max(1, result.size.x);
-					result.size.y = std::max(1, result.size.y);
-				}
+				const auto& tex_rect = destructible.texture_rect;
+				/* Use float arithmetic and round to avoid precision loss */
+				result.size.x = static_cast<int>(std::round(static_cast<float>(result.size.x) * tex_rect.w));
+				result.size.y = static_cast<int>(std::round(static_cast<float>(result.size.y) * tex_rect.h));
+				/* Ensure minimum size of 1 to prevent zero-size sprites */
+				result.size.x = std::max(1, result.size.x);
+				result.size.y = std::max(1, result.size.y);
 			}
 
 			return result;
@@ -130,20 +128,18 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			/* Pass texture_rect and tile_offset for destructible sprites */
 			if constexpr(H::template has<components::destructible>()) {
 				const auto& destructible = typed_handle.template get<components::destructible>();
-				if (destructible.is_enabled()) {
-					result.texture_rect = destructible.texture_rect;
-					
-					/* 
-					 * For tiled sprites, calculate the tile offset to maintain visual continuity.
-					 * The offset is where this chunk starts within the original sprite's tile grid.
-					 */
-					if (sprite.tile_excess_size) {
-						const auto original_sprite_size = typed_handle.template get<invariants::sprite>().size;
-						result.tile_offset = vec2(
-							original_sprite_size.x * destructible.texture_rect.x,
-							original_sprite_size.y * destructible.texture_rect.y
-						);
-					}
+				result.texture_rect = destructible.texture_rect;
+				
+				/* 
+				 * For tiled sprites, calculate the tile offset to maintain visual continuity.
+				 * The offset is where this chunk starts within the original sprite's tile grid.
+				 */
+				if (sprite.tile_excess_size) {
+					const auto original_sprite_size = typed_handle.template get<invariants::sprite>().size;
+					result.tile_offset = vec2(
+						original_sprite_size.x * destructible.texture_rect.x,
+						original_sprite_size.y * destructible.texture_rect.y
+					);
 				}
 			}
 

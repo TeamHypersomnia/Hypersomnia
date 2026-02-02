@@ -170,11 +170,9 @@ public:
 		/* If we have a base size and a destructible component, apply texture_rect scaling */
 		if (has_base_size) {
 			if (const auto* const destructible = handle.template find<components::destructible>()) {
-				if (destructible->is_enabled()) {
-					const auto& tex_rect = destructible->texture_rect;
-					base_size.x *= tex_rect.w;
-					base_size.y *= tex_rect.h;
-				}
+				const auto& tex_rect = destructible->texture_rect;
+				base_size.x *= tex_rect.w;
+				base_size.y *= tex_rect.h;
 			}
 			return augs::calc_sprite_aabb(transform, vec2i(base_size));
 		}

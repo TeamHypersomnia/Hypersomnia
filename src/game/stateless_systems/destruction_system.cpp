@@ -21,7 +21,6 @@
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/detail/spaaawn.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
