@@ -106,7 +106,13 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 	auto& cosm = step.get_cosmos();
 	auto& global = cosm.get_global_solvable();
 	auto& rng = step.step_rng;
-	const auto& damages = step.get_queue<messages::damage_message>();
+
+	/* 
+	 * IMPORTANT: Copy the queue before iteration.
+	 * During iteration we may post new messages (pure_color_highlight, pending_destructions, etc.)
+	 * which could cause the underlying vector to reallocate, invalidating all references.
+	 */
+	auto damages = step.get_queue<messages::damage_message>();
 
 	for (const auto& d : damages) {
 		if (d.processed) {
