@@ -102,6 +102,19 @@ void destruction_system::generate_damages_for_pending_destructions(const logic_s
 	});
 }
 
+/*
+ * IMPORTANT: This function uses queue_clone_entity instead of just_clone_entity to prevent
+ * component pointer invalidation. If just_clone_entity was called directly during iteration,
+ * the entity pool could reallocate, invalidating all component pointers.
+ *
+ * Additionally, immutable destructible data (max_health, disable_below_area, etc.) is stored
+ * in invariants::destructible (flavour-based) rather than components::destructible. Invariants
+ * are stored separately from entity pools and are not affected by pool reallocation.
+ *
+ * At commit b9e777f, these values were in the component, and pool reallocation during
+ * direct just_clone_entity calls caused component pointer corruption, manifesting as
+ * garbage values like 2.01787e-42 for disable_below_area.
+ */
 void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	auto& global = cosm.get_global_solvable();
@@ -213,10 +226,11 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			 * This is the original entity being split for the first time.
 			 */
 			const bool is_first_split = (texture_area >= 0.99f);
-			if (is_first_split && dest_inv_ref.money_spawned_max > 0 && !dest_inv_ref.coin_flavours.empty()) {
+			const auto& common_assets = cosm.get_common_assets();
+			if (is_first_split && dest_inv_ref.money_spawned_max > 0 && !common_assets.default_coin_flavours.empty()) {
 				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
 				if (money_amount > 0) {
-					spawn_coins_queued(money_amount, d.point_of_impact, step, dest_inv_ref.coin_flavours);
+					spawn_coins_queued(money_amount, d.point_of_impact, step, common_assets.default_coin_flavours);
 				}
 			}
 
