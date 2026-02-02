@@ -215,7 +215,6 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			if (is_first_split && dest_inv_ref.money_spawned_max > 0 && !dest_inv_ref.coin_flavours.empty()) {
 				const auto money_amount = rng.randval(dest_inv_ref.money_spawned_min, dest_inv_ref.money_spawned_max);
 				if (money_amount > 0) {
-					/* Queue coin spawning at the split location */
 					spawn_coins_queued(money_amount, d.point_of_impact, step, dest_inv_ref.coin_flavours);
 				}
 			}
@@ -417,7 +416,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				
 				if (const auto* mat = logicals.find(material_id)) {
 					/* Calculate pitch and scale modifiers based on area */
-					const real32 pitch_mult = 1.0f + 0.4f * (1.0f - texture_area);
+					const real32 pitch_mult = 0.9f + 0.3f * (1.0f - texture_area);
 					const real32 scale_mult = 0.6f + 0.4f * texture_area;
 
 					const auto effect_transform = transformr(d.point_of_impact, (-d.impact_velocity).degrees());
