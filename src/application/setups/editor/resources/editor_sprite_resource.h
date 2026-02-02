@@ -14,7 +14,7 @@
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/assets/image_offsets.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
-#include "game/detail/view_input/money_type.h"
+#include "game/detail/economy/money_type.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain

@@ -1,5 +1,6 @@
 #pragma once
-#include "game/detail/view_input/money_type.h"
+
+using money_type = int;
 
 namespace invariants {
 	struct destructible {
