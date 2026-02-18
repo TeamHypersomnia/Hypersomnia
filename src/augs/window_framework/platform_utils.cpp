@@ -95,6 +95,9 @@ namespace augs {
 
 #elif PLATFORM_UNIX
 #include <unistd.h>
+#if PLATFORM_LINUX
+#include <linux/limits.h>
+#endif
 	path_type get_executable_path() {
 		char dest[PATH_MAX];
 		memset(dest,0,sizeof(dest)); // readlink does not null terminate!
