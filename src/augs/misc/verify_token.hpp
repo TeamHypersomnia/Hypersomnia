@@ -236,7 +236,7 @@ std::string verify_steam_token(const std::string& api_key, const std::string& ti
 	params.emplace("ticket", ticket_hex);
 	params.emplace("identity", identity);
 
-	const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::Progress());
+	const auto result = http_client->Get("/ISteamUserAuth/AuthenticateUserTicket/v1", params, httplib::Headers(), httplib::DownloadProgress());
 
 	if (result) {
 		if (httplib_utils::successful(result->status)) {

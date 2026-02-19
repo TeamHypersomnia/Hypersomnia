@@ -173,7 +173,7 @@ namespace telegram_webhooks {
 		return result;
 	}
 
-	inline httplib::MultipartFormDataItems form_player_connected(
+	inline httplib::UploadFormDataItems form_player_connected(
 		const std::string& channel_id,
 		const std::string& connected_player,
 		const std::string& from_where
@@ -187,7 +187,7 @@ namespace telegram_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_error_report(
+	inline httplib::UploadFormDataItems form_error_report(
 		const std::string& channel_id,
 		const std::string& error
 	) {
@@ -198,7 +198,7 @@ namespace telegram_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_new_community_server(
+	inline httplib::UploadFormDataItems form_new_community_server(
 		const std::string& channel_id,
 		const std::string& new_server_name,
 		const std::string& new_server_ip,
@@ -576,7 +576,7 @@ namespace discord_webhooks {
 		return "";
 	}
 
-	inline httplib::MultipartFormDataItems form_error_report(
+	inline httplib::UploadFormDataItems form_error_report(
 		const std::string& username,
 		const std::string& error_title,
 		const std::string& error
@@ -621,7 +621,7 @@ namespace discord_webhooks {
 			{ "payload_json", payload, "", "" }
 		};
 	}
-	inline httplib::MultipartFormDataItems form_new_community_server(
+	inline httplib::UploadFormDataItems form_new_community_server(
 		const std::string& hook_username,
 		const std::string& new_server_name,
 		const std::string& new_server_ip,
@@ -710,7 +710,7 @@ namespace discord_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_duel_interrupted(
+	inline httplib::UploadFormDataItems form_duel_interrupted(
 		const std::string& hook_username,
 		const std::string& fled_pic_link,
 		const std::string& truce_pic_link,
@@ -797,7 +797,7 @@ namespace discord_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_match_summary(
+	inline httplib::UploadFormDataItems form_match_summary(
 		const std::string& hook_username,
 		const std::string& mvp_name,
 		const std::string& mvp_avatar_link,
@@ -989,7 +989,7 @@ namespace discord_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_duel_of_honor(
+	inline httplib::UploadFormDataItems form_duel_of_honor(
 		const std::string& hook_username,
 		const std::string& first_player,
 		const std::string& second_player,
@@ -1042,7 +1042,7 @@ namespace discord_webhooks {
 		};
 	}
 
-	inline httplib::MultipartFormDataItems form_player_connected(
+	inline httplib::UploadFormDataItems form_player_connected(
 		const std::vector<std::byte> avatar,
 		const std::string& hook_username,
 		const std::string& connected_player,

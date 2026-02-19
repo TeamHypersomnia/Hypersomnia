@@ -100,13 +100,13 @@ void https_file_uploader::worker_func() {
 			// TODO_WEB
 			auto res = augs::emscripten_http::result();
 #else
-			httplib::MultipartFormDataItems items = {
+			httplib::UploadFormDataItems items = {
 				{"apikey", api_key, "", "text/plain"},
 				{"arena", arena_name, "", "text/plain"},
 				{"filename", location_on_server, "", "text/plain"}
 			};
 
-			httplib::MultipartFormDataProviderItems provider_items = {
+			httplib::FormDataProviderItems provider_items = {
 				{"upload", content_provider, location_on_server, "application/octet-stream"}
 			};
 
