@@ -9,6 +9,7 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
+#include "game/components/destructible_component.h"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
@@ -44,11 +45,30 @@ template <class E>
 auto calc_body_type(const E& handle) {
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
-	const auto type = 
+	auto type = 
 		is_like_planted_or_defused_bomb(handle) 
 		? rigid_body_type::STATIC 
 		: physics_def.body_type
 	;
+
+	/* 
+	 * If a plain sprited body is static and has a destructible component,
+	 * check if split area falls below the configured threshold. If so, make it dynamic.
+	 */
+	if (type == rigid_body_type::STATIC) {
+		if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
+			if (const auto* dest_comp = handle.template find<components::destructible>()) {
+				const auto& texture_rect = dest_comp->texture_rect;
+				const auto current_area = texture_rect.w * texture_rect.h;
+				const auto threshold = dest_inv->make_dynamic_below_area;
+				
+				/* If threshold > 0 and area <= threshold, make it dynamic */
+				if (threshold > 0.0f && current_area <= threshold) {
+					type = rigid_body_type::DYNAMIC;
+				}
+			}
+		}
+	}
 
 	return to_b2Body_type(type);
 }
@@ -109,6 +129,16 @@ auto calc_filters(const E& handle) {
 	if (const auto rigid = handle.template find<components::rigid_body>()) {
 		if (rigid.get_special().inside_portal.is_set()) {
 			return filter_type();
+		}
+	}
+
+	/* 
+	 * Check if this is a destructible chunk that is too small.
+	 * Instead of deleting it, use LYING_ITEM filter so it doesn't block characters.
+	 */
+	if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
+		if (handle.get_logical_size().area() < dest_inv->disable_below_area) {
+			return filters[predefined_filter_type::LYING_ITEM];
 		}
 	}
 
@@ -450,6 +480,10 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	};
 
 	auto from_box_shape = [&](vec2 size, const real32 additional_rotation) {
+		/* 
+		 * Note: size already includes texture_rect scaling from get_logical_size().
+		 * Do NOT scale again here to avoid double-scaling.
+		 */
 		size.x = std::max(1.f, size.x);
 		size.y = std::max(1.f, size.y);
 

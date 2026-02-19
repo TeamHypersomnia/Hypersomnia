@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- naprawic particle przy rozwalaniu, lepsze
+- niech sie jeden tlyko dzwiek spawnuje przy rozwalaniu wszystkich excessive
+- zjebane jest dalej cos z iteracja ze za duzo ich tworzy
+
 - jak za dlugi combat to lec do paki
 - mozna jeszcze opoznic wybuch krwi do wybuchow tych staminowych posmiertnych
 - czemu nie dzialaja cast blinki

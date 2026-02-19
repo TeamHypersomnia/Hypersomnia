@@ -12,6 +12,9 @@ auto& editor_official_resource_map::get_container(S& self, const T& id) {
 	else if constexpr(std::is_same_v<T, test_plain_sprited_bodies>) {
 		return self.plain_sprited_bodies;
 	}
+	else if constexpr(std::is_same_v<T, test_destructible_sprited_bodies>) {
+		return self.destructible_sprited_bodies;
+	}
 	else if constexpr(std::is_same_v<T, test_dynamic_decorations>) {
 		return self.dynamic_decorations;
 	}

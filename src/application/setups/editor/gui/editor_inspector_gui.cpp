@@ -1809,6 +1809,61 @@ EDIT_FUNCTION(
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, bullets and magic missiles will freely fly over this object.\nCharacters will still collide - except their weapons.\n\nNote that rockets are NOT considered bullets.\nFor these, you must tick Grenades fly over.");
 		}
+
+		/* 
+		 * Destructibility is only available for box-based shapes (no custom shape defined).
+		 */
+		{
+			const bool has_custom_shape = !insp.as_physical.custom_shape.empty();
+			auto disabled = maybe_disabled_only_cols(has_custom_shape);
+
+			MULTIPROPERTY("Destructible", as_physical.is_destructible);
+
+			if (ImGui::IsItemHovered()) {
+				if (has_custom_shape) {
+					text_tooltip("Destructibility is only available for box-based shapes.\nRemove the custom shape to enable this feature.");
+				}
+				else {
+					text_tooltip("If enabled, this object can be destroyed by damage.\nWhen health reaches zero, the object will split into chunks.");
+				}
+			}
+
+			if (insp.as_physical.is_destructible && !has_custom_shape) {
+				auto indent = scoped_indent();
+				MULTIPROPERTY("Health", as_physical.max_health);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Maximum health of this object.\nWhen health reaches zero, the object splits into chunks.\nLarger chunks inherit proportionally more health.");
+				}
+
+				/* Only show make_dynamic_below_area when the object is static */
+				if (insp.as_physical.is_static) {
+					MULTIPROPERTY("Make dynamic below area", as_physical.make_dynamic_below_area);
+
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("Fraction of original area below which split chunks become dynamic.\n0 = chunks never become dynamic (stay static until deleted).\n0.6 = chunks become dynamic when their area is 60% or less of the original.\nRange: 0.0 - 1.0");
+					}
+				}
+
+				MULTIPROPERTY("Disable below area", as_physical.disable_below_area);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Chunks smaller than this area (in pixels²) will stop being destructible.\nThey will pass through like lying items.\nDefault: 4096 (64x64 pixels).");
+				}
+
+				MULTIPROPERTY("Money drop min", as_physical.money_spawned_min);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Minimum amount of money dropped when this object is first destroyed.\nSet both min and max to 0 to disable money drops.");
+				}
+
+				MULTIPROPERTY("Money drop max", as_physical.money_spawned_max);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Maximum amount of money dropped when this object is first destroyed.\nSet both min and max to 0 to disable money drops.");
+				}
+			}
+		}
 	}
 	else {
 		MULTIPROPERTY("Cover background neons", as_nonphysical.cover_background_neons);
@@ -1973,6 +2028,14 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		MULTIPROPERTY("Silence damager destruction sound", silence_damager_destruction_sound);
 		tooltip_on_hover("Tick to silence the default bullet destruction sound.");
 	}
+
+	ImGui::Separator();
+	text_color("Default destruction behavior", yellow);
+	ImGui::Separator();
+
+	text_disabled("Played when a destructible object is split.\nIf not set, no destruction effects are played.");
+	SOUND_EFFECT_LEAN_MULTIPROPERTY("Destruction sound", destruction_sound);
+	PARTICLE_EFFECT_MULTIPROPERTY("Destruction particles", destruction_particles);
 
 	ImGui::Separator();
 	text_color("Default collision behavior", yellow);
