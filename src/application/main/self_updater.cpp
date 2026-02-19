@@ -111,7 +111,7 @@ self_update_result check_and_apply_updates(
 
 	auto log_null_response = [&client]() {
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-		auto result = client->get_openssl_verify_result();
+		auto result = client->get_verify_result();
 
 		if (result) {
 			LOG("verify error: %x", X509_verify_cert_error_string(result));
