@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- low effort byloby jakby odpadały łapy z krecacych sie corpsów, bardziej pasuje od jakichs lezacych zwlok
+
 - z tym wyborem bokow cos jest nie tak dalej
 - drobny lag na debugu jak spawnuje splatter przy hedzie z awki na niskim hp, moze limit jakis na ilosc tych particli, choc to bedzie sie dzialo rzadko
 - fixnac fizyke zeby monety nad remnantami

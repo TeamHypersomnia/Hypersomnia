@@ -235,8 +235,10 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				}
 			}
 
-			finalize_bullet();
-			damage_msg.spawn_destruction_effects = true;
+			if (sentience->is_conscious()) {
+				finalize_bullet();
+				damage_msg.spawn_destruction_effects = true;
+			}
 		}
 		else {
 			if (!info.ignore_standard_collision_resolution()) {
