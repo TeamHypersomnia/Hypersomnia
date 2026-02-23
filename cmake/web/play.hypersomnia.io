@@ -8,9 +8,8 @@ server {
         # Try to serve file directly, then directories, then fall back to Hypersomnia.html
         try_files $uri $uri/ /Hypersomnia.html;
 
-        # Add security headers to prevent embedding
-        add_header X-Frame-Options "DENY";
-        add_header Content-Security-Policy "frame-ancestors 'self'";
+        # Allow embedding in iframes from any origin
+        add_header Content-Security-Policy "frame-ancestors *";
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
         add_header Cross-Origin-Resource-Policy "same-site";
