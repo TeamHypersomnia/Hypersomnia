@@ -87,39 +87,6 @@ struct plain_sprited_body {
 	>;
 };
 
-/* E.g. a destructible wall that splits into chunks when shot */
-
-struct destructible_sprited_body {
-	static constexpr std::size_t statically_allocated_entities = 500;
-	static constexpr std::size_t statically_allocated_flavours = 100;
-
-	using invariant_list = type_list<
-		invariants::rigid_body,
-		invariants::fixtures,
-		invariants::sprite,
-		invariants::render,
-		invariants::animation,
-		invariants::destructible,
-
-		invariants::interpolation
-	>;
-
-	using component_list = type_list<
-		components::sprite,
-		components::sorting_order,
-		components::overridden_geo,
-		components::rigid_body,
-		components::animation,
-		components::destructible
-	>;
-
-	using synchronized_arrays = type_list<
-		components::interpolation,
-		rigid_body_cache,
-		colliders_cache
-	>;
-};
-
 /* E.g. an AK or a pistol */
 
 struct shootable_weapon {

@@ -6,9 +6,8 @@
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/sentience_system.h"
-#include "game/stateless_systems/destruction_system.h"
 
-struct creation_system;
+struct allocation_system;
 class gun_system;
 class sentience_system;
 class movement_system;
@@ -45,7 +44,7 @@ class allocate_new_entity_access {
 		in a safe, handle-free environment.
 	*/
 
-	friend creation_system;
+	friend allocation_system;
 
 	/*
 		perform_transfer might need to clone a stackable item.
@@ -130,8 +129,6 @@ class allocate_new_entity_access {
 	*/
 
 	friend void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step) const;
-
-	friend void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const;
 
 	/* 
 		For allocating characters. No character handles are manipulated anywhere in proximity. 

@@ -9,7 +9,6 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
-#include "game/components/destructible_component.h"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
@@ -45,21 +44,11 @@ template <class E>
 auto calc_body_type(const E& handle) {
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
-	auto type = 
+	const auto type = 
 		is_like_planted_or_defused_bomb(handle) 
 		? rigid_body_type::STATIC 
 		: physics_def.body_type
 	;
-
-	/* 
-	 * If a destructible entity has been split (texture_rect != 1,1), 
-	 * it becomes a dynamic remnant regardless of original body type.
-	 */
-	if (const auto* dest_comp = handle.template find<components::destructible>()) {
-		if (dest_comp->is_remnant()) {
-			type = rigid_body_type::DYNAMIC;
-		}
-	}
 
 	return to_b2Body_type(type);
 }
@@ -120,16 +109,6 @@ auto calc_filters(const E& handle) {
 	if (const auto rigid = handle.template find<components::rigid_body>()) {
 		if (rigid.get_special().inside_portal.is_set()) {
 			return filter_type();
-		}
-	}
-
-	/* 
-	 * Check if this is a destructible remnant (already split).
-	 * Remnants use REMNANT filter - they don't block characters or bullets.
-	 */
-	if (const auto* dest_comp = handle.template find<components::destructible>()) {
-		if (dest_comp->is_remnant()) {
-			return filters[predefined_filter_type::REMNANT];
 		}
 	}
 
@@ -471,10 +450,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	};
 
 	auto from_box_shape = [&](vec2 size, const real32 additional_rotation) {
-		/* 
-		 * Note: size already includes texture_rect scaling from get_logical_size().
-		 * Do NOT scale again here to avoid double-scaling.
-		 */
 		size.x = std::max(1.f, size.x);
 		size.y = std::max(1.f, size.y);
 

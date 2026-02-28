@@ -150,36 +150,4 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		glass.standard_damage_particles.modifier.color = rgba(142, 186, 197, 255);
 		glass.silence_damager_destruction_sound = true;
 	}
-
-	/* 
-	 * Set up destruction effects for all materials.
-	 * Uses EXHAUSTED_SMOKE particles and CRATE_DESTRUCTION sound.
-	 */
-	{
-		auto& wood = all_definitions[to_physical_material_id(test_scene_physical_material_id::WOOD)];
-		wood.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION);
-		wood.lesser_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION_LESSER);
-		wood.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
-	}
-
-	{
-		auto& metal = all_definitions[to_physical_material_id(test_scene_physical_material_id::METAL)];
-		metal.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION);
-		metal.lesser_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION_LESSER);
-		metal.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
-	}
-
-	{
-		auto& glass = all_definitions[to_physical_material_id(test_scene_physical_material_id::GLASS)];
-		glass.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION);
-		glass.lesser_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION_LESSER);
-		glass.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
-	}
-
-	{
-		auto& vent = all_definitions[to_physical_material_id(test_scene_physical_material_id::VENT)];
-		vent.standard_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION);
-		vent.lesser_destruction_sound.id = to_sound_id(test_scene_sound_id::CRATE_DESTRUCTION_LESSER);
-		vent.standard_destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
-	}
 }

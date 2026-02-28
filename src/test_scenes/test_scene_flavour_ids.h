@@ -69,6 +69,7 @@ enum class test_controlled_characters {
 
 enum class test_plain_sprited_bodies {
 	// GEN INTROSPECTOR enum class test_plain_sprited_bodies
+	CRATE,
 	HARD_WOODEN_WALL,
 	AQUARIUM_GLASS,
 
@@ -98,15 +99,6 @@ enum class test_plain_sprited_bodies {
 	DEV_WALL_64,
 	DEV_WALL_128,
 	DEV_WALL_256,
-
-	COUNT
-	// END GEN INTROSPECTOR
-};
-
-enum class test_destructible_sprited_bodies {
-	// GEN INTROSPECTOR enum class test_destructible_sprited_bodies
-	CRATE,
-	HARD_WOODEN_WALL_DEST,
 
 	COUNT
 	// END GEN INTROSPECTOR

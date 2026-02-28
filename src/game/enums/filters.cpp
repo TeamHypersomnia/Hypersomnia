@@ -189,14 +189,15 @@ predefined_filters::predefined_filters() {
 		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::CHARACTER_WEAPON);
 	}
 	{
-		auto& out = filters[predefined_filter_type::REMNANT];
-		out.categoryBits = make_flags(C::REMNANT);
-		out.maskBits = standard_participation();
-	}
-	{
+
 		auto& out = filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 		out.categoryBits = make_flags(C::LYING_ITEM);
 		out.maskBits = make_flags(C::QUERY);
+	}
+	{
+		auto& out = filters[predefined_filter_type::REMNANT];
+		out.categoryBits = make_flags(C::REMNANT);
+		out.maskBits = standard_participation();
 	}
 	{
 

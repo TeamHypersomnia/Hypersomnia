@@ -17,8 +17,7 @@ namespace augs {
 		F callback, 
 		const real32 final_rotation, 
 		const vec2i tile_size,
-		const camera_cone& cone,
-		const vec2 tile_offset = vec2::zero
+		const camera_cone& cone
 	) {
 		const auto total_size = spr.get_size();
 		const auto times = total_size / tile_size;
@@ -42,17 +41,7 @@ namespace augs {
 			);
 		}();
 
-		/* 
-		 * Calculate the local offset for where the tile grid should start.
-		 * For destructible sprite chunks, tile_offset represents how far into 
-		 * the original sprite this chunk starts, which shifts where tiles begin.
-		 */
-		const auto offset_in_tiles = vec2i(
-			tile_offset.x > 0.0f ? static_cast<int>(std::fmod(tile_offset.x, static_cast<float>(tile_size.x))) : 0,
-			tile_offset.y > 0.0f ? static_cast<int>(std::fmod(tile_offset.y, static_cast<float>(tile_size.y))) : 0
-		);
-
-		const auto first_center_local = -vec2(tile_size * (times - vec2i(1, 1))) / 2 - vec2(offset_in_tiles);
+		const auto first_center_local = -vec2(tile_size * (times - vec2i(1, 1))) / 2;
 
 		const auto first_center = pos + vec2(first_center_local).rotate(final_rotation);
 		const auto first_lt = pos + (first_center_local - tile_size / 2).rotate(final_rotation);
@@ -102,19 +91,11 @@ namespace augs {
 			target_color *= in.colorize;
 		}
 
-		/* 
-		 * For tiled sprites (where tile_size is set), use full 0-1 UV range.
-		 * For non-tiled sprites, use texture_rect for UV mapping (destructible sprites).
-		 */
-		const bool is_tiled = in.tile_size.x > 0 && in.tile_size.y > 0;
-		const auto effective_texture_rect = is_tiled ? xywh(0, 0, 1.0f, 1.0f) : in.texture_rect;
-
 		auto triangles = make_sprite_triangles(
 			considered_texture,
 			points,
 			target_color, 
-			in.flip,
-			effective_texture_rect
+			in.flip 
 		);
 
 		if (!in.disable_special_effects && spr.effect == sprite_special_effect::COLOR_WAVE) {
@@ -243,8 +224,7 @@ namespace augs {
 					},
 					final_rotation,
 					in.tile_size,
-					in.cone,
-					in.tile_offset
+					in.cone
 				);
 			}
 			else {

@@ -14,7 +14,6 @@
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/assets/image_offsets.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
-#include "game/detail/economy/money_type.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
@@ -74,11 +73,6 @@ struct editor_sprite_resource_physical {
 	bool illuminate_like_wall = true;
 
 	image_shape_type custom_shape;
-
-	bool is_destructible = false;
-	real32 max_health = 100.0f;
-	money_type money_spawned_min = 0;
-	money_type money_spawned_max = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sprite_resource_physical&) const = default;
@@ -124,7 +118,6 @@ struct editor_sprite_resource {
 	std::optional<std::variant<
 		test_static_decorations,
 		test_plain_sprited_bodies,
-		test_destructible_sprited_bodies,
 		test_dynamic_decorations
 	>> official_tag;
 
@@ -134,7 +127,6 @@ struct editor_sprite_resource {
 	mutable std::variant<
 		typed_entity_flavour_id<static_decoration>,
 		typed_entity_flavour_id<plain_sprited_body>,
-		typed_entity_flavour_id<destructible_sprited_body>,
 		typed_entity_flavour_id<dynamic_decoration>
 	> scene_flavour_id;
 

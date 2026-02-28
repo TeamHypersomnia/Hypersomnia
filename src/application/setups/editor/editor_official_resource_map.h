@@ -15,7 +15,6 @@ struct editor_official_resource_map {
 	// GEN INTROSPECTOR struct editor_official_resource_map
 	Map<test_static_decorations, editor_sprite_resource> static_decorations;
 	Map<test_plain_sprited_bodies, editor_sprite_resource> plain_sprited_bodies;
-	Map<test_destructible_sprited_bodies, editor_sprite_resource> destructible_sprited_bodies;
 	Map<test_dynamic_decorations, editor_sprite_resource> dynamic_decorations;
 	Map<test_sound_decorations, editor_sound_resource> sound_decorations;
 	Map<test_static_lights, editor_light_resource> lights;

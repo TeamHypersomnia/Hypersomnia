@@ -1,6 +1,5 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
-#include "game/components/destructible_component.h"
 
 augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
 
@@ -158,17 +157,7 @@ void allocate_flavours_and_assets_for_resource(
 		};
 
 		if (domain == editor_sprite_domain::PHYSICAL) {
-			/* 
-			 * Use destructible_sprited_body for destructible entities, plain_sprited_body otherwise.
-			 * Destructibility only works with box-based shapes, so entities with custom_shape 
-			 * must use plain_sprited_body even if is_destructible is set.
-			 */
-			if (editable.as_physical.is_destructible && editable.as_physical.custom_shape.empty()) {
-				create_as(destructible_sprited_body());
-			}
-			else {
-				create_as(plain_sprited_body());
-			}
+			create_as(plain_sprited_body());
 		}
 		else {
 			if (n_frames > 1) {
@@ -227,10 +216,6 @@ void setup_scene_object_from_resource(
 		scene.standard_damage_particles = to_game_effect(editable.damage_particles);
 		scene.silence_damager_impact_sound = editable.silence_damager_impact_sound;
 		scene.silence_damager_destruction_sound = editable.silence_damager_destruction_sound;
-
-		/* Destruction effects - fall back to damage effects if not set */
-		scene.standard_destruction_sound = to_game_effect(editable.destruction_sound);
-		scene.standard_destruction_particles = to_game_effect(editable.destruction_particles);
 
 		auto to_game_collision_def = [&to_game_effect](const auto& from) {
 			collision_sound_def out;
@@ -402,16 +387,7 @@ void setup_scene_object_from_resource(
 			rigid_body->damping.angular = physical.angular_damping;
 
 			if (physical.is_static) {
-				/* 
-				 * Use STATIC (not ALWAYS_STATIC) for destructible entities
-				 * so they can transition to DYNAMIC upon splitting.
-				 */
-				if (physical.is_destructible && physical.custom_shape.empty()) {
-					rigid_body->body_type = rigid_body_type::STATIC;
-				}
-				else {
-					rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
-				}
+				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
 			}
 		}
 
@@ -465,13 +441,6 @@ void setup_scene_object_from_resource(
 			}
 
 			fixtures->collision_sound_sensitivity = physical.collision_sound_sensitivity;
-		}
-
-		/* Set up invariants::destructible for destructible_sprited_body entities */
-		if (auto dest = scene.template find<invariants::destructible>()) {
-			dest->max_health = physical.max_health;
-			dest->money_spawned_min = physical.money_spawned_min;
-			dest->money_spawned_max = physical.money_spawned_max;
 		}
 
 		if (domain != editor_sprite_domain::PHYSICAL) {

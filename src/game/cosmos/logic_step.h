@@ -137,7 +137,7 @@ public:
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
-	void flush_create_entity_requests() const {
-		creation_system().flush_create_entity_requests(*this);
+	void flush_pending_allocations() const {
+		allocation_system().flush_pending_allocations(*this);
 	}
 };
