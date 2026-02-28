@@ -470,8 +470,6 @@ void setup_scene_object_from_resource(
 		/* Set up invariants::destructible for destructible_sprited_body entities */
 		if (auto dest = scene.template find<invariants::destructible>()) {
 			dest->max_health = physical.max_health;
-			dest->make_dynamic_below_area = physical.make_dynamic_below_area;
-			dest->disable_below_area = physical.disable_below_area;
 			dest->money_spawned_min = physical.money_spawned_min;
 			dest->money_spawned_max = physical.money_spawned_max;
 		}

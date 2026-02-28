@@ -52,21 +52,12 @@ auto calc_body_type(const E& handle) {
 	;
 
 	/* 
-	 * If a plain sprited body is static and has a destructible component,
-	 * check if split area falls below the configured threshold. If so, make it dynamic.
+	 * If a destructible entity has been split (texture_rect != 1,1), 
+	 * it becomes a dynamic remnant regardless of original body type.
 	 */
-	if (type == rigid_body_type::STATIC) {
-		if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
-			if (const auto* dest_comp = handle.template find<components::destructible>()) {
-				const auto& texture_rect = dest_comp->texture_rect;
-				const auto current_area = texture_rect.w * texture_rect.h;
-				const auto threshold = dest_inv->make_dynamic_below_area;
-				
-				/* If threshold > 0 and area <= threshold, make it dynamic */
-				if (threshold > 0.0f && current_area <= threshold) {
-					type = rigid_body_type::DYNAMIC;
-				}
-			}
+	if (const auto* dest_comp = handle.template find<components::destructible>()) {
+		if (dest_comp->is_remnant()) {
+			type = rigid_body_type::DYNAMIC;
 		}
 	}
 
@@ -133,12 +124,12 @@ auto calc_filters(const E& handle) {
 	}
 
 	/* 
-	 * Check if this is a destructible chunk that is too small.
-	 * Instead of deleting it, use LYING_ITEM filter so it doesn't block characters.
+	 * Check if this is a destructible remnant (already split).
+	 * Remnants use REMNANT filter - they don't block characters or bullets.
 	 */
-	if (const auto* dest_inv = handle.template find<invariants::destructible>()) {
-		if (handle.get_logical_size().area() < dest_inv->disable_below_area) {
-			return filters[predefined_filter_type::LYING_ITEM];
+	if (const auto* dest_comp = handle.template find<components::destructible>()) {
+		if (dest_comp->is_remnant()) {
+			return filters[predefined_filter_type::REMNANT];
 		}
 	}
 
