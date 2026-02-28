@@ -169,9 +169,9 @@ struct glfw_callbacks {
 		wnd->platform->unhandled_window_positions.push_back({ xpos, ypos });
 	}
 
-	static void window_size_callback(GLFWwindow* window, int xsize, int ysize) {
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 		auto wnd = reinterpret_cast<augs::window*>(glfwGetWindowUserPointer(window));
-		wnd->platform->unhandled_window_sizes.push_back({ xsize, ysize });
+		wnd->platform->unhandled_window_sizes.push_back({ width, height });
 	}
 
 	static void focus_callback(GLFWwindow* window, int focused) {
@@ -183,11 +183,35 @@ struct glfw_callbacks {
 		auto wnd = reinterpret_cast<augs::window*>(glfwGetWindowUserPointer(window));
 		wnd->platform->content_scale_x = xscale;
 		wnd->platform->content_scale_y = yscale;
+		wnd->platform->unhandled_window_sizes.push_back({ 0, 0 });
 	}
 };
 
 static void error_callback(int error, const char* description) {
 	LOG("GLFW Error %x: %x\n", error, description);
+}
+
+static GLFWmonitor* get_current_monitor(GLFWwindow* window) {
+	int wx, wy, ww, wh;
+	glfwGetWindowPos(window, &wx, &wy);
+	glfwGetWindowSize(window, &ww, &wh);
+
+	const int cx = wx + ww / 2;
+	const int cy = wy + wh / 2;
+
+	int count = 0;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	for (int i = 0; i < count; i++) {
+		int mx, my, mw, mh;
+		glfwGetMonitorWorkarea(monitors[i], &mx, &my, &mw, &mh);
+
+		if (cx >= mx && cx < mx + mw && cy >= my && cy < my + mh) {
+			return monitors[i];
+		}
+	}
+
+	return glfwGetPrimaryMonitor();
 }
 
 namespace augs {
@@ -256,7 +280,7 @@ namespace augs {
 		glfwSetScrollCallback(window, glfw_callbacks::scroll_callback);
 
 		glfwSetWindowPosCallback(window, glfw_callbacks::window_pos_callback);
-		glfwSetWindowSizeCallback(window, glfw_callbacks::window_size_callback);
+		glfwSetFramebufferSizeCallback(window, glfw_callbacks::framebuffer_size_callback);
 
 		glfwSetWindowFocusCallback(window, glfw_callbacks::focus_callback);
 
@@ -493,15 +517,15 @@ namespace augs {
 	}
 	
 	void window::set_fullscreen_hint(const bool hint) {
-		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+		GLFWmonitor* monitor = get_current_monitor(platform->window);
 
-		if (primary) {
-			const GLFWvidmode* mode = glfwGetVideoMode(primary);
+		if (monitor) {
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 			if (mode) {
 				if (hint) {
 					LOG("SETTING FULLSCREEN MODE: %xx%x@%x Hz", mode->width, mode->height, mode->refreshRate);
-					glfwSetWindowMonitor(platform->window, primary, 0, 0, mode->width, mode->height, mode->refreshRate);
+					glfwSetWindowMonitor(platform->window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 				}
 				else {
 					const auto rect = last_windowed_rect;
@@ -525,10 +549,10 @@ namespace augs {
 	}
 
 	xywhi window::get_display() const { 
-		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+		GLFWmonitor* monitor = get_current_monitor(platform->window);
 
-		if (primary) {
-			const GLFWvidmode* mode = glfwGetVideoMode(primary);
+		if (monitor) {
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 			if (mode) {
 				return { 0, 0, mode->width, mode->height };
@@ -661,10 +685,10 @@ namespace augs {
 	}
 
 	int window::get_refresh_rate() {
-		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+		GLFWmonitor* monitor = get_current_monitor(platform->window);
 
-		if (primary) {
-			const GLFWvidmode* mode = glfwGetVideoMode(primary);
+		if (monitor) {
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 			if (mode) {
 				return mode->refreshRate;
