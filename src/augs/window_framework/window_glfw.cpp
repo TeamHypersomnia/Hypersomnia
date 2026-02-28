@@ -62,6 +62,8 @@ namespace augs {
 		vec2d last_mouse_pos_for_dt;
 		bool mouse_pos_initialized = false;
 		int clips_called = 0;
+		float content_scale_x = 1.0f;
+		float content_scale_y = 1.0f;
 
 		std::vector<unhandled_key> unhandled_keys;
 		std::vector<unhandled_char> unhandled_characters;
@@ -176,6 +178,12 @@ struct glfw_callbacks {
 		auto wnd = reinterpret_cast<augs::window*>(glfwGetWindowUserPointer(window));
 		wnd->platform->unhandled_focuses.push_back({ focused });
 	}
+
+	static void content_scale_callback(GLFWwindow* window, float xscale, float yscale) {
+		auto wnd = reinterpret_cast<augs::window*>(glfwGetWindowUserPointer(window));
+		wnd->platform->content_scale_x = xscale;
+		wnd->platform->content_scale_y = yscale;
+	}
 };
 
 static void error_callback(int error, const char* description) {
@@ -252,6 +260,9 @@ namespace augs {
 
 		glfwSetWindowFocusCallback(window, glfw_callbacks::focus_callback);
 
+		glfwGetWindowContentScale(window, &platform->content_scale_x, &platform->content_scale_y);
+		glfwSetWindowContentScaleCallback(window, glfw_callbacks::content_scale_callback);
+
 		if (glfwRawMouseMotionSupported()) {
 			glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 		}
@@ -276,8 +287,11 @@ namespace augs {
 			double mx, my;
 			glfwGetCursorPos(window, &mx, &my);
 
-			last_mouse_pos.set(mx, my);
-			platform->last_mouse_pos_for_dt = last_mouse_pos;
+			const auto sx = static_cast<double>(platform->content_scale_x);
+			const auto sy = static_cast<double>(platform->content_scale_y);
+
+			last_mouse_pos.set(mx * sx, my * sy);
+			platform->last_mouse_pos_for_dt = vec2d(mx * sx, my * sy);
 		}
 		
 		glfwSetCursorPosCallback(window, glfw_callbacks::cursor_callback);
@@ -376,7 +390,10 @@ namespace augs {
 		}
 
 		for (const auto& cursor : platform->unhandled_cursors) {
-			const auto new_mouse_pos = vec2d(cursor.xpos, cursor.ypos);
+			const auto sx = static_cast<double>(platform->content_scale_x);
+			const auto sy = static_cast<double>(platform->content_scale_y);
+
+			const auto new_mouse_pos = vec2d(cursor.xpos * sx, cursor.ypos * sy);
 
 			if (!platform->mouse_pos_initialized) {
 				platform->last_mouse_pos_for_dt = new_mouse_pos;
@@ -396,8 +413,8 @@ namespace augs {
 			}
 			else {
 				const auto new_pos = basic_vec2<short>{ 
-					static_cast<short>(cursor.xpos),
-					static_cast<short>(cursor.ypos)
+					static_cast<short>(cursor.xpos * sx),
+					static_cast<short>(cursor.ypos * sy)
 			   	};
 
 				if (const auto ch = handle_mousemove(new_pos)) {
@@ -544,7 +561,10 @@ namespace augs {
 		platform->last_mouse_pos_for_dt = pos;
 		last_mouse_pos = pos;
 	
-		glfwSetCursorPos(platform->window, pos.x, pos.y);
+		const auto sx = static_cast<double>(platform->content_scale_x);
+		const auto sy = static_cast<double>(platform->content_scale_y);
+
+		glfwSetCursorPos(platform->window, pos.x / sx, pos.y / sy);
 		platform->unhandled_cursors.clear();
 
 	}
