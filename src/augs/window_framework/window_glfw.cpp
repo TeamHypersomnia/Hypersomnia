@@ -289,9 +289,10 @@ namespace augs {
 
 			const auto sx = static_cast<double>(platform->content_scale_x);
 			const auto sy = static_cast<double>(platform->content_scale_y);
+			const auto scaled = vec2d(mx * sx, my * sy);
 
-			last_mouse_pos.set(mx * sx, my * sy);
-			platform->last_mouse_pos_for_dt = vec2d(mx * sx, my * sy);
+			last_mouse_pos.set(scaled.x, scaled.y);
+			platform->last_mouse_pos_for_dt = scaled;
 		}
 		
 		glfwSetCursorPosCallback(window, glfw_callbacks::cursor_callback);
