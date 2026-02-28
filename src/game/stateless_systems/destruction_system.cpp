@@ -274,7 +274,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 			if (dest_inv->money_spawned_max > 0 && !common_assets.default_coin_flavours.empty()) {
 				const auto money_amount = rng.randval(dest_inv->money_spawned_min, dest_inv->money_spawned_max);
 				if (money_amount > 0) {
-					spawn_coins_queued(money_amount, d.point_of_impact, step, common_assets.default_coin_flavours);
+					spawn_coins_queued(money_amount, transform.pos, step, common_assets.default_coin_flavours);
 				}
 			}
 
@@ -370,7 +370,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				queue_clone_entity(
 					step,
 					subject_id,
-					[=](entity_handle new_entity, logic_step step_inner) mutable {
+					[=](entity_handle new_entity, logic_step) mutable {
 						if (new_entity.dead()) {
 							return;
 						}
