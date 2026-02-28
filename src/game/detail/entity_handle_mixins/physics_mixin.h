@@ -76,12 +76,6 @@ real32 physics_mixin<E>::calc_density(
 		}
 	}
 
-	if (const auto* const destructible = owner_body.template find<components::destructible>()) {
-		if (const auto area = destructible->texture_rect.area(); area > 0.0f) {
-			density /= (area);
-		}
-	}
-
 	return density;
 }
 

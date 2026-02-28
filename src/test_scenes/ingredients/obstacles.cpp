@@ -2,7 +2,6 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/destructible_component.h"
 
 real32 get_material_penetrability(const test_scene_physical_material_id id) {
 	using T = test_scene_physical_material_id;
@@ -100,80 +99,23 @@ namespace test_flavours {
 			return meta;
 		};
 
-		{
-			auto& crate_meta = dynamic_obstacle(
-				flavour_with_sprite(
-					test_destructible_sprited_bodies::CRATE,
-					test_scene_image_id::CRATE,
-					test_obstacle_order::OPAQUE
-				),
-				test_scene_physical_material_id::WOOD
-			);
-			crate_meta.template get<invariants::fixtures>().penetrability *= 1.2f;
+		dynamic_obstacle(
+			flavour_with_sprite(
+				test_plain_sprited_bodies::CRATE,
+				test_scene_image_id::CRATE,
+				test_obstacle_order::OPAQUE
+			),
+			test_scene_physical_material_id::WOOD
+		).template get<invariants::fixtures>().penetrability *= 1.2f;
 
-			/* Set up invariant for permanent destructible properties */
-			auto& dest_inv = crate_meta.template get<invariants::destructible>();
-			dest_inv.max_health = 100.0f;
-			dest_inv.money_spawned_min = 500;
-			dest_inv.money_spawned_max = 1000;
-
-			/* Set up component for initial health value */
-			auto& dest_comp = crate_meta.template get<components::destructible>();
-			dest_comp.health = 100.0f;
-		}
-
-		{
-			auto& wall_meta = static_obstacle(
-				flavour_with_sprite(
-					test_plain_sprited_bodies::HARD_WOODEN_WALL,
-					test_scene_image_id::BRICK_WALL,
-					test_obstacle_order::OPAQUE
-				),
-				test_scene_physical_material_id::WOOD
-			);
-			wall_meta.template get<invariants::sprite>().tile_excess_size = true;
-			/* Non-destructible version */
-		}
-
-		/* 
-		 * Destructible wall flavour - requires destructible_sprited_body entity type 
-		 */
-		{
-			auto& wall_meta = get_test_flavour(in.flavours, test_destructible_sprited_bodies::HARD_WOODEN_WALL_DEST);
-
-			auto& sprite = wall_meta.template get<invariants::sprite>();
-			sprite.set(
-				to_image_id(test_scene_image_id::BRICK_WALL), 
-				caches.at(to_image_id(test_scene_image_id::BRICK_WALL)).original_image_size
-			);
-			sprite.tile_excess_size = true;
-
-			test_flavours::add_standard_static_body(wall_meta);
-
-			auto& rigid_body = wall_meta.template get<invariants::rigid_body>();
-			rigid_body.body_type = rigid_body_type::STATIC; /* STATIC, not ALWAYS_STATIC for destructibles */
-
-			auto& fixtures_def = wall_meta.template get<invariants::fixtures>();
-			fixtures_def.restitution = 0.f;
-			fixtures_def.density = 100.f;
-			fixtures_def.max_ricochet_angle = 10.f;
-			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
-			fixtures_def.penetrability = get_material_penetrability(test_scene_physical_material_id::WOOD);
-
-			wall_meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
-			wall_meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
-			wall_meta.template get<invariants::render>().layer = render_layer::SOLID_OBSTACLES;
-
-			/* Set up invariant for permanent destructible properties */
-			auto& dest_inv = wall_meta.template get<invariants::destructible>();
-			dest_inv.max_health = 500.0f;
-			dest_inv.money_spawned_min = 0;
-			dest_inv.money_spawned_max = 0;
-
-			/* Set up component for initial health value */
-			auto& dest_comp = wall_meta.template get<components::destructible>();
-			dest_comp.health = 500.0f;
-		}
+		static_obstacle(
+			flavour_with_sprite(
+				test_plain_sprited_bodies::HARD_WOODEN_WALL,
+				test_scene_image_id::BRICK_WALL,
+				test_obstacle_order::OPAQUE
+			),
+			test_scene_physical_material_id::WOOD
+		).template get<invariants::sprite>().tile_excess_size = true;
 
 		{
 			auto make_dev_wall = [&](const auto fid, const auto iid) {

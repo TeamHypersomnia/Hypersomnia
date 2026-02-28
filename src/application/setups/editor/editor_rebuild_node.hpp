@@ -6,7 +6,6 @@
 #include "view/audiovisual_state/systems/light_attenuation.h"
 #include "game/enums/filters.h"
 #include "augs/templates/traits/has_flip.h"
-#include "game/components/destructible_component.h"
 
 template <class T>
 void make_unselectable(T& agg) {
@@ -63,22 +62,6 @@ bool setup_entity_from_node(
 
 		if (auto body = agg.template find<components::rigid_body>()) {
 			body->special.penetrability = editable.penetrability;
-		}
-
-		/* 
-		 * Set up destructible component if enabled in resource and custom_shape is empty.
-		 * max_health, make_dynamic_below_area, etc. are in the invariant.
-		 * The component only needs health and texture_rect.
-		 */
-		if (auto destructible = agg.template find<components::destructible>()) {
-			const auto& physical = resource.editable.as_physical;
-			if (physical.is_destructible && physical.custom_shape.empty()) {
-				/* 
-				 * Initialize health to max_health from the resource.
-				 * This is the same value set in the invariant during flavour setup.
-				 */
-				destructible->health = physical.max_health;
-			}
 		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {

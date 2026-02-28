@@ -292,11 +292,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 	for (const auto& h : healths) {
 		const auto subject = cosm[h.subject];
-		const auto sentience = subject.find<invariants::sentience>();
-
-		if (sentience == nullptr) {
-			continue;
-		}
+		const auto& sentience = subject.get<invariants::sentience>();
 
 		sound_effect_input effect;
 
@@ -304,11 +300,11 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.special_result == messages::health_event::result_type::DEATH) {
-				effect = sentience->death_sound;
+				effect = sentience.death_sound;
 				predictability = never_predictable_v;
 			}
 			else if (h.damage.total() > 0) {
-				effect = h.was_dead ? sentience->corpse_health_decrease_sound : sentience->health_decrease_sound;
+				effect = h.was_dead ? sentience.corpse_health_decrease_sound : sentience.health_decrease_sound;
 			}
 			else {
 				continue;
@@ -332,11 +328,11 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
 			if (h.damage.total() > 0.f) {
-				effect = sentience->consciousness_decrease_sound;
+				effect = sentience.consciousness_decrease_sound;
 				effect.modifier.pitch *= 1.2f + h.damage.total() / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-					effect = sentience->loss_of_consciousness_sound;
+					effect = sentience.loss_of_consciousness_sound;
 					effect.modifier.pitch *= 1.5f;
 
 					predictability = never_predictable_v;
@@ -367,7 +363,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const bool was_headshot = h.origin.circumstances.headshot;
 
 		if (h.play_headshot_sound) {
-			auto hs_effect = sentience->headshot_sound;
+			auto hs_effect = sentience.headshot_sound;
 
 			hs_effect.start(
 				step,
@@ -377,7 +373,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		}
 
 		if (effect.id.is_set()) {
-			const bool skip = was_headshot && (effect.id == sentience->health_decrease_sound.id || effect.id == sentience->corpse_health_decrease_sound.id);
+			const bool skip = was_headshot && (effect.id == sentience.health_decrease_sound.id || effect.id == sentience.corpse_health_decrease_sound.id);
 
 			if (!skip) {
 				effect.start(

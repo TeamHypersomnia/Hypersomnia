@@ -1,6 +1,4 @@
 #pragma once
-#include <algorithm>
-#include <cmath>
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/sprite.hpp"
@@ -15,7 +13,6 @@
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/destructible_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/render_component.h"
 #include "game/components/remnant_component.h"
@@ -88,22 +85,6 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			/* 
-			 * If the entity has a destructible component with non-default texture_rect,
-			 * scale the sprite size accordingly. The texture_rect represents the portion
-			 * of the original texture that is still visible after destruction.
-			 */
-			if constexpr(H::template has<components::destructible>()) {
-				const auto& destructible = typed_handle.template get<components::destructible>();
-				const auto& tex_rect = destructible.texture_rect;
-				/* Use float arithmetic and round to avoid precision loss */
-				result.size.x = static_cast<int>(std::round(static_cast<float>(result.size.x) * tex_rect.w));
-				result.size.y = static_cast<int>(std::round(static_cast<float>(result.size.y) * tex_rect.h));
-				/* Ensure minimum size of 1 to prevent zero-size sprites */
-				result.size.x = std::max(1, result.size.x);
-				result.size.y = std::max(1, result.size.y);
-			}
-
 			return result;
 		}();
 
@@ -123,24 +104,6 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			if (flip_vertically) {
 				result.flip.vertically = !result.flip.vertically;
-			}
-
-			/* Pass texture_rect and tile_offset for destructible sprites */
-			if constexpr(H::template has<components::destructible>()) {
-				const auto& destructible = typed_handle.template get<components::destructible>();
-				result.texture_rect = destructible.texture_rect;
-				
-				/* 
-				 * For tiled sprites, calculate the tile offset to maintain visual continuity.
-				 * The offset is where this chunk starts within the original sprite's tile grid.
-				 */
-				if (sprite.tile_excess_size) {
-					const auto original_sprite_size = typed_handle.template get<invariants::sprite>().size;
-					result.tile_offset = vec2(
-						original_sprite_size.x * destructible.texture_rect.x,
-						original_sprite_size.y * destructible.texture_rect.y
-					);
-				}
 			}
 
 			{

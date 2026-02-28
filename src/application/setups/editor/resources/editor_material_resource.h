@@ -53,9 +53,6 @@ struct editor_material_resource_editable {
 	real32 max_ricochet_angle = 20.0f;
 	bool point_blank_ricochets = false;
 	real32 penetrability = 1.0f;
-
-	editor_sound_effect destruction_sound;
-	editor_particle_effect destruction_particles;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_material_resource_editable&) const = default;

@@ -21,7 +21,6 @@
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
 	type_pair<test_plain_sprited_bodies, plain_sprited_body>,
-	type_pair<test_destructible_sprited_bodies, destructible_sprited_body>,
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_melee_weapons, melee_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,

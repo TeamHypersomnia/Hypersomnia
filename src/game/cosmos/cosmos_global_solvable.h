@@ -1,8 +1,6 @@
 #pragma once
 #include "game/detail/inventory/item_mounting.h"
 #include "game/cosmos/step_declaration.h"
-#include "game/cosmos/entity_id.h"
-#include "augs/math/vec2.h"
 
 struct cosmos_global_solvable {
 	// GEN INTROSPECTOR struct cosmos_global_solvable
@@ -12,3 +10,4 @@ struct cosmos_global_solvable {
 	void solve_item_mounting(logic_step);
 	void clear();
 };
+
