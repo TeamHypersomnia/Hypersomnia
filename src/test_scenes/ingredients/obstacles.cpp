@@ -114,8 +114,6 @@ namespace test_flavours {
 			/* Set up invariant for permanent destructible properties */
 			auto& dest_inv = crate_meta.template get<invariants::destructible>();
 			dest_inv.max_health = 100.0f;
-			dest_inv.make_dynamic_below_area = 0.6f;
-			dest_inv.disable_below_area = 64.0f * 64.0f;
 			dest_inv.money_spawned_min = 500;
 			dest_inv.money_spawned_max = 1000;
 
@@ -169,8 +167,6 @@ namespace test_flavours {
 			/* Set up invariant for permanent destructible properties */
 			auto& dest_inv = wall_meta.template get<invariants::destructible>();
 			dest_inv.max_health = 500.0f;
-			dest_inv.make_dynamic_below_area = 0.6f;
-			dest_inv.disable_below_area = 64.0f * 64.0f;
 			dest_inv.money_spawned_min = 0;
 			dest_inv.money_spawned_max = 0;
 

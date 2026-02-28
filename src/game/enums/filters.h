@@ -56,6 +56,7 @@ enum class predefined_filter_type {
 	REMNANT,
 
 	PORTAL,
+	REMNANT,
 
 	COUNT
 	// END GEN INTROSPECTOR

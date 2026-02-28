@@ -12,7 +12,6 @@ namespace messages {
 	struct damage_message : public message {
 		bool spawn_destruction_effects = false;
 		bool processed = false;
-		bool from_pending_destruction = false;
 		transformr head_transform;
 		real32 headshot_mult = 1.0f;
 

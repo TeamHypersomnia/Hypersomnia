@@ -190,6 +190,5 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 
 void cosmos_global_solvable::clear() {
 	pending_item_mounts.clear();
-	pending_destructions.clear();
 }
 
