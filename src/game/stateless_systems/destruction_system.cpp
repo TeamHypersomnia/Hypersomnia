@@ -25,7 +25,7 @@
 #include "augs/misc/randomization.h"
 
 namespace {
-	constexpr real32 REMNANT_BRIGHTNESS_MULT = 0.7f;
+	constexpr real32 REMNANT_BRIGHTNESS_MULT = 0.65f;
 
 	void make_sprite_remnant(components::sprite* sprite) {
 		if (sprite) {
@@ -380,9 +380,6 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 							new_dest->texture_rect = chunk_texture_rect;
 						}
 
-						/* Make sprite darker and disable effects */
-						make_sprite_remnant(new_entity.find<components::sprite>());
-
 						/* Calculate new position */
 						auto offset = chunk_center_offset;
 						offset.rotate(rotation);
@@ -399,10 +396,13 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 
 						/* Apply impulse - chunks fly in impact direction with some spread */
 						if (auto rigid = new_entity.find<components::rigid_body>()) {
-							const auto chunk_dir = (chunk_center_offset.is_nonzero() ? 
+							const auto chunk_dir = (
+								chunk_center_offset.is_nonzero() ? 
 								vec2(chunk_center_offset).normalize().rotate(rotation) : 
-								impact_dir);
-							rigid.apply_impulse((impact_dir * 0.7f + chunk_dir * 0.3f) * impulse_magnitude * 0.25f);
+								impact_dir
+							);
+
+							rigid.apply_impulse((impact_dir * 0.7f + chunk_dir * 0.3f) * impulse_magnitude);
 						}
 					}
 				);
