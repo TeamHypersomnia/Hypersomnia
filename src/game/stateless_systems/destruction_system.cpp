@@ -24,6 +24,20 @@
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
+namespace {
+	constexpr real32 REMNANT_BRIGHTNESS_MULT = 0.7f;
+
+	void make_sprite_remnant(components::sprite* sprite) {
+		if (sprite) {
+			sprite->disable_neon_map = true;
+			sprite->disable_special_effects = true;
+			sprite->colorize.r = static_cast<rgba_channel>(sprite->colorize.r * REMNANT_BRIGHTNESS_MULT);
+			sprite->colorize.g = static_cast<rgba_channel>(sprite->colorize.g * REMNANT_BRIGHTNESS_MULT);
+			sprite->colorize.b = static_cast<rgba_channel>(sprite->colorize.b * REMNANT_BRIGHTNESS_MULT);
+		}
+	}
+}
+
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::collision_message>();
@@ -323,16 +337,9 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 				
 				/* Update the original entity to become the first chunk */
 				dest.texture_rect = chunk.texture_rect;
-				dest.health = dest_inv->max_health; /* Not relevant anymore, but set it */
 
 				/* Make sprite darker and disable effects */
-				if (auto* sprite = subject.find<components::sprite>()) {
-					sprite->disable_neon_map = true;
-					sprite->disable_special_effects = true;
-					sprite->colorize.r = static_cast<rgba_channel>(sprite->colorize.r * 0.7f);
-					sprite->colorize.g = static_cast<rgba_channel>(sprite->colorize.g * 0.7f);
-					sprite->colorize.b = static_cast<rgba_channel>(sprite->colorize.b * 0.7f);
-				}
+				make_sprite_remnant(subject.find<components::sprite>());
 
 				/* Calculate new position */
 				auto offset = chunk.center_offset;
@@ -374,13 +381,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 						}
 
 						/* Make sprite darker and disable effects */
-						if (auto* sprite = new_entity.find<components::sprite>()) {
-							sprite->disable_neon_map = true;
-							sprite->disable_special_effects = true;
-							sprite->colorize.r = static_cast<rgba_channel>(sprite->colorize.r * 0.7f);
-							sprite->colorize.g = static_cast<rgba_channel>(sprite->colorize.g * 0.7f);
-							sprite->colorize.b = static_cast<rgba_channel>(sprite->colorize.b * 0.7f);
-						}
+						make_sprite_remnant(new_entity.find<components::sprite>());
 
 						/* Calculate new position */
 						auto offset = chunk_center_offset;

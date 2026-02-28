@@ -18,7 +18,6 @@ enum class filter_category {
 	FLYING_MELEE,
 	SHELL,
 	GLASS_OBSTACLE,
-	REMNANT,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -53,7 +52,6 @@ enum class predefined_filter_type {
 	SHELL,
 	PLANTED_EXPLOSIVE,
 	GLASS_OBSTACLE,
-	REMNANT,
 
 	PORTAL,
 	REMNANT,
