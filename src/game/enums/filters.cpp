@@ -107,6 +107,7 @@ namespace predefined_queries {
 			C::FLYING_EXPLOSIVE,
 			C::FLYING_MELEE,
 			C::SHELL,
+			C::REMNANT,
 			C::GLASS_OBSTACLE
 		);
 
@@ -188,7 +189,11 @@ predefined_filters::predefined_filters() {
 		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::CHARACTER_WEAPON);
 	}
 	{
-
+		auto& out = filters[predefined_filter_type::REMNANT];
+		out.categoryBits = make_flags(C::REMNANT);
+		out.maskBits = standard_participation();
+	}
+	{
 		auto& out = filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 		out.categoryBits = make_flags(C::LYING_ITEM);
 		out.maskBits = make_flags(C::QUERY);
@@ -206,13 +211,6 @@ predefined_filters::predefined_filters() {
 
 		/* This is just a default that will be overridden by editor_filter_flags anyway. */
 		out.maskBits = standard_participation_except(C::CHARACTER_WEAPON, C::CAR_FLOOR);
-	}
-
-	{
-		/* REMNANT: Destroyed chunks that don't block characters or bullets */
-		auto& out = filters[predefined_filter_type::REMNANT];
-		out.categoryBits = make_flags(C::LYING_ITEM);
-		out.maskBits = make_flags(C::WALL, C::LYING_ITEM);
 	}
 }
 
