@@ -200,7 +200,7 @@ void standard_solve(const logic_step step) {
 
 		demolitions_system().handle_arming_requests(step);
 		demolitions_system().detonate_fuses(step);
-		step.flush_pending_allocations();
+		step.flush_create_entity_requests();
 		demolitions_system().advance_cascade_explosions(step);
 	}
 
@@ -230,6 +230,7 @@ void standard_solve(const logic_step step) {
 
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
+	step.flush_create_entity_requests();
 
 	{
 		auto scope = measure_scope(performance.sentiences);
