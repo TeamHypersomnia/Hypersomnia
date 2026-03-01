@@ -672,7 +672,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
-	set_uniform(shaders.illuminated, U::global_time, int(global_time_seconds * 1000));
 
 	renderer.call_triangles(D::GROUND);
 
