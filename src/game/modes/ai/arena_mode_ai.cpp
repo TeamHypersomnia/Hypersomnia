@@ -80,6 +80,11 @@ void update_arena_mode_ai_team(
 			for (auto& bot : only_bot(players)) {
 				if (bot.first == most.example_bot) {
 					bot.second.ai_state.patrol_letter = least.letter;
+
+					if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(bot.second.ai_state.last_behavior)) {
+						*patrol = ai_behavior_patrol();
+					}
+
 					break;
 				}
 			}
