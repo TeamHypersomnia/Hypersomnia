@@ -7,6 +7,7 @@
 #include "game/modes/mode_player_id.h"
 #include "augs/math/transform.h"
 #include "augs/log.h"
+#include "augs/misc/constant_size_vector.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 
@@ -175,8 +176,8 @@ struct arena_mode_ai_arena_meta {
 		return find_bombsite_ids(letter) != nullptr;
 	}
 
-	std::vector<marker_letter_type> get_available_bombsite_letters() const {
-		std::vector<marker_letter_type> letters;
+	augs::constant_size_vector<marker_letter_type, static_cast<std::size_t>(marker_letter_type::COUNT)> get_available_bombsite_letters() const {
+		augs::constant_size_vector<marker_letter_type, static_cast<std::size_t>(marker_letter_type::COUNT)> letters;
 		for (const auto& mapping : bombsite_mappings) {
 			letters.push_back(mapping.letter);
 		}
