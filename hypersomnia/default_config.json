@@ -213,15 +213,17 @@
             "overlay_color": [0, 0, 0, 40]
         },
         "crosshair": {
-            "scale": 3,
+            "scale": 5,
             "border_width": 1,
             "show_dot": true,
             "dot_size": 1.0,
             "segment_length": 10.0,
+            "segment_thickness": 2.0,
             "recoil_expansion_base": 5.0,
-            "recoil_expansion_mult": 1.0,
+            "recoil_expansion_mult": 0.5,
             "inside_color": [255, 255, 255, 255],
-            "border_color": [0, 0, 0, 255]
+            "border_color": [0, 0, 0, 255],
+            "background_color": [0, 0, 0, 100]
         },
         "teammates_are_enemies": false,
         "stencil_before_light_pass": false
