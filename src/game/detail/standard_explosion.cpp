@@ -114,7 +114,7 @@ void standard_explosion_input::instantiate(
 			subject_shake.apply(now, subject.template get<invariants::sentience>(), *sentience);
 
 			impulse_input in;
-			in.angular = damage.base / 15.f;
+			in.angular = damage.base / 45.f;
 
 			subject.apply_crosshair_recoil(in);
 		}
