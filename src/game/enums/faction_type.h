@@ -31,7 +31,7 @@ inline bool is_waypoint_for_faction(
 	const faction_type waypoint_faction,
 	const faction_type bot_faction
 ) {
-	if (waypoint_faction == faction_type::ANY || waypoint_faction == faction_type::DEFAULT) {
+	if (waypoint_faction == faction_type::ANY) {
 		return true;
 	}
 
