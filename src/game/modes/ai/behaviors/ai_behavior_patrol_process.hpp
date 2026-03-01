@@ -179,6 +179,18 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	if (current_waypoint_id.is_set() && camp_duration > 0.0f && camp_timer <= 0.0f) {
 		AI_LOG("Camp duration expired - clearing waypoint for next pick");
 		clear_waypoint();
+
+		/*
+			PHASE 4 (calc_pathfinding_request) ran before this process() call
+			and may have started pathfinding back to the old camp waypoint
+			(since is_camping() was already false but patrol_waypoint was still set).
+
+			Clear that spurious pathfinding so it doesn't immediately complete
+			next frame (bot is already at old position) and falsely trigger
+			pathfinding_just_completed on whatever new waypoint we pick below.
+		*/
+		ai_state.clear_pathfinding();
+		ai_state.current_pathfinding_request = std::nullopt;
 	}
 
 	/*
