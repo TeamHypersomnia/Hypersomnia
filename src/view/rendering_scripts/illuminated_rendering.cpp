@@ -422,12 +422,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			const vec2 world_space_pos = it.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
 			const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
 
-			float maximum_heat = 0.0f;
-			maximum_heat = std::max(maximum_heat, std::abs(it.template get<components::crosshair>().recoil.rotation));
+			float recoil_amount = 0.0f;
 
-			for (const auto& gun_id : it.get_wielded_guns())
-			{
-				(void)gun_id;
+			if (it.alive()) {
+				if (auto crosshair = it.template find<components::crosshair>()) {
+					recoil_amount = std::abs(crosshair->recoil.rotation);
+				}
 			}
 
 			if (settings.crosshair.type == crosshair_type::CIRCULAR) {
@@ -437,11 +437,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					renderer.get_special_buffer(),
 					projection_space_pos,
 					screen_size,
-					maximum_heat
+					recoil_amount
 				);
 			}
 			else {
-				::draw_crosshair_procedurally(settings.crosshair, get_drawer(), projection_space_pos, maximum_heat);
+				::draw_crosshair_procedurally(settings.crosshair, get_drawer(), projection_space_pos, recoil_amount);
 			}
 		};
 
