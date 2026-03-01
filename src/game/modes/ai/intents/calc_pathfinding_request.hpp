@@ -72,7 +72,6 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	const arena_mode_ai_team_state& team_state,
 	const arena_mode_ai_arena_meta& arena_meta,
 	const mode_player_id& bot_player_id,
-	const faction_type bot_faction,
 	const vec2 character_pos,
 	const bool bomb_planted,
 	const entity_id bomb_entity,
