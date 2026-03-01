@@ -152,19 +152,8 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	if (ai_state.patrol_letter == marker_letter_type::COUNT) {
-		if (bot_faction == faction_type::METROPOLIS) {
-			ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
-		}
-		else {
-			const auto available = arena_meta.get_available_bombsite_letters();
-			if (!available.empty()) {
-				ai_state.patrol_letter = stable_rng.rand_element(available);
-			}
-			else {
-				ai_state.patrol_letter = marker_letter_type::A;
-			}
-		}
+	if (bot_faction == faction_type::METROPOLIS && ai_state.patrol_letter == marker_letter_type::COUNT) {
+		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
 	}
 
 	/*

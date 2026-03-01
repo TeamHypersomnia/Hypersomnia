@@ -34,7 +34,7 @@
   - **Resistance**: Picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
   - **Metropolis**: Rebalances bots' `patrol_letter` distribution — if any bot's letter is over-covered by 2+ compared to the least-covered letter (via `find_least_assigned_bombsite`), it switches. Skipped when bomb is planted.
 - **Per-bot** initialization is in `update_arena_mode_ai()` PHASE 0:
-  - If `patrol_letter` is `COUNT`, Metropolis bots use `find_least_assigned_bombsite()`, others pick randomly.
+  - Only Metropolis bots get `patrol_letter` initialized (via `find_least_assigned_bombsite()`). `patrol_letter` is only used for Metropolis bombsite defense distribution.
 - Uses `marker_letter_type::COUNT` as sentinel for "not yet assigned".
 
 ### 4. Faction Matching Fix (`faction_type.h`)
@@ -60,6 +60,5 @@
 ## Architecture Notes
 - The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
 - `update_arena_mode_ai_team()` runs once per step per faction (before the per-bot loop). It handles team-level decisions: Resistance `chosen_bombsite` initialization and Metropolis patrol rebalancing.
-- `update_arena_mode_ai()` runs per-bot. PHASE 0 handles per-bot `patrol_letter` initialization using `find_least_assigned_bombsite()` for Metropolis or random pick for others.
+- `update_arena_mode_ai()` runs per-bot. PHASE 0 handles per-bot `patrol_letter` initialization using `find_least_assigned_bombsite()` for Metropolis only. `patrol_letter` is only used in the context of Metropolis (bombsite defense distribution).
 - `find_least_assigned_bombsite()` is always used for Metropolis — both at initialization and for continuous rebalancing. When a bot dies, its waypoint assignments clear, the letter's count drops, and `update_arena_mode_ai_team` detects the imbalance (difference ≥ 2) and rebalances. Skipped when bomb is planted.
-- The random selection for Resistance ensures unpredictability — the attacking team doesn't always go to the same site.
