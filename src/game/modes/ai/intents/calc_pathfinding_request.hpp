@@ -154,42 +154,24 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 
 			/*
 				If cached_plant_target is not set, find a random unoccupied cell
-				within the chosen bombsite area.
+				within the chosen bombsite area using gathered bombsite mappings.
 			*/
 			if (!b.cached_plant_target.has_value()) {
 				const auto bombsite_letter = team_state.chosen_bombsite;
+				const auto* bombsite_ids = team_state.find_bombsite_ids(bombsite_letter);
 
-				/*
-					Find a bombsite area marker with the chosen letter.
-				*/
-				std::optional<transformr> found_target;
+				if (bombsite_ids != nullptr) {
+					std::optional<transformr> found_target;
 
-				cosm.for_each_having<invariants::area_marker>(
-					[&](const auto& typed_handle) {
+					for (const auto& bombsite_id : *bombsite_ids) {
 						if (found_target.has_value()) {
-							return;
+							break;
 						}
 
-						const auto& marker_inv = typed_handle.template get<invariants::area_marker>();
+						const auto typed_handle = cosm[bombsite_id];
 
-						if (!::is_bombsite(marker_inv.type)) {
-							return;
-						}
-
-						/*
-							Check if this bombsite matches the chosen letter.
-						*/
-						if (const auto marker_comp = typed_handle.template find<components::marker>()) {
-							if (marker_comp->letter != bombsite_letter) {
-								return;
-							}
-						}
-
-						/*
-							Check faction - bombsite should be for the bot's faction.
-						*/
-						if (typed_handle.get_official_faction() != bot_faction) {
-							return;
+						if (!typed_handle.alive()) {
+							continue;
 						}
 
 						/*
@@ -216,10 +198,10 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 							}
 						}
 					}
-				);
 
-				if (found_target.has_value()) {
-					b.cached_plant_target = *found_target;
+					if (found_target.has_value()) {
+						b.cached_plant_target = *found_target;
+					}
 				}
 			}
 
