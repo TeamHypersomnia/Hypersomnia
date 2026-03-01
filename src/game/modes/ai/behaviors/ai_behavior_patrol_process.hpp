@@ -189,8 +189,8 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		const auto wp_handle = cosm[current_waypoint_id];
 
 		if (wp_handle.alive()) {
-			if (current_is_push || ::is_camp_waypoint(cosm, current_waypoint_id)) {
-				AI_LOG("Camp/push waypoint - setting up camp");
+			if (::is_camp_waypoint(cosm, current_waypoint_id)) {
+				AI_LOG("Camp waypoint - setting up camp");
 				const auto wp_transform = wp_handle.get_logic_transform();
 				const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, current_waypoint_id);
 
