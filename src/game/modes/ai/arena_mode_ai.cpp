@@ -118,20 +118,33 @@ arena_ai_result update_arena_mode_ai(
 		}
 
 		/*
-			Per-bot: if patrol_letter is unset, assign the least-covered bombsite letter.
+			Metropolis: always use find_least_assigned_bombsite.
+			On initialization (COUNT): pick the least-covered letter.
+			On rebalance (e.g. teammate died): if current letter is over-covered
+			by 2+ compared to the least-covered, switch to rebalance.
 		*/
-		if (ai_state.patrol_letter == marker_letter_type::COUNT) {
-			if (is_metropolis) {
-				ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+		if (is_metropolis) {
+			const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+
+			if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+				ai_state.patrol_letter = least;
+			}
+			else if (!bomb_planted) {
+				const auto current_count = ::count_assigned_waypoints_for_letter(cosm, team_state, ai_state.patrol_letter);
+				const auto least_count = ::count_assigned_waypoints_for_letter(cosm, team_state, least);
+
+				if (current_count >= least_count + 2) {
+					ai_state.patrol_letter = least;
+				}
+			}
+		}
+		else if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+			const auto available = arena_meta.get_available_bombsite_letters();
+			if (!available.empty()) {
+				ai_state.patrol_letter = stable_rng.rand_element(available);
 			}
 			else {
-				const auto available = arena_meta.get_available_bombsite_letters();
-				if (!available.empty()) {
-					ai_state.patrol_letter = stable_rng.rand_element(available);
-				}
-				else {
-					ai_state.patrol_letter = marker_letter_type::A;
-				}
+				ai_state.patrol_letter = marker_letter_type::A;
 			}
 		}
 	}

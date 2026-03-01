@@ -32,7 +32,7 @@
 ### 3. Stateless Bombsite Selection (`arena_mode_ai.cpp`)
 - Bombsite selection is done statelessly in `update_arena_mode_ai()` PHASE 0, not eagerly at round start in `arena_mode.cpp`.
 - **Resistance**: The first Resistance bot to run PHASE 0 picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
-- **Metropolis**: Each bot picks its own `patrol_letter` via `find_least_assigned_bombsite()` if still `COUNT`, distributing defenders evenly.
+- **Metropolis**: Always uses `find_least_assigned_bombsite()` — both for initialization (when `COUNT`) and for rebalancing when a teammate dies. If the bot's current letter is over-covered by 2+ compared to the least-covered letter, it switches. Rebalancing is skipped when the bomb is planted (all defenders converge on the planted site).
 - Uses `marker_letter_type::COUNT` as sentinel for "not yet assigned".
 
 ### 4. Faction Matching Fix (`faction_type.h`)
@@ -58,5 +58,5 @@
 ## Architecture Notes
 - The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
 - Bombsite selection uses `marker_letter_type::COUNT` as a sentinel meaning "not yet assigned". Selection happens lazily in `update_arena_mode_ai()` PHASE 0 on a per-bot basis (patrol_letter) or per-team basis (chosen_bombsite).
-- `find_least_assigned_bombsite()` distributes Metropolis defenders evenly across sites. The first bot gets the least-assigned letter, the second bot recalculates and gets the next least-assigned, etc.
+- `find_least_assigned_bombsite()` is always used for Metropolis — both at initialization and for continuous rebalancing. When a bot dies, its waypoint assignments clear, the letter's count drops, and surviving bots on over-covered sites (difference ≥ 2) switch to rebalance. Rebalancing is skipped when bomb is planted.
 - The random selection for Resistance ensures unpredictability — the attacking team doesn't always go to the same site.
