@@ -294,6 +294,41 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto subject = cosm[h.subject];
 		const auto& sentience = subject.get<invariants::sentience>();
 
+		const bool is_special_event =
+			h.special_result == messages::health_event::result_type::DEATH
+			|| h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS
+			|| h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION
+		;
+
+		bool is_duplicate_shotgun_sound = false;
+
+		if (!is_special_event) {
+			const auto bullet_entity = cosm[h.origin.cause.entity];
+
+			if (bullet_entity.alive()) {
+				bullet_entity.dispatch_on_having_all<components::missile>([&](const auto& typed_bullet) {
+					const auto bullet_gun = entity_id(h.origin.sender.direct_sender);
+					const auto bullet_birth = typed_bullet.template get<components::missile>().when_fired;
+
+					if (auto* sentience_comp = subject.find<components::sentience>()) {
+						if (sentience_comp->last_damaging_gun == bullet_gun
+							&& sentience_comp->when_born_of_last_spawned_bullet == bullet_birth
+							&& bullet_birth.was_set()) {
+							is_duplicate_shotgun_sound = true;
+						}
+						else {
+							sentience_comp->last_damaging_gun = bullet_gun;
+							sentience_comp->when_born_of_last_spawned_bullet = bullet_birth;
+						}
+					}
+				});
+			}
+		}
+
+		if (is_duplicate_shotgun_sound) {
+			continue;
+		}
+
 		sound_effect_input effect;
 
 		auto predictability = always_predictable_v;

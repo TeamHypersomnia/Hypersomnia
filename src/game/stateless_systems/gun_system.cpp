@@ -602,6 +602,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
 											missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
 											missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
+											missile.when_fired = cosm.get_timestamp();
 										}
 
 										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
@@ -821,6 +822,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 														missile.power_multiplier_of_sender = gun_def.damage_multiplier;
 														missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
 														missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
+														missile.when_fired = cosm.get_timestamp();
 
 														missile.penetration_distance_remaining = gun_def.basic_penetration_distance;
 														missile.starting_penetration_distance = gun_def.basic_penetration_distance;
