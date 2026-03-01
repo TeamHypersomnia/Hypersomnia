@@ -24,7 +24,7 @@ enum class offscreen_reference_type {
 
 enum class crosshair_type {
 	// GEN INTROSPECTOR enum class crosshair_type
-	LEGACY,
+	CLASSIC,
 	CIRCULAR,
 	COUNT
 	// END GEN INTROSPECTOR
@@ -32,7 +32,7 @@ enum class crosshair_type {
 
 struct crosshair_drawing_settings {
 	// GEN INTROSPECTOR struct crosshair_drawing_settings
-	crosshair_type type = crosshair_type::LEGACY;
+	crosshair_type type = crosshair_type::CLASSIC;
 	int scale = 3;
 	int border_width = 1;
 	bool show_dot = true;
