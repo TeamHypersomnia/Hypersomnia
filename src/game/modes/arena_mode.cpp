@@ -1103,11 +1103,15 @@ void arena_mode::setup_round(
 
 	/*
 		Gather waypoints for AI teams at round start.
-		This also gathers bombsite letter -> entity id mappings.
 	*/
 	for_each_faction([&](const auto faction) {
 		::gather_waypoints_for_team(cosm, factions[faction].ai_team_state, faction);
 	});
+
+	/*
+		Gather bombsite mappings once (team-agnostic).
+	*/
+	::gather_bombsite_mappings(cosm, ai_arena_meta);
 
 	/*
 		Choose a random bombsite for Resistance (attackers) at round start.
@@ -1117,10 +1121,9 @@ void arena_mode::setup_round(
 		auto rng = randomization(stable_round_rng);
 
 		auto& resistance_team = factions[faction_type::RESISTANCE].ai_team_state;
-		resistance_team.chosen_bombsite = ::choose_random_bombsite(resistance_team, rng);
+		resistance_team.chosen_bombsite = ::choose_random_bombsite(ai_arena_meta, rng);
 
-		auto& metropolis_team = factions[faction_type::METROPOLIS].ai_team_state;
-		const auto available_letters = metropolis_team.get_available_bombsite_letters();
+		const auto available_letters = ai_arena_meta.get_available_bombsite_letters();
 
 		if (!available_letters.empty()) {
 			std::size_t letter_idx = 0;
@@ -2497,6 +2500,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			step,
 			player.ai_state,
 			faction_state.ai_team_state,
+			ai_arena_meta,
 			player.controlled_character_id,
 			it.first,
 			player_faction,

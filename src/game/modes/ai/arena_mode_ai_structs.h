@@ -140,11 +140,6 @@ struct ai_waypoint_state {
 };
 
 /*
-	Per-team common AI state.
-	Held in arena_mode per faction.
-*/
-
-/*
 	Mapping of bombsite letter -> bombsite area marker entity ids.
 	Gathered at round start from area_marker_type::BOMBSITE markers.
 */
@@ -156,16 +151,15 @@ struct bombsite_mapping {
 	// END GEN INTROSPECTOR
 };
 
-struct arena_mode_ai_team_state {
-	// GEN INTROSPECTOR struct arena_mode_ai_team_state
-	std::vector<ai_waypoint_state> patrol_waypoints;
-	std::vector<ai_waypoint_state> push_waypoints;
+/*
+	Team-agnostic arena metadata for AI.
+	Bombsite data is the same for both factions, so compute it once
+	and store it in the arena_mode struct, not per-faction.
+*/
 
+struct arena_mode_ai_arena_meta {
+	// GEN INTROSPECTOR struct arena_mode_ai_arena_meta
 	std::vector<bombsite_mapping> bombsite_mappings;
-
-	marker_letter_type chosen_bombsite = marker_letter_type::A;
-	entity_id bot_with_defuse_mission;
-	entity_id bot_with_bomb_retrieval_mission;
 	// END GEN INTROSPECTOR
 
 	const std::vector<entity_id>* find_bombsite_ids(const marker_letter_type letter) const {
@@ -188,10 +182,26 @@ struct arena_mode_ai_team_state {
 		}
 		return letters;
 	}
+};
+
+/*
+	Per-team common AI state.
+	Held in arena_mode per faction.
+*/
+
+struct arena_mode_ai_team_state {
+	// GEN INTROSPECTOR struct arena_mode_ai_team_state
+	std::vector<ai_waypoint_state> patrol_waypoints;
+	std::vector<ai_waypoint_state> push_waypoints;
+
+	marker_letter_type chosen_bombsite = marker_letter_type::A;
+	entity_id bot_with_defuse_mission;
+	entity_id bot_with_bomb_retrieval_mission;
+	// END GEN INTROSPECTOR
 
 	void round_reset() {
 		/*
-			Don't clear waypoint lists or bombsite mappings - they are gathered at round start.
+			Don't clear waypoint lists - they are gathered at round start.
 			Just clear the assignments.
 		*/
 		clear_waypoint_assignments();

@@ -9,6 +9,7 @@ arena_ai_result update_arena_mode_ai(
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
 	const entity_id controlled_character_id,
 	const mode_player_id& bot_player_id,
 	const faction_type bot_faction,
