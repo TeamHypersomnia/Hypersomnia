@@ -426,7 +426,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			for (const auto& gun_id : it.get_wielded_guns())
 			{
-				maximum_heat = std::max(maximum_heat, cosm[gun_id].template get<components::gun>().recoil.pattern_progress);
+				(void)gun_id;
+				maximum_heat = std::max(maximum_heat, std::abs(it.template get<components::crosshair>().recoil.rotation));
 			}
 
 			if (settings.crosshair.type == crosshair_type::CIRCULAR) {
