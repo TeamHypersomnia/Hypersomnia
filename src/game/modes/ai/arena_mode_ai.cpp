@@ -252,7 +252,6 @@ arena_ai_result update_arena_mode_ai(
 		team_state,
 		arena_meta,
 		bot_player_id,
-		bot_faction,
 		character_pos,
 		bomb_planted,
 		bomb_entity,
