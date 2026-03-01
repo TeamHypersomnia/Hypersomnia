@@ -429,20 +429,59 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				maximum_heat = std::max(maximum_heat, cosm[gun_id].template get<components::gun>().recoil.pattern_progress);
 			}
 
-			::draw_crosshair_procedurally(settings.crosshair, get_drawer(), projection_space_pos, maximum_heat);
+			if (settings.crosshair.type == crosshair_type::CIRCULAR) {
+				::draw_crosshair_circular(
+					settings.crosshair,
+					get_drawer(),
+					renderer.get_special_buffer(),
+					projection_space_pos,
+					screen_size,
+					maximum_heat
+				);
+			}
+			else {
+				::draw_crosshair_procedurally(settings.crosshair, get_drawer(), projection_space_pos, maximum_heat);
+			}
 		};
 
 		if (viewed_character) {
 			//if (is_zoomed_out)
 			{
 				renderer.call_and_clear_triangles();
-				shaders.standard->set_projection(renderer, non_zoomed_matrix);
+
+				if (settings.crosshair.type == crosshair_type::CIRCULAR) {
+					shaders.exploding_rings->set_as_current(renderer);
+					shaders.exploding_rings->set_projection(renderer, non_zoomed_matrix);
+				}
+				else {
+					shaders.standard->set_projection(renderer, non_zoomed_matrix);
+				}
 			}
 
 			draw_crosshair(viewed_character);
 
 			//if (is_zoomed_out)
 			{
+				if (settings.crosshair.type == crosshair_type::CIRCULAR) {
+					renderer.call_and_clear_triangles();
+
+					shaders.standard->set_as_current(renderer);
+					shaders.standard->set_projection(renderer, non_zoomed_matrix);
+
+					if (settings.crosshair.show_dot) {
+						const vec2 world_space_pos = viewed_character.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
+						const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
+
+						const auto dot_size = vec2::square(1.f * settings.crosshair.dot_size * settings.crosshair.scale);
+						const auto dot_origin = ltrb::center_and_size(projection_space_pos, dot_size);
+
+						auto borders = border_input();
+						borders.width = settings.crosshair.border_width;
+
+						get_drawer().aabb_with_border(dot_origin, settings.crosshair.inside_color, settings.crosshair.border_color, borders);
+					}
+				}
+
 				renderer.call_and_clear_triangles();
 				shaders.standard->set_projection(renderer, matrix);
 			}
