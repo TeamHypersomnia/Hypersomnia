@@ -32,7 +32,7 @@
 ### 3. Stateless Bombsite Selection (`arena_mode_ai.cpp`)
 - **Team-level** logic is in `update_arena_mode_ai_team()`, called once per step per faction before the per-bot loop:
   - **Resistance**: Picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
-  - **Metropolis**: Rebalances bots' `patrol_letter` distribution — if any bot's letter is over-covered by 2+ compared to the least-covered letter (via `find_least_assigned_bombsite`), it switches. Skipped when bomb is planted.
+  - **Metropolis**: Rebalances bots' `patrol_letter` distribution — uses `find_most_assigned_bombsite` and `find_least_assigned_bombsite` (both wrappers around a generic `find_bombsite_by_assignment` with template comparator). If the most-assigned letter has 2+ more than the least-assigned, switches one bot (using the `example_bot` from the result). Skipped when bomb is planted.
 - **Per-bot** initialization is in `update_arena_mode_ai()` PHASE 0:
   - Only Metropolis bots get `patrol_letter` initialized (via `find_least_assigned_bombsite()`). `patrol_letter` is only used for Metropolis bombsite defense distribution.
 - Uses `marker_letter_type::COUNT` as sentinel for "not yet assigned".
@@ -45,8 +45,14 @@
 - Removed the per-entity faction check (bombsite mappings are per-team anyway).
 
 ### 6. Bombsite Rebalancing Helpers (`ai_waypoint_helpers.hpp`)
-- `find_least_assigned_bombsite()` now uses gathered bombsite mappings to only consider available letters.
+- `bombsite_assignment_info` struct holds letter, count, and example_bot.
+- `find_bombsite_by_assignment()` is a generic template function with a comparator parameter that finds the best bombsite letter by assignment count.
+- `find_least_assigned_bombsite()` and `find_most_assigned_bombsite()` are wrappers using `std::less` and `std::greater`.
 - Added `choose_random_bombsite()` for random bombsite selection from available letters.
+
+### 7. Dead Bot Waypoint Assignment Fix (`arena_mode.cpp`)
+- Waypoint reassignment loops now skip dead/unconscious bots via `sentient_and_conscious()`.
+- When a bot dies, its waypoint assignments are no longer counted, allowing `find_least_assigned_bombsite` counts to decrease properly.
 
 ## What Was Already Done (from the spec)
 - Waypoint types (`BOT_WAYPOINT_PATROL`, `BOT_WAYPOINT_PUSH`) with `camp` flag and faction — already implemented.
@@ -61,4 +67,5 @@
 - The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
 - `update_arena_mode_ai_team()` runs once per step per faction (before the per-bot loop). It handles team-level decisions: Resistance `chosen_bombsite` initialization and Metropolis patrol rebalancing.
 - `update_arena_mode_ai()` runs per-bot. PHASE 0 handles per-bot `patrol_letter` initialization using `find_least_assigned_bombsite()` for Metropolis only. `patrol_letter` is only used in the context of Metropolis (bombsite defense distribution).
-- `find_least_assigned_bombsite()` is always used for Metropolis — both at initialization and for continuous rebalancing. When a bot dies, its waypoint assignments clear, the letter's count drops, and `update_arena_mode_ai_team` detects the imbalance (difference ≥ 2) and rebalances. Skipped when bomb is planted.
+- `find_least_assigned_bombsite()` and `find_most_assigned_bombsite()` are both wrappers around `find_bombsite_by_assignment()` with template comparator. They return `bombsite_assignment_info` with letter, count, and example_bot. Used for Metropolis initialization and continuous rebalancing. Skipped when bomb is planted.
+- Waypoint reassignment loops in `arena_mode.cpp` now skip dead/unconscious bots via `sentient_and_conscious()`, so when a bot dies its waypoints are freed and assignment counts decrease properly.

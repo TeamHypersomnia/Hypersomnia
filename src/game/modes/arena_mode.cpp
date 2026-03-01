@@ -2458,8 +2458,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 			for (auto& bot : only_bot(players)) {
 				if (faction == bot.second.get_faction()) {
-					const auto assigned = ::calc_assigned_waypoint(bot.second.ai_state.last_behavior);
-					::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, bot.first);
+					if (sentient_and_conscious(cosm[bot.second.controlled_character_id])) {
+						const auto assigned = ::calc_assigned_waypoint(bot.second.ai_state.last_behavior);
+						::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, bot.first);
+					}
 				}
 			}
 
@@ -2490,8 +2492,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 		for (auto& other_bot : only_bot(players)) {
 			if (player_faction == other_bot.second.get_faction()) {
-				const auto assigned = ::calc_assigned_waypoint(other_bot.second.ai_state.last_behavior);
-				::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, other_bot.first);
+				if (sentient_and_conscious(cosm[other_bot.second.controlled_character_id])) {
+					const auto assigned = ::calc_assigned_waypoint(other_bot.second.ai_state.last_behavior);
+					::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, other_bot.first);
+				}
 			}
 		}
 
