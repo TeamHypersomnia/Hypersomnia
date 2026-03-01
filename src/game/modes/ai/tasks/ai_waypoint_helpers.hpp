@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
@@ -234,35 +235,93 @@ inline void for_each_marker_letter(F callback) {
 }
 
 /*
-	Find the bombsite letter with the least assigned soldiers.
-	Uses the gathered bombsite_mappings to only consider available letters.
-	Used for distributing bots evenly at round start.
+	Result of find_bombsite_by_assignment: letter, count, and an example assigned bot.
 */
 
-inline marker_letter_type find_least_assigned_bombsite(
+struct bombsite_assignment_info {
+	marker_letter_type letter = marker_letter_type::A;
+	std::size_t count = 0;
+	mode_player_id example_bot;
+};
+
+/*
+	Generic function to find a bombsite letter by assignment count using a comparator.
+	Comparator(candidate_count, best_count) should return true if candidate is better.
+	Also captures an example assigned bot from the first matching patrol waypoint.
+*/
+
+template <class Comparator>
+inline bombsite_assignment_info find_bombsite_by_assignment(
+	const cosmos& cosm,
+	const arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
+	Comparator comp
+) {
+	const auto available_letters = arena_meta.get_available_bombsite_letters();
+
+	bombsite_assignment_info best;
+
+	if (available_letters.empty()) {
+		return best;
+	}
+
+	best.letter = available_letters[0];
+	best.count = ::count_assigned_waypoints_for_letter(cosm, team_state, best.letter);
+
+	for (std::size_t i = 1; i < available_letters.size(); ++i) {
+		const auto letter = available_letters[i];
+		const auto assigned = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
+
+		if (comp(assigned, best.count)) {
+			best.count = assigned;
+			best.letter = letter;
+		}
+	}
+
+	for (const auto& wp : team_state.patrol_waypoints) {
+		if (!wp.is_assigned()) {
+			continue;
+		}
+
+		const auto waypoint_handle = cosm[wp.waypoint_id];
+
+		if (!waypoint_handle.alive()) {
+			continue;
+		}
+
+		const auto& marker_comp = waypoint_handle.template get<components::marker>();
+
+		if (marker_comp.letter == best.letter) {
+			best.example_bot = wp.assigned_bot;
+			break;
+		}
+	}
+
+	return best;
+}
+
+/*
+	Find the bombsite letter with the least assigned soldiers.
+*/
+
+inline bombsite_assignment_info find_least_assigned_bombsite(
 	const cosmos& cosm,
 	const arena_mode_ai_team_state& team_state,
 	const arena_mode_ai_arena_meta& arena_meta
 ) {
-	const auto available_letters = arena_meta.get_available_bombsite_letters();
+	return ::find_bombsite_by_assignment(cosm, team_state, arena_meta, std::less<std::size_t>{});
+}
 
-	if (available_letters.empty()) {
-		return marker_letter_type::A;
-	}
+/*
+	Find the bombsite letter with the most assigned soldiers.
+*/
 
-	marker_letter_type best_letter = available_letters[0];
-	std::size_t least_assigned = std::numeric_limits<std::size_t>::max();
-
-	for (const auto letter : available_letters) {
-		const auto assigned = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
-
-		if (assigned < least_assigned) {
-			least_assigned = assigned;
-			best_letter = letter;
-		}
-	}
-
-	return best_letter;
+inline bombsite_assignment_info find_most_assigned_bombsite(
+	const cosmos& cosm,
+	const arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta
+) {
+	return ::find_bombsite_by_assignment(cosm, team_state, arena_meta, std::greater<std::size_t>{});
 }
 
 /*

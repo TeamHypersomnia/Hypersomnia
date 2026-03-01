@@ -74,23 +74,14 @@ void update_arena_mode_ai_team(
 	*/
 	if (faction == faction_type::METROPOLIS && !bomb_planted) {
 		const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+		const auto most = ::find_most_assigned_bombsite(cosm, team_state, arena_meta);
 
-		for (auto& bot : only_bot(players)) {
-			if (bot.second.get_faction() != faction) {
-				continue;
-			}
-
-			auto& ai_state = bot.second.ai_state;
-
-			if (ai_state.patrol_letter == marker_letter_type::COUNT) {
-				continue;
-			}
-
-			const auto current_count = ::count_assigned_waypoints_for_letter(cosm, team_state, ai_state.patrol_letter);
-			const auto least_count = ::count_assigned_waypoints_for_letter(cosm, team_state, least);
-
-			if (current_count >= least_count + 2) {
-				ai_state.patrol_letter = least;
+		if (most.count >= least.count + 2 && most.example_bot.is_set()) {
+			for (auto& bot : only_bot(players)) {
+				if (bot.first == most.example_bot) {
+					bot.second.ai_state.patrol_letter = least.letter;
+					break;
+				}
 			}
 		}
 	}
@@ -153,7 +144,7 @@ arena_ai_result update_arena_mode_ai(
 	*/
 
 	if (bot_faction == faction_type::METROPOLIS && ai_state.patrol_letter == marker_letter_type::COUNT) {
-		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta).letter;
 	}
 
 	/*
