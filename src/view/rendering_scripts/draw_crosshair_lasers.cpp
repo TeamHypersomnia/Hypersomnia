@@ -90,7 +90,7 @@ void draw_crosshair_circular(
 	vec2i screen_size,
 	float recoil_amount
 ) {
-	const float scale = static_cast<float>(settings.scale);
+	const auto scale = static_cast<float>(settings.scale);
 
 	float total_offset = settings.recoil_expansion_base;
 	total_offset += recoil_amount * settings.recoil_expansion_mult;
@@ -99,6 +99,7 @@ void draw_crosshair_circular(
 	const float ring_thickness = scale * settings.segment_thickness;
 	const float border = static_cast<float>(settings.border_width);
 
+	/* Y flip: convert from screen-space (top-left origin) to gl_FragCoord space (bottom-left origin) */
 	const vec2 ring_center_screen(center.x, static_cast<float>(screen_size.y) - center.y);
 
 	auto push_ring = [&](const float inner_r, const float outer_r, const rgba color) {

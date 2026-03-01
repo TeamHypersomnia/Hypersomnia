@@ -472,7 +472,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						const vec2 world_space_pos = viewed_character.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
 						const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
 
-						const auto dot_size = vec2::square(1.f * settings.crosshair.dot_size * settings.crosshair.scale);
+						const auto dot_size = vec2::square(settings.crosshair.dot_size * settings.crosshair.scale);
 						const auto dot_origin = ltrb::center_and_size(projection_space_pos, dot_size);
 
 						auto borders = border_input();
