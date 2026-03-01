@@ -1108,6 +1108,11 @@ void arena_mode::setup_round(
 		::gather_waypoints_for_team(cosm, factions[faction].ai_team_state, faction);
 	});
 
+	/*
+		Gather bombsite mappings once (team-agnostic).
+	*/
+	::gather_bombsite_mappings(cosm, ai_arena_meta);
+
 	fill_spawns(cosm, faction_type::ANY, ffa_faction);
 
 	messages::changed_identities_message changed_identities;
@@ -2435,6 +2440,45 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	const bool is_bomb_planted = bomb_planted(in);
 	const auto current_bomb_entity = bomb_entity;
 
+	/*
+		Update team-level AI state once per step per faction
+		before the per-bot loop.
+	*/
+	{
+		auto team_rng = randomization(stable_round_rng);
+
+		for_each_faction([&](const auto faction) {
+			auto& faction_state = factions[faction];
+
+			/*
+				Recalculate waypoint assignments for this faction
+				so that find_least_assigned_bombsite has current data.
+			*/
+			faction_state.ai_team_state.clear_waypoint_assignments();
+
+			for (auto& bot : only_bot(players)) {
+				if (faction == bot.second.get_faction()) {
+					if (sentient_and_conscious(cosm[bot.second.controlled_character_id])) {
+						const auto assigned = ::calc_assigned_waypoint(bot.second.ai_state.last_behavior);
+						::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, bot.first);
+					}
+				}
+			}
+
+			update_arena_mode_ai_team(
+				cosm,
+				faction_state.ai_team_state,
+				ai_arena_meta,
+				players,
+				faction,
+				is_bomb_planted,
+				team_rng
+			);
+		});
+
+		stable_round_rng = team_rng.generator;
+	}
+
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 		const auto player_faction = player.get_faction();
@@ -2448,8 +2492,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 		for (auto& other_bot : only_bot(players)) {
 			if (player_faction == other_bot.second.get_faction()) {
-				const auto assigned = ::calc_assigned_waypoint(other_bot.second.ai_state.last_behavior);
-				::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, other_bot.first);
+				if (sentient_and_conscious(cosm[other_bot.second.controlled_character_id])) {
+					const auto assigned = ::calc_assigned_waypoint(other_bot.second.ai_state.last_behavior);
+					::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, other_bot.first);
+				}
 			}
 		}
 
@@ -2469,6 +2515,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			step,
 			player.ai_state,
 			faction_state.ai_team_state,
+			ai_arena_meta,
 			player.controlled_character_id,
 			it.first,
 			player_faction,

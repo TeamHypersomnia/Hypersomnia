@@ -7,6 +7,7 @@
 #include "game/modes/mode_player_id.h"
 #include "augs/math/transform.h"
 #include "augs/log.h"
+#include "augs/misc/constant_size_vector.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
 
@@ -140,6 +141,51 @@ struct ai_waypoint_state {
 };
 
 /*
+	Mapping of bombsite letter -> bombsite area marker entity ids.
+	Gathered at round start from area_marker_type::BOMBSITE markers.
+*/
+
+struct bombsite_mapping {
+	// GEN INTROSPECTOR struct bombsite_mapping
+	marker_letter_type letter = marker_letter_type::A;
+	std::vector<entity_id> bombsite_ids;
+	// END GEN INTROSPECTOR
+};
+
+/*
+	Team-agnostic arena metadata for AI.
+	Bombsite data is the same for both factions, so compute it once
+	and store it in the arena_mode struct, not per-faction.
+*/
+
+struct arena_mode_ai_arena_meta {
+	// GEN INTROSPECTOR struct arena_mode_ai_arena_meta
+	std::vector<bombsite_mapping> bombsite_mappings;
+	// END GEN INTROSPECTOR
+
+	const std::vector<entity_id>* find_bombsite_ids(const marker_letter_type letter) const {
+		for (const auto& mapping : bombsite_mappings) {
+			if (mapping.letter == letter) {
+				return &mapping.bombsite_ids;
+			}
+		}
+		return nullptr;
+	}
+
+	bool has_bombsite_letter(const marker_letter_type letter) const {
+		return find_bombsite_ids(letter) != nullptr;
+	}
+
+	augs::constant_size_vector<marker_letter_type, static_cast<std::size_t>(marker_letter_type::COUNT)> get_available_bombsite_letters() const {
+		augs::constant_size_vector<marker_letter_type, static_cast<std::size_t>(marker_letter_type::COUNT)> letters;
+		for (const auto& mapping : bombsite_mappings) {
+			letters.push_back(mapping.letter);
+		}
+		return letters;
+	}
+};
+
+/*
 	Per-team common AI state.
 	Held in arena_mode per faction.
 */
@@ -149,7 +195,7 @@ struct arena_mode_ai_team_state {
 	std::vector<ai_waypoint_state> patrol_waypoints;
 	std::vector<ai_waypoint_state> push_waypoints;
 
-	marker_letter_type chosen_bombsite = marker_letter_type::A;
+	marker_letter_type chosen_bombsite = marker_letter_type::COUNT;
 	entity_id bot_with_defuse_mission;
 	entity_id bot_with_bomb_retrieval_mission;
 	// END GEN INTROSPECTOR
@@ -157,9 +203,10 @@ struct arena_mode_ai_team_state {
 	void round_reset() {
 		/*
 			Don't clear waypoint lists - they are gathered at round start.
-			Just clear the assignments.
+			Just clear the assignments and reset chosen_bombsite.
 		*/
 		clear_waypoint_assignments();
+		chosen_bombsite = marker_letter_type::COUNT;
 		bot_with_defuse_mission = entity_id::dead();
 		bot_with_bomb_retrieval_mission = entity_id::dead();
 	}
@@ -179,7 +226,7 @@ struct arena_mode_ai_state {
 	ai_behavior_variant last_behavior = ai_behavior_idle();
 	ai_target_tracking combat_target;
 
-	marker_letter_type patrol_letter = marker_letter_type::A;
+	marker_letter_type patrol_letter = marker_letter_type::COUNT;
 	bool tried_push_already = false;
 	bool recoil_cooldown = false;
 	bool stamina_cooldown = false;
@@ -209,7 +256,7 @@ struct arena_mode_ai_state {
 	void round_reset() {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
-		patrol_letter = marker_letter_type::A;
+		patrol_letter = marker_letter_type::COUNT;
 		tried_push_already = false;
 		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -10000.0f;

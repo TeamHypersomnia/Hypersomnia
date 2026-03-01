@@ -51,11 +51,53 @@
 #include "game/modes/ai/tasks/can_weapon_penetrate.hpp"
 #include "game/cosmos/make_physics_path_hints.h"
 
+void update_arena_mode_ai_team(
+	cosmos& cosm,
+	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
+	std::map<mode_player_id, arena_mode_player>& players,
+	const faction_type faction,
+	const bool bomb_planted,
+	randomization& rng
+) {
+	/*
+		Resistance: if team has no chosen_bombsite yet, pick one randomly.
+	*/
+	if (faction == faction_type::RESISTANCE && team_state.chosen_bombsite == marker_letter_type::COUNT) {
+		team_state.chosen_bombsite = ::choose_random_bombsite(arena_meta, rng);
+	}
+
+	/*
+		Metropolis: rebalance patrol_letter distribution once per step.
+		If any bot's letter is over-covered by 2+ compared to the least-covered,
+		switch that bot to the least-covered letter.
+	*/
+	if (faction == faction_type::METROPOLIS && !bomb_planted) {
+		const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+		const auto most = ::find_most_assigned_bombsite(cosm, team_state, arena_meta);
+
+		if (most.count >= least.count + 2 && most.example_bot.is_set()) {
+			for (auto& bot : only_bot(players)) {
+				if (bot.first == most.example_bot) {
+					bot.second.ai_state.patrol_letter = least.letter;
+
+					if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(bot.second.ai_state.last_behavior)) {
+						*patrol = ai_behavior_patrol();
+					}
+
+					break;
+				}
+			}
+		}
+	}
+}
+
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
 	const logic_step step,
 	arena_mode_ai_state& ai_state,
 	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
 	const entity_id controlled_character_id,
 	const mode_player_id& bot_player_id,
 	const faction_type bot_faction,
@@ -97,6 +139,24 @@ arena_ai_result update_arena_mode_ai(
 	};
 
 	AI_LOG("=== update_arena_mode_ai ===");
+
+	/*
+		===========================================================================
+		PHASE 0: Per-bot patrol_letter initialization.
+		Team-level data (chosen_bombsite, rebalancing) is handled by
+		update_arena_mode_ai_team called before the per-bot loop.
+		===========================================================================
+	*/
+
+	if (bot_faction == faction_type::METROPOLIS && ai_state.patrol_letter == marker_letter_type::COUNT) {
+		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta).letter;
+	}
+
+	if (bot_faction == faction_type::RESISTANCE && ai_state.patrol_letter == marker_letter_type::COUNT) {
+		if (team_state.chosen_bombsite != marker_letter_type::COUNT) {
+			ai_state.patrol_letter = team_state.chosen_bombsite;
+		}
+	}
 
 	/*
 		===========================================================================
@@ -249,8 +309,8 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.last_behavior,
 		ai_state.combat_target,
 		team_state,
+		arena_meta,
 		bot_player_id,
-		bot_faction,
 		character_pos,
 		bomb_planted,
 		bomb_entity,
