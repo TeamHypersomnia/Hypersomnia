@@ -101,6 +101,43 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
+		PHASE 0: Ensure team-level and per-bot bombsite data is initialized.
+		This runs on a per-bot basis but updates team state if needed.
+		===========================================================================
+	*/
+
+	{
+		const bool is_resistance = (bot_faction == faction_type::RESISTANCE);
+		const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
+
+		/*
+			Resistance: if team has no chosen_bombsite yet, pick one randomly.
+		*/
+		if (is_resistance && team_state.chosen_bombsite == marker_letter_type::COUNT) {
+			team_state.chosen_bombsite = ::choose_random_bombsite(arena_meta, stable_rng);
+		}
+
+		/*
+			Per-bot: if patrol_letter is unset, assign the least-covered bombsite letter.
+		*/
+		if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+			if (is_metropolis) {
+				ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+			}
+			else {
+				const auto available = arena_meta.get_available_bombsite_letters();
+				if (!available.empty()) {
+					ai_state.patrol_letter = stable_rng.rand_element(available);
+				}
+				else {
+					ai_state.patrol_letter = marker_letter_type::A;
+				}
+			}
+		}
+	}
+
+	/*
+		===========================================================================
 		PHASE 1: Update combat target tracking (before behavior tree evaluation).
 		NOTE: listen_for_footsteps is now called in post_solve_arena_mode_ai.
 		===========================================================================

@@ -267,7 +267,7 @@ inline marker_letter_type find_least_assigned_bombsite(
 
 /*
 	Choose a random bombsite letter from the available bombsite mappings.
-	Used at round start for Resistance chosen_bombsite selection.
+	Used for Resistance chosen_bombsite selection when not yet assigned.
 */
 
 inline marker_letter_type choose_random_bombsite(

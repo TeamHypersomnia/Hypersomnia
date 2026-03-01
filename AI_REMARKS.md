@@ -29,9 +29,11 @@
 - `gather_waypoints_for_team()` now also iterates `area_marker_type::BOMBSITE` entities and builds the letter → entity ID mappings.
 - This is called at round start for each faction.
 
-### 3. Bombsite Selection at Round Start (`arena_mode.cpp`)
-- **Resistance**: `chosen_bombsite` is now randomly selected from available bombsite letters at round start using `choose_random_bombsite()`.
-- **Metropolis**: Bot `patrol_letter` values are distributed round-robin across available bombsite letters, so defenders spread evenly across sites.
+### 3. Stateless Bombsite Selection (`arena_mode_ai.cpp`)
+- Bombsite selection is done statelessly in `update_arena_mode_ai()` PHASE 0, not eagerly at round start in `arena_mode.cpp`.
+- **Resistance**: The first Resistance bot to run PHASE 0 picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
+- **Metropolis**: Each bot picks its own `patrol_letter` via `find_least_assigned_bombsite()` if still `COUNT`, distributing defenders evenly.
+- Uses `marker_letter_type::COUNT` as sentinel for "not yet assigned".
 
 ### 4. Faction Matching Fix (`faction_type.h`)
 - `is_waypoint_for_faction()` now treats both `faction_type::ANY` and `faction_type::DEFAULT` as applicable for both factions, per the specification.
@@ -55,5 +57,6 @@
 
 ## Architecture Notes
 - The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
-- The round-robin distribution for Metropolis ensures even coverage. If there are 4 bots and 2 bombsites (A, B), bots get assigned: A, B, A, B.
+- Bombsite selection uses `marker_letter_type::COUNT` as a sentinel meaning "not yet assigned". Selection happens lazily in `update_arena_mode_ai()` PHASE 0 on a per-bot basis (patrol_letter) or per-team basis (chosen_bombsite).
+- `find_least_assigned_bombsite()` distributes Metropolis defenders evenly across sites. The first bot gets the least-assigned letter, the second bot recalculates and gets the next least-assigned, etc.
 - The random selection for Resistance ensures unpredictability — the attacking team doesn't always go to the same site.
