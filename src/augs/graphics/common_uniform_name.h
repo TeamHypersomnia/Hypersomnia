@@ -21,6 +21,8 @@ namespace augs {
 		afterimage_texture,
 		global_color,
 
+		global_time,
+
 		COUNT
 		// END GEN INTROSPECTOR
 	};

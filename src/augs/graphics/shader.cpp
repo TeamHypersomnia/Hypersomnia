@@ -77,7 +77,7 @@ namespace augs {
 #elif PLATFORM_WEB
 			const auto glsl_version = "#version 300 es";
 #else
-			const auto glsl_version = "#version 130";
+			const auto glsl_version = "#version 330";
 #endif
 			create(shader_type, std::string(glsl_version) + "\n" + "// " + path.string() + "\n" + file_to_string(path));
 		}
