@@ -54,6 +54,6 @@
 - Post-bomb-plant bombsite detection and AI redirection — already implemented.
 
 ## Architecture Notes
-- The `bombsite_mappings` are shared across both factions since bombsites are not faction-specific (they are global map features). Both Resistance and Metropolis teams gather the same bombsite data.
+- The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
 - The round-robin distribution for Metropolis ensures even coverage. If there are 4 bots and 2 bombsites (A, B), bots get assigned: A, B, A, B.
 - The random selection for Resistance ensures unpredictability — the attacking team doesn't always go to the same site.

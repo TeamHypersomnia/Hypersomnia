@@ -70,6 +70,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 	ai_behavior_variant& behavior,
 	const ai_target_tracking& combat_target,
 	const arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
 	const mode_player_id& bot_player_id,
 	const faction_type bot_faction,
 	const vec2 character_pos,
@@ -158,7 +159,7 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 			*/
 			if (!b.cached_plant_target.has_value()) {
 				const auto bombsite_letter = team_state.chosen_bombsite;
-				const auto* bombsite_ids = team_state.find_bombsite_ids(bombsite_letter);
+				const auto* bombsite_ids = arena_meta.find_bombsite_ids(bombsite_letter);
 
 				if (bombsite_ids != nullptr) {
 					std::optional<transformr> found_target;
