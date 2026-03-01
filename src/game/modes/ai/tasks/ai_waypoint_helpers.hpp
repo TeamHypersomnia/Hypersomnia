@@ -196,14 +196,16 @@ inline entity_id find_random_unassigned_push_waypoint(
 
 /*
 	Count how many patrol waypoints of a given letter are assigned.
+	Also returns an example assigned bot (from the first match).
 */
 
-inline std::size_t count_assigned_waypoints_for_letter(
+inline std::pair<std::size_t, mode_player_id> count_assigned_waypoints_for_letter(
 	const cosmos& cosm,
 	const arena_mode_ai_team_state& team_state,
 	const marker_letter_type letter
 ) {
 	std::size_t count = 0;
+	mode_player_id example_bot;
 
 	for (const auto& wp : team_state.patrol_waypoints) {
 		const auto waypoint_handle = cosm[wp.waypoint_id];
@@ -215,11 +217,15 @@ inline std::size_t count_assigned_waypoints_for_letter(
 		const auto& marker_comp = waypoint_handle.template get<components::marker>();
 
 		if (marker_comp.letter == letter && wp.is_assigned()) {
+			if (count == 0) {
+				example_bot = wp.assigned_bot;
+			}
+
 			++count;
 		}
 	}
 
-	return count;
+	return { count, example_bot };
 }
 
 /*
@@ -266,34 +272,21 @@ inline bombsite_assignment_info find_bombsite_by_assignment(
 	}
 
 	best.letter = available_letters[0];
-	best.count = ::count_assigned_waypoints_for_letter(cosm, team_state, best.letter);
+
+	{
+		const auto [count, example] = ::count_assigned_waypoints_for_letter(cosm, team_state, best.letter);
+		best.count = count;
+		best.example_bot = example;
+	}
 
 	for (std::size_t i = 1; i < available_letters.size(); ++i) {
 		const auto letter = available_letters[i];
-		const auto assigned = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
+		const auto [count, example] = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
 
-		if (comp(assigned, best.count)) {
-			best.count = assigned;
+		if (comp(count, best.count)) {
+			best.count = count;
 			best.letter = letter;
-		}
-	}
-
-	for (const auto& wp : team_state.patrol_waypoints) {
-		if (!wp.is_assigned()) {
-			continue;
-		}
-
-		const auto waypoint_handle = cosm[wp.waypoint_id];
-
-		if (!waypoint_handle.alive()) {
-			continue;
-		}
-
-		const auto& marker_comp = waypoint_handle.template get<components::marker>();
-
-		if (marker_comp.letter == best.letter) {
-			best.example_bot = wp.assigned_bot;
-			break;
+			best.example_bot = example;
 		}
 	}
 
