@@ -18,7 +18,6 @@ inline void gather_waypoints_for_team(
 ) {
 	team_state.patrol_waypoints.clear();
 	team_state.push_waypoints.clear();
-	team_state.bombsite_mappings.clear();
 
 	cosm.for_each_having<invariants::point_marker>(
 		[&](const auto typed_handle) {
@@ -51,10 +50,19 @@ inline void gather_waypoints_for_team(
 			}
 		}
 	);
+}
 
-	/*
-		Gather all bombsite area markers and build letter -> entity id mappings.
-	*/
+/*
+	Gather all bombsite area markers and build letter -> entity id mappings.
+	This is team-agnostic and should be called once at round start.
+*/
+
+inline void gather_bombsite_mappings(
+	const cosmos& cosm,
+	arena_mode_ai_arena_meta& arena_meta
+) {
+	arena_meta.bombsite_mappings.clear();
+
 	cosm.for_each_having<invariants::area_marker>(
 		[&](const auto typed_handle) {
 			const auto& marker_inv = typed_handle.template get<invariants::area_marker>();
@@ -69,7 +77,7 @@ inline void gather_waypoints_for_team(
 
 				/* Find or create the mapping for this letter. */
 				bool found = false;
-				for (auto& mapping : team_state.bombsite_mappings) {
+				for (auto& mapping : arena_meta.bombsite_mappings) {
 					if (mapping.letter == letter) {
 						mapping.bombsite_ids.push_back(id);
 						found = true;
@@ -81,7 +89,7 @@ inline void gather_waypoints_for_team(
 					bombsite_mapping new_mapping;
 					new_mapping.letter = letter;
 					new_mapping.bombsite_ids.push_back(id);
-					team_state.bombsite_mappings.push_back(new_mapping);
+					arena_meta.bombsite_mappings.push_back(new_mapping);
 				}
 			}
 		}
@@ -233,9 +241,10 @@ inline void for_each_marker_letter(F callback) {
 
 inline marker_letter_type find_least_assigned_bombsite(
 	const cosmos& cosm,
-	const arena_mode_ai_team_state& team_state
+	const arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta
 ) {
-	const auto available_letters = team_state.get_available_bombsite_letters();
+	const auto available_letters = arena_meta.get_available_bombsite_letters();
 
 	if (available_letters.empty()) {
 		return marker_letter_type::A;
@@ -262,10 +271,10 @@ inline marker_letter_type find_least_assigned_bombsite(
 */
 
 inline marker_letter_type choose_random_bombsite(
-	const arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
 	randomization& rng
 ) {
-	const auto available_letters = team_state.get_available_bombsite_letters();
+	const auto available_letters = arena_meta.get_available_bombsite_letters();
 
 	if (available_letters.empty()) {
 		return marker_letter_type::A;

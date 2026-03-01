@@ -462,6 +462,7 @@ private:
 
 	per_actual_faction<arena_mode_faction_state> factions;
 	arena_mode_faction_state ffa_faction;
+	arena_mode_ai_arena_meta ai_arena_meta;
 	uint8_t spawn_reshuffle_counter = 0;
 
 	std::map<mode_player_id, player_type> players;
