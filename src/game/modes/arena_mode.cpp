@@ -919,6 +919,7 @@ bool arena_mode::give_bomb_to_random_player(const input_type in, const logic_ste
 
 			auto request = item_slot_transfer_request::standard(spawned_bomb.get_id(), typed_player[t].get_id());
 			request.params.bypass_mounting_requirements = true;
+			request.params.perform_recoils = false;
 			perform_transfer(request, step);
 			break;
 		}

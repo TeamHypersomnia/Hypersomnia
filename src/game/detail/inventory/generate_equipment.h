@@ -49,7 +49,7 @@ entity_id requested_equipment::generate_for_impl(
 
 	auto recoils = perform_recoils;
 
-	auto transfer = [recoils, &cosm, &on_step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
+	auto transfer = [&recoils, &cosm, &on_step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) mutable {
 		if (to.dead()) {
 			return;
 		}
@@ -67,6 +67,7 @@ entity_id requested_equipment::generate_for_impl(
 		request.params.play_transfer_sounds = max_effects_played > 0 && play_effects;
 		request.params.play_transfer_particles = max_effects_played > 0 && play_effects;
 		request.params.perform_recoils = recoils;
+		recoils = false;
 
 		const auto result = perform_transfer_no_step(request, cosm);
 
