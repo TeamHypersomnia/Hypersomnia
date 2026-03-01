@@ -152,6 +152,12 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta).letter;
 	}
 
+	if (bot_faction == faction_type::RESISTANCE && ai_state.patrol_letter == marker_letter_type::COUNT) {
+		if (team_state.chosen_bombsite != marker_letter_type::COUNT) {
+			ai_state.patrol_letter = team_state.chosen_bombsite;
+		}
+	}
+
 	/*
 		===========================================================================
 		PHASE 1: Update combat target tracking (before behavior tree evaluation).
