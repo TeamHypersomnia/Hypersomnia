@@ -144,19 +144,54 @@ struct ai_waypoint_state {
 	Held in arena_mode per faction.
 */
 
+/*
+	Mapping of bombsite letter -> bombsite area marker entity ids.
+	Gathered at round start from area_marker_type::BOMBSITE markers.
+*/
+
+struct bombsite_mapping {
+	// GEN INTROSPECTOR struct bombsite_mapping
+	marker_letter_type letter = marker_letter_type::A;
+	std::vector<entity_id> bombsite_ids;
+	// END GEN INTROSPECTOR
+};
+
 struct arena_mode_ai_team_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_team_state
 	std::vector<ai_waypoint_state> patrol_waypoints;
 	std::vector<ai_waypoint_state> push_waypoints;
+
+	std::vector<bombsite_mapping> bombsite_mappings;
 
 	marker_letter_type chosen_bombsite = marker_letter_type::A;
 	entity_id bot_with_defuse_mission;
 	entity_id bot_with_bomb_retrieval_mission;
 	// END GEN INTROSPECTOR
 
+	const std::vector<entity_id>* find_bombsite_ids(const marker_letter_type letter) const {
+		for (const auto& mapping : bombsite_mappings) {
+			if (mapping.letter == letter) {
+				return &mapping.bombsite_ids;
+			}
+		}
+		return nullptr;
+	}
+
+	bool has_bombsite_letter(const marker_letter_type letter) const {
+		return find_bombsite_ids(letter) != nullptr;
+	}
+
+	std::vector<marker_letter_type> get_available_bombsite_letters() const {
+		std::vector<marker_letter_type> letters;
+		for (const auto& mapping : bombsite_mappings) {
+			letters.push_back(mapping.letter);
+		}
+		return letters;
+	}
+
 	void round_reset() {
 		/*
-			Don't clear waypoint lists - they are gathered at round start.
+			Don't clear waypoint lists or bombsite mappings - they are gathered at round start.
 			Just clear the assignments.
 		*/
 		clear_waypoint_assignments();

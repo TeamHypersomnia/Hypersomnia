@@ -18,6 +18,7 @@ inline void gather_waypoints_for_team(
 ) {
 	team_state.patrol_waypoints.clear();
 	team_state.push_waypoints.clear();
+	team_state.bombsite_mappings.clear();
 
 	cosm.for_each_having<invariants::point_marker>(
 		[&](const auto typed_handle) {
@@ -47,6 +48,41 @@ inline void gather_waypoints_for_team(
 			}
 			else if (marker_inv.type == point_marker_type::BOT_WAYPOINT_PUSH) {
 				team_state.push_waypoints.push_back(wp_state);
+			}
+		}
+	);
+
+	/*
+		Gather all bombsite area markers and build letter -> entity id mappings.
+	*/
+	cosm.for_each_having<invariants::area_marker>(
+		[&](const auto typed_handle) {
+			const auto& marker_inv = typed_handle.template get<invariants::area_marker>();
+
+			if (!::is_bombsite(marker_inv.type)) {
+				return;
+			}
+
+			if (const auto marker_comp = typed_handle.template find<components::marker>()) {
+				const auto letter = marker_comp->letter;
+				const auto id = typed_handle.get_id();
+
+				/* Find or create the mapping for this letter. */
+				bool found = false;
+				for (auto& mapping : team_state.bombsite_mappings) {
+					if (mapping.letter == letter) {
+						mapping.bombsite_ids.push_back(id);
+						found = true;
+						break;
+					}
+				}
+
+				if (!found) {
+					bombsite_mapping new_mapping;
+					new_mapping.letter = letter;
+					new_mapping.bombsite_ids.push_back(id);
+					team_state.bombsite_mappings.push_back(new_mapping);
+				}
 			}
 		}
 	);
@@ -191,6 +227,7 @@ inline void for_each_marker_letter(F callback) {
 
 /*
 	Find the bombsite letter with the least assigned soldiers.
+	Uses the gathered bombsite_mappings to only consider available letters.
 	Used for distributing bots evenly at round start.
 */
 
@@ -198,19 +235,43 @@ inline marker_letter_type find_least_assigned_bombsite(
 	const cosmos& cosm,
 	const arena_mode_ai_team_state& team_state
 ) {
-	marker_letter_type best_letter = marker_letter_type::A;
+	const auto available_letters = team_state.get_available_bombsite_letters();
+
+	if (available_letters.empty()) {
+		return marker_letter_type::A;
+	}
+
+	marker_letter_type best_letter = available_letters[0];
 	std::size_t least_assigned = std::numeric_limits<std::size_t>::max();
 
-	::for_each_marker_letter([&](const auto letter) {
+	for (const auto letter : available_letters) {
 		const auto assigned = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
 
 		if (assigned < least_assigned) {
 			least_assigned = assigned;
 			best_letter = letter;
 		}
-	});
+	}
 
 	return best_letter;
+}
+
+/*
+	Choose a random bombsite letter from the available bombsite mappings.
+	Used at round start for Resistance chosen_bombsite selection.
+*/
+
+inline marker_letter_type choose_random_bombsite(
+	const arena_mode_ai_team_state& team_state,
+	randomization& rng
+) {
+	const auto available_letters = team_state.get_available_bombsite_letters();
+
+	if (available_letters.empty()) {
+		return marker_letter_type::A;
+	}
+
+	return rng.rand_element(available_letters);
 }
 
 /*
