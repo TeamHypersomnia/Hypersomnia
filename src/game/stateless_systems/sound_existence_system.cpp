@@ -307,8 +307,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 			if (bullet_entity.alive()) {
 				bullet_entity.dispatch_on_having_all<components::missile>([&](const auto& typed_bullet) {
-					const auto bullet_gun = entity_id(h.origin.sender.direct_sender);
-					const auto bullet_birth = typed_bullet.template get<components::missile>().when_fired;
+					const auto bullet_gun = h.origin.sender.direct_sender;
+					const auto& missile_comp = typed_bullet.template get<components::missile>();
+					const auto bullet_birth = missile_comp.when_fired;
 
 					if (auto* sentience_comp = subject.find<components::sentience>()) {
 						if (sentience_comp->last_damaging_gun == bullet_gun
