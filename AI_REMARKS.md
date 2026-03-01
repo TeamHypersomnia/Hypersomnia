@@ -30,9 +30,11 @@
 - This is called at round start for each faction.
 
 ### 3. Stateless Bombsite Selection (`arena_mode_ai.cpp`)
-- Bombsite selection is done statelessly in `update_arena_mode_ai()` PHASE 0, not eagerly at round start in `arena_mode.cpp`.
-- **Resistance**: The first Resistance bot to run PHASE 0 picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
-- **Metropolis**: Always uses `find_least_assigned_bombsite()` — both for initialization (when `COUNT`) and for rebalancing when a teammate dies. If the bot's current letter is over-covered by 2+ compared to the least-covered letter, it switches. Rebalancing is skipped when the bomb is planted (all defenders converge on the planted site).
+- **Team-level** logic is in `update_arena_mode_ai_team()`, called once per step per faction before the per-bot loop:
+  - **Resistance**: Picks `chosen_bombsite` randomly if it's still `COUNT` (unset).
+  - **Metropolis**: Rebalances bots' `patrol_letter` distribution — if any bot's letter is over-covered by 2+ compared to the least-covered letter (via `find_least_assigned_bombsite`), it switches. Skipped when bomb is planted.
+- **Per-bot** initialization is in `update_arena_mode_ai()` PHASE 0:
+  - If `patrol_letter` is `COUNT`, Metropolis bots use `find_least_assigned_bombsite()`, others pick randomly.
 - Uses `marker_letter_type::COUNT` as sentinel for "not yet assigned".
 
 ### 4. Faction Matching Fix (`faction_type.h`)
@@ -57,6 +59,7 @@
 
 ## Architecture Notes
 - The `bombsite_mappings` live in `arena_mode_ai_arena_meta`, a team-agnostic struct stored once in `arena_mode`. Since bombsites are global map features (not faction-specific), they are gathered once at round start via `gather_bombsite_mappings()` and passed to AI functions as needed.
-- Bombsite selection uses `marker_letter_type::COUNT` as a sentinel meaning "not yet assigned". Selection happens lazily in `update_arena_mode_ai()` PHASE 0 on a per-bot basis (patrol_letter) or per-team basis (chosen_bombsite).
-- `find_least_assigned_bombsite()` is always used for Metropolis — both at initialization and for continuous rebalancing. When a bot dies, its waypoint assignments clear, the letter's count drops, and surviving bots on over-covered sites (difference ≥ 2) switch to rebalance. Rebalancing is skipped when bomb is planted.
+- `update_arena_mode_ai_team()` runs once per step per faction (before the per-bot loop). It handles team-level decisions: Resistance `chosen_bombsite` initialization and Metropolis patrol rebalancing.
+- `update_arena_mode_ai()` runs per-bot. PHASE 0 handles per-bot `patrol_letter` initialization using `find_least_assigned_bombsite()` for Metropolis or random pick for others.
+- `find_least_assigned_bombsite()` is always used for Metropolis — both at initialization and for continuous rebalancing. When a bot dies, its waypoint assignments clear, the letter's count drops, and `update_arena_mode_ai_team` detects the imbalance (difference ≥ 2) and rebalances. Skipped when bomb is planted.
 - The random selection for Resistance ensures unpredictability — the attacking team doesn't always go to the same site.
