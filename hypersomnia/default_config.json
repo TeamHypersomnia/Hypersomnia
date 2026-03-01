@@ -213,14 +213,14 @@
             "overlay_color": [0, 0, 0, 40]
         },
         "crosshair": {
-            "scale": 5,
+            "scale": 1,
+            "dot_size": 7.0,
+            "segment_length": 50.0,
+            "segment_thickness": 9.0,
+            "recoil_expansion_base": 25.0,
+            "recoil_expansion_mult": 15.0,
             "border_width": 1,
             "show_dot": true,
-            "dot_size": 1.0,
-            "segment_length": 10.0,
-            "segment_thickness": 2.0,
-            "recoil_expansion_base": 5.0,
-            "recoil_expansion_mult": 0.5,
             "inside_color": [255, 255, 255, 255],
             "border_color": [0, 0, 0, 255],
             "background_color": [0, 0, 0, 100]
