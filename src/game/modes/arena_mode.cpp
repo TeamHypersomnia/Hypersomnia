@@ -2440,6 +2440,43 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	const bool is_bomb_planted = bomb_planted(in);
 	const auto current_bomb_entity = bomb_entity;
 
+	/*
+		Update team-level AI state once per step per faction
+		before the per-bot loop.
+	*/
+	{
+		auto team_rng = randomization(stable_round_rng);
+
+		for_each_faction([&](const auto faction) {
+			auto& faction_state = factions[faction];
+
+			/*
+				Recalculate waypoint assignments for this faction
+				so that find_least_assigned_bombsite has current data.
+			*/
+			faction_state.ai_team_state.clear_waypoint_assignments();
+
+			for (auto& bot : only_bot(players)) {
+				if (faction == bot.second.get_faction()) {
+					const auto assigned = ::calc_assigned_waypoint(bot.second.ai_state.last_behavior);
+					::assign_waypoint(faction_state.ai_team_state, assigned.waypoint_id, bot.first);
+				}
+			}
+
+			update_arena_mode_ai_team(
+				cosm,
+				faction_state.ai_team_state,
+				ai_arena_meta,
+				players,
+				faction,
+				is_bomb_planted,
+				team_rng
+			);
+		});
+
+		stable_round_rng = team_rng.generator;
+	}
+
 	for (auto& it : only_bot(players)) {
 		auto& player = it.second;
 		const auto player_faction = player.get_faction();

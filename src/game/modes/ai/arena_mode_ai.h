@@ -3,6 +3,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 
 struct cosmos_navmesh;
+struct randomization;
 
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
@@ -23,6 +24,16 @@ arena_ai_result update_arena_mode_ai(
 	pathfinding_context* pathfinding_ctx,
 	const bool in_buy_area,
 	const bool is_freeze_time
+);
+
+void update_arena_mode_ai_team(
+	cosmos& cosm,
+	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
+	std::map<mode_player_id, arena_mode_player>& players,
+	const faction_type faction,
+	const bool bomb_planted,
+	randomization& rng
 );
 
 void post_solve_arena_mode_ai(

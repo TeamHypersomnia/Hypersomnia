@@ -51,6 +51,51 @@
 #include "game/modes/ai/tasks/can_weapon_penetrate.hpp"
 #include "game/cosmos/make_physics_path_hints.h"
 
+void update_arena_mode_ai_team(
+	cosmos& cosm,
+	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
+	std::map<mode_player_id, arena_mode_player>& players,
+	const faction_type faction,
+	const bool bomb_planted,
+	randomization& rng
+) {
+	/*
+		Resistance: if team has no chosen_bombsite yet, pick one randomly.
+	*/
+	if (faction == faction_type::RESISTANCE && team_state.chosen_bombsite == marker_letter_type::COUNT) {
+		team_state.chosen_bombsite = ::choose_random_bombsite(arena_meta, rng);
+	}
+
+	/*
+		Metropolis: rebalance patrol_letter distribution once per step.
+		If any bot's letter is over-covered by 2+ compared to the least-covered,
+		switch that bot to the least-covered letter.
+	*/
+	if (faction == faction_type::METROPOLIS && !bomb_planted) {
+		const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+
+		for (auto& bot : only_bot(players)) {
+			if (bot.second.get_faction() != faction) {
+				continue;
+			}
+
+			auto& ai_state = bot.second.ai_state;
+
+			if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+				continue;
+			}
+
+			const auto current_count = ::count_assigned_waypoints_for_letter(cosm, team_state, ai_state.patrol_letter);
+			const auto least_count = ::count_assigned_waypoints_for_letter(cosm, team_state, least);
+
+			if (current_count >= least_count + 2) {
+				ai_state.patrol_letter = least;
+			}
+		}
+	}
+}
+
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
 	const logic_step step,
@@ -101,44 +146,17 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
-		PHASE 0: Ensure team-level and per-bot bombsite data is initialized.
-		This runs on a per-bot basis but updates team state if needed.
+		PHASE 0: Per-bot patrol_letter initialization.
+		Team-level data (chosen_bombsite, rebalancing) is handled by
+		update_arena_mode_ai_team called before the per-bot loop.
 		===========================================================================
 	*/
 
-	{
-		const bool is_resistance = (bot_faction == faction_type::RESISTANCE);
-		const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
-
-		/*
-			Resistance: if team has no chosen_bombsite yet, pick one randomly.
-		*/
-		if (is_resistance && team_state.chosen_bombsite == marker_letter_type::COUNT) {
-			team_state.chosen_bombsite = ::choose_random_bombsite(arena_meta, stable_rng);
+	if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+		if (bot_faction == faction_type::METROPOLIS) {
+			ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
 		}
-
-		/*
-			Metropolis: always use find_least_assigned_bombsite.
-			On initialization (COUNT): pick the least-covered letter.
-			On rebalance (e.g. teammate died): if current letter is over-covered
-			by 2+ compared to the least-covered, switch to rebalance.
-		*/
-		if (is_metropolis) {
-			const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
-
-			if (ai_state.patrol_letter == marker_letter_type::COUNT) {
-				ai_state.patrol_letter = least;
-			}
-			else if (!bomb_planted) {
-				const auto current_count = ::count_assigned_waypoints_for_letter(cosm, team_state, ai_state.patrol_letter);
-				const auto least_count = ::count_assigned_waypoints_for_letter(cosm, team_state, least);
-
-				if (current_count >= least_count + 2) {
-					ai_state.patrol_letter = least;
-				}
-			}
-		}
-		else if (ai_state.patrol_letter == marker_letter_type::COUNT) {
+		else {
 			const auto available = arena_meta.get_available_bombsite_letters();
 			if (!available.empty()) {
 				ai_state.patrol_letter = stable_rng.rand_element(available);
