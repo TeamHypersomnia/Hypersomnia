@@ -113,6 +113,9 @@ namespace components {
 
 		entity_id ignore_bullet;
 		augs::stepped_timestamp time_of_last_blood_drip;
+
+		entity_id last_damaging_gun;
+		augs::stepped_timestamp when_born_of_last_spawned_bullet;
 		// END GEN INTROSPECTOR
 
 		bool is_requesting_any_interaction() const {

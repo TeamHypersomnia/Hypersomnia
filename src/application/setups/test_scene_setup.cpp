@@ -21,6 +21,7 @@
 #include "game/detail/calc_ammo_info.hpp"
 
 #include "augs/misc/web_sdk_events.h"
+#include "augs/templates/algorithm_templates.h"
 
 void web_sdk_happy_time();
 void snap_interpolated_to_logical(cosmos& cosm);
@@ -473,6 +474,7 @@ void test_scene_setup::restart_mode() {
 					auto& s = cosm[viewed_character_id].get<components::sentience>();
 
 					s.spells_drain_pe = false;
+					fill_range(s.learnt_spells, true);
 				}
 			}
 			else {
