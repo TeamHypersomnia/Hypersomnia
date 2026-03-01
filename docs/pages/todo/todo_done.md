@@ -7404,3 +7404,4 @@ This will discard your redo history."
 
 - find closest unoccupied tile if the target tile is occupied, in pathfinding
 
+- splat further the more damage is applied

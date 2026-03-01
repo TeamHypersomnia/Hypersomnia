@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- drobny lag na debugu jak spawnuje splatter przy hedzie z awki na niskim hp, moze limit jakis na ilosc tych particli, choc to bedzie sie dzialo rzadko
+	- sa limity na particle - statycznie alokowane jest max 10k wiec jest ok
+
 - Simple opt - if a source has 0 gain, stop calling all updates on it (since we determined that AL calls can be bottleneck too) 
     - test it with normal update freq on tutorial with all levels (from editor)
     - e.g. the shooting range has NO reason to NOT be as "snappy" as empty scene on web

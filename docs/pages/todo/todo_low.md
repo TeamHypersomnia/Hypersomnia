@@ -4,6 +4,16 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- super simple destruction system
+	- just divide the into four rectangles or even two along the axis of impact
+		- hp of smaller parts is area percentage of the bigger part
+		- we can easily implement uv offsets for the sprites
+	- fixnac fizyke zeby monety nad remnantami
+	- osobne particle tez dla mniejszych
+	- naprawic particle przy rozwalaniu, lepsze
+	- niech sie jeden tlyko dzwiek spawnuje przy rozwalaniu wszystkich excessive
+
+
 - corner case - everyone abandons?
     - have to count suspended when checking if someone abandoned the match and run this logic on 
         - Doesn't matter since everyone loses in this case as it should be (it's counted as a loss on the report_match endpoint)

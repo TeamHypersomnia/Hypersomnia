@@ -8,24 +8,9 @@ summary: That which we are brainstorming at the moment.
 
 - low effort byloby jakby odpadały łapy z krecacych sie corpsów, bardziej pasuje od jakichs lezacych zwlok
 
-- z tym wyborem bokow cos jest nie tak dalej
-- drobny lag na debugu jak spawnuje splatter przy hedzie z awki na niskim hp, moze limit jakis na ilosc tych particli, choc to bedzie sie dzialo rzadko
-- fixnac fizyke zeby monety nad remnantami
-- osobne particle tez dla mniejszych
-- naprawic particle przy rozwalaniu, lepsze
-- niech sie jeden tlyko dzwiek spawnuje przy rozwalaniu wszystkich excessive
-- zjebane jest dalej cos z iteracja ze za duzo ich tworzy
-
 - jak za dlugi combat to lec do paki
 - mozna jeszcze opoznic wybuch krwi do wybuchow tych staminowych posmiertnych
 - czemu nie dzialaja cast blinki
-
-- super simple destruction system
-	- just divide the into four rectangles or even two along the axis of impact
-		- hp of smaller parts is area percentage of the bigger part
-		- we can easily implement uv offsets for the sprites
-
-- splat further the more damage is applied
 
 - additional bot capabilities
 	- in combat have 20-70% chance (aggressiveness, higher for resistance, lower for metropolis, higher for when trying to defuse etc) to pick the closest tile WITHOUT direct LoS (in threshold of e.g. 500 px)
