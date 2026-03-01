@@ -1399,6 +1399,8 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.drawing.crosshair;
 
 					if (auto node = scoped_tree_node("Crosshair")) {
+						revertable_enum_radio(SCOPE_CFG_NVP(type));
+
 						revertable_slider(SCOPE_CFG_NVP(scale), 0, 20);
 						revertable_slider(SCOPE_CFG_NVP(border_width), 0, 20);
 
@@ -1410,11 +1412,16 @@ void settings_gui_state::perform(
 						}
 
 						revertable_slider(SCOPE_CFG_NVP(segment_length), 0.f, 200.f);
+						revertable_slider(SCOPE_CFG_NVP(segment_thickness), 0.f, 20.f);
 						revertable_slider(SCOPE_CFG_NVP(recoil_expansion_base), 0.f, 200.f);
 						revertable_slider(SCOPE_CFG_NVP(recoil_expansion_mult), 0.f, 100.f);
 
 						revertable_color_edit(SCOPE_CFG_NVP(inside_color));
 						revertable_color_edit(SCOPE_CFG_NVP(border_color));
+
+						if (scope_cfg.type == crosshair_type::CIRCULAR) {
+							revertable_color_edit(SCOPE_CFG_NVP(background_color));
+						}
 					}
 				}
 

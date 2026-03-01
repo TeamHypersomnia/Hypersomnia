@@ -48,7 +48,7 @@ void draw_crosshair_procedurally(
 		target.aabb_with_border(dot_origin, in_col, bo_col, borders);
 	}
 
-	const auto hori_segment_size = vec2(settings.scale * settings.segment_length, settings.scale);
+	const auto hori_segment_size = vec2(settings.scale * settings.segment_length, settings.scale * settings.segment_thickness);
 	const auto vert_segment_size = hori_segment_size.transposed();
 
 	float total_offset = settings.recoil_expansion_base;
@@ -80,6 +80,53 @@ void draw_crosshair_procedurally(
 	target.aabb_with_border(r_segment_origin, in_col, bo_col, borders);
 	target.aabb_with_border(t_segment_origin, in_col, bo_col, borders);
 	target.aabb_with_border(b_segment_origin, in_col, bo_col, borders);
+}
+
+void draw_crosshair_circular(
+	const crosshair_drawing_settings& settings,
+	augs::drawer_with_default target,
+	augs::special_buffer& specials,
+	vec2 center,
+	vec2i screen_size,
+	float recoil_amount
+) {
+	const float scale = static_cast<float>(settings.scale);
+
+	float total_offset = settings.recoil_expansion_base;
+	total_offset += recoil_amount * settings.recoil_expansion_mult;
+	total_offset *= scale;
+
+	const float ring_thickness = scale * settings.segment_thickness;
+	const float border = static_cast<float>(settings.border_width);
+
+	const vec2 ring_center_screen(center.x, static_cast<float>(screen_size.y) - center.y);
+
+	auto push_ring = [&](const float inner_r, const float outer_r, const rgba color) {
+		if (outer_r <= 0.f) {
+			return;
+		}
+
+		const auto size = vec2::square(outer_r * 2.f);
+		const auto rect = ltrb::center_and_size(center, size);
+
+		target.aabb(rect, color);
+
+		augs::special sp;
+		sp.v1 = ring_center_screen;
+		sp.v2.x = inner_r;
+		sp.v2.y = outer_r;
+
+		for (int i = 0; i < 6; ++i) {
+			specials.push_back(sp);
+		}
+	};
+
+	const float inner_ring_outer = total_offset + ring_thickness;
+	const float border_outer = inner_ring_outer + border;
+
+	push_ring(0.f, total_offset, settings.background_color);
+	push_ring(total_offset, inner_ring_outer, settings.inside_color);
+	push_ring(inner_ring_outer, border_outer, settings.border_color);
 }
 
 void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {

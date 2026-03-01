@@ -142,6 +142,15 @@ void draw_crosshair_procedurally(
 	float recoil_amount
 );
 
+void draw_crosshair_circular(
+	const crosshair_drawing_settings& settings,
+	augs::drawer_with_default target,
+	augs::special_buffer& specials,
+	vec2 center,
+	vec2i screen_size,
+	float recoil_amount
+);
+
 struct draw_beep_lights {
 	const augs::drawer output;
 	const interpolation_system& interpolation;

@@ -22,17 +22,28 @@ enum class offscreen_reference_type {
 	// END GEN INTROSPECTOR
 };
 
+enum class crosshair_type {
+	// GEN INTROSPECTOR enum class crosshair_type
+	LEGACY,
+	CIRCULAR,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct crosshair_drawing_settings {
 	// GEN INTROSPECTOR struct crosshair_drawing_settings
+	crosshair_type type = crosshair_type::LEGACY;
 	int scale = 3;
 	int border_width = 1;
 	bool show_dot = true;
 	float dot_size = 1.0f;
 	float segment_length = 10.0f;
+	float segment_thickness = 1.0f;
 	float recoil_expansion_base = 5.0f;
 	float recoil_expansion_mult = 1.0f;
 	rgba inside_color = white;
 	rgba border_color = black;
+	rgba background_color = rgba(0, 0, 0, 50);
 	// END GEN INTROSPECTOR
 
 	bool operator==(const crosshair_drawing_settings& b) const = default;
