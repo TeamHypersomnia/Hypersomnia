@@ -39,7 +39,20 @@ void draw_crosshair_procedurally(
 		round_center = vec2(vec2(center).discard_fract() + vec2(0.5f, 0.5f));
 	}
 
-	const auto dot_size = vec2::square(1 * settings.dot_size * settings.scale);
+	/*
+		Snap a scaled dimension so that rect edges land on integer pixels.
+		Odd scale puts center at half-pixel, so dimensions must be odd.
+		Even scale puts center at integer, so dimensions must be even.
+	*/
+	auto snap = [&](float v) -> float {
+		int iv = static_cast<int>(v);
+		if (iv % 2 != settings.scale % 2) {
+			--iv;
+		}
+		return static_cast<float>(std::max(iv, 1));
+	};
+
+	const auto dot_size = vec2::square(snap(1 * settings.dot_size * settings.scale));
 
 	if (settings.show_dot)
 	{
@@ -48,13 +61,14 @@ void draw_crosshair_procedurally(
 		target.aabb_with_border(dot_origin, in_col, bo_col, borders);
 	}
 
-	const auto hori_segment_size = vec2(settings.scale * settings.segment_length, settings.scale * settings.segment_thickness);
+	const auto hori_segment_size = vec2(snap(settings.scale * settings.segment_length), snap(settings.scale * settings.segment_thickness));
 	const auto vert_segment_size = hori_segment_size.transposed();
 
 	float total_offset = settings.recoil_expansion_base;
 	total_offset += recoil_amount * settings.recoil_expansion_mult;
 
 	total_offset *= settings.scale;
+	total_offset = std::round(total_offset);
 
 	const auto l_segment_origin = ltrb::center_and_size(
 		vec2(round_center.x - hori_segment_size.x / 2 - dot_size.x / 2 - total_offset, round_center.y),
