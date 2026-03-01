@@ -194,7 +194,7 @@ struct arena_mode_ai_team_state {
 	std::vector<ai_waypoint_state> patrol_waypoints;
 	std::vector<ai_waypoint_state> push_waypoints;
 
-	marker_letter_type chosen_bombsite = marker_letter_type::A;
+	marker_letter_type chosen_bombsite = marker_letter_type::COUNT;
 	entity_id bot_with_defuse_mission;
 	entity_id bot_with_bomb_retrieval_mission;
 	// END GEN INTROSPECTOR
@@ -202,9 +202,10 @@ struct arena_mode_ai_team_state {
 	void round_reset() {
 		/*
 			Don't clear waypoint lists - they are gathered at round start.
-			Just clear the assignments.
+			Just clear the assignments and reset chosen_bombsite.
 		*/
 		clear_waypoint_assignments();
+		chosen_bombsite = marker_letter_type::COUNT;
 		bot_with_defuse_mission = entity_id::dead();
 		bot_with_bomb_retrieval_mission = entity_id::dead();
 	}
@@ -224,7 +225,7 @@ struct arena_mode_ai_state {
 	ai_behavior_variant last_behavior = ai_behavior_idle();
 	ai_target_tracking combat_target;
 
-	marker_letter_type patrol_letter = marker_letter_type::A;
+	marker_letter_type patrol_letter = marker_letter_type::COUNT;
 	bool tried_push_already = false;
 	bool recoil_cooldown = false;
 	bool stamina_cooldown = false;
@@ -254,7 +255,7 @@ struct arena_mode_ai_state {
 	void round_reset() {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
-		patrol_letter = marker_letter_type::A;
+		patrol_letter = marker_letter_type::COUNT;
 		tried_push_already = false;
 		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -10000.0f;
