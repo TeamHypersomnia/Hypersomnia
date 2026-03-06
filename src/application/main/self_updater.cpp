@@ -109,20 +109,6 @@ self_update_result check_and_apply_updates(
 		typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING)
 	;
 
-	auto log_null_response = [&client]() {
-#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-		auto result = client->get_openssl_verify_result();
-
-		if (result) {
-			LOG("verify error: %x", X509_verify_cert_error_string(result));
-		}
-#else
-		(void)client;
-#endif
-
-		LOG("Response was null!");
-	};
-
 	std::string new_version;
 	std::string new_commit_hash; // unused yet
 	std::string new_signature;
@@ -134,10 +120,18 @@ self_update_result check_and_apply_updates(
 		const auto response = launch_download(*client, version_path); 
 
 		if (response == nullptr) {
-			log_null_response();
+			LOG("Response was null!");
 			result.type = R::FAILED;
 			return result;
 		}
+
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+		if (response.ssl_backend_error()) {
+			LOG("verify error: %x", X509_verify_cert_error_string(response.ssl_backend_error()));
+			result.type = R::FAILED;
+			return result;
+		}
+#endif
 
 		if (response->status == 404 || response->status == 403) {
 			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
@@ -656,10 +650,18 @@ self_update_result check_and_apply_updates(
 					auto result = future_response.get();
 
 					if (result == std::nullopt || result.value() == nullptr) {
-						log_null_response();
+						LOG("Response was null!");
 						interrupt(R::FAILED);
 						return;
 					}
+
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+					if (result->ssl_backend_error()) {
+						LOG("verify error: %x", X509_verify_cert_error_string(result->ssl_backend_error()));
+						interrupt(R::FAILED);
+						return;
+					}
+#endif
 
 					const auto& response = result.value();
 
