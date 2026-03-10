@@ -9,22 +9,28 @@ server {
         try_files $uri $uri/ /Hypersomnia.html;
 
         # Allow embedding in iframes from any origin
-		add_header Content-Security-Policy "frame-ancestors *" always;
+        add_header Content-Security-Policy "frame-ancestors *" always;
+
+        # Allow cross-origin requests (needed for iframed resources)
+        add_header Access-Control-Allow-Origin "*" always;
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-		add_header Cross-Origin-Resource-Policy "cross-origin" always;
-		add_header Cross-Origin-Opener-Policy "same-origin" always;
-		add_header Cross-Origin-Embedder-Policy "require-corp" always;
+        add_header Cross-Origin-Resource-Policy "cross-origin" always;
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+        add_header Cross-Origin-Embedder-Policy "require-corp" always;
     }
 
     location /assets/ {
         alias /var/www/html/assets/;
         autoindex on;  # This is optional; it allows directory listing if no index file is found
 
+        # Allow cross-origin requests
+        add_header Access-Control-Allow-Origin "*" always;
+
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-		add_header Cross-Origin-Resource-Policy "cross-origin" always;
-		add_header Cross-Origin-Opener-Policy "same-origin" always;
-		add_header Cross-Origin-Embedder-Policy "require-corp" always;
+        add_header Cross-Origin-Resource-Policy "cross-origin" always;
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+        add_header Cross-Origin-Embedder-Policy "require-corp" always;
     }
 
     # MIME types for WebAssembly (.wasm) files
@@ -37,9 +43,10 @@ server {
     }
 
     # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-	add_header Cross-Origin-Resource-Policy "cross-origin" always;
-	add_header Cross-Origin-Opener-Policy "same-origin" always;
-	add_header Cross-Origin-Embedder-Policy "require-corp" always;
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Cross-Origin-Resource-Policy "cross-origin" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Cross-Origin-Embedder-Policy "require-corp" always;
 
     gzip on;
     gzip_types application/wasm application/octet-stream;

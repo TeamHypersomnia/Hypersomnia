@@ -2385,6 +2385,11 @@ if (BUILD_FOR_WEB)
 	set(TARGET_LINK "${CMAKE_BINARY_DIR}/assets")
 
 	file(CREATE_LINK ${SOURCE_LINK} ${TARGET_LINK} SYMBOLIC)
+
+	set(SOURCE_SW "${PROJECT_SOURCE_DIR}/cmake/web/coi-serviceworker.js")
+	set(TARGET_SW "${CMAKE_BINARY_DIR}/coi-serviceworker.js")
+
+	file(CREATE_LINK ${SOURCE_SW} ${TARGET_SW} SYMBOLIC)
 endif()
 
 get_target_property(OUT Hypersomnia LINK_LIBRARIES)
