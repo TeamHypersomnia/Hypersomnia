@@ -9,12 +9,12 @@ server {
         try_files $uri $uri/ /Hypersomnia.html;
 
         # Allow embedding in iframes from any origin
-        add_header Content-Security-Policy "frame-ancestors *";
+		add_header Content-Security-Policy "frame-ancestors *" always;
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "cross-origin";
-        add_header Cross-Origin-Opener-Policy "same-origin";
-        add_header Cross-Origin-Embedder-Policy "require-corp";
+		add_header Cross-Origin-Resource-Policy "cross-origin" always;
+		add_header Cross-Origin-Opener-Policy "same-origin" always;
+		add_header Cross-Origin-Embedder-Policy "require-corp" always;
     }
 
     location /assets/ {
@@ -22,9 +22,9 @@ server {
         autoindex on;  # This is optional; it allows directory listing if no index file is found
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "cross-origin";
-        add_header Cross-Origin-Opener-Policy "same-origin";
-        add_header Cross-Origin-Embedder-Policy "require-corp";
+		add_header Cross-Origin-Resource-Policy "cross-origin" always;
+		add_header Cross-Origin-Opener-Policy "same-origin" always;
+		add_header Cross-Origin-Embedder-Policy "require-corp" always;
     }
 
     # MIME types for WebAssembly (.wasm) files
@@ -37,9 +37,9 @@ server {
     }
 
     # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-    add_header Cross-Origin-Resource-Policy "cross-origin";
-    add_header Cross-Origin-Opener-Policy "same-origin";
-    add_header Cross-Origin-Embedder-Policy "require-corp";
+	add_header Cross-Origin-Resource-Policy "cross-origin" always;
+	add_header Cross-Origin-Opener-Policy "same-origin" always;
+	add_header Cross-Origin-Embedder-Policy "require-corp" always;
 
     gzip on;
     gzip_types application/wasm application/octet-stream;
