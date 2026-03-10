@@ -1,15 +1,3 @@
-if (!window.crossOriginIsolated && navigator.serviceWorker) {
-  navigator.serviceWorker.register('assets/coi-serviceworker.js', { scope: '/' }).then((r) => {
-    console.log("COOP/COEP Service Worker registered", r.scope);
-    r.addEventListener("updatefound", () => {
-      r.installing.addEventListener("statechange", function () {
-        if (this.state === "activated") window.location.reload();
-      });
-    });
-    if (r.active && !navigator.serviceWorker.controller) window.location.reload();
-  }).catch((e) => console.log("COOP/COEP Service Worker failed:", e));
-}
-
 const ipinfo_endpoint = 'https://hypersomnia.io/geolocation';
 const clientIdDiscord = '1189671952479158403';
 const revoke_origin = 'https://hypersomnia.io';
