@@ -9,12 +9,12 @@ server {
         try_files $uri $uri/ /Hypersomnia.html;
 
         # Allow embedding in iframes from any origin
-        add_header Content-Security-Policy "frame-ancestors *";
+		add_header Content-Security-Policy "frame-ancestors *" always;
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "cross-origin";
-        add_header Cross-Origin-Opener-Policy "same-origin";
-        add_header Cross-Origin-Embedder-Policy "require-corp";
+		add_header Cross-Origin-Resource-Policy "cross-origin" always;
+		add_header Cross-Origin-Opener-Policy "same-origin" always;
+		add_header Cross-Origin-Embedder-Policy "credentialless" always;
     }
 
     location /assets/ {
@@ -22,12 +22,12 @@ server {
         autoindex on;  # This is optional; it allows directory listing if no index file is found
 
         # Allow the service worker in coi-serviceworker.js to control the root scope
-        add_header Service-Worker-Allowed "/";
+		add_header Service-Worker-Allowed "/" always;
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "cross-origin";
-        add_header Cross-Origin-Opener-Policy "same-origin";
-        add_header Cross-Origin-Embedder-Policy "require-corp";
+		add_header Cross-Origin-Resource-Policy "cross-origin" always;
+		add_header Cross-Origin-Opener-Policy "same-origin" always;
+		add_header Cross-Origin-Embedder-Policy "credentialless" always;
     }
 
     # MIME types for WebAssembly (.wasm) files
@@ -40,9 +40,9 @@ server {
     }
 
     # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-    add_header Cross-Origin-Resource-Policy "cross-origin";
-    add_header Cross-Origin-Opener-Policy "same-origin";
-    add_header Cross-Origin-Embedder-Policy "require-corp";
+	add_header Cross-Origin-Resource-Policy "cross-origin" always;
+	add_header Cross-Origin-Opener-Policy "same-origin" always;
+	add_header Cross-Origin-Embedder-Policy "credentialless" always;
 
     gzip on;
     gzip_types application/wasm application/octet-stream;
