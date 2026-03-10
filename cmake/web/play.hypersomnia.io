@@ -12,7 +12,7 @@ server {
         add_header Content-Security-Policy "frame-ancestors *";
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "same-site";
+        add_header Cross-Origin-Resource-Policy "cross-origin";
         add_header Cross-Origin-Opener-Policy "same-origin";
         add_header Cross-Origin-Embedder-Policy "require-corp";
     }
@@ -22,7 +22,7 @@ server {
         autoindex on;  # This is optional; it allows directory listing if no index file is found
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-        add_header Cross-Origin-Resource-Policy "same-site";
+        add_header Cross-Origin-Resource-Policy "cross-origin";
         add_header Cross-Origin-Opener-Policy "same-origin";
         add_header Cross-Origin-Embedder-Policy "require-corp";
     }
@@ -37,7 +37,7 @@ server {
     }
 
     # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-    add_header Cross-Origin-Resource-Policy "same-site";
+    add_header Cross-Origin-Resource-Policy "cross-origin";
     add_header Cross-Origin-Opener-Policy "same-origin";
     add_header Cross-Origin-Embedder-Policy "require-corp";
 
