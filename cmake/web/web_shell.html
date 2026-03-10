@@ -28,15 +28,14 @@
   <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
   <script>
     if (!window.crossOriginIsolated && navigator.serviceWorker) {
+      var coiReloading = false;
       navigator.serviceWorker.register('assets/coi-serviceworker.js', { scope: '/' }).then(function(r) {
         console.log("COOP/COEP Service Worker registered", r.scope);
-        r.addEventListener("updatefound", function() {
-          r.installing.addEventListener("statechange", function() {
-            if (this.state === "activated") window.location.reload();
-          });
-        });
-        if (r.active && !navigator.serviceWorker.controller) window.location.reload();
+        if (r.active && !coiReloading) { coiReloading = true; window.location.reload(); }
       }).catch(function(e) { console.log("COOP/COEP Service Worker failed:", e); });
+      navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (!coiReloading) { coiReloading = true; window.location.reload(); }
+      });
     }
   </script>
   <script src="assets/common.js"></script>
