@@ -1,5 +1,7 @@
 #include "game/stateless_systems/demolitions_system.h"
 #include "game/cosmos/entity_id.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 #include "game/cosmos/cosmos.h"
 

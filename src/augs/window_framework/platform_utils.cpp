@@ -96,7 +96,10 @@ namespace augs {
 #elif PLATFORM_UNIX
 #include <unistd.h>
 #if PLATFORM_LINUX
+#if PLATFORM_WEB
+#else
 #include <linux/limits.h>
+#endif
 #endif
 	path_type get_executable_path() {
 		char dest[PATH_MAX];
