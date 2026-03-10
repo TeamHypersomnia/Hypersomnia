@@ -1,3 +1,32 @@
+/*
+ * When loaded as a Service Worker, intercept requests and add
+ * COEP/CORP headers to enable cross-origin isolation (SharedArrayBuffer)
+ * even when the page is embedded in a cross-origin iframe.
+ */
+if (typeof window === 'undefined') {
+  self.addEventListener("install", () => self.skipWaiting());
+  self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+  self.addEventListener("fetch", function (e) {
+    if (e.request.cache === "only-if-cached" && e.request.mode !== "same-origin") return;
+    e.respondWith(fetch(e.request).then((r) => {
+      const headers = new Headers(r.headers);
+      headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+      headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+      return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
+    }));
+  });
+} else if (window.crossOriginIsolated === false && navigator.serviceWorker) {
+  navigator.serviceWorker.register(window.document.currentScript.src, { scope: '/' }).then((r) => {
+    console.log("COOP/COEP Service Worker registered", r.scope);
+    r.addEventListener("updatefound", () => {
+      r.installing.addEventListener("statechange", function () {
+        if (this.state === "activated") window.location.reload();
+      });
+    });
+    if (r.active && !navigator.serviceWorker.controller) window.location.reload();
+  }).catch((e) => console.log("COOP/COEP Service Worker failed:", e));
+}
+
 const ipinfo_endpoint = 'https://hypersomnia.io/geolocation';
 const clientIdDiscord = '1189671952479158403';
 const revoke_origin = 'https://hypersomnia.io';
