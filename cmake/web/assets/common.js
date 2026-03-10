@@ -55,7 +55,7 @@ function openUrl(url) {
   try {
     window.open(urlStr, '_blank');
   } catch (e) {
-    console.warn("Could not open URL (possibly blocked by iframe sandbox):", e);
+    console.warn("Could not open URL (may be blocked by iframe restrictions or popup blocker):", e);
   }
 }
 
@@ -436,7 +436,7 @@ function loginDiscord() {
   try {
     window.open(authUrl, '_blank');
   } catch (e) {
-    console.warn("Could not open Discord login (possibly blocked by iframe sandbox):", e);
+    console.warn("Could not open Discord login (may be blocked by iframe restrictions or popup blocker):", e);
   }
 }
 
