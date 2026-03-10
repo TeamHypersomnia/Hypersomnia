@@ -52,7 +52,11 @@ function getUserGeolocation() {
 
 function openUrl(url) {
   const urlStr = UTF8ToString(url);
-  window.open(urlStr, '_blank');
+  try {
+    window.open(urlStr, '_blank');
+  } catch (e) {
+    console.warn("Could not open URL (possibly blocked by iframe sandbox):", e);
+  }
 }
 
 function hideProgress() {
@@ -74,7 +78,11 @@ function setBrowserLocation(newLocation) {
   const locStr = UTF8ToString(newLocation);
 
   console.log("New location: ", locStr);
-  window.history.pushState("object or string", "Title", locStr);
+  try {
+    window.history.pushState("object or string", "Title", locStr);
+  } catch (e) {
+    console.warn("Could not update browser location (possibly in a cross-origin iframe):", e);
+  }
 }
 
 function setBrowserLocation_cg(newLocation) {
@@ -425,7 +433,11 @@ function loginDiscord() {
   const scope = 'identify';
   const authUrl = `https://discord.com/oauth2/authorize?response_type=token&client_id=${clientIdDiscord}&redirect_uri=${redirectUri}&scope=${scope}`;
 
-  window.open(authUrl, '_blank');
+  try {
+    window.open(authUrl, '_blank');
+  } catch (e) {
+    console.warn("Could not open Discord login (possibly blocked by iframe sandbox):", e);
+  }
 }
 
 function loginCrazyGames() {
