@@ -13,9 +13,9 @@ if (typeof window === 'undefined') {
       headers.set("Cross-Origin-Embedder-Policy", "credentialless");
       headers.set("Cross-Origin-Resource-Policy", "cross-origin");
       return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
-    }));
+    }).catch((e) => console.error(e)));
   });
-} else if (window.crossOriginIsolated === false && navigator.serviceWorker) {
+} else if (!window.crossOriginIsolated && navigator.serviceWorker) {
   navigator.serviceWorker.register(window.document.currentScript.src, { scope: '/' }).then((r) => {
     console.log("COOP/COEP Service Worker registered", r.scope);
     r.addEventListener("updatefound", () => {
