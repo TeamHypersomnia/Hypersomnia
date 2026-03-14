@@ -1586,10 +1586,10 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 					auto result = http_client->Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
 
 					if (result) {
-						LOG("/report_match: %x", result->body);
+						LOG("/report_match HTTP %x: %x", result->status, result->body);
 					}
 					else {
-						LOG("/report_match: null result.");
+						LOG("/report_match: null result (network error or timeout).");
 					}
 
 					return "";
@@ -1614,6 +1614,9 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
 			post_to(aux_endpoint.url, aux_endpoint.header_apikey);
 		}
+	}
+	else {
+		LOG("push_report_match_webhook: not a ranked server, skipping.");
 	}
 }
 
@@ -1810,7 +1813,19 @@ void server_setup::finalize_webhook_jobs() {
 			return false;
 		}
 
-		const auto webhook_result = webhook_job.job->get();
+		std::string webhook_result;
+
+		try {
+			webhook_result = webhook_job.job->get();
+		}
+		catch (const std::exception& e) {
+			LOG("ERROR: webhook job %x threw an exception: %x", webhook_job.type, e.what());
+			return true;
+		}
+		catch (...) {
+			LOG("ERROR: webhook job %x threw an unknown exception.", webhook_job.type);
+			return true;
+		}
 
 		LOG("Finalized webhook job: %x. Result: %x", webhook_job.type, webhook_result);
 
