@@ -28,14 +28,21 @@
   <canvas oncontextmenu="return false;" id="canvas" tabindex="-1"></canvas>
   <script>
     if (!window.crossOriginIsolated && navigator.serviceWorker) {
-      var coiReloading = false;
-      navigator.serviceWorker.register('assets/coi-serviceworker.js', { scope: '/' }).then(function(r) {
-        console.log("COOP/COEP Service Worker registered", r.scope);
-        if (r.active && !coiReloading) { coiReloading = true; window.location.reload(); }
-      }).catch(function(e) { console.log("COOP/COEP Service Worker failed:", e); });
-      navigator.serviceWorker.addEventListener('controllerchange', function() {
-        if (!coiReloading) { coiReloading = true; window.location.reload(); }
-      });
+      if (navigator.serviceWorker.controller) {
+        // SW is already controlling this page but we're still not cross-origin isolated.
+        // This happens when embedded in a cross-origin iframe whose parent lacks COOP/COEP.
+        // Reloading again won't help - the parent page needs those headers.
+        console.warn("COI service worker is active but crossOriginIsolated is still false. If embedded in an iframe, the parent page needs Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers.");
+      } else {
+        var coiReloading = false;
+        navigator.serviceWorker.register('assets/coi-serviceworker.js', { scope: '/' }).then(function(r) {
+          console.log("COOP/COEP Service Worker registered", r.scope);
+          if (r.active && !coiReloading) { coiReloading = true; window.location.reload(); }
+        }).catch(function(e) { console.log("COOP/COEP Service Worker failed:", e); });
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (!coiReloading) { coiReloading = true; window.location.reload(); }
+        });
+      }
     }
   </script>
   <script src="assets/common.js"></script>
