@@ -141,6 +141,8 @@ inline std::optional<ai_pathfinding_request> calc_current_pathfinding_request(
 				return req;
 			}
 
+			AI_LOG("calc_pathfinding_request: patrol has no alive waypoint (push=%x, patrol=%x)",
+				b.push_waypoint.is_set(), b.patrol_waypoint.is_set());
 			return std::nullopt;
 		}
 		else if constexpr (std::is_same_v<T, ai_behavior_plant>) {

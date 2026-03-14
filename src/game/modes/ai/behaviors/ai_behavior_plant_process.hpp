@@ -68,6 +68,10 @@ inline void ai_behavior_plant::process(ai_behavior_process_ctx& ctx) {
 					reset_plant_state();
 					return;
 				}
+				else {
+					AI_LOG("Plant in progress: is_planting=%x, when_started_arming set, when_armed=%x",
+						is_planting, hand_fuse->when_armed.was_set());
+				}
 			}
 		}
 		else {

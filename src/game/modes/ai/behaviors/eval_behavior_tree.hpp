@@ -60,6 +60,7 @@ inline ai_behavior_variant eval_behavior_tree(
 		Priority 1: COMBAT if we have an active combat target.
 	*/
 	if (ai_state.combat_target.active(cosm, global_time_secs)) {
+		AI_LOG("eval_behavior_tree: COMBAT (faction=%x, bomb_planted=%x)", static_cast<int>(bot_faction), round_state.bomb_planted);
 		return ai_behavior_combat{};
 	}
 
@@ -193,6 +194,12 @@ inline ai_behavior_variant eval_behavior_tree(
 			}
 		}
 
+		if (is_resistance && round_state.bomb_planted) {
+			AI_LOG("eval_behavior_tree: PATROL (faction=%x, bomb_planted=%x, patrol_letter=%x, tried_push=%x, push_wp_set=%x)",
+				static_cast<int>(bot_faction), round_state.bomb_planted,
+				static_cast<int>(ai_state.patrol_letter), ai_state.tried_push_already,
+				patrol_behavior.push_waypoint.is_set());
+		}
 		return patrol_behavior;
 	}
 }

@@ -138,8 +138,6 @@ arena_ai_result update_arena_mode_ai(
 		character_handle
 	};
 
-	AI_LOG("=== update_arena_mode_ai ===");
-
 	/*
 		===========================================================================
 		PHASE 0: Per-bot patrol_letter initialization.
@@ -228,7 +226,9 @@ arena_ai_result update_arena_mode_ai(
 		Check if behavior changed - if so, handle transition.
 	*/
 	if (desired_behavior.index() != ai_state.last_behavior.index()) {
-		AI_LOG("Behavior changed - transitioning");
+		AI_LOG("Behavior changed - transitioning (from index %x to index %x, bomb_planted=%x, faction=%x)",
+			ai_state.last_behavior.index(), desired_behavior.index(),
+			bomb_planted, static_cast<int>(bot_faction));
 		::behavior_state_transition(
 			ai_state.last_behavior,
 			desired_behavior,
@@ -332,6 +332,11 @@ arena_ai_result update_arena_mode_ai(
 
 			if (ai_state.is_pathfinding_active()) {
 				ai_state.pathfinding->exact_destination = new_request->exact;
+			}
+			else {
+				/* Unconditional LOG (not AI_LOG) — always visible even with LOG_AI=0. */
+				LOG("AI ERROR: start_pathfinding_to FAILED for bot at (%x,%x) -> target (%x,%x). Waypoint unreachable?",
+					character_pos.x, character_pos.y, new_request->target.pos.x, new_request->target.pos.y);
 			}
 		}
 	}

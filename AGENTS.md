@@ -230,6 +230,12 @@ Prefer `build_file` to verify edits to a specific file before running a full `bu
 - To log values, use the type-safe log functions:
 	- `LOG("some value: %x", some_value)` where "%x" stands for argument of any type.
 	- `LOG_NVPS(var1, var2)`
+	- Supported format specifiers (via `typesafe_sprintf`):
+		- `%x` — generic, works with any type
+		- `%f` — fixed-point float
+		- `%2f`, `%4f` — fixed-point float with N digits precision
+		- `%h` — hexadecimal
+	- **Standard printf specifiers like `%d`, `%u`, `%.2f` do NOT work** — they will be printed as literal text.
 
 - Some of the existing code might not follow the above principles, do not edit it to make it consistent unless explicitly asked.
 
