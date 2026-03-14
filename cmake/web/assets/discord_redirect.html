@@ -46,23 +46,36 @@ window.onload = function() {
             token_type: token_type
         };
 
-        // BroadcastChannel works when the game is not iframed (same top-level origin)
+        // Method 1: BroadcastChannel (works when game is same top-level origin)
         try {
             const channel = new BroadcastChannel('token_bridge');
             channel.postMessage(message);
             channel.close();
+            console.log("discord_redirect: sent via BroadcastChannel");
         } catch (e) {
-            console.warn("BroadcastChannel failed:", e);
+            console.warn("discord_redirect: BroadcastChannel failed:", e);
         }
 
-        // window.opener.postMessage works when the game is iframed on a third-party domain
-        // (BroadcastChannel is partitioned by top-level site in modern browsers)
+        // Method 2: window.opener.postMessage (works when game is iframed,
+        // requires COOP: unsafe-none on this page so opener survives the redirect chain)
         if (window.opener) {
             try {
                 window.opener.postMessage(message, window.location.origin);
+                console.log("discord_redirect: sent via window.opener.postMessage");
             } catch (e) {
-                console.warn("window.opener.postMessage failed:", e);
+                console.warn("discord_redirect: window.opener.postMessage failed:", e);
             }
+        } else {
+            console.warn("discord_redirect: window.opener is null (COOP may have severed it)");
+        }
+
+        // Method 3: localStorage (fallback for when both above fail;
+        // requires iframe to have called requestStorageAccess)
+        try {
+            localStorage.setItem('discord_auth_result', JSON.stringify(message));
+            console.log("discord_redirect: wrote token to localStorage");
+        } catch (e) {
+            console.warn("discord_redirect: localStorage write failed:", e);
         }
     }
 };

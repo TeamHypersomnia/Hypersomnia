@@ -426,15 +426,65 @@ function revokeDiscord(accessToken) {
 }
 
 function loginDiscord() {
-  const site_origin = window.location.origin; // Dynamically get the origin of the current site
+  const site_origin = window.location.origin;
   const redirect = site_origin + '/assets/discord_redirect.html';
   const redirectUri = encodeURIComponent(redirect);
 
   const scope = 'identify';
   const authUrl = `https://discord.com/oauth2/authorize?response_type=token&client_id=${clientIdDiscord}&redirect_uri=${redirectUri}&scope=${scope}`;
 
+  // Request unpartitioned storage access (for iframe scenarios where
+  // localStorage polling is needed as a last-resort fallback).
+  // Must be called within user gesture, before window.open.
+  if (document.requestStorageAccess) {
+    document.requestStorageAccess().then(() => {
+      console.log("loginDiscord: storage access granted");
+    }).catch(() => {});
+  }
+
   try {
-    window.open(authUrl, '_blank');
+    const popup = window.open(authUrl, '_blank');
+
+    // Poll localStorage as a last-resort fallback for when both
+    // BroadcastChannel and postMessage fail (e.g. Discord itself sets COOP)
+    if (popup) {
+      const pollInterval = setInterval(() => {
+        try {
+          const result = localStorage.getItem('discord_auth_result');
+          if (result) {
+            const data = JSON.parse(result);
+            if (data && data.access_token) {
+              clearInterval(pollInterval);
+              localStorage.removeItem('discord_auth_result');
+              fetchUserProfile(data.access_token, data.expires_in);
+              try { popup.close(); } catch (e) {}
+            }
+          }
+        } catch (e) {}
+
+        try {
+          if (popup.closed) {
+            // Final check after popup closes
+            setTimeout(() => {
+              try {
+                const result = localStorage.getItem('discord_auth_result');
+                if (result) {
+                  const data = JSON.parse(result);
+                  if (data && data.access_token) {
+                    localStorage.removeItem('discord_auth_result');
+                    fetchUserProfile(data.access_token, data.expires_in);
+                  }
+                }
+              } catch (e) {}
+            }, 500);
+            clearInterval(pollInterval);
+          }
+        } catch (e) {}
+      }, 1000);
+
+      // Stop polling after 10 minutes
+      setTimeout(() => clearInterval(pollInterval), 600000);
+    }
   } catch (e) {
     console.warn("Could not open Discord login (may be blocked by iframe restrictions or popup blocker):", e);
   }
@@ -582,12 +632,22 @@ function create_module(for_cg) {
     Module['preRun'].push(pre_run);
 
     const channel = new BroadcastChannel('token_bridge');
+    let discordAuthHandled = false;
 
     function handleDiscordAuth(data) {
+      if (discordAuthHandled) return;
+      discordAuthHandled = true;
+
       console.log('Expires in:', data.expires_in);
       console.log('Token type:', data.token_type);
 
+      // Clean up localStorage fallback token if present
+      try { localStorage.removeItem('discord_auth_result'); } catch (e) {}
+
       fetchUserProfile(data.access_token, data.expires_in);
+
+      // Reset after a delay so user can re-login later
+      setTimeout(() => { discordAuthHandled = false; }, 5000);
     }
 
     channel.addEventListener('message', event => {
@@ -599,6 +659,21 @@ function create_module(for_cg) {
     window.addEventListener('message', event => {
       if (event.origin === window.location.origin && event.data && event.data.type === 'authentication' && event.data.access_token) {
         handleDiscordAuth(event.data);
+      }
+    });
+
+    // Listen for localStorage changes (fallback for edge cases where both
+    // BroadcastChannel and postMessage fail, requires requestStorageAccess)
+    window.addEventListener('storage', event => {
+      if (event.key === 'discord_auth_result' && event.newValue) {
+        try {
+          const data = JSON.parse(event.newValue);
+          if (data && data.type === 'authentication' && data.access_token) {
+            handleDiscordAuth(data);
+          }
+        } catch (e) {
+          console.warn("storage event handling failed:", e);
+        }
       }
     });
 
