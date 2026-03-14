@@ -39,11 +39,6 @@ server {
         text/css      css;
     }
 
-    # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
-	add_header Cross-Origin-Resource-Policy "cross-origin" always;
-	add_header Cross-Origin-Opener-Policy "same-origin" always;
-	add_header Cross-Origin-Embedder-Policy "credentialless" always;
-
     gzip on;
     gzip_types application/wasm application/octet-stream;
     gzip_min_length 10240;
