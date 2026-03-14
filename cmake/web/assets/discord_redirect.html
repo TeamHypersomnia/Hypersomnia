@@ -39,16 +39,31 @@ window.onload = function() {
     const token_type = params.get('token_type');
 
     if (access_token) {
-        const channel = new BroadcastChannel('token_bridge');
-
-        channel.postMessage({
+        const message = {
             type: 'authentication',
             access_token: access_token,
             expires_in: expires_in,
             token_type: token_type
-        });
+        };
 
-        channel.close();
+        // BroadcastChannel works when the game is not iframed (same top-level origin)
+        try {
+            const channel = new BroadcastChannel('token_bridge');
+            channel.postMessage(message);
+            channel.close();
+        } catch (e) {
+            console.warn("BroadcastChannel failed:", e);
+        }
+
+        // window.opener.postMessage works when the game is iframed on a third-party domain
+        // (BroadcastChannel is partitioned by top-level site in modern browsers)
+        if (window.opener) {
+            try {
+                window.opener.postMessage(message, window.location.origin);
+            } catch (e) {
+                console.warn("window.opener.postMessage failed:", e);
+            }
+        }
     }
 };
 </script>

@@ -583,12 +583,23 @@ function create_module(for_cg) {
 
     const channel = new BroadcastChannel('token_bridge');
 
-    channel.addEventListener('message', event => {
-      // console.log('Received access token:', event.data.access_token);
-      console.log('Expires in:', event.data.expires_in);
-      console.log('Token type:', event.data.token_type);
+    function handleDiscordAuth(data) {
+      console.log('Expires in:', data.expires_in);
+      console.log('Token type:', data.token_type);
 
-      fetchUserProfile(event.data.access_token, event.data.expires_in);
+      fetchUserProfile(data.access_token, data.expires_in);
+    }
+
+    channel.addEventListener('message', event => {
+      handleDiscordAuth(event.data);
+    });
+
+    // Also listen for postMessage as a fallback for when the game is iframed
+    // on a third-party domain (BroadcastChannel is partitioned by top-level site)
+    window.addEventListener('message', event => {
+      if (event.origin === window.location.origin && event.data && event.data.type === 'authentication' && event.data.access_token) {
+        handleDiscordAuth(event.data);
+      }
     });
 
     Module.channel = channel;
