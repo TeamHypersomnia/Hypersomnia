@@ -3229,6 +3229,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 		);
 
 		for (auto& s : sorted_abandoned_nonspectating) {
+			if (!s.first.is_bot) {
+				summary.non_bots++;
+			}
+
 			summary.first_faction.emplace_back(make_entry(s.second, s.first));
 		}
 
@@ -3284,6 +3288,10 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	for_each_player_best_to_worst_in(second_team, add_to_second);
 
 	for (const auto& s : sorted_abandoned_nonspectating) {
+		if (!s.first.is_bot) {
+			summary.non_bots++;
+		}
+
 		if (s.first.get_faction() == first_team) {
 			summary.first_faction.emplace_back(make_entry(s.second, s.first));
 		}

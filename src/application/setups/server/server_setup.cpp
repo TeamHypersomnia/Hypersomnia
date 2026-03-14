@@ -1275,15 +1275,13 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 
 		for (const auto& summary : summaries) {
 			request_immediate_heartbeat();
-
-			if (summary.alone_or_all_bots()) {
-				continue;
-			}
-
-			push_match_summary_webhook(summary);
 			log_match_end_json(summary);
 
 			push_report_match_webhook(summary);
+
+			if (!summary.alone_or_all_bots()) {
+				push_match_summary_webhook(summary);
+			}
 		}
 	}
 
