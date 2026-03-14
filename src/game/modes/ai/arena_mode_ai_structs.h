@@ -15,6 +15,15 @@
 #define LOG_AI 0
 #endif
 
+/*
+	LOG/AI_LOG use typesafe_sprintf. Only these format specifiers work:
+	  %x        - generic (any type)
+	  %f        - fixed-point float
+	  %2f, %4f  - fixed-point float with N digits precision
+	  %h        - hexadecimal
+	Standard printf specifiers like %d, %u, %.2f do NOT work.
+*/
+
 template <class... Args>
 void AI_LOG(Args&&... args) {
 #if LOG_AI

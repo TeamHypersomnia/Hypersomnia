@@ -239,6 +239,9 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		   	sprint back to the actual patrol waypoint.
 		*/
 
+		AI_LOG("patrol::process: no waypoint - searching for new one (patrol_letter=%x, bot_id=%x)",
+			static_cast<int>(ai_state.patrol_letter), bot_player_id.value);
+
 		const auto new_wp = ::find_random_unassigned_patrol_waypoint(
 			cosm,
 			team_state,
@@ -254,6 +257,10 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 
 			AI_LOG("Found new patrol waypoint");
 			patrol_waypoint = new_wp;
+		}
+		else {
+			AI_LOG("patrol::process: WARNING - no patrol waypoint found! patrol_letter=%x, team patrol_waypoints.size=%x",
+				static_cast<int>(ai_state.patrol_letter), team_state.patrol_waypoints.size());
 		}
 	}
 }

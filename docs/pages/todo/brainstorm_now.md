@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- trzeba zoverhaulowac log system zeby byl warning i error level i na czerwono logi
+
 - low effort byloby jakby odpadały łapy z krecacych sie corpsów, bardziej pasuje od jakichs lezacych zwlok
 
 - jak za dlugi combat to lec do paki

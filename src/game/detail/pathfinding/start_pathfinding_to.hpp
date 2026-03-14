@@ -53,7 +53,7 @@ inline std::optional<ai_pathfinding_state> start_pathfinding_to(
 		return std::nullopt;
 	}
 
-	AI_LOG("start_pathfinding_to: no ok");
+	AI_LOG("start_pathfinding_to: ok");
 
 	return ai_pathfinding_state {
 		pathfinding_progress{ std::move(*path), 0 },
