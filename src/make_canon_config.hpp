@@ -109,7 +109,9 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		*/
 
 		result.audio.output_mode = audio_output_mode::STEREO_HRTF;
+#endif
 
+#if WEB_SINGLETHREAD
 		result.sound.max_short_sounds = 16;
 		result.sound.processing_frequency = sound_processing_frequency::PERIODIC;
 		result.sound.custom_processing_frequency = 2;
