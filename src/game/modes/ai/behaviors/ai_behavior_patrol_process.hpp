@@ -200,6 +200,11 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		AI_LOG("Reached patrol waypoint");
 		const auto wp_handle = cosm[current_waypoint_id];
 
+		if (current_is_push) {
+			/* Push waypoint reached — mark push phase as done so the bomb carrier can plant. */
+			ai_state.push_phase = push_phase_type::COMPLETED;
+		}
+
 		if (wp_handle.alive()) {
 			if (::is_camp_waypoint(cosm, current_waypoint_id)) {
 				AI_LOG("Camp waypoint - setting up camp");

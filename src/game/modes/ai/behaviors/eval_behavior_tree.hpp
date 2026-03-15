@@ -132,22 +132,20 @@ inline ai_behavior_variant eval_behavior_tree(
 	}
 
 	/*
-		Priority 4: PLANT behavior (Resistance, bot has the bomb, already went to push point).
+		Priority 4: PLANT behavior (Resistance, bot has the bomb, push phase completed).
 		
-		If the bot has the bomb in inventory and has already tried the push waypoint,
-		then planting takes priority before combat.
+		If the bot has the bomb in inventory and has already completed the push waypoint
+		(or skipped it), then planting takes priority before combat.
 	*/
-	if (!round_state.bomb_planted && is_resistance && ai_state.tried_push_already) {
+	if (!round_state.bomb_planted && is_resistance && ai_state.push_phase == push_phase_type::COMPLETED) {
 		if (round_state.bomb_entity.is_set()) {
 			const auto bomb_handle = cosm[round_state.bomb_entity];
 
 			if (bomb_handle.alive()) {
 				const auto bomb_owner = bomb_handle.get_owning_transfer_capability();
+				const bool is_bomb_carrier = bomb_owner == cosm[controlled_character_id];
 
-				/*
-					Check if this bot owns the bomb.
-				*/
-				if (bomb_owner == cosm[controlled_character_id]) {
+				if (is_bomb_carrier) {
 					return ai_behavior_plant{};
 				}
 			}
@@ -157,24 +155,21 @@ inline ai_behavior_variant eval_behavior_tree(
 	/*
 		Priority 5: PATROL behavior (with optional push_waypoint).
 		
-		If tried_push_already == false, we'll set the push_waypoint in the patrol behavior.
-		The patrol::process() will handle clearing it once reached.
+		If push_phase == NOT_DECIDED, assign a push waypoint and transition to IN_PROGRESS.
+		Once the push waypoint is reached, patrol_process sets push_phase = COMPLETED.
 	*/
 	{
 		auto patrol_behavior = ai_behavior_patrol();
 
 		/*
-			If not pushed yet, try to assign a push waypoint.
+			If push hasn't been decided yet, assign a push waypoint (once per round).
 		*/
-		if (!ai_state.tried_push_already) {
-			/* Try this only once */
-			ai_state.tried_push_already = true;
-
+		if (ai_state.push_phase == push_phase_type::NOT_DECIDED) {
 			entity_id push_wp;
 
 			if (is_resistance) {
 				/*
-					Resistance: try to get a push waypoint.
+					Resistance: always try to get a push waypoint.
 				*/
 				push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
 			}
@@ -191,13 +186,21 @@ inline ai_behavior_variant eval_behavior_tree(
 
 			if (push_wp.is_set()) {
 				patrol_behavior.push_waypoint = push_wp;
+				ai_state.push_phase = push_phase_type::IN_PROGRESS;
+			}
+			else {
+				/*
+					No push waypoint available — push phase is immediately done,
+					so the bomb carrier can proceed to plant after this patrol.
+				*/
+				ai_state.push_phase = push_phase_type::COMPLETED;
 			}
 		}
 
 		if (is_resistance && round_state.bomb_planted) {
-			AI_LOG("eval_behavior_tree: PATROL (faction=%x, bomb_planted=%x, patrol_letter=%x, tried_push=%x, push_wp_set=%x)",
+			AI_LOG("eval_behavior_tree: PATROL (faction=%x, bomb_planted=%x, patrol_letter=%x, push_phase=%x, push_wp_set=%x)",
 				static_cast<int>(bot_faction), round_state.bomb_planted,
-				static_cast<int>(ai_state.patrol_letter), ai_state.tried_push_already,
+				static_cast<int>(ai_state.patrol_letter), static_cast<int>(ai_state.push_phase),
 				patrol_behavior.push_waypoint.is_set());
 		}
 		return patrol_behavior;
@@ -224,11 +227,13 @@ inline void behavior_state_transition(
 	}
 
 	/*
-		If transitioning FROM patrol with push_waypoint, mark push as done.
+		If transitioning FROM patrol while push is still in progress
+		(e.g. interrupted by combat or a higher-priority mission),
+		mark push as completed so the bot can plant when it returns.
 	*/
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(last_behavior)) {
-		if (patrol->push_waypoint.is_set()) {
-			ai_state.tried_push_already = true;
+		if (patrol->push_waypoint.is_set() && ai_state.push_phase == push_phase_type::IN_PROGRESS) {
+			ai_state.push_phase = push_phase_type::COMPLETED;
 		}
 	}
 

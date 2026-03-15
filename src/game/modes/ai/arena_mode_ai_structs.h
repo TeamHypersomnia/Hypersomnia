@@ -230,13 +230,19 @@ struct arena_mode_ai_team_state {
 	}
 };
 
+enum class push_phase_type : uint8_t {
+	NOT_DECIDED,  /* round start: haven't assigned a push waypoint yet */
+	IN_PROGRESS,  /* push waypoint assigned, bot is navigating there */
+	COMPLETED     /* push done or skipped — bomb carrier may now plant */
+};
+
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
 	ai_behavior_variant last_behavior = ai_behavior_idle();
 	ai_target_tracking combat_target;
 
 	marker_letter_type patrol_letter = marker_letter_type::COUNT;
-	bool tried_push_already = false;
+	push_phase_type push_phase = push_phase_type::NOT_DECIDED;
 	bool recoil_cooldown = false;
 	bool stamina_cooldown = false;
 
@@ -266,7 +272,7 @@ struct arena_mode_ai_state {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
 		patrol_letter = marker_letter_type::COUNT;
-		tried_push_already = false;
+		push_phase = push_phase_type::NOT_DECIDED;
 		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -10000.0f;
 		pathfinding.reset();
