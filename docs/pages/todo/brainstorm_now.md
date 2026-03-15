@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- grenade callouts
+	- frag out
+	- flashing
+	- flashbang
+
 - trzeba zoverhaulowac log system zeby byl warning i error level i na czerwono logi
 
 - low effort byloby jakby odpadały łapy z krecacych sie corpsów, bardziej pasuje od jakichs lezacych zwlok

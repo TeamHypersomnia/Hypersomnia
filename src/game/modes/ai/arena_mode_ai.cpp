@@ -150,9 +150,20 @@ arena_ai_result update_arena_mode_ai(
 		ai_state.patrol_letter = ::find_least_assigned_bombsite(cosm, team_state, arena_meta).letter;
 	}
 
-	if (bot_faction == faction_type::RESISTANCE && ai_state.patrol_letter == marker_letter_type::COUNT) {
-		if (team_state.chosen_bombsite != marker_letter_type::COUNT) {
+	/*
+		Resistance bots all go to the team's chosen bombsite — there is no
+		per-bot letter split.  Always keep patrol_letter in sync so a
+		mid-round change (e.g. bomb carrier realigning to nearest bombsite)
+		is picked up immediately by every bot.
+	*/
+	if (bot_faction == faction_type::RESISTANCE && team_state.chosen_bombsite != marker_letter_type::COUNT) {
+		if (ai_state.patrol_letter != team_state.chosen_bombsite) {
 			ai_state.patrol_letter = team_state.chosen_bombsite;
+
+			/* Clear cached patrol waypoint so the bot reroutes to the new site. */
+			if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
+				patrol->patrol_waypoint = entity_id::dead();
+			}
 		}
 	}
 
@@ -214,6 +225,7 @@ arena_ai_result update_arena_mode_ai(
 		cosm,
 		ai_state,
 		team_state,
+		arena_meta,
 		bot_player_id,
 		controlled_character_id,
 		bot_faction,

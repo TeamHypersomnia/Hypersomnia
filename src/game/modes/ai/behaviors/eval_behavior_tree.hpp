@@ -42,6 +42,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	const cosmos& cosm,
 	arena_mode_ai_state& ai_state,
 	arena_mode_ai_team_state& team_state,
+	const arena_mode_ai_arena_meta& arena_meta,
 	const mode_player_id& bot_player_id,
 	const entity_id controlled_character_id,
 	const faction_type bot_faction,
@@ -165,13 +166,31 @@ inline ai_behavior_variant eval_behavior_tree(
 			If push hasn't been decided yet, assign a push waypoint (once per round).
 		*/
 		if (ai_state.push_phase == push_phase_type::NOT_DECIDED) {
+			/*
+				Determine whether this bot is the bomb carrier.
+			*/
+			bool is_bomb_carrier = false;
+
+			if (is_resistance && round_state.bomb_entity.is_set()) {
+				const auto bomb_handle = cosm[round_state.bomb_entity];
+
+				if (bomb_handle.alive()) {
+					is_bomb_carrier = bomb_handle.get_owning_transfer_capability() == cosm[controlled_character_id];
+				}
+			}
+
 			entity_id push_wp;
 
 			if (is_resistance) {
 				/*
-					Resistance: always try to get a push waypoint.
+					Resistance non-carriers always push.
+					Bomb carrier pushes with 80% probability.
 				*/
-				push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
+				const bool should_push = !is_bomb_carrier || rng.randval(0, 99) < 80;
+
+				if (should_push) {
+					push_wp = ::find_random_unassigned_push_waypoint(team_state, rng);
+				}
 			}
 			else if (is_metropolis) {
 				/*
@@ -187,11 +206,25 @@ inline ai_behavior_variant eval_behavior_tree(
 			if (push_wp.is_set()) {
 				patrol_behavior.push_waypoint = push_wp;
 				ai_state.push_phase = push_phase_type::IN_PROGRESS;
+
+				/*
+					When the bomb carrier is assigned a push waypoint, align
+					chosen_bombsite to the nearest bomb area so the team plants
+					at the site that makes sense for the chosen approach.
+				*/
+				if (is_bomb_carrier) {
+					const auto push_wp_pos = cosm[push_wp].get_logic_transform().pos;
+					const auto closest = ::find_closest_bombsite_letter(cosm, arena_meta, push_wp_pos);
+
+					if (closest != marker_letter_type::COUNT) {
+						team_state.chosen_bombsite = closest;
+					}
+				}
 			}
 			else {
 				/*
-					No push waypoint available — push phase is immediately done,
-					so the bomb carrier can proceed to plant after this patrol.
+					No push waypoint available (or carrier skipped push) —
+					push phase is immediately done so the bomb carrier can plant.
 				*/
 				ai_state.push_phase = push_phase_type::COMPLETED;
 			}

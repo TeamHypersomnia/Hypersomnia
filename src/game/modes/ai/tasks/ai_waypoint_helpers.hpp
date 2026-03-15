@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <limits>
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
@@ -333,6 +334,38 @@ inline marker_letter_type choose_random_bombsite(
 	}
 
 	return rng.rand_element(available_letters);
+}
+
+/*
+	Find the bombsite letter whose nearest area entity is closest (euclidean)
+	to reference_pos.  Used by the bomb carrier to align chosen_bombsite with
+	the push waypoint it has been assigned to.
+*/
+
+inline marker_letter_type find_closest_bombsite_letter(
+	const cosmos& cosm,
+	const arena_mode_ai_arena_meta& arena_meta,
+	const vec2 reference_pos
+) {
+	marker_letter_type best_letter = marker_letter_type::COUNT;
+	real32 best_dist_sq = std::numeric_limits<real32>::max();
+
+	for (const auto& mapping : arena_meta.bombsite_mappings) {
+		for (const auto& bombsite_id : mapping.bombsite_ids) {
+			const auto handle = cosm[bombsite_id];
+
+			if (handle.alive()) {
+				const real32 dist_sq = (handle.get_logic_transform().pos - reference_pos).length_sq();
+
+				if (dist_sq < best_dist_sq) {
+					best_dist_sq = dist_sq;
+					best_letter = mapping.letter;
+				}
+			}
+		}
+	}
+
+	return best_letter;
 }
 
 /*
