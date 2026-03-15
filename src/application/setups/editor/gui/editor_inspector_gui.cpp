@@ -2270,6 +2270,12 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 		text_tooltip("For debugging.");
 	}
 
+	PROPERTY("Draw enemy crosshairs", draw_enemy_crosshairs);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Draw crosshairs for all enemy characters.\nFor debugging bot aim.");
+	}
+
 	PROPERTY("Bot difficulty", bot_difficulty);
 
 	return result;

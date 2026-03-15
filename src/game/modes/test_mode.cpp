@@ -436,7 +436,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 					::interpolate_crosshair(
 						character.find_crosshair(),
 						nav_result.crosshair_offset,
-						true,
 						dt_secs,
 						difficulty_type::HARD,
 						is_navigating

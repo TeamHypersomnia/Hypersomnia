@@ -5045,6 +5045,18 @@ work_result work(
 					return false;
 				});
 
+				const bool draw_enemy_crosshairs = visit_current_setup([&](const auto& setup) {
+					using S = remove_cref<decltype(setup)>;
+
+					if constexpr(std::is_same_v<S, editor_setup>) {
+						if (setup.is_playtesting()) {
+							return setup.get_project().playtesting.draw_enemy_crosshairs;
+						}
+					}
+
+					return false;
+				});
+
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
 					get_camera_requested_fov_expansion(),
@@ -5055,6 +5067,7 @@ work_result work(
 					viewing_config.drawing,
 					viewer_is_spectator(),
 					see_enemies_behind_walls,
+					draw_enemy_crosshairs,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,

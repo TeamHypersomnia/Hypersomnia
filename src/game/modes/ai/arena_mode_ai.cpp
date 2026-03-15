@@ -606,7 +606,7 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	if (!is_thinking_what_to_buy) {
-		::interpolate_crosshair(ctx, move_result.crosshair_offset, target_acquired, dt_secs, difficulty, move_result.is_navigating);
+		::interpolate_crosshair(ctx, move_result.crosshair_offset, dt_secs, difficulty, move_result.is_navigating);
 	}
 
 	arena_ai_result result;

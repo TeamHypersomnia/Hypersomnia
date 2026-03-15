@@ -51,6 +51,7 @@ struct illuminated_rendering_input {
 	const game_drawing_settings drawing;
 	const bool viewer_is_spectator;
 	const bool see_enemies_behind_walls = false;
+	const bool draw_enemy_crosshairs = false;
 	const necessary_images_in_atlas_map& necessary_images;
 	const all_loaded_gui_fonts& fonts;
 	const images_in_atlas_map& game_images;
