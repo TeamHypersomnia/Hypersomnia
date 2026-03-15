@@ -6,6 +6,15 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Better keyboard mapping
+	- hotbar_button_0 -> hotbar 0
+	- hotbar_button_1 -> hotbar 1
+	- special_action_button_1 -> spell 1
+	- maybe just Support spell
+		- Offensive spell
+		- Defensive spell
+	- Then we can rebind B to buy menu
+
 - Investigate audio delay on Windows
     - On a second thought, not as bad as I expected
         - Was probably due to other applications taking control of the sound
