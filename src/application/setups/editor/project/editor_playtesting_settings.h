@@ -16,6 +16,7 @@ struct editor_playtesting_settings {
 	bool skip_freeze_time = true;
 	bool unlimited_money = true;
 	bool spawn_bots = false;
+	bool spawn_only_enemy_bots = false;
 	bool see_enemies_behind_walls = false;
 	// END GEN INTROSPECTOR
 

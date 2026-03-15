@@ -134,7 +134,7 @@ auto setup_ruleset_from_editor_mode(
 				rules.economy.maximum_money = 40000;
 			}
 
-			if (!playtesting_overrides->spawn_bots) {
+			if (!playtesting_overrides->spawn_bots && !playtesting_overrides->spawn_only_enemy_bots) {
 				rules.default_bot_quota = 0;
 			}
 		}

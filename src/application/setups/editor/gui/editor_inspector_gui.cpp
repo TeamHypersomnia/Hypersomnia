@@ -2258,6 +2258,12 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 		text_tooltip("Only in Bomb Defusal and Gun Game.");
 	}
 
+	PROPERTY("Spawn only enemy bots", spawn_only_enemy_bots);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Only in Bomb Defusal and Gun Game.\nSpawns bots exclusively for the enemy team.");
+	}
+
 	PROPERTY("See enemies behind walls", see_enemies_behind_walls);
 
 	if (ImGui::IsItemHovered()) {

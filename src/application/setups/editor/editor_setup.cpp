@@ -3377,6 +3377,14 @@ void editor_setup::start_playtesting() {
 		else {
 			local_player_id = mode.add_player(input, simulated_client.nickname);
 			mode.choose_faction(input, local_player_id, project.playtesting.starting_faction);
+
+			if (project.playtesting.spawn_only_enemy_bots) {
+				dummy_dynamic_vars.bots_override = {
+					local_player_id,
+					uint8_t(0),
+					static_cast<uint8_t>(input.rules.default_bot_quota)
+				};
+			}
 		}
 	});
 
@@ -3385,6 +3393,7 @@ void editor_setup::start_playtesting() {
 
 void editor_setup::stop_playtesting() {
 	playtesting = false;
+	dummy_dynamic_vars.bots_override = {};
 	rebuild_arena();
 
 	recent_message.set("Ended playtesting session.");
