@@ -372,9 +372,10 @@ arena_mode_faction_state& arena_mode::get_spawns_for(const input in, const facti
 	return factions[faction];
 }
 
-void arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
+entity_id arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
+	entity_id used_spawn;
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		const auto faction = typed_handle.get_official_faction();
@@ -403,6 +404,8 @@ void arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 			reshuffle();
 		}
 		else {
+			used_spawn = spawns[spawn_idx];
+
 			const auto spawn_transform = spawn.get_logic_transform();
 			typed_handle.set_logic_transform(spawn_transform);
 			snap_interpolated_to(typed_handle, spawn_transform);
@@ -418,6 +421,8 @@ void arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 			}
 		}
 	});
+
+	return used_spawn;
 }
 
 bool arena_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
@@ -956,8 +961,9 @@ void arena_mode::create_character_for_player(
 					entity_flavour_id(flavour), 
 					[](entity_handle) {},
 					[&](const entity_handle new_character) {
-						teleport_to_next_spawn(in, new_character);
+						const auto spawn_used = teleport_to_next_spawn(in, new_character);
 						init_spawned(in, id, new_character, step, changed_identities, transferred);
+						p.ai_state.source_spawn_point = spawn_used;
 					}
 				);
 

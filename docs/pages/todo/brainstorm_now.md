@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- zaktualizowac tutorial
+
 - low effort - gory sprity dla idle stojacych rozjebanych bo z nich kapie krew to musi byc widac
 	- dla głów też
 

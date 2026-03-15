@@ -2,6 +2,7 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/hand_fuse_component.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/cosmos/entity_handle.h"
 #include "augs/math/math.h"
@@ -156,13 +157,71 @@ arena_ai_result update_arena_mode_ai(
 		mid-round change (e.g. bomb carrier realigning to nearest bombsite)
 		is picked up immediately by every bot.
 	*/
-	if (bot_faction == faction_type::RESISTANCE && team_state.chosen_bombsite != marker_letter_type::COUNT) {
+	if (
+		bot_faction == faction_type::RESISTANCE &&
+		team_state.chosen_bombsite != marker_letter_type::COUNT &&
+		!ai_state.escaping_explosion
+	) {
 		if (ai_state.patrol_letter != team_state.chosen_bombsite) {
 			ai_state.patrol_letter = team_state.chosen_bombsite;
 
 			/* Clear cached patrol waypoint so the bot reroutes to the new site. */
 			if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
 				patrol->patrol_waypoint = entity_id::dead();
+			}
+		}
+	}
+
+	/*
+		RESISTANCE escape: when the bomb has <= 6 seconds until explosion,
+		change patrol_letter to a different bombsite so the bot runs away.
+		If only one bombsite exists, set patrol_letter to COUNT so that
+		patrol_process uses source_spawn_point as fallback.
+	*/
+
+	if (
+		bot_faction == faction_type::RESISTANCE &&
+		bomb_planted &&
+		!ai_state.escaping_explosion &&
+		bomb_entity.is_set()
+	) {
+		if (const auto bomb_handle = cosm[bomb_entity]) {
+			if (const auto* fuse = bomb_handle.find<components::hand_fuse>()) {
+				if (fuse->armed()) {
+					const auto& clk = cosm.get_clock();
+					const auto remaining_ms = clk.get_remaining_ms(fuse->fuse_delay_ms, fuse->when_armed);
+
+					if (remaining_ms <= 6000.0f) {
+						ai_state.escaping_explosion = true;
+
+						const auto available = arena_meta.get_available_bombsite_letters();
+
+						if (available.size() > 1) {
+							auto candidates = available;
+
+							for (auto it = candidates.begin(); it != candidates.end(); ++it) {
+								if (*it == ai_state.patrol_letter) {
+									candidates.erase(it);
+									break;
+								}
+							}
+
+							if (!candidates.empty()) {
+								ai_state.patrol_letter = candidates[stable_rng.randval(0u, static_cast<unsigned>(candidates.size() - 1))];
+							}
+						}
+						else {
+							/*
+								Only one bombsite letter — no other site to flee to.
+								Set patrol_letter to COUNT so patrol_process uses
+								source_spawn_point as the escape destination.
+							*/
+							ai_state.patrol_letter = marker_letter_type::COUNT;
+						}
+
+						ai_state.last_behavior = ai_behavior_patrol();
+					}
+				}
 			}
 		}
 	}
@@ -241,6 +300,33 @@ arena_ai_result update_arena_mode_ai(
 							alert.enemy_pos
 						);
 						break;
+				}
+			}
+		}
+	}
+
+	/*
+		===========================================================================
+		PHASE 0.75: If bomb is planted and a METROPOLIS soldier is defusing,
+		alert RESISTANCE soldiers about the defuser.
+		===========================================================================
+	*/
+
+	if (bomb_planted && bot_faction == faction_type::RESISTANCE) {
+		if (const auto bomb_handle = cosm[bomb_entity]) {
+			if (const auto* fuse = bomb_handle.find<components::hand_fuse>()) {
+				const auto defuser_handle = cosm[fuse->character_now_defusing];
+
+				if (defuser_handle.alive()) {
+					const auto defuser_pos = defuser_handle.get_logic_transform().pos;
+
+					ai_state.alertness.queue_alert(ai_pending_alert{
+						defuser_handle.get_id(),
+						defuser_pos,
+						global_time_secs,
+						0.49f,
+						alert_acquire_type::FULL
+					});
 				}
 			}
 		}
@@ -335,14 +421,18 @@ arena_ai_result update_arena_mode_ai(
 		Check if behavior changed - if so, handle transition.
 	*/
 	if (desired_behavior.index() != ai_state.last_behavior.index()) {
-		AI_LOG("Behavior changed - transitioning (from index %x to index %x, bomb_planted=%x, faction=%x)",
+		AI_LOG(
+			"Behavior changed - transitioning (from index %x to index %x, bomb_planted=%x, faction=%x)",
 			ai_state.last_behavior.index(), desired_behavior.index(),
-			bomb_planted, static_cast<int>(bot_faction));
+			bomb_planted, static_cast<int>(bot_faction)
+		);
+
 		::behavior_state_transition(
 			ai_state.last_behavior,
 			desired_behavior,
 			ai_state
 		);
+
 		ai_state.last_behavior = desired_behavior;
 	}
 
@@ -529,7 +619,7 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	movement.flags.walking = ::should_walk_silently(ai_state.last_behavior);
+	movement.flags.walking = ::should_walk_silently(ai_state.last_behavior, bot_faction, ai_state.escaping_explosion, bomb_planted);
 	movement.flags.sprinting = ::should_sprint(ai_state.last_behavior, move_result.can_sprint);
 	movement.flags.dashing = ::should_dash_for_combat(ai_state.last_behavior, ai_state.combat_target, character_pos);
 

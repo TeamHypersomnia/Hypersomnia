@@ -363,7 +363,7 @@ private:
 	template <class H>
 	void reset_equipment_for(logic_step step, input in, mode_player_id ko, H character_handle);
 
-	void teleport_to_next_spawn(input, entity_id character);
+	entity_id teleport_to_next_spawn(input, entity_id character);
 	void init_spawned(
 		input, 
 		mode_player_id,

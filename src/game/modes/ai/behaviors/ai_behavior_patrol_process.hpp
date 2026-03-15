@@ -263,6 +263,14 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			AI_LOG("Found new patrol waypoint");
 			patrol_waypoint = new_wp;
 		}
+		else if (ai_state.patrol_letter == marker_letter_type::COUNT && ai_state.source_spawn_point.is_set()) {
+			/*
+				No waypoints for COUNT — escaping explosion to spawn point.
+			*/
+			going_to_first_waypoint = true;
+			walk_silently_to_next_waypoint = true;
+			patrol_waypoint = ai_state.source_spawn_point;
+		}
 		else {
 			AI_LOG("patrol::process: WARNING - no patrol waypoint found! patrol_letter=%x, team patrol_waypoints.size=%x",
 				static_cast<int>(ai_state.patrol_letter), team_state.patrol_waypoints.size());

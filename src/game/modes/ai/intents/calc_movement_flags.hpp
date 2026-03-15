@@ -1,6 +1,7 @@
 #pragma once
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/behaviors/ai_target_tracking.hpp"
+#include "game/enums/faction_type.h"
 
 /*
 	Stateless intent calculations that std::visit the behavior variant.
@@ -40,12 +41,29 @@ inline bool is_camping_on_waypoint(const ai_behavior_variant& behavior) {
 	return false;
 }
 
-inline bool should_walk_silently(const ai_behavior_variant& behavior) {
+inline bool should_walk_silently(
+	const ai_behavior_variant& behavior,
+	const faction_type bot_faction,
+	const bool escaping_explosion,
+	const bool bomb_planted
+) {
 	if (::is_camping_on_waypoint(behavior)) {
 		return true;
 	}
 
 	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
+		if (escaping_explosion) {
+			return false;
+		}
+
+		/*
+			RESISTANCE should always walk silently when patrolling a bombsite
+			after the bomb is planted (to avoid giving away their position).
+		*/
+		if (bot_faction == faction_type::RESISTANCE && bomb_planted) {
+			return true;
+		}
+
 		/* Always walk silently when camping (twitching). */
 		if (patrol->in_motion() && !patrol->is_going_far()) {
 			return patrol->walk_silently_to_next_waypoint;
