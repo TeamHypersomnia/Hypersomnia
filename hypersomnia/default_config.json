@@ -218,7 +218,7 @@
             "segment_length": 10.0,
             "segment_thickness": 2,
             "recoil_expansion_base": 5.0,
-            "recoil_expansion_mult": 2.0,
+            "recoil_expansion_mult": 1.5,
             "border_width": 1,
             "show_dot": true,
             "inside_color": [255, 255, 255, 255],

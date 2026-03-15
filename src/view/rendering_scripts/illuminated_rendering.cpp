@@ -428,6 +428,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				if (auto crosshair = it.template find<components::crosshair>()) {
 					recoil_amount = std::abs(crosshair->recoil.rotation);
 				}
+
+				if (it.get_wielded_guns().empty() && !it.get_wielded_melees().empty()) {
+					recoil_amount *= 0.5f;
+				}
 			}
 
 			if (settings.crosshair.type == crosshair_type::CIRCULAR) {
