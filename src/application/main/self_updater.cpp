@@ -119,12 +119,6 @@ self_update_result check_and_apply_updates(
 
 		const auto response = launch_download(*client, version_path); 
 
-		if (response == nullptr) {
-			LOG("Response was null!");
-			result.type = R::FAILED;
-			return result;
-		}
-
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
 		if (response.ssl_backend_error()) {
 			LOG("verify error: %x", X509_verify_cert_error_string(response.ssl_backend_error()));
@@ -132,6 +126,12 @@ self_update_result check_and_apply_updates(
 			return result;
 		}
 #endif
+
+		if (response == nullptr) {
+			LOG("Response was null!");
+			result.type = R::FAILED;
+			return result;
+		}
 
 		if (response->status == 404 || response->status == 403) {
 			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
@@ -649,7 +649,7 @@ self_update_result check_and_apply_updates(
 				if (valid_and_is_ready(future_response)) {
 					auto result = future_response.get();
 
-					if (result == std::nullopt || result.value() == nullptr) {
+					if (result == std::nullopt) {
 						LOG("Response was null!");
 						interrupt(R::FAILED);
 						return;
@@ -662,6 +662,12 @@ self_update_result check_and_apply_updates(
 						return;
 					}
 #endif
+
+					if (result.value() == nullptr) {
+						LOG("Response was null!");
+						interrupt(R::FAILED);
+						return;
+					}
 
 					const auto& response = result.value();
 
