@@ -256,7 +256,6 @@ arena_ai_result update_arena_mode_ai(
 	const bool is_camping = ::is_camping_on_waypoint(ai_state.last_behavior);
 	const auto now_closest_enemy = ::find_closest_enemy(ctx, is_ffa, is_camping);
 
-	LOG_NVPS(now_closest_enemy);
 	if (now_closest_enemy != ai_state.confirmed_closest_enemy) {
 		/* World state differs from bot's perception — queue/update LOS change. */
 		const auto enemy_pos = now_closest_enemy.is_set()
@@ -371,9 +370,8 @@ arena_ai_result update_arena_mode_ai(
 				/* Not confirmed seeing target — wall penetration at last known position. */
 				const auto time_since_known = global_time_secs - ai_state.combat_target.when_last_known_secs;
 				const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
-				LOG_NVPS(time_since_known, shoot_wall_time_limit);
 
-				if (time_since_known < shoot_wall_time_limit) {
+				if (time_since_known < shoot_wall_time_limit + ai_state.alertness.base_rt_secs) {
 					target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
 				}
 			}

@@ -27,7 +27,7 @@ inline float get_crosshair_speed_mult(const difficulty_type difficulty) {
 	switch (difficulty) {
 		case difficulty_type::EASY:   return 0.4f;
 		case difficulty_type::MEDIUM: return 0.7f;
-		case difficulty_type::HARD:   return 1.0f;
+		case difficulty_type::HARD:   return 1.2f;
 		default:                      return 1.0f;
 	}
 }
@@ -69,7 +69,6 @@ inline void interpolate_crosshair(
 
 			const auto speed = crosshair_speed_for_distance(dist) * get_crosshair_speed_mult(difficulty);
 			const auto step = speed * dt_secs;
-			LOG_NVPS(step, dist, target_offset);
 
 			if (step >= dist) {
 				crosshair->base_offset = target_offset;
