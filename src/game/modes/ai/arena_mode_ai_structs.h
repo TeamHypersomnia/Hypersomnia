@@ -236,10 +236,187 @@ enum class push_phase_type : uint8_t {
 	COMPLETED     /* push done or skipped — bomb carrier may now plant */
 };
 
+/*
+	How the bot should commit a pending alert to combat_target.
+	Ordered by priority — higher value overrides lower on merge.
+*/
+
+enum class alert_acquire_type {
+	// GEN INTROSPECTOR enum class alert_acquire_type
+	HEARD_ONLY,          /* just update last_known_pos (acquire_target_heard) */
+	SEEN,                /* visual acquisition (acquire_target_seen) */
+	FULL,                /* forced acquisition — damage, wall penetration (full_acquire) */
+	CLOSEST_LOS_CHANGE   /* dedicated: closest visible enemy changed (separate slot) */
+	// END GEN INTROSPECTOR
+};
+
+/*
+	Pending stimulus for the reaction time system.
+	Each alert tracks its own enemy, perception time, and reaction multiplier.
+*/
+
+struct ai_pending_alert {
+	// GEN INTROSPECTOR struct ai_pending_alert
+	entity_id enemy;
+	vec2 enemy_pos = vec2::zero;
+	real32 when_perceived_secs = 0.0f;
+	real32 reaction_multiplier = 1.0f;
+	alert_acquire_type acquire_type = alert_acquire_type::SEEN;
+	// END GEN INTROSPECTOR
+};
+
+/*
+	Reaction time system for combat target acquisition.
+
+	Holds up to 3 independent alerts, each with its own deadline
+	(when_perceived + base_reaction_time * reaction_multiplier).
+
+	Same-enemy stimuli merge: position updates, multiplier takes min,
+	acquire_type upgrades but perception time is kept (fair delay).
+
+	Different enemies get separate slots. If full, oldest is evicted.
+
+	Commit: each frame, find the newest ready alert. Commit it and
+	remove only that one — remaining alerts stay and mature independently.
+*/
+
+struct ai_alertness_state {
+	// GEN INTROSPECTOR struct ai_alertness_state
+	augs::constant_size_vector<ai_pending_alert, 3> alerts;
+	real32 base_rt_secs = 0.20f;
+	std::optional<ai_pending_alert> los_change_alert;
+	// END GEN INTROSPECTOR
+
+	real32 deadline_of(const ai_pending_alert& a) const {
+		return a.when_perceived_secs + base_rt_secs * a.reaction_multiplier;
+	}
+
+	void queue_alert(const ai_pending_alert& alert) {
+		for (auto& existing : alerts) {
+			if (existing.enemy == alert.enemy) {
+				existing.enemy_pos = alert.enemy_pos;
+				existing.reaction_multiplier = std::min(existing.reaction_multiplier, alert.reaction_multiplier);
+
+				if (alert.acquire_type > existing.acquire_type) {
+					existing.acquire_type = alert.acquire_type;
+				}
+
+				return;
+			}
+		}
+
+		if (alerts.size() < 3) {
+			alerts.push_back(alert);
+			return;
+		}
+
+		/*
+			Queue full. Evict only if the new alert has strictly higher priority
+			(lower reaction_multiplier) than at least one existing alert.
+
+			From eligible victims (those with strictly higher multiplier),
+			pick the lowest priority tier first (highest multiplier value),
+			and within that tier pick the one furthest from maturity.
+		*/
+
+		real32 worst_mult = -1.0f;
+
+		for (std::size_t i = 0; i < alerts.size(); ++i) {
+			if (alerts[i].reaction_multiplier > alert.reaction_multiplier) {
+				if (alerts[i].reaction_multiplier > worst_mult) {
+					worst_mult = alerts[i].reaction_multiplier;
+				}
+			}
+		}
+
+		if (worst_mult < 0.0f) {
+			return;
+		}
+
+		std::optional<std::size_t> victim;
+		real32 victim_deadline = -1.0f;
+
+		for (std::size_t i = 0; i < alerts.size(); ++i) {
+			if (alerts[i].reaction_multiplier == worst_mult) {
+				const auto d = deadline_of(alerts[i]);
+
+				if (!victim.has_value() || d > victim_deadline) {
+					victim_deadline = d;
+					victim = i;
+				}
+			}
+		}
+
+		if (victim.has_value()) {
+			alerts[*victim] = alert;
+		}
+	}
+
+	/*
+		Queue or update the dedicated LOS change alert.
+		Keeps the original perception time if already pending (first-noticed deadline).
+	*/
+	void queue_los_change(const entity_id new_enemy, const vec2 enemy_pos, const real32 now) {
+		if (los_change_alert.has_value()) {
+			los_change_alert->enemy = new_enemy;
+			los_change_alert->enemy_pos = enemy_pos;
+		}
+		else {
+			los_change_alert = ai_pending_alert{
+				new_enemy,
+				enemy_pos,
+				now,
+				1.0f,
+				alert_acquire_type::CLOSEST_LOS_CHANGE
+			};
+		}
+	}
+
+	bool is_los_change_ready(const real32 now) const {
+		return los_change_alert.has_value() && now >= deadline_of(*los_change_alert);
+	}
+
+	/*
+		Find the newest ready alert index, or empty if none are ready.
+	*/
+	std::optional<std::size_t> find_ready_index(const real32 now) const {
+		std::optional<std::size_t> best;
+
+		for (std::size_t i = 0; i < alerts.size(); ++i) {
+			if (now >= deadline_of(alerts[i])) {
+				if (!best.has_value() || alerts[i].when_perceived_secs > alerts[*best].when_perceived_secs) {
+					best = i;
+				}
+			}
+		}
+
+		return best;
+	}
+
+	void remove_at(const std::size_t index) {
+		alerts.erase(alerts.begin() + index);
+	}
+
+	void clear() {
+		alerts.clear();
+		los_change_alert.reset();
+	}
+};
+
+/*
+	Get the reaction time in seconds for a given difficulty level.
+	This is the delay between perceiving a stimulus and committing
+	it to the combat target.
+*/
+
+real32 get_reaction_time_secs(const difficulty_type difficulty);
+
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
 	ai_behavior_variant last_behavior = ai_behavior_idle();
 	ai_target_tracking combat_target;
+	ai_alertness_state alertness;
+	entity_id confirmed_closest_enemy;
 
 	marker_letter_type patrol_letter = marker_letter_type::COUNT;
 	push_phase_type push_phase = push_phase_type::NOT_DECIDED;
@@ -271,6 +448,8 @@ struct arena_mode_ai_state {
 	void round_reset() {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
+		alertness.clear();
+		confirmed_closest_enemy = {};
 		patrol_letter = marker_letter_type::COUNT;
 		push_phase = push_phase_type::NOT_DECIDED;
 		already_nothing_more_to_buy = false;

@@ -3,6 +3,7 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 #include "game/enums/faction_type.h"
+#include "game/modes/difficulty_type.h"
 
 struct editor_game_mode_resource;
 
@@ -18,6 +19,7 @@ struct editor_playtesting_settings {
 	bool spawn_bots = false;
 	bool spawn_only_enemy_bots = false;
 	bool see_enemies_behind_walls = false;
+	difficulty_type bot_difficulty = difficulty_type::EASY;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_playtesting_settings&) const = default;

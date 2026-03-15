@@ -3388,6 +3388,8 @@ void editor_setup::start_playtesting() {
 		}
 	});
 
+	dummy_dynamic_vars.bot_difficulty = project.playtesting.bot_difficulty;
+
 	cosm.request_resample();
 }
 

@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- low effort - gory sprity dla idle stojacych rozjebanych bo z nich kapie krew to musi byc widac
+	- dla głów też
+
+- discord api, flathub, teraz takie rzeczy easy z ai
+
 - grenade callouts
 	- frag out
 	- flashing

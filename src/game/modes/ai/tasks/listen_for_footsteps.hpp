@@ -29,9 +29,6 @@ inline void listen_for_footsteps(
 	const auto& sound_cues = step.get_queue<messages::sound_cue_message>();
 	const auto bot_faction = ctx.character_handle.get_official_faction();
 
-	auto rng_state = xorshift_state{ static_cast<uint64_t>(global_time_secs * 1000.0f + 54321) };
-	auto rng = randomization(rng_state);
-
 	auto is_enemy_faction = [&](const faction_type source_faction) {
 		if (is_ffa) {
 			return bot_faction != source_faction;
@@ -72,15 +69,16 @@ inline void listen_for_footsteps(
 
 		/*
 			No direct line of sight. Check if we can penetrate walls to shoot them.
-			If weapon can penetrate to the target position, full_acquire.
+			If weapon can penetrate to the target position, queue alert.
 		*/
 		if (::can_weapon_penetrate(ctx.character_handle, cue.position)) {
-			ctx.ai_state.combat_target.full_acquire(
-				rng,
-				global_time_secs,
+			ctx.ai_state.alertness.queue_alert({
 				cue.source_entity,
-				cue.position
-			);
+				cue.position,
+				global_time_secs,
+				1.2f,
+				alert_acquire_type::FULL
+			});
 			continue;
 		}
 
@@ -88,24 +86,26 @@ inline void listen_for_footsteps(
 			Can't see and can't penetrate. Check if faction-specific hearing aggro should kick in.
 		*/
 		if (::should_acquire_target_by_hearing(bot_faction, bomb_planted)) {
-			ctx.ai_state.combat_target.full_acquire(
-				rng,
-				global_time_secs,
+			ctx.ai_state.alertness.queue_alert({
 				cue.source_entity,
-				cue.position
-			);
+				cue.position,
+				global_time_secs,
+				1.2f,
+				alert_acquire_type::FULL
+			});
 			continue;
 		}
 
 		/*
-			Default: Update target tracking via acquire_target_heard.
-			This updates last_known_pos if it matches current target,
-			otherwise just notes the position.
+			Default: Update last_known_pos through reaction time.
+			Uses HEARD_ONLY so it only updates position, doesn't force combat.
 		*/
-		ctx.ai_state.combat_target.acquire_target_heard(
-			global_time_secs,
+		ctx.ai_state.alertness.queue_alert({
 			cue.source_entity,
-			cue.position
-		);
+			cue.position,
+			global_time_secs,
+			1.2f,
+			alert_acquire_type::HEARD_ONLY
+		});
 	}
 }

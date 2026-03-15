@@ -169,15 +169,123 @@ arena_ai_result update_arena_mode_ai(
 
 	/*
 		===========================================================================
+		PHASE 0.5: Commit any pending reaction-time alerts.
+		===========================================================================
+	*/
+
+	ai_state.alertness.base_rt_secs = ::get_reaction_time_secs(difficulty);
+
+	/* Commit LOS change alert (dedicated slot, never evicted). */
+	if (ai_state.alertness.is_los_change_ready(global_time_secs)) {
+		const auto& alert = *ai_state.alertness.los_change_alert;
+
+		if (alert.enemy.is_set()) {
+			const auto enemy_handle = cosm[alert.enemy];
+
+			if (enemy_handle.alive() && sentient_and_conscious(enemy_handle)) {
+				ai_state.confirmed_closest_enemy = alert.enemy;
+
+				ai_state.combat_target.acquire_target_seen(
+					stable_rng,
+					global_time_secs,
+					alert.enemy,
+					alert.enemy_pos,
+					character_pos
+				);
+			}
+			else {
+				ai_state.confirmed_closest_enemy = {};
+			}
+		}
+		else {
+			ai_state.confirmed_closest_enemy = {};
+		}
+
+		ai_state.alertness.los_change_alert.reset();
+	}
+
+	/* Commit regular alerts (damage, gunshots, footsteps). */
+	{
+		const auto ready_idx = ai_state.alertness.find_ready_index(global_time_secs);
+
+		if (ready_idx.has_value()) {
+			const auto alert = ai_state.alertness.alerts[*ready_idx];
+			ai_state.alertness.remove_at(*ready_idx);
+
+			const auto enemy_handle = cosm[alert.enemy];
+
+			if (enemy_handle.alive() && sentient_and_conscious(enemy_handle)) {
+				switch (alert.acquire_type) {
+					case alert_acquire_type::FULL:
+						ai_state.combat_target.full_acquire(
+							stable_rng,
+							global_time_secs,
+							alert.enemy,
+							alert.enemy_pos
+						);
+						break;
+					case alert_acquire_type::SEEN:
+					case alert_acquire_type::CLOSEST_LOS_CHANGE:
+						ai_state.combat_target.acquire_target_seen(
+							stable_rng,
+							global_time_secs,
+							alert.enemy,
+							alert.enemy_pos,
+							character_pos
+						);
+						break;
+					case alert_acquire_type::HEARD_ONLY:
+						ai_state.combat_target.acquire_target_heard(
+							global_time_secs,
+							alert.enemy,
+							alert.enemy_pos
+						);
+						break;
+				}
+			}
+		}
+	}
+
+	/*
+		===========================================================================
 		PHASE 1: Update combat target tracking (before behavior tree evaluation).
 		NOTE: listen_for_footsteps is now called in post_solve_arena_mode_ai.
 		===========================================================================
 	*/
 
-	/* Check for visible enemies and update combat_target. */
 	const bool is_camping = ::is_camping_on_waypoint(ai_state.last_behavior);
-	const auto closest_enemy = ::find_closest_enemy(ctx, is_ffa, is_camping);
-	const bool sees_target = closest_enemy.is_set();
+	const auto now_closest_enemy = ::find_closest_enemy(ctx, is_ffa, is_camping);
+
+	LOG_NVPS(now_closest_enemy);
+	if (now_closest_enemy != ai_state.confirmed_closest_enemy) {
+		/* World state differs from bot's perception — queue/update LOS change. */
+		const auto enemy_pos = now_closest_enemy.is_set()
+			? cosm[now_closest_enemy].get_logic_transform().pos
+			: vec2::zero;
+
+		LOG("Q LOS CHANGE");
+		ai_state.alertness.queue_los_change(now_closest_enemy, enemy_pos, global_time_secs);
+	}
+	else {
+		if (const auto enemy_handle = cosm[ai_state.confirmed_closest_enemy]) {
+			/* Confirmed visual contact with same target — immediate position update. */
+			const auto enemy_pos = enemy_handle.get_logic_transform().pos;
+
+			ai_state.combat_target.acquire_target_seen(
+				stable_rng,
+				global_time_secs,
+				ai_state.confirmed_closest_enemy,
+				enemy_pos,
+				character_pos
+			);
+		}
+	}
+
+	/*
+		All downstream logic uses the confirmed (reaction-time-delayed) state,
+		never the raw find_closest_enemy result.
+	*/
+	const bool sees_target = ai_state.confirmed_closest_enemy.is_set();
 
 	if (sees_target) {
 		/*
@@ -185,16 +293,6 @@ arena_ai_result update_arena_mode_ai(
 			prevent any buying logic in that case.
 		*/
 		in_buy_area = false;
-
-		const auto enemy_handle = cosm[closest_enemy];
-		const auto enemy_pos = enemy_handle.get_logic_transform().pos;
-		ai_state.combat_target.acquire_target_seen(
-			stable_rng,
-			global_time_secs,
-			closest_enemy,
-			enemy_pos,
-			character_pos
-		);
 	}
 	else {
 		/*
@@ -261,20 +359,22 @@ arena_ai_result update_arena_mode_ai(
 
 	if (::is_behavior<ai_behavior_combat>(ai_state.last_behavior)) {
 		if (ai_state.combat_target.active(cosm, global_time_secs)) {
-			const auto time_since_known = global_time_secs - ai_state.combat_target.when_last_known_secs;
-			const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
-
-			/* 
-				This will always be true when seeing the enemy,
-				because then when_last_known_secs will is always updated to now.
-			*/
-			if (time_since_known < shoot_wall_time_limit) {
+			if (ai_state.confirmed_closest_enemy.is_set()) {
+				/* Confirmed visual contact — direct engagement. */
 				target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
 
-				if (sees_target) {
-					if (const auto enemy_handle = cosm[closest_enemy]) {
-						target_enemy_velocity = enemy_handle.get_effective_velocity();
-					}
+				if (const auto enemy_handle = cosm[ai_state.confirmed_closest_enemy]) {
+					target_enemy_velocity = enemy_handle.get_effective_velocity();
+				}
+			}
+			else {
+				/* Not confirmed seeing target — wall penetration at last known position. */
+				const auto time_since_known = global_time_secs - ai_state.combat_target.when_last_known_secs;
+				const auto shoot_wall_time_limit = ai_state.combat_target.chosen_combat_time_secs / 20.0f;
+				LOG_NVPS(time_since_known, shoot_wall_time_limit);
+
+				if (time_since_known < shoot_wall_time_limit) {
+					target_acquired = ::can_weapon_penetrate(character_handle, ai_state.combat_target.last_known_pos);
 				}
 			}
 		}
@@ -579,9 +679,6 @@ void post_solve_arena_mode_ai(
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
 	const auto filter = predefined_queries::line_of_sight();
 
-	auto rng_state = xorshift_state{ static_cast<uint64_t>(global_time_secs * 1000.0f + 12345) };
-	auto rng = randomization(rng_state);
-
 	auto is_enemy_faction = [&](const faction_type shooter_faction) {
 		if (is_ffa) {
 			return bot_faction != shooter_faction;
@@ -641,37 +738,26 @@ void post_solve_arena_mode_ai(
 			character_handle
 		);
 
-		if (!raycast.hit) {
+		LOG_NVPS(raycast.hit, ::can_weapon_penetrate(shooter, character_pos));
+		if (!raycast.hit || ::can_weapon_penetrate(shooter, character_pos)) {
+			LOG("QUEUE");
 			/*
-				Gunshot seen - update combat target.
+				Gunshot muzzle flash seen — queue through reaction time.
 			*/
-			ai_state.combat_target.acquire_target_seen(
-				rng,
-				global_time_secs,
+			ai_state.alertness.queue_alert({
 				shot.capability,
 				muzzle_pos,
-				character_pos
-			);
-		}
-		else {
-			/*
-				No direct line of sight. Check if we can penetrate walls to shoot them.
-				If weapon can penetrate to the muzzle position, full_acquire.
-			*/
-			if (::can_weapon_penetrate(character_handle, muzzle_pos)) {
-				ai_state.combat_target.full_acquire(
-					rng,
-					global_time_secs,
-					shot.capability,
-					muzzle_pos
-				);
-			}
+				static_cast<real32>(global_time_secs),
+				0.8f,
+				alert_acquire_type::SEEN
+			});
 		}
 	}
 
 	/*
 		Damage-based combat initiation.
-		Receiving damage always initiates COMBAT regardless of LoS.
+		Receiving damage initiates COMBAT regardless of LoS,
+		but with a shorter reaction delay (0.5x multiplier).
 	*/
 	const auto& health_events = step.get_queue<messages::health_event>();
 
@@ -701,15 +787,21 @@ void post_solve_arena_mode_ai(
 
 		const auto attacker_pos = attacker.get_logic_transform().pos;
 
-		/*
-			Damage always initiates combat (no LoS check needed).
-			Use full_acquire since damage is always significant.
-		*/
-		ai_state.combat_target.full_acquire(
-			rng,
-			global_time_secs,
+		ai_state.alertness.queue_alert({
 			attacker_id,
-			attacker_pos
-		);
+			attacker_pos,
+			static_cast<real32>(global_time_secs),
+			0.5f,
+			alert_acquire_type::FULL
+		});
+	}
+}
+
+real32 get_reaction_time_secs(const difficulty_type difficulty) {
+	switch (difficulty) {
+		case difficulty_type::EASY:   return 1.0f;
+		case difficulty_type::MEDIUM: return 0.50f;
+		case difficulty_type::HARD:   return 0.35f;
+		default:                      return 0.20f;
 	}
 }

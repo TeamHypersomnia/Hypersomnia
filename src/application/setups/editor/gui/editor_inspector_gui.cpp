@@ -2270,6 +2270,8 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 		text_tooltip("For debugging.");
 	}
 
+	PROPERTY("Bot difficulty", bot_difficulty);
+
 	return result;
 }
 
