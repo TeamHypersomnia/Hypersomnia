@@ -606,6 +606,33 @@ void post_solve_arena_mode_ai(
 		}
 
 		const auto muzzle_pos = shot.muzzle_transform.pos;
+
+		/* Only react to gunshots within hearing range (80% of max_distance) */
+		{
+			bool out_of_range = false;
+			const auto gun_handle = cosm[shot.subject];
+
+			if (gun_handle.alive()) {
+				gun_handle.dispatch_on_having_all<invariants::gun>([&](const auto& typed_gun) {
+					const auto& gun_def = typed_gun.template get<invariants::gun>();
+					const auto max_dist = gun_def.muzzle_shot_sound.modifier.max_distance;
+
+					if (max_dist > 0.f) {
+						const auto hearing_dist = max_dist * 0.8f;
+						const auto dist_sq = (character_pos - muzzle_pos).length_sq();
+
+						if (dist_sq > hearing_dist * hearing_dist) {
+							out_of_range = true;
+						}
+					}
+				});
+			}
+
+			if (out_of_range) {
+				continue;
+			}
+		}
+
 		const auto raycast = physics.ray_cast_px(
 			cosm.get_si(),
 			character_pos,
