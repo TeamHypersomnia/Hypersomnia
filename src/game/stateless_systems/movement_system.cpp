@@ -601,10 +601,16 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							if (decal_def.is_blood_decal && !decal_def.is_footstep_decal) {
 								const auto decal_pos = typed_decal.get_logic_transform().pos;
 								if ((decal_pos - foot_query_pos).length_sq() < BLOOD_DETECTION_RADIUS * BLOOD_DETECTION_RADIUS) {
+									const auto& decal_state = typed_decal.template get<components::decal>();
+
+									/* Skip own blood splatters for 2 seconds after spawning */
+									if (decal_state.spawned_by == it.get_id() && clk.lasts(3000.f, typed_decal.when_born())) {
+										return;
+									}
+
 									++blood_splatters_stepped;
 									
 									/* Track most fresh (higher value = more recent) */
-									const auto& decal_state = typed_decal.template get<components::decal>();
 									if (decal_state.freshness > most_fresh_timestamp) {
 										most_fresh_timestamp = decal_state.freshness;
 									}

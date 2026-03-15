@@ -419,12 +419,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
 
-				/* Increment blood step counter for bloody footsteps */
-				if (auto* movement = subject.template find<components::movement>()) {
-					const auto steps_to_add = static_cast<uint8_t>(std::min(255.f, std::max(10.f, amount / 6.f)));
-					movement->blood_step_counter = static_cast<uint8_t>(std::min(255, movement->blood_step_counter + steps_to_add));
-				}
-
 				const auto prev_consciousness = consciousness.value;
 
 				if (consciousness.value > 0) {
