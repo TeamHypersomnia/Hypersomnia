@@ -135,8 +135,9 @@ inline void spawn_blood_splatters(
 
 	/* Calculate max distance based on damage: scales from base to max at full damage */
 	const auto damage_ratio = std::min(1.f, damage_amount / params.distance_damage_scale);
-	const auto max_distance = params.max_distance_base + 
-		(params.max_distance_at_full_damage - params.max_distance_base) * damage_ratio;
+	const auto max_distance = std::min(140.0f, params.max_distance_base + 
+		(params.max_distance_at_full_damage - params.max_distance_base) * damage_ratio
+	);
 
 	const auto half_spread = params.angle_spread / 2.f;
 
