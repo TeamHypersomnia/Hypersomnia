@@ -73,7 +73,8 @@ struct texture_in_progress {
 
 	void finalize_tasks_if_any() {
 		if (future_output.valid()) {
-			future_output.get();
+			auto discard = future_output.get();
+			(void)discard;
 		}
 	}
 

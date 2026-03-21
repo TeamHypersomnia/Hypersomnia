@@ -36,11 +36,13 @@ void viewables_streaming::request_rescan() {
 
 void viewables_streaming::finalize_pending_tasks() {
 	if (future_loaded_buffers.valid()) {
-		future_loaded_buffers.get();
+		auto discard = future_loaded_buffers.get();
+		(void)discard;
 	}
 
 	if (future_general_atlas.valid()) {
-		future_general_atlas.get();
+		auto discard = future_general_atlas.get();
+		(void)discard;
 	}
 
 	avatars.finalize_tasks_if_any();
@@ -399,7 +401,8 @@ void texture_in_progress<output_type>::finalize_load(augs::renderer& renderer) {
 
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	if (valid_and_is_ready(future_compressed_demos)) {
-		future_compressed_demos.get();
+		auto discard = future_compressed_demos.get();
+		(void)discard;
 	}
 
 	if (requested_avatar_preview.has_value()) {
@@ -509,7 +512,8 @@ bool viewables_streaming::general_atlas_in_progress() const {
 
 void viewables_streaming::wait_demos_compressed() {
 	if (future_compressed_demos.valid()) {
-		future_compressed_demos.get();
+		auto discard = future_compressed_demos.get();
+		(void)discard;
 	}
 }
 

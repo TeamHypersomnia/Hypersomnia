@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- boty (jeszcze)
+	- aggro zrandomizowac np. jak szlyszy krok do 20% szansy na aggro od metropolis i wiekszy dla resistance
+	- jak przeladowuje to do najblizszego tile z coverem
+	- jak slychac kroki gdzies to przy kampieniu celowac w najblizsza kratke z coverem albo nawet stanac jak patroluje i on jest blisko
+	- unikanie nejdow tez najblizszy cover
+
 - zaktualizowac tutorial
 
 - low effort - gory sprity dla idle stojacych rozjebanych bo z nich kapie krew to musi byc widac
