@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- gore system
+	- headshot -> has to deal additional 30 dmg for an arm to fall off, but like if the headshot caused to go from 10 to -26, then you have to deal up to -56 for an arm to fall off
+	- normal kill -> any time the health is below -30, arm falls off
+	- after corpse explosion, spawn a corpse sprite that can be walked on with a specific sound
+
 - boty (jeszcze)
 	- aggro zrandomizowac np. jak szlyszy krok do 20% szansy na aggro od metropolis i wiekszy dla resistance
 	- jak przeladowuje to do najblizszego tile z coverem
