@@ -59,6 +59,7 @@ namespace components {
 	struct sentience {
 		// GEN INTROSPECTOR struct components::sentience
 		augs::stepped_timestamp time_of_last_received_damage;
+		augs::stepped_timestamp time_of_last_received_hit;
 		augs::stepped_timestamp time_of_last_exertion;
 
 		augs::stepped_cooldown cast_cooldown_for_all_spells;

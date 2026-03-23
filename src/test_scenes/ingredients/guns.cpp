@@ -2838,7 +2838,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.54");
+			charge_deposit_def.space_available = to_space_units("0.57");
 			charge_deposit_def.mounting_duration_ms = 300.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::PRO90_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -3515,7 +3515,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.3f);
+			set_density_mult(meta, 0.8f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2500;
 			set_chambering_duration_ms(meta, 600.f);

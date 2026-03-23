@@ -23,8 +23,13 @@
 #include "augs/misc/web_sdk_events.h"
 #include "augs/templates/algorithm_templates.h"
 
+#include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/test_scene_flavour_ids.h"
+
 void web_sdk_happy_time();
 void snap_interpolated_to_logical(cosmos& cosm);
+
+static std::optional<item_flavour_id> test_enemy_weapon;//= to_entity_flavour_id(test_shootable_weapons::BAKA47);
 
 using portal_marker = editor_area_marker_node;
 
@@ -377,6 +382,12 @@ void test_scene_setup::restart_mode() {
 	}
 
 	auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+
+	if (test_enemy_weapon) {
+		if (auto* rs = std::get_if<test_mode_ruleset>(&ruleset)) {
+			rs->factions[enemy_faction].round_start_eq.weapon = *test_enemy_weapon;
+		}
+	}
 
 
 	if (is_planting_level) {

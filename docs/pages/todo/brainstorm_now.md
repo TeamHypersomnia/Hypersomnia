@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- play shot animation when receiving any dmg
+	- timestamp last received dmg?
+
+- łeb niech bedzie ciezszy zeby nie lecial tak daleko, moze tez spawnowac krew 1-2 razy tak jak lapy odpadniete
+
 - gore system
 	- headshot -> has to deal additional 30 dmg for an arm to fall off, but like if the headshot caused to go from 10 to -26, then you have to deal up to -56 for an arm to fall off
 	- normal kill -> any time the health is below -30, arm falls off

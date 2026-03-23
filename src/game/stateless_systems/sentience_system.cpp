@@ -418,6 +418,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
+				sentience.time_of_last_received_hit = cosm.get_timestamp();
 
 				const auto prev_consciousness = consciousness.value;
 
@@ -462,6 +463,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				const auto now = cosm.get_timestamp();
 
 				sentience.time_of_last_received_damage = now;
+				sentience.time_of_last_received_hit = now;
 				sentience.time_of_last_exertion = now;
 
 				sentience.cast_cooldown_for_all_spells.set(
@@ -492,6 +494,8 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			personal_electricity.value -= amount;
 
 			if (amount > 0) {
+				sentience.time_of_last_received_hit = cosm.get_timestamp();
+
 				if (!personal_electricity.is_positive()) {
 					h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
 				}

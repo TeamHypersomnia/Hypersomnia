@@ -2,6 +2,7 @@
 #include "game/components/gun_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/melee_fighter_component.h"
+#include "game/components/sentience_component.h"
 #include "game/assets/animation_math.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/assets/animation.h"
@@ -205,6 +206,18 @@ auto calc_stance_usage(
 	const auto& logicals = cosm.get_logical_assets();
 
 	const auto n = wielded_items.size();
+
+	if (const auto sentience = typed_handle.template find<components::sentience>()) {
+		if (sentience->time_of_last_received_hit.was_set()) {
+			if (const auto pain_animation = logicals.find(stance.pain)) {
+				const auto passed_ms = cosm.get_clock().get_passed_ms(sentience->time_of_last_received_hit);
+
+				if (const auto found_frame = ::calc_current_frame(*pain_animation, passed_ms)) {
+					return result_t::shoot(*found_frame);
+				}
+			}
+		}
+	}
 
 	if (n > 0) {
 		if (const auto rld = ::calc_reloading_movement(cosm, wielded_items)) {

@@ -22,6 +22,7 @@ struct stance_animations {
 	assets::torso_animation_id grip_to_mag;
 	assets::torso_animation_id pocket_to_mag;
 	assets::torso_animation_id arming_throwable;
+	assets::torso_animation_id pain;
 	// END GEN INTROSPECTORS
 };
 
