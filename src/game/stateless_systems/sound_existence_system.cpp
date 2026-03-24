@@ -349,7 +349,10 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.damage.total() > 0.f) {
 				effect = cosm.get_common_assets().ped_shield_impact_sound;
-				effect.modifier.pitch *= 1.2f + h.damage.total() / 100.f;
+				//effect.modifier.pitch *= 1.0f - std::min(0.5f, h.damage.total() / 100.f);
+
+				auto rng = step.step_rng;
+				effect.modifier.pitch += rng.randval(-0.1f, 0.1f);
 
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
 					effect = cosm.get_common_assets().ped_shield_destruction_sound;
