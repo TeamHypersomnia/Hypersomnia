@@ -101,6 +101,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		cone_for_explosion_particles.eye.zoom *= 0.9f;
 
 		exploding_rings.advance(
+			cosm,
 			rng, 
 			cone_for_explosion_particles, 
 			cosm.get_common_assets(), 
@@ -574,7 +575,7 @@ void audiovisual_state::standard_post_solve(
 			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 				if (h.damage.total() > 0) {
 					number = rgba(100, 100, 255, 255);
-					highlight = rgba(0, 146, 222, 255);
+					highlight = white;
 				}
 				else {
 					number = cyan;
@@ -584,7 +585,7 @@ void audiovisual_state::standard_post_solve(
 				if (faction == faction_type::RESISTANCE) {
 					if (h.damage.total() > 0) {
 						number = rgba(255, 90, 0, 255);
-						highlight = rgba(255, 90, 0, 255);
+						highlight = white;
 					}
 					else {
 						number = cyan;

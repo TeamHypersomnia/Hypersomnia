@@ -300,6 +300,12 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			return messages::thunder_effect(predictability);
 		};
 
+		auto victim_transform = subject.find_logic_transform();
+
+		if (victim_transform == std::nullopt) {
+			continue;
+		}
+
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.damage.total() > 0) {
 				const auto base_radius = destroyed ? 80.f : h.damage.total() * 1.5f;
@@ -374,25 +380,56 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					auto msg = make_ring_input();
 					auto& ring = msg.payload;
 
-					ring.outer_radius_start_value = base_radius / 1.5f;
-					ring.outer_radius_end_value = base_radius / 3.f;
-
-					ring.inner_radius_start_value = base_radius / 2.5f;
-					ring.inner_radius_end_value = base_radius / 3.f;
-
-					ring.emit_particles_on_ring = false;
-
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = rgba(cyan).mult_brightness(1.1);
+					ring.color = white;
 
-					if (subject.get_official_faction() == faction_type::RESISTANCE) {
-						ring.color = rgba(255, 90, 0, 255);
+					if (destroyed) {
+						ring.center = victim_transform->pos;
+					}
+					else {
+						ring.center = h.point_of_impact;
 					}
 
-					ring.center = h.point_of_impact;
+					{
+						auto dmg = std::min(40.0f, h.damage.total()) * 3.5f;
 
-					step.post_message(std::move(msg));
+						if (destroyed) {
+							dmg = 190;
+							ring.fixed_thickness = 8.0f;
+							ring.maximum_duration_seconds = 0.115f;
+						}
+						else {
+							ring.fixed_thickness = 3.0f;
+							ring.maximum_duration_seconds = 0.10f;
+						}
+
+						ring.outer_radius_start_value = 20;
+						ring.outer_radius_end_value   = 20 + dmg;
+
+						ring.halve_per_ms = 150.0f;
+						ring.emit_light = false;
+						ring.final_alpha = 0.7f;
+
+						ring.color = white;
+
+						if (destroyed) {
+							ring.final_alpha = 0.7f;
+							ring.halve_per_ms = 50.0f;
+						}
+
+						step.post_message(std::move(msg));
+
+						ring.fixed_thickness = -1.0f;
+						ring.inner_radius_start_value = 0;
+						ring.inner_radius_end_value   = 0;
+						ring.emit_light = destroyed;
+						ring.final_alpha = 0.9f;
+
+						ring.color = rgba(255, 255, 255, 20);
+
+						step.post_message(std::move(msg));
+					}
 				}
 
 				{
@@ -417,7 +454,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					ring.center = h.point_of_impact;
 
-					step.post_message(std::move(msg));
+					// step.post_message(std::move(msg));
 				}
 			}
 		}

@@ -17,6 +17,7 @@ class particles_simulation_system;
 struct randomization;
 struct common_assets;
 struct explosions_settings;
+class cosmos;
 
 class exploding_ring_system {
 public:
@@ -36,9 +37,10 @@ public:
 	void acquire_new_ring(I&&);
 
 	void advance(
+		const cosmos& cosm,
 		randomization& rng,
 		const camera_cone queried_cone,
-		const common_assets& cosm,
+		const common_assets& common,
 		const particle_effects_map&,
 		const augs::delta dt,
 		const explosions_settings& settings,

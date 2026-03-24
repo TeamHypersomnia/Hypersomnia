@@ -4,6 +4,10 @@
 #include "augs/templates/container_templates.h"
 
 #include "game/cosmos/cosmos_common.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/for_each_entity.h"
+#include "game/cosmos/typed_entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
@@ -19,6 +23,7 @@ void exploding_ring_system::clear() {
 }
 
 void exploding_ring_system::advance(
+	const cosmos& cosm,
 	randomization& rng,
 	const camera_cone queried_cone,
 	const common_assets& common,
@@ -35,6 +40,12 @@ void exploding_ring_system::advance(
 
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;
+
+		if (r.target.is_set()) {
+			if (const auto handle = cosm[r.target]) {
+				r.center = handle.get_logic_transform().pos;
+			}
+		}
 
 		const auto secs_remaining = r.maximum_duration_seconds - (global_time_seconds - e.time_of_occurence_seconds);
 
@@ -150,11 +161,6 @@ void exploding_ring_system::advance(
 	});
 }
 
-#include "game/cosmos/cosmos.h"
-#include "game/cosmos/for_each_entity.h"
-#include "game/cosmos/typed_entity_handle.h"
-#include "game/cosmos/entity_handle.h"
-
 void exploding_ring_system::draw_continuous_rings(
 	const cosmos& cosm,
 	const augs::drawer_with_default output,
@@ -251,8 +257,25 @@ void exploding_ring_system::draw_rings(
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 		const auto ratio = passed / r.maximum_duration_seconds;
 
-		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
-		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / eye.zoom;
+		float outer_radius_now;
+
+		if (r.halve_per_ms > 0.0f) {
+			const auto passed_ms = static_cast<float>(passed) * 1000.0f;
+			const auto exp_ratio = 1.0f - std::pow(0.5f, passed_ms / r.halve_per_ms);
+			outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, exp_ratio) / eye.zoom;
+		}
+		else {
+			outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / eye.zoom;
+		}
+
+		float inner_radius_now;
+
+		if (r.fixed_thickness > 0.0f) {
+			inner_radius_now = outer_radius_now - r.fixed_thickness / eye.zoom;
+		}
+		else {
+			inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
+		}
 
 		const auto aabb_size = vec2::square(outer_radius_now * 2 * eye.zoom);
 		const auto explosion_ltrb = ltrbi::center_and_size(world_explosion_center, aabb_size);
@@ -271,12 +294,13 @@ void exploding_ring_system::draw_rings(
 		const auto& vis = r.visibility;
 
 		auto considered_color = r.color;
-		considered_color.a = static_cast<rgba_channel>(considered_color.a * (1.f - ratio));
+		const float alpha_t = augs::interp(1.0f, r.final_alpha, ratio);
+		considered_color.a = static_cast<rgba_channel>(considered_color.a * alpha_t);
 
 		const int alpha_levels = 2;
 		const int alpha_step = 255 / alpha_levels;
 
-		float a = 1.0f - ratio;
+		float a = alpha_t;
 		int a255 = int(a * 255.0f);
 
 		a255 = alpha_step * (a255 / alpha_step) + alpha_step;
@@ -365,6 +389,10 @@ void exploding_ring_system::draw_highlights_of_explosions(
 	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
 
 	for (const auto& r : rings) {
+		if (!r.in.emit_light) {
+			continue;
+		}
+
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		const auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
