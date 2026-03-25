@@ -1175,7 +1175,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ICE_PROJECTILE_DESTRUCTION);
 
 			missile.damage.base = 10;
-			missile.max_lifetime_ms = 650.f;
+			missile.max_lifetime_ms = 850.f;
 
 			missile.trace_sound.id = {};
 
@@ -1310,7 +1310,7 @@ namespace test_flavours {
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
-			missile.max_lifetime_ms = 850.f;
+			missile.max_lifetime_ms = 1050.f;
 			missile.damage.base = 10;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
