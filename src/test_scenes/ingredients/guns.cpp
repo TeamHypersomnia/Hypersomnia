@@ -1191,6 +1191,73 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::CYBERSPRAY_ROUND);
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_violet).neon_color = bullet_violet_neon;
+
+			{
+				{
+					invariants::trace trace_def;
+
+					trace_def.max_multiplier_x = {0.670f, 1.8f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 466.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+
+					meta.set(trace_def);
+				}
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+			meta.template get<invariants::rigid_body>().damping.linear = 2.0f;
+
+			invariants::missile missile;
+
+			{
+				auto& dest_eff = missile.damage.effects.destruction;
+				dest_eff.particles.modifier.color = pink;
+				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			}
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.modifier.color = muzzle_violet;
+			missile.trace_particles.modifier.scale_amounts *= 0.5f;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
+			missile.trace_particles_fly_backwards = true;
+			missile.muzzle_leave_particles.modifier.color = pink;
+			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.modifier.color = pink;
+			missile.ricochet_born_cooldown_ms = 17.f;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			missile.max_lifetime_ms = 600.f;
+			missile.damage.base = 10;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.doppler_factor = 0.6f;
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::SZCZUR_ROUND);
 
 
@@ -2492,7 +2559,7 @@ namespace test_flavours {
 				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
 
 				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
-				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZCZUR_ROUND);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYBERSPRAY_ROUND);
 
 				meta.set(cartridge);
 			}
@@ -3497,7 +3564,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.0f;
-			gun_def.head_radius_multiplier = 0.85f;
+			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 1.f;
@@ -3517,7 +3584,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.8f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
-			meta.get<invariants::item>().standard_price = 2500;
+			meta.get<invariants::item>().standard_price = 2600;
 			set_chambering_duration_ms(meta, 600.f);
 
 			auto& item = meta.get<invariants::item>();
@@ -3557,8 +3624,8 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.4;
-			gun_def.headshot_multiplier = 2.5f;
-			gun_def.head_radius_multiplier = 0.85f;
+			gun_def.headshot_multiplier = 3.0f;
+			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
@@ -3620,8 +3687,8 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.4;
-			gun_def.headshot_multiplier = 2.5f;
-			gun_def.head_radius_multiplier = 0.85f;
+			gun_def.headshot_multiplier = 3.0f;
+			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
@@ -3680,7 +3747,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.2;
-			gun_def.head_radius_multiplier = 0.4f;
+			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 1.f;
@@ -3700,7 +3767,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.6f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f, 0.f, false);
-			meta.get<invariants::item>().standard_price = 2300;
+			meta.get<invariants::item>().standard_price = 2400;
 			set_chambering_duration_ms(meta, 300.f);
 
 			auto& item = meta.get<invariants::item>();
