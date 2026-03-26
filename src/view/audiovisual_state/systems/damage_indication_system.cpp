@@ -14,6 +14,17 @@
 #include "augs/drawing/sprite_helpers.h"
 #include "augs/log.h"
 
+#include "augs/math/easing.h"
+
+/* Constexprs for damage indicator parabolic curves */
+constexpr float parabolic_start_y = -20.0f;
+constexpr float parabolic_end_y = 180.0f;
+constexpr float parabolic_max_peak_height = 240.0f;
+constexpr float parabolic_horizontal_speed = 80.0f;
+
+/* Constexpr for total damage number size bounce */
+constexpr float total_damage_size_bounce_mult = 1.9f;
+
 void damage_indication_system::clear() {
 	streaks.clear();
 	awards.clear();
@@ -62,6 +73,7 @@ void damage_indication_system::add(const entity_id subject, const damage_event::
 	streak.events.push_back(new_event);
 	streak.total += new_in.amount;
 	++streak.total_damage_events;
+	streak.when_last_event_added = global_time_seconds;
 
 	active_white_highlights[subject].time_of_occurence_seconds = global_time_seconds;
 }
@@ -130,14 +142,30 @@ void damage_indication_system::advance(
 				[&](auto& e) {
 					const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 
-					const auto max_total_lifetime = 
-						settings.indicator_fading_duration_secs 
-						+ settings.single_indicator_lifetime_secs
-					;
+					if (e.parabolic_curve) {
+						if (e.time_fully_displayed <= 0.0) {
+							/* Still accumulating displayed value - don't erase */
+						}
+						else {
+							const auto passed_since_full = global_time_seconds - e.time_fully_displayed;
+							const auto parabolic_lifetime = settings.single_indicator_lifetime_secs * 0.5f + settings.indicator_fading_duration_secs;
 
-					if (passed >= max_total_lifetime) {
-						streak.when_last_event_disappeared = global_time_seconds;
-						return true;
+							if (passed_since_full >= parabolic_lifetime) {
+								streak.when_last_event_disappeared = global_time_seconds;
+								return true;
+							}
+						}
+					}
+					else {
+						const auto max_total_lifetime =
+							settings.indicator_fading_duration_secs
+							+ settings.single_indicator_lifetime_secs
+						;
+
+						if (passed >= max_total_lifetime) {
+							streak.when_last_event_disappeared = global_time_seconds;
+							return true;
+						}
 					}
 
 					if (accum_speed.is_enabled) {
@@ -146,6 +174,10 @@ void damage_indication_system::advance(
 					}
 					else {
 						e.displayed_amount = e.in.amount;
+					}
+
+					if (e.parabolic_curve && e.time_fully_displayed <= 0.0 && e.displayed_amount >= e.in.amount) {
+						e.time_fully_displayed = global_time_seconds;
 					}
 
 					return false;
@@ -369,6 +401,8 @@ void damage_indication_system::draw_indicators(
 					auto border = border_color;
 					border.a = text_color.a;
 
+					const auto tri_start = output.output_buffer.size();
+
 					augs::gui::text::print_stroked(
 						output,
 						text_pos,
@@ -376,6 +410,25 @@ void damage_indication_system::draw_indicators(
 						{ augs::ralign::CX, augs::ralign::CY },
 						border
 					);
+
+					/* Bouncy size effect for total damage number */
+					{
+						const auto since_last_hit = global_time_seconds - streak.when_last_event_added;
+						const auto bounce_duration = static_cast<double>(settings.character_silhouette_damage_highlight_secs);
+
+						if (since_last_hit < bounce_duration) {
+							const auto bounce_ratio = static_cast<float>(since_last_hit / bounce_duration);
+							const auto current_mult = augs::easing(augs::easing_type::SQRT, total_damage_size_bounce_mult, 1.0f, bounce_ratio);
+
+							const auto center = vec2(text_pos);
+
+							for (auto i = tri_start; i < output.output_buffer.size(); ++i) {
+								for (auto& v : output.output_buffer[i].vertices) {
+									v.pos = center + (v.pos - center) * current_mult;
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -384,7 +437,6 @@ void damage_indication_system::draw_indicators(
 			const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 
 			const auto current_offset = indicator_offsets[e.offset_slot % indicator_offsets.size()];
-			const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
 
 			const auto round_amount = static_cast<int>(e.displayed_amount);
 
@@ -412,11 +464,48 @@ void damage_indication_system::draw_indicators(
 			auto text_pos = cone.to_screen_space(world_pos + current_offset * offset_mult);
 			auto text_color = get_indicator_color(e.in, subject.get_official_faction());
 
-			if (fading_progress >= 0.0f) {
-				const auto fading_mult = std::sqrt(fading_progress / settings.indicator_fading_duration_secs);
+			if (e.parabolic_curve) {
+				if (e.time_fully_displayed > 0.0) {
+					/* Value fully displayed - start parabolic curve */
+					const auto curve_passed = global_time_seconds - e.time_fully_displayed;
+					const auto alpha1_duration = settings.single_indicator_lifetime_secs * 0.5f;
+					const auto damage_ratio = std::clamp(e.in.amount / 100.0f, 0.0f, 1.0f);
+					const auto chosen_duration = settings.indicator_fading_duration_secs*(0.6f+damage_ratio*0.4f);
+					const auto total_parabolic_lifetime = alpha1_duration + chosen_duration;
+					const auto t = std::pow(std::clamp(static_cast<float>(curve_passed / total_parabolic_lifetime), 0.0f, 1.0f), 0.9f+damage_ratio*0.05f);
 
-				text_pos.y -= fading_mult * settings.indicator_rising_speed;
-				text_color.mult_alpha(1 - fading_mult);
+
+
+					/* Parabolic y offset: flatter for higher damage */
+					const auto peak_height = parabolic_max_peak_height + damage_ratio*50.0f;
+					const auto y_offset = parabolic_start_y + (parabolic_end_y - parabolic_start_y) * t - peak_height * 4.0f * t * (1.0f - t);
+
+					/* Horizontal offset based on impact velocity direction */
+					const auto x_dir = e.in.impact_velocity.x >= 0.0f ? -1.0f : 1.0f;
+					const auto x_offset = x_dir * (parabolic_horizontal_speed+damage_ratio*50.0f) * t;
+
+					text_pos.x += x_offset;
+					text_pos.y += y_offset;
+
+					/* Alpha: stay at 1.0 for alpha1_duration, then fade */
+					if (curve_passed > alpha1_duration) {
+						const auto fade_progress = static_cast<float>((curve_passed - alpha1_duration) / chosen_duration);
+						const auto fade_mult = std::sqrt(std::clamp(fade_progress, 0.0f, 1.0f));
+						text_color.mult_alpha(1.0f - fade_mult);
+					}
+				}
+				/* else: still accumulating - stay in place with alpha = 1.0 */
+			}
+			else {
+				/* Old behavior: stay in place, then drift upward with fade */
+				const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
+
+				if (fading_progress >= 0.0f) {
+					const auto fading_mult = std::sqrt(fading_progress / settings.indicator_fading_duration_secs);
+
+					text_pos.y -= fading_mult * settings.indicator_rising_speed;
+					text_color.mult_alpha(1 - fading_mult);
+				}
 			}
 
 			auto border = border_color;

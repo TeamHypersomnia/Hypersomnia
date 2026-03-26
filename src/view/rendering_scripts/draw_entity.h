@@ -618,6 +618,8 @@ FORCE_INLINE void specific_draw_border(
 	}
 }
 
+constexpr bool should_also_enlarge_items_v = true;
+
 template <class E, class F = default_customize_input>
 FORCE_INLINE void specific_draw_color_highlight(
 	const cref_typed_entity_handle<E> typed_handle,
@@ -626,9 +628,16 @@ FORCE_INLINE void specific_draw_color_highlight(
 	F&& customize_input = default_customize_input(),
 	vec2 size_mult = vec2(1.0f, 1.0f)
 ) {
-	auto highlight_maker = [color, &customize_input, size_mult](auto renderable, const auto& manager, const auto& input) {
+	const auto center = typed_handle.get_viewing_transform(in.interp).pos;
+
+	auto highlight_maker = [color, &customize_input, size_mult, center](auto renderable, const auto& manager, auto input) {
 		renderable.set_color(color);
-		renderable.size *= size_mult;
+		renderable.size = vec2(renderable.size) * size_mult;
+
+		if constexpr (should_also_enlarge_items_v) {
+			input.renderable_transform.pos = center + (vec2(input.renderable_transform.pos) - center) * size_mult;
+		}
+
 		augs::draw(renderable, manager, customize_input(input));
 	};
 
@@ -698,10 +707,11 @@ FORCE_INLINE void draw_neon_map(
 FORCE_INLINE void draw_color_highlight(
 	const const_entity_handle& handle,
 	const rgba color,
-	const draw_renderable_input& in
+	const draw_renderable_input& in,
+	vec2 size_mult = vec2(1.0f, 1.0f)
 ) {
-	handle.constrained_dispatch<entities_with_renderables>([&in, color](const auto typed_handle) {
-		specific_draw_color_highlight(typed_handle, color, in);
+	handle.constrained_dispatch<entities_with_renderables>([&in, color, size_mult](const auto typed_handle) {
+		specific_draw_color_highlight(typed_handle, color, in, default_customize_input(), size_mult);
 	});
 }
 

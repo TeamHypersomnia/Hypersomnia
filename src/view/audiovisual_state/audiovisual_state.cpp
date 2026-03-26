@@ -622,6 +622,7 @@ void audiovisual_state::standard_post_solve(
 			auto de = damage_event::input();
 
 			de.pos = h.point_of_impact;
+			de.impact_velocity = h.impact_velocity;
 
 			float original_ratio = 0.0f;
 
@@ -665,6 +666,8 @@ void audiovisual_state::standard_post_solve(
 	if (acquire_highlights.should_play(settings.prediction)) {
 		auto& highlights = get<pure_color_highlight_system>();
 
+		constexpr float highlight_size_bounce_mult = 1.5f;
+
 		for (const auto& h : healths) {
 			if (augs::is_nonzero(h.damage.total())) {
 				const auto cols = color_info(h, cosm[h.subject].get_official_faction());
@@ -674,6 +677,7 @@ void audiovisual_state::standard_post_solve(
 				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.damage.ratio_effective_to_maximum * 5);
 				new_highlight.maximum_duration_seconds = input.damage_indication.character_silhouette_damage_highlight_secs;
 				new_highlight.color = cols.highlight;
+				new_highlight.size_mult_start = highlight_size_bounce_mult;
 
 				highlights.add(h.subject, new_highlight);
 			}

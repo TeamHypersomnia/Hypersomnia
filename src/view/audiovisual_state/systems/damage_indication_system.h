@@ -41,6 +41,7 @@ public:
 			event_type type = event_type::HEALTH;
 			real32 amount = 0.0f;
 			vec2 pos;
+			vec2 impact_velocity;
 			transformr head_transform;
 
 			messages::health_event::result_type special_result = messages::health_event::result_type::NONE;
@@ -54,8 +55,10 @@ public:
 
 		real32 displayed_amount = 0.0f;
 		double time_of_occurence_seconds = 0.0;
+		double time_fully_displayed = 0.0;
 		uint32_t offset_slot = 0;
 		mutable std::optional<vec2> first_pos;
+		bool parabolic_curve = true;
 
 		bool is_set() const {
 			return in.amount != 0.0f;
@@ -67,6 +70,7 @@ private:
 		std::vector<damage_event> events;
 
 		double when_last_event_disappeared = 0.0;
+		double when_last_event_added = 0.0;
 
 		real32 total = 0.0f;
 		real32 displayed_total = 0.0f;

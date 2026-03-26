@@ -15,6 +15,8 @@
 #include "view/audiovisual_state/systems/pure_color_highlight_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+#include "augs/math/easing.h"
+
 void pure_color_highlight_system::clear() {
 	highlights.clear();
 }
@@ -78,6 +80,10 @@ void pure_color_highlight_system::draw_highlights(
 			static_cast<rgba_channel>(255.f * time_ratio * r.in.starting_alpha_ratio * teleport_alpha)
 		};
 
-		draw_color_highlight(subject, target_color, in);
+		const auto passed_ratio = std::clamp(static_cast<float>(passed / r.in.maximum_duration_seconds), 0.0f, 1.0f);
+		const auto current_size_mult = augs::easing(augs::easing_type::SQRT, r.in.size_mult_start, 1.0f, passed_ratio);
+		const auto sm = vec2(current_size_mult, current_size_mult);
+
+		draw_color_highlight(subject, target_color, in, sm);
 	}
 }
