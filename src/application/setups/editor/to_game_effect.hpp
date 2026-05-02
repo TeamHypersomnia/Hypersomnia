@@ -5,11 +5,20 @@ auto convert_to_game_effect(A get_asset_id_of, R find_resource, const T& in) {
 	auto do_full_modifier = [&](auto& out, auto& from) {
 		out.gain = from.gain;
 		out.pitch = from.pitch;
-		out.max_distance = from.max_distance.is_enabled ? from.max_distance.value : -1;
-		out.reference_distance = from.reference_distance.is_enabled ? from.reference_distance.value : -1;
 		out.doppler_factor = from.doppler_intensity;
-		out.distance_model = from.distance_model.is_enabled ? from.distance_model.value : augs::distance_model::NONE;
 		out.always_direct_listener = !from.spatialize;
+
+		if (from.max_distance.is_enabled) {
+			out.max_distance = from.max_distance.value;
+		}
+
+		if (from.reference_distance.is_enabled) {
+			out.reference_distance = from.reference_distance.value;
+		}
+
+		if (from.distance_model.is_enabled) {
+			out.distance_model = from.distance_model.value;
+		}
 
 		if (from.loop) {
 			out.repetitions = -1;
