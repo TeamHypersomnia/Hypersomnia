@@ -93,6 +93,7 @@ struct test_mode_player {
 
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;
+	bool is_bot = false;
 
 	std::optional<ai_path_navigation_state> debug_navigation;
 	// END GEN INTROSPECTOR

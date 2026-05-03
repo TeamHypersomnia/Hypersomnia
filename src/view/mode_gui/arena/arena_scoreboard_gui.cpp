@@ -772,7 +772,11 @@ void arena_scoreboard_gui::draw_gui(
 			
 			auto clan = std::string("");
 
-			if (in.player_metas) {
+			if (player_data.is_bot) {
+				clan = "[BOT]";
+			}
+
+			if (clan.empty() && in.player_metas) {
 				clan = (*in.player_metas)[player_id.value].synced.public_settings.clan;
 
 				if (!clan.empty()) {
