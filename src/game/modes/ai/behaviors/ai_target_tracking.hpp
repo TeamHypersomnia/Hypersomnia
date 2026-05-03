@@ -10,8 +10,8 @@
 	All values in seconds.
 */
 namespace ai_combat_time {
-	constexpr auto BOMB_CARRIER_MIN_SECS = 2.0f;
-	constexpr auto BOMB_CARRIER_MAX_SECS = 4.0f;
+	constexpr auto BOMB_CARRIER_MIN_SECS = 0.5f;
+	constexpr auto BOMB_CARRIER_MAX_SECS = 2.0f;
 
 	constexpr auto DEFUSER_LONG_ENGAGEMENT_MIN_SECS = 2.0f;
 	constexpr auto DEFUSER_LONG_ENGAGEMENT_MAX_SECS = 12.0f;
@@ -151,7 +151,7 @@ struct ai_target_tracking {
 			*/
 			engagement_started_secs = global_time_secs;
 			engagement_timeout_secs = ::pick_combat_time_secs(rng, is_bomb_carrier, is_defuser, bomb_time_remaining_secs) + reaction_time_secs;
-			timeout_from_engagement_start = is_defuser;
+			timeout_from_engagement_start = is_defuser || is_bomb_carrier;
 		}
 	}
 
@@ -198,7 +198,7 @@ struct ai_target_tracking {
 		last_known_time_secs = global_time_secs;
 		engagement_started_secs = global_time_secs;
 		engagement_timeout_secs = ::pick_combat_time_secs(rng, is_bomb_carrier, is_defuser, bomb_time_remaining_secs) + reaction_time_secs;
-		timeout_from_engagement_start = is_defuser;
+		timeout_from_engagement_start = is_defuser || is_bomb_carrier;
 	}
 
 	/*
