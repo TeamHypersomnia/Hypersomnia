@@ -92,6 +92,8 @@ namespace test_flavours {
 
 			gun_def.firing_engine_particles.modifier.scale_amounts = 0.8f;
 			gun_def.trigger_pull_sound.id = to_sound_id(test_scene_sound_id::TRIGGER_PULL);
+
+			//gun_def.muzzle_shot_sound.modifier.pitch *= 1.5f;
 			//gun_def.firing_engine_particles.modifier.scale_lifetimes = 0.5f;
 		};
 

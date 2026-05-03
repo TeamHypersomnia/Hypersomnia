@@ -183,8 +183,9 @@ namespace augs {
 		AL_CHECK(alSourcei(id, AL_SOURCE_SPATIALIZE_SOFT, f ? AL_TRUE : AL_FALSE));
 	}
 
-	void sound_source::set_pitch(const float pitch) const {
+	void sound_source::set_pitch(float pitch) const {
 		(void)pitch;
+		//pitch *= 0.75f;
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
 #if TRACE_PARAMETERS
 		LOG_NVPS(pitch);
