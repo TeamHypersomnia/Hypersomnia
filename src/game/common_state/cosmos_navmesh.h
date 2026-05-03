@@ -53,6 +53,7 @@ struct navmesh_portal {
 	// GEN INTROSPECTOR struct navmesh_portal
 	vec2u in_cell_pos = vec2u::zero;
 	vec2u out_cell_pos = vec2u::zero;
+	vec2 in_world_pos = vec2::zero;
 	int out_island_index = 0;
 	// END GEN INTROSPECTOR
 };

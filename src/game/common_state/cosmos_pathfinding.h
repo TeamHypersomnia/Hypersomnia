@@ -45,6 +45,7 @@ struct pathfinding_path {
 	island_id_type island_index = 0;
 	std::vector<pathfinding_node> nodes;
 	std::optional<cell_on_navmesh> final_portal_exit;
+	std::optional<vec2> destination_portal_world_pos;
 	// END GEN INTROSPECTOR
 };
 

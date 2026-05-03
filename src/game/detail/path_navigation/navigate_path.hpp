@@ -51,6 +51,23 @@ inline navigate_path_result navigate_path(
 	auto& navigation = *navigation_opt;
 
 	/*
+		If the path leads through a portal and the bot is now on a different
+		island, the teleport has fired — this segment is complete.
+	*/
+	if (navigation.main.path.final_portal_exit.has_value()) {
+		const auto current_island_opt = ::find_island_for_position(navmesh, bot_pos);
+
+		if (current_island_opt.has_value()
+			&& *current_island_opt != navigation.main.path.island_index
+		) {
+			result.path_completed = true;
+			result.crosshair_offset = navigation.target_transform.get_direction() * 200.0f;
+			navigation_opt.reset();
+			return result;
+		}
+	}
+
+	/*
 		Advance along path and check for deviation.
 	*/
 	bool cell_path_completed = false;

@@ -163,6 +163,21 @@ inline void advance_path_if_cell_reached(
 		}
 
 		if (should_advance) {
+			/*
+				If the path ends at a portal, never advance past the last node.
+				The bot must remain on the portal cell to be teleported. Path
+				completion is detected separately by navigate_path observing
+				that the bot has moved to a different island (= teleported).
+				If the bot is pushed off the portal cell, check_path_deviation
+				will route it back.
+			*/
+			const bool would_finish = (progress.node_index + 1 >= path.nodes.size());
+			const bool path_to_portal = path.final_portal_exit.has_value();
+
+			if (would_finish && path_to_portal) {
+				return false;
+			}
+
 			++progress.node_index;
 
 			/*

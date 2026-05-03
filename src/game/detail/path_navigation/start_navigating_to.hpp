@@ -55,10 +55,33 @@ inline std::optional<ai_path_navigation_state> start_navigating_to(
 
 	AI_LOG("start_navigating_to: ok");
 
+	/*
+		If this path leads to a portal (the segment ends at a portal entry cell),
+		override the navigation target to be the portal's exact stand-on point
+		with rotation vec2(1, 0). The portal direction itself is irrelevant for
+		teleportation, but giving target_transform a defined direction lets the
+		easing logic in get_navigation_movement_direction smoothly orient the
+		bot as it stops on the portal cell. The bot will reorient on whatever
+		segment is started after teleportation.
+
+		exact_destination is intentionally NOT forced on here: the cell-stop
+		behavior for portals is handled inside advance_path_if_cell_reached
+		(it never advances past the portal node), so the bot stays on the
+		portal cell regardless of the caller's exact_destination preference.
+	*/
+	auto effective_target_transform = target_transform;
+
+	if (path->destination_portal_world_pos.has_value()) {
+		effective_target_transform = transformr(
+			*path->destination_portal_world_pos,
+			vec2(1.0f, 0.0f).degrees()
+		);
+	}
+
 	return ai_path_navigation_state {
 		path_navigation_progress{ std::move(*path), 0 },
 		std::nullopt,
-		target_transform,
+		effective_target_transform,
 		new_target_cell_id
 	};
 }

@@ -461,6 +461,12 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 		portal.out_cell_pos
 	);
 
+	/*
+		Use the portal entity's exact world position as the precise stand-on point
+		(portals may not be perfectly cell-centered).
+	*/
+	result.destination_portal_world_pos = portal.in_world_pos;
+
 	return result;
 }
 
@@ -489,7 +495,8 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 		const auto start_cell = ::world_to_cell(island, source_pos);
 
 		/*
-			Check for same-island portals that might provide a shortcut.
+			Check for same-island portals that might provide a shortcut OR a way
+			around walls when the two endpoints are walled off from each other.
 		*/
 		const auto direct_dist = ::world_distance(source_pos, target_pos);
 
@@ -501,62 +508,99 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 			target_pos
 		);
 
-		if (best_same_island_portal_opt.has_value()) {
-			const auto best_same_island_portal = best_same_island_portal_opt.value();
-			const auto& portal = island.portals[best_same_island_portal];
+		auto try_portal = [&]() -> std::optional<pathfinding_path> {
+			if (!best_same_island_portal_opt.has_value()) {
+				return std::nullopt;
+			}
 
+			const auto best_same_island_portal = *best_same_island_portal_opt;
+			const auto& portal = island.portals[best_same_island_portal];
+			const auto portal_center_world = ::cell_to_world(island, portal.in_cell_pos);
+
+			auto path_nodes = ::find_path_within_island(
+				island,
+				start_cell,
+				portal_center_world,
+				best_same_island_portal,
+				physics_hints,
+				ctx
+			);
+
+			if (!path_nodes.has_value()) {
+				return std::nullopt;
+			}
+
+			pathfinding_path result;
+			result.island_index = source_island;
+			result.nodes = std::move(path_nodes.value());
+			result.final_portal_exit = cell_on_navmesh(
+				source_island,
+				portal.out_cell_pos
+			);
+			result.destination_portal_world_pos = portal.in_world_pos;
+			return result;
+		};
+
+		auto try_direct = [&]() -> std::optional<pathfinding_path> {
+			auto path_nodes = ::find_path_within_island(
+				island,
+				start_cell,
+				target_pos,
+				std::nullopt,
+				physics_hints,
+				ctx
+			);
+
+			if (!path_nodes.has_value()) {
+				return std::nullopt;
+			}
+
+			pathfinding_path result;
+			result.island_index = source_island;
+			result.nodes = std::move(path_nodes.value());
+			return result;
+		};
+
+		const bool prefer_portal = [&]() {
+			if (!best_same_island_portal_opt.has_value()) {
+				return false;
+			}
+
+			const auto& portal = island.portals[*best_same_island_portal_opt];
 			const auto portal_center_world = ::cell_to_world(island, portal.in_cell_pos);
 			const auto exit_world = ::cell_to_world(island, portal.out_cell_pos);
 
 			const auto portal_route_dist = ::world_distance(source_pos, portal_center_world) +
 			                               ::world_distance(exit_world, target_pos);
 
-			if (portal_route_dist < direct_dist) {
-				/*
-					Use portal route.
-				*/
-				auto path_nodes = ::find_path_within_island(
-					island,
-					start_cell,
-					portal_center_world,
-					best_same_island_portal,
-					physics_hints,
-					ctx
-				);
+			return portal_route_dist < direct_dist;
+		}();
 
-				if (path_nodes.has_value()) {
-					pathfinding_path result;
-					result.island_index = source_island;
-					result.nodes = std::move(path_nodes.value());
-					result.final_portal_exit = cell_on_navmesh(
-						source_island,
-						portal.out_cell_pos
-					);
-					return result;
-				}
+		/*
+			Try the preferred route first, then fall back to the other if it fails.
+			This guarantees a path is found whenever any same-island route exists,
+			even when two enclosed rooms are connected only by a portal.
+		*/
+		if (prefer_portal) {
+			if (auto p = try_portal()) {
+				return p;
+			}
+
+			if (auto p = try_direct()) {
+				return p;
+			}
+		}
+		else {
+			if (auto p = try_direct()) {
+				return p;
+			}
+
+			if (auto p = try_portal()) {
+				return p;
 			}
 		}
 
-		/*
-			Direct path within island.
-		*/
-		auto path_nodes = ::find_path_within_island(
-			island,
-			start_cell,
-			target_pos,
-			std::nullopt,
-			physics_hints,
-			ctx
-		);
-
-		if (!path_nodes.has_value()) {
-			return std::nullopt;
-		}
-
-		pathfinding_path result;
-		result.island_index = source_island;
-		result.nodes = std::move(path_nodes.value());
-		return result;
+		return std::nullopt;
 	}
 
 	/*

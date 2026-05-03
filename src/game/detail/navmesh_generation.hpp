@@ -527,6 +527,7 @@ inline void process_portals_for_navmesh(
 
 			portal_entry.out_cell_pos = out_cell_pos;
 			portal_entry.out_island_index = exit_island_idx;
+			portal_entry.in_world_pos = portal_pos;
 			island.portals.push_back(portal_entry);
 
 			/*

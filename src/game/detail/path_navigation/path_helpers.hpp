@@ -45,8 +45,8 @@ inline std::optional<vec2> get_current_path_target(
 	/*
 		If rerouting, use rerouting path.
 	*/
-	const auto& progress = navigation.rerouting.has_value() 
-		? *navigation.rerouting 
+	const auto& progress = navigation.rerouting.has_value()
+		? *navigation.rerouting
 		: navigation.main
 	;
 
@@ -56,6 +56,18 @@ inline std::optional<vec2> get_current_path_target(
 	    progress.node_index >= path.nodes.size()
 	) {
 		return std::nullopt;
+	}
+
+	/*
+		If we're at the last node of a path that ends at a portal, return
+		the portal's exact world position (which may be off-center within
+		its cell) so the bot eases its position precisely onto the portal,
+		not just onto the cell center.
+	*/
+	if (path.destination_portal_world_pos.has_value()
+		&& progress.node_index + 1 >= path.nodes.size()
+	) {
+		return *path.destination_portal_world_pos;
 	}
 
 	const auto& island = navmesh.islands[path.island_index];
