@@ -8,6 +8,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/motor_joint_component.h"
+#include "game/components/crosshair_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
@@ -431,6 +432,13 @@ perform_transfer_result perform_transfer_impl::operator()(
 					in.linear = mult * conceptual_mass * target_root.get_logic_transform().get_direction();
 					in.angular = mult * conceptual_mass;
 					in = in * capability_def->transfer_recoil_mults;
+
+					if (const auto c = target_root.template find<components::crosshair>()) {
+						if (c->base_offset.x > 0) {
+							in.angular = -in.angular;
+						}
+					}
+
 					target_root.apply_crosshair_recoil(in);
 				}
 			};
