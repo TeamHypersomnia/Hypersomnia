@@ -7,9 +7,12 @@
 	Start navigating to a target position.
 	Updates the ai_state's optional navigation field.
 	Returns the new navigation state if navigation was initiated.
-	
-	Note: Does not initiate navigation if bot is standing on a portal cell
-	(to allow portal teleportation to complete first).
+
+	Pathfinding from a portal cell is allowed: find_path_within_island treats
+	the start cell's portal value as walkable via source_portal_value, so the
+	first node of the returned path is the portal cell itself and subsequent
+	nodes route the bot off it. The portal_inertia_ms cooldown that follows
+	a teleport stops the bot from being immediately re-caught.
 */
 
 inline std::optional<ai_path_navigation_state> start_navigating_to(
@@ -19,16 +22,6 @@ inline std::optional<ai_path_navigation_state> start_navigating_to(
 	const physics_path_hints* physics_hints = nullptr,
 	pathfinding_context* ctx = nullptr
 ) {
-	/*
-		Don't initiate new navigation while standing on a portal cell.
-		Existing navigation sessions can continue, but new ones should wait
-		until the bot has teleported through the portal.
-	*/
-	if (::is_on_portal_cell(bot_pos, navmesh)) {
-		AI_LOG("start_navigating_to: portal");
-		return std::nullopt;
-	}
-
 	const auto target_pos = target_transform.pos;
 	const auto target_island_opt = ::find_island_for_position(navmesh, target_pos);
 

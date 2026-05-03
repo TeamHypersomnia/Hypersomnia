@@ -941,20 +941,41 @@ arena_ai_result update_arena_mode_ai(
 		return new_request;
 	}();
 
-	if (effective_request != ai_state.current_navigation_request) {
-		AI_LOG("Navigation request changed - reinitializing");
+	/*
+		Re-initialize navigation when the request changes OR when there is a
+		live request but no active path. The latter case happens when a prior
+		start_navigating_to() failed (e.g. bot was momentarily on a portal
+		cell while a force pushed it around) — without retrying, the cached
+		request would equal the next request and the bot would freeze.
+	*/
+	const bool needs_init =
+		effective_request != ai_state.current_navigation_request
+		|| (effective_request.has_value() && !ai_state.is_navigating())
+	;
 
-		ai_state.set_navigation_request(effective_request);
+	if (needs_init) {
+		AI_LOG("Navigation request changed or retrying - reinitializing");
 
-		if (effective_request != std::nullopt) {
+		/*
+			Clear first so we never leave a stale (cached request, null path)
+			pair behind if start_navigating_to fails below.
+		*/
+		ai_state.clear_navigation();
+
+		if (effective_request.has_value()) {
 			const auto physics_hints = make_physics_path_hints(cosm);
-			ai_state.navigation = ::start_navigating_to(character_pos, effective_request->target, navmesh, &physics_hints, pathfinding_ctx);
+			auto new_navigation = ::start_navigating_to(character_pos, effective_request->target, navmesh, &physics_hints, pathfinding_ctx);
 
-			if (ai_state.is_navigating()) {
-				ai_state.navigation->exact_destination = effective_request->exact;
+			if (new_navigation.has_value()) {
+				new_navigation->exact_destination = effective_request->exact;
+				ai_state.navigation = std::move(new_navigation);
+				ai_state.current_navigation_request = effective_request;
 			}
 			else {
-				/* Unconditional LOG (not AI_LOG) — always visible even with LOG_AI=0. */
+				/*
+					Don't cache the failed request — leave current_navigation_request
+					at nullopt so the next AI tick re-enters this branch and retries.
+				*/
 				LOG("AI ERROR: start_navigating_to FAILED for bot at (%x,%x) -> target (%x,%x). Waypoint unreachable?",
 					character_pos.x, character_pos.y, effective_request->target.pos.x, effective_request->target.pos.y);
 			}
