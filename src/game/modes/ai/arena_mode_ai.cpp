@@ -944,8 +944,7 @@ arena_ai_result update_arena_mode_ai(
 	if (effective_request != ai_state.current_navigation_request) {
 		AI_LOG("Navigation request changed - reinitializing");
 
-		ai_state.current_navigation_request = effective_request;
-		ai_state.clear_navigation();
+		ai_state.set_navigation_request(effective_request);
 
 		if (effective_request != std::nullopt) {
 			const auto physics_hints = make_physics_path_hints(cosm);
@@ -1216,7 +1215,6 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	if (move_result.path_completed) {
-		ai_state.current_navigation_request = std::nullopt;
 		ai_state.clear_navigation();
 	}
 
@@ -1270,8 +1268,8 @@ void post_solve_arena_mode_ai(
 		if (const auto* tp = std::get_if<messages::teleportation>(&notification.payload)) {
 			if (tp->teleported == controlled_character_id) {
 				/*
-					Bot was teleported - clear pathfinding state.
-					New pathfinding will be initiated on next update.
+					Bot was teleported - drop the stale path so the next AI
+					tick re-initializes navigation from the bot's new position.
 				*/
 				ai_state.clear_navigation();
 				break;

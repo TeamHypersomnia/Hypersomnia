@@ -60,7 +60,6 @@ inline bool update_take_cover(
 	if (!taking_cover) {
 		if (ai_state.take_cover_navigation_request.has_value()) {
 			ai_state.take_cover_navigation_request = std::nullopt;
-			ai_state.current_navigation_request = std::nullopt;
 			ai_state.clear_navigation();
 		}
 

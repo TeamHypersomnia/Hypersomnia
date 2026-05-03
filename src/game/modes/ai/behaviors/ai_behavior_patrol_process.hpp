@@ -189,7 +189,6 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			navigation_just_completed on whatever new waypoint we pick below.
 		*/
 		ai_state.clear_navigation();
-		ai_state.current_navigation_request = std::nullopt;
 	}
 
 	/*

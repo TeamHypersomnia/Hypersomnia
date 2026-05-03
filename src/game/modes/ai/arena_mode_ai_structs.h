@@ -462,8 +462,21 @@ struct arena_mode_ai_state {
 		return navigation.has_value();
 	}
 
-	void clear_navigation() {
+	void set_navigation_request(const std::optional<ai_navigation_request>& request) {
+		current_navigation_request = request;
 		navigation.reset();
+	}
+
+	/*
+		Clears the active path AND the cached request, so the next AI tick
+		treats the next request as "changed" and re-initializes navigation.
+		Always use this (or set_navigation_request) when invalidating the
+		bot's path — clearing only `navigation` would leave the request
+		cache in a state that suppresses re-initialization.
+	*/
+
+	void clear_navigation() {
+		set_navigation_request(std::nullopt);
 	}
 
 	/*
