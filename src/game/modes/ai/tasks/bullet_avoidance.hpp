@@ -77,7 +77,7 @@ inline bool update_bullet_avoidance(
 	if (should_run_avoidance_update) {
 		const auto bot_faction = character_handle.get_official_faction();
 		const auto character_unversioned_id = character_handle.get_id().to_unversioned();
-		const auto min_bullet_age_secs = ::get_reaction_time_secs(difficulty) / 3.0f;
+		const auto min_bullet_age_secs = ::get_reaction_time_secs(difficulty) / 1.4f;
 
 		struct bullet_candidate {
 			signi_entity_id id;
