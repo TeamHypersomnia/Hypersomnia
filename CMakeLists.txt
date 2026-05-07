@@ -1347,11 +1347,11 @@ if (NOT USE_O3)
 	message("Forcing use of O2.")
 
 	string(REPLACE "O3" "O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-	string(REPLACE "O3" "O2" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O3" "O2" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 else()
 	message("Forcing use of O3.")
 	string(REPLACE "O2" "O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-	string(REPLACE "O2" "O3" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O2" "O3" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 endif()
 
 if (LINK_TIME_OPTIMIZATION)
@@ -1914,6 +1914,24 @@ if (HEADLESS)
 	add_definitions(-DHEADLESS=1)
 else()
 	add_definitions(-DHEADLESS=0)
+endif()
+
+# Optionally enable cpp-httplib compression backends if available.
+
+find_package(ZLIB)
+if(ZLIB_FOUND)
+	add_definitions(-DCPPHTTPLIB_ZLIB_SUPPORT)
+endif()
+
+find_package(Zstd)
+if(Zstd_FOUND)
+	add_definitions(-DCPPHTTPLIB_ZSTD_SUPPORT)
+endif()
+
+find_path(BROTLI_INCLUDE_DIR brotli/decode.h)
+find_library(BROTLI_LIB brotlidec)
+if(BROTLI_INCLUDE_DIR AND BROTLI_LIB)
+	add_definitions(-DCPPHTTPLIB_BROTLI_SUPPORT)
 endif()
 
 # We configure additional user options for building the game.
