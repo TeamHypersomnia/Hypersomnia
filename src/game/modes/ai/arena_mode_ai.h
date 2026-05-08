@@ -16,6 +16,7 @@ arena_ai_result update_arena_mode_ai(
 	const faction_type bot_faction,
 	const money_type money,
 	const bool is_ffa,
+	const bool is_gun_game,
 	xorshift_state& stable_round_rng,
 	const difficulty_type difficulty,
 	const cosmos_navmesh& navmesh,
@@ -47,5 +48,6 @@ void post_solve_arena_mode_ai(
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
 	const bool is_ffa,
+	const bool is_gun_game,
 	const bool bomb_planted
 );

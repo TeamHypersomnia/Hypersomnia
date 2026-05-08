@@ -102,6 +102,7 @@ struct arena_mode_ruleset {
 	bool has_bomb_mechanics() const { return bomb_flavour.is_set(); }
 
 	bool is_ffa() const;
+	bool is_gun_game() const;
 };
 
 struct arena_mode_faction_state {

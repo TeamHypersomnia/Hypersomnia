@@ -33,4 +33,5 @@ struct ai_behavior_process_ctx {
 	const bool bomb_planted;
 	const bool navigation_just_completed;
 	const bool is_ffa;
+	const bool is_gun_game;
 };

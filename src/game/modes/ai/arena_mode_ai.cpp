@@ -263,6 +263,7 @@ arena_ai_result update_arena_mode_ai(
 	const faction_type bot_faction,
 	const money_type money,
 	const bool is_ffa,
+	const bool is_gun_game,
 	xorshift_state& stable_round_rng,
 	const difficulty_type difficulty,
 	const cosmos_navmesh& navmesh,
@@ -675,7 +676,7 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		round_state,
 		stable_rng,
-		is_ffa,
+		is_gun_game,
 		should_avoid_combat
 	);
 
@@ -1008,7 +1009,8 @@ arena_ai_result update_arena_mode_ai(
 			bomb_entity,
 			bomb_planted,
 			move_result.path_completed,
-			is_ffa
+			is_ffa,
+			is_gun_game
 		};
 
 		auto process_lbd = [&process_ctx](auto& behavior) {
@@ -1250,6 +1252,7 @@ void post_solve_arena_mode_ai(
 	arena_mode_ai_state& ai_state,
 	const entity_id controlled_character_id,
 	const bool is_ffa,
+	const bool is_gun_game,
 	const bool bomb_planted
 ) {
 	const auto character_handle = cosm[controlled_character_id];
@@ -1279,7 +1282,7 @@ void post_solve_arena_mode_ai(
 	const bool is_deafened_ps = bot_sentience_ps != nullptr && bot_sentience_ps->audio_flash_secs > 2.0f;
 
 	if (!is_deafened_ps) {
-		::listen_for_sound_cues(ctx, step, is_ffa, global_time_secs, bomb_planted);
+		::listen_for_sound_cues(ctx, step, is_ffa, is_gun_game, global_time_secs, bomb_planted);
 	}
 
 	/*

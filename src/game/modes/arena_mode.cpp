@@ -2535,6 +2535,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			player_faction,
 			player.stats.money,
 			in.rules.is_ffa(),
+			in.rules.is_gun_game(),
 			stable_round_rng,
 			in.dynamic_vars.bot_difficulty,
 			cosm.get_common_significant().navmesh,
@@ -3943,6 +3944,7 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 			it.second.ai_state,
 			it.second.controlled_character_id,
 			in.rules.is_ffa(),
+			in.rules.is_gun_game(),
 			is_bomb_planted
 		);
 	}
@@ -4821,6 +4823,10 @@ bool arena_mode_ruleset::has_economy() const {
 
 bool arena_mode_ruleset::is_ffa() const {
 	return free_for_all;
+}
+
+bool arena_mode_ruleset::is_gun_game() const {
+	return std::holds_alternative<gun_game_rules>(subrules);
 }
 
 bool arena_mode::levelling_enabled(const_input_type in) const {

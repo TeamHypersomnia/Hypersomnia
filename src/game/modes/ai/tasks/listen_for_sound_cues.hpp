@@ -21,6 +21,7 @@ inline void listen_for_sound_cues(
 	const ai_character_context& ctx,
 	const logic_step step,
 	const bool is_ffa,
+	const bool is_gun_game,
 	const real32 global_time_secs,
 	const bool bomb_planted
 ) {
@@ -92,7 +93,8 @@ inline void listen_for_sound_cues(
 		if (::should_acquire_target_by_hearing(
 			bot_faction,
 			bomb_planted,
-			ctx.ai_state.has_acquired_target_by_hearing_during_bomb_plant
+			ctx.ai_state.has_acquired_target_by_hearing_during_bomb_plant,
+			is_gun_game
 		)) {
 			ctx.ai_state.alertness.queue_alert({
 				cue.source_entity,

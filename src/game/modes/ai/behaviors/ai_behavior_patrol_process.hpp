@@ -252,7 +252,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			ctx.controlled_character_id,
 			current_waypoint_id,
 			rng,
-			ctx.is_ffa
+			ctx.is_gun_game
 		);
 
 		if (new_wp.is_set()) {

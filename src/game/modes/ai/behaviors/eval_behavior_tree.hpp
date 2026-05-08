@@ -49,7 +49,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	const vec2 character_pos,
 	const ai_round_state& round_state,
 	randomization& rng,
-	const bool is_ffa,
+	const bool is_gun_game,
 	const bool should_avoid_combat = false
 ) {
 	const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
@@ -69,10 +69,10 @@ inline ai_behavior_variant eval_behavior_tree(
 	}
 
 	/*
-		FFA modes (e.g. gun game): no plant/defuse/retrieve missions.
-		Only COMBAT and PATROL are meaningful — fall through to PATROL.
+		Gun game (FFA or team): no plant/defuse/retrieve missions and no
+		bombsite-locked patrol — only COMBAT and PATROL are meaningful.
 	*/
-	if (is_ffa) {
+	if (is_gun_game) {
 		auto patrol_behavior = ai_behavior_patrol();
 		return patrol_behavior;
 	}
