@@ -1987,18 +1987,12 @@ else()
 endif()
 
 # Optionally enable cpp-httplib compression backends if available.
-# sudo apt install zlib1g-dev libzstd-dev libbrotli-dev
+# sudo apt install zlib1g-dev libbrotli-dev
 
 find_package(ZLIB)
 if(ZLIB_FOUND)
 	add_definitions(-DCPPHTTPLIB_ZLIB_SUPPORT)
 	target_link_libraries(Hypersomnia ZLIB::ZLIB)
-endif()
-
-find_package(Zstd)
-if(Zstd_FOUND)
-	add_definitions(-DCPPHTTPLIB_ZSTD_SUPPORT)
-	target_link_libraries(Hypersomnia Zstd::Zstd)
 endif()
 
 find_path(BROTLI_INCLUDE_DIR brotli/decode.h)
