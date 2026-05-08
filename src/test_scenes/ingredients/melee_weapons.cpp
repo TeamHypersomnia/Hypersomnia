@@ -114,7 +114,7 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
-						clash.victim_inert_for_ms = 500.f * weight_mult;
+						clash.victim_inert_for_ms = std::min(600.0f, 500.f * weight_mult);
 						clash.impulse = 450.f * weight_mult;
 					}
 
@@ -160,7 +160,7 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
-						clash.victim_inert_for_ms = 850.f * weight_mult;
+						clash.victim_inert_for_ms = std::min(1000.0f, 850.f * weight_mult);
 						clash.impulse = 750.f * weight_mult;
 					}
 
@@ -349,6 +349,39 @@ namespace test_flavours {
 
 			meta.template get<invariants::fixtures>().material = to_physical_material_id(test_scene_physical_material_id::METAL);
 			meta.template get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_DRAW);
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.0");
+		}
+
+		{
+			auto& meta = make_knife(
+				test_melee_weapons::SWORD,
+				test_scene_image_id::SWORD,
+				static_cast<money_type>(2300),
+				faction_type::SPECTATOR,
+				2.0f,
+				white
+			);
+
+			auto& melee = meta.template get<invariants::melee>();
+
+			melee.throw_def.throw_angular_speed = 0.0f;
+
+			for (auto& a : melee.actions) {
+				a.head_radius_multiplier = 0.7f;
+			}
+
+			melee.adversarial.knockout_award = static_cast<money_type>(700 * award_mult);
+
+			{
+				auto& a = melee.actions[weapon_action_type::PRIMARY];
+				a.bot_attack_range = 100.0f;
+			}
+
+			{
+				auto& a = melee.actions[weapon_action_type::SECONDARY];
+				a.bot_attack_range = 370.0f;
+			}
+
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.0");
 		}
 	}

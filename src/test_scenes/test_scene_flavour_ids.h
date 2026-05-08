@@ -161,6 +161,8 @@ enum class test_melee_weapons {
 	ASSAULT_RATTLE,
 	MINI_KNIFE,
 
+	SWORD,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

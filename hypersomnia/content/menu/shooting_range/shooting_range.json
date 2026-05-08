@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-01-31 12:50:24.022018 UTC"
+        "version_timestamp": "2026-05-08 21:48:24.807064 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -38,7 +38,7 @@
             "file_hash": "3d44ea0d1a7ba7a6fae076c21988ff4a727107138c9ed44250550b5d342a9afe",
             "id": "@captions/glass.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 180, 255, 255],
@@ -50,7 +50,7 @@
             "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
             "id": "@captions/metal.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "size": [291, 66]
@@ -60,7 +60,7 @@
             "file_hash": "a5bb4864ebd02475245eec67542069a0aec31372063593057ca7842cdd674ae8",
             "id": "@captions/vent.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 126, 255],
@@ -72,7 +72,7 @@
             "file_hash": "aef50032f491c555a2c7f798bbadc0ff1245475e928124497a1bca51440a7f21",
             "id": "@captions/wood.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [255, 127, 0, 255],
@@ -86,7 +86,7 @@
             "neon_map": {
                 "standard_deviation": 8.0,
                 "amplification": 10.0,
-                "light_colors": [[95, 205, 228, 255]
+                "light_colors": [[95, 205, 228, 255, 1.0]
                 ]
             },
             "neon_color": [255, 255, 255, 106],
@@ -122,7 +122,7 @@
             "id": "@materials/glass.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255], [219, 213, 207, 255], [255, 245, 237, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0], [219, 213, 207, 255, 1.0], [255, 245, 237, 255, 1.0]
                 ]
             },
             "color": [0, 180, 255, 255],
@@ -141,7 +141,7 @@
             "id": "@materials/metal.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "neon_color": [255, 255, 255, 72],
@@ -157,7 +157,7 @@
             "id": "@materials/vent.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 126, 255],
@@ -175,7 +175,7 @@
             "id": "@materials/wood.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255], [218, 218, 214, 255], [224, 224, 220, 255], [238, 236, 230, 255], [232, 232, 226, 255], [214, 216, 212, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0], [218, 218, 214, 255, 1.0], [224, 224, 220, 255, 1.0], [238, 236, 230, 255, 1.0], [232, 232, 226, 255, 1.0], [214, 216, 212, 255, 1.0]
                 ]
             },
             "color": [255, 171, 0, 255],
@@ -189,6 +189,15 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 17",
+            "nodes": [
+                "sword-right (1)",
+                "sword-right",
+                "sword (1)",
+                "sword"
+            ]
+        },
         {
             "id": "Layer 16"
         },
@@ -1721,6 +1730,28 @@
             "type": "electric_rapier",
             "pos": [1303.0, 4913.0],
             "rotation": 180.0
+        },
+        {
+            "id": "sword",
+            "type": "sword",
+            "pos": [-1306.0, 5313.0]
+        },
+        {
+            "id": "sword-right",
+            "type": "sword",
+            "pos": [-1177.0, 5314.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "sword-right (1)",
+            "type": "sword",
+            "pos": [1303.0001220703125, 5313.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "sword (1)",
+            "type": "sword",
+            "pos": [1174.0, 5313.0]
         },
         {
             "id": "sn69",
