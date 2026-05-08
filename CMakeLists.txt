@@ -1916,29 +1916,6 @@ else()
 	add_definitions(-DHEADLESS=0)
 endif()
 
-# Optionally enable cpp-httplib compression backends if available.
-
-find_package(ZLIB)
-if(ZLIB_FOUND)
-	add_definitions(-DCPPHTTPLIB_ZLIB_SUPPORT)
-	target_link_libraries(Hypersomnia PRIVATE ZLIB::ZLIB)
-endif()
-
-find_package(Zstd)
-if(Zstd_FOUND)
-	add_definitions(-DCPPHTTPLIB_ZSTD_SUPPORT)
-	target_link_libraries(Hypersomnia PRIVATE Zstd::Zstd)
-endif()
-
-find_path(BROTLI_INCLUDE_DIR brotli/decode.h)
-find_library(BROTLI_DEC brotlidec)
-find_library(BROTLI_ENC brotlienc)
-find_library(BROTLI_COM brotlicommon)
-if(BROTLI_INCLUDE_DIR AND BROTLI_DEC AND BROTLI_ENC AND BROTLI_COM)
-	add_definitions(-DCPPHTTPLIB_BROTLI_SUPPORT)
-	target_link_libraries(Hypersomnia PRIVATE ${BROTLI_DEC} ${BROTLI_ENC} ${BROTLI_COM})
-endif()
-
 # We configure additional user options for building the game.
 
 if (STATICALLY_ALLOCATE_ENTITIES)
@@ -2007,6 +1984,30 @@ if(MSVC)
 	endif()
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+endif()
+
+# Optionally enable cpp-httplib compression backends if available.
+# sudo apt install zlib1g-dev libzstd-dev libbrotli-dev
+
+find_package(ZLIB)
+if(ZLIB_FOUND)
+	add_definitions(-DCPPHTTPLIB_ZLIB_SUPPORT)
+	target_link_libraries(Hypersomnia PRIVATE ZLIB::ZLIB)
+endif()
+
+find_package(Zstd)
+if(Zstd_FOUND)
+	add_definitions(-DCPPHTTPLIB_ZSTD_SUPPORT)
+	target_link_libraries(Hypersomnia PRIVATE Zstd::Zstd)
+endif()
+
+find_path(BROTLI_INCLUDE_DIR brotli/decode.h)
+find_library(BROTLI_DEC brotlidec)
+find_library(BROTLI_ENC brotlienc)
+find_library(BROTLI_COM brotlicommon)
+if(BROTLI_INCLUDE_DIR AND BROTLI_DEC AND BROTLI_ENC AND BROTLI_COM)
+	add_definitions(-DCPPHTTPLIB_BROTLI_SUPPORT)
+	target_link_libraries(Hypersomnia PRIVATE ${BROTLI_DEC} ${BROTLI_ENC} ${BROTLI_COM})
 endif()
 
 # We define libraries upon which Hypersomnia depends.
