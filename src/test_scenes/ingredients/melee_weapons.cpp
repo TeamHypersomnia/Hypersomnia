@@ -356,10 +356,12 @@ namespace test_flavours {
 			auto& meta = make_knife(
 				test_melee_weapons::SWORD,
 				test_scene_image_id::SWORD,
-				static_cast<money_type>(2300),
+				static_cast<money_type>(2700),
 				faction_type::SPECTATOR,
 				2.0f,
-				white
+				white,
+				1.2f,
+				400
 			);
 
 			auto& melee = meta.template get<invariants::melee>();
