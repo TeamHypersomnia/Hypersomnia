@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bot quota w gun game?
+- zmienic default na easy
 - gore do mieczy i moze do nozy tez kiedys
 
 - jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?

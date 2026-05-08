@@ -1425,15 +1425,17 @@ void post_solve_arena_mode_ai(
 
 real32 get_reaction_time_secs(const difficulty_type difficulty) {
 	switch (difficulty) {
-		case difficulty_type::EASY:   return 1.0f;
-		case difficulty_type::MEDIUM: return 0.50f;
-		case difficulty_type::HARD:   return 0.35f;
-		default:                      return 0.20f;
+		case difficulty_type::VERY_EASY:   return 2.0f;
+		case difficulty_type::EASY:        return 1.0f;
+		case difficulty_type::MEDIUM:      return 0.50f;
+		case difficulty_type::HARD:        return 0.35f;
+		default:                           return 0.20f;
 	}
 }
 
 real32 get_melee_reaction_time_secs(const difficulty_type difficulty) {
 	switch (difficulty) {
+		case difficulty_type::VERY_EASY:   return 0.5f;
 		case difficulty_type::EASY:   return 0.22f;
 		case difficulty_type::MEDIUM: return 0.15f;
 		case difficulty_type::HARD:   return 0.00f;

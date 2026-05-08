@@ -5049,6 +5049,9 @@ void server_setup::handle_client_chat_command(
 			else if (begins_with(chat.message, "/bots easy") || chat.message == "/bots e") {
 				set_difficulty(difficulty_type::EASY);
 			}
+			else if (begins_with(chat.message, "/bots veasy") || chat.message == "/bots ve") {
+				set_difficulty(difficulty_type::VERY_EASY);
+			}
 			else {
 				unsigned first = -1;
 				unsigned second = -1;

@@ -106,7 +106,7 @@ struct server_vars {
 
 	bool friendly_fire = true;
 	bool bots = true;
-	difficulty_type bot_difficulty = difficulty_type::EASY;
+	difficulty_type bot_difficulty = difficulty_type::VERY_EASY;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;
