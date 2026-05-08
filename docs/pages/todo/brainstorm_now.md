@@ -15,8 +15,14 @@ summary: That which we are brainstorming at the moment.
 
 # Turniej
 
+- audit all allocation patterns against crashes
+
 - Krotsze mecze zaimplementowac ewentualnie
+
 - Przygotowac sie na brak internetu
+	- jakies dogodne znajdywanie lokalnego masterservera
+	- co z uploadowaniem wynikow gdzies? bez neta jest dupa
+		- w sumie na piwo tez nie wrzucalismy
 
 # Rest
 

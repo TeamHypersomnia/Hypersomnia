@@ -727,15 +727,13 @@ arena_ai_result update_arena_mode_ai(
 					can_attack_position handles both gun (penetration) and melee/bare-hands
 					(LoS-only); the swing/range decision is made downstream by calc_hand_flags.
 				*/
-				const auto enemy_handle = cosm[ai_state.perceived_enemy];
+				if (const auto enemy_handle = cosm[ai_state.perceived_enemy]) {
+					target_acquired = ::can_attack_position(
+						character_handle,
+						enemy_handle,
+						ai_state.combat_target.last_known_pos
+					);
 
-				target_acquired = ::can_attack_position(
-					character_handle,
-					enemy_handle,
-					ai_state.combat_target.last_known_pos
-				);
-
-				if (enemy_handle) {
 					aim_velocity = enemy_handle.get_effective_velocity();
 				}
 			}
