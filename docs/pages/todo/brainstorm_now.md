@@ -6,9 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+# Turniej
+- Krotsze mecze zaimplementowac ewentualnie
+- Przygotowac sie na brak internetu
+
+# Rest
+
+- non defusing CT boty powinny robic dojazd na uslyszenie czegokolwiek
 - site-specific push waypoints, default to all
 - kurwa naprawic to jebane generowanie neon map w folderze mapy
-- what if parts of bombsite are occupied?
 - rotate waypoints by pointing towards mouse
 - bot quota for playtesting because we'll have dangling test values
 

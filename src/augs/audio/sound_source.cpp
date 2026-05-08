@@ -185,7 +185,7 @@ namespace augs {
 
 	void sound_source::set_pitch(float pitch) const {
 		(void)pitch;
-		//pitch *= 0.75f;
+		//pitch *= 1.5f;
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
 #if TRACE_PARAMETERS
 		LOG_NVPS(pitch);

@@ -4176,7 +4176,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 3.2f);
+			set_density_mult(meta, 5.3f);
 			make_default_gun_container(meta, item_holding_stance::SNIPER_LIKE, 1850.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SNIPER_DRAW);
 			meta.get<invariants::item>().standard_price = 7000;
@@ -4350,7 +4350,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELON_HRL, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.9f);
+			set_density_mult(meta, 3.4f);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 0.f, 0.f, false, "1.0");
 
 			auto& slots = meta.get<invariants::container>().slots;
@@ -4418,7 +4418,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 2.0f);
+			set_density_mult(meta, 3.5f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);

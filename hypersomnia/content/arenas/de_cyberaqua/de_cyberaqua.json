@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-04-23 11:43:31.383154 UTC"
+        "version_timestamp": "2026-05-03 22:23:19.794358 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -6438,7 +6438,7 @@
         {
             "id": "Crate (3)",
             "type": "crate",
-            "pos": [2401.0, 961.0001831054688],
+            "pos": [2369.0, 959.0001220703125],
             "rotation": 180.55682373046875
         },
         {
