@@ -7424,3 +7424,6 @@ This will discard your redo history."
 
 - boty (jeszcze)
 	- rebalance defenderow tych ktorzy nie sa w combacie a nie wszystkich
+- what if parts of bombsite are occupied?
+- non defusing CT boty powinny robic dojazd na uslyszenie czegokolwiek
+	- juz tak jest ale raz

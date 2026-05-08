@@ -315,6 +315,7 @@ namespace test_flavours {
 				auto& a = melee.actions[weapon_action_type::PRIMARY];
 				a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
 				a.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
+				a.bot_attack_range = 100.0f;
 
 				auto& eff = a.damage.effects;
 				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
@@ -325,6 +326,7 @@ namespace test_flavours {
 				auto& a = melee.actions[weapon_action_type::SECONDARY];
 				a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
 				a.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
+				a.bot_attack_range = 350.0f;
 
 				auto& eff = a.damage.effects;
 				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);

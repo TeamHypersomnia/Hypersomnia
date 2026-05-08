@@ -53,6 +53,7 @@ struct melee_attack_definition {
 
 	real32 headshot_multiplier = 3.0f;
 	real32 head_radius_multiplier = 0.9f;
+	real32 bot_attack_range = 80.0f;
 	// END GEN INTROSPECTOR
 };
 
@@ -80,6 +81,11 @@ namespace invariants {
 		real32 movement_speed_bonus = 1.1f;
 		adversarial_meta adversarial = { static_cast<money_type>(1200) };
 		// END GEN INTROSPECTOR
+
+		melee() {
+			actions[weapon_action_type::PRIMARY].bot_attack_range = 80.0f;
+			actions[weapon_action_type::SECONDARY].bot_attack_range = 200.0f;
+		}
 	};
 }
 

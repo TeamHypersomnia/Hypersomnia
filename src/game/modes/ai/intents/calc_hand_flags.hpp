@@ -7,9 +7,6 @@
 #include "game/detail/gun/gun_math.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 
-constexpr real32 MELEE_SHORT_ATTACK_RANGE = 80.0f;
-constexpr real32 MELEE_STRONG_ATTACK_RANGE = 200.0f;
-
 /*
 	Returns the bot_aim_radius_to_shoot for the first wielded gun found on the
 	character, falling back to 25.0f when no gun is wielded.
@@ -40,7 +37,7 @@ real32 calc_aim_radius_to_shoot(const CharacterHandle& character_handle) {
 	aim_pos: The position to aim at (last known or current enemy position).
 
 	melee_reaction_timer: persistent gating timer for melee swings.
-	  - Builds up while the bot stays within MELEE_STRONG_ATTACK_RANGE of aim_pos.
+	  - Builds up while the bot stays within the secondary bot_attack_range of aim_pos.
 	  - Drains (clamped to 0) while outside, so a brief out-of-range frame
 	    doesn't reset commitment.
 	  - Reset to 0 the moment a swing is committed.
@@ -99,12 +96,15 @@ inline hand_flags_result calc_hand_flags(
 			for (const auto& item_id : character_handle.get_wielded_items()) {
 				const auto wielded_handle = cosm[item_id];
 
-				if (wielded_handle.template has<components::melee>()) {
+				if (const auto melee_def = wielded_handle.template find<invariants::melee>()) {
 					melee_path_handled = true;
+
+					const auto primary_range = melee_def->actions[weapon_action_type::PRIMARY].bot_attack_range;
+					const auto secondary_range = melee_def->actions[weapon_action_type::SECONDARY].bot_attack_range;
 
 					const auto dist = (aim_pos - character_handle.get_logic_transform().pos).length();
 
-					if (dist <= MELEE_STRONG_ATTACK_RANGE) {
+					if (dist <= secondary_range) {
 						melee_reaction_timer += dt_secs;
 					}
 					else {
@@ -112,11 +112,11 @@ inline hand_flags_result calc_hand_flags(
 					}
 
 					if (melee_reaction_timer >= melee_reaction_threshold) {
-						if (dist < MELEE_SHORT_ATTACK_RANGE) {
+						if (dist < primary_range) {
 							result.hand_flag_0 = true;
 							melee_reaction_timer = 0.0f;
 						}
-						else if (dist < MELEE_STRONG_ATTACK_RANGE) {
+						else if (dist < secondary_range) {
 							result.hand_flag_1 = true;
 							melee_reaction_timer = 0.0f;
 						}
