@@ -130,6 +130,10 @@ inline void assign_waypoint(
 /*
 	Find a random unassigned patrol waypoint of a specific letter.
 	Returns entity_id::dead() if none found.
+
+	When is_ffa is true, the letter filter is ignored — any waypoint in the
+	team's patrol_waypoints list is eligible (gun game mode patrols freely
+	across the whole map).
 */
 
 inline entity_id find_random_unassigned_patrol_waypoint(
@@ -138,7 +142,8 @@ inline entity_id find_random_unassigned_patrol_waypoint(
 	const marker_letter_type letter,
 	const entity_id bot_char_id,
 	const entity_id ignore_waypoint_id,
-	randomization& rng
+	randomization& rng,
+	const bool is_ffa = false
 ) {
 	std::vector<entity_id> available;
 
@@ -153,10 +158,12 @@ inline entity_id find_random_unassigned_patrol_waypoint(
 			continue;
 		}
 
-		const auto& marker_comp = waypoint_handle.template get<components::marker>();
+		if (!is_ffa) {
+			const auto& marker_comp = waypoint_handle.template get<components::marker>();
 
-		if (marker_comp.letter != letter) {
-			continue;
+			if (marker_comp.letter != letter) {
+				continue;
+			}
 		}
 
 		if (!wp.is_assigned(cosm) || wp.assigned_bot == bot_char_id) {

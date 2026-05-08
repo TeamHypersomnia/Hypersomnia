@@ -32,4 +32,5 @@ struct ai_behavior_process_ctx {
 	const entity_id bomb_entity;
 	const bool bomb_planted;
 	const bool navigation_just_completed;
+	const bool is_ffa;
 };

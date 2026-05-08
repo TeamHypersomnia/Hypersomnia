@@ -49,6 +49,7 @@ inline ai_behavior_variant eval_behavior_tree(
 	const vec2 character_pos,
 	const ai_round_state& round_state,
 	randomization& rng,
+	const bool is_ffa,
 	const bool should_avoid_combat = false
 ) {
 	const bool is_metropolis = (bot_faction == faction_type::METROPOLIS);
@@ -65,6 +66,15 @@ inline ai_behavior_variant eval_behavior_tree(
 	if (!should_avoid_combat && ai_state.combat_target.within_engagement_window(cosm, global_time_secs)) {
 		AI_LOG("eval_behavior_tree: COMBAT (faction=%x, bomb_planted=%x)", static_cast<int>(bot_faction), round_state.bomb_planted);
 		return ai_behavior_combat{};
+	}
+
+	/*
+		FFA modes (e.g. gun game): no plant/defuse/retrieve missions.
+		Only COMBAT and PATROL are meaningful — fall through to PATROL.
+	*/
+	if (is_ffa) {
+		auto patrol_behavior = ai_behavior_patrol();
+		return patrol_behavior;
 	}
 
 	/*

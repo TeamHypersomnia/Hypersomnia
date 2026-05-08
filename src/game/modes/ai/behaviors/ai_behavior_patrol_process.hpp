@@ -251,7 +251,8 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			ai_state.patrol_letter,
 			ctx.controlled_character_id,
 			current_waypoint_id,
-			rng
+			rng,
+			ctx.is_ffa
 		);
 
 		if (new_wp.is_set()) {

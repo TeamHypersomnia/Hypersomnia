@@ -29,7 +29,11 @@ inline void listen_for_sound_cues(
 
 	auto is_enemy_faction = [&](const faction_type source_faction) {
 		if (is_ffa) {
-			return bot_faction != source_faction;
+			/*
+				FFA: everyone is an enemy regardless of faction
+				(matches find_closest_enemy semantics).
+			*/
+			return true;
 		}
 
 		return bot_faction != source_faction && source_faction != faction_type::SPECTATOR;

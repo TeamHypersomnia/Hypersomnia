@@ -12,6 +12,7 @@ summary: That which we are brainstorming at the moment.
 - friendly fire bym dal tylko na rankedy
 
 # Turniej
+
 - Krotsze mecze zaimplementowac ewentualnie
 - Przygotowac sie na brak internetu
 

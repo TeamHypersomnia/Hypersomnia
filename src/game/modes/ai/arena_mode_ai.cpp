@@ -675,6 +675,7 @@ arena_ai_result update_arena_mode_ai(
 		character_pos,
 		round_state,
 		stable_rng,
+		is_ffa,
 		should_avoid_combat
 	);
 
@@ -1006,7 +1007,8 @@ arena_ai_result update_arena_mode_ai(
 			stable_rng,
 			bomb_entity,
 			bomb_planted,
-			move_result.path_completed
+			move_result.path_completed,
+			is_ffa
 		};
 
 		auto process_lbd = [&process_ctx](auto& behavior) {
@@ -1303,7 +1305,12 @@ void post_solve_arena_mode_ai(
 
 	auto is_enemy_faction = [&](const faction_type shooter_faction) {
 		if (is_ffa) {
-			return bot_faction != shooter_faction;
+			/*
+				FFA: every shooter is an enemy regardless of faction
+				(matches find_closest_enemy semantics).
+				The shooter == character_handle self-check happens above.
+			*/
+			return true;
 		}
 
 		return bot_faction != shooter_faction && shooter_faction != faction_type::SPECTATOR;
