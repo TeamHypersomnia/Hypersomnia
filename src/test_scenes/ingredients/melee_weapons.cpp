@@ -384,7 +384,8 @@ namespace test_flavours {
 				a.bot_attack_range = 370.0f;
 			}
 
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.0");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("4.0");
+			//meta.template get<invariants::fixtures>().density *= 3;
 		}
 	}
 }
