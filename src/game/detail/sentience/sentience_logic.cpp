@@ -163,18 +163,6 @@ static void try_detach_arms(
 			);
 
 			/*
-				Spawn an immediate splatter at the damage location,
-				oriented in the flight direction.
-				Use typed_entity (arm) as orbit subject to avoid orbit glitches.
-			*/
-
-			{
-				auto& cosm = step.get_cosmos();
-				auto rng = cosm.get_rng_for(typed_entity.get_id());
-				::spawn_blood_splatter(access, rng, step, typed_entity, arm_splatter_origin + fly_direction * 20.f, arm_splatter_origin, 0.7f);
-			}
-
-			/*
 				Send a white highlight for the detached arm when it first appears.
 				Analogous to the lying corpse highlight.
 			*/
@@ -193,8 +181,8 @@ static void try_detach_arms(
 				Play the arm detach sound from the dead player's perspective.
 			*/
 			if (arm_detach_sound.id.is_set()) {
-				const auto predictability = 
-					step.get_settings().effect_prediction.predict_death_particles 
+				const auto predictability =
+					step.get_settings().effect_prediction.predict_death_particles
 					? always_predictable_v
 					: never_predictable_v
 				;
@@ -204,6 +192,22 @@ static void try_detach_arms(
 					sound_effect_start_input::at_listener(typed_subject_id),
 					predictability
 				);
+			}
+
+			/*
+				Spawn an immediate splatter at the damage location,
+				oriented in the flight direction.
+				Use typed_entity (arm) as orbit subject to avoid orbit glitches.
+
+				Kept last because spawn_blood_splatter allocates an entity in the
+				decal_decoration pool. If the arm flavour ever shared that pool,
+				typed_entity's cached pointer would be invalidated by this allocation.
+			*/
+
+			{
+				auto& cosm = step.get_cosmos();
+				auto rng = cosm.get_rng_for(typed_entity.get_id());
+				::spawn_blood_splatter(access, rng, step, typed_entity, arm_splatter_origin + fly_direction * 20.f, arm_splatter_origin, 0.7f);
 			}
 		}
 	);
@@ -839,17 +843,6 @@ void perform_knockout(
 						);
 
 						/*
-							Spawn an immediate splatter at the damage location,
-							oriented in the head's flight direction.
-							Use typed_entity (head) as orbit subject to avoid orbit glitches.
-						*/
-						{
-							auto& cosm = step.get_cosmos();
-							auto rng = cosm.get_rng_for(typed_entity.get_id());
-							::spawn_blood_splatter(head_access, rng, step, typed_entity, head_splatter_origin + head_flight_dir * 20.f, head_splatter_origin, 1.2f);
-						}
-
-						/*
 							Send a white highlight for the detached head when it first appears.
 							Analogous to the lying corpse highlight.
 						*/
@@ -862,6 +855,21 @@ void perform_knockout(
 							msg.input.color = white;
 
 							step.post_message(msg);
+						}
+
+						/*
+							Spawn an immediate splatter at the damage location,
+							oriented in the head's flight direction.
+							Use typed_entity (head) as orbit subject to avoid orbit glitches.
+
+							Kept last because spawn_blood_splatter allocates an entity in the
+							decal_decoration pool. If the head flavour ever shared that pool,
+							typed_entity's cached pointer would be invalidated by this allocation.
+						*/
+						{
+							auto& cosm = step.get_cosmos();
+							auto rng = cosm.get_rng_for(typed_entity.get_id());
+							::spawn_blood_splatter(head_access, rng, step, typed_entity, head_splatter_origin + head_flight_dir * 20.f, head_splatter_origin, 1.2f);
 						}
 					}
 				);

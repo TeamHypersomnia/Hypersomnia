@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- difficulty advancement system
+	- player based zeby mialo sens 
+		- przy casualach bedzie resetowalo po reconnect
+		- ale z levelem aury bedzie z automatu
+		- wtedy jak player based to bedzie dobieralo ilosc botow do balansu
+	- zamiast miec no. allies i no. enemies po prostu dynamicznie to zrobmy
+	- ale ff wylacozne bedzie wiec git
+	- wiadomosci jakies win x more matches to make bots hard
+	- na to moglby byc tez aczik ze od poczatku do konca byl
+
 - bot quota w gun game?
 - zmienic default na easy
 - gore do mieczy i moze do nozy tez kiedys
@@ -16,8 +26,6 @@ summary: That which we are brainstorming at the moment.
 - friendly fire bym dal tylko na rankedy
 
 # Turniej
-
-- audit all allocation patterns against crashes
 
 - Krotsze mecze zaimplementowac ewentualnie
 

@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "deletion_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
@@ -35,7 +36,15 @@ void creation_system::flush_clone_entity_requests(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	auto& queued = step.get_queue<messages::clone_entity_message>();
 
-	for (auto& q : queued) {
+	/*
+		Move the queue out into a local before iterating, so a post_clone callback
+		may safely re-queue more messages without reallocating the vector under us.
+		New messages must not be queued from inside post_clone — see post-loop check below.
+	*/
+	auto local = std::move(queued);
+	queued.clear();
+
+	for (auto& q : local) {
 		const auto source = cosm[q.source];
 
 		if (source.dead()) {
@@ -49,7 +58,10 @@ void creation_system::flush_clone_entity_requests(const logic_step step) {
 		}
 	}
 
-	queued.clear();
+	if (!queued.empty()) {
+		LOG("ERROR: %x clone_entity_message(s) posted from inside a post_clone callback. Discarding to prevent recursion. Queue allocations outside flush callbacks.", queued.size());
+		queued.clear();
+	}
 }
 
 void creation_system::flush_just_create_entity_requests(const logic_step step) {
@@ -57,7 +69,15 @@ void creation_system::flush_just_create_entity_requests(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	auto& queued = step.get_queue<messages::just_create_entity_message>();
 
-	for (auto& q : queued) {
+	/*
+		Move the queue out into a local before iterating, so a post_create callback
+		may safely re-queue more messages without reallocating the vector under us.
+		New messages must not be queued from inside post_create — see post-loop check below.
+	*/
+	auto local = std::move(queued);
+	queued.clear();
+
+	for (auto& q : local) {
 		if (!q.flavour.is_set()) {
 			continue;
 		}
@@ -82,7 +102,10 @@ void creation_system::flush_just_create_entity_requests(const logic_step step) {
 		}
 	}
 
-	queued.clear();
+	if (!queued.empty()) {
+		LOG("ERROR: %x just_create_entity_message(s) posted from inside a post_create callback. Discarding to prevent recursion. Queue allocations outside flush callbacks.", queued.size());
+		queued.clear();
+	}
 }
 
 void creation_system::flush_create_entity_requests(const logic_step step) {
@@ -101,11 +124,20 @@ void creation_system::flush_create_entity_requests(const logic_step step) {
 
 		auto& queued = step.get_queue<messages::create_entity_message<E>>();
 
-		for (auto& q : queued) {
+		/*
+			Move the queue out into a local before iterating, so a post_construction
+			callback may safely re-queue more messages without reallocating
+			the vector under us. New messages must not be queued from inside
+			post_construction — see post-loop check below.
+		*/
+		auto local = std::move(queued);
+		queued.clear();
+
+		for (auto& q : local) {
 			const ref_typed_entity_handle<E> typed_handle = cosmic::specific_create_entity(
 				access,
-				cosm, 
-				typed_entity_flavour_id<E>(q.flavour_id.raw), 
+				cosm,
+				typed_entity_flavour_id<E>(q.flavour_id.raw),
 				[&q](const ref_typed_entity_handle<E> pre_handle, entity_solvable<E>& agg) {
 					if (q.pre_construction) {
 						q.pre_construction(pre_handle, agg);
@@ -118,6 +150,9 @@ void creation_system::flush_create_entity_requests(const logic_step step) {
 			}
 		}
 
-		queued.clear();
+		if (!queued.empty()) {
+			LOG("ERROR: %x create_entity_message(s) for entity type idx %x posted from inside a post_construction callback. Discarding to prevent recursion. Queue allocations outside flush callbacks.", queued.size(), ENTITY_TYPE_IDX<E>);
+			queued.clear();
+		}
 	});
 }
