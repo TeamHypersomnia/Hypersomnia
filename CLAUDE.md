@@ -1,3 +1,5 @@
+**No yapping.** To the point language.
+
 # Build tools (MCP)
 
 A `build` MCP server is available with four tools:
