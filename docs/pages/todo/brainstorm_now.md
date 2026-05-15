@@ -17,7 +17,7 @@ summary: That which we are brainstorming at the moment.
 	- na to moglby byc tez aczik ze od poczatku do konca byl
 
 - bot quota w gun game?
-- zmienic default na easy
+- zmienic default na very easy
 - gore do mieczy i moze do nozy tez kiedys
 
 - jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?
