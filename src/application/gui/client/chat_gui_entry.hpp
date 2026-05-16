@@ -1,10 +1,15 @@
 #pragma once
+#include "game/modes/casual_level_logic.h"
 
 std::string chat_gui_entry::get_author_string(const bool streamer_mode) const {
 	auto result = author;
 
 	if ((streamer_mode || augs::has_profanity(result)) && result.size() > 0) {
 		result = "Player";
+	}
+
+	if (result.size() > 0 && is_user_message && show_author_level) {
+		result += typesafe_sprintf(" [%x]", player_level_display(author_level));
 	}
 
 	if (faction_specific) {
@@ -32,12 +37,16 @@ chat_gui_entry chat_gui_entry::from(
 	const net_time_t timestamp,
 	const std::string& author,
 	const faction_type author_faction,
-	const bool is_my_message
+	const bool is_my_message,
+	const uint16_t author_level,
+	const bool show_author_level
 ) {
 	chat_gui_entry new_entry;
 
 	new_entry.timestamp = timestamp;
 	new_entry.author_faction = author_faction;
+	new_entry.author_level = author_level;
+	new_entry.show_author_level = show_author_level;
 
 	const auto message_str = std::string(payload.message);
 

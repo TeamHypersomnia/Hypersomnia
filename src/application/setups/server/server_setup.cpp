@@ -1305,7 +1305,7 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		if (any_ended && !is_playtesting_server()) {
 			if (!is_idle()) {
 				/*
-					Don't do changes on idle when an idle match ends as this is controlled by an explicit interval: 
+					Don't do changes on idle when an idle match ends as this is controlled by an explicit interval:
 					when_idle_change_maps_once_every_mins
 				*/
 
@@ -2600,7 +2600,10 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	out.force_short_match = has_browser_clients_playing;
 
-	out.bot_difficulty = vars.bot_difficulty;
+	/*
+		COUNT means: no override, use the level-derived difficulty.
+	*/
+	out.bot_override_difficulty = difficulty_type::COUNT;
 
 	if (!vars.bots) {
 		out.bots_override = { {}, 0u, 0u };
@@ -2611,7 +2614,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	}
 
 	if (overrides.bot_difficulty.is_set()) {
-		out.bot_difficulty = overrides.bot_difficulty.difficulty;
+		out.bot_override_difficulty = overrides.bot_difficulty.difficulty;
 	}
 
 	return out;
@@ -2812,6 +2815,13 @@ void register_external_resources_of(
 
 void server_setup::rechoose_arena() {
 	LOG("Choosing arena: %x", vars.arena);
+
+	/*
+		Any /bots override is scoped to the current arena.
+		Clearing here ensures e.g. "/bots h" in bomb defusal does not carry into gun game.
+	*/
+	overrides.bots = {};
+	overrides.bot_difficulty = {};
 
 	const auto& arena = get_arena_handle();
 
@@ -4409,12 +4419,14 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
 	std::string sender_player_nickname;
 	auto sender_player_faction = faction_type::SPECTATOR;
+	uint16_t sender_player_level = 0;
 
 	get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
 			if (const auto entry = typed_mode.find(payload.author)) {
 				sender_player_faction = entry->get_faction();
 				sender_player_nickname = entry->get_nickname();
+				sender_player_level = entry->session.casual_level;
 			}
 		}
 	);
@@ -4426,7 +4438,9 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		get_current_time(),
 		sender_player_nickname,
 		sender_player_faction,
-		payload.author == get_local_player_id()
+		payload.author == get_local_player_id(),
+		sender_player_level,
+		!is_ranked_server()
 	);
 
 	auto send_it = [&](const auto recipient_client_id, auto&) {
@@ -5020,11 +5034,12 @@ void server_setup::handle_client_chat_command(
 				overrides.bots = {};
 				overrides.bot_difficulty = {};
 				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
+				return;
 			}
 
 			auto set_difficulty = [&](const difficulty_type target_difficulty) {
-				const auto current_difficulty = last_broadcast_dynamic_vars.bot_difficulty;
-				
+				const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
+
 				if (current_difficulty == target_difficulty) {
 					broadcast_info(typesafe_sprintf("Bots are already %x.", augs::enum_to_string(target_difficulty)), chat_target_type::INFO);
 				}
@@ -5034,7 +5049,7 @@ void server_setup::handle_client_chat_command(
 						target_difficulty
 					};
 
-					const auto notice = typesafe_sprintf("Bots difficulty changed from %x to %x.", augs::enum_to_string(current_difficulty), augs::enum_to_string(target_difficulty));
+					const auto notice = typesafe_sprintf("Bots difficulty forced to %x.", augs::enum_to_string(target_difficulty));
 
 					broadcast_info(notice, chat_target_type::INFO);
 				}

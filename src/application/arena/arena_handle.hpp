@@ -68,7 +68,7 @@ void get_arena_steam_rich_presence_pairs(
 						}
 
 						if (mode.levelling_enabled(input)) {
-							level = std::to_string(player_data->stats.level);
+							level = std::to_string(player_data->stats.gun_game_level);
 						}
 						else {
 							auto participating = mode.calc_participating_factions(input);

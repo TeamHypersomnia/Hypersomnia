@@ -38,7 +38,7 @@ struct synced_dynamic_vars {
 	bool force_short_match = false;
 	server_ranked_vars ranked;
 	bots_request bots_override;
-	difficulty_type bot_difficulty = difficulty_type::VERY_EASY;
+	difficulty_type bot_override_difficulty = difficulty_type::COUNT;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const synced_dynamic_vars&) const = default;

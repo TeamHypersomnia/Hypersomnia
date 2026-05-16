@@ -140,7 +140,7 @@ struct arena_mode_player_stats {
 
 	int bomb_defuses = 0;
 
-	int level = 0;
+	int gun_game_level = 0;
 
 	arena_mode_player_round_state round_state;
 
@@ -202,8 +202,8 @@ struct arena_mode_player {
 		return false;
 	}
 
-	auto get_level() const {
-		return stats.level;
+	auto get_gun_game_level() const {
+		return stats.gun_game_level;
 	}
 
 	auto get_score() const {
@@ -211,7 +211,7 @@ struct arena_mode_player {
 	}
 
 	auto get_order() const {
-		return arena_player_order_info { get_nickname(), stats.calc_score(), stats.level };
+		return arena_player_order_info { get_nickname(), stats.calc_score(), stats.gun_game_level };
 	}
 
 	bool suspend_limit_exceeded(const server_ranked_vars&, bool) const;
@@ -450,7 +450,7 @@ private:
 
 	void reset_players_stats(input);
 	void set_players_money_to_initial(input);
-	void set_players_level_to_initial(input);
+	void set_players_gun_game_level_to_initial(input);
 	void clear_players_round_state(input);
 
 	void give_monetary_award(input, mode_player_id knockouter, mode_player_id victim, money_type amount);
@@ -499,6 +499,9 @@ private:
 
 	bool short_match = false;
 	xorshift_state stable_round_rng;
+
+	per_actual_faction<uint16_t> last_announced_team_casual_levels = {};
+	difficulty_type last_announced_casual_bot_difficulty = difficulty_type::VERY_EASY;
 	// END GEN INTROSPECTOR
 
 	/*
@@ -818,6 +821,17 @@ public:
 		int8_t second_quota = -1,
 		const mode_player_id& requester_player = mode_player_id()
 	) const;
+	per_actual_faction<uint8_t> calc_requested_bots_from_casual_levels(
+		const const_input in,
+		uint8_t team_size
+	) const;
+
+	bool casual_levels_enabled(const_input) const;
+	bool bot_settings_overridden(const_input) const;
+	uint16_t calc_team_level(faction_type) const;
+	difficulty_type calc_bot_difficulty(const_input) const;
+
+	void announce_casual_level_changes(const_input, logic_step);
 
 	void remove_old_lying_items(const input in, const logic_step step);
 };

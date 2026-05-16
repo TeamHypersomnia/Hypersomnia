@@ -131,6 +131,7 @@ message_handler_result client_setup::handle_payload(
 
 		std::string sender_player_nickname;
 		auto sender_player_faction = faction_type::SPECTATOR;
+		uint16_t sender_player_level = 0;
 
 		if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
 			/* Has to set it as we have potentially no mode properly setup yet. */
@@ -142,6 +143,7 @@ message_handler_result client_setup::handle_payload(
 				if (auto entry = typed_mode.find(author_id)) {
 					sender_player_faction = entry->get_faction();
 					sender_player_nickname = entry->get_nickname();
+					sender_player_level = entry->session.casual_level;
 				}
 			}
 		);
@@ -161,7 +163,9 @@ message_handler_result client_setup::handle_payload(
 				get_current_time(),
 				sender_player_nickname,
 				sender_player_faction,
-				author_id == get_local_player_id()
+				author_id == get_local_player_id(),
+				sender_player_level,
+				!sv_dynamic_vars.is_ranked_server()
 			);
 
 			LOG(new_entry.to_string());

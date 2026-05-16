@@ -26,13 +26,17 @@ struct chat_gui_entry {
 		net_time_t timestamp,
 		const std::string& author,
 		const faction_type author_faction,
-		const bool is_my_message
+		const bool is_my_message,
+		const uint16_t author_level = 0,
+		const bool show_author_level = false
 	);
 
 	net_time_t timestamp = 0.0;
 
 	std::string author;
 	faction_type author_faction = faction_type::DEFAULT;
+	uint16_t author_level = 0;
+	bool show_author_level = false;
 	bool faction_specific = false;
 	bool is_user_message = false;
 	bool is_my_message = false;

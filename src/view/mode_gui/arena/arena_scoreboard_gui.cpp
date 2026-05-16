@@ -6,7 +6,9 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/modes/arena_mode.hpp"
+#include "game/modes/casual_level_logic.h"
 #include "game/modes/test_mode.h"
+#include "application/arena/synced_dynamic_vars.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_json_table.h"
 #include "game/modes/mode_helpers.h"
@@ -63,6 +65,23 @@ void arena_scoreboard_gui::draw_gui(
 	if (!should_show) {
 		return;
 	}
+
+	const bool show_player_levels = [&]() {
+		if constexpr(std::is_same_v<M, test_mode>) {
+			return false;
+		}
+		else {
+			if (!typed_mode.casual_levels_enabled(mode_input)) {
+				return false;
+			}
+
+			if (mode_input.rules.is_ffa()) {
+				return false;
+			}
+
+			return true;
+		}
+	}();
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
@@ -482,7 +501,17 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x += score_text_max_w + cell_pad.x * 4;
 			//head_orig.r + cell_pad.x * 2
 
-			text_stroked(std::string("for ") + format_enum(faction), colors.standard, vec2i { 0, faction_bg_orig.get_center().y } , { augs::ralign::CY });
+			const auto faction_label = std::string("for ") + format_enum(faction);
+			text_stroked(faction_label, colors.standard, vec2i { 0, faction_bg_orig.get_center().y } , { augs::ralign::CY });
+
+			if constexpr(!std::is_same_v<M, test_mode>) {
+				if (show_player_levels) {
+					const auto team_lvl = typed_mode.calc_team_level(faction);
+					const auto lvl_str = typesafe_sprintf(" [%x]", player_level_display(team_lvl));
+					const auto label_w = calc_size(faction_label).x;
+					text_stroked(lvl_str, colors.standard, vec2i { label_w, faction_bg_orig.get_center().y }, { augs::ralign::CY });
+				}
+			}
 
 			pen.y += bg_height;
 			pen.x = prev_pen_x;
@@ -798,10 +827,36 @@ void arena_scoreboard_gui::draw_gui(
 				preffix += fmt(clan, pref_col);
 			}
 
+			const auto nick_str = get_nickname_str(player_id, player_data);
+
 			col_text(
-				get_nickname_str(player_id, player_data), 
+				nick_str,
 				preffix
 			);
+
+			if constexpr(!std::is_same_v<M, test_mode>) {
+				if (show_player_levels && !player_data.is_bot) {
+					auto suf_pos_x = cell_pad.x + 2;
+
+					if (!preffix.empty()) {
+						suf_pos_x += calc_size(preffix).x + 1;
+					}
+
+					suf_pos_x += calc_size(nick_str).x;
+
+					auto level_col = colors.standard;
+
+					if (is_local) {
+						level_col = rgba(255, 255, 100, 255);
+					}
+					else if (is_conscious) {
+						level_col.mult_luminance(1.25f);
+					}
+
+					const auto level_str = typesafe_sprintf(" [%x]", player_level_display(player_data.session.casual_level));
+					text_stroked(level_str, level_col, vec2i(player_col.l + suf_pos_x, cell_pad.y));
+				}
+			}
 
 			next_col();
 
@@ -810,7 +865,7 @@ void arena_scoreboard_gui::draw_gui(
 			if constexpr(!std::is_same_v<M, test_mode>) {
 				auto do_money = [&]() {
 					if (typed_mode.levelling_enabled(mode_input)) {
-						col_text(typesafe_sprintf("%x", stats.level));
+						col_text(typesafe_sprintf("%x", stats.gun_game_level));
 					}
 					else {
 						col_text(typesafe_sprintf("%x$", stats.money));

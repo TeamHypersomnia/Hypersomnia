@@ -5,6 +5,7 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/messages/health_event.h"
 #include "game/modes/arena_mode.hpp"
+#include "game/modes/casual_level_logic.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
@@ -53,8 +54,22 @@ bool _is_ranked(const synced_dynamic_vars& dynamic_vars) {
 	return dynamic_vars.is_ranked_server();
 }
 
+static per_actual_faction<uint8_t> verify_max_quota(const per_actual_faction<uint8_t> q) {
+	std::size_t total = 0;
+
+	q.for_each([&total](const auto n) { total += n; });
+
+	if (total > max_bot_quota_v) {
+		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
+	}
+
+	return q;
+}
+
 using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
+
+#include "game/modes/arena_mode_casual_levels.hpp"
 
 int arena_mode_player_stats::calc_score() const {
 	return 
@@ -714,7 +729,7 @@ void arena_mode::assign_free_color_to_best_uncolored(const const_input_type in, 
 	}
 }
 
-void arena_mode::on_faction_changed_for(const const_input_type in, const faction_type previous_faction, const mode_player_id& id) { 
+void arena_mode::on_faction_changed_for(const const_input_type in, const faction_type previous_faction, const mode_player_id& id) {
 	if (const auto entry = find(id)) {
 		{
 			const auto free_color = entry->assigned_color;
@@ -725,6 +740,23 @@ void arena_mode::on_faction_changed_for(const const_input_type in, const faction
 
 		if (entry->get_faction() == faction_type::SPECTATOR) {
 			return;
+		}
+
+		const bool is_team_switch =
+			!entry->is_bot
+			&& is_actual_faction(previous_faction)
+			&& is_actual_faction(entry->get_faction())
+			&& previous_faction != entry->get_faction()
+		;
+
+		const bool is_warmup = state == arena_mode_state::WARMUP;
+
+		if (is_team_switch && !is_warmup && casual_levels_enabled(in)) {
+			if (entry->session.casual_level > 0) {
+				--entry->session.casual_level;
+			}
+
+			entry->session.casual_pve_loss_streak = 0;
 		}
 
 		if (in.rules.enable_player_colors) {
@@ -1295,7 +1327,7 @@ void arena_mode::reset_equipment_for(const logic_step step, const input_type in,
 		}
 
 		if (auto gg = std::get_if<gun_game_rules>(&in.rules.subrules)) {
-			const bool is_final_level = stats.level == gg->get_final_level();
+			const bool is_final_level = stats.gun_game_level == gg->get_final_level();
 
 			::delete_all_owned_items(player_handle);
 
@@ -1312,8 +1344,8 @@ void arena_mode::reset_equipment_for(const logic_step step, const input_type in,
 
 			const auto faction = player_data->get_faction();
 
-			if (stats.level < static_cast<int>(gg->progression.size())) {
-				const auto next = gg->progression[stats.level];
+			if (stats.gun_game_level < static_cast<int>(gg->progression.size())) {
+				const auto next = gg->progression[stats.gun_game_level];
 
 				auto eq = gg->basic_eq[faction];
 				eq.perform_recoils = false;
@@ -1610,12 +1642,12 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 					return 0;
 				}, in.rules.subrules);
 
-				auto before_level = s->level;
+				auto before_level = s->gun_game_level;
 
 				if (knockouts_dt > 0) {
 					bool weapon_requirement_met = true;
 
-					if (s->level == final_level) {
+					if (s->gun_game_level == final_level) {
 						weapon_requirement_met = ko.origin.on_tool_used(in.cosm, [&](const auto& tool) {
 							if constexpr(is_nullopt_v<decltype(tool)>) {
 
@@ -1637,20 +1669,20 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 
 					if (weapon_requirement_met) {
 						if (tool_humiliating) {
-							s->level += 2;
+							s->gun_game_level += 2;
 
 							/* Prevent jumping from the one before final straight to victory */
-							if (s->level == final_level + 1) {
-								s->level = final_level;
+							if (s->gun_game_level == final_level + 1) {
+								s->gun_game_level = final_level;
 							}
 
 							if (const auto v = stats_of(ko.victim.id)) {
-								v->level -= 1;
-								v->level = std::max(0, v->level);
+								v->gun_game_level -= 1;
+								v->gun_game_level = std::max(0, v->gun_game_level);
 							}
 						}
 						else {
-							s->level += 1;
+							s->gun_game_level += 1;
 						}
 					}
 					else {
@@ -1660,19 +1692,19 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 
 						if (tool_humiliating) {
 							if (const auto v = stats_of(ko.victim.id)) {
-								v->level -= 1;
-								v->level = std::max(0, v->level);
+								v->gun_game_level -= 1;
+								v->gun_game_level = std::max(0, v->gun_game_level);
 							}
 						}
 					}
 				}
 				else if (knockouts_dt < 0) {
-					s->level -= 1;
-					s->level = std::max(0, s->level);
+					s->gun_game_level -= 1;
+					s->gun_game_level = std::max(0, s->gun_game_level);
 				}
 
-				if (before_level != s->level) {
-					const bool victory_already = s->level > final_level;
+				if (before_level != s->gun_game_level) {
+					const bool victory_already = s->gun_game_level > final_level;
 
 					if (victory_already) {
 						victorious_player_nickname = ko.knockouter.name;
@@ -1682,7 +1714,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 					else {
 						on_player_handle(in.cosm, ko.knockouter.id, [&](const auto& player_handle) {
 							if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-								if (s->level > before_level) {
+								if (s->gun_game_level > before_level) {
 									auto start = sound_effect_start_input::at_listener(player_handle);
 									start.listener_faction = ko.knockouter.faction;
 
@@ -1832,6 +1864,40 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 		const auto faction = p.second.get_faction();
 
 		give_monetary_award(in, player_id, {}, faction == winner ? winner_award : loser_award);
+	}
+
+	if (casual_levels_enabled(in)) {
+		const bool pvp_loss = num_human_players_in(winner) > 0;
+
+		for (auto& human : only_human(players)) {
+			auto& session = human.second.session;
+			const auto faction = human.second.get_faction();
+
+			if (faction == winner) {
+				session.casual_level = std::min(casual_level_cap_v, uint16_t(session.casual_level + 1));
+				session.casual_pve_loss_streak = 0;
+			}
+			else if (faction == loser) {
+				if (pvp_loss) {
+					if (session.casual_level > 0) {
+						--session.casual_level;
+					}
+
+					session.casual_pve_loss_streak = 0;
+				}
+				else {
+					++session.casual_pve_loss_streak;
+
+					if (session.casual_pve_loss_streak >= 2) {
+						if (session.casual_level > 0) {
+							--session.casual_level;
+						}
+
+						session.casual_pve_loss_streak = 0;
+					}
+				}
+			}
+		}
 	}
 
 	if (is_halfway_round(in) || is_final_round(in)) {
@@ -2245,6 +2311,12 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 		}
 	};
 
+	auto post_teams_swapped = [&]() {
+		messages::mode_notification notification;
+		notification.payload = messages::no_arg_mode_notification::TEAMS_SWAPPED;
+		step.post_message(std::move(notification));
+	};
+
 	std::visit(
 		[&](const auto& cmd) {
 			using C = remove_cref<decltype(cmd)>;
@@ -2279,11 +2351,13 @@ void arena_mode::handle_special_commands(const input_type in, const mode_entropy
 
 					case C::SWAP_TEAMS:
 						swap_assigned_factions(calc_participating_factions(in));
+						post_teams_swapped();
 						restart_match(in, step);
 						break;
 
 					case C::SCRAMBLE_TEAMS:
 						scramble_assigned_factions(calc_participating_factions(in));
+						post_teams_swapped();
 						restart_match(in, step);
 						break;
 
@@ -2364,6 +2438,18 @@ void arena_mode::migrate(const input_type in, const arena_migrated_session& sess
 	}
 
 	next_session_id = session.next_session_id;
+
+	/*
+		Initialize the announcement baselines to the migrated state so we don't
+		broadcast spurious "level changed" messages right after a map/mode swap.
+	*/
+	if (const auto p = calc_participating_factions(in); p.valid()) {
+		for (const auto f : p.get_all()) {
+			last_announced_team_casual_levels[f] = calc_team_level(f);
+		}
+	}
+
+	last_announced_casual_bot_difficulty = calc_bot_difficulty(in);
 }
 
 bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
@@ -2537,7 +2623,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			in.rules.is_ffa(),
 			in.rules.is_gun_game(),
 			stable_round_rng,
-			in.dynamic_vars.bot_difficulty,
+			calc_bot_difficulty(in),
 			cosm.get_common_significant().navmesh,
 			is_bomb_planted,
 			current_bomb_entity,
@@ -2895,18 +2981,6 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 	}
 }
 
-per_actual_faction<uint8_t> verify_max_quota(const per_actual_faction<uint8_t> q) {
-	std::size_t total = 0;
-
-	q.for_each([&total](const auto n) { total += n; });
-
-	if (total > max_bot_quota_v) {
-		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
-	}
-
-	return q;
-}
-
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 	const const_input_type in,
 	const int8_t first_quota,
@@ -2961,9 +3035,17 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 		);
 	}
 
+	const auto p = calc_participating_factions(in);
+	const auto quota = in.rules.default_bot_quota;
+
+	if (casual_levels_enabled(in) && p.valid() && quota > 0) {
+		const auto team_size = uint8_t(quota / int(p.size()));
+		return calc_requested_bots_from_casual_levels(in, team_size);
+	}
+
 	return calc_requested_bots_from_quotas(
 		in,
-		in.rules.default_bot_quota
+		quota
 	);
 }
 
@@ -3746,6 +3828,12 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 
 				swap_assigned_factions(p);
 
+				{
+					messages::mode_notification swapped;
+					swapped.payload = messages::no_arg_mode_notification::TEAMS_SWAPPED;
+					step.post_message(std::move(swapped));
+				}
+
 				had_first_blood = false;
 
 				std::swap(factions[p.bombing].score, factions[p.defusing].score);
@@ -3755,7 +3843,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 				});
 
 				set_players_money_to_initial(in);
-				set_players_level_to_initial(in);
+				set_players_gun_game_level_to_initial(in);
 
 				start_next_round(in, step, round_start_type::DONT_KEEP_EQUIPMENTS);
 			}
@@ -3947,6 +4035,77 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 			in.rules.is_gun_game(),
 			is_bomb_planted
 		);
+	}
+
+	announce_casual_level_changes(in, step);
+}
+
+void arena_mode::announce_casual_level_changes(const_input_type in, const logic_step step) {
+	if (!casual_levels_enabled(in)) {
+		return;
+	}
+
+	const auto p = calc_participating_factions(in);
+
+	if (!p.valid()) {
+		return;
+	}
+
+	/*
+		Skip the per-faction level comparison this step if a team swap was reported —
+		the per-faction values legitimately shuffled without anyone's actual level changing.
+	*/
+	const bool teams_just_swapped = [&]() {
+		const auto& notifications = step.get_queue<messages::mode_notification>();
+
+		for (const auto& n : notifications) {
+			if (const auto* arg = std::get_if<messages::no_arg_mode_notification>(&n.payload)) {
+				if (*arg == messages::no_arg_mode_notification::TEAMS_SWAPPED) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}();
+
+	if (teams_just_swapped) {
+		for (const auto f : p.get_all()) {
+			last_announced_team_casual_levels[f] = calc_team_level(f);
+		}
+
+		last_announced_casual_bot_difficulty = calc_bot_difficulty(in);
+		return;
+	}
+
+	for (const auto f : p.get_all()) {
+		const auto old_level = last_announced_team_casual_levels[f];
+		const auto new_level = calc_team_level(f);
+
+		if (old_level != new_level) {
+			messages::mode_notification notification;
+			notification.payload = messages::casual_team_level_change {
+				f,
+				new_level,
+				new_level > old_level
+			};
+			step.post_message(std::move(notification));
+
+			last_announced_team_casual_levels[f] = new_level;
+		}
+	}
+
+	const auto new_difficulty = calc_bot_difficulty(in);
+
+	if (new_difficulty != last_announced_casual_bot_difficulty) {
+		messages::mode_notification notification;
+		notification.payload = messages::casual_bot_difficulty_change {
+			new_difficulty,
+			int(new_difficulty) > int(last_announced_casual_bot_difficulty)
+		};
+		step.post_message(std::move(notification));
+
+		last_announced_casual_bot_difficulty = new_difficulty;
 	}
 }
 
@@ -4483,7 +4642,7 @@ void arena_mode::clear_players_round_state(const input_type in) {
 		factions[faction].round_reset_ai();
 	});
 
-	set_players_level_to_initial(in);
+	set_players_gun_game_level_to_initial(in);
 }
 
 void arena_mode::set_players_money_to_initial(const input_type in) {
@@ -4493,12 +4652,12 @@ void arena_mode::set_players_money_to_initial(const input_type in) {
 	}
 }
 
-void arena_mode::set_players_level_to_initial(const input_type in) {
+void arena_mode::set_players_gun_game_level_to_initial(const input_type in) {
 	(void)in;
 
 	for (auto& it : players) {
 		auto& p = it.second;
-		p.stats.level = 0;
+		p.stats.gun_game_level = 0;
 	}
 }
 

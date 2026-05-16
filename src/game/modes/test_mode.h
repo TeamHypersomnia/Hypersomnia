@@ -127,7 +127,7 @@ struct test_mode_player {
 		return stats.calc_score();
 	}
 
-	auto get_level() const {
+	auto get_gun_game_level() const {
 		return 0;
 	}
 

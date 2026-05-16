@@ -3,8 +3,8 @@
 
 template <class A>
 bool compare_arena_players(const A& a, const A& b) {
-	const auto al = a.get_level();
-	const auto bl = b.get_level();
+	const auto al = a.get_gun_game_level();
+	const auto bl = b.get_gun_game_level();
 
 	if (al == bl) {
 		const auto as = a.get_score();
@@ -23,7 +23,7 @@ bool compare_arena_players(const A& a, const A& b) {
 struct arena_player_order_info {
 	client_nickname_type nickname;
 	int score = 0;
-	int level = 0;
+	int gun_game_level = 0;
 
 	const auto& get_nickname() const {
 		return nickname;
@@ -33,8 +33,8 @@ struct arena_player_order_info {
 		return score;
 	}
 
-	const auto& get_level() const {
-		return level;
+	const auto& get_gun_game_level() const {
+		return gun_game_level;
 	}
 
 	bool operator<(const arena_player_order_info& b) const {

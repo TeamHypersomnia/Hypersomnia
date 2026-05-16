@@ -47,6 +47,8 @@ struct arena_migrated_player {
 	client_nickname_type nickname;
 	session_id_type id = session_id_type::dead();
 	faction_type faction = faction_type::SPECTATOR;
+	uint16_t casual_level = 0;
+	uint8_t casual_pve_loss_streak = 0;
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {

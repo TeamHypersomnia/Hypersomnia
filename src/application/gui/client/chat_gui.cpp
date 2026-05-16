@@ -173,6 +173,31 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 			return true;
 		}
+		else if constexpr(std::is_same_v<P, casual_team_level_change>) {
+			do_entry(
+				typesafe_sprintf(
+					"%x %x to level %x.",
+					format_enum(payload.faction),
+					payload.advanced ? "advanced" : "dropped",
+					payload.new_level + 1
+				),
+				cyan
+			);
+
+			return true;
+		}
+		else if constexpr(std::is_same_v<P, casual_bot_difficulty_change>) {
+			do_entry(
+				typesafe_sprintf(
+					"Bot difficulty %x to %x.",
+					payload.advanced ? "advanced" : "dropped",
+					augs::enum_to_string(payload.new_difficulty)
+				),
+				cyan
+			);
+
+			return true;
+		}
 		else if constexpr(std::is_same_v<P, joined_or_left>) {
 			const auto action = [&]() {
 				if (payload == joined_or_left::JOINED) {
