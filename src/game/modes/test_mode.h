@@ -12,6 +12,7 @@
 
 #include "game/modes/session_id.h"
 #include "game/modes/arena_mode_structs.h"
+#include "application/arena/synced_dynamic_vars.h"
 #include "augs/templates/continue_or_callback_result.h"
 #include "game/modes/ranked_state_type.h"
 
@@ -188,11 +189,13 @@ public:
 
 	template <class C>
 	decltype(auto) advance(
-		const input in, 
-		const mode_entropy& entropy, 
+		const input in,
+		const mode_entropy& entropy,
 		C callbacks,
-		const solve_settings settings
+		solve_settings settings
 	) {
+		settings.friendly_fire = in.dynamic_vars.friendly_fire;
+
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
 		return standard_solver()(

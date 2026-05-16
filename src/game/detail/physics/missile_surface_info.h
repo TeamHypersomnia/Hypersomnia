@@ -18,14 +18,15 @@ public:
 	template <class A, class B>
 	missile_surface_info(
 		const A missile,
-		const B surface
+		const B surface,
+		const bool friendly_fire = true
 	) {
 		const auto& missile_sender = missile.template get<components::sender>();
 
-		if ((missile.template has<components::missile>() 
+		if ((missile.template has<components::missile>()
 			&& surface.template has<components::missile>())
 			||
-			(missile.template has<components::melee>() 
+			(missile.template has<components::melee>()
 			&& surface.template has<components::melee>())
 		) {
 			/* Prevent bullets coming from the same weapon or character from colliding with each other */
@@ -60,6 +61,12 @@ public:
 			surface_is_unconscious_body = !sentience->is_conscious();
 
 			if (sentience->spawn_protection_cooldown.lasts(surface.get_cosmos().get_clock())) {
+				ignore_altogether = true;
+			}
+
+			if (!friendly_fire
+				&& missile_sender.faction_of_sender == surface.get_official_faction()
+			) {
 				ignore_altogether = true;
 			}
 		}

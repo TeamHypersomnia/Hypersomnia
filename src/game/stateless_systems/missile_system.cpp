@@ -406,7 +406,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			auto& missile = typed_missile.template get<components::missile>();
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 
-			const auto info = missile_surface_info(typed_missile, surface_handle);
+			const auto info = missile_surface_info(typed_missile, surface_handle, step.get_settings().friendly_fire);
 
 			if (const auto result = collide_missile_against_surface(
 				access,
@@ -479,7 +479,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						return true;
 					};
 
-					const auto info = missile_surface_info(typed_melee, surface_handle);
+					const auto info = missile_surface_info(typed_melee, surface_handle, step.get_settings().friendly_fire);
 
 					if (info.should_ignore_altogether()) {
 						return;

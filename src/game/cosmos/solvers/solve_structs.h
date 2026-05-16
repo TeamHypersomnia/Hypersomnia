@@ -14,4 +14,5 @@ struct solve_settings {
 	bool drop_weapons_if_empty = true;
 
 	bool pause_simulation = false;
+	bool friendly_fire = true;
 };

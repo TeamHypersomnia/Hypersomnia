@@ -111,6 +111,7 @@ void standard_solve(const logic_step step) {
 	auto total_raycasts_scope = cosm.measure_raycasts(performance.total_step_raycasts);
 
 	contact_listener listener(cosm);
+	listener.friendly_fire = step.get_settings().friendly_fire;
 
 	for (const auto& p : step.get_entropy().players) {
 		const auto player_entity = cosm[p.first];

@@ -807,6 +807,17 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 		return false;
 	}
 
+	if (sentience && !step.get_settings().friendly_fire) {
+		const auto victim_handle = cosm[sentience_subject_id];
+
+		if (victim_handle.alive()
+			&& d.origin.sender.faction_of_sender == victim_handle.get_official_faction()
+			&& d.origin.sender.capability_of_sender != sentience_subject_id
+		) {
+			return false;
+		}
+	}
+
 	messages::health_event event_template;
 	event_template.subject = sentience_subject_id;
 	event_template.point_of_impact = d.point_of_impact;

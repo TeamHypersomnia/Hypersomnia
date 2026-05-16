@@ -23,7 +23,7 @@ static void ricochet_missile_against_surface(
 
 	auto& missile = typed_missile.template get<components::missile>();
 
-	const auto info = missile_surface_info(typed_missile, surface_handle);
+	const auto info = missile_surface_info(typed_missile, surface_handle, step.get_settings().friendly_fire);
 
 	if (missile.during_penetration) {
 		return;

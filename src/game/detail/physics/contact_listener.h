@@ -14,6 +14,7 @@ struct contact_listener : public b2ContactListener {
 	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
 	bool during_step = false;
+	bool friendly_fire = true;
 
 	cosmos& cosm;
 	physics_world_cache& get_sys() const;

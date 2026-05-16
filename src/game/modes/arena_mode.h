@@ -5,6 +5,7 @@
 
 #include "augs/math/declare_math.h"
 #include "game/modes/arena_mode_structs.h"
+#include "application/arena/synced_dynamic_vars.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/enums/faction_type.h"
 #include "game/cosmos/solvers/standard_solver.h"
@@ -600,6 +601,8 @@ public:
 		C callbacks,
 		solve_settings settings
 	) {
+		settings.friendly_fire = in.dynamic_vars.friendly_fire;
+
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
 		++total_mode_steps_passed;
