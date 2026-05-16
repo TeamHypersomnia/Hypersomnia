@@ -1,4 +1,4 @@
-**No yapping.** To the point language.
+**No yapping.** To the point language. Speak like a caveman, but dont remove tenses: keep "used", "uses". Keep "a", "an", "the".
 
 # Build tools (MCP)
 

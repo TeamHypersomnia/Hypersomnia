@@ -3071,8 +3071,6 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 	LOG("Requested bots: %xm %xr %xa", requested_bots.metropolis, requested_bots.resistance, requested_bots.atlantis);
 	LOG("Current bots: %xm %xr %xa", current_num_bots.metropolis, current_num_bots.resistance, current_num_bots.atlantis);
 
-	int bot_name_counter = int(get_num_bot_players());
-
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type faction) {
@@ -3096,17 +3094,44 @@ void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step)
 			for (const auto& t : to_erase) {
 				LOG("Removing superfluous bot: %x", t.value);
 				remove_player(in, step, t);
-				--bot_name_counter;
 			}
 		}
 	});
+
+	/*
+		Pick the first name from the list that no current bot is using.
+		Using a counter is unsafe because removals are by faction iteration,
+		not LIFO — so an old name may still be in use when the counter wraps.
+		If all names are exhausted, append a numeric suffix.
+	*/
+	auto pick_free_bot_name = [&]() -> client_nickname_type {
+		if (names.empty()) {
+			return {};
+		}
+
+		for (const auto& candidate : names) {
+			if (find_player_by(candidate) == nullptr) {
+				return candidate;
+			}
+		}
+
+		for (int suffix = 2; ; ++suffix) {
+			for (const auto& base : names) {
+				const auto candidate = client_nickname_type(typesafe_sprintf("%x %x", base, suffix));
+
+				if (find_player_by(candidate) == nullptr) {
+					return candidate;
+				}
+			}
+		}
+	};
 
 	p.for_each([&](const faction_type faction) {
 		auto current = current_num_bots[faction];
 		auto requested = requested_bots[faction];
 
 		while (current < requested) {
-			const auto new_id = add_bot_player(in, names[(bot_name_counter++) % names.size()]);
+			const auto new_id = add_bot_player(in, pick_free_bot_name());
 			choose_faction(in, new_id, faction);
 			++current;
 		}

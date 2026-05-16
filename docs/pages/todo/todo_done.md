@@ -1,3 +1,15 @@
+- difficulty advancement system
+	- player based zeby mialo sens 
+		- przy casualach bedzie resetowalo po reconnect
+		- ale z levelem aury bedzie z automatu
+		- wtedy jak player based to bedzie dobieralo ilosc botow do balansu
+	- zamiast miec no. allies i no. enemies po prostu dynamicznie to zrobmy
+	- ale ff wylacozne bedzie wiec git
+	- wiadomosci jakies win x more matches to make bots hard
+	- na to moglby byc tez aczik ze od poczatku do konca byl
+
+- bot quota w gun game?
+- zmienic default na very easy
 - neons aren't occluded beneath the sentiences again (pixel format problem again?)
 	- it's actually ok, it's just that there is a corner case on ct spawn on cyberaqua
 

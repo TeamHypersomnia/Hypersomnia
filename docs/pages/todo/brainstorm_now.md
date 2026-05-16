@@ -6,24 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- difficulty advancement system
-	- player based zeby mialo sens 
-		- przy casualach bedzie resetowalo po reconnect
-		- ale z levelem aury bedzie z automatu
-		- wtedy jak player based to bedzie dobieralo ilosc botow do balansu
-	- zamiast miec no. allies i no. enemies po prostu dynamicznie to zrobmy
-	- ale ff wylacozne bedzie wiec git
-	- wiadomosci jakies win x more matches to make bots hard
-	- na to moglby byc tez aczik ze od poczatku do konca byl
+- friendly fire bym dal tylko na rankedy
+	- dla casuali nawet bym wylaczyl
+	- ale to jako setting
 
-- bot quota w gun game?
-- zmienic default na very easy
+- poupewniac sie ze mapki maja dobre bot quotas
 - gore do mieczy i moze do nozy tez kiedys
 
 - jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?
 	 - rownamy ilosc graczy wtedy?
-
-- friendly fire bym dal tylko na rankedy
 
 # Turniej
 
