@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/math/vec2.h" 
+#include "augs/math/vec2.h"
 #include "augs/pad_bytes.h"
 
 #include "augs/misc/timing/stepped_timing.h"
@@ -13,6 +13,7 @@
 #include "augs/pad_bytes.h"
 #include "augs/math/physics_structs.h"
 #include "game/detail/adversarial_meta.h"
+#include "game/assets/ids/asset_ids.h"
 
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
@@ -80,6 +81,7 @@ namespace invariants {
 		melee_throw_def throw_def;
 		real32 movement_speed_bonus = 1.1f;
 		adversarial_meta adversarial = { static_cast<money_type>(1200) };
+		assets::image_id gore_image_id;
 		// END GEN INTROSPECTOR
 
 		melee() {
@@ -95,6 +97,7 @@ namespace components {
 		augs::stepped_timestamp when_passed_held_item;
 		augs::stepped_timestamp when_clashed;
 		augs::stepped_timestamp when_inflicted_damage;
+		real32 gore_freshness = -1.f;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -16,6 +16,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/render_component.h"
 #include "game/components/remnant_component.h"
+#include "game/components/melee_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
@@ -256,6 +257,36 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		}
 
 		render_visitor(sprite, in.manager, input);
+
+		if constexpr(!for_gui && H::template has<components::melee>() && H::template has<invariants::melee>()) {
+			const auto& melee_comp = typed_handle.template get<components::melee>();
+			const auto& melee_def = typed_handle.template get<invariants::melee>();
+
+			if (melee_comp.gore_freshness >= 0.f && melee_def.gore_image_id.is_set()) {
+				/*
+					Same tempo as decal_system blood freshness:
+					over 40s, diffuse colorize 1.0 -> 0.3, neon alpha 1.0 -> 0.
+				*/
+				constexpr real32 FRESHNESS_STEP_SECS = 2.f;
+				constexpr int FRESHNESS_NUM_STEPS = 20;
+				constexpr real32 FRESHNESS_MIN_COLORIZE = 0.3f;
+
+				const auto now_secs = static_cast<real32>(typed_handle.get_cosmos().get_total_seconds_passed());
+				const auto elapsed_secs = now_secs - melee_comp.gore_freshness;
+				const auto freshness_step = std::min(static_cast<int>(elapsed_secs / FRESHNESS_STEP_SECS), FRESHNESS_NUM_STEPS);
+				const auto progress = static_cast<real32>(freshness_step) / static_cast<real32>(FRESHNESS_NUM_STEPS);
+				const auto colorize_mult = 1.0f - progress * (1.0f - FRESHNESS_MIN_COLORIZE);
+				const auto neon_alpha_mult = 1.0f - progress;
+
+				auto gore = sprite;
+				gore.image_id = melee_def.gore_image_id;
+				gore.color = rgba(white).multiply_rgb(colorize_mult);
+				gore.neon_color = rgba(white).mult_alpha(neon_alpha_mult);
+
+				render_visitor(gore, in.manager, input);
+			}
+		}
+
 		return;
 	}
 

@@ -26,6 +26,7 @@
 #include "game/components/render_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/owner_component.h"
+#include "game/components/melee_component.h"
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
@@ -998,6 +999,14 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 
 		if (reported_hp_damage > 0 || reported_pe_damage > 0) {
 			contribute_to_damage(amount, reported_hp_damage, reported_pe_damage);
+		}
+
+		if (reported_hp_damage > 0) {
+			if (const auto cause_entity = cosm[d.origin.cause.entity]) {
+				if (auto* const melee = cause_entity.find<components::melee>()) {
+					melee->gore_freshness = static_cast<real32>(cosm.get_total_seconds_passed());
+				}
+			}
 		}
 	}
 

@@ -287,6 +287,7 @@ enum class test_scene_image_id {
 	ASSAULT_RATTLE_1,
 
 	SWORD,
+	SWORD_GORE,
 
 	SZTURM,
 	SZTURM_MAGAZINE,

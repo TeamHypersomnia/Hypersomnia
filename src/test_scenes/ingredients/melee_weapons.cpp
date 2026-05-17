@@ -374,6 +374,8 @@ namespace test_flavours {
 
 			auto& melee = meta.template get<invariants::melee>();
 
+			melee.gore_image_id = to_image_id(test_scene_image_id::SWORD_GORE);
+
 			melee.throw_def.throw_angular_speed = 0.0f;
 
 			for (auto& a : melee.actions) {
