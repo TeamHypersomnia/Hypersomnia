@@ -32,6 +32,7 @@ namespace test_flavours {
 			const auto specific_to,
 			const auto weight_mult,
 			const auto color,
+			std::string space_occupied = "1.5",
 			const float dmg_mult = 1.f,
 			const money_type award = 1350,
 			const float swings_mult = 1.0f
@@ -50,7 +51,7 @@ namespace test_flavours {
 			{
 				invariants::item item;
 
-				item.space_occupied_per_charge = to_space_units("1.5");
+				item.space_occupied_per_charge = to_space_units(space_occupied);
 				item.holding_stance = item_holding_stance::KNIFE_LIKE;
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_DRAW);
 				item.standard_price = static_cast<money_type>(price);
@@ -193,6 +194,7 @@ namespace test_flavours {
 				faction_type::RESISTANCE,
 				1.f,
 				white,
+				"1.7",
 				1.125f,
 				4500,
 				1.15f
@@ -218,6 +220,7 @@ namespace test_flavours {
 			faction_type::SPECTATOR,
 			0.65f,
 			white,
+			"1.6",
 			1.8f,
 			static_cast<money_type>(800)
 		);
@@ -229,6 +232,7 @@ namespace test_flavours {
 			faction_type::METROPOLIS,
 			1.f,
 			cyan,
+			"1.5",
 			1.f,
 			static_cast<money_type>(3000)
 		);
@@ -240,6 +244,7 @@ namespace test_flavours {
 			faction_type::RESISTANCE,
 			1.f,
 			yellow,
+			"1.5",
 			1.f,
 			static_cast<money_type>(3000)
 		);
@@ -252,6 +257,7 @@ namespace test_flavours {
 				faction_type::SPECTATOR,
 				0.7f,
 				white,
+				"1.0",
 				1.0f,
 				static_cast<money_type>(5000)
 			);
@@ -271,6 +277,7 @@ namespace test_flavours {
 				faction_type::SPECTATOR,
 				1.1f,
 				white,
+				"1.7",
 				1.0f,
 				4500
 			);
@@ -295,7 +302,8 @@ namespace test_flavours {
 				static_cast<money_type>(1700),
 				faction_type::SPECTATOR,
 				1.8f,
-				cyan
+				cyan,
+				"3.0"
 			);
 
 			auto& melee = meta.template get<invariants::melee>();
@@ -349,7 +357,6 @@ namespace test_flavours {
 
 			meta.template get<invariants::fixtures>().material = to_physical_material_id(test_scene_physical_material_id::METAL);
 			meta.template get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_DRAW);
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.0");
 		}
 
 		{
@@ -360,6 +367,7 @@ namespace test_flavours {
 				faction_type::SPECTATOR,
 				2.0f,
 				white,
+				"4.0",
 				1.2f,
 				400
 			);
@@ -384,7 +392,6 @@ namespace test_flavours {
 				a.bot_attack_range = 370.0f;
 			}
 
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("4.0");
 			//meta.template get<invariants::fixtures>().density *= 3;
 		}
 	}
