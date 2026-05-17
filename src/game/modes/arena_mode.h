@@ -335,6 +335,7 @@ private:
 			std::size_t container_index = static_cast<std::size_t>(-1);
 			slot_function slot_type = slot_function::INVALID;
 			entity_id source_entity_id;
+			uint32_t incoming_transfer_id = 0;
 		};
 
 		std::vector<item> items;

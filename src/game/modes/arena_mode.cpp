@@ -191,10 +191,11 @@ faction_type arena_mode::get_player_faction(const mode_player_id& id) const {
 }
 
 template <class H>
-void arena_mode_set_transferred_item_meta(const H handle, int charges, const item_owner_meta& meta) {
+void arena_mode_set_transferred_item_meta(const H handle, int charges, const item_owner_meta& meta, const uint32_t incoming_transfer_id) {
 	auto& item = *handle.template get<components::item>().component;
 	item.charges = charges;
 	item.owner_meta = meta;
+	item.incoming_transfer_id = incoming_transfer_id;
 }
 
 void arena_mode::init_spawned(
@@ -271,7 +272,7 @@ void arena_mode::init_spawned(
 					cosm,
 					i.flavour,
 					[&](const entity_handle handle) {
-						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta);
+						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta, i.incoming_transfer_id);
 					}
 				);
 
@@ -1255,7 +1256,7 @@ arena_mode::round_transferred_players arena_mode::make_transferred_players(const
 					const auto source_entity_id = typed_item.get_id();
 					const auto& item = typed_item.template get<components::item>();
 
-					items.push_back({ flavour_id, item.get_charges(), item.get_raw_component().owner_meta, container_index, slot.get_type(), source_entity_id });
+					items.push_back({ flavour_id, item.get_charges(), item.get_raw_component().owner_meta, container_index, slot.get_type(), source_entity_id, item.get_incoming_transfer_id() });
 
 					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				}
