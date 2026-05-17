@@ -424,6 +424,10 @@ void test_scene_setup::restart_mode() {
 					}
 
 					if (is_tutorial()) {
+						if (p.editable.faction == player_faction) {
+							continue;
+						}
+
 						const auto new_id = mode.add_player(input, nickname, enemy_faction);
 						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
 						mode.find(new_id)->hide_in_scoreboard = true;

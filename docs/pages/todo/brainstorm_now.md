@@ -13,9 +13,6 @@ summary: That which we are brainstorming at the moment.
 - poupewniac sie ze mapki maja dobre bot quotas
 - gore do mieczy i moze do nozy tez kiedys
 
-- jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?
-	 - rownamy ilosc graczy wtedy?
-
 # Turniej
 
 - CUSTOM MAPKI! trzeba zorganizowac
