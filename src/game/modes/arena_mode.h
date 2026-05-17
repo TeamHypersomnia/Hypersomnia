@@ -820,8 +820,7 @@ public:
 	per_actual_faction<uint8_t> calc_requested_bots(const const_input in) const;
 	per_actual_faction<uint8_t> calc_requested_bots_from_quotas(
 		const const_input in,
-		int8_t first_quota,
-		int8_t second_quota = -1,
+		const bot_quota& quota,
 		const mode_player_id& requester_player = mode_player_id()
 	) const;
 	per_actual_faction<uint8_t> calc_requested_bots_from_casual_levels(
@@ -830,7 +829,6 @@ public:
 	) const;
 
 	bool casual_levels_enabled(const_input) const;
-	bool bot_settings_overridden(const_input) const;
 	uint16_t calc_team_level(faction_type) const;
 	difficulty_type calc_bot_difficulty(const_input) const;
 

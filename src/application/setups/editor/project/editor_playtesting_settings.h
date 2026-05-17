@@ -21,7 +21,7 @@ struct editor_playtesting_settings {
 	bool spawn_only_enemy_bots = false;
 	bool see_enemies_behind_walls = false;
 	bool draw_enemy_crosshairs = false;
-	difficulty_type bot_difficulty = difficulty_type::VERY_EASY;
+	difficulty_type bot_difficulty = difficulty_type::LEVELLING;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_playtesting_settings&) const = default;

@@ -1,17 +1,5 @@
 #pragma once
 
-bool arena_mode::bot_settings_overridden(const_input_type in) const {
-	if (in.dynamic_vars.bots_override.is_set()) {
-		return true;
-	}
-
-	if (in.dynamic_vars.bot_override_difficulty != difficulty_type::COUNT) {
-		return true;
-	}
-
-	return false;
-}
-
 bool arena_mode::casual_levels_enabled(const_input_type in) const {
 	if (in.rules.is_gun_game()) {
 		return false;
@@ -21,7 +9,7 @@ bool arena_mode::casual_levels_enabled(const_input_type in) const {
 		return false;
 	}
 
-	if (bot_settings_overridden(in)) {
+	if (in.dynamic_vars.bot_override_difficulty != difficulty_type::LEVELLING) {
 		return false;
 	}
 
@@ -141,7 +129,7 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_casual_levels(
 difficulty_type arena_mode::calc_bot_difficulty(const_input_type in) const {
 	const auto override_diff = in.dynamic_vars.bot_override_difficulty;
 
-	if (override_diff != difficulty_type::COUNT) {
+	if (override_diff != difficulty_type::LEVELLING) {
 		return override_diff;
 	}
 

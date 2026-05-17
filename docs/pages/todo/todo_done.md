@@ -7444,3 +7444,11 @@ This will discard your redo history."
 - jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?
 	 - rownamy ilosc graczy wtedy?
 
+- balance snipers
+- te teleporty co jest
+- fix spawn na tutorialu czemu tam gosc jest
+
+- friendly fire bym dal tylko na rankedy
+	- dla casuali nawet bym wylaczyl
+	- ale to jako setting
+

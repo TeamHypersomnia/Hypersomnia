@@ -2312,8 +2312,7 @@ work_result work(
 						params.suppress_server_webhook,
 						assigned_teams,
 						config.webrtc_signalling_server_url,
-						"",
-						start_server_gui.get_initial_overrides()
+						""
 					);
 				});
 

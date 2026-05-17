@@ -10,6 +10,7 @@
 #include "augs/misc/secure_hash.h"
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/difficulty_type.h"
+#include "game/modes/bot_quota.h"
 
 namespace augs { struct introspection_access; }
 class start_server_gui_state;
@@ -138,7 +139,8 @@ private:
 	bool friendly_fire = false;
 public:
 	bool bots = true;
-	difficulty_type bot_difficulty = difficulty_type::VERY_EASY;
+	difficulty_type bot_difficulty = difficulty_type::LEVELLING;
+	bot_quota bot_quota;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;

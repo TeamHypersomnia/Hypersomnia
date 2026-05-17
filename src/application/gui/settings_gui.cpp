@@ -31,6 +31,7 @@
 #include "augs/audio/sound_sizes.h"
 #include "application/gui/config_nvp.h"
 #include "application/gui/do_server_vars.h"
+#include "application/gui/bot_quota_widget.h"
 #include "application/gui/pretty_tabs.h"
 #include "application/setups/editor/editor_paths.h"
 #include "augs/string/typesafe_sscanf.h"
@@ -2259,6 +2260,26 @@ void do_server_vars(
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
 		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
+
+		if (auto node = scoped_tree_node("Bots")) {
+			revertable_checkbox("Enable bots", vars.bots);
+
+			if (vars.bots) {
+				auto bind = scoped_indent();
+
+				revertable_enum("Difficulty", vars.bot_difficulty);
+				revert(vars.bot_difficulty);
+
+				if (vars.bot_difficulty != difficulty_type::LEVELLING) {
+					text("Bot quota:");
+					edit_bot_quota_widget(vars.bot_quota);
+					revert(vars.bot_quota);
+				}
+				else {
+					text_disabled("\"Levelling\" uses the map's default bot quota.");
+				}
+			}
+		}
 
 		revertable_checkbox("Show on server list", vars.show_on_server_list);
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list));

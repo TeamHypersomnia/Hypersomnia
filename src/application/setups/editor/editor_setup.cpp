@@ -3379,8 +3379,8 @@ void editor_setup::start_playtesting() {
 			mode.choose_faction(input, local_player_id, project.playtesting.starting_faction);
 
 			if (project.playtesting.spawn_only_enemy_bots) {
-				dummy_dynamic_vars.bots_override = {
-					local_player_id,
+				dummy_dynamic_vars.bots_override.requester = local_player_id;
+				dummy_dynamic_vars.bots_override.quota = {
 					uint8_t(0),
 					static_cast<uint8_t>(input.rules.default_bot_quota)
 				};

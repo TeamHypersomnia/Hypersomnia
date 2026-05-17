@@ -5,7 +5,6 @@
 #include "application/setups/server/dedicated_or_integrated.h"
 #include "augs/misc/timing/timer.h"
 #include "application/arena/synced_dynamic_vars.h"
-#include "application/setups/server/server_temp_var_overrides.h"
 
 struct server_vars;
 struct server_public_vars;
@@ -23,14 +22,6 @@ public:
 	bool is_steam_client = false;
 	bool show_help = false;
 	bool show_nat_details = false;
-
-	bool enable_bots = true;
-	difficulty_type bot_difficulty = difficulty_type::HARD;
-
-	int bot_allies = 2;
-	int bot_enemies = 5;
-
-	server_temp_var_overrides get_initial_overrides() const;
 
 	bool perform(
 		server_listen_input& into,

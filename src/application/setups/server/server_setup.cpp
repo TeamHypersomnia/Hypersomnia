@@ -2600,13 +2600,15 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	out.force_short_match = has_browser_clients_playing;
 
-	/*
-		COUNT means: no override, use the level-derived difficulty.
-	*/
-	out.bot_override_difficulty = difficulty_type::COUNT;
+	out.bot_override_difficulty = vars.bot_difficulty;
 
 	if (!vars.bots) {
-		out.bots_override = { {}, 0u, 0u };
+		out.bots_override.requester = mode_player_id::machine_admin();
+		out.bots_override.quota = { 0u, 0u };
+	}
+	else if (!vars.bot_quota.empty()) {
+		out.bots_override.requester = mode_player_id::machine_admin();
+		out.bots_override.quota = vars.bot_quota;
 	}
 
 	if (overrides.bots.is_set()) {
@@ -5067,31 +5069,46 @@ void server_setup::handle_client_chat_command(
 			else if (begins_with(chat.message, "/bots veasy") || chat.message == "/bots ve") {
 				set_difficulty(difficulty_type::VERY_EASY);
 			}
+			else if (begins_with(chat.message, "/bots levelling") || chat.message == "/bots l") {
+				set_difficulty(difficulty_type::LEVELLING);
+			}
 			else {
-				unsigned first = -1;
-				unsigned second = -1;
+				unsigned first = 0;
+				unsigned second = 0;
 
-				typesafe_sscanf(chat.message, "/bots %x %x", first, second);
-				LOG("Bots: %x, %x", first, second);
+				const bool got_two = typesafe_sscanf(chat.message, "/bots %x %x", first, second);
+				const bool got_one = !got_two && typesafe_sscanf(chat.message, "/bots %x", first);
 
-				if (first == unsigned(-1)) {
+				if (!got_one && !got_two) {
 					broadcast_info("Wrong command format.", chat_target_type::INFO_CRITICAL);
 				}
 				else if (
 					first > max_bot_quota_v
-					|| (second != unsigned(-1) && second > max_bot_quota_v)
-					|| (second != unsigned(-1) && first + second > max_bot_quota_v)
+					|| (got_two && second > max_bot_quota_v)
+					|| (got_two && first + second > max_bot_quota_v)
 				) {
 					broadcast_info("Cannot exceed " + std::to_string(max_bot_quota_v) + " bots.", chat_target_type::INFO_CRITICAL);
 				}
-				else if (first != unsigned(-1)) {
-					overrides.bots = {
-						to_mode_player_id(id),
-						uint8_t(first),
-						second == unsigned(-1) ? uint8_t(-1) : uint8_t(second)
-					};
+				else {
+					overrides.bots.requester = to_mode_player_id(id);
+					overrides.bots.quota.clear();
+					overrides.bots.quota.emplace_back(uint8_t(first));
 
-					broadcast_info("Bots adjusted.", chat_target_type::INFO);
+					if (got_two) {
+						overrides.bots.quota.emplace_back(uint8_t(second));
+					}
+
+					const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
+
+					if (current_difficulty == difficulty_type::LEVELLING) {
+						broadcast_info(
+							"\"levelling\" difficulty uses the map's quota.\nFirst type e.g. \"/bots easy\".",
+							chat_target_type::INFO
+						);
+					}
+					else {
+						broadcast_info("Bots adjusted.", chat_target_type::INFO);
+					}
 				}
 			}
 		}

@@ -2983,8 +2983,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 	const const_input_type in,
-	const int8_t first_quota,
-	const int8_t second_quota,
+	const bot_quota& quota,
 	const mode_player_id& requester_player
 ) const {
 	const auto factions = calc_participating_factions(in);
@@ -2992,19 +2991,24 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 
 	per_actual_faction<uint8_t> result = { 0u, 0u, 0u };
 
-	if (const bool custom_split = second_quota > -1 && player != nullptr) {
+	if (quota.empty()) {
+		return result;
+	}
+
+	if (const bool custom_split = quota.size() == 2 && player != nullptr) {
 		auto requester_faction = player->get_faction();
 
 		if (requester_faction == faction_type::SPECTATOR) {
 			requester_faction = factions.bombing;
 		}
 
-		result[requester_faction] = first_quota;
-		result[factions.get_opposing(requester_faction)] = second_quota;
+		result[requester_faction] = quota[0];
+		result[factions.get_opposing(requester_faction)] = quota[1];
 	}
 	else {
-		const auto rem = first_quota % factions.size();
-		const auto per_fact = first_quota / factions.size() + rem;
+		const auto total = quota[0];
+		const auto rem = total % factions.size();
+		const auto per_fact = total / factions.size() + rem;
 
 		factions.for_each(
 			[&](const auto faction) {
@@ -3026,26 +3030,33 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
 	}
 
-	if (over.is_set()) {
+	const bool levelling = casual_levels_enabled(in);
+
+	if (over.is_set() && !levelling) {
 		return calc_requested_bots_from_quotas(
 			in,
-			over.first,
-			over.second,
+			over.quota,
 			over.requester
 		);
 	}
 
 	const auto p = calc_participating_factions(in);
-	const auto quota = in.rules.default_bot_quota;
+	const auto map_quota = in.rules.default_bot_quota;
 
-	if (casual_levels_enabled(in) && p.valid() && quota > 0) {
-		const auto team_size = uint8_t(quota / int(p.size()));
+	if (levelling && p.valid() && map_quota > 0) {
+		const auto team_size = uint8_t(map_quota / int(p.size()));
 		return calc_requested_bots_from_casual_levels(in, team_size);
+	}
+
+	bot_quota single_total;
+
+	if (map_quota > 0) {
+		single_total.emplace_back(uint8_t(map_quota));
 	}
 
 	return calc_requested_bots_from_quotas(
 		in,
-		quota
+		single_total
 	);
 }
 
