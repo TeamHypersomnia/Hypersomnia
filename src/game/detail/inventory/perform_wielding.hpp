@@ -1,6 +1,9 @@
 #pragma once
 #include <cstddef>
 #include "augs/templates/logically_empty.h"
+#include "game/components/melee_component.h"
+#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/manage_shoulder_storage.hpp"
 
 #define LOG_WIELDING 0
 
@@ -248,6 +251,14 @@ void perform_wielding(
 			}
 		}
 	}
+
+	/*
+		After any wielding, if the SHOULDER is empty (a melee may have been
+		drawn from there into a hand), silently park the largest remaining
+		non-held melee back into SHOULDER so the player keeps their best
+		backup mounted.
+	*/
+	::silently_fill_shoulder_with_largest_melee(step, self);
 
 
 #else

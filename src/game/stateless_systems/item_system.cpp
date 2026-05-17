@@ -1322,9 +1322,39 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					auto num_additional_melees = requested_knives - num_wielded_melees;
 					bool any_found = false;
 
+					entity_id prioritized_shoulder_melee;
+
+					/*
+						Priority: a melee weapon kept in the SHOULDER slot is always
+						the first candidate to be drawn for throwing.
+					*/
+					if (num_additional_melees > 0) {
+						if (const auto shoulder_slot = typed_subject[slot_function::SHOULDER]) {
+							if (const auto shoulder_item = shoulder_slot.get_item_if_any()) {
+								if (is_melee_like(shoulder_item)) {
+									requested_wield.hand_selections[target_index] = shoulder_item;
+									target_index = 1 - target_index;
+									++num_found_melees;
+									--num_additional_melees;
+
+									any_found = true;
+									prioritized_shoulder_melee = shoulder_item.get_id();
+								}
+							}
+						}
+					}
+
 					typed_subject.for_each_contained_item_recursive(
 						[&](const auto& candidate_item) {
+							if (num_additional_melees <= 0) {
+								return recursive_callback_result::ABORT;
+							}
+
 							if (candidate_item.get_current_slot().is_hand_slot()) {
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
+
+							if (entity_id(candidate_item.get_id()) == prioritized_shoulder_melee) {
 								return recursive_callback_result::CONTINUE_AND_RECURSE;
 							}
 
@@ -1346,8 +1376,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					const auto total_wielded_melees = num_found_melees + num_wielded_melees;
 
 					if (any_found) {
-						const bool any_item_was_replaced = 
-							current_wielding.is_akimbo(cosm) || 
+						const bool any_item_was_replaced =
+							current_wielding.is_akimbo(cosm) ||
 							total_wielded_melees == 2
 						;
 

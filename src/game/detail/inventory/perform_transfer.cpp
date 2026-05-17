@@ -28,6 +28,8 @@
 #include "game/detail/explosive/like_explosive.h"
 #include "game/inferred_caches/relational_cache.hpp"
 #include "game/cosmos/might_allocate_entities_having.hpp"
+#include "game/components/melee_component.h"
+#include "game/detail/inventory/manage_shoulder_storage.hpp"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
@@ -72,9 +74,33 @@ perform_transfer_result perform_transfer(
 	const item_slot_transfer_request r,
 	const logic_step step
 ) {
-	const auto result = perform_transfer_no_step(r, step.get_cosmos());
+	auto& cosm = step.get_cosmos();
+
+	const bool was_melee_transfer = cosm[r.item].template has<components::melee>();
+
+	const auto result = perform_transfer_no_step(r, cosm);
 	result.notify(step);
 	result.play_effects(step);
+
+	/*
+		Whenever a melee weapon changes slots, reevaluate the SHOULDER mount
+		so the largest available melee always sits there.
+	*/
+	if (was_melee_transfer && result.result.is_successful()) {
+		const auto chosen_root = result.result.target_root.is_set()
+			? result.result.target_root
+			: result.result.source_root
+		;
+
+		if (chosen_root.is_set()) {
+			cosm[chosen_root].dispatch_on_having_all<components::item_slot_transfers>(
+				[&](const auto& typed_subject) {
+					::silently_fill_shoulder_with_largest_melee(step, typed_subject);
+				}
+			);
+		}
+	}
+
 	return result;
 }
 
