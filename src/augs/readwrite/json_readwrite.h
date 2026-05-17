@@ -237,7 +237,7 @@ namespace augs {
 
 					if (from_array.Size() > max_size) {
 						throw json_deserialization_error(
-							"Too many elements in a container (%x)!\nElements passed: %x\nMax size: %x", 
+							"Too many elements in a container (%x)!\nElements passed: %x\nMax size: %x",
 							get_type_name_strip_namespace<Container>(),
 							from_array.Size(),
 							max_size
@@ -262,6 +262,23 @@ namespace augs {
 						else {
 							out.emplace(std::move(val));
 						}
+					}
+				}
+				else if constexpr(!is_std_array_v<Container>) {
+					/*
+						A single value is read as a container with a single value.
+						Example: "bot_quota": 10 is treated as "bot_quota": [10].
+						Writing always uses the explicit array form.
+					*/
+					typename Container::value_type val;
+
+					read_json(from, val);
+
+					if constexpr(can_emplace_back_v<Container>) {
+						out.emplace_back(std::move(val));
+					}
+					else {
+						out.emplace(std::move(val));
 					}
 				}
 			}
