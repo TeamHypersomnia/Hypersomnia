@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2024-06-08 19:54:34.872179 UTC"
+        "version_timestamp": "2026-05-17 12:46:26.559651 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -13,8 +13,7 @@
         "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
-        "mode": "quick_test",
-        "bots": 53
+        "mode": "quick_test"
     },
     "game_modes": {
         "quick_test": {
@@ -22,6 +21,7 @@
                 "metropolis": {
                     "firearm": null,
                     "melee": null,
+                    "all_spells": true,
                     "backpack": false
                 },
                 "resistance": {
@@ -39,7 +39,7 @@
             "file_hash": "3d44ea0d1a7ba7a6fae076c21988ff4a727107138c9ed44250550b5d342a9afe",
             "id": "@captions/glass.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 180, 255, 255],
@@ -51,7 +51,7 @@
             "file_hash": "c40b0009b01b152e98c5635c00de3552a00b1332302e2417325f9c501b224058",
             "id": "@menu",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 0, 255],
@@ -63,7 +63,7 @@
             "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
             "id": "@captions/metal.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "size": [291, 66]
@@ -73,7 +73,7 @@
             "file_hash": "b48f30bc5d35a7be466277cc1a914911e534d7f009473701bb3ab51f3d7ea06e",
             "id": "@range",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 255, 255],
@@ -85,7 +85,7 @@
             "file_hash": "99dc0a53037b99e1e1512300f2e117241e64f3485a5782f02458f56c243cc46e",
             "id": "@surf",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [255, 0, 255, 255],
@@ -97,7 +97,7 @@
             "file_hash": "a5bb4864ebd02475245eec67542069a0aec31372063593057ca7842cdd674ae8",
             "id": "@captions/vent.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 126, 255],
@@ -109,7 +109,7 @@
             "file_hash": "aef50032f491c555a2c7f798bbadc0ff1245475e928124497a1bca51440a7f21",
             "id": "@captions/wood.png",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [255, 127, 0, 255],
@@ -127,7 +127,7 @@
             "file_hash": "a5a603e1000edc2d429209336b93110632f953e2a75777268b6767d931e3f935",
             "id": "@arrow_green",
             "neon_map": {
-                "light_colors": [[16, 242, 0, 255]
+                "light_colors": [[16, 242, 0, 255, 1.0]
                 ]
             },
             "size": [500, 250]
@@ -137,7 +137,7 @@
             "file_hash": "93851d8ea61b5fbbb9d2996dbf225afb33ac857b810bc7fe0267542b4701b124",
             "id": "@asite",
             "neon_map": {
-                "light_colors": [[255, 0, 0, 255], [150, 0, 20, 255]
+                "light_colors": [[255, 0, 0, 255, 1.0], [150, 0, 20, 255, 1.0]
                 ]
             },
             "size": [128, 128]
@@ -147,7 +147,7 @@
             "file_hash": "2412b2636a06074fe5bf84a29f339f973c1f0a7e0db95c922b7d815d0a4a9f50",
             "id": "@bsite",
             "neon_map": {
-                "light_colors": [[255, 0, 0, 255], [150, 0, 20, 254], [150, 0, 20, 255]
+                "light_colors": [[255, 0, 0, 255, 1.0], [150, 0, 20, 254, 1.0], [150, 0, 20, 255, 1.0]
                 ]
             },
             "size": [128, 128]
@@ -159,7 +159,7 @@
             "neon_map": {
                 "standard_deviation": 8.0,
                 "amplification": 10.0,
-                "light_colors": [[95, 205, 228, 255]
+                "light_colors": [[95, 205, 228, 255, 1.0]
                 ]
             },
             "neon_color": [255, 255, 255, 106],
@@ -195,7 +195,7 @@
             "id": "@yellow_barrier",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[232, 199, 65, 255]
+                "light_colors": [[232, 199, 65, 255, 1.0]
                 ]
             },
             "size": [32, 128],
@@ -213,7 +213,7 @@
             "id": "@materials/glass.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 180, 255, 255],
@@ -233,7 +233,7 @@
             "id": "@materials/metal.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "neon_color": [255, 255, 255, 72],
@@ -251,7 +251,7 @@
             "id": "@materials/vent.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [0, 255, 126, 255],
@@ -270,7 +270,7 @@
             "id": "@materials/wood.png",
             "domain": "PHYSICAL",
             "neon_map": {
-                "light_colors": [[255, 255, 255, 255]
+                "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
             "color": [255, 171, 0, 255],
@@ -884,7 +884,6 @@
         },
         {
             "id": "Level16",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_256 (98)",
                 "hazard (11)",
@@ -1843,7 +1842,6 @@
         },
         {
             "id": "Level1",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (2)",
                 "tip1_1",
@@ -1865,7 +1863,6 @@
         },
         {
             "id": "Level0",
-            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
@@ -1889,7 +1886,6 @@
         },
         {
             "id": "Floors",
-            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (9)",
                 "floor_right (7)",
@@ -2035,8 +2031,8 @@
         {
             "id": "dev_floor_256 (3)",
             "type": "dev_floor_256",
-            "pos": [0.0, 7424.0],
-            "size": [1536, 1024],
+            "pos": [0.0, 7552.0],
+            "size": [1536, 768],
             "color": [255, 0, 0, 255]
         },
         {
@@ -4232,8 +4228,8 @@
         {
             "id": "dev_floor_256 (98)",
             "type": "dev_floor_256",
-            "pos": [26624.0, 50944.0],
-            "size": [1792, 1536],
+            "pos": [26240.0, 50944.0],
+            "size": [1024, 1536],
             "color": [255, 0, 0, 255]
         },
         {
@@ -11110,8 +11106,8 @@
         {
             "id": "hazard (2)",
             "type": "hazard",
-            "pos": [0.0, 7424.0],
-            "size": [1536, 1024],
+            "pos": [0.0, 7551.99951171875],
+            "size": [1536, 768],
             "exit_cooldown_ms": 500.0,
             "hazard": {
                 "damage": 30.0
@@ -14326,8 +14322,8 @@
         {
             "id": "hazard (11)",
             "type": "hazard",
-            "pos": [26624.0, 50944.0],
-            "size": [1792, 1536],
+            "pos": [26240.0, 50944.0],
+            "size": [1024, 1536],
             "exit_cooldown_ms": 500.0,
             "hazard": {
                 "damage": 30.0
