@@ -3966,13 +3966,13 @@ work_result work(
 				/* The client needs more goodies */
 
 				setup.advance(
-					{ 
+					{
 						frame_delta,
-						logic_get_screen_size(), 
-						input_cfg, 
+						logic_get_screen_size(),
+						input_cfg,
 						nonzoomedout_zoom,
-						viewing_config.simulation_receiver, 
-						viewing_config.lag_compensation, 
+						viewing_config.simulation_receiver,
+						viewing_config.lag_compensation,
 						network_performance,
 						network_stats,
 						get_audiovisuals().get<interpolation_system>(),
@@ -3995,9 +3995,9 @@ work_result work(
 			else if constexpr(std::is_same_v<S, server_setup>) {
 #if BUILD_NETWORKING
 				setup.advance(
-					{ 
-						logic_get_screen_size(), 
-						input_cfg, 
+					{
+						logic_get_screen_size(),
+						input_cfg,
 						nonzoomedout_zoom,
 						get_detected_nat(),
 						network_performance,

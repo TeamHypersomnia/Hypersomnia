@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- balance snipers
+- te teleporty co jest
+- mapki poprawic
+- fix spawn na tutorialu czemu tam gosc jest
+
 - friendly fire bym dal tylko na rankedy
 	- dla casuali nawet bym wylaczyl
 	- ale to jako setting

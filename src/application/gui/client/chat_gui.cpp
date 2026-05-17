@@ -34,6 +34,17 @@ bool chat_gui_state::add_entry_from_mode_notification(
 		add_entry(std::move(new_entry));
 	};
 
+	auto do_faction_entry = [&](const auto& str, const faction_type faction) {
+		chat_gui_entry new_entry;
+		new_entry.timestamp = timestamp;
+		new_entry.message = str;
+		new_entry.author_faction = faction;
+		new_entry.is_my_message = current_mode_id == msg.subject_mode_id;
+
+		LOG_NOFORMAT(new_entry.to_string());
+		add_entry(std::move(new_entry));
+	};
+
 	auto handle_payload = [&](const auto& payload) {
 		using P = remove_cref<decltype(payload)>;
 		using F = faction_choice;
@@ -174,14 +185,14 @@ bool chat_gui_state::add_entry_from_mode_notification(
 			return true;
 		}
 		else if constexpr(std::is_same_v<P, casual_team_level_change>) {
-			do_entry(
+			do_faction_entry(
 				typesafe_sprintf(
 					"%x %x to level %x.",
 					format_enum(payload.faction),
 					payload.advanced ? "advanced" : "dropped",
 					payload.new_level + 1
 				),
-				cyan
+				payload.faction
 			);
 
 			return true;
@@ -193,7 +204,7 @@ bool chat_gui_state::add_entry_from_mode_notification(
 					payload.advanced ? "advanced" : "dropped",
 					augs::enum_to_string(payload.new_difficulty)
 				),
-				cyan
+				yellow
 			);
 
 			return true;
@@ -425,8 +436,13 @@ void chat_gui_state::draw_recent_messages(
 			}
 		}
 
-		const auto author_col = entry.overridden_message_color == rgba::zero ? get_col(entry.author_faction) : entry.overridden_message_color;
-		const auto message_col = entry.overridden_message_color == rgba::zero ? white : entry.overridden_message_color;
+		const auto faction_col = get_col(entry.author_faction);
+		const auto author_col = entry.overridden_message_color == rgba::zero ? faction_col : entry.overridden_message_color;
+		const auto message_col =
+			entry.overridden_message_color == rgba::zero ?
+			(entry.author.empty() ? faction_col : white) :
+			entry.overridden_message_color
+		;
 
 		const auto total_text = colored(author_text, author_col) + colored(message, message_col);
 

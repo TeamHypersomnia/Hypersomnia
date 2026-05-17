@@ -7441,3 +7441,6 @@ This will discard your redo history."
 	- juz tak jest ale raz
 - audit all allocation patterns against crashes
 
+- jesli quota dajemy typu 2 allies 5 enemies, co jak dojdzie jeden gracz do enemies?
+	 - rownamy ilosc graczy wtedy?
+
