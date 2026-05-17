@@ -202,7 +202,6 @@ public:
 	bool auto_authorize_loopback_for_rcon = true;
 	bool auto_authorize_internal_for_rcon = false;
 	uint32_t max_unauthorized_rcon_commands = 100;
-	uint32_t max_bots = 0;
 	float log_performance_once_every_secs = 1;
 	float sleep_mult = 0.1f;
 
