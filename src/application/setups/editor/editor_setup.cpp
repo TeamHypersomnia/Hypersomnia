@@ -3389,6 +3389,7 @@ void editor_setup::start_playtesting() {
 	});
 
 	dummy_dynamic_vars.bot_override_difficulty = project.playtesting.bot_difficulty;
+	dummy_dynamic_vars.friendly_fire = project.playtesting.friendly_fire;
 
 	cosm.request_resample();
 }

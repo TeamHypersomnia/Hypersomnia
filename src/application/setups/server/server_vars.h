@@ -11,6 +11,13 @@
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/difficulty_type.h"
 
+namespace augs { struct introspection_access; }
+class start_server_gui_state;
+enum class rcon_pane;
+struct server_runtime_info;
+struct server_vars;
+void do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*);
+
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
 struct arena_switching_settings {
@@ -65,6 +72,17 @@ enum class arena_cycle_type {
 	// END GEN INTROSPECTOR
 };
 
+struct server_ranked_overrides_vars {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct server_ranked_overrides_vars
+	bool friendly_fire = true;
+	float client_network_timeout_secs = 1.0f;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const server_ranked_overrides_vars&) const = default;
+};
+
 struct server_ranked_vars {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -75,7 +93,7 @@ struct server_ranked_vars {
 	uint8_t max_rejoins = 1;
 	uint8_t match_unfreezes_in_secs = 5;
 	bool freeze_match_on_disconnect = true;
-	float client_network_timeout_secs = 1.0f;
+	server_ranked_overrides_vars overrides;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_vars&) const = default;
@@ -96,7 +114,19 @@ struct server_ranked_vars {
 struct server_vars {
 	static constexpr bool force_read_field_by_field = true;
 
+	friend augs::introspection_access;
+	friend start_server_gui_state;
+	friend void ::do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*);
+
 	bool operator==(const server_vars&) const = default;
+
+	/*
+		Fields marked private in the GEN INTROSPECTOR block below are overridable
+		in ranked mode via ranked.overrides.*. Read them via getters
+		(get_friendly_fire / get_client_network_timeout_secs) so the right value
+		is picked depending on the server mode. Direct write access is granted
+		only to introspection and the settings GUIs.
+	*/
 
 	// GEN INTROSPECTOR struct server_vars
 	arena_identifier arena;
@@ -104,7 +134,9 @@ struct server_vars {
 
 	server_ranked_vars ranked;
 
-	bool friendly_fire = true;
+private:
+	bool friendly_fire = false;
+public:
 	bool bots = true;
 	difficulty_type bot_difficulty = difficulty_type::VERY_EASY;
 
@@ -144,7 +176,9 @@ struct server_vars {
 	uint32_t move_to_spectators_if_afk_for_secs = 120;
 	uint32_t kick_if_afk_for_secs = 7200;
 	float web_client_network_timeout_secs = 1.5f;
+private:
 	float client_network_timeout_secs = 3.0f;
+public:
 	bool authenticate_with_nicknames = false;
 	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
@@ -181,7 +215,7 @@ struct server_vars {
 
 	float get_client_network_timeout_secs(const bool is_browser) const {
 		if (ranked.is_ranked_server()) {
-			return ranked.client_network_timeout_secs;
+			return ranked.overrides.client_network_timeout_secs;
 		}
 
 		if (is_browser) {
@@ -189,6 +223,14 @@ struct server_vars {
 		}
 
 		return client_network_timeout_secs;
+	}
+
+	bool get_friendly_fire() const {
+		if (ranked.is_ranked_server()) {
+			return ranked.overrides.friendly_fire;
+		}
+
+		return friendly_fire;
 	}
 
 	bool requires_authentication() const {

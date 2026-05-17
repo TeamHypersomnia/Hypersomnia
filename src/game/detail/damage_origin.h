@@ -24,7 +24,8 @@ struct damage_circumstances {
 	// GEN INTROSPECTOR struct damage_circumstances
 	bool headshot = false;
 	bool wallbang = false;
-	pad_bytes<2> pad;
+	bool from_always_friendly_fire = false;
+	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
 };
 

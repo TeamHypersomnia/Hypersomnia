@@ -2271,6 +2271,7 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 	PROPERTY("Skip warmup", skip_warmup);
 	PROPERTY("Skip freeze time", skip_freeze_time);
 	PROPERTY("Unlimited money", unlimited_money);
+	PROPERTY("Friendly fire", friendly_fire);
 	PROPERTY("Spawn bots", spawn_bots);
 
 	if (ImGui::IsItemHovered()) {

@@ -2258,6 +2258,7 @@ void do_server_vars(
 		ImGui::Separator();
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
+		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
 
 		revertable_checkbox("Show on server list", vars.show_on_server_list);
 		revertable_input_text(SCOPE_CFG_NVP(notified_server_list));
@@ -2287,7 +2288,7 @@ void do_server_vars(
 			revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 10u, 2 * 3600u);
 			revertable_slider(SCOPE_CFG_NVP(client_network_timeout_secs), 0.2f, 10.0f);
 			revertable_slider("Client network timeout secs (WEB clients)", scope_cfg.web_client_network_timeout_secs, 0.2f, 10.0f);
-			revertable_slider("Client network timeout secs (RANKED)", scope_cfg.ranked.client_network_timeout_secs, 0.2f, 10.0f);
+			revertable_slider("Client network timeout secs (RANKED)", scope_cfg.ranked.overrides.client_network_timeout_secs, 0.2f, 10.0f);
 			revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
 		}
 

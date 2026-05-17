@@ -414,26 +414,33 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		}
 
 		/*
-			Disable collision between teammates when one of them is defusing.
-			This prevents bots walking onto each other and interrupting defusal.
+			Disable collision between teammates when:
+			- friendly fire is off (so allies can move through each other freely),
+			- one of them is defusing (so bots don't walk into the defuser).
 		*/
 		const auto collider_capability = collider.get_owning_transfer_capability();
 
 		if (subject_capability.alive() && collider_capability.alive()) {
 			const auto subject_faction = subject_capability.get_official_faction();
 			const auto collider_faction = collider_capability.get_official_faction();
-			
+
 			/*
 				Only apply to teammates (same faction, not spectators).
 			*/
 			if (subject_faction == collider_faction && subject_faction != faction_type::SPECTATOR) {
-				const auto* subject_sentience = subject_capability.find<components::sentience>();
-				const auto* collider_sentience = collider_capability.find<components::sentience>();
+				bool should_disable = !friendly_fire;
 
-				const bool subject_is_defusing = subject_sentience && subject_sentience->is_interacting();
-				const bool collider_is_defusing = collider_sentience && collider_sentience->is_interacting();
+				if (!should_disable) {
+					const auto* subject_sentience = subject_capability.find<components::sentience>();
+					const auto* collider_sentience = collider_capability.find<components::sentience>();
 
-				if (subject_is_defusing || collider_is_defusing) {
+					const bool subject_is_defusing = subject_sentience && subject_sentience->is_interacting();
+					const bool collider_is_defusing = collider_sentience && collider_sentience->is_interacting();
+
+					should_disable = subject_is_defusing || collider_is_defusing;
+				}
+
+				if (should_disable) {
 					contact->SetEnabled(false);
 					post_collision_messages = false;
 					break;

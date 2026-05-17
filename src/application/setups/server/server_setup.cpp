@@ -2595,7 +2595,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.all_not_banned = true;
 	}
 
-	out.friendly_fire = vars.friendly_fire;
+	out.friendly_fire = vars.get_friendly_fire();
 	out.ranked = vars.ranked;
 
 	out.force_short_match = has_browser_clients_playing;

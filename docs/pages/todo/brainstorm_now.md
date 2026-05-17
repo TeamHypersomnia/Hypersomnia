@@ -18,6 +18,8 @@ summary: That which we are brainstorming at the moment.
 
 # Turniej
 
+- CUSTOM MAPKI! trzeba zorganizowac
+
 - Krotsze mecze zaimplementowac ewentualnie
 
 - Przygotowac sie na brak internetu

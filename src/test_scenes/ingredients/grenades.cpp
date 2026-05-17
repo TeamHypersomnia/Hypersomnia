@@ -369,6 +369,10 @@ namespace test_flavours {
 		bomb_cascade_explosion.inner_ring_color = white;
 		bomb_cascade_explosion.outer_ring_color = cyan;
 		bomb_cascade_explosion.ring_duration_seconds = 0.3f;
+		/*
+			The bomb ignores friendly_fire being off — friendlies had plenty of time to walk away.
+		*/
+		bomb_cascade_explosion.damage.always_friendly_fire = true;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
@@ -572,8 +576,9 @@ namespace test_flavours {
 			meta.set(fuse);
 
 			{
-				invariants::explosive explosive; 
+				invariants::explosive explosive;
 				explosive.explosion = bomb_explosion;
+				explosive.explosion.damage.always_friendly_fire = true;
 
 				{
 					auto& c = explosive.cascade[0];

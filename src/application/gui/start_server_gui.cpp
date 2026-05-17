@@ -159,6 +159,8 @@ as well as to test your skills in a laggy environment.
 			checkbox("Bots (NEW!)", enable_bots);
 		}
 
+		checkbox("Friendly fire", into_vars.friendly_fire);
+
 		if (enable_bots) {
 			auto ind = scoped_indent();
 

@@ -55,6 +55,8 @@ void test_scene_setup::init(const test_scene_type new_type) {
 		current_arena_folder = "content/menu/shooting_range";
 	}
 
+	dummy_dynamic_vars.friendly_fire = true;
+
 	{
 		auto json_read_settings = editor_project_readwrite::reading_settings();
 		json_read_settings.read_inactive_nodes = false;

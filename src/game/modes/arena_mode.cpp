@@ -1607,14 +1607,24 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 			knockouts_dt = 0;
 		}
 		else if (!in.rules.is_ffa() && ko.knockouter.faction == ko.victim.faction) {
-			knockouts_dt = -1;
+			/*
+				Damage flagged always_friendly_fire (e.g. the planted bomb) ignores the
+				friendly_fire=off filter. Don't punish the planter — friendlies had time
+				to walk away.
+			*/
+			if (ko.origin.circumstances.from_always_friendly_fire) {
+				knockouts_dt = 0;
+			}
+			else {
+				knockouts_dt = -1;
 
-			give_monetary_award(
-				in,
-				ko.knockouter.id,
-				ko.victim.id,
-				in.rules.economy.team_kill_penalty * -1
-			);
+				give_monetary_award(
+					in,
+					ko.knockouter.id,
+					ko.victim.id,
+					in.rules.economy.team_kill_penalty * -1
+				);
+			}
 		}
 
 		if (knockouts_dt > 0) {

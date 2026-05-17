@@ -34,7 +34,7 @@ struct synced_dynamic_vars {
 	bool all_assigned_present = false;
 	bool all_authenticated = false;
 	bool all_not_banned = false;
-	bool friendly_fire = true;
+	bool friendly_fire = false;
 	bool force_short_match = false;
 	server_ranked_vars ranked;
 	bots_request bots_override;

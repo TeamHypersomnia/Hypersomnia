@@ -299,9 +299,12 @@
             "max_rejoins": 5,
             "match_unfreezes_in_secs": 5,
             "freeze_match_on_disconnect": true,
-            "client_network_timeout_secs": 1.5
+            "overrides": {
+                "friendly_fire": true,
+                "client_network_timeout_secs": 1.5
+            }
         },
-        "friendly_fire": true,
+        "friendly_fire": false,
         "bots": true, // Can override with "/bots 0" in-game.
         "bot_difficulty": "VERY_EASY", // or: "MEDIUM" | "EASY" | "VERY_EASY"
         "cycle": "REPEAT_CURRENT", // or: "LIST" | "ALL_ON_DISK"

@@ -30,6 +30,9 @@ struct damage_definition {
 	damage_effects effects;
 
 	sound_effect_input pass_through_held_item_sound;
+
+	bool always_friendly_fire = false;
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
 	template <class T>
