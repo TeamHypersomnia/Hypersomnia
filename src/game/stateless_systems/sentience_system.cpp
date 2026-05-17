@@ -824,7 +824,6 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 	event_template.impact_velocity = d.impact_velocity;
 	event_template.special_result = messages::health_event::result_type::NONE;
 	event_template.origin = d.origin;
-	event_template.origin.circumstances.from_always_friendly_fire = d.damage.always_friendly_fire;
 	event_template.source_adversity = d.type;
 	event_template.head_transform = d.head_transform;
 
