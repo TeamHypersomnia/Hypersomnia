@@ -368,6 +368,20 @@ perform_transfer_result perform_transfer_impl::operator()(
 		item.when_last_transferred = now;
 	}
 
+	/*
+		Stamp the item with a fresh incoming_transfer_id whenever it enters a
+		new capability (pickup, equipment generation, or capability-to-capability
+		transfer). This drives the hotbar's stateless rebuild ordering: lower id
+		means earlier slot. Items merely moved between slots of the same character
+		keep their existing id and therefore their hotbar position.
+	*/
+	if (target_root && target_root != source_root) {
+		if (const auto target_transfers = target_root.template find<components::item_slot_transfers>()) {
+			++target_transfers->num_incoming_transfers;
+			item.incoming_transfer_id = target_transfers->num_incoming_transfers;
+		}
+	}
+
 	if (source_root) {
 		source_root.infer_item_physics_recursive();
 	}

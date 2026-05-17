@@ -973,7 +973,6 @@ void settings_gui_state::perform(
 						auto& scope_cfg = config.hotbar;
 
 						revertable_checkbox(SCOPE_CFG_NVP(hide_unassigned_hotbar_buttons));
-						//revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
 					}
 
 					revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));

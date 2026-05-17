@@ -18,6 +18,26 @@ struct cosmic_entropy_recording_options;
 class cosmos;
 
 template <class key>
+struct basic_hotbar_swap {
+	// GEN INTROSPECTOR struct basic_hotbar_swap class key
+	key a;
+	key b;
+	// END GEN INTROSPECTOR
+
+	bool is_set() const {
+		return a.is_set() && b.is_set();
+	}
+
+	bool operator==(const basic_hotbar_swap& o) const {
+		return a == o.a && b == o.b;
+	}
+
+	bool operator!=(const basic_hotbar_swap& o) const {
+		return !operator==(o);
+	}
+};
+
+template <class key>
 struct basic_player_commands {
 	// GEN INTROSPECTOR struct basic_player_commands class key
 	spell_id cast_spell;
@@ -25,6 +45,7 @@ struct basic_player_commands {
 	game_intents intents;
 	raw_game_motion_map motions;
 	basic_item_slot_transfer_request<key> transfer;
+	basic_hotbar_swap<key> swap_hotbar_buttons;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const basic_player_commands<key>& b) const;

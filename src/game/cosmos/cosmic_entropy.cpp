@@ -24,7 +24,11 @@ std::size_t basic_player_commands<K>::length() const {
 		++total;
 	}
 
-	if (logically_set(wield)) { 
+	if (logically_set(wield)) {
+		++total;
+	}
+
+	if (swap_hotbar_buttons.is_set()) {
 		++total;
 	}
 
@@ -102,6 +106,10 @@ basic_player_commands<K>& basic_player_commands<K>::operator+=(const basic_playe
 		cast_spell = r.cast_spell;
 	}
 
+	if (r.swap_hotbar_buttons.is_set()) {
+		swap_hotbar_buttons = r.swap_hotbar_buttons;
+	}
+
 	return *this;
 }
 
@@ -113,6 +121,7 @@ bool basic_player_commands<K>::operator==(const basic_player_commands<K>& b) con
 		&& wield == b.wield
 		&& cast_spell == b.cast_spell
 		&& transfer == b.transfer
+		&& swap_hotbar_buttons == b.swap_hotbar_buttons
 	;
 }
 
@@ -150,6 +159,7 @@ void basic_player_commands<K>::clear_relevant(const cosmic_entropy_recording_opt
 		cast_spell.unset();
 		wield = {};
 		transfer = {};
+		swap_hotbar_buttons = {};
 	}
 }
 

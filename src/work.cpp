@@ -3906,7 +3906,8 @@ work_result work(
 		}
 
 		game_gui.standard_post_solve(
-			step, 
+			step,
+			get_game_gui_subject(),
 			{ settings.prediction }
 		);
 
@@ -4175,6 +4176,15 @@ work_result work(
 
 	WEBSTATIC auto make_create_game_gui_context = [&](const config_json_table& viewing_config) {
 		return [&]() {
+			/*
+				Ensure the hotbar reflects whichever subject we are about to draw -
+				spectator switches happen at render time, not at logical-step time,
+				and we don't want a 1-2 frame blank between subjects on high-refresh
+				displays. rebuild_hotbar is idempotent so this is cheap when nothing
+				changed.
+			*/
+			game_gui.rebuild_hotbar(get_game_gui_subject());
+
 			return game_gui.create_context(
 				logic_get_screen_size(),
 				common_input_state,
@@ -4969,7 +4979,7 @@ work_result work(
 				}
 				else if (game_gui_mode && should_draw_game_gui()) {
 					if (get_viewed_character()) {
-						const auto& character_gui = game_gui.get_character_gui(get_game_gui_subject());
+						const auto& character_gui = game_gui.get_character_gui();
 
 						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(chosen_renderer, viewing_config), should_draw_our_cursor);
 					}

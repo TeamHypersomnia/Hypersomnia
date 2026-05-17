@@ -6,7 +6,6 @@
 #include "view/game_gui/game_gui_context.h"
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
-using last_assigned_type = std::variant<entity_id, entity_flavour_id>;
 
 class hotbar_button : public game_gui_rect_node {
 public:
@@ -16,7 +15,13 @@ public:
 	using this_in_item = dereferenced_location<hotbar_button_in_character_gui>;
 	using const_this_in_item = const_dereferenced_location<hotbar_button_in_character_gui>;
 
-	last_assigned_type last_assigned;
+	/*
+		Pure cache: the entity to display, rebuilt every logical step in
+		game_gui_system::rebuild_hotbar by sorting the subject's inventory
+		by components::item::incoming_transfer_id. No flavour, no stale-id
+		bookkeeping - render frames between logical steps read this directly.
+	*/
+	entity_id assigned;
 
 	augs::gui::appearance_detector detector;
 

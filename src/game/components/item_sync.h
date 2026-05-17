@@ -37,4 +37,12 @@ public:
 	auto& get_owner_meta() const {
 		return this->component->owner_meta;
 	}
+
+	auto get_incoming_transfer_id() const {
+		return get_raw_component().incoming_transfer_id;
+	}
+
+	void set_incoming_transfer_id(const uint32_t id) const {
+		this->component->incoming_transfer_id = id;
+	}
 };

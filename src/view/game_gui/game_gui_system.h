@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cstdint>
 #include <unordered_map>
 
 #include "augs/misc/timing/delta.h"
@@ -32,7 +33,23 @@ public:
 	std::unordered_map<entity_id, item_button> item_buttons;
 	std::unordered_map<inventory_slot_id, slot_button> slot_buttons;
 
-	std::unordered_map<entity_id, character_gui> character_guis;
+	/*
+		One hotbar state per session. The subject whose inventory drives the
+		hotbar is passed in at each call site. Spectator switches "reset" the
+		hotbar implicitly: rebuild_hotbar walks the new subject's inventory
+		from scratch each logical step.
+	*/
+	character_gui local_gui;
+
+	/*
+		The hotbar is rebuilt at most once per logical step. (step, subject)
+		key gates redundant work: render frames within the same step skip,
+		but a spectator switch within the same step still forces a rebuild
+		against the new subject - otherwise the hotbar visibly flickers on
+		high-refresh displays where many render frames fall between steps.
+	*/
+	std::uint64_t last_rebuilt_step = static_cast<std::uint64_t>(-1);
+	entity_id last_rebuilt_subject;
 
 	using pending_entropy_type = cosmic_player_entropy;
 
@@ -53,7 +70,7 @@ public:
 			{ world, tree, screen_size, input_state },
 			*this,
 			gui_entity,
-			get_character_gui(gui_entity),
+			local_gui,
 			deps
 		};
 	}
@@ -68,7 +85,7 @@ public:
 			{ world, tree, screen_size, input_state },
 			*this,
 			gui_entity,
-			get_character_gui(gui_entity),
+			local_gui,
 			deps
 		};
 	}
@@ -77,9 +94,10 @@ public:
 
 	void queue_transfer(const entity_id&, const item_slot_transfer_request);
 	void queue_wielding(const entity_id&, const wielding_setup&);
+	void queue_swap_hotbar_buttons(const entity_id, const entity_id);
 
-	character_gui& get_character_gui(const entity_id);
-	const character_gui& get_character_gui(const entity_id) const;
+	character_gui& get_character_gui() { return local_gui; }
+	const character_gui& get_character_gui() const { return local_gui; }
 
 	slot_button& get_slot_button(const inventory_slot_id);
 	const slot_button& get_slot_button(const inventory_slot_id) const;
@@ -111,7 +129,16 @@ public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 	void standard_post_solve(
-		const_logic_step, 
+		const_logic_step,
+		const_entity_handle subject,
 		game_gui_post_solve_settings
 	);
+
+	/*
+		Idempotent: gated by (step, subject) so repeated calls within the same
+		logical step against the same subject short-circuit. Render-frame call
+		sites use this to ensure a spectator switch reflects on the very next
+		frame instead of waiting for the next logical post-solve.
+	*/
+	void rebuild_hotbar(const_entity_handle subject);
 };

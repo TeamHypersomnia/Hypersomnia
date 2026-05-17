@@ -26,62 +26,96 @@ bool hotbar_button::is_assigned(const const_entity_handle item) const {
 		return false;
 	}
 
-	return 
-		last_assigned    == last_assigned_type(item.get_id()) 
-		|| last_assigned == last_assigned_type(item.get_flavour_id())
-	;
+	if (!assigned.is_set()) {
+		return false;
+	}
+
+	if (assigned == item.get_id()) {
+		return true;
+	}
+
+	/*
+		Stackable items (grenades, melees) collapse onto a single slot - the
+		slot stores one specific instance but all instances of the same
+		flavour count as "this slot's item" for selection-highlight purposes.
+	*/
+	const auto& cosm = item.get_cosmos();
+	const auto stored = cosm[assigned];
+
+	if (stored.dead()) {
+		return false;
+	}
+
+	if (!::is_stackable_in_hotbar(item)) {
+		return false;
+	}
+
+	return stored.get_flavour_id() == item.get_flavour_id();
 }
 
 const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability, int* const out_stackable_count, int offset) const {
-	return std::visit(
-		[&]<typename A>(const A& assigned) {
-			const auto& cosm = owner_transfer_capability.get_cosmos();
-			if constexpr(std::is_same_v<A, entity_id>) {
-				const auto handle = cosm[assigned];
+	const auto& cosm = owner_transfer_capability.get_cosmos();
 
-				if (handle.alive()) {
-					if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
-						const auto slot = handle.get_current_slot();
-						const bool should_ignore = slot->is_mounted_slot() && slot.get_type() != slot_function::TORSO_ARMOR;
+	if (!assigned.is_set()) {
+		return cosm[entity_id()];
+	}
 
-						if (!should_ignore) {
-							return handle;
-						}
-					}
+	const auto handle = cosm[assigned];
+
+	if (handle.dead()) {
+		return cosm[entity_id()];
+	}
+
+	if (handle.get_owning_transfer_capability() != owner_transfer_capability) {
+		return cosm[entity_id()];
+	}
+
+	/*
+		Stackable slots (grenades, melees) collapse multiple instances of one
+		flavour onto a single button. Callers may request:
+
+		- the Nth instance (offset > 0), used to dual-wield two grenades from
+		  the same slot - primary takes offset=0, secondary takes offset=1;
+
+		- the total instance count, used to draw the count badge.
+
+		Both paths walk the inventory by flavour. The default (offset=0,
+		out_stackable_count=nullptr) is the cheap path that just returns the
+		stored entity.
+	*/
+	const bool needs_walk = ::is_stackable_in_hotbar(handle) && (offset > 0 || out_stackable_count != nullptr);
+
+	if (!needs_walk) {
+		return handle;
+	}
+
+	const auto stored_flavour = handle.get_flavour_id();
+	entity_id nth_match;
+	int matches_seen = 0;
+
+	owner_transfer_capability.for_each_contained_item_recursive(
+		[&](const auto& item) {
+			if (item.get_flavour_id() == stored_flavour) {
+				if (matches_seen == offset) {
+					nth_match = item.get_id();
 				}
 
-				return cosm[entity_id()];
+				++matches_seen;
 			}
-			else {
-				entity_id found;
 
-				owner_transfer_capability.for_each_contained_item_recursive(
-					[&](const auto& item) {
-						if (item.get_flavour_id() == assigned) {
-							found = item.get_id();
-
-							if (offset > 0) {
-								--offset;
-								return recursive_callback_result::CONTINUE_AND_RECURSE;
-							}
-
-							if (out_stackable_count) {
-								++(*out_stackable_count);
-								return recursive_callback_result::CONTINUE_AND_RECURSE;
-							}
-
-							return recursive_callback_result::ABORT;
-						}
-
-						return recursive_callback_result::CONTINUE_AND_RECURSE;
-					}
-				);
-
-				return cosm[found];
-			}
-		},
-		last_assigned
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
+		}
 	);
+
+	if (out_stackable_count != nullptr) {
+		*out_stackable_count = matches_seen;
+	}
+
+	if (offset > 0) {
+		return cosm[nth_match];
+	}
+
+	return handle;
 }
 
 bool hotbar_button::is_selected_as_primary(const const_entity_handle owner_transfer_capability) const {
@@ -97,7 +131,7 @@ bool hotbar_button::is_selected_as_secondary(const const_entity_handle owner_tra
 }
 
 void hotbar_button::clear_assigned() {
-	last_assigned = entity_id();
+	assigned = {};
 }
 
 button_corners_info hotbar_button::get_button_corners_info() const {

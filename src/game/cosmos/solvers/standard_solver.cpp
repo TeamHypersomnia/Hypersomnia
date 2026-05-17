@@ -124,6 +124,32 @@ void standard_solve(const logic_step step) {
 			continue;
 		}
 
+		/*
+			Hotbar reorder: swap two items' incoming_transfer_id so that the next
+			rebuild on the GUI side picks up the new order. Only honoured if both
+			items belong to the requesting player - otherwise it would let one
+			client touch another's inventory state.
+		*/
+		if (const auto& swap = p.second.commands.swap_hotbar_buttons; swap.is_set()) {
+			const auto item_a = cosm[swap.a];
+			const auto item_b = cosm[swap.b];
+
+			if (item_a.alive() && item_b.alive()
+				&& item_a.get_owning_transfer_capability() == player_entity
+				&& item_b.get_owning_transfer_capability() == player_entity
+			) {
+				const auto a_item = item_a.template find<components::item>();
+				const auto b_item = item_b.template find<components::item>();
+
+				if (a_item != nullptr && b_item != nullptr) {
+					const auto a_id = a_item.get_incoming_transfer_id();
+					const auto b_id = b_item.get_incoming_transfer_id();
+					a_item.set_incoming_transfer_id(b_id);
+					b_item.set_incoming_transfer_id(a_id);
+				}
+			}
+		}
+
 		auto t = p.second.commands.transfer;
 		t.params.set_source_root_as_sender = false;
 		t.params.bypass_mounting_requirements = false;

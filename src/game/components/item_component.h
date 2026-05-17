@@ -25,6 +25,7 @@ namespace components {
 		signi_inventory_slot_id previous_slot;
 		augs::stepped_timestamp when_last_transferred;
 		item_owner_meta owner_meta;
+		uint32_t incoming_transfer_id = 0;
 		// END GEN INTROSPECTOR
 
 		void clear_slot_info() {

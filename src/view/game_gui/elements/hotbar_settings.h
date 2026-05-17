@@ -9,7 +9,6 @@ struct hotbar_settings {
 	bool colorize_inside_when_selected = true;
 
 	bool hide_unassigned_hotbar_buttons = true;
-	bool autocollapse_hotbar_buttons = true;
 
 	rgba primary_selected_color = rgba(0, 255, 255, 255);
 	rgba secondary_selected_color = rgba(86, 156, 214, 255);

@@ -65,26 +65,30 @@ void drag_and_drop_callback(
 			const auto target_button = context.dereference_location(transfer_data.assign_to);
 			ensure(target_button != nullptr);
 
-			const auto target_button_index = target_button.get_location().index;
-
-			const auto new_assigned_item = cosm[transfer_data.item_id];
 			const auto owner_transfer_capability = context.get_subject_entity();
+			const auto new_assigned_item = cosm[transfer_data.item_id];
+			const auto item_to_be_swapped = target_button->get_assigned_entity(owner_transfer_capability);
 
-			const auto source_hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
-			
-			if (source_hotbar_location != nullptr) {
-				const auto item_to_be_swapped = target_button->get_assigned_entity(owner_transfer_capability);
+			/*
+				The hotbar is now derived statelessly from components::item::incoming_transfer_id
+				on each logical step. A manual swap exchanges that field between the two items;
+				the solver picks up the swap from basic_player_commands::swap_hotbar_buttons and
+				the next rebuild reflects the new order.
 
-				gui.assign_item_to_hotbar_button(target_button_index, owner_transfer_capability, new_assigned_item);
-				
-				if (item_to_be_swapped.alive()) {
-					const auto source_button_index = source_hotbar_location.get_location().index;
-					gui.assign_item_to_hotbar_button(source_button_index, owner_transfer_capability, item_to_be_swapped);
-				}
+				Optimistically swap the local hotbar entity_ids too, so the change is visible on
+				the very next render frame instead of waiting up to one logical step.
+			*/
+			if (new_assigned_item.alive() && item_to_be_swapped.alive()) {
+				context.get_game_gui_system().queue_swap_hotbar_buttons(
+					new_assigned_item.get_id(),
+					item_to_be_swapped.get_id()
+				);
 			}
-			else {
-				gui.assign_item_to_hotbar_button(target_button_index, owner_transfer_capability, new_assigned_item);
-			}
+			/*
+				TODO: assignment into an empty slot still needs to be defined - with stateless
+				rebuild, "this item goes to slot N" means renumbering its incoming_transfer_id
+				to land at position N in sort order. Skipped here until the semantics are nailed.
+			*/
 		}
 		else {
 			static_assert(always_false_v<T>);
@@ -150,10 +154,10 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				}
 				else {
 					if (assigned_entity.dead()) {
-						hotbar_drop.hint_text = typesafe_sprintf("Assign %x", hotbar_button_location.index);
+						hotbar_drop.hint_text = typesafe_sprintf("Assign %x", 1 + hotbar_button_location.index);
 					}
 					else {
-						hotbar_drop.hint_text = typesafe_sprintf("Reassign %x", hotbar_button_location.index);
+						hotbar_drop.hint_text = typesafe_sprintf("Reassign %x", 1 + hotbar_button_location.index);
 					}
 				}
 

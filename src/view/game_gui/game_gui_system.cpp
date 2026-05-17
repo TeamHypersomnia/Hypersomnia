@@ -33,29 +33,6 @@
 #include "game/detail/explosive/like_explosive.h"
 #include "3rdparty/imgui/imgui.h"
 
-template <class E>
-bool should_fill_hotbar_from_right(const E& handle) {
-	const auto& item = handle.template get<invariants::item>();
-
-	if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::OVER_BACK_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::TORSO_ARMOR)) {
-		return true;
-	}
-
-	return false;
-}
-
 static int to_hotbar_index(const inventory_gui_intent_type type) {
 	switch (type) {
 	case inventory_gui_intent_type::HOTBAR_0: return 0;
@@ -96,14 +73,6 @@ game_gui_system::pending_entropy_type game_gui_system::get_and_clear_pending_eve
 	return out;
 }
 
-character_gui& game_gui_system::get_character_gui(const entity_id id) {
-	return character_guis[id];
-}
-
-const character_gui& game_gui_system::get_character_gui(const entity_id id) const {
-	return character_guis.at(id);
-}
-
 slot_button& game_gui_system::get_slot_button(const inventory_slot_id id) {
 	return slot_buttons[id];
 }
@@ -129,6 +98,31 @@ void game_gui_system::queue_transfer(const entity_id& subject, const item_slot_t
 void game_gui_system::queue_wielding(const entity_id& subject, const wielding_setup& wielding) {
 	(void)subject;
 	pending.wield = wielding;
+}
+
+void game_gui_system::queue_swap_hotbar_buttons(const entity_id a, const entity_id b) {
+	pending.swap_hotbar_buttons.a = a;
+	pending.swap_hotbar_buttons.b = b;
+
+	/*
+		Optimistic local swap so that high-refresh render frames between now
+		and the next logical step see the new order immediately. The next
+		rebuild_hotbar will overwrite this with the cosmos-driven order which,
+		by the time it runs, has the solver-applied swap baked in.
+	*/
+	auto& hotbar = local_gui.hotbar_buttons;
+
+	for (auto& slot_a : hotbar) {
+		if (slot_a.assigned == a) {
+			for (auto& slot_b : hotbar) {
+				if (slot_b.assigned == b) {
+					std::swap(slot_a.assigned, slot_b.assigned);
+					return;
+				}
+			}
+			return;
+		}
+	}
 }
 	
 bool game_gui_system::control_gui_world(
@@ -226,7 +220,7 @@ void game_gui_system::control_hotbar_and_action_button(
 		return;
 	}
 
-	auto& gui = get_character_gui(gui_entity);
+	auto& gui = get_character_gui();
 
 	{
 		auto r = intent;
@@ -427,50 +421,7 @@ void game_gui_system::advance(
 ) {
 	const auto subject = context.get_subject_entity();
 
-	const auto settings = context.get_hotbar_settings();
-
 	ensure(subject.alive());
-
-	if (settings.autocollapse_hotbar_buttons) {
-		static_assert(std::is_trivially_copyable_v<hotbar_button>);
-
-		auto is_tied_to_right = [&](const auto& button) {
-			const auto assigned_item = button.get_assigned_entity(subject);
-
-			if (assigned_item.dead()) {
-				return false;
-			}
-
-			return should_fill_hotbar_from_right(assigned_item);
-		};
-
-		auto is_tied_to_left = [&](const auto& button) {
-			const auto assigned_item = button.get_assigned_entity(subject);
-
-			if (assigned_item.dead()) {
-				return false;
-			}
-
-			return !should_fill_hotbar_from_right(assigned_item);
-		};
-
-		auto is_unassigned = [&](const auto& button) {
-			return button.get_assigned_entity(subject).dead();
-		};
-
-		auto& buttons = context.get_character_gui().hotbar_buttons;
-
-		const auto right_bound = find_in_if(buttons, is_tied_to_right);
-		const auto rright_bound = rfind_in_if(buttons, is_tied_to_left);
-
-		for (auto it = std::remove_if(buttons.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
-			*it = {};
-		}
-
-		for (auto it = std::remove_if(buttons.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
-			*it = {};
-		}
-	}
 
 	const bool drop_armed = context.dependencies.game_gui.autodrop_holstered_armed_explosives;
 	const bool drop_orphans = context.dependencies.game_gui.autodrop_magazines_of_dropped_weapons;
@@ -672,12 +623,9 @@ void game_gui_system::rebuild_layouts(
 
 void game_gui_system::standard_post_solve(
 	const const_logic_step step,
+	const const_entity_handle subject,
 	const game_gui_post_solve_settings settings
 ) {
-	const auto& cosm = step.get_cosmos();
-
-	const auto pickups = always_predictable_v;
-
 	auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
 		using M = remove_cref<decltype(migrated)>;
 
@@ -703,7 +651,6 @@ void game_gui_system::standard_post_solve(
 		}
 
 		migrate_nodes(item_buttons, changed.changes);
-		migrate_nodes(character_guis, changed.changes);
 
 		auto migrate_id = [&](auto& id) {
 			if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
@@ -711,110 +658,136 @@ void game_gui_system::standard_post_solve(
 			}
 		};
 
-		for (auto& it : character_guis) {
-			auto& ch = it.second;
-
-			for (auto& h : ch.hotbar_buttons) {
-				std::visit(
-					[&]<typename A>(A& assigned) {
-						if constexpr(std::is_same_v<A, entity_id>) {
-							migrate_id(assigned);
-						}
-					},
-					h.last_assigned
-				);
-			}
-
-			for (auto& s : ch.last_setup.hand_selections) {
-				migrate_id(s);
-			}
+		for (auto& s : local_gui.last_setup.hand_selections) {
+			migrate_id(s);
 		}
 	}
 
-	{
-		/* 
-			We don't want to miss a pickup and we want it to always be predicted,
-			so we handle pickups from both referential and predicted cosmoi.
-		*/
-		(void)pickups;
+	rebuild_hotbar(subject);
+}
 
-		for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
-			const auto transferred_item = cosm[transfer.item];
+void game_gui_system::rebuild_hotbar(const const_entity_handle subject) {
+	/*
+		Stateless rebuild. Each logical step we sort the subject's weapon-like
+		inventory by components::item::incoming_transfer_id ascending and lay
+		the result out into hotbar buttons in order. Stackable items (grenades,
+		melees) collapse: the slot for a given flavour is the earliest-acquired
+		instance, the rest are reachable via flavour matching in get_assigned_entity.
 
-			if (transferred_item.dead()) {
-				continue;
+		A manual hotbar swap (drag-and-drop) is implemented elsewhere by
+		swapping the incoming_transfer_id of two items - the next rebuild then
+		picks up the new order automatically. No flavour fallback, no migration,
+		no stale-id healing - the hotbar cache is rebuilt from scratch every
+		step, with rendering between steps reading the cached entity_ids directly.
+	*/
+
+	auto& hotbar = local_gui.hotbar_buttons;
+
+	auto clear_all = [&]() {
+		for (auto& slot : hotbar) {
+			slot.assigned = {};
+		}
+	};
+
+	if (subject.dead()) {
+		clear_all();
+		return;
+	}
+
+	const auto& cosm = subject.get_cosmos();
+	const auto current_step = cosm.get_timestamp().step;
+	const auto current_subject = subject.get_id();
+
+	if (current_step == last_rebuilt_step
+		&& current_subject == last_rebuilt_subject
+	) {
+		return;
+	}
+
+	auto is_interesting_for_hotbar = [](const auto item) {
+		if (!is_weapon_like(item)) {
+			return false;
+		}
+
+		if (is_like_plantable_bomb(item)) {
+			return false;
+		}
+
+		const auto slot = item.get_current_slot();
+
+		if (slot.alive() && slot.get_type() == slot_function::PERSONAL_DEPOSIT) {
+			return false;
+		}
+
+		return true;
+	};
+
+	struct candidate {
+		entity_id id;
+		entity_flavour_id flavour;
+		uint32_t order = 0;
+		bool stackable = false;
+	};
+
+	std::array<candidate, 64> buf;
+	std::size_t buf_n = 0;
+
+	subject.for_each_contained_item_recursive(
+		[&](const auto& item) {
+			if (!is_interesting_for_hotbar(item)) {
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
 			}
 
-			const auto target_slot = cosm[transfer.target_slot];
-
-			const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
-
-			if (logically_empty(recently_dropped) && transfer.result.is_drop()) {
-				recently_dropped = transferred_item;
+			if (buf_n >= buf.size()) {
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
 			}
 
-			const bool interested =
-				target_slot.alive()
-				&& transferred_item.alive()
-				&& (is_weapon_like(transferred_item))
-				&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
-				&& !is_like_plantable_bomb(transferred_item)
-				&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
-			;
+			buf[buf_n++] = candidate {
+				item.get_id(),
+				item.get_flavour_id(),
+				item.template get<components::item>().get_incoming_transfer_id(),
+				::is_stackable_in_hotbar(item)
+			};
 
-			if (!interested) {
-				continue;
-			}
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
+		}
+	);
 
-			const bool always_reassign_button = 
-				transfer.result.is_pickup()
-			;
+	std::sort(buf.begin(), buf.begin() + buf_n, [](const candidate& a, const candidate& b) {
+		return a.order < b.order;
+	});
 
-			if (cosm[transfer.target_root].dead()) {
-				continue;
-			}
+	clear_all();
 
-			auto& gui = get_character_gui(transfer.target_root);
+	/*
+		Walk sorted candidates; for stackables, skip any subsequent instance of
+		a flavour already represented by an earlier (lower-id) one.
+	*/
+	std::size_t next_slot = 0;
 
-			if (!always_reassign_button) {
-				if (gui.hotbar_assignment_exists_for(transferred_item)) {
-					continue;
+	for (std::size_t i = 0; i < buf_n && next_slot < hotbar.size(); ++i) {
+		const auto& c = buf[i];
+
+		if (c.stackable) {
+			bool already_represented = false;
+
+			for (std::size_t k = 0; k < next_slot; ++k) {
+				const auto stored = cosm[hotbar[k].assigned];
+
+				if (stored.alive() && stored.get_flavour_id() == c.flavour) {
+					already_represented = true;
+					break;
 				}
 			}
 
-			auto add = [&](const auto handle) {
-				gui.assign_item_to_first_free_hotbar_button(
-					cosm[transfer.target_root],
-					handle,
-					should_fill_hotbar_from_right(handle)
-				);
-			};
-
-			add(transferred_item);
-
-			auto should_recurse = [](const auto item_entity) {
-				const auto& item = item_entity.template get<invariants::item>();
-
-				if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
-					return true;
-				}
-
-				return false;
-			};
-
-			if (should_recurse(transferred_item)) {
-				transferred_item.for_each_contained_item_recursive(
-					[&add, should_recurse](const auto child_item) {
-						add(child_item);
-
-						if (should_recurse(child_item)) {
-							return recursive_callback_result::CONTINUE_AND_RECURSE;
-						}
-
-						return recursive_callback_result::CONTINUE_DONT_RECURSE;
-					}
-				);
+			if (already_represented) {
+				continue;
 			}
 		}
+
+		hotbar[next_slot++].assigned = c.id;
 	}
+
+	last_rebuilt_step = current_step;
+	last_rebuilt_subject = current_subject;
 }

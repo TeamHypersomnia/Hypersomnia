@@ -124,94 +124,10 @@ wielding_setup character_gui::get_setup_from_button_indices(
 	return output;
 }
 
-bool character_gui::hotbar_assignment_exists_for(const const_entity_handle item_entity) const{
-	for (const auto& h : hotbar_buttons) {
-		if (h.last_assigned == last_assigned_type(item_entity.get_id()) || h.last_assigned == last_assigned_type(item_entity.get_flavour_id())) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void character_gui::clear_dangling_references_in_hotbar_buttons(
-	const const_entity_handle item_entity
-) {
-	for (auto& h : hotbar_buttons) {
-		if (h.last_assigned == last_assigned_type(item_entity.get_id()) || h.last_assigned == last_assigned_type(item_entity.get_flavour_id())) {
-			h.last_assigned = {};
-		}
-	}
-}
-
 void character_gui::clear_hotbar_button_assignment(
 	const size_t button_index
 ) {
 	hotbar_buttons[button_index].clear_assigned();
-}
-
-void character_gui::assign_item_to_hotbar_button(
-	const size_t button_index,
-	const const_entity_handle gui_entity,
-	const const_entity_handle item
-) {
-	clear_dangling_references_in_hotbar_buttons(item);
-
-	{
-		const auto item_capability = item.get_owning_transfer_capability();
-
-		if (item_capability != gui_entity) {
-			LOG("Warning! Assigned entity's owning capability is not the gui subject (%x != %x)!", item_capability, gui_entity);
-		}
-	}
-
-	if (::is_stackable_in_hotbar(item)) {
-		hotbar_buttons[button_index].last_assigned = item.get_flavour_id();
-	}
-	else {
-		hotbar_buttons[button_index].last_assigned = item.get_id();
-	}
-}
-
-void character_gui::assign_item_to_first_free_hotbar_button(
-	const const_entity_handle gui_entity,
-	const const_entity_handle item_entity,
-	const bool from_the_right
-) {
-	if (::is_stackable_in_hotbar(item_entity)) {
-		if (hotbar_assignment_exists_for(item_entity)) {
-			return;
-		}
-	}
-
-	/* const auto categories = item_entity.get<invariants::item>().categories_for_slot_compatibility; */
-
-	clear_dangling_references_in_hotbar_buttons(item_entity);
-
-	auto try_assign = [&](const size_t n) {
-		if (hotbar_buttons[n].get_assigned_entity(gui_entity).dead()) {
-			assign_item_to_hotbar_button(n, gui_entity, item_entity);
-
-			return true;
-		}
-
-		return false;
-	};
-
-	if (from_the_right) {
-		for (int i = hotbar_buttons.size() - 1; i >= 0; --i) {
-			if (try_assign(i)) {
-				return;
-			}
-		}
-	}
-	else {
-		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
-			if (try_assign(i)) {
-				return;
-			}
-		}
-	}
 }
 
 wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setup(

@@ -429,7 +429,8 @@ namespace net_messages {
 		bool has_wield = logically_set(c.wield);
 		bool has_intents = logically_set(c.intents);
 		bool has_motions = logically_set(c.motions);
-		bool has_transfer = logically_set(c.transfer);
+		bool has_swap = c.swap_hotbar_buttons.is_set();
+		bool has_transfer = logically_set(c.transfer) || has_swap;
 
 		auto one_byte_pred = [&](const auto& coord) {
 			return coord >= -7 && coord <= 8;
@@ -566,8 +567,25 @@ namespace net_messages {
 		}
 
 		if (has_transfer) {
-			if (!serialize_trivial_as_bytes(s, c.transfer)) {
-				return false;
+			/*
+				The has_transfer flag is shared between transfer requests and hotbar swaps
+				to avoid spending a separate boolean bit (the 8-bool budget per byte is full).
+				Inside this block we use two sub-flags to indicate which payload is present.
+			*/
+			bool has_real_transfer = logically_set(c.transfer);
+			serialize_bool(s, has_real_transfer);
+			serialize_bool(s, has_swap);
+
+			if (has_real_transfer) {
+				if (!serialize_trivial_as_bytes(s, c.transfer)) {
+					return false;
+				}
+			}
+
+			if (has_swap) {
+				if (!serialize_trivial_as_bytes(s, c.swap_hotbar_buttons)) {
+					return false;
+				}
 			}
 		}
 
