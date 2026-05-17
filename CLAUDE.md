@@ -32,6 +32,7 @@ Prefer `build_file` to verify edits to a specific file before running a full `bu
 - Basic cpp footguns
 	- Do not use `using namespace std;`
 	- Use `static_cast<>` and the like instead of `(type)obj;`
+	- Avoid bleeding-edge C++20/23 features unless already used in the codebase — e.g. do not use `if constexpr (requires { ... })` for member detection; add a stub method on the affected types or use an older SFINAE idiom instead.
 
 - Prefer initialization with ``auto`` or ``const auto``.
 	- `const auto abc = 2;` instead of `int abc = 2;`
