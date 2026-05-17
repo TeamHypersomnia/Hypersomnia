@@ -1,33 +1,81 @@
 #include <cstdint>
 #include "augs/string/typesafe_sscanf.h"
 
+namespace {
+	struct parsed_version {
+		int major = 0;
+		int minor = 0;
+		int patch = 0;
+		/*
+			0 means a full release (no suffix).
+			N >= 1 means pre-release number N (-preN).
+			A full release ranks higher than any pre-release with the same X.Y.Z.
+		*/
+		int prerelease = 0;
+	};
+
+	bool parse_version(const std::string& version_string, parsed_version& out) {
+		const auto dash_pos = version_string.find('-');
+
+		const auto core =
+			dash_pos == std::string::npos
+			? version_string
+			: version_string.substr(0, dash_pos)
+		;
+
+		if (!typesafe_sscanf(core, "%x.%x.%x", out.major, out.minor, out.patch)) {
+			return false;
+		}
+
+		if (dash_pos != std::string::npos) {
+			const auto suffix = version_string.substr(dash_pos + 1);
+
+			if (!typesafe_sscanf(suffix, "pre%x", out.prerelease)) {
+				return false;
+			}
+
+			if (out.prerelease <= 0) {
+				out.prerelease = 1;
+			}
+		}
+
+		return true;
+	}
+}
+
 bool is_more_recent(const std::string& next_version, const std::string& current_version) {
-	int major_a = 0;
-	int minor_a = 0;
-	int revision_a = 0;
-	int major_b = 0;
-	int minor_b = 0;
-	int revision_b = 0;
+	parsed_version a;
+	parsed_version b;
 
-	const auto format = "%x.%x.%x";
-
-	if (
-		typesafe_sscanf(   next_version, format, major_a, minor_a, revision_a)
-		&& typesafe_sscanf(current_version, format, major_b, minor_b, revision_b)
-
-	) {
-		if (major_a != major_b) {
-			return major_a > major_b;
-		}
-		if (minor_a != minor_b) {
-			return minor_a > minor_b;
-		}
-		if (revision_a != revision_b) {
-			return revision_a > revision_b;
-		}
+	if (!::parse_version(next_version, a) || !::parse_version(current_version, b)) {
+		return false;
 	}
 
-	return false;
+	if (a.major != b.major) {
+		return a.major > b.major;
+	}
+	if (a.minor != b.minor) {
+		return a.minor > b.minor;
+	}
+	if (a.patch != b.patch) {
+		return a.patch > b.patch;
+	}
+
+	/*
+		Same X.Y.Z — full release outranks any pre-release.
+	*/
+
+	if (a.prerelease == 0 && b.prerelease == 0) {
+		return false;
+	}
+	if (a.prerelease == 0) {
+		return true;
+	}
+	if (b.prerelease == 0) {
+		return false;
+	}
+
+	return a.prerelease > b.prerelease;
 }
 
 #if BUILD_UNIT_TESTS
@@ -65,6 +113,32 @@ TEST_CASE("IsMoreRecent", "IsMoreRecentSeveralTests") {
 	REQUIRE(!is_more_recent("2.0.0", "3.0.0"));
 	REQUIRE(!is_more_recent("2.999.43", "3.0.0"));
 	REQUIRE(is_more_recent("3.0.0", "2.999.43"));
+
+	/* Pre-release ordering. */
+	REQUIRE(!is_more_recent("2.0.0-pre1", "2.0.0-pre1"));
+	REQUIRE(is_more_recent("2.0.0-pre2", "2.0.0-pre1"));
+	REQUIRE(!is_more_recent("2.0.0-pre1", "2.0.0-pre2"));
+	REQUIRE(is_more_recent("2.0.0-pre10", "2.0.0-pre9"));
+	REQUIRE(!is_more_recent("2.0.0-pre9", "2.0.0-pre10"));
+
+	/* Full release outranks pre-release with same X.Y.Z. */
+	REQUIRE(is_more_recent("2.0.0", "2.0.0-pre1"));
+	REQUIRE(is_more_recent("2.0.0", "2.0.0-pre99"));
+	REQUIRE(!is_more_recent("2.0.0-pre1", "2.0.0"));
+	REQUIRE(!is_more_recent("2.0.0-pre99", "2.0.0"));
+
+	/* X.Y.Z still dominates over suffix. */
+	REQUIRE(is_more_recent("2.0.0-pre1", "1.9.0"));
+	REQUIRE(is_more_recent("2.0.0-pre1", "1.99.99"));
+	REQUIRE(!is_more_recent("1.9.0", "2.0.0-pre1"));
+	REQUIRE(is_more_recent("2.0.1-pre1", "2.0.0"));
+	REQUIRE(!is_more_recent("2.0.0", "2.0.1-pre1"));
+	REQUIRE(is_more_recent("2.1.0-pre1", "2.0.99"));
+
+	/* Unknown suffix — refuse to compare, never trigger an update. */
+	REQUIRE(!is_more_recent("2.0.0-rc1", "1.0.0"));
+	REQUIRE(!is_more_recent("2.0.0-alpha", "2.0.0-pre1"));
+	REQUIRE(!is_more_recent("2.0.0-pre", "2.0.0-pre1"));
 }
 
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
