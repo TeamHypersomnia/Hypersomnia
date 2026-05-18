@@ -54,19 +54,29 @@ int main(int argc, char** argv) {
 
 	debug_argv_content += "\n";
 
-	/*
-		HACK: hardcoded version data to exactly match the 2.0.0-pre1 binary
-		on production for crash core debugging. String lengths in constructor
-		determine .text address layout, so they must match byte-for-byte.
-	*/
-	std::string version_string = "2.0.0-pre1";
+	const auto git_tag = augs::exec(git_executable_path.string() + " describe --exact-match --tags HEAD");
+	
+	std::string version_string;
+
+	if (!git_tag.empty() && git_tag.find("fatal") == std::string::npos) {
+		version_string = git_tag;
+	}
+	else {
+		version_string = "0.0.0";
+	}
 	std::cout << "Detected version: " << version_string << std::endl;
+	
+	auto git_commit_message = augs::exec(git_executable_path.string() + " log -1 --format=%s");
+	// We shall add the backslash both before \ and " to avoid compilation errors
+	str_ops(git_commit_message)
+		.replace_all("\\", "\\\\")
+		.replace_all("\"", "\\\"")
+	;
 
-	std::string git_commit_message = "allow -pre* vers";
-	const std::string git_commit_date = "Mon May 18 00:55:37 2026";
-	const std::string git_commit_hash = "4df328bacd9974dba4cd8ad4ac71f5bafcaa3f84";
+	const auto git_commit_date = augs::exec(git_executable_path.string() + " log -1 --format=%ad --date=local");
+	const auto git_commit_hash = augs::exec(git_executable_path.string() + " rev-parse --verify HEAD");
 
-	std::istringstream git_working_tree_changes ("");
+	std::istringstream git_working_tree_changes (augs::exec(git_executable_path.string() + " diff --name-only"));
 
 	std::string git_working_tree_changes_lines;
 
