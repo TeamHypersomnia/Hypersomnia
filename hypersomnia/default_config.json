@@ -781,10 +781,14 @@
                     "first": 48,
                     "second": 57
                 },
-                // plus and $
+                // plus, $, %
                 {
                     "first": 36,
                     "second": 36
+                },
+                {
+                    "first": 37,
+                    "second": 37
                 },
                 {
                     "first": 43,

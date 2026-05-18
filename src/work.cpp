@@ -5402,13 +5402,54 @@ work_result work(
 
 				using namespace augs::gui::text;
 
+				const auto loading_secs = std::chrono::duration<double>(
+					std::chrono::steady_clock::now().time_since_epoch()
+				).count();
+
+				const int num_dots = static_cast<int>(loading_secs) % 3 + 1;
+
+				const auto pulse_t = 0.5f + 0.5f * static_cast<float>(std::sin(loading_secs * 2.0 * PI<double>));
+				const auto pulse_channel = static_cast<rgba_channel>(200 + static_cast<int>(55.0f * pulse_t));
+				const auto pulse_color = rgba(pulse_channel, pulse_channel, pulse_channel, 255);
+
+				const auto& medium_numbers = streaming.get_loaded_gui_fonts().medium_numbers;
+				const auto line_height = static_cast<int>(medium_numbers.metrics.get_height());
+
+				const auto progress_percent = streaming.get_loading_progress_percent();
+				const auto vertical_offset = progress_percent.has_value() ? line_height / 2 : 0;
+
+				/*
+					Use the full "Loading..." bbox to pin the left edge, so the visible
+					text stays X-stationary as the dot count cycles.
+				*/
+				const auto reference_text = formatted_string("Loading...", style(medium_numbers, pulse_color));
+				const auto reference_bbox = get_text_bbox(reference_text);
+
+				const auto left_x = screen_size.x / 2 - reference_bbox.x / 2;
+				const auto center_y = screen_size.y / 2 - vertical_offset;
+
+				const auto visible_text = std::string("Loading") + std::string(num_dots, '.');
+
 				print_stroked(
 					get_drawer_for(post_game_gui_renderer),
-					screen_size / 2,
-					formatted_string("Loading...", style(streaming.get_loaded_gui_fonts().medium_numbers, white)),
-					{ augs::ralign::CX , augs::ralign::CY },
+					vec2i(left_x, center_y),
+					formatted_string(visible_text, style(medium_numbers, pulse_color)),
+					{ augs::ralign::L, augs::ralign::CY },
 					black
 				);
+
+				if (progress_percent.has_value()) {
+					const auto pct = static_cast<int>(std::round(*progress_percent * 100.f));
+					const auto pct_text = std::to_string(pct) + "%";
+
+					print_stroked(
+						get_drawer_for(post_game_gui_renderer),
+						screen_size / 2 + vec2i(0, line_height - vertical_offset),
+						formatted_string(pct_text, style(medium_numbers, pulse_color)),
+						{ augs::ralign::CX , augs::ralign::CY },
+						black
+					);
+				}
 			}
 			else {
 				if (ad_state != ad_state_type::NONE) {
