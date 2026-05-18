@@ -17,6 +17,7 @@ mkdir /tmp/AppDir/usr/bin -p
 mkdir /tmp/AppDir/usr/lib -p
 
 cp build/current/Hypersomnia /tmp/AppDir/usr/bin
+cp build/current/Hypersomnia Hypersomnia-unstripped
 strip /tmp/AppDir/usr/bin/Hypersomnia
 
 if [ "$BUILD_TYPE" == "steam" ]; then
