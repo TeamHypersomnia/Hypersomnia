@@ -35,6 +35,7 @@ struct subjects_gathering_input {
 	const all_gui_fonts_inputs gui_font_inputs;
 	const augs::path_type unofficial_project_dir;
 	atlas_progress_structs* const progress;
+	const bool gore_enabled = true;
 };
 
 struct general_atlas_input {

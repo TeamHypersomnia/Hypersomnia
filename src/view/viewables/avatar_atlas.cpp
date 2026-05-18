@@ -29,7 +29,8 @@ avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			1
+			1,
+			true /* gore_enabled — avatar atlas, no gore content */
 		},
 		{
 			in.atlas_image_output,

@@ -1686,6 +1686,8 @@ void load_test_scene_particle_effects(
 		em.initial_rotation_variation = 180;
 		//em.fade_when_ms_remaining = float_range(10, 50);
 
+		em.should_gore_remap = true;
+
 		effect.emissions.push_back(em);
 	}
 
@@ -3743,11 +3745,13 @@ void load_test_scene_particle_effects(
 			em.starting_spawn_circle_size_multiplier = float_range(0.2f, 0.2f);
 			em.ending_spawn_circle_size_multiplier = float_range(1.f, 1.f);
 
+			em.should_gore_remap = true;
+
 			effect.emissions.push_back(em);
 		}
 
 		{
-			particles_emission em; 
+			particles_emission em;
 			default_bounds(em);
 
 			em.swing_spread.set(10, 20);
@@ -3783,6 +3787,8 @@ void load_test_scene_particle_effects(
 
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(5.f, 5.f);
 			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(10.f, 10.f);
+
+			em.should_gore_remap = true;
 
 			effect.emissions.push_back(em);
 		}
@@ -4503,11 +4509,13 @@ void load_test_scene_particle_effects(
 
 			em.use_sqrt_to_ease_spawn_circle = true;
 
+			em.should_gore_remap = true;
+
 			effect.emissions.push_back(em);
 		}
 
 		{
-			particles_emission em; 
+			particles_emission em;
 			default_bounds(em);
 
 			em.swing_spread.set(10, 20);
@@ -5550,6 +5558,8 @@ void load_test_scene_particle_effects(
 			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 180;
 			em.should_particles_look_towards_velocity = true;
+
+			em.should_gore_remap = true;
 
 			effect.emissions.push_back(em);
 		}

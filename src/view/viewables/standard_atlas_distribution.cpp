@@ -126,7 +126,7 @@ void regenerate_and_gather_subjects(
 
 			const auto def = make_view(d);
 
-			auto result = def.should_regenerate_neon_map(force);
+			auto result = def.should_regenerate_neon_map(force, in.gore_enabled);
 
 			if (result.has_value()) {
 				++total_to_regenerate;
@@ -153,7 +153,7 @@ void regenerate_and_gather_subjects(
 					in.progress->current_neon_map_num.fetch_add(1, std::memory_order_relaxed);
 				}
 
-				def.regenerate_neon_map(*this_cached_in);
+				def.regenerate_neon_map(*this_cached_in, in.gore_enabled);
 			}
 		};
 
@@ -218,7 +218,8 @@ general_atlas_output create_general_atlas(
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			in.subjects.settings.atlas_blitting_threads
+			in.subjects.settings.atlas_blitting_threads,
+			in.subjects.gore_enabled
 		},
 		{
 			in.atlas_image_output,
@@ -375,7 +376,8 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			1
+			1,
+			true /* gore_enabled — ad-hoc atlas (avatars/thumbnails), no gore content */
 		},
 		{
 			in.atlas_image_output,

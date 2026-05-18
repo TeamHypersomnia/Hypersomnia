@@ -9,6 +9,7 @@
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/image/image.h"
+#include "augs/graphics/gore_colors.h"
 
 #include "view/viewables/regeneration/neon_maps.h"
 
@@ -72,7 +73,8 @@ void regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
-	cached_neon_map_in cached_in
+	cached_neon_map_in cached_in,
+	const bool remap_gore_pixels_in_source
 ) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
@@ -86,6 +88,10 @@ void regenerate_neon_map(
 	thread_local augs::image source_image;
 	source_image.clear();
 	source_image.from_file(input_image_path);
+
+	if (remap_gore_pixels_in_source) {
+		augs::remap_gore_pixels(source_image);
+	}
 
 	make_neon(in, source_image);
 

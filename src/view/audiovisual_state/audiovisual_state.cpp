@@ -144,7 +144,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			input.particle_effects,
 			anims,
 			scaled_frame_dt,
-			interp
+			interp,
+			input.gore_enabled
 		);
 	};
 

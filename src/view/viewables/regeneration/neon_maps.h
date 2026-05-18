@@ -48,5 +48,6 @@ void regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
-	cached_neon_map_in
+	cached_neon_map_in,
+	const bool remap_gore_pixels_in_source
 );

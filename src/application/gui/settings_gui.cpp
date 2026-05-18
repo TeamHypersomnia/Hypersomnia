@@ -576,6 +576,11 @@ void settings_gui_state::perform(
 					ImGui::Separator();
 				}
 
+#if !WEB_CRAZYGAMES
+				revertable_checkbox("Gore", config.gore);
+				tooltip_on_hover("Enables blood and gore visuals.");
+#endif
+
 #if !PLATFORM_WEB
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
 

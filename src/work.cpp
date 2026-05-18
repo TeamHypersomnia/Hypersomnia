@@ -1994,7 +1994,8 @@ work_result work(
 
 			new_player_metas,
 			new_ad_hoc_images,
-			audio_buffers
+			audio_buffers,
+			config.gore
 		});
 	};
 
@@ -3875,6 +3876,8 @@ work_result work(
 
 			viewing_config.damage_indication,
 
+			viewing_config.gore,
+
 			thread_pool
 		});
 
@@ -3892,9 +3895,9 @@ work_result work(
 		{
 			const auto& defs = get_viewable_defs();
 
-			get_audiovisuals().standard_post_solve(step, { 
+			get_audiovisuals().standard_post_solve(step, {
 				audio_renderer,
-				defs.particle_effects, 
+				defs.particle_effects,
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
 				viewing_config.sound,

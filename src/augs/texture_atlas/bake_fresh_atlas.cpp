@@ -13,6 +13,7 @@
 
 #include "augs/image/image.h"
 #include "augs/image/blit.h"
+#include "augs/graphics/gore_colors.h"
 #include "augs/texture_atlas/bake_fresh_atlas.h"
 
 #include "augs/readwrite/byte_file.h"
@@ -282,7 +283,9 @@ void bake_fresh_atlas(
 
 		auto scope = measure_scope(out.profiler.blitting_images);
 
-		auto worker = [&output_image, &subjects, &baked, output_image_size](const worker_input& input) {
+		const bool gore_enabled = in.gore_enabled;
+
+		auto worker = [&output_image, &subjects, &baked, output_image_size, gore_enabled](const worker_input& input) {
 			const bool is_loaded_image = input.original_index >= subjects.images.size();
 			const auto loaded_image_index = input.original_index - subjects.images.size();
 
@@ -347,6 +350,12 @@ void bake_fresh_atlas(
 			catch (...) {
 				set_glitch_uv();
 				return;
+			}
+
+			if (!gore_enabled && !is_loaded_image) {
+				if (augs::path_matches_gore_words(input_img_id.string())) {
+					augs::remap_gore_pixels(loaded_image);
+				}
 			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR

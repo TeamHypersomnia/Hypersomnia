@@ -1,6 +1,7 @@
 #include "augs/image/image.h"
 #include "augs/string/string_templates.h"
 #include "augs/filesystem/file.h"
+#include "augs/graphics/gore_colors.h"
 
 #include "view/viewables/image_definition.h"
 #include "view/viewables/regeneration/desaturations.h"
@@ -85,7 +86,8 @@ static bool already_packaged(const augs::path_type& source_path) {
 }
 
 std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_map(
-	const bool force_regenerate
+	const bool force_regenerate,
+	const bool gore_enabled
 ) const {
 	if (const auto generated_neon_map_path = find_generated_neon_map_path()) {
 		const auto diffuse_path = resolved_source_path;
@@ -94,10 +96,16 @@ std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_
 			return std::nullopt;
 		}
 
+		auto neon_input = get_def().meta.extra_loadables.generate_neon_map.value;
+
+		if (!gore_enabled && augs::path_matches_gore_words(diffuse_path.string())) {
+			augs::remap_gore_light_colors(neon_input.light_colors);
+		}
+
 		return ::should_regenerate_neon_map(
 			diffuse_path,
 			*generated_neon_map_path,
-			get_def().meta.extra_loadables.generate_neon_map.value,
+			neon_input,
 			force_regenerate
 		);
 	}
@@ -106,16 +114,26 @@ std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_
 }
 
 void image_definition_view::regenerate_neon_map(
-	const cached_neon_map_in& cached_in
+	const cached_neon_map_in& cached_in,
+	const bool gore_enabled
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
 	if (const auto generated_neon_map_path = find_generated_neon_map_path()) {
+		auto neon_input = get_def().meta.extra_loadables.generate_neon_map.value;
+
+		const bool remap_gore = !gore_enabled && augs::path_matches_gore_words(diffuse_path.string());
+
+		if (remap_gore) {
+			augs::remap_gore_light_colors(neon_input.light_colors);
+		}
+
 		::regenerate_neon_map(
 			diffuse_path,
 			*generated_neon_map_path,
-			get_def().meta.extra_loadables.generate_neon_map.value,
-			cached_in
+			neon_input,
+			cached_in,
+			remap_gore
 		);
 	}
 }

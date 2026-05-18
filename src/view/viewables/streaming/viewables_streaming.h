@@ -41,6 +41,7 @@ struct viewables_load_input {
 	std::optional<arena_player_metas>& new_player_metas;
 	std::optional<ad_hoc_atlas_subjects> ad_hoc_subjects;
 	augs::audio_command_buffers& audio_buffers;
+	const bool gore_enabled = true;
 };
 
 struct viewables_finalize_input {
@@ -91,6 +92,7 @@ class viewables_streaming {
 	image_definitions_map future_image_definitions;
 	all_gui_fonts_inputs future_gui_fonts;
 	float future_gui_font_ratio = 1.0f;
+	bool future_gore_enabled = true;
 
 	augs::future<general_atlas_output> future_general_atlas;
 
@@ -113,6 +115,7 @@ class viewables_streaming {
 
 	bool rescan_for_modified_images = false;
 	bool rescan_for_modified_sounds = false;
+	bool now_loaded_gore_enabled = true;
 
 	augs::graphics::texture blank_atlas = augs::image::white_pixel();
 	augs::graphics::texture general_atlas = augs::image::white_pixel();

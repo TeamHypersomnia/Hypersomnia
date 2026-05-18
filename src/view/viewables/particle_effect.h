@@ -57,7 +57,7 @@ struct particles_emission {
 	bool randomize_acceleration = false;
 	bool scale_damping_to_velocity = false;
 	bool should_particles_look_towards_velocity = true;
-	pad_bytes<1> pad;
+	bool should_gore_remap = false;
 
 	particle_definitions_vectors particle_definitions;
 	particle_layer target_layer = particle_layer::ILLUMINATING_PARTICLES;

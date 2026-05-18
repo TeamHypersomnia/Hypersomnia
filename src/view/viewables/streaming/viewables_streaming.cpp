@@ -191,6 +191,11 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			new_atlas_required = true;
 		}
 
+		if (now_loaded_gore_enabled != in.gore_enabled) {
+			LOG("Gore setting changed (now=%x). Forcing atlas reload.", in.gore_enabled);
+			new_atlas_required = true;
+		}
+
 		if (!new_atlas_required) {
 			if (rescan_for_modified_images) {
 				augs::timer t;
@@ -238,7 +243,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 					in_gui_fonts,
 					unofficial_content_dir,
 
-					std::addressof(*general_atlas_progress)
+					std::addressof(*general_atlas_progress),
+					in.gore_enabled
 				},
 
 				max_atlas_size,
@@ -271,6 +277,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			future_image_definitions = new_defs;
 			future_gui_fonts = gui_fonts;
 			future_gui_font_ratio = in.gui_fonts_ratio;
+			future_gore_enabled = in.gore_enabled;
 		}
 	}
 
@@ -436,6 +443,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		now_loaded_gui_font_defs = future_gui_fonts;
 		now_loaded_gui_font_ratio = future_gui_font_ratio;
+		now_loaded_gore_enabled = future_gore_enabled;
 
 		auto& now_loaded_defs = now_all_defs.image_definitions;
 		auto& new_loaded_defs = future_image_definitions;

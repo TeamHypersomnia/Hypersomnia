@@ -25,6 +25,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/light_attenuation.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
+#include "augs/graphics/gore_colors.h"
 #include "augs/templates/traits/is_nullopt.h"
 #include "game/detail/gun/firearm_engine.h"
 #include "augs/templates/enum_introspect.h"
@@ -590,13 +591,14 @@ void update_component_related_cache(
 
 void particles_simulation_system::advance_visible_streams(
 	randomization& rng,
-	const camera_cone queried_cone, 
+	const camera_cone queried_cone,
 	const special_effects_settings& settings,
 	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const plain_animations_pool& anims,
 	const augs::delta& delta,
-	const interpolation_system& interp
+	const interpolation_system& interp,
+	const bool gore_enabled
 ) {
 	const auto dt_secs = delta.in_seconds();
 
@@ -612,7 +614,7 @@ void particles_simulation_system::advance_visible_streams(
 
 		const auto particles_cam_aabb = particles_checked_cone.get_visible_world_rect_aabb();
 
-		const auto& modifier = effect.input.modifier;
+		const auto& original_modifier = effect.input.modifier;
 		const auto homing_target = effect.start.homing_target;
 		const auto infinitely = effect.start.stream_infinitely;
 
@@ -624,10 +626,23 @@ void particles_simulation_system::advance_visible_streams(
 				continue;
 			}
 
+			/*
+				(idempotent — green isn't in the gore source set, so re-runs are no-ops).
+			*/
+			auto modifier = original_modifier;
+
+			if (!gore_enabled && instance.source_emission.should_gore_remap) {
+				augs::try_remap_gore_color(modifier.color);
+
+				instance.source_emission.particle_definitions.for_each([](auto& def) {
+					augs::try_remap_gore_color(def.color);
+				});
+			}
+
 			const auto total_amount_mult = modifier.scale_amounts * settings.particle_stream_amount;
 
-			auto new_particles_to_spawn_by_time = 
-				(instance.particles_per_sec * total_amount_mult) * 
+			auto new_particles_to_spawn_by_time =
+				(instance.particles_per_sec * total_amount_mult) *
 				(stream_delta / 1000.f)
 			;
 

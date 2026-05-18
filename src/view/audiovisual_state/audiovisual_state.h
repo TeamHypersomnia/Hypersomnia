@@ -80,6 +80,8 @@ struct audiovisual_advance_input {
 
 	const damage_indication_settings& damage_indication;
 
+	const bool gore_enabled;
+
 	augs::thread_pool& pool;
 };
 

@@ -261,7 +261,8 @@ public:
 		const particle_effects_map&,
 		const plain_animations_pool&,
 		const augs::delta& dt,
-		const interpolation_system&
+		const interpolation_system&,
+		const bool gore_enabled
 	);
 
 	void spawn_temporary_lights(
