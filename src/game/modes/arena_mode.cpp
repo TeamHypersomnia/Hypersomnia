@@ -5044,7 +5044,7 @@ bool arena_mode::can_use_map_command_now(const const_input_type in) const {
 
 	const bool all_in_same_team = [&]() {
 		if (in.rules.is_ffa()) {
-			return get_num_active_players() == 1;
+			return get_num_active_players() <= 1;
 		}
 		else {
 			int nonempty_factions = 0;
@@ -5055,7 +5055,7 @@ bool arena_mode::can_use_map_command_now(const const_input_type in) const {
 				}
 			});
 
-			return nonempty_factions == 1;
+			return nonempty_factions <= 1;
 		}
 	}();
 
