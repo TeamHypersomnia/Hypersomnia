@@ -159,11 +159,13 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 		return std::max(1u, static_cast<uint32_t>(1 / delta.in_milliseconds() * m.regeneration_interval_ms));
 	};
 
-	cosm.for_each_having<invariants::touch_collectible>(
-		[&](const auto& subject) {
-			DEBUG_LOGIC_STEP_LINES.emplace_back(white, vec2(0,0), subject.get_logic_transform().pos);
-		}
-	);
+	if (DEBUG_DRAWING.enabled) {
+		cosm.for_each_having<invariants::touch_collectible>(
+			[&](const auto& subject) {
+				DEBUG_LOGIC_STEP_LINES.emplace_back(white, vec2(0,0), subject.get_logic_transform().pos);
+			}
+		);
+	}
 
 	cosm.for_each_having<components::sentience>(
 		[&](const auto& subject) {

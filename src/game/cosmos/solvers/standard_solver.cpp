@@ -287,7 +287,7 @@ void standard_solve(const logic_step step) {
 		auto scope = measure_scope(performance.visibility);
 		auto visibility_raycasts_scope = cosm.measure_raycasts(performance.visibility_raycasts);
 
-		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(step);
+		visibility_system().calc_visibility(step);
 	}
 #endif
 

@@ -40,7 +40,7 @@ inline void enqueue_visibility_jobs(
 			auto& triangles = light_triangles_vectors[i].triangles;
 
 			auto light_job = [&cosm, request, &response, &triangles]() {
-				visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, response);
+				visibility_system().calc_visibility(cosm, request, response);
 				vis_response_to_triangles(response, triangles, request.color, request.eye_transform.pos);
 			};
 
@@ -63,7 +63,7 @@ inline void enqueue_visibility_jobs(
 		auto& fow_triangles = dedicated[D::FOG_OF_WAR].triangles;
 
 		auto fow_job = [request, &cosm, &fow_response, &fow_triangles]() {
-			visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, fow_response);
+			visibility_system().calc_visibility(cosm, request, fow_response);
 			vis_response_to_triangles(fow_response, fow_triangles, white, request.eye_transform.pos);
 		};
 

@@ -198,7 +198,7 @@ void visibility_system::calc_visibility(
 	}();
 
 
-	auto& lines = DEBUG_LINES_TARGET;
+	auto& lines = DEBUG_FRAME_LINES;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const auto epsilon_distance_vertex_hit_sq =
@@ -861,7 +861,7 @@ void visibility_system::calc_visibility(
 
 		/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 		discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
-			[unreachable_area_col, &request, edges_num, &transform, &wrap, &lines, &marked_holes, &response]
+			[unreachable_area_col, &request, edges_num, &transform, &wrap, &marked_holes, &response]
 		(const discontinuity& d) {
 			thread_local std::vector<vec2> points_too_close;
 			points_too_close.clear();

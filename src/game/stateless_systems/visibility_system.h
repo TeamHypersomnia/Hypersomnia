@@ -14,12 +14,7 @@ inline auto& thread_local_visibility_response() {
 }
 
 class visibility_system {
-	using lines_ref = std::vector<debug_line>&;
-
 public:
-	lines_ref DEBUG_LINES_TARGET;
-	visibility_system(lines_ref ref) : DEBUG_LINES_TARGET(ref) {}
-
 	void calc_visibility(
 		const cosmos&,
 		const visibility_request&,

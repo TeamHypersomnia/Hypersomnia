@@ -159,7 +159,7 @@ void standard_explosion_input::instantiate(
 	request.subject = subject_if_any;
 
 	auto& response = thread_local_visibility_response();
-	visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request, response);
+	visibility_system().calc_visibility(cosm, request, response);
 
 	if (response.empty()) {
 		return;
