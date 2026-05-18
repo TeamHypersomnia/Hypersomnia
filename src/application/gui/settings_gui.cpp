@@ -686,13 +686,6 @@ void settings_gui_state::perform(
 					revertable_checkbox("Border", config.window.border);
 				}
 
-				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
-
-#if 0
-				tooltip_on_hover("Try this if the cursor malfunctions for any reason.\nE.g. sometimes the system cursor disappears in fullscreen on Windows,\nor it breaks with fractional scaling on Wayland.");
-#else
-				tooltip_on_hover("Disable if the cursor malfunctions for any reason.");
-#endif
 
 #endif
 
@@ -1797,6 +1790,16 @@ void settings_gui_state::perform(
 			}
 
 			case settings_pane::ADVANCED: {
+#if !PLATFORM_WEB
+				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+
+#if 0
+				tooltip_on_hover("Try this if the cursor malfunctions for any reason.\nE.g. sometimes the system cursor disappears in fullscreen on Windows,\nor it breaks with fractional scaling on Wayland.");
+#else
+				tooltip_on_hover("Experiment if the cursor malfunctions for any reason.");
+#endif
+#endif
+
 #if !WEB_LOWEND
 				if (auto node = scoped_tree_node("Server settings")) {
 					do_server_settings();
