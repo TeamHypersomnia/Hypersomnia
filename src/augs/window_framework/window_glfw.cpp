@@ -311,8 +311,18 @@ namespace augs {
 			double mx, my;
 			glfwGetCursorPos(window, &mx, &my);
 
+#if PLATFORM_WINDOWS
+			/*
+				On Windows, GLFW 3.3+ makes the process per-monitor DPI aware,
+				so glfwGetCursorPos and glfwGetFramebufferSize already agree in pixels.
+				Skip the content-scale multiplication used on Wayland/macOS.
+			*/
+			const auto sx = 1.0;
+			const auto sy = 1.0;
+#else
 			const auto sx = static_cast<double>(platform->content_scale_x);
 			const auto sy = static_cast<double>(platform->content_scale_y);
+#endif
 			const auto scaled = vec2d(mx * sx, my * sy);
 
 			last_mouse_pos.set(scaled.x, scaled.y);
@@ -415,8 +425,13 @@ namespace augs {
 		}
 
 		for (const auto& cursor : platform->unhandled_cursors) {
+#if PLATFORM_WINDOWS
+			const auto sx = 1.0;
+			const auto sy = 1.0;
+#else
 			const auto sx = static_cast<double>(platform->content_scale_x);
 			const auto sy = static_cast<double>(platform->content_scale_y);
+#endif
 
 			const auto new_mouse_pos = vec2d(cursor.xpos * sx, cursor.ypos * sy);
 
@@ -585,9 +600,14 @@ namespace augs {
 	void window::set_cursor_pos(const vec2i pos) {
 		platform->last_mouse_pos_for_dt = pos;
 		last_mouse_pos = pos;
-	
+
+#if PLATFORM_WINDOWS
+		const auto sx = 1.0;
+		const auto sy = 1.0;
+#else
 		const auto sx = static_cast<double>(platform->content_scale_x);
 		const auto sy = static_cast<double>(platform->content_scale_y);
+#endif
 
 		glfwSetCursorPos(platform->window, pos.x / sx, pos.y / sy);
 		platform->unhandled_cursors.clear();
