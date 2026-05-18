@@ -156,7 +156,6 @@ public:
 	bool finished_generating_atlas() const;
 	bool general_atlas_in_progress() const;
 	void display_loading_progress() const;
-	std::optional<float> get_loading_progress_percent() const;
 	bool completed_all_loading() const;
 	bool is_loading_sounds() const;
 

@@ -603,32 +603,6 @@ bool viewables_streaming::completed_all_loading() const {
 	return !general_atlas_progress.has_value() && !sounds_progress.has_value();
 }
 
-std::optional<float> viewables_streaming::get_loading_progress_percent() const {
-	if (const auto& progress = general_atlas_progress; progress.has_value()) {
-		const auto neon_i = progress->current_neon_map_num.load();
-		const auto neon_max_i = progress->max_neon_maps.load();
-
-		if (neon_max_i > 0 && neon_i > 0 && neon_i < neon_max_i) {
-			return float(neon_i) / neon_max_i;
-		}
-	}
-
-	if (const auto& progress = sounds_progress; progress.has_value()) {
-		const auto sound_i = progress->current_sound_num.load();
-		const auto sound_max_i = progress->max_sounds.load();
-
-		if (sound_max_i > 0) {
-			if (sound_i < sound_max_i) {
-				return float(sound_i + 1) / sound_max_i;
-			}
-
-			return 1.0f;
-		}
-	}
-
-	return std::nullopt;
-}
-
 void viewables_streaming::display_loading_progress() const {
 	using namespace augs::imgui;
 
