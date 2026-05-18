@@ -89,6 +89,7 @@ struct config_json_table {
 	activity_type last_activity = activity_type::TUTORIAL;
 	launch_type launch_at_startup = launch_type::LAST_ACTIVITY;
 
+	bool gore = true;
 	bool skip_tutorial = false;
 	bool log_to_live_file = false;
 	bool remove_live_log_file_on_start = true;

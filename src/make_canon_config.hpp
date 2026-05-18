@@ -127,6 +127,8 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		if (const auto k = key_or_default(app_controls, app_intent_type::SHOW_LOGS); k != key_type()) {
 			app_controls.erase(k);
 		}
+
+		result.gore = false;
 #endif
 
 #if WEB_ITCH

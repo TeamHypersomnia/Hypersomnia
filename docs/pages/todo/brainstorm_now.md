@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- core produkowac dla serwerow
+
 - mapki poprawic
 - poupewniac sie ze mapki maja dobre bot quotas
 - gore do mieczy i moze do nozy tez kiedys
