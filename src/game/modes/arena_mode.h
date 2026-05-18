@@ -602,7 +602,7 @@ public:
 		C callbacks,
 		solve_settings settings
 	) {
-		settings.friendly_fire = in.dynamic_vars.friendly_fire;
+		settings.friendly_fire = in.rules.is_ffa() ? true : in.dynamic_vars.friendly_fire;
 
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
