@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+# Przed Turniejem
+
+- config: max_rounds
+- config: wylaczenie remisow
+- zapisywanie solvabli (cosm/mode) + meta identyfikacyjna klienta w server setup
+	- moze byc bajtowo bo to tylko crash insurance i natychmiast restart wczyta to
+	- dawac wersje tez w razie czego jakby akurat weszla nowa i nie czytac wtedy
+
+- prostszy tutorial
+
+
+- no throwing mode
+- grid widoczny do tych navmeshy
+- opc. wiecej max rund zeby dalo sie na jednej mapie wbic harda?
 - core produkowac dla serwerow
 
 - wyjasniac jakos o co chodzi z levelami
@@ -24,9 +38,8 @@ jakis crash na serwerze przy graniu z januszem
 
 - CUSTOM MAPKI! trzeba zorganizowac
 
-- Krotsze mecze zaimplementowac ewentualnie
-
 - Przygotowac sie na brak internetu
+	- sciagnac customowe mapki
 	- jakies dogodne znajdywanie lokalnego masterservera
 	- co z uploadowaniem wynikow gdzies? bez neta jest dupa
 		- w sumie na piwo tez nie wrzucalismy
