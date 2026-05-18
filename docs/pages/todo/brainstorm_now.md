@@ -10,9 +10,6 @@ summary: That which we are brainstorming at the moment.
 
 - wyjasniac jakos o co chodzi z levelami
 
-- map can only be changed during warmup mimo ze sam jestem jako spectator - jak jestem sam jako spectator to tez powinno sie dac zmienic.
-- friendly fire zawsze musi byc on w gun game - nawet jak w ustawieniach serwera jest off.
-
 - coredumpy w ~/page niech ustawia tez
 jakis crash na serwerze przy graniu z januszem
 

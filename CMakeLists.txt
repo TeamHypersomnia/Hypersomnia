@@ -1461,7 +1461,6 @@ if(BUILD_FOR_WEB)
 
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/cache/content@/cache/content")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.json@/default_config.json")
 

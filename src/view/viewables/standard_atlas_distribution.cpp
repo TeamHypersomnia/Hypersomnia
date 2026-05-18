@@ -15,6 +15,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
 #include "augs/filesystem/directory.h"
+#include "augs/persistent_filesystem.h"
 
 augs::path_type get_path_in_cache(const augs::path_type& from_source_path);
 
@@ -166,6 +167,13 @@ void regenerate_and_gather_subjects(
 			workers.help_until_no_tasks();
 			workers.wait_for_all_tasks_to_complete();
 		}
+
+		/*
+			Push freshly regenerated neon maps / desaturations into IndexedDB on web,
+			so subsequent page loads can reuse them instead of regenerating.
+			No-op on native.
+		*/
+		::persistent_filesystem_sync();
 
 		for (const auto& d : in.image_definitions) {
 			const auto def = make_view(d);

@@ -30,6 +30,7 @@ struct neon_map_stamp {
 	// GEN INTROSPECTOR struct neon_map_stamp
 	neon_map_input input;
 	augs::file_time_type last_write_time_of_source;
+	bool gore_remap_applied = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -41,7 +42,8 @@ std::optional<cached_neon_map_in> should_regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
-	const bool force_regenerate
+	const bool force_regenerate,
+	const bool gore_remap_applied
 );
 
 void regenerate_neon_map(
@@ -49,5 +51,5 @@ void regenerate_neon_map(
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	cached_neon_map_in,
-	const bool remap_gore_pixels_in_source
+	const bool gore_remap_applied
 );

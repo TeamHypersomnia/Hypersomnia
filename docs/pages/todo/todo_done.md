@@ -7452,3 +7452,5 @@ This will discard your redo history."
 	- dla casuali nawet bym wylaczyl
 	- ale to jako setting
 
+- komunikat "map can only be changed during warmup" mimo ze sam jestem jako spectator - jak jestem sam na serwerze jako spectator to tez powinno sie dac zmienic. bo na razie musze wejsc do teamu jakiegos
+- friendly fire zawsze musi byc on w gun game - nawet jak w ustawieniach serwera jest off. bo to jest ffa. czyli jak game mode jest ffa to zawsze powinien overridowac friendly fire na false.

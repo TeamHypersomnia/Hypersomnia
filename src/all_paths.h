@@ -75,7 +75,17 @@ extern augs::path_type APPDATA_DIR;
 */
 
 #define LOGS_DIR (APPDATA_DIR / LOGS_FOLDER_NAME)
+
+#if PLATFORM_WEB
+/*
+	On WEB, /user is mounted on IDBFS (regular web/itch); cache lives there so
+	regenerated neon maps and other on-disk caches persist across page reloads.
+	CrazyGames creates /user but does not mount IDBFS — there it stays MEMFS-only.
+*/
+#define CACHE_DIR (augs::path_type("/user") / CACHE_FOLDER_NAME)
+#else
 #define CACHE_DIR (APPDATA_DIR / CACHE_FOLDER_NAME)
+#endif
 
 /*
 	APPDATA_DIR with appended Steam ID or NONSTEAM_USER_FOLDER_NAME ("user")

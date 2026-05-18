@@ -27,11 +27,13 @@ std::optional<cached_neon_map_in> should_regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
-	const bool force_regenerate
+	const bool force_regenerate,
+	const bool gore_remap_applied
 ) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
 	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
+	new_stamp.gore_remap_applied = gore_remap_applied;
 
 	const auto neon_map_path = output_image_path;
 	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
@@ -74,11 +76,12 @@ void regenerate_neon_map(
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	cached_neon_map_in cached_in,
-	const bool remap_gore_pixels_in_source
+	const bool gore_remap_applied
 ) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
 	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
+	new_stamp.gore_remap_applied = gore_remap_applied;
 
 	const auto neon_map_path = output_image_path;
 	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
@@ -89,7 +92,7 @@ void regenerate_neon_map(
 	source_image.clear();
 	source_image.from_file(input_image_path);
 
-	if (remap_gore_pixels_in_source) {
+	if (gore_remap_applied) {
 		augs::remap_gore_pixels(source_image);
 	}
 

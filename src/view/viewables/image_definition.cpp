@@ -69,22 +69,6 @@ vec2u image_definition_view::read_source_image_size() const {
 }
 
 #if !HEADLESS
-static bool already_packaged(const augs::path_type& source_path) {
-#if PLATFORM_WEB
-	if (::begins_with(source_path.string(), OFFICIAL_CONTENT_DIR.string())) {
-		return true;
-	}
-
-	if (::begins_with(source_path.string(), (CACHE_DIR / OFFICIAL_CONTENT_DIR).string())) {
-		return true;
-	}
-#endif
-
-	(void)source_path;
-
-	return false;
-}
-
 std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_map(
 	const bool force_regenerate,
 	const bool gore_enabled
@@ -92,13 +76,11 @@ std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_
 	if (const auto generated_neon_map_path = find_generated_neon_map_path()) {
 		const auto diffuse_path = resolved_source_path;
 
-		if (already_packaged(diffuse_path)) {
-			return std::nullopt;
-		}
+		const bool remap_gore = !gore_enabled && augs::path_matches_gore_words(diffuse_path.string());
 
 		auto neon_input = get_def().meta.extra_loadables.generate_neon_map.value;
 
-		if (!gore_enabled && augs::path_matches_gore_words(diffuse_path.string())) {
+		if (remap_gore) {
 			augs::remap_gore_light_colors(neon_input.light_colors);
 		}
 
@@ -106,7 +88,8 @@ std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_
 			diffuse_path,
 			*generated_neon_map_path,
 			neon_input,
-			force_regenerate
+			force_regenerate,
+			remap_gore
 		);
 	}
 
@@ -142,10 +125,6 @@ void image_definition_view::regenerate_desaturation(
 	const bool force_regenerate
 ) const {
 	const auto diffuse_path = resolved_source_path;
-
-	if (already_packaged(diffuse_path)) {
-		return;
-	}
 
 	if (const auto desaturation_path = find_desaturation_path()) {
 		::regenerate_desaturation(
