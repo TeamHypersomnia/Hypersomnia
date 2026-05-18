@@ -4,7 +4,21 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
 
+#if PLATFORM_WEB
+/*
+	cpp-httplib v0.32.0+ emits a #warning on 32-bit platforms (Emscripten is 32-bit).
+	On web we only use the httplib types at compile time; actual HTTP goes through
+	augs::emscripten_http, so the warning is harmless and must not break -Werror.
+*/
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-W#warnings"
+#endif
+
 #include "3rdparty/cpp-httplib/httplib.h"
+
+#if PLATFORM_WEB
+#pragma clang diagnostic pop
+#endif
 
 #if PLATFORM_WEB
 #include "augs/misc/httplib_emscripten.h"

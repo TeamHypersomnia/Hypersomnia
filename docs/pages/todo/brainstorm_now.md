@@ -8,6 +8,17 @@ summary: That which we are brainstorming at the moment.
 
 - core produkowac dla serwerow
 
+- wyjasniac jakos o co chodzi z levelami
+
+- map can only be changed during warmup mimo ze sam jestem jako spectator - jak jestem sam jako spectator to tez powinno sie dac zmienic.
+- friendly fire zawsze musi byc on w gun game - nawet jak w ustawieniach serwera jest off.
+
+- coredumpy w ~/page niech ustawia tez
+jakis crash na serwerze przy graniu z januszem
+
+- segfault na serwerze, niedobrze
+- zwiekszyc quota znowu, cyberaqua itp
+
 - mapki poprawic
 - poupewniac sie ze mapki maja dobre bot quotas
 - gore do mieczy i moze do nozy tez kiedys
