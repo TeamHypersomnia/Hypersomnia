@@ -93,7 +93,16 @@ if [ -f "$EXE_PATH" ]; then
 		i=0
 		until [[ -e "${DMG_PATH}" ]]; do
 		  echo "Attempt $((i+1)): Running create-dmg..."
-		  create-dmg "${DMG_PATH}" "${APP_PATH}" || true
+		  create-dmg \
+		    --volname "Hypersomnia" \
+		    --window-pos 200 120 \
+		    --window-size 600 400 \
+		    --icon-size 100 \
+		    --icon "Hypersomnia.app" 150 200 \
+		    --app-drop-link 450 200 \
+		    --hide-extension "Hypersomnia.app" \
+		    "${DMG_PATH}" \
+		    "${APP_PATH}" || true
 		  if [[ $i -eq 30 ]]; then
 			echo 'Error: create-dmg did not succeed even after 30 tries.'
 			exit 1
