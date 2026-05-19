@@ -11,7 +11,7 @@ protected:
 	using base::operator->;
 
 	template <class H>
-	friend void arena_mode_set_transferred_item_meta(H, int charges, const item_owner_meta&, uint32_t);
+	friend void arena_mode_set_transferred_item_meta(H, int charges, const item_owner_meta&);
 
 public:
 	using base::get_raw_component;

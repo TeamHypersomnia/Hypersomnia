@@ -346,6 +346,7 @@ private:
 		bool survived = false;
 		transferred_inventory saved_eq;
 		learnt_spells_array_type saved_spells;
+		uint32_t num_incoming_transfers = 0;
 	};
 
 	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;

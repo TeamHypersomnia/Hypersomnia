@@ -191,11 +191,10 @@ faction_type arena_mode::get_player_faction(const mode_player_id& id) const {
 }
 
 template <class H>
-void arena_mode_set_transferred_item_meta(const H handle, int charges, const item_owner_meta& meta, const uint32_t incoming_transfer_id) {
+void arena_mode_set_transferred_item_meta(const H handle, int charges, const item_owner_meta& meta) {
 	auto& item = *handle.template get<components::item>().component;
 	item.charges = charges;
 	item.owner_meta = meta;
-	item.incoming_transfer_id = incoming_transfer_id;
 }
 
 void arena_mode::init_spawned(
@@ -272,7 +271,7 @@ void arena_mode::init_spawned(
 					cosm,
 					i.flavour,
 					[&](const entity_handle handle) {
-						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta, i.incoming_transfer_id);
+						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta);
 					}
 				);
 
@@ -287,6 +286,12 @@ void arena_mode::init_spawned(
 						const auto result = perform_transfer_no_step(request, cosm);
 						result.notify_logical(step);
 					}
+
+					/*
+						perform_transfer stamps a fresh incoming_transfer_id whenever an item enters
+						a new capability. Restore the saved id so the hotbar order survives the round transition.
+					*/
+					new_item.template get<components::item>().set_incoming_transfer_id(i.incoming_transfer_id);
 
 					{
 						const auto new_id = new_item.get_id();
@@ -352,9 +357,17 @@ void arena_mode::init_spawned(
 					skip_creation();
 				}
 			}
+
+			/*
+				Restore the exact transfer counter from the previous round so subsequent pickups
+				continue numbering from where they left off.
+			*/
+			if (const auto transfers = typed_handle.template find<components::item_slot_transfers>()) {
+				transfers->num_incoming_transfers = transferred->num_incoming_transfers;
+			}
 		}
 		else {
-			const auto& eq = 
+			const auto& eq =
 				state == arena_mode_state::WARMUP
 				? faction_rules.warmup_initial_eq
 				: faction_rules.round_start_eq
@@ -1220,6 +1233,10 @@ arena_mode::round_transferred_players arena_mode::make_transferred_players(const
 
 			if (const auto sentience = handle.find<components::sentience>()) {
 				pm.saved_spells = sentience->learnt_spells;
+			}
+
+			if (const auto transfers = handle.find<components::item_slot_transfers>()) {
+				pm.num_incoming_transfers = transfers->num_incoming_transfers;
 			}
 
 			auto& eq = pm.saved_eq;
