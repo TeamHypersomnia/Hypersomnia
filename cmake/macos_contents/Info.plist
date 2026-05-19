@@ -6,7 +6,27 @@
 	<string>Hypersomnia</string>
 	<key>CFBundleDisplayName</key>
 	<string>Hypersomnia</string>
+	<key>CFBundleExecutable</key>
+	<string>Hypersomnia</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.hypersomnia.Hypersomnia</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
 	<key>CFBundleIconFile</key>
 	<string>iconfile</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.15</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>
