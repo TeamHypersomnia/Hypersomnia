@@ -161,6 +161,13 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 	output.result.source_root = source_root;
 
+	/*
+		Capture the previous root NOW, before the previous_slot field gets overwritten below.
+		Used later to detect re-entry into the same capability across drop+pickup sequences
+		(e.g. swap_slots_for_items), so the hotbar order survives wielding swaps.
+	*/
+	const auto previous_root_at_entry = cosm[item.previous_slot].get_container().get_topmost_container();
+
 	if (!r.params.bypass_mounting_requirements) {
 		const auto transferred_item_id = transferred_item.get_id();
 
@@ -374,11 +381,19 @@ perform_transfer_result perform_transfer_impl::operator()(
 		transfer). This drives the hotbar's stateless rebuild ordering: lower id
 		means earlier slot. Items merely moved between slots of the same character
 		keep their existing id and therefore their hotbar position.
+
+		Wielding swaps go through swap_slots_for_items, which emits drop+drop+pickup+pickup;
+		each pickup looks like an entry into a new capability because source_root is invalid.
+		Detect re-entry into the same capability via the item's previous_slot to preserve ids.
 	*/
 	if (target_root && target_root != source_root) {
-		if (const auto target_transfers = target_root.template find<components::item_slot_transfers>()) {
-			++target_transfers->num_incoming_transfers;
-			item.incoming_transfer_id = target_transfers->num_incoming_transfers;
+		const bool returning_to_same_capability = previous_root_at_entry && previous_root_at_entry == target_root;
+
+		if (!returning_to_same_capability) {
+			if (const auto target_transfers = target_root.template find<components::item_slot_transfers>()) {
+				++target_transfers->num_incoming_transfers;
+				item.incoming_transfer_id = target_transfers->num_incoming_transfers;
+			}
 		}
 	}
 
