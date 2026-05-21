@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include "augs/network/network_simulator_settings.h"
+#include "augs/templates/maybe.h"
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_vector.h"
@@ -141,6 +142,9 @@ public:
 	bool bots = true;
 	difficulty_type bot_difficulty = difficulty_type::LEVELLING;
 	bot_quota bot_quota;
+
+	bool allow_overtime = false;
+	augs::maybe<uint32_t> max_team_score;
 
 	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
 	std::vector<arena_and_mode_identifier> cycle_list;

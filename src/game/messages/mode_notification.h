@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <variant>
 #include "game/enums/faction_choice_result.h"
 #include "game/modes/difficulty_type.h"
@@ -49,6 +50,12 @@ namespace messages {
 		bool operator==(const casual_bot_difficulty_change&) const = default;
 	};
 
+	struct overtime_started {
+		uint32_t play_to = 0;
+
+		bool operator==(const overtime_started&) const = default;
+	};
+
 	struct mode_notification {
 		mode_player_id subject_mode_id;
 		std::string subject_name;
@@ -59,7 +66,8 @@ namespace messages {
 			joined_or_left,
 			no_arg_mode_notification,
 			casual_team_level_change,
-			casual_bot_difficulty_change
+			casual_bot_difficulty_change,
+			overtime_started
 		> payload;
 	};
 }

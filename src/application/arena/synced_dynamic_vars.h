@@ -36,6 +36,8 @@ struct synced_dynamic_vars {
 	bool all_not_banned = false;
 	bool friendly_fire = false;
 	bool force_short_match = false;
+	bool allow_overtime = false;
+	augs::maybe<uint32_t> max_team_score;
 	server_ranked_vars ranked;
 	bots_request bots_override;
 	difficulty_type bot_override_difficulty = difficulty_type::LEVELLING;

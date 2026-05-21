@@ -2268,6 +2268,26 @@ void do_server_vars(
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
 		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
 
+		revertable_checkbox("Allow overtime", vars.allow_overtime);
+		tooltip_on_hover("A tie at (max team score - 1) each plays out into overtime\nuntil one team leads by two rounds (e.g. 17:15, then 18:16...).");
+
+		{
+			bool override_max_team_score = vars.max_team_score.is_enabled;
+
+			if (checkbox("Override max team score", override_max_team_score)) {
+				vars.max_team_score.is_enabled = override_max_team_score;
+			}
+
+			revert(vars.max_team_score.is_enabled);
+			tooltip_on_hover("Overrides the map's max team score (number of rounds)\nand the short-match for browser players.");
+
+			if (vars.max_team_score.is_enabled) {
+				auto scope = scoped_indent();
+
+				revertable_slider("Max team score", vars.max_team_score.value, 2u, 100u);
+			}
+		}
+
 		if (auto node = scoped_tree_node("Bots")) {
 			revertable_checkbox("Enable bots", vars.bots);
 

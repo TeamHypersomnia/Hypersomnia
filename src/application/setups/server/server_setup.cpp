@@ -2599,6 +2599,8 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.ranked = vars.ranked;
 
 	out.force_short_match = has_browser_clients_playing;
+	out.allow_overtime = vars.allow_overtime;
+	out.max_team_score = vars.max_team_score;
 
 	out.bot_override_difficulty = vars.bot_difficulty;
 

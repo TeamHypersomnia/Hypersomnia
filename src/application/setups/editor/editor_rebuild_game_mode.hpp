@@ -154,7 +154,7 @@ auto setup_ruleset_from_editor_mode(
 		rules.round_end_secs = vars.round_end_time;
 		rules.respawn_after_ms = vars.respawn_after_ms;
 		rules.spawn_protection_ms = vars.spawn_protection_ms;
-		rules.max_rounds = (std::max(2u, vars.max_team_score) - 1) * 2;
+		rules.max_team_score = vars.max_team_score;
 
 		using S = typename I::subrules_type;
 		S subrules;

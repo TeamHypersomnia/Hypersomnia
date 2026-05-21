@@ -59,7 +59,7 @@ struct arena_mode_ruleset {
 	uint32_t buy_secs_after_freeze = 30;
 	uint32_t warmup_secs = 45;
 	uint32_t warmup_respawn_after_ms = 2000;
-	uint32_t max_rounds = 30;
+	uint32_t max_team_score = 16;
 	uint32_t halftime_summary_seconds = 8;
 	uint32_t match_summary_seconds = 15;
 	uint32_t game_commencing_seconds = 3;
@@ -92,11 +92,6 @@ struct arena_mode_ruleset {
 
 	bool should_hide_details_when_spectating_enemies() const {
 		return true;
-	}
-
-	auto get_num_rounds() const {
-		/* Make it even */
-		return std::max((max_rounds / 2) * 2, 2u);
 	}
 
 	bool has_economy() const;
@@ -781,7 +776,7 @@ public:
 
 	float get_warmup_seconds(const const_input in) const;
 
-	uint32_t get_num_rounds(const const_input in) const;
+	uint32_t get_max_team_score(const const_input in) const;
 
 	bool is_halftime_summary(const const_input in) const;
 	bool is_last_summary(const const_input in) const;

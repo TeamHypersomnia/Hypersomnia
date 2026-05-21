@@ -310,6 +310,8 @@
         "bots": true, // Can override with "/bots 0" in-game.
         "bot_difficulty": "LEVELLING", // or: "VERY_EASY" | "EASY" | "MEDIUM" | "HARD" 
         "bot_quota": [ ], // empty for map default, [ 10 ] for always 10, [ 3, 4 ] for team specific.
+        "allow_overtime": false, // On a tie at (max_team_score - 1) each, play on until one team leads by two rounds (e.g. 17:15, then 18:16...).
+        "OFF_max_team_score": 16, // Rename to "max_team_score" to override the map's score-to-win (and the short match for browser players). Normally maps use 16.
         "cycle": "REPEAT_CURRENT", // or: "LIST" | "ALL_ON_DISK"
         "cycle_list": [
             "de_cyberaqua",

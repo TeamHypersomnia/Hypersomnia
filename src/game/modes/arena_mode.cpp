@@ -1775,42 +1775,34 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 	}
 }
 
-uint32_t arena_mode::get_num_rounds(const const_input_type in) const {
-	if (short_match) {
-		const auto num = in.rules.get_num_rounds();
-
-		if (num == 30) {
-			/* 
-				Special case:
-				Instead of playing "to 16" (with tie 15:15),
-				play "to 10" (with tie 9:9) as it's a nicer number
-			*/
-
-			return 18;
-		}
-
-		auto half = in.rules.get_num_rounds() / 2;
-
-		if (half < 2) {
-			return 2;
-		}
-
-		if (half % 2 == 1) {
-			return half + 1;
-		}
-
-		return half;
+uint32_t arena_mode::get_max_team_score(const const_input_type in) const {
+	if (const auto overridden = in.dynamic_vars.max_team_score) {
+		/* A max team score set on the server overrides everything else. */
+		return std::max(2u, overridden.value);
 	}
 
-	return in.rules.get_num_rounds();
+	const auto max_team_score = std::max(2u, in.rules.max_team_score);
+
+	if (short_match) {
+		/* Browser players get a shortened match - roughly half the score. */
+
+		if (max_team_score == 16) {
+			/* Special case: play to 10 (9:9 tie) instead of 9, as it's a nicer number. */
+			return 10;
+		}
+
+		return max_team_score / 2 + 1;
+	}
+
+	return max_team_score;
 }
 
 bool arena_mode::is_halfway_round(const const_input_type in) const {
-	const auto max_rounds = get_num_rounds(in);
-	const auto current_round = get_current_round_number();
-
-	return current_round == max_rounds / 2;
+	/* Teams swap once each side has played a full half. */
+	return get_current_round_number() == get_max_team_score(in) - 1;
 }
+
+constexpr uint32_t overtime_score_limit_v = 10000;
 
 bool arena_mode::is_final_round(const const_input_type in) const {
 	if (abandoned_team != faction_type::COUNT) {
@@ -1821,20 +1813,32 @@ bool arena_mode::is_final_round(const const_input_type in) const {
 		return true;
 	}
 
-	const auto max_rounds = get_num_rounds(in);
-	const auto current_round = get_current_round_number();
-
-	bool someone_has_over_half = false;
+	const auto max_team_score = get_max_team_score(in);
 
 	const auto p = calc_participating_factions(in);
-	
-	p.for_each([&](const auto f) {
-		if (get_score(f) > max_rounds / 2) {
-			someone_has_over_half = true;
-		}
-	});
 
-	return someone_has_over_half || current_round >= max_rounds;
+	const auto higher = std::max(get_score(p.bombing), get_score(p.defusing));
+	const auto lower = std::min(get_score(p.bombing), get_score(p.defusing));
+
+	if (in.dynamic_vars.allow_overtime) {
+		/*
+			In overtime a team must reach the max team score AND lead by at
+			least two rounds to win (e.g. 17:15, then 18:16...). A tie at
+			(max_team_score - 1) each (or any higher equal score) extends the match.
+		*/
+
+		const bool won_by_two = higher >= max_team_score && (higher - lower) >= 2;
+
+		/* Extreme safety limit to never get stuck in an infinite match. */
+		const bool reached_extreme_limit = higher >= overtime_score_limit_v;
+
+		return won_by_two || reached_extreme_limit;
+	}
+
+	const bool someone_reached_max = higher >= max_team_score;
+	const bool all_rounds_played = get_current_round_number() >= (max_team_score - 1) * 2;
+
+	return someone_reached_max || all_rounds_played;
 }
 
 void arena_mode::trigger_match_summary(const input_type in, const const_logic_step step) {
@@ -1915,6 +1919,24 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 					}
 				}
 			}
+		}
+	}
+
+	if (in.dynamic_vars.allow_overtime) {
+		/*
+			Whenever the score becomes tied at (max_team_score - 1) each or
+			higher, announce that overtime continues and to which score we now play.
+		*/
+
+		const auto tie_threshold = get_max_team_score(in) - 1;
+		const auto bombing_score = get_score(p.bombing);
+		const auto defusing_score = get_score(p.defusing);
+
+		if (const bool overtime_tie = bombing_score == defusing_score && bombing_score >= tie_threshold) {
+			messages::mode_notification notification;
+			notification.payload = messages::overtime_started { bombing_score + 2 };
+
+			step.post_message(std::move(notification));
 		}
 	}
 
@@ -5104,6 +5126,11 @@ bool arena_mode::team_choice_allowed(const const_input_type in) const {
 }
 
 bool arena_mode::should_match_be_short(const const_input_type in) const {
+	if (in.dynamic_vars.max_team_score) {
+		/* An explicit max team score overrides the short match. */
+		return false;
+	}
+
 	return in.dynamic_vars.force_short_match;
 }
 

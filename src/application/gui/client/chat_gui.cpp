@@ -209,6 +209,14 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 			return true;
 		}
+		else if constexpr(std::is_same_v<P, overtime_started>) {
+			do_entry(
+				typesafe_sprintf("Overtime. We play to %x.", payload.play_to),
+				orange
+			);
+
+			return true;
+		}
 		else if constexpr(std::is_same_v<P, joined_or_left>) {
 			const auto action = [&]() {
 				if (payload == joined_or_left::JOINED) {
