@@ -3559,7 +3559,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5200.f, 5200.f};
+			gun_def.muzzle_velocity = {5450.f, 5450.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3619,7 +3619,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5050.f, 5050.f};
+			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3682,7 +3682,7 @@ namespace test_flavours {
 			gun_def.muzzle_cast_shadow = false;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5250.f, 5300.f};
+			gun_def.muzzle_velocity = {5550.f, 5550.f};
 			gun_def.shot_cooldown_ms = 75.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3742,7 +3742,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5900.f, 6000.f};
+			gun_def.muzzle_velocity = {6000.f, 6100.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};

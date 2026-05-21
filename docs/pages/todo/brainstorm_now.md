@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- dalej zjebana jest kolejnosc, pewnie dlatego ze kopiujemy najpierw id a potem transfer robimy i sie znowu nadpisuje id
-
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
 
 # Przed Turniejem
