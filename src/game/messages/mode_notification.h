@@ -19,7 +19,16 @@ namespace messages {
 
 		SHORT_MATCH,
 
-		TEAMS_SWAPPED
+		TEAMS_SWAPPED,
+
+		/*
+			Emitted by arena_mode::setup_round() once a new round has been set up
+			(cosmos reset to clean_round_state, spawns filled). The server uses
+			this as the sole trigger for ranked crash-recovery dumps. The server
+			filters by ranked_live, so warmup rounds and non-ranked modes are
+			ignored even though the notification fires there too.
+		*/
+		ROUND_START
 	};
 
 	enum class joined_or_left {

@@ -14,6 +14,7 @@
 #include "game/modes/arena_mode_structs.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "augs/templates/continue_or_callback_result.h"
+#include "augs/network/network_types.h"
 #include "game/modes/ranked_state_type.h"
 
 #include "application/arena/arena_playtesting_context.h"
@@ -100,7 +101,7 @@ struct test_mode_player {
 	// END GEN INTROSPECTOR
 
 	/* Dummy field for compatibility */
-	std::string server_ranked_account_id;
+	server_ranked_account_id_type server_ranked_account_id;
 
 	auto should_hide_in_scoreboard() const {
 		return hide_in_scoreboard;
@@ -341,4 +342,6 @@ public:
 	uint32_t get_num_human_players() const {
 		return get_num_players() - get_num_bot_players();
 	}
+
+	void recover_from_crash() {}
 };

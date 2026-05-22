@@ -1218,6 +1218,17 @@ void arena_mode::setup_round(
 	}
 
 	step.post_message(messages::hud_message { messages::special_hud_command::CLEAR });
+
+	/*
+		Sole trigger for ranked crash-recovery dumps. Posted unconditionally;
+		the server gates on ranked_live, so warmup rounds and non-ranked modes
+		are ignored.
+	*/
+	{
+		messages::mode_notification round_start;
+		round_start.payload = messages::no_arg_mode_notification::ROUND_START;
+		step.post_message(std::move(round_start));
+	}
 }
 
 arena_mode::round_transferred_players arena_mode::make_transferred_players(const input_type in, const bool only_input_flags) const {
@@ -3611,6 +3622,34 @@ mode_player_id arena_mode::find_suspended_player_id(const std::string& account_i
 	}
 
 	return mode_player_id::dead();
+}
+
+void arena_mode::recover_from_crash() {
+	/*
+		Move every active human player into suspension so the match freezes and waits
+		for them to reconnect (no clients exist right after a recovery load). Bots have
+		no client to reconnect, so they stay active and are re-driven by the AI.
+	*/
+
+	std::vector<mode_player_id> humans_to_suspend;
+
+	for (auto& p : only_human(players)) {
+		p.second.unset_inputs_once = true;
+		suspended_players[p.first] = p.second;
+		humans_to_suspend.push_back(p.first);
+	}
+
+	for (const auto& id : humans_to_suspend) {
+		erase_element(players, id);
+	}
+
+	/*
+		Give a fresh rejoin window: the crash was the server's fault, not the players'.
+	*/
+
+	for (auto& p : suspended_players) {
+		p.second.stats.total_time_suspended = 0.0f;
+	}
 }
 
 float arena_mode_player::suspended_time_until_kick(const server_ranked_vars& vars, const bool is_short) const {

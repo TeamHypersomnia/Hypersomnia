@@ -301,6 +301,7 @@
             "max_rejoins": 5,
             "match_unfreezes_in_secs": 5,
             "freeze_match_on_disconnect": true,
+            "dump_server_recovery_state_every_round": true, // dedicated servers only. Dumps a snapshot at the start of each LIVE ranked round so a crash can resume the match.
             "overrides": {
                 "friendly_fire": true,
                 "client_network_timeout_secs": 1.5

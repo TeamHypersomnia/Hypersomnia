@@ -135,6 +135,8 @@
 #include "application/setups/editor/editor_setup_for_each_highlight.hpp"
 #endif
 
+#include "application/setups/server/crash_recovery/server_recovery_worker.h"
+
 #include "application/masterserver/masterserver.h"
 #include "application/network/network_common.h"
 
@@ -1181,6 +1183,15 @@ work_result work(
 		auto port_counter = original_port;
 		auto webrtc_port_counter = config_pattern.server.webrtc_port_range_begin;
 
+#if CRASH_RECOVERY
+		/*
+			One shared worker thread for all ranked instances to write their crash-recovery
+			snapshots to disk. Its thread is created lazily on the first push, so this stays
+			inert unless some ranked instance actually dumps state.
+		*/
+		server_recovery_worker recovery_worker;
+#endif
+
 		auto write_vars_to_disk = [&](const server_vars& new_vars) {
 			LOG("Writing server_vars to disk.");
 
@@ -1239,8 +1250,8 @@ work_result work(
 			auto write_or_not = std::function<void(const server_vars&)>(write_vars_to_disk);
 			bool should_suppress_webhook = params.suppress_server_webhook;
 			
-			const bool pick_random_map = 
-				later_server && 
+			const bool pick_random_map =
+				later_server &&
 				this_config.server.cycle_randomize_order &&
 				this_config.server.cycle != arena_cycle_type::REPEAT_CURRENT
 			;
@@ -1273,14 +1284,21 @@ work_result work(
 				type == SINGLE ? assigned_teams : server_assigned_teams(),
 
 				this_config.webrtc_signalling_server_url,
+#if CRASH_RECOVERY
+				recovery_worker,
+#endif
 				server_name_suffix
 			);
 
-			if (pick_random_map) {
+			/*
+				If the instance recovered a crashed match, it already loaded that match's
+				arena - don't override it with a random cycle pick.
+			*/
+			if (pick_random_map && !server_ptr->recovered_from_crash()) {
 				server_ptr->choose_next_map_from_cycle();
 			}
 
-			return dedicated_server_worker_input { 
+			return dedicated_server_worker_input {
 				std::move(server_ptr),
 				params.appimage_path,
 				this_config.self_update,

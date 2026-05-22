@@ -686,9 +686,12 @@ server_setup::server_setup(
 	const bool suppress_community_server_webhook_this_run,
 	const server_assigned_teams& assigned_teams,
 	const std::string& webrtc_signalling_server_url,
+#if CRASH_RECOVERY
+	server_recovery_worker& recovery_worker,
+#endif
 	const std::string& name_suffix,
 	const server_temp_var_overrides& initial_overrides
-) : 
+) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
 	official(official),
@@ -712,6 +715,9 @@ server_setup::server_setup(
 			is_webrtc_only()
 		)
 	),
+#if CRASH_RECOVERY
+	crash_recovery(recovery_worker),
+#endif
 	server_time(server_setup::get_current_time()),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run),
 	name_suffix(name_suffix),
@@ -733,7 +739,7 @@ server_setup::server_setup(
 		auto initial_vars_modified = initial_vars;
 
 		const auto default_name = "${MY_NICKNAME}'s server";
-		
+
 		if (initial_vars_modified.server_name.empty()) {
 			initial_vars_modified.server_name = default_name;
 		}
@@ -749,7 +755,41 @@ server_setup::server_setup(
 			initial_vars_modified.server_name = source_server_name;
 		}
 
+#if CRASH_RECOVERY
+		/*
+			Crash-recovery flow. The recovery file is authoritative about which arena/mode
+			to load, so we resume exactly the interrupted match regardless of cycle/config,
+			then apply the saved solvable onto the freshly loaded arena.
+
+			load() validates the recovery arena exists on disk via the predicate before
+			letting it override the configured one - otherwise a since-deleted arena
+			would propagate into apply()'s catch path, whose `previous_arena` fallback
+			is empty on first_time and would fail the second rechoose too.
+		*/
+		const bool recovery_enabled =
+			initial_vars.ranked.is_ranked_server()
+			&& initial_vars.ranked.dump_server_recovery_state_every_round
+		;
+
+		const auto target = crash_recovery.load(
+			last_start.port,
+			recovery_enabled,
+			[](const arena_identifier& name) {
+				return !::server_choose_arena_file_by(std::string(name)).empty();
+			}
+		);
+
+		if (target.has_value()) {
+			initial_vars_modified.arena = target->arena;
+			initial_vars_modified.game_mode = target->game_mode;
+		}
+#endif
+
 		apply(initial_vars_modified, true);
+
+#if CRASH_RECOVERY
+		recovered_from_crash_flag = crash_recovery.consume(get_arena_handle(), current_arena_hash);
+#endif
 	}
 
 	refresh_runtime_info_for_rcon();
@@ -1097,6 +1137,35 @@ void server_setup::log_match_end_json(const messages::match_summary_message& sum
 
 	LOG("SERVER_EVENT match_end: %x", augs::to_json_string_nopretty(end));
 }
+
+#if CRASH_RECOVERY
+void server_setup::crash_recovery_dump_on_round_start(const const_logic_step step) {
+	const auto& notifications = step.get_queue<messages::mode_notification>();
+
+	for (const auto& n : notifications) {
+		using J = messages::no_arg_mode_notification;
+
+		const auto* const arg = std::get_if<J>(std::addressof(n.payload));
+
+		if (arg != nullptr && *arg == J::ROUND_START) {
+			/*
+				New round just set up. dump_now() is a no-op outside LIVE ranked,
+				so the warmup-round notification fires harmlessly.
+			*/
+			crash_recovery.dump_now(
+				get_arena_handle(),
+				vars.ranked.dump_server_recovery_state_every_round,
+				is_ranked_live(),
+				vars.arena,
+				vars.game_mode,
+				current_arena_hash
+			);
+
+			return;
+		}
+	}
+}
+#endif
 
 void server_setup::lock_ranked_roster_if_started(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::mode_notification>();
@@ -1895,6 +1964,14 @@ void server_setup::finalize_webhook_jobs() {
 
 							break;
 						}
+
+						/*
+							The authenticated id is later assigned to server_ranked_account_id
+							(a constant_size_string) which silently truncates - two distinct ids
+							that truncate to the same prefix would alias on suspended-player
+							rejoin matching. Hard-fail at the source instead of corrupting state.
+						*/
+						ensure(new_id.size() <= max_ranked_account_id_length_v);
 
 						client->authenticated_id = new_id;
 

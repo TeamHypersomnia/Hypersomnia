@@ -95,6 +95,7 @@ struct server_ranked_vars {
 	uint8_t max_rejoins = 1;
 	uint8_t match_unfreezes_in_secs = 5;
 	bool freeze_match_on_disconnect = true;
+	bool dump_server_recovery_state_every_round = true;
 	server_ranked_overrides_vars overrides;
 	// END GEN INTROSPECTOR
 

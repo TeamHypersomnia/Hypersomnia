@@ -21,6 +21,7 @@
 #include "augs/network/network_types.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/server/server_client_state.h"
+#include "application/setups/server/crash_recovery/server_crash_recovery.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/misc/serialization_buffers.h"
 
@@ -176,6 +177,14 @@ class server_setup :
 
 	net_time_t when_last_used_map_command = 0;
 	net_time_t when_last_changed_map_due_to_idle = 0;
+
+#if CRASH_RECOVERY
+	/* Crash-recovery state for ranked matches (see crash_recovery/). */
+	server_crash_recovery crash_recovery;
+#endif
+
+	/* Always present (no #if) so callers can query it regardless of build. */
+	bool recovered_from_crash_flag = false;
 
 	net_time_t dont_check_timeouts_until = 0;
 
@@ -397,6 +406,9 @@ public:
 		bool suppress_community_server_webhook_this_run,
 		const server_assigned_teams& assigned_teams,
 		const std::string& webrtc_signalling_server_url,
+#if CRASH_RECOVERY
+		server_recovery_worker& recovery_worker,
+#endif
 		const std::string& name_suffix = "",
 		const server_temp_var_overrides& initial_overrides = server_temp_var_overrides()
 	);
@@ -554,6 +566,9 @@ public:
 						handle_abandon_requests(step);
 						ban_players_who_left_for_good(step);
 						lock_ranked_roster_if_started(step);
+#if CRASH_RECOVERY
+						crash_recovery_dump_on_round_start(step);
+#endif
 
 						{
 							auto& notifications = step.get_queue<messages::mode_notification>();
@@ -636,6 +651,15 @@ public:
 
 			update_stats(in.server_stats);
 			step_collected.clear();
+
+#if CRASH_RECOVERY
+			/*
+				Cheap per-tick falling-edge cleanup: deletes the dump file the first
+				tick after the match leaves the LIVE state. The dump itself is
+				event-driven (crash_recovery_dump_on_round_start), not periodic.
+			*/
+			crash_recovery.update_live_state(is_ranked_live());
+#endif
 		}
 
 		refresh_available_direct_download_bandwidths();
@@ -784,6 +808,9 @@ public:
 	void ban_players_who_left_for_good(const const_logic_step step);
 	void handle_abandon_requests(const const_logic_step step);
 	void lock_ranked_roster_if_started(const const_logic_step step);
+#if CRASH_RECOVERY
+	void crash_recovery_dump_on_round_start(const const_logic_step step);
+#endif
 
 	void log_match_end_json(const messages::match_summary_message&);
 	void log_match_start_json(const messages::team_match_start_message&);
@@ -833,6 +860,10 @@ public:
 	void handle_client_chat_command(client_id_type, const ::client_requested_chat&);
 
 	bool is_ranked_server() const;
+
+	bool recovered_from_crash() const {
+		return recovered_from_crash_flag;
+	}
 
 	bool can_use_map_command_now() const;
 

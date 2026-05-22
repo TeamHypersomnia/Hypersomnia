@@ -162,15 +162,15 @@ struct arena_mode_player {
 	bool unset_inputs_once = false;
 	bool ready_for_ranked = false;
 	arena_mode_ai_state ai_state;
+	server_ranked_account_id_type server_ranked_account_id;
 	// END GEN INTROSPECTOR
 
 	/*
-		Helper struct only used by the server -
-		won't be synchronized to clients since it doesn't influence
-		the deterministic simulation.
+		server_ranked_account_id (above) is the authenticated ranked id. It does not
+		influence the deterministic simulation, but being part of the serialized/introspected
+		state means it survives a crash-recovery load with no manual rewriting - and is
+		also sent to clients in the full-state snapshot.
 	*/
-
-	std::string server_ranked_account_id;
 
 	arena_mode_player(const client_nickname_type& nickname = {}) {
 		session.nickname = nickname;
@@ -798,6 +798,13 @@ public:
 	float get_match_unfreezes_in_secs() const;
 
 	mode_player_id find_suspended_player_id(const std::string& account_id) const;
+
+	/*
+		Called once after a crash-recovery load. Suspends every active human player so the
+		match freezes and waits for them to reconnect (their state, including the ranked
+		account id, was restored by deserialization).
+	*/
+	void recover_from_crash();
 
 	bool can_use_map_command_now(const const_input in) const;
 

@@ -516,6 +516,15 @@ if(BUILD_NETWORKING)
 	"src/augs/network/network_types.cpp"
 	)
 
+	# Crash recovery is only built for dedicated (headless) servers - see CRASH_RECOVERY.
+	if (HEADLESS)
+		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
+		"src/application/setups/server/crash_recovery/server_recovery_worker.cpp"
+		"src/application/setups/server/crash_recovery/server_crash_recovery.cpp"
+		"src/application/setups/server/crash_recovery/server_recovery_serialize.cpp"
+		)
+	endif()
+
 	if (BUILD_NATIVE_SOCKETS)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/nat/nat_detection_session.cpp"
@@ -1913,6 +1922,15 @@ if (HEADLESS)
 	add_definitions(-DHEADLESS=1)
 else()
 	add_definitions(-DHEADLESS=0)
+endif()
+
+# Crash recovery for ranked matches is only built for dedicated (headless) servers.
+# Desktop/integrated builds and the web never run a recovery worker, so its threaded
+# code is compiled out entirely.
+if (HEADLESS)
+	add_definitions(-DCRASH_RECOVERY=1)
+else()
+	add_definitions(-DCRASH_RECOVERY=0)
 endif()
 
 # We configure additional user options for building the game.

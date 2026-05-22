@@ -38,6 +38,7 @@ constexpr std::size_t max_chat_message_length_v = 180;
 
 constexpr std::size_t min_nickname_length_v = 1;
 constexpr std::size_t max_nickname_length_v = 40;
+constexpr std::size_t max_ranked_account_id_length_v = 64;
 constexpr std::size_t max_clan_length_v = 20;
 constexpr std::size_t max_server_name_length_v = 60;
 
@@ -73,6 +74,7 @@ using hour_and_minute_str = augs::constant_size_string<5>;
 using signalling_message_str = augs::constant_size_string<max_signalling_udp_message_length_v>;
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
+using server_ranked_account_id_type = augs::constant_size_string<max_ranked_account_id_length_v>;
 using version_timestamp_string = augs::constant_size_string<max_version_timestamp_length_v>;
 
 inline bool nickname_len_in_range(const std::size_t len) {
