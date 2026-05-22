@@ -76,6 +76,19 @@ public:
 	const cosmos_solvable_significant& clean_round_state;
 	const synced_dynamic_vars& dynamic_vars;
 
+	/* A non-const handle can be passed where a read-only (const) handle is expected. */
+	template <bool is_const = C>
+	operator std::enable_if_t<!is_const, basic_arena_handle<true, ModeVariant, RulesVariant>>() const {
+		return {
+			current_mode_state,
+			scene,
+			advanced_cosm,
+			ruleset,
+			clean_round_state,
+			dynamic_vars
+		};
+	}
+
 	void verify_mode_hasnt_changed() {
 		on_mode(
 			[&](auto& typed_mode) -> decltype(auto) {
