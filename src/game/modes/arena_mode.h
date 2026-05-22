@@ -492,6 +492,7 @@ private:
 	entity_id bomb_detonation_theme;
 
 	ranked_state_type ranked_state = ranked_state_type::NONE;
+	std::array<uint8_t, 8> random_ranked_match_id = {};
 	float unfreezing_match_in_secs = -1.0f;
 	float secs_when_warmup_ended = 0.0f;
 

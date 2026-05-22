@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/misc/secure_hash.h"
 
 namespace ranked_webhooks {
 	template <class F>
@@ -15,6 +16,10 @@ namespace ranked_webhooks {
 		Writer<StringBuffer> writer(s);
 
 		writer.StartObject();
+
+		/* Hex string of the random 64-bit match id, for deduplicating reports (e.g. after a crash recovery). */
+		writer.Key("match_id");
+		writer.String(augs::bytes_to_hex(info.ranked_match_id).c_str());
 
 		writer.Key("match_start_date");
 		writer.String(info.match_start_timestamp.c_str());

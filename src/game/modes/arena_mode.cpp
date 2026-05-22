@@ -6,6 +6,12 @@
 #include "game/messages/health_event.h"
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/casual_level_logic.h"
+
+/*
+	Non-deterministic randomness for the ranked match id (declared in yojimbo_utils.h).
+	It does not influence the simulation, so it is fine that clients compute their own.
+*/
+extern void yojimbo_random_bytes(uint8_t* data, int bytes);
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
@@ -3437,6 +3443,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.match_start_timestamp = match_start_timestamp;
 	summary.losers_abandoned = result.losers_abandoned;
 	summary.was_ranked = is_ranked_live();
+	summary.ranked_match_id = random_ranked_match_id;
 
 	if (in.rules.is_ffa()) {
 		summary.was_ffa = true;
@@ -3801,6 +3808,9 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 
 						LOG("Starting ranked.");
 						secs_when_warmup_ended = get_seconds_passed_in_cosmos(in);
+
+						/* Assign a fresh match id so duplicate match reports (e.g. after a crash recovery) can be deduplicated by the backend. */
+						::yojimbo_random_bytes(random_ranked_match_id.data(), static_cast<int>(random_ranked_match_id.size()));
 
 						ranked_state = ranked_state_type::STARTING;
 						play_ranked_starting_sound(in, step);

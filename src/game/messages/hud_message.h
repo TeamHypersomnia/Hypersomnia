@@ -85,6 +85,8 @@ namespace messages {
 		bool was_ranked = false;
 		bool was_ffa = false;
 
+		std::array<uint8_t, 8> ranked_match_id = {};
+
 		int first_team_score = 0;
 		int second_team_score = 0;
 

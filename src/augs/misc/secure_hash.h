@@ -30,6 +30,24 @@ namespace augs {
 	hash_string_type to_hex_format(const secure_hash_type& hstr);
 	secure_hash_type to_secure_hash_byte_format(const std::string& hex_string);
 
+	/* Lowercase hex string of any byte-like container (std::array<uint8_t>, std::vector<std::byte>, ...). */
+	template <class C>
+	std::string bytes_to_hex(const C& bytes) {
+		static constexpr char hex_chars[] = "0123456789abcdef";
+
+		std::string out;
+		out.reserve(bytes.size() * 2);
+
+		for (const auto byte : bytes) {
+			const auto b = static_cast<uint8_t>(byte);
+
+			out += hex_chars[(b >> 4) & 0x0F];
+			out += hex_chars[b & 0x0F];
+		}
+
+		return out;
+	}
+
 	secure_hash_type secure_hash(const std::byte* bytes, std::size_t n);
 
 	template <class S>
