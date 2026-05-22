@@ -114,6 +114,64 @@ if [ -f "$EXE_PATH" ]; then
 		echo "Ad-hoc signing the .dmg itself."
 		codesign --force --sign - "${DMG_PATH}" || true
 		codesign --verify --verbose=2 "${DMG_PATH}" || true
+
+		# Steam variant of the bundle.
+		#
+		# It must be assembled AND code-signed here on macOS: the Steam
+		# upload script runs on Linux, where modifying the bundle would
+		# both break the ad-hoc signature and (worse) leave an
+		# arch-mismatched dylib inside. So we produce a ready-to-ship,
+		# already-signed Steam .sfx that the Linux side only extracts.
+		#
+		# The non-Steam DMG/SFX above embed the stub libsteam_integration.dylib
+		# (BUILD_STEAM=0). For Steam we swap in the real, Steam-enabled
+		# integration dylib plus the Steam API dylib, both prebuilt privately
+		# with the Steamworks SDK and committed under cmake/steam_integration/bin/macos.
+		echo "Preparing the Steam application bundle."
+
+		STEAM_SFX_PATH="Hypersomnia-for-$PLATFORM-Steam.app.sfx"
+		STEAM_PACK_DIR="steam_pack"
+		STEAM_APP_PATH="$STEAM_PACK_DIR/Hypersomnia.app"
+		STEAM_MACOS_DIR="$STEAM_APP_PATH/Contents/MacOS"
+
+		PREBUILT_MACOS="cmake/steam_integration/bin/macos"
+
+		rm -rf "$STEAM_PACK_DIR"
+		mkdir -p "$STEAM_PACK_DIR"
+		cp -R "$APP_PATH" "$STEAM_APP_PATH"
+
+		cp "$PREBUILT_MACOS/libsteam_integration.dylib" "$STEAM_MACOS_DIR/"
+		cp "$PREBUILT_MACOS/libsteam_api.dylib"         "$STEAM_MACOS_DIR/"
+
+		echo "Verifying the Steam integration dylib has an arm64 slice."
+		lipo -info "$STEAM_MACOS_DIR/libsteam_integration.dylib"
+		if ! lipo -archs "$STEAM_MACOS_DIR/libsteam_integration.dylib" | grep -q arm64; then
+			echo "ERROR: $PREBUILT_MACOS/libsteam_integration.dylib has no arm64 slice."
+			echo "Rebuild it in the steambuilders repo (universal arm64;x86_64) and re-commit."
+			exit 1
+		fi
+
+		echo "Sanitizing extended attributes before signing (Steam bundle)."
+		xattr -cr "$STEAM_APP_PATH" 2>/dev/null || true
+
+		echo "Removing any pre-existing signatures (Steam bundle)."
+		codesign --remove-signature "$STEAM_MACOS_DIR/libsteam_integration.dylib" 2>/dev/null || true
+		codesign --remove-signature "$STEAM_MACOS_DIR/libsteam_api.dylib" 2>/dev/null || true
+		codesign --remove-signature "$STEAM_MACOS_DIR/Hypersomnia" 2>/dev/null || true
+
+		echo "Applying ad-hoc codesign inside-out (Steam bundle)."
+		codesign --force --sign - --timestamp=none "$STEAM_MACOS_DIR/libsteam_integration.dylib"
+		codesign --force --sign - --timestamp=none "$STEAM_MACOS_DIR/libsteam_api.dylib"
+		codesign --force --sign - --timestamp=none "$STEAM_MACOS_DIR/Hypersomnia"
+		codesign --force --deep --sign - --timestamp=none "$STEAM_APP_PATH"
+
+		echo "Verifying Steam bundle signature (strict)."
+		codesign --verify --deep --strict --verbose=2 "$STEAM_APP_PATH"
+
+		echo "Generating the Steam .sfx archive."
+		pushd "$STEAM_PACK_DIR"
+			7z a -sfx "../$STEAM_SFX_PATH" Hypersomnia.app
+		popd
 	fi
 else
 	echo "No exe found. Nothing to archivize."

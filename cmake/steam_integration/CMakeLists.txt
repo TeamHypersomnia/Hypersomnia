@@ -74,8 +74,13 @@ else()
     message("Building a Non-Steam version of the library.")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+if(NOT APPLE)
+    # On Apple the architecture is selected via CMAKE_OSX_ARCHITECTURES
+    # (used to build a universal arm64;x86_64 dylib). Passing -m64 there
+    # conflicts with explicit -arch flags, so only force it elsewhere.
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+endif()
 
 set_property(TARGET steam_integration PROPERTY CXX_STANDARD 20)
 
