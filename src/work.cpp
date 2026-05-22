@@ -1225,11 +1225,17 @@ work_result work(
 
 			auto this_config = config_pattern;
 
-			this_config.server.ranked.autostart_when = 
-				type == RANKED ?
-				ranked_autostart_type::ALWAYS :
-				ranked_autostart_type::NEVER
-			;
+			/*
+				SINGLE instance respects the autostart_when value from the config.
+				Multi-instance RANKED/CASUAL types force it.
+			*/
+			if (type != SINGLE) {
+				this_config.server.ranked.autostart_when =
+					type == RANKED ?
+					ranked_autostart_type::ALWAYS :
+					ranked_autostart_type::NEVER
+				;
+			}
 
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
 
