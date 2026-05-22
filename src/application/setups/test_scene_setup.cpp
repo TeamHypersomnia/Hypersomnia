@@ -207,30 +207,33 @@ void test_scene_setup::restart_arena() {
 	auto pre_crosshair = character() ? character().get<components::crosshair>() : components::crosshair();
 	auto pre_movement_flags = character() ? character().get<components::movement>().flags : components::movement().flags;
 
-	auto get_next = [&](auto l) -> uint32_t {
-		if (l == 5) {
-			// skip deagles level (6)
-			return 7;
-		}
-
-		return l + 1;
-	};
-
 	{
+		/*
+			Activate the current tutorial level's layer, plus every layer that
+			the current level's outgoing portals lead to (the layer owning each
+			portal's portal_exit). This way the outgoing layers always exist
+			without hardcoding the relations between levels.
+		*/
+
 		for (auto& l : project.layers.pool) {
 			if (begins_with(l.unique_name, "Level")) {
-				uint32_t layer_level = 0;
+				l.editable.active = false;
+			}
+		}
 
-				if (!typesafe_sscanf(l.unique_name, "Level%x", layer_level)) {
-					l.editable.active = false;
-				}
+		const auto current_level_name = "Level" + std::to_string(tutorial.level);
 
-				l.editable.active = layer_level == tutorial.level || layer_level == get_next(tutorial.level);
+		if (const auto current_layer = project.find_layer(current_level_name)) {
+			current_layer->editable.active = true;
 
-				if (tutorial.level == 9) {
-					if (layer_level == 11) {
-						/* We need this for the mouse wheel skip portal */
-						l.editable.active = true;
+			for (const auto& node_id : current_layer->hierarchy.nodes) {
+				if (const auto portal = find<portal_marker>(node_id)) {
+					const auto exit_id = portal->editable.as_portal.portal_exit.operator editor_node_id();
+
+					if (const auto exit_layer = project.find_parent_layer(exit_id)) {
+						if (const auto exit_layer_ptr = project.find_layer(exit_layer->layer_id)) {
+							exit_layer_ptr->editable.active = true;
+						}
 					}
 				}
 			}
@@ -766,11 +769,11 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 				if (const auto portal = find<portal_marker>(tp->to_portal)) {
 					const auto& name = portal->unique_name;
 
-					if (name == "main_menu") {
+					if (begins_with(name, "main_menu")) {
 						special_result = custom_imgui_result::GO_TO_MAIN_MENU;
 					}
 
-					if (name == "shooting_range") {
+					if (begins_with(name, "shooting_range")) {
 						shooting_range = true;
 					}
 
