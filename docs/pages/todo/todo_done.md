@@ -7457,3 +7457,11 @@ This will discard your redo history."
 
 - dalej zjebana jest kolejnosc, pewnie dlatego ze kopiujemy najpierw id a potem transfer robimy i sie znowu nadpisuje id
 
+
+- config: max_rounds
+- config: wylaczenie remisow
+- zapisywanie solvabli (cosm/mode) + meta identyfikacyjna klienta w server setup
+	- moze byc bajtowo bo to tylko crash insurance i natychmiast restart wczyta to
+	- dawac wersje tez w razie czego jakby akurat weszla nowa i nie czytac wtedy
+	- w razie czego tez uzupelniajaco, nie zaszkodzi miec jakichs komend na ustawianie scora, kasy i pozycji
+		- pozycje nawet mamy juz chyba, tylko nie zapomniec udokumentowac w helpie tam przy tej konsoli 
