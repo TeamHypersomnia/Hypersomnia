@@ -1410,9 +1410,9 @@ work_result work(
 		simple_popup sp;
 		sp.title = "WARNING";
 		sp.warning_notice_above = "Are you sure you want to abandon the match?";
-		sp.message = "You will not be able to rejoin!\n";
+		sp.message = "You will NOT be able to rejoin!\n";
 
-		sp.warning_notice = "\n\nYou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
+		sp.warning_notice = "\nYou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
 
 		abandon_are_you_sure_popup = sp;
 	};

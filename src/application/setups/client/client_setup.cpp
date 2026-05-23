@@ -2327,6 +2327,10 @@ bool client_setup::is_ranked_live_or_starting() const {
 }
 
 bool client_setup::would_abandon_match() const {
+	if (is_replaying()) {
+		return false;
+	}
+
 	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
 		[&](const auto& mode, const auto& in) {
 			return mode.should_suspend_instead_of_remove(in);
