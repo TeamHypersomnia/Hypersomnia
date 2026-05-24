@@ -2733,6 +2733,7 @@ server_public_vars server_setup::make_public_vars() const {
 
 	pub.arena = vars.arena;
 	pub.game_mode = vars.game_mode;
+	pub.server_name = get_server_name();
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;

@@ -2355,11 +2355,17 @@ faction_type client_setup::get_assigned_faction() const {
 }
 
 std::string client_setup::get_scoreboard_caption() const {
+	auto base = arena_gui_base::get_scoreboard_caption();
+
 	if (is_ranked_live_or_starting()) {
-		return std::string("Ranked: ") + arena_gui_base::get_scoreboard_caption();
+		base = std::string("Ranked: ") + base;
 	}
 
-	return arena_gui_base::get_scoreboard_caption();
+	if (const auto& sv_name = sv_public_vars.server_name; !sv_name.empty()) {
+		return std::string(sv_name) + " | " + base;
+	}
+
+	return base;
 }
 
 void client_setup::request_abandon_ranked_match(ingame_menu_button_type op) {

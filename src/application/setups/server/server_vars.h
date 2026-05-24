@@ -49,6 +49,7 @@ struct server_public_vars {
 	std::optional<arena_playtesting_context> playtesting_context;
 
 	address_string_type external_arena_files_provider;
+	server_name_type server_name;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_public_vars&) const = default;
