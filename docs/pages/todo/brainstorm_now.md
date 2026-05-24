@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- every overtime round should silently swap factions every round (no summary, just immediate swap BUT - preserve the money and weapons - so this is a specific type of swap to be implemented).
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
 
 # Przed Turniejem
