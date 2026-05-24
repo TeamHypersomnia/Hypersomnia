@@ -887,10 +887,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	filter_with_hint(filter, "##HierarchyFilter", "Filter server names/arenas...");
 	local_server_list.clear();
+	tournament_server_list.clear();
 	official_server_list.clear();
 	community_server_list.clear();
 
 	bool has_local_servers = false;
+	bool has_tournament_servers = false;
 	bool has_official_servers = false;
 	bool has_community_servers = false;
 
@@ -956,8 +958,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 		else {
 			if (const bool is_official = s.is_official_server()) {
-				has_official_servers = true;
-				push_if_passes(official_server_list);
+				if (s.heartbeat.is_tournament_server()) {
+					has_tournament_servers = true;
+					push_if_passes(tournament_server_list);
+				}
+				else {
+					has_official_servers = true;
+					push_if_passes(official_server_list);
+				}
 			}
 			else {
 				has_community_servers = true;
@@ -1028,6 +1036,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			auto sort_by = [&](auto... cmps) {
 				sort_range(local_server_list, make_comparator(cmps...));
+				sort_range(tournament_server_list, make_comparator(cmps...));
 				sort_range(official_server_list, make_comparator(cmps...));
 				sort_range(community_server_list, make_comparator(cmps...));
 			};
@@ -1154,10 +1163,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		const auto num_locals = local_server_list.size();
+		const auto num_tournaments = tournament_server_list.size();
 		const auto num_officials = official_server_list.size();
 		const auto num_communities = community_server_list.size();
 
 		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", num_locals);
+		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", num_tournaments);
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_officials);
 		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", num_communities);
 
@@ -1171,17 +1182,29 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::Separator();
 		};
 
+		bool first_section = true;
+
+		auto header_or_separator = [&](const auto& label, const auto& color) {
+			if (first_section) {
+				do_column_labels(label, color);
+				first_section = false;
+			}
+			else {
+				separate_with_label_only(label, color);
+			}
+		};
+
 		if (has_local_servers) {
-			do_column_labels(local_servers_label, green);
+			header_or_separator(local_servers_label, green);
 			show_server_list("local", local_server_list, in.faction_view, in.streamer_mode);
 		}
 
-		if (!has_local_servers) {
-			do_column_labels(official_servers_label, yellow);
+		if (has_tournament_servers) {
+			header_or_separator(tournament_servers_label, cyan);
+			show_server_list("tournament", tournament_server_list, in.faction_view, in.streamer_mode);
 		}
-		else {
-			separate_with_label_only(official_servers_label, yellow);
-		}
+
+		header_or_separator(official_servers_label, yellow);
 
 		if (has_official_servers) {
 			show_server_list("official", official_server_list, in.faction_view, in.streamer_mode);

@@ -67,6 +67,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::string error_message;
 
 	std::vector<server_list_entry*> local_server_list;
+	std::vector<server_list_entry*> tournament_server_list;
 	std::vector<server_list_entry*> official_server_list;
 	std::vector<server_list_entry*> community_server_list;
 
