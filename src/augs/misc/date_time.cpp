@@ -174,6 +174,10 @@ std::string augs::date_time::get_readable_for_file() const {
 	return get_readable_format("%y.%m.%d at %H-%M-%S");
 }
 
+std::string augs::date_time::get_readable_for_file_long() const {
+	return get_readable_format("%Y-%m-%d_%H-%M-%S");
+}
+
 std::string augs::date_time::get_readable_day_hour() const {
 	return get_readable_format("%d-%m-%y %H:%M:%S");
 }
