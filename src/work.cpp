@@ -1321,24 +1321,40 @@ work_result work(
 		}();
 
 		if (!tournament_file_path.empty()) {
-			LOG("Tournament mode enabled (file: %x).", tournament_file_path.string());
+			/*
+				Missing tournament file isn't fatal: operators commonly point a
+				dedicated server at a configured tournament path that only exists
+				during scheduled events. Falling through to the normal multi-instance
+				path lets the same binary host casual/ranked the rest of the time
+				without manual config edits.
+			*/
 
-			const auto state_file_path = USER_DIR / "tournament.ongoing.json";
+			if (!augs::exists(tournament_file_path)) {
+				LOG(
+					"Tournament file %x does not exist; skipping tournament mode and falling back to normal dedicated-server startup.",
+					tournament_file_path.string()
+				);
+			}
+			else {
+				LOG("Tournament mode enabled (file: %x).", tournament_file_path.string());
 
-			auto runner_in = run_tournament_input {
-				*official,
-				config_pattern,
-				canon_config_with_confd,
-				params,
+				const auto state_file_path = USER_DIR / "tournament.ongoing.json";
+
+				auto runner_in = run_tournament_input {
+					*official,
+					config_pattern,
+					canon_config_with_confd,
+					params,
 #if CRASH_RECOVERY
-				recovery_worker,
+					recovery_worker,
 #endif
-				handle_sigint,
-				tournament_file_path,
-				state_file_path
-			};
+					handle_sigint,
+					tournament_file_path,
+					state_file_path
+				};
 
-			return ::run_tournament(runner_in);
+				return ::run_tournament(runner_in);
+			}
 		}
 #endif
 
