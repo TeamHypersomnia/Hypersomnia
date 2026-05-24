@@ -3297,16 +3297,30 @@ arena_mode::composition_info arena_mode::get_team_composition_info(const_input_t
 }
 
 bool arena_mode::teams_viable_for_match(const_input_type in) const {
+	/*
+		With preassigned factions (tournament/--assign-teams), the server already
+		verifies that every rostered playing member is present and sitting on their
+		assigned faction (all_assigned_present). Gate solely on that.
+
+		Do NOT fall through to the generic each_team_has_at_least_one check below:
+		that one counts players per calc_participating_factions(), whose faction pair
+		is derived from the arena (bombsite owner + spawnable factions) and need not
+		equal the RESISTANCE/METROPOLIS the tournament hardcodes. When the arena's
+		participating pair differs, a fully-present roster gets misread as "a team is
+		empty" and the match waits for players forever (and /go does nothing, as it
+		sits behind this same gate).
+	*/
+
+	if (in.dynamic_vars.preassigned_factions) {
+		return in.dynamic_vars.all_assigned_present;
+	}
+
 	const bool count_bots = !in.is_ranked_server();
 	if (!get_team_composition_info(in, count_bots).each_team_has_at_least_one) {
 		return false;
 	}
 
 	// TODO_RANKED: handle different ranked requirements here
-
-	if (in.dynamic_vars.preassigned_factions) {
-		return in.dynamic_vars.all_assigned_present;
-	}
 
 	return true;
 }
