@@ -600,6 +600,11 @@ namespace augs {
 		return save_as_text(path, to_json_string(from));
 	}
 
+	template <class T>
+	void save_as_json_atomic(const T& from, const path_type& path) {
+		return save_as_text_atomic(path, to_json_string(from));
+	}
+
 	template <class F, class T>
 	void write_json_diff(F& to, const T& from, const T& reference_object, const bool write_object_delimiters = false) {
 		if constexpr(representable_as_json_value_v<T>) {

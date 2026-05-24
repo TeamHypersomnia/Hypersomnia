@@ -150,6 +150,29 @@ namespace augs {
 		sync_if_persistent(path);
 	}
 
+	/*
+		Crash-safe write: writes to <path>.tmp, then atomically renames it onto
+		path. A crash during the write leaves the original file intact; a crash
+		after the rename has the new content in place. There is no window where
+		`path` is half-written or missing.
+	*/
+	template <class S>
+	void save_as_text_atomic(const path_type& path, const S& text) {
+		auto tmp = path;
+		tmp += ".tmp";
+
+		{
+			auto out = with_exceptions<std::ofstream>();
+			out.open(tmp, std::ios::out);
+			out << text;
+			out.flush();
+		}
+
+		std::filesystem::rename(tmp, path);
+
+		sync_if_persistent(path);
+	}
+
 	template <class S>
 	void save_as_text_if_different(const path_type& path, const S& text) {
 		if (!augs::exists(path) || text != file_to_string(path)) {
