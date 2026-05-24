@@ -43,7 +43,7 @@ tournament_coordinator::tournament_coordinator(
 		if (loaded->config_hash != current_hash) {
 			/*
 				Config on disk has changed since this ongoing tournament began.
-				Pairings, teams or maps may all differ from what's in the state,
+				Pairings, teams or arenas may all differ from what's in the state,
 				so resuming would corrupt the bracket. Archive the old state and
 				start fresh; the new tournament adopts the current config.
 			*/
@@ -180,8 +180,8 @@ void tournament_coordinator::pair_teams() {
 		}
 	}
 
-	const auto map_index = std::min(static_cast<size_t>(state.stage_index), cfg.maps.size() - 1);
-	const std::string& arena_and_mode_for_stage = cfg.maps[map_index];
+	const auto map_index = std::min(static_cast<size_t>(state.stage_index), cfg.arenas.size() - 1);
+	const std::string& arena_and_mode_for_stage = cfg.arenas[map_index];
 
 	uint16_t port_cursor = deps.base_port;
 

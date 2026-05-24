@@ -31,7 +31,7 @@ struct tournament_config {
 	tournament_matchup_scheme matchup_scheme = tournament_matchup_scheme::STRONGEST_VS_WEAKEST;
 
 	std::vector<std::vector<std::string>> teams;
-	std::vector<std::string> maps;
+	std::vector<std::string> arenas;
 	std::vector<std::string> additional_spectators;
 	// END GEN INTROSPECTOR
 

@@ -58,8 +58,8 @@ work_result run_tournament(const run_tournament_input& in) {
 		return work_result::FAILURE;
 	}
 
-	if (cfg.maps.empty()) {
-		LOG("Tournament: 'maps' must list at least one 'arena mode' entry. Aborting.");
+	if (cfg.arenas.empty()) {
+		LOG("Tournament: 'arenas' must list at least one 'arena mode' entry. Aborting.");
 		return work_result::FAILURE;
 	}
 
@@ -109,7 +109,7 @@ work_result run_tournament(const run_tournament_input& in) {
 		    - vars.shutdown_after_one_match = true (graceful exit after summary intermission)
 		    - vars.ranked.autostart_when = ALWAYS (start as soon as both teams join)
 		    - per-match assigned_teams (team_a -> RESISTANCE, team_b -> METROPOLIS)
-		    - per-match arena/mode from tournament_config.maps
+		    - per-match arena/mode from tournament_config.arenas
 		    - per-match server_name from coordinator
 		    - on_match_summary callback that writes back into the match struct
 	*/

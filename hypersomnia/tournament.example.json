@@ -1,0 +1,55 @@
+{
+    // Example tournament definition for Hypersomnia dedicated server.
+    //
+    // Point "tournament_file" in your config (see default_config.json) at this
+    // file to enable single-elimination tournament mode. The server then spawns
+    // one ranked server per match, runs every stage, and advances winners until
+    // one team remains.
+
+    // How initial team skill (seeding) is determined:
+    //     "ORDER"    - teams are seeded by their order in the "teams" list below
+    //                  (first = strongest). This is the default.
+    //     "RANDOM"   - skill assigned randomly, ignoring list order.
+    //     "ENDPOINT" - fetch skill from an external endpoint.
+    //                  NOT implemented yet; falls back to "ORDER".
+    "skill_level_source": "ORDER",
+
+    // If true, after each stage a team's skill is recomputed from how long its
+    // match took (faster win => higher skill), which reseeds the next bracket.
+    // If false, the source skill from "skill_level_source" is kept throughout.
+    "skill_by_match_time": true,
+
+    // When the number of teams in a stage is not a power of 2, some teams get a bye
+    // (advance without playing). If true, the bye goes to the strongest teams;
+    // if false, to the weakest.
+    "byes_to_strongest": true,
+
+    // How opponents are paired within a stage:
+    //     "STRONGEST_VS_WEAKEST"   - 1 vs N, 2 vs N-1, ... (classic seeding).
+    //     "STRONGEST_VS_STRONGEST" - 1 vs 2, 3 vs 4, ...
+    "matchup_scheme": "STRONGEST_VS_WEAKEST",
+
+    // The teams.
+    // On LAN parties these are just nicknames by default.
+    // On production dedicated servers these will be e.g. Steam identifiers.
+    //
+    // Order matters when "skill_level_source" is "ORDER": the first team is the
+    // strongest seed. At least 2 teams are required, or the tournament aborts.
+    "teams": [
+        ["alice_account_id", "bob_account_id"],
+        ["carol_account_id", "dave_account_id"],
+        ["erin_account_id",  "frank_account_id"],
+        ["grace_account_id", "heidi_account_id"]
+    ],
+
+    // Per-stage arena strings. The first word is the arena, the
+    // second is the game mode. Stage N uses entry N; if there are fewer entries
+    // than stages, the last entry is reused for all remaining stages.
+    //
+    // At least one entry is required, or the tournament aborts.
+    "arenas": [
+        "de_cyberaqua bomb_defusal",
+        "fy_minilab bomb_defusal",
+        "de_silo bomb_defusal"
+    ]
+}
