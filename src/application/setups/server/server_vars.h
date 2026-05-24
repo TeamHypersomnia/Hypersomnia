@@ -240,6 +240,17 @@ public:
 	}
 
 	bool requires_authentication() const {
+		/*
+			Nickname-auth ranked servers (e.g. tournaments) authenticate clients
+			by their declared nickname, not by a Steam ticket. They must not be
+			treated as requiring Steam authentication - otherwise non-Steam
+			clients filter them out of the server browser as ranked-with-auth.
+		*/
+
+		if (authenticate_with_nicknames) {
+			return false;
+		}
+
 		return ranked.is_ranked_server() && kick_if_unauthenticated_for_secs > 0;
 	}
 };
