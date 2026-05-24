@@ -6,6 +6,9 @@
     // one ranked server per match, runs every stage, and advances winners until
     // one team remains.
 
+    // The tournament result is saved in:
+    // ~/.config/Hypersomnia/user/tournament.completed.[timestamp].state.json.
+
     // How initial team skill (seeding) is determined:
     //     "ORDER"    - teams are seeded by their order in the "teams" list below
     //                  (first = strongest). This is the default.
@@ -36,10 +39,19 @@
     // Order matters when "skill_level_source" is "ORDER": the first team is the
     // strongest seed. At least 2 teams are required, or the tournament aborts.
     "teams": [
-        ["alice_account_id", "bob_account_id"],
-        ["carol_account_id", "dave_account_id"],
-        ["erin_account_id",  "frank_account_id"],
-        ["grace_account_id", "heidi_account_id"]
+        [ "mikolaj" ], 
+        [ "nomz" ],
+        [ "oaj" ],
+        [ "sensacja" ],
+        [ "suve" ],
+        [ "glitch" ]
+        // Or:
+        // [ "Player1", "Player2" ]
+        // [ "Player3", "Player4" ]
+    ],
+
+    "additional_spectators": [
+        "Pythagoras of Samos"
     ],
 
     // Per-stage arena strings. The first word is the arena, the

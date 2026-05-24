@@ -32,7 +32,17 @@
 #include "game/messages/hud_message.h"
 
 tournament_config tournament_config::from_file(const augs::path_type& path) {
-	return augs::from_json_file<tournament_config>(path);
+	constexpr auto rapidjson_flags =
+		rapidjson::kParseDefaultFlags |
+		rapidjson::kParseCommentsFlag |
+		rapidjson::kParseTrailingCommasFlag
+	;
+
+	auto doc = augs::json_document_from<rapidjson_flags>(augs::file_to_string(path));
+
+	tournament_config result;
+	augs::read_json(doc, result);
+	return result;
 }
 
 std::string tournament_config::compute_hash() const {
