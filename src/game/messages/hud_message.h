@@ -96,6 +96,13 @@ namespace messages {
 		mode_player_id mvp_player_id;
 		std::string match_start_timestamp;
 
+		/*
+			Effective playtime: accumulated only while the match was ranked-live, no
+			players were suspended, no unfreezing countdown, and state was an actively-
+			playing phase. The tournament coordinator uses this directly as 1/skill.
+		*/
+		float effective_playtime_secs = 0.f;
+
 		bool is_tie() const {
 			if (was_ffa) {
 				return false;

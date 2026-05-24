@@ -483,6 +483,7 @@ private:
 	uint32_t sound_clock = 0;
 	uint32_t total_mode_steps_passed = 0;
 	uint32_t prepare_to_fight_counter = 0;
+	float total_effective_ranked_time_secs = 0.f;
 
 	client_nickname_type victorious_player_nickname = {};
 	mode_player_id duellist_1 = mode_player_id::dead();
@@ -605,6 +606,17 @@ public:
 
 		++total_mode_steps_passed;
 		++sound_clock;
+
+		const bool ranked_active_playtime =
+			ranked_state == ranked_state_type::LIVE &&
+			(state == arena_mode_state::LIVE || state == arena_mode_state::ROUND_END_DELAY) &&
+			unfreezing_match_in_secs <= 0.0f &&
+			suspended_players.empty()
+		;
+
+		if (ranked_active_playtime) {
+			total_effective_ranked_time_secs += in.cosm.get_fixed_delta().in_seconds();
+		}
 
 		return standard_solver()(
 			step_input, 

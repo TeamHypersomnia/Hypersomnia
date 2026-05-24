@@ -590,8 +590,18 @@ void arena_mode::notify_ranked_banned(
 }
 
 void arena_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
+	const auto entry = find(id);
+
+	/*
+		Spectators get no second chance during a ranked match - they're not
+		part of the competition. Their disconnect is also not allowed to gate
+		match suspension; remove them immediately so the match keeps running.
+	*/
+
+	const bool is_spectator = entry != nullptr && entry->get_faction() == faction_type::SPECTATOR;
+
 	auto suspend = [&]() {
-		if (const auto entry = find(id)) {
+		if (entry != nullptr) {
 			++entry->stats.times_suspended;
 
 			if (entry->suspend_limit_exceeded(in.dynamic_vars.ranked, short_match)) {
@@ -609,7 +619,7 @@ void arena_mode::remove_player(input_type in, const logic_step step, const mode_
 		}
 	};
 
-	if (should_suspend_instead_of_remove(in)) {
+	if (!is_spectator && should_suspend_instead_of_remove(in)) {
 		suspend();
 	}
 	else {
@@ -2735,6 +2745,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 									int players_left = 0;
 
 									for (auto& p : only_human(players)) {
+										if (p.second.get_faction() == faction_type::SPECTATOR) {
+											continue;
+										}
+
 										if (!p.second.ready_for_ranked) {
 											++players_left;
 										}
@@ -3365,6 +3379,7 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 		}
 		else {
 			ranked_state = ranked_state_type::LIVE;
+			total_effective_ranked_time_secs = 0.f;
 
 			messages::mode_notification notification;
 			notification.payload = messages::no_arg_mode_notification::RANKED_STARTED;
@@ -3455,6 +3470,7 @@ void arena_mode::post_match_summary(const input_type in, const const_logic_step 
 	summary.losers_abandoned = result.losers_abandoned;
 	summary.was_ranked = is_ranked_live();
 	summary.ranked_match_id = random_ranked_match_id;
+	summary.effective_playtime_secs = total_effective_ranked_time_secs;
 
 	if (in.rules.is_ffa()) {
 		summary.was_ffa = true;
@@ -3817,13 +3833,22 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		bool all_ready_for_ranked = false;
 
 		if (
-			in.is_ranked_server() && 
+			in.is_ranked_server() &&
 			ranked_state == ranked_state_type::NONE &&
 			teams_viable_for_match(in)
 		) {
 			all_ready_for_ranked = true;
 
 			for (auto& p : only_human(players)) {
+				/*
+					Spectators (e.g. defeated tournament teams streaming in) are
+					observers - they don't get to gate /go-consensus match start.
+				*/
+
+				if (p.second.get_faction() == faction_type::SPECTATOR) {
+					continue;
+				}
+
 				if (!p.second.ready_for_ranked) {
 					all_ready_for_ranked = false;
 					break;
