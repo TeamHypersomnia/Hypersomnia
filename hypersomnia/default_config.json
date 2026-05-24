@@ -371,7 +371,7 @@
             "reconsidered_pic_link": "https://hypersomnia.io/assets/images/duels/reconsidered.jpg",
             "num_duel_pics": 6
         },
-        "shutdown_after_first_match": false,
+        "shutdown_after_one_match": false,
         "sync_all_external_arenas_on_startup": false
     },
 

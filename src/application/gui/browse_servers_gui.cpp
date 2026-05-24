@@ -669,11 +669,21 @@ void browse_servers_gui_state::show_server_list(
 		{
 			if (s.is_official_server() ) {
 				if (d.is_ranked_server()) {
+					const auto [label, stage_color] = [&]() -> std::pair<const char*, rgba> {
+						switch (d.get_ranked_type()) {
+							case ranked_server_type::TOURNAMENT_BYES:        return { "BYES",       yellow };
+							case ranked_server_type::TOURNAMENT_MID:         return { "TOURNAMENT", cyan };
+							case ranked_server_type::TOURNAMENT_SEMIFINALS:  return { "SEMIFINALS", orange };
+							case ranked_server_type::TOURNAMENT_FINALS:      return { "FINALS",     red };
+							default:                                         return { "RANKED",     wave_color };
+						}
+					}();
+
 					if (d.is_full()) {
-						text_color("RANKED", color);
+						text_color(label, color);
 					}
 					else {
-						text_color("RANKED", wave_color);
+						text_color(label, stage_color);
 					}
 
 					ImGui::SameLine();

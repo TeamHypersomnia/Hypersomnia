@@ -522,6 +522,9 @@ if(BUILD_NETWORKING)
 		"src/application/setups/server/crash_recovery/server_recovery_worker.cpp"
 		"src/application/setups/server/crash_recovery/server_crash_recovery.cpp"
 		"src/application/setups/server/crash_recovery/server_recovery_serialize.cpp"
+		"src/application/setups/server/tournament/tournament_state.cpp"
+		"src/application/setups/server/tournament/tournament_coordinator.cpp"
+		"src/application/setups/server/tournament/run_tournament.cpp"
 		)
 	endif()
 

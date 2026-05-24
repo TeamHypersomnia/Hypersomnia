@@ -1351,6 +1351,10 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 			if (!summary.alone_or_all_bots()) {
 				push_match_summary_webhook(summary);
 			}
+
+			if (on_match_summary) {
+				on_match_summary(summary);
+			}
 		}
 	}
 
@@ -1363,7 +1367,7 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 			request_immediate_heartbeat();
 
 			if (ended.is_final) {
-				if (vars.shutdown_after_first_match) {
+				if (vars.shutdown_after_one_match) {
 					schedule_shutdown();
 				}
 
@@ -2317,16 +2321,18 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.require_authentication = vars.requires_authentication();
 
-	if (is_ranked_server()) {
-		if (is_ranked_live_or_starting()) {
-			heartbeat.ranked_state = 2;
-		}
-		else {
-			heartbeat.ranked_state = 1;
-		}
+	if (heartbeat_reported_tournament_stage.has_value()) {
+		heartbeat.set_ranked_type(*heartbeat_reported_tournament_stage);
+	}
+	else if (is_ranked_server()) {
+		heartbeat.set_ranked_type(
+			is_ranked_live_or_starting() ?
+			ranked_server_type::LIVE :
+			ranked_server_type::JOINABLE
+		);
 	}
 	else {
-		heartbeat.ranked_state = 0;
+		heartbeat.set_ranked_type(ranked_server_type::NONE);
 	}
 
 	heartbeat.server_name = get_server_name();
@@ -2651,17 +2657,36 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.preassigned_factions = has_assigned_teams();
 
 	if (has_assigned_teams()) {
-		std::size_t num_in_game = 0;
+		/*
+			Spectators in the roster (e.g. defeated tournament teams) are optional;
+			only count actual playing assignments toward the "all present" gate.
+		*/
+
+		std::size_t expected_playing = 0;
+
+		for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+			(void)id;
+
+			if (::is_actual_faction(faction)) {
+				++expected_playing;
+			}
+		}
+
+		std::size_t playing_in_game = 0;
 
 		auto count_in_game = [&](auto, auto& c) {
-			if (c.state == client_state_type::IN_GAME) {
-				++num_in_game;
+			if (c.state != client_state_type::IN_GAME) {
+				return;
+			}
+
+			if (::is_actual_faction(get_assigned_team(c.authenticated_id))) {
+				++playing_in_game;
 			}
 		};
 
 		for_each_id_and_client(count_in_game, connected_and_integrated_v);
 
-		out.all_assigned_present = num_in_game == assigned_teams.id_to_faction.size();
+		out.all_assigned_present = playing_in_game == expected_playing;
 	}
 
 	out.all_authenticated = all_authenticated;
@@ -2678,6 +2703,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.force_short_match = has_browser_clients_playing;
 	out.allow_overtime = vars.allow_overtime;
 	out.max_team_score = vars.max_team_score;
+	out.shutdown_after_one_match = vars.shutdown_after_one_match;
 
 	out.bot_override_difficulty = vars.bot_difficulty;
 

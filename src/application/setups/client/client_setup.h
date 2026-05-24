@@ -433,6 +433,18 @@ class client_setup :
 						}
 					}
 
+					if (sv_dynamic_vars.shutdown_after_one_match) {
+						const auto& ends = step.get_queue<messages::match_summary_ended>();
+
+						for (const auto& ended : ends) {
+							if (ended.is_final) {
+								set_disconnect_reason("This match has concluded.", true);
+								disconnect();
+								break;
+							}
+						}
+					}
+
 					audiovisual_post_solve(step, settings);
 				};
 

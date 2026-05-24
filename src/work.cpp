@@ -179,6 +179,9 @@
 #if !PLATFORM_WEB
 #include "application/main/dedicated_server_worker.hpp"
 #endif
+#if HEADLESS
+#include "application/setups/server/tournament/run_tournament.h"
+#endif
 #include "work_result.h"
 
 namespace augs {
@@ -656,25 +659,6 @@ work_result work(
 	}();
 
 	LOG("Loaded all user configs.");
-
-	if (!params.assign_teams.empty()) {
-		LOG("Reading server assigned teams from: %x", CALLING_CWD / params.assign_teams); 
-	}
-
-#if BUILD_NETWORKING
-	WEBSTATIC const auto assigned_teams = 
-		params.assign_teams.empty() ? 
-		server_assigned_teams() :
-		server_assigned_teams(CALLING_CWD / params.assign_teams)
-	;
-
-	if (params.type == app_type::DEDICATED_SERVER && params.assign_teams.empty()) {
-		LOG("No players were assigned to teams for this dedicated server session.");
-	}
-	else {
-		LOG("Assigned teams: %x", assigned_teams.id_to_faction);
-	}
-#endif
 
 	WEBSTATIC auto& config = *config_ptr;
 
@@ -1287,7 +1271,7 @@ work_result work(
 				this_config.dedicated_server,
 
 				should_suppress_webhook,
-				type == SINGLE ? assigned_teams : server_assigned_teams(),
+				server_assigned_teams(),
 
 				this_config.webrtc_signalling_server_url,
 #if CRASH_RECOVERY
@@ -1313,6 +1297,50 @@ work_result work(
 				"[" + instance_log_label + "] "
 			};
 		};
+
+#if HEADLESS
+		auto resolve_user_config_path = [](const augs::path_type& p) -> augs::path_type {
+			/*
+				Resolves a path the user supplied through configuration. Absolute paths
+				pass through; relative paths are taken to be next to the user's editable
+				config (runtime_prefs.json) under USER_DIR. This matters on AppImage builds
+				whose AppRun chdirs into the read-only mount, making "raw" relative paths
+				point at bundled content rather than user data. Cmdline args use
+				CALLING_CWD instead (where the operator invoked the binary from).
+			*/
+
+			return p.empty() || p.is_absolute() ? p : (USER_DIR / p);
+		};
+
+		const auto tournament_file_path = [&]() -> augs::path_type {
+			if (!params.tournament.empty()) {
+				return CALLING_CWD / params.tournament;
+			}
+
+			return resolve_user_config_path(config_pattern.tournament_file);
+		}();
+
+		if (!tournament_file_path.empty()) {
+			LOG("Tournament mode enabled (file: %x).", tournament_file_path.string());
+
+			const auto state_file_path = USER_DIR / "tournament.ongoing.json";
+
+			auto runner_in = run_tournament_input {
+				*official,
+				config_pattern,
+				canon_config_with_confd,
+				params,
+#if CRASH_RECOVERY
+				recovery_worker,
+#endif
+				handle_sigint,
+				tournament_file_path,
+				state_file_path
+			};
+
+			return ::run_tournament(runner_in);
+		}
+#endif
 
 		const auto num_ranked = std::min(uint16_t(20u), config_pattern.num_ranked_servers);
 		const auto num_casual = std::min(uint16_t(20u), config_pattern.num_casual_servers);
@@ -2335,7 +2363,7 @@ work_result work(
 						config.client,
 						std::nullopt,
 						params.suppress_server_webhook,
-						assigned_teams,
+						server_assigned_teams(),
 						config.webrtc_signalling_server_url,
 						""
 					);
@@ -2977,7 +3005,7 @@ work_result work(
 								config.client,
 								std::nullopt,
 								params.suppress_server_webhook,
-								assigned_teams,
+								server_assigned_teams(),
 								config.webrtc_signalling_server_url
 							);
 						});

@@ -93,6 +93,7 @@ void server_recovery_worker::worker_loop() {
 
 			current = std::move(queue.front());
 			queue.pop_front();
+			processing = true;
 		}
 
 		switch (current.kind) {
@@ -106,7 +107,24 @@ void server_recovery_worker::worker_loop() {
 				}
 				break;
 		}
+
+		{
+			std::unique_lock<std::mutex> guard(lk);
+			processing = false;
+		}
+
+		idle_cv.notify_all();
 	}
+}
+
+void server_recovery_worker::wait_until_idle() {
+	std::unique_lock<std::mutex> guard(lk);
+
+	if (!started) {
+		return;
+	}
+
+	idle_cv.wait(guard, [this]() { return queue.empty() && !processing; });
 }
 
 server_recovery_worker::~server_recovery_worker() {

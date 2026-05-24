@@ -37,6 +37,7 @@ struct synced_dynamic_vars {
 	bool friendly_fire = false;
 	bool force_short_match = false;
 	bool allow_overtime = false;
+	bool shutdown_after_one_match = false;
 	augs::maybe<uint32_t> max_team_score;
 	server_ranked_vars ranked;
 	bots_request bots_override;

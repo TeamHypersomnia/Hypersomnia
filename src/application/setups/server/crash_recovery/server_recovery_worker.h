@@ -51,6 +51,14 @@ public:
 
 	void push_delete(augs::path_type target_path);
 
+	/*
+		Blocks until every task currently queued has been processed AND the worker
+		is not mid-task. Used by callers that need to read a recovery file
+		synchronously after the worker may have queued writes/deletes for it
+		(e.g. tournament coordinator recycling the same port across stages).
+	*/
+	void wait_until_idle();
+
 private:
 	enum class task_kind {
 		WRITE,
@@ -68,10 +76,12 @@ private:
 
 	std::mutex lk;
 	std::condition_variable cv;
+	std::condition_variable idle_cv;
 	std::deque<task> queue;
 
 	std::thread worker;
 	bool started = false;
 	bool stop = false;
+	bool processing = false;
 };
 #endif

@@ -2,7 +2,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <future>
+#include <functional>
+#include <optional>
 #include "application/masterserver/netcode_address_hash.h"
+#include "application/masterserver/server_heartbeat.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/server/server_listen_input.h"
@@ -394,6 +397,20 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = false;
+
+	/*
+		Optional callback fired once per match the moment the summary is posted (match decided).
+		Used by the tournament coordinator to record per-match results. The instance still
+		runs through the summary intermission afterwards before exiting via shutdown_after_one_match.
+	*/
+	std::function<void(const messages::match_summary_message&)> on_match_summary;
+
+	/*
+		If engaged, the heartbeat reports this value instead of the derived
+		ranked/casual state. Used by tournament servers to show BYES / TOURNAMENT /
+		SEMIFINALS / FINALS in the server browser.
+	*/
+	std::optional<ranked_server_type> heartbeat_reported_tournament_stage;
 
 	server_setup(
 		const packaged_official_content& official,

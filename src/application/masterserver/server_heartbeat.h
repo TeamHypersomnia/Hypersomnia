@@ -8,6 +8,16 @@
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
 
+enum class ranked_server_type : uint8_t {
+	NONE,
+	JOINABLE,
+	LIVE,
+	TOURNAMENT_BYES,
+	TOURNAMENT_MID,
+	TOURNAMENT_SEMIFINALS,
+	TOURNAMENT_FINALS
+};
+
 struct server_heartbeat_player_info {
 	// GEN INTROSPECTOR struct server_heartbeat_player_info
 	client_nickname_type nickname;
@@ -70,12 +80,28 @@ struct server_heartbeat {
 		return server_slots + num_online_bots();
 	}
 
+	ranked_server_type get_ranked_type() const {
+		return static_cast<ranked_server_type>(ranked_state);
+	}
+
+	void set_ranked_type(const ranked_server_type t) {
+		ranked_state = static_cast<uint8_t>(t);
+	}
+
 	bool is_ranked_server() const {
-		return ranked_state >= 1;
+		return get_ranked_type() != ranked_server_type::NONE;
 	}
 
 	bool is_still_joinable_ranked() const {
-		return ranked_state == 1;
+		return get_ranked_type() == ranked_server_type::JOINABLE;
+	}
+
+	bool is_tournament_server() const {
+		const auto t = get_ranked_type();
+		return t == ranked_server_type::TOURNAMENT_BYES
+			|| t == ranked_server_type::TOURNAMENT_MID
+			|| t == ranked_server_type::TOURNAMENT_SEMIFINALS
+			|| t == ranked_server_type::TOURNAMENT_FINALS;
 	}
 
 	bool operator==(const server_heartbeat&) const = default;

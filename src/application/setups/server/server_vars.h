@@ -214,7 +214,7 @@ public:
 
 	server_webhook_vars webhooks;
 
-	bool shutdown_after_first_match = false;
+	bool shutdown_after_one_match = false;
 
 	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR
