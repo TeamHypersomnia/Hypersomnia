@@ -7,6 +7,7 @@
 #include "application/arena/synced_dynamic_vars.h"
 
 struct server_vars;
+struct server_private_vars;
 struct server_public_vars;
 class nat_detection_session;
 
@@ -26,6 +27,7 @@ public:
 	bool perform(
 		server_listen_input& into,
 		server_vars&,
+		server_private_vars&,
 
 		const nat_detection_session*,
 		const port_type currently_bound_port

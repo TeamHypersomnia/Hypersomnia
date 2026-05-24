@@ -486,12 +486,20 @@ void settings_gui_state::perform(
 #endif
 
 			
-			if (auto node = scoped_tree_node("RCON")) {
+			if (auto node = scoped_tree_node("Passwords")) {
 				auto& scope_cfg = config.server_private;
 
 				{
 					thread_local bool show = false;
-					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
+
+					input_text(SCOPE_CFG_NVP(server_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.server_password);
+					text_disabled("If set, clients must provide this password to connect to the server.\nLeave empty to allow anyone to join.");
+				}
+
+				{
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
 
 					input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
 					text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
@@ -1451,9 +1459,10 @@ void settings_gui_state::perform(
 
 				{
 					thread_local bool show = false;
-					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
 
-					input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
+					input_text(SCOPE_CFG_NVP(server_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.server_password);
+					text_disabled("Used when connecting to password-protected servers.");
 				}
 
 				revertable_checkbox("Record demo", scope_cfg.record_demo);

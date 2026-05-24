@@ -117,6 +117,11 @@ message_handler_result server_setup::handle_payload(
 
 		c.settings = std::move(payload);
 
+		if (!is_authorized_for_access(client_id)) {
+			kick(client_id, "Wrong password. Try again.", chat_target_type::KICK_WRONG_PASSWORD);
+			return abort_v;
+		}
+
 		if (c.state == S::PENDING_WELCOME) {
 			LOG("Client %x requested nickname: %x", client_id, c.get_nickname());
 			c.state = S::WELCOME_ARRIVED;

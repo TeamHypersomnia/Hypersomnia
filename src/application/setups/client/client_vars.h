@@ -5,6 +5,7 @@
 #include "augs/filesystem/path_declaration.h"
 #include "augs/graphics/rgba.h"
 #include "augs/misc/constant_size_string.h"
+#include "augs/network/network_types.h"
 #include "application/setups/client/demo_paths.h"
 #include "view/client_arena_type.h"
 
@@ -70,7 +71,7 @@ struct client_vars {
 	unsigned flush_demo_to_disk_once_every_secs = 10u;
 
 	client_arena_type spectated_arena_type = client_arena_type::REFERENTIAL;
-	std::string rcon_password = "";
+	server_password_type server_password;
 	client_chat_settings client_chat;
 	augs::path_type avatar_image_path;
 	bool record_demo = true;

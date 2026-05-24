@@ -24,6 +24,8 @@ struct browse_servers_input {
 
 	const faction_view_settings& faction_view;
 	const bool streamer_mode;
+
+	const std::string& current_server_password;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
@@ -55,11 +57,16 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 		const std::string& label,
 		const std::vector<server_list_entry*>&,
 		const faction_view_settings&,
-		const bool streamer_mode
+		const bool streamer_mode,
+		const std::string& current_server_password
 	);
 
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
+
+	std::optional<server_list_entry> pending_password_entry;
+	std::string password_prompt_input;
+	std::optional<std::string> pending_password_save;
 
 	net_time_t when_last_started_refreshing_server_list = 0;
 	net_time_t when_last_updated_time_to_events = 0;
@@ -138,4 +145,10 @@ public:
 	void select_server(const server_list_entry&);
 
 	bool refresh_in_progress() const;
+
+	std::optional<std::string> take_pending_password_save() {
+		auto out = std::move(pending_password_save);
+		pending_password_save.reset();
+		return out;
+	}
 };

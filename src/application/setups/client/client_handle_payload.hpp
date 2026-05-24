@@ -215,6 +215,10 @@ message_handler_result client_setup::handle_payload(
 					reason_str
 				), true);
 			}
+			else if (payload.target == chat_target_type::KICK_WRONG_PASSWORD) {
+				set_disconnect_reason("Wrong password. Try again.", true);
+				wrong_password_kick = true;
+			}
 			else {
 				std::string kicked_or_banned;
 
@@ -226,7 +230,7 @@ message_handler_result client_setup::handle_payload(
 				}
 
 				set_disconnect_reason(typesafe_sprintf(
-					"You were %x from the server.\nReason: %x", 
+					"You were %x from the server.\nReason: %x",
 					kicked_or_banned,
 					std::string(payload.message)
 				), true);

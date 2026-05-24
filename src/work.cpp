@@ -2193,7 +2193,8 @@ work_result work(
 			config.client_connect,
 			displayed_connecting_server_name,
 			config.faction_view,
-			config.streamer_mode && config.streamer_mode_flags.community_servers
+			config.streamer_mode && config.streamer_mode_flags.community_servers,
+			config.client.server_password
 		};
 	};
 
@@ -2484,6 +2485,12 @@ work_result work(
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
+			if (auto new_password = browse_servers_gui.take_pending_password_save()) {
+				change_with_save([&new_password](config_json_table& cfg) {
+					cfg.client.server_password = *new_password;
+				});
+			}
+
 			start_client_setup();
 		}
 	};
@@ -2525,8 +2532,9 @@ work_result work(
 
 	WEBSTATIC auto perform_start_server_gui = [&]() {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
-			config.server_start, 
-			config.server, 
+			config.server_start,
+			config.server,
+			config.server_private,
 #if BUILD_NATIVE_SOCKETS
 			nat_detection.has_value() ? std::addressof(*nat_detection) : nullptr,
 #else
@@ -2543,6 +2551,7 @@ work_result work(
 					cfg.server_start = config.server_start;
 					cfg.client = config.client;
 					cfg.server = config.server;
+					cfg.server_private = config.server_private;
 				}
 			);
 
@@ -2963,6 +2972,12 @@ work_result work(
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
+						if (auto new_password = setup.take_pending_password_save()) {
+							change_with_save([&new_password](config_json_table& cfg) {
+								cfg.client.server_password = *new_password;
+							});
+						}
+
 						launch_setup(activity_type::CLIENT);
 					}
 

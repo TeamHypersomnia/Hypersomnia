@@ -1956,10 +1956,13 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (
-			const bool failed_after_connected = adapter->is_connecting() && state > C::NETCODE_NEGOTIATING_CONNECTION; 
-			failed_after_connected || adapter->has_connection_failed()
+			const bool failed_after_connected = adapter->is_connecting() && state > C::NETCODE_NEGOTIATING_CONNECTION;
+			failed_after_connected || adapter->has_connection_failed() || (wrong_password_kick && adapter->is_disconnected())
 		) {
-			if (state == C::IN_GAME) {
+			if (wrong_password_kick) {
+				text("Failed to join %x", get_displayed_connecting_server_name());
+			}
+			else if (state == C::IN_GAME) {
 				text("Lost connection to the server.");
 			}
 			else if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
@@ -1972,16 +1975,40 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			print_reason_if_any();
 
 			text("\n");
-			ImGui::Separator();
 
-			if (ImGui::Button("Retry")) {
-				return custom_imgui_result::RETRY;
+			if (wrong_password_kick) {
+				ImGui::Separator();
+
+				const auto flags = ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue;
+				const bool enter_pressed = input_text("Server password", password_retry_input, flags);
+
+				ImGui::Separator();
+
+				const bool retry_clicked = ImGui::Button("Retry") || enter_pressed;
+
+				if (retry_clicked) {
+					pending_password_save = password_retry_input;
+					return custom_imgui_result::RETRY;
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel")) {
+					return custom_imgui_result::GO_TO_MAIN_MENU;
+				}
 			}
+			else {
+				ImGui::Separator();
 
-			ImGui::SameLine();
+				if (ImGui::Button("Retry")) {
+					return custom_imgui_result::RETRY;
+				}
 
-			if (ImGui::Button("Go back")) {
-				return custom_imgui_result::GO_TO_MAIN_MENU;
+				ImGui::SameLine();
+
+				if (ImGui::Button("Go back")) {
+					return custom_imgui_result::GO_TO_MAIN_MENU;
+				}
 			}
 		}
 		else if (adapter->is_disconnected()) {
@@ -2023,7 +2050,7 @@ void client_setup::apply(const config_json_table& cfg) {
 	auto& r = requested_settings;
 	r.chosen_nickname = get_nickname();
 	r.platform_type = ::u8_get_client_platform_type(vars.suppress_webhooks);
-	r.rcon_password = vars.rcon_password;
+	r.server_password = vars.server_password;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;
 	r.public_settings.clan = cfg.client.clan;

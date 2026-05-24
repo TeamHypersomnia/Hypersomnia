@@ -26,6 +26,7 @@ bool perform_game_mode_chooser(game_mode_name_type& current_arena, const std::st
 bool start_server_gui_state::perform(
 	server_listen_input& into,
 	server_vars& into_vars,
+	server_private_vars& into_private_vars,
 
 	const nat_detection_session* nat_detection,
 	const port_type currently_bound_port
@@ -126,6 +127,15 @@ as well as to test your skills in a laggy environment.
 		// auto& scope_cfg = into;
 
 		input_text_with_hint("Server name", "(default)", into_vars.server_name);
+
+		{
+			thread_local bool show = false;
+			const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
+
+			input_text_with_hint("Server password", "(empty: no password)", into_private_vars.server_password, flags);
+			ImGui::SameLine();
+			checkbox("Show##serverpw", show);
+		}
 
 		if (perform_arena_chooser(into_vars.arena)) {
 			into_vars.game_mode = "";

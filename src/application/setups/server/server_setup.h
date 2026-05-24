@@ -705,7 +705,7 @@ public:
 
 	void disconnect_and_unset(const client_id_type&);
 
-	void kick(const client_id_type&, const std::string& reason);
+	void kick(const client_id_type&, const std::string& reason, chat_target_type target = chat_target_type::KICK);
 	message_handler_result abort_or_kick_if_debug(const client_id_type&, const std::string& reason);
 	void ban(const client_id_type&, const std::string& reason);
 
@@ -738,6 +738,7 @@ public:
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
 
 	rcon_level_type get_rcon_level(const client_id_type&) const;
+	bool is_authorized_for_access(const client_id_type&) const;
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return local_collected;

@@ -64,6 +64,7 @@ struct server_heartbeat {
 
 	bool require_authentication = false;
 	uint8_t ranked_state = 0;
+	bool require_password = false;
 	// END GEN INTROSPECTOR
 
 	double cached_time_to_event = 0.0;

@@ -16,9 +16,7 @@ struct public_client_settings {
 	bool operator==(const public_client_settings&) const = default;
 };
 
-using rcon_password_type = augs::constant_size_string<max_rcon_password_length_v>;
-
-/* 
+/*
 	NOTE: this struct, as well as many other important network structs,
    	is serialized manually in net_serialize.h!!!
 
@@ -31,7 +29,7 @@ struct requested_client_settings {
 
 	// GEN INTROSPECTOR struct requested_client_settings
 	client_nickname_type chosen_nickname;
-	rcon_password_type rcon_password;
+	server_password_type server_password;
 
 	public_client_settings public_settings;
 	client_net_vars net;

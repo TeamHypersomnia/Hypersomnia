@@ -16,6 +16,8 @@ enum class chat_target_type : uint8_t {
 	KICK,
 	BAN,
 
+	KICK_WRONG_PASSWORD,
+
 	DOWNLOADING_FILES,
 	FINISHED_DOWNLOADING,
 

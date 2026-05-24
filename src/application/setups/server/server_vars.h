@@ -286,6 +286,7 @@ struct server_private_vars {
 	// GEN INTROSPECTOR struct server_private_vars
 	std::string master_rcon_password = "";
 	std::string rcon_password = "";
+	server_password_type server_password;
 
 	std::string discord_webhook_url = "";
 	std::string telegram_webhook_url = "";

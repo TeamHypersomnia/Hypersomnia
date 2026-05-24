@@ -136,6 +136,9 @@ class client_setup :
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
+	bool wrong_password_kick = false;
+	std::string password_retry_input;
+	std::optional<std::string> pending_password_save;
 
 	bool rebuild_player_meta_viewables = false;
 	bool has_sent_avatar = false;
@@ -627,6 +630,12 @@ class client_setup :
 
 	client_nickname_type get_nickname() const;
 public:
+	std::optional<std::string> take_pending_password_save() {
+		auto out = std::move(pending_password_save);
+		pending_password_save.reset();
+		return out;
+	}
+
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = false;

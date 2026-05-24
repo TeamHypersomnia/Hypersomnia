@@ -2346,6 +2346,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	;
 
 	heartbeat.show_on_server_list = vars.show_on_server_list;
+	heartbeat.require_password = !private_vars.server_password.empty();
 
 #if BUILD_NATIVE_SOCKETS
 	heartbeat.internal_network_address = internal_address;
@@ -4420,10 +4421,10 @@ augs::path_type server_setup::get_unofficial_content_dir() const {
 	Timing attack resistant password comparator.
 */
 
-bool safe_equal(const decltype(requested_client_settings::rcon_password)& candidate_password, const std::string& actual_password) {
-	const bool rcon_is_disabled = actual_password.empty();
+bool safe_equal(const decltype(requested_client_settings::server_password)& candidate_password, const std::string& actual_password) {
+	const bool password_is_disabled = actual_password.empty();
 
-	if (rcon_is_disabled) {
+	if (password_is_disabled) {
 		return false;
 	}
 
@@ -4505,12 +4506,12 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 		}
 	}
 
-	if (::safe_equal(c.settings.rcon_password, private_vars.master_rcon_password)) {
+	if (::safe_equal(c.settings.server_password, private_vars.master_rcon_password)) {
 		LOG("Authorized the remote client for master rcon.");
 		return rcon_level_type::MASTER;
 	}
 
-	if (::safe_equal(c.settings.rcon_password, private_vars.rcon_password)) {
+	if (::safe_equal(c.settings.server_password, private_vars.rcon_password)) {
 		if (private_vars.master_rcon_password.empty()) {
 			LOG("Authorized the remote client for master rcon.");
 			return rcon_level_type::MASTER;
@@ -4523,6 +4524,46 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	LOG("RCON disabled for this client.");
 
 	return rcon_level_type::DENIED;
+}
+
+bool server_setup::is_authorized_for_access(const client_id_type& id) const {
+	if (private_vars.server_password.empty()) {
+		return true;
+	}
+
+	if (is_integrated() && id == get_integrated_client_id()) {
+		return true;
+	}
+
+	const auto& c = clients[id];
+
+	if (!c.is_webrtc_client()) {
+		if (vars.auto_authorize_loopback_for_rcon) {
+			if (get_client_address(id).IsLoopback()) {
+				return true;
+			}
+		}
+
+		if (vars.auto_authorize_internal_for_rcon) {
+			if (is_internal(to_netcode_addr(get_client_address(id)))) {
+				return true;
+			}
+		}
+	}
+
+	if (::safe_equal(c.settings.server_password, private_vars.server_password)) {
+		return true;
+	}
+
+	if (::safe_equal(c.settings.server_password, private_vars.rcon_password)) {
+		return true;
+	}
+
+	if (::safe_equal(c.settings.server_password, private_vars.master_rcon_password)) {
+		return true;
+	}
+
+	return false;
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
@@ -4646,7 +4687,7 @@ message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type
 #endif
 }
 
-void server_setup::kick(const client_id_type& kicked_id, const std::string& reason) {
+void server_setup::kick(const client_id_type& kicked_id, const std::string& reason, chat_target_type target) {
 	auto& c = clients[kicked_id];
 
 	if (!c.is_set()) {
@@ -4663,11 +4704,13 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 
 	server_broadcasted_chat message;
 	message.message = reason;
-	message.target = chat_target_type::KICK;
+	message.target = target;
 	message.author = to_mode_player_id(kicked_id);
 
-	const auto except = kicked_id;
-	broadcast(message, except);
+	if (target != chat_target_type::KICK_WRONG_PASSWORD) {
+		const auto except = kicked_id;
+		broadcast(message, except);
+	}
 
 	message.recipient_effect = recipient_effect_type::DISCONNECT;
 

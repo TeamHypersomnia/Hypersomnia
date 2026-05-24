@@ -361,7 +361,7 @@ namespace net_messages {
 				return false;
 			}
 
-			if (!serialize_fixed_size_str(stream, payload.rcon_password)) {
+			if (!serialize_fixed_size_str(stream, payload.server_password)) {
 				return false;
 			}
 		}
