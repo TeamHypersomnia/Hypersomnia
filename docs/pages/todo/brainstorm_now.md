@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+1. jak jestes spectem w rankedzie to nie pisz ze stracisz mmr 
+sp.warning_notice = "\nYou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
+2. zachowuj hash configa tournament.json w tournament.ongoing.json - zeby jak sie zmieni config to forsowalo nowy turniej i wyjebalo stary tournament.ongoing.json
+3. usun to jebane gowno ze serwery rankedowe sa chowane na non-steamowym buildzie, zawsze pokazuj turniejowe/rankedowe w server browserze, pozwalaj sie laczyc, po prostu wyjebie autentykacja, tylko w find best server nie wybieraj rankeda na non steamowym buildzie
+4. tournament.example.json zrob komentarze // BARDZO KROTKIE KURWA bo /**/ nie dzialaja
+5. zaimplementuj additional_spectators nicknames w tournament.json zeby nie brali udzialu w turnieju ale mogli spectowac kazdy mecz
+6. w arena_scoreboard_gui.cpp pisz na scoreboardzie tez nazwe serwera na ktory jestesmy polaczeni, przed mapa/modem; ale zobacz czy mamy informacje od serwera na ten temat. jak nie ma to dodaj pole do server_public_vars
+
+na wszystko zrob osobne commity
+
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
 
 # Przed Turniejem
