@@ -667,7 +667,7 @@ void browse_servers_gui_state::show_server_list(
 		const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
 
 		{
-			if (s.is_official_server() ) {
+			if (s.is_official_server() || s.is_internal_network()) {
 				if (d.is_ranked_server()) {
 					const auto [label, stage_color] = [&]() -> std::pair<const char*, rgba> {
 						switch (d.get_ranked_type()) {

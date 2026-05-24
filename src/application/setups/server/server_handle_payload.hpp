@@ -138,7 +138,7 @@ message_handler_result server_setup::handle_payload(
 					to_mode_player_id(client_id),
 
 					[client_chosen_nickname]() {
-						return std::string("nick_") + std::string(client_chosen_nickname);
+						return nickname_to_account_id(std::string(client_chosen_nickname));
 					}
 				);
 			}

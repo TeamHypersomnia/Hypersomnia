@@ -17,6 +17,7 @@
 #include "application/setups/server/tournament/tournament_coordinator.h"
 #include "application/setups/server/server_setup.h"
 #include "application/setups/server/server_assigned_teams.h"
+#include "application/setups/server/server_nickname_auth.h"
 #if CRASH_RECOVERY
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
 #endif
@@ -165,9 +166,22 @@ work_result run_tournament(const run_tournament_input& in) {
 
 			server_assigned_teams roster;
 
-			auto fill_faction = [&roster](const std::vector<account_id_string>& ids, const faction_type f) {
+			/*
+				The tournament JSON holds raw nicknames ("alice"), but when
+				authenticate_with_nicknames is set the server authenticates clients
+				as "nick_alice". Roster keys and summary matching must use that same
+				authenticated form or every client is kicked as "wrong match".
+			*/
+
+			const bool nickname_auth = this_config.server.authenticate_with_nicknames;
+
+			auto to_auth_id = [nickname_auth](const account_id_string& id) {
+				return nickname_auth ? nickname_to_account_id(id) : id;
+			};
+
+			auto fill_faction = [&roster, &to_auth_id](const std::vector<account_id_string>& ids, const faction_type f) {
 				for (const auto& id : ids) {
-					roster.id_to_faction[id] = f;
+					roster.id_to_faction[to_auth_id(id)] = f;
 				}
 			};
 
@@ -189,6 +203,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				match_ptr,
 				this_config = std::move(this_config),
 				roster = std::move(roster),
+				nickname_auth,
 				stage_should_interrupt,
 				on_instance_exit,
 				commit,
@@ -262,7 +277,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
-				server_ptr->on_match_summary = [match_ptr, commit](const messages::match_summary_message& s) {
+				server_ptr->on_match_summary = [match_ptr, commit, nickname_auth](const messages::match_summary_message& s) {
 					/*
 						Faction of `first_faction` shifts after a halftime swap (a player who
 						started on RESISTANCE can be on METROPOLIS by match end), so the
@@ -276,9 +291,11 @@ work_result run_tournament(const run_tournament_input& in) {
 						sole occupant of first_faction and is detected as a normal win.
 					*/
 
-					const auto roster_contains = [](const std::vector<account_id_string>& roster, const std::string& id) {
+					const auto roster_contains = [nickname_auth](const std::vector<account_id_string>& roster, const std::string& id) {
 						for (const auto& r : roster) {
-							if (r == id) {
+							const auto auth_r = nickname_auth ? nickname_to_account_id(r) : r;
+
+							if (auth_r == id) {
 								return true;
 							}
 						}

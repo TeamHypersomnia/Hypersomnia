@@ -75,6 +75,7 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
 };
 
+#include "application/setups/server/server_nickname_auth.h"
 #include "application/setups/server/server_handle_payload.hpp"
 
 #if BUILD_WEBRTC
@@ -1957,7 +1958,7 @@ void server_setup::finalize_webhook_jobs() {
 							auto duplicate_message = std::string("Duplicate client.");
 
 							if (vars.authenticate_with_nicknames) {
-								const auto chosen_nick = cut_preffix(std::string(new_id), "nick_");
+								const auto chosen_nick = account_id_to_nickname(new_id);
 
 								duplicate_message = 
 									typesafe_sprintf("Your nickname: '%x'\nis already taken!", chosen_nick)
