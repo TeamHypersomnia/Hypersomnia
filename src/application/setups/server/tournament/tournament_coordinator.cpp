@@ -298,17 +298,23 @@ std::string tournament_coordinator::make_server_name_for(const tournament_match&
 void tournament_coordinator::commit_match_result(
 	tournament_match& m,
 	const uint32_t winner_team_index,
-	const float duration_secs
+	const float duration_secs,
+	const uint32_t team_a_score,
+	const uint32_t team_b_score
 ) {
 	std::scoped_lock lk(state_lk);
 
-	if (m.resolved) {
+	if (m.result.has_value()) {
 		return;
 	}
 
-	m.resolved = true;
-	m.winner_team_index = winner_team_index;
-	m.duration_secs = duration_secs;
+	tournament_match_result r;
+	r.winner_team_index = winner_team_index;
+	r.duration_secs = duration_secs;
+	r.team_a_score = team_a_score;
+	r.team_b_score = team_b_score;
+
+	m.result = r;
 
 	state.save(state_path);
 }
@@ -320,8 +326,14 @@ void tournament_coordinator::run_current_stage() {
 
 	LOG("Tournament stage %x: running %x matches.", state.stage_index, state.current_stage_matches.size());
 
-	auto commit = [this](tournament_match& m, const uint32_t winner, const float duration) {
-		commit_match_result(m, winner, duration);
+	auto commit = [this](
+		tournament_match& m,
+		const uint32_t winner,
+		const float duration,
+		const uint32_t team_a_score,
+		const uint32_t team_b_score
+	) {
+		commit_match_result(m, winner, duration, team_a_score, team_b_score);
 	};
 
 	deps.run_stage(state.current_stage_matches, commit);
@@ -333,34 +345,40 @@ void tournament_coordinator::update_skills() {
 	}
 
 	for (const auto& m : state.current_stage_matches) {
-		if (!m.resolved) {
+		if (!m.result.has_value()) {
 			continue;
 		}
 
-		state.teams[m.winner_team_index].skill = ::skill_from_match_time(m.duration_secs);
+		state.teams[m.result->winner_team_index].skill = ::skill_from_match_time(m.result->duration_secs);
 	}
 }
 
 void tournament_coordinator::eliminate_losers() {
 	for (const auto& m : state.current_stage_matches) {
-		if (!m.resolved) {
+		if (!m.result.has_value()) {
 			LOG("Tournament: match port=%x unresolved; nothing to eliminate.", m.port);
 			continue;
 		}
 
+		const auto& r = *m.result;
+
 		const uint32_t loser =
-			m.winner_team_index == m.team_a_index ?
+			r.winner_team_index == m.team_a_index ?
 			m.team_b_index :
 			m.team_a_index
 		;
 
 		state.teams[loser].eliminated = true;
 
+		const bool winner_is_a = r.winner_team_index == m.team_a_index;
+
 		tournament_match_history_entry h;
 		h.played_in_stage = state.stage_index;
-		h.winner_player_ids = state.teams[m.winner_team_index].player_ids;
+		h.winner_player_ids = state.teams[r.winner_team_index].player_ids;
 		h.loser_player_ids = state.teams[loser].player_ids;
-		h.duration_secs = m.duration_secs;
+		h.duration_secs = r.duration_secs;
+		h.winner_score = winner_is_a ? r.team_a_score : r.team_b_score;
+		h.loser_score = winner_is_a ? r.team_b_score : r.team_a_score;
 
 		state.match_history.push_back(std::move(h));
 	}
@@ -481,7 +499,7 @@ void tournament_coordinator::run() {
 			LOG("Tournament: resuming stage %x with %x ongoing matches.", state.stage_index, state.current_stage_matches.size());
 
 			for (const auto& m : state.current_stage_matches) {
-				if (m.resolved) {
+				if (m.result.has_value()) {
 					wipe_port(m.port);
 				}
 			}
@@ -504,7 +522,7 @@ void tournament_coordinator::run() {
 		*/
 
 		for (const auto& m : state.current_stage_matches) {
-			if (!m.resolved) {
+			if (!m.result.has_value()) {
 				LOG(
 					"Tournament: stage %x match on port %x (%x) exited without resolving. "
 					"Aborting tournament; edit %x to force a resolution before resuming.",

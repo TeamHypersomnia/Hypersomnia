@@ -20,6 +20,15 @@ struct tournament_team_state {
 	// END GEN INTROSPECTOR
 };
 
+struct tournament_match_result {
+	// GEN INTROSPECTOR struct tournament_match_result
+	uint32_t winner_team_index = 0;
+	float duration_secs = 0.f;
+	uint32_t team_a_score = 0;
+	uint32_t team_b_score = 0;
+	// END GEN INTROSPECTOR
+};
+
 struct tournament_match {
 	// GEN INTROSPECTOR struct tournament_match
 	uint32_t team_a_index = 0;
@@ -31,9 +40,7 @@ struct tournament_match {
 	std::string server_name;
 	std::string arena_and_mode;
 
-	bool resolved = false;
-	uint32_t winner_team_index = 0;
-	float duration_secs = 0.f;
+	std::optional<tournament_match_result> result;
 	uint8_t heartbeat_ranked_type = 0;
 	// END GEN INTROSPECTOR
 };
@@ -44,6 +51,8 @@ struct tournament_match_history_entry {
 	std::vector<account_id_string> winner_player_ids;
 	std::vector<account_id_string> loser_player_ids;
 	float duration_secs = 0.f;
+	uint32_t winner_score = 0;
+	uint32_t loser_score = 0;
 	// END GEN INTROSPECTOR
 };
 

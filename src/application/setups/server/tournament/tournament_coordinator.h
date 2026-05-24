@@ -15,7 +15,7 @@
 	resume - no replay of finished matches.
 */
 using tournament_commit_match_result_fn = std::function<
-	void(tournament_match&, uint32_t winner_team_index, float duration_secs)
+	void(tournament_match&, uint32_t winner_team_index, float duration_secs, uint32_t team_a_score, uint32_t team_b_score)
 >;
 
 struct tournament_coordinator_dependencies {
@@ -92,7 +92,7 @@ private:
 
 	std::string make_server_name_for(const tournament_match&) const;
 
-	void commit_match_result(tournament_match& m, uint32_t winner_team_index, float duration_secs);
+	void commit_match_result(tournament_match& m, uint32_t winner_team_index, float duration_secs, uint32_t team_a_score, uint32_t team_b_score);
 
 	tournament_config cfg;
 	tournament_state state;

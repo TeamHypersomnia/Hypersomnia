@@ -1,4 +1,5 @@
 #if HEADLESS
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -149,7 +150,7 @@ work_result run_tournament(const run_tournament_input& in) {
 		threads.reserve(matches.size());
 
 		for (auto& match : matches) {
-			if (match.resolved) {
+			if (match.result.has_value()) {
 				/*
 					Carried over from a previous (crashed) session: this match already
 					concluded and was persisted. No instance to spawn. The coordinator
@@ -370,9 +371,21 @@ work_result run_tournament(const run_tournament_input& in) {
 						);
 					}
 
+					/*
+						Winner is whichever roster lives in s.first_faction. arena_mode sets
+						first_faction to the surviving side when losers_abandoned, regardless
+						of which side was leading. So a 4:1 game where the leading team
+						abandons correctly resolves as: surviving (score=1) wins, abandoning
+						(score=4) is eliminated. The per-team scores are preserved as-is, so
+						the recorded result can legitimately have winner_score < loser_score.
+					*/
+
 					const uint32_t winner_team_index = team_a_in_first ? match_ptr->team_a_index : match_ptr->team_b_index;
 
-					commit(*match_ptr, winner_team_index, s.effective_playtime_secs);
+					const uint32_t team_a_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.first_team_score : s.second_team_score));
+					const uint32_t team_b_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.second_team_score : s.first_team_score));
+
+					commit(*match_ptr, winner_team_index, s.effective_playtime_secs, team_a_score, team_b_score);
 				};
 
 				auto worker_in = dedicated_server_worker_input {
