@@ -118,8 +118,14 @@ message_handler_result server_setup::handle_payload(
 		c.settings = std::move(payload);
 
 		if (!is_authorized_for_access(client_id)) {
+			/*
+				Don't return abort_v here: that would disconnect the client immediately
+				(see server_adapter::advance) before the reliable KICK_WRONG_PASSWORD message
+				gets flushed, leaving the client stuck without a reason.
+				kick() sets when_kicked, so the linger logic disconnects after the message is sent.
+			*/
 			kick(client_id, "Wrong password. Try again.", chat_target_type::KICK_WRONG_PASSWORD);
-			return abort_v;
+			return continue_v;
 		}
 
 		if (c.state == S::PENDING_WELCOME) {

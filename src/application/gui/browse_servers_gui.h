@@ -86,6 +86,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	server_details_gui_state server_details = std::string("Server details");
 
 	bool only_responding = false;
+	bool no_password = false;
 #if IS_PRODUCTION_BUILD
 	bool show_incompatible = false;
 #else

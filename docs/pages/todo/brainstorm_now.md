@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- zrobic zeby mi na lokalu wbudowywalo wszystko z dedyka do binarki bo sie zajebie tu
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
 
 # Przed Turniejem

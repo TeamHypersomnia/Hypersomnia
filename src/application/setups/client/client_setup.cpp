@@ -2,6 +2,7 @@
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/maybe_different.h"
 
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
@@ -1979,21 +1980,45 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			if (wrong_password_kick) {
 				ImGui::Separator();
 
-				const auto flags = ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue;
-				const bool enter_pressed = input_text("Server password", password_retry_input, flags);
+				/*
+					Don't use ImGuiInputTextFlags_EnterReturnsTrue here: the input_text wrapper
+					only writes back into password_retry_input when ImGui::InputText returns true,
+					which with that flag happens only on Enter. We want every keystroke captured
+					so clicking Retry sends what was actually typed. Detect Enter separately.
+				*/
+				const auto flags = ImGuiInputTextFlags_Password;
+
+				if (password_retry_focus_pending) {
+					ImGui::SetKeyboardFocusHere();
+					password_retry_focus_pending = false;
+				}
+
+				input_text("Server password", password_retry_input, flags);
+
+				const bool enter_pressed =
+					ImGui::IsItemFocused()
+					&& (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
+				;
 
 				ImGui::Separator();
 
-				const bool retry_clicked = ImGui::Button("Retry") || enter_pressed;
+				const bool password_entered = !password_retry_input.empty();
 
-				if (retry_clicked) {
+				const bool retry_clicked = [&]() {
+					auto scope = maybe_disabled_cols({}, !password_entered);
+					return ImGui::Button("Retry");
+				}();
+
+				if (password_entered && (retry_clicked || enter_pressed)) {
 					pending_password_save = password_retry_input;
 					return custom_imgui_result::RETRY;
 				}
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("Cancel")) {
+				const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
+
+				if (ImGui::Button("Cancel") || escape_pressed) {
 					return custom_imgui_result::GO_TO_MAIN_MENU;
 				}
 			}

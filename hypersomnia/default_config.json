@@ -394,6 +394,10 @@
     // Private vars aren't known to any clients.
 
     "server_private": {
+        // Access password.
+        // Empty to let everybody in.
+        "server_password": "",
+
         "master_rcon_password": "",
         "rcon_password": "",
         "discord_webhook_url": "",

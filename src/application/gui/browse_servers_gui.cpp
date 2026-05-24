@@ -933,6 +933,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				}
 			}
 
+			if (no_password) {
+				if (s.heartbeat.require_password) {
+					return;
+				}
+			}
+
 			if (at_least_players.is_enabled) {
 				if (s.heartbeat.num_online_humans < at_least_players.value) {
 					return;
@@ -1257,6 +1263,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		checkbox("Only responding", only_responding);
 		ImGui::SameLine();
 
+		checkbox("No password", no_password);
+		ImGui::SameLine();
+
 		checkbox("Show incompatible", show_incompatible);
 		ImGui::SameLine();
 
@@ -1364,8 +1373,23 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		)) {
 			text("Server '%x' requires a password.", pending_password_entry->heartbeat.server_name);
 
-			const auto flags = ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue;
-			const bool enter_pressed = input_text("Password##server_password_prompt", password_prompt_input, flags);
+			/*
+				Don't use ImGuiInputTextFlags_EnterReturnsTrue here: the input_text wrapper
+				only writes back into password_prompt_input when ImGui::InputText returns true,
+				which with that flag happens only on Enter. We want every keystroke captured.
+			*/
+			const auto flags = ImGuiInputTextFlags_Password;
+
+			if (ImGui::IsWindowAppearing()) {
+				ImGui::SetKeyboardFocusHere();
+			}
+
+			input_text("Password##server_password_prompt", password_prompt_input, flags);
+
+			const bool enter_pressed =
+				ImGui::IsItemFocused()
+				&& (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
+			;
 
 			const bool can_connect = !password_prompt_input.empty();
 
@@ -1384,7 +1408,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Cancel")) {
+			const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
+
+			if (ImGui::Button("Cancel") || escape_pressed) {
 				pending_password_entry.reset();
 				password_prompt_input.clear();
 				ImGui::CloseCurrentPopup();

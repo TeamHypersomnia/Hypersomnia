@@ -137,6 +137,7 @@ class client_setup :
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
 	bool wrong_password_kick = false;
+	bool password_retry_focus_pending = false;
 	std::string password_retry_input;
 	std::optional<std::string> pending_password_save;
 

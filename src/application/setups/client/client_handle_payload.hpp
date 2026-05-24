@@ -218,6 +218,7 @@ message_handler_result client_setup::handle_payload(
 			else if (payload.target == chat_target_type::KICK_WRONG_PASSWORD) {
 				set_disconnect_reason("Wrong password. Try again.", true);
 				wrong_password_kick = true;
+				password_retry_focus_pending = true;
 			}
 			else {
 				std::string kicked_or_banned;
