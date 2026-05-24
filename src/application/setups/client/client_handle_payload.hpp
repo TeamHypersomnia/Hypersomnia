@@ -133,6 +133,9 @@ message_handler_result client_setup::handle_payload(
 		auto sender_player_faction = faction_type::SPECTATOR;
 		uint16_t sender_player_level = 0;
 
+		bool mode_is_ranked_live = false;
+		auto local_player_faction = faction_type::SPECTATOR;
+
 		if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
 			/* Has to set it as we have potentially no mode properly setup yet. */
 			sender_player_nickname = get_nickname();
@@ -144,6 +147,16 @@ message_handler_result client_setup::handle_payload(
 					sender_player_faction = entry->get_faction();
 					sender_player_nickname = entry->get_nickname();
 					sender_player_level = entry->session.casual_level;
+				}
+
+				using M = remove_cref<decltype(typed_mode)>;
+
+				if constexpr (std::is_same_v<M, arena_mode>) {
+					mode_is_ranked_live = typed_mode.is_ranked_live();
+				}
+
+				if (auto local_entry = typed_mode.find(get_local_player_id())) {
+					local_player_faction = local_entry->get_faction();
 				}
 			}
 		);
@@ -157,7 +170,22 @@ message_handler_result client_setup::handle_payload(
 			}
 		}
 
-		{
+		/*
+			During a live ranked match, hide spectator chat from playing clients
+			so spectators can't hint at enemy positions etc. Demo replay (where
+			the viewer is reviewing the match post-hoc) shows everything.
+			Also skip the LOG, since recent log lines are visible in-game from
+			settings - logging would let a determined player read it anyway.
+		*/
+
+		const bool hide_spectator_chat =
+			!is_replaying() &&
+			mode_is_ranked_live &&
+			sender_player_faction == faction_type::SPECTATOR &&
+			local_player_faction != faction_type::SPECTATOR
+		;
+
+		if (!hide_spectator_chat) {
 			auto new_entry = chat_gui_entry::from(
 				payload,
 				get_current_time(),
