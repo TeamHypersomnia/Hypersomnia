@@ -28,10 +28,12 @@ namespace {
 
 tournament_coordinator::tournament_coordinator(
 	tournament_config in_cfg,
+	augs::path_type in_config_path,
 	augs::path_type in_state_path,
 	tournament_coordinator_dependencies in_deps
 ) :
 	cfg(std::move(in_cfg)),
+	config_path(std::move(in_config_path)),
 	state_path(std::move(in_state_path)),
 	deps(std::move(in_deps))
 {
@@ -395,26 +397,42 @@ void tournament_coordinator::declare_winner() const {
 }
 
 void tournament_coordinator::cleanup() const {
-	if (!augs::exists(state_path)) {
-		return;
-	}
-
 	const auto stamp = augs::date_time().get_readable_for_file_long();
-	const auto archive_name = std::string("tournament.completed.") + stamp + ".json";
-	const auto archive_path = state_path.parent_path() / archive_name;
 
-	try {
-		std::filesystem::rename(state_path, archive_path);
-		LOG("Tournament: archived state to %x.", archive_path.string());
-	}
-	catch (const std::exception& err) {
-		LOG("Tournament: failed to archive state file (%x); removing instead.", err.what());
+	auto archive = [&stamp](const augs::path_type& src, const std::string& kind) {
+		if (!augs::exists(src)) {
+			return;
+		}
 
+		const auto archive_name = std::string("tournament.completed.") + stamp + "." + kind + ".json";
+		const auto archive_path = src.parent_path() / archive_name;
+
+		try {
+			std::filesystem::rename(src, archive_path);
+			LOG("Tournament: archived %x to %x.", kind, archive_path.string());
+		}
+		catch (const std::exception& err) {
+			LOG("Tournament: failed to archive %x (%x); leaving in place.", kind, err.what());
+		}
+	};
+
+	/*
+		Snapshot both the live state and the config the tournament ran with under
+		the same timestamp. The config is intentionally not deleted on failure -
+		operators may have hand-edited it and a stale copy is more useful than
+		nothing for forensics; the state file is the consumable runtime artifact
+		and gets removed on rename failure to keep load() from picking it up.
+	*/
+
+	archive(state_path, "state");
+	archive(config_path, "config");
+
+	if (augs::exists(state_path)) {
 		try {
 			std::filesystem::remove(state_path);
 		}
-		catch (const std::exception& err2) {
-			LOG("Tournament: failed to remove state file: %x", err2.what());
+		catch (const std::exception& err) {
+			LOG("Tournament: failed to remove state file: %x", err.what());
 		}
 	}
 }

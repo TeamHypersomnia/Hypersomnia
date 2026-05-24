@@ -376,6 +376,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 	auto coordinator = tournament_coordinator(
 		std::move(cfg),
+		in.tournament_file_path,
 		in.state_file_path,
 		std::move(deps)
 	);

@@ -71,6 +71,7 @@ class tournament_coordinator {
 public:
 	tournament_coordinator(
 		tournament_config config,
+		augs::path_type config_file_path,
 		augs::path_type state_file_path,
 		tournament_coordinator_dependencies deps
 	);
@@ -95,6 +96,7 @@ private:
 
 	tournament_config cfg;
 	tournament_state state;
+	augs::path_type config_path;
 	augs::path_type state_path;
 	tournament_coordinator_dependencies deps;
 
