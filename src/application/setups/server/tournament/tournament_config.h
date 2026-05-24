@@ -32,6 +32,7 @@ struct tournament_config {
 
 	std::vector<std::vector<std::string>> teams;
 	std::vector<std::string> maps;
+	std::vector<std::string> additional_spectators;
 	// END GEN INTROSPECTOR
 
 	static tournament_config from_file(const augs::path_type& path);

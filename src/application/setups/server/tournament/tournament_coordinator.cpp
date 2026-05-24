@@ -215,6 +215,17 @@ void tournament_coordinator::pair_teams() {
 		}
 	}
 
+	/*
+		Players listed in additional_spectators don't take part in the tournament
+		but are whitelisted as spectators on every match in every stage - useful
+		for casters, observers and admins. They go into every match's roster as
+		SPECTATOR; assigned_teams would otherwise kick them as "wrong match".
+	*/
+
+	for (const auto& pid : cfg.additional_spectators) {
+		shared_spectator_ids.push_back(pid);
+	}
+
 	const uint8_t heartbeat_value = [&]() -> uint8_t {
 		const auto as_u8 = [](const ranked_server_type t) {
 			return static_cast<uint8_t>(t);
