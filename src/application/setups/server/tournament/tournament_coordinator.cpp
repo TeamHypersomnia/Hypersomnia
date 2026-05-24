@@ -35,10 +35,49 @@ tournament_coordinator::tournament_coordinator(
 	state_path(std::move(in_state_path)),
 	deps(std::move(in_deps))
 {
+	const auto current_hash = cfg.compute_hash();
+
 	if (const auto loaded = tournament_state::load(state_path)) {
-		state = *loaded;
-		LOG("Tournament: resumed from %x at stage %x.", state_path.string(), state.stage_index);
+		if (loaded->config_hash != current_hash) {
+			/*
+				Config on disk has changed since this ongoing tournament began.
+				Pairings, teams or maps may all differ from what's in the state,
+				so resuming would corrupt the bracket. Archive the old state and
+				start fresh; the new tournament adopts the current config.
+			*/
+
+			LOG(
+				"Tournament: config hash mismatch (state=%x, current=%x). "
+				"Archiving stale tournament.ongoing.json and starting fresh.",
+				loaded->config_hash, current_hash
+			);
+
+			try {
+				const auto stamp = augs::date_time().get_readable_for_file_long();
+				const auto archive_name = std::string("tournament.config-changed.") + stamp + ".json";
+				const auto archive_path = state_path.parent_path() / archive_name;
+
+				std::filesystem::rename(state_path, archive_path);
+				LOG("Tournament: archived stale state to %x.", archive_path.string());
+			}
+			catch (const std::exception& err) {
+				LOG("Tournament: failed to archive stale state file (%x); removing instead.", err.what());
+
+				try {
+					std::filesystem::remove(state_path);
+				}
+				catch (const std::exception& err2) {
+					LOG("Tournament: failed to remove stale state file: %x", err2.what());
+				}
+			}
+		}
+		else {
+			state = *loaded;
+			LOG("Tournament: resumed from %x at stage %x.", state_path.string(), state.stage_index);
+		}
 	}
+
+	state.config_hash = current_hash;
 }
 
 bool tournament_coordinator::finished() const {

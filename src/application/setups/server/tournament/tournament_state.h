@@ -54,6 +54,7 @@ struct tournament_state {
 	std::vector<tournament_match> current_stage_matches;
 	std::vector<tournament_match_history_entry> match_history;
 	bool initialized = false;
+	std::string config_hash;
 	// END GEN INTROSPECTOR
 
 	void save(const augs::path_type& path) const;

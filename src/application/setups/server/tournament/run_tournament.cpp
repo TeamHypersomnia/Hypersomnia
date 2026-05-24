@@ -10,6 +10,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/misc/secure_hash.h"
 
 #include "application/setups/server/tournament/run_tournament.h"
 #include "application/setups/server/tournament/tournament_config.h"
@@ -32,6 +33,11 @@
 
 tournament_config tournament_config::from_file(const augs::path_type& path) {
 	return augs::from_json_file<tournament_config>(path);
+}
+
+std::string tournament_config::compute_hash() const {
+	const auto serialized = augs::to_json_string_nopretty(*this);
+	return augs::bytes_to_hex(augs::secure_hash(serialized));
 }
 
 work_result run_tournament(const run_tournament_input& in) {

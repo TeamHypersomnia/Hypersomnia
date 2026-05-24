@@ -35,4 +35,6 @@ struct tournament_config {
 	// END GEN INTROSPECTOR
 
 	static tournament_config from_file(const augs::path_type& path);
+
+	std::string compute_hash() const;
 };
