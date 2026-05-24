@@ -388,7 +388,8 @@
 
     // Put this in the user folder (~/.config/Hypersomnia/user) to launch a tournament.
     // Dedicated-server only (Linux)!
-    // "tournament_file": "tournament.example.json",
+    // If the file doesn't exist, tournament mode is skipped and the server starts normally.
+    "tournament_file": "tournament.example.json",
 
     // Private vars aren't known to any clients.
 

@@ -173,6 +173,19 @@ work_result run_tournament(const run_tournament_input& in) {
 			server_assigned_teams roster;
 
 			/*
+				Without a Steam Web API key the server can't validate Steam auth
+				tickets, so a tournament run in that mode has to fall back to
+				nickname auth or every client would be kicked as unauthenticated.
+				Force the flag on here so LAN tournaments work out of the box -
+				operators don't have to remember to also flip
+				authenticate_with_nicknames in the dedicated-server config.
+			*/
+
+			if (this_config.server_private.steam_web_api_key.empty()) {
+				this_config.server.authenticate_with_nicknames = true;
+			}
+
+			/*
 				The tournament JSON holds raw nicknames ("alice"), but when
 				authenticate_with_nicknames is set the server authenticates clients
 				as "nick_alice". Roster keys and summary matching must use that same
