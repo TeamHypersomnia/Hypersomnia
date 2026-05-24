@@ -1868,6 +1868,27 @@ bool arena_mode::is_final_round(const const_input_type in) const {
 	return someone_reached_max || all_rounds_played;
 }
 
+bool arena_mode::is_overtime_round(const const_input_type in) const {
+	/*
+		We are about to start an overtime round whenever both teams have
+		already scored at least (max_team_score - 1). That covers the very
+		first overtime round (15:15 -> round 31) and every subsequent one,
+		until is_final_round fires on a two-round lead.
+	*/
+
+	if (!in.dynamic_vars.allow_overtime) {
+		return false;
+	}
+
+	const auto p = calc_participating_factions(in);
+	const auto tie_threshold = get_max_team_score(in) - 1;
+
+	return
+		get_score(p.bombing) >= tie_threshold &&
+		get_score(p.defusing) >= tie_threshold
+	;
+}
+
 void arena_mode::trigger_match_summary(const input_type in, const const_logic_step step) {
 	state = arena_mode_state::MATCH_SUMMARY;
 	set_players_frozen(in, true);
@@ -3969,8 +3990,19 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	}
 	else if (state == arena_mode_state::ROUND_END_DELAY) {
 		if (get_round_end_seconds_left(in) <= 0.f) {
-			{
+			if (is_overtime_round(in)) {
+				/*
+					In overtime, silently swap factions every round to neutralize
+					side advantage (maps are usually CT-sided). No summary, no
+					notification — money and weapons are preserved via the default
+					KEEP_EQUIPMENTS transfer in start_next_round. Scores are swapped
+					between factions so each team's accumulated progress follows
+					them to the new side, mirroring the halftime swap.
+				*/
 
+				const auto p = calc_participating_factions(in);
+				swap_assigned_factions(p);
+				std::swap(factions[p.bombing].score, factions[p.defusing].score);
 			}
 
 			start_next_round(in, step);

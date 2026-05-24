@@ -315,6 +315,7 @@ public:
 
 	bool is_halfway_round(const_input) const;
 	bool is_final_round(const_input) const;
+	bool is_overtime_round(const_input) const;
 
 	arena_mode_player_stats* stats_of(const mode_player_id&);
 
