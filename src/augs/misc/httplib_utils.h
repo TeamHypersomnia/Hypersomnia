@@ -38,6 +38,7 @@ namespace httplib_utils {
 #endif
 
 		http_client.set_follow_location(true);
+		http_client.set_connection_timeout(io_timeout);
 		http_client.set_read_timeout(io_timeout);
 		http_client.set_write_timeout(io_timeout);
 
