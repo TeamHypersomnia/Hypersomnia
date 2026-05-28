@@ -5,6 +5,8 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- RCON: dont send to other servers
+
 - OAuth
 	- likely use authorization code instead of implicit grant
 

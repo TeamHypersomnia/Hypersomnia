@@ -21,22 +21,28 @@ static char rcsid[] = "$NetBSD: e_sqrtf.c,v 1.4f 1995/05/10 20:46:19 jtc Exp $";
 #include "SMath.h"
 #include "math_private.h"
 
-namespace streflop_libm {
-#ifdef __STDC__
-	Simple __ieee754_sqrtf(Simple x)
-#else
-	Simple __ieee754_sqrtf(x)
-	Simple x;
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
+#include <xmmintrin.h>
 #endif
-{
-    float y = x;
-    // Approximation
-    uint32_t* i = (uint32_t*)&x;
-    *i = (*i >> 1) + (127 << 22);
-    // Newton-Raphson
-    x = (x + y/x) / 2;
-    x = (x + y/x) / 2;
-    x = (x + y/x) / 2;
-    return x;
-}
+
+namespace streflop_libm {
+	/*
+		IEEE 754 mandates correctly-rounded sqrt, so hardware sqrt
+		is bit-exact deterministic across all target platforms
+		(x64 sqrtss, ARM64 fsqrt, WASM f32.sqrt) under the project's
+		-ffp-model=strict / /fp:strict flags.
+		Streflop's libm header trampoline shadows <cmath>, so we
+		emit the hardware op directly via a builtin / SSE intrinsic
+		instead of going through std::sqrt.
+	*/
+	Simple __ieee754_sqrtf(Simple x)
+	{
+#if defined(__clang__) || defined(__GNUC__)
+		return __builtin_sqrtf(x);
+#elif defined(_MSC_VER)
+		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(x)));
+#else
+#error "unsupported compiler: no portable correctly-rounded sqrtf available"
+#endif
+	}
 }
