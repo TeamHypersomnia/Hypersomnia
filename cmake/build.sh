@@ -19,7 +19,10 @@ fi
 
 if [[ -z "$ARCHITECTURE" ]]
 then
-	ARCHITECTURE="x64"
+	case "$(uname -m)" in
+		arm64|aarch64) ARCHITECTURE="ARM64" ;;
+		*)             ARCHITECTURE="x64" ;;
+	esac
 fi
 
 if [[ -z "$C_COMPILER" ]]

@@ -1,6 +1,7 @@
 #include <cstring>
 #include <cstddef>
 #include <cstdint>
+#include <climits>
 #include <thread>
 
 #include <unistd.h>

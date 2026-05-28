@@ -1215,6 +1215,14 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-contract=off -ffp-model=strict")
 	endif()
 
+	# Enforce IEEE 754 strictly on EVERY clang/gcc target (x64, ARM64, WASM).
+	# strict implies -ffp-contract=off and disables fast-math-style reassociation.
+	# On baseline x64/WASM there is no FMA so this is effectively a no-op today,
+	# but it guards against -march=native / -mrelaxed-simd silently breaking
+	# cross-platform determinism, and documents the intent.
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -ffp-model=strict")
+	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-model=strict")
+
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${XCLANG_STR} -fno-threadsafe-statics")
 
 	message("-O0 will be specified for Debug build.")
@@ -1305,7 +1313,11 @@ if(GCC)
 -Winit-self"
 	)
 
-	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Wextra -Werror -Wno-unused-value")
+	# The codebase is clang-first, and gcc emits many extra diagnostics that clang does not
+	# (the recommended `if (const bool x = cond)` idiom, members named like a type, memset on
+	#  non-trivial 3rdparty types, deprecated 3rdparty declarations, etc.). For this non-primary
+	# compiler we keep them visible as warnings but do not treat them as errors.
+	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Wextra -Wno-unused-value -Wno-changes-meaning")
 
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -fdiagnostics-color")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
@@ -1387,7 +1399,8 @@ if(UNIX AND NOT BUILD_FOR_WEB)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
-if(LINUX)
+if(LINUX AND CLANG)
+	# -unwindlib is a Clang-specific flag; GCC links against libgcc by default.
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -unwindlib=libgcc")
 endif()
 
