@@ -1220,8 +1220,15 @@ if(GCC OR CLANG)
 	# On baseline x64/WASM there is no FMA so this is effectively a no-op today,
 	# but it guards against -march=native / -mrelaxed-simd silently breaking
 	# cross-platform determinism, and documents the intent.
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -ffp-model=strict")
-	set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-model=strict")
+	# emscripten/wasm rejects -ffp-model=strict (no rounding mode / FP exceptions
+	# support on the target), so on web we fall back to -ffp-contract=off only.
+	if(BUILD_FOR_WEB)
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -ffp-contract=off")
+		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-contract=off")
+	else()
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -ffp-model=strict")
+		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-model=strict")
+	endif()
 
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${XCLANG_STR} -fno-threadsafe-statics")
 
