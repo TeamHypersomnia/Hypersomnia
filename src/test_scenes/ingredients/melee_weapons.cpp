@@ -363,7 +363,7 @@ namespace test_flavours {
 			auto& meta = make_knife(
 				test_melee_weapons::SWORD,
 				test_scene_image_id::SWORD,
-				static_cast<money_type>(2700),
+				static_cast<money_type>(2200),
 				faction_type::SPECTATOR,
 				2.0f,
 				white,

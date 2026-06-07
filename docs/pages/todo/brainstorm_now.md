@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- nie wiem czemu goodbye nie wysyla instancja do mservera
+- dziura w wencie na cyberaqua
+
+- na duze lany kiedys mozna dac hasla na nicki tez przypisywac im
+	- i np. rozeslac na teamsach
+
+- przed piwem:
+	- disable jebany map cycling na tournamentach zeby se wisialy zawsze te same, z automatu
+	- vote /restart
+		- wszyscy votuja i wtedy restartuje sie mecz
+	- mega wazne jakby cos sie zjebalo a juz pare punktow poszlo
+	- vote /pause
+		- 2 minuty timeoutu
+	
+
+- pomyslec co sie dizeje jak all abandon ale to juz po piwie
+
+- stestowac jeszcze wszystkie commity, m.in. overtime swap
 - zrobic zeby mi na lokalu wbudowywalo wszystko z dedyka do binarki bo sie zajebie tu
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
 
