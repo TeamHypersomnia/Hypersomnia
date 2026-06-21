@@ -6,6 +6,8 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- dziura w wencie na cyberaqua
+
 - buff those flashbangs
 
 - either all smgs/shotguns should wallbang through 32 metal or none

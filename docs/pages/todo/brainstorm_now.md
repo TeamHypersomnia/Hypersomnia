@@ -7,7 +7,6 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - sentry
-- dziura w wencie na cyberaqua
 
 - na duze lany kiedys mozna dac hasla na nicki tez przypisywac im
 	- i np. rozeslac na teamsach
