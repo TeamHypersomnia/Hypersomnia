@@ -163,7 +163,7 @@ public:
 		auto corner_color = color;
 		corner_color.a = 255;
 
-		//special_image_color *= color;
+		special_image_color *= corner_color;
 
 		const auto flip = this_id->corners.flip;
 		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(necessarys, this_tree_entry.get_absolute_rect());

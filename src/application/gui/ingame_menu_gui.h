@@ -109,9 +109,9 @@ struct ingame_menu_gui {
 		root.set_menu_buttons_colors(menu_buttons_colors);
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
-		root.buttons[int(ingame_menu_button_type::STEAM)].colorize = white;
-		root.buttons[int(ingame_menu_button_type::DISCORD)].colorize = white;
-		root.buttons[int(ingame_menu_button_type::GITHUB)].colorize = white;
+		root.buttons[int(ingame_menu_button_type::STEAM)].colorize = white * menu_buttons_colors;
+		root.buttons[int(ingame_menu_button_type::DISCORD)].colorize = white * menu_buttons_colors;
+		root.buttons[int(ingame_menu_button_type::GITHUB)].colorize = white * menu_buttons_colors;
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {
 			const auto e = static_cast<ingame_menu_button_type>(i);

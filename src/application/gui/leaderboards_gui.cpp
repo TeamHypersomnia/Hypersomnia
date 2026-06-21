@@ -26,6 +26,12 @@
 #include "view/ranks_info.h"
 #include "augs/misc/async_get.h"
 
+/*
+	Amber tint multiplied into the white shades used across the leaderboards.
+	Matches the strong amber of menu_buttons_colors (255, 206, 130).
+*/
+static const rgba leaderboards_tint = rgba(255, 206, 130, 255);
+
 struct leaderboards_gui_internal {
 	augs::async_response_ptr future_response;
 
@@ -312,7 +318,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 #endif
 
-		return white;
+		return rgba(ImGui::GetStyle().Colors[ImGuiCol_Text]);
 	};
 
 
@@ -339,9 +345,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			const auto alpha_sin = (std::sin(augs::steady_secs()*4) + 1) / 2;
 
 			auto darkened_selectables = scoped_selectable_colors({
-				rgba(255, 255, 255, alpha_sin*25+10),
-				rgba(255, 255, 255, 40),
-				rgba(255, 255, 255, 60)
+				rgba(255, 255, 255, alpha_sin*25+10) * leaderboards_tint,
+				rgba(255, 255, 255, 40) * leaderboards_tint,
+				rgba(255, 255, 255, 60) * leaderboards_tint
 			});
 
 			text_disabled("(Guest)");
@@ -414,9 +420,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset_x);
 
 			auto darkened_selectables = scoped_selectable_colors({
-				rgba(255, 255, 255, 20),
-				rgba(255, 255, 255, 30),
-				rgba(255, 255, 255, 60)
+				rgba(255, 255, 255, 20) * leaderboards_tint,
+				rgba(255, 255, 255, 30) * leaderboards_tint,
+				rgba(255, 255, 255, 60) * leaderboards_tint
 			});
 
 			//auto sc = scoped_text_color(rgba(255, 255, 255, 200));
@@ -437,7 +443,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	auto show_leaderboards = [&](const auto& list) {
 		{
-			auto sc = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,10));
+			auto sc = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,10) * leaderboards_tint);
 
 			filter_with_hint(filter, "##HierarchyFilter", "Search players...");
 		}
@@ -579,7 +585,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 				auto every_two = place % 2 == 0;
 
 				if (every_two && !is_us && !viewing) {
-					col_sin = rgba(255, 255, 255, 8);
+					col_sin = rgba(255, 255, 255, 8) * leaderboards_tint;
 				}
 
 				auto progress_bg_cols = scoped_selectable_colors({ col_sin, this_rank_hov, this_rank_act });
@@ -613,13 +619,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		{
 			rgba(0, 0, 0, 0),
-			rgba(255, 255, 255, 30),
-			rgba(255, 255, 255, 60)
+			rgba(255, 255, 255, 30) * leaderboards_tint,
+			rgba(255, 255, 255, 60) * leaderboards_tint
 		},
 		{
-			rgba(255, 255, 255, 20),
-			rgba(255, 255, 255, 30),
-			rgba(255, 255, 255, 60)
+			rgba(255, 255, 255, 20) * leaderboards_tint,
+			rgba(255, 255, 255, 30) * leaderboards_tint,
+			rgba(255, 255, 255, 60) * leaderboards_tint
 		}
 	);
 

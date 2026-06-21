@@ -229,7 +229,11 @@ void main_menu_setup::draw_overlays(
 	const bool draw_menu_logo = true;
 
 	if (draw_menu_logo) {
-		output.aabb(game_logo, game_logo_rect);
+		/* Tint the logo with the menu amber shade, but keep it fully opaque. */
+		auto logo_color = menu_buttons_colors;
+		logo_color.a = 255;
+
+		output.aabb(game_logo, game_logo_rect, logo_color);
 	}
 #endif
 
@@ -263,7 +267,7 @@ void main_menu_setup::draw_overlays(
 
 		switch (t) {
 			case R::NONE:
-				return colored("Automatic updates are disabled.", gray);
+				return colored("Automatic updates are disabled.", gray * menu_buttons_colors.rgb());
 			case R::CANCELLED:
 				return colored("Automatic update was cancelled!", orange);
 			case R::FIRST_LAUNCH_AFTER_UPGRADE:
