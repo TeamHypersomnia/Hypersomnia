@@ -3773,6 +3773,130 @@ void editor_setup::recount_internal_resource_references_if_needed() {
 	}
 }
 
+void editor_setup::prepare_remove_unused_resources() {
+	/*
+		Recount references freshly so that we know exactly which pathed
+		resources are not used by any node anymore, regardless of whether
+		they have non-default properties set.
+	*/
+
+	project.recount_references(official.resources, false);
+
+	pending_unused_resources.clear();
+
+	std::vector<std::string> unused_paths;
+
+	auto collect = [&]<typename P>(const P& pool) {
+		using R = typename P::mapped_type;
+
+		if constexpr(is_pathed_resource_v<R>) {
+			pool.for_each_id_and_object(
+				[&](const auto raw_id, const R& typed_resource) {
+					const bool is_miniature =
+						typed_resource.external_file.path_in_project == editor_project_paths::get_miniature_filename()
+					;
+
+					if (typed_resource.reference_count == 0 && !is_miniature) {
+						const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
+
+						pending_unused_resources.push_back(typed_id.operator editor_resource_id());
+						unused_paths.push_back(typed_resource.external_file.path_in_project.string());
+					}
+				}
+			);
+		}
+	};
+
+	project.resources.pools.for_each_container(collect);
+
+	simple_popup popup;
+	popup.title = "Remove unused resources from disk";
+
+	if (pending_unused_resources.empty()) {
+		popup.message = "No unused resources found.";
+		remove_unused_resources_popup = popup;
+		return;
+	}
+
+	sort_range(unused_paths);
+
+	popup.message = typesafe_sprintf("Are you sure you want to delete %x files?", pending_unused_resources.size());
+	popup.warning_notice = "This will permanently delete them from disk.";
+
+	std::string details;
+
+	for (const auto& p : unused_paths) {
+		details += p + "\n";
+	}
+
+	if (!details.empty()) {
+		details.pop_back();
+	}
+
+	popup.details = details;
+
+	remove_unused_resources_popup = popup;
+}
+
+void editor_setup::perform_remove_unused_resources() {
+	if (pending_unused_resources.empty()) {
+		return;
+	}
+
+	auto sync_after = hold_persistent_filesystem_raii();
+
+	/*
+		Pathed resources (images and sounds) are not handled by delete_resources_command,
+		which only supports internal resource types.
+		We free them directly from their pools and delete the backing files from disk.
+
+		We free them even if they have non-default settings (changes_detected),
+		so that they don't linger as "missing" resources afterwards.
+
+		This is irreversible (the files are deleted), hence no undo command is posted.
+	*/
+
+	clear_inspector();
+
+	for (const auto& id : pending_unused_resources) {
+		on_resource(id, [&]<typename R>(const R& resource, const editor_typed_resource_id<R> typed_id) {
+			if constexpr(is_pathed_resource_v<R>) {
+				const auto full_path = resolve_project_path(resource.external_file.path_in_project);
+
+				LOG("Removing unused resource from disk: %x", full_path);
+
+				augs::remove_file(full_path);
+
+				project.resources.get_pool_for<R>().free(typed_id.raw);
+			}
+		});
+	}
+
+	pending_unused_resources.clear();
+
+	/*
+		Refresh the filesystem tree and pools to reflect the now-deleted files,
+		recount references and rebuild the scene.
+	*/
+
+	rescan_physical_filesystem();
+	rebuild_pathed_resources();
+	on_resource_references_changed();
+
+	if (!is_playtesting()) {
+		rebuild_arena();
+	}
+
+	/*
+		The files are already gone from disk, so persist the project json
+		right away to keep it consistent (otherwise a reload would report
+		the deleted, non-default resources as missing).
+	*/
+
+	dirty_after_resource_hash_changed = true;
+	force_autosave();
+}
+
 bool editor_setup::upload_icon_visible() const {
 	return !settings.upload_api_key.empty();
 }

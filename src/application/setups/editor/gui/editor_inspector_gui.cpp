@@ -3308,6 +3308,50 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				text_disabled("Screenshots are taken with the current zoom,\nthen scaled down if required.");
 			}
 
+			ImGui::Separator();
+
+			text_color("Cleanup", yellow);
+
+			ImGui::Separator();
+
+			text_disabled("Delete all images and sounds no longer\nin use by any node, even if they have\nnon-default settings.");
+			{
+				const auto& history = in.setup.get_history();
+
+				const bool has_unsaved = in.setup.is_dirty() || !history.at_saved_revision();
+				const bool history_empty = history.empty();
+
+				const bool can_remove = history_empty && !has_unsaved;
+
+				auto red_cols = std::make_tuple(
+					cond_scoped_style_color(can_remove, ImGuiCol_Button, rgba(200, 40, 0, 255)),
+					cond_scoped_style_color(can_remove, ImGuiCol_ButtonHovered, rgba(225, 60, 0, 255)),
+					cond_scoped_style_color(can_remove, ImGuiCol_ButtonActive, rgba(250, 80, 0, 255))
+				);
+
+				auto disabled_cols = maybe_disabled_cols(!can_remove);
+
+				if (ImGui::Button("Remove unused resources from disk")) {
+					if (can_remove) {
+						in.setup.prepare_remove_unused_resources();
+					}
+				}
+
+				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+					auto scope = scoped_tooltip();
+
+					if (can_remove) {
+						text("Scan for images and sounds not referenced by any node\nand permanently delete them from disk.");
+					}
+					else if (has_unsaved) {
+						text("Save the project and reload it first.");
+					}
+					else {
+						text("Reload the project first so that the history is empty.");
+					}
+				}
+			}
+
 		}
 		else if (project_current_tab == inspected_project_tab_type::PLAYTESTING) {
 			edit_project_settings_command cmd;

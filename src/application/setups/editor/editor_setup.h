@@ -150,6 +150,9 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	std::optional<simple_popup> autosave_popup;
 	std::optional<simple_popup> invalid_filenames_popup;
 	std::optional<simple_popup> redirect_or_missing_popup;
+	std::optional<simple_popup> remove_unused_resources_popup;
+
+	std::vector<editor_resource_id> pending_unused_resources;
 
 	std::optional<miniature_generator_state> miniature_generator;
 
@@ -819,6 +822,23 @@ public:
 
 	void rebuild_project_internal_resources_gui();
 	void recount_internal_resource_references_if_needed();
+
+	/*
+		Scans all pathed resources (images and sounds) in the project,
+		gathers those that are not referenced by any node,
+		and prepares a confirmation popup before deleting them from disk.
+	*/
+
+	/*
+		Removing unused resources frees them directly from the pools,
+		outside the command system. This would invalidate pool ids stored
+		in the undo history and could crash. So it is only allowed on a freshly
+		opened, already-saved project: empty history and no unsaved changes
+		(the caller is responsible for checking this).
+	*/
+
+	void prepare_remove_unused_resources();
+	void perform_remove_unused_resources();
 
 	bool warp_cursor_once = false;
 

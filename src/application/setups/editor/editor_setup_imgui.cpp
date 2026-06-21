@@ -496,6 +496,32 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			redirect_or_missing_popup = std::nullopt;
 		}
 	}
+	else if (remove_unused_resources_popup) {
+		if (pending_unused_resources.empty()) {
+			if (remove_unused_resources_popup->perform()) {
+				remove_unused_resources_popup = std::nullopt;
+			}
+		}
+		else {
+			if (const auto result = remove_unused_resources_popup->perform({
+				{ "Cancel" },
+				{
+					typesafe_sprintf("Delete (%x)", pending_unused_resources.size()),
+					rgba(200, 40, 0, 255),
+					rgba(25, 20, 0, 255)
+				}
+			})) {
+				remove_unused_resources_popup = std::nullopt;
+
+				if (const bool should_delete = result == 2) {
+					perform_remove_unused_resources();
+				}
+				else {
+					pending_unused_resources.clear();
+				}
+			}
+		}
+	}
 
 	using namespace augs::imgui;
 
