@@ -170,7 +170,8 @@ struct main_menu_gui {
 			output.color_overlay(screen_size, rgba{ 0, 0, 0, 30 });
 		}
 
-		root.draw_background_behind_buttons(context);
+		/* Tint the buttons-background border with the menu amber shade (alpha is overridden inside). */
+		root.draw_background_behind_buttons(context, { 14, 10 }, { 0, 0, 0, 180 }, menu_buttons_colors);
 		world.draw(context);
 
 		auto determined_cursor = assets::necessary_image_id::GUI_CURSOR;

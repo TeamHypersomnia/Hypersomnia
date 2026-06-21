@@ -4581,6 +4581,17 @@ work_result work(
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;
 
+#if !HEADLESS
+				/*
+					Apply the current setup's customized ImGui style.
+					The ImGui style is global state set once at startup, so this is the only way
+					to scope a style (e.g. the main menu's amber gui_style patch from
+					content/menu/config.json) to a particular setup and nowhere else.
+					Takes effect on the next frame's ImGui pass; a one-frame lag is imperceptible.
+				*/
+				ImGui::GetStyle() = viewing_config.gui_style;
+#endif
+
 				configurables.apply(viewing_config);
 				write_buffer.new_settings = viewing_config.window;
 				write_buffer.browser_location = visit_current_setup([&](const auto& setup) { return setup.get_browser_location(); });

@@ -76,12 +76,18 @@ public:
 
 		auto menu_b = 104 + 70;
 
+		const bool draw_socials_in_main_menu = false;
+
 		if constexpr(std::is_same_v<Enum, ingame_menu_button_type>) {
 			menu_b = 20;
 		}
 		else {
 			s_rc.l += 415;
 			s_rc.r += 415;
+
+			if (!draw_socials_in_main_menu) {
+				s_rc.set(0, 0, 0, 0);
+			}
 		}
 
 		auto t = menu_b + 10;
@@ -207,7 +213,14 @@ public:
 		buttons_bg.r += buttons_bg.l + 8;
 #endif
 		buttons_bg.l = 0;
-		buttons_bg.t = 0;
+
+		if constexpr(std::is_same_v<Enum, ingame_menu_button_type>) {
+			buttons_bg.t = 0;
+		}
+		else {
+			buttons_bg.t = 0;
+		}
+
 		buttons_bg.b = (context.get_screen_size().y);
 
 		border_col.a = 35;
