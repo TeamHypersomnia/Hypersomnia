@@ -1109,16 +1109,18 @@ else()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
-# Print version at configure time (for human visibility)
 execute_process(
-  COMMAND ${VERSION_FILE_GENERATOR_PATH} ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
-  OUTPUT_VARIABLE _vergen_output
-  ERROR_VARIABLE _vergen_error
-  RESULT_VARIABLE _vergen_result
+	COMMAND ${GIT_EXECUTABLE} describe --exact-match --tags HEAD
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	OUTPUT_VARIABLE _git_tag
+	ERROR_QUIET
+	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-message(STATUS "Version generator STDOUT:\n${_vergen_output}")
-message(STATUS "Version generator STDERR:\n${_vergen_error}")
-message(STATUS "Version generator exit code: ${_vergen_result}")
+if(_git_tag)
+	message("Building version: ${_git_tag}")
+else()
+	message("Building version: 0.0.0 (no exact tag on current commit)")
+endif()
 
 macro(prefer_static_libraries)
 	if (UNIX)
