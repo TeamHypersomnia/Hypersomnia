@@ -19,12 +19,5 @@ void create_lights(const intercosm& scene, editor_resource_pools& pools) {
 			pool.allocate(res);
 		});
 	}
-
-#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
-	{
-		auto& point_lamp = create_official(official_lights::POINT_LAMP, pools);
-		(void)point_lamp;
-	}
-#endif
 }
 
