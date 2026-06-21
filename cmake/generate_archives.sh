@@ -151,6 +151,19 @@ if [ -f "$EXE_PATH" ]; then
 			exit 1
 		fi
 
+		# Guard against shipping the non-Steam stub in the Steam bundle.
+		# The stub (BUILD_STEAM=0) does not link libsteam_api, so steam_init()
+		# returns DISABLED at runtime -> the game runs as a non-Steam session
+		# (e.g. nickname falls back to "root"). We key on the libsteam_api
+		# dependency (a stable redistributable filename) rather than on any
+		# SteamAPI symbol name, which would break on SDK renames.
+		echo "Verifying the Steam integration dylib is Steam-enabled (links libsteam_api)."
+		if ! otool -L "$STEAM_MACOS_DIR/libsteam_integration.dylib" | grep -q libsteam_api; then
+			echo "ERROR: libsteam_integration.dylib does not link libsteam_api — it is the non-Steam stub."
+			echo "The non-Steam build step likely overwrote $PREBUILT_MACOS; restore the real dylib before packaging."
+			exit 1
+		fi
+
 		echo "Sanitizing extended attributes before signing (Steam bundle)."
 		xattr -cr "$STEAM_APP_PATH" 2>/dev/null || true
 

@@ -33,12 +33,22 @@ jobs:
       run: brew install glfw
     - name: Install sodium
       run: brew install libsodium
+    # The committed bin/macos/libsteam_integration.dylib is the real, Steam-enabled
+    # one. build_nonsteam_integration.sh's "ninja install" overwrites it with the
+    # stub (BUILD_STEAM=0). generate_archives.sh swaps that file back into the Steam
+    # .app bundle, so without a backup/restore the Steam bundle would ship the stub
+    # (steam_init() -> DISABLED -> non-Steam session, "root" nickname). Mirror the
+    # backup/restore that Linux_build.yml already does.
+    - name: Backup Steam lib
+      run: cp cmake/steam_integration/bin/macos/libsteam_integration.dylib libsteam_integration.dylib.bak
     - name: Build Non-Steam libsteam_integration
       run: . cmake/build_nonsteam_integration.sh
     - name: Generate CMake files
       run: export LDFLAGS="-framework Cocoa -framework IOKit -framework CoreFoundation" && cmake/build.sh Release x64 '-DLINK_STEAM_INTEGRATION=1 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl'
     - name: Build
       run: pushd build/current && ninja && ls -alh && otool -L Hypersomnia && otool -l Hypersomnia && ninja tests -k 0 && popd
+    - name: Restore Steam lib
+      run: cp libsteam_integration.dylib.bak cmake/steam_integration/bin/macos/libsteam_integration.dylib
     - name: Generate downloadable archives
       run: cmake/generate_archives.sh MacOS
 
