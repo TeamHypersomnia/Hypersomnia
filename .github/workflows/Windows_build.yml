@@ -85,12 +85,6 @@ jobs:
         ninja --version
       shell: pwsh
 
-    - name: Install LLVM
-      run: |
-        Invoke-WebRequest -Uri https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe -OutFile llvm-installer.exe
-        Start-Process -FilePath llvm-installer.exe -ArgumentList "/S", "/D=C:\Program Files\LLVM" -Wait
-      shell: pwsh
-
     - name: Build
       run: |
         for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do set "VS_PATH=%%i"
@@ -105,7 +99,7 @@ jobs:
         mkdir build
         cd build
         dir
-        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
+        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_LINKER="C:\Program Files\LLVM\bin\lld-link.exe" -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
         ninja
       shell: cmd
 
