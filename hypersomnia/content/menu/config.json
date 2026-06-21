@@ -16,7 +16,7 @@
     }
   },
   "audio_volume": {
-    "music": 1.0
+    "music": 1.4
   },
   "camera": {
     "averages_per_sec": 12

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2026-06-21 20:46:18.375301 UTC"
+        "version_timestamp": "2026-06-21 20:35:13.354012 UTC"
     },
     "about": {
         "author": "lia",
@@ -182,7 +182,7 @@
         },
         {
             "path": "gfx/object2.png",
-            "file_hash": "4b734871e44c41f2a8460480733bb49269d6b9d5b69964bffb3db8808e8094d9",
+            "file_hash": "bd437e7931942016a0947eebb74dbc8e3a3bdd1827449e4490324733bea4f442",
             "id": "@object2",
             "OFF_neon_map": {
                 "standard_deviation": 25.0,
@@ -355,8 +355,6 @@
             "id": "lights",
             "nodes": [
                 "\t (3)",
-                "\t",
-                "\t (1)",
                 "\t (4)",
                 "\t (5)",
                 "\t (12)"
@@ -1555,10 +1553,10 @@
             "id": "\t (4)",
             "type": "point_light",
             "pos": [121.018310546875, -90.98876953125],
-            "color": [255, 71, 0, 204],
+            "color": [255, 111, 0, 255],
             "falloff": {
-                "radius": 2000.0,
-                "strength": 9
+                "radius": 1000.0,
+                "strength": 29
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
@@ -1581,30 +1579,6 @@
             "falloff": {
                 "radius": 1000.0,
                 "strength": 29
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
-            "id": "\t",
-            "type": "point_light",
-            "pos": [-520.0, 261.0],
-            "color": [255, 71, 0, 204],
-            "falloff": {
-                "radius": 2000.0,
-                "strength": 9
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
-            "id": "\t (1)",
-            "type": "point_light",
-            "pos": [414.0, -31.0],
-            "color": [255, 71, 0, 36],
-            "falloff": {
-                "radius": 247.2729949951172,
-                "strength": 4
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
