@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- nie wiem czemu goodbye nie wysyla instancja do mservera
+- sentry
 - dziura w wencie na cyberaqua
 
 - na duze lany kiedys mozna dac hasla na nicki tez przypisywac im
@@ -19,17 +19,12 @@ summary: That which we are brainstorming at the moment.
 	- mega wazne jakby cos sie zjebalo a juz pare punktow poszlo
 	- vote /pause
 		- 2 minuty timeoutu
-	
 
 - pomyslec co sie dizeje jak all abandon ale to juz po piwie
 
 - stestowac jeszcze wszystkie commity, m.in. overtime swap
 - zrobic zeby mi na lokalu wbudowywalo wszystko z dedyka do binarki bo sie zajebie tu
 - czemu mnie ciagle goni w combacie metropolis jak pake musi podniesc?
-
-# Przed Turniejem
-
-- prostszy tutorial
 
 - no throwing mode
 - grid widoczny do tych navmeshy
