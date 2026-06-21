@@ -29,7 +29,9 @@ jobs:
 
     - name: Generate Visual Studio solution files
       run: |
-        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do set "VS_PATH=%%i"
+        echo VS found at: %VS_PATH%
+        call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x64
         echo "where clang-cl:"
         where clang-cl
         echo "clang-cl --version"
@@ -38,6 +40,7 @@ jobs:
         mkdir sln
         cd sln
         cmake -G "Visual Studio 17 2022" -A x64 -T ClangCL ^
+          -DCMAKE_GENERATOR_INSTANCE="%VS_PATH%" ^
           -DLINK_STEAM_INTEGRATION=0 ^
           -DBLAKE_PORTABLE=1 ^
           -DARCHITECTURE="x64" ^
@@ -56,7 +59,8 @@ jobs:
 
 #   - name: Build Hypersomnia.sln with MSBuild
 #     run: |
-#       call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+#       for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do set "VS_PATH=%%i"
+#       call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x64
 #       msbuild sln/Hypersomnia.sln /p:Configuration=Release /p:Platform=x64 /m
 #     shell: cmd
 
@@ -90,7 +94,8 @@ jobs:
 
     - name: Build
       run: |
-        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do set "VS_PATH=%%i"
+        call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x64
         cd cmake\steam_integration
         mkdir build
         cd build
