@@ -60,12 +60,14 @@ struct main_menu_setup_detail {
 };
 
 void main_menu_setup::customize_for_viewing(config_json_table& config) const {
+	const auto previous_music_volume = config.audio_volume.music;
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;
 	augs::read_json(detail->patch, config);
 	
 	/* Treat new volume as a multiplier */
 
 	config.audio_volume.sound_effects *= previous_sfx_volume;
+	config.audio_volume.music *= previous_music_volume;
 	config.drawing.cinematic_mode = true;
 	config.drawing.custom_zoom = 3.0f;
 }
@@ -177,7 +179,7 @@ main_menu_setup::main_menu_setup(
 			ruleset = *r;
 		}
 
-		viewed_character_id = cosm[mode.lookup(mode.add_player({ dummy_dynamic_vars, ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
+		viewed_character_id = cosm[mode.lookup(mode.add_player({ dummy_dynamic_vars, ruleset, cosm }, "Player", faction_type::RESISTANCE))].get_id();
 	}
 
 	const bool is_recording_available = is_intro_scene_available && false;

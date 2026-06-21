@@ -361,6 +361,8 @@ enum class test_remnant_bodies {
 
 enum class test_sound_decorations {
 	// GEN INTROSPECTOR enum class test_sound_decorations
+	AMBIENCE_WIND,
+
 	AQUARIUM_AMBIENCE_LEFT,
 	AQUARIUM_AMBIENCE_RIGHT,
 

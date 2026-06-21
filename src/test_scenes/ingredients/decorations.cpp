@@ -460,8 +460,9 @@ namespace test_flavours {
 
 		auto& flavours = in.flavours;
 
-		auto make_loop = [&](auto& meta) {
+		auto make_loop = [&](auto& meta) -> auto& {
 			meta.template get<invariants::continuous_sound>().effect.modifier.repetitions = -1;
+			return meta;
 		};
 
 		auto flavour_with_sound = [&](
@@ -472,7 +473,8 @@ namespace test_flavours {
 			const auto max_distance,
 			const real32 doppler = 1.f,
 			const real32 gain = 1.f,
-			const real32 pitch = 1.f
+			const real32 pitch = 1.f,
+			const bool stereo = false
 		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -485,6 +487,7 @@ namespace test_flavours {
 			sound_def.effect.modifier.gain = gain;
 			sound_def.effect.modifier.pitch = pitch;
 			sound_def.effect.modifier.repetitions = 1;
+			sound_def.effect.modifier.always_direct_listener = stereo;
 			meta.set(sound_def);
 
 			return meta;
@@ -604,6 +607,18 @@ namespace test_flavours {
 			530.f,
 			2000.f,
 			0.f
+		));
+
+		make_loop(flavour_with_sound(
+			test_sound_decorations::AMBIENCE_WIND,
+			test_scene_sound_id::AMBIENCE_WIND,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			530.f,
+			2000.f,
+			0.f,
+			1.0f, 
+			1.0f,
+			true
 		));
 
 		make_loop(flavour_with_sound(
