@@ -288,9 +288,6 @@ rgba& rgba::mult_brightness(const float mult) {
 	return set_hsl(h);
 }
 
-rgba rgba::zero = rgba(0, 0, 0, 0);
-rgba rgba::faction_color = rgba(0, 0, 0, 1);
-
 rgba rgba::get_bright_wave(const double secs, const double upperLimit1, const double lowerLimit2) {
 	const auto cycleTime = std::fmod(secs, 1.0); 
 	const auto wave = std::sin(cycleTime * 2 * PI<double>);
@@ -306,3 +303,9 @@ rgba rgba::get_bright_wave(const double secs, const double upperLimit1, const do
 	return rgba(hsv{ hue, 1.0, 1.0 });
 }
 
+rgba rgba::zero = rgba(0, 0, 0, 0);
+rgba rgba::faction_color = rgba(0, 0, 0, 1);
+
+rgba menu_buttons_colors = rgba(255, 255, 255, 120);
+rgba quick_play_color = rgba(0xff, 0xff, 0x00, 255);
+rgba download_maps_color = rgba(0xff, 0xA5, 0x00, 255);

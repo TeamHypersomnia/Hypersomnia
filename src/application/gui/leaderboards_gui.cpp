@@ -249,7 +249,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		text_color(std::string("Refreshing")+loading_dots, yellow);
 	}
 	else {
-		text_color(typesafe_sprintf("Welcome home,", in.nickname), green);
+		text_color(typesafe_sprintf("Welcome home,", in.nickname), rgba(255, 215, 0, 255));
 	}
 
 	ImGui::Columns(3);

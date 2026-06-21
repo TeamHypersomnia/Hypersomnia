@@ -454,3 +454,7 @@ inline const rgba vslightgray(220, 220, 220, 255);
 inline const rgba vsdarkgray(127, 127, 127, 255);
 
 inline const rgba turquoise(0, 146, 222, 255);
+
+extern rgba menu_buttons_colors;
+extern rgba quick_play_color;
+extern rgba download_maps_color;

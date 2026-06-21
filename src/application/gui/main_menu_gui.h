@@ -132,9 +132,9 @@ struct main_menu_gui {
 	) {
 		const auto& gui_font = context.get_gui_font();
 
-		root.set_menu_buttons_colors(cyan);
-		root.buttons[std::size_t(main_menu_button_type::DOWNLOAD_MAPS)].colorize = rgba(green).mult_brightness(1.2f);
-		root.buttons[std::size_t(main_menu_button_type::QUICK_PLAY)].colorize = rgba(pink).mult_brightness(1.4f);
+		root.set_menu_buttons_colors(menu_buttons_colors);
+		root.buttons[std::size_t(main_menu_button_type::DOWNLOAD_MAPS)].colorize = rgba(download_maps_color).mult_brightness(1.2f);
+		root.buttons[std::size_t(main_menu_button_type::QUICK_PLAY)].colorize = rgba(quick_play_color).mult_brightness(1.4f);
 
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 

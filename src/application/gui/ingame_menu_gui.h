@@ -106,7 +106,7 @@ struct ingame_menu_gui {
 		root.buttons[int(ingame_menu_button_type::DISCORD)].special_image = assets::necessary_image_id::DISCORD_BUTTON;
 		root.buttons[int(ingame_menu_button_type::GITHUB)].special_image = assets::necessary_image_id::GITHUB_BUTTON;
 
-		root.set_menu_buttons_colors(cyan);
+		root.set_menu_buttons_colors(menu_buttons_colors);
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
 		root.buttons[int(ingame_menu_button_type::STEAM)].colorize = white;
