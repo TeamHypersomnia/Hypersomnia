@@ -181,4 +181,3 @@ Most bugs were introduced by bots in `1.3.0`:
 ### Notes
 
 - This is the first tagged version. Previous work existed but wasn't versioned.
-
