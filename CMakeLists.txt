@@ -1379,11 +1379,11 @@ if (NOT USE_O3)
 	message("Forcing use of O2.")
 
 	string(REPLACE "O3" "O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-	string(REPLACE "O3" "O2" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O3" "O2" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 else()
 	message("Forcing use of O3.")
 	string(REPLACE "O2" "O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-	string(REPLACE "O2" "O3" CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+	string(REPLACE "O2" "O3" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 endif()
 
 if (LINK_TIME_OPTIMIZATION)
@@ -2025,6 +2025,24 @@ if(MSVC)
 	endif()
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+endif()
+
+# Optionally enable cpp-httplib compression backends if available.
+# sudo apt install zlib1g-dev libbrotli-dev
+
+find_package(ZLIB)
+if(ZLIB_FOUND)
+	add_definitions(-DCPPHTTPLIB_ZLIB_SUPPORT)
+	target_link_libraries(Hypersomnia ZLIB::ZLIB)
+endif()
+
+find_path(BROTLI_INCLUDE_DIR brotli/decode.h)
+find_library(BROTLI_DEC brotlidec)
+find_library(BROTLI_ENC brotlienc)
+find_library(BROTLI_COM brotlicommon)
+if(BROTLI_INCLUDE_DIR AND BROTLI_DEC AND BROTLI_ENC AND BROTLI_COM)
+	add_definitions(-DCPPHTTPLIB_BROTLI_SUPPORT)
+	target_link_libraries(Hypersomnia ${BROTLI_DEC} ${BROTLI_ENC} ${BROTLI_COM})
 endif()
 
 # We define libraries upon which Hypersomnia depends.
