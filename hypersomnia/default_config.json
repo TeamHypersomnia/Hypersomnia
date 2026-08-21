@@ -206,10 +206,6 @@
         "radar_pos": [-201.0, 84.0],
         "print_current_character_callout": true,
         "nickname_characters_for_offscreen_indicators": 4,
-        "fog_of_war": {
-            "angle": 165.0,
-            "size": [1920.0, 1080.0]
-        },
         "fog_of_war_appearance": {
             "overlay_color_on_visible": false,
             "overlay_color": [0, 0, 0, 40]

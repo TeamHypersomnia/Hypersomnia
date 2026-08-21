@@ -100,13 +100,27 @@ struct game_drawing_settings {
 	bool print_current_character_callout = false;
 	int nickname_characters_for_offscreen_indicators = 4;
 
-	fog_of_war_settings fog_of_war;
 	fog_of_war_appearance_settings fog_of_war_appearance;
 	crosshair_drawing_settings crosshair;
 
 	bool teammates_are_enemies = false;
 	bool stencil_before_light_pass = false;
 	// END GEN INTROSPECTOR
+
+	/*
+		Deliberately outside the introspector so it cannot be set from config
+		files - players must not be able to easily zoom the camera out.
+		When > 0, sets the camera zoom exactly to this multiplier and bypasses
+		the balance zoom-out. Used by the main menu for the exact 3x effect.
+	*/
+	float _override_zoom = 0.0f;
+
+	/*
+		Not introspected: never read from the player's config. It is filled at
+		runtime from the active mode ruleset (see arena_handle::adjust), and
+		defaults to the balance constants when no mode is adjusting it.
+	*/
+	fog_of_war_settings fog_of_war;
 
 	bool operator==(const game_drawing_settings& b) const = default;
 };

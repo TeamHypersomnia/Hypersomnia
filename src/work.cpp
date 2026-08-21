@@ -54,6 +54,7 @@
 #include "augs/misc/mutex.h"
 #include "augs/misc/future.h"
 
+#include "game/balance_params.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -2761,12 +2762,20 @@ work_result work(
 		return gameplay_camera.current_edge_zoomout_mult;
 	};
 
-	WEBSTATIC auto get_camera_requested_fov_expansion = [&]() {		
+	WEBSTATIC auto get_camera_requested_fov_expansion = [&]() {
 		auto result = 1.0f / get_logic_eye(false).zoom;
 
 		if (get_camera_edge_zoomout_mult() > 0.001f) {
 			result /= max_zoom_out_at_edges_v;
 		}
+
+		/*
+			The camera always zooms out by BALANCE_ZOOM_OUT (see get_camera_eye),
+			which widens the visible area by 1 / BALANCE_ZOOM_OUT. This value only
+			feeds fog-of-war sizing, so fold the same factor in here to keep the fog
+			reaching the screen edges both at rest and during edge zoom-out.
+		*/
+		result /= BALANCE_ZOOM_OUT;
 
 		return result;
 	};
@@ -2812,7 +2821,13 @@ work_result work(
 			logic_eye.zoom *= zoom_to_snap_to_fov;
 		}
 
-		logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
+		if (const auto override_zoom = viewing_config.drawing._override_zoom; override_zoom > 0.0f) {
+			logic_eye.zoom *= override_zoom;
+		}
+		else {
+			logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
+			logic_eye.zoom *= BALANCE_ZOOM_OUT;
+		}
 
 		return logic_eye;
 	};

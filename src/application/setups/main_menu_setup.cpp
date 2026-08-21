@@ -69,7 +69,11 @@ void main_menu_setup::customize_for_viewing(config_json_table& config) const {
 	config.audio_volume.sound_effects *= previous_sfx_volume;
 	config.audio_volume.music *= previous_music_volume;
 	config.drawing.cinematic_mode = true;
-	config.drawing.custom_zoom = 3.0f;
+	/*
+		Use the non-introspected override so the menu keeps an exact 3x zoom,
+		unaffected by the balance zoom-out applied during gameplay.
+	*/
+	config.drawing._override_zoom = 3.0f;
 }
 
 void main_menu_setup::apply(const config_json_table& config) {

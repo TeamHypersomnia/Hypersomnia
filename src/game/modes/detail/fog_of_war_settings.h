@@ -1,6 +1,13 @@
 #pragma once
 #include "augs/math/vec2.h"
 
+/*
+	These are ruleset values, derived from the map JSON - not player-editable.
+	The size doubles as the snap-to-fov target for the camera zoom, so the
+	balance zoom-out is folded into the fov expansion (see
+	get_camera_requested_fov_expansion) rather than baked into this size.
+*/
+
 struct fog_of_war_settings {
 	// GEN INTROSPECTOR struct fog_of_war_settings
 	real32 angle = 165.f;

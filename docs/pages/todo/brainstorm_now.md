@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- miejscowe zoomy na open areas zamiast odzoomowywac
+	- best of both worlds
+
+- /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg
+- odzoomowac do 85% i synchronizowac custom zoom z fowem zawsze
+- na mapkach pozwalac na zmieniony zoom
+	- tez synchro z fowem
+
 - sentry
 
 - na duze lany kiedys mozna dac hasla na nicki tez przypisywac im
