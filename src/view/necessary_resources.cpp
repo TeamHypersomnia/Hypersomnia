@@ -43,6 +43,8 @@ void all_necessary_fbos::apply(
 	reset(smoke);
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(flash_afterimage);
+	reset(bloom);
+	reset(bloom_blur);
 }
 
 all_necessary_shaders::all_necessary_shaders(
@@ -129,6 +131,26 @@ all_necessary_shaders::all_necessary_shaders(
 	if (neon_occluder) {
 		neon_occluder->set_as_current(renderer);
 		neon_occluder->set_uniform(renderer, U::basic_texture, 0);
+	}
+
+	if (bloom_blur) {
+		bloom_blur->set_as_current(renderer);
+		bloom_blur->set_uniform(renderer, U::basic_texture, 4);
+	}
+
+	if (bloom_blur_v) {
+		bloom_blur_v->set_as_current(renderer);
+		bloom_blur_v->set_uniform(renderer, U::basic_texture, 5);
+	}
+
+	if (bloom_darken) {
+		bloom_darken->set_as_current(renderer);
+		bloom_darken->set_uniform(renderer, U::basic_texture, 4);
+	}
+
+	if (bloom_overlay) {
+		bloom_overlay->set_as_current(renderer);
+		bloom_overlay->set_uniform(renderer, U::basic_texture, 4);
 	}
 } 
 catch (const augs::graphics::shader_compilation_error& err) {

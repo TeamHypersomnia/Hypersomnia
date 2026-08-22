@@ -46,6 +46,8 @@ struct all_necessary_fbos {
 	optional_fbo smoke;
 	optional_fbo light;
 	optional_fbo flash_afterimage;
+	optional_fbo bloom;
+	optional_fbo bloom_blur;
 
 	all_necessary_fbos(
 		const vec2i screen_size, 
@@ -71,6 +73,10 @@ struct all_necessary_shaders {
 	optional_shader textured_light;
 	optional_shader flash_afterimage;
 	optional_shader neon_occluder;
+	optional_shader bloom_blur;
+	optional_shader bloom_blur_v;
+	optional_shader bloom_darken;
+	optional_shader bloom_overlay;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

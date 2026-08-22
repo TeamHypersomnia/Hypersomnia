@@ -58,6 +58,9 @@ struct game_drawing_settings {
 	bool draw_enemy_silhouettes_in_spectator = true;
 
 	bool draw_bullet_shadows = true;
+	bool draw_bloom = true;
+	float bloom_intensity = 2.0f;
+	float bloom_darkening = 0.6f;
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_aabb_highlighter = true;

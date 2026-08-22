@@ -819,6 +819,15 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
 
+				revertable_checkbox("Bloom", config.drawing.draw_bloom);
+
+				if (config.drawing.draw_bloom) {
+					auto scope = scoped_indent();
+
+					revertable_slider("Bloom intensity", config.drawing.bloom_intensity, 0.f, 5.f);
+					revertable_slider("Bloom darkening", config.drawing.bloom_darkening, 0.f, 1.f);
+				}
+
 				{
 					auto& scope_cfg = config.performance.special_effects;
 					revertable_slider(SCOPE_CFG_NVP(muzzle_flash_intensity), 0.f, 1.f);

@@ -100,6 +100,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	const auto queried_cone = in.queried_cone;
 
+	const bool bloom_effective =
+		settings.draw_bloom
+		&& fbos.bloom.has_value()
+		&& fbos.bloom_blur.has_value()
+		&& shaders.bloom_blur.has_value()
+		&& shaders.bloom_blur_v.has_value()
+		&& shaders.bloom_darken.has_value()
+		&& shaders.bloom_overlay.has_value()
+	;
+
 	auto& profiler = in.frame_performance;
 	auto& renderer = in.renderer;
 
@@ -702,7 +712,50 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_particles(particle_layer::ILLUMINATING_SMOKES);
 
 	renderer.call_and_clear_triangles();
-	
+
+	if (bloom_effective) {
+		/*
+			Accumulate the bloom sources: missile neons and neon particles
+			(muzzle flashes emit NEONING_PARTICLES), still with additive blending.
+		*/
+
+		fbos.bloom->set_as_current(renderer);
+
+		renderer.set_clear_color(rgba(0, 0, 0, 0));
+		renderer.clear_current_fbo();
+
+		renderer.call_triangles(D::MISSILES_NEONS);
+		draw_particles_neons();
+
+		/*
+			Horizontal blur pass: bloom fbo -> bloom_blur fbo,
+			then the vertical pass back: bloom_blur fbo -> bloom fbo.
+			After these, the bloom fbo holds the fully blurred glow.
+		*/
+
+		fbos.bloom_blur->set_as_current(renderer);
+		renderer.clear_current_fbo();
+
+		renderer.set_active_texture(4);
+		bind_and_update_filtering(fbos.bloom->get_texture());
+		renderer.set_active_texture(0);
+
+		set_shader(shaders.bloom_blur);
+		renderer.fullscreen_quad();
+
+		fbos.bloom->set_as_current(renderer);
+		renderer.clear_current_fbo();
+
+		renderer.set_active_texture(5);
+		bind_and_update_filtering(fbos.bloom_blur->get_texture());
+		renderer.set_active_texture(0);
+
+		set_shader(shaders.bloom_blur_v);
+		renderer.fullscreen_quad();
+
+		set_shader(shaders.standard);
+	}
+
 	renderer.set_standard_blending();
 
 	augs::graphics::fbo::set_current_to_marked(in.renderer);
@@ -816,6 +869,40 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	if (strict_fow) {
 		renderer.set_stencil(false);
+	}
+
+	if (bloom_effective) {
+		/*
+			Camera-exposure-like darkening of the glow's surroundings,
+			then the additive composite of the glow itself on top.
+		*/
+
+		renderer.set_active_texture(4);
+		bind_and_update_filtering(fbos.bloom->get_texture());
+		renderer.set_active_texture(0);
+
+		if (strict_fow) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+		}
+
+		set_shader(shaders.bloom_darken);
+		set_uniform(shaders.bloom_darken, U::bloom_darkening, settings.bloom_darkening);
+
+		renderer.fullscreen_quad();
+
+		set_shader(shaders.bloom_overlay);
+		set_uniform(shaders.bloom_overlay, U::bloom_intensity, settings.bloom_intensity);
+
+		renderer.set_additive_blending();
+		renderer.fullscreen_quad();
+
+		if (strict_fow) {
+			renderer.set_stencil(false);
+		}
+
+		renderer.set_standard_blending();
+		set_shader(shaders.standard);
 	}
 
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);

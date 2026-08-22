@@ -20,6 +20,8 @@ namespace augs {
 		light_texture,
 		afterimage_texture,
 		global_color,
+		bloom_intensity,
+		bloom_darkening,
 
 		COUNT
 		// END GEN INTROSPECTOR
