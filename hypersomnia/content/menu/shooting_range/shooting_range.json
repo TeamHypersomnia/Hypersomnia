@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-05-08 21:48:24.807064 UTC"
+        "version_timestamp": "2026-08-31 19:49:05.839986 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -9,7 +9,7 @@
     },
     "settings": {
         "default_server_mode": "quick_test",
-        "ambient_light_color": [0, 67, 90, 255]
+        "ambient_light_color": [6, 42, 63, 255]
     },
     "playtesting": {
         "mode": "quick_test"
@@ -89,7 +89,7 @@
                 "light_colors": [[95, 205, 228, 255, 1.0]
                 ]
             },
-            "neon_color": [255, 255, 255, 106],
+            "neon_color": [255, 255, 255, 0],
             "size": [64, 64],
             "as_nonphysical": {
                 "custom_footstep": {
@@ -103,7 +103,6 @@
             "path": "gfx/water_room_floor_2.png",
             "file_hash": "9d7d4e14d04d6bda52e7c7b59ed0f177caadf5e3a486fde33f1fce82883e0826",
             "id": "@water_room_floor_2",
-            "color": [255, 132, 132, 255],
             "neon_color": [255, 255, 255, 106],
             "size": [64, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -190,6 +189,76 @@
     ],
     "layers": [
         {
+            "id": "Layer 24",
+            "nodes": [
+                "green_coin (5)",
+                "green_coin (4)",
+                "green_coin (3)",
+                "crystal_coin (8)",
+                "crystal_coin (7)",
+                "crystal_coin (6)",
+                "crystal_coin (5)",
+                "crystal_coin (4)",
+                "crystal_coin (3)",
+                "platinum_coin",
+                "platinum_coin (1)",
+                "platinum_coin (2)",
+                "gold_coin",
+                "gold_coin (1)",
+                "gold_coin (2)"
+            ]
+        },
+        {
+            "id": "Layer 23"
+        },
+        {
+            "id": "Layer 22"
+        },
+        {
+            "id": "Layer 21"
+        },
+        {
+            "id": "Layer 20",
+            "nodes": [
+                "point_light (8)",
+                "point_light (7)",
+                "point_light (3)"
+            ]
+        },
+        {
+            "id": "Layer 19"
+        },
+        {
+            "id": "Layer 18",
+            "nodes": [
+                "dev_wall_256 (3)",
+                "dev_wall_256 (2)",
+                "dev_wall_256 (4)",
+                "aquarium_bottom_lamp_light-down (3)",
+                "aquarium_bottom_lamp_body-down (3)",
+                "aquarium_bottom_lamp_light (3)",
+                "aquarium_bottom_lamp_body (3)",
+                "aquarium_bottom_lamp_light-down (2)",
+                "aquarium_bottom_lamp_body-down (2)",
+                "aquarium_bottom_lamp_light (2)",
+                "aquarium_bottom_lamp_body (2)",
+                "aquarium_bottom_lamp_light-down (1)",
+                "aquarium_bottom_lamp_body-down (1)",
+                "aquarium_bottom_lamp_light (1)",
+                "aquarium_bottom_lamp_body (1)",
+                "aquarium_bottom_lamp_light-down",
+                "aquarium_bottom_lamp_body-down",
+                "aquarium_bottom_lamp_light",
+                "aquarium_bottom_lamp_body",
+                "point_light (2)",
+                "point_light",
+                "dev_floor_256 (1)",
+                "dev_wall_256 (5)",
+                "dev_wall_256 (1)",
+                "dev_wall_256"
+            ]
+        },
+        {
             "id": "Layer 17",
             "nodes": [
                 "sword-right (1)",
@@ -252,16 +321,6 @@
         {
             "id": "Layer 3",
             "nodes": [
-                "lab_wall-up (1)-left",
-                "lab_wall (1)-left",
-                "lab_wall-up-left (1)",
-                "lab_wall-left (1)",
-                "lab_wall-up-left",
-                "lab_wall-left",
-                "lab_wall-up (1)",
-                "lab_wall (1)",
-                "lab_wall-up",
-                "lab_wall",
                 "aquarium"
             ]
         },
@@ -408,6 +467,10 @@
             "id": "Layer 7",
             "nodes": [
                 "dev_floor_128 (2)",
+                "point_light (6)",
+                "point_light (5)",
+                "point_light (4)",
+                "point_light (1)",
                 "dev_floor_128"
             ]
         },
@@ -610,6 +673,9 @@
             "id": "New layer",
             "nodes": [
                 "Water room floor-brighter-right",
+                "dev_wall_128 (1)",
+                "dev_wall_128 (2)",
+                "dev_wall_128",
                 "Water room floor-brighter",
                 "Water room floor-brighter (1)"
             ]
@@ -919,8 +985,7 @@
             "id": "Water room floor-brighter",
             "type": "@water_room_floor",
             "pos": [-3872.0, 5088.0],
-            "size": [6208, 7744],
-            "color": [255, 132, 132, 255]
+            "size": [6208, 7744]
         },
         {
             "id": "water_room_floor_2",
@@ -979,7 +1044,6 @@
             "type": "@water_room_floor",
             "pos": [2336.0, 5248.0],
             "size": [3136, 7424],
-            "color": [255, 132, 132, 255],
             "flip_horizontally": true
         },
         {
@@ -988,81 +1052,6 @@
             "pos": [5088.0, 5248.0],
             "size": [2368, 7424],
             "flip_horizontally": true
-        },
-        {
-            "id": "lab_wall",
-            "type": "lab_wall",
-            "pos": [3040.0, 1200.0],
-            "size": [1856, 32]
-        },
-        {
-            "id": "lab_wall-up",
-            "type": "lab_wall",
-            "pos": [3040.0, 1168.0],
-            "size": [1856, 32],
-            "flip_vertically": true
-        },
-        {
-            "id": "lab_wall (1)",
-            "type": "lab_wall",
-            "pos": [3984.0, 4031.99951171875],
-            "rotation": 90.0,
-            "size": [5760, 32]
-        },
-        {
-            "id": "lab_wall-up (1)",
-            "type": "lab_wall",
-            "pos": [4016.0, 4031.99951171875],
-            "rotation": 90.0,
-            "size": [5760, 32],
-            "flip_vertically": true
-        },
-        {
-            "id": "lab_wall-left",
-            "type": "lab_wall",
-            "pos": [-3040.0, 1200.0],
-            "size": [1856, 32],
-            "flip_horizontally": true
-        },
-        {
-            "id": "lab_wall-up-left",
-            "type": "lab_wall",
-            "pos": [-3040.0, 1168.0],
-            "size": [1856, 32],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "lab_wall (1)-left",
-            "type": "lab_wall",
-            "pos": [-3984.0, 4031.99951171875],
-            "rotation": -90.0,
-            "size": [5760, 32],
-            "flip_horizontally": true
-        },
-        {
-            "id": "lab_wall-up (1)-left",
-            "type": "lab_wall",
-            "pos": [-4016.0, 4031.99951171875],
-            "rotation": -90.0,
-            "size": [5760, 32],
-            "flip_horizontally": true,
-            "flip_vertically": true
-        },
-        {
-            "id": "lab_wall-left (1)",
-            "type": "lab_wall",
-            "pos": [0.0, 6960.0],
-            "size": [8064, 32],
-            "flip_horizontally": true
-        },
-        {
-            "id": "lab_wall-up-left (1)",
-            "type": "lab_wall",
-            "pos": [0.0, 6928.0],
-            "size": [8064, 32],
-            "flip_horizontally": true,
-            "flip_vertically": true
         },
         {
             "id": "crate",
@@ -1212,8 +1201,177 @@
         {
             "id": "water_room_floor_2 (4)",
             "type": "@water_room_floor_2",
-            "pos": [-2496.0, 3840.0],
-            "size": [192, 1280]
+            "pos": [-2464.0, 3840.0],
+            "size": [192, 1536]
+        },
+        {
+            "id": "dev_wall_256",
+            "type": "dev_wall_256",
+            "pos": [-7040.0, 1792.0],
+            "size": [6144, 10240]
+        },
+        {
+            "id": "dev_wall_256 (1)",
+            "type": "dev_wall_256",
+            "pos": [-3072.0, -1024.0],
+            "size": [1792, 4608]
+        },
+        {
+            "id": "dev_wall_256 (2)",
+            "type": "dev_wall_256",
+            "pos": [3072.0, 896.0],
+            "size": [1792, 768]
+        },
+        {
+            "id": "dev_wall_256 (3)",
+            "type": "dev_wall_256",
+            "pos": [6016.0, 3712.0],
+            "size": [4096, 6400]
+        },
+        {
+            "id": "dev_wall_256 (4)",
+            "type": "dev_wall_256",
+            "pos": [-1024.0, 9344.0],
+            "size": [18176, 4864]
+        },
+        {
+            "id": "dev_floor_256 (1)",
+            "type": "dev_floor_256",
+            "pos": [-3328.0, 3840.0],
+            "size": [1792, 1536]
+        },
+        {
+            "id": "dev_wall_128",
+            "type": "dev_wall_128",
+            "pos": [-3775.999755859375, 4160.0]
+        },
+        {
+            "id": "dev_wall_128 (2)",
+            "type": "dev_wall_128",
+            "pos": [-3391.999755859375, 3520.0]
+        },
+        {
+            "id": "dev_wall_128 (1)",
+            "type": "dev_wall_128",
+            "pos": [-3264.0, 4032.0]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3558.0, 3220.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3558.0, 3220.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3558.0, 3183.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3558.0, 3183.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body (1)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3611.0, 3220.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (1)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3611.0, 3220.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (1)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3611.0, 3183.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (1)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3611.0, 3183.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body (2)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3558.0, 4502.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (2)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3558.0, 4502.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (2)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3558.0, 4465.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (2)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3558.0, 4465.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body (3)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3611.0, 4502.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (3)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3611.0, 4502.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (3)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-3611.0, 4465.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (3)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-3611.0, 4465.0],
+            "rotation": -180.0,
+            "color": [0, 157, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "dev_wall_256 (5)",
+            "type": "dev_wall_256",
+            "pos": [2944.0, -1408.0],
+            "size": [10240, 3840]
         },
         {
             "id": "aquarium_ambience_left",
@@ -1229,7 +1387,7 @@
             "id": "Strong lamp (2)",
             "type": "point_light",
             "pos": [2945.0, 1297.0],
-            "color": [80, 255, 71, 94],
+            "color": [255, 183, 71, 94],
             "falloff": {
                 "constant": 0.968999981880188,
                 "linear": 0.03100001811981201,
@@ -1245,7 +1403,7 @@
             "id": "Strong lamp",
             "type": "point_light",
             "pos": [-2577.0, 1327.0],
-            "color": [80, 255, 71, 94],
+            "color": [255, 183, 71, 94],
             "falloff": {
                 "constant": 0.968999981880188,
                 "linear": 0.03100001811981201,
@@ -1256,6 +1414,106 @@
                 "radius": 962.9630126953125,
                 "strength": 23
             }
+        },
+        {
+            "id": "point_light (1)",
+            "type": "point_light",
+            "pos": [-1.0, 3583.0],
+            "color": [255, 220, 0, 60],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (4)",
+            "type": "point_light",
+            "pos": [1.0, 4095.0],
+            "color": [0, 180, 255, 65],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (5)",
+            "type": "point_light",
+            "pos": [-1.0, 4609.0],
+            "color": [255, 255, 255, 13],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (6)",
+            "type": "point_light",
+            "pos": [-1.0, 5121.0],
+            "color": [0, 255, 126, 46],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light",
+            "type": "point_light",
+            "pos": [-3585.0, 4483.0],
+            "color": [0, 157, 255, 41],
+            "falloff": {
+                "radius": 1240.0
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (2)",
+            "type": "point_light",
+            "pos": [-3585.0, 3201.0],
+            "color": [0, 157, 255, 41],
+            "falloff": {
+                "radius": 1240.0
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (3)",
+            "type": "point_light",
+            "pos": [-3777.0, 4161.0],
+            "falloff": {
+                "radius": 221.8179931640625
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (7)",
+            "type": "point_light",
+            "pos": [-3265.0, 4033.0],
+            "falloff": {
+                "radius": 221.8179931640625
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (8)",
+            "type": "point_light",
+            "pos": [-3393.0, 3521.0],
+            "falloff": {
+                "radius": 221.8179931640625
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
         },
         {
             "id": "interference_grenade",
@@ -2039,10 +2297,85 @@
             "pos": [-1782.0, 2992.0]
         },
         {
+            "id": "gold_coin (2)",
+            "type": "gold_coin",
+            "pos": [-3179.0, 4084.999755859375]
+        },
+        {
+            "id": "gold_coin (1)",
+            "type": "gold_coin",
+            "pos": [-3179.0, 4027.0]
+        },
+        {
+            "id": "gold_coin",
+            "type": "gold_coin",
+            "pos": [-3179.0, 3979.0]
+        },
+        {
+            "id": "green_coin (3)",
+            "type": "green_coin",
+            "pos": [-3866.999755859375, 4213.0]
+        },
+        {
+            "id": "green_coin (4)",
+            "type": "green_coin",
+            "pos": [-3866.999755859375, 4155.0]
+        },
+        {
+            "id": "green_coin (5)",
+            "type": "green_coin",
+            "pos": [-3866.999755859375, 4107.0]
+        },
+        {
+            "id": "platinum_coin (2)",
+            "type": "platinum_coin",
+            "pos": [-3304.0, 3575.999755859375]
+        },
+        {
+            "id": "platinum_coin (1)",
+            "type": "platinum_coin",
+            "pos": [-3304.0, 3518.0]
+        },
+        {
+            "id": "platinum_coin",
+            "type": "platinum_coin",
+            "pos": [-3304.0, 3470.0]
+        },
+        {
+            "id": "crystal_coin (3)",
+            "type": "crystal_coin",
+            "pos": [-3634.999755859375, 3202.0]
+        },
+        {
+            "id": "crystal_coin (4)",
+            "type": "crystal_coin",
+            "pos": [-3584.999755859375, 3202.0]
+        },
+        {
+            "id": "crystal_coin (5)",
+            "type": "crystal_coin",
+            "pos": [-3534.999755859375, 3202.0]
+        },
+        {
+            "id": "crystal_coin (6)",
+            "type": "crystal_coin",
+            "pos": [-3634.999755859375, 4483.0]
+        },
+        {
+            "id": "crystal_coin (7)",
+            "type": "crystal_coin",
+            "pos": [-3584.999755859375, 4483.0]
+        },
+        {
+            "id": "crystal_coin (8)",
+            "type": "crystal_coin",
+            "pos": [-3534.999755859375, 4483.0]
+        },
+        {
             "id": "aquarium",
             "type": "aquarium",
             "pos": [0.0, 896.0],
-            "size": [4224, 768]
+            "size": [4352, 768]
         },
         {
             "id": "team_spawn",
@@ -2419,7 +2752,6 @@
             "id": "portal (4)",
             "type": "portal",
             "pos": [-3584.0, 6528.0],
-            "color_preset": "PINK",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
@@ -2431,7 +2763,7 @@
             "type": "portal",
             "pos": [3584.0, 6528.0],
             "rotation": -90.0,
-            "color_preset": "PINK",
+            "color_preset": "YELLOW",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
@@ -2441,9 +2773,9 @@
         {
             "id": "portal (6)",
             "type": "portal",
-            "pos": [3584.0, 1728.0001220703125],
+            "pos": [3584.0, 1664.0001220703125],
             "rotation": -180.0,
-            "color_preset": "PINK",
+            "color_preset": "YELLOW",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
@@ -2453,9 +2785,8 @@
         {
             "id": "portal (7)",
             "type": "portal",
-            "pos": [-3584.0, 1600.0],
+            "pos": [-3584.0, 1664.0],
             "rotation": 90.0,
-            "color_preset": "PINK",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
@@ -2467,7 +2798,7 @@
             "type": "portal",
             "pos": [3584.0, 4096.0],
             "rotation": -90.0,
-            "color_preset": "PINK",
+            "color_preset": "YELLOW",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
@@ -2479,7 +2810,7 @@
             "type": "portal",
             "pos": [3584.0, 5760.0],
             "rotation": -90.0,
-            "color_preset": "PINK",
+            "color_preset": "YELLOW",
             "trampoline_like": true,
             "character_exit_impulse": {
                 "amount": 20000.0,
