@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <optional>
 #include <unordered_map>
 #include "augs/misc/simple_pair.h"
 
@@ -137,6 +138,18 @@ public:
 
 	struct orbital_cache : basic_cache {
 		absolute_or_local chasing;
+
+		/*
+			The chased entity's emitter transform as of the moment before its position
+			changed abruptly (a teleport) or before it was deleted
+			(e.g. a bullet breaking against a wall).
+
+			When set, the next advance spawns one batch of particles distributed
+			up to this transform - filling the gap between the last spawn point
+			and the point of the abrupt change - instead of either interpolating
+			the spawn points across the jump or ending the stream mid-air.
+		*/
+		std::optional<transformr> before_abrupt_change;
 
 		orbital_cache() = default;
 

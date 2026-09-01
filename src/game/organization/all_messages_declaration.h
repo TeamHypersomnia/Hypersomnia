@@ -11,6 +11,7 @@ namespace messages {
 	struct intent_message;
 	struct motion_message;
 	struct interpolation_correction_request;
+	struct abrupt_position_change;
 	struct damage_message;
 	struct queue_deletion;
 	struct will_soon_be_deleted;
@@ -71,6 +72,7 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::performed_transfer_message,
 	messages::changed_identities_message,
 	messages::interpolation_correction_request,
+	messages::abrupt_position_change,
 
 	/* Purely effect messages. The only recipient is the audiovisual state. */
 	messages::start_temporary_light,

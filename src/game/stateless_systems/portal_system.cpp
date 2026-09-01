@@ -11,6 +11,7 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/game_notification.h"
+#include "game/messages/abrupt_position_change.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -341,6 +342,20 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					if (should_snap_interp) {
 						::snap_interpolated_to(typed_contacted_entity, final_transform);
+
+						{
+							/*
+								Let the audiovisual state know the position jumped,
+								so that e.g. particle streams chasing this entity
+								do not interpolate their spawn points across the jump.
+							*/
+
+							messages::abrupt_position_change msg;
+							msg.subject = typed_contacted_entity.get_id();
+							msg.before_change = contacted_entity_transform;
+
+							step.post_message(msg);
+						}
 					}
 
 					{

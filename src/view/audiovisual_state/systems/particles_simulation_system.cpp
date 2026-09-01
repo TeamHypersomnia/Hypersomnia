@@ -14,8 +14,11 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/gun_component.h"
 
+#include "game/components/missile_component.h"
+
 #include "game/messages/start_particle_effect.h"
 #include "game/messages/gunshot_message.h"
+#include "game/messages/abrupt_position_change.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
@@ -213,9 +216,11 @@ void particles_simulation_system::update_effects_from_messages(
 	randomization& rng,
 	const const_logic_step step,
 	const particle_effects_map& manager,
-	const interpolation_system&,
+	const interpolation_system& interp,
 	const special_effects_settings& settings
 ) {
+	const auto& cosm = step.get_cosmos();
+
 	{
 		const auto& events = step.get_queue<messages::stop_particle_effect>();
 
@@ -272,11 +277,101 @@ void particles_simulation_system::update_effects_from_messages(
 						rng,
 						settings
 					);
+
+					/*
+						Anchor the stream at the current chase transform right away.
+						For a freshly fired round the interpolation correction has already
+						set it to the muzzle transform, so even the very first batch
+						is distributed along the path travelled since the gunshot -
+						also when the round dies before the stream is ever advanced
+						(point-blank shots).
+					*/
+
+					auto& c = orbital_emissions.back();
+
+					if (const auto where = find_transform(c.chasing, cosm, interp)) {
+						for (auto& instance : c.emission_instances) {
+							instance.previous_chased_pos = where->pos;
+							instance.has_previous_chased_pos = true;
+						}
+					}
 				}
 			}
 		}
 		catch (const effect_not_found&) {
 
+		}
+	}
+
+	{
+		auto displace_streams_chasing = [&](
+			const entity_id subject,
+			const transformr& last_transform,
+			const vec2 last_velocity
+		) {
+			auto do_cache = [&](orbital_cache& c) {
+				if (c.chasing.target != subject) {
+					return;
+				}
+
+				auto chased_transform = last_transform;
+
+				if (c.chasing.face_velocity) {
+					chased_transform.rotation = last_velocity.degrees();
+				}
+
+				c.before_abrupt_change = chased_transform * c.chasing.offset;
+			};
+
+			for (auto& c : orbital_emissions) {
+				do_cache(c);
+			}
+
+			for (auto& it : firearm_engine_caches) {
+				do_cache(it.second.cache);
+			}
+
+			for (auto& it : continuous_particles_caches) {
+				do_cache(it.second.cache);
+			}
+		};
+
+		{
+			const auto& events = step.get_queue<messages::abrupt_position_change>();
+
+			for (const auto& e : events) {
+				if (const auto subject = cosm[e.subject]) {
+					displace_streams_chasing(e.subject, e.before_change, subject.get_effective_velocity());
+				}
+			}
+		}
+
+		{
+			/*
+				Deletions are performed only after the post-solve,
+				so the subjects are still alive here. Memorize their final transforms
+				so that the streams chasing them can spawn one last batch of particles
+				distributed up to the exact point of death, instead of ending mid-air.
+			*/
+
+			const auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
+
+			for (const auto& e : deletions) {
+				if (const auto subject = cosm[e.subject]) {
+					auto last_transform = subject.find_logic_transform();
+
+					if (last_transform == std::nullopt) {
+						continue;
+					}
+
+					if (const auto missile = subject.template find<components::missile>()) {
+						/* The most accurate spot, also used for the finishing traces. */
+						*last_transform = missile->saved_point_of_impact_before_death;
+					}
+
+					displace_streams_chasing(e.subject, *last_transform, subject.get_effective_velocity());
+				}
+			}
 		}
 	}
 
@@ -815,6 +910,30 @@ void particles_simulation_system::advance_visible_streams(
 
 		const auto cam_aabb = checked_cone.get_visible_world_rect_aabb();
 
+		/*
+			When the chased entity has just teleported or was deleted,
+			this frame's advance is spent on its last known transform, so that the batch
+			is distributed between the last spawn point and the point of the abrupt change -
+			otherwise the stream would either end mid-air (deletion) or spawn particles
+			across the whole jump (teleport).
+		*/
+		auto consume_before_abrupt_change = [](auto& c) {
+			const auto result = c.before_abrupt_change;
+			c.before_abrupt_change = std::nullopt;
+			return result;
+		};
+
+		/*
+			Called after the flush advance if the chased entity is still alive (a teleport),
+			so the next batch is not distributed across the jump.
+		*/
+		auto reanchor_to = [](auto& c, const transformr& live_transform) {
+			for (auto& instance : c.emission_instances) {
+				instance.previous_chased_pos = live_transform.pos;
+				instance.has_previous_chased_pos = true;
+			}
+		};
+
 		erase_if(fire_and_forget_emissions, [&](auto& c) {
 			const auto where = c.transform;
 			const bool visible_in_camera = cam_aabb.hover(where.pos);
@@ -825,8 +944,11 @@ void particles_simulation_system::advance_visible_streams(
 
 		erase_if(orbital_emissions, [&](auto& c) {
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosm, interp);
-			
+			const auto live_transform = find_transform(chase, cosm, interp);
+			const auto before_abrupt_change = consume_before_abrupt_change(c);
+
+			const auto where = before_abrupt_change.has_value() ? before_abrupt_change : live_transform;
+
 			if (where == std::nullopt) {
 				return true;
 			}
@@ -844,6 +966,16 @@ void particles_simulation_system::advance_visible_streams(
 			}
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity);
+
+			if (before_abrupt_change.has_value()) {
+				if (live_transform == std::nullopt) {
+					/* Deleted - the stream properly ends at the last known transform. */
+					return true;
+				}
+
+				reanchor_to(c, *live_transform);
+			}
+
 			return c.is_over();
 		});
 
@@ -851,7 +983,10 @@ void particles_simulation_system::advance_visible_streams(
 			auto& c = it.second.cache;
 
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosm, interp);
+			const auto live_transform = find_transform(chase, cosm, interp);
+			const auto before_abrupt_change = consume_before_abrupt_change(c);
+
+			const auto where = before_abrupt_change.has_value() ? before_abrupt_change : live_transform;
 
 			if (where == std::nullopt) {
 				return true;
@@ -866,14 +1001,26 @@ void particles_simulation_system::advance_visible_streams(
 			const bool visible_in_camera = cam_aabb.hover(where->pos);
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+
+			if (before_abrupt_change.has_value()) {
+				if (live_transform == std::nullopt) {
+					return true;
+				}
+
+				reanchor_to(c, *live_transform);
+			}
+
 			return false;
 		});
 		
-		erase_if(continuous_particles_caches, [&](auto& it) { 
+		erase_if(continuous_particles_caches, [&](auto& it) {
 			auto& c = it.second.cache;
 			const auto chase = c.chasing;
 
-			auto where = find_transform(chase, cosm, interp);
+			const auto live_transform = find_transform(chase, cosm, interp);
+			const auto before_abrupt_change = consume_before_abrupt_change(c);
+
+			auto where = before_abrupt_change.has_value() ? before_abrupt_change : live_transform;
 
 			if (where == std::nullopt) {
 				return true;
@@ -923,6 +1070,15 @@ void particles_simulation_system::advance_visible_streams(
 			}
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity);
+
+			if (before_abrupt_change.has_value()) {
+				if (live_transform == std::nullopt) {
+					return true;
+				}
+
+				reanchor_to(c, *live_transform + displacement);
+			}
+
 			return false;
 		});
 	}
