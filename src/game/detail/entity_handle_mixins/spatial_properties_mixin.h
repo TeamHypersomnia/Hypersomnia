@@ -240,6 +240,22 @@ public:
 		return std::nullopt;
 	}
 
+	vec2 get_logical_back(const transformr& t) const {
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
+		const auto w = handle.get_logical_size().x;
+		return t.pos - t.get_direction() * (w / 2);
+	}
+
+	std::optional<vec2> find_logical_back() const {
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
+
+		if (const auto t = handle.find_logic_transform()) {
+			return get_logical_back(*t);
+		}
+
+		return std::nullopt;
+	}
+
 	/* Compatibility shortcuts. Their use is not recommended henceforth. */
 
 	template <class... Args>

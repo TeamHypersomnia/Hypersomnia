@@ -85,19 +85,19 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	for (const auto& g : gunshots) {
 		const auto predictability = predictable_only_by(g.capability);
 
+		const auto gun_entity = cosm[g.subject];
+
+		if (gun_entity.dead()) {
+			continue;
+		}
+
+		const auto* const gun = gun_entity.template find<invariants::gun>();
+
+		if (gun == nullptr) {
+			continue;
+		}
+
 		{
-			const auto gun_entity = cosm[g.subject];
-
-			if (gun_entity.dead()) {
-				continue;
-			}
-
-			const auto* const gun = gun_entity.template find<invariants::gun>();
-
-			if (gun == nullptr) {
-				continue;
-			}
-
 			/*
 				Create a temporary light at the muzzle position.
 			*/
@@ -115,18 +115,23 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			step.post_message(std::move(event));
 		}
 
+		if (!g.spawned_rounds.empty()) {
+			/*
+				Fired once per gunshot, not once per spawned round - otherwise shotguns
+				(which spawn many pellets per shot) would stack the muzzle explosion
+				as many times as they have pellets.
+			*/
+			const auto& effect = cosm[g.spawned_rounds.front()].get<invariants::missile>().muzzle_leave_particles;
+
+			effect.start(
+				step,
+				particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform),
+				predictability
+			);
+		}
+
 		for (auto& r : g.spawned_rounds) {
 			const auto spawned_round = cosm[r];
-
-			{
-				const auto& effect = spawned_round.get<invariants::missile>().muzzle_leave_particles;
-
-				effect.start(
-					step,
-					particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform),
-					predictability
-				);
-			}
 
 			{
 				if (const auto missile = spawned_round.find<invariants::missile>()) {
@@ -134,9 +139,14 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					const auto rotation = missile->trace_particles_fly_backwards ? 180.f : 0.f;
 
+					/*
+						Anchor trace particles near the bullet's tail rather than its tip/center.
+					*/
+					const auto tail_offset = spawned_round.get_logical_back(transformr());
+
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_local(cosm[r], { vec2::zero, rotation } ),
+						particle_effect_start_input::orbit_local(cosm[r], { tail_offset, rotation } ),
 						predictability
 					);
 				}
