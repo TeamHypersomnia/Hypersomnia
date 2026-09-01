@@ -814,6 +814,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
+	/* Always on top of all the other particles. */
+	draw_particles(particle_layer::TRAILS);
+
 	if (strict_fow) {
 		renderer.set_stencil(false);
 	}

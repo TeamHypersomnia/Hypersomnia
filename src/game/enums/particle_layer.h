@@ -8,6 +8,13 @@ enum class particle_layer {
 	DIM_SMOKES,
 	NEONING_PARTICLES,
 
+	/*
+		Drawn in full color (standard shader, no neon) above all other particle layers.
+		Gives effects like bullet line trails their own buffer, so they are never
+		dropped when the other layers' particle pools overflow.
+	*/
+	TRAILS,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

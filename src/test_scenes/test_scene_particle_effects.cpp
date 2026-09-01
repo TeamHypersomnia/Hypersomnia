@@ -77,7 +77,7 @@ void load_test_scene_particle_effects(
 		jitter, drifting very slowly along the bullet's own velocity, with widely staggered
 		(not simultaneous) particle deaths. Used by sniper rifle trails (Hunter, AWKA).
 	*/
-	auto make_sniper_line_trail = [&](
+	auto make_line_trail = [&](
 		const float density_mult = 1.f,
 		const rgba color = white,
 		const bool counter_flip = false,
@@ -136,7 +136,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1, 1);
-		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::TRAILS;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = true;
 
@@ -1496,7 +1496,7 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 
-		effect.emissions.push_back(make_sniper_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 7, 0.07f, 100.f));
+		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 7, 0.07f, 100.f));
 	}
 
 	{
@@ -1507,7 +1507,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		effect.emissions.push_back(make_sniper_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f));
+		effect.emissions.push_back(make_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f));
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1577,7 +1577,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
 
-		effect.emissions.push_back(make_sniper_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 18, 0.04f, 50.f, 10.f));
 	}
 
 	{
@@ -1687,7 +1687,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		effect.emissions.push_back(make_sniper_line_trail(6.6f, cyan, false, 0, 4, 0.5f));
+		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f));
 	}
 
 	{
@@ -4266,7 +4266,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AO44_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		effect.emissions.push_back(make_sniper_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+		effect.emissions.push_back(make_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, 10.f));
 	}
 
 	{
