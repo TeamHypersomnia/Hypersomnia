@@ -11,7 +11,7 @@ namespace augs {
 		vertex_triangle& t1,
 		vertex_triangle& t2,
 		const T& entry,
-		const vec2i size,
+		const vec2 size,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color
@@ -73,7 +73,7 @@ namespace augs {
 		vertex_triangle& t1,
 		vertex_triangle& t2,
 		const T& entry,
-		const vec2i size,
+		const vec2 size,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color

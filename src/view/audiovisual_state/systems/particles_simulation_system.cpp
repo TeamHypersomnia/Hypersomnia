@@ -139,7 +139,10 @@ particles_simulation_system::basic_cache::basic_cache(
 
 			emission_instances.emplace_back(emission, rng);
 			auto& e = emission_instances.back();
-			e.stream_particles_to_spawn *= original.input.modifier.scale_amounts;
+
+			if (!emission.ignore_effect_modifier) {
+				e.stream_particles_to_spawn *= original.input.modifier.scale_amounts;
+			}
 		}
 	}
 	else {
@@ -631,6 +634,10 @@ void particles_simulation_system::advance_visible_streams(
 			*/
 			auto modifier = original_modifier;
 
+			if (instance.source_emission.ignore_effect_modifier) {
+				modifier = particle_effect_modifier();
+			}
+
 			if (!gore_enabled && instance.source_emission.should_gore_remap) {
 				augs::try_remap_gore_color(modifier.color);
 
@@ -641,8 +648,23 @@ void particles_simulation_system::advance_visible_streams(
 
 			const auto total_amount_mult = modifier.scale_amounts * settings.particle_stream_amount;
 
+			/*
+				Ramps the spawn rate up from 0 to full over the stream's first stream_fade_in_ms,
+				so a freshly started stream doesn't pop into existence at full density immediately.
+			*/
+			const auto fade_in_ms = instance.source_emission.stream_fade_in_ms;
+
+			float fade_in_mult = 1.0f;
+
+			if (fade_in_ms > 0.f) {
+				auto fade_mult = instance.stream_lifetime_ms / fade_in_ms;
+				fade_mult *= fade_mult;
+
+				fade_in_mult = std::min(1.f, fade_mult);
+			}
+
 			auto new_particles_to_spawn_by_time =
-				(instance.particles_per_sec * total_amount_mult) *
+				(instance.particles_per_sec * total_amount_mult * fade_in_mult) *
 				(stream_delta / 1000.f)
 			;
 
@@ -678,9 +700,25 @@ void particles_simulation_system::advance_visible_streams(
 				const float t = (static_cast<float>(i) / to_spawn);
 				const float time_elapsed = (1.f - t) * dt_secs;
 
-				vec2 final_particle_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
-				
+				/*
+					Spread this frame's whole particle batch along the distance the emitter
+					actually travelled since the last time it was advanced, rather than
+					spawning it all at the current position - otherwise a capped/low framerate
+					with a fast emitter (e.g. a sniper round) leaves visible gaps in the trail.
+				*/
+				vec2 final_particle_position =
+					instance.has_previous_chased_pos
+					? augs::interp(instance.previous_chased_pos, current_transform.pos, t)
+					: current_transform.pos
+				;
+
+				final_particle_position += augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f)) - current_transform.pos;
+
 				const auto& emission = instance.source_emission;
+
+				if (emission.local_spawn_offset != vec2::zero) {
+					final_particle_position += vec2(emission.local_spawn_offset).rotate(current_transform.rotation);
+				}
 
 				if (modifier.box != vec2::zero) {
 					const auto rx = rng.randval(0.f, 1.f) - 0.5f;
@@ -765,6 +803,9 @@ void particles_simulation_system::advance_visible_streams(
 
 			/* Leave only the fractional part */
 			instance.stream_particles_to_spawn -= static_cast<int>(instance.stream_particles_to_spawn);
+
+			instance.previous_chased_pos = current_transform.pos;
+			instance.has_previous_chased_pos = true;
 		}
 	};
 

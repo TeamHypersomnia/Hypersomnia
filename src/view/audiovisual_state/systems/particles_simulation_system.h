@@ -76,6 +76,15 @@ public:
 
 		float fade_when_ms_remaining = 0.f;
 
+		/*
+			The chased entity's position as of the previous time this instance was advanced.
+			Lets a frame's whole batch of spawned particles be distributed along the path the
+			entity actually travelled since then, instead of clumping at its current position -
+			otherwise a capped/low framerate makes fast-moving trails look like discrete blobs.
+		*/
+		vec2 previous_chased_pos = vec2::zero;
+		bool has_previous_chased_pos = false;
+
 		particles_emission source_emission;
 
 		bool is_over() const;

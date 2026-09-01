@@ -29,6 +29,7 @@ struct particles_emission {
 	bound rotation_speed = bound(0.f, 0.f);
 	bound particles_per_sec = bound(0.f, 0.f);
 	bound stream_lifetime_ms = bound(0.f, 0.f);
+	float stream_fade_in_ms = 0.f;
 	bound particle_lifetime_ms = bound(0.f, 0.f);
 	bound size_multiplier = bound(1.f, 1.f);
 	bound acceleration = bound(0.f, 0.f);
@@ -45,6 +46,8 @@ struct particles_emission {
 	bound randomize_spawn_point_within_circle_of_outer_radius = bound(0.f, 0.f);
 	bound randomize_spawn_point_within_circle_of_inner_radius = bound(0.f, 0.f);
 
+	vec2 local_spawn_offset = vec2::zero;
+
 	bound starting_spawn_circle_size_multiplier = bound(1.f, 1.f);
 	bound ending_spawn_circle_size_multiplier = bound(1.f, 1.f);
 	bool use_sqrt_to_ease_spawn_circle = false;
@@ -58,6 +61,7 @@ struct particles_emission {
 	bool scale_damping_to_velocity = false;
 	bool should_particles_look_towards_velocity = true;
 	bool should_gore_remap = false;
+	bool ignore_effect_modifier = false;
 
 	particle_definitions_vectors particle_definitions;
 	particle_layer target_layer = particle_layer::ILLUMINATING_PARTICLES;

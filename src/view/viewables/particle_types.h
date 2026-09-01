@@ -42,6 +42,7 @@ struct general_particle {
 	float unshrinking_time_ms = 0.f;
 
 	int alpha_levels = -1;
+	bool smooth_shrink = false;
 	// END GEN INTROSPECTOR
 
 	void integrate(const float dt);
@@ -76,7 +77,7 @@ struct general_particle {
 			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 		}
 
-		auto draw = [&](const vec2i drawn_size) {
+		auto draw = [&](const vec2 drawn_size) {
 			if constexpr(use_neon_maps) {
 				augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, color);
 			}
@@ -86,8 +87,23 @@ struct general_particle {
 		};
 
 		if (size_mult != 1.f) {
-			if (const auto target_size = vec2i(vec2(size) * size_mult); target_size.area() > 1) {
-				draw(target_size);
+			const auto scaled_size = vec2(size) * size_mult;
+
+			/*
+				Snapping the shrinking size to whole pixels is the norm (e.g. blood particles
+				rely on it - with so many of them shrinking at once, the abrupt per-pixel steps
+				read as an intentional "pop" rather than a glitch). Some particles (e.g. the thin
+				sniper trace dashes) look better with a smooth, fractional-pixel fade instead.
+			*/
+			if (smooth_shrink) {
+				if (scaled_size.area() > 1.f) {
+					draw(scaled_size);
+				}
+			}
+			else {
+				if (const auto target_size = vec2i(scaled_size); target_size.area() > 1) {
+					draw(vec2(target_size));
+				}
 			}
 		}
 		else {

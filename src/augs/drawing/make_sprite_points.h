@@ -10,7 +10,7 @@ namespace augs {
 	template <bool reproducible = false>
 	FORCE_INLINE sprite_points make_sprite_points(
 		const vec2 pos,
-		const vec2i size, 
+		const vec2 size, 
 		const std::conditional_t<reproducible, real32, float> degrees
 	) {
 		return make_rect_points<reproducible>(pos, size, degrees);
