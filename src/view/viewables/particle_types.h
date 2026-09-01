@@ -43,7 +43,6 @@ struct general_particle {
 	rgba start_color = rgba(0, 0, 0, 0);
 	float start_color_fade_ms = 0.f;
 
-	int alpha_levels = -1;
 	bool smooth_shrink = false;
 	// END GEN INTROSPECTOR
 
@@ -62,17 +61,6 @@ struct general_particle {
 			const auto alivity_multiplier = std::min(1.f, (max_lifetime_ms - current_lifetime_ms) / shrink_when_ms_remaining);
 
 			size_mult *= std::sqrt(alivity_multiplier);
-
-			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
-			//
-			//if (fade_on_disappearance) {
-			//	if (alpha_levels > 0) {
-			//		face.color.a = desired_alpha == 0 ? 0 : ((255 / alpha_levels) * (1 + (desired_alpha / (255 / alpha_levels))));
-			//	}
-			//	else {
-			//		face.color.a = desired_alpha;
-			//	}
-			//}
 		}
 
 		if (unshrinking_time_ms > 0.f) {

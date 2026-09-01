@@ -128,7 +128,6 @@ void load_test_scene_particle_effects(
 				color
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.smooth_shrink = true;
 			particle_definition.start_color = start_color;
 			particle_definition.start_color_fade_ms = start_color_fade_ms;
@@ -251,7 +250,6 @@ void load_test_scene_particle_effects(
 			set(particle_definition, to_image_id(test_scene_image_id::ROUND_TRACE), rgba(255, 255, 255, 255));
 			particle_definition.unshrinking_time_ms = 30.f;
 			particle_definition.shrink_when_ms_remaining = 30.f;
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 
@@ -577,7 +575,6 @@ void load_test_scene_particle_effects(
 				particle_definition.linear_damping = 1000;
 				set(particle_definition, anim.frames[2].image_id, white);
 				particle_definition.acc.set(900, -900);
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -689,7 +686,6 @@ void load_test_scene_particle_effects(
 				particle_definition.linear_damping = 1000;
 				set(particle_definition, anim.frames[2].image_id, white);
 				particle_definition.acc.set(900, -900);
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -783,7 +779,6 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 6000;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
-				particle_definition.alpha_levels = 1;
 				particle_definition.unshrinking_time_ms = 10.f;
 
 				em.add_particle_definition(particle_definition);
@@ -860,7 +855,6 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 5000;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1111,7 +1105,6 @@ void load_test_scene_particle_effects(
 			particle_definition.linear_damping = 5000;
 			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
 			particle_definition.size.x *= 1.3f;
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -1226,7 +1219,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1263,7 +1255,6 @@ void load_test_scene_particle_effects(
 					rgba(202, 185, 89, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
@@ -1287,7 +1278,6 @@ void load_test_scene_particle_effects(
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1366,7 +1356,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1403,7 +1392,6 @@ void load_test_scene_particle_effects(
 					cyan
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
@@ -1427,7 +1415,6 @@ void load_test_scene_particle_effects(
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1466,7 +1453,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1483,7 +1469,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1539,7 +1524,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1556,7 +1540,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1614,7 +1597,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -1667,7 +1649,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -1718,7 +1699,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -1736,7 +1716,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -1778,7 +1757,6 @@ void load_test_scene_particle_effects(
 					(i == 0 || i == 4) ? col_2 : col_1
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1793,7 +1771,6 @@ void load_test_scene_particle_effects(
 				
 				set(particle_definition, anim.frames[2].image_id, col_1);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -1880,7 +1857,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -2345,7 +2321,6 @@ void load_test_scene_particle_effects(
 					orange
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2362,7 +2337,6 @@ void load_test_scene_particle_effects(
 				yellow
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2399,7 +2373,6 @@ void load_test_scene_particle_effects(
 					orange
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2416,7 +2389,6 @@ void load_test_scene_particle_effects(
 				yellow
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2497,7 +2469,6 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 6000;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(0, 255, 255, 255));
-				particle_definition.alpha_levels = 1;
 				particle_definition.unshrinking_time_ms = 10.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2615,7 +2586,6 @@ void load_test_scene_particle_effects(
 					pink
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2632,7 +2602,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 80, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2670,7 +2639,6 @@ void load_test_scene_particle_effects(
 					orange
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2687,7 +2655,6 @@ void load_test_scene_particle_effects(
 				yellow
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -2733,7 +2700,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -2898,7 +2864,6 @@ void load_test_scene_particle_effects(
 					gray
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -2966,7 +2931,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -3004,7 +2968,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3024,7 +2987,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3044,7 +3006,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3124,7 +3085,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3144,7 +3104,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3164,7 +3123,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3280,7 +3238,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3317,7 +3274,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
@@ -3341,7 +3297,6 @@ void load_test_scene_particle_effects(
 				//particle_definition.unshrinking_time_ms = 50.f;
 				particle_definition.shrink_when_ms_remaining = 160.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3382,7 +3337,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3403,7 +3357,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3482,7 +3435,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3503,7 +3455,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3523,7 +3474,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -3608,7 +3558,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -3874,7 +3823,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3893,7 +3841,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -3991,7 +3938,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -4012,7 +3958,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -4090,7 +4035,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4121,7 +4065,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4158,7 +4101,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4176,7 +4118,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4215,7 +4156,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4249,7 +4189,6 @@ void load_test_scene_particle_effects(
 
 			particle_definition.color = yellow;
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4297,7 +4236,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4315,7 +4253,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4354,7 +4291,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 255)
 			);
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4388,7 +4324,6 @@ void load_test_scene_particle_effects(
 
 			particle_definition.color = white;
 
-			particle_definition.alpha_levels = 1;
 			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
@@ -4647,7 +4582,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -4666,7 +4600,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -4805,7 +4738,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -4826,7 +4758,6 @@ void load_test_scene_particle_effects(
 
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -4905,7 +4836,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -4989,7 +4919,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5006,7 +4935,6 @@ void load_test_scene_particle_effects(
 				rgba(255, 255, 255, 200)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5059,7 +4987,6 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 0;
 				set(particle_definition, anim.frames[2].image_id, white);
-				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -5119,7 +5046,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5136,7 +5062,6 @@ void load_test_scene_particle_effects(
 				white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5179,7 +5104,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5196,7 +5120,6 @@ void load_test_scene_particle_effects(
 				white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5315,7 +5238,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5332,7 +5254,6 @@ void load_test_scene_particle_effects(
 				white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5498,7 +5419,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5515,7 +5435,6 @@ void load_test_scene_particle_effects(
 				white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5559,7 +5478,6 @@ void load_test_scene_particle_effects(
 					white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5576,7 +5494,6 @@ void load_test_scene_particle_effects(
 				white
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5704,7 +5621,6 @@ void load_test_scene_particle_effects(
 					blood_color
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5724,7 +5640,6 @@ void load_test_scene_particle_effects(
 					rgba(192, 0, 0, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 				particle_definition.shrink_when_ms_remaining = 80.f;
 
 				em.add_particle_definition(particle_definition);
@@ -5772,7 +5687,6 @@ void load_test_scene_particle_effects(
 					rgba(255, 255, 255, 255)
 				);
 
-				particle_definition.alpha_levels = 1;
 
 				if (i > 1) {
 					particle_definition.shrink_when_ms_remaining = 70.f;
