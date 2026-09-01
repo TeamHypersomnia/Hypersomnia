@@ -40,6 +40,8 @@ struct general_particle {
 	float max_lifetime_ms = 0.f;
 	float shrink_when_ms_remaining = 0.f;
 	float unshrinking_time_ms = 0.f;
+	rgba start_color = rgba(0, 0, 0, 0);
+	float start_color_fade_ms = 0.f;
 
 	int alpha_levels = -1;
 	bool smooth_shrink = false;
@@ -77,12 +79,22 @@ struct general_particle {
 			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 		}
 
+		/*
+			When start_color_fade_ms > 0, the particle spawns with start_color
+			and blends into its target color over the first start_color_fade_ms of its lifetime.
+		*/
+		auto considered_color = color;
+
+		if (start_color_fade_ms > 0.f && current_lifetime_ms < start_color_fade_ms) {
+			considered_color = augs::interp(start_color, color, current_lifetime_ms / start_color_fade_ms);
+		}
+
 		auto draw = [&](const vec2 drawn_size) {
 			if constexpr(use_neon_maps) {
-				augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, color);
+				augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, considered_color);
 			}
 			else {
-				augs::detail_write_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, color);
+				augs::detail_write_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, considered_color);
 			}
 		};
 

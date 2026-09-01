@@ -85,7 +85,9 @@ void load_test_scene_particle_effects(
 		const int size_i_end = 3,
 		const float lifetime_mult = 1.f,
 		const float fade_in_ms = 40.f,
-		const float extra_back_offset = 0.f
+		const float extra_back_offset = 0.f,
+		const rgba start_color = rgba(0, 0, 0, 0),
+		const float start_color_fade_ms = 0.f
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
@@ -128,6 +130,8 @@ void load_test_scene_particle_effects(
 
 			particle_definition.alpha_levels = 1;
 			particle_definition.smooth_shrink = true;
+			particle_definition.start_color = start_color;
+			particle_definition.start_color_fade_ms = start_color_fade_ms;
 			if (i > 0)
 			particle_definition.shrink_when_ms_remaining = 300.f;
 			//particle_definition.unshrinking_time_ms = 200.f;
@@ -1496,7 +1500,8 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 
-		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 7, 0.07f, 100.f));
+		/* Bulldup */
+		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 10, 0.07f, 50.f, 10.f));
 	}
 
 	{
@@ -1577,7 +1582,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
 
-		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 21, 0.04f, 50.f, 18.f));
 	}
 
 	{
@@ -1687,7 +1692,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f));
+		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f, 40.f, 0.f, white, 30.f));
 	}
 
 	{

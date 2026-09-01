@@ -57,6 +57,7 @@ FORCE_INLINE void general_particle::set_max_lifetime_ms(const float new_max_life
 
 FORCE_INLINE void general_particle::colorize(const rgba mult) {
 	color *= mult;
+	start_color *= mult;
 }
 
 FORCE_INLINE void general_particle::set_image(
