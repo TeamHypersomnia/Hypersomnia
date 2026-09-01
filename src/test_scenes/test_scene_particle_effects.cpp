@@ -72,6 +72,85 @@ void load_test_scene_particle_effects(
 		return all_definitions[to_particle_effect_id(test_id)];
 	};
 
+	/*
+		A straight, non-spreading single-pixel-file trail: no lateral spread, no spawn-point
+		jitter, drifting very slowly along the bullet's own velocity, with widely staggered
+		(not simultaneous) particle deaths. Used by sniper rifle trails (Hunter, AWKA).
+	*/
+	auto make_sniper_line_trail = [&](
+		const float density_mult = 1.f,
+		const rgba color = white,
+		const bool counter_flip = false,
+		const int size_i_begin = 0,
+		const int size_i_end = 3,
+		const float lifetime_mult = 1.f,
+		const float fade_in_ms = 40.f,
+		const float extra_back_offset = 0.f
+	) {
+		particles_emission em;
+		em.spread_degrees = float_range(0, 0);
+		em.particles_per_sec = float_range(1200 * density_mult, 1200 * density_mult);
+		em.stream_lifetime_ms = float_range(300000, 300000);
+		em.stream_fade_in_ms = fade_in_ms;
+		em.base_speed = float_range(300, 300);
+
+		/*
+			On top of the missile's own tail anchor (particles_existence_system.cpp), shift
+			this emission further back - needed when its segments (below) are large enough
+			to overhang the tip from the tail anchor alone.
+		*/
+		em.local_spawn_offset = vec2(-extra_back_offset, 0.f);
+
+		/*
+			The round's trace_particles_fly_backwards flips the WHOLE effect's spawn direction
+			(e.g. AWKA/HPSR_ROUND sets it true so its electric spark trail properly trails
+			behind). This emission specifically imitates a line of fire, so it should still
+			point forward regardless - counter the flip with a 180 degree offset.
+		*/
+		em.angular_offset = counter_flip ? float_range(180, 180) : float_range(0, 0);
+		em.rotation_speed = float_range(0, 0);
+		em.particle_lifetime_ms = float_range(0, 2000 * lifetime_mult);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(0.f, 0.f);
+
+		for (int i = size_i_begin; i < size_i_end; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK),
+				vec2i((i + 1)*8, i + 1),
+				color
+			);
+
+			particle_definition.alpha_levels = 1;
+			particle_definition.smooth_shrink = true;
+			if (i > 0)
+			particle_definition.shrink_when_ms_remaining = 300.f;
+			//particle_definition.unshrinking_time_ms = 200.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.size_multiplier = float_range(1, 1);
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = true;
+
+		/*
+			Kept immune to the round's trace_particles.modifier (color/scale_amounts/
+			scale_lifetimes/scale_velocities) - that modifier is tuned for the OTHER,
+			denser trail emission and would otherwise blow up this deliberately sparse,
+			slow line (e.g. Hunter's scale_amounts = 26).
+		*/
+		em.ignore_effect_modifier = true;
+
+		return em;
+	};
+
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_SMOKE);
 
@@ -1416,6 +1495,19 @@ void load_test_scene_particle_effects(
 
 			effect.emissions.push_back(em);
 		}
+
+		effect.emissions.push_back(make_sniper_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 7, 0.07f, 100.f));
+	}
+
+	{
+		/*
+			Hunter's own trace - a clone of STEEL_PROJECTILE_TRACE_PRECISE (still used as-is by
+			Bilmer2000) so the sniper-only line trail below doesn't affect Bilmer2000's trail.
+		*/
+		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
+		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
+
+		effect.emissions.push_back(make_sniper_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f));
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1478,6 +1570,17 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		/*
+			Deagle's own trace - a clone of STEEL_PROJECTILE_TRACE (still used as-is by
+			Steel/Galilea) so the sniper-line-trail addition below doesn't affect them.
+		*/
+		auto& effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
+		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
+
+		effect.emissions.push_back(make_sniper_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+	}
+
+	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
 		particles_emission em;
@@ -1528,6 +1631,63 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
+	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::AWKA_ROUND_TRACE);
+
+		particles_emission em;
+		em.spread_degrees = float_range(10, 25);
+		em.particles_per_sec = float_range(70, 80);
+		em.stream_lifetime_ms = float_range(300000, 300000);
+		em.base_speed = float_range(100, 300);
+		em.rotation_speed = float_range(0, 0);
+		em.particle_lifetime_ms = float_range(150, 1300);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		em.starting_spawn_circle_size_multiplier = float_range(1.f, 1.f);
+		em.ending_spawn_circle_size_multiplier = float_range(2.f, 2.f);
+
+		for (int i = 0; i < 5; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK),
+				vec2i(2, 2),
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		for (int rep = 0; rep < 2; ++rep) {
+			for (size_t i = 0; i < anim.frames.size() - 1; ++i) {
+				animated_particle particle_definition;
+
+				particle_definition.linear_damping = 0;
+				particle_definition.animation.state.frame_num = i;
+				particle_definition.animation.speed_factor = 0.65f;
+				particle_definition.animation.id = cast_blink_id;
+				//particle_definition.acc.set(900, -900);
+				particle_definition.color = white;
+
+				em.add_particle_definition(particle_definition);
+			}
+		}
+
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = false;
+
+		effect.emissions.push_back(em);
+		effect.emissions.push_back(make_sniper_line_trail(6.6f, cyan, false, 0, 4, 0.5f));
 	}
 
 	{
@@ -4099,6 +4259,17 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		/*
+			AO44's own trace - a clone of FURY_THROWER_ATTACK (still used as-is by ORANGE_ROUND)
+			so the sniper-line-trail addition below doesn't affect it.
+		*/
+		auto& effect = acquire_effect(test_scene_particle_effect_id::AO44_ROUND_TRACE);
+		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
+
+		effect.emissions.push_back(make_sniper_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+	}
+
+	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);
 
 		particles_emission em;
@@ -5562,6 +5733,95 @@ void load_test_scene_particle_effects(
 			em.should_gore_remap = true;
 
 			effect.emissions.push_back(em);
+		}
+	}
+
+	{
+		auto make_dense_pixel_burst = [&](
+			const float min_particles,
+			const float max_particles
+		) {
+			particles_emission em;
+
+			em.spread_degrees = float_range(0, 50);
+			em.num_of_particles_to_spawn_initially = float_range(min_particles, max_particles);
+			em.angular_offset = float_range(0, 0);
+
+			em.base_speed = float_range(250, 1500);
+			em.rotation_speed = float_range(0, 0);
+			em.particle_lifetime_ms = float_range(30, 150);
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(35.f, 35.f);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 0;
+
+				set_with_size(
+					particle_definition,
+					to_image_id(test_scene_image_id::BLANK),
+					vec2i::square(i + 1),
+					rgba(255, 255, 255, 255)
+				);
+
+				particle_definition.alpha_levels = 1;
+
+				if (i > 1) {
+					particle_definition.shrink_when_ms_remaining = 70.f;
+				}
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(1, 1);
+			em.target_layer = particle_layer::NEONING_PARTICLES;
+			em.initial_rotation_variation = 0;
+
+			/*
+				Always bright/white, regardless of the per-weapon particle_effect_modifier
+				(muzzle/destruction color, scale_amounts, scale_lifetimes, scale_velocities)
+				set at the call site in guns.cpp - e.g. Deagle's muzzle_leave_particles.modifier *= 2.f
+				must not blow up the burst too.
+			*/
+			em.ignore_effect_modifier = true;
+
+			return em;
+		};
+
+		auto pixelify_muzzle_effect = [&](const test_id_type id) {
+			auto& effect = acquire_effect(id);
+			effect.emissions.push_back(make_dense_pixel_burst(80, 120));
+		};
+
+		pixelify_muzzle_effect(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::SKULL_ROCKET_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::HPSR_ROUND_MUZZLE_LEAVE_EXPLOSION);
+
+		{
+			/*
+				The same pixel explosion on the point of impact.
+				The destruction effects are already started with a transform
+				that points away from the surface (the impact velocity reversed),
+				so the pixels explode backwards, towards the shooter.
+			*/
+
+			auto add_impact_pixel_burst = [&](const test_id_type id) {
+				auto& effect = acquire_effect(id);
+
+				effect.emissions.push_back(make_dense_pixel_burst(40, 80));
+			};
+
+			add_impact_pixel_burst(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
+			add_impact_pixel_burst(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			add_impact_pixel_burst(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
+			add_impact_pixel_burst(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION);
 		}
 	}
 }
