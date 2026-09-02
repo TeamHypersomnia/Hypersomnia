@@ -80,6 +80,17 @@ enum class test_scene_particle_effect_id {
 
 	BLOOD_BURST,
 
+	/*
+		Plain (no dense pixel burst) counterparts of effect ids shared between
+		the pixel-burst weapon roster (bulldup2000, lews, hunter, deagle, ao44,
+		bulwark, warx, gradobicie, galilea, vindicator) and other weapons that
+		reuse the same round/muzzle categories but must not get the burst.
+	*/
+	FIRE_MUZZLE_LEAVE_EXPLOSION_PLAIN,
+	STEEL_PROJECTILE_DESTRUCTION_PLAIN,
+	PIXEL_MUZZLE_LEAVE_EXPLOSION_PLAIN,
+	ICE_PROJECTILE_DESTRUCTION_PLAIN,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -5666,15 +5666,15 @@ void load_test_scene_particle_effects(
 			particles_emission em;
 
 			em.spread_degrees = float_range(0, 50);
-			em.num_of_particles_to_spawn_initially = float_range(min_particles, max_particles);
+			em.num_of_particles_to_spawn_initially = float_range(min_particles*0.2, max_particles*0.2);
 			em.angular_offset = float_range(0, 0);
 
-			em.base_speed = float_range(250, 1500);
+			em.base_speed = float_range(100, 1200);
 			em.rotation_speed = float_range(0, 0);
-			em.particle_lifetime_ms = float_range(30, 150);
+			em.particle_lifetime_ms = float_range(30, 220);
 
-			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(35.f, 35.f);
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(60.f, 70.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(75.f, 85.f);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -5700,6 +5700,7 @@ void load_test_scene_particle_effects(
 			em.size_multiplier = float_range(1, 1);
 			em.target_layer = particle_layer::NEONING_PARTICLES;
 			em.initial_rotation_variation = 0;
+			//em.should_particles_look_towards_velocity = true;
 
 			/*
 				Always bright/white, regardless of the per-weapon particle_effect_modifier
@@ -5712,18 +5713,23 @@ void load_test_scene_particle_effects(
 			return em;
 		};
 
-		auto pixelify_muzzle_effect = [&](const test_id_type id) {
+		/*
+			The dense pixel burst is reserved for: bulldup2000, lews, hunter, deagle,
+			ao44, bulwark, warx, gradobicie, galilea, vindicator.
+
+			Some other weapons reuse the very same effect id (muzzle/destruction category
+			is shared, not per-weapon), so the pre-burst definition is snapshotted into a
+			plain id first, and those other weapons' rounds are pointed at the plain id
+			in guns.cpp instead.
+		*/
+		auto pixelify_muzzle_effect = [&](const test_id_type id, const test_id_type plain_id) {
 			auto& effect = acquire_effect(id);
+			acquire_effect(plain_id) = effect;
 			effect.emissions.push_back(make_dense_pixel_burst(80, 120));
 		};
 
-		pixelify_muzzle_effect(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::SKULL_ROCKET_MUZZLE_LEAVE_EXPLOSION);
-		pixelify_muzzle_effect(test_scene_particle_effect_id::HPSR_ROUND_MUZZLE_LEAVE_EXPLOSION);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION, test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION_PLAIN);
+		pixelify_muzzle_effect(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION, test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION_PLAIN);
 
 		{
 			/*
@@ -5733,16 +5739,15 @@ void load_test_scene_particle_effects(
 				so the pixels explode backwards, towards the shooter.
 			*/
 
-			auto add_impact_pixel_burst = [&](const test_id_type id) {
+			auto add_impact_pixel_burst = [&](const test_id_type id, const test_id_type plain_id) {
 				auto& effect = acquire_effect(id);
+				acquire_effect(plain_id) = effect;
 
 				effect.emissions.push_back(make_dense_pixel_burst(40, 80));
 			};
 
-			add_impact_pixel_burst(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
-			add_impact_pixel_burst(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
-			add_impact_pixel_burst(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
-			add_impact_pixel_burst(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION);
+			add_impact_pixel_burst(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION, test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION_PLAIN);
+			add_impact_pixel_burst(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION, test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION_PLAIN);
 		}
 	}
 }
