@@ -85,9 +85,9 @@ void load_test_scene_particle_effects(
 		const int size_i_end = 3,
 		const float lifetime_mult = 1.f,
 		const float fade_in_ms = 40.f,
-		const float extra_back_offset = 0.f,
 		const rgba start_color = rgba(0, 0, 0, 0),
-		const float start_color_fade_ms = 0.f
+		const float start_color_fade_ms = 0.f,
+		const float extra_back_offset = -15.f
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
@@ -97,11 +97,13 @@ void load_test_scene_particle_effects(
 		em.base_speed = float_range(300, 300);
 
 		/*
-			On top of the missile's own tail anchor (particles_existence_system.cpp), shift
-			this emission further back - needed when its segments (below) are large enough
-			to overhang the tip from the tail anchor alone.
+			The spawn point (the center of each segment) sits right behind the bullet's
+			rendered rear tip. The segments are drawn centered, so their front halves
+			reach forward and interlock with the bullet's rear - no visible seam between
+			the trail and the bullet. The widest segments reach the furthest, hence
+			the automatic size_i_end component pushing wider trails further back.
 		*/
-		em.local_spawn_offset = vec2(-extra_back_offset, 0.f);
+		em.local_spawn_offset = vec2(-(size_i_end + extra_back_offset), 0.f);
 
 		/*
 			The round's trace_particles_fly_backwards flips the WHOLE effect's spawn direction
@@ -1486,7 +1488,7 @@ void load_test_scene_particle_effects(
 		}
 
 		/* Bulldup */
-		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 10, 0.07f, 50.f, 10.f));
+		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 10, 0.07f, 50.f, white, 30.f));
 	}
 
 	{
@@ -1497,7 +1499,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		effect.emissions.push_back(make_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f));
+		effect.emissions.push_back(make_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f, white, 30.f));
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1565,7 +1567,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
 
-		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 245, 200, 255), true, 0, 21, 0.04f, 50.f, 18.f));
+		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 100, 0, 255), true, 0, 27, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f));
 	}
 
 	{
@@ -1673,7 +1675,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f, 40.f, 0.f, white, 30.f));
+		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f, 40.f, white, 250.f));
 	}
 
 	{
@@ -4210,7 +4212,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AO44_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		effect.emissions.push_back(make_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, 10.f));
+		effect.emissions.push_back(make_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f));
 	}
 
 	{
