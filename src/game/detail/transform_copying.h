@@ -14,6 +14,13 @@ struct absolute_or_local {
 	bool face_velocity = false;
 	bool chase_velocity = false;
 
+	/*
+		Anchor at the rear tip of the target's rendered sprite,
+		tracking its current trace stretch (the sprite lengthens in flight),
+		instead of at a fixed point. offset.pos applies on top of that anchor.
+	*/
+	bool chase_sprite_back = false;
+
 	template <class C, class I>
 	auto find_transform(C& cosm, I& interp) {
 		return find_transform_impl(*this, cosm, interp);
@@ -27,7 +34,7 @@ struct absolute_or_local {
 	bool operator==(const absolute_or_local& b) const = default;
 
 	auto hash() const {
-		return augs::hash_multiple(target, offset, face_velocity, chase_velocity);
+		return augs::hash_multiple(target, offset, face_velocity, chase_velocity, chase_sprite_back);
 	}
 };
 

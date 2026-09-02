@@ -305,12 +305,12 @@ void particles_simulation_system::update_effects_from_messages(
 
 	{
 		auto displace_streams_chasing = [&](
-			const entity_id subject,
+			const const_entity_handle subject,
 			const transformr& last_transform,
 			const vec2 last_velocity
 		) {
 			auto do_cache = [&](orbital_cache& c) {
-				if (c.chasing.target != subject) {
+				if (c.chasing.target != subject.get_id()) {
 					return;
 				}
 
@@ -320,7 +320,7 @@ void particles_simulation_system::update_effects_from_messages(
 					chased_transform.rotation = last_velocity.degrees();
 				}
 
-				c.before_abrupt_change = chased_transform * c.chasing.offset;
+				c.before_abrupt_change = chased_transform * ::considered_chase_offset(c.chasing, subject);
 			};
 
 			for (auto& c : orbital_emissions) {
@@ -341,7 +341,7 @@ void particles_simulation_system::update_effects_from_messages(
 
 			for (const auto& e : events) {
 				if (const auto subject = cosm[e.subject]) {
-					displace_streams_chasing(e.subject, e.before_change, subject.get_effective_velocity());
+					displace_streams_chasing(subject, e.before_change, subject.get_effective_velocity());
 				}
 			}
 		}
@@ -369,7 +369,7 @@ void particles_simulation_system::update_effects_from_messages(
 						*last_transform = missile->saved_point_of_impact_before_death;
 					}
 
-					displace_streams_chasing(e.subject, *last_transform, subject.get_effective_velocity());
+					displace_streams_chasing(subject, *last_transform, subject.get_effective_velocity());
 				}
 			}
 		}
@@ -701,11 +701,12 @@ void particles_simulation_system::advance_visible_streams(
 	const auto dt_secs = delta.in_seconds();
 
 	auto advance_emissions = [&](
-		emission_instances_type& instances, 
+		emission_instances_type& instances,
 		const transformr current_transform,
 		const bool visible_in_camera,
 		const packaged_particle_effect& effect,
-		const vec2 chased_velocity = vec2::zero
+		const vec2 chased_velocity = vec2::zero,
+		const std::optional<float> chased_entity_rotation = std::nullopt
 	) {
 		auto particles_checked_cone = queried_cone;
 		particles_checked_cone.eye.zoom /= 2.f;
@@ -812,7 +813,18 @@ void particles_simulation_system::advance_visible_streams(
 				const auto& emission = instance.source_emission;
 
 				if (emission.local_spawn_offset != vec2::zero) {
-					final_particle_position += vec2(emission.local_spawn_offset).rotate(current_transform.rotation);
+					/*
+						In the chased entity's frame, not the emitter's - the chase offset may
+						carry a 180 degrees flip (trace_particles_fly_backwards), and the spawn
+						offset must shift consistently regardless of the particles' fly direction.
+					*/
+					const auto spawn_offset_rotation =
+						chased_entity_rotation.has_value()
+						? *chased_entity_rotation
+						: current_transform.rotation
+					;
+
+					final_particle_position += vec2(emission.local_spawn_offset).rotate(spawn_offset_rotation);
 				}
 
 				if (modifier.box != vec2::zero) {
@@ -965,7 +977,7 @@ void particles_simulation_system::advance_visible_streams(
 				}
 			}
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity);
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity, where->rotation - chase.offset.rotation);
 
 			if (before_abrupt_change.has_value()) {
 				if (live_transform == std::nullopt) {

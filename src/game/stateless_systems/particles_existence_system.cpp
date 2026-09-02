@@ -140,13 +140,16 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					const auto rotation = missile->trace_particles_fly_backwards ? 180.f : 0.f;
 
 					/*
-						Anchor trace particles near the bullet's tail rather than its tip/center.
+						Anchor trace particles at the bullet's tail rather than its tip/center.
+						chase_sprite_back tracks the rendered tail as the trace stretches
+						the sprite in flight.
 					*/
-					const auto tail_offset = spawned_round.get_logical_back(transformr());
+					auto start_in = particle_effect_start_input::orbit_local(cosm[r], { vec2::zero, rotation });
+					start_in.positioning.chase_sprite_back = true;
 
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_local(cosm[r], { tail_offset, rotation } ),
+						start_in,
 						predictability
 					);
 				}
