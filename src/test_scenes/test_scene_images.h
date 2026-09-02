@@ -84,6 +84,7 @@ enum class test_scene_image_id {
 	ORANGE_CHARGE,
 	ORANGE_SHELL,
 	ORANGE_ROUND,
+	AO44_ROUND,
 
 	STEEL_CHARGE,
 	STEEL_SHELL,

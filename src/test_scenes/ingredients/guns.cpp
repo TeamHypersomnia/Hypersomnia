@@ -743,7 +743,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white).size *= 1.8f;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.8f;
 
 			{
 				{
@@ -812,7 +812,11 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).neon_color = bullet_gold_neon;
+			/*
+				Match the height of the AO44 round scaled by 1.8 (8 px * 1.8 = 14.4 px),
+				so both rounds and their baked neon halos look the same in-game.
+			*/
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 14.4f / 11.f;
 
 			{
 				{
@@ -3347,7 +3351,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::DEAGLE_ROUND_FINISHING_TRACE);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).neon_color = bullet_gold_neon;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 14.4f / 11.f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::trace>());
@@ -3376,8 +3380,8 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.8f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::AO44_ROUND).get<invariants::trace>());
