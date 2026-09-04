@@ -447,8 +447,16 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
+		/*
+			After the advance loop, server_time points at the time of the NEXT step
+			(the loop runs while server_time <= current_time, incrementing by dt),
+			so the fraction of the way from the LAST performed step is offset by +1.
+			Without it, the ratio was negative, extrapolating every rendered transform
+			one tick backwards - fast bullets (and their trails) rendered deep behind
+			the muzzle, inside the shooter.
+		*/
 		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
-		return std::min(1.0, (get_current_time() - server_time) / dt);
+		return std::clamp((get_current_time() - server_time) / dt + 1.0, 0.0, 1.0);
 	}
 
 	entity_id get_controlled_character_id() const;
