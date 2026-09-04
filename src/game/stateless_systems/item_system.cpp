@@ -543,10 +543,23 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 		[&]() {
 			if (is_context_alive()) {
-				/* 
+				/*
 					Otherwise we won't have a chance of starting the reload mid-way because we're constantly chambering,
 					thus keeping the guns in action.
 				*/
+
+				if (transfers.mid_akimbo_chambered_gun.is_set()) {
+					/*
+						A reloading context has taken over while a mid-akimbo chambering
+						was still pending, e.g. an automatic reload armed right as the chambering
+						completed. The restoring branch below will now never run,
+						and a stale mid_akimbo_chambered_gun forever blocks firing
+						in gun_system's try_to_fire_interval. Orphaned - clear it.
+					*/
+
+					transfers.mid_akimbo_chambered_gun = {};
+					transfers.wield_after_mid_akimbo_chambering = {};
+				}
 
 				return;
 			}
@@ -624,6 +637,20 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 						if (requires_two_hands_to_chamber(gun)) {
 							if (!gun_shot_cooldown(gun) && chambering_in_order(gun)) {
+								const auto other_item = cosm[wielded_items[0] == w ? wielded_items[1] : wielded_items[0]];
+
+								if (other_item.find_mounting_progress() != nullptr) {
+									/*
+										The other hand holds an item that is still being mounted -
+										e.g. a shell mid-insertion when a shot interrupts the fluid
+										reload of a pump shotgun. Stowing it here would abort the mount;
+										once it completes, the hand frees up and chambering
+										proceeds without any re-wielding.
+									*/
+
+									continue;
+								}
+
 								const auto current_setup = wielding_setup::from_current(capability);
 								transfers.wield_after_mid_akimbo_chambering = current_setup;
 								transfers.mid_akimbo_chambered_gun = gun;
