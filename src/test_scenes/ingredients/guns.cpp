@@ -1372,13 +1372,13 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE);
 			missile.trace_particles.modifier.color = muzzle_violet;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
-			missile.muzzle_leave_particles.modifier.color = pink;
+			missile.muzzle_leave_particles.modifier.color = violet;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -1440,13 +1440,13 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE);
 			missile.trace_particles.modifier.color = muzzle_violet;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
-			missile.muzzle_leave_particles.modifier.color = violet;
+			missile.muzzle_leave_particles.modifier.color = pink;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -2736,7 +2736,7 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("0.1");
 				item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 				item.stackable = true;
-				item.standard_price = static_cast<money_type>(150);
+				item.standard_price = static_cast<money_type>(100);
 
 				meta.set(item);
 			}
@@ -3616,7 +3616,7 @@ namespace test_flavours {
 
 			gun_def.muzzle_cast_shadow = false;
 			gun_def.muzzle_light_radius *= 0.75f;
-			gun_def.muzzle_light_color = yellow;
+			gun_def.muzzle_light_color = cyan;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BILMER2000_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 300.f;
 			gun_def.muzzle_shot_sound.modifier.max_distance = 500.f;
@@ -4213,7 +4213,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PLASMA_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {5100.f, 5100.f};
+			gun_def.muzzle_velocity = {6800.f, 6800.f};
 			gun_def.shot_cooldown_ms = 95.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -4222,7 +4222,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 85.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 105.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
@@ -4238,11 +4238,11 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN, white);
 
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.45f);
+			set_density_mult(meta, 1.58f);
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
-			meta.get<invariants::item>().standard_price = 3900;
+			meta.get<invariants::item>().standard_price = 4300;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);
@@ -4505,7 +4505,7 @@ namespace test_flavours {
 			set_density_mult(meta, 2.3f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1100;
+			meta.get<invariants::item>().standard_price = 1500;
 			set_chambering_duration_ms(meta, 200.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
@@ -4602,7 +4602,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1800.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 8000.0f, 8000.0f };
+			gun_def.muzzle_velocity = { 9000.0f, 9000.0f };
 			gun_def.shot_cooldown_ms = 230.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -4630,7 +4630,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 5000;
+			meta.get<invariants::item>().standard_price = 5100;
 			set_chambering_duration_ms(meta, 700.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("9");
 			only_allow_mag(meta, test_container_items::BULLDUP2000_MAGAZINE);
@@ -4651,7 +4651,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = { 4600.f, 5600.f };
-			gun_def.shot_cooldown_ms = 200.f;
+			gun_def.shot_cooldown_ms = 190.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
@@ -4681,7 +4681,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 2600;
+			meta.get<invariants::item>().standard_price = 2500;
 			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
@@ -5024,7 +5024,7 @@ namespace test_flavours {
 			set_density_mult(meta, 3.0f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1250;
+			meta.get<invariants::item>().standard_price = 1750;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::DEAGLE_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
