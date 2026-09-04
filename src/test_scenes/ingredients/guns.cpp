@@ -4574,6 +4574,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = { 4200.f, 6300.f };
 			gun_def.shot_cooldown_ms = 300.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_CHAMBERING);
+			gun_def.shot_pitch_drop_at_low_ammo = 0.1f;
 			gun_def.allow_chambering_with_akimbo = false;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};

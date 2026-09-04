@@ -227,7 +227,18 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				const auto predictability = predictable_only_by(owning_capability);
 
 				{
-					const auto& effect = gun_def.muzzle_shot_sound;
+					auto effect = gun_def.muzzle_shot_sound;
+
+					/*
+						The lower the remaining ammo, the lower the pitch:
+						a full magazine shoots at 100%, the last shot at (100 - 100 * drop)%.
+						The gunshot message arrives after the cartridge is destroyed,
+						so the ammo ratio already reflects the state after this shot.
+					*/
+					if (gun_def.shot_pitch_drop_at_low_ammo > 0.f) {
+						const auto ammo_ratio = ::calc_ammo_info(typed_subject).get_ammo_ratio();
+						effect.modifier.pitch *= 1.f - gun_def.shot_pitch_drop_at_low_ammo * (1.f - ammo_ratio);
+					}
 
 					effect.start(
 						step,

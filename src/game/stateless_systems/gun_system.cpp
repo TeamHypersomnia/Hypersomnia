@@ -842,6 +842,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 															o.rotation += *cartridge_rotational_offset;
 														}
 
+														if (gun_def.randomize_spawn_point_within_circle_of_radius > 0.f) {
+															o.pos += stack_rng.random_point_in_circle(gun_def.randomize_spawn_point_within_circle_of_radius);
+														}
+
 														return o;
 													}();
 
