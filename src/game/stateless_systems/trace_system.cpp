@@ -1,3 +1,5 @@
+#include "augs/math/repro_math.h"
+
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/create_entity.hpp"
@@ -48,11 +50,32 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 				trace.last_center_offset_mult = (trace.last_size_mult - trace_def.additional_multiplier) / 2.f;
 			}
 			else {
-				const auto surplus_multiplier = vec2(trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms);
+				auto surplus_multiplier = vec2(trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms);
+
+				/*
+					Cap the lengthwise stretch so that the sprite's rear tip never reaches
+					behind the point of the shot. The rear extends w * (1 + s)^2 / 2 behind
+					the body (with additional_multiplier = 1), while the body has only travelled
+					speed * time - and the rendered, interpolated position lags up to one tick
+					behind the logical one, so one tick's worth of distance is subtracted.
+					Otherwise, with short lengthening durations and low tickrates, the stretched
+					trace - and the trail streams anchored at its back - poked into the shooter.
+				*/
+				{
+					const auto w = static_cast<float>(t.get_logical_size().x);
+					const auto speed = t.get_effective_velocity().length();
+
+					const auto travelled = speed * std::max(0.f, trace.lengthening_time_passed_ms - static_cast<float>(delta.in_milliseconds())) / 1000.f;
+
+					if (w > 0.f) {
+						const auto max_surplus = repro::sqrt(std::max(0.f, 2.f * travelled / w)) - 1.f;
+						surplus_multiplier.x = std::min(surplus_multiplier.x, std::max(0.f, max_surplus));
+					}
+				}
 
 				const auto size_multiplier = trace_def.additional_multiplier + surplus_multiplier;
 
-				trace.last_size_mult = size_multiplier; 
+				trace.last_size_mult = size_multiplier;
 				trace.last_center_offset_mult = surplus_multiplier / 2.f;
 
 				trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());

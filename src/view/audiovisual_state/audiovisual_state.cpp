@@ -40,8 +40,19 @@ void interpolation_system::set_updated_interpolated_transform(
 	const E& subject,
 	const transformr updated_value
 ) {
+	/*
+		Snap all three transforms, not just the interpolated one.
+
+		The birth-time snap in entity_construction.h happens before the round is moved
+		to the muzzle (it captures e.g. the chamber's position, i.e. the shooter's body),
+		so if only interpolated_transform were corrected here, the next integrate pass
+		would blend previous_transform (still at the shooter) towards the muzzle,
+		sweeping the round's - and its trail's - rendered position through the body.
+	*/
 	auto& info = get_corresponding<components::interpolation>(subject);
 	info.interpolated_transform = updated_value;
+	info.previous_transform = updated_value;
+	info.desired_transform = updated_value;
 }
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {

@@ -288,21 +288,42 @@ void particles_simulation_system::update_effects_from_messages(
 					);
 
 					/*
-						Anchor the stream at the current chase transform right away.
-						For a freshly fired round the interpolation correction has already
-						set it to the muzzle transform, so even the very first batch
-						is distributed along the path travelled since the gunshot -
-						also when the round dies before the stream is ever advanced
-						(point-blank shots).
+						Anchor the stream at the current chase transform right away,
+						so even the very first batch is distributed along the path travelled
+						since the gunshot - also when the round dies before the stream
+						is ever advanced (point-blank shots).
+
+						Anchor from the LOGIC transform, not the interpolated one.
+						Online, the interpolation correction messages can be erased
+						(they are predictable-only), and a freshly allocated round can inherit
+						a stale interpolation cache from a dead entity that previously used
+						its pool slot - which anchored trails e.g. inside the shooter's body.
+						At the time this message is consumed, the round's logic transform
+						is always right at the muzzle.
 					*/
 
 					auto& c = orbital_emissions.back();
 
-					if (const auto where = find_transform(c.chasing, cosm, interp)) {
+					auto anchor_to = [&](const transformr& where) {
 						for (auto& instance : c.emission_instances) {
-							instance.previous_chased_pos = where->pos;
+							instance.previous_chased_pos = where.pos;
 							instance.has_previous_chased_pos = true;
 						}
+					};
+
+					if (const auto subject = cosm[c.chasing.target]) {
+						if (const auto tr = subject.find_logic_transform()) {
+							auto chased = *tr;
+
+							if (c.chasing.face_velocity) {
+								chased.rotation = subject.get_effective_velocity().degrees();
+							}
+
+							anchor_to(chased * ::considered_chase_offset(c.chasing, subject));
+						}
+					}
+					else if (const auto where = find_transform(c.chasing, cosm, interp)) {
+						anchor_to(*where);
 					}
 				}
 			}
