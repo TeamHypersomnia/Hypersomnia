@@ -52,6 +52,7 @@ inline void setup_game_mode_defaults(
 
 		o[test_shootable_weapons::WARX],
 		o[test_shootable_weapons::GRADOBICIE],
+		o[test_shootable_weapons::SZKWAL],
 
 		o[test_shootable_weapons::AWKA],
 		o[test_shootable_weapons::HUNTER],

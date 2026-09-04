@@ -1569,17 +1569,50 @@ void load_test_scene_particle_effects(
 
 			effect.emissions.push_back(em);
 		}
-	}
 
-	{
 		/*
-			Deagle's own trace - a clone of STEEL_PROJECTILE_TRACE (still used as-is by
-			Steel/Galilea) so the sniper-line-trail addition below doesn't affect them.
+			Baka47's own clone - the same base (taken before the line trail below is added),
+			but its line trail colorizes from white to the round's gold neon instead of
+			staying white.
 		*/
-		auto& effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
-		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
+		{
+			auto& baka_effect = acquire_effect(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
+			baka_effect = effect;
 
-		effect.emissions.push_back(make_line_trail(7.5f, rgba(255, 100, 0, 255), true, 0, 27, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f));
+			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 11, 22, 0.0275f, 50.f, white, 30.f, -15.f, 0.f, true);
+		}
+
+		/*
+			Deagle's own clone - also taken before the white line trail below is added,
+			so only its own gold-to-orange line renders (the inherited white segments
+			used to flicker right on top of the bullet).
+		*/
+		{
+			auto& deagle_effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
+			deagle_effect = effect;
+
+			make_line_trail(deagle_effect, 7.5f, rgba(255, 100, 0, 255), true, 0, 27, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f);
+		}
+
+		/*
+			Szkwal's pellets - the same deagle-like base, but with a shorter line trail
+			fitting a 12-pellet spread, colorizing from white to dark orange
+			(the standard shotgun scheme, matching the round's white-to-orange neon).
+		*/
+		{
+			auto& szkwal_effect = acquire_effect(test_scene_particle_effect_id::SZKWAL_ROUND_TRACE);
+			szkwal_effect = effect;
+
+			make_line_trail(szkwal_effect, 5.f, rgba(255, 100, 0, 255), true, 8, 16, 0.02f, 50.f, white, 30.f, -15.f, 0.f, true);
+		}
+
+		/*
+			Shared by Bulwark, Galilea, Lews and Vindicator (none of them clone
+			this base id) - a short line trail, its length randomized once per shot,
+			roughly matched to this weapon family's damage (~3.2-4.0x multiplier).
+			White neons, so the line trail stays white as well.
+		*/
+		make_line_trail(effect, 6.f, white, true, 11, 22, 0.0275f, 50.f, white, 30.f, -15.f, 0.f, true);
 	}
 
 	{
@@ -5785,7 +5818,7 @@ void load_test_scene_particle_effects(
 
 		/*
 			The dense pixel burst is reserved for: bulldup2000, lews, hunter, deagle,
-			ao44, bulwark, warx, gradobicie, galilea, vindicator.
+			ao44, bulwark, warx, gradobicie, galilea, vindicator, szkwal.
 
 			Some other weapons reuse the very same effect id (muzzle/destruction category
 			is shared, not per-weapon), so the pre-burst definition is snapshotted into a

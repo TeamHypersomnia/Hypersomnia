@@ -888,6 +888,9 @@ namespace test_scenes {
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::GRADOBICIE);
 				give_charge(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_charges::GRADOBICIE_CHARGE, 8);
 
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::SZKWAL);
+				give_charge(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_charges::SZKWAL_CHARGE, 8);
+
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::BULWARK);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::ZAMIEC);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::SZCZUR);

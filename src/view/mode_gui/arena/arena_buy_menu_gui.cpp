@@ -889,7 +889,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
 					const auto buy_type = flavour.template get<invariants::gun>().buy_type;
 
-					if (buy_type != buy_menu_type::COUNT && buy_type != buy_menu_type::RIFLES) {
+					if (buy_type == buy_menu_type::RIFLES) {
+						callback(id, flavour);
+						return;
+					}
+
+					if (buy_type != buy_menu_type::COUNT) {
 						return;
 					}
 
@@ -923,6 +928,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_shotgun = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+					const auto buy_type = flavour.template get<invariants::gun>().buy_type;
+
+					if (buy_type == buy_menu_type::SHOTGUNS) {
+						callback(id, flavour);
+						return;
+					}
+
+					if (buy_type != buy_menu_type::COUNT) {
+						return;
+					}
+
 					if (is_shotgun_like(cosm, id)) {
 						callback(id, flavour);
 					}

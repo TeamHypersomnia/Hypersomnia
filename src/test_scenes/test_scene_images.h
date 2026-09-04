@@ -425,6 +425,8 @@ enum class test_scene_image_id {
 	CORPSE_HEAD_SPLATTER,
 	CORPSE_BODY_SPLATTER,
 
+	SZKWAL,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

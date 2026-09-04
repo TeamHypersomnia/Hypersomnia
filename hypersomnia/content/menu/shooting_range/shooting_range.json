@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-08-31 19:49:05.839986 UTC"
+        "version_timestamp": "2026-09-04 10:24:34.529062 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -273,6 +273,7 @@
         {
             "id": "Layer 15",
             "nodes": [
+                "bilmik (1)",
                 "bilmik"
             ]
         },
@@ -282,14 +283,14 @@
         {
             "id": "Layer 13",
             "nodes": [
-                "vindicator (1)",
+                "vindicator (2)",
                 "vindicator"
             ]
         },
         {
             "id": "Layer 10",
             "nodes": [
-                "szczur (1)",
+                "szczur (2)",
                 "szczur"
             ]
         },
@@ -518,6 +519,8 @@
                 "amplifier_arm",
                 "datum",
                 "szturm",
+                "szkwal (1)",
+                "szkwal",
                 "bilmer2000",
                 "baka47",
                 "blunaz",
@@ -2097,6 +2100,11 @@
             "pos": [-1440.0, 3700.0]
         },
         {
+            "id": "szkwal",
+            "type": "szkwal",
+            "pos": [-897.0, 4300.0]
+        },
+        {
             "id": "szturm",
             "type": "szturm",
             "pos": [-1440.0, 3800.0]
@@ -2254,27 +2262,37 @@
         {
             "id": "szczur",
             "type": "szczur",
-            "pos": [-947.0, 4000.0]
-        },
-        {
-            "id": "szczur (1)",
-            "type": "szczur",
-            "pos": [1357.0, 4000.0]
+            "pos": [-899.0, 4000.0]
         },
         {
             "id": "vindicator",
             "type": "vindicator",
-            "pos": [-947.0, 4100.0]
-        },
-        {
-            "id": "vindicator (1)",
-            "type": "vindicator",
-            "pos": [1357.0, 4100.0]
+            "pos": [-897.0, 4100.0]
         },
         {
             "id": "bilmik",
             "type": "bilmik",
-            "pos": [-929.0, 4171.0]
+            "pos": [-897.0, 4200.0]
+        },
+        {
+            "id": "bilmik (1)",
+            "type": "bilmik",
+            "pos": [1601.0, 4300.0]
+        },
+        {
+            "id": "vindicator (2)",
+            "type": "vindicator",
+            "pos": [1601.0, 4200.0]
+        },
+        {
+            "id": "szczur (2)",
+            "type": "szczur",
+            "pos": [1599.0, 4100.0]
+        },
+        {
+            "id": "szkwal (1)",
+            "type": "szkwal",
+            "pos": [1601.0, 4400.0]
         },
         {
             "id": "electric_armor",
