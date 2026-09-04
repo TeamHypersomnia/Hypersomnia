@@ -121,6 +121,84 @@ namespace augs {
 		in.output.push(triangles[1]);
 	}
 
+	/*
+		Draws the neon map in two pieces:
+		- the front half stays exactly where it would normally be, so the glow's tip keeps touching the bullet's tip,
+		- the back half is stretched backward so that the total length becomes neon_extension_mult times the normal one,
+		  with a linear alpha gradient fading to zero at its end.
+
+		This makes the glow overlap the bullet's particle trail instead of ending abruptly behind the bullet.
+		The gradient is interpolated per-fragment by the GPU, so no banding occurs regardless of the neon map's resolution.
+
+		Assumes the sprite faces right at zero rotation and ignores in.flip.
+	*/
+
+	template <class id_type>
+	FORCE_INLINE void detail_draw_neon_extended(
+		const sprite<id_type>& spr,
+		const sprite_drawing_input in,
+		const atlas_entry considered_texture,
+		const vec2 target_position,
+		const float target_rotation,
+		const vec2 considered_size,
+		rgba target_color
+	) {
+		if (in.colorize != white) {
+			target_color *= in.colorize;
+		}
+
+		auto faded_color = target_color;
+		faded_color.a = 0;
+
+		const auto dir = vec2::from_degrees(target_rotation);
+		const auto half_length = considered_size.x / 2;
+		const auto tail_length = half_length * (2 * spr.neon_extension_mult - 1);
+
+		const auto head_center = target_position + dir * (half_length / 2);
+		const auto tail_center = target_position - dir * (tail_length / 2);
+
+		auto push_piece = [&](
+			const vec2 center,
+			const vec2 size,
+			const float u_from,
+			const float u_to,
+			const rgba back_color
+		) {
+			const auto points = make_sprite_points(center, size, target_rotation);
+
+			auto t1 = vertex_triangle();
+			auto t2 = vertex_triangle();
+
+			const std::array<vec2, 4> texcoords = {
+				vec2(u_from, 0.f),
+				vec2(u_to, 0.f),
+				vec2(u_to, 1.f),
+				vec2(u_from, 1.f)
+			};
+
+			t1.vertices[0].texcoord = t2.vertices[0].texcoord = considered_texture.get_atlas_space_uv(texcoords[0]);
+			t2.vertices[1].texcoord = considered_texture.get_atlas_space_uv(texcoords[1]);
+			t1.vertices[1].texcoord = t2.vertices[2].texcoord = considered_texture.get_atlas_space_uv(texcoords[2]);
+			t1.vertices[2].texcoord = considered_texture.get_atlas_space_uv(texcoords[3]);
+
+			t1.vertices[0].pos = t2.vertices[0].pos = points[0];
+			t2.vertices[1].pos = points[1];
+			t1.vertices[1].pos = t2.vertices[2].pos = points[2];
+			t1.vertices[2].pos = points[3];
+
+			t1.vertices[0].color = t2.vertices[0].color = back_color;
+			t2.vertices[1].color = target_color;
+			t1.vertices[1].color = t2.vertices[2].color = target_color;
+			t1.vertices[2].color = back_color;
+
+			in.output.push(t1);
+			in.output.push(t2);
+		};
+
+		push_piece(head_center, vec2(half_length, considered_size.y), 0.5f, 1.f, target_color);
+		push_piece(tail_center, vec2(tail_length, considered_size.y), 0.f, 0.5f, faded_color);
+	}
+
 	template <class id_type>
 	FORCE_INLINE void detail_draw(
 		const sprite<id_type>& spr,
@@ -195,16 +273,30 @@ namespace augs {
 				else {
 					const auto original_size = vec2i(diffuse.get_original_size());
 					const auto neon_size_mult = vec2(drawn_size) / original_size;
+					const auto considered_neon_size = original_neon_size * neon_size_mult;
 
-					detail_draw(
-						spr,
-						in,
-						maybe_neon_map,
-						pos,
-						final_rotation,
-						original_neon_size * neon_size_mult,
-						spr.neon_color
-					);
+					if (spr.neon_extension_mult > 1.f) {
+						detail_draw_neon_extended(
+							spr,
+							in,
+							maybe_neon_map,
+							pos,
+							final_rotation,
+							considered_neon_size,
+							spr.neon_color
+						);
+					}
+					else {
+						detail_draw(
+							spr,
+							in,
+							maybe_neon_map,
+							pos,
+							final_rotation,
+							considered_neon_size,
+							spr.neon_color
+						);
+					}
 				}
 			}
 		}

@@ -43,6 +43,7 @@ const auto bright_cyan = rgba(cyan).mult_brightness(1.1);
 const auto muzzle_cyan = bullet_cyan_neon;
 
 const auto bullet_ice_neon = rgba(cyan).mult_brightness(1.1);
+const auto bullet_red_neon = rgba(red).mult_brightness(1.0);
 
 const auto bullet_blueish = rgba(198, 236, 255, 255);
 const auto bullet_blueish_neon = rgba(64, 97, 178, 255);
@@ -365,6 +366,8 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, bullet_steel).neon_color = bullet_steel_neon;
+			meta.get<invariants::sprite>().neon_color.a = 100;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.2f;
 
 			{
 				{
@@ -434,6 +437,8 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
+			meta.get<invariants::sprite>().neon_color.a = 100;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
 				{
@@ -503,6 +508,12 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
+
+			/*
+				Matches the warm white of HUNTER_ROUND_TRACE's line trail.
+			*/
+			meta.get<invariants::sprite>().neon_color = rgba(255, 245, 200, 50);
+			meta.get<invariants::sprite>().neon_extension_mult = 4.f;
 
 			{
 				{
@@ -577,6 +588,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white).neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 4.f;
 
 			{
 				{
@@ -664,6 +676,14 @@ namespace test_flavours {
 			meta.get<invariants::sprite>().neon_color = bullet_gold_neon;
 			meta.get<invariants::missile>().trace_particles.modifier.color = bullet_gold_neon;
 
+			meta.get<invariants::sprite>().neon_color.a = 120;
+
+			/*
+				Own clone of STEEL_PROJECTILE_TRACE whose line trail colorizes
+				from white to the round's gold neon instead of staying white.
+			*/
+			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
+
 			/*
 				Baka47 is not part of the dense pixel burst roster, even though it
 				inherits STEEL_ROUND - point it at the plain (no-burst) variants.
@@ -683,6 +703,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white).size *= 1.4f;
+			meta.get<invariants::sprite>().neon_extension_mult = 1.2f;
 
 			{
 				{
@@ -709,7 +730,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION_PLAIN);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ORANGE_ROUND_TRACE);
 			missile.trace_particles.modifier.color = rgba(255, 100, 0, 255);
 			missile.trace_particles.modifier.scale_amounts = 1.1f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.8f;
@@ -751,6 +772,8 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.8f;
+			meta.get<invariants::sprite>().neon_color.a = 130;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -824,6 +847,8 @@ namespace test_flavours {
 				so both rounds and their baked neon halos look the same in-game.
 			*/
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 14.4f / 11.f;
+			meta.get<invariants::sprite>().neon_color.a = 100;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
 				{
@@ -896,6 +921,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -924,8 +950,8 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.color = white;
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SN69_ROUND_TRACE);
+			missile.trace_particles.modifier.color = bullet_cyan_neon;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.color = muzzle_cyan;
@@ -963,6 +989,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
 				{
@@ -1031,7 +1058,9 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_red_neon;
+			meta.get<invariants::sprite>().neon_color.a = 180;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.5f;
 
 			{
 				{
@@ -1060,7 +1089,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WARX_ROUND_TRACE);
 			missile.trace_particles.modifier.color = red;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
@@ -1099,6 +1128,8 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_ice_neon;
+			meta.get<invariants::sprite>().neon_color.a = 70;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.5f;
 
 			{
 				{
@@ -1127,8 +1158,8 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.color = white;
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::GRADOBICIE_ROUND_TRACE);
+			missile.trace_particles.modifier.color = bullet_ice_neon;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.color = muzzle_cyan;
@@ -1169,6 +1200,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_ice_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1196,8 +1228,8 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION_PLAIN);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.color = white;
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE);
+			missile.trace_particles.modifier.color = bullet_ice_neon;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION_PLAIN);
 			missile.muzzle_leave_particles.modifier.color = muzzle_cyan;
@@ -1235,6 +1267,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_violet).neon_color = bullet_violet_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1261,7 +1294,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE);
 			missile.trace_particles.modifier.color = muzzle_violet;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
@@ -1302,6 +1335,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_violet).neon_color = bullet_violet_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1328,13 +1362,13 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE);
 			missile.trace_particles.modifier.color = muzzle_violet;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
-			missile.muzzle_leave_particles.modifier.color = pink;
+			missile.muzzle_leave_particles.modifier.color = violet;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -1369,6 +1403,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_violet).neon_color = bullet_violet_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1397,8 +1432,8 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.color = white;
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::KEK9_ROUND_TRACE);
+			missile.trace_particles.modifier.color = bullet_violet_neon;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.color = muzzle_cyan;
@@ -1438,6 +1473,9 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			meta.get<invariants::sprite>().neon_color = pro90_round_col;
+			meta.get<invariants::sprite>().neon_color.a = 110;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1466,7 +1504,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION_PLAIN);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PRO90_ROUND_TRACE);
 			missile.trace_particles.modifier.color = pro90_round_col;
 			missile.trace_particles.modifier.scale_amounts = 0.5f;
 
@@ -1507,6 +1545,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1532,7 +1571,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CYAN_ROUND_TRACE);
 			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION_PLAIN);
@@ -1571,6 +1610,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1596,7 +1636,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_ROUND_TRACE);
 			missile.trace_particles.modifier.color = cyan;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
@@ -1636,6 +1676,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_blueish).neon_color = bullet_blueish_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
 				{
@@ -1661,7 +1702,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_ROUND_TRACE);
 			missile.trace_particles.modifier.color = bullet_blueish;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
@@ -3397,8 +3438,8 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::SHOTGUN_RED_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_red_neon;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());

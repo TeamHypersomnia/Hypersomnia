@@ -78,6 +78,7 @@ void load_test_scene_particle_effects(
 		(not simultaneous) particle deaths. Used by sniper rifle trails (Hunter, AWKA).
 	*/
 	auto make_line_trail = [&](
+		particle_effect& effect,
 		const float density_mult = 1.f,
 		const rgba color = white,
 		const bool counter_flip = false,
@@ -87,7 +88,9 @@ void load_test_scene_particle_effects(
 		const float fade_in_ms = 40.f,
 		const rgba start_color = rgba(0, 0, 0, 0),
 		const float start_color_fade_ms = 0.f,
-		const float extra_back_offset = -15.f
+		const float extra_back_offset = -15.f,
+		const float min_lifetime_ms = 0.f,
+		const bool randomize_length_per_shot = false
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
@@ -113,7 +116,16 @@ void load_test_scene_particle_effects(
 		*/
 		em.angular_offset = counter_flip ? float_range(180, 180) : float_range(0, 0);
 		em.rotation_speed = float_range(0, 0);
-		em.particle_lifetime_ms = float_range(0, 2000 * lifetime_mult);
+		em.particle_lifetime_ms = float_range(min_lifetime_ms, 2000 * lifetime_mult);
+
+		/*
+			Each shot resolves its own effective lifetime_mult once, somewhere between
+			half of lifetime_mult and lifetime_mult itself - as if a different lifetime_mult
+			had been passed for that one shot - and every particle spawned by that shot still
+			randomizes its own lifetime within the resulting range (so the within-shot taper
+			is unaffected, only the shot's overall max reach varies).
+		*/
+		em.stream_particle_lifetime_mult = randomize_length_per_shot ? float_range(0.5f, 1.f) : float_range(1.f, 1.f);
 
 		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(0.f, 0.f);
@@ -153,7 +165,7 @@ void load_test_scene_particle_effects(
 		*/
 		em.ignore_effect_modifier = true;
 
-		return em;
+		effect.emissions.push_back(em);
 	};
 
 	{
@@ -1488,7 +1500,7 @@ void load_test_scene_particle_effects(
 		}
 
 		/* Bulldup */
-		effect.emissions.push_back(make_line_trail(5.5f, rgba(255, 245, 200, 255), true, 0, 10, 0.07f, 50.f, white, 30.f));
+		make_line_trail(effect, 5.5f, rgba(255, 245, 200, 255), true, 0, 10, 0.07f, 50.f, white, 30.f);
 	}
 
 	{
@@ -1499,7 +1511,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		effect.emissions.push_back(make_line_trail(5.5f, white, true, 1, 4, 0.25f, 60.0f, white, 30.f));
+		make_line_trail(effect, 5.5f, white, true, 1, 4, 0.25f, 60.0f, white, 30.f);
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1622,6 +1634,52 @@ void load_test_scene_particle_effects(
 		effect.emissions.push_back(em);
 	}
 
+	/*
+		Own clones of ELECTRIC_PROJECTILE_TRACE for the gun rounds that share it (base id
+		stays untouched, still used as-is by Blunaz/Electric missile) - each gets a short
+		line trail, its length randomized once per shot, roughly matched to that weapon's
+		own damage. Sn69 and Kek9 are the weakest, so theirs is barely visible.
+	*/
+	auto make_electric_trace_clone = [&](
+		const test_id_type new_id,
+		const float density_mult,
+		const rgba color,
+		const bool counter_flip,
+		const int size_i_begin,
+		const int size_i_end,
+		const float lifetime_mult
+	) {
+		auto& effect = acquire_effect(new_id);
+		effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+
+		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, 50.f, white, 25.f, -15.f, 0.f, true);
+	};
+
+	make_electric_trace_clone(test_scene_particle_effect_id::SN69_ROUND_TRACE, 5.f, cyan, true, 8, 16, 0.013f);
+	make_electric_trace_clone(test_scene_particle_effect_id::WARX_ROUND_TRACE, 5.f, red, true, 8, 16, 0.025f);
+	make_electric_trace_clone(test_scene_particle_effect_id::GRADOBICIE_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), true, 8, 16, 0.0275f);
+	make_electric_trace_clone(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), true, 8, 16, 0.0225f);
+
+	/*
+		Cyberspray's and Szczur's rounds have trace_particles_fly_backwards set, so
+		counter_flip must stay false here (like AWKA) instead of countering a flip that
+		doesn't apply.
+	*/
+	make_electric_trace_clone(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE, 5.f, pink, false, 8, 16, 0.0175f);
+	make_electric_trace_clone(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE, 5.5f, pink, false, 8, 16, 0.0225f);
+
+	make_electric_trace_clone(test_scene_particle_effect_id::KEK9_ROUND_TRACE, 5.f, violet, true, 8, 16, 0.013f);
+	make_electric_trace_clone(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 5.f, rgba(255, 234, 30, 255), true, 8, 16, 0.02f);
+	make_electric_trace_clone(test_scene_particle_effect_id::SZTURM_ROUND_TRACE, 5.5f, rgba(198, 236, 255, 255), true, 10, 20, 0.0275f);
+
+	/*
+		Bilmer2000/Datum gun (CYAN_ROUND) and Covert used the base ELECTRIC_PROJECTILE_TRACE
+		as-is, so they were the last guns left without a line trail. Both of their rounds set
+		trace_particles_fly_backwards, so counter_flip stays false (like AWKA).
+	*/
+	make_electric_trace_clone(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 8, 16, 0.025f);
+	make_electric_trace_clone(test_scene_particle_effect_id::COVERT_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), false, 8, 16, 0.015f);
+
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AWKA_ROUND_TRACE);
 
@@ -1675,7 +1733,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		effect.emissions.push_back(make_line_trail(6.6f, cyan, false, 0, 4, 0.5f, 40.f, white, 250.f));
+		make_line_trail(effect, 6.6f, cyan, false, 0, 4, 0.5f, 40.f, white, 250.f);
 	}
 
 	{
@@ -4206,14 +4264,26 @@ void load_test_scene_particle_effects(
 
 	{
 		/*
-			AO44's own trace - a clone of FURY_THROWER_ATTACK (still used as-is by ORANGE_ROUND)
-			so the sniper-line-trail addition below doesn't affect it.
+			AO44's own trace - a clone of FURY_THROWER_ATTACK so the sniper-line-trail
+			addition below doesn't affect it (ORANGE_ROUND has its own separate clone too).
 		*/
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AO44_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		effect.emissions.push_back(make_line_trail(4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f));
+		make_line_trail(effect, 4.5f, rgba(255, 100, 0, 255), true, 0, 18, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f);
 	}
+
+	{
+		/*
+			Calico's own trace - a clone of FURY_THROWER_ATTACK, short and randomized
+			per shot, roughly matched to Calico's damage (~3.0x multiplier).
+		*/
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ORANGE_ROUND_TRACE);
+		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
+
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 11, 22, 0.025f, 50.f, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, true);
+	}
+
 
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);

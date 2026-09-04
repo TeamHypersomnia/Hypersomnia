@@ -62,10 +62,20 @@ struct particles_emission {
 	bool should_particles_look_towards_velocity = true;
 	bool should_gore_remap = false;
 	bool ignore_effect_modifier = false;
+	bound stream_particle_lifetime_mult = bound(1.f, 1.f);
 
 	particle_definitions_vectors particle_definitions;
 	particle_layer target_layer = particle_layer::ILLUMINATING_PARTICLES;
 	// END GEN INTROSPECTOR
+
+	/*
+		stream_particle_lifetime_mult resolves a multiplier ONCE per stream instance (like
+		stream_lifetime_ms already is), and every particle spawned by that stream draws its
+		own particle_lifetime_ms with the upper bound scaled by that one resolved multiplier -
+		as if a different lifetime_mult had been passed for that one shot. Particles still
+		taper within the shot (Tier B), but the overall max reach of the trail varies from
+		shot to shot (Tier A). Default (1, 1) is a no-op.
+	*/
 
 	template <class T>
 	auto& get_definitions() {

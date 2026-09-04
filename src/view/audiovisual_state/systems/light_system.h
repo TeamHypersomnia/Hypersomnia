@@ -14,6 +14,7 @@
 
 #include "game/detail/visible_entities.h"
 #include "application/performance_settings.h"
+#include "augs/graphics/renderer_settings.h"
 
 class interpolation_system;
 class particles_simulation_system;
@@ -24,6 +25,7 @@ namespace augs {
 	namespace graphics {
 		class fbo;
 		class shader_program;
+		class texture;
 	}
 }
 
@@ -54,6 +56,9 @@ struct light_system_input {
 	const performance_settings& perf_settings;
 	const std::vector<visibility_request>& requests;
 	const bool strict_fow;
+
+	augs::graphics::texture* general_atlas;
+	augs::filtering_type default_filtering;
 };
 
 struct light_system {

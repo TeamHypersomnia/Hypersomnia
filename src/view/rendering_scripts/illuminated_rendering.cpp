@@ -651,7 +651,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			make_drawing_input,
 			in.perf_settings,
 			in.light_requests,
-			strict_fow
+			strict_fow,
+			in.general_atlas,
+			in.renderer_settings.default_filtering
 		};
 
 		light.render_all_lights(light_input);

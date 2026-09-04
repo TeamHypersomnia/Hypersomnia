@@ -78,6 +78,13 @@ public:
 		float fade_when_ms_remaining = 0.f;
 
 		/*
+			particle_lifetime_ms with its upper bound pre-scaled by the stream's resolved
+			source_emission.stream_particle_lifetime_mult - see particles_emission for the
+			rationale. Resolved once per stream instead of once per spawned particle.
+		*/
+		bound resolved_particle_lifetime_ms;
+
+		/*
 			The chased entity's position as of the previous time this instance was advanced.
 			Lets a frame's whole batch of spawned particles be distributed along the path the
 			entity actually travelled since then, instead of clumping at its current position -
@@ -223,7 +230,8 @@ public:
 		const float basic_velocity_degrees,
 		const float spread,
 		const particles_emission& emission,
-		const vec2 additional_vel = vec2::zero
+		const vec2 additional_vel = vec2::zero,
+		const std::optional<augs::bound<float>> forced_particle_lifetime_ms = std::nullopt
 	) {
 		const auto& templates = emission.get_definitions<particle_type>();
 		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
@@ -250,7 +258,9 @@ public:
 		const auto chosen_rotation_speed = rng.randval(emission.rotation_speed);
 
 		new_particle.set_rotation_speed(chosen_rotation_speed);
-		new_particle.set_max_lifetime_ms(rng.randval(emission.particle_lifetime_ms));
+		new_particle.set_max_lifetime_ms(
+			rng.randval(forced_particle_lifetime_ms.value_or(emission.particle_lifetime_ms))
+		);
 
 		if (emission.randomize_acceleration) {
 			new_particle.set_acceleration(

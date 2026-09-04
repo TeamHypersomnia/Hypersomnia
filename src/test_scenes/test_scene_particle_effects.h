@@ -91,6 +91,26 @@ enum class test_scene_particle_effect_id {
 	PIXEL_MUZZLE_LEAVE_EXPLOSION_PLAIN,
 	ICE_PROJECTILE_DESTRUCTION_PLAIN,
 
+	/*
+		Own clones so each of these weapons can get its own short, per-shot-randomized
+		line trail (length roughly matched to the weapon's damage) without changing the
+		shared base id (FURY_THROWER_ATTACK / ELECTRIC_PROJECTILE_TRACE) other users rely on.
+	*/
+	ORANGE_ROUND_TRACE,
+	SN69_ROUND_TRACE,
+	WARX_ROUND_TRACE,
+	GRADOBICIE_ROUND_TRACE,
+	ZAMIEC_ROUND_TRACE,
+	CYBERSPRAY_ROUND_TRACE,
+	SZCZUR_ROUND_TRACE,
+	KEK9_ROUND_TRACE,
+	PRO90_ROUND_TRACE,
+	SZTURM_ROUND_TRACE,
+
+	BAKA47_ROUND_TRACE,
+	CYAN_ROUND_TRACE,
+	COVERT_ROUND_TRACE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

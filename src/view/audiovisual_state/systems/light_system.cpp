@@ -3,6 +3,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"
 #include "augs/graphics/fbo.h"
+#include "augs/graphics/texture.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
@@ -361,7 +362,21 @@ void light_system::render_all_lights(const light_system_input in) const {
 		renderer.stencil_positive_test();
 	}
 
+	/*
+		The neon maps of bullets are stretched backward several times to overlap their particle trails,
+		which would magnify the atlas' nearest-neighbor filtering into visible blocks.
+		Filter this single layer linearly.
+	*/
+
+	if (in.general_atlas != nullptr) {
+		in.general_atlas->set_filtering(renderer, augs::filtering_type::LINEAR);
+	}
+
 	renderer.call_triangles(D::MISSILES_NEONS);
+
+	if (in.general_atlas != nullptr) {
+		in.general_atlas->set_filtering(renderer, in.default_filtering);
+	}
 
 	if (in.strict_fow) {
 		renderer.set_stencil(false);

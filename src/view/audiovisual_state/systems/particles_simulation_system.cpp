@@ -105,6 +105,15 @@ void particles_simulation_system::emission_instance::init_bounds(
 
 	fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
 
+	{
+		const auto mult = rng.randval(emission.stream_particle_lifetime_mult);
+
+		resolved_particle_lifetime_ms = bound(
+			emission.particle_lifetime_ms.first,
+			emission.particle_lifetime_ms.second * mult
+		);
+	}
+
 	randomize_spawn_point_within_circle_of_inner_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_inner_radius);
 	randomize_spawn_point_within_circle_of_outer_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_outer_radius);
 
@@ -876,7 +885,8 @@ void particles_simulation_system::advance_visible_streams(
 						current_transform.rotation + instance.swing_spread * static_cast<float>(std::sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI<float> * instance.swings_per_sec)),
 						instance.spread,
 						emission,
-						chased_velocity
+						chased_velocity,
+						instance.resolved_particle_lifetime_ms
 					);
 
 					return ::apply_to_particle(modifier, particle);

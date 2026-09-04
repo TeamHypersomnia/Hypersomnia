@@ -107,6 +107,7 @@ namespace augs {
 		bool vibrate_diffuse_too = false;
 		bool tile_excess_size = false;
 		pad_bytes<2> pad;
+		real32 neon_extension_mult = 0.f;
 		// END GEN INTROSPECTOR
 
 		bool has_color_wave() const {
