@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "augs/pad_bytes.h"
 #include "game/cosmos/entity_id.h"
 #include "game/detail/inventory/wielding_setup.h"
 
@@ -19,6 +20,8 @@ struct reloading_context {
 	signi_inventory_slot_id concerned_slot;
 	signi_entity_id new_ammo_source;
 	signi_entity_id old_ammo_source;
+	bool played_start_mounting_sound = false;
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
 	template <class C>

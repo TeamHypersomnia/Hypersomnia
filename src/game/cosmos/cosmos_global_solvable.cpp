@@ -132,8 +132,16 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					sound.post(step, predictability);
 				};
 
-				if (progress == 0.f) {
+				/*
+					When a stack of charges is mounted one by one (e.g. shotgun shells
+					fed into the chamber magazine), play the start sound only once,
+					at the beginning of the whole sequence. Subsequent shells arrive
+					as separate requests with play_start_mounting_sound set to false.
+				*/
+
+				if (progress == 0.f && !request.start_sound_played && request.params.play_start_mounting_sound) {
 					play_sound(sound_type::START);
+					request.start_sound_played = true;
 				}
 
 				should_be_erased = false;

@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include "augs/pad_bytes.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/cosmos/entity_handle_declaration.h"
 
@@ -10,6 +11,8 @@ struct pending_item_mount {
 	inventory_slot_id target;
 	item_slot_transfer_request_params params;
 	real32 progress_ms = 0.f;
+	bool start_sound_played = false;
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
 	real32 get_mounting_duration_ms(const const_entity_handle&) const;

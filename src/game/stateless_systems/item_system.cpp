@@ -447,10 +447,18 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						return true;
 					}
 
-					const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
+					auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
+
+					/*
+						When charges are fed one by one (e.g. shotgun shells),
+						each one is a separate mount request within the same reloading sequence -
+						play the start sound only for the first one.
+					*/
+					mount_new.params.play_start_mounting_sound = !ctx.played_start_mounting_sound;
 
 					if (transfer(mount_new)) {
 						RLD_LOG("Started mounting new mag.");
+						ctx.played_start_mounting_sound = true;
 						return true;
 					}
 
@@ -685,6 +693,12 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 								if (chamber.get_item_if_any()) {
 									if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
 										ctx = *new_ctx;
+
+										/*
+											This is a continuation of a shell-by-shell reload -
+											the start sound has already been played for the first shell.
+										*/
+										ctx.played_start_mounting_sound = true;
 									}
 								}
 							}

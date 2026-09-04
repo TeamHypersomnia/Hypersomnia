@@ -246,6 +246,19 @@ perform_transfer_result perform_transfer_impl::operator()(
 			}
 			else {
 				sound.input = target_slot->finish_mounting_sound;
+
+				/*
+					Shell-by-shell fed slots (shotgun chamber magazines) pitch the insert
+					click with the fill level: a near-empty tube clicks at ~85%, a full one at 100%.
+				*/
+				if (target_slot.get_id().type == slot_function::GUN_CHAMBER_MAGAZINE) {
+					const auto total_space = target_slot->space_available;
+
+					if (total_space > 0) {
+						const auto fill_ratio = 1.f - static_cast<real32>(target_slot.calc_local_space_available()) / static_cast<real32>(total_space);
+						sound.input.modifier.pitch *= 0.80f + 0.20f * fill_ratio;
+					}
+				}
 			}
 
 			if (sound.input.id.is_set()) {
