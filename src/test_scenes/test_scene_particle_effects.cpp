@@ -39,6 +39,12 @@ auto float_range(const A a, const B b) {
 	return augs::bound<float>(static_cast<float>(a), static_cast<float>(b));
 }
 
+/*
+	The standard fade-in for the guns' line trails; snipers, deagle, ao44
+	and the shotguns override it with their own, shorter values.
+*/
+constexpr float standard_line_trail_fade_in_ms = 120.f;
+
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map& images,
 	const plain_animations_pool& anims,
@@ -1511,7 +1517,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		make_line_trail(effect, 5.5f, white, true, 1, 4, 0.25f, 60.0f, white, 30.f);
+		make_line_trail(effect, 5.5f, white, true, 1, 4, 0.25f, standard_line_trail_fade_in_ms, white, 30.f);
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1579,7 +1585,7 @@ void load_test_scene_particle_effects(
 			auto& baka_effect = acquire_effect(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
 			baka_effect = effect;
 
-			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 11, 22, 0.0275f, 50.f, white, 30.f, -15.f, 0.f, true);
+			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 11, 22, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -15.f, 0.f, true);
 		}
 
 		/*
@@ -1612,7 +1618,7 @@ void load_test_scene_particle_effects(
 			roughly matched to this weapon family's damage (~3.2-4.0x multiplier).
 			White neons, so the line trail stays white as well.
 		*/
-		make_line_trail(effect, 6.f, white, true, 11, 22, 0.0275f, 50.f, white, 30.f, -15.f, 0.f, true);
+		make_line_trail(effect, 6.f, white, true, 11, 22, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -15.f, 0.f, true);
 	}
 
 	{
@@ -1680,17 +1686,18 @@ void load_test_scene_particle_effects(
 		const bool counter_flip,
 		const int size_i_begin,
 		const int size_i_end,
-		const float lifetime_mult
+		const float lifetime_mult,
+		const float fade_in_ms = standard_line_trail_fade_in_ms
 	) {
 		auto& effect = acquire_effect(new_id);
 		effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
-		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, 50.f, white, 25.f, -15.f, 0.f, true);
+		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, fade_in_ms, white, 25.f, -15.f, 0.f, true);
 	};
 
 	make_electric_trace_clone(test_scene_particle_effect_id::SN69_ROUND_TRACE, 5.f, cyan, true, 8, 16, 0.013f);
-	make_electric_trace_clone(test_scene_particle_effect_id::WARX_ROUND_TRACE, 5.f, red, true, 8, 16, 0.025f);
-	make_electric_trace_clone(test_scene_particle_effect_id::GRADOBICIE_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), true, 8, 16, 0.0275f);
+	make_electric_trace_clone(test_scene_particle_effect_id::WARX_ROUND_TRACE, 5.f, red, true, 8, 16, 0.025f, 50.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::GRADOBICIE_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), true, 8, 16, 0.0275f, 50.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), true, 8, 16, 0.0225f);
 
 	/*
@@ -4314,7 +4321,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ORANGE_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 11, 22, 0.025f, 50.f, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, true);
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 11, 22, 0.025f, standard_line_trail_fade_in_ms, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, true);
 	}
 
 
