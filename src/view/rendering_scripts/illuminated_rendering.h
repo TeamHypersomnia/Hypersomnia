@@ -43,7 +43,7 @@ struct additional_highlight {
 
 struct illuminated_rendering_input {
 	const character_camera camera;
-	const float camera_requested_fov_expansion;
+	const float camera_requested_fow_expansion;
 	const float camera_edge_zoomout_mult;
 	const camera_cone queried_cone;
 	const vec2 pre_step_crosshair_displacement;
@@ -79,19 +79,19 @@ struct illuminated_rendering_input {
 		return camera_edge_zoomout_mult > 0.35f;
 	}
 
-	auto get_considered_fov() const {
-		auto considered_fov = drawing.fog_of_war;
+	auto get_considered_fow() const {
+		auto considered_fow = drawing.fog_of_war;
 
-		considered_fov.size *= camera_requested_fov_expansion;
+		considered_fow.size *= camera_requested_fow_expansion;
 
 		if (camera_edge_zoomout_mult > 0.0f) {
-			const auto max_fov_reduction = 1.0f / 12;
-			const auto fov_reduction = augs::interp(1.0f, max_fov_reduction, camera_edge_zoomout_mult);
+			const auto max_fow_reduction = 1.0f / 12;
+			const auto fow_reduction = augs::interp(1.0f, max_fow_reduction, camera_edge_zoomout_mult);
 
-			considered_fov.angle *= fov_reduction;
+			considered_fow.angle *= fow_reduction;
 		}
 
-		return considered_fov;
+		return considered_fow;
 	}
 };
 

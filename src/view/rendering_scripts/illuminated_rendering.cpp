@@ -103,7 +103,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	auto& profiler = in.frame_performance;
 	auto& renderer = in.renderer;
 
-	const auto considered_fov = in.get_considered_fov();
+	const auto considered_fow = in.get_considered_fow();
 
 	/* Shader manipulation lambdas */
 
@@ -187,7 +187,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
 		viewed_character_transform.has_value() 
-		&& considered_fov.is_enabled()
+		&& considered_fow.is_enabled()
 	;
 #else
 	const bool fog_of_war_effective = false;
@@ -214,7 +214,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			dir.set(1, 0);
 		}
 
-		const auto& angle = considered_fov.angle;
+		const auto& angle = considered_fow.angle;
 		const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();
 		const auto right_dir = vec2(dir).rotate(angle / 2).neg_y();
 
@@ -338,7 +338,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader_with_matrix(shaders.pure_color_highlight);
 
-		const auto fow_size = considered_fov.get_real_size();
+		const auto fow_size = considered_fow.get_real_size();
 
 		get_drawer().aabb(
 			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
@@ -864,7 +864,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			character,
 			in.pre_step_crosshair_displacement,
 			interp,
-			considered_fov,
+			considered_fow,
 			settings.teammates_are_enemies
 		);
 	};

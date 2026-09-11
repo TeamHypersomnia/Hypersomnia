@@ -436,7 +436,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
 			meta.get<invariants::sprite>().neon_color.a = 100;
 			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
@@ -674,6 +674,7 @@ namespace test_flavours {
 				(default yellow) stays a more saturated yellow for the muzzle flash.
 			*/
 			meta.get<invariants::sprite>().neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().size *= 1.2f;
 			meta.get<invariants::missile>().trace_particles.modifier.color = bullet_gold_neon;
 
 			meta.get<invariants::sprite>().neon_color.a = 120;
@@ -702,7 +703,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white).size *= 1.4f;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.4f;
 			meta.get<invariants::sprite>().neon_extension_mult = 1.2f;
 
 			{
@@ -1753,7 +1754,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_blueish).neon_color = bullet_blueish_neon;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, white).neon_color = bullet_blueish_neon;
 			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
@@ -3506,7 +3507,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::GALILEA_ROUND_FINISHING_TRACE);
 			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::GALILEA_ROUND).get<invariants::trace>());
@@ -3537,7 +3538,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::ORANGE_ROUND_FINISHING_TRACE);
 			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND).get<invariants::trace>());

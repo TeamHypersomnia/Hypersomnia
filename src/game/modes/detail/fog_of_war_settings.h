@@ -4,8 +4,8 @@
 /*
 	These are ruleset values, derived from the map JSON - not player-editable.
 	The size doubles as the snap-to-fov target for the camera zoom, so the
-	balance zoom-out is folded into the fov expansion (see
-	get_camera_requested_fov_expansion) rather than baked into this size.
+	balance zoom-out is folded into the fow expansion (see
+	get_camera_requested_fow_expansion) rather than baked into this size.
 */
 
 struct fog_of_war_settings {

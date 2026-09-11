@@ -2762,7 +2762,7 @@ work_result work(
 		return gameplay_camera.current_edge_zoomout_mult;
 	};
 
-	WEBSTATIC auto get_camera_requested_fov_expansion = [&]() {
+	WEBSTATIC auto get_camera_requested_fow_expansion = [&]() {
 		auto result = 1.0f / get_logic_eye(false).zoom;
 
 		if (get_camera_edge_zoomout_mult() > 0.001f) {
@@ -2783,8 +2783,8 @@ work_result work(
 	WEBSTATIC auto get_camera_eye = [&](const config_json_table& viewing_config, bool with_edge_zoomout = true) {		
 		auto logic_eye = get_logic_eye(with_edge_zoomout);
 
-		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
-		const float target_visible_pixels_x = considered_fov_size.x;
+		const auto considered_fow_size = viewing_config.drawing.fog_of_war.size;
+		const float target_visible_pixels_x = considered_fow_size.x;
 
 		const bool should_zoom_to_fov = viewing_config.drawing.snap_zoom_to_fov_size;
 
@@ -5180,7 +5180,7 @@ work_result work(
 
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
-					get_camera_requested_fov_expansion(),
+					get_camera_requested_fow_expansion(),
 					get_camera_edge_zoomout_mult(),
 					get_queried_cone(viewing_config),
 					calc_pre_step_crosshair_displacement(viewing_config),
@@ -5386,7 +5386,7 @@ work_result work(
 				);
 
 				auto fog_of_war = new_viewing_config.drawing.fog_of_war;
-				fog_of_war.size *= get_camera_requested_fov_expansion();
+				fog_of_war.size *= get_camera_requested_fow_expansion();
 
 				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
