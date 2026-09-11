@@ -1904,7 +1904,7 @@ void settings_gui_state::perform(
 #if PLATFORM_WEB || !IS_PRODUCTION_BUILD
 				revertable_checkbox("Suppress client webhooks", config.client.suppress_webhooks);
 #endif
-				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);
+				revertable_slider("Camera query aabb add", config.session.camera_query_aabb_add, 0.f, 500.f);
 				
 				revertable_checkbox("Draw debug lines", config.debug_drawing.enabled);
 

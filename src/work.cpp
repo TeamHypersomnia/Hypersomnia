@@ -3772,12 +3772,13 @@ work_result work(
 		auto queried_eye = get_camera_eye(viewing_config);
 		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
 
-		const auto queried_cone = camera_cone(queried_eye, screen_size);
+		const auto query_expansion_px = vec2::square(2 * viewing_config.session.camera_query_aabb_add * queried_eye.zoom);
+		const auto queried_cone = camera_cone(queried_eye, vec2i(vec2(screen_size) + query_expansion_px));
 		const auto& cosm = viewed_character.get_cosmos();
 
-		all_visible.reacquire_all({ 
-			cosm, 
-			queried_cone, 
+		all_visible.reacquire_all({
+			cosm,
+			queried_cone,
 			accuracy_type::PROXIMATE,
 			get_render_layer_filter(),
 			tree_of_npo_filter::all()

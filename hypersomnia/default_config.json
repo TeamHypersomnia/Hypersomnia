@@ -695,7 +695,8 @@
         "show_performance": false,
         "show_logs": false,
         "hide_settings_ingame": true,
-        "camera_query_aabb_mult": 1.0
+        "camera_query_aabb_mult": 1.0,
+        "camera_query_aabb_add": 100.0
     },
 
     "test_scene": {

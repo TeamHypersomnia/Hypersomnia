@@ -44,12 +44,14 @@ void draw_debug_lines(
 	DEBUG_FRAME_LINES.clear();
 
 	const auto& query_mult = cfg.session.camera_query_aabb_mult;
+	const auto& query_add = cfg.session.camera_query_aabb_add;
 
 	if (DEBUG_DRAWING.draw_camera_query) {
-		if (!augs::compare(query_mult, 1.f)) {
+		if (!augs::compare(query_mult, 1.f) || !augs::compare(query_add, 0.f)) {
 			auto multiplied_cone = cone;
 			auto& zoom = multiplied_cone.eye.zoom;
 			zoom /= query_mult;
+			multiplied_cone.screen_size += vec2::square(2 * query_add * zoom);
 
 			augs::drawer_with_default(renderer.get_triangle_buffer(), default_texture).border(
 				multiplied_cone.get_visible_world_rect_aabb(),
