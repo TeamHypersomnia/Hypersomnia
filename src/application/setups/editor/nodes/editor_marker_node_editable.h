@@ -121,6 +121,8 @@ struct editor_area_marker_node_editable {
 	real32 rotation = 0.0f;
 	vec2i size = { 256, 256 };
 
+	float zoom = 0.75f;
+
 	editor_portal_info as_portal;
 	// END GEN INTROSPECTOR
 

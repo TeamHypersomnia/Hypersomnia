@@ -19,6 +19,8 @@ inline auto render_layer_to_tonpo_type(const render_layer layer) {
 			return tree_of_npo_type::LIGHTS;
 		case render_layer::CALLOUT_MARKERS:
 			return tree_of_npo_type::CALLOUT_MARKERS;
+		case render_layer::CAMERA_ZOOM_MARKERS:
+			return tree_of_npo_type::CAMERA_ZOOM_AREAS;
 		default:
 			return tree_of_npo_type::RENDERABLES;
 	}

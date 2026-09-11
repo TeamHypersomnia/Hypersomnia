@@ -54,6 +54,10 @@ struct marker_icon {
 			result.id = I::GUI_CURSOR_TEXT_INPUT;
 			result.col = white;
 		}
+		else if (type == area_marker_type::CAMERA_ZOOM) {
+			result.id = I::EDITOR_TOOL_RESET_ZOOM;
+			result.col = white;
+		}
 
 		return result;
 	}
@@ -104,7 +108,7 @@ void for_each_iconed_entity(
 		return settings.colors[f].standard;
 	};
 
-	visible.for_each<render_layer::POINT_MARKERS, render_layer::AREA_MARKERS, render_layer::AREA_SENSORS>(cosm, [&](const auto handle) {
+	visible.for_each<render_layer::POINT_MARKERS, render_layer::AREA_MARKERS, render_layer::AREA_SENSORS, render_layer::CAMERA_ZOOM_MARKERS>(cosm, [&](const auto handle) {
 		handle.template dispatch_on_having_all<components::marker>([&](const auto& typed_handle) {
 			using E = remove_cref<decltype(typed_handle)>;
 

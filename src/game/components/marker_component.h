@@ -111,6 +111,7 @@ namespace components {
 		pad_bytes<3> pad;
 		float camp_secs_min = 5.0f;
 		float camp_secs_max = 15.0f;
+		float zoom = 0.75f;
 		// END GEN INTROSPECTOR
 
 		auto get_faction() const {

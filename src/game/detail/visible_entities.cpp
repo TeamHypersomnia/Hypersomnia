@@ -192,8 +192,13 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 
 		cosm.for_each_having<invariants::area_marker>(
 			[&](const auto typed_handle) {
-				if (typed_handle.template get<invariants::area_marker>().type != area_marker_type::CALLOUT) {
-					// callouts already do have their own tonpo
+				const auto type = typed_handle.template get<invariants::area_marker>().type;
+
+				if (
+					type != area_marker_type::CALLOUT &&
+					type != area_marker_type::CAMERA_ZOOM
+				) {
+					// callouts and camera zoom areas already do have their own tonpo
 					register_visible(cosm, typed_handle);
 				}
 			}

@@ -420,7 +420,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			//LOG_NVPS(screen_space_pos.x, screen_space_pos.y, screen_size.x);
 
 			const vec2 world_space_pos = it.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
-			const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
+
+			/* Round to whole pixels so the crosshair stays crisp under fractional camera zooms. */
+			const vec2 projection_space_pos = vec2(cone.to_screen_space(world_space_pos)).round_fract();
 
 			float recoil_amount = 0.0f;
 
@@ -470,7 +472,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 				if (settings.crosshair.show_dot) {
 					const vec2 world_space_pos = it.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
-					const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
+					const vec2 projection_space_pos = vec2(cone.to_screen_space(world_space_pos)).round_fract();
 
 					const auto dot_size = vec2::square(settings.crosshair.dot_size * settings.crosshair.scale);
 					const auto dot_origin = ltrb::center_and_size(projection_space_pos, dot_size);

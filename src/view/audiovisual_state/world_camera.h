@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "augs/math/vec2.h"
 #include "game/components/transform_component.h"
 #include "augs/misc/smooth_value_field.h"
@@ -44,6 +45,15 @@ struct world_camera {
 
 	float current_edge_zoomout_mult = 0.0f;
 
+	/*
+		Multiplier applied on top of the final zoom,
+		works like a per-area BALANCE_ZOOM_OUT.
+		Driven by camera_zoom area markers, queried once per logic step.
+	*/
+
+	float target_area_zoom_mult = 1.0f;
+	float current_area_zoom_mult = 1.0f;
+
 	camera_eye get_current_eye(bool with_edge_zoomout) const;
 
 	void tick(
@@ -70,6 +80,8 @@ private:
 
 	void advance_flash(const_entity_handle viewer, augs::delta dt);
 	float target_edge_zoomout_mult = 1.0f;
+
+	uint32_t last_area_zoom_query_step = 0xffffffff;
 
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;

@@ -14,6 +14,7 @@ inline bool always_hide_in_game(const area_marker_type t) {
 		case area_marker_type::PREFAB:
 		case area_marker_type::PORTAL:
 		case area_marker_type::HAZARD:
+		case area_marker_type::CAMERA_ZOOM:
 			return true;
 
 		default:
@@ -49,6 +50,9 @@ void draw_area_indicator(
 				}
 				else if (t == area_marker_type::BUY_ZONE) {
 					return rgba(200, 200, 0, 255);
+				}
+				else if (t == area_marker_type::CAMERA_ZOOM) {
+					return rgba(0, 200, 255, 255);
 				}
 
 				return white;

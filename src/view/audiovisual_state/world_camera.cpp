@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "view/audiovisual_state/world_camera.h"
 #include "augs/misc/timing/delta.h"
 #include "game/cosmos/entity_handle.h"
@@ -6,6 +8,10 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/marker_component.h"
+#include "game/detail/visible_entities.h"
+#include "game/detail/get_hovered_world_entity.h"
+#include "game/detail/camera_zoom_area_logic.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
@@ -18,6 +24,8 @@ camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const
 	auto output_eye = current_eye;
 	//output_eye.transform.pos.x = (int(output_eye.transform.pos.x) / 3) * 3; 
 	//output_eye.transform.pos.y = (int(output_eye.transform.pos.y) / 3) * 3; 
+
+	output_eye.zoom *= current_area_zoom_mult;
 
 	if (with_edge_zoomout) {
 		const auto max_zoom_out = max_zoom_out_at_edges_v;
@@ -219,7 +227,13 @@ void world_camera::tick(
 
 		auto smoothing_settings = settings.additional_position_smoothing;
 
-		const bool surfing = std::abs(current_eye.zoom - 1.0f) > 0.01f;
+		/*
+			Note we check the target surf zoom, not current_eye.zoom -
+			current_eye.zoom includes the camera zoom areas
+			which must not trigger the surf camera behavior.
+		*/
+
+		const bool surfing = std::abs(target_zoom - 1.0f) > 0.01f;
 
 		if (surfing) {
 			additional_position_smoothing.target_value *= -1;
@@ -272,6 +286,31 @@ void world_camera::tick(
 		input_cfg
 	);
 
+	{
+		/*
+			The queried areas can only change with a logic step,
+			so it makes no sense to query more often than that.
+		*/
+
+		const auto current_step = static_cast<uint32_t>(cosm.get_total_steps_passed());
+
+		if (last_area_zoom_query_step != current_step) {
+			last_area_zoom_query_step = current_step;
+
+			target_area_zoom_mult = 1.0f;
+
+			if (entity_to_chase.alive()) {
+				if (const auto tr = entity_to_chase.find_logic_transform()) {
+					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos); area_zoom.has_value()) {
+						/* Sanitize, as this value comes from arbitrary map files. */
+						target_area_zoom_mult = std::clamp(*area_zoom, 0.2f, 4.0f);
+					}
+				}
+			}
+		}
+	}
+
+	interp_zoom(current_area_zoom_mult, target_area_zoom_mult, 2.5f, 2.5f);
 	interp_zoom(current_eye.zoom, target_zoom);
 
 	/* Here it's reversed */

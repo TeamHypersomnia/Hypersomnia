@@ -919,6 +919,11 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	const bool is_hurt = type == area_marker_type::HAZARD;
 	(void)is_hurt;
 
+	if (type == area_marker_type::CAMERA_ZOOM) {
+		MULTIPROPERTY("Zoom", zoom);
+		tooltip_on_hover("The camera will smoothly change zoom to this value\nwhenever the viewed character is inside this area.\nValues below 1 zoom the camera out - useful for large open spaces.\n\nIf zoom areas overlap, the one higher in the layer hierarchy wins.");
+	}
+
 	if (::is_portal_based(type)) {
 		ImGui::ColorButton("##Cbutton", insp.as_portal.get_icon_color().operator ImVec4());
 
