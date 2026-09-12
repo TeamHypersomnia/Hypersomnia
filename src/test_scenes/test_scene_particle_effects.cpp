@@ -1,4 +1,6 @@
 #include <cstddef>
+#include <cmath>
+#include <algorithm>
 /*
 	Disable float/int warnings, this is just a content script
 */
@@ -1729,7 +1731,7 @@ void load_test_scene_particle_effects(
 		Datum gun (DATUM_ROUND) shared CYAN_ROUND once, so its trail follows the same rules,
 		it is just longer and thicker.
 	*/
-	make_electric_trace_clone(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 25, 0.056f, standard_line_trail_fade_in_ms, -24.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 25, 0.056f, standard_line_trail_fade_in_ms, -17.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::DATUM_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 26, 0.080f, standard_line_trail_fade_in_ms, -24.f, 450.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::COVERT_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), false, 14, 25, 0.056f, standard_line_trail_fade_in_ms, -24.f);
 
