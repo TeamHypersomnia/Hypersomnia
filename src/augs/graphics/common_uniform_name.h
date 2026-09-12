@@ -14,6 +14,7 @@ namespace augs {
 		light_attenuation,
 		multiply_color,
 		texture_center,
+		black_cutoff,
 
 		basic_texture,
 		smoke_texture,

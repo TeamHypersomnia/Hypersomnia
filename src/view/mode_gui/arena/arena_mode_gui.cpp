@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include "augs/drawing/drawing.hpp"
 #include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
@@ -37,7 +38,8 @@ void draw_weapon_flavour_with_attachments(
 	const vec2 lt_pos,
 	const images_in_atlas_map& images_in_atlas,
 	const cosmos& cosm,
-	const item_flavour_id& flavour
+	const item_flavour_id& flavour,
+	const rgba color = white
 ) {
 	using namespace augs::imgui;
 	const auto lt_offset = -precalculated_aabb.left_top();
@@ -50,7 +52,7 @@ void draw_weapon_flavour_with_attachments(
 		const auto& entry = images_in_atlas.find_or(attachment_image).diffuse;
 		const auto final_pos = lt_pos + lt_offset + attachment_offset.pos;
 
-		augs::detail_sprite(output_buffer, entry, final_pos, attachment_offset.rotation, white);
+		augs::detail_sprite(output_buffer, entry, final_pos, attachment_offset.rotation, color);
 	};
 
 	presentational_with_attachments(
@@ -75,7 +77,8 @@ tool_layout_meta make_tool_layout(
 	augs::vertex_triangle_buffer& output_buffer,
 	const damage_origin& origin,
 	const cosmos& cosm,
-	const images_in_atlas_map& images_in_atlas
+	const images_in_atlas_map& images_in_atlas,
+	const std::optional<rgba> silhouette_color = std::nullopt
 ) {
 	auto from_image = [&](const assets::image_id image_id) {
 		//LOG_NVPS(image_id.get_cache_index(), static_cast<std::size_t>(image_id.get_cache_index()), images_in_atlas.size());
@@ -84,12 +87,22 @@ tool_layout_meta make_tool_layout(
 		auto meta = tool_layout_meta();
 
 		meta.aabb = ltrb(vec2::zero, entry.get_original_size());
-		meta.draw = [&](const ltrb target_aabb) {
-			augs::drawer{ output_buffer }.aabb(
-				entry,
-				target_aabb,
-				white
-			);
+		meta.draw = [&, silhouette_color](const ltrb target_aabb) {
+			if (silhouette_color.has_value()) {
+				augs::drawer{ output_buffer }.aabb_bordered(
+					entry,
+					target_aabb,
+					*silhouette_color,
+					black
+				);
+			}
+			else {
+				augs::drawer{ output_buffer }.aabb(
+					entry,
+					target_aabb,
+					white
+				);
+			}
 		};
 
 		return meta;
@@ -106,12 +119,22 @@ tool_layout_meta make_tool_layout(
 					auto meta = tool_layout_meta();
 
 					meta.aabb = ltrb(vec2::zero, entry.get_original_size());
-					meta.draw = [&](const ltrb target_aabb) {
-						augs::drawer{ output_buffer }.aabb(
-							entry,
-							target_aabb,
-							orange
-						);
+					meta.draw = [&, entry, silhouette_color](const ltrb target_aabb) {
+						if (silhouette_color.has_value()) {
+							augs::drawer{ output_buffer }.aabb_bordered(
+								entry,
+								target_aabb,
+								*silhouette_color,
+								black
+							);
+						}
+						else {
+							augs::drawer{ output_buffer }.aabb(
+								entry,
+								target_aabb,
+								orange
+							);
+						}
 					};
 
 					return meta;
@@ -132,16 +155,35 @@ tool_layout_meta make_tool_layout(
 				const auto total_aabb = aabb_of_game_image_with_attachments(images_in_atlas, cosm, tool);
 
 				meta.aabb = total_aabb;
-				meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
+				meta.draw = [&, tool, total_aabb, silhouette_color](const auto& target_aabb) {
 					const auto lt_pos = target_aabb.left_top();
+
+					if (silhouette_color.has_value()) {
+						const vec2i offsets[4] = {
+							vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+						};
+
+						for (const auto& o : offsets) {
+							::draw_weapon_flavour_with_attachments(
+								output_buffer,
+								total_aabb,
+								lt_pos + o,
+								images_in_atlas,
+								cosm,
+								tool,
+								black
+							);
+						}
+					}
 
 					::draw_weapon_flavour_with_attachments(
 						output_buffer,
-						total_aabb, 
+						total_aabb,
 						lt_pos,
 						images_in_atlas,
 						cosm,
-						tool
+						tool,
+						silhouette_color.has_value() ? *silhouette_color : white
 					);
 				};
 
@@ -919,13 +961,23 @@ void arena_gui_state::draw_mode_gui(
 					return { bg, col };
 				}();
 
+				/*
+					Tool and circumstance icons are drawn as pure color silhouettes.
+					They go into a dedicated buffer drawn with the pure_color_highlight shader
+					in a separate drawcall - see draw_mode_and_setup_custom_gui in work.cpp.
+				*/
+
+				auto& silhouettes_buffer = in.renderer.dedicated[augs::dedicated_buffer::KNOCKOUT_ICONS].triangles;
+				const auto silhouettes_drawer = augs::drawer { silhouettes_buffer };
+
 				const auto layout = make_tool_layout(
 					death_hazard_icon,
 					death_fallback_icon,
-					get_drawer().output_buffer,
+					silhouettes_buffer,
 					ko.origin,
 					cosm,
-					in.images_in_atlas
+					in.images_in_atlas,
+					orange
 				);
 
 				const auto tool_size = [&]() {
@@ -1021,7 +1073,7 @@ void arena_gui_state::draw_mode_gui(
 					//auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, wallbang_icon_size.y / 2), wallbang_icon_size);
 
-					general_drawer.aabb_bordered(
+					silhouettes_drawer.aabb_bordered(
 						wallbang_entry,
 						origin,
 						orange,
@@ -1036,7 +1088,7 @@ void arena_gui_state::draw_mode_gui(
 					//auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, headshot_icon_size.y / 2), headshot_icon_size);
 
-					general_drawer.aabb_bordered(
+					silhouettes_drawer.aabb_bordered(
 						headshot_entry,
 						origin,
 						orange,

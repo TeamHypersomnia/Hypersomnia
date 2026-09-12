@@ -81,6 +81,7 @@
 
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/renderer_backend.h"
+#include "augs/graphics/shader.hpp"
 
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
@@ -5019,6 +5020,39 @@ work_result work(
 					setup.draw_custom_gui(make_draw_setup_gui_input(chosen_renderer, new_viewing_config));
 					chosen_renderer.call_and_clear_lines();
 				});
+
+				{
+					/*
+						Knockout indicator icons (weapon, headshot, wallbang) are drawn
+						as pure color silhouettes in a single separate drawcall.
+					*/
+
+					const auto& silhouettes = chosen_renderer.dedicated[augs::dedicated_buffer::KNOCKOUT_ICONS].triangles;
+
+					if (silhouettes.size() > 0) {
+						chosen_renderer.call_and_clear_triangles();
+
+						auto& shader = necessary_shaders.pure_color_highlight;
+
+						/*
+							Skip the black outlines baked into sprites,
+							so the silhouettes are not overly thick.
+							Reset to 0 afterwards as the shader is shared with world highlights.
+						*/
+
+						const auto silhouette_black_cutoff = 0.15f;
+
+						shader->set_as_current(chosen_renderer);
+						shader->set_projection(chosen_renderer, make_gui_projection());
+						shader->set_uniform(chosen_renderer, augs::common_uniform_name::black_cutoff, silhouette_black_cutoff);
+
+						chosen_renderer.call_triangles(augs::dedicated_buffer::KNOCKOUT_ICONS);
+
+						shader->set_uniform(chosen_renderer, augs::common_uniform_name::black_cutoff, 0.0f);
+
+						necessary_shaders.standard->set_as_current(chosen_renderer);
+					}
+				}
 
 				if (new_viewing_config.hud_messages.is_enabled) {
 					hud_messages.draw(
