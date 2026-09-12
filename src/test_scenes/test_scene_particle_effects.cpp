@@ -96,7 +96,8 @@ void load_test_scene_particle_effects(
 		const float start_color_fade_ms = 0.f,
 		const float extra_back_offset = -15.f,
 		const float min_lifetime_ms = 0.f,
-		const bool randomize_length_per_shot = false
+		const bool randomize_length_per_shot = false,
+		const float shrink_ms = 300.f
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
@@ -151,8 +152,15 @@ void load_test_scene_particle_effects(
 			particle_definition.smooth_shrink = true;
 			particle_definition.start_color = start_color;
 			particle_definition.start_color_fade_ms = start_color_fade_ms;
+			/*
+				Also determines the segments' scale at birth:
+				sqrt(max_lifetime / shrink_ms) - so for longer-lived trails,
+				pass a proportionally larger shrink_ms to keep the fresh segments
+				spawning at the bullet's tip equally small.
+			*/
+
 			if (i > 0)
-			particle_definition.shrink_when_ms_remaining = 300.f;
+			particle_definition.shrink_when_ms_remaining = shrink_ms;
 			//particle_definition.unshrinking_time_ms = 200.f;
 
 			em.add_particle_definition(particle_definition);
@@ -1688,18 +1696,19 @@ void load_test_scene_particle_effects(
 		const int size_i_end,
 		const float lifetime_mult,
 		const float fade_in_ms = standard_line_trail_fade_in_ms,
-		const float extra_back_offset = -15.f
+		const float extra_back_offset = -15.f,
+		const float shrink_ms = 300.f
 	) {
 		auto& effect = acquire_effect(new_id);
 		effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
-		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, fade_in_ms, white, 25.f, extra_back_offset, 0.f, true);
+		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, fade_in_ms, white, 25.f, extra_back_offset, 0.f, true, shrink_ms);
 	};
 
-	make_electric_trace_clone(test_scene_particle_effect_id::SN69_ROUND_TRACE, 5.f, cyan, true, 12, 22, 0.018f, standard_line_trail_fade_in_ms, -21.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::SN69_ROUND_TRACE, 5.f, cyan, true, 12, 22, 0.032f, standard_line_trail_fade_in_ms, -21.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::WARX_ROUND_TRACE, 5.f, red, true, 8, 16, 0.025f, 50.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::GRADOBICIE_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), true, 8, 16, 0.0275f, 50.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), true, 14, 25, 0.028f, standard_line_trail_fade_in_ms, -24.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), true, 14, 25, 0.042f, standard_line_trail_fade_in_ms, -24.f);
 
 	/*
 		Cyberspray's and Szczur's rounds have trace_particles_fly_backwards set, so
@@ -1707,19 +1716,22 @@ void load_test_scene_particle_effects(
 		doesn't apply.
 	*/
 	make_electric_trace_clone(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE, 5.f, pink, false, 12, 22, 0.0175f, standard_line_trail_fade_in_ms, -21.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE, 5.5f, pink, false, 12, 22, 0.0225f, standard_line_trail_fade_in_ms, -21.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE, 5.5f, pink, false, 13, 23, 0.042f, standard_line_trail_fade_in_ms, -22.f);
 
-	make_electric_trace_clone(test_scene_particle_effect_id::KEK9_ROUND_TRACE, 5.f, violet, true, 12, 22, 0.018f, standard_line_trail_fade_in_ms, -21.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 5.f, rgba(255, 234, 30, 255), true, 14, 25, 0.025f, standard_line_trail_fade_in_ms, -24.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::KEK9_ROUND_TRACE, 5.f, violet, true, 12, 22, 0.038f, standard_line_trail_fade_in_ms, -21.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 5.f, rgba(255, 234, 30, 255), true, 16, 28, 0.028f, standard_line_trail_fade_in_ms, -27.f);
 	make_electric_trace_clone(test_scene_particle_effect_id::SZTURM_ROUND_TRACE, 5.5f, rgba(198, 236, 255, 255), true, 14, 28, 0.0275f, standard_line_trail_fade_in_ms, -23.f);
 
 	/*
-		Bilmer2000/Datum gun (CYAN_ROUND) and Covert used the base ELECTRIC_PROJECTILE_TRACE
+		Bilmer2000 (CYAN_ROUND) and Covert used the base ELECTRIC_PROJECTILE_TRACE
 		as-is, so they were the last guns left without a line trail. Both of their rounds set
 		trace_particles_fly_backwards, so counter_flip stays false (like AWKA).
+		Datum gun (DATUM_ROUND) shared CYAN_ROUND once, so its trail follows the same rules,
+		it is just longer and thicker.
 	*/
-	make_electric_trace_clone(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 25, 0.031f, standard_line_trail_fade_in_ms, -24.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::COVERT_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), false, 14, 25, 0.026f, standard_line_trail_fade_in_ms, -24.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 25, 0.056f, standard_line_trail_fade_in_ms, -24.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::DATUM_ROUND_TRACE, 5.5f, rgba(0, 146, 222, 255), false, 14, 26, 0.080f, standard_line_trail_fade_in_ms, -24.f, 450.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::COVERT_ROUND_TRACE, 5.f, rgba(0, 146, 222, 255), false, 14, 25, 0.056f, standard_line_trail_fade_in_ms, -24.f);
 
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AWKA_ROUND_TRACE);

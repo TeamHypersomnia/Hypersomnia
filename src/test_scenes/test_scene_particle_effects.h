@@ -109,6 +109,7 @@ enum class test_scene_particle_effect_id {
 
 	BAKA47_ROUND_TRACE,
 	CYAN_ROUND_TRACE,
+	DATUM_ROUND_TRACE,
 	COVERT_ROUND_TRACE,
 	SZKWAL_ROUND_TRACE,
 

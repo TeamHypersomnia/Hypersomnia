@@ -1552,6 +1552,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			meta.get<invariants::sprite>().size *= 1.2f;
 			meta.get<invariants::sprite>().neon_color = pro90_round_col;
 			meta.get<invariants::sprite>().neon_color.a = 110;
 			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
@@ -1676,6 +1677,16 @@ namespace test_flavours {
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::DATUM_ROUND);
+			meta = get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND);
+			meta.get<invariants::text_details>().name = "Datum gun round";
+
+			meta.get<invariants::sprite>().size *= 1.1f;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
+			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DATUM_ROUND_TRACE);
 		}
 
 		{
@@ -2506,6 +2517,13 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::DATUM_CHARGE);
+			meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
+			meta.get<invariants::text_details>().name = "Datum gun charge";
+			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::DATUM_ROUND);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::SKULL_ROCKET);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET, white);
@@ -2876,7 +2894,7 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.61");
 			charge_deposit_def.mounting_duration_ms = 700.f;
-			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::DATUM_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -4808,7 +4826,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.15f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 4200;
+			meta.get<invariants::item>().standard_price = 4000;
 			set_chambering_duration_ms(meta, 550.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.5");
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
