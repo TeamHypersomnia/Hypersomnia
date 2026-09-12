@@ -748,10 +748,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.pure_color_highlight);
 	renderer.call_triangles(D::MISSILES_SHADOWS);
 
-	set_shader(shaders.standard);
-
-	renderer.call_triangles(D::MISSILES);
-
 	if (strict_fow) {
 		renderer.set_stencil(false);
 	}
@@ -820,6 +816,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	/* Always on top of all the other particles. */
 	draw_particles(particle_layer::TRAILS);
+
+	/*
+		The missile sprites are drawn on top of all the particles
+		so that the trails never poke above the rounds,
+		and on top of the lying items with all their shadows and highlights.
+		Only their shadows stay early in the order, as they are cast on the ground.
+	*/
+
+	set_shader(shaders.standard);
+	renderer.call_triangles(D::MISSILES);
 
 	if (strict_fow) {
 		renderer.set_stencil(false);
