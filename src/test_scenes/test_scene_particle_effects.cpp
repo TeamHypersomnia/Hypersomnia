@@ -1525,7 +1525,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		make_line_trail(effect, 5.5f, white, true, 1, 6, 0.25f, standard_line_trail_fade_in_ms, white, 30.f, -17.f);
+		make_line_trail(effect, 5.5f, white, true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 30.f, -18.f);
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1786,7 +1786,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		make_line_trail(effect, 6.6f, cyan, false, 0, 6, 0.5f, 40.f, white, 250.f, -17.f);
+		make_line_trail(effect, 6.6f, cyan, false, 0, 8, 0.5f, 40.f, white, 250.f, -19.f);
 	}
 
 	{
