@@ -1982,6 +1982,29 @@ work_result work(
 		});
 	};
 
+	WEBSTATIC auto is_buy_time_active = [&]() {
+		return visit_current_setup([&]<typename S>(S& setup) {
+			if constexpr(S::has_game_mode) {
+				return setup.on_mode_with_input(
+					[&]<typename M>(const M& typed_mode, const auto& mode_input) {
+						if constexpr(std::is_same_v<M, arena_mode>) {
+							return typed_mode.get_buy_seconds_left(mode_input) > 0.f;
+						}
+						else {
+							/* Modes without a buy time restriction allow buying anytime. */
+							(void)typed_mode;
+							(void)mode_input;
+							return true;
+						}
+					}
+				);
+			}
+			else {
+				return true;
+			}
+		});
+	};
+
 	WEBSTATIC auto on_specific_setup = [&](auto callback) -> decltype(auto) {
 		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
@@ -3883,7 +3906,8 @@ work_result work(
 			viewing_config.camera,
 			viewed_character,
 			calc_pre_step_crosshair_displacement(viewing_config),
-			get_current_input_settings(viewing_config)
+			get_current_input_settings(viewing_config),
+			is_buy_time_active()
 		);
 
 		hud_messages.advance(viewing_config.hud_messages.value);

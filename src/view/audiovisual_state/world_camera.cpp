@@ -57,7 +57,8 @@ void world_camera::tick(
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase,
 	const vec2 mid_step_crosshair_displacement,
-	const input_settings& input_cfg
+	const input_settings& input_cfg,
+	const bool during_buy_time
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
@@ -301,7 +302,7 @@ void world_camera::tick(
 
 			if (entity_to_chase.alive()) {
 				if (const auto tr = entity_to_chase.find_logic_transform()) {
-					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos); area_zoom.has_value()) {
+					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos, during_buy_time); area_zoom.has_value()) {
 						/* Sanitize, as this value comes from arbitrary map files. */
 						target_area_zoom_mult = std::clamp(*area_zoom, 0.2f, 4.0f);
 					}

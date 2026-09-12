@@ -59,12 +59,13 @@ struct world_camera {
 	void tick(
 		const vec2i screen_size,
 		const vec2 nonzoomedout_visible_world_area,
-		const interpolation_system& interp, 
+		const interpolation_system& interp,
 		augs::delta dt,
 		world_camera_settings settings,
 		const_entity_handle entity_to_chase,
 		const vec2 mid_step_crosshair_displacement,
-		const input_settings& input_cfg
+		const input_settings& input_cfg,
+		bool during_buy_time
 	);
 
 	auto get_effective_flash_mult() const {
