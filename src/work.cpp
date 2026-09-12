@@ -5037,10 +5037,12 @@ work_result work(
 						/*
 							Skip the black outlines baked into sprites,
 							so the silhouettes are not overly thick.
+							Below 1/255 on purpose: only pixels of exactly rgb(0,0,0) are
+							considered outlines, so even rgb(1,1,1) survives in the silhouette.
 							Reset to 0 afterwards as the shader is shared with world highlights.
 						*/
 
-						const auto silhouette_black_cutoff = 0.15f;
+						const auto silhouette_black_cutoff = 0.003f;
 
 						shader->set_as_current(chosen_renderer);
 						shader->set_projection(chosen_renderer, make_gui_projection());
