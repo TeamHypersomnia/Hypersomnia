@@ -1,14 +1,14 @@
 {
     "extra_loadables": {
         "generate_neon_map": {
-            "standard_deviation": 6.0,
+            "standard_deviation": 8.0,
             "radius": [
-                80,
-                80
+                180,
+                180
             ],
-            "amplification": 120.0,
+            "amplification": 300.0,
             "alpha_multiplier": 1.0,
-            "light_colors": [[255, 0, 0, 255], [251, 242, 54, 255], [25, 195, 157, 255], [157, 243, 224, 255]
+            "light_colors": [[255, 0, 0, 255], [255, 160, 0, 255], [255, 90, 0, 255]
             ]
         },
         "generate_desaturation": false

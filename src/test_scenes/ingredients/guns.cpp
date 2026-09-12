@@ -301,6 +301,9 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_FLYING, white);
 
+			/* A long, stretching neon tail like Deagle's. */
+			meta.get<invariants::sprite>().neon_extension_mult = 1.f;
+
 			{
 				{
 					components::trace trace_def;
@@ -436,9 +439,15 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
+			/*
+				Exactly Baka47's round, only slightly thinner -
+				proportionally to the damage multipliers (Galilea 3.3x, Baka47 4x).
+			*/
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
-			meta.get<invariants::sprite>().neon_color.a = 100;
-			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
+			meta.get<invariants::sprite>().neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().neon_color.a = 90;
+			meta.get<invariants::sprite>().size *= 1.1f;
+			meta.get<invariants::sprite>().neon_extension_mult = 3.2f;
 
 			{
 				{
@@ -465,8 +474,8 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.color = white;
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::GALILEA_ROUND_TRACE);
+			missile.trace_particles.modifier.color = bullet_gold_neon;
 			missile.trace_particles.modifier.scale_amounts = 3.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.3f;
 
@@ -690,6 +699,9 @@ namespace test_flavours {
 				from white to the round's gold neon instead of staying white.
 			*/
 			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
+
+			/* Own finishing trace - the inherited steel one is white and unscaled. */
+			meta.get<invariants::trace>().finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::BAKA47_ROUND_FINISHING_TRACE);
 
 			/*
 				Baka47 is not part of the dense pixel burst roster, even though it
@@ -938,7 +950,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::PISTOL_CYAN_ROUND_FINISHING_TRACE);
 					meta.set(trace_def);
 				}
 			}
@@ -997,6 +1009,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().size *= 1.1f;
 			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
 			{
@@ -1694,6 +1707,9 @@ namespace test_flavours {
 			meta.get<invariants::sprite>().size *= 1.1f;
 			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DATUM_ROUND_TRACE);
+
+			/* Own finishing trace - the shared cyan one is unscaled. */
+			meta.get<invariants::trace>().finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::DATUM_ROUND_FINISHING_TRACE);
 		}
 
 		{
@@ -1783,7 +1799,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZTURM_ROUND_FINISHING_TRACE);
 
 					meta.set(trace_def);
 				}
@@ -3490,8 +3506,60 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::DATUM_ROUND_FINISHING_TRACE);
+
+			/* Matches DATUM_ROUND's sprite scale. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().size *= 1.1f;
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::DATUM_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::PISTOL_CYAN_ROUND_FINISHING_TRACE);
+
+			/* Matches PISTOL_CYAN_ROUND's sprite - the shared cyan one uses a different image. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::PISTOL_CYAN_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZTURM_ROUND_FINISHING_TRACE);
+
+			/* Matches SZTURM_ROUND's sprite - the shared cyan one has a different tint and neon. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, white).neon_color = bullet_blueish_neon;
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::SZTURM_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::BAKA47_ROUND_FINISHING_TRACE);
+
+			/* Matches BAKA47_ROUND's sprite. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().neon_color.a = 120;
+			meta.get<invariants::sprite>().size *= 1.2f * 1.11f;
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::BAKA47_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
-			
+
+			/*
+				Intentionally pink on a different image than the violet rounds
+				that share it (Cyberspray, Szczur, Kek9) -
+				gives a nice color variety at the trail's end.
+			*/
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, pink);
 
 			{
@@ -3503,6 +3571,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
 			
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
+			meta.get<invariants::sprite>().size *= 1.1f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::HPSR_ROUND).get<invariants::trace>());
@@ -3524,8 +3593,8 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HUNTER_ROUND_FINISHING_TRACE);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
-			/* Matches the round's sprite scale. */
+			/* Matches the round's sprite. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
 			meta.get<invariants::sprite>().size *= 1.45f;
 
 			{
@@ -3535,8 +3604,11 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::GALILEA_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
+
+			/* Matches the round's sprite. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().neon_color.a = 120;
+			meta.get<invariants::sprite>().size *= 1.1f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::GALILEA_ROUND).get<invariants::trace>());
@@ -3567,8 +3639,9 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::ORANGE_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
+
+			/* Matches the round's sprite scale. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.4f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND).get<invariants::trace>());
@@ -3579,6 +3652,8 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.8f;
+			/* Matches the round's neon alpha. */
+			meta.get<invariants::sprite>().neon_color.a = 130;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::AO44_ROUND).get<invariants::trace>());
@@ -3617,8 +3692,11 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::PRO90_ROUND_FINISHING_TRACE);
-			
+
+			/* Matches the round's sprite and neon (pro90_round_col, alpha 110). */
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			meta.get<invariants::sprite>().size *= 1.2f;
+			meta.get<invariants::sprite>().neon_color = rgba(255, 234, 30, 110);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());

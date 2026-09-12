@@ -100,14 +100,17 @@ void load_test_scene_particle_effects(
 		const float min_lifetime_ms = 0.f,
 		const bool randomize_length_per_shot = false,
 		const float shrink_ms = 300.f,
-		const float spawn_jitter_radius = 0.f
+		const float spawn_jitter_radius = 0.f,
+		const float unshrinking_ms = 0.f,
+		const float stream_lifetime = 300000.f,
+		const float max_base_speed = 300.f
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
 		em.particles_per_sec = float_range(1200 * density_mult, 1200 * density_mult);
-		em.stream_lifetime_ms = float_range(300000, 300000);
+		em.stream_lifetime_ms = float_range(stream_lifetime, stream_lifetime);
 		em.stream_fade_in_ms = fade_in_ms;
-		em.base_speed = float_range(300, 300);
+		em.base_speed = float_range(300, max_base_speed);
 
 		/*
 			The spawn point (the center of each segment) sits right behind the bullet's
@@ -164,7 +167,7 @@ void load_test_scene_particle_effects(
 
 			if (i > 0)
 			particle_definition.shrink_when_ms_remaining = shrink_ms;
-			//particle_definition.unshrinking_time_ms = 200.f;
+			particle_definition.unshrinking_time_ms = unshrinking_ms;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -1603,7 +1606,7 @@ void load_test_scene_particle_effects(
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
 		/* White for most of the trail, colorizing to the standard shotgun orange at the far tail. */
-		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 400.f, -18.f, 0.f, false, 300.f, 10.f);
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 400.f, -18.f, 0.f, false, 300.f, 10.f, 8.f);
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1676,7 +1679,7 @@ void load_test_scene_particle_effects(
 				so the segments are thinner in compensation
 				(the round's sprite stays small, unlike Deagle's).
 			*/
-			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 13, 20, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -19.f, 0.f, true, 300.f, 5.f);
+			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 13, 20, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -19.f, 0.f, true, 300.f, 7.f, 8.f);
 		}
 
 		/*
@@ -1688,7 +1691,7 @@ void load_test_scene_particle_effects(
 			auto& deagle_effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
 			deagle_effect = effect;
 
-			make_line_trail(deagle_effect, 7.5f, rgba(255, 100, 0, 255), true, 0, 24, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, false, 300.f, 7.f);
+			make_line_trail(deagle_effect, 7.5f, rgba(255, 100, 0, 255), true, 0, 24, 0.035f, 50.f, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, false, 300.f, 12.f, 0.f);
 		}
 
 		/*
@@ -1704,12 +1707,26 @@ void load_test_scene_particle_effects(
 		}
 
 		/*
-			Shared by Bulwark, Galilea, Lews and Vindicator (none of them clone
+			Galilea's own clone - taken before the line trail below is added.
+			Exactly Baka47's trail, only slightly thinner -
+			proportionally to the damage multipliers (Galilea 3.3x, Baka47 4x).
+		*/
+		{
+			auto& galilea_effect = acquire_effect(test_scene_particle_effect_id::GALILEA_ROUND_TRACE);
+			galilea_effect = effect;
+
+			make_line_trail(galilea_effect, 6.f, rgba(255, 228, 145, 255), true, 11, 17, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -16.f, 0.f, true, 300.f, 6.f, 8.f);
+		}
+
+		/*
+			Shared by Bulwark, Lews and Vindicator (none of them clone
 			this base id) - a short line trail, its length randomized once per shot,
 			roughly matched to this weapon family's damage (~3.2-4.0x multiplier).
 			White neons, so the line trail stays white as well.
+			The spawn jitter widens the trail visually,
+			so the segments are thinner in compensation.
 		*/
-		make_line_trail(effect, 6.f, white, true, 15, 30, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -23.f, 0.f, true);
+		make_line_trail(effect, 6.f, white, true, 12, 20, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -13.f, 0.f, true, 300.f, 5.f, 8.f);
 	}
 
 	{
@@ -1780,12 +1797,14 @@ void load_test_scene_particle_effects(
 		const float lifetime_mult,
 		const float fade_in_ms = standard_line_trail_fade_in_ms,
 		const float extra_back_offset = -15.f,
-		const float shrink_ms = 300.f
+		const float shrink_ms = 300.f,
+		const float spawn_jitter_radius = 0.f,
+		const float unshrinking_ms = 0.f
 	) {
 		auto& effect = acquire_effect(new_id);
 		effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
-		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, fade_in_ms, white, 25.f, extra_back_offset, 0.f, true, shrink_ms);
+		make_line_trail(effect, density_mult, color, counter_flip, size_i_begin, size_i_end, lifetime_mult, fade_in_ms, white, 25.f, extra_back_offset, 0.f, true, shrink_ms, spawn_jitter_radius, unshrinking_ms);
 	};
 
 	make_electric_trace_clone(test_scene_particle_effect_id::SN69_ROUND_TRACE, 5.f, cyan, true, 12, 22, 0.032f, standard_line_trail_fade_in_ms, -21.f);
@@ -1802,8 +1821,8 @@ void load_test_scene_particle_effects(
 	make_electric_trace_clone(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE, 5.5f, pink, false, 13, 23, 0.042f, standard_line_trail_fade_in_ms, -22.f);
 
 	make_electric_trace_clone(test_scene_particle_effect_id::KEK9_ROUND_TRACE, 5.f, violet, true, 12, 22, 0.038f, standard_line_trail_fade_in_ms, -21.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 5.f, rgba(255, 234, 30, 255), true, 16, 28, 0.028f, standard_line_trail_fade_in_ms, -27.f);
-	make_electric_trace_clone(test_scene_particle_effect_id::SZTURM_ROUND_TRACE, 5.5f, rgba(198, 236, 255, 255), true, 14, 28, 0.0275f, standard_line_trail_fade_in_ms, -23.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 5.f, rgba(255, 234, 30, 255), true, 13, 18, 0.028f, standard_line_trail_fade_in_ms, -17.f, 300.f, 6.f, 8.f);
+	make_electric_trace_clone(test_scene_particle_effect_id::SZTURM_ROUND_TRACE, 5.5f, rgba(198, 236, 255, 255), true, 11, 18, 0.0275f, standard_line_trail_fade_in_ms, -13.f, 300.f, 10.f, 8.f);
 
 	/*
 		Bilmer2000 (CYAN_ROUND) and Covert used the base ELECTRIC_PROJECTILE_TRACE
@@ -1869,7 +1888,7 @@ void load_test_scene_particle_effects(
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
-		make_line_trail(effect, 6.6f, cyan, false, 0, 8, 0.5f, 40.f, white, 250.f, -19.f);
+		make_line_trail(effect, 6.6f, cyan, false, 0, 8, 0.5f, 40.f, white, 250.f, -19.f, 0.f, false, 300.f, 0.f, 8.f);
 	}
 
 	{
@@ -2068,179 +2087,17 @@ void load_test_scene_particle_effects(
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::SKULL_ROCKET_TRACE);
 
-		/* The smoke trace */
-		{
-			particles_emission em;
-			default_bounds(em);
-
-			em.swing_spread.set(0, 0);
-			em.swings_per_sec.set(0, 0);
-			em.swing_spread_change_rate.set(0, 0);
-
-			em.spread_degrees = float_range(1, 2);
-			em.angular_offset = float_range(0, 0);
-			em.particles_per_sec = float_range(400, 400);
-			em.stream_lifetime_ms = float_range(3000, 5000);
-
-			em.base_speed = float_range(-800, -900);
-			em.base_speed_variation = float_range(10.f, 12.f);
-
-			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(700, 800);
-
-			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(5.f, 15.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(30.f, 35.f);
-
-			for (int i = 0; i < 3; ++i) {
-				general_particle particle_definition;
-
-				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 0;
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
-				particle_definition.unshrinking_time_ms = 50.f;
-				particle_definition.shrink_when_ms_remaining = 150.f;
-
-				em.add_particle_definition(particle_definition);
-			}
-
-			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_layer = particle_layer::DIM_SMOKES;
-			em.initial_rotation_variation = 180;
-
-			effect.emissions.push_back(em);
-		}
-
-		/* The light smoke trace */
-
-		{
-			particles_emission em;
-			default_bounds(em);
-
-			em.swing_spread.set(0, 0);
-			em.swings_per_sec.set(0, 0);
-			em.swing_spread_change_rate.set(0, 0);
-
-			em.spread_degrees = float_range(0, 1);
-			em.angular_offset = float_range(0, 0);
-			em.particles_per_sec = float_range(200, 200);
-			em.stream_lifetime_ms = float_range(3000, 5000);
-
-			em.base_speed = float_range(-800, -900);
-			em.base_speed_variation = float_range(10.f, 12.f);
-
-			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(700, 800);
-
-			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(5.f, 15.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(30.f, 35.f);
-
-			for (int i = 0; i < 3; ++i) {
-				general_particle particle_definition;
-
-				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 0;
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
-				particle_definition.unshrinking_time_ms = 50.f;
-				particle_definition.shrink_when_ms_remaining = 150.f;
-
-				em.add_particle_definition(particle_definition);
-			}
-
-			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
-			em.initial_rotation_variation = 180;
-
-			effect.emissions.push_back(em);
-		}
-
-		/* The fire smoke trace (condensed) */
-
-		{
-			particles_emission em;
-			default_bounds(em);
-
-			em.particles_per_sec = float_range(200, 250);
-			em.stream_lifetime_ms = float_range(3000, 5000);
-
-			em.swing_spread.set(0, 0);
-			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
-
-			em.angular_offset = float_range(0, 0);
-			em.spread_degrees = float_range(8, 10);
-
-			em.base_speed = float_range(-200, -20);
-			em.base_speed_variation = float_range(10.f, 12.f);
-
-			em.rotation_speed = float_range(2.0f*RAD_TO_DEG<float>, 2.2f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(45, 65);
-
-			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 5.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(10.f, 15.f);
-
-			for (int i = 0; i < 3; ++i) {
-				general_particle particle_definition;
-
-				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 80;
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(orange.rgb(), 20));
-				particle_definition.unshrinking_time_ms = 10.f;
-				particle_definition.shrink_when_ms_remaining = 10.f;
-
-				em.add_particle_definition(particle_definition);
-			}
-
-			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
-			em.initial_rotation_variation = 180;
-			em.scale_damping_to_velocity = true;
-
-			effect.emissions.push_back(em);
-		}
-
-		/* The fire smoke trace */
-
-		{
-			particles_emission em;
-			default_bounds(em);
-
-			em.swing_spread.set(0, 0);
-			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
-
-			em.spread_degrees = float_range(3, 5);
-			em.particles_per_sec = float_range(400, 400);
-			em.stream_lifetime_ms = float_range(3000, 5000);
-
-			em.angular_offset = float_range(0, 0);
-			em.base_speed = float_range(-2000, -1800);
-			em.base_speed_variation = float_range(10.f, 12.f);
-
-			em.rotation_speed = float_range(2.0f*RAD_TO_DEG<float>, 2.2f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(60, 80);
-
-			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(5.f, 10.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(20.f, 25.f);
-
-			for (int i = 0; i < 3; ++i) {
-				general_particle particle_definition;
-
-				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 80;
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(orange.rgb(), 45));
-				particle_definition.unshrinking_time_ms = 10.f;
-				particle_definition.shrink_when_ms_remaining = 10.f;
-
-				em.add_particle_definition(particle_definition);
-			}
-
-			em.size_multiplier = float_range(0.25, 0.30);
-			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
-			em.initial_rotation_variation = 180;
-			em.scale_damping_to_velocity = true;
-
-			effect.emissions.push_back(em);
-		}
+		/*
+			A fiery line trail like Deagle's - gold colorizing into orange -
+			instead of the old rocket smoke. The jitter is the largest of all guns,
+			fitting the rocket's exhaust.
+		*/
+		/*
+			The finite stream dies out mid-flight like the grenade trails,
+			the randomized particle speed scatters the exhaust,
+			and the large shrink threshold makes the segments spawn small.
+		*/
+		make_line_trail(effect, 2.5f, rgba(255, 100, 0, 255), true, 10, 18, 0.143f, 50.f, rgba(255, 218, 5, 255), 60.f, -15.f, 0.f, false, 600.f, 25.f, 7.f, 800.f, 600.f);
 	}
 
 	{
@@ -4410,7 +4267,7 @@ void load_test_scene_particle_effects(
 			The spawn jitter widens the trail visually,
 			so the segments are thinner in compensation - the round's sprite stays small.
 		*/
-		make_line_trail(effect, 4.5f, rgba(255, 100, 0, 255), true, 0, 20, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -17.f, 0.f, false, 300.f, 5.f);
+		make_line_trail(effect, 4.5f, rgba(255, 100, 0, 255), true, 0, 20, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -17.f, 0.f, false, 300.f, 5.f, 0.f);
 	}
 
 	{
@@ -4421,7 +4278,7 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ORANGE_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 15, 30, 0.025f, standard_line_trail_fade_in_ms, rgba(255, 218, 5, 255), 30.f, -23.f, 0.f, true);
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 15, 30, 0.025f, standard_line_trail_fade_in_ms, rgba(255, 218, 5, 255), 30.f, -23.f, 0.f, true, 300.f, 0.f, 8.f);
 	}
 
 
