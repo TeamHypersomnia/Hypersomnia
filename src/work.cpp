@@ -4955,8 +4955,21 @@ work_result work(
 				}
 			};
 
+			auto make_gui_projection = [&]() {
+				/*
+					A quarter-pixel bias. The GUI centers sprites on their boxes, so sprites
+					with an odd dimension land on half-pixel positions, which makes NEAREST
+					sampling hit exact texel boundaries - float error in interpolated UVs then
+					decides each pixel arbitrarily, duplicating some texel rows and dropping others.
+					The bias moves sampling safely inside texels while staying visually unnoticeable.
+				*/
+
+				const auto bias = vec2::square(-0.25f);
+				return augs::orthographic_projection(ltrb(bias, vec2(screen_size)));
+			};
+
 			auto setup_standard_projection = [&](augs::renderer& chosen_renderer) {
-				necessary_shaders.standard->set_projection(chosen_renderer, augs::orthographic_projection(vec2(screen_size)));
+				necessary_shaders.standard->set_projection(chosen_renderer, make_gui_projection());
 			};
 
 			auto draw_game_gui = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
