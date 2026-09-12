@@ -5433,6 +5433,13 @@ work_result work(
 				/* #1 */
 				perform_illuminated_rendering(illuminated_input);
 
+				/*
+					World rendering forces LINEAR filtering on the general atlas when the camera
+					zooms out (see get_setup_customized_config), and the GUI passes share that atlas.
+					Restore the user's filtering here so the GUI always samples its sprites 1:1.
+				*/
+				streaming.get_general_atlas().set_filtering(get_general_renderer(), config.renderer.default_filtering);
+
 				// Call this in case we don't call perform_illuminated_rendering
 				// necessary_shaders.standard->set_as_current(get_general_renderer());
 
