@@ -301,7 +301,10 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_FLYING, white);
 
-			/* A long, stretching neon tail like Deagle's. */
+			/*
+				No stretching (values <= 1 disable it) - the strong glow
+				comes from the neon map itself (radius 180, amplification 300).
+			*/
 			meta.get<invariants::sprite>().neon_extension_mult = 1.f;
 
 			{
@@ -521,9 +524,6 @@ namespace test_flavours {
 			/* Bigger than Bulldup's round - Hunter hits harder and its rounds are faster. */
 			meta.get<invariants::sprite>().size *= 1.45f;
 
-			/*
-				Matches the warm white of HUNTER_ROUND_TRACE's line trail.
-			*/
 			meta.get<invariants::sprite>().neon_color = bullet_gold_neon;
 			meta.get<invariants::sprite>().neon_extension_mult = 4.0f;
 
@@ -3607,7 +3607,7 @@ namespace test_flavours {
 
 			/* Matches the round's sprite. */
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
-			meta.get<invariants::sprite>().neon_color.a = 120;
+			meta.get<invariants::sprite>().neon_color.a = 90;
 			meta.get<invariants::sprite>().size *= 1.1f;
 
 			{

@@ -189,11 +189,11 @@ void load_test_scene_particle_effects(
 	};
 
 	/*
-		Subtle line trails for the thrown grenades, matching their colors.
+		Line trails for the thrown grenades, matching their colors.
 		The stream is short-lived so that it dies out mid-flight -
 		a slowed down or lying grenade should not emit anything.
-		The segments spawn at half alpha and additionally grow in
-		over unshrinking_time_ms to avoid popping right at the grenade.
+		The segments grow in over unshrinking_time_ms
+		to avoid popping right at the grenade.
 	*/
 
 	auto make_grenade_trail = [&](
@@ -204,7 +204,7 @@ void load_test_scene_particle_effects(
 
 		color.a = 255;
 
-		/* The trail colorizes into a darker version of the grenade's color along the tail. */
+		/* Uncomment the darker variant to colorize the tail into a darker shade. */
 		const auto darker_color = color;//rgba(color.r / 2, color.g / 2, color.b / 2, color.a);
 
 		particles_emission em;
