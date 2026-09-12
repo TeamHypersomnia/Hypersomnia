@@ -72,6 +72,7 @@ namespace invariants {
 		std::array<sound_effect_input, 2> defused_sound;
 		particle_effect_input defused_particles;
 		sound_effect_input release_sound;
+		particle_effect_input released_trace_particles;
 
 		assets::plain_animation_id armed_animation_id;
 		assets::image_id defused_image_id;

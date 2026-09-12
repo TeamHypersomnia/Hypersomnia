@@ -53,6 +53,7 @@ namespace test_flavours {
 				fuse.beep_color = red;
 				fuse.beep_time_mult = 0.20f;
 
+				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FORCE_GRENADE_TRAIL);
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
@@ -151,6 +152,7 @@ namespace test_flavours {
 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::INTERFERENCE_GRENADE_TRAIL);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
@@ -241,6 +243,7 @@ namespace test_flavours {
 				invariants::hand_fuse fuse; 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FLASHBANG_TRAIL);
 				fuse.released_image_id = to_image_id(test_scene_image_id::FLASHBANG_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::FLASHBANG);
 				fuse.additional_release_impulse.linear = 3000.f;
@@ -303,6 +306,7 @@ namespace test_flavours {
 				fuse.beep_color.a = 150;
 				fuse.beep_time_mult = 0.50f;
 
+				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PED_GRENADE_TRAIL);
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;

@@ -507,13 +507,16 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
+
+			/* Bigger than Bulldup's round - Hunter hits harder and its rounds are faster. */
+			meta.get<invariants::sprite>().size *= 1.45f;
 
 			/*
 				Matches the warm white of HUNTER_ROUND_TRACE's line trail.
 			*/
-			meta.get<invariants::sprite>().neon_color = rgba(255, 245, 200, 50);
-			meta.get<invariants::sprite>().neon_extension_mult = 4.f;
+			meta.get<invariants::sprite>().neon_color = bullet_gold_neon;
+			meta.get<invariants::sprite>().neon_extension_mult = 4.0f;
 
 			{
 				{
@@ -587,7 +590,10 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white).neon_color = bullet_gold_neon;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
+
+			/* Slightly thickened to fit the trail widened by the spawn jitter. */
+			meta.get<invariants::sprite>().size *= 1.25f;
 			meta.get<invariants::sprite>().neon_extension_mult = 4.f;
 
 			{
@@ -846,8 +852,9 @@ namespace test_flavours {
 			/*
 				Match the height of the AO44 round scaled by 1.8 (8 px * 1.8 = 14.4 px),
 				so both rounds and their baked neon halos look the same in-game.
+				The extra 1.2 compensates for the spawn jitter widening the line trail.
 			*/
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 14.4f / 11.f;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 1.2f * 14.4f / 11.f;
 			meta.get<invariants::sprite>().neon_color.a = 100;
 			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
 
@@ -3505,7 +3512,9 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::BULLDUP2000_ROUND_FINISHING_TRACE);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white).neon_color = bullet_gold_neon;
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
+			/* Matches the round's sprite scale. */
+			meta.get<invariants::sprite>().size *= 1.25f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::BULLDUP2000_ROUND).get<invariants::trace>());
@@ -3514,8 +3523,10 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HUNTER_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
+			/* Matches the round's sprite scale. */
+			meta.get<invariants::sprite>().size *= 1.45f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::HUNTER_ROUND).get<invariants::trace>());
@@ -3536,7 +3547,8 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::DEAGLE_ROUND_FINISHING_TRACE);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 14.4f / 11.f;
+			/* The 1.2 matches the round's sprite scale. */
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 1.2f * 14.4f / 11.f;
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::trace>());

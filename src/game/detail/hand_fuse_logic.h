@@ -256,6 +256,8 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 	void release_explosive(const bool play_sound = true) const {
 		// const auto& explosive = fused_entity.template get<invariants::explosive>();
 
+		float momentum_boost = 0.f;
+
 		if (holder) {
 			const auto total_impulse = [&]() {
 				if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
@@ -307,7 +309,8 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 
 						if (auto body = fused_entity.template find<components::rigid_body>()) {
 							const auto total_speed = dash_bonus * 8 + speed * 4;
-							body.set_velocity(body.get_velocity().add_length(total_speed * parallel_mult));
+							momentum_boost = total_speed * parallel_mult;
+							body.set_velocity(body.get_velocity().add_length(momentum_boost));
 
 							const auto considered_max_speed = 10000.0f;
 							const auto speed_mult = total_speed / considered_max_speed;
@@ -334,6 +337,33 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
 				predictable_only_by(holder)
 			);
+
+			{
+				/*
+					Chase the velocity direction rather than the entity's own rotation,
+					as the thrown grenade tumbles in flight.
+				*/
+
+				auto trail_input = particle_effect_start_input::orbit_local(fused_entity, transformr());
+				trail_input.positioning.face_velocity = true;
+
+				/*
+					Momentum throws launch the explosive faster than a standing throw -
+					give them a proportionally denser trail.
+					Standing primary and secondary throws stay at the base amounts.
+				*/
+
+				const auto considered_max_boost = 4000.f;
+
+				auto trail_effect = fuse_def.released_trace_particles;
+				trail_effect.modifier.scale_amounts *= 1.f + std::min(1.f, momentum_boost / considered_max_boost);
+
+				trail_effect.start(
+					step,
+					trail_input,
+					predictable_only_by(holder)
+				);
+			}
 		}
 	}
 

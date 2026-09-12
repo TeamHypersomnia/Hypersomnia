@@ -99,7 +99,8 @@ void load_test_scene_particle_effects(
 		const float extra_back_offset = -15.f,
 		const float min_lifetime_ms = 0.f,
 		const bool randomize_length_per_shot = false,
-		const float shrink_ms = 300.f
+		const float shrink_ms = 300.f,
+		const float spawn_jitter_radius = 0.f
 	) {
 		particles_emission em;
 		em.spread_degrees = float_range(0, 0);
@@ -137,7 +138,7 @@ void load_test_scene_particle_effects(
 		em.stream_particle_lifetime_mult = randomize_length_per_shot ? float_range(0.5f, 1.f) : float_range(1.f, 1.f);
 
 		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
-		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(0.f, 0.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(spawn_jitter_radius, spawn_jitter_radius);
 
 		for (int i = size_i_begin; i < size_i_end; ++i) {
 			general_particle particle_definition;
@@ -183,6 +184,80 @@ void load_test_scene_particle_effects(
 
 		effect.emissions.push_back(em);
 	};
+
+	/*
+		Subtle line trails for the thrown grenades, matching their colors.
+		The stream is short-lived so that it dies out mid-flight -
+		a slowed down or lying grenade should not emit anything.
+		The segments spawn at half alpha and additionally grow in
+		over unshrinking_time_ms to avoid popping right at the grenade.
+	*/
+
+	auto make_grenade_trail = [&](
+		const test_scene_particle_effect_id id,
+		rgba color
+	) {
+		auto& effect = acquire_effect(id);
+
+		color.a = 255;
+
+		/* The trail colorizes into a darker version of the grenade's color along the tail. */
+		const auto darker_color = color;//rgba(color.r / 2, color.g / 2, color.b / 2, color.a);
+
+		particles_emission em;
+		em.spread_degrees = float_range(0, 0);
+		em.particles_per_sec = float_range(3000, 3000);
+		em.stream_lifetime_ms = float_range(500, 500);
+		em.stream_fade_in_ms = 40.f;
+		em.base_speed = float_range(150, 150);
+		em.angular_offset = float_range(0, 0);
+		em.rotation_speed = float_range(0, 0);
+		em.particle_lifetime_ms = float_range(0.f, 200.f);
+		em.local_spawn_offset = vec2(-50.f, 0.f);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(10.f, 10.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(10.f, 10.f);
+
+		for (int i = 1; i < 14; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK),
+				vec2i((i + 1) * 8, i + 1),
+				darker_color
+			);
+
+			particle_definition.start_color = color;
+			particle_definition.start_color_fade_ms = 150.f;
+
+			particle_definition.smooth_shrink = true;
+			particle_definition.shrink_when_ms_remaining = 300.f;
+			particle_definition.unshrinking_time_ms = 100.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.size_multiplier = float_range(1, 1);
+		em.target_layer = particle_layer::TRAILS;
+		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = true;
+
+		/*
+			The modifier must apply, as the throw logic scales the amounts up
+			for the momentum throws. Nothing else ever starts this effect.
+		*/
+		em.ignore_effect_modifier = false;
+
+		effect.emissions.push_back(em);
+	};
+
+	make_grenade_trail(test_scene_particle_effect_id::FORCE_GRENADE_TRAIL, red);
+	make_grenade_trail(test_scene_particle_effect_id::INTERFERENCE_GRENADE_TRAIL, yellow);
+	make_grenade_trail(test_scene_particle_effect_id::FLASHBANG_TRAIL, white);
+	make_grenade_trail(test_scene_particle_effect_id::PED_GRENADE_TRAIL, cyan);
 
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_SMOKE);
@@ -1515,8 +1590,8 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 
-		/* Bulldup */
-		make_line_trail(effect, 5.5f, rgba(255, 245, 200, 255), true, 0, 14, 0.07f, 50.f, white, 30.f, -19.f);
+		/* Bulldup - white for most of the trail, colorizing to the standard shotgun orange at the far tail. */
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 0, 14, 0.07f, 50.f, white, 100.f, -19.f, 0.f, false, 300.f, 10.f);
 	}
 
 	{
@@ -1527,7 +1602,8 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
 
-		make_line_trail(effect, 5.5f, white, true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 30.f, -18.f);
+		/* White for most of the trail, colorizing to the standard shotgun orange at the far tail. */
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 400.f, -18.f, 0.f, false, 300.f, 10.f);
 	}
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
@@ -1595,7 +1671,12 @@ void load_test_scene_particle_effects(
 			auto& baka_effect = acquire_effect(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
 			baka_effect = effect;
 
-			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 17, 33, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -26.f, 0.f, true);
+			/*
+				The spawn jitter widens the trail visually,
+				so the segments are thinner in compensation
+				(the round's sprite stays small, unlike Deagle's).
+			*/
+			make_line_trail(baka_effect, 6.f, rgba(255, 228, 145, 255), true, 13, 20, 0.0275f, standard_line_trail_fade_in_ms, white, 30.f, -19.f, 0.f, true, 300.f, 5.f);
 		}
 
 		/*
@@ -1607,7 +1688,7 @@ void load_test_scene_particle_effects(
 			auto& deagle_effect = acquire_effect(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
 			deagle_effect = effect;
 
-			make_line_trail(deagle_effect, 7.5f, rgba(255, 100, 0, 255), true, 0, 27, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f);
+			make_line_trail(deagle_effect, 7.5f, rgba(255, 100, 0, 255), true, 0, 24, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -15.f, 0.f, false, 300.f, 7.f);
 		}
 
 		/*
@@ -4325,7 +4406,11 @@ void load_test_scene_particle_effects(
 		auto& effect = acquire_effect(test_scene_particle_effect_id::AO44_ROUND_TRACE);
 		effect = acquire_effect(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
 
-		make_line_trail(effect, 4.5f, rgba(255, 100, 0, 255), true, 0, 24, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -21.f);
+		/*
+			The spawn jitter widens the trail visually,
+			so the segments are thinner in compensation - the round's sprite stays small.
+		*/
+		make_line_trail(effect, 4.5f, rgba(255, 100, 0, 255), true, 0, 20, 0.04f, 50.f, rgba(255, 218, 5, 255), 30.f, -17.f, 0.f, false, 300.f, 5.f);
 	}
 
 	{
