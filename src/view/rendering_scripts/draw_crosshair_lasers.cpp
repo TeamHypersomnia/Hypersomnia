@@ -20,6 +20,7 @@
 #include "augs/log.h"
 
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "view/rendering_scripts/calc_laser_path.h"
 
 void draw_crosshair_procedurally(
 	const crosshair_drawing_settings& settings,
@@ -178,7 +179,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		const auto make_laser_from_to = [&](
 			const const_entity_handle subject,
 			const vec2 line_from,
-			vec2 line_to,
+			const vec2 line_to,
 			const b2Filter& filter
 		) {
 			auto detected_color = cyan;
@@ -196,33 +197,55 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 					detected_color = calc_color(cosm[raycast.what_entity]);
 				}
 			}
-			
-			const auto laser_dir = (line_to - line_from).normalize();
-			line_to += laser_dir * 10000;
 
-			const auto raycast = physics.ray_cast_px(
-				cosm.get_si(),
+			const auto basic_penetration_distance = [&]() {
+				if (const auto* const gun_def = subject.find<invariants::gun>()) {
+					return gun_def->basic_penetration_distance;
+				}
+
+				return 0.0f;
+			}();
+
+			thread_local std::vector<laser_path_segment> segments;
+			segments.clear();
+
+			::calc_laser_path(
+				cosm,
 				line_from,
 				line_to,
 				filter,
-				subject
+				basic_penetration_distance,
+				subject,
+				segments
 			);
 
-			if (raycast.hit) {
-				in.dashed_line_callback(raycast.intersection, line_to, white);
-
-				in.callback(
-					line_from, 
-					raycast.intersection, 
-					detected_color
-				);
+			for (const auto& seg : segments) {
+				if (seg.penetrating) {
+					in.dashed_line_callback(seg.from, seg.to, white);
+				}
+				else {
+					/*
+						Enemy detection only applies to the segment with
+						a direct line of sight - the continuations after
+						penetrated obstacles stay neutral.
+					*/
+					const bool is_direct = std::addressof(seg) == std::addressof(segments.front());
+					in.callback(seg.from, seg.to, is_direct ? detected_color : cyan);
+				}
 			}
-			else {
-				in.callback(
-					line_from,
-					line_to,
-					detected_color
-				);
+
+			/*
+				Past the point where the bullet would die,
+				continue with a dashed line all the way to the screen's end.
+			*/
+			if (!segments.empty()) {
+				const auto laser_dir = (line_to - line_from).normalize();
+				const auto far_point = line_from + laser_dir * 10000;
+				const auto path_end = segments.back().to;
+
+				if ((far_point - path_end).length_sq() > 1.0f) {
+					in.dashed_line_callback(path_end, far_point, white);
+				}
 			}
 		};
 

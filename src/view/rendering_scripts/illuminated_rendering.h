@@ -41,6 +41,8 @@ struct additional_highlight {
 	rgba col;
 };
 
+struct minimap_world_transform;
+
 struct illuminated_rendering_input {
 	const character_camera camera;
 	const float camera_requested_fow_expansion;
@@ -52,6 +54,7 @@ struct illuminated_rendering_input {
 	const bool viewer_is_spectator;
 	const bool see_enemies_behind_walls = false;
 	const bool draw_enemy_crosshairs = false;
+	const bool minimap_extended_range = false;
 	const necessary_images_in_atlas_map& necessary_images;
 	const all_loaded_gui_fonts& fonts;
 	const images_in_atlas_map& game_images;
@@ -73,6 +76,7 @@ struct illuminated_rendering_input {
 	
 	const std::vector<visibility_request>& light_requests;
 	const bool streamer_mode;
+	minimap_world_transform* const minimap_transform;
 	augs::thread_pool& pool;
 
 	bool strict_fow_mode() const {

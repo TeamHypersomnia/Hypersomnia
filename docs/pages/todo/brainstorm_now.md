@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- naprawic waypointy na minilabie
+
 - miejscowe zoomy na open areas zamiast odzoomowywac
 	- best of both worlds
 

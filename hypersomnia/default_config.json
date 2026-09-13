@@ -900,9 +900,9 @@
             "already_owns_other_type_bg": [94, 12, 255, 91],
             "already_owns_other_type_active_bg": [94, 101, 255, 120]
         },
-        "money_indicator_color": [255, 249, 133, 255],
+        "money_indicator_color": [255, 230, 120, 255],
         "award_indicator_color": [255, 255, 0, 255],
-        "money_indicator_pos": [-50, 148],
+        "money_indicator_pos": [-10, -150],
         "show_recent_awards_num": 8,
         "keep_recent_awards_for_seconds": 3.0,
         "show_client_resyncing_notifier": true,

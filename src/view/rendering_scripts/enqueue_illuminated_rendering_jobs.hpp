@@ -5,6 +5,8 @@
 #include "game/detail/use_interaction_logic.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "view/rendering_scripts/corpse_head_overlays.h"
+#include "view/rendering_scripts/draw_minimap.h"
+#include "view/audiovisual_state/systems/minimap_sighting_system.h"
 
 const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 80);
 const vec2 CHARACTER_SHADOW_OFFSET = vec2(7, 7);
@@ -241,6 +243,10 @@ void enqueue_illuminated_rendering_jobs(
 			const auto alpha = settings.draw_tactical_indicators.value;
 
 			for (const auto& special : special_indicators) {
+				if (special.minimap_only) {
+					continue;
+				}
+
 				auto col = special.color;
 				col.mult_alpha(alpha);
 
@@ -771,6 +777,28 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
+	auto minimap_job = [minimap_extended_range = in.minimap_extended_range, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
+		::draw_minimap({
+			settings.minimap,
+			settings.fog_of_war,
+			minimap_extended_range,
+			screen_size,
+			viewed_character,
+			interp,
+			av.template get<minimap_sighting_system>(),
+			global_time_seconds,
+			pre_step_crosshair_displacement,
+			necessarys.at(assets::necessary_image_id::BLANK),
+			special_indicators,
+			necessarys,
+			bomb_owner,
+			minimap_transform,
+			dedicated[D::MINIMAP].triangles,
+			dedicated[D::MINIMAP_DITHER].triangles,
+			dedicated[D::MINIMAP_FOREGROUND].triangles
+		});
+	};
+
 	enqueue_layer_jobs();
 
 	pool.enqueue(sentiences_job);
@@ -778,6 +806,10 @@ void enqueue_illuminated_rendering_jobs(
 	if (viewed_character) {
 		pool.enqueue(indicators_and_callouts_job);
 		pool.enqueue(sentience_hud_job);
+
+		if (settings.minimap.enabled) {
+			pool.enqueue(minimap_job);
+		}
 	}
 
 	pool.enqueue(explosives_hud_job);

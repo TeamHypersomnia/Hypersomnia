@@ -397,6 +397,7 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = false;
+	static constexpr bool has_arena_gui = true;
 
 	/*
 		Optional callback fired once per match the moment the summary is posted (match decided).

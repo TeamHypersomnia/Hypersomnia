@@ -9,6 +9,7 @@ namespace augs {
 
 struct game_gui_settings;
 struct randomizing_system;
+struct game_drawing_settings;
 
 struct game_gui_context_dependencies {
 	const image_definitions_map& image_definitions;
@@ -18,4 +19,5 @@ struct game_gui_context_dependencies {
 	randomizing_system& randomizing;
 	const game_gui_settings& game_gui;
 	const hotbar_settings hotbar;
+	const game_drawing_settings& drawing;
 };

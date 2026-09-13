@@ -20,6 +20,8 @@
 #include "view/game_gui/elements/game_gui_root.h"
 
 #include "view/game_gui/game_gui_system.h"
+#include "view/rendering_scripts/minimap_layout.h"
+#include "3rdparty/imgui/imgui.h"
 #include "augs/drawing/drawing.hpp"
 
 using namespace augs::gui::text;
@@ -377,11 +379,43 @@ void value_bar::rebuild_layouts(
 		}
 	}
 
+	unsigned total_enabled = 0;
+
+	for (unsigned i = 0; i < value_bar_count; ++i) {
+		if (is_enabled(context, i)) {
+			++total_enabled;
+		}
+	}
+
 	const auto screen_size = context.get_screen_size();
 	const auto icon_size = context.get_game_images().at(get_bar_icon(context, this_id)).get_original_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
-	const auto lt = vec2i(screen_size.x - 220, 20 + drawing_vertical_index * (icon_size.y + 4));
+	/*
+		The bars live at the right bottom, in top-down order (health first),
+		with the same bottom padding as the hotbar. When the minimap
+		occupies the same corner, the bars keep that padding above it.
+	*/
+
+	const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
+
+	const auto rb_minimap_shift = [&]() {
+		const auto& minimap = context.dependencies.drawing.minimap;
+
+		if (minimap.enabled && minimap.position == hud_corner_type::RIGHT_BOTTOM) {
+			return minimap.size + minimap_screen_margin_v;
+		}
+
+		return 0;
+	}();
+
+	const auto bars_bottom = screen_size.y - bottom_pad - rb_minimap_shift;
+	const auto row_pitch = static_cast<int>(icon_size.y) + 4;
+
+	const auto lt = vec2i(
+		screen_size.x - minimap_screen_margin_v - with_bar_size.x,
+		bars_bottom - static_cast<int>(total_enabled - drawing_vertical_index) * row_pitch
+	);
 
 	auto& rc = this_id->rc;
 	rc.set_position(lt);

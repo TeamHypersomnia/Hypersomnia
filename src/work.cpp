@@ -119,6 +119,9 @@
 #include "augs/graphics/frame_num_type.h"
 #include "view/rendering_scripts/launch_visibility_jobs.h"
 #include "view/rendering_scripts/for_each_vis_request.h"
+#include "view/rendering_scripts/minimap_layout.h"
+#include "view/rendering_scripts/draw_minimap.h"
+#include "game/detail/crosshair_math.hpp"
 #include "view/hud_messages/hud_messages_gui.h"
 #include "application/input/input_pass_result.h"
 
@@ -2675,7 +2678,8 @@ work_result work(
 			streaming.get_loaded_gui_fonts().gui,
 			get_audiovisuals().randomizing,
 			viewing_config.game_gui,
-			viewing_config.hotbar
+			viewing_config.hotbar,
+			viewing_config.drawing
 		};
 	};
 
@@ -2924,6 +2928,7 @@ work_result work(
 				d.draw_teammate_indicators.is_enabled = false;
 				d.draw_danger_indicators.is_enabled = false;
 				d.draw_tactical_indicators.is_enabled = false;
+				d.minimap.enabled = false;
 				d.print_current_character_callout = false;
 				d.show_danger_indicator_for_seconds = 0;
 				d.show_death_indicator_for_seconds = 0;
@@ -2932,6 +2937,13 @@ work_result work(
 
 			if (!game_gui_mode_flag) {
 				config_copy.drawing.draw_inventory = false;
+			}
+			else {
+				/*
+					The inventory GUI opens at the right bottom,
+					where the health bars normally live.
+				*/
+				config_copy.drawing.draw_character_status = false;
 			}
 
 			if (ad_state == ad_state_type::PLAYING) {
@@ -4028,6 +4040,7 @@ work_result work(
 				get_character_camera(viewing_config),
 				viewing_config.performance,
 				viewing_config.damage_indication,
+				viewing_config.drawing,
 				settings
 			});
 		}
@@ -5177,9 +5190,13 @@ work_result work(
 				}
 			};
 
+			auto minimap_transform = minimap_world_transform();
+
 			auto make_illuminated_rendering_input = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
 				thread_local std::vector<additional_highlight> highlights;
 				highlights.clear();
+
+				minimap_transform.valid = false;
 
 				visit_current_setup([&](const auto& setup) {
 					using T = remove_cref<decltype(setup)>;
@@ -5202,12 +5219,14 @@ work_result work(
 						setup.on_mode_with_input(
 							[&](const auto&... args) {
 								::gather_special_indicators(
-									args..., 
-									viewed_character.get_official_faction(), 
-									streaming.necessary_images_in_atlas, 
+									args...,
+									viewed_character.get_official_faction(),
+									streaming.necessary_images_in_atlas,
 									special_indicators,
 									indicator_meta,
-									viewed_character
+									viewed_character,
+									viewing_config.drawing,
+									get_audiovisuals().get<minimap_sighting_system>().recent_deaths
 								);
 							}
 						);
@@ -5252,6 +5271,19 @@ work_result work(
 					return false;
 				});
 
+				/*
+					When the scoreboard is open, the minimap doubles its range.
+				*/
+				const bool minimap_extended_range = visit_current_setup([&](const auto& setup) {
+					using S = remove_cref<decltype(setup)>;
+
+					if constexpr(S::has_arena_gui) {
+						return setup.arena_gui.scoreboard.show;
+					}
+
+					return false;
+				});
+
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
 					get_camera_requested_fow_expansion(),
@@ -5263,6 +5295,7 @@ work_result work(
 					viewer_is_spectator(),
 					see_enemies_behind_walls,
 					draw_enemy_crosshairs,
+					minimap_extended_range,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,
@@ -5282,6 +5315,7 @@ work_result work(
 					viewing_config.damage_indication,
 					cached_visibility.light_requests,
 					viewing_config.streamer_mode && viewing_config.streamer_mode_flags.inworld_hud,
+					std::addressof(minimap_transform),
 					thread_pool
 				};
 			};
@@ -5500,6 +5534,55 @@ work_result work(
 				*/
 				streaming.get_general_atlas().set_filtering(get_general_renderer(), config.renderer.default_filtering);
 
+				/*
+					The minimap is drawn here, after the filtering restore,
+					so its icons always sample the atlas 1:1.
+				*/
+				{
+					const auto& minimap = new_viewing_config.drawing.minimap;
+					auto& chosen_renderer = get_general_renderer();
+
+					if (minimap.enabled && get_viewed_character().alive()) {
+						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size);
+
+						/*
+							The border is drawn outside of the minimap rect,
+							so the scissor must accommodate it.
+						*/
+						const auto scissor_expansion = minimap.border_thickness;
+
+						/* GL scissor origin is bottom-left. */
+						chosen_renderer.set_scissor_bounds({
+							minimap_rect.l - scissor_expansion,
+							screen_size.y - (minimap_rect.b + scissor_expansion),
+							minimap_rect.w() + 2 * scissor_expansion,
+							minimap_rect.h() + 2 * scissor_expansion
+						});
+
+						chosen_renderer.set_scissor(true);
+
+						using D = augs::dedicated_buffer;
+
+						necessary_shaders.standard->set_as_current(chosen_renderer);
+						necessary_shaders.standard->set_projection(chosen_renderer, make_gui_projection());
+
+						chosen_renderer.call_triangles(D::MINIMAP);
+
+						if (necessary_shaders.pure_color_dither) {
+							necessary_shaders.pure_color_dither->set_as_current(chosen_renderer);
+							necessary_shaders.pure_color_dither->set_projection(chosen_renderer, make_gui_projection());
+
+							chosen_renderer.call_triangles(D::MINIMAP_DITHER);
+
+							necessary_shaders.standard->set_as_current(chosen_renderer);
+						}
+
+						chosen_renderer.call_triangles(D::MINIMAP_FOREGROUND);
+
+						chosen_renderer.set_scissor(false);
+					}
+				}
+
 				// Call this in case we don't call perform_illuminated_rendering
 				// necessary_shaders.standard->set_as_current(get_general_renderer());
 
@@ -5621,8 +5704,105 @@ work_result work(
 			thread_pool.help_until_no_tasks();
 			thread_pool.wait_for_all_tasks_to_complete();
 
-			/* 
-				This task is dependent upon completion of two other tasks: 
+			/*
+				The fog of war overlay on the minimap: remaps the computed
+				visibility polygon into the minimap space. This must happen
+				after the pool join, since both the polygon
+				and the minimap transform are computed by pool jobs.
+			*/
+
+			{
+				const auto& minimap = new_viewing_config.drawing.minimap;
+				auto& chosen_renderer = get_general_renderer();
+
+				const auto& fow_triangles = chosen_renderer.dedicated[augs::dedicated_buffer::FOG_OF_WAR].triangles;
+
+				const bool draw_fow_overlay =
+					minimap.enabled &&
+					minimap.fog_of_war_color.a > 0 &&
+					minimap_transform.valid &&
+					!fow_triangles.empty()
+				;
+
+				if (draw_fow_overlay) {
+					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size);
+					const auto scissor_expansion = minimap.border_thickness;
+
+					chosen_renderer.set_scissor_bounds({
+						minimap_rect.l - scissor_expansion,
+						screen_size.y - (minimap_rect.b + scissor_expansion),
+						minimap_rect.w() + 2 * scissor_expansion,
+						minimap_rect.h() + 2 * scissor_expansion
+					});
+
+					chosen_renderer.set_scissor(true);
+
+					/*
+						The same shader the in-world fog of war uses for its stencil,
+						so the overlay respects the field of view angle - narrowing
+						with the edge zoomout and rotating with the aim direction.
+					*/
+
+					const auto viewed_character = get_viewed_character();
+
+					auto& fow_shader = necessary_shaders.fog_of_war;
+
+					fow_shader->set_as_current(get_general_renderer());
+					fow_shader->set_projection(get_general_renderer(), make_gui_projection());
+
+					{
+						using U = augs::common_uniform_name;
+
+						auto dir = ::calc_crosshair_displacement(viewed_character) + calc_pre_step_crosshair_displacement(new_viewing_config);
+
+						if (dir.is_zero()) {
+							dir.set(1, 0);
+						}
+
+						auto considered_angle = new_viewing_config.drawing.fog_of_war.angle;
+
+						const auto edge_zoomout_mult = get_camera_edge_zoomout_mult();
+
+						if (edge_zoomout_mult > 0.0f) {
+							const auto max_fow_reduction = 1.0f / 12;
+							considered_angle *= augs::interp(1.0f, max_fow_reduction, edge_zoomout_mult);
+						}
+
+						const auto left_dir = vec2(dir).rotate(-considered_angle / 2).neg_y();
+						const auto right_dir = vec2(dir).rotate(considered_angle / 2).neg_y();
+
+						const auto eye_world_pos = viewed_character.find_viewing_transform(get_audiovisuals().get<interpolation_system>())->pos;
+						const auto eye_minimap_pos = minimap_transform.minimap_center + (eye_world_pos - minimap_transform.world_center) * minimap_transform.scale;
+						const auto eye_frag_pos = vec2(eye_minimap_pos.x, screen_size.y - eye_minimap_pos.y);
+
+						fow_shader->set_uniform(chosen_renderer, U::startingAngleVec, left_dir);
+						fow_shader->set_uniform(chosen_renderer, U::endingAngleVec, right_dir);
+						fow_shader->set_uniform(chosen_renderer, U::eye_frag_pos, eye_frag_pos);
+					}
+
+					auto& output = chosen_renderer.get_triangle_buffer();
+
+					for (const auto& tri : fow_triangles) {
+						auto mapped = tri;
+
+						for (auto& v : mapped.vertices) {
+							v.pos = minimap_transform.minimap_center + (v.pos - minimap_transform.world_center) * minimap_transform.scale;
+							v.color = minimap.fog_of_war_color;
+						}
+
+						output.push_back(mapped);
+					}
+
+					chosen_renderer.call_and_clear_triangles();
+					chosen_renderer.set_scissor(false);
+
+					necessary_shaders.standard->set_as_current(chosen_renderer);
+					setup_standard_projection(chosen_renderer);
+				}
+			}
+
+			/*
+				This task is dependent upon completion of two other tasks:
 				- game_gui_job
 				- post_game_gui_job
 			*/

@@ -40,6 +40,7 @@ namespace augs {
 
 struct character_camera;
 struct damage_indication_settings;
+struct game_drawing_settings;
 
 struct audiovisual_post_solve_input {
 	const augs::audio_renderer* audio_renderer;
@@ -50,6 +51,7 @@ struct audiovisual_post_solve_input {
 	const character_camera& camera;
 	const performance_settings& performance;
 	const damage_indication_settings& damage_indication;
+	const game_drawing_settings& drawing;
 	const audiovisual_post_solve_settings settings;
 };
 

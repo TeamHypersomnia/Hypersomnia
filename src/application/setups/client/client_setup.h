@@ -641,6 +641,7 @@ public:
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = false;
 	static constexpr bool has_game_mode = true;
+	static constexpr bool has_arena_gui = true;
 
 	client_setup(
 		const packaged_official_content& official,

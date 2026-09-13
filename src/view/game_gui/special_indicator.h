@@ -8,6 +8,9 @@ struct special_indicator {
 	augs::atlas_entry radar_tex;
 
 	bool draw_onscreen = true;
+
+	/* Shown only on the minimap, not as an offscreen indicator. */
+	bool minimap_only = false;
 };
 
 struct special_indicator_meta {

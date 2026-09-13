@@ -1,7 +1,9 @@
 #pragma once
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/draw_setup_gui_input.h"
+#include "application/config_json_table.h"
 #include "view/client_arena_type.h"
+#include "view/rendering_scripts/minimap_layout.h"
 
 class client_setup;
 
@@ -56,9 +58,9 @@ custom_imgui_result arena_gui_mixin<D>::perform_custom_imgui(
 
 	const auto game_screen_top = 0.f;
 
-	const auto draw_mode_in = draw_mode_gui_input { 
-		game_screen_top, 
-		self.get_local_player_id(), 
+	const auto draw_mode_in = draw_mode_gui_input {
+		game_screen_top,
+		self.get_local_player_id(),
 		in.game_atlas,
 		in.config,
 		in.demo_replay_mode
@@ -136,9 +138,9 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 
 	const auto game_screen_top = 0.f;
 
-	const auto draw_mode_in = draw_mode_gui_input { 
+	const auto draw_mode_in = draw_mode_gui_input {
 		game_screen_top,
-		self.get_local_player_id(), 
+		self.get_local_player_id(),
 		in.images_in_atlas,
 		in.config,
 		in.demo_replay_mode

@@ -32,6 +32,7 @@
 #include "game/detail/visible_entities.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/damage_indication_settings.h"
+#include "view/game_drawing_settings.h"
 #include "game/messages/collected_message.h"
 //#include "augs/log.h"
 
@@ -451,6 +452,24 @@ void audiovisual_state::standard_post_solve(
 	auto& interp = get<interpolation_system>();
 
 	const auto& settings = input.settings;
+
+	{
+		auto& minimap_sighting = get<minimap_sighting_system>();
+		const auto acquire_sighting = never_predictable_v;
+
+		if (acquire_sighting.should_play(settings.prediction)) {
+			minimap_sighting.record_deaths(step);
+
+			if (input.drawing.minimap.enabled) {
+				minimap_sighting.advance(
+					step,
+					input.camera.viewed_character,
+					input.drawing.fog_of_war.get_real_size(),
+					input.drawing.fog_of_war.angle
+				);
+			}
+		}
+	}
 
 	const auto correct_interpolations = always_predictable_v;
 	const auto acquire_damage_indication = never_predictable_v;

@@ -2047,11 +2047,13 @@
         {
             "id": "bombsite",
             "type": "bombsite",
+            "letter": "B",
             "pos": [680.0, 640.0],
             "size": [592, 256]
         },
         {
             "id": "bombsite (1)",
+            "letter": "A",
             "type": "bombsite",
             "pos": [648.0, -640.0],
             "size": [688, 256]
@@ -2059,7 +2061,7 @@
         {
             "id": "bombsite (2)",
             "type": "bombsite",
-            "letter": "B",
+            "letter": "C",
             "pos": [2392.0, 0.0],
             "size": [688, 256]
         }

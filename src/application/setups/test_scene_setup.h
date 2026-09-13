@@ -109,6 +109,7 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
+	static constexpr bool has_arena_gui = true;
 
 	test_scene_setup(
 		std::string nickname,

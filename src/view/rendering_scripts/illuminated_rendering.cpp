@@ -45,6 +45,7 @@
 #include "augs/math/simple_calculations.h"
 #include "game/detail/sentience/callout_logic.h"
 #include "view/rendering_scripts/draw_offscreen_indicator.h"
+#include "view/rendering_scripts/minimap_layout.h"
 #include "game/detail/sentience/callout_logic.h"
 
 #include "augs/graphics/shader.hpp"
@@ -890,6 +891,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();
+
+	/*
+		The minimap buffers are drawn later, in work.cpp -
+		after the user's filtering is restored on the general atlas,
+		so the zoom-out LINEAR filtering never blurs the minimap icons.
+	*/
 
 	shaders.standard->set_projection(renderer, matrix);
 

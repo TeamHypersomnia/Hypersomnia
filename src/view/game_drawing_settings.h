@@ -49,6 +49,50 @@ struct crosshair_drawing_settings {
 	bool operator==(const crosshair_drawing_settings& b) const = default;
 };
 
+enum class hud_corner_type {
+	// GEN INTROSPECTOR enum class hud_corner_type
+	LEFT_TOP,
+	RIGHT_TOP,
+	LEFT_BOTTOM,
+	RIGHT_BOTTOM,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class minimap_tab_behavior_type {
+	// GEN INTROSPECTOR enum class minimap_tab_behavior_type
+	SHOW_ENTIRE_MAP,
+	ZOOM_OUT,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+struct minimap_settings {
+	// GEN INTROSPECTOR struct minimap_settings
+	bool enabled = true;
+	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
+	int size = 300;
+	int border_thickness = 1;
+	float range_mult = 1.5f;
+	float show_entire_map_if_fits_mult = 2.0f;
+	minimap_tab_behavior_type tab_behavior = minimap_tab_behavior_type::SHOW_ENTIRE_MAP;
+	float scoreboard_range_mult = 2.0f;
+	rgba background_color = rgba(0, 44, 0, 255);
+	rgba border_color = rgba(0, 255, 90, 255);
+	rgba obstacle_color = rgba(0, 220, 78, 255);
+	rgba portal_color = cyan;
+	rgba marker_color = cyan;
+	rgba fog_of_war_color = rgba(255, 255, 255, 15);
+	rgba player_color = white;
+	rgba teammate_color = yellow;
+	rgba enemy_color = red;
+	bool animate_laser_dashes = false;
+	bool clamp_important_to_border = true;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const minimap_settings& b) const = default;
+};
+
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
 	bool snap_zoom_to_fov_size = true;
@@ -102,6 +146,7 @@ struct game_drawing_settings {
 
 	fog_of_war_appearance_settings fog_of_war_appearance;
 	crosshair_drawing_settings crosshair;
+	minimap_settings minimap;
 
 	bool teammates_are_enemies = false;
 	bool stencil_before_light_pass = false;

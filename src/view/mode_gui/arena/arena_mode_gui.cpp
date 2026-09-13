@@ -4,6 +4,7 @@
 #include "augs/drawing/drawing.hpp"
 #include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
+#include "view/rendering_scripts/minimap_layout.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/chrono_templates.h"
@@ -800,6 +801,11 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_money_and_awards = [&]() {
+			/* The inventory GUI takes over this corner. */
+			if (in.is_cursor_released) {
+				return;
+			}
+
 			const auto money_player_id = [&]() {
 				if (in.demo_replay_mode) {
 					return spectator.active ? spectator.now_spectating : local_player_id;
@@ -816,8 +822,49 @@ void arena_gui_state::draw_mode_gui(
 
 				auto drawn_current_money = stats.money;
 
-				const auto money_indicator_pos = augs::get_screen_pos_from_offset(in.screen_size, cfg.money_indicator_pos, game_screen_top); 
-				
+				/*
+					The money block lives at the right bottom.
+					When the minimap occupies the same corner, stack above it.
+				*/
+				const auto rb_minimap_shift = [&]() {
+					const auto& minimap = in.config.drawing.minimap;
+
+					if (minimap.enabled && minimap.position == hud_corner_type::RIGHT_BOTTOM) {
+						return minimap.size + minimap_screen_margin_v;
+					}
+
+					return 0;
+				}();
+
+				/*
+					The money bar mirrors the geometry of the value bars below:
+					the same left edge, the same border style, and the caption
+					starting right at the bar's end - just like the health numbers.
+					The caption region is wider (up to 6 characters of "$20000").
+				*/
+
+				const auto money_border = border_input { 1, 1 };
+				const auto border_expansion = money_border.get_total_expansion();
+
+				/*
+					The money caption is right-aligned so that its last digit
+					lands in the same column as the last digit of a 3-digit
+					health value drawn by the bars below.
+				*/
+				const auto align_end_x =
+					in.screen_size.x - 10
+					- calc_size("99999").x
+					+ border_expansion * 2
+					+ calc_size("100").x
+				;
+
+				const auto money_bar_l = in.screen_size.x - 10 - 184 + border_expansion;
+				const auto money_bar_r = align_end_x - calc_size("$20000").x - 6;
+
+				const auto money_row_y = in.screen_size.y + cfg.money_indicator_pos.y - rb_minimap_shift;
+
+				const auto money_indicator_pos = vec2i(align_end_x, money_row_y);
+
 				{
 					const auto& cosm = mode_input.cosm;
 					const auto& awards = stats.round_state.awards;
@@ -843,11 +890,12 @@ void arena_gui_state::draw_mode_gui(
 						drawn_current_money -= a;
 
 						const auto award_color = a > 0 ? cfg.award_indicator_color : red;
-						const auto award_text = a > 0 ? typesafe_sprintf("+ %x$", a) : typesafe_sprintf("- %x$", -a);
+						const auto award_text = a > 0 ? typesafe_sprintf("+ $%x", a) : typesafe_sprintf("- $%x", -a);
 						const auto award_text_w = calc_size(award_text).x;
 
+						/* Awards stack upward - the money sits at the bottom. */
 						auto award_indicator_pos = money_indicator_pos;
-						award_indicator_pos.y += line_height * (i + 1 - starting_i);
+						award_indicator_pos.y -= line_height * (i + 1 - starting_i);
 
 						print_stroked(
 							general_drawer,
@@ -857,7 +905,7 @@ void arena_gui_state::draw_mode_gui(
 					}
 				}
 
-				const auto money_text = typesafe_sprintf("%x$", drawn_current_money);
+				const auto money_text = typesafe_sprintf("$%x", drawn_current_money);
 				const auto money_text_w = calc_size(money_text).x;
 
 				print_stroked(
@@ -865,6 +913,64 @@ void arena_gui_state::draw_mode_gui(
 					money_indicator_pos - vec2i(money_text_w, 0),
 					colored(money_text, cfg.money_indicator_color)
 				);
+
+				/*
+					The money bar - like a health bar, but without an icon.
+					Maximum is the money cap of $20000.
+				*/
+
+				{
+					const auto max_money = 20000.0f;
+					const auto ratio = std::clamp(static_cast<float>(stats.money) / max_money, 0.0f, 1.0f);
+
+					/* Slightly lower than the value bars (their 16px icons). */
+					const auto bar_h = 14;
+
+					const auto expansion = border_expansion;
+
+					const auto bar_l = static_cast<float>(money_bar_l);
+					const auto bar_r = static_cast<float>(money_bar_r);
+					const auto bar_center_y = static_cast<float>(money_row_y) + line_height / 2.0f;
+
+					const auto bordered_rect = ltrb(
+						bar_l,
+						bar_center_y - bar_h / 2,
+						bar_r,
+						bar_center_y + bar_h / 2
+					);
+
+					const auto full_fill_rect = ltrb(bordered_rect).expand_from_center({
+						static_cast<float>(-expansion),
+						static_cast<float>(-expansion)
+					});
+
+					auto fill_rect = full_fill_rect;
+					fill_rect.r = fill_rect.l + std::max(0.0f, fill_rect.w() * ratio);
+
+					auto bar_col = cfg.money_indicator_color;
+					bar_col.a = 200;
+
+					general_drawer.aabb(fill_rect, bar_col);
+					general_drawer.border(full_fill_rect, bar_col, money_border);
+
+					/* Sparkles flowing through the filled part. */
+
+					if (fill_rect.w() > 4.0f) {
+						const auto secs = mode_input.cosm.get_total_seconds_passed();
+
+						for (int s = 0; s < 5; ++s) {
+							const auto phase = static_cast<float>(std::fmod(secs * 20.0 + s * 41.0, static_cast<double>(fill_rect.w() - 2.0f)));
+							const auto wobble = std::sin(static_cast<float>(secs) * 3.0f + s * 1.7f) * (bar_h / 2 - 3);
+
+							const auto sparkle_pos = vec2(fill_rect.l + 1 + phase, bar_center_y + wobble);
+
+							auto sparkle_col = white;
+							sparkle_col.a = 180;
+
+							general_drawer.aabb(ltrb::center_and_size(sparkle_pos, vec2::square(2)), sparkle_col);
+						}
+					}
+				}
 			}
 			else {
 				warmup.requested.clear();
@@ -892,29 +998,210 @@ void arena_gui_state::draw_mode_gui(
 				return i;
 			}();
 
-			auto pen = vec2i(10, game_screen_top);
+			const auto corner = cfg.knockout_indicators_position;
 
-			for (std::size_t i = starting_i; i < kos.size(); ++i) {
-				pen.x = 10;
-				pen.y += cfg.between_knockout_boxes_pad;
+			const bool at_right =
+				corner == hud_corner_type::RIGHT_TOP ||
+				corner == hud_corner_type::RIGHT_BOTTOM
+			;
 
-				const auto& ko = kos[i];
+			auto get_col = [&](const auto& participant) {
+				return in.config.faction_view.colors[participant.faction].standard;
+			};
 
-				auto get_col = [&](const auto& participant) {
-					return in.config.faction_view.colors[participant.faction].standard;
-				};
+			auto get_name = [&](const auto& entry) -> std::string {
+				const bool streamer_mode = in.streamer_mode && in.streamer_mode_flags.kill_notifications;
 
-				auto get_name = [&](const auto& entry) -> std::string {
-					const bool streamer_mode = in.streamer_mode && in.streamer_mode_flags.kill_notifications;
+				if (streamer_mode) {
+					if (entry.name.size() > 0 && entry.id != local_player_id) {
+						return "Player";
+					}
+				}
 
-					if (streamer_mode) {
-						if (entry.name.size() > 0 && entry.id != local_player_id) {
-							return "Player";
-						}
+				return entry.name;
+			};
+
+			/*
+				Tool and circumstance icons are drawn as pure color silhouettes.
+				They go into a dedicated buffer drawn with the pure_color_highlight shader
+				in a separate drawcall - see draw_mode_and_setup_custom_gui in work.cpp.
+			*/
+
+			auto& silhouettes_buffer = in.renderer.dedicated[augs::dedicated_buffer::KNOCKOUT_ICONS].triangles;
+			const auto silhouettes_drawer = augs::drawer { silhouettes_buffer };
+
+			auto clamp_tool_size = [&](const vec2i original_tool_size) {
+				const auto max_tool_height = cfg.max_weapon_icon_height;
+
+				if (max_tool_height == 0) {
+					/* No limit */
+					return original_tool_size;
+				}
+
+				const auto m = vec2(0, max_tool_height);
+				auto s = vec2(original_tool_size);
+
+				if (s.y > m.y) {
+					s.x *= m.y / s.y;
+					s.y = m.y;
+				}
+
+				return static_cast<vec2i>(s);
+			};
+
+			/*
+				Keep in sync with the width composition in the drawing loop below.
+			*/
+			auto calc_box_width = [&](const auto& ko) {
+				const bool is_suicide = ko.knockouter.id == ko.victim.id;
+
+				const auto lhs_text =
+					colored(is_suicide ? "" : get_name(ko.knockouter), get_col(ko.knockouter))
+					+ colored(get_name(ko.assist).size() > 0 ? " (+ " + get_name(ko.assist) + ")" : "", get_col(ko.assist))
+				;
+
+				const auto rhs_text = colored(get_name(ko.victim), get_col(ko.victim));
+
+				const auto lhs_bbox = get_text_bbox(lhs_text);
+				const auto rhs_bbox = get_text_bbox(rhs_text);
+
+				const auto layout = ::make_tool_layout(
+					death_hazard_icon,
+					death_fallback_icon,
+					silhouettes_buffer,
+					ko.origin,
+					cosm,
+					in.images_in_atlas,
+					orange
+				);
+
+				const auto tool_size = clamp_tool_size(static_cast<vec2i>(layout.get_size()));
+
+				const auto headshot_icon = mode_input.rules.view.headshot_icons[ko.victim.faction];
+				const auto headshot_icon_size = ko.origin.circumstances.headshot ? in.images_in_atlas.find_or(headshot_icon).diffuse.get_original_size() : vec2u::zero;
+
+				const auto wallbang_icon = mode_input.rules.view.wallbang_icon;
+				const auto wallbang_icon_size = ko.origin.circumstances.wallbang ? in.images_in_atlas.find_or(wallbang_icon).diffuse.get_original_size() : vec2u::zero;
+
+				auto times_padded = 2;
+
+				if (ko.origin.circumstances.headshot) {
+					++times_padded;
+				}
+
+				if (ko.origin.circumstances.wallbang) {
+					++times_padded;
+				}
+
+				return static_cast<int>(
+					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + wallbang_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x
+				);
+			};
+
+			/*
+				When right-aligned, consecutive kills of the same player
+				share a common left edge, so that kill streaks stand out.
+			*/
+
+			thread_local std::vector<int> aligned_widths;
+			aligned_widths.clear();
+
+			if (at_right) {
+				aligned_widths.resize(kos.size() - starting_i);
+
+				/*
+					Streak runs are detected over the full history,
+					so that when the older boxes of a streak expire,
+					the remaining ones do not jump back to the right.
+				*/
+
+				/*
+					When true, expired boxes of a streak still count towards
+					the alignment, so the remaining ones never shift as the
+					older ones disappear - at the cost of the last box of
+					a long streak hanging left-shifted alone at the top.
+				*/
+				constexpr bool align_streaks_over_full_history_v = false;
+
+				const auto run_floor = align_streaks_over_full_history_v ? std::size_t(0) : starting_i;
+
+				std::size_t i = starting_i;
+
+				while (i < kos.size()) {
+					auto run_begin = i;
+					auto run_end = i + 1;
+
+					while (run_begin > run_floor && kos[run_begin - 1].knockouter.id == kos[i].knockouter.id) {
+						--run_begin;
 					}
 
-					return entry.name;
-				};
+					while (run_end < kos.size() && kos[run_end].knockouter.id == kos[i].knockouter.id) {
+						++run_end;
+					}
+
+					auto max_w = 0;
+
+					for (auto g = run_begin; g < run_end; ++g) {
+						max_w = std::max(max_w, calc_box_width(kos[g]));
+					}
+
+					for (auto g = std::max(run_begin, starting_i); g < run_end; ++g) {
+						aligned_widths[g - starting_i] = max_w;
+					}
+
+					i = run_end;
+				}
+			}
+
+			const bool at_bottom =
+				corner == hud_corner_type::LEFT_BOTTOM ||
+				corner == hud_corner_type::RIGHT_BOTTOM
+			;
+
+			/*
+				Corner stacking priority: minimap -> money/health bars -> knockouts.
+			*/
+
+			const auto corner_occupied = [&]() {
+				auto result = 0;
+
+				const auto& minimap = in.config.drawing.minimap;
+
+				if (minimap.enabled && minimap.position == corner) {
+					result += minimap.size + 2 * minimap_screen_margin_v;
+				}
+
+				if (corner == hud_corner_type::RIGHT_BOTTOM) {
+					/* The money and health bars always live in this corner. */
+					result += 280;
+				}
+
+				return result;
+			}();
+
+			/*
+				In the bottom corners, the bottom padding matches the hotbar's.
+			*/
+			const auto hud_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
+			const auto left_margin = 10;
+
+			auto pen = vec2i(left_margin, 0);
+
+			if (at_bottom) {
+				pen.y = in.screen_size.y - hud_pad - corner_occupied;
+			}
+			else {
+				pen.y = static_cast<int>(game_screen_top) + corner_occupied;
+			}
+
+			for (std::size_t n = starting_i; n < kos.size(); ++n) {
+				/*
+					Bottom stacks grow upward with the newest knockout
+					nearest the corner, preserving the oldest-at-top order.
+				*/
+				const auto i = at_bottom ? kos.size() - 1 - (n - starting_i) : n;
+
+				const auto& ko = kos[i];
 
 				const auto knockouter = get_name(ko.knockouter);
 				const auto assist = get_name(ko.assist);
@@ -961,15 +1248,6 @@ void arena_gui_state::draw_mode_gui(
 					return { bg, col };
 				}();
 
-				/*
-					Tool and circumstance icons are drawn as pure color silhouettes.
-					They go into a dedicated buffer drawn with the pure_color_highlight shader
-					in a separate drawcall - see draw_mode_and_setup_custom_gui in work.cpp.
-				*/
-
-				auto& silhouettes_buffer = in.renderer.dedicated[augs::dedicated_buffer::KNOCKOUT_ICONS].triangles;
-				const auto silhouettes_drawer = augs::drawer { silhouettes_buffer };
-
 				const auto layout = make_tool_layout(
 					death_hazard_icon,
 					death_fallback_icon,
@@ -980,25 +1258,7 @@ void arena_gui_state::draw_mode_gui(
 					orange
 				);
 
-				const auto tool_size = [&]() {
-					const auto original_tool_size = static_cast<vec2i>(layout.get_size());
-					const auto max_tool_height = cfg.max_weapon_icon_height;
-
-					if (max_tool_height == 0) {
-						/* No limit */
-						return original_tool_size;
-					}
-
-					const auto m = vec2(0, max_tool_height);
-					auto s = vec2(original_tool_size);
-
-					if (s.y > m.y) {
-						s.x *= m.y / s.y;
-						s.y = m.y;
-					}
-
-					return static_cast<vec2i>(s);
-				}();
+				const auto tool_size = clamp_tool_size(static_cast<vec2i>(layout.get_size()));
 
 				const bool was_headshot = ko.origin.circumstances.headshot;
 				const auto headshot_icon = mode_input.rules.view.headshot_icons[ko.victim.faction];
@@ -1022,11 +1282,33 @@ void arena_gui_state::draw_mode_gui(
 					++times_padded;
 				}
 
+				const auto box_w = static_cast<int>(
+					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + wallbang_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x
+				);
+
+				const auto box_h = static_cast<int>(
+					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
+				);
+
+				/*
+					When right-aligned, boxes of a kill streak share
+					the left edge of the widest one - only that one
+					touches the right edge of the screen.
+				*/
+				pen.x = at_right ? in.screen_size.x - 10 - aligned_widths[i - starting_i] : left_margin;
+
+				if (at_bottom) {
+					pen.y -= static_cast<int>(cfg.between_knockout_boxes_pad) + box_h;
+				}
+				else {
+					pen.y += cfg.between_knockout_boxes_pad;
+				}
+
 				const auto total_bbox = xywhi(
 					pen.x,
 					pen.y,
-					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + wallbang_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
-					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
+					box_w,
+					box_h
 				);
 
 				auto general_drawer = get_drawer();
@@ -1106,7 +1388,7 @@ void arena_gui_state::draw_mode_gui(
 					{ augs::ralign::CY }
 				);
 
-				pen.y = total_bbox.b();
+				pen.y = at_bottom ? total_bbox.y : total_bbox.b();
 			}
 		};
 

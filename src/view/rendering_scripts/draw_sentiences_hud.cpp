@@ -635,7 +635,14 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			col = white;
 		}
 
-		if (indicators_enabled && (is_conscious || koed_recently) && col.a > 0) {
+		/*
+			When tactical indicators are on, death skulls are drawn
+			by the special indicators instead - for both factions.
+		*/
+		const bool skull_covered_by_tactical = in.settings.draw_tactical_indicators.is_enabled;
+		const bool show_death_skull = koed_recently && !skull_covered_by_tactical;
+
+		if (indicators_enabled && (is_conscious || show_death_skull) && col.a > 0) {
 			const auto cam = in.text_camera;
 			const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
 			const auto angle = starting_health_angle + in.color_indicator_angle;

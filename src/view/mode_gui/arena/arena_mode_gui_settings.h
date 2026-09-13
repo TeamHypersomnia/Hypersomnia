@@ -1,4 +1,5 @@
 #pragma once
+#include "view/game_drawing_settings.h"
 
 struct buy_menu_gui_settings {
 	// GEN INTROSPECTOR struct buy_menu_gui_settings
@@ -65,12 +66,13 @@ struct arena_mode_gui_settings {
 	unsigned show_recent_knockouts_num = 5;
 	float keep_recent_knockouts_for_seconds = 8.f;
 	unsigned max_weapon_icon_height = 0;
+	hud_corner_type knockout_indicators_position = hud_corner_type::RIGHT_TOP;
 
 	scoreboard_gui_settings scoreboard_settings;
 	buy_menu_gui_settings buy_menu_settings;
-	rgba money_indicator_color = rgba(249, 133, 255, 255);
+	rgba money_indicator_color = rgba(255, 230, 120, 255);
 	rgba award_indicator_color = yellow;
-	vec2i money_indicator_pos = vec2i(-40, 20 + 16 * 4);
+	vec2i money_indicator_pos = vec2i(-10, -150);
 
 	unsigned show_recent_awards_num = 5;
 	float keep_recent_awards_for_seconds = 8.f;

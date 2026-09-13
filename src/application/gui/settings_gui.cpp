@@ -1302,6 +1302,8 @@ void settings_gui_state::perform(
 					if (auto node = scoped_tree_node("HUD")) {
 						revertable_checkbox("Cinematic mode", config.drawing.cinematic_mode);
 
+						revertable_enum_radio("Knockout indicators position", config.arena_mode_gui.knockout_indicators_position);
+
 						revertable_checkbox("Draw enemy silhouettes in Spectator", config.drawing.draw_enemy_silhouettes_in_spectator);
 
 						revertable_checkbox(SCOPE_CFG_NVP(draw_inventory));
@@ -1427,6 +1429,42 @@ void settings_gui_state::perform(
 
 						if (scope_cfg.type == crosshair_type::CIRCULAR) {
 							revertable_color_edit(SCOPE_CFG_NVP(background_color));
+						}
+					}
+				}
+
+				{
+					auto& scope_cfg = config.drawing.minimap;
+
+					if (auto node = scoped_tree_node("Minimap")) {
+						revertable_checkbox(SCOPE_CFG_NVP(enabled));
+
+						if (scope_cfg.enabled) {
+							revertable_enum_radio(SCOPE_CFG_NVP(position));
+
+							revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
+							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
+							revertable_slider(SCOPE_CFG_NVP(range_mult), 0.5f, 4.f);
+							revertable_slider(SCOPE_CFG_NVP(show_entire_map_if_fits_mult), 0.f, 4.f);
+
+							revertable_enum_radio(SCOPE_CFG_NVP(tab_behavior));
+
+							if (scope_cfg.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
+								revertable_slider(SCOPE_CFG_NVP(scoreboard_range_mult), 1.f, 4.f);
+							}
+
+							revertable_color_edit(SCOPE_CFG_NVP(background_color));
+							revertable_color_edit(SCOPE_CFG_NVP(border_color));
+							revertable_color_edit(SCOPE_CFG_NVP(obstacle_color));
+							revertable_color_edit(SCOPE_CFG_NVP(portal_color));
+							revertable_color_edit(SCOPE_CFG_NVP(marker_color));
+							revertable_color_edit(SCOPE_CFG_NVP(fog_of_war_color));
+							revertable_color_edit(SCOPE_CFG_NVP(player_color));
+							revertable_color_edit(SCOPE_CFG_NVP(teammate_color));
+							revertable_color_edit(SCOPE_CFG_NVP(enemy_color));
+
+							revertable_checkbox(SCOPE_CFG_NVP(animate_laser_dashes));
+							revertable_checkbox(SCOPE_CFG_NVP(clamp_important_to_border));
 						}
 					}
 				}
