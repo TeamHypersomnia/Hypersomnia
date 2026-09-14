@@ -2676,8 +2676,8 @@ namespace test_flavours {
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SHOTGUN_RED_ROUND);
 
 				cartridge.num_rounds_spawned = 12;
-				cartridge.rounds_spread_degrees = 18.f;
-				cartridge.rounds_spread_degrees_variation = 9.f;
+				cartridge.rounds_spread_degrees = 11.5f;
+				cartridge.rounds_spread_degrees_variation = 0.f;
 
 				meta.set(cartridge);
 			}
@@ -2800,7 +2800,7 @@ namespace test_flavours {
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GRADOBICIE_ROUND);
 
 				cartridge.num_rounds_spawned = 14;
-				cartridge.rounds_spread_degrees = 12.f;
+				cartridge.rounds_spread_degrees = 8.f;
 				cartridge.rounds_spread_degrees_variation = 0.f;
 
 				meta.set(cartridge);
@@ -4790,7 +4790,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 2500;
+			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
@@ -4839,7 +4839,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.9f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 2100;
+			meta.get<invariants::item>().standard_price = 2500;
 			set_chambering_duration_ms(meta, 550.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.5");
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
