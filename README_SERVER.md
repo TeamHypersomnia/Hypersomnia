@@ -20,6 +20,11 @@ Check out this [handy script to quickly deploy the `AppImage` as a service](http
     - [--daily-autoupdate](#--daily-autoupdate)
     - [--appdata-dir](#--appdata-dir)
     - [--apply-config](#--apply-config)
+    - [--tournament](#--tournament)
+- [Hosting a tournament](#hosting-a-tournament)
+  * [Quickstart](#quickstart)
+  * [How players join](#how-players-join)
+  * [Results, crashes, recovery](#results-crashes-recovery)
 
 # Docker setup
 
@@ -285,3 +290,56 @@ will read:
 - ``./some_config.json``
 
 In this order.
+
+### --tournament
+
+Runs a [tournament](#hosting-a-tournament) defined by the given file:
+
+```sh
+./Hypersomnia-Headless.AppImage --tournament ./tournament.json
+```
+
+The path is relative to the directory you invoke the binary from. Equivalent to setting the ``tournament_file`` config var, which resolves relative paths against ``~/.config/Hypersomnia/user/`` instead.
+
+# Hosting a tournament
+
+The dedicated server can run a complete single-elimination tournament on its own - no manual bracket management. It spawns one ranked server instance per match, waits for the results, advances the winners stage by stage and reseeds the bracket, until a single winning team remains.
+
+**This is a Linux dedicated server feature.**
+
+## Quickstart
+
+1) Download [`tournament.example.json`](./hypersomnia/tournament.example.json) - it documents every field. Save it e.g. as ``~/.config/Hypersomnia/user/tournament.json``.
+2) Edit ``"teams"`` (player nicknames, one or more players per team) and ``"arenas"`` (one entry per stage).
+3) Launch the server with:
+
+```sh
+./Hypersomnia-Headless.AppImage --tournament ~/.config/Hypersomnia/user/tournament.json
+```
+
+Alternatively, set this in your ``conf.d/`` config:
+
+```json
+"tournament_file": "tournament.json"
+```
+
+Relative paths are resolved against ``~/.config/Hypersomnia/user/``. If the file does not exist, the server just starts normally - so you can keep the var set at all times and only drop the file in when you host an event.
+
+## How players join
+
+- Every match of a stage runs concurrently on its own UDP port - consecutive ports starting from ``server_start.port``, exactly like with [multiple server instances](#many-server-instances). With ``N`` teams, open ``N / 2`` consecutive native ports, and as many web ports starting from ``webrtc_port_range_begin``.
+- The matches appear on the server list with names built from the team rosters, e.g. ``[alice] vs [bob]`` - semifinals and finals are specially tagged.
+- If no ``steam_web_api_key`` is configured, nickname authentication is forced on, so LAN tournaments work out of the box: a player simply connects with the exact nickname listed in ``"teams"``. Clients that are not on the match's roster are kicked, so nobody can wander onto the wrong server.
+- People listed in ``"additional_spectators"`` (casters, admins) may spectate every match of every stage.
+- A match autostarts as soon as both teams join, with full ranked logistics: the match freezes when someone disconnects so they can rejoin, and overtime is forced on since a bracket cannot handle ties.
+
+## Results, crashes, recovery
+
+Tournament progress is continuously persisted to ``~/.config/Hypersomnia/user/tournament.ongoing.json``. If the host machine crashes or you stop the server, just launch it again the same way: already-resolved matches are not replayed, and thanks to per-round recovery snapshots, live rounds resume mid-match.
+
+If a match somehow ends up unresolvable, you can hand-edit ``tournament.ongoing.json`` to force a winner and relaunch.
+
+When the tournament concludes, the winner is logged and two archives are written next to their source files:
+
+- ``tournament.completed.[timestamp].state.json`` - the full bracket history and results.
+- ``tournament.completed.[timestamp].config.json`` - the tournament definition it ran with (the original file is renamed, so the next launch starts normally).
