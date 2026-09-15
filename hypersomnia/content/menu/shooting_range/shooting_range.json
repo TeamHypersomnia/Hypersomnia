@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-04 10:24:34.529062 UTC"
+        "version_timestamp": "2026-09-15 23:48:22.716828 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -80,6 +80,16 @@
             "size": [235, 68]
         },
         {
+            "path": "gfx/pad_outline.png",
+            "file_hash": "38350600fdfa2032c4e414127c72100b6f5224a40d8541f454925ad5eb2bd4c3",
+            "id": "@pad_outline",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255, 1.0]
+                ]
+            },
+            "size": [256, 256]
+        },
+        {
             "path": "gfx/water_room_floor.png",
             "file_hash": "67c17418dc25e164ebf0265d50490fd9388da8ff0e37ae4d7838b2a9d8a4b7ed",
             "id": "@water_room_floor",
@@ -114,6 +124,17 @@
                     }
                 }
             }
+        },
+        {
+            "path": "gfx/zoom.png",
+            "file_hash": "645cec995d9c9b8625f3111b59b0fcbfe1f79d5b13cc76afc72edb41f33ec705",
+            "id": "@zoom",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255, 1.0]
+                ]
+            },
+            "size": [32, 32],
+            "stretch_when_resized": true
         },
         {
             "path": "materials/glass.png",
@@ -164,7 +185,6 @@
             "size": [64, 64],
             "as_physical": {
                 "is_static": true,
-                "is_see_through": true,
                 "material": "vent"
             }
         },
@@ -189,7 +209,59 @@
     ],
     "layers": [
         {
+            "id": "Layer 30",
+            "nodes": [
+                "bombsite"
+            ]
+        },
+        {
+            "id": "Layer 29",
+            "nodes": [
+                "bomb (1)",
+                "bomb"
+            ]
+        },
+        {
+            "id": "Layer 28",
+            "nodes": [
+                "minimap_marker",
+                "zoom_1x",
+                "zoom_0.8x",
+                "zoom_0.75x",
+                "zoom_0.7x",
+                "zoom_0.6x",
+                "zoom_0.5x",
+                "zoom_1x_outline",
+                "zoom_0.8x_outline",
+                "zoom_0.75x_outline",
+                "zoom_0.7x_outline",
+                "zoom_0.6x_outline",
+                "zoom_0.5x_outline"
+            ]
+        },
+        {
+            "id": "Layer 27",
+            "nodes": [
+                "dev_floor_256 (5)",
+                "dev_floor_256 (4)",
+                "dev_floor_256 (3)",
+                "dev_floor_256 (2)",
+                "dev_floor_256 (7)",
+                "dev_floor_256 (6)"
+            ]
+        },
+        {
+            "id": "Layer 26"
+        },
+        {
+            "id": "Layer 25",
+            "nodes": [
+                "nav_island"
+            ]
+        },
+        {
             "id": "Layer 24",
+            "is_open_in_editor": false,
             "nodes": [
                 "green_coin (5)",
                 "green_coin (4)",
@@ -1377,6 +1449,114 @@
             "size": [10240, 3840]
         },
         {
+            "id": "dev_floor_256 (6)",
+            "type": "dev_floor_256",
+            "pos": [-3840.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "zoom_0.8x",
+            "type": "@zoom",
+            "pos": [-640.0, 3456.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "zoom_1x",
+            "type": "@zoom",
+            "pos": [-640.0, 3200.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "zoom_0.75x",
+            "type": "@zoom",
+            "pos": [-640.0, 3712.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "zoom_0.7x",
+            "type": "@zoom",
+            "pos": [-640.0, 3968.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "zoom_0.5x",
+            "type": "@zoom",
+            "pos": [-640.0, 4480.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "dev_floor_256 (2)",
+            "type": "dev_floor_256",
+            "pos": [-3328.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "dev_floor_256 (3)",
+            "type": "dev_floor_256",
+            "pos": [-3072.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "dev_floor_256 (4)",
+            "type": "dev_floor_256",
+            "pos": [-2816.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "dev_floor_256 (5)",
+            "type": "dev_floor_256",
+            "pos": [-2560.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "dev_floor_256 (7)",
+            "type": "dev_floor_256",
+            "pos": [-3584.0, 2944.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "zoom_0.6x",
+            "type": "@zoom",
+            "pos": [-640.0, 4224.0],
+            "size": [64, 64]
+        },
+        {
+            "id": "zoom_1x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 3200.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.8x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 3456.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.75x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 3712.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.7x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 3968.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.6x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 4224.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.5x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 4480.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
             "id": "aquarium_ambience_left",
             "type": "aquarium_ambience_left",
             "pos": [-619.0, 1274.0]
@@ -1839,6 +2019,16 @@
             "pos": [2069.0, 4098.0]
         },
         {
+            "id": "bomb",
+            "type": "bomb",
+            "pos": [-2171.0, 2988.0]
+        },
+        {
+            "id": "bomb (1)",
+            "type": "bomb",
+            "pos": [-2271.0, 2988.0]
+        },
+        {
             "id": "mini_knife",
             "type": "mini_knife",
             "pos": [-1306.0, 4613.0]
@@ -2297,22 +2487,22 @@
         {
             "id": "electric_armor",
             "type": "electric_armor",
-            "pos": [-2064.0, 2992.0]
+            "pos": [-2071.0, 2992.0]
         },
         {
             "id": "defuse_kit",
             "type": "defuse_kit",
-            "pos": [-1977.0, 2992.0]
+            "pos": [-1971.0, 2992.0]
         },
         {
             "id": "metropolis_backpack",
             "type": "metropolis_backpack",
-            "pos": [-1870.9998779296875, 2992.0]
+            "pos": [-1871.0, 2992.0]
         },
         {
             "id": "resistance_backpack",
             "type": "resistance_backpack",
-            "pos": [-1782.0, 2992.0]
+            "pos": [-1771.0, 2992.0]
         },
         {
             "id": "gold_coin (2)",
@@ -2518,113 +2708,97 @@
             "id": "team_spawn (17)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [453.0, 3903.0],
-            "rotation": -180.0
+            "pos": [451.0, 3903.0]
         },
         {
             "id": "team_spawn (18)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 4031.0],
-            "rotation": -180.0
+            "pos": [453.0, 4031.0]
         },
         {
             "id": "team_spawn (19)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [453.0, 4289.0],
-            "rotation": -180.0
+            "pos": [451.0, 4289.0]
         },
         {
             "id": "team_spawn (20)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 4161.0],
-            "rotation": -180.0
+            "pos": [453.0, 4161.0]
         },
         {
             "id": "team_spawn (21)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [455.0, 3393.0],
-            "rotation": -180.0
+            "pos": [449.0, 3393.0]
         },
         {
             "id": "team_spawn (22)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [453.0, 3521.0],
-            "rotation": -180.0
+            "pos": [451.0, 3521.0]
         },
         {
             "id": "team_spawn (23)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [455.0, 3779.0],
-            "rotation": -180.0
+            "pos": [449.0, 3779.0]
         },
         {
             "id": "team_spawn (24)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [453.0, 3651.0],
-            "rotation": -180.0
+            "pos": [451.0, 3651.0]
         },
         {
             "id": "team_spawn (25)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 4413.0],
-            "rotation": -180.0
+            "pos": [453.0, 4413.0]
         },
         {
             "id": "team_spawn (26)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [449.0, 4541.0],
-            "rotation": -180.0
+            "pos": [455.0, 4541.0]
         },
         {
             "id": "team_spawn (27)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 4799.0],
-            "rotation": -180.0
+            "pos": [453.0, 4799.0]
         },
         {
             "id": "team_spawn (28)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [449.0, 4671.0],
-            "rotation": -180.0
+            "pos": [455.0, 4671.0]
         },
         {
             "id": "team_spawn (29)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 4925.0],
-            "rotation": -180.0
+            "pos": [453.0, 4925.0]
         },
         {
             "id": "team_spawn (30)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [449.0, 5053.0],
-            "rotation": -180.0
+            "pos": [455.0, 5053.0]
         },
         {
             "id": "team_spawn (31)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [451.0, 5311.0],
-            "rotation": -180.0
+            "pos": [453.0, 5311.0]
         },
         {
             "id": "team_spawn (32)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [449.0, 5183.0],
-            "rotation": -180.0
+            "pos": [455.0, 5183.0]
         },
         {
             "id": "team_spawn (33)",
@@ -2637,8 +2811,7 @@
             "id": "team_spawn (34)",
             "type": "team_spawn",
             "faction": "RESISTANCE",
-            "pos": [449.0, 3201.0],
-            "rotation": -180.0
+            "pos": [455.0, 3201.0]
         },
         {
             "id": "team_spawn (16)",
@@ -2834,6 +3007,29 @@
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
             }
+        },
+        {
+            "id": "nav_island",
+            "type": "nav_island",
+            "faction": "RESISTANCE",
+            "pos": [0.0, 3840.0],
+            "size": [9216, 7680]
+        },
+        {
+            "id": "minimap_marker",
+            "type": "portal",
+            "faction": "RESISTANCE",
+            "shape": "BOX",
+            "pos": [-640.0, 3840.000244140625],
+            "size": [256, 1536],
+            "disable_all_entry_effects": true
+        },
+        {
+            "id": "bombsite",
+            "type": "bombsite",
+            "faction": "RESISTANCE",
+            "pos": [40.0, 1408.0],
+            "size": [4272, 256]
         }
     ]
 }
