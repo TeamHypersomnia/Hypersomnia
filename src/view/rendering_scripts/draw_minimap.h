@@ -32,6 +32,12 @@ struct draw_minimap_input {
 	/* True when the scoreboard is open - doubles the queried range. */
 	const bool extended_range;
 
+	/*
+		The camera's current (smoothed) zoom area multiplier -
+		the minimap zooms out along with it.
+	*/
+	const float camera_area_zoom;
+
 	const vec2i screen_size;
 	const const_entity_handle viewed_character;
 	const interpolation_system& interp;

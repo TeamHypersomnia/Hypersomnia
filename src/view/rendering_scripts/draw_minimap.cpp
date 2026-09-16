@@ -5,6 +5,7 @@
 
 #include "augs/math/rects.h"
 #include "augs/drawing/drawing.hpp"
+#include "game/balance_params.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
@@ -86,6 +87,17 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	;
 
 	auto world_side = max_fow_side * settings.range_mult;
+
+	/*
+		range_mult was tuned against the default camera zoom.
+		When a Camera zoom area (or the map's default zoom) zooms
+		the camera out further, the minimap zooms out proportionally.
+		Zooming in closer than the default leaves the range unchanged.
+	*/
+
+	if (in.camera_area_zoom > 0.0f) {
+		world_side *= std::max(1.0f, BALANCE_ZOOM_OUT / in.camera_area_zoom);
+	}
 
 	if (in.extended_range && settings.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
 		world_side *= settings.scoreboard_range_mult;

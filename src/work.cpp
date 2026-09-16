@@ -5298,6 +5298,7 @@ work_result work(
 					see_enemies_behind_walls,
 					draw_enemy_crosshairs,
 					minimap_extended_range,
+					gameplay_camera.current_area_zoom_mult,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,

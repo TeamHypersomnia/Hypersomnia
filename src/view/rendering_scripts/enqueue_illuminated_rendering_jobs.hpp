@@ -777,11 +777,12 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto minimap_job = [minimap_extended_range = in.minimap_extended_range, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
+	auto minimap_job = [minimap_extended_range = in.minimap_extended_range, minimap_area_zoom = in.minimap_area_zoom, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
 		::draw_minimap({
 			settings.minimap,
 			settings.fog_of_war,
 			minimap_extended_range,
+			minimap_area_zoom,
 			screen_size,
 			viewed_character,
 			interp,

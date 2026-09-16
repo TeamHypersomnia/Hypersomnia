@@ -55,6 +55,7 @@ struct illuminated_rendering_input {
 	const bool see_enemies_behind_walls = false;
 	const bool draw_enemy_crosshairs = false;
 	const bool minimap_extended_range = false;
+	const float minimap_area_zoom = 1.0f;
 	const necessary_images_in_atlas_map& necessary_images;
 	const all_loaded_gui_fonts& fonts;
 	const images_in_atlas_map& game_images;
