@@ -926,8 +926,9 @@
             "already_owns_other_type_bg": [94, 12, 255, 91],
             "already_owns_other_type_active_bg": [94, 101, 255, 120]
         },
-        "money_indicator_color": [255, 230, 120, 255],
-        "award_indicator_color": [255, 255, 0, 255],
+        "money_indicator_color": [255, 236, 179, 255],
+        "money_bar_color": [255, 190, 0, 255],
+        "award_indicator_color": [255, 230, 120, 255],
         "money_indicator_pos": [-10, -150],
         "knockout_indicators_position": "RIGHT_TOP",
         "show_recent_awards_num": 8,

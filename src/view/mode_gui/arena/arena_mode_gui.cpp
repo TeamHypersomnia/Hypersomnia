@@ -911,7 +911,7 @@ void arena_gui_state::draw_mode_gui(
 				print_stroked(
 					general_drawer,
 					money_indicator_pos - vec2i(money_text_w, 0),
-					colored(money_text, cfg.money_indicator_color)
+					colored(money_text, cfg.money_bar_color)
 				);
 
 				/*
@@ -947,8 +947,7 @@ void arena_gui_state::draw_mode_gui(
 					auto fill_rect = full_fill_rect;
 					fill_rect.r = fill_rect.l + std::max(0.0f, fill_rect.w() * ratio);
 
-					auto bar_col = cfg.money_indicator_color;
-					bar_col.a = 200;
+					const auto bar_col = cfg.money_bar_color;
 
 					general_drawer.aabb(fill_rect, bar_col);
 					general_drawer.border(full_fill_rect, bar_col, money_border);

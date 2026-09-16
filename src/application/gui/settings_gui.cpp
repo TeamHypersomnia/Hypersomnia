@@ -1827,6 +1827,7 @@ void settings_gui_state::perform(
 							drag("Money indicator position Y", scope_cfg.money_indicator_pos.y, 0.3f, -vec2i(screen_size).y, vec2i(screen_size).y);
 
 							revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
+							revertable_color_edit("Money bar color", scope_cfg.money_bar_color);
 							revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
 							revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
 							revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);

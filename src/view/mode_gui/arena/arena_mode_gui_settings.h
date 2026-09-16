@@ -70,8 +70,9 @@ struct arena_mode_gui_settings {
 
 	scoreboard_gui_settings scoreboard_settings;
 	buy_menu_gui_settings buy_menu_settings;
-	rgba money_indicator_color = rgba(255, 230, 120, 255);
-	rgba award_indicator_color = yellow;
+	rgba money_indicator_color = rgba(255, 236, 179, 255);
+	rgba money_bar_color = rgba(255, 190, 0, 255);
+	rgba award_indicator_color = rgba(255, 230, 120, 255);
 	vec2i money_indicator_pos = vec2i(-10, -150);
 
 	unsigned show_recent_awards_num = 5;
