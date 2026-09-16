@@ -6,7 +6,8 @@
 */
 
 /*
-	Camera zoom-out applied for balance: enlarges both the
-	visible world area and the fog of war that corresponds to it.
+	Camera zoom-out applied for balance: the default value
+	of the per-map default_zoom arena setting. Maps can still
+	override it, and camera_zoom areas take precedence locally.
 */
-constexpr float BALANCE_ZOOM_OUT = 1.0f;
+constexpr float BALANCE_ZOOM_OUT = 0.8f;

@@ -1,12 +1,13 @@
 #pragma once
 #include "augs/graphics/rgba.h"
+#include "game/balance_params.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
 
 struct editor_arena_settings {
 	// GEN INTROSPECTOR struct editor_arena_settings
 	editor_typed_resource_id<editor_game_mode_resource> default_server_mode;
 	bool include_disabled_nodes = true;
-	float default_zoom = 0.8f;
+	float default_zoom = BALANCE_ZOOM_OUT;
 	bool minimap_tab_shows_all_islands = false;
 	rgba ambient_light_color = rgba(53, 97, 102, 255);
 	editor_theme warmup_theme;

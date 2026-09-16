@@ -7,6 +7,7 @@
 #include "augs/templates/identity_templates.h"
 #include "augs/templates/get_by_dynamic_id.h"
 
+#include "game/balance_params.h"
 #include "game/common_state/visibility_settings.h"
 #include "game/common_state/common_assets.h"
 #include "game/common_state/entity_flavours.h"
@@ -54,7 +55,7 @@ struct cosmos_common_significant {
 
 	cosmos_light_settings light;
 
-	float default_zoom = 0.8f;
+	float default_zoom = BALANCE_ZOOM_OUT;
 	bool minimap_tab_shows_all_islands = false;
 
 	default_sound_properties_info default_sound_properties;

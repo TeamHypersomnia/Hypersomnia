@@ -54,7 +54,6 @@
 #include "augs/misc/mutex.h"
 #include "augs/misc/future.h"
 
-#include "game/balance_params.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -2797,14 +2796,6 @@ work_result work(
 			result /= max_zoom_out_at_edges_v;
 		}
 
-		/*
-			The camera always zooms out by BALANCE_ZOOM_OUT (see get_camera_eye),
-			which widens the visible area by 1 / BALANCE_ZOOM_OUT. This value only
-			feeds fog-of-war sizing, so fold the same factor in here to keep the fog
-			reaching the screen edges both at rest and during edge zoom-out.
-		*/
-		result /= BALANCE_ZOOM_OUT;
-
 		return result;
 	};
 
@@ -2854,7 +2845,6 @@ work_result work(
 		}
 		else {
 			logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
-			logic_eye.zoom *= BALANCE_ZOOM_OUT;
 		}
 
 		return logic_eye;

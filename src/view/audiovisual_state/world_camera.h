@@ -46,9 +46,9 @@ struct world_camera {
 	float current_edge_zoomout_mult = 0.0f;
 
 	/*
-		Multiplier applied on top of the final zoom,
-		works like a per-area BALANCE_ZOOM_OUT.
-		Driven by camera_zoom area markers, queried once per logic step.
+		Multiplier applied on top of the final zoom.
+		Defaults to the map's default_zoom; driven by camera_zoom
+		area markers, queried once per logic step.
 	*/
 
 	float target_area_zoom_mult = 1.0f;

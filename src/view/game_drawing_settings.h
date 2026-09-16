@@ -170,8 +170,8 @@ struct game_drawing_settings {
 	/*
 		Deliberately outside the introspector so it cannot be set from config
 		files - players must not be able to easily zoom the camera out.
-		When > 0, sets the camera zoom exactly to this multiplier and bypasses
-		the balance zoom-out. Used by the main menu for the exact 3x effect.
+		When > 0, sets the camera zoom exactly to this multiplier, bypassing
+		custom_zoom. Used by the main menu for the exact 3x effect.
 	*/
 	float _override_zoom = 0.0f;
 
