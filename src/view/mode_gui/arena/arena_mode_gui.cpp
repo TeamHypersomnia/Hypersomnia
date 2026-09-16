@@ -953,6 +953,21 @@ void arena_gui_state::draw_mode_gui(
 					general_drawer.aabb(fill_rect, bar_col);
 					general_drawer.border(full_fill_rect, bar_col, money_border);
 
+					/*
+						The gold coin icon to the left of the bar,
+						mirroring the icons of the value bars below.
+					*/
+
+					{
+						const auto& coin_tex = in.necessary_images[assets::necessary_image_id::MONEY_ICON];
+						const auto coin_size = vec2(coin_tex.get_original_size());
+
+						general_drawer.aabb_lt(
+							coin_tex,
+							vec2(bar_l - expansion - 4.0f - coin_size.x, bar_center_y - coin_size.y / 2.0f)
+						);
+					}
+
 					/* Sparkles flowing through the filled part. */
 
 					if (fill_rect.w() > 4.0f) {
