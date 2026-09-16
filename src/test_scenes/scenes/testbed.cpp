@@ -529,7 +529,8 @@ arena_mode_ruleset::arena_mode_ruleset() {
 		rs.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
 	}
 
-	rs.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
+	rs.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON_SHOP);
+	rs.view.money_bar_icon = to_image_id(test_scene_image_id::MONEY_ICON);
 }
 
 namespace test_scenes {

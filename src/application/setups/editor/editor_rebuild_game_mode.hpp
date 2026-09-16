@@ -147,6 +147,15 @@ auto setup_ruleset_from_editor_mode(
 
 		auto rules = typename T::ruleset_type();
 
+		/*
+			The official built_content populates the test scene images
+			in the enum order, so these ids stay valid for arenas
+			built from editor projects as well.
+		*/
+
+		rules.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON_SHOP);
+		rules.view.money_bar_icon = to_image_id(test_scene_image_id::MONEY_ICON);
+
 		rules.default_bot_quota = vars.default_bot_quota;
 		rules.warmup_secs = vars.warmup_time;
 		rules.freeze_secs = vars.freeze_time;

@@ -955,16 +955,16 @@ void arena_gui_state::draw_mode_gui(
 
 					/*
 						The gold coin icon to the left of the bar,
-						mirroring the icons of the value bars below.
+						with the same spacing the value bars below
+						put between their icons and bars.
 					*/
 
-					{
-						const auto& coin_tex = in.necessary_images[assets::necessary_image_id::MONEY_ICON];
+					if (const auto& coin_tex = in.images_in_atlas.find_or(mode_input.rules.view.money_bar_icon).diffuse; coin_tex.exists()) {
 						const auto coin_size = vec2(coin_tex.get_original_size());
 
 						general_drawer.aabb_lt(
 							coin_tex,
-							vec2(bar_l - expansion - 4.0f - coin_size.x, bar_center_y - coin_size.y / 2.0f)
+							vec2(bar_l - expansion - coin_size.x, bar_center_y - coin_size.y / 2.0f)
 						);
 					}
 
