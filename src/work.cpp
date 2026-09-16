@@ -5574,6 +5574,9 @@ work_result work(
 
 						using D = augs::dedicated_buffer;
 
+						/* Smoother icons and shapes on the minimap. */
+						streaming.get_general_atlas().set_filtering(chosen_renderer, augs::filtering_type::LINEAR);
+
 						necessary_shaders.standard->set_as_current(chosen_renderer);
 						necessary_shaders.standard->set_projection(chosen_renderer, make_gui_projection());
 
@@ -5589,6 +5592,8 @@ work_result work(
 						}
 
 						chosen_renderer.call_triangles(D::MINIMAP_FOREGROUND);
+
+						streaming.get_general_atlas().set_filtering(chosen_renderer, config.renderer.default_filtering);
 
 						chosen_renderer.set_scissor(false);
 					}

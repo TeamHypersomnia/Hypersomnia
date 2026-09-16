@@ -146,6 +146,7 @@ bool setup_entity_from_node(
 
 					to.ignore_airborne_characters = from.ignore_airborne_characters;
 					to.ignore_walking_characters = from.ignore_walking_characters;
+					to.hide_on_minimap = from.hide_on_minimap;
 
 					to.enter_time_ms = from.enter_time_ms;
 					to.travel_time_ms = from.travel_time_ms;

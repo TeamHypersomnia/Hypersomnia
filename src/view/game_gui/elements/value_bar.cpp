@@ -402,7 +402,7 @@ void value_bar::rebuild_layouts(
 	const auto rb_minimap_shift = [&]() {
 		const auto& minimap = context.dependencies.drawing.minimap;
 
-		if (minimap.enabled && minimap.position == hud_corner_type::RIGHT_BOTTOM) {
+		if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
 			return minimap.size + minimap_screen_margin_v;
 		}
 

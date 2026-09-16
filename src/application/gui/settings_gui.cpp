@@ -1440,10 +1440,13 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(enabled));
 
 						if (scope_cfg.enabled) {
+							revertable_checkbox(SCOPE_CFG_NVP(only_under_tab));
+
 							revertable_enum_radio(SCOPE_CFG_NVP(position));
 
 							revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
 							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
+							revertable_slider(SCOPE_CFG_NVP(dot_size_mult), 0.5f, 3.f);
 							revertable_slider(SCOPE_CFG_NVP(range_mult), 0.5f, 4.f);
 							revertable_slider(SCOPE_CFG_NVP(show_entire_map_if_fits_mult), 0.f, 4.f);
 
@@ -1457,6 +1460,7 @@ void settings_gui_state::perform(
 							revertable_color_edit(SCOPE_CFG_NVP(border_color));
 							revertable_color_edit(SCOPE_CFG_NVP(obstacle_color));
 							revertable_color_edit(SCOPE_CFG_NVP(portal_color));
+							revertable_color_edit(SCOPE_CFG_NVP(hazard_color));
 							revertable_color_edit(SCOPE_CFG_NVP(marker_color));
 							revertable_color_edit(SCOPE_CFG_NVP(fog_of_war_color));
 							revertable_color_edit(SCOPE_CFG_NVP(player_color));
@@ -1465,6 +1469,7 @@ void settings_gui_state::perform(
 
 							revertable_checkbox(SCOPE_CFG_NVP(animate_laser_dashes));
 							revertable_checkbox(SCOPE_CFG_NVP(clamp_important_to_border));
+							revertable_checkbox(SCOPE_CFG_NVP(draw_viewed_player_ring));
 						}
 					}
 				}

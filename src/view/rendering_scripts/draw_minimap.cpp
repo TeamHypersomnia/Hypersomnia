@@ -108,12 +108,40 @@ void draw_minimap(const draw_minimap_input in) {
 	{
 		auto world_bounds = std::optional<ltrb>();
 
+		/*
+			If the player stands on a NAV_ISLAND marker, the island's AABB
+			becomes the effective map bounds - maps with several islands
+			connected by distant teleports then show only the current one.
+		*/
+
+		cosm.for_each_having<invariants::area_marker>(
+			[&](const auto& typed_handle) {
+				if (world_bounds.has_value()) {
+					return;
+				}
+
+				const auto& marker = typed_handle.template get<invariants::area_marker>();
+
+				if (marker.type != area_marker_type::NAV_ISLAND) {
+					return;
+				}
+
+				const auto aabb = typed_handle.find_aabb();
+
+				if (aabb.has_value() && aabb->hover(world_center)) {
+					world_bounds = *aabb;
+				}
+			}
+		);
+
+		const bool try_physical_bounds = !world_bounds.has_value();
+
 		const auto obstacle_categories = uint16(
 			(1 << int(filter_category::WALL)) |
 			(1 << int(filter_category::GLASS_OBSTACLE))
 		);
 
-		for (const b2Body* body = physics.get_b2world().GetBodyList(); body != nullptr; body = body->GetNext()) {
+		for (const b2Body* body = try_physical_bounds ? physics.get_b2world().GetBodyList() : nullptr; body != nullptr; body = body->GetNext()) {
 			if (body->GetType() != b2_staticBody) {
 				continue;
 			}
@@ -428,9 +456,13 @@ void draw_minimap(const draw_minimap_input in) {
 
 			const auto& portal = typed_handle.template get<components::portal>();
 
+			if (portal.hide_on_minimap) {
+				return;
+			}
+
 			const auto color =
 				portal.hazard.is_enabled ?
-				settings.enemy_color :
+				settings.hazard_color :
 				settings.portal_color
 			;
 
@@ -480,6 +512,32 @@ void draw_minimap(const draw_minimap_input in) {
 
 	const auto now = cosm.get_total_seconds_passed();
 	const auto viewer_faction = viewed.get_official_faction();
+
+	const auto dot_radius = minimap_dot_radius_v * settings.dot_size_mult;
+
+	auto push_pulse = [&](
+		const vec2 minimap_pos,
+		const double started_at,
+		const rgba base_color,
+		const float duration_mult,
+		const float growth_mult
+	) {
+		const auto duration = minimap_sighting_system::pulse_duration_secs * duration_mult;
+		const auto progress = (now - started_at) / duration;
+
+		if (progress < 0.0 || progress >= 1.0) {
+			return;
+		}
+
+		const auto t = static_cast<float>(progress);
+
+		auto col = base_color;
+		col.mult_alpha(1.0f - t);
+
+		const auto radius = dot_radius * (1.0f + growth_mult * t);
+
+		push_circle_ring(in.foreground_output, minimap_pos, radius - 1.5f, radius + 1.5f, col);
+	};
 
 	/*
 		Lasers: dashed aiming lines respecting penetration,
@@ -641,6 +699,14 @@ void draw_minimap(const draw_minimap_input in) {
 		const auto icon_size_mult = 0.75f;
 
 		for (const auto& special : in.special_indicators) {
+			/*
+				The minimap-only ones (the carried bomb) are drawn
+				later, above the carrier's dot.
+			*/
+			if (special.minimap_only) {
+				continue;
+			}
+
 			const auto& tex = special.radar_tex;
 
 			if (!tex.exists()) {
@@ -656,13 +722,42 @@ void draw_minimap(const draw_minimap_input in) {
 				special.color
 			);
 		}
+
+		/*
+			Pulses on the appearing skulls,
+			and when the bomb lands on the ground or gets planted.
+		*/
+
+		for (const auto& d : in.sighting.recent_deaths) {
+			push_pulse(clamp_to_border(to_minimap(d.pos), vec2::square(dot_radius)), d.when, white, 3.0f, 5.0f);
+		}
+
+		{
+			const auto& bp = in.sighting.bomb_pulse;
+
+			/* The pulse follows the bomb as it slides after being dropped. */
+			const auto pulse_pos = [&]() {
+				if (const auto bomb = cosm[bp.subject]) {
+					const auto transform = bomb.find_viewing_transform(in.interp);
+
+					if (transform.has_value()) {
+						return transform->pos;
+					}
+				}
+
+				return bp.pos;
+			}();
+
+			push_pulse(clamp_to_border(to_minimap(pulse_pos), vec2::square(dot_radius)), bp.when, white, 4.0f, 7.0f);
+		}
 	}
 
 	/*
-		The bomb carrier's dot is drawn bigger.
+		The bomb carrier's facing arrow orbits a bit further out,
+		so it stays visible next to the bomb icon.
 	*/
-	auto dot_radius_of = [&](const entity_id& character_id) {
-		return character_id == in.bomb_owner ? minimap_dot_radius_v * 1.6f : minimap_dot_radius_v;
+	auto arrow_radius_of = [&](const entity_id& character_id) {
+		return character_id == in.bomb_owner ? dot_radius + 2.0f : dot_radius;
 	};
 
 	/*
@@ -709,7 +804,7 @@ void draw_minimap(const draw_minimap_input in) {
 				return;
 			}
 
-			const auto dot_r = dot_radius_of(entity_id(typed_handle.get_id()));
+			const auto dot_r = dot_radius;
 			const auto minimap_pos = clamp_to_border(to_minimap(transform->pos), vec2::square(dot_r));
 
 			push_filled_circle(
@@ -719,7 +814,7 @@ void draw_minimap(const draw_minimap_input in) {
 				settings.teammate_color
 			);
 
-			push_facing_triangle(minimap_pos, transform->rotation, dot_r, settings.teammate_color);
+			push_facing_triangle(minimap_pos, transform->rotation, arrow_radius_of(entity_id(typed_handle.get_id())), settings.teammate_color);
 
 			draw_laser_of(typed_handle, false);
 		}
@@ -748,6 +843,7 @@ void draw_minimap(const draw_minimap_input in) {
 		auto dot_pos = std::optional<vec2>();
 		auto dot_color = settings.enemy_color;
 		auto facing = std::optional<float>();
+		bool stale = false;
 
 		if (seen_now) {
 			if (const auto enemy = cosm[it.first]) {
@@ -765,13 +861,20 @@ void draw_minimap(const draw_minimap_input in) {
 		else if (rec.last_seen_at > -1000.0) {
 			dot_pos = rec.last_seen_pos;
 			dot_color.mult_alpha(0.6f);
+			stale = true;
 		}
 
 		if (!dot_pos.has_value()) {
 			continue;
 		}
 
-		const auto dot_r = dot_radius_of(it.first);
+		/* The last-seen dot is drawn smaller than the live one. */
+		auto dot_r = dot_radius;
+
+		if (stale) {
+			dot_r = dot_radius * (1.25f / 1.5f);
+		}
+
 		const auto minimap_pos = to_minimap(*dot_pos);
 
 		push_filled_circle(
@@ -782,37 +885,30 @@ void draw_minimap(const draw_minimap_input in) {
 		);
 
 		if (facing.has_value()) {
-			push_facing_triangle(minimap_pos, *facing, dot_r, dot_color);
+			push_facing_triangle(minimap_pos, *facing, arrow_radius_of(it.first), dot_color);
 		}
 
-		/*
-			The very first sighting pulses twice as big
-			and fades twice as long.
-		*/
-		const auto pulse_duration =
-			rec.first_sighting_pulse ?
-			minimap_sighting_system::pulse_duration_secs * 2 :
-			minimap_sighting_system::pulse_duration_secs
-		;
+		push_pulse(minimap_pos, rec.appeared_at, settings.enemy_color, 2.0f, 3.0f);
+	}
 
-		const auto pulse_progress = (now - rec.appeared_at) / pulse_duration;
+	/*
+		The carried bomb icon - above the dots, but below
+		the facing arrow and the viewed player's ring.
+	*/
 
-		if (pulse_progress >= 0.0 && pulse_progress < 1.0) {
-			const auto t = static_cast<float>(pulse_progress);
-
-			auto pulse_color = settings.enemy_color;
-			pulse_color.mult_alpha(1.0f - t);
-
-			const auto pulse_radius = minimap_dot_radius_v * (1.0f + (rec.first_sighting_pulse ? 3.0f : 1.0f) * t);
-
-			push_circle_ring(
-				in.foreground_output,
-				minimap_pos,
-				pulse_radius - 1.5f,
-				pulse_radius + 1.5f,
-				pulse_color
-			);
+	for (const auto& special : in.special_indicators) {
+		if (!special.minimap_only || !special.radar_tex.exists()) {
+			continue;
 		}
+
+		const auto icon_size = vec2(special.radar_tex.get_original_size()) * 0.75f;
+
+		fg_drawer.aabb_centered(
+			special.radar_tex,
+			clamp_to_border(to_minimap(special.transform.pos), icon_size / 2),
+			icon_size,
+			special.color
+		);
 	}
 
 	/*
@@ -822,7 +918,7 @@ void draw_minimap(const draw_minimap_input in) {
 	draw_laser_of(viewed, true);
 
 	{
-		const auto dot_r = dot_radius_of(viewed.get_id());
+		const auto dot_r = dot_radius;
 		const auto minimap_pos = to_minimap(viewer_transform->pos);
 
 		push_filled_circle(
@@ -832,7 +928,42 @@ void draw_minimap(const draw_minimap_input in) {
 			settings.player_color
 		);
 
-		push_facing_triangle(minimap_pos, viewer_transform->rotation, dot_r, settings.player_color);
+		push_facing_triangle(minimap_pos, viewer_transform->rotation, arrow_radius_of(viewed.get_id()), settings.player_color);
+
+		/*
+			A ring around the viewed character's dot, so it is clear
+			who is being watched. The ring opens up where
+			the facing arrow points.
+		*/
+
+		if (settings.draw_viewed_player_ring) {
+			const auto facing = viewer_transform->rotation;
+
+			const auto ring_r = dot_r + 5.0f;
+			const auto inner_r = ring_r - 1.5f;
+			const auto outer_r = ring_r + 1.5f;
+
+			/*
+				The arc is anchored to the facing angle, so its ends
+				stay exact while rotating instead of snapping to segments.
+			*/
+
+			const auto gap_half_angle = 120.0f;
+			const auto arc_begin = facing + gap_half_angle;
+			const auto arc_length = 360.0f - 2 * gap_half_angle;
+			const auto n = minimap_circle_segments_v * 2;
+
+			for (int i = 0; i < n; ++i) {
+				const auto a0 = arc_begin + arc_length * i / n;
+				const auto a1 = arc_begin + arc_length * (i + 1) / n;
+
+				const auto d0 = vec2::from_degrees(a0);
+				const auto d1 = vec2::from_degrees(a1);
+
+				push_triangle(in.foreground_output, minimap_pos + d0 * inner_r, minimap_pos + d0 * outer_r, minimap_pos + d1 * outer_r, settings.player_color);
+				push_triangle(in.foreground_output, minimap_pos + d0 * inner_r, minimap_pos + d1 * outer_r, minimap_pos + d1 * inner_r, settings.player_color);
+			}
+		}
 	}
 
 	draw_frame();

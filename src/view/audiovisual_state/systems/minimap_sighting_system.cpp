@@ -7,6 +7,8 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/components/sentience_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/hand_fuse_component.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/messages/gunshot_message.h"
 #include "game/messages/health_event.h"
 #include "augs/templates/container_templates.h"
@@ -18,7 +20,9 @@
 void minimap_sighting_system::clear() {
 	enemy_records.clear();
 	recent_deaths.clear();
+	bomb_pulse = {};
 	teammate_rotation_counter = 0;
+	prev_bomb_state = 0;
 }
 
 void minimap_sighting_system::record_deaths(const const_logic_step step) {
@@ -60,6 +64,12 @@ void minimap_sighting_system::record_deaths(const const_logic_step step) {
 			subject.get_official_faction(),
 			now
 		});
+
+		/*
+			Death interrupts any active pulse and dot of that entity -
+			the skull takes over from here.
+		*/
+		enemy_records.erase(event.subject);
 	}
 }
 
@@ -252,7 +262,6 @@ void minimap_sighting_system::advance(
 			auto& rec = enemy_records[enemy_id];
 
 			if (now - rec.last_seen_at > reappear_pulse_threshold_secs) {
-				rec.first_sighting_pulse = rec.last_seen_at <= -999.0;
 				rec.appeared_at = now;
 			}
 
@@ -330,5 +339,60 @@ void minimap_sighting_system::advance(
 			rec.heard_at = now;
 			rec.heard_pos = muzzle_pos;
 		}
+	}
+
+	/*
+		A pulse when the bomb lands on the ground or gets planted.
+	*/
+
+	{
+		if (bomb_pulse.when > now) {
+			bomb_pulse = {};
+		}
+
+		/* 0 - unknown, 1 - carried, 2 - dropped, 3 - planted */
+		auto bomb_state = 0;
+		auto bomb_pos = vec2();
+		auto bomb_id = entity_id();
+
+		cosm.for_each_having<components::hand_fuse>(
+			[&](const auto& typed_handle) {
+				const auto& fuse_def = typed_handle.template get<invariants::hand_fuse>();
+
+				if (!fuse_def.is_like_plantable_bomb()) {
+					return;
+				}
+
+				const auto transform = typed_handle.find_logic_transform();
+
+				if (!transform.has_value()) {
+					return;
+				}
+
+				const auto& fuse = typed_handle.template get<components::hand_fuse>();
+
+				if (fuse.armed()) {
+					bomb_state = 3;
+				}
+				else if (typed_handle.get_owning_transfer_capability().alive()) {
+					bomb_state = 1;
+				}
+				else {
+					bomb_state = 2;
+				}
+
+				bomb_pos = transform->pos;
+				bomb_id = typed_handle.get_id();
+			}
+		);
+
+		const bool became_dropped = bomb_state == 2 && prev_bomb_state != 2;
+		const bool became_planted = bomb_state == 3 && prev_bomb_state != 3;
+
+		if ((became_dropped || became_planted) && prev_bomb_state != 0) {
+			bomb_pulse = { bomb_pos, now, bomb_id };
+		}
+
+		prev_bomb_state = bomb_state;
 	}
 }

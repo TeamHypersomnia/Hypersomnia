@@ -63,6 +63,7 @@ enum class minimap_tab_behavior_type {
 	// GEN INTROSPECTOR enum class minimap_tab_behavior_type
 	SHOW_ENTIRE_MAP,
 	ZOOM_OUT,
+	NONE,
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -73,6 +74,7 @@ struct minimap_settings {
 	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
 	int size = 300;
 	int border_thickness = 1;
+	float dot_size_mult = 1.5f;
 	float range_mult = 1.5f;
 	float show_entire_map_if_fits_mult = 2.0f;
 	minimap_tab_behavior_type tab_behavior = minimap_tab_behavior_type::SHOW_ENTIRE_MAP;
@@ -81,16 +83,27 @@ struct minimap_settings {
 	rgba border_color = rgba(0, 255, 90, 255);
 	rgba obstacle_color = rgba(0, 220, 78, 255);
 	rgba portal_color = cyan;
+	rgba hazard_color = rgba(160, 0, 0, 120);
 	rgba marker_color = cyan;
-	rgba fog_of_war_color = rgba(255, 255, 255, 15);
+	rgba fog_of_war_color = rgba(255, 255, 255, 0);
 	rgba player_color = white;
 	rgba teammate_color = yellow;
 	rgba enemy_color = red;
 	bool animate_laser_dashes = false;
 	bool clamp_important_to_border = true;
+	bool only_under_tab = false;
+	bool draw_viewed_player_ring = true;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const minimap_settings& b) const = default;
+
+	/*
+		Whether the minimap permanently occupies the given corner,
+		so the other HUD elements have to make room for it there.
+	*/
+	bool occupies_corner(const hud_corner_type corner) const {
+		return enabled && !only_under_tab && position == corner;
+	}
 };
 
 struct game_drawing_settings {

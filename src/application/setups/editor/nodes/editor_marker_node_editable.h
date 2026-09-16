@@ -43,6 +43,7 @@ struct editor_portal_info {
 	bool trampoline_like = false;
 	bool ignore_airborne_characters = false;
 	bool ignore_walking_characters = false;
+	bool hide_on_minimap = false;
 
 	float enter_time_ms = 500.0f;
 	float travel_time_ms = 500.0f;

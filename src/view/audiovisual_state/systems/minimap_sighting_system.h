@@ -30,9 +30,6 @@ public:
 		/* When the enemy (re)appeared - drives the pulse animation. */
 		double appeared_at = -1000.0;
 
-		/* The very first sighting gets a more intense pulse. */
-		bool first_sighting_pulse = false;
-
 		double heard_at = -1000.0;
 		vec2 heard_pos;
 
@@ -61,8 +58,19 @@ public:
 		double when = -1000.0;
 	};
 
+	struct event_pulse {
+		vec2 pos;
+		double when = -1000.0;
+
+		/* When set, the pulse follows this entity instead of the fixed pos. */
+		entity_id subject;
+	};
+
 	std::unordered_map<entity_id, enemy_record> enemy_records;
 	std::vector<death_record> recent_deaths;
+
+	/* Fired when the bomb lands on the ground or gets planted. */
+	event_pulse bomb_pulse;
 
 	void record_deaths(const const_logic_step step);
 
@@ -83,4 +91,7 @@ public:
 
 private:
 	unsigned teammate_rotation_counter = 0;
+
+	/* 0 - unknown, 1 - carried, 2 - dropped, 3 - planted */
+	int prev_bomb_state = 0;
 };

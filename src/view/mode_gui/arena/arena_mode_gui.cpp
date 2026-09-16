@@ -829,7 +829,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto rb_minimap_shift = [&]() {
 					const auto& minimap = in.config.drawing.minimap;
 
-					if (minimap.enabled && minimap.position == hud_corner_type::RIGHT_BOTTOM) {
+					if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
 						return minimap.size + minimap_screen_margin_v;
 					}
 
@@ -1167,7 +1167,7 @@ void arena_gui_state::draw_mode_gui(
 
 				const auto& minimap = in.config.drawing.minimap;
 
-				if (minimap.enabled && minimap.position == corner) {
+				if (minimap.occupies_corner(corner)) {
 					result += minimap.size + 2 * minimap_screen_margin_v;
 				}
 

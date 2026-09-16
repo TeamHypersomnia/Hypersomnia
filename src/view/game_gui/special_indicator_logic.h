@@ -5,6 +5,7 @@
 #include "game/detail/hand_fuse_math.h"
 #include "game/modes/arena_mode.hpp"
 #include "view/game_drawing_settings.h"
+#include "game/cosmos/for_each_entity.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
 
 template <class T, class MI, class E>
@@ -58,6 +59,61 @@ void gather_special_indicators(
 		}
 	}
 
+	/*
+		Shared by the arena and test modes.
+	*/
+
+	auto push_bomb_on_ground_indicator = [&](
+		const transformr where,
+		const components::hand_fuse& fuse,
+		const invariants::hand_fuse& fuse_def
+	) {
+		const bool defused = fuse.defused();
+		const bool armed = fuse.armed();
+
+		/* Draw the bomb icon on screen only if it is unarmed yet. */
+		const bool draw_onscreen = !armed;
+
+		auto col = defused ? rgba(160, 160, 160, 255) : white;
+
+		if (armed) {
+			const auto fuse_math = beep_math { fuse, fuse_def, viewed_character.get_cosmos().get_clock() };
+
+			col.multiply_rgb(fuse_math.get_beep_light_mult());
+			col.r = 255;
+		}
+
+		special_indicators.push_back({
+			where,
+			col,
+
+			necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+			necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+
+			draw_onscreen
+		});
+	};
+
+	auto push_bomb_carrier_indicator = [&](const auto& capability) {
+		const bool carried_by_viewed = entity_id(capability.get_id()) == entity_id(viewed_character.get_id());
+		const auto carrier_color = carried_by_viewed ? drawing.minimap.player_color : drawing.minimap.teammate_color;
+
+		/*
+			Only on the minimap - the offscreen indicator
+			of the carrying teammate already shows the bomb.
+		*/
+		special_indicators.push_back({
+			capability.get_logic_transform(),
+			carrier_color,
+
+			necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+			necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+
+			false,
+			true
+		});
+	};
+
 	if constexpr(std::is_same_v<T, arena_mode>) {
 		meta.draw_nicknames_for_fallback = mode.get_current_fallback_color_for(mode_input, viewer_faction);
 
@@ -81,28 +137,11 @@ void gather_special_indicators(
 							*/
 
 							if (viewer_faction == participants.bombing || armed || defused) {
-								/* Draw the bomb icon on screen only if it is unarmed yet. */
-								const bool draw_onscreen = !armed;
-
-								auto col = defused ? rgba(160, 160, 160, 255) : white;
-
-								if (armed) {
-									const auto fuse_math = beep_math { *fuse, bomb.template get<invariants::hand_fuse>(), viewed_character.get_cosmos().get_clock() };
-									const auto mult = fuse_math.get_beep_light_mult();
-
-									col.multiply_rgb(mult);
-									col.r = 255;
-								}
-
-								special_indicators.push_back({
+								push_bomb_on_ground_indicator(
 									bomb.get_logic_transform(),
-									col,
-
-									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-
-									draw_onscreen
-								});
+									*fuse,
+									bomb.template get<invariants::hand_fuse>()
+								);
 							}
 						}
 						else {
@@ -112,20 +151,7 @@ void gather_special_indicators(
 							;
 
 							if (teammate_carries_bomb) {
-								/*
-									Only on the minimap - the offscreen indicator
-									of the carrying teammate already shows the bomb.
-								*/
-								special_indicators.push_back({
-									capability.get_logic_transform(),
-									drawing.minimap.teammate_color,
-
-									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-
-									false,
-									true
-								});
+								push_bomb_carrier_indicator(capability);
 							}
 						}
 					}
@@ -141,7 +167,39 @@ void gather_special_indicators(
 		);
 	}
 	else if constexpr(std::is_same_v<T, test_mode>) {
+		/*
+			No bomb bookkeeping in the test mode - scan the cosmos
+			for a plantable bomb, so it shows on the minimap
+			at the shooting range as well.
+		*/
 
+		const auto& cosm = viewed_character.get_cosmos();
+
+		cosm.template for_each_having<components::hand_fuse>(
+			[&](const auto& typed_bomb) {
+				const auto& fuse_def = typed_bomb.template get<invariants::hand_fuse>();
+
+				if (!fuse_def.is_like_plantable_bomb()) {
+					return;
+				}
+
+				const auto& fuse = typed_bomb.template get<components::hand_fuse>();
+				const auto capability = typed_bomb.get_owning_transfer_capability();
+
+				meta.bomb_owner = capability;
+
+				if (capability.dead()) {
+					push_bomb_on_ground_indicator(
+						typed_bomb.get_logic_transform(),
+						fuse,
+						fuse_def
+					);
+				}
+				else {
+					push_bomb_carrier_indicator(capability);
+				}
+			}
+		);
 	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled mode type!");
