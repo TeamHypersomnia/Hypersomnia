@@ -15,6 +15,7 @@ inline bool always_hide_in_game(const area_marker_type t) {
 		case area_marker_type::PORTAL:
 		case area_marker_type::HAZARD:
 		case area_marker_type::CAMERA_ZOOM:
+		case area_marker_type::NAV_ISLAND:
 			return true;
 
 		default:
