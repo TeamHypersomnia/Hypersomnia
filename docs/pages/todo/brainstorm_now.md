@@ -6,13 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- naprawic te kurwa invalid filenames i jebane stampy w projectach z menu
+
+- miniaturke naprawic w facing worldsach
 - proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp
 
 - dwa problemy
 	- ten laser jebany nie wiem jak rozwiazac
-	- offscreen indicatory wchodza w minimape i to boli bo za maly padding ma mapka
-		- jebac to
 
 - review + ocenic perf hity
 

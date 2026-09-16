@@ -7475,3 +7475,5 @@ This will discard your redo history."
 
 - jakas ikonke kasy jednak
 
+- offscreen indicatory wchodza w minimape i to boli bo za maly padding ma mapka
+	- jebac to
