@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+
+- jakies kolko z borderem naokolo obecnego gracza w minimapie zeby bylo widac ktorego gracza ogladasz. to moze byc taki border naokolo tej strzalki zeby nie powiekszac tej kulki ale rozumiesz taki ring dookola tej strzalki i ten ring sie przerywa w miejscu stej strzalki ktora patrzy.
+- smierc powinna przerywac puls tez jesli byl jakikolwiek na dana encje
+
+- jakas ikonke kasy jednak
+
+- dwa problemy
+	- ten laser jebany nie wiem jak rozwiazac
+	- offscreen indicatory wchodza w minimape i to boli bo za maly padding ma mapka
+
+- review + ocenic perf hity
+
 - naprawic waypointy na minilabie
 
 - miejscowe zoomy na open areas zamiast odzoomowywac
@@ -51,6 +64,10 @@ jakis crash na serwerze przy graniu z januszem
 - mapki poprawic
 - poupewniac sie ze mapki maja dobre bot quotas
 - gore do mieczy i moze do nozy tez kiedys
+
+# Edytor grupowanie
+
+- kiedys prefaby normalnie moglyby miec "states" takie w enumie i definiowac kilka zbiorow wlasciwosci osobnych i wtedy takie pady z lupami bardzo prosto zrobic nie trzeba skryptowac do tego wielu wlasciwosci jakos recznie ze skryptu ustawiac
 
 # Turniej
 

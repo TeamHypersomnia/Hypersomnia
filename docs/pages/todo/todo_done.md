@@ -7465,3 +7465,7 @@ This will discard your redo history."
 	- dawac wersje tez w razie czego jakby akurat weszla nowa i nie czytac wtedy
 	- w razie czego tez uzupelniajaco, nie zaszkodzi miec jakichs komend na ustawianie scora, kasy i pozycji
 		- pozycje nawet mamy juz chyba, tylko nie zapomniec udokumentowac w helpie tam przy tej konsoli 
+
+- czemu w shooting range nie nikna z pola widzenia kurwa ci z prawej
+	- bo teammates go widza lol
+- nav area chyba bym obecny rysowal dla draw entire map bo on bedzie lepiej wypoziomowany - patrz rambo
