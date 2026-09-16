@@ -112,11 +112,20 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 			If the player stands on a NAV_ISLAND marker, the island's AABB
 			becomes the effective map bounds - maps with several islands
 			connected by distant teleports then show only the current one.
+
+			With minimap_tab_shows_all_islands set on the map, the extended
+			view instead considers a single island being the union of all
+			of them.
 		*/
+
+		const bool union_all_islands =
+			in.extended_range &&
+			cosm.get_common_significant().minimap_tab_shows_all_islands
+		;
 
 		cosm.for_each_having<invariants::area_marker>(
 			[&](const auto& typed_handle) {
-				if (world_bounds.has_value()) {
+				if (!union_all_islands && world_bounds.has_value()) {
 					return;
 				}
 
@@ -128,7 +137,19 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 
 				const auto aabb = typed_handle.find_aabb();
 
-				if (aabb.has_value() && aabb->hover(world_center)) {
+				if (!aabb.has_value()) {
+					return;
+				}
+
+				if (union_all_islands) {
+					if (world_bounds.has_value()) {
+						world_bounds->contain(*aabb);
+					}
+					else {
+						world_bounds = *aabb;
+					}
+				}
+				else if (aabb->hover(world_center)) {
 					world_bounds = *aabb;
 				}
 			}

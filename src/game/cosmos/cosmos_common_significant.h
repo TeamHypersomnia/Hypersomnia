@@ -55,6 +55,7 @@ struct cosmos_common_significant {
 	cosmos_light_settings light;
 
 	float default_zoom = 0.8f;
+	bool minimap_tab_shows_all_islands = false;
 
 	default_sound_properties_info default_sound_properties;
 	cosmos_navmesh navmesh;

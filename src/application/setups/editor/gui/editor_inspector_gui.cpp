@@ -2336,6 +2336,12 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		text_tooltip("The camera zoom used wherever no Camera zoom area\ncovers the player.");
 	}
 
+	PROPERTY("Minimap tab shows all islands", minimap_tab_shows_all_islands);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("If ticked, the extended minimap view (under Tab)\nshows the union of all Nav island areas,\ninstead of just the island the player is currently on.");
+	}
+
 	PROPERTY("Ambient light color", ambient_light_color);
 	THEME_PROPERTY("Warmup theme", warmup_theme);
 
