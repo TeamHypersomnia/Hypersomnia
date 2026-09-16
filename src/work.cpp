@@ -3910,6 +3910,16 @@ work_result work(
 			}
 		});
 
+		const auto forced_area_zoom = visit_current_setup([&](const auto& setup) -> std::optional<float> {
+			using S = remove_cref<decltype(setup)>;
+
+			if constexpr(std::is_same_v<S, test_scene_setup>) {
+				return setup.get_camera_zoom_override();
+			}
+
+			return std::nullopt;
+		});
+
 		gameplay_camera.tick(
 			screen_size,
 			nonzoomedout_area,
@@ -3919,7 +3929,8 @@ work_result work(
 			viewed_character,
 			calc_pre_step_crosshair_displacement(viewing_config),
 			get_current_input_settings(viewing_config),
-			is_buy_time_active()
+			is_buy_time_active(),
+			forced_area_zoom
 		);
 
 		hud_messages.advance(viewing_config.hud_messages.value);

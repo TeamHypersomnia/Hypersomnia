@@ -12,6 +12,10 @@
 #include "application/arena/build_arena_from_editor_project.hpp"
 
 #include "game/messages/game_notification.h"
+#include "game/components/sprite_component.h"
+#include "game/components/portal_component.h"
+#include "game/detail/physics/shape_overlapping.hpp"
+#include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
 #include "application/setups/editor/project/editor_project.hpp"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/gui/text/printer.h"
@@ -271,6 +275,88 @@ void test_scene_setup::restart_arena() {
 	}
 
 	character().get<components::movement>().flags = pre_movement_flags;
+
+	refresh_range_zoom_pads();
+}
+
+void test_scene_setup::refresh_range_zoom_pads() {
+	range_zoom_pads.clear();
+
+	if (is_tutorial()) {
+		return;
+	}
+
+	/*
+		Scans for all node pairs named "zoom_<value>x" (the magnifier icon)
+		and "zoom_<value>x_outline" (the pad's outline),
+		so new pads can be added in the editor without touching the code.
+	*/
+
+	for (const auto& entry : name_to_node) {
+		const auto& name = entry.first;
+
+		if (!begins_with(name, "zoom_") || !ends_with(name, "x")) {
+			continue;
+		}
+
+		auto zoom = 0.0f;
+
+		if (1 != typesafe_sscanf(name, "zoom_%xx", zoom) || zoom <= 0.0f) {
+			continue;
+		}
+
+		auto pad = range_zoom_pad();
+		pad.zoom = zoom;
+
+		if (const auto icon = find<editor_sprite_node>(name)) {
+			pad.icon = icon->scene_entity_id;
+
+			if (const auto icon_handle = scene.world[pad.icon]) {
+				icon_handle.dispatch_on_having_all<components::sprite>(
+					[&](const auto& typed_icon) {
+						pad.inactive_neon = typed_icon.template get<components::sprite>().colorize_neon;
+						pad.inactive_neon.a = 100;
+					}
+				);
+			}
+		}
+
+		if (const auto outline = find<editor_sprite_node>(name + "_outline")) {
+			pad.outline = outline->scene_entity_id;
+
+			if (const auto outline_handle = scene.world[pad.outline]) {
+				outline_handle.dispatch_on_having_all<components::sprite>(
+					[&](const auto& typed_outline) {
+						pad.inactive_outline = typed_outline.template get<components::sprite>().colorize;
+					}
+				);
+			}
+		}
+
+		if (pad.outline.is_set() && pad.icon.is_set()) {
+			range_zoom_pads.push_back(pad);
+		}
+	}
+
+	/*
+		The pads reuse the begin entering sound of the range's entry portal.
+	*/
+
+	if (const auto entry = find<portal_marker>("portal")) {
+		if (const auto handle = scene.world[entry->scene_entity_id]) {
+			if (const auto* const portal = handle.find<components::portal>()) {
+				range_pad_sound = portal->begin_entering_sound;
+			}
+		}
+	}
+
+	/*
+		The pad matching the map's default zoom starts out active.
+	*/
+
+	if (!range_zoom_pads.empty() && !range_zoom_override.has_value()) {
+		range_zoom_override = project.settings.default_zoom;
+	}
 }
 
 template <class T>
@@ -720,6 +806,145 @@ void test_scene_setup::pre_solve(const logic_step step) {
 	}
 
 	do_tutorial_logic(step);
+	do_range_zoom_pads_logic(step);
+}
+
+void test_scene_setup::do_range_zoom_pads_logic(const logic_step step) {
+	if (range_zoom_pads.empty()) {
+		return;
+	}
+
+	auto& cosm = scene.world;
+	const auto character = cosm[viewed_character_id];
+
+	if (character.dead()) {
+		return;
+	}
+
+	/*
+		The pads are detected by the character's center against
+		the outlines' AABBs, every step - portal contacts proved
+		unreliable for the adjacent pads.
+	*/
+
+	const auto transform = character.find_logic_transform();
+
+	if (transform.has_value()) {
+		const auto si = cosm.get_si();
+
+		const range_zoom_pad* best_pad = nullptr;
+		auto best_dist_sq = 0.0f;
+
+		/*
+			Full-geometry test: a pad activates the moment the character's
+			collider touches its outline. When two pads are touched at once,
+			the one closer to the character's center wins.
+		*/
+
+		for (const auto& pad : range_zoom_pads) {
+			const auto outline = cosm[pad.outline];
+
+			if (outline.dead()) {
+				continue;
+			}
+
+			const auto outline_transform = outline.find_logic_transform();
+
+			if (!outline_transform.has_value()) {
+				continue;
+			}
+
+			bool overlaps = false;
+
+			outline.dispatch_on_having_all<components::sprite>(
+				[&](const auto& typed_outline) {
+					const auto pad_size = typed_outline.get_logical_size();
+
+					/*
+						The activation box is shrunk so that the character
+						has to visibly step onto the pad.
+					*/
+					const auto activation_margin = 10.0f;
+
+					b2PolygonShape pad_box;
+
+					pad_box.SetAsBox(
+						si.get_meters(std::max(1.0f, pad_size.x / 2 - activation_margin)),
+						si.get_meters(std::max(1.0f, pad_size.y / 2 - activation_margin))
+					);
+
+					/*
+						Exact test against the character's true physical hitbox
+						(the convex hull derived from the sprite),
+						skipping any sensor fixtures.
+					*/
+
+					::for_each_fixture(character, [&](const b2Fixture& fixture) -> std::optional<bool> {
+						if (fixture.IsSensor()) {
+							return std::nullopt;
+						}
+
+						if (::shape_overlaps_fixture(std::addressof(pad_box), si, *outline_transform, fixture).has_value()) {
+							overlaps = true;
+							return true;
+						}
+
+						return std::nullopt;
+					});
+				}
+			);
+
+			if (!overlaps) {
+				continue;
+			}
+
+			const auto dist_sq = (outline_transform->pos - transform->pos).length_sq();
+
+			if (best_pad == nullptr || dist_sq < best_dist_sq) {
+				best_pad = std::addressof(pad);
+				best_dist_sq = dist_sq;
+			}
+		}
+
+		if (best_pad != nullptr) {
+			const bool changed = !range_zoom_override.has_value() || *range_zoom_override != best_pad->zoom;
+
+			if (changed) {
+				range_zoom_override = best_pad->zoom;
+
+				auto effect = range_pad_sound;
+
+				effect.start(
+					step,
+					sound_effect_start_input::at_listener(character),
+					always_predictable_v
+				);
+			}
+		}
+	}
+
+	for (const auto& pad : range_zoom_pads) {
+		const bool active =
+			range_zoom_override.has_value()
+			&& *range_zoom_override == pad.zoom
+		;
+
+		if (const auto icon = cosm[pad.icon]) {
+			icon.dispatch_on_having_all<components::sprite>(
+				[&](const auto& typed_icon) {
+					typed_icon.template get<components::sprite>().colorize_neon = active ? rgba(0, 255, 0, 255) : pad.inactive_neon;
+				}
+			);
+		}
+
+		if (const auto outline = cosm[pad.outline]) {
+			outline.dispatch_on_having_all<components::sprite>(
+				[&](const auto& typed_outline) {
+					typed_outline.template get<components::sprite>().colorize = active ? rgba(0, 255, 0, 255) : pad.inactive_outline;
+				}
+			);
+		}
+	}
 }
 
 bool test_scene_setup::post_solve(const const_logic_step step) {

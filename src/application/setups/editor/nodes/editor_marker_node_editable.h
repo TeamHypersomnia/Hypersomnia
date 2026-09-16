@@ -122,7 +122,6 @@ struct editor_area_marker_node_editable {
 	vec2i size = { 256, 256 };
 
 	float zoom = 0.75f;
-	bool zoom_only_during_buy_time = false;
 
 	editor_portal_info as_portal;
 	// END GEN INTROSPECTOR

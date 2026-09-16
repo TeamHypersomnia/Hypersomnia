@@ -11,6 +11,7 @@
 #include "test_scenes/test_scene_settings.h"
 
 #include "application/intercosm.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "application/setups/default_setup_settings.h"
 
 #include "application/debug_settings.h"
@@ -64,6 +65,21 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 
 	entity_id range_entry_portal;
 
+	struct range_zoom_pad {
+		entity_id icon;
+		entity_id outline;
+		float zoom = 1.0f;
+		rgba inactive_neon = rgba(255, 255, 255, 100);
+		rgba inactive_outline = rgba(255, 0, 255, 20);
+	};
+
+	std::vector<range_zoom_pad> range_zoom_pads;
+	std::optional<float> range_zoom_override;
+	sound_effect_input range_pad_sound;
+
+	void refresh_range_zoom_pads();
+	void do_range_zoom_pads_logic(logic_step step);
+
 	intercosm scene;
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -110,6 +126,10 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_arena_gui = true;
+
+	std::optional<float> get_camera_zoom_override() const {
+		return range_zoom_override;
+	}
 
 	test_scene_setup(
 		std::string nickname,

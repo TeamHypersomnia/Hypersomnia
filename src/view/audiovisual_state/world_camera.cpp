@@ -9,6 +9,16 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/marker_component.h"
+
+/*
+	Set to 1 to restore the buy zones overriding the camera zoom
+	back to 1x during the buy time.
+*/
+#define ZOOM_IN_DURING_BUY_TIME 0
+
+#if ZOOM_IN_DURING_BUY_TIME
+#include "game/detail/buy_area_in_range.h"
+#endif
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
 #include "game/detail/camera_zoom_area_logic.h"
@@ -58,11 +68,19 @@ void world_camera::tick(
 	const const_entity_handle entity_to_chase,
 	const vec2 mid_step_crosshair_displacement,
 	const input_settings& input_cfg,
-	const bool during_buy_time
+	const bool during_buy_time,
+	const std::optional<float> forced_area_zoom
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
 	}
+
+	/*
+		A cosmos switch or a resample (map change, entering or leaving
+		a setup) sets dont_smooth_once - snap the zoom then, instead of
+		having it float towards the target on every such transition.
+	*/
+	const bool snap_zoom_now = dont_smooth_once;
 
 	const auto min_height_for_zoom = 500.0f;
 	//const auto max_height_for_zoom = 1500.0f;
@@ -295,18 +313,42 @@ void world_camera::tick(
 
 		const auto current_step = static_cast<uint32_t>(cosm.get_total_steps_passed());
 
-		if (last_area_zoom_query_step != current_step) {
+		if (snap_zoom_now || last_area_zoom_query_step != current_step) {
 			last_area_zoom_query_step = current_step;
 
-			target_area_zoom_mult = 1.0f;
+			/*
+				The map-wide default applies wherever no camera zoom area
+				covers the player. Sanitize, as these values come from
+				arbitrary map files.
+			*/
+			target_area_zoom_mult = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
 
-			if (entity_to_chase.alive()) {
+			if (forced_area_zoom.has_value()) {
+				/* E.g. chosen with the zoom pads at the shooting range. */
+				target_area_zoom_mult = std::clamp(*forced_area_zoom, 0.2f, 4.0f);
+			}
+			else if (entity_to_chase.alive()) {
 				if (const auto tr = entity_to_chase.find_logic_transform()) {
-					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos, during_buy_time); area_zoom.has_value()) {
-						/* Sanitize, as this value comes from arbitrary map files. */
+					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos); area_zoom.has_value()) {
 						target_area_zoom_mult = std::clamp(*area_zoom, 0.2f, 4.0f);
 					}
+
+#if ZOOM_IN_DURING_BUY_TIME
+					/*
+						During buy time, standing in your own buy zone
+						always overrides the zoom back to 1x.
+					*/
+					if (during_buy_time && ::buy_area_in_range(entity_to_chase)) {
+						target_area_zoom_mult = 1.0f;
+					}
+#else
+					(void)during_buy_time;
+#endif
 				}
+			}
+
+			if (snap_zoom_now) {
+				current_area_zoom_mult = target_area_zoom_mult;
 			}
 		}
 	}

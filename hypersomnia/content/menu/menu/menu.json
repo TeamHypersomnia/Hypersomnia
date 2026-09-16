@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2026-06-21 20:46:18.375301 UTC"
+        "version_timestamp": "2026-09-15 23:00:34.188244 UTC"
     },
     "about": {
         "author": "lia",
@@ -11,6 +11,7 @@
     "settings": {
         "default_server_mode": "quick_test",
         "include_disabled_nodes": false,
+        "default_zoom": 1.0,
         "ambient_light_color": [44, 44, 44, 255],
         "warmup_theme": {
             "id": "arabesque"

@@ -6,11 +6,9 @@
 	The topmost one is the one with the highest sorting order,
 	i.e. the same order that is used for rendering sprites -
 	so the priority is controlled by the node order in the editor layers.
-	Areas flagged as buy-time-only are skipped once buying is over,
-	letting any always-on area beneath them win instead.
 */
 
-inline std::optional<float> find_camera_zoom_area(const cosmos& cosm, const vec2 pos, const bool during_buy_time) {
+inline std::optional<float> find_camera_zoom_area(const cosmos& cosm, const vec2 pos) {
 	auto& zoom_areas = thread_local_visible_entities();
 
 	tree_of_npo_filter tree_types;
@@ -31,10 +29,8 @@ inline std::optional<float> find_camera_zoom_area(const cosmos& cosm, const vec2
 	zoom_areas.get_topmost_fulfilling([&](const entity_id& candidate) {
 		if (const auto handle = cosm[candidate]) {
 			if (const auto marker = handle.find<components::marker>(); marker != nullptr) {
-				if (during_buy_time || !marker->zoom_only_during_buy_time) {
-					result = marker->zoom;
-					return true;
-				}
+				result = marker->zoom;
+				return true;
 			}
 		}
 

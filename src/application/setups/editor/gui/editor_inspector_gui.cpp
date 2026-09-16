@@ -922,9 +922,6 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	if (type == area_marker_type::CAMERA_ZOOM) {
 		MULTIPROPERTY("Zoom", zoom);
 		tooltip_on_hover("The camera will smoothly change zoom to this value\nwhenever the viewed character is inside this area.\nValues below 1 zoom the camera out - useful for large open spaces.\n\nIf zoom areas overlap, the one higher in the layer hierarchy wins.");
-
-		MULTIPROPERTY("Only during buy time", zoom_only_during_buy_time);
-		tooltip_on_hover("This area will only affect the camera while buying is still enabled.\nUseful around spawns - once the round is in full swing,\nthe camera stays at the default zoom there.");
 	}
 
 	if (::is_portal_based(type)) {
@@ -2328,6 +2325,12 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("If ticked, all nodes disabled with the \"eye\" icon\nwill still appear in-game (both when playtesting and live).\n\nThey will remain hidden when editing.");
+	}
+
+	PROPERTY("Default zoom", default_zoom);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("The camera zoom used wherever no Camera zoom area\ncovers the player.");
 	}
 
 	PROPERTY("Ambient light color", ambient_light_color);

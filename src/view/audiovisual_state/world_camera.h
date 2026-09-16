@@ -65,7 +65,8 @@ struct world_camera {
 		const_entity_handle entity_to_chase,
 		const vec2 mid_step_crosshair_displacement,
 		const input_settings& input_cfg,
-		bool during_buy_time
+		bool during_buy_time,
+		std::optional<float> forced_area_zoom
 	);
 
 	auto get_effective_flash_mult() const {

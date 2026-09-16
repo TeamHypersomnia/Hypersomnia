@@ -108,8 +108,7 @@ namespace components {
 		marker_letter_type letter = marker_letter_type::A;
 		marker_shape_type shape = marker_shape_type::BOX;
 		bool camp = false;
-		bool zoom_only_during_buy_time = false;
-		pad_bytes<2> pad;
+		pad_bytes<3> pad;
 		float camp_secs_min = 5.0f;
 		float camp_secs_max = 15.0f;
 		float zoom = 0.75f;
