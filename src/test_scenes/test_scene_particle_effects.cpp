@@ -106,6 +106,7 @@ void load_test_scene_particle_effects(
 		const float max_base_speed = 300.f
 	) {
 		particles_emission em;
+		em.is_bullet_trail = true;
 		em.spread_degrees = float_range(0, 0);
 		em.particles_per_sec = float_range(1200 * density_mult, 1200 * density_mult);
 		em.stream_lifetime_ms = float_range(stream_lifetime, stream_lifetime);

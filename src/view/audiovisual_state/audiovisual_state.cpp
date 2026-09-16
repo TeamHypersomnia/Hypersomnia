@@ -157,7 +157,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			anims,
 			scaled_frame_dt,
 			interp,
-			input.gore_enabled
+			input.gore_enabled,
+			input.bullet_trails_enabled
 		);
 	};
 

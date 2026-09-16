@@ -726,7 +726,8 @@ void particles_simulation_system::advance_visible_streams(
 	const plain_animations_pool& anims,
 	const augs::delta& delta,
 	const interpolation_system& interp,
-	const bool gore_enabled
+	const bool gore_enabled,
+	const bool bullet_trails_enabled
 ) {
 	const auto dt_secs = delta.in_seconds();
 
@@ -752,6 +753,10 @@ void particles_simulation_system::advance_visible_streams(
 			const auto stream_delta = instance.advance_lifetime_get_dt(delta, infinitely);
 
 			if (!visible_in_camera) {
+				continue;
+			}
+
+			if (!bullet_trails_enabled && instance.source_emission.is_bullet_trail) {
 				continue;
 			}
 

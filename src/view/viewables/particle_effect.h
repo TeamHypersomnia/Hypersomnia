@@ -61,6 +61,7 @@ struct particles_emission {
 	bool scale_damping_to_velocity = false;
 	bool should_particles_look_towards_velocity = true;
 	bool should_gore_remap = false;
+	bool is_bullet_trail = false;
 	bool ignore_effect_modifier = false;
 	bound stream_particle_lifetime_mult = bound(1.f, 1.f);
 

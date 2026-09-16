@@ -4024,6 +4024,7 @@ work_result work(
 			viewing_config.damage_indication,
 
 			viewing_config.gore,
+			viewing_config.drawing.draw_bullet_trails,
 
 			thread_pool
 		});

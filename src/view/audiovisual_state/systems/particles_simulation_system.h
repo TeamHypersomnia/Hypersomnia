@@ -294,7 +294,8 @@ public:
 		const plain_animations_pool&,
 		const augs::delta& dt,
 		const interpolation_system&,
-		const bool gore_enabled
+		const bool gore_enabled,
+		const bool bullet_trails_enabled
 	);
 
 	void spawn_temporary_lights(

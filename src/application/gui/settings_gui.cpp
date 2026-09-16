@@ -817,6 +817,7 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
+				revertable_checkbox("Draw bullet trails", config.drawing.draw_bullet_trails);
 				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
 
 				{
