@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <algorithm>
 #define TRACE_PARAMETERS 0
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
 #define Y_IS_Z 1
@@ -251,7 +252,8 @@ namespace augs {
 	}
 
 	void sound_source::set_max_distance(const si_scaling si, const float distance) const {
-		const auto passed_distance = si.get_meters(distance);
+		/* Sanitize - a negative or NaN value is an AL_INVALID_VALUE. */
+		const auto passed_distance = std::max(0.f, si.get_meters(distance));
 
 		(void)passed_distance;
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, passed_distance));
@@ -272,7 +274,8 @@ namespace augs {
 	}
 
 	void sound_source::set_reference_distance(const si_scaling si, const float distance) const {
-		const auto passed_distance = si.get_meters(distance);
+		/* Sanitize - a negative or NaN value is an AL_INVALID_VALUE. */
+		const auto passed_distance = std::max(0.f, si.get_meters(distance));
 
 		(void)passed_distance;
 		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, passed_distance));
