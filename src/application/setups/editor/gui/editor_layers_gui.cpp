@@ -17,6 +17,8 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "application/setups/editor/defaults/editor_node_defaults.h"
+#include "application/setups/editor/editor_setup_find_aabb_of_nodes.hpp"
+#include "application/setups/editor/editor_official_resource_map.hpp"
 
 #include "application/setups/editor/detail/make_command_from_selections.h"
 
@@ -224,6 +226,71 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					l.is_open = true;
 				}
 			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("Advanced")) {
+			const auto inspected_layers = in.setup.template get_all_inspected<editor_layer_id>();
+
+			{
+				auto disabled = maybe_disabled_cols(inspected_layers.empty());
+
+				if (ImGui::Selectable("Make nav islands from layer AABBs")) {
+					const auto resource_id = in.setup.get_official_resource_map().area_markers.at(area_marker_type::NAV_ISLAND);
+					const auto* const resource = in.setup.find_resource(resource_id);
+
+					bool first = true;
+
+					for (const auto& layer_id : inspected_layers) {
+						const auto* const layer = in.setup.find_layer(layer_id);
+
+						if (layer == nullptr) {
+							continue;
+						}
+
+						auto for_each_node = [&](auto callback) {
+							for (const auto& node_id : layer->hierarchy.nodes) {
+								callback(node_id);
+							}
+						};
+
+						const auto aabb = in.setup.find_aabb_of_nodes(for_each_node);
+
+						if (!aabb.has_value()) {
+							continue;
+						}
+
+						auto new_node = editor_area_marker_node();
+
+						if (resource != nullptr) {
+							::setup_node_defaults(new_node.editable, *resource, true);
+						}
+
+						new_node.resource_id = resource_id;
+						new_node.unique_name = layer->unique_name + " island";
+						new_node.editable.pos = aabb->get_center();
+						new_node.editable.size = vec2i(aabb->get_size());
+
+						create_node_command<editor_area_marker_node> command;
+						command.built_description = typesafe_sprintf("Created nav island for %x", layer->unique_name);
+						command.created_node = std::move(new_node);
+						command.layer_id = layer_id;
+						command.index_in_layer = 0;
+						command.omit_inspector = true;
+
+						in.setup.post_new_command(std::move(command));
+
+						if (!first) {
+							in.setup.make_last_command_a_child();
+						}
+
+						first = false;
+					}
+				}
+			}
+
+			ImGui::EndMenu();
 		}
 	};
 
