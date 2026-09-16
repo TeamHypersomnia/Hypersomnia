@@ -6,16 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
-
-- jakies kolko z borderem naokolo obecnego gracza w minimapie zeby bylo widac ktorego gracza ogladasz. to moze byc taki border naokolo tej strzalki zeby nie powiekszac tej kulki ale rozumiesz taki ring dookola tej strzalki i ten ring sie przerywa w miejscu stej strzalki ktora patrzy.
-- smierc powinna przerywac puls tez jesli byl jakikolwiek na dana encje
-
-- jakas ikonke kasy jednak
+- proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
+	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp
 
 - dwa problemy
 	- ten laser jebany nie wiem jak rozwiazac
 	- offscreen indicatory wchodza w minimape i to boli bo za maly padding ma mapka
+		- jebac to
 
 - review + ocenic perf hity
 

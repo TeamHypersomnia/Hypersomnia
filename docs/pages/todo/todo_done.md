@@ -7469,3 +7469,9 @@ This will discard your redo history."
 - czemu w shooting range nie nikna z pola widzenia kurwa ci z prawej
 	- bo teammates go widza lol
 - nav area chyba bym obecny rysowal dla draw entire map bo on bedzie lepiej wypoziomowany - patrz rambo
+
+- jakies kolko z borderem naokolo obecnego gracza w minimapie zeby bylo widac ktorego gracza ogladasz. to moze byc taki border naokolo tej strzalki zeby nie powiekszac tej kulki ale rozumiesz taki ring dookola tej strzalki i ten ring sie przerywa w miejscu stej strzalki ktora patrzy.
+- smierc powinna przerywac puls tez jesli byl jakikolwiek na dana encje
+
+- jakas ikonke kasy jednak
+
