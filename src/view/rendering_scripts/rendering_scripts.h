@@ -122,6 +122,12 @@ struct draw_circular_progresses_input {
 struct draw_crosshair_lasers_input {
 	const std::function<void(vec2, vec2, rgba)> callback;
 	const std::function<void(vec2, vec2, rgba)> dashed_line_callback;
+
+	/*
+		Receives the segments that the bullet penetrates -
+		drawn as perpendicular "stitches" by the caller.
+	*/
+	const std::function<void(vec2, vec2, rgba)> penetration_callback;
 	const interpolation_system& interpolation;
 	const const_entity_handle character;
 	const vec2 crosshair_displacement;

@@ -7477,3 +7477,8 @@ This will discard your redo history."
 
 - offscreen indicatory wchodza w minimape i to boli bo za maly padding ma mapka
 	- jebac to
+- dwa problemy
+	- ten laser jebany nie wiem jak rozwiazac
+- odzoomowac do 85% i synchronizowac custom zoom z fowem zawsze
+- na mapkach pozwalac na zmieniony zoom
+	- tez synchro z fowem

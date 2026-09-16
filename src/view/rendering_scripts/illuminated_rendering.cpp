@@ -509,17 +509,86 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	auto draw_weapon_laser = [&]() {
 		if (settings.draw_weapon_laser && viewed_character.alive()) {
 			const auto laser = necessarys.at(assets::necessary_image_id::LASER);
-			
+
+			/*
+				The laser is drawn in screen space under the non-zoomed
+				projection - as if the camera zoom was always 1.0 - so its
+				thickness, dashes, stitches and borders keep the same
+				on-screen size regardless of the current camera zoom.
+			*/
+
+			auto in_screen_space = [&](auto base) {
+				return [base, this_cone = cone](const vec2 from, const vec2 to, const rgba col) {
+					base(
+						vec2(this_cone.to_screen_space(from)),
+						vec2(this_cone.to_screen_space(to)),
+						col
+					);
+				};
+			};
+
+			/*
+				Every line is first drawn in black with 1px offsets
+				in the four directions, then in its color on top -
+				a 1px border keeping the laser readable on bright
+				backgrounds.
+			*/
+			auto with_border = [](auto base) {
+				return [base](const vec2 from, const vec2 to, const rgba col) {
+					const vec2 offsets[4] = {
+						vec2(-1, 0), vec2(1, 0), vec2(0, -1), vec2(0, 1)
+					};
+
+					for (const auto& o : offsets) {
+						base(from + o, to + o, black);
+					}
+
+					base(from, to, col);
+				};
+			};
+
+			/*
+				Perpendicular ticks ("stitches") instead of longitudinal
+				dashes, so the through-material part cannot be confused
+				with the dead path past the bullet's death point.
+			*/
+			auto as_stitches = [](auto base) {
+				return [base](const vec2 from, const vec2 to, const rgba col) {
+					const auto delta = to - from;
+					const auto len = delta.length();
+
+					if (len <= 0.0f) {
+						return;
+					}
+
+					const auto dir = delta / len;
+					const auto tick_offset = dir.perpendicular_cw() * 4.0f;
+
+					const auto tick_spacing = 7.0f;
+
+					for (float d = 0.0f; d <= len; d += tick_spacing) {
+						const auto center = from + dir * d;
+
+						base(center - tick_offset, center + tick_offset, col);
+					}
+				};
+			};
+
+			renderer.call_and_clear_lines();
+			shaders.standard->set_projection(renderer, non_zoomed_matrix);
+
 			draw_crosshair_lasers({
-				line_output_wrapper { get_line_drawer(), laser },
-				dashed_line_output_wrapper  { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds },
-				interp, 
+				in_screen_space(with_border(line_output_wrapper { get_line_drawer(), laser })),
+				in_screen_space(with_border(dashed_line_output_wrapper { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds })),
+				in_screen_space(as_stitches(with_border(line_output_wrapper { get_line_drawer(), laser }))),
+				interp,
 				viewed_character,
 				in.pre_step_crosshair_displacement,
 				screen_size
 			});
 
 			renderer.call_and_clear_lines();
+			shaders.standard->set_projection(renderer, matrix);
 		}
 	};
 
@@ -589,6 +658,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 							get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
 							get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 5.f, col, flip_flags::make_horizontally());
 						},
+						[](const vec2, const vec2, const rgba) {},
 						[](const vec2, const vec2, const rgba) {},
 						interp,
 						viewed_character,

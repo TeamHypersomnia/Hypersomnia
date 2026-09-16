@@ -12,20 +12,13 @@ summary: That which we are brainstorming at the moment.
 - proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp
 
-- dwa problemy
-	- ten laser jebany nie wiem jak rozwiazac
-
 - review + ocenic perf hity
 
 - naprawic waypointy na minilabie
-
-- miejscowe zoomy na open areas zamiast odzoomowywac
-	- best of both worlds
+- na cyberaqua te camera zoomy przy akwarium
+- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
 
 - /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg
-- odzoomowac do 85% i synchronizowac custom zoom z fowem zawsze
-- na mapkach pozwalac na zmieniony zoom
-	- tez synchro z fowem
 
 - sentry
 

@@ -221,7 +221,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 
 			for (const auto& seg : segments) {
 				if (seg.penetrating) {
-					in.dashed_line_callback(seg.from, seg.to, white);
+					in.penetration_callback(seg.from, seg.to, white);
 				}
 				else {
 					/*
