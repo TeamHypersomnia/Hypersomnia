@@ -1440,6 +1440,8 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(enabled));
 
 						if (scope_cfg.enabled) {
+							revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
+
 							revertable_checkbox(SCOPE_CFG_NVP(only_under_tab));
 
 							revertable_enum_radio(SCOPE_CFG_NVP(position));

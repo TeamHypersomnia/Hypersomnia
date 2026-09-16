@@ -37,7 +37,7 @@ constexpr float minimap_laser_dash_len_v = 4.0f;
 constexpr float minimap_laser_dash_velocity_v = 20.0f;
 constexpr float minimap_laser_alpha_mult_v = 0.7f;
 
-void draw_minimap(const draw_minimap_input in) {
+static void draw_minimap_impl(const draw_minimap_input in) {
 	if (in.out_transform != nullptr) {
 		in.out_transform->valid = false;
 	}
@@ -967,4 +967,38 @@ void draw_minimap(const draw_minimap_input in) {
 	}
 
 	draw_frame();
+}
+
+void draw_minimap(const draw_minimap_input in) {
+	/*
+		Remember how many triangles were already there,
+		in case the buffers are shared with other passes.
+	*/
+
+	const auto solids_from = in.solids_output.size();
+	const auto dither_from = in.dither_output.size();
+	const auto foreground_from = in.foreground_output.size();
+
+	::draw_minimap_impl(in);
+
+	/*
+		The master alpha scales the transparency of everything
+		the minimap has just drawn, the background and border included.
+	*/
+
+	const auto master_alpha = std::clamp(in.settings.master_alpha, 0.0f, 1.0f);
+
+	if (master_alpha < 1.0f) {
+		auto scale_alphas_from = [master_alpha](augs::vertex_triangle_buffer& buffer, const std::size_t from) {
+			for (std::size_t i = from; i < buffer.size(); ++i) {
+				for (auto& v : buffer[i].vertices) {
+					v.color.mult_alpha(master_alpha);
+				}
+			}
+		};
+
+		scale_alphas_from(in.solids_output, solids_from);
+		scale_alphas_from(in.dither_output, dither_from);
+		scale_alphas_from(in.foreground_output, foreground_from);
+	}
 }

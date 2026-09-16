@@ -5798,12 +5798,16 @@ work_result work(
 
 					auto& output = chosen_renderer.get_triangle_buffer();
 
+					/* The overlay respects the minimap's master alpha as well. */
+					auto fow_color = minimap.fog_of_war_color;
+					fow_color.mult_alpha(std::clamp(minimap.master_alpha, 0.0f, 1.0f));
+
 					for (const auto& tri : fow_triangles) {
 						auto mapped = tri;
 
 						for (auto& v : mapped.vertices) {
 							v.pos = minimap_transform.minimap_center + (v.pos - minimap_transform.world_center) * minimap_transform.scale;
-							v.color = minimap.fog_of_war_color;
+							v.color = fow_color;
 						}
 
 						output.push_back(mapped);

@@ -71,6 +71,7 @@ enum class minimap_tab_behavior_type {
 struct minimap_settings {
 	// GEN INTROSPECTOR struct minimap_settings
 	bool enabled = true;
+	float master_alpha = 1.0f;
 	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
 	int size = 300;
 	int border_thickness = 1;

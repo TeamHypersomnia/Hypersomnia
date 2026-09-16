@@ -225,6 +225,7 @@
         },
         "minimap": {
             "enabled": true,
+            "master_alpha": 1.0,
             "position": "LEFT_TOP",
             "size": 320,
             "border_thickness": 1,
