@@ -1297,13 +1297,16 @@ void settings_gui_state::perform(
 					}
 				}
 
+				if (auto node = scoped_tree_node("HUD Layout")) {
+					revertable_enum("Minimap position", config.drawing.minimap.position);
+					revertable_enum("Knockout indicators position", config.arena_mode_gui.knockout_indicators_position);
+				}
+
 				{
 					auto& scope_cfg = config.drawing;
 
 					if (auto node = scoped_tree_node("HUD")) {
 						revertable_checkbox("Cinematic mode", config.drawing.cinematic_mode);
-
-						revertable_enum_radio("Knockout indicators position", config.arena_mode_gui.knockout_indicators_position);
 
 						revertable_checkbox("Draw enemy silhouettes in Spectator", config.drawing.draw_enemy_silhouettes_in_spectator);
 
@@ -1441,11 +1444,12 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(enabled));
 
 						if (scope_cfg.enabled) {
+							{
+								auto ind = scoped_indent();
+								revertable_checkbox(SCOPE_CFG_NVP(only_under_tab));
+							}
+
 							revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
-
-							revertable_checkbox(SCOPE_CFG_NVP(only_under_tab));
-
-							revertable_enum_radio(SCOPE_CFG_NVP(position));
 
 							revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
 							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
