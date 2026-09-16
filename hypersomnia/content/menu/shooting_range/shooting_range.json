@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-15 23:48:22.716828 UTC"
+        "version_timestamp": "2026-09-16 04:35:18.210428 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -3022,7 +3022,17 @@
             "shape": "BOX",
             "pos": [-640.0, 3840.000244140625],
             "size": [256, 1536],
-            "disable_all_entry_effects": true
+            "disable_all_entry_effects": true,
+            "reacts_to": {
+                "characters": false,
+                "character_weapons": false,
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            }
         },
         {
             "id": "bombsite",
