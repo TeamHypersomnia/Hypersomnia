@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <algorithm>
 #define TRACE_PARAMETERS 0
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
@@ -124,8 +125,29 @@ namespace augs {
 	}
 	
 	void sound_source::seek_to(const float seconds) const {
-		(void)seconds;
-		AL_CHECK(alSourcef(id, AL_SEC_OFFSET, seconds));
+		/*
+			OpenAL rejects offsets landing at or past the end of the buffer
+			with AL_INVALID_VALUE, and the callers compute the target offset
+			from the elapsed time - which can overshoot the buffer's length,
+			e.g. when the sync commands catch up after the game hangs for a while
+			(the float rounding alone can land fmod's result exactly at the length).
+
+			Clamp instead of erroring; back off a millisecond from the end,
+			since our computed length may round up past the last sample.
+		*/
+
+		if (!std::isfinite(seconds)) {
+			return;
+		}
+
+		auto clamped_seconds = std::max(0.f, seconds);
+
+		if (const auto length = static_cast<float>(buffer_meta.computed_length_in_seconds); length > 0.f) {
+			clamped_seconds = std::min(clamped_seconds, std::max(0.f, length - 0.001f));
+		}
+
+		(void)clamped_seconds;
+		AL_CHECK(alSourcef(id, AL_SEC_OFFSET, clamped_seconds));
 	}
 	
 	float sound_source::get_time_in_seconds() const {
