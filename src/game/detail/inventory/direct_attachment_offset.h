@@ -260,12 +260,16 @@ auto direct_attachment_offset(
 
 			if (const auto fighter = container.template find<components::melee_fighter>()) {
 				if (const auto frame = find_action_frame(stance, *fighter, logicals)) {
-					return logicals.get_offsets(frame->image_id).torso;
+					auto result = logicals.get_offsets(frame->image_id).torso;
+					result.apply_body_rotation();
+					return result;
 				}
 			}
 
 			if (const auto* const anim = logicals.find(stance.carry)) {
-				return logicals.get_offsets(anim->frames[0].image_id).torso;
+				auto result = logicals.get_offsets(anim->frames[0].image_id).torso;
+				result.apply_body_rotation();
+				return result;
 			}
 		}
 

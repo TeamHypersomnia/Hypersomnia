@@ -16,6 +16,7 @@ struct torso_offsets {
 	transformi secondary_shoulder;
 	real32 strafe_facing_offset = 0.f;
 	bool is_akimbo = false;
+	real32 body_rotation = 0.f;
 	// END GEN INTROSPECTOR
 
 	void flip_vertically() {
@@ -26,9 +27,32 @@ struct torso_offsets {
 		shoulder.flip_vertically();
 		secondary_shoulder.flip_vertically();
 		strafe_facing_offset *= -1;
+		body_rotation *= -1;
 
 		std::swap(primary_hand, secondary_hand);
 		std::swap(shoulder, secondary_shoulder);
+	}
+
+	/*
+		The torso sprite is drawn rotated by body_rotation,
+		so all anchors defined in the sprite's image space
+		must be rotated accordingly before use.
+	*/
+	void apply_body_rotation() {
+		if (body_rotation != 0.f) {
+			auto rotate_anchor = [this](transformi& t) {
+				t.pos = vec2i(vec2(t.pos).rotate(body_rotation).round_fract());
+				t.rotation += body_rotation;
+			};
+
+			rotate_anchor(primary_hand);
+			rotate_anchor(secondary_hand);
+			rotate_anchor(back);
+			rotate_anchor(head);
+			rotate_anchor(legs);
+			rotate_anchor(shoulder);
+			rotate_anchor(secondary_shoulder);
+		}
 	}
 };
 

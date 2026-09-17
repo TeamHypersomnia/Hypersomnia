@@ -552,6 +552,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 								considered_offsets.flip_vertically();
 							}
 
+							considered_offsets.apply_body_rotation();
+
 							const auto stance_rotation = considered_offsets.back.rotation;
 							return stance_rotation;
 						}

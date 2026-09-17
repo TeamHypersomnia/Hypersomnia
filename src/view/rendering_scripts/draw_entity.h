@@ -422,6 +422,8 @@ FORCE_INLINE void specific_entity_drawer(
 						result.flip_vertically();
 					}
 
+					result.apply_body_rotation();
+
 					return result;
 				}();
 
@@ -539,13 +541,15 @@ FORCE_INLINE void specific_entity_drawer(
 					{
 						/* Draw the actual torso */
 						auto usage = stance_usage;
+						auto body_rotation = stance_offsets.body_rotation;
 
 						if (only_secondary) {
 							auto& f = usage.movement_flip.vertically;
 							f = !f;
+							body_rotation = -body_rotation;
 						}
 
-						draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
+						draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees + body_rotation });
 					}
 
 					draw_items_recursively(true);
@@ -564,13 +568,15 @@ FORCE_INLINE void specific_entity_drawer(
 				else {
 					/* Tattered standing corpse - draw tattered torso sprite */
 					auto usage = stance_usage;
+					auto body_rotation = stance_offsets.body_rotation;
 
 					if (sentience.should_flip_tattered_sprite()) {
 						auto& f = usage.movement_flip.vertically;
 						f = !f;
+						body_rotation = -body_rotation;
 					}
 
-					draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
+					draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees + body_rotation });
 
 					draw_standing_head = true;
 					head_flip = sentience.should_flip_tattered_sprite();

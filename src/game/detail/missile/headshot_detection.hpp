@@ -43,6 +43,8 @@ std::optional<transformr> calc_head_transform(const E& typed_handle) {
 				result.flip_vertically();
 			}
 
+			result.apply_body_rotation();
+
 			return result;
 		}();
 
