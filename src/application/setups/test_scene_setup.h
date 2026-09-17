@@ -1,8 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <optional>
+#include <unordered_set>
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/math/camera_cone.h"
+#include "view/hud_bar_drawing.h"
 
 #include "game/detail/render_layer_filter.h"
 #include "game/cosmos/entity_handle.h"
@@ -95,6 +97,39 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 
 	tutorial_state tutorial;
 	uint32_t max_tutorial_level = 0;
+
+	/*
+		Tutorial progress HUD state.
+
+		The bottom bar counts the green context-tip portals
+		visited on the current level's layer.
+	*/
+
+	std::vector<uint32_t> basic_tutorial_levels;
+	std::vector<uint32_t> advanced_tutorial_levels;
+	std::optional<uint32_t> tutorial_finish_level;
+
+	std::unordered_set<std::string> current_tip_portals;
+	std::unordered_set<std::string> visited_tip_portals;
+
+	hud_bar_highlight_state bottom_bar_highlight;
+	hud_bar_highlight_state stage_bar_highlight;
+
+	/*
+		Measured during drawing, read by customize_for_viewing
+		to make the other HUD elements give way.
+	*/
+	int stage_block_height = 48;
+
+	hud_bar_particles_state bottom_bar_particles;
+	hud_bar_particles_state stage_bar_particles;
+
+	void refresh_tip_portals();
+	void draw_tutorial_hud(const draw_setup_gui_input&);
+	std::optional<std::pair<uint32_t, uint32_t>> get_tutorial_stage_num_and_count() const;
+	bool is_tutorial_finish_level() const;
+	bool should_draw_bottom_progress_bar() const;
+	bool should_draw_stage_bar() const;
 
 	bool should_init_level = false;
 	float restart_arena_in_ms = -1;

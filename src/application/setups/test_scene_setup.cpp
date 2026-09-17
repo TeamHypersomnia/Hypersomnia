@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <sstream>
+#include <iomanip>
 #include "game/cosmos/logic_step.h"
 #include "game/organization/all_messages_includes.h"
 
@@ -19,6 +21,9 @@
 #include "application/setups/editor/project/editor_project.hpp"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/gui/text/printer.h"
+#include "application/setups/draw_setup_gui_input.h"
+#include "view/rendering_scripts/minimap_layout.h"
+#include "view/mode_gui/arena/on_first_touching_portal.hpp"
 
 #include "game/modes/detail/delete_with_held_items.hpp"
 #include "game/detail/hand_fuse_logic.h"
@@ -36,6 +41,28 @@ void snap_interpolated_to_logical(cosmos& cosm);
 static std::optional<item_flavour_id> test_enemy_weapon;//= to_entity_flavour_id(test_shootable_weapons::BAKA47);
 
 using portal_marker = editor_area_marker_node;
+
+/*
+	Testing: when 1, the tutorial starts right on the finish screen
+	(the one congratulating on completing the basic tutorial),
+	so the advanced tutorial can be tested right away.
+*/
+#define TEST_START_AT_TUTORIAL_FINISH_SCREEN 1
+
+/*
+	Level0..Level4 are the basic tutorial.
+	The rest of the stage structure (the finish screen, the advanced levels)
+	is derived from the portal graph in init().
+*/
+
+constexpr uint32_t tutorial_last_basic_level_v = 4;
+
+/* Based on the height of the character's value bars (their 16px icons). */
+constexpr int tutorial_hud_bar_h_v = 16;
+
+/* Both progress bars are slightly taller. */
+constexpr int tutorial_bottom_bar_h_v = tutorial_hud_bar_h_v + 5;
+constexpr int tutorial_stage_bar_h_v = tutorial_hud_bar_h_v + 1;
 
 test_scene_setup::test_scene_setup(
 	std::string nickname,
@@ -107,17 +134,103 @@ void test_scene_setup::init(const test_scene_type new_type) {
 		}
 	};
 
-	for (auto& l : project.layers.pool) {
-		if (begins_with(l.unique_name, "Level")) {
-			uint32_t level = 0;
+	/*
+		Derive the tutorial's stage structure factually from the portal graph,
+		instead of trusting the numbers in the layer names -
+		some levels are excluded from circulation
+		(either their layers are inactive - these are skipped at read time
+		altogether - or no portal ever leads to them).
 
-			if (1 == typesafe_sscanf(l.unique_name, "Level%x", level)) {
-				max_tutorial_level = std::max(level, max_tutorial_level);
+		Level0..Level4 are the basic tutorial.
+		The level that the last basic level exits to is the finish screen -
+		no progress HUD is drawn there.
+		Everything reachable from the finish screen onwards is the advanced tutorial.
+	*/
+
+	basic_tutorial_levels.clear();
+	advanced_tutorial_levels.clear();
+	tutorial_finish_level = std::nullopt;
+	current_tip_portals.clear();
+	visited_tip_portals.clear();
+
+	{
+		std::unordered_map<uint32_t, std::vector<uint32_t>> level_edges;
+
+		for (auto& l : project.layers.pool) {
+			if (!begins_with(l.unique_name, "Level")) {
+				continue;
 			}
+
+			uint32_t source_level = 0;
+
+			if (1 != typesafe_sscanf(l.unique_name, "Level%x", source_level)) {
+				continue;
+			}
+
+			max_tutorial_level = std::max(source_level, max_tutorial_level);
+
+			if (source_level <= tutorial_last_basic_level_v) {
+				basic_tutorial_levels.push_back(source_level);
+			}
+
+			for (const auto& node_id : l.hierarchy.nodes) {
+				if (const auto portal = find<portal_marker>(node_id)) {
+					const auto exit_id = portal->editable.as_portal.portal_exit.operator editor_node_id();
+
+					if (const auto exit_layer = project.find_parent_layer(exit_id)) {
+						if (exit_layer->layer_ptr != nullptr) {
+							uint32_t target_level = 0;
+
+							if (1 == typesafe_sscanf(exit_layer->layer_ptr->unique_name, "Level%x", target_level)) {
+								if (target_level != source_level) {
+									level_edges[source_level].push_back(target_level);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		sort_range(basic_tutorial_levels);
+
+		if (!basic_tutorial_levels.empty()) {
+			for (const auto target : level_edges[basic_tutorial_levels.back()]) {
+				if (target > tutorial_last_basic_level_v) {
+					tutorial_finish_level = target;
+					break;
+				}
+			}
+		}
+
+		if (tutorial_finish_level.has_value()) {
+			std::unordered_set<uint32_t> reached = { *tutorial_finish_level };
+			std::vector<uint32_t> queue = { *tutorial_finish_level };
+
+			while (!queue.empty()) {
+				const auto current = queue.back();
+				queue.pop_back();
+
+				for (const auto target : level_edges[current]) {
+					if (target > tutorial_last_basic_level_v && reached.emplace(target).second) {
+						advanced_tutorial_levels.push_back(target);
+						queue.push_back(target);
+					}
+				}
+			}
+
+			sort_range(advanced_tutorial_levels);
 		}
 	}
 
 	LOG("Tutorial levels: %x", max_tutorial_level);
+	LOG("Tutorial basic stages: %x, advanced stages: %x, finish level: %x", basic_tutorial_levels.size(), advanced_tutorial_levels.size(), tutorial_finish_level ? static_cast<int>(*tutorial_finish_level) : -1);
+
+#if TEST_START_AT_TUTORIAL_FINISH_SCREEN
+	if (is_tutorial() && tutorial_finish_level.has_value()) {
+		tutorial.level = *tutorial_finish_level;
+	}
+#endif
 
 	restart_arena();
 
@@ -277,6 +390,112 @@ void test_scene_setup::restart_arena() {
 	character().get<components::movement>().flags = pre_movement_flags;
 
 	refresh_range_zoom_pads();
+	refresh_tip_portals();
+}
+
+void test_scene_setup::refresh_tip_portals() {
+	current_tip_portals.clear();
+
+	/*
+		Any restart of the arena - a death, a checkpoint restart
+		from the menu, or a level change - resets the progress.
+	*/
+
+	visited_tip_portals.clear();
+
+	/*
+		Cancel any pending flash: its timestamp comes from the previous
+		cosmos' clock, and the rebuilt cosmos starts counting from zero again,
+		so a stale flash would replay on the fresh bar.
+		last_ratio is kept, so a genuine increase across a level change still flashes.
+	*/
+
+	bottom_bar_highlight.at_secs = -1.0;
+	stage_bar_highlight.at_secs = -1.0;
+
+	/*
+		On the finish screen, zero the trackers altogether,
+		so the advanced tutorial starts fresh and its first
+		progress gains highlight correctly.
+	*/
+
+	if (is_tutorial_finish_level()) {
+		bottom_bar_highlight = {};
+		stage_bar_highlight = {};
+	}
+
+	if (!is_tutorial()) {
+		return;
+	}
+
+	const auto current_level_name = "Level" + std::to_string(tutorial.level);
+
+	if (const auto current_layer = project.find_layer(current_level_name)) {
+		for (const auto& node_id : current_layer->hierarchy.nodes) {
+			if (const auto portal = find<portal_marker>(node_id)) {
+				const auto& info = portal->editable.as_portal;
+
+				const bool is_green_tip_portal =
+					info.color_preset == editor_color_preset::GREEN
+					&& info.context_tip.is_enabled
+					&& !info.context_tip.value.empty()
+				;
+
+				if (is_green_tip_portal) {
+					current_tip_portals.emplace(portal->unique_name);
+				}
+			}
+		}
+	}
+}
+
+bool test_scene_setup::is_tutorial_finish_level() const {
+	return is_tutorial() && tutorial_finish_level.has_value() && tutorial.level == *tutorial_finish_level;
+}
+
+bool test_scene_setup::should_draw_bottom_progress_bar() const {
+	return is_tutorial() && !is_tutorial_finish_level() && !current_tip_portals.empty();
+}
+
+bool test_scene_setup::should_draw_stage_bar() const {
+	return is_tutorial() && get_tutorial_stage_num_and_count().has_value();
+}
+
+std::optional<std::pair<uint32_t, uint32_t>> test_scene_setup::get_tutorial_stage_num_and_count() const {
+	if (!is_tutorial()) {
+		return std::nullopt;
+	}
+
+	if (is_tutorial_finish_level()) {
+		return std::nullopt;
+	}
+
+	const auto stage_among = [&](const std::vector<uint32_t>& levels) -> std::optional<std::pair<uint32_t, uint32_t>> {
+		uint32_t stage = 0;
+		bool found = false;
+
+		for (const auto level : levels) {
+			if (level <= tutorial.level) {
+				++stage;
+			}
+
+			if (level == tutorial.level) {
+				found = true;
+			}
+		}
+
+		if (!found) {
+			return std::nullopt;
+		}
+
+		return std::pair { stage, static_cast<uint32_t>(levels.size()) };
+	};
+
+	if (tutorial.level <= tutorial_last_basic_level_v) {
+		return stage_among(basic_tutorial_levels);
+	}
+
+	return stage_among(advanced_tutorial_levels);
 }
 
 void test_scene_setup::refresh_range_zoom_pads() {
@@ -642,6 +861,27 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 	}
 
 	auto& cosm = scene.world;
+
+	{
+		/*
+			Track the visited context-tip portals for the bottom progress bar.
+
+			Poll the same way the context tip drawing detects the tip
+			for the character - this also catches the portal the character
+			spawns in, whose entering the portal system never reports.
+		*/
+
+		::on_first_touching_portal(
+			cosm[viewed_character_id],
+			[&](const auto& touched_portal) {
+				if (const auto portal = find<portal_marker>(entity_id(touched_portal.get_id()))) {
+					if (found_in(current_tip_portals, portal->unique_name)) {
+						visited_tip_portals.emplace(portal->unique_name);
+					}
+				}
+			}
+		);
+	}
 
 	if (const bool is_planting_level = tutorial.level == 14) {
 		if (auto armor = cosm[viewed_character_id][slot_function::TORSO_ARMOR].get_item_if_any()) {
@@ -1079,6 +1319,23 @@ void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 		if (tutorial.level < 4) {
 			config.drawing.draw_hotbar = false;
 		}
+
+		/*
+			Make room for the tutorial progress HUD:
+			the minimap has to sit above the bottom progress bar,
+			and anything sharing the minimap's corner (e.g. the value bars)
+			has to make room for the stage bar block drawn at the minimap's edge.
+		*/
+
+		auto& minimap = config.drawing.minimap;
+
+		if (should_draw_bottom_progress_bar()) {
+			minimap.extra_bottom_margin = tutorial_bottom_bar_h_v;
+		}
+
+		if (should_draw_stage_bar() && minimap.occupies_corner(minimap.position)) {
+			minimap.extra_hud_space = stage_block_height;
+		}
 	}
 }
 
@@ -1094,28 +1351,236 @@ bool test_scene_setup::handle_input_before_imgui(
 	return false;
 }
 
-void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
+void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	arena_gui_base::draw_custom_gui(in);
 
-#if 0
+	draw_tutorial_hud(in);
+}
+
+void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 	using namespace augs::gui::text;
-	using namespace augs::gui;
+
+	if (!is_tutorial()) {
+		return;
+	}
+
+	const auto& cosm = scene.world;
+	const auto total_secs = cosm.get_total_seconds_passed(get_interpolation_ratio());
+
+	const auto output = in.get_drawer();
+	const auto highlight_base_secs = in.config.damage_indication.white_damage_highlight_secs;
+
+	auto draw_bar = [&](
+		hud_bar_particles_state& particles,
+		hud_bar_highlight_state& highlight,
+		const hud_bar_appearance& appearance,
+		const ltrb bordered_rect,
+		const float ratio
+	) {
+		::draw_hud_bar(
+			output,
+			in.necessary_images,
+			appearance,
+			bordered_rect,
+			ratio,
+			total_secs,
+			highlight_base_secs,
+			highlight,
+			std::addressof(particles),
+			std::addressof(in.gui_fonts.gui)
+		);
+	};
 
 	const auto screen_size = in.screen_size;
 
-	using FS = formatted_string;
+	if (should_draw_bottom_progress_bar()) {
+		uint32_t num_visited = 0;
 
-	auto colored = [&](const auto& text, const auto& color) {
-		return FS(std::string(text), { in.gui_fonts.gui, color });
-	};
+		for (const auto& name : visited_tip_portals) {
+			if (found_in(current_tip_portals, name)) {
+				++num_visited;
+			}
+		}
 
-	print_stroked(
-		in.get_drawer(),
-		vec2i(screen_size.x / 2, 2),
-		colored("Tutorial", white),
-		{ augs::ralign::CX, augs::ralign::T }
-	);
-#endif
+		const auto ratio = static_cast<float>(num_visited) / current_tip_portals.size();
+
+		/*
+			Stretched over the whole screen's width,
+			touching the bottom edge exactly - no padding.
+		*/
+
+		const auto bar_rect = ltrb(
+			0.0f,
+			static_cast<float>(screen_size.y - tutorial_bottom_bar_h_v),
+			static_cast<float>(screen_size.x),
+			static_cast<float>(screen_size.y)
+		);
+
+		auto appearance = hud_bar_appearance();
+
+		/* A less garish green than the pure rgba one. */
+		appearance.color = rgba(41, 130, 2, 255);
+		appearance.border_w = 2;
+		appearance.particle_tint = 0.12f;
+
+		/* One segment per element. */
+		appearance.splits = std::min(max_hud_bar_splits_v, static_cast<int>(current_tip_portals.size()));
+		appearance.split_gap = 2;
+		appearance.label_background = true;
+		appearance.label_align_bottom = true;
+		appearance.label_border_w = 4;
+		appearance.label_unfilled_border_w = 2;
+		appearance.label_padding = vec2i(14, 6);
+
+		const auto& drawing = in.config.drawing;
+
+		if (drawing.draw_value_on_aura_bar) {
+			if (drawing.aura_bar_value_as_percent) {
+				const auto decimal_places = std::clamp(drawing.aura_bar_percent_decimal_places, 0, 3);
+
+				auto percent_stream = std::ostringstream();
+				percent_stream << std::fixed << std::setprecision(decimal_places) << ratio * 100.0f << "%";
+
+				appearance.label = percent_stream.str();
+			}
+			else {
+				appearance.label = typesafe_sprintf("%x/%x", num_visited, current_tip_portals.size());
+			}
+		}
+
+		draw_bar(bottom_bar_particles, bottom_bar_highlight, appearance, bar_rect, ratio);
+	}
+
+	if (const auto stage = get_tutorial_stage_num_and_count()) {
+		const auto& minimap = in.config.drawing.minimap;
+
+		if (minimap.occupies_corner(minimap.position)) {
+			const auto minimap_rect = ltrb(calc_minimap_rect(minimap, screen_size));
+
+			const auto& font = in.gui_fonts.gui;
+			const auto line_height = static_cast<int>(font.metrics.get_height());
+
+			const auto bar_pad = 6;
+			const auto label_pad = 8;
+			const auto bar_h = tutorial_stage_bar_h_v;
+
+			stage_block_height = bar_pad + bar_h + label_pad + line_height;
+
+			const bool minimap_at_top =
+				minimap.position == hud_corner_type::LEFT_TOP
+				|| minimap.position == hud_corner_type::RIGHT_TOP
+			;
+
+			/*
+				The bar sticks to the minimap's edge,
+				with the label on the bar's far side.
+			*/
+
+			const auto bar_t =
+				minimap_at_top ?
+				minimap_rect.b + bar_pad :
+				minimap_rect.t - bar_pad - bar_h
+			;
+
+			const auto label_t =
+				minimap_at_top ?
+				bar_t + bar_h + label_pad :
+				bar_t - label_pad - line_height
+			;
+
+			auto appearance = hud_bar_appearance();
+
+			/* The money bar's gold, mellowed the same way the bottom bar's green is. */
+			appearance.color = rgba(183, 140, 22, 255);
+			appearance.border_w = 2;
+			appearance.particle_tint = 0.2f;
+
+			/*
+				One segment per level transition in the basic tutorial.
+				The advanced one has too many stages, so group them instead:
+				the smallest group of 2..4 stages dividing the count evenly,
+				so that a whole segment fills exactly every k stages.
+				With no even division (a prime count), fall back
+				to one segment per transition to keep the boundaries aligned.
+			*/
+
+			const auto num_transitions = static_cast<int>(stage->second - 1);
+			const bool is_basic = tutorial.level <= tutorial_last_basic_level_v;
+
+			const auto advanced_splits = [&]() {
+				for (int group = 2; group <= 4; ++group) {
+					if (num_transitions % group == 0) {
+						return num_transitions / group;
+					}
+				}
+
+				return num_transitions;
+			}();
+
+			appearance.splits = std::min(max_hud_bar_splits_v, is_basic ? num_transitions : advanced_splits);
+
+			/*
+				Widened so that the bar's bright border
+				lines up with the minimap's border.
+			*/
+
+			const auto bar_rect = ltrb(
+				minimap_rect.l - minimap.border_thickness,
+				bar_t,
+				minimap_rect.r + minimap.border_thickness,
+				bar_t + bar_h
+			);
+
+			/*
+				The bar starts out empty on the first stage
+				and gets full on the final one.
+			*/
+
+			const auto ratio =
+				stage->second > 1 ?
+				static_cast<float>(stage->first - 1) / (stage->second - 1) :
+				1.0f
+			;
+
+			draw_bar(stage_bar_particles, stage_bar_highlight, appearance, bar_rect, ratio);
+
+			/*
+				Zero-based, so that the counter matches the bar exactly:
+				Stage X/N = X out of N segments filled.
+				The zeroth stage is just the welcome screen, not a real level.
+			*/
+
+			const auto label_text = formatted_string(
+				stage->first == stage->second ?
+				std::string("Final stage") :
+				typesafe_sprintf("Stage %x/%x", stage->first - 1, stage->second - 1),
+				style(font, in.config.arena_mode_gui.money_bar_color)
+			);
+
+			/*
+				The label hugs the bar's screen-inward edge:
+				its left edge when the minimap sits in a right corner,
+				mirrored to its right edge when in a left corner.
+			*/
+
+			const bool minimap_at_left =
+				minimap.position == hud_corner_type::LEFT_TOP
+				|| minimap.position == hud_corner_type::LEFT_BOTTOM
+			;
+
+			const auto label_l =
+				minimap_at_left ?
+				bar_rect.r - get_text_bbox(label_text).x :
+				bar_rect.l
+			;
+
+			print_stroked(
+				output,
+				vec2i(static_cast<int>(label_l), static_cast<int>(label_t)),
+				label_text
+			);
+		}
+	}
 }
 
 setup_escape_result test_scene_setup::escape() {
