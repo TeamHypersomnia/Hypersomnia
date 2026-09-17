@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- swiecacy dev label
+- te public keye cale dla linuxiarzy
+
 - pistoletowe animacje wreszcie
 - naprawic te kurwa invalid filenames i jebane stampy w projectach z menu
 
