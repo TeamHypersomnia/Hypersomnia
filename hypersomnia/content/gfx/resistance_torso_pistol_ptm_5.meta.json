@@ -52,7 +52,7 @@
             },
             "strafe_facing_offset": -90.0,
             "is_akimbo": false,
-            "body_rotation": 46.65
+            "body_rotation": 87.43
         },
         "legs": {
             "foot": [0, 0]

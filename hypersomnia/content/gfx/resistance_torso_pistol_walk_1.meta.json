@@ -23,35 +23,36 @@
     "offsets": {
         "torso": {
             "primary_hand": {
-                "pos": [66, 23],
-                "rotation": 0.0
+                "pos": [26, 27],
+                "rotation": 45.0
             },
             "secondary_hand": {
                 "pos": [0, 0],
                 "rotation": 0.0
             },
             "back": {
-                "pos": [-15, 13],
-                "rotation": -42.1
+                "pos": [-14, -14],
+                "rotation": 43.68
             },
             "head": {
                 "pos": [0, 0],
-                "rotation": 0.0
+                "rotation": 45.0
             },
             "legs": {
                 "pos": [0, 0],
                 "rotation": 0.0
             },
             "shoulder": {
-                "pos": [-12, -16],
-                "rotation": 137.69
+                "pos": [15, -13],
+                "rotation": -136.53
             },
             "secondary_shoulder": {
-                "pos": [15, 15],
-                "rotation": 142.81
+                "pos": [-14, 16],
+                "rotation": -131.41
             },
             "strafe_facing_offset": -90.0,
-            "is_akimbo": false
+            "is_akimbo": false,
+            "body_rotation": -45.0
         },
         "legs": {
             "foot": [0, 0]
@@ -106,9 +107,9 @@
             }
         },
         "non_standard_shape": {
-            "source_polygon": [[-34.0, -19.0], [-29.0, -35.0], [-22.0, -42.0], [-18.0, -45.0], [-5.0, -40.0], [4.0, -31.0], [16.0, 1.0], [25.0, 9.0], [62.0, 20.0], [63.0, 28.0], [12.0, 35.0], [-2.0, 27.0], [-23.0, 5.0]
+            "source_polygon": [[-25.0, 4.0], [8.0, -29.0], [26.0, -26.0], [38.0, -16.0], [41.0, 2.0], [31.0, 34.0], [-10.0, 40.0], [-28.0, 20.0]
             ],
-            "convex_partition": [7, 8, 9, 10, 11, 7, 6, 7, 11, 12, 6, 3, 4, 5, 6, 12, 0, 1, 2, 3]
+            "convex_partition": []
         }
     }
 }
