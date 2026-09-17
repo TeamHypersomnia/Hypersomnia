@@ -4027,7 +4027,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ZAMIEC, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f, false);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false);
 			meta.get<invariants::item>().standard_price = 2200;
 			set_chambering_duration_ms(meta, 600.f);
 
@@ -4040,7 +4040,7 @@ namespace test_flavours {
 
 			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
 			mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
-			item.draw_over_hands = true;
+			item.draw_over_hands = false;
 			item.draw_under_hands_in_akimbo = true;
 		}
 
@@ -4085,7 +4085,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYBERSPRAY, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.6f);
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f, 0.f, false);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().standard_price = 2400;
 			set_chambering_duration_ms(meta, 300.f);
 
@@ -4100,7 +4100,7 @@ namespace test_flavours {
 			mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
 
 			item.gratis_ammo_pieces_with_first = 4;
-			item.draw_over_hands = true;
+			item.draw_over_hands = false;
 			item.draw_under_hands_in_akimbo = true;
 		}
 

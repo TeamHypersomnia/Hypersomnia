@@ -993,8 +993,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				}
 
 				case buy_menu_type::SUBMACHINE_GUNS: {
+					/*
+						No stance filter: for_each_smg already picks guns
+						with buy_type == SUBMACHINE_GUNS, and SMGs may use
+						either RIFLE_LIKE or PISTOL_LIKE stances.
+					*/
 					do_item_menu(
-						item_holding_stance::RIFLE_LIKE,
+						std::nullopt,
 						for_each_smg
 					);
 					break;
