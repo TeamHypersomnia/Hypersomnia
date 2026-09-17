@@ -53,7 +53,15 @@ struct non_standard_shape_widget {
 
 			const auto viewing_size = (is * zoom).operator ImVec2();
 
-			text("Image size: %x, zoom: %x\nHold CTRL to add vertices.\nHold Shift to delete vertices.\nHold Alt to show the convex partition.", is, zoom);
+			const auto collider_area = [&]() {
+				if (object.empty()) {
+					return is.area();
+				}
+
+				return static_cast<int>(std::abs(object.signed_area()));
+			}();
+
+			text("Image size: %x, zoom: %x\nCollider area: %x\nHold CTRL to add vertices.\nHold Shift to delete vertices.\nHold Alt to show the convex partition.", is, zoom, collider_area);
 
 			invisible_button_reset_cursor("###VertexSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);

@@ -47,6 +47,19 @@ struct basic_convex_partitioned_shape {
 		return source_polygon.empty();
 	}
 
+	T signed_area() const {
+		T s = 0;
+
+		for (std::size_t i = 0; i < source_polygon.size(); ++i) {
+			const auto& a = source_polygon[i];
+			const auto& b = source_polygon[(i + 1) % source_polygon.size()];
+
+			s += a.cross(b);
+		}
+
+		return s / 2;
+	}
+
 	bool take_vertices_one_after_another() const {
 		return convex_partition.empty();
 	}
