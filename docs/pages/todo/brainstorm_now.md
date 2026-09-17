@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- usunac define z tutoriala
-- przeplyw partikli w tym srodkowym kafelku
-	- i moze wiekszy padding?
-
 - swiecacy dev label
 - te public keye cale dla linuxiarzy
 

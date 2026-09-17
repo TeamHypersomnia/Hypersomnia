@@ -225,14 +225,12 @@
             "id": "Layer 28",
             "nodes": [
                 "minimap_marker",
-                "zoom_4x",
                 "zoom_1x",
                 "zoom_0.8x",
                 "zoom_0.75x",
                 "zoom_0.7x",
                 "zoom_0.6x",
                 "zoom_0.5x",
-                "zoom_4x_outline",
                 "zoom_1x_outline",
                 "zoom_0.8x_outline",
                 "zoom_0.75x_outline",
@@ -1469,12 +1467,6 @@
             "size": [64, 64]
         },
         {
-            "id": "zoom_4x",
-            "type": "@zoom",
-            "pos": [-640.0, 2944.0],
-            "size": [64, 64]
-        },
-        {
             "id": "zoom_0.75x",
             "type": "@zoom",
             "pos": [-640.0, 3712.0],
@@ -1532,12 +1524,6 @@
             "id": "zoom_1x_outline",
             "type": "@pad_outline",
             "pos": [-640.0, 3200.0],
-            "color": [255, 0, 255, 20]
-        },
-        {
-            "id": "zoom_4x_outline",
-            "type": "@pad_outline",
-            "pos": [-640.0, 2944.0],
             "color": [255, 0, 255, 20]
         },
         {

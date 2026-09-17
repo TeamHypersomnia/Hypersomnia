@@ -81,7 +81,7 @@
         },
         "item": {
             "hand_anchor": {
-                "pos": [-9, 5],
+                "pos": [-15, 3],
                 "rotation": 0.0
             },
             "back_anchor": {

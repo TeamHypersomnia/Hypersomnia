@@ -5032,7 +5032,6 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 450.f);
 			only_allow_mag(meta, test_container_items::BULWARK_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
-			meta.get<invariants::item>().draw_over_hands = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("2.5");

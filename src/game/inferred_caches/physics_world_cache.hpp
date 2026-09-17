@@ -539,13 +539,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		else {
 			const image_shape_type* non_standard_shape = nullptr;
 
-			/*
-				The raw, unflipped body_rotation of the stance frame.
-				The mirroring in from_convex_partition negates it implicitly,
-				as flip(rotate(r, v)) == rotate(-r, flip(v)).
-			*/
-			real32 stance_shape_rotation = 0.f;
-
 			const auto additional_rotation = [&]() {
 				const auto& typed_self = handle;
 
@@ -561,7 +554,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 							if (!offsets.non_standard_shape.empty()) {
 								non_standard_shape = &offsets.non_standard_shape;
-								stance_shape_rotation = offsets.torso.body_rotation;
 							}
 
 							auto considered_offsets = offsets.torso;
@@ -588,18 +580,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			}();
 
 			if (non_standard_shape) {
-				if (stance_shape_rotation != 0.f) {
-					auto rotated_shape = *non_standard_shape;
-
-					for (auto& v : rotated_shape.source_polygon) {
-						v.rotate(stance_shape_rotation);
-					}
-
-					from_convex_partition(rotated_shape);
-				}
-				else {
-					from_convex_partition(*non_standard_shape);
-				}
+				from_convex_partition(*non_standard_shape);
 			}
 			else {
 				from_box_shape(handle.get_logical_size(), additional_rotation);

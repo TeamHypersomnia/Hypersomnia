@@ -23,36 +23,35 @@
     "offsets": {
         "torso": {
             "primary_hand": {
-                "pos": [22, 23],
-                "rotation": 45.0
+                "pos": [60, 22],
+                "rotation": 0.0
             },
             "secondary_hand": {
                 "pos": [0, 0],
                 "rotation": 0.0
             },
             "back": {
-                "pos": [-14, -14],
-                "rotation": 43.68
+                "pos": [-13, 12],
+                "rotation": -38.67
             },
             "head": {
-                "pos": [0, 0],
-                "rotation": 45.0
+                "pos": [-1, -1],
+                "rotation": 5.64
             },
             "legs": {
                 "pos": [0, 0],
                 "rotation": 0.0
             },
             "shoulder": {
-                "pos": [15, -13],
-                "rotation": -136.53
+                "pos": [-8, -17],
+                "rotation": 142.73
             },
             "secondary_shoulder": {
-                "pos": [-14, 16],
-                "rotation": -131.41
+                "pos": [15, 14],
+                "rotation": 147.85
             },
             "strafe_facing_offset": -90.0,
-            "is_akimbo": false,
-            "body_rotation": -45.0
+            "is_akimbo": false
         },
         "legs": {
             "foot": [0, 0]
