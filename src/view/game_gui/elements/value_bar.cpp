@@ -140,19 +140,16 @@ void value_bar::draw(
 
 	output.aabb_lt(game_images.at(icon_tex).diffuse, absolute.get_position());
 
-	const auto total_spacing = this_id->border.get_total_expansion();
-
 	{
 		const auto full_bar_rect_bordered = get_bar_rect_with_borders(context, this_id, absolute);
-		const auto value_bar_rect = get_value_bar_rect(context, this_id, absolute);
 
 		auto bar_col = get_bar_col(context, this_id);
 		bar_col.a = icon_col.a;
 
 		const auto vertical_index = this_id.get_location().vertical_index;
-			
+
 		const auto& sentience = context.get_subject_entity().get<components::sentience>();
-		
+
 		const auto current_value_ratio = visit_by_vertical_index(
 			sentience,
 			cosm,
@@ -167,43 +164,48 @@ void value_bar::draw(
 			}
 		);
 
-		auto current_value_bar_rect = value_bar_rect;
+		/* The same look scheme the tutorial's progress bars use. */
 
-		const auto bar_width = std::max(0, static_cast<int>(current_value_bar_rect.w() * current_value_ratio));
+		auto appearance = hud_bar_appearance();
+		appearance.color = bar_col;
+		appearance.border_w = this_id->border.width;
+		appearance.particle_tint = 0.12f;
+		//appearance.splits = 3;
+		//appearance.split_gap = 1;
+		appearance.label_background = true;
+		appearance.label_align_right = true;
+		appearance.label_padding = vec2i(10, 4);
 
-		current_value_bar_rect.w(static_cast<float>(bar_width));
+		/*
+			The brick is too narrow for the border's value sweep to read -
+			keep its border constant, and always a plain 1px.
+		*/
+		appearance.label_border_w = 1;
+		appearance.label_border_shows_value = false;
 
-		output.aabb(current_value_bar_rect, bar_col);
-		output.border(value_bar_rect, bar_col, this_id->border);
-
-		/* Draw the value label if it is a meter, draw nothing if perk */
+		/* The value label - only meters have one, perks do not. */
 
 		visit_by_vertical_index(sentience, cosm, vertical_index,
 			[&](const auto& meter, auto) {
-				const auto value = meter.get_value();
-
-				print_stroked(
-					output,
-					vec2{ full_bar_rect_bordered.r + total_spacing * 2, full_bar_rect_bordered.t - total_spacing },
-					{ typesafe_sprintf("%x", static_cast<int>(value)),{ context.get_gui_font(), white } }
-				);
+				appearance.label = typesafe_sprintf("%x", static_cast<int>(meter.get_value()));
+				appearance.label_widest_text = typesafe_sprintf("%x", static_cast<int>(meter.get_maximum_value()));
 			},
 
 			[](auto...) { return; }
 		);
 
-		if (/* should_draw_particles */ bar_width >= 1) {
-			for (const auto& p : this_id->particles) {
-				const auto particle_col = bar_col + rgba(30, 30, 30, 0);
-			
-				output.aabb_lt_clipped(
-					necessarys.at(p.image_id),
-					value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos,
-					current_value_bar_rect,
-					particle_col
-				);
-			}
-		}
+		::draw_hud_bar(
+			output,
+			necessarys,
+			appearance,
+			full_bar_rect_bordered,
+			current_value_ratio,
+			cosm.get_total_seconds_passed(),
+			context.dependencies.white_damage_highlight_secs,
+			this_id->highlight,
+			std::addressof(this_id->particles_state),
+			std::addressof(context.get_gui_font())
+		);
 	}
 }
 
@@ -217,11 +219,14 @@ ltrb value_bar::get_bar_rect_with_borders(
 	auto icon_tex = get_bar_icon(context, this_id);
 	icon_rect.set_size(context.get_game_images().at(icon_tex).get_original_size());
 
-	const auto max_value_caption_size = get_text_bbox({ "99999", context.get_gui_font() });
+	/*
+		The bar stretches to the row's very right edge - the value label
+		is drawn centered over the bar, so no caption space is reserved.
+	*/
 
 	auto value_bar_rect = icon_rect;
 	value_bar_rect.set_position(icon_rect.get_position() + vec2(this_id->border.get_total_expansion() + icon_rect.get_size().x, 0));
-	value_bar_rect.r = absolute.r - max_value_caption_size.x;
+	value_bar_rect.r = absolute.r;
 
 	return value_bar_rect;
 }
@@ -236,44 +241,11 @@ ltrb value_bar::get_value_bar_rect(
 }
 
 void value_bar::advance_elements(
-	const game_gui_context context,
-	const this_pointer this_id,
-	const augs::delta dt
+	const game_gui_context,
+	const this_pointer,
+	const augs::delta
 ) {
-	this_id->seconds_accumulated += dt.in_seconds();
-
-	if (this_id->particles.size() > 0) {
-		randomization rng{ static_cast<rng_seed_type>(this_id.get_location().vertical_index + context.get_cosmos().get_total_seconds_passed() * 1000) };
-
-		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
-
-		while (this_id->seconds_accumulated > 0.f) {
-			for (auto& p : this_id->particles) {
-				const auto action = rng.randval(0, 8);
-
-				if (action == 0) {
-					const auto y_dir = rng.randval(0, 1);
-
-					if (y_dir == 0) {
-						++p.relative_pos.y;
-					}
-					else {
-						--p.relative_pos.y;
-					}
-				}
-				
-				++p.relative_pos.x;
-
-				p.relative_pos.y = std::max(0, p.relative_pos.y);
-				p.relative_pos.x = std::max(0, p.relative_pos.x);
-
-				p.relative_pos.x %= static_cast<int>(value_bar_size.x + 12);
-				p.relative_pos.y %= static_cast<int>(value_bar_size.y + 12);
-			}
-
-			this_id->seconds_accumulated -= 1.f / 15;
-		}
-	}
+	/* The shared HUD bar drawing advances its own particles at draw time. */
 }
 
 void value_bar::respond_to_events(
@@ -403,14 +375,19 @@ void value_bar::rebuild_layouts(
 		const auto& minimap = context.dependencies.drawing.minimap;
 
 		if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-			return minimap.size + minimap_screen_margin_v;
+			return minimap.size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
 		}
 
 		return 0;
 	}();
 
 	const auto bars_bottom = screen_size.y - bottom_pad - rb_minimap_shift;
-	const auto row_pitch = static_cast<int>(icon_size.y) + 4;
+
+	/*
+		Pushed apart a little so that the centered value labels' backdrops
+		do not overlap the neighboring rows.
+	*/
+	const auto row_pitch = static_cast<int>(icon_size.y) + 17;
 
 	const auto lt = vec2i(
 		screen_size.x - minimap_screen_margin_v - with_bar_size.x,
@@ -420,26 +397,4 @@ void value_bar::rebuild_layouts(
 	auto& rc = this_id->rc;
 	rc.set_position(lt);
 	rc.set_size(with_bar_size);
-
-	thread_local randomization rng;
-
-	if (this_id->particles.empty()) {
-		const auto value_bar_size = get_value_bar_rect(context, this_id, rc).get_size();
-
-		constexpr auto num_particles_to_spawn = 40u;
-
-		for (size_t i = 0; i < num_particles_to_spawn; ++i) {
-			const auto mats = std::array<assets::necessary_image_id, 3> {
-				assets::necessary_image_id::WANDERING_CROSS,
-				assets::necessary_image_id::BLINK_1,
-				static_cast<assets::necessary_image_id>(static_cast<int>(assets::necessary_image_id::BLINK_1) + 2),
-			};
-
-			effect_particle new_part;
-			new_part.relative_pos = rng.randval(vec2(0, 0), value_bar_size);
-			new_part.image_id = rng.choose_from(mats);
-
-			this_id->particles.push_back(new_part);
-		}
-	}
 }

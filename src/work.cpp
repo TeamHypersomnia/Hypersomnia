@@ -4956,7 +4956,8 @@ work_result work(
 						viewing_config.drawing,
 						viewing_config.inventory_gui_controls,
 						get_camera_eye(viewing_config),
-						get_drawer_for(chosen_renderer)
+						get_drawer_for(chosen_renderer),
+						viewing_config.damage_indication.white_damage_highlight_secs
 					}
 				};
 			};

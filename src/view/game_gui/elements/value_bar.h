@@ -5,6 +5,7 @@
 #include "augs/gui/appearance_detector.h"
 
 #include "view/game_gui/game_gui_context.h"
+#include "view/hud_bar_drawing.h"
 
 struct value_bar : game_gui_rect_node {
 	using this_pointer = dereferenced_location<value_bar_in_character_gui>;
@@ -12,17 +13,12 @@ struct value_bar : game_gui_rect_node {
 	using gui_entropy = typename game_gui_rect_node::gui_entropy;
 
 	augs::gui::appearance_detector detector;
-	
-	struct effect_particle {
-		vec2i relative_pos;
-		assets::necessary_image_id image_id;
-	};
 
-	border_input border = { 1, 1 };
-	
-	float seconds_accumulated = 0.f;
+	border_input border = { 2, 1 };
 
-	std::vector<effect_particle> particles;
+	/* Draw-time caches of the shared HUD bar drawing. */
+	mutable hud_bar_particles_state particles_state;
+	mutable hud_bar_highlight_state highlight;
 
 	value_bar();
 

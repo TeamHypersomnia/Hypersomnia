@@ -21,4 +21,7 @@ struct viewing_game_gui_context_dependencies {
 	const inventory_gui_intent_map input_information;
 	const camera_eye camera;
 	const augs::drawer_with_default output;
+
+	/* For the value bars' white flash on increase. */
+	const float white_damage_highlight_secs = 0.11f;
 };

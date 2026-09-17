@@ -23,6 +23,7 @@
 #include "augs/log.h"
 
 #include "view/mode_gui/arena/arena_context_tip.h"
+#include "augs/templates/for_each_std_get.h"
 #include "augs/drawing/sprite_helpers.h"
 
 #include "augs/math/simple_calculations.h"
@@ -830,7 +831,7 @@ void arena_gui_state::draw_mode_gui(
 					const auto& minimap = in.config.drawing.minimap;
 
 					if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-						return minimap.size + minimap_screen_margin_v;
+						return minimap.size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
 					}
 
 					return 0;
@@ -858,12 +859,89 @@ void arena_gui_state::draw_mode_gui(
 					+ calc_size("100").x
 				;
 
-				const auto money_bar_l = in.screen_size.x - 10 - 184 + border_expansion;
-				const auto money_bar_r = align_end_x - calc_size("$20000").x - 6;
+				/*
+					The money bar sits exactly one row above the character's
+					value bars, mirroring their layout math: the same bottom
+					padding, row pitch and the count of the enabled bars.
+				*/
 
-				const auto money_row_y = in.screen_size.y + cfg.money_indicator_pos.y - rb_minimap_shift;
+				const auto& cosm = mode_input.cosm;
 
-				const auto money_indicator_pos = vec2i(align_end_x, money_row_y);
+				/*
+					The on-screen value bars belong to the viewed character -
+					when spectating, that is the spectated player's, not ours.
+				*/
+
+				const auto bars_character_id = [&]() {
+					if (spectator.active) {
+						if (const auto spectated = typed_mode.find(spectator.now_spectating)) {
+							return spectated->controlled_character_id;
+						}
+					}
+
+					return p->controlled_character_id;
+				}();
+
+				const auto num_value_bars = [&]() {
+					auto result = 0;
+
+					if (const auto character = cosm[bars_character_id]) {
+						if (const auto* const sentience = character.template find<components::sentience>()) {
+							const auto& clk = cosm.get_clock();
+
+							for_each_through_std_get(sentience->meters, [&](const auto& meter) {
+								if (meter.is_enabled()) {
+									++result;
+								}
+							});
+
+							for_each_through_std_get(sentience->perks, [&](const auto& perk) {
+								if (perk.timing.is_enabled(clk)) {
+									++result;
+								}
+							});
+						}
+					}
+
+					return result;
+				}();
+
+				const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
+				const auto value_bar_h = 16;
+				const auto row_pitch = value_bar_h + 17;
+
+				/* Set a bit further apart from the value bars' stack. */
+				const auto money_extra_gap = 6;
+
+				const auto bars_bottom = in.screen_size.y - bottom_pad - rb_minimap_shift;
+				const auto money_row_top = bars_bottom - (num_value_bars + 1) * row_pitch - money_extra_gap;
+
+				/* The bar drawing below centers the bar at money_row_y + line_height / 2. */
+				const auto money_row_y = money_row_top + value_bar_h / 2 - static_cast<int>(line_height) / 2;
+
+				/*
+					Mirrors the value bars' geometry: their 16px icons,
+					4px icon padding, 180px bars and the {2, 1} border.
+				*/
+
+				const auto value_bar_icon_w = 16;
+				const auto value_bar_row_w = value_bar_icon_w + 4 + 180;
+				const auto value_bar_expansion = 3;
+
+				const auto bar_l = static_cast<float>(in.screen_size.x - minimap_screen_margin_v - value_bar_row_w + value_bar_icon_w + value_bar_expansion);
+				const auto bar_r = static_cast<float>(in.screen_size.x - minimap_screen_margin_v);
+
+				/*
+					The award indicators stack above the bar's right end,
+					over the amount brick capping the bar there.
+				*/
+
+				const auto money_indicator_pos = vec2i(
+					static_cast<int>(bar_r) + 1,
+					money_row_top - static_cast<int>(line_height) - 8
+				);
+
+				(void)align_end_x;
 
 				{
 					const auto& cosm = mode_input.cosm;
@@ -905,18 +983,12 @@ void arena_gui_state::draw_mode_gui(
 					}
 				}
 
-				const auto money_text = typesafe_sprintf("$%x", drawn_current_money);
-				const auto money_text_w = calc_size(money_text).x;
-
-				print_stroked(
-					general_drawer,
-					money_indicator_pos - vec2i(money_text_w, 0),
-					colored(money_text, cfg.money_bar_color)
-				);
-
 				/*
-					The money bar - like a health bar, but without an icon.
+					The money bar - drawn with the same look scheme
+					the character's value bars use, and aligned width-wise
+					with them exactly, as if it were another value bar.
 					Maximum is the money cap of $20000.
+					The amount is drawn centered over the bar.
 				*/
 
 				{
@@ -926,10 +998,6 @@ void arena_gui_state::draw_mode_gui(
 					/* Slightly lower than the value bars (their 16px icons). */
 					const auto bar_h = 14;
 
-					const auto expansion = border_expansion;
-
-					const auto bar_l = static_cast<float>(money_bar_l);
-					const auto bar_r = static_cast<float>(money_bar_r);
 					const auto bar_center_y = static_cast<float>(money_row_y) + line_height / 2.0f;
 
 					const auto bordered_rect = ltrb(
@@ -939,18 +1007,42 @@ void arena_gui_state::draw_mode_gui(
 						bar_center_y + bar_h / 2
 					);
 
-					const auto full_fill_rect = ltrb(bordered_rect).expand_from_center({
-						static_cast<float>(-expansion),
-						static_cast<float>(-expansion)
-					});
+					{
+						/*
+							The amount brick caps the bar's right end,
+							just like the value bars' number bricks.
+						*/
 
-					auto fill_rect = full_fill_rect;
-					fill_rect.r = fill_rect.l + std::max(0.0f, fill_rect.w() * ratio);
+						auto appearance = hud_bar_appearance();
+						appearance.color = cfg.money_bar_color;
+						appearance.border_w = 2;
+						appearance.particle_tint = 0.2f;
+						appearance.label = typesafe_sprintf("$%x", drawn_current_money);
+						appearance.label_background = true;
+						appearance.label_align_right = true;
+						appearance.label_widest_text = "$20000";
+						appearance.label_padding = vec2i(10, 4);
+						appearance.label_border_w = 1;
+						appearance.label_border_shows_value = false;
 
-					const auto bar_col = cfg.money_bar_color;
+						/* Darkened further, for the amount to read better. */
+						auto darker_backdrop = rgba(cfg.money_bar_color) * 0.25f;
+						darker_backdrop.a = 230;
+						appearance.label_background_color = darker_backdrop;
 
-					general_drawer.aabb(fill_rect, bar_col);
-					general_drawer.border(full_fill_rect, bar_col, money_border);
+						::draw_hud_bar(
+							general_drawer,
+							in.necessary_images,
+							appearance,
+							bordered_rect,
+							ratio,
+							mode_input.cosm.get_total_seconds_passed(),
+							in.config.damage_indication.white_damage_highlight_secs,
+							money_bar_highlight,
+							std::addressof(money_bar_particles),
+							std::addressof(in.gui_fonts.gui)
+						);
+					}
 
 					/*
 						The gold coin icon to the left of the bar,
@@ -963,26 +1055,8 @@ void arena_gui_state::draw_mode_gui(
 
 						general_drawer.aabb_lt(
 							coin_tex,
-							vec2(bar_l - expansion - coin_size.x, bar_center_y - coin_size.y / 2.0f)
+							vec2(bar_l - value_bar_expansion - coin_size.x, bar_center_y - coin_size.y / 2.0f)
 						);
-					}
-
-					/* Sparkles flowing through the filled part. */
-
-					if (fill_rect.w() > 4.0f) {
-						const auto secs = mode_input.cosm.get_total_seconds_passed();
-
-						for (int s = 0; s < 5; ++s) {
-							const auto phase = static_cast<float>(std::fmod(secs * 20.0 + s * 41.0, static_cast<double>(fill_rect.w() - 2.0f)));
-							const auto wobble = std::sin(static_cast<float>(secs) * 3.0f + s * 1.7f) * (bar_h / 2 - 3);
-
-							const auto sparkle_pos = vec2(fill_rect.l + 1 + phase, bar_center_y + wobble);
-
-							auto sparkle_col = white;
-							sparkle_col.a = 180;
-
-							general_drawer.aabb(ltrb::center_and_size(sparkle_pos, vec2::square(2)), sparkle_col);
-						}
 					}
 				}
 			}
