@@ -372,11 +372,19 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		flips.vertically = !flips.vertically;
 	}
 
-	const bool flip_order = flips.vertically != flips.horizontally;
-
 	auto from_convex_partition = [&](auto shape) {
-		shape.offset_vertices(connection.shape_offset);
+		/*
+			Read the flips lazily as they might still be toggled
+			by the torso stance logic before this is called.
+		*/
+		const bool flip_order = flips.vertically != flips.horizontally;
 
+		/*
+			Mirror the vertices in the shape's local space,
+			BEFORE offsetting: connection.shape_offset is already mirrored
+			by the attachment offset composition, so flipping afterwards
+			would mirror the offset twice.
+		*/
 		if (flips.horizontally) {
 			for (auto& v : shape.source_polygon) {
 				v.neg_x();
@@ -388,6 +396,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				v.neg_y();
 			}
 		}
+
+		shape.offset_vertices(connection.shape_offset);
 
 		unsigned ci = 0;
 
@@ -550,6 +560,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 							if (typed_self.only_secondary_holds_item()) {
 								considered_offsets.flip_vertically();
+
+								/*
+									Mirror the custom collider shape as well,
+									as the torso sprite is drawn flipped.
+								*/
+								flips.vertically = !flips.vertically;
 							}
 
 							considered_offsets.apply_body_rotation();
