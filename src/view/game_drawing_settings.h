@@ -99,6 +99,21 @@ struct minimap_settings {
 	bool operator==(const minimap_settings& b) const = default;
 
 	/*
+		Deliberately outside the introspector so they cannot be set from
+		config files - these are filled at runtime by setups that draw
+		custom HUD around the minimap (e.g. the tutorial's progress bars).
+
+		extra_bottom_margin pushes the minimap up when it sits in a bottom
+		corner, to make room for HUD drawn at the very bottom of the screen.
+
+		extra_hud_space is the height of the HUD block drawn right at the
+		minimap's edge (e.g. the tutorial's stage bar) - other elements
+		sharing the corner have to make room for it as well.
+	*/
+	int extra_bottom_margin = 0;
+	int extra_hud_space = 0;
+
+	/*
 		Whether the minimap permanently occupies the given corner,
 		so the other HUD elements have to make room for it there.
 	*/
@@ -130,6 +145,10 @@ struct game_drawing_settings {
 	bool draw_pe_bar = false;
 	bool draw_character_status = true;
 	bool draw_remaining_ammo = true;
+
+	bool draw_value_on_aura_bar = true;
+	bool aura_bar_value_as_percent = false;
+	int aura_bar_percent_decimal_places = 1;
 
 	bool draw_offscreen_indicators = true;
 	bool draw_offscreen_callouts = true;
