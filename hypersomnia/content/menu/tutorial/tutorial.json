@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-15 20:14:26.753644 UTC"
+        "version_timestamp": "2026-09-16 19:36:37.334811 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1378,7 +1378,6 @@
         },
         {
             "id": "Level11",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level11 island",
                 "vent (45)",
@@ -1443,12 +1442,14 @@
                 "obs11",
                 "obs11 (3)",
                 "kill11 (2)",
+                "tip3_1 (72)",
                 "tip3_1 (32)",
                 "entry10",
                 "vent (49)",
                 "vent (44)",
                 "vent (48)",
                 "vent (47)",
+                "dev_floor_256 (148)",
                 "dev_floor_256 (65)",
                 "Strong lamp (22)",
                 "Strong lamp (23)"
@@ -1456,7 +1457,6 @@
         },
         {
             "id": "Level9",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level9 island",
                 "point_light (139)",
@@ -1542,11 +1542,13 @@
                 "poseidon (2)",
                 "poseidon (1)",
                 "poseidon",
+                "tip3_1 (73)",
                 "tip3_1 (29)",
                 "tip3_1 (25)",
                 "tip3_1 (24)",
                 "tip3_1 (71)",
                 "tip3_1 (13)",
+                "dev_floor_256 (149)",
                 "dev_floor_256 (67)",
                 "dev_floor_256 (58)",
                 "dev_floor_256 (57)",
@@ -1855,11 +1857,11 @@
         },
         {
             "id": "Level3",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level3 island",
                 "hazard (6)",
                 "tip3_1",
+                "tip3_2",
                 "entry3",
                 "exit3",
                 "point_light (5)",
@@ -1869,6 +1871,7 @@
                 "vent (17)",
                 "vent (18)",
                 "dev_floor_256 (15)",
+                "dev_floor_256 (147)",
                 "dev_floor_256 (16)",
                 "dev_floor_256 (17)",
                 "Strong lamp (6)",
@@ -1878,8 +1881,8 @@
         },
         {
             "id": "Level2",
-            "is_open_in_editor": false,
             "nodes": [
+                "dev_floor_256 (146)",
                 "Level2 island",
                 "point_light (3)",
                 "point_light (2)",
@@ -1893,6 +1896,7 @@
                 "hazard (3)",
                 "hazard (1)",
                 "hazard",
+                "tip2_1 (8)",
                 "tip2_1 (3)",
                 "tip2_1 (2)",
                 "tip2_1",
@@ -3334,7 +3338,7 @@
         {
             "id": "obs11 (4)",
             "type": "@materials/wood.png",
-            "pos": [47424.0, 12352.0],
+            "pos": [47424.0, 12480.0],
             "size": [1536, 128]
         },
         {
@@ -3496,8 +3500,8 @@
         {
             "id": "obs12",
             "type": "@materials/glass.png",
-            "pos": [38912.0, 6719.99951171875],
-            "size": [128, 384]
+            "pos": [38912.0, 6783.99951171875],
+            "size": [128, 256]
         },
         {
             "id": "obs12 (1)",
@@ -3509,7 +3513,7 @@
         {
             "id": "obs12 (2)",
             "type": "@materials/glass.png",
-            "pos": [39072.0, 6592.0],
+            "pos": [39072.0, 6719.99951171875],
             "rotation": 90.0,
             "size": [128, 192]
         },
@@ -3523,7 +3527,7 @@
         {
             "id": "obs12 (4)",
             "type": "@yellow_barrier",
-            "pos": [38400.0, 6559.9990234375],
+            "pos": [38400.0, 6687.9990234375],
             "rotation": -90.0,
             "size": [64, 896]
         },
@@ -3538,7 +3542,7 @@
         {
             "id": "obs12 (6)",
             "type": "@materials/glass.png",
-            "pos": [37728.0, 6592.0],
+            "pos": [37728.0, 6719.99951171875],
             "rotation": -90.0,
             "size": [128, 192],
             "flip_horizontally": true
@@ -3546,8 +3550,8 @@
         {
             "id": "obs12 (7)",
             "type": "@materials/glass.png",
-            "pos": [37888.0, 6719.99951171875],
-            "size": [128, 384],
+            "pos": [37888.0, 6783.99951171875],
+            "size": [128, 256],
             "flip_horizontally": true
         },
         {
@@ -6818,6 +6822,34 @@
             "type": "@advanced",
             "pos": [-23040.0, 27364.0],
             "color": [255, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (146)",
+            "type": "dev_floor_256",
+            "pos": [2176.0, 15360.0],
+            "size": [256, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (147)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 25216.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (148)",
+            "type": "dev_floor_256",
+            "pos": [47424.0, 12288.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (149)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 6528.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
         },
         {
             "id": "Strong lamp (1)",
@@ -10886,13 +10918,13 @@
         {
             "id": "kill12 (1)",
             "type": "team_spawn",
-            "pos": [39039.0, 6783.0],
+            "pos": [39105.0, 6847.0],
             "rotation": 90.0
         },
         {
             "id": "kill12",
             "type": "team_spawn",
-            "pos": [37761.0, 6783.0],
+            "pos": [37697.0, 6847.0],
             "rotation": 90.0
         },
         {
@@ -11587,11 +11619,11 @@
             "context_tip": "Running costs Stamina.\nWalk or stand still to regenerate Stamina faster."
         },
         {
-            "id": "tip3_1",
+            "id": "tip3_2",
             "type": "portal",
             "shape": "BOX",
-            "pos": [0.0, 27392.001953125],
-            "size": [1536, 2048],
+            "pos": [0.0, 25216.0],
+            "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -11613,7 +11645,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "{WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk silently over the blue floor!"
+            "context_tip": "Stealth is very important."
         },
         {
             "id": "entry3",
@@ -16968,6 +17000,122 @@
             "faction": "RESISTANCE",
             "pos": [0.0, -1407.999755859375],
             "size": [2304, 5503]
+        },
+        {
+            "id": "tip2_1 (8)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [2176.0, 15360.0009765625],
+            "size": [256, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Excellent work!"
+        },
+        {
+            "id": "tip3_1",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [0.0, 27392.001953125],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "{WALK_SILENTLY} to walk silently over the blue floor."
+        },
+        {
+            "id": "tip3_1 (72)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [47424.0, 12288.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Excellent!"
+        },
+        {
+            "id": "tip3_1 (73)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 6528.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Nice work!"
         }
     ]
 }
