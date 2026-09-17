@@ -7,11 +7,54 @@
 #include "view/viewables/regeneration/desaturations.h"
 
 augs::path_type get_path_in_cache(const augs::path_type& from_source_path) {
+	/*
+		The result must always stay within CACHE_DIR.
+
+		Note the source might come as an absolute path, e.g. resolved
+		through a symlink - a naive relative() against USER_DIR would then
+		produce a ..-ridden path escaping the cache, polluting the source's
+		own folder with the generated maps and their stamps.
+	*/
+
 	if (::begins_with(from_source_path.string(), OFFICIAL_CONTENT_DIR.string())) {
 		return CACHE_DIR / from_source_path;
 	}
 
-	return CACHE_DIR / std::filesystem::relative(from_source_path, USER_DIR);
+	auto is_within = [](const augs::path_type& p, const augs::path_type& root) {
+		const auto rel = p.lexically_relative(root);
+
+		return !rel.empty() && *rel.begin() != "..";
+	};
+
+	std::error_code ec;
+
+	const auto source = std::filesystem::weakly_canonical(from_source_path, ec);
+
+	if (!ec) {
+		const auto official = std::filesystem::weakly_canonical(OFFICIAL_CONTENT_DIR, ec);
+
+		if (!ec && is_within(source, official)) {
+			return CACHE_DIR / OFFICIAL_CONTENT_FOLDER_NAME / source.lexically_relative(official);
+		}
+
+		const auto user = std::filesystem::weakly_canonical(USER_DIR, ec);
+
+		if (!ec && is_within(source, user)) {
+			return CACHE_DIR / source.lexically_relative(user);
+		}
+	}
+
+	/* A foreign source: flatten it inside the cache, never escaping it. */
+
+	auto flattened = augs::path_type("foreign");
+
+	for (const auto& part : augs::path_type(from_source_path).relative_path()) {
+		if (part != ".." && part != ".") {
+			flattened /= part;
+		}
+	}
+
+	return CACHE_DIR / flattened;
 }
 
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
