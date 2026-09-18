@@ -126,6 +126,28 @@
             }
         },
         {
+            "path": "gfx/metropolis_head_icon.png",
+            "file_hash": "f5b2434feeea5ef7863753b9dc6e11cef51c2d313bb19b013ec02c235ef10f57",
+            "id": "@metropolis_logo",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255, 1.0]
+                ]
+            },
+            "size": [33, 26],
+            "stretch_when_resized": true
+        },
+        {
+            "path": "gfx/resistance_head_icon.png",
+            "file_hash": "3cb78cda6e076f6992026ad396f7c6bd0501808a8d91d70df5162be21fcf6655",
+            "id": "@resistance_logo",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255, 1.0]
+                ]
+            },
+            "size": [35, 30],
+            "stretch_when_resized": true
+        },
+        {
             "path": "gfx/zoom.png",
             "file_hash": "645cec995d9c9b8625f3111b59b0fcbfe1f79d5b13cc76afc72edb41f33ec705",
             "id": "@zoom",
@@ -755,6 +777,15 @@
                 "dev_wall_128",
                 "Water room floor-brighter",
                 "Water room floor-brighter (1)"
+            ]
+        },
+        {
+            "id": "faction_pads",
+            "nodes": [
+                "faction_resistance_outline",
+                "faction_metropolis_outline",
+                "faction_resistance",
+                "faction_metropolis"
             ]
         }
     ],
@@ -1467,6 +1498,28 @@
             "type": "@zoom",
             "pos": [-640.0, 3200.0],
             "size": [64, 64]
+        },
+        {
+            "id": "faction_resistance",
+            "type": "@resistance_logo",
+            "pos": [-2560.0, 2944.0]
+        },
+        {
+            "id": "faction_metropolis",
+            "type": "@metropolis_logo",
+            "pos": [-2816.0, 2944.0]
+        },
+        {
+            "id": "faction_resistance_outline",
+            "type": "@pad_outline",
+            "pos": [-2560.0, 2944.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "faction_metropolis_outline",
+            "type": "@pad_outline",
+            "pos": [-2816.0, 2944.0],
+            "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_4x",

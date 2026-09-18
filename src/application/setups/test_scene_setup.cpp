@@ -390,6 +390,7 @@ void test_scene_setup::restart_arena() {
 	character().get<components::movement>().flags = pre_movement_flags;
 
 	refresh_range_zoom_pads();
+	refresh_faction_pads();
 	refresh_tip_portals();
 }
 
@@ -1047,6 +1048,100 @@ void test_scene_setup::pre_solve(const logic_step step) {
 
 	do_tutorial_logic(step);
 	do_range_zoom_pads_logic(step);
+	do_faction_pads_logic(step);
+}
+
+/*
+	The pads are detected against the character's full collider geometry,
+	every step - portal contacts proved unreliable for the adjacent pads.
+
+	A pad activates the moment the character's collider touches its outline.
+	When two pads are touched at once, the one closer to the character's center wins.
+*/
+
+template <class P>
+static const P* find_best_touched_pad(
+	cosmos& cosm,
+	const entity_handle character,
+	const std::vector<P>& pads
+) {
+	const auto transform = character.find_logic_transform();
+
+	if (!transform.has_value()) {
+		return nullptr;
+	}
+
+	const auto si = cosm.get_si();
+
+	const P* best_pad = nullptr;
+	auto best_dist_sq = 0.0f;
+
+	for (const auto& pad : pads) {
+		const auto outline = cosm[pad.outline];
+
+		if (outline.dead()) {
+			continue;
+		}
+
+		const auto outline_transform = outline.find_logic_transform();
+
+		if (!outline_transform.has_value()) {
+			continue;
+		}
+
+		bool overlaps = false;
+
+		outline.template dispatch_on_having_all<components::sprite>(
+			[&](const auto& typed_outline) {
+				const auto pad_size = typed_outline.get_logical_size();
+
+				/*
+					The activation box is shrunk so that the character
+					has to visibly step onto the pad.
+				*/
+				const auto activation_margin = 10.0f;
+
+				b2PolygonShape pad_box;
+
+				pad_box.SetAsBox(
+					si.get_meters(std::max(1.0f, pad_size.x / 2 - activation_margin)),
+					si.get_meters(std::max(1.0f, pad_size.y / 2 - activation_margin))
+				);
+
+				/*
+					Exact test against the character's true physical hitbox
+					(the convex hull derived from the sprite),
+					skipping any sensor fixtures.
+				*/
+
+				::for_each_fixture(character, [&](const b2Fixture& fixture) -> std::optional<bool> {
+					if (fixture.IsSensor()) {
+						return std::nullopt;
+					}
+
+					if (::shape_overlaps_fixture(std::addressof(pad_box), si, *outline_transform, fixture).has_value()) {
+						overlaps = true;
+						return true;
+					}
+
+					return std::nullopt;
+				});
+			}
+		);
+
+		if (!overlaps) {
+			continue;
+		}
+
+		const auto dist_sq = (outline_transform->pos - transform->pos).length_sq();
+
+		if (best_pad == nullptr || dist_sq < best_dist_sq) {
+			best_pad = std::addressof(pad);
+			best_dist_sq = dist_sq;
+		}
+	}
+
+	return best_pad;
 }
 
 void test_scene_setup::do_range_zoom_pads_logic(const logic_step step) {
@@ -1061,90 +1156,8 @@ void test_scene_setup::do_range_zoom_pads_logic(const logic_step step) {
 		return;
 	}
 
-	/*
-		The pads are detected by the character's center against
-		the outlines' AABBs, every step - portal contacts proved
-		unreliable for the adjacent pads.
-	*/
-
-	const auto transform = character.find_logic_transform();
-
-	if (transform.has_value()) {
-		const auto si = cosm.get_si();
-
-		const range_zoom_pad* best_pad = nullptr;
-		auto best_dist_sq = 0.0f;
-
-		/*
-			Full-geometry test: a pad activates the moment the character's
-			collider touches its outline. When two pads are touched at once,
-			the one closer to the character's center wins.
-		*/
-
-		for (const auto& pad : range_zoom_pads) {
-			const auto outline = cosm[pad.outline];
-
-			if (outline.dead()) {
-				continue;
-			}
-
-			const auto outline_transform = outline.find_logic_transform();
-
-			if (!outline_transform.has_value()) {
-				continue;
-			}
-
-			bool overlaps = false;
-
-			outline.dispatch_on_having_all<components::sprite>(
-				[&](const auto& typed_outline) {
-					const auto pad_size = typed_outline.get_logical_size();
-
-					/*
-						The activation box is shrunk so that the character
-						has to visibly step onto the pad.
-					*/
-					const auto activation_margin = 10.0f;
-
-					b2PolygonShape pad_box;
-
-					pad_box.SetAsBox(
-						si.get_meters(std::max(1.0f, pad_size.x / 2 - activation_margin)),
-						si.get_meters(std::max(1.0f, pad_size.y / 2 - activation_margin))
-					);
-
-					/*
-						Exact test against the character's true physical hitbox
-						(the convex hull derived from the sprite),
-						skipping any sensor fixtures.
-					*/
-
-					::for_each_fixture(character, [&](const b2Fixture& fixture) -> std::optional<bool> {
-						if (fixture.IsSensor()) {
-							return std::nullopt;
-						}
-
-						if (::shape_overlaps_fixture(std::addressof(pad_box), si, *outline_transform, fixture).has_value()) {
-							overlaps = true;
-							return true;
-						}
-
-						return std::nullopt;
-					});
-				}
-			);
-
-			if (!overlaps) {
-				continue;
-			}
-
-			const auto dist_sq = (outline_transform->pos - transform->pos).length_sq();
-
-			if (best_pad == nullptr || dist_sq < best_dist_sq) {
-				best_pad = std::addressof(pad);
-				best_dist_sq = dist_sq;
-			}
-		}
+	{
+		const auto best_pad = ::find_best_touched_pad(cosm, character, range_zoom_pads);
 
 		if (best_pad != nullptr) {
 			const bool changed = !range_zoom_override.has_value() || *range_zoom_override != best_pad->zoom;
@@ -1168,6 +1181,125 @@ void test_scene_setup::do_range_zoom_pads_logic(const logic_step step) {
 			range_zoom_override.has_value()
 			&& *range_zoom_override == pad.zoom
 		;
+
+		if (const auto icon = cosm[pad.icon]) {
+			icon.dispatch_on_having_all<components::sprite>(
+				[&](const auto& typed_icon) {
+					typed_icon.template get<components::sprite>().colorize_neon = active ? rgba(0, 255, 0, 255) : pad.inactive_neon;
+				}
+			);
+		}
+
+		if (const auto outline = cosm[pad.outline]) {
+			outline.dispatch_on_having_all<components::sprite>(
+				[&](const auto& typed_outline) {
+					typed_outline.template get<components::sprite>().colorize = active ? rgba(0, 255, 0, 255) : pad.inactive_outline;
+				}
+			);
+		}
+	}
+}
+
+void test_scene_setup::refresh_faction_pads() {
+	faction_pads.clear();
+
+	if (is_tutorial()) {
+		return;
+	}
+
+	/*
+		Scans for node pairs named "faction_<lowercase faction name>" (the faction logo)
+		and "faction_<lowercase faction name>_outline" (the pad's outline).
+		Stepping on such a pad recreates the character as the given faction,
+		moving the whole equipment onto the new character.
+	*/
+
+	auto add_pad = [&](const std::string& name, const faction_type faction) {
+		auto pad = faction_pad();
+		pad.faction = faction;
+
+		if (const auto icon = find<editor_sprite_node>(name)) {
+			pad.icon = icon->scene_entity_id;
+
+			if (const auto icon_handle = scene.world[pad.icon]) {
+				icon_handle.dispatch_on_having_all<components::sprite>(
+					[&](const auto& typed_icon) {
+						pad.inactive_neon = typed_icon.template get<components::sprite>().colorize_neon;
+						pad.inactive_neon.a = 100;
+					}
+				);
+			}
+		}
+
+		if (const auto outline = find<editor_sprite_node>(name + "_outline")) {
+			pad.outline = outline->scene_entity_id;
+
+			if (const auto outline_handle = scene.world[pad.outline]) {
+				outline_handle.dispatch_on_having_all<components::sprite>(
+					[&](const auto& typed_outline) {
+						pad.inactive_outline = typed_outline.template get<components::sprite>().colorize;
+					}
+				);
+			}
+		}
+
+		if (pad.outline.is_set() && pad.icon.is_set()) {
+			faction_pads.push_back(pad);
+		}
+	};
+
+	add_pad("faction_metropolis", faction_type::METROPOLIS);
+	add_pad("faction_resistance", faction_type::RESISTANCE);
+}
+
+void test_scene_setup::do_faction_pads_logic(const logic_step step) {
+	if (faction_pads.empty()) {
+		return;
+	}
+
+	auto& cosm = scene.world;
+	const auto character = cosm[viewed_character_id];
+
+	if (character.dead()) {
+		return;
+	}
+
+	if (const auto best_pad = ::find_best_touched_pad(cosm, character, faction_pads)) {
+		if (best_pad->faction != character.get_official_faction()) {
+			const auto pad_faction = best_pad->faction;
+
+			get_arena_handle().on_mode_with_input(
+				[&]<typename M>(M& mode, const auto& input) {
+					if constexpr(std::is_same_v<test_mode, M>) {
+						const auto new_id = mode.change_player_faction(input, step, local_player_id, pad_faction);
+
+						if (const auto new_character = cosm[new_id]; new_character && new_id != viewed_character_id) {
+							viewed_character_id = new_id;
+
+							auto effect = range_pad_sound;
+
+							effect.start(
+								step,
+								sound_effect_start_input::at_listener(new_character),
+								always_predictable_v
+							);
+						}
+					}
+				}
+			);
+		}
+	}
+
+	const auto viewed_faction = [&]() {
+		if (const auto handle = cosm[viewed_character_id]) {
+			return handle.get_official_faction();
+		}
+
+		return faction_type::SPECTATOR;
+	}();
+
+	for (const auto& pad : faction_pads) {
+		const bool active = pad.faction == viewed_faction;
 
 		if (const auto icon = cosm[pad.icon]) {
 			icon.dispatch_on_having_all<components::sprite>(

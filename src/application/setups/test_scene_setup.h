@@ -82,6 +82,19 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	void refresh_range_zoom_pads();
 	void do_range_zoom_pads_logic(logic_step step);
 
+	struct faction_pad {
+		entity_id icon;
+		entity_id outline;
+		faction_type faction = faction_type::SPECTATOR;
+		rgba inactive_neon = rgba(255, 255, 255, 100);
+		rgba inactive_outline = rgba(255, 0, 255, 20);
+	};
+
+	std::vector<faction_pad> faction_pads;
+
+	void refresh_faction_pads();
+	void do_faction_pads_logic(logic_step step);
+
 	intercosm scene;
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
