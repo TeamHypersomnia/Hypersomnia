@@ -47,7 +47,14 @@ using portal_marker = editor_area_marker_node;
 	(the one congratulating on completing the basic tutorial),
 	so the advanced tutorial can be tested right away.
 */
-#define TEST_START_AT_TUTORIAL_FINISH_SCREEN 1
+#define TEST_START_AT_TUTORIAL_FINISH_SCREEN 0
+
+/*
+	Testing: when 1, the shooting range draws a test exp bar at the bottom,
+	filled by the character's horizontal movement - to interactively test
+	the HUD bar rendering.
+*/
+#define TEST_EXP_BAR_IN_RANGE 0
 
 /*
 	Level0..Level4 are the basic tutorial.
@@ -411,8 +418,8 @@ void test_scene_setup::refresh_tip_portals() {
 		last_ratio is kept, so a genuine increase across a level change still flashes.
 	*/
 
-	bottom_bar_highlight.at_secs = -1.0;
-	stage_bar_highlight.at_secs = -1.0;
+	bottom_bar_highlight.flashes.clear();
+	stage_bar_highlight.flashes.clear();
 
 	/*
 		On the finish screen, zero the trackers altogether,
@@ -1049,6 +1056,25 @@ void test_scene_setup::pre_solve(const logic_step step) {
 	do_tutorial_logic(step);
 	do_range_zoom_pads_logic(step);
 	do_faction_pads_logic(step);
+
+#if TEST_EXP_BAR_IN_RANGE
+	if (!is_tutorial()) {
+		/*
+			The test bar follows the character's horizontal velocity:
+			10% per second of moving at 500 units/s - rightward movement
+			adds, leftward subtracts.
+		*/
+
+		if (const auto character = scene.world[viewed_character_id]) {
+			if (const auto rigid_body = character.find<components::rigid_body>()) {
+				const auto velocity_x = rigid_body.get_velocity().x;
+
+				range_test_bar_ratio += velocity_x / 500.0f * 0.10f * step.get_delta().in_seconds();
+				range_test_bar_ratio = std::clamp(range_test_bar_ratio, 0.0f, 1.0f);
+			}
+		}
+	}
+#endif
 }
 
 /*
@@ -1487,6 +1513,106 @@ void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	arena_gui_base::draw_custom_gui(in);
 
 	draw_tutorial_hud(in);
+	draw_range_test_bar(in);
+}
+
+/*
+	The shared setup of the "aura" (exp-like) progress bars:
+	the tutorial's bottom bar and the range's test bar.
+*/
+
+static hud_bar_appearance make_aura_bar_appearance() {
+	auto appearance = hud_bar_appearance();
+
+	/* A less garish green than the pure rgba one. */
+	appearance.color = rgba(41, 130, 2, 255);
+	appearance.border_w = 2;
+	appearance.particle_tint = 0.12f;
+	appearance.multiple_flashes = true;
+	appearance.split_gap = 2;
+	appearance.label_background = true;
+	appearance.label_align_bottom = true;
+	appearance.label_border_w = 6;
+	appearance.label_unfilled_border_w = 2;
+	appearance.label_padding = vec2i(20, 12);
+
+	/* The dark inner outline drawn whole - in the unfilled part too. */
+	appearance.label_inner_outline_shows_value = false;
+
+	/* An opaque, solid backdrop under the label's text. */
+	appearance.label_background_color = rgba(25, 56, 9, 255);
+
+	return appearance;
+}
+
+/*
+	Stretched over the whole screen's width,
+	touching the bottom edge exactly - no padding.
+*/
+
+static ltrb make_aura_bar_rect(const vec2i screen_size) {
+	return ltrb(
+		0.0f,
+		static_cast<float>(screen_size.y - tutorial_bottom_bar_h_v),
+		static_cast<float>(screen_size.x),
+		static_cast<float>(screen_size.y)
+	);
+}
+
+static std::string make_aura_bar_label(
+	const game_drawing_settings& drawing,
+	const float ratio,
+	const int current_value,
+	const int max_value
+) {
+	if (!drawing.draw_value_on_aura_bar) {
+		return {};
+	}
+
+	if (drawing.aura_bar_value_as_percent) {
+		const auto decimal_places = std::clamp(drawing.aura_bar_percent_decimal_places, 0, 3);
+
+		auto percent_stream = std::ostringstream();
+		percent_stream << std::fixed << std::setprecision(decimal_places) << ratio * 100.0f << "%";
+
+		return percent_stream.str();
+	}
+
+	return typesafe_sprintf("%x/%x", current_value, max_value);
+}
+
+void test_scene_setup::draw_range_test_bar(const draw_setup_gui_input& in) {
+#if TEST_EXP_BAR_IN_RANGE
+	if (is_tutorial()) {
+		return;
+	}
+
+	const auto& cosm = scene.world;
+	const auto total_secs = cosm.get_total_seconds_passed(get_interpolation_ratio());
+
+	auto appearance = ::make_aura_bar_appearance();
+	appearance.splits = 20;
+
+	const auto max_value = 10000;
+	appearance.label = ::make_aura_bar_label(in.config.drawing, range_test_bar_ratio, static_cast<int>(range_test_bar_ratio * max_value), max_value);
+
+	::draw_hud_bar(
+		in.get_drawer(),
+		in.necessary_images,
+		appearance,
+		::make_aura_bar_rect(in.screen_size),
+		range_test_bar_ratio,
+		total_secs,
+		in.config.damage_indication.white_damage_highlight_secs,
+		bottom_bar_highlight,
+		std::addressof(bottom_bar_particles),
+		std::addressof(in.gui_fonts.gui),
+		std::addressof(bottom_bar_label_particles)
+	);
+#else
+	(void)in;
+	(void)range_test_bar_ratio;
+#endif
 }
 
 void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
@@ -1507,7 +1633,8 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 		hud_bar_highlight_state& highlight,
 		const hud_bar_appearance& appearance,
 		const ltrb bordered_rect,
-		const float ratio
+		const float ratio,
+		hud_bar_particles_state* const label_particles = nullptr
 	) {
 		::draw_hud_bar(
 			output,
@@ -1519,7 +1646,8 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 			highlight_base_secs,
 			highlight,
 			std::addressof(particles),
-			std::addressof(in.gui_fonts.gui)
+			std::addressof(in.gui_fonts.gui),
+			label_particles
 		);
 	};
 
@@ -1541,46 +1669,13 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 			touching the bottom edge exactly - no padding.
 		*/
 
-		const auto bar_rect = ltrb(
-			0.0f,
-			static_cast<float>(screen_size.y - tutorial_bottom_bar_h_v),
-			static_cast<float>(screen_size.x),
-			static_cast<float>(screen_size.y)
-		);
-
-		auto appearance = hud_bar_appearance();
-
-		/* A less garish green than the pure rgba one. */
-		appearance.color = rgba(41, 130, 2, 255);
-		appearance.border_w = 2;
-		appearance.particle_tint = 0.12f;
+		auto appearance = ::make_aura_bar_appearance();
 
 		/* One segment per element. */
 		appearance.splits = std::min(max_hud_bar_splits_v, static_cast<int>(current_tip_portals.size()));
-		appearance.split_gap = 2;
-		appearance.label_background = true;
-		appearance.label_align_bottom = true;
-		appearance.label_border_w = 4;
-		appearance.label_unfilled_border_w = 2;
-		appearance.label_padding = vec2i(14, 6);
+		appearance.label = ::make_aura_bar_label(in.config.drawing, ratio, num_visited, static_cast<int>(current_tip_portals.size()));
 
-		const auto& drawing = in.config.drawing;
-
-		if (drawing.draw_value_on_aura_bar) {
-			if (drawing.aura_bar_value_as_percent) {
-				const auto decimal_places = std::clamp(drawing.aura_bar_percent_decimal_places, 0, 3);
-
-				auto percent_stream = std::ostringstream();
-				percent_stream << std::fixed << std::setprecision(decimal_places) << ratio * 100.0f << "%";
-
-				appearance.label = percent_stream.str();
-			}
-			else {
-				appearance.label = typesafe_sprintf("%x/%x", num_visited, current_tip_portals.size());
-			}
-		}
-
-		draw_bar(bottom_bar_particles, bottom_bar_highlight, appearance, bar_rect, ratio);
+		draw_bar(bottom_bar_particles, bottom_bar_highlight, appearance, ::make_aura_bar_rect(screen_size), ratio, std::addressof(bottom_bar_label_particles));
 	}
 
 	if (const auto stage = get_tutorial_stage_num_and_count()) {

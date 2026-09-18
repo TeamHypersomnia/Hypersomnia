@@ -135,10 +135,18 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	int stage_block_height = 48;
 
 	hud_bar_particles_state bottom_bar_particles;
+	hud_bar_particles_state bottom_bar_label_particles;
 	hud_bar_particles_state stage_bar_particles;
+
+	/*
+		The shooting range's test bar - fills up with the character's
+		movement, to test the bar rendering interactively.
+	*/
+	float range_test_bar_ratio = 0.0f;
 
 	void refresh_tip_portals();
 	void draw_tutorial_hud(const draw_setup_gui_input&);
+	void draw_range_test_bar(const draw_setup_gui_input&);
 	std::optional<std::pair<uint32_t, uint32_t>> get_tutorial_stage_num_and_count() const;
 	bool is_tutorial_finish_level() const;
 	bool should_draw_bottom_progress_bar() const;
