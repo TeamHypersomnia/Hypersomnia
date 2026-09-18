@@ -838,28 +838,6 @@ void arena_gui_state::draw_mode_gui(
 				}();
 
 				/*
-					The money bar mirrors the geometry of the value bars below:
-					the same left edge, the same border style, and the caption
-					starting right at the bar's end - just like the health numbers.
-					The caption region is wider (up to 6 characters of "$20000").
-				*/
-
-				const auto money_border = border_input { 1, 1 };
-				const auto border_expansion = money_border.get_total_expansion();
-
-				/*
-					The money caption is right-aligned so that its last digit
-					lands in the same column as the last digit of a 3-digit
-					health value drawn by the bars below.
-				*/
-				const auto align_end_x =
-					in.screen_size.x - 10
-					- calc_size("99999").x
-					+ border_expansion * 2
-					+ calc_size("100").x
-				;
-
-				/*
 					The money bar sits exactly one row above the character's
 					value bars, mirroring their layout math: the same bottom
 					padding, row pitch and the count of the enabled bars.
@@ -908,7 +886,7 @@ void arena_gui_state::draw_mode_gui(
 
 				const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
 				const auto value_bar_h = 16;
-				const auto row_pitch = value_bar_h + 17;
+				const auto row_pitch = value_bar_h + 8;
 
 				/* Set a bit further apart from the value bars' stack. */
 				const auto money_extra_gap = 6;
@@ -940,8 +918,6 @@ void arena_gui_state::draw_mode_gui(
 					static_cast<int>(bar_r) + 1,
 					money_row_top - static_cast<int>(line_height) - 8
 				);
-
-				(void)align_end_x;
 
 				{
 					const auto& cosm = mode_input.cosm;
@@ -1009,8 +985,8 @@ void arena_gui_state::draw_mode_gui(
 
 					{
 						/*
-							The amount brick caps the bar's right end,
-							just like the value bars' number bricks.
+							A plain amount right of the bar,
+							just like the value bars' numbers.
 						*/
 
 						auto appearance = hud_bar_appearance();
@@ -1018,17 +994,9 @@ void arena_gui_state::draw_mode_gui(
 						appearance.border_w = 2;
 						appearance.particle_tint = 0.2f;
 						appearance.label = typesafe_sprintf("$%x", drawn_current_money);
-						appearance.label_background = true;
 						appearance.label_align_right = true;
 						appearance.label_widest_text = "$20000";
-						appearance.label_padding = vec2i(10, 4);
-						appearance.label_border_w = 1;
-						appearance.label_border_shows_value = false;
-
-						/* Darkened further, for the amount to read better. */
-						auto darker_backdrop = rgba(cfg.money_bar_color) * 0.25f;
-						darker_backdrop.a = 230;
-						appearance.label_background_color = darker_backdrop;
+						appearance.label_padding = vec2i(5, 0);
 
 						::draw_hud_bar(
 							general_drawer,

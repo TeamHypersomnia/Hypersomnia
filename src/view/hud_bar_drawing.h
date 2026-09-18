@@ -13,6 +13,7 @@
 #include "augs/graphics/rgba.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/misc/randomization.h"
+#include "augs/templates/container_templates.h"
 #include "augs/gui/text/printer.h"
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
@@ -63,6 +64,13 @@ struct hud_bar_appearance {
 	int split_gap = 0;
 
 	/*
+		Whether the gains keep up to 16 independent, concurrently fading
+		flashes (with continuous growth merging into one) - or restart
+		a single flash on every gain, like the value bars originally did.
+	*/
+	bool multiple_flashes = false;
+
+	/*
 		Renders the two middle segments as one, so that no division
 		hides under the centered label - the value still fills
 		by the original equal slices.
@@ -106,12 +114,9 @@ struct hud_bar_appearance {
 		columns of the side edges' thickness. Where it is cut away,
 		the backdrop's background shade shows in its place.
 		The dark 1px outline inside the border can sweep along with it.
-		With full_range_sweep, the value range maps linearly onto the band's
-		whole width instead of following the bar's actual fill edge.
 	*/
 	bool label_border_shows_value = true;
 	bool label_inner_outline_shows_value = true;
-	bool label_border_full_range_sweep = false;
 
 	/*
 		The unfilled part of the luminous border is still drawn,
@@ -125,14 +130,6 @@ struct hud_bar_appearance {
 		e.g. to darken it further for the text to read better.
 	*/
 	std::optional<rgba> label_background_color;
-
-	/*
-		When set, the label block is lifted so that this many pixels
-		of the bar's actual interior (not its borders) stay visible
-		below the backdrop's frame - with large values the text
-		may stick out entirely above the bar.
-	*/
-	std::optional<int> label_reveal_bottom_px;
 };
 
 struct hud_bar_particle {
@@ -151,37 +148,86 @@ struct hud_bar_particles_state {
 	to know when (and over what part) to draw the white flash.
 */
 
-struct hud_bar_highlight_state {
-	float last_ratio = -1.0f;
+struct hud_bar_flash {
 	float from_ratio = 0.0f;
 	float to_ratio = 0.0f;
 	double at_secs = -1.0;
+};
+
+struct hud_bar_highlight_state {
+	float last_ratio = -1.0f;
 	double last_update_secs = 0.0;
+
+	/*
+		Every gain spawns its own flash, so the earlier ones
+		keep fading out undisturbed when new gains arrive.
+	*/
+	std::vector<hud_bar_flash> flashes;
 };
 
 inline void update_hud_bar_highlight(
 	hud_bar_highlight_state& highlight,
 	const float ratio,
-	const double total_secs
+	const double total_secs,
+	const double flash_duration_secs,
+	const bool multiple_flashes
 ) {
 	if (total_secs < highlight.last_update_secs) {
 		/*
 			The cosmos' clock went back - a round restart or a demo seek.
 			Start tracking afresh: the jump back to the initial values
-			must not read as a gain, and a pending flash whose timestamp
-			comes from the previous timeline must not replay.
+			must not read as a gain, and the pending flashes whose timestamps
+			come from the previous timeline must not replay.
 		*/
 
-		highlight.at_secs = -1.0;
+		highlight.flashes.clear();
 		highlight.last_ratio = ratio;
 	}
 
 	highlight.last_update_secs = total_secs;
 
+	erase_if(highlight.flashes, [&](const hud_bar_flash& flash) {
+		return total_secs - flash.at_secs >= flash_duration_secs;
+	});
+
 	if (highlight.last_ratio >= 0.0f && ratio > highlight.last_ratio) {
-		highlight.at_secs = total_secs;
-		highlight.from_ratio = highlight.last_ratio;
-		highlight.to_ratio = ratio;
+		auto& flashes = highlight.flashes;
+
+		if (!multiple_flashes) {
+			/* The original behavior: every gain restarts the single flash. */
+
+			flashes.clear();
+			flashes.push_back({ highlight.last_ratio, ratio, total_secs });
+		}
+		else {
+			/*
+				A continuously growing value merges into a single flash
+				covering the whole run - it stays lit while the growth lasts
+				and fades out once it pauses. Otherwise, per-frame micro-flashes
+				would flood the list and evict each other before finishing.
+				Gains separated in time still get their own independent flashes.
+			*/
+
+			const bool continues_the_last_flash =
+				!flashes.empty()
+				&& flashes.back().to_ratio >= highlight.last_ratio - 0.0001f
+				&& total_secs - flashes.back().at_secs < 0.06
+			;
+
+			if (continues_the_last_flash) {
+				flashes.back().to_ratio = ratio;
+				flashes.back().at_secs = total_secs;
+			}
+			else {
+				constexpr std::size_t max_flashes = 16;
+
+				if (flashes.size() >= max_flashes) {
+					flashes.erase(flashes.begin());
+				}
+
+				flashes.push_back({ highlight.last_ratio, ratio, total_secs });
+			}
+		}
 	}
 
 	highlight.last_ratio = ratio;
@@ -197,7 +243,8 @@ inline void update_hud_bar_highlight(
 inline void advance_hud_bar_particles(
 	hud_bar_particles_state& state,
 	const double total_secs,
-	const vec2i field_size
+	const vec2i field_size,
+	const int px_per_particle = 4
 ) {
 	if (state.particles.empty() || state.spawned_for_size != field_size) {
 		state.particles.clear();
@@ -205,8 +252,8 @@ inline void advance_hud_bar_particles(
 
 		thread_local randomization rng;
 
-		/* The same density the character's value bars use: 40 particles per a 160px bar. */
-		const auto num_particles_to_spawn = static_cast<std::size_t>(std::max(1, field_size.x / 4));
+		/* The default density is the character's value bars': 40 particles per a 160px bar. */
+		const auto num_particles_to_spawn = static_cast<std::size_t>(std::max(1, field_size.x / std::max(1, px_per_particle)));
 
 		for (std::size_t i = 0; i < num_particles_to_spawn; ++i) {
 			const auto mats = std::array<assets::necessary_image_id, 3> {
@@ -294,12 +341,13 @@ inline void draw_hud_bar(
 	const float highlight_base_duration_secs,
 	hud_bar_highlight_state& highlight,
 	hud_bar_particles_state* const particles,
-	const augs::baked_font* const label_font = nullptr
+	const augs::baked_font* const label_font = nullptr,
+	hud_bar_particles_state* const label_particles = nullptr
 ) {
 	const auto bar_col = appearance.color;
 	const auto clamped_ratio = std::clamp(ratio, 0.0f, 1.0f);
 
-	::update_hud_bar_highlight(highlight, clamped_ratio, total_secs);
+	::update_hud_bar_highlight(highlight, clamped_ratio, total_secs, highlight_base_duration_secs * bar_increase_highlight_duration_mult_v, appearance.multiple_flashes);
 
 	const auto bar_border = border_input { appearance.border_w, 1 };
 	const auto border_expansion = bar_border.get_total_expansion();
@@ -311,31 +359,37 @@ inline void draw_hud_bar(
 	particle_col.a = 220;
 
 	/*
-		A right-aligned label brick truncates the bar: since the brick's
-		backdrop is translucent, nothing may render underneath it -
-		the bar (its frames included) ends right where the brick begins.
-		This is the x the bar's outermost right edge may reach.
+		A right-aligned label truncates the bar: nothing may render under
+		the label's area - the bar (its frames included) ends right where
+		the label's brick begins, or - with no backdrop - the plain text's
+		reserved column. This is the x the bar's outermost right edge may reach.
 	*/
 
 	const auto bar_truncate_r = [&]() -> std::optional<float> {
-		if (label_font == nullptr || appearance.label.empty() || !appearance.label_background || !appearance.label_align_right) {
+		if (label_font == nullptr || appearance.label.empty() || !appearance.label_align_right) {
 			return std::nullopt;
 		}
 
 		using namespace augs::gui::text;
 
-		const auto label_bw = std::max(1, appearance.label_border_w);
-		const auto frame_expansion = 1 + label_bw + 1;
-		const auto pad_x = appearance.label_padding.x - 2 * label_bw;
-
 		const auto& measured_text = appearance.label_widest_text.empty() ? appearance.label : appearance.label_widest_text;
 		const auto text_w = get_text_bbox(formatted_string(measured_text, style(*label_font, white))).x;
 
 		const auto bar_outer_r = static_cast<int>(bordered_rect.r) + (appearance.black_frame ? 1 : 0);
-		const auto backdrop_l = bar_outer_r - frame_expansion - (text_w + pad_x);
-		const auto brick_outer_l = backdrop_l - frame_expansion;
 
-		return static_cast<float>(brick_outer_l);
+		const auto reserved_w = [&]() {
+			if (appearance.label_background) {
+				const auto label_bw = std::max(1, appearance.label_border_w);
+				const auto frame_expansion = 1 + label_bw + 1;
+				const auto pad_x = appearance.label_padding.x - 2 * label_bw;
+
+				return 2 * frame_expansion + text_w + pad_x;
+			}
+
+			return text_w + appearance.label_padding.x;
+		}();
+
+		return static_cast<float>(bar_outer_r - reserved_w);
 	}();
 
 	/*
@@ -424,15 +478,27 @@ inline void draw_hud_bar(
 
 	if (bar_truncate_r.has_value()) {
 		const auto touch_x = *bar_truncate_r;
+		const auto black_w = appearance.black_frame ? 1 : 0;
 
 		for (int i = 0; i < num_segments; ++i) {
 			auto& seg = segments[i];
 
-			const auto outer_r = seg.inner.r + border_expansion + (appearance.black_frame ? 1 : 0);
+			const auto outer_r = seg.inner.r + border_expansion + black_w;
 
 			if (outer_r > touch_x) {
-				seg.open_right = true;
-				seg.visible_r = std::clamp(touch_x, seg.inner.l, seg.inner.r);
+				if (appearance.label_background) {
+					/* The brick terminates the segment - it stays open on its right. */
+					seg.open_right = true;
+					seg.visible_r = std::clamp(touch_x, seg.inner.l, seg.inner.r);
+				}
+				else {
+					/*
+						A plain text label terminates nothing - close the segment,
+						its full frame included, before the reserved column.
+					*/
+					seg.inner.r = std::max(seg.inner.l + 1, touch_x - border_expansion - black_w);
+					seg.visible_r = seg.inner.r;
+				}
 			}
 		}
 	}
@@ -578,9 +644,9 @@ inline void draw_hud_bar(
 		in the concatenated inner space, clipped to each segment's interior.
 	*/
 
-	if (highlight.at_secs >= 0.0) {
+	for (const auto& flash : highlight.flashes) {
 		const auto highlight_secs = highlight_base_duration_secs * bar_increase_highlight_duration_mult_v;
-		const auto passed = total_secs - highlight.at_secs;
+		const auto passed = total_secs - flash.at_secs;
 
 		if (passed >= 0.0 && passed < highlight_secs) {
 			auto highlight_col = white;
@@ -588,7 +654,7 @@ inline void draw_hud_bar(
 
 			const auto flashed_range = [&]() -> std::pair<float, float> {
 				if constexpr(bar_increase_highlight_only_added_part_v) {
-					return { highlight.from_ratio, highlight.to_ratio };
+					return { flash.from_ratio, flash.to_ratio };
 				}
 
 				return { 0.0f, clamped_ratio };
@@ -682,12 +748,6 @@ inline void draw_hud_bar(
 					return static_cast<int>(bordered_rect.b) - frame_expansion - backdrop_size.y;
 				}
 
-				if (appearance.label_reveal_bottom_px.has_value()) {
-					const auto inner_b = static_cast<int>(bordered_rect.b) - border_expansion;
-
-					return inner_b - *appearance.label_reveal_bottom_px - frame_expansion - backdrop_size.y;
-				}
-
 				return label_center.y - backdrop_size.y / 2;
 			}();
 
@@ -744,28 +804,22 @@ inline void draw_hud_bar(
 			output.aabb(border_band, appearance.label_background_color.value_or(dark_bar_col));
 
 			/*
-				The x the given value ratio maps to on the border:
-				either the covered bar's actual fill edge (across its segments),
-				or - with the full range sweep - a linear map onto
-				the band's whole width.
+				The x the given value ratio maps to on the border.
 			*/
 
 			const auto border_x_of_ratio = [&](const float of_ratio) {
-				if (appearance.label_border_full_range_sweep) {
-					return border_band.l + border_band.w() * std::clamp(of_ratio, 0.0f, 1.0f);
-				}
+				/*
+					A continuous linear map over the bar's whole span -
+					deliberately ignoring the segmentation, so the border's
+					sweep never jumps over the inter-segment frames
+					at the slice boundaries.
+				*/
 
 				const auto raw_fill_x = [&]() {
-					for (int i = 0; i < num_segments; ++i) {
-						const auto& seg = segments[i];
-						const auto local = local_ratio_of(of_ratio, seg);
+					const auto fill_l = segments[0].inner.l;
+					const auto fill_r = segments[num_segments - 1].inner.r;
 
-						if (local < 1.0f || i == num_segments - 1) {
-							return seg.inner.l + seg.inner.w() * local;
-						}
-					}
-
-					return segments[num_segments - 1].inner.r;
+					return fill_l + (fill_r - fill_l) * std::clamp(of_ratio, 0.0f, 1.0f);
 				}();
 
 				/*
@@ -805,11 +859,63 @@ inline void draw_hud_bar(
 			}();
 
 			/*
-				The dark 1px outline inside the luminous border,
-				optionally swept by the value just like the border itself.
+				The dark 1px outline inside the luminous border: either swept
+				along with the border, or drawn whole - filled and unfilled
+				parts alike. In the latter case, once the border's sweep
+				reaches the outline's left column, that column (its corner
+				pixels included) turns fully luminous - so no dark sliver
+				ever cuts through the lit-up left edge, at any percentage.
 			*/
 
-			frame_sides(inner_outline, 1, black, std::nullopt, appearance.label_inner_outline_shows_value ? luminous_cut : std::nullopt);
+			if (appearance.label_inner_outline_shows_value) {
+				frame_sides(inner_outline, 1, black, std::nullopt, luminous_cut);
+			}
+			else {
+				/*
+					Drawn whole, but in two parts: within the filled part
+					it hugs the thick border, and within the unfilled part
+					it moves out to touch the thin outline instead
+					(the two lines may sit at different offsets
+					across the sweep point - that is fine).
+				*/
+
+				frame_sides(inner_outline, 1, black, std::nullopt, luminous_cut);
+
+				if (luminous_cut.has_value()) {
+					const auto thin_w = appearance.label_unfilled_border_w;
+					const auto unfilled_expansion = std::max(1, 1 + label_bw - thin_w);
+					const auto unfilled_outline = ltrb(backdrop_rect).expand_from_center(vec2::square(static_cast<float>(unfilled_expansion)));
+
+					frame_sides(unfilled_outline, 1, black, *luminous_cut, std::nullopt);
+
+					/*
+						Only while the sweep sits INSIDE the filled ring's left
+						column does that column (corner pixels included) turn
+						fully luminous - no dark sliver ever cuts through
+						the lit-up left edge at any percentage; once the sweep
+						passes it, the classic dark column returns.
+					*/
+
+					if (*luminous_cut >= inner_outline.l && *luminous_cut < inner_outline.l + 1) {
+						output.aabb(ltrb(inner_outline.l, inner_outline.t, inner_outline.l + 1, inner_outline.b), bar_col);
+					}
+
+					/*
+						The completing connectors: short vertical black pixels
+						at the sweep point, joining the filled part's dark
+						outline with the unfilled part's one - the dark line
+						thus runs continuously across the offset jump,
+						along the top and the bottom edge alike.
+					*/
+
+					if (*luminous_cut > unfilled_outline.l && *luminous_cut < unfilled_outline.r - 1) {
+						const auto connector_x = *luminous_cut;
+
+						output.aabb(ltrb(connector_x, unfilled_outline.t, connector_x + 1, inner_outline.t + 1), black);
+						output.aabb(ltrb(connector_x, inner_outline.b - 1, connector_x + 1, unfilled_outline.b), black);
+					}
+				}
+			}
 
 			frame_sides(border_band, label_bw, bar_col, std::nullopt, luminous_cut);
 
@@ -834,6 +940,39 @@ inline void draw_hud_bar(
 
 					output.aabb(ltrb(border_band.l, border_band.t + th, border_band.l + th, border_band.b - th), bar_col);
 				}
+
+			}
+
+			/*
+				A separate instance of the flowing particles, wandering
+				inside the filled part of the luminous border - so the border
+				evidently reads as lit up.
+			*/
+
+			if (label_particles != nullptr) {
+				/*
+					Denser than the bar's own particles - only the thin ring
+					of the whole wandering field is ever visible.
+				*/
+				::advance_hud_bar_particles(*label_particles, total_secs, vec2i(border_band.get_size()), 1);
+
+				const auto label_particle_col = rgba(255, 255, 255, 220);
+				const auto band_field_origin = vec2(border_band.l, border_band.t);
+				const auto band_bw = static_cast<float>(label_bw);
+				const auto lit_r = luminous_cut.has_value() ? *luminous_cut : border_band.r;
+
+				const auto band_strips = std::array<ltrb, 4> {
+					ltrb(border_band.l, border_band.t, lit_r, border_band.t + band_bw),
+					ltrb(border_band.l, border_band.b - band_bw, lit_r, border_band.b),
+					ltrb(border_band.l, border_band.t + band_bw, std::min(lit_r, border_band.l + band_bw), border_band.b - band_bw),
+					ltrb(border_band.r - band_bw, border_band.t + band_bw, std::min(lit_r, border_band.r), border_band.b - band_bw)
+				};
+
+				for (const auto& strip : band_strips) {
+					if (strip.w() >= 1) {
+						::draw_hud_bar_particles(*label_particles, output, necessary_images, band_field_origin, strip, label_particle_col);
+					}
+				}
 			}
 
 			/*
@@ -841,9 +980,9 @@ inline void draw_hud_bar(
 				over the same value range the bar itself flashes with.
 			*/
 
-			if (highlight.at_secs >= 0.0) {
+			for (const auto& flash : highlight.flashes) {
 				const auto highlight_secs = highlight_base_duration_secs * bar_increase_highlight_duration_mult_v;
-				const auto passed = total_secs - highlight.at_secs;
+				const auto passed = total_secs - flash.at_secs;
 
 				if (passed >= 0.0 && passed < highlight_secs) {
 					auto highlight_col = white;
@@ -851,7 +990,7 @@ inline void draw_hud_bar(
 
 					const auto flashed_range = [&]() -> std::pair<float, float> {
 						if constexpr(bar_increase_highlight_only_added_part_v) {
-							return { border_x_of_ratio(highlight.from_ratio), border_x_of_ratio(highlight.to_ratio) };
+							return { border_x_of_ratio(flash.from_ratio), border_x_of_ratio(flash.to_ratio) };
 						}
 
 						return { border_band.l, border_x_of_ratio(clamped_ratio) };
@@ -862,6 +1001,23 @@ inline void draw_hud_bar(
 			}
 
 			frame_sides(black_outline, 1, black, std::nullopt, std::nullopt);
+		}
+		else if (appearance.label_align_right) {
+			/*
+				A plain label: the stroked text sits LEFT-aligned within
+				the column the truncation reserved right of the bar, so all
+				the values - the negative ones included - line up at the same x.
+			*/
+
+			if (bar_truncate_r.has_value()) {
+				right_aligned_text_pos = vec2i(static_cast<int>(*bar_truncate_r) + appearance.label_padding.x, label_center.y);
+			}
+			else {
+				const auto label_bbox = get_text_bbox(label_fs);
+				const auto bar_outer_r = static_cast<int>(bordered_rect.r) + (appearance.black_frame ? 1 : 0);
+
+				right_aligned_text_pos = vec2i(bar_outer_r - label_bbox.x, label_center.y);
+			}
 		}
 
 		if (right_aligned_text_pos.has_value()) {

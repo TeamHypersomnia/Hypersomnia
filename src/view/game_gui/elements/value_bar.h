@@ -40,12 +40,6 @@ struct value_bar : game_gui_rect_node {
 		const const_this_pointer
 	);
 
-	static ltrb get_value_bar_rect(
-		const const_game_gui_context context,
-		const const_this_pointer this_id,
-		const ltrb absolute
-	);
-
 	static ltrb get_bar_rect_with_borders(
 		const const_game_gui_context context,
 		const const_this_pointer this_id,

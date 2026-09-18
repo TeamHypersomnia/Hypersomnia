@@ -1,5 +1,4 @@
 #include <cstddef>
-#include "augs/misc/randomization.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/gui/text/printer.h"
 
@@ -172,16 +171,13 @@ void value_bar::draw(
 		appearance.particle_tint = 0.12f;
 		//appearance.splits = 3;
 		//appearance.split_gap = 1;
-		appearance.label_background = true;
-		appearance.label_align_right = true;
-		appearance.label_padding = vec2i(10, 4);
-
 		/*
-			The brick is too narrow for the border's value sweep to read -
-			keep its border constant, and always a plain 1px.
+			A plain number right of the bar, no brick underneath -
+			the padding is just the gap between the bar's end and the text.
 		*/
-		appearance.label_border_w = 1;
-		appearance.label_border_shows_value = false;
+
+		appearance.label_align_right = true;
+		appearance.label_padding = vec2i(5, 0);
 
 		/* The value label - only meters have one, perks do not. */
 
@@ -229,15 +225,6 @@ ltrb value_bar::get_bar_rect_with_borders(
 	value_bar_rect.r = absolute.r;
 
 	return value_bar_rect;
-}
-
-ltrb value_bar::get_value_bar_rect(
-	const const_game_gui_context context,
-	const const_this_pointer this_id,
-	const ltrb absolute
-) {
-	const auto border_expansion = this_id->border.get_total_expansion();
-	return get_bar_rect_with_borders(context, this_id, absolute).expand_from_center({ static_cast<float>(-border_expansion), static_cast<float>(-border_expansion) });
 }
 
 void value_bar::advance_elements(
@@ -387,7 +374,7 @@ void value_bar::rebuild_layouts(
 		Pushed apart a little so that the centered value labels' backdrops
 		do not overlap the neighboring rows.
 	*/
-	const auto row_pitch = static_cast<int>(icon_size.y) + 17;
+	const auto row_pitch = static_cast<int>(icon_size.y) + 8;
 
 	const auto lt = vec2i(
 		screen_size.x - minimap_screen_margin_v - with_bar_size.x,
