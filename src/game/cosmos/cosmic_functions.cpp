@@ -343,16 +343,25 @@ ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(
 	allocate_new_entity_access access,
 	const ref_typed_entity_handle<entity_type> in_entity
 ) {
+	return cosmic::specific_clone_entity(access, in_entity, in_entity.get_flavour_id());
+}
+
+template <class entity_type>
+ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(
+	allocate_new_entity_access access,
+	const ref_typed_entity_handle<entity_type> in_entity,
+	const typed_entity_flavour_id<entity_type> new_flavour
+) {
 	const auto source_entity = in_entity.to_const();
 	auto& cosm = in_entity.get_cosmos();
 
-	return cosmic::specific_create_entity(access, cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
+	return cosmic::specific_create_entity(access, cosm, new_flavour, [&](const auto new_entity, auto&&...) {
 		const auto& source_components = source_entity.get({}).component_state;
 		auto& new_solvable = new_entity.get({});
 		auto& new_components = new_solvable.component_state;
 
 		/* Initial copy-assignment */
-		new_components = source_components; 
+		new_components = source_components;
 
 		cosmic::make_suitable_for_cloning(new_solvable);
 
@@ -366,6 +375,8 @@ ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(
 	});
 }
 
-#define INSTANTIATE_SPECIFIC_CLONE(entity_type) template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(allocate_new_entity_access access, const ref_typed_entity_handle<entity_type> in_entity);
+#define INSTANTIATE_SPECIFIC_CLONE(entity_type) \
+	template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(allocate_new_entity_access access, const ref_typed_entity_handle<entity_type> in_entity); \
+	template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(allocate_new_entity_access access, const ref_typed_entity_handle<entity_type> in_entity, const typed_entity_flavour_id<entity_type> new_flavour);
 
 FOR_ALL_ENTITY_TYPES(INSTANTIATE_SPECIFIC_CLONE)

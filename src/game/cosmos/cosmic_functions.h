@@ -96,6 +96,17 @@ public:
 		ref_typed_entity_handle<entity_type> source_entity
 	);
 
+	/*
+		Clones the source entity as a different flavour of the same entity type,
+		rewriting the whole component aggregate.
+	*/
+	template <class entity_type>
+	static ref_typed_entity_handle<entity_type> specific_clone_entity(
+		allocate_new_entity_access access,
+		ref_typed_entity_handle<entity_type> source_entity,
+		typed_entity_flavour_id<entity_type> new_flavour
+	);
+
 	static void undo_last_create_entity(const entity_handle);
 	static std::optional<cosmic_pool_undo_free_input> delete_entity(const entity_handle);
 
