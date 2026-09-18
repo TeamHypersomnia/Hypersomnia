@@ -185,6 +185,15 @@ public:
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
 	void remove_player(input, logic_step, mode_player_id);
 
+	/*
+		Recreates the player's character as the new faction's flavour in place,
+		moving the whole equipment onto the new character.
+		Posts changed_identities_message so that this step's inputs
+		and all the audiovisual state get remapped to the new character.
+		Returns the new character's id, or a dead id on failure.
+	*/
+	entity_id change_player_faction(input, logic_step, mode_player_id, faction_type new_faction);
+
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
 

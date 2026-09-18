@@ -21,11 +21,13 @@
 
 #include "game/components/movement_component.h"
 #include "game/components/crosshair_component.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/pathfinding/pathfinding.h"
 #include "game/detail/path_navigation/navigate_path.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/detail/pathfinding/pathfinding_bomb.hpp"
 #include "game/messages/game_notification.h"
+#include "game/messages/changed_identities_message.h"
 #include "augs/math/repro_math.h"
 #include "game/modes/difficulty_type.h"
 
@@ -164,6 +166,115 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 			}
 		);
 	}
+}
+
+entity_id test_mode::change_player_faction(
+	const input_type in,
+	const logic_step step,
+	const mode_player_id id,
+	const faction_type new_faction
+) {
+	auto entry = find(id);
+
+	if (entry == nullptr) {
+		return entity_id();
+	}
+
+	auto& cosm = in.cosm;
+	const auto old_id = cosm[entry->controlled_character_id].get_id();
+
+	if (entry->get_faction() == new_faction) {
+		return old_id;
+	}
+
+	const auto old_character = cosm[old_id];
+
+	if (old_character.dead()) {
+		return entity_id();
+	}
+
+	const auto flavour = ::find_faction_character_flavour(cosm, new_faction);
+
+	if (!flavour.is_set()) {
+		return entity_id();
+	}
+
+	auto access = allocate_new_entity_access();
+
+	entity_id new_id;
+
+	/*
+		Recreate the character in place as the new faction's flavour,
+		rewriting the whole component aggregate so the switch is seamless:
+		position, velocities, movement flags, crosshair and sentience state all carry over.
+	*/
+
+	cosm[old_id].dispatch_on_having_all<components::sentience>([&](const auto typed_old) {
+		if constexpr(std::is_same_v<typename std::decay_t<decltype(typed_old)>::used_entity_type, player_character_type>) {
+			const auto new_character = cosmic::specific_clone_entity(access, typed_old, flavour);
+
+			/*
+				The cloned sentience component still holds the old faction.
+			*/
+			new_character.template get<components::sentience>().official_faction = new_faction;
+
+			new_id = new_character.get_id();
+			cosmic::set_specific_name(new_character, entry->get_nickname());
+		}
+	});
+
+	if (!cosm[new_id]) {
+		return entity_id();
+	}
+
+	entry->session.faction = new_faction;
+
+	/*
+		Move the whole equipment onto the new character.
+		The slot list comes from the character's own container definition.
+		Handles are re-acquired on every transfer
+		as transfers of stackable items might allocate new entities.
+	*/
+
+	std::vector<slot_function> transferred_slots;
+
+	cosm[old_id].dispatch_on_having_all<invariants::container>([&](const auto typed_old) {
+		for (const auto& s : typed_old.template get<invariants::container>().slots) {
+			transferred_slots.push_back(s.first);
+		}
+	});
+
+	for (const auto s : transferred_slots) {
+		if (const auto item = cosm[old_id][s].get_item_if_any()) {
+			auto request = item_slot_transfer_request::standard(item.get_id(), cosm[new_id][s].get_id());
+			request.params.bypass_mounting_requirements = true;
+			request.params.bypass_unmatching_capabilities = true;
+			request.params.play_transfer_sounds = false;
+			request.params.perform_recoils = false;
+
+			perform_transfer_no_step(request, cosm);
+		}
+	}
+
+	::delete_with_held_items_except({}, cosm[old_id]);
+
+	entry->controlled_character_id = new_id;
+
+	if (infinite_ammo_for == old_id) {
+		infinite_ammo_for = new_id;
+	}
+
+	{
+		messages::changed_identities_message msg;
+		msg.changes[old_id] = new_id;
+		step.post_message(msg);
+	}
+
+	cosm[new_id].dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
+		::snap_interpolated_to(typed_handle, typed_handle.get_logic_transform());
+	});
+
+	return new_id;
 }
 
 bool test_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
