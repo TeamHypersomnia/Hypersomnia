@@ -6,10 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- co z facing worlds z ta minimapa kurwa
+	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
+
 - swiecacy dev label
 - te public keye cale dla linuxiarzy
 
-- pistoletowe animacje wreszcie
 - naprawic te kurwa invalid filenames i jebane stampy w projectach z menu
 
 - miniaturke naprawic w facing worldsach
@@ -20,7 +22,6 @@ summary: That which we are brainstorming at the moment.
 
 - naprawic waypointy na minilabie
 - na cyberaqua te camera zoomy przy akwarium
-- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
 
 - /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg
 

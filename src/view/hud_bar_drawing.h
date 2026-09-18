@@ -11,7 +11,7 @@
 #include "augs/math/rects.h"
 #include "augs/math/arithmetical.h"
 #include "augs/graphics/rgba.h"
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/misc/randomization.h"
 #include "augs/gui/text/printer.h"
 #include "view/necessary_image_id.h"

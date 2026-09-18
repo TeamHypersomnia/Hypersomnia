@@ -7482,3 +7482,4 @@ This will discard your redo history."
 - odzoomowac do 85% i synchronizowac custom zoom z fowem zawsze
 - na mapkach pozwalac na zmieniony zoom
 	- tez synchro z fowem
+- pistoletowe animacje wreszcie
