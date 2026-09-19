@@ -8,6 +8,7 @@
 
 #include "game/components/gun_component.h"
 #include "game/components/decal_component.h"
+#include "game/detail/decals/decal_geometry.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/movement_component.h"
@@ -512,6 +513,58 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				sound.modifier.gain *= gain_mult;
 				sound.modifier.pitch *= pitch_mult;
+
+				{
+					/*
+						Stepping on scorched ground dampens the footstep.
+						Applied only once, no matter how many explosion decals overlap here.
+					*/
+					static constexpr real32 EXPLOSION_DECAL_FOOTSTEP_PITCH_MULT = 0.65f;
+
+					const auto foot_query_pos = effect_transform.pos;
+					const auto query_cone = camera_cone(transformr(foot_query_pos), vec2i::square(4));
+
+					auto& visible = thread_local_visible_entities();
+
+					/* Decals are non-physical, so the physical pass would be pure waste. */
+					visible.acquire_non_physical({
+						cosm,
+						query_cone,
+						accuracy_type::EXACT,
+						render_layer_filter::whitelist(render_layer::GROUND_DECALS),
+						tree_of_npo_filter::all()
+					});
+
+					bool explosion_decal_stepped = false;
+
+					visible.for_each<render_layer::GROUND_DECALS>(cosm, [&](const auto& decal_handle) {
+						decal_handle.template dispatch_on_having_all<invariants::decal>([&](const auto& typed_decal) {
+							if (explosion_decal_stepped) {
+								return;
+							}
+
+							if (!typed_decal.template get<invariants::decal>().is_explosion_decal) {
+								return;
+							}
+
+							/*
+								The query only tests AABBs, which for a rotated decal
+								reach well past its visible circle.
+							*/
+							const auto decal_transform = typed_decal.get_logic_transform();
+							const auto decal_size = ::get_decal_size(typed_decal);
+							const auto radius = std::min(decal_size.x, decal_size.y) / 2;
+
+							if ((decal_transform.pos - foot_query_pos).length_sq() < radius * radius) {
+								explosion_decal_stepped = true;
+							}
+						});
+					});
+
+					if (explosion_decal_stepped) {
+						sound.modifier.pitch *= EXPLOSION_DECAL_FOOTSTEP_PITCH_MULT;
+					}
+				}
 
 				const auto predictability = predictable_only_by(it);
 

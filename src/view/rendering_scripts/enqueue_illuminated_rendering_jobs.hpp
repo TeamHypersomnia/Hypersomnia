@@ -339,7 +339,8 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				h2.draw<
-					render_layer::FOREGROUND
+					render_layer::FOREGROUND,
+					render_layer::SURFACE_DECALS
 				>();
 
 				h3.draw<
@@ -366,7 +367,8 @@ void enqueue_illuminated_rendering_jobs(
 
 				h2.draw_neons<
 					render_layer::FOREGROUND,
-					render_layer::FOREGROUND_GLOWS
+					render_layer::FOREGROUND_GLOWS,
+					render_layer::SURFACE_DECALS
 				>();
 
 				h3.draw_neons<

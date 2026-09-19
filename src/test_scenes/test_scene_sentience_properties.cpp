@@ -9,6 +9,7 @@
 
 #include "test_scenes/test_scene_images.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/test_scene_physical_materials.h"
 
 void load_test_scene_sentience_properties(
 	cosmos_common_significant& state
@@ -326,5 +327,56 @@ void load_test_scene_sentience_properties(
 		assets.blood_footstep_1_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK);
 		assets.blood_footstep_2_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2_WEAK);
 		assets.blood_footstep_3_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK);
+	}
+
+	/* Explosion decal flavours */
+	{
+		auto& assets = state.assets;
+		assets.explosion_decal_1 = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_1);
+		assets.explosion_decal_2 = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_2);
+	}
+
+	/*
+		Gunshot/melee decals per physical material.
+		Glass uses the same white glass decals for both.
+		Wood additionally shows the glass-crack decals in black on melee hits.
+	*/
+	{
+		auto& material_decals = state.assets.material_decals;
+
+		const auto gunshot_1 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_1);
+		const auto gunshot_2 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_2);
+		const auto glass_1 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_GLASS_1);
+		const auto glass_2 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_GLASS_2);
+		const auto glass_black_1 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_GLASS_BLACK_1);
+		const auto glass_black_2 = to_entity_flavour_id(test_decal_decorations::GUNSHOT_DECAL_GLASS_BLACK_2);
+
+		const auto set_standard_gunshot_decals = [&](const test_scene_physical_material_id id) {
+			auto& decals = material_decals[to_physical_material_id(id)];
+
+			decals.gunshot_decals.push_back(gunshot_1);
+			decals.gunshot_decals.push_back(gunshot_2);
+		};
+
+		set_standard_gunshot_decals(test_scene_physical_material_id::WOOD);
+		set_standard_gunshot_decals(test_scene_physical_material_id::METAL);
+		set_standard_gunshot_decals(test_scene_physical_material_id::VENT);
+
+		{
+			auto& glass = material_decals[to_physical_material_id(test_scene_physical_material_id::GLASS)];
+
+			glass.gunshot_decals.push_back(glass_1);
+			glass.gunshot_decals.push_back(glass_2);
+
+			glass.melee_decals.push_back(glass_1);
+			glass.melee_decals.push_back(glass_2);
+		}
+
+		{
+			auto& wood = material_decals[to_physical_material_id(test_scene_physical_material_id::WOOD)];
+
+			wood.melee_decals.push_back(glass_black_1);
+			wood.melee_decals.push_back(glass_black_2);
+		}
 	}
 }

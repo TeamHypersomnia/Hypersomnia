@@ -602,6 +602,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
 											missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
 											missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
+											missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
 											missile.when_fired = cosm.get_timestamp();
 										}
 
@@ -822,6 +823,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 														missile.power_multiplier_of_sender = gun_def.damage_multiplier;
 														missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
 														missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
+														missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
 														missile.when_fired = cosm.get_timestamp();
 
 														missile.penetration_distance_remaining = gun_def.basic_penetration_distance;

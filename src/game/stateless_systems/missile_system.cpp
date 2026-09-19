@@ -61,6 +61,8 @@ void RIC_LOG(Args&&... args) {
 #include "game/detail/missile/missile_utils.h"
 #include "game/detail/missile/missile_collision.h"
 #include "game/detail/missile/missile_ricochet.h"
+#include "game/detail/decals/penetration_fatigue.h"
+#include "game/detail/physics/calc_penetrability.hpp"
 
 using namespace augs;
 
@@ -243,20 +245,14 @@ void missile_system::advance_penetrations(const logic_step step) {
 
 				fixture.penetration_processed_flag = true;
 
-				float penetrability = 1.0f;
+				const auto surface = cosm[fixture.GetUserData()];
 
-				if (const auto handle = cosm[fixture.GetUserData()]) {
-					if (const auto fixtures = handle.template find<invariants::fixtures>()) {
-						penetrability = fixtures->penetrability;
-					}
-
-					if (const auto body = handle.template find<components::rigid_body>()) {
-						penetrability *= body.get_special().penetrability;
-					}
-				}
-				else {
+				if (surface.dead()) {
 					continue;
 				}
+
+				const auto surface_owner = surface.get_id();
+				const auto penetrability = ::calc_penetrability(surface);
 
 				const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
 				const auto considered_p2 = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
@@ -267,20 +263,55 @@ void missile_system::advance_penetrations(const logic_step step) {
 				}
 				else {
 					const auto offset = considered_p2 - considered_p1;
-					const auto full_penetrated_distance = offset.length() / penetrability;
+
+					/*
+						Discounted by the decals already covering this stretch.
+						The gift over the bullet's lifetime is capped in total.
+					*/
+					const auto max_gift = ::calc_remaining_fatigue_gift(
+						missile.starting_penetration_distance,
+						missile.penetration_fatigue_gift_used
+					);
+
+					const auto cost = ::calc_penetration_cost_px(
+						cosm,
+						surface_owner,
+						considered_p1,
+						considered_p2,
+						penetrability,
+						max_gift,
+						missile.when_fired.step
+					);
 
 					auto& remaining = missile.penetration_distance_remaining;
-					const auto required = full_penetrated_distance;
-
-					//LOG_NVPS(full_penetrated_distance, remaining);
+					const auto required = cost.cost;
 
 					if (remaining > required) {
+						missile.penetration_fatigue_gift_used += cost.gifted;
+
 						remaining -= required;
 						rigid_body.infer_damping();
 					}
 					else {
-						const auto ratio_travelled = remaining / required;
-						expire_at(considered_p1 + offset * ratio_travelled);
+						/*
+							The bullet dies inside. An exact walk here:
+							a ratio would smear the decal tunnel's discount
+							uniformly over the whole stretch.
+						*/
+						const auto reach = ::calc_penetration_reach_px(
+							cosm,
+							surface_owner,
+							considered_p1,
+							vec2(offset).normalize(),
+							remaining,
+							max_gift,
+							penetrability,
+							missile.when_fired.step
+						);
+
+						missile.penetration_fatigue_gift_used += reach.gifted;
+
+						expire_at(considered_p1 + vec2(offset).set_length(std::min(reach.reach, offset.length())));
 						break;
 					}
 				}

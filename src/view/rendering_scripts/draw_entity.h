@@ -316,7 +316,25 @@ FORCE_INLINE void specific_entity_drawer(
 	(void)render_visitor;
 	(void)in;
 
-	const auto viewing_transform = typed_handle.get_viewing_transform(in.interp);
+	const auto viewing_transform = [&]() {
+		if constexpr(H::template has<components::decal>()) {
+			/*
+				A decal attached to a movable body orbits it smoothly,
+				deriving its transform from the body's interpolated transform.
+			*/
+			const auto& decal = typed_handle.template get<components::decal>();
+
+			if (decal.attached_to.is_set()) {
+				if (const auto owner = typed_handle.get_cosmos()[decal.attached_to]) {
+					if (const auto owner_transform = owner.find_viewing_transform(in.interp)) {
+						return *owner_transform * decal.attachment_offset;
+					}
+				}
+			}
+		}
+
+		return typed_handle.get_viewing_transform(in.interp);
+	}();
 
 	if constexpr (H::template has<components::item>()) {
 		if (typed_handle.get_current_slot().alive()) {

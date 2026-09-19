@@ -807,6 +807,13 @@ namespace test_flavours {
 			decal_def.is_blood_decal = true;
 			meta.set(decal_def);
 
+			/*
+				Above explosion decals which share this layer with order 0.
+			*/
+			components::sorting_order order_def;
+			order_def.order = 1;
+			meta.set(order_def);
+
 			return meta;
 		};
 
@@ -825,6 +832,49 @@ namespace test_flavours {
 			invariants::decal decal_def;
 			decal_def.is_blood_decal = true;
 			decal_def.is_footstep_decal = true;
+			meta.set(decal_def);
+
+			components::sorting_order order_def;
+			order_def.order = 1;
+			meta.set(order_def);
+
+			return meta;
+		};
+
+		auto gunshot_decal_flavour = [&](
+			const auto flavour_id,
+			const auto image_id,
+			const rgba color
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::SURFACE_DECALS;
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, image_id, color);
+
+			invariants::decal decal_def;
+			decal_def.is_gunshot_decal = true;
+			meta.set(decal_def);
+
+			return meta;
+		};
+
+		auto explosion_decal_flavour = [&](
+			const auto flavour_id,
+			const auto image_id
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::GROUND_DECALS;
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, image_id, white);
+
+			invariants::decal decal_def;
+			decal_def.is_explosion_decal = true;
 			meta.set(decal_def);
 
 			return meta;
@@ -869,6 +919,54 @@ namespace test_flavours {
 		blood_footstep_flavour(
 			test_decal_decorations::BLOOD_FOOTSTEP_3_WEAK,
 			test_scene_image_id::BLOOD_FOOTSTEP_3_WEAK
+		);
+
+		/* Gunshot decals */
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_1,
+			test_scene_image_id::GUNSHOT_DECAL_1,
+			white
+		);
+
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_2,
+			test_scene_image_id::GUNSHOT_DECAL_2,
+			white
+		);
+
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_GLASS_1,
+			test_scene_image_id::GUNSHOT_DECAL_GLASS_1,
+			rgba(255, 255, 255, 200)
+		);
+
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_GLASS_2,
+			test_scene_image_id::GUNSHOT_DECAL_GLASS_2,
+			rgba(255, 255, 255, 200)
+		);
+
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_GLASS_BLACK_1,
+			test_scene_image_id::GUNSHOT_DECAL_GLASS_1,
+			black
+		);
+
+		gunshot_decal_flavour(
+			test_decal_decorations::GUNSHOT_DECAL_GLASS_BLACK_2,
+			test_scene_image_id::GUNSHOT_DECAL_GLASS_2,
+			black
+		);
+
+		/* Explosion decals */
+		explosion_decal_flavour(
+			test_decal_decorations::EXPLOSION_DECAL_1,
+			test_scene_image_id::EXPLOSION_DECAL_1
+		);
+
+		explosion_decal_flavour(
+			test_decal_decorations::EXPLOSION_DECAL_2,
+			test_scene_image_id::EXPLOSION_DECAL_2
 		);
 	}
 }

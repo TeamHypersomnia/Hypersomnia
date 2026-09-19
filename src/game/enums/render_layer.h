@@ -19,6 +19,11 @@ enum class render_layer {
 	SENTIENCES,
 	FOREGROUND,
 	FOREGROUND_GLOWS,
+	/*
+		Bullet marks on walls. Drawn at the very end of the FOREGROUND buffer,
+		so that they are visible above every physical body, including FOREGROUND walls.
+	*/
+	SURFACE_DECALS,
 
 	DIM_WANDERING_PIXELS,
 	CONTINUOUS_SOUNDS,

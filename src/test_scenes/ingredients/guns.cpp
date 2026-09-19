@@ -4465,6 +4465,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {12000.f, 12000.f};
 			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
+			gun_def.gunshot_decal_scale = 4.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HPSR_CHAMBERING);
 			gun_def.chambering_sound.modifier.pitch = 0.91f;
 			gun_def.allow_chambering_with_akimbo = false;
@@ -5109,6 +5110,7 @@ namespace test_flavours {
 			gun_def.shell_velocity = {500.f, 3200.f};
 			gun_def.damage_multiplier = 9.8f;
 			gun_def.headshot_multiplier = 3.0f;
+			gun_def.gunshot_decal_scale = 3.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.75f;

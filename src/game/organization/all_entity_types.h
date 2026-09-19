@@ -606,7 +606,8 @@ struct area_sensor {
 /* Blood splatters and other ground decals */
 
 struct decal_decoration {
-	static constexpr std::size_t statically_allocated_entities = 600;
+	/* Must cover the sum of all the per-category limits in decal_system. */
+	static constexpr std::size_t statically_allocated_entities = 2048;
 	static constexpr std::size_t statically_allocated_flavours = 50;
 
 	using invariant_list = type_list<

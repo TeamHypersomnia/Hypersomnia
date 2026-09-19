@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- cos zeby bylo widac zawsze moje pociski i ich particle w tym extended fowie
+
+- decale jeszcze powinny wchodzic na gleboko jesli przywalimy w to samo miejsce wiecej niz raz
+	- kwerenda zeby zobaczyc czy docelowa pozycja declau nachodzi na jakis inny decal, moze byc kwerenda do tonpo? bo i tak to renderowane jest wiec to powinno byc tam
+	- jak jest to przesun sie o 80% dlugosci naszego przeskalowanego decala w strone trajektorii, i zrob kolejna kwerende
+	- ogranicz ilosc prob do 10 i do pozostalej dlugosci penetracji tego pocisku wzgledem tego materialu - symulacja penetracji jest zaimplementowana np. w can_weapon_penetrate.hpp
+- also sclampuj skalowanie decali gunshotow tak 0.6x do 2.0x
+- also nie wiem czemu ale kurwa nie swieci ten decal dla szkla
+na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a chcialem zeby zawsze byl jakis wlasnie nawet jak przez prawie róg przeleci
+
 - co z facing worlds z ta minimapa kurwa
 	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
 

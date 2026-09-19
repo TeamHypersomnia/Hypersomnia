@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+
 #include "game/assets/ids/asset_ids.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
@@ -8,6 +10,20 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "augs/misc/constant_size_vector.h"
 #include "game/components/touch_collectible.h"
+
+using material_decal_variants = augs::constant_size_vector<typed_entity_flavour_id<decal_decoration>, 4>;
+
+/*
+	Decals spawned on surfaces of the given physical material.
+	This lives here and not in physical_material itself,
+	because assets must not hold flavour ids.
+*/
+struct material_decals_def {
+	// GEN INTROSPECTOR struct material_decals_def
+	material_decal_variants gunshot_decals;
+	material_decal_variants melee_decals;
+	// END GEN INTROSPECTOR
+};
 
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
@@ -48,6 +64,11 @@ struct common_assets {
 	typed_entity_flavour_id<decal_decoration> blood_footstep_1_weak;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_2_weak;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_3_weak;
+
+	typed_entity_flavour_id<decal_decoration> explosion_decal_1;
+	typed_entity_flavour_id<decal_decoration> explosion_decal_2;
+
+	std::unordered_map<assets::physical_material_id, material_decals_def> material_decals;
 
 	particle_effect_input blood_burst_particles;
 

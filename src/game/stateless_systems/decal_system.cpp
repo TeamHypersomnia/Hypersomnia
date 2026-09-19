@@ -1,3 +1,6 @@
+#include <array>
+#include <cstddef>
+
 #include "augs/log.h"
 #include "game/messages/queue_deletion.h"
 #include "game/stateless_systems/decal_system.h"
@@ -7,20 +10,51 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/cosmos/cosmic_functions.h"
 #include "game/components/decal_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/sprite_component.h"
 
-/* Soft limit: when exceeded, oldest decals are marked for deletion */
-static constexpr std::size_t SOFT_LIMIT_DECALS = 800;
-/* Hard limit: when exceeded, oldest decal is deleted immediately */
-static constexpr std::size_t HARD_LIMIT_DECALS = 1000;
+/*
+	Blood, gunshot and explosion decals have separate budgets
+	so that e.g. numerous gunshot decals never eat away the explosion ones.
+*/
+enum class decal_category {
+	BLOOD,
+	GUNSHOT,
+	EXPLOSION,
+
+	COUNT
+};
+
+static constexpr std::size_t NUM_DECAL_CATEGORIES = static_cast<std::size_t>(decal_category::COUNT);
+
+/* Soft limits: when exceeded, oldest decals of the category are marked for deletion */
+static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> SOFT_LIMIT_DECALS = { 800, 500, 150 };
+/* Hard limits: when exceeded, oldest decal of the category is deleted immediately */
+static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> HARD_LIMIT_DECALS = { 1000, 600, 200 };
+
+static decal_category calc_decal_category(const invariants::decal& def) {
+	if (def.is_gunshot_decal) {
+		return decal_category::GUNSHOT;
+	}
+
+	if (def.is_explosion_decal) {
+		return decal_category::EXPLOSION;
+	}
+
+	return decal_category::BLOOD;
+}
 /* Maximum blood footsteps per character */
 static constexpr uint8_t MAX_FOOTSTEPS_PER_CHARACTER = 100;
 /* Shrink in discrete 1-second steps (10% less each second) */
 static constexpr real32 SHRINK_STEP_MS = 1000.f;
 /* Number of shrink steps (10 steps for 10% each) */
 static constexpr int NUM_SHRINK_STEPS = 10;
+
+/* An attached decal only follows its body once the body has moved this much */
+static constexpr real32 DECAL_FOLLOW_EPSILON_PX = 0.2f;
+static constexpr real32 DECAL_FOLLOW_EPSILON_DEGREES = 0.1f;
 
 /* Freshness step interval in seconds (2 seconds per step) */
 static constexpr real32 FRESHNESS_STEP_SECS = 2.f;
@@ -36,18 +70,21 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	const auto& clk = cosm.get_clock();
 	const auto now_secs = cosm.get_total_seconds_passed();
 
-	std::size_t unmarked_count = 0;
-	std::size_t marked_count = 0;
-	
-	/* Track oldest unmarked decal for marking (step=0 is oldest, higher step = more recent) */
-	entity_id oldest_unmarked_id;
-	augs::stepped_timestamp oldest_unmarked_timestamp;
-	oldest_unmarked_timestamp.step = std::numeric_limits<unsigned>::max();
+	std::array<std::size_t, NUM_DECAL_CATEGORIES> unmarked_count = {};
+	std::array<std::size_t, NUM_DECAL_CATEGORIES> marked_count = {};
 
-	/* Track oldest marked decal for hard limit deletion */
-	entity_id oldest_marked_id;
-	augs::stepped_timestamp oldest_marked_timestamp;
-	oldest_marked_timestamp.step = std::numeric_limits<unsigned>::max();
+	/* Track oldest unmarked decal per category for marking (step=0 is oldest, higher step = more recent) */
+	std::array<entity_id, NUM_DECAL_CATEGORIES> oldest_unmarked_id;
+	std::array<augs::stepped_timestamp, NUM_DECAL_CATEGORIES> oldest_unmarked_timestamp;
+
+	/* Track oldest marked decal per category for hard limit deletion */
+	std::array<entity_id, NUM_DECAL_CATEGORIES> oldest_marked_id;
+	std::array<augs::stepped_timestamp, NUM_DECAL_CATEGORIES> oldest_marked_timestamp;
+
+	for (std::size_t i = 0; i < NUM_DECAL_CATEGORIES; ++i) {
+		oldest_unmarked_timestamp[i].step = std::numeric_limits<unsigned>::max();
+		oldest_marked_timestamp[i].step = std::numeric_limits<unsigned>::max();
+	}
 
 	/* Track oldest superfluous footstep to delete (across all characters) */
 	entity_id oldest_superfluous_footstep_id;
@@ -60,6 +97,44 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			auto& state = subject.template get<components::decal>();
 			const auto& def = subject.template get<invariants::decal>();
 			const auto when_born = subject.when_born();
+			const auto category = static_cast<std::size_t>(::calc_decal_category(def));
+
+			/* Follow the movable body the decal was spawned on */
+			if (state.attached_to.is_set()) {
+				if (const auto owner = cosm[state.attached_to]) {
+					if (const auto owner_transform = owner.find_logic_transform()) {
+						const auto new_transform = *owner_transform * state.attachment_offset;
+
+						/*
+							Reinference is not free, so only follow a body
+							that has actually moved perceptibly.
+						*/
+						const auto current_transform = subject.find_logic_transform();
+
+						const bool worth_moving =
+							!current_transform.has_value()
+							|| !current_transform->compare(new_transform, DECAL_FOLLOW_EPSILON_PX, DECAL_FOLLOW_EPSILON_DEGREES)
+						;
+
+						if (worth_moving) {
+							subject.set_logic_transform(new_transform);
+
+							/*
+								set_logic_transform does not reinfer the npo cache
+								for non-physical entities. Without this, the decal keeps
+								its spawn-time AABB in the render tree and gets culled away
+								once the body carries it somewhere else.
+							*/
+							cosmic::infer_caches_for(entity_handle(subject));
+						}
+					}
+				}
+				else {
+					/* The body is gone - delete the decal with it right away. */
+					step.queue_deletion_of(subject, "Decal owner body is gone");
+					return;
+				}
+			}
 
 			/* Freshness-based darkening for blood decals */
 			if (def.is_blood_decal) {
@@ -94,22 +169,22 @@ void decal_system::limit_decal_count(const logic_step step) const {
 					/* Calculate discrete size multiplier: 100%, 90%, 80%, ... 10% */
 					const auto discrete_mult = static_cast<real32>(NUM_SHRINK_STEPS - current_step) / static_cast<real32>(NUM_SHRINK_STEPS);
 					state.last_size_mult = discrete_mult;
-					++marked_count;
+					++marked_count[category];
 
 					/* Track oldest marked decal for hard limit */
-					if (when_born.step < oldest_marked_timestamp.step) {
-						oldest_marked_timestamp = when_born;
-						oldest_marked_id = subject.get_id();
+					if (when_born.step < oldest_marked_timestamp[category].step) {
+						oldest_marked_timestamp[category] = when_born;
+						oldest_marked_id[category] = subject.get_id();
 					}
 				}
 			}
 			else {
-				++unmarked_count;
-				
-				/* Track oldest unmarked decal for global soft limit */
-				if (when_born.step < oldest_unmarked_timestamp.step) {
-					oldest_unmarked_timestamp = when_born;
-					oldest_unmarked_id = subject.get_id();
+				++unmarked_count[category];
+
+				/* Track oldest unmarked decal for the category's soft limit */
+				if (when_born.step < oldest_unmarked_timestamp[category].step) {
+					oldest_unmarked_timestamp[category] = when_born;
+					oldest_unmarked_id[category] = subject.get_id();
 				}
 
 				/* Track footsteps per character */
@@ -138,29 +213,31 @@ void decal_system::limit_decal_count(const logic_step step) const {
 		}
 	);
 
-	const auto total_count = unmarked_count + marked_count;
+	for (std::size_t i = 0; i < NUM_DECAL_CATEGORIES; ++i) {
+		const auto total_count = unmarked_count[i] + marked_count[i];
 
-	/* Hard limit: delete oldest decal (marked or unmarked) immediately if we're over 600 */
-	if (total_count > HARD_LIMIT_DECALS) {
-		/* First try to delete oldest marked decal */
-		if (oldest_marked_id.is_set()) {
-			if (const auto handle = cosm[oldest_marked_id]) {
-				step.queue_deletion_of(handle, "Decal hard limit reached");
+		/* Hard limit: delete oldest decal of the category (marked or unmarked) immediately */
+		if (total_count > HARD_LIMIT_DECALS[i]) {
+			/* First try to delete oldest marked decal */
+			if (oldest_marked_id[i].is_set()) {
+				if (const auto handle = cosm[oldest_marked_id[i]]) {
+					step.queue_deletion_of(handle, "Decal hard limit reached");
+				}
+			}
+			/* If no marked decals, delete oldest unmarked */
+			else if (oldest_unmarked_id[i].is_set()) {
+				if (const auto handle = cosm[oldest_unmarked_id[i]]) {
+					step.queue_deletion_of(handle, "Decal hard limit reached");
+				}
 			}
 		}
-		/* If no marked decals, delete oldest unmarked */
-		else if (oldest_unmarked_id.is_set()) {
-			if (const auto handle = cosm[oldest_unmarked_id]) {
-				step.queue_deletion_of(handle, "Decal hard limit reached");
+		/* Soft limit: mark oldest unmarked decal of the category for deletion */
+		else if (unmarked_count[i] > SOFT_LIMIT_DECALS[i]) {
+			if (const auto handle = cosm[oldest_unmarked_id[i]]) {
+				auto& state = handle.template get<components::decal>();
+				state.marked_for_deletion = true;
+				state.when_marked_for_deletion = cosm.get_timestamp();
 			}
-		}
-	}
-	/* Soft limit: mark oldest unmarked decal for deletion if we're over 300 */
-	else if (unmarked_count > SOFT_LIMIT_DECALS) {
-		if (const auto handle = cosm[oldest_unmarked_id]) {
-			auto& state = handle.template get<components::decal>();
-			state.marked_for_deletion = true;
-			state.when_marked_for_deletion = cosm.get_timestamp();
 		}
 	}
 

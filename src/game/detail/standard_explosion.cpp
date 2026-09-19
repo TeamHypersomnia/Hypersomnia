@@ -21,6 +21,7 @@
 #include "game/detail/damage_origin.hpp"
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/detail/decals/spawn_decals.hpp"
 
 static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 	constexpr auto eps_triangle_degenerate = 0.5f;
@@ -142,6 +143,31 @@ void standard_explosion_input::instantiate(
 	}
 
 	const auto explosion_pos = explosion_location.pos;
+
+	{
+		const bool leaves_decal =
+			this->type == adverse_element_type::FORCE ||
+			this->type == adverse_element_type::FLASH
+		;
+
+		if (leaves_decal) {
+			/*
+				Flashes deal negligible damage, so they get a fixed-size decal instead.
+			*/
+			const auto size_mult =
+				this->type == adverse_element_type::FLASH ?
+				FLASH_EXPLOSION_DECAL_SIZE_MULT :
+				damage.base / EXPLOSION_DECAL_BASELINE_DAMAGE
+			;
+
+			::spawn_explosion_decal(
+				step,
+				explosion_pos,
+				size_mult,
+				cause.entity
+			);
+		}
+	}
 
 	if (this->type != adverse_element_type::PED) {
 		startle_nearby_organisms(cosm, explosion_pos, effective_radius * 1.8f, 60.f, startle_type::IMMEDIATE);

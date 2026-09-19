@@ -31,6 +31,7 @@ namespace components {
 		real32 power_multiplier_of_sender = 1.f;
 		real32 headshot_multiplier_of_sender = 1.f;
 		real32 head_radius_multiplier_of_sender = 1.f;
+		real32 decal_scale_of_sender = 0.f;
 		real32 initial_speed = 0.f;
 
 		augs::stepped_timestamp when_last_ricocheted;
@@ -41,6 +42,7 @@ namespace components {
 		transformr saved_point_of_impact_before_death;
 		real32 penetration_distance_remaining = 0.f;
 		real32 starting_penetration_distance = 0.f;
+		real32 penetration_fatigue_gift_used = 0.f;
 
 		vec2 prev_tip_position = vec2::zero;
 		vec2 potential_exit = vec2::zero;

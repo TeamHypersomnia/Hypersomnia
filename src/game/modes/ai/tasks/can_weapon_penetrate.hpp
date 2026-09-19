@@ -9,6 +9,8 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/physics/physics_queries.h"
+#include "game/detail/decals/penetration_fatigue.h"
+#include "game/detail/physics/calc_penetrability.hpp"
 #include "game/modes/ai/tasks/line_of_sight.hpp"
 
 /*
@@ -125,6 +127,7 @@ inline bool can_weapon_penetrate(
 		Following missile_system.cpp logic exactly.
 	*/
 	real32 penetration_remaining = basic_penetration_distance;
+	real32 fatigue_gift_used = 0.0f;
 	bool can_penetrate = true;
 
 	for (auto& fixture_ptr : hits) {
@@ -140,20 +143,14 @@ inline bool can_weapon_penetrate(
 
 		fixture.penetration_processed_flag = true;
 
-		float penetrability = 1.0f;
+		const auto surface = cosm[fixture.GetUserData()];
 
-		if (const auto handle = cosm[fixture.GetUserData()]) {
-			if (const auto fixtures_comp = handle.template find<invariants::fixtures>()) {
-				penetrability = fixtures_comp->penetrability;
-			}
-
-			if (const auto body = handle.template find<components::rigid_body>()) {
-				penetrability *= body.get_special().penetrability;
-			}
-		}
-		else {
+		if (surface.dead()) {
 			continue;
 		}
+
+		const auto surface_owner = surface.get_id();
+		const auto penetrability = ::calc_penetrability(surface);
 
 		const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
 		const auto considered_p2 = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
@@ -163,11 +160,26 @@ inline bool can_weapon_penetrate(
 			break;
 		}
 		else {
-			const auto offset = considered_p2 - considered_p1;
-			const auto full_penetrated_distance = offset.length() / penetrability;
+			/*
+				Discounted by material fatigue - same math as the missile system.
+				The step is "now" because this estimates a bullet fired right now.
+			*/
+			const auto max_gift = ::calc_remaining_fatigue_gift(basic_penetration_distance, fatigue_gift_used);
 
-			if (penetration_remaining > full_penetrated_distance) {
-				penetration_remaining -= full_penetrated_distance;
+			const auto cost = ::calc_penetration_cost_px(
+				cosm,
+				surface_owner,
+				considered_p1,
+				considered_p2,
+				penetrability,
+				max_gift,
+				cosm.get_timestamp().step
+			);
+
+			fatigue_gift_used += cost.gifted;
+
+			if (penetration_remaining > cost.cost) {
+				penetration_remaining -= cost.cost;
 			}
 			else {
 				can_penetrate = false;

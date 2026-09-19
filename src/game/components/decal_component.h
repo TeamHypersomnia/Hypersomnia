@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/declare_math.h"
+#include "augs/math/transform.h"
 #include "game/cosmos/entity_id.h"
 #include "augs/misc/timing/stepped_timing.h"
 
@@ -8,7 +9,8 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::decal
 		bool is_blood_decal = false;
 		bool is_footstep_decal = false;
-		pad_bytes<2> pad;
+		bool is_gunshot_decal = false;
+		bool is_explosion_decal = false;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -22,6 +24,8 @@ namespace components {
 		augs::stepped_timestamp when_marked_for_deletion;
 		entity_id spawned_by;
 		real32 freshness = -1.f;
+		entity_id attached_to;
+		transformr attachment_offset;
 		// END GEN INTROSPECTOR
 	};
 }

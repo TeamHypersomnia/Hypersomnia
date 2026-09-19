@@ -28,6 +28,7 @@
 #include "game/messages/sound_cue_message.h"
 #include "game/messages/thunder_effect.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/decals/spawn_decals.hpp"
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
@@ -352,6 +353,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 									else if (is_yet_unaffected) {
 										already_hit.emplace_back(victim_id);
 
+										std::optional<transformr> spawned_decal_transform;
+
 										if (is_solid_obstacle && already_hit.size() == 1) {
 											{
 												auto& current = sentience.rotation_inertia_ms;
@@ -413,6 +416,30 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 														body.apply_impulse(total_impulse);
 														fighter.first_separating_impulse = total_impulse;
+													}
+
+													{
+														auto rng = cosm.get_rng_for(subject_id);
+
+														/*
+															The decal belongs to whatever the confirming
+															raycast hit, which is what the impact point
+															and the normal describe.
+														*/
+														const auto hit_surface = cosm[ray.what_entity];
+
+														spawned_decal_transform = ::spawn_surface_impact_decal(
+															step,
+															rng,
+															hit_surface,
+															ray.what_fixture,
+															ray.intersection,
+															-n,
+															damage_def.base * (1.f + bonus_mult),
+															0.f,
+															true,
+															[]() { return 0.f; }
+														);
 													}
 												}
 											}
@@ -584,6 +611,14 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 											damage_msg.impact_velocity = impact_velocity;
 											damage_msg.normal = impact_velocity;
 											damage_msg.point_of_impact = point_of_impact;
+
+											/*
+												Reposition the impact effects onto the spawned decal,
+												so that the mark and the burst always match visually.
+											*/
+											if (spawned_decal_transform.has_value()) {
+												damage_msg.point_of_impact = spawned_decal_transform->pos;
+											}
 
 											if (victim_sentient) {
 												const auto impact_dir = vec2(impact_velocity).normalize();

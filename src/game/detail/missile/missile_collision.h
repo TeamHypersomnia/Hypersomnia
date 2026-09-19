@@ -3,6 +3,9 @@
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/missile/headshot_detection.hpp"
+#include "game/detail/decals/spawn_decals.hpp"
+#include "game/detail/decals/penetration_fatigue.h"
+#include "game/detail/physics/calc_penetrability.hpp"
 #include "game/stateless_systems/sentience_system.h"
 
 #if HEADLESS
@@ -248,6 +251,57 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			if (!info.ignore_standard_collision_resolution()) {
 				penetrate_or_finalize();
 				damage_msg.spawn_destruction_effects = true;
+
+				/*
+					A non-ricochet hit against a wall - ricochets returned early above.
+					This also spawns on every penetration entry, as the bullet is not yet destroyed then.
+				*/
+				{
+					auto rng = cosm.get_rng_for(typed_missile);
+
+					/*
+						Only evaluated if the decal has to stack in depth:
+						how far this bullet would ACTUALLY travel through this material,
+						given the current decal coverage - the same walk
+						that advance_penetrations and the laser perform.
+					*/
+					auto get_max_decal_depth = [&]() {
+						return ::calc_penetration_reach_px(
+							cosm,
+							surface_handle.get_id(),
+							point,
+							impact_dir,
+							missile.penetration_distance_remaining,
+							::calc_remaining_fatigue_gift(
+								missile.starting_penetration_distance,
+								missile.penetration_fatigue_gift_used
+							),
+							::calc_penetrability(surface_handle),
+							missile.when_fired.step
+						).reach;
+					};
+
+					const auto spawned_decal = ::spawn_surface_impact_decal(
+						step,
+						rng,
+						surface_handle,
+						::find_fixture_of_impact(surface_handle, cosm.get_si(), point),
+						point,
+						impact_dir,
+						damage_msg.damage.base,
+						missile.decal_scale_of_sender,
+						false,
+						get_max_decal_depth
+					);
+
+					/*
+						Reposition the impact/destruction effects onto the decal,
+						so that the mark and the burst always match visually.
+					*/
+					if (spawned_decal.has_value()) {
+						damage_msg.point_of_impact = spawned_decal->pos;
+					}
+				}
 			}
 		}
 
