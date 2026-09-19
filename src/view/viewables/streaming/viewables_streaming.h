@@ -20,6 +20,7 @@
 
 #include "augs/filesystem/file_time_type.h"
 #include "augs/misc/future.h"
+#include "augs/misc/timing/timer.h"
 
 class sound_system;
 
@@ -121,6 +122,9 @@ class viewables_streaming {
 	augs::graphics::texture general_atlas = augs::image::white_pixel();
 
 	mutable bool bring_loading_popup_to_front = true;
+
+	/* Set while something is loading, so that a brief load never flashes a popup. */
+	mutable std::optional<augs::timer> loading_since;
 
 public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();

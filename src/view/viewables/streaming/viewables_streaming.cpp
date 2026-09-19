@@ -658,6 +658,20 @@ void viewables_streaming::display_loading_progress() const {
 	}
 
 	if (loading_message.size() > 0) {
+		if (!loading_since.has_value()) {
+			loading_since.emplace();
+		}
+
+		/*
+			Most loads are over well before this. A popup that appears and disappears
+			within a couple of frames reads as a glitch, so it is worth withholding.
+		*/
+		const auto show_popup_after_ms = 500;
+
+		if (loading_since->get<std::chrono::milliseconds>() < show_popup_after_ms) {
+			return;
+		}
+
 		loading_message += "\n";
 
 		if (bring_loading_popup_to_front) {
@@ -678,6 +692,7 @@ void viewables_streaming::display_loading_progress() const {
 		}
 	}
 	else {
+		loading_since.reset();
 		bring_loading_popup_to_front = true;
 
 		if (future_compressed_demos.valid()) {
