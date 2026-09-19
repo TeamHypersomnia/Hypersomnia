@@ -24,6 +24,11 @@
 	I believe it's the simplest to just have everything that relates to the main game loop in a single function: "work".
 */
 
+/* See WEB_MULTITHREADING in CMakeLists.txt. */
+#if PLATFORM_WEB && !WEB_SINGLETHREAD
+#error "We've stopped supporting web multithreaded for now due to maintenance/support complexity."
+#endif
+
 #if PLATFORM_UNIX
 #include <csignal>
 #endif

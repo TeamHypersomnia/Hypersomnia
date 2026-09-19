@@ -1415,11 +1415,16 @@ if(LINUX AND CLANG)
 endif()
 
 if(BUILD_FOR_WEB)
-	if (BUILD_CRAZYGAMES OR BUILD_ITCH)
-		set(WEB_MULTITHREADING OFF)
-	else()
-		set(WEB_MULTITHREADING OFF)
-	endif()
+	# We've stopped supporting web multithreaded for now due to maintenance/support
+	# complexity.
+	#
+	# Every web configuration therefore builds with WEB_SINGLETHREAD. The
+	# "#if PLATFORM_WEB && !WEB_SINGLETHREAD" branches scattered around the codebase
+	# are kept as a record of what a multithreaded web build would need, but they are
+	# not compiled and not tested - hence the #error at the top of work.cpp, so that
+	# flipping this back on fails loudly instead of quietly producing a build nobody
+	# has run.
+	set(WEB_MULTITHREADING OFF)
 
 	if (WEB_MULTITHREADING)
 		message("Web build will be multithreaded.")
