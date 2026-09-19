@@ -2,12 +2,14 @@
 #include <string>
 #include <sstream>
 #include <numeric>
+#include <atomic>
 
 #include "3rdparty/rectpack2D/src/rectpack2D/finders_interface.h"
 
 #include "augs/ensure.h"
 #include "augs/log.h"
 #include "augs/misc/measurements.h"
+#include "augs/templates/resource_workers.h"
 
 #include "augs/readwrite/memory_stream.h"
 
@@ -285,7 +287,34 @@ void bake_fresh_atlas(
 
 		const bool gore_enabled = in.gore_enabled;
 
-		auto worker = [&output_image, &subjects, &baked, output_image_size, gore_enabled](const worker_input& input) {
+		std::atomic<double> solidify_seconds = 0.0;
+
+		auto add_solidify_time = [&solidify_seconds](const double v) {
+			auto current = solidify_seconds.load();
+
+			while (!solidify_seconds.compare_exchange_weak(current, current + v)) {
+
+			}
+		};
+
+		/*
+			The buffers above are thread_local, which a lambda cannot capture - and a
+			helper thread would otherwise reach for its own, empty copy. Bind them to
+			plain references first, so that every worker reads this thread's data.
+		*/
+		auto& packed_rects = rects_for_packer;
+		auto& image_bytes = all_loaded_bytes;
+
+		auto worker = [
+			&output_image,
+			&subjects,
+			&baked,
+			&packed_rects,
+			&image_bytes,
+			&add_solidify_time,
+			output_image_size,
+			gore_enabled
+		](const worker_input& input) {
 			const bool is_loaded_image = input.original_index >= subjects.images.size();
 			const auto loaded_image_index = input.original_index - subjects.images.size();
 
@@ -297,9 +326,13 @@ void bake_fresh_atlas(
 				subjects.images[current_rect]
 			;
 
-			const auto packed_rect = rects_for_packer[current_rect];
+			const auto packed_rect = packed_rects[current_rect];
 
-			auto& output_entry = is_loaded_image ? baked.loaded_images[loaded_image_index] : baked.images[input_img_id];
+			/*
+				Every key was inserted while the image sizes were read, so at() only
+				looks up - it can never rehash the map from under another worker.
+			*/
+			auto& output_entry = is_loaded_image ? baked.loaded_images[loaded_image_index] : baked.images.at(input_img_id);
 			const auto& error_reported_img_id = input_img_id;
 
 			auto set_glitch_uv = [&output_entry, output_image_size](){
@@ -333,10 +366,10 @@ void bake_fresh_atlas(
 
 			thread_local augs::image loaded_image;
 
-			const auto& source_bytes = 
+			const auto& source_bytes =
 				is_loaded_image ?
 				subjects.loaded_images[loaded_image_index] :
-				all_loaded_bytes[current_rect]
+				image_bytes[current_rect]
 			;
 
 			if (source_bytes.empty()) {
@@ -356,6 +389,12 @@ void bake_fresh_atlas(
 				if (augs::path_matches_gore_words(input_img_id.string())) {
 					augs::remap_gore_pixels(loaded_image);
 				}
+			}
+
+			{
+				auto timer = augs::timer();
+				loaded_image.solidify_transparent_edge();
+				add_solidify_time(timer.get<std::chrono::seconds>());
 			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
@@ -382,8 +421,32 @@ void bake_fresh_atlas(
 			);
 		};
 
-		for (const auto& w : worker_inputs) {
-			worker(w);
+		auto& inputs = worker_inputs;
+
+		/*
+			worker_inputs is sorted biggest-first, so process() handing out indices on
+			demand keeps every participant busy right to the end, instead of splitting
+			the work into equal-sized chunks of wildly unequal cost.
+		*/
+		if (in.use_resource_workers) {
+			augs::get_resource_workers().process(
+				inputs.size(),
+				[&worker, &inputs](const std::size_t i) { worker(inputs[i]); },
+				augs::resource_priority::FIRST_FRAME
+			);
+		}
+		else {
+			for (const auto& w : inputs) {
+				worker(w);
+			}
+		}
+
+		{
+			const auto total = solidify_seconds.load();
+
+			if (total > 0.0) {
+				out.profiler.solidifying_images.measure(total);
+			}
 		}
 	}
 
@@ -430,6 +493,6 @@ void bake_fresh_atlas(
 	}
 
 #if TEST_SAVE_ATLAS
-	augs::image(output_image.data(), output_image.get_size()).save_as_image("/tmp/atl.image");
+	augs::image(output_image.data(), output_image.get_size()).save_as_binary_file("/tmp/atl.bin");
 #endif
 }

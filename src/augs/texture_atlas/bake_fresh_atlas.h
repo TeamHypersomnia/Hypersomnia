@@ -45,7 +45,8 @@ struct baked_atlas {
 struct bake_fresh_atlas_input {
 	const atlas_input_subjects& subjects;
 	const unsigned max_atlas_size;
-	const unsigned blitting_threads;
+	/* Whether to hand the blitting out to augs::resource_workers, or stay on this thread. */
+	const bool use_resource_workers;
 	const bool gore_enabled;
 };
 

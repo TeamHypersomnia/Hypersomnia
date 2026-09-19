@@ -103,7 +103,6 @@ class viewables_streaming {
 
 	sound_definitions_map future_sound_definitions;
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
-	std::vector<augs::path_type> sound_paths_info;
 
 	augs::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 

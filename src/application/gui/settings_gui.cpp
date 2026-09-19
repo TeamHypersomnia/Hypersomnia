@@ -63,6 +63,19 @@ void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
 	hijacking.captured = k;
 }
 
+/*
+	This budget covers the long-lived threads only. The content loading pool -
+	atlas blitting, neon map regeneration and sound decoding - deliberately lives
+	outside it and overcommits the machine while it runs: a load is short and rare,
+	and finishing it sooner is worth a briefly choppier frame. See
+	content_regeneration_settings::get_default_resource_workers.
+
+	Note that a machine with four logical cores or fewer ends up with zero workers,
+	and that this is intended rather than a degenerate case. The threads subtracted
+	below are the high-priority ones, and a gap in the audio is far worse than a
+	slower frame. No work is lost: with an empty pool, help_until_no_tasks() simply
+	runs every job on the thread that posted it.
+*/
 int performance_settings::get_default_num_pool_workers() {
 #if PLATFORM_WEB
 	return 1;
@@ -75,7 +88,7 @@ int performance_settings::get_default_num_pool_workers() {
 	const auto rendering_threads = 1;
 	const auto main_threads = 1;
 
-	const auto total_other_threads = 
+	const auto total_other_threads =
 		audio_threads
 		+ rendering_threads
 		+ main_threads
@@ -91,6 +104,40 @@ int performance_settings::get_num_pool_workers() const {
 	}
 
 	return get_default_num_pool_workers();
+}
+
+unsigned content_regeneration_settings::get_default_resource_workers() {
+	/*
+		Content is loaded asynchronously, on threads of its own, and only when it
+		actually changes - so unlike the render-frame pool this one is free to take
+		most of the machine. The thread that asked for the work helps too, so the
+		count below is the number of helpers on top of it.
+
+		Measured on a 24-thread machine over 1557 sprites: the atlas blitting stage
+		takes ~160 ms sequentially, ~90 ms on 2, ~48 ms on 4 and ~32 ms on 8
+		participants, after which it flattens out. Hence the ceiling of 8 - past that
+		the pool would grow for no gain. Spawning them costs under 0.2 ms.
+
+		No headroom is left for the rest of the game on purpose. A load is not
+		exclusive to loading screens - changing the map re-bakes, and so does
+		alt-tabbing back in with rescan_assets_on_window_focus - but it is short and
+		rare, so finishing it sooner beats keeping the frame smooth while it runs.
+	*/
+	const auto concurrency = std::thread::hardware_concurrency();
+
+	if (concurrency <= 1) {
+		return 0;
+	}
+
+	return std::min(8u, concurrency) - 1;
+}
+
+unsigned content_regeneration_settings::get_resource_workers() const {
+	if (custom_resource_workers.is_enabled) {
+		return custom_resource_workers.value;
+	}
+
+	return get_default_resource_workers();
 }
 
 #if BUILD_NATIVE_SOCKETS
@@ -2010,15 +2057,6 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.content_regeneration;
 					revertable_checkbox(SCOPE_CFG_NVP(regenerate_every_time));
 					revertable_checkbox(SCOPE_CFG_NVP(rescan_assets_on_window_focus));
-
-					const auto concurrency = std::thread::hardware_concurrency();
-					const auto t_max = concurrency * 2;
-
-					text_disabled("(Value of 0 tells regenerators to not spawn any additional workers)");
-					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
-
-					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 1u, t_max);
-					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 1u, t_max);
 				}
 #endif
 
@@ -2036,29 +2074,59 @@ void settings_gui_state::perform(
 
 					const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
-					{
-						text("Concurrent hardware threads:");
+					text("Concurrent hardware threads:");
+					ImGui::SameLine();
+					text_color(typesafe_sprintf("%x\n", concurrency), green);
+
+					text_disabled("(Both counts below are workers on top of the thread that posts the work,\nwhich takes part itself - so 0 means it runs everything alone.)\n");
+
+					/*
+						Both pools are configured the same way: an automatic count derived
+						from the hardware, with an optional override.
+					*/
+					auto worker_count = [&](
+						const char* const label,
+						const auto default_count,
+						auto& custom,
+						const auto max_count,
+						const char* const note = nullptr
+					) {
+						auto id = scoped_id(label);
+
+						text("%x:", label);
 						ImGui::SameLine();
-						text_color(typesafe_sprintf("%x", concurrency), green);
-					}
+						text_color(typesafe_sprintf("%x", default_count), default_count == 0 ? red : green);
 
-					{
-						const auto default_n = performance_settings::get_default_num_pool_workers();
-						text("Default number of thread pool workers:");
-						ImGui::SameLine();
-						text_color(typesafe_sprintf("%x\n\n", default_n), default_n == 0 ? red : green);
-					}
-
-
-					{
-						auto& cn = scope_cfg.custom_num_pool_workers;
-						revertable_checkbox("Custom number of thread pool workers", cn.is_enabled);
-
-						if (cn.is_enabled) {
-							auto indent = scoped_indent();
-							revertable_slider("##ThreadCount", cn.value, 0, concurrency * 3);
+						if (note != nullptr) {
+							text_disabled(note);
 						}
-					}
+
+						revertable_checkbox("Override", custom.is_enabled);
+
+						if (custom.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("##Count", custom.value, decltype(custom.value)(0), max_count);
+						}
+
+						text("\n");
+					};
+
+					worker_count(
+						"Frame job workers",
+						performance_settings::get_default_num_pool_workers(),
+						scope_cfg.custom_num_pool_workers,
+						concurrency * 3
+					);
+
+#if !PLATFORM_WEB
+					worker_count(
+						"Content loading workers",
+						content_regeneration_settings::get_default_resource_workers(),
+						config.content_regeneration.custom_resource_workers,
+						static_cast<unsigned>(concurrency) * 2,
+						"(Applied on the next launch.)"
+					);
+#endif
 
 					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
 				}

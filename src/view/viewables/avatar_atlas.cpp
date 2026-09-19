@@ -29,7 +29,7 @@ avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			1,
+			false /* use_resource_workers: a handful of tiny avatars is not worth the round trip */,
 			true /* gore_enabled — avatar atlas, no gore content */
 		},
 		{

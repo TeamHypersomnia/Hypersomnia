@@ -19,6 +19,7 @@ struct atlas_profiler : public augs::profiler_mixin<atlas_profiler> {
 
 	augs::time_measurements loading_fonts = std::size_t(1);
 
+	augs::time_measurements solidifying_images = std::size_t(1);
 	augs::time_measurements blitting_images = std::size_t(1);
 	augs::time_measurements blitting_fonts = std::size_t(1);
 

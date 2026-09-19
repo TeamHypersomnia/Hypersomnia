@@ -19,6 +19,8 @@
 #include "application/setups/client/demo_file_meta.h"
 #include "augs/misc/scope_guard.h"
 
+#include "augs/templates/resource_workers.h"
+
 #if PLATFORM_WEB && !WEB_SINGLETHREAD
 #include "augs/templates/main_thread_queue.h"
 #endif
@@ -326,15 +328,16 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			sounds_progress.emplace();
 
-			sound_paths_info.clear();
+			auto num_to_load = std::size_t(0);
 
 			for (const auto& r : sound_requests) {
 				if (!r.second.source_sound.empty()) {
-					sound_paths_info.push_back(r.second.source_sound);
+					/* The empty ones are requests to unload, which load nothing. */
+					++num_to_load;
 				}
 			}
 
-			sounds_progress->max_sounds.store(sound_paths_info.size());
+			sounds_progress->max_sounds.store(num_to_load);
 
 			auto buffer_loader = [&](){
 				web_sdk_loading_start();
@@ -342,25 +345,32 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 				using value_type = decltype(future_loaded_buffers.get());
 
+				/*
+					Sized up front and written by index, so that the results keep matching
+					sound_requests no matter in which order the workers finish. An entry
+					left untouched stays nullopt, which is what both an unload request and
+					a failed load used to push.
+				*/
 				value_type result;
+				result.resize(sound_requests.size());
 
-				for (const auto& r : sound_requests) {
+				augs::get_resource_workers().process(sound_requests.size(), [&](const std::size_t i) {
+					const auto& r = sound_requests[i];
+
 					if (r.second.source_sound.empty()) {
 						/* A request to unload. */
-						result.push_back(std::nullopt);
-						continue;
+						return;
 					}
 
 					try {
-						augs::sound_buffer b = r.second;
-						result.emplace_back(std::move(b));
+						result[i].emplace(r.second);
 					}
 					catch (...) {
-						result.push_back(std::nullopt);
+
 					}
 
 					sounds_progress->current_sound_num += 1;
-				}
+				});
 
 				return result;
 			};
@@ -646,9 +656,13 @@ void viewables_streaming::display_loading_progress() const {
 			const auto sounds_finished = sound_i == sound_max_i;
 
 			if (!sounds_finished) {
-				loading_message = typesafe_sprintf("Loading %x...", sound_paths_info[sound_i].filename(), sound_i+1, sound_max_i);
+				/*
+					Only the count, no file name: the sounds are decoded by several
+					workers at once, so there is no single one being loaded right now.
+				*/
+				loading_message = typesafe_sprintf("Loading sounds... %x / %x", sound_i, sound_max_i);
 
-				progress_percent = float(sound_i+1) / sound_max_i;
+				progress_percent = float(sound_i) / sound_max_i;
 			}
 			else {
 				loading_message = "Loading sounds...";

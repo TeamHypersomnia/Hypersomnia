@@ -45,6 +45,7 @@
 #include "augs/templates/history.hpp"
 #include "augs/templates/traits/in_place.h"
 #include "augs/templates/thread_pool.h"
+#include "augs/templates/resource_workers.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -1512,6 +1513,20 @@ work_result work(
 	WEBSTATIC const auto num_pool_workers = config.performance.get_num_pool_workers();
 	LOG("Creating the thread pool with %x workers.", num_pool_workers);
 	WEBSTATIC auto thread_pool = augs::thread_pool(num_pool_workers);
+
+	/*
+		The resource loading pool is separate from the frame's, and deliberately
+		outside its budget: a bake or a sound load is short, rare and runs in the
+		background, so it may overcommit the machine while it lasts.
+
+		Sized here, once, because resizing it while a load is in flight would pull
+		the workers out from under it.
+	*/
+	{
+		const auto num_resource_workers = config.content_regeneration.get_resource_workers();
+		LOG("Creating the resource loading pool with %x workers.", num_resource_workers);
+		augs::get_resource_workers().start(num_resource_workers);
+	}
 
 	LOG("Initializing audio command buffers.");
 	WEBSTATIC augs::audio_command_buffers audio_buffers(thread_pool);

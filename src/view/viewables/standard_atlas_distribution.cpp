@@ -6,7 +6,7 @@
 
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/image_definition.h"
-#include "augs/templates/thread_pool.h"
+#include "augs/templates/resource_workers.h"
 #include "augs/templates/introspect.h"
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/log.h"
@@ -43,10 +43,13 @@ void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
 	atlas_input_subjects& output
 ) {
-	const auto num_workers = std::size_t(in.settings.neon_regeneration_threads - 1);
-
-	static augs::thread_pool workers = 0;
-	workers.resize(num_workers);
+	/*
+		Everything regenerated here feeds the atlas bake that follows in
+		create_general_atlas, on this very thread - so it all sits on the path to the
+		first frame and shares that priority, rather than competing with it.
+	*/
+	auto& workers = augs::get_resource_workers();
+	const auto priority = augs::resource_priority::FIRST_FRAME;
 
 	auto make_view = [&in](const auto& def) {
 		return image_definition_view(in.unofficial_project_dir, def);
@@ -73,8 +76,13 @@ void regenerate_and_gather_subjects(
 	}
 
 	if (!gifs_to_regenerate.empty()) {
-		for (const auto& gif : gifs_to_regenerate) {
-			auto new_job = [&gif]() {
+		const auto gifs = std::vector<augs::path_type>(gifs_to_regenerate.begin(), gifs_to_regenerate.end());
+
+		workers.process(
+			gifs.size(),
+			[&gifs](const std::size_t gif_index) {
+				const auto& gif = gifs[gif_index];
+
 				const auto frames = augs::image::gif_to_frames(gif);
 				const auto generated_png_path_base = ::get_path_in_cache(gif);
 
@@ -85,7 +93,7 @@ void regenerate_and_gather_subjects(
 
 					LOG("Reading frame %x, %x bytes", i, frame.serialized_frame.size());
 
-					augs::image img; 
+					augs::image img;
 					img.from_bytes(frame.serialized_frame, "dummy.bin");
 
 					auto generated_png_path = generated_png_path_base;
@@ -95,20 +103,15 @@ void regenerate_and_gather_subjects(
 					augs::create_directories_for(generated_png_path);
 					LOG("Saving as png: %x", generated_png_path);
 					img.save_as_png(generated_png_path);
-				};
+				}
 
 				auto stamp_path = generated_png_path_base;
 				stamp_path += ".stamp";
 
 				augs::save_as_bytes(augs::last_write_time(gif), stamp_path);
-			};
-
-			workers.enqueue(new_job);
-		}
-
-		workers.submit();
-		workers.help_until_no_tasks();
-		workers.wait_for_all_tasks_to_complete();
+			},
+			priority
+		);
 	}
 
 	{
@@ -159,13 +162,13 @@ void regenerate_and_gather_subjects(
 		};
 
 		{
-			for (const auto& d : in.image_definitions) {
-				workers.enqueue([&d, worker]() { worker(d); });
-			}
+			const auto& definitions = in.image_definitions.get_objects();
 
-			workers.submit();
-			workers.help_until_no_tasks();
-			workers.wait_for_all_tasks_to_complete();
+			workers.process(
+				definitions.size(),
+				[&definitions, worker](const std::size_t i) { worker(definitions[i]); },
+				priority
+			);
 		}
 
 		/*
@@ -226,7 +229,7 @@ general_atlas_output create_general_atlas(
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			in.subjects.settings.atlas_blitting_threads,
+			true /* use_resource_workers */,
 			in.subjects.gore_enabled
 		},
 		{

@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <mutex>
 #include "augs/log.h"
 
 #if BUILD_OPENAL
@@ -94,7 +95,21 @@ namespace augs {
 		return get_id();
 	}
 
+	/*
+		Decoding a sound is pure CPU work and accounts for some 98% of the load, so it
+		is done from several threads at once. The OpenAL calls in set_data are the
+		remaining 2%, and they are serialised rather than relied upon to be
+		thread-safe: alGetError, which AL_CHECK uses, reports per context and not per
+		thread, so concurrent callers would consume each other's errors.
+
+		At namespace scope because the project builds with -fno-threadsafe-statics,
+		which would leave a function-local static without an initialisation guard.
+	*/
+	static std::mutex al_buffer_mutex;
+
 	void single_sound_buffer::set_data(const sound_data& new_data) {
+		auto lock = std::scoped_lock(al_buffer_mutex);
+
 		if (!initialized) {
 			AL_CHECK(alGenBuffers(1, &id));
 
