@@ -299,7 +299,7 @@ void resize_image(
 
 	augs::image copy_mat;
 
-	copy_mat.resize_fill(size);
+	copy_mat.recreate_filled(size);
 
 	auto offset_x = static_cast<int>(size.x - image_to_resize.get_columns()) / 2;
 
@@ -363,7 +363,7 @@ void cut_empty_edges(augs::image& source) {
 
 	augs::image copy;
 
-	copy.resize_no_fill(output_size);
+	copy.recreate_no_fill(output_size);
 
 	for (unsigned x = 0; x < copy.get_columns(); ++x) {
 		for (unsigned y = 0; y < copy.get_rows(); ++y) {

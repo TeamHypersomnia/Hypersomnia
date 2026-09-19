@@ -120,7 +120,6 @@ namespace augs {
 		image(std::vector<rgba>&& in, vec2u size) : v(std::move(in)), size(size) {}
 		
 		void fill(const rgba fill_color);
-		void flip_y();
 
 		void execute(const paint_command_variant&);
 
@@ -130,15 +129,41 @@ namespace augs {
 		
 		void swap_red_and_blue();
 
-		void resize_no_fill(const vec2u new_size) {
+		/*
+			Gives every fully transparent texel that borders a visible one the colour of
+			its most opaque visible neighbour, and flattens the rest to plain black.
+
+			Sprites are sampled with GL_LINEAR, which interpolates RGB and alpha
+			independently - so the RGB of a texel with alpha == 0 is not invisible at
+			all. It gets averaged into every sample straddling the sprite's edge, and
+			whatever the painting process happened to leave there shows up as a halo of
+			that colour. Since the colour itself is wrong, stacking several such sprites
+			converges to it instead of to the intended one.
+
+			Only the immediate ring can ever be reached: GL_LINEAR does a 2x2 fetch at
+			any zoom, and the atlas carries no mipmaps. Should mipmaps ever be enabled,
+			one ring stops being enough - and so does solidifying a sprite on its own,
+			because the lower mip levels would blend neighbouring sprites together.
+		*/
+		void solidify_transparent_edge();
+
+		/*
+			Both of these discard the previous image - after a change of width the old
+			pixels would land in the wrong rows anyway.
+
+			This one leaves the texels unwritten, since rgba does not initialise itself.
+			The caller is expected to write every one of them.
+		*/
+		void recreate_no_fill(const vec2u new_size) {
 			size = new_size;
 			v.resize(new_size.area());
 		}
 
 		void scale(vec2u new_size, scaling_method = scaling_method::STB);
 
-		void resize_fill(const vec2u new_size, const rgba col = rgba(0, 0, 0, 0)) {
+		void recreate_filled(const vec2u new_size, const rgba col = rgba(0, 0, 0, 0)) {
 			size = new_size;
+			v.clear();
 			v.resize(new_size.area(), col);
 		}
 

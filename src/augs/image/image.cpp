@@ -157,7 +157,7 @@ namespace augs {
 	}
 
 	image::image(const vec2u new_size) {
-		resize_fill(new_size);
+		recreate_filled(new_size);
 	}
 	
 	image::image(
@@ -166,7 +166,7 @@ namespace augs {
 		const unsigned channels,
 		const unsigned pitch 
 	) {
-		resize_no_fill(new_size);
+		recreate_no_fill(new_size);
 
 		if (channels == 1) {
 			for (unsigned j = 0; j < new_size.y; ++j) {
@@ -184,11 +184,10 @@ namespace augs {
 	}
 
 	void image::load_stbi_buffer(unsigned char* buf, const int w, const int h) {
-		size.x = w;
-		size.y = h;
+		/* stbi hands us w * h * 4 bytes, which is exactly w * h elements of rgba. */
+		recreate_no_fill(vec2u(static_cast<unsigned>(w), static_cast<unsigned>(h)));
 
-		v.resize(size.area() * 4);
-		std::memcpy(v.data(), buf, v.size());
+		std::memcpy(v.data(), buf, v.size() * sizeof(rgba));
 
 		stbi_image_free(reinterpret_cast<void*>(buf));
 	}
@@ -494,7 +493,7 @@ namespace augs {
 		}
 
 		if (in.border_width > 1) {
-			for (unsigned y = 0; y < surface.size.x; ++y) {
+			for (unsigned y = 0; y < surface.size.y; ++y) {
 				for (unsigned x = 0; x < surface.size.x; ++x) {
 					if (x > 0 && y > 0 && x < surface.size.x - 1 && y < surface.size.y - 1) {
 						if (surface.pixel({ x, y }).a == 0 &&
@@ -525,7 +524,7 @@ namespace augs {
 		const auto side = in.radius * 2 + 1;
 
 		if (v.empty()) {
-			resize_fill({ side, side });
+			recreate_filled({ side, side });
 		}
 		else {
 			ensure(size.x >= side);
@@ -563,6 +562,58 @@ namespace augs {
 	void image::swap_red_and_blue() {
 		for (auto& p : v) {
 			std::swap(p.r, p.b);
+		}
+	}
+
+	void image::solidify_transparent_edge() {
+		if (size.x == 0 || size.y == 0) {
+			return;
+		}
+
+		const auto cols = static_cast<int>(size.x);
+		const auto rows = static_cast<int>(size.y);
+
+		/*
+			Safe in place: only texels with alpha == 0 are written, and only neighbours
+			with alpha > 0 are read, so a write can never poison a later read.
+		*/
+		for (int y = 0; y < rows; ++y) {
+			for (int x = 0; x < cols; ++x) {
+				auto& px = pixel(static_cast<unsigned>(y * cols + x));
+
+				if (px.a != 0) {
+					continue;
+				}
+
+				int best_alpha = 0;
+				auto best_colour = rgba(0, 0, 0, 0);
+
+				for (int dy = -1; dy <= 1; ++dy) {
+					for (int dx = -1; dx <= 1; ++dx) {
+						if (dx == 0 && dy == 0) {
+							continue;
+						}
+
+						const auto ny = y + dy;
+						const auto nx = x + dx;
+
+						if (ny < 0 || ny >= rows || nx < 0 || nx >= cols) {
+							continue;
+						}
+
+						const auto& neighbour = pixel(static_cast<unsigned>(ny * cols + nx));
+
+						if (neighbour.a > best_alpha) {
+							best_alpha = neighbour.a;
+							best_colour = neighbour;
+						}
+					}
+				}
+
+				px.r = best_colour.r;
+				px.g = best_colour.g;
+				px.b = best_colour.b;
+			}
 		}
 	}
 	
@@ -626,7 +677,7 @@ namespace augs {
 	void image_view::fill(const rgba fill_color) {
 		for (auto y = 0u; y < size.y; ++y) {
 			for (auto x = 0u; x < size.x; ++x) {
-				pixel(vec2u{ y, x }) = fill_color;
+				pixel(vec2u{ x, y }) = fill_color;
 			}
 		}
 	}
@@ -644,7 +695,7 @@ namespace augs {
 	void image::scale(const vec2u new_size, const scaling_method method) {
 		if (method == scaling_method::STB) {
 			image new_image;
-			new_image.resize_no_fill(new_size);
+			new_image.recreate_no_fill(new_size);
 
 			const auto in_ptr = v.data();
 			const auto out_ptr = new_image.v.data();
