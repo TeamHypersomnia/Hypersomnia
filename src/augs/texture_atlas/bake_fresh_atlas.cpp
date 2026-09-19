@@ -2,7 +2,6 @@
 #include <string>
 #include <sstream>
 #include <numeric>
-#include <atomic>
 
 #include "3rdparty/rectpack2D/src/rectpack2D/finders_interface.h"
 
@@ -287,16 +286,6 @@ void bake_fresh_atlas(
 
 		const bool gore_enabled = in.gore_enabled;
 
-		std::atomic<double> solidify_seconds = 0.0;
-
-		auto add_solidify_time = [&solidify_seconds](const double v) {
-			auto current = solidify_seconds.load();
-
-			while (!solidify_seconds.compare_exchange_weak(current, current + v)) {
-
-			}
-		};
-
 		/*
 			The buffers above are thread_local, which a lambda cannot capture - and a
 			helper thread would otherwise reach for its own, empty copy. Bind them to
@@ -311,7 +300,6 @@ void bake_fresh_atlas(
 			&baked,
 			&packed_rects,
 			&image_bytes,
-			&add_solidify_time,
 			output_image_size,
 			gore_enabled
 		](const worker_input& input) {
@@ -391,11 +379,7 @@ void bake_fresh_atlas(
 				}
 			}
 
-			{
-				auto timer = augs::timer();
-				loaded_image.solidify_transparent_edge();
-				add_solidify_time(timer.get<std::chrono::seconds>());
-			}
+			loaded_image.solidify_transparent_edge();
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			loaded_image.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
@@ -438,14 +422,6 @@ void bake_fresh_atlas(
 		else {
 			for (const auto& w : inputs) {
 				worker(w);
-			}
-		}
-
-		{
-			const auto total = solidify_seconds.load();
-
-			if (total > 0.0) {
-				out.profiler.solidifying_images.measure(total);
 			}
 		}
 	}

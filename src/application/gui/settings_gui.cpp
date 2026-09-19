@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <thread>
+#include <algorithm>
 
 #include "augs/log.h"
 #include "augs/log_path_getters.h"

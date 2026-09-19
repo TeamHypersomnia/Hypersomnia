@@ -44,6 +44,23 @@ namespace augs {
 #endif
 	}
 
+	/*
+		Decoding a sound is pure CPU work and accounts for some 98% of the load, so it
+		is done from several threads at once. The OpenAL calls are the remaining 2%,
+		and they are serialised rather than relied upon to be thread-safe: alGetError,
+		which AL_CHECK uses, reports per context and not per thread, so concurrent
+		callers would consume each other's errors.
+
+		Taken by destroy() as well, so that every AL call this class makes obeys one
+		rule. Its callers all happen to sit on one thread today; holding the lock
+		there costs nothing and makes that true by construction rather than by
+		coincidence.
+
+		At namespace scope because the project builds with -fno-threadsafe-statics,
+		which would leave a function-local static without an initialisation guard.
+	*/
+	static std::mutex al_buffer_mutex;
+
 	single_sound_buffer::single_sound_buffer(const sound_data& data, const sound_buffer_loading_settings) {
 		set_data(data);
 	}
@@ -77,6 +94,8 @@ namespace augs {
 	}
 
 	void single_sound_buffer::destroy() {
+		auto lock = std::scoped_lock(al_buffer_mutex);
+
 		if (initialized) {
 #if TRACE_CONSTRUCTORS_DESTRUCTORS
 			--g_num_buffers;
@@ -94,18 +113,6 @@ namespace augs {
 	single_sound_buffer::operator ALuint() const {
 		return get_id();
 	}
-
-	/*
-		Decoding a sound is pure CPU work and accounts for some 98% of the load, so it
-		is done from several threads at once. The OpenAL calls in set_data are the
-		remaining 2%, and they are serialised rather than relied upon to be
-		thread-safe: alGetError, which AL_CHECK uses, reports per context and not per
-		thread, so concurrent callers would consume each other's errors.
-
-		At namespace scope because the project builds with -fno-threadsafe-statics,
-		which would leave a function-local static without an initialisation guard.
-	*/
-	static std::mutex al_buffer_mutex;
 
 	void single_sound_buffer::set_data(const sound_data& new_data) {
 		auto lock = std::scoped_lock(al_buffer_mutex);

@@ -143,16 +143,23 @@ void regenerate_and_gather_subjects(
 			in.progress->max_neon_maps.store(total_to_regenerate);
 		}
 
-		auto worker = [make_view, &in, &neon_regen_inputs](const image_definition& d) {
-			const auto this_i = index_in(in.image_definitions.get_objects(), d);
+		/*
+			neon_regen_inputs was filled by iterating in.image_definitions, and a pool
+			iterates exactly its vector of objects - so the index handed out by
+			process() addresses both.
+		*/
+		const auto& definitions = in.image_definitions.get_objects();
 
-			const auto this_cached_in = neon_regen_inputs[this_i];
+		auto worker = [&make_view, &in, &neon_regen_inputs, &definitions](const std::size_t i) {
+			const auto& d = definitions[i];
+
+			const auto& this_cached_in = neon_regen_inputs[i];
 			const auto def = make_view(d);
 
 			const bool force = in.settings.regenerate_every_time;
 			def.regenerate_desaturation(force);
 
-			if (this_cached_in) {
+			if (this_cached_in.has_value()) {
 				if (in.progress) {
 					in.progress->current_neon_map_num.fetch_add(1, std::memory_order_relaxed);
 				}
@@ -161,15 +168,7 @@ void regenerate_and_gather_subjects(
 			}
 		};
 
-		{
-			const auto& definitions = in.image_definitions.get_objects();
-
-			workers.process(
-				definitions.size(),
-				[&definitions, worker](const std::size_t i) { worker(definitions[i]); },
-				priority
-			);
-		}
+		workers.process(definitions.size(), worker, priority);
 
 		/*
 			Push freshly regenerated neon maps / desaturations into IndexedDB on web,
@@ -387,7 +386,8 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 		{
 			atlas_subjects,
 			in.max_atlas_size,
-			1,
+			false /* use_resource_workers: a handful of thumbnails is not worth the round trip,
+			         and this bake happens while the game is already running */,
 			true /* gore_enabled — ad-hoc atlas (avatars/thumbnails), no gore content */
 		},
 		{
