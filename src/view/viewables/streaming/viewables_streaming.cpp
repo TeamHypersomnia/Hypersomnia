@@ -354,6 +354,12 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				value_type result;
 				result.resize(sound_requests.size());
 
+				/*
+					ThreadSanitizer reports a race on stb_vorbis' global CRC table here:
+					it rebuilds the table on every decoder open, from whichever thread
+					opens one. Upstream does that on purpose - every writer stores the
+					same constants - so cmake/tsan_suppressions.txt silences it.
+				*/
 				augs::get_resource_workers().process(sound_requests.size(), [&](const std::size_t i) {
 					const auto& r = sound_requests[i];
 

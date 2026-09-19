@@ -1,0 +1,20 @@
+# ThreadSanitizer suppressions.
+#
+# Usage:
+#   TSAN_OPTIONS="suppressions=$(pwd)/cmake/tsan_suppressions.txt" ./Hypersomnia
+#
+# Only races that were looked at and found harmless belong here. Everything else
+# is left visible on purpose - including the reports from glad and openal-soft,
+# which predate any of our threading and have not been analysed.
+
+# stb_vorbis rebuilds its global CRC table on every decoder open, from whichever
+# thread happens to open one. Sounds are decoded on several workers at once, so
+# they race over it - deliberately, on upstream's part: every writer stores the
+# same constants, computed the same way, so a read landing mid-write still sees
+# the right value. See the comment at stb_vorbis.c:3707.
+#
+# Matched on the function rather than on the racing object: 'crc_table' is also
+# the name of unrelated tables in freetype's gzip and in usrsctp, and a pattern
+# is tested against a whole report, so that one would silence those too.
+# crc32_init exists nowhere else in the tree.
+race:crc32_init
