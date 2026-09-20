@@ -50,7 +50,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	*/
 
 	const auto settings = in.settings.with_faded_background(in.extended_range);
-	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size));
+	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size, in.extended_range));
 
 	const auto blank = in.blank_tex;
 	const auto blank_uv = blank.get_center();

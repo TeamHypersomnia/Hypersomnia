@@ -7497,3 +7497,6 @@ This will discard your redo history."
 na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a chcialem zeby zawsze byl jakis wlasnie nawet jak przez prawie róg przeleci
 - moze spozycjonowac te pady jakos ludzko
 
+- na cyberaqua te camera zoomy przy akwarium
+
+- /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg

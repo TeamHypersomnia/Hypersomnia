@@ -5567,7 +5567,7 @@ work_result work(
 					auto& chosen_renderer = get_general_renderer();
 
 					if (minimap.enabled && get_viewed_character().alive()) {
-						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size);
+						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, illuminated_input.minimap_extended_range);
 
 						/*
 							The border is drawn outside of the minimap rect,
@@ -5746,15 +5746,7 @@ work_result work(
 
 				const auto& fow_triangles = chosen_renderer.dedicated[augs::dedicated_buffer::FOG_OF_WAR].triangles;
 
-				const bool minimap_under_tab = visit_current_setup([&](const auto& setup) {
-					using S = remove_cref<decltype(setup)>;
-
-					if constexpr(S::has_arena_gui) {
-						return setup.arena_gui.scoreboard.show;
-					}
-
-					return false;
-				});
+				const bool minimap_under_tab = illuminated_input.minimap_extended_range;
 
 				const bool draw_fow_overlay =
 					minimap.is_visible(minimap_under_tab) &&
@@ -5764,7 +5756,7 @@ work_result work(
 				;
 
 				if (draw_fow_overlay) {
-					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size);
+					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, minimap_under_tab);
 					const auto scissor_expansion = minimap.border_thickness;
 
 					chosen_renderer.set_scissor_bounds({

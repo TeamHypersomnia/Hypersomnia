@@ -79,6 +79,7 @@ struct minimap_settings {
 	float background_alpha_under_tab = 1.0f;
 	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
 	int size = 300;
+	int size_under_tab = 300;
 	int border_thickness = 1;
 	float dot_size_mult = 1.5f;
 	float range_mult = 1.5f;
@@ -123,6 +124,20 @@ struct minimap_settings {
 		while the scoreboard is closed, so that it obscures less of the
 		gameplay area, and become fully opaque once the player holds TAB.
 	*/
+	/*
+		The minimap can grow once the scoreboard is held,
+		so that it stays small during the play but becomes
+		properly readable when actually looked at.
+
+		Note that only the gameplay size is ever accounted for
+		by the HUD elements sharing the minimap's corner -
+		the enlarged one is transient, and the scoreboard
+		covers most of the screen anyway.
+	*/
+	int calc_size(const bool under_tab) const {
+		return under_tab ? size_under_tab : size;
+	}
+
 	float calc_master_alpha(const bool under_tab) const {
 		return std::clamp(under_tab ? master_alpha_under_tab : master_alpha, 0.0f, 1.0f);
 	}

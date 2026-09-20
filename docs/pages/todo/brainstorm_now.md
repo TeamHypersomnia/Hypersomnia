@@ -22,10 +22,6 @@ summary: That which we are brainstorming at the moment.
 
 - review + ocenic perf hity
 
-- na cyberaqua te camera zoomy przy akwarium
-
-- /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg
-
 - sentry
 
 - na duze lany kiedys mozna dac hasla na nicki tez przypisywac im
