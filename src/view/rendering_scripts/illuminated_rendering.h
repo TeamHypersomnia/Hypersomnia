@@ -54,7 +54,7 @@ struct illuminated_rendering_input {
 	const bool viewer_is_spectator;
 	const bool see_enemies_behind_walls = false;
 	const bool draw_enemy_crosshairs = false;
-	const bool minimap_extended_range = false;
+	const minimap_state_type minimap_state = minimap_state_type::NORMAL;
 	const float minimap_area_zoom = 1.0f;
 	const necessary_images_in_atlas_map& necessary_images;
 	const all_loaded_gui_fonts& fonts;

@@ -1505,18 +1505,31 @@ void settings_gui_state::perform(
 
 						if (scope_cfg.enabled) {
 							/*
+								One block of sliders per state the minimap can be in.
 								A zeroed gameplay alpha hides the minimap
 								until the scoreboard is held.
 							*/
 
-							revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
-							revertable_slider(SCOPE_CFG_NVP(master_alpha_under_tab), 0.f, 1.f);
+							augs::for_each_enum_except_bounds([&](const minimap_state_type state) {
+								const auto label = [state]() {
+									switch (state) {
+										case minimap_state_type::UNDER_TAB:
+											return "Under TAB";
+										case minimap_state_type::NORMAL:
+										default:
+											return "While playing";
+									}
+								}();
 
-							revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
-							revertable_slider(SCOPE_CFG_NVP(background_alpha_under_tab), 0.f, 1.f);
+								if (auto appearance_node = scoped_tree_node(label)) {
+									auto& scope_cfg = config.drawing.minimap.appearances[state];
 
-							revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
-							revertable_slider(SCOPE_CFG_NVP(size_under_tab), 100, 600);
+									revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
+									revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
+									revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
+								}
+							});
+
 							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
 							revertable_slider(SCOPE_CFG_NVP(dot_size_mult), 0.5f, 3.f);
 							revertable_slider(SCOPE_CFG_NVP(range_mult), 0.5f, 4.f);

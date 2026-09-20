@@ -49,8 +49,11 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		(players, markers, the bomb) keep their own opacity.
 	*/
 
-	const auto settings = in.settings.with_faded_background(in.extended_range);
-	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size, in.extended_range));
+	const auto settings = in.settings.with_faded_background(in.state);
+	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size, in.state));
+
+	/* Only the scoreboard extends the queried range. */
+	const bool extended_range = in.state == minimap_state_type::UNDER_TAB;
 
 	const auto blank = in.blank_tex;
 	const auto blank_uv = blank.get_center();
@@ -88,7 +91,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	const auto max_fow_side = std::max(fow_size.x, fow_size.y);
 
 	const bool show_entire_map =
-		in.extended_range &&
+		extended_range &&
 		settings.tab_behavior == minimap_tab_behavior_type::SHOW_ENTIRE_MAP
 	;
 
@@ -105,7 +108,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		world_side *= std::max(1.0f, BALANCE_ZOOM_OUT / in.camera_area_zoom);
 	}
 
-	if (in.extended_range && settings.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
+	if (extended_range && settings.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
 		world_side *= settings.scoreboard_range_mult;
 	}
 
@@ -137,7 +140,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		*/
 
 		const bool union_all_islands =
-			in.extended_range &&
+			extended_range &&
 			cosm.get_common_significant().minimap_tab_shows_all_islands
 		;
 
@@ -1025,7 +1028,7 @@ void draw_minimap(const draw_minimap_input in) {
 		the minimap has just drawn, the background and border included.
 	*/
 
-	const auto master_alpha = in.settings.calc_master_alpha(in.extended_range);
+	const auto master_alpha = in.settings.calc_master_alpha(in.state);
 
 	if (master_alpha < 1.0f) {
 		auto scale_alphas_from = [master_alpha](augs::vertex_triangle_buffer& buffer, const std::size_t from) {

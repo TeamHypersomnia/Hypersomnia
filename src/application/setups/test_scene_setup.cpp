@@ -1686,7 +1686,7 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 				The stage bar lays itself out around the minimap's
 				permanent footprint, so always the gameplay size.
 			*/
-			const auto minimap_rect = ltrb(calc_minimap_rect(minimap, screen_size, false));
+			const auto minimap_rect = ltrb(calc_minimap_rect(minimap, screen_size, minimap_state_type::NORMAL));
 
 			const auto& font = in.gui_fonts.gui;
 			const auto line_height = static_cast<int>(font.metrics.get_height());

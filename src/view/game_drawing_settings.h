@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <memory>
 #include "augs/pad_bytes.h"
+#include "augs/misc/enum/enum_array.h"
 #include "augs/templates/maybe.h"
 #include "augs/graphics/rgba.h"
 #include "game/modes/detail/fog_of_war_settings.h"
@@ -70,16 +71,36 @@ enum class minimap_tab_behavior_type {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	The states the minimap can find itself in, each with
+	an appearance of its own. NORMAL is the one the player
+	spends the round looking at, so it is also the only one
+	the surrounding HUD ever lays itself out around.
+*/
+
+enum class minimap_state_type {
+	// GEN INTROSPECTOR enum class minimap_state_type
+	NORMAL,
+	UNDER_TAB,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+struct minimap_appearance {
+	// GEN INTROSPECTOR struct minimap_appearance
+	float master_alpha = 1.0f;
+	float background_alpha = 1.0f;
+	int size = 300;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const minimap_appearance& b) const = default;
+};
+
 struct minimap_settings {
 	// GEN INTROSPECTOR struct minimap_settings
 	bool enabled = true;
-	float master_alpha = 1.0f;
-	float master_alpha_under_tab = 1.0f;
-	float background_alpha = 1.0f;
-	float background_alpha_under_tab = 1.0f;
+	augs::enum_array<minimap_appearance, minimap_state_type> appearances;
 	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
-	int size = 300;
-	int size_under_tab = 300;
 	int border_thickness = 1;
 	float dot_size_mult = 1.5f;
 	float range_mult = 1.5f;
@@ -118,18 +139,21 @@ struct minimap_settings {
 	int extra_bottom_margin = 0;
 	int extra_hud_space = 0;
 
-	/*
-		The minimap can grow once the scoreboard is held,
-		so that it stays small during the play but becomes
-		properly readable when actually looked at.
+	const minimap_appearance& get_appearance(const minimap_state_type state) const {
+		return appearances[state];
+	}
 
-		Note that only the gameplay size is ever accounted for
-		by the HUD elements sharing the minimap's corner -
-		the enlarged one is transient, and the scoreboard
-		covers most of the screen anyway.
+	/*
+		The appearance the surrounding HUD makes room for.
+		The other states are transient - a corner element
+		must not jump around while the scoreboard is tapped.
 	*/
-	int calc_size(const bool under_tab) const {
-		return under_tab ? size_under_tab : size;
+	const minimap_appearance& get_gameplay_appearance() const {
+		return get_appearance(minimap_state_type::NORMAL);
+	}
+
+	int calc_size(const minimap_state_type state) const {
+		return get_appearance(state).size;
 	}
 
 	/*
@@ -140,8 +164,8 @@ struct minimap_settings {
 		A zeroed gameplay alpha is how one asks for a minimap
 		that only ever shows up under TAB.
 	*/
-	float calc_master_alpha(const bool under_tab) const {
-		return std::clamp(under_tab ? master_alpha_under_tab : master_alpha, 0.0f, 1.0f);
+	float calc_master_alpha(const minimap_state_type state) const {
+		return std::clamp(get_appearance(state).master_alpha, 0.0f, 1.0f);
 	}
 
 	/*
@@ -152,13 +176,13 @@ struct minimap_settings {
 		This way the map itself can be faded out to a bare hint
 		while the players, the markers and the bomb stay fully readable.
 	*/
-	float calc_background_alpha(const bool under_tab) const {
-		return std::clamp(under_tab ? background_alpha_under_tab : background_alpha, 0.0f, 1.0f);
+	float calc_background_alpha(const minimap_state_type state) const {
+		return std::clamp(get_appearance(state).background_alpha, 0.0f, 1.0f);
 	}
 
-	minimap_settings with_faded_background(const bool under_tab) const {
+	minimap_settings with_faded_background(const minimap_state_type state) const {
 		auto result = *this;
-		const auto alpha = calc_background_alpha(under_tab);
+		const auto alpha = calc_background_alpha(state);
 
 		if (alpha < 1.0f) {
 			const auto faded = {
@@ -177,8 +201,8 @@ struct minimap_settings {
 		return result;
 	}
 
-	bool is_visible(const bool under_tab) const {
-		return enabled && calc_master_alpha(under_tab) > 0.0f;
+	bool is_visible(const minimap_state_type state) const {
+		return enabled && calc_master_alpha(state) > 0.0f;
 	}
 
 	/*
@@ -186,7 +210,17 @@ struct minimap_settings {
 		sighting system that feeds it can be left unadvanced.
 	*/
 	bool is_ever_visible() const {
-		return is_visible(false) || is_visible(true);
+		if (!enabled) {
+			return false;
+		}
+
+		for (const auto& appearance : appearances) {
+			if (std::clamp(appearance.master_alpha, 0.0f, 1.0f) > 0.0f) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/*
@@ -194,7 +228,7 @@ struct minimap_settings {
 		so the other HUD elements have to make room for it there.
 	*/
 	bool occupies_corner(const hud_corner_type corner) const {
-		return is_visible(false) && position == corner;
+		return is_visible(minimap_state_type::NORMAL) && position == corner;
 	}
 };
 

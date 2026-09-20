@@ -29,8 +29,11 @@ struct draw_minimap_input {
 	const minimap_settings& settings;
 	const fog_of_war_settings& fog_of_war;
 
-	/* True when the scoreboard is open - doubles the queried range. */
-	const bool extended_range;
+	/*
+		Which of the configured appearances to draw with.
+		Under the scoreboard, the queried range is extended as well.
+	*/
+	const minimap_state_type state;
 
 	/*
 		The camera's current (smoothed) zoom area multiplier -

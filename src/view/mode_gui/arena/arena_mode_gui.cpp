@@ -831,7 +831,7 @@ void arena_gui_state::draw_mode_gui(
 					const auto& minimap = in.config.drawing.minimap;
 
 					if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-						return minimap.size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
+						return minimap.get_gameplay_appearance().size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
 					}
 
 					return 0;
@@ -1224,7 +1224,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto& minimap = in.config.drawing.minimap;
 
 				if (minimap.occupies_corner(corner)) {
-					result += minimap.size + 2 * minimap_screen_margin_v;
+					result += minimap.get_gameplay_appearance().size + 2 * minimap_screen_margin_v;
 				}
 
 				if (corner == hud_corner_type::RIGHT_BOTTOM) {

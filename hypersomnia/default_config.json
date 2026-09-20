@@ -227,13 +227,19 @@
 
         "minimap": {
             "enabled": true,
-            "master_alpha": 1.0,
-            "master_alpha_under_tab": 1.0,
-            "background_alpha": 0.45,
-            "background_alpha_under_tab": 1.0,
+            "appearances": {
+                "NORMAL": {
+                    "master_alpha": 1.0,
+                    "background_alpha": 0.45,
+                    "size": 320
+                },
+                "UNDER_TAB": {
+                    "master_alpha": 1.0,
+                    "background_alpha": 1.0,
+                    "size": 320
+                }
+            },
             "position": "LEFT_TOP",
-            "size": 320,
-            "size_under_tab": 320,
             "border_thickness": 1,
             "dot_size_mult": 1.25,
             "range_mult": 1.75,

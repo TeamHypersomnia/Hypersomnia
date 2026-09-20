@@ -362,7 +362,7 @@ void value_bar::rebuild_layouts(
 		const auto& minimap = context.dependencies.drawing.minimap;
 
 		if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-			return minimap.size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
+			return minimap.get_gameplay_appearance().size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
 		}
 
 		return 0;

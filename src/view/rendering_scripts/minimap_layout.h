@@ -7,9 +7,9 @@ constexpr int minimap_screen_margin_v = 10;
 inline ltrbi calc_minimap_rect(
 	const minimap_settings& settings,
 	const vec2i screen_size,
-	const bool under_tab
+	const minimap_state_type state
 ) {
-	const auto size = vec2i::square(settings.calc_size(under_tab));
+	const auto size = vec2i::square(settings.calc_size(state));
 	const auto margin = minimap_screen_margin_v;
 
 	/*

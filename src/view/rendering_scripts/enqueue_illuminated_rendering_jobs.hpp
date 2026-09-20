@@ -779,11 +779,11 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto minimap_job = [minimap_extended_range = in.minimap_extended_range, minimap_area_zoom = in.minimap_area_zoom, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
+	auto minimap_job = [minimap_state = in.minimap_state, minimap_area_zoom = in.minimap_area_zoom, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
 		::draw_minimap({
 			settings.minimap,
 			settings.fog_of_war,
-			minimap_extended_range,
+			minimap_state,
 			minimap_area_zoom,
 			screen_size,
 			viewed_character,
@@ -810,7 +810,7 @@ void enqueue_illuminated_rendering_jobs(
 		pool.enqueue(indicators_and_callouts_job);
 		pool.enqueue(sentience_hud_job);
 
-		if (settings.minimap.is_visible(in.minimap_extended_range)) {
+		if (settings.minimap.is_visible(in.minimap_state)) {
 			pool.enqueue(minimap_job);
 		}
 	}

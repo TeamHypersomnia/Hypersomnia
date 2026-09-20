@@ -5318,7 +5318,7 @@ work_result work(
 					viewer_is_spectator(),
 					see_enemies_behind_walls,
 					draw_enemy_crosshairs,
-					minimap_extended_range,
+					minimap_extended_range ? minimap_state_type::UNDER_TAB : minimap_state_type::NORMAL,
 					gameplay_camera.current_area_zoom_mult,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts(),
@@ -5566,8 +5566,8 @@ work_result work(
 					const auto& minimap = new_viewing_config.drawing.minimap;
 					auto& chosen_renderer = get_general_renderer();
 
-					if (minimap.is_visible(illuminated_input.minimap_extended_range) && get_viewed_character().alive()) {
-						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, illuminated_input.minimap_extended_range);
+					if (minimap.is_visible(illuminated_input.minimap_state) && get_viewed_character().alive()) {
+						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, illuminated_input.minimap_state);
 
 						/*
 							The border is drawn outside of the minimap rect,
@@ -5746,17 +5746,17 @@ work_result work(
 
 				const auto& fow_triangles = chosen_renderer.dedicated[augs::dedicated_buffer::FOG_OF_WAR].triangles;
 
-				const bool minimap_under_tab = illuminated_input.minimap_extended_range;
+				const auto minimap_state = illuminated_input.minimap_state;
 
 				const bool draw_fow_overlay =
-					minimap.is_visible(minimap_under_tab) &&
+					minimap.is_visible(minimap_state) &&
 					minimap.fog_of_war_color.a > 0 &&
 					minimap_transform.valid &&
 					!fow_triangles.empty()
 				;
 
 				if (draw_fow_overlay) {
-					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, minimap_under_tab);
+					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, minimap_state);
 					const auto scissor_expansion = minimap.border_thickness;
 
 					chosen_renderer.set_scissor_bounds({
@@ -5818,7 +5818,7 @@ work_result work(
 						so it respects both the master and the background alpha.
 					*/
 					auto fow_color = minimap.fog_of_war_color;
-					fow_color.mult_alpha(minimap.calc_master_alpha(minimap_under_tab) * minimap.calc_background_alpha(minimap_under_tab));
+					fow_color.mult_alpha(minimap.calc_master_alpha(minimap_state) * minimap.calc_background_alpha(minimap_state));
 
 					for (const auto& tri : fow_triangles) {
 						auto mapped = tri;
