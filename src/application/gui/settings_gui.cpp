@@ -1510,25 +1510,25 @@ void settings_gui_state::perform(
 								until the scoreboard is held.
 							*/
 
-							augs::for_each_enum_except_bounds([&](const minimap_state_type state) {
-								const auto label = [state]() {
-									switch (state) {
-										case minimap_state_type::UNDER_TAB:
-											return "Under TAB";
-										case minimap_state_type::NORMAL:
-										default:
-											return "While playing";
-									}
-								}();
+							auto do_appearance = [&](const minimap_state_type state) {
+								auto& scope_cfg = config.drawing.minimap.appearances[state];
 
-								if (auto appearance_node = scoped_tree_node(label)) {
-									auto& scope_cfg = config.drawing.minimap.appearances[state];
+								revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
+								revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
+								revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
+							};
 
-									revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
-									revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
-									revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
-								}
-							});
+							/*
+								The gameplay appearance is what one tunes the most,
+								so it stays in the open - only the scoreboard's
+								is folded away.
+							*/
+
+							do_appearance(minimap_state_type::NORMAL);
+
+							if (auto under_tab_node = scoped_tree_node("Under TAB")) {
+								do_appearance(minimap_state_type::UNDER_TAB);
+							}
 
 							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
 							revertable_slider(SCOPE_CFG_NVP(dot_size_mult), 0.5f, 3.f);
