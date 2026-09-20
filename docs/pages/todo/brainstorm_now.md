@@ -6,15 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- cos zeby bylo widac zawsze moje pociski i ich particle w tym extended fowie
+- moze spozycjonowac te pady jakos ludzko
 
-- decale jeszcze powinny wchodzic na gleboko jesli przywalimy w to samo miejsce wiecej niz raz
-	- kwerenda zeby zobaczyc czy docelowa pozycja declau nachodzi na jakis inny decal, moze byc kwerenda do tonpo? bo i tak to renderowane jest wiec to powinno byc tam
-	- jak jest to przesun sie o 80% dlugosci naszego przeskalowanego decala w strone trajektorii, i zrob kolejna kwerende
-	- ogranicz ilosc prob do 10 i do pozostalej dlugosci penetracji tego pocisku wzgledem tego materialu - symulacja penetracji jest zaimplementowana np. w can_weapon_penetrate.hpp
-- also sclampuj skalowanie decali gunshotow tak 0.6x do 2.0x
-- also nie wiem czemu ale kurwa nie swieci ten decal dla szkla
-na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a chcialem zeby zawsze byl jakis wlasnie nawet jak przez prawie róg przeleci
+- kiedys mozna byloby symulowac te trajektorie granatow
 
 - co z facing worlds z ta minimapa kurwa
 	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
@@ -31,6 +25,8 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - review + ocenic perf hity
 
 - naprawic waypointy na minilabie
+	- nie critical bo to bylo tylko przez to ze literki sie pojawiaja w minilabie
+
 - na cyberaqua te camera zoomy przy akwarium
 
 - /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg

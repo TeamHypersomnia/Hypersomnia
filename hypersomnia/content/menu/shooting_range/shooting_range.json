@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-19 13:28:26.740832 UTC"
+        "version_timestamp": "2026-09-20 10:16:11.272545 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -35,7 +35,7 @@
     "external_resources": [
         {
             "path": "captions/glass.png",
-            "file_hash": "3d44ea0d1a7ba7a6fae076c21988ff4a727107138c9ed44250550b5d342a9afe",
+            "file_hash": "ad952aaf897e1a14d2676b0b28332c3bd470fb8d27bb5077d15faa911625cf79",
             "id": "@captions/glass.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -47,7 +47,7 @@
         },
         {
             "path": "captions/metal.png",
-            "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
+            "file_hash": "d918c3bc85e974a066078d23c4409b4dce2b09b75673e844b8feea2f59ebfb65",
             "id": "@captions/metal.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -57,7 +57,7 @@
         },
         {
             "path": "captions/vent.png",
-            "file_hash": "a5bb4864ebd02475245eec67542069a0aec31372063593057ca7842cdd674ae8",
+            "file_hash": "34d7519a5c3ba91d9db2c315b69783ee4dc32a02c4ea6222edf52d81f217a9fb",
             "id": "@captions/vent.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -69,7 +69,7 @@
         },
         {
             "path": "captions/wood.png",
-            "file_hash": "aef50032f491c555a2c7f798bbadc0ff1245475e928124497a1bca51440a7f21",
+            "file_hash": "8c633cd48dc37d6088c5c6cd79982328ab27eaab81b54186930345153404d1f3",
             "id": "@captions/wood.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -81,7 +81,7 @@
         },
         {
             "path": "gfx/metropolis_head_icon.png",
-            "file_hash": "f5b2434feeea5ef7863753b9dc6e11cef51c2d313bb19b013ec02c235ef10f57",
+            "file_hash": "a36ffc3016f743c048591357f5750c0f7a49a1bdc6eae0d5378508cfdb9ed075",
             "id": "@metropolis_head_icon",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -92,7 +92,7 @@
         },
         {
             "path": "gfx/pad_outline.png",
-            "file_hash": "38350600fdfa2032c4e414127c72100b6f5224a40d8541f454925ad5eb2bd4c3",
+            "file_hash": "0271bdbf4e60e99bb605e7d5f8e72d92771009c38c33a9b65a127ba42aa74d71",
             "id": "@pad_outline",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -102,7 +102,7 @@
         },
         {
             "path": "gfx/resistance_head_icon.png",
-            "file_hash": "3cb78cda6e076f6992026ad396f7c6bd0501808a8d91d70df5162be21fcf6655",
+            "file_hash": "effb9f216350c1ccbebbacf7ed3237bf8d53707fdbe7cbb46b2eea81b3397ba7",
             "id": "@resistance_head_icon",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -149,7 +149,7 @@
         },
         {
             "path": "gfx/zoom.png",
-            "file_hash": "645cec995d9c9b8625f3111b59b0fcbfe1f79d5b13cc76afc72edb41f33ec705",
+            "file_hash": "10f2395fd613ae719a85ad7e04794a3afa2f5b985f632ecc1e2dd131c648d3da",
             "id": "@zoom",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -234,13 +234,24 @@
     ],
     "layers": [
         {
+            "id": "faction_pads",
+            "nodes": [
+                "faction_resistance_outline",
+                "faction_metropolis_outline",
+                "faction_resistance",
+                "faction_metropolis"
+            ]
+        },
+        {
             "id": "Layer 30",
+            "is_open_in_editor": false,
             "nodes": [
                 "bombsite"
             ]
         },
         {
             "id": "Layer 29",
+            "is_open_in_editor": false,
             "nodes": [
                 "bomb (1)",
                 "bomb"
@@ -248,8 +259,12 @@
         },
         {
             "id": "Layer 28",
+            "is_open_in_editor": false,
             "nodes": [
+                "minimap_marker (1)",
                 "minimap_marker",
+                "zoom_2x",
+                "zoom_2x_outline",
                 "zoom_4x",
                 "zoom_1x",
                 "zoom_0.8x",
@@ -269,19 +284,16 @@
         {
             "id": "Layer 27",
             "nodes": [
-                "dev_floor_256 (5)",
-                "dev_floor_256 (4)",
-                "dev_floor_256 (3)",
-                "dev_floor_256 (2)",
-                "dev_floor_256 (7)",
-                "dev_floor_256 (6)"
+                "dev_floor_256 (5)"
             ]
         },
         {
-            "id": "Layer 26"
+            "id": "Layer 26",
+            "is_open_in_editor": false
         },
         {
             "id": "Layer 25",
+            "is_open_in_editor": false,
             "nodes": [
                 "nav_island"
             ]
@@ -308,16 +320,20 @@
             ]
         },
         {
-            "id": "Layer 23"
+            "id": "Layer 23",
+            "is_open_in_editor": false
         },
         {
-            "id": "Layer 22"
+            "id": "Layer 22",
+            "is_open_in_editor": false
         },
         {
-            "id": "Layer 21"
+            "id": "Layer 21",
+            "is_open_in_editor": false
         },
         {
             "id": "Layer 20",
+            "is_open_in_editor": false,
             "nodes": [
                 "point_light (8)",
                 "point_light (7)",
@@ -325,10 +341,12 @@
             ]
         },
         {
-            "id": "Layer 19"
+            "id": "Layer 19",
+            "is_open_in_editor": false
         },
         {
             "id": "Layer 18",
+            "is_open_in_editor": false,
             "nodes": [
                 "dev_wall_256 (3)",
                 "dev_wall_256 (2)",
@@ -359,6 +377,7 @@
         },
         {
             "id": "Layer 17",
+            "is_open_in_editor": false,
             "nodes": [
                 "sword-right (1)",
                 "sword-right",
@@ -367,20 +386,24 @@
             ]
         },
         {
-            "id": "Layer 16"
+            "id": "Layer 16",
+            "is_open_in_editor": false
         },
         {
             "id": "Layer 15",
+            "is_open_in_editor": false,
             "nodes": [
                 "bilmik (1)",
                 "bilmik"
             ]
         },
         {
-            "id": "Layer 14"
+            "id": "Layer 14",
+            "is_open_in_editor": false
         },
         {
             "id": "Layer 13",
+            "is_open_in_editor": false,
             "nodes": [
                 "vindicator (2)",
                 "vindicator"
@@ -388,6 +411,7 @@
         },
         {
             "id": "Layer 10",
+            "is_open_in_editor": false,
             "nodes": [
                 "szczur (2)",
                 "szczur"
@@ -395,6 +419,7 @@
         },
         {
             "id": "Layer 6",
+            "is_open_in_editor": false,
             "nodes": [
                 "aquarium_ambience_right",
                 "aquarium_ambience_left"
@@ -402,6 +427,7 @@
         },
         {
             "id": "Layer 5",
+            "is_open_in_editor": false,
             "nodes": [
                 "crate (1)",
                 "crate"
@@ -409,6 +435,7 @@
         },
         {
             "id": "Layer 4",
+            "is_open_in_editor": false,
             "nodes": [
                 "portal (7)",
                 "portal (6)",
@@ -420,12 +447,14 @@
         },
         {
             "id": "Layer 3",
+            "is_open_in_editor": false,
             "nodes": [
                 "aquarium"
             ]
         },
         {
             "id": "knifes",
+            "is_open_in_editor": false,
             "nodes": [
                 "assault_rattle-right (1)",
                 "fury_thrower-right (1)",
@@ -459,6 +488,7 @@
         },
         {
             "id": "portals",
+            "is_open_in_editor": false,
             "nodes": [
                 "portal (1)",
                 "portal (3)",
@@ -468,6 +498,7 @@
         },
         {
             "id": "Layer 2",
+            "is_open_in_editor": false,
             "nodes": [
                 "Water room floor 2 (4)",
                 "range_spawn"
@@ -475,6 +506,7 @@
         },
         {
             "id": "Layer 12",
+            "is_open_in_editor": false,
             "nodes": [
                 "force_grenade (1)-down-down (1)",
                 "flashbang (1)-down-down (1)",
@@ -552,6 +584,7 @@
         },
         {
             "id": "Layer 8",
+            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_32 (7)",
                 "dev_floor_32 (6)",
@@ -565,6 +598,7 @@
         },
         {
             "id": "Layer 7",
+            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_128 (2)",
                 "point_light (6)",
@@ -576,6 +610,7 @@
         },
         {
             "id": "weapons2-right",
+            "is_open_in_editor": false,
             "nodes": [
                 "cyberspray-right",
                 "warx-right",
@@ -594,6 +629,7 @@
         },
         {
             "id": "weapons1-right",
+            "is_open_in_editor": false,
             "nodes": [
                 "elon-right",
                 "lews-right",
@@ -610,6 +646,7 @@
         },
         {
             "id": "weapons1",
+            "is_open_in_editor": false,
             "nodes": [
                 "elon",
                 "lews",
@@ -628,6 +665,7 @@
         },
         {
             "id": "weapons2",
+            "is_open_in_editor": false,
             "nodes": [
                 "cyberspray",
                 "warx",
@@ -646,6 +684,7 @@
         },
         {
             "id": "Layer 1",
+            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (32)",
                 "team_spawn (31)",
@@ -749,6 +788,7 @@
         },
         {
             "id": "garden lights",
+            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp",
                 "Strong lamp (2)"
@@ -763,15 +803,6 @@
                 "dev_wall_128",
                 "Water room floor-brighter",
                 "Water room floor-brighter (1)"
-            ]
-        },
-        {
-            "id": "faction_pads",
-            "nodes": [
-                "faction_resistance_outline",
-                "faction_metropolis_outline",
-                "faction_resistance",
-                "faction_metropolis"
             ]
         }
     ],
@@ -1359,21 +1390,15 @@
             "size": [10240, 3840]
         },
         {
-            "id": "dev_floor_256 (6)",
-            "type": "dev_floor_256",
-            "pos": [-3840.0, 2944.0],
-            "size": [256, 256]
-        },
-        {
             "id": "zoom_0.8x",
             "type": "@zoom",
-            "pos": [-640.0, 3456.0],
+            "pos": [-640.0, 3712.0],
             "size": [64, 64]
         },
         {
             "id": "zoom_1x",
             "type": "@zoom",
-            "pos": [-640.0, 3200.0],
+            "pos": [-640.0, 3456.0],
             "size": [64, 64]
         },
         {
@@ -1384,7 +1409,7 @@
         {
             "id": "faction_metropolis",
             "type": "@metropolis_head_icon",
-            "pos": [-2816.0, 2944.0]
+            "pos": [-2560.0, 2691.0]
         },
         {
             "id": "faction_resistance_outline",
@@ -1395,110 +1420,98 @@
         {
             "id": "faction_metropolis_outline",
             "type": "@pad_outline",
-            "pos": [-2816.0, 2944.0],
+            "pos": [-2560.0, 2688.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_4x",
             "type": "@zoom",
-            "pos": [-640.0, 2944.0],
+            "pos": [-384.0, 2688.0],
             "size": [64, 64]
         },
         {
             "id": "zoom_0.75x",
             "type": "@zoom",
-            "pos": [-640.0, 3712.0],
+            "pos": [-640.0, 3968.0],
             "size": [64, 64]
         },
         {
             "id": "zoom_0.7x",
             "type": "@zoom",
-            "pos": [-640.0, 3968.0],
+            "pos": [-640.0, 4224.0],
             "size": [64, 64]
         },
         {
             "id": "zoom_0.5x",
             "type": "@zoom",
-            "pos": [-640.0, 4480.0],
+            "pos": [-640.0, 4736.0],
             "size": [64, 64]
-        },
-        {
-            "id": "dev_floor_256 (2)",
-            "type": "dev_floor_256",
-            "pos": [-3328.0, 2944.0],
-            "size": [256, 256]
-        },
-        {
-            "id": "dev_floor_256 (3)",
-            "type": "dev_floor_256",
-            "pos": [-3072.0, 2944.0],
-            "size": [256, 256]
-        },
-        {
-            "id": "dev_floor_256 (4)",
-            "type": "dev_floor_256",
-            "pos": [-2816.0, 2944.0],
-            "size": [256, 256]
         },
         {
             "id": "dev_floor_256 (5)",
             "type": "dev_floor_256",
-            "pos": [-2560.0, 2944.0],
-            "size": [256, 256]
-        },
-        {
-            "id": "dev_floor_256 (7)",
-            "type": "dev_floor_256",
-            "pos": [-3584.0, 2944.0],
-            "size": [256, 256]
+            "pos": [-3200.0, 2816.0],
+            "size": [1536, 512]
         },
         {
             "id": "zoom_0.6x",
             "type": "@zoom",
-            "pos": [-640.0, 4224.0],
+            "pos": [-640.0, 4480.0],
             "size": [64, 64]
         },
         {
             "id": "zoom_1x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 3200.0],
+            "pos": [-640.0, 3456.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_4x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 2944.0],
+            "pos": [-384.0, 2688.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.8x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 3456.0],
+            "pos": [-640.0, 3712.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.75x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 3712.0],
+            "pos": [-640.0, 3968.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.7x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 3968.0],
+            "pos": [-640.0, 4224.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.6x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 4224.0],
+            "pos": [-640.0, 4480.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.5x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 4480.0],
+            "pos": [-640.0, 4736.0],
             "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_2x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 2688.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_2x",
+            "type": "@zoom",
+            "pos": [-640.0, 2688.0],
+            "size": [64, 64]
         },
         {
             "id": "aquarium_ambience_left",
@@ -2964,7 +2977,7 @@
             "type": "portal",
             "faction": "RESISTANCE",
             "shape": "BOX",
-            "pos": [-640.0, 3840.000244140625],
+            "pos": [-640.0, 4096.0],
             "size": [256, 1536],
             "disable_all_entry_effects": true,
             "reacts_to": {
@@ -2984,6 +2997,25 @@
             "faction": "RESISTANCE",
             "pos": [40.0, 1408.0],
             "size": [4272, 256]
+        },
+        {
+            "id": "minimap_marker (1)",
+            "type": "portal",
+            "faction": "RESISTANCE",
+            "shape": "BOX",
+            "pos": [-512.0, 2688.0],
+            "size": [512, 256],
+            "disable_all_entry_effects": true,
+            "reacts_to": {
+                "characters": false,
+                "character_weapons": false,
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            }
         }
     ]
 }

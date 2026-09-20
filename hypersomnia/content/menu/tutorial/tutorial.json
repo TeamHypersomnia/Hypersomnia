@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-16 19:36:37.334811 UTC"
+        "version_timestamp": "2026-09-20 10:17:56.775677 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -35,7 +35,7 @@
     "external_resources": [
         {
             "path": "captions/advanced.png",
-            "file_hash": "db725692ed1f29a2419fab1e5f55329fcc7089f83c44b02aae7e99cacbc18972",
+            "file_hash": "ff303f0cf1be48eebbea214651335585926e7a6b2f830da7bc13d9a6562bacfb",
             "id": "@advanced",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -45,7 +45,7 @@
         },
         {
             "path": "captions/glass.png",
-            "file_hash": "3d44ea0d1a7ba7a6fae076c21988ff4a727107138c9ed44250550b5d342a9afe",
+            "file_hash": "ad952aaf897e1a14d2676b0b28332c3bd470fb8d27bb5077d15faa911625cf79",
             "id": "@captions/glass.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -57,7 +57,7 @@
         },
         {
             "path": "captions/menu.png",
-            "file_hash": "c40b0009b01b152e98c5635c00de3552a00b1332302e2417325f9c501b224058",
+            "file_hash": "9f7f4cd25afef47abc48b91e87a2cb1d498032d4eb6b857d1b48f0a4a3f6b993",
             "id": "@menu",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -69,7 +69,7 @@
         },
         {
             "path": "captions/metal.png",
-            "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
+            "file_hash": "d918c3bc85e974a066078d23c4409b4dce2b09b75673e844b8feea2f59ebfb65",
             "id": "@captions/metal.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -79,7 +79,7 @@
         },
         {
             "path": "captions/range.png",
-            "file_hash": "b48f30bc5d35a7be466277cc1a914911e534d7f009473701bb3ab51f3d7ea06e",
+            "file_hash": "d5e8a1a2c2c04ac9708db21a220c3b46537610f3be8d1f18e14060c2ef3bd1c8",
             "id": "@range",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -91,7 +91,7 @@
         },
         {
             "path": "captions/surf.png",
-            "file_hash": "99dc0a53037b99e1e1512300f2e117241e64f3485a5782f02458f56c243cc46e",
+            "file_hash": "2cefc0c128abc0d654fa79735d573ae16bdfa014cbab9462a483b2a0dfc0f442",
             "id": "@surf",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -103,7 +103,7 @@
         },
         {
             "path": "captions/vent.png",
-            "file_hash": "a5bb4864ebd02475245eec67542069a0aec31372063593057ca7842cdd674ae8",
+            "file_hash": "34d7519a5c3ba91d9db2c315b69783ee4dc32a02c4ea6222edf52d81f217a9fb",
             "id": "@captions/vent.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -115,7 +115,7 @@
         },
         {
             "path": "captions/wood.png",
-            "file_hash": "aef50032f491c555a2c7f798bbadc0ff1245475e928124497a1bca51440a7f21",
+            "file_hash": "8c633cd48dc37d6088c5c6cd79982328ab27eaab81b54186930345153404d1f3",
             "id": "@captions/wood.png",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -149,7 +149,7 @@
         },
         {
             "path": "gfx/asite.png",
-            "file_hash": "93851d8ea61b5fbbb9d2996dbf225afb33ac857b810bc7fe0267542b4701b124",
+            "file_hash": "21584e73b6267db7db92545ea973cdb45243b35770a3a03bb81353f4d804eaa3",
             "id": "@asite",
             "neon_map": {
                 "light_colors": [[255, 0, 0, 255, 1.0], [150, 0, 20, 255, 1.0]
@@ -159,7 +159,7 @@
         },
         {
             "path": "gfx/bsite.png",
-            "file_hash": "2412b2636a06074fe5bf84a29f339f973c1f0a7e0db95c922b7d815d0a4a9f50",
+            "file_hash": "4c9cafd9bd473e264cdb2a83f1762f6908eb7224dcec39f7c37e0958e660d303",
             "id": "@bsite",
             "neon_map": {
                 "light_colors": [[255, 0, 0, 255, 1.0], [150, 0, 20, 254, 1.0], [150, 0, 20, 255, 1.0]
@@ -206,7 +206,7 @@
         },
         {
             "path": "gfx/yellow_barrier.png",
-            "file_hash": "476d3f37c8629632a11f7b5102840f4e54629ab285299588ce8550538ee0d177",
+            "file_hash": "0abb76a893b068ac7081f1f6a22414fe7be9c37fd68ca93d4889bca0c53741b4",
             "id": "@yellow_barrier",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -1097,7 +1097,6 @@
         },
         {
             "id": "Level13",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level13 island",
                 "floor_right (18)",
@@ -1135,6 +1134,7 @@
                 "kill15 (1)",
                 "kill15 (2)",
                 "kill15",
+                "tip3_1 (74)",
                 "tip3_1 (39)",
                 "metropolis_backpack (1)",
                 "tip3_1 (70)",
@@ -1147,6 +1147,7 @@
                 "vent (56)",
                 "vent (55)",
                 "bilmer2000",
+                "dev_floor_256 (150)",
                 "dev_floor_256 (142)",
                 "dev_floor_256 (141)",
                 "dev_floor_256 (140)",
@@ -6849,6 +6850,13 @@
             "type": "dev_floor_256",
             "pos": [38400.0, 6528.0],
             "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (150)",
+            "type": "dev_floor_256",
+            "pos": [20352.0, 28416.0],
+            "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
@@ -17116,6 +17124,35 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Nice work!"
+        },
+        {
+            "id": "tip3_1 (74)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [20352.0, 28416.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Well done!"
         }
     ]
 }

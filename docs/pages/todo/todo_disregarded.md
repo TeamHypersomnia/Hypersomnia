@@ -741,3 +741,5 @@ summary: Just a hidden scratchpad.
 - mozna sprobowac rysowac tylko te bloodsplattery co sa w fovie
 	- "co tu sie odjebalo" effect
 	- i nie beda sie pokazywac splattery za scianami w dziwnych miejscach
+- cos zeby bylo widac zawsze moje pociski i ich particle w tym extended fowie
+
