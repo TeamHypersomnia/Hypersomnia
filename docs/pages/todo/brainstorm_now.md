@@ -8,15 +8,11 @@ summary: That which we are brainstorming at the moment.
 
 - kiedys mozna byloby symulowac te trajektorie granatow
 
-- co z facing worlds z ta minimapa kurwa
-	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
-
 - swiecacy dev label
 - te public keye cale dla linuxiarzy
 
 - naprawic te kurwa invalid filenames i jebane stampy w projectach z menu
 
-- miniaturke naprawic w facing worldsach
 - proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp
 

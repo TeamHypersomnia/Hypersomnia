@@ -4,6 +4,17 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [3.0.0] - 2026-09-20
+
+### Added
+
+- **Gore.**
+- **Intelligent bots with progression.**
+- **Decals.**
+- **Bullet traces.**
+- Game is zoomed out by 0.8x by default.
+- Many more!
+
 ## [1.6.3] - 2025-10-26
 
 ### Changed

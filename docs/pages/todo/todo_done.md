@@ -7500,3 +7500,7 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - na cyberaqua te camera zoomy przy akwarium
 
 - /bots 0 naprawic jak levelling i przypomniec se post-turniej feedback, mam chyba na tg
+
+- co z facing worlds z ta minimapa kurwa
+	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
+- miniaturke naprawic w facing worldsach

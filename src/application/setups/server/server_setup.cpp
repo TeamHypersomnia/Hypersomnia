@@ -5289,7 +5289,7 @@ void server_setup::handle_client_chat_command(
 
 				if (current_difficulty == target_difficulty) {
 					broadcast_info(
-						typesafe_sprintf("Bots were already %x.", augs::enum_to_string(target_difficulty)),
+						typesafe_sprintf("Bots are already %x.", augs::enum_to_string(target_difficulty)),
 						chat_target_type::INFO
 					);
 
