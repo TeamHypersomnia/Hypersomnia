@@ -21,6 +21,31 @@ namespace augs {
 		return false;
 	}
 
+	basic_vec2<short> window::consume_whole_raw_motion(const vec2d motion) {
+		/*
+			The platform may report fractional deltas (pointer acceleration,
+			high resolution devices, content scaling). Carry the fraction over
+			to the next event instead of truncating it,
+			so that slow movements don't get lost entirely.
+		*/
+
+		raw_motion_remainder += motion;
+
+		/* Clamp before the cast so that an absurd value can't wrap the short */
+		auto whole = [](const double v) {
+			return static_cast<int>(std::clamp(v, -30000.0, 30000.0));
+		};
+
+		const auto result = vec2i(
+			whole(raw_motion_remainder.x),
+			whole(raw_motion_remainder.y)
+		);
+
+		raw_motion_remainder -= vec2d(result);
+
+		return basic_vec2<short>(result);
+	}
+
 	event::change window::do_raw_motion(basic_vec2<short> motion) {
 		/* Clamp it out of consideration for network */
 		motion.x = std::clamp(motion.x, mouse_rel_min_v, mouse_rel_max_v);

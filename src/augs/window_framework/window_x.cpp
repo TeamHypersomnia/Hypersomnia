@@ -2,6 +2,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <climits>
+#include <cmath>
+#include <algorithm>
 #include <thread>
 
 #include <unistd.h>
@@ -634,10 +636,56 @@ namespace augs {
 		}
 	}
 
-	static inline double fp3232val(xcb_input_fp3232_t* val)
+	static inline double fp3232val(const xcb_input_fp3232_t* val)
 	{
 		//LOG_NVPS(val->integral, val->frac, val->frac / (double)UINT_MAX);
 		return val->integral + val->frac / (double)UINT_MAX;
+	}
+
+	/*
+		Extracts the pointer motion from a raw XI2 event.
+
+		The valuator mask tells us which axes the event actually carries,
+		and the axis values are packed in the order of the set mask bits.
+		Only the valuators 0 and 1 are the pointer's X and Y;
+		2 and 3 are the scroll axes, and must never be read as motion,
+		otherwise a single wheel notch would jerk the crosshair away.
+
+		We read axisvalues (the values that X applies to the pointer itself),
+		not axisvalues_raw (the unaccelerated device counts).
+	*/
+
+	static vec2d get_raw_motion_axes(const xcb_input_raw_motion_event_t* const mot) {
+		const auto* const mask = xcb_input_raw_button_press_valuator_mask(mot);
+		const auto mask_len = static_cast<int>(mot->valuators_len);
+
+		const auto* const axes = xcb_input_raw_button_press_axisvalues(mot);
+		const auto axis_n = xcb_input_raw_button_press_axisvalues_raw_length(mot);
+
+		auto result = vec2d::zero;
+		auto next_axis = 0;
+
+		for (int word = 0; word < mask_len && next_axis < axis_n; ++word) {
+			for (int bit = 0; bit < 32 && next_axis < axis_n; ++bit) {
+				if (0 == (mask[word] & (uint32_t(1) << bit))) {
+					continue;
+				}
+
+				const auto valuator = word * 32 + bit;
+				const auto value = fp3232val(&axes[next_axis]);
+
+				++next_axis;
+
+				if (valuator == 0) {
+					result.x = value;
+				}
+				else if (valuator == 1) {
+					result.y = value;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	void window::collect_entropy(local_entropy& output) {
@@ -692,33 +740,15 @@ namespace augs {
 					&& generic_event->extension == xi_opcode 
 					&& generic_event->event_type == XI_RawMotion
 				) {
-					const auto mot = reinterpret_cast<xcb_input_raw_motion_event_t*>(generic_event);
-					const auto axis_n = xcb_input_raw_button_press_axisvalues_raw_length(mot);
+					const auto mot = reinterpret_cast<const xcb_input_raw_motion_event_t*>(generic_event);
+					const auto motion = get_raw_motion_axes(mot);
 
-					if (2 == axis_n) {
-						const auto axes = xcb_input_raw_button_press_axisvalues(mot);
-						const auto x = fp3232val(&axes[0]);
-						const auto y = fp3232val(&axes[1]);
+					if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
+						const auto whole = consume_whole_raw_motion(motion);
 
-						if (x != 0.0) {
-							smallest_raw_x_unit = std::min(std::abs(x), smallest_raw_x_unit);
+						if (!whole.is_zero()) {
+							output.push_back(do_raw_motion(whole));
 						}
-
-						if (y != 0.0) {
-							smallest_raw_y_unit = std::min(std::abs(y), smallest_raw_y_unit);
-						}
-
-						if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
-							auto ch = do_raw_motion({
-								static_cast<short>(x / smallest_raw_x_unit),
-								static_cast<short>(y / smallest_raw_y_unit) 
-							});
-
-							output.push_back(ch);
-						}
-					}
-					else {
-						/* LOG("WARNING! axis_n = %x (should be 2)", axis_n); */
 					}
 
 					continue;

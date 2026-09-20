@@ -61,7 +61,7 @@ namespace augs {
 		GLFWwindow* window = nullptr;
 		vec2d last_mouse_pos_for_dt;
 		bool mouse_pos_initialized = false;
-		int clips_called = 0;
+		double scroll_remainder = 0.0;
 		float content_scale_x = 1.0f;
 		float content_scale_y = 1.0f;
 
@@ -417,9 +417,24 @@ namespace augs {
 		}
 
 		for (const auto& scroll : platform->unhandled_scrolls) {
+			/*
+				Smooth scrolling devices (e.g. trackpads) report fractions of a notch,
+				so accumulate them instead of truncating each one to zero.
+			*/
+
+			platform->scroll_remainder += scroll.yoffset;
+
+			const auto notches = static_cast<int>(platform->scroll_remainder);
+
+			if (notches == 0) {
+				continue;
+			}
+
+			platform->scroll_remainder -= notches;
+
 			change ch;
 			ch.msg = message::wheel;
-			ch.data.scroll.amount = static_cast<int>(scroll.yoffset);
+			ch.data.scroll.amount = notches;
 
 			handle_event(ch);
 		}
@@ -444,12 +459,11 @@ namespace augs {
 			platform->last_mouse_pos_for_dt = new_mouse_pos;
 
 			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
-				const auto ch = do_raw_motion({
-					static_cast<short>(dt.x),
-					static_cast<short>(dt.y) 
-				});
+				const auto whole = consume_whole_raw_motion(dt);
 
-				handle_event(ch);
+				if (!whole.is_zero()) {
+					handle_event(do_raw_motion(whole));
+				}
 			}
 			else {
 				const auto new_pos = basic_vec2<short>{ 
@@ -616,9 +630,13 @@ namespace augs {
 
 #if PLATFORM_LINUX
 	bool window::set_cursor_clipping_impl(const bool flag) {
-		if (flag) {
-			platform->mouse_pos_initialized = false;
-		}
+		/*
+			Both entering and leaving the cursor-disabled mode switch the cursor
+			to a different coordinate space, so the next reported position
+			must not be treated as a continuation of the previous one.
+		*/
+
+		platform->mouse_pos_initialized = false;
 
 		Display* display = platform->has_x11 ? glfwGetX11Display() : nullptr;
 		Window window_id = display ? glfwGetX11Window(platform->window) : 0;
@@ -684,10 +702,13 @@ namespace augs {
 	}
 
 	bool window::set_cursor_clipping_impl(bool clip) {
-		if (clip && platform->clips_called == 0 && current_settings.draws_own_cursor()) {
-			platform->mouse_pos_initialized = false;
-			platform->clips_called = 1;
-		}
+		/*
+			Both entering and leaving the cursor-disabled mode switch the cursor
+			to a different coordinate space, so the next reported position
+			must not be treated as a continuation of the previous one.
+		*/
+
+		platform->mouse_pos_initialized = false;
 
 		glfwSetInputMode(platform->window, GLFW_CURSOR, clip ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 		return true;

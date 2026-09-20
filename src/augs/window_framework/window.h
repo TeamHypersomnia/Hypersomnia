@@ -81,9 +81,6 @@ namespace augs {
 		);
 
 #elif PLATFORM_UNIX
-		double smallest_raw_x_unit = 1.0;
-		double smallest_raw_y_unit = 1.0;
-
 		xcb_timestamp_t last_ldown_time_ms = 0;
 
 		GLXContext context = 0;
@@ -121,10 +118,14 @@ namespace augs {
 		xywhi current_rect;
 		xywhi last_windowed_rect;
 
+		/* Fractional part of the raw motion, carried over to the next event */
+		vec2d raw_motion_remainder;
+
 		std::optional<event::change> handle_mousemove(
 			const basic_vec2<short> new_position
 		);
-		
+
+		basic_vec2<short> consume_whole_raw_motion(const vec2d motion);
 		event::change do_raw_motion(const basic_vec2<short>);
 		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
 		bool common_event_handler(event::change, local_entropy&);
