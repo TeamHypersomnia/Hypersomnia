@@ -902,9 +902,28 @@ void arena_scoreboard_gui::draw_gui(
 				preffix += fmt(clan, pref_col);
 			}
 
+			/*
+				The level is printed right after the nickname, so its width
+				has to come off the nickname's budget as well - otherwise
+				a long name simply pushes the level out of the column.
+			*/
+
+			const auto level_str = [&]() -> std::string {
+				if constexpr(std::is_same_v<M, test_mode>) {
+					return std::string();
+				}
+				else {
+					if (!show_player_levels || player_data.is_bot) {
+						return std::string();
+					}
+
+					return typesafe_sprintf(" [%x]", player_level_display(player_data.session.casual_level));
+				}
+			}();
+
 			const auto nick_str = clip_to_player_column(
 				get_nickname_str(player_id, player_data),
-				preffix.empty() ? 0 : calc_size(preffix).x
+				(preffix.empty() ? 0 : calc_size(preffix).x) + (level_str.empty() ? 0 : calc_size(level_str).x)
 			);
 
 			col_text(
@@ -913,7 +932,7 @@ void arena_scoreboard_gui::draw_gui(
 			);
 
 			if constexpr(!std::is_same_v<M, test_mode>) {
-				if (show_player_levels && !player_data.is_bot) {
+				if (!level_str.empty()) {
 					auto suf_pos_x = cell_pad.x + 2;
 
 					if (!preffix.empty()) {
@@ -931,7 +950,6 @@ void arena_scoreboard_gui::draw_gui(
 						level_col.mult_luminance(1.25f);
 					}
 
-					const auto level_str = typesafe_sprintf(" [%x]", player_level_display(player_data.session.casual_level));
 					text_stroked(level_str, level_col, vec2i(player_col.l + suf_pos_x, cell_pad.y));
 				}
 			}
