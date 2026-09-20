@@ -13,6 +13,7 @@
 #include "application/config_json_table.h"
 #include "game/modes/mode_helpers.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "view/rendering_scripts/minimap_layout.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/templates/logically_empty.h"
@@ -118,7 +119,45 @@ void arena_scoreboard_gui::draw_gui(
 	const bool compact_h = in.screen_size.y <= 700;
 	const bool compact_w = in.screen_size.x <= 1200;
 	const auto num_headline_cells = compact_h ? 2 : 3;
-	const auto w_mult = compact_w ? 0.8f : 0.6f;
+
+	const auto w_mult = [&]() {
+		const auto base = compact_w ? 0.8f : 0.6f;
+
+		/*
+			The scoreboard only ever shows while TAB is held, which is exactly
+			when the minimap occupies its corner - so the panel must not grow
+			underneath it.
+
+			Above the compact threshold the base is already narrow enough to
+			clear the minimap, so this only ever bites into the compact case.
+
+			Only the player column pays for it: every other one takes its
+			natural width and subtracts it from that column.
+		*/
+
+		const auto& minimap = in.config.drawing.minimap;
+
+		if (!minimap.is_visible(minimap_state_type::UNDER_TAB)) {
+			return base;
+		}
+
+		const auto minimap_rect = ::calc_minimap_rect(minimap, in.screen_size, minimap_state_type::UNDER_TAB);
+
+		const bool minimap_on_the_left =
+			minimap.position == hud_corner_type::LEFT_TOP
+			|| minimap.position == hud_corner_type::LEFT_BOTTOM
+		;
+
+		const auto occupied = minimap_on_the_left ? minimap_rect.r : in.screen_size.x - minimap_rect.l;
+		const auto free_mult = 1.0f - 2.0f * (occupied + minimap_screen_margin_v) / in.screen_size.x;
+
+		/*
+			A minimap sized large enough to leave no room at all
+			must not collapse the scoreboard into nothing.
+		*/
+
+		return std::max(0.4f, std::min(base, free_mult));
+	}();
 
 	auto estimated_window_height = [&]() {
 		auto num_players = uint32_t(0);
