@@ -2,7 +2,7 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2026-04-23 11:43:34.700738 UTC"
+        "version_timestamp": "2026-09-20 10:33:00.500545 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -39,6 +39,12 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 2",
+            "nodes": [
+                "nav_island"
+            ]
+        },
         {
             "id": "waypoints_push",
             "nodes": [
@@ -1831,6 +1837,7 @@
         {
             "id": "bot_waypoint_patrol",
             "type": "bot_waypoint_patrol",
+            "letter": "B",
             "pos": [1354.0, 364.0],
             "rotation": -153.42958068847656
         },
@@ -1849,18 +1856,21 @@
         {
             "id": "bot_waypoint_patrol (3)",
             "type": "bot_waypoint_patrol",
+            "letter": "B",
             "pos": [1791.0, 671.0],
             "rotation": -180.0
         },
         {
             "id": "bot_waypoint_patrol (4)",
             "type": "bot_waypoint_patrol",
+            "letter": "B",
             "pos": [697.0, 465.0],
             "rotation": -163.5802459716797
         },
         {
             "id": "bot_waypoint_patrol (5)",
             "type": "bot_waypoint_patrol",
+            "letter": "B",
             "pos": [493.0, 517.0],
             "rotation": -255.0
         },
@@ -1944,7 +1954,7 @@
             "id": "bot_waypoint_patrol (16)",
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
-            "letter": "B",
+            "letter": "C",
             "pos": [2119.0, 173.0],
             "rotation": -180.0
         },
@@ -1952,7 +1962,7 @@
             "id": "bot_waypoint_patrol (17)",
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
-            "letter": "B",
+            "letter": "C",
             "pos": [2203.0, -174.0],
             "rotation": -180.0
         },
@@ -1960,7 +1970,7 @@
             "id": "bot_waypoint_patrol (18)",
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
-            "letter": "B",
+            "letter": "C",
             "pos": [2711.0, 16.0],
             "rotation": -180.0
         },
@@ -2053,7 +2063,6 @@
         },
         {
             "id": "bombsite (1)",
-            "letter": "A",
             "type": "bombsite",
             "pos": [648.0, -640.0],
             "size": [688, 256]
@@ -2064,6 +2073,13 @@
             "letter": "C",
             "pos": [2392.0, 0.0],
             "size": [688, 256]
+        },
+        {
+            "id": "nav_island",
+            "type": "nav_island",
+            "faction": "RESISTANCE",
+            "pos": [128.0, 0.0],
+            "size": [5632, 3072]
         }
     ]
 }

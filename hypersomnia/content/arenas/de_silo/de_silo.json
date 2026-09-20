@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-05-08 22:54:13.469178 UTC"
+        "version_timestamp": "2026-09-20 10:33:58.556248 UTC"
     },
     "about": {
         "author": "lia",
@@ -45,7 +45,7 @@
         },
         {
             "path": "gfx/blacksilo.png",
-            "file_hash": "fea1157f2a45fa019862a0bca742eb92d7874f4284baa07df248ed27bb5476b7",
+            "file_hash": "01f1d2e4ae2977a430e6ebc3b94fcfe86d177336f760a64caa518a3119828e0c",
             "id": "@blacksilo",
             "color": [255, 255, 255, 147],
             "size": [768, 768],
@@ -72,7 +72,7 @@
         },
         {
             "path": "gfx/cable1.png",
-            "file_hash": "9e5c1262a715257529f85fca362f0db2c11b55d2a11dacf93842afac3c091b8a",
+            "file_hash": "bae0b98f310322dc6a61fd2229e80d072c0a016adbb435538bf987ad1143751a",
             "id": "@cable1",
             "color": [255, 255, 168, 141],
             "size": [256, 128],
@@ -81,7 +81,7 @@
         },
         {
             "path": "gfx/cable2.png",
-            "file_hash": "51b0883549282433b17a482c8c255863eec90c80e3d8a88ff049b9e780360dcc",
+            "file_hash": "e74d9c6dba28f7666813d79c809e826f4694e4d1f8b7ab27976d3dd4eeb705a7",
             "id": "@cable2",
             "color": [255, 255, 255, 208],
             "size": [512, 512],
@@ -90,7 +90,7 @@
         },
         {
             "path": "gfx/cable3.png",
-            "file_hash": "8b72890284de410dc261bc99baca3fb3b40e0833da934992999a394f5c9af697",
+            "file_hash": "3553f3c37d512e7ce75ffd94403c6e0ec144f4eb2d57911f7fa01c962c7e8021",
             "id": "@cable3",
             "color": [255, 255, 255, 109],
             "size": [512, 512],
@@ -102,7 +102,7 @@
         },
         {
             "path": "gfx/cable4.png",
-            "file_hash": "143fbb4cf73b33dcbcd95ec0cafd645c0a4b51ba80c3ba0052d9054c87b3e895",
+            "file_hash": "f17a11097d71cc495e9fc6bda26734c7c3d0e277c327c6d14eb75d9f8ac13340",
             "id": "@cable4",
             "size": [256, 256],
             "stretch_when_resized": true,
@@ -110,7 +110,7 @@
         },
         {
             "path": "gfx/decal1.png",
-            "file_hash": "c05e6dde1faa382ca43b5175cfce7be1c373d4c14ee80c2b810391b0ea02f64d",
+            "file_hash": "e0d3cf3ef20049db724d12355a3c1541eae102d030eb200b101a7495f19c0781",
             "id": "@decal1",
             "color": [255, 255, 255, 44],
             "size": [128, 32],
@@ -118,7 +118,7 @@
         },
         {
             "path": "gfx/decal1y.png",
-            "file_hash": "3d5d47a31a81ce7d700176ece997eba2eea2d8df31f7ac0150520b2503f4511e",
+            "file_hash": "37515671ba777d6bb0bcb57e166fe51950f4065ad4c4b855383a8910dca70db7",
             "id": "@decal1y",
             "color": [255, 255, 255, 44],
             "size": [128, 32],
@@ -126,7 +126,7 @@
         },
         {
             "path": "gfx/decal2.png",
-            "file_hash": "4cdd33c9168682632b9565f905a87f960d1ecefa3c4d0f49a10e45bb7df9e5fc",
+            "file_hash": "68d17e1565ff514b3226bab37657ec3a8a2965c5ec26de108df719068dff2164",
             "id": "@decal2",
             "color": [255, 255, 255, 44],
             "size": [32, 128],
@@ -134,7 +134,7 @@
         },
         {
             "path": "gfx/decal2y.png",
-            "file_hash": "a63856006c2bdf9c70e4be7f5cdc75a9d2db2db56df2f5d16e36fbb3078a1421",
+            "file_hash": "883aefad0d0199dc5052d5c2b58da9bb8d5f2e8685f31a41b984cb742adc71c7",
             "id": "@decal2y",
             "color": [255, 255, 255, 44],
             "size": [32, 128],
@@ -142,7 +142,7 @@
         },
         {
             "path": "gfx/decal3.png",
-            "file_hash": "80fd7f80fba00552dc9bce2796f876514d5ebdfb8f47e5afd042fe324835146a",
+            "file_hash": "add6f0682582629bddf608174e5d02ccf157f1ca8b0fc6216c8a450d119d9386",
             "id": "@decal3",
             "color": [255, 255, 255, 44],
             "size": [64, 64],
@@ -150,7 +150,7 @@
         },
         {
             "path": "gfx/decal3y.png",
-            "file_hash": "a22d3207ca57f3a57de6894d44cb5871fe04777ccf79f82f3704cbe3d2af27a8",
+            "file_hash": "7456603adf48a26c6da8a87ca7d2719d4222a63127a54314d95b869328793831",
             "id": "@decal3y",
             "color": [255, 255, 255, 44],
             "size": [128, 128],
@@ -158,7 +158,7 @@
         },
         {
             "path": "gfx/decal4.png",
-            "file_hash": "508acf403fae9cb62d37e1403994ef1b4e7a35e8bd0985ec0c52e0759a61ceb8",
+            "file_hash": "dfb0cd5279f2353cc28689868a48935a0b618d70d15be73ec093db682c2c94bf",
             "id": "@decal4",
             "color": [255, 255, 255, 44],
             "size": [128, 16],
@@ -166,7 +166,7 @@
         },
         {
             "path": "gfx/decal5.png",
-            "file_hash": "93d67851d30cce7673c0a959804eaa1bb8b8ce1e0df26c65384f5caa4d3931ad",
+            "file_hash": "a72acee65ad4f268db3cbd1640fe84f0495ddbbdd6b517eeedae506d0703f4af",
             "id": "@decal5",
             "color": [255, 255, 255, 44],
             "size": [16, 112],
@@ -174,7 +174,7 @@
         },
         {
             "path": "gfx/dirt1.png",
-            "file_hash": "74456438820a3bd6ce47bc1d90c87d18c513ff089c4a4c48de71502edb7dfff5",
+            "file_hash": "4d3c06cdbf73fb0646dcf595f702c21d07a4f79d93055196764e1b6e5ccfce86",
             "id": "@dirt1",
             "color": [255, 255, 255, 14],
             "size": [256, 256],
@@ -183,7 +183,7 @@
         },
         {
             "path": "gfx/dirt2.png",
-            "file_hash": "b5271d5810c5db19e1b283281096708eb2c69be64cd53ff457d7803b5d8a7004",
+            "file_hash": "2c813f7788bb3f208d6f815380049a95dd730e967ec60c409fbeb2e685d19483",
             "id": "@dirt2",
             "color": [255, 255, 255, 79],
             "size": [256, 256],
@@ -193,7 +193,7 @@
         },
         {
             "path": "gfx/dirt3.png",
-            "file_hash": "6a8c67ecc297525d3e9314c5a880e271d365a7b374857d93c2c94583afd6edfa",
+            "file_hash": "cd08b9876388b8931dc32c792a7cccda660c1746173be33adf58838fd7524dc1",
             "id": "@dirt3",
             "color": [255, 255, 255, 59],
             "size": [512, 768],
@@ -202,7 +202,7 @@
         },
         {
             "path": "gfx/dirt4.png",
-            "file_hash": "5b638a3b92a9d21a6f96c3e306e44ba3e678f9d2c4c9c761f2b8f0bc1aa6c2eb",
+            "file_hash": "b94ac7ed41f3a159e5c3e576dd20dc181a2ad66af70a95417f3693872a9e7565",
             "id": "@dirt4",
             "color": [255, 255, 255, 127],
             "size": [512, 1024],
@@ -212,7 +212,7 @@
         },
         {
             "path": "gfx/dirt5.png",
-            "file_hash": "5f0200681a2e3e89ac31e3067f9630bdfca1399b674aac5529d649f168af0fda",
+            "file_hash": "c89d803f97acf512a7688281165b8743bb1ec34314419b357c72407fe94e4981",
             "id": "@dirt5",
             "size": [256, 768],
             "stretch_when_resized": true,
@@ -220,7 +220,7 @@
         },
         {
             "path": "gfx/dirt6.png",
-            "file_hash": "22558fd305959bee3bb68c6974518cc816c29e2477ef54c01f2bf34e51908b33",
+            "file_hash": "b4291ad0f89813885b8d2b2bbd35e1da237cadbc019341f8e2792b552138abbb",
             "id": "@dirt6",
             "color": [255, 255, 255, 82],
             "size": [512, 512],
@@ -230,7 +230,7 @@
         },
         {
             "path": "gfx/dirt7.png",
-            "file_hash": "ebdcb7bc3c3a60c3f2519b01f2bc497d6adfe0e9bde912cb31faa12fddb8191a",
+            "file_hash": "892e6f5e21c2bf0437a50615e858af6d07f514903b915680d0c437f1af8764c6",
             "id": "@dirt7",
             "color": [255, 255, 255, 60],
             "size": [1024, 512],
@@ -266,7 +266,7 @@
         },
         {
             "path": "gfx/furn2.png",
-            "file_hash": "d0c5d83428aeac82e95b694c57075babb02f67d79093e78886d5943557e031d7",
+            "file_hash": "b2772260f81d19f67cf21a7c1c26aa847d8ee29bbf76994882003f1ae879be12",
             "id": "@furn2",
             "domain": "PHYSICAL",
             "size": [80, 80],
@@ -283,7 +283,7 @@
         },
         {
             "path": "gfx/furn3.png",
-            "file_hash": "6a46b092d73a334a69d42fdeb0db30993e6f48e2ba44e3939ec0d77714a629ce",
+            "file_hash": "636340ec6ae9fceca04c0909ea34a36fb372ce15b5b46eafb2579d5a4a8a190d",
             "id": "@furn3",
             "domain": "FOREGROUND",
             "neon_map": {
@@ -296,7 +296,7 @@
         },
         {
             "path": "gfx/furn4.png",
-            "file_hash": "dea12f13489ed271c767905c16ed366822be9dbaef6e34fdf0e51601f669bf5b",
+            "file_hash": "6a420efc8e0401bb620216e11c4687b224c8b4155ab1b7342aab9784b74e8109",
             "id": "@furn4",
             "neon_map": {
                 "radius": [
@@ -313,7 +313,7 @@
         },
         {
             "path": "gfx/light1.png",
-            "file_hash": "7ce4ae2e724def8a15bebb622c6a9da3abaa15de5ec5c2c2edc304508f5d0246",
+            "file_hash": "8b61389b0c7e0245f6a3fb55c5cdaf3a652895579186a9bd8dfb03ddcb790f8a",
             "id": "@light1",
             "size": [128, 128],
             "stretch_when_resized": true,
@@ -339,7 +339,7 @@
         },
         {
             "path": "gfx/metal3.png",
-            "file_hash": "168baddaf2785003fee1b4a04fb45c015855605b0d3c08a0383e89f86c6fb969",
+            "file_hash": "c345807c0c4d35b2bafb7e3ba75fb489cdcfcaafef65d21b58d79e8c29eae447",
             "id": "@metal3",
             "size": [32, 32],
             "OFF_rotate_continuously_degrees_per_sec": 1.0
@@ -361,7 +361,7 @@
         },
         {
             "path": "gfx/object1.png",
-            "file_hash": "b08417e51df4dbf09bbc6301139d8c6c224eb17a64b4630f08c534f1164a6669",
+            "file_hash": "45c63cd3adca43d2cbf4b2afd03432004bd77ba98e7361ec0de7b1d00a95a24a",
             "id": "@object1",
             "size": [64, 32],
             "stretch_when_resized": true,
@@ -369,7 +369,7 @@
         },
         {
             "path": "gfx/object2.png",
-            "file_hash": "6c036d8a2d0abda436e5d35ffb4a4ea9bce3d1f839cf2c63baab125a187c0b04",
+            "file_hash": "716ca93f6e93cd2786321566c55d5bc550aad3bc97492e1935bf208aed30dba5",
             "id": "@object2",
             "neon_map": {
                 "standard_deviation": 25.0,
@@ -387,7 +387,7 @@
         },
         {
             "path": "gfx/object3.png",
-            "file_hash": "8c9deb65feb3247a770b24a031b7d4e089493ab77e92e2ca2d8ba621431a5d3f",
+            "file_hash": "2f7161f0459e0edbb2d423a58169de7cffd5d1294da94a0877a812ba587c62a2",
             "id": "@object3",
             "size": [386, 386],
             "stretch_when_resized": true,
@@ -398,7 +398,7 @@
         },
         {
             "path": "gfx/rust1.png",
-            "file_hash": "a791c44ff005fd485cfb0408984c9354d4940d94dda5a18a569b611213dc52d0",
+            "file_hash": "3fa50b1cb5e536f9ef7a3e58423543fbf2ebd305e5fc2d70184c43e2151e301b",
             "id": "@rust1",
             "color": [255, 255, 255, 23],
             "size": [512, 512],
@@ -407,7 +407,7 @@
         },
         {
             "path": "gfx/scratches1.png",
-            "file_hash": "bc90a6aa3d84c9965a70176e5ff63703ba60e816477bc6b8278bea0a8a926d1c",
+            "file_hash": "8e3d5d63c0a828bff5ee4f77e4a0e3b223714c7c199c34b1c228aa7e2ea5c04f",
             "id": "@scratches1",
             "color": [255, 255, 255, 17],
             "size": [256, 256],
@@ -416,7 +416,7 @@
         },
         {
             "path": "gfx/scratches2.png",
-            "file_hash": "0a0ca14d1473c1881db1f7a491c89206c409dce09b7ca2af5d86e3038e12abd3",
+            "file_hash": "81b7f54f013024922048a7c8f1548f9921a48dd8ba744642abd7fefb3940e2a5",
             "id": "@scratches2",
             "color": [255, 255, 255, 17],
             "size": [256, 256],
@@ -488,7 +488,7 @@
         },
         {
             "path": "miniature.png",
-            "file_hash": "c9aaf7b8fe07a29ff1b408676571f562fdb26b4b44d9e97c2d4e5339115e4eac",
+            "file_hash": "420187204026bf54d8a2e8024325288070c49daf5f63c446b0dc6d196f54b60c",
             "id": "@miniature",
             "size": [400, 313]
         },
@@ -542,6 +542,12 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 2",
+            "nodes": [
+                "nav_island"
+            ]
+        },
         {
             "id": "Layer 1",
             "nodes": [
@@ -5112,6 +5118,13 @@
             "type": "buy_zone",
             "pos": [-2304.0, 1984.0],
             "size": [512, 512]
+        },
+        {
+            "id": "nav_island",
+            "type": "nav_island",
+            "faction": "RESISTANCE",
+            "pos": [321.0, 2115.0],
+            "size": [6272, 4704]
         }
     ]
 }

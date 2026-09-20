@@ -3,16 +3,16 @@
         "unit_pixels": 128,
         "unit_degrees": 15
     },
-    "show_grid": true,
+    "show_grid": false,
     "snapping_enabled": true,
     "ignore_groups": false,
     "show_navmesh": true,
     "panned_camera": {
         "transform": {
-            "pos": [861.0890502929688, 193.9684295654297],
+            "pos": [363.84942626953125, -136.6668243408203],
             "rotation": 0.0
         },
-        "zoom": 0.3652230501174927
+        "zoom": 0.5239129066467285
     },
     "rect_select_mode": "EVERYTHING"
 }

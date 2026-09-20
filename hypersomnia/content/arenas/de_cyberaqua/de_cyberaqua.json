@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-05-03 22:23:19.794358 UTC"
+        "version_timestamp": "2026-09-20 11:04:50.151580 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -15,7 +15,7 @@
         }
     },
     "playtesting": {
-        "mode": "bomb_defusal",
+        "mode": "quick_test",
         "starting_faction": "RESISTANCE",
         "spawn_bots": true,
         "spawn_only_enemy_bots": true,
@@ -34,7 +34,7 @@
     "external_resources": [
         {
             "path": "gfx/aquarium/aquarium_pump.png",
-            "file_hash": "3eac2e64cd61240742e07dc819983893565b4140a739bae1178f18c3ea2ff651",
+            "file_hash": "1ea4a2667cd9241635fecae4e9fefe0fb368099065e64f15e4d56c719c8bf3ad",
             "id": "@aquarium_pump",
             "domain": "PHYSICAL",
             "size": [244, 119],
@@ -47,7 +47,7 @@
         },
         {
             "path": "gfx/aquarium/generatorconnector.png",
-            "file_hash": "e4765400e269e4408a2ffdb3331e1be6ff5b26c3617dddd875954535f3fc30b2",
+            "file_hash": "2dde5affaa2dab4dd4a034c033e0937d859c704601058fb2dd4fb83be5e4bfd7",
             "id": "@generatorconnector",
             "neon_map": {
                 "light_colors": [[48, 96, 130, 255, 1.0], [136, 39, 39, 255, 1.0]
@@ -66,7 +66,7 @@
         },
         {
             "path": "gfx/aquarium/generatorconsole.png",
-            "file_hash": "03b463d03c84bd6ec1a7f4a84a1c33cde0787d1e46d95345b5660aff09a451e3",
+            "file_hash": "70ba19849743ea292c7fd8b581447a91bed8162eb1692894ea8c2ee96e0f5ebb",
             "id": "@generatorconsole",
             "size": [54, 192],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -82,7 +82,7 @@
         },
         {
             "path": "gfx/aquarium/generatorconsolelight.png",
-            "file_hash": "744629c9c1768e769b0ebec443ddba30c25d6a056c3530b734a9f17abf5459e1",
+            "file_hash": "2e044e981c5d2e499608b0b905464e7b7832db98b38960c280d304810a2b0c94",
             "id": "@generatorconsolelight",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -102,7 +102,7 @@
         },
         {
             "path": "gfx/aquarium/generatorrightcab.png",
-            "file_hash": "3db5ec3001e9fc76e373761c8669efbef9bb61d28c44c1b9b30861d11573c7b9",
+            "file_hash": "392d04a6f36a3f447162556a3d510d5eb722638485dcdfb86f4a6ec3c9953a37",
             "id": "@generatorrightcab",
             "neon_map": {
                 "standard_deviation": 7.0,
@@ -457,7 +457,7 @@
         },
         {
             "path": "gfx/decorations/bins/bin_blue.png",
-            "file_hash": "75c6e6e09cc5d9c897a6d2ade4cf5d809a22fb28fa158c425b745581676d468d",
+            "file_hash": "dca88054c954a412daed0326323b8210a54d9127f2bc0ba9d63f491072671f43",
             "id": "@bin_blue",
             "neon_map": {
                 "light_colors": [[64, 136, 179, 255, 1.0], [110, 159, 72, 255, 1.0], [230, 78, 28, 255, 1.0], [179, 37, 37, 255, 1.0], [177, 185, 63, 255, 1.0], [153, 159, 63, 255, 1.0], [140, 50, 50, 255, 1.0], [37, 89, 35, 255, 1.0], [52, 116, 153, 255, 1.0], [115, 47, 47, 255, 1.0], [159, 48, 48, 255, 1.0], [17, 77, 16, 255, 1.0]
@@ -479,7 +479,7 @@
         },
         {
             "path": "gfx/decorations/bins/bin_green.png",
-            "file_hash": "95170812d70c31cd6aed89801cb5486c2eb3365b345ed601609c1a5db9bd58f7",
+            "file_hash": "3e87dd57c9109d862fc9ee5e68c29583ab998af58403768ba42410e59dfecd4d",
             "id": "@bin_green",
             "neon_map": {
                 "light_colors": [[64, 136, 179, 255, 1.0], [110, 159, 72, 255, 1.0], [230, 78, 28, 255, 1.0], [179, 37, 37, 255, 1.0], [177, 185, 63, 255, 1.0], [153, 159, 63, 255, 1.0], [140, 50, 50, 255, 1.0], [37, 89, 35, 255, 1.0], [52, 116, 153, 255, 1.0], [115, 47, 47, 255, 1.0], [159, 48, 48, 255, 1.0], [17, 77, 16, 255, 1.0]
@@ -499,7 +499,7 @@
         },
         {
             "path": "gfx/decorations/bins/bin_red.png",
-            "file_hash": "1d652e486935e07c45429c13a6ed1cb088692890a625d49eae66cfbd1d4bb644",
+            "file_hash": "c2b8e8b980a2c0577434b56e8896bc36ef791826aa399bd2d296d5bcbab42014",
             "id": "@bin_red",
             "neon_map": {
                 "light_colors": [[64, 136, 179, 255, 1.0], [110, 159, 72, 255, 1.0], [230, 78, 28, 255, 1.0], [179, 37, 37, 255, 1.0], [177, 185, 63, 255, 1.0], [153, 159, 63, 255, 1.0], [140, 50, 50, 255, 1.0], [37, 89, 35, 255, 1.0], [52, 116, 153, 255, 1.0], [115, 47, 47, 255, 1.0], [159, 48, 48, 255, 1.0], [17, 77, 16, 255, 1.0]
@@ -519,7 +519,7 @@
         },
         {
             "path": "gfx/decorations/bins/bin_yellow.png",
-            "file_hash": "49245b0751a20ffb3dfe7bb1d4d5f4d254df1ebe5853d870c46bcf0cfc5c966c",
+            "file_hash": "e75574f9a743d09156cdeaea41375270afde3e6007a49d16c79156473c379528",
             "id": "@bin_yellow",
             "neon_map": {
                 "light_colors": [[64, 136, 179, 255, 1.0], [110, 159, 72, 255, 1.0], [230, 78, 28, 255, 1.0], [179, 37, 37, 255, 1.0], [177, 185, 63, 255, 1.0], [153, 159, 63, 255, 1.0], [140, 50, 50, 255, 1.0], [37, 89, 35, 255, 1.0], [52, 116, 153, 255, 1.0], [115, 47, 47, 255, 1.0], [159, 48, 48, 255, 1.0], [17, 77, 16, 255, 1.0]
@@ -539,7 +539,7 @@
         },
         {
             "path": "gfx/decorations/brown_chair.png",
-            "file_hash": "6e9534f9908d80dc52a480217f4a6500d4d59260636bf1bfefb9f7a1fc55ac2b",
+            "file_hash": "dfdd65946ab979d8375fcd6cb7f0a1c646a2080ad6523c2560059031c23c20ff",
             "id": "@brown_chair",
             "neon_map": {
                 "standard_deviation": 8.0,
@@ -609,7 +609,7 @@
         },
         {
             "path": "gfx/decorations/electronics/info_console_1.png",
-            "file_hash": "9e0ddfdd74e924fc91fdd91d1ce6cf3ef1207359038b5800bd005a4a8f19d2ca",
+            "file_hash": "ea367875e0de333c2a39715dec39661ee00b2a27b079c9365dc2903a3711312a",
             "id": "@info_console_1",
             "size": [128, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -625,7 +625,7 @@
         },
         {
             "path": "gfx/decorations/electronics/local_radar.png",
-            "file_hash": "c4ebde9a9df387d8d6f40e85352f0ab7add8efad5004625075e370b0274b6930",
+            "file_hash": "7d611bc7768605a48026ed0c427bc89c3009959311f4da95550a3598f7c2b1fd",
             "id": "@local_radar",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -668,7 +668,7 @@
         },
         {
             "path": "gfx/decorations/electronics/noweustrojstwo.png",
-            "file_hash": "618d2981ec1e77bf151303b1d3f2ece06944c891296b5b5d2d0f3a91bf92acfb",
+            "file_hash": "009392a8e93d929483fd0c6e2385faa83b0a361f24b0b58ee94c7f4ad841eca7",
             "id": "@noweustrojstwo",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -716,7 +716,7 @@
         },
         {
             "path": "gfx/decorations/electronics/ustrojstwo_grid.png",
-            "file_hash": "b58d4c84b43610b20f79c60581108e61599cba194305520b41f2b1976d712947",
+            "file_hash": "b9567c9221d2c00e83c63a42c571322532d4aa404d88d32d53a350e2e8968fd0",
             "id": "@ustrojstwo_grid",
             "domain": "FOREGROUND",
             "size": [106, 106],
@@ -725,7 +725,7 @@
         },
         {
             "path": "gfx/decorations/fotel.png",
-            "file_hash": "adce7524885cb25f9dfaa62ccef1f9e6c9aa5bc686e68816e79ac6423d058682",
+            "file_hash": "2c07b3de93bac0e8890babc39a6c4107abe81edd9830e5d6e2289a7e8bea3aac",
             "id": "@fotel",
             "neon_map": {
                 "standard_deviation": 7.0,
@@ -802,7 +802,7 @@
         },
         {
             "path": "gfx/decorations/szkicstracja2.png",
-            "file_hash": "fe0298bb7e4ce3d0d684361a9b3837cee1bc5ce64a7ece0e401bac917a250c3b",
+            "file_hash": "5bc15f9b1c84c5baa77a7ff5f9599ca092708dedb4fe289903baa7f83e19d826",
             "id": "@szkicstracja2",
             "neon_map": {
                 "light_colors": [[99, 155, 255, 255, 1.0], [249, 0, 255, 255, 1.0]
@@ -824,7 +824,7 @@
         },
         {
             "path": "gfx/decorations/szkicstracja.png",
-            "file_hash": "b16ebeb0cf76e269d57a3a1acb8ccc0fc15c5a946e1f8c334f57fccc11acb280",
+            "file_hash": "7d6d0d9a769c3230b447388436e5870fb66973fc3ea9b3fe13f660921bfaa60c",
             "id": "@szkicstracja",
             "neon_map": {
                 "light_colors": [[99, 155, 255, 255, 1.0], [134, 230, 250, 255, 1.0], [0, 211, 255, 255, 1.0]
@@ -952,7 +952,7 @@
         },
         {
             "path": "gfx/garden/bush.png",
-            "file_hash": "c2175c5d0915e83fe56616ce31a5b19257a4cb295d8158df90420dfac7062324",
+            "file_hash": "e551fe2a02ba65e4b6bb7b81fbbf075ffdfd1a7b6ae58f6cacf4b0811be863a8",
             "id": "@bush",
             "neon_map": {
                 "standard_deviation": 9.0,
@@ -967,7 +967,7 @@
         },
         {
             "path": "gfx/garden/donic2.png",
-            "file_hash": "853b1fccf37395f29727bd0deb9308e7288e124257d7e092fe9d1ce072c6502d",
+            "file_hash": "214b4da0463bdb6251f5c37da91c91d8430a8febf6deb37763df70b32c1b31ac",
             "id": "@donic2",
             "neon_map": {
                 "light_colors": [[0, 211, 255, 255, 1.0]
@@ -987,7 +987,7 @@
         },
         {
             "path": "gfx/garden/donicv2.png",
-            "file_hash": "22d30ca2311a08f44fca570fbcbdeb9776d92edcf34a2ec664cdf63cb87bef30",
+            "file_hash": "b00940d61dac1700747878d99b83995f84b326405d4db532f5bc5855db3931b8",
             "id": "@donicv2",
             "neon_map": {
                 "amplification": 120.0,
@@ -1009,7 +1009,7 @@
         },
         {
             "path": "gfx/garden/fern.png",
-            "file_hash": "1ac8d8c8d9a11dce236c6e5c2264d0aedf7d59427551f77544837ee599fadf08",
+            "file_hash": "73161f5865e2f4109cb407fa95c417d28a3c1829ef4d49c7c860b69877de0c47",
             "id": "@fern",
             "domain": "FOREGROUND",
             "neon_map": {
@@ -1071,7 +1071,7 @@
         },
         {
             "path": "gfx/garden/grass_dune_1.png",
-            "file_hash": "17db41626adf3ba75069323a748b32526fd841b76f77604b86d049776f93faf8",
+            "file_hash": "8f518401206bed5bd6aab719e2adc1d5a4b658401f6627af126e68d734b5ac25",
             "id": "@grass_dune_1",
             "color": [255, 254, 254, 255],
             "neon_color": [255, 255, 255, 212],
@@ -1090,7 +1090,7 @@
         },
         {
             "path": "gfx/garden/grass_dune_2.png",
-            "file_hash": "18dce67fa4468737edb9ea7c719be588dd5da28355ec3764f5be58b5c30758b4",
+            "file_hash": "d43e46168b1442f50d9ced069f97332a24b365a946062b36d6882b3423938cdd",
             "id": "@grass_dune_2",
             "color": [255, 254, 254, 255],
             "neon_color": [255, 255, 255, 212],
@@ -1127,7 +1127,7 @@
         },
         {
             "path": "gfx/garden/monstera.png",
-            "file_hash": "7ce3aa85907930464331868ac27cac89ecb887bf866fbd88a0b7c146e401445e",
+            "file_hash": "faf8b9b0d63b9a694fded3e82877d5956369ad5604fab1535faf673383995f97",
             "id": "@monstera",
             "domain": "FOREGROUND",
             "neon_map": {
@@ -1156,7 +1156,7 @@
         },
         {
             "path": "gfx/garden/monstera_donica.png",
-            "file_hash": "3d25cb4a690e2b5c8d79e9d414c28dc8203eafd7c3cb869bbf3d00c64d262191",
+            "file_hash": "3377e05b101277c1eba0dd82489cd4eaeb5bbb5739bf250add8d2ae052d0e4b1",
             "id": "@monstera_donica",
             "neon_map": {
                 "standard_deviation": 8.0,
@@ -1181,7 +1181,7 @@
         },
         {
             "path": "gfx/garden/orange_flowerpot.png",
-            "file_hash": "97dc12901c389a466551f1ba598b14706d72c4bddbe24b6c885cbc95da6124f2",
+            "file_hash": "ba80a1c675d9b3232241cbea115a92209469f42c14726df4d3f07630bd77c990",
             "id": "@orange_flowerpot",
             "neon_map": {
                 "standard_deviation": 8.0,
@@ -1206,7 +1206,7 @@
         },
         {
             "path": "gfx/garden/roboworker.png",
-            "file_hash": "e1a2942164151d4c6c3eb5f9c349f0187b191a52b11c1f56e3f176534b5a1c8f",
+            "file_hash": "5e8a180d7757c957dc44b00fbd540909d6bdef1a16f0e68d5b50db6343ab69ef",
             "id": "@roboworker",
             "size": [384, 256],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -1240,7 +1240,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_bottom.png",
-            "file_hash": "ee30bf0ee6a7b29e387b01548e62216136f5e8696687a5fc451b7eff5b81fe64",
+            "file_hash": "f3832fc86b117fcdae257892025f9636dd3125fcf4b59efbfe376827b11e9cf7",
             "id": "@stone_pavement_bottom",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1258,7 +1258,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_bottom_right.png",
-            "file_hash": "f7b98b2febe51505f4cfb917d9d182c0706cb3a80d70ddd87c40eff94155498e",
+            "file_hash": "2bd1770c5ed16dfdbf17578c572add18f2fe85ce0a9ee3e762b588e82beaaa16",
             "id": "@stone_pavement_bottom_right",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1276,7 +1276,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_left.png",
-            "file_hash": "c85e4b18c8cd90ddecbe2974f98e23ef779bee6b320d99ffc42e3fb18131c019",
+            "file_hash": "44c24fe4bd87af4439ed79bbe8074f52f5723f7c683a831246972ad586e378a2",
             "id": "@stone_pavement_left",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1294,7 +1294,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_right.png",
-            "file_hash": "e6dfa1ddcfbfa6f14cf7fce3d750e5e2a645b620721034f12abdc9fe46ceeb7c",
+            "file_hash": "bba6d068ec8e5f095b5c23d7e9e3cdd0ce0c5665f5ec311eabb2970cd4d3f5f5",
             "id": "@stone_pavement_right",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1312,7 +1312,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_top.png",
-            "file_hash": "bee9dc49f444ef59d8df6d129486dde1fd1895a893db1eeb55ef7764973ee673",
+            "file_hash": "35267f5d80b4c5cd3eed268ae5db4de3c9a1216707dd47e508bcd39041d888a3",
             "id": "@stone_pavement_top",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1330,7 +1330,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_top_left.png",
-            "file_hash": "11380283c92a15a7ddedc397146aa4981d57a29f81d7221e6e8f159d2ae5b47e",
+            "file_hash": "9243abb5c98383c176dbb2acef27de11bb0e1f0bd20cec2117ab841d75f3327a",
             "id": "@stone_pavement_top_left",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1348,7 +1348,7 @@
         },
         {
             "path": "gfx/garden/stone_pavement_top_right.png",
-            "file_hash": "c6c626d99367ed6d2ac63ad781975a2b01ddb8b87e7b91d97dec4014f559e70c",
+            "file_hash": "4f3dd84cb9f70f55e8e232587346a85ecfeb6cc32bbceb89dc2428e5a5950dee",
             "id": "@stone_pavement_top_right",
             "color": [255, 255, 162, 255],
             "neon_color": [255, 255, 255, 106],
@@ -1366,7 +1366,7 @@
         },
         {
             "path": "gfx/generator/generatorleftcab.png",
-            "file_hash": "b9921b5ae7b48ab395ae4ccd46300568b85711a058d262c8707680dfabfdb4d0",
+            "file_hash": "94a965042ed8cbe74ba91d1b3bc1448e235bb0e5df24de36dfb44c7ddfae9ef2",
             "id": "@generatorleftcab",
             "neon_map": {
                 "standard_deviation": 7.0,
@@ -1388,7 +1388,7 @@
         },
         {
             "path": "gfx/generator/generatormainpart.png",
-            "file_hash": "b533c3f32029ed9648cccb693d14dc7a67a016b3324b3721bde0ce2b0734747c",
+            "file_hash": "ea9d5729c80d192b02042c61598e70fa2ca17e36faf2827a8a75cc80d6bbe1e5",
             "id": "@generatormainpart",
             "domain": "PHYSICAL",
             "size": [540, 450],
@@ -1429,7 +1429,7 @@
         },
         {
             "path": "gfx/generator/generatormainpartlight.png",
-            "file_hash": "3b70e060e0a059b6b7533620940993ce10e04ead1d7dfe2c289b34d708ec64b3",
+            "file_hash": "a6a91baf551514039e0a81b982ea45b56fcbc3927aceaa7463d4d8b47a17fecf",
             "id": "@generatormainpartlight",
             "domain": "FOREGROUND",
             "neon_map": {
@@ -1456,7 +1456,7 @@
         },
         {
             "path": "gfx/generator/generatorpart1.png",
-            "file_hash": "74f05679f9c33af4dbf88333710ec7459630a70098fbf900240d4266a01ac0d9",
+            "file_hash": "2bb8f6fe674cebc511a0a62be9a7f8530afba474fb6dc6d51a6b170e6f28f906",
             "id": "@generatorpart1",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -1555,7 +1555,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_a1tob1.png",
-            "file_hash": "77f9ee26c5bec0ee2268eae8bf1cf7b851f6deab6c5e450b797799c816ca1f24",
+            "file_hash": "409299045936785760b8578c1a3b7a0ea80fa16791aec4914c6434165f6f201c",
             "id": "@green_room_wall_a1tob1",
             "neon_map": {
                 "amplification": 20.0,
@@ -1577,7 +1577,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_a2.png",
-            "file_hash": "cd1f5a25a5ef1e485d87856e7f14daefa44a71e7c0f2b8836d41f065d1e1e7f3",
+            "file_hash": "ae66e5db0e7b1ee098b715dac69ee3644a3754da3c979bf3feea716bbacca429",
             "id": "@green_room_wall_a2",
             "neon_map": {
                 "amplification": 20.0,
@@ -1668,7 +1668,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_b1.png",
-            "file_hash": "5d6b1999704936e930c2b4c7f62fd62bd5f2fc0275bce9b85b86015102026b7e",
+            "file_hash": "ffc5100a40285438e3ff3b8676b6461b385b174a68fe9bde2763c79b754c9261",
             "id": "@green_room_wall_b1",
             "neon_map": {
                 "amplification": 20.0,
@@ -1690,7 +1690,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_b1toc1.png",
-            "file_hash": "59403d85ed9a4588ea75078e2e8e02d6060f3b18f6b45f77ac6e6dcce2678659",
+            "file_hash": "1394eb221dae095dcb1d961d4609401f8294df2f6c5f7d7ac4bbe3eaf9836838",
             "id": "@green_room_wall_b1toc1",
             "neon_map": {
                 "amplification": 20.0,
@@ -1712,7 +1712,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_barier.png",
-            "file_hash": "0ffea290ff6cb370e0e93d1b6ca2ed80f620c639e06894051dc1c527e6b663de",
+            "file_hash": "d80a6f654feb31af14bc35e7e156cb67460842828595278ff72e28bf20ed6e38",
             "id": "@green_room_wall_barier",
             "neon_map": {
                 "amplification": 20.0,
@@ -1734,7 +1734,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_c1.png",
-            "file_hash": "db09581219b04e17327e9def1516ced4678a97fdcf308dc924512883cd4d1803",
+            "file_hash": "d295adf4d8d653578e7d494f96cbb37b393038bb13cab74d52cf0ddbf2ff89ee",
             "id": "@green_room_wall_c1",
             "neon_map": {
                 "amplification": 20.0,
@@ -1846,7 +1846,7 @@
         },
         {
             "path": "gfx/green_room/green_room_wall_corner_c1.png",
-            "file_hash": "b8673357d988a8732a343be1c686c85952a949f709787053245e1706e047f9d0",
+            "file_hash": "77e7f2412a428862592514d745532c49b8246bc91d398b9fe14aecf7e2c11255",
             "id": "@green_room_wall_corner_c1",
             "neon_map": {
                 "amplification": 20.0,
@@ -1868,7 +1868,7 @@
         },
         {
             "path": "gfx/lab_table.png",
-            "file_hash": "1803d1d8218942a512e8821a6568eadafcdaa70a64498de57aa0b38706a68622",
+            "file_hash": "14ccf6481b4e64bf1c65b1d659edb562fdd61090eef0572814bdf6a446e3528b",
             "id": "@lab_table",
             "neon_map": {
                 "light_colors": [[223, 113, 38, 255, 1.0]
@@ -2028,7 +2028,7 @@
         },
         {
             "path": "gfx/obstacles/green_metal_box_closed.png",
-            "file_hash": "3dbcdf25af4b2d98962b6eeef580e4ef126a3dfbbb758c48fdb052af3a14aa9c",
+            "file_hash": "2d909cfeea759c6aaa757ca23ebdd5dee40a9672b60e8f220b8aa22008ce8d96",
             "id": "@green_metal_box_closed",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2045,7 +2045,7 @@
         },
         {
             "path": "gfx/obstacles/green_metal_box_open.png",
-            "file_hash": "3d8a8f6ca0c21b8d7f773661bcb01616cdd747a25e4232391238147c3d656561",
+            "file_hash": "9f880b6df00a1da981db83f525332c046955baab25a2529adccfa60df71ab74b",
             "id": "@green_metal_box_open",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2062,7 +2062,7 @@
         },
         {
             "path": "gfx/obstacles/pink_box.png",
-            "file_hash": "36ebdeefb76f72000bb9db344cab6fc41ce4112482fc5a5d482fc3178a81f7db",
+            "file_hash": "f2a8e9dd4f93497feabca2afe551b0701911f7a49db3afb136c201c0b3d75535",
             "id": "@pink_box",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2079,7 +2079,7 @@
         },
         {
             "path": "gfx/obstacles/steel_crate.png",
-            "file_hash": "ac18db3b8941e28dabf2faa3c0bd8c7c7d8201544ac762f16dc5e147c3973e2f",
+            "file_hash": "1bbeb2e77ca75df3a24d4983253b4c241e0ab667cb08eb724482c22da413aecd",
             "id": "@steel_crate",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2131,7 +2131,7 @@
         },
         {
             "path": "gfx/obstacles/violet_box.png",
-            "file_hash": "639d683b727d53b72e7e3b8db4756cd65273626e6fc0c7dbc93db00d641ad053",
+            "file_hash": "fdb713e6a9aec91050f4bedb36944d9205f648d7259376a6ad1b9fbebc4b5ac6",
             "id": "@violet_box",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2148,7 +2148,7 @@
         },
         {
             "path": "gfx/obstacles/yellow_barrier.png",
-            "file_hash": "476d3f37c8629632a11f7b5102840f4e54629ab285299588ce8550538ee0d177",
+            "file_hash": "0abb76a893b068ac7081f1f6a22414fe7be9c37fd68ca93d4889bca0c53741b4",
             "id": "@yellow_barrier",
             "neon_map": {
                 "light_colors": [[232, 199, 65, 255, 1.0]
@@ -2247,7 +2247,7 @@
         },
         {
             "path": "gfx/server_room/server_room_cable_1.png",
-            "file_hash": "6a7f7bab0d79e30ef4bd284007403c7d90c22cdc838567afc3d3212d6fc2673d",
+            "file_hash": "35208da9defe1d7edcd1aa93124396f10bd028766cf8ba5e554437e0c62bf3d8",
             "id": "@server_room_cable_1",
             "neon_map": {
                 "amplification": 20.0,
@@ -2260,7 +2260,7 @@
         },
         {
             "path": "gfx/server_room/server_room_cable_2.png",
-            "file_hash": "234ae5d8f84cf25a1bbebc130305cf471a68a531f6c1b206e45798c7f75266a2",
+            "file_hash": "cf6c329a974234d88ba75361efbc7d1a0740dec3b246615f6a82b0d874485e2b",
             "id": "@server_room_cable_2",
             "neon_map": {
                 "amplification": 20.0,
@@ -2324,7 +2324,7 @@
         },
         {
             "path": "gfx/server_room/server_room_floor_3.png",
-            "file_hash": "29199a8408b8249248139c21c0f2dd2432354c756a281bcaa64b2d3712b5717c",
+            "file_hash": "a948ad361f3242b1d407143a503e506ad6b5a0a0c4f9be4cf164873af2127d33",
             "id": "@server_room_floor_3",
             "color": [189, 189, 189, 255],
             "neon_color": [255, 255, 255, 106],
@@ -2401,7 +2401,7 @@
         },
         {
             "path": "gfx/sub/sub_control.png",
-            "file_hash": "a9f5a2dd5a19487af85be1f25a6084de428964691bff6cf2ddeb2f9666e75a37",
+            "file_hash": "28266e39db09a399fdd556e037f50cdd7b49aaf4ef5f83c3a87c5e7cdacbed5c",
             "id": "@sub_control",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -2421,7 +2421,7 @@
         },
         {
             "path": "gfx/sub/sub_entry.png",
-            "file_hash": "813a663d6d45c773affc408b0f23d9aa9355565d7add13582371eb67ac8fd102",
+            "file_hash": "68abbf8fe690e4840b1beb9c913fc7c60b9c2dc194f907ec115c96a63667ccf2",
             "id": "@sub_entry",
             "size": [206, 239],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
@@ -2436,7 +2436,7 @@
         },
         {
             "path": "gfx/sub/sub_entry_safety_light.png",
-            "file_hash": "50a3318c2d0cfe4ddddc2caeab151b45a4c61e0978c358ff72441ad691c17665",
+            "file_hash": "72272ec6589105e2bab99617571db90fb86dc3ab38d03fa3c61d08f03fde770a",
             "id": "@sub_entry_safety_light",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255, 1.0]
@@ -2457,7 +2457,7 @@
         },
         {
             "path": "gfx/sub/sub_floor.png",
-            "file_hash": "a9937b3eb3d32513d14599bf8ede50c98ea51f14577916798e3dcc4b7c6ffb23",
+            "file_hash": "442864a67410359118140803d236fc8ad7720814e418063cd160b6c8caf7bc76",
             "id": "@sub_floor",
             "OFF_neon_map": {
                 "standard_deviation": 8.0,
@@ -2478,7 +2478,7 @@
         },
         {
             "path": "gfx/sub/sub_floor_light.png",
-            "file_hash": "6113c1689e2bf65dd69ee294ba88eb6f31aaf23b879a4b187ec5bea83c27a020",
+            "file_hash": "e69b780337e5267baa1039de12c97c6980f4f9e8ccd9612d7ab8c0fbddb74efc",
             "id": "@sub_floor_light",
             "neon_map": {
                 "standard_deviation": 7.0,
@@ -2499,7 +2499,7 @@
         },
         {
             "path": "gfx/sub/sub_fotel_cyan.png",
-            "file_hash": "34aa2280df592cfa8395c762de16898841e216b9f2d2f5ddc00e255c93bc9385",
+            "file_hash": "ea9755fbe513cb85f594391273248ac4185ec5c4dfd2871ce2af57e9367a6bc5",
             "id": "@sub_fotel_cyan",
             "neon_map": {
                 "light_colors": [[0, 255, 255, 255, 1.0]
@@ -2622,7 +2622,7 @@
         },
         {
             "path": "gfx/warning_line/warning_line.png",
-            "file_hash": "b8a25c02bf96c7247da78e090f475ce1e22cbb2a67e2adf9c8b0877d86b8c308",
+            "file_hash": "463c513639ec2b7bc03d214c8f08a62d281402cb7d281fe316ad7ba421bbcd89",
             "id": "@warning_line",
             "neon_map": {
                 "light_colors": [[213, 167, 56, 255, 1.0], [212, 196, 80, 255, 1.0]
@@ -2641,7 +2641,7 @@
         },
         {
             "path": "gfx/warning_line/warning_line_corner.png",
-            "file_hash": "2c482e04e9ffcf4bbff1dd93952196d9866de16e1fb40c5237e51545ee395884",
+            "file_hash": "71d56f766e86af076ee8c0852c6e8afd17f068973fcbad2d530d5b7e3493ab1c",
             "id": "@warning_line_corner",
             "neon_map": {
                 "light_colors": [[213, 167, 56, 255, 1.0], [212, 196, 80, 255, 1.0]
@@ -2680,7 +2680,7 @@
         },
         {
             "path": "gfx/yellow_barrier_dynamic.png",
-            "file_hash": "476d3f37c8629632a11f7b5102840f4e54629ab285299588ce8550538ee0d177",
+            "file_hash": "0abb76a893b068ac7081f1f6a22414fe7be9c37fd68ca93d4889bca0c53741b4",
             "id": "@yellow_barrier_dynamic",
             "domain": "PHYSICAL",
             "neon_map": {
@@ -2697,7 +2697,7 @@
         },
         {
             "path": "miniature.png",
-            "file_hash": "0bac59c94788e5ee96bece125acf334ea48c4ad39335841777e0168f2542786b",
+            "file_hash": "c5a4264ef1634bca61d350a36f1d896478c65a977d4ee12ddbbf937c07a4e68a",
             "id": "@miniature",
             "size": [361, 400]
         },
@@ -2766,6 +2766,14 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 2",
+            "nodes": [
+                "camera_zoom (1)",
+                "camera_zoom (2)",
+                "camera_zoom"
+            ]
+        },
         {
             "id": "waypoints_push",
             "nodes": [
@@ -3177,6 +3185,7 @@
                 "Metal obstacle (27)",
                 "Metal obstacle (28)",
                 "Metal obstacle (29)",
+                "nav_island",
                 "Metal obstacle (30)",
                 "Metal obstacle (31)",
                 "Metal obstacle (32)",
@@ -6846,14 +6855,14 @@
         {
             "id": "Metal obstacle (8)",
             "type": "@blank4",
-            "pos": [-3375.999755859375, -2384.0],
-            "size": [608, 96]
+            "pos": [-3391.999755859375, -2384.0],
+            "size": [640, 96]
         },
         {
             "id": "Metal obstacle (9)",
             "type": "@blank4",
-            "pos": [-3759.999755859375, -2240.0],
-            "size": [160, 384]
+            "pos": [-3775.999755859375, -2240.0],
+            "size": [128, 384]
         },
         {
             "id": "Metal obstacle (10)",
@@ -17835,6 +17844,38 @@
             "type": "organism_area",
             "pos": [1248.0, -1312.0],
             "size": [768, 768]
+        },
+        {
+            "id": "nav_island",
+            "type": "nav_island",
+            "faction": "RESISTANCE",
+            "pos": [92.0, -752.0],
+            "size": [7816, 8544]
+        },
+        {
+            "id": "camera_zoom",
+            "type": "camera_zoom",
+            "faction": "RESISTANCE",
+            "pos": [1248.0, -872.0],
+            "size": [704, 48],
+            "zoom": 1.0
+        },
+        {
+            "id": "camera_zoom (1)",
+            "type": "camera_zoom",
+            "faction": "RESISTANCE",
+            "pos": [1688.0, -1296.0],
+            "rotation": 90.0,
+            "size": [736, 48],
+            "zoom": 1.0
+        },
+        {
+            "id": "camera_zoom (2)",
+            "type": "camera_zoom",
+            "faction": "RESISTANCE",
+            "pos": [812.0, -988.0],
+            "size": [40, 88],
+            "zoom": 2.0
         }
     ]
 }
