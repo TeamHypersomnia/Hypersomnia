@@ -5267,12 +5267,26 @@ void server_setup::handle_client_chat_command(
 			}
 
 			auto set_difficulty = [&](const difficulty_type target_difficulty) {
+				const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
+
+				if (current_difficulty == target_difficulty) {
+					broadcast_info(
+						typesafe_sprintf("Bots were already %x.", augs::enum_to_string(target_difficulty)),
+						chat_target_type::INFO
+					);
+
+					return;
+				}
+
 				overrides.bot_difficulty = {
 					to_mode_player_id(id),
 					target_difficulty
 				};
 
-				broadcast_bots_adjusted(to_mode_player_id(id));
+				broadcast_info(
+					typesafe_sprintf("Bots difficulty changed to %x.", augs::enum_to_string(target_difficulty)),
+					chat_target_type::INFO
+				);
 			};
 
 			if (begins_with(chat.message, "/bots hard") || chat.message == "/bots h") {
