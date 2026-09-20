@@ -12,6 +12,7 @@
 - **Intelligent bots with progression.**
 - **Decals.**
 - **Bullet traces.**
+- **Minimap.**
 - Game is zoomed out by 0.8x by default.
 - Many more!
 
