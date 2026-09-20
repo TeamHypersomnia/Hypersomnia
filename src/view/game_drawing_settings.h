@@ -98,7 +98,6 @@ struct minimap_settings {
 	rgba enemy_color = red;
 	bool animate_laser_dashes = false;
 	bool clamp_important_to_border = true;
-	bool only_under_tab = false;
 	bool draw_viewed_player_ring = true;
 	// END GEN INTROSPECTOR
 
@@ -120,11 +119,6 @@ struct minimap_settings {
 	int extra_hud_space = 0;
 
 	/*
-		The minimap can be kept more transparent (or hidden altogether)
-		while the scoreboard is closed, so that it obscures less of the
-		gameplay area, and become fully opaque once the player holds TAB.
-	*/
-	/*
 		The minimap can grow once the scoreboard is held,
 		so that it stays small during the play but becomes
 		properly readable when actually looked at.
@@ -138,6 +132,14 @@ struct minimap_settings {
 		return under_tab ? size_under_tab : size;
 	}
 
+	/*
+		The minimap can be kept more transparent (or hidden altogether)
+		while the scoreboard is closed, so that it obscures less of the
+		gameplay area, and become fully opaque once the player holds TAB.
+
+		A zeroed gameplay alpha is how one asks for a minimap
+		that only ever shows up under TAB.
+	*/
 	float calc_master_alpha(const bool under_tab) const {
 		return std::clamp(under_tab ? master_alpha_under_tab : master_alpha, 0.0f, 1.0f);
 	}
@@ -176,15 +178,15 @@ struct minimap_settings {
 	}
 
 	bool is_visible(const bool under_tab) const {
-		if (!enabled) {
-			return false;
-		}
+		return enabled && calc_master_alpha(under_tab) > 0.0f;
+	}
 
-		if (only_under_tab && !under_tab) {
-			return false;
-		}
-
-		return calc_master_alpha(under_tab) > 0.0f;
+	/*
+		Whether the minimap can show up at all - if not, even the
+		sighting system that feeds it can be left unadvanced.
+	*/
+	bool is_ever_visible() const {
+		return is_visible(false) || is_visible(true);
 	}
 
 	/*

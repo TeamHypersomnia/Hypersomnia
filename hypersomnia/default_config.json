@@ -252,8 +252,7 @@
             "enemy_color": [255, 0, 0, 255],
             "animate_laser_dashes": false,
             "clamp_important_to_border": true,
-            "draw_viewed_player_ring": true,
-            "only_under_tab": false
+            "draw_viewed_player_ring": true
         },
         "teammates_are_enemies": false,
         "stencil_before_light_pass": false

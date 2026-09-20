@@ -1504,21 +1504,15 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(enabled));
 
 						if (scope_cfg.enabled) {
-							{
-								auto ind = scoped_indent();
-								revertable_checkbox(SCOPE_CFG_NVP(only_under_tab));
-							}
+							/*
+								A zeroed gameplay alpha hides the minimap
+								until the scoreboard is held.
+							*/
 
-							if (!scope_cfg.only_under_tab) {
-								revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
-							}
-
+							revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(master_alpha_under_tab), 0.f, 1.f);
 
-							if (!scope_cfg.only_under_tab) {
-								revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
-							}
-
+							revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(background_alpha_under_tab), 0.f, 1.f);
 
 							revertable_slider(SCOPE_CFG_NVP(size), 100, 600);

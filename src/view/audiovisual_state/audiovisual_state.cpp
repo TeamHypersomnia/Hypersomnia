@@ -461,7 +461,11 @@ void audiovisual_state::standard_post_solve(
 		if (acquire_sighting.should_play(settings.prediction)) {
 			minimap_sighting.record_deaths(step);
 
-			if (input.drawing.minimap.enabled) {
+			/*
+				A minimap that can never show up needs no sightings recorded.
+			*/
+
+			if (input.drawing.minimap.is_ever_visible()) {
 				minimap_sighting.advance(
 					step,
 					input.camera.viewed_character,

@@ -5566,7 +5566,7 @@ work_result work(
 					const auto& minimap = new_viewing_config.drawing.minimap;
 					auto& chosen_renderer = get_general_renderer();
 
-					if (minimap.enabled && get_viewed_character().alive()) {
+					if (minimap.is_visible(illuminated_input.minimap_extended_range) && get_viewed_character().alive()) {
 						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, illuminated_input.minimap_extended_range);
 
 						/*
