@@ -5145,6 +5145,16 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 
 	const auto new_vars = make_synced_dynamic_vars();
 
+	if (new_vars.bot_override_difficulty == difficulty_type::LEVELLING) {
+		/*
+			Levelling keeps recalculating both the counts and the difficulty on its own,
+			so any concrete numbers here would only look like they're set in stone.
+		*/
+
+		broadcast_info("Bots adjusted: LEVELLING.", chat_target_type::INFO);
+		return;
+	}
+
 	const auto message = get_arena_handle().on_mode_with_input(
 		[&](const auto& mode, const auto& in) -> std::string {
 			using M = remove_cref<decltype(mode)>;
@@ -5178,18 +5188,11 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 				const auto requested = mode.calc_requested_bots(new_in);
 				const auto difficulty = mode.calc_bot_difficulty(new_in);
 
-				const auto levelling_note =
-					new_vars.bot_override_difficulty == difficulty_type::LEVELLING ?
-					" (levelling)" :
-					""
-				;
-
 				return typesafe_sprintf(
-					"Bots adjusted: %x allied, %x enemy, %x%x.",
+					"Bots adjusted: %x allied, %x enemy, %x.",
 					int(requested[requester_faction]),
 					int(requested[factions.get_opposing(requester_faction)]),
-					augs::enum_to_string(difficulty),
-					levelling_note
+					augs::enum_to_string(difficulty)
 				);
 			}
 			else {
