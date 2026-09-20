@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+#include <memory>
 #include "augs/pad_bytes.h"
 #include "augs/templates/maybe.h"
 #include "augs/graphics/rgba.h"
@@ -72,6 +74,9 @@ struct minimap_settings {
 	// GEN INTROSPECTOR struct minimap_settings
 	bool enabled = true;
 	float master_alpha = 1.0f;
+	float master_alpha_under_tab = 1.0f;
+	float background_alpha = 1.0f;
+	float background_alpha_under_tab = 1.0f;
 	hud_corner_type position = hud_corner_type::RIGHT_BOTTOM;
 	int size = 300;
 	int border_thickness = 1;
@@ -114,11 +119,65 @@ struct minimap_settings {
 	int extra_hud_space = 0;
 
 	/*
+		The minimap can be kept more transparent (or hidden altogether)
+		while the scoreboard is closed, so that it obscures less of the
+		gameplay area, and become fully opaque once the player holds TAB.
+	*/
+	float calc_master_alpha(const bool under_tab) const {
+		return std::clamp(under_tab ? master_alpha_under_tab : master_alpha, 0.0f, 1.0f);
+	}
+
+	/*
+		The background alpha is a separate multiplier on top of the master one,
+		applied only to what is not a gameplay indicator: the background fill,
+		the border, the obstacle geometry, the portals and the hazards.
+
+		This way the map itself can be faded out to a bare hint
+		while the players, the markers and the bomb stay fully readable.
+	*/
+	float calc_background_alpha(const bool under_tab) const {
+		return std::clamp(under_tab ? background_alpha_under_tab : background_alpha, 0.0f, 1.0f);
+	}
+
+	minimap_settings with_faded_background(const bool under_tab) const {
+		auto result = *this;
+		const auto alpha = calc_background_alpha(under_tab);
+
+		if (alpha < 1.0f) {
+			const auto faded = {
+				std::addressof(result.background_color),
+				std::addressof(result.border_color),
+				std::addressof(result.obstacle_color),
+				std::addressof(result.portal_color),
+				std::addressof(result.hazard_color)
+			};
+
+			for (const auto c : faded) {
+				c->mult_alpha(alpha);
+			}
+		}
+
+		return result;
+	}
+
+	bool is_visible(const bool under_tab) const {
+		if (!enabled) {
+			return false;
+		}
+
+		if (only_under_tab && !under_tab) {
+			return false;
+		}
+
+		return calc_master_alpha(under_tab) > 0.0f;
+	}
+
+	/*
 		Whether the minimap permanently occupies the given corner,
 		so the other HUD elements have to make room for it there.
 	*/
 	bool occupies_corner(const hud_corner_type corner) const {
-		return enabled && !only_under_tab && position == corner;
+		return is_visible(false) && position == corner;
 	}
 };
 

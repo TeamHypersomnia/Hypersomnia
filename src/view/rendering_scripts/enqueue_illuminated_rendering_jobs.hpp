@@ -810,12 +810,7 @@ void enqueue_illuminated_rendering_jobs(
 		pool.enqueue(indicators_and_callouts_job);
 		pool.enqueue(sentience_hud_job);
 
-		const bool minimap_visible =
-			settings.minimap.enabled &&
-			(!settings.minimap.only_under_tab || in.minimap_extended_range)
-		;
-
-		if (minimap_visible) {
+		if (settings.minimap.is_visible(in.minimap_extended_range)) {
 			pool.enqueue(minimap_job);
 		}
 	}

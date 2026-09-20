@@ -5746,8 +5746,18 @@ work_result work(
 
 				const auto& fow_triangles = chosen_renderer.dedicated[augs::dedicated_buffer::FOG_OF_WAR].triangles;
 
+				const bool minimap_under_tab = visit_current_setup([&](const auto& setup) {
+					using S = remove_cref<decltype(setup)>;
+
+					if constexpr(S::has_arena_gui) {
+						return setup.arena_gui.scoreboard.show;
+					}
+
+					return false;
+				});
+
 				const bool draw_fow_overlay =
-					minimap.enabled &&
+					minimap.is_visible(minimap_under_tab) &&
 					minimap.fog_of_war_color.a > 0 &&
 					minimap_transform.valid &&
 					!fow_triangles.empty()
@@ -5811,9 +5821,12 @@ work_result work(
 
 					auto& output = chosen_renderer.get_triangle_buffer();
 
-					/* The overlay respects the minimap's master alpha as well. */
+					/*
+						The overlay is a part of the map itself,
+						so it respects both the master and the background alpha.
+					*/
 					auto fow_color = minimap.fog_of_war_color;
-					fow_color.mult_alpha(std::clamp(minimap.master_alpha, 0.0f, 1.0f));
+					fow_color.mult_alpha(minimap.calc_master_alpha(minimap_under_tab) * minimap.calc_background_alpha(minimap_under_tab));
 
 					for (const auto& tri : fow_triangles) {
 						auto mapped = tri;

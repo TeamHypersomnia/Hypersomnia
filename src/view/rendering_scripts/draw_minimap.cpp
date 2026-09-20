@@ -43,7 +43,13 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		in.out_transform->valid = false;
 	}
 
-	const auto& settings = in.settings;
+	/*
+		A copy, not a reference: the background alpha is baked
+		into the map's colors here, so that the indicators
+		(players, markers, the bomb) keep their own opacity.
+	*/
+
+	const auto settings = in.settings.with_faded_background(in.extended_range);
 	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size));
 
 	const auto blank = in.blank_tex;
@@ -1019,7 +1025,7 @@ void draw_minimap(const draw_minimap_input in) {
 		the minimap has just drawn, the background and border included.
 	*/
 
-	const auto master_alpha = std::clamp(in.settings.master_alpha, 0.0f, 1.0f);
+	const auto master_alpha = in.settings.calc_master_alpha(in.extended_range);
 
 	if (master_alpha < 1.0f) {
 		auto scale_alphas_from = [master_alpha](augs::vertex_triangle_buffer& buffer, const std::size_t from) {
