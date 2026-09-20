@@ -4,19 +4,6 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [3.0.2] - 2026-09-20
-
-### Fixed
-
-- The scoreboard no longer widens underneath the minimap on screens narrower than 1200px. Only the player column gives up the width.
-- Nicknames too long for the player column are now cut off at its edge instead of running over the columns to the right.
-
-## [3.0.1] - 2026-09-20
-
-### Fixed
-
-- The minimap now scales with the screen height instead of always being drawn at its configured size, which is calibrated against 1080p.
-
 ## [3.0.0] - 2026-09-20
 
 ### Added
@@ -28,6 +15,11 @@
 - **Minimap.**
 - Game is zoomed out by 0.8x by default.
 - Many more!
+
+### Fixed
+
+- The scoreboard no longer widens underneath the minimap on screens narrower than 1200px. Only the player column gives up the width.
+- Nicknames too long for the player column are now cut off at its edge instead of running over the columns to the right.
 
 ## [1.6.3] - 2025-10-26
 
