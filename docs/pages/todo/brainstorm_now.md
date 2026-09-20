@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- te eksplozje lepsze pixelartowe z traceowych particli
+- jak sie wylaczy te bullet trace to te neony trzeba tez normalizowac
+	- cos zrobic z tymi rykoszetami paskudnymi jak jest neon rysowany, particle chyba moga byc
 - kiedys mozna byloby symulowac te trajektorie granatow
 
 - swiecacy dev label
