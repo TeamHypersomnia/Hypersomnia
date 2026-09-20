@@ -305,6 +305,10 @@ public:
 		return false;
 	}
 
+	difficulty_type calc_bot_difficulty(const_input) const {
+		return difficulty_type::VERY_EASY;
+	}
+
 	const auto& get_players() const {
 		return players;
 	}

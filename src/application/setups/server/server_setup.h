@@ -894,6 +894,9 @@ public:
 
 	bool can_use_map_command_now() const;
 
+	difficulty_type calc_current_bot_difficulty() const;
+	void broadcast_bots_adjusted(const mode_player_id& requester);
+
 	void choose_next_map_from_cycle();
 	bool is_idle() const;
 

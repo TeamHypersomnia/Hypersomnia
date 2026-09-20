@@ -5129,6 +5129,80 @@ bool server_setup::can_use_map_command_now() const {
 	);
 }
 
+difficulty_type server_setup::calc_current_bot_difficulty() const {
+	return get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			return mode.calc_bot_difficulty(in);
+		}
+	);
+}
+
+void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
+	/*
+		Report the bots that the already-applied overrides will result in,
+		so simulate the mode input with the new dynamic vars.
+	*/
+
+	const auto new_vars = make_synced_dynamic_vars();
+
+	const auto message = get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& in) -> std::string {
+			using M = remove_cref<decltype(mode)>;
+
+			if constexpr (std::is_same_v<M, arena_mode>) {
+				const auto new_in = typename M::const_input {
+					new_vars,
+					in.rules,
+					in.clean_round_state,
+					in.cosm
+				};
+
+				const auto factions = mode.calc_participating_factions(new_in);
+
+				if (!factions.valid()) {
+					return std::string();
+				}
+
+				const auto requester_faction = [&]() {
+					if (const auto player = mode.find(requester)) {
+						const auto faction = player->get_faction();
+
+						if (faction != faction_type::SPECTATOR) {
+							return faction;
+						}
+					}
+
+					return factions.bombing;
+				}();
+
+				const auto requested = mode.calc_requested_bots(new_in);
+				const auto difficulty = mode.calc_bot_difficulty(new_in);
+
+				const auto levelling_note =
+					new_vars.bot_override_difficulty == difficulty_type::LEVELLING ?
+					" (levelling)" :
+					""
+				;
+
+				return typesafe_sprintf(
+					"Bots adjusted: %x allied, %x enemy, %x%x.",
+					int(requested[requester_faction]),
+					int(requested[factions.get_opposing(requester_faction)]),
+					augs::enum_to_string(difficulty),
+					levelling_note
+				);
+			}
+			else {
+				return std::string();
+			}
+		}
+	);
+
+	if (!message.empty()) {
+		broadcast_info(message, chat_target_type::INFO);
+	}
+}
+
 void server_setup::handle_changing_maps_on_idle() {
 	if (!is_idle()) {
 		when_last_changed_map_due_to_idle = server_time;
@@ -5185,26 +5259,17 @@ void server_setup::handle_client_chat_command(
 			if (chat.message == "/bots" || chat.message == "/bots ") {
 				overrides.bots = {};
 				overrides.bot_difficulty = {};
-				broadcast_info("Bots reset to default server setting.", chat_target_type::INFO);
+				broadcast_bots_adjusted(to_mode_player_id(id));
 				return;
 			}
 
 			auto set_difficulty = [&](const difficulty_type target_difficulty) {
-				const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
+				overrides.bot_difficulty = {
+					to_mode_player_id(id),
+					target_difficulty
+				};
 
-				if (current_difficulty == target_difficulty) {
-					broadcast_info(typesafe_sprintf("Bots are already %x.", augs::enum_to_string(target_difficulty)), chat_target_type::INFO);
-				}
-				else {
-					overrides.bot_difficulty = {
-						to_mode_player_id(id),
-						target_difficulty
-					};
-
-					const auto notice = typesafe_sprintf("Bots difficulty forced to %x.", augs::enum_to_string(target_difficulty));
-
-					broadcast_info(notice, chat_target_type::INFO);
-				}
+				broadcast_bots_adjusted(to_mode_player_id(id));
 			};
 
 			if (begins_with(chat.message, "/bots hard") || chat.message == "/bots h") {
@@ -5251,14 +5316,18 @@ void server_setup::handle_client_chat_command(
 					const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
 
 					if (current_difficulty == difficulty_type::LEVELLING) {
-						broadcast_info(
-							"\"levelling\" difficulty uses the map's quota.\nFirst type e.g. \"/bots easy\".",
-							chat_target_type::INFO
-						);
+						/*
+							"levelling" would ignore the requested quota and use the map's,
+							so freeze the difficulty at whatever the levelling currently yields.
+						*/
+
+						overrides.bot_difficulty = {
+							to_mode_player_id(id),
+							calc_current_bot_difficulty()
+						};
 					}
-					else {
-						broadcast_info("Bots adjusted.", chat_target_type::INFO);
-					}
+
+					broadcast_bots_adjusted(to_mode_player_id(id));
 				}
 			}
 		}
