@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- moze spozycjonowac te pady jakos ludzko
-
 - kiedys mozna byloby symulowac te trajektorie granatow
 
 - co z facing worlds z ta minimapa kurwa
@@ -23,9 +21,6 @@ summary: That which we are brainstorming at the moment.
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp
 
 - review + ocenic perf hity
-
-- naprawic waypointy na minilabie
-	- nie critical bo to bylo tylko przez to ze literki sie pojawiaja w minilabie
 
 - na cyberaqua te camera zoomy przy akwarium
 

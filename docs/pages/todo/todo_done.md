@@ -1,3 +1,7 @@
+
+- naprawic waypointy na minilabie
+	- nie critical bo to bylo tylko przez to ze literki sie pojawiaja w minilabie
+
 - difficulty advancement system
 	- player based zeby mialo sens 
 		- przy casualach bedzie resetowalo po reconnect
@@ -7491,3 +7495,5 @@ This will discard your redo history."
 - also sclampuj skalowanie decali gunshotow tak 0.6x do 2.0x
 - also nie wiem czemu ale kurwa nie swieci ten decal dla szkla
 na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a chcialem zeby zawsze byl jakis wlasnie nawet jak przez prawie róg przeleci
+- moze spozycjonowac te pady jakos ludzko
+
