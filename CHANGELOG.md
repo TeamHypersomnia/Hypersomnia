@@ -4,6 +4,12 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [3.0.1] - 2026-09-20
+
+### Fixed
+
+- The minimap now scales with the screen height instead of always being drawn at its configured size, which is calibrated against 1080p.
+
 ## [3.0.0] - 2026-09-20
 
 ### Added

@@ -2911,6 +2911,25 @@ work_result work(
 				config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
 			}
 
+			/*
+				The configured minimap size is calibrated against 1080p,
+				so what is actually drawn scales with the screen height.
+
+				Otherwise the minimap would eat a disproportionate part
+				of a smaller viewport - which is especially painful on the Web,
+				where the canvas is often a fraction of the display - and
+				would shrink to an unreadable stamp on a larger one.
+			*/
+
+			if (const auto screen_height = logic_get_screen_size().y; screen_height > 0) {
+				const auto reference_screen_height = 1080.0f;
+				const auto screen_ratio = screen_height / reference_screen_height;
+
+				for (auto& appearance : config_copy.drawing.minimap.appearances) {
+					appearance.size = static_cast<int>(appearance.size * screen_ratio);
+				}
+			}
+
 			if (config_copy.drawing.cinematic_mode) {
 				auto& d = config_copy.drawing;
 
