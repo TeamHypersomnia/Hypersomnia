@@ -330,6 +330,42 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	}
 
+	/*
+		A nickname wider than its column would run over the columns to its
+		right - all the more likely now that the player column is the one
+		giving up width to make room for the minimap.
+
+		It is cut off outright rather than ellipsized: the point is only
+		to keep it inside the column, and an ellipsis would eat two more
+		characters of a name that is already short of room.
+	*/
+
+	auto clip_to_player_column = [&](std::string str, const int already_taken = 0) {
+		const auto max_w = player_col.w - cell_pad.x * 2 - 2 - already_taken;
+
+		if (max_w <= 0) {
+			return std::string();
+		}
+
+		while (!str.empty() && calc_size(str).x > max_w) {
+			/*
+				Drop a whole code point at a time -
+				popping single bytes would tear a multibyte one in half.
+			*/
+
+			while (!str.empty()) {
+				const auto byte = static_cast<unsigned char>(str.back());
+				str.pop_back();
+
+				if ((byte & 0xC0) != 0x80) {
+					break;
+				}
+			}
+		}
+
+		return str;
+	};
+
 	auto print_col_text = [&](const column& c, const auto& text, const auto& col, formatted_string preffix = formatted_string()) {
 		auto pp = cell_pad;
 
@@ -866,7 +902,10 @@ void arena_scoreboard_gui::draw_gui(
 				preffix += fmt(clan, pref_col);
 			}
 
-			const auto nick_str = get_nickname_str(player_id, player_data);
+			const auto nick_str = clip_to_player_column(
+				get_nickname_str(player_id, player_data),
+				preffix.empty() ? 0 : calc_size(preffix).x
+			);
 
 			col_text(
 				nick_str,
@@ -984,7 +1023,7 @@ void arena_scoreboard_gui::draw_gui(
 			pen.y += cell_h;
 
 			for (const auto& p : sorted_players) {
-				print_col_text(columns[3], get_nickname_str(p.second, p.first), column_label_color);
+				print_col_text(columns[3], clip_to_player_column(get_nickname_str(p.second, p.first)), column_label_color);
 				pen.y += cell_h;
 			}
 		}

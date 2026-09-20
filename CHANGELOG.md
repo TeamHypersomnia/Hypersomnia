@@ -9,6 +9,7 @@
 ### Fixed
 
 - The scoreboard no longer widens underneath the minimap on screens narrower than 1200px. Only the player column gives up the width.
+- Nicknames too long for the player column are now cut off at its edge instead of running over the columns to the right.
 
 ## [3.0.1] - 2026-09-20
 
