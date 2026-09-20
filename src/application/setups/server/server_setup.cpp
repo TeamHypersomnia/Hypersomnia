@@ -2870,11 +2870,19 @@ void server_setup::broadcast_info(const std::string& text, const chat_target_typ
 }
 
 void server_setup::try_apply(const public_client_settings& requested_settings) {
-	const bool can_already_resend_settings = server_time - when_last_sent_admin_public_settings > 1.0;
-
 	auto& current_requested_settings = integrated_client.settings.public_settings;
 
-	if (can_already_resend_settings && current_requested_settings != requested_settings) {
+	/*
+		Always store the settings right away: the server reads them back
+		when unpacking our own entropy (e.g. for crosshair_sensitivity),
+		so leaving them at their defaults for even a moment
+		would apply our mouse input with a completely wrong sensitivity.
+
+		Only the broadcast of the synced meta is rate limited,
+		and that happens in rebroadcast_player_synced_metas.
+	*/
+
+	if (current_requested_settings != requested_settings) {
 		current_requested_settings = requested_settings;
 		integrated_client.rebroadcast_synced_meta = true;
 	}
@@ -3894,11 +3902,21 @@ void server_setup::rebroadcast_player_synced_metas() {
 			return;
 		}
 
-		c.rebroadcast_synced_meta = false;
-
 		if (to_mode_player_id(client_id) == get_local_player_id()) {
+			/*
+				Our own public settings (e.g. the visible world area) can change every frame,
+				so don't spam the clients with them. Keep the flag set
+				so that the latest state still gets sent once the cooldown passes.
+			*/
+
+			if (server_time - when_last_sent_admin_public_settings <= 1.0) {
+				return;
+			}
+
 			when_last_sent_admin_public_settings = server_time;
 		}
+
+		c.rebroadcast_synced_meta = false;
 
 		const auto broadcasted_update = make_synced_meta_update_from(c, client_id);
 
