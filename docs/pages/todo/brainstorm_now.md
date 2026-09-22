@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- skala tego crosshaira nizsza
+- finishing trace powinny tez miec interpolowany rozmiar
+	 - zrobimy z tego interpolowany system
+
+- decalsy sasiadujace naprawic zeby spawnowalo kolejny na sasaidujacej przestrzeni ale to na tej sesji gdzie mamy kontekst
+- zwolnic gre 15-20% separate constants in balance vars
+- restart timy lepsze wszystkim mapom 15 sekund max
+- wylaczyc te linie przerywane w minimapie i dac na ticka, albo pod tabem tylko
+
 - te eksplozje lepsze pixelartowe z traceowych particli
 - jak sie wylaczy te bullet trace to te neony trzeba tez normalizowac
 	- cos zrobic z tymi rykoszetami paskudnymi jak jest neon rysowany, particle chyba moga byc

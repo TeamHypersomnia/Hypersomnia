@@ -221,7 +221,7 @@
             "overlay_color": [0, 0, 0, 40]
         },
         "crosshair": {
-            "scale": 4,
+            "scale": 3,
             "dot_size": 1.5,
             "segment_length": 10.0,
             "segment_thickness": 2,
