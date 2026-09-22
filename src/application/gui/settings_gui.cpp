@@ -849,12 +849,40 @@ void settings_gui_state::perform(
 				}
 
 				
-				revertable_enum("Interpolation method", config.interpolation.method);
-				
-				if (config.interpolation.method == interpolation_method::EXPONENTIAL) {
+				text_color("Interpolation", yellow);
+
+				{
 					auto scope = scoped_indent();
 
-					revertable_slider("Speed", config.interpolation.speed, 50.f, 1000.f);
+					const auto uniform_mode = config.interpolation.modes.find_uniform();
+
+					const auto preview =
+						uniform_mode.has_value() ?
+						format_enum(*uniform_mode) :
+						std::string("(Custom)")
+					;
+
+					if (auto combo = scoped_combo("Method##interpolation", preview.c_str())) {
+						augs::for_each_enum_except_bounds([&](const interpolation_mode mode) {
+							if (ImGui::Selectable(format_enum(mode).c_str(), uniform_mode == mode)) {
+								config.interpolation.modes.set_all(mode);
+							}
+						});
+					}
+
+					/* Only the modes - the smoothing speed below has its own. */
+					revert(config.interpolation.modes);
+
+					if (auto node = scoped_tree_node("Advanced")) {
+						revertable_enum("Controlled character position", config.interpolation.modes.controlled_character_position);
+						revertable_enum("Controlled character rotation", config.interpolation.modes.controlled_character_rotation);
+						revertable_enum("Other characters' position", config.interpolation.modes.other_characters_position);
+						revertable_enum("Other characters' rotation", config.interpolation.modes.other_characters_rotation);
+						revertable_enum("Bullets", config.interpolation.modes.bullets);
+						revertable_enum("Everything else", config.interpolation.modes.everything_else);
+					}
+
+					revertable_slider("Misprediction smoothing speed", config.interpolation.misprediction_smoothing_speed, 50.f, 1000.f);
 				}
 
 				//revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);

@@ -1461,7 +1461,7 @@ void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 	}
 
 	if (speed < 1.0f) {
-		//config.interpolation.method = interpolation_method::NONE;
+		//config.interpolation.modes.set_all(interpolation_mode::NONE);
 	}
 
 	nickname = config.client.get_nickname();

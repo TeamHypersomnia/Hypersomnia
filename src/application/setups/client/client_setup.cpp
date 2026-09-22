@@ -1214,7 +1214,7 @@ void client_setup::customize_for_viewing(config_json_table& config) const {
 		config.client.spectated_arena_type = demo_player.gui.shown_arena_type;
 
 		if (is_paused()) {
-			config.interpolation.method = interpolation_method::NONE;
+			config.interpolation.modes.set_all(interpolation_mode::NONE);
 		}
 	}
 }

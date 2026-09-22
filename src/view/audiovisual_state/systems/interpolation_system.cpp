@@ -5,11 +5,51 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/components/sentience_component.h"
+#include "game/components/missile_component.h"
 #define LOG_INTERPOLATION 0
 
 #if LOG_INTERPOLATION
 #include "augs/log.h"
 #endif
+
+namespace {
+	struct resolved_modes {
+		interpolation_mode position;
+		interpolation_mode rotation;
+	};
+
+	template <class E>
+	resolved_modes calc_modes(
+		const E& handle,
+		const interpolation_settings& settings,
+		const entity_id controlled_character_id
+	) {
+		if constexpr(E::template has<invariants::missile>()) {
+			return { settings.modes.bullets, settings.modes.bullets };
+		}
+		else if constexpr(E::template has<invariants::sentience>()) {
+			if (entity_id(handle.get_id()) == controlled_character_id) {
+				return { settings.modes.controlled_character_position, settings.modes.controlled_character_rotation };
+			}
+
+			return { settings.modes.other_characters_position, settings.modes.other_characters_rotation };
+		}
+		else {
+			return { settings.modes.everything_else, settings.modes.everything_else };
+		}
+	}
+
+	float calc_alpha(const interpolation_mode mode, const float ratio) {
+		switch (mode) {
+			case interpolation_mode::INTERPOLATE: return ratio;
+			case interpolation_mode::EXTRAPOLATE: return ratio + 1.0f;
+
+			/* NONE lands exactly on the newest simulated state. */
+			default: return 1.0f;
+		}
+	}
+}
 
 void interpolation_system::set_interpolation_enabled(const bool flag) {
 	enabled = flag;
@@ -52,6 +92,7 @@ void interpolation_system::update_desired_transforms(const cosmos& cosm, const b
 
 void interpolation_system::integrate_interpolated_transforms(
 	const interpolation_settings& settings,
+	const entity_id controlled_character_id,
 	const cosmos& cosm,
 	const augs::delta delta,
 	const augs::delta fixed_delta_for_slowdowns,
@@ -94,9 +135,14 @@ void interpolation_system::integrate_interpolated_transforms(
 			}
 #endif
 
-			if (compensating_lag || settings.method == interpolation_method::EXPONENTIAL) {
-				const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
-				const auto considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
+			/*
+				A misprediction is being smoothed out, so chase the corrected state
+				exponentially instead of honouring the requested mode -
+				there is nothing sensible to extrapolate from mid-correction.
+			*/
+			if (compensating_lag) {
+				const auto considered_positional_speed = settings.misprediction_smoothing_speed / (sqrt(cache.positional_slowdown_multiplier));
+				const auto considered_rotational_speed = settings.misprediction_smoothing_speed / (sqrt(cache.rotational_slowdown_multiplier));
 
 				if (cache.positional_slowdown_multiplier > 1.f) {
 					cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
@@ -137,7 +183,8 @@ void interpolation_system::integrate_interpolated_transforms(
 			else {
 				auto& integrated = info.interpolated_transform;
 
-				auto ratio = static_cast<float>(interpolation_ratio);
+				const auto ratio = static_cast<float>(interpolation_ratio);
+				const auto modes = ::calc_modes(e, settings, controlled_character_id);
 
 #if LOG_INTERPOLATION
 				if (e.template has<components::sentience>()) {
@@ -147,11 +194,11 @@ void interpolation_system::integrate_interpolated_transforms(
 				}
 #endif
 
-				if (settings.method == interpolation_method::LINEAR_EXTRAPOLATE) {
-					ratio += 1.0f;
-				}
-
-				integrated = info.previous_transform.interp_separate(info.desired_transform, ratio, ratio);
+				integrated = info.previous_transform.interp_separate(
+					info.desired_transform,
+					::calc_alpha(modes.position, ratio),
+					::calc_alpha(modes.rotation, ratio)
+				);
 
 				/* 
 					For numerical stability when bodies are asleep.

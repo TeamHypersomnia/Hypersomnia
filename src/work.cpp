@@ -3917,9 +3917,21 @@ work_result work(
 				interp.update_desired_transforms(cosm, use_current_as_previous);
 			}
 
+			const auto interpolation_for_this_frame = [&]() {
+				auto settings = viewing_config.interpolation;
+
+				if (get_viewed_character() != get_controlled_character()) {
+					/* Nothing on screen is ours to predict while spectating. */
+					settings.modes.set_all(interpolation_mode::INTERPOLATE);
+				}
+
+				return settings;
+			}();
+
 			interp.integrate_interpolated_transforms(
-				viewing_config.interpolation, 
-				cosm, 
+				interpolation_for_this_frame,
+				get_controlled_character().get_id(),
+				cosm,
 				frame_delta, 
 				cosm.get_fixed_delta(),
 				speed_multiplier,

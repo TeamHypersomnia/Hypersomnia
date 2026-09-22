@@ -79,8 +79,16 @@
     },
 
     "interpolation": {
-        "method": "LINEAR",
-        "speed": 1000.0 // only for EXPONENTIAL method
+        "modes": {
+            // NONE / INTERPOLATE / EXTRAPOLATE
+            "controlled_character_position": "INTERPOLATE",
+            "controlled_character_rotation": "INTERPOLATE",
+            "other_characters_position": "INTERPOLATE",
+            "other_characters_rotation": "INTERPOLATE",
+            "bullets": "INTERPOLATE",
+            "everything_else": "INTERPOLATE"
+        },
+        "misprediction_smoothing_speed": 1000.0
     },
 
     "app_controls": {

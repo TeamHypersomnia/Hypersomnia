@@ -23,8 +23,10 @@ public:
 
 	void integrate_interpolated_transforms(
 		const interpolation_settings&,
+		/* Anything else with a sentience counts as another character. */
+		const entity_id controlled_character_id,
 		const cosmos&,
-		const augs::delta delta, 
+		const augs::delta delta,
 		const augs::delta fixed_delta_for_slowdowns,
 		const double speed_multiplier,
 		const double interpolation_ratio
