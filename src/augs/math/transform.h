@@ -106,13 +106,41 @@ struct basic_transform {
 		return !operator==(b);
 	}
 
+	/*
+		Sweeps along the shortest arc at a uniform angular rate.
+		Exact for any alpha, including the alphas above 1
+		with which interpolation_mode::EXTRAPOLATE extrapolates.
+
+		The result is wrapped to [-180; 180]: a body spinning for long enough carries
+		an angle large enough to eat its own angular precision, and there is no reason
+		to pass that on to whoever renders it.
+	*/
+	template <class A>
+	R interp_rotation(const transform next, const A alpha) const {
+		auto wrap = [](const R degrees) {
+			const auto within_a_turn = repro::fmod(degrees, static_cast<R>(360));
+
+			if (within_a_turn > static_cast<R>(180)) {
+				return within_a_turn - static_cast<R>(360);
+			}
+
+			if (within_a_turn < static_cast<R>(-180)) {
+				return within_a_turn + static_cast<R>(360);
+			}
+
+			return within_a_turn;
+		};
+
+		return wrap(rotation + wrap(next.rotation - rotation) * static_cast<R>(alpha));
+	}
+
 	auto interp(
 		const transform next,
 		const R alpha
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, alpha),
-			augs::interp(get_direction(), next.get_direction(), alpha).degrees()
+			interp_rotation(next, alpha)
 		};
 	}
 
@@ -124,7 +152,7 @@ struct basic_transform {
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, positional_alpha),
-			augs::interp(get_direction(), next.get_direction(), rotational_alpha).degrees()
+			interp_rotation(next, rotational_alpha)
 		};
 	}
 
