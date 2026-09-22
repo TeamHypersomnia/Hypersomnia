@@ -867,6 +867,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 														round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
 													}
 
+													/*
+														The plain muzzle, not considered_muzzle_transform, on purpose.
+														A pellet therefore interpolates from the barrel onto its own
+														spread offset over the first step, so a shotgun blast fans out
+														instead of appearing as a finished circle at the muzzle.
+													*/
 													::correct_interpolation_for(step, round_entity.get_id(), muzzle_transform);
 												}, [&](const auto) {});
 											};
