@@ -242,6 +242,7 @@ struct game_drawing_settings {
 
 	bool draw_bullet_shadows = true;
 	bool draw_bullet_trails = true;
+	bool draw_long_bullet_neons = true;
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_aabb_highlighter = true;

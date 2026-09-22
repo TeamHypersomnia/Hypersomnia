@@ -76,7 +76,9 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::drawer_with_default { dedicated[d].triangles, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto make_drawing_input = [get_drawer_for, &game_images, global_time_seconds, &av, &interp, queried_cone](const D d) {
+	const bool draw_long_bullet_neons = in.drawing.draw_long_bullet_neons;
+
+	auto make_drawing_input = [get_drawer_for, &game_images, global_time_seconds, &av, &interp, queried_cone, draw_long_bullet_neons](const D d) {
 		return draw_renderable_input { 
 			{
 				get_drawer_for(d), 
@@ -84,7 +86,8 @@ void enqueue_illuminated_rendering_jobs(
 				global_time_seconds,
 				flip_flags(),
 				av.randomizing,
-				queried_cone
+				queried_cone,
+				draw_long_bullet_neons
 			},
 			interp
 		};

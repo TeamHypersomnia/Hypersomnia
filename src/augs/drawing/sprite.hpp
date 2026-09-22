@@ -152,7 +152,16 @@ namespace augs {
 
 		const auto dir = vec2::from_degrees(target_rotation);
 		const auto half_length = considered_size.x / 2;
-		const auto tail_length = half_length * (2 * spr.neon_extension_mult - 1);
+
+		const auto tail_length = [&]() {
+			auto extension = half_length * (2 * spr.neon_extension_mult - 2) * in.neon_tail_extension_mult;
+
+			if (in.max_neon_tail_behind >= 0.f) {
+				extension = std::min(extension, in.max_neon_tail_behind);
+			}
+
+			return half_length + std::max(0.f, extension);
+		}();
 
 		const auto head_center = target_position + dir * (half_length / 2);
 		const auto tail_center = target_position - dir * (tail_length / 2);

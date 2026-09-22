@@ -35,4 +35,13 @@ struct sprite_drawing_input : drawing_input_base {
 	double global_time_seconds = 0.0;
 	vec2i tile_size = vec2i(0, 0);
 	flip_flags flip;
+
+	/*
+		How far behind its own back the neon tail may reach, in world units.
+		Negative imposes no limit.
+	*/
+	real32 max_neon_tail_behind = -1.f;
+
+	/* Scales whatever extension survives that limit. */
+	real32 neon_tail_extension_mult = 1.f;
 };

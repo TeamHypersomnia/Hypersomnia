@@ -36,6 +36,7 @@ namespace components {
 
 		augs::stepped_timestamp when_last_ricocheted;
 		augs::stepped_timestamp when_fired;
+		augs::stepped_timestamp when_last_reoriented;
 
 		signi_entity_id particular_homing_target;
 		

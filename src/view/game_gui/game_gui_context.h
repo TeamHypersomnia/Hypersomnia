@@ -173,7 +173,8 @@ public:
 			0.0,
 			flip_flags(),
 			base::dependencies.randomizing,
-			camera_cone(get_camera_eye(), this->get_screen_size())
+			camera_cone(get_camera_eye(), this->get_screen_size()),
+			true
 		};
 	}
 

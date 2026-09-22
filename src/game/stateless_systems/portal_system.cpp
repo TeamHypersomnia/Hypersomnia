@@ -338,6 +338,10 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					const bool should_snap_interp = (contacted_entity_transform.pos - final_transform.pos).length() > 1.0;
 
+					if (const auto missile = typed_contacted_entity.template find<components::missile>()) {
+						missile->when_last_reoriented = cosm.get_timestamp();
+					}
+
 					typed_contacted_entity.set_logic_transform(final_transform);
 
 					if (should_snap_interp) {

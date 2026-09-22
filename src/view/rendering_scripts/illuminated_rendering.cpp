@@ -156,7 +156,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				global_time_seconds,
 				flip_flags(),
 				av.randomizing,
-				queried_cone
+				queried_cone,
+				settings.draw_long_bullet_neons
 			},
 			interp
 		};

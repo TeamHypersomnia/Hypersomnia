@@ -14,6 +14,7 @@ struct specific_draw_input {
 	const flip_flags flip;
 	const randomizing_system& randomizing;
 	const camera_cone cone;
+	const bool draw_long_bullet_neons = true;
 
 	template <class T>
 	auto make_input_for() const {

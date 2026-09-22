@@ -17,6 +17,7 @@
 #include "game/components/render_component.h"
 #include "game/components/remnant_component.h"
 #include "game/components/melee_component.h"
+#include "game/components/missile_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
@@ -26,6 +27,12 @@
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
 #include "game/components/torso_component.hpp"
+
+/*
+	Collapse a round's neon tail the moment it is turned, instead of fading it out
+	over the step in which its rotation actually swings over.
+*/
+constexpr bool hard_snap_at_missile_reoriented = true;
 
 using entities_with_renderables = entity_types_having_any_of<
 	invariants::sprite,
@@ -102,6 +109,56 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			result.renderable_transform = viewing_transform;
 			result.global_time_seconds = in.global_time_seconds;
+
+			if constexpr(H::template has<components::missile>()) {
+				/*
+					The tail trails behind the round, so it may only reach as far back as the
+					round has actually come - otherwise one that has just been fired, or has
+					just been turned, glows straight through whatever it came off.
+
+					The two cases run on different clocks. A stamp is taken mid-step and
+					describes the state at the END of that step, which interpolation only
+					begins to show a step later:
+
+					- fired: the first rendered step already carries the round away from the
+					  muzzle, so its travel begins one step past the stamp.
+					- reoriented: the step rendered right after the stamp is still the approach
+					  towards whatever turned the round, only drawn with the already new
+					  rotation. Nothing has been travelled yet, so the extension fades out as
+					  that rotation swings over, and travel starts counting a step later still.
+				*/
+				if (!in.draw_long_bullet_neons) {
+					result.neon_tail_extension_mult = 0.f;
+				}
+				else {
+					const auto& missile = typed_handle.template get<components::missile>();
+					const auto dt_secs = typed_handle.get_cosmos().get_fixed_delta().template in_seconds<double>();
+
+					auto travelled_since = [&](const double secs) {
+						return static_cast<real32>(std::max(0.0, secs) * typed_handle.get_effective_velocity().length());
+					};
+
+					if (missile.when_last_reoriented.was_set()) {
+						const auto secs = in.global_time_seconds - (missile.when_last_reoriented.step + 2) * dt_secs;
+
+						if (secs < 0.0) {
+							result.neon_tail_extension_mult =
+								hard_snap_at_missile_reoriented ?
+								0.f :
+								static_cast<real32>(std::min(1.0, -secs / dt_secs))
+							;
+						}
+						else {
+							result.max_neon_tail_behind = travelled_since(secs);
+						}
+					}
+					else if (missile.when_fired.was_set()) {
+						result.max_neon_tail_behind = travelled_since(
+							in.global_time_seconds - (missile.when_fired.step + 1) * dt_secs
+						);
+					}
+				}
+			}
 
 			if (flip_vertically) {
 				result.flip.vertically = !result.flip.vertically;

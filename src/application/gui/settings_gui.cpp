@@ -894,6 +894,7 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				revertable_checkbox("Draw bullet trails", config.drawing.draw_bullet_trails);
+				revertable_checkbox("Draw long bullet neons", config.drawing.draw_long_bullet_neons);
 				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
 
 				{

@@ -108,6 +108,9 @@ static void ricochet_missile_against_surface(
 
 		missile.when_last_ricocheted = now;
 
+		/* Stamped by anything that puts the round onto a new heading, a portal included. */
+		missile.when_last_reoriented = now;
+
 		const auto reflected_dir = vec2(impact_dir).reflect(collision_normal);
 		const auto& rigid_body = typed_missile.template get<components::rigid_body>();
 
