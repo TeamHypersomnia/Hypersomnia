@@ -173,6 +173,7 @@ namespace augs {
 		void set_standard_blending();
 		void set_overwriting_blending();
 		void set_additive_blending();
+		void set_max_blending();
 		
 		void call_triangles_direct_ptr(const vertex_triangle_buffer&);
 		void call_triangles(vertex_triangle_buffer&&);

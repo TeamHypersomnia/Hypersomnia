@@ -38,6 +38,14 @@ namespace augs {
 
 			unsigned max_texture_size = static_cast<unsigned>(-1);
 
+			/*
+				Tracked so that the other blending setters
+				restore GL_FUNC_ADD only after a max blending pass.
+			*/
+
+			bool max_blending_active = false;
+			void restore_add_blend_equation();
+
 			void set_active_texture(const unsigned);
 			void fullscreen_quad();
 
@@ -53,6 +61,7 @@ namespace augs {
 			void set_standard_blending();
 			void set_overwriting_blending();
 			void set_additive_blending();
+			void set_max_blending();
 			
 			void enable_special_vertex_attribute();
 			void disable_special_vertex_attribute();

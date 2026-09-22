@@ -311,6 +311,10 @@ namespace augs {
 		push_no_arg(no_arg_command::SET_ADDITIVE_BLENDING);
 	}
 
+	void renderer::set_max_blending() {
+		push_no_arg(no_arg_command::SET_MAX_BLENDING);
+	}
+
 	void renderer::set_active_texture(const unsigned n) {
 		push_command(set_active_texture_command { n });
 	}

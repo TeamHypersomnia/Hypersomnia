@@ -356,6 +356,7 @@ namespace augs {
 							case N::SET_STANDARD_BLENDING: set_standard_blending(); break;
 							case N::SET_OVERWRITING_BLENDING: set_overwriting_blending(); break;
 							case N::SET_ADDITIVE_BLENDING: set_additive_blending(); break;
+							case N::SET_MAX_BLENDING: set_max_blending(); break;
 							case N::CLEAR_STENCIL: clear_stencil(); break;
 							case N::START_WRITING_STENCIL: start_writing_stencil(); break;
 							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
@@ -480,16 +481,35 @@ namespace augs {
 			GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 		}
 
+		void renderer_backend::restore_add_blend_equation() {
+			if (max_blending_active) {
+				GL_CHECK(glBlendEquation(GL_FUNC_ADD));
+				max_blending_active = false;
+			}
+		}
+
 		void renderer_backend::set_standard_blending() {
+			restore_add_blend_equation();
 			GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE));
 		}
 
 		void renderer_backend::set_overwriting_blending() {
+			restore_add_blend_equation();
 			GL_CHECK(glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO));
 		}
 
 		void renderer_backend::set_additive_blending() {
+			restore_add_blend_equation();
 			GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE));
+		}
+
+		void renderer_backend::set_max_blending() {
+			/*
+				GL_MAX ignores the blend factors - each channel keeps the larger of source and destination.
+			*/
+
+			GL_CHECK(glBlendEquation(GL_MAX));
+			max_blending_active = true;
 		}
 
 		void renderer_backend::set_active_texture(const unsigned n) {
