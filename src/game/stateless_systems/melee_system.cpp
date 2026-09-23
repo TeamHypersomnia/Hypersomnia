@@ -437,7 +437,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 															-n,
 															damage_def.base * (1.f + bonus_mult),
 															0.f,
-															true,
+															&material_decals_def::melee_decals,
 															[]() { return 0.f; }
 														);
 													}

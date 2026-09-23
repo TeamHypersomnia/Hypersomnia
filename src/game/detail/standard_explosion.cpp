@@ -195,6 +195,30 @@ void standard_explosion_input::instantiate(
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 
+	/*
+		Surfaces hit by the blast get marks - only those whose material defines explosion_decals, e.g. glass.
+		Every visibility triangle hitting a surface is a candidate spot, so a surface can get several marks,
+		spread apart and capped. No stacking in depth - a blast has no trajectory to march along.
+	*/
+	const bool leaves_surface_decals = this->type == adverse_element_type::FORCE;
+
+	struct surface_decal_candidate {
+		const b2Fixture* fixture = nullptr;
+		vec2 point;
+	};
+
+	struct surface_decal_candidates_of_victim {
+		entity_id victim_id;
+		std::vector<surface_decal_candidate> candidates;
+	};
+
+	/*
+		Kept in insertion order, not iterated through the map - the order of spawned decals must be deterministic.
+	*/
+	std::vector<surface_decal_candidates_of_victim> surface_decal_candidates;
+	std::unordered_map<unversioned_entity_id, std::size_t> surface_decal_candidates_index;
+	auto decal_rng = cosm.get_rng_for(subject_if_any);
+
 	for (auto i = 0u; i < response.get_num_triangles(); ++i) {
 		auto damaging_triangle = response.get_world_triangle(i, request.eye_transform.pos);
 		damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
@@ -305,33 +329,62 @@ void standard_explosion_input::instantiate(
 						}
 
 						step.post_message(damage_msg);
+					}
 
-						/*
-							Walls hit by the blast get a mark, same as with bullets.
-							No stacking in depth - a blast has no trajectory to march along.
-						*/
-						if (this->type == adverse_element_type::FORCE && !victim.template has<components::sentience>()) {
-							auto rng = cosm.get_rng_for(victim.get_id());
+					if (leaves_surface_decals && !victim.template has<components::sentience>()) {
+						const auto found = surface_decal_candidates_index.try_emplace(victim_id, surface_decal_candidates.size());
 
-							::spawn_surface_impact_decal(
-								step,
-								rng,
-								victim,
-								&fix,
-								point_b,
-								damage_msg.impact_velocity,
-								damage_msg.damage.base,
-								0.f,
-								false,
-								[]() { return 0.f; }
-							);
+						if (found.second) {
+							surface_decal_candidates.push_back({ victim.get_id(), {} });
 						}
+
+						surface_decal_candidates[found.first->second].candidates.push_back({ &fix, point_b });
 					}
 				}
 
 				return callback_result::CONTINUE;
 			}
 		);
+	}
+
+	for (const auto& [victim_id, candidates] : surface_decal_candidates) {
+		const auto victim = cosm[victim_id];
+		const auto num_candidates = candidates.size();
+		const auto num_marks = std::min(num_candidates, MAX_EXPLOSION_DECALS_PER_SURFACE);
+
+		augs::constant_size_vector<vec2, MAX_EXPLOSION_DECALS_PER_SURFACE> marks;
+
+		for (std::size_t m = 0; m < num_marks; ++m) {
+			/*
+				Candidates come in the angular order of the triangles,
+				so evenly spaced indices spread the marks across the whole hit stretch.
+			*/
+			const auto& candidate = candidates[(2 * m + 1) * num_candidates / (2 * num_marks)];
+			const auto point = candidate.point;
+
+			const bool spot_free = std::none_of(marks.begin(), marks.end(), [&](const vec2 other) {
+				return (other - point).length_sq() < MIN_EXPLOSION_SURFACE_DECAL_SPACING_PX * MIN_EXPLOSION_SURFACE_DECAL_SPACING_PX;
+			});
+
+			if (!spot_free) {
+				continue;
+			}
+
+			marks.push_back(point);
+
+			::spawn_surface_impact_decal(
+				step,
+				decal_rng,
+				victim,
+				candidate.fixture,
+				point,
+				(point - explosion_pos).normalize(),
+				damage.base,
+				0.f,
+				&material_decals_def::explosion_decals,
+				[]() { return 0.f; }
+			);
+		}
 	}
 
 	{

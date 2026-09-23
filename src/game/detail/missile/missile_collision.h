@@ -290,7 +290,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 						impact_dir,
 						damage_msg.damage.base,
 						missile.decal_scale_of_sender,
-						false,
+						&material_decals_def::gunshot_decals,
 						get_max_decal_depth
 					);
 

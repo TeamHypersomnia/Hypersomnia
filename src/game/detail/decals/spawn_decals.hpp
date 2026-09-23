@@ -97,6 +97,12 @@ inline const rgba EXPLOSION_DECAL_COLORIZE = rgba(255, 255, 255, 255);
 inline constexpr real32 MIN_EXPLOSION_DECAL_SCALE = 0.25f;
 inline constexpr real32 MAX_EXPLOSION_DECAL_SCALE = 3.0f;
 
+/* How many marks a single blast may leave on one surface entity. */
+inline constexpr std::size_t MAX_EXPLOSION_DECALS_PER_SURFACE = 4;
+
+/* The marks a single blast leaves on one surface are at least this far apart. */
+inline constexpr real32 MIN_EXPLOSION_SURFACE_DECAL_SPACING_PX = 32.f;
+
 /* Sprite sizes are integral, so a thin decal must not round away to nothing. */
 inline vec2i to_decal_sprite_size(const vec2 size) {
 	return vec2i(
@@ -308,7 +314,8 @@ inline void queue_decal_creation(
 }
 
 /*
-	Spawns a gunshot or melee decal on the hit surface.
+	Spawns a gunshot, melee or explosion decal on the hit surface,
+	picked from the given variant list of the surface's material.
 	The decal slides along slide_dir into the hit fixture
 	and is downscaled if there's not enough space there,
 	so that it (almost) never sticks out of the convex fixture.
@@ -331,7 +338,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 	const vec2 slide_dir,
 	const real32 damage_amount,
 	const real32 custom_decal_scale,
-	const bool melee,
+	const material_decal_variants material_decals_def::* const variants_of_material,
 	F&& get_max_stacking_depth_px
 ) {
 	if (fixture == nullptr || !(damage_amount > 0.f)) {
@@ -353,7 +360,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 		return std::nullopt;
 	}
 
-	const auto& variants = melee ? found_decals->second.melee_decals : found_decals->second.gunshot_decals;
+	const auto& variants = found_decals->second.*variants_of_material;
 
 	if (variants.empty()) {
 		return std::nullopt;
