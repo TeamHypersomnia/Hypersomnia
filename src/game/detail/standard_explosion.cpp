@@ -305,6 +305,27 @@ void standard_explosion_input::instantiate(
 						}
 
 						step.post_message(damage_msg);
+
+						/*
+							Walls hit by the blast get a mark, same as with bullets.
+							No stacking in depth - a blast has no trajectory to march along.
+						*/
+						if (this->type == adverse_element_type::FORCE && !victim.template has<components::sentience>()) {
+							auto rng = cosm.get_rng_for(victim.get_id());
+
+							::spawn_surface_impact_decal(
+								step,
+								rng,
+								victim,
+								&fix,
+								point_b,
+								damage_msg.impact_velocity,
+								damage_msg.damage.base,
+								0.f,
+								false,
+								[]() { return 0.f; }
+							);
+						}
 					}
 				}
 
