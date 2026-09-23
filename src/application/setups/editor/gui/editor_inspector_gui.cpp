@@ -1367,6 +1367,11 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	MULTIPROPERTY("Color", color);
 	MULTIPROPERTY("Positional vibration", positional_vibration);
 	MULTIPROPERTY("Intensity vibration", intensity_vibration);
+	MULTIPROPERTY("Cast shadows", cast_shadows);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("If disabled, walls and other obstacles don't block this light.");
+	}
 
 	ImGui::Separator();
 	text("Falloff");

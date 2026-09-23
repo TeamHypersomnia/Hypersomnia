@@ -42,7 +42,18 @@ void for_each_light_vis_request(
 					request.queried_rect = {};
 				}
 
-				request.filter = predefined_queries::light();
+				if (light.cast_shadows) {
+					request.filter = predefined_queries::light();
+				}
+				else {
+					/*
+						Matches no fixture, so the light's visibility is its whole reach square.
+					*/
+
+					request.filter = b2Filter();
+					request.filter.maskBits = 0;
+				}
+
 				request.subject = light_entity;
 				request.color = light.color;
 

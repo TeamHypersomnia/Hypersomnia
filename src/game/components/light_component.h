@@ -76,6 +76,8 @@ namespace components {
 		augs::maybe<std::array<light_value_variation, 2>> position_variations;
 
 		rgba color = white;
+		bool cast_shadows = true;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		light();
