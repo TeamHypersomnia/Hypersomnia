@@ -1,3 +1,4 @@
+#include <map>
 #include "augs/misc/randomization.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/standard_explosion.h"
@@ -195,8 +196,108 @@ void standard_explosion_input::instantiate(
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 
+	/*
+		Marks left by the blast on the surfaces it hits.
+		Only surfaces whose material defines explosion_decals get them, e.g. glass.
+
+		Where the blast touches a surface:
+		every visibility triangle ends exactly on the wall it hit,
+		so the triangle's far edge is a stretch of that wall exposed to the blast.
+
+		Where the marks go:
+		each stretch is cut into 8px pieces, and each piece gets a weight -
+		high close to the blast, zero outside its radius.
+		The marks are then spread so that each one covers an equal share of the total weight.
+		This puts most of them near the point closest to the blast.
+
+		How many marks:
+		the more total weight a surface gets, the more marks, up to MAX_EXPLOSION_DECALS_PER_SURFACE.
+
+		Unlike bullet marks, they do not stack in depth - a blast has no trajectory to march along.
+	*/
+	const bool leaves_surface_decals = this->type == adverse_element_type::FORCE;
+
+	struct hit_surface_piece {
+		const b2Fixture* fixture = nullptr;
+		vec2 center;
+		real32 weight = 0.f;
+	};
+
+	struct hit_surface_pieces_of_victim {
+		std::vector<hit_surface_piece> pieces;
+		real32 total_weight = 0.f;
+	};
+
+	/*
+		An ordered map, not unordered - we iterate it to spawn the decals,
+		and the order in which they are spawned must be deterministic.
+	*/
+	std::map<entity_id, hit_surface_pieces_of_victim> hit_surface_pieces;
+	auto decal_rng = cosm.get_rng_for(subject_if_any);
+
+	/*
+		Checks if the triangle's far edge really lies on this fixture.
+		A triangle can also overlap a fixture without ending on it, e.g.:
+		- the triangle ends at the edge of the queried rect, with no wall there,
+		- the fixture does not block visibility, so the triangle passes through it and ends on another wall behind.
+	*/
+	auto edge_lies_on_fixture = [&](
+		const b2Fixture& fix,
+		const vec2 visible_a,
+		const vec2 visible_b
+	) {
+		/*
+			We test a point slightly behind the middle of the edge, as seen from the blast.
+			If it is inside the fixture, the edge lies on the fixture's face.
+		*/
+		constexpr auto face_probe_depth_px = 2.f;
+
+		const auto edge_center = (visible_a + visible_b) / 2;
+		const auto probe = edge_center + (edge_center - explosion_pos).set_length(face_probe_depth_px);
+
+		return fix.TestPoint(b2Vec2(si.get_meters(probe)));
+	};
+
+	/*
+		Weight of a spot on a surface: 1 right at the blast, down to 0 at its radius.
+		Squared, so that the marks gather near the closest point more strongly.
+	*/
+	auto calc_surface_weight_at = [&](const vec2 point) {
+		const auto proximity = std::max(0.f, 1.f - (point - explosion_pos).length() / effective_radius);
+		return proximity * proximity;
+	};
+
+	/*
+		Cuts the stretch into short pieces and adds the ones within the blast radius.
+		A piece's weight is its length times the weight at its center.
+	*/
+	auto add_hit_surface_pieces = [&](
+		hit_surface_pieces_of_victim& of_victim,
+		const b2Fixture& fix,
+		const vec2 stretch_a,
+		const vec2 stretch_b
+	) {
+		constexpr auto piece_length_px = 8.f;
+
+		const auto stretch = stretch_b - stretch_a;
+		const auto num_pieces = std::size_t(1) + static_cast<std::size_t>(stretch.length() / piece_length_px);
+		const auto piece_length = stretch.length() / static_cast<real32>(num_pieces);
+
+		for (std::size_t p = 0; p < num_pieces; ++p) {
+			const auto center = stretch_a + stretch * ((static_cast<real32>(p) + 0.5f) / static_cast<real32>(num_pieces));
+			const auto weight = piece_length * calc_surface_weight_at(center);
+
+			if (weight > 0.f) {
+				of_victim.pieces.push_back({ &fix, center, weight });
+				of_victim.total_weight += weight;
+			}
+		}
+	};
+
 	for (auto i = 0u; i < response.get_num_triangles(); ++i) {
-		auto damaging_triangle = response.get_world_triangle(i, request.eye_transform.pos);
+		const auto visible_triangle = response.get_world_triangle(i, request.eye_transform.pos);
+
+		auto damaging_triangle = visible_triangle;
 		damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
 		damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
 
@@ -305,33 +406,73 @@ void standard_explosion_input::instantiate(
 						}
 
 						step.post_message(damage_msg);
+					}
 
-						/*
-							Walls hit by the blast get a mark, same as with bullets.
-							No stacking in depth - a blast has no trajectory to march along.
-						*/
-						if (this->type == adverse_element_type::FORCE && !victim.template has<components::sentience>()) {
-							auto rng = cosm.get_rng_for(victim.get_id());
+					const bool may_get_surface_decals =
+						leaves_surface_decals
+						&& !victim.template has<components::sentience>()
+						&& ::find_material_decal_variants(victim, &material_decals_def::explosion_decals) != nullptr
+					;
 
-							::spawn_surface_impact_decal(
-								step,
-								rng,
-								victim,
-								&fix,
-								point_b,
-								damage_msg.impact_velocity,
-								damage_msg.damage.base,
-								0.f,
-								false,
-								[]() { return 0.f; }
-							);
-						}
+					if (may_get_surface_decals && edge_lies_on_fixture(fix, visible_triangle[1], visible_triangle[2])) {
+						add_hit_surface_pieces(hit_surface_pieces[victim.get_id()], fix, visible_triangle[1], visible_triangle[2]);
 					}
 				}
 
 				return callback_result::CONTINUE;
 			}
 		);
+	}
+
+	for (const auto& [victim_id, of_victim] : hit_surface_pieces) {
+		const auto& [pieces, total_weight] = of_victim;
+
+		if (pieces.empty()) {
+			continue;
+		}
+
+		const auto victim = cosm[victim_id];
+
+		const auto num_marks = std::min(
+			std::size_t(1) + static_cast<std::size_t>(total_weight / EXPLOSION_SURFACE_WEIGHT_PER_DECAL),
+			MAX_EXPLOSION_DECALS_PER_SURFACE
+		);
+
+		/*
+			Imagine all the pieces laid out one after another on a line, each as long as its weight.
+			Cut this line into num_marks equal parts and put a mark in the middle of each part.
+			Heavy pieces take up more of the line, so they get more marks.
+		*/
+		auto current_piece = std::size_t(0);
+		auto weight_before_current = 0.f;
+
+		for (std::size_t m = 0; m < num_marks; ++m) {
+			const auto mark_at_weight = (static_cast<real32>(m) + 0.5f) * total_weight / static_cast<real32>(num_marks);
+
+			while (
+				current_piece + 1 < pieces.size()
+				&& weight_before_current + pieces[current_piece].weight < mark_at_weight
+			) {
+				weight_before_current += pieces[current_piece].weight;
+				++current_piece;
+			}
+
+			const auto& piece = pieces[current_piece];
+			const auto point = piece.center;
+
+			::spawn_surface_impact_decal(
+				step,
+				decal_rng,
+				victim,
+				piece.fixture,
+				point,
+				(point - explosion_pos).normalize(),
+				damage.base,
+				0.f,
+				&material_decals_def::explosion_decals,
+				[]() { return 0.f; }
+			);
+		}
 	}
 
 	{

@@ -22,6 +22,7 @@ struct material_decals_def {
 	// GEN INTROSPECTOR struct material_decals_def
 	material_decal_variants gunshot_decals;
 	material_decal_variants melee_decals;
+	material_decal_variants explosion_decals;
 	// END GEN INTROSPECTOR
 };
 

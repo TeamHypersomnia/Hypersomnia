@@ -338,7 +338,8 @@ void load_test_scene_sentience_properties(
 
 	/*
 		Gunshot/melee decals per physical material.
-		Glass uses the same white glass decals for both.
+		Glass uses the same white glass decals for both, and for explosions -
+		which leave marks only on glass.
 		Wood additionally shows the glass-crack decals in black on melee hits.
 	*/
 	{
@@ -370,6 +371,9 @@ void load_test_scene_sentience_properties(
 
 			glass.melee_decals.push_back(glass_1);
 			glass.melee_decals.push_back(glass_2);
+
+			glass.explosion_decals.push_back(glass_1);
+			glass.explosion_decals.push_back(glass_2);
 		}
 
 		{
