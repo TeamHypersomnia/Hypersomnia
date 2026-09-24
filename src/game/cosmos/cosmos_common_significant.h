@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 
+#include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 
 #include "augs/templates/type_in_list_id.h"
@@ -33,9 +34,16 @@ struct default_sound_properties_info {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	shadow_step is the displacement of an environment shadow per one level of the caster's shadow height.
+	shadow_strength is the fraction of the ambient light removed inside the shadow.
+*/
+
 struct cosmos_light_settings {
 	// GEN INTROSPECTOR struct cosmos_light_settings
 	rgba ambient_color = rgba(53, 97, 102, 255);
+	vec2 shadow_step = vec2(1.87f, 2.34f);
+	real32 shadow_strength = 0.8f;
 	// END GEN INTROSPECTOR
 };
 

@@ -85,7 +85,7 @@ inline constexpr std::size_t MAX_DECALS_PER_SPOT = 4;
 */
 
 /* A force grenade explosion (88 damage) spawns the explosion decal at its original sprite size. */
-inline constexpr real32 EXPLOSION_DECAL_BASELINE_DAMAGE = 88.f*3.0f;
+inline constexpr real32 EXPLOSION_DECAL_BASELINE_DAMAGE = 88.f;
 
 /* Flash explosions deal negligible damage, so they leave a fixed-size decal instead. */
 inline constexpr real32 FLASH_EXPLOSION_DECAL_SIZE_MULT = 0.5f;

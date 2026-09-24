@@ -6,6 +6,7 @@
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "view/rendering_scripts/corpse_head_overlays.h"
 #include "view/rendering_scripts/draw_minimap.h"
+#include "view/rendering_scripts/draw_environment_shadows.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
 
 const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 80);
@@ -55,6 +56,26 @@ void enqueue_illuminated_rendering_jobs(
 	const auto indicator_meta = in.indicator_meta;
 
 	const auto considered_fow = in.get_considered_fow();
+
+	const bool environment_shadows = in.environment_shadows_enabled();
+
+	/*
+		With environment shadows on, character and bullet shadows keep their lengths
+		but point along the sun, so that all shadows fall the same way.
+	*/
+
+	auto along_the_sun = [&](const vec2 legacy_offset) {
+		const auto sun_step = cosm.get_common_significant().light.shadow_step;
+
+		if (!environment_shadows || sun_step.is_zero()) {
+			return legacy_offset;
+		}
+
+		return vec2(sun_step).normalize() * legacy_offset.length();
+	};
+
+	const auto character_shadow_offset = along_the_sun(CHARACTER_SHADOW_OFFSET);
+	const auto missile_shadow_offset = along_the_sun(MISSILE_SHADOW_OFFSET);
 
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
@@ -531,6 +552,7 @@ void enqueue_illuminated_rendering_jobs(
 
 			auto job = [
 				draw_bullet_shadows,
+				missile_shadow_offset,
 				&visible,
 				&cosm,
 				h1 = make_helper(D::GROUND),
@@ -551,8 +573,8 @@ void enqueue_illuminated_rendering_jobs(
 					visible.for_each<render_layer::MISSILES>(
 						cosm,
 						[&](const auto& handle) {
-							auto make_offset_input = [](auto offset_input) {
-								offset_input.renderable_transform += MISSILE_SHADOW_OFFSET;
+							auto make_offset_input = [missile_shadow_offset](auto offset_input) {
+								offset_input.renderable_transform += missile_shadow_offset;
 								return offset_input;
 							};
 
@@ -664,7 +686,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	auto sentiences_job = [character_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -716,8 +738,8 @@ void enqueue_illuminated_rendering_jobs(
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					const bool is_local = typed_handle == fog_of_war_character;
 
-					const auto shadow_input_customizer = [](auto modified_input) {
-						modified_input.renderable_transform += CHARACTER_SHADOW_OFFSET;
+					const auto shadow_input_customizer = [character_shadow_offset](auto modified_input) {
+						modified_input.renderable_transform += character_shadow_offset;
 						return modified_input;
 					};
 
@@ -820,5 +842,21 @@ void enqueue_illuminated_rendering_jobs(
 
 	pool.enqueue(explosives_hud_job);
 	pool.enqueue(special_effects_job);
+
+	if (environment_shadows) {
+		auto environment_shadows_job = [&cosm, &interp, &visible, queried_cone, &dedicated, &necessarys]() {
+			::draw_environment_shadows({
+				cosm,
+				interp,
+				visible,
+				queried_cone.get_visible_world_rect_aabb(),
+				necessarys.at(assets::necessary_image_id::BLANK),
+				dedicated[D::SHADOW_CASTS].triangles,
+				dedicated[D::SHADOW_FOOTPRINTS].triangles
+			});
+		};
+
+		pool.enqueue(environment_shadows_job);
+	}
 }
 

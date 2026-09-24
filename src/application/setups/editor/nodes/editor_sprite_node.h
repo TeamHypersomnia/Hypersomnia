@@ -23,6 +23,7 @@ struct editor_sprite_node_editable {
 
 	float animation_speed_factor = 1.0f;
 	real32 penetrability = 1.0f;
+	real32 shadow_height_mult = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

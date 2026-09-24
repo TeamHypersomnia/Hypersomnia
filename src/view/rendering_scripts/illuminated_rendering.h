@@ -80,6 +80,12 @@ struct illuminated_rendering_input {
 	minimap_world_transform* const minimap_transform;
 	augs::thread_pool& pool;
 
+	float get_environment_shadow_strength() const;
+
+	bool environment_shadows_enabled() const {
+		return get_environment_shadow_strength() > 0.0f;
+	}
+
 	bool strict_fow_mode() const {
 		return camera_edge_zoomout_mult > 0.35f;
 	}

@@ -22,6 +22,14 @@ namespace augs {
 		afterimage_texture,
 		global_color,
 
+		shadow_texture,
+		shadow_step,
+		shadow_strength,
+		shadow_fix,
+		receiver_height,
+		ambient_color,
+		light_levels,
+
 		COUNT
 		// END GEN INTROSPECTOR
 	};

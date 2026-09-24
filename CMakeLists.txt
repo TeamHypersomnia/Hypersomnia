@@ -595,6 +595,7 @@ if(HAS_HEAD)
 	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
 	"src/view/rendering_scripts/draw_circular_progresses.cpp"
 	"src/view/rendering_scripts/draw_minimap.cpp"
+	"src/view/rendering_scripts/draw_environment_shadows.cpp"
 	"src/view/audiovisual_state/systems/minimap_sighting_system.cpp"
 
 	"src/augs/image/font.cpp"

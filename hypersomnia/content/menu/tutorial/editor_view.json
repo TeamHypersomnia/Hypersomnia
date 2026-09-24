@@ -9,10 +9,10 @@
     "show_navmesh": false,
     "panned_camera": {
         "transform": {
-            "pos": [38465.5234375, 7578.04931640625],
+            "pos": [-435.287353515625, 10648.1962890625],
             "rotation": 0.0
         },
-        "zoom": 0.40117695927619934
+        "zoom": 0.8589059710502625
     },
     "rect_select_mode": "EVERYTHING"
 }

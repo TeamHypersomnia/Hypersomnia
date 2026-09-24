@@ -11,12 +11,23 @@ enum class swap_buffers_moment {
 	// END GEN INTROSPECTOR
 };
 
+enum class shadow_quality_type {
+	// GEN INTROSPECTOR enum class shadow_quality_type
+	NONE,
+	LOW,
+	NORMAL,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct performance_settings {
 	// GEN INTROSPECTOR struct performance_settings
 	special_effects_settings special_effects;
 	int max_particles_in_single_job = 2500;
 	augs::maybe<int> custom_num_pool_workers = augs::maybe<int>(0, false);
 	accuracy_type wall_light_drawing_precision = accuracy_type::EXACT;
+	shadow_quality_type shadow_quality = shadow_quality_type::NORMAL;
+	float shadow_strength_multiplier = 1.0f;
 	swap_buffers_moment swap_window_buffers_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	// END GEN INTROSPECTOR
 

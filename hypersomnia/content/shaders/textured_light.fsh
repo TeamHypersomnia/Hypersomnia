@@ -16,6 +16,24 @@ in vec2 theTexcoord;
 
 uniform sampler2D basic_texture;
 
+/*
+	Posterizes this light's own contribution for the pixel-art look. Zero disables it.
+*/
+
+uniform int light_levels;
+
+float posterize_light(float alpha, vec3 color) {
+	if (light_levels <= 0) {
+		return alpha;
+	}
+
+	int light_step = 255 / light_levels;
+	float intensity = alpha * max(max(color.r, color.g), color.b);
+	float mult = float(light_step * (int(intensity * 255.0) / light_step + light_levels)) / 255.0;
+
+	return min(alpha * mult, 1.0);
+}
+
 void main() 
 {	
 	float light_distance = length(gl_FragCoord.xy - light_pos) * distance_mult;
@@ -45,6 +63,7 @@ void main()
 
 	final_color *= texture_pixel.a;
 	final_color.a = min(theColor.a, final_color.a);
+	final_color.a = posterize_light(final_color.a, final_color.rgb);
 
 	outputColor = final_color;
 }

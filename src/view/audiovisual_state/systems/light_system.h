@@ -30,6 +30,12 @@ namespace augs {
 }
 
 struct frame_profiler;
+
+/*
+	How many posterization levels each light uses.
+*/
+
+constexpr int DEFAULT_LIGHT_LEVELS = 3;
 struct draw_renderable_input;
 struct randomization;
 

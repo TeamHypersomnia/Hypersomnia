@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-22 23:29:35.391415 UTC"
+        "version_timestamp": "2026-09-20 10:17:56.775677 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -276,7 +276,6 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
-                "shadow_height": 64,
                 "material": "vent"
             }
         },
@@ -296,7 +295,6 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
-                "shadow_height": 64,
                 "material": "wood"
             }
         }

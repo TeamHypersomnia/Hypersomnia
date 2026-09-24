@@ -139,6 +139,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 
 		set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
+		set_uniform(light_shader, augs::common_uniform_name::light_levels, DEFAULT_LIGHT_LEVELS);
 
 		renderer.set_additive_blending();
 	};
@@ -218,6 +219,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			wall_light_shader.set_as_current(renderer);
 			wall_light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 			set_uniform(wall_light_shader, wall_light_uniform.distance_mult, 1.f / eye.zoom);
+			set_uniform(wall_light_shader, augs::common_uniform_name::light_levels, DEFAULT_LIGHT_LEVELS);
 		}
 	};
 

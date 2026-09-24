@@ -7,8 +7,6 @@ in vec2 theTexcoord;
 out vec4 outputColor;
 
 uniform sampler2D basic_texture;
-uniform sampler2D light_texture;
-uniform vec4 ambient_color;
 
 /*
 	Environment shadows.
@@ -101,35 +99,14 @@ float calc_shadow_amount() {
 	return to_shadow_level(s.r) > r ? s.g * shadow_strength * sun_reaches : 0.0;
 }
 
-
 void main() 
 {
-	vec2 texcoord = gl_FragCoord.xy;
-	texcoord.x /= float(textureSize(light_texture, 0).x);
-	texcoord.y /= float(textureSize(light_texture, 0).y);
-
-	vec4 light = texture(light_texture, texcoord);
+	vec4 pixel = theColor * texture(basic_texture, theTexcoord);
 
 	/*
-		The more intense the light, the more it gets brightened - up to twice at full intensity.
-		Lights posterize themselves in their own shaders.
-		The boost comes from the unshadowed light, so the shadow strength stays linear.
+		Ground decals are drawn fully illuminated, so shadows darken them directly.
 	*/
 
-	float boost = 1.0 + float(int(max(max(light.r, light.g), light.b) * 255.0)) / 255.0;
-
-	/*
-		Shadows remove the ambient part of the light only - lights still illuminate shadowed areas.
-	*/
-
-	light.rgb = max(light.rgb - ambient_color.rgb * calc_shadow_amount(), vec3(0.0));
-	light.rgb *= boost;
-
-	vec4 texComponent = texture(basic_texture, theTexcoord);
-	vec4 pixel = theColor * texComponent * light;
-	pixel.r = min(texComponent.r, pixel.r);
-	pixel.g = min(texComponent.g, pixel.g);
-	pixel.b = min(texComponent.b, pixel.b);
-
+	pixel.rgb *= 1.0 - calc_shadow_amount();
 	outputColor = pixel;
 }

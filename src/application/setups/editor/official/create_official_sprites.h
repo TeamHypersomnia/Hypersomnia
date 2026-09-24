@@ -50,6 +50,11 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
 			res.editable.domain = editor_sprite_domain::PHYSICAL;
+			res.editable.as_physical.shadow_height = scene.world.get_flavour(flavour_id).template get<invariants::render>().shadow_height;
+
+			if (enum_id == test_id_type::DEV_WALL_32 || enum_id == test_id_type::DEV_WALL_64) {
+				res.editable.as_physical.is_see_through = true;
+			}
 			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 			pool.allocate(res);
 		});

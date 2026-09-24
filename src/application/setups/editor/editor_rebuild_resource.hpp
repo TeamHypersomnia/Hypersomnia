@@ -339,6 +339,10 @@ void setup_scene_object_from_resource(
 				}
 			}();
 
+			if (domain == editor_sprite_domain::PHYSICAL) {
+				render.shadow_height = editable.as_physical.shadow_height;
+			}
+
 			on_domain_specific([&](auto& specific) {
 				render.special_functions.set(special_render_function::ILLUMINATE_AS_WALL, specific.illuminate_like_wall);
 
