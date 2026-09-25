@@ -40,7 +40,7 @@ namespace augs {
 
 			/*
 				Tracked so that the other blending setters
-				restore GL_FUNC_ADD only after a max blending pass.
+				restore GL_FUNC_ADD only after a max or min blending pass.
 			*/
 
 			bool max_blending_active = false;
@@ -62,6 +62,10 @@ namespace augs {
 			void set_overwriting_blending();
 			void set_additive_blending();
 			void set_max_blending();
+			void set_min_blending();
+			void set_dst_alpha_additive_blending();
+			void set_color_only_additive_blending();
+			void set_alpha_only_additive_blending();
 			
 			void enable_special_vertex_attribute();
 			void disable_special_vertex_attribute();

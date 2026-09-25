@@ -357,6 +357,10 @@ namespace augs {
 							case N::SET_OVERWRITING_BLENDING: set_overwriting_blending(); break;
 							case N::SET_ADDITIVE_BLENDING: set_additive_blending(); break;
 							case N::SET_MAX_BLENDING: set_max_blending(); break;
+							case N::SET_MIN_BLENDING: set_min_blending(); break;
+							case N::SET_DST_ALPHA_ADDITIVE_BLENDING: set_dst_alpha_additive_blending(); break;
+							case N::SET_COLOR_ONLY_ADDITIVE_BLENDING: set_color_only_additive_blending(); break;
+							case N::SET_ALPHA_ONLY_ADDITIVE_BLENDING: set_alpha_only_additive_blending(); break;
 							case N::CLEAR_STENCIL: clear_stencil(); break;
 							case N::START_WRITING_STENCIL: start_writing_stencil(); break;
 							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
@@ -503,12 +507,40 @@ namespace augs {
 			GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE));
 		}
 
+		void renderer_backend::set_dst_alpha_additive_blending() {
+			/*
+				Adds the source color scaled by the destination's alpha, and keeps the destination's alpha.
+			*/
+
+			restore_add_blend_equation();
+			GL_CHECK(glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE));
+		}
+
+		void renderer_backend::set_color_only_additive_blending() {
+			restore_add_blend_equation();
+			GL_CHECK(glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE));
+		}
+
+		void renderer_backend::set_alpha_only_additive_blending() {
+			restore_add_blend_equation();
+			GL_CHECK(glBlendFuncSeparate(GL_ZERO, GL_ONE, GL_ONE, GL_ONE));
+		}
+
 		void renderer_backend::set_max_blending() {
 			/*
 				GL_MAX ignores the blend factors - each channel keeps the larger of source and destination.
 			*/
 
 			GL_CHECK(glBlendEquation(GL_MAX));
+			max_blending_active = true;
+		}
+
+		void renderer_backend::set_min_blending() {
+			/*
+				GL_MIN ignores the blend factors - each channel keeps the smaller of source and destination.
+			*/
+
+			GL_CHECK(glBlendEquation(GL_MIN));
 			max_blending_active = true;
 		}
 
