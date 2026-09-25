@@ -1,10 +1,15 @@
 #pragma once
+#include <algorithm>
 #include "augs/templates/enum_introspect.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/string/format_enum.h"
 
+/*
+	Only the first num_shown tabs are shown - a way to hide the trailing ones.
+*/
+
 template <class E, class F>
-void do_pretty_tabs(E& active_pane, F custom_name) {
+void do_pretty_tabs(E& active_pane, F custom_name, const int num_shown) {
 	using namespace augs::imgui;
 
 	{
@@ -26,7 +31,7 @@ void do_pretty_tabs(E& active_pane, F custom_name) {
 			}();
 
 			auto index = static_cast<int>(active_pane);
-			ImGui::TabLabels(labels.data(), static_cast<int>(labels.size()), index, nullptr);
+			ImGui::TabLabels(labels.data(), std::min(num_shown, static_cast<int>(labels.size())), index, nullptr);
 			active_pane = static_cast<E>(index);
 		}
 	}
@@ -35,6 +40,11 @@ void do_pretty_tabs(E& active_pane, F custom_name) {
 		auto scope = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
 		ImGui::Separator();
 	}
+}
+
+template <class E, class F>
+void do_pretty_tabs(E& active_pane, F custom_name) {
+	do_pretty_tabs(active_pane, custom_name, static_cast<int>(E::COUNT));
 }
 
 template <class E>

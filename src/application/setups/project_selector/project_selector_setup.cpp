@@ -35,6 +35,17 @@
 #include "augs/window_framework/shell.h"
 #include "augs/persistent_filesystem.h"
 
+/*
+	Development builds open official, downloaded and menu arenas directly, without cloning them first.
+	Production builds don't show the menu arenas at all.
+*/
+
+#if IS_PRODUCTION_BUILD
+constexpr bool edit_any_arena_directly = false;
+#else
+constexpr bool edit_any_arena_directly = true;
+#endif
+
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
@@ -50,6 +61,9 @@ static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 
 		case project_tab_type::DOWNLOADED_ARENAS:
 			return DOWNLOADED_ARENAS_DIR;
+
+		case project_tab_type::MENU:
+			return OFFICIAL_MENU_ARENAS_DIR;
 
 		default:
 			return "";
@@ -187,6 +201,10 @@ void project_selector_setup::scan_for_all_arenas() {
 	scan_for(project_tab_type::MY_PROJECTS);
 	scan_for(project_tab_type::OFFICIAL_ARENAS);
 	scan_for(project_tab_type::DOWNLOADED_ARENAS);
+
+	if (edit_any_arena_directly) {
+		scan_for(project_tab_type::MENU);
+	}
 
 	rebuild_miniatures = true;
 }
@@ -425,6 +443,9 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			case project_tab_type::DOWNLOADED_ARENAS:
 			return tab.perform_list(filter, ad_hoc, "Last updated", in.window);
 
+			case project_tab_type::MENU:
+			return tab.perform_list(filter, ad_hoc, "Last updated", in.window);
+
 			default:
 			return false;
 		}
@@ -476,7 +497,21 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 	}
 
 	{
-		do_pretty_tabs(current_tab);
+		{
+			if (!edit_any_arena_directly && current_tab == project_tab_type::MENU) {
+				current_tab = project_tab_type::MY_PROJECTS;
+			}
+
+			const auto num_shown_tabs = static_cast<int>(edit_any_arena_directly ? project_tab_type::COUNT : project_tab_type::MENU);
+
+			do_pretty_tabs(
+				current_tab,
+				[](const project_tab_type) -> std::optional<std::string> { return std::nullopt; },
+				num_shown_tabs
+			);
+		}
+
+		const bool can_open_directly = edit_any_arena_directly || current_tab == project_tab_type::MY_PROJECTS;
 
 		const auto avail = ImGui::GetContentRegionAvail();
 		const auto proj_list_width = avail.x * 0.6f;
@@ -491,7 +526,6 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			auto scope = scoped_child("Project list view", ImVec2(proj_list_width, -space_for_clone_button));
 
 			if (const bool choice_performed = perform_arena_list()) {
-				const bool can_open_directly = current_tab == project_tab_type::MY_PROJECTS;
 				const bool needs_to_clone_before_open = !can_open_directly;
 
 				if (can_open_directly) {
@@ -597,7 +631,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 				}
 			};
 
-			if (current_tab == project_tab_type::MY_PROJECTS) {
+			if (can_open_directly) {
 				ImGui::Columns(2);
 				do_big_button("OPEN SELECTED", assets::necessary_image_id::EDITOR_ICON_OPEN, project_list_view_result::OPEN_SELECTED_PROJECT);
 				ImGui::NextColumn();
@@ -695,6 +729,8 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 					return "An official arena with this name already exists.";
 				case project_tab_type::DOWNLOADED_ARENAS:
 					return "Warning: a downloaded arena with the same name detected.";
+				case project_tab_type::MENU:
+					return "A menu arena with this name already exists.";
 				case project_tab_type::COUNT:
 				default:
 					return "Unknown error.";
