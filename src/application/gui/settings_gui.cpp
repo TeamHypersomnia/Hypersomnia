@@ -889,6 +889,33 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
+				text_color("Lighting", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.performance;
+
+					revertable_enum_radio(SCOPE_CFG_NVP(shadow_quality));
+
+					{
+						auto scope = scoped_indent();
+
+						text_disabled(
+							"Shadows cast by walls and other objects that bullets can't fly over.\n"
+							"Low skips a correction for the lit side of tall objects - a little faster, a little less accurate."
+						);
+					}
+
+					revertable_slider(SCOPE_CFG_NVP(shadow_strength_multiplier), 0.f, 2.f);
+					tooltip_on_hover("Scales how dark the shadows are relative to what the map sets.\n0 disables shadows entirely, same as None.");
+
+					revertable_slider(SCOPE_CFG_NVP(shadow_smoothness_multiplier), 0.f, 1.f);
+					tooltip_on_hover("Scales how much shadows fade along their length relative to what the map sets.\n0 makes them hard. They stay as dark on average.");
+				}
+
+				ImGui::Separator();
+
 				text_color("General Effects", yellow);
 
 				ImGui::Separator();

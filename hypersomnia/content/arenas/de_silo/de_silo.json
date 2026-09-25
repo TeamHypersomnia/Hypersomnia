@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-09-20 10:33:58.556248 UTC"
+        "version_timestamp": "2026-09-25 15:01:39.865097 UTC"
     },
     "about": {
         "author": "lia",
@@ -12,12 +12,13 @@
         "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
         "ambient_light_color": [71, 113, 183, 255],
+        "shadow_strength": 0.6000000238418579,
         "warmup_theme": {
             "id": "arabesque"
         }
     },
     "playtesting": {
-        "mode": "bomb_defusal",
+        "mode": "quick_test",
         "starting_faction": "RESISTANCE",
         "spawn_bots": true
     },
@@ -675,7 +676,6 @@
         },
         {
             "id": "New layer 2",
-            "is_open_in_editor": false,
             "nodes": [
                 "bombsite (1)",
                 "bombsite",
@@ -4478,10 +4478,10 @@
         {
             "id": "\t (6)",
             "type": "point_light",
-            "pos": [493.0, 2944.0],
+            "pos": [486.0, 2947.0],
             "falloff": {
                 "radius": 1000.0,
-                "strength": 29
+                "strength": 11
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
@@ -4491,8 +4491,8 @@
             "type": "point_light",
             "pos": [641.0, 4193.0],
             "falloff": {
-                "radius": 1000.0,
-                "strength": 29
+                "radius": 376.2380065917969,
+                "strength": 34
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0

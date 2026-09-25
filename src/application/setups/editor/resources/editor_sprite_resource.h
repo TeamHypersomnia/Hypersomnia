@@ -67,6 +67,8 @@ struct editor_sprite_resource_physical {
 
 	real32 collision_sound_sensitivity = 1.0f;
 
+	uint8_t shadow_height = 32;
+
 	editor_typed_resource_id<editor_material_resource> material;
 
 	bool cover_background_neons = true;

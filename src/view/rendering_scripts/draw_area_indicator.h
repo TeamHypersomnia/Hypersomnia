@@ -15,6 +15,7 @@ inline bool always_hide_in_game(const area_marker_type t) {
 		case area_marker_type::PORTAL:
 		case area_marker_type::HAZARD:
 		case area_marker_type::CAMERA_ZOOM:
+		case area_marker_type::NO_SHADOW:
 		case area_marker_type::NAV_ISLAND:
 			return true;
 
@@ -54,6 +55,9 @@ void draw_area_indicator(
 				}
 				else if (t == area_marker_type::CAMERA_ZOOM) {
 					return rgba(0, 200, 255, 255);
+				}
+				else if (t == area_marker_type::NO_SHADOW) {
+					return rgba(255, 220, 120, 255);
 				}
 
 				return white;

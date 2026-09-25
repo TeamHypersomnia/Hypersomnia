@@ -38,6 +38,7 @@ enum class area_marker_type {
 	PREFAB,
 	NAV_ISLAND,
 	CAMERA_ZOOM,
+	NO_SHADOW,
 	COUNT
 	// END GEN INTROSPECTOR
 };

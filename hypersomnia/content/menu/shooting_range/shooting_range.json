@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-20 10:16:11.272545 UTC"
+        "version_timestamp": "2026-09-25 13:23:51.045195 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -9,7 +9,8 @@
     },
     "settings": {
         "default_server_mode": "quick_test",
-        "ambient_light_color": [6, 42, 63, 255]
+        "ambient_light_color": [6, 42, 63, 255],
+        "shadow_strength": 0.800000011920929
     },
     "playtesting": {
         "mode": "quick_test"
@@ -333,7 +334,6 @@
         },
         {
             "id": "Layer 20",
-            "is_open_in_editor": false,
             "nodes": [
                 "point_light (8)",
                 "point_light (7)",
@@ -346,7 +346,6 @@
         },
         {
             "id": "Layer 18",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_wall_256 (3)",
                 "dev_wall_256 (2)",
@@ -427,7 +426,6 @@
         },
         {
             "id": "Layer 5",
-            "is_open_in_editor": false,
             "nodes": [
                 "crate (1)",
                 "crate"
@@ -584,7 +582,6 @@
         },
         {
             "id": "Layer 8",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_32 (7)",
                 "dev_floor_32 (6)",
@@ -684,7 +681,6 @@
         },
         {
             "id": "Layer 1",
-            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (32)",
                 "team_spawn (31)",
@@ -788,9 +784,7 @@
         },
         {
             "id": "garden lights",
-            "is_open_in_editor": false,
             "nodes": [
-                "Strong lamp",
                 "Strong lamp (2)"
             ]
         },
@@ -1540,22 +1534,6 @@
             }
         },
         {
-            "id": "Strong lamp",
-            "type": "point_light",
-            "pos": [-2577.0, 1327.0],
-            "color": [255, 183, 71, 94],
-            "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            }
-        },
-        {
             "id": "point_light (1)",
             "type": "point_light",
             "pos": [-1.0, 3583.0],
@@ -1612,7 +1590,8 @@
                 "radius": 1240.0
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "cast_shadows": false
         },
         {
             "id": "point_light (2)",
@@ -1623,7 +1602,8 @@
                 "radius": 1240.0
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "cast_shadows": false
         },
         {
             "id": "point_light (3)",

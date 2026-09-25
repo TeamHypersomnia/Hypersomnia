@@ -104,6 +104,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
+	common.light.shadow_step = project.settings.shadow_step;
+	common.light.shadow_strength = project.settings.shadow_strength;
+	common.light.shadow_hue_preservation = project.settings.shadow_hue_preservation;
+	common.light.shadow_smoothness = project.settings.shadow_smoothness;
 	common.default_zoom = project.settings.default_zoom;
 	common.minimap_tab_shows_all_islands = project.settings.minimap_tab_shows_all_islands;
 

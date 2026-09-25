@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "augs/math/camera_cone.h"
 #include "augs/math/matrix.h"
 
@@ -54,6 +55,13 @@
 #include "game/detail/get_hovered_world_entity.h"
 
 #include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
+
+/*
+	Characters have no footprints in the shadow texture - their sprites stick out of their bodies -
+	so they receive environment shadows at a fixed shadow height instead.
+*/
+
+constexpr float CHARACTER_SHADOW_HEIGHT = 2.0f;
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	using U = augs::common_uniform_name;
@@ -778,10 +786,63 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_particles(particle_layer::ILLUMINATING_SMOKES);
 
 	renderer.call_and_clear_triangles();
+
+	const auto environment_shadow_strength = in.get_environment_shadow_strength();
+	const bool environment_shadows = environment_shadow_strength > 0.0f;
+
+	if (environment_shadows) {
+		/*
+			Max blending keeps the tallest height and the strongest shadow in each pixel,
+			so overlapping fading shadows don't leave seams.
+			Footprints only raise the blue channel.
+		*/
+
+		fbos.shadow->set_as_current(renderer);
+		renderer.clear_current_fbo();
+
+		renderer.set_max_blending();
+		renderer.call_triangles(D::SHADOW_CASTS);
+		renderer.call_triangles(D::SHADOW_FOOTPRINTS);
+	}
 	
 	renderer.set_standard_blending();
 
 	augs::graphics::fbo::set_current_to_marked(in.renderer);
+
+	if (environment_shadows) {
+		renderer.set_active_texture(4);
+		fbos.shadow->get_texture().set_as_current(renderer);
+		renderer.set_active_texture(0);
+	}
+
+	const auto& light_settings = cosm.get_common_significant().light;
+
+	auto setup_shadow_uniforms = [&](auto& shader) {
+		if (!environment_shadows) {
+			return;
+		}
+
+		/*
+			The shader walks in fragment space where the y axis points up.
+		*/
+
+		const auto fragment_step = vec2(light_settings.shadow_step.x, -light_settings.shadow_step.y) * cone.eye.zoom;
+		const auto fix_samples = in.perf_settings.shadow_quality == shadow_quality_type::NORMAL ? 16 : 0;
+
+		set_uniform(shader, U::shadow_step, fragment_step);
+		set_uniform(shader, U::shadow_fix, fix_samples);
+		set_uniform(shader, U::ambient_color, light_settings.ambient_color);
+		set_uniform(shader, U::shadow_hue_preservation, light_settings.shadow_hue_preservation);
+	};
+
+	auto receive_shadows = [&](auto& shader, const bool receive, const float receiver_height = -1.0f) {
+		if (!environment_shadows) {
+			return;
+		}
+
+		set_uniform(shader, U::shadow_strength, receive ? environment_shadow_strength : 0.0f);
+		set_uniform(shader, U::receiver_height, receiver_height);
+	};
 
 	if (settings.stencil_before_light_pass) {
 		if (fog_of_war_effective) {
@@ -802,14 +863,26 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
+	setup_shadow_uniforms(shaders.illuminated);
+	receive_shadows(shaders.illuminated, true);
 
 	renderer.call_triangles(D::GROUND);
 
 	/* Render ground decals (blood splatters) with full illumination */
-	set_shader(shaders.standard);
+	if (environment_shadows) {
+		set_uniform(shaders.illuminated, U::fully_lit, 1);
+	}
+	else {
+		set_shader(shaders.standard);
+	}
+
 	renderer.call_triangles(D::GROUND_DECALS);
 
 	set_shader_with_matrix(shaders.illuminated);
+
+	if (environment_shadows) {
+		set_uniform(shaders.illuminated, U::fully_lit, 0);
+	}
 	renderer.call_triangles(D::LYING_CORPSES);
 
 	if (strict_fow) {
@@ -854,6 +927,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::DROPPED_ITEMS_BORDERS);
 
 	set_shader_with_matrix(shaders.illuminated);
+	receive_shadows(shaders.illuminated, false);
 	renderer.call_triangles(D::DROPPED_ITEMS_DIFFUSE);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
@@ -864,10 +938,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
+	receive_shadows(shaders.illuminated, true, CHARACTER_SHADOW_HEIGHT);
 
 	draw_fog_of_war_overlay();
 	draw_sentiences(shaders.illuminated);
 	set_shader_with_matrix(shaders.illuminated);
+	receive_shadows(shaders.illuminated, false);
 	renderer.call_triangles(D::FOREGROUND);
 
 	overlay_smoke_texture();
@@ -974,6 +1050,36 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (in.general_atlas) {
 		in.general_atlas->set_as_current(renderer);
 	}
+}
+
+float illuminated_rendering_input::get_environment_shadow_strength() const {
+	if (perf_settings.shadow_quality == shadow_quality_type::NONE) {
+		return 0.0f;
+	}
+
+	if (!fbos.shadow.has_value()) {
+		return 0.0f;
+	}
+
+	const auto& cosm = camera.viewed_character.get_cosmos();
+	const auto map_strength = cosm.get_common_significant().light.shadow_strength;
+
+	/*
+		A shadow fading linearly to (1 - smoothness) of its strength is on average (2 - smoothness) / 2 as dark.
+		Dividing by (2 - smoothness) keeps the average at half the map's strength for any smoothness,
+		and leaves the map's strength intact at the base of fully smooth shadows.
+	*/
+
+	const auto smoothness_compensation = 1.0f / (2.0f - get_environment_shadow_smoothness());
+
+	return std::clamp(map_strength * perf_settings.shadow_strength_multiplier * smoothness_compensation, 0.0f, 1.0f);
+}
+
+float illuminated_rendering_input::get_environment_shadow_smoothness() const {
+	const auto& cosm = camera.viewed_character.get_cosmos();
+	const auto map_smoothness = cosm.get_common_significant().light.shadow_smoothness;
+
+	return std::clamp(map_smoothness * perf_settings.shadow_smoothness_multiplier, 0.0f, 1.0f);
 }
 
 float special_physics::get_teleport_alpha() const {

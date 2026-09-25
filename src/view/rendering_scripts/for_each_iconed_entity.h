@@ -58,6 +58,10 @@ struct marker_icon {
 			result.id = I::EDITOR_TOOL_RESET_ZOOM;
 			result.col = white;
 		}
+		else if (type == area_marker_type::NO_SHADOW) {
+			result.id = I::EDITOR_ICON_LIGHT;
+			result.col = rgba(255, 220, 120, 255);
+		}
 
 		return result;
 	}

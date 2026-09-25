@@ -62,6 +62,7 @@ bool setup_entity_from_node(
 
 		if (auto body = agg.template find<components::rigid_body>()) {
 			body->special.penetrability = editable.penetrability;
+			body->special.shadow_height_mult = editable.shadow_height_mult;
 		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {

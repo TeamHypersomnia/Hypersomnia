@@ -42,6 +42,7 @@ void all_necessary_fbos::apply(
 	reset(illuminating_smoke);
 	reset(smoke);
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
+	reset(shadow);
 	reset(flash_afterimage);
 }
 
@@ -88,6 +89,9 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminated->set_as_current(renderer);
 		illuminated->set_uniform(renderer, U::basic_texture, 0);
 		illuminated->set_uniform(renderer, U::light_texture, 2);
+		illuminated->set_uniform(renderer, U::shadow_texture, 4);
+		illuminated->set_uniform(renderer, U::shadow_strength, 0.0f);
+		illuminated->set_uniform(renderer, U::fully_lit, 0);
 	}
 
 	if (standard) {

@@ -45,6 +45,7 @@ struct special_physics {
 	vec2 saved_velocity;
 	real32 saved_angular_velocity = 0.f;
 	real32 penetrability = 1.0f;
+	real32 shadow_height_mult = 1.0f;
 #if TODO_CARS
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};

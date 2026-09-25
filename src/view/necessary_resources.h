@@ -45,6 +45,7 @@ struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
 	optional_fbo smoke;
 	optional_fbo light;
+	optional_fbo shadow;
 	optional_fbo flash_afterimage;
 
 	all_necessary_fbos(

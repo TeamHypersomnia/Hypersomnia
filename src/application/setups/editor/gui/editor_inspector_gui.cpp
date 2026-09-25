@@ -240,7 +240,7 @@ bool edit_property(
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if constexpr(std::is_same_v<float, T>) {
-			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic") {
+			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow strength" || label == "Shadow hue preservation" || label == "Shadow smoothness") {
 				if (slider(label, property, 0.0f, 1.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -249,7 +249,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Density" || label == "Friction" || label == "Bounciness") {
+			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult") {
 				if (slider(label, property, 0.0f, 4.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -534,6 +534,15 @@ bool edit_property(
 
 				return false;
 			}
+
+			if (label == "Shadow height") {
+				if (slider(label, property, uint8_t(0u), uint8_t(255u))) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
 		}
 		else if constexpr(std::is_same_v<uint16_t, T>) {
 			if (label.find("Num particles") != std::string::npos) {
@@ -707,6 +716,11 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 	if (resource.editable.domain == editor_sprite_domain::PHYSICAL) {
 		text_disabled("Tip: you can also set penetrability\nper-resource or even per-material.\nAll three will combine.\nModify it per-node as a last resort.");
 		MULTIPROPERTY("Penetrability", penetrability);
+		MULTIPROPERTY("Shadow height mult", shadow_height_mult);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Multiplies the resource's Shadow height for this node only.");
+		}
 	}
 
 	return result;
@@ -909,11 +923,18 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Letter", letter);
 	}
 
-	const bool has_shape = ::is_portal_based(type);
+	const bool has_shape = ::is_portal_based(type) || type == area_marker_type::NO_SHADOW;
 
 	if (has_shape) {
 		MULTIPROPERTY("Shape", shape);
-		tooltip_on_hover("Note that rectangular effects for portals are not supported yet,\nbut the physical sensor itself will work just fine as a box.");
+
+		if (::is_portal_based(type)) {
+			tooltip_on_hover("Note that rectangular effects for portals are not supported yet,\nbut the physical sensor itself will work just fine as a box.");
+		}
+	}
+
+	if (type == area_marker_type::NO_SHADOW) {
+		text_disabled("Environment shadows are never drawn inside this area -\nuse it for roofed interiors, where the sun can't reach.");
 	}
 
 	const bool is_hurt = type == area_marker_type::HAZARD;
@@ -1841,6 +1862,12 @@ EDIT_FUNCTION(
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, bullets and magic missiles will freely fly over this object.\nCharacters will still collide - except their weapons.\n\nNote that rockets are NOT considered bullets.\nFor these, you must tick Grenades fly over.");
 		}
+
+		MULTIPROPERTY("Shadow height", as_physical.shadow_height);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("How tall this object is, in levels of the arena's Shadow step.\nOnly objects that bullets can't fly over cast shadows,\nbut every physical object receives shadows of taller objects.");
+		}
 	}
 	else {
 		MULTIPROPERTY("Cover background neons", as_nonphysical.cover_background_neons);
@@ -2347,8 +2374,36 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		text_tooltip("If ticked, the extended minimap view (under Tab)\nshows the union of all Nav island areas,\ninstead of just the island the player is currently on.");
 	}
 
-	PROPERTY("Ambient light color", ambient_light_color);
 	THEME_PROPERTY("Warmup theme", warmup_theme);
+
+	ImGui::Separator();
+	text_color("Lighting", yellow);
+	ImGui::Separator();
+
+	PROPERTY("Ambient light color", ambient_light_color);
+	PROPERTY("Shadow step", shadow_step);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Displacement of environment shadows per one level of an object's Shadow height.\nDetermines the direction of all shadows, including those of characters and bullets.");
+	}
+
+	PROPERTY("Shadow strength", shadow_strength);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("How much of the ambient light is removed inside environment shadows.\nLights still illuminate shadowed areas.");
+	}
+
+	PROPERTY("Shadow smoothness", shadow_smoothness);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.");
+	}
+
+	PROPERTY("Shadow hue preservation", shadow_hue_preservation);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("1 keeps the hue of the surrounding light mix inside shadows - they only get darker.\n0 removes the ambient color, so shadows take on the hue of nearby lights.");
+	}
 
 	ImGui::Separator();
 	text_color("Navmesh", yellow);

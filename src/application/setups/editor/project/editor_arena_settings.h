@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 #include "game/balance_params.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
@@ -10,6 +11,10 @@ struct editor_arena_settings {
 	float default_zoom = BALANCE_ZOOM_OUT;
 	bool minimap_tab_shows_all_islands = false;
 	rgba ambient_light_color = rgba(53, 97, 102, 255);
+	vec2 shadow_step = vec2(1.87f, 2.34f);
+	real32 shadow_strength = 0.35f;
+	real32 shadow_hue_preservation = 1.0f;
+	real32 shadow_smoothness = 1.0f;
 	editor_theme warmup_theme;
 	uint32_t navmesh_cell_size = 128;
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-25 13:20:44.892852 UTC"
+        "version_timestamp": "2026-09-20 10:17:56.775677 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -10,8 +10,7 @@
     "settings": {
         "default_server_mode": "quick_test",
         "include_disabled_nodes": false,
-        "ambient_light_color": [0, 67, 90, 255],
-        "shadow_strength": 0.5130000114440918
+        "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
         "mode": "quick_test"
@@ -277,7 +276,6 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
-                "shadow_height": 64,
                 "material": "vent"
             }
         },
@@ -297,7 +295,6 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
-                "shadow_height": 64,
                 "material": "wood"
             }
         }

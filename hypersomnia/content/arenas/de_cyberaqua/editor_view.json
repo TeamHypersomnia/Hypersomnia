@@ -6,13 +6,13 @@
     "show_grid": false,
     "snapping_enabled": true,
     "ignore_groups": false,
-    "show_navmesh": true,
+    "show_navmesh": false,
     "panned_camera": {
         "transform": {
-            "pos": [2757.41455078125, -4026.6103515625],
+            "pos": [139.78895568847656, -3941.34619140625],
             "rotation": 0.0
         },
-        "zoom": 0.2513103187084198
+        "zoom": 0.8106695413589478
     },
     "rect_select_mode": "EVERYTHING"
 }

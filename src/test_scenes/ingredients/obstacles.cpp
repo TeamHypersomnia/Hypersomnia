@@ -118,8 +118,13 @@ namespace test_flavours {
 		).template get<invariants::sprite>().tile_excess_size = true;
 
 		{
-			auto make_dev_wall = [&](const auto fid, const auto iid) {
-				static_obstacle(
+			/*
+				Shadow heights proportional to the wall sizes - the 128 one matches the default height.
+				The low ones are see-through, consistently with their short shadows.
+			*/
+
+			auto make_dev_wall = [&](const auto fid, const auto iid, const uint8_t shadow_height, const bool see_through) {
+				auto& meta = static_obstacle(
 					flavour_with_sprite(
 						fid,
 						iid,
@@ -129,13 +134,20 @@ namespace test_flavours {
 					test_scene_physical_material_id::METAL,
 					0.2f,
 					20.f
-				).template get<invariants::sprite>().tile_excess_size = true;
+				);
+
+				meta.template get<invariants::sprite>().tile_excess_size = true;
+				meta.template get<invariants::render>().shadow_height = shadow_height;
+
+				if (see_through) {
+					meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::GLASS_OBSTACLE];
+				}
 			};
 
-			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_32, test_scene_image_id::DEV_FLOOR_32);
-			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_64, test_scene_image_id::DEV_FLOOR_64);
-			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_128, test_scene_image_id::DEV_FLOOR_128);
-			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_256, test_scene_image_id::DEV_FLOOR_256);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_32, test_scene_image_id::DEV_FLOOR_32, 8, true);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_64, test_scene_image_id::DEV_FLOOR_64, 16, true);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_128, test_scene_image_id::DEV_FLOOR_128, 32, false);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_256, test_scene_image_id::DEV_FLOOR_256, 64, false);
 		}
 
 		static_obstacle(
@@ -150,49 +162,32 @@ namespace test_flavours {
 			20.f
 		);
 
-		static_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
-				test_scene_image_id::LAB_WALL_SMOOTH_END,
-				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::METAL,
-			0.2f,
-			20.f
-		).template get<invariants::render>().layer = render_layer::FOREGROUND;
+		{
+			/*
+				Lab walls are drawn in the foreground and cast no environment shadows.
+			*/
 
-		static_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
-				test_scene_image_id::LAB_WALL_CORNER_CUT,
-				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::METAL,
-			0.2f,
-			20.f
-		).template get<invariants::render>().layer = render_layer::FOREGROUND;
+			auto make_lab_wall = [&](const auto fid, const auto iid) {
+				auto& meta = static_obstacle(
+					flavour_with_sprite(
+						fid,
+						iid,
+						test_obstacle_order::OPAQUE
+					),
+					test_scene_physical_material_id::METAL,
+					0.2f,
+					20.f
+				);
 
-		static_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE,
-				test_scene_image_id::LAB_WALL_CORNER_SQUARE,
-				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::METAL,
-			0.2f,
-			20.f
-		).template get<invariants::render>().layer = render_layer::FOREGROUND;
+				meta.template get<invariants::render>().layer = render_layer::FOREGROUND;
+				//meta.template get<invariants::render>().shadow_height = 0;
+			};
 
-		static_obstacle(
-			flavour_with_sprite(
-				test_plain_sprited_bodies::LAB_WALL,
-				test_scene_image_id::LAB_WALL,
-				test_obstacle_order::OPAQUE
-			),
-			test_scene_physical_material_id::METAL,
-			0.2f,
-			20.f
-		).template get<invariants::render>().layer = render_layer::FOREGROUND;
+			make_lab_wall(test_plain_sprited_bodies::LAB_WALL_SMOOTH_END, test_scene_image_id::LAB_WALL_SMOOTH_END);
+			make_lab_wall(test_plain_sprited_bodies::LAB_WALL_CORNER_CUT, test_scene_image_id::LAB_WALL_CORNER_CUT);
+			make_lab_wall(test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE, test_scene_image_id::LAB_WALL_CORNER_SQUARE);
+			make_lab_wall(test_plain_sprited_bodies::LAB_WALL, test_scene_image_id::LAB_WALL);
+		}
 
 		static_glass_obstacle(
 			flavour_with_sprite(

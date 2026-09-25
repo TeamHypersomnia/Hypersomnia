@@ -29,6 +29,7 @@ void packaged_official_content::create_official_prefabs() {
 
 					a.point_light = m[test_static_lights::POINT_LIGHT];
 					a.organism_area = m[area_marker_type::ORGANISM_AREA];
+					a.no_shadow_area = m[area_marker_type::NO_SHADOW];
 
 					a.sand_1 = m[test_static_decorations::AQUARIUM_SAND_1];
 					a.sand_2 = m[test_static_decorations::AQUARIUM_SAND_2];
