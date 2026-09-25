@@ -106,6 +106,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	common.light.ambient_color = project.settings.ambient_light_color;
 	common.light.shadow_step = project.settings.shadow_step;
 	common.light.shadow_strength = project.settings.shadow_strength;
+	common.light.shadow_hue_preservation = project.settings.shadow_hue_preservation;
+	common.light.shadow_smoothness = project.settings.shadow_smoothness;
+	common.light.point_light_shadow_smoothness_mult = project.settings.point_light_shadow_smoothness_mult;
+	common.light.point_light_hue_preservation = project.settings.point_light_hue_preservation;
 	common.default_zoom = project.settings.default_zoom;
 	common.minimap_tab_shows_all_islands = project.settings.minimap_tab_shows_all_islands;
 

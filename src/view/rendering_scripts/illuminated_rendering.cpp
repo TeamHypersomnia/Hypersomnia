@@ -638,6 +638,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			cosm, 
 			matrix,
 			fbos.light.value(),
+			fbos.removed_light.has_value() ? std::addressof(fbos.removed_light.value()) : nullptr,
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
@@ -792,17 +793,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	if (environment_shadows) {
 		/*
-			Casts come sorted by (height, strength), so overwriting leaves the tallest caster's pair in each pixel.
-			Footprints only raise the blue channel, max blending keeps the casts intact.
+			Max blending keeps the tallest height and the strongest shadow in each pixel,
+			so overlapping fading shadows don't leave seams.
+			Footprints only raise the blue channel.
 		*/
 
 		fbos.shadow->set_as_current(renderer);
 		renderer.clear_current_fbo();
 
-		renderer.set_overwriting_blending();
-		renderer.call_triangles(D::SHADOW_CASTS);
-
 		renderer.set_max_blending();
+		renderer.call_triangles(D::SHADOW_CASTS);
 		renderer.call_triangles(D::SHADOW_FOOTPRINTS);
 	}
 	
@@ -833,6 +833,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shader, U::shadow_step, fragment_step);
 		set_uniform(shader, U::shadow_fix, fix_samples);
 		set_uniform(shader, U::ambient_color, light_settings.ambient_color);
+		set_uniform(shader, U::shadow_hue_preservation, light_settings.shadow_hue_preservation);
 	};
 
 	auto receive_shadows = [&](auto& shader, const bool receive, const float receiver_height = -1.0f) {
@@ -863,6 +864,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
+	set_uniform(shaders.illuminated, U::quantize_lights, in.perf_settings.quantize_lights ? 1 : 0);
+
+	set_uniform(shaders.illuminated, U::removed_light_available, fbos.removed_light.has_value() ? 1 : 0);
+
+	set_uniform(
+		shaders.illuminated,
+		U::point_light_hue_preservation,
+		fbos.removed_light.has_value() ? cosm.get_common_significant().light.point_light_hue_preservation : 0.0f
+	);
 	setup_shadow_uniforms(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true);
 
@@ -870,9 +880,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	/* Render ground decals (blood splatters) with full illumination */
 	if (environment_shadows) {
-		set_shader_with_matrix(shaders.ground_decal);
-		setup_shadow_uniforms(shaders.ground_decal);
-		receive_shadows(shaders.ground_decal, true);
+		set_uniform(shaders.illuminated, U::fully_lit, 1);
 	}
 	else {
 		set_shader(shaders.standard);
@@ -881,6 +889,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::GROUND_DECALS);
 
 	set_shader_with_matrix(shaders.illuminated);
+
+	if (environment_shadows) {
+		set_uniform(shaders.illuminated, U::fully_lit, 0);
+	}
 	renderer.call_triangles(D::LYING_CORPSES);
 
 	if (strict_fow) {
@@ -1062,7 +1074,22 @@ float illuminated_rendering_input::get_environment_shadow_strength() const {
 	const auto& cosm = camera.viewed_character.get_cosmos();
 	const auto map_strength = cosm.get_common_significant().light.shadow_strength;
 
-	return std::clamp(map_strength * perf_settings.shadow_strength_multiplier, 0.0f, 1.0f);
+	/*
+		A shadow fading linearly to (1 - smoothness) of its strength is on average (2 - smoothness) / 2 as dark.
+		Dividing by (2 - smoothness) keeps the average at half the map's strength for any smoothness,
+		and leaves the map's strength intact at the base of fully smooth shadows.
+	*/
+
+	const auto smoothness_compensation = 1.0f / (2.0f - get_environment_shadow_smoothness());
+
+	return std::clamp(map_strength * perf_settings.shadow_strength_multiplier * smoothness_compensation, 0.0f, 1.0f);
+}
+
+float illuminated_rendering_input::get_environment_shadow_smoothness() const {
+	const auto& cosm = camera.viewed_character.get_cosmos();
+	const auto map_smoothness = cosm.get_common_significant().light.shadow_smoothness;
+
+	return std::clamp(map_smoothness * perf_settings.shadow_smoothness_multiplier, 0.0f, 1.0f);
 }
 
 float special_physics::get_teleport_alpha() const {

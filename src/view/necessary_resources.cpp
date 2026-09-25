@@ -42,6 +42,7 @@ void all_necessary_fbos::apply(
 	reset(illuminating_smoke);
 	reset(smoke);
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
+	reset(removed_light);
 	reset(shadow);
 	reset(flash_afterimage);
 }
@@ -91,13 +92,16 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminated->set_uniform(renderer, U::light_texture, 2);
 		illuminated->set_uniform(renderer, U::shadow_texture, 4);
 		illuminated->set_uniform(renderer, U::shadow_strength, 0.0f);
+		illuminated->set_uniform(renderer, U::fully_lit, 0);
+		illuminated->set_uniform(renderer, U::quantize_lights, 1);
+		illuminated->set_uniform(renderer, U::removed_light_texture, 5);
+		illuminated->set_uniform(renderer, U::point_light_hue_preservation, 0.0f);
+		illuminated->set_uniform(renderer, U::removed_light_available, 0);
 	}
 
-	if (ground_decal) {
-		ground_decal->set_as_current(renderer);
-		ground_decal->set_uniform(renderer, U::basic_texture, 0);
-		ground_decal->set_uniform(renderer, U::shadow_texture, 4);
-		ground_decal->set_uniform(renderer, U::shadow_strength, 0.0f);
+	if (light) {
+		light->set_as_current(renderer);
+		light->set_uniform(renderer, U::light_mask_texture, 6);
 	}
 
 	if (standard) {

@@ -230,8 +230,17 @@ void visibility_system::calc_visibility(
 	thread_local std::vector <target_vertex> all_vertices_transformed;
 	all_vertices_transformed.clear();
 
-	/* transform entity position to Box2D coordinates and take offset into account */
-	const vec2 eye_meters = si.get_meters(transform.pos + request.offset);
+	/*
+		Transform entity position to Box2D coordinates and take offset into account.
+
+		The eye is also nudged by a fraction of a pixel that no grid aligns with.
+		An eye exactly collinear with the shared edge of two touching obstacles
+		(e.g. standing at a whole coordinate next to tiles laid on a grid)
+		would cast rays grazing both of their corners, which the ray casts let through the wall.
+	*/
+
+	const auto degeneracy_nudge = vec2(0.2371f, 0.1923f);
+	const vec2 eye_meters = si.get_meters(transform.pos + request.offset + degeneracy_nudge);
 
 	/* to Box2D coordinates */
 	const auto vision_meters = si.get_meters(request.queried_rect);
@@ -466,6 +475,51 @@ void visibility_system::calc_visibility(
 
 	sort_range(all_vertices_transformed);
 	remove_duplicates_from_sorted(all_vertices_transformed);
+
+	/*
+		A boundary vertex collinear with an obstacle vertex that extends vision is redundant -
+		the discontinuity cast at the obstacle vertex lands on the very same spot.
+
+		It is also harmful: collinear vertices are ordered from the farthest,
+		which is wrong for discontinuities extending vision to the right,
+		so the polygon would get an edge cutting through the obstacle.
+		Happens e.g. with a corner exactly diagonal from the eye, as the visibility square's corners are.
+	*/
+
+	{
+		thread_local std::vector<target_vertex> kept;
+		kept.clear();
+
+		const auto n = all_vertices_transformed.size();
+
+		auto collinear_with_extending = [&](const std::size_t i) {
+			const auto& v = all_vertices_transformed[i];
+
+			auto check = [&](const std::size_t j) {
+				const auto& other = all_vertices_transformed[j];
+
+				return 
+					!other.is_on_a_bound
+					&& other.vision_extends != 0
+					&& augs::is_epsilon(other.angle - v.angle, 0.00001f)
+				;
+			};
+
+			return (i > 0 && check(i - 1)) || (i + 1 < n && check(i + 1));
+		};
+
+		for (std::size_t i = 0; i < n; ++i) {
+			const auto& v = all_vertices_transformed[i];
+
+			if (v.is_on_a_bound && collinear_with_extending(i)) {
+				continue;
+			}
+
+			kept.push_back(v);
+		}
+
+		all_vertices_transformed.assign(kept.begin(), kept.end());
+	}
 
 #if LOG_VISIBILITY
 	for (const auto& v : all_vertices_transformed) {

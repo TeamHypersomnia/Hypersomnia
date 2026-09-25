@@ -25,6 +25,21 @@ enum class editor_sprite_domain {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	Whether point lights can shine over an obstacle, whatever its shadow height.
+	AUTO makes static obstacles that bullets can't fly over reach the ceiling - walls, invisible colliders.
+*/
+
+enum class reaches_ceiling_type {
+	// GEN INTROSPECTOR enum class reaches_ceiling_type
+	AUTO,
+	YES,
+	NO,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct editor_material_resource;
 
 struct editor_custom_footstep {
@@ -68,6 +83,7 @@ struct editor_sprite_resource_physical {
 	real32 collision_sound_sensitivity = 1.0f;
 
 	uint8_t shadow_height = 32;
+	reaches_ceiling_type reaches_ceiling = reaches_ceiling_type::AUTO;
 
 	editor_typed_resource_id<editor_material_resource> material;
 

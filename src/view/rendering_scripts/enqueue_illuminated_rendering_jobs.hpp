@@ -844,13 +844,16 @@ void enqueue_illuminated_rendering_jobs(
 	pool.enqueue(special_effects_job);
 
 	if (environment_shadows) {
-		auto environment_shadows_job = [&cosm, &interp, &visible, queried_cone, &dedicated, &necessarys]() {
+		const auto shadow_tip_strength = 1.0f - in.get_environment_shadow_smoothness();
+
+		auto environment_shadows_job = [&cosm, &interp, &visible, queried_cone, &dedicated, &necessarys, shadow_tip_strength]() {
 			::draw_environment_shadows({
 				cosm,
 				interp,
 				visible,
 				queried_cone.get_visible_world_rect_aabb(),
 				necessarys.at(assets::necessary_image_id::BLANK),
+				shadow_tip_strength,
 				dedicated[D::SHADOW_CASTS].triangles,
 				dedicated[D::SHADOW_FOOTPRINTS].triangles
 			});

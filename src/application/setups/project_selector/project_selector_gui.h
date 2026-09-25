@@ -11,6 +11,7 @@ enum class project_tab_type {
 	MY_PROJECTS,
 	OFFICIAL_ARENAS,
 	DOWNLOADED_ARENAS,
+	MENU,
 
 	COUNT
 	// END GEN INTROSPECTOR

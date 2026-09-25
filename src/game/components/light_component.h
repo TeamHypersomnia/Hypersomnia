@@ -66,6 +66,11 @@ namespace invariants {
 }
 
 namespace components {
+	/*
+		height is in pixels of height, like shadow heights of obstacles.
+		Zero means an infinitely high light, whose shadows always reach the end.
+	*/
+
 	struct light {
 		// GEN INTROSPECTOR struct components::light
 		attenuation_properties attenuation;
@@ -78,6 +83,8 @@ namespace components {
 		rgba color = white;
 		bool cast_shadows = true;
 		pad_bytes<3> pad;
+		real32 shadow_smoothness = 1.0f;
+		real32 height = 64.0f;
 		// END GEN INTROSPECTOR
 
 		light();

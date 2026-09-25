@@ -2,17 +2,19 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2026-09-20 10:33:00.500545 UTC"
+        "version_timestamp": "2026-09-25 13:39:52.876893 UTC"
     },
     "about": {
         "author": "Pythagoras",
         "short_description": "A timeless 2017 classic."
     },
     "settings": {
-        "default_server_mode": "bomb_defusal"
+        "default_server_mode": "bomb_defusal",
+        "shadow_strength": 0.7239999771118164,
+        "shadow_smoothness": 0.0
     },
     "playtesting": {
-        "mode": "bomb_defusal",
+        "mode": "quick_test",
         "spawn_bots": true,
         "spawn_only_enemy_bots": true
     },

@@ -80,6 +80,8 @@ namespace augs {
 
 	enum class dedicated_buffer_vector {
 		LIGHT_VISIBILITY,
+		LIGHT_PENUMBRAS,
+		LIGHT_SHADOW_MASKS,
 		SENTIENCE_HUDS,
 		EXPLOSIVE_HUDS,
 

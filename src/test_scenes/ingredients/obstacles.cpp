@@ -180,7 +180,7 @@ namespace test_flavours {
 				);
 
 				meta.template get<invariants::render>().layer = render_layer::FOREGROUND;
-				meta.template get<invariants::render>().shadow_height = 0;
+				//meta.template get<invariants::render>().shadow_height = 0;
 			};
 
 			make_lab_wall(test_plain_sprited_bodies::LAB_WALL_SMOOTH_END, test_scene_image_id::LAB_WALL_SMOOTH_END);

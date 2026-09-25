@@ -195,6 +195,12 @@ void rebuild_prefab_nodes(
 
 		create_child(a.organism_area, transformr(), e.size);
 
+		/*
+			The interior is lit by its own lamps - shadows of the surrounding walls would look out of place there.
+		*/
+
+		create_child(a.no_shadow_area, transformr(), e.size);
+
 		create_child(a.wandering_pixels_1, transformr(), e.size);
 		create_child(a.wandering_pixels_2, transformr(), e.size);
 

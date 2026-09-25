@@ -28,7 +28,14 @@ namespace augs {
 		shadow_fix,
 		receiver_height,
 		ambient_color,
-		light_levels,
+		fully_lit,
+		shadow_hue_preservation,
+		quantize_lights,
+		light_pass,
+		light_mask_texture,
+		removed_light_texture,
+		removed_light_available,
+		point_light_hue_preservation,
 
 		COUNT
 		// END GEN INTROSPECTOR

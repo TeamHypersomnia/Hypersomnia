@@ -81,6 +81,7 @@ struct illuminated_rendering_input {
 	augs::thread_pool& pool;
 
 	float get_environment_shadow_strength() const;
+	float get_environment_shadow_smoothness() const;
 
 	bool environment_shadows_enabled() const {
 		return get_environment_shadow_strength() > 0.0f;

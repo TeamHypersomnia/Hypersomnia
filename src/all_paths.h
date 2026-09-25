@@ -100,6 +100,7 @@ extern augs::path_type USER_DIR;
 
 #define USER_DOWNLOADS_DIR 		(USER_DIR / "downloads")
 #define OFFICIAL_ARENAS_DIR  	(OFFICIAL_CONTENT_DIR / "arenas")
+#define OFFICIAL_MENU_ARENAS_DIR  	(OFFICIAL_CONTENT_DIR / "menu")
 #define DOWNLOADED_ARENAS_DIR 	(USER_DOWNLOADS_DIR / "arenas")
 #define DEMOS_DIR (USER_DIR / "demos")
 #define EDITOR_PROJECTS_DIR (USER_DIR / "projects")

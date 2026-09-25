@@ -35,15 +35,24 @@ struct default_sound_properties_info {
 };
 
 /*
-	shadow_step is the displacement of an environment shadow per one level of the caster's shadow height.
+	shadow_step is the displacement of an environment shadow per one pixel of the caster's shadow height.
 	shadow_strength is the fraction of the ambient light removed inside the shadow.
+	shadow_hue_preservation blends between removing the ambient color (0) and only its brightness (1).
+	shadow_smoothness is how much of the strength a shadow loses along its length, fading linearly - 1 fades it out completely.
+	point_light_shadow_smoothness_mult scales the shadow smoothness of every point light.
+	point_light_hue_preservation blends between shadows of point lights taking the hue of the remaining light (0)
+	and keeping the hue of the light they would get without the shadow, only darker (1).
 */
 
 struct cosmos_light_settings {
 	// GEN INTROSPECTOR struct cosmos_light_settings
 	rgba ambient_color = rgba(53, 97, 102, 255);
 	vec2 shadow_step = vec2(1.87f, 2.34f);
-	real32 shadow_strength = 0.8f;
+	real32 shadow_strength = 0.35f;
+	real32 shadow_hue_preservation = 1.0f;
+	real32 shadow_smoothness = 1.0f;
+	real32 point_light_shadow_smoothness_mult = 0.5f;
+	real32 point_light_hue_preservation = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

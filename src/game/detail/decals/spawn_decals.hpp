@@ -100,8 +100,15 @@ inline constexpr real32 MAX_EXPLOSION_DECAL_SCALE = 3.0f;
 /* How many marks a single blast may leave on one surface entity. */
 inline constexpr std::size_t MAX_EXPLOSION_DECALS_PER_SURFACE = 4;
 
-/* The marks a single blast leaves on one surface are at least this far apart. */
-inline constexpr real32 MIN_EXPLOSION_SURFACE_DECAL_SPACING_PX = 32.f;
+/*
+	A blast leaves one mark on a surface it hits within its radius,
+	plus one more for every this much of the total weight the surface got.
+
+	Weight = hit length in px, where each px counts as (1 - distance / blast radius)^2.
+	So a px right at the blast counts fully, and a px at the edge of the radius not at all.
+	E.g. a long flat wall right next to a blast of radius R gets 2R/3 in total.
+*/
+inline constexpr real32 EXPLOSION_SURFACE_WEIGHT_PER_DECAL = 40.f;
 
 /* Sprite sizes are integral, so a thin decal must not round away to nothing. */
 inline vec2i to_decal_sprite_size(const vec2 size) {
@@ -314,6 +321,37 @@ inline void queue_decal_creation(
 }
 
 /*
+	The given variant list of the surface's material,
+	or nullptr if the material defines no such decals.
+*/
+template <class S>
+const material_decal_variants* find_material_decal_variants(
+	const S& surface_handle,
+	const material_decal_variants material_decals_def::* const variants_of_material
+) {
+	const auto material_id = ::calc_physical_material(surface_handle);
+
+	if (!material_id.is_set()) {
+		return nullptr;
+	}
+
+	const auto& material_decals = surface_handle.get_cosmos().get_common_assets().material_decals;
+	const auto found_decals = material_decals.find(material_id);
+
+	if (found_decals == material_decals.end()) {
+		return nullptr;
+	}
+
+	const auto& variants = found_decals->second.*variants_of_material;
+
+	if (variants.empty()) {
+		return nullptr;
+	}
+
+	return &variants;
+}
+
+/*
 	Spawns a gunshot, melee or explosion decal on the hit surface,
 	picked from the given variant list of the surface's material.
 	The decal slides along slide_dir into the hit fixture
@@ -347,24 +385,13 @@ std::optional<transformr> spawn_surface_impact_decal(
 
 	auto& cosm = step.get_cosmos();
 
-	const auto material_id = ::calc_physical_material(surface_handle);
+	const auto* const found_variants = ::find_material_decal_variants(surface_handle, variants_of_material);
 
-	if (!material_id.is_set()) {
+	if (found_variants == nullptr) {
 		return std::nullopt;
 	}
 
-	const auto& material_decals = cosm.get_common_assets().material_decals;
-	const auto found_decals = material_decals.find(material_id);
-
-	if (found_decals == material_decals.end()) {
-		return std::nullopt;
-	}
-
-	const auto& variants = found_decals->second.*variants_of_material;
-
-	if (variants.empty()) {
-		return std::nullopt;
-	}
+	const auto& variants = *found_variants;
 
 	const auto flavour = variants[rng.randval(0, static_cast<int>(variants.size()) - 1)];
 

@@ -340,7 +340,17 @@ void setup_scene_object_from_resource(
 			}();
 
 			if (domain == editor_sprite_domain::PHYSICAL) {
-				render.shadow_height = editable.as_physical.shadow_height;
+				const auto& physical = editable.as_physical;
+
+				render.shadow_height = physical.shadow_height;
+
+				render.reaches_ceiling = [&]() {
+					switch (physical.reaches_ceiling) {
+						case reaches_ceiling_type::YES: return true;
+						case reaches_ceiling_type::NO: return false;
+						default: return physical.is_static && !physical.is_shoot_through;
+					}
+				}();
 			}
 
 			on_domain_specific([&](auto& specific) {

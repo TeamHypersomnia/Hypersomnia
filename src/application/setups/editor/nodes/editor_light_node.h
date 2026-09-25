@@ -19,6 +19,8 @@ struct editor_light_node_editable {
 	float intensity_vibration = 0.1f;
 
 	bool cast_shadows = true;
+	float shadow_smoothness = 1.0f;
+	float height = 64.0f;
 	// END GEN INTROSPECTOR
 };
 

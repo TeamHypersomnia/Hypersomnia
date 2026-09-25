@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-09-20 11:04:50.151580 UTC"
+        "version_timestamp": "2026-09-25 18:23:57.569371 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -10,6 +10,7 @@
     "settings": {
         "default_server_mode": "bomb_defusal",
         "ambient_light_color": [0, 67, 90, 255],
+        "shadow_strength": 0.7080000042915344,
         "warmup_theme": {
             "id": "arabesque"
         }
@@ -42,6 +43,7 @@
             "as_physical": {
                 "is_static": true,
                 "density": 100.0,
+                "shadow_height": 128,
                 "cover_background_neons": false
             }
         },
@@ -188,7 +190,7 @@
             "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
             "id": "@blank2",
             "domain": "PHYSICAL",
-            "color": [175, 175, 175, 0],
+            "color": [175, 175, 175, 255],
             "neon_color": [255, 254, 254, 255],
             "size": [1, 1],
             "stretch_when_resized": true,
@@ -683,6 +685,7 @@
                 "is_static": true,
                 "density": 5.5,
                 "bounciness": 0.800000011920929,
+                "shadow_height": 64,
                 "custom_shape": {
                     "source_polygon": [[-105.0, -59.0], [-87.0, -98.0], [-37.0, -98.0], [-2.0, -77.0], [52.0, -63.0], [59.0, -67.0], [75.0, -68.0], [105.0, -38.0], [105.0, 38.0], [75.0, 68.0], [60.0, 68.0], [53.0, 64.0], [-1.0, 78.0], [-36.0, 97.0], [-86.0, 97.0], [-106.0, 58.0]
                     ],
@@ -1398,6 +1401,7 @@
                 "is_static": true,
                 "density": 5.5,
                 "bounciness": 0.800000011920929,
+                "shadow_height": 200,
                 "cover_background_neons": false,
                 "custom_shape": {
                     "source_polygon": [[-267.0, -136.0], [-86.0, -137.0], [38.0, -177.0], [133.0, -144.0], [181.0, -117.0], [253.0, -117.0], [269.0, -20.0], [253.0, 86.0], [182.0, 85.0], [133.0, 112.0], [37.0, 145.0], [-87.0, 104.0], [-267.0, 105.0]
@@ -7699,7 +7703,8 @@
             "id": "Aquarium pump (1)",
             "type": "@aquarium_pump",
             "pos": [773.4999389648438, -1157.0],
-            "rotation": -270.0
+            "rotation": -270.0,
+            "shadow_height_mult": 0.3700000047683716
         },
         {
             "id": "Metal obstacle (72)",
@@ -7730,7 +7735,8 @@
             "type": "hard_wooden_wall",
             "pos": [2176.0, 192.0],
             "rotation": -90.0,
-            "size": [128, 256]
+            "size": [128, 256],
+            "shadow_height_mult": 2.0
         },
         {
             "id": "Lab wall corner cut (40)",
@@ -7883,7 +7889,8 @@
             "type": "hard_wooden_wall",
             "pos": [1472.0, -192.0],
             "rotation": -90.0,
-            "size": [128, 512]
+            "size": [128, 512],
+            "shadow_height_mult": 2.0
         },
         {
             "id": "Metal obstacle (62)",
@@ -7895,7 +7902,8 @@
             "id": "Brick wall (1)",
             "type": "hard_wooden_wall",
             "pos": [2624.0, -128.0],
-            "size": [128, 512]
+            "size": [128, 512],
+            "shadow_height_mult": 2.0
         },
         {
             "id": "Lab wall corner cut (27)",
@@ -7916,7 +7924,8 @@
             "id": "Metal obstacle (61)",
             "type": "@blank4",
             "pos": [576.0, -128.0],
-            "size": [384, 256]
+            "size": [384, 256],
+            "shadow_height_mult": 3.0
         },
         {
             "id": "Lab wall corner cut (25)",
@@ -8238,7 +8247,8 @@
             "id": "Metal obstacle (27)",
             "type": "@blank4",
             "pos": [-320.0, -128.0],
-            "size": [384, 256]
+            "size": [384, 256],
+            "shadow_height_mult": 3.0
         },
         {
             "id": "Lab wall (17)",
@@ -9464,55 +9474,64 @@
             "id": "Air duct obstacle",
             "type": "@blank2",
             "pos": [1424.0, -2256.0],
-            "size": [32, 416]
+            "size": [32, 416],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (1)",
             "type": "@blank2",
             "pos": [2288.0, -3408.000244140625],
-            "size": [32, 416]
+            "size": [32, 416],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (2)",
             "type": "@blank2",
             "pos": [-943.9999389648438, -272.0],
-            "size": [96, 32]
+            "size": [96, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (3)",
             "type": "@blank2",
             "pos": [-1088.0, 16.0],
-            "size": [384, 32]
+            "size": [384, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (4)",
             "type": "@blank2",
             "pos": [2720.0, -3600.0],
-            "size": [832, 32]
+            "size": [832, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (5)",
             "type": "@blank2",
             "pos": [912.0, -2624.0],
-            "size": [32, 384]
+            "size": [32, 384],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (6)",
             "type": "@blank2",
             "pos": [1168.0, -3312.0],
-            "size": [480, 32]
+            "size": [480, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (7)",
             "type": "@blank2",
             "pos": [720.0, -3072.0],
-            "size": [416, 512]
+            "size": [416, 512],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (8)",
             "type": "@blank2",
             "pos": [3168.0, -3824.000244140625],
-            "size": [64, 480]
+            "size": [64, 480],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Info console 1",
@@ -9525,13 +9544,15 @@
             "id": "Air duct obstacle (9)",
             "type": "@blank2",
             "pos": [928.0, -3840.000244140625],
-            "size": [64, 512]
+            "size": [64, 512],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (10)",
             "type": "@blank2",
             "pos": [3584.0, -3696.0],
-            "size": [256, 800]
+            "size": [256, 800],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Fotel (5)",
@@ -9543,13 +9564,15 @@
             "id": "Air duct obstacle (11)",
             "type": "@blank2",
             "pos": [3024.0, -3312.0],
-            "size": [864, 32]
+            "size": [864, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (12)",
             "type": "@blank2",
             "pos": [1184.0, -3600.0],
-            "size": [448, 32]
+            "size": [448, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Info console 1 (1)",
@@ -9581,43 +9604,50 @@
             "id": "Air duct obstacle (13)",
             "type": "@blank2",
             "pos": [1168.0, -2448.0],
-            "size": [480, 32]
+            "size": [480, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (14)",
             "type": "@blank2",
             "pos": [3136.0, -4080.0],
-            "size": [128, 32]
+            "size": [128, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (15)",
             "type": "@blank2",
             "pos": [3648.0, -3168.0],
-            "size": [128, 256]
+            "size": [128, 256],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (16)",
             "type": "@blank2",
             "pos": [3968.0, -3056.0],
-            "size": [512, 32]
+            "size": [512, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (17)",
             "type": "@blank2",
             "pos": [-1216.0, -912.0],
-            "size": [384, 32]
+            "size": [384, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (18)",
             "type": "@blank2",
             "pos": [-943.9999389648438, -272.0],
-            "size": [96, 32]
+            "size": [96, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (19)",
             "type": "@blank2",
             "pos": [-1360.0, -624.0],
-            "size": [96, 32]
+            "size": [96, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Info console 1 (3)",
@@ -9630,7 +9660,8 @@
             "id": "Air duct obstacle (20)",
             "type": "@blank2",
             "pos": [2576.0, -3264.0],
-            "size": [32, 128]
+            "size": [32, 128],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall a5 (10)",
@@ -9662,7 +9693,8 @@
             "id": "Air duct obstacle (21)",
             "type": "@blank2",
             "pos": [1136.0, -2096.0],
-            "size": [32, 96]
+            "size": [32, 96],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "GeneratorCONNECTOR (3)",
@@ -9680,7 +9712,8 @@
             "id": "Air duct obstacle (22)",
             "type": "@blank2",
             "pos": [512.0, -2224.0],
-            "size": [256, 96]
+            "size": [256, 96],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "GeneratorRIGHTCAB (1)",
@@ -9692,7 +9725,8 @@
             "id": "Air duct obstacle (23)",
             "type": "@blank2",
             "pos": [-1008.0, -592.0],
-            "size": [32, 672]
+            "size": [32, 672],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall a1tob1 (18)",
@@ -9722,7 +9756,8 @@
             "id": "Air duct obstacle (24)",
             "type": "@blank2",
             "pos": [3520.0, -4368.0],
-            "size": [896, 32]
+            "size": [896, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall a1tob1 (17)",
@@ -9795,7 +9830,8 @@
             "id": "Air duct obstacle (25)",
             "type": "@blank2",
             "pos": [-1296.0, -304.0],
-            "size": [32, 672]
+            "size": [32, 672],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall a1tob1 (15)",
@@ -9808,7 +9844,8 @@
             "id": "Air duct obstacle (26)",
             "type": "@blank2",
             "pos": [4096.0, -4128.0],
-            "size": [256, 2112]
+            "size": [256, 2112],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "GeneratorCONSOLElight",
@@ -10018,7 +10055,8 @@
             "id": "Air duct obstacle (27)",
             "type": "@blank2",
             "pos": [-688.0, -2496.0],
-            "size": [32, 192]
+            "size": [32, 192],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Brain console light 1-1 (2)",
@@ -10043,7 +10081,8 @@
             "id": "Air duct obstacle (28)",
             "type": "@blank2",
             "pos": [-480.0000305175781, -2576.0],
-            "size": [384, 32]
+            "size": [384, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall a1tob1 (4)",
@@ -10063,7 +10102,8 @@
             "id": "Air duct obstacle (29)",
             "type": "@blank2",
             "pos": [-304.0, -2640.0],
-            "size": [32, 96]
+            "size": [32, 96],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall corner a1 (1)",
@@ -10081,7 +10121,8 @@
             "id": "Air duct obstacle (30)",
             "type": "@blank2",
             "pos": [-224.0, -2288.0],
-            "size": [384, 32]
+            "size": [384, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Green room wall corner a1",
@@ -10164,7 +10205,8 @@
             "id": "Air duct obstacle (31)",
             "type": "@blank2",
             "pos": [112.0, -2464.0],
-            "size": [288, 384]
+            "size": [288, 384],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Ball console light 1-1 (3)",
@@ -10184,7 +10226,8 @@
             "id": "Air duct obstacle (32)",
             "type": "@blank2",
             "pos": [768.0, -2160.0],
-            "size": [768, 32]
+            "size": [768, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Ball console light 1-1 (4)",
@@ -10223,13 +10266,15 @@
             "id": "Air duct obstacle (33)",
             "type": "@blank2",
             "pos": [448.0, -2416.0],
-            "size": [384, 288]
+            "size": [384, 288],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (34)",
             "type": "@blank2",
             "pos": [208.0, -3232.0],
-            "size": [96, 1152]
+            "size": [96, 1152],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Rotating fan-on-floor",
@@ -10413,7 +10458,8 @@
             "id": "Air duct obstacle (35)",
             "type": "@blank2",
             "pos": [-64.0, -3824.000244140625],
-            "size": [640, 32]
+            "size": [640, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Ball console light 1-1 (14)",
@@ -10497,31 +10543,36 @@
             "id": "Air duct obstacle (36)",
             "type": "@blank2",
             "pos": [448.0, -3712.0],
-            "size": [384, 256]
+            "size": [384, 256],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (37)",
             "type": "@blank2",
             "pos": [-16.0, -4112.0],
-            "size": [736, 32]
+            "size": [736, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (38)",
             "type": "@blank2",
             "pos": [368.0, -4160.0],
-            "size": [32, 128]
+            "size": [32, 128],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (39)",
             "type": "@blank2",
             "pos": [656.0, -4160.0],
-            "size": [32, 128]
+            "size": [32, 128],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Air duct obstacle (40)",
             "type": "@blank2",
             "pos": [816.0, -4128.0],
-            "size": [288, 64]
+            "size": [288, 64],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Bin green",
@@ -15007,7 +15058,8 @@
             "id": "box_collider_glass",
             "type": "box_collider_glass",
             "pos": [1248.0, -1312.0],
-            "size": [768, 768]
+            "size": [768, 768],
+            "shadow_height_mult": 2.0
         },
         {
             "id": "box_collider_metal",
@@ -15111,7 +15163,8 @@
             "id": "Air duct obstacle (41)",
             "type": "@blank2",
             "pos": [-16.0, -2672.0],
-            "size": [32, 32]
+            "size": [32, 32],
+            "color": [255, 255, 255, 0]
         },
         {
             "id": "Vent wall end-Dup-1 (16)",

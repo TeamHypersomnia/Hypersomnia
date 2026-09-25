@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-22 23:29:35.391415 UTC"
+        "version_timestamp": "2026-09-25 13:20:44.892852 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -10,7 +10,8 @@
     "settings": {
         "default_server_mode": "quick_test",
         "include_disabled_nodes": false,
-        "ambient_light_color": [0, 67, 90, 255]
+        "ambient_light_color": [0, 67, 90, 255],
+        "shadow_strength": 0.5130000114440918
     },
     "playtesting": {
         "mode": "quick_test"

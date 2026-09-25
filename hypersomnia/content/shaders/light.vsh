@@ -9,6 +9,7 @@ in vec2 texcoord;
 in vec4 color;
 
 smooth out vec4 theColor;
+out vec2 theTexcoord;
 
 void main() 
 {
@@ -20,4 +21,5 @@ void main()
 	
 	gl_Position = projection_matrix*output_vert;
 	theColor = color;
+	theTexcoord = texcoord;
 }

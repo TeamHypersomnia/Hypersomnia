@@ -88,6 +88,32 @@ void light_system::advance_attenuation_variations(
 	);
 }
 
+/*
+	Queues and draws an untextured rectangle in world coordinates.
+*/
+
+static void draw_world_rect(augs::renderer& renderer, const ltrb rect, const rgba col) {
+	auto push = [&](const vec2 a, const vec2 b, const vec2 c) {
+		augs::vertex_triangle tri;
+
+		tri.vertices[0].pos = a;
+		tri.vertices[1].pos = b;
+		tri.vertices[2].pos = c;
+
+		for (auto& v : tri.vertices) {
+			v.color = col;
+			v.texcoord = vec2::zero;
+		}
+
+		renderer.push_triangle(tri);
+	};
+
+	push(rect.left_top(), rect.right_top(), rect.right_bottom());
+	push(rect.left_top(), rect.right_bottom(), rect.left_bottom());
+
+	renderer.call_and_clear_triangles();
+}
+
 struct light_uniforms {
 	using U = augs::common_uniform_name;
 
@@ -139,12 +165,24 @@ void light_system::render_all_lights(const light_system_input in) const {
 		light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 
 		set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
-		set_uniform(light_shader, augs::common_uniform_name::light_levels, DEFAULT_LIGHT_LEVELS);
+		set_uniform(light_shader, augs::common_uniform_name::light_pass, 0);
 
 		renderer.set_additive_blending();
 	};
 
+	const bool track_removed_light = in.removed_light_fbo != nullptr;
+
+	auto set_pass = [&](const int pass) {
+		set_uniform(light_shader, augs::common_uniform_name::light_pass, pass);
+	};
+
 	auto overlay_light_polygons = [&]() {
+		if (track_removed_light) {
+			renderer.set_active_texture(6);
+			in.light_fbo.get_texture().set_as_current(renderer);
+			renderer.set_active_texture(0);
+		}
+
 		for (std::size_t i = 0; i < light_requests.size(); ++i) {
 			const auto& request = light_requests[i];
 
@@ -209,9 +247,59 @@ void light_system::render_all_lights(const light_system_input in) const {
 					cutoff_distance
 				);
 
-				renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);
+				/*
+					Every light is its whole reach, scaled by the mask of its shadows
+					built in the alpha of the light texture - see light.fsh for the passes.
+					Lights with a height build it from their own shadows (light_height_shadows.h),
+					the other ones from their visibility polygons.
+				*/
+
+				const auto reach = xywh::center_and_size(world_light_pos, request.queried_rect);
+
+				if (light.height > 0.0f) {
+					set_pass(3);
+					renderer.set_max_blending();
+					::draw_world_rect(renderer, reach, white);
+
+					set_pass(2);
+					renderer.set_min_blending();
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_SHADOW_MASKS, i);
+				}
+				else {
+					set_pass(6);
+					renderer.set_min_blending();
+					::draw_world_rect(renderer, reach, white);
+
+					set_pass(8);
+					renderer.set_max_blending();
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_PENUMBRAS, i);
+				}
+
+				set_pass(4);
+				renderer.set_dst_alpha_additive_blending();
+				::draw_world_rect(renderer, reach, request.color);
+
+				if (track_removed_light) {
+					/*
+						The light removed by the shadows goes to its own texture,
+						so that the illuminated shader knows what the shadowed pixels would get without them -
+						for the brightening of quantized lights and for keeping the hue in shadows.
+					*/
+
+					in.removed_light_fbo->set_as_current(renderer);
+
+					set_pass(7);
+					renderer.set_additive_blending();
+					::draw_world_rect(renderer, reach, request.color);
+
+					in.light_fbo.set_as_current(renderer);
+				}
 			}
 		}
+
+		set_pass(0);
+		renderer.set_additive_blending();
 	};
 
 	auto setup_wall_light_shader = [&]() {
@@ -219,7 +307,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 			wall_light_shader.set_as_current(renderer);
 			wall_light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 			set_uniform(wall_light_shader, wall_light_uniform.distance_mult, 1.f / eye.zoom);
-			set_uniform(wall_light_shader, augs::common_uniform_name::light_levels, DEFAULT_LIGHT_LEVELS);
 		}
 	};
 
@@ -320,12 +407,23 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		renderer.set_active_texture(2);
 		in.light_fbo.get_texture().set_as_current(renderer);
+
+		if (in.removed_light_fbo != nullptr) {
+			renderer.set_active_texture(5);
+			in.removed_light_fbo->get_texture().set_as_current(renderer);
+		}
+
 		renderer.set_active_texture(0);
 	};
 
 	/* Flow */
 
 	augs::graphics::fbo::mark_current(in.renderer);
+
+	if (in.removed_light_fbo != nullptr) {
+		in.removed_light_fbo->set_as_current(renderer);
+		renderer.clear_current_fbo();
+	}
 
 	in.light_fbo.set_as_current(renderer);
 	in.write_fow_to_stencil();

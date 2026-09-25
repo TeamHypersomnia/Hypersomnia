@@ -10,8 +10,9 @@
 
 namespace invariants {
 	/*
-		shadow_height is in levels of cosmos_light_settings::shadow_step.
-		It is read only for entities with physical bodies.
+		shadow_height is in pixels of height, which cosmos_light_settings::shadow_step turns into the length of sun shadows.
+		reaches_ceiling makes point lights never shine over the obstacle, whatever its shadow height.
+		Both are read only for entities with physical bodies.
 	*/
 
 	struct render {
@@ -19,7 +20,8 @@ namespace invariants {
 		render_layer layer = render_layer::GROUND;
 		augs::enum_boolset<special_render_function> special_functions;
 		uint8_t shadow_height = 32;
-		pad_bytes<3> pad;
+		bool reaches_ceiling = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-23 12:14:16.605987 UTC"
+        "version_timestamp": "2026-09-25 17:56:46.113089 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -426,7 +426,6 @@
         },
         {
             "id": "Layer 5",
-            "is_open_in_editor": false,
             "nodes": [
                 "crate (1)",
                 "crate"
@@ -446,9 +445,117 @@
         },
         {
             "id": "Layer 3",
-            "is_open_in_editor": false,
             "nodes": [
-                "aquarium"
+                "aquarium no_shadow",
+                "aquarium organism_area",
+                "aquarium aquarium_pixels_light",
+                "aquarium aquarium_pixels_dim",
+                "aquarium flower_bubbles (7)",
+                "aquarium flower_bubbles (6)",
+                "aquarium flower_bubbles (5)",
+                "aquarium flower_bubbles (4)",
+                "aquarium flower_bubbles (3)",
+                "aquarium flower_bubbles (2)",
+                "aquarium flower_bubbles (1)",
+                "aquarium flower_bubbles",
+                "aquarium aquarium_bubbles",
+                "aquarium point_light (2)",
+                "aquarium point_light (1)",
+                "aquarium point_light",
+                "aquarium aquarium_ambience_right",
+                "aquarium aquarium_ambience_left",
+                "aquarium water_caustics (12)",
+                "aquarium water_caustics (11)",
+                "aquarium water_caustics (10)",
+                "aquarium water_caustics (9)",
+                "aquarium water_caustics (8)",
+                "aquarium water_caustics (7)",
+                "aquarium water_caustics (6)",
+                "aquarium water_caustics (5)",
+                "aquarium water_caustics (4)",
+                "aquarium water_caustics (3)",
+                "aquarium water_caustics (2)",
+                "aquarium water_caustics (1)",
+                "aquarium water_caustics",
+                "aquarium rainbow_dragon_fish (3)",
+                "aquarium rainbow_dragon_fish (2)",
+                "aquarium rainbow_dragon_fish (1)",
+                "aquarium rainbow_dragon_fish",
+                "aquarium dragon_fish (3)",
+                "aquarium dragon_fish (2)",
+                "aquarium dragon_fish (1)",
+                "aquarium dragon_fish",
+                "aquarium jellyfish (5)",
+                "aquarium jellyfish (4)",
+                "aquarium jellyfish (3)",
+                "aquarium jellyfish (2)",
+                "aquarium jellyfish (1)",
+                "aquarium jellyfish",
+                "aquarium cyanviolet_fish (5)",
+                "aquarium cyanviolet_fish (4)",
+                "aquarium cyanviolet_fish (3)",
+                "aquarium cyanviolet_fish (2)",
+                "aquarium cyanviolet_fish (1)",
+                "aquarium cyanviolet_fish",
+                "aquarium darkblue_fish (7)",
+                "aquarium darkblue_fish (6)",
+                "aquarium darkblue_fish (5)",
+                "aquarium darkblue_fish (4)",
+                "aquarium darkblue_fish (3)",
+                "aquarium darkblue_fish (2)",
+                "aquarium darkblue_fish (1)",
+                "aquarium darkblue_fish",
+                "aquarium yellow_fish (11)",
+                "aquarium yellow_fish (10)",
+                "aquarium yellow_fish (9)",
+                "aquarium yellow_fish (8)",
+                "aquarium yellow_fish (7)",
+                "aquarium yellow_fish (6)",
+                "aquarium yellow_fish (5)",
+                "aquarium yellow_fish (4)",
+                "aquarium yellow_fish (3)",
+                "aquarium yellow_fish (2)",
+                "aquarium yellow_fish (1)",
+                "aquarium yellow_fish",
+                "aquarium pink_coral (1)",
+                "aquarium pink_coral",
+                "aquarium flower_cyan (2)",
+                "aquarium flower_cyan (1)",
+                "aquarium flower_cyan",
+                "aquarium flower_pink (4)",
+                "aquarium flower_pink (3)",
+                "aquarium flower_pink (2)",
+                "aquarium flower_pink (1)",
+                "aquarium flower_pink",
+                "aquarium dune_small",
+                "aquarium aquarium_bottom_lamp_light",
+                "aquarium aquarium_bottom_lamp_body",
+                "aquarium aquarium_halogen_1_light (1)",
+                "aquarium aquarium_halogen_1_body (1)",
+                "aquarium aquarium_halogen_1_light",
+                "aquarium aquarium_halogen_1_body",
+                "aquarium water_color_overlay",
+                "aquarium lab_wall_a2_foreground",
+                "aquarium aquarium_glass",
+                "aquarium aquarium_glass_start (1)",
+                "aquarium aquarium_glass_start",
+                "aquarium lab_wall_smooth_end (1)",
+                "aquarium lab_wall_smooth_end",
+                "aquarium lab_wall_corner_cut (3)",
+                "aquarium lab_wall_corner_cut (2)",
+                "aquarium lab_wall_corner_cut (1)",
+                "aquarium lab_wall_corner_cut",
+                "aquarium lab_wall (2)",
+                "aquarium lab_wall (1)",
+                "aquarium lab_wall",
+                "aquarium dune_big (1)",
+                "aquarium dune_big",
+                "aquarium aquarium_sand_edge (1)",
+                "aquarium aquarium_sand_edge",
+                "aquarium aquarium_sand_2 (1)",
+                "aquarium aquarium_sand_2",
+                "aquarium aquarium_sand_1 (1)",
+                "aquarium aquarium_sand_1"
             ]
         },
         {
@@ -497,7 +604,6 @@
         },
         {
             "id": "Layer 2",
-            "is_open_in_editor": false,
             "nodes": [
                 "Water room floor 2 (4)",
                 "range_spawn"
@@ -597,7 +703,6 @@
         },
         {
             "id": "Layer 7",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_128 (2)",
                 "point_light (6)",
@@ -683,7 +788,6 @@
         },
         {
             "id": "Layer 1",
-            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (32)",
                 "team_spawn (31)",
@@ -1178,7 +1282,7 @@
         {
             "id": "crate",
             "type": "crate",
-            "pos": [-319.0, 3200.999755859375]
+            "pos": [-415.0, 2988.0]
         },
         {
             "id": "crate (1)",
@@ -1511,6 +1615,571 @@
             "size": [64, 64]
         },
         {
+            "id": "aquarium aquarium_sand_1",
+            "type": "aquarium_sand_1",
+            "pos": [-1072.0, 720.0],
+            "size": [2144, 352]
+        },
+        {
+            "id": "aquarium aquarium_sand_1 (1)",
+            "type": "aquarium_sand_1",
+            "pos": [1072.0, 1072.0],
+            "size": [2144, 352]
+        },
+        {
+            "id": "aquarium aquarium_sand_2",
+            "type": "aquarium_sand_2",
+            "pos": [1072.0, 720.0],
+            "size": [2144, 352]
+        },
+        {
+            "id": "aquarium aquarium_sand_2 (1)",
+            "type": "aquarium_sand_2",
+            "pos": [-1072.0, 1072.0],
+            "size": [2144, 352]
+        },
+        {
+            "id": "aquarium aquarium_sand_edge",
+            "type": "aquarium_sand_edge",
+            "pos": [-1072.0, 1230.0],
+            "size": [2144, 36]
+        },
+        {
+            "id": "aquarium aquarium_sand_edge (1)",
+            "type": "aquarium_sand_edge",
+            "pos": [1072.0, 1230.0],
+            "size": [2144, 36]
+        },
+        {
+            "id": "aquarium dune_big",
+            "type": "dune_big",
+            "pos": [-476.4444580078125, 896.0]
+        },
+        {
+            "id": "aquarium dune_big (1)",
+            "type": "dune_big",
+            "pos": [612.5714111328125, 1036.800048828125]
+        },
+        {
+            "id": "aquarium lab_wall",
+            "type": "lab_wall",
+            "pos": [0.0, 528.0],
+            "rotation": 180.0,
+            "size": [4288, 32]
+        },
+        {
+            "id": "aquarium lab_wall (1)",
+            "type": "lab_wall",
+            "pos": [2160.0, 896.0],
+            "rotation": -90.0,
+            "size": [704, 32]
+        },
+        {
+            "id": "aquarium lab_wall (2)",
+            "type": "lab_wall",
+            "pos": [-2160.0, 896.0],
+            "rotation": 90.0,
+            "size": [704, 32]
+        },
+        {
+            "id": "aquarium lab_wall_corner_cut",
+            "type": "lab_wall_corner_cut",
+            "pos": [-2160.0, 1264.0]
+        },
+        {
+            "id": "aquarium lab_wall_corner_cut (1)",
+            "type": "lab_wall_corner_cut",
+            "pos": [-2160.0, 528.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium lab_wall_corner_cut (2)",
+            "type": "lab_wall_corner_cut",
+            "pos": [2160.0, 528.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "aquarium lab_wall_corner_cut (3)",
+            "type": "lab_wall_corner_cut",
+            "pos": [2160.0, 1264.0],
+            "rotation": 270.0
+        },
+        {
+            "id": "aquarium lab_wall_smooth_end",
+            "type": "lab_wall_smooth_end",
+            "pos": [-2121.0, 1264.0]
+        },
+        {
+            "id": "aquarium lab_wall_smooth_end (1)",
+            "type": "lab_wall_smooth_end",
+            "pos": [2121.0, 1264.0],
+            "flip_horizontally": true
+        },
+        {
+            "id": "aquarium aquarium_glass_start",
+            "type": "aquarium_glass_start",
+            "pos": [-2063.0, 1264.0]
+        },
+        {
+            "id": "aquarium aquarium_glass_start (1)",
+            "type": "aquarium_glass_start",
+            "pos": [2063.0, 1264.0],
+            "flip_horizontally": true
+        },
+        {
+            "id": "aquarium aquarium_glass",
+            "type": "aquarium_glass",
+            "pos": [0.0, 1264.0],
+            "size": [4036, 32]
+        },
+        {
+            "id": "aquarium lab_wall_a2_foreground",
+            "type": "lab_wall_a2_foreground",
+            "pos": [0.0, 528.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "aquarium water_color_overlay",
+            "type": "water_color_overlay",
+            "pos": [0.0, 896.0],
+            "size": [4288, 704]
+        },
+        {
+            "id": "aquarium aquarium_halogen_1_body",
+            "type": "aquarium_halogen_1_body",
+            "pos": [-2127.0, 1163.0],
+            "rotation": 90.0,
+            "color": [0, 122, 255, 255]
+        },
+        {
+            "id": "aquarium aquarium_halogen_1_light",
+            "type": "aquarium_halogen_1_light",
+            "pos": [-2127.0, 1163.0],
+            "rotation": 90.0,
+            "color": [96, 255, 255, 255]
+        },
+        {
+            "id": "aquarium aquarium_halogen_1_body (1)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [2059.0, 561.0],
+            "rotation": 180.0,
+            "color": [0, 180, 59, 255]
+        },
+        {
+            "id": "aquarium aquarium_halogen_1_light (1)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [2059.0, 561.0],
+            "rotation": 180.0,
+            "color": [103, 255, 69, 255]
+        },
+        {
+            "id": "aquarium aquarium_bottom_lamp_body",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-714.0, 779.0],
+            "rotation": -45.0,
+            "color": [0, 122, 255, 255]
+        },
+        {
+            "id": "aquarium aquarium_bottom_lamp_light",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-714.0, 779.0],
+            "rotation": -45.0,
+            "color": [96, 255, 255, 255]
+        },
+        {
+            "id": "aquarium dune_small",
+            "type": "dune_small",
+            "pos": [-696.0, 801.0]
+        },
+        {
+            "id": "aquarium flower_pink",
+            "type": "flower_pink",
+            "pos": [-1072.0, 790.4000244140625],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium flower_pink (1)",
+            "type": "flower_pink",
+            "pos": [-1072.0, 848.4000244140625],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium flower_pink (2)",
+            "type": "flower_pink",
+            "pos": [-1500.7999267578125, 720.0]
+        },
+        {
+            "id": "aquarium flower_pink (3)",
+            "type": "flower_pink",
+            "pos": [-1442.7999267578125, 670.0]
+        },
+        {
+            "id": "aquarium flower_pink (4)",
+            "type": "flower_pink",
+            "pos": [-643.2000122070313, 649.5999755859375]
+        },
+        {
+            "id": "aquarium flower_cyan",
+            "type": "flower_cyan",
+            "pos": [1072.0, 720.0]
+        },
+        {
+            "id": "aquarium flower_cyan (1)",
+            "type": "flower_cyan",
+            "pos": [1130.0, 670.0]
+        },
+        {
+            "id": "aquarium flower_cyan (2)",
+            "type": "flower_cyan",
+            "pos": [1072.0, 770.0]
+        },
+        {
+            "id": "aquarium pink_coral",
+            "type": "pink_coral",
+            "pos": [1286.4000244140625, 1001.5999755859375]
+        },
+        {
+            "id": "aquarium pink_coral (1)",
+            "type": "pink_coral",
+            "pos": [643.2000122070313, 1107.199951171875],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium yellow_fish",
+            "type": "yellow_fish",
+            "pos": [743.0, 1097.0],
+            "rotation": 95.0
+        },
+        {
+            "id": "aquarium yellow_fish (1)",
+            "type": "yellow_fish",
+            "pos": [1819.0, 691.0],
+            "rotation": 257.0
+        },
+        {
+            "id": "aquarium yellow_fish (2)",
+            "type": "yellow_fish",
+            "pos": [-1691.0, 743.0],
+            "rotation": 183.0
+        },
+        {
+            "id": "aquarium yellow_fish (3)",
+            "type": "yellow_fish",
+            "pos": [1348.0, 1163.0],
+            "rotation": 199.0
+        },
+        {
+            "id": "aquarium yellow_fish (4)",
+            "type": "yellow_fish",
+            "pos": [788.0, 695.0],
+            "rotation": 127.0
+        },
+        {
+            "id": "aquarium yellow_fish (5)",
+            "type": "yellow_fish",
+            "pos": [2057.0, 1148.0],
+            "rotation": 34.0
+        },
+        {
+            "id": "aquarium yellow_fish (6)",
+            "type": "yellow_fish",
+            "pos": [-1476.0, 832.0],
+            "rotation": 81.0
+        },
+        {
+            "id": "aquarium yellow_fish (7)",
+            "type": "yellow_fish",
+            "pos": [-1025.0, 1116.0],
+            "rotation": 321.0
+        },
+        {
+            "id": "aquarium yellow_fish (8)",
+            "type": "yellow_fish",
+            "pos": [-529.0, 950.0],
+            "rotation": 195.0
+        },
+        {
+            "id": "aquarium yellow_fish (9)",
+            "type": "yellow_fish",
+            "pos": [1866.0, 904.0],
+            "rotation": 323.0
+        },
+        {
+            "id": "aquarium yellow_fish (10)",
+            "type": "yellow_fish",
+            "pos": [1969.0, 676.0],
+            "rotation": 246.0
+        },
+        {
+            "id": "aquarium yellow_fish (11)",
+            "type": "yellow_fish",
+            "pos": [-1114.0, 986.0],
+            "rotation": 111.0
+        },
+        {
+            "id": "aquarium darkblue_fish",
+            "type": "darkblue_fish",
+            "pos": [-1128.0, 1138.0],
+            "rotation": 309.0
+        },
+        {
+            "id": "aquarium darkblue_fish (1)",
+            "type": "darkblue_fish",
+            "pos": [-1097.0, 788.0],
+            "rotation": 63.0
+        },
+        {
+            "id": "aquarium darkblue_fish (2)",
+            "type": "darkblue_fish",
+            "pos": [-652.0, 577.0],
+            "rotation": 55.0
+        },
+        {
+            "id": "aquarium darkblue_fish (3)",
+            "type": "darkblue_fish",
+            "pos": [981.0, 1090.0],
+            "rotation": 327.0
+        },
+        {
+            "id": "aquarium darkblue_fish (4)",
+            "type": "darkblue_fish",
+            "pos": [294.0, 696.0],
+            "rotation": 30.0
+        },
+        {
+            "id": "aquarium darkblue_fish (5)",
+            "type": "darkblue_fish",
+            "pos": [472.0, 967.0],
+            "rotation": 19.0
+        },
+        {
+            "id": "aquarium darkblue_fish (6)",
+            "type": "darkblue_fish",
+            "pos": [-1509.0, 669.0],
+            "rotation": 144.0
+        },
+        {
+            "id": "aquarium darkblue_fish (7)",
+            "type": "darkblue_fish",
+            "pos": [-2009.0, 951.0],
+            "rotation": 105.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish",
+            "type": "cyanviolet_fish",
+            "pos": [1536.0, 1002.0],
+            "rotation": 191.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish (1)",
+            "type": "cyanviolet_fish",
+            "pos": [-1255.0, 768.0],
+            "rotation": 64.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish (2)",
+            "type": "cyanviolet_fish",
+            "pos": [309.0, 832.0],
+            "rotation": 309.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish (3)",
+            "type": "cyanviolet_fish",
+            "pos": [-205.0, 1000.0],
+            "rotation": 72.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish (4)",
+            "type": "cyanviolet_fish",
+            "pos": [-783.0, 1130.0],
+            "rotation": 203.0
+        },
+        {
+            "id": "aquarium cyanviolet_fish (5)",
+            "type": "cyanviolet_fish",
+            "pos": [848.0, 914.0],
+            "rotation": 22.0
+        },
+        {
+            "id": "aquarium jellyfish",
+            "type": "jellyfish",
+            "pos": [-1485.0, 1083.0],
+            "rotation": 139.0
+        },
+        {
+            "id": "aquarium jellyfish (1)",
+            "type": "jellyfish",
+            "pos": [-1430.0, 809.0],
+            "rotation": 96.0
+        },
+        {
+            "id": "aquarium jellyfish (2)",
+            "type": "jellyfish",
+            "pos": [-1815.0, 1068.0],
+            "rotation": 103.0
+        },
+        {
+            "id": "aquarium jellyfish (3)",
+            "type": "jellyfish",
+            "pos": [1565.0, 1078.0],
+            "rotation": 45.0
+        },
+        {
+            "id": "aquarium jellyfish (4)",
+            "type": "jellyfish",
+            "pos": [-193.0, 789.0],
+            "rotation": 265.0
+        },
+        {
+            "id": "aquarium jellyfish (5)",
+            "type": "jellyfish",
+            "pos": [1518.0, 1174.0],
+            "rotation": 122.0
+        },
+        {
+            "id": "aquarium dragon_fish",
+            "type": "dragon_fish",
+            "pos": [-1380.0, 865.0],
+            "rotation": 150.0
+        },
+        {
+            "id": "aquarium dragon_fish (1)",
+            "type": "dragon_fish",
+            "pos": [-557.0, 1026.0],
+            "rotation": 11.0
+        },
+        {
+            "id": "aquarium dragon_fish (2)",
+            "type": "dragon_fish",
+            "pos": [198.0, 955.0],
+            "rotation": 103.0
+        },
+        {
+            "id": "aquarium dragon_fish (3)",
+            "type": "dragon_fish",
+            "pos": [1119.0, 943.0],
+            "rotation": 199.0
+        },
+        {
+            "id": "aquarium rainbow_dragon_fish",
+            "type": "rainbow_dragon_fish",
+            "pos": [167.0, 964.0],
+            "rotation": 305.0
+        },
+        {
+            "id": "aquarium rainbow_dragon_fish (1)",
+            "type": "rainbow_dragon_fish",
+            "pos": [503.0, 807.0],
+            "rotation": 272.0
+        },
+        {
+            "id": "aquarium rainbow_dragon_fish (2)",
+            "type": "rainbow_dragon_fish",
+            "pos": [-519.0, 861.0],
+            "rotation": 23.0
+        },
+        {
+            "id": "aquarium rainbow_dragon_fish (3)",
+            "type": "rainbow_dragon_fish",
+            "pos": [1126.0, 1052.0],
+            "rotation": 33.0
+        },
+        {
+            "id": "aquarium water_caustics",
+            "type": "water_caustics",
+            "pos": [-987.0, 676.0],
+            "rotation": 317.0,
+            "starting_animation_frame": 84
+        },
+        {
+            "id": "aquarium water_caustics (1)",
+            "type": "water_caustics",
+            "pos": [-1870.0, 711.0],
+            "rotation": 112.0,
+            "starting_animation_frame": 49
+        },
+        {
+            "id": "aquarium water_caustics (2)",
+            "type": "water_caustics",
+            "pos": [-100.0, 834.0],
+            "rotation": 310.0,
+            "starting_animation_frame": 21
+        },
+        {
+            "id": "aquarium water_caustics (3)",
+            "type": "water_caustics",
+            "pos": [-1473.0, 1059.0],
+            "rotation": 73.0,
+            "starting_animation_frame": 14
+        },
+        {
+            "id": "aquarium water_caustics (4)",
+            "type": "water_caustics",
+            "pos": [-888.0, 1016.0],
+            "rotation": 84.0,
+            "starting_animation_frame": 44
+        },
+        {
+            "id": "aquarium water_caustics (5)",
+            "type": "water_caustics",
+            "pos": [-897.0, 1091.0],
+            "rotation": 136.0,
+            "starting_animation_frame": 81
+        },
+        {
+            "id": "aquarium water_caustics (6)",
+            "type": "water_caustics",
+            "pos": [1073.0, 696.0],
+            "rotation": 339.0,
+            "starting_animation_frame": 25
+        },
+        {
+            "id": "aquarium water_caustics (7)",
+            "type": "water_caustics",
+            "pos": [1762.0, 733.0],
+            "rotation": 264.0,
+            "starting_animation_frame": 22
+        },
+        {
+            "id": "aquarium water_caustics (8)",
+            "type": "water_caustics",
+            "pos": [65.0, 757.0],
+            "rotation": 94.0,
+            "starting_animation_frame": 43
+        },
+        {
+            "id": "aquarium water_caustics (9)",
+            "type": "water_caustics",
+            "pos": [598.0, 1013.0],
+            "rotation": 146.0,
+            "color": [255, 255, 255, 79],
+            "starting_animation_frame": 37
+        },
+        {
+            "id": "aquarium water_caustics (10)",
+            "type": "water_caustics",
+            "pos": [1722.0, 936.0],
+            "rotation": 191.0,
+            "color": [255, 255, 255, 79],
+            "starting_animation_frame": 31
+        },
+        {
+            "id": "aquarium water_caustics (11)",
+            "type": "water_caustics",
+            "pos": [804.0, 1049.0],
+            "rotation": 176.0,
+            "color": [255, 255, 255, 79],
+            "starting_animation_frame": 60
+        },
+        {
+            "id": "aquarium water_caustics (12)",
+            "type": "water_caustics",
+            "pos": [844.0, 1032.0],
+            "rotation": 128.0,
+            "color": [255, 255, 255, 79],
+            "starting_animation_frame": 97
+        },
+        {
             "id": "aquarium_ambience_left",
             "type": "aquarium_ambience_left",
             "pos": [-619.0, 1274.0]
@@ -1519,6 +2188,16 @@
             "id": "aquarium_ambience_right",
             "type": "aquarium_ambience_right",
             "pos": [825.0, 1292.0]
+        },
+        {
+            "id": "aquarium aquarium_ambience_left",
+            "type": "aquarium_ambience_left",
+            "pos": [-2144.0, 1248.0]
+        },
+        {
+            "id": "aquarium aquarium_ambience_right",
+            "type": "aquarium_ambience_right",
+            "pos": [2144.0, 1248.0]
         },
         {
             "id": "Strong lamp (2)",
@@ -1539,12 +2218,13 @@
         {
             "id": "point_light (1)",
             "type": "point_light",
-            "pos": [-1.0, 3583.0],
+            "pos": [-243.0, 3093.0],
             "color": [255, 220, 0, 60],
             "falloff": {
                 "radius": 676.364013671875,
                 "strength": 23
             },
+            "wall_falloff": {},
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
@@ -1570,19 +2250,21 @@
                 "strength": 23
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "height": 0.0
         },
         {
             "id": "point_light (6)",
             "type": "point_light",
-            "pos": [-1.0, 5121.0],
+            "pos": [-1.0, 5117.0],
             "color": [0, 255, 126, 46],
             "falloff": {
                 "radius": 676.364013671875,
                 "strength": 23
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "height": 100.0
         },
         {
             "id": "point_light",
@@ -1637,6 +2319,85 @@
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0
+        },
+        {
+            "id": "aquarium point_light",
+            "type": "point_light",
+            "pos": [-2098.0, 1163.0],
+            "color": [96, 255, 255, 255],
+            "height": 0.0
+        },
+        {
+            "id": "aquarium point_light (1)",
+            "type": "point_light",
+            "pos": [2059.0, 590.0],
+            "color": [103, 255, 69, 255]
+        },
+        {
+            "id": "aquarium point_light (2)",
+            "type": "point_light",
+            "pos": [-714.0, 779.0],
+            "color": [0, 99, 126, 255]
+        },
+        {
+            "id": "aquarium aquarium_bubbles",
+            "type": "aquarium_bubbles",
+            "pos": [0.0, 559.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium flower_bubbles",
+            "type": "flower_bubbles",
+            "pos": [-1072.0, 790.4000244140625],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium flower_bubbles (1)",
+            "type": "flower_bubbles",
+            "pos": [-1072.0, 848.4000244140625],
+            "rotation": 90.0
+        },
+        {
+            "id": "aquarium flower_bubbles (2)",
+            "type": "flower_bubbles",
+            "pos": [-1500.7999267578125, 720.0]
+        },
+        {
+            "id": "aquarium flower_bubbles (3)",
+            "type": "flower_bubbles",
+            "pos": [-1442.7999267578125, 670.0]
+        },
+        {
+            "id": "aquarium flower_bubbles (4)",
+            "type": "flower_bubbles",
+            "pos": [-643.2000122070313, 649.5999755859375]
+        },
+        {
+            "id": "aquarium flower_bubbles (5)",
+            "type": "flower_bubbles",
+            "pos": [1072.0, 720.0]
+        },
+        {
+            "id": "aquarium flower_bubbles (6)",
+            "type": "flower_bubbles",
+            "pos": [1130.0, 670.0]
+        },
+        {
+            "id": "aquarium flower_bubbles (7)",
+            "type": "flower_bubbles",
+            "pos": [1072.0, 770.0]
+        },
+        {
+            "id": "aquarium aquarium_pixels_dim",
+            "type": "aquarium_pixels_dim",
+            "pos": [0.0, 896.0],
+            "size": [4288, 704]
+        },
+        {
+            "id": "aquarium aquarium_pixels_light",
+            "type": "aquarium_pixels_light",
+            "pos": [0.0, 896.0],
+            "size": [4288, 704]
         },
         {
             "id": "interference_grenade",
@@ -2520,12 +3281,6 @@
             "pos": [-3534.999755859375, 4483.0]
         },
         {
-            "id": "aquarium",
-            "type": "aquarium",
-            "pos": [0.0, 896.0],
-            "size": [4352, 768]
-        },
-        {
             "id": "team_spawn",
             "type": "team_spawn",
             "faction": "METROPOLIS",
@@ -2999,6 +3754,18 @@
                 "shells": false,
                 "obstacles": false
             }
+        },
+        {
+            "id": "aquarium organism_area",
+            "type": "organism_area",
+            "pos": [0.0, 896.0],
+            "size": [4288, 704]
+        },
+        {
+            "id": "aquarium no_shadow",
+            "type": "no_shadow",
+            "pos": [0.0, 896.0],
+            "size": [4288, 704]
         }
     ]
 }

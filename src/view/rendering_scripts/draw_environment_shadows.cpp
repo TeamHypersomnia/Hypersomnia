@@ -1,10 +1,10 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <limits>
 #include <vector>
 
-#include "augs/math/convex_hull.h"
 #include "augs/math/vec2.h"
 
 #include "game/cosmos/cosmos.h"
@@ -20,6 +20,7 @@
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/rendering_scripts/draw_environment_shadows.h"
+#include "view/rendering_scripts/shadow_casters.h"
 
 void draw_environment_shadows(const draw_environment_shadows_input in) {
 	const auto& cosm = in.cosm;
@@ -64,16 +65,23 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 		(1 << int(filter_category::GLASS_OBSTACLE))
 	;
 
-	struct shadow_cast {
-		uint8_t height = 0;
-		uint8_t strength = 0;
-		std::size_t first = 0;
-		std::size_t count = 0;
-	};
-
-	auto casts = std::vector<shadow_cast>();
-	auto cast_points = std::vector<vec2>();
 	auto fixture_points = std::vector<vec2>();
+
+	auto push_triangle = [&](
+		augs::vertex_triangle_buffer& buf,
+		const std::array<vec2, 3> positions,
+		const std::array<rgba, 3> colors
+	) {
+		augs::vertex_triangle tri;
+
+		for (std::size_t i = 0; i < 3; ++i) {
+			tri.vertices[i].pos = positions[i];
+			tri.vertices[i].color = colors[i];
+			tri.vertices[i].texcoord = blank_uv;
+		}
+
+		buf.push_back(tri);
+	};
 
 	auto push_fan = [&](
 		augs::vertex_triangle_buffer& buf,
@@ -82,45 +90,44 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 		const rgba col
 	) {
 		for (std::size_t i = 2; i < count; ++i) {
-			augs::vertex_triangle tri;
-
-			tri.vertices[0].pos = points[0];
-			tri.vertices[1].pos = points[i - 1];
-			tri.vertices[2].pos = points[i];
-
-			for (auto& v : tri.vertices) {
-				v.color = col;
-				v.texcoord = blank_uv;
-			}
-
-			buf.push_back(tri);
+			push_triangle(buf, { points[0], points[i - 1], points[i] }, { col, col, col });
 		}
 	};
 
-	auto gather_fixture_points = [&](const b2Fixture& fix, const transformr body_transform) {
-		fixture_points.clear();
+	/*
+		The shadow of a convex fixture is the fixture itself
+		plus one parallelogram swept along the shadow from every edge facing away from the sun.
+		These tile the shadow exactly, and their colors interpolate linearly along its length.
+	*/
 
-		auto to_world = [&](const b2Vec2 local_meters) {
-			return body_transform.pos + vec2(si.get_pixels(vec2(local_meters))).rotate(body_transform.rotation);
-		};
+	auto push_cast = [&](const vec2 offset, const rgba base_col, const rgba tip_col) {
+		const auto num_points = fixture_points.size();
 
-		const auto* const shape = fix.GetShape();
+		push_fan(in.casts_output, fixture_points.data(), num_points, base_col);
 
-		if (shape->GetType() == b2Shape::e_polygon) {
-			const auto& poly = static_cast<const b2PolygonShape&>(*shape);
+		auto center = vec2::zero;
 
-			for (int v = 0; v < poly.GetVertexCount(); ++v) {
-				fixture_points.push_back(to_world(poly.GetVertex(v)));
-			}
+		for (const auto& p : fixture_points) {
+			center += p;
 		}
-		else if (shape->GetType() == b2Shape::e_circle) {
-			const auto& circle = static_cast<const b2CircleShape&>(*shape);
-			const auto num_sides = 12;
 
-			for (int v = 0; v < num_sides; ++v) {
-				const auto offset = vec2::from_degrees(360.0f * v / num_sides) * circle.m_radius;
-				fixture_points.push_back(to_world(circle.m_p + b2Vec2(offset.x, offset.y)));
+		center /= static_cast<float>(num_points);
+
+		for (std::size_t i = 0; i < num_points; ++i) {
+			const auto a = fixture_points[i];
+			const auto b = fixture_points[(i + 1) % num_points];
+
+			const auto outward = [&]() {
+				const auto normal = (b - a).perpendicular_cw();
+				return normal.dot(a - center) < 0.0f ? -normal : normal;
+			}();
+
+			if (outward.dot(offset) <= 0.0f) {
+				continue;
 			}
+
+			push_triangle(in.casts_output, { a, b, b + offset }, { base_col, base_col, tip_col });
+			push_triangle(in.casts_output, { a, b + offset, a + offset }, { base_col, tip_col, tip_col });
 		}
 	};
 
@@ -147,11 +154,10 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 					}
 				}
 
-				const auto& b2_transform = body->GetTransform();
-				return transformr(vec2(b2_transform.p), b2_transform.q.GetAngle()).to_user_space(si);
+				return ::calc_physical_body_transform(*body, si);
 			}();
 
-			gather_fixture_points(fix, body_transform);
+			::gather_fixture_world_points(fixture_points, fix, body_transform, si, 12);
 
 			if (fixture_points.size() < 3) {
 				return callback_result::CONTINUE;
@@ -159,26 +165,7 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 
 			const auto owner = cosm[fix.GetUserData()];
 
-			const auto height = [&]() -> uint8_t {
-				const auto base_height = [&]() {
-					if (owner) {
-						if (const auto render = owner.find<invariants::render>()) {
-							return render->shadow_height;
-						}
-					}
-
-					return invariants::render().shadow_height;
-				}();
-
-				if (owner) {
-					if (const auto rigid_body = owner.find<components::rigid_body>()) {
-						const auto scaled = std::round(base_height * rigid_body->get_raw_component().special.shadow_height_mult);
-						return static_cast<uint8_t>(std::clamp(scaled, 0.0f, 255.0f));
-					}
-				}
-
-				return base_height;
-			}();
+			const auto height = ::calc_fixture_shadow_height(cosm, fix);
 
 			push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, height, 0));
 
@@ -204,37 +191,17 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 				return 255;
 			}();
 
-			const auto offset = step * static_cast<float>(height);
-			const auto num_points = fixture_points.size();
+			const auto tip_strength = static_cast<uint8_t>(std::round(strength * in.tip_strength));
 
-			for (std::size_t i = 0; i < num_points; ++i) {
-				fixture_points.push_back(fixture_points[i] + offset);
-			}
-
-			const auto extruded = augs::convex_hull(fixture_points);
-
-			casts.push_back({ height, strength, cast_points.size(), extruded.size() });
-			cast_points.insert(cast_points.end(), extruded.begin(), extruded.end());
+			push_cast(
+				step * static_cast<float>(height),
+				rgba(height, strength, 0, 0),
+				rgba(height, tip_strength, 0, 0)
+			);
 
 			return callback_result::CONTINUE;
 		}
 	);
-
-	std::sort(
-		casts.begin(),
-		casts.end(),
-		[](const shadow_cast& a, const shadow_cast& b) {
-			if (a.height != b.height) {
-				return a.height < b.height;
-			}
-
-			return a.strength < b.strength;
-		}
-	);
-
-	for (const auto& c : casts) {
-		push_fan(in.casts_output, cast_points.data() + c.first, c.count, rgba(c.height, c.strength, 0, 0));
-	}
 
 	in.visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto& handle) {
 		handle.template dispatch_on_having_all<invariants::area_marker>([&](const auto& typed_handle) {

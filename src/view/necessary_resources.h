@@ -45,6 +45,7 @@ struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
 	optional_fbo smoke;
 	optional_fbo light;
+	optional_fbo removed_light;
 	optional_fbo shadow;
 	optional_fbo flash_afterimage;
 
@@ -73,7 +74,6 @@ struct all_necessary_shaders {
 	optional_shader textured_light;
 	optional_shader flash_afterimage;
 	optional_shader neon_occluder;
-	optional_shader ground_decal;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

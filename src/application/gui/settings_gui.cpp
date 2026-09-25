@@ -909,6 +909,21 @@ void settings_gui_state::perform(
 
 					revertable_slider(SCOPE_CFG_NVP(shadow_strength_multiplier), 0.f, 2.f);
 					tooltip_on_hover("Scales how dark the shadows are relative to what the map sets.\n0 disables shadows entirely, same as None.");
+
+					revertable_slider(SCOPE_CFG_NVP(shadow_smoothness_multiplier), 0.f, 1.f);
+					tooltip_on_hover("Scales how much shadows fade along their length relative to what the map sets.\n0 makes them hard. They stay as dark on average.\nDoesn't affect performance.");
+
+					revertable_slider(SCOPE_CFG_NVP(point_light_shadow_smoothness_multiplier), 0.f, 1.f);
+					tooltip_on_hover("Scales how soft the edges of shadows cast by point lights are relative to what the map sets.\n0 makes them hard.\nDoesn't affect performance.");
+
+					revertable_checkbox("Point light soft shadows", scope_cfg.point_light_soft_shadows);
+					tooltip_on_hover("If not ticked, shadows of point lights have hard edges regardless of what the map sets.");
+
+					revertable_checkbox("Point light heights", scope_cfg.point_light_heights);
+					tooltip_on_hover("If not ticked, point lights ignore their Light height:\nevery shadow reaches the end of the light, computed from the visibility polygon like before heights existed.");
+
+					revertable_checkbox("Quantize lights", scope_cfg.quantize_lights);
+					tooltip_on_hover("If ticked, lights brighten the scene in a few discrete bands for the pixel-art look.\nPenumbras of shadows stay smooth either way.\nIf not, the brightening is smooth everywhere.");
 				}
 
 				ImGui::Separator();
