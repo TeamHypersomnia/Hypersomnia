@@ -135,7 +135,18 @@ bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) 
 		return true;
 	}
 
-	return 
+	/*
+		Stamps are cache artifacts and never project resources.
+		Older builds generated them next to the source images.
+	*/
+
+	const bool is_stamp = path.extension() == ".stamp";
+
+	if (is_stamp) {
+		return true;
+	}
+
+	return
 		path == project_json
 		|| path == project_nav
 		|| path == legacy_autosave_json
