@@ -54,7 +54,8 @@ namespace invariants {
 		bool override_release_impulse = false;
 
 		bool apply_movement_boost = true;
-		pad_bytes<3> pad;
+		uint8_t floor_hits_when_thrown = 3;
+		pad_bytes<2> pad;
 
 		real32 arming_duration_ms = -1.f;
 		real32 defusing_duration_ms = -1.f;
@@ -72,6 +73,7 @@ namespace invariants {
 		std::array<sound_effect_input, 2> defused_sound;
 		particle_effect_input defused_particles;
 		sound_effect_input release_sound;
+		std::array<sound_effect_input, 2> floor_hit_sounds;
 		particle_effect_input released_trace_particles;
 
 		assets::plain_animation_id armed_animation_id;

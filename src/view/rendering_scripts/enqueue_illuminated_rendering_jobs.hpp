@@ -3,7 +3,7 @@
 #include "game/detail/visible_entities.hpp"
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
 #include "game/detail/use_interaction_logic.h"
-#include "game/detail/melee/like_melee.h"
+#include "view/rendering_scripts/falling_item_offsets.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "view/rendering_scripts/corpse_head_overlays.h"
 #include "view/rendering_scripts/draw_minimap.h"
@@ -36,7 +36,7 @@ const float CHARACTER_SUN_SHADOW_HEIGHT = CHARACTER_SHADOW_OFFSET.length() / vec
 const vec2 CORPSE_SHADOW_OFFSET = vec2(5, 5);
 const rgba CORPSE_SHADOW_COLOR = rgba(0, 0, 0, 180);
 const rgba MISSILE_SHADOW_COLOR = rgba(0, 0, 0, 140);
-const vec2 MISSILE_SHADOW_OFFSET = vec2(20, 25);
+const rgba THROWN_EXPLOSIVE_SHADOW_COLOR = rgba(0, 0, 0, 170);
 const vec2 MISSILE_SHADOW_SCALE = vec2(1.4f, 1.8f);
 
 inline auto make_shadow_offset_customizer(const vec2 offset) {
@@ -115,19 +115,8 @@ void enqueue_illuminated_rendering_jobs(
 
 	const bool environment_shadows = in.environment_shadows_enabled();
 
-	/*
-		With environment shadows on, character and bullet shadows keep their lengths
-		but point along the sun, so that all shadows fall the same way.
-	*/
-
 	auto along_the_sun = [&](const vec2 legacy_offset) {
-		const auto sun_step = cosm.get_common_significant().light.sun_shadows.step;
-
-		if (!environment_shadows || sun_step.is_zero()) {
-			return legacy_offset;
-		}
-
-		return vec2(sun_step).normalize() * legacy_offset.length();
+		return ::calc_along_the_sun(legacy_offset, cosm.get_common_significant().light.sun_shadows.step, environment_shadows);
 	};
 
 	auto calc_character_shadow_offset = [&](const float mult) {
@@ -583,57 +572,51 @@ void enqueue_illuminated_rendering_jobs(
 							}();
 
 
-							if (!is_laying_on_ground) {
-								/*
-									Thrown melee weapons and grenades in flight cast shadows like bullets.
-								*/
+							/*
+								Items thrown or dropped explicitly are drawn as flying until they hit the floor for the last time,
+								even though they can already be picked up.
+							*/
+
+							using item_type = remove_cref<decltype(typed_item)>;
+
+							const auto* const fall = [&]() -> const item_fall_state* {
+								if constexpr(item_type::template has<components::item>()) {
+									return std::addressof(typed_item.template get<components::item>().get_fall());
+								}
+								else {
+									return nullptr;
+								}
+							}();
+
+							const bool falling = fall != nullptr && fall->floor_hits_left > 0;
+
+							if (!is_laying_on_ground || falling) {
+								const auto offsets = ::calc_flying_item_offsets(typed_item, global_time_seconds, missile_shadow_offset);
 
 								if (draw_bullet_shadows) {
-									/*
-										A thrown melee weapon falls as it slows down -
-										its shadow shortens until it lands right under it.
-									*/
+									const auto shadow_color = ::is_like_thrown_explosive(typed_item) ? THROWN_EXPLOSIVE_SHADOW_COLOR : MISSILE_SHADOW_COLOR;
 
-									const auto falling_mult = [&]() {
-										if (::is_like_thrown_melee(typed_item)) {
-											const auto melee = typed_item.template find<components::melee>();
-											const auto melee_def = typed_item.template find<invariants::melee>();
-
-											if (melee != nullptr && melee_def != nullptr) {
-												const auto landing_speed = melee_def->throw_def.min_speed_to_hurt;
-												const auto speed = typed_item.template get<components::rigid_body>().get_velocity().length();
-
-												if (melee->top_thrown_speed > landing_speed) {
-													return std::clamp((speed - landing_speed) / (melee->top_thrown_speed - landing_speed), 0.0f, 1.0f);
-												}
-											}
-										}
-
-										return 1.0f;
-									}();
-
-									::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, shadows, ::make_shadow_offset_customizer(missile_shadow_offset * falling_mult));
+									::specific_draw_color_highlight(typed_item, shadow_color, shadows, ::make_shadow_offset_customizer(offsets.shadow));
 								}
 
-								::specific_draw_entity(typed_item, diffuse);
-								::specific_draw_neon_map(typed_item, neons);
+								::specific_draw_entity(typed_item, diffuse, ::make_shadow_offset_customizer(offsets.sprite));
+								::specific_draw_neon_map(typed_item, neons, ::make_shadow_offset_customizer(offsets.sprite));
 
 								return;
 							}
 
 							const auto bounce_dir = touch_collectible ? vec2(0, -1) : vec2(-1, -1);
 							const auto bounce_height = touch_collectible ? 10.0f : 8.f;
+
 							/*
-								Thrown melee weapons start bouncing from the ground as they land,
+								Items start bouncing from the ground as they come to rest,
 								so they don't jump when they stop being drawn as flying.
 								A third of a second back is where the bounce is lowest.
 							*/
 
 							const auto bounce_secs = [&]() {
-								if (const auto melee = typed_item.template find<components::melee>()) {
-									if (melee->when_landed.was_set()) {
-										return global_time_seconds - melee->when_landed.in_seconds(cosm.get_fixed_delta()) - 1.0 / 3.0;
-									}
+								if (fall != nullptr && fall->when_landed.was_set()) {
+									return global_time_seconds - fall->when_landed.in_seconds(cosm.get_fixed_delta()) - 1.0 / 3.0;
 								}
 
 								return global_time_seconds + 2.0 * double(typed_item.get_id().raw.indirection_index);

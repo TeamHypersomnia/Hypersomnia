@@ -38,6 +38,10 @@ public:
 		return this->component->owner_meta;
 	}
 
+	auto& get_fall() const {
+		return this->component->fall;
+	}
+
 	auto get_incoming_transfer_id() const {
 		return get_raw_component().incoming_transfer_id;
 	}

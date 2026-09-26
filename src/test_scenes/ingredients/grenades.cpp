@@ -45,6 +45,8 @@ namespace test_flavours {
 			{
 				invariants::hand_fuse fuse; 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+				fuse.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_SECOND);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 
 				fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
@@ -151,6 +153,8 @@ namespace test_flavours {
 				fuse.beep_time_mult = 0.5f;
 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+				fuse.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_SECOND);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::INTERFERENCE_GRENADE_TRAIL);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
@@ -242,8 +246,11 @@ namespace test_flavours {
 			{
 				invariants::hand_fuse fuse; 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+				fuse.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_SECOND);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FLASHBANG_TRAIL);
+				fuse.floor_hits_when_thrown = 2;
 				fuse.released_image_id = to_image_id(test_scene_image_id::FLASHBANG_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::FLASHBANG);
 				fuse.additional_release_impulse.linear = 3000.f;
@@ -300,6 +307,8 @@ namespace test_flavours {
 				invariants::hand_fuse fuse; 
 
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+				fuse.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_SECOND);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 
 				fuse.beep_color = cyan;

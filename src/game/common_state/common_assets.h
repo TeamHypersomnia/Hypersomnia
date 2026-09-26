@@ -26,8 +26,13 @@ struct material_decals_def {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	floor_material is the material of the floor, for the sounds of items hitting it.
+*/
+
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
+	assets::physical_material_id floor_material;
 	sound_effect_input ped_shield_impact_sound;
 	sound_effect_input ped_shield_destruction_sound;
 	sound_effect_input cast_unsuccessful_sound;

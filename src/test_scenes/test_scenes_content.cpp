@@ -7,6 +7,7 @@
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "test_scenes/test_scene_sounds.h"
 #include "test_scenes/test_scene_particle_effects.h"
+#include "test_scenes/test_scene_physical_materials.h"
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_cache.h"
 
@@ -98,6 +99,7 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 	common_assets.ped_shield_impact_sound.modifier.pitch = 1.05f;
 	common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+	common_assets.floor_material = to_physical_material_id(test_scene_physical_material_id::METAL);
 	common_assets.item_throw_sound.id = to_sound_id(test_scene_sound_id::ITEM_THROW);
 	common_assets.item_throw_sound.modifier.pitch = 1.15f;
 	common_assets.item_throw_sound.modifier.gain = 0.8f;

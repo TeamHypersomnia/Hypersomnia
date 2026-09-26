@@ -38,6 +38,8 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/detail/inventory/item_falling.h"
+#include "game/detail/missile/missile_utils.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/inventory/wielding_setup.h"
@@ -889,7 +891,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			return;
 		}
 
-		auto do_drop = [&](const auto& item, const bool fix_secondary = false) {
+		auto do_drop = [&](const auto& item, const bool fix_secondary = false, const bool thrown_melee = false) {
 			if (item.dead()) {
 				return;
 			}
@@ -910,6 +912,23 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			request.params.set_source_root_as_sender = is_throw;
 
 			perform_transfer(request, step);
+
+			if (const auto item_state = item.template find<components::item>()) {
+				auto& fall = item_state.get_fall();
+
+				::start_falling(
+					fall,
+					DROPPED_ITEM_FLOOR_HITS,
+					DROPPED_ITEM_FALL_SECS * (thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f),
+					DROPPED_ITEM_FALL_HEIGHT,
+					0.f,
+					false,
+					cosm.get_nontemporal_rng_seed_for(item),
+					cosm.get_timestamp()
+				);
+
+				fall.thrown_melee = thrown_melee;
+			}
 
 			if (fix_secondary) {
 				if (const auto secondary_hand = typed_subject[slot_function::SECONDARY_HAND]) {
@@ -977,7 +996,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 								mult = -1;
 							}
 
-							do_drop(h);
+							do_drop(h, false, true);
 
 							if (thrown_ids.size() < thrown_ids.max_size()) {
 								thrown_ids.push_back(h.get_id());
@@ -1509,4 +1528,156 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			commands.wield
 		);
 	}
+}
+
+void item_system::advance_falling_items(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+	const auto now = cosm.get_timestamp();
+	const auto dt = cosm.get_fixed_delta();
+
+	cosm.for_each_having<components::item>([&](const auto& typed_item) {
+		auto& fall = typed_item.template get<components::item>().get_fall();
+
+		if (fall.floor_hits_left == 0) {
+			return;
+		}
+
+		const auto body = typed_item.template find<components::rigid_body>();
+
+		if (typed_item.get_current_slot().alive() || body == nullptr) {
+			/*
+				Picked up mid-air.
+			*/
+
+			fall = {};
+			return;
+		}
+
+		if ((now - fall.when_hop_started).step < ::calc_hop_steps(fall.hop_duration_secs, dt)) {
+			return;
+		}
+
+		const bool explosive = ::is_like_thrown_explosive(typed_item);
+		const auto fall_seed = ::calc_fall_seed(cosm.get_nontemporal_rng_seed_for(typed_item), fall.when_started_falling);
+		const auto hit_index = fall.floor_hits_done;
+		const bool last_silent_hit = SILENCE_LAST_ITEM_FLOOR_HIT && !explosive && fall.floor_hits_left == 1;
+
+		/*
+			How much the third and later hits of dropped items and thrown melee weapons still spin and push them.
+		*/
+
+		auto later_hit_mult = [&](const real32 last_hit_mult, const real32 third_hit_mult) {
+			if (last_silent_hit) {
+				return last_hit_mult;
+			}
+
+			return hit_index >= 2 ? third_hit_mult : 1.f;
+		};
+
+		auto play_hit_sound = [&]() {
+			if (explosive) {
+				if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
+					const auto& sounds = fuse_def->floor_hit_sounds;
+
+					if (sounds[0].id.is_set()) {
+						/*
+							The explosive's own floor hit sounds, in order - the hits after them are silent.
+						*/
+
+						if (hit_index < sounds.size()) {
+							auto effect = sounds[hit_index];
+							effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index);
+
+							effect.start(
+								step,
+								sound_effect_start_input::fire_and_forget(typed_item.get_logic_transform()),
+								always_predictable_v
+							);
+						}
+
+						return;
+					}
+				}
+			}
+
+			/*
+				Lower hops are quieter.
+			*/
+
+			::play_floor_collision_sound(
+				FLOOR_HIT_STRENGTH * std::sqrt(std::min(fall.hop_height, 1.f)),
+				::calc_floor_hit_pitch(fall_seed, hit_index),
+				typed_item.get_logic_transform(),
+				typed_item,
+				step
+			);
+		};
+
+		auto spin = [&]() {
+			const auto current_spin = body.get_degree_velocity();
+			const auto current_direction = current_spin < 0.f ? -1.f : 1.f;
+
+			if (fall.thrown_up) {
+				body.set_angular_velocity(current_direction * EXPLOSIVE_FLOOR_HIT_SPIN_DEGREES);
+			}
+			else if (hit_index == 0) {
+				body.set_angular_velocity(current_spin * DROPPED_ITEM_SPIN_KEPT);
+			}
+			else {
+				const auto counter_direction = hit_index == 1 ? -current_direction : current_direction;
+				const auto mult = later_hit_mult(LAST_FLOOR_HIT_SPIN_MULT, THIRD_FLOOR_HIT_SPIN_MULT);
+
+				body.set_angular_velocity(counter_direction * mult * DROPPED_ITEM_COUNTER_SPIN_DEGREES);
+			}
+		};
+
+		auto push = [&]() {
+			const auto velocity = body.get_velocity();
+			const auto speed = velocity.length();
+
+			if (speed > 1.f) {
+				const auto mult = later_hit_mult(LAST_FLOOR_HIT_PUSH_MULT, THIRD_FLOOR_HIT_PUSH_MULT);
+				body.set_velocity(velocity + velocity / speed * mult * DROPPED_ITEM_PUSH_SPEED);
+			}
+		};
+
+		auto start_next_hop = [&]() {
+			/*
+				Varied hops shorten from their unvaried durations.
+			*/
+
+			const auto variation = explosive ? EXPLOSIVE_HOP_DURATION_VARIATION : 0.f;
+			const auto unvaried_secs = fall.hop_duration_secs / ::calc_hop_duration_mult(variation, fall_seed, hit_index);
+			const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR;
+
+			const auto min_secs = 
+				explosive ? 
+				EXPLOSIVE_MIN_HOP_SECS : 
+				DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
+			;
+
+			fall.when_hop_started = now;
+			fall.hop_duration_secs = std::max(min_secs, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
+			fall.hop_height *= NEXT_HOP_HEIGHT_MULT;
+		};
+
+		if (!last_silent_hit) {
+			play_hit_sound();
+		}
+
+		spin();
+
+		if (!explosive) {
+			push();
+		}
+
+		++fall.floor_hits_done;
+		--fall.floor_hits_left;
+
+		if (fall.floor_hits_left == 0) {
+			fall.when_landed = now;
+		}
+
+		start_next_hop();
+	});
 }
