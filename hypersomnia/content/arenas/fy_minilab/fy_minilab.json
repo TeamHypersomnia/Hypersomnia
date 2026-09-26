@@ -11,7 +11,9 @@
     "settings": {
         "default_server_mode": "bomb_defusal",
         "ambient_light_color": [51, 93, 98, 255],
-        "shadow_strength": 0.6000000238418579
+        "sun_shadows": {
+            "strength": 0.6000000238418579
+        }
     },
     "playtesting": {
         "mode": "quick_test",

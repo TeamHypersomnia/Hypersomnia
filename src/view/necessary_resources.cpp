@@ -44,7 +44,7 @@ void all_necessary_fbos::apply(
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(removed_light);
 	reset(hue_light);
-	reset(shadow);
+	reset(shadow, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(flash_afterimage);
 }
 

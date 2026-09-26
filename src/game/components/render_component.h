@@ -10,7 +10,7 @@
 
 namespace invariants {
 	/*
-		shadow_height is in pixels of height, which cosmos_light_settings::shadow_step turns into the length of sun shadows.
+		shadow_height is in pixels of height, which sun_shadow_settings::step turns into the length of sun shadows.
 		reaches_ceiling makes point lights never shine over the obstacle, whatever its shadow height.
 		Both are read only for entities with physical bodies.
 

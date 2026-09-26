@@ -637,7 +637,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
-			in.perf_settings.quantize_neons && shaders.quantized_neon ? std::addressof(*shaders.quantized_neon) : nullptr,
+			in.perf_settings.posterize_neons && shaders.quantized_neon ? std::addressof(*shaders.quantized_neon) : nullptr,
 			neon_occlusion_callback,
 			[&]() {
 				draw_particles_neons();
@@ -804,6 +804,24 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		if (shaders.shadow_sprite) {
 			set_shader_with_matrix(shaders.shadow_sprite);
 			renderer.call_triangles(D::SHADOW_SPRITES);
+			renderer.call_triangles(D::CORPSE_SHADOW_SPRITES);
+			renderer.call_triangles(D::SENTIENCE_SHADOW_SPRITES);
+
+			/*
+				Shadows of enemies only where the viewed character sees,
+				so they never give away enemies behind walls.
+			*/
+
+			if (!renderer.dedicated[D::ENEMY_SENTIENCE_SHADOW_SPRITES].triangles.empty()) {
+				write_fow_to_stencil();
+
+				set_shader_with_matrix(shaders.shadow_sprite);
+				renderer.set_stencil(true);
+				renderer.stencil_positive_test();
+				renderer.call_triangles(D::ENEMY_SENTIENCE_SHADOW_SPRITES);
+				renderer.set_stencil(false);
+			}
+
 			set_shader_with_matrix(shaders.standard);
 		}
 	}
@@ -829,13 +847,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			The shader walks in fragment space where the y axis points up.
 		*/
 
-		const auto fragment_step = vec2(light_settings.shadow_step.x, -light_settings.shadow_step.y) * cone.eye.zoom;
-		const auto fix_samples = in.perf_settings.shadow_quality == shadow_quality_type::NORMAL ? 16 : 0;
+		const auto fragment_step = vec2(light_settings.sun_shadows.step.x, -light_settings.sun_shadows.step.y) * cone.eye.zoom;
+		const auto fix_samples = in.perf_settings.sun_shadows.quality == shadow_quality_type::NORMAL ? 16 : 0;
 
 		set_uniform(shader, U::shadow_step, fragment_step);
 		set_uniform(shader, U::shadow_fix, fix_samples);
 		set_uniform(shader, U::ambient_color, light_settings.ambient_color);
-		set_uniform(shader, U::shadow_hue_preservation, light_settings.shadow_hue_preservation);
+		set_uniform(shader, U::shadow_hue_preservation, light_settings.sun_shadows.hue_preservation);
 	};
 
 	auto receive_shadows = [&](auto& shader, const bool receive, const float receiver_height = -1.0f) {
@@ -873,7 +891,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_uniform(
 		shaders.illuminated,
 		U::point_light_hue_preservation,
-		fbos.hue_light.has_value() ? cosm.get_common_significant().light.point_light_hue_preservation : 0.0f
+		fbos.hue_light.has_value() ? cosm.get_common_significant().light.point_light_shadows.hue_preservation : 0.0f
 	);
 	setup_shadow_uniforms(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true);
@@ -895,15 +913,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (environment_shadows) {
 		set_uniform(shaders.illuminated, U::fully_lit, 0);
 	}
-	renderer.call_triangles(D::LYING_CORPSES);
-
 	/*
-		Ground sprites casting shadows, above decals and corpses.
+		Corpses and ground sprites casting shadows, the latter above decals and corpses.
 		Their footprints in the shadow texture keep them from receiving their own shadows,
 		and only decide which shadows reach them - the shadows aren't displaced by their small heights.
 	*/
 
 	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
+	renderer.call_triangles(D::LYING_CORPSES);
 	renderer.call_triangles(D::GROUND_SHADOW_CASTERS);
 	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
@@ -942,7 +959,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.stencil_positive_test();
 	}
 
+	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
 	renderer.call_triangles(D::REMNANTS);
+	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 	renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
@@ -960,7 +979,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
-	receive_shadows(shaders.illuminated, true, CHARACTER_SHADOW_HEIGHT);
+	receive_shadows(shaders.illuminated, true, static_cast<float>(CHARACTER_SHADOW_HEIGHT));
 
 	draw_fog_of_war_overlay();
 	draw_sentiences(shaders.illuminated);
@@ -1075,7 +1094,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 }
 
 float illuminated_rendering_input::get_environment_shadow_strength() const {
-	if (perf_settings.shadow_quality == shadow_quality_type::NONE) {
+	if (perf_settings.sun_shadows.quality == shadow_quality_type::NONE) {
 		return 0.0f;
 	}
 
@@ -1084,7 +1103,7 @@ float illuminated_rendering_input::get_environment_shadow_strength() const {
 	}
 
 	const auto& cosm = camera.viewed_character.get_cosmos();
-	const auto map_strength = cosm.get_common_significant().light.shadow_strength;
+	const auto map_strength = cosm.get_common_significant().light.sun_shadows.strength;
 
 	/*
 		A shadow fading linearly to (1 - smoothness) of its strength is on average (2 - smoothness) / 2 as dark.
@@ -1094,14 +1113,14 @@ float illuminated_rendering_input::get_environment_shadow_strength() const {
 
 	const auto smoothness_compensation = 1.0f / (2.0f - get_environment_shadow_smoothness());
 
-	return std::clamp(map_strength * perf_settings.shadow_strength_multiplier * smoothness_compensation, 0.0f, 1.0f);
+	return std::clamp(map_strength * perf_settings.sun_shadows.strength_mult * smoothness_compensation, 0.0f, 1.0f);
 }
 
 float illuminated_rendering_input::get_environment_shadow_smoothness() const {
 	const auto& cosm = camera.viewed_character.get_cosmos();
-	const auto map_smoothness = cosm.get_common_significant().light.shadow_smoothness;
+	const auto map_smoothness = cosm.get_common_significant().light.sun_shadows.smoothness;
 
-	return std::clamp(map_smoothness * perf_settings.shadow_smoothness_multiplier, 0.0f, 1.0f);
+	return std::clamp(map_smoothness * perf_settings.sun_shadows.smoothness_mult, 0.0f, 1.0f);
 }
 
 float special_physics::get_teleport_alpha() const {

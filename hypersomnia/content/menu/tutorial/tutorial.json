@@ -11,7 +11,9 @@
         "default_server_mode": "quick_test",
         "include_disabled_nodes": false,
         "ambient_light_color": [0, 66, 89, 255],
-        "shadow_strength": 0.5130000114440918
+        "sun_shadows": {
+            "strength": 0.5130000114440918
+        }
     },
     "playtesting": {
         "mode": "quick_test"

@@ -58,7 +58,7 @@ inline void enqueue_visibility_jobs(
 		light_low_shadow_masks_vectors.resize(lights_n);
 
 		const auto smoothness_mult = 
-			cosm.get_common_significant().light.point_light_shadow_smoothness_mult 
+			cosm.get_common_significant().light.point_light_shadows.smoothness_mult 
 			* point_light_shadow_smoothness_multiplier
 		;
 

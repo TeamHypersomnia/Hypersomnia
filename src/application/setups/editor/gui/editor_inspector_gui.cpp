@@ -240,7 +240,7 @@ bool edit_property(
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if constexpr(std::is_same_v<float, T>) {
-			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow strength" || label == "Shadow opacity" || label == "Shadow hue preservation" || label == "Point light hue preservation" || label == "Shadow smoothness") {
+			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow opacity" || label == "Hue preservation" || label == "Strength" || label == "Smoothness" || label == "Shadow smoothness") {
 				if (slider(label, property, 0.0f, 1.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -262,7 +262,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult" || label == "Point light shadow smoothness mult") {
+			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult" || label == "Smoothness mult") {
 				if (slider(label, property, 0.0f, 4.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -2455,40 +2455,80 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	ImGui::Separator();
 
 	PROPERTY("Ambient light color", ambient_light_color);
-	PROPERTY("Shadow step", shadow_step);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Displacement of environment shadows per one pixel of an object's Shadow height.\nDetermines the direction of all shadows, including those of characters and bullets.");
+	ImGui::Separator();
+	text_color("Sun shadows", yellow);
+	ImGui::Separator();
+
+	{
+		auto id = scoped_id("sun_shadows");
+		auto& sun = insp.sun_shadows;
+
+		PROPERTY("Step", sun_shadows.step);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Displacement of sun shadows per one pixel of an object's Shadow height.\nDetermines the direction and length of all shadows, including those of characters and bullets.");
+		}
+
+		{
+			/*
+				The direction of the step, kept in sync with its coordinates both ways.
+			*/
+
+			const auto length = sun.step.length();
+			auto angle = sun.step.degrees();
+
+			if (angle < 0.0f) {
+				angle += 360.0f;
+			}
+
+			if (ImGui::SliderFloat("Angle", &angle, 0.0f, 360.0f, "%.0f*")) {
+				sun.step = vec2::from_degrees(angle) * length;
+				result = typesafe_sprintf("Set Sun shadow angle to %x in %x", angle);
+			}
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("The direction of sun shadows. Moving it rotates the Step, keeping its length.");
+			}
+		}
+
+		PROPERTY("Strength", sun_shadows.strength);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("How much of the ambient light is removed inside sun shadows.\nLights still illuminate shadowed areas.");
+		}
+
+		PROPERTY("Smoothness", sun_shadows.smoothness);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.\nDoesn't affect performance.");
+		}
+
+		PROPERTY("Hue preservation", sun_shadows.hue_preservation);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("1 keeps the hue of the surrounding light mix inside shadows - they only get darker.\n0 removes the ambient color, so shadows take on the hue of nearby lights.");
+		}
 	}
 
-	PROPERTY("Shadow strength", shadow_strength);
+	ImGui::Separator();
+	text_color("Point light shadows", yellow);
+	ImGui::Separator();
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("How much of the ambient light is removed inside environment shadows.\nLights still illuminate shadowed areas.");
-	}
+	{
+		auto id = scoped_id("point_light_shadows");
 
-	PROPERTY("Shadow smoothness", shadow_smoothness);
+		PROPERTY("Smoothness mult", point_light_shadows.smoothness_mult);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.\nDoesn't affect performance.");
-	}
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Scales the Shadow smoothness of every point light on this map.\nDoesn't affect performance.");
+		}
 
-	PROPERTY("Point light shadow smoothness mult", point_light_shadow_smoothness_mult);
+		PROPERTY("Hue preservation", point_light_shadows.hue_preservation);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Scales the Shadow smoothness of every point light on this map.\nDoesn't affect performance.");
-	}
-
-	PROPERTY("Point light hue preservation", point_light_hue_preservation);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("1 keeps the hue of the light mix inside shadows of point lights - they only get darker,\nso they don't abruptly change color.\n0 lets them take the hue of whatever light remains there.");
-	}
-
-	PROPERTY("Shadow hue preservation", shadow_hue_preservation);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("1 keeps the hue of the surrounding light mix inside shadows - they only get darker.\n0 removes the ambient color, so shadows take on the hue of nearby lights.");
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("1 keeps the hue of the light mix inside shadows of point lights - they only get darker,\nso they don't abruptly change color.\n0 lets them take the hue of whatever light remains there.");
+		}
 	}
 
 	ImGui::Separator();

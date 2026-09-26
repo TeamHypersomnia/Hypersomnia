@@ -5573,9 +5573,9 @@ work_result work(
 					viewed_character,
 					viewed_character_transform ? *viewed_character_transform : transformr(),
 					fog_of_war,
-					new_viewing_config.performance.point_light_shadow_smoothness_multiplier,
-					new_viewing_config.performance.point_light_soft_shadows,
-					new_viewing_config.performance.point_light_heights
+					new_viewing_config.performance.point_light_shadows.smoothness_mult,
+					new_viewing_config.performance.point_light_shadows.soft,
+					new_viewing_config.performance.point_light_shadows.heights
 				);
 			};
 

@@ -25,7 +25,7 @@
 void draw_environment_shadows(const draw_environment_shadows_input in) {
 	const auto& cosm = in.cosm;
 	const auto& light = cosm.get_common_significant().light;
-	const auto step = light.shadow_step;
+	const auto step = light.sun_shadows.step;
 	const auto si = cosm.get_si();
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto blank_uv = in.blank_tex.get_center();

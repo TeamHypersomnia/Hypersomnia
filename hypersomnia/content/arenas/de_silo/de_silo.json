@@ -12,7 +12,9 @@
         "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
         "ambient_light_color": [70, 111, 179, 255],
-        "shadow_strength": 0.6000000238418579,
+        "sun_shadows": {
+            "strength": 0.6000000238418579
+        },
         "warmup_theme": {
             "id": "arabesque"
         }

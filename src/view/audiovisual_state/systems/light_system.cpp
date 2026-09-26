@@ -233,7 +233,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const bool keep_hue_in_shadows = 
 		in.hue_light_fbo != nullptr
-		&& cosm.get_common_significant().light.point_light_hue_preservation > 0.0f
+		&& cosm.get_common_significant().light.point_light_shadows.hue_preservation > 0.0f
 	;
 
 	const bool track_removed_intensity = 

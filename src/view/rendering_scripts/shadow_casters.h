@@ -16,7 +16,7 @@
 	Helpers shared by the environment shadows and the shadows of lights with a height.
 
 	Shadow heights are in pixels of height.
-	cosmos_light_settings::shadow_step is how far the sun moves a shadow per one pixel of height.
+	sun_shadow_settings::step is how far the sun moves a shadow per one pixel of height.
 */
 
 inline uint8_t calc_fixture_shadow_height(const cosmos& cosm, const b2Fixture& fix) {

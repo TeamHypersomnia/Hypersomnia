@@ -10,7 +10,9 @@
     "settings": {
         "default_server_mode": "quick_test",
         "ambient_light_color": [5, 35, 52, 255],
-        "shadow_strength": 0.6019999980926514
+        "sun_shadows": {
+            "strength": 0.6019999980926514
+        }
     },
     "playtesting": {
         "mode": "quick_test"

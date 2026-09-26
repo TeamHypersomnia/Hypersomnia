@@ -15,6 +15,31 @@ const rgba MISSILE_SHADOW_COLOR = rgba(0, 0, 0, 140);
 const vec2 MISSILE_SHADOW_OFFSET = vec2(20, 25);
 const vec2 MISSILE_SHADOW_SCALE = vec2(1.4f, 1.8f);
 
+/*
+	A sprite lying on the ground throws its silhouette along the sun into the environment shadow texture,
+	and marks its footprint where it lies, so that it only receives shadows of what's taller - never its own.
+	The color encodes the shadow, so no special effect may alter it - e.g. the color wave of dragon fish.
+*/
+
+template <class R, class M, class I>
+void draw_ground_silhouette_shadow(
+	R renderable,
+	const M& manager,
+	I input,
+	const uint8_t height,
+	const rgba shadow_color,
+	const vec2 sun_step
+) {
+	renderable.effect = augs::sprite_special_effect::NONE;
+
+	renderable.set_color(rgba(0, 0, height, 0));
+	augs::draw(renderable, manager, input);
+
+	renderable.set_color(shadow_color);
+	input.renderable_transform.pos += sun_step * static_cast<float>(height);
+	augs::draw(renderable, manager, input);
+}
+
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 
 	const illuminated_rendering_input& in
@@ -65,7 +90,7 @@ void enqueue_illuminated_rendering_jobs(
 	*/
 
 	auto along_the_sun = [&](const vec2 legacy_offset) {
-		const auto sun_step = cosm.get_common_significant().light.shadow_step;
+		const auto sun_step = cosm.get_common_significant().light.sun_shadows.step;
 
 		if (!environment_shadows || sun_step.is_zero()) {
 			return legacy_offset;
@@ -460,6 +485,8 @@ void enqueue_illuminated_rendering_jobs(
 				&visible,
 				&cosm,
 				global_time_seconds,
+				missile_shadow_offset,
+				draw_bullet_shadows = in.drawing.draw_bullet_shadows,
 				pickable_item_to_highlight,
 				pickable_color,
 				shadows  = make_drawing_input(D::DROPPED_ITEMS_SHADOWS),
@@ -495,6 +522,19 @@ void enqueue_illuminated_rendering_jobs(
 
 
 							if (!is_laying_on_ground) {
+								/*
+									Thrown melee weapons and grenades in flight cast shadows like bullets.
+								*/
+
+								if (draw_bullet_shadows) {
+									auto make_offset_input = [missile_shadow_offset](auto offset_input) {
+										offset_input.renderable_transform += missile_shadow_offset;
+										return offset_input;
+									};
+
+									::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, shadows, make_offset_input);
+								}
+
 								::specific_draw_entity(typed_item, diffuse);
 								::specific_draw_neon_map(typed_item, neons);
 
@@ -618,10 +658,26 @@ void enqueue_illuminated_rendering_jobs(
 				&cosm,
 				&interp,
 				&game_images,
+				&visible,
 				queried_cone,
+				corpse_shadows = environment_shadows && in.perf_settings.sun_shadows.background,
 				corpses_in = make_drawing_input(D::LYING_CORPSES),
-				corpse_neons_in = make_drawing_input(D::LYING_CORPSES_NEONS)
+				corpse_neons_in = make_drawing_input(D::LYING_CORPSES_NEONS),
+				corpse_shadows_in = make_drawing_input(D::CORPSE_SHADOW_SPRITES)
 			]() {
+				const auto sun_step = cosm.get_common_significant().light.sun_shadows.step;
+				const auto corpse_shadow_color = rgba(0, 0, 0, ::encode_silhouette_shadow_opacity(255, false));
+
+				if (corpse_shadows) {
+					visible.for_each<render_layer::LYING_CORPSES>(cosm, [&](const auto& handle) {
+						handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
+							::specific_entity_drawer(typed_handle, corpse_shadows_in, [&](auto renderable, const auto& manager, auto input) {
+								::draw_ground_silhouette_shadow(renderable, manager, input, CORPSE_SHADOW_HEIGHT, corpse_shadow_color, sun_step);
+							});
+						});
+					});
+				}
+
 				h4.draw<
 					render_layer::GROUND_DECALS
 				>();
@@ -677,6 +733,14 @@ void enqueue_illuminated_rendering_jobs(
 
 								augs::draw(sprite, game_images, input);
 
+								if (corpse_shadows) {
+									auto shadow_input = corpse_shadows_in.make_input_for<invariants::sprite>();
+									shadow_input.renderable_transform = input.renderable_transform;
+									shadow_input.flip = input.flip;
+
+									::draw_ground_silhouette_shadow(sprite, game_images, shadow_input, CORPSE_SHADOW_HEIGHT, corpse_shadow_color, sun_step);
+								}
+
 								auto neon_input = corpse_neons_in.make_input_for<invariants::sprite>();
 								neon_input.renderable_transform = overlay.world_transform;
 								neon_input.flip = input.flip;
@@ -696,7 +760,14 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [character_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	/*
+		With environment shadows on, characters cast their silhouettes into the shadow texture,
+		at a single strength so that overlapping body parts don't darken each other.
+	*/
+
+	const auto sentience_shadow_offset = cosm.get_common_significant().light.sun_shadows.step * static_cast<float>(CHARACTER_SHADOW_HEIGHT);
+
+	auto sentiences_job = [environment_shadows, sentience_shadow_offset, character_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -741,6 +812,30 @@ void enqueue_illuminated_rendering_jobs(
 		const auto neons_friendly_drawing_in = make_drawing_input(D::NEONS_FRIENDLY_SENTIENCES);
 		const auto neons_enemy_drawing_in = make_drawing_input(D::NEONS_ENEMY_SENTIENCES);
 
+		const auto shadows_friendly_drawing_in = make_drawing_input(D::SENTIENCE_SHADOW_SPRITES);
+		const auto shadows_enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCE_SHADOW_SPRITES);
+
+		const auto shadow_input_customizer = [character_shadow_offset](auto modified_input) {
+			modified_input.renderable_transform += character_shadow_offset;
+			return modified_input;
+		};
+
+		const auto environment_shadow_input_customizer = [sentience_shadow_offset](auto modified_input) {
+			modified_input.renderable_transform += sentience_shadow_offset;
+			return modified_input;
+		};
+
+		const auto environment_shadow_color = rgba(CHARACTER_SHADOW_HEIGHT, 255, 0, 0);
+
+		auto draw_shadow_for = [&](const auto& typed_handle, const auto& legacy_drawing_in, const auto& environment_drawing_in) {
+			if (environment_shadows) {
+				::specific_draw_color_highlight(typed_handle, environment_shadow_color, environment_drawing_in, environment_shadow_input_customizer);
+			}
+			else {
+				::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, legacy_drawing_in, shadow_input_customizer);
+			}
+		};
+
 		if (const auto fog_of_war_character = cosm[fog_of_war_character_id ? *fog_of_war_character_id : entity_id()]) {
 			const auto fow_faction = fog_of_war_character.get_official_faction();
 
@@ -748,22 +843,17 @@ void enqueue_illuminated_rendering_jobs(
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					const bool is_local = typed_handle == fog_of_war_character;
 
-					const auto shadow_input_customizer = [character_shadow_offset](auto modified_input) {
-						modified_input.renderable_transform += character_shadow_offset;
-						return modified_input;
-					};
-
 					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction) || see_enemies_behind_walls) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle);
 
-						::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, friendly_drawing_in, shadow_input_customizer);
+						draw_shadow_for(typed_handle, friendly_drawing_in, shadows_friendly_drawing_in);
 						::specific_draw_entity(typed_handle, friendly_drawing_in);
 						::specific_draw_border(typed_handle, borders_friendly_drawing_in, standard_border_provider);
 					}
 					else {
 						draw_lights_for(neons_enemy_drawing_in, typed_handle);
 
-						::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, enemy_drawing_in, shadow_input_customizer);
+						draw_shadow_for(typed_handle, enemy_drawing_in, shadows_enemy_drawing_in);
 						::specific_draw_entity(typed_handle, enemy_drawing_in);
 						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
 
@@ -778,6 +868,10 @@ void enqueue_illuminated_rendering_jobs(
 			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					draw_lights_for(neons_friendly_drawing_in, typed_handle);
+
+					if (environment_shadows) {
+						::specific_draw_color_highlight(typed_handle, environment_shadow_color, shadows_friendly_drawing_in, environment_shadow_input_customizer);
+					}
 
 					::specific_draw_entity(typed_handle, friendly_drawing_in);
 					::specific_draw_border(typed_handle, borders_friendly_drawing_in, standard_border_provider);
@@ -878,12 +972,12 @@ void enqueue_illuminated_rendering_jobs(
 			Foreground shadows fall on everything, the ones of ground sprites only on the ground.
 		*/
 
-		const bool draw_foreground_shadows = in.perf_settings.foreground_shadows;
-		const bool draw_background_shadows = in.perf_settings.background_shadows;
+		const bool draw_foreground_shadows = in.perf_settings.sun_shadows.foreground;
+		const bool draw_background_shadows = in.perf_settings.sun_shadows.background;
 
 		auto foreground_shadows_job = [&cosm, &visible, make_drawing_input, draw_foreground_shadows, draw_background_shadows]() {
 			const auto drawing_in = make_drawing_input(D::SHADOW_SPRITES);
-			const auto sun_step = cosm.get_common_significant().light.shadow_step;
+			const auto sun_step = cosm.get_common_significant().light.sun_shadows.step;
 			visible.for_each<render_layer::GROUND, render_layer::FOREGROUND, render_layer::FOREGROUND_GLOWS>(cosm, [&](const auto& handle) {
 				handle.template dispatch_on_having_all<invariants::sprite, invariants::render>([&](const auto& typed_handle) {
 					const auto& render = typed_handle.template get<invariants::render>();
@@ -916,23 +1010,13 @@ void enqueue_illuminated_rendering_jobs(
 						::encode_silhouette_shadow_opacity(render.foreground_shadow_opacity, is_foreground)
 					);
 
-					/*
-						The color encodes the shadow, so no special effect may alter it - e.g. the color wave of dragon fish.
-					*/
-
 					::specific_entity_drawer(typed_handle, drawing_in, [&](auto renderable, const auto& manager, auto input) {
-						renderable.effect = augs::sprite_special_effect::NONE;
-
 						if (!is_foreground) {
-							/*
-								The footprint of the sprite itself, so that it receives shadows only of what's taller -
-								never its own.
-							*/
-
-							renderable.set_color(rgba(0, 0, height, 0));
-							augs::draw(renderable, manager, input);
+							::draw_ground_silhouette_shadow(renderable, manager, input, height, shadow_color, sun_step);
+							return;
 						}
 
+						renderable.effect = augs::sprite_special_effect::NONE;
 						renderable.set_color(shadow_color);
 						input.renderable_transform.pos += offset;
 
@@ -940,6 +1024,18 @@ void enqueue_illuminated_rendering_jobs(
 					});
 				});
 			});
+
+			if (draw_background_shadows) {
+				const auto corpse_shadow_color = rgba(0, 0, 0, ::encode_silhouette_shadow_opacity(255, false));
+
+				visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
+					handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
+						::specific_entity_drawer(typed_handle, drawing_in, [&](auto renderable, const auto& manager, auto input) {
+							::draw_ground_silhouette_shadow(renderable, manager, input, CORPSE_SHADOW_HEIGHT, corpse_shadow_color, sun_step);
+						});
+					});
+				});
+			}
 		};
 
 		pool.enqueue(foreground_shadows_job);

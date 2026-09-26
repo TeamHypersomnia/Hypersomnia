@@ -13,7 +13,9 @@
         "include_disabled_nodes": false,
         "default_zoom": 1.0,
         "ambient_light_color": [44, 44, 44, 255],
-        "point_light_shadow_smoothness_mult": 0.10000000149011612,
+        "point_light_shadows": {
+            "smoothness_mult": 0.10000000149011612
+        },
         "warmup_theme": {
             "id": "arabesque"
         }

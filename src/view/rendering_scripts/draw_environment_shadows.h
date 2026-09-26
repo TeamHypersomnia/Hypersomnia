@@ -11,7 +11,7 @@ class visible_entities;
 
 /*
 	Environment shadows are cast by physical bodies that bullets can't fly over,
-	under a single distant sun given by cosmos_light_settings::shadow_step.
+	under a single distant sun given by sun_shadow_settings::step.
 
 	casts_output: every caster's fixture swept along its shadow,
 	colored (shadow height, strength, 0, 0) with the strength fading towards the far end.
@@ -25,15 +25,26 @@ class visible_entities;
 /*
 	Characters have no footprints in the shadow texture - their sprites stick out of their bodies -
 	so they receive environment shadows at a fixed shadow height instead.
+	They cast their silhouettes from the same height, so they never shadow themselves or each other.
+
+	12 keeps the length of character shadows from before sun shadows existed under the default sun,
+	and stays well below the 32 of crates and walls, so a character's shadow never climbs onto them.
 */
 
-inline constexpr float CHARACTER_SHADOW_HEIGHT = 2.0f;
+inline constexpr uint8_t CHARACTER_SHADOW_HEIGHT = 12;
 
 /*
-	Foreground sprites are drawn above characters, so their shadows always come from above them too.
+	Shadows of foreground sprites fall on everything below them regardless of their height,
+	which only decides how far they are thrown.
 */
 
-inline constexpr float FOREGROUND_SHADOW_BASE_HEIGHT = CHARACTER_SHADOW_HEIGHT + 1.0f;
+inline constexpr float FOREGROUND_SHADOW_BASE_HEIGHT = 3.0f;
+
+/*
+	Lying corpses and remnants throw short, opaque shadows onto the ground, like ground sprites set to cast them.
+*/
+
+inline constexpr uint8_t CORPSE_SHADOW_HEIGHT = 4;
 
 inline uint8_t calc_foreground_shadow_height(const uint8_t extra_height) {
 	return static_cast<uint8_t>(std::min(255.0f, FOREGROUND_SHADOW_BASE_HEIGHT + extra_height));
