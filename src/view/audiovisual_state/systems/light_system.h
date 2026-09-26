@@ -40,9 +40,12 @@ struct light_system_input {
 	const cosmos& cosm;
 	std::array<float, 16> projection_matrix;
 	const augs::graphics::fbo& light_fbo;
+	const augs::graphics::fbo* const removed_light_fbo;
+	const augs::graphics::fbo* const hue_light_fbo;
 	const augs::graphics::shader_program& light_shader;
 	const augs::graphics::shader_program& textured_light_shader;
 	const augs::graphics::shader_program& standard_shader;
+	const augs::graphics::shader_program* const quantized_neon_shader;
 	std::function<void(bool)> neon_occlusion_callback;
 	std::function<void()> neon_callback;
 	std::function<void()> write_fow_to_stencil;

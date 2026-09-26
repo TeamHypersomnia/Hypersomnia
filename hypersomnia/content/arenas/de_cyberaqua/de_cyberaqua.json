@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-09-25 13:44:31.858846 UTC"
+        "version_timestamp": "2026-09-26 16:43:39.659885 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -9,8 +9,8 @@
     },
     "settings": {
         "default_server_mode": "bomb_defusal",
-        "ambient_light_color": [0, 67, 90, 255],
-        "shadow_strength": 0.7080000042915344,
+        "ambient_light_color": [0, 66, 89, 255],
+        "shadow_strength": 0.699999988079071,
         "warmup_theme": {
             "id": "arabesque"
         }
@@ -30,6 +30,16 @@
         },
         "gun_game": {
             "warmup_time": 81
+        },
+        "quick_test": {
+            "equipment": {
+                "metropolis": {
+                    "explosive": "force_grenade"
+                },
+                "resistance": {
+                    "explosive": "force_grenade"
+                }
+            }
         }
     },
     "external_resources": [
@@ -44,6 +54,7 @@
                 "is_static": true,
                 "density": 100.0,
                 "shadow_height": 128,
+                "reaches_ceiling": "NO",
                 "cover_background_neons": false
             }
         },
@@ -471,6 +482,7 @@
             "as_nonphysical": {
                 "cover_background_neons": true,
                 "illuminate_like_wall": true,
+                "casts_shadow": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -491,6 +503,8 @@
             "size": [62, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 4,
                 "OFF_custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -511,6 +525,7 @@
             "size": [62, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -531,6 +546,7 @@
             "size": [62, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
                 "OFF_custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -597,7 +613,11 @@
                 "light_colors": [[255, 255, 255, 255, 1.0]
                 ]
             },
-            "size": [18, 18]
+            "size": [18, 18],
+            "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 8
+            }
         },
         {
             "path": "gfx/decorations/electronics/brain_console_light.gif",
@@ -616,6 +636,8 @@
             "size": [128, 64],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 8,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -642,6 +664,8 @@
                 "is_static": true,
                 "density": 5.5,
                 "bounciness": 0.800000011920929,
+                "shadow_height": 100,
+                "reaches_ceiling": "NO",
                 "cover_background_neons": false,
                 "custom_shape": {
                     "source_polygon": [[-72.0, -40.0], [-48.0, -42.0], [0.0, -57.0], [47.0, -42.0], [70.0, -39.0], [71.0, 39.0], [48.0, 42.0], [0.0, 56.0], [-48.0, 43.0], [-72.0, 39.0]
@@ -686,6 +710,7 @@
                 "density": 5.5,
                 "bounciness": 0.800000011920929,
                 "shadow_height": 64,
+                "reaches_ceiling": "NO",
                 "custom_shape": {
                     "source_polygon": [[-105.0, -59.0], [-87.0, -98.0], [-37.0, -98.0], [-2.0, -77.0], [52.0, -63.0], [59.0, -67.0], [75.0, -68.0], [105.0, -38.0], [105.0, 38.0], [75.0, 68.0], [60.0, 68.0], [53.0, 64.0], [-1.0, 78.0], [-36.0, 97.0], [-86.0, 97.0], [-106.0, 58.0]
                     ],
@@ -743,6 +768,8 @@
                 "lower": 220
             },
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 9,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -817,6 +844,7 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "illuminate_like_wall": true,
+                "casts_shadow": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -839,6 +867,7 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "illuminate_like_wall": true,
+                "casts_shadow": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -979,6 +1008,9 @@
             "size": [272, 128],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 4,
+                "shadow_opacity": 1.0,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1000,6 +1032,7 @@
             "size": [518, 160],
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1026,6 +1059,9 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "full_illumination": true,
+                "casts_shadow": true,
+                "extra_shadow_height": 10,
+                "shadow_opacity": 1.0,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1149,6 +1185,9 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
                 "full_illumination": true,
+                "casts_shadow": true,
+                "extra_shadow_height": 10,
+                "shadow_opacity": 1.0,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1172,6 +1211,8 @@
             "stretch_when_resized": true,
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 4,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1197,6 +1238,8 @@
             "stretch_when_resized": true,
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_nonphysical": {
+                "casts_shadow": true,
+                "extra_shadow_height": 4,
                 "custom_footstep": {
                     "sound": {
                         "gain": 0.6000000238418579,
@@ -1401,7 +1444,8 @@
                 "is_static": true,
                 "density": 5.5,
                 "bounciness": 0.800000011920929,
-                "shadow_height": 200,
+                "shadow_height": 164,
+                "reaches_ceiling": "NO",
                 "cover_background_neons": false,
                 "custom_shape": {
                     "source_polygon": [[-267.0, -136.0], [-86.0, -137.0], [38.0, -177.0], [133.0, -144.0], [181.0, -117.0], [253.0, -117.0], [269.0, -20.0], [253.0, 86.0], [182.0, 85.0], [133.0, 112.0], [37.0, 145.0], [-87.0, 104.0], [-267.0, 105.0]
@@ -2400,7 +2444,8 @@
             "OFF_rotate_continuously_degrees_per_sec": 1.0,
             "as_physical": {
                 "is_static": true,
-                "density": 100.0
+                "density": 100.0,
+                "reaches_ceiling": "NO"
             }
         },
         {
@@ -3067,7 +3112,6 @@
         },
         {
             "id": "garden lights",
-            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp (2)",
                 "Strong lamp (31)",
@@ -3089,7 +3133,7 @@
             "id": "colliders",
             "opacity": 0.0,
             "nodes": [
-                "box_collider_glass",
+                "blank3",
                 "box_collider_metal",
                 "box_collider_metal (1)",
                 "box_collider_metal (2)",
@@ -15055,8 +15099,8 @@
             "size": [768, 32]
         },
         {
-            "id": "box_collider_glass",
-            "type": "box_collider_glass",
+            "id": "blank3",
+            "type": "@blank3",
             "pos": [1248.0, -1312.0],
             "size": [768, 768],
             "shadow_height_mult": 2.0
@@ -15515,8 +15559,7 @@
             "falloff": {
                 "radius": 1234.47705078125,
                 "strength": 9
-            },
-            "wall_falloff": {}
+            }
         },
         {
             "id": "Strong lamp (1)",
@@ -15588,7 +15631,7 @@
         {
             "id": "Strong lamp (9)",
             "type": "point_light",
-            "pos": [2924.0, -4551.0],
+            "pos": [3007.0, -4921.0],
             "color": [255, 254, 254, 78],
             "falloff": {
                 "radius": 2000.0,
@@ -15939,7 +15982,7 @@
                 "radius": 576.2490234375,
                 "strength": 19
             },
-            "wall_falloff": {
+            "OFF_wall_falloff": {
                 "radius": 962.9630126953125,
                 "strength": 23
             }
@@ -15953,7 +15996,7 @@
                 "radius": 1141.2740478515625,
                 "strength": 9
             },
-            "wall_falloff": {
+            "OFF_wall_falloff": {
                 "radius": 962.9630126953125,
                 "strength": 23
             },
@@ -15968,7 +16011,7 @@
                 "radius": 593.1265258789063,
                 "strength": 22
             },
-            "wall_falloff": {
+            "OFF_wall_falloff": {
                 "radius": 962.9630126953125,
                 "strength": 23
             }
@@ -16055,12 +16098,12 @@
         {
             "id": "Strong lamp (39)",
             "type": "point_light",
-            "pos": [-224.0, 2106.0],
-            "color": [255, 255, 255, 133],
+            "pos": [-103.0, 2143.0],
+            "color": [165, 96, 255, 133],
             "falloff": {
                 "constant": 0.6290000081062317,
                 "linear": 0.3709999918937683,
-                "radius": 1358.6500244140625,
+                "radius": 853.4949951171875,
                 "strength": 11
             },
             "wall_falloff": {},
@@ -16086,7 +16129,7 @@
         {
             "id": "Strong lamp (6)",
             "type": "point_light",
-            "pos": [1602.0, -4020.0],
+            "pos": [1190.0, -4887.0],
             "color": [255, 254, 254, 66],
             "falloff": {
                 "radius": 2000.0,

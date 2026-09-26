@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2026-09-15 23:00:34.188244 UTC"
+        "version_timestamp": "2026-09-25 21:00:58.582978 UTC"
     },
     "about": {
         "author": "lia",
@@ -13,6 +13,7 @@
         "include_disabled_nodes": false,
         "default_zoom": 1.0,
         "ambient_light_color": [44, 44, 44, 255],
+        "point_light_shadow_smoothness_mult": 0.10000000149011612,
         "warmup_theme": {
             "id": "arabesque"
         }
@@ -81,7 +82,7 @@
         },
         {
             "path": "gfx/decal1.png",
-            "file_hash": "c05e6dde1faa382ca43b5175cfce7be1c373d4c14ee80c2b810391b0ea02f64d",
+            "file_hash": "e0d3cf3ef20049db724d12355a3c1541eae102d030eb200b101a7495f19c0781",
             "id": "@decal1",
             "color": [255, 255, 255, 44],
             "size": [128, 32],
@@ -89,7 +90,7 @@
         },
         {
             "path": "gfx/decal1y.png",
-            "file_hash": "3d5d47a31a81ce7d700176ece997eba2eea2d8df31f7ac0150520b2503f4511e",
+            "file_hash": "37515671ba777d6bb0bcb57e166fe51950f4065ad4c4b855383a8910dca70db7",
             "id": "@decal1y",
             "color": [255, 255, 255, 44],
             "size": [128, 32],
@@ -97,7 +98,7 @@
         },
         {
             "path": "gfx/decal2.png",
-            "file_hash": "4cdd33c9168682632b9565f905a87f960d1ecefa3c4d0f49a10e45bb7df9e5fc",
+            "file_hash": "68d17e1565ff514b3226bab37657ec3a8a2965c5ec26de108df719068dff2164",
             "id": "@decal2",
             "color": [255, 255, 255, 44],
             "size": [32, 128],
@@ -105,7 +106,7 @@
         },
         {
             "path": "gfx/dirt1.png",
-            "file_hash": "74456438820a3bd6ce47bc1d90c87d18c513ff089c4a4c48de71502edb7dfff5",
+            "file_hash": "4d3c06cdbf73fb0646dcf595f702c21d07a4f79d93055196764e1b6e5ccfce86",
             "id": "@dirt1",
             "color": [255, 255, 255, 14],
             "size": [256, 256],
@@ -114,7 +115,7 @@
         },
         {
             "path": "gfx/dirt6.png",
-            "file_hash": "22558fd305959bee3bb68c6974518cc816c29e2477ef54c01f2bf34e51908b33",
+            "file_hash": "b4291ad0f89813885b8d2b2bbd35e1da237cadbc019341f8e2792b552138abbb",
             "id": "@dirt6",
             "color": [255, 255, 255, 82],
             "size": [512, 512],
@@ -124,7 +125,7 @@
         },
         {
             "path": "gfx/dirt7.png",
-            "file_hash": "ebdcb7bc3c3a60c3f2519b01f2bc497d6adfe0e9bde912cb31faa12fddb8191a",
+            "file_hash": "892e6f5e21c2bf0437a50615e858af6d07f514903b915680d0c437f1af8764c6",
             "id": "@dirt7",
             "color": [255, 255, 255, 60],
             "size": [1024, 512],
@@ -143,7 +144,7 @@
         },
         {
             "path": "gfx/light1.png",
-            "file_hash": "7ce4ae2e724def8a15bebb622c6a9da3abaa15de5ec5c2c2edc304508f5d0246",
+            "file_hash": "8b61389b0c7e0245f6a3fb55c5cdaf3a652895579186a9bd8dfb03ddcb790f8a",
             "id": "@light1",
             "size": [128, 128],
             "stretch_when_resized": true,
@@ -160,7 +161,7 @@
         },
         {
             "path": "gfx/metal3.png",
-            "file_hash": "168baddaf2785003fee1b4a04fb45c015855605b0d3c08a0383e89f86c6fb969",
+            "file_hash": "c345807c0c4d35b2bafb7e3ba75fb489cdcfcaafef65d21b58d79e8c29eae447",
             "id": "@metal3",
             "size": [32, 32],
             "OFF_rotate_continuously_degrees_per_sec": 1.0
@@ -175,7 +176,7 @@
         },
         {
             "path": "gfx/object1.png",
-            "file_hash": "b08417e51df4dbf09bbc6301139d8c6c224eb17a64b4630f08c534f1164a6669",
+            "file_hash": "45c63cd3adca43d2cbf4b2afd03432004bd77ba98e7361ec0de7b1d00a95a24a",
             "id": "@object1",
             "size": [64, 32],
             "stretch_when_resized": true,
@@ -183,7 +184,7 @@
         },
         {
             "path": "gfx/object2.png",
-            "file_hash": "4b734871e44c41f2a8460480733bb49269d6b9d5b69964bffb3db8808e8094d9",
+            "file_hash": "60ccf2907a744305c9cbf71301f15b8d541f35b3923caf9707cf6f3c07848981",
             "id": "@object2",
             "OFF_neon_map": {
                 "standard_deviation": 25.0,
@@ -229,7 +230,7 @@
         },
         {
             "path": "miniature.png",
-            "file_hash": "c9aaf7b8fe07a29ff1b408676571f562fdb26b4b44d9e97c2d4e5339115e4eac",
+            "file_hash": "420187204026bf54d8a2e8024325288070c49daf5f63c446b0dc6d196f54b60c",
             "id": "@miniature",
             "size": [400, 313]
         }
@@ -355,12 +356,9 @@
         {
             "id": "lights",
             "nodes": [
-                "\t (3)",
                 "\t",
                 "\t (1)",
-                "\t (4)",
-                "\t (5)",
-                "\t (12)"
+                "\t (4)"
             ]
         },
         {
@@ -1542,46 +1540,13 @@
             "pos": [210.537841796875, 328.8994140625]
         },
         {
-            "id": "\t (3)",
-            "type": "point_light",
-            "pos": [181.56405639648438, 707.7470703125],
-            "falloff": {
-                "radius": 1000.0,
-                "strength": 29
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
             "id": "\t (4)",
             "type": "point_light",
             "pos": [121.018310546875, -90.98876953125],
-            "color": [255, 71, 0, 204],
+            "color": [255, 71, 0, 104],
             "falloff": {
                 "radius": 2000.0,
                 "strength": 9
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
-            "id": "\t (5)",
-            "type": "point_light",
-            "pos": [983.2772827148438, 217.1953125],
-            "falloff": {
-                "radius": 1000.0,
-                "strength": 29
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
-            "id": "\t (12)",
-            "type": "point_light",
-            "pos": [2890.6435546875, 893.35009765625],
-            "falloff": {
-                "radius": 1000.0,
-                "strength": 29
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0

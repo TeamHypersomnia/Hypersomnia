@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-09-25 13:23:51.045195 UTC"
+        "version_timestamp": "2026-09-25 21:06:02.047583 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -9,8 +9,8 @@
     },
     "settings": {
         "default_server_mode": "quick_test",
-        "ambient_light_color": [6, 42, 63, 255],
-        "shadow_strength": 0.800000011920929
+        "ambient_light_color": [5, 35, 52, 255],
+        "shadow_strength": 0.6019999980926514
     },
     "playtesting": {
         "mode": "quick_test"
@@ -235,6 +235,9 @@
     ],
     "layers": [
         {
+            "id": "Layer 31"
+        },
+        {
             "id": "faction_pads",
             "nodes": [
                 "faction_resistance_outline",
@@ -345,6 +348,34 @@
             "is_open_in_editor": false
         },
         {
+            "id": "Layer 33",
+            "nodes": [
+                "point_light (9)-right",
+                "aquarium_bottom_lamp_light-down (5)-right",
+                "aquarium_bottom_lamp_body-down (5)-right",
+                "aquarium_bottom_lamp_light (5)-right",
+                "aquarium_bottom_lamp_body (4)-right",
+                "aquarium_bottom_lamp_light-down (4)-right",
+                "aquarium_bottom_lamp_body-down (4)-down-right",
+                "aquarium_bottom_lamp_body-down (4)-right",
+                "aquarium_bottom_lamp_light (4)-right"
+            ]
+        },
+        {
+            "id": "Layer 32",
+            "nodes": [
+                "point_light (9)",
+                "aquarium_bottom_lamp_light-down (5)",
+                "aquarium_bottom_lamp_body-down (5)",
+                "aquarium_bottom_lamp_light (5)",
+                "aquarium_bottom_lamp_body (4)",
+                "aquarium_bottom_lamp_light-down (4)",
+                "aquarium_bottom_lamp_body-down (4)-down",
+                "aquarium_bottom_lamp_body-down (4)",
+                "aquarium_bottom_lamp_light (4)"
+            ]
+        },
+        {
             "id": "Layer 18",
             "nodes": [
                 "dev_wall_256 (3)",
@@ -428,6 +459,7 @@
             "id": "Layer 5",
             "nodes": [
                 "crate (1)",
+                "crate (2)",
                 "crate"
             ]
         },
@@ -595,13 +627,11 @@
         },
         {
             "id": "Layer 7",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_128 (2)",
                 "point_light (6)",
                 "point_light (5)",
                 "point_light (4)",
-                "point_light (1)",
                 "dev_floor_128"
             ]
         },
@@ -1175,12 +1205,14 @@
         {
             "id": "crate",
             "type": "crate",
-            "pos": [-319.0, 3200.999755859375]
+            "pos": [-30.000001907348633, 2354.0]
         },
         {
             "id": "crate (1)",
             "type": "crate",
-            "pos": [321.0, 3202.0]
+            "pos": [-337.0, 3202.0],
+            "rotation": 0.49795693159103394,
+            "shadow_height_mult": 0.6140000224113464
         },
         {
             "id": "wood (10)",
@@ -1508,6 +1540,131 @@
             "size": [64, 64]
         },
         {
+            "id": "crate (2)",
+            "type": "crate",
+            "pos": [360.0, 2903.0]
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (4)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-126.0, 2254.0],
+            "rotation": -180.0,
+            "color": [255, 0, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (4)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-126.0, 2217.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (4)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-126.0, 2217.0],
+            "rotation": -180.0,
+            "color": [255, 0, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body (4)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-179.0, 2254.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (5)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-179.0, 2254.0],
+            "rotation": -180.0,
+            "color": [255, 0, 255, 255]
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (5)",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-179.0, 2217.0],
+            "rotation": -180.0,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (5)",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [-179.0, 2217.0],
+            "rotation": -180.0,
+            "color": [255, 0, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (4)-down",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [-126.0, 2254.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (5)-right",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [600.0, 2730.0],
+            "rotation": -180.0,
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (5)-right",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [600.0, 2730.0],
+            "rotation": -180.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (5)-right",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [600.0, 2767.0],
+            "rotation": -180.0,
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body (4)-right",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [600.0, 2767.0],
+            "rotation": -180.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light-down (4)-right",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [547.0, 2730.0],
+            "rotation": -180.0,
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (4)-down-right",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [547.0, 2767.0],
+            "rotation": -180.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_body-down (4)-right",
+            "type": "aquarium_bottom_lamp_body",
+            "pos": [547.0, 2730.0],
+            "rotation": -180.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "aquarium_bottom_lamp_light (4)-right",
+            "type": "aquarium_bottom_lamp_light",
+            "pos": [547.0, 2767.0],
+            "rotation": -180.0,
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
             "id": "aquarium_ambience_left",
             "type": "aquarium_ambience_left",
             "pos": [-619.0, 1274.0]
@@ -1534,18 +1691,6 @@
             }
         },
         {
-            "id": "point_light (1)",
-            "type": "point_light",
-            "pos": [-1.0, 3583.0],
-            "color": [255, 220, 0, 60],
-            "falloff": {
-                "radius": 676.364013671875,
-                "strength": 23
-            },
-            "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
-        },
-        {
             "id": "point_light (4)",
             "type": "point_light",
             "pos": [1.0, 4095.0],
@@ -1567,19 +1712,21 @@
                 "strength": 23
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "height": 0.0
         },
         {
             "id": "point_light (6)",
             "type": "point_light",
-            "pos": [-1.0, 5121.0],
+            "pos": [-1.0, 5117.0],
             "color": [0, 255, 126, 46],
             "falloff": {
                 "radius": 676.364013671875,
                 "strength": 23
             },
             "positional_vibration": 0.0,
-            "intensity_vibration": 0.0
+            "intensity_vibration": 0.0,
+            "height": 100.0
         },
         {
             "id": "point_light",
@@ -1631,6 +1778,30 @@
             "pos": [-3393.0, 3521.0],
             "falloff": {
                 "radius": 221.8179931640625
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (9)",
+            "type": "point_light",
+            "pos": [-153.0, 2234.0],
+            "color": [255, 0, 255, 60],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "point_light (9)-right",
+            "type": "point_light",
+            "pos": [574.0, 2747.0],
+            "color": [0, 255, 0, 60],
+            "falloff": {
+                "radius": 676.364013671875,
+                "strength": 23
             },
             "positional_vibration": 0.0,
             "intensity_vibration": 0.0

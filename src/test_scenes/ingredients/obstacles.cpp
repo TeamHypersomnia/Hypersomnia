@@ -37,6 +37,12 @@ namespace test_flavours {
 
 			test_flavours::add_standard_static_body(meta);
 
+			/*
+				Static obstacles are walls, so point lights never shine over them.
+			*/
+
+			meta.template get<invariants::render>().reaches_ceiling = true;
+
 			auto& fixtures_def = meta.template get<invariants::fixtures>();
 
 			fixtures_def.restitution = restitution;
@@ -120,7 +126,8 @@ namespace test_flavours {
 		{
 			/*
 				Shadow heights proportional to the wall sizes - the 128 one matches the default height.
-				The low ones are see-through, consistently with their short shadows.
+				The low ones are see-through, consistently with their short shadows,
+				and don't reach the ceiling, so point lights hanging higher shine over them.
 			*/
 
 			auto make_dev_wall = [&](const auto fid, const auto iid, const uint8_t shadow_height, const bool see_through) {
@@ -141,6 +148,7 @@ namespace test_flavours {
 
 				if (see_through) {
 					meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::GLASS_OBSTACLE];
+					meta.template get<invariants::render>().reaches_ceiling = false;
 				}
 			};
 

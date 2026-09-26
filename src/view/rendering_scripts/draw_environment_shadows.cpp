@@ -20,6 +20,7 @@
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/rendering_scripts/draw_environment_shadows.h"
+#include "view/rendering_scripts/shadow_casters.h"
 
 void draw_environment_shadows(const draw_environment_shadows_input in) {
 	const auto& cosm = in.cosm;
@@ -130,33 +131,6 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 		}
 	};
 
-	auto gather_fixture_points = [&](const b2Fixture& fix, const transformr body_transform) {
-		fixture_points.clear();
-
-		auto to_world = [&](const b2Vec2 local_meters) {
-			return body_transform.pos + vec2(si.get_pixels(vec2(local_meters))).rotate(body_transform.rotation);
-		};
-
-		const auto* const shape = fix.GetShape();
-
-		if (shape->GetType() == b2Shape::e_polygon) {
-			const auto& poly = static_cast<const b2PolygonShape&>(*shape);
-
-			for (int v = 0; v < poly.GetVertexCount(); ++v) {
-				fixture_points.push_back(to_world(poly.GetVertex(v)));
-			}
-		}
-		else if (shape->GetType() == b2Shape::e_circle) {
-			const auto& circle = static_cast<const b2CircleShape&>(*shape);
-			const auto num_sides = 12;
-
-			for (int v = 0; v < num_sides; ++v) {
-				const auto offset = vec2::from_degrees(360.0f * v / num_sides) * circle.m_radius;
-				fixture_points.push_back(to_world(circle.m_p + b2Vec2(offset.x, offset.y)));
-			}
-		}
-	};
-
 	physics.for_each_in_aabb(
 		si,
 		query.left_top(),
@@ -180,11 +154,10 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 					}
 				}
 
-				const auto& b2_transform = body->GetTransform();
-				return transformr(vec2(b2_transform.p), b2_transform.q.GetAngle()).to_user_space(si);
+				return ::calc_physical_body_transform(*body, si);
 			}();
 
-			gather_fixture_points(fix, body_transform);
+			::gather_fixture_world_points(fixture_points, fix, body_transform, si, 12);
 
 			if (fixture_points.size() < 3) {
 				return callback_result::CONTINUE;
@@ -192,30 +165,21 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 
 			const auto owner = cosm[fix.GetUserData()];
 
-			const auto height = [&]() -> uint8_t {
-				const auto base_height = [&]() {
-					if (owner) {
-						if (const auto render = owner.find<invariants::render>()) {
-							return render->shadow_height;
-						}
-					}
-
-					return invariants::render().shadow_height;
-				}();
-
-				if (owner) {
-					if (const auto rigid_body = owner.find<components::rigid_body>()) {
-						const auto scaled = std::round(base_height * rigid_body->get_raw_component().special.shadow_height_mult);
-						return static_cast<uint8_t>(std::clamp(scaled, 0.0f, 255.0f));
-					}
-				}
-
-				return base_height;
-			}();
-
-			push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, height, 0));
+			const auto height = ::calc_fixture_shadow_height(cosm, fix);
 
 			const auto filter = fix.GetFilterData();
+
+			/*
+				Through see-through bodies, like glass filling a whole aquarium, the floor below is what's seen -
+				so they don't raise it in the shadow texture. They still cast their shadows.
+			*/
+
+			const bool see_through = (filter.categoryBits & (1 << int(filter_category::GLASS_OBSTACLE))) != 0;
+
+			if (!see_through) {
+				push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, height, 0));
+			}
+
 			const bool blocks_bullets = (filter.maskBits & (1 << int(filter_category::FLYING_BULLET))) != 0;
 
 			if (!blocks_bullets || height == 0) {
@@ -284,7 +248,7 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 				}
 			}
 
-			push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, 0, 255));
+			push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, 255, 0));
 		});
 	});
 }

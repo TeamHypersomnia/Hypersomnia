@@ -29,6 +29,12 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
+
+			const auto& flavour_render = scene.world.get_flavour(flavour_id).template get<invariants::render>();
+			res.editable.as_nonphysical.casts_shadow = flavour_render.casts_foreground_shadow;
+			res.editable.as_nonphysical.extra_shadow_height = flavour_render.foreground_shadow_extra_height;
+			res.editable.as_nonphysical.shadow_opacity = flavour_render.foreground_shadow_opacity / 255.0f;
+
 			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 			pool.allocate(res);
 		});
@@ -50,7 +56,10 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
 			res.editable.domain = editor_sprite_domain::PHYSICAL;
-			res.editable.as_physical.shadow_height = scene.world.get_flavour(flavour_id).template get<invariants::render>().shadow_height;
+			const auto& flavour_render = scene.world.get_flavour(flavour_id).template get<invariants::render>();
+
+			res.editable.as_physical.shadow_height = flavour_render.shadow_height;
+			res.editable.as_physical.reaches_ceiling = flavour_render.reaches_ceiling ? reaches_ceiling_type::YES : reaches_ceiling_type::NO;
 
 			if (enum_id == test_id_type::DEV_WALL_32 || enum_id == test_id_type::DEV_WALL_64) {
 				res.editable.as_physical.is_see_through = true;

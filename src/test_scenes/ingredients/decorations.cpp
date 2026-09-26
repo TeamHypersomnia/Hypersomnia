@@ -186,6 +186,15 @@ namespace test_flavours {
 			def.sine_wandering_period = sine_wandering_period;
 
 			def.susceptible_to.set(scare_source::MELEE);
+
+			/*
+				Insects flutter a little above characters.
+			*/
+
+			auto& render = meta.template get<invariants::render>();
+			render.casts_foreground_shadow = true;
+			render.foreground_shadow_extra_height = 6;
+			render.foreground_shadow_opacity = 255;
 		};
 
 		insect_flavour(
@@ -261,37 +270,52 @@ namespace test_flavours {
 			);
 
 			meta.get<invariants::sprite>().neon_alpha_vibration.is_enabled = true;
+
+			auto& render = meta.template get<invariants::render>();
+			render.casts_foreground_shadow = true;
+			render.foreground_shadow_extra_height = 5;
 		}
 
-		fish_flavour(
+		/*
+			Fish swim a little above the aquarium floor, and water lets much of the light through.
+		*/
+
+		auto set_fish_shadow = [](auto& meta) {
+			auto& render = meta.template get<invariants::render>();
+			render.casts_foreground_shadow = true;
+			render.foreground_shadow_extra_height = 6;
+			render.foreground_shadow_opacity = 255;
+		};
+
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::YELLOW_FISH,
 			test_scene_image_id::YELLOW_FISH_1,
 			test_scene_plain_animation_id::YELLOW_FISH,
 			test_ground_order::UPPER_FISH
-		);
+		));
 
-		fish_flavour(
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::DARKBLUE_FISH,
 			test_scene_image_id::DARKBLUE_FISH_1,
 			test_scene_plain_animation_id::DARKBLUE_FISH,
 			test_ground_order::UPPER_FISH
-		);
+		));
 		
-		fish_flavour(
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::CYANVIOLET_FISH,
 			test_scene_image_id::CYANVIOLET_FISH_1,
 			test_scene_plain_animation_id::CYANVIOLET_FISH,
 			test_ground_order::UPPER_FISH
-		);
+		));
 
-		fish_flavour(
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::JELLYFISH,
 			test_scene_image_id::JELLYFISH_1,
 			test_scene_plain_animation_id::JELLYFISH,
 			test_ground_order::UPPER_FISH
-		);
+		));
 
-		fish_flavour(
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::RAINBOW_DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
@@ -299,16 +323,16 @@ namespace test_flavours {
 			160,
 			200,
 			augs::sprite_special_effect::COLOR_WAVE
-		);
+		));
 
-		fish_flavour(
+		set_fish_shadow(fish_flavour(
 			test_dynamic_decorations::DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
 			test_ground_order::BOTTOM_FISH,
 			160,
 			200
-		);
+		));
 
 #if 0
 		flavour_with_sprite(
@@ -325,11 +349,22 @@ namespace test_flavours {
 			render_layer::FOREGROUND
 		);
 
-		flavour_with_sprite(
-			test_static_decorations::FERN,
-			test_scene_image_id::FERN,
-			render_layer::FOREGROUND
-		);
+		{
+			auto& meta = flavour_with_sprite(
+				test_static_decorations::FERN,
+				test_scene_image_id::FERN,
+				render_layer::FOREGROUND
+			);
+
+			/*
+				A fern hangs a little above characters.
+			*/
+
+			auto& render = meta.template get<invariants::render>();
+			render.casts_foreground_shadow = true;
+			render.foreground_shadow_extra_height = 10;
+			render.foreground_shadow_opacity = 255;
+		}
 
 		set_dirt_footstep(flavour_with_sprite(
 			test_static_decorations::FLOWERBED_CYAN,
@@ -431,11 +466,16 @@ namespace test_flavours {
 			sand_color
 		);
 
+		/*
+			Water is drawn in the foreground, over the fish -
+			which cast shadows, so they are drawn above the rest of the ground.
+		*/
+
 		{
 			auto& meta = flavour_with_sprite(
 				test_static_decorations::WATER_COLOR_OVERLAY,
 				test_scene_image_id::BLANK,
-				test_ground_order::WATER_COLOR_OVERLAYS,
+				render_layer::FOREGROUND,
 				rgba(0, 75, 255, 46)
 			);
 
@@ -446,7 +486,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_dynamic_decorations::WATER_CAUSTICS,
 				test_scene_image_id::WATER_SURFACE_1,
-				test_ground_order::WATER_SURFACES
+				render_layer::FOREGROUND
 			);
 
 			meta.get<invariants::sprite>().color.a = 0;

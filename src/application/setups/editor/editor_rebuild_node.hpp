@@ -80,6 +80,9 @@ bool setup_entity_from_node(
 		auto& light = agg.template get<components::light>();
 		light.color *= editable.color;
 		light.cast_shadows = editable.cast_shadows;
+		light.hue_through_walls = editable.hue_through_walls;
+		light.shadow_smoothness = editable.shadow_smoothness;
+		light.height = editable.height;
 
 		set_attn_from_falloff(light.attenuation, node.editable.falloff);
 
