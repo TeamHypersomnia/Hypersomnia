@@ -3,14 +3,15 @@
 #include "game/detail/visible_entities.hpp"
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
 #include "game/detail/use_interaction_logic.h"
+#include "game/detail/melee/like_melee.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "view/rendering_scripts/corpse_head_overlays.h"
 #include "view/rendering_scripts/draw_minimap.h"
 #include "view/rendering_scripts/draw_environment_shadows.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
 
-const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 90);
-const vec2 CHARACTER_SHADOW_OFFSET = vec2(24, 24);
+const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 100);
+const vec2 CHARACTER_SHADOW_OFFSET = vec2(21, 21);
 
 /*
 	Living characters throw their shadows a bit closer than the legacy offset,
@@ -588,12 +589,30 @@ void enqueue_illuminated_rendering_jobs(
 								*/
 
 								if (draw_bullet_shadows) {
-									auto make_offset_input = [missile_shadow_offset](auto offset_input) {
-										offset_input.renderable_transform += missile_shadow_offset;
-										return offset_input;
-									};
+									/*
+										A thrown melee weapon falls as it slows down -
+										its shadow shortens until it lands right under it.
+									*/
 
-									::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, shadows, make_offset_input);
+									const auto falling_mult = [&]() {
+										if (::is_like_thrown_melee(typed_item)) {
+											const auto melee = typed_item.template find<components::melee>();
+											const auto melee_def = typed_item.template find<invariants::melee>();
+
+											if (melee != nullptr && melee_def != nullptr) {
+												const auto landing_speed = melee_def->throw_def.min_speed_to_hurt;
+												const auto speed = typed_item.template get<components::rigid_body>().get_velocity().length();
+
+												if (melee->top_thrown_speed > landing_speed) {
+													return std::clamp((speed - landing_speed) / (melee->top_thrown_speed - landing_speed), 0.0f, 1.0f);
+												}
+											}
+										}
+
+										return 1.0f;
+									}();
+
+									::specific_draw_color_highlight(typed_item, MISSILE_SHADOW_COLOR, shadows, ::make_shadow_offset_customizer(missile_shadow_offset * falling_mult));
 								}
 
 								::specific_draw_entity(typed_item, diffuse);

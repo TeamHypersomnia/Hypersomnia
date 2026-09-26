@@ -54,11 +54,22 @@ void melee_system::advance_thrown_melee_logic(const logic_step step) {
 		auto& sender = it.template get<components::sender>();
 
 		if (sender.is_set()) {
+			auto& melee = it.template get<components::melee>();
+
 			if (!has_hurting_velocity(it)) {
 				sender.unset();
-				it.template get<components::melee>().when_landed = cosm.get_timestamp();
+				melee.when_landed = cosm.get_timestamp();
+				melee.top_thrown_speed = 0.f;
 				it.infer_rigid_body();
 				it.infer_colliders();
+			}
+			else {
+				/*
+					For the view to tell how far the flight has gone.
+				*/
+
+				const auto speed = it.template get<components::rigid_body>().get_velocity().length();
+				melee.top_thrown_speed = std::max(melee.top_thrown_speed, speed);
 			}
 		}
 	});
