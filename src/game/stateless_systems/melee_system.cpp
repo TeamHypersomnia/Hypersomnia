@@ -56,6 +56,7 @@ void melee_system::advance_thrown_melee_logic(const logic_step step) {
 		if (sender.is_set()) {
 			if (!has_hurting_velocity(it)) {
 				sender.unset();
+				it.template get<components::melee>().when_landed = cosm.get_timestamp();
 				it.infer_rigid_body();
 				it.infer_colliders();
 			}

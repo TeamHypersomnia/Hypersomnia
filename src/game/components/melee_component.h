@@ -97,6 +97,7 @@ namespace components {
 		augs::stepped_timestamp when_passed_held_item;
 		augs::stepped_timestamp when_clashed;
 		augs::stepped_timestamp when_inflicted_damage;
+		augs::stepped_timestamp when_landed;
 		real32 gore_freshness = -1.f;
 		// END GEN INTROSPECTOR
 	};

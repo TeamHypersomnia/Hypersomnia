@@ -543,8 +543,23 @@ void enqueue_illuminated_rendering_jobs(
 
 							const auto bounce_dir = touch_collectible ? vec2(0, -1) : vec2(-1, -1);
 							const auto bounce_height = touch_collectible ? 10.0f : 8.f;
-							const auto bounce_variation_secs = 2.0 * double(typed_item.get_id().raw.indirection_index);
-							const auto bounce_progress = static_cast<float>((1.0 + std::sin(1.5 * (global_time_seconds + bounce_variation_secs) * PI<double>)) / 2.0);
+							/*
+								Thrown melee weapons start bouncing from the ground as they land,
+								so they don't jump when they stop being drawn as flying.
+								A third of a second back is where the bounce is lowest.
+							*/
+
+							const auto bounce_secs = [&]() {
+								if (const auto melee = typed_item.template find<components::melee>()) {
+									if (melee->when_landed.was_set()) {
+										return global_time_seconds - melee->when_landed.in_seconds(cosm.get_fixed_delta()) - 1.0 / 3.0;
+									}
+								}
+
+								return global_time_seconds + 2.0 * double(typed_item.get_id().raw.indirection_index);
+							}();
+
+							const auto bounce_progress = static_cast<float>((1.0 + std::sin(1.5 * bounce_secs * PI<double>)) / 2.0);
 
 							const auto shadow_alpha = bounce_progress;
 							const auto overlay_alpha = 1.0f - bounce_progress;
