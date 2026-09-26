@@ -15,6 +15,8 @@ struct editor_arena_settings {
 	real32 shadow_strength = 0.35f;
 	real32 shadow_hue_preservation = 1.0f;
 	real32 shadow_smoothness = 1.0f;
+	real32 point_light_shadow_smoothness_mult = 0.5f;
+	real32 point_light_hue_preservation = 1.0f;
 	editor_theme warmup_theme;
 	uint32_t navmesh_cell_size = 128;
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);

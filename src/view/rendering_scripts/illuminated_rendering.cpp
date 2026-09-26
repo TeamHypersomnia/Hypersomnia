@@ -56,12 +56,6 @@
 
 #include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
 
-/*
-	Characters have no footprints in the shadow texture - their sprites stick out of their bodies -
-	so they receive environment shadows at a fixed shadow height instead.
-*/
-
-constexpr float CHARACTER_SHADOW_HEIGHT = 2.0f;
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	using U = augs::common_uniform_name;
@@ -638,6 +632,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			cosm, 
 			matrix,
 			fbos.light.value(),
+			fbos.removed_light.has_value() ? std::addressof(fbos.removed_light.value()) : nullptr,
+			fbos.hue_light.has_value() ? std::addressof(fbos.hue_light.value()) : nullptr,
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
@@ -803,6 +799,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.set_max_blending();
 		renderer.call_triangles(D::SHADOW_CASTS);
 		renderer.call_triangles(D::SHADOW_FOOTPRINTS);
+
+		if (shaders.shadow_sprite) {
+			set_shader_with_matrix(shaders.shadow_sprite);
+			renderer.call_triangles(D::SHADOW_SPRITES);
+			set_shader_with_matrix(shaders.standard);
+		}
 	}
 	
 	renderer.set_standard_blending();
@@ -863,6 +865,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
+	set_uniform(shaders.illuminated, U::quantize_lights, in.perf_settings.quantize_lights ? 1 : 0);
+
+	set_uniform(shaders.illuminated, U::removed_light_available, fbos.removed_light.has_value() && in.perf_settings.quantize_lights ? 1 : 0);
+
+	set_uniform(
+		shaders.illuminated,
+		U::point_light_hue_preservation,
+		fbos.hue_light.has_value() ? cosm.get_common_significant().light.point_light_hue_preservation : 0.0f
+	);
 	setup_shadow_uniforms(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true);
 
@@ -884,6 +895,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shaders.illuminated, U::fully_lit, 0);
 	}
 	renderer.call_triangles(D::LYING_CORPSES);
+
+	/*
+		Ground sprites casting shadows, above decals and corpses.
+		Their footprints in the shadow texture keep them from receiving their own shadows,
+		and only decide which shadows reach them - the shadows aren't displaced by their small heights.
+	*/
+
+	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
+	renderer.call_triangles(D::GROUND_SHADOW_CASTERS);
+	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
 	if (strict_fow) {
 		renderer.set_stencil(true);

@@ -9,6 +9,7 @@
         "short_description": "A timeless 2017 classic."
     },
     "settings": {
+        "ambient_light_color": [51, 93, 98, 255],
         "default_server_mode": "bomb_defusal",
         "shadow_strength": 0.7239999771118164,
         "shadow_smoothness": 0.0

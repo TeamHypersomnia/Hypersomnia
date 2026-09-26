@@ -340,11 +340,27 @@ void setup_scene_object_from_resource(
 			}();
 
 			if (domain == editor_sprite_domain::PHYSICAL) {
-				render.shadow_height = editable.as_physical.shadow_height;
+				const auto& physical = editable.as_physical;
+
+				render.shadow_height = physical.shadow_height;
+
+				render.reaches_ceiling = [&]() {
+					switch (physical.reaches_ceiling) {
+						case reaches_ceiling_type::YES: return true;
+						case reaches_ceiling_type::NO: return false;
+						default: return physical.is_static && !physical.is_shoot_through;
+					}
+				}();
 			}
 
 			on_domain_specific([&](auto& specific) {
 				render.special_functions.set(special_render_function::ILLUMINATE_AS_WALL, specific.illuminate_like_wall);
+
+				if (domain != editor_sprite_domain::PHYSICAL) {
+					render.casts_foreground_shadow = editable.as_nonphysical.casts_shadow;
+					render.foreground_shadow_extra_height = editable.as_nonphysical.extra_shadow_height;
+					render.foreground_shadow_opacity = static_cast<uint8_t>(std::clamp(editable.as_nonphysical.shadow_opacity, 0.0f, 1.0f) * 255.0f + 0.5f);
+				}
 
 				if (domain == editor_sprite_domain::FOREGROUND) {
 					render.special_functions.set(special_render_function::COVER_GROUND_NEONS, false);

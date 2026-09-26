@@ -5572,7 +5572,10 @@ work_result work(
 					fog_of_war_effective,
 					viewed_character,
 					viewed_character_transform ? *viewed_character_transform : transformr(),
-					fog_of_war
+					fog_of_war,
+					new_viewing_config.performance.point_light_shadow_smoothness_multiplier,
+					new_viewing_config.performance.point_light_soft_shadows,
+					new_viewing_config.performance.point_light_heights
 				);
 			};
 

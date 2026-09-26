@@ -555,15 +555,25 @@ void enqueue_illuminated_rendering_jobs(
 				missile_shadow_offset,
 				&visible,
 				&cosm,
-				h1 = make_helper(D::GROUND),
+				ground_in = make_drawing_input(D::GROUND),
+				ground_shadow_casters_in = make_drawing_input(D::GROUND_SHADOW_CASTERS),
 				h2 = make_helper(D::MISSILES),
 				missiles_shadows  = make_drawing_input(D::MISSILES_SHADOWS)
 			]() {
-				h1.draw<
+				/*
+					Ground sprites that cast shadows go to their own buffer, drawn above decals and corpses.
+				*/
+
+				visible.for_each<
 					render_layer::GROUND,
 					render_layer::PLANTED_ITEMS,
 					render_layer::OBSTACLES_UNDER_MISSILES
-				>();
+				>(cosm, [&](const auto& handle) {
+					const auto render = handle.template find<invariants::render>();
+					const bool casts_shadow = render != nullptr && render->casts_foreground_shadow;
+
+					::draw_entity(handle, casts_shadow ? ground_shadow_casters_in : ground_in);
+				});
 
 				h2.draw<
 					render_layer::MISSILES
@@ -860,6 +870,77 @@ void enqueue_illuminated_rendering_jobs(
 		};
 
 		pool.enqueue(environment_shadows_job);
+
+		/*
+			Sprites that cast silhouette shadows - foreground ones, or fish swimming above the aquarium floor -
+			throw them along the sun, like characters do,
+			but into the environment shadow texture - so only what lies lower receives them.
+		*/
+
+		const bool draw_foreground_shadows = in.perf_settings.foreground_shadows;
+		const bool draw_background_shadows = in.perf_settings.background_shadows;
+
+		auto foreground_shadows_job = [&cosm, &visible, make_drawing_input, draw_foreground_shadows, draw_background_shadows]() {
+			const auto drawing_in = make_drawing_input(D::SHADOW_SPRITES);
+			const auto sun_step = cosm.get_common_significant().light.shadow_step;
+			visible.for_each<render_layer::GROUND, render_layer::FOREGROUND, render_layer::FOREGROUND_GLOWS>(cosm, [&](const auto& handle) {
+				handle.template dispatch_on_having_all<invariants::sprite, invariants::render>([&](const auto& typed_handle) {
+					const auto& render = typed_handle.template get<invariants::render>();
+
+					if (!render.casts_foreground_shadow) {
+						return;
+					}
+
+					/*
+						Foreground always hangs above characters, anything lower casts from its own height.
+					*/
+
+					const bool is_foreground = render.layer == render_layer::FOREGROUND || render.layer == render_layer::FOREGROUND_GLOWS;
+
+					if (!(is_foreground ? draw_foreground_shadows : draw_background_shadows)) {
+						return;
+					}
+
+					const auto height = 
+						is_foreground ?
+						::calc_foreground_shadow_height(render.foreground_shadow_extra_height) :
+						std::max(uint8_t(1), render.foreground_shadow_extra_height)
+					;
+					const auto offset = sun_step * static_cast<float>(height);
+
+					const auto shadow_color = 
+						is_foreground ?
+						rgba(height, render.foreground_shadow_opacity, 0, 0) :
+						rgba(0, 0, 0, render.foreground_shadow_opacity)
+					;
+
+					/*
+						The color encodes the shadow, so no special effect may alter it - e.g. the color wave of dragon fish.
+					*/
+
+					::specific_entity_drawer(typed_handle, drawing_in, [&](auto renderable, const auto& manager, auto input) {
+						renderable.effect = augs::sprite_special_effect::NONE;
+
+						if (!is_foreground) {
+							/*
+								The footprint of the sprite itself, so that it receives shadows only of what's taller -
+								never its own.
+							*/
+
+							renderable.set_color(rgba(0, 0, height, 0));
+							augs::draw(renderable, manager, input);
+						}
+
+						renderable.set_color(shadow_color);
+						input.renderable_transform.pos += offset;
+
+						augs::draw(renderable, manager, input);
+					});
+				});
+			});
+		};
+
+		pool.enqueue(foreground_shadows_job);
 	}
 }
 

@@ -240,7 +240,7 @@ bool edit_property(
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if constexpr(std::is_same_v<float, T>) {
-			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow strength" || label == "Shadow hue preservation" || label == "Shadow smoothness") {
+			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow strength" || label == "Shadow opacity" || label == "Shadow hue preservation" || label == "Point light hue preservation" || label == "Shadow smoothness") {
 				if (slider(label, property, 0.0f, 1.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -249,7 +249,20 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult") {
+			if (label == "Light height") {
+				/*
+					The same range as Shadow height of objects - a light higher than all of them only shortens every shadow further.
+				*/
+
+				if (slider(label, property, 0.0f, 256.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult" || label == "Point light shadow smoothness mult") {
 				if (slider(label, property, 0.0f, 4.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -535,7 +548,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Shadow height") {
+			if (label == "Shadow height" || label == "Extra shadow height") {
 				if (slider(label, property, uint8_t(0u), uint8_t(255u))) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -1394,6 +1407,24 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		text_tooltip("If disabled, walls and other obstacles don't block this light.");
 	}
 
+	MULTIPROPERTY("Shadow smoothness", shadow_smoothness);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Softens the edges of this light's shadows.\nThe penumbra widens with the distance from the light.\nScaled by the arena's Point light shadow smoothness mult.\nDoesn't affect performance.");
+	}
+
+	MULTIPROPERTY("Hue through walls", hue_through_walls);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Keeping the hue of this light in its shadows (the arena's Point light hue preservation)\nwill go even through walls that reach the ceiling,\ngiving a GI-like effect. Makes sense only for rooms that are very \"open\".\n\nThis happens by default for shadows of objects with finite height.");
+	}
+
+	MULTIPROPERTY("Light height", height);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("How high the light hangs, in pixels - the same units as Shadow height of objects.\nObstacles lower than the light throw shadows that end before its reach,\nthe taller ones - and walls with no Shadow height - throw them to the end.\n0 means infinitely high: every shadow reaches the end, like before heights existed.");
+	}
+
 	ImGui::Separator();
 	text("Falloff");
 
@@ -1866,7 +1897,13 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Shadow height", as_physical.shadow_height);
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("How tall this object is, in levels of the arena's Shadow step.\nOnly objects that bullets can't fly over cast shadows,\nbut every physical object receives shadows of taller objects.");
+			text_tooltip("How tall this object is, in pixels.\nDetermines the length of its sun shadow and whether point lights hanging higher shine over it.\nOnly objects that bullets can't fly over cast sun shadows,\nbut every physical object receives shadows of taller objects.");
+		}
+
+		MULTIPROPERTY("Reaches ceiling", as_physical.reaches_ceiling);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If it does, point lights never shine over it, whatever its Shadow height - like walls of a room.\nThe sun shadow still follows the Shadow height.\n\nAuto: static objects that bullets can't fly over reach the ceiling,\nso walls and invisible colliders block lights, crates and tables don't.");
 		}
 	}
 	else {
@@ -1882,6 +1919,43 @@ EDIT_FUNCTION(
 		}
 
 		ImGui::Separator();
+
+		{
+			const bool is_foreground = insp.domain == editor_sprite_domain::FOREGROUND;
+
+			MULTIPROPERTY("Casts shadow", as_nonphysical.casts_shadow);
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip(
+					is_foreground ?
+					"Throws the sprite's silhouette as a sun shadow, along the arena's Shadow step.\nForeground is drawn above characters, so it always shadows them too.\nDoesn't affect performance." :
+					"Throws the sprite's silhouette as a sun shadow, along the arena's Shadow step,\nonto everything lower than its Shadow height.\nThe sprite is then drawn above decals and corpses, e.g. a bench blood splatters under.\nDoesn't affect performance."
+				);
+			}
+
+			if (insp.as_nonphysical.casts_shadow) {
+				if (is_foreground) {
+					MULTIPROPERTY("Extra shadow height", as_nonphysical.extra_shadow_height);
+
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("How much higher than characters this hangs.\nThe higher, the further the shadow falls from the sprite,\nand the taller the objects below it that it still shadows.");
+					}
+				}
+				else {
+					MULTIPROPERTY("Shadow height", as_nonphysical.extra_shadow_height);
+
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("How high the sprite rises above the ground, in pixels of height.\n1 already offsets the shadow by a few pixels. Characters stand at 2.");
+					}
+				}
+
+				MULTIPROPERTY("Shadow opacity", as_nonphysical.shadow_opacity);
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Scales the arena's Shadow strength for this sprite's shadow.\nFoliage lets some light through - 1 matches the arena's other shadows.");
+				}
+			}
+		}
 
 		MULTIPROPERTY("Custom footstep", as_nonphysical.custom_footstep.is_enabled);
 
@@ -2384,7 +2458,7 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	PROPERTY("Shadow step", shadow_step);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("Displacement of environment shadows per one level of an object's Shadow height.\nDetermines the direction of all shadows, including those of characters and bullets.");
+		text_tooltip("Displacement of environment shadows per one pixel of an object's Shadow height.\nDetermines the direction of all shadows, including those of characters and bullets.");
 	}
 
 	PROPERTY("Shadow strength", shadow_strength);
@@ -2396,7 +2470,19 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	PROPERTY("Shadow smoothness", shadow_smoothness);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.");
+		text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.\nDoesn't affect performance.");
+	}
+
+	PROPERTY("Point light shadow smoothness mult", point_light_shadow_smoothness_mult);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Scales the Shadow smoothness of every point light on this map.\nDoesn't affect performance.");
+	}
+
+	PROPERTY("Point light hue preservation", point_light_hue_preservation);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("1 keeps the hue of the light mix inside shadows of point lights - they only get darker,\nso they don't abruptly change color.\n0 lets them take the hue of whatever light remains there.");
 	}
 
 	PROPERTY("Shadow hue preservation", shadow_hue_preservation);

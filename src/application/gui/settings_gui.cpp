@@ -896,22 +896,48 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.performance;
 
-					revertable_enum_radio(SCOPE_CFG_NVP(shadow_quality));
+					revertable_enum_radio(std::string("Sun shadows##") + std::to_string(field_id++), scope_cfg.shadow_quality);
 
 					{
 						auto scope = scoped_indent();
 
 						text_disabled(
-							"Shadows cast by walls and other objects that bullets can't fly over.\n"
+							"Shadows along the map's sun, cast by walls and other objects that bullets can't fly over.\n"
 							"Low skips a correction for the lit side of tall objects - a little faster, a little less accurate."
 						);
+
+						revertable_checkbox("Foreground shadows", scope_cfg.foreground_shadows);
+						tooltip_on_hover("Sun shadows of foreground sprites set to cast them, like plants and insects.");
+
+						revertable_checkbox("Background shadows", scope_cfg.background_shadows);
+						tooltip_on_hover("Sun shadows of sprites lying on the ground set to cast them, like fish or planters.");
 					}
 
-					revertable_slider(SCOPE_CFG_NVP(shadow_strength_multiplier), 0.f, 2.f);
-					tooltip_on_hover("Scales how dark the shadows are relative to what the map sets.\n0 disables shadows entirely, same as None.");
+					text("Point light shadows");
 
-					revertable_slider(SCOPE_CFG_NVP(shadow_smoothness_multiplier), 0.f, 1.f);
-					tooltip_on_hover("Scales how much shadows fade along their length relative to what the map sets.\n0 makes them hard. They stay as dark on average.");
+					{
+						auto scope = scoped_indent();
+
+						revertable_checkbox("Soft shadows##point_lights", scope_cfg.point_light_soft_shadows);
+						tooltip_on_hover("If not ticked, shadows of point lights have hard edges regardless of what the map sets.");
+
+						revertable_checkbox("Heights##point_lights", scope_cfg.point_light_heights);
+						tooltip_on_hover("If not ticked, point lights ignore their Light height:\nevery shadow reaches the end of the light, computed from the visibility polygon like before heights existed.");
+					}
+
+					revertable_checkbox("Quantize lights", scope_cfg.quantize_lights);
+					tooltip_on_hover("If ticked, lights brighten the scene in a few discrete bands for the pixel-art look.\nPenumbras of shadows stay smooth either way.\nIf not, the brightening is smooth everywhere.");
+
+					if (auto node = scoped_tree_node("Advanced##Lighting")) {
+						revertable_slider(std::string("Sun shadow strength##") + std::to_string(field_id++), scope_cfg.shadow_strength_multiplier, 0.f, 2.f);
+						tooltip_on_hover("Scales how dark sun shadows are relative to what the map sets.\n0 disables them entirely, same as None.");
+
+						revertable_slider(std::string("Sun shadow smoothness##") + std::to_string(field_id++), scope_cfg.shadow_smoothness_multiplier, 0.f, 1.f);
+						tooltip_on_hover("Scales how much sun shadows fade along their length relative to what the map sets.\n0 makes them hard. They stay as dark on average.\nDoesn't affect performance.");
+
+						revertable_slider(std::string("Point light shadow smoothness##") + std::to_string(field_id++), scope_cfg.point_light_shadow_smoothness_multiplier, 0.f, 1.f);
+						tooltip_on_hover("Scales how soft the edges of shadows cast by point lights are relative to what the map sets.\n0 makes them hard.\nDoesn't affect performance.");
+					}
 				}
 
 				ImGui::Separator();

@@ -88,6 +88,88 @@ void light_system::advance_attenuation_variations(
 	);
 }
 
+/*
+	Draws the part of the reach rectangle that a light can illuminate - a polygon circumscribing its circle, clipped to the rectangle.
+	Fragments beyond the circle would be discarded by the light shader anyway, so this only saves the work on them.
+*/
+
+static void draw_light_area(
+	augs::renderer& renderer,
+	const ltrb reach,
+	const vec2 center,
+	const real32 radius,
+	const rgba col
+) {
+	constexpr int num_sides = 32;
+
+	thread_local std::vector<vec2> polygon;
+	thread_local std::vector<vec2> clipped;
+
+	polygon.clear();
+
+	const auto circumscribed_radius = radius / std::cos(PI<real32> / num_sides) + 2.0f;
+
+	for (int i = 0; i < num_sides; ++i) {
+		polygon.push_back(center + vec2::from_degrees(360.0f * i / num_sides) * circumscribed_radius);
+	}
+
+	auto clip = [&](auto inside, auto intersect) {
+		clipped.clear();
+
+		for (std::size_t i = 0; i < polygon.size(); ++i) {
+			const auto a = polygon[i];
+			const auto b = polygon[(i + 1) % polygon.size()];
+
+			const bool a_in = inside(a);
+			const bool b_in = inside(b);
+
+			if (a_in) {
+				clipped.push_back(a);
+			}
+
+			if (a_in != b_in) {
+				clipped.push_back(intersect(a, b));
+			}
+		}
+
+		polygon.swap(clipped);
+	};
+
+	auto at_x = [](const vec2 a, const vec2 b, const real32 x) {
+		return vec2(x, a.y + (b.y - a.y) * (x - a.x) / (b.x - a.x));
+	};
+
+	auto at_y = [](const vec2 a, const vec2 b, const real32 y) {
+		return vec2(a.x + (b.x - a.x) * (y - a.y) / (b.y - a.y), y);
+	};
+
+	clip([&](const vec2 p) { return p.x >= reach.l; }, [&](const vec2 a, const vec2 b) { return at_x(a, b, reach.l); });
+	clip([&](const vec2 p) { return p.x <= reach.r; }, [&](const vec2 a, const vec2 b) { return at_x(a, b, reach.r); });
+	clip([&](const vec2 p) { return p.y >= reach.t; }, [&](const vec2 a, const vec2 b) { return at_y(a, b, reach.t); });
+	clip([&](const vec2 p) { return p.y <= reach.b; }, [&](const vec2 a, const vec2 b) { return at_y(a, b, reach.b); });
+
+	if (polygon.size() < 3) {
+		return;
+	}
+
+	for (std::size_t i = 2; i < polygon.size(); ++i) {
+		augs::vertex_triangle tri;
+
+		tri.vertices[0].pos = polygon[0];
+		tri.vertices[1].pos = polygon[i - 1];
+		tri.vertices[2].pos = polygon[i];
+
+		for (auto& v : tri.vertices) {
+			v.color = col;
+			v.texcoord = vec2::zero;
+		}
+
+		renderer.push_triangle(tri);
+	}
+
+	renderer.call_and_clear_triangles();
+}
+
 struct light_uniforms {
 	using U = augs::common_uniform_name;
 
@@ -139,11 +221,39 @@ void light_system::render_all_lights(const light_system_input in) const {
 		light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 
 		set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
+		set_uniform(light_shader, augs::common_uniform_name::light_pass, 0);
 
 		renderer.set_additive_blending();
 	};
 
+	/*
+		The removed light texture holds the light that all shadows removed - for the quantization,
+		and the hue light texture - the light that shadows of low obstacles removed, for keeping the hue.
+	*/
+
+	const bool keep_hue_in_shadows = 
+		in.hue_light_fbo != nullptr
+		&& cosm.get_common_significant().light.point_light_hue_preservation > 0.0f
+	;
+
+	const bool track_removed_intensity = 
+		in.removed_light_fbo != nullptr
+		&& in.perf_settings.quantize_lights
+	;
+
+	const bool track_removed_light = keep_hue_in_shadows || track_removed_intensity;
+
+	auto set_pass = [&](const int pass) {
+		set_uniform(light_shader, augs::common_uniform_name::light_pass, pass);
+	};
+
 	auto overlay_light_polygons = [&]() {
+		if (track_removed_light) {
+			renderer.set_active_texture(6);
+			in.light_fbo.get_texture().set_as_current(renderer);
+			renderer.set_active_texture(0);
+		}
+
 		for (std::size_t i = 0; i < light_requests.size(); ++i) {
 			const auto& request = light_requests[i];
 
@@ -208,9 +318,92 @@ void light_system::render_all_lights(const light_system_input in) const {
 					cutoff_distance
 				);
 
-				renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);
+				/*
+					Every light is its whole reach, scaled by the mask of its shadows
+					built in the alpha of the light texture - see light.fsh for the passes.
+					Lights with a height build it from their own shadows (light_height_shadows.h),
+					the other ones from their visibility polygons.
+				*/
+
+				const auto reach = xywh::center_and_size(world_light_pos, request.queried_rect);
+
+				if (light.height > 0.0f) {
+					set_pass(3);
+					renderer.set_max_blending();
+					::draw_light_area(renderer, reach, world_light_pos, max_distance, white);
+
+					set_pass(2);
+					renderer.set_min_blending();
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_SHADOW_MASKS, i);
+
+					if (keep_hue_in_shadows && !light.hue_through_walls) {
+						/*
+							The mask holds only the obstacles reaching the ceiling now,
+							so the light removed by the lower ones is taken only where walls let it through.
+						*/
+
+						in.hue_light_fbo->set_as_current(renderer);
+
+						set_pass(9);
+						renderer.set_color_only_additive_blending();
+						renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_LOW_SHADOW_MASKS, i);
+
+						in.light_fbo.set_as_current(renderer);
+
+						set_pass(2);
+						renderer.set_min_blending();
+					}
+
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_LOW_SHADOW_MASKS, i);
+				}
+				else {
+					set_pass(6);
+					renderer.set_min_blending();
+					::draw_light_area(renderer, reach, world_light_pos, max_distance, white);
+
+					set_pass(8);
+					renderer.set_max_blending();
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);
+					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_PENUMBRAS, i);
+				}
+
+				set_pass(4);
+				renderer.set_dst_alpha_additive_blending();
+				::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
+
+				if (keep_hue_in_shadows && light.hue_through_walls) {
+					/*
+						The light keeps its hue through all its shadows, walls included.
+					*/
+
+					in.hue_light_fbo->set_as_current(renderer);
+
+					set_pass(7);
+					renderer.set_color_only_additive_blending();
+					::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
+
+					in.light_fbo.set_as_current(renderer);
+				}
+
+				if (track_removed_intensity) {
+					/*
+						The light all the shadows removed, so that quantized lights brighten shadowed pixels
+						by the light they would get without them, keeping penumbras smooth.
+					*/
+
+					in.removed_light_fbo->set_as_current(renderer);
+
+					set_pass(7);
+					renderer.set_color_only_additive_blending();
+					::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
+
+					in.light_fbo.set_as_current(renderer);
+				}
 			}
 		}
+
+		set_pass(0);
+		renderer.set_additive_blending();
 	};
 
 	auto setup_wall_light_shader = [&]() {
@@ -318,12 +511,37 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		renderer.set_active_texture(2);
 		in.light_fbo.get_texture().set_as_current(renderer);
+
+		if (in.removed_light_fbo != nullptr) {
+			renderer.set_active_texture(5);
+			in.removed_light_fbo->get_texture().set_as_current(renderer);
+		}
+
+		if (in.hue_light_fbo != nullptr) {
+			renderer.set_active_texture(7);
+			in.hue_light_fbo->get_texture().set_as_current(renderer);
+		}
+
 		renderer.set_active_texture(0);
 	};
 
 	/* Flow */
 
 	augs::graphics::fbo::mark_current(in.renderer);
+
+	/*
+		Textures that no pass writes to this frame aren't cleared - nothing reads them either.
+	*/
+
+	if (track_removed_intensity) {
+		in.removed_light_fbo->set_as_current(renderer);
+		renderer.clear_current_fbo();
+	}
+
+	if (keep_hue_in_shadows) {
+		in.hue_light_fbo->set_as_current(renderer);
+		renderer.clear_current_fbo();
+	}
 
 	in.light_fbo.set_as_current(renderer);
 	in.write_fow_to_stencil();

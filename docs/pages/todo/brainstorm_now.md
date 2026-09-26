@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- dla foregroundowych jeszcze drop shadow z ustalonym shadow heightem i offsetem recznie dla danego resourca
 - skala tego crosshaira nizsza
 - finishing trace powinny tez miec interpolowany rozmiar
 	 - zrobimy z tego interpolowany system

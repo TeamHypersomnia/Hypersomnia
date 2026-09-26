@@ -93,6 +93,18 @@ public:
 		const entity_id ignore_entity = entity_id()
 	) const;
 
+	/*
+		Cheaper than ray_cast_px when only the fact of hitting matters - stops at the first fixture found.
+	*/
+
+	bool ray_cast_hits_anything_px(
+		const si_scaling si,
+		const vec2 p1, 
+		const vec2 p2, 
+		const b2Filter filter, 
+		const entity_id ignore_entity = entity_id()
+	) const;
+
 	physics_raycast_output ray_cast_px(
 		const si_scaling si,
 		const vec2 p1, 

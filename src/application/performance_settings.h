@@ -29,6 +29,12 @@ struct performance_settings {
 	shadow_quality_type shadow_quality = shadow_quality_type::NORMAL;
 	float shadow_strength_multiplier = 1.0f;
 	float shadow_smoothness_multiplier = 1.0f;
+	float point_light_shadow_smoothness_multiplier = 1.0f;
+	bool point_light_soft_shadows = true;
+	bool point_light_heights = true;
+	bool foreground_shadows = true;
+	bool background_shadows = true;
+	bool quantize_lights = true;
 	swap_buffers_moment swap_window_buffers_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	// END GEN INTROSPECTOR
 

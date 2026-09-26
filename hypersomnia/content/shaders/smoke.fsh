@@ -62,6 +62,7 @@ void main()
 		texcoord.y /= float(textureSize(light_texture, 0).y);
 	
 		vec4 light = texture(light_texture, texcoord);
+		light.a = 1.0;
 	
 		float light_intensity = max(max(light.r, light.g), light.b);
 		light_intensity = float(

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-09-25 15:01:39.865097 UTC"
+        "version_timestamp": "2026-09-25 21:20:11.426801 UTC"
     },
     "about": {
         "author": "lia",
@@ -11,16 +11,19 @@
     "settings": {
         "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
-        "ambient_light_color": [71, 113, 183, 255],
+        "ambient_light_color": [70, 111, 179, 255],
         "shadow_strength": 0.6000000238418579,
         "warmup_theme": {
             "id": "arabesque"
         }
     },
     "playtesting": {
-        "mode": "quick_test",
+        "mode": "bomb_defusal",
         "starting_faction": "RESISTANCE",
-        "spawn_bots": true
+        "friendly_fire": false,
+        "spawn_bots": true,
+        "spawn_only_enemy_bots": true,
+        "bot_difficulty": "HARD"
     },
     "game_modes": {
         "bomb_defusal": {
@@ -579,9 +582,7 @@
         },
         {
             "id": "New layer 1",
-            "is_open_in_editor": false,
             "opacity": 0.0,
-            "selectable_on_scene": false,
             "nodes": [
                 "Plainspritedbody-New-1 (53)",
                 "Plainspritedbody-New-1 (52)",
@@ -4031,7 +4032,8 @@
             "id": "Plainspritedbody-New-1 (76)",
             "type": "@blank",
             "pos": [2048.0, 1152.0],
-            "size": [256, 256]
+            "size": [256, 256],
+            "shadow_height_mult": 2.5
         },
         {
             "id": "Plainspritedbody-New-1 (63)",
@@ -4043,7 +4045,8 @@
             "id": "Plainspritedbody-New-1 (75)",
             "type": "@blank",
             "pos": [1536.0, 1152.0],
-            "size": [256, 256]
+            "size": [256, 256],
+            "shadow_height_mult": 2.5
         },
         {
             "id": "Plainspritedbody-New-1 (74)",
@@ -4412,7 +4415,7 @@
         {
             "id": "\t",
             "type": "point_light",
-            "pos": [-369.0, 1663.0],
+            "pos": [-410.0, 1704.0],
             "falloff": {
                 "radius": 1000.0,
                 "strength": 29

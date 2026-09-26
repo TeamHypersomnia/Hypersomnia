@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-09-26 01:24:05.705104 UTC"
+        "version_timestamp": "2026-09-26 01:06:17.836058 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -3111,6 +3111,7 @@
         },
         {
             "id": "garden lights",
+            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp (2)",
                 "Strong lamp (31)",
@@ -5483,7 +5484,8 @@
         {
             "id": "Butterfly (3)",
             "type": "butterfly",
-            "pos": [1927.0, 142.0]
+            "pos": [1926.618896484375, 141.9969024658203],
+            "rotation": -0.13530340790748596
         },
         {
             "id": "Mota (3)",
@@ -5537,7 +5539,7 @@
             "id": "Mota",
             "type": "mota",
             "pos": [2101.51171875, -185.2264404296875],
-            "rotation": -32.5443115234375
+            "rotation": -31.099599838256836
         },
         {
             "id": "Cicada",
@@ -15292,7 +15294,7 @@
         {
             "id": "Orange flowerpot (10)",
             "type": "@orange_flowerpot",
-            "pos": [1267.0, -307.0],
+            "pos": [1285.0, -365.0],
             "rotation": 4.5081024169921875
         },
         {
@@ -17236,7 +17238,7 @@
             "id": "bot_waypoint_patrol (12)",
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
-            "pos": [1924.0, -235.0],
+            "pos": [1391.0, -1.0],
             "rotation": -270.0
         },
         {
