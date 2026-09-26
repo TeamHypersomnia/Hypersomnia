@@ -45,7 +45,7 @@ struct light_system_input {
 	const augs::graphics::shader_program& light_shader;
 	const augs::graphics::shader_program& textured_light_shader;
 	const augs::graphics::shader_program& standard_shader;
-	const augs::graphics::shader_program* const quantized_neon_shader;
+	const augs::graphics::shader_program* const posterized_neon_shader;
 	std::function<void(bool)> neon_occlusion_callback;
 	std::function<void()> neon_callback;
 	std::function<void()> write_fow_to_stencil;

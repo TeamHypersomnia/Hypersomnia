@@ -12,6 +12,7 @@ struct editor_arena_settings {
 	float default_zoom = BALANCE_ZOOM_OUT;
 	bool minimap_tab_shows_all_islands = false;
 	rgba ambient_light_color = rgba(53, 97, 102, 255);
+	bool posterize_light = true;
 	sun_shadow_settings sun_shadows;
 	point_light_shadow_settings point_light_shadows;
 	editor_theme warmup_theme;

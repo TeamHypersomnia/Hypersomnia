@@ -16,7 +16,6 @@ uniform sampler2D light_texture;
 
 uniform sampler2D removed_light_texture;
 uniform sampler2D hue_light_texture;
-uniform int removed_light_available;
 uniform float point_light_hue_preservation;
 uniform vec4 ambient_color;
 
@@ -75,10 +74,10 @@ uniform int receiver_displacement;
 uniform int fully_lit;
 
 /*
-	Nonzero brightens the light in discrete bands, zero brightens it smoothly over the same range.
+	Nonzero brightens the light in discrete bands of its intensity, zero applies it as it is.
 */
 
-uniform int quantize_lights;
+uniform int posterize_light;
 
 /*
 	0 removes the ambient color inside shadows, 1 only its brightness - keeping the hue of the surrounding light mix.
@@ -182,17 +181,28 @@ void main()
 	light.a = 1.0;
 
 	/*
-		Light removed by the shadows of point lights - by all of them, for the quantization.
+		The more intense the light, the more it gets brightened - up to twice, in discrete bands.
+
+		The bands step by the light unshadowed by point lights - with the light all their shadows removed added back -
+		and the shadows only scale the brightening smoothly, by the ratio of the smooth curves.
+		So outside shadows the bands stay exactly as they were, and penumbras stay smooth.
+		The environment shadows below work the same way - their boost comes from the unshadowed light too.
 	*/
 
-	vec3 unshadowed = light.rgb;
+	float intensity = 1.0;
 
-	if (removed_light_available != 0) {
-		unshadowed += texture(removed_light_texture, texcoord).rgb;
+	if (posterize_light != 0) {
+		vec3 unshadowed = light.rgb + texture(removed_light_texture, texcoord).rgb;
+
+		float shadowed_intensity = min(max(max(light.r, light.g), light.b), 1.0);
+		float unshadowed_intensity = min(max(max(unshadowed.r, unshadowed.g), unshadowed.b), 1.0);
+
+		float posterized_intensity = float(
+			light_step * (int(unshadowed_intensity * 255.0) / light_step + light_levels)
+		) / 255.0;
+
+		intensity = posterized_intensity * (1.0 + shadowed_intensity) / (1.0 + unshadowed_intensity);
 	}
-
-	float shadowed_intensity = min(max(max(light.r, light.g), light.b), 1.0);
-	float unshadowed_intensity = min(max(max(unshadowed.r, unshadowed.g), unshadowed.b), 1.0);
 
 	/*
 		Light removed only by the shadows of obstacles not reaching the ceiling, where walls let it through - for keeping the hue.
@@ -202,27 +212,6 @@ void main()
 		vec3 hue_source = light.rgb + texture(hue_light_texture, texcoord).rgb;
 		vec3 hue_kept = hue_source * (luma(light.rgb) / max(luma(hue_source), 0.0001));
 		light.rgb = mix(light.rgb, hue_kept, point_light_hue_preservation);
-	}
-
-	/*
-		The more intense the light, the more it gets brightened - up to twice.
-
-		Quantization steps the brightening by the light unshadowed by point lights,
-		and their shadows only scale it smoothly, by the ratio of the smooth curves.
-		So outside shadows the bands stay exactly as they were, and penumbras stay smooth.
-		The environment shadows below work the same way - their boost comes from the unshadowed light too.
-	*/
-
-	float intensity = 1.0 + shadowed_intensity;
-
-	if (quantize_lights != 0) {
-		float quantized_intensity = float(
-			
-			light_step * (int(unshadowed_intensity * 255.0) / light_step + light_levels)
-
-			) / 255.0;
-
-		intensity = quantized_intensity * (1.0 + shadowed_intensity) / (1.0 + unshadowed_intensity);
 	}
 
 	/*

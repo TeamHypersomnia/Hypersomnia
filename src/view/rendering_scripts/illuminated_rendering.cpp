@@ -637,7 +637,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
-			in.perf_settings.posterize_neons && shaders.quantized_neon ? std::addressof(*shaders.quantized_neon) : nullptr,
+			in.perf_settings.posterize_neons && !cosm.get_common_significant().light.posterize_light && shaders.posterized_neon ? std::addressof(*shaders.posterized_neon) : nullptr,
 			neon_occlusion_callback,
 			[&]() {
 				draw_particles_neons();
@@ -884,9 +884,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
-	set_uniform(shaders.illuminated, U::quantize_lights, in.perf_settings.quantize_lights ? 1 : 0);
+	set_uniform(shaders.illuminated, U::posterize_light, light_settings.posterize_light ? 1 : 0);
 
-	set_uniform(shaders.illuminated, U::removed_light_available, fbos.removed_light.has_value() && in.perf_settings.quantize_lights ? 1 : 0);
 
 	set_uniform(
 		shaders.illuminated,

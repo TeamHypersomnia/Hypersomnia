@@ -54,7 +54,6 @@ struct performance_settings {
 	accuracy_type wall_light_drawing_precision = accuracy_type::EXACT;
 	sun_shadow_preferences sun_shadows;
 	point_light_shadow_preferences point_light_shadows;
-	bool quantize_lights = true;
 	bool posterize_neons = true;
 	swap_buffers_moment swap_window_buffers_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	// END GEN INTROSPECTOR

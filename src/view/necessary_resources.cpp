@@ -95,10 +95,9 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminated->set_uniform(renderer, U::shadow_strength, 0.0f);
 		illuminated->set_uniform(renderer, U::receiver_displacement, 1);
 		illuminated->set_uniform(renderer, U::fully_lit, 0);
-		illuminated->set_uniform(renderer, U::quantize_lights, 1);
+		illuminated->set_uniform(renderer, U::posterize_light, 1);
 		illuminated->set_uniform(renderer, U::removed_light_texture, 5);
 		illuminated->set_uniform(renderer, U::point_light_hue_preservation, 0.0f);
-		illuminated->set_uniform(renderer, U::removed_light_available, 0);
 		illuminated->set_uniform(renderer, U::hue_light_texture, 7);
 	}
 
@@ -112,9 +111,9 @@ all_necessary_shaders::all_necessary_shaders(
 		shadow_sprite->set_uniform(renderer, U::basic_texture, 0);
 	}
 
-	if (quantized_neon) {
-		quantized_neon->set_as_current(renderer);
-		quantized_neon->set_uniform(renderer, U::basic_texture, 0);
+	if (posterized_neon) {
+		posterized_neon->set_as_current(renderer);
+		posterized_neon->set_uniform(renderer, U::basic_texture, 0);
 	}
 
 	if (standard) {

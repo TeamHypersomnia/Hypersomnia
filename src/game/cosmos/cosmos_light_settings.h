@@ -35,9 +35,15 @@ struct point_light_shadow_settings {
 	bool operator==(const point_light_shadow_settings&) const = default;
 };
 
+/*
+	posterize_light brightens lit pixels by up to twice as much, in a few discrete bands of the light's intensity.
+	Without it, the light is applied as it is.
+*/
+
 struct cosmos_light_settings {
 	// GEN INTROSPECTOR struct cosmos_light_settings
 	rgba ambient_color = rgba(53, 97, 102, 255);
+	bool posterize_light = true;
 	sun_shadow_settings sun_shadows;
 	point_light_shadow_settings point_light_shadows;
 	// END GEN INTROSPECTOR

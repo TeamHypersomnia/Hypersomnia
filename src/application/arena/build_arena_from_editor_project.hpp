@@ -104,6 +104,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
+	common.light.posterize_light = project.settings.posterize_light;
 	common.light.sun_shadows = project.settings.sun_shadows;
 	common.light.point_light_shadows = project.settings.point_light_shadows;
 	common.default_zoom = project.settings.default_zoom;

@@ -31,11 +31,10 @@ namespace augs {
 		ambient_color,
 		fully_lit,
 		shadow_hue_preservation,
-		quantize_lights,
+		posterize_light,
 		light_pass,
 		light_mask_texture,
 		removed_light_texture,
-		removed_light_available,
 		hue_light_texture,
 		point_light_hue_preservation,
 

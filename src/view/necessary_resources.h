@@ -76,7 +76,7 @@ struct all_necessary_shaders {
 	optional_shader flash_afterimage;
 	optional_shader neon_occluder;
 	optional_shader shadow_sprite;
-	optional_shader quantized_neon;
+	optional_shader posterized_neon;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

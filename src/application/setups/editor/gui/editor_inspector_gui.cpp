@@ -2455,6 +2455,11 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	ImGui::Separator();
 
 	PROPERTY("Ambient light color", ambient_light_color);
+	PROPERTY("Posterize light", posterize_light);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Turn off for maximum color fidelity.\nTurn on for brighter lights.");
+	}
 
 	ImGui::Separator();
 	text_color("Sun shadows", yellow);

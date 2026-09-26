@@ -940,11 +940,8 @@ void settings_gui_state::perform(
 						tooltip_on_hover("If not ticked, point lights ignore their Light height:\nevery shadow reaches the end of the light, computed from the visibility polygon like before heights existed.");
 					}
 
-					revertable_checkbox("Quantize lights", scope_cfg.quantize_lights);
-					tooltip_on_hover("If ticked, lights brighten the scene in a few discrete bands for the pixel-art look.\nPenumbras of shadows stay smooth either way.\nIf not, the brightening is smooth everywhere.");
-
 					revertable_checkbox("Posterize neons", scope_cfg.posterize_neons);
-					tooltip_on_hover("If ticked, neon maps and the glow of electric armor light the scene in a few discrete bands.");
+					tooltip_on_hover("If ticked, neon maps and the glow of electric armor light the scene in a few discrete bands\non maps that don't Posterize light as a whole.");
 				}
 
 				ImGui::Separator();

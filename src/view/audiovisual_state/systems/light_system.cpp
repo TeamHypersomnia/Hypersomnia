@@ -227,7 +227,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	};
 
 	/*
-		The removed light texture holds the light that all shadows removed - for the quantization,
+		The removed light texture holds the light that all shadows removed - for posterizing the light,
 		and the hue light texture - the light that shadows of low obstacles removed, for keeping the hue.
 	*/
 
@@ -238,7 +238,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const bool track_removed_intensity = 
 		in.removed_light_fbo != nullptr
-		&& in.perf_settings.quantize_lights
+		&& cosm.get_common_significant().light.posterize_light
 	;
 
 	auto set_pass = [&](const int pass) {
@@ -401,7 +401,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 				if (track_removed_intensity) {
 					/*
-						The light all the shadows removed, so that quantized lights brighten shadowed pixels
+						The light all the shadows removed, so that posterized light brightens shadowed pixels
 						by the light they would get without them, keeping penumbras smooth.
 					*/
 
@@ -521,23 +521,23 @@ void light_system::render_all_lights(const light_system_input in) const {
 	};
 
 	/*
-		Neon maps and the glow of electric armor, optionally in quantized bands.
+		Neon maps and the glow of electric armor, optionally in posterized bands - on maps not posterizing the light as a whole.
 		Missiles and particles stay smooth - their neons are stretched along trails.
 	*/
 
 	auto set_neon_shader = [&]() {
-		if (in.quantized_neon_shader != nullptr) {
-			in.quantized_neon_shader->set_as_current(renderer);
+		if (in.posterized_neon_shader != nullptr) {
+			in.posterized_neon_shader->set_as_current(renderer);
 		}
 		else {
 			standard_shader.set_as_current(renderer);
 		}
 	};
 
-	if (in.quantized_neon_shader != nullptr) {
-		in.quantized_neon_shader->set_as_current(renderer);
-		in.quantized_neon_shader->set_projection(renderer, in.cone.get_projection_matrix());
-		set_uniform(*in.quantized_neon_shader, augs::common_uniform_name::ambient_color, cosm.get_common_significant().light.ambient_color);
+	if (in.posterized_neon_shader != nullptr) {
+		in.posterized_neon_shader->set_as_current(renderer);
+		in.posterized_neon_shader->set_projection(renderer, in.cone.get_projection_matrix());
+		set_uniform(*in.posterized_neon_shader, augs::common_uniform_name::ambient_color, cosm.get_common_significant().light.ambient_color);
 	}
 
 	auto restore_renderer = [&]() {
