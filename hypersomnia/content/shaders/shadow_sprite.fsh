@@ -14,6 +14,8 @@ uniform sampler2D basic_texture;
 	the shadow height and strength in red and green for shadows of foreground sprites,
 	the strength in alpha for shadows of sprites lying on the ground,
 	the height in blue for footprints of the latter.
+
+	Also draws translucent shadows of characters over the ground, whose color is simply the shadow's.
 */
 
 void main() 

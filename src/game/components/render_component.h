@@ -19,6 +19,8 @@ namespace invariants {
 		For anything lower, foreground_shadow_extra_height is the whole height,
 		and such sprites are drawn above decals and corpses, shadowed only by what's taller.
 		foreground_shadow_opacity scales the arena's shadow strength for it - foliage lets some light through.
+
+		casts_overlay_shadow draws a translucent shadow under a solid obstacle lying around, like a detached head.
 	*/
 
 	struct render {
@@ -30,7 +32,8 @@ namespace invariants {
 		bool casts_foreground_shadow = false;
 		uint8_t foreground_shadow_extra_height = 0;
 		uint8_t foreground_shadow_opacity = 153;
-		pad_bytes<3> pad;
+		bool casts_overlay_shadow = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 	};
 }

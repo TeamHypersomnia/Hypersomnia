@@ -386,6 +386,8 @@ namespace test_flavours {
 				render_layer::SOLID_OBSTACLES
 			);
 
+			meta.template get<invariants::render>().casts_overlay_shadow = true;
+
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
 			f.density *= 5.0;
 			f.restitution *= 2.;
@@ -398,6 +400,8 @@ namespace test_flavours {
 				test_scene_image_id::METROPOLIS_HEAD,
 				render_layer::SOLID_OBSTACLES
 			);
+
+			meta.template get<invariants::render>().casts_overlay_shadow = true;
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
 			f.density *= 5.0;

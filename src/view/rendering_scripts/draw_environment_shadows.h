@@ -25,13 +25,9 @@ class visible_entities;
 /*
 	Characters have no footprints in the shadow texture - their sprites stick out of their bodies -
 	so they receive environment shadows at a fixed shadow height instead.
-	They cast their silhouettes from the same height, so they never shadow themselves or each other.
-
-	12 keeps the length of character shadows from before sun shadows existed under the default sun,
-	and stays well below the 32 of crates and walls, so a character's shadow never climbs onto them.
 */
 
-inline constexpr uint8_t CHARACTER_SHADOW_HEIGHT = 12;
+inline constexpr float CHARACTER_SHADOW_HEIGHT = 2.0f;
 
 /*
 	Shadows of foreground sprites fall on everything below them regardless of their height,
@@ -39,12 +35,6 @@ inline constexpr uint8_t CHARACTER_SHADOW_HEIGHT = 12;
 */
 
 inline constexpr float FOREGROUND_SHADOW_BASE_HEIGHT = 3.0f;
-
-/*
-	Lying corpses and remnants throw short, opaque shadows onto the ground, like ground sprites set to cast them.
-*/
-
-inline constexpr uint8_t CORPSE_SHADOW_HEIGHT = 4;
 
 inline uint8_t calc_foreground_shadow_height(const uint8_t extra_height) {
 	return static_cast<uint8_t>(std::min(255.0f, FOREGROUND_SHADOW_BASE_HEIGHT + extra_height));

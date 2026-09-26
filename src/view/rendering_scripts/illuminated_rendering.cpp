@@ -804,24 +804,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		if (shaders.shadow_sprite) {
 			set_shader_with_matrix(shaders.shadow_sprite);
 			renderer.call_triangles(D::SHADOW_SPRITES);
-			renderer.call_triangles(D::CORPSE_SHADOW_SPRITES);
-			renderer.call_triangles(D::SENTIENCE_SHADOW_SPRITES);
-
-			/*
-				Shadows of enemies only where the viewed character sees,
-				so they never give away enemies behind walls.
-			*/
-
-			if (!renderer.dedicated[D::ENEMY_SENTIENCE_SHADOW_SPRITES].triangles.empty()) {
-				write_fow_to_stencil();
-
-				set_shader_with_matrix(shaders.shadow_sprite);
-				renderer.set_stencil(true);
-				renderer.stencil_positive_test();
-				renderer.call_triangles(D::ENEMY_SENTIENCE_SHADOW_SPRITES);
-				renderer.set_stencil(false);
-			}
-
 			set_shader_with_matrix(shaders.standard);
 		}
 	}
@@ -912,14 +894,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (environment_shadows) {
 		set_uniform(shaders.illuminated, U::fully_lit, 0);
 	}
+	renderer.call_triangles(D::LYING_CORPSES);
+
 	/*
-		Corpses and ground sprites casting shadows, the latter above decals and corpses.
+		Ground sprites casting shadows, above decals and corpses.
 		Their footprints in the shadow texture keep them from receiving their own shadows,
 		and only decide which shadows reach them - the shadows aren't displaced by their small heights.
 	*/
 
 	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
-	renderer.call_triangles(D::LYING_CORPSES);
 	renderer.call_triangles(D::GROUND_SHADOW_CASTERS);
 	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
@@ -958,9 +941,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.stencil_positive_test();
 	}
 
-	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
 	renderer.call_triangles(D::REMNANTS);
-	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 	renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
@@ -978,9 +959,40 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
-	receive_shadows(shaders.illuminated, true, static_cast<float>(CHARACTER_SHADOW_HEIGHT));
+	receive_shadows(shaders.illuminated, true, CHARACTER_SHADOW_HEIGHT);
 
 	draw_fog_of_war_overlay();
+
+	if (shaders.shadow_sprite) {
+		/*
+			Shadows of characters before all characters, each pixel darkened once -
+			so that heads, backpacks and other attachments don't darken the shadows of bodies,
+			and shadows of neighbouring characters merge.
+			The alpha threshold of the shader keeps faint edges from blocking the solid parts of other sprites.
+		*/
+
+		set_shader_with_matrix(shaders.shadow_sprite);
+
+#if BUILD_STENCIL_BUFFER
+		renderer.set_stencil(true);
+		renderer.clear_single_coverage();
+
+		if (fog_of_war_effective) {
+			renderer.start_single_coverage_where_stencil();
+			renderer.call_triangles(D::ENEMY_SENTIENCE_SHADOWS);
+		}
+
+		renderer.start_single_coverage();
+		renderer.call_triangles(D::FRIENDLY_SENTIENCE_SHADOWS);
+		renderer.finish_single_coverage();
+		renderer.set_stencil(false);
+#else
+		renderer.call_triangles(D::FRIENDLY_SENTIENCE_SHADOWS);
+#endif
+
+		set_shader_with_matrix(shaders.illuminated);
+	}
+
 	draw_sentiences(shaders.illuminated);
 	set_shader_with_matrix(shaders.illuminated);
 	receive_shadows(shaders.illuminated, false);
