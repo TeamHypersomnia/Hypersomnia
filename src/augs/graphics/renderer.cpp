@@ -371,4 +371,20 @@ namespace augs {
 		push_no_arg(no_arg_command::FINISH_WRITING_STENCIL);
 	}
 
+	void renderer::clear_single_coverage() {
+		push_no_arg(no_arg_command::CLEAR_SINGLE_COVERAGE);
+	}
+
+	void renderer::start_single_coverage() {
+		push_no_arg(no_arg_command::START_SINGLE_COVERAGE);
+	}
+
+	void renderer::start_single_coverage_where_stencil() {
+		push_no_arg(no_arg_command::START_SINGLE_COVERAGE_WHERE_STENCIL);
+	}
+
+	void renderer::finish_single_coverage() {
+		push_no_arg(no_arg_command::FINISH_SINGLE_COVERAGE);
+	}
+
 }

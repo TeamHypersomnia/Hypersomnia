@@ -195,6 +195,16 @@ namespace augs {
 		void stencil_positive_test();
 		void stencil_reverse_test();
 
+		/*
+			Every pixel is drawn at most once until the stencil is cleared - e.g. for translucent shadows of overlapping sprites.
+			The where_stencil variant additionally draws only where the stencil was written, like stencil_positive_test.
+		*/
+
+		void clear_single_coverage();
+		void start_single_coverage();
+		void start_single_coverage_where_stencil();
+		void finish_single_coverage();
+
 		void next_frame();
 		void screenshot(xywhi bounds);
 

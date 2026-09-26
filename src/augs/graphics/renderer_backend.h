@@ -79,6 +79,10 @@ namespace augs {
 			void stencil_positive_test();
 			void stencil_reverse_test();
 
+			void clear_single_coverage();
+			void start_single_coverage(bool where_stencil);
+			void finish_single_coverage();
+
 			void perform(const drawcall_command&);
 
 		public:

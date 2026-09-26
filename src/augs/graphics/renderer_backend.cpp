@@ -364,6 +364,10 @@ namespace augs {
 							case N::CLEAR_STENCIL: clear_stencil(); break;
 							case N::START_WRITING_STENCIL: start_writing_stencil(); break;
 							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
+							case N::CLEAR_SINGLE_COVERAGE: clear_single_coverage(); break;
+							case N::START_SINGLE_COVERAGE: start_single_coverage(false); break;
+							case N::START_SINGLE_COVERAGE_WHERE_STENCIL: start_single_coverage(true); break;
+							case N::FINISH_SINGLE_COVERAGE: finish_single_coverage(); break;
 							case N::STENCIL_POSITIVE_TEST: stencil_positive_test(); break;
 							case N::STENCIL_REVERSE_TEST: stencil_reverse_test(); break;
 							case N::FINISH: finish(); break;
@@ -589,12 +593,51 @@ namespace augs {
 			GL_CHECK(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
 		}
 
+		/*
+			The written stencil is the lowest bit - the others are free for single coverage.
+		*/
+
+		static constexpr GLuint written_stencil_bit = 0x01;
+		static constexpr GLuint single_coverage_bit = 0x02;
+
 		void renderer_backend::stencil_reverse_test() {
-			GL_CHECK(glStencilFunc(GL_EQUAL, 0, 0xFF));
+			GL_CHECK(glStencilFunc(GL_EQUAL, 0, written_stencil_bit));
 		}
 
 		void renderer_backend::stencil_positive_test() {
-			GL_CHECK(glStencilFunc(GL_EQUAL, 1, 0xFF));
+			GL_CHECK(glStencilFunc(GL_EQUAL, written_stencil_bit, written_stencil_bit));
+		}
+
+		void renderer_backend::clear_single_coverage() {
+			/*
+				Clears only the coverage bit, keeping the written stencil.
+			*/
+
+			GL_CHECK(glStencilMask(single_coverage_bit));
+			GL_CHECK(glClear(GL_STENCIL_BUFFER_BIT));
+			GL_CHECK(glStencilMask(0x00));
+		}
+
+		void renderer_backend::start_single_coverage(const bool where_stencil) {
+			/*
+				Passes only where the coverage bit is still clear, and flips it right away.
+			*/
+
+			if (where_stencil) {
+				GL_CHECK(glStencilFunc(GL_EQUAL, written_stencil_bit, written_stencil_bit | single_coverage_bit));
+			}
+			else {
+				GL_CHECK(glStencilFunc(GL_EQUAL, 0, single_coverage_bit));
+			}
+
+			GL_CHECK(glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT));
+			GL_CHECK(glStencilMask(single_coverage_bit));
+		}
+
+		void renderer_backend::finish_single_coverage() {
+			GL_CHECK(glStencilMask(0x00));
+			GL_CHECK(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+			stencil_reverse_test();
 		}
 
 		void renderer_backend::finish_writing_stencil() {
