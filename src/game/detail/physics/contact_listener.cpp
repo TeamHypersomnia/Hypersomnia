@@ -312,7 +312,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		ensure(collider.alive());
 
 		const auto subject_fixtures = subject.get<invariants::fixtures>();
-		const auto collider_fixtures = subject.get<invariants::fixtures>();
+		const auto collider_fixtures = collider.get<invariants::fixtures>();
 
 		const const_entity_handle subject_owner_body = subject.get_owner_of_colliders();
 		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();

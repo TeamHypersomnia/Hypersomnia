@@ -19,6 +19,7 @@ void draw_headshot_debug_lines(vec2 missile_pos, vec2 impact_dir, vec2 head_pos,
 
 struct missile_collision_result {
 	transformr transform_of_impact;
+	vec2 impact_velocity;
 	bool deleted_already = false;
 	bool penetration_began = false;
 };
@@ -216,21 +217,44 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		make_velocity_face_body_orientation(typed_missile);
 	}
 
-	{
-		const bool missile_ricochetted_in_this_step = 
-			missile.when_last_ricocheted.was_set()
-			&& now.step <= missile.when_last_ricocheted.step + 1
+	const bool within_ricochet_cooldown =
+		missile.when_last_ricocheted.was_set()
+		&& now.step <= missile.when_last_ricocheted.step + 1
+	;
+
+	if (within_ricochet_cooldown && pre_solve) {
+		return std::nullopt;
+	}
+
+	if (within_ricochet_cooldown) {
+		/*
+			Only the fixture the bullet has just bounced off counts as that ricochet.
+			Anything else it runs into meanwhile is where the ricocheted bullet ends up -
+			e.g. the neighbouring wall of an inner corner.
+		*/
+		const auto* const fixture = ::find_fixture_of_impact(surface_handle, cosm.get_si(), point);
+		const auto convex_index = fixture != nullptr ? static_cast<int32_t>(fixture->index_in_component) : -1;
+
+		const bool same_fixture =
+			surface_handle.get_id() == missile.last_ricochet_surface
+			&& (missile.last_ricochet_convex_index == -1 || convex_index == -1 || convex_index == missile.last_ricochet_convex_index)
 		;
 
-		if (missile_ricochetted_in_this_step) {
+		if (same_fixture) {
 			RIC_LOG("DET: This impact counted as ricochet already.");
 			return std::nullopt;
 		}
-
-		RIC_LOG("DET: NO COOLDOWN, IMPACTING");
 	}
 
-	const auto impact_velocity = collider_impact_velocity;
+	/*
+		Right after a ricochet, the contact's own velocity is the physics solver's bounce,
+		not the ricochet - the bullet's current velocity is the one the ricochet gave it.
+	*/
+	const auto impact_velocity =
+		within_ricochet_cooldown ?
+		vec2(typed_missile.template get<components::rigid_body>().get_velocity()) :
+		collider_impact_velocity
+	;
 	const auto impact_dir = vec2(impact_velocity).normalize();
 
 	bool penetration_began = false;
@@ -240,6 +264,40 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto sentience = surface_handle.template find<components::sentience>();
 
 	const bool surface_sentient = sentience_def != nullptr && sentience != nullptr;
+
+	const bool surface_is_wall = [&]() {
+		if (const auto* const fixtures_def = surface_handle.template find<invariants::fixtures>()) {
+			const auto wall_categories = uint16(
+				(1 << int(filter_category::WALL)) |
+				(1 << int(filter_category::GLASS_OBSTACLE))
+			);
+
+			return (fixtures_def->filter.categoryBits & wall_categories) != 0;
+		}
+
+		return false;
+	}();
+
+	if (contact_start && surface_is_wall) {
+		/*
+			Within the very step a bullet begins penetrating, the physics solver
+			may already have bounced it off that wall into another one -
+			such a contact is an artifact of the bounce. The walls truly
+			along the bullet's path are hit by advance_penetrations.
+		*/
+		if (missile.during_penetration) {
+			return std::nullopt;
+		}
+
+		/*
+			A bullet moving away from a wall merely grazes it: e.g. right after
+			a ricochet off the neighbouring tile of a flat wall, or while leaving
+			the wall it has just gone through.
+		*/
+		if (impact_dir.dot(collision_normal) >= 0.f) {
+			return std::nullopt;
+		}
+	}
 
 	auto finalize_bullet = [&]() {
 		if (!missile_def.destroy_upon_damage) {
@@ -406,5 +464,5 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		step.post_message(damage_msg);
 	}
 
-	return missile_collision_result { transformr { point, impact_dir.degrees() }, deleted_already, penetration_began };
+	return missile_collision_result { transformr { point, impact_dir.degrees() }, impact_velocity, deleted_already, penetration_began };
 }

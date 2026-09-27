@@ -35,6 +35,7 @@ namespace components {
 		real32 initial_speed = 0.f;
 
 		augs::stepped_timestamp when_last_ricocheted;
+		augs::stepped_timestamp when_last_ricochet_considered;
 		augs::stepped_timestamp when_fired;
 		augs::stepped_timestamp when_last_reoriented;
 
@@ -48,6 +49,8 @@ namespace components {
 		vec2 prev_tip_position = vec2::zero;
 		vec2 potential_exit = vec2::zero;
 		entity_id last_penetrated_surface;
+		entity_id last_ricochet_surface;
+		int32_t last_ricochet_convex_index = -1;
 
 		bool during_penetration = false;
 		bool deleted_already = false;

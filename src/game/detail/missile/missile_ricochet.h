@@ -34,10 +34,27 @@ static void ricochet_missile_against_surface(
 		return;
 	}
 
+	/*
+		Only the first contact of a step can be a ricochet: within one step the physics solver
+		may already have bounced the bullet off it into further walls, with a velocity
+		that has nothing to do with how the bullet flew.
+	*/
+	if (missile.when_last_ricochet_considered.was_set() && missile.when_last_ricochet_considered.step == now.step) {
+		return;
+	}
+
+	missile.when_last_ricochet_considered = now;
+
 	const auto collision_normal = vec2(normal).normalize();
 
 	const auto impact_velocity = collider_impact_velocity;
 	const auto impact_speed = impact_velocity.length();
+
+	/* Negated so that a NaN takes the safe branch. */
+	if (!(impact_speed > AUGS_EPSILON<real32>)) {
+		return;
+	}
+
 	const auto impact_dir = impact_velocity / impact_speed;
 	const auto impact_dot_normal = impact_dir.dot(collision_normal);
 
@@ -107,6 +124,19 @@ static void ricochet_missile_against_surface(
 		const auto angle_mult = angle / max_ricochet_angle;
 
 		missile.when_last_ricocheted = now;
+
+		/*
+			Remembered so that only this very fixture is ignored during the cooldown -
+			any other one the bullet runs into right after is a genuine hit.
+		*/
+		missile.last_ricochet_surface = surface_handle.get_id();
+
+		if (const auto* const fixture = ::find_fixture_of_impact(surface_handle, cosm.get_si(), point)) {
+			missile.last_ricochet_convex_index = fixture->index_in_component;
+		}
+		else {
+			missile.last_ricochet_convex_index = -1;
+		}
 
 		/* Stamped by anything that puts the round onto a new heading, a portal included. */
 		missile.when_last_reoriented = now;

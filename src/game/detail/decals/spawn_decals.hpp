@@ -39,6 +39,9 @@ inline constexpr real32 GUNSHOT_DECAL_BASELINE_DAMAGE = 16.f;
 inline constexpr real32 MIN_GUNSHOT_DECAL_SCALE = 1.0f;
 inline constexpr real32 MAX_GUNSHOT_DECAL_SCALE = 3.2f;
 
+/* A weapon's own decal scale is clamped to this, so that content can never make it absurd. */
+inline constexpr real32 MAX_CUSTOM_GUNSHOT_DECAL_SCALE = 10.f;
+
 /*
 	Surface decals are never shrunk below this size to fit their fixture;
 	they are allowed to overhang slightly instead, so that a hit always leaves a mark.
@@ -124,10 +127,12 @@ inline constexpr real32 EXPLOSION_SURFACE_WEIGHT_PER_DECAL = 40.f;
 
 /* Sprite sizes are integral, so a thin decal must not round away to nothing. */
 inline vec2i to_decal_sprite_size(const vec2 size) {
-	return vec2i(
-		std::max(1, static_cast<int>(size.x)),
-		std::max(1, static_cast<int>(size.y))
-	);
+	/* Clamped, as casting an out-of-range float to int is undefined. */
+	auto to_side = [](const real32 side) {
+		return std::max(1, static_cast<int>(std::clamp(side, 1.f, 100000.f)));
+	};
+
+	return vec2i(to_side(size.x), to_side(size.y));
 }
 
 /* How far outside a fixture an impact point may land and still be attributed to it. */
@@ -514,7 +519,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 	*/
 	const auto size_mult =
 		custom_decal_scale > 0.f ?
-		custom_decal_scale :
+		std::min(custom_decal_scale, MAX_CUSTOM_GUNSHOT_DECAL_SCALE) :
 		std::clamp(damage_amount / GUNSHOT_DECAL_BASELINE_DAMAGE, MIN_GUNSHOT_DECAL_SCALE, MAX_GUNSHOT_DECAL_SCALE)
 	;
 
@@ -546,11 +551,48 @@ std::optional<transformr> spawn_surface_impact_decal(
 		return std::nullopt;
 	}
 
-	const auto final_size_f = desired_size * fit->fitted_scale;
-	const auto decal_len = std::max(final_size_f.x, final_size_f.y);
-
+	auto final_size_f = desired_size * fit->fitted_scale;
 	auto final_center = fit->center;
 	const b2Fixture* placed_fixture = fixture;
+
+	if (fit->fitted_scale < 1.f) {
+		/*
+			Shrunk to fit the entered fixture alone - but the wall may well go on
+			into a neighbouring fixture, e.g. at the corner of a tile. Take the nearest
+			spot along the slide where the full-size decal fits into the wall instead.
+		*/
+		if (const auto full_fit = ::slide_rect_into_convex(polygon, impact_point, slide_dir, desired_size, rotation, 1.f)) {
+			const auto full_len = std::max(desired_size.x, desired_size.y);
+			const auto search_len = MAX_DECAL_STACKING_SKIP_MULT * full_len;
+			const auto search_step = DECAL_STACKING_STEP_MULT * full_len;
+			const auto search_dir = full_fit->applied_slide_dir;
+
+			const auto wall = ::gather_wall_fixtures(
+				cosm,
+				*fixture,
+				full_fit->center + search_dir * (search_len / 2),
+				vec2::square(full_len * 2 + search_len)
+			);
+
+			for (auto dist = 0.f; dist <= search_len; dist += search_step) {
+				const auto candidate = full_fit->center + search_dir * dist;
+
+				if (::decal_fits_in_wall(wall, cosm.get_si(), candidate, desired_size, rotation)) {
+					final_size_f = desired_size;
+					final_center = candidate;
+
+					if (const auto* const containing = ::find_wall_fixture_at(wall, cosm.get_si(), candidate)) {
+						placed_fixture = containing;
+					}
+
+					break;
+				}
+			}
+		}
+	}
+
+	const auto decal_len = std::max(final_size_f.x, final_size_f.y);
+
 
 	nearby_decals nearby;
 
@@ -589,7 +631,11 @@ std::optional<transformr> spawn_surface_impact_decal(
 			const auto depth_budget = get_max_stacking_depth_px();
 
 			if (depth_budget >= step_len) {
-				const auto march_dir = fit->applied_slide_dir;
+				/*
+					Always along the bullet's line - the fit's inward push on grazing hits
+					only serves to get the first decal inside the wall.
+				*/
+				const auto march_dir = slide_dir;
 				const auto march_end = final_center + march_dir * depth_budget;
 				const auto corridor = march_end - final_center;
 				const auto corridor_center = (final_center + march_end) / 2;
@@ -602,7 +648,6 @@ std::optional<transformr> spawn_surface_impact_decal(
 				const auto max_skip = MAX_DECAL_STACKING_SKIP_MULT * decal_len;
 
 				auto candidate = final_center;
-				auto depth_used = 0.f;
 				auto skipped = 0.f;
 
 				for (int steps = 0; steps < MAX_DECAL_STACKING_STEPS_SAFETY_CAP; ++steps) {
@@ -610,12 +655,14 @@ std::optional<transformr> spawn_surface_impact_decal(
 						break;
 					}
 
-					if (depth_used + step_len > depth_budget) {
+					const auto next_candidate = candidate + march_dir * step_len;
+
+					/* The budget is how deep the bullet gets, as measured from where it hit. */
+					if ((next_candidate - impact_point).dot(march_dir) > depth_budget) {
 						break;
 					}
 
-					candidate += march_dir * step_len;
-					depth_used += step_len;
+					candidate = next_candidate;
 
 					if (!::decal_fits_in_wall(wall, cosm.get_si(), candidate, final_size_f, rotation)) {
 						skipped += step_len;

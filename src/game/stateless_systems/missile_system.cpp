@@ -71,9 +71,10 @@ using namespace augs;
 
 /*
 	Fixture entries closer than this to where the step began are the fixture
-	the bullet was already in, not a new one.
+	the bullet was already in, not a new one. Only guards against float noise:
+	the fixture a penetration began in is recognized by its entity anyway.
 */
-static constexpr real32 PENETRATION_ENTRY_EPSILON_PX = 2.f;
+static constexpr real32 PENETRATION_ENTRY_EPSILON_PX = 0.1f;
 
 void missile_system::advance_penetrations(const logic_step step) {
 	auto& cosm = step.get_cosmos();
@@ -247,6 +248,67 @@ void missile_system::advance_penetrations(const logic_step step) {
 			*/
 			hits.erase(std::remove(hits.begin(), hits.end(), nullptr), hits.end());
 
+			/*
+				A character standing between walls on this step's path is only hit
+				once this system is done - by its contact in detonate_colliding_missiles.
+				So as not to charge - or even die in - the walls behind them first,
+				this step's walk stops at the first such character and resumes from there.
+			*/
+			const auto character_cut = [&]() -> std::optional<vec2> {
+				std::optional<vec2> nearest;
+				auto nearest_dist_sq = std::numeric_limits<real32>::max();
+
+				const auto character_filter = filters[predefined_filter_type::PENETRATING_BULLET];
+
+				for (const auto& result : physics.ray_cast_all_intersections(p1_meters, p2_meters, character_filter)) {
+					const auto character = cosm[result.what_fixture->GetUserData()];
+
+					if (character.dead()) {
+						continue;
+					}
+
+					const auto* const sentience = character.template find<components::sentience>();
+
+					if (sentience == nullptr) {
+						continue;
+					}
+
+					const bool already_hit_by_this_bullet =
+						sentience->ignore_bullet == entity_id(it.get_id())
+						&& sentience->ignore_bullet_when_born == missile.when_fired
+					;
+
+					if (already_hit_by_this_bullet) {
+						continue;
+					}
+
+					if (missile_surface_info(it, character, step.get_settings().friendly_fire).should_ignore_altogether()) {
+						continue;
+					}
+
+					const auto point = si.get_pixels(result.intersection);
+					const auto dist_sq = (point - p1).length_sq();
+
+					/*
+						Where the walk already stopped last step. Cutting there again
+						would stall the walk for good if that contact never got processed.
+					*/
+					if (dist_sq <= PENETRATION_SEAM_TOLERANCE_PX * PENETRATION_SEAM_TOLERANCE_PX) {
+						continue;
+					}
+
+					if (dist_sq < nearest_dist_sq) {
+						nearest_dist_sq = dist_sq;
+						nearest = point;
+					}
+				}
+
+				return nearest;
+			}();
+
+			const auto walk_end = character_cut.has_value() ? *character_cut : p2;
+			const auto walk_end_dist = (walk_end - p1).length();
+
 			auto entry_dist_sq_of = [&](const b2Fixture* const f) {
 				const auto entry = f->penetrated_forward ? vec2(f->forward_point) : p1;
 				return (entry - p1).length_sq();
@@ -307,7 +369,21 @@ void missile_system::advance_penetrations(const logic_step step) {
 				const auto penetrability = ::calc_penetrability(surface);
 
 				const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
-				const auto considered_p2 = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
+
+				if ((considered_p1 - p1).length() > walk_end_dist) {
+					/* Beyond the character - will be walked next step. */
+					continue;
+				}
+
+				const auto considered_p2 = [&]() {
+					const auto exit = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
+
+					if ((exit - p1).length() > walk_end_dist) {
+						return walk_end;
+					}
+
+					return exit;
+				}();
 
 				{
 					/*
@@ -448,7 +524,7 @@ void missile_system::advance_penetrations(const logic_step step) {
 				fixture->penetrated_backward = false;
 			}
 
-			missile.prev_tip_position = tip;
+			missile.prev_tip_position = walk_end;
 		}
 	);
 }
@@ -554,7 +630,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					missile.during_penetration = true;
 					missile.last_penetrated_surface = surface_handle.get_id();
 					typed_missile.infer_colliders();
-					typed_missile.template get<components::rigid_body>().set_velocity(it.collider_impact_velocity);
+					typed_missile.template get<components::rigid_body>().set_velocity(result->impact_velocity);
 
 					//const auto& clk = cosm.get_clock();
 					//const auto& now = clk.now;
@@ -564,7 +640,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 					auto shifted_bullet_tr = result->transform_of_impact;
 
-					auto vel = it.collider_impact_velocity;
+					auto vel = result->impact_velocity;
 					vel.normalize();
 
 					const auto w = typed_missile.get_logical_size().x;
@@ -781,11 +857,20 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					const auto dist_remaining = missile.penetration_distance_remaining;
 					const auto dist_starting = missile.starting_penetration_distance;
 
-					if (dist_remaining != dist_starting && dist_starting != 0.0f) {
-						considered_lifetime *= repro::sqrt(dist_remaining / dist_starting);
+					if (dist_remaining != dist_starting && dist_starting > 0.0f) {
+						considered_lifetime *= repro::sqrt(std::max(0.0f, dist_remaining / dist_starting));
 					}
 
-					const auto fuse_delay_steps = static_cast<uint32_t>(considered_lifetime / delta.in_milliseconds());
+					const auto fuse_delay_steps = [&]() {
+						const auto steps = considered_lifetime / delta.in_milliseconds();
+
+						/* Negated so that a NaN takes the safe branch. */
+						if (!(steps > 0.0f)) {
+							return uint32_t(0);
+						}
+
+						return static_cast<uint32_t>(std::min(steps, 1e9f));
+					}();
 					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
 					bool force_detonate = false;
