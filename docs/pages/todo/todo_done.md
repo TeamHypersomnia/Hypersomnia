@@ -7504,3 +7504,8 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - co z facing worlds z ta minimapa kurwa
 	- ogarnac te navy na facing worlds ale facing jest gotowy tam u nas lokalnie tylko ta miniaturka
 - miniaturke naprawic w facing worldsach
+
+- dla foregroundowych jeszcze drop shadow z ustalonym shadow heightem i offsetem recznie dla danego resourca
+- skala tego crosshaira nizsza
+- jak sie wylaczy te bullet trace to te neony trzeba tez normalizowac
+	- cos zrobic z tymi rykoszetami paskudnymi jak jest neon rysowany, particle chyba moga byc

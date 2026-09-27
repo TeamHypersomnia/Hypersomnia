@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-09-25 21:20:11.426801 UTC"
+        "version_timestamp": "2026-09-26 20:35:53.529113 UTC"
     },
     "about": {
         "author": "lia",
@@ -20,9 +20,12 @@
         }
     },
     "playtesting": {
-        "mode": "quick_test",
+        "mode": "bomb_defusal",
         "starting_faction": "RESISTANCE",
-        "spawn_bots": true
+        "friendly_fire": false,
+        "spawn_bots": true,
+        "spawn_only_enemy_bots": true,
+        "bot_difficulty": "MEDIUM"
     },
     "game_modes": {
         "bomb_defusal": {
