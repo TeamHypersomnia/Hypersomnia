@@ -9,8 +9,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
-#include "game/detail/decals/penetration_fatigue.h"
-#include "game/detail/physics/calc_penetrability.hpp"
+#include "game/detail/missile/penetration_path.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 
 struct laser_path_segment {
@@ -51,7 +50,7 @@ inline void calc_laser_path(
 	const auto si = cosm.get_si();
 
 	const auto laser_dir = (line_to - line_from).normalize();
-	const auto far_point = line_from + laser_dir * 10000;
+	const auto far_point = line_from + laser_dir * PENETRATION_PATH_MAX_RANGE_PX;
 
 	const auto first_hit = physics.ray_cast_px(
 		si,
@@ -80,154 +79,51 @@ inline void calc_laser_path(
 		return;
 	}
 
-	/*
-		Gather entry and exit points of every penetrable obstacle along the
-		whole path with two all-intersection raycasts (forward and backward),
-		paired per-fixture in a local vector instead of the b2Fixture
-		scratch fields used by the logic-side simulation.
-	*/
+	auto& obstacles = ::thread_local_penetration_obstacles();
 
-	struct walk_entry {
-		const b2Fixture* fixture = nullptr;
-		std::optional<real32> entry_dist;
-		std::optional<real32> exit_dist;
-	};
-
-	std::vector<walk_entry> obstacles;
-
-	auto find_or_add = [&](const b2Fixture* const f) -> walk_entry& {
-		for (auto& o : obstacles) {
-			if (o.fixture == f) {
-				return o;
-			}
-		}
-
-		obstacles.push_back({ f, std::nullopt, std::nullopt });
-		return obstacles.back();
-	};
-
-	const auto progress_filter = filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY];
-
-	const auto p1_meters = si.get_meters(line_from);
-	const auto p2_meters = si.get_meters(far_point);
-
-	for (const auto& result : physics.ray_cast_all_intersections(p1_meters, p2_meters, progress_filter, ignore_entity)) {
-		auto& o = find_or_add(result.what_fixture);
-		o.entry_dist = (si.get_pixels(result.intersection) - line_from).dot(laser_dir);
-	}
-
-	for (const auto& result : physics.ray_cast_all_intersections(p2_meters, p1_meters, progress_filter, ignore_entity)) {
-		auto& o = find_or_add(result.what_fixture);
-		o.exit_dist = (si.get_pixels(result.intersection) - line_from).dot(laser_dir);
-	}
-
-	const auto max_range = (far_point - line_from).length();
-
-	std::sort(
-		obstacles.begin(),
-		obstacles.end(),
-		[](const walk_entry& a, const walk_entry& b) {
-			return a.entry_dist.value_or(0.0f) < b.entry_dist.value_or(0.0f);
-		}
+	::gather_penetration_obstacles(
+		cosm,
+		line_from,
+		laser_dir,
+		PENETRATION_PATH_MAX_RANGE_PX,
+		ignore_entity,
+		obstacles
 	);
-
-	struct surface_info {
-		real32 penetrability;
-		entity_id owner;
-	};
-
-	auto penetrability_of = [&](const b2Fixture& fixture) -> std::optional<surface_info> {
-		if (const auto handle = cosm[fixture.GetUserData()]) {
-			return surface_info { ::calc_penetrability(handle), handle.get_id() };
-		}
-
-		return std::nullopt;
-	};
 
 	auto at_dist = [&](const real32 d) {
 		return line_from + laser_dir * d;
 	};
 
-	auto penetration_remaining = basic_penetration_distance;
-	auto fatigue_gift_used = 0.0f;
 	auto cursor = 0.0f;
 
-	for (const auto& o : obstacles) {
-		const auto entry_d = o.entry_dist.value_or(0.0f);
-		const auto exit_d = o.exit_dist.value_or(max_range);
+	/*
+		The step is "now" because this previews a bullet fired right now.
+	*/
+	const auto stopped_at = ::walk_penetration_obstacles(
+		cosm,
+		obstacles,
+		line_from,
+		laser_dir,
+		basic_penetration_distance,
+		basic_penetration_distance,
+		0.0f,
+		cosm.get_timestamp().step,
+		[&](const penetration_obstacle& o, const real32 end_dist) {
+			if (o.entry_dist > cursor) {
+				out.push_back({ at_dist(cursor), at_dist(o.entry_dist), false });
+				cursor = o.entry_dist;
+			}
 
-		if (exit_d <= cursor) {
-			continue;
+			const auto segment_end = std::max(end_dist, cursor);
+
+			if (segment_end > cursor) {
+				out.push_back({ at_dist(cursor), at_dist(segment_end), true });
+				cursor = segment_end;
+			}
 		}
+	);
 
-		if (entry_d > cursor) {
-			out.push_back({ at_dist(cursor), at_dist(entry_d), false });
-			cursor = entry_d;
-		}
-
-		const auto maybe_surface = penetrability_of(*o.fixture);
-
-		if (!maybe_surface.has_value()) {
-			/* Dead entity - skip, like the logic-side simulation does. */
-			continue;
-		}
-
-		const auto penetrability = maybe_surface->penetrability;
-
-		if (penetrability <= 0.0f) {
-			return;
-		}
-
-		/*
-			Discounted by material fatigue - same math as the missile system.
-			The step is "now" because this previews a bullet fired right now.
-		*/
-		const auto max_gift = ::calc_remaining_fatigue_gift(basic_penetration_distance, fatigue_gift_used);
-
-		const auto cost = ::calc_penetration_cost_px(
-			cosm,
-			maybe_surface->owner,
-			at_dist(entry_d),
-			at_dist(exit_d),
-			penetrability,
-			max_gift,
-			cosm.get_timestamp().step
-		);
-
-		if (penetration_remaining > cost.cost) {
-			fatigue_gift_used += cost.gifted;
-			penetration_remaining -= cost.cost;
-
-			const auto seg_end = std::max(exit_d, cursor);
-			out.push_back({ at_dist(cursor), at_dist(seg_end), true });
-			cursor = seg_end;
-		}
-		else {
-			/*
-				The bullet dies inside this obstacle. An exact walk here:
-				a ratio would smear the decal tunnel's discount uniformly
-				over the whole obstacle, grossly undershooting on thick walls.
-			*/
-			const auto obstacle_len = exit_d - entry_d;
-
-			const auto reach = ::calc_penetration_reach_px(
-				cosm,
-				maybe_surface->owner,
-				at_dist(entry_d),
-				laser_dir,
-				penetration_remaining,
-				max_gift,
-				penetrability,
-				cosm.get_timestamp().step
-			);
-
-			const auto end_d = std::max(entry_d + std::min(reach.reach, obstacle_len), cursor);
-			out.push_back({ at_dist(cursor), at_dist(end_d), true });
-			return;
-		}
-	}
-
-	if (cursor < max_range) {
-		out.push_back({ at_dist(cursor), at_dist(max_range), false });
+	if (!stopped_at.has_value() && cursor < PENETRATION_PATH_MAX_RANGE_PX) {
+		out.push_back({ at_dist(cursor), at_dist(PENETRATION_PATH_MAX_RANGE_PX), false });
 	}
 }

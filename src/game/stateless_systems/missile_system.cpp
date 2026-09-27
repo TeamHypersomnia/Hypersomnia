@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <algorithm>
+#include <limits>
 #include "missile_system.h"
 #include "augs/math/steering.h"
 #include "game/cosmos/cosmos.h"
@@ -63,8 +65,15 @@ void RIC_LOG(Args&&... args) {
 #include "game/detail/missile/missile_ricochet.h"
 #include "game/detail/decals/penetration_fatigue.h"
 #include "game/detail/physics/calc_penetrability.hpp"
+#include "game/detail/missile/penetration_path.h"
 
 using namespace augs;
+
+/*
+	Fixture entries closer than this to where the step began are the fixture
+	the bullet was already in, not a new one.
+*/
+static constexpr real32 PENETRATION_ENTRY_EPSILON_PX = 2.f;
 
 void missile_system::advance_penetrations(const logic_step step) {
 	auto& cosm = step.get_cosmos();
@@ -232,11 +241,54 @@ void missile_system::advance_penetrations(const logic_step step) {
 				}
 			}
 
-			for (auto& fixture_ptr : hits) {
-				if (fixture_ptr == nullptr) {
-					continue;
+			/*
+				Process the fixtures in the order the bullet meets them,
+				so that it dies in - and hits - the right ones.
+			*/
+			hits.erase(std::remove(hits.begin(), hits.end(), nullptr), hits.end());
+
+			auto entry_dist_sq_of = [&](const b2Fixture* const f) {
+				const auto entry = f->penetrated_forward ? vec2(f->forward_point) : p1;
+				return (entry - p1).length_sq();
+			};
+
+			auto owner_index_of = [&](const b2Fixture* const f) {
+				if (const auto owner = cosm[f->GetUserData()]) {
+					return owner.get_id().raw.indirection_index;
 				}
 
+				return std::numeric_limits<decltype(entity_id().raw.indirection_index)>::max();
+			};
+
+			std::sort(
+				hits.begin(),
+				hits.end(),
+				[&](const b2Fixture* const a, const b2Fixture* const b) {
+					const auto dist_a = entry_dist_sq_of(a);
+					const auto dist_b = entry_dist_sq_of(b);
+
+					if (dist_a != dist_b) {
+						return dist_a < dist_b;
+					}
+
+					/* Ties are broken by identity, never by the order of the spatial query. */
+					const auto owner_a = owner_index_of(a);
+					const auto owner_b = owner_index_of(b);
+
+					if (owner_a != owner_b) {
+						return owner_a < owner_b;
+					}
+
+					return a->index_in_component < b->index_in_component;
+				}
+			);
+
+			const auto path_dir = vec2(p2 - p1).normalize();
+
+			const b2Fixture* previous_fixture = nullptr;
+			auto previous_exit = p1;
+
+			for (auto& fixture_ptr : hits) {
 				auto& fixture = *fixture_ptr;
 
 				if (fixture.penetration_processed_flag) {
@@ -256,6 +308,42 @@ void missile_system::advance_penetrations(const logic_step step) {
 
 				const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
 				const auto considered_p2 = fixture.penetrated_backward ? vec2(fixture.backward_point) : p2;
+
+				{
+					/*
+						Entered during this very step, rather than
+						being the fixture the bullet is already in.
+					*/
+					const bool entered_now =
+						fixture.penetrated_forward
+						&& (considered_p1 - p1).length_sq() > PENETRATION_ENTRY_EPSILON_PX * PENETRATION_ENTRY_EPSILON_PX
+					;
+
+					/* Merely the next part of the wall the bullet is going through. */
+					const bool continues_wall =
+						previous_fixture != nullptr
+						&& ::same_wall(*previous_fixture, fixture)
+						&& (considered_p1 - previous_exit).dot(path_dir) <= PENETRATION_SEAM_TOLERANCE_PX
+					;
+
+					/* One bullet never hits the same entity twice. */
+					const bool same_entity = surface_owner == missile.last_penetrated_surface;
+
+					if (entered_now && !continues_wall && !same_entity) {
+						::on_missile_entered_next_surface(
+							step,
+							it,
+							surface,
+							fixture,
+							considered_p1,
+							path_dir
+						);
+					}
+
+					missile.last_penetrated_surface = surface_owner;
+					previous_fixture = std::addressof(fixture);
+					previous_exit = considered_p2;
+				}
 
 				if (penetrability <= 0.0f) {
 					expire_at(considered_p1);
@@ -464,6 +552,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				if (result->penetration_began) {
 					missile.during_penetration = true;
+					missile.last_penetrated_surface = surface_handle.get_id();
 					typed_missile.infer_colliders();
 					typed_missile.template get<components::rigid_body>().set_velocity(it.collider_impact_velocity);
 

@@ -123,29 +123,3 @@ std::optional<rect_slide_fit> slide_rect_into_convex(
 	};
 }
 
-/*
-	Checks if a rotated rectangle centered at rect_center
-	lies entirely inside a convex polygon, with eps_px of allowed overhang.
-*/
-template <class VertsContainer>
-bool rect_inside_convex(
-	const VertsContainer& polygon,
-	const vec2 rect_center,
-	const vec2 rect_size,
-	const real32 rect_rotation_degs,
-	const real32 eps_px
-) {
-	if (polygon.size() < 3) {
-		return false;
-	}
-
-	const auto centroid = augs::calc_centroid(polygon);
-
-	for (const auto& c : augs::make_rotated_corners(rect_size, rect_rotation_degs)) {
-		if (augs::calc_max_edge_violation(polygon, centroid, rect_center + c) > eps_px) {
-			return false;
-		}
-	}
-
-	return true;
-}

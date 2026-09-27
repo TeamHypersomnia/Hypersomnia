@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- łapy odpadniete tez niech cienie rysują
+
 - to samo zrobic dla łusek to co dla dropped itemow i magazynkow
 - finishing trace powinny tez miec interpolowany rozmiar
 	 - zrobimy z tego interpolowany system

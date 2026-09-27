@@ -23,6 +23,7 @@
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/visible_entities.hpp"
 #include "game/inferred_caches/find_physics_cache.h"
+#include "game/detail/missile/penetration_path.h"
 
 /*
 	Gunshot/melee decal sizing.
@@ -65,13 +66,24 @@ inline constexpr real32 DECAL_STACKING_STEP_MULT = 0.5f;
 inline constexpr real32 DECAL_STACKING_NEIGHBOR_SIZE_MULT = 0.5f;
 
 /*
-	A safety cap only - with sane budgets, the binding constraint
-	should be the bullet's actual reachable depth, not this.
+	Crash safety only, never meant to bind: the march already ends
+	at a free spot, at the bullet's reachable depth, at the wall's end
+	or after too long a run of spots the decal does not fit in.
 */
-inline constexpr int MAX_DECAL_STACKING_TRIES = 32;
+inline constexpr int MAX_DECAL_STACKING_STEPS_SAFETY_CAP = 1024;
+
+/*
+	While marching, spots where the decal would stick out of the wall are skipped,
+	but for no longer than this many decal lengths in a row - a longer gap
+	would be a visibly empty stretch of the tunnel.
+*/
+inline constexpr real32 MAX_DECAL_STACKING_SKIP_MULT = 1.0f;
 
 /* How many already-placed decals are considered when looking for a free spot. */
 inline constexpr std::size_t MAX_NEARBY_DECALS_CONSIDERED = 64;
+
+/* How many fixtures of one wall are considered around a decal's march. */
+inline constexpr std::size_t MAX_WALL_FIXTURES_CONSIDERED = 32;
 
 /*
 	Once this many decals pile up in one spot, the oldest of them is deleted
@@ -351,6 +363,87 @@ const material_decal_variants* find_material_decal_variants(
 	return &variants;
 }
 
+using wall_fixtures = augs::constant_size_vector<const b2Fixture*, MAX_WALL_FIXTURES_CONSIDERED>;
+
+/*
+	The fixtures around a box that form one wall with the entered fixture.
+*/
+inline wall_fixtures gather_wall_fixtures(
+	const cosmos& cosm,
+	const b2Fixture& entered,
+	const vec2 box_center,
+	const vec2 box_size
+) {
+	wall_fixtures result;
+
+	const auto& physics = cosm.get_solvable_inferred().physics;
+
+	physics.for_each_in_aabb(
+		cosm.get_si(),
+		box_center - box_size / 2,
+		box_center + box_size / 2,
+		filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY],
+		[&](const b2Fixture& f) {
+			if (result.size() == result.max_size()) {
+				return callback_result::ABORT;
+			}
+
+			if (::same_wall(entered, f)) {
+				result.push_back(std::addressof(f));
+			}
+
+			return callback_result::CONTINUE;
+		}
+	);
+
+	return result;
+}
+
+inline const b2Fixture* find_wall_fixture_at(
+	const wall_fixtures& wall,
+	const si_scaling si,
+	const vec2 point
+) {
+	const auto point_meters = b2Vec2(si.get_meters(point));
+
+	for (const auto* const f : wall) {
+		if (f->TestPoint(point_meters)) {
+			return f;
+		}
+	}
+
+	return nullptr;
+}
+
+/*
+	Whether a rotated decal lies entirely within the wall, however many fixtures it spans.
+	Edge midpoints are tested too, so that a concave junction of fixtures is not missed.
+*/
+inline bool decal_fits_in_wall(
+	const wall_fixtures& wall,
+	const si_scaling si,
+	const vec2 center,
+	const vec2 size,
+	const real32 rotation
+) {
+	const auto corners = augs::make_rotated_corners(size, rotation);
+
+	for (std::size_t i = 0; i < corners.size(); ++i) {
+		const auto a = center + corners[i];
+		const auto b = center + corners[(i + 1) % corners.size()];
+
+		if (::find_wall_fixture_at(wall, si, a) == nullptr) {
+			return false;
+		}
+
+		if (::find_wall_fixture_at(wall, si, (a + b) / 2) == nullptr) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /*
 	Spawns a gunshot, melee or explosion decal on the hit surface,
 	picked from the given variant list of the surface's material.
@@ -359,9 +452,11 @@ const material_decal_variants* find_material_decal_variants(
 	so that it (almost) never sticks out of the convex fixture.
 
 	When the target position already overlaps another surface decal,
-	the decal is pushed deeper along the trajectory, step by step.
+	the decal is pushed deeper along the trajectory, step by step -
+	also into the other fixtures of the same wall, taking on
+	the owner and the material of the fixture it ends up in.
 	get_max_stacking_depth_px is only invoked if that happens,
-	and must yield the bullet's actual reachable depth in this material.
+	and must yield how deep the bullet actually gets within this wall.
 
 	Returns the final transform of the spawned decal, if any -
 	e.g. so that the impact effects can be repositioned onto it.
@@ -393,7 +488,8 @@ std::optional<transformr> spawn_surface_impact_decal(
 
 	const auto& variants = *found_variants;
 
-	const auto flavour = variants[rng.randval(0, static_cast<int>(variants.size()) - 1)];
+	const auto variant_index = static_cast<std::size_t>(rng.randval(0, static_cast<int>(variants.size()) - 1));
+	const auto flavour = variants[variant_index];
 
 	if (!flavour.is_set()) {
 		return std::nullopt;
@@ -454,6 +550,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 	const auto decal_len = std::max(final_size_f.x, final_size_f.y);
 
 	auto final_center = fit->center;
+	const b2Fixture* placed_fixture = fixture;
 
 	nearby_decals nearby;
 
@@ -492,18 +589,23 @@ std::optional<transformr> spawn_surface_impact_decal(
 			const auto depth_budget = get_max_stacking_depth_px();
 
 			if (depth_budget >= step_len) {
-				/* Re-gather once over the whole corridor we may march through. */
-				const auto march_end = final_center + fit->applied_slide_dir * depth_budget;
+				const auto march_dir = fit->applied_slide_dir;
+				const auto march_end = final_center + march_dir * depth_budget;
 				const auto corridor = march_end - final_center;
+				const auto corridor_center = (final_center + march_end) / 2;
+				const auto corridor_size = vec2(std::abs(corridor.x), std::abs(corridor.y)) + vec2::square(decal_len * 2);
 
-				gather_nearby(
-					(final_center + march_end) / 2,
-					vec2(std::abs(corridor.x), std::abs(corridor.y)) + vec2::square(decal_len * 2)
-				);
+				/* Gather once for the whole corridor we may march through. */
+				gather_nearby(corridor_center, corridor_size);
+				const auto wall = ::gather_wall_fixtures(cosm, *fixture, corridor_center, corridor_size);
 
+				const auto max_skip = MAX_DECAL_STACKING_SKIP_MULT * decal_len;
+
+				auto candidate = final_center;
 				auto depth_used = 0.f;
+				auto skipped = 0.f;
 
-				for (int tries = 0; tries < MAX_DECAL_STACKING_TRIES; ++tries) {
+				for (int steps = 0; steps < MAX_DECAL_STACKING_STEPS_SAFETY_CAP; ++steps) {
 					if (!overlaps_any_nearby(final_center)) {
 						break;
 					}
@@ -512,14 +614,25 @@ std::optional<transformr> spawn_surface_impact_decal(
 						break;
 					}
 
-					const auto next_center = final_center + fit->applied_slide_dir * step_len;
+					candidate += march_dir * step_len;
+					depth_used += step_len;
 
-					if (!::rect_inside_convex(polygon, next_center, final_size_f, rotation, 0.5f)) {
-						break;
+					if (!::decal_fits_in_wall(wall, cosm.get_si(), candidate, final_size_f, rotation)) {
+						skipped += step_len;
+
+						if (skipped > max_skip) {
+							break;
+						}
+
+						continue;
 					}
 
-					final_center = next_center;
-					depth_used += step_len;
+					skipped = 0.f;
+					final_center = candidate;
+				}
+
+				if (const auto* const containing = ::find_wall_fixture_at(wall, cosm.get_si(), final_center)) {
+					placed_fixture = containing;
 				}
 			}
 		}
@@ -534,17 +647,43 @@ std::optional<transformr> spawn_surface_impact_decal(
 	const auto decal_transform = transformr(final_center, rotation);
 
 	/*
+		The march may have carried the decal into another fixture of the wall,
+		possibly of another entity and material.
+	*/
+	const auto placed_surface = cosm[placed_fixture->GetUserData()];
+
+	if (placed_surface.dead()) {
+		return std::nullopt;
+	}
+
+	const auto placed_flavour = [&]() {
+		if (placed_surface.get_id() == surface_handle.get_id()) {
+			return flavour;
+		}
+
+		if (const auto* const placed_variants = ::find_material_decal_variants(placed_surface, variants_of_material)) {
+			const auto candidate = (*placed_variants)[variant_index % placed_variants->size()];
+
+			if (candidate.is_set() && cosm.find_flavour(candidate) != nullptr) {
+				return candidate;
+			}
+		}
+
+		return flavour;
+	}();
+
+	/*
 		Inherit the surface's own tint, e.g. colored glass.
 		Applied through colorize so it composes with the flavour's base color.
 	*/
 	const auto surface_color = [&]() {
 		auto result = white;
 
-		if (const auto* const surface_sprite = surface_handle.template find<invariants::sprite>()) {
+		if (const auto* const surface_sprite = placed_surface.template find<invariants::sprite>()) {
 			result = surface_sprite->color;
 		}
 
-		if (const auto* const surface_sprite_state = surface_handle.template find<components::sprite>()) {
+		if (const auto* const surface_sprite_state = placed_surface.template find<components::sprite>()) {
 			result *= surface_sprite_state->colorize;
 		}
 
@@ -567,19 +706,19 @@ std::optional<transformr> spawn_surface_impact_decal(
 	auto attached_to = entity_id();
 	auto attachment_offset = transformr();
 
-	if (fixture->GetBody()->GetType() != b2_staticBody) {
-		if (const auto surface_transform = surface_handle.find_logic_transform()) {
-			attached_to = surface_handle.get_id();
+	if (placed_fixture->GetBody()->GetType() != b2_staticBody) {
+		if (const auto surface_transform = placed_surface.find_logic_transform()) {
+			attached_to = placed_surface.get_id();
 			attachment_offset = augs::get_relative_offset(*surface_transform, decal_transform);
 		}
 	}
 
 	::queue_decal_creation(
 		step,
-		flavour,
+		placed_flavour,
 		decal_transform,
 		::to_decal_sprite_size(final_size_f),
-		surface_handle.get_id(),
+		placed_surface.get_id(),
 		attached_to,
 		attachment_offset,
 		surface_color

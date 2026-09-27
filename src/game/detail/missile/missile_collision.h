@@ -7,6 +7,9 @@
 #include "game/detail/decals/penetration_fatigue.h"
 #include "game/detail/physics/calc_penetrability.hpp"
 #include "game/stateless_systems/sentience_system.h"
+#include "game/detail/missile/penetration_path.h"
+#include "augs/misc/randomization.h"
+#include "augs/templates/hash_templates.h"
 
 #if HEADLESS
 void draw_headshot_debug_lines(vec2, vec2, vec2, float) {}
@@ -24,6 +27,137 @@ enum class missile_collision_type {
 	CONTACT_START,
 	PRE_SOLVE,
 };
+
+/*
+	Marks the surface a bullet has just entered and moves the impact effects onto the mark,
+	so that the mark and the burst always match visually.
+*/
+template <class A, class S>
+void spawn_gunshot_decal_of_impact(
+	const logic_step step,
+	const A& typed_missile,
+	const components::missile& missile,
+	const S& surface_handle,
+	const b2Fixture* const fixture,
+	const vec2 point,
+	const vec2 impact_dir,
+	messages::damage_message& damage_msg
+) {
+	const auto& cosm = step.get_cosmos();
+
+	/*
+		Mixing in the fixture keeps several entries within one step
+		from rolling identical marks.
+	*/
+	auto rng = randomization(augs::hash_multiple(
+		cosm.get_rng_seed_for(typed_missile),
+		surface_handle.get_id().raw.indirection_index,
+		fixture != nullptr ? fixture->index_in_component : -1
+	));
+
+	/*
+		Only evaluated if the decal has to stack in depth:
+		how far this bullet would ACTUALLY get within the wall it has entered -
+		the same walk the laser performs.
+	*/
+	auto get_max_decal_depth = [&]() {
+		auto& obstacles = ::thread_local_penetration_obstacles();
+
+		::gather_penetration_obstacles(
+			cosm,
+			point,
+			impact_dir,
+			PENETRATION_PATH_MAX_RANGE_PX,
+			entity_id(),
+			obstacles
+		);
+
+		const auto stopped_at = ::walk_penetration_obstacles(
+			cosm,
+			obstacles,
+			point,
+			impact_dir,
+			missile.penetration_distance_remaining,
+			missile.starting_penetration_distance,
+			missile.penetration_fatigue_gift_used,
+			missile.when_fired.step,
+			[](auto&&...) {}
+		);
+
+		return std::min(
+			stopped_at.value_or(PENETRATION_PATH_MAX_RANGE_PX),
+			::calc_wall_run_end(obstacles)
+		);
+	};
+
+	const auto spawned_decal = ::spawn_surface_impact_decal(
+		step,
+		rng,
+		surface_handle,
+		fixture,
+		point,
+		impact_dir,
+		damage_msg.damage.base,
+		missile.decal_scale_of_sender,
+		&material_decals_def::gunshot_decals,
+		get_max_decal_depth
+	);
+
+	if (spawned_decal.has_value()) {
+		damage_msg.point_of_impact = spawned_decal->pos;
+	}
+}
+
+/*
+	While penetrating, a bullet gets no contact events with walls at all.
+	advance_penetrations calls this when the bullet's path crosses into
+	a surface that is not a part of the wall it was going through,
+	so that the surface gets hit just as if the bullet had flown into it.
+*/
+template <class A, class S>
+void on_missile_entered_next_surface(
+	const logic_step step,
+	const A& typed_missile,
+	const S& surface_handle,
+	const b2Fixture& fixture,
+	const vec2 entry_point,
+	const vec2 dir
+) {
+	const auto& missile_def = typed_missile.template get<invariants::missile>();
+	const auto& missile = typed_missile.template get<components::missile>();
+
+	messages::damage_message damage_msg;
+	damage_msg.damage = missile_def.damage;
+	damage_msg.damage *= missile.power_multiplier_of_sender;
+	damage_msg.origin = damage_origin(typed_missile);
+
+	const auto dist_remaining = missile.penetration_distance_remaining;
+	const auto dist_starting = missile.starting_penetration_distance;
+
+	if (dist_remaining != dist_starting && dist_starting != 0.0f) {
+		damage_msg.damage *= dist_remaining / dist_starting;
+		damage_msg.origin.circumstances.wallbang = true;
+	}
+
+	damage_msg.subject = surface_handle;
+	damage_msg.impact_velocity = typed_missile.template get<components::rigid_body>().get_velocity();
+	damage_msg.normal = -dir;
+	damage_msg.point_of_impact = entry_point;
+	damage_msg.spawn_destruction_effects = true;
+
+	::spawn_gunshot_decal_of_impact(
+		step,
+		typed_missile,
+		missile,
+		surface_handle,
+		std::addressof(fixture),
+		entry_point,
+		dir,
+		damage_msg
+	);
+
+	step.post_message(damage_msg);
+}
 
 template <class A, class B>
 static std::optional<missile_collision_result> collide_missile_against_surface(
@@ -256,52 +390,16 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					A non-ricochet hit against a wall - ricochets returned early above.
 					This also spawns on every penetration entry, as the bullet is not yet destroyed then.
 				*/
-				{
-					auto rng = cosm.get_rng_for(typed_missile);
-
-					/*
-						Only evaluated if the decal has to stack in depth:
-						how far this bullet would ACTUALLY travel through this material,
-						given the current decal coverage - the same walk
-						that advance_penetrations and the laser perform.
-					*/
-					auto get_max_decal_depth = [&]() {
-						return ::calc_penetration_reach_px(
-							cosm,
-							surface_handle.get_id(),
-							point,
-							impact_dir,
-							missile.penetration_distance_remaining,
-							::calc_remaining_fatigue_gift(
-								missile.starting_penetration_distance,
-								missile.penetration_fatigue_gift_used
-							),
-							::calc_penetrability(surface_handle),
-							missile.when_fired.step
-						).reach;
-					};
-
-					const auto spawned_decal = ::spawn_surface_impact_decal(
-						step,
-						rng,
-						surface_handle,
-						::find_fixture_of_impact(surface_handle, cosm.get_si(), point),
-						point,
-						impact_dir,
-						damage_msg.damage.base,
-						missile.decal_scale_of_sender,
-						&material_decals_def::gunshot_decals,
-						get_max_decal_depth
-					);
-
-					/*
-						Reposition the impact/destruction effects onto the decal,
-						so that the mark and the burst always match visually.
-					*/
-					if (spawned_decal.has_value()) {
-						damage_msg.point_of_impact = spawned_decal->pos;
-					}
-				}
+				::spawn_gunshot_decal_of_impact(
+					step,
+					typed_missile,
+					missile,
+					surface_handle,
+					::find_fixture_of_impact(surface_handle, cosm.get_si(), point),
+					point,
+					impact_dir,
+					damage_msg
+				);
 			}
 		}
 

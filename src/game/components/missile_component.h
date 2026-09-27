@@ -47,6 +47,7 @@ namespace components {
 
 		vec2 prev_tip_position = vec2::zero;
 		vec2 potential_exit = vec2::zero;
+		entity_id last_penetrated_surface;
 
 		bool during_penetration = false;
 		bool deleted_already = false;
