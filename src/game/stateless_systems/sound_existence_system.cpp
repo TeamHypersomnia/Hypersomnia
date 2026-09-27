@@ -30,30 +30,24 @@
 #include "augs/misc/randomization.h"
 #include "game/detail/calc_ammo_info.hpp"
 
-/*
-	col may be dead - e.g. for the floor, which has no entity - then only collider_material_id is known.
-*/
-
-static void play_material_collision_sound(
+void play_collision_sound(
 	const real32 strength,
 	const transformr location,
 	const const_entity_handle sub,
 	const const_entity_handle col,
-	const assets::physical_material_id collider_material_id,
-	const real32 collider_sensitivity,
-	const real32 pitch_mult,
 	const logic_step step
 ) {
 	const auto& cosm = step.get_cosmos();
 	const auto& logicals = cosm.get_logical_assets();
 	const auto subject_coll = sub.find<invariants::fixtures>();
+	const auto collider_coll = col.find<invariants::fixtures>();
 
-	if (subject_coll == nullptr) {
+	if (subject_coll == nullptr || collider_coll == nullptr) {
 		return;
 	}
 
 	const bool sub_missile = sub.find<invariants::missile>();
-	const bool col_missile = col.alive() && col.find<invariants::missile>();
+	const bool col_missile = col.find<invariants::missile>();
 
 	const bool for_damage_cooldown = sub_missile || col_missile;
 	
@@ -62,7 +56,7 @@ static void play_material_collision_sound(
 			return;
 		}
 
-		const auto impulse = strength * subject_coll->collision_sound_sensitivity * collider_sensitivity;
+		const auto impulse = strength * subject_coll->collision_sound_sensitivity * collider_coll->collision_sound_sensitivity;
 
 		constexpr real32 gain_normalizer = 1.f / 225.f;
 		constexpr real32 pitch_normalizer = 1.f / 185.f;
@@ -71,6 +65,7 @@ static void play_material_collision_sound(
 		nicely_scaled_sound_sens *= nicely_scaled_sound_sens*nicely_scaled_sound_sens;
 
 		const auto gain_mult = impulse * impulse * nicely_scaled_sound_sens * gain_normalizer;
+		const auto pitch_mult = impulse * pitch_normalizer;
 
 		if (gain_mult <= 0.01f) {
 			return;
@@ -93,7 +88,7 @@ static void play_material_collision_sound(
 		auto effect = sound_def->effect;
 
 		const auto& pitch_bound = sound_def->pitch_bound;
-		effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - impulse * pitch_normalizer) * pitch_mult;
+		effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
 		effect.modifier.gain *= std::min(1.f, gain_mult);
 
 		auto start = sound_effect_start_input::fire_and_forget(location);
@@ -106,12 +101,7 @@ static void play_material_collision_sound(
 
 			start.mark_as_missile_impact(capability, wall);
 		}
-		else if (col.alive()) {
-			/*
-				Floor hits are few and timed, so they are never muted like repeated collisions between two bodies -
-				that would leave only one of the two materials' sounds.
-			*/
-
+		else {
 			start.mark_source_collision(sub, col);
 			start.collision_unmute_after_ms = sound_def->unmute_after_ms;
 			start.collision_mute_after_playing_times = sound_def->mute_after_playing_times;
@@ -148,6 +138,7 @@ static void play_material_collision_sound(
 	*/
 
 	const auto subject_material_id = calc_physical_material(sub);
+	const auto collider_material_id = calc_physical_material(col);
 
 	const auto* const subject_coll_material = logicals.find(subject_material_id);
 	const auto* const collider_coll_material = logicals.find(collider_material_id);
@@ -192,57 +183,6 @@ static void play_material_collision_sound(
 			play_sound(second);
 		}
 	}
-}
-
-void play_collision_sound(
-	const real32 strength,
-	const transformr location,
-	const const_entity_handle sub,
-	const const_entity_handle col,
-	const logic_step step
-) {
-	const auto collider_coll = col.find<invariants::fixtures>();
-
-	if (collider_coll == nullptr) {
-		return;
-	}
-
-	::play_material_collision_sound(
-		strength,
-		location,
-		sub,
-		col,
-		calc_physical_material(col),
-		collider_coll->collision_sound_sensitivity,
-		1.f,
-		step
-	);
-}
-
-void play_floor_collision_sound(
-	const real32 strength,
-	const real32 pitch_mult,
-	const transformr location,
-	const const_entity_handle sub,
-	const logic_step step
-) {
-	const auto& cosm = step.get_cosmos();
-	const auto floor_material = cosm.get_common_significant().assets.floor_material;
-
-	if (!floor_material.is_set()) {
-		return;
-	}
-
-	::play_material_collision_sound(
-		strength,
-		location,
-		sub,
-		cosm[entity_id()],
-		floor_material,
-		1.f,
-		pitch_mult,
-		step
-	);
 }
 
 void sound_existence_system::play_sounds_from_events(const logic_step step) const {

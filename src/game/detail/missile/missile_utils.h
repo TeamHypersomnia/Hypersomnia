@@ -8,18 +8,6 @@ void play_collision_sound(
 	const logic_step step
 );
 
-/*
-	Of the subject hitting the floor, whose material is common_assets::floor_material.
-*/
-
-void play_floor_collision_sound(
-	const real32 strength,
-	const real32 pitch_mult,
-	const transformr location,
-	const const_entity_handle sub,
-	const logic_step step
-);
-
 template <class R, class F>
 static void spawn_bullet_remnants(
 	allocate_new_entity_access access,

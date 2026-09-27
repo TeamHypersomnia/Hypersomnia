@@ -60,6 +60,17 @@ namespace test_flavours {
 				item.wear_sound.id = to_sound_id(test_scene_sound_id::SHEATH_KNIFE);
 				item.draw_over_hands = false;
 
+				/*
+					Knives hit the floor like they hit metal walls, only lower.
+				*/
+
+				for (auto& sound : item.floor_hit_sounds) {
+					sound.id = to_sound_id(test_scene_sound_id::COLLISION_KNIFE_METAL);
+				}
+
+				item.floor_hit_sounds[0].modifier.pitch = 0.935f;
+				item.floor_hit_sounds[1].modifier.pitch = 0.895f;
+
 				meta.set(item);
 			}
 

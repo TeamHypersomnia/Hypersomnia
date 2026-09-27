@@ -39,7 +39,6 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/inventory/item_falling.h"
-#include "game/detail/missile/missile_utils.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/inventory/wielding_setup.h"
@@ -916,13 +915,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			if (const auto item_state = item.template find<components::item>()) {
 				auto& fall = item_state.get_fall();
 
-				::start_falling(
+				::start_falling_like_dropped(
 					fall,
-					DROPPED_ITEM_FLOOR_HITS,
 					DROPPED_ITEM_FALL_SECS * (thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f),
 					DROPPED_ITEM_FALL_HEIGHT,
-					0.f,
-					false,
 					cosm.get_nontemporal_rng_seed_for(item),
 					cosm.get_timestamp()
 				);
@@ -1574,43 +1570,32 @@ void item_system::advance_falling_items(const logic_step step) {
 			return hit_index >= 2 ? third_hit_mult : 1.f;
 		};
 
+		/*
+			Floor hit sounds play in order - hits without them are silent.
+			Thrown explosives have their own, other items those of their invariants::item.
+		*/
+
 		auto play_hit_sound = [&]() {
-			if (explosive) {
-				if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
-					const auto& sounds = fuse_def->floor_hit_sounds;
-
-					if (sounds[0].id.is_set()) {
-						/*
-							The explosive's own floor hit sounds, in order - the hits after them are silent.
-						*/
-
-						if (hit_index < sounds.size()) {
-							auto effect = sounds[hit_index];
-							effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index);
-
-							effect.start(
-								step,
-								sound_effect_start_input::fire_and_forget(typed_item.get_logic_transform()),
-								always_predictable_v
-							);
-						}
-
-						return;
+			const auto& sounds = [&]() -> const std::array<sound_effect_input, 2>& {
+				if (explosive) {
+					if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
+						return fuse_def->floor_hit_sounds;
 					}
 				}
+
+				return typed_item.template get<invariants::item>().floor_hit_sounds;
+			}();
+
+			if (hit_index < sounds.size() && sounds[hit_index].id.is_set()) {
+				auto effect = sounds[hit_index];
+				effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index);
+
+				effect.start(
+					step,
+					sound_effect_start_input::fire_and_forget(typed_item.get_logic_transform()),
+					always_predictable_v
+				);
 			}
-
-			/*
-				Lower hops are quieter.
-			*/
-
-			::play_floor_collision_sound(
-				FLOOR_HIT_STRENGTH * std::sqrt(std::min(fall.hop_height, 1.f)),
-				::calc_floor_hit_pitch(fall_seed, hit_index),
-				typed_item.get_logic_transform(),
-				typed_item,
-				step
-			);
 		};
 
 		auto spin = [&]() {

@@ -67,6 +67,20 @@ inventory_space_type to_space_units(const std::string& s);
 
 const auto award_mult = 1.5f;
 
+/*
+	Weapons hit the floor with two sounds, the second quieter and lower.
+*/
+
+static void set_weapon_floor_hit_sounds(invariants::item& item) {
+	item.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::WEAPON_FLOOR_HIT_FIRST);
+	item.floor_hit_sounds[0].modifier.gain = 1.0f;
+	item.floor_hit_sounds[0].modifier.pitch = 1.1f;
+
+	item.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::WEAPON_FLOOR_HIT_SECOND);
+	item.floor_hit_sounds[1].modifier.gain = 0.7f;
+	item.floor_hit_sounds[1].modifier.pitch = 1.0f;
+}
+
 namespace test_flavours {
 	void populate_gun_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
@@ -173,6 +187,7 @@ namespace test_flavours {
 
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
+			::set_weapon_floor_hit_sounds(item);
 			item.gratis_ammo_pieces_with_first = 3;
 
 			const bool under_hands = stance == item_holding_stance::HEAVY_LIKE || stance == item_holding_stance::PISTOL_LIKE;
@@ -5176,6 +5191,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("3.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			item.gratis_ammo_pieces_with_first = 0;
+			::set_weapon_floor_hit_sounds(item);
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 4100;
 		}
@@ -5215,6 +5231,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("5.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			item.gratis_ammo_pieces_with_first = 0;
+			::set_weapon_floor_hit_sounds(item);
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2600;
 		}

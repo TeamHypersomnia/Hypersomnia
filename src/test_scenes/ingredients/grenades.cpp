@@ -20,6 +20,18 @@
 
 inventory_space_type to_space_units(const std::string& s);
 
+/*
+	Dropped unarmed, grenades - and the bomb - hit the floor with the same sound twice, the second time lower.
+*/
+
+static void set_dropped_grenade_floor_hit_sounds(invariants::item& item) {
+	for (auto& sound : item.floor_hit_sounds) {
+		sound.id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+	}
+
+	item.floor_hit_sounds[1].modifier.pitch = 0.85f;
+}
+
 namespace test_flavours {
 	void populate_grenade_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
@@ -40,6 +52,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			item.standard_price = 1000;
+			set_dropped_grenade_floor_hit_sounds(item);
 			meta.set(item);
 
 			{
@@ -143,6 +156,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.standard_price = 600;
 			item.space_occupied_per_charge = to_space_units("1.0");
+			set_dropped_grenade_floor_hit_sounds(item);
 			meta.set(item);
 
 			{
@@ -241,6 +255,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.standard_price = 700;
 			item.space_occupied_per_charge = to_space_units("1.0");
+			set_dropped_grenade_floor_hit_sounds(item);
 			meta.set(item);
 
 			{
@@ -301,6 +316,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.standard_price = 800;
 			item.space_occupied_per_charge = to_space_units("1.0");
+			set_dropped_grenade_floor_hit_sounds(item);
 			meta.set(item);
 
 			{
@@ -548,6 +564,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("30");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::OVER_BACK_WEARABLE };
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
+			set_dropped_grenade_floor_hit_sounds(item);
 
 			meta.set(item);
 

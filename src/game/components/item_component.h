@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_types.h"
 
@@ -70,6 +71,7 @@ namespace invariants {
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
+		std::array<sound_effect_input, 2> floor_hit_sounds;
 
 		money_type standard_price = 0;
 

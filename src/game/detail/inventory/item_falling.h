@@ -39,6 +39,7 @@ inline constexpr real32 NEXT_HOP_HEIGHT_MULT = 0.5f;
 	then the second hit turns them a bit the other way, and every next one keeps turning them that way.
 	The third and later hits are only slight turns and nudges, and the last one - silent - only a symbolic one.
 	Thrown melee weapons fall just like dropped items, only with every interval a bit longer.
+	Items unmounted onto the floor, like magazines dropped while reloading, fall from higher and longer.
 */
 
 inline constexpr uint8_t DROPPED_ITEM_FLOOR_HITS = 3;
@@ -48,6 +49,8 @@ inline constexpr real32 DROPPED_ITEM_FALL_SECS = 0.22f;
 inline constexpr real32 DROPPED_ITEM_FALL_HEIGHT = 1.6f;
 inline constexpr real32 DROPPED_ITEM_MIN_HOP_SECS = 0.25f;
 inline constexpr real32 THROWN_MELEE_HOP_DURATION_MULT = 1.25f;
+inline constexpr real32 UNMOUNTED_ITEM_FALL_SECS = 0.42f;
+inline constexpr real32 UNMOUNTED_ITEM_FALL_HEIGHT = 4.4f;
 
 inline constexpr real32 DROPPED_ITEM_SPIN_KEPT = 0.25f;
 inline constexpr real32 DROPPED_ITEM_COUNTER_SPIN_DEGREES = 310.f;
@@ -80,25 +83,18 @@ inline constexpr real32 SLOW_THROW_SPEED = 0.7f * NORMAL_THROW_SPEED;
 inline constexpr uint8_t SLOW_THROW_MAX_FLOOR_HITS = 2;
 
 inline constexpr real32 EXPLOSIVE_HAND_HEIGHT = 1.f;
-inline constexpr real32 EXPLOSIVE_THROW_HEIGHT = 2.5f;
+inline constexpr real32 EXPLOSIVE_THROW_HEIGHT = 5.f;
 inline constexpr real32 EXPLOSIVE_MIN_THROW_HEIGHT_MULT = 0.3f;
 inline constexpr real32 EXPLOSIVE_MAX_THROW_HEIGHT_MULT = 1.3f;
 
 inline constexpr real32 EXPLOSIVE_FLOOR_HIT_SPIN_DEGREES = 1575.f;
 
 /*
-	Sounds of items hitting the floor with their materials, unless explosives have their own.
-
-	Hitting the floor sounds clearly lower than hitting a wall.
-	The pitch of an object hitting something comes from its own resonance,
-	so it varies by which side it hits the floor with - by more than the drop between hits, so a hit is sometimes higher.
-	Weaker hits excite fewer high overtones and sound duller, so on average every next hit is lower.
-	Even the highest stays below a hit against a wall. Every fall sounds a bit different as a whole too.
+	Sounds of items hitting the floor are their own - of thrown explosives in invariants::hand_fuse,
+	of other items in invariants::item - and without them the hits are silent.
+	Their pitch varies by which side the item hits the floor with, and a bit for every fall as a whole.
 */
 
-inline constexpr real32 FLOOR_HIT_STRENGTH = 15.f;
-inline constexpr real32 FLOOR_HIT_PITCH_MULT = 0.8f;
-inline constexpr real32 NEXT_FLOOR_HIT_PITCH_DROP = 0.05f;
 inline constexpr real32 FLOOR_HIT_PITCH_VARIATION = 0.12f;
 inline constexpr real32 FALL_PITCH_VARIATION = 0.08f;
 
@@ -191,11 +187,6 @@ inline real32 calc_floor_hit_pitch_variation(const rng_seed_type fall_seed, cons
 	;
 }
 
-inline real32 calc_floor_hit_pitch(const rng_seed_type fall_seed, const uint8_t hit_index) {
-	const auto average = FLOOR_HIT_PITCH_MULT * std::pow(1.f - NEXT_FLOOR_HIT_PITCH_DROP, static_cast<real32>(hit_index));
-	return average * ::calc_floor_hit_pitch_variation(fall_seed, hit_index);
-}
-
 /*
 	The floor is hit at the first step at which the hop has lasted its duration.
 */
@@ -225,6 +216,16 @@ inline void start_falling(
 	fall.when_hop_started = now;
 	fall.hop_duration_secs = first_hop_secs * ::calc_hop_duration_mult(duration_variation, ::calc_fall_seed(nontemporal_item_seed, now), 0);
 	fall.hop_height = first_hop_height;
+}
+
+inline void start_falling_like_dropped(
+	item_fall_state& fall,
+	const real32 first_hop_secs,
+	const real32 first_hop_height,
+	const rng_seed_type nontemporal_item_seed,
+	const augs::stepped_timestamp now
+) {
+	::start_falling(fall, DROPPED_ITEM_FLOOR_HITS, first_hop_secs, first_hop_height, 0.f, false, nontemporal_item_seed, now);
 }
 
 inline uint8_t calc_thrown_explosive_floor_hits(const real32 speed, const uint8_t floor_hits_when_thrown) {

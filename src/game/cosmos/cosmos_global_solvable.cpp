@@ -9,6 +9,7 @@
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/item_mounting.hpp"
+#include "game/detail/inventory/item_falling.h"
 #include "game/messages/start_sound_effect.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/might_allocate_entities_having.hpp"
@@ -184,6 +185,20 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					}
 
 					::perform_transfer(transfer, step);
+
+					if (target_slot.dead()) {
+						/*
+							Unmounted onto the floor, like magazines dropped while reloading.
+						*/
+
+						::start_falling_like_dropped(
+							transferred_item.template get<components::item>().get_fall(),
+							UNMOUNTED_ITEM_FALL_SECS,
+							UNMOUNTED_ITEM_FALL_HEIGHT,
+							cosm.get_nontemporal_rng_seed_for(transferred_item),
+							cosm.get_timestamp()
+						);
+					}
 				}
 			}
 			else {
