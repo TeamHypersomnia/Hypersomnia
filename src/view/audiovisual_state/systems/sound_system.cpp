@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cmath>
 #include "augs/templates/container_templates.h"
 #include "augs/audio/sound_buffer.h"
 #include "game/cosmos/logic_step.h"
@@ -8,6 +10,7 @@
 #include "game/cosmos/for_each_entity.h"
 
 #include "game/messages/start_sound_effect.h"
+#include "game/messages/gunshot_message.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
@@ -22,6 +25,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/flashbang_math.h"
 #include "game/detail/find_absolute_or_local_transform.h"
+#include "game/detail/shell_params.h"
 #include "augs/log.h"
 
 struct shouldnt_play {};
@@ -77,6 +81,37 @@ bool sound_system::start_fading(generic_sound_cache& cache, const float fade_per
 	return false;
 }
 
+/*
+	Past max_shell_sounds_per_gun, the oldest shell sounds of the gun fade out - after the new one started playing,
+	so that none stops for nothing, when the new one turns out not to play at all.
+*/
+
+void sound_system::evict_excess_shell_sounds(const update_properties_input& in, const entity_id gun) {
+	auto of_gun = [&](const generic_sound_cache& c) {
+		return c.original.start.shell_ejected_by == gun && c.probably_still_playing();
+	};
+
+	/*
+		Short sounds are in the order they started, so the oldest come first - and the new one, last, is never evicted.
+	*/
+
+	auto num_to_evict = static_cast<int>(std::count_if(short_sounds.begin(), short_sounds.end(), of_gun)) - in.settings.max_shell_sounds_per_gun;
+
+	erase_if(short_sounds, [&](generic_sound_cache& c) {
+		if (num_to_evict <= 0 || !of_gun(c)) {
+			return false;
+		}
+
+		--num_to_evict;
+
+		if (!start_fading(c, SHELL_SOUNDS_EVICTION_FADE_PER_SEC)) {
+			c.stop_and_free(in);
+		}
+
+		return true;
+	});
+}
+
 void sound_system::clear_sources_playing(const assets::sound_id id) {
 	auto and_free_proxy_id = [&](const augs::sound_source_proxy_id& id) {
 		id_pool.free(id);
@@ -121,6 +156,7 @@ void sound_system::update_listener(
 		;
 
 		cmd.position = listener_pos;
+		last_listener_pos = listener_pos;
 	}
 
 	cmd.velocity = listener_handle ? listener_handle.get_effective_velocity() : vec2(0, 0);
@@ -358,6 +394,10 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 			}
 		}
 
+		if (original.start.shell_ejected_by.is_set()) {
+			return in.volume.get_sound_effects_volume() * in.settings.shell_sounds_gain * in.owner.get_shell_sounds_ducking_mult();
+		}
+
 		return in.volume.get_sound_effects_volume();
 	}();
 
@@ -472,7 +512,44 @@ bool sound_system::generic_sound_cache::probably_still_playing() const {
 	return elapsed_secs <= source.buffer_meta.computed_length_in_seconds * reps;
 }
 
+void sound_system::duck_shell_sounds_at_gunshots(const const_logic_step step) {
+	const auto& cosm = step.get_cosmos();
+
+	for (const auto& shot : step.get_queue<messages::gunshot_message>()) {
+		const auto gun = cosm[shot.subject];
+
+		if (gun.dead()) {
+			continue;
+		}
+
+		const auto distance = (shot.muzzle_transform.pos - last_listener_pos).length();
+
+		gun.dispatch_on_having_all<invariants::gun>([&](const auto& typed_gun) {
+			const auto reference_distance = typed_gun.template get<invariants::gun>().muzzle_shot_sound.modifier.reference_distance;
+			const auto heard_within = reference_distance * SHELL_SOUNDS_DUCKING_DISTANCE_MULT;
+
+			if (distance <= heard_within) {
+				shell_sounds_ducking_rises = true;
+			}
+		});
+	}
+}
+
+/*
+	Evenly in decibels - linear in gain would recover too abruptly at first.
+*/
+
+float sound_system::get_shell_sounds_ducking_mult() const {
+	if (shell_sounds_ducking >= 1.f && SHELL_SOUNDS_DUCKED_GAIN <= 0.f) {
+		return 0.f;
+	}
+
+	return std::pow(std::max(SHELL_SOUNDS_DUCKED_GAIN, SHELL_SOUNDS_DUCKING_SILENCE_GAIN), shell_sounds_ducking);
+}
+
 void sound_system::update_effects_from_messages(const const_logic_step step, const update_properties_input in) {
+	duck_shell_sounds_at_gunshots(step);
+
 	{
 		const auto& events = step.get_queue<messages::stop_sound_effect>();
 
@@ -566,6 +643,12 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				}
 			}
 
+			const auto shell_ejected_by = e.payload.start.shell_ejected_by;
+
+			if (shell_ejected_by.is_set() && in.settings.max_shell_sounds_per_gun <= 0) {
+				continue;
+			}
+
 			if (in.settings.max_short_sounds > 0 && !id_pool.full() && short_sounds.size() < short_sounds.max_size()) {
 				if (in.short_sound_limit_exceeded()) {
 					if (short_sounds.size() > 0) {
@@ -582,6 +665,10 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 
 				try {
 					short_sounds.emplace_back(new_id, e.payload, in);
+
+					if (shell_ejected_by.is_set()) {
+						evict_excess_shell_sounds(in, shell_ejected_by);
+					}
 				}
 				catch (const effect_not_found&) {
 					release_id();
@@ -634,6 +721,14 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 }
 
 void sound_system::update_elapsed_times(const augs::delta dt) {
+	if (shell_sounds_ducking_rises) {
+		shell_sounds_ducking = std::min(1.f, shell_sounds_ducking + dt.in_seconds() / SHELL_SOUNDS_DUCKING_ATTACK_SECS);
+		shell_sounds_ducking_rises = shell_sounds_ducking < 1.f;
+	}
+	else {
+		shell_sounds_ducking = std::max(0.f, shell_sounds_ducking - dt.in_seconds() / SHELL_SOUNDS_DUCKING_RECOVERY_SECS);
+	}
+
 	silent_trace_cooldown += dt.in_milliseconds();
 
 	if (silent_trace_cooldown > 150.f) {

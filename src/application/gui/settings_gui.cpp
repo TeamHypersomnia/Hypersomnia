@@ -1064,6 +1064,8 @@ void settings_gui_state::perform(
 					}
 
 					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
+					revertable_slider(SCOPE_CFG_NVP(max_shell_sounds_per_gun), 0, 7);
+					revertable_slider(SCOPE_CFG_NVP(shell_sounds_gain), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
 
 #if 0

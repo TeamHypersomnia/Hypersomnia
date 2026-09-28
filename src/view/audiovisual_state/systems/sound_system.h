@@ -181,12 +181,24 @@ class sound_system {
 	);
 
 	bool start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
+	void evict_excess_shell_sounds(const update_properties_input&, entity_id gun);
 
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
 
 	float silent_trace_cooldown = 0.f;
 	int current_num_silent_traces = 0;
+
+	/*
+		Rises to 1 as a gunshot is heard nearby, then recovers down to 0 - see SHELL_SOUNDS_DUCKED_GAIN.
+	*/
+
+	float shell_sounds_ducking = 0.f;
+	bool shell_sounds_ducking_rises = false;
+	vec2 last_listener_pos;
+
+	void duck_shell_sounds_at_gunshots(const_logic_step);
+	float get_shell_sounds_ducking_mult() const;
 
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}

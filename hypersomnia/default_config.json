@@ -490,6 +490,8 @@
         "listener_reference": "CHARACTER_POSITION",
         "set_listener_orientation_to_character_orientation": false,
         "max_simultaneous_bullet_trace_sounds": 5,
+        "max_shell_sounds_per_gun": 4,
+        "shell_sounds_gain": 1.0,
         "gain_threshold_for_bullet_trace_sounds": 0.012,
         "max_short_sounds": 80,
         "processing_frequency": "EVERY_SINGLE_FRAME",
