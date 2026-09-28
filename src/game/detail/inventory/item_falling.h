@@ -1,12 +1,19 @@
 #pragma once
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include "augs/math/arithmetical.h"
+#include "augs/math/transform.h"
+#include "augs/misc/bound.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/randomization.h"
 #include "augs/templates/hash_templates.h"
 #include "game/components/item_component.h"
 #include "game/components/item_sync.h"
+#include "game/components/item_fall_state.h"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/predictability_info.h"
+#include "game/detail/shell_params.h"
 
 /*
 	Items thrown or dropped explicitly hit the floor a few times before they come to rest.
@@ -151,6 +158,8 @@ inline real32 calc_hop_curve(const real32 distance_from_top) {
 
 enum class floor_hit_rng_purpose : uint8_t {
 	HOP_DURATION,
+	PUSH,
+	ROLL_SIDE,
 	PITCH_SIDE,
 	FALL_PITCH
 };
@@ -177,13 +186,18 @@ inline real32 calc_hop_duration_mult(const real32 variation, const rng_seed_type
 	The random part of the pitch of a floor hit - for the whole fall and for the side the item hits the floor with.
 */
 
-inline real32 calc_floor_hit_pitch_variation(const rng_seed_type fall_seed, const uint8_t hit_index) {
+inline real32 calc_floor_hit_pitch_variation(
+	const rng_seed_type fall_seed,
+	const uint8_t hit_index,
+	const real32 fall_variation,
+	const real32 hit_variation
+) {
 	auto fall_rng = ::make_floor_hit_rng(fall_seed, 0, floor_hit_rng_purpose::FALL_PITCH);
 	auto side_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::PITCH_SIDE);
 
 	return
-		fall_rng.randval(1.f - FALL_PITCH_VARIATION, 1.f + FALL_PITCH_VARIATION)
-		* side_rng.randval(1.f - FLOOR_HIT_PITCH_VARIATION, 1.f + FLOOR_HIT_PITCH_VARIATION)
+		fall_rng.randval(1.f - fall_variation, 1.f + fall_variation)
+		* side_rng.randval(1.f - hit_variation, 1.f + hit_variation)
 	;
 }
 
@@ -195,8 +209,76 @@ inline uint32_t calc_hop_steps(const real32 hop_duration_secs, const augs::delta
 	return static_cast<uint32_t>(std::max(1.f, std::ceil(hop_duration_secs / dt.in_seconds() - 0.001f)));
 }
 
+inline bool is_floor_hit_due(const item_fall_state& fall, const augs::stepped_timestamp now, const augs::delta dt) {
+	return fall.floor_hits_left > 0 && (now - fall.when_hop_started).step >= ::calc_hop_steps(fall.hop_duration_secs, dt);
+}
+
+/*
+	After a floor hit: counts it and starts the next hop, shorter and lower.
+	Varied hops shorten from their unvaried durations.
+*/
+
+inline void count_floor_hit_and_start_next_hop(
+	item_fall_state& fall,
+	const real32 variation,
+	const real32 min_hop_secs,
+	const rng_seed_type fall_seed,
+	const augs::stepped_timestamp now
+) {
+	const auto hit_index = fall.floor_hits_done;
+	const auto unvaried_secs = fall.hop_duration_secs / ::calc_hop_duration_mult(variation, fall_seed, hit_index);
+	const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR;
+
+	++fall.floor_hits_done;
+	--fall.floor_hits_left;
+
+	if (fall.floor_hits_left == 0) {
+		fall.when_landed = now;
+	}
+
+	fall.when_hop_started = now;
+	fall.hop_duration_secs = std::max(min_hop_secs, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
+	fall.hop_height *= NEXT_HOP_HEIGHT_MULT;
+}
+
+/*
+	Floor hit sounds play in order - hits without them are silent.
+*/
+
+template <class S>
+void play_floor_hit_sound(
+	const S& step,
+	const std::array<sound_effect_input, 2>& sounds,
+	const item_fall_state& fall,
+	const rng_seed_type fall_seed,
+	const transformr where,
+	const real32 fall_pitch_variation = FALL_PITCH_VARIATION,
+	const real32 hit_pitch_variation = FLOOR_HIT_PITCH_VARIATION,
+	const entity_id shell_ejected_by = entity_id()
+) {
+	const auto hit_index = fall.floor_hits_done;
+
+	if (hit_index >= sounds.size() || !sounds[hit_index].id.is_set()) {
+		return;
+	}
+
+	auto effect = sounds[hit_index];
+	effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index, fall_pitch_variation, hit_pitch_variation);
+
+	auto start = sound_effect_start_input::fire_and_forget(where);
+
+	if (fall.sound_variation != NO_SOUND_VARIATION) {
+		start.variation_number = fall.sound_variation;
+	}
+
+	start.shell_ejected_by = shell_ejected_by;
+
+	effect.start(step, start, always_predictable_v);
+}
+
 /*
 	thrown_up makes the first hop rise before falling, and the hits spin like those of explosives.
+	fall_seed randomizes the fall - see calc_fall_seed.
 */
 
 inline void start_falling(
@@ -206,7 +288,7 @@ inline void start_falling(
 	const real32 first_hop_height,
 	const real32 duration_variation,
 	const bool thrown_up,
-	const rng_seed_type nontemporal_item_seed,
+	const rng_seed_type fall_seed,
 	const augs::stepped_timestamp now
 ) {
 	fall = {};
@@ -214,7 +296,7 @@ inline void start_falling(
 	fall.thrown_up = thrown_up;
 	fall.when_started_falling = now;
 	fall.when_hop_started = now;
-	fall.hop_duration_secs = first_hop_secs * ::calc_hop_duration_mult(duration_variation, ::calc_fall_seed(nontemporal_item_seed, now), 0);
+	fall.hop_duration_secs = first_hop_secs * ::calc_hop_duration_mult(duration_variation, fall_seed, 0);
 	fall.hop_height = first_hop_height;
 }
 
@@ -225,7 +307,66 @@ inline void start_falling_like_dropped(
 	const rng_seed_type nontemporal_item_seed,
 	const augs::stepped_timestamp now
 ) {
-	::start_falling(fall, DROPPED_ITEM_FLOOR_HITS, first_hop_secs, first_hop_height, 0.f, false, nontemporal_item_seed, now);
+	::start_falling(fall, DROPPED_ITEM_FLOOR_HITS, first_hop_secs, first_hop_height, 0.f, false, ::calc_fall_seed(nontemporal_item_seed, now), now);
+}
+
+/*
+	height_roll is from 0 to 1.
+	Shells fall only once, so their shell_seed alone randomizes the fall - not when it starts,
+	and so the whole fall is decided as the shell is ejected, however late the shot comes.
+*/
+
+template <class V>
+void start_shell_falling(
+	item_fall_state& fall,
+	const augs::bound<real32> shell_height,
+	const real32 height_roll,
+	const V& variations_by_height,
+	const rng_seed_type shell_seed,
+	const augs::stepped_timestamp now
+) {
+	const auto height = augs::interp(shell_height.first, shell_height.second, height_roll);
+
+	const auto floor_hits = [&]() {
+		constexpr auto next_height_mult = 1.f / (NEXT_HOP_DURATION_DIVISOR * NEXT_HOP_DURATION_DIVISOR);
+
+		uint8_t hits = 1;
+
+		for (auto next_height = height * next_height_mult; next_height >= SHELL_LAST_HOP_HEIGHT && hits < 255; next_height *= next_height_mult) {
+			++hits;
+		}
+
+		return hits;
+	}();
+
+	::start_falling(
+		fall,
+		floor_hits,
+		SHELL_HOP_SECS_AT_UNIT_HEIGHT * std::sqrt(height),
+		height,
+		SHELL_HOP_DURATION_VARIATION,
+		true,
+		shell_seed,
+		now
+	);
+
+	if (!variations_by_height.empty()) {
+		const auto index = std::min(variations_by_height.size() - 1, static_cast<std::size_t>(height_roll * variations_by_height.size()));
+		fall.sound_variation = variations_by_height[index];
+	}
+}
+
+inline real32 calc_shell_low_hop_roll_mult(const real32 hop_height) {
+	return std::min(std::sqrt(hop_height / SHELL_LOW_HOP_ROLL_AT_HEIGHT), SHELL_LOW_HOP_ROLL_MAX_MULT);
+}
+
+/*
+	As high as a shell's hop of this duration would physically be.
+*/
+
+inline real32 calc_shell_hop_height(const real32 hop_duration_secs) {
+	const auto ratio = hop_duration_secs / SHELL_HOP_SECS_AT_UNIT_HEIGHT;
+	return ratio * ratio;
 }
 
 inline uint8_t calc_thrown_explosive_floor_hits(const real32 speed, const uint8_t floor_hits_when_thrown) {
@@ -258,10 +399,7 @@ inline real32 calc_thrown_explosive_height(const real32 speed) {
 	hand_height is what a thrown up item rises from - the view passes whatever it draws exactly where the item is.
 */
 
-template <class E>
-real32 calc_item_fall_height(const E& item, const double now_secs, const real32 hand_height) {
-	const auto& fall = item.template get<components::item>().get_fall();
-
+inline real32 calc_fall_height(const item_fall_state& fall, const augs::delta dt, const double now_secs, const real32 hand_height) {
 	if (fall.floor_hits_left == 0 || fall.hop_duration_secs <= 0.f) {
 		return 0.f;
 	}
@@ -272,7 +410,6 @@ real32 calc_item_fall_height(const E& item, const double now_secs, const real32 
 		It also starts at the step it was stamped at, but the clock is already a step later once that step is solved.
 	*/
 
-	const auto dt = item.get_cosmos().get_fixed_delta();
 	const auto hop_secs = static_cast<real32>(::calc_hop_steps(fall.hop_duration_secs, dt)) * dt.in_seconds();
 	const auto hop_start_secs = fall.when_hop_started.in_seconds(dt) + dt.in_seconds();
 	const auto t = std::clamp(static_cast<real32>(now_secs - hop_start_secs) / hop_secs, 0.f, 1.f);
@@ -299,4 +436,9 @@ real32 calc_item_fall_height(const E& item, const double now_secs, const real32 
 	}
 
 	return fall.hop_height * ::calc_hop_curve(distance_from_top);
+}
+
+template <class E>
+real32 calc_item_fall_height(const E& item, const double now_secs, const real32 hand_height) {
+	return ::calc_fall_height(item.template get<components::item>().get_fall(), item.get_cosmos().get_fixed_delta(), now_secs, hand_height);
 }

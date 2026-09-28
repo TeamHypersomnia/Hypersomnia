@@ -19,6 +19,7 @@
 #include "game/assets/recoil_player.h"
 
 #include "game/detail/adversarial_meta.h"
+#include "game/detail/shell_params.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/sentience_shake.h"
@@ -46,7 +47,7 @@ namespace components {
 
 		bool shell_drop_scheduled = false;
 		bool interfer_once = false;
-		pad_bytes<2> pad;
+		uint16_t num_ejected_shells = 0;
 
 		real32 max_heat_after_steam_schedule = 0.f;
 
@@ -63,6 +64,9 @@ namespace components {
 		recoil_player_instance recoil;
 
 		simple_rot_vel magazine;
+
+		uint8_t unejected_shells = 0;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -91,7 +95,9 @@ namespace invariants {
 		real32 gunshot_decal_scale = 0.f;
 
 		augs::bound<real32> shell_velocity = { 300.f, 1700.f };
-		augs::bound<real32> shell_angular_velocity = { 2.f, 14.f };
+		augs::bound<real32> shell_slow_angular_velocity = { SHELL_SLOW_SPIN_MIN, SHELL_SLOW_SPIN_MAX };
+		augs::bound<real32> shell_fast_angular_velocity = { SHELL_FAST_SPIN_MIN, SHELL_FAST_SPIN_MAX };
+		augs::bound<real32> shell_height = { 0.f, 0.f };
 
 		real32 shell_spread_degrees = 20.f;
 
@@ -144,7 +150,8 @@ namespace invariants {
 		real32 muzzle_light_duration = 87.0f;
 		rgba muzzle_light_color = yellow;
 		bool muzzle_cast_shadow = true;
-		pad_bytes<3> pad;
+		bool eject_shells_on_magazine_unmount = false;
+		pad_bytes<2> pad;
 		real32 randomize_spawn_point_within_circle_of_radius = 0.f;
 		real32 shot_pitch_drop_at_low_ammo = 0.f;
 		// END GEN INTROSPECTOR

@@ -203,9 +203,13 @@ predefined_filters::predefined_filters() {
 	}
 	{
 
+		/*
+			Shells never collide with each other - that would be too much going on.
+		*/
+
 		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
-		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::CHARACTER_WEAPON);
+		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::CHARACTER_WEAPON, C::SHELL);
 	}
 	{
 

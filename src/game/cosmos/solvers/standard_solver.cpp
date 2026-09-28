@@ -215,6 +215,7 @@ void standard_solve(const logic_step step) {
 
 	melee_system().advance_thrown_melee_logic(step);
 	item_system().advance_falling_items(step);
+	remnant_system().advance_falling_remnants(step);
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);

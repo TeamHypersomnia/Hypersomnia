@@ -22,6 +22,9 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/inventory/item_falling.h"
+#include "game/enums/filters.h"
+#include "game/components/remnant_component.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
@@ -345,6 +348,49 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			}
 		}
 #endif
+
+		/*
+			Shells don't get tossed around by dynamic bodies - they only get kicked gently now and then,
+			see remnant_system - and not at all before they first hit the floor.
+			They collide with static bodies as usual, and with items -
+			unless either is still in the air, before its first floor hit, as then it's drawn raised above the other.
+		*/
+
+		const bool shell_touched_by_dynamic_body =
+			(fix_a->GetFilterData().categoryBits & (1 << int(filter_category::SHELL))) != 0
+			&& body_b->GetType() != b2_staticBody
+		;
+
+		if (shell_touched_by_dynamic_body) {
+			const bool touched_by_lying_item = (fix_b->GetFilterData().categoryBits & (1 << int(filter_category::LYING_ITEM))) != 0;
+			bool bounces_off = false;
+
+			subject.template dispatch_on_having_all<components::remnant>([&](const auto& typed_shell) {
+				auto& remnant = typed_shell.template get<components::remnant>();
+
+				if (touched_by_lying_item) {
+					const auto item = collider.template find<components::item>();
+					const bool item_in_the_air = item && item.get_fall().is_in_the_air();
+
+					bounces_off = !remnant.fall.is_in_the_air() && !item_in_the_air;
+					return;
+				}
+
+				if (!remnant.fall.is_in_the_air() && !clk.lasts(SHELL_KICK_COOLDOWN_MS, remnant.when_kicked)) {
+					const auto away = vec2(body_a->GetPosition().x, body_a->GetPosition().y) - vec2(body_b->GetPosition().x, body_b->GetPosition().y);
+
+					remnant.when_kicked = now;
+					remnant.pending_kick = away.is_epsilon(0.0001f) ? vec2(1, 0) : vec2(away).normalize();
+				}
+			});
+
+			if (!bounces_off) {
+				contact->SetEnabled(false);
+			}
+
+			post_collision_messages = false;
+			break;
+		}
 
 		if (subject_capability.alive()) {
 			const auto* const driver = subject_capability.find<components::driver>();

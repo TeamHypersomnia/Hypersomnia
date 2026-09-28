@@ -1549,7 +1549,7 @@ void item_system::advance_falling_items(const logic_step step) {
 			return;
 		}
 
-		if ((now - fall.when_hop_started).step < ::calc_hop_steps(fall.hop_duration_secs, dt)) {
+		if (!::is_floor_hit_due(fall, now, dt)) {
 			return;
 		}
 
@@ -1571,8 +1571,7 @@ void item_system::advance_falling_items(const logic_step step) {
 		};
 
 		/*
-			Floor hit sounds play in order - hits without them are silent.
-			Thrown explosives have their own, other items those of their invariants::item.
+			Thrown explosives have their own floor hit sounds, other items those of their invariants::item.
 		*/
 
 		auto play_hit_sound = [&]() {
@@ -1586,16 +1585,7 @@ void item_system::advance_falling_items(const logic_step step) {
 				return typed_item.template get<invariants::item>().floor_hit_sounds;
 			}();
 
-			if (hit_index < sounds.size() && sounds[hit_index].id.is_set()) {
-				auto effect = sounds[hit_index];
-				effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index);
-
-				effect.start(
-					step,
-					sound_effect_start_input::fire_and_forget(typed_item.get_logic_transform()),
-					always_predictable_v
-				);
-			}
+			::play_floor_hit_sound(step, sounds, fall, fall_seed, typed_item.get_logic_transform());
 		};
 
 		auto spin = [&]() {
@@ -1626,26 +1616,6 @@ void item_system::advance_falling_items(const logic_step step) {
 			}
 		};
 
-		auto start_next_hop = [&]() {
-			/*
-				Varied hops shorten from their unvaried durations.
-			*/
-
-			const auto variation = explosive ? EXPLOSIVE_HOP_DURATION_VARIATION : 0.f;
-			const auto unvaried_secs = fall.hop_duration_secs / ::calc_hop_duration_mult(variation, fall_seed, hit_index);
-			const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR;
-
-			const auto min_secs = 
-				explosive ? 
-				EXPLOSIVE_MIN_HOP_SECS : 
-				DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
-			;
-
-			fall.when_hop_started = now;
-			fall.hop_duration_secs = std::max(min_secs, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
-			fall.hop_height *= NEXT_HOP_HEIGHT_MULT;
-		};
-
 		if (!last_silent_hit) {
 			play_hit_sound();
 		}
@@ -1656,13 +1626,14 @@ void item_system::advance_falling_items(const logic_step step) {
 			push();
 		}
 
-		++fall.floor_hits_done;
-		--fall.floor_hits_left;
+		const auto variation = explosive ? EXPLOSIVE_HOP_DURATION_VARIATION : 0.f;
 
-		if (fall.floor_hits_left == 0) {
-			fall.when_landed = now;
-		}
+		const auto min_hop_secs = 
+			explosive ? 
+			EXPLOSIVE_MIN_HOP_SECS : 
+			DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
+		;
 
-		start_next_hop();
+		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, fall_seed, now);
 	});
 }

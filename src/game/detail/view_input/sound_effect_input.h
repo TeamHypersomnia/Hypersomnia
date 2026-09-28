@@ -32,6 +32,13 @@ struct sound_effect_start_input {
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 	collision_sound_source source_collision;
 
+	/*
+		At most sound_system_settings::max_shell_sounds_per_gun sounds of shells of one gun play at once -
+		the oldest ones fade out.
+	*/
+
+	entity_id shell_ejected_by;
+
 	real32 collision_min_interval_ms = 50.f;
 	real32 collision_unmute_after_ms = 250.f;
 	int collision_mute_after_playing_times = 4;

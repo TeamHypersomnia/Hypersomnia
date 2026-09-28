@@ -3,32 +3,13 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_types.h"
 
-#include "augs/pad_bytes.h"
 #include "augs/misc/timing/stepped_timing.h"
+#include "game/components/item_fall_state.h"
 #include "game/enums/item_category.h"
 #include "game/enums/item_holding_stance.h"
 
 #include "game/detail/economy/money_type.h"
 #include "game/detail/view_input/sound_effect_input.h"
-
-/*
-	Items thrown or dropped explicitly hit the floor a few times before they come to rest - see item_falling.h.
-	when_landed is when they came to rest after the last hit.
-*/
-
-struct item_fall_state {
-	// GEN INTROSPECTOR struct item_fall_state
-	augs::stepped_timestamp when_landed;
-	augs::stepped_timestamp when_started_falling;
-	augs::stepped_timestamp when_hop_started;
-	real32 hop_duration_secs = 0.f;
-	real32 hop_height = 1.f;
-	uint8_t floor_hits_left = 0;
-	uint8_t floor_hits_done = 0;
-	bool thrown_up = false;
-	bool thrown_melee = false;
-	// END GEN INTROSPECTOR
-};
 
 struct item_owner_meta {
 	// GEN INTROSPECTOR struct item_owner_meta

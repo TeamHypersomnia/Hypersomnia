@@ -68,13 +68,22 @@ namespace test_flavours {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
-		body_def.damping.linear = 6.5f;
+		/*
+			Low linear damping lets shells roll on for a while.
+		*/
+
+		body_def.damping.linear = 3.0f;
 		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters[predefined_filter_type::SHELL];
 		fixtures_def.restitution = 1.2f;
 		fixtures_def.density = 0.0005f;
-		fixtures_def.collision_sound_sensitivity = 100.f;
+
+		/*
+			Shells only sound as they hit the floor, never as they collide with anything else.
+		*/
+
+		fixtures_def.collision_sound_sensitivity = 0.f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);

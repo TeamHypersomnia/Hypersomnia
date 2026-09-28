@@ -339,7 +339,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 						::calc_thrown_explosive_height(speed),
 						EXPLOSIVE_HOP_DURATION_VARIATION,
 						true,
-						fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity),
+						::calc_fall_seed(fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity), clk.now),
 						clk.now
 					);
 				}

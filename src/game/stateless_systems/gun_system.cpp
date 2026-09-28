@@ -31,6 +31,7 @@
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/gun/gun_math.h"
 #include "game/detail/gun/shell_offset.h"
+#include "game/detail/inventory/item_falling.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/messages/start_sound_effect.h"
@@ -212,21 +213,62 @@ static void spawn_shell(
 ) {
 	auto& cosm = step.get_cosmos();
 
+	/*
+		Seeded only by the gun and how many shells it ejected before - so that every shell of a gun is decided as soon as the gun exists,
+		the same everywhere and however late the shot comes, even where shell entities get different ids, like when predicted.
+		The count wraps around, but only after so many shells that the pattern never repeats noticeably.
+	*/
+
+	auto& num_ejected_shells = gun_entity.template get<components::gun>().num_ejected_shells;
+
+	const auto shell_seed = static_cast<uint32_t>(augs::hash_multiple(
+		cosm.get_nontemporal_rng_seed_for(gun_entity),
+		num_ejected_shells++
+	));
+
 	cosmic::create_entity(access, cosm, shell_flavour, [&](const auto shell_entity, auto&&...) {
-		auto rng = cosm.get_nontemporal_rng_for(shell_entity);
+		auto rng = randomization(shell_seed);
 
 		const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
 		const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + shell_spawn_offset.rotation;
 
+		/*
+			Shells leave the chamber parallel to the barrel, only flying off towards where they're ejected.
+		*/
+
 		auto shell_transform = gun_transform;
 		shell_transform.pos += vec2(shell_spawn_offset.pos).rotate(gun_transform.rotation);
-		shell_transform.rotation += spread_component;
 
 		shell_entity.set_logic_transform(shell_transform);
 
 		const auto& rigid_body = shell_entity.template get<components::rigid_body>();
 		rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-		rigid_body.set_angular_velocity(rng.randval(gun_def.shell_angular_velocity));
+		const bool fast_spin = rng.randval(0.f, 1.f) < SHELL_FAST_SPIN_CHANCE;
+		rigid_body.set_angular_velocity(rng.randval(fast_spin ? gun_def.shell_fast_angular_velocity : gun_def.shell_slow_angular_velocity));
+
+		const auto remnant = shell_entity.template find<components::remnant>();
+		const auto remnant_def = shell_entity.template find<invariants::remnant>();
+
+		if (remnant != nullptr && remnant_def != nullptr) {
+			remnant->seed = shell_seed;
+
+			/*
+				Only so many shells of a gun hit the floor audibly at once - see sound_system::evict_excess_shell_sounds.
+			*/
+
+			remnant->ejected_by = gun_entity.get_id();
+
+			if (gun_def.shell_height.second > 0.f) {
+				::start_shell_falling(
+					remnant->fall,
+					gun_def.shell_height,
+					rng.randval(0.f, 1.f),
+					remnant_def->floor_hit_variations_by_height,
+					shell_seed,
+					cosm.get_timestamp()
+				);
+			}
+		}
 
 		auto& ignored = rigid_body.get_special().during_cooldown_ignore_collision_with;
 
@@ -237,7 +279,18 @@ static void spawn_shell(
 			ignored = gun_entity;
 		}
 
-		const auto& effect = cartridge_def.shell_trace_particles;
+		auto effect = cartridge_def.shell_trace_particles;
+
+		if (remnant_def != nullptr) {
+			const auto size_mult = remnant_def->ejection_smoke_size_mult;
+
+			auto part_of_size = [size_mult](const float part) {
+				return 1.f + (size_mult - 1.f) * part;
+			};
+
+			effect.modifier.scale_sizes *= part_of_size(SHELL_SMOKE_PARTICLE_SIZE_PER_SIZE);
+			effect.modifier.scale_stream_lifetimes *= part_of_size(SHELL_SMOKE_DURATION_PER_SIZE);
+		}
 
 		const auto predictability = predictable_only_by(owning_capability);
 
@@ -247,6 +300,39 @@ static void spawn_shell(
 			predictability
 		);
 	}, [&](const auto) {});
+}
+
+/*
+	Spawns the shell of the charge the gun takes - for shells spawned later than their shots,
+	when there's no fired cartridge at hand anymore.
+*/
+
+template <class A, class C>
+static void spawn_shell_of_default_charge(
+	const allocate_new_entity_access access,
+	const logic_step step,
+	const transformr gun_transform,
+	const transformr muzzle_transform,
+	const invariants::gun& gun_def,
+	const A& gun_entity,
+	const C& owning_capability
+) {
+	const auto charge_flavour = ::calc_default_charge_flavour(gun_entity);
+
+	if (!charge_flavour.is_set()) {
+		return;
+	}
+
+	step.get_cosmos().on_flavour(
+		charge_flavour,
+		[&](const auto& typed_charge_flavour) {
+			if (const auto cartridge_def = typed_charge_flavour.template find<invariants::cartridge>()) {
+				if (const auto shell_flavour = cartridge_def->shell_flavour; shell_flavour.is_set()) {
+					::spawn_shell(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, *cartridge_def);
+				}
+			}
+		}
+	);
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
@@ -287,6 +373,20 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (gun.fire_cooldown_object > -200.f) {
 					gun.fire_cooldown_object -= delta_ms;
+				}
+			}
+
+			/*
+				Like from a revolver's cylinder - the shells of all the shots fall out only once the magazine is unmounted.
+			*/
+
+			if (gun.unejected_shells > 0) {
+				if (const auto magazine_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE]; magazine_slot.alive() && !magazine_slot.has_items()) {
+					for (uint8_t i = 0; i < gun.unejected_shells; ++i) {
+						::spawn_shell_of_default_charge(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, capability);
+					}
+
+					gun.unejected_shells = 0;
 				}
 			}
 		
@@ -668,19 +768,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								if (gun.shell_drop_scheduled) {
 									if (progress >= chambering_duration_ms * gun_def.shell_spawn_delay_mult) {
-										if (const auto charge_flavour = ::calc_default_charge_flavour(gun_entity); charge_flavour.is_set()) {
-											cosm.on_flavour(
-												charge_flavour,
-												[&](const auto& typed_charge_flavour) {
-													if (const auto cartridge_def = typed_charge_flavour.template find<invariants::cartridge>()) {
-														if (const auto shell_flavour = cartridge_def->shell_flavour; shell_flavour.is_set()) {
-															::spawn_shell(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, *cartridge_def);
-														}
-													}
-												}
-											);
-										}
-
+										::spawn_shell_of_default_charge(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, owning_capability);
 										gun.shell_drop_scheduled = false;
 									}
 								}
@@ -892,7 +980,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										}
 									}
 
-									if (gun_def.delay_shell_spawn_until_chambering) {
+									if (gun_def.eject_shells_on_magazine_unmount) {
+										gun.unejected_shells = static_cast<uint8_t>(std::min(gun.unejected_shells + 1, 255));
+									}
+									else if (gun_def.delay_shell_spawn_until_chambering) {
 										gun.shell_drop_scheduled = true;
 									}
 									else {

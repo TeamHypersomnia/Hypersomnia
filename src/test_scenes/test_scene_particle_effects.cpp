@@ -1946,6 +1946,85 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		/*
+			Thin smoke rising from a freshly ejected shell, like from a hot barrel - faint, thinning out from the start.
+			Dense enough to show right away, as the shell flies off quickly,
+			and over before the shell first hits the floor.
+		*/
+
+		auto& effect = acquire_effect(test_scene_particle_effect_id::SHELL_SMOKE);
+
+		particles_emission em;
+		default_bounds(em);
+
+		em.swing_spread.set(5, 10);
+		em.swings_per_sec.set(1.3, 1.5);
+		em.swing_spread_change_rate.set(0.8, 0.9);
+
+		em.spread_degrees = float_range(10, 10);
+		em.particles_per_sec.set(1000, 1200);
+		em.stream_lifetime_ms = float_range(100, 230);
+		em.stream_shrink_out_ms = 230.f;
+		em.stream_fade_in_ms = 30.0f;
+
+		em.base_speed = float_range(25, 25);
+
+		em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+		em.particle_lifetime_ms = float_range(400, 600);
+
+		for (int i = 0; i < 3; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 10;
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 120));
+			particle_definition.unshrinking_time_ms = 0.f;
+			particle_definition.shrink_when_ms_remaining = 200.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.size_multiplier = float_range(0.08, 0.08);
+		em.target_layer = particle_layer::OVERLAY_SMOKES;
+		em.initial_rotation_variation = 180;
+
+		effect.emissions.push_back(em);
+
+		/*
+			Then the shell, lying on the floor by now, smolders for a while - much more thinly, always rising upwards.
+		*/
+
+		em.ignore_emitter_rotation = true;
+		em.angular_offset = float_range(-90, -90);
+
+		/*
+			Growing from nothing as they rise, the puffs appear a bit above the shell - living a bit longer to make up for it.
+		*/
+
+		em.particle_lifetime_ms = float_range(800, 1200);
+
+		em.particle_definitions.for_each([](auto& particle_definition) {
+			if constexpr(std::is_same_v<remove_cref<decltype(particle_definition)>, general_particle>) {
+				particle_definition.unshrinking_time_ms = 0.f;
+			}
+		});
+		em.spread_degrees = float_range(0, 0);
+		em.stream_delay_ms = 600.f;
+		em.particles_per_sec.set(80, 80);
+		em.stream_lifetime_ms = float_range(200, 1000);
+		em.stream_shrink_out_ms = 500.f;
+		em.base_speed = float_range(60, 60);
+		em.stream_fade_in_ms = 100.0f;
+		em.swing_spread = float_range(5, 52);
+		em.swings_per_sec = float_range(2, 8);
+		em.swing_spread_change_rate = float_range(0, 0);
+
+		em.size_multiplier = float_range(0.08, 0.08);
+
+		effect.emissions.push_back(em);
+	}
+
+	{
 		auto make_insect_sparkles = [&](
 			const auto id, 
 			const rgba col_1,

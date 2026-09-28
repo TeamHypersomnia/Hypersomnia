@@ -113,6 +113,7 @@ namespace test_flavours {
 
 			gun_def.firing_engine_particles.modifier.scale_amounts = 0.8f;
 			gun_def.trigger_pull_sound.id = to_sound_id(test_scene_sound_id::TRIGGER_PULL);
+			gun_def.shell_height = { 3.f, 6.f };
 
 			//gun_def.muzzle_shot_sound.modifier.pitch *= 1.5f;
 			//gun_def.firing_engine_particles.modifier.scale_lifetimes = 0.5f;
@@ -2080,171 +2081,120 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::CYAN_SHELL);
+			/*
+				Shells lie around until too many of them do, and all hit the floor with the same sounds - heavier ones lower.
+				The variations of the sounds from the quietest to the loudest are ordered by the heights they're picked for.
+			*/
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
+			struct shell_sounds {
+				test_scene_sound_id first;
+				test_scene_sound_id second;
+				test_scene_sound_id roll;
+				std::vector<uint8_t> variations_by_height;
+			};
 
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
+			/*
+				Variations of each set ordered from the quietest first hit to the loudest.
+				Shotgun shells hit the floor loudly with just one of their two first hits, then always the same way.
+			*/
+
+			const auto shell_set = shell_sounds {
+				test_scene_sound_id::SHELL_FLOOR_HIT_FIRST,
+				test_scene_sound_id::SHELL_FLOOR_HIT_SECOND,
+				test_scene_sound_id::SHELL_ROLL,
+				{ 3, 4, 0, 1, 2 }
+			};
+
+			const auto small_shell_set = shell_sounds {
+				test_scene_sound_id::SMALL_SHELL_FLOOR_HIT_FIRST,
+				test_scene_sound_id::SMALL_SHELL_FLOOR_HIT_SECOND,
+				test_scene_sound_id::SMALL_SHELL_ROLL,
+				{ 1, 14, 7, 15, 4, 2, 3, 16, 0, 17, 13, 11, 12, 5, 6, 18, 10, 9, 8 }
+			};
+
+			const auto shotgun_shell_set = shell_sounds {
+				test_scene_sound_id::SHOTGUN_SHELL_FLOOR_HIT_FIRST,
+				test_scene_sound_id::SHOTGUN_SHELL_FLOOR_HIT_SECOND,
+				test_scene_sound_id::SHELL_ROLL,
+				{ 0, 1 }
+			};
+
+			auto make_shell = [&](
+				const test_remnant_bodies id,
+				const test_scene_image_id image_id,
+				const shell_sounds& sounds,
+				const real32 pitch,
+				const real32 smoke_size_mult
+			) {
+				auto& meta = get_test_flavour(flavours, id);
+
+				test_flavours::add_sprite(meta, caches, image_id, white);
+				test_flavours::add_shell_dynamic_body(meta);
+
+				invariants::remnant remnant;
+				remnant.kept_until_evicted = true;
+				remnant.start_shrinking_when_remaining_ms = 3000.f;
+				remnant.ejection_smoke_size_mult = smoke_size_mult;
+
+				remnant.floor_hit_sounds[0].id = to_sound_id(sounds.first);
+				remnant.floor_hit_sounds[1].id = to_sound_id(sounds.second);
+				remnant.roll_sound.id = to_sound_id(sounds.roll);
+
+				/*
+					Audible within 1000 px.
+				*/
+
+				auto set_modifier = [&](sound_effect_modifier& modifier) {
+					modifier.pitch = pitch;
+					modifier.max_distance = 1000.f;
+					modifier.reference_distance = 500.f;
+				};
+
+				for (auto& sound : remnant.floor_hit_sounds) {
+					set_modifier(sound.modifier);
+				}
+
+				set_modifier(remnant.roll_sound.modifier);
+
+				for (const auto variation : sounds.variations_by_height) {
+					remnant.floor_hit_variations_by_height.push_back(variation);
+				}
+
+				meta.set(remnant);
+			};
+
+			/*
+				Smoke of pistol calibers is the baseline - bigger calibers smoke more.
+			*/
+
+			make_shell(test_remnant_bodies::SMG_CASING, test_scene_image_id::SMG_CASING, small_shell_set, 1.0f, 1.0f);
+			make_shell(test_remnant_bodies::PISTOL_CASING, test_scene_image_id::PISTOL_CASING, small_shell_set, 1.0f, 1.0f);
+			make_shell(test_remnant_bodies::HEAVY_PISTOL_CASING, test_scene_image_id::HEAVY_PISTOL_CASING, shell_set, 0.95f, 1.2f);
+			make_shell(test_remnant_bodies::REVOLVER_CASING, test_scene_image_id::REVOLVER_CASING, shell_set, 0.97f, 1.1f);
+			make_shell(test_remnant_bodies::RIFLE_CASING, test_scene_image_id::RIFLE_CASING, shell_set, 1.0f, 1.2f);
+			make_shell(test_remnant_bodies::BATTLE_RIFLE_CASING, test_scene_image_id::BATTLE_RIFLE_CASING, shell_set, 0.94f, 1.4f);
+			make_shell(test_remnant_bodies::SNIPER_CASING, test_scene_image_id::SNIPER_CASING, shell_set, 0.86f, 1.8f);
+
+			make_shell(test_remnant_bodies::SHOTGUN_RED_SHELL, test_scene_image_id::SHOTGUN_RED_SHELL, shotgun_shell_set, 1.0f, 1.5f);
+			make_shell(test_remnant_bodies::GRADOBICIE_SHELL, test_scene_image_id::GRADOBICIE_SHELL, shell_set, 0.86f, 1.5f);
+			make_shell(test_remnant_bodies::SKULL_ROCKET_SHELL, test_scene_image_id::SKULL_ROCKET_SHELL, shell_set, 0.8f, 2.0f);
+			get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL).get<invariants::remnant>().rolls = false;
 		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::PINK_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::PINK_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::HPSR_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 10.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::BULLDUP2000_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::HUNTER_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::GALILEA_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
 
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::SHOTGUN_RED_SHELL);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
 
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 10.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::GRADOBICIE_SHELL);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
 
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 10.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
 
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 5000.f;
-			meta.set(remnant);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
 
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 3.f;
-			remnant.start_shrinking_when_remaining_ms = 1500.f;
-			meta.set(remnant);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::LEWSII_SHELL);
-			meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
-			meta.get<invariants::text_details>().name = "Lews II shell";
-
-			auto& remnant = meta.get<invariants::remnant>();
-			remnant.lifetime_secs = 0.35f;
-			remnant.start_shrinking_when_remaining_ms = 100.f;
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::ORANGE_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::AO44_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::DEAGLE_SHELL);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_SHELL, white);
-			test_flavours::add_shell_dynamic_body(meta);
-
-			invariants::remnant remnant;
-			remnant.lifetime_secs = 5.f;
-			remnant.start_shrinking_when_remaining_ms = 3000.f;
-			meta.set(remnant);
-		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
@@ -2262,10 +2212,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::RIFLE_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
 
 				meta.set(cartridge);
@@ -2288,10 +2237,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PISTOL_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::COVERT_CYAN_ROUND);
 
 				meta.set(cartridge);
@@ -2314,10 +2262,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = bullet_blueish;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::RIFLE_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZTURM_ROUND);
 
 				meta.set(cartridge);
@@ -2340,10 +2287,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PISTOL_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PISTOL_CYAN_ROUND);
 
 				meta.set(cartridge);
@@ -2366,10 +2312,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PISTOL_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::KEK9_ROUND);
 
 				meta.set(cartridge);
@@ -2392,10 +2337,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = pro90_round_col;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PRO90_ROUND);
 
 				cartridge.num_rounds_spawned = 1;
@@ -2423,10 +2367,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = steel_color;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::STEEL_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
 
 				meta.set(cartridge);
@@ -2449,11 +2392,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = pink;
-				cartridge.shell_trace_particles.modifier *= 2.5f;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HPSR_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SNIPER_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::HPSR_ROUND);
 
 				meta.set(cartridge);
@@ -2476,10 +2417,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = steel_color;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::BULLDUP2000_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::BATTLE_RIFLE_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::BULLDUP2000_ROUND);
 
 				meta.set(cartridge);
@@ -2502,10 +2442,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = steel_color;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HUNTER_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::BATTLE_RIFLE_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::HUNTER_ROUND);
 
 				meta.set(cartridge);
@@ -2528,10 +2467,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = steel_color;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GALILEA_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::RIFLE_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GALILEA_ROUND);
 
 				meta.set(cartridge);
@@ -2544,7 +2482,7 @@ namespace test_flavours {
 			meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 			meta.get<invariants::text_details>().name = "Lews II charge";
 			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::LEWSII_ROUND);
-			meta.get<invariants::cartridge>().shell_flavour = to_entity_flavour_id(test_remnant_bodies::LEWSII_SHELL);
+			meta.get<invariants::cartridge>().shell_flavour = to_entity_flavour_id(test_remnant_bodies::BATTLE_RIFLE_CASING);
 		}
 
 		{
@@ -2552,6 +2490,7 @@ namespace test_flavours {
 			meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 			meta.get<invariants::text_details>().name = "Baka47 charge";
 			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::BAKA47_ROUND);
+			meta.get<invariants::cartridge>().shell_flavour = to_entity_flavour_id(test_remnant_bodies::BATTLE_RIFLE_CASING);
 		}
 
 		{
@@ -2579,8 +2518,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = orange;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SKULL_ROCKET_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SKULL_ROCKET_FLYING);
@@ -2605,10 +2543,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = rgba(202, 186, 89, 255);
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ORANGE_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ORANGE_ROUND);
 
 				meta.set(cartridge);
@@ -2631,10 +2568,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = rgba(202, 186, 89, 255);
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::AO44_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::REVOLVER_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::AO44_ROUND);
 
 				meta.set(cartridge);
@@ -2657,10 +2593,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = white;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::DEAGLE_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HEAVY_PISTOL_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::DEAGLE_ROUND);
 
 				meta.set(cartridge);
@@ -2683,9 +2618,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = red;
-				cartridge.shell_trace_particles.modifier.scale_amounts = 1.5f;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SHOTGUN_RED_ROUND);
@@ -2716,10 +2649,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ZAMIEC_ROUND);
 
 				meta.set(cartridge);
@@ -2744,10 +2676,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = pink;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PINK_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZCZUR_ROUND);
 
 				meta.set(cartridge);
@@ -2772,10 +2703,9 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYBERSPRAY_ROUND);
 
 				meta.set(cartridge);
@@ -2807,9 +2737,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = muzzle_cyan;
-				cartridge.shell_trace_particles.modifier.scale_amounts = 1.5f;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GRADOBICIE_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GRADOBICIE_ROUND);
@@ -2847,9 +2775,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge;
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.color = orange;
-				cartridge.shell_trace_particles.modifier.scale_amounts = 1.5f;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZKWAL_ROUND);
@@ -3749,7 +3675,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -3797,7 +3722,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -3845,9 +3769,8 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 84.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
-			gun_def.shell_velocity = {300.f, 2500.f};
+			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -3894,7 +3817,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {5450.f, 5450.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.0f;
@@ -3954,7 +3876,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.4;
@@ -4017,7 +3938,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {5550.f, 5550.f};
 			gun_def.shot_cooldown_ms = 75.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.4;
@@ -4077,7 +3997,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {6000.f, 6100.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.2;
@@ -4135,7 +4054,6 @@ namespace test_flavours {
 			gun_def.shot_cooldown_ms = 100.f;
 			gun_def.bot_aim_radius_to_shoot = 50.0f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 4.f;
@@ -4181,7 +4099,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 94.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -4227,7 +4144,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.2f;
@@ -4283,7 +4199,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -4340,7 +4255,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {6800.f, 6800.f};
 			gun_def.shot_cooldown_ms = 95.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -4386,7 +4300,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.f;
@@ -4432,7 +4345,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 1.8f;
@@ -4488,9 +4400,8 @@ namespace test_flavours {
 			gun_def.delay_shell_spawn_until_chambering = true;
 			gun_def.shell_spawn_delay_mult = 0.15f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {2500.f, 3500.f};
+			gun_def.shell_velocity = {1500.f, 2500.f};
 			gun_def.damage_multiplier = 22.4f;
 			gun_def.headshot_multiplier = 3.85f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
@@ -4545,9 +4456,8 @@ namespace test_flavours {
 			gun_def.delay_shell_spawn_until_chambering = true;
 			gun_def.shell_spawn_delay_mult = 0.15f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {2500.f, 3500.f};
+			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 9.8f;
 			gun_def.headshot_multiplier = 3.85f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
@@ -4599,9 +4509,9 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {500.f, 2500.f};
+			gun_def.shell_velocity = {300.f, 1300.f};
+			gun_def.eject_shells_on_magazine_unmount = true;
 			gun_def.damage_multiplier = 6.f;
 			gun_def.headshot_multiplier = 3.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
@@ -4657,7 +4567,6 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
 			gun_def.damage_multiplier = 11.2f;
@@ -4732,9 +4641,8 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {900.f, 3500.f};
+			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 8.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 5;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -4780,9 +4688,8 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {900.f, 3500.f};
+			gun_def.shell_velocity = {400.f, 1700.f};
 			gun_def.damage_multiplier = 0.8f;
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
@@ -4830,10 +4737,11 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_CHAMBERING);
 			gun_def.shot_pitch_drop_at_low_ammo = 0.1f;
 			gun_def.allow_chambering_with_akimbo = false;
+			gun_def.delay_shell_spawn_until_chambering = true;
+			gun_def.shell_spawn_delay_mult = 0.15f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 13.f;
-			gun_def.shell_velocity = {900.f, 3500.f};
+			gun_def.shell_velocity = {400.f, 1700.f};
 			gun_def.damage_multiplier = 1.2f;
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 5;
@@ -4908,9 +4816,8 @@ namespace test_flavours {
 			gun_def.allow_chambering_with_akimbo = false;
 			gun_def.randomize_spawn_point_within_circle_of_radius = 30.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 13.f;
-			gun_def.shell_velocity = {900.f, 3500.f};
+			gun_def.shell_velocity = {400.f, 1700.f};
 			gun_def.damage_multiplier = 1.1f;
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
@@ -4973,7 +4880,6 @@ namespace test_flavours {
 			gun_def.shot_cooldown_ms = 125.f;
 			gun_def.muzzle_light_radius *= 0.9f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 3.f;
@@ -5019,7 +4925,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4150.f, 4150.f};
 			gun_def.shot_cooldown_ms = 150.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -5069,7 +4974,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4600.f, 4600.f};
 			gun_def.shot_cooldown_ms = 150.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -5120,9 +5024,8 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {5100.f, 5100.f};
 			gun_def.shot_cooldown_ms = 380.f;
 
-			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {500.f, 3200.f};
+			gun_def.shell_velocity = {500.f, 1500.f};
 			gun_def.damage_multiplier = 9.8f;
 			gun_def.headshot_multiplier = 3.0f;
 			gun_def.gunshot_decal_scale = 3.5f;
