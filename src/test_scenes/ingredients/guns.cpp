@@ -2144,17 +2144,22 @@ namespace test_flavours {
 					Audible within 1000 px.
 				*/
 
-				auto set_modifier = [&](sound_effect_modifier& modifier) {
-					modifier.pitch = pitch;
+				auto set_modifier = [&](sound_effect_modifier& modifier, const real32 sound_pitch) {
+					modifier.pitch = sound_pitch;
 					modifier.max_distance = 1000.f;
 					modifier.reference_distance = 500.f;
 				};
 
 				for (auto& sound : remnant.floor_hit_sounds) {
-					set_modifier(sound.modifier);
+					set_modifier(sound.modifier, pitch);
 				}
 
-				set_modifier(remnant.roll_sound.modifier);
+				/*
+					Rolls deepen only a bit with the caliber - the roll is recorded with heavy shells already.
+				*/
+
+				constexpr auto roll_pitch_part = 0.8f;
+				set_modifier(remnant.roll_sound.modifier, 1.f - (1.f - pitch) * roll_pitch_part);
 
 				for (const auto variation : sounds.variations_by_height) {
 					remnant.floor_hit_variations_by_height.push_back(variation);
@@ -2176,7 +2181,7 @@ namespace test_flavours {
 			make_shell(test_remnant_bodies::SNIPER_CASING, test_scene_image_id::SNIPER_CASING, shell_set, 0.86f, 1.8f);
 
 			make_shell(test_remnant_bodies::SHOTGUN_RED_SHELL, test_scene_image_id::SHOTGUN_RED_SHELL, shotgun_shell_set, 1.0f, 1.5f);
-			make_shell(test_remnant_bodies::GRADOBICIE_SHELL, test_scene_image_id::GRADOBICIE_SHELL, shell_set, 0.86f, 1.5f);
+			make_shell(test_remnant_bodies::GRADOBICIE_SHELL, test_scene_image_id::GRADOBICIE_SHELL, shell_set, 1.0f, 1.5f);
 			make_shell(test_remnant_bodies::SKULL_ROCKET_SHELL, test_scene_image_id::SKULL_ROCKET_SHELL, shell_set, 0.8f, 2.0f);
 			get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL).get<invariants::remnant>().rolls = false;
 		}
