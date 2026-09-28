@@ -451,7 +451,7 @@ void enqueue_illuminated_rendering_jobs(
 				&cosm,
 				missile_shadow_offset,
 				global_time_seconds,
-				under_foreground_neons_in = make_drawing_input(D::UNDER_FOREGROUND_NEONS),
+				remnants_neons_in = make_drawing_input(D::REMNANTS_NEONS),
 				h1 = make_helper(D::UNDER_FOREGROUND_NEONS),
 				h2 = make_helper(D::FOREGROUND_NEONS),
 				h3 = make_helper(D::MISSILES_NEONS)
@@ -464,7 +464,7 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				/*
-					Neons of shells follow their raised sprites.
+					Neons of shells follow their raised sprites - in their own buffer, hidden like the shells in strict fog of war.
 				*/
 
 				visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
@@ -472,7 +472,7 @@ void enqueue_illuminated_rendering_jobs(
 						const auto shell_fall = ::find_shell_fall(typed_handle);
 						const auto sprite_offset = ::calc_shell_offsets(shell_fall, cosm.get_fixed_delta(), global_time_seconds, missile_shadow_offset).sprite;
 
-						::specific_draw_neon_map(typed_handle, under_foreground_neons_in, ::make_shadow_offset_customizer(sprite_offset));
+						::specific_draw_neon_map(typed_handle, remnants_neons_in, ::make_shadow_offset_customizer(sprite_offset));
 					});
 				});
 

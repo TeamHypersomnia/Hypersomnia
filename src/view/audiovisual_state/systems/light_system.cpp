@@ -604,6 +604,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	}
 
 	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);
+	renderer.call_triangles(D::REMNANTS_NEONS);
 
 	if (in.strict_fow) {
 		renderer.set_stencil(false);
