@@ -4983,6 +4983,7 @@ namespace test_flavours {
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = { 365.f, 1090.f };
+			gun_def.ducks_shell_sounds = false;
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -5033,6 +5034,7 @@ namespace test_flavours {
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 1500.f};
+			gun_def.ducks_shell_sounds = false;
 			gun_def.damage_multiplier = 9.8f;
 			gun_def.headshot_multiplier = 3.0f;
 			gun_def.gunshot_decal_scale = 3.5f;

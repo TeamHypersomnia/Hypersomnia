@@ -33,11 +33,12 @@ struct sound_effect_start_input {
 	collision_sound_source source_collision;
 
 	/*
-		At most sound_system_settings::max_shell_sounds_per_gun sounds of shells of one gun play at once -
-		the oldest ones fade out.
+		At most sound_system_settings::max_shell_sounds_per_gun floor hits of shells of one gun play at once,
+		and max_shell_roll_sounds_per_gun of their rolls - the oldest ones fade out.
 	*/
 
 	entity_id shell_ejected_by;
+	bool shell_roll = false;
 
 	real32 collision_min_interval_ms = 50.f;
 	real32 collision_unmute_after_ms = 250.f;

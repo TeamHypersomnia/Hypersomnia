@@ -54,6 +54,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 
 				auto start = sound_effect_start_input::fire_and_forget(subject.get_logic_transform());
 				start.shell_ejected_by = state.ejected_by;
+				start.shell_roll = true;
 				start.variation_number = augs::hash_multiple(state.seed, state.num_kicks);
 
 				def.roll_sound.start(step, start, always_predictable_v);

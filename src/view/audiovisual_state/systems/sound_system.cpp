@@ -81,21 +81,26 @@ bool sound_system::start_fading(generic_sound_cache& cache, const float fade_per
 	return false;
 }
 
+static int calc_max_shell_sounds_per_gun(const sound_system_settings& settings, const sound_effect_start_input& start) {
+	return start.shell_roll ? settings.max_shell_roll_sounds_per_gun : settings.max_shell_sounds_per_gun;
+}
+
 /*
-	Past max_shell_sounds_per_gun, the oldest shell sounds of the gun fade out - after the new one started playing,
+	Past the maximum, the oldest shell sounds of the gun - floor hits and rolls apart - fade out, after the new one started playing,
 	so that none stops for nothing, when the new one turns out not to play at all.
 */
 
-void sound_system::evict_excess_shell_sounds(const update_properties_input& in, const entity_id gun) {
+void sound_system::evict_excess_shell_sounds(const update_properties_input& in, const sound_effect_start_input& start) {
 	auto of_gun = [&](const generic_sound_cache& c) {
-		return c.original.start.shell_ejected_by == gun && c.probably_still_playing();
+		const auto& other = c.original.start;
+		return other.shell_ejected_by == start.shell_ejected_by && other.shell_roll == start.shell_roll && c.probably_still_playing();
 	};
 
 	/*
 		Short sounds are in the order they started, so the oldest come first - and the new one, last, is never evicted.
 	*/
 
-	auto num_to_evict = static_cast<int>(std::count_if(short_sounds.begin(), short_sounds.end(), of_gun)) - in.settings.max_shell_sounds_per_gun;
+	auto num_to_evict = static_cast<int>(std::count_if(short_sounds.begin(), short_sounds.end(), of_gun)) - ::calc_max_shell_sounds_per_gun(in.settings, start);
 
 	erase_if(short_sounds, [&](generic_sound_cache& c) {
 		if (num_to_evict <= 0 || !of_gun(c)) {
@@ -525,7 +530,13 @@ void sound_system::duck_shell_sounds_at_gunshots(const const_logic_step step) {
 		const auto distance = (shot.muzzle_transform.pos - last_listener_pos).length();
 
 		gun.dispatch_on_having_all<invariants::gun>([&](const auto& typed_gun) {
-			const auto reference_distance = typed_gun.template get<invariants::gun>().muzzle_shot_sound.modifier.reference_distance;
+			const auto& gun_def = typed_gun.template get<invariants::gun>();
+
+			if (!gun_def.ducks_shell_sounds) {
+				return;
+			}
+
+			const auto reference_distance = gun_def.muzzle_shot_sound.modifier.reference_distance;
 			const auto heard_within = reference_distance * SHELL_SOUNDS_DUCKING_DISTANCE_MULT;
 
 			if (distance <= heard_within) {
@@ -643,9 +654,10 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				}
 			}
 
-			const auto shell_ejected_by = e.payload.start.shell_ejected_by;
+			const auto& start = e.payload.start;
+			const bool shell_sound = start.shell_ejected_by.is_set();
 
-			if (shell_ejected_by.is_set() && in.settings.max_shell_sounds_per_gun <= 0) {
+			if (shell_sound && ::calc_max_shell_sounds_per_gun(in.settings, start) <= 0) {
 				continue;
 			}
 
@@ -666,8 +678,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				try {
 					short_sounds.emplace_back(new_id, e.payload, in);
 
-					if (shell_ejected_by.is_set()) {
-						evict_excess_shell_sounds(in, shell_ejected_by);
+					if (shell_sound) {
+						evict_excess_shell_sounds(in, start);
 					}
 				}
 				catch (const effect_not_found&) {

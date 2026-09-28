@@ -95,7 +95,8 @@ inline constexpr float SHELL_SOUNDS_EVICTION_FADE_PER_SEC = 15.f;
 
 /*
 	Shells hitting the floor would only be noise during a firefight, so at every gunshot heard within
-	SHELL_SOUNDS_DUCKING_DISTANCE_MULT times its reference distance - the listener's own included - they duck down to SHELL_SOUNDS_DUCKED_GAIN over SHELL_SOUNDS_DUCKING_ATTACK_SECS,
+	SHELL_SOUNDS_DUCKING_DISTANCE_MULT times its reference distance - the listener's own included,
+	unless the gun doesn't invariants::gun::ducks_shell_sounds - they duck down to SHELL_SOUNDS_DUCKED_GAIN over SHELL_SOUNDS_DUCKING_ATTACK_SECS,
 	and recover over SHELL_SOUNDS_DUCKING_RECOVERY_SECS as long as there are no more gunshots - both evenly in decibels.
 	Decibels of silence are infinite, so a SHELL_SOUNDS_DUCKED_GAIN of 0 fades through SHELL_SOUNDS_DUCKING_SILENCE_GAIN instead - as quiet as silence -
 	and only fully ducked is exactly silent.

@@ -92,6 +92,7 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 
 		result.sound.max_simultaneous_bullet_trace_sounds = 0;
 		result.sound.max_shell_sounds_per_gun = 2;
+		result.sound.max_shell_roll_sounds_per_gun = 2;
 		result.content_regeneration.rescan_assets_on_window_focus = false;
 
 		result.client.nickname = "Guest";

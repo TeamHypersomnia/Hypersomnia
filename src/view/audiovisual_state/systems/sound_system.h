@@ -181,7 +181,7 @@ class sound_system {
 	);
 
 	bool start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
-	void evict_excess_shell_sounds(const update_properties_input&, entity_id gun);
+	void evict_excess_shell_sounds(const update_properties_input&, const sound_effect_start_input&);
 
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;

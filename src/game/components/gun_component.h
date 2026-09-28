@@ -151,7 +151,8 @@ namespace invariants {
 		rgba muzzle_light_color = yellow;
 		bool muzzle_cast_shadow = true;
 		bool eject_shells_on_magazine_unmount = false;
-		pad_bytes<2> pad;
+		bool ducks_shell_sounds = true;
+		pad_bytes<1> pad;
 		real32 randomize_spawn_point_within_circle_of_radius = 0.f;
 		real32 shot_pitch_drop_at_low_ammo = 0.f;
 		// END GEN INTROSPECTOR

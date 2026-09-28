@@ -34,6 +34,7 @@ struct sound_system_settings {
 	bool set_listener_orientation_to_character_orientation = false;
 	int max_simultaneous_bullet_trace_sounds = 6;
 	int max_shell_sounds_per_gun = 4;
+	int max_shell_roll_sounds_per_gun = 3;
 	float shell_sounds_gain = 1.0f;
 	float gain_threshold_for_bullet_trace_sounds = 0.012f;
 	int max_short_sounds = 64;
