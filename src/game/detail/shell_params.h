@@ -11,7 +11,9 @@
 	as the roll picks the variation of their sounds.
 	Their hops vary, and every hop is as high as its duration would physically take - heights go with durations squared.
 
-	Like dropped items, they mostly stop spinning as they first hit the floor, and spin a bit faster after the second hit.
+	Like dropped items, they mostly stop spinning as they first hit the floor - and every hit spins them anew,
+	by SHELL_HIT_SPIN_IMPULSE_MIN to MAX degrees per second, either way - as the speed of the impact,
+	with the square root of the height of the hop that ends, fully from SHELL_HIT_SPIN_FULL_AT_HEIGHT.
 	Every hit pushes them on slightly along their motion - once their hops get low, sideways instead, starting to roll -
 	and after the last one they roll off sideways for a moment. They roll to whichever side is closer to where they fly or are kicked.
 	Dynamic bodies don't touch them until they first hit the floor, and then don't toss them around - only kick them now and then:
@@ -29,7 +31,14 @@
 	so fast spins start close to the limit to show for a while.
 */
 
-inline constexpr real32 SHELL_FAST_SPIN_CHANCE = 0.3f;
+/*
+	Longer shells spin slower, so that their ends move about as fast as those of a SHELL_SPIN_REFERENCE_LENGTH px long one -
+	both as they're ejected and as they hit the floor. Shorter ones spin as the reference one.
+*/
+
+inline constexpr real32 SHELL_SPIN_REFERENCE_LENGTH = 13.f;
+
+inline constexpr real32 SHELL_FAST_SPIN_CHANCE = 0.4f;
 inline constexpr real32 SHELL_SLOW_SPIN_MIN = 180.f;
 inline constexpr real32 SHELL_SLOW_SPIN_MAX = 720.f;
 inline constexpr real32 SHELL_FAST_SPIN_MIN = 3600.f;
@@ -41,7 +50,9 @@ inline constexpr real32 SHELL_LAST_HOP_HEIGHT = 0.04f;
 inline constexpr real32 SHELL_HOP_DURATION_VARIATION = 0.2f;
 
 inline constexpr real32 SHELL_SPIN_KEPT = 0.2f;
-inline constexpr real32 SHELL_SECOND_HIT_SPIN_DEGREES = 180.f;
+inline constexpr real32 SHELL_HIT_SPIN_IMPULSE_MIN = 300.f;
+inline constexpr real32 SHELL_HIT_SPIN_IMPULSE_MAX = 1200.f;
+inline constexpr real32 SHELL_HIT_SPIN_FULL_AT_HEIGHT = 2.f;
 
 inline constexpr real32 SHELL_PUSH_MIN_SPEED = 15.f;
 inline constexpr real32 SHELL_PUSH_MAX_SPEED = 40.f;

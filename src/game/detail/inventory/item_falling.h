@@ -8,6 +8,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/randomization.h"
 #include "augs/templates/hash_templates.h"
+#include "augs/drawing/sprite.h"
 #include "game/components/item_component.h"
 #include "game/components/item_sync.h"
 #include "game/components/item_fall_state.h"
@@ -161,7 +162,8 @@ enum class floor_hit_rng_purpose : uint8_t {
 	PUSH,
 	ROLL_SIDE,
 	PITCH_SIDE,
-	FALL_PITCH
+	FALL_PITCH,
+	SPIN
 };
 
 /*
@@ -354,6 +356,23 @@ void start_shell_falling(
 		const auto index = std::min(variations_by_height.size() - 1, static_cast<std::size_t>(height_roll * variations_by_height.size()));
 		fall.sound_variation = variations_by_height[index];
 	}
+}
+
+template <class E>
+real32 calc_shell_length_spin_mult(const E& shell) {
+	if (const auto sprite = shell.template find<invariants::sprite>()) {
+		const auto length = static_cast<real32>(std::max(sprite->size.x, sprite->size.y));
+
+		if (length > 0.f) {
+			return std::min(1.f, SHELL_SPIN_REFERENCE_LENGTH / length);
+		}
+	}
+
+	return 1.f;
+}
+
+inline real32 calc_shell_hit_spin_mult(const real32 hop_height) {
+	return std::min(std::sqrt(hop_height / SHELL_HIT_SPIN_FULL_AT_HEIGHT), 1.f);
 }
 
 inline real32 calc_shell_low_hop_roll_mult(const real32 hop_height) {

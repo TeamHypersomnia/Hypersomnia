@@ -244,7 +244,8 @@ static void spawn_shell(
 		const auto& rigid_body = shell_entity.template get<components::rigid_body>();
 		rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 		const bool fast_spin = rng.randval(0.f, 1.f) < SHELL_FAST_SPIN_CHANCE;
-		rigid_body.set_angular_velocity(rng.randval(fast_spin ? gun_def.shell_fast_angular_velocity : gun_def.shell_slow_angular_velocity));
+		const auto spin = rng.randval(fast_spin ? gun_def.shell_fast_angular_velocity : gun_def.shell_slow_angular_velocity);
+		rigid_body.set_angular_velocity(spin * ::calc_shell_length_spin_mult(shell_entity));
 
 		const auto remnant = shell_entity.template find<components::remnant>();
 		const auto remnant_def = shell_entity.template find<invariants::remnant>();

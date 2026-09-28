@@ -120,14 +120,19 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				state.ejected_by
 			);
 
-			const auto current_spin = body.get_degree_velocity();
+			{
+				const auto current_spin = body.get_degree_velocity();
+				const auto kept_spin = hit_index == 0 ? current_spin * SHELL_SPIN_KEPT : current_spin;
 
-			if (hit_index == 0) {
-				body.set_angular_velocity(current_spin * SHELL_SPIN_KEPT);
-			}
-			else if (hit_index == 1) {
-				const auto direction = current_spin < 0.f ? -1.f : 1.f;
-				body.set_angular_velocity(current_spin + direction * SHELL_SECOND_HIT_SPIN_DEGREES);
+				auto spin_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::SPIN);
+				const auto impulse =
+					spin_rng.randval(SHELL_HIT_SPIN_IMPULSE_MIN, SHELL_HIT_SPIN_IMPULSE_MAX)
+					* random_side(spin_rng)
+					* ::calc_shell_hit_spin_mult(hop_height)
+					* ::calc_shell_length_spin_mult(subject)
+				;
+
+				body.set_angular_velocity(kept_spin + impulse);
 			}
 
 			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, fall_seed, now);
