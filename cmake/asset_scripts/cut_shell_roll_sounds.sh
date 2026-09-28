@@ -3,8 +3,8 @@
 # Cuts the rolling of shells out of freesound 337236 (anthousai, bullet shells handful consolidated), eight drops of shells:
 #
 #   small_shell_roll_N.ogg - the first five drops without their first knock, for light shells
-#   shell_roll_N.ogg       - the sixth, seventh and eighth, for heavy shells - without their first knocks either,
-#                            and fading in longer, so they don't start with too much of a punch
+#   shell_roll_1.ogg       - the eighth, for heavy shells - without its first knock either, and fading in longer,
+#                            so it doesn't start with too much of a punch. The sixth and seventh knock too much to sound like rolling.
 #
 # The recording is quiet, so every roll is brought to a peak of ROLL_PEAK_DB - see cut_to_peak in floor_hit_cutting.sh.
 #
@@ -34,8 +34,6 @@ SMALL_ROLLS=(
 )
 
 ROLLS=(
-	"11.520 11.990"
-	"13.730 14.240"
 	"16.210 16.730"
 )
 
@@ -65,7 +63,9 @@ cut_rolls() {
 	local index=1
 
 	for roll in "$@"; do
+		local start end
 		read -r start end <<< "$roll"
+
 		cut_to_peak "$OUT_DIR/${prefix}_$index.ogg" "$start" "$end" "$fade_in" "$FADE_OUT" "$filters" "$peak_db"
 		index=$((index + 1))
 	done
