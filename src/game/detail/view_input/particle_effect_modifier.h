@@ -8,6 +8,8 @@ struct particle_effect_modifier {
 	real32 scale_amounts = 1.f;
 	real32 scale_lifetimes = 1.f;
 	real32 scale_velocities = 1.f;
+	real32 scale_sizes = 1.f;
+	real32 scale_stream_lifetimes = 1.f;
 	real32 radius = 0.0f;
 	vec2 box = vec2::zero;
 	// END GEN INTROSPECTOR
@@ -16,6 +18,8 @@ struct particle_effect_modifier {
 		scale_amounts = std::min(scale_amounts, 100.0f);
 		scale_lifetimes = std::min(scale_lifetimes, 100.0f);
 		scale_velocities = std::min(scale_velocities, 100.0f);
+		scale_sizes = std::min(scale_sizes, 100.0f);
+		scale_stream_lifetimes = std::min(scale_stream_lifetimes, 100.0f);
 	}
 
 	auto& operator*=(const real32 scalar) {
@@ -30,6 +34,8 @@ struct particle_effect_modifier {
 		scale_amounts *= b.scale_amounts;
 		scale_lifetimes *= b.scale_lifetimes;
 		scale_velocities *= b.scale_velocities;
+		scale_sizes *= b.scale_sizes;
+		scale_stream_lifetimes *= b.scale_stream_lifetimes;
 		return *this;
 	}
 

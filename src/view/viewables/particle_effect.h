@@ -30,6 +30,8 @@ struct particles_emission {
 	bound particles_per_sec = bound(0.f, 0.f);
 	bound stream_lifetime_ms = bound(0.f, 0.f);
 	float stream_fade_in_ms = 0.f;
+	float stream_shrink_out_ms = 0.f;
+	float stream_delay_ms = 0.f;
 	bound particle_lifetime_ms = bound(0.f, 0.f);
 	bound size_multiplier = bound(1.f, 1.f);
 	bound acceleration = bound(0.f, 0.f);
@@ -63,6 +65,7 @@ struct particles_emission {
 	bool should_gore_remap = false;
 	bool is_bullet_trail = false;
 	bool ignore_effect_modifier = false;
+	bool ignore_emitter_rotation = false;
 	bound stream_particle_lifetime_mult = bound(1.f, 1.f);
 
 	particle_definitions_vectors particle_definitions;

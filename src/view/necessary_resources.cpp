@@ -40,6 +40,7 @@ void all_necessary_fbos::apply(
 	};
 
 	reset(illuminating_smoke);
+	reset(overlay_smoke);
 	reset(smoke);
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(removed_light);
@@ -94,7 +95,6 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminated->set_uniform(renderer, U::shadow_texture, 4);
 		illuminated->set_uniform(renderer, U::shadow_strength, 0.0f);
 		illuminated->set_uniform(renderer, U::receiver_displacement, 1);
-		illuminated->set_uniform(renderer, U::fully_lit, 0);
 		illuminated->set_uniform(renderer, U::posterize_light, 1);
 		illuminated->set_uniform(renderer, U::removed_light_texture, 5);
 		illuminated->set_uniform(renderer, U::point_light_hue_preservation, 0.0f);
@@ -140,6 +140,7 @@ all_necessary_shaders::all_necessary_shaders(
 	if (illuminating_smoke) {
 		illuminating_smoke->set_as_current(renderer);
 		illuminating_smoke->set_uniform(renderer, U::smoke_texture, 3);
+		illuminating_smoke->set_uniform(renderer, U::smoke_flat_intensity, 0.0f);
 	}
 
 	if (textured_light) {

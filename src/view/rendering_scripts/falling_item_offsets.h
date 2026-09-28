@@ -5,6 +5,7 @@
 #include "augs/templates/remove_cref.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/components/remnant_component.h"
 
 const vec2 MISSILE_SHADOW_OFFSET = vec2(20, 25);
 
@@ -16,10 +17,19 @@ constexpr float FALLEN_ITEM_SHADOW_DISTANCE = 4.0f;
 
 /*
 	If true, thrown explosives are drawn raised above their shadows, towards the sun,
-	with the shadows where the explosives actually are.
+	with the shadows where they would lie. Shells have their own RAISE_SHELLS_ABOVE_SHADOWS in shell_params.h.
 */
 
-constexpr bool RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS = true;
+constexpr bool RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS = false;
+
+/*
+	If not raised, thrown explosives and shells cast shadows growing the higher they fly - unphysical with the sun infinitely far,
+	but it reads well. The shadow is *_SHADOW_SCALE_AT_REFERENCE times larger
+	when it falls SHADOW_SCALE_REFERENCE_DISTANCE px away from them, linearly in between.
+*/
+
+constexpr float THROWN_EXPLOSIVE_SHADOW_SCALE_AT_REFERENCE = 1.5f;
+constexpr float SHADOW_SCALE_REFERENCE_DISTANCE = 100.0f;
 
 /*
 	With sun shadows on, character and bullet shadows keep their lengths
@@ -41,49 +51,46 @@ inline vec2 calc_along_the_sun(const vec2 legacy_offset, const vec2 sun_step, co
 struct flying_item_offsets {
 	vec2 shadow;
 	vec2 sprite;
+	float shadow_scale = 1.0f;
 };
 
 /*
-	Thrown melee weapons and grenades in flight cast shadows like bullets.
+	Thrown melee weapons, grenades and shells in flight cast shadows like bullets.
 	Falling items' shadows shorten until they hit the floor, down to one right under them,
 	and grow again as they bounce off it.
 
 	Normally the item is drawn where it is and its shadow further along the sun.
-	Raised explosives are the other way around - their shadow marks where they actually are,
-	and they are drawn above it, towards the sun. Released from the hand,
-	they start rising from exactly where they are.
+	Raised ones - thrown explosives and shells - are drawn above where they actually are, towards the sun,
+	and their shadow is where it would be if they lay there - so once on the floor, they're drawn right where they are,
+	and don't stick into the walls they rest against.
+	Released from the hand, they start rising from exactly where they are.
 
+	fall is null for items that never fall.
 	missile_shadow_offset is MISSILE_SHADOW_OFFSET along the sun. now_secs may be interpolated.
 */
 
-template <class E>
-flying_item_offsets calc_flying_item_offsets(const E& typed_item, const double now_secs, const vec2 missile_shadow_offset) {
-	using item_type = remove_cref<E>;
-
-	const bool raised = RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS && ::is_like_thrown_explosive(typed_item);
-
+inline flying_item_offsets calc_flying_offsets(
+	const item_fall_state* const fall,
+	const bool raised,
+	const augs::delta dt,
+	const double now_secs,
+	const vec2 missile_shadow_offset,
+	const float fallen_shadow_distance = FALLEN_ITEM_SHADOW_DISTANCE
+) {
 	const auto longest = missile_shadow_offset.length();
-	const auto shortest = std::min(longest, FALLEN_ITEM_SHADOW_DISTANCE);
+	const auto shortest = std::min(longest, fallen_shadow_distance);
 
-	const auto hand_height = [&]() {
-		if (raised && longest > shortest) {
-			return -shortest / (longest - shortest);
-		}
-
-		return EXPLOSIVE_HAND_HEIGHT;
-	}();
+	const auto hand_height = raised ? 0.0f : EXPLOSIVE_HAND_HEIGHT;
 
 	const auto fall_height = [&]() {
-		if constexpr(item_type::template has<components::item>()) {
-			const auto& fall = typed_item.template get<components::item>().get_fall();
-
-			if (fall.floor_hits_left > 0) {
-				return ::calc_item_fall_height(typed_item, now_secs, hand_height);
+		if (fall != nullptr) {
+			if (fall->floor_hits_left > 0) {
+				return ::calc_fall_height(*fall, dt, now_secs, hand_height);
 			}
 
-			if (fall.when_landed.was_set()) {
+			if (fall->when_landed.was_set()) {
 				/*
-					Rolling on the floor after the last hit, like armed grenades.
+					Lying or rolling on the floor after the last hit.
 				*/
 
 				return 0.0f;
@@ -93,11 +100,81 @@ flying_item_offsets calc_flying_item_offsets(const E& typed_item, const double n
 		return 1.0f;
 	}();
 
-	const auto shadow_offset = vec2(missile_shadow_offset).normalize() * augs::interp(shortest, longest, fall_height);
+	const auto sun_direction = vec2(missile_shadow_offset).normalize();
+	const auto shadow_offset = sun_direction * augs::interp(shortest, longest, fall_height);
 
 	if (raised) {
-		return { vec2::zero, -shadow_offset };
+		const auto lying_shadow_offset = sun_direction * shortest;
+		return { lying_shadow_offset, lying_shadow_offset - shadow_offset };
 	}
 
 	return { shadow_offset, vec2::zero };
+}
+
+inline void scale_shadow_with_distance(flying_item_offsets& offsets, const float scale_at_reference) {
+	const auto distance_ratio = offsets.shadow.length() / SHADOW_SCALE_REFERENCE_DISTANCE;
+	offsets.shadow_scale = augs::interp(1.0f, scale_at_reference, distance_ratio);
+}
+
+template <class E>
+flying_item_offsets calc_flying_item_offsets(const E& typed_item, const double now_secs, const vec2 missile_shadow_offset) {
+	using item_type = remove_cref<E>;
+
+	const auto* const fall = [&]() -> const item_fall_state* {
+		if constexpr(item_type::template has<components::item>()) {
+			return std::addressof(typed_item.template get<components::item>().get_fall());
+		}
+		else {
+			return nullptr;
+		}
+	}();
+
+	const bool explosive = ::is_like_thrown_explosive(typed_item);
+	const bool raised = RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS && explosive;
+
+	auto offsets = ::calc_flying_offsets(fall, raised, typed_item.get_cosmos().get_fixed_delta(), now_secs, missile_shadow_offset);
+
+	if (explosive && !raised) {
+		::scale_shadow_with_distance(offsets, THROWN_EXPLOSIVE_SHADOW_SCALE_AT_REFERENCE);
+	}
+
+	return offsets;
+}
+
+/*
+	Fall of shells, which fly once ejected - null for remnants that don't fall.
+*/
+
+template <class E>
+const item_fall_state* find_shell_fall(const E& typed_remnant) {
+	if (const auto remnant = typed_remnant.template find<components::remnant>()) {
+		if (remnant->fall.when_started_falling.was_set()) {
+			return std::addressof(remnant->fall);
+		}
+	}
+
+	return nullptr;
+}
+
+/*
+	shell_fall is null for remnants that don't fall - they get no offsets.
+*/
+
+inline flying_item_offsets calc_shell_offsets(
+	const item_fall_state* const shell_fall,
+	const augs::delta dt,
+	const double now_secs,
+	const vec2 missile_shadow_offset
+) {
+	if (shell_fall == nullptr) {
+		return {};
+	}
+
+	auto offsets = ::calc_flying_offsets(shell_fall, RAISE_SHELLS_ABOVE_SHADOWS, dt, now_secs, missile_shadow_offset, FALLEN_SHELL_SHADOW_DISTANCE);
+
+	if (!RAISE_SHELLS_ABOVE_SHADOWS) {
+		::scale_shadow_with_distance(offsets, SHELL_SHADOW_SCALE_AT_REFERENCE);
+	}
+
+	return offsets;
 }

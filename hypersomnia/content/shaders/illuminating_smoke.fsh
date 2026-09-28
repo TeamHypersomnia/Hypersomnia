@@ -5,6 +5,7 @@ in vec2 theTexcoord;
 out vec4 outputColor;
 
 uniform sampler2D smoke_texture;
+uniform float smoke_flat_intensity;
 
 const int smoke_levels = 3;
 const int smoke_step = 255/smoke_levels;
@@ -49,7 +50,8 @@ void main()
 		vec3 smoke_hsv = rgb2hsv(smoke.rgb);
 		vec3 colorful_smoke = hsv2rgb(vec3(smoke_hsv.x, smoke_hsv.y, 1.0));
 	
-		smoke.a = smoke_intensity;
+		// A flat intensity draws all the smoke in a single shade instead of quantized levels.
+		smoke.a = smoke_flat_intensity > 0.0 ? smoke_flat_intensity : smoke_intensity;
 		smoke.rgb = colorful_smoke;
 	}
 

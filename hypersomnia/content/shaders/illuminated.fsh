@@ -68,12 +68,6 @@ uniform float receiver_height;
 uniform int receiver_displacement;
 
 /*
-	Nonzero draws the texture fully illuminated, darkened only by environment shadows - used for ground decals.
-*/
-
-uniform int fully_lit;
-
-/*
 	Nonzero brightens the light in discrete bands of its intensity, zero applies it as it is.
 */
 
@@ -165,13 +159,6 @@ const int light_step = 255/light_levels;
 
 void main() 
 {
-	if (fully_lit != 0) {
-		vec4 decal_pixel = theColor * texture(basic_texture, theTexcoord);
-		decal_pixel.rgb *= 1.0 - calc_shadow_amount();
-		outputColor = decal_pixel;
-		return;
-	}
-
 	vec2 texcoord = gl_FragCoord.xy;
 	texcoord.x /= float(textureSize(light_texture, 0).x);
 	texcoord.y /= float(textureSize(light_texture, 0).y);

@@ -12,7 +12,7 @@ constexpr std::size_t MAX_FLYING_NUMBER_INDICATORS = 300;
 constexpr std::size_t MAX_FLYING_NUMBER_CHARACTERS = 16;
 
 constexpr std::size_t MAX_PARTICLE_EMISSIONS = 10;
-constexpr std::size_t MAX_ORBITAL_EMISSIONS = 200;
+constexpr std::size_t MAX_ORBITAL_EMISSIONS = 400;
 constexpr std::size_t MAX_FIRE_AND_FORGET_EMISSIONS = 200;
 
 constexpr std::size_t MAX_FOLLOWUP_SOUND_INPUTS = 3;

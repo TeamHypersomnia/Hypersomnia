@@ -29,7 +29,6 @@ namespace augs {
 		receiver_height,
 		receiver_displacement,
 		ambient_color,
-		fully_lit,
 		shadow_hue_preservation,
 		posterize_light,
 		light_pass,
@@ -37,6 +36,7 @@ namespace augs {
 		removed_light_texture,
 		hue_light_texture,
 		point_light_hue_preservation,
+		smoke_flat_intensity,
 
 		COUNT
 		// END GEN INTROSPECTOR

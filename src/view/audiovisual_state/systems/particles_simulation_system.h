@@ -78,6 +78,11 @@ public:
 		float fade_when_ms_remaining = 0.f;
 
 		/*
+			The stream starts only after source_emission.stream_delay_ms - neither spawning nor aging until then.
+		*/
+		float delay_remaining_ms = 0.f;
+
+		/*
 			particle_lifetime_ms with its upper bound pre-scaled by the stream's resolved
 			source_emission.stream_particle_lifetime_mult - see particles_emission for the
 			rationale. Resolved once per stream instead of once per spawned particle.
@@ -97,6 +102,7 @@ public:
 
 		bool is_over() const;
 		float calc_alivity_mult() const;
+		float calc_remaining_ms() const;
 		float advance_lifetime_get_dt(const augs::delta& dt, bool stream_infinitely);
 
 		void init_bounds(
@@ -295,7 +301,9 @@ public:
 		const augs::delta& dt,
 		const interpolation_system&,
 		const bool gore_enabled,
-		const bool bullet_trails_enabled
+		const bool bullet_trails_enabled,
+		const double now_secs,
+		const vec2 missile_shadow_offset
 	);
 
 	void spawn_temporary_lights(

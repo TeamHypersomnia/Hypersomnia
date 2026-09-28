@@ -15,6 +15,12 @@ enum class particle_layer {
 	*/
 	TRAILS,
 
+	/*
+		Faint smoke in a single shade, overlaid on the scene regardless of light - visible even over a black floor in the dark.
+		For thin smoke that would glare if illuminating, yet can't be dim, as dim smokes show only where they're dense.
+	*/
+	OVERLAY_SMOKES,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -56,6 +56,7 @@
 
 #include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
 
+inline constexpr float OVERLAY_SMOKE_ALPHA = 0.084f;
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	using U = augs::common_uniform_name;
@@ -689,10 +690,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					cast_highlight
 				})();
 
-				renderer.set_active_texture(3);
-				bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
-				renderer.set_active_texture(0);
-
 				set_shader(shaders.illuminating_smoke);
 
 				if (strict_fow) {
@@ -700,6 +697,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					renderer.stencil_positive_test();
 				}
 
+				renderer.set_active_texture(3);
+				bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
+				renderer.set_active_texture(0);
+
+				set_uniform(shaders.illuminating_smoke, U::smoke_flat_intensity, 0.0f);
 				renderer.fullscreen_quad();
 
 				if (strict_fow) {
@@ -781,6 +783,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.clear_current_fbo();
 
 	draw_particles(particle_layer::ILLUMINATING_SMOKES);
+
+	renderer.call_and_clear_triangles();
+
+	fbos.overlay_smoke->set_as_current(renderer);
+	renderer.clear_current_fbo();
+
+	draw_particles(particle_layer::OVERLAY_SMOKES);
 
 	renderer.call_and_clear_triangles();
 
@@ -879,21 +888,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::GROUND);
 
-	/* Render ground decals (blood splatters) with full illumination */
-	if (environment_shadows) {
-		set_uniform(shaders.illuminated, U::fully_lit, 1);
-	}
-	else {
-		set_shader(shaders.standard);
-	}
+	/*
+		Ground decals (blood splatters) with full illumination - so they read clearly anywhere, sun shadows included.
+	*/
 
+	set_shader(shaders.standard);
 	renderer.call_triangles(D::GROUND_DECALS);
 
 	set_shader_with_matrix(shaders.illuminated);
-
-	if (environment_shadows) {
-		set_uniform(shaders.illuminated, U::fully_lit, 0);
-	}
 	renderer.call_triangles(D::LYING_CORPSES);
 
 	/*
@@ -941,6 +943,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.stencil_positive_test();
 	}
 
+	/*
+		Remnants, like shells, with full illumination - so they read clearly anywhere, sun shadows included,
+		the way their neons would light them up.
+	*/
+
+	set_shader(shaders.standard);
 	renderer.call_triangles(D::REMNANTS);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
@@ -999,6 +1007,30 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::FOREGROUND);
 
 	overlay_smoke_texture();
+
+	/*
+		Overlay smokes in a single shade, alpha blended over the scene regardless of light.
+	*/
+
+	{
+		renderer.set_active_texture(3);
+		bind_and_update_filtering(fbos.overlay_smoke->get_texture());
+		renderer.set_active_texture(0);
+
+		set_shader(shaders.illuminating_smoke);
+		set_uniform(shaders.illuminating_smoke, U::smoke_flat_intensity, OVERLAY_SMOKE_ALPHA);
+
+		if (strict_fow) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+		}
+
+		renderer.fullscreen_quad();
+
+		if (strict_fow) {
+			renderer.set_stencil(false);
+		}
+	}
 	
 	set_shader(shaders.standard);
 	renderer.call_triangles(D::FOREGROUND_GLOWS);

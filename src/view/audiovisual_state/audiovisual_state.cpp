@@ -18,6 +18,7 @@
 #include "game/messages/exploding_ring_effect.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
+#include "view/rendering_scripts/falling_item_offsets.h"
 #include "view/audiovisual_state/systems/exploding_ring_system.hpp"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/special_effects_settings.h"
@@ -148,6 +149,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto advance_visible_particle_streams = [&]() {
 		auto scope = measure_scope(performance.advance_particle_streams);
 
+		const auto& sun = cosm.get_common_significant().light.sun_shadows;
+
+		const bool sun_shadows =
+			input.performance.sun_shadows.quality != shadow_quality_type::NONE
+			&& sun.strength * input.performance.sun_shadows.strength_mult > 0.0f
+		;
+
 		particles.advance_visible_streams(
 			rng,
 			queried_cone,
@@ -158,7 +166,9 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			scaled_frame_dt,
 			interp,
 			input.gore_enabled,
-			input.bullet_trails_enabled
+			input.bullet_trails_enabled,
+			cosm.get_total_seconds_passed(input.interpolation_ratio),
+			::calc_along_the_sun(MISSILE_SHADOW_OFFSET, sun.step, sun_shadows)
 		);
 	};
 

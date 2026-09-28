@@ -416,6 +416,8 @@ namespace test_flavours {
 				render_layer::SOLID_OBSTACLES
 			);
 
+			meta.template get<invariants::render>().casts_overlay_shadow = true;
+
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
 			f.density *= 7.0;
 			f.restitution *= 2.;

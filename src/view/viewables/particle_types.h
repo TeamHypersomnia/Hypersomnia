@@ -283,6 +283,7 @@ T& apply_to_particle(const particle_effect_modifier& m, T& p) {
 	}
 
 	p.vel *= m.scale_velocities;
+	p.multiply_size(m.scale_sizes);
 
 	return p;
 }

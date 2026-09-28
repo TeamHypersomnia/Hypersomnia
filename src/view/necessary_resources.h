@@ -43,6 +43,7 @@ namespace augs {
 
 struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
+	optional_fbo overlay_smoke;
 	optional_fbo smoke;
 	optional_fbo light;
 	optional_fbo removed_light;

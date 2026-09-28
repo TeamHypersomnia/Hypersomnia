@@ -25,6 +25,7 @@
 #include "view/viewables/particle_types.h"
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
+#include "view/rendering_scripts/falling_item_offsets.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/light_attenuation.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
@@ -58,6 +59,10 @@ float emi_inst::calc_alivity_mult() const {
 	}
 
 	return stream_lifetime_ms / stream_max_lifetime_ms;
+}
+
+float emi_inst::calc_remaining_ms() const {
+	return stream_max_lifetime_ms - stream_lifetime_ms;
 }
 
 float emi_inst::advance_lifetime_get_dt(const augs::delta& delta, const bool stream_infinitely) {
@@ -104,6 +109,7 @@ void particles_simulation_system::emission_instance::init_bounds(
 	swing_spread_change = rng.randval(emission.swing_spread_change_rate);
 
 	fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+	delay_remaining_ms = emission.stream_delay_ms;
 
 	{
 		const auto mult = rng.randval(emission.stream_particle_lifetime_mult);
@@ -148,6 +154,18 @@ particles_simulation_system::basic_cache::basic_cache(
 			auto& num = emission.num_of_particles_to_spawn_initially;
 			num.first = num.first * settings.particle_burst_amount;
 			num.second = num.second * settings.particle_burst_amount;
+
+			if (!emission.ignore_effect_modifier) {
+				const auto& m = original.input.modifier;
+
+				auto scale = [](auto& bound, const float mult) {
+					bound.first *= mult;
+					bound.second *= mult;
+				};
+
+				scale(emission.stream_lifetime_ms, m.scale_stream_lifetimes);
+				emission.stream_shrink_out_ms *= m.scale_stream_lifetimes;
+			}
 
 			emission_instances.emplace_back(emission, rng);
 			auto& e = emission_instances.back();
@@ -727,7 +745,9 @@ void particles_simulation_system::advance_visible_streams(
 	const augs::delta& delta,
 	const interpolation_system& interp,
 	const bool gore_enabled,
-	const bool bullet_trails_enabled
+	const bool bullet_trails_enabled,
+	const double now_secs,
+	const vec2 missile_shadow_offset
 ) {
 	const auto dt_secs = delta.in_seconds();
 
@@ -749,6 +769,11 @@ void particles_simulation_system::advance_visible_streams(
 		const auto infinitely = effect.start.stream_infinitely;
 
 		for (auto& instance : instances) {
+			if (instance.delay_remaining_ms > 0.f) {
+				instance.delay_remaining_ms -= delta.in_milliseconds();
+				continue;
+			}
+
 			const auto stream_alivity_mult = std::fmod(instance.calc_alivity_mult(), 1.0f);
 			const auto stream_delta = instance.advance_lifetime_get_dt(delta, infinitely);
 
@@ -792,6 +817,18 @@ void particles_simulation_system::advance_visible_streams(
 				fade_mult *= fade_mult;
 
 				fade_in_mult = std::min(1.f, fade_mult);
+			}
+
+			/*
+				Shrinks the particles spawned over the stream's last stream_shrink_out_ms down to nothing,
+				so the stream thins out instead of ending abruptly.
+			*/
+			const auto shrink_out_ms = instance.source_emission.stream_shrink_out_ms;
+
+			float shrink_out_mult = 1.0f;
+
+			if (shrink_out_ms > 0.f && !infinitely) {
+				shrink_out_mult = std::clamp(instance.calc_remaining_ms() / shrink_out_ms, 0.f, 1.f);
 			}
 
 			auto new_particles_to_spawn_by_time =
@@ -900,6 +937,12 @@ void particles_simulation_system::advance_visible_streams(
 				/* MSVC ICE workaround */
 				auto& _rng = rng;
 
+				/*
+					Streams ignoring the emitter's rotation go in a fixed world direction - just their angular_offset.
+				*/
+
+				const auto emitter_rotation = emission.ignore_emitter_rotation ? 0.f : current_transform.rotation;
+
 				const auto spawner = [&](auto dummy) {
 					using spawned_particle_type = decltype(dummy);
 
@@ -908,14 +951,17 @@ void particles_simulation_system::advance_visible_streams(
 						instance.angular_offset,
 						instance.particle_speed,
 						final_particle_position,
-						current_transform.rotation + instance.swing_spread * static_cast<float>(std::sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI<float> * instance.swings_per_sec)),
+						emitter_rotation + instance.swing_spread * static_cast<float>(std::sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI<float> * instance.swings_per_sec)),
 						instance.spread,
 						emission,
 						chased_velocity,
 						instance.resolved_particle_lifetime_ms
 					);
 
-					return ::apply_to_particle(modifier, particle);
+					auto modified = ::apply_to_particle(modifier, particle);
+					modified.multiply_size(shrink_out_mult);
+
+					return modified;
 				};
 
 				if (emission.has<general_particle>()) {
@@ -995,10 +1041,24 @@ void particles_simulation_system::advance_visible_streams(
 			const auto live_transform = find_transform(chase, cosm, interp);
 			const auto before_abrupt_change = consume_before_abrupt_change(c);
 
-			const auto where = before_abrupt_change.has_value() ? before_abrupt_change : live_transform;
+			auto where = before_abrupt_change.has_value() ? before_abrupt_change : live_transform;
 
 			if (where == std::nullopt) {
 				return true;
+			}
+
+			if (!before_abrupt_change.has_value()) {
+				/*
+					Smoke of shells follows where their sprites are drawn - raised above their shadows, if they are.
+				*/
+
+				if (const auto target_handle = cosm[chase.target]) {
+					target_handle.template dispatch_on_having_all<components::remnant>([&](const auto& typed_target) {
+						if (const auto shell_fall = ::find_shell_fall(typed_target)) {
+							where->pos += ::calc_shell_offsets(shell_fall, cosm.get_fixed_delta(), now_secs, missile_shadow_offset).sprite;
+						}
+					});
+				}
 			}
 
 			const bool visible_in_camera = cam_aabb.hover(where->pos);

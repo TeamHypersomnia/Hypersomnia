@@ -447,6 +447,11 @@ void enqueue_illuminated_rendering_jobs(
 
 		{
 			auto job = [
+				&visible,
+				&cosm,
+				missile_shadow_offset,
+				global_time_seconds,
+				under_foreground_neons_in = make_drawing_input(D::UNDER_FOREGROUND_NEONS),
 				h1 = make_helper(D::UNDER_FOREGROUND_NEONS),
 				h2 = make_helper(D::FOREGROUND_NEONS),
 				h3 = make_helper(D::MISSILES_NEONS)
@@ -454,10 +459,22 @@ void enqueue_illuminated_rendering_jobs(
 				h1.draw_neons<
 					render_layer::PLANTED_ITEMS,
 					render_layer::OBSTACLES_UNDER_MISSILES,
-					render_layer::SOLID_OBSTACLES,
-					render_layer::REMNANTS
+					render_layer::SOLID_OBSTACLES
 					/* Sentiences would come here if not for the fact that they have special neon logic */
 				>();
+
+				/*
+					Neons of shells follow their raised sprites.
+				*/
+
+				visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
+					handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
+						const auto shell_fall = ::find_shell_fall(typed_handle);
+						const auto sprite_offset = ::calc_shell_offsets(shell_fall, cosm.get_fixed_delta(), global_time_seconds, missile_shadow_offset).sprite;
+
+						::specific_draw_neon_map(typed_handle, under_foreground_neons_in, ::make_shadow_offset_customizer(sprite_offset));
+					});
+				});
 
 				h2.draw_neons<
 					render_layer::FOREGROUND,
@@ -492,16 +509,43 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [&visible, &cosm, corpse_shadow_offset, remnants_in = make_drawing_input(D::REMNANTS), h = make_helper(D::REMNANTS)]() {
-				visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
-					handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
-						::specific_draw_color_highlight(typed_handle, CORPSE_SHADOW_COLOR, remnants_in, ::make_shadow_offset_customizer(corpse_shadow_offset));
+			auto job = [&visible, &cosm, corpse_shadow_offset, missile_shadow_offset, global_time_seconds, remnants_in = make_drawing_input(D::REMNANTS)]() {
+				const auto dt = cosm.get_fixed_delta();
+
+				/*
+					Shells cast shadows like thrown explosives,
+					other remnants lie on the floor with short shadows like corpses.
+				*/
+
+				auto for_each_remnant = [&](auto callback) {
+					visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
+						handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
+							const auto shell_fall = ::find_shell_fall(typed_handle);
+							const auto offsets = ::calc_shell_offsets(shell_fall, dt, global_time_seconds, missile_shadow_offset);
+
+							callback(typed_handle, shell_fall != nullptr, offsets);
+						});
 					});
+				};
+
+				for_each_remnant([&](const auto& typed_handle, const bool shell, const auto& offsets) {
+					if (shell) {
+						::specific_draw_color_highlight(
+							typed_handle,
+							SHELL_SHADOW_COLOR,
+							remnants_in,
+							::make_shadow_offset_customizer(offsets.shadow),
+							vec2::square(offsets.shadow_scale)
+						);
+					}
+					else {
+						::specific_draw_color_highlight(typed_handle, CORPSE_SHADOW_COLOR, remnants_in, ::make_shadow_offset_customizer(corpse_shadow_offset));
+					}
 				});
 
-				h.draw<
-					render_layer::REMNANTS
-				>();
+				for_each_remnant([&](const auto& typed_handle, const bool /* shell */, const auto& offsets) {
+					::specific_draw_entity(typed_handle, remnants_in, ::make_shadow_offset_customizer(offsets.sprite));
+				});
 			};
 
 			pool.enqueue(job);
@@ -596,7 +640,13 @@ void enqueue_illuminated_rendering_jobs(
 								if (draw_bullet_shadows) {
 									const auto shadow_color = ::is_like_thrown_explosive(typed_item) ? THROWN_EXPLOSIVE_SHADOW_COLOR : MISSILE_SHADOW_COLOR;
 
-									::specific_draw_color_highlight(typed_item, shadow_color, shadows, ::make_shadow_offset_customizer(offsets.shadow));
+									::specific_draw_color_highlight(
+										typed_item,
+										shadow_color,
+										shadows,
+										::make_shadow_offset_customizer(offsets.shadow),
+										vec2::square(offsets.shadow_scale)
+									);
 								}
 
 								::specific_draw_entity(typed_item, diffuse, ::make_shadow_offset_customizer(offsets.sprite));
