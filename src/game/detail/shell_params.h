@@ -38,7 +38,7 @@
 
 inline constexpr real32 SHELL_SPIN_REFERENCE_LENGTH = 13.f;
 
-inline constexpr real32 SHELL_FAST_SPIN_CHANCE = 0.4f;
+inline constexpr real32 SHELL_FAST_SPIN_CHANCE = 0.3f;
 inline constexpr real32 SHELL_SLOW_SPIN_MIN = 180.f;
 inline constexpr real32 SHELL_SLOW_SPIN_MAX = 720.f;
 inline constexpr real32 SHELL_FAST_SPIN_MIN = 3600.f;

@@ -3909,6 +3909,7 @@ namespace test_flavours {
 
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = { 330.f, 990.f };
+
 			gun_def.damage_multiplier = 2.0f;
 			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
@@ -3932,6 +3933,12 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2600;
 			set_chambering_duration_ms(meta, 600.f);
+
+			/*
+				Ejected down, under the gun - thrown up only half as high as usual. After the default props, which would reset it.
+			*/
+
+			meta.get<invariants::gun>().shell_height = { 1.5f, 3.f };
 
 			auto& item = meta.get<invariants::item>();
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
