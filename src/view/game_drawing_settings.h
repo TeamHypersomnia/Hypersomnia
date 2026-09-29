@@ -117,6 +117,7 @@ struct minimap_settings {
 	rgba player_color = white;
 	rgba teammate_color = yellow;
 	rgba enemy_color = red;
+	bool draw_lasers = true;
 	bool animate_laser_dashes = false;
 	bool clamp_important_to_border = true;
 	bool draw_viewed_player_ring = true;

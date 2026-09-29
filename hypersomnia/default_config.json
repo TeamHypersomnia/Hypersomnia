@@ -265,6 +265,7 @@
             "player_color": [255, 255, 255, 255],
             "teammate_color": [255, 255, 0, 255],
             "enemy_color": [255, 0, 0, 255],
+            "draw_lasers": true,
             "animate_laser_dashes": false,
             "clamp_important_to_border": true,
             "draw_viewed_player_ring": true

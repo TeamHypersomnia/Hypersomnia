@@ -587,6 +587,10 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	*/
 
 	auto draw_laser_of = [&](const auto& character, const bool is_viewer) {
+		if (!settings.draw_lasers) {
+			return;
+		}
+
 		const auto base_color = [&]() {
 			auto col = is_viewer ? settings.player_color : settings.teammate_color;
 			col.mult_alpha(minimap_laser_alpha_mult_v);

@@ -1641,7 +1641,12 @@ void settings_gui_state::perform(
 							revertable_color_edit(SCOPE_CFG_NVP(teammate_color));
 							revertable_color_edit(SCOPE_CFG_NVP(enemy_color));
 
-							revertable_checkbox(SCOPE_CFG_NVP(animate_laser_dashes));
+							revertable_checkbox(SCOPE_CFG_NVP(draw_lasers));
+
+							if (scope_cfg.draw_lasers) {
+								revertable_checkbox(SCOPE_CFG_NVP(animate_laser_dashes));
+							}
+
 							revertable_checkbox(SCOPE_CFG_NVP(clamp_important_to_border));
 							revertable_checkbox(SCOPE_CFG_NVP(draw_viewed_player_ring));
 						}
