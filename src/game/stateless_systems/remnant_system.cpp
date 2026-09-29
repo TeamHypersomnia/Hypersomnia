@@ -81,9 +81,13 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 			if (kicked) {
 				auto rng = randomization(augs::hash_multiple(state.seed, state.num_kicks++));
 
+				/*
+					Kicks by items roll the shells for sure - see SHELL_ITEM_CONTACT_ROLL_CHANCE.
+				*/
+
 				const auto outcome = rng.randval(0, SHELL_KICK_OUTCOMES - 1);
-				const bool passes_through = outcome < SHELL_KICK_PASSES_THROUGH;
-				const bool rolled = def.rolls && !passes_through && outcome < SHELL_KICK_PASSES_THROUGH + SHELL_KICK_ROLLS;
+				const bool passes_through = !state.pending_kick_rolls && outcome < SHELL_KICK_PASSES_THROUGH;
+				const bool rolled = def.rolls && !passes_through && (state.pending_kick_rolls || outcome < SHELL_KICK_PASSES_THROUGH + SHELL_KICK_ROLLS);
 				const bool nudged = !passes_through && !rolled;
 
 				if (rolled) {
@@ -96,6 +100,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				}
 
 				state.pending_kick = vec2::zero;
+				state.pending_kick_rolls = false;
 			}
 
 			if (!floor_hit_due) {
@@ -121,20 +126,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				state.ejected_by
 			);
 
-			{
-				const auto current_spin = body.get_degree_velocity();
-				const auto kept_spin = hit_index == 0 ? current_spin * SHELL_SPIN_KEPT : current_spin;
-
-				auto spin_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::SPIN);
-				const auto impulse =
-					spin_rng.randval(SHELL_HIT_SPIN_IMPULSE_MIN, SHELL_HIT_SPIN_IMPULSE_MAX)
-					* random_side(spin_rng)
-					* ::calc_shell_hit_spin_mult(hop_height)
-					* ::calc_shell_length_spin_mult(subject)
-				;
-
-				body.set_angular_velocity(kept_spin + impulse);
-			}
+			::spin_on_shell_floor_hit(body, hit_index, hop_height, ::calc_shell_length_spin_mult(subject), fall_seed);
 
 			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, fall_seed, now);
 			fall.hop_height = ::calc_shell_hop_height(fall.hop_duration_secs);
@@ -159,12 +151,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				body.set_velocity(body.get_velocity() + sideways * roll_side * speed);
 			}
 			else {
-				const auto velocity = body.get_velocity();
-				const auto speed = velocity.length();
-
-				if (speed > 1.f) {
-					body.set_velocity(velocity + velocity / speed * push_rng.randval(SHELL_PUSH_MIN_SPEED, SHELL_PUSH_MAX_SPEED));
-				}
+				::push_on_shell_floor_hit(body, push_rng);
 			}
 		}
 	);

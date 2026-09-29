@@ -350,19 +350,24 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 #endif
 
 		/*
-			Shells don't get tossed around by dynamic bodies - they only get kicked gently now and then,
+			Shells don't get tossed around by characters - they only get kicked gently now and then,
 			see remnant_system - and not at all before they first hit the floor.
-			They collide with static bodies as usual, and with items -
-			unless either is still in the air, before its first floor hit, as then it's drawn raised above the other.
+			They collide with any other bodies as usual - static ones, crates - and items either bounce them off or roll them off,
+			see SHELL_ITEM_CONTACT_ROLL_CHANCE - unless either is still in the air, before its first floor hit,
+			as then it's drawn raised above the other.
 		*/
 
-		const bool shell_touched_by_dynamic_body =
-			(fix_a->GetFilterData().categoryBits & (1 << int(filter_category::SHELL))) != 0
-			&& body_b->GetType() != b2_staticBody
+		const auto category_of = [](const b2Fixture* const fixture, const filter_category category) {
+			return (fixture->GetFilterData().categoryBits & (1 << int(category))) != 0;
+		};
+
+		const bool shell_touched_by_character_or_item =
+			category_of(fix_a, filter_category::SHELL)
+			&& (category_of(fix_b, filter_category::CHARACTER) || category_of(fix_b, filter_category::LYING_ITEM))
 		;
 
-		if (shell_touched_by_dynamic_body) {
-			const bool touched_by_lying_item = (fix_b->GetFilterData().categoryBits & (1 << int(filter_category::LYING_ITEM))) != 0;
+		if (shell_touched_by_character_or_item) {
+			const bool touched_by_lying_item = category_of(fix_b, filter_category::LYING_ITEM);
 			bool bounces_off = false;
 
 			subject.template dispatch_on_having_all<components::remnant>([&](const auto& typed_shell) {
@@ -372,7 +377,29 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 					const auto item = collider.template find<components::item>();
 					const bool item_in_the_air = item && item.get_fall().is_in_the_air();
 
-					bounces_off = !remnant.fall.is_in_the_air() && !item_in_the_air;
+					if (remnant.fall.is_in_the_air() || item_in_the_air) {
+						return;
+					}
+
+					/*
+						Decided anew only once the cooldown passes, so that the contact goes the same way while it lasts.
+					*/
+
+					if (!clk.lasts(SHELL_KICK_COOLDOWN_MS, remnant.when_kicked)) {
+						auto rng = randomization(augs::hash_multiple(remnant.seed, remnant.num_kicks++));
+
+						remnant.when_kicked = now;
+						remnant.item_contact_rolls = rng.randval(0.f, 1.f) < SHELL_ITEM_CONTACT_ROLL_CHANCE;
+
+						if (remnant.item_contact_rolls) {
+							const auto away = vec2(body_a->GetPosition().x, body_a->GetPosition().y) - vec2(body_b->GetPosition().x, body_b->GetPosition().y);
+
+							remnant.pending_kick = away.is_epsilon(0.0001f) ? vec2(1, 0) : vec2(away).normalize();
+							remnant.pending_kick_rolls = true;
+						}
+					}
+
+					bounces_off = !remnant.item_contact_rolls;
 					return;
 				}
 

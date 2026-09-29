@@ -15,14 +15,15 @@
 	Either way they shrink for start_shrinking_when_remaining_ms before disappearing.
 
 	floor_hit_sounds play in order as they hit the floor after being ejected.
-	roll_sound plays only as they're kicked into rolling - by characters walking into them.
+	roll_sound plays only as they're kicked into rolling - by characters walking into them, or by items.
 	ejection_smoke_size_mult scales the smoke of the cartridge they're ejected from - bigger calibers smoke more,
 	in bigger particles and longer - see SHELL_SMOKE_PARTICLE_SIZE_PER_SIZE.
 	floor_hit_variations_by_height orders the variations of the sounds from the lowest falls to the highest.
 	Remnants that don't roll - like shells too heavy for it - get only pushed along and nudged away, never rolled sideways.
 
-	pending_kick is the direction a dynamic body bumping into the remnant kicked it in, until remnant_system handles it.
-	seed randomizes everything about a shell - see spawn_shell - and so does num_kicks every next kick, however late it comes.
+	pending_kick is the direction a character or an item bumping into the remnant kicked it in, until remnant_system handles it -
+	and pending_kick_rolls makes it roll the remnant for sure. item_contact_rolls is how the last contact with an item goes, see contact_listener.
+	seed randomizes everything about a shell - see spawn_shell - and so does num_kicks every next kick or contact with an item, however late it comes.
 */
 
 namespace invariants {
@@ -31,7 +32,7 @@ namespace invariants {
 		real32 lifetime_secs = 2.f;
 		real32 start_shrinking_when_remaining_ms = 10.0f;
 		particle_effect_input trace_particles;
-		std::array<sound_effect_input, 2> floor_hit_sounds;
+		floor_hit_sounds_array floor_hit_sounds;
 		sound_effect_input roll_sound;
 		augs::constant_size_vector<uint8_t, 32> floor_hit_variations_by_height;
 		real32 ejection_smoke_size_mult = 1.f;
@@ -51,6 +52,9 @@ namespace components {
 		vec2 pending_kick;
 		augs::stepped_timestamp when_kicked;
 		uint32_t num_kicks = 0;
+		bool pending_kick_rolls = false;
+		bool item_contact_rolls = false;
+		pad_bytes<2> pad;
 		uint32_t seed = 0;
 		entity_id ejected_by;
 		// END GEN INTROSPECTOR

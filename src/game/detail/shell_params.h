@@ -16,9 +16,9 @@
 	with the square root of the height of the hop that ends, fully from SHELL_HIT_SPIN_FULL_AT_HEIGHT.
 	Every hit pushes them on slightly along their motion - once their hops get low, sideways instead, starting to roll -
 	and after the last one they roll off sideways for a moment. They roll to whichever side is closer to where they fly or are kicked.
-	Dynamic bodies don't touch them until they first hit the floor, and then don't toss them around - only kick them now and then:
+	Characters don't touch them until they first hit the floor, and then don't toss them around - only kick them now and then:
 	out of SHELL_KICK_OUTCOMES kicks, SHELL_KICK_PASSES_THROUGH don't touch them, SHELL_KICK_ROLLS roll them off sideways, harder,
-	and the rest nudge them away.
+	and the rest nudge them away. Other bodies they collide with as usual, and items - see SHELL_ITEM_CONTACT_ROLL_CHANCE.
 
 	The sideways push eases with the height of the hop that ends: as the speed of the impact, with its square root -
 	the SHELL_LOW_HOP_ROLL speeds at SHELL_LOW_HOP_ROLL_AT_HEIGHT, at most SHELL_LOW_HOP_ROLL_MAX_MULT of them.
@@ -77,6 +77,13 @@ inline constexpr real32 SHELL_KICK_ROLL_MAX_SPEED = 380.f;
 inline constexpr real32 SHELL_NUDGE_MIN_SPEED = 30.f;
 inline constexpr real32 SHELL_NUDGE_MAX_SPEED = 90.f;
 inline constexpr real32 SHELL_KICK_COOLDOWN_MS = 1000.f;
+
+/*
+	Items never pass through shells - touching one, a shell either bounces off it, or rolls off it as if kicked,
+	SHELL_ITEM_CONTACT_ROLL_CHANCE of the time.
+*/
+
+inline constexpr real32 SHELL_ITEM_CONTACT_ROLL_CHANCE = 0.5f;
 
 inline constexpr int SHELL_KICK_OUTCOMES = 6;
 inline constexpr int SHELL_KICK_PASSES_THROUGH = 2;
