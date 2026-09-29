@@ -507,6 +507,20 @@ inline real32 calc_thrown_explosive_height(const real32 speed) {
 }
 
 /*
+	How far into the current hop a falling item is, from 0 to 1. now_secs may be interpolated.
+	The hop ends exactly at the step the floor is hit at,
+	so the item neither lies on the floor for a while nor jumps off it at once.
+	It also starts at the step it was stamped at, but the clock is already a step later once that step is solved.
+*/
+
+inline real32 calc_hop_progress(const item_fall_state& fall, const augs::delta dt, const double now_secs) {
+	const auto hop_secs = static_cast<real32>(::calc_hop_steps(fall.hop_duration_secs, dt)) * dt.in_seconds();
+	const auto hop_start_secs = fall.when_hop_started.in_seconds(dt) + dt.in_seconds();
+
+	return std::clamp(static_cast<real32>(now_secs - hop_start_secs) / hop_secs, 0.f, 1.f);
+}
+
+/*
 	How high a falling item is. Zero once it came to rest. now_secs may be interpolated.
 	hand_height is what a thrown up item rises from - the view passes whatever it draws exactly where the item is.
 */
@@ -516,15 +530,7 @@ inline real32 calc_fall_height(const item_fall_state& fall, const augs::delta dt
 		return 0.f;
 	}
 
-	/*
-		The hop ends exactly at the step the floor is hit at,
-		so the item neither lies on the floor for a while nor jumps off it at once.
-		It also starts at the step it was stamped at, but the clock is already a step later once that step is solved.
-	*/
-
-	const auto hop_secs = static_cast<real32>(::calc_hop_steps(fall.hop_duration_secs, dt)) * dt.in_seconds();
-	const auto hop_start_secs = fall.when_hop_started.in_seconds(dt) + dt.in_seconds();
-	const auto t = std::clamp(static_cast<real32>(now_secs - hop_start_secs) / hop_secs, 0.f, 1.f);
+	const auto t = ::calc_hop_progress(fall, dt, now_secs);
 	const auto distance_from_top = 2.f * t - 1.f;
 
 	if (fall.floor_hits_done > 0) {
@@ -553,4 +559,46 @@ inline real32 calc_fall_height(const item_fall_state& fall, const augs::delta dt
 template <class E>
 real32 calc_item_fall_height(const E& item, const double now_secs, const real32 hand_height) {
 	return ::calc_fall_height(item.template get<components::item>().get_fall(), item.get_cosmos().get_fixed_delta(), now_secs, hand_height);
+}
+
+/*
+	Magazines lying on the ground - in no slot - are GROUND_MAGAZINE_SCALE times bigger, sprite and body alike,
+	so that they are easier to notice.
+	They grow as they fly off: up to the top of their first hop if thrown up, like unmounted ones, or else until they first hit the floor.
+	now_secs may be interpolated.
+*/
+
+inline constexpr real32 GROUND_MAGAZINE_SCALE = 2.f;
+
+template <class E>
+bool is_magazine_on_the_ground(const E& typed_item) {
+	if (const auto item_def = typed_item.template find<invariants::item>()) {
+		if (item_def->categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+			return !typed_item.get_current_slot().alive();
+		}
+	}
+
+	return false;
+}
+
+template <class E>
+real32 calc_ground_item_scale(const E& typed_item, const double now_secs) {
+	if (!::is_magazine_on_the_ground(typed_item)) {
+		return 1.f;
+	}
+
+	const auto& fall = typed_item.template get<components::item>().get_fall();
+
+	const auto growth = [&]() {
+		if (!fall.is_in_the_air() || fall.hop_duration_secs <= 0.f) {
+			return 1.f;
+		}
+
+		const auto t = ::calc_hop_progress(fall, typed_item.get_cosmos().get_fixed_delta(), now_secs);
+		const auto top_t = fall.thrown_up ? 0.5f : 1.f;
+
+		return std::min(1.f, t / top_t);
+	}();
+
+	return augs::interp(1.f, GROUND_MAGAZINE_SCALE, growth);
 }

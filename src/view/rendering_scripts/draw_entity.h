@@ -20,6 +20,7 @@
 #include "game/components/missile_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "game/detail/inventory/item_falling.h"
 #include "game/detail/frame_calculation.h"
 
 #include "view/viewables/all_viewables_declaration.h"
@@ -81,7 +82,9 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 		teleport_alpha *= mult_alpha;
 
-		const auto sprite = [&typed_handle]() {
+		const auto sprite = [&typed_handle, &in]() {
+			(void)in;
+
 			auto result = typed_handle.template get<invariants::sprite>();
 
 			if constexpr(H::template has<components::overridden_geo>()) {
@@ -91,6 +94,10 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				if (s.is_enabled) {
 					result.size = s.value;
 				}
+			}
+
+			if constexpr(!for_gui && H::template has<components::item>()) {
+				result.size = vec2i(vec2(result.size) * ::calc_ground_item_scale(typed_handle, in.global_time_seconds));
 			}
 
 			return result;
