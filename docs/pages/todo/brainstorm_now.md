@@ -6,9 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- czy rng do kolizji z postacia jest przewidywalny tez
+
 - zaudytuj tez caly plumbing parametrow gdzies do tych lusek czy cieni roznych czy sie nie da uproscic gdzies zeby np mniej stanu przechowywala logika jesli do logiki cos wkladalismy i generalnie czy to przekazywanie wyjatkow ze a to dla digla inaczej a to dla innej łuski inaczej czy innego fleszbenga inaczej cos czy to jest zrobione tak jak ja przewaznie na moj sposob robie faktycznie. to jest wazne zeby tu mnie nasladowac
-- jakos spowolnic optycznie te luski jak nie wiem czy nizsza wysokosc czy co bez rozpierdalania juz zsynchronizowanych dzwiekow 
-- osobne sloty na rolle i 3 bo tak najczysciej jest
 - nie powinien zerowac cooldownu chyba jesli jest begin contact i to poprawnie zadziala
 
 - itemy niech nie koliduja z innymi itemami przed pierwszym uderzeniem w ziemie tak samo jak luski

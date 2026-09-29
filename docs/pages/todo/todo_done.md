@@ -7509,3 +7509,6 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - skala tego crosshaira nizsza
 - jak sie wylaczy te bullet trace to te neony trzeba tez normalizowac
 	- cos zrobic z tymi rykoszetami paskudnymi jak jest neon rysowany, particle chyba moga byc
+- moze jeszcze bardziej losowe obroty tym luskom troche przy uderzeniach w sensie mocniejsze angularne impulsy przy kazdym.
+- jakos spowolnic optycznie te luski jak nie wiem czy nizsza wysokosc czy co bez rozpierdalania juz zsynchronizowanych dzwiekow 
+- osobne sloty na rolle i 3 bo tak najczysciej jest
