@@ -57,8 +57,14 @@ inline constexpr real32 DROPPED_ITEM_FALL_SECS = 0.22f;
 inline constexpr real32 DROPPED_ITEM_FALL_HEIGHT = 1.6f;
 inline constexpr real32 DROPPED_ITEM_MIN_HOP_SECS = 0.25f;
 inline constexpr real32 THROWN_MELEE_HOP_DURATION_MULT = 1.25f;
-inline constexpr real32 UNMOUNTED_ITEM_FALL_SECS = 0.42f;
-inline constexpr real32 UNMOUNTED_ITEM_FALL_HEIGHT = 4.4f;
+inline constexpr real32 UNMOUNTED_ITEM_FALL_SECS = 0.5f;
+inline constexpr real32 UNMOUNTED_ITEM_FALL_HEIGHT = 4.8f;
+inline constexpr uint8_t UNMOUNTED_MAGAZINE_FLOOR_HITS = 2;
+inline constexpr real32 UNMOUNTED_MAGAZINE_HOP_HEIGHT = 6.f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION = 0.12f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT = 0.04f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT = 0.1f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_VELOCITY_MULT = 1.5f;
 
 inline constexpr real32 DROPPED_ITEM_SPIN_KEPT = 0.25f;
 inline constexpr real32 DROPPED_ITEM_COUNTER_SPIN_DEGREES = 310.f;
@@ -250,7 +256,7 @@ inline void count_floor_hit_and_start_next_hop(
 template <class S>
 void play_floor_hit_sound(
 	const S& step,
-	const std::array<sound_effect_input, 2>& sounds,
+	const floor_hit_sounds_array& sounds,
 	const item_fall_state& fall,
 	const rng_seed_type fall_seed,
 	const transformr where,
@@ -386,6 +392,93 @@ inline real32 calc_shell_low_hop_roll_mult(const real32 hop_height) {
 inline real32 calc_shell_hop_height(const real32 hop_duration_secs) {
 	const auto ratio = hop_duration_secs / SHELL_HOP_SECS_AT_UNIT_HEIGHT;
 	return ratio * ratio;
+}
+
+/*
+	What a floor hit does to shells, and to items hopping like them:
+	they mostly stop spinning at the first hit, and every hit spins them anew - as hard as it is, and the slower the longer they are.
+*/
+
+template <class B>
+void spin_on_shell_floor_hit(
+	const B& body,
+	const uint8_t hit_index,
+	const real32 hop_height,
+	const real32 length_spin_mult,
+	const rng_seed_type fall_seed
+) {
+	const auto current_spin = body.get_degree_velocity();
+	const auto kept_spin = hit_index == 0 ? current_spin * SHELL_SPIN_KEPT : current_spin;
+
+	auto spin_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::SPIN);
+	const auto magnitude = spin_rng.randval(SHELL_HIT_SPIN_IMPULSE_MIN, SHELL_HIT_SPIN_IMPULSE_MAX);
+	const auto direction = spin_rng.randval(0, 1) == 0 ? -1.f : 1.f;
+
+	const auto impulse = magnitude * direction * ::calc_shell_hit_spin_mult(hop_height) * length_spin_mult;
+
+	body.set_angular_velocity(kept_spin + impulse);
+}
+
+/*
+	Pushes them slightly on along their motion.
+*/
+
+template <class B>
+void push_on_shell_floor_hit(const B& body, randomization& push_rng) {
+	const auto velocity = body.get_velocity();
+	const auto speed = velocity.length();
+
+	if (speed > 1.f) {
+		body.set_velocity(velocity + velocity / speed * push_rng.randval(SHELL_PUSH_MIN_SPEED, SHELL_PUSH_MAX_SPEED));
+	}
+}
+
+/*
+	How long a hop of shells - and of items hopping like them - lasts to be this high. The inverse of calc_shell_hop_height.
+*/
+
+inline real32 calc_shell_hop_secs(const real32 hop_height) {
+	return std::max(SHELL_MIN_HOP_SECS, SHELL_HOP_SECS_AT_UNIT_HEIGHT * std::sqrt(hop_height));
+}
+
+/*
+	Magazines unmounted onto the floor hop off it like shells - spinning and pushed on like them, but never rolling off -
+	UNMOUNTED_MAGAZINE_FLOOR_HITS times, every hit playing its own floor hit sound.
+	Their hops are set by their heights, and last as long as it physically takes to hop that high:
+	the first one UNMOUNTED_MAGAZINE_HOP_HEIGHT high, rising a bit out of the hand like thrown explosives,
+	varying by up to UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION - seeded by the gun and how many shells it ejected,
+	so decided as soon as the gun exists, like its shells - and every next one UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT as high as the one before.
+	Hits after hops higher than UNMOUNTED_MAGAZINE_HOP_HEIGHT sound higher - by UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT of how much faster
+	their impact is, with the square root of the height - and the others as they are.
+	They fly off UNMOUNTED_MAGAZINE_VELOCITY_MULT as fast as other unmounted items - times invariants::gun::unmounted_magazine_velocity_mult of their gun.
+*/
+
+inline void start_falling_like_unmounted_magazine(
+	item_fall_state& fall,
+	const rng_seed_type fall_seed,
+	const augs::stepped_timestamp now
+) {
+	auto rng = randomization(fall_seed);
+
+	const auto variation = UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION;
+	const auto height = UNMOUNTED_MAGAZINE_HOP_HEIGHT * rng.randval(1.f - variation, 1.f + variation);
+
+	::start_falling(fall, UNMOUNTED_MAGAZINE_FLOOR_HITS, ::calc_shell_hop_secs(height), height, 0.f, true, fall_seed, now);
+	fall.hops_like_shell = true;
+}
+
+/*
+	After a floor hit of an unmounted magazine - see start_falling_like_unmounted_magazine.
+*/
+
+inline real32 calc_unmounted_magazine_hit_pitch_mult(const real32 hop_height) {
+	const auto impact = std::sqrt(hop_height / UNMOUNTED_MAGAZINE_HOP_HEIGHT);
+	return 1.f + std::max(0.f, impact - 1.f) * UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT;
+}
+
+inline void start_next_hop_of_unmounted_magazine(item_fall_state& fall, const real32 previous_hop_height) {
+	fall.hop_height = previous_hop_height * UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT;
+	fall.hop_duration_secs = ::calc_shell_hop_secs(fall.hop_height);
 }
 
 inline uint8_t calc_thrown_explosive_floor_hits(const real32 speed, const uint8_t floor_hits_when_thrown) {

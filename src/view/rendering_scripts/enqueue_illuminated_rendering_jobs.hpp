@@ -635,10 +635,26 @@ void enqueue_illuminated_rendering_jobs(
 							const bool falling = fall != nullptr && fall->floor_hits_left > 0;
 
 							if (!is_laying_on_ground || falling) {
-								const auto offsets = ::calc_flying_item_offsets(typed_item, global_time_seconds, missile_shadow_offset);
+								/*
+									Items hopping like shells - unmounted magazines - are drawn like shells too.
+								*/
+
+								const bool like_shell = fall != nullptr && fall->hops_like_shell;
+
+								const auto offsets = 
+									like_shell ?
+									::calc_shell_offsets(fall, typed_item.get_cosmos().get_fixed_delta(), global_time_seconds, missile_shadow_offset) :
+									::calc_flying_item_offsets(typed_item, global_time_seconds, missile_shadow_offset)
+								;
 
 								if (draw_bullet_shadows) {
-									const auto shadow_color = ::is_like_thrown_explosive(typed_item) ? THROWN_EXPLOSIVE_SHADOW_COLOR : MISSILE_SHADOW_COLOR;
+									const auto shadow_color = [&]() {
+										if (like_shell) {
+											return SHELL_SHADOW_COLOR;
+										}
+
+										return ::is_like_thrown_explosive(typed_item) ? THROWN_EXPLOSIVE_SHADOW_COLOR : MISSILE_SHADOW_COLOR;
+									}();
 
 									::specific_draw_color_highlight(
 										typed_item,

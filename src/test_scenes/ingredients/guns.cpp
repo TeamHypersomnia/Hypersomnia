@@ -1,3 +1,7 @@
+#include <algorithm>
+#include <optional>
+#include "augs/math/repro_math.h"
+#include "augs/templates/enum_introspect.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
@@ -68,6 +72,67 @@ inventory_space_type to_space_units(const std::string& s);
 */
 
 const auto award_mult = 1.5f;
+
+/*
+	Magazines hit the floor like those unmounted while reloading, a sound for each of their three hits.
+	The more powerful their gun, the deeper they sound and the farther they fly as they're unmounted - by the logarithm
+	of how many times more powerful it is than magazine_baseline_power, the Baka47's shot - so that the weakest and the strongest
+	guns, like pistols and snipers, don't stray too far. At the Baka47, the pitch is magazine_baseline_pitch and the velocity mult 1.
+*/
+
+constexpr auto magazine_baseline_power = 4.f;
+constexpr auto magazine_baseline_pitch = 1.f;
+constexpr auto magazine_pitch_per_log_power = 0.06f;
+constexpr auto magazine_velocity_per_log_power = 0.42f;
+const auto magazine_pitch_bounds = augs::bound<real32> { 0.85f, 1.15f };
+const auto magazine_velocity_mult_bounds = augs::bound<real32> { 0.67f, 1.02f };
+
+/*
+	Shells and magazines hitting the floor are heard within a screen's width - fully within three quarters of it.
+*/
+
+constexpr auto floor_hit_sound_max_distance = 1920.f;
+constexpr auto floor_hit_sound_reference_distance = 0.75f * floor_hit_sound_max_distance;
+
+/*
+	Heard with every reload, so barely a click, like shells hitting the floor.
+*/
+
+constexpr auto magazine_floor_hit_gain = 0.25f;
+
+/*
+	Pistols don't throw their magazines as far as their power would.
+*/
+
+static std::optional<real32> get_unmounted_magazine_velocity_mult_exception(const test_shootable_weapons w) {
+	using W = test_shootable_weapons;
+
+	switch (w) {
+		case W::DEAGLE:         return 0.8f;
+		case W::COVERT:         return 0.8f;
+		case W::CALICO:         return 0.74f;
+		case W::BULWARK:        return 0.74f;
+
+		/*
+			The revolver's cylinder just drops out, right by the shooter.
+		*/
+
+		case W::AO44:           return 0.4f;
+		default:                return std::nullopt;
+	}
+}
+
+static void set_magazine_floor_hit_sounds(invariants::item& item) {
+	item.floor_hit_sounds[0].id = to_sound_id(test_scene_sound_id::MAGAZINE_FLOOR_HIT_FIRST);
+	item.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::MAGAZINE_FLOOR_HIT_SECOND);
+	item.floor_hit_sounds[2].id = to_sound_id(test_scene_sound_id::MAGAZINE_FLOOR_HIT_THIRD);
+
+	for (auto& sound : item.floor_hit_sounds) {
+		sound.modifier.gain = magazine_floor_hit_gain;
+		sound.modifier.max_distance = floor_hit_sound_max_distance;
+		sound.modifier.reference_distance = floor_hit_sound_reference_distance;
+	}
+}
 
 /*
 	Weapons hit the floor with two sounds, the second quieter and lower.
@@ -2142,14 +2207,10 @@ namespace test_flavours {
 				remnant.floor_hit_sounds[1].id = to_sound_id(sounds.second);
 				remnant.roll_sound.id = to_sound_id(sounds.roll);
 
-				/*
-					Audible within 1000 px.
-				*/
-
 				auto set_modifier = [&](sound_effect_modifier& modifier, const real32 sound_pitch) {
 					modifier.pitch = sound_pitch;
-					modifier.max_distance = 1000.f;
-					modifier.reference_distance = 500.f;
+					modifier.max_distance = floor_hit_sound_max_distance;
+					modifier.reference_distance = floor_hit_sound_reference_distance;
 				};
 
 				for (auto& sound : remnant.floor_hit_sounds) {
@@ -2817,6 +2878,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 110;
@@ -2846,6 +2908,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.6");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 150;
@@ -2875,6 +2938,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 250;
@@ -2904,6 +2968,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -2933,6 +2998,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.4");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -2962,6 +3028,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.4");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -2991,6 +3058,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.4");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 80;
@@ -3020,6 +3088,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.4");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 80;
@@ -3049,6 +3118,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 200;
@@ -3078,6 +3148,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 300;
@@ -3107,6 +3178,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 150;
@@ -3140,6 +3212,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -3173,6 +3246,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -3202,6 +3276,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 150;
@@ -3231,6 +3306,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 150;
@@ -3260,6 +3336,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 350;
@@ -3289,6 +3366,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -3318,6 +3396,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -3347,6 +3426,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 250;
@@ -3376,6 +3456,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 100;
@@ -3405,6 +3486,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 200;
@@ -3433,6 +3515,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				::set_magazine_floor_hit_sounds(item);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 200;
@@ -3878,6 +3961,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZCZUR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
 			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
+			gun_def.ducks_shell_sounds = false;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
@@ -5147,6 +5231,97 @@ namespace test_flavours {
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2600;
 		}
+
+		/*
+			The more powerful a gun - the damage of its shot, with the square root of how many pellets it has,
+			as they scatter and hit a bit apart - the deeper its magazines hit the floor, and the farther they fly as they're unmounted.
+			See magazine_baseline_power.
+		*/
+
+		auto find_charge_of = [&](const auto& magazine_flavour_id) -> const invariants::cartridge* {
+			const invariants::cartridge* found = nullptr;
+
+			augs::for_each_enum_except_bounds([&](const test_container_items magazine) {
+				if (found != nullptr || !(::to_entity_flavour_id(magazine) == magazine_flavour_id)) {
+					return;
+				}
+
+				const auto magazine_container = get_test_flavour(flavours, magazine).template find<invariants::container>();
+
+				if (magazine_container == nullptr) {
+					return;
+				}
+
+				const auto deposit = mapped_or_nullptr(magazine_container->slots, slot_function::ITEM_DEPOSIT);
+
+				if (deposit == nullptr) {
+					return;
+				}
+
+				augs::for_each_enum_except_bounds([&](const test_shootable_charges charge) {
+					if (found == nullptr && ::to_entity_flavour_id(charge) == deposit->only_allow_flavour) {
+						found = get_test_flavour(flavours, charge).template find<invariants::cartridge>();
+					}
+				});
+			});
+
+			return found;
+		};
+
+		augs::for_each_enum_except_bounds([&](const test_shootable_weapons weapon) {
+			auto& gun_meta = get_test_flavour(flavours, weapon);
+
+			const auto gun_def = gun_meta.template find<invariants::gun>();
+			const auto container = gun_meta.template find<invariants::container>();
+
+			if (gun_def == nullptr || container == nullptr) {
+				return;
+			}
+
+			/*
+				Only looked up - indexing would add a magazine slot to guns without one, like shotguns.
+			*/
+
+			const auto magazine_slot = mapped_or_nullptr(container->slots, slot_function::GUN_DETACHABLE_MAGAZINE);
+
+			if (magazine_slot == nullptr || !magazine_slot->only_allow_flavour.is_set()) {
+				return;
+			}
+
+			const auto magazine_flavour = magazine_slot->only_allow_flavour;
+			const auto charge = find_charge_of(magazine_flavour);
+			const auto pellets = charge != nullptr ? static_cast<real32>(charge->num_rounds_spawned) : 1.f;
+
+			const auto power = gun_def->damage_multiplier * repro::sqrt(pellets);
+
+			/*
+				Reproducible, as it decides how magazines fly.
+			*/
+
+			const auto log_power = static_cast<real32>(repro::log(power / magazine_baseline_power));
+
+			const auto velocity_mult_exception = ::get_unmounted_magazine_velocity_mult_exception(weapon);
+
+			gun_def->unmounted_magazine_velocity_mult = velocity_mult_exception.has_value() ? *velocity_mult_exception : std::clamp(
+				1.f + log_power * magazine_velocity_per_log_power,
+				magazine_velocity_mult_bounds.first,
+				magazine_velocity_mult_bounds.second
+			);
+
+			const auto pitch = std::clamp(
+				magazine_baseline_pitch - log_power * magazine_pitch_per_log_power,
+				magazine_pitch_bounds.first,
+				magazine_pitch_bounds.second
+			);
+
+			augs::for_each_enum_except_bounds([&](const test_container_items magazine) {
+				if (::to_entity_flavour_id(magazine) == magazine_flavour) {
+					for (auto& sound : get_test_flavour(flavours, magazine).template get<invariants::item>().floor_hit_sounds) {
+						sound.modifier.pitch = pitch;
+					}
+				}
+			});
+		});
 	}
 }
 

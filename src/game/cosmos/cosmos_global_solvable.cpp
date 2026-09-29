@@ -184,20 +184,49 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 						progress = 0.f;
 					}
 
+					const auto source_container = transferred_item.get_current_slot().get_container();
+
 					::perform_transfer(transfer, step);
 
 					if (target_slot.dead()) {
 						/*
-							Unmounted onto the floor, like magazines dropped while reloading.
+							Unmounted onto the floor, like magazines dropped while reloading - which hop off it like shells.
 						*/
 
-						::start_falling_like_dropped(
-							transferred_item.template get<components::item>().get_fall(),
-							UNMOUNTED_ITEM_FALL_SECS,
-							UNMOUNTED_ITEM_FALL_HEIGHT,
-							cosm.get_nontemporal_rng_seed_for(transferred_item),
-							cosm.get_timestamp()
-						);
+						auto& fall = transferred_item.template get<components::item>().get_fall();
+						const auto seed = cosm.get_nontemporal_rng_seed_for(transferred_item);
+						const bool magazine = transferred_item.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE);
+
+						if (magazine) {
+							/*
+								Seeded by the gun and how many shells it ejected - see start_falling_like_unmounted_magazine.
+							*/
+
+							const auto magazine_seed = [&]() -> rng_seed_type {
+								if (const auto gun = source_container.template find<components::gun>()) {
+									return augs::hash_multiple(cosm.get_nontemporal_rng_seed_for(source_container), gun->num_ejected_shells);
+								}
+
+								return seed;
+							}();
+
+							::start_falling_like_unmounted_magazine(fall, magazine_seed, cosm.get_timestamp());
+
+							const auto gun_velocity_mult = [&]() {
+								if (const auto gun_def = source_container.template find<invariants::gun>()) {
+									return gun_def->unmounted_magazine_velocity_mult;
+								}
+
+								return 1.f;
+							}();
+
+							if (const auto body = transferred_item.template find<components::rigid_body>()) {
+								body.set_velocity(body.get_velocity() * UNMOUNTED_MAGAZINE_VELOCITY_MULT * gun_velocity_mult);
+							}
+						}
+						else {
+							::start_falling_like_dropped(fall, UNMOUNTED_ITEM_FALL_SECS, UNMOUNTED_ITEM_FALL_HEIGHT, seed, cosm.get_timestamp());
+						}
 					}
 				}
 			}

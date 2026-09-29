@@ -155,6 +155,7 @@ namespace invariants {
 		pad_bytes<1> pad;
 		real32 randomize_spawn_point_within_circle_of_radius = 0.f;
 		real32 shot_pitch_drop_at_low_ammo = 0.f;
+		real32 unmounted_magazine_velocity_mult = 1.f;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

@@ -1556,6 +1556,37 @@ void item_system::advance_falling_items(const logic_step step) {
 		const bool explosive = ::is_like_thrown_explosive(typed_item);
 		const auto fall_seed = ::calc_fall_seed(cosm.get_nontemporal_rng_seed_for(typed_item), fall.when_started_falling);
 		const auto hit_index = fall.floor_hits_done;
+
+		if (fall.hops_like_shell) {
+			const auto hop_height = fall.hop_height;
+
+			auto sounds = typed_item.template get<invariants::item>().floor_hit_sounds;
+
+			if (hit_index < sounds.size()) {
+				sounds[hit_index].modifier.pitch *= ::calc_unmounted_magazine_hit_pitch_mult(hop_height);
+			}
+
+			::play_floor_hit_sound(
+				step,
+				sounds,
+				fall,
+				fall_seed,
+				typed_item.get_logic_transform(),
+				SHELL_FALL_PITCH_VARIATION,
+				SHELL_FLOOR_HIT_PITCH_VARIATION
+			);
+
+			::spin_on_shell_floor_hit(body, hit_index, hop_height, ::calc_shell_length_spin_mult(typed_item), fall_seed);
+
+			auto push_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::PUSH);
+			::push_on_shell_floor_hit(body, push_rng);
+
+			::count_floor_hit_and_start_next_hop(fall, 0.f, SHELL_MIN_HOP_SECS, fall_seed, now);
+			::start_next_hop_of_unmounted_magazine(fall, hop_height);
+
+			return;
+		}
+
 		const bool last_silent_hit = SILENCE_LAST_ITEM_FLOOR_HIT && !explosive && fall.floor_hits_left == 1;
 
 		/*
@@ -1575,7 +1606,7 @@ void item_system::advance_falling_items(const logic_step step) {
 		*/
 
 		auto play_hit_sound = [&]() {
-			const auto& sounds = [&]() -> const std::array<sound_effect_input, 2>& {
+			const auto& sounds = [&]() -> const floor_hit_sounds_array& {
 				if (explosive) {
 					if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
 						return fuse_def->floor_hit_sounds;

@@ -9,6 +9,7 @@ inline constexpr uint8_t NO_SOUND_VARIATION = 0xff;
 	Items thrown or dropped explicitly, and shells ejected from guns, hit the floor a few times before they come to rest -
 	see item_falling.h. when_landed is when they came to rest after the last hit.
 	sound_variation picks the variation of the floor hit sounds, or a random one if NO_SOUND_VARIATION.
+	hops_like_shell makes an item hop off the floor like shells do - see start_falling_like_unmounted_magazine.
 */
 
 struct item_fall_state {
@@ -23,7 +24,8 @@ struct item_fall_state {
 	bool thrown_up = false;
 	bool thrown_melee = false;
 	uint8_t sound_variation = NO_SOUND_VARIATION;
-	pad_bytes<3> pad;
+	bool hops_like_shell = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	bool is_in_the_air() const {

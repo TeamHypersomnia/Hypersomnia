@@ -52,7 +52,7 @@ namespace invariants {
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
-		std::array<sound_effect_input, 2> floor_hit_sounds;
+		floor_hit_sounds_array floor_hit_sounds;
 
 		money_type standard_price = 0;
 

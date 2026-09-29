@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cstddef>
 #include "augs/misc/constant_size_vector.h"
 #include "view/view_container_sizes.h"
@@ -118,6 +119,12 @@ struct packaged_sound_effect {
 };
 
 using sound_effect_input_vector = augs::constant_size_vector<sound_effect_input, MAX_FOLLOWUP_SOUND_INPUTS>;
+
+/*
+	Sounds of hitting the floor, one for each hit, in order - hits without them are silent.
+*/
+
+using floor_hit_sounds_array = std::array<sound_effect_input, 3>;
 
 struct packaged_multi_sound_effect {
 	sound_effect_input_vector inputs;
