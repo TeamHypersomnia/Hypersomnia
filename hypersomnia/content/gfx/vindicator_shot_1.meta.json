@@ -71,8 +71,8 @@
                 "rotation": 0.0
             },
             "shell_spawn": {
-                "pos": [4, -5],
-                "rotation": -63.43495178222656
+                "pos": [-16, 4],
+                "rotation": 110.0
             },
             "rail": {
                 "pos": [0, 0],
