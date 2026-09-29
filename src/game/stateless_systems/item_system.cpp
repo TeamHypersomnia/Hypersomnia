@@ -1549,6 +1549,14 @@ void item_system::advance_falling_items(const logic_step step) {
 			return;
 		}
 
+		if (fall.is_in_the_air() && ::is_magazine_on_the_ground(typed_item)) {
+			/*
+				The body grows along with the sprite - see calc_ground_item_scale.
+			*/
+
+			typed_item.infer_colliders_from_scratch();
+		}
+
 		if (!::is_floor_hit_due(fall, now, dt)) {
 			return;
 		}

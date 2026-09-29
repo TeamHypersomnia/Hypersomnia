@@ -7,6 +7,7 @@
 
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/detail/inventory/item_falling.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
 
@@ -372,6 +373,20 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		flips.vertically = !flips.vertically;
 	}
 
+	auto calc_ground_scale = [&]() {
+		if constexpr(E::template has<components::item>()) {
+			/*
+				As the view sees it once this step is solved, so the body is fully grown by the step the first hop tops at.
+			*/
+
+			const auto solved_secs = cosm.get_total_seconds_passed() + cosm.get_fixed_delta().in_seconds();
+			return ::calc_ground_item_scale(handle, solved_secs);
+		}
+		else {
+			return 1.f;
+		}
+	};
+
 	auto from_convex_partition = [&](auto shape) {
 		/*
 			Read the flips lazily as they might still be toggled
@@ -411,6 +426,10 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 					scale = ::calc_requested_scale(sprite->get_size(), s.value);
 				}
 			}
+		}
+
+		if (const auto ground_scale = calc_ground_scale(); ground_scale != 1.f) {
+			scale = scale.value_or(vec2::square(1.f)) * ground_scale;
 		}
 
 		auto add_convex = [&](const auto& convex) {
@@ -602,7 +621,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				}
 			}
 			else {
-				from_box_shape(handle.get_logical_size(), additional_rotation);
+				from_box_shape(handle.get_logical_size() * calc_ground_scale(), additional_rotation);
 			}
 		}
 
