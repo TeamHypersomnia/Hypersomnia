@@ -419,6 +419,33 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			break;
 		}
 
+		/*
+			Items lying on their own don't touch each other while either is still in the air, before its first floor hit,
+			as then it's drawn raised above the other - same as with shells.
+		*/
+
+		const bool item_touched_item_in_the_air = [&]() {
+			/*
+				Owner bodies, as a lying gun carries the fixtures of its magazine and attachments.
+				Held items have characters for owners, so they never pass.
+			*/
+
+			const auto subject_item = subject_owner_body.template find<components::item>();
+			const auto collider_item = collider_owner_body.template find<components::item>();
+
+			if (!subject_item || !collider_item) {
+				return false;
+			}
+
+			return subject_item.get_fall().is_in_the_air() || collider_item.get_fall().is_in_the_air();
+		}();
+
+		if (item_touched_item_in_the_air) {
+			contact->SetEnabled(false);
+			post_collision_messages = false;
+			break;
+		}
+
 		if (subject_capability.alive()) {
 			const auto* const driver = subject_capability.find<components::driver>();
 			
