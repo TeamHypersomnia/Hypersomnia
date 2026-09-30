@@ -1675,6 +1675,22 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 		appearance.splits = std::min(max_hud_bar_splits_v, static_cast<int>(current_tip_portals.size()));
 		appearance.label = ::make_aura_bar_label(in.config.drawing, ratio, num_visited, static_cast<int>(current_tip_portals.size()));
 
+		if (const bool full = ratio >= 1.0f) {
+			/* The stage bar's gold, with a backdrop darkened like the green one's. */
+			appearance.color = rgba(183, 140, 22, 255);
+			appearance.label_background_color = rgba(73, 56, 9, 255);
+
+			auto& last_ratio = bottom_bar_highlight.last_ratio;
+
+			if (const bool just_filled = last_ratio >= 0.0f && last_ratio < 1.0f) {
+				/*
+					Flash the whole bar on completion instead of only the last gain -
+					the gain detection now sees it as growing from zero.
+				*/
+				last_ratio = 0.0f;
+			}
+		}
+
 		draw_bar(bottom_bar_particles, bottom_bar_highlight, appearance, ::make_aura_bar_rect(screen_size), ratio, std::addressof(bottom_bar_label_particles));
 	}
 
