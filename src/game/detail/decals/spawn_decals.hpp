@@ -311,18 +311,20 @@ inline void queue_decal_creation(
 	const vec2i final_size,
 	const entity_id spawned_by,
 	const entity_id attached_to = entity_id(),
+	const bool follows_attached = false,
 	const transformr attachment_offset = transformr(),
 	const rgba colorize = white
 ) {
 	cosmic::queue_create_entity(
 		step,
 		constrained_entity_flavour_id<invariants::decal>(flavour),
-		[decal_transform, final_size, spawned_by, attached_to, attachment_offset, colorize](const auto typed_handle, auto& agg) {
+		[decal_transform, final_size, spawned_by, attached_to, follows_attached, attachment_offset, colorize](const auto typed_handle, auto& agg) {
 			typed_handle.set_logic_transform(decal_transform);
 
 			if (auto* const decal_state = agg.template find<components::decal>()) {
 				decal_state->spawned_by = spawned_by;
 				decal_state->attached_to = attached_to;
+				decal_state->follows_attached = follows_attached;
 				decal_state->attachment_offset = attachment_offset;
 			}
 
@@ -746,16 +748,20 @@ std::optional<transformr> spawn_surface_impact_decal(
 	}();
 
 	/*
-		If the surface body can move, remember the decal's offset
+		Always attach to the surface so that the decal is deleted together with it
+		(e.g. a static tutorial wall removed once the level is cleared).
+
+		If the surface body can move, also remember the decal's offset
 		in the body's local space so that the decal can follow it.
 	*/
 
-	auto attached_to = entity_id();
+	const auto attached_to = placed_surface.get_id();
+	auto follows_attached = false;
 	auto attachment_offset = transformr();
 
 	if (placed_fixture->GetBody()->GetType() != b2_staticBody) {
 		if (const auto surface_transform = placed_surface.find_logic_transform()) {
-			attached_to = placed_surface.get_id();
+			follows_attached = true;
 			attachment_offset = augs::get_relative_offset(*surface_transform, decal_transform);
 		}
 	}
@@ -767,6 +773,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 		::to_decal_sprite_size(final_size_f),
 		placed_surface.get_id(),
 		attached_to,
+		follows_attached,
 		attachment_offset,
 		surface_color
 	);
@@ -854,6 +861,7 @@ inline void spawn_explosion_decal(
 		::to_decal_sprite_size(original_size * final_size_mult),
 		subject,
 		entity_id(),
+		false,
 		transformr(),
 		EXPLOSION_DECAL_COLORIZE
 	);

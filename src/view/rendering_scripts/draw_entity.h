@@ -388,7 +388,7 @@ FORCE_INLINE void specific_entity_drawer(
 			*/
 			const auto& decal = typed_handle.template get<components::decal>();
 
-			if (decal.attached_to.is_set()) {
+			if (decal.attached_to.is_set() && decal.follows_attached) {
 				if (const auto owner = typed_handle.get_cosmos()[decal.attached_to]) {
 					if (const auto owner_transform = owner.find_viewing_transform(in.interp)) {
 						return *owner_transform * decal.attachment_offset;

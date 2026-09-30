@@ -102,7 +102,10 @@ void decal_system::limit_decal_count(const logic_step step) const {
 			/* Follow the movable body the decal was spawned on */
 			if (state.attached_to.is_set()) {
 				if (const auto owner = cosm[state.attached_to]) {
-					if (const auto owner_transform = owner.find_logic_transform()) {
+					if (!state.follows_attached) {
+						/* Static surface - only needs to exist. */
+					}
+					else if (const auto owner_transform = owner.find_logic_transform()) {
 						const auto new_transform = *owner_transform * state.attachment_offset;
 
 						/*
