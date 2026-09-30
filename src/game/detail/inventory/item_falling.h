@@ -12,6 +12,8 @@
 #include "game/components/item_component.h"
 #include "game/components/item_sync.h"
 #include "game/components/item_fall_state.h"
+#include "game/components/cartridge_component.h"
+#include "game/components/hand_fuse_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/predictability_info.h"
 #include "game/detail/shell_params.h"
@@ -562,20 +564,35 @@ real32 calc_item_fall_height(const E& item, const double now_secs, const real32 
 }
 
 /*
-	Magazines lying on the ground - in no slot - are GROUND_MAGAZINE_SCALE times bigger, sprite and body alike,
-	so that they are easier to notice.
-	They grow as they fly off: up to the top of their first hop if thrown up, like unmounted ones, or else until they first hit the floor.
+	Small items lying on the ground - magazines, shotgun shells and grenades, in no slot -
+	are GROUND_ITEM_SCALE times bigger, so that they are easier to notice.
+	Their bodies grow too, except grenades' - so that they still bounce as they did.
+	They grow as they fly off: up to the top of their first hop if thrown up, like unmounted magazines, or else until they first hit the floor.
 	now_secs may be interpolated.
 */
 
-inline constexpr real32 GROUND_MAGAZINE_SCALE = 1.5f;
+inline constexpr real32 GROUND_ITEM_SCALE = 1.75f;
 
 template <class E>
-bool is_magazine_on_the_ground(const E& typed_item) {
-	if (const auto item_def = typed_item.template find<invariants::item>()) {
-		if (item_def->categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
-			return !typed_item.get_current_slot().alive();
-		}
+bool is_enlarged_on_the_ground(const E& typed_item) {
+	const auto item_def = typed_item.template find<invariants::item>();
+
+	if (item_def == nullptr || typed_item.get_current_slot().alive()) {
+		return false;
+	}
+
+	if (item_def->categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+		return true;
+	}
+
+	/* Shotgun shells spawn many rounds - unlike rockets or loose rifle bullets. */
+	if (const auto cartridge_def = typed_item.template find<invariants::cartridge>()) {
+		return cartridge_def->num_rounds_spawned > 1;
+	}
+
+	/* Grenades, but not the bomb. */
+	if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
+		return !fuse_def->is_like_plantable_bomb();
 	}
 
 	return false;
@@ -583,7 +600,7 @@ bool is_magazine_on_the_ground(const E& typed_item) {
 
 template <class E>
 real32 calc_ground_item_scale(const E& typed_item, const double now_secs) {
-	if (!::is_magazine_on_the_ground(typed_item)) {
+	if (!::is_enlarged_on_the_ground(typed_item)) {
 		return 1.f;
 	}
 
@@ -600,5 +617,19 @@ real32 calc_ground_item_scale(const E& typed_item, const double now_secs) {
 		return std::min(1.f, t / top_t);
 	}();
 
-	return augs::interp(1.f, GROUND_MAGAZINE_SCALE, growth);
+	return augs::interp(1.f, GROUND_ITEM_SCALE, growth);
+}
+
+template <class E>
+bool has_enlarged_body_on_the_ground(const E& typed_item) {
+	return ::is_enlarged_on_the_ground(typed_item) && !typed_item.template has<invariants::hand_fuse>();
+}
+
+template <class E>
+real32 calc_ground_body_scale(const E& typed_item, const double now_secs) {
+	if (!::has_enlarged_body_on_the_ground(typed_item)) {
+		return 1.f;
+	}
+
+	return ::calc_ground_item_scale(typed_item, now_secs);
 }

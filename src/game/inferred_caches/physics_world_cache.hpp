@@ -380,7 +380,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			*/
 
 			const auto solved_secs = cosm.get_total_seconds_passed() + cosm.get_fixed_delta().in_seconds();
-			return ::calc_ground_item_scale(handle, solved_secs);
+			return ::calc_ground_body_scale(handle, solved_secs);
 		}
 		else {
 			return 1.f;
