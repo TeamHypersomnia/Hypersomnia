@@ -4,6 +4,7 @@
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
 #include "game/detail/use_interaction_logic.h"
 #include "view/rendering_scripts/falling_item_offsets.h"
+#include "game/detail/low_ammo_magazine.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "view/rendering_scripts/corpse_head_overlays.h"
 #include "view/rendering_scripts/draw_minimap.h"
@@ -662,16 +663,40 @@ void enqueue_illuminated_rendering_jobs(
 								}
 							};
 
-							if (!is_laying_on_ground || falling) {
+							/*
+								Nearly empty magazines are not worth a bounce -
+								they lie on the ground like shells.
+							*/
+
+							const bool low_ammo_magazine = ::is_low_ammo_magazine(typed_item);
+
+							if (!is_laying_on_ground || falling || low_ammo_magazine) {
 								/*
 									Items hopping like shells - unmounted magazines - are drawn like shells too.
 								*/
 
-								const bool like_shell = fall != nullptr && fall->hops_like_shell;
+								const bool like_shell = low_ammo_magazine || (fall != nullptr && fall->hops_like_shell);
+
+								/*
+									A magazine that never fell (e.g. placed on the map) lies on the ground all the same.
+								*/
+
+								auto resting_fall = item_fall_state();
+
+								const auto* const shell_fall = [&]() -> const item_fall_state* {
+									const bool never_fell = !falling && (fall == nullptr || !fall->when_landed.was_set());
+
+									if (never_fell) {
+										resting_fall.when_landed = cosm.get_timestamp();
+										return std::addressof(resting_fall);
+									}
+
+									return fall;
+								}();
 
 								const auto offsets = 
 									like_shell ?
-									::calc_shell_offsets(fall, typed_item.get_cosmos().get_fixed_delta(), global_time_seconds, missile_shadow_offset) :
+									::calc_shell_offsets(shell_fall, typed_item.get_cosmos().get_fixed_delta(), global_time_seconds, missile_shadow_offset) :
 									::calc_flying_item_offsets(typed_item, global_time_seconds, missile_shadow_offset)
 								;
 
@@ -696,6 +721,15 @@ void enqueue_illuminated_rendering_jobs(
 								::specific_draw_entity(typed_item, diffuse, ::make_shadow_offset_customizer(offsets.sprite));
 								::specific_draw_neon_map(typed_item, neons, ::make_shadow_offset_customizer(offsets.sprite));
 								draw_throw_flash(::make_shadow_offset_customizer(offsets.sprite));
+
+								if (typed_item.get_id() == pickable_item_to_highlight) {
+									auto standard_border_provider = [pickable_color](const auto& typed_handle) -> std::optional<rgba> {
+										(void)typed_handle;
+										return pickable_color;
+									};
+
+									::specific_draw_border(typed_item, borders, standard_border_provider, ::make_shadow_offset_customizer(offsets.sprite));
+								}
 
 								return;
 							}

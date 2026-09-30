@@ -4,6 +4,8 @@
 #include "game/detail/bombsite_in_range.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/detail/use_interaction_logic.h"
+#include "game/detail/low_ammo_magazine.h"
+#include "view/low_ammo_magazine_color.h"
 #include "view/mode_gui/arena/render_text_with_hotkeys.hpp"
 #include "view/mode_gui/arena/on_first_touching_portal.hpp"
 
@@ -298,6 +300,17 @@ inline void draw_context_tip(
 					text("Press ");
 					hotkey(game_intent_type::INTERACT);
 					text(" to pick up ");
+
+					const auto ammo_state = item_handle.dispatch([](const auto& typed_item) {
+						return ::calc_magazine_ammo_state(typed_item);
+					});
+
+					if (ammo_state == magazine_ammo_state::EMPTY) {
+						text_colored("(Empty) ", LOW_AMMO_MAGAZINE_COLOR);
+					}
+					else if (ammo_state == magazine_ammo_state::LOW) {
+						text_colored("(Low) ", LOW_AMMO_MAGAZINE_COLOR);
+					}
 
 					const auto& item_name = item_handle.get_name();
 					total_text += colored(item_name, settings.item_name_color);
