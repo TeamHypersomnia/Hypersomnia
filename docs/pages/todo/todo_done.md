@@ -7512,3 +7512,10 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - moze jeszcze bardziej losowe obroty tym luskom troche przy uderzeniach w sensie mocniejsze angularne impulsy przy kazdym.
 - jakos spowolnic optycznie te luski jak nie wiem czy nizsza wysokosc czy co bez rozpierdalania juz zsynchronizowanych dzwiekow 
 - osobne sloty na rolle i 3 bo tak najczysciej jest
+- do audytu dodac tez jakosc determinizmu czy RNG sa odporne na lag/jitter ze np wartosci te losowe sa ustalone juz w momencie istnienia entita 
+- łapy odpadniete tez niech cienie rysują
+- to samo zrobic dla łusek to co dla dropped itemow i magazynkow
+- decalsy sasiadujace naprawic zeby spawnowalo kolejny na sasaidujacej przestrzeni ale to na tej sesji gdzie mamy kontekst
+- wylaczyc te linie przerywane w minimapie i dac na ticka, albo pod tabem tylko
+- itemy niech nie koliduja z innymi itemami przed pierwszym uderzeniem w ziemie tak samo jak luski
+

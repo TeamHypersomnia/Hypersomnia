@@ -8,22 +8,12 @@ summary: That which we are brainstorming at the moment.
 
 - czy rng do kolizji z postacia jest przewidywalny tez
 
-- zaudytuj tez caly plumbing parametrow gdzies do tych lusek czy cieni roznych czy sie nie da uproscic gdzies zeby np mniej stanu przechowywala logika jesli do logiki cos wkladalismy i generalnie czy to przekazywanie wyjatkow ze a to dla digla inaczej a to dla innej łuski inaczej czy innego fleszbenga inaczej cos czy to jest zrobione tak jak ja przewaznie na moj sposob robie faktycznie. to jest wazne zeby tu mnie nasladowac
-- nie powinien zerowac cooldownu chyba jesli jest begin contact i to poprawnie zadziala
-
-- itemy niech nie koliduja z innymi itemami przed pierwszym uderzeniem w ziemie tak samo jak luski
-- do audytu dodac tez jakosc determinizmu czy RNG sa odporne na lag/jitter ze np wartosci te losowe sa ustalone juz w momencie istnienia entita 
-- łapy odpadniete tez niech cienie rysują
-
-- to samo zrobic dla łusek to co dla dropped itemow i magazynkow
 - finishing trace powinny tez miec interpolowany rozmiar
 	 - zrobimy z tego interpolowany system
 
 - decalsy estetyka
-- decalsy sasiadujace naprawic zeby spawnowalo kolejny na sasaidujacej przestrzeni ale to na tej sesji gdzie mamy kontekst
 - zwolnic gre 15-20% separate constants in balance vars
 - restart timy lepsze wszystkim mapom 15 sekund max
-- wylaczyc te linie przerywane w minimapie i dac na ticka, albo pod tabem tylko
 
 - te eksplozje lepsze pixelartowe z traceowych particli
 - kiedys mozna byloby symulowac te trajektorie granatow

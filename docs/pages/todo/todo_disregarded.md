@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- smoke jeszcze czy nie da sie ominac
+- nie powinien zerowac cooldownu chyba jesli jest begin contact i to poprawnie zadziala?
+
 - loading screen?
     - screw it
     - maybe just render "Loading..." on black screen using imgui atlas since it doesnt change
