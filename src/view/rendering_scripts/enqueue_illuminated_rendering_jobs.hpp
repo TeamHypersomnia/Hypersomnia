@@ -634,6 +634,34 @@ void enqueue_illuminated_rendering_jobs(
 
 							const bool falling = fall != nullptr && fall->floor_hits_left > 0;
 
+							/*
+								Items thrown, dropped or unmounted from a gun flash white at full intensity
+								the moment they start falling, then ease down to nothing.
+							*/
+
+							const auto throw_flash_alpha = [&]() {
+								const auto flash_secs = 0.5;
+
+								if (fall == nullptr || !fall->when_started_falling.was_set()) {
+									return 0.f;
+								}
+
+								const auto elapsed_secs = global_time_seconds - fall->when_started_falling.in_seconds(cosm.get_fixed_delta());
+								const auto remaining = static_cast<float>(1.0 - std::clamp(elapsed_secs / flash_secs, 0.0, 1.0));
+
+								return remaining ;
+							}();
+
+							auto draw_throw_flash = [&](auto&& customize_input) {
+								if (throw_flash_alpha > 0.f) {
+									auto flash_color = rgba(white);
+									flash_color.a = 40;
+									flash_color.mult_alpha(throw_flash_alpha);
+
+									::specific_draw_color_highlight(typed_item, flash_color, overlays, customize_input);
+								}
+							};
+
 							if (!is_laying_on_ground || falling) {
 								/*
 									Items hopping like shells - unmounted magazines - are drawn like shells too.
@@ -667,6 +695,7 @@ void enqueue_illuminated_rendering_jobs(
 
 								::specific_draw_entity(typed_item, diffuse, ::make_shadow_offset_customizer(offsets.sprite));
 								::specific_draw_neon_map(typed_item, neons, ::make_shadow_offset_customizer(offsets.sprite));
+								draw_throw_flash(::make_shadow_offset_customizer(offsets.sprite));
 
 								return;
 							}
@@ -714,6 +743,8 @@ void enqueue_illuminated_rendering_jobs(
 							if (!pickable) {
 								::specific_draw_color_highlight(typed_item, overlay_color, overlays, make_offset_input);
 							}
+
+							draw_throw_flash(make_offset_input);
 
 							if (pickable) {
 								auto standard_border_provider = [pickable_color](const auto& typed_handle) -> std::optional<rgba> {
