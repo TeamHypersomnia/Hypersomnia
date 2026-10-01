@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-09-30 23:30:21.888627 UTC"
+        "version_timestamp": "2026-10-01 22:21:08.913153 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -39,7 +39,9 @@
                     "explosive": "force_grenade"
                 },
                 "resistance": {
-                    "explosive": "force_grenade"
+                    "firearm": null,
+                    "melee": null,
+                    "backpack": false
                 }
             }
         }

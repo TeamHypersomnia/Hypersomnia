@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- enum na bullet trails mode: none, only light, particles and light
+
+- osobne skale na granasy i magazynki
+- jeszcze nie wiem jak by to mozna zrobic ale fajnie byloby zrobic audyt "plynnosci" gry w tym sensie czy nie ma jakichs hitchow jak jestes normalnie w grze i idziesz po prostu postacia trzymajac klawisz w lewo i do gory, w jakims miejscu na cyberaqua na przyklad teraz ustawilem jak wejdziesz do edytora i wlacyzsz playtesting, mozesz sobie flage na to zrobic, i przytrzymasz lewo-gora zeby postac sobie szla przez 4 sekundy dokladnie to bedzie miala na tyle miejsca zeby sie przejsc bez przeszkod i przejdzie akurat przez jakis w miare hot path mapowy. dlatego ze moze to moja paranoja ale mam wrazenie ze mimo >400 fps (a mam monitor 144hz) mam wrazenie ze jakos nieregularnie czasami losowo sa jakies takie nieplynnosci jakkby co x klatek byla klatka wolniejsza i to odrobine widac bylo. nie wiem jak to zmierzyc jak jestes clankerem to moze jakos nagrac ekran i zobaczyc statystycznie czy piksele rownomiernie sie przesuwaja i porownac w upstreamem bo w upstreamie nie mialem takiego wrazenia jeszcze nigdy ze pomimo takich wysokich fps czasami cos tak odrboine ale naprawde praktyycznie niezauwazalnei bo ja mam autyzm i widze takie bardzo drobne drobniutkie spadki. wiec plan to byloby na tej rewizji teraz odpalic edytor tak jak jest teraz w edytorze, pobrac jakies probki plynnosci ekranu, ale tak jak mowie wlasnie nie wiem jak to zrobic plynnie bo ty clanker ja oczami zbadam plynnosc a ty bys musial jakos bardzo dokladnie nagrac ekran tylko ze nagrywanie tez wplywa na wydajnosc, i nie wiem jak to najlepiej w tym momencie zrobic. wiec plan to wlasnie na tej rewizji odpalic teraz playtesting w edytorze tak jak sie gra odpali teraz i w tym miejscu gdzie editor view jest tak jakbym wcisnal spacje, potem zbudowac upstream z taga 3.0.0 i nalozyc ewentualnie jakis kod instrumentacyjny zeby zrobic to samo, i znowu pobrac probki plynnosci, i porownac czy cos sie zmienilo. teraz wszystkie efekty cieni itp etc mam on wiec tak ma być bo na upstreamie tego nie ma wiec bedzie git porownanie.
+
+- kasa powinna byc rysowana spectowanego gracza/teammate chyba a jak enemy to puste i ?
+
 - czy rng do kolizji z postacia jest przewidywalny tez
 
 - finishing trace powinny tez miec interpolowany rozmiar
