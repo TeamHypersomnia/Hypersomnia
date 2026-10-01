@@ -78,7 +78,6 @@ namespace components {
 
 		augs::maybe<attenuation_variations> variation;
 		augs::maybe<attenuation_variations> wall_variation;
-		augs::maybe<std::array<light_value_variation, 2>> position_variations;
 
 		rgba color = white;
 		bool cast_shadows = true;

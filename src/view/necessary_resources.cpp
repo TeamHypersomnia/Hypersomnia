@@ -9,6 +9,7 @@
 #include "view/game_drawing_settings.h"
 
 #include "view/necessary_resources.h"
+#include "view/rendering_scripts/draw_environment_shadows.h"
 
 #include "view/viewables/regeneration/images_from_commands.h"
 #include "view/viewables/regeneration/procedural_image_definition.h"
@@ -33,10 +34,14 @@ void all_necessary_fbos::apply(
 		return;
 	}
 
-	auto reset = [screen_size](auto& fbo, auto... args) {
-		if (!fbo || fbo->get_size() != static_cast<vec2u>(screen_size)) {
-			fbo.emplace(screen_size, augs::graphics::fbo_opts { args... });
+	auto reset_sized = [](auto& fbo, const vec2i size, auto... args) {
+		if (!fbo || fbo->get_size() != static_cast<vec2u>(size)) {
+			fbo.emplace(size, augs::graphics::fbo_opts { args... });
 		}
+	};
+
+	auto reset = [&](auto& fbo, auto... args) {
+		reset_sized(fbo, screen_size, args...);
 	};
 
 	reset(illuminating_smoke);
@@ -45,7 +50,7 @@ void all_necessary_fbos::apply(
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(removed_light);
 	reset(hue_light);
-	reset(shadow);
+	reset_sized(shadow, screen_size + vec2i::square(SUN_SHADOW_GUARD_BAND_PX));
 	reset(flash_afterimage);
 }
 
@@ -109,6 +114,7 @@ all_necessary_shaders::all_necessary_shaders(
 	if (shadow_sprite) {
 		shadow_sprite->set_as_current(renderer);
 		shadow_sprite->set_uniform(renderer, U::basic_texture, 0);
+		shadow_sprite->set_uniform(renderer, U::color_encodes_footprints, 0);
 	}
 
 	if (posterized_neon) {

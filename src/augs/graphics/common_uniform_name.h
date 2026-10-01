@@ -23,6 +23,7 @@ namespace augs {
 		global_color,
 
 		shadow_texture,
+		shadow_texture_offset,
 		shadow_step,
 		shadow_strength,
 		shadow_fix,
@@ -37,6 +38,7 @@ namespace augs {
 		hue_light_texture,
 		point_light_hue_preservation,
 		smoke_flat_intensity,
+		color_encodes_footprints,
 
 		COUNT
 		// END GEN INTROSPECTOR

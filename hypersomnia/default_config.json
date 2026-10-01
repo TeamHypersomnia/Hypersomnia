@@ -1070,6 +1070,19 @@
         "max_particles_in_single_job": 2500,
         "OFF_custom_num_pool_workers": 0,
         "wall_light_drawing_precision": "EXACT",
+        "sun_shadows": {
+            "quality": "NORMAL",
+            "foreground": true,
+            "background": true,
+            "strength_mult": 1.0,
+            "smoothness_mult": 1.0
+        },
+        "point_light_shadows": {
+            "soft": true,
+            "smoothness_mult": 1.0,
+            "heights": true
+        },
+        "posterize_neons": true,
         "swap_window_buffers_when": "AFTER_HELPING_LOGIC_THREAD"
     },
 

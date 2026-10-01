@@ -34,6 +34,18 @@ struct joint_cache {
 };
 #endif
 
+/*
+	How many ray casts and AABB queries the calling thread has made so far - for profiling.
+	Per thread, so that the parallel jobs count without contending for a shared counter.
+*/
+
+struct physics_query_counters {
+	std::size_t ray_casts = 0;
+	std::size_t aabb_queries = 0;
+};
+
+inline thread_local physics_query_counters thread_physics_query_counters;
+
 struct physics_raycast_output {
 	b2Fixture* what_fixture = nullptr;
 	vec2 intersection;
@@ -93,18 +105,6 @@ public:
 		const entity_id ignore_entity = entity_id()
 	) const;
 
-	/*
-		Cheaper than ray_cast_px when only the fact of hitting matters - stops at the first fixture found.
-	*/
-
-	bool ray_cast_hits_anything_px(
-		const si_scaling si,
-		const vec2 p1, 
-		const vec2 p2, 
-		const b2Filter filter, 
-		const entity_id ignore_entity = entity_id()
-	) const;
-
 	physics_raycast_output ray_cast_px(
 		const si_scaling si,
 		const vec2 p1, 
@@ -135,6 +135,7 @@ public:
 
 	template <class... Args>
 	void for_each_in_aabb_meters(Args&&... args) const {
+		++thread_physics_query_counters.aabb_queries;
 		::for_each_in_aabb_meters(get_b2world(), std::forward<Args>(args)...);
 	}
 
@@ -155,6 +156,7 @@ public:
 
 	template <class... Args>
 	void for_each_in_aabb(Args&&... args) const {
+		++thread_physics_query_counters.aabb_queries;
 		::for_each_in_aabb(get_b2world(), std::forward<Args>(args)...);
 	}
 

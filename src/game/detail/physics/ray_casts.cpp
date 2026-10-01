@@ -11,7 +11,6 @@ struct raycast_input : public b2RayCastCallback {
 	b2Filter subject_filter;
 
 	bool save_all = false;
-	bool stop_at_any = false;
 	physics_raycast_output output;
 	std::vector<physics_raycast_output> outputs;
 
@@ -44,10 +43,6 @@ float32 raycast_input::ReportFixture(
 		return 1.f;
 	}
 
-	if (stop_at_any) {
-		return 0.f;
-	}
-
 	return fraction;
 }
 
@@ -67,6 +62,7 @@ std::vector<physics_raycast_output> physics_world_cache::ray_cast_all_intersecti
 		return callback.outputs;
 	}
 
+	++thread_physics_query_counters.ray_casts;
 	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
 	return callback.outputs;
 }
@@ -149,31 +145,9 @@ physics_raycast_output physics_world_cache::ray_cast(const vec2 p1_meters, const
 		return callback.output;
 	}
 
+	++thread_physics_query_counters.ray_casts;
 	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
 	return callback.output;
-}
-
-bool physics_world_cache::ray_cast_hits_anything_px(
-	const si_scaling si,
-	const vec2 p1, 
-	const vec2 p2, 
-	const b2Filter filter, 
-	const entity_id ignore_entity
-) const {
-	const auto p1_meters = si.get_meters(p1);
-	const auto p2_meters = si.get_meters(p2);
-
-	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
-		return false;
-	}
-
-	raycast_input callback;
-	callback.subject = ignore_entity;
-	callback.subject_filter = filter;
-	callback.stop_at_any = true;
-
-	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
-	return callback.output.hit;
 }
 
 physics_raycast_output physics_world_cache::ray_cast_px(

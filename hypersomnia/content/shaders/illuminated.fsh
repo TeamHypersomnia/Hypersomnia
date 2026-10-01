@@ -35,6 +35,12 @@ uniform vec4 ambient_color;
 uniform sampler2D shadow_texture;
 
 /*
+	Where the screen lies within the shadow texture, which reaches past it - see SUN_SHADOW_GUARD_BAND_PX.
+*/
+
+uniform vec2 shadow_texture_offset;
+
+/*
 	Displacement of the shadow per one pixel of shadow height, in fragment pixels.
 */
 
@@ -47,11 +53,13 @@ uniform vec2 shadow_step;
 uniform float shadow_strength;
 
 /*
-	Maximum number of samples that guard against false shadows
-	on the sunlit side of taller objects. Zero disables the guard.
+	Nonzero enables the samples that guard against false shadows
+	on the sunlit side of taller objects - at most max_shadow_fix_samples of them.
 */
 
 uniform int shadow_fix;
+
+const int max_shadow_fix_samples = 16;
 
 /*
 	Negative means the receiver's height is read from the shadow texture.
@@ -81,7 +89,7 @@ uniform float shadow_hue_preservation;
 
 vec4 fetch_shadow(highp vec2 frag_pos) {
 	ivec2 size = textureSize(shadow_texture, 0);
-	ivec2 texel = clamp(ivec2(floor(frag_pos)), ivec2(0), size - ivec2(1));
+	ivec2 texel = clamp(ivec2(floor(frag_pos + shadow_texture_offset)), ivec2(0), size - ivec2(1));
 	return texelFetch(shadow_texture, texel, 0);
 }
 
@@ -128,11 +136,11 @@ float calc_shadow_amount() {
 
 	float displacement = receiver_displacement != 0 ? r : 0.0;
 
-	if (displacement > 0.0 && shadow_fix > 0) {
+	if (displacement > 0.0 && shadow_fix != 0) {
 		float path_len = r * length(shadow_step);
-		int samples = min(shadow_fix, int(ceil(path_len / 2.0)));
+		int samples = min(max_shadow_fix_samples, int(ceil(path_len / 2.0)));
 
-		for (int i = 1; i <= 16; ++i) {
+		for (int i = 1; i <= max_shadow_fix_samples; ++i) {
 			if (i > samples) {
 				break;
 			}

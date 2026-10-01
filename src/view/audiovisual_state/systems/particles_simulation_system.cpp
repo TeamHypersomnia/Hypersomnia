@@ -1320,7 +1320,6 @@ components::light temporary_light::to_light_component() const {
 
 	light.variation.is_enabled = false;
 	light.wall_variation.is_enabled = false;
-	light.position_variations.is_enabled = false;
 
 	light.color = color;
 

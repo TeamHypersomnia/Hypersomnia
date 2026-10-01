@@ -15,7 +15,6 @@ struct editor_light_node_editable {
 	editor_light_falloff falloff;
 	augs::maybe<editor_light_falloff> wall_falloff;
 
-	float positional_vibration = 0.5f;
 	float intensity_vibration = 0.1f;
 
 	bool cast_shadows = true;

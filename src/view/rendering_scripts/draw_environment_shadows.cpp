@@ -38,7 +38,7 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 	const auto longest_shadow = step * static_cast<float>(std::numeric_limits<uint8_t>::max());
 
 	const auto query = [&]() {
-		auto q = in.queried_camera_aabb;
+		auto q = in.covered_world_rect;
 
 		if (longest_shadow.x > 0.0f) {
 			q.l -= longest_shadow.x;
@@ -65,7 +65,7 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 		(1 << int(filter_category::GLASS_OBSTACLE))
 	;
 
-	auto fixture_points = std::vector<vec2>();
+	thread_local std::vector<vec2> fixture_points;
 
 	auto push_triangle = [&](
 		augs::vertex_triangle_buffer& buf,
@@ -176,7 +176,13 @@ void draw_environment_shadows(const draw_environment_shadows_input in) {
 
 			const bool see_through = (filter.categoryBits & (1 << int(filter_category::GLASS_OBSTACLE))) != 0;
 
-			if (!see_through) {
+			/*
+				Footprints outside the shadow texture would only be clipped away - casts of such fixtures can still reach it.
+			*/
+
+			const bool footprint_covered = in.covered_world_rect.hover(augs::calc_vertices_aabb(fixture_points));
+
+			if (!see_through && footprint_covered) {
 				push_fan(in.footprints_output, fixture_points.data(), fixture_points.size(), rgba(0, 0, height, 0));
 			}
 

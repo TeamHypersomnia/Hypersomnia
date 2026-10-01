@@ -151,10 +151,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		const auto& sun = cosm.get_common_significant().light.sun_shadows;
 
-		const bool sun_shadows =
-			input.performance.sun_shadows.quality != shadow_quality_type::NONE
-			&& sun.strength * input.performance.sun_shadows.strength_mult > 0.0f
-		;
+		const bool sun_shadows = input.performance.sun_shadows.enabled_for(sun.strength);
 
 		particles.advance_visible_streams(
 			rng,

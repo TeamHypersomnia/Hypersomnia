@@ -44,12 +44,12 @@ constexpr float SHADOW_SCALE_REFERENCE_DISTANCE = 100.0f;
 	but point along the sun, so that all shadows fall the same way.
 */
 
-inline vec2 calc_along_the_sun(const vec2 legacy_offset, const vec2 sun_step, const bool sun_shadows) {
+inline vec2 calc_along_the_sun(const vec2 sunless_offset, const vec2 sun_step, const bool sun_shadows) {
 	if (!sun_shadows || sun_step.is_zero()) {
-		return legacy_offset;
+		return sunless_offset;
 	}
 
-	return vec2(sun_step).normalize() * legacy_offset.length();
+	return vec2(sun_step).normalize() * sunless_offset.length();
 }
 
 /*

@@ -5767,6 +5767,16 @@ work_result work(
 			thread_pool.help_until_no_tasks();
 			thread_pool.wait_for_all_tasks_to_complete();
 
+			{
+				const auto& light_stats = cached_visibility.light_stats;
+
+				game_thread_performance.light_ray_casts.measure(light_stats.ray_casts.load());
+				game_thread_performance.light_aabb_queries.measure(light_stats.aabb_queries.load());
+				game_thread_performance.lights_recalculated.measure(light_stats.lights_recalculated.load());
+				game_thread_performance.lights_reused.measure(light_stats.lights_reused.load());
+				game_thread_performance.light_jobs_cpu_us.measure(light_stats.cpu_microseconds.load());
+			}
+
 			/*
 				The fog of war overlay on the minimap: remaps the computed
 				visibility polygon into the minimap space. This must happen

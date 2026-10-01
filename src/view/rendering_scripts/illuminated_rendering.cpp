@@ -69,6 +69,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto viewed_character = in.camera.viewed_character;
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 	const auto& cosm = viewed_character.get_cosmos();
+	const auto& light_settings = cosm.get_common_significant().light;
 
 	const auto cone = in.camera.cone;
 	const auto screen_size = cone.screen_size;
@@ -106,6 +107,23 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	auto& profiler = in.frame_performance;
 	auto& renderer = in.renderer;
+
+	/*
+		What strict fog of war hides is drawn only where the stencil marks the visible area.
+	*/
+
+	auto within_strict_fow = [&](auto&& draw) {
+		if (strict_fow) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+		}
+
+		draw();
+
+		if (strict_fow) {
+			renderer.set_stencil(false);
+		}
+	};
 
 	const auto considered_fow = in.get_considered_fow();
 
@@ -615,7 +633,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader_with_matrix(shader);
 
-		const auto& ambient_color = cosm.get_common_significant().light.ambient_color;
+		const auto& ambient_color = light_settings.ambient_color;
 		set_uniform(shader, U::global_color, ambient_color);
 
 		if (!is_foreground) {
@@ -639,7 +657,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
-			in.perf_settings.posterize_neons && !cosm.get_common_significant().light.posterize_light && shaders.posterized_neon ? std::addressof(*shaders.posterized_neon) : nullptr,
+			in.perf_settings.posterize_neons && !light_settings.posterize_light && shaders.posterized_neon ? std::addressof(*shaders.posterized_neon) : nullptr,
 			neon_occlusion_callback,
 			[&]() {
 				draw_particles_neons();
@@ -694,21 +712,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 				set_shader(shaders.illuminating_smoke);
 
-				if (strict_fow) {
-					renderer.set_stencil(true);
-					renderer.stencil_positive_test();
-				}
+				within_strict_fow([&]() {
+					renderer.set_active_texture(3);
+					bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
+					renderer.set_active_texture(0);
 
-				renderer.set_active_texture(3);
-				bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
-				renderer.set_active_texture(0);
-
-				set_uniform(shaders.illuminating_smoke, U::smoke_flat_intensity, 0.0f);
-				renderer.fullscreen_quad();
-
-				if (strict_fow) {
-					renderer.set_stencil(false);
-				}
+					set_uniform(shaders.illuminating_smoke, U::smoke_flat_intensity, 0.0f);
+					renderer.fullscreen_quad();
+				});
 
 				set_shader(shaders.standard);
 
@@ -749,16 +760,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader(shaders.smoke);
 
-		if (strict_fow) {
-			renderer.set_stencil(true);
-			renderer.stencil_positive_test();
-		}
-
-		renderer.fullscreen_quad();
-
-		if (strict_fow) {
-			renderer.set_stencil(false);
-		}
+		within_strict_fow([&]() {
+			renderer.fullscreen_quad();
+		});
 	};
 
 	/* Flow */
@@ -805,18 +809,39 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			Footprints only raise the blue channel.
 		*/
 
+		const auto shadow_layout = ::calc_sun_shadow_texture_layout(
+			cone.get_visible_world_rect_aabb(),
+			cone.eye.zoom,
+			light_settings.sun_shadows.step
+		);
+
+		const auto shadow_matrix = augs::orthographic_projection(shadow_layout.world_rect);
+
 		fbos.shadow->set_as_current(renderer);
+		renderer.set_viewport({ vec2i::zero, vec2i(fbos.shadow->get_size()) });
 		renderer.clear_current_fbo();
+
+		shaders.standard->set_projection(renderer, shadow_matrix);
 
 		renderer.set_max_blending();
 		renderer.call_triangles(D::SHADOW_CASTS);
 		renderer.call_triangles(D::SHADOW_FOOTPRINTS);
 
 		if (shaders.shadow_sprite) {
-			set_shader_with_matrix(shaders.shadow_sprite);
+			set_shader(shaders.shadow_sprite);
+			shaders.shadow_sprite->set_projection(renderer, shadow_matrix);
+			set_uniform(shaders.shadow_sprite, U::color_encodes_footprints, 1);
 			renderer.call_triangles(D::SHADOW_SPRITES);
-			set_shader_with_matrix(shaders.standard);
+			set_uniform(shaders.shadow_sprite, U::color_encodes_footprints, 0);
+			set_shader(shaders.standard);
 		}
+
+		shaders.standard->set_projection(renderer, matrix);
+		renderer.set_viewport({ vec2i::zero, screen_size });
+
+		shaders.illuminated->set_as_current(renderer);
+		shaders.illuminated->set_uniform(renderer, U::shadow_texture_offset, shadow_layout.texel_offset);
+		set_shader(shaders.standard);
 	}
 	
 	renderer.set_standard_blending();
@@ -829,8 +854,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.set_active_texture(0);
 	}
 
-	const auto& light_settings = cosm.get_common_significant().light;
-
 	auto setup_shadow_uniforms = [&](auto& shader) {
 		if (!environment_shadows) {
 			return;
@@ -841,7 +864,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		*/
 
 		const auto fragment_step = vec2(light_settings.sun_shadows.step.x, -light_settings.sun_shadows.step.y) * cone.eye.zoom;
-		const auto fix_samples = in.perf_settings.sun_shadows.quality == shadow_quality_type::NORMAL ? 16 : 0;
+		const auto fix_samples = in.perf_settings.sun_shadows.quality == shadow_quality_type::NORMAL ? 1 : 0;
 
 		set_uniform(shader, U::shadow_step, fragment_step);
 		set_uniform(shader, U::shadow_fix, fix_samples);
@@ -851,6 +874,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	auto receive_shadows = [&](auto& shader, const bool receive, const float receiver_height = -1.0f) {
 		if (!environment_shadows) {
+			/*
+				The shadow texture is not redrawn this frame - it must not show from an earlier one.
+			*/
+			set_uniform(shader, U::shadow_strength, 0.0f);
 			return;
 		}
 
@@ -883,7 +910,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_uniform(
 		shaders.illuminated,
 		U::point_light_hue_preservation,
-		fbos.hue_light.has_value() ? cosm.get_common_significant().light.point_light_shadows.hue_preservation : 0.0f
+		fbos.hue_light.has_value() ? light_settings.point_light_shadows.hue_preservation : 0.0f
 	);
 	setup_shadow_uniforms(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true);
@@ -910,17 +937,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::GROUND_SHADOW_CASTERS);
 	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
 
-	if (strict_fow) {
-		renderer.set_stencil(true);
-		renderer.stencil_positive_test();
-	}
-
-	set_shader_with_matrix(shaders.pure_color_highlight);
-	renderer.call_triangles(D::MISSILES_SHADOWS);
-
-	if (strict_fow) {
-		renderer.set_stencil(false);
-	}
+	within_strict_fow([&]() {
+		set_shader_with_matrix(shaders.pure_color_highlight);
+		renderer.call_triangles(D::MISSILES_SHADOWS);
+	});
 
 	set_shader_with_matrix(shaders.illuminated);
 
@@ -940,33 +960,26 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::SOLID_OBSTACLES);
 
-	if (strict_fow) {
-		renderer.set_stencil(true);
-		renderer.stencil_positive_test();
-	}
+	within_strict_fow([&]() {
+		/*
+			Remnants, like shells, with full illumination - so they read clearly anywhere, sun shadows included,
+			the way their neons would light them up.
+		*/
 
-	/*
-		Remnants, like shells, with full illumination - so they read clearly anywhere, sun shadows included,
-		the way their neons would light them up.
-	*/
+		set_shader(shaders.standard);
+		renderer.call_triangles(D::REMNANTS);
 
-	set_shader(shaders.standard);
-	renderer.call_triangles(D::REMNANTS);
+		set_shader_with_matrix(shaders.pure_color_highlight);
+		renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
+		renderer.call_triangles(D::DROPPED_ITEMS_BORDERS);
 
-	set_shader_with_matrix(shaders.pure_color_highlight);
-	renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
-	renderer.call_triangles(D::DROPPED_ITEMS_BORDERS);
+		set_shader_with_matrix(shaders.illuminated);
+		receive_shadows(shaders.illuminated, false);
+		renderer.call_triangles(D::DROPPED_ITEMS_DIFFUSE);
 
-	set_shader_with_matrix(shaders.illuminated);
-	receive_shadows(shaders.illuminated, false);
-	renderer.call_triangles(D::DROPPED_ITEMS_DIFFUSE);
-
-	set_shader_with_matrix(shaders.pure_color_highlight);
-	renderer.call_triangles(D::DROPPED_ITEMS_OVERLAYS);
-
-	if (strict_fow) {
-		renderer.set_stencil(false);
-	}
+		set_shader_with_matrix(shaders.pure_color_highlight);
+		renderer.call_triangles(D::DROPPED_ITEMS_OVERLAYS);
+	});
 
 	set_shader_with_matrix(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true, CHARACTER_SHADOW_HEIGHT);
@@ -1022,16 +1035,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_shader(shaders.illuminating_smoke);
 		set_uniform(shaders.illuminating_smoke, U::smoke_flat_intensity, OVERLAY_SMOKE_ALPHA);
 
-		if (strict_fow) {
-			renderer.set_stencil(true);
-			renderer.stencil_positive_test();
-		}
-
-		renderer.fullscreen_quad();
-
-		if (strict_fow) {
-			renderer.set_stencil(false);
-		}
+		within_strict_fow([&]() {
+			renderer.fullscreen_quad();
+		});
 	}
 	
 	set_shader(shaders.standard);
@@ -1040,30 +1046,23 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_crosshairs();
 	draw_weapon_laser();
 
-	if (strict_fow) {
-		renderer.set_stencil(true);
-		renderer.stencil_positive_test();
-	}
+	within_strict_fow([&]() {
+		draw_particles(particle_layer::NEONING_PARTICLES);
+		draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	draw_particles(particle_layer::NEONING_PARTICLES);
-	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
+		/* Always on top of all the other particles. */
+		draw_particles(particle_layer::TRAILS);
 
-	/* Always on top of all the other particles. */
-	draw_particles(particle_layer::TRAILS);
+		/*
+			The missile sprites are drawn on top of all the particles
+			so that the trails never poke above the rounds,
+			and on top of the lying items with all their shadows and highlights.
+			Only their shadows stay early in the order, as they are cast on the ground.
+		*/
 
-	/*
-		The missile sprites are drawn on top of all the particles
-		so that the trails never poke above the rounds,
-		and on top of the lying items with all their shadows and highlights.
-		Only their shadows stay early in the order, as they are cast on the ground.
-	*/
-
-	set_shader(shaders.standard);
-	renderer.call_triangles(D::MISSILES);
-
-	if (strict_fow) {
-		renderer.set_stencil(false);
-	}
+		set_shader(shaders.standard);
+		renderer.call_triangles(D::MISSILES);
+	});
 
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 
@@ -1139,16 +1138,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 }
 
 float illuminated_rendering_input::get_environment_shadow_strength() const {
-	if (perf_settings.sun_shadows.quality == shadow_quality_type::NONE) {
-		return 0.0f;
-	}
-
-	if (!fbos.shadow.has_value()) {
-		return 0.0f;
-	}
-
 	const auto& cosm = camera.viewed_character.get_cosmos();
 	const auto map_strength = cosm.get_common_significant().light.sun_shadows.strength;
+
+	if (!perf_settings.sun_shadows.enabled_for(map_strength) || !fbos.shadow.has_value()) {
+		return 0.0f;
+	}
 
 	/*
 		A shadow fading linearly to (1 - smoothness) of its strength is on average (2 - smoothness) / 2 as dark.

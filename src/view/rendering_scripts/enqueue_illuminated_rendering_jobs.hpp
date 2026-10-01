@@ -15,7 +15,7 @@ const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 100);
 const vec2 CHARACTER_SHADOW_OFFSET = vec2(21, 21);
 
 /*
-	Living characters throw their shadows a bit closer than the legacy offset,
+	Living characters throw their shadows a bit closer than CHARACTER_SHADOW_OFFSET,
 	and dead ones still standing before they fall - closer yet.
 */
 
@@ -24,11 +24,12 @@ const float STANDING_CORPSE_SHADOW_MULT = 0.2f;
 
 /*
 	Under the sun, character shadows grow with the sun's step as if cast from this height,
-	up to the legacy length - which they reach under a step of (2.34, 2.34), like de_duel_practice has.
+	up to the length of CHARACTER_SHADOW_OFFSET - which they reach under CHARACTER_SHADOW_FULL_LENGTH_SUN_STEP.
 	Longer ones would look comical.
 */
 
-const float CHARACTER_SUN_SHADOW_HEIGHT = CHARACTER_SHADOW_OFFSET.length() / vec2(2.34f, 2.34f).length();
+const vec2 CHARACTER_SHADOW_FULL_LENGTH_SUN_STEP = vec2::square(2.34f);
+const float CHARACTER_SUN_SHADOW_HEIGHT = CHARACTER_SHADOW_OFFSET.length() / CHARACTER_SHADOW_FULL_LENGTH_SUN_STEP.length();
 
 /*
 	Lying corpses, their heads, remnants and detached heads lie flat - their shadows are short.
@@ -116,8 +117,8 @@ void enqueue_illuminated_rendering_jobs(
 
 	const bool environment_shadows = in.environment_shadows_enabled();
 
-	auto along_the_sun = [&](const vec2 legacy_offset) {
-		return ::calc_along_the_sun(legacy_offset, cosm.get_common_significant().light.sun_shadows.step, environment_shadows);
+	auto along_the_sun = [&](const vec2 sunless_offset) {
+		return ::calc_along_the_sun(sunless_offset, cosm.get_common_significant().light.sun_shadows.step, environment_shadows);
 	};
 
 	auto calc_character_shadow_offset = [&](const float mult) {
@@ -518,13 +519,27 @@ void enqueue_illuminated_rendering_jobs(
 					other remnants lie on the floor with short shadows like corpses.
 				*/
 
+				/*
+					The shadows and then the sprites visit the remnants in the same order,
+					so the offsets computed for the shadows are reused for the sprites.
+				*/
+
+				thread_local std::vector<flying_item_offsets> remnant_offsets;
+				remnant_offsets.clear();
+
 				auto for_each_remnant = [&](auto callback) {
+					std::size_t index = 0;
+					const bool compute = remnant_offsets.empty();
+
 					visible.for_each<render_layer::REMNANTS>(cosm, [&](const auto& handle) {
 						handle.template dispatch_on_having_all<invariants::sprite>([&](const auto& typed_handle) {
 							const auto shell_fall = ::find_shell_fall(typed_handle);
-							const auto offsets = ::calc_shell_offsets(shell_fall, dt, global_time_seconds, missile_shadow_offset);
 
-							callback(typed_handle, shell_fall != nullptr, offsets);
+							if (compute) {
+								remnant_offsets.push_back(::calc_shell_offsets(shell_fall, dt, global_time_seconds, missile_shadow_offset));
+							}
+
+							callback(typed_handle, shell_fall != nullptr, remnant_offsets[index++]);
 						});
 					});
 				};
@@ -1126,7 +1141,11 @@ void enqueue_illuminated_rendering_jobs(
 				cosm,
 				interp,
 				visible,
-				queried_cone.get_visible_world_rect_aabb(),
+				::calc_sun_shadow_texture_layout(
+					queried_cone.get_visible_world_rect_aabb(),
+					queried_cone.eye.zoom,
+					cosm.get_common_significant().light.sun_shadows.step
+				).world_rect,
 				necessarys.at(assets::necessary_image_id::BLANK),
 				shadow_tip_strength,
 				dedicated[D::SHADOW_CASTS].triangles,

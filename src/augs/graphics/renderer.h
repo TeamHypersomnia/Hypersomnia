@@ -177,7 +177,6 @@ namespace augs {
 		void set_min_blending();
 		void set_dst_alpha_additive_blending();
 		void set_color_only_additive_blending();
-		void set_alpha_only_additive_blending();
 		
 		void call_triangles_direct_ptr(const vertex_triangle_buffer&);
 		void call_triangles(vertex_triangle_buffer&&);

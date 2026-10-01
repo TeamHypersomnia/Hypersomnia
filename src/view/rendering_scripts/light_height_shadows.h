@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "augs/math/vec2.h"
+#include "augs/math/arithmetical.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/detail/physics/physics_queries.h"
 #include "view/rendering_scripts/shadow_casters.h"
@@ -152,15 +153,8 @@ inline void build_light_shadow_masks(
 			*/
 
 			{
-				auto lt = points[0];
-				auto rb = points[0];
-
-				for (const auto& p : points) {
-					lt = vec2(std::min(lt.x, p.x), std::min(lt.y, p.y));
-					rb = vec2(std::max(rb.x, p.x), std::max(rb.y, p.y));
-				}
-
-				const auto closest = vec2(std::clamp(L.x, lt.x, rb.x), std::clamp(L.y, lt.y, rb.y));
+				const auto aabb = augs::calc_vertices_aabb(points);
+				const auto closest = vec2(std::clamp(L.x, aabb.l, aabb.r), std::clamp(L.y, aabb.t, aabb.b));
 
 				if ((closest - L).length() > in.light_radius) {
 					return callback_result::CONTINUE;
@@ -288,20 +282,14 @@ inline void build_light_shadow_masks(
 					b2Vec2(si.get_meters(probe_points[2]))
 				};
 
-				auto probes_lt = probe_points[0];
-				auto probes_rb = probe_points[0];
-
-				for (const auto& p : probe_points) {
-					probes_lt = vec2(std::min(probes_lt.x, p.x), std::min(probes_lt.y, p.y));
-					probes_rb = vec2(std::max(probes_rb.x, p.x), std::max(probes_rb.y, p.y));
-				}
+				const auto probes_aabb = augs::calc_vertices_aabb(probe_points);
 
 				auto covered = false;
 
 				physics.for_each_in_aabb(
 					si,
-					probes_lt - vec2::square(1.0f),
-					probes_rb + vec2::square(1.0f),
+					probes_aabb.lt() - vec2::square(1.0f),
+					probes_aabb.rb() + vec2::square(1.0f),
 					in.filter,
 					[&](const b2Fixture& other) {
 						if (&other == &fix || other.IsSensor()) {

@@ -28,16 +28,6 @@ namespace components {
 		}
 
 		wall_variation = variation;
-
-		position_variations.is_enabled = true;
-
-		auto& p = position_variations.value;
-
-		p[0].change_speed = 50;
-		p[0].magnitude = 20;
-
-		p[1].change_speed = 50;
-		p[1].magnitude = 20;
 	}
 
 	vec2 light::calc_reach_trimmed() const {

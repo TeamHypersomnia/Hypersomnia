@@ -937,7 +937,7 @@ void settings_gui_state::perform(
 						}
 
 						revertable_checkbox("Heights##point_light_shadows", point.heights);
-						tooltip_on_hover("If not ticked, point lights ignore their Light height:\nevery shadow reaches the end of the light, computed from the visibility polygon like before heights existed.");
+						tooltip_on_hover("If not ticked, point lights ignore their Light height:\nevery shadow reaches the end of the light, computed from the visibility polygon.");
 					}
 
 					revertable_checkbox("Posterize neons", scope_cfg.posterize_neons);
@@ -953,6 +953,7 @@ void settings_gui_state::perform(
 				revertable_checkbox("Draw bullet trails", config.drawing.draw_bullet_trails);
 				revertable_checkbox("Draw long bullet neons", config.drawing.draw_long_bullet_neons);
 				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
+				tooltip_on_hover("Also the shadows of thrown and dropped items, grenades and shells in flight.");
 
 				{
 					auto& scope_cfg = config.performance.special_effects;

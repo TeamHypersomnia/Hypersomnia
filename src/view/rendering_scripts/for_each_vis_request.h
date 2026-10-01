@@ -1,4 +1,5 @@
 #pragma once
+#include "game/enums/filters.h"
 
 class particles_simulation_system;
 
@@ -28,12 +29,9 @@ void for_each_light_vis_request(
 			const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
 
 			if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
-				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
-
 				messages::visibility_information_request request;
 
 				request.eye_transform = light_transform;
-				request.eye_transform.pos += light_displacement;
 
 				if (queried_camera_aabb.hover(light_aabb)) {
 					request.queried_rect = reach;

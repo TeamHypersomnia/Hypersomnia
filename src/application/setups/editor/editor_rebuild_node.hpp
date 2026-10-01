@@ -103,17 +103,10 @@ bool setup_entity_from_node(
 		light.wall_variation = light.variation;
 
 		{
-			const float positional_vibration = node.editable.positional_vibration;
 			const float intensity_vibration = node.editable.intensity_vibration;
 
 			light.variation.is_enabled = intensity_vibration > 0.0f;
 			light.wall_variation.is_enabled = intensity_vibration > 0.0f;
-
-			light.position_variations.is_enabled = positional_vibration > 0.0f;
-
-			for (auto& pv : light.position_variations.value) {
-				pv *= positional_vibration;
-			}
 
 			light.variation.value *= intensity_vibration;
 			light.wall_variation.value *= intensity_vibration;

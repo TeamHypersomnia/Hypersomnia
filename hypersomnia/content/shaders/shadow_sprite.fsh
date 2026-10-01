@@ -9,6 +9,12 @@ out vec4 outputColor;
 uniform sampler2D basic_texture;
 
 /*
+	Nonzero while drawing into the environment shadow texture, where a blue color marks a footprint.
+*/
+
+uniform int color_encodes_footprints;
+
+/*
 	Silhouettes of foreground sprites drawn into the environment shadow texture.
 	The vertex color carries what to write, see enqueue_illuminated_rendering_jobs.hpp:
 	the shadow height and strength in red and green for shadows of foreground sprites,
@@ -25,7 +31,8 @@ void main()
 		otherwise the faint edges of foliage would receive the sprite's own shadow.
 	*/
 
-	float alpha_threshold = theColor.b > 0.0 ? 0.02 : 0.5;
+	bool footprint = color_encodes_footprints != 0 && theColor.b > 0.0;
+	float alpha_threshold = footprint ? 0.02 : 0.5;
 
 	if (texture(basic_texture, theTexcoord).a < alpha_threshold) {
 		discard;

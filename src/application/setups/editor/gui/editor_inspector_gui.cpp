@@ -1,3 +1,5 @@
+#include <optional>
+#include <utility>
 #include <cstddef>
 #include <cstdint>
 #include "augs/templates/enum_introspect.h"
@@ -52,6 +54,21 @@ struct default_widget_handler {
 
 #define PROPERTY(label, MEMBER) \
 edit_property(result, label, special_handler, insp.MEMBER);
+
+/*
+	The slider range of the next float property, for properties whose labels are too generic
+	to pick their range by - see edit_property.
+*/
+
+thread_local std::optional<std::pair<float, float>> next_float_property_range;
+
+#define PROPERTY_RANGED(label, MEMBER, MIN_VALUE, MAX_VALUE) \
+next_float_property_range = std::pair<float, float>(MIN_VALUE, MAX_VALUE); \
+PROPERTY(label, MEMBER)
+
+#define MULTIPROPERTY_RANGED(label, MEMBER, MIN_VALUE, MAX_VALUE) \
+next_float_property_range = std::pair<float, float>(MIN_VALUE, MAX_VALUE); \
+MULTIPROPERTY(label, MEMBER)
 
 #define MULTIPROPERTY(label, MEMBER) \
 {\
@@ -240,7 +257,16 @@ bool edit_property(
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if constexpr(std::is_same_v<float, T>) {
-			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow opacity" || label == "Hue preservation" || label == "Strength" || label == "Smoothness" || label == "Shadow smoothness") {
+			if (const auto range = std::exchange(next_float_property_range, std::nullopt)) {
+				if (slider(label, property, range->first, range->second)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic" || label == "Shadow opacity") {
 				if (slider(label, property, 0.0f, 1.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -249,20 +275,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Light height") {
-				/*
-					The same range as Shadow height of objects - a light higher than all of them only shortens every shadow further.
-				*/
-
-				if (slider(label, property, 0.0f, 256.0f)) { 
-					result = typesafe_sprintf("Set %x to %x in %x", label, property);
-					return true;
-				}
-
-				return false;
-			}
-
-			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult" || label == "Smoothness mult") {
+			if (label == "Density" || label == "Friction" || label == "Bounciness" || label == "Shadow height mult") {
 				if (slider(label, property, 0.0f, 4.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -1399,30 +1412,37 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 
 	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Color", color);
-	MULTIPROPERTY("Positional vibration", positional_vibration);
 	MULTIPROPERTY("Intensity vibration", intensity_vibration);
-	MULTIPROPERTY("Cast shadows", cast_shadows);
+	MULTIPROPERTY("Casts shadows", cast_shadows);
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("If disabled, walls and other obstacles don't block this light.");
 	}
 
-	MULTIPROPERTY("Shadow smoothness", shadow_smoothness);
+	if (insp.cast_shadows) {
+		auto indent = scoped_indent();
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Softens the edges of this light's shadows.\nThe penumbra widens with the distance from the light.\nScaled by the arena's Point light shadow smoothness mult.\nDoesn't affect performance.");
-	}
+		MULTIPROPERTY_RANGED("Shadow smoothness", shadow_smoothness, 0.0f, 1.0f);
 
-	MULTIPROPERTY("Hue through walls", hue_through_walls);
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Softens the edges of this light's shadows.\nThe penumbra widens with the distance from the light.\nScaled by the arena's Point light shadow smoothness mult.\nDoesn't affect performance.");
+		}
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Keeping the hue of this light in its shadows (the arena's Point light hue preservation)\nwill go even through walls that reach the ceiling,\ngiving a GI-like effect. Makes sense only for rooms that are very \"open\".\n\nThis happens by default for shadows of objects with finite height.");
-	}
+		MULTIPROPERTY("Hue through walls", hue_through_walls);
 
-	MULTIPROPERTY("Light height", height);
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Keeping the hue of this light in its shadows (the arena's Point light hue preservation)\nwill go even through walls that reach the ceiling,\ngiving a GI-like effect. Makes sense only for rooms that are very \"open\".\n\nThis happens by default for shadows of objects with finite height.");
+		}
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("How high the light hangs, in pixels - the same units as Shadow height of objects.\nObstacles lower than the light throw shadows that end before its reach,\nthe taller ones - and walls with no Shadow height - throw them to the end.\n0 means infinitely high: every shadow reaches the end, like before heights existed.");
+		/*
+			The same range as Shadow height of objects - a light higher than all of them only shortens every shadow further.
+		*/
+
+		MULTIPROPERTY_RANGED("Light height", height, 0.0f, 256.0f);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("How high the light hangs, in pixels - the same units as Shadow height of objects.\nObstacles lower than the light throw shadows that end before its reach,\nthe taller ones - and walls with no Shadow height - throw them to the end.\n0 means infinitely high: every shadow reaches the end of the light.");
+		}
 	}
 
 	ImGui::Separator();
@@ -2497,19 +2517,19 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 			}
 		}
 
-		PROPERTY("Strength", sun_shadows.strength);
+		PROPERTY_RANGED("Strength", sun_shadows.strength, 0.0f, 1.0f);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("How much of the ambient light is removed inside sun shadows.\nLights still illuminate shadowed areas.");
 		}
 
-		PROPERTY("Smoothness", sun_shadows.smoothness);
+		PROPERTY_RANGED("Smoothness", sun_shadows.smoothness, 0.0f, 1.0f);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("How much shadows fade along their length.\n1 fades them out completely - soft shadows. 0 keeps them hard.\nThe strength is compensated so that shadows stay as dark on average.\nDoesn't affect performance.");
 		}
 
-		PROPERTY("Hue preservation", sun_shadows.hue_preservation);
+		PROPERTY_RANGED("Hue preservation", sun_shadows.hue_preservation, 0.0f, 1.0f);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("1 keeps the hue of the surrounding light mix inside shadows - they only get darker.\n0 removes the ambient color, so shadows take on the hue of nearby lights.");
@@ -2523,13 +2543,13 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	{
 		auto id = scoped_id("point_light_shadows");
 
-		PROPERTY("Smoothness mult", point_light_shadows.smoothness_mult);
+		PROPERTY_RANGED("Smoothness mult", point_light_shadows.smoothness_mult, 0.0f, 4.0f);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("Scales the Shadow smoothness of every point light on this map.\nDoesn't affect performance.");
 		}
 
-		PROPERTY("Hue preservation", point_light_shadows.hue_preservation);
+		PROPERTY_RANGED("Hue preservation", point_light_shadows.hue_preservation, 0.0f, 1.0f);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("1 keeps the hue of the light mix inside shadows of point lights - they only get darker,\nso they don't abruptly change color.\n0 lets them take the hue of whatever light remains there.");

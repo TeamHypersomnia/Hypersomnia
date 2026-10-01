@@ -74,16 +74,6 @@ void light_system::advance_attenuation_variations(
 			else {
 				vals[3] = vals[4] = vals[5] = 0.f;
 			}
-
-			if (light.position_variations.is_enabled) {
-				auto& v = light.position_variations.value;
-
-				v[0].update_value(rng, vals[6], delta);
-				v[1].update_value(rng, vals[7], delta);
-			}
-			else {
-				vals[6] = vals[7] = 0.f;
-			}
 		}
 	);
 }
@@ -337,6 +327,14 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 				const auto reach = xywh::center_and_size(world_light_pos, request.queried_rect);
 
+				/*
+					A light that casts no shadows has its whole mask lit,
+					so the passes adding the light its shadows removed would add nothing.
+					Only what's known before the light jobs run decides it - they still run in parallel with this.
+				*/
+
+				const bool casts_any_shadow = request.filter.maskBits != 0;
+
 				if (light.height > 0.0f) {
 					set_pass(3);
 					renderer.set_max_blending();
@@ -346,7 +344,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					renderer.set_min_blending();
 					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_SHADOW_MASKS, i);
 
-					if (keep_hue_in_shadows && !light.hue_through_walls) {
+					if (keep_hue_in_shadows && !light.hue_through_walls && casts_any_shadow) {
 						/*
 							The mask holds only the obstacles reaching the ceiling now,
 							so the light removed by the lower ones is taken only where walls let it through.
@@ -383,7 +381,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				renderer.set_dst_alpha_additive_blending();
 				::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
 
-				if (keep_hue_in_shadows && light.hue_through_walls) {
+				if (keep_hue_in_shadows && light.hue_through_walls && casts_any_shadow) {
 					/*
 						The light keeps its hue through all its shadows, walls included.
 					*/
@@ -399,7 +397,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					in.light_fbo.set_as_current(renderer);
 				}
 
-				if (track_removed_intensity) {
+				if (track_removed_intensity && casts_any_shadow) {
 					/*
 						The light all the shadows removed, so that posterized light brightens shadowed pixels
 						by the light they would get without them, keeping penumbras smooth.

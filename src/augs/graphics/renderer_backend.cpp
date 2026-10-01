@@ -360,7 +360,6 @@ namespace augs {
 							case N::SET_MIN_BLENDING: set_min_blending(); break;
 							case N::SET_DST_ALPHA_ADDITIVE_BLENDING: set_dst_alpha_additive_blending(); break;
 							case N::SET_COLOR_ONLY_ADDITIVE_BLENDING: set_color_only_additive_blending(); break;
-							case N::SET_ALPHA_ONLY_ADDITIVE_BLENDING: set_alpha_only_additive_blending(); break;
 							case N::CLEAR_STENCIL: clear_stencil(); break;
 							case N::START_WRITING_STENCIL: start_writing_stencil(); break;
 							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
@@ -490,9 +489,9 @@ namespace augs {
 		}
 
 		void renderer_backend::restore_add_blend_equation() {
-			if (max_blending_active) {
+			if (custom_blend_equation_active) {
 				GL_CHECK(glBlendEquation(GL_FUNC_ADD));
-				max_blending_active = false;
+				custom_blend_equation_active = false;
 			}
 		}
 
@@ -525,18 +524,13 @@ namespace augs {
 			GL_CHECK(glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE));
 		}
 
-		void renderer_backend::set_alpha_only_additive_blending() {
-			restore_add_blend_equation();
-			GL_CHECK(glBlendFuncSeparate(GL_ZERO, GL_ONE, GL_ONE, GL_ONE));
-		}
-
 		void renderer_backend::set_max_blending() {
 			/*
 				GL_MAX ignores the blend factors - each channel keeps the larger of source and destination.
 			*/
 
 			GL_CHECK(glBlendEquation(GL_MAX));
-			max_blending_active = true;
+			custom_blend_equation_active = true;
 		}
 
 		void renderer_backend::set_min_blending() {
@@ -545,7 +539,7 @@ namespace augs {
 			*/
 
 			GL_CHECK(glBlendEquation(GL_MIN));
-			max_blending_active = true;
+			custom_blend_equation_active = true;
 		}
 
 		void renderer_backend::set_active_texture(const unsigned n) {

@@ -8,7 +8,11 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	// GEN INTROSPECTOR struct frame_profiler
 	augs::time_measurements total;
 	augs::amount_measurements<std::size_t> num_triangles = 1;
-	augs::amount_measurements<std::size_t> visibility_raycasts = 1;
+	augs::amount_measurements<std::size_t> light_ray_casts = 1;
+	augs::amount_measurements<std::size_t> light_aabb_queries = 1;
+	augs::amount_measurements<std::size_t> lights_recalculated = 1;
+	augs::amount_measurements<std::size_t> lights_reused = 1;
+	augs::amount_measurements<std::size_t> light_jobs_cpu_us = 1;
 
 	augs::time_measurements rendering_script;
 	augs::time_measurements drawing_layers;

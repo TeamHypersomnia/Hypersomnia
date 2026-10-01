@@ -34,6 +34,11 @@ struct sun_shadow_preferences {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const sun_shadow_preferences&) const = default;
+
+	/* Whether sun shadows are drawn at all, under a map's sun of the given strength. */
+	bool enabled_for(const float map_strength) const {
+		return quality != shadow_quality_type::NONE && map_strength * strength_mult > 0.0f;
+	}
 };
 
 struct point_light_shadow_preferences {

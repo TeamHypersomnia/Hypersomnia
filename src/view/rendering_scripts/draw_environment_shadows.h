@@ -10,6 +10,52 @@ class interpolation_system;
 class visible_entities;
 
 /*
+	The shadow texture reaches this many screen pixels past the two edges of the screen away from the sun.
+	A receiver raised above the ground samples the shadows its height times the sun's step further from the sun -
+	near those edges, beyond the screen - so it samples the shadows really lying there,
+	not the screen's edge repeated. Farther samples are still clamped to the texture's edge.
+*/
+
+inline constexpr int SUN_SHADOW_GUARD_BAND_PX = 384;
+
+struct sun_shadow_texture_layout {
+	/* The world area the shadow texture covers. */
+	ltrb world_rect;
+
+	/* Added to the fragment coordinates of the screen to find their texel in the shadow texture. */
+	vec2 texel_offset;
+};
+
+inline sun_shadow_texture_layout calc_sun_shadow_texture_layout(const ltrb visible_world_rect, const float zoom, const vec2 sun_step) {
+	const auto band_px = static_cast<float>(SUN_SHADOW_GUARD_BAND_PX);
+	const auto band_world = band_px / zoom;
+
+	auto result = sun_shadow_texture_layout { visible_world_rect, vec2::zero };
+
+	/*
+		Fragment coordinates grow rightwards and upwards, while the world's y grows downwards.
+	*/
+
+	if (sun_step.x >= 0.0f) {
+		result.world_rect.r += band_world;
+	}
+	else {
+		result.world_rect.l -= band_world;
+		result.texel_offset.x = band_px;
+	}
+
+	if (sun_step.y >= 0.0f) {
+		result.world_rect.b += band_world;
+		result.texel_offset.y = band_px;
+	}
+	else {
+		result.world_rect.t -= band_world;
+	}
+
+	return result;
+}
+
+/*
 	Environment shadows are cast by physical bodies that bullets can't fly over,
 	under a single distant sun given by sun_shadow_settings::step.
 
@@ -56,7 +102,8 @@ struct draw_environment_shadows_input {
 	const cosmos& cosm;
 	const interpolation_system& interp;
 	const visible_entities& visible;
-	const ltrb queried_camera_aabb;
+	/* The world area of the shadow texture - see calc_sun_shadow_texture_layout. */
+	const ltrb covered_world_rect;
 	const augs::atlas_entry blank_tex;
 	const float tip_strength;
 
