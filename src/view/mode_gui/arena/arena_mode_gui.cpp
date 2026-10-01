@@ -1791,7 +1791,8 @@ void arena_gui_state::draw_mode_gui(
 						const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
 						if (viewed_player_data == nullptr) {
-							return false;
+							/* Nobody else is viewed - the money is our own. */
+							return true;
 						}
 
 						return viewed_player_data->get_faction() == *local_player_faction;
