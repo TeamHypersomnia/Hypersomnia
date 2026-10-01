@@ -25,8 +25,29 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/flashbang_math.h"
 #include "game/detail/find_absolute_or_local_transform.h"
-#include "game/detail/shell_params.h"
 #include "augs/log.h"
+
+/*
+	Past sound_system_settings::max_shell_sounds_per_gun, the oldest shell sounds of the gun fade out this fast.
+*/
+
+inline constexpr float SHELL_SOUNDS_EVICTION_FADE_PER_SEC = 15.f;
+
+/*
+	Shells hitting the floor would only be noise during a firefight, so at every gunshot heard within
+	SHELL_SOUNDS_DUCKING_DISTANCE_MULT times its reference distance - the listener's own included,
+	unless the gun doesn't invariants::gun::ducks_shell_sounds - they duck down to SHELL_SOUNDS_DUCKED_GAIN over SHELL_SOUNDS_DUCKING_ATTACK_SECS,
+	and recover over SHELL_SOUNDS_DUCKING_RECOVERY_SECS as long as there are no more gunshots - both evenly in decibels.
+	Decibels of silence are infinite, so a SHELL_SOUNDS_DUCKED_GAIN of 0 fades through SHELL_SOUNDS_DUCKING_SILENCE_GAIN instead - as quiet as silence -
+	and only fully ducked is exactly silent.
+*/
+
+inline constexpr float SHELL_SOUNDS_DUCKING_SILENCE_GAIN = 0.001f;
+
+inline constexpr float SHELL_SOUNDS_DUCKED_GAIN = 0.0f;
+inline constexpr float SHELL_SOUNDS_DUCKING_DISTANCE_MULT = 1.5f;
+inline constexpr float SHELL_SOUNDS_DUCKING_ATTACK_SECS = 0.06f;
+inline constexpr float SHELL_SOUNDS_DUCKING_RECOVERY_SECS = 0.2f;
 
 struct shouldnt_play {};
 

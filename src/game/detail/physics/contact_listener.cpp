@@ -370,11 +370,24 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			const bool touched_by_lying_item = category_of(fix_b, filter_category::LYING_ITEM);
 			bool bounces_off = false;
 
+			/*
+				Owner bodies, as a lying gun carries the fixtures of its magazine and attachments.
+			*/
+
+			const auto kicker = collider_owner_body;
+
+			auto kick_away = [&](auto& remnant) {
+				const auto away = vec2(body_a->GetPosition().x, body_a->GetPosition().y) - vec2(body_b->GetPosition().x, body_b->GetPosition().y);
+
+				remnant.pending_kick = away.is_epsilon(0.0001f) ? vec2(1, 0) : vec2(away).normalize();
+				remnant.kicked_by = kicker.get_id();
+			};
+
 			subject.template dispatch_on_having_all<components::remnant>([&](const auto& typed_shell) {
 				auto& remnant = typed_shell.template get<components::remnant>();
 
 				if (touched_by_lying_item) {
-					const auto item = collider.template find<components::item>();
+					const auto item = kicker.template find<components::item>();
 					const bool item_in_the_air = item && item.get_fall().is_in_the_air();
 
 					if (remnant.fall.is_in_the_air() || item_in_the_air) {
@@ -386,15 +399,13 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 					*/
 
 					if (!clk.lasts(SHELL_KICK_COOLDOWN_MS, remnant.when_kicked)) {
-						auto rng = randomization(augs::hash_multiple(remnant.seed, remnant.num_kicks++));
+						auto rng = randomization(augs::hash_multiple(remnant.fall.seed, remnant.num_kicks++));
 
 						remnant.when_kicked = now;
 						remnant.item_contact_rolls = rng.randval(0.f, 1.f) < SHELL_ITEM_CONTACT_ROLL_CHANCE;
 
 						if (remnant.item_contact_rolls) {
-							const auto away = vec2(body_a->GetPosition().x, body_a->GetPosition().y) - vec2(body_b->GetPosition().x, body_b->GetPosition().y);
-
-							remnant.pending_kick = away.is_epsilon(0.0001f) ? vec2(1, 0) : vec2(away).normalize();
+							kick_away(remnant);
 							remnant.pending_kick_rolls = true;
 						}
 					}
@@ -404,10 +415,8 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 				}
 
 				if (!remnant.fall.is_in_the_air() && !clk.lasts(SHELL_KICK_COOLDOWN_MS, remnant.when_kicked)) {
-					const auto away = vec2(body_a->GetPosition().x, body_a->GetPosition().y) - vec2(body_b->GetPosition().x, body_b->GetPosition().y);
-
 					remnant.when_kicked = now;
-					remnant.pending_kick = away.is_epsilon(0.0001f) ? vec2(1, 0) : vec2(away).normalize();
+					kick_away(remnant);
 				}
 			});
 

@@ -19,7 +19,6 @@
 #include "game/assets/recoil_player.h"
 
 #include "game/detail/adversarial_meta.h"
-#include "game/detail/shell_params.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/sentience_shake.h"
@@ -72,6 +71,13 @@ namespace components {
 }
 
 namespace invariants {
+	/*
+		Shells spin either slowly or fast - see SHELL_FAST_SPIN_CHANCE - in degrees per second.
+		Box2D rotates bodies by at most 90 degrees a step, so at 60 steps a second nothing spins faster than 5400.
+		Angular damping takes a tenth of the spin away every step, halving it every ~0.1 s,
+		so fast spins start close to the limit to show for a while.
+	*/
+
 	struct gun {
 		// GEN INTROSPECTOR struct invariants::gun
 		real32 shot_cooldown_ms = 100.f;
@@ -95,8 +101,8 @@ namespace invariants {
 		real32 gunshot_decal_scale = 0.f;
 
 		augs::bound<real32> shell_velocity = { 300.f, 1700.f };
-		augs::bound<real32> shell_slow_angular_velocity = { SHELL_SLOW_SPIN_MIN, SHELL_SLOW_SPIN_MAX };
-		augs::bound<real32> shell_fast_angular_velocity = { SHELL_FAST_SPIN_MIN, SHELL_FAST_SPIN_MAX };
+		augs::bound<real32> shell_slow_angular_velocity = { 180.f, 720.f };
+		augs::bound<real32> shell_fast_angular_velocity = { 3600.f, 10000.f };
 		augs::bound<real32> shell_height = { 0.f, 0.f };
 
 		real32 shell_spread_degrees = 20.f;

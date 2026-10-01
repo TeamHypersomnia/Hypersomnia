@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include "augs/math/repro_math.h"
 #include "augs/math/arithmetical.h"
 #include "augs/math/transform.h"
 #include "augs/misc/bound.h"
@@ -29,8 +30,9 @@
 	never changing their trajectory, so their hops may vary randomly.
 	The hops are fit within the fuse of a normal throw - if held armed for long, they explode before hitting the floor as many times.
 
-	Everything random is seeded only by what's known since the item was created,
-	the step its fall started at and the index of the hit, so it's predicted the same everywhere, regardless of lag.
+	Everything random is seeded only by what's known since the item was created - its own seed,
+	how many times it fell before and the index of the hit - never by the step the fall started at,
+	so a throw or a drop coming a step later due to lag still falls the same way.
 
 	Heights are relative to the height a dropped item falls from.
 */
@@ -48,12 +50,12 @@ inline constexpr real32 NEXT_HOP_HEIGHT_MULT = 0.5f;
 	They mostly stop spinning as they first hit the floor,
 	then the second hit turns them a bit the other way, and every next one keeps turning them that way.
 	The third and later hits are only slight turns and nudges, and the last one - silent - only a symbolic one.
+	The last hit of thrown explosives is not silent.
 	Thrown melee weapons fall just like dropped items, only with every interval a bit longer.
 	Items unmounted onto the floor, like magazines dropped while reloading, fall from higher and longer.
 */
 
 inline constexpr uint8_t DROPPED_ITEM_FLOOR_HITS = 3;
-inline constexpr bool SILENCE_LAST_ITEM_FLOOR_HIT = true;
 
 inline constexpr real32 DROPPED_ITEM_FALL_SECS = 0.22f;
 inline constexpr real32 DROPPED_ITEM_FALL_HEIGHT = 1.6f;
@@ -115,28 +117,6 @@ inline constexpr real32 FLOOR_HIT_PITCH_VARIATION = 0.12f;
 inline constexpr real32 FALL_PITCH_VARIATION = 0.08f;
 
 /*
-	How heights are drawn over a hop, by x - the distance from its top in time, from -1 to 1.
-	Hops are far shorter than the heights they're drawn at would take, so the physical parabola only flashes at its top.
-
-	PARABOLA - 1 - x^2, the physical one.
-	POWER - 1 - |x|^HOP_CURVE_EXPONENT, leaving the floor and falling back quickly, hanging around the top for longer.
-	LINEAR - 1 - |x|, at a constant speed.
-	SQRT - sqrt(1 - |x|), slowing down towards the top, but reaching the floor at a finite speed.
-	CIRCLE - sqrt(1 - x^2), the flattest top, leaving the floor and falling back the most abruptly.
-*/
-
-enum class hop_curve_type {
-	PARABOLA,
-	POWER,
-	LINEAR,
-	SQRT,
-	CIRCLE
-};
-
-inline constexpr auto HOP_CURVE = hop_curve_type::PARABOLA;
-inline constexpr real32 HOP_CURVE_EXPONENT = 3.5f;
-
-/*
 	The sum of the shortening hop durations of explosives, relative to the first one - with the durations varied at most upwards.
 */
 
@@ -146,23 +126,15 @@ inline constexpr real32 EXPLOSIVE_HOPS_DURATION_MULT = (1.f + EXPLOSIVE_HOP_DURA
 	+ 1.f / (NEXT_HOP_DURATION_DIVISOR * NEXT_HOP_DURATION_DIVISOR)
 );
 
+/*
+	How heights are drawn over a hop, by x - the distance from its top in time, from -1 to 1:
+	the physical parabola. Hops are far shorter than the heights they're drawn at would take,
+	so the parabola only flashes at its top.
+*/
+
 inline real32 calc_hop_curve(const real32 distance_from_top) {
 	const auto x = std::min(std::abs(distance_from_top), 1.f);
-
-	switch (HOP_CURVE) {
-		case hop_curve_type::PARABOLA:
-			return 1.f - x * x;
-		case hop_curve_type::POWER:
-			return 1.f - std::pow(x, HOP_CURVE_EXPONENT);
-		case hop_curve_type::LINEAR:
-			return 1.f - x;
-		case hop_curve_type::SQRT:
-			return std::sqrt(1.f - x);
-		case hop_curve_type::CIRCLE:
-			return std::sqrt(1.f - x * x);
-		default:
-			return 1.f - x * x;
-	}
+	return 1.f - x * x;
 }
 
 enum class floor_hit_rng_purpose : uint8_t {
@@ -176,11 +148,15 @@ enum class floor_hit_rng_purpose : uint8_t {
 
 /*
 	Differs for every fall of every item: the item's seed known since it was created,
-	and the step the fall started at, known since the throw or the drop.
+	and how many times it fell before.
 */
 
-inline rng_seed_type calc_fall_seed(const rng_seed_type nontemporal_item_seed, const augs::stepped_timestamp when_started_falling) {
-	return augs::hash_multiple(nontemporal_item_seed, when_started_falling.step);
+inline rng_seed_type calc_next_fall_seed(const rng_seed_type nontemporal_item_seed, const item_fall_state& fall) {
+	return augs::hash_multiple(nontemporal_item_seed, fall.num_falls);
+}
+
+inline real32 random_sign(randomization& rng) {
+	return rng.randval(0, 1) == 0 ? -1.f : 1.f;
 }
 
 inline randomization make_floor_hit_rng(const rng_seed_type fall_seed, const uint8_t hit_index, const floor_hit_rng_purpose purpose) {
@@ -232,9 +208,9 @@ inline void count_floor_hit_and_start_next_hop(
 	item_fall_state& fall,
 	const real32 variation,
 	const real32 min_hop_secs,
-	const rng_seed_type fall_seed,
 	const augs::stepped_timestamp now
 ) {
+	const auto fall_seed = fall.seed;
 	const auto hit_index = fall.floor_hits_done;
 	const auto unvaried_secs = fall.hop_duration_secs / ::calc_hop_duration_mult(variation, fall_seed, hit_index);
 	const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR;
@@ -260,7 +236,6 @@ void play_floor_hit_sound(
 	const S& step,
 	const floor_hit_sounds_array& sounds,
 	const item_fall_state& fall,
-	const rng_seed_type fall_seed,
 	const transformr where,
 	const real32 fall_pitch_variation = FALL_PITCH_VARIATION,
 	const real32 hit_pitch_variation = FLOOR_HIT_PITCH_VARIATION,
@@ -273,7 +248,7 @@ void play_floor_hit_sound(
 	}
 
 	auto effect = sounds[hit_index];
-	effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall_seed, hit_index, fall_pitch_variation, hit_pitch_variation);
+	effect.modifier.pitch *= ::calc_floor_hit_pitch_variation(fall.seed, hit_index, fall_pitch_variation, hit_pitch_variation);
 
 	auto start = sound_effect_start_input::fire_and_forget(where);
 
@@ -288,7 +263,7 @@ void play_floor_hit_sound(
 
 /*
 	thrown_up makes the first hop rise before falling, and the hits spin like those of explosives.
-	fall_seed randomizes the fall - see calc_fall_seed.
+	fall_seed randomizes the fall - see calc_next_fall_seed.
 */
 
 inline void start_falling(
@@ -301,12 +276,15 @@ inline void start_falling(
 	const rng_seed_type fall_seed,
 	const augs::stepped_timestamp now
 ) {
-	fall = {};
+	fall.stop();
+	++fall.num_falls;
+
+	fall.seed = static_cast<uint32_t>(fall_seed);
 	fall.floor_hits_left = floor_hits;
 	fall.thrown_up = thrown_up;
 	fall.when_started_falling = now;
 	fall.when_hop_started = now;
-	fall.hop_duration_secs = first_hop_secs * ::calc_hop_duration_mult(duration_variation, fall_seed, 0);
+	fall.hop_duration_secs = first_hop_secs * ::calc_hop_duration_mult(duration_variation, fall.seed, 0);
 	fall.hop_height = first_hop_height;
 }
 
@@ -317,7 +295,7 @@ inline void start_falling_like_dropped(
 	const rng_seed_type nontemporal_item_seed,
 	const augs::stepped_timestamp now
 ) {
-	::start_falling(fall, DROPPED_ITEM_FLOOR_HITS, first_hop_secs, first_hop_height, 0.f, false, ::calc_fall_seed(nontemporal_item_seed, now), now);
+	::start_falling(fall, DROPPED_ITEM_FLOOR_HITS, first_hop_secs, first_hop_height, 0.f, false, ::calc_next_fall_seed(nontemporal_item_seed, fall), now);
 }
 
 /*
@@ -335,7 +313,7 @@ void start_shell_falling(
 	const rng_seed_type shell_seed,
 	const augs::stepped_timestamp now
 ) {
-	const auto height = augs::interp(shell_height.first, shell_height.second, height_roll);
+	const auto height = std::max(0.f, augs::interp(shell_height.first, shell_height.second, height_roll));
 
 	const auto floor_hits = [&]() {
 		constexpr auto next_height_mult = 1.f / (NEXT_HOP_DURATION_DIVISOR * NEXT_HOP_DURATION_DIVISOR);
@@ -352,7 +330,7 @@ void start_shell_falling(
 	::start_falling(
 		fall,
 		floor_hits,
-		SHELL_HOP_SECS_AT_UNIT_HEIGHT * std::sqrt(height),
+		SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(height),
 		height,
 		SHELL_HOP_DURATION_VARIATION,
 		true,
@@ -380,11 +358,11 @@ real32 calc_shell_length_spin_mult(const E& shell) {
 }
 
 inline real32 calc_shell_hit_spin_mult(const real32 hop_height) {
-	return std::min(std::sqrt(hop_height / SHELL_HIT_SPIN_FULL_AT_HEIGHT), 1.f);
+	return std::min(repro::sqrt(hop_height / SHELL_HIT_SPIN_FULL_AT_HEIGHT), 1.f);
 }
 
 inline real32 calc_shell_low_hop_roll_mult(const real32 hop_height) {
-	return std::min(std::sqrt(hop_height / SHELL_LOW_HOP_ROLL_AT_HEIGHT), SHELL_LOW_HOP_ROLL_MAX_MULT);
+	return std::min(repro::sqrt(hop_height / SHELL_LOW_HOP_ROLL_AT_HEIGHT), SHELL_LOW_HOP_ROLL_MAX_MULT);
 }
 
 /*
@@ -404,21 +382,33 @@ inline real32 calc_shell_hop_height(const real32 hop_duration_secs) {
 template <class B>
 void spin_on_shell_floor_hit(
 	const B& body,
-	const uint8_t hit_index,
-	const real32 hop_height,
-	const real32 length_spin_mult,
-	const rng_seed_type fall_seed
+	const item_fall_state& fall,
+	const real32 length_spin_mult
 ) {
+	const auto hit_index = fall.floor_hits_done;
+	const auto hop_height = fall.hop_height;
+	const auto fall_seed = fall.seed;
+
 	const auto current_spin = body.get_degree_velocity();
 	const auto kept_spin = hit_index == 0 ? current_spin * SHELL_SPIN_KEPT : current_spin;
 
 	auto spin_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::SPIN);
 	const auto magnitude = spin_rng.randval(SHELL_HIT_SPIN_IMPULSE_MIN, SHELL_HIT_SPIN_IMPULSE_MAX);
-	const auto direction = spin_rng.randval(0, 1) == 0 ? -1.f : 1.f;
+	const auto direction = ::random_sign(spin_rng);
 
 	const auto impulse = magnitude * direction * ::calc_shell_hit_spin_mult(hop_height) * length_spin_mult;
 
 	body.set_angular_velocity(kept_spin + impulse);
+}
+
+template <class B>
+void push_along_motion(const B& body, const real32 push_speed) {
+	const auto velocity = body.get_velocity();
+	const auto speed = velocity.length();
+
+	if (speed > 1.f) {
+		body.set_velocity(velocity + velocity / speed * push_speed);
+	}
 }
 
 /*
@@ -427,12 +417,7 @@ void spin_on_shell_floor_hit(
 
 template <class B>
 void push_on_shell_floor_hit(const B& body, randomization& push_rng) {
-	const auto velocity = body.get_velocity();
-	const auto speed = velocity.length();
-
-	if (speed > 1.f) {
-		body.set_velocity(velocity + velocity / speed * push_rng.randval(SHELL_PUSH_MIN_SPEED, SHELL_PUSH_MAX_SPEED));
-	}
+	::push_along_motion(body, push_rng.randval(SHELL_PUSH_MIN_SPEED, SHELL_PUSH_MAX_SPEED));
 }
 
 /*
@@ -440,7 +425,34 @@ void push_on_shell_floor_hit(const B& body, randomization& push_rng) {
 */
 
 inline real32 calc_shell_hop_secs(const real32 hop_height) {
-	return std::max(SHELL_MIN_HOP_SECS, SHELL_HOP_SECS_AT_UNIT_HEIGHT * std::sqrt(hop_height));
+	return std::max(SHELL_MIN_HOP_SECS, SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(hop_height));
+}
+
+/*
+	What every floor hit of shells and of items hopping like them does first:
+	plays its sound and spins them, before the hit is counted.
+*/
+
+template <class S, class E, class B>
+void start_shell_like_floor_hit(
+	const S& step,
+	const E& subject,
+	const B& body,
+	const item_fall_state& fall,
+	const floor_hit_sounds_array& sounds,
+	const entity_id shell_ejected_by = entity_id()
+) {
+	::play_floor_hit_sound(
+		step,
+		sounds,
+		fall,
+		subject.get_logic_transform(),
+		SHELL_FALL_PITCH_VARIATION,
+		SHELL_FLOOR_HIT_PITCH_VARIATION,
+		shell_ejected_by
+	);
+
+	::spin_on_shell_floor_hit(body, fall, ::calc_shell_length_spin_mult(subject));
 }
 
 /*
@@ -448,8 +460,8 @@ inline real32 calc_shell_hop_secs(const real32 hop_height) {
 	UNMOUNTED_MAGAZINE_FLOOR_HITS times, every hit playing its own floor hit sound.
 	Their hops are set by their heights, and last as long as it physically takes to hop that high:
 	the first one UNMOUNTED_MAGAZINE_HOP_HEIGHT high, rising a bit out of the hand like thrown explosives,
-	varying by up to UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION - seeded by the gun and how many shells it ejected,
-	so decided as soon as the gun exists, like its shells - and every next one UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT as high as the one before.
+	varying by up to UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION - seeded like every fall of an item, see calc_next_fall_seed -
+	and every next one UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT as high as the one before.
 	Hits after hops higher than UNMOUNTED_MAGAZINE_HOP_HEIGHT sound higher - by UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT of how much faster
 	their impact is, with the square root of the height - and the others as they are.
 	They fly off UNMOUNTED_MAGAZINE_VELOCITY_MULT as fast as other unmounted items - times invariants::gun::unmounted_magazine_velocity_mult of their gun.
@@ -457,9 +469,10 @@ inline real32 calc_shell_hop_secs(const real32 hop_height) {
 
 inline void start_falling_like_unmounted_magazine(
 	item_fall_state& fall,
-	const rng_seed_type fall_seed,
+	const rng_seed_type nontemporal_item_seed,
 	const augs::stepped_timestamp now
 ) {
+	const auto fall_seed = ::calc_next_fall_seed(nontemporal_item_seed, fall);
 	auto rng = randomization(fall_seed);
 
 	const auto variation = UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION;
@@ -474,7 +487,7 @@ inline void start_falling_like_unmounted_magazine(
 */
 
 inline real32 calc_unmounted_magazine_hit_pitch_mult(const real32 hop_height) {
-	const auto impact = std::sqrt(hop_height / UNMOUNTED_MAGAZINE_HOP_HEIGHT);
+	const auto impact = repro::sqrt(hop_height / UNMOUNTED_MAGAZINE_HOP_HEIGHT);
 	return 1.f + std::max(0.f, impact - 1.f) * UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT;
 }
 
@@ -564,43 +577,29 @@ real32 calc_item_fall_height(const E& item, const double now_secs, const real32 
 }
 
 /*
-	Small items lying on the ground - magazines, shotgun shells and grenades, in no slot -
-	are GROUND_ITEM_SCALE times bigger, so that they are easier to notice.
-	Their bodies grow too, except grenades' - so that they still bounce as they did.
-	They grow as they fly off: up to the top of their first hop if thrown up, like unmounted magazines, or else until they first hit the floor.
+	Small items lying on the ground - in no slot - are invariants::item::ground_scale times bigger,
+	so that they are easier to notice. Their bodies are that big right away, unless ground_scale_affects_body is false -
+	e.g. grenades', so that they still bounce as they did - while the sprites grow as they fly off:
+	up to the top of their first hop if thrown up, like unmounted magazines, or else until they first hit the floor.
 	now_secs may be interpolated.
 */
 
-inline constexpr real32 GROUND_ITEM_SCALE = 1.75f;
-
 template <class E>
-bool is_enlarged_on_the_ground(const E& typed_item) {
+const invariants::item* find_enlarged_on_the_ground(const E& typed_item) {
 	const auto item_def = typed_item.template find<invariants::item>();
 
-	if (item_def == nullptr || typed_item.get_current_slot().alive()) {
-		return false;
+	if (item_def == nullptr || item_def->ground_scale == 1.f || typed_item.get_current_slot().alive()) {
+		return nullptr;
 	}
 
-	if (item_def->categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
-		return true;
-	}
-
-	/* Shotgun shells spawn many rounds - unlike rockets or loose rifle bullets. */
-	if (const auto cartridge_def = typed_item.template find<invariants::cartridge>()) {
-		return cartridge_def->num_rounds_spawned > 1;
-	}
-
-	/* Grenades, but not the bomb. */
-	if (const auto fuse_def = typed_item.template find<invariants::hand_fuse>()) {
-		return !fuse_def->is_like_plantable_bomb();
-	}
-
-	return false;
+	return item_def;
 }
 
 template <class E>
 real32 calc_ground_item_scale(const E& typed_item, const double now_secs) {
-	if (!::is_enlarged_on_the_ground(typed_item)) {
+	const auto item_def = ::find_enlarged_on_the_ground(typed_item);
+
+	if (item_def == nullptr) {
 		return 1.f;
 	}
 
@@ -617,19 +616,16 @@ real32 calc_ground_item_scale(const E& typed_item, const double now_secs) {
 		return std::min(1.f, t / top_t);
 	}();
 
-	return augs::interp(1.f, GROUND_ITEM_SCALE, growth);
+	return augs::interp(1.f, item_def->ground_scale, growth);
 }
 
 template <class E>
-bool has_enlarged_body_on_the_ground(const E& typed_item) {
-	return ::is_enlarged_on_the_ground(typed_item) && !typed_item.template has<invariants::hand_fuse>();
-}
-
-template <class E>
-real32 calc_ground_body_scale(const E& typed_item, const double now_secs) {
-	if (!::has_enlarged_body_on_the_ground(typed_item)) {
-		return 1.f;
+real32 calc_ground_body_scale(const E& typed_item) {
+	if (const auto item_def = ::find_enlarged_on_the_ground(typed_item)) {
+		if (item_def->ground_scale_affects_body) {
+			return item_def->ground_scale;
+		}
 	}
 
-	return ::calc_ground_item_scale(typed_item, now_secs);
+	return 1.f;
 }

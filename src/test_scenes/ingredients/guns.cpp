@@ -3909,7 +3909,6 @@ namespace test_flavours {
 
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = { 330.f, 990.f };
-
 			gun_def.damage_multiplier = 2.0f;
 			gun_def.head_radius_multiplier = 1.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;

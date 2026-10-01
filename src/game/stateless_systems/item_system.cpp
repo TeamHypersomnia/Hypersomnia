@@ -58,6 +58,7 @@
 #include "game/cosmos/might_allocate_entities_having.hpp"
 #include "game/detail/inventory/wield_same_as.hpp"
 #include "game/messages/collected_message.h"
+#include "game/detail/low_ammo_magazine.h"
 
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
@@ -382,7 +383,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						return 0u;
 					}();
 
-					if (count_charges_in_deposit(old_mag) < static_cast<int>(keep_mags_above_charges)) {
+					if (::is_below_low_ammo_threshold(count_charges_in_deposit(old_mag), keep_mags_above_charges)) {
 						drop_mag_to_ground(old_mag);
 					}
 				};
@@ -1545,16 +1546,8 @@ void item_system::advance_falling_items(const logic_step step) {
 				Picked up mid-air.
 			*/
 
-			fall = {};
+			fall.stop();
 			return;
-		}
-
-		if (fall.is_in_the_air() && ::has_enlarged_body_on_the_ground(typed_item)) {
-			/*
-				The body grows along with the sprite - see calc_ground_body_scale.
-			*/
-
-			typed_item.infer_colliders_from_scratch();
 		}
 
 		if (!::is_floor_hit_due(fall, now, dt)) {
@@ -1562,7 +1555,6 @@ void item_system::advance_falling_items(const logic_step step) {
 		}
 
 		const bool explosive = ::is_like_thrown_explosive(typed_item);
-		const auto fall_seed = ::calc_fall_seed(cosm.get_nontemporal_rng_seed_for(typed_item), fall.when_started_falling);
 		const auto hit_index = fall.floor_hits_done;
 
 		if (fall.hops_like_shell) {
@@ -1574,28 +1566,18 @@ void item_system::advance_falling_items(const logic_step step) {
 				sounds[hit_index].modifier.pitch *= ::calc_unmounted_magazine_hit_pitch_mult(hop_height);
 			}
 
-			::play_floor_hit_sound(
-				step,
-				sounds,
-				fall,
-				fall_seed,
-				typed_item.get_logic_transform(),
-				SHELL_FALL_PITCH_VARIATION,
-				SHELL_FLOOR_HIT_PITCH_VARIATION
-			);
+			::start_shell_like_floor_hit(step, typed_item, body, fall, sounds);
 
-			::spin_on_shell_floor_hit(body, hit_index, hop_height, ::calc_shell_length_spin_mult(typed_item), fall_seed);
-
-			auto push_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::PUSH);
+			auto push_rng = ::make_floor_hit_rng(fall.seed, hit_index, floor_hit_rng_purpose::PUSH);
 			::push_on_shell_floor_hit(body, push_rng);
 
-			::count_floor_hit_and_start_next_hop(fall, 0.f, SHELL_MIN_HOP_SECS, fall_seed, now);
+			::count_floor_hit_and_start_next_hop(fall, 0.f, SHELL_MIN_HOP_SECS, now);
 			::start_next_hop_of_unmounted_magazine(fall, hop_height);
 
 			return;
 		}
 
-		const bool last_silent_hit = SILENCE_LAST_ITEM_FLOOR_HIT && !explosive && fall.floor_hits_left == 1;
+		const bool last_silent_hit = !explosive && fall.floor_hits_left == 1;
 
 		/*
 			How much the third and later hits of dropped items and thrown melee weapons still spin and push them.
@@ -1624,7 +1606,7 @@ void item_system::advance_falling_items(const logic_step step) {
 				return typed_item.template get<invariants::item>().floor_hit_sounds;
 			}();
 
-			::play_floor_hit_sound(step, sounds, fall, fall_seed, typed_item.get_logic_transform());
+			::play_floor_hit_sound(step, sounds, fall, typed_item.get_logic_transform());
 		};
 
 		auto spin = [&]() {
@@ -1646,13 +1628,7 @@ void item_system::advance_falling_items(const logic_step step) {
 		};
 
 		auto push = [&]() {
-			const auto velocity = body.get_velocity();
-			const auto speed = velocity.length();
-
-			if (speed > 1.f) {
-				const auto mult = later_hit_mult(LAST_FLOOR_HIT_PUSH_MULT, THIRD_FLOOR_HIT_PUSH_MULT);
-				body.set_velocity(velocity + velocity / speed * mult * DROPPED_ITEM_PUSH_SPEED);
-			}
+			::push_along_motion(body, later_hit_mult(LAST_FLOOR_HIT_PUSH_MULT, THIRD_FLOOR_HIT_PUSH_MULT) * DROPPED_ITEM_PUSH_SPEED);
 		};
 
 		if (!last_silent_hit) {
@@ -1673,6 +1649,6 @@ void item_system::advance_falling_items(const logic_step step) {
 			DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
 		;
 
-		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, fall_seed, now);
+		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, now);
 	});
 }

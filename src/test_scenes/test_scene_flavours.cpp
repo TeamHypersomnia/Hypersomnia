@@ -1,3 +1,7 @@
+#include <utility>
+#include <vector>
+#include "augs/templates/container_templates.h"
+#include "augs/templates/remove_cref.h"
 #include "game/common_state/entity_flavours.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "test_scenes/ingredients/ingredients.h"
@@ -7,6 +11,84 @@
 #include "augs/templates/enum_introspect.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/inventory/inventory_utils.h"
+
+/*
+	Small items are easy to miss lying on the ground, so they're this much bigger there:
+	magazines, shotgun shells - spawning many rounds, unlike rockets or loose rifle bullets -
+	and grenades, but not the bomb. Grenades only visually, so that they still bounce as they did.
+*/
+
+constexpr real32 small_ground_item_scale_v = 1.5f;
+
+template <class F>
+static void for_each_flavour_object(all_entity_flavours& flavours, F&& callback) {
+	flavours.for_each_container([&](auto& pool) {
+		pool.for_each_id_and_object([&](const auto& raw_id, auto& flavour) {
+			using E = typename remove_cref<decltype(flavour)>::used_entity_type;
+			callback(entity_flavour_id(typed_entity_flavour_id<E>(raw_id)), flavour);
+		});
+	});
+}
+
+/*
+	Item invariants that follow from the other definitions.
+*/
+
+static void set_derived_item_invariants(all_entity_flavours& flavours) {
+	std::vector<std::pair<entity_flavour_id, unsigned>> low_ammo_thresholds_of_magazines;
+
+	::for_each_flavour_object(flavours, [&](const entity_flavour_id, auto& flavour) {
+		using F = remove_cref<decltype(flavour)>;
+
+		if constexpr(F::template has<invariants::gun>() && F::template has<invariants::container>()) {
+			const auto& slots = flavour.template get<invariants::container>().slots;
+
+			if (const auto mag_slot = mapped_or_nullptr(slots, slot_function::GUN_DETACHABLE_MAGAZINE)) {
+				if (mag_slot->only_allow_flavour.is_set()) {
+					low_ammo_thresholds_of_magazines.emplace_back(
+						entity_flavour_id(mag_slot->only_allow_flavour),
+						flavour.template get<invariants::gun>().num_last_bullets_to_trigger_low_ammo_cue
+					);
+				}
+			}
+		}
+	});
+
+	::for_each_flavour_object(flavours, [&](const entity_flavour_id id, auto& flavour) {
+		using F = remove_cref<decltype(flavour)>;
+
+		if constexpr(F::template has<invariants::item>()) {
+			auto& item = flavour.template get<invariants::item>();
+
+			for (const auto& [magazine_id, threshold] : low_ammo_thresholds_of_magazines) {
+				if (magazine_id == id) {
+					item.low_ammo_threshold = threshold;
+				}
+			}
+
+			const bool small = [&]() {
+				if (item.categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+					return true;
+				}
+
+				if constexpr(F::template has<invariants::cartridge>()) {
+					return flavour.template get<invariants::cartridge>().num_rounds_spawned > 1;
+				}
+				else if constexpr(F::template has<invariants::hand_fuse>()) {
+					return !flavour.template get<invariants::hand_fuse>().is_like_plantable_bomb();
+				}
+				else {
+					return false;
+				}
+			}();
+
+			if (small) {
+				item.ground_scale = small_ground_item_scale_v;
+				item.ground_scale_affects_body = !F::template has<invariants::hand_fuse>();
+			}
+		}
+	});
+}
 
 void populate_test_scene_flavours(const populate_flavours_input in) {
 	test_flavours::populate_grenade_flavours(in);
@@ -18,6 +100,8 @@ void populate_test_scene_flavours(const populate_flavours_input in) {
 	test_flavours::populate_decoration_flavours(in);
 	test_flavours::populate_melee_flavours(in);
 	test_flavours::populate_backpack_flavours(in);
+
+	::set_derived_item_invariants(in.flavours);
 }
 
 namespace test_flavours {

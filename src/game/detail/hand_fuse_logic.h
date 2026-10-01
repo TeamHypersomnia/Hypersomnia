@@ -331,15 +331,16 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			if (!fuse_def.is_like_plantable_bomb()) {
 				if (const auto body = fused_entity.template find<components::rigid_body>()) {
 					const auto speed = body.get_velocity().length();
+					auto& fall = fused_entity.template get<components::item>().get_fall();
 
 					::start_falling(
-						fused_entity.template get<components::item>().get_fall(),
+						fall,
 						::calc_thrown_explosive_floor_hits(speed, fuse_def.floor_hits_when_thrown),
 						::calc_thrown_explosive_first_hop_secs(speed, fuse.fuse_delay_ms / 1000.f),
 						::calc_thrown_explosive_height(speed),
 						EXPLOSIVE_HOP_DURATION_VARIATION,
 						true,
-						::calc_fall_seed(fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity), clk.now),
+						::calc_next_fall_seed(fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity), fall),
 						clk.now
 					);
 				}

@@ -39,6 +39,13 @@ namespace components {
 }
 
 namespace invariants {
+	/*
+		ground_scale enlarges the item lying on the ground - see calc_ground_item_scale -
+		and ground_scale_affects_body decides whether its body grows too.
+		low_ammo_threshold of a magazine is the low ammo cue threshold of its gun,
+		so that a magazine lying on the ground knows it without its gun - see calc_magazine_ammo_state.
+	*/
+
 	struct item {
 		static constexpr bool reinfer_when_tweaking = true;
 		// GEN INTROSPECTOR struct invariants::item
@@ -48,7 +55,8 @@ namespace invariants {
 
 		bool stackable = false;
 		bool draw_under_hands_in_akimbo = false;
-		pad_bytes<2> pad;
+		bool ground_scale_affects_body = true;
+		pad_bytes<1> pad;
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
@@ -65,6 +73,9 @@ namespace invariants {
 		unsigned gratis_ammo_pieces_with_first = 0;
 
 		transformi hand_anchor_offset;
+
+		real32 ground_scale = 1.f;
+		unsigned low_ammo_threshold = 0;
 		// END GEN INTROSPECTOR
 	};
 }

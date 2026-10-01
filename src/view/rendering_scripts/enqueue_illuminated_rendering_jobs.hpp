@@ -622,35 +622,17 @@ void enqueue_illuminated_rendering_jobs(
 								even though they can already be picked up.
 							*/
 
-							using item_type = remove_cref<decltype(typed_item)>;
-
-							const auto* const fall = [&]() -> const item_fall_state* {
-								if constexpr(item_type::template has<components::item>()) {
-									return std::addressof(typed_item.template get<components::item>().get_fall());
-								}
-								else {
-									return nullptr;
-								}
-							}();
+							const auto* const fall = ::find_item_fall(typed_item);
 
 							const bool falling = fall != nullptr && fall->floor_hits_left > 0;
 
-							/*
-								Items thrown, dropped or unmounted from a gun flash white at full intensity
-								the moment they start falling, then ease down to nothing.
-							*/
-
 							const auto throw_flash_alpha = [&]() {
-								const auto flash_secs = 0.5;
-
 								if (fall == nullptr || !fall->when_started_falling.was_set()) {
 									return 0.f;
 								}
 
 								const auto elapsed_secs = global_time_seconds - fall->when_started_falling.in_seconds(cosm.get_fixed_delta());
-								const auto remaining = static_cast<float>(1.0 - std::clamp(elapsed_secs / flash_secs, 0.0, 1.0));
-
-								return remaining ;
+								return static_cast<float>(1.0 - std::clamp(elapsed_secs / ITEM_THROW_FLASH_SECS, 0.0, 1.0));
 							}();
 
 							auto draw_throw_flash = [&](auto&& customize_input) {

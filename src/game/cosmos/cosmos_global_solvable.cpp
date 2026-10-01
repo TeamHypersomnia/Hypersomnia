@@ -198,19 +198,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 						const bool magazine = transferred_item.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE);
 
 						if (magazine) {
-							/*
-								Seeded by the gun and how many shells it ejected - see start_falling_like_unmounted_magazine.
-							*/
-
-							const auto magazine_seed = [&]() -> rng_seed_type {
-								if (const auto gun = source_container.template find<components::gun>()) {
-									return augs::hash_multiple(cosm.get_nontemporal_rng_seed_for(source_container), gun->num_ejected_shells);
-								}
-
-								return seed;
-							}();
-
-							::start_falling_like_unmounted_magazine(fall, magazine_seed, cosm.get_timestamp());
+							::start_falling_like_unmounted_magazine(fall, seed, cosm.get_timestamp());
 
 							const auto gun_velocity_mult = [&]() {
 								if (const auto gun_def = source_container.template find<invariants::gun>()) {

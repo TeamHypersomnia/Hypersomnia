@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "augs/math/vec2.h"
 #include "augs/math/arithmetical.h"
+#include "augs/graphics/rgba.h"
 #include "augs/templates/remove_cref.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/explosive/like_explosive.h"
@@ -16,15 +17,22 @@ const vec2 MISSILE_SHADOW_OFFSET = vec2(20, 25);
 constexpr float FALLEN_ITEM_SHADOW_DISTANCE = 4.0f;
 
 /*
-	If true, thrown explosives are drawn raised above their shadows, towards the sun,
-	with the shadows where they would lie. Shells have their own RAISE_SHELLS_ABOVE_SHADOWS in shell_params.h.
+	Shells lying on the floor have a bit longer shadows than other fallen items, so they read clearly.
 */
 
-constexpr bool RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS = false;
+constexpr float FALLEN_SHELL_SHADOW_DISTANCE = 6.0f;
+inline const rgba SHELL_SHADOW_COLOR = rgba(0, 0, 0, 200);
 
 /*
-	If not raised, thrown explosives and shells cast shadows growing the higher they fly - unphysical with the sun infinitely far,
-	but it reads well. The shadow is *_SHADOW_SCALE_AT_REFERENCE times larger
+	Items thrown, dropped or unmounted from a gun flash white at full intensity
+	the moment they start falling, then ease down to nothing over this long.
+*/
+
+constexpr double ITEM_THROW_FLASH_SECS = 0.5;
+
+/*
+	Thrown explosives cast shadows growing the higher they fly - unphysical with the sun infinitely far,
+	but it reads well. The shadow is THROWN_EXPLOSIVE_SHADOW_SCALE_AT_REFERENCE times larger
 	when it falls SHADOW_SCALE_REFERENCE_DISTANCE px away from them, linearly in between.
 */
 
@@ -60,7 +68,7 @@ struct flying_item_offsets {
 	and grow again as they bounce off it.
 
 	Normally the item is drawn where it is and its shadow further along the sun.
-	Raised ones - thrown explosives and shells - are drawn above where they actually are, towards the sun,
+	Raised ones - shells - are drawn above where they actually are, towards the sun,
 	and their shadow is where it would be if they lay there - so once on the floor, they're drawn right where they are,
 	and don't stick into the walls they rest against.
 	Released from the hand, they start rising from exactly where they are.
@@ -116,25 +124,27 @@ inline void scale_shadow_with_distance(flying_item_offsets& offsets, const float
 	offsets.shadow_scale = augs::interp(1.0f, scale_at_reference, distance_ratio);
 }
 
+/*
+	Null for entities that are not items.
+*/
+
+template <class E>
+const item_fall_state* find_item_fall(const E& typed_item) {
+	if constexpr(remove_cref<E>::template has<components::item>()) {
+		return std::addressof(typed_item.template get<components::item>().get_fall());
+	}
+	else {
+		return nullptr;
+	}
+}
+
 template <class E>
 flying_item_offsets calc_flying_item_offsets(const E& typed_item, const double now_secs, const vec2 missile_shadow_offset) {
-	using item_type = remove_cref<E>;
+	const auto* const fall = ::find_item_fall(typed_item);
 
-	const auto* const fall = [&]() -> const item_fall_state* {
-		if constexpr(item_type::template has<components::item>()) {
-			return std::addressof(typed_item.template get<components::item>().get_fall());
-		}
-		else {
-			return nullptr;
-		}
-	}();
+	auto offsets = ::calc_flying_offsets(fall, false, typed_item.get_cosmos().get_fixed_delta(), now_secs, missile_shadow_offset);
 
-	const bool explosive = ::is_like_thrown_explosive(typed_item);
-	const bool raised = RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS && explosive;
-
-	auto offsets = ::calc_flying_offsets(fall, raised, typed_item.get_cosmos().get_fixed_delta(), now_secs, missile_shadow_offset);
-
-	if (explosive && !raised) {
+	if (::is_like_thrown_explosive(typed_item)) {
 		::scale_shadow_with_distance(offsets, THROWN_EXPLOSIVE_SHADOW_SCALE_AT_REFERENCE);
 	}
 
@@ -170,11 +180,5 @@ inline flying_item_offsets calc_shell_offsets(
 		return {};
 	}
 
-	auto offsets = ::calc_flying_offsets(shell_fall, RAISE_SHELLS_ABOVE_SHADOWS, dt, now_secs, missile_shadow_offset, FALLEN_SHELL_SHADOW_DISTANCE);
-
-	if (!RAISE_SHELLS_ABOVE_SHADOWS) {
-		::scale_shadow_with_distance(offsets, SHELL_SHADOW_SCALE_AT_REFERENCE);
-	}
-
-	return offsets;
+	return ::calc_flying_offsets(shell_fall, true, dt, now_secs, missile_shadow_offset, FALLEN_SHELL_SHADOW_DISTANCE);
 }

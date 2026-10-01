@@ -55,13 +55,9 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				auto start = sound_effect_start_input::fire_and_forget(subject.get_logic_transform());
 				start.shell_ejected_by = state.ejected_by;
 				start.shell_roll = true;
-				start.variation_number = augs::hash_multiple(state.seed, state.num_kicks);
+				start.variation_number = augs::hash_multiple(fall.seed, state.num_kicks);
 
-				def.roll_sound.start(step, start, always_predictable_v);
-			};
-
-			auto random_side = [](randomization& rng) {
-				return rng.randval(0, 1) == 0 ? -1.f : 1.f;
+				def.roll_sound.start(step, start, predictable_only_by(state.kicked_by));
 			};
 
 			/*
@@ -72,14 +68,14 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				const auto dot = sideways.dot(direction);
 
 				if (dot == 0.f) {
-					return random_side(rng);
+					return ::random_sign(rng);
 				}
 
 				return dot > 0.f ? 1.f : -1.f;
 			};
 
 			if (kicked) {
-				auto rng = randomization(augs::hash_multiple(state.seed, state.num_kicks++));
+				auto rng = randomization(augs::hash_multiple(fall.seed, state.num_kicks++));
 
 				/*
 					Kicks by items roll the shells for sure - see SHELL_ITEM_CONTACT_ROLL_CHANCE.
@@ -111,24 +107,12 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 				Shells fall only once - see start_shell_falling.
 			*/
 
-			const auto fall_seed = static_cast<rng_seed_type>(state.seed);
+			const auto fall_seed = fall.seed;
 			const auto hit_index = fall.floor_hits_done;
 			const auto hop_height = fall.hop_height;
 
-			::play_floor_hit_sound(
-				step,
-				def.floor_hit_sounds,
-				fall,
-				fall_seed,
-				subject.get_logic_transform(),
-				SHELL_FALL_PITCH_VARIATION,
-				SHELL_FLOOR_HIT_PITCH_VARIATION,
-				state.ejected_by
-			);
-
-			::spin_on_shell_floor_hit(body, hit_index, hop_height, ::calc_shell_length_spin_mult(subject), fall_seed);
-
-			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, fall_seed, now);
+			::start_shell_like_floor_hit(step, subject, body, fall, def.floor_hit_sounds, state.ejected_by);
+			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, now);
 			fall.hop_height = ::calc_shell_hop_height(fall.hop_duration_secs);
 
 			auto side_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::ROLL_SIDE);
@@ -146,7 +130,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 					body.set_velocity(body.get_velocity() + slide);
 				}
 			}
-			else if (def.rolls && hop_height < SHELL_ROLLING_BELOW_HOP_HEIGHT) {
+			else if (def.rolls) {
 				const auto speed = push_rng.randval(SHELL_LOW_HOP_ROLL_MIN_SPEED, SHELL_LOW_HOP_ROLL_MAX_SPEED) * ::calc_shell_low_hop_roll_mult(hop_height);
 				body.set_velocity(body.get_velocity() + sideways * roll_side * speed);
 			}
@@ -174,7 +158,7 @@ void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 			auto& state = subject.template get<components::remnant>();
 
 			auto shrink_or_delete = [&](const real32 remaining_ms) {
-				const auto size_mult = remaining_ms / def.start_shrinking_when_remaining_ms;
+				const auto size_mult = def.start_shrinking_when_remaining_ms > 0.f ? remaining_ms / def.start_shrinking_when_remaining_ms : remaining_ms;
 
 				if (size_mult <= 0.f) {
 					step.queue_deletion_of(subject, "Remnant expiration");

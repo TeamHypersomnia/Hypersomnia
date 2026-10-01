@@ -375,12 +375,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	auto calc_ground_scale = [&]() {
 		if constexpr(E::template has<components::item>()) {
-			/*
-				As the view sees it once this step is solved, so the body is fully grown by the step the first hop tops at.
-			*/
-
-			const auto solved_secs = cosm.get_total_seconds_passed() + cosm.get_fixed_delta().in_seconds();
-			return ::calc_ground_body_scale(handle, solved_secs);
+			return ::calc_ground_body_scale(handle);
 		}
 		else {
 			return 1.f;

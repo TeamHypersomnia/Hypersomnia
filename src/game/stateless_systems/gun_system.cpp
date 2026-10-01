@@ -251,7 +251,8 @@ static void spawn_shell(
 		const auto remnant_def = shell_entity.template find<invariants::remnant>();
 
 		if (remnant != nullptr && remnant_def != nullptr) {
-			remnant->seed = shell_seed;
+			/* Also seeds the kicks of shells that don't fall. */
+			remnant->fall.seed = shell_seed;
 
 			/*
 				Only so many shells of a gun hit the floor audibly at once - see sound_system::evict_excess_shell_sounds.
