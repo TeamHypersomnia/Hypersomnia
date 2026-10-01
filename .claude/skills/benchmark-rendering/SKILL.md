@@ -24,12 +24,34 @@ One run with alternating phases cancels out scene, thermal and clock differences
   did last (editor, menu, a server...) - and only if `skip_tutorial` is true, else the tutorial.
   `launch_at_startup: MAIN_MENU` in the config would send it to the menu too.
 - A different scene (editor, a map on a server) needs a different measuring setup - ask the user if the range isn't representative.
+- **A specific map, with a fixed camera:** open it in the editor with `--edit <project dir>`, e.g.
+  `../build/current/Hypersomnia --edit user/projects/de_cyberaqua_bench` (cwd = `hypersomnia/`).
+  Confirm `Launched mode: EDITOR` and that no `DTOR finished: ~editor_setup` follows right after loading -
+  builds before 2026-10-01 fell through to the project selector with `--edit` (missing `break` in `work.cpp`).
+  - Never benchmark on the official `content/arenas/*` or the user's own `user/projects/*`: the editor writes
+    `navmesh.nav`, `editor_view.json` and autosaves there. Copy the arena to `user/projects/<name>_bench`,
+    rename its json to match the folder, drop `last_saved.json`, and set `meta.name`.
+  - The editor camera comes from `editor_view.json` (`panned_camera.transform.pos`, `zoom`) - set it to frame
+    what is measured, e.g. zoom 0.45 at the average position of the lights to catch many of them.
+- **Never use `--apply-config` for a benchmark variant:** the patch lands in `user/runtime_prefs.json` when the game quits
+  (even on `timeout`'s SIGTERM), silently changing the user's settings. Back up `runtime_prefs.json` and diff it after the run,
+  or toggle the setting in code with a `/* BENCH TEMP */` flag. The editor also saves its camera to `editor_view.json` on quit -
+  reset it before every run so the scene stays the same.
+- **CPU-side light work:** the profiler has `light_ray_casts`, `light_aabb_queries`, `lights_recalculated`,
+  `lights_reused` and `light_jobs_cpu_us` per frame (`frame_profiler.h`, summed by the light jobs in
+  `launch_visibility_jobs.cpp` from the per-thread `thread_physics_query_counters`). Log them in the A/B harness
+  instead of the GPU query when the measured thing is CPU work.
+  The light jobs run in parallel on the thread pool, so their summed CPU time barely moves the FPS on a many-core machine -
+  report the CPU sum, not just FPS.
 - Uncapped already: `vsync_mode` is `OFF` in `default_config.json`, and `max_fps` is disabled (`OFF_max_fps` in runtime prefs).
   Verify if the numbers look capped (e.g. exactly 60/144/400 FPS).
 - Launch with cwd = `hypersomnia/`: `cd hypersomnia && timeout 76 ../build/current/Hypersomnia /range > <scratchpad>/bench.txt 2>&1`.
   From the repo root the game fails to read its config and litters the root with empty `cache/`, `user/`, `logs/`.
 - LOG output goes to stdout, so it lands in the redirected file even when `timeout` kills the game.
 - The user allows launching and killing the game by yourself for benchmarks.
+- **Check that no other game instance runs before measuring:** `ps -eo pid,lstart,args | grep "[b]uild/.*Hypersomnia"`.
+  The user often keeps one open (launched via `ninja run -C build/current`). It skews the absolute CPU numbers and FPS -
+  ask them to close it rather than killing it, then rerun. An A/B in one run keeps the ratio roughly right even then.
 
 ## Gotchas: FPS caps and vsync
 
@@ -91,7 +113,17 @@ Suspicious FPS values are the round ones: 60, 144, 165, 240, 400, or anything ex
    Scale the estimate for other resolutions by the pixel count, and state clearly that other hardware wasn't measured.
    Mention the memory cost of any removed FBO: width × height × 4 B for RGBA8 (+ stencil if `WITH_STENCIL`).
 
-## Reference result
+## Reference results
+
+The light shadows cache on de_cyberaqua in the editor (Oct 2026, RX 5700, 25 lights in view, all with heights, zoom 0.45):
+light jobs 3.06 → 0.50 ms of CPU per frame summed over threads (6x less), AABB queries 1319 → 25, 0 ray casts either way
+(lights with a height skip the visibility polygon and use only AABB queries), 407 → 467 FPS.
+With point light heights off (the visibility polygon path, 19 lights at another camera): 2471 → ~1 ray casts per frame,
+3.96 → 0.18 ms of CPU, 409 → 517 FPS. GPU time +0.07 ms with the cache although it draws the same
+geometry - likely GPU clocks at the higher FPS, not a cost.
+
+The sun shadow guard band (384 px past two screen edges) on the same scene: +0.006-0.010 ms GPU on a 1.9 ms frame (~0.5%),
+FPS unchanged, +5 MB of VRAM at 1080p.
 
 The shell smoke `overlay_smoke` FBO pass with no shells on screen (Sep 2026, RX 5700, 1918×1060):
 0.518 vs 0.498 ms GPU per frame (+0.02 ms, ~4%), no FPS difference (~1110 both), 8 MB of VRAM.
