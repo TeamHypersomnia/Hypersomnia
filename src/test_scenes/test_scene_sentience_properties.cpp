@@ -332,8 +332,8 @@ void load_test_scene_sentience_properties(
 	/* Explosion decal flavours */
 	{
 		auto& assets = state.assets;
-		assets.explosion_decal_1 = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_1);
-		assets.explosion_decal_2 = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_2);
+		assets.explosion_decal_small = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_SMALL);
+		assets.explosion_decal_big = to_entity_flavour_id(test_decal_decorations::EXPLOSION_DECAL_BIG);
 	}
 
 	/*

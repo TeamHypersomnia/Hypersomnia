@@ -1000,13 +1000,13 @@ namespace test_flavours {
 
 		/* Explosion decals */
 		explosion_decal_flavour(
-			test_decal_decorations::EXPLOSION_DECAL_1,
-			test_scene_image_id::EXPLOSION_DECAL_1
+			test_decal_decorations::EXPLOSION_DECAL_SMALL,
+			test_scene_image_id::EXPLOSION_DECAL_SMALL
 		);
 
 		explosion_decal_flavour(
-			test_decal_decorations::EXPLOSION_DECAL_2,
-			test_scene_image_id::EXPLOSION_DECAL_2
+			test_decal_decorations::EXPLOSION_DECAL_BIG,
+			test_scene_image_id::EXPLOSION_DECAL_BIG
 		);
 	}
 }

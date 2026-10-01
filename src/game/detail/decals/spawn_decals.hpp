@@ -100,8 +100,12 @@ inline constexpr std::size_t MAX_DECALS_PER_SPOT = 4;
 	Explosion decals.
 */
 
-/* A force grenade explosion (88 damage) spawns the explosion decal at its original sprite size. */
-inline constexpr real32 EXPLOSION_DECAL_BASELINE_DAMAGE = 88.f;
+/*
+	Damage at which the explosion decal is as big as the small sprite.
+	Bigger blasts switch to the big sprite (2x the resolution) once it needs less scaling,
+	so a force grenade practically always uses the small one.
+*/
+inline constexpr real32 EXPLOSION_DECAL_BASELINE_DAMAGE = 66.0f;
 
 /* Explosion decal opacity. */
 inline const rgba EXPLOSION_DECAL_COLORIZE = rgba(255, 255, 255, 255);
@@ -805,35 +809,24 @@ inline void spawn_explosion_decal(
 
 	auto rng = ::make_explosion_decal_rng(cosm, subject, explosion_pos, explosion_decal_rng_purpose::GROUND);
 
-	const std::array<typed_entity_flavour_id<decal_decoration>, 2> variants = {
-		assets.explosion_decal_1,
-		assets.explosion_decal_2
-	};
+	auto get_sprite_size = [&](const typed_entity_flavour_id<decal_decoration> id) {
+		if (id.is_set()) {
+			if (const auto* const flavour_ptr = cosm.find_flavour(id)) {
+				const auto size = vec2(flavour_ptr->template get<invariants::sprite>().size);
 
-	auto flavour = variants[rng.randval(0, 1)];
-
-	if (!flavour.is_set()) {
-		for (const auto& f : variants) {
-			if (f.is_set()) {
-				flavour = f;
-				break;
+				if (size.x > 0.f && size.y > 0.f) {
+					return std::optional<vec2>(size);
+				}
 			}
 		}
-	}
 
-	if (!flavour.is_set()) {
-		return;
-	}
+		return std::optional<vec2>();
+	};
 
-	const auto* const flavour_ptr = cosm.find_flavour(flavour);
+	const auto small_size = get_sprite_size(assets.explosion_decal_small);
+	const auto big_size = get_sprite_size(assets.explosion_decal_big);
 
-	if (flavour_ptr == nullptr) {
-		return;
-	}
-
-	const auto original_size = vec2(flavour_ptr->template get<invariants::sprite>().size);
-
-	if (!(original_size.x > 0.f) || !(original_size.y > 0.f)) {
+	if (!small_size.has_value() && !big_size.has_value()) {
 		return;
 	}
 
@@ -841,11 +834,39 @@ inline void spawn_explosion_decal(
 	const auto rotation = rng.randval(0.f, 360.f);
 
 	/*
+		size_mult is relative to the small sprite.
+	*/
+	const auto final_size = (small_size.has_value() ? *small_size : *big_size) * final_size_mult;
+
+	/*
+		Pick the sprite that has to be scaled up or down the least.
+	*/
+	const auto flavour = [&]() {
+		auto scaling_error = [&](const vec2 sprite_size) {
+			const auto scale = final_size.x / sprite_size.x;
+			return std::max(scale, 1.f / scale);
+		};
+
+		if (!small_size.has_value()) {
+			return assets.explosion_decal_big;
+		}
+
+		if (!big_size.has_value()) {
+			return assets.explosion_decal_small;
+		}
+
+		if (scaling_error(*big_size) < scaling_error(*small_size)) {
+			return assets.explosion_decal_big;
+		}
+
+		return assets.explosion_decal_small;
+	}();
+
+	/*
 		Repeated blasts in one place would just pile up -
 		evict the scorch mark we land on top of.
 	*/
 	{
-		const auto final_size = original_size * final_size_mult;
 		const auto decal_len = std::max(final_size.x, final_size.y);
 
 		nearby_decals nearby;
@@ -867,7 +888,7 @@ inline void spawn_explosion_decal(
 		step,
 		flavour,
 		transformr(explosion_pos, rotation),
-		::to_decal_sprite_size(original_size * final_size_mult),
+		::to_decal_sprite_size(final_size),
 		subject,
 		entity_id(),
 		false,
