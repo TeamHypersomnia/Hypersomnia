@@ -21,16 +21,19 @@
 
 class minimap_sighting_system {
 public:
+	/* A time before anything could happen. */
+	static constexpr double never_secs = -1000.0;
+
 	struct enemy_record {
 		vec2 last_seen_pos;
 
-		/* All times below are in cosmos seconds (get_total_seconds_passed). */
-		double last_seen_at = -1000.0;
+		/* All times below are in the seconds of clock_secs. */
+		double last_seen_at = never_secs;
 
 		/* When the enemy (re)appeared - drives the pulse animation. */
-		double appeared_at = -1000.0;
+		double appeared_at = never_secs;
 
-		double heard_at = -1000.0;
+		double heard_at = never_secs;
 		vec2 heard_pos;
 
 		/*
@@ -55,16 +58,24 @@ public:
 	struct death_record {
 		vec2 pos;
 		faction_type faction = faction_type::SPECTATOR;
-		double when = -1000.0;
+		double when = never_secs;
 	};
 
 	struct event_pulse {
 		vec2 pos;
-		double when = -1000.0;
+		double when = never_secs;
 
 		/* When set, the pulse follows this entity instead of the fixed pos. */
 		entity_id subject;
 	};
+
+	/*
+		The cosmos seconds of the last step recorded - all the records are timed by it.
+		On a client, sightings are recorded from the referential cosmos only,
+		while the viewed one is predicted ahead of it - so the records must never be compared with the viewed cosmos' clock.
+	*/
+
+	double clock_secs = 0.0;
 
 	std::unordered_map<entity_id, enemy_record> enemy_records;
 	std::vector<death_record> recent_deaths;
@@ -90,8 +101,13 @@ public:
 	void clear();
 
 private:
-	unsigned teammate_rotation_counter = 0;
+	enum class bomb_state_type {
+		UNKNOWN,
+		CARRIED,
+		DROPPED,
+		PLANTED
+	};
 
-	/* 0 - unknown, 1 - carried, 2 - dropped, 3 - planted */
-	int prev_bomb_state = 0;
+	unsigned teammate_rotation_counter = 0;
+	bomb_state_type prev_bomb_state = bomb_state_type::UNKNOWN;
 };

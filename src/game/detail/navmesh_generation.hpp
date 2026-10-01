@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "game/common_state/cosmos_navmesh.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
@@ -46,47 +47,26 @@ inline b2AABB compute_exact_fixture_aabb(
 }
 
 /*
-	Collects navmesh island bounds from the cosmos.
-	First checks for NAV_ISLAND area markers, then falls back to 
-	computing the AABB of all fixtures that hit the pathfinding filter.
+	Obstacles at the edges of the map get some room around them for navigation.
 */
 
-inline void collect_navmesh_island_bounds(
-	const cosmos& cosm,
-	std::vector<ltrbi>& island_bounds,
-	const uint32_t cell_size
-) {
-	island_bounds.clear();
+inline ltrbi expand_by_navmesh_margin(ltrbi bounds, const uint32_t cell_size) {
+	const auto margin = static_cast<int>(cell_size * 2);
 
-	/*
-		Check for NAV_ISLAND area markers by iterating actual entities.
-	*/
+	bounds.l -= margin;
+	bounds.t -= margin;
+	bounds.r += margin;
+	bounds.b += margin;
 
-	cosm.for_each_having<invariants::area_marker>(
-		[&](const auto& typed_handle) {
-			const auto& marker = typed_handle.template get<invariants::area_marker>();
+	return bounds;
+}
 
-			if (marker.type == area_marker_type::NAV_ISLAND) {
-				if (const auto aabb = typed_handle.find_aabb()) {
-					island_bounds.push_back(ltrbi(
-						static_cast<int>(aabb->l),
-						static_cast<int>(aabb->t),
-						static_cast<int>(aabb->r),
-						static_cast<int>(aabb->b)
-					));
-				}
-			}
-		}
-	);
+/*
+	The bounds of every fixture hitting the pathfinding filter - what a map is made of.
+	build_arena_from_editor_project gives maps without NAV_ISLAND markers one of these bounds.
+*/
 
-	if (!island_bounds.empty()) {
-		return;
-	}
-
-	/*
-		Fall back: compute AABB from all fixtures that hit the pathfinding filter.
-	*/
-
+inline std::optional<ltrbi> calc_bounds_of_pathfinding_obstacles(const cosmos& cosm) {
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto& b2w = physics.get_b2world();
 	const auto pathfinding_filter = predefined_queries::pathfinding();
@@ -141,15 +121,48 @@ inline void collect_navmesh_island_bounds(
 		}
 	}
 
-	if (!first) {
-		/* Expand the bounding box a bit for navigation */
-		const auto margin = static_cast<int>(cell_size * 2);
-		total_aabb.l -= margin;
-		total_aabb.t -= margin;
-		total_aabb.r += margin;
-		total_aabb.b += margin;
+	if (first) {
+		return std::nullopt;
+	}
 
-		island_bounds.push_back(total_aabb);
+	return total_aabb;
+}
+
+/*
+	Collects navmesh island bounds from the NAV_ISLAND area markers of the cosmos -
+	or, with none, the bounds of all obstacles.
+*/
+
+inline void collect_navmesh_island_bounds(
+	const cosmos& cosm,
+	std::vector<ltrbi>& island_bounds,
+	const uint32_t cell_size
+) {
+	island_bounds.clear();
+
+	cosm.for_each_having<invariants::area_marker>(
+		[&](const auto& typed_handle) {
+			const auto& marker = typed_handle.template get<invariants::area_marker>();
+
+			if (marker.type == area_marker_type::NAV_ISLAND) {
+				if (const auto aabb = typed_handle.find_aabb()) {
+					island_bounds.push_back(ltrbi(
+						static_cast<int>(aabb->l),
+						static_cast<int>(aabb->t),
+						static_cast<int>(aabb->r),
+						static_cast<int>(aabb->b)
+					));
+				}
+			}
+		}
+	);
+
+	if (!island_bounds.empty()) {
+		return;
+	}
+
+	if (const auto bounds = ::calc_bounds_of_pathfinding_obstacles(cosm)) {
+		island_bounds.push_back(::expand_by_navmesh_margin(*bounds, cell_size));
 	}
 }
 

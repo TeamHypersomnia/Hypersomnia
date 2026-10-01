@@ -38,9 +38,36 @@ constexpr float minimap_laser_dash_len_v = 4.0f;
 constexpr float minimap_laser_dash_velocity_v = 20.0f;
 constexpr float minimap_laser_alpha_mult_v = 0.7f;
 
+/* Icons are drawn at this part of their original size. */
+constexpr float minimap_icon_size_mult_v = 0.75f;
+
+/* The dot of an enemy seen a while ago, relative to a live one. */
+constexpr float minimap_stale_dot_size_mult_v = 1.25f / 1.5f;
+
+/*
+	Every map built from a project has at least one - see build_arena_from_editor_project.
+*/
+
+static bool has_any_nav_island(const cosmos& cosm) {
+	bool found = false;
+
+	cosm.for_each_having<invariants::area_marker>([&](const auto& typed_handle) {
+		if (typed_handle.template get<invariants::area_marker>().type == area_marker_type::NAV_ISLAND) {
+			found = true;
+		}
+	});
+
+	return found;
+}
+
 static void draw_minimap_impl(const draw_minimap_input in) {
 	if (in.out_transform != nullptr) {
 		in.out_transform->valid = false;
+	}
+
+	/* Without nav islands there are no bounds to lay the minimap out by. */
+	if (in.viewed_character.alive() && !::has_any_nav_island(in.viewed_character.get_cosmos())) {
+		return;
 	}
 
 	/*
@@ -50,6 +77,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	*/
 
 	const auto settings = in.settings.with_faded_background(in.state);
+	const auto hud_scale = settings.hud_scale;
 	const auto rect = ltrb(calc_minimap_rect(settings, in.screen_size, in.state));
 
 	/* Only the scoreboard extends the queried range. */
@@ -176,48 +204,6 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 			}
 		);
 
-		const bool try_physical_bounds = !world_bounds.has_value();
-
-		const auto obstacle_categories = uint16(
-			(1 << int(filter_category::WALL)) |
-			(1 << int(filter_category::GLASS_OBSTACLE))
-		);
-
-		for (const b2Body* body = try_physical_bounds ? physics.get_b2world().GetBodyList() : nullptr; body != nullptr; body = body->GetNext()) {
-			if (body->GetType() != b2_staticBody) {
-				continue;
-			}
-
-			for (const b2Fixture* f = body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-				if (f->IsSensor()) {
-					continue;
-				}
-
-				if ((f->GetFilterData().categoryBits & obstacle_categories) == 0) {
-					continue;
-				}
-
-				const auto* const shape = f->GetShape();
-
-				for (int32 c = 0; c < shape->GetChildCount(); ++c) {
-					auto aabb = b2AABB();
-					shape->ComputeAABB(&aabb, body->GetTransform(), c);
-
-					const auto fixture_bounds = ltrb::from_points(
-						si.get_pixels(vec2(aabb.lowerBound)),
-						si.get_pixels(vec2(aabb.upperBound))
-					);
-
-					if (world_bounds.has_value()) {
-						world_bounds->contain(fixture_bounds);
-					}
-					else {
-						world_bounds = fixture_bounds;
-					}
-				}
-			}
-		}
-
 		if (world_bounds.has_value()) {
 			/*
 				Small maps: some players prefer to always see the whole map
@@ -231,8 +217,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 
 			if (show_entire_map || entire_map_fits) {
 				/*
-					The scoreboard view: the whole map centered,
-					regardless of where the player is.
+					The whole map centered, regardless of where the player is.
 				*/
 				world_center = world_bounds->get_center();
 				world_side = std::max(world_bounds->w(), world_bounds->h()) * 1.05f;
@@ -253,15 +238,23 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		}
 	}
 
+	/* A degenerate island leaves nothing to fit. */
+	if (!(world_side > 0.0f)) {
+		draw_frame();
+		return;
+	}
+
 	const auto scale = rect.w() / world_side;
 	const auto minimap_center = rect.get_center();
 
+	const auto world_transform = minimap_world_transform { world_center, scale, minimap_center, viewer_transform->pos, true };
+
 	if (in.out_transform != nullptr) {
-		*in.out_transform = { world_center, scale, minimap_center, true };
+		*in.out_transform = world_transform;
 	}
 
 	auto to_minimap = [&](const vec2 world_pos) {
-		return minimap_center + (world_pos - world_center) * scale;
+		return world_transform.to_minimap(world_pos);
 	};
 
 	/*
@@ -323,18 +316,19 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		}
 	};
 
-	auto push_circle_ring = [&](
+	auto push_arc_ring = [&](
 		augs::vertex_triangle_buffer& buf,
 		const vec2 center,
 		const float inner_r,
 		const float outer_r,
+		const float begin_degrees,
+		const float length_degrees,
+		const int num_segments,
 		const rgba col
 	) {
-		const auto n = minimap_circle_segments_v;
-
-		for (int i = 0; i < n; ++i) {
-			const auto d0 = vec2::from_degrees(360.f * i / n);
-			const auto d1 = vec2::from_degrees(360.f * (i + 1) / n);
+		for (int i = 0; i < num_segments; ++i) {
+			const auto d0 = vec2::from_degrees(begin_degrees + length_degrees * i / num_segments);
+			const auto d1 = vec2::from_degrees(begin_degrees + length_degrees * (i + 1) / num_segments);
 
 			const auto i0 = center + d0 * inner_r;
 			const auto i1 = center + d1 * inner_r;
@@ -344,6 +338,16 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 			push_triangle(buf, i0, o0, o1, col);
 			push_triangle(buf, i0, o1, i1, col);
 		}
+	};
+
+	auto push_circle_ring = [&](
+		augs::vertex_triangle_buffer& buf,
+		const vec2 center,
+		const float inner_r,
+		const float outer_r,
+		const rgba col
+	) {
+		push_arc_ring(buf, center, inner_r, outer_r, 0.0f, 360.0f, minimap_circle_segments_v, col);
 	};
 
 	auto push_line_quad = [&](
@@ -381,11 +385,11 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 
 		const auto dir = line_vector / line_length;
 
-		auto dash_end = static_cast<float>(std::fmod(in.global_time_seconds * dash_velocity, dash_length * 2));
+		auto dash_end = std::min(static_cast<float>(std::fmod(in.global_time_seconds * dash_velocity, dash_length * 2)), line_length);
 		auto dash_begin = std::max(dash_end - dash_length, 0.0f);
 
 		while (dash_begin < line_length) {
-			push_line_quad(buf, from + dir * dash_begin, from + dir * dash_end, 1.0f, col);
+			push_line_quad(buf, from + dir * dash_begin, from + dir * dash_end, hud_scale, col);
 
 			dash_begin = dash_end + dash_length;
 			dash_end = std::min(dash_begin + dash_length, line_length);
@@ -552,10 +556,12 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		}
 	);
 
-	const auto now = cosm.get_total_seconds_passed();
+	/* The clock of the sightings - see minimap_sighting_system::clock_secs. */
+	const auto now = in.sighting.clock_secs;
 	const auto viewer_faction = viewed.get_official_faction();
 
-	const auto dot_radius = minimap_dot_radius_v * settings.dot_size_mult;
+	const auto dot_radius = minimap_dot_radius_v * settings.dot_size_mult * hud_scale;
+	const auto icon_size_mult = minimap_icon_size_mult_v * hud_scale;
 
 	auto push_pulse = [&](
 		const vec2 minimap_pos,
@@ -578,7 +584,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 
 		const auto radius = dot_radius * (1.0f + growth_mult * t);
 
-		push_circle_ring(in.foreground_output, minimap_pos, radius - 1.5f, radius + 1.5f, col);
+		push_circle_ring(in.foreground_output, minimap_pos, radius - 1.5f * hud_scale, radius + 1.5f * hud_scale, col);
 	};
 
 	/*
@@ -652,8 +658,8 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 					to_minimap(seg.from),
 					to_minimap(seg.to),
 					base_color,
-					minimap_laser_dash_len_v,
-					dash_velocity
+					minimap_laser_dash_len_v * hud_scale,
+					dash_velocity * hud_scale
 				);
 			}
 		}
@@ -665,8 +671,6 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	*/
 
 	{
-		const auto icon_size_mult = 0.75f;
-
 		cosm.for_each_having<invariants::area_marker>(
 			[&](const auto& typed_handle) {
 				const auto& marker_def = typed_handle.template get<invariants::area_marker>();
@@ -692,7 +696,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 					so it stays legible over the obstacle shapes.
 				*/
 
-				const auto bg_rect = ltrb::center_and_size(center, icon_size + vec2::square(8));
+				const auto bg_rect = ltrb::center_and_size(center, icon_size + vec2::square(8 * hud_scale));
 
 				auto bg_col = settings.marker_color;
 				bg_col.multiply_rgb(0.2f);
@@ -716,7 +720,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 						corners[c],
 						corners[(c + 1) % corners.size()],
 						bg_border_col,
-						3.0f,
+						3.0f * hud_scale,
 						0.0f
 					);
 				}
@@ -737,8 +741,6 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	*/
 
 	{
-		const auto icon_size_mult = 0.75f;
-
 		for (const auto& special : in.special_indicators) {
 			/*
 				The minimap-only ones (the carried bomb) are drawn
@@ -798,7 +800,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		so it stays visible next to the bomb icon.
 	*/
 	auto arrow_radius_of = [&](const entity_id& character_id) {
-		return character_id == in.bomb_owner ? dot_radius + 2.0f : dot_radius;
+		return character_id == in.bomb_owner ? dot_radius + 2.0f * hud_scale : dot_radius;
 	};
 
 	/*
@@ -807,14 +809,14 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	auto push_facing_triangle = [&](
 		const vec2 minimap_pos,
 		const float facing_degrees,
-		const float dot_radius,
+		const float orbit_radius,
 		const rgba col
 	) {
 		const auto dir = vec2::from_degrees(facing_degrees);
 
-		const auto tip = minimap_pos + dir * (dot_radius + 6.0f);
-		const auto base_center = minimap_pos + dir * (dot_radius + 1.0f);
-		const auto side = dir.perpendicular_cw() * 4.5f;
+		const auto tip = minimap_pos + dir * (orbit_radius + 6.0f * hud_scale);
+		const auto base_center = minimap_pos + dir * (orbit_radius + 1.0f * hud_scale);
+		const auto side = dir.perpendicular_cw() * 4.5f * hud_scale;
 
 		push_triangle(in.foreground_output, tip, base_center + side, base_center - side, col);
 	};
@@ -845,17 +847,17 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 				return;
 			}
 
-			const auto dot_r = dot_radius;
-			const auto minimap_pos = clamp_to_border(to_minimap(transform->pos), vec2::square(dot_r));
+			const auto minimap_pos = clamp_to_border(to_minimap(transform->pos), vec2::square(dot_radius));
 
 			push_filled_circle(
 				in.foreground_output,
 				minimap_pos,
-				dot_r,
+				dot_radius,
 				settings.teammate_color
 			);
 
-			push_facing_triangle(minimap_pos, transform->rotation, arrow_radius_of(entity_id(typed_handle.get_id())), settings.teammate_color);
+			const auto teammate_arrow_radius = arrow_radius_of(entity_id(typed_handle.get_id()));
+			push_facing_triangle(minimap_pos, transform->rotation, teammate_arrow_radius, settings.teammate_color);
 
 			draw_laser_of(typed_handle, false);
 		}
@@ -866,7 +868,23 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		with a pulse ring on each (re)appearance.
 	*/
 
+	/*
+		In a stable order, so that overlapping dots don't swap as the map of records rehashes.
+	*/
+
+	thread_local std::vector<const std::pair<const entity_id, minimap_sighting_system::enemy_record>*> sorted_enemy_records;
+	sorted_enemy_records.clear();
+
 	for (const auto& it : in.sighting.enemy_records) {
+		sorted_enemy_records.push_back(std::addressof(it));
+	}
+
+	std::sort(sorted_enemy_records.begin(), sorted_enemy_records.end(), [](const auto* const a, const auto* const b) {
+		return a->first < b->first;
+	});
+
+	for (const auto* const it_ptr : sorted_enemy_records) {
+		const auto& it = *it_ptr;
 		const auto& rec = it.second;
 
 		{
@@ -899,7 +917,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		else if (heard_recently && rec.heard_at > rec.last_seen_at) {
 			dot_pos = rec.heard_pos;
 		}
-		else if (rec.last_seen_at > -1000.0) {
+		else if (rec.last_seen_at > minimap_sighting_system::never_secs) {
 			dot_pos = rec.last_seen_pos;
 			dot_color.mult_alpha(0.6f);
 			stale = true;
@@ -910,11 +928,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		}
 
 		/* The last-seen dot is drawn smaller than the live one. */
-		auto dot_r = dot_radius;
-
-		if (stale) {
-			dot_r = dot_radius * (1.25f / 1.5f);
-		}
+		const auto dot_r = stale ? dot_radius * minimap_stale_dot_size_mult_v : dot_radius;
 
 		const auto minimap_pos = to_minimap(*dot_pos);
 
@@ -942,7 +956,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 			continue;
 		}
 
-		const auto icon_size = vec2(special.radar_tex.get_original_size()) * 0.75f;
+		const auto icon_size = vec2(special.radar_tex.get_original_size()) * icon_size_mult;
 
 		fg_drawer.aabb_centered(
 			special.radar_tex,
@@ -959,13 +973,12 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 	draw_laser_of(viewed, true);
 
 	{
-		const auto dot_r = dot_radius;
 		const auto minimap_pos = to_minimap(viewer_transform->pos);
 
 		push_filled_circle(
 			in.foreground_output,
 			minimap_pos,
-			dot_r,
+			dot_radius,
 			settings.player_color
 		);
 
@@ -980,9 +993,9 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 		if (settings.draw_viewed_player_ring) {
 			const auto facing = viewer_transform->rotation;
 
-			const auto ring_r = dot_r + 5.0f;
-			const auto inner_r = ring_r - 1.5f;
-			const auto outer_r = ring_r + 1.5f;
+			const auto ring_r = dot_radius + 5.0f * hud_scale;
+			const auto inner_r = ring_r - 1.5f * hud_scale;
+			const auto outer_r = ring_r + 1.5f * hud_scale;
 
 			/*
 				The arc is anchored to the facing angle, so its ends
@@ -992,18 +1005,17 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 			const auto gap_half_angle = 120.0f;
 			const auto arc_begin = facing + gap_half_angle;
 			const auto arc_length = 360.0f - 2 * gap_half_angle;
-			const auto n = minimap_circle_segments_v * 2;
 
-			for (int i = 0; i < n; ++i) {
-				const auto a0 = arc_begin + arc_length * i / n;
-				const auto a1 = arc_begin + arc_length * (i + 1) / n;
-
-				const auto d0 = vec2::from_degrees(a0);
-				const auto d1 = vec2::from_degrees(a1);
-
-				push_triangle(in.foreground_output, minimap_pos + d0 * inner_r, minimap_pos + d0 * outer_r, minimap_pos + d1 * outer_r, settings.player_color);
-				push_triangle(in.foreground_output, minimap_pos + d0 * inner_r, minimap_pos + d1 * outer_r, minimap_pos + d1 * inner_r, settings.player_color);
-			}
+			push_arc_ring(
+				in.foreground_output,
+				minimap_pos,
+				inner_r,
+				outer_r,
+				arc_begin,
+				arc_length,
+				minimap_circle_segments_v * 2,
+				settings.player_color
+			);
 		}
 	}
 

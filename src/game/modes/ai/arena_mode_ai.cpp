@@ -53,6 +53,7 @@
 #include "game/modes/ai/intents/calc_requested_interaction.hpp"
 #include "game/modes/ai/intents/calc_hand_flags.hpp"
 #include "game/modes/ai/tasks/can_weapon_penetrate.hpp"
+#include "game/detail/gun/gunshot_hearing.h"
 #include "game/cosmos/make_physics_path_hints.h"
 #include "game/modes/ai/tasks/bot_avoidance.hpp"
 #include "game/modes/ai/tasks/bullet_avoidance.hpp"
@@ -1334,15 +1335,14 @@ void post_solve_arena_mode_ai(
 
 		const auto muzzle_pos = shot.muzzle_transform.pos;
 
-		/* Only react to gunshots within hearing range (80% of max_distance) */
+		/* Only react to gunshots within hearing range */
 		{
 			bool out_of_range = false;
 			const auto gun_handle = cosm[shot.subject];
 
 			if (gun_handle.alive()) {
 				gun_handle.dispatch_on_having_all<invariants::gun>([&](const auto& typed_gun) {
-					const auto& gun_def = typed_gun.template get<invariants::gun>();
-					const auto hearing_dist = gun_def.muzzle_shot_sound.modifier.max_distance * 0.8f;
+					const auto hearing_dist = ::calc_gunshot_hearing_distance(typed_gun.template get<invariants::gun>());
 					const auto dist_sq = (character_pos - muzzle_pos).length_sq();
 
 					if (dist_sq > hearing_dist * hearing_dist) {

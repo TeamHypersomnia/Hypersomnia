@@ -828,15 +828,7 @@ void arena_gui_state::draw_mode_gui(
 					The money block lives at the right bottom.
 					When the minimap occupies the same corner, stack above it.
 				*/
-				const auto rb_minimap_shift = [&]() {
-					const auto& minimap = in.config.drawing.minimap;
-
-					if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-						return minimap.get_gameplay_appearance().size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
-					}
-
-					return 0;
-				}();
+				const auto rb_minimap_shift = ::calc_minimap_corner_reservation(in.config.drawing.minimap, hud_corner_type::RIGHT_BOTTOM);
 
 				/*
 					The money bar sits exactly one row above the character's
@@ -1218,10 +1210,9 @@ void arena_gui_state::draw_mode_gui(
 			const auto corner_occupied = [&]() {
 				auto result = 0;
 
-				const auto& minimap = in.config.drawing.minimap;
-
-				if (minimap.occupies_corner(corner)) {
-					result += minimap.get_gameplay_appearance().size + 2 * minimap_screen_margin_v;
+				/* Knockouts keep another margin's gap from the minimap. */
+				if (const auto reservation = ::calc_minimap_corner_reservation(in.config.drawing.minimap, corner); reservation > 0) {
+					result += reservation + minimap_screen_margin_v;
 				}
 
 				if (corner == hud_corner_type::RIGHT_BOTTOM) {

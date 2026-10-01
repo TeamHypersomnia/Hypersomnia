@@ -22,7 +22,15 @@ struct minimap_world_transform {
 	vec2 world_center;
 	float scale = 0.0f;
 	vec2 minimap_center;
+
+	/* Where the viewed character was drawn, in the world. */
+	vec2 viewer_pos;
+
 	bool valid = false;
+
+	vec2 to_minimap(const vec2 world_pos) const {
+		return minimap_center + (world_pos - world_center) * scale;
+	}
 };
 
 struct draw_minimap_input {

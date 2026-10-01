@@ -2926,8 +2926,10 @@ work_result work(
 				const auto screen_ratio = screen_height / reference_screen_height;
 
 				for (auto& appearance : config_copy.drawing.minimap.appearances) {
-					appearance.size = static_cast<int>(appearance.size * screen_ratio);
+					appearance.size = std::max(1, static_cast<int>(appearance.size * screen_ratio));
 				}
+
+				config_copy.drawing.minimap.hud_scale = screen_ratio;
 			}
 
 			if (config_copy.drawing.cinematic_mode) {
@@ -5280,7 +5282,7 @@ work_result work(
 									indicator_meta,
 									viewed_character,
 									viewing_config.drawing,
-									get_audiovisuals().get<minimap_sighting_system>().recent_deaths
+									get_audiovisuals().get<minimap_sighting_system>()
 								);
 							}
 						);
@@ -5326,7 +5328,7 @@ work_result work(
 				});
 
 				/*
-					When the scoreboard is open, the minimap doubles its range.
+					When the scoreboard is open, the minimap is drawn UNDER_TAB - see minimap_tab_behavior_type.
 				*/
 				const bool minimap_extended_range = visit_current_setup([&](const auto& setup) {
 					using S = remove_cref<decltype(setup)>;
@@ -5601,21 +5603,7 @@ work_result work(
 					auto& chosen_renderer = get_general_renderer();
 
 					if (minimap.is_visible(illuminated_input.minimap_state) && get_viewed_character().alive()) {
-						const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, illuminated_input.minimap_state);
-
-						/*
-							The border is drawn outside of the minimap rect,
-							so the scissor must accommodate it.
-						*/
-						const auto scissor_expansion = minimap.border_thickness;
-
-						/* GL scissor origin is bottom-left. */
-						chosen_renderer.set_scissor_bounds({
-							minimap_rect.l - scissor_expansion,
-							screen_size.y - (minimap_rect.b + scissor_expansion),
-							minimap_rect.w() + 2 * scissor_expansion,
-							minimap_rect.h() + 2 * scissor_expansion
-						});
+						chosen_renderer.set_scissor_bounds(::calc_minimap_scissor(minimap, screen_size, illuminated_input.minimap_state));
 
 						chosen_renderer.set_scissor(true);
 
@@ -5800,15 +5788,7 @@ work_result work(
 				;
 
 				if (draw_fow_overlay) {
-					const auto minimap_rect = ::calc_minimap_rect(minimap, screen_size, minimap_state);
-					const auto scissor_expansion = minimap.border_thickness;
-
-					chosen_renderer.set_scissor_bounds({
-						minimap_rect.l - scissor_expansion,
-						screen_size.y - (minimap_rect.b + scissor_expansion),
-						minimap_rect.w() + 2 * scissor_expansion,
-						minimap_rect.h() + 2 * scissor_expansion
-					});
+					chosen_renderer.set_scissor_bounds(::calc_minimap_scissor(minimap, screen_size, minimap_state));
 
 					chosen_renderer.set_scissor(true);
 
@@ -5846,8 +5826,7 @@ work_result work(
 						const auto left_dir = vec2(dir).rotate(-considered_angle / 2).neg_y();
 						const auto right_dir = vec2(dir).rotate(considered_angle / 2).neg_y();
 
-						const auto eye_world_pos = viewed_character.find_viewing_transform(get_audiovisuals().get<interpolation_system>())->pos;
-						const auto eye_minimap_pos = minimap_transform.minimap_center + (eye_world_pos - minimap_transform.world_center) * minimap_transform.scale;
+						const auto eye_minimap_pos = minimap_transform.to_minimap(minimap_transform.viewer_pos);
 						const auto eye_frag_pos = vec2(eye_minimap_pos.x, screen_size.y - eye_minimap_pos.y);
 
 						fow_shader->set_uniform(chosen_renderer, U::startingAngleVec, left_dir);
@@ -5868,7 +5847,7 @@ work_result work(
 						auto mapped = tri;
 
 						for (auto& v : mapped.vertices) {
-							v.pos = minimap_transform.minimap_center + (v.pos - minimap_transform.world_center) * minimap_transform.scale;
+							v.pos = minimap_transform.to_minimap(v.pos);
 							v.color = fow_color;
 						}
 

@@ -498,6 +498,64 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		};
 
 		resolve_node_dependencies();
+
+		/*
+			A map without any NAV_ISLAND gets one over all its obstacles - with the same margin the navmesh had for such maps -
+			so that the bots' navmesh and the minimap's bounds always come from nav islands.
+		*/
+
+		auto add_nav_island_if_none = [&]() {
+			bool any_nav_island = false;
+
+			scene.world.template for_each_having<invariants::area_marker>([&](const auto& typed_handle) {
+				if (typed_handle.template get<invariants::area_marker>().type == area_marker_type::NAV_ISLAND) {
+					any_nav_island = true;
+				}
+			});
+
+			if (any_nav_island) {
+				return;
+			}
+
+			const auto obstacles_bounds = ::calc_bounds_of_pathfinding_obstacles(scene.world);
+
+			if (!obstacles_bounds.has_value()) {
+				return;
+			}
+
+			const auto cell_size = std::max(16u, project.settings.navmesh_cell_size);
+			const auto island_bounds = ltrb(::expand_by_navmesh_margin(*obstacles_bounds, cell_size));
+
+			LOG("No NAV_ISLAND on the map - adding one over all its obstacles: %x", island_bounds);
+
+			for (const auto& resource : official.resources.get_pool_for<editor_area_marker_resource>()) {
+				if (resource.editable.type != area_marker_type::NAV_ISLAND) {
+					continue;
+				}
+
+				std::visit(
+					[&](const auto& typed_flavour_id) {
+						cosmic::specific_create_entity(
+							access,
+							scene.world,
+							typed_flavour_id,
+							[&](const auto& handle, auto& agg) {
+								if (auto geo = agg.template find<components::overridden_geo>()) {
+									geo->size = vec2i(island_bounds.get_size());
+								}
+
+								handle.set_logic_transform(transformr(island_bounds.get_center(), 0.0f));
+							}
+						);
+					},
+					resource.scene_flavour_id
+				);
+
+				return;
+			}
+		};
+
+		add_nav_island_if_none();
 	};
 
 	/* 

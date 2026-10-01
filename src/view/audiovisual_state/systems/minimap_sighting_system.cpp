@@ -1,4 +1,5 @@
 #include <vector>
+#include <optional>
 #include "augs/math/rects.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -15,19 +16,40 @@
 #include "augs/log.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
+#include "game/detail/gun/gunshot_hearing.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
+
+/*
+	The faction of a conscious character - nothing for anyone else.
+*/
+
+template <class H>
+static std::optional<faction_type> find_conscious_faction(const H& handle) {
+	if (handle.alive()) {
+		if (const auto* const sentience = handle.template find<components::sentience>()) {
+			if (sentience->is_conscious()) {
+				return handle.get_official_faction();
+			}
+		}
+	}
+
+	return std::nullopt;
+}
 
 void minimap_sighting_system::clear() {
 	enemy_records.clear();
 	recent_deaths.clear();
 	bomb_pulse = {};
 	teammate_rotation_counter = 0;
-	prev_bomb_state = 0;
+	prev_bomb_state = bomb_state_type::UNKNOWN;
+	clock_secs = 0.0;
 }
 
 void minimap_sighting_system::record_deaths(const const_logic_step step) {
 	const auto& cosm = step.get_cosmos();
 	const auto now = cosm.get_total_seconds_passed();
+
+	clock_secs = now;
 
 	/* Prune old entries, and ones from the future after a clock rewind. */
 	erase_if(
@@ -138,13 +160,8 @@ void minimap_sighting_system::advance(
 			rec.appeared_at > now
 		;
 
-		const bool still_relevant =
-			!from_the_future &&
-			handle.alive() &&
-			handle.template find<components::sentience>() != nullptr &&
-			handle.template get<components::sentience>().is_conscious() &&
-			handle.get_official_faction() != viewer_faction
-		;
+		const auto faction = ::find_conscious_faction(handle);
+		const bool still_relevant = !from_the_future && faction.has_value() && *faction != viewer_faction;
 
 		if (still_relevant) {
 			++it;
@@ -197,12 +214,7 @@ void minimap_sighting_system::advance(
 				if (!found_in(effective_observers, rec.last_seen_by)) {
 					const auto tracker = cosm[rec.last_seen_by];
 
-					const bool valid_tracker =
-						tracker.alive() &&
-						tracker.template find<components::sentience>() != nullptr &&
-						tracker.template get<components::sentience>().is_conscious() &&
-						tracker.get_official_faction() == viewer_faction
-					;
+					const bool valid_tracker = ::find_conscious_faction(tracker) == viewer_faction;
 
 					if (valid_tracker) {
 						effective_observers.push_back(rec.last_seen_by);
@@ -298,8 +310,7 @@ void minimap_sighting_system::advance(
 
 			if (gun_handle.alive()) {
 				gun_handle.dispatch_on_having_all<invariants::gun>([&](const auto& typed_gun) {
-					const auto& gun_def = typed_gun.template get<invariants::gun>();
-					hearing_dist = gun_def.muzzle_shot_sound.modifier.max_distance * 0.8f;
+					hearing_dist = ::calc_gunshot_hearing_distance(typed_gun.template get<invariants::gun>());
 				});
 			}
 		}
@@ -350,8 +361,7 @@ void minimap_sighting_system::advance(
 			bomb_pulse = {};
 		}
 
-		/* 0 - unknown, 1 - carried, 2 - dropped, 3 - planted */
-		auto bomb_state = 0;
+		auto bomb_state = bomb_state_type::UNKNOWN;
 		auto bomb_pos = vec2();
 		auto bomb_id = entity_id();
 
@@ -372,13 +382,13 @@ void minimap_sighting_system::advance(
 				const auto& fuse = typed_handle.template get<components::hand_fuse>();
 
 				if (fuse.armed()) {
-					bomb_state = 3;
+					bomb_state = bomb_state_type::PLANTED;
 				}
 				else if (typed_handle.get_owning_transfer_capability().alive()) {
-					bomb_state = 1;
+					bomb_state = bomb_state_type::CARRIED;
 				}
 				else {
-					bomb_state = 2;
+					bomb_state = bomb_state_type::DROPPED;
 				}
 
 				bomb_pos = transform->pos;
@@ -386,10 +396,10 @@ void minimap_sighting_system::advance(
 			}
 		);
 
-		const bool became_dropped = bomb_state == 2 && prev_bomb_state != 2;
-		const bool became_planted = bomb_state == 3 && prev_bomb_state != 3;
+		const bool became_dropped = bomb_state == bomb_state_type::DROPPED && prev_bomb_state != bomb_state_type::DROPPED;
+		const bool became_planted = bomb_state == bomb_state_type::PLANTED && prev_bomb_state != bomb_state_type::PLANTED;
 
-		if ((became_dropped || became_planted) && prev_bomb_state != 0) {
+		if ((became_dropped || became_planted) && prev_bomb_state != bomb_state_type::UNKNOWN) {
 			bomb_pulse = { bomb_pos, now, bomb_id };
 		}
 

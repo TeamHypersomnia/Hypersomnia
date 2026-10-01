@@ -354,22 +354,11 @@ void value_bar::rebuild_layouts(
 
 	const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
 
-	const auto rb_minimap_shift = [&]() {
-		const auto& minimap = context.dependencies.drawing.minimap;
-
-		if (minimap.occupies_corner(hud_corner_type::RIGHT_BOTTOM)) {
-			return minimap.get_gameplay_appearance().size + minimap_screen_margin_v + minimap.extra_bottom_margin + minimap.extra_hud_space;
-		}
-
-		return 0;
-	}();
+	const auto rb_minimap_shift = ::calc_minimap_corner_reservation(context.dependencies.drawing.minimap, hud_corner_type::RIGHT_BOTTOM);
 
 	const auto bars_bottom = screen_size.y - bottom_pad - rb_minimap_shift;
 
-	/*
-		Pushed apart a little so that the centered value labels' backdrops
-		do not overlap the neighboring rows.
-	*/
+	/* Pushed apart a little so that the rows do not stick together. */
 	const auto row_pitch = static_cast<int>(icon_size.y) + 8;
 
 	const auto lt = vec2i(

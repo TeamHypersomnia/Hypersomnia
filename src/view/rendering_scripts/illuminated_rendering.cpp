@@ -46,7 +46,6 @@
 #include "augs/math/simple_calculations.h"
 #include "game/detail/sentience/callout_logic.h"
 #include "view/rendering_scripts/draw_offscreen_indicator.h"
-#include "view/rendering_scripts/minimap_layout.h"
 #include "game/detail/sentience/callout_logic.h"
 
 #include "augs/graphics/shader.hpp"

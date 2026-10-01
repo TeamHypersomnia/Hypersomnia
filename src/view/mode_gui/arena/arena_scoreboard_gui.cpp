@@ -128,8 +128,8 @@ void arena_scoreboard_gui::draw_gui(
 			when the minimap occupies its corner - so the panel must not grow
 			underneath it.
 
-			Above the compact threshold the base is already narrow enough to
-			clear the minimap, so this only ever bites into the compact case.
+			The panel is narrowed whenever it would reach under the minimap,
+			whatever the minimap's size.
 
 			Only the player column pays for it: every other one takes its
 			natural width and subtracts it from that column.

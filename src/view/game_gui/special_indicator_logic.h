@@ -18,7 +18,7 @@ void gather_special_indicators(
 	special_indicator_meta& meta,
 	const E& viewed_character,
 	const game_drawing_settings& drawing,
-	const std::vector<minimap_sighting_system::death_record>& recent_deaths
+	const minimap_sighting_system& sighting
 ) {
 	/*
 		Deaths of both enemies and teammates are marked with the skull icon.
@@ -29,12 +29,12 @@ void gather_special_indicators(
 	*/
 
 	{
-		const auto now = viewed_character.get_cosmos().get_total_seconds_passed();
+		const auto now = sighting.clock_secs;
 
 		const auto show_secs = drawing.show_death_indicator_for_seconds;
 		const auto fade_secs = drawing.fade_death_indicator_for_seconds;
 
-		for (const auto& rec : recent_deaths) {
+		for (const auto& rec : sighting.recent_deaths) {
 			const auto since = static_cast<float>(now - rec.when);
 
 			if (since < 0.f || since > show_secs) {

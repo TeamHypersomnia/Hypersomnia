@@ -140,6 +140,12 @@ struct minimap_settings {
 	int extra_bottom_margin = 0;
 	int extra_hud_space = 0;
 
+	/*
+		The screen height relative to 1080p - the dots, icons and arrows drawn on the minimap scale with it,
+		like its size does.
+	*/
+	float hud_scale = 1.0f;
+
 	const minimap_appearance& get_appearance(const minimap_state_type state) const {
 		return appearances[state];
 	}
@@ -154,7 +160,7 @@ struct minimap_settings {
 	}
 
 	int calc_size(const minimap_state_type state) const {
-		return get_appearance(state).size;
+		return std::max(1, get_appearance(state).size);
 	}
 
 	/*

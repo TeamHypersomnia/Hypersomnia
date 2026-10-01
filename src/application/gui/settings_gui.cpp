@@ -1611,6 +1611,7 @@ void settings_gui_state::perform(
 								revertable_slider(SCOPE_CFG_NVP(master_alpha), 0.f, 1.f);
 								revertable_slider(SCOPE_CFG_NVP(background_alpha), 0.f, 1.f);
 								revertable_slider(SCOPE_CFG_NVP(size), 100, 600);
+								tooltip_on_hover("In pixels at 1080p - the minimap scales with the screen height.");
 							};
 
 							/*
@@ -1623,29 +1624,34 @@ void settings_gui_state::perform(
 
 							if (auto under_tab_node = scoped_tree_node("Under TAB")) {
 								do_appearance(minimap_state_type::UNDER_TAB);
+
+								revertable_enum_radio(SCOPE_CFG_NVP(tab_behavior));
+
+								if (scope_cfg.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
+									auto indent = scoped_indent();
+									revertable_slider(SCOPE_CFG_NVP(scoreboard_range_mult), 1.f, 4.f);
+								}
 							}
 
 							revertable_slider(SCOPE_CFG_NVP(border_thickness), 1, 10);
 							revertable_slider(SCOPE_CFG_NVP(dot_size_mult), 0.5f, 3.f);
 							revertable_slider(SCOPE_CFG_NVP(range_mult), 0.5f, 4.f);
 							revertable_slider(SCOPE_CFG_NVP(show_entire_map_if_fits_mult), 0.f, 4.f);
+							tooltip_on_hover("Shows the whole map if it fits within this many fields of view.\n0 disables it.");
 
-							revertable_enum_radio(SCOPE_CFG_NVP(tab_behavior));
-
-							if (scope_cfg.tab_behavior == minimap_tab_behavior_type::ZOOM_OUT) {
-								revertable_slider(SCOPE_CFG_NVP(scoreboard_range_mult), 1.f, 4.f);
+							if (auto colors_node = scoped_tree_node("Colors")) {
+								revertable_color_edit(SCOPE_CFG_NVP(background_color));
+								revertable_color_edit(SCOPE_CFG_NVP(border_color));
+								revertable_color_edit(SCOPE_CFG_NVP(obstacle_color));
+								revertable_color_edit(SCOPE_CFG_NVP(portal_color));
+								revertable_color_edit(SCOPE_CFG_NVP(hazard_color));
+								revertable_color_edit(SCOPE_CFG_NVP(marker_color));
+								revertable_color_edit(SCOPE_CFG_NVP(fog_of_war_color));
+								tooltip_on_hover("Zero alpha disables the fog of war overlay.");
+								revertable_color_edit(SCOPE_CFG_NVP(player_color));
+								revertable_color_edit(SCOPE_CFG_NVP(teammate_color));
+								revertable_color_edit(SCOPE_CFG_NVP(enemy_color));
 							}
-
-							revertable_color_edit(SCOPE_CFG_NVP(background_color));
-							revertable_color_edit(SCOPE_CFG_NVP(border_color));
-							revertable_color_edit(SCOPE_CFG_NVP(obstacle_color));
-							revertable_color_edit(SCOPE_CFG_NVP(portal_color));
-							revertable_color_edit(SCOPE_CFG_NVP(hazard_color));
-							revertable_color_edit(SCOPE_CFG_NVP(marker_color));
-							revertable_color_edit(SCOPE_CFG_NVP(fog_of_war_color));
-							revertable_color_edit(SCOPE_CFG_NVP(player_color));
-							revertable_color_edit(SCOPE_CFG_NVP(teammate_color));
-							revertable_color_edit(SCOPE_CFG_NVP(enemy_color));
 
 							revertable_checkbox(SCOPE_CFG_NVP(draw_lasers));
 

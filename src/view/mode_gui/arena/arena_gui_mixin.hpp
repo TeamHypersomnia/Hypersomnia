@@ -3,7 +3,6 @@
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_json_table.h"
 #include "view/client_arena_type.h"
-#include "view/rendering_scripts/minimap_layout.h"
 
 class client_setup;
 
