@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-09-26 16:43:39.659885 UTC"
+        "version_timestamp": "2026-09-30 23:30:21.888627 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -15690,7 +15690,6 @@
                 "radius": 1147.678955078125,
                 "strength": 39
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15708,7 +15707,6 @@
                 "radius": 1054.85205078125,
                 "strength": 19
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15796,7 +15794,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15816,7 +15813,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15836,7 +15832,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15856,7 +15851,6 @@
                 "radius": 742.4290161132813,
                 "strength": 16
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15874,7 +15868,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15892,7 +15885,6 @@
                 "radius": 1572.51904296875,
                 "strength": 15
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15912,7 +15904,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15932,7 +15923,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15952,7 +15942,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -15972,7 +15961,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16001,8 +15989,7 @@
             "OFF_wall_falloff": {
                 "radius": 962.9630126953125,
                 "strength": 23
-            },
-            "positional_vibration": 0.0
+            }
         },
         {
             "id": "Strong lamp (33)",
@@ -16041,7 +16028,6 @@
                 "radius": 1569.6199951171875,
                 "strength": 24
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16061,7 +16047,6 @@
                 "radius": 742.4290161132813,
                 "strength": 16
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16081,7 +16066,6 @@
                 "radius": 742.4290161132813,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16109,7 +16093,6 @@
                 "strength": 11
             },
             "wall_falloff": {},
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16213,7 +16196,6 @@
             "OFF_wall_falloff": {
                 "radius": 1082.5179443359375
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16263,7 +16245,6 @@
             "OFF_wall_falloff": {
                 "radius": 1082.5179443359375
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -16281,7 +16262,6 @@
                 "radius": 1054.85205078125,
                 "strength": 19
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
