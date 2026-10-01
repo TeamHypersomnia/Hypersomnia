@@ -1,0 +1,349 @@
+diff --git a/src/application/main/game_frame_buffer.h b/src/application/main/game_frame_buffer.h
+index cb0b43f5d..bde4a0a55 100644
+--- a/src/application/main/game_frame_buffer.h
++++ b/src/application/main/game_frame_buffer.h
+@@ -6,6 +6,7 @@
+ 
+ #include "game/enums/particle_layer.h"
+ #include "view/audiovisual_state/particle_triangle_buffers.h"
++#include "bench_smoothness.h" /* BENCH TEMP */
+ 
+ enum class renderer_type {
+ 	// GEN INTROSPECTOR enum class renderer_type
+@@ -58,6 +59,7 @@ struct game_frame_buffer {
+ 
+ 	all_game_renderers renderers;
+ 	particle_triangle_buffers particle_buffers;
++	bench_smooth::record bench_rec; /* BENCH TEMP */
+ 
+ 	void clear_frame() {
+ 		renderers.next_frame();
+diff --git a/src/bench_smoothness.h b/src/bench_smoothness.h
+new file mode 100644
+index 000000000..fb24f4177
+--- /dev/null
++++ b/src/bench_smoothness.h
+@@ -0,0 +1,144 @@
++#pragma once
++/*
++	BENCH TEMP - frame pacing / smoothness audit.
++
++	Enabled with HYPERSOMNIA_SMOOTHNESS_BENCH=<output csv>.
++	Script (game thread, steady clock since the first editor frame):
++		3 s  -> start playtesting (like Space)
++		6 s  -> press A + W
++		10 s -> release A + W
++		10.5 s -> dump csv and quit
++*/
++
++#include <chrono>
++#include <vector>
++#include <mutex>
++#include <cstdio>
++#include <cstdlib>
++#include <csignal>
++#include <string>
++#include "augs/window_framework/event.h"
++
++namespace bench_smooth {
++	inline double now_s() {
++		using namespace std::chrono;
++		return duration<double>(steady_clock::now().time_since_epoch()).count();
++	}
++
++	struct record {
++		/* game thread */
++		double t_frame_start = 0;
++		double frame_delta = 0;
++		double t_prepared = 0;
++		double cam_x = 0, cam_y = 0, cam_raw_x = 0, cam_raw_y = 0, zoom = 0;
++		double char_x = 0, char_y = 0;
++		double interp_ratio = 0;
++		long long steps = 0;
++		int walking = 0;
++
++		/* render thread */
++		double t_perform_begin = 0;
++		double t_perform_end = 0;
++		double t_swap_begin = 0;
++		double t_swap_end = 0;
++		long long gl_now_at_perform_begin = 0;
++		long long gpu_begin = 0;
++		long long gpu_end = 0;
++	};
++
++	struct state {
++		bool enabled = false;
++		std::string out_path;
++
++		double t0 = -1;
++		int stage = 0;
++		bool walking = false;
++
++		std::mutex m;
++		std::vector<record> records;
++
++		state() {
++			if (const auto p = std::getenv("HYPERSOMNIA_SMOOTHNESS_BENCH")) {
++				enabled = true;
++				out_path = p;
++				records.reserve(200000);
++			}
++		}
++
++		void dump() {
++			auto lk = std::scoped_lock(m);
++
++			if (auto f = std::fopen(out_path.c_str(), "w")) {
++				std::fprintf(f, "t_frame_start,frame_delta,t_prepared,cam_x,cam_y,cam_raw_x,cam_raw_y,zoom,char_x,char_y,interp_ratio,steps,walking,t_perform_begin,t_perform_end,t_swap_begin,t_swap_end,gl_now_at_perform_begin,gpu_begin,gpu_end\n");
++
++				for (const auto& r : records) {
++					std::fprintf(
++						f,
++						"%.9f,%.9f,%.9f,%.4f,%.4f,%.4f,%.4f,%.6f,%.4f,%.4f,%.6f,%lld,%d,%.9f,%.9f,%.9f,%.9f,%lld,%lld,%lld\n",
++						r.t_frame_start, r.frame_delta, r.t_prepared,
++						r.cam_x, r.cam_y, r.cam_raw_x, r.cam_raw_y, r.zoom,
++						r.char_x, r.char_y, r.interp_ratio, r.steps, r.walking,
++						r.t_perform_begin, r.t_perform_end, r.t_swap_begin, r.t_swap_end,
++						r.gl_now_at_perform_begin, r.gpu_begin, r.gpu_end
++					);
++				}
++
++				std::fclose(f);
++			}
++		}
++
++		/*
++			Called every game frame with the frame's window entropy - injects the key events of the script.
++		*/
++		template <class StartPlaytest>
++		void script(augs::local_entropy& entropy, const bool in_editor, StartPlaytest&& start_playtest) {
++			if (!enabled || !in_editor) {
++				return;
++			}
++
++			const auto t = now_s();
++
++			if (t0 < 0) {
++				t0 = t;
++			}
++
++			const auto elapsed = t - t0;
++
++			auto key_event = [&](const augs::event::message msg, const augs::event::keys::key k) {
++				auto ch = augs::event::change();
++				ch.msg = msg;
++				ch.data.key.key = k;
++				entropy.push_back(ch);
++			};
++
++			using namespace augs::event;
++
++			if (stage == 0 && elapsed > 3.0) {
++				start_playtest();
++				stage = 1;
++			}
++			else if (stage == 1 && elapsed > 6.0) {
++				key_event(message::keydown, keys::key::A);
++				key_event(message::keydown, keys::key::W);
++				walking = true;
++				stage = 2;
++			}
++			else if (stage == 2 && elapsed > 10.0) {
++				key_event(message::keyup, keys::key::A);
++				key_event(message::keyup, keys::key::W);
++				walking = false;
++				stage = 3;
++			}
++			else if (stage == 3 && elapsed > 10.5) {
++				dump();
++				stage = 4;
++				std::raise(SIGTERM);
++			}
++		}
++	};
++
++	inline state& get() {
++		static state s;
++		return s;
++	}
++}
+diff --git a/src/work.cpp b/src/work.cpp
+index 8839c5dee..30e9a7441 100644
+--- a/src/work.cpp
++++ b/src/work.cpp
+@@ -122,6 +122,8 @@
+ #include "application/main/game_frame_buffer.h"
+ #include "application/main/cached_visibility_data.h"
+ #include "augs/graphics/frame_num_type.h"
++#include "augs/graphics/OpenGL_includes.h" /* BENCH TEMP */
++#include "bench_smoothness.h" /* BENCH TEMP */
+ #include "view/rendering_scripts/launch_visibility_jobs.h"
+ #include "view/rendering_scripts/for_each_vis_request.h"
+ #include "view/rendering_scripts/minimap_layout.h"
+@@ -4507,6 +4509,12 @@ work_result work(
+ 
+ 			auto& write_buffer = get_write_buffer();
+ 
++			/* BENCH TEMP */
++			write_buffer.bench_rec = {};
++			write_buffer.bench_rec.t_frame_start = bench_smooth::now_s();
++			write_buffer.bench_rec.frame_delta = frame_delta.in_seconds<double>();
++			write_buffer.bench_rec.walking = bench_smooth::get().walking ? 1 : 0;
++
+ 			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
+ 			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
+ 			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
+@@ -4569,6 +4577,16 @@ work_result work(
+ 					concatenate(new_window_entropy, write_buffer.new_window_entropy);
+ 				}
+ 
++				/* BENCH TEMP */
++				{
++					bool bench_in_editor = false;
++					on_specific_setup([&](editor_setup&) { bench_in_editor = true; });
++
++					bench_smooth::get().script(new_window_entropy, bench_in_editor, [&]() {
++						on_specific_setup([&](editor_setup& editor) { editor.start_playtesting(); });
++					});
++				}
++
+ 				on_specific_setup([&](editor_setup& editor) {
+ 					if (editor.warp_cursor_once) {
+ 						editor.warp_cursor_once = false;
+@@ -5321,6 +5339,27 @@ work_result work(
+ 				/*
+ 					Determine if we can draw enemies (for editor playtesting debug).
+ 				*/
++				/* BENCH TEMP - after the camera snapping above */
++				{
++					auto& br = get_write_buffer().bench_rec;
++					const auto raw_eye = get_camera_eye(viewing_config);
++					br.cam_x = cone.eye.transform.pos.x;
++					br.cam_y = cone.eye.transform.pos.y;
++					br.cam_raw_x = raw_eye.transform.pos.x;
++					br.cam_raw_y = raw_eye.transform.pos.y;
++					br.zoom = cone.eye.zoom;
++					br.interp_ratio = get_interpolation_ratio();
++
++					if (const auto bench_character = get_viewed_character()) {
++						if (const auto tr = bench_character.find_viewing_transform(get_audiovisuals().get<interpolation_system>())) {
++							br.char_x = tr->pos.x;
++							br.char_y = tr->pos.y;
++						}
++
++						br.steps = static_cast<long long>(bench_character.get_cosmos().get_total_steps_passed());
++					}
++				}
++
+ 				const bool see_enemies_behind_walls = visit_current_setup([&](const auto& setup) {
+ 					using S = remove_cref<decltype(setup)>;
+ 
+@@ -5918,6 +5957,8 @@ work_result work(
+ 						the main loop is simply called infrequently.
+ 					*/
+ 
++					get_write_buffer().bench_rec.t_prepared = bench_smooth::now_s(); /* BENCH TEMP */
++
+ 					auto scope = measure_scope(game_thread_performance.wait_swap);
+ 					buffer_swapper.wait_swap();
+ 				}
+@@ -6100,6 +6141,8 @@ work_result work(
+ 	}
+ #endif
+ 
++	static long long bench_last_record = -1; /* BENCH TEMP */
++
+ 	static auto main_loop_iter = [](void* arg) -> bool {
+ 		auto& mi = *reinterpret_cast<main_loop_input*>(arg);
+ 
+@@ -6142,8 +6185,18 @@ work_result work(
+ 			}
+ #endif
+ 
++			/* BENCH TEMP */
++			auto& bench = bench_smooth::get();
++			const auto bench_swap_begin = bench_smooth::now_s();
++
+ 			window.swap_buffers();
+ 
++			if (bench.enabled && bench_last_record >= 0) {
++				auto lk = std::scoped_lock(bench.m);
++				bench.records[bench_last_record].t_swap_begin = bench_swap_begin;
++				bench.records[bench_last_record].t_swap_end = bench_smooth::now_s();
++			}
++
+ 			if (!until_first_swap_measured) {
+ 				LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
+ 				until_first_swap_measured = true;
+@@ -6245,6 +6298,45 @@ work_result work(
+ 
+ 				rendering_result.clear();
+ 
++				/* BENCH TEMP */
++				auto& bench = bench_smooth::get();
++				auto bench_rec = read_buffer.bench_rec;
++				constexpr int bench_ring = 16;
++				static GLuint bench_queries[bench_ring * 2] = {};
++				static long long bench_query_record[bench_ring] = {};
++				static bool bench_inited = false;
++				static int bench_slot = 0;
++
++				if (bench.enabled) {
++					if (!bench_inited) {
++						glGenQueries(bench_ring * 2, bench_queries);
++
++						for (auto& q : bench_query_record) {
++							q = -1;
++						}
++
++						bench_inited = true;
++					}
++
++					if (bench_query_record[bench_slot] >= 0) {
++						GLuint64 b = 0;
++						GLuint64 e = 0;
++						glGetQueryObjectui64v(bench_queries[bench_slot * 2], GL_QUERY_RESULT, &b);
++						glGetQueryObjectui64v(bench_queries[bench_slot * 2 + 1], GL_QUERY_RESULT, &e);
++
++						auto lk = std::scoped_lock(bench.m);
++						bench.records[bench_query_record[bench_slot]].gpu_begin = static_cast<long long>(b);
++						bench.records[bench_query_record[bench_slot]].gpu_end = static_cast<long long>(e);
++						bench_query_record[bench_slot] = -1;
++					}
++
++					GLint64 gl_now = 0;
++					bench_rec.t_perform_begin = bench_smooth::now_s();
++					glGetInteger64v(GL_TIMESTAMP, &gl_now);
++					bench_rec.gl_now_at_perform_begin = static_cast<long long>(gl_now);
++					glQueryCounter(bench_queries[bench_slot * 2], GL_TIMESTAMP);
++				}
++
+ 				for (auto& r : read_buffer.renderers.all) {
+ 					renderer_backend.perform(
+ 						rendering_result,
+@@ -6254,6 +6346,24 @@ work_result work(
+ 					);
+ 				}
+ 
++				if (bench.enabled) {
++					glQueryCounter(bench_queries[bench_slot * 2 + 1], GL_TIMESTAMP);
++					bench_rec.t_perform_end = bench_smooth::now_s();
++
++					auto lk = std::scoped_lock(bench.m);
++
++					if (bench_rec.t_frame_start > 0) {
++						bench.records.push_back(bench_rec);
++						bench_last_record = static_cast<long long>(bench.records.size()) - 1;
++						bench_query_record[bench_slot] = bench_last_record;
++					}
++					else {
++						bench_last_record = -1;
++					}
++
++					bench_slot = (bench_slot + 1) % bench_ring;
++				}
++
+ 				read_buffer.clear_frame();
+ 
+ 				current_frame.fetch_add(1, std::memory_order_relaxed);

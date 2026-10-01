@@ -1,6 +1,6 @@
 ---
 name: benchmark-rendering
-description: Measure the FPS and GPU frame time impact of a rendering pass, FBO, shader or other rendering change in Hypersomnia by A/B toggling it within a single game run. Use whenever the user says "zrób benchmark X", "zrob benchmark X", "zbenchmarkuj X", "benchmark X", or asks how much FPS/GPU time something rendered costs (e.g. "fps impact z i bez X").
+description: Measure the FPS and GPU frame time impact of a rendering pass, FBO, shader or other rendering change in Hypersomnia by A/B toggling it within a single game run. Use whenever the user says "zrób benchmark X", "zrob benchmark X", "zbenchmarkuj X", "benchmark X", or asks how much FPS/GPU time something rendered costs (e.g. "fps impact z i bez X"), or wants to measure frame pacing, judder or hitches ("płynność", "przycina", "hitche"), also between two builds or tags.
 ---
 
 # Benchmarking a rendering change (A/B in one run)
@@ -29,7 +29,8 @@ One run with alternating phases cancels out scene, thermal and clock differences
   Confirm `Launched mode: EDITOR` and that no `DTOR finished: ~editor_setup` follows right after loading -
   builds before 2026-10-01 fell through to the project selector with `--edit` (missing `break` in `work.cpp`).
   - Never benchmark on the official `content/arenas/*` or the user's own `user/projects/*`: the editor writes
-    `navmesh.nav`, `editor_view.json` and autosaves there. Copy the arena to `user/projects/<name>_bench`,
+    `navmesh.nav`, `editor_view.json` and autosaves there. `user/projects` is a symlink to `../content/arenas`,
+    so a copy there lands in the repo too. Copy the arena to the scratchpad instead - `--edit` takes an absolute path -
     rename its json to match the folder, drop `last_saved.json`, and set `meta.name`.
   - The editor camera comes from `editor_view.json` (`panned_camera.transform.pos`, `zoom`) - set it to frame
     what is measured, e.g. zoom 0.45 at the average position of the lights to catch many of them.
@@ -49,9 +50,43 @@ One run with alternating phases cancels out scene, thermal and clock differences
   From the repo root the game fails to read its config and litters the root with empty `cache/`, `user/`, `logs/`.
 - LOG output goes to stdout, so it lands in the redirected file even when `timeout` kills the game.
 - The user allows launching and killing the game by yourself for benchmarks.
-- **Check that no other game instance runs before measuring:** `ps -eo pid,lstart,args | grep "[b]uild/.*Hypersomnia"`.
-  The user often keeps one open (launched via `ninja run -C build/current`). It skews the absolute CPU numbers and FPS -
+- **Check that no other game instance runs before measuring:** `ps -eo pid,pcpu,lstart,args | grep -i "[h]ypersomnia"`.
+  The user often keeps one open (launched via `ninja run -C build/current`), or plays the release AppImage between runs -
+  it runs as `/tmp/.mount_*/usr/bin/Hypersomnia`, which a `build/` grep misses, and took 320% CPU in one case. It skews the absolute CPU numbers and FPS -
   ask them to close it rather than killing it, then rerun. An A/B in one run keeps the ratio roughly right even then.
+
+## Frame pacing / smoothness (judder), and comparing two builds
+
+FPS and GPU averages say nothing about judder. Use `smoothness/` next to this file:
+
+- `smoothness.patch` (`git apply` it; applies to HEAD and to tag 3.0.0) adds `src/bench_smoothness.h` and hooks in `work.cpp`.
+  With `HYPERSOMNIA_SMOOTHNESS_BENCH=<out.csv>` in the editor it starts playtesting after 3 s (like Space),
+  holds A+W from 6 to 10 s, dumps one CSV row per frame and quits by SIGTERM. Per frame: game frame start and delta,
+  GPU timestamps after the frame's commands (`GL_TIMESTAMP`, so fill rate counts), swap times, the drawn camera position
+  (after pixel snapping), the raw camera, the viewed character, logic steps.
+  Not for committing: `GL_TIMESTAMP` does not exist in WebGL.
+- `analyze_smoothness.py name=run.csv name=run2.csv ...` groups runs by name and prints p50/p99/p99.9/max of:
+  display intervals, GPU and swap times, latency, position judder (deviation from a moving average, in screen px),
+  the step per simulated 144 Hz refresh, backward camera steps per second, and hitches.
+  The display time of a frame = max(GPU end, swap end) - right for X11 without a compositor, vsync off.
+- Run 3-5 times per build, alternating builds. The bench script needs a window in view; a run that logs
+  `Launched mode: SHOOTING_RANGE` or `WM_DELETE_WINDOW` was disturbed by the user - drop it and rerun.
+- Use the same scratchpad copy of the map for both builds (3.0.0 loads HEAD's map json fine) and restore
+  its `editor_view.json` before every run.
+
+**Another build (e.g. a release tag):** `git worktree add /home/pbc/Hypersomnia_<tag> <tag>`, then copy the submodule
+directories from the main checkout instead of cloning (`git ls-tree -r <tag> | awk '$2=="commit"{print $4}'`; compare
+with HEAD first) and delete the `.git` files inside the copies, or every git command in the worktree fails.
+Build with `BUILD_FOLDER_SUFFIX=fast cmake/build.sh RelWithDebInfo x64 -DGENERATE_DEBUG_INFORMATION=0`, then `ninja`
+in `build/current` (~15 min, run it in the background). Copy `hypersomnia/user/runtime_prefs.json` into the worktree.
+Before commit a5c684fd5 `--edit` falls through to the project selector: add the `break;` after `launch_editor(params.editor_target);`.
+A worktree for 3.0.0 may already exist at `/home/pbc/Hypersomnia_300` (built, with the smoothness patch).
+
+**What the smoothness numbers showed (Oct 2026):** the judder came from the camera logic, not from frame times -
+backward 1 px camera steps from pixel snapping and 1 px "snap to target" jumps of the smoothing (fixed in 39f1b07fd).
+Frame times were steady on both HEAD and 3.0.0; rare 4-5 ms stalls inside `renderer_backend.perform`
+(0-1 per 4 s, random moments, both builds) are driver noise. Deterministic stalls happen only at loading:
+`texImage2D` uploads (8-20 ms) when the editor opens, and the first `LIGHT_SHADOW_MASKS` upload (7 ms) when playtesting starts.
 
 ## Gotchas: FPS caps and vsync
 
@@ -114,6 +149,11 @@ Suspicious FPS values are the round ones: 60, 144, 165, 240, 400, or anything ex
    Mention the memory cost of any removed FBO: width × height × 4 B for RGBA8 (+ stencil if `WITH_STENCIL`).
 
 ## Reference results
+
+HEAD (shadows on) vs 3.0.0, walking on de_cyberaqua in an editor playtest (Oct 2026, RX 5700, 1918x1060, zoom 0.8,
+X11/i3 without a compositor, 5 runs each): 769 vs 866 FPS, GPU 1.27 vs 0.60 ms per frame (HEAD is GPU-bound),
+latency from the frame start to the display 4.6 vs 3.1 ms - the GPU-bound frames queue up. Judder identical before the camera fix;
+after it, the per-refresh step deviation went 0.51 -> 0.17 px (p50).
 
 The light shadows cache on de_cyberaqua in the editor (Oct 2026, RX 5700, 25 lights in view, all with heights, zoom 0.45):
 light jobs 3.06 → 0.50 ms of CPU per frame summed over threads (6x less), AABB queries 1319 → 25, 0 ray casts either way
