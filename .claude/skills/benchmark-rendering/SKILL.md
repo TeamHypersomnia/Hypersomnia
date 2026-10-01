@@ -80,7 +80,7 @@ with HEAD first) and delete the `.git` files inside the copies, or every git com
 Build with `BUILD_FOLDER_SUFFIX=fast cmake/build.sh RelWithDebInfo x64 -DGENERATE_DEBUG_INFORMATION=0`, then `ninja`
 in `build/current` (~15 min, run it in the background). Copy `hypersomnia/user/runtime_prefs.json` into the worktree.
 Before commit a5c684fd5 `--edit` falls through to the project selector: add the `break;` after `launch_editor(params.editor_target);`.
-A worktree for 3.0.0 may already exist at `/home/pbc/Hypersomnia_300` (built, with the smoothness patch).
+Remove the worktree when done: `git worktree remove --force <path>` (the build inside is the only thing lost).
 
 **What the smoothness numbers showed (Oct 2026):** the judder came from the camera logic, not from frame times -
 backward 1 px camera steps from pixel snapping and 1 px "snap to target" jumps of the smoothing (fixed in 39f1b07fd).
