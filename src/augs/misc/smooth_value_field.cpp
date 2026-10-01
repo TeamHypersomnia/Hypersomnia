@@ -11,7 +11,11 @@ namespace augs {
 
 		auto calculated_smoothed_value = value * averaging_constant + target_value * (1.0 - averaging_constant);
 
-		if (vec2(calculated_smoothed_value).compare_abs(vec2(target_value), 1.0f)) {
+		/*
+			Only ends the endless exponential approach.
+			A bigger threshold made the camera jump the remaining distance at once - visible as a judder.
+		*/
+		if (vec2(calculated_smoothed_value).compare_abs(vec2(target_value), 0.01f)) {
 			calculated_smoothed_value = target_value;
 		}
 

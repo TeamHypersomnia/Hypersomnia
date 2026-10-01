@@ -2871,6 +2871,16 @@ work_result work(
 		return logic_eye;
 	};
 
+	/*
+		Whole world pixels keep the nearest-neighbor texels stable and the tiles seamless.
+		With linear filtering (forced when zoomed out) there is nothing to keep stable -
+		a world pixel is not a screen pixel anymore - so the camera and the viewed character
+		move smoothly instead of in uneven pixel steps.
+	*/
+	WEBSTATIC auto is_camera_pixel_snapped = [&](const config_json_table& viewing_config) {
+		return viewing_config.renderer.default_filtering == augs::filtering_type::NEAREST_NEIGHBOR;
+	};
+
 	WEBSTATIC auto get_camera_cone = [&](const config_json_table& viewing_config) {		
 		return camera_cone(get_camera_eye(viewing_config), logic_get_screen_size());
 	};
@@ -4069,6 +4079,7 @@ work_result work(
 
 			viewing_config.gore,
 			viewing_config.drawing.draw_bullet_trails,
+			is_camera_pixel_snapped(viewing_config),
 
 			thread_pool
 		});
@@ -5291,14 +5302,20 @@ work_result work(
 				}
 
 				auto cone = get_camera_cone(viewing_config);
-				cone.eye.transform.pos.discard_fract();
 
-				if (screen_size.x % 2 == 1) {
-					cone.eye.transform.pos.x -= 0.5f;
+				if (is_camera_pixel_snapped(viewing_config)) {
+					cone.eye.transform.pos = gameplay_camera.snap_to_pixels(cone.eye.transform.pos);
+
+					if (screen_size.x % 2 == 1) {
+						cone.eye.transform.pos.x -= 0.5f;
+					}
+
+					if (screen_size.y % 2 == 1) {
+						cone.eye.transform.pos.y -= 0.5f;
+					}
 				}
-
-				if (screen_size.y % 2 == 1) {
-					cone.eye.transform.pos.y -= 0.5f;
+				else {
+					gameplay_camera.last_pixel_snapped_pos.reset();
 				}
 
 				/*

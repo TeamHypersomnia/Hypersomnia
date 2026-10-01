@@ -29,6 +29,43 @@
 
 extern float max_zoom_out_at_edges_v;
 
+vec2 world_camera::snap_to_pixels(const vec2 pos) {
+	/*
+		The camera has to stand on whole pixels so that tiled sprites have no seams.
+
+		The chased character is integerized too (see interpolation_system::get_interpolated),
+		so the camera is the integer character position plus the smoothed look offset.
+		While that offset grows against the motion, plain truncation sometimes steps
+		the camera one pixel back, against the direction the character walks - a visible judder.
+
+		So on each axis, a one-pixel step against the motion is skipped
+		as long as the previous pixel is still less than a pixel away from the true position.
+	*/
+
+	auto snapped = pos;
+	snapped.discard_fract();
+
+	if (last_pixel_snapped_pos.has_value()) {
+		const auto previous = *last_pixel_snapped_pos;
+		const auto motion = player_position_at_previous_step - player_position_previously_seen;
+
+		auto keep_previous_if_against_motion = [](float& snapped_axis, const float previous_axis, const float pos_axis, const float motion_axis) {
+			const bool against_motion = (snapped_axis - previous_axis) * motion_axis < 0.0f;
+			const bool previous_still_close = std::abs(pos_axis - previous_axis) < 1.0f;
+
+			if (against_motion && previous_still_close) {
+				snapped_axis = previous_axis;
+			}
+		};
+
+		keep_previous_if_against_motion(snapped.x, previous.x, pos.x, motion.x);
+		keep_previous_if_against_motion(snapped.y, previous.y, pos.y, motion.y);
+	}
+
+	last_pixel_snapped_pos = snapped;
+	return snapped;
+}
+
 camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const
 {
 	auto output_eye = current_eye;
@@ -161,7 +198,8 @@ void world_camera::tick(
 		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_eye.rotation))
 		//	last_interpolant.rotation = smoothed_camera_eye.rotation;
 
-		if (calculated_smoothed_pos.compare_abs(current_eye.transform.pos, 1.f)) {
+		/* Same as in smooth_value_field - a bigger threshold jumps the camera by the remaining distance. */
+		if (calculated_smoothed_pos.compare_abs(current_eye.transform.pos, 0.01f)) {
 			last_interpolant.pos = smoothed_part;
 		}
 		if (std::abs(calculated_smoothed_rotation - current_eye.transform.rotation) < 1.f) {

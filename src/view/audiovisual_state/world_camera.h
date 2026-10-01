@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 #include "augs/math/vec2.h"
 #include "game/components/transform_component.h"
 #include "augs/misc/smooth_value_field.h"
@@ -40,6 +41,8 @@ struct world_camera {
 	vec2 player_position_previously_seen;
 	vec2 player_position_at_previous_step;
 
+	std::optional<vec2> last_pixel_snapped_pos;
+
 	augs::smooth_value_field additional_position_smoothing;
 	float target_zoom = 1.0f;
 
@@ -55,6 +58,8 @@ struct world_camera {
 	float current_area_zoom_mult = 1.0f;
 
 	camera_eye get_current_eye(bool with_edge_zoomout) const;
+
+	vec2 snap_to_pixels(vec2 pos);
 
 	void tick(
 		const vec2i screen_size,

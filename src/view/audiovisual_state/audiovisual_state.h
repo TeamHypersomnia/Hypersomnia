@@ -84,6 +84,7 @@ struct audiovisual_advance_input {
 
 	const bool gore_enabled;
 	const bool bullet_trails_enabled;
+	const bool integerize_viewed_character;
 
 	augs::thread_pool& pool;
 };

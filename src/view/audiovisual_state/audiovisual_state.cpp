@@ -107,7 +107,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& all_visible = input.all_visible;
 	auto& game_images = input.game_images;
 
-	interp.id_to_integerize = viewed_character;
+	interp.id_to_integerize = input.integerize_viewed_character ? entity_id(viewed_character.get_id()) : entity_id();
 
 	auto advance_exploding_rings = [&]() {
 		auto cone_for_explosion_particles = queried_cone;
