@@ -132,6 +132,7 @@ struct draw_crosshair_lasers_input {
 	const const_entity_handle character;
 	const vec2 crosshair_displacement;
 	const vec2i screen_size;
+	const ltrb visible_world_aabb;
 };
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);

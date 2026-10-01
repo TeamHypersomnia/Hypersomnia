@@ -402,7 +402,7 @@ void missile_system::advance_penetrations(const logic_step step) {
 						&& (considered_p1 - previous_exit).dot(path_dir) <= PENETRATION_SEAM_TOLERANCE_PX
 					;
 
-					/* One bullet never hits the same entity twice. */
+					/* One bullet never hits the same entity twice in a row. */
 					const bool same_entity = surface_owner == missile.last_penetrated_surface;
 
 					if (entered_now && !continues_wall && !same_entity) {
@@ -505,7 +505,11 @@ void missile_system::advance_penetrations(const logic_step step) {
 					);
 				}
 
-				if (!any_intersection) {
+				/*
+					A walk cut at a character has yet to reach the walls behind them -
+					the next step resumes it from the cut.
+				*/
+				if (!any_intersection && !character_cut.has_value()) {
 					missile.during_penetration = false;
 					it.infer_colliders();
 					//LOG("STEP: %x NO HITS BETWEEN %x and %x! EXIT, REM: %x", now.step, p1, p2, missile.penetration_distance_remaining);

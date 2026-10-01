@@ -65,7 +65,8 @@ namespace components {
 		simple_rot_vel magazine;
 
 		uint8_t unejected_shells = 0;
-		pad_bytes<3> pad;
+		pad_bytes<1> pad;
+		uint16_t num_fired_rounds = 0;
 		// END GEN INTROSPECTOR
 	};
 }

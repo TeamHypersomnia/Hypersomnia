@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cmath>
 #include <cstdint>
 #include <array>
 #include <bit>
@@ -12,7 +13,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/components/decal_component.h"
 #include "game/detail/decals/decal_geometry.h"
-#include "game/detail/visible_entities.hpp"
+#include "game/detail/decals/for_each_decal_in_box.hpp"
 
 /*
 	Material fatigue: stretches of a fixture already covered by gunshot decals
@@ -98,63 +99,45 @@ inline decal_coverage_mask calc_decal_coverage_mask(
 		return mask;
 	}
 
-	const auto query_center = (p1 + p2) / 2;
+	const auto query_size = vec2(std::abs(segment.x), std::abs(segment.y)) + vec2::square(4);
 
-	const auto query_size = vec2i(
-		static_cast<int>(std::min(std::abs(segment.x), 100000.f)) + 4,
-		static_cast<int>(std::min(std::abs(segment.y), 100000.f)) + 4
-	);
+	::for_each_decal_in_box<render_layer::SURFACE_DECALS>(cosm, (p1 + p2) / 2, query_size, [&](const auto& typed_decal) {
+		/* Only the decals of this very fixture's owner may fatigue it. */
+		if (typed_decal.template get<components::decal>().spawned_by != surface_owner) {
+			return;
+		}
 
-	auto& visible = thread_local_visible_entities();
+		if (!(typed_decal.when_born().step < only_born_before_step)) {
+			return;
+		}
 
-	/* Decals are non-physical, so the physical pass would be pure waste. */
-	visible.acquire_non_physical({
-		cosm,
-		camera_cone(transformr(query_center), query_size),
-		accuracy_type::EXACT,
-		render_layer_filter::whitelist(render_layer::SURFACE_DECALS),
-		tree_of_npo_filter::all()
-	});
+		const auto decal_transform = typed_decal.get_logic_transform();
 
-	visible.for_each<render_layer::SURFACE_DECALS>(cosm, [&](const auto& decal_handle) {
-		decal_handle.template dispatch_on_having_all<components::decal>([&](const auto& typed_decal) {
-			/* Only the decals of this very fixture's owner may fatigue it. */
-			if (typed_decal.template get<components::decal>().spawned_by != surface_owner) {
-				return;
-			}
+		const auto hit = ::segment_obb_intersection(
+			p1,
+			p2,
+			decal_transform.pos,
+			::get_current_decal_size(typed_decal) / 2,
+			decal_transform.rotation
+		);
 
-			if (!(typed_decal.when_born().step < only_born_before_step)) {
-				return;
-			}
+		if (!hit.has_value()) {
+			return;
+		}
 
-			const auto decal_transform = typed_decal.get_logic_transform();
+		constexpr auto n = static_cast<real32>(DECAL_COVERAGE_BUCKETS);
 
-			const auto hit = ::segment_obb_intersection(
-				p1,
-				p2,
-				decal_transform.pos,
-				::get_decal_size(typed_decal) / 2,
-				decal_transform.rotation
-			);
+		auto first = static_cast<std::size_t>(std::clamp(hit->first * n + 0.5f, 0.f, n - 1));
+		auto last = static_cast<std::size_t>(std::clamp(hit->second * n + 0.5f, 0.f, n));
 
-			if (!hit.has_value()) {
-				return;
-			}
+		if (last <= first) {
+			/* Thinner than a bucket - still worth exactly one. */
+			last = first + 1;
+		}
 
-			constexpr auto n = static_cast<real32>(DECAL_COVERAGE_BUCKETS);
-
-			auto first = static_cast<std::size_t>(std::clamp(hit->first * n + 0.5f, 0.f, n - 1));
-			auto last = static_cast<std::size_t>(std::clamp(hit->second * n + 0.5f, 0.f, n));
-
-			if (last <= first) {
-				/* Thinner than a bucket - still worth exactly one. */
-				last = first + 1;
-			}
-
-			for (auto i = first; i < std::min(last, DECAL_COVERAGE_BUCKETS); ++i) {
-				mask[i / 64] |= uint64_t(1) << (i % 64);
-			}
-		});
+		for (auto i = first; i < std::min(last, DECAL_COVERAGE_BUCKETS); ++i) {
+			mask[i / 64] |= uint64_t(1) << (i % 64);
+		}
 	});
 
 	return mask;

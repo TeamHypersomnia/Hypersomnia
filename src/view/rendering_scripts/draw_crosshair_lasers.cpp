@@ -198,12 +198,18 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				}
 			}
 
-			const auto basic_penetration_distance = [&]() {
-				if (const auto* const gun_def = subject.find<invariants::gun>()) {
-					return gun_def->basic_penetration_distance;
+			const auto basic_penetration_distance = ::get_basic_penetration_distance(subject);
+
+			/* Up to the farthest visible corner - nothing beyond is ever seen. */
+			const auto max_range = [&]() {
+				const auto& visible = in.visible_world_aabb;
+				auto result = 0.f;
+
+				for (const auto corner : { visible.lt(), visible.rt(), visible.rb(), visible.lb() }) {
+					result = std::max(result, (corner - line_from).length());
 				}
 
-				return 0.0f;
+				return result;
 			}();
 
 			thread_local std::vector<laser_path_segment> segments;
@@ -216,6 +222,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				filter,
 				basic_penetration_distance,
 				subject,
+				max_range,
 				segments
 			);
 
@@ -240,7 +247,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			*/
 			if (!segments.empty()) {
 				const auto laser_dir = (line_to - line_from).normalize();
-				const auto far_point = line_from + laser_dir * 10000;
+				const auto far_point = line_from + laser_dir * max_range;
 				const auto path_end = segments.back().to;
 
 				if ((far_point - path_end).length_sq() > 1.0f) {
@@ -271,16 +278,11 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				const auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
 				const auto muzzle = calc_muzzle_transform(subject_item, rifle_transform).pos;
 
-				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
-
-				if (proj > 1.f) {
-					const auto line_from = muzzle;
-					const auto line_to = barrel_center + (muzzle - barrel_center) * proj;
-
+				if (const auto line_to = ::calc_laser_end_at_crosshair(barrel_center, muzzle, crosshair_pos)) {
 					make_laser_from_to(
 						subject_item,
-						line_from,
-						line_to,
+						muzzle,
+						*line_to,
 						*queried_filter
 					);
 				}

@@ -38,12 +38,12 @@ static void ricochet_missile_against_surface(
 		Only the first contact of a step can be a ricochet: within one step the physics solver
 		may already have bounced the bullet off it into further walls, with a velocity
 		that has nothing to do with how the bullet flew.
+		Contacts the bullet moves away from don't count - e.g. at a seam of a flat wall,
+		the tile it has flown past may come before the one it really hits.
 	*/
 	if (missile.when_last_ricochet_considered.was_set() && missile.when_last_ricochet_considered.step == now.step) {
 		return;
 	}
-
-	missile.when_last_ricochet_considered = now;
 
 	const auto collision_normal = vec2(normal).normalize();
 
@@ -62,6 +62,8 @@ static void ricochet_missile_against_surface(
 		RIC_LOG("dot normal is %x, IGNORED", impact_dot_normal);
 		return;
 	}
+
+	missile.when_last_ricochet_considered = now;
 
 	/* 
 		If the collision normal and velocity point in opposite directions,

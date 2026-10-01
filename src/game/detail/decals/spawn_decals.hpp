@@ -22,6 +22,7 @@
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/visible_entities.hpp"
+#include "game/detail/decals/for_each_decal_in_box.hpp"
 #include "game/inferred_caches/find_physics_cache.h"
 #include "game/detail/missile/penetration_path.h"
 
@@ -102,9 +103,6 @@ inline constexpr std::size_t MAX_DECALS_PER_SPOT = 4;
 /* A force grenade explosion (88 damage) spawns the explosion decal at its original sprite size. */
 inline constexpr real32 EXPLOSION_DECAL_BASELINE_DAMAGE = 88.f;
 
-/* Flash explosions deal negligible damage, so they leave a fixed-size decal instead. */
-inline constexpr real32 FLASH_EXPLOSION_DECAL_SIZE_MULT = 0.5f;
-
 /* Explosion decal opacity. */
 inline const rgba EXPLOSION_DECAL_COLORIZE = rgba(255, 255, 255, 255);
 
@@ -127,9 +125,13 @@ inline constexpr real32 EXPLOSION_SURFACE_WEIGHT_PER_DECAL = 40.f;
 
 /* Sprite sizes are integral, so a thin decal must not round away to nothing. */
 inline vec2i to_decal_sprite_size(const vec2 size) {
-	/* Clamped, as casting an out-of-range float to int is undefined. */
+	/* Clamped, as casting an out-of-range float - or a NaN - to int is undefined. */
 	auto to_side = [](const real32 side) {
-		return std::max(1, static_cast<int>(std::clamp(side, 1.f, 100000.f)));
+		if (!(side >= 1.f)) {
+			return 1;
+		}
+
+		return static_cast<int>(std::min(side, 100000.f));
 	};
 
 	return vec2i(to_side(size.x), to_side(size.y));
@@ -218,39 +220,21 @@ void gather_nearby_decals(
 ) {
 	output.clear();
 
-	const auto clamped_size = vec2i(
-		static_cast<int>(std::min(box_size.x, 100000.f)) + 2,
-		static_cast<int>(std::min(box_size.y, 100000.f)) + 2
-	);
+	::for_each_decal_in_box<Layer>(cosm, box_center, box_size + vec2::square(2), [&](const auto& typed_decal) {
+		if (output.size() == output.max_size()) {
+			return;
+		}
 
-	auto& visible = thread_local_visible_entities();
+		if (!is_considered(typed_decal)) {
+			return;
+		}
 
-	/* Decals are non-physical, so the physical pass would be pure waste. */
-	visible.acquire_non_physical({
-		cosm,
-		camera_cone(transformr(box_center), clamped_size),
-		accuracy_type::EXACT,
-		render_layer_filter::whitelist(Layer),
-		tree_of_npo_filter::all()
-	});
+		const auto other_size = ::get_current_decal_size(typed_decal);
 
-	visible.for_each<Layer>(cosm, [&](const auto& decal_handle) {
-		decal_handle.template dispatch_on_having_all<components::decal>([&](const auto& typed_decal) {
-			if (output.size() == output.max_size()) {
-				return;
-			}
-
-			if (!is_considered(typed_decal)) {
-				return;
-			}
-
-			const auto other_size = ::get_decal_size(typed_decal);
-
-			output.push_back({
-				typed_decal.get_id(),
-				typed_decal.get_logic_transform().pos,
-				std::max(other_size.x, other_size.y)
-			});
+		output.push_back({
+			typed_decal.get_id(),
+			typed_decal.get_logic_transform().pos,
+			std::max(other_size.x, other_size.y)
 		});
 	});
 }
@@ -481,7 +465,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 	const material_decal_variants material_decals_def::* const variants_of_material,
 	F&& get_max_stacking_depth_px
 ) {
-	if (fixture == nullptr || !(damage_amount > 0.f)) {
+	if (fixture == nullptr || surface_handle.dead() || !(damage_amount > 0.f)) {
 		return std::nullopt;
 	}
 
@@ -594,7 +578,6 @@ std::optional<transformr> spawn_surface_impact_decal(
 	}
 
 	const auto decal_len = std::max(final_size_f.x, final_size_f.y);
-
 
 	nearby_decals nearby;
 
@@ -781,6 +764,32 @@ std::optional<transformr> spawn_surface_impact_decal(
 	return decal_transform;
 }
 
+enum class explosion_decal_rng_purpose : uint8_t {
+	GROUND,
+	SURFACES
+};
+
+/*
+	Seeds the marks of a blast by what is known of it regardless of when it comes - the entity that caused it
+	and the spot, in whole pixels - never by the step, so that a blast coming a step later due to lag leaves the same marks.
+	purpose tells the ground scorch apart from the surface marks.
+*/
+inline randomization make_explosion_decal_rng(
+	const cosmos& cosm,
+	const entity_id cause,
+	const vec2 explosion_pos,
+	const explosion_decal_rng_purpose purpose
+) {
+	const auto spot = vec2i(explosion_pos);
+
+	return randomization(augs::hash_multiple(
+		cosm.get_nontemporal_rng_seed_for(cause),
+		spot.x,
+		spot.y,
+		static_cast<uint8_t>(purpose)
+	));
+}
+
 inline void spawn_explosion_decal(
 	const logic_step step,
 	const vec2 explosion_pos,
@@ -794,7 +803,7 @@ inline void spawn_explosion_decal(
 	auto& cosm = step.get_cosmos();
 	const auto& assets = cosm.get_common_assets();
 
-	auto rng = cosm.get_rng_for(subject);
+	auto rng = ::make_explosion_decal_rng(cosm, subject, explosion_pos, explosion_decal_rng_purpose::GROUND);
 
 	const std::array<typed_entity_flavour_id<decal_decoration>, 2> variants = {
 		assets.explosion_decal_1,

@@ -20,6 +20,10 @@ namespace invariants {
 }
 
 namespace components {
+	/*
+		num_surface_hits counts the marks the fighter left on surfaces, to seed every next one differently.
+	*/
+
 	struct melee_fighter {
 		// GEN INTROSPECTOR struct components::melee_fighter
 		melee_fighter_state state = melee_fighter_state::READY;
@@ -31,6 +35,7 @@ namespace components {
 		vec2 first_separating_impulse;
 		vec2 overridden_crosshair_base_offset;
 		real32 throw_cooldown_ms = -1.f;
+		uint32_t num_surface_hits = 0;
 		// END GEN INTROSPECTOR
 
 		bool now_returning() const;

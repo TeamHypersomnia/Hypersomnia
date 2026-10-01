@@ -199,6 +199,21 @@ static void cooldown_gun_heat(
 	}
 }
 
+/*
+	Seeded only by the gun and how many rounds it fired before, like shells - see spawn_shell.
+	Every pellet of a shot counts as a round of its own.
+*/
+
+template <class G>
+static uint32_t calc_next_round_seed(const cosmos& cosm, const G& gun_entity) {
+	auto& num_fired_rounds = gun_entity.template get<components::gun>().num_fired_rounds;
+
+	return static_cast<uint32_t>(augs::hash_multiple(
+		cosm.get_nontemporal_rng_seed_for(gun_entity),
+		num_fired_rounds++
+	));
+}
+
 template <class A, class B, class C, class D>
 static void spawn_shell(
 	const allocate_new_entity_access access,
@@ -706,6 +721,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 											missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
 											missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
 											missile.when_fired = cosm.get_timestamp();
+											missile.rng_seed = ::calc_next_round_seed(cosm, gun_entity);
 										}
 
 										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
@@ -915,6 +931,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 														missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
 														missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
 														missile.when_fired = cosm.get_timestamp();
+														missile.rng_seed = ::calc_next_round_seed(cosm, gun_entity);
 
 														missile.penetration_distance_remaining = gun_def.basic_penetration_distance;
 														missile.starting_penetration_distance = gun_def.basic_penetration_distance;

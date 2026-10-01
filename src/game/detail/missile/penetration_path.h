@@ -25,6 +25,22 @@ inline constexpr real32 PENETRATION_SEAM_TOLERANCE_PX = 0.5f;
 inline constexpr real32 PENETRATION_PATH_MAX_RANGE_PX = 10000.f;
 
 /*
+	Walls are gathered this far ahead at first - the range doubles
+	only while the wall still reaches its end. See gather_obstacles_of_wall_run.
+*/
+inline constexpr real32 WALL_RUN_INITIAL_RANGE_PX = 512.f;
+
+/* Bullets penetrate only walls and glass. */
+inline bool is_penetrable_wall(const b2Filter& filter) {
+	const auto wall_categories = uint16(
+		(1 << int(filter_category::WALL)) |
+		(1 << int(filter_category::GLASS_OBSTACLE))
+	);
+
+	return (filter.categoryBits & wall_categories) != 0;
+}
+
+/*
 	Whether two fixtures belong to one wall as far as the bullet's marks are concerned:
 	touching statics form one wall, while a dynamic body is a wall only of itself.
 */
@@ -52,7 +68,8 @@ using penetration_obstacles = std::vector<penetration_obstacle>;
 /*
 	Gathers every penetrable obstacle along the path, in the order the bullet meets them,
 	with its entry and exit distances. An obstacle the path starts inside of enters at 0,
-	one it never leaves exits at max_range.
+	one it never leaves exits at max_range. By default only what bullets penetrate is gathered -
+	a broader filter also gathers what they can't, with its own penetrability, e.g. 0.
 
 	Only reads the physics world - safe in the view, including parallel render jobs.
 */
@@ -62,14 +79,14 @@ inline void gather_penetration_obstacles(
 	const vec2 dir,
 	const real32 max_range,
 	const entity_id ignore_entity,
-	penetration_obstacles& out
+	penetration_obstacles& out,
+	const b2Filter& filter = filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY]
 ) {
 	out.clear();
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto si = cosm.get_si();
 
-	const auto filter = filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY];
 	const auto to = from + dir * max_range;
 
 	const auto from_meters = si.get_meters(from);
@@ -132,11 +149,16 @@ inline void gather_penetration_obstacles(
 	on_obstacle(obstacle, end_dist) is called for every obstacle the bullet enters:
 	end_dist is its exit, or the point where the bullet dies inside.
 
-	Returns the distance at which the bullet stops,
-	or std::nullopt if it makes it through all of them.
+	stopped_at is the distance at which the bullet stops,
+	or std::nullopt if it makes it through all of them - with power_left.
 */
+struct penetration_walk_result {
+	std::optional<real32> stopped_at;
+	real32 power_left = 0.f;
+};
+
 template <class F>
-std::optional<real32> walk_penetration_obstacles(
+penetration_walk_result walk_penetration_obstacles(
 	const cosmos& cosm,
 	const penetration_obstacles& obstacles,
 	const vec2 from,
@@ -160,7 +182,7 @@ std::optional<real32> walk_penetration_obstacles(
 
 		if (o.penetrability <= 0.f) {
 			on_obstacle(o, o.entry_dist);
-			return o.entry_dist;
+			return { o.entry_dist, 0.f };
 		}
 
 		const auto max_gift = ::calc_remaining_fatigue_gift(base_penetration_distance, fatigue_gift_used);
@@ -201,11 +223,11 @@ std::optional<real32> walk_penetration_obstacles(
 			const auto end_dist = o.entry_dist + std::min(reach.reach, o.exit_dist - o.entry_dist);
 
 			on_obstacle(o, end_dist);
-			return end_dist;
+			return { end_dist, 0.f };
 		}
 	}
 
-	return std::nullopt;
+	return { std::nullopt, power };
 }
 
 /*
@@ -238,6 +260,26 @@ inline real32 calc_wall_run_end(const penetration_obstacles& obstacles) {
 	}
 
 	return run_end;
+}
+
+/*
+	Gathers the obstacles far enough along the path to cover the whole wall the path starts in.
+*/
+inline void gather_obstacles_of_wall_run(
+	const cosmos& cosm,
+	const vec2 from,
+	const vec2 dir,
+	penetration_obstacles& out
+) {
+	for (auto range = WALL_RUN_INITIAL_RANGE_PX; ; range = std::min(range * 2, PENETRATION_PATH_MAX_RANGE_PX)) {
+		::gather_penetration_obstacles(cosm, from, dir, range, entity_id(), out);
+
+		const bool wall_reaches_range_end = ::calc_wall_run_end(out) >= range - PENETRATION_SEAM_TOLERANCE_PX;
+
+		if (!wall_reaches_range_end || range >= PENETRATION_PATH_MAX_RANGE_PX) {
+			return;
+		}
+	}
 }
 
 inline penetration_obstacles& thread_local_penetration_obstacles() {

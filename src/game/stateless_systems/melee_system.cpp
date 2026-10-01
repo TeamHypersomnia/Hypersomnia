@@ -419,7 +419,14 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													}
 
 													{
-														auto rng = cosm.get_rng_for(subject_id);
+														/*
+															Seeded by the fighter and how many marks they left before,
+															never by the step, so that a swing coming later due to lag leaves the same mark.
+														*/
+														auto rng = randomization(augs::hash_multiple(
+															cosm.get_nontemporal_rng_seed_for(subject_id),
+															fighter.num_surface_hits++
+														));
 
 														/*
 															The decal belongs to whatever the confirming

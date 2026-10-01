@@ -1993,6 +1993,8 @@ namespace test_flavours {
 			auto& dmg = in.damage;
 
 			in.type = adverse_element_type::PED;
+			in.leaves_ground_decal = false;
+			in.leaves_surface_decals = false;
 			dmg.base = 64.f;
 			in.inner_ring_color = bullet_cyan;
 			in.outer_ring_color = white;

@@ -552,7 +552,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 								reach well past its visible circle.
 							*/
 							const auto decal_transform = typed_decal.get_logic_transform();
-							const auto decal_size = ::get_decal_size(typed_decal);
+							const auto decal_size = ::get_current_decal_size(typed_decal);
 							const auto radius = std::min(decal_size.x, decal_size.y) / 2;
 
 							if ((decal_transform.pos - foot_query_pos).length_sq() < radius * radius) {

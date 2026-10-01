@@ -6,11 +6,40 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/gun_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/missile/penetration_path.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
+
+/*
+	How far the bullets of the given item penetrate - zero for anything but guns.
+*/
+
+template <class E>
+real32 get_basic_penetration_distance(const E& item) {
+	if (const auto* const gun_def = item.template find<invariants::gun>()) {
+		return gun_def->basic_penetration_distance;
+	}
+
+	return 0.0f;
+}
+
+/*
+	Where a laser from the muzzle, along the barrel, reaches the crosshair's projection on it -
+	nothing when the crosshair is behind the muzzle.
+*/
+
+inline std::optional<vec2> calc_laser_end_at_crosshair(const vec2 barrel_center, const vec2 muzzle, const vec2 crosshair_pos) {
+	const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
+
+	if (proj > 1.f) {
+		return barrel_center + (muzzle - barrel_center) * proj;
+	}
+
+	return std::nullopt;
+}
 
 struct laser_path_segment {
 	vec2 from;
@@ -35,6 +64,7 @@ struct laser_path_segment {
 	the cost math of missile_system::advance_penetrations, but without
 	mutating any b2Fixture scratch state, so it is safe to call from
 	view code (including parallel render jobs).
+	max_range is how far the path is traced at most - only as far as it can be seen.
 */
 
 inline void calc_laser_path(
@@ -44,13 +74,14 @@ inline void calc_laser_path(
 	const b2Filter& bullet_filter,
 	const real32 basic_penetration_distance,
 	const entity_id ignore_entity,
+	const real32 max_range,
 	std::vector<laser_path_segment>& out
 ) {
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto si = cosm.get_si();
 
 	const auto laser_dir = (line_to - line_from).normalize();
-	const auto far_point = line_from + laser_dir * PENETRATION_PATH_MAX_RANGE_PX;
+	const auto far_point = line_from + laser_dir * max_range;
 
 	const auto first_hit = physics.ray_cast_px(
 		si,
@@ -65,14 +96,7 @@ inline void calc_laser_path(
 		return;
 	}
 
-	const auto first_hit_category = first_hit.what_fixture->GetFilterData().categoryBits;
-
-	const auto penetrable_categories = uint16(
-		(1 << int(filter_category::WALL)) |
-		(1 << int(filter_category::GLASS_OBSTACLE))
-	);
-
-	const bool first_hit_penetrable = (first_hit_category & penetrable_categories) != 0;
+	const bool first_hit_penetrable = ::is_penetrable_wall(first_hit.what_fixture->GetFilterData());
 
 	if (!first_hit_penetrable || basic_penetration_distance <= 0.0f) {
 		out.push_back({ line_from, first_hit.intersection, false });
@@ -85,7 +109,7 @@ inline void calc_laser_path(
 		cosm,
 		line_from,
 		laser_dir,
-		PENETRATION_PATH_MAX_RANGE_PX,
+		max_range,
 		ignore_entity,
 		obstacles
 	);
@@ -99,7 +123,7 @@ inline void calc_laser_path(
 	/*
 		The step is "now" because this previews a bullet fired right now.
 	*/
-	const auto stopped_at = ::walk_penetration_obstacles(
+	const auto walk = ::walk_penetration_obstacles(
 		cosm,
 		obstacles,
 		line_from,
@@ -123,7 +147,7 @@ inline void calc_laser_path(
 		}
 	);
 
-	if (!stopped_at.has_value() && cursor < PENETRATION_PATH_MAX_RANGE_PX) {
-		out.push_back({ at_dist(cursor), at_dist(PENETRATION_PATH_MAX_RANGE_PX), false });
+	if (!walk.stopped_at.has_value() && cursor < max_range) {
+		out.push_back({ at_dist(cursor), at_dist(max_range), false });
 	}
 }

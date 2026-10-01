@@ -16,6 +16,12 @@
 
 struct damage_cause;
 
+/*
+	leaves_ground_decal leaves a scorch mark on the ground, sized by the damage -
+	or ground_decal_fixed_size_mult if above 0, e.g. for flashes, which deal negligible damage.
+	leaves_surface_decals leaves marks on the surfaces the blast hits whose materials define explosion_decals.
+*/
+
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
 	real32 effective_radius = 250.f;
@@ -36,7 +42,10 @@ struct standard_explosion_input {
 	bool create_thunders_effect = false;
 	bool hit_friendlies = true;
 	bool bother_avoiding = true;
-	pad_bytes<1> pad;
+	bool leaves_ground_decal = true;
+	bool leaves_surface_decals = true;
+	pad_bytes<3> pad;
+	real32 ground_decal_fixed_size_mult = 0.f;
 	// END GEN INTROSPECTOR
 
 	auto& operator*=(const real32 scalar) {

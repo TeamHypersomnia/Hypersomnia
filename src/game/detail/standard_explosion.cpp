@@ -146,18 +146,10 @@ void standard_explosion_input::instantiate(
 	const auto explosion_pos = explosion_location.pos;
 
 	{
-		const bool leaves_decal =
-			this->type == adverse_element_type::FORCE ||
-			this->type == adverse_element_type::FLASH
-		;
-
-		if (leaves_decal) {
-			/*
-				Flashes deal negligible damage, so they get a fixed-size decal instead.
-			*/
+		if (leaves_ground_decal) {
 			const auto size_mult =
-				this->type == adverse_element_type::FLASH ?
-				FLASH_EXPLOSION_DECAL_SIZE_MULT :
+				ground_decal_fixed_size_mult > 0.f ?
+				ground_decal_fixed_size_mult :
 				damage.base / EXPLOSION_DECAL_BASELINE_DAMAGE
 			;
 
@@ -215,7 +207,6 @@ void standard_explosion_input::instantiate(
 
 		Unlike bullet marks, they do not stack in depth - a blast has no trajectory to march along.
 	*/
-	const bool leaves_surface_decals = this->type == adverse_element_type::FORCE;
 
 	struct hit_surface_piece {
 		const b2Fixture* fixture = nullptr;
@@ -233,7 +224,7 @@ void standard_explosion_input::instantiate(
 		and the order in which they are spawned must be deterministic.
 	*/
 	std::map<entity_id, hit_surface_pieces_of_victim> hit_surface_pieces;
-	auto decal_rng = cosm.get_rng_for(subject_if_any);
+	auto decal_rng = ::make_explosion_decal_rng(cosm, subject_if_any, explosion_pos, explosion_decal_rng_purpose::SURFACES);
 
 	/*
 		Checks if the triangle's far edge really lies on this fixture.

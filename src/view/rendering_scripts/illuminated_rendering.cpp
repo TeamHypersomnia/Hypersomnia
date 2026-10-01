@@ -588,7 +588,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				interp,
 				viewed_character,
 				in.pre_step_crosshair_displacement,
-				screen_size
+				screen_size,
+				cone.get_visible_world_rect_aabb()
 			});
 
 			renderer.call_and_clear_lines();
@@ -670,7 +671,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						interp,
 						viewed_character,
 						in.pre_step_crosshair_displacement,
-						screen_size
+						screen_size,
+						cone.get_visible_world_rect_aabb()
 					});
 				}
 

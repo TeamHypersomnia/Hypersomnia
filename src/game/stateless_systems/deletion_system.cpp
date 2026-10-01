@@ -134,6 +134,17 @@ void creation_system::flush_create_entity_requests(const logic_step step) {
 		queued.clear();
 
 		for (auto& q : local) {
+			if constexpr(std::is_same_v<E, decal_decoration>) {
+				/*
+					Heavy firefights spawn decals by the dozen. With the pool full, a decal is skipped
+					instead of failing the whole step - the per-category hard limits of decal_system,
+					which sum up to less than the pool, free a slot every step.
+				*/
+				if (cosm.get_solvable().is_pool_full<E>()) {
+					continue;
+				}
+			}
+
 			const ref_typed_entity_handle<E> typed_handle = cosmic::specific_create_entity(
 				access,
 				cosm,

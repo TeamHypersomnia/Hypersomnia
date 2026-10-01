@@ -617,24 +617,18 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 						viewed.get_world_crosshair_transform(in.interp, false).pos
 					;
 
-					const auto barrel_center = ::calc_barrel_center(item, gun_transform);
-					const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, line_from);
-
-					if (proj > 1.f) {
-						return barrel_center + (line_from - barrel_center) * proj;
+					if (const auto end = ::calc_laser_end_at_crosshair(::calc_barrel_center(item, gun_transform), line_from, crosshair_pos)) {
+						return *end;
 					}
 				}
 
 				return line_from + vec2::from_degrees(muzzle_transform.rotation) * 100;
 			}();
 
-			const auto basic_penetration_distance = [&]() {
-				if (const auto* const gun_def = item.template find<invariants::gun>()) {
-					return gun_def->basic_penetration_distance;
-				}
+			const auto basic_penetration_distance = ::get_basic_penetration_distance(item);
 
-				return 0.0f;
-			}();
+			/* Up to the farthest corner of the shown area. */
+			const auto max_range = (line_from - world_center).length() + world_side * 0.75f;
 
 			thread_local std::vector<laser_path_segment> segments;
 			segments.clear();
@@ -646,6 +640,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 				filter,
 				basic_penetration_distance,
 				item,
+				max_range,
 				segments
 			);
 

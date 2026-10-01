@@ -101,6 +101,11 @@ public:
 		return significant.get_pool<E>().capacity();
 	}
 
+	template <class E>
+	bool is_pool_full() const {
+		return significant.get_pool<E>().full();
+	}
+
 	double get_total_seconds_passed(const double view_interpolation_ratio) const;
 	double get_total_seconds_passed() const;
 	decltype(augs::stepped_timestamp::step) get_total_steps_passed() const;

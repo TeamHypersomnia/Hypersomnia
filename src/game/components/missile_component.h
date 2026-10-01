@@ -26,6 +26,11 @@ using remnant_flavour_id = constrained_entity_flavour_id<invariants::remnant>;
 using remnant_flavour_vector = augs::constant_size_vector<remnant_flavour_id, 4>;
 
 namespace components {
+	/*
+		rng_seed randomizes the marks the bullet leaves - seeded by its gun and how many rounds it fired before,
+		so that it is the same however late the shot comes, even where the bullet gets a different id, like when predicted.
+	*/
+
 	struct missile {
 		// GEN INTROSPECTOR struct components::missile
 		real32 power_multiplier_of_sender = 1.f;
@@ -55,6 +60,8 @@ namespace components {
 		bool during_penetration = false;
 		bool deleted_already = false;
 		uint16_t force_detonate_in_ms = -1;
+
+		uint32_t rng_seed = 0;
 		// END GEN INTROSPECTOR
 	};
 }

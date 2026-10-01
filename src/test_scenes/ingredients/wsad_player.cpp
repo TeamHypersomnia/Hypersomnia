@@ -344,6 +344,8 @@ namespace test_flavours {
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.type = adverse_element_type::INTERFERENCE;
+				in.leaves_ground_decal = false;
+				in.leaves_surface_decals = false;
 				in.wave_shake_radius_mult = 6;
 				in.hit_friendlies = false;
 

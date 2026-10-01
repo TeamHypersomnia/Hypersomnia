@@ -201,6 +201,8 @@ namespace test_flavours {
 			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::INTERFERENCE;
+			in.leaves_ground_decal = false;
+			in.leaves_surface_decals = false;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 2000.f;
@@ -296,6 +298,9 @@ namespace test_flavours {
 			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::FLASH;
+			/* Flashes deal negligible damage, so they leave a fixed-size scorch instead. */
+			in.ground_decal_fixed_size_mult = 0.5f;
+			in.leaves_surface_decals = false;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 1400.f;
@@ -362,6 +367,8 @@ namespace test_flavours {
 			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::PED;
+			in.leaves_ground_decal = false;
+			in.leaves_surface_decals = false;
 			in.create_thunders_effect = true;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -461,6 +468,8 @@ namespace test_flavours {
 			e.ring_duration_seconds = 0.3f;
 			e.wave_shake_radius_mult = 6;
 			e.type = adverse_element_type::PED;
+			e.leaves_ground_decal = false;
+			e.leaves_surface_decals = false;
 
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BLUNAZ_MISSILE_CASCADE);
 			auto& c = meta.get<invariants::cascade_explosion>();
@@ -482,6 +491,8 @@ namespace test_flavours {
 			e.outer_ring_color = cyan;
 			e.ring_duration_seconds = 0.3f;
 			e.type = adverse_element_type::PED;
+			e.leaves_ground_decal = false;
+			e.leaves_surface_decals = false;
 
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BLUNAZ_MISSILE_CASCADE_SMALLER);
 			auto& c = meta.get<invariants::cascade_explosion>();

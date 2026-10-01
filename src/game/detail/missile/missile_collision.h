@@ -33,10 +33,9 @@ enum class missile_collision_type {
 	Marks the surface a bullet has just entered and moves the impact effects onto the mark,
 	so that the mark and the burst always match visually.
 */
-template <class A, class S>
+template <class S>
 void spawn_gunshot_decal_of_impact(
 	const logic_step step,
-	const A& typed_missile,
 	const components::missile& missile,
 	const S& surface_handle,
 	const b2Fixture* const fixture,
@@ -47,11 +46,11 @@ void spawn_gunshot_decal_of_impact(
 	const auto& cosm = step.get_cosmos();
 
 	/*
-		Mixing in the fixture keeps several entries within one step
-		from rolling identical marks.
+		Seeded by the bullet's own seed, known since it was fired - see components::missile -
+		and the surface and fixture, so that several entries of one bullet don't roll identical marks.
 	*/
 	auto rng = randomization(augs::hash_multiple(
-		cosm.get_rng_seed_for(typed_missile),
+		missile.rng_seed,
 		surface_handle.get_id().raw.indirection_index,
 		fixture != nullptr ? fixture->index_in_component : -1
 	));
@@ -64,16 +63,10 @@ void spawn_gunshot_decal_of_impact(
 	auto get_max_decal_depth = [&]() {
 		auto& obstacles = ::thread_local_penetration_obstacles();
 
-		::gather_penetration_obstacles(
-			cosm,
-			point,
-			impact_dir,
-			PENETRATION_PATH_MAX_RANGE_PX,
-			entity_id(),
-			obstacles
-		);
+		/* Only the wall it has entered matters. */
+		::gather_obstacles_of_wall_run(cosm, point, impact_dir, obstacles);
 
-		const auto stopped_at = ::walk_penetration_obstacles(
+		const auto walk = ::walk_penetration_obstacles(
 			cosm,
 			obstacles,
 			point,
@@ -86,7 +79,7 @@ void spawn_gunshot_decal_of_impact(
 		);
 
 		return std::min(
-			stopped_at.value_or(PENETRATION_PATH_MAX_RANGE_PX),
+			walk.stopped_at.value_or(PENETRATION_PATH_MAX_RANGE_PX),
 			::calc_wall_run_end(obstacles)
 		);
 	};
@@ -110,6 +103,31 @@ void spawn_gunshot_decal_of_impact(
 }
 
 /*
+	The damage of a bullet hitting something - less for every surface it went through before.
+*/
+template <class A>
+messages::damage_message make_missile_damage_msg(
+	const A& typed_missile,
+	const invariants::missile& missile_def,
+	const components::missile& missile
+) {
+	messages::damage_message damage_msg;
+	damage_msg.damage = missile_def.damage;
+	damage_msg.damage *= missile.power_multiplier_of_sender;
+	damage_msg.origin = damage_origin(typed_missile);
+
+	const auto dist_remaining = missile.penetration_distance_remaining;
+	const auto dist_starting = missile.starting_penetration_distance;
+
+	if (dist_remaining != dist_starting && dist_starting != 0.0f) {
+		damage_msg.damage *= dist_remaining / dist_starting;
+		damage_msg.origin.circumstances.wallbang = true;
+	}
+
+	return damage_msg;
+}
+
+/*
 	While penetrating, a bullet gets no contact events with walls at all.
 	advance_penetrations calls this when the bullet's path crosses into
 	a surface that is not a part of the wall it was going through,
@@ -127,19 +145,7 @@ void on_missile_entered_next_surface(
 	const auto& missile_def = typed_missile.template get<invariants::missile>();
 	const auto& missile = typed_missile.template get<components::missile>();
 
-	messages::damage_message damage_msg;
-	damage_msg.damage = missile_def.damage;
-	damage_msg.damage *= missile.power_multiplier_of_sender;
-	damage_msg.origin = damage_origin(typed_missile);
-
-	const auto dist_remaining = missile.penetration_distance_remaining;
-	const auto dist_starting = missile.starting_penetration_distance;
-
-	if (dist_remaining != dist_starting && dist_starting != 0.0f) {
-		damage_msg.damage *= dist_remaining / dist_starting;
-		damage_msg.origin.circumstances.wallbang = true;
-	}
-
+	auto damage_msg = ::make_missile_damage_msg(typed_missile, missile_def, missile);
 	damage_msg.subject = surface_handle;
 	damage_msg.impact_velocity = typed_missile.template get<components::rigid_body>().get_velocity();
 	damage_msg.normal = -dir;
@@ -148,7 +154,6 @@ void on_missile_entered_next_surface(
 
 	::spawn_gunshot_decal_of_impact(
 		step,
-		typed_missile,
 		missile,
 		surface_handle,
 		std::addressof(fixture),
@@ -267,12 +272,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 	const bool surface_is_wall = [&]() {
 		if (const auto* const fixtures_def = surface_handle.template find<invariants::fixtures>()) {
-			const auto wall_categories = uint16(
-				(1 << int(filter_category::WALL)) |
-				(1 << int(filter_category::GLASS_OBSTACLE))
-			);
-
-			return (fixtures_def->filter.categoryBits & wall_categories) != 0;
+			return ::is_penetrable_wall(fixtures_def->filter);
 		}
 
 		return false;
@@ -335,19 +335,15 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	};
 
 	if (contact_start && !deleted_already) {
-		messages::damage_message damage_msg;
+		auto damage_msg = ::make_missile_damage_msg(typed_missile, missile_def, missile);
 		damage_msg.indices = indices;
-		damage_msg.damage = missile_def.damage;
-		damage_msg.damage *= missile.power_multiplier_of_sender;
-
-		const auto dist_remaining = missile.penetration_distance_remaining;
-		const auto dist_starting = missile.starting_penetration_distance;
 
 		if (info.should_detonate()) {
 			detonate_if(typed_missile.get_id(), point, step);
 
 			{
-				const auto& total_damage_amount = damage_msg.damage.base;
+				/* Startles as far as the full, undiminished damage would. */
+				const auto total_damage_amount = missile_def.damage.base * missile.power_multiplier_of_sender;
 
 				if (augs::is_positive_epsilon(total_damage_amount)) {
 					startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
@@ -356,16 +352,10 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			}
 		}
 
-		damage_msg.origin = damage_origin(typed_missile);
 		damage_msg.subject = surface_handle;
 		damage_msg.impact_velocity = impact_velocity;
 		damage_msg.normal = collision_normal;
 		damage_msg.point_of_impact = point;
-
-		if (dist_remaining != dist_starting && dist_starting != 0.0f) {
-			damage_msg.damage *= dist_remaining / dist_starting;
-			damage_msg.origin.circumstances.wallbang = true;
-		}
 
 		if (surface_sentient) {
 			const auto missile_entity_id = typed_missile.get_id();
@@ -450,7 +440,6 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				*/
 				::spawn_gunshot_decal_of_impact(
 					step,
-					typed_missile,
 					missile,
 					surface_handle,
 					::find_fixture_of_impact(surface_handle, cosm.get_si(), point),
