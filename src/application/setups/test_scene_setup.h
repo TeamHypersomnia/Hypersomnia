@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/math/camera_cone.h"
-#include "view/hud_bar_drawing.h"
+#include "view/hud_bar_state.h"
 
 #include "game/detail/render_layer_filter.h"
 #include "game/cosmos/entity_handle.h"
@@ -125,18 +125,14 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	std::unordered_set<std::string> current_tip_portals;
 	std::unordered_set<std::string> visited_tip_portals;
 
-	hud_bar_highlight_state bottom_bar_highlight;
-	hud_bar_highlight_state stage_bar_highlight;
+	hud_bar_state bottom_bar;
+	hud_bar_state stage_bar;
 
 	/*
 		Measured during drawing, read by customize_for_viewing
 		to make the other HUD elements give way.
 	*/
 	int stage_block_height = 48;
-
-	hud_bar_particles_state bottom_bar_particles;
-	hud_bar_particles_state bottom_bar_label_particles;
-	hud_bar_particles_state stage_bar_particles;
 
 	/*
 		The shooting range's test bar - fills up with the character's

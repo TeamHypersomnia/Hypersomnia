@@ -5,6 +5,7 @@
 #include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 #include "view/rendering_scripts/minimap_layout.h"
+#include "view/hud_bar_drawing.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/chrono_templates.h"
@@ -964,7 +965,6 @@ void arena_gui_state::draw_mode_gui(
 					the character's value bars use, and aligned width-wise
 					with them exactly, as if it were another value bar.
 					Maximum is the money cap of $20000.
-					The amount is drawn centered over the bar.
 				*/
 
 				{
@@ -998,18 +998,15 @@ void arena_gui_state::draw_mode_gui(
 						appearance.label_widest_text = "$20000";
 						appearance.label_padding = vec2i(5, 0);
 
-						::draw_hud_bar(
+						const auto bar_in = hud_bar_draw_input {
 							general_drawer,
 							in.necessary_images,
-							appearance,
-							bordered_rect,
-							ratio,
 							mode_input.cosm.get_total_seconds_passed(),
 							in.config.damage_indication.white_damage_highlight_secs,
-							money_bar_highlight,
-							std::addressof(money_bar_particles),
-							std::addressof(in.gui_fonts.gui)
-						);
+							in.gui_fonts.gui
+						};
+
+						::draw_hud_bar(bar_in, money_bar, appearance, bordered_rect, ratio);
 					}
 
 					/*

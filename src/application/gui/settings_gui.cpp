@@ -1457,18 +1457,6 @@ void settings_gui_state::perform(
 						revertable_checkbox("Draw remaining ammo", config.drawing.draw_remaining_ammo);
 						revertable_checkbox("Draw damage indicators", config.drawing.draw_damage_indicators);
 
-						revertable_checkbox("Draw value on aura bar", config.drawing.draw_value_on_aura_bar);
-
-						if (config.drawing.draw_value_on_aura_bar) {
-							auto indent = scoped_indent();
-
-							revertable_checkbox("As percentage", config.drawing.aura_bar_value_as_percent);
-
-							if (config.drawing.aura_bar_value_as_percent) {
-								revertable_slider("Decimal places", config.drawing.aura_bar_percent_decimal_places, 0, 3);
-							}
-						}
-
 						revertable_checkbox(SCOPE_CFG_NVP(draw_weapon_laser));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_crosshairs));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
@@ -1527,6 +1515,20 @@ void settings_gui_state::perform(
 						if (config.drawing.draw_area_markers.is_enabled) {
 							auto indent = scoped_indent();
 							revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
+						}
+
+						if (auto tutorial_bar_node = scoped_tree_node("Tutorial progress bar")) {
+							revertable_checkbox("Show value", config.drawing.draw_value_on_aura_bar);
+
+							if (config.drawing.draw_value_on_aura_bar) {
+								auto indent = scoped_indent();
+
+								revertable_checkbox("As percentage", config.drawing.aura_bar_value_as_percent);
+
+								if (config.drawing.aura_bar_value_as_percent) {
+									revertable_slider("Decimal places", config.drawing.aura_bar_percent_decimal_places, 0, 3);
+								}
+							}
 						}
 
 						//revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));

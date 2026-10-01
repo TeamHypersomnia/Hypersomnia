@@ -15,7 +15,7 @@
 #include "game/detail/view_input/predictability_info.h"
 
 #include "game/modes/mode_entropy.h"
-#include "view/hud_bar_drawing.h"
+#include "view/hud_bar_state.h"
 
 struct warmup_welcome_cache {
 	augs::gui::text::formatted_string current;
@@ -40,8 +40,7 @@ struct arena_gui_state {
 	mutable warmup_welcome_cache warmup;
 
 	/* Draw-time caches of the money bar's shared HUD bar drawing. */
-	mutable hud_bar_highlight_state money_bar_highlight;
-	mutable hud_bar_particles_state money_bar_particles;
+	mutable hud_bar_state money_bar;
 
 	mutable std::optional<augs::sound_source> tick_sound;
 

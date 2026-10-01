@@ -23,6 +23,7 @@
 #include "augs/gui/text/printer.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/minimap_layout.h"
+#include "view/hud_bar_drawing.h"
 #include "view/mode_gui/arena/on_first_touching_portal.hpp"
 
 #include "game/modes/detail/delete_with_held_items.hpp"
@@ -418,8 +419,8 @@ void test_scene_setup::refresh_tip_portals() {
 		last_ratio is kept, so a genuine increase across a level change still flashes.
 	*/
 
-	bottom_bar_highlight.flashes.clear();
-	stage_bar_highlight.flashes.clear();
+	bottom_bar.highlight.flashes.clear();
+	stage_bar.highlight.flashes.clear();
 
 	/*
 		On the finish screen, zero the trackers altogether,
@@ -428,8 +429,8 @@ void test_scene_setup::refresh_tip_portals() {
 	*/
 
 	if (is_tutorial_finish_level()) {
-		bottom_bar_highlight = {};
-		stage_bar_highlight = {};
+		bottom_bar.highlight = {};
+		stage_bar.highlight = {};
 	}
 
 	if (!is_tutorial()) {
@@ -1521,23 +1522,31 @@ void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	the tutorial's bottom bar and the range's test bar.
 */
 
+static hud_bar_draw_input make_tutorial_bar_input(const draw_setup_gui_input& in, const double total_secs) {
+	return hud_bar_draw_input {
+		in.get_drawer(),
+		in.necessary_images,
+		total_secs,
+		in.config.damage_indication.white_damage_highlight_secs,
+		in.gui_fonts.gui
+	};
+}
+
 static hud_bar_appearance make_aura_bar_appearance() {
 	auto appearance = hud_bar_appearance();
 
-	/* A less garish green than the pure rgba one. */
+	/* A muted green. */
 	appearance.color = rgba(41, 130, 2, 255);
 	appearance.border_w = 2;
 	appearance.particle_tint = 0.12f;
 	appearance.multiple_flashes = true;
+	appearance.flash_whole_on_full = true;
 	appearance.split_gap = 2;
 	appearance.label_background = true;
 	appearance.label_align_bottom = true;
 	appearance.label_border_w = 6;
 	appearance.label_unfilled_border_w = 2;
 	appearance.label_padding = vec2i(20, 12);
-
-	/* The dark inner outline drawn whole - in the unfilled part too. */
-	appearance.label_inner_outline_shows_value = false;
 
 	/* An opaque, solid backdrop under the label's text. */
 	appearance.label_background_color = rgba(25, 56, 9, 255);
@@ -1596,19 +1605,7 @@ void test_scene_setup::draw_range_test_bar(const draw_setup_gui_input& in) {
 	const auto max_value = 10000;
 	appearance.label = ::make_aura_bar_label(in.config.drawing, range_test_bar_ratio, static_cast<int>(range_test_bar_ratio * max_value), max_value);
 
-	::draw_hud_bar(
-		in.get_drawer(),
-		in.necessary_images,
-		appearance,
-		::make_aura_bar_rect(in.screen_size),
-		range_test_bar_ratio,
-		total_secs,
-		in.config.damage_indication.white_damage_highlight_secs,
-		bottom_bar_highlight,
-		std::addressof(bottom_bar_particles),
-		std::addressof(in.gui_fonts.gui),
-		std::addressof(bottom_bar_label_particles)
-	);
+	::draw_hud_bar(::make_tutorial_bar_input(in, total_secs), bottom_bar, appearance, ::make_aura_bar_rect(in.screen_size), range_test_bar_ratio);
 #else
 	(void)in;
 	(void)range_test_bar_ratio;
@@ -1626,72 +1623,30 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 	const auto total_secs = cosm.get_total_seconds_passed(get_interpolation_ratio());
 
 	const auto output = in.get_drawer();
-	const auto highlight_base_secs = in.config.damage_indication.white_damage_highlight_secs;
-
-	auto draw_bar = [&](
-		hud_bar_particles_state& particles,
-		hud_bar_highlight_state& highlight,
-		const hud_bar_appearance& appearance,
-		const ltrb bordered_rect,
-		const float ratio,
-		hud_bar_particles_state* const label_particles = nullptr
-	) {
-		::draw_hud_bar(
-			output,
-			in.necessary_images,
-			appearance,
-			bordered_rect,
-			ratio,
-			total_secs,
-			highlight_base_secs,
-			highlight,
-			std::addressof(particles),
-			std::addressof(in.gui_fonts.gui),
-			label_particles
-		);
-	};
+	const auto bar_in = ::make_tutorial_bar_input(in, total_secs);
 
 	const auto screen_size = in.screen_size;
 
 	if (should_draw_bottom_progress_bar()) {
-		uint32_t num_visited = 0;
+		/* Only the current tip portals ever get visited. */
+		const auto num_visited = static_cast<int>(visited_tip_portals.size());
+		const auto num_tip_portals = static_cast<int>(current_tip_portals.size());
 
-		for (const auto& name : visited_tip_portals) {
-			if (found_in(current_tip_portals, name)) {
-				++num_visited;
-			}
-		}
-
-		const auto ratio = static_cast<float>(num_visited) / current_tip_portals.size();
-
-		/*
-			Stretched over the whole screen's width,
-			touching the bottom edge exactly - no padding.
-		*/
+		const auto ratio = static_cast<float>(num_visited) / num_tip_portals;
 
 		auto appearance = ::make_aura_bar_appearance();
 
 		/* One segment per element. */
-		appearance.splits = std::min(max_hud_bar_splits_v, static_cast<int>(current_tip_portals.size()));
-		appearance.label = ::make_aura_bar_label(in.config.drawing, ratio, num_visited, static_cast<int>(current_tip_portals.size()));
+		appearance.splits = std::min(max_hud_bar_splits_v, num_tip_portals);
+		appearance.label = ::make_aura_bar_label(in.config.drawing, ratio, num_visited, num_tip_portals);
 
 		if (const bool full = ratio >= 1.0f) {
 			/* The stage bar's gold, with a backdrop darkened like the green one's. */
 			appearance.color = rgba(183, 140, 22, 255);
 			appearance.label_background_color = rgba(73, 56, 9, 255);
-
-			auto& last_ratio = bottom_bar_highlight.last_ratio;
-
-			if (const bool just_filled = last_ratio >= 0.0f && last_ratio < 1.0f) {
-				/*
-					Flash the whole bar on completion instead of only the last gain -
-					the gain detection now sees it as growing from zero.
-				*/
-				last_ratio = 0.0f;
-			}
 		}
 
-		draw_bar(bottom_bar_particles, bottom_bar_highlight, appearance, ::make_aura_bar_rect(screen_size), ratio, std::addressof(bottom_bar_label_particles));
+		::draw_hud_bar(bar_in, bottom_bar, appearance, ::make_aura_bar_rect(screen_size), ratio);
 	}
 
 	if (const auto stage = get_tutorial_stage_num_and_count()) {
@@ -1789,7 +1744,7 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 				1.0f
 			;
 
-			draw_bar(stage_bar_particles, stage_bar_highlight, appearance, bar_rect, ratio);
+			::draw_hud_bar(bar_in, stage_bar, appearance, bar_rect, ratio);
 
 			/*
 				Zero-based, so that the counter matches the bar exactly:

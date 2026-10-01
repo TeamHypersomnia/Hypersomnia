@@ -20,6 +20,7 @@
 
 #include "view/game_gui/game_gui_system.h"
 #include "view/rendering_scripts/minimap_layout.h"
+#include "view/hud_bar_drawing.h"
 #include "3rdparty/imgui/imgui.h"
 #include "augs/drawing/drawing.hpp"
 
@@ -169,8 +170,6 @@ void value_bar::draw(
 		appearance.color = bar_col;
 		appearance.border_w = this_id->border.width;
 		appearance.particle_tint = 0.12f;
-		//appearance.splits = 3;
-		//appearance.split_gap = 1;
 		/*
 			A plain number right of the bar, no brick underneath -
 			the padding is just the gap between the bar's end and the text.
@@ -190,18 +189,15 @@ void value_bar::draw(
 			[](auto...) { return; }
 		);
 
-		::draw_hud_bar(
+		const auto bar_in = hud_bar_draw_input {
 			output,
 			necessarys,
-			appearance,
-			full_bar_rect_bordered,
-			current_value_ratio,
 			cosm.get_total_seconds_passed(),
 			context.dependencies.white_damage_highlight_secs,
-			this_id->highlight,
-			std::addressof(this_id->particles_state),
-			std::addressof(context.get_gui_font())
-		);
+			context.get_gui_font()
+		};
+
+		::draw_hud_bar(bar_in, this_id->bar_state, appearance, full_bar_rect_bordered, current_value_ratio);
 	}
 }
 
@@ -216,8 +212,8 @@ ltrb value_bar::get_bar_rect_with_borders(
 	icon_rect.set_size(context.get_game_images().at(icon_tex).get_original_size());
 
 	/*
-		The bar stretches to the row's very right edge - the value label
-		is drawn centered over the bar, so no caption space is reserved.
+		The bar stretches to the row's very right edge -
+		the right-aligned value label shortens it at draw time.
 	*/
 
 	auto value_bar_rect = icon_rect;

@@ -584,6 +584,7 @@ if(HAS_HEAD)
 	"src/view/game_gui/elements/drag_and_drop_target_drop_item.cpp"
 	"src/view/game_gui/elements/game_gui_root.cpp"
 	"src/view/game_gui/elements/value_bar.cpp"
+	"src/view/hud_bar_drawing.cpp"
 	"src/view/game_gui/elements/slot_button.cpp"
 	"src/view/game_gui/game_gui_system.cpp"
 	"src/view/viewables/particle_effect.cpp"
