@@ -29,11 +29,7 @@
     },
     "game_modes": {
         "bomb_defusal": {
-            "default_bot_quota": 6,
-            "warmup_time": 81
-        },
-        "gun_game": {
-            "warmup_time": 81
+            "default_bot_quota": 6
         }
     },
     "external_resources": [
