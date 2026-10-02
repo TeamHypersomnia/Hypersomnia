@@ -64,11 +64,16 @@ inline constexpr real32 THROWN_MELEE_HOP_DURATION_MULT = 1.25f;
 inline constexpr real32 UNMOUNTED_ITEM_FALL_SECS = 0.5f;
 inline constexpr real32 UNMOUNTED_ITEM_FALL_HEIGHT = 4.8f;
 inline constexpr uint8_t UNMOUNTED_MAGAZINE_FLOOR_HITS = 2;
-inline constexpr real32 UNMOUNTED_MAGAZINE_HOP_HEIGHT = 6.f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_HOP_HEIGHT = 4.2f;
 inline constexpr real32 UNMOUNTED_MAGAZINE_HOP_HEIGHT_VARIATION = 0.12f;
 inline constexpr real32 UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT = 0.04f;
 inline constexpr real32 UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT = 0.1f;
-inline constexpr real32 UNMOUNTED_MAGAZINE_VELOCITY_MULT = 1.5f;
+/*
+	Hops last as long as the square root of their height, so to scale how far magazines fly by k
+	while keeping the arc's shape, scale UNMOUNTED_MAGAZINE_HOP_HEIGHT by k and this by sqrt(k).
+*/
+
+inline constexpr real32 UNMOUNTED_MAGAZINE_VELOCITY_MULT = 1.25f;
 
 inline constexpr real32 DROPPED_ITEM_SPIN_KEPT = 0.25f;
 inline constexpr real32 DROPPED_ITEM_COUNTER_SPIN_DEGREES = 310.f;
