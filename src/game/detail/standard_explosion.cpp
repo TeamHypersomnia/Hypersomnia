@@ -1,4 +1,5 @@
 #include <map>
+#include <algorithm>
 #include "augs/misc/randomization.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/standard_explosion.h"
@@ -60,7 +61,7 @@ void standard_explosion_input::instantiate(
 			th.max_branch_lifetime_ms = {40.f, 65.f};
 			th.branch_length = {10.f, 120.f};
 
-			th.max_all_spawned_branches = 40 + (t+1)*10;
+			th.max_all_spawned_branches = static_cast<decltype(th.max_all_spawned_branches)>((40 + (t+1)*10) * thunders_mult);
 			th.max_branch_children = 2;
 
 			th.first_branch_root = explosion_location;
@@ -68,7 +69,10 @@ void standard_explosion_input::instantiate(
 			th.first_branch_root.rotation += t * 360/4;
 			th.branch_angle_spread = 40.f;
 
-			th.color = t % 2 ? cyan : turquoise;
+			/*
+				In the explosion's own colors - e.g. fiery for the skull rockets.
+			*/
+			th.color = t % 2 ? inner_ring_color : outer_ring_color;
 
 			step.post_message(msg);
 		}
@@ -498,42 +502,97 @@ void standard_explosion_input::instantiate(
 
 	// TODO_PERFORMANCE: This code is unnecessary for the server
 
-	{
+	/*
+		Each ring of the explosion is made of the pixel art particles,
+		accompanied by a thin ring following its outer edge with the particles' timing, to accentuate the explosion.
+		The thin ring is opaque until the end, vanishing by getting thinner - no translucency in pixel art.
+	*/
+
+	const auto& palette = explosion_particles.palette;
+
+	auto palette_color_or = [&palette](const std::size_t index, const rgba fallback) {
+		if (palette.empty()) {
+			return fallback;
+		}
+
+		return palette[std::min(index, palette.size() - 1)];
+	};
+
+	auto post_rings = [&](
+		const real32 outer_start,
+		const real32 outer_end,
+		const real32 inner_start,
+		const real32 inner_end,
+		const rgba color,
+		const real32 palette_offset
+	) {
 		auto msg = messages::exploding_ring_effect(predictability);
 		auto& ring = msg.payload;
 
-		ring.outer_radius_start_value = effective_radius / 2;
-		ring.outer_radius_end_value = effective_radius;
+		ring.outer_radius_start_value = outer_start;
+		ring.outer_radius_end_value = outer_end;
 
-		ring.inner_radius_start_value = 0.f;
-		ring.inner_radius_end_value = effective_radius;
-		
-		ring.emit_particles_on_ring = true;
+		ring.inner_radius_start_value = inner_start;
+		ring.inner_radius_end_value = inner_end;
+
+		ring.emit_ring_end_particles = true;
+		ring.emit_explosion_particles = true;
+		ring.explosion_particles = explosion_particles;
+		ring.explosion_particles_share = 0.5f;
+		ring.explosion_particles_palette_offset = palette_offset;
+		ring.explosion_particles_hot_color = inner_ring_color;
+		ring.draw_color_rings = draws_color_rings;
 
 		ring.maximum_duration_seconds = ring_duration_seconds;
 
-		ring.color = inner_ring_color;
+		ring.color = color;
 		ring.center = explosion_pos;
 		ring.visibility = response;
 
 		step.post_message(msg);
-	}
+
+		ring.emit_ring_end_particles = false;
+		ring.emit_explosion_particles = false;
+		ring.draw_color_rings = true;
+		ring.emit_light = false;
+		ring.color = palette_color_or(0, color);
+
+		/* The client's settings override this thickness. */
+		ring.fixed_thickness = explosion_particles.fire ? 20.0f : 6.0f;
+		ring.is_explosion_thin_ring = true;
+		ring.final_alpha = 1.0f;
+		ring.fade_by_thinning = true;
+
+		step.post_message(msg);
+	};
+
+	post_rings(effective_radius / 2, effective_radius, 0.f, effective_radius, inner_ring_color, 0.f);
+	post_rings(effective_radius, effective_radius / 2, effective_radius / 1.5f, effective_radius / 2, outer_ring_color, 0.5f);
 
 	{
+		/*
+			A hard, fully opaque flash in the inner ring's color for the first couple of frames,
+			a third of the explosion's radius across, marking the very moment of the blast.
+			No light of its own - the explosion's rings already emit it.
+		*/
+
 		auto msg = messages::exploding_ring_effect(predictability);
 		auto& ring = msg.payload;
 
-		ring.outer_radius_start_value = effective_radius;
-		ring.outer_radius_end_value = effective_radius / 2;
+		ring.outer_radius_start_value = effective_radius / 3;
+		ring.outer_radius_end_value = effective_radius / 2.5f;
 
-		ring.inner_radius_start_value = effective_radius / 1.5f;
-		ring.inner_radius_end_value = effective_radius / 2;
-		
-		ring.emit_particles_on_ring = true;
+		ring.inner_radius_start_value = 0.f;
+		ring.inner_radius_end_value = 0.f;
 
-		ring.maximum_duration_seconds = ring_duration_seconds;
+		ring.maximum_duration_seconds = 0.035f;
+		ring.final_alpha = 1.0f;
 
-		ring.color = outer_ring_color;
+		ring.draw_color_rings = true;
+		ring.emit_light = false;
+
+		ring.color = palette_color_or(0, inner_ring_color);
+		ring.color.a = 255;
 		ring.center = explosion_pos;
 		ring.visibility = response;
 

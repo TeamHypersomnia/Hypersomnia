@@ -3,6 +3,13 @@
 
 constexpr std::size_t MAX_EXPLODING_RINGS = 300;
 
+/*
+	A dedicated pool for the pixel art explosion particles,
+	so that they never starve the other particle pools (and vice versa).
+	Fits around 10 full-sized explosions on screen at once.
+*/
+constexpr std::size_t MAX_EXPLOSION_PARTICLES = 20000;
+
 constexpr std::size_t MAX_THUNDERS = 100;
 
 constexpr std::size_t MAX_THUNDER_BRANCHES = 255;

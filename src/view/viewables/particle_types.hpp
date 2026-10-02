@@ -1,4 +1,6 @@
 #pragma once
+#include <cmath>
+#include <algorithm>
 #include "particle_types.h"
 #include "augs/templates/traits/has_rotation.h"
 
@@ -25,6 +27,89 @@ FORCE_INLINE void general_particle::integrate(const float dt) {
 
 FORCE_INLINE bool general_particle::is_dead() const {
 	return current_lifetime_ms >= max_lifetime_ms;
+}
+
+FORCE_INLINE void explosion_particle::update_sprite_transform() {
+	sprite.pos = center + vec2::from_degrees(angle) * radius + drift;
+	sprite.rotation = angle + 90.f + rotation_offset;
+}
+
+FORCE_INLINE void explosion_particle::update_sprite_color() {
+	const auto age_ms = sprite.current_lifetime_ms;
+
+	if (!palette.empty()) {
+		const auto last = static_cast<float>(palette.size() - 1);
+		const auto pos = std::clamp(palette_offset + age_ms / palette_step_ms, 0.f, last);
+		const auto i = static_cast<std::size_t>(pos);
+		const auto next = std::min(i + 1, palette.size() - 1);
+
+		sprite.color = augs::interp(palette[i], palette[next], pos - static_cast<float>(i));
+		sprite.color.a = 255;
+		return;
+	}
+
+	auto stepped = [this](const float t) {
+		const auto clamped = std::clamp(t, 0.f, 1.f);
+
+		if (color_steps > 0) {
+			const auto steps = static_cast<float>(color_steps);
+			return std::floor(clamped * steps) / steps;
+		}
+
+		return clamped;
+	};
+
+	const auto considered = [&]() {
+		if (age_ms < hot_until_ms) {
+			return augs::interp(hot_color, ring_color, stepped(age_ms / hot_until_ms));
+		}
+
+		if (age_ms > cool_from_ms) {
+			const auto cooling_ms = std::max(cool_until_ms - cool_from_ms, 1.f);
+			return augs::interp(ring_color, cool_color, stepped((age_ms - cool_from_ms) / cooling_ms));
+		}
+
+		return ring_color;
+	}();
+
+	sprite.color = considered;
+	sprite.color.a = 255;
+}
+
+FORCE_INLINE void explosion_particle::update_sprite_size() {
+	if (speed_stretch <= 0.f || initial_speed <= 0.f) {
+		return;
+	}
+
+	const auto speed = vec2(radial_vel, tangential_vel).length();
+	const auto stretch = 1.f + speed_stretch * std::min(1.f, speed / initial_speed);
+
+	sprite.size = vec2i(vec2(base_size.x * stretch, base_size.y));
+}
+
+FORCE_INLINE void explosion_particle::integrate(const float dt) {
+	sprite.current_lifetime_ms += dt * 1000;
+
+	if (velocity_damping > 0.f) {
+		const auto decay = std::exp(-velocity_damping * dt);
+
+		radial_vel *= decay;
+		tangential_vel *= decay;
+	}
+
+	radius += radial_vel * dt;
+	angle += RAD_TO_DEG<float> * tangential_vel * dt / std::max(radius, 1.f);
+
+	drift_vel += drift_acc * dt;
+	drift += drift_vel * dt;
+
+	if (radius < 0.f || radius > max_radius) {
+		sprite.current_lifetime_ms = sprite.max_lifetime_ms;
+	}
+
+	update_sprite_transform();
+	update_sprite_color();
+	update_sprite_size();
 }
 
 FORCE_INLINE void general_particle::set_position(const vec2 new_pos) {

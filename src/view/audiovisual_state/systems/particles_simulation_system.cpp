@@ -186,6 +186,10 @@ std::size_t particles_simulation_system::count_particles_on_layer(const particle
 	total += general_particles[p].size();
 	total += animated_particles[p].size();
 
+	if (p == explosion_particles_layer) {
+		total += explosion_particles.size();
+	}
+
 	for (const auto& v : homing_animated_particles[p]) {
 		total += v.second.size();
 	}
@@ -198,6 +202,7 @@ std::size_t particles_simulation_system::count_all_particles() const {
 
 	total += ::accumulate_sizes(general_particles);
 	total += ::accumulate_sizes(animated_particles);
+	total += explosion_particles.size();
 
 	for (const auto& m : homing_animated_particles) {
 		for (const auto& v : m) {
@@ -217,6 +222,7 @@ void particles_simulation_system::clear() {
 	clearer(general_particles);
 	clearer(animated_particles);
 	clearer(homing_animated_particles);
+	explosion_particles.clear();
 
 	firearm_engine_caches.clear();
 	continuous_particles_caches.clear();
@@ -237,6 +243,11 @@ void particles_simulation_system::add_particle(const particle_layer l, const ani
 
 void particles_simulation_system::add_particle(const particle_layer l, const entity_id id, const homing_animated_particle& p) {
 	homing_animated_particles[l][id].push_back(p);
+}
+
+void particles_simulation_system::add_explosion_particle(const explosion_particle& p) {
+	auto p_copy = p;
+	::simple_push_or_recycle(explosion_particles, p_copy);
 }
 
 void particles_simulation_system::update_effects_from_messages(
@@ -519,6 +530,8 @@ void particles_simulation_system::for_each_particle_in_range(
 			}
 		}
 	});
+
+	maybe_process(explosion_particles_layer, explosion_particles);
 }
 
 void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
@@ -533,6 +546,8 @@ void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
 	for (auto& particle_layer : animated_particles) {
 		dead_particles_remover(particle_layer);
 	}
+
+	dead_particles_remover(explosion_particles);
 
 	for (auto& particle_layer : homing_animated_particles) {
 		erase_if(particle_layer, [&](auto& cluster) {
@@ -594,6 +609,9 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 			}
 			else if constexpr(std::is_same_v<P, homing_animated_particle>) {
 				particle.integrate(delta, anims, std::forward<decltype(args)>(args)...);
+			}
+			else if constexpr(std::is_same_v<P, explosion_particle>) {
+				particle.integrate(delta);
 			}
 			else {
 				static_assert(always_false_v<P>, "Unimplemented!");

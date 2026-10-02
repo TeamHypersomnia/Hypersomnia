@@ -13,6 +13,7 @@
 #include "game/detail/damage/damage_definition.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/predictability_info.h"
+#include "game/detail/view_input/explosion_particles_def.h"
 
 struct damage_cause;
 
@@ -20,6 +21,8 @@ struct damage_cause;
 	leaves_ground_decal leaves a scorch mark on the ground, sized by the damage -
 	or ground_decal_fixed_size_mult if above 0, e.g. for flashes, which deal negligible damage.
 	leaves_surface_decals leaves marks on the surfaces the blast hits whose materials define explosion_decals.
+	draws_color_rings draws the flat colored rings of the explosion.
+	thunders_mult scales the number of branches of the thunders (with create_thunders_effect).
 */
 
 struct standard_explosion_input {
@@ -44,8 +47,11 @@ struct standard_explosion_input {
 	bool bother_avoiding = true;
 	bool leaves_ground_decal = true;
 	bool leaves_surface_decals = true;
-	pad_bytes<3> pad;
+	bool draws_color_rings = true;
+	pad_bytes<2> pad;
 	real32 ground_decal_fixed_size_mult = 0.f;
+	real32 thunders_mult = 1.f;
+	explosion_particles_def explosion_particles;
 	// END GEN INTROSPECTOR
 
 	auto& operator*=(const real32 scalar) {

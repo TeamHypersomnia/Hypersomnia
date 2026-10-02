@@ -1,6 +1,7 @@
 #pragma once
 #include "game/cosmos/entity_id.h"
 #include "game/messages/visibility_information.h"
+#include "game/detail/view_input/explosion_particles_def.h"
 
 struct exploding_ring_input {
 	float outer_radius_start_value = 0.f;
@@ -10,8 +11,33 @@ struct exploding_ring_input {
 
 	float maximum_duration_seconds = 0.f;
 
-	bool emit_particles_on_ring = false;
+	/*
+		emit_ring_end_particles spawns the sparkles and smokes along the ring right before it vanishes.
+
+		emit_explosion_particles fills the whole ring at its start with pixel art particles
+		moving with the ring's edges, so they approximate the ring itself (see explosion_particles_def).
+		explosion_particles_share is the fraction of the per-explosion particle budget this ring takes,
+		e.g. 0.5 for each of the two rings of a standard explosion.
+		The particles start from explosion_particles_hot_color, slightly brightened,
+		or explosion_particles_palette_offset entries into the palette.
+
+		draw_color_rings draws the ring itself as a flat colored shape.
+		is_explosion_thin_ring marks the thin ring accompanying an explosion's ring -
+		its thickness then comes from the client's explosions_settings.
+		fade_by_thinning makes a fixed_thickness ring vanish by getting thinner (down to sub-pixel widths)
+		instead of by fading its alpha.
+	*/
+	bool emit_ring_end_particles = false;
+	bool emit_explosion_particles = false;
+	bool draw_color_rings = true;
+	bool fade_by_thinning = false;
+	bool is_explosion_thin_ring = false;
 	bool emit_light = true;
+
+	explosion_particles_def explosion_particles;
+	float explosion_particles_share = 1.f;
+	float explosion_particles_palette_offset = 0.f;
+	rgba explosion_particles_hot_color = white;
 
 	float final_alpha = 0.0f;
 	float halve_per_ms = -1.0f;

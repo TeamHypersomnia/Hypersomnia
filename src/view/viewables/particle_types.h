@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <limits>
 #include "augs/drawing/drawing.h"
 #include "augs/math/vec2.h"
 #include "view/viewables/particle_types_declaration.h"
@@ -12,6 +13,7 @@
 #include "game/assets/animation.h"
 
 #include "augs/drawing/sprite_helpers.h"
+#include "game/detail/view_input/explosion_particles_def.h"
 
 template <class T, class = void>
 struct has_lifetime : std::false_type {};
@@ -123,6 +125,81 @@ struct general_particle {
 	void colorize(const rgba);
 
 	void set_image(assets::image_id, vec2i size, rgba);
+};
+
+/*
+	A general_particle moving in polar coordinates around a fixed center,
+	for the pixel art explosions approximating the exploding rings.
+
+	The sprite always lies tangent to the circle it is on (plus rotation_offset).
+	tangential_vel is in pixels per second, so the angular velocity follows the current radius.
+	The drift is an independent cartesian offset, driven by drift_acc.
+
+	The particle dies upon reaching max_radius (e.g. a wall that occluded the explosion)
+	or crossing the center.
+
+	Both velocities decay exponentially by velocity_damping (per second) for an explosive ease-out.
+	At full initial speed, the sprite is stretched by speed_stretch along its length,
+	going back to base_size as it slows down.
+
+	The color goes from hot_color through ring_color to cool_color, by the time since the spawn -
+	all the particles of one explosion spawn at once, so they all change color in sync.
+	The transitions happen in color_steps discrete steps (0 = smoothly), always fully opaque.
+
+	A non-empty palette replaces all that: the color is interpolated between the palette's entries
+	at palette_offset + (time since the spawn / palette_step_ms), clamped to the last one.
+*/
+
+struct explosion_particle {
+	general_particle sprite;
+
+	vec2 center;
+	vec2 drift;
+	vec2 drift_vel;
+	vec2 drift_acc;
+
+	float radius = 0.f;
+	float radial_vel = 0.f;
+	float tangential_vel = 0.f;
+	float angle = 0.f;
+	float rotation_offset = 0.f;
+	float max_radius = std::numeric_limits<float>::max();
+
+	float velocity_damping = 0.f;
+	float initial_speed = 0.f;
+	float speed_stretch = 0.f;
+	vec2 base_size;
+
+	rgba hot_color = white;
+	rgba ring_color = white;
+	rgba cool_color = white;
+	float hot_until_ms = 0.f;
+	float cool_from_ms = std::numeric_limits<float>::max();
+	float cool_until_ms = std::numeric_limits<float>::max();
+	int color_steps = 0;
+
+	explosion_particles_palette palette;
+	float palette_offset = 0.f;
+	float palette_step_ms = 1.f;
+
+	void integrate(const float dt);
+	void update_sprite_color();
+	void update_sprite_size();
+	void update_sprite_transform();
+
+	template <bool use_neon_maps, class M>
+	void draw_as_sprite(
+		augs::vertex_triangle& t1,
+		augs::vertex_triangle& t2,
+		const M& manager,
+		const plain_animations_pool& anims
+	) const {
+		sprite.template draw_as_sprite<use_neon_maps>(t1, t2, manager, anims);
+	}
+
+	bool is_dead() const {
+		return sprite.is_dead();
+	}
 };
 
 struct animation_in_particle {

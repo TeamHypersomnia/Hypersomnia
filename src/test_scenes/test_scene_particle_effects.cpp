@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cmath>
 #include <algorithm>
+#include <iterator>
 /*
 	Disable float/int warnings, this is just a content script
 */
@@ -262,6 +263,67 @@ void load_test_scene_particle_effects(
 	make_grenade_trail(test_scene_particle_effect_id::INTERFERENCE_GRENADE_TRAIL, yellow);
 	make_grenade_trail(test_scene_particle_effect_id::FLASHBANG_TRAIL, white);
 	make_grenade_trail(test_scene_particle_effect_id::PED_GRENADE_TRAIL, cyan);
+
+	{
+		/*
+			Only the particle definitions are used - the exploding ring system
+			spawns them itself, colors them with the ring's color
+			and overrides their lifetimes to match the ring's duration.
+
+			Optionally, instead of the full blank rectangles, each size gets its own
+			ragged flame sprite: a piece of an arc (of a circle with a radius of 120 sprite pixels),
+			twice the blank's length and thickness (fire_particle_1 is 16 long and 2 thick, fire_particle_2 is 32 and 4 etc.),
+			drawn in exactly the sprite's size. The arc bulges towards the image's top,
+			i.e. away from the explosion's center, as the particles' local y axis points towards it.
+		*/
+		auto& effect = acquire_effect(test_scene_particle_effect_id::EXPLODING_RING_EXPLOSION_PARTICLES);
+		make_line_trail(effect, 1.f, white, false, 0, 6);
+
+		auto& definitions = effect.emissions.back().get_definitions<general_particle>();
+
+#if 1
+		const auto first_fire_particle = static_cast<int>(test_scene_image_id::FIRE_PARTICLE_1);
+
+		/*
+			The exact sizes of the fire_particle_N.png files.
+			The arcs need extra height for their bulge.
+		*/
+		const vec2i fire_particle_sizes[] = {
+			{ 16, 3 },
+			{ 32, 8 },
+			{ 48, 11 },
+			{ 64, 15 },
+			{ 80, 19 },
+			{ 96, 25 }
+		};
+
+		/*
+			Each size also comes straight (fire_particle_straight_N),
+			so that both the arcs and the straight ones spawn, equally often.
+		*/
+		const auto first_straight_fire_particle = static_cast<int>(test_scene_image_id::FIRE_PARTICLE_STRAIGHT_1);
+		const auto straight_definitions = definitions;
+
+		for (std::size_t i = 0; i < definitions.size() && i < std::size(fire_particle_sizes); ++i) {
+			definitions[i].image_id = to_image_id(static_cast<test_scene_image_id>(first_fire_particle + static_cast<int>(i)));
+			definitions[i].size = fire_particle_sizes[i];
+		}
+
+		for (std::size_t i = 0; i < straight_definitions.size(); ++i) {
+			auto straight = straight_definitions[i];
+			const auto size_i = static_cast<int>(i) + 1;
+
+			straight.image_id = to_image_id(static_cast<test_scene_image_id>(first_straight_fire_particle + static_cast<int>(i)));
+			straight.size = vec2i(size_i * 16, size_i * 2);
+
+			definitions.push_back(straight);
+		}
+#else
+		for (auto& definition : definitions) {
+			definition.image_id = to_image_id(test_scene_image_id::BLANK);
+		}
+#endif
+	}
 
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_SMOKE);

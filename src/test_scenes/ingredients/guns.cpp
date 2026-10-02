@@ -2270,6 +2270,8 @@ namespace test_flavours {
 			in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 
 			in.create_thunders_effect = true;
+			/* Thinner thunders - the Electric Triad spell fires three of these at once. */
+			in.thunders_mult = 0.35f;
 			in.wave_shake_radius_mult = 6;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);

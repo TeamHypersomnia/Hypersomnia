@@ -209,7 +209,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = max_radius / 1.4f;
 					ring.inner_radius_end_value = max_radius / 1.2f;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.16f;
 
@@ -333,7 +333,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = base_radius / 2.5f;
 					ring.inner_radius_end_value = base_radius / 3.f;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.20f;
 
@@ -353,7 +353,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = 0.f;
 					ring.inner_radius_end_value = base_radius;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.20f;
 
@@ -455,7 +455,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = 0.f;
 					ring.inner_radius_end_value = base_radius;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.20f;
 
@@ -484,7 +484,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = base_radius / 2.5f;
 					ring.inner_radius_end_value = base_radius / 3.f;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.20f;
 
@@ -504,7 +504,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.inner_radius_start_value = 0.f;
 					ring.inner_radius_end_value = base_radius;
 
-					ring.emit_particles_on_ring = false;
+					ring.emit_ring_end_particles = false;
 
 					ring.maximum_duration_seconds = 0.20f;
 

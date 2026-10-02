@@ -22,6 +22,14 @@
 
 inventory_space_type to_space_units(const std::string& s);
 
+/*
+	The colors the corpse explosions' particles end in - the factions' colors
+	(Resistance's brightened, as its standard red goes too dark).
+*/
+
+static const auto metropolis_corpse_explosion_end_color = rgba(40, 230, 255, 255);
+static const auto resistance_corpse_explosion_end_color = rgba(255, 100, 50, 255);
+
 namespace test_flavours {
 	void populate_character_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
@@ -334,9 +342,26 @@ namespace test_flavours {
 				auto& dmg = in.damage;
 
 				dmg.base = -100.f;
-				in.inner_ring_color = orange;
-				in.outer_ring_color = yellow;
+				in.inner_ring_color = white;
+				in.outer_ring_color = white;
 				in.effective_radius = 350.f;
+
+				/* Orderly, cybernetic-looking particles. */
+				in.explosion_particles.variation = 0.2f;
+
+				/*
+					A gentler, longer blast: the particles live longer and slow down only mildly,
+					so they keep drifting past the ring's end instead of stalling in thin rings.
+				*/
+				in.explosion_particles.lifetime_mult = 1.2f;
+				in.explosion_particles.ease_out_mult = 1.2f;
+
+				/*
+					The white particles fade into the faction's color only late,
+					so that the white still dominates.
+				*/
+				in.explosion_particles.cool_color = metropolis_corpse_explosion_end_color;
+				in.explosion_particles.cool_from_mult = 0.925f;
 				dmg.impact_impulse = 2.f;
 				dmg.impulse_multiplier_against_sentience = 1000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
@@ -369,6 +394,7 @@ namespace test_flavours {
 						auto& c = meta.get<invariants::cascade_explosion>();
 						e.inner_ring_color = white;
 						e.outer_ring_color = white;
+						e.explosion_particles.cool_color = metropolis_corpse_explosion_end_color;
 						c.explosion = e;
 						c.explosion_interval_ms = { 500.f, 1.f };
 						c.circle_collider_radius = 50.f;
@@ -382,6 +408,7 @@ namespace test_flavours {
 						auto& c = meta.get<invariants::cascade_explosion>();
 						e.inner_ring_color = white;
 						e.outer_ring_color = white;
+						e.explosion_particles.cool_color = resistance_corpse_explosion_end_color;
 						c.explosion = e;
 						c.explosion_interval_ms = { 500.f, 1.f };
 						c.circle_collider_radius = 50.f;
@@ -491,8 +518,9 @@ namespace test_flavours {
 				auto& explosive = meta.get<invariants::sentience>().corpse_explosion;
 
 				auto& in = explosive.explosion;
-				in.inner_ring_color = orange;
-				in.outer_ring_color = yellow;
+				in.inner_ring_color = white;
+				in.outer_ring_color = white;
+				in.explosion_particles.cool_color = resistance_corpse_explosion_end_color;
 
 				{
 					auto& c = explosive.cascade[0];

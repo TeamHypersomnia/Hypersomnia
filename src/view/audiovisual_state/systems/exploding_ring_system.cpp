@@ -1,4 +1,6 @@
 #include <cstddef>
+#include <cmath>
+#include <limits>
 #include "augs/drawing/drawing.hpp"
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
@@ -17,6 +19,280 @@
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/special_effects_settings.h"
 #include "view/viewables/particle_types.hpp"
+
+/*
+	The radius of a force grenade's explosion.
+	An explosion this big spawns the whole max_particles_per_explosion budget.
+	Bigger explosions scale their particles up instead of spawning more of them,
+	smaller ones spawn proportionally fewer particles, keeping the density.
+*/
+
+constexpr auto reference_explosion_radius = 380.f;
+
+static void spawn_explosion_particles(
+	const exploding_ring_input& r,
+	randomization& rng,
+	const explosions_settings& settings,
+	const particles_emission& emission,
+	particles_simulation_system& particles
+) {
+	const auto& definitions = emission.get_definitions<general_particle>();
+	const auto& def = r.explosion_particles;
+	const auto& look = def.fire ? settings.fire_particles : settings.standard_particles;
+
+	if (definitions.empty()) {
+		return;
+	}
+
+	const auto max_ring_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
+	const auto radius_ratio = max_ring_radius / reference_explosion_radius;
+	const auto size_mult = std::max(1.f, radius_ratio);
+	const auto amount_mult = std::min(1.f, radius_ratio * radius_ratio);
+
+	const auto total_to_spawn = 
+		static_cast<float>(settings.max_particles_per_explosion) 
+		* r.explosion_particles_share 
+		* amount_mult
+	;
+
+	const auto duration_secs = std::max(r.maximum_duration_seconds, 0.01f);
+	const auto duration_ms = duration_secs * 1000.f;
+	const auto explosion_lifetime_mult = std::max(0.01f, def.lifetime_mult);
+	const auto max_lifetime_ms = duration_ms * look.particle_lifetime_mult_max * explosion_lifetime_mult;
+
+	const auto inner_start = r.inner_radius_start_value;
+	const auto outer_start = r.outer_radius_start_value;
+	const auto band_width = outer_start - inner_start;
+
+	/*
+		Both edges of the ring move at constant speeds over its duration.
+		Each particle moves at the speed interpolated between them by where it starts within the ring,
+		so the particles keep filling the ring as it expands or contracts.
+	*/
+
+	const auto inner_vel = (r.inner_radius_end_value - inner_start) / duration_secs;
+	const auto outer_vel = (r.outer_radius_end_value - outer_start) / duration_secs;
+
+	const auto spin = rng.randval(0, 1) == 0 ? -1.f : 1.f;
+
+	const auto variation = std::max(0.f, def.variation);
+	const auto jitter_radius = look.particle_jitter_radius * variation;
+	const auto jitter_degrees = look.particle_jitter_degrees * variation;
+	const auto random_acceleration_min = look.particle_random_acceleration_min * variation;
+	const auto random_acceleration_max = look.particle_random_acceleration_max * variation;
+
+	/*
+		Less variation narrows the lifetime range towards the moment the ring ends (1),
+		so the particles die out more in unison - right as they arrive at the ring's end radius,
+		not lingering there after having eased out to a stop.
+	*/
+
+	const auto lifetime_narrowing_target = std::clamp(1.f, look.particle_lifetime_mult_min, look.particle_lifetime_mult_max);
+	const auto clamped_variation = std::min(1.f, variation);
+	const auto lifetime_mult_min = augs::interp(lifetime_narrowing_target, look.particle_lifetime_mult_min, clamped_variation);
+	const auto lifetime_mult_max = augs::interp(lifetime_narrowing_target, look.particle_lifetime_mult_max, clamped_variation);
+
+	/*
+		The exponential slowdown with the time constant tau covers tau * (1 - exp(-duration / tau)) 
+		in the time a constant speed covers the whole duration - the initial speeds are compensated by the ratio,
+		so the particles still reach the ring's end radius right when the ring ends.
+	*/
+
+	const auto ease_tau_secs = look.particle_ease_out * std::max(0.f, def.ease_out_mult) * duration_secs;
+	const auto velocity_damping = ease_tau_secs > 0.f ? 1.f / ease_tau_secs : 0.f;
+
+	const auto ease_compensation = 
+		ease_tau_secs > 0.f ?
+		duration_secs / (ease_tau_secs * (1.f - std::exp(-duration_secs / ease_tau_secs))) :
+		1.f
+	;
+
+	/*
+		Opaque colors only - the particles are pixel art, no translucency.
+	*/
+
+	auto ring_color = r.color;
+	ring_color.a = 255;
+
+	/*
+		Hot means the explosion's inner ring color, slightly brightened -
+		the same for both rings, so that the blast starts in a single color.
+	*/
+
+	auto hot_color = r.explosion_particles_hot_color;
+
+	{
+		auto hot_hsl = hot_color.get_hsl();
+		hot_hsl.l += (1.f - hot_hsl.l) * 0.35f;
+		hot_color.set_hsl(hot_hsl);
+	}
+
+	hot_color.a = 255;
+
+	auto cool_color = ring_color;
+
+	if (def.cool_color.a > 0) {
+		cool_color = def.cool_color;
+	}
+	else if (const auto cooling = std::clamp(def.cooling, 0.f, 1.f); cooling > 0.f) {
+		cool_color.mult_brightness(augs::interp(1.f, look.particle_cool_brightness, cooling));
+	}
+
+	cool_color.a = 255;
+
+	/*
+		Only the fiery (red to orange) explosions leave embers behind -
+		the others (white, cyan etc.) are luminous, cybernetic blasts.
+	*/
+
+	const auto ember_fraction = [&]() {
+		const auto ring_hsl = ring_color.get_hsl();
+		const bool is_fiery = ring_hsl.s > 0.5f && (ring_hsl.h <= 45 || ring_hsl.h >= 345);
+
+		return is_fiery ? look.particle_ember_fraction : 0.f;
+	}();
+
+	/*
+		The particles go through the whole palette over particle_palette_duration_fraction of the ring's duration,
+		then stay in its last color.
+	*/
+	const auto palette_duration_ms = duration_ms * explosion_lifetime_mult * look.particle_palette_duration_fraction;
+
+	const auto palette_step_ms = 
+		def.palette.size() < 2 ? 
+		1.f : 
+		std::max(1.f, palette_duration_ms / static_cast<float>(def.palette.size() - 1))
+	;
+
+	const auto hot_until_ms = duration_ms * look.particle_hot_fraction;
+	const auto cool_from_ms = duration_ms * look.particle_cool_from_fraction * std::max(0.f, def.cool_from_mult);
+	const auto cool_until_ms = cool_from_ms + std::max(1.f, duration_ms * look.particle_cool_duration_fraction);
+
+	auto spawn_one = [&](const float angle, const float max_particle_radius) {
+		/* Uniform density over the ring's area. */
+		const auto radius = std::sqrt(augs::interp(inner_start * inner_start, outer_start * outer_start, rng.randval(0.f, 1.f)));
+		const auto t = std::abs(band_width) > 0.001f ? (radius - inner_start) / band_width : 0.5f;
+		const auto jittered_radius = std::max(0.f, radius + rng.randval_h(jitter_radius * size_mult));
+
+		if (jittered_radius > max_particle_radius) {
+			return;
+		}
+
+		auto p = explosion_particle();
+
+		const bool is_ember = rng.randval(0.f, 1.f) < ember_fraction;
+
+		p.sprite = definitions[rng.randval(0u, static_cast<unsigned>(definitions.size()) - 1)];
+		p.sprite.multiply_size(size_mult * look.particle_size_mult * (is_ember ? 0.5f : 1.f));
+		p.sprite.max_lifetime_ms = duration_ms * explosion_lifetime_mult * rng.randval(lifetime_mult_min, lifetime_mult_max);
+		p.sprite.shrink_when_ms_remaining = max_lifetime_ms;
+
+		p.center = r.center;
+		p.radius = jittered_radius;
+		p.radial_vel = augs::interp(inner_vel, outer_vel, t) * ease_compensation;
+		p.tangential_vel = spin * size_mult * rng.randval(look.particle_tangential_speed_min, look.particle_tangential_speed_max) * ease_compensation;
+		p.angle = angle;
+		p.rotation_offset = rng.randval_h(jitter_degrees);
+		p.max_radius = max_particle_radius;
+		p.velocity_damping = velocity_damping;
+
+		p.drift_acc = 
+			vec2::from_degrees(rng.randval(0.f, 360.f)) 
+			* size_mult
+			* rng.randval(random_acceleration_min, random_acceleration_max)
+		;
+
+		if (is_ember) {
+			/*
+				Embers linger after the blast, drifting around more erratically,
+				shrinking over their whole long lifetime.
+			*/
+			p.sprite.max_lifetime_ms *= look.particle_ember_lifetime_mult;
+			p.sprite.shrink_when_ms_remaining = p.sprite.max_lifetime_ms;
+			p.radial_vel *= 0.5f;
+			p.tangential_vel *= 0.5f;
+			p.drift_acc *= 2.f;
+		}
+		else {
+			p.speed_stretch = look.particle_speed_stretch;
+		}
+
+		p.initial_speed = vec2(p.radial_vel, p.tangential_vel).length();
+		p.base_size = vec2(p.sprite.size);
+
+		p.hot_color = hot_color;
+		p.ring_color = ring_color;
+		p.cool_color = cool_color;
+		p.hot_until_ms = hot_until_ms;
+		p.cool_from_ms = cool_from_ms;
+		p.cool_until_ms = cool_until_ms;
+		p.color_steps = look.particle_color_steps;
+
+		if (!def.palette.empty()) {
+			p.palette = def.palette;
+			p.palette_offset = r.explosion_particles_palette_offset;
+			p.palette_step_ms = palette_step_ms;
+		}
+
+		p.update_sprite_transform();
+		p.update_sprite_color();
+		p.update_sprite_size();
+		particles.add_explosion_particle(p);
+	};
+
+	const auto& vis = r.visibility;
+	const auto num_triangles = vis.get_num_triangles();
+
+	if (num_triangles == 0) {
+		for (auto i = 0.f; i < total_to_spawn; i += 1.f) {
+			spawn_one(rng.randval(0.f, 360.f), std::numeric_limits<float>::max());
+		}
+
+		return;
+	}
+
+	/*
+		The visibility triangles fan out from the center.
+		Each spawns its share of the particles in its angular sector,
+		only up to the sector's far edge - so the walls occlude the explosion,
+		and the particles die upon reaching them.
+	*/
+
+	auto carried_amount = 0.f;
+
+	for (std::size_t i = 0; i < num_triangles; ++i) {
+		const auto tri = vis.get_world_triangle(i, r.center);
+		const auto first_dir = tri[1] - r.center;
+		const auto second_dir = tri[2] - r.center;
+		const auto first_angle = first_dir.degrees();
+		const auto sweep = first_dir.full_degrees_between(second_dir);
+
+		if (!std::isfinite(sweep) || !std::isfinite(first_angle)) {
+			continue;
+		}
+
+		const auto far_edge = tri[2] - tri[1];
+		const auto fallback_boundary = std::max(first_dir.length(), second_dir.length());
+
+		carried_amount += total_to_spawn * std::abs(sweep) / 360.f;
+
+		while (carried_amount >= 1.f) {
+			carried_amount -= 1.f;
+
+			const auto angle = first_angle + sweep * rng.randval(0.f, 1.f);
+			const auto dir = vec2::from_degrees(angle);
+			const auto denom = dir.cross(far_edge);
+
+			const auto boundary = 
+				std::abs(denom) > 0.0001f ? 
+				first_dir.cross(far_edge) / denom :
+				fallback_boundary
+			;
+
+			spawn_one(angle, boundary);
+		}
+	}
+}
 
 void exploding_ring_system::clear() {
 	rings.clear();
@@ -41,9 +317,29 @@ void exploding_ring_system::advance(
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;
 
+		if (r.is_explosion_thin_ring) {
+			const auto& look = r.explosion_particles.fire ? settings.fire_particles : settings.standard_particles;
+			r.fixed_thickness = look.thin_ring_thickness;
+		}
+
 		if (r.target.is_set()) {
 			if (const auto handle = cosm[r.target]) {
 				r.center = handle.get_logic_transform().pos;
+			}
+		}
+
+		if (r.emit_explosion_particles) {
+			r.emit_explosion_particles = false;
+
+			const auto max_ring_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
+			const bool visible = queried_camera_aabb.hover(ltrb::center_and_size(r.center, vec2::square(max_ring_radius * 2)));
+
+			if (visible) {
+				if (const auto* const effect = mapped_or_nullptr(manager, common.exploding_ring_explosion_particles)) {
+					if (!effect->emissions.empty()) {
+						::spawn_explosion_particles(r, rng, settings, effect->emissions[0], particles);
+					}
+				}
 			}
 		}
 
@@ -52,8 +348,8 @@ void exploding_ring_system::advance(
 		if (secs_remaining < 0.06f) {
 			const auto& vis = r.visibility;
 
-			if (r.emit_particles_on_ring && vis.get_num_triangles() > 0) {
-				r.emit_particles_on_ring = false;
+			if (r.emit_ring_end_particles && vis.get_num_triangles() > 0) {
+				r.emit_ring_end_particles = false;
 				const auto minimum_spawn_radius = std::min(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto maximum_spawn_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
@@ -252,6 +548,11 @@ void exploding_ring_system::draw_rings(
 
 	for (const auto& e : rings) {
 		const auto& r = e.in;
+
+		if (!r.draw_color_rings) {
+			continue;
+		}
+
 		const auto world_explosion_center = r.center;
 
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
@@ -271,7 +572,13 @@ void exploding_ring_system::draw_rings(
 		float inner_radius_now;
 
 		if (r.fixed_thickness > 0.0f) {
-			inner_radius_now = outer_radius_now - r.fixed_thickness / eye.zoom;
+			const auto thickness_now = 
+				r.fade_by_thinning ? 
+				r.fixed_thickness * std::max(0.f, 1.f - static_cast<float>(ratio)) :
+				r.fixed_thickness
+			;
+
+			inner_radius_now = outer_radius_now - thickness_now / eye.zoom;
 		}
 		else {
 			inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
@@ -304,7 +611,11 @@ void exploding_ring_system::draw_rings(
 		int a255 = int(a * 255.0f);
 
 		a255 = alpha_step * (a255 / alpha_step) + alpha_step;
-		a = float(a255) / 255.0f;
+
+		/*
+			Rounding up from full alpha would overshoot 255 and wrap around the channel.
+		*/
+		a = std::min(1.0f, float(a255) / 255.0f);
 
 		considered_color.a = static_cast<rgba_channel>(
 			considered_color.a * a

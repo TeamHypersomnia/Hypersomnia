@@ -41,6 +41,7 @@ struct common_assets {
 
 	assets::particle_effect_id exploding_ring_smoke;
 	assets::particle_effect_id exploding_ring_sparkles;
+	assets::particle_effect_id exploding_ring_explosion_particles;
 	assets::particle_effect_id thunder_remnants;
 
 	footstep_effect_input standard_footstep;

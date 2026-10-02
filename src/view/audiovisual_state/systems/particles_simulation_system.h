@@ -16,6 +16,8 @@
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
+#include "view/viewables/particle_types.h"
+#include "view/view_container_sizes.h"
 #include "view/audiovisual_state/special_effects_settings.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 #include "game/detail/view_input/temporary_light.h"
@@ -205,6 +207,12 @@ public:
 	per_particle_layer_t<make_particle_vector<general_particle>> general_particles;
 	per_particle_layer_t<make_particle_vector<animated_particle>> animated_particles;
 
+	/*
+		The pixel art explosions have their own pool, all drawn on explosion_particles_layer.
+	*/
+	static constexpr auto explosion_particles_layer = particle_layer::TRAILS;
+	augs::constant_size_vector<explosion_particle, MAX_EXPLOSION_PARTICLES> explosion_particles;
+
 	/* Here we must have a vector as we would be forced to allocate memory every time we begin an emission */
 	per_particle_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
@@ -223,6 +231,7 @@ public:
 	void add_particle(const particle_layer, const general_particle&);
 	void add_particle(const particle_layer, const animated_particle&);
 	void add_particle(const particle_layer, const entity_id, const homing_animated_particle&);
+	void add_explosion_particle(const explosion_particle&);
 
 	std::size_t count_all_particles() const;
 	std::size_t count_particles_on_layer(particle_layer) const;

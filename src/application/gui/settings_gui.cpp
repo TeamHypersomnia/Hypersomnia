@@ -974,6 +974,39 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(sparkle_amount), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(thunder_amount), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(smoke_amount), 0.f, 1.f);
+
+					revertable_slider(SCOPE_CFG_NVP(max_particles_per_explosion), 0, 4000);
+					tooltip_on_hover("For an explosion the size of a force grenade's. Smaller explosions spawn proportionally fewer.");
+
+					auto particle_sliders = [&](const auto& label, auto& scope_cfg) {
+						if (auto node = scoped_tree_node(label)) {
+							revertable_slider(SCOPE_CFG_NVP(particle_jitter_radius), 0.f, 50.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_jitter_degrees), 0.f, 90.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_tangential_speed_min), 0.f, 5000.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_tangential_speed_max), 0.f, 5000.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_random_acceleration_min), 0.f, 20000.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_random_acceleration_max), 0.f, 20000.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_size_mult), 0.5f, 5.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_lifetime_mult_min), 0.1f, 4.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_lifetime_mult_max), 0.1f, 4.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_hot_fraction), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_cool_from_fraction), 0.f, 2.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_cool_brightness), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_cool_duration_fraction), 0.f, 2.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_palette_duration_fraction), 0.05f, 3.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_color_steps), 0, 255);
+							revertable_slider(SCOPE_CFG_NVP(particle_ease_out), 0.f, 2.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_speed_stretch), 0.f, 3.f);
+							revertable_slider(SCOPE_CFG_NVP(particle_ember_fraction), 0.f, 0.5f);
+							revertable_slider(SCOPE_CFG_NVP(particle_ember_lifetime_mult), 1.f, 8.f);
+							revertable_slider(SCOPE_CFG_NVP(thin_ring_thickness), 0.f, 50.f);
+						}
+					};
+
+					if (auto node = scoped_tree_node("Advanced##ExplosionParticles")) {
+						particle_sliders("Fire particles (force grenades, skull rockets, bombs)", scope_cfg.fire_particles);
+						particle_sliders("Standard particles (other explosions)", scope_cfg.standard_particles);
+					}
 				}
 
 				break;

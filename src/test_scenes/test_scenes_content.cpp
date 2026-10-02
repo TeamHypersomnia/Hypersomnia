@@ -106,6 +106,7 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.exhausted_smoke_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
 	common_assets.exploding_ring_smoke = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SMOKE);
 	common_assets.exploding_ring_sparkles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);
+	common_assets.exploding_ring_explosion_particles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_EXPLOSION_PARTICLES);
 	common_assets.thunder_remnants = to_particle_effect_id(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
 	common_assets.haste_footstep_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HASTE_FOOTSTEP);

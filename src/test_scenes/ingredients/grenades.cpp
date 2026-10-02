@@ -32,6 +32,40 @@ static void set_dropped_grenade_floor_hit_sounds(invariants::item& item) {
 	item.floor_hit_sounds[1].modifier.pitch = 0.85f;
 }
 
+/*
+	All the fiery (force grenade and skull rocket) explosions, main ones and cascades alike,
+	share a single saturated ramp - full yellow, full orange, orange-red, full red - the particles going through it smoothly,
+	the outer ring half a step ahead of the inner one, with the fire particle settings.
+	The flat translucent color rings are off - only the opaque particles,
+	the thin rings and the flash (in the full yellow) remain.
+*/
+
+static void apply_fire_explosion_look(standard_explosion_input& e) {
+	auto& palette = e.explosion_particles.palette;
+
+	palette.clear();
+	palette.push_back(rgba(255, 240, 40, 255));
+	palette.push_back(rgba(255, 140, 0, 255));
+	palette.push_back(rgba(255, 70, 0, 255));
+	palette.push_back(rgba(255, 10, 0, 255));
+
+	/* For the light, the sparkles and the smokes. */
+	e.inner_ring_color = palette[0];
+	e.outer_ring_color = palette[1];
+
+	e.draws_color_rings = false;
+	e.explosion_particles.fire = true;
+}
+
+/*
+	Orderly, cybernetic-looking particles that never darken - for the PED, interference and flash explosions.
+*/
+
+static void apply_cybernetic_explosion_look(standard_explosion_input& e) {
+	e.explosion_particles.variation = 0.2f;
+	e.explosion_particles.cooling = 0.f;
+}
+
 namespace test_flavours {
 	void populate_grenade_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
@@ -99,8 +133,7 @@ namespace test_flavours {
 			}
 
 			dmg.base = 88.f;
-			in.inner_ring_color = red;
-			in.outer_ring_color = orange;
+			::apply_fire_explosion_look(in);
 			in.effective_radius = 380.f;
 			dmg.impact_impulse = 550.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
@@ -130,8 +163,7 @@ namespace test_flavours {
 			dmg.shake.duration_ms = 1500.f;
 			dmg.shake.strength = 1.4f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
-			e.inner_ring_color = yellow;
-			e.outer_ring_color = orange;
+			::apply_fire_explosion_look(e);
 			e.ring_duration_seconds = 0.3f;
 			e.wave_shake_radius_mult = 6;
 
@@ -192,9 +224,16 @@ namespace test_flavours {
 			auto& dmg = in.damage;
 
 			dmg.base = 180.f;
+			/*
+				A light yellow, to tell it apart from the force grenades.
+			*/
+			const auto interference_pale_yellow = rgba(255, 240, 100, 255);
+
 			in.inner_ring_color = yellow;
-			in.outer_ring_color = orange;
+			in.outer_ring_color = interference_pale_yellow;
 			in.effective_radius = 550.f;
+
+			::apply_cybernetic_explosion_look(in);
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 3000.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
@@ -219,7 +258,7 @@ namespace test_flavours {
 				e.sound.modifier.pitch = 0.75f;
 				e.sound.modifier.max_distance = 6000.f;
 				e.sound.modifier.reference_distance = 2000.f;
-				e.inner_ring_color = orange;
+				e.inner_ring_color = interference_pale_yellow;
 				e.outer_ring_color = yellow;
 				e.ring_duration_seconds = 0.3f;
 
@@ -292,6 +331,8 @@ namespace test_flavours {
 			in.inner_ring_color = white;
 			in.outer_ring_color = white;
 			in.effective_radius = 2100.f;
+
+			::apply_cybernetic_explosion_look(in);
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
@@ -361,6 +402,8 @@ namespace test_flavours {
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
 			in.effective_radius = 1100.f;
+
+			::apply_cybernetic_explosion_look(in);
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
@@ -409,6 +452,9 @@ namespace test_flavours {
 			The bomb ignores friendly_fire being off — friendlies had plenty of time to walk away.
 		*/
 		bomb_cascade_explosion.damage.always_friendly_fire = true;
+
+		/* Bombs get the fire particle settings too, keeping their own colors. */
+		bomb_cascade_explosion.explosion_particles.fire = true;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
@@ -509,8 +555,7 @@ namespace test_flavours {
 			auto e = bomb_explosion;
 			e *= 0.4f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
-			e.inner_ring_color = yellow;
-			e.outer_ring_color = orange;
+			::apply_fire_explosion_look(e);
 			e.ring_duration_seconds = 0.3f;
 			e.wave_shake_radius_mult = 6;
 
@@ -529,8 +574,7 @@ namespace test_flavours {
 			e *= 0.35f;
 			e.wave_shake_radius_mult = 6;
 			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
-			e.inner_ring_color = red;
-			e.outer_ring_color = orange;
+			::apply_fire_explosion_look(e);
 			e.ring_duration_seconds = 0.3f;
 
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::SKULL_ROCKET_CASCADE_SMALLER);
@@ -550,6 +594,7 @@ namespace test_flavours {
 			smaller_bomb_cascade_explosion.inner_ring_color = green;
 			smaller_bomb_cascade_explosion.outer_ring_color = dark_green;
 			smaller_bomb_cascade_explosion.ring_duration_seconds = 0.3f;
+			smaller_bomb_cascade_explosion.explosion_particles.fire = true;
 
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION_SMALLER);
 			auto& c = meta.get<invariants::cascade_explosion>();
@@ -620,6 +665,7 @@ namespace test_flavours {
 				invariants::explosive explosive;
 				explosive.explosion = bomb_explosion;
 				explosive.explosion.damage.always_friendly_fire = true;
+				explosive.explosion.explosion_particles.fire = true;
 
 				{
 					auto& c = explosive.cascade[0];
@@ -656,8 +702,7 @@ namespace test_flavours {
 
 				in.type = adverse_element_type::FORCE;
 				dmg.base = 142.f;
-				in.inner_ring_color = orange;
-				in.outer_ring_color = red;
+				::apply_fire_explosion_look(in);
 				in.effective_radius = 500.f;
 				dmg.impact_impulse = 350.f;
 				dmg.impulse_multiplier_against_sentience = 1.f;
