@@ -950,8 +950,8 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				revertable_checkbox("Draw bullet trails", config.drawing.draw_bullet_trails);
-				revertable_checkbox("Draw long bullet neons", config.drawing.draw_long_bullet_neons);
+				revertable_enum("Bullet trails", config.drawing.bullet_trails);
+				tooltip_on_hover("Only light: the long neon tails of bullets.\nParticles and light: also the particle trails.");
 				revertable_checkbox("Draw bullet shadows", config.drawing.draw_bullet_shadows);
 				tooltip_on_hover("Also the shadows of thrown and dropped items, grenades and shells in flight.");
 

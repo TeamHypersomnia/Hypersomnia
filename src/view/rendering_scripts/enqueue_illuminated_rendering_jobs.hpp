@@ -157,7 +157,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::drawer_with_default { dedicated[d].triangles, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	const bool draw_long_bullet_neons = in.drawing.draw_long_bullet_neons;
+	const bool draw_long_bullet_neons = in.drawing.bullet_trails != bullet_trails_mode::NONE;
 
 	auto make_drawing_input = [get_drawer_for, &game_images, global_time_seconds, &av, &interp, queried_cone, draw_long_bullet_neons](const D d) {
 		return draw_renderable_input { 

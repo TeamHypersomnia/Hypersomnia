@@ -4078,7 +4078,7 @@ work_result work(
 			viewing_config.damage_indication,
 
 			viewing_config.gore,
-			viewing_config.drawing.draw_bullet_trails,
+			viewing_config.drawing.bullet_trails == bullet_trails_mode::FULL,
 			is_camera_pixel_snapped(viewing_config),
 
 			thread_pool

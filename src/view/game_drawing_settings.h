@@ -1,6 +1,9 @@
 #pragma once
 #include <algorithm>
+#include <array>
+#include <cstdint>
 #include <memory>
+#include <string>
 #include "augs/pad_bytes.h"
 #include "augs/misc/enum/enum_array.h"
 #include "augs/templates/maybe.h"
@@ -32,6 +35,33 @@ enum class crosshair_type {
 	COUNT
 	// END GEN INTROSPECTOR
 };
+
+enum class bullet_trails_mode {
+	// GEN INTROSPECTOR enum class bullet_trails_mode
+	NONE,
+	ONLY_LIGHT,
+	FULL,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+template <class Enum>
+auto format_enum(const Enum e);
+
+template <>
+inline auto format_enum(const bullet_trails_mode e) {
+	constexpr std::array<const char*, 3> vals = {
+		"None",
+		"Only light",
+		"Particles and light"
+	};
+
+	if (static_cast<uint8_t>(e) < static_cast<uint8_t>(vals.size())) {
+		return std::string(vals[static_cast<uint8_t>(e)]);
+	}
+
+	return std::string("UnknownEnumValue");
+}
 
 struct crosshair_drawing_settings {
 	// GEN INTROSPECTOR struct crosshair_drawing_settings
@@ -248,8 +278,7 @@ struct game_drawing_settings {
 	bool draw_enemy_silhouettes_in_spectator = true;
 
 	bool draw_bullet_shadows = true;
-	bool draw_bullet_trails = true;
-	bool draw_long_bullet_neons = true;
+	bullet_trails_mode bullet_trails = bullet_trails_mode::FULL;
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_aabb_highlighter = true;
