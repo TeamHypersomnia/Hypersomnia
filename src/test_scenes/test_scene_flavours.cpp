@@ -19,6 +19,7 @@
 */
 
 constexpr real32 small_ground_item_scale_v = 1.5f;
+constexpr real32 ground_magazine_scale_v = 1.75f;
 
 template <class F>
 static void for_each_flavour_object(all_entity_flavours& flavours, F&& callback) {
@@ -66,8 +67,10 @@ static void set_derived_item_invariants(all_entity_flavours& flavours) {
 				}
 			}
 
+			const bool is_magazine = item.categories_for_slot_compatibility.test(item_category::MAGAZINE);
+
 			const bool small = [&]() {
-				if (item.categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+				if (is_magazine) {
 					return true;
 				}
 
@@ -83,7 +86,7 @@ static void set_derived_item_invariants(all_entity_flavours& flavours) {
 			}();
 
 			if (small) {
-				item.ground_scale = small_ground_item_scale_v;
+				item.ground_scale = is_magazine ? ground_magazine_scale_v : small_ground_item_scale_v;
 				item.ground_scale_affects_body = !F::template has<invariants::hand_fuse>();
 			}
 		}
