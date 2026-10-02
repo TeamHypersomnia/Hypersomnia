@@ -18,6 +18,9 @@ class interpolation_system {
 	bool enabled = true;
 	void set_interpolation_enabled(const bool);
 
+	float bullets_alpha = 1.0f;
+	float everything_else_alpha = 1.0f;
+
 public:
 	entity_id id_to_integerize;
 
@@ -71,5 +74,19 @@ public:
 
 	bool is_enabled() const {
 		return enabled;
+	}
+
+	/*
+		How far between the two newest steps bullets and everything else are drawn in the current frame.
+		For stateless view effects that have to stay in sync with interpolated positions,
+		e.g. the stretching of traces.
+	*/
+
+	float get_bullets_alpha() const {
+		return bullets_alpha;
+	}
+
+	float get_everything_else_alpha() const {
+		return everything_else_alpha;
 	}
 };

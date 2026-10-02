@@ -44,4 +44,10 @@ struct sprite_drawing_input : drawing_input_base {
 
 	/* Scales whatever extension survives that limit. */
 	real32 neon_tail_extension_mult = 1.f;
+
+	/*
+		Scales the drawn size without truncating it to whole pixels,
+		so that e.g. the stretching of traces stays smooth.
+	*/
+	vec2 size_mult = vec2(1.f, 1.f);
 };

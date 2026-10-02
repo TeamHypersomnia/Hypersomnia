@@ -154,6 +154,155 @@ namespace test_flavours {
 		auto& caches = in.caches;
 		(void)bullet_cyan;
 
+		/*
+			Drawn by the view in place of a round once it dies, shrinking away -
+			see finishing_trace_system.
+		*/
+
+		auto make_finishing_sprite = [&](const test_scene_image_id id, const rgba col) {
+			invariants::sprite sprite_def;
+			sprite_def.set(to_image_id(id), caches, col);
+			return sprite_def;
+		};
+
+		const auto cyan_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::ROUND_TRACE, bullet_cyan);
+			s.neon_color = bullet_cyan_neon;
+			return s;
+		}();
+
+		const auto datum_round_finishing_sprite = [&]() {
+			/* Matches DATUM_ROUND's sprite scale. */
+			auto s = make_finishing_sprite(test_scene_image_id::ROUND_TRACE, bullet_cyan);
+			s.neon_color = bullet_cyan_neon;
+			s.size *= 1.1f;
+			return s;
+		}();
+
+		const auto pistol_cyan_round_finishing_sprite = [&]() {
+			/* Matches PISTOL_CYAN_ROUND's sprite - the shared cyan one uses a different image. */
+			auto s = make_finishing_sprite(test_scene_image_id::SHOTGUN_RED_ROUND, bullet_cyan);
+			s.neon_color = bullet_cyan_neon;
+			return s;
+		}();
+
+		const auto szturm_round_finishing_sprite = [&]() {
+			/* Matches SZTURM_ROUND's sprite - the shared cyan one has a different tint and neon. */
+			auto s = make_finishing_sprite(test_scene_image_id::ROUND_TRACE, white);
+			s.neon_color = bullet_blueish_neon;
+			return s;
+		}();
+
+		const auto baka47_round_finishing_sprite = [&]() {
+			/* Matches BAKA47_ROUND's sprite. */
+			auto s = make_finishing_sprite(test_scene_image_id::STEEL_ROUND, white);
+			s.neon_color = bullet_gold_neon;
+			s.neon_color.a = 120;
+			s.size *= 1.2f * 1.11f;
+			return s;
+		}();
+
+		const auto szczur_round_finishing_sprite = [&]() {
+			/*
+				Intentionally pink on a different image than the violet rounds
+				that share it (Cyberspray, Szczur, Kek9) -
+				gives a nice color variety at the trail's end.
+			*/
+			auto s = make_finishing_sprite(test_scene_image_id::ROUND_TRACE, pink);
+			return s;
+		}();
+
+		const auto hpsr_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::HPSR_ROUND, bullet_cyan);
+			s.neon_color = bullet_cyan_neon;
+			s.size *= 1.1f;
+			return s;
+		}();
+
+		const auto bulldup2000_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::STEEL_ROUND, white);
+			s.neon_color = bullet_gold_neon;
+			/* Matches the round's sprite scale. */
+			s.size *= 1.25f;
+			return s;
+		}();
+
+		const auto hunter_round_finishing_sprite = [&]() {
+			/* Matches the round's sprite. */
+			auto s = make_finishing_sprite(test_scene_image_id::STEEL_ROUND, white);
+			s.neon_color = bullet_gold_neon;
+			s.size *= 1.45f;
+			return s;
+		}();
+
+		const auto galilea_round_finishing_sprite = [&]() {
+			/* Matches the round's sprite. */
+			auto s = make_finishing_sprite(test_scene_image_id::STEEL_ROUND, white);
+			s.neon_color = bullet_gold_neon;
+			s.neon_color.a = 90;
+			s.size *= 1.1f;
+			return s;
+		}();
+
+		const auto deagle_round_finishing_sprite = [&]() {
+			/* The 1.2 matches the round's sprite scale. */
+			auto s = make_finishing_sprite(test_scene_image_id::DEAGLE_ROUND, white);
+			s.size *= 1.2f * 14.4f / 11.f;
+			return s;
+		}();
+
+		const auto steel_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::STEEL_ROUND, white);
+			return s;
+		}();
+
+		const auto orange_round_finishing_sprite = [&]() {
+			/* Matches the round's sprite scale. */
+			auto s = make_finishing_sprite(test_scene_image_id::AO44_ROUND, white);
+			s.size *= 1.4f;
+			return s;
+		}();
+
+		const auto ao44_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::AO44_ROUND, white);
+			s.size *= 1.8f;
+			/* Matches the round's neon alpha. */
+			s.neon_color.a = 130;
+			return s;
+		}();
+
+		const auto shotgun_red_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			s.neon_color = bullet_red_neon;
+			return s;
+		}();
+
+		const auto gradobicie_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			s.neon_color = bullet_ice_neon;
+			return s;
+		}();
+
+		const auto szkwal_round_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			s.neon_color = rgba(255, 100, 0, 255);
+			return s;
+		}();
+
+		const auto pro90_round_finishing_sprite = [&]() {
+			/* Matches the round's sprite and neon (pro90_round_col, alpha 110). */
+			auto s = make_finishing_sprite(test_scene_image_id::SHOTGUN_RED_ROUND, white);
+			s.size *= 1.2f;
+			s.neon_color = rgba(255, 234, 30, 110);
+			return s;
+		}();
+
+		const auto electric_missile_finishing_sprite = [&]() {
+			auto s = make_finishing_sprite(test_scene_image_id::ELECTRIC_MISSILE, bullet_cyan);
+			s.neon_color = bullet_cyan_neon;
+			return s;
+		}();
+
 		/* Types for bullets etc. */
 
 		static const auto density_mult = 0.4f;
@@ -392,7 +541,7 @@ namespace test_flavours {
 
 			{
 				{
-					components::trace trace_def;
+					invariants::trace trace_def;
 					trace_def.enabled = false;
 					meta.set(trace_def);
 				}
@@ -465,7 +614,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = steel_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -542,7 +691,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::GALILEA_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = galilea_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -617,7 +766,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::HUNTER_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = hunter_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -695,7 +844,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::BULLDUP2000_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = bulldup2000_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -784,7 +933,7 @@ namespace test_flavours {
 			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::BAKA47_ROUND_TRACE);
 
 			/* Own finishing trace - the inherited steel one is white and unscaled. */
-			meta.get<invariants::trace>().finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::BAKA47_ROUND_FINISHING_TRACE);
+			meta.get<invariants::trace>().finishing_sprite = baka47_round_finishing_sprite;
 
 			/*
 				Baka47 is not part of the dense pixel burst roster, even though it
@@ -814,7 +963,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ORANGE_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = orange_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -884,7 +1033,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = ao44_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -960,7 +1109,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::DEAGLE_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = deagle_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1033,7 +1182,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::PISTOL_CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = pistol_cyan_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1103,7 +1252,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = hpsr_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1173,7 +1322,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SHOTGUN_RED_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = shotgun_red_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1242,7 +1391,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::GRADOBICIE_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = gradobicie_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1318,7 +1467,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZKWAL_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = szkwal_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1391,7 +1540,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::GRADOBICIE_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = gradobicie_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1459,7 +1608,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = szczur_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1527,7 +1676,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = szczur_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1594,7 +1743,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = szczur_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1667,7 +1816,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::PRO90_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = pro90_round_finishing_sprite;
 					meta.set(trace_def);
 				}
 			}
@@ -1738,7 +1887,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = cyan_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1792,7 +1941,7 @@ namespace test_flavours {
 			meta.get<invariants::missile>().trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DATUM_ROUND_TRACE);
 
 			/* Own finishing trace - the shared cyan one is unscaled. */
-			meta.get<invariants::trace>().finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::DATUM_ROUND_FINISHING_TRACE);
+			meta.get<invariants::trace>().finishing_sprite = datum_round_finishing_sprite;
 		}
 
 		{
@@ -1816,7 +1965,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = cyan_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1882,7 +2031,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.09f};
 					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::SZTURM_ROUND_FINISHING_TRACE);
+					trace_def.finishing_sprite = szturm_round_finishing_sprite;
 
 					meta.set(trace_def);
 				}
@@ -1939,7 +2088,7 @@ namespace test_flavours {
 				trace_def.lengthening_duration_ms = {300.f, 350.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
+				trace_def.finishing_sprite = electric_missile_finishing_sprite;
 
 				meta.set(trace_def);
 			}
@@ -2050,7 +2199,7 @@ namespace test_flavours {
 				trace_def.lengthening_duration_ms = {300.f, 350.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
+				trace_def.finishing_sprite = electric_missile_finishing_sprite;
 
 				meta.set(trace_def);
 			}
@@ -3527,225 +3676,6 @@ namespace test_flavours {
 
 			meta.get<invariants::text_details>().name = "Lews II magazine";
 		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::DATUM_ROUND_FINISHING_TRACE);
-
-			/* Matches DATUM_ROUND's sprite scale. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, bullet_cyan).neon_color = bullet_cyan_neon;
-			meta.get<invariants::sprite>().size *= 1.1f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::DATUM_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::PISTOL_CYAN_ROUND_FINISHING_TRACE);
-
-			/* Matches PISTOL_CYAN_ROUND's sprite - the shared cyan one uses a different image. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::PISTOL_CYAN_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZTURM_ROUND_FINISHING_TRACE);
-
-			/* Matches SZTURM_ROUND's sprite - the shared cyan one has a different tint and neon. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, white).neon_color = bullet_blueish_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::SZTURM_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::BAKA47_ROUND_FINISHING_TRACE);
-
-			/* Matches BAKA47_ROUND's sprite. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
-			meta.get<invariants::sprite>().neon_color.a = 120;
-			meta.get<invariants::sprite>().size *= 1.2f * 1.11f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::BAKA47_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZCZUR_ROUND_FINISHING_TRACE);
-
-			/*
-				Intentionally pink on a different image than the violet rounds
-				that share it (Cyberspray, Szczur, Kek9) -
-				gives a nice color variety at the trail's end.
-			*/
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, pink);
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::SZCZUR_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, bullet_cyan).neon_color = bullet_cyan_neon;
-			meta.get<invariants::sprite>().size *= 1.1f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::HPSR_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::BULLDUP2000_ROUND_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
-			/* Matches the round's sprite scale. */
-			meta.get<invariants::sprite>().size *= 1.25f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::BULLDUP2000_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::HUNTER_ROUND_FINISHING_TRACE);
-
-			/* Matches the round's sprite. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
-			meta.get<invariants::sprite>().size *= 1.45f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::HUNTER_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::GALILEA_ROUND_FINISHING_TRACE);
-
-			/* Matches the round's sprite. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white).neon_color = bullet_gold_neon;
-			meta.get<invariants::sprite>().neon_color.a = 90;
-			meta.get<invariants::sprite>().size *= 1.1f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::GALILEA_ROUND).get<invariants::trace>());
-			}
-		}
-
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::DEAGLE_ROUND_FINISHING_TRACE);
-
-			/* The 1.2 matches the round's sprite scale. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 1.2f * 14.4f / 11.f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
-			
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::ORANGE_ROUND_FINISHING_TRACE);
-
-			/* Matches the round's sprite scale. */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.4f;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white).size *= 1.8f;
-			/* Matches the round's neon alpha. */
-			meta.get<invariants::sprite>().neon_color.a = 130;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::AO44_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::SHOTGUN_RED_ROUND_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_red_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::GRADOBICIE_ROUND_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = bullet_ice_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::GRADOBICIE_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::SZKWAL_ROUND_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white).neon_color = rgba(255, 100, 0, 255);
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::SZKWAL_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::PRO90_ROUND_FINISHING_TRACE);
-
-			/* Matches the round's sprite and neon (pro90_round_col, alpha 110). */
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
-			meta.get<invariants::sprite>().size *= 1.2f;
-			meta.get<invariants::sprite>().neon_color = rgba(255, 234, 30, 110);
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, bullet_cyan).neon_color = bullet_cyan_neon;
-
-			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE).get<invariants::trace>());
-			}
-		}
-
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BILMER2000);

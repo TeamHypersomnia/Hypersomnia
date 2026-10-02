@@ -24,7 +24,6 @@
 #include "game/stateless_systems/item_system.h"
 #include "game/stateless_systems/force_joint_system.h"
 #include "game/stateless_systems/intent_contextualization_system.h"
-#include "game/stateless_systems/trace_system.h"
 #include "game/stateless_systems/melee_system.h"
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/destruction_system.h"
@@ -243,7 +242,6 @@ void standard_solve(const logic_step step) {
 	portal_system().advance_portal_logic(step);
 
 	item_system().handle_touch_collectibles(step);
-	trace_system().lengthen_sprites_of_traces(step);
 
 	crosshair_system().integrate_crosshair_recoils(step);
 
@@ -298,21 +296,10 @@ void standard_solve(const logic_step step) {
 		perform_transfers(transfers, step);
 	}
 
-	trace_system().destroy_outdated_traces(step);
 	remnant_system().shrink_and_destroy_remnants(step);
 	decal_system().limit_decal_count(step);
 
-	const auto queued_before_marking_num = step.get_queue<messages::queue_deletion>().size();
-	(void)queued_before_marking_num;
-
 	deletion_system().mark_queued_entities_and_their_children_for_deletion(step);
-
-	trace_system().spawn_finishing_traces_for_deleted_entities(step);
-
-	const auto queued_at_end_num = step.get_queue<messages::queue_deletion>().size();
-	(void)queued_at_end_num;
-
-	ensure_eq(queued_at_end_num, queued_before_marking_num);
 
 	cosmic::increment_step(cosm);
 }

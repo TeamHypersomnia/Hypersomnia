@@ -215,7 +215,7 @@ namespace augs {
 		const atlas_entry considered_texture,
 		const vec2 target_position,
 		float target_rotation,
-		const sprite_size_type considered_size,
+		const vec2 considered_size,
 		rgba target_color
 	) {
 		detail_draw(
@@ -246,7 +246,7 @@ namespace augs {
 			final_rotation += std::fmod(in.global_time_seconds * spr.effect_speed_multiplier * 360.f, 360.f);
 		}
 
-		const auto drawn_size = spr.get_size();
+		const auto drawn_size = vec2(spr.get_size()) * in.size_mult;
 
 		const auto& entry = manager.at(spr.image_id);
 		const auto& diffuse = entry.diffuse;

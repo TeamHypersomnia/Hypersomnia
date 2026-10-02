@@ -488,6 +488,15 @@ void audiovisual_state::standard_post_solve(
 	const auto acquire_collectibles = always_predictable_v;
 	const auto acquire_highlights = always_predictable_v;
 
+	/*
+		Mirrors what was drawn while the traces were entities of the predicted cosmos.
+	*/
+	const auto acquire_finishing_traces = always_predictable_v;
+
+	if (acquire_finishing_traces.should_play(settings.prediction)) {
+		get<finishing_trace_system>().acquire_new_traces(step);
+	}
+
 	if (correct_interpolations.should_play(settings.prediction)) {
 		const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 

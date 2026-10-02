@@ -337,7 +337,7 @@ void particles_simulation_system::update_effects_from_messages(
 								chased.rotation = subject.get_effective_velocity().degrees();
 							}
 
-							anchor_to(chased * ::considered_chase_offset(c.chasing, subject));
+							anchor_to(chased * ::considered_chase_offset(c.chasing, subject, 1.0f));
 						}
 					}
 					else if (const auto where = find_transform(c.chasing, cosm, interp)) {
@@ -368,7 +368,7 @@ void particles_simulation_system::update_effects_from_messages(
 					chased_transform.rotation = last_velocity.degrees();
 				}
 
-				c.before_abrupt_change = chased_transform * ::considered_chase_offset(c.chasing, subject);
+				c.before_abrupt_change = chased_transform * ::considered_chase_offset(c.chasing, subject, 1.0f);
 			};
 
 			for (auto& c : orbital_emissions) {

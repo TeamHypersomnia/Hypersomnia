@@ -34,9 +34,6 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<components::missile>()) {
 			return render_layer::MISSILES;
 		}
-		else if constexpr(H::template has<components::trace>()) {
-			return render_layer::MISSILES;
-		}
 		else if constexpr(H::template has<invariants::sentience>()) {
 			return render_layer::SENTIENCES;
 		}

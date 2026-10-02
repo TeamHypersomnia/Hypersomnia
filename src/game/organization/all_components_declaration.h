@@ -65,7 +65,6 @@ namespace components {
 	struct item;
 	struct force_joint;
 	struct item_slot_transfers;
-	struct trace;
 	struct melee;
 	struct sentience;
 	struct processing;
@@ -92,7 +91,6 @@ namespace components {
 
 using assert_always_together = type_list<
 	type_pair<invariants::gun, components::gun>,
-	type_pair<invariants::trace, components::trace>,
 	type_pair<invariants::rigid_body, components::rigid_body>,
 	type_pair<invariants::rigid_body, invariants::fixtures>,
 	type_pair<invariants::item, components::item>,
@@ -150,7 +148,6 @@ using component_list_t = List<
 	components::item,
 	components::force_joint,
 	components::item_slot_transfers,
-	components::trace,
 	components::melee,
 	components::melee_fighter,
 	components::sentience,

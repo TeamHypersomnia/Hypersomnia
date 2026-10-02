@@ -14,7 +14,6 @@ struct dynamic_decoration;
 struct wandering_pixels_decoration;
 struct static_light;
 struct hand_explosive;
-struct finishing_trace;
 struct container_item;
 struct remnant_body;
 struct sound_decoration;
@@ -39,7 +38,6 @@ using all_entity_types = type_list<
 	wandering_pixels_decoration,
 	static_light,
 	hand_explosive,
-	finishing_trace,
 	container_item,
 	remnant_body,
 	sound_decoration,
@@ -65,7 +63,6 @@ using all_entity_types = type_list<
 	MACRO(wandering_pixels_decoration) \
 	MACRO(static_light) \
 	MACRO(hand_explosive) \
-	MACRO(finishing_trace) \
 	MACRO(container_item) \
 	MACRO(remnant_body) \
 	MACRO(sound_decoration) \

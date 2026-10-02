@@ -10,6 +10,7 @@
 #include "view/rendering_scripts/draw_minimap.h"
 #include "view/rendering_scripts/draw_environment_shadows.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
+#include "view/rendering_scripts/draw_finishing_traces.h"
 
 const rgba CHARACTER_SHADOW_COLOR = rgba(0, 0, 0, 100);
 const vec2 CHARACTER_SHADOW_OFFSET = vec2(21, 21);
@@ -99,6 +100,7 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& actual_cone = in.camera.cone;
 	const auto& visible = in.all_visible;
 	const auto& interp = av.template get<interpolation_system>();
+	const auto& finishing_traces = av.template get<finishing_trace_system>();
 	const auto& damage_indication = av.template get<damage_indication_system>();
 	const auto& gui_font = in.fonts.gui;
 	const auto& game_images = in.game_images;
@@ -168,7 +170,8 @@ void enqueue_illuminated_rendering_jobs(
 				flip_flags(),
 				av.randomizing,
 				queried_cone,
-				draw_long_bullet_neons
+				draw_long_bullet_neons,
+				interp.get_bullets_alpha()
 			},
 			interp
 		};
@@ -453,7 +456,9 @@ void enqueue_illuminated_rendering_jobs(
 				&cosm,
 				missile_shadow_offset,
 				global_time_seconds,
+				&finishing_traces,
 				remnants_neons_in = make_drawing_input(D::REMNANTS_NEONS),
+				missiles_neons_in = make_drawing_input(D::MISSILES_NEONS),
 				h1 = make_helper(D::UNDER_FOREGROUND_NEONS),
 				h2 = make_helper(D::FOREGROUND_NEONS),
 				h3 = make_helper(D::MISSILES_NEONS)
@@ -487,6 +492,8 @@ void enqueue_illuminated_rendering_jobs(
 				h3.draw_neons<
 					render_layer::MISSILES
 				>();
+
+				::draw_finishing_traces(finishing_traces, cosm, missiles_neons_in, true);
 			};
 
 			pool.enqueue(job);
@@ -803,7 +810,9 @@ void enqueue_illuminated_rendering_jobs(
 				&cosm,
 				ground_in = make_drawing_input(D::GROUND),
 				ground_shadow_casters_in = make_drawing_input(D::GROUND_SHADOW_CASTERS),
+				&finishing_traces,
 				h2 = make_helper(D::MISSILES),
+				missiles_in = make_drawing_input(D::MISSILES),
 				missiles_shadows  = make_drawing_input(D::MISSILES_SHADOWS)
 			]() {
 				/*
@@ -824,6 +833,8 @@ void enqueue_illuminated_rendering_jobs(
 				h2.draw<
 					render_layer::MISSILES
 				>();
+
+				::draw_finishing_traces(finishing_traces, cosm, missiles_in, false);
 
 				if (draw_bullet_shadows) {
 					visible.for_each<render_layer::MISSILES>(

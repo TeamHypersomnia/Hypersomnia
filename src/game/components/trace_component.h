@@ -2,45 +2,20 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/bound.h"
 #include "augs/pad_bytes.h"
+#include "augs/drawing/sprite.h"
 
-#include "game/cosmos/entity_flavour_id.h"
-#include "game/organization/all_entity_types.h"
-
-struct randomization;
+#include "game/components/sprite_component_declaration.h"
 
 namespace invariants {
-	struct trace;
-}
+	/*
+		Purely cosmetic - the stretching of a flying round's sprite and the shrinking
+		of what is left of it once it dies are calculated and drawn by the view alone.
 
-namespace components {
-	struct trace {
-		// GEN INTROSPECTOR struct components::trace
-		vec2 chosen_multiplier = vec2(-1.f, -1.f);
-		float chosen_lengthening_duration_ms = -1.f;
-		float lengthening_time_passed_ms = 0.f;
+		See calc_trace_scaling.h and finishing_trace_system.h.
+	*/
 
-		vec2 last_size_mult;
-		vec2 last_center_offset_mult;
-
-		bool is_it_a_finishing_trace = false;
-		bool enabled = true;
-		pad_bytes<2> pad;
-		// END GEN INTROSPECTOR
-
-		void reset(
-			const invariants::trace&,
-			randomization& p
-		);
-	};
-}
-
-namespace invariants {
 	struct trace {
 		using bound = augs::bound<float>;
-		using finishing_trace_flavour_type = constrained_entity_flavour_id<
-			components::trace,
-			invariants::interpolation
-		>; 
 
 		// GEN INTROSPECTOR struct invariants::trace
 		bound max_multiplier_x = bound(1.f, 1.f);
@@ -50,8 +25,10 @@ namespace invariants {
 
 		bound lengthening_duration_ms = bound(200.f, 400.f);
 
-		finishing_trace_flavour_type finishing_trace_flavour;
+		invariants::sprite finishing_sprite;
 
+		bool enabled = true;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

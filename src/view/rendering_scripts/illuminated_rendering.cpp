@@ -177,7 +177,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				flip_flags(),
 				av.randomizing,
 				queried_cone,
-				settings.bullet_trails != bullet_trails_mode::NONE
+				settings.bullet_trails != bullet_trails_mode::NONE,
+				interp.get_bullets_alpha()
 			},
 			interp
 		};

@@ -104,7 +104,16 @@ void interpolation_system::integrate_interpolated_transforms(
 	(void)speed_multiplier;
 
 	if (!enabled) {
+		bullets_alpha = 1.0f;
+		everything_else_alpha = 1.0f;
 		return;
+	}
+
+	{
+		const auto ratio = static_cast<float>(interpolation_ratio);
+
+		bullets_alpha = ::calc_alpha(settings.modes.bullets, ratio);
+		everything_else_alpha = ::calc_alpha(settings.modes.everything_else, ratio);
 	}
 	
 	const auto seconds = delta.in_seconds();

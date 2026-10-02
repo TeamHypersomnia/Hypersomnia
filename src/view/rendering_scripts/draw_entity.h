@@ -22,6 +22,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/frame_calculation.h"
+#include "game/detail/calc_trace_scaling.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
@@ -259,23 +260,20 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(H::template has<components::trace>()) {
-				const auto& trace = typed_handle.template get<components::trace>();
+			if constexpr(H::template has<invariants::trace>()) {
+				if (const auto trace = ::calc_trace_scaling(typed_handle, in.bullets_alpha)) {
+					const auto tracified_size = vec2(sprite.size) * trace->size_mult;
 
-				if (trace.enabled) {
-					const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
-
-					if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
+					if (const auto center_offset = tracified_size * trace->center_offset_mult;
 						center_offset.is_nonzero()
 					) {
 						const auto final_rotation = input.renderable_transform.rotation;
 						input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation);
 					}
 
-					auto tracified_sprite = sprite;
-					tracified_sprite.size = tracified_size;
+					input.size_mult *= trace->size_mult;
 
-					render_visitor(tracified_sprite, in.manager, input);
+					render_visitor(sprite, in.manager, input);
 					return;
 				}
 			}

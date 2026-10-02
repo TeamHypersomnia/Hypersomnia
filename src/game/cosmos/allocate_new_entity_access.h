@@ -2,7 +2,6 @@
 #include "game/stateless_systems/item_system.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/missile_system.h"
-#include "game/stateless_systems/trace_system.h"
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/sentience_system.h"
@@ -169,15 +168,6 @@ class allocate_new_entity_access {
 	*/
 
 	friend void missile_system::detonate_colliding_missiles(const logic_step);
-
-	/* 
-		Rationale: trace system will allocate a lot of remnants from missilesand shells,
-		and we want one of the most frequent case of allocations to be rather fast.
-
-		This will only invalidate handles to traces which are pretty much never formed except in preconstruct/postconstruct callbacks.
-	*/
-
-	friend void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step) const;
 
 	friend void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const;
 

@@ -327,35 +327,13 @@ struct plain_missile {
 	using component_list = type_list<
 		components::rigid_body,
 		components::missile,
-		components::sender,
-		components::trace
+		components::sender
 	>;
 
 	using synchronized_arrays = type_list<
 		components::interpolation,
 		rigid_body_cache,
 		colliders_cache
-	>;
-};
-
-struct finishing_trace {
-	static constexpr std::size_t statically_allocated_entities = 3000;
-	static constexpr std::size_t statically_allocated_flavours = 150;
-
-	using invariant_list = type_list<
-		invariants::sprite,
-		invariants::trace,
-		invariants::interpolation
-	>;
-
-	using component_list = type_list<
-		components::transform,
-		components::trace
-	>;
-
-	using synchronized_arrays = type_list<
-		components::interpolation,
-		tree_of_npo_cache_data
 	>;
 };
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/misc/randomization.h"
 
-#include "game/components/trace_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/rigid_body_component.h"
 
@@ -59,11 +58,6 @@ void construct_post_inference(const handle_type h) {
 
 	if (const auto missile = h.template find<components::missile>()) {
 		missile->initial_speed = h.get_effective_velocity().length();
-	}
-
-	if (const auto trace = h.template find<components::trace>()) {
-		auto rng = cosm.get_rng_for(h.get_id());
-		trace->reset(*h.template find<invariants::trace>(), rng);
 	}
 
 	if (const auto animation = h.template find<components::animation>()) {
