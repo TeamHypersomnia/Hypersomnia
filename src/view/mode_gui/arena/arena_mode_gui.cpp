@@ -808,19 +808,30 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 
-			const auto money_player_id = [&]() {
-				if (in.demo_replay_mode) {
-					return spectator.active ? spectator.now_spectating : local_player_id;
-				}
+			/*
+				The money of whoever is viewed - when spectating, the spectated player's.
+				Drawn in every frame no matter who it is, just its amount hidden for enemies.
+			*/
 
-				return local_player_id;
-			}();
+			const auto money_player_id = spectator.should_be_drawn(typed_mode) ? spectator.now_spectating : local_player_id;
 
 			// TODO: fix this for varying icon sizes
 
 			if (const auto p = typed_mode.find(money_player_id)) {
 				auto general_drawer = get_drawer();
 				const auto& stats = p->stats;
+
+				const bool money_hidden = [&]() {
+					if (in.demo_replay_mode || !mode_input.rules.hide_details_when_spectating_enemies) {
+						return false;
+					}
+
+					if (!local_player_faction.has_value() || *local_player_faction == faction_type::SPECTATOR) {
+						return false;
+					}
+
+					return p->get_faction() != *local_player_faction;
+				}();
 
 				auto drawn_current_money = stats.money;
 
@@ -840,18 +851,10 @@ void arena_gui_state::draw_mode_gui(
 
 				/*
 					The on-screen value bars belong to the viewed character -
-					when spectating, that is the spectated player's, not ours.
+					the one of the player whose money this is.
 				*/
 
-				const auto bars_character_id = [&]() {
-					if (spectator.active) {
-						if (const auto spectated = typed_mode.find(spectator.now_spectating)) {
-							return spectated->controlled_character_id;
-						}
-					}
-
-					return p->controlled_character_id;
-				}();
+				const auto bars_character_id = p->controlled_character_id;
 
 				const auto num_value_bars = [&]() {
 					auto result = 0;
@@ -961,7 +964,7 @@ void arena_gui_state::draw_mode_gui(
 
 				{
 					const auto max_money = 20000.0f;
-					const auto ratio = std::clamp(static_cast<float>(stats.money) / max_money, 0.0f, 1.0f);
+					const auto ratio = money_hidden ? 0.0f : std::clamp(static_cast<float>(stats.money) / max_money, 0.0f, 1.0f);
 
 					/* Slightly lower than the value bars (their 16px icons). */
 					const auto bar_h = 14;
@@ -985,7 +988,7 @@ void arena_gui_state::draw_mode_gui(
 						appearance.color = cfg.money_bar_color;
 						appearance.border_w = 2;
 						appearance.particle_tint = 0.2f;
-						appearance.label = typesafe_sprintf("$%x", drawn_current_money);
+						appearance.label = money_hidden ? std::string("?") : typesafe_sprintf("$%x", drawn_current_money);
 						appearance.label_align_right = true;
 						appearance.label_widest_text = "$20000";
 						appearance.label_padding = vec2i(5, 0);
@@ -1767,33 +1770,7 @@ void arena_gui_state::draw_mode_gui(
 				draw_spectator();
 			}
 
-			const bool draw_money = [&]() {
-				if (!mode_input.rules.has_economy()) {
-					return false;
-				}
-
-				if (in.demo_replay_mode) {
-					return true;
-				}
-
-				if (mode_input.rules.hide_details_when_spectating_enemies) {
-					if (local_player_faction && *local_player_faction != faction_type::SPECTATOR) {
-						const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
-						const auto viewed_player_data = typed_mode.find(viewed_player_id);
-
-						if (viewed_player_data == nullptr) {
-							/* Nobody else is viewed - the money is our own. */
-							return true;
-						}
-
-						return viewed_player_data->get_faction() == *local_player_faction;
-					}
-				}
-
-				return true;
-			}();
-
-			if (draw_money) {
+			if (mode_input.rules.has_economy()) {
 				draw_money_and_awards();
 			}
 
