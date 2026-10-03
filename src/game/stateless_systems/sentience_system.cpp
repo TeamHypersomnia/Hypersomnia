@@ -154,9 +154,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto now = step.get_cosmos().get_timestamp();
 	auto& cosm = step.get_cosmos();
 	const auto delta = cosm.get_fixed_delta();
+	const auto real_delta = cosm.get_clock().get_real_dt();
 
 	auto make_interval_in_steps = [delta](const auto& m) {
-		return std::max(1u, static_cast<uint32_t>(1 / delta.in_milliseconds() * m.regeneration_interval_ms));
+		return std::max(1u, static_cast<uint32_t>(std::round(m.regeneration_interval_ms / delta.in_milliseconds())));
 	};
 
 	if (DEBUG_DRAWING.enabled) {
@@ -445,8 +446,12 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				now
 			);
 
+			/*
+				Ends as quickly as at logic speed 1, like the aimpunch.
+			*/
+
 			const auto since_last_shake = (now - sentience.time_of_last_shake);
-			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience_def.shake_settings.duration_unit;
+			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(real_delta)) / sentience_def.shake_settings.duration_unit;
 
 			if (shake_amount > 0.f) {
 				const auto shake_mult = shake_amount * shake_amount * sentience_def.shake_settings.final_mult;

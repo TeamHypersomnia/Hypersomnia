@@ -400,7 +400,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 
 					if (sentience->time_of_last_received_damage.was_set()) {
-						if ((cosm.get_timestamp() - sentience->time_of_last_received_damage).in_milliseconds(delta) <= 250.0f) {
+						/*
+							Lasts as long as at logic speed 1, since movement responds as quickly - see movement_snappiness.h.
+						*/
+
+						if ((cosm.get_timestamp() - sentience->time_of_last_received_damage).in_milliseconds(clk.get_real_dt()) <= 250.0f) {
 							movement_force_mult *= 0.10f;
 						}	
 					}

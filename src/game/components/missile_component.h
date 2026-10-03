@@ -56,10 +56,11 @@ namespace components {
 		entity_id last_penetrated_surface;
 		entity_id last_ricochet_surface;
 		int32_t last_ricochet_convex_index = -1;
+		real32 force_detonate_in_ms = -1.f;
 
 		bool during_penetration = false;
 		bool deleted_already = false;
-		uint16_t force_detonate_in_ms = -1;
+		pad_bytes<2> pad;
 
 		uint32_t rng_seed = 0;
 		// END GEN INTROSPECTOR

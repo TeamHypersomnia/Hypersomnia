@@ -356,7 +356,7 @@ void standard_explosion_input::instantiate(
 					}
 
 					if (const auto missile = victim.find<components::missile>()) {
-						missile->force_detonate_in_ms = 100;
+						missile->force_detonate_in_ms = 100.f;
 
 						if (type == adverse_element_type::INTERFERENCE) {
 							missile->force_detonate_in_ms = 0.0f;

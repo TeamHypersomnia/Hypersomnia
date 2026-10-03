@@ -56,7 +56,11 @@ inline void remove_test_characters(cosmos& cosm) {
 inline void remove_all_dropped_items(cosmos& cosm, const float delay_for_mags = 0.0f, bool allow_melees = false) {
 	deletion_queue q;
 
-	auto& clk = cosm.get_clock();
+	/*
+		Like remove_old_lying_items, a UX matter that should not slow down with logic speed.
+	*/
+
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	cosm.for_each_having<components::item>(
 		[&](const auto typed_handle) {

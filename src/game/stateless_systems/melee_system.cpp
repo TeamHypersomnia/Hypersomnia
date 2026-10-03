@@ -287,7 +287,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 						);
 					}
 
-					const auto impact_velocity = (to.pos - from.pos) * dt.in_steps_per_second();
+					const auto impact_velocity = (to.pos - from.pos) / dt.in_seconds();
 
 					const auto image_id = typed_weapon.get_image_id();
 					const auto& offsets = cosm.get_logical_assets().get_offsets(image_id);

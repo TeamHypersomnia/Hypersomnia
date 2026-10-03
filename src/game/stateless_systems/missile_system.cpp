@@ -879,11 +879,11 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 					bool force_detonate = false;
 
-					if (missile.force_detonate_in_ms != uint16_t(-1)) {
-						const auto u_dt = uint16_t(delta.in_milliseconds());
+					if (missile.force_detonate_in_ms >= 0.f) {
+						const auto dt_ms = delta.in_milliseconds();
 
-						if (missile.force_detonate_in_ms > u_dt) {
-							missile.force_detonate_in_ms -= u_dt;
+						if (missile.force_detonate_in_ms > dt_ms) {
+							missile.force_detonate_in_ms -= dt_ms;
 						}
 						else {
 							force_detonate = true;
