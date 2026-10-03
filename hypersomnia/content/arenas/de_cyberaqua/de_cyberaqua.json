@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-10-01 22:21:08.913153 UTC"
+        "version_timestamp": "2026-10-03 19:10:41.228366 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -18,7 +18,7 @@
         }
     },
     "playtesting": {
-        "mode": "quick_test",
+        "mode": "bomb_defusal",
         "starting_faction": "RESISTANCE",
         "spawn_bots": true,
         "spawn_only_enemy_bots": true,
@@ -12783,7 +12783,7 @@
         {
             "id": "Green room floor 6 (9)",
             "type": "@green_room_floor_6",
-            "pos": [3008.3056640625, -1855.85009765625],
+            "pos": [3008.0, -1855.0],
             "rotation": -360.0
         },
         {
