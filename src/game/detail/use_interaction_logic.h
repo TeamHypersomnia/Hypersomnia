@@ -35,7 +35,12 @@ struct item_pickup {
 
 	interaction_result_type process(const logic_step step, const entity_id character) const {
 		auto& cosm = step.get_cosmos();
-		const auto& clk = cosm.get_clock();
+
+		/*
+			Pickup delays are a UX matter and should not slow down with logic speed.
+		*/
+
+		const auto clk = cosm.get_clock().get_real_clock();
 		const auto picker = cosm[character];
 
 		auto handle_pickup = [&](const auto& typed_item) {
@@ -173,7 +178,7 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject, c
 	entities.for_each<render_layer::ITEMS_ON_GROUND>(cosm, [&](const const_entity_handle& touched_item_part) {
 		auto handle_candidate = [&](const auto& typed_root_item) {
 			{
-				const auto& clk = cosm.get_clock();
+				const auto clk = cosm.get_clock().get_real_clock();
 
 				auto c = typed_root_item.get_special_physics().dropped_or_created_cooldown;
 				c.cooldown_duration_ms = 80.f;

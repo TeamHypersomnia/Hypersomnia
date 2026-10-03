@@ -81,8 +81,13 @@ void crosshair_system::update_base_offsets(const logic_step step) {
 
 void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 	const auto dt = step.get_delta();
-	const auto secs = dt.in_seconds();
 	auto& cosm = step.get_cosmos();
+
+	/*
+		Recoil should feel the same regardless of logic speed.
+	*/
+
+	const auto real_secs = cosm.get_clock().get_real_dt().in_seconds();
 
 	cosm.for_each_having<components::crosshair>(
 		[&](const auto subject) {
@@ -90,8 +95,8 @@ void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 			auto& crosshair_def = subject.template get<invariants::crosshair>();
 			auto& recoil = crosshair.recoil;
 
-			recoil.integrate(secs);
-			recoil.damp(secs, crosshair_def.recoil_damping);
+			recoil.integrate(real_secs);
+			recoil.damp(real_secs, crosshair_def.recoil_damping);
 
 			const auto inertia_mult = [&]() {
 				const auto& sentience_def = subject.template get<invariants::sentience>();
@@ -112,8 +117,8 @@ void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 				return 1.f;
 			}();
 
-			recoil.position.damp(secs, vec2::square(60.f));
-			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f * inertia_mult);
+			recoil.position.damp(real_secs, vec2::square(60.f));
+			recoil.rotation = augs::damp(recoil.rotation, real_secs, 60.f * inertia_mult);
 
 			if (recoil.position.is_zero()) {
 				recoil.position = vec2::zero;

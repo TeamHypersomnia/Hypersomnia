@@ -57,8 +57,12 @@ struct stepless_fuse_logic_provider {
 	}
 
 	bool arming_delay_complete() const {
+		/*
+			Planting always takes the same real time, regardless of logic speed.
+		*/
+
 		const auto when_started = fuse.when_started_arming;
-		return when_started.was_set() && clk.is_ready(fuse_def.arming_duration_ms, when_started);
+		return when_started.was_set() && clk.get_real_clock().is_ready(fuse_def.arming_duration_ms, when_started);
 	}
 
 	bool defusing_delay_complete() const {
@@ -516,7 +520,11 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 							defusing_speed_mult *= 2.f;
 						}
 
-						fuse.amount_defused += defusing_speed_mult * clk.dt.in_milliseconds();
+						/*
+							Defusing always takes the same real time (e.g. 5s, 2.5s with a defusal kit), regardless of logic speed.
+						*/
+
+						fuse.amount_defused += defusing_speed_mult * clk.get_real_dt().in_milliseconds();
 					}
 					else {
 						interrupt_defusing();

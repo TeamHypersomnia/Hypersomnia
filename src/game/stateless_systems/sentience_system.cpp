@@ -1075,7 +1075,12 @@ void sentience_system::process_damages_and_generate_health_events(const logic_st
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
-	const auto dt = cosm.get_fixed_delta();
+
+	/*
+		Aimpunch is part of the shooting feel, so it should not slow down with logic speed.
+	*/
+
+	const auto dt = cosm.get_clock().get_real_dt();
 
 	cosm.for_each_having<components::head>(
 		[&](const auto typed_handle) {

@@ -70,6 +70,14 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 	const auto& dt = step.get_delta();
 	const auto anims = cosm.get_logical_assets().plain_animations;
 
+	/*
+		Swings are animated and move physics bodies, so they slow down with logic speed.
+		Cooldowns between attacks stay in real time - they are like fire rates.
+	*/
+
+	const auto& clk = cosm.get_clock();
+	const auto real_dt_ms = clk.get_real_dt().in_milliseconds();
+
 	std::vector<vec2> total_verts;
 	const auto si = cosm.get_si();
 	const auto& physics = cosm.get_solvable_inferred().physics;
@@ -80,7 +88,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 		auto& fighter = it.template get<components::melee_fighter>();
 
-		fighter.throw_cooldown_ms = std::max(-1.f, fighter.throw_cooldown_ms - dt.in_milliseconds());
+		fighter.throw_cooldown_ms = std::max(-1.f, fighter.throw_cooldown_ms - real_dt_ms);
 
 		auto& state = fighter.state;
 		auto& anim_state = fighter.anim_state;
@@ -240,7 +248,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 					const auto speed_mult = fighter_def.cooldown_speed_mult;
 
-					cooldown_left_ms -= dt_ms * speed_mult;
+					cooldown_left_ms -= real_dt_ms * speed_mult;
 
 					if (cooldown_left_ms <= 0.f) {
 						state = melee_fighter_state::READY;
@@ -797,7 +805,11 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 							}
 
 							auto& cooldown_left_ms = elapsed_ms;
-							cooldown_left_ms = std::max(0.f, current_attack_def.cooldown_ms - total_ms);
+							/*
+								The attack's cooldown includes the animation, which took longer in real time.
+							*/
+
+							cooldown_left_ms = std::max(0.f, current_attack_def.cooldown_ms - clk.logic_to_real_ms(total_ms));
 
 							fighter.throw_cooldown_ms = std::max(fighter.throw_cooldown_ms, cooldown_left_ms);
 						}

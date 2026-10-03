@@ -34,7 +34,11 @@ bool gun_shot_cooldown(const E& gun_entity) {
 
 	if (const auto gun_def = gun_entity.template find<invariants::gun>()) {
 		if (const auto gun = gun_entity.template find<components::gun>()) {
-			const auto& clk = cosm.get_clock();
+			/*
+				Gun cooldowns run in real time - see gun_system.
+			*/
+
+			const auto clk = cosm.get_clock().get_real_clock();
 			const auto when_transferred = gun_entity.when_last_transferred();
 
 			const bool shot_cooldown_passed = clk.is_ready(gun_def->shot_cooldown_ms, gun->fire_cooldown_object);

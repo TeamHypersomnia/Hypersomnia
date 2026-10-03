@@ -155,11 +155,15 @@ static void cooldown_gun_heat(
 	auto& heat = gun.current_heat;
 
 	const auto& gun_def = gun_entity.template get<invariants::gun>();
-	const auto delta = step.get_delta();
 
 	auto& cosm = step.get_cosmos();
 
-	const auto& clk = cosm.get_clock();
+	/*
+		Fire rates, heat and recoil should feel the same regardless of logic speed.
+	*/
+
+	const auto clk = cosm.get_clock().get_real_clock();
+	const auto delta = clk.dt;
 
 	if (clk.is_ready(gun_def.shot_cooldown_ms, gun.fire_cooldown_object)) {
 		/* Apply idle cooldown */
@@ -354,7 +358,13 @@ static void spawn_shell_of_default_charge(
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto& clk = cosm.get_clock();
+
+	/*
+		Fire rates, chambering, heat and recoil should feel the same regardless of logic speed.
+		Missiles still fly with the logic delta since they are simulated by physics.
+	*/
+
+	const auto clk = cosm.get_clock().get_real_clock();
 	const auto delta = clk.dt;
 	const auto& logicals = step.get_logical_assets();
 	const auto delta_ms = delta.in_milliseconds();
