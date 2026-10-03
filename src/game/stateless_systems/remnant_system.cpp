@@ -112,7 +112,7 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 			const auto hop_height = fall.hop_height;
 
 			::start_shell_like_floor_hit(step, subject, body, fall, def.floor_hit_sounds, state.ejected_by);
-			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, now);
+			::count_floor_hit_and_start_next_hop(fall, SHELL_HOP_DURATION_VARIATION, SHELL_MIN_HOP_SECS, now, cosm.get_clock().logic_speed);
 			fall.hop_height = ::calc_shell_hop_height(fall.hop_duration_secs);
 
 			auto side_rng = ::make_floor_hit_rng(fall_seed, hit_index, floor_hit_rng_purpose::ROLL_SIDE);

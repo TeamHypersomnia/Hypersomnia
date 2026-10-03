@@ -73,7 +73,7 @@ inline constexpr real32 UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT = 0.1f;
 	while keeping the arc's shape, scale UNMOUNTED_MAGAZINE_HOP_HEIGHT by k and this by sqrt(k).
 */
 
-inline constexpr real32 UNMOUNTED_MAGAZINE_VELOCITY_MULT = 1.25f;
+inline constexpr real32 UNMOUNTED_MAGAZINE_VELOCITY_MULT = 0.625f;
 
 inline constexpr real32 DROPPED_ITEM_SPIN_KEPT = 0.25f;
 inline constexpr real32 DROPPED_ITEM_COUNTER_SPIN_DEGREES = 310.f;
@@ -205,20 +205,36 @@ inline bool is_floor_hit_due(const item_fall_state& fall, const augs::stepped_ti
 }
 
 /*
+	With lower logic speed, the hops after the first floor hit keep the rhythm they have at logic speed 1,
+	so that the hits - and the sounds tuned to them - are as frequent in real time.
+	So they are shorter in logic time by logic_speed, and lower by its square, as a physical hop would be.
+	The first hop is left as it is, so the first fall lasts longer when slowed down.
+
+	Every next hop derives from the one before, so the multiplier is applied only at the first hit.
+*/
+
+inline real32 calc_hop_rhythm_mult(const uint8_t hit_index, const real32 logic_speed) {
+	return hit_index == 0 ? logic_speed : 1.f;
+}
+
+/*
 	After a floor hit: counts it and starts the next hop, shorter and lower.
 	Varied hops shorten from their unvaried durations.
+	min_hop_secs is in real time - see calc_hop_rhythm_mult.
 */
 
 inline void count_floor_hit_and_start_next_hop(
 	item_fall_state& fall,
 	const real32 variation,
 	const real32 min_hop_secs,
-	const augs::stepped_timestamp now
+	const augs::stepped_timestamp now,
+	const real32 logic_speed
 ) {
 	const auto fall_seed = fall.seed;
 	const auto hit_index = fall.floor_hits_done;
+	const auto rhythm_mult = ::calc_hop_rhythm_mult(hit_index, logic_speed);
 	const auto unvaried_secs = fall.hop_duration_secs / ::calc_hop_duration_mult(variation, fall_seed, hit_index);
-	const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR;
+	const auto next_unvaried_secs = unvaried_secs / NEXT_HOP_DURATION_DIVISOR * rhythm_mult;
 
 	++fall.floor_hits_done;
 	--fall.floor_hits_left;
@@ -228,8 +244,8 @@ inline void count_floor_hit_and_start_next_hop(
 	}
 
 	fall.when_hop_started = now;
-	fall.hop_duration_secs = std::max(min_hop_secs, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
-	fall.hop_height *= NEXT_HOP_HEIGHT_MULT;
+	fall.hop_duration_secs = std::max(min_hop_secs * logic_speed, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
+	fall.hop_height *= NEXT_HOP_HEIGHT_MULT * rhythm_mult * rhythm_mult;
 }
 
 /*
@@ -496,9 +512,15 @@ inline real32 calc_unmounted_magazine_hit_pitch_mult(const real32 hop_height) {
 	return 1.f + std::max(0.f, impact - 1.f) * UNMOUNTED_MAGAZINE_PITCH_PER_IMPACT;
 }
 
-inline void start_next_hop_of_unmounted_magazine(item_fall_state& fall, const real32 previous_hop_height) {
-	fall.hop_height = previous_hop_height * UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT;
-	fall.hop_duration_secs = ::calc_shell_hop_secs(fall.hop_height);
+inline void start_next_hop_of_unmounted_magazine(item_fall_state& fall, const real32 previous_hop_height, const real32 logic_speed) {
+	/*
+		Called after count_floor_hit_and_start_next_hop, so the hit that just happened is floor_hits_done - 1.
+	*/
+
+	const auto rhythm_mult = ::calc_hop_rhythm_mult(fall.floor_hits_done - 1, logic_speed);
+
+	fall.hop_height = previous_hop_height * UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT * rhythm_mult * rhythm_mult;
+	fall.hop_duration_secs = std::max(SHELL_MIN_HOP_SECS * logic_speed, SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(fall.hop_height));
 }
 
 inline uint8_t calc_thrown_explosive_floor_hits(const real32 speed, const uint8_t floor_hits_when_thrown) {

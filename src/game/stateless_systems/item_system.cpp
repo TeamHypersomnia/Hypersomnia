@@ -956,7 +956,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				const auto h = cosm[w];
 
 				if (const auto melee_def = h.template find<invariants::melee>()) {
-					const bool transfer_cooldown_persists = clk.lasts(
+					/*
+						Like melee cooldowns, stays in real time regardless of logic speed.
+					*/
+
+					const bool transfer_cooldown_persists = clk.get_real_clock().lasts(
 						fighter_def.throw_cooldown_ms * melee_def->throw_def.after_transfer_throw_cooldown_mult,
 						h.when_last_transferred()
 					);
@@ -1531,6 +1535,7 @@ void item_system::advance_falling_items(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto now = cosm.get_timestamp();
 	const auto dt = cosm.get_fixed_delta();
+	const auto logic_speed = cosm.get_clock().logic_speed;
 
 	cosm.for_each_having<components::item>([&](const auto& typed_item) {
 		auto& fall = typed_item.template get<components::item>().get_fall();
@@ -1571,8 +1576,8 @@ void item_system::advance_falling_items(const logic_step step) {
 			auto push_rng = ::make_floor_hit_rng(fall.seed, hit_index, floor_hit_rng_purpose::PUSH);
 			::push_on_shell_floor_hit(body, push_rng);
 
-			::count_floor_hit_and_start_next_hop(fall, 0.f, SHELL_MIN_HOP_SECS, now);
-			::start_next_hop_of_unmounted_magazine(fall, hop_height);
+			::count_floor_hit_and_start_next_hop(fall, 0.f, SHELL_MIN_HOP_SECS, now, logic_speed);
+			::start_next_hop_of_unmounted_magazine(fall, hop_height, logic_speed);
 
 			return;
 		}
@@ -1649,6 +1654,6 @@ void item_system::advance_falling_items(const logic_step step) {
 			DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
 		;
 
-		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, now);
+		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, now, logic_speed);
 	});
 }
