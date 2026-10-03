@@ -60,10 +60,11 @@ void minimap_sighting_system::record_deaths(const const_logic_step step) {
 	);
 
 	for (const auto& event : step.get_queue<messages::health_event>()) {
-		const bool knocked_out =
-			event.special_result == messages::health_event::result_type::DEATH ||
-			event.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS
-		;
+		/*
+			Only a real knockout - a loss of consciousness (e.g. from an interference explosion)
+			is not one, the character keeps playing.
+		*/
+		const bool knocked_out = event.special_result == messages::health_event::result_type::DEATH;
 
 		if (!knocked_out) {
 			continue;
