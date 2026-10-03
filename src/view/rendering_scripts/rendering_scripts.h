@@ -96,6 +96,8 @@ struct draw_explosion_body_highlights_input {
 	const cosmos& cosm;
 	const double global_time_seconds;
 	const augs::atlas_entry cast_highlight_tex;
+	const float fire_light_brightness_mult;
+	const float standard_light_brightness_mult;
 };
 
 enum class circular_bar_type {

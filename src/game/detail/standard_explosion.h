@@ -22,6 +22,8 @@ struct damage_cause;
 	or ground_decal_fixed_size_mult if above 0, e.g. for flashes, which deal negligible damage.
 	leaves_surface_decals leaves marks on the surfaces the blast hits whose materials define explosion_decals.
 	draws_color_rings draws the flat colored rings of the explosion.
+	inner_ring_emits_light and outer_ring_emits_light pick the rings whose colors light up the surroundings -
+	the lights add up, so two overlapping saturated lights would clip into white.
 	thunders_mult scales the number of branches of the thunders (with create_thunders_effect).
 */
 
@@ -48,7 +50,8 @@ struct standard_explosion_input {
 	bool leaves_ground_decal = true;
 	bool leaves_surface_decals = true;
 	bool draws_color_rings = true;
-	pad_bytes<2> pad;
+	bool inner_ring_emits_light = true;
+	bool outer_ring_emits_light = true;
 	real32 ground_decal_fixed_size_mult = 0.f;
 	real32 thunders_mult = 1.f;
 	explosion_particles_def explosion_particles;

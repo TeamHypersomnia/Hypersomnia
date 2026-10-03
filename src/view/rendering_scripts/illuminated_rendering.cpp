@@ -694,13 +694,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					});
 				}
 
+				const auto& explosions = in.perf_settings.special_effects.explosions;
+
 				draw_explosion_body_highlights({
 					get_drawer(),
 					queried_cone,
 					interp,
 					cosm,
 					global_time_seconds,
-					cast_highlight
+					cast_highlight,
+					explosions.fire_particles.light_brightness_mult,
+					explosions.standard_particles.light_brightness_mult
 				});
 
 				draw_beep_lights({

@@ -994,12 +994,11 @@ void settings_gui_state::perform(
 							revertable_slider(SCOPE_CFG_NVP(particle_cool_brightness), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_cool_duration_fraction), 0.f, 2.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_palette_duration_fraction), 0.05f, 3.f);
-							revertable_slider(SCOPE_CFG_NVP(particle_color_steps), 0, 255);
 							revertable_slider(SCOPE_CFG_NVP(particle_ease_out), 0.f, 2.f);
-							revertable_slider(SCOPE_CFG_NVP(particle_speed_stretch), 0.f, 3.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_ember_fraction), 0.f, 0.5f);
 							revertable_slider(SCOPE_CFG_NVP(particle_ember_lifetime_mult), 1.f, 8.f);
 							revertable_slider(SCOPE_CFG_NVP(thin_ring_thickness), 0.f, 50.f);
+							revertable_slider(SCOPE_CFG_NVP(light_brightness_mult), 0.f, 2.f);
 						}
 					};
 

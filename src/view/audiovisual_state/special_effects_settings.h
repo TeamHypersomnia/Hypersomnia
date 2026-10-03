@@ -15,41 +15,39 @@
 	until particle_hot_fraction of the ring's duration, then from particle_cool_from_fraction
 	cools down to the ring's color darkened to particle_cool_brightness (or to the explosion's own end color)
 	over particle_cool_duration_fraction of the ring's duration.
-	Each transition goes in particle_color_steps discrete steps (0 = smoothly).
 	Explosions with a palette go through all of its colors over particle_palette_duration_fraction of the ring's duration instead.
 
 	particle_ease_out is the time constant of the particles' exponential slowdown, relative to the ring's duration
 	(0 = constant speed). Their paths stay the same, only front-loaded: they reach the ring's end at the same time.
-	particle_speed_stretch lengthens the particles at full speed (0.6 = 60% longer).
 
 	particle_ember_fraction of the particles become embers: smaller, slower, lingering particle_ember_lifetime_mult times longer.
 	Only in the red to orange explosions.
 
 	thin_ring_thickness is the thickness of the thin rings accompanying the explosion's rings.
+	light_brightness_mult scales the intensity of the explosion's light.
 */
 
 struct explosion_particles_settings {
 	// GEN INTROSPECTOR struct explosion_particles_settings
 	float particle_jitter_radius = 5.f;
 	float particle_jitter_degrees = 0.f;
-	float particle_tangential_speed_min = 300.f;
-	float particle_tangential_speed_max = 4250.f;
-	float particle_random_acceleration_min = 0.f;
-	float particle_random_acceleration_max = 1000.f;
+	float particle_tangential_speed_min = 100.f;
+	float particle_tangential_speed_max = 1450.f;
+	float particle_random_acceleration_min = 200.f;
+	float particle_random_acceleration_max = 250.f;
 	float particle_size_mult = 1.5f;
-	float particle_lifetime_mult_min = 0.1f;
+	float particle_lifetime_mult_min = 0.02f;
 	float particle_lifetime_mult_max = 1.4f;
 	float particle_hot_fraction = 0.15f;
 	float particle_cool_from_fraction = 1.f;
 	float particle_cool_brightness = 0.65f;
 	float particle_cool_duration_fraction = 0.15f;
 	float particle_palette_duration_fraction = 0.7f;
-	int particle_color_steps = 255;
 	float particle_ease_out = 0.35f;
-	float particle_speed_stretch = 0.f;
 	float particle_ember_fraction = 0.03f;
 	float particle_ember_lifetime_mult = 3.f;
-	float thin_ring_thickness = 6.f;
+	float thin_ring_thickness = 20.f;
+	float light_brightness_mult = 0.45f;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const explosion_particles_settings& b) const = default;
@@ -58,13 +56,13 @@ struct explosion_particles_settings {
 		auto result = explosion_particles_settings();
 
 		result.particle_jitter_radius = 0.f;
-		result.particle_tangential_speed_min = 800.f;
-		result.particle_tangential_speed_max = 2250.f;
+		result.particle_tangential_speed_max = 450.f;
 		result.particle_size_mult = 3.4f;
-		result.particle_palette_duration_fraction = 2.2f;
-		result.particle_ember_fraction = 0.02f;
+		result.particle_lifetime_mult_min = 0.04f;
+		result.particle_palette_duration_fraction = 1.55f;
 		result.particle_ember_lifetime_mult = 1.8f;
 		result.thin_ring_thickness = 39.f;
+		result.light_brightness_mult = 0.5f;
 
 		return result;
 	}

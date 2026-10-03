@@ -524,7 +524,8 @@ void standard_explosion_input::instantiate(
 		const real32 inner_start,
 		const real32 inner_end,
 		const rgba color,
-		const real32 palette_offset
+		const real32 palette_offset,
+		const bool emit_light
 	) {
 		auto msg = messages::exploding_ring_effect(predictability);
 		auto& ring = msg.payload;
@@ -536,14 +537,14 @@ void standard_explosion_input::instantiate(
 		ring.inner_radius_end_value = inner_end;
 
 		ring.emit_ring_end_particles = true;
-		ring.emit_explosion_particles = true;
+		ring.emit_explosion_particles = explosion_particles.enabled;
 		ring.explosion_particles = explosion_particles;
-		ring.explosion_particles_share = 0.5f;
 		ring.explosion_particles_palette_offset = palette_offset;
 		ring.explosion_particles_hot_color = inner_ring_color;
 		ring.draw_color_rings = draws_color_rings;
+		ring.emit_light = emit_light;
 
-		ring.maximum_duration_seconds = ring_duration_seconds;
+		ring.maximum_duration_seconds = ring_duration_seconds / std::max(0.01f, explosion_particles.playback_speed);
 
 		ring.color = color;
 		ring.center = explosion_pos;
@@ -558,16 +559,15 @@ void standard_explosion_input::instantiate(
 		ring.color = palette_color_or(0, color);
 
 		/* The client's settings override this thickness. */
-		ring.fixed_thickness = explosion_particles.fire ? 20.0f : 6.0f;
+		ring.fixed_thickness = (explosion_particles.fire ? 20.0f : 6.0f) * explosion_particles.thin_ring_thickness_mult;
 		ring.is_explosion_thin_ring = true;
 		ring.final_alpha = 1.0f;
-		ring.fade_by_thinning = true;
 
 		step.post_message(msg);
 	};
 
-	post_rings(effective_radius / 2, effective_radius, 0.f, effective_radius, inner_ring_color, 0.f);
-	post_rings(effective_radius, effective_radius / 2, effective_radius / 1.5f, effective_radius / 2, outer_ring_color, 0.5f);
+	post_rings(effective_radius / 2, effective_radius, 0.f, effective_radius, inner_ring_color, 0.f, inner_ring_emits_light);
+	post_rings(effective_radius, effective_radius / 2, effective_radius / 1.5f, effective_radius / 2, outer_ring_color, 0.5f, outer_ring_emits_light);
 
 	{
 		/*

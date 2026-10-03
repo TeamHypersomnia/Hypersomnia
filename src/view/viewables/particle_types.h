@@ -139,12 +139,10 @@ struct general_particle {
 	or crossing the center.
 
 	Both velocities decay exponentially by velocity_damping (per second) for an explosive ease-out.
-	At full initial speed, the sprite is stretched by speed_stretch along its length,
-	going back to base_size as it slows down.
 
 	The color goes from hot_color through ring_color to cool_color, by the time since the spawn -
 	all the particles of one explosion spawn at once, so they all change color in sync.
-	The transitions happen in color_steps discrete steps (0 = smoothly), always fully opaque.
+	Always fully opaque.
 
 	A non-empty palette replaces all that: the color is interpolated between the palette's entries
 	at palette_offset + (time since the spawn / palette_step_ms), clamped to the last one.
@@ -166,9 +164,6 @@ struct explosion_particle {
 	float max_radius = std::numeric_limits<float>::max();
 
 	float velocity_damping = 0.f;
-	float initial_speed = 0.f;
-	float speed_stretch = 0.f;
-	vec2 base_size;
 
 	rgba hot_color = white;
 	rgba ring_color = white;
@@ -176,7 +171,6 @@ struct explosion_particle {
 	float hot_until_ms = 0.f;
 	float cool_from_ms = std::numeric_limits<float>::max();
 	float cool_until_ms = std::numeric_limits<float>::max();
-	int color_steps = 0;
 
 	explosion_particles_palette palette;
 	float palette_offset = 0.f;
@@ -184,7 +178,6 @@ struct explosion_particle {
 
 	void integrate(const float dt);
 	void update_sprite_color();
-	void update_sprite_size();
 	void update_sprite_transform();
 
 	template <bool use_neon_maps, class M>

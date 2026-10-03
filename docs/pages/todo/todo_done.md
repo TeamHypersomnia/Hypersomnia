@@ -7526,3 +7526,10 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - kasa powinna byc rysowana spectowanego gracza/teammate chyba a jak enemy to puste i ?
 - czy rng do kolizji z postacia jest przewidywalny tez
 - restart timy lepsze wszystkim mapom 15 sekund max
+- skrocic czasowo te efekty bez utraty struktury? 
+- finishing trace powinny tez miec interpolowany rozmiar
+	 - zrobimy z tego interpolowany system
+- te eksplozje lepsze pixelartowe z traceowych particli
+
+- cos za bardzo na bialo jest ten flash na eksplozjach
+

@@ -6,14 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- cos za bardzo na bialo jest ten flash na eksplozjach
-- skrocic czasowo te efekty bez utraty struktury? 
-
 - wylacz rykoszety na postaciach
-- finishing trace powinny tez miec interpolowany rozmiar
-	 - zrobimy z tego interpolowany system
-
-- te eksplozje lepsze pixelartowe z traceowych particli
 
 - zwolnic gre 15-20% separate constants in balance vars
 

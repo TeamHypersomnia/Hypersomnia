@@ -54,7 +54,9 @@ static void apply_fire_explosion_look(standard_explosion_input& e) {
 	e.outer_ring_color = palette[1];
 
 	e.draws_color_rings = false;
+	e.outer_ring_emits_light = false;
 	e.explosion_particles.fire = true;
+	e.explosion_particles.playback_speed = 1.2f;
 }
 
 /*
@@ -227,11 +229,14 @@ namespace test_flavours {
 			/*
 				A light yellow, to tell it apart from the force grenades.
 			*/
-			const auto interference_pale_yellow = rgba(255, 240, 100, 255);
+			const auto interference_pale_yellow = rgba(yellow).mult_brightness(0.8f);
 
 			in.inner_ring_color = yellow;
-			in.outer_ring_color = interference_pale_yellow;
+			in.outer_ring_color = yellow;
 			in.effective_radius = 550.f;
+
+			/* Only the yellow lights up the surroundings - in the cascades too. */
+			in.inner_ring_emits_light = false;
 
 			::apply_cybernetic_explosion_look(in);
 			dmg.impact_impulse = 2.f;
@@ -333,6 +338,10 @@ namespace test_flavours {
 			in.effective_radius = 2100.f;
 
 			::apply_cybernetic_explosion_look(in);
+
+			/* Too big for the particles - very thick thin rings and the flash suffice. */
+			in.explosion_particles.enabled = false;
+			in.explosion_particles.thin_ring_thickness_mult = 5.f;
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);

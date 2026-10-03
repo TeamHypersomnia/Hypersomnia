@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <limits>
 #include "augs/misc/bound.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/constant_size_vector.h"
@@ -24,6 +25,13 @@ public:
 	struct ring {
 		exploding_ring_input in;
 		double time_of_occurence_seconds = 0.0;
+
+		/*
+			Cached from the client's settings every advance, for the drawing.
+			Before the first advance, the light stays at the palette's start.
+		*/
+		float palette_step_ms = std::numeric_limits<float>::max();
+		float light_brightness_mult = 1.f;
 	};
 
 	double global_time_seconds = 0.0;

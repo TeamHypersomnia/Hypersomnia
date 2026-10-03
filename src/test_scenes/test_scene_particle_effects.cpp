@@ -270,7 +270,7 @@ void load_test_scene_particle_effects(
 			spawns them itself, colors them with the ring's color
 			and overrides their lifetimes to match the ring's duration.
 
-			Optionally, instead of the full blank rectangles, each size gets its own
+			Instead of the blank rectangles, each size gets its own
 			ragged flame sprite: a piece of an arc (of a circle with a radius of 120 sprite pixels),
 			twice the blank's length and thickness (fire_particle_1 is 16 long and 2 thick, fire_particle_2 is 32 and 4 etc.),
 			drawn in exactly the sprite's size. The arc bulges towards the image's top,
@@ -281,7 +281,6 @@ void load_test_scene_particle_effects(
 
 		auto& definitions = effect.emissions.back().get_definitions<general_particle>();
 
-#if 1
 		const auto first_fire_particle = static_cast<int>(test_scene_image_id::FIRE_PARTICLE_1);
 
 		/*
@@ -318,11 +317,6 @@ void load_test_scene_particle_effects(
 
 			definitions.push_back(straight);
 		}
-#else
-		for (auto& definition : definitions) {
-			definition.image_id = to_image_id(test_scene_image_id::BLANK);
-		}
-#endif
 	}
 
 	{

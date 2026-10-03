@@ -362,6 +362,9 @@ namespace test_flavours {
 				*/
 				in.explosion_particles.cool_color = metropolis_corpse_explosion_end_color;
 				in.explosion_particles.cool_from_mult = 0.925f;
+
+				/* The whole effect plays a bit faster. */
+				in.explosion_particles.playback_speed = 1.1f;
 				dmg.impact_impulse = 2.f;
 				dmg.impulse_multiplier_against_sentience = 1000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "rendering_scripts.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/templates/get_by_dynamic_id.h"
@@ -20,7 +21,18 @@ void draw_explosion_body_highlights(const draw_explosion_body_highlights_input i
 			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 				const auto& cascade_def = it.template get<invariants::cascade_explosion>();
 
-				const auto highlight_col = cascade_def.explosion.outer_ring_color;
+				/*
+					Scaled like the explosions' own lights - the overlapping lights add up,
+					so at full intensity the flying bodies would clip the light into white.
+				*/
+				const auto light_mult = 
+					cascade_def.explosion.explosion_particles.fire ? 
+					in.fire_light_brightness_mult : 
+					in.standard_light_brightness_mult
+				;
+
+				auto highlight_col = cascade_def.explosion.outer_ring_color;
+				highlight_col.a = static_cast<rgba_channel>(std::clamp(highlight_col.a * light_mult, 0.f, 255.f));
 
 				const auto highlight_ltrb = ltrb::center_and_size(tr->pos, in.cast_highlight_tex.get_original_size());
 

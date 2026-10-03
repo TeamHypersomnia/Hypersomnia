@@ -29,6 +29,39 @@
 
 constexpr auto reference_explosion_radius = 380.f;
 
+static const auto& get_particles_look(const exploding_ring_input& r, const explosions_settings& settings) {
+	return r.explosion_particles.fire ? settings.fire_particles : settings.standard_particles;
+}
+
+static auto get_particles_duration_secs(const exploding_ring_input& r) {
+	return std::max(r.maximum_duration_seconds, 0.01f);
+}
+
+static auto get_particles_lifetime_mult(const exploding_ring_input& r) {
+	return std::max(0.01f, r.explosion_particles.lifetime_mult);
+}
+
+/*
+	The particles - and the explosion's light - go through the whole palette
+	over particle_palette_duration_fraction of the ring's duration, then stay in its last color.
+*/
+
+static auto calc_palette_step_ms(const exploding_ring_input& r, const explosion_particles_settings& look) {
+	const auto& palette = r.explosion_particles.palette;
+
+	if (palette.size() < 2) {
+		return 1.f;
+	}
+
+	const auto palette_duration_ms = 
+		get_particles_duration_secs(r) * 1000.f 
+		* get_particles_lifetime_mult(r) 
+		* look.particle_palette_duration_fraction
+	;
+
+	return std::max(1.f, palette_duration_ms / static_cast<float>(palette.size() - 1));
+}
+
 static void spawn_explosion_particles(
 	const exploding_ring_input& r,
 	randomization& rng,
@@ -38,7 +71,7 @@ static void spawn_explosion_particles(
 ) {
 	const auto& definitions = emission.get_definitions<general_particle>();
 	const auto& def = r.explosion_particles;
-	const auto& look = def.fire ? settings.fire_particles : settings.standard_particles;
+	const auto& look = ::get_particles_look(r, settings);
 
 	if (definitions.empty()) {
 		return;
@@ -49,15 +82,18 @@ static void spawn_explosion_particles(
 	const auto size_mult = std::max(1.f, radius_ratio);
 	const auto amount_mult = std::min(1.f, radius_ratio * radius_ratio);
 
+	/*
+		Each of the explosion's two rings takes half of the budget.
+	*/
 	const auto total_to_spawn = 
 		static_cast<float>(settings.max_particles_per_explosion) 
-		* r.explosion_particles_share 
+		* 0.5f 
 		* amount_mult
 	;
 
-	const auto duration_secs = std::max(r.maximum_duration_seconds, 0.01f);
+	const auto duration_secs = ::get_particles_duration_secs(r);
 	const auto duration_ms = duration_secs * 1000.f;
-	const auto explosion_lifetime_mult = std::max(0.01f, def.lifetime_mult);
+	const auto explosion_lifetime_mult = ::get_particles_lifetime_mult(r);
 	const auto max_lifetime_ms = duration_ms * look.particle_lifetime_mult_max * explosion_lifetime_mult;
 
 	const auto inner_start = r.inner_radius_start_value;
@@ -75,11 +111,18 @@ static void spawn_explosion_particles(
 
 	const auto spin = rng.randval(0, 1) == 0 ? -1.f : 1.f;
 
+	/*
+		The ring's duration is already shortened by the playback speed, and so are all the timings relative to it.
+		The absolute speeds and accelerations are scaled so that the paths stay the same, only traced faster.
+	*/
+
+	const auto playback_speed = std::max(0.01f, def.playback_speed);
+
 	const auto variation = std::max(0.f, def.variation);
 	const auto jitter_radius = look.particle_jitter_radius * variation;
 	const auto jitter_degrees = look.particle_jitter_degrees * variation;
-	const auto random_acceleration_min = look.particle_random_acceleration_min * variation;
-	const auto random_acceleration_max = look.particle_random_acceleration_max * variation;
+	const auto random_acceleration_min = look.particle_random_acceleration_min * variation * playback_speed * playback_speed;
+	const auto random_acceleration_max = look.particle_random_acceleration_max * variation * playback_speed * playback_speed;
 
 	/*
 		Less variation narrows the lifetime range towards the moment the ring ends (1),
@@ -152,17 +195,7 @@ static void spawn_explosion_particles(
 		return is_fiery ? look.particle_ember_fraction : 0.f;
 	}();
 
-	/*
-		The particles go through the whole palette over particle_palette_duration_fraction of the ring's duration,
-		then stay in its last color.
-	*/
-	const auto palette_duration_ms = duration_ms * explosion_lifetime_mult * look.particle_palette_duration_fraction;
-
-	const auto palette_step_ms = 
-		def.palette.size() < 2 ? 
-		1.f : 
-		std::max(1.f, palette_duration_ms / static_cast<float>(def.palette.size() - 1))
-	;
+	const auto palette_step_ms = ::calc_palette_step_ms(r, look);
 
 	const auto hot_until_ms = duration_ms * look.particle_hot_fraction;
 	const auto cool_from_ms = duration_ms * look.particle_cool_from_fraction * std::max(0.f, def.cool_from_mult);
@@ -190,7 +223,7 @@ static void spawn_explosion_particles(
 		p.center = r.center;
 		p.radius = jittered_radius;
 		p.radial_vel = augs::interp(inner_vel, outer_vel, t) * ease_compensation;
-		p.tangential_vel = spin * size_mult * rng.randval(look.particle_tangential_speed_min, look.particle_tangential_speed_max) * ease_compensation;
+		p.tangential_vel = spin * size_mult * playback_speed * rng.randval(look.particle_tangential_speed_min, look.particle_tangential_speed_max) * ease_compensation;
 		p.angle = angle;
 		p.rotation_offset = rng.randval_h(jitter_degrees);
 		p.max_radius = max_particle_radius;
@@ -213,12 +246,6 @@ static void spawn_explosion_particles(
 			p.tangential_vel *= 0.5f;
 			p.drift_acc *= 2.f;
 		}
-		else {
-			p.speed_stretch = look.particle_speed_stretch;
-		}
-
-		p.initial_speed = vec2(p.radial_vel, p.tangential_vel).length();
-		p.base_size = vec2(p.sprite.size);
 
 		p.hot_color = hot_color;
 		p.ring_color = ring_color;
@@ -226,7 +253,6 @@ static void spawn_explosion_particles(
 		p.hot_until_ms = hot_until_ms;
 		p.cool_from_ms = cool_from_ms;
 		p.cool_until_ms = cool_until_ms;
-		p.color_steps = look.particle_color_steps;
 
 		if (!def.palette.empty()) {
 			p.palette = def.palette;
@@ -236,7 +262,6 @@ static void spawn_explosion_particles(
 
 		p.update_sprite_transform();
 		p.update_sprite_color();
-		p.update_sprite_size();
 		particles.add_explosion_particle(p);
 	};
 
@@ -317,9 +342,13 @@ void exploding_ring_system::advance(
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;
 
+		const auto& look = ::get_particles_look(r, settings);
+
+		e.palette_step_ms = ::calc_palette_step_ms(r, look);
+		e.light_brightness_mult = look.light_brightness_mult;
+
 		if (r.is_explosion_thin_ring) {
-			const auto& look = r.explosion_particles.fire ? settings.fire_particles : settings.standard_particles;
-			r.fixed_thickness = look.thin_ring_thickness;
+			r.fixed_thickness = look.thin_ring_thickness * r.explosion_particles.thin_ring_thickness_mult;
 		}
 
 		if (r.target.is_set()) {
@@ -573,7 +602,7 @@ void exploding_ring_system::draw_rings(
 
 		if (r.fixed_thickness > 0.0f) {
 			const auto thickness_now = 
-				r.fade_by_thinning ? 
+				r.is_explosion_thin_ring ? 
 				r.fixed_thickness * std::max(0.f, 1.f - static_cast<float>(ratio)) :
 				r.fixed_thickness
 			;
@@ -708,7 +737,21 @@ void exploding_ring_system::draw_highlights_of_explosions(
 		const auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
 		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value);
-		auto highlight_col = r.in.color;
+
+		/*
+			With a palette, the light goes through it in sync with the ring's particles.
+		*/
+
+		const auto& palette = r.in.explosion_particles.palette;
+
+		auto highlight_col = 
+			palette.empty() ? 
+			r.in.color : 
+			::sample_explosion_particles_palette(
+				palette, 
+				r.in.explosion_particles_palette_offset + static_cast<float>(passed * 1000.0) / r.palette_step_ms
+			)
+		;
 
 		const auto highlight_amount = 1.f - ratio;
 
@@ -720,7 +763,7 @@ void exploding_ring_system::draw_highlights_of_explosions(
 		}
 
 		if (highlight_amount > 0.f) {
-			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
+			highlight_col.a = static_cast<rgba_channel>(std::min(255.0, 255 * highlight_amount * r.light_brightness_mult));
 
 			output.aabb(
 				highlight_tex,
