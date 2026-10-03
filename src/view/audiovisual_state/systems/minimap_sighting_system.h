@@ -70,7 +70,7 @@ public:
 	};
 
 	/*
-		The cosmos seconds of the last step recorded - all the records are timed by it.
+		The real seconds of the last step recorded - all the records are timed by it.
 		On a client, sightings are recorded from the referential cosmos only,
 		while the viewed one is predicted ahead of it - so the records must never be compared with the viewed cosmos' clock.
 	*/

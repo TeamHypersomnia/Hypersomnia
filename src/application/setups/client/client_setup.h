@@ -665,7 +665,11 @@ public:
 			return 0.0;
 		}
 
-		const auto dt_secs = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+		/*
+			Steps are ticked in real time, regardless of the logic speed.
+		*/
+
+		const auto dt_secs = get_inv_tickrate();
 
 		if (is_replaying()) {
 			return demo_player.timer.next_step_progress_fraction(dt_secs);

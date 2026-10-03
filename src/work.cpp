@@ -3946,7 +3946,7 @@ work_result work(
 				get_controlled_character().get_id(),
 				cosm,
 				frame_delta, 
-				cosm.get_fixed_delta(),
+				cosm.get_clock().get_real_dt(),
 				speed_multiplier,
 				get_interpolation_ratio()
 			);

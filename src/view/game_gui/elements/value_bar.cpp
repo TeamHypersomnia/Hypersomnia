@@ -192,7 +192,7 @@ void value_bar::draw(
 		const auto bar_in = hud_bar_draw_input {
 			output,
 			necessarys,
-			cosm.get_total_seconds_passed(),
+			cosm.get_clock().get_real_seconds_passed(),
 			context.dependencies.white_damage_highlight_secs,
 			context.get_gui_font()
 		};

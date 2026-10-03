@@ -34,7 +34,6 @@ struct test_mode_faction_rules {
 
 struct test_mode_view_rules {
 	// GEN INTROSPECTOR struct test_mode_view_rules
-	double audiovisual_speed = 1.0;
 	fog_of_war_settings fog_of_war;
 	character_hud_type enemy_hud_mode = character_hud_type::SMALL_HEALTH_BAR;
 
@@ -179,7 +178,6 @@ public:
 	session_id_type next_session_id = session_id_type::first();
 	std::optional<arena_playtesting_context> playtesting_context;
 	entity_id infinite_ammo_for;
-	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
@@ -197,6 +195,8 @@ public:
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
 
+	void update_logic_speed(input);
+
 	template <class C>
 	decltype(auto) advance(
 		const input in,
@@ -205,6 +205,8 @@ public:
 		solve_settings settings
 	) {
 		settings.friendly_fire = in.dynamic_vars.friendly_fire;
+
+		update_logic_speed(in);
 
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 

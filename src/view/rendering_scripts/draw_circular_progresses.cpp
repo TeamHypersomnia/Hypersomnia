@@ -101,8 +101,14 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 								global_time_seconds
 							;
 
+							/*
+								Planting takes real time - see hand_fuse_logic.
+							*/
+
+							const auto real_secs_arming = clk.logic_to_real_secs(global_time_seconds - when_started_arming);
+
 							const auto highlight_amount = static_cast<float>(
-								(global_time_seconds - when_started_arming)
+								real_secs_arming
 								/ (fuse_def.arming_duration_ms / 1000.f) 
 							);
 
@@ -192,7 +198,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 
 						if (cooldown > 1000.f && is_wielded()) {
 							const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.fire_cooldown_object);
-							const auto transfer_r = clk.get_ratio_of_remaining_time(
+							const auto transfer_r = clk.get_real_clock().get_ratio_of_remaining_time(
 								gun_def.get_transfer_shot_cooldown(), 
 								it.when_last_transferred()
 							);

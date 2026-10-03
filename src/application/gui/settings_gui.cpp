@@ -24,6 +24,7 @@
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/window.h"
 
+#include "game/modes/logic_speed.h"
 #include "view/necessary_resources.h"
 
 #include "application/config_json_table.h"
@@ -2564,6 +2565,13 @@ void do_server_vars(
 
 		revertable_checkbox("Friendly fire", vars.friendly_fire);
 		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
+
+		revertable_slider("Game speed", vars.speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+		vars.speed = ::sanitize_logic_speed(vars.speed);
+		tooltip_on_hover("Slows down the logic (movement, physics, bullets, reloads, bots).\nFire rates, recoil and round time stay the same.");
+
+		revertable_checkbox("Allow /speed command", vars.allow_setting_speed);
+		revertable_checkbox("Allow /speed command (RANKED)", vars.ranked.overrides.allow_setting_speed);
 
 		revertable_checkbox("Allow overtime", vars.allow_overtime);
 		tooltip_on_hover("A tie at (max team score - 1) each plays out into overtime\nuntil one team leads by two rounds (e.g. 17:15, then 18:16...).");

@@ -7,7 +7,7 @@ struct beep_math {
 	const augs::stepped_clock& clk;
 
 	auto get_beep_duration() const {
-		const auto remaining_time_ms = augs::stepped_clock{ clk.dt, fuse.when_last_beep }.get_remaining_ms(
+		const auto remaining_time_ms = augs::stepped_clock::from_timestamp(clk, fuse.when_last_beep).get_remaining_ms(
 			fuse.fuse_delay_ms,
 			fuse.when_armed
 		);

@@ -98,14 +98,6 @@ augs::delta cosmos_solvable::get_fixed_delta() const {
 	return significant.clk.dt;
 }
 
-void cosmos_solvable::set_steps_per_second(const unsigned steps) {
-	significant.clk.dt = augs::delta::steps_per_second(steps);
-}
-
-unsigned cosmos_solvable::get_steps_per_second() const {
-	return get_fixed_delta().in_steps_per_second();
-}
-
 std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const entity_id id) {
 	significant.specific_names.erase(id);
 	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id.raw); });

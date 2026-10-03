@@ -30,6 +30,7 @@
 #include "game/messages/changed_identities_message.h"
 #include "augs/math/repro_math.h"
 #include "game/modes/difficulty_type.h"
+#include "game/modes/logic_speed.h"
 
 using input_type = test_mode::input;
 
@@ -361,7 +362,7 @@ void test_mode::remove_old_lying_items(input_type in, logic_step) {
 	const auto max_age_ms = 10000;
 
 	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	deletion_queue q;
 
@@ -404,7 +405,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 	auto& cosm = in.cosm;
 
-	const auto& clk = cosm.get_clock();
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	for (const auto& p : pending_inits) {
 		if (const auto handle = cosm[p]) {
@@ -788,8 +789,18 @@ bool test_mode_player::operator<(const test_mode_player& b) const {
 	return ::compare_arena_players(*this, b);
 }
 
+void test_mode::update_logic_speed(const input in) {
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+	const auto requested_speed = ::sanitize_logic_speed(in.dynamic_vars.logic_speed);
+
+	if (clk.logic_speed != requested_speed) {
+		cosm.set_clock_timing(clk.tickrate, requested_speed);
+	}
+}
+
 float test_mode::get_seconds_passed_in_cosmos(const const_input in) const {
-	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
+	return in.cosm.get_clock().get_real_seconds_passed();
 }
 
 float test_mode::get_round_seconds_left(const const_input in) const {

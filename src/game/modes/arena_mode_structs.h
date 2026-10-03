@@ -13,7 +13,6 @@
 #include "game/modes/arena_player_order.h"
 #include "game/modes/session_id.h"
 #include "view/character_hud_type.h"
-#include "augs/misc/timing/speed_vars.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "augs/network/network_types.h"
 
@@ -167,7 +166,6 @@ struct arena_mode_view_rules {
 	assets::image_id wallbang_icon;
 
 	fog_of_war_settings fog_of_war;
-	double audiovisual_speed = 1.0;
 	uint32_t can_spectate_dead_body_for_secs = 5;
 
 	bool enable_danger_indicators = true;

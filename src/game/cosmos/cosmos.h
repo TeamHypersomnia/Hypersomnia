@@ -307,7 +307,7 @@ public:
 
 	void reinfer_everything();
 
-	void set_fixed_delta(const augs::delta& dt);
+	void set_clock_timing(uint32_t tickrate, real32 logic_speed);
 
 	void assign_solvable(const cosmos& b);
 

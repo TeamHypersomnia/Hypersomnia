@@ -58,7 +58,7 @@ void intercosm::populate_official_content(
 
 	cosmic::change_solvable_significant(world, [&](auto& s){
 		s.clk.now.step = 0;
-		s.clk.dt = augs::delta::steps_per_second(tickrate);
+		s.clk.set_timing(tickrate, 1.f);
 		return changer_callback_result::DONT_REFRESH;
 	});
 }
@@ -89,7 +89,7 @@ void intercosm::make_test_scene(
 		cosmic::change_solvable_significant(world, [&settings](auto& s){
 			/* Populating with test scene will advance it so revert the step number back to 0 */
 			s.clk.now.step = 0;
-			s.clk.dt = augs::delta::steps_per_second(settings.scene_tickrate);
+			s.clk.set_timing(settings.scene_tickrate, 1.f);
 			return changer_callback_result::DONT_REFRESH;
 		});
 

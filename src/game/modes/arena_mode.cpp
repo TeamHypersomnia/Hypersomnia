@@ -76,6 +76,7 @@ using input_type = arena_mode::input;
 using const_input_type = arena_mode::const_input;
 
 #include "game/modes/arena_mode_casual_levels.hpp"
+#include "game/modes/logic_speed.h"
 
 int arena_mode_player_stats::calc_score() const {
 	return 
@@ -1129,7 +1130,6 @@ void arena_mode::setup_round(
 
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
-	round_speeds = in.rules.speeds;
 
 	stable_round_rng = randomization(total_mode_steps_passed).generator;
 
@@ -1150,7 +1150,19 @@ void arena_mode::setup_round(
 		step.get_queue<messages::mode_notification>() = notifications;
 	}
 
-	cosm.set_fixed_delta(round_speeds.calc_fixed_delta());
+	/*
+		The clean round state carries its own clock timing.
+		Keep the tickrate we were running at and apply the requested logic speed at every round start -
+		except during a live ranked match, which keeps the speed it started with.
+	*/
+
+	const auto round_logic_speed =
+		is_ranked_live() ?
+		clock_before_setup.logic_speed :
+		::sanitize_logic_speed(in.dynamic_vars.logic_speed)
+	;
+
+	cosm.set_clock_timing(clock_before_setup.tickrate, round_logic_speed);
 
 	remove_test_characters(cosm);
 
@@ -3357,7 +3369,7 @@ void arena_mode::handle_game_commencing(const input_type in, const logic_step st
 	}
 
 	if (commencing_timer_ms != -1.f) {
-		commencing_timer_ms -= step.get_delta().in_milliseconds();
+		commencing_timer_ms -= step.get_real_delta().in_milliseconds();
 
 		if (commencing_timer_ms <= 0.f) {
 			commencing_timer_ms = -1.f;
@@ -3723,7 +3735,7 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 	std::vector<mode_player_id> to_erase;
 
 	for (auto& p : suspended_players) {
-		p.second.stats.total_time_suspended += step.get_delta().in_seconds();
+		p.second.stats.total_time_suspended += step.get_real_delta().in_seconds();
 
 		if (p.second.unset_inputs_once) {
 			p.second.unset_inputs_once = false;
@@ -3750,7 +3762,7 @@ bool arena_mode::handle_suspended_logic(const input_type in, const logic_step st
 		unfreezing_match_in_secs = in.dynamic_vars.ranked.match_unfreezes_in_secs;
 	}
 	else if (unfreezing_match_in_secs > 0.0f) {
-		unfreezing_match_in_secs -= step.get_delta().in_seconds();
+		unfreezing_match_in_secs -= step.get_real_delta().in_seconds();
 	}
 
 	return unfreezing_match_in_secs > 0.0f;
@@ -4307,7 +4319,7 @@ void arena_mode::announce_casual_level_changes(const_input_type in, const logic_
 
 void arena_mode::respawn_the_dead(const input_type in, const logic_step step, const unsigned after_ms) {
 	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	for (auto& it : players) {
 		const auto id = it.first;
@@ -4340,7 +4352,7 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 void arena_mode::respawn_the_dead_as_bots(const input_type in, const logic_step step, const unsigned after_ms) {
 	(void)step;
 	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	for (auto& it : only_human(players)) {
 		auto& victim_info = it.second;
@@ -4501,8 +4513,45 @@ float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
 	return -1.f;
 }
 
+bool arena_mode::is_logic_speed_change_unnoticeable(const const_input_type in) const {
+	return state == arena_mode_state::WARMUP || get_freeze_seconds_left(in) > 0.f;
+}
+
+void arena_mode::update_logic_speed(const input_type in) {
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+	const auto requested_speed = ::sanitize_logic_speed(in.dynamic_vars.logic_speed);
+
+	if (clk.logic_speed == requested_speed) {
+		return;
+	}
+
+	/*
+		Changing the speed mid-round retroactively rescales all logic timestamps
+		(e.g. the remaining fuse time of a planted bomb jumps).
+		That's acceptable in warmup and freeze time, and for administrative changes.
+		Otherwise setup_round applies the new speed at the start of the next round.
+	*/
+
+	const bool can_change_now = [&]() {
+		if (is_ranked_live()) {
+			return false;
+		}
+
+		if (in.dynamic_vars.apply_logic_speed_immediately) {
+			return true;
+		}
+
+		return is_logic_speed_change_unnoticeable(in);
+	}();
+
+	if (can_change_now) {
+		cosm.set_clock_timing(clk.tickrate, requested_speed);
+	}
+}
+
 float arena_mode::get_seconds_passed_in_cosmos(const const_input_type in) const {
-	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
+	return in.cosm.get_clock().get_real_seconds_passed();
 }
 
 float arena_mode::get_round_seconds_passed(const const_input_type in) const {
@@ -4544,9 +4593,7 @@ float arena_mode::get_seconds_since_win(const const_input_type in) const {
 		return -1.f;
 	}
 
-	auto clk = in.cosm.get_clock();
-	clk.dt = round_speeds.calc_ticking_delta();
-	return clk.diff_seconds(last_win.when);
+	return in.cosm.get_clock().diff_real_seconds(last_win.when);
 }
 
 float arena_mode::get_match_summary_seconds_left(const const_input_type in) const {
@@ -4631,7 +4678,11 @@ real32 arena_mode::get_critical_seconds_left(const const_input_type in) const {
 
 			const auto when_armed = fuse.when_armed;
 
-			return clk.get_remaining_secs(fuse.fuse_delay_ms, when_armed);
+			/*
+				The fuse runs in logic time, but HUD shows real seconds.
+			*/
+
+			return clk.logic_to_real_secs(clk.get_remaining_secs(fuse.fuse_delay_ms, when_armed));
 		}
 	});
 }
@@ -4652,7 +4703,7 @@ float arena_mode::get_seconds_since_planting(const const_input_type in) const {
 			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
 			const auto when_armed = fuse.when_armed;
 
-			return (clk.now - when_armed).in_seconds(clk.dt);
+			return (clk.now - when_armed).in_seconds(clk.get_real_dt());
 		}
 	});
 }
@@ -4959,7 +5010,7 @@ bool arena_mode::conscious_or_can_still_spectate(
 	const real32 limit_in_seconds
 ) const {
 	const auto max_secs = std::min(limit_in_seconds, static_cast<real32>(in.rules.view.can_spectate_dead_body_for_secs));
-	const auto& clk = in.cosm.get_clock();
+	const auto clk = in.cosm.get_clock().get_real_clock();
 
 	return on_player_handle(in.cosm, who, [&](const auto& player_handle) {
 		if constexpr(!is_nullopt_v<decltype(player_handle)>) {
@@ -5258,7 +5309,7 @@ void arena_mode::remove_old_lying_items(const input_type in, const logic_step) {
 	const auto max_age_ms = 7000;
 
 	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	deletion_queue q;
 

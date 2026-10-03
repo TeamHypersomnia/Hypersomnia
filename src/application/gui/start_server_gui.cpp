@@ -11,6 +11,7 @@
 #include "augs/misc/imgui/imgui_enum_combo.h"
 #include "augs/misc/date_time.h"
 #include "application/gui/bot_quota_widget.h"
+#include "game/modes/logic_speed.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -171,6 +172,10 @@ as well as to test your skills in a laggy environment.
 		}
 
 		checkbox("Friendly fire", into_vars.friendly_fire);
+
+		slider("Game speed", into_vars.speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+		into_vars.speed = ::sanitize_logic_speed(into_vars.speed);
+		text_disabled("Sending \"/speed 0.7\" in chat changes the speed.");
 
 		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");

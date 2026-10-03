@@ -251,6 +251,16 @@ Prefer `build_file` to verify edits to a specific file before running a full `bu
 
 # Game architecture specific
 
+## State architecture overview
+
+- **Cosmos** - the whole game world: entities, components, physics. Built from the map's editor project JSON (`build_arena_from_editor_project`). Advanced one fixed step at a time by `standard_solver` with a `cosmic_entropy` (player inputs).
+- **Significant state** - the source of truth that gets serialized, synced over the network and compared for determinism. Everything else must be derivable from it.
+- **Inferred state** - runtime-only caches (physics world, name maps, relations) generated from significant state. Never serialized; losing it loses no data.
+- **Reinference** - destroy inferred caches and regenerate them from significant. Required whenever significant changes outside the solver, e.g. state received from the network or loaded from disk.
+- **Solvable vs common** - `cosmos_solvable` is what the solver changes every step (entities, clock). `cosmos_common` is read-only during simulation (flavours, logical assets, spells) and only changes at content creation, e.g. in the editor.
+- **Arena mode** - game mode state on top of the cosmos: rounds, players, economy, timers. `rules` come from the map/server, `dynamic_vars` are server-driven synced vars. `clean_round_state` is the solvable significant snapshot restored at every round start.
+- **Logic vs real time** - `clk.dt` is the logic delta: `(1 / tickrate) * logic_speed`, set by `/speed` and `server_vars.speed`. Physics, movement, missiles, fuses, reloads and bots use it and slow down. Fire rates, recoil, melee cooldowns, pickup delays, mode timers and HUD countdowns use `clk.get_real_dt()` / `get_real_clock()` / `step.get_real_delta()` instead.
+
 - To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.
 
 - Prefer using vec2 (float) and vec2i (int) for coordinates so e.g.

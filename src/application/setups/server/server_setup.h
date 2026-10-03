@@ -233,6 +233,13 @@ class server_setup :
 	std::string name_suffix;
 	server_temp_var_overrides overrides;
 
+	/*
+		Speed changed by the admin (RCON/config) applies immediately.
+		Speed changed with /speed waits for warmup, freeze time or the next round.
+	*/
+
+	bool apply_speed_immediately = false;
+
 	enum class job_type {
 		AVATAR,
 		AUTH,
@@ -456,7 +463,7 @@ public:
 			one tick backwards - fast bullets (and their trails) rendered deep behind
 			the muzzle, inside the shooter.
 		*/
-		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+		const auto dt = get_inv_tickrate();
 		return std::clamp((get_current_time() - server_time) / dt + 1.0, 0.0, 1.0);
 	}
 
@@ -896,6 +903,7 @@ public:
 
 	difficulty_type calc_current_bot_difficulty() const;
 	void broadcast_bots_adjusted(const mode_player_id& requester);
+	void broadcast_speed_adjusted();
 
 	void choose_next_map_from_cycle();
 	bool is_idle() const;

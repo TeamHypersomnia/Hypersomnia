@@ -644,7 +644,7 @@ public:
 	setup_escape_result escape();
 
 	auto get_inv_tickrate() const {
-		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+		return get_viewed_cosmos().get_clock().get_real_dt().in_seconds<double>();
 	}
 
 	template <class C>

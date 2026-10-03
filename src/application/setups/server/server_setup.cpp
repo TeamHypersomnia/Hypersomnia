@@ -50,6 +50,7 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "application/setups/editor/editor_paths.h"
 #include "game/modes/arena_mode.hpp"
+#include "game/modes/logic_speed.h"
 #include "game/messages/mode_notification.h"
 #include "augs/misc/httplib_utils.h"
 #include "application/gui/client/chat_gui_entry.hpp"
@@ -2726,6 +2727,9 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.bot_override_difficulty = overrides.bot_difficulty.difficulty;
 	}
 
+	out.logic_speed = ::sanitize_logic_speed(overrides.speed.is_set() ? overrides.speed.speed : vars.speed);
+	out.apply_logic_speed_immediately = apply_speed_immediately;
+
 	return out;
 }
 
@@ -2794,6 +2798,15 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 
 	const bool reload_arena = first_time || vars.arena != new_vars.arena || vars.game_mode != new_vars.game_mode;
 	const bool reload_net_sim = first_time || vars.network_simulator != new_vars.network_simulator;
+
+	if (!first_time && vars.speed != new_vars.speed) {
+		/*
+			Administrative change: overrides whatever was requested with /speed.
+		*/
+
+		overrides.speed = {};
+		apply_speed_immediately = true;
+	}
 
 	vars = new_vars;
 
@@ -3869,6 +3882,13 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 		}
 	}
 
+	if (overrides.speed.requester.is_set()) {
+		if (const bool disconnected_already = !get_client_state(overrides.speed.requester).is_set()) {
+			overrides.speed = defaults.speed;
+			apply_speed_immediately = false;
+		}
+	}
+
 	if (current_dynamic_vars != last_broadcast_dynamic_vars) {
 		LOG(
 			"Sending new dynamic vars at step: %x. %x %x %x",
@@ -4282,7 +4302,7 @@ double server_setup::get_inv_tickrate() const {
 }
 
 double server_setup::get_audiovisual_speed() const {
-	return get_arena_handle().get_audiovisual_speed();
+	return 1.0;
 }
 
 
@@ -5155,6 +5175,31 @@ difficulty_type server_setup::calc_current_bot_difficulty() const {
 	);
 }
 
+void server_setup::broadcast_speed_adjusted() {
+	const auto new_speed = make_synced_dynamic_vars().logic_speed;
+
+	const bool applies_now = get_arena_handle().on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			using M = remove_cref<decltype(mode)>;
+
+			if constexpr(std::is_same_v<M, arena_mode>) {
+				return mode.is_logic_speed_change_unnoticeable(in);
+			}
+			else {
+				return true;
+			}
+		}
+	);
+
+	const auto message = typesafe_sprintf(
+		"Speed changed to %2fx%x",
+		new_speed,
+		applies_now ? "." : " from the next round."
+	);
+
+	broadcast_info(message, chat_target_type::INFO);
+}
+
 void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 	/*
 		Report the bots that the already-applied overrides will result in,
@@ -5365,6 +5410,36 @@ void server_setup::handle_client_chat_command(
 					broadcast_bots_adjusted(to_mode_player_id(id));
 				}
 			}
+		}
+		else if (begins_with(chat.message, "/speed")) {
+			if (is_ranked_live_or_starting()) {
+				broadcast_info("Speed cannot be changed during a ranked match.", chat_target_type::INFO_CRITICAL);
+				return;
+			}
+
+			if (!vars.get_allow_setting_speed()) {
+				broadcast_info("Changing speed is disabled on this server.", chat_target_type::INFO_CRITICAL);
+				return;
+			}
+
+			if (chat.message == "/speed" || chat.message == "/speed ") {
+				overrides.speed = {};
+				apply_speed_immediately = false;
+				broadcast_speed_adjusted();
+				return;
+			}
+
+			auto requested_speed = 0.f;
+
+			if (!typesafe_sscanf(chat.message, "/speed %x", requested_speed)) {
+				broadcast_info("Wrong command format. Example: /speed 0.8", chat_target_type::INFO_CRITICAL);
+				return;
+			}
+
+			overrides.speed.requester = to_mode_player_id(id);
+			overrides.speed.speed = ::sanitize_logic_speed(requested_speed);
+			apply_speed_immediately = false;
+			broadcast_speed_adjusted();
 		}
 		else if (chat.message == "/next") {
 			if (!can_use_map_command_now()) {

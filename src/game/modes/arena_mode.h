@@ -16,7 +16,6 @@
 #include "game/enums/battle_event.h"
 #include "augs/misc/enum/enum_array.h"
 #include "augs/misc/timing/stepped_timing.h"
-#include "augs/misc/timing/speed_vars.h"
 #include "game/modes/mode_commands/mode_entropy_structs.h"
 #include "game/detail/view_input/predictability_info.h"
 #include "augs/enums/callback_result.h"
@@ -82,8 +81,6 @@ struct arena_mode_ruleset {
 
 	arena_mode_economy_rules economy;
 	arena_mode_view_rules view;
-
-	augs::speed_vars speeds;
 
 	all_subrules_variant subrules;
 	// END GEN INTROSPECTOR
@@ -382,6 +379,12 @@ private:
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
 	void setup_round(input, logic_step, const round_transferred_players&, setup_next_round_params = {});
+	void update_logic_speed(input);
+
+public:
+	bool is_logic_speed_change_unnoticeable(const_input) const;
+
+private:
 	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
 
 	void fill_spawns(const cosmos&, faction_type, arena_mode_faction_state& out);
@@ -478,7 +481,6 @@ private:
 	bool should_commence_when_ready = false;
 	faction_type abandoned_team = faction_type::COUNT;
 
-	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
 
 	uint32_t sound_clock = 0;
@@ -603,6 +605,8 @@ public:
 	) {
 		settings.friendly_fire = in.rules.is_ffa() ? true : in.dynamic_vars.friendly_fire;
 
+		update_logic_speed(in);
+
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
 		++total_mode_steps_passed;
@@ -616,7 +620,7 @@ public:
 		;
 
 		if (ranked_active_playtime) {
-			total_effective_ranked_time_secs += in.cosm.get_fixed_delta().in_seconds();
+			total_effective_ranked_time_secs += in.cosm.get_clock().get_real_dt().in_seconds();
 		}
 
 		return standard_solver()(
@@ -648,10 +652,6 @@ public:
 				callbacks.post_cleanup
 			)
 		);
-	}
-
-	const auto& get_round_speeds() const {
-		return round_speeds;
 	}
 
 	auto get_commencing_left_ms() const {

@@ -48,6 +48,12 @@ struct general_particle {
 	bool smooth_shrink = false;
 	// END GEN INTROSPECTOR
 
+	/*
+		Runtime only. Bullet trail particles slow down together with the logic speed.
+	*/
+
+	float time_mult = 1.f;
+
 	void integrate(const float dt);
 
 	template <bool use_neon_maps, class M>
@@ -257,6 +263,12 @@ struct animated_particle {
 	rgba color = white;
 	// END GEN INTROSPECTOR
 
+	/*
+		Runtime only. Bullet trail particles slow down together with the logic speed.
+	*/
+
+	float time_mult = 1.f;
+
 	void integrate(const float dt, const plain_animations_pool& anims);
 
 	template <bool use_neon_maps, class M>
@@ -306,6 +318,12 @@ struct homing_animated_particle {
 
 	simple_animation_state animation_state;
 	// END GEN INTROSPECTOR
+
+	/*
+		Runtime only. Bullet trail particles slow down together with the logic speed.
+	*/
+
+	float time_mult = 1.f;
 
 	void integrate(
 		const float dt, 

@@ -2638,6 +2638,14 @@ void editor_setup::apply(const config_json_table& cfg) {
 	settings = cfg.editor;
 	faction_view = cfg.faction_view;
 	simulated_client = cfg.client;
+
+	/*
+		Playtest at the same speed the map would be hosted at.
+		playtest_speed remains a separate warp of the whole application on top of it.
+	*/
+
+	dummy_dynamic_vars.logic_speed = cfg.server.speed;
+	dummy_dynamic_vars.apply_logic_speed_immediately = true;
 }
 
 void editor_setup::unhover() {
@@ -3178,7 +3186,7 @@ bool editor_setup::is_node_active(const editor_node_id id) const {
 
 double editor_setup::get_interpolation_ratio() const {
 	if (is_playtesting()) {
-		return timer.next_step_progress_fraction(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+		return timer.next_step_progress_fraction(get_inv_tickrate());
 	}
 
 	return global_time_seconds / get_inv_tickrate();

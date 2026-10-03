@@ -907,7 +907,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 	}
 
 	if (restart_arena_in_ms > 0) {
-		restart_arena_in_ms -= step.get_delta().in_milliseconds();
+		restart_arena_in_ms -= step.get_real_delta().in_milliseconds();
 
 		if (restart_arena_in_ms <= 0) {
 			restart_arena();
@@ -1451,6 +1451,14 @@ std::string test_scene_setup::get_scoreboard_caption() const {
 	else {
 		return "Shooting Range";
 	}
+}
+
+void test_scene_setup::apply(const config_json_table& cfg) {
+	/*
+		Shooting range and tutorial run at the same speed the player would host a server at.
+	*/
+
+	dummy_dynamic_vars.logic_speed = cfg.server.speed;
 }
 
 void test_scene_setup::customize_for_viewing(config_json_table& config) const {

@@ -26,6 +26,15 @@ struct bot_difficulty_request {
 	}
 };
 
+struct speed_request {
+	mode_player_id requester;
+	float speed = 1.f;
+
+	bool is_set() const {
+		return requester.is_set();
+	}
+};
+
 struct synced_dynamic_vars {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -42,6 +51,8 @@ struct synced_dynamic_vars {
 	server_ranked_vars ranked;
 	bots_request bots_override;
 	difficulty_type bot_override_difficulty = difficulty_type::LEVELLING;
+	real32 logic_speed = 1.f;
+	bool apply_logic_speed_immediately = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const synced_dynamic_vars&) const = default;

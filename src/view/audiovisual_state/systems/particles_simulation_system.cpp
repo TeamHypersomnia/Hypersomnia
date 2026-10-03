@@ -602,13 +602,13 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 			auto& particle = range[from_i];
 
 			if constexpr(std::is_same_v<P, general_particle>) {
-				particle.integrate(delta);
+				particle.integrate(delta * particle.time_mult);
 			}
 			else if constexpr(std::is_same_v<P, animated_particle>) {
-				particle.integrate(delta, anims);
+				particle.integrate(delta * particle.time_mult, anims);
 			}
 			else if constexpr(std::is_same_v<P, homing_animated_particle>) {
-				particle.integrate(delta, anims, std::forward<decltype(args)>(args)...);
+				particle.integrate(delta * particle.time_mult, anims, std::forward<decltype(args)>(args)...);
 			}
 			else if constexpr(std::is_same_v<P, explosion_particle>) {
 				particle.integrate(delta);
@@ -767,7 +767,12 @@ void particles_simulation_system::advance_visible_streams(
 	const double now_secs,
 	const vec2 missile_shadow_offset
 ) {
-	const auto dt_secs = delta.in_seconds();
+	/*
+		Audiovisual effects play at 1.0x regardless of logic speed,
+		except bullet trails which should match the slowed down missiles.
+	*/
+
+	const auto bullet_trail_time_mult = cosm.get_clock().logic_speed;
 
 	auto advance_emissions = [&](
 		emission_instances_type& instances,
@@ -787,13 +792,23 @@ void particles_simulation_system::advance_visible_streams(
 		const auto infinitely = effect.start.stream_infinitely;
 
 		for (auto& instance : instances) {
+			const auto time_mult = instance.source_emission.is_bullet_trail ? bullet_trail_time_mult : 1.f;
+
+			auto considered_delta = delta;
+
+			if (time_mult != 1.f) {
+				considered_delta *= time_mult;
+			}
+
+			const auto dt_secs = considered_delta.in_seconds();
+
 			if (instance.delay_remaining_ms > 0.f) {
-				instance.delay_remaining_ms -= delta.in_milliseconds();
+				instance.delay_remaining_ms -= considered_delta.in_milliseconds();
 				continue;
 			}
 
 			const auto stream_alivity_mult = std::fmod(instance.calc_alivity_mult(), 1.0f);
-			const auto stream_delta = instance.advance_lifetime_get_dt(delta, infinitely);
+			const auto stream_delta = instance.advance_lifetime_get_dt(considered_delta, infinitely);
 
 			if (!visible_in_camera) {
 				continue;
@@ -978,6 +993,7 @@ void particles_simulation_system::advance_visible_streams(
 
 					auto modified = ::apply_to_particle(modifier, particle);
 					modified.multiply_size(shrink_out_mult);
+					modified.time_mult = time_mult;
 
 					return modified;
 				};

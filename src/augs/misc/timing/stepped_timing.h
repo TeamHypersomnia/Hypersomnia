@@ -27,15 +27,74 @@ namespace augs {
 
 	using real_cooldown = real32;
 
+	/*
+		tickrate - how many steps per real second the client/server performs.
+		logic_speed - how much logic time passes per real time.
+
+		dt - the logic delta passed to the solver: (1 / tickrate) * logic_speed.
+		Everything measured with dt (physics, movement, fuses, reloads, AI) slows down with logic_speed.
+
+		Durations that should stay constant in real time regardless of logic_speed
+		(fire rates, recoil, mode timers) should use get_real_dt() or get_real_clock().
+
+		Only change tickrate and logic_speed through set_timing so that dt stays consistent.
+	*/
+
 	struct stepped_clock {
 		// GEN INTROSPECTOR struct augs::stepped_clock
 		delta dt = delta::steps_per_second(60);
+		uint32_t tickrate = 60;
+		real32 logic_speed = 1.f;
 		stepped_timestamp now = { static_cast<unsigned>(0) };
 		// END GEN INTROSPECTOR
 
-		auto diff_seconds(const stepped_clock& lesser) const {
-			/* TODO: Account for different deltas when they can change. */
-			return (now - lesser.now).in_seconds(dt);
+		static stepped_clock from_timestamp(const stepped_clock& source, const stepped_timestamp new_now) {
+			auto result = source;
+			result.now = new_now;
+			return result;
+		}
+
+		void set_timing(const uint32_t new_tickrate, const real32 new_logic_speed) {
+			tickrate = new_tickrate;
+			logic_speed = new_logic_speed;
+			dt = delta::steps_per_second(tickrate);
+
+			if (logic_speed != 1.f) {
+				dt *= logic_speed;
+			}
+		}
+
+		delta get_real_dt() const {
+			return delta::steps_per_second(tickrate);
+		}
+
+		/*
+			A copy of this clock whose dt measures real time.
+			Pass it to systems whose cooldowns should not slow down with logic_speed.
+		*/
+
+		stepped_clock get_real_clock() const {
+			auto result = *this;
+			result.set_timing(tickrate, 1.f);
+			return result;
+		}
+
+		template <class T>
+		real32 logic_to_real_secs(const T logic_secs) const {
+			return static_cast<real32>(logic_secs) / logic_speed;
+		}
+
+		template <class T>
+		real32 logic_to_real_ms(const T logic_ms) const {
+			return static_cast<real32>(logic_ms) / logic_speed;
+		}
+
+		auto diff_real_seconds(const stepped_clock& lesser) const {
+			return (now - lesser.now).in_seconds(get_real_dt());
+		}
+
+		double get_real_seconds_passed() const {
+			return now.step * get_real_dt().in_seconds<double>();
 		}
 
 		bool was_set() const {
@@ -158,8 +217,6 @@ namespace augs {
 			return std::max(0.f, current_cooldown_ms / cooldown_ms);
 		}
 	};
-
-	static_assert(sizeof(stepped_clock) == sizeof(delta) + sizeof(stepped_timestamp));
 
 	struct stepped_cooldown {
 		// GEN INTROSPECTOR struct augs::stepped_cooldown

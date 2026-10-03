@@ -257,7 +257,12 @@ void arena_scoreboard_gui::draw_gui(
 			col = yellow;
 		}
 
-		text_stroked(window_name, col, { sz.x / 2 - window_name_size.x / 2, 0 });
+		const auto speed_caption = typesafe_sprintf("   Speed: %xx", mode_input.cosm.get_clock().logic_speed);
+		const auto speed_caption_size = calc_size(speed_caption);
+		const auto caption_x = sz.x / 2 - (window_name_size.x + speed_caption_size.x) / 2;
+
+		text_stroked(window_name, col, { caption_x, 0 });
+		text_stroked(speed_caption, gray, { caption_x + window_name_size.x, 0 });
 	}
 
 	pen.y += window_name_size.y;

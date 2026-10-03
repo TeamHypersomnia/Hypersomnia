@@ -374,7 +374,11 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 				return displacement * frame_dt_in_steps;
 			}
 
-			return displacement * cosm.get_fixed_delta().in_steps_per_second();
+			/*
+				Velocity as perceived in real time, regardless of logic speed.
+			*/
+
+			return displacement * static_cast<real32>(cosm.get_clock().tickrate);
 		}();
 
 		previous_transform = current_transform;
@@ -1042,7 +1046,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}
 
 				auto born_at_secs = when_born * in.inv_tickrate;
-				auto total_secs_passed = cosm.get_total_seconds_passed(in.interpolation_ratio);
+				/*
+					Sounds play in real time, so measure their age in real seconds like born_at_secs.
+				*/
+
+				auto total_secs_passed = (double(now_step) + in.interpolation_ratio) * in.inv_tickrate;
 
 				if (looping) {
 					born_at_secs = 0;

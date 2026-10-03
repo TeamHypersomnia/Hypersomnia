@@ -81,6 +81,7 @@ struct server_ranked_overrides_vars {
 	// GEN INTROSPECTOR struct server_ranked_overrides_vars
 	bool friendly_fire = true;
 	float client_network_timeout_secs = 1.0f;
+	bool allow_setting_speed = true;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_overrides_vars&) const = default;
@@ -127,7 +128,7 @@ struct server_vars {
 	/*
 		Fields marked private in the GEN INTROSPECTOR block below are overridable
 		in ranked mode via ranked.overrides.*. Read them via getters
-		(get_friendly_fire / get_client_network_timeout_secs) so the right value
+		(get_friendly_fire / get_client_network_timeout_secs / get_allow_setting_speed) so the right value
 		is picked depending on the server mode. Direct write access is granted
 		only to introspection and the settings GUIs.
 	*/
@@ -142,6 +143,11 @@ private:
 	bool friendly_fire = false;
 public:
 	bool bots = true;
+
+	float speed = 0.75f;
+private:
+	bool allow_setting_speed = true;
+public:
 	difficulty_type bot_difficulty = difficulty_type::LEVELLING;
 	bot_quota bot_quota;
 
@@ -230,6 +236,14 @@ public:
 		}
 
 		return client_network_timeout_secs;
+	}
+
+	bool get_allow_setting_speed() const {
+		if (ranked.is_ranked_server()) {
+			return ranked.overrides.allow_setting_speed;
+		}
+
+		return allow_setting_speed;
 	}
 
 	bool get_friendly_fire() const {

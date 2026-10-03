@@ -47,7 +47,7 @@ void minimap_sighting_system::clear() {
 
 void minimap_sighting_system::record_deaths(const const_logic_step step) {
 	const auto& cosm = step.get_cosmos();
-	const auto now = cosm.get_total_seconds_passed();
+	const auto now = cosm.get_clock().get_real_seconds_passed();
 
 	clock_secs = now;
 
@@ -116,7 +116,7 @@ void minimap_sighting_system::advance(
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto si = cosm.get_si();
-	const auto now = cosm.get_total_seconds_passed();
+	const auto now = cosm.get_clock().get_real_seconds_passed();
 	const auto viewer_faction = viewed.get_official_faction();
 	const auto los_filter = predefined_queries::line_of_sight();
 

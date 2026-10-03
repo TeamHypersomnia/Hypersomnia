@@ -70,7 +70,6 @@ public:
 	void increment_step();
 	void clear();
 
-	void set_steps_per_second(const unsigned steps_per_second);
 
 	entity_id get_versioned(const unversioned_entity_id&) const;
 	entity_id find_versioned(const unversioned_entity_id&) const;
@@ -114,7 +113,6 @@ public:
 	const augs::stepped_clock& get_clock() const;
 
 	augs::delta get_fixed_delta() const;
-	unsigned get_steps_per_second() const;
 
 	template <template <class> class Predicate = always_true, class F>
 	void for_each_entity(F&& callback);

@@ -76,6 +76,10 @@ public:
 		return input.cosm.get_logical_assets();
 	}
 
+	auto get_real_delta() const {
+		return get_cosmos().get_clock().get_real_dt();
+	}
+
 	auto get_delta() const {
 		return get_cosmos().get_fixed_delta();
 	}

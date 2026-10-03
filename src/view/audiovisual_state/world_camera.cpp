@@ -235,7 +235,7 @@ void world_camera::tick(
 				player_position_previously_seen = player_position_at_previous_step = player_pos;
 			}
 
-			const auto dt_ms = cosm.get_fixed_delta().in_milliseconds();
+			const auto dt_ms = cosm.get_clock().get_real_dt().in_milliseconds();
 
 			const auto pos_dt = player_pos - player_position_previously_seen;
 			target_value = pos_dt * dt_ms;

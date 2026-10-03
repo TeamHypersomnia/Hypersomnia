@@ -1279,13 +1279,11 @@ double client_setup::get_audiovisual_speed() const {
 		return 1.0;
 	}
 
-	auto mult = 1.0;
-
 	if (is_replaying()) {
-		mult = demo_player.get_speed();
+		return demo_player.get_speed();
 	}
 
-	return mult * get_arena_handle().get_audiovisual_speed();
+	return 1.0;
 }
 
 bool client_setup::handle_new_avatar(arena_player_avatar_payload& new_avatar, const mode_player_id player_id) {

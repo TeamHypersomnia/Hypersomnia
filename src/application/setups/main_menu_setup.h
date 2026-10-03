@@ -90,7 +90,7 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.next_step_progress_fraction(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+		return timer.next_step_progress_fraction(get_inv_tickrate());
 	}
 
 	entity_id get_viewed_character_id() const;
@@ -120,8 +120,8 @@ public:
 	void customize_for_viewing(config_json_table& config) const;
 	void apply(const config_json_table& config);
 
-	auto get_inv_tickrate() const {
-		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+	double get_inv_tickrate() const {
+		return get_viewed_cosmos().get_clock().get_real_dt().in_seconds<double>();
 	}
 
 	template <class C>

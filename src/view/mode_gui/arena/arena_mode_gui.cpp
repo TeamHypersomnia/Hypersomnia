@@ -928,7 +928,7 @@ void arena_gui_state::draw_mode_gui(
 					const auto starting_i = [&]() {
 						auto i = awards.size() - awards_to_show;
 
-						while (i < awards.size() && clk.diff_seconds(awards[i].when) >= cfg.keep_recent_awards_for_seconds) {
+						while (i < awards.size() && clk.diff_real_seconds(awards[i].when) >= cfg.keep_recent_awards_for_seconds) {
 							++i;
 						}
 
@@ -996,7 +996,7 @@ void arena_gui_state::draw_mode_gui(
 						const auto bar_in = hud_bar_draw_input {
 							general_drawer,
 							in.necessary_images,
-							mode_input.cosm.get_total_seconds_passed(),
+							mode_input.cosm.get_clock().get_real_seconds_passed(),
 							in.config.damage_indication.white_damage_highlight_secs,
 							in.gui_fonts.gui
 						};
@@ -1039,7 +1039,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto starting_i = [&]() {
 				auto i = kos.size() - knockouts_to_show;
 
-				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= cfg.keep_recent_knockouts_for_seconds) {
+				while (i < kos.size() && clk.diff_real_seconds(kos[i].when) >= cfg.keep_recent_knockouts_for_seconds) {
 					++i;
 				}
 

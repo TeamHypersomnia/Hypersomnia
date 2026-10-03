@@ -152,34 +152,12 @@ public:
 	}
 
 	double get_inv_tickrate() const {
-		return this->on_mode(
-			[&](const auto& typed_mode) {
-				using M = remove_cref<decltype(typed_mode)>;
+		/*
+			How often the client/server ticks in real time.
+			Independent of logic speed which only scales the delta passed to the solver.
+		*/
 
-				if constexpr(std::is_same_v<test_mode, M>) {
-					return advanced_cosm.get_fixed_delta().template in_seconds<double>();
-				}
-				else {
-					return typed_mode.get_round_speeds().calc_inv_tickrate();
-				}
-			}
-		);
-	}
-
-	double get_audiovisual_speed() const {
-		return this->on_mode_with_rules([](const auto& m, const auto& rules) -> double {
-			using M = remove_cref<decltype(m)>;
-
-			if constexpr(std::is_same_v<test_mode, M>) {
-				return 1.0;
-			}
-			else {
-				const auto current_logic_speed = static_cast<double>(m.get_round_speeds().logic_speed_mult);
-				const auto chosen_audiovisual_speed = rules.view.audiovisual_speed;
-
-				return std::max(current_logic_speed, chosen_audiovisual_speed);
-			}
-		});
+		return advanced_cosm.get_clock().get_real_dt().template in_seconds<double>();
 	}
 
 	template <class F>
