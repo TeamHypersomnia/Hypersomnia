@@ -149,6 +149,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 	const auto delta = clk.dt;
 	const auto delta_ms = delta.in_milliseconds();
 
+	/*
+		Leg animations (and so the footstep frequency) play at the same pace regardless of logic speed.
+	*/
+
+	const auto real_delta_ms = clk.get_real_dt().in_milliseconds();
+
 	cosm.for_each_having<components::movement>(
 		[&](const auto& it) {
 			auto& movement = it.template get<components::movement>();
@@ -335,8 +341,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				return idx;
 			};
 
+			/*
+				See movement_snappiness.h. Multiplies the movement force here and the damping in infer_damping.
+			*/
+
+			const auto snappiness_mult = ::calc_movement_snappiness_mult(movement, movement_def, clk.logic_speed);
+
 			const auto time_to_gain_speed_ms = 100.f;
-			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= time_to_gain_speed_ms;
+			const bool should_decelerate_due_to_walk = is_walking && movement.walk_cycle_amount >= time_to_gain_speed_ms;
 			const bool propelling = !should_decelerate_due_to_walk && non_zero_requested;
 
 			if (propelling) {
@@ -401,6 +413,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				applied_force *= movement_force_mult;
+				applied_force *= snappiness_mult;
 
 				rigid_body.apply_force(
 					applied_force, 
@@ -766,34 +779,70 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			};
 
 			const bool freeze_leg_frame = movement.portal_inertia_ms > 0.0f || ::legs_frozen(it);
-			const auto animation_dt = freeze_leg_frame ? 0.f : delta_ms * speed_mult;
 
-			auto& backward = movement.four_ways_animation.backward;
-			auto& amount = movement.animation_amount;
+			auto advance_cycle = [&](real32& amount, bool& backward, const real32 dt_ms, const bool flip_feet) {
+				const auto animation_dt = freeze_leg_frame ? 0.f : dt_ms * speed_mult;
 
-			if (!propelling && current_speed <= conceptual_max_speed / 2) {
-				/* Animation is finishing. */
-				const auto decreasing_dt = delta_ms * std::max(repro::sqrt(repro::sqrt(speed_mult)), 0.2f);
-				amount = std::max(0.f, amount - decreasing_dt);
-			}
-			else {
-				if (backward) {
-					amount -= animation_dt;
-
-					if (augs::flip_if_lt(amount, 0.f)) {
-						backward = false;
-
-						auto& f = movement.four_ways_animation.flip;
-						f = !f;
-					}
+				if (!propelling && current_speed <= conceptual_max_speed / 2) {
+					/* Animation is finishing. */
+					const auto decreasing_dt = dt_ms * std::max(repro::sqrt(repro::sqrt(speed_mult)), 0.2f);
+					amount = std::max(0.f, amount - decreasing_dt);
 				}
 				else {
-					amount += animation_dt;
+					if (backward) {
+						amount -= animation_dt;
 
-					if (augs::flip_if_gt(amount, duration_bound)) {
-						backward = true;
+						if (augs::flip_if_lt(amount, 0.f)) {
+							backward = false;
+
+							if (flip_feet) {
+								auto& f = movement.four_ways_animation.flip;
+								f = !f;
+							}
+						}
+					}
+					else {
+						amount += animation_dt;
+
+						if (augs::flip_if_gt(amount, duration_bound)) {
+							backward = true;
+						}
 					}
 				}
+			};
+
+			/*
+				The same cycle is tracked twice:
+				to pulse the walking, and in real time for the leg animation and footsteps,
+				so that they look the same regardless of logic speed.
+
+				The walking pulses must last as long, relative to the time it takes to accelerate, as at logic speed 1 -
+				otherwise walking would get faster or slower.
+				The response time is shortened by snappiness_mult (see movement_snappiness.h), so the pulses are too.
+				With full compensation that's exactly real time, and with no compensation, it's logic time.
+			*/
+
+			advance_cycle(movement.walk_cycle_amount, movement.walk_cycle_backward, delta_ms * snappiness_mult, false);
+			advance_cycle(movement.animation_amount, movement.four_ways_animation.backward, real_delta_ms, true);
+
+			/*
+				Walking pulses stop the cycle before its last frame, which keeps walking silent -
+				footsteps are spawned only upon entering the last frame.
+				With lower logic speed the real time cycle runs ahead of the logic one,
+				so cap it while walking, or it would reach the last frame and spawn footsteps on every pulse.
+			*/
+
+			if (is_walking) {
+				movement.animation_amount = std::min(movement.animation_amount, movement.walk_cycle_amount);
+			}
+			else {
+				/*
+					The cycles drift apart e.g. after a dash, which blends out snappiness_mult.
+					Keep them in sync so that walking always starts from the same phase as the legs.
+				*/
+
+				movement.walk_cycle_amount = movement.animation_amount;
+				movement.walk_cycle_backward = movement.four_ways_animation.backward;
 			}
 
 			movement.four_ways_animation.base_frames_n = num_frames;
@@ -810,7 +859,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			rigid_body.infer_damping();
 
 			if (surface_slowdown) {
-				movement.surface_slowdown_ms -= delta_ms;
+				/*
+					Accumulated per footstep, which come in real time - so it wears off in real time too.
+				*/
+
+				movement.surface_slowdown_ms -= real_delta_ms;
 			}
 
 			if (!rigid_body.get_special().inside_portal.is_set()) {

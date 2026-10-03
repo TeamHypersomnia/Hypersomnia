@@ -210,7 +210,11 @@ auto calc_stance_usage(
 	if (const auto sentience = typed_handle.template find<components::sentience>()) {
 		if (sentience->time_of_last_received_hit.was_set()) {
 			if (const auto pain_animation = logicals.find(stance.pain)) {
-				const auto passed_ms = cosm.get_clock().get_passed_ms(sentience->time_of_last_received_hit);
+				/*
+					Character animations play at the same pace regardless of logic speed.
+				*/
+
+				const auto passed_ms = cosm.get_clock().get_real_clock().get_passed_ms(sentience->time_of_last_received_hit);
 
 				if (const auto found_frame = ::calc_current_frame(*pain_animation, passed_ms)) {
 					return result_t::shoot(*found_frame);
@@ -229,7 +233,17 @@ auto calc_stance_usage(
 			;
 
 			if (const auto anim_ptr = logicals.find(anim)) {
-				if (const auto found_frame = ::calc_current_frame(*anim_ptr, rld->progress_ms)) {
+				/*
+					The reload itself takes longer with lower logic speed,
+					but its animation plays at the same pace - it lingers on its last frames for longer instead.
+				*/
+
+				const auto real_progress_ms = std::min(
+					cosm.get_clock().logic_to_real_ms(rld->progress_ms),
+					::calc_total_duration(anim_ptr->frames)
+				);
+
+				if (const auto found_frame = ::calc_current_frame(*anim_ptr, real_progress_ms)) {
 					if (gtm) {
 						return result_t::grip_to_mag(*found_frame);
 					}

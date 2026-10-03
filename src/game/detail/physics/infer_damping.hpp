@@ -1,4 +1,5 @@
 #pragma once
+#include "game/detail/movement/movement_snappiness.h"
 
 template <class E>
 bool calc_angled_damping_enabled(const E& handle) {
@@ -73,6 +74,16 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 				requested_by_input.y_non_zero() ? 0.f : movement_def.braking_damping
 			);
 		}
+
+		/*
+			Must match the multiplier of the movement force in movement_system,
+			so that the top speed stays the same.
+		*/
+
+		const auto snappiness_mult = ::calc_movement_snappiness_mult(movement, movement_def, typed_handle.get_cosmos().get_clock().logic_speed);
+
+		damping.linear *= snappiness_mult;
+		damping.linear_axis_aligned *= snappiness_mult;
 	});
 
 	handle.template dispatch_on_having_all<components::missile>([&damping](const auto& typed_handle) {

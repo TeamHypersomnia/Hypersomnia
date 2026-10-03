@@ -99,12 +99,14 @@ namespace components {
 		real32 portal_inertia_ms = 0.f;
 
 		real32 animation_amount = 0.f;
+		real32 walk_cycle_amount = 0.f;
 
 		movement_animation_state four_ways_animation;
 
 		uint8_t blood_step_counter = 0;
 		uint8_t _total_blood_steps_cache = 0;
-		pad_bytes<2> pad;
+		bool walk_cycle_backward = false;
+		pad_bytes<1> pad;
 		augs::stepped_timestamp _oldest_footstep_stamp;
 		real32 blood_step_freshness = -1.f;
 		// END GEN INTROSPECTOR
