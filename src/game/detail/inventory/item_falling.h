@@ -244,7 +244,10 @@ inline void count_floor_hit_and_start_next_hop(
 	}
 
 	fall.when_hop_started = now;
-	fall.hop_duration_secs = std::max(min_hop_secs * logic_speed, next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done));
+	fall.hop_duration_secs = std::max(
+		min_hop_secs * logic_speed,
+		next_unvaried_secs * ::calc_hop_duration_mult(variation, fall_seed, fall.floor_hits_done)
+	);
 	fall.hop_height *= NEXT_HOP_HEIGHT_MULT * rhythm_mult * rhythm_mult;
 }
 
@@ -445,8 +448,8 @@ void push_on_shell_floor_hit(const B& body, randomization& push_rng) {
 	How long a hop of shells - and of items hopping like them - lasts to be this high. The inverse of calc_shell_hop_height.
 */
 
-inline real32 calc_shell_hop_secs(const real32 hop_height) {
-	return std::max(SHELL_MIN_HOP_SECS, SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(hop_height));
+inline real32 calc_shell_hop_secs(const real32 hop_height, const real32 min_hop_secs = SHELL_MIN_HOP_SECS) {
+	return std::max(min_hop_secs, SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(hop_height));
 }
 
 /*
@@ -520,7 +523,7 @@ inline void start_next_hop_of_unmounted_magazine(item_fall_state& fall, const re
 	const auto rhythm_mult = ::calc_hop_rhythm_mult(fall.floor_hits_done - 1, logic_speed);
 
 	fall.hop_height = previous_hop_height * UNMOUNTED_MAGAZINE_NEXT_HOP_HEIGHT_MULT * rhythm_mult * rhythm_mult;
-	fall.hop_duration_secs = std::max(SHELL_MIN_HOP_SECS * logic_speed, SHELL_HOP_SECS_AT_UNIT_HEIGHT * repro::sqrt(fall.hop_height));
+	fall.hop_duration_secs = ::calc_shell_hop_secs(fall.hop_height, SHELL_MIN_HOP_SECS * logic_speed);
 }
 
 inline uint8_t calc_thrown_explosive_floor_hits(const real32 speed, const uint8_t floor_hits_when_thrown) {

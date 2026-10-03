@@ -25,6 +25,7 @@
 #include "view/viewables/image_cache.h"
 
 #include "test_scenes/test_scene_particle_effects.h"
+#include "test_scenes/bullet_trail_scalings.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/test_scene_images.h"
@@ -5956,22 +5957,22 @@ void load_test_scene_particle_effects(
 
 	{
 		/*
-			Shorter and thinner bullet line trails - the long ones obscured too much.
+			See bullet_trail_scalings.h.
 
 			Done at the very end, after all the effects were cloned from each other,
-			so that every effect is scaled exactly once. Only the emissions made by make_line_trail are affected
-			(bullet trails immune to the effect modifier).
+			so that every effect is scaled exactly once. Only the emissions made by make_line_trail are affected.
 
-			The length is the segments' lifetime. The shrinking, growing and colorizing windows scale together with it,
+			The shrinking, growing and colorizing windows scale together with the segments' lifetime,
 			so the trail keeps its shape and thickness profile - only shorter.
-			The thickness is the segments' height.
-			The spread is the radius around the bullet's path within which the segments spawn -
-			a narrower spread makes the trail as a whole look thinner while the segments themselves stay thick.
+			A narrower spread makes the trail as a whole look thinner while the segments themselves stay thick.
 		*/
 
-		auto scale_line_trail = [&](const test_id_type id, const float length_mult, const float thickness_mult = 1.f, const float spread_mult = 1.f) {
-			for (auto& em : acquire_effect(id).emissions) {
-				if (!em.is_bullet_trail || !em.ignore_effect_modifier) {
+		for (const auto& scaling : ::get_bullet_trail_scalings()) {
+			const auto length_mult = scaling.length_mult;
+			const auto spread_mult = scaling.spread_mult;
+
+			for (auto& em : acquire_effect(scaling.trace).emissions) {
+				if (!em.is_bullet_trail) {
 					continue;
 				}
 
@@ -5985,38 +5986,9 @@ void load_test_scene_particle_effects(
 					def.shrink_when_ms_remaining *= length_mult;
 					def.unshrinking_time_ms *= length_mult;
 					def.start_color_fade_ms *= length_mult;
-					def.size.y = std::max(1, static_cast<int>(std::round(def.size.y * thickness_mult)));
+					def.size.y = std::max(1, static_cast<int>(std::round(def.size.y * scaling.thickness_mult)));
 				}
 			}
-		};
-
-		/* Rifles. CYAN_ROUND_TRACE is shared by Bilmer2000 and Bilmik. */
-		scale_line_trail(test_scene_particle_effect_id::BAKA47_ROUND_TRACE, 0.4f, 0.7f);
-		scale_line_trail(test_scene_particle_effect_id::SZTURM_ROUND_TRACE, 0.28f, 0.7f);
-		scale_line_trail(test_scene_particle_effect_id::CYAN_ROUND_TRACE, 0.35f);
-		scale_line_trail(test_scene_particle_effect_id::GALILEA_ROUND_TRACE, 0.5f);
-
-		/* Pistols. STEEL_PROJECTILE_TRACE is shared by Bulwark, Lews and Vindicator. */
-		scale_line_trail(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE, 0.5f);
-		scale_line_trail(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE, 0.56f, 0.256f);
-		scale_line_trail(test_scene_particle_effect_id::ORANGE_ROUND_TRACE, 0.7f, 0.8f);
-		scale_line_trail(test_scene_particle_effect_id::AO44_ROUND_TRACE, 0.56f, 0.56f);
-		scale_line_trail(test_scene_particle_effect_id::KEK9_ROUND_TRACE, 0.8f);
-		scale_line_trail(test_scene_particle_effect_id::SN69_ROUND_TRACE, 0.8f);
-		scale_line_trail(test_scene_particle_effect_id::COVERT_ROUND_TRACE, 0.8f);
-
-		/* SMGs. */
-		scale_line_trail(test_scene_particle_effect_id::PRO90_ROUND_TRACE, 0.25f);
-		scale_line_trail(test_scene_particle_effect_id::SZCZUR_ROUND_TRACE, 0.5f);
-		scale_line_trail(test_scene_particle_effect_id::ZAMIEC_ROUND_TRACE, 0.5f);
-		scale_line_trail(test_scene_particle_effect_id::CYBERSPRAY_ROUND_TRACE, 0.25f);
-
-		/*
-			Same length, only thinner - but through a narrower spread instead of thinner segments,
-			which would otherwise be dominated by single pixel ones.
-			HUNTER_ROUND_TRACE also contains Bulldup's line trail, as it's cloned from STEEL_PROJECTILE_TRACE_PRECISE after it was added.
-		*/
-		scale_line_trail(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE, 1.f, 1.f, 0.275f);
-		scale_line_trail(test_scene_particle_effect_id::HUNTER_ROUND_TRACE, 1.f, 1.f, 0.275f);
+		}
 	}
 }

@@ -381,10 +381,6 @@ private:
 	void setup_round(input, logic_step, const round_transferred_players&, setup_next_round_params = {});
 	void update_logic_speed(input);
 
-public:
-	bool is_logic_speed_change_unnoticeable(const_input) const;
-
-private:
 	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
 
 	void fill_spawns(const cosmos&, faction_type, arena_mode_faction_state& out);
@@ -796,6 +792,7 @@ public:
 	bool is_last_summary(const const_input in) const;
 
 	bool is_ranked_live() const;
+	bool is_logic_speed_change_unnoticeable(const_input) const;
 
 	const auto& get_suspended_players() const {
 		return suspended_players;

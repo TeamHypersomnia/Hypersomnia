@@ -28,7 +28,7 @@ struct bot_difficulty_request {
 
 struct speed_request {
 	mode_player_id requester;
-	float speed = 1.f;
+	real32 speed = 1.f;
 
 	bool is_set() const {
 		return requester.is_set();

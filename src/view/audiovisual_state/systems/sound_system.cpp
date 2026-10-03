@@ -1045,11 +1045,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					return;
 				}
 
-				auto born_at_secs = when_born * in.inv_tickrate;
 				/*
-					Sounds play in real time, so measure their age in real seconds like born_at_secs.
+					Sounds play in real time, so measure their age in real seconds.
 				*/
 
+				auto born_at_secs = when_born * in.inv_tickrate;
 				auto total_secs_passed = (double(now_step) + in.interpolation_ratio) * in.inv_tickrate;
 
 				if (looping) {

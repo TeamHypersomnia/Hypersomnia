@@ -32,6 +32,7 @@
 #include "game/enums/filters.h"
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
+#include "game/detail/movement/movement_inertia.h"
 #include "game/detail/sentience/tool_getters.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/get_hovered_world_entity.h"
@@ -385,9 +386,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				if (linear_inertia) {
-					const auto m = movement_def.max_linear_inertia_when_movement_possible;
-					const auto inertia_mult = std::clamp(1.f - movement.linear_inertia_ms / m, 0.f, 1.f);
-					movement_force_mult *= inertia_mult;
+					movement_force_mult *= ::calc_linear_inertia_mult(movement, movement_def);
 				}
 
 				if (is_sentient) {

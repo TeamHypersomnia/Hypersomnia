@@ -756,6 +756,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/rigid_body_component.cpp"
 	"src/game/components/sentience_component.cpp"
 	"src/game/detail/standard_explosion.cpp"
+	"src/game/detail/movement/movement_snappiness.cpp"
 	"src/game/detail/inventory/inventory_slot.cpp"
 	"src/game/detail/inventory/inventory_slot_id.cpp"
 	"src/game/detail/inventory/inventory_utils.cpp"

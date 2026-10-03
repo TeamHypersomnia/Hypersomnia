@@ -259,7 +259,9 @@ Prefer `build_file` to verify edits to a specific file before running a full `bu
 - **Reinference** - destroy inferred caches and regenerate them from significant. Required whenever significant changes outside the solver, e.g. state received from the network or loaded from disk.
 - **Solvable vs common** - `cosmos_solvable` is what the solver changes every step (entities, clock). `cosmos_common` is read-only during simulation (flavours, logical assets, spells) and only changes at content creation, e.g. in the editor.
 - **Arena mode** - game mode state on top of the cosmos: rounds, players, economy, timers. `rules` come from the map/server, `dynamic_vars` are server-driven synced vars. `clean_round_state` is the solvable significant snapshot restored at every round start.
-- **Logic vs real time** - `clk.dt` is the logic delta: `(1 / tickrate) * logic_speed`, set by `/speed` and `server_vars.speed`. Physics, movement, missiles, fuses, reloads and bots use it and slow down. Fire rates, recoil, melee cooldowns, pickup delays, mode timers and HUD countdowns use `clk.get_real_dt()` / `get_real_clock()` / `step.get_real_delta()` instead.
+- **Logic vs real time** - `clk.dt` is the logic delta: `(1 / tickrate) * logic_speed`, set by `/speed` and `server_vars.game_speed`. Physics, movement, missiles, fuses, reloads and bots use it and slow down. Fire rates, recoil, melee cooldowns, pickup delays, mode timers and HUD countdowns use `clk.get_real_dt()` / `get_real_clock()` / `step.get_real_delta()` instead.
+
+## Rules
 
 - To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.
 

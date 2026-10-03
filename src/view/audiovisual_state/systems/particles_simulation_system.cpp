@@ -795,10 +795,7 @@ void particles_simulation_system::advance_visible_streams(
 			const auto time_mult = instance.source_emission.is_bullet_trail ? bullet_trail_time_mult : 1.f;
 
 			auto considered_delta = delta;
-
-			if (time_mult != 1.f) {
-				considered_delta *= time_mult;
-			}
+			considered_delta *= time_mult;
 
 			const auto dt_secs = considered_delta.in_seconds();
 

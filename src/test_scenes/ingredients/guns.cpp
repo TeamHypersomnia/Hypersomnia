@@ -27,6 +27,7 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "test_scenes/test_scene_animations.h"
+#include "test_scenes/bullet_trail_scalings.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
@@ -2404,6 +2405,8 @@ namespace test_flavours {
 
 		{
 			/*
+				See bullet_trail_scalings.h.
+
 				The neon glow extends backward over the bullet's line trail,
 				so it has to shrink together with the trails shortened in load_test_scene_particle_effects.
 				The part behind the bullet is (2 * neon_extension_mult - 2) half-lengths long,
@@ -2414,39 +2417,19 @@ namespace test_flavours {
 				are scaled exactly once.
 			*/
 
-			auto scale_neon_tail = [&](const test_plain_missiles id, const float length_mult) {
-				auto& sprite_def = get_test_flavour(flavours, id).get<invariants::sprite>();
+			for (const auto& scaling : ::get_bullet_trail_scalings()) {
+				for (const auto round : scaling.rounds) {
+					auto& sprite_def = get_test_flavour(flavours, round).get<invariants::sprite>();
 
-				if (sprite_def.neon_extension_mult > 1.f) {
-					sprite_def.neon_extension_mult = 1.f + (sprite_def.neon_extension_mult - 1.f) * length_mult;
+					if (sprite_def.neon_extension_mult > 1.f) {
+						sprite_def.neon_extension_mult = 1.f + (sprite_def.neon_extension_mult - 1.f) * scaling.get_neon_length_mult();
+					}
+
+					if (scaling.neon_thickness_mult.has_value()) {
+						sprite_def.neon_thickness_mult = *scaling.neon_thickness_mult;
+					}
 				}
-			};
-
-			/* Rifles. CYAN_ROUND is shared by Bilmer2000 and Bilmik. */
-			scale_neon_tail(test_plain_missiles::BAKA47_ROUND, 0.4f);
-			scale_neon_tail(test_plain_missiles::SZTURM_ROUND, 0.28f);
-			scale_neon_tail(test_plain_missiles::CYAN_ROUND, 0.35f);
-			scale_neon_tail(test_plain_missiles::GALILEA_ROUND, 0.5f);
-
-			/* Bulwark, and Lews with Vindicator which share its trail. */
-			scale_neon_tail(test_plain_missiles::STEEL_ROUND, 0.5f);
-			scale_neon_tail(test_plain_missiles::LEWSII_ROUND, 0.5f);
-
-			/* Pistols. */
-			/* Deliberately a bit longer than its trail (0.56). */
-			scale_neon_tail(test_plain_missiles::DEAGLE_ROUND, 0.672f);
-			get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::sprite>().neon_thickness_mult = 0.7f;
-			scale_neon_tail(test_plain_missiles::ORANGE_ROUND, 0.7f);
-			scale_neon_tail(test_plain_missiles::AO44_ROUND, 0.56f);
-			scale_neon_tail(test_plain_missiles::KEK9_ROUND, 0.8f);
-			scale_neon_tail(test_plain_missiles::PISTOL_CYAN_ROUND, 0.8f);
-			scale_neon_tail(test_plain_missiles::COVERT_CYAN_ROUND, 0.8f);
-
-			/* SMGs. */
-			scale_neon_tail(test_plain_missiles::PRO90_ROUND, 0.25f);
-			scale_neon_tail(test_plain_missiles::SZCZUR_ROUND, 0.5f);
-			scale_neon_tail(test_plain_missiles::ZAMIEC_ROUND, 0.5f);
-			scale_neon_tail(test_plain_missiles::CYBERSPRAY_ROUND, 0.25f);
+			}
 		}
 
 

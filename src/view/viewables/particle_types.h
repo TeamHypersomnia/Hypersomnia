@@ -264,7 +264,7 @@ struct animated_particle {
 	// END GEN INTROSPECTOR
 
 	/*
-		Runtime only. Bullet trail particles slow down together with the logic speed.
+		See general_particle::time_mult.
 	*/
 
 	float time_mult = 1.f;
@@ -320,7 +320,7 @@ struct homing_animated_particle {
 	// END GEN INTROSPECTOR
 
 	/*
-		Runtime only. Bullet trail particles slow down together with the logic speed.
+		See general_particle::time_mult.
 	*/
 
 	float time_mult = 1.f;

@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/movement/movement_snappiness.h"
+#include "game/detail/movement/movement_inertia.h"
 
 template <class E>
 bool calc_angled_damping_enabled(const E& handle) {
@@ -33,21 +34,8 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 			damping.linear = movement_def.standard_linear_damping;
 		}
 
-		{
-			const auto m = movement_def.max_linear_inertia_when_movement_possible;
-			const auto inertia_mult = std::clamp(1.f - movement.linear_inertia_ms / m, 0.f, 1.f);
-
-			damping.linear *= inertia_mult;
-		}
-
-		{
-			const auto max_considered_portal_inertia = 500.0f;
-			const auto m = max_considered_portal_inertia;
-
-			const auto inertia_mult = std::clamp(1.f - movement.portal_inertia_ms / m, 0.f, 1.f);
-
-			damping.linear *= inertia_mult;
-		}
+		damping.linear *= ::calc_linear_inertia_mult(movement, movement_def);
+		damping.linear *= ::calc_portal_inertia_mult(movement);
 
 		auto flags = movement.flags;
 
@@ -80,7 +68,8 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 			so that the top speed stays the same.
 		*/
 
-		const auto snappiness_mult = ::calc_movement_snappiness_mult(movement, movement_def, typed_handle.get_cosmos().get_clock().logic_speed);
+		const auto logic_speed = typed_handle.get_cosmos().get_clock().logic_speed;
+		const auto snappiness_mult = ::calc_movement_snappiness_mult(movement, movement_def, logic_speed);
 
 		damping.linear *= snappiness_mult;
 		damping.linear_axis_aligned *= snappiness_mult;
