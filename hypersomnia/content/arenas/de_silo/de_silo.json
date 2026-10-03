@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-09-26 20:35:53.529113 UTC"
+        "version_timestamp": "2026-10-03 02:09:06.767778 UTC"
     },
     "about": {
         "author": "lia",
@@ -25,7 +25,7 @@
         "friendly_fire": false,
         "spawn_bots": true,
         "spawn_only_enemy_bots": true,
-        "bot_difficulty": "MEDIUM"
+        "bot_difficulty": "HARD"
     },
     "game_modes": {
         "bomb_defusal": {
@@ -4418,7 +4418,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4429,7 +4428,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4440,7 +4438,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4451,7 +4448,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4462,7 +4458,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4473,7 +4468,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4484,7 +4478,6 @@
                 "radius": 1000.0,
                 "strength": 11
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4495,7 +4488,6 @@
                 "radius": 376.2380065917969,
                 "strength": 34
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4506,7 +4498,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4517,7 +4508,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4528,7 +4518,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4539,7 +4528,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4550,7 +4538,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4561,7 +4548,6 @@
                 "radius": 1000.0,
                 "strength": 29
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
@@ -4577,7 +4563,6 @@
                 "radius": 234.5679931640625,
                 "strength": 52
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {

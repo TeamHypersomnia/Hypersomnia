@@ -35,6 +35,14 @@ static void ricochet_missile_against_surface(
 	}
 
 	/*
+		Bullets never ricochet off characters - a hit that would ricochet damages them instead.
+	*/
+	if (surface_handle.template has<components::sentience>()) {
+		RIC_LOG("sentient surface, IGNORED");
+		return;
+	}
+
+	/*
 		Only the first contact of a step can be a ricochet: within one step the physics solver
 		may already have bounced the bullet off it into further walls, with a velocity
 		that has nothing to do with how the bullet flew.

@@ -38,8 +38,8 @@ static std::size_t calc_light_shadows_fingerprint(
 	const auto& light = request.light_data;
 	const auto pos = request.eye_transform.pos;
 
-	auto fixtures_sum = std::size_t(0);
-	auto num_fixtures = std::size_t(0);
+	auto fixtures_sum = uint64_t(0);
+	auto num_fixtures = uint64_t(0);
 
 	const auto half_reach = vec2(request.queried_rect) / 2 + vec2::square(4.0f);
 
@@ -52,7 +52,7 @@ static std::size_t calc_light_shadows_fingerprint(
 			const auto& xf = fix.GetBody()->GetTransform();
 
 			fixtures_sum += augs::hash_multiple(
-				reinterpret_cast<std::uintptr_t>(std::addressof(fix)),
+				static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(std::addressof(fix))),
 				xf.p.x,
 				xf.p.y,
 				xf.q.s,
