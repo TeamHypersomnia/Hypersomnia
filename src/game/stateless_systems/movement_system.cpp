@@ -72,6 +72,57 @@ namespace augs {
 	}
 }
 
+/*
+	Cadence (steps per second) of the real time leg animation and so of the footsteps.
+
+	Derived from the character's speed as seen in real time, so it accounts both for the logic speed
+	and for whatever slows the character down, e.g. a heavy weapon.
+
+	Fit to human gait, with the scale taken from the character's body (shoulders: 83 px ~ 0.46 m):
+	- at walking pace, the cadence grows with the square root of the speed,
+	- when running, it barely grows - people run faster mostly by lengthening their steps.
+	The two blend between WALK_TO_RUN_BEGIN_MPS and WALK_TO_RUN_END_MPS.
+*/
+
+constexpr real32 GAIT_PIXELS_PER_METER = 180.f;
+constexpr real32 GAIT_CADENCE_MULT = 1.f;
+constexpr real32 WALK_TO_RUN_BEGIN_MPS = 1.8f;
+constexpr real32 WALK_TO_RUN_END_MPS = 2.2f;
+
+static real32 calc_human_cadence(const real32 speed_mps) {
+	const auto walking = 1.85f * repro::sqrt(speed_mps / 1.4f);
+	const auto running = 2.7f * repro::pow(speed_mps / 3.f, 0.18f);
+
+	const auto running_amount = std::clamp(
+		(speed_mps - WALK_TO_RUN_BEGIN_MPS) / (WALK_TO_RUN_END_MPS - WALK_TO_RUN_BEGIN_MPS),
+		0.f,
+		1.f
+	);
+
+	return GAIT_CADENCE_MULT * augs::interp(walking, running, running_amount);
+}
+
+/*
+	Above the sprint threshold (the conceptual max speed for animation),
+	blends the realistic cadence (0) with one proportional to the speed (1):
+	sprinting twice as fast as the threshold, the legs move twice as often.
+	The proportional one feels faster and more hurried.
+*/
+
+constexpr real32 SPRINT_PROPORTIONAL_CADENCE_ALPHA = 0.6f;
+
+static real32 calc_legs_cadence(const real32 speed_mps, const real32 sprint_threshold_mps) {
+	const auto realistic = ::calc_human_cadence(speed_mps);
+
+	if (speed_mps <= sprint_threshold_mps) {
+		return realistic;
+	}
+
+	const auto proportional = ::calc_human_cadence(sprint_threshold_mps) * speed_mps / sprint_threshold_mps;
+
+	return augs::interp(realistic, proportional, SPRINT_PROPORTIONAL_CADENCE_ALPHA);
+}
+
 void movement_system::set_movement_flags_from_input(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::intent_message>();
@@ -783,8 +834,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			const bool freeze_leg_frame = movement.portal_inertia_ms > 0.0f || ::legs_frozen(it);
 
-			auto advance_cycle = [&](real32& amount, bool& backward, const real32 dt_ms, const bool flip_feet) {
-				const auto animation_dt = freeze_leg_frame ? 0.f : dt_ms * speed_mult;
+			auto advance_cycle = [&](
+				real32& amount,
+				bool& backward,
+				const real32 dt_ms,
+				const real32 tempo,
+				const bool flip_feet
+			) {
+				const auto animation_dt = freeze_leg_frame ? 0.f : dt_ms * tempo;
 
 				if (!propelling && current_speed <= conceptual_max_speed / 2) {
 					/* Animation is finishing. */
@@ -817,7 +874,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			/*
 				The same cycle is tracked twice:
 				to pulse the walking, and in real time for the leg animation and footsteps,
-				so that they look the same regardless of logic speed.
+				with the cadence of a human moving as fast as the character appears to - see calc_human_cadence.
 
 				The walking pulses must last as long, relative to the time it takes to accelerate, as at logic speed 1 -
 				otherwise walking would get faster or slower.
@@ -825,8 +882,17 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				With full compensation that's exactly real time, and with no compensation, it's logic time.
 			*/
 
-			advance_cycle(movement.walk_cycle_amount, movement.walk_cycle_backward, delta_ms * snappiness_mult, false);
-			advance_cycle(movement.animation_amount, movement.four_ways_animation.backward, real_delta_ms, true);
+			/*
+				One step is a full sweep of the cycle there and back.
+			*/
+
+			const auto to_real_mps = clk.logic_speed / GAIT_PIXELS_PER_METER;
+			const auto real_speed_mps = current_speed * to_real_mps;
+			const auto sprint_threshold_mps = conceptual_max_speed * to_real_mps;
+			const auto legs_tempo = ::calc_legs_cadence(real_speed_mps, sprint_threshold_mps) * (2.f * duration_bound / 1000.f);
+
+			advance_cycle(movement.walk_cycle_amount, movement.walk_cycle_backward, delta_ms * snappiness_mult, speed_mult, false);
+			advance_cycle(movement.animation_amount, movement.four_ways_animation.backward, real_delta_ms, legs_tempo, true);
 
 			/*
 				Walking pulses stop the cycle before its last frame, which keeps walking silent -
