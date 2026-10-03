@@ -21,6 +21,13 @@ namespace augs {
 		else if constexpr(std::is_enum_v<T>) {
 			return ::portable_hash(static_cast<std::underlying_type_t<T>>(t));
 		}
+		else if constexpr(std::is_integral_v<T> && std::is_unsigned_v<T> && sizeof(T) == sizeof(uint64_t)) {
+			/*
+				On macOS, uint64_t is unsigned long long,
+				so size_t/uintptr_t (unsigned long) would be ambiguous between the overloads.
+			*/
+			return ::portable_hash(static_cast<uint64_t>(t));
+		}
 		else {
 			return ::portable_hash(t);
 		}
