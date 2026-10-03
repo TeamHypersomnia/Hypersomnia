@@ -282,7 +282,12 @@ namespace augs {
 				else {
 					const auto original_size = vec2i(diffuse.get_original_size());
 					const auto neon_size_mult = vec2(drawn_size) / original_size;
-					const auto considered_neon_size = original_neon_size * neon_size_mult;
+
+					/*
+						The neon's height - e.g. how thick the glow of a bullet facing right is.
+					*/
+
+					const auto considered_neon_size = original_neon_size * neon_size_mult * vec2(1.f, spr.neon_thickness_mult);
 
 					if (spr.neon_extension_mult > 1.f) {
 						detail_draw_neon_extended(

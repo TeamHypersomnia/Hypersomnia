@@ -108,6 +108,7 @@ namespace augs {
 		bool tile_excess_size = false;
 		pad_bytes<2> pad;
 		real32 neon_extension_mult = 0.f;
+		real32 neon_thickness_mult = 1.f;
 		// END GEN INTROSPECTOR
 
 		bool has_color_wave() const {

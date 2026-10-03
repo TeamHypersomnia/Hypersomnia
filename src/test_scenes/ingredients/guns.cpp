@@ -1215,7 +1215,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			missile.damage.base = 10;
 			//missile.damage.shake *= 0.85f;
-			missile.max_lifetime_ms = 550.f;
+			missile.max_lifetime_ms = 700.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 
@@ -1776,7 +1776,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			missile.damage.base = 10;
 			//missile.damage.shake *= 0.85f;
-			missile.max_lifetime_ms = 550.f;
+			missile.max_lifetime_ms = 700.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 
@@ -2400,6 +2400,53 @@ namespace test_flavours {
 			make_shell(test_remnant_bodies::GRADOBICIE_SHELL, test_scene_image_id::GRADOBICIE_SHELL, shell_set, 1.0f, 1.5f);
 			make_shell(test_remnant_bodies::SKULL_ROCKET_SHELL, test_scene_image_id::SKULL_ROCKET_SHELL, shell_set, 0.8f, 2.0f);
 			get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL).get<invariants::remnant>().rolls = false;
+		}
+
+		{
+			/*
+				The neon glow extends backward over the bullet's line trail,
+				so it has to shrink together with the trails shortened in load_test_scene_particle_effects.
+				The part behind the bullet is (2 * neon_extension_mult - 2) half-lengths long,
+				hence only the excess over 1 is scaled.
+
+				Done here, after all the rounds were defined,
+				so that rounds copied from others (e.g. LEWSII and BAKA47 from STEEL, DATUM from CYAN)
+				are scaled exactly once.
+			*/
+
+			auto scale_neon_tail = [&](const test_plain_missiles id, const float length_mult) {
+				auto& sprite_def = get_test_flavour(flavours, id).get<invariants::sprite>();
+
+				if (sprite_def.neon_extension_mult > 1.f) {
+					sprite_def.neon_extension_mult = 1.f + (sprite_def.neon_extension_mult - 1.f) * length_mult;
+				}
+			};
+
+			/* Rifles. CYAN_ROUND is shared by Bilmer2000 and Bilmik. */
+			scale_neon_tail(test_plain_missiles::BAKA47_ROUND, 0.4f);
+			scale_neon_tail(test_plain_missiles::SZTURM_ROUND, 0.28f);
+			scale_neon_tail(test_plain_missiles::CYAN_ROUND, 0.35f);
+			scale_neon_tail(test_plain_missiles::GALILEA_ROUND, 0.5f);
+
+			/* Bulwark, and Lews with Vindicator which share its trail. */
+			scale_neon_tail(test_plain_missiles::STEEL_ROUND, 0.5f);
+			scale_neon_tail(test_plain_missiles::LEWSII_ROUND, 0.5f);
+
+			/* Pistols. */
+			/* Deliberately a bit longer than its trail (0.56). */
+			scale_neon_tail(test_plain_missiles::DEAGLE_ROUND, 0.672f);
+			get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::sprite>().neon_thickness_mult = 0.7f;
+			scale_neon_tail(test_plain_missiles::ORANGE_ROUND, 0.7f);
+			scale_neon_tail(test_plain_missiles::AO44_ROUND, 0.56f);
+			scale_neon_tail(test_plain_missiles::KEK9_ROUND, 0.8f);
+			scale_neon_tail(test_plain_missiles::PISTOL_CYAN_ROUND, 0.8f);
+			scale_neon_tail(test_plain_missiles::COVERT_CYAN_ROUND, 0.8f);
+
+			/* SMGs. */
+			scale_neon_tail(test_plain_missiles::PRO90_ROUND, 0.25f);
+			scale_neon_tail(test_plain_missiles::SZCZUR_ROUND, 0.5f);
+			scale_neon_tail(test_plain_missiles::ZAMIEC_ROUND, 0.5f);
+			scale_neon_tail(test_plain_missiles::CYBERSPRAY_ROUND, 0.25f);
 		}
 
 
@@ -4329,7 +4376,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
-			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.shot_cooldown_ms = 122.f;
 
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = { 215.f, 640.f };
@@ -4355,7 +4402,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 350;
-			set_chambering_duration_ms(meta, 390.f);
+			set_chambering_duration_ms(meta, 433.f);
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -4374,7 +4421,7 @@ namespace test_flavours {
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {4900.f, 4900.f};
-			gun_def.shot_cooldown_ms = 90.f;
+			gun_def.shot_cooldown_ms = 111.f;
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = { 200.f, 600.f };
@@ -4400,7 +4447,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 350;
-			set_chambering_duration_ms(meta, 350.f);
+			set_chambering_duration_ms(meta, 389.f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
@@ -4534,9 +4581,9 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
-			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.shot_cooldown_ms = 118.f;
 			gun_def.after_transfer_shot_cooldown_mult = 1.5f;
-			gun_def.burst_interval_ms = 72.f;
+			gun_def.burst_interval_ms = 85.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
@@ -4562,7 +4609,7 @@ namespace test_flavours {
 
 			gun_def.burst_spread_degrees = 11.f;
 			gun_def.burst_spread_degrees_variation = 0.f;
-			gun_def.after_burst_chambering_ms = 500.f;
+			gun_def.after_burst_chambering_ms = 588.f;
 			gun_def.num_burst_bullets = 3;
 			gun_def.burst_recoil_mult = 0.4f;
 
@@ -4572,7 +4619,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1500;
-			set_chambering_duration_ms(meta, 200.f);
+			set_chambering_duration_ms(meta, 235.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -4599,7 +4646,7 @@ namespace test_flavours {
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {500.f, 2500.f};
+			gun_def.shell_velocity = {500.f, 1500.f};
 			gun_def.damage_multiplier = 11.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 0;
 			gun_def.recoil_multiplier = 4.f;
@@ -4908,7 +4955,7 @@ namespace test_flavours {
 			gun_def.muzzle_light_color = yellow;
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4150.f, 4150.f};
-			gun_def.shot_cooldown_ms = 125.f;
+			gun_def.shot_cooldown_ms = 139.f;
 			gun_def.muzzle_light_radius *= 0.9f;
 
 			gun_def.shell_spread_degrees = 12.f;
@@ -4936,7 +4983,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 800;
-			set_chambering_duration_ms(meta, 500.f);
+			set_chambering_duration_ms(meta, 556.f);
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
@@ -4954,7 +5001,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4150.f, 4150.f};
-			gun_def.shot_cooldown_ms = 150.f;
+			gun_def.shot_cooldown_ms = 167.f;
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = { 355.f, 1060.f };
@@ -4981,7 +5028,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
-			set_chambering_duration_ms(meta, 450.f);
+			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::BULWARK_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
@@ -5003,7 +5050,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4600.f, 4600.f};
-			gun_def.shot_cooldown_ms = 150.f;
+			gun_def.shot_cooldown_ms = 167.f;
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = { 365.f, 1090.f };
@@ -5033,7 +5080,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1000;
-			set_chambering_duration_ms(meta, 500.f);
+			set_chambering_duration_ms(meta, 556.f);
 			only_allow_mag(meta, test_container_items::COVERT_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
@@ -5054,7 +5101,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5100.f, 5100.f};
-			gun_def.shot_cooldown_ms = 380.f;
+			gun_def.shot_cooldown_ms = 475.f;
 
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 1500.f};
@@ -5087,7 +5134,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1750;
-			set_chambering_duration_ms(meta, 500.f);
+			set_chambering_duration_ms(meta, 625.f);
 			only_allow_mag(meta, test_container_items::DEAGLE_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
