@@ -6,10 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- wylacz rykoszety na postaciach
-
-- zwolnic gre 15-20% separate constants in balance vars
-
+- audyt hrtfu
 - kiedys mozna byloby symulowac te trajektorie granatow
 
 - swiecacy dev label

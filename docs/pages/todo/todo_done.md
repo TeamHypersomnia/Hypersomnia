@@ -7533,3 +7533,7 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 
 - cos za bardzo na bialo jest ten flash na eksplozjach
 
+- wylacz rykoszety na postaciach
+
+- zwolnic gre 15-20% separate constants in balance vars
+
