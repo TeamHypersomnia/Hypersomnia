@@ -421,6 +421,12 @@ real32 get_reaction_time_secs(const difficulty_type difficulty);
 */
 real32 get_melee_reaction_time_secs(const difficulty_type difficulty);
 
+/*
+	Minimum age of an enemy bullet before the bot starts dodging it.
+	Larger value -> the bot notices incoming bullets later and gets hit more often.
+*/
+real32 get_bullet_reaction_time_secs(const difficulty_type difficulty);
+
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
 	ai_behavior_variant last_behavior = ai_behavior_idle();

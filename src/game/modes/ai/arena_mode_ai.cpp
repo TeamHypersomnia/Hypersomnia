@@ -442,7 +442,13 @@ arena_ai_result update_arena_mode_ai(
 
 	const auto bomb_time_remaining = get_bomb_time_remaining();
 	constexpr auto CRITICAL_DEFUSE_TIME_SECS = 5.0f;
-	const bool should_avoid_combat = (team_state.bot_with_defuse_mission == controlled_character_id) && bomb_time_remaining < CRITICAL_DEFUSE_TIME_SECS;
+
+	/*
+		bomb_time_remaining is in logic time, but defusing takes real time - see hand_fuse_logic.
+	*/
+
+	const auto critical_defuse_time_logic_secs = CRITICAL_DEFUSE_TIME_SECS * cosm.get_clock().logic_speed;
+	const bool should_avoid_combat = (team_state.bot_with_defuse_mission == controlled_character_id) && bomb_time_remaining < critical_defuse_time_logic_secs;
 
 	/* Commit LOS change alert (dedicated slot, never evicted). */
 	if (ai_state.alertness.is_los_change_ready(global_time_secs)) {
@@ -1431,6 +1437,10 @@ real32 get_reaction_time_secs(const difficulty_type difficulty) {
 		case difficulty_type::HARD:        return 0.35f;
 		default:                           return 0.20f;
 	}
+}
+
+real32 get_bullet_reaction_time_secs(const difficulty_type difficulty) {
+	return get_reaction_time_secs(difficulty) * 1.7f;
 }
 
 real32 get_melee_reaction_time_secs(const difficulty_type difficulty) {
