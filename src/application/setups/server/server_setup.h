@@ -903,7 +903,7 @@ public:
 
 	difficulty_type calc_current_bot_difficulty() const;
 	void broadcast_bots_adjusted(const mode_player_id& requester);
-	void broadcast_speed_adjusted();
+	void broadcast_speed_adjusted(const std::string& what_happened, real32 new_speed);
 
 	void choose_next_map_from_cycle();
 	bool is_idle() const;

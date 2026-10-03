@@ -38,6 +38,11 @@ namespace augs {
 		(fire rates, recoil, mode timers) should use get_real_dt() or get_real_clock().
 
 		Only change tickrate and logic_speed through set_timing so that dt stays consistent.
+
+		bullet_speed - how much time passes for missiles per real time.
+		Equal to logic_speed unless overridden, e.g. to keep the bullets as fast as at logic speed 1 in a slowed down game.
+		Missiles are simulated with the logic dt like everything else,
+		so their velocities, dampings and lifetimes are scaled by get_bullet_time_mult instead.
 	*/
 
 	struct stepped_clock {
@@ -45,6 +50,7 @@ namespace augs {
 		delta dt = delta::steps_per_second(60);
 		uint32_t tickrate = 60;
 		real32 logic_speed = 1.f;
+		real32 bullet_speed = 1.f;
 		stepped_timestamp now = { static_cast<unsigned>(0) };
 		// END GEN INTROSPECTOR
 
@@ -66,6 +72,24 @@ namespace augs {
 
 		delta get_real_dt() const {
 			return delta::steps_per_second(tickrate);
+		}
+
+		/*
+			How much faster the missiles' time runs than the logic time.
+		*/
+
+		real32 get_bullet_time_mult() const {
+			return bullet_speed / logic_speed;
+		}
+
+		delta get_bullet_dt() const {
+			auto result = get_real_dt();
+
+			if (bullet_speed != 1.f) {
+				result *= bullet_speed;
+			}
+
+			return result;
 		}
 
 		/*

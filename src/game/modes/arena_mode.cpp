@@ -1152,8 +1152,8 @@ void arena_mode::setup_round(
 
 	/*
 		The clean round state carries its own clock timing.
-		Keep the tickrate we were running at and apply the requested logic speed at every round start -
-		except during a live ranked match, which keeps the speed it started with.
+		Keep the tickrate we were running at and apply the requested logic and bullet speeds at every round start -
+		except during a live ranked match, which keeps the speeds it started with.
 	*/
 
 	const auto round_logic_speed =
@@ -1162,7 +1162,13 @@ void arena_mode::setup_round(
 		::sanitize_logic_speed(in.dynamic_vars.logic_speed)
 	;
 
-	cosm.set_clock_timing(clock_before_setup.tickrate, round_logic_speed);
+	const auto round_bullet_speed =
+		is_ranked_live() ?
+		clock_before_setup.bullet_speed :
+		::sanitize_logic_speed(in.dynamic_vars.bullet_speed)
+	;
+
+	cosm.set_clock_timing(clock_before_setup.tickrate, round_logic_speed, round_bullet_speed);
 
 	remove_test_characters(cosm);
 
@@ -4518,14 +4524,6 @@ bool arena_mode::is_logic_speed_change_unnoticeable(const const_input_type in) c
 }
 
 void arena_mode::update_logic_speed(const input_type in) {
-	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
-	const auto requested_speed = ::sanitize_logic_speed(in.dynamic_vars.logic_speed);
-
-	if (clk.logic_speed == requested_speed) {
-		return;
-	}
-
 	/*
 		Changing the speed mid-round retroactively rescales all logic timestamps
 		(e.g. the remaining fuse time of a planted bomb jumps).
@@ -4533,7 +4531,7 @@ void arena_mode::update_logic_speed(const input_type in) {
 		Otherwise setup_round applies the new speed at the start of the next round.
 	*/
 
-	const bool can_change_now = [&]() {
+	auto can_change_now = [&]() {
 		if (is_ranked_live()) {
 			return false;
 		}
@@ -4543,11 +4541,9 @@ void arena_mode::update_logic_speed(const input_type in) {
 		}
 
 		return is_logic_speed_change_unnoticeable(in);
-	}();
+	};
 
-	if (can_change_now) {
-		cosm.set_clock_timing(clk.tickrate, requested_speed);
-	}
+	::apply_requested_logic_speed(in.cosm, in.dynamic_vars.logic_speed, in.dynamic_vars.bullet_speed, can_change_now);
 }
 
 float arena_mode::get_seconds_passed_in_cosmos(const const_input_type in) const {
@@ -4583,7 +4579,7 @@ float arena_mode::get_buy_seconds_left(const const_input_type in) const {
 }
 
 float arena_mode::get_round_seconds_left(const const_input_type in) const {
-	return static_cast<float>(in.rules.round_secs) + get_freeze_time(in) - get_seconds_passed_in_cosmos(in);
+	return ::calc_real_round_secs(in.rules.round_secs, in.cosm.get_clock()) + get_freeze_time(in) - get_seconds_passed_in_cosmos(in);
 }
 
 float arena_mode::get_seconds_since_win(const const_input_type in) const {

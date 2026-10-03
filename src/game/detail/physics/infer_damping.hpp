@@ -84,6 +84,15 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		if (dist_remaining != dist_starting && dist_starting != 0.0f) {
 			damping.linear += 2.0f * (1.0f - dist_remaining / dist_starting);
 		}
+
+		/*
+			Missiles slow down in their own time - see augs::stepped_clock::bullet_speed.
+		*/
+
+		const auto bullet_time_mult = typed_handle.get_cosmos().get_clock().get_bullet_time_mult();
+
+		damping.linear *= bullet_time_mult;
+		damping.linear_axis_aligned *= bullet_time_mult;
 	});
 
 	handle.template dispatch_on_having_all<components::hand_fuse>([&damping](const auto& typed_handle) {

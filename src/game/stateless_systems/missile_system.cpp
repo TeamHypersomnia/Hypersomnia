@@ -844,7 +844,14 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 void missile_system::detonate_expired_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto now = cosm.get_timestamp();
-	const auto& delta = step.get_delta();
+
+	/*
+		Missiles live in their own time - see augs::stepped_clock::bullet_speed.
+	*/
+
+	const auto& clk = cosm.get_clock();
+	const auto delta = clk.get_bullet_dt();
+	const auto bullet_time_mult = clk.get_bullet_time_mult();
 
 	cosm.for_each_having<components::missile>(
 		[&](const auto& it) {
@@ -933,7 +940,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					);
 
 					it.template get<components::rigid_body>().apply_force(
-						homing_force * missile_def.homing_towards_hostile_strength
+						homing_force * missile_def.homing_towards_hostile_strength * bullet_time_mult
 					);
 				}
 			}

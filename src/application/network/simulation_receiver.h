@@ -242,6 +242,13 @@ public:
 							if (new_dynamic_vars.has_value()) {
 								sv_dynamic_vars = *new_dynamic_vars;
 
+								/*
+									The predicted steps were simulated with the old vars, e.g. the old logic speed.
+									New vars arrive rarely, so it's cheap to always repredict.
+								*/
+
+								repredict = true;
+
 								LOG(
 									"New synced_dynamic_vars. Step: %x, Run ranked logic: %x, FF: %x; preassigned teams: %x %x", 
 									referential_arena.get_cosmos().get_total_steps_passed(),

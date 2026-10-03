@@ -52,7 +52,11 @@ std::optional<trace_scaling> calc_trace_scaling(const H& handle, const float ste
 
 	const auto chosen_lengthening_duration_ms = rng.randval(trace_def.lengthening_duration_ms);
 
-	const auto dt_ms = static_cast<float>(cosm.get_fixed_delta().in_milliseconds());
+	/*
+		The round ages in its own time - see augs::stepped_clock::bullet_speed.
+	*/
+
+	const auto dt_ms = static_cast<float>(cosm.get_clock().get_bullet_dt().in_milliseconds());
 
 	/*
 		The step the round was born in already applies the stretch of age zero,
@@ -85,7 +89,11 @@ std::optional<trace_scaling> calc_trace_scaling(const H& handle, const float ste
 	*/
 	{
 		const auto w = static_cast<float>(handle.get_logical_size().x);
-		const auto speed = handle.get_effective_velocity().length();
+		/*
+			Per second of the round's own time, like time_passed_ms.
+		*/
+
+		const auto speed = handle.get_effective_velocity().length() / cosm.get_clock().get_bullet_time_mult();
 
 		const auto travelled = speed * std::max(0.f, time_passed_ms - dt_ms) / 1000.f;
 

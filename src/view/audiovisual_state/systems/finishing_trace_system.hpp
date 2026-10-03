@@ -10,7 +10,11 @@ void finishing_trace_system::for_each_drawn(
 	F&& callback
 ) const {
 	const auto steps_passed = cosm.get_total_steps_passed();
-	const auto dt_secs = cosm.get_fixed_delta().in_seconds();
+	/*
+		Traces shrink as fast as the missiles fly - see augs::stepped_clock::bullet_speed.
+	*/
+
+	const auto dt_secs = cosm.get_clock().get_bullet_dt().in_seconds();
 
 	for (const auto& t : traces) {
 		if (steps_passed < t.steps_passed_when_spawned) {

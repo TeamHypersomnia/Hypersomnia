@@ -53,7 +53,7 @@ std::optional<vec2> finishing_trace_system::calc_size_mult(
 void finishing_trace_system::acquire_new_traces(const const_logic_step step) {
 	const auto& cosm = step.get_cosmos();
 	const auto steps_passed = cosm.get_total_steps_passed();
-	const auto dt_secs = cosm.get_fixed_delta().in_seconds();
+	const auto dt_secs = cosm.get_clock().get_bullet_dt().in_seconds();
 
 	/*
 		Even the start of the interpolated shrinking is gone by now.

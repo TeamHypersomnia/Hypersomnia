@@ -144,7 +144,8 @@ private:
 public:
 	bool bots = true;
 
-	float speed = 0.75f;
+	real32 game_speed = 0.75f;
+	augs::maybe<real32> bullet_speed = augs::maybe<real32>::disabled(1.f);
 private:
 	bool allow_setting_speed = true;
 public:
@@ -236,6 +237,14 @@ public:
 		}
 
 		return client_network_timeout_secs;
+	}
+
+	/*
+		The bullet speed follows the given game speed unless set explicitly.
+	*/
+
+	real32 calc_bullet_speed(const real32 considered_game_speed) const {
+		return bullet_speed.is_enabled ? bullet_speed.value : considered_game_speed;
 	}
 
 	bool get_allow_setting_speed() const {

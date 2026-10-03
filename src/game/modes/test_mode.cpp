@@ -790,13 +790,12 @@ bool test_mode_player::operator<(const test_mode_player& b) const {
 }
 
 void test_mode::update_logic_speed(const input in) {
-	auto& cosm = in.cosm;
-	const auto& clk = cosm.get_clock();
-	const auto requested_speed = ::sanitize_logic_speed(in.dynamic_vars.logic_speed);
-
-	if (clk.logic_speed != requested_speed) {
-		cosm.set_clock_timing(clk.tickrate, requested_speed);
-	}
+	::apply_requested_logic_speed(
+		in.cosm,
+		in.dynamic_vars.logic_speed,
+		in.dynamic_vars.bullet_speed,
+		[]() { return true; }
+	);
 }
 
 float test_mode::get_seconds_passed_in_cosmos(const const_input in) const {
@@ -804,5 +803,5 @@ float test_mode::get_seconds_passed_in_cosmos(const const_input in) const {
 }
 
 float test_mode::get_round_seconds_left(const const_input in) const {
-	return static_cast<float>(in.rules.round_secs) - get_seconds_passed_in_cosmos(in);
+	return ::calc_real_round_secs(in.rules.round_secs, in.cosm.get_clock()) - get_seconds_passed_in_cosmos(in);
 }

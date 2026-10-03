@@ -307,7 +307,7 @@ public:
 
 	void reinfer_everything();
 
-	void set_clock_timing(uint32_t tickrate, real32 logic_speed);
+	void set_clock_timing(uint32_t tickrate, real32 logic_speed, real32 bullet_speed);
 
 	void assign_solvable(const cosmos& b);
 

@@ -57,6 +57,19 @@ void construct_post_inference(const handle_type h) {
 
 
 	if (const auto missile = h.template find<components::missile>()) {
+		/*
+			Every missile is given its velocity at logic speed 1 before construction.
+			Scale it here once, so that it flies in its own time - see augs::stepped_clock::bullet_speed.
+		*/
+
+		if (const auto rigid_body = h.template find<components::rigid_body>()) {
+			const auto bullet_time_mult = cosm.get_clock().get_bullet_time_mult();
+
+			if (bullet_time_mult != 1.f) {
+				rigid_body.set_velocity(rigid_body.get_velocity() * bullet_time_mult);
+			}
+		}
+
 		missile->initial_speed = h.get_effective_velocity().length();
 	}
 

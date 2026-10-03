@@ -2644,7 +2644,8 @@ void editor_setup::apply(const config_json_table& cfg) {
 		playtest_speed remains a separate warp of the whole application on top of it.
 	*/
 
-	dummy_dynamic_vars.logic_speed = cfg.server.speed;
+	dummy_dynamic_vars.logic_speed = cfg.server.game_speed;
+	dummy_dynamic_vars.bullet_speed = cfg.server.calc_bullet_speed(cfg.server.game_speed);
 	dummy_dynamic_vars.apply_logic_speed_immediately = true;
 }
 

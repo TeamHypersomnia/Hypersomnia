@@ -1,5 +1,10 @@
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <cmath>
+#include <algorithm>
+#include <optional>
+#include <string>
 #include "augs/misc/date_time.h"
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -2727,7 +2732,17 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.bot_override_difficulty = overrides.bot_difficulty.difficulty;
 	}
 
-	out.logic_speed = ::sanitize_logic_speed(overrides.speed.is_set() ? overrides.speed.speed : vars.speed);
+	out.logic_speed = ::sanitize_logic_speed(overrides.speed.is_set() ? overrides.speed.speed : vars.game_speed);
+
+	/*
+		Unless set, the bullet speed follows the game speed, including the one requested with /speed.
+	*/
+
+	out.bullet_speed = ::sanitize_logic_speed(
+		overrides.bullet_speed.is_set() ?
+		overrides.bullet_speed.speed :
+		vars.calc_bullet_speed(out.logic_speed)
+	);
 	out.apply_logic_speed_immediately = apply_speed_immediately;
 
 	return out;
@@ -2799,16 +2814,28 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	const bool reload_arena = first_time || vars.arena != new_vars.arena || vars.game_mode != new_vars.game_mode;
 	const bool reload_net_sim = first_time || vars.network_simulator != new_vars.network_simulator;
 
-	if (!first_time && vars.speed != new_vars.speed) {
-		/*
-			Administrative change: overrides whatever was requested with /speed.
-		*/
+	const auto new_speed = ::sanitize_logic_speed(new_vars.game_speed);
 
+	auto new_bullet_speed = new_vars.bullet_speed;
+	new_bullet_speed.value = ::sanitize_logic_speed(new_bullet_speed.value);
+
+	/*
+		Administrative changes: override whatever was requested with /speed or /bspeed.
+	*/
+
+	if (!first_time && ::sanitize_logic_speed(vars.game_speed) != new_speed) {
 		overrides.speed = {};
 		apply_speed_immediately = true;
 	}
 
+	if (!first_time && vars.bullet_speed != new_bullet_speed) {
+		overrides.bullet_speed = {};
+		apply_speed_immediately = true;
+	}
+
 	vars = new_vars;
+	vars.game_speed = new_speed;
+	vars.bullet_speed = new_bullet_speed;
 
 	if (reload_arena) {
 		dont_check_timeouts_until = server_time + 6.0;
@@ -3882,9 +3909,38 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 		}
 	}
 
-	if (overrides.speed.requester.is_set()) {
-		if (const bool disconnected_already = !get_client_state(overrides.speed.requester).is_set()) {
-			overrides.speed = defaults.speed;
+	/*
+		On ranked servers, the speeds agreed upon in warmup stay for the whole match,
+		even if their requester leaves.
+	*/
+
+	const bool keep_speeds_after_requester_leaves = vars.ranked.is_ranked_server();
+
+	auto revert_if_requester_left = [&](speed_request& request, const std::string& what_reverted, auto get_new_speed) {
+		if (keep_speeds_after_requester_leaves || !request.requester.is_set()) {
+			return;
+		}
+
+		if (const bool disconnected_already = !get_client_state(request.requester).is_set()) {
+			request = {};
+			apply_speed_immediately = false;
+
+			broadcast_speed_adjusted(what_reverted, get_new_speed(make_synced_dynamic_vars()));
+		}
+	};
+
+	revert_if_requester_left(overrides.speed, "Speed reverted", [](const auto& v) { return v.logic_speed; });
+	revert_if_requester_left(overrides.bullet_speed, "Bullet speed reverted", [](const auto& v) { return v.bullet_speed; });
+
+	if (apply_speed_immediately) {
+		const auto& clk = scene.world.get_clock();
+
+		const bool already_applied =
+			clk.logic_speed == current_dynamic_vars.logic_speed
+			&& clk.bullet_speed == current_dynamic_vars.bullet_speed
+		;
+
+		if (already_applied) {
 			apply_speed_immediately = false;
 		}
 	}
@@ -5175,9 +5231,48 @@ difficulty_type server_setup::calc_current_bot_difficulty() const {
 	);
 }
 
-void server_setup::broadcast_speed_adjusted() {
-	const auto new_speed = make_synced_dynamic_vars().logic_speed;
+/*
+	"/speed 0.8" -> "0.8", "/speed" -> "".
+*/
 
+static std::string trim_speed_command_argument(const std::string& message, const std::string& command) {
+	const auto first = message.find_first_not_of(' ', command.size());
+
+	if (first == std::string::npos) {
+		return {};
+	}
+
+	const auto last = message.find_last_not_of(' ');
+	return message.substr(first, last - first + 1);
+}
+
+/*
+	Accepts a decimal comma too. Rejects trailing junk, non-finite and non-positive values.
+	The result still has to be sanitized into the allowed range.
+*/
+
+static std::optional<real32> parse_requested_speed(std::string argument) {
+	if (argument.empty()) {
+		return std::nullopt;
+	}
+
+	std::replace(argument.begin(), argument.end(), ',', '.');
+
+	char* end = nullptr;
+	const auto value = std::strtof(argument.c_str(), &end);
+
+	if (end != argument.c_str() + argument.size()) {
+		return std::nullopt;
+	}
+
+	if (!std::isfinite(value) || value <= 0.f) {
+		return std::nullopt;
+	}
+
+	return value;
+}
+
+void server_setup::broadcast_speed_adjusted(const std::string& what_happened, const real32 new_speed) {
 	const bool applies_now = get_arena_handle().on_mode_with_input(
 		[&](const auto& mode, const auto& in) {
 			using M = remove_cref<decltype(mode)>;
@@ -5192,8 +5287,9 @@ void server_setup::broadcast_speed_adjusted() {
 	);
 
 	const auto message = typesafe_sprintf(
-		"Speed changed to %2fx%x",
-		new_speed,
+		"%x to %x%x",
+		what_happened,
+		::format_logic_speed(new_speed),
 		applies_now ? "." : " from the next round."
 	);
 
@@ -5411,9 +5507,19 @@ void server_setup::handle_client_chat_command(
 				}
 			}
 		}
-		else if (begins_with(chat.message, "/speed")) {
+		else if (begins_with(chat.message, "/speed") || begins_with(chat.message, "/bspeed")) {
+			const bool bullets = begins_with(chat.message, "/bspeed");
+			const auto command = std::string(bullets ? "/bspeed" : "/speed");
+			const auto label = std::string(bullets ? "Bullet speed" : "Speed");
+			auto& request = bullets ? overrides.bullet_speed : overrides.speed;
+
+			auto get_effective_speed = [&]() {
+				const auto dynamic_vars = make_synced_dynamic_vars();
+				return bullets ? dynamic_vars.bullet_speed : dynamic_vars.logic_speed;
+			};
+
 			if (is_ranked_live_or_starting()) {
-				broadcast_info("Speed cannot be changed during a ranked match.", chat_target_type::INFO_CRITICAL);
+				broadcast_info(label + " cannot be changed during a ranked match.", chat_target_type::INFO_CRITICAL);
 				return;
 			}
 
@@ -5422,24 +5528,40 @@ void server_setup::handle_client_chat_command(
 				return;
 			}
 
-			if (chat.message == "/speed" || chat.message == "/speed ") {
-				overrides.speed = {};
-				apply_speed_immediately = false;
-				broadcast_speed_adjusted();
+			/*
+				A bare command resets to the server's setting -
+				for the bullet speed, that's usually following the game speed.
+			*/
+
+			const auto argument = ::trim_speed_command_argument(chat.message, command);
+			const bool reset_to_default = argument.empty();
+			const auto requested_speed = ::parse_requested_speed(argument);
+
+			if (!reset_to_default && !requested_speed.has_value()) {
+				broadcast_info(typesafe_sprintf("Wrong command format. Example: %x 0.8", command), chat_target_type::INFO_CRITICAL);
 				return;
 			}
 
-			auto requested_speed = 0.f;
+			const auto previous_speed = get_effective_speed();
 
-			if (!typesafe_sscanf(chat.message, "/speed %x", requested_speed)) {
-				broadcast_info("Wrong command format. Example: /speed 0.8", chat_target_type::INFO_CRITICAL);
-				return;
+			if (reset_to_default) {
+				request = {};
+			}
+			else {
+				request.requester = to_mode_player_id(id);
+				request.speed = ::sanitize_logic_speed(*requested_speed);
 			}
 
-			overrides.speed.requester = to_mode_player_id(id);
-			overrides.speed.speed = ::sanitize_logic_speed(requested_speed);
 			apply_speed_immediately = false;
-			broadcast_speed_adjusted();
+
+			const auto new_speed = get_effective_speed();
+
+			if (new_speed == previous_speed) {
+				broadcast_info(typesafe_sprintf("%x is already %x.", label, ::format_logic_speed(previous_speed)), chat_target_type::INFO);
+				return;
+			}
+
+			broadcast_speed_adjusted(label + (reset_to_default ? " reset" : " changed"), new_speed);
 		}
 		else if (chat.message == "/next") {
 			if (!can_use_map_command_now()) {

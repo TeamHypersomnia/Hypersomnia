@@ -6,6 +6,7 @@
 #include "augs/misc/compress.h"
 #include "augs/misc/readable_bytesize.h"
 #include "augs/templates/logically_empty.h"
+#include "game/modes/logic_speed.h"
 #include "application/network/net_serialize.h"
 #include "application/network/net_solvable_stream.h"
 #include "augs/string/get_type_name.h"
@@ -281,6 +282,8 @@ namespace net_messages {
 		augs::read_bytes(s, in.mode);
 		augs::read_bytes(s, in.client_id);
 		augs::read_bytes(s, in.rcon);
+
+		::sanitize_clock_timing(in.signi.clk);
 
 		LOG_NVPS(in.signi.entity_pools.size());
 

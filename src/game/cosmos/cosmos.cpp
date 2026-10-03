@@ -153,9 +153,10 @@ void cosmos::reinfer_everything() {
 	cosmic::reinfer_solvable(*this);
 }
 
-void cosmos::set_clock_timing(const uint32_t tickrate, const real32 logic_speed) {
+void cosmos::set_clock_timing(const uint32_t tickrate, const real32 logic_speed, const real32 bullet_speed) {
 	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
 		current_signi.clk.set_timing(tickrate, logic_speed);
+		current_signi.clk.bullet_speed = bullet_speed;
 		return changer_callback_result::DONT_REFRESH; 
 	});
 }

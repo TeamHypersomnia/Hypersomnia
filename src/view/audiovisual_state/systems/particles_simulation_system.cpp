@@ -769,10 +769,10 @@ void particles_simulation_system::advance_visible_streams(
 ) {
 	/*
 		Audiovisual effects play at 1.0x regardless of logic speed,
-		except bullet trails which should match the slowed down missiles.
+		except bullet trails which should match the missiles, running at bullet speed.
 	*/
 
-	const auto bullet_trail_time_mult = cosm.get_clock().logic_speed;
+	const auto bullet_trail_time_mult = cosm.get_clock().bullet_speed;
 
 	auto advance_emissions = [&](
 		emission_instances_type& instances,

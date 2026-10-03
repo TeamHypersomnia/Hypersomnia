@@ -2416,6 +2416,42 @@ bool perform_arena_chooser(
 	return changed;
 }
 
+bool do_bullet_speed_slider(server_vars& vars, const bool game_speed_changed) {
+	using namespace augs::imgui;
+
+	if (game_speed_changed) {
+		vars.bullet_speed.is_enabled = false;
+	}
+
+	auto shown_speed = vars.bullet_speed.is_enabled ? vars.bullet_speed.value : vars.game_speed;
+	const bool moved = slider("Bullet speed", shown_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+
+	if (moved) {
+		vars.bullet_speed = augs::maybe<real32>::enabled(::sanitize_logic_speed(shown_speed));
+	}
+
+	return moved;
+}
+
+void do_game_speed_tooltip() {
+	augs::imgui::tooltip_on_hover(
+		"Slows down the logic (movement, physics, bullets, reloads, bots).\n"
+		"Fire rates and recoil stay the same.\n"
+		"The round time limit gets proportionally longer.\n\n"
+		"Players can change it in chat, e.g. \"/speed 0.7\".\n"
+		"\"/speed\" alone reverts to this setting."
+	);
+}
+
+void do_bullet_speed_tooltip() {
+	augs::imgui::tooltip_on_hover(
+		"Speed of the bullets. Follows Game speed until moved.\n"
+		"1.0x keeps the bullets as fast as in a normal-speed game.\n\n"
+		"Players can change it in chat, e.g. \"/bspeed 1\".\n"
+		"\"/bspeed\" alone reverts to this setting."
+	);
+}
+
 void do_server_vars(
 	server_vars& vars,
 	server_vars& last_saved_vars,
@@ -2437,8 +2473,9 @@ void do_server_vars(
 	};
 
 	auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
-		slider(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
+		const bool result = slider(l, f, std::forward<decltype(args)>(args)...);
+		const bool reverted = revert(f);
+		return result || reverted;
 	};
 
 	if (pane == rcon_pane::ARENAS) {
@@ -2563,15 +2600,19 @@ void do_server_vars(
 
 		ImGui::Separator();
 
-		revertable_checkbox("Friendly fire", vars.friendly_fire);
-		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
+		const bool game_speed_changed = revertable_slider("Game speed", vars.game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+		vars.game_speed = ::sanitize_logic_speed(vars.game_speed);
+		::do_game_speed_tooltip();
 
-		revertable_slider("Game speed", vars.speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
-		vars.speed = ::sanitize_logic_speed(vars.speed);
-		tooltip_on_hover("Slows down the logic (movement, physics, bullets, reloads, bots).\nFire rates, recoil and round time stay the same.");
+		::do_bullet_speed_slider(vars, game_speed_changed);
+		::do_bullet_speed_tooltip();
+		revert(vars.bullet_speed);
 
 		revertable_checkbox("Allow /speed command", vars.allow_setting_speed);
 		revertable_checkbox("Allow /speed command (RANKED)", vars.ranked.overrides.allow_setting_speed);
+
+		revertable_checkbox("Friendly fire", vars.friendly_fire);
+		revertable_checkbox("Friendly fire (RANKED)", vars.ranked.overrides.friendly_fire);
 
 		revertable_checkbox("Allow overtime", vars.allow_overtime);
 		tooltip_on_hover("A tie at (max team score - 1) each plays out into overtime\nuntil one team leads by two rounds (e.g. 17:15, then 18:16...).");

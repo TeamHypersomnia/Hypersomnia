@@ -8,6 +8,7 @@
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/casual_level_logic.h"
 #include "game/modes/test_mode.h"
+#include "game/modes/logic_speed.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_json_table.h"
@@ -257,7 +258,17 @@ void arena_scoreboard_gui::draw_gui(
 			col = yellow;
 		}
 
-		const auto speed_caption = typesafe_sprintf("   Speed: %xx", mode_input.cosm.get_clock().logic_speed);
+		const auto& clk = mode_input.cosm.get_clock();
+
+		const auto speed_caption = [&]() {
+			auto result = "   Speed: " + ::format_logic_speed(clk.logic_speed);
+
+			if (clk.bullet_speed != clk.logic_speed) {
+				result += ", bullets: " + ::format_logic_speed(clk.bullet_speed);
+			}
+
+			return result;
+		}();
 		const auto speed_caption_size = calc_size(speed_caption);
 		const auto caption_x = sz.x / 2 - (window_name_size.x + speed_caption_size.x) / 2;
 

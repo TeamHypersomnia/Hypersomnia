@@ -146,10 +146,27 @@ as well as to test your skills in a laggy environment.
 
 		slider("Slots", into.slots, 2, 64);
 
+		const auto new_feature_color = rgba::get_bright_wave(augs::steady_secs() / 4.0, 0.55);
+
+		const bool game_speed_changed = [&]() {
+			auto scope = scoped_text_color(new_feature_color);
+			return slider("Game speed (NEW!)", into_vars.game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+		}();
+
+		into_vars.game_speed = ::sanitize_logic_speed(into_vars.game_speed);
+		::do_game_speed_tooltip();
+
 		{
-			const auto wave_time = augs::steady_secs() / 4.0;
-			const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
-			auto scope = scoped_text_color(wave_color);
+			auto scope = scoped_text_color(new_feature_color);
+			::do_bullet_speed_slider(into_vars, game_speed_changed);
+		}
+
+		::do_bullet_speed_tooltip();
+
+		text_disabled("Sending \"/speed 0.7\" or \"/bspeed 1\" in chat changes the speeds.");
+
+		{
+			auto scope = scoped_text_color(new_feature_color);
 			checkbox("Bots (NEW!)", into_vars.bots);
 		}
 
@@ -172,10 +189,6 @@ as well as to test your skills in a laggy environment.
 		}
 
 		checkbox("Friendly fire", into_vars.friendly_fire);
-
-		slider("Game speed", into_vars.speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
-		into_vars.speed = ::sanitize_logic_speed(into_vars.speed);
-		text_disabled("Sending \"/speed 0.7\" in chat changes the speed.");
 
 		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");

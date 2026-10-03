@@ -1458,7 +1458,8 @@ void test_scene_setup::apply(const config_json_table& cfg) {
 		Shooting range and tutorial run at the same speed the player would host a server at.
 	*/
 
-	dummy_dynamic_vars.logic_speed = cfg.server.speed;
+	dummy_dynamic_vars.logic_speed = cfg.server.game_speed;
+	dummy_dynamic_vars.bullet_speed = cfg.server.calc_bullet_speed(cfg.server.game_speed);
 }
 
 void test_scene_setup::customize_for_viewing(config_json_table& config) const {

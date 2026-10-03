@@ -52,6 +52,7 @@ struct synced_dynamic_vars {
 	bots_request bots_override;
 	difficulty_type bot_override_difficulty = difficulty_type::LEVELLING;
 	real32 logic_speed = 1.f;
+	real32 bullet_speed = 1.f;
 	bool apply_logic_speed_immediately = false;
 	// END GEN INTROSPECTOR
 
