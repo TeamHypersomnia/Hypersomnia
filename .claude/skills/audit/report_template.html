@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hypersomnia Audit</title>
+<style>
+:root {
+	--bg: #f7f7f5; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --line: #e2e2dc; --accent: #2b5cd6;
+	--crash: #c62828; --desync: #8e24aa; --lag: #d84315; --bug: #e65100; --perf: #1565c0;
+	--quality: #2e7d32; --nit: #757575; --decision: #b8860b;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #151514; --fg: #e8e8e3; --muted: #9a9a93; --card: #1e1e1c; --line: #33332f; --accent: #7aa2ff;
+		--crash: #ef5350; --desync: #ce93d8; --lag: #ff8a65; --bug: #ffb74d; --perf: #64b5f6;
+		--quality: #81c784; --nit: #a0a0a0; --decision: #e6c34a;
+	}
+}
+:root[data-theme="dark"] {
+	--bg: #151514; --fg: #e8e8e3; --muted: #9a9a93; --card: #1e1e1c; --line: #33332f; --accent: #7aa2ff;
+	--crash: #ef5350; --desync: #ce93d8; --lag: #ff8a65; --bug: #ffb74d; --perf: #64b5f6;
+	--quality: #81c784; --nit: #a0a0a0; --decision: #e6c34a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { padding: 20px 16px 0; max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 13px; }
+nav { display: flex; flex-wrap: wrap; gap: 4px; max-width: 1200px; margin: 16px auto 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+nav button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 8px 12px; font: inherit; cursor: pointer; }
+nav button.on { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+nav .count { font-size: 12px; opacity: .7; margin-left: 4px; }
+main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.filters label { font-size: 13px; display: inline-flex; gap: 4px; align-items: center; cursor: pointer; }
+.clean { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+.item { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.item h3 { font-size: 15px; margin: 0 0 6px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.num { color: var(--muted); font-variant-numeric: tabular-nums; }
+.badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; color: #fff; }
+.b-crash { background: var(--crash); } .b-desync { background: var(--desync); } .b-lag { background: var(--lag); }
+.b-bug { background: var(--bug); } .b-perf { background: var(--perf); } .b-quality { background: var(--quality); }
+.b-nit { background: var(--nit); } .b-decision { background: var(--decision); }
+.sysname { font-size: 12px; color: var(--muted); }
+.row { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; font-size: 14px; }
+.row dt { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.row dd { margin: 0; }
+code { font-family: ui-monospace, "JetBrains Mono", monospace; font-size: 12.5px; background: color-mix(in srgb, var(--line) 60%, transparent); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.done { opacity: .45; }
+.item input[type=checkbox] { margin-left: auto; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+	<h1>Audyt nowych systemów</h1>
+	<div class="sub">2026-09-30 · checklista: <code>.claude/skills/audit/SKILL.md</code> · tylko raport, nic nie edytowane · checkbox = zrobione (zapamiętywane lokalnie)</div>
+</header>
+<nav id="tabs"></nav>
+<main>
+	<div class="filters" id="filters"></div>
+	<div id="list"></div>
+	<p class="clean" id="clean"></p>
+</main>
+<script>
+const SEV = ["crash", "desync", "lag", "bug", "perf", "quality", "nit", "decision"];
+const SEV_LABEL = { crash: "crash", desync: "desync", lag: "lag", bug: "bug", perf: "perf", quality: "jakość", nit: "nit", decision: "decyzja" };
+
+const SYSTEMS = [
+{
+	id: "minimap", name: "Minimapa",
+	clean: "Czyste: determinizm (wszystko view-side), RNG (brak), web (dither shader GLES3-safe), logika vs AV, martwy kod poza include'ami.",
+	items: [
+		["lag", "Sightingi i minimapa używają różnych zegarów na kliencie z predykcją",
+			"<code>draw_minimap.cpp:555, 568, 886</code>, <code>special_indicator_logic.h:32</code>, <code>audiovisual_state.cpp:469</code>",
+			"Sightingi nagrywane pod <code>never_predictable_v</code> → czas referential. Rysowanie porównuje z <code>get_total_seconds_passed()</code> kosmosu predicted. <code>is_seen_now</code> ma 0.15 s grace → powyżej ~150 ms predykcji wrogowie nigdy nie są live dotami ze strzałką; przy niższym pingu migają. Pulsy, okno słyszanego strzału i czaszki przesunięte tak samo.",
+			"Trzymać <code>clock_secs</code> ostatnio advanced referential czasu w <code>minimap_sighting_system</code>; rysowanie i <code>gather_special_indicators</code> używają tego + <code>interpolation_ratio * dt</code>."],
+		["crash", "Dzielenie przez 0 w gałęzi map bounds",
+			"<code>draw_minimap.cpp:238</code> → <code>:256</code>",
+			"Guard <code>world_side &lt;= 0</code> na <code>:115</code> jest przed gałęzią bounds. NAV_ISLAND rozmiaru 0 → <code>scale = rect.w() / 0</code>.",
+			"Powtórzyć early-out <code>world_side &lt;= 0.0f</code> przed <code>:256</code>."],
+		["crash", "Rozmiar minimapy nieclampowany",
+			"<code>game_drawing_settings.h:156</code>, <code>work.cpp:5616, 5799, 2929</code>",
+			"<code>size</code> ≤ 0 z configu → ujemny rect i ujemny scissor → GL_INVALID_VALUE, lustrzana mapa.",
+			"<code>return std::max(1, get_appearance(state).size);</code> w <code>calc_size</code>; clamp też po skalowaniu wysokością ekranu."],
+		["crash", "Niesprawdzany optional w overlayu FOW (latentny)",
+			"<code>work.cpp:5839</code>",
+			"<code>find_viewing_transform(...)->pos</code> bezpieczne tylko dlatego, że <code>minimap_transform.valid</code> ustawiono w tej klatce.",
+			"<code>draw_minimap_impl</code> zapisuje <code>viewer_pos</code> w <code>minimap_world_transform</code>, tu go użyć."],
+		["perf", "Bounds mapy liczone co klatkę",
+			"<code>draw_minimap.cpp:186-219</code>, <code>:147-177</code>",
+			"Mapy bez NAV_ISLAND chodzą po całej liście body <code>b2World</code> (też dynamicznych), AABB per child, co klatkę. Geometria statyczna.",
+			"Cache bounds i AABB wysp raz na load mapy / reinference kosmosu."],
+		["quality", "Pierwszy dash lasera wychodzi za koniec segmentu",
+			"<code>draw_minimap.cpp:384-388</code>",
+			"Początkowy <code>dash_end</code> (do <code>2*dash_length</code>) niezclampowany do <code>line_length</code> → dashe do 8 px za ścianę na krótkich segmentach penetracji.",
+			"<code>dash_end = std::min(dash_end, line_length);</code> przed pętlą."],
+		["quality", "Skalowanie wysokością ekranu obejmuje tylko size",
+			"<code>work.cpp:2928-2930</code>",
+			"Kropki, trójkąt, ring, ikony (<code>* 0.75f</code>), ramka zostają w pikselach 1080p → malutkie na 4K, wielkie na małych canvasach weba.",
+			"Pole runtime <code>hud_scale</code> w <code>minimap_settings</code> (poza introspectorem jak <code>extra_bottom_margin</code>), mnożyć nim <code>dot_radius</code>, ikony, stałe."],
+		["quality", "Dedup: formuła rezerwacji rogu 3×, jedna już się rozjechała",
+			"<code>value_bar.cpp:361-369</code>, <code>arena_mode_gui.cpp:830-838</code>, <code>arena_mode_gui.cpp:1227</code>",
+			"Ostatnia kopia używa <code>2 * margin</code> i gubi <code>extra_bottom_margin</code> i <code>extra_hud_space</code>.",
+			"<code>minimap_settings::calc_corner_reservation(corner)</code> w <code>minimap_layout.h</code>."],
+		["quality", "Dedup: scissor 2×, mapowanie świat→minimapa 3×, ring ręcznie",
+			"<code>work.cpp:5610-5618, 5794-5801</code>; <code>draw_minimap.cpp:264</code>, <code>work.cpp:5840, 5861</code>; <code>draw_minimap.cpp:1002-1011</code>",
+			"Ta sama logika powielona.",
+			"<code>calc_minimap_scissor(...)</code>, <code>minimap_world_transform::to_minimap(vec2)</code>, <code>push_arc_ring(...)</code> z pełnym ringiem na nim."],
+		["quality", "Dedup: maska kategorii przeszkód, formuła słyszenia strzału, helpery lasera, predykat conscious+faction",
+			"<code>draw_minimap.cpp:181-184, 404-407</code>; <code>minimap_sighting_system.cpp:302</code> vs <code>arena_mode_ai.cpp:1345</code>; <code>draw_minimap.cpp:631, 620-625</code> vs <code>draw_crosshair_lasers.cpp:201, 271-278</code>; <code>minimap_sighting_system.cpp:141-147, 200-205</code>",
+			"<code>max_distance * 0.8f</code> duplikuje AI. <code>basic_penetration_distance</code> i projekcja celownika powielone.",
+			"Jeden <code>constexpr</code> maski; <code>calc_gunshot_hearing_distance(gun_def)</code> w <code>game/detail</code>; helpery lasera do <code>calc_laser_path.h</code>; lokalna lambda."],
+		["quality", "Nieaktualne komentarze",
+			"<code>work.cpp:5329</code>, <code>draw_minimap.cpp:233-236</code>, <code>arena_scoreboard_gui.cpp:131-132</code>",
+			"\"minimap doubles its range\" – teraz zależy od <code>tab_behavior</code>. \"The scoreboard view\" – gałąź też dla <code>entire_map_fits</code>. Szerokość non-compact nie zawsze omija minimapę (UNDER_TAB ~600).",
+			"Przepisać na obecne zachowanie."],
+		["quality", "Nieużywane include'y minimap_layout.h",
+			"<code>arena_gui_mixin.hpp:6</code>, <code>illuminated_rendering.cpp:49</code>",
+			"Pozostałość prototypu, ciągną <code>game_drawing_settings.h</code>.",
+			"Usunąć."],
+		["quality", "Settings UI minimapy",
+			"<code>settings_gui.cpp:1590-1669</code>",
+			"10 <code>revertable_color_edit</code> płasko. <code>tab_behavior</code> i <code>scoreboard_range_mult</code> poza nodem \"Under TAB\". Brak tooltipów.",
+			"Node \"Colors\"; przenieść do \"Under TAB\"; tooltipy: <code>size</code> (\"at 1080p, scales with screen height\"), <code>show_entire_map_if_fits_mult</code> (\"0 = off\"), <code>fog_of_war_color</code> (\"alpha 0 = off\")."],
+		["nit", "Drobiazgi",
+			"<code>minimap_sighting_system.h:192</code>, <code>sighting.h:125</code>, <code>draw_minimap.cpp:673, 745, 815, 853, 874, 907, 921, 950, 967</code>",
+			"Bomb state jako magic int 0-3; sentinel <code>-1000.0</code>; magic <code>0.75f</code>, <code>1.25f / 1.5f</code>; parametr <code>dot_radius</code> shadowuje zewnętrzny; zbędne aliasy <code>dot_r</code>; kolejność rysowania wrogów z <code>unordered_map</code>; linie &gt;125 znaków.",
+			"<code>enum class</code>, <code>std::optional&lt;double&gt;</code>, nazwane stałe, sortowanie po id."]
+	]
+},
+{
+	id: "lighting", name: "Oświetlenie / cienie",
+	clean: "Czyste: blend modes i stencil na WebGL2/GLES3 (GL_MIN/MAX, BlendFuncSeparate, GL_INVERT, texelFetch, stałe pętle), RNG (brak), plumbing poza drobiazgami, logika vs AV poza shell_params.h.",
+	items: [
+		["bug", "Cień zamarza na ekranie po wyłączeniu (potwierdzone w kodzie)",
+			"<code>illuminated_rendering.cpp:832-857</code>",
+			"<code>setup_shadow_uniforms</code> i <code>receive_shadows</code> wracają wcześnie przy <code>!environment_shadows</code>. <code>U::shadow_strength</code> zostaje &gt;0, unit 4 dalej trzyma <code>fbos.shadow</code>. Triggery: None w runtime, Strength mult = 0, mapa bez słońca po mapie z cieniami.",
+			"Przy <code>!environment_shadows</code> i tak ustawić <code>shadow_strength = 0</code> na <code>shaders.illuminated</code> (przed early returnem w <code>receive_shadows</code>)."],
+		["perf", "Każde światło: ~6 drawów, 4 przełączenia FBO, 4 fille zasięgu",
+			"<code>light_system.cpp:340-417</code>",
+			"Defaulty: <code>posterize_light = true</code>, <code>hue_preservation = 1</code>, <code>hue_through_walls = true</code>. Kolejność light→hue→light→removed→light. Na GPU tile-based (mobile WebGL, Safari/Apple Silicon) każde przełączenie to store+reload ekranu.",
+			"Pominąć passy 7 i 9 gdy obie maski światła puste (<code>cast_shadows = false</code> albo brak fixture'ów w zasięgu). Dłużej: MRT z per-target blendingiem (<code>OES_draw_buffers_indexed</code>) albo akumulacja removed raz. Zmierzyć <code>benchmark-rendering</code>."],
+		["perf", "4 nowe fullscreen RGBA8 bufory zawsze alokowane",
+			"<code>necessary_resources.cpp:43-48</code>",
+			"<code>overlay_smoke</code>, <code>removed_light</code>, <code>hue_light</code>, <code>shadow</code> niezależnie od ustawień: ~33 MB @1080p, ~133 MB @4K.",
+			"<code>all_necessary_fbos::apply</code> z flagami: <code>shadow</code> gdy sun quality ≠ NONE, <code>removed_light</code> gdy <code>posterize_light</code>, <code>hue_light</code> gdy <code>hue_preservation &gt; 0</code>. Checki <code>has_value()</code> już są (<code>:636-637</code>, <code>:1144</code>)."],
+		["bug", "Cienie wrogów zdradzają ukrytych wrogów",
+			"<code>enqueue_illuminated_rendering_jobs.hpp:1049</code>, <code>illuminated_rendering.cpp:988-990</code>",
+			"<code>ENEMY_SENTIENCE_SHADOWS</code> clipowane per pixel tylko do FOW. Offset urósł z 7 do ~17 px wzdłuż słońca → wróg za rogiem rzuca widoczny cień.",
+			"Rysować cień wroga tylko gdy sam wróg widoczny (<code>::is_reasonably_in_view</code> / pozycja w poligonie FOW), albo mały offset dla wrogów."],
+		["desync", "Commit od cieni zmienił logikę gry",
+			"<code>visibility_system.cpp:242-243, 495-521</code> (commit <code>e70b6ab28</code>)",
+			"<code>degeneracy_nudge</code> i filtr kolinearnych wierzchołków zmieniają <code>calc_visibility</code>, którego eksplozje używają w logice (<code>standard_explosion.cpp:189</code>). Stare dema/replaye desyncują, klienci różnych wersji się nie zgadzają. W jednym buildzie deterministyczne.",
+			"Bump wersji protokołu/dem, wpis w changelogu. Na przyszłość: zmiany logiki poza commitami renderingu."],
+		["bug", "Złe cienie przy krawędzi ekranu",
+			"<code>illuminated.fsh:82-86, 142, 148</code>",
+			"<code>fetch_shadow</code> clampuje sample do krawędzi tekstury. Podniesione receivery samplują do <code>r * shadow_step</code> (~150 px przy height 64) → smużenie/pop przy krawędzi od strony słońca.",
+			"Poza teksturą zwracać 0 (brak cienia) zamiast clampu, albo guard band w teksturze cieni."],
+		["quality", "Higiena headerów",
+			"<code>shell_params.h:136-139</code>; <code>light_height_shadows.h</code>, <code>vis_response_to_triangles.h</code>",
+			"Stałe wizualne (<code>SHELL_SHADOW_COLOR</code>, <code>RAISE_SHELLS_ABOVE_SHADOWS</code>, <code>FALLEN_SHELL_SHADOW_DISTANCE</code>, <code>SHELL_SHADOW_SCALE_AT_REFERENCE</code>) w headerze z ~30 includerami, i to view data w <code>game/</code>. Duże inline funkcje + tweakables docierają do <code>work.cpp</code> przez <code>launch_visibility_jobs.h</code>.",
+			"Stałe do <code>view/rendering_scripts/falling_item_offsets.h</code>. Funkcje do <code>.cpp</code> jak <code>draw_environment_shadows.cpp</code>."],
+		["perf", "Praca CPU per światło powtarzana co klatkę",
+			"<code>light_height_shadows.h:126-485</code>, <code>vis_response_to_triangles.h:152</code>",
+			"1 AABB query per światło + 2 per fixture (<code>side_is_covered</code>); 6 raycastów per nieciągłość per światło. Wszystko od nowa, też dla statycznych świateł na statycznej geometrii.",
+			"Cache masek i półcieni per światło (klucz: pozycja, height, smoothness), invalidacja gdy niestatyczne body w zasięgu."],
+		["perf", "Drobne perf",
+			"<code>draw_environment_shadows.cpp:38-58, 68</code>; <code>enqueue_illuminated_rendering_jobs.hpp:470-475, 519-548</code>",
+			"Query rośnie o <code>step * 255</code> (~480×600 px), footprinty dla off-screen fixture'ów. Nowy vector co klatkę. <code>calc_shell_offsets</code> 3× per remnant per klatkę.",
+			"Footprinty tylko dla fixture'ów w kamerze + clamp step w edytorze; <code>thread_local</code>; liczyć offsety raz per remnant."],
+		["quality", "Dedup",
+			"<code>audiovisual_state.cpp:154-157</code> vs <code>illuminated_rendering.cpp:1139</code>; <code>light_height_shadows.h:155-161, 291-297</code>; <code>illuminated_rendering.cpp:695, 750, 911, 941, 1023, 1041</code>; <code>:617, 641, 884</code>",
+			"Warunek sun-shadows-enabled 2× inaczej (jeden bez <code>fbos.shadow</code>). Ręczne pętle AABB. Blok strict_fow stencil 6+ razy. <code>get_common_significant().light</code> pobierany ponownie mimo cache na <code>:830</code>.",
+			"Jedna wolna funkcja; <code>augs::calc_vertices_aabb</code>; lambda <code>with_strict_fow_stencil(callback)</code>; użyć <code>light_settings</code>."],
+		["quality", "Martwy kod",
+			"<code>renderer.h:180</code>, <code>renderer.cpp:330</code>, <code>renderer_backend.cpp:363, 528</code>; <code>ray_casts.cpp:156-177</code>, <code>physics_world_cache.h:96-106</code>; <code>falling_item_offsets.h:23</code>",
+			"<code>set_alpha_only_additive_blending</code> nieużywane. <code>ray_cast_hits_anything_px</code> i <code>raycast_input::stop_at_any</code> nieużywane. <code>RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS = false</code> – przełącznik eksperymentu.",
+			"Usunąć, albo zrobić prawdziwy parametr."],
+		["quality", "Settings / edytor UI",
+			"<code>editor_inspector_gui.cpp:243, 1404-1426</code>; <code>settings_gui.cpp:940, 955</code>; <code>performance_settings.h:82-83, 107</code>; <code>default_config.json:1068-1074</code>",
+			"Shadow smoothness / Hue through walls / Light height widoczne przy Cast shadows off. \"Cast shadows\" vs \"Casts shadow\". Zakresy sliderów po stringu labela. \"Draw bullet shadows\" obejmuje też itemy/granaty/łuski. Tooltipy \"like before heights existed\" = historia. <code>strength_mult</code>, <code>smoothness_mult</code>, <code>posterize_neons</code> to wygląd, nie performance. Brak nowych pól w default configu.",
+			"<code>if (insp.cast_shadows)</code> + indent; ujednolicić nazwę; zakresy per property; rename/tooltip; przepisać tooltipy; przenieść do drawing settings; dopisać pola."],
+		["nit", "Web / drobiazgi",
+			"<code>illuminated_rendering.cpp:842</code> vs <code>illuminated.fsh:135</code>; <code>renderer_backend.h:47</code>; <code>shadow_sprite.fsh:220</code>",
+			"<code>fix_samples = 16</code> duplikuje bound pętli w shaderze (większa wartość cicho ucięta). <code>max_blending_active</code> śledzi też GL_MIN. Blue kanał koloru jako dane i wybór progu alpha – tint niebieski przełączy próg na 0.02. Web ma te same defaulty co desktop.",
+			"Wspólna stała / bool; rename na <code>custom_blend_equation_active</code>; uniform zamiast kanału; niższe defaulty webowe po benchmarku."],
+		["nit", "Nazewnictwo",
+			"<code>enqueue_illuminated_rendering_jobs.hpp:18-31</code>, <code>falling_item_offsets.h:39</code>",
+			"\"legacy offset\" / <code>legacy_offset</code>. <code>CHARACTER_SUN_SHADOW_HEIGHT</code> związane z <code>vec2(2.34f, 2.34f)</code> i de_duel_practice.",
+			"<code>sunless_offset</code>; <code>vec2::square(2.34f)</code> i nazwana stała."]
+	]
+},
+{
+	id: "decals", name: "Decale / rykoszety",
+	clean: "Czyste: matma przez repro::, posortowane listy przeszkód, std::map dla ofiar eksplozji, coverage bitmask niezależny od kolejności, kasowanie z powierzchniami, web, headery, martwy kod (#if 0 i ricochet_cooldown_ms sprzed tych commitów), settings UI.",
+	items: [
+		["bug", "Pocisk, który zabije postać, przechodzi darmo przez ścianę za nią",
+			"<code>missile_system.cpp:309, 484-513, 527</code>, <code>missile_collision.h:288</code>",
+			"<code>advance_penetrations</code> zatrzymuje walk na pierwszej postaci; ściany za nią płacone dopiero w następnym stepie. Exit check widzi czubek już za ścianą B → <code>during_penetration = false</code>. Kontakt z postacią dopiero w <code>detonate_colliding_missiles</code>. Jeśli ofiara zginie / to trup, pocisk leci dalej. Ściana B: bez kosztu, bez damage, bez decala; jej kontakt odrzucony jako \"penetrating artifact\".",
+			"Nie kończyć penetracji gdy walk był ucięty: <code>if (!character_cut.has_value() &amp;&amp; !any_intersection) { missile.during_penetration = false; ... }</code>."],
+		["lag", "Seedy decali zależą od stepu (i id missile'a)",
+			"<code>missile_collision.h:53-57</code>; <code>melee_system.cpp:422</code>; <code>standard_explosion.cpp:236</code>, <code>spawn_decals.hpp:797</code>",
+			"Strzały: <code>get_rng_seed_for(typed_missile)</code> = indirection index + total steps. Predicted pociski mają inne id, jitter przesuwa step → predicted ślady prawie nigdy nie pasują do serwera, popują przy korekcie. I zmieniają predicted głębokość penetracji (fatigue czyta decale). Melee: <code>get_rng_for(subject_id)</code>. Eksplozje: scorch i pierwszy ślad na szkle z tym samym seedem; przy martwym cause seed = sam step.",
+			"Przy wystrzale: <code>rng_seed = hash(get_nontemporal_rng_seed_for(gun), shot counter)</code> w <code>components::missile</code> (jak <code>num_ejected_shells</code>) + licznik trafień per missile; mix seed + counter + surface + fixture. Melee: nontemporal atakującego + licznik zamachów. Eksplozje: nontemporal eksplodującego + salt per użycie, fallback hash pozycji."],
+		["decision", "Muśnięcie zużywa jedyną szansę na rykoszet w stepie",
+			"<code>missile_ricochet.h:42-64</code>",
+			"<code>when_last_ricochet_considered = now</code> stemplowane przed odrzuceniem po prędkości i <code>impact_dot_normal &gt;= 0</code>. Kontakt, od którego pocisk się oddala (sąsiedni tile), może przyjść pierwszy; prawdziwe trafienie nie zrykoszetuje. <b>Ale</b> komentarz nad tym mówi celowo \"only the first contact of a step can be a ricochet\" – późniejsze kontakty mają velocity zmienione przez solver.",
+			"Twoja decyzja: czy kontakt oddalający się liczy się jako \"pierwszy\". Jeśli nie – przenieść stempel pod facing check."],
+		["perf", "Budżet głębokości decala raycastuje 10000 px, lookup O(n²)",
+			"<code>missile_collision.h:67-73</code>, <code>penetration_path.h:78-87</code>, <code>calc_laser_path.h:84</code>",
+			"Dwa pełne raycasty na <code>PENETRATION_PATH_MAX_RANGE_PX</code>, choć liczy się bieżący run ścian. <code>find_or_add</code> liniowo per wynik. Laser celownika płaci to co klatkę.",
+			"Zasięg = max reach pocisku <code>(remaining + calc_remaining_fatigue_gift(...)) * max penetrability</code>; lookup po wskaźniku fixture'a w małym posortowanym vectorze."],
+		["lag", "Wyniki zależą od kolejności spatial query (latentny desync)",
+			"<code>spawn_decals.hpp:239, 280-304, 394, 416</code>; <code>missile_system.cpp:317-344</code>, <code>penetration_path.h:119-123</code>",
+			"<code>gather_nearby_decals</code> ucina na 64 w kolejności npo-tree; <code>gather_wall_fixtures</code> na 32; <code>find_wall_fixture_at</code> bierze pierwszy (na szwie TestPoint trafia 2 fixture'y → <code>attached_to</code>, <code>spawned_by</code>, fatigue). Tie-break po <code>indirection_index</code> bez <code>type_id</code>. Predicted kosmos z przebudowanym drzewem może się różnić od referential.",
+			"Sortować zebrane decale i fixture'y po (type_id, indirection_index, index_in_component) przed ucięciem/first-match; dodać <code>type_id</code> do tie-breaków."],
+		["perf", "Hard limit kasuje tylko 1 decal na kategorię na step",
+			"<code>decal_system.cpp:271-288</code>",
+			"Salwa ze shotguna przez ściany albo blast (do 4 śladów na szybę) dodaje kilka na step → licznik przekracza <code>HARD_LIMIT_DECALS</code>, spływa dopiero potem. Decale to pełne encje logiczne, do 1800 – uzasadnione przez fatigue, ale koszt snapshotu i kopii kosmosu.",
+			"Kasować <code>total - HARD_LIMIT</code> najstarszych naraz (zbierać (born step, id), <code>nth_element</code>)."],
+		["quality", "Kurczące się decale liczą się w pełnym rozmiarze",
+			"<code>penetration_fatigue.h:136</code>, <code>spawn_decals.hpp:247</code>",
+			"<code>get_decal_size</code> ignoruje <code>components::decal::last_size_mult</code> → decal do usunięcia dalej męczy ścianę i blokuje stackowanie.",
+			"Mnożyć przez <code>last_size_mult</code> albo pomijać <code>marked_for_deletion</code>."],
+		["quality", "Plumbing: zachowanie decali eksplozji zahardkodowane po typie",
+			"<code>standard_explosion.cpp:149-170, 218</code>",
+			"Scorch tylko dla FORCE i FLASH, flash ze stałym <code>FLASH_EXPLOSION_DECAL_SIZE_MULT</code>, ślady na powierzchniach tylko FORCE.",
+			"Pola na <code>standard_explosion_input</code> (<code>ground_decal_size_mult</code>, <code>leaves_surface_decals</code>); opcjonalnie warianty ground per eksplozja zamiast <code>common_assets</code>."],
+		["quality", "Dedup",
+			"<code>missile_collision.h:130-147</code> vs <code>:338-368</code>; <code>missile_collision.h:268-279</code> vs <code>calc_laser_path.h</code>; <code>can_weapon_penetrate.hpp:100-190</code>; <code>spawn_decals.hpp</code>",
+			"Damage message budowany 2×. Maska WALL | GLASS_OBSTACLE 2×. <code>can_weapon_penetrate.hpp</code> reimplementuje walk bez sortowania po dystansie i bez szwów, z alokacją vectora per call, a komentarz twierdzi \"same logic\". <code>gather_nearby_decals</code> i <code>calc_decal_coverage_mask</code> dzielą ten sam kod.",
+			"<code>make_missile_damage_msg(...)</code>; <code>is_penetrable_wall(filter)</code>; przepisać na <code>gather_penetration_obstacles</code> + <code>walk_penetration_obstacles</code> jak laser; mały helper."],
+		["nit", "Komentarze",
+			"<code>missile_system.cpp:405</code>, <code>spawn_decals.hpp:597-598</code>",
+			"\"One bullet never hits the same entity twice\" nieprawda (A→B→A trafia A ponownie). Podwójna pusta linia.",
+			"\"...twice consecutively\"; usunąć linię."],
+		["nit", "Hardening crash",
+			"<code>spawn_decals.hpp:131-133, 490</code>",
+			"<code>to_decal_sprite_size</code> przepuszcza NaN przez <code>std::clamp</code> → UB przy cast do int (<code>size_mult &lt;= 0.f</code> nie łapie NaN). Brak guard <code>surface_handle.dead()</code> przed <code>calc_physical_material</code>.",
+			"<code>if (!(side &gt;= 1.f)) { return 1; }</code>; tani guard."]
+	]
+},
+{
+	id: "shells", name: "Łuski / itemy o ziemię",
+	clean: "Seed łusek poprawny: hash(nontemporal gun seed, num_ejected_shells++) w gun_system.cpp:217-227; floor hity z make_floor_hit_rng, kopnięcia hash(seed, num_kicks++). Czyste: komentarze, web, crash poza nitami, stan łusek w logice uzasadniony.",
+	items: [
+		["lag", "Magazynki mieszają dwa seedy",
+			"<code>cosmos_global_solvable.cpp:205-213</code>, <code>item_system.cpp:1565</code>",
+			"Pierwszy hop z gun-based <code>magazine_seed</code>, ale <code>advance_falling_items</code> liczy seed od nowa jako <code>calc_fall_seed(item seed, when_started_falling.step)</code> → spin, push, pitch każdego kolejnego hitu zależą od stepu. Komentarz \"decided as soon as the gun exists\" nieprawdziwy po pierwszym hopie.",
+			"<code>rng_seed_type seed</code> w <code>item_fall_state</code> (mieści się w paddingu), ustawiany w <code>start_falling</code>; używać <code>fall.seed</code>."],
+		["lag", "Rzucone granaty i upuszczone itemy seedowane stepem",
+			"<code>hand_fuse_logic.h:342</code>, <code>item_falling.h:182-184, 320</code>, <code>item_system.cpp:918-923</code>",
+			"<code>calc_fall_seed(..., clk.now)</code> losuje długości hopów (<code>EXPLOSIVE_HOP_DURATION_VARIATION</code>) → timing spinu (logika) i dźwięków. Rzut spóźniony o step = inne hopy. Komentarz <code>item_falling.h:32-33</code> \"regardless of lag\" nieprawdziwy.",
+			"<code>hash(item nontemporal seed, num_falls)</code>, licznik <code>uint16 num_falls</code> w <code>components::item</code> inkrementowany w <code>start_falling</code>. To samo dla upuszczonych (tam tylko pitch, ale jedna reguła wszędzie)."],
+		["quality", "Seed magazynka = seed następnej łuski",
+			"<code>cosmos_global_solvable.cpp:207</code> vs <code>gun_system.cpp:224-227</code>",
+			"<code>hash(gun_seed, num_ejected_shells)</code> to dokładnie seed następnej wyrzuconej łuski → te same rolle hit-0. Dwa reloady bez strzału = identyczne spadki.",
+			"Salt: <code>hash(gun_seed, num_ejected_shells, MAGAZINE_FALL_SALT)</code> albo licznik <code>num_unmounted_magazines</code>."],
+		["bug", "Kontakt łuska–item sprawdza złą encję",
+			"<code>contact_listener.cpp:377-378</code>",
+			"<code>collider.find&lt;components::item&gt;()</code> = encja fixture'a; dla lecącej broni to może być jej magazynek, który nigdy nie jest \"in the air\" → magazynek lecącej broni dotyka łusek przed pierwszym hitem. Blok niżej (<code>:431-441</code>) robi to dobrze przez <code>collider_owner_body</code>.",
+			"<code>collider_owner_body.find&lt;components::item&gt;()</code> dla <code>item_in_the_air</code>."],
+		["bug", "SHELL_ROLLING_BELOW_HOP_HEIGHT = 100.6f – literówka 0.6? (potwierdzone)",
+			"<code>shell_params.h:59</code>, <code>remnant_system.cpp:149</code>",
+			"Wysokości łusek max 6 (<code>{3,6}</code>, pro90 <code>{1.5,3}</code>). Od pierwszego commitu łusek 100.6 → każdy nie-ostatni hit toczącej się łuski idzie w boczny low-hop roll, <code>push_on_shell_floor_hit</code> nigdy dla toczących się. Komentarz <code>shell_params.h:17</code> opisuje zachowanie, które nie zachodzi. 0.6 = <code>SHELL_LOW_HOP_ROLL_AT_HEIGHT</code>.",
+			"Jeśli celowe: usunąć stałą i martwą gałąź, poprawić komentarz. Jeśli nie: ~0.6."],
+		["quality", "shell_params.h w gun_component.h → rekompilacja całej gry",
+			"<code>gun_component.h:22</code>",
+			"<code>gun_component.h</code> idzie do <code>all_component_includes.h</code>. Header miesza logikę, dźwięk (<code>SHELL_SOUNDS_*</code>) i rendering (<code>SHELL_SHADOW_*</code>, <code>RAISE_SHELLS_ABOVE_SHADOWS</code>).",
+			"Literalne defaulty spinu w <code>gun_component.h</code> albo mały <code>shell_spin_defaults.h</code>; dźwięki do <code>sound_system.cpp</code>, rendering do <code>falling_item_offsets.h</code>."],
+		["quality", "Plumbing: powiększenie na ziemi przez zahardkodowane type checki",
+			"<code>item_falling.h:576-626</code>",
+			"<code>is_enlarged_on_the_ground</code>: kategoria MAGAZINE, <code>num_rounds_spawned &gt; 1</code> jako proxy shotgun shells, hand_fuse nie-plantable. <code>has_enlarged_body_on_the_ground</code> wyklucza <code>invariants::hand_fuse</code> (\"grenades only visually\"). Jedna stała <code>GROUND_ITEM_SCALE</code>. (pro90 <code>shell_height</code> i <code>unmounted_magazine_velocity_mult</code> są OK.)",
+			"<code>real32 ground_scale = 1.f; bool ground_scale_affects_body = true;</code> w <code>invariants::item</code>, ustawiane w test_scenes."],
+		["desync", "std::sqrt w logice (niskie ryzyko)",
+			"<code>item_falling.h:355, 383, 387, 443, 477</code>",
+			"Jedyny plik w <code>game/</code> z <code>std::sqrt</code> (hopy, impulsy spinu, prędkości toczenia). Correctly rounded, ale łamie konwencję streflop.",
+			"<code>repro::sqrt</code>. <code>std::pow</code> na <code>:156</code> tylko w nieużywanej krzywej."],
+		["perf", "Powiększane itemy w powietrzu przebudowują collidery co step",
+			"<code>item_system.cpp:1552-1558</code>",
+			"<code>infer_colliders_from_scratch()</code> co step przy <code>is_in_the_air()</code>, nawet po osiągnięciu skali 1 (<code>top_t</code> 0.5) → ~30 przebudów per unmount.",
+			"Tylko gdy skala się zmienia (porównanie z poprzednim stepem, albo <code>t &lt;= top_t</code> + jedna końcowa)."],
+		["perf", "Łuski jako significant encje Box2D",
+			"<code>MAX_KEPT_REMNANTS</code>, <code>contact_listener.cpp:402</code>",
+			"Do 400 łusek (limit 600) w stanie significant – puchnie stream solvable dla dołączających i koszt resymulacji przy rollbacku. Muszą być logiką dopóki itemy i skrzynie się od nich odbijają.",
+			"Jeśli ta interakcja niekonieczna: kontakty z itemami sensor-only → łuski czysto AV poza kosmosem. Minimum: pilnować limitu vs rozmiar snapshotu."],
+		["perf", "Próg low ammo skanuje wszystkie flavoury broni per magazynek per klatkę",
+			"<code>low_ammo_magazine.h:22-38</code>, <code>enqueue_illuminated_rendering_jobs.hpp:671</code>",
+			"Dwie bronie z tym samym magazynkiem – wygrywa ostatnia.",
+			"<code>low_ammo_threshold</code> w <code>invariants::item</code> magazynka przy populacji test scenes, albo cache per flavour."],
+		["quality", "Dedup",
+			"<code>item_system.cpp:1568-1596</code> vs <code>remnant_system.cpp:118-132, 154</code>; <code>item_system.cpp:1650-1658</code>; <code>remnant_system.cpp:63</code> vs <code>item_falling.h:417</code>; <code>contact_listener.cpp:396-397, 407-410</code>; <code>enqueue_illuminated_rendering_jobs.hpp:624-631</code> vs <code>falling_item_offsets.h:123-130</code>; <code>item_system.cpp:371-386</code> vs <code>low_ammo_magazine.h:59-61</code>",
+			"Floor hit magazynka = floor hit łuski. Push = <code>push_on_shell_floor_hit</code> ze stałą prędkością. Rzut monetą ±1 2×. Kierunek \"away\" z fallbackiem (1,0) 2×. Szukanie fall itemu 2×. Reguła low ammo 2×.",
+			"<code>shell_like_floor_hit(...)</code>, <code>push_along_motion(body, speed)</code>, <code>random_sign(rng)</code>, lambda away, <code>find_item_fall(typed_item)</code>, jeden predykat."],
+		["quality", "Martwy kod",
+			"<code>item_falling.h:117-166</code>, <code>falling_item_offsets.h:23</code>",
+			"<code>hop_curve_type</code> z 5 krzywymi + <code>HOP_CURVE_EXPONENT</code>, używana tylko PARABOLA. <code>RAISE_THROWN_EXPLOSIVES_ABOVE_SHADOWS = false</code>, <code>SILENCE_LAST_ITEM_FLOOR_HIT</code> – compile-time toggle z nigdy niebraną gałęzią.",
+			"Zostawić jedną krzywą, usunąć toggle."],
+		["lag", "Przewidywalność dźwięku toczenia (niskie)",
+			"<code>remnant_system.cpp:60</code>",
+			"Roll sound pod <code>always_predictable_v</code>, a kopnięcia zdalnych postaci często mispredicted → fałszywe/podwójne dźwięki. Floor hity OK (znane przy wyrzucie).",
+			"Zapisać kickera w remnancie, <code>predictable_only_by(kicker)</code>."],
+		["nit", "Drobiazgi",
+			"<code>enqueue_illuminated_rendering_jobs.hpp:644, 653</code>, <code>remnant_system.cpp:177</code>, <code>start_shell_falling</code>, <code>guns.cpp:3912</code>",
+			"<code>flash_secs = 0.5</code> magic number; <code>return remaining ;</code>; dzielenie przez <code>start_shrinking_when_remaining_ms</code> (0 → inf/NaN); ujemny <code>shell_height</code> → NaN angular velocity; pusta linia z commitu pro90.",
+			"Nazwana stała; spacja; guard; clamp ≥ 0; usunąć linię."],
+		["nit", "Settings UI: slidery łusek wśród ogólnych dźwięków",
+			"<code>settings_gui.cpp:1067-1069</code>",
+			"Trzy slidery łusek wymieszane z generycznymi.",
+			"Tree node \"Shell sounds\"."]
+	]
+},
+{
+	id: "hud", name: "Pasek tutorialu / healthbary",
+	clean: "Czyste: determinizm, lag-robust RNG (wszystko AV, test scene lokalny), web. Logika vs AV OK: postęp tutorialu (visited_tip_portals) w setupie, nie w kosmosie; stage_block_height z opóźnieniem jednej klatki – nieszkodliwe. Małe healthbary w draw_sentiences_hud.cpp to osobny system.",
+	items: [
+		["perf", "Cząsteczki odtwarzają cały czas kosmosu przy pierwszym rysowaniu (regresja)",
+			"<code>hud_bar_drawing.h:142, 273-298</code>",
+			"<code>last_advance_secs</code> startuje od 0.0, pętla 15 Hz do <code>total_secs</code>. Klient dołączający przy zegarze 1800 s: ~27k iteracji × ~45 cząsteczek per bar, dla każdego value bara, money bara i każdego <code>character_gui</code>. Forward seek dema tak samo. Guard tylko na cofanie czasu. Stary value bar akumulował <code>dt</code> (regresja z <code>bfe33a880</code>).",
+			"Gdy cząsteczki świeżo zespawnowane albo <code>total_secs - last_advance_secs &gt; 0.25</code>: <code>last_advance_secs = total_secs</code> zamiast doganiać."],
+		["crash", "Modulo przez 0 na zerowym / malutkim barze",
+			"<code>hud_bar_drawing.h:256, 266, 293-294</code>, layout <code>:427-444</code>",
+			"Malutki rect → ujemne szerokości segmentów → ujemny <code>total_inner_w</code>. Np. 0-width ekran, 3 splity: segment -2, inner -8, total -24 → <code>field_size.x + 12 == 0</code> → SIGFPE. <code>randval</code> dostaje odwrócony zakres.",
+			"Early return w <code>draw_hud_bar</code> gdy rect mniejszy niż ramki + 1 px; w <code>advance_hud_bar_particles</code> return gdy <code>field_size.x &lt;= 0 || field_size.y &lt;= 0</code>."],
+		["quality", "Dedup: wszystkie 4 call site'y ręcznie podają ten sam kontekst",
+			"<code>value_bar.cpp:193-204</code>, <code>arena_mode_gui.cpp:1001-1012</code>, <code>test_scene_setup.cpp:1599-1611, 1631-1652</code>",
+			"11 tych samych argumentów (output, necessary_images, total_secs, highlight_base_secs, font, 3 osobne wskaźniki stanu). Range test bar powtarza lambdę <code>draw_bar</code> tutorialu.",
+			"<code>hud_bar_draw_input { output, necessary_images, total_secs, highlight_base_secs, font }</code> + <code>hud_bar_state { highlight, particles, label_particles }</code> zamiast 3 luźnych membersów (<code>test_scene_setup.h:128-139</code>, <code>arena_mode_gui.h:43-44</code>, <code>value_bar.h:20-21</code>). Call: <code>draw_hud_bar(in, state, appearance, rect, ratio)</code>."],
+		["quality", "Plumbing: \"flash whole bar when full\" to hack w callerze",
+			"<code>test_scene_setup.cpp:1683-1691, 1680, 1741, 1528, 1543, 1681, 1804</code>",
+			"Caller pisze <code>bottom_bar_highlight.last_ratio = 0.0f</code> żeby udać wzrost od zera. Złoto <code>rgba(183, 140, 22, 255)</code> 2×, zielenie/ciemne kilka razy. Label stage'a używa <code>money_bar_color</code> (255,190,0), a stage bar przygaszonego złota – nie pasują.",
+			"<code>bool flash_whole_on_full</code> w <code>hud_bar_appearance</code>, obsługa w <code>update_hud_bar_highlight</code>. Nazwane <code>constexpr rgba</code> obok <code>tutorial_*_bar_h_v</code>, jedno złoto."],
+		["quality", "Header hygiene: 1040-liniowy inline header w 29 TU",
+			"<code>hud_bar_drawing.h</code>; includowany z <code>value_bar.h:8</code>, <code>arena_mode_gui.h:18</code>, <code>test_scene_setup.h:7</code>",
+			"Pełna implementacja + tweak constants (<code>:31, 37, 43, 46</code>), ciągnie <code>printer.h</code>, <code>drawing.hpp</code>, <code>necessary_resources.h</code>. <code>ninja -t deps</code>: 29 TU (m.in. <code>work.cpp</code>, edytor, client/server setup). Tylko 4 wołają <code>draw_hud_bar</code>.",
+			"Split: <code>hud_bar_state.h</code> (struktury stanu i appearance), funkcje + stałe do <code>hud_bar_drawing.cpp</code>."],
+		["quality", "Martwy kod",
+			"<code>hud_bar_drawing.h:73-78, 450-467, 626, 655-661, 674-676, 991-997</code>; <code>value_bar.cpp:172-173</code>; <code>test_scene_setup.cpp:57, 1060-1076, 1584-1616</code>, <code>test_scene_setup.h:141-145</code>",
+			"Pola appearance nigdy nieustawiane: <code>trisplit</code>, <code>label_border_shows_value</code>, <code>fill_edge_outline</code>, <code>black_frame</code>, <code>dark_background</code>, <code>label_color</code>. Toggle <code>bar_increase_highlight_affects_border_v</code> i <code>bar_increase_highlight_only_added_part_v</code> z martwymi gałęziami. <code>label_inner_outline_shows_value == true</code> nieosiągalne. Zakomentowany kod. <code>TEST_EXP_BAR_IN_RANGE</code> wyłączony debug toggle.",
+			"Usunąć i wbudować wybrane zachowanie. <code>TEST_EXP_BAR_IN_RANGE</code> + <code>range_test_bar_ratio</code> – zostawić jeśli potrzebne, inaczej wyrzucić."],
+		["quality", "Powtórzony kod w draw_hud_bar",
+			"<code>hud_bar_drawing.h:587-601</code> vs <code>771-792</code>; <code>647-679</code> vs <code>983-1001</code>; <code>380-390</code> vs <code>693-705, 724</code>; <code>378, 737, 1017</code>; <code>376, 722</code>; <code>871, 882</code>; <code>test_scene_setup.cpp:1548, 1667</code>",
+			"<code>open_frame</code> = <code>frame_sides</code> bez prawej linii. Pętla flash 2× (z przeliczaniem <code>highlight_secs</code>). Formuła szerokości backdropu 2× – rozjedzie się. <code>bar_outer_r</code> 3×, bbox najszerszego tekstu 2×. Obie gałęzie <code>label_inner_outline_shows_value</code> zaczynają się tym samym. Komentarz \"Stretched over the whole screen's width\" 2×.",
+			"Jeden helper z flagą <code>draw_right</code>; lambda <code>flash_alpha(flash)</code>; jedna formuła; cache wartości."],
+		["perf", "Minor perf + wizualny nit",
+			"<code>test_scene_setup.cpp:1657-1663, 886-887, 1675, 1767</code>; <code>hud_bar_drawing.h:280</code>",
+			"Hashowanie stringów co klatkę do liczenia odwiedzonych portali – to po prostu <code>visited_tip_portals.size()</code>. mt19937 per bar per klatkę seedowany tylko <code>total_secs</code> → cząsteczki wszystkich barów w lockstepie (stary kod dodawał <code>vertical_index</code>). Splity cap 20 → &gt;20 portali cicho przestaje być 1 segment per portal.",
+			"<code>.size()</code>; rng w stanie cząsteczek; podnieść / udokumentować cap."],
+		["quality", "Komentarze",
+			"<code>value_bar.cpp:218-221, 373-376</code>; <code>hud_bar_drawing.h:21-25, 69-71, 146-149, 197, 700</code>; <code>test_scene_setup.cpp:1527</code>",
+			"Nieaktualne: label \"centered over the bar\" (teraz right-aligned i skraca bar); \"centered label backdrops\" (nie istnieją); lista użytkowników bez value barów. Historia: \"like the value bars originally did\", \"The original behavior\", \"as with the original 1px border\", \"less garish than the pure rgba one\". Blok na <code>hud_bar_flash</code> opisuje <code>update_hud_bar_highlight</code>.",
+			"Przepisać na stan obecny i \"dlaczego\"; przenieść blok."],
+		["nit", "Settings UI: \"Draw value on aura bar\"",
+			"<code>settings_gui.cpp:1460-1470</code>, <code>game_drawing_settings.h:261-263</code>",
+			"Wewnętrzny żargon, środek płaskiego nodu HUD między damage indicators a weapon laser. Dotyczy tylko dolnego paska tutorialu.",
+			"Tree node \"Tutorial progress bar\" (\"Show value\" / \"As percentage\" / \"Decimal places\"); opcjonalnie rename pól <code>aura_bar_*</code>."]
+	]
+}
+];
+
+const TOP = [
+	["decals", 0], ["shells", 0], ["shells", 1], ["decals", 1], ["minimap", 0], ["lighting", 0],
+	["shells", 4], ["decals", 4], ["hud", 0], ["lighting", 4], ["lighting", 2], ["lighting", 3]
+];
+
+const DONE_KEY = "hs-audit-done";
+let done = {};
+try { done = JSON.parse(localStorage.getItem(DONE_KEY) || "{}"); } catch (e) {}
+const save_done = () => { try { localStorage.setItem(DONE_KEY, JSON.stringify(done)); } catch (e) {} };
+
+let active = "top";
+let sev_on = Object.fromEntries(SEV.map(s => [s, true]));
+
+const tabs = [{ id: "top", name: "Top", n: TOP.length }].concat(SYSTEMS.map(s => ({ id: s.id, name: s.name, n: s.items.length })));
+
+function render_tabs() {
+	const nav = document.getElementById("tabs");
+	nav.innerHTML = "";
+	for (const t of tabs) {
+		const b = document.createElement("button");
+		b.className = t.id === active ? "on" : "";
+		b.innerHTML = `${t.name}<span class="count">${t.n}</span>`;
+		b.onclick = () => { active = t.id; location.hash = t.id; render(); };
+		nav.appendChild(b);
+	}
+}
+
+function render_filters() {
+	const f = document.getElementById("filters");
+	f.innerHTML = "";
+	for (const s of SEV) {
+		const l = document.createElement("label");
+		l.innerHTML = `<input type="checkbox" ${sev_on[s] ? "checked" : ""}> <span class="badge b-${s}">${SEV_LABEL[s]}</span>`;
+		l.querySelector("input").onchange = e => { sev_on[s] = e.target.checked; render(); };
+		f.appendChild(l);
+	}
+}
+
+function card(sys, idx, show_sys) {
+	const [sev, title, where, problem, fix] = sys.items[idx];
+	const key = `${sys.id}:${idx}`;
+	const d = document.createElement("div");
+	d.className = "item" + (done[key] ? " done" : "");
+	d.innerHTML = `
+		<h3><span class="num">${idx + 1}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
+			${show_sys ? `<span class="sysname">· ${sys.name}</span>` : ""}
+			<input type="checkbox" title="zrobione" ${done[key] ? "checked" : ""}></h3>
+		<dl class="row">
+			<dt>Gdzie</dt><dd>${where}</dd>
+			<dt>Problem</dt><dd>${problem}</dd>
+			<dt>Fix</dt><dd>${fix}</dd>
+		</dl>`;
+	d.querySelector("input").onchange = e => {
+		if (e.target.checked) { done[key] = 1; } else { delete done[key]; }
+		save_done();
+		d.classList.toggle("done", e.target.checked);
+	};
+	return d;
+}
+
+function render() {
+	render_tabs();
+	const list = document.getElementById("list");
+	const clean = document.getElementById("clean");
+	list.innerHTML = "";
+	if (active === "top") {
+		for (const [sid, idx] of TOP) {
+			const sys = SYSTEMS.find(s => s.id === sid);
+			if (sev_on[sys.items[idx][0]]) { list.appendChild(card(sys, idx, true)); }
+		}
+		clean.textContent = "Najgorsze findingi ze wszystkich systemów, od najpoważniejszych. Wspólny fix seed-z-licznika pokrywa lag w łuskach/itemach i decalach (~1–2 h z testem).";
+		return;
+	}
+	const sys = SYSTEMS.find(s => s.id === active);
+	sys.items.forEach((it, i) => { if (sev_on[it[0]]) { list.appendChild(card(sys, i, false)); } });
+	clean.textContent = sys.clean;
+}
+
+const h = location.hash.slice(1);
+if (tabs.some(t => t.id === h)) { active = h; }
+render_filters();
+render();
+</script>
+</body>
+</html>

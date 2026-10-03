@@ -63,6 +63,20 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
 
 ## Report format
 
-Per checklist point: findings with `file:line`, severity (crash / desync / lag-quality / perf / quality / nit),
-and a concrete fix. Skip points with nothing to report, but list them in one line as "clean".
-Rank the most severe findings first.
+Per checklist point: findings with `file:line`, severity, a concrete problem and a concrete fix.
+Skip points with nothing to report, but list them in one line as "clean". Rank the most severe findings first.
+
+**The final report is an HTML page, in exactly the format of `report_template.html` next to this file** -
+a real report from 2026-09-30, kept as the example. Copy it, keep its CSS and script, and replace only the data:
+
+- `SYSTEMS` - one entry per audited system, one tab each: `{ id, name, clean, items }`.
+  `clean` is the one line listing the checklist points with nothing to report.
+  Every item is `[severity, title, where, problem, fix]` - `where` lists `file:line` in `<code>`,
+  severity is one of `crash`, `desync`, `lag`, `bug`, `perf`, `quality`, `nit`, `decision`
+  (`decision` for what the user has to settle, e.g. intended behavior vs a bug).
+- `TOP` - `[system id, item index]` pairs of the worst findings across all systems, most severe first, shown in the first tab.
+- The page title, the header line (date, checklist path) and the `DONE_KEY` of localStorage - a new key per audit.
+
+Write it in the user's language. Save it to `~/Downloads/audit-<topic>.html` and open it in Firefox
+(`firefox <path> &`). The page has severity filters and per-finding "done" checkboxes kept in the browser.
+Then summarize the worst findings in the chat as well.
