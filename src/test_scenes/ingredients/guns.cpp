@@ -1100,8 +1100,9 @@ namespace test_flavours {
 				The extra 1.2 compensates for the spawn jitter widening the line trail.
 			*/
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white).size *= 1.2f * 14.4f / 11.f;
-			meta.get<invariants::sprite>().neon_color.a = 100;
-			meta.get<invariants::sprite>().neon_extension_mult = 3.f;
+
+			meta.get<invariants::sprite>().neon_color = rgba(255, 200, 255, 120);
+			meta.get<invariants::sprite>().neon_extension_mult = 2.f;
 
 			{
 				{
@@ -1130,7 +1131,13 @@ namespace test_flavours {
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DEAGLE_ROUND_TRACE);
-			missile.trace_particles.modifier.color = bullet_gold_neon;
+
+			/*
+				Orange rather than gold, to match the line trail that colorizes from gold to orange.
+				The line trail itself ignores the modifier.
+			*/
+
+			missile.trace_particles.modifier.color = rgba(255, 160, 50, 255);
 			missile.trace_particles.modifier.scale_amounts = 35.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.4f;
 
@@ -4358,7 +4365,7 @@ namespace test_flavours {
 			gun_def.muzzle_cast_shadow = false;
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {4900.f, 4900.f};
+			gun_def.muzzle_velocity = {5600.f, 5600.f};
 			gun_def.shot_cooldown_ms = 122.f;
 
 			gun_def.shell_spread_degrees = 20.f;
@@ -4403,7 +4410,7 @@ namespace test_flavours {
 			gun_def.muzzle_light_radius *= small_pistol_light_mult;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {4900.f, 4900.f};
+			gun_def.muzzle_velocity = {5600.f, 5600.f};
 			gun_def.shot_cooldown_ms = 111.f;
 
 			gun_def.shell_spread_degrees = 12.f;
