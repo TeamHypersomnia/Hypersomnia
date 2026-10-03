@@ -192,9 +192,10 @@ predefined_filters::predefined_filters() {
 	}
 	{
 
+		/* Thrown grenades pass through bullets, so that they can't be shot away mid-flight. */
 		auto& out = filters[predefined_filter_type::FLYING_EXPLOSIVE];
 		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
-		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::CHARACTER, C::CHARACTER_WEAPON);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::CHARACTER, C::CHARACTER_WEAPON, C::FLYING_BULLET);
 	}
 	{
 		auto& out = filters[predefined_filter_type::FLYING_MELEE];
