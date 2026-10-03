@@ -684,7 +684,7 @@ public:
 		}
 
 		if (is_playtesting()) {
-			global_time_seconds = scene.world.get_total_seconds_passed(get_interpolation_ratio());
+			global_time_seconds = scene.world.get_clock().get_real_seconds_passed(get_interpolation_ratio());
 		}
 
 		(void)in;

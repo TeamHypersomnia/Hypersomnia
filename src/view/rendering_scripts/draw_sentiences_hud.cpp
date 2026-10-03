@@ -319,7 +319,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 							const auto single_pulse_cycle_ms = static_cast<int>(1250 - 1000 * (1 - out.ratio));
 
 							if (single_pulse_cycle_ms > 0) {
-								const auto global_time_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
+								const auto global_time_ms = static_cast<unsigned>(in.real_global_time_seconds * 1000);
 								const float time_pulse_ratio = (global_time_ms % single_pulse_cycle_ms) / static_cast<float>(single_pulse_cycle_ms);
 
 								out.color = sentience.calc_health_color(time_pulse_ratio);

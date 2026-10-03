@@ -385,7 +385,7 @@ static void draw_minimap_impl(const draw_minimap_input in) {
 
 		const auto dir = line_vector / line_length;
 
-		auto dash_end = std::min(static_cast<float>(std::fmod(in.global_time_seconds * dash_velocity, dash_length * 2)), line_length);
+		auto dash_end = std::min(static_cast<float>(std::fmod(in.real_global_time_seconds * dash_velocity, dash_length * 2)), line_length);
 		auto dash_begin = std::max(dash_end - dash_length, 0.0f);
 
 		while (dash_begin < line_length) {

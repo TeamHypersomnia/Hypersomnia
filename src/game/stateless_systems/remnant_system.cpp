@@ -144,7 +144,11 @@ void remnant_system::advance_falling_remnants(const logic_step step) const {
 void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 
-	const auto& clk = cosm.get_clock();
+	/*
+		Remnants are decorative, so they last as long regardless of logic speed.
+	*/
+
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	std::size_t num_kept = 0;
 	std::size_t num_kept_not_evicted = 0;

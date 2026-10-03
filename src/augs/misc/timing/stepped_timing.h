@@ -93,8 +93,8 @@ namespace augs {
 			return (now - lesser.now).in_seconds(get_real_dt());
 		}
 
-		double get_real_seconds_passed() const {
-			return now.step * get_real_dt().in_seconds<double>();
+		double get_real_seconds_passed(const double interpolation_ratio = 0.0) const {
+			return (now.step + interpolation_ratio) * get_real_dt().in_seconds<double>();
 		}
 
 		bool was_set() const {

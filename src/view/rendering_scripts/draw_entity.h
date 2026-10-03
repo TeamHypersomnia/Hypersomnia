@@ -116,7 +116,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			}
 
 			result.renderable_transform = viewing_transform;
-			result.global_time_seconds = in.global_time_seconds;
+			result.global_time_seconds = in.real_global_time_seconds;
 
 			if constexpr(H::template has<components::missile>()) {
 				/*
@@ -333,7 +333,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				constexpr int FRESHNESS_NUM_STEPS = 20;
 				constexpr real32 FRESHNESS_MIN_COLORIZE = 0.3f;
 
-				const auto now_secs = static_cast<real32>(typed_handle.get_cosmos().get_total_seconds_passed());
+				const auto now_secs = static_cast<real32>(typed_handle.get_cosmos().get_clock().get_real_seconds_passed());
 				const auto elapsed_secs = now_secs - melee_comp.gore_freshness;
 				const auto freshness_step = std::min(static_cast<int>(elapsed_secs / FRESHNESS_STEP_SECS), FRESHNESS_NUM_STEPS);
 				const auto progress = static_cast<real32>(freshness_step) / static_cast<real32>(FRESHNESS_NUM_STEPS);

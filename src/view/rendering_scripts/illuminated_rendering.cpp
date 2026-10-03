@@ -78,6 +78,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& damage_indication = av.get<damage_indication_system>();
 	const auto& highlights = av.get<pure_color_highlight_system>();
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
+	const auto real_global_time_seconds = cosm.get_clock().get_real_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
 
@@ -174,6 +175,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				get_drawer(), 
 				game_images, 
 				global_time_seconds,
+				real_global_time_seconds,
 				flip_flags(),
 				av.randomizing,
 				queried_cone,
@@ -601,7 +603,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			draw_crosshair_lasers({
 				in_screen_space(with_border(line_output_wrapper { get_line_drawer(), laser })),
-				in_screen_space(with_border(dashed_line_output_wrapper { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds })),
+				in_screen_space(with_border(dashed_line_output_wrapper { get_line_drawer(), laser, 10.f, 40.f, real_global_time_seconds })),
 				in_screen_space(as_stitches(with_border(line_output_wrapper { get_line_drawer(), laser }))),
 				interp,
 				viewed_character,

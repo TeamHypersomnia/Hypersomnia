@@ -26,7 +26,12 @@
 
 void particles_existence_system::displace_streams(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
-	const auto& clk = cosm.get_clock();
+
+	/*
+		Audiovisual, so it wanders at the same pace regardless of logic speed.
+	*/
+
+	const auto clk = cosm.get_clock().get_real_clock();
 
 	auto& step_rng = step.step_rng;
 

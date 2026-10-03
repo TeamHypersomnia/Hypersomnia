@@ -21,7 +21,12 @@
 
 void animation_system::advance_stateful_animations(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
-	const auto delta = step.get_delta();
+
+	/*
+		Animations play at the same pace regardless of logic speed.
+	*/
+
+	const auto delta = step.get_real_delta();
 
 	const auto& logicals = cosm.get_logical_assets();
 
@@ -53,7 +58,7 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 }
 
 void animation_system::dry_advance_stateful_animations(cosmos& cosm) const {
-	const auto delta = cosm.get_fixed_delta();
+	const auto delta = cosm.get_clock().get_real_dt();
 	const auto& logicals = cosm.get_logical_assets();
 
 	cosm.for_each_having<components::animation>(

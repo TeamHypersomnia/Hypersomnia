@@ -11,6 +11,10 @@ struct specific_draw_input {
 	const augs::drawer drawer;
 	const images_in_atlas_map& manager;
 	const double global_time_seconds;
+	/*
+		For effects which play at the same pace regardless of logic speed.
+	*/
+	const double real_global_time_seconds;
 	const flip_flags flip;
 	const randomizing_system& randomizing;
 	const camera_cone cone;

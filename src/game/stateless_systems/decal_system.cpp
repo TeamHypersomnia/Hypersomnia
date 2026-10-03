@@ -68,7 +68,11 @@ void decal_system::limit_decal_count(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 
 	const auto& clk = cosm.get_clock();
-	const auto now_secs = cosm.get_total_seconds_passed();
+	/*
+		Freshness fades in real time, like the other audiovisual effects.
+	*/
+
+	const auto now_secs = cosm.get_clock().get_real_seconds_passed();
 
 	std::array<std::size_t, NUM_DECAL_CATEGORIES> unmarked_count = {};
 	std::array<std::size_t, NUM_DECAL_CATEGORIES> marked_count = {};

@@ -68,7 +68,7 @@ struct draw_sentiences_hud_input {
 	const damage_indication_system& damage_indication_sys;
 	const damage_indication_settings& damage_indication_settings;
 
-	const double global_time_seconds;
+	const double real_global_time_seconds;
 
 	const augs::baked_font& gui_font;
 

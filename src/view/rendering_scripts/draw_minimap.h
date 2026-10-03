@@ -53,7 +53,7 @@ struct draw_minimap_input {
 	const const_entity_handle viewed_character;
 	const interpolation_system& interp;
 	const minimap_sighting_system& sighting;
-	const double global_time_seconds;
+	const double real_global_time_seconds;
 	const vec2 pre_step_crosshair_displacement;
 	const augs::atlas_entry blank_tex;
 	const std::vector<special_indicator>& special_indicators;

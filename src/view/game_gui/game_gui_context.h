@@ -171,6 +171,7 @@ public:
 			output,
 			get_game_images(),
 			0.0,
+			0.0,
 			flip_flags(),
 			base::dependencies.randomizing,
 			camera_cone(get_camera_eye(), this->get_screen_size()),

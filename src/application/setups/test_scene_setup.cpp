@@ -1605,7 +1605,7 @@ void test_scene_setup::draw_range_test_bar(const draw_setup_gui_input& in) {
 	}
 
 	const auto& cosm = scene.world;
-	const auto total_secs = cosm.get_total_seconds_passed(get_interpolation_ratio());
+	const auto total_secs = cosm.get_clock().get_real_seconds_passed(get_interpolation_ratio());
 
 	auto appearance = ::make_aura_bar_appearance();
 	appearance.splits = 20;
@@ -1628,7 +1628,7 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 	}
 
 	const auto& cosm = scene.world;
-	const auto total_secs = cosm.get_total_seconds_passed(get_interpolation_ratio());
+	const auto total_secs = cosm.get_clock().get_real_seconds_passed(get_interpolation_ratio());
 
 	const auto output = in.get_drawer();
 	const auto bar_in = ::make_tutorial_bar_input(in, total_secs);

@@ -154,6 +154,8 @@ void enqueue_illuminated_rendering_jobs(
 	auto& dedicated = in.renderer.dedicated;
 
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
+	const auto real_global_time_seconds = cosm.get_clock().get_real_seconds_passed(in.interpolation_ratio);
+	const auto real_dt_secs = cosm.get_clock().get_real_dt().in_seconds<double>();
 
 	auto get_drawer_for = [&](const D d) {
 		return augs::drawer_with_default { dedicated[d].triangles, necessarys.at(assets::necessary_image_id::BLANK) };
@@ -161,12 +163,13 @@ void enqueue_illuminated_rendering_jobs(
 
 	const bool draw_long_bullet_neons = in.drawing.bullet_trails != bullet_trails_mode::NONE;
 
-	auto make_drawing_input = [get_drawer_for, &game_images, global_time_seconds, &av, &interp, queried_cone, draw_long_bullet_neons](const D d) {
+	auto make_drawing_input = [get_drawer_for, &game_images, global_time_seconds, real_global_time_seconds, &av, &interp, queried_cone, draw_long_bullet_neons](const D d) {
 		return draw_renderable_input { 
 			{
 				get_drawer_for(d), 
 				game_images, 
 				global_time_seconds,
+				real_global_time_seconds,
 				flip_flags(),
 				av.randomizing,
 				queried_cone,
@@ -181,7 +184,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [viewer_is_spectator, draw_enemy_silhouettes, &cosm, considered_fow, streamer_mode, cone, global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [viewer_is_spectator, draw_enemy_silhouettes, &cosm, considered_fow, streamer_mode, cone, real_global_time_seconds, settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		(void)fog_of_war_effective;
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
@@ -267,7 +270,7 @@ void enqueue_illuminated_rendering_jobs(
 			interp,
 			damage_indication,
 			damage_indication_settings,
-			global_time_seconds,
+			real_global_time_seconds,
 			gui_font,
 			requested_meters,
 
@@ -603,6 +606,8 @@ void enqueue_illuminated_rendering_jobs(
 				&visible,
 				&cosm,
 				global_time_seconds,
+				real_global_time_seconds,
+				real_dt_secs,
 				missile_shadow_offset,
 				draw_bullet_shadows = in.drawing.draw_bullet_shadows,
 				pickable_item_to_highlight,
@@ -749,10 +754,10 @@ void enqueue_illuminated_rendering_jobs(
 
 							const auto bounce_secs = [&]() {
 								if (fall != nullptr && fall->when_landed.was_set()) {
-									return global_time_seconds - fall->when_landed.in_seconds(cosm.get_fixed_delta()) - 1.0 / 3.0;
+									return real_global_time_seconds - fall->when_landed.step * real_dt_secs - 1.0 / 3.0;
 								}
 
-								return global_time_seconds + 2.0 * double(typed_item.get_id().raw.indirection_index);
+								return real_global_time_seconds + 2.0 * double(typed_item.get_id().raw.indirection_index);
 							}();
 
 							const auto bounce_progress = static_cast<float>((1.0 + std::sin(1.5 * bounce_secs * PI<double>)) / 2.0);
@@ -977,7 +982,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, global_time_seconds]() {
+	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
 			::specific_draw_neon_map(handle, drawing_in);
 			::draw_character_glow(
@@ -985,13 +990,13 @@ void enqueue_illuminated_rendering_jobs(
 				{
 					drawing_in.drawer,
 					interp,
-					global_time_seconds,
+					real_global_time_seconds,
 					cast_highlight_tex
 				}
 			);
 		};
 
-		const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
+		const auto timestamp_ms = static_cast<unsigned>(real_global_time_seconds * 1000);
 
 		auto standard_border_provider = [timestamp_ms](const auto& typed_handle) {
 			return typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
@@ -1105,7 +1110,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto minimap_job = [minimap_state = in.minimap_state, minimap_area_zoom = in.minimap_area_zoom, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, global_time_seconds, pre_step_crosshair_displacement]() {
+	auto minimap_job = [minimap_state = in.minimap_state, minimap_area_zoom = in.minimap_area_zoom, minimap_transform = in.minimap_transform, bomb_owner = in.indicator_meta.bomb_owner, settings, screen_size, &av, &interp, &dedicated, &necessarys, &special_indicators, viewed_character, real_global_time_seconds, pre_step_crosshair_displacement]() {
 		::draw_minimap({
 			settings.minimap,
 			settings.fog_of_war,
@@ -1115,7 +1120,7 @@ void enqueue_illuminated_rendering_jobs(
 			viewed_character,
 			interp,
 			av.template get<minimap_sighting_system>(),
-			global_time_seconds,
+			real_global_time_seconds,
 			pre_step_crosshair_displacement,
 			necessarys.at(assets::necessary_image_id::BLANK),
 			special_indicators,

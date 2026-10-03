@@ -367,18 +367,18 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		const bool interp_enabled = in.interp.is_enabled();
 		const auto frame_dt_in_steps = in.dt.in_steps_per_second();
 
+		/*
+			In logic units, like the listener's velocity taken from physics.
+		*/
+
 		const auto effective_velocity = [&]() {
 			const auto displacement = current_transform.pos - previous_transform->pos;
 
 			if (interp_enabled) {
-				return displacement * frame_dt_in_steps;
+				return displacement * frame_dt_in_steps / cosm.get_clock().logic_speed;
 			}
 
-			/*
-				Velocity as perceived in real time, regardless of logic speed.
-			*/
-
-			return displacement * static_cast<real32>(cosm.get_clock().tickrate);
+			return displacement / cosm.get_fixed_delta().in_seconds();
 		}();
 
 		previous_transform = current_transform;

@@ -93,7 +93,7 @@ inline void spawn_blood_splatter(
 			const auto random_offset_secs = rng.randval(0.f, 4.f);
 
 			/* Subtract seconds to make it appear older (as if it existed for that time already) */
-			decal_state->freshness = real32(cosm.get_total_seconds_passed()) - random_offset_secs;
+			decal_state->freshness = real32(cosm.get_clock().get_real_seconds_passed()) - random_offset_secs;
 		}
 
 		/* Apply size multiplier through overridden_geo if needed */
