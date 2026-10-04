@@ -9,6 +9,7 @@
 
 #include "augs/misc/scope_guard.h"
 #include "augs/audio/sound_data.h"
+#include "augs/audio/sound_buffer_structs.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"
@@ -113,17 +114,6 @@ namespace augs {
 		else {
 			throw sound_decoding_error("Failed to decode %x as a sound file: unknown extension.", path);
 		}
-
-/*
-	Mono buffers can't play through direct channels, which we use for the sounds
-	of the listener's own character. On desktop, sound_source plays them direct
-	with AL_PANNING_ENABLED_SOFT instead, so mono stays mono: half the memory,
-	and a single HRTF convolution for spatialized sounds instead of two.
-
-	The Web's OpenAL has neither direct channels nor source panning.
-*/
-
-#define MONO_TO_STEREO PLATFORM_WEB
 
 #if MONO_TO_STEREO
 		if (channels == 1) {

@@ -76,7 +76,7 @@ namespace augs {
 		float sound_meters_per_second = 180.f;
 		std::string hrtf_preset = "";
 		bool hrtf_preset_is_user = false;
-		unsigned period_size = 256u;
+		unsigned period_size = 512u;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const audio_settings& b) const = default;

@@ -66,8 +66,10 @@ namespace augs {
 #if !PLATFORM_WEB
 		AL_CHECK(alSourcei(id, AL_SOURCE_RESAMPLER_SOFT, static_cast<std::uint8_t>(Resampler::Spline)));
 
+#if !MONO_TO_STEREO
 		/* Room for get_mono_gain_compensation. */
 		AL_CHECK(alSourcef(id, AL_MAX_GAIN, 2.f));
+#endif
 #endif
 
 		initialized = true;
@@ -224,16 +226,14 @@ namespace augs {
 	}
 
 	/*
-		Before mono buffers stayed mono, every mono file was loaded as stereo
-		with both channels identical. Spatialized, both channels land at the source's position
-		and sum up - twice the amplitude of the same sound in mono.
-
-		Doubling the gain of spatialized mono keeps the loudness exactly as it was,
-		at half the mixing cost.
+		The content is balanced for mono files duplicated to stereo (see MONO_TO_STEREO).
+		Spatialized, both channels land at the source's position and sum up
+		to twice the amplitude of the same sound in mono.
+		Doubling the gain of spatialized mono keeps that loudness at half the mixing cost.
 	*/
 
 	float sound_source::get_mono_gain_compensation() const {
-#if PLATFORM_WEB
+#if MONO_TO_STEREO
 		return 1.f;
 #else
 		const bool spatialized_mono = buffer_meta.channels == 1 && !direct_channels;
@@ -246,7 +246,8 @@ namespace augs {
 	}
 
 	void sound_source::set_gain(const float gain) const {
-		requested_gain = gain;
+		/* AL_MAX_GAIN is raised only for the mono compensation. */
+		requested_gain = std::clamp(gain, 0.f, 1.f);
 		apply_gain();
 #if TRACE_PARAMETERS
 		LOG_NVPS(gain);
@@ -347,7 +348,9 @@ namespace augs {
 			exactly like a stereo buffer with identical channels.
 			Panning is centered by default, and a no-op for stereo buffers.
 		*/
+#if !MONO_TO_STEREO
 		AL_CHECK(alSourcei(id, AL_PANNING_ENABLED_SOFT, flag ? AL_TRUE : AL_FALSE));
+#endif
 
 		if (direct_channels != flag) {
 			direct_channels = flag;

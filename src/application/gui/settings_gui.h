@@ -90,6 +90,9 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	key_hijack_request hijacking;
 	std::optional<bool> separate_sensitivity_axes;
 
+	std::vector<std::string> official_hrtf_presets;
+	std::vector<std::string> user_hrtf_presets;
+
 public:
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;

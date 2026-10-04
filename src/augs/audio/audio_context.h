@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <optional>
 #include "augs/filesystem/path.h"
 #include "augs/templates/exception_templates.h"
 #include "augs/audio/audio_settings.h"
@@ -64,7 +65,7 @@ namespace augs {
 		hrtf_stat get_hrtf_status() const;
 		std::string get_output_mode() const;
 		std::string get_hrtf_name() const;
-		int get_sample_rate() const;
+		std::optional<float> get_latency_ms() const;
 		int find_hrtf_id(const audio_settings&) const;
 
 		const auto& get_paths() const {

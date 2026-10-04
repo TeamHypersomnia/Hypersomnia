@@ -1,6 +1,19 @@
 #pragma once
 #include "augs/filesystem/path.h"
 
+/*
+	Mono buffers can't play through direct channels, which we use for the sounds
+	of the listener's own character. With our OpenAL Soft, sound_source plays them direct
+	with AL_PANNING_ENABLED_SOFT instead, so mono stays mono: half the memory,
+	and a single HRTF convolution for spatialized sounds instead of two.
+
+	The Web's OpenAL has neither direct channels nor source panning.
+	A system OpenAL may lack panning or use a different value for this experimental enum.
+	There every mono file is duplicated to stereo instead.
+*/
+
+#define MONO_TO_STEREO (PLATFORM_WEB || USE_SYSTEM_OPENAL)
+
 namespace augs {
 	struct sound_buffer_meta {
 		double computed_length_in_seconds = -1.0;

@@ -1721,6 +1721,9 @@ if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 		message("Looking for system OpenAL")
 		find_package(OpenAL REQUIRED)
 
+		# Disables our use of in-progress OpenAL Soft extensions, see MONO_TO_STEREO.
+		add_definitions(-DUSE_SYSTEM_OPENAL=1)
+
 		if (OPENAL_FOUND)
 			message("Found the system OpenAL at: ${OPENAL_LIBRARY}")
 		endif()

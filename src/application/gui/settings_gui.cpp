@@ -1075,8 +1075,16 @@ void settings_gui_state::perform(
 						return audio_cfg.hrtf_preset + (audio_cfg.hrtf_preset_is_user ? " (User)" : "");
 					}();
 
+					/* Presets only matter with HRTF output. */
+					ImGui::BeginDisabled(audio_cfg.output_mode != audio_output_mode::STEREO_HRTF);
+
 					if (auto combo = scoped_combo("HRTF preset", current_preset_label.c_str(), ImGuiComboFlags_HeightLargest)) {
-						const auto presets = augs::find_hrtf_presets(audio.get_device().get_paths());
+						if (ImGui::IsWindowAppearing()) {
+							auto presets = augs::find_hrtf_presets(audio.get_device().get_paths());
+
+							official_hrtf_presets = std::move(presets.official);
+							user_hrtf_presets = std::move(presets.user);
+						}
 
 						auto preset_selectable = [&](const std::string& label, const std::string& preset, const bool is_user) {
 							const bool is_current = 
@@ -1109,8 +1117,8 @@ void settings_gui_state::perform(
 							}
 						};
 
-						preset_section("(Official presets)", presets.official, false);
-						preset_section("(User presets)", presets.user, true);
+						preset_section("(Official presets)", official_hrtf_presets, false);
+						preset_section("(User presets)", user_hrtf_presets, true);
 					}
 
 					{
@@ -1132,6 +1140,8 @@ void settings_gui_state::perform(
 						}
 					}
 
+					ImGui::EndDisabled();
+
 					if (ImGui::Button("Open user HRTF presets folder")) {
 						window.reveal_in_explorer(USER_HRTFS_DIR);
 					}
@@ -1146,7 +1156,11 @@ void settings_gui_state::perform(
 
 					revertable_enum_radio("Keep listener position at:", scope_cfg.listener_reference);
 					revertable_checkbox("Make listener face the same direction as character", scope_cfg.set_listener_orientation_to_character_orientation);
+
+					/* Elevation and front/back sound the same without HRTF. */
+					ImGui::BeginDisabled(config.audio.output_mode != audio_output_mode::STEREO_HRTF);
 					revertable_enum("Hear screen up/down as", scope_cfg.screen_vertical_as);
+					ImGui::EndDisabled();
 				}
 
 				text_disabled("\n");
@@ -1162,17 +1176,11 @@ void settings_gui_state::perform(
 
 					revertable_slider("Audio period (samples)", audio_cfg.period_size, 64u, 2048u);
 
-					/* OpenAL Soft keeps 3 periods queued by default. */
-					const auto num_periods = 3;
-					const auto sample_rate = std::max(1, device.get_sample_rate());
-					const auto period_ms = 1000.f * static_cast<float>(audio_cfg.period_size) / static_cast<float>(sample_rate);
+					text_disabled("Lower is more responsive, but too low will crackle when the CPU can't keep up.");
 
-					text_disabled(typesafe_sprintf(
-						"%2f ms per period at %x Hz, ~%2f ms buffered.\nLower is more responsive, but too low will crackle when the CPU can't keep up.",
-						period_ms,
-						sample_rate,
-						period_ms * num_periods
-					));
+					if (const auto latency_ms = device.get_latency_ms(); latency_ms.has_value()) {
+						text_disabled(typesafe_sprintf("Current output latency: %2f ms", *latency_ms));
+					}
 
 					if (audio_cfg.period_size != device.get_period_size_at_launch()) {
 						text_color("Restart the game to apply the new period.", orange);
@@ -2558,7 +2566,7 @@ void do_game_speed_tooltip() {
 void do_bullet_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
 		"Separate setting for bullet speeds.\n\n"
-		"Type \"/bspeed 0.8\". to adjust in-game.\n"
+		"Type \"/bspeed 0.8\" to adjust in-game."
 	);
 }
 
