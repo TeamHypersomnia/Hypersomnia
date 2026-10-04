@@ -14,6 +14,7 @@
 #else
 #include <AL/alext.h>
 #include "3rdparty/openal-soft/core/mixer/defs.h"
+#include "3rdparty/openal-soft/alc/inprogext.h"
 #endif
 #endif
 
@@ -64,6 +65,9 @@ namespace augs {
 
 #if !PLATFORM_WEB
 		AL_CHECK(alSourcei(id, AL_SOURCE_RESAMPLER_SOFT, static_cast<std::uint8_t>(Resampler::Spline)));
+
+		/* Room for get_mono_gain_compensation. */
+		AL_CHECK(alSourcef(id, AL_MAX_GAIN, 2.f));
 #endif
 
 		initialized = true;
@@ -77,7 +81,9 @@ namespace augs {
 		initialized(b.initialized),
 		id(b.id),
 		attached_buffer(b.attached_buffer),
-		buffer_meta(std::move(b.buffer_meta))
+		buffer_meta(std::move(b.buffer_meta)),
+		requested_gain(b.requested_gain),
+		direct_channels(b.direct_channels)
 	{
 		b.initialized = false;
 		b.buffer_meta = {};
@@ -90,6 +96,8 @@ namespace augs {
 		id = b.id;
 		attached_buffer = b.attached_buffer;
 		buffer_meta = std::move(b.buffer_meta);
+		requested_gain = b.requested_gain;
+		direct_channels = b.direct_channels;
 
 		b.buffer_meta = {};
 		b.initialized = false;
@@ -215,9 +223,31 @@ namespace augs {
 #endif
 	}
 
+	/*
+		Before mono buffers stayed mono, every mono file was loaded as stereo
+		with both channels identical. Spatialized, both channels land at the source's position
+		and sum up - twice the amplitude of the same sound in mono.
+
+		Doubling the gain of spatialized mono keeps the loudness exactly as it was,
+		at half the mixing cost.
+	*/
+
+	float sound_source::get_mono_gain_compensation() const {
+#if PLATFORM_WEB
+		return 1.f;
+#else
+		const bool spatialized_mono = buffer_meta.channels == 1 && !direct_channels;
+		return spatialized_mono ? 2.f : 1.f;
+#endif
+	}
+
+	void sound_source::apply_gain() const {
+		AL_CHECK(alSourcef(id, AL_GAIN, requested_gain * get_mono_gain_compensation()));
+	}
+
 	void sound_source::set_gain(const float gain) const {
-		(void)gain;
-		AL_CHECK(alSourcef(id, AL_GAIN, gain));
+		requested_gain = gain;
+		apply_gain();
 #if TRACE_PARAMETERS
 		LOG_NVPS(gain);
 #endif
@@ -310,6 +340,19 @@ namespace augs {
 		(void)flag;
 #if !PLATFORM_WEB
 		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag ? 1 : 0));
+
+		/*
+			Mono buffers ignore direct channels, unless panning is enabled:
+			then the mono channel is duplicated to the left and right output,
+			exactly like a stereo buffer with identical channels.
+			Panning is centered by default, and a no-op for stereo buffers.
+		*/
+		AL_CHECK(alSourcei(id, AL_PANNING_ENABLED_SOFT, flag ? AL_TRUE : AL_FALSE));
+
+		if (direct_channels != flag) {
+			direct_channels = flag;
+			apply_gain();
+		}
 #endif
 
 #if TRACE_PARAMETERS
@@ -367,7 +410,13 @@ namespace augs {
 			//seek_to(std::min(new_meta.computed_length_in_seconds, static_cast<double>(*previous_seconds)));
 		}
 
+		const bool channels_changed = buffer_meta.channels != new_meta.channels;
+
 		buffer_meta = new_meta;
+
+		if (channels_changed) {
+			apply_gain();
+		}
 	}
 
 	void sound_source::bind_buffer(
@@ -381,6 +430,7 @@ namespace augs {
 		attached_buffer = 0;
 		buffer_meta = {};
 		AL_CHECK(alSourcei(id, AL_BUFFER, 0));
+		apply_gain();
 	}
 	
 	void sound_source::just_play(const single_sound_buffer& buffer, const float gain) {

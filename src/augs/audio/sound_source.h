@@ -32,7 +32,12 @@ namespace augs {
 		ALuint attached_buffer = -1;
 		sound_buffer_meta buffer_meta;
 
+		mutable float requested_gain = 1.f;
+		mutable bool direct_channels = false;
+
 		void destroy();
+		void apply_gain() const;
+		float get_mono_gain_compensation() const;
 	public:
 		sound_source();
 		~sound_source();

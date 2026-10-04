@@ -4,6 +4,7 @@
 namespace augs {
 	struct sound_buffer_meta {
 		double computed_length_in_seconds = -1.0;
+		int channels = 0;
 
 		bool is_set() const {
 			return computed_length_in_seconds >= 0.0;

@@ -136,6 +136,7 @@ namespace augs {
 		const auto passed_frequency = new_data.frequency;
 		const auto passed_bytesize = new_data.samples.size() * sizeof(sound_sample_type);
 		meta.computed_length_in_seconds = new_data.compute_length_in_seconds();
+		meta.channels = new_data.channels;
 
 #if LOG_AUDIO_BUFFERS
 		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
