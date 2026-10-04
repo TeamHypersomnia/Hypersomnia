@@ -7,6 +7,7 @@
 
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/detail/melee/thrown_melee_bounce.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
@@ -358,6 +359,16 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		}
 	}
 
+	/*
+		See thrown_melee_bounce.h.
+	*/
+
+	const bool thrown_melee = is_like_thrown_melee(handle);
+
+	if (thrown_melee) {
+		fixdef.filter = ::make_thrown_melee_hitting_filter(fixdef.filter);
+	}
+
 	cached_connection = connection;
 
 	auto& constructed_fixtures = cache.constructed_fixtures;
@@ -620,6 +631,29 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			}
 		}
 
+		if (thrown_melee) {
+			/*
+				Created last, so that it is centered at the center of mass of the real shape,
+				and of zero density, so that it does not move it.
+			*/
+
+			b2CircleShape bounce_shape;
+			bounce_shape.m_radius = si.get_meters(::calc_thrown_melee_bounce_radius(handle));
+			bounce_shape.m_p = owner_b2Body.GetLocalCenter();
+
+			auto bounce_def = fixdef;
+			bounce_def.shape = &bounce_shape;
+			bounce_def.density = 0.f;
+			bounce_def.friction = THROWN_MELEE_BOUNCE_FRICTION;
+			bounce_def.restitution = THROWN_MELEE_BOUNCE_RESTITUTION;
+			bounce_def.filter = ::make_thrown_melee_bouncing_filter(calc_filters(handle));
+
+			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&bounce_def);
+
+			new_fix->index_in_component = static_cast<short>(constructed_fixtures.size());
+			constructed_fixtures.emplace_back(new_fix);
+		}
+
 		return;
 	}
 
@@ -674,6 +708,25 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 
 		if (cache.constructed_fixtures.empty()) {
 			only_update_properties = false;
+		}
+
+		if constexpr(E::template has<invariants::melee>()) {
+			/*
+				Thrown melee weapons have colliders of their own - see thrown_melee_bounce.h -
+				so they are rebuilt whenever they are or just were thrown.
+			*/
+
+			const bool has_bounce_circle = std::any_of(
+				cache.constructed_fixtures.begin(),
+				cache.constructed_fixtures.end(),
+				[](const auto& f) {
+					return f.get()->GetType() == b2Shape::e_circle;
+				}
+			);
+
+			if (has_bounce_circle || is_like_thrown_melee(handle)) {
+				only_update_properties = false;
+			}
 		}
 
 		if (only_update_properties) {

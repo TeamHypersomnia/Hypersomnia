@@ -238,6 +238,8 @@ void standard_solve(const logic_step step) {
 		listener.during_step = false;
 	}
 
+	melee_system().face_thrown_melee_along_flight(step);
+
 	physics_system().post_and_clear_accumulated_collision_messages(step);
 	portal_system().advance_portal_logic(step);
 

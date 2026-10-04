@@ -36,6 +36,15 @@ namespace predefined_queries {
 	filter_type bullet_penetration_check();
 };
 
+/*
+	A thrown melee weapon bounces off obstacles with a circle - see calc_thrown_melee_bounce_radius -
+	and hits everything else with its real shape, so that it has to really touch a character to hurt it.
+	Both take a filter of a thrown melee weapon and leave only what the respective collider collides with.
+*/
+
+filter_type make_thrown_melee_bouncing_filter(filter_type);
+filter_type make_thrown_melee_hitting_filter(filter_type);
+
 enum class predefined_filter_type {
 	// GEN INTROSPECTOR enum class predefined_filter_type
 	WALL,

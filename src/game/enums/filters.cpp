@@ -37,6 +37,20 @@ static auto standard_participation_except(C... c) {
 	return static_cast<uint16>(r.to_ulong());
 }
 
+static auto thrown_melee_bouncing_categories() {
+	return make_flags(C::WALL, C::GLASS_OBSTACLE, C::CAR_FLOOR);
+}
+
+filter_type make_thrown_melee_bouncing_filter(filter_type f) {
+	f.maskBits &= thrown_melee_bouncing_categories();
+	return f;
+}
+
+filter_type make_thrown_melee_hitting_filter(filter_type f) {
+	f.maskBits &= static_cast<uint16>(~thrown_melee_bouncing_categories());
+	return f;
+}
+
 namespace predefined_queries {
 	b2Filter light() {
 		b2Filter out;
@@ -171,12 +185,12 @@ predefined_filters::predefined_filters() {
 	{
 		auto& out = filters[predefined_filter_type::FLYING_BULLET];
 		out.categoryBits = make_flags(C::FLYING_BULLET);
-		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::FLYING_MELEE);
 	}
 	{
 		auto& out = filters[predefined_filter_type::PENETRATING_BULLET];
 		out.categoryBits = make_flags(C::FLYING_BULLET);
-		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::WALL, C::GLASS_OBSTACLE);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::FLYING_MELEE, C::WALL, C::GLASS_OBSTACLE);
 	}
 	{
 		auto& out = filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY];
@@ -188,19 +202,24 @@ predefined_filters::predefined_filters() {
 		/* Rockets should collide with characters */
 		auto& out = filters[predefined_filter_type::FLYING_ROCKET];
 		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
-		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::FLYING_MELEE);
 	}
 	{
 
 		/* Thrown grenades pass through bullets, so that they can't be shot away mid-flight. */
 		auto& out = filters[predefined_filter_type::FLYING_EXPLOSIVE];
 		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
-		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::CHARACTER, C::CHARACTER_WEAPON, C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::CHARACTER, C::CHARACTER_WEAPON, C::FLYING_BULLET, C::FLYING_MELEE);
 	}
 	{
 		auto& out = filters[predefined_filter_type::FLYING_MELEE];
 		out.categoryBits = make_flags(C::FLYING_MELEE);
-		out.maskBits = standard_participation_except(C::LYING_ITEM);
+
+		/*
+			Bullets, rockets and thrown explosives fly through thrown melee weapons.
+		*/
+
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::FLYING_EXPLOSIVE);
 	}
 	{
 

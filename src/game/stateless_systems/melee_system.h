@@ -16,4 +16,5 @@ class melee_system {
 public:
 	void initiate_and_update_moves(const logic_step step);
 	void advance_thrown_melee_logic(const logic_step step);
+	void face_thrown_melee_along_flight(const logic_step step);
 };

@@ -18,6 +18,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/melee/like_melee.h"
+#include "game/detail/melee/thrown_melee_bounce.h"
 #include "game/assets/animation_math.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/math/convex_hull.h"
@@ -60,6 +61,29 @@ void melee_system::advance_thrown_melee_logic(const logic_step step) {
 				it.infer_colliders();
 			}
 		}
+	});
+}
+
+void melee_system::face_thrown_melee_along_flight(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+
+	cosm.for_each_having<components::melee>([&](const auto& it) {
+		if (!::is_like_thrown_melee(it) || !::faces_flight_direction(it.template get<invariants::melee>())) {
+			return;
+		}
+
+		const auto body = it.template get<components::rigid_body>();
+		const auto velocity = body.get_velocity();
+
+		if (velocity.is_epsilon(1.f)) {
+			return;
+		}
+
+		const auto transform = it.get_logic_transform();
+		const auto dt_secs = step.get_delta().in_seconds();
+
+		body.set_transform(transformr(transform.pos, ::calc_rotation_facing_flight(transform.rotation, velocity, dt_secs)));
+		body.set_angular_velocity(0.f);
 	});
 }
 
