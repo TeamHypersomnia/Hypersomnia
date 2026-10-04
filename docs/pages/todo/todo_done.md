@@ -7544,3 +7544,4 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - kiedys mozna byloby symulowac te trajektorie granatow
 - troche settingi poorganizowac bo syf szczegolnie te serverowe moze nie wiem tab osobny
 
+- sprofilowac de facing worlds

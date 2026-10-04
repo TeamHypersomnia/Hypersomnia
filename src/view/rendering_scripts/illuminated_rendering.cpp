@@ -1077,7 +1077,58 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shader, U::shadow_hue_preservation, light_settings.sun_shadows.hue_preservation);
 	};
 
+	/*
+		The light of every pixel computed once, for the receivers reading their height from the shadow texture -
+		the ground overlaps itself many times. Without environment shadows it holds for every receiver.
+		See light_resolve in illuminated.fsh.
+	*/
+
+	bool light_resolved = false;
+
+	auto use_resolved_light = [&](const bool use) {
+		set_uniform(shaders.illuminated, U::light_resolve, light_resolved && use ? 2 : 0);
+	};
+
+	auto resolve_light = [&]() {
+		if (!fbos.resolved_light.has_value()) {
+			return;
+		}
+
+		/*
+			Anything still queued would be flushed into the resolved light along with the quad.
+		*/
+
+		ensure_eq(static_cast<std::size_t>(0), renderer.get_triangle_count());
+
+		fbos.resolved_light->set_as_current(renderer);
+		renderer.set_overwriting_blending();
+		set_uniform(shaders.illuminated, U::light_resolve, 1);
+
+		/*
+			The shader reads only gl_FragCoord, so the quad just has to cover every pixel -
+			the margin is for the rounding of the camera's position and zoom.
+		*/
+
+		auto whole_screen = cone.get_visible_world_rect_aabb();
+		whole_screen.expand_from_center(vec2::square(8.0f));
+
+		get_drawer().aabb(whole_screen, white);
+		renderer.call_and_clear_triangles();
+
+		renderer.set_standard_blending();
+		augs::graphics::fbo::set_current_to_marked(in.renderer);
+
+		renderer.set_active_texture(8);
+		fbos.resolved_light->get_texture().set_as_current(renderer);
+		renderer.set_active_texture(0);
+
+		light_resolved = true;
+		use_resolved_light(true);
+	};
+
 	auto receive_shadows = [&](auto& shader, const bool receive, const float receiver_height = -1.0f) {
+		use_resolved_light(!environment_shadows || (receive && receiver_height < 0.0f));
+
 		if (!environment_shadows) {
 			/*
 				The shadow texture is not redrawn this frame - it must not show from an earlier one.
@@ -1119,6 +1170,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	);
 	setup_shadow_uniforms(shaders.illuminated);
 	receive_shadows(shaders.illuminated, true);
+	resolve_light();
 
 	renderer.call_triangles(D::GROUND);
 
@@ -1139,8 +1191,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	*/
 
 	set_uniform(shaders.illuminated, U::receiver_displacement, 0);
+	use_resolved_light(!environment_shadows);
 	renderer.call_triangles(D::GROUND_SHADOW_CASTERS);
 	set_uniform(shaders.illuminated, U::receiver_displacement, 1);
+	use_resolved_light(true);
 
 	within_strict_fow([&]() {
 		set_shader_with_matrix(shaders.pure_color_highlight);
@@ -1225,6 +1279,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.illuminated);
 	receive_shadows(shaders.illuminated, false);
 	renderer.call_triangles(D::FOREGROUND);
+
+	/*
+		The resolved light holds only for this frame.
+	*/
+
+	use_resolved_light(false);
 
 	overlay_smoke_texture();
 

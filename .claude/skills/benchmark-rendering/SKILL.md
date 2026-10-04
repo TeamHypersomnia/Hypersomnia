@@ -32,6 +32,9 @@ One run with alternating phases cancels out scene, thermal and clock differences
     `navmesh.nav`, `editor_view.json` and autosaves there. `user/projects` is a symlink to `../content/arenas`,
     so a copy there lands in the repo too. Copy the arena to the scratchpad instead - `--edit` takes an absolute path -
     rename its json to match the folder, drop `last_saved.json`, and set `meta.name`.
+  - **`--edit` overwrites `user/editor_last_project.txt`** with the scratch path: the user's next launch without arguments
+    opens the scratch copy, and they edit it unknowingly (it happened - a whole round of map work landed in /tmp).
+    Back the file up before the first run and restore it after the last one, and never name the copy like the original.
   - The editor camera comes from `editor_view.json` (`panned_camera.transform.pos`, `zoom`) - set it to frame
     what is measured, e.g. zoom 0.45 at the average position of the lights to catch many of them.
 - **Never use `--apply-config` for a benchmark variant:** the patch lands in `user/runtime_prefs.json` when the game quits
@@ -54,6 +57,16 @@ One run with alternating phases cancels out scene, thermal and clock differences
   The user often keeps one open (launched via `ninja run -C build/current`), or plays the release AppImage between runs -
   it runs as `/tmp/.mount_*/usr/bin/Hypersomnia`, which a `build/` grep misses, and took 320% CPU in one case. It skews the absolute CPU numbers and FPS -
   ask them to close it rather than killing it, then rerun. An A/B in one run keeps the ratio roughly right even then.
+
+- **Which pass eats the GPU:** time segments of the command stream - `glQueryCounter(GL_TIMESTAMP)` in `renderer_backend::perform`
+  at every change of the bound FBO (`fbo::set_as_current_impl`) or program (`shader_program::set_as_current_impl`), read back
+  blocking at the frame end, summed per (fbo id, program id). Log the ids at creation (`fbo::fbo`, the path ctor of `shader_program`)
+  to name them; `all_necessary_fbos::apply` creates them in a fixed order. Split further by a tag: the `light_pass` uniform
+  (hook `shader_program::perform(set_uniform_command)`) or the `dedicated_buffer` of a `drawcall_dedicated_command`.
+  Trust the total and big segments only - the cost of an FBO switch can land in a neighbouring segment.
+  The blocking readback lowers the FPS: measure FPS in separate runs without it.
+- **GLSL: return early instead of skipping work in an `else`:** on radeonsi a uniform `if (mode == 2) { cheap } else { expensive }`
+  ran at the cost of the expensive branch (0.90 ms); returning right after the cheap path got 0.29 ms.
 
 ## Frame pacing / smoothness (judder), and comparing two builds
 
@@ -164,6 +177,13 @@ geometry - likely GPU clocks at the higher FPS, not a cost.
 
 The sun shadow guard band (384 px past two screen edges) on the same scene: +0.006-0.010 ms GPU on a 1.9 ms frame (~0.5%),
 FPS unchanged, +5 MB of VRAM at 1080p.
+
+de_facing_worlds regression (Oct 2026, editor playtest standing still, 24 lights in view, 1918x1060): 3.0.0 895 FPS / GPU 1.01 ms,
+HEAD 360 FPS / GPU 2.70 ms. Per pass: GROUND in `illuminated.fsh` 0.29 -> 0.90 ms (the layers of the ground overlap many times
+and every fragment computed posterize, hue and sun shadows - up to 18 fetches), point light masks 0.07 -> ~1.2 ms (passes 2-4, 7,
+removed and hue light FBOs). Fixed by resolving the light once per pixel (`light_resolve`, GROUND 0.29 ms + 0.13 ms resolve)
+and drawing the hue light only when some light doesn't keep its hue through walls: ~480 FPS / GPU ~2.0 ms.
+Skipping pass 3 with a scissored reach saved only ~0.05 ms - not worth the mask invariant.
 
 The shell smoke `overlay_smoke` FBO pass with no shells on screen (Sep 2026, RX 5700, 1918×1060):
 0.518 vs 0.498 ms GPU per frame (+0.02 ms, ~4%), no FPS difference (~1110 both), 8 MB of VRAM.

@@ -48,6 +48,7 @@ struct all_necessary_fbos {
 	optional_fbo light;
 	optional_fbo removed_light;
 	optional_fbo hue_light;
+	optional_fbo resolved_light;
 	optional_fbo shadow;
 	optional_fbo flash_afterimage;
 

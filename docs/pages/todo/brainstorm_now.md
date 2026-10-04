@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- sprofilowac de facing worlds
+- lagodniejsza interpolacja tych markerow szczegolnie dla melee
 
 - swiecacy dev label
 - te public keye cale dla linuxiarzy

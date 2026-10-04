@@ -50,6 +50,7 @@ void all_necessary_fbos::apply(
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 	reset(removed_light);
 	reset(hue_light);
+	reset(resolved_light);
 	reset_sized(shadow, screen_size + vec2i::square(SUN_SHADOW_GUARD_BAND_PX));
 	reset(flash_afterimage);
 }
@@ -104,6 +105,8 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminated->set_uniform(renderer, U::removed_light_texture, 5);
 		illuminated->set_uniform(renderer, U::point_light_hue_preservation, 0.0f);
 		illuminated->set_uniform(renderer, U::hue_light_texture, 7);
+		illuminated->set_uniform(renderer, U::light_resolve, 0);
+		illuminated->set_uniform(renderer, U::resolved_light_texture, 8);
 	}
 
 	if (light) {

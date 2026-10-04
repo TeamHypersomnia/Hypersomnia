@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <algorithm>
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"
@@ -226,9 +227,40 @@ void light_system::render_all_lights(const light_system_input in) const {
 		&& cosm.get_common_significant().light.point_light_shadows.hue_preservation > 0.0f
 	;
 
+	/*
+		A light that casts no shadows has its whole mask lit,
+		so the passes adding the light its shadows removed would add nothing.
+		Only what's known before the light jobs run decides it - they still run in parallel with this.
+	*/
+
+	auto casts_any_shadow = [](const auto& request) {
+		return request.filter.maskBits != 0;
+	};
+
+	/*
+		A light keeping its hue through walls adds to the hue light texture exactly what it adds to the removed light texture.
+		So when all the shadow casting lights do, only the removed light texture is drawn, and it serves as both.
+	*/
+
+	const bool all_hue_through_walls = std::all_of(
+		light_requests.begin(),
+		light_requests.end(),
+		[&](const auto& request) {
+			return request.light_data.hue_through_walls || !casts_any_shadow(request);
+		}
+	);
+
+	const bool hue_from_removed_light = 
+		keep_hue_in_shadows
+		&& all_hue_through_walls
+		&& in.removed_light_fbo != nullptr
+	;
+
+	const bool draw_hue_light = keep_hue_in_shadows && !hue_from_removed_light;
+
 	const bool track_removed_intensity = 
 		in.removed_light_fbo != nullptr
-		&& cosm.get_common_significant().light.posterize_light
+		&& (cosm.get_common_significant().light.posterize_light || hue_from_removed_light)
 	;
 
 	auto set_pass = [&](const int pass) {
@@ -327,13 +359,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 				const auto reach = xywh::center_and_size(world_light_pos, request.queried_rect);
 
-				/*
-					A light that casts no shadows has its whole mask lit,
-					so the passes adding the light its shadows removed would add nothing.
-					Only what's known before the light jobs run decides it - they still run in parallel with this.
-				*/
-
-				const bool casts_any_shadow = request.filter.maskBits != 0;
+				const bool light_casts_shadow = casts_any_shadow(request);
 
 				if (light.height > 0.0f) {
 					set_pass(3);
@@ -344,7 +370,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					renderer.set_min_blending();
 					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_SHADOW_MASKS, i);
 
-					if (keep_hue_in_shadows && !light.hue_through_walls && casts_any_shadow) {
+					if (draw_hue_light && !light.hue_through_walls && light_casts_shadow) {
 						/*
 							The mask holds only the obstacles reaching the ceiling now,
 							so the light removed by the lower ones is taken only where walls let it through.
@@ -381,7 +407,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				renderer.set_dst_alpha_additive_blending();
 				::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
 
-				if (keep_hue_in_shadows && light.hue_through_walls && casts_any_shadow) {
+				if (draw_hue_light && light.hue_through_walls && light_casts_shadow) {
 					/*
 						The light keeps its hue through all its shadows, walls included.
 					*/
@@ -397,10 +423,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 					in.light_fbo.set_as_current(renderer);
 				}
 
-				if (track_removed_intensity && casts_any_shadow) {
+				if (track_removed_intensity && light_casts_shadow) {
 					/*
 						The light all the shadows removed, so that posterized light brightens shadowed pixels
 						by the light they would get without them, keeping penumbras smooth.
+						With hue_from_removed_light, also the hue light.
 					*/
 
 					in.removed_light_fbo->set_as_current(renderer);
@@ -546,7 +573,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 			in.removed_light_fbo->get_texture().set_as_current(renderer);
 		}
 
-		if (in.hue_light_fbo != nullptr) {
+		if (hue_from_removed_light) {
+			renderer.set_active_texture(7);
+			in.removed_light_fbo->get_texture().set_as_current(renderer);
+		}
+		else if (in.hue_light_fbo != nullptr) {
 			renderer.set_active_texture(7);
 			in.hue_light_fbo->get_texture().set_as_current(renderer);
 		}
@@ -567,7 +598,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		renderer.clear_current_fbo();
 	}
 
-	if (keep_hue_in_shadows) {
+	if (draw_hue_light) {
 		in.hue_light_fbo->set_as_current(renderer);
 		renderer.clear_current_fbo();
 	}

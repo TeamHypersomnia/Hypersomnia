@@ -87,6 +87,21 @@ uniform int posterize_light;
 
 uniform float shadow_hue_preservation;
 
+/*
+	The light of a pixel is the same for every receiver lying under it with its height read from the shadow texture,
+	and the ground overlaps itself many times - so it is computed once per pixel:
+
+	0 - computes it for every fragment,
+	1 - writes the light of the pixel into the resolved light texture - its color in rgb, its intensity in alpha,
+	    scaled so that 1 stays exact and the brightening up to twice still fits,
+	2 - reads it from resolved_light_texture.
+*/
+
+uniform int light_resolve;
+uniform sampler2D resolved_light_texture;
+
+const float intensity_scale = 255.0 / 127.0;
+
 vec4 fetch_shadow(highp vec2 frag_pos) {
 	ivec2 size = textureSize(shadow_texture, 0);
 	ivec2 texel = clamp(ivec2(floor(frag_pos + shadow_texture_offset)), ivec2(0), size - ivec2(1));
@@ -165,15 +180,15 @@ float luma(vec3 c) {
 const int light_levels = 3;
 const int light_step = 255/light_levels;
 
-void main() 
-{
-	vec2 texcoord = gl_FragCoord.xy;
-	texcoord.x /= float(textureSize(light_texture, 0).x);
-	texcoord.y /= float(textureSize(light_texture, 0).y);
+/*
+	The light of the fragment - its color, and in intensity, how much it gets brightened.
+*/
 
+vec4 calc_light(vec2 texcoord, out float intensity) {
 	vec4 light = texture(light_texture, texcoord);
 
 	light.a = 1.0;
+	intensity = 1.0;
 
 	/*
 		The more intense the light, the more it gets brightened - up to twice, in discrete bands.
@@ -183,8 +198,6 @@ void main()
 		So outside shadows the bands stay exactly as they were, and penumbras stay smooth.
 		The environment shadows below work the same way - their boost comes from the unshadowed light too.
 	*/
-
-	float intensity = 1.0;
 
 	if (posterize_light != 0) {
 		vec3 unshadowed = light.rgb + texture(removed_light_texture, texcoord).rgb;
@@ -220,6 +233,11 @@ void main()
 		vec3 hue_kept = light.rgb * (luma(without_ambient) / max(luma(light.rgb), 0.0001));
 		light.rgb = mix(without_ambient, hue_kept, shadow_hue_preservation);
 	}
+
+	return light;
+}
+
+vec4 illuminate(vec4 light, float intensity) {
 	light.rgb *= intensity;
 
 	vec4 texComponent = texture(basic_texture, theTexcoord);
@@ -228,5 +246,32 @@ void main()
 	pixel.g = min(texComponent.g, pixel.g);
 	pixel.b = min(texComponent.b, pixel.b);
 
-	outputColor = pixel;
+	return pixel;
+}
+
+void main() 
+{
+	vec2 texcoord = gl_FragCoord.xy;
+	texcoord.x /= float(textureSize(light_texture, 0).x);
+	texcoord.y /= float(textureSize(light_texture, 0).y);
+
+	/*
+		Returning right away - with calc_light in a branch merely skipped, the compiler might evaluate it anyway.
+	*/
+
+	if (light_resolve == 2) {
+		vec4 resolved = texture(resolved_light_texture, texcoord);
+		outputColor = illuminate(vec4(resolved.rgb, 1.0), resolved.a * intensity_scale);
+		return;
+	}
+
+	float intensity = 1.0;
+	vec4 light = calc_light(texcoord, intensity);
+
+	if (light_resolve == 1) {
+		outputColor = vec4(light.rgb, intensity / intensity_scale);
+		return;
+	}
+
+	outputColor = illuminate(light, intensity);
 }

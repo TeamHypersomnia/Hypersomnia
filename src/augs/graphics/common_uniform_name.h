@@ -37,6 +37,8 @@ namespace augs {
 		removed_light_texture,
 		hue_light_texture,
 		point_light_hue_preservation,
+		light_resolve,
+		resolved_light_texture,
 		smoke_flat_intensity,
 		color_encodes_footprints,
 
