@@ -4892,20 +4892,15 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return false;
 	}();
 
-	/*
-		Cinematic mode hides the recent messages until the chat is opened.
-	*/
-
-	if (const bool shown = is_open || !in.config.drawing.cinematic_mode) {
-		integrated_client_gui.chat.draw_recent_messages(
-			in.get_drawer(),
-			integrated_client_vars.client_chat,
-			in.config.faction_view,
-			in.gui_fonts.gui,
-			get_current_time(),
-			should_censor
-		);
-	}
+	integrated_client_gui.chat.draw_recent_messages(
+		in.get_drawer(),
+		integrated_client_vars.client_chat,
+		in.config.faction_view,
+		in.gui_fonts.gui,
+		get_current_time(),
+		should_censor,
+		in.config.drawing.cinematic_mode
+	);
 
 	arena_gui_base::draw_custom_gui(in);
 }

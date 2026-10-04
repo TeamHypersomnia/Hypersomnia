@@ -764,7 +764,7 @@ public:
 
 	bool can_respawn_already() const;
 
-	bool levelling_enabled(const_input) const;
+	bool progressive_enabled(const_input) const;
 
 	arena_mode_faction_state& get_spawns_for(input, faction_type faction);
 
@@ -843,7 +843,7 @@ public:
 		uint8_t team_size
 	) const;
 
-	bool casual_levels_enabled(const_input) const;
+	bool casual_progressive_enabled(const_input) const;
 	uint16_t calc_team_level(faction_type) const;
 	difficulty_type calc_bot_difficulty(const_input) const;
 

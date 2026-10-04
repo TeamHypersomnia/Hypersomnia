@@ -1555,28 +1555,33 @@ void settings_gui_state::perform(
 						*/
 
 						switch (active_keybindings_pane) {
-							case keybindings_settings_pane::COMBAT:
+							case keybindings_settings_pane::COMBAT: {
 								map_i = 0;
 								control_i = 0;
 								do_bindings_map("Combat controls", config.game_controls);
 								break;
-							case keybindings_settings_pane::GUI:
+							}
+							case keybindings_settings_pane::GUI: {
 								map_i = 1;
 								control_i = 1000;
 								do_bindings_map("GUI controls", config.general_gui_controls);
 								break;
-							case keybindings_settings_pane::INVENTORY:
+							}
+							case keybindings_settings_pane::INVENTORY: {
 								map_i = 2;
 								control_i = 2000;
 								do_bindings_map("Inventory controls", config.inventory_gui_controls);
 								break;
-							case keybindings_settings_pane::APPLICATION:
+							}
+							case keybindings_settings_pane::APPLICATION: {
 								map_i = 3;
 								control_i = 3000;
 								do_bindings_map("General application controls", config.app_controls);
 								break;
-							default:
+							}
+							default: {
 								break;
+							}
 						}
 
 						ImGui::Columns(1);
@@ -1687,10 +1692,6 @@ void settings_gui_state::perform(
 #endif
 						}
 
-						ImGui::Separator();
-						text_color("HUD", yellow);
-						ImGui::Separator();
-
 						revertable_enum("Minimap position", config.drawing.minimap.position);
 						revertable_enum("Knockout indicators position", config.arena_mode_gui.knockout_indicators_position);
 
@@ -1700,6 +1701,10 @@ void settings_gui_state::perform(
 						auto& scope_cfg = config.drawing;
 
 						revertable_checkbox("Cinematic mode", config.drawing.cinematic_mode);
+
+						if (config.drawing.cinematic_mode) {
+							text_disabled("(hides the HUD regardless of the settings below)");
+						}
 
 						revertable_checkbox("Draw enemy silhouettes in Spectator", config.drawing.draw_enemy_silhouettes_in_spectator);
 
@@ -2974,14 +2979,12 @@ void do_server_vars(
 	server_vars& vars,
 	server_vars& last_saved_vars,
 	rcon_pane pane,
-	const server_runtime_info* runtime_info,
-	const bool admin_view
+	const server_runtime_info* runtime_info
 ) {
 	using namespace augs::imgui;
 
 	/*
-		What only server admins tweak is folded away, unless admin_view - in the rcon.
-		Settings only for dedicated servers are shown only there.
+		Only the rcon calls this - the settings show the sections in tabs.
 	*/
 
 	auto do_section = [&](const server_vars_section section) {
@@ -2989,7 +2992,7 @@ void do_server_vars(
 	};
 
 	auto folded_section = [&](const std::string& label, const server_vars_section section) {
-		if (auto node = scoped_tree_node_ex(label, admin_view ? ImGuiTreeNodeFlags_DefaultOpen : 0)) {
+		if (auto node = scoped_tree_node_ex(label, ImGuiTreeNodeFlags_DefaultOpen)) {
 			do_section(section);
 		}
 	};
@@ -3010,9 +3013,7 @@ void do_server_vars(
 		folded_section("Time limits", server_vars_section::TIME_LIMITS);
 		folded_section("Ranked", server_vars_section::RANKED);
 
-		if (admin_view) {
-			folded_section("Dedicated server", server_vars_section::DEDICATED_SERVER);
-		}
+		folded_section("Dedicated server", server_vars_section::DEDICATED_SERVER);
 	}
 }
 

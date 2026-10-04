@@ -1,6 +1,6 @@
 #pragma once
 
-bool arena_mode::casual_levels_enabled(const_input_type in) const {
+bool arena_mode::casual_progressive_enabled(const_input_type in) const {
 	if (in.rules.is_gun_game()) {
 		return false;
 	}
@@ -133,7 +133,7 @@ difficulty_type arena_mode::calc_bot_difficulty(const_input_type in) const {
 		return override_diff;
 	}
 
-	if (!casual_levels_enabled(in)) {
+	if (!casual_progressive_enabled(in)) {
 		return difficulty_type::VERY_EASY;
 	}
 

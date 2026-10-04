@@ -89,8 +89,7 @@ void perform_rcon_gui(
 					edited,
 					last_saved,
 					pane,
-					runtime_info,
-					true
+					runtime_info
 				);
 			}
 

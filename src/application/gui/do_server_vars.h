@@ -47,6 +47,5 @@ void do_server_vars(
 	server_vars& vars,
 	server_vars& last_saved_vars,
 	rcon_pane pane = rcon_pane::ARENAS,
-	const server_runtime_info* runtime_info = nullptr,
-	bool admin_view = false
+	const server_runtime_info* runtime_info = nullptr
 );

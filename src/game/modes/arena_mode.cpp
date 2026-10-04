@@ -219,7 +219,7 @@ void arena_mode::init_spawned(
 	auto access = allocate_new_entity_access();
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-		if (levelling_enabled(in)) {
+		if (progressive_enabled(in)) {
 			reset_equipment_for(step, in, player_id, typed_handle);
 		}
 		else if (transferred != nullptr && transferred->survived) {
@@ -782,7 +782,7 @@ void arena_mode::on_faction_changed_for(const const_input_type in, const faction
 
 		const bool is_warmup = state == arena_mode_state::WARMUP;
 
-		if (is_team_switch && !is_warmup && casual_levels_enabled(in)) {
+		if (is_team_switch && !is_warmup && casual_progressive_enabled(in)) {
 			if (entry->session.casual_level > 0) {
 				--entry->session.casual_level;
 			}
@@ -1387,7 +1387,7 @@ void arena_mode::reset_equipment_for(const logic_step step, const input_type in,
 	if (const auto player_data = find(id)) {
 		auto& stats = player_data->stats;
 
-		if (!levelling_enabled(in)) {
+		if (!progressive_enabled(in)) {
 			return;
 		}
 
@@ -1695,7 +1695,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 
 			announce_knockout(s, knockouts_dt);
 
-			if (levelling_enabled(in)) {
+			if (progressive_enabled(in)) {
 				requested_equipment final_eq;
 
 				const auto final_level = std::visit([&]<typename S>(const S& subrules) {
@@ -1956,7 +1956,7 @@ void arena_mode::count_win(const input_type in, const const_logic_step step, con
 		give_monetary_award(in, player_id, {}, faction == winner ? winner_award : loser_award);
 	}
 
-	if (casual_levels_enabled(in)) {
+	if (casual_progressive_enabled(in)) {
 		const bool pvp_loss = num_human_players_in(winner) > 0;
 
 		for (auto& human : only_human(players)) {
@@ -3142,9 +3142,9 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
 	}
 
-	const bool levelling = casual_levels_enabled(in);
+	const bool progressive = casual_progressive_enabled(in);
 
-	if (over.is_set() && !levelling) {
+	if (over.is_set() && !progressive) {
 		return calc_requested_bots_from_quotas(
 			in,
 			over.quota,
@@ -3155,7 +3155,7 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 	const auto p = calc_participating_factions(in);
 	const auto map_quota = in.rules.default_bot_quota;
 
-	if (levelling && p.valid() && map_quota > 0) {
+	if (progressive && p.valid() && map_quota > 0) {
 		const auto team_size = uint8_t(map_quota / int(p.size()));
 		return calc_requested_bots_from_casual_levels(in, team_size);
 	}
@@ -4257,7 +4257,7 @@ void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entrop
 }
 
 void arena_mode::announce_casual_level_changes(const_input_type in, const logic_step step) {
-	if (!casual_levels_enabled(in)) {
+	if (!casual_progressive_enabled(in)) {
 		return;
 	}
 
@@ -5233,7 +5233,7 @@ bool arena_mode_ruleset::is_gun_game() const {
 	return std::holds_alternative<gun_game_rules>(subrules);
 }
 
-bool arena_mode::levelling_enabled(const_input_type in) const {
+bool arena_mode::progressive_enabled(const_input_type in) const {
 	return state != arena_mode_state::WARMUP && std::holds_alternative<gun_game_rules>(in.rules.subrules);
 }
 

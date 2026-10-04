@@ -371,9 +371,18 @@ void chat_gui_state::draw_recent_messages(
    	const faction_view_settings& faction_view,
 	const augs::baked_font& gui_font,
    	const net_time_t current_time,
-	const bool streamer_mode
+	const bool streamer_mode,
+	const bool cinematic_mode
 ) const {
 	using namespace augs::gui::text;
+
+	/*
+		Cinematic mode hides the recent messages until the chat is opened.
+	*/
+
+	if (cinematic_mode && !show) {
+		return;
+	}
 
 	const auto entries_to_show = std::min(
 		history.size(), 

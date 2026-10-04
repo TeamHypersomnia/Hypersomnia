@@ -73,7 +73,7 @@ void arena_scoreboard_gui::draw_gui(
 			return false;
 		}
 		else {
-			if (!typed_mode.casual_levels_enabled(mode_input)) {
+			if (!typed_mode.casual_progressive_enabled(mode_input)) {
 				return false;
 			}
 
@@ -300,7 +300,7 @@ void arena_scoreboard_gui::draw_gui(
 		{ 22, " " },
 		{ scoreboard_avatar_icon_side, " " },
 		{ sz.x, "Player" },
-		{ calc_size("999999$").x, typed_mode.levelling_enabled(mode_input) ? "Level" : "Money", true },
+		{ calc_size("999999$").x, typed_mode.progressive_enabled(mode_input) ? "Level" : "Money", true },
 
 		{ calc_size("999").x, "K", true },
 		{ calc_size("999").x, "A", true },
@@ -976,7 +976,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			if constexpr(!std::is_same_v<M, test_mode>) {
 				auto do_money = [&]() {
-					if (typed_mode.levelling_enabled(mode_input)) {
+					if (typed_mode.progressive_enabled(mode_input)) {
 						col_text(typesafe_sprintf("%x", stats.gun_game_level));
 					}
 					else {

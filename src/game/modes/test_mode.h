@@ -303,7 +303,7 @@ public:
 		return "Test mode";
 	}
 
-	bool levelling_enabled(const_input) const {
+	bool progressive_enabled(const_input) const {
 		return false;
 	}
 

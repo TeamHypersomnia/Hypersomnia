@@ -84,6 +84,7 @@ struct chat_gui_state {
 		const faction_view_settings&,
 		const augs::baked_font& gui_font,
 		net_time_t current_time,
-		bool streamer_mode
+		bool streamer_mode,
+		bool cinematic_mode
 	) const;
 };

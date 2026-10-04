@@ -67,7 +67,7 @@ void get_arena_steam_rich_presence_pairs(
 							annotation = "Warmup";
 						}
 
-						if (mode.levelling_enabled(input)) {
+						if (mode.progressive_enabled(input)) {
 							level = std::to_string(player_data->stats.gun_game_level);
 						}
 						else {
