@@ -57,7 +57,7 @@ struct performance_settings {
 	augs::maybe<int> custom_num_pool_workers = augs::maybe<int>(0, false);
 	sun_shadow_preferences sun_shadows;
 	point_light_shadow_preferences point_light_shadows;
-	bool posterize_neons = true;
+	bool quantize_neons = true;
 	swap_buffers_moment swap_window_buffers_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	// END GEN INTROSPECTOR
 

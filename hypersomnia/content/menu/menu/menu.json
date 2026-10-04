@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2026-09-25 21:00:58.582978 UTC"
+        "version_timestamp": "2026-10-04 23:51:23.665460 UTC"
     },
     "about": {
         "author": "lia",
@@ -13,6 +13,7 @@
         "include_disabled_nodes": false,
         "default_zoom": 1.0,
         "ambient_light_color": [44, 44, 44, 255],
+        "brighten_lights": false,
         "point_light_shadows": {
             "smoothness_mult": 0.10000000149011612
         },
@@ -1548,33 +1549,33 @@
             "color": [255, 71, 0, 104],
             "falloff": {
                 "radius": 2000.0,
-                "strength": 9
+                "intensity": 1.347000002861023,
+                "falloff": 0.6399999856948853
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
             "id": "\t",
             "type": "point_light",
             "pos": [-520.0, 261.0],
-            "color": [255, 71, 0, 204],
+            "color": [255, 71, 0, 255],
             "falloff": {
                 "radius": 2000.0,
-                "strength": 9
+                "intensity": 2.365999937057495,
+                "falloff": 0.8299999833106995
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {
             "id": "\t (1)",
             "type": "point_light",
-            "pos": [414.0, -31.0],
-            "color": [255, 71, 0, 36],
+            "pos": [411.0, -29.0],
+            "color": [255, 50, 0, 36],
             "falloff": {
                 "radius": 247.2729949951172,
-                "strength": 4
+                "intensity": 0.8199999928474426,
+                "falloff": 0.7689999938011169
             },
-            "positional_vibration": 0.0,
             "intensity_vibration": 0.0
         },
         {

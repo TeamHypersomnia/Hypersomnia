@@ -843,6 +843,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 	};
 
+	/*
+		Legacy lights that Brighten lights band all light already, neons included.
+	*/
+
+	const bool quantize_neons = 
+		in.perf_settings.quantize_neons
+		&& !(light_settings.brighten_lights && !light_settings.physical_lights)
+	;
+
 	auto light_pass = [&]() {
 		const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
@@ -857,7 +866,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			*shaders.light, 
 			*shaders.textured_light, 
 			*shaders.standard, 
-			in.perf_settings.posterize_neons && !light_settings.posterize_light && shaders.posterized_neon ? std::addressof(*shaders.posterized_neon) : nullptr,
+			quantize_neons && shaders.posterized_neon ? std::addressof(*shaders.posterized_neon) : nullptr,
 			neon_occlusion_callback,
 			[&]() {
 				draw_particles_neons();
@@ -1160,7 +1169,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	set_shader_with_matrix(shaders.illuminated);
-	set_uniform(shaders.illuminated, U::posterize_light, light_settings.posterize_light ? 1 : 0);
+	const auto brighten_mode = [&]() {
+		if (!light_settings.brighten_lights) {
+			return 0;
+		}
+
+		return light_settings.physical_lights ? 1 : 2;
+	}();
+
+	set_uniform(shaders.illuminated, U::brighten_lights, brighten_mode);
 
 
 	set_uniform(

@@ -75,7 +75,7 @@ static std::size_t calc_light_shadows_fingerprint(
 		request.filter.maskBits,
 		light.height,
 		smoothness,
-		light.attenuation.calc_reach(),
+		light.falloff.radius,
 		request.subject.raw.indirection_index,
 		request.color.r,
 		request.color.g,
@@ -253,7 +253,7 @@ void enqueue_visibility_jobs(
 							smoothness,
 							MAX_LIGHT_PENUMBRA_DEGREES,
 							request.color,
-							request.light_data.attenuation.calc_reach()
+							request.light_data.falloff.radius
 						},
 						shadow_masks,
 						low_shadow_masks

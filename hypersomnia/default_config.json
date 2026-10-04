@@ -1131,7 +1131,7 @@
             "smoothness_mult": 1.0,
             "heights": true
         },
-        "posterize_neons": true,
+        "quantize_neons": true,
         "swap_window_buffers_when": "AFTER_HELPING_LOGIC_THREAD"
     },
 

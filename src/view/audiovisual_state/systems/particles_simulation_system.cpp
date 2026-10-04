@@ -1305,45 +1305,32 @@ components::light temporary_light::to_light_component() const {
 
 	components::light light;
 
-	/*
-		Use standard falloff parameters for temporary lights.
-		constant=0, linear=1, quadratic=0 gives a linear falloff.
-	*/
-
-	const real32 falloff_constant = 0.0f;
-	const real32 falloff_linear = 1.0f;
-	const real32 falloff_quadratic = 0.0f;
-	const rgba_channel strength = 30;
-
 	const auto fade_mult = get_attenuation_mult();
 	const auto effective_radius = radius * fade_mult;
-
-	const auto mult = ::calc_attenuation_mult_for_requested_radius(
-		falloff_constant,
-		falloff_linear,
-		falloff_quadratic,
-		effective_radius,
-		strength
-	);
-
-	light.attenuation.constant = falloff_constant * mult * CONST_MULT;
-	light.attenuation.linear = falloff_linear * mult * LINEAR_MULT;
-	light.attenuation.quadratic = falloff_quadratic * mult * QUADRATIC_MULT;
-	light.attenuation.trim_alpha = strength;
-
 	const auto wall_effective_radius = effective_radius / 1.3f;
-	const auto wall_mult = ::calc_attenuation_mult_for_requested_radius(
-		falloff_constant,
-		falloff_linear,
-		falloff_quadratic,
-		wall_effective_radius,
-		strength
-	);
 
-	light.wall_attenuation.constant = falloff_constant * wall_mult * CONST_MULT;
-	light.wall_attenuation.linear = falloff_linear * wall_mult * LINEAR_MULT;
-	light.wall_attenuation.quadratic = falloff_quadratic * wall_mult * QUADRATIC_MULT;
-	light.wall_attenuation.trim_alpha = strength;
+	light.falloff = { effective_radius, intensity, falloff };
+	light.wall_falloff = { wall_effective_radius, intensity, falloff };
+
+	/*
+		The legacy model approximates the same parameters - see light_falloff.
+	*/
+
+	auto set_legacy = [&](legacy_attenuation& attn, const light_falloff& foff) {
+		const auto c = foff.calc_legacy_constant();
+		const auto l = foff.calc_legacy_linear();
+		const auto q = foff.calc_legacy_quadratic();
+		const auto strength = foff.calc_legacy_strength();
+		const auto mult = ::calc_attenuation_mult_for_requested_radius(c, l, q, foff.radius, strength);
+
+		attn.constant = c * mult * CONST_MULT;
+		attn.linear = l * mult * LINEAR_MULT;
+		attn.quadratic = q * mult * QUADRATIC_MULT;
+		attn.trim_alpha = strength;
+	};
+
+	set_legacy(light.attenuation, light.falloff);
+	set_legacy(light.wall_attenuation, light.wall_falloff);
 
 	/*
 		No variations for temporary lights (no flickering).

@@ -114,6 +114,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			light.positioning = { gun_entity.get_id(), augs::get_relative_offset(gun_entity.get_logic_transform(), g.muzzle_transform) };
 			light.color = gun->muzzle_light_color;
 			light.radius = gun->muzzle_light_radius;
+			light.intensity = gun->muzzle_light_intensity;
+			light.falloff = gun->muzzle_light_falloff;
 			light.max_lifetime_ms = gun->muzzle_light_duration;
 			light.current_lifetime_ms = 0.0f;
 

@@ -155,6 +155,8 @@ namespace invariants {
 
 		real32 muzzle_light_radius = 300.0f;
 		real32 muzzle_light_duration = 87.0f;
+		real32 muzzle_light_intensity = 1.0f;
+		real32 muzzle_light_falloff = 0.5f;
 		rgba muzzle_light_color = yellow;
 		bool muzzle_cast_shadow = true;
 		bool eject_shells_on_magazine_unmount = false;

@@ -960,8 +960,8 @@ void settings_gui_state::perform(
 
 							ImGui::Separator();
 
-							revertable_checkbox("Posterize neons", scope_cfg.posterize_neons);
-							tooltip_on_hover("If ticked, neon maps and the glow of electric armor light the scene in a few discrete bands\non maps that don't Posterize light as a whole.");
+							revertable_checkbox("Quantize neons", scope_cfg.quantize_neons);
+							tooltip_on_hover("If ticked, neon maps and the glow of electric armor light the scene in a few discrete bands.\nOn maps with legacy lights that Brighten lights, all light is already banded.");
 						}
 
 						break;

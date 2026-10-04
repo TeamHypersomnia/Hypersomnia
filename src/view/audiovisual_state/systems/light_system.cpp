@@ -55,25 +55,17 @@ void light_system::advance_attenuation_variations(
 			auto& vals = cache.all_variation_values;
 
 			if (light.variation.is_enabled) {
-				auto& v = light.variation.value;
-
-				v.constant.update_value(rng, vals[0], delta);
-				v.linear.update_value(rng, vals[1], delta);
-				v.quadratic.update_value(rng, vals[2], delta);
+				light.variation.value.update_value(rng, vals[0], delta);
 			}
 			else {
-				vals[0] = vals[1] = vals[2] = 0.f;
+				vals[0] = 0.f;
 			}
 
 			if (light.wall_variation.is_enabled) {
-				auto& v = light.wall_variation.value;
-
-				v.constant.update_value(rng, vals[3], delta);
-				v.linear.update_value(rng, vals[4], delta);
-				v.quadratic.update_value(rng, vals[5], delta);
+				light.wall_variation.value.update_value(rng, vals[3], delta);
 			}
 			else {
-				vals[3] = vals[4] = vals[5] = 0.f;
+				vals[3] = 0.f;
 			}
 		}
 	);
@@ -169,6 +161,9 @@ struct light_uniforms {
 	U max_distance = U::max_distance;
 	U cutoff_distance = U::cutoff_distance;
 	U attenuation = U::light_attenuation;
+	U core = U::light_core;
+	U intensity = U::light_intensity;
+	U physical = U::physical_lights;
 	U multiply_color = U::multiply_color;
 
 	light_uniforms(const augs::graphics::shader_program& s) {
@@ -178,6 +173,50 @@ struct light_uniforms {
 
 void light_system::render_all_lights(const light_system_input in) const {
 	using D = augs::dedicated_buffer;
+
+	const bool physical_lights = in.cosm.get_common_significant().light.physical_lights;
+
+	/*
+		variation_val is the flicker of the intensity, see light_value_variation.
+		Returns the radius, where the light ends.
+	*/
+
+	auto set_falloff_uniforms = [&](
+		const auto& shader,
+		const light_uniforms& uniforms,
+		const light_falloff& falloff,
+		const legacy_attenuation& attenuation,
+		const float variation_val
+	) {
+		const auto flicker = 1.0f - std::abs(variation_val);
+
+		if (physical_lights) {
+			shader.set_uniform(in.renderer, uniforms.max_distance, falloff.radius);
+			shader.set_uniform(in.renderer, uniforms.core, falloff.calc_core());
+			shader.set_uniform(in.renderer, uniforms.intensity, falloff.intensity * flicker);
+
+			return falloff.radius;
+		}
+
+		const auto max_distance = attenuation.calc_reach();
+		const auto cutoff_distance = std::max(0.0f, max_distance - 3 * float(attenuation.trim_alpha));
+
+		/*
+			Flickering raises every attenuation term by the same factor.
+		*/
+
+		const auto attenuations = vec3 {
+			attenuation.constant / CONST_MULT / flicker,
+			attenuation.linear / LINEAR_MULT / flicker,
+			attenuation.quadratic / QUADRATIC_MULT / flicker
+		};
+
+		shader.set_uniform(in.renderer, uniforms.attenuation, attenuations);
+		shader.set_uniform(in.renderer, uniforms.max_distance, max_distance);
+		shader.set_uniform(in.renderer, uniforms.cutoff_distance, cutoff_distance);
+
+		return max_distance;
+	};
 
 	const auto& light_shader = in.light_shader;
 	const auto& wall_light_shader = in.textured_light_shader;
@@ -212,14 +251,16 @@ void light_system::render_all_lights(const light_system_input in) const {
 		light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 
 		set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
+		set_uniform(light_shader, light_uniform.physical, physical_lights ? 1 : 0);
 		set_uniform(light_shader, augs::common_uniform_name::light_pass, 0);
 
 		renderer.set_additive_blending();
 	};
 
 	/*
-		The removed light texture holds the light that all shadows removed - for posterizing the light,
-		and the hue light texture - the light that shadows of low obstacles removed, for keeping the hue.
+		The hue light texture holds the light that shadows of low obstacles removed, for keeping the hue,
+		and the removed light texture - the light that all shadows removed: for brightening legacy lights in bands
+		(keeping penumbras smooth, see illuminated.fsh), and it can serve as the hue light (below).
 	*/
 
 	const bool keep_hue_in_shadows = 
@@ -258,9 +299,14 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const bool draw_hue_light = keep_hue_in_shadows && !hue_from_removed_light;
 
-	const bool track_removed_intensity = 
+	const bool legacy_bands = 
+		!physical_lights
+		&& cosm.get_common_significant().light.brighten_lights
+	;
+
+	const bool draw_removed_light = 
 		in.removed_light_fbo != nullptr
-		&& (cosm.get_common_significant().light.posterize_light || hue_from_removed_light)
+		&& (legacy_bands || hue_from_removed_light)
 	;
 
 	auto set_pass = [&](const int pass) {
@@ -317,37 +363,12 @@ void light_system::render_all_lights(const light_system_input in) const {
 			if (was_visibility_calculated) {
 				++num_lights;
 
-				{
-					const auto& a = light.attenuation;
-
-					const auto attenuations = vec3 {
-						(std::abs(variation_vals[0]) + a.constant) / CONST_MULT,
-						(std::abs(variation_vals[1]) + a.linear) / LINEAR_MULT,
-						(std::abs(variation_vals[2]) + a.quadratic) / QUADRATIC_MULT
-					};
-
-					set_uniform(light_shader, light_uniform.attenuation, attenuations);
-				}
+				const auto max_distance = set_falloff_uniforms(light_shader, light_uniform, light.falloff, light.attenuation, variation_vals[0]);
 
 				set_uniform(
 					light_shader, 
 					light_uniform.multiply_color,
 					white.rgb()
-				);
-
-				const auto max_distance = light.attenuation.calc_reach();
-				const auto cutoff_distance = std::max(0.0f, max_distance - 3*float(light.attenuation.trim_alpha));
-
-				set_uniform(
-					light_shader, 
-					light_uniform.max_distance,
-					max_distance
-				);
-
-				set_uniform(
-					light_shader, 
-					light_uniform.cutoff_distance,
-					cutoff_distance
 				);
 
 				/*
@@ -423,11 +444,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 					in.light_fbo.set_as_current(renderer);
 				}
 
-				if (track_removed_intensity && light_casts_shadow) {
+				if (draw_removed_light && light_casts_shadow) {
 					/*
-						The light all the shadows removed, so that posterized light brightens shadowed pixels
-						by the light they would get without them, keeping penumbras smooth.
-						With hue_from_removed_light, also the hue light.
+						The light all the shadows removed - see draw_removed_light.
 					*/
 
 					in.removed_light_fbo->set_as_current(renderer);
@@ -452,6 +471,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			wall_light_shader.set_as_current(renderer);
 			wall_light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 			set_uniform(wall_light_shader, wall_light_uniform.distance_mult, 1.f / eye.zoom);
+			set_uniform(wall_light_shader, wall_light_uniform.physical, physical_lights ? 1 : 0);
 		}
 	};
 
@@ -472,7 +492,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 			const auto variation_vals = request.variation_cache.value_or(std::array<float, 10>{});
 
-			const auto wall_light_aabb = xywh::center_and_size(world_light_pos, light.calc_wall_reach_trimmed());
+			const auto wall_light_aabb = xywh::center_and_size(world_light_pos, light.calc_wall_reach());
 
 			if (!queried_camera_aabb.hover(wall_light_aabb)) {
 				continue;
@@ -488,37 +508,12 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 			++num_wall_lights;
 
-			{
-				const auto& a = light.wall_attenuation;
-
-				const auto attenuations = vec3 {
-					(std::abs(variation_vals[3]) + a.constant) / CONST_MULT,
-					(std::abs(variation_vals[4]) + a.linear) / LINEAR_MULT,
-					(std::abs(variation_vals[5]) + a.quadratic) / QUADRATIC_MULT
-				};
-
-				set_uniform(wall_light_shader, wall_light_uniform.attenuation, attenuations);
-			}
+			set_falloff_uniforms(wall_light_shader, wall_light_uniform, light.wall_falloff, light.wall_attenuation, variation_vals[3]);
 
 			set_uniform(
 				wall_light_shader, 
 				wall_light_uniform.multiply_color,
 				light.color.rgb()
-			);
-
-			const auto max_distance = light.wall_attenuation.calc_reach();
-			const auto cutoff_distance = std::max(0.0f, max_distance - 3*float(light.wall_attenuation.trim_alpha));
-
-			set_uniform(
-				wall_light_shader, 
-				wall_light_uniform.max_distance,
-				max_distance
-			);
-
-			set_uniform(
-				wall_light_shader, 
-				wall_light_uniform.cutoff_distance,
-				cutoff_distance
 			);
 
 			renderer.call_triangles(D::WALL_ILLUMINATIONS);
@@ -541,7 +536,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	};
 
 	/*
-		Neon maps and the glow of electric armor, optionally in posterized bands - on maps not posterizing the light as a whole.
+		Neon maps and the glow of electric armor, optionally in discrete bands - unless the legacy lights of the map already band all light.
 		Missiles and particles stay smooth - their neons are stretched along trails.
 	*/
 
@@ -558,6 +553,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 		in.posterized_neon_shader->set_as_current(renderer);
 		in.posterized_neon_shader->set_projection(renderer, in.cone.get_projection_matrix());
 		set_uniform(*in.posterized_neon_shader, augs::common_uniform_name::ambient_color, cosm.get_common_significant().light.ambient_color);
+
+		const bool smooth_brightening = physical_lights && cosm.get_common_significant().light.brighten_lights;
+		set_uniform(*in.posterized_neon_shader, augs::common_uniform_name::smooth_brightening, smooth_brightening ? 1 : 0);
 	}
 
 	auto restore_renderer = [&]() {
@@ -593,7 +591,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		Textures that no pass writes to this frame aren't cleared - nothing reads them either.
 	*/
 
-	if (track_removed_intensity) {
+	if (draw_removed_light) {
 		in.removed_light_fbo->set_as_current(renderer);
 		renderer.clear_current_fbo();
 	}

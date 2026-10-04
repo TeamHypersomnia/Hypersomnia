@@ -12,6 +12,9 @@ namespace augs {
 		max_distance,
 		cutoff_distance,
 		light_attenuation,
+		light_core,
+		light_intensity,
+		physical_lights,
 		multiply_color,
 		texture_center,
 		black_cutoff,
@@ -31,7 +34,7 @@ namespace augs {
 		receiver_displacement,
 		ambient_color,
 		shadow_hue_preservation,
-		posterize_light,
+		brighten_lights,
 		light_pass,
 		light_mask_texture,
 		removed_light_texture,
@@ -41,6 +44,7 @@ namespace augs {
 		resolved_light_texture,
 		smoke_flat_intensity,
 		color_encodes_footprints,
+		smooth_brightening,
 
 		COUNT
 		// END GEN INTROSPECTOR

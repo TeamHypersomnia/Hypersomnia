@@ -5,6 +5,8 @@ struct temporary_light {
 	absolute_or_local positioning;
 	rgba color;
 	real32 radius = 0.0f;
+	real32 intensity = 1.0f;
+	real32 falloff = 0.5f;
 	real32 max_lifetime_ms = 0.0f;
 	real32 current_lifetime_ms = 0.0f;
 	bool cast_shadow = true;

@@ -2081,8 +2081,8 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 				);
 			};
 
-			draw_reach_indicator(light.calc_reach_trimmed(), light_color);
-			draw_reach_indicator(light.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
+			draw_reach_indicator(light.calc_reach(), light_color);
+			draw_reach_indicator(light.calc_wall_reach(), rgba(light_color).mult_alpha(0.7f));
 		});
 
 		if (is_mover_active()) {

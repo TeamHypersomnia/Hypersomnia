@@ -25,7 +25,7 @@ void for_each_light_vis_request(
 			const auto light_transform = light_entity.get_viewing_transform(interp);
 			const auto& light = light_entity.template get<components::light>();
 
-			const auto reach = light.calc_reach_trimmed();
+			const auto reach = light.calc_reach();
 			const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
 
 			if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
@@ -78,7 +78,7 @@ void for_each_light_vis_request(
 			*/
 
 			const auto light_component = temp_light.to_light_component();
-			const auto reach = light_component.calc_reach_trimmed();
+			const auto reach = light_component.calc_reach();
 
 			messages::visibility_information_request request;
 

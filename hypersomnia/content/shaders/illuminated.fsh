@@ -76,10 +76,14 @@ uniform float receiver_height;
 uniform int receiver_displacement;
 
 /*
-	Nonzero brightens the light in discrete bands of its intensity, zero applies it as it is.
+	Brightens the light by up to twice, the more the more intense it is:
+	1 smoothly (physical lights), 2 in discrete bands (legacy lights), 0 applies it as it is.
 */
 
-uniform int posterize_light;
+uniform int brighten_lights;
+
+const int light_levels = 3;
+const int light_step = 255/light_levels;
 
 /*
 	0 removes the ambient color inside shadows, 1 only its brightness - keeping the hue of the surrounding light mix.
@@ -177,9 +181,6 @@ float luma(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));
 }
 
-const int light_levels = 3;
-const int light_step = 255/light_levels;
-
 /*
 	The light of the fragment - its color, and in intensity, how much it gets brightened.
 */
@@ -191,18 +192,24 @@ vec4 calc_light(vec2 texcoord, out float intensity) {
 	intensity = 1.0;
 
 	/*
-		The more intense the light, the more it gets brightened - up to twice, in discrete bands.
-
-		The bands step by the light unshadowed by point lights - with the light all their shadows removed added back -
-		and the shadows only scale the brightening smoothly, by the ratio of the smooth curves.
-		So outside shadows the bands stay exactly as they were, and penumbras stay smooth.
-		The environment shadows below work the same way - their boost comes from the unshadowed light too.
+		The more intense the light, the more it gets brightened - up to twice.
+		A lit texture can then reach its full brightness under a light dimmer than white.
+		Taken before the environment shadows below, which remove only the ambient part.
 	*/
 
-	if (posterize_light != 0) {
-		vec3 unshadowed = light.rgb + texture(removed_light_texture, texcoord).rgb;
+	float shadowed_intensity = min(max(max(light.r, light.g), light.b), 1.0);
 
-		float shadowed_intensity = min(max(max(light.r, light.g), light.b), 1.0);
+	if (brighten_lights == 1) {
+		intensity = 1.0 + shadowed_intensity;
+	}
+	else if (brighten_lights == 2) {
+		/*
+			The bands step by the light unshadowed by point lights - with the light all their shadows removed added back -
+			and the shadows only scale the brightening smoothly, by the ratio of the smooth curves.
+			So outside shadows the bands stay exactly as they were, and penumbras stay smooth.
+		*/
+
+		vec3 unshadowed = light.rgb + texture(removed_light_texture, texcoord).rgb;
 		float unshadowed_intensity = min(max(max(unshadowed.r, unshadowed.g), unshadowed.b), 1.0);
 
 		float posterized_intensity = float(

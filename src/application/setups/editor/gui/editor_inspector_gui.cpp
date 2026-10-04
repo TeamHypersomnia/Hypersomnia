@@ -50,8 +50,6 @@ struct default_widget_handler {
 	}
 };
 
-#define EDIT_ATTENUATIONS 1
-
 #define PROPERTY(label, MEMBER) \
 edit_property(result, label, special_handler, insp.MEMBER);
 
@@ -1448,88 +1446,28 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	ImGui::Separator();
 	text("Falloff");
 
-	MULTIPROPERTY("Radius", falloff.radius);
-	MULTIPROPERTY("Strength", falloff.strength);
+	auto falloff_tooltips = [&](const int which) {
+		if (!ImGui::IsItemHovered()) {
+			return;
+		}
 
-#if EDIT_ATTENUATIONS
-	thread_local editor_tweaked_widget_tracker tracker;
-	thread_local editor_light_falloff operated_falloff;
-
-	auto prev_foff = insp.falloff;
-	auto prev_woff = insp.wall_falloff;
-
-	auto rebalance_coeffs = [&](
-		auto& changed, 
-		auto& first, 
-		auto& second,
-		const auto& first_orig, 
-		const auto& second_orig,
-		bool is_wall
-	) {
-		//LOG_NVPS(first_orig, second_orig);
-		if (last_result) {
-			if (tracker.changed(0)) {
-				changed = std::clamp(changed, 0.0f, 1.0f);
-				operated_falloff = is_wall ? prev_woff.value : prev_foff;
-				tracker.update(0);
-			}
-
-			const auto total_orig = first_orig + second_orig;
-
-			const auto first_shares = first_orig == second_orig ? 0.5f : first_orig / total_orig;
-			const auto second_shares = first_orig == second_orig ? 0.5f : second_orig / total_orig;
-
-			const auto new_total = 1 - changed;
-
-			first = first_shares * new_total;
-			second = second_shares * new_total;
-
-			for (auto& e : es) {
-				if (is_wall) {
-					e.after.wall_falloff = insp.wall_falloff;
-				}
-				else {
-					e.after.falloff = insp.falloff;
-				}
-			}
+		if (which == 0) {
+			text_tooltip("Where the light fades out to zero.");
+		}
+		else if (which == 1) {
+			text_tooltip("Brightness at the center.\nOver 1 brightens the lit textures further.");
+		}
+		else {
+			text_tooltip("Shape of the light.\n0 spreads it evenly over the radius,\n1 concentrates it around the center.");
 		}
 	};
 
-	if (auto scope = augs::imgui::scoped_tree_node_ex("Attenuations (advanced)")) {
-		MULTIPROPERTY("Constant", falloff.constant);
-		rebalance_coeffs(
-			insp.falloff.constant,
-
-			insp.falloff.linear,
-			insp.falloff.quadratic,
-			operated_falloff.linear,
-			operated_falloff.quadratic,
-			false
-		);
-
-		MULTIPROPERTY("Linear", falloff.linear);
-		rebalance_coeffs(
-			insp.falloff.linear,
-
-			insp.falloff.constant,
-			insp.falloff.quadratic,
-			operated_falloff.constant,
-			operated_falloff.quadratic,
-			false
-		);
-
-		MULTIPROPERTY("Quadratic", falloff.quadratic);
-		rebalance_coeffs(
-			insp.falloff.quadratic,
-
-			insp.falloff.constant,
-			insp.falloff.linear,
-			operated_falloff.constant,
-			operated_falloff.linear,
-			false
-		);
-	}
-#endif
+	MULTIPROPERTY("Radius", falloff.radius);
+	falloff_tooltips(0);
+	MULTIPROPERTY_RANGED("Intensity", falloff.intensity, 0.0f, 4.0f);
+	falloff_tooltips(1);
+	MULTIPROPERTY_RANGED("Falloff", falloff.falloff, 0.0f, 1.0f);
+	falloff_tooltips(2);
 
 	MULTIPROPERTY("Custom falloff for walls", wall_falloff.is_enabled);
 
@@ -1551,46 +1489,11 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 			auto ind = scoped_indent();
 
 			MULTIPROPERTY("Radius", wall_falloff.value.radius);
-			MULTIPROPERTY("Strength", wall_falloff.value.strength);
-
-#if EDIT_ATTENUATIONS
-			if (auto scope = augs::imgui::scoped_tree_node_ex("Attenuations (advanced)")) {
-				auto& edited_foff = insp.wall_falloff.value;
-
-				MULTIPROPERTY("Constant", wall_falloff.value.constant);
-				rebalance_coeffs(
-					edited_foff.constant,
-
-					edited_foff.linear,
-					edited_foff.quadratic,
-					operated_falloff.linear,
-					operated_falloff.quadratic,
-					true
-				);
-
-				MULTIPROPERTY("Linear", wall_falloff.value.linear);
-				rebalance_coeffs(
-					edited_foff.linear,
-
-					edited_foff.constant,
-					edited_foff.quadratic,
-					operated_falloff.constant,
-					operated_falloff.quadratic,
-					true
-				);
-
-				MULTIPROPERTY("Quadratic", wall_falloff.value.quadratic);
-				rebalance_coeffs(
-					edited_foff.quadratic,
-
-					edited_foff.constant,
-					edited_foff.linear,
-					operated_falloff.constant,
-					operated_falloff.linear,
-					true
-				);
-			}
-#endif
+			falloff_tooltips(0);
+			MULTIPROPERTY_RANGED("Intensity", wall_falloff.value.intensity, 0.0f, 4.0f);
+			falloff_tooltips(1);
+			MULTIPROPERTY_RANGED("Falloff", wall_falloff.value.falloff, 0.0f, 1.0f);
+			falloff_tooltips(2);
 		}
 	}
 
@@ -2475,7 +2378,13 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	ImGui::Separator();
 
 	PROPERTY("Ambient light color", ambient_light_color);
-	PROPERTY("Posterize light", posterize_light);
+	PROPERTY("Physical lights", physical_lights);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Point lights fade out smoothly to zero at their Radius, shaped by their Intensity and Falloff.\nOff: the legacy model for comparison - the same parameters approximated\nby the old attenuation with a visible edge, and Brighten lights in discrete bands.");
+	}
+
+	PROPERTY("Brighten lights", brighten_lights);
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("Turn off for maximum color fidelity.\nTurn on for brighter lights.");

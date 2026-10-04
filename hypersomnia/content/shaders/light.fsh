@@ -12,11 +12,56 @@ in vec2 theTexcoord;
 out vec4 outputColor;
 
 uniform vec2 light_pos;
-uniform vec3 light_attenuation;
 uniform vec3 multiply_color;
 uniform float distance_mult;
+
 uniform float max_distance;
+
+/*
+	Nonzero: the physical falloff - the inverse square law of a source light_core * max_distance in size,
+	windowed so that it reaches exactly zero at max_distance with a flat slope, no visible edge.
+	See light_falloff in light_component.h.
+
+	Zero: the legacy one - 1 / (constant + linear * d + quadratic * d^2), halved past cutoff_distance
+	and cut off at max_distance. See legacy_attenuation.
+*/
+
+uniform int physical_lights;
+
+uniform float light_core;
+uniform float light_intensity;
+
+uniform vec3 light_attenuation;
 uniform float cutoff_distance;
+
+float light_amount(float light_distance, float vertex_alpha) {
+	if (physical_lights != 0) {
+		float x = light_distance / max_distance;
+		float core_x = x / light_core;
+		float x2 = x * x;
+		float window = clamp(1.0 - x2 * x2, 0.0, 1.0);
+
+		return vertex_alpha * light_intensity * window * window / (1.0 + core_x * core_x);
+	}
+
+	float amount = 1.0 / (
+		light_attenuation.x
+		+ light_attenuation.y * light_distance
+		+ light_attenuation.z * light_distance * light_distance
+	); 
+
+	if (light_distance > cutoff_distance) {
+		amount *= 0.5;
+
+		float cutoff_len = max_distance - cutoff_distance;
+		float cutoff_amt = (light_distance - cutoff_distance) / cutoff_len;
+		cutoff_amt *= cutoff_amt;
+
+		amount *= 1.0 - cutoff_amt;
+	}
+
+	return min(vertex_alpha, amount);
+}
 
 /*
 	Which pass of light_system.cpp this is.
@@ -82,28 +127,15 @@ void main()
 	vec4 final_color = theColor;
 	final_color.rgb *= multiply_color;
 
-	final_color.a = 1.0 / (
-		light_attenuation.x
-		+ light_attenuation.y * light_distance
-		+ light_attenuation.z * light_distance * light_distance
-	); 
-
 	if (light_distance > max_distance) {
 		discard;
 	}
-	else if (light_distance > cutoff_distance) {
-		final_color.a *= 0.5;
 
-		float cutoff_len = max_distance - cutoff_distance;
-		float cutoff_amt = (light_distance - cutoff_distance) / cutoff_len;
-		cutoff_amt *= cutoff_amt;
+	/*
+		Over 1 near the center of an intense physical light - the light texture saturates there.
+	*/
 
-		final_color.a *= 1.0 - cutoff_amt;
-	}
-
-	final_color.a = min(theColor.a, final_color.a);
-
-	vec3 premultiplied = final_color.rgb * final_color.a;
+	vec3 premultiplied = final_color.rgb * light_amount(light_distance, theColor.a);
 
 	if (light_pass == 4) {
 		outputColor = vec4(premultiplied, 0.0);
@@ -123,5 +155,5 @@ void main()
 		return;
 	}
 
-	outputColor = final_color;
+	outputColor = vec4(premultiplied, 1.0);
 }

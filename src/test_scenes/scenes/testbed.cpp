@@ -1019,8 +1019,7 @@ namespace test_scenes {
 					l.set_logic_transform(aquarium_tr + transformr(lights[i]));
 					auto& light = l.get<components::light>();
 					light.color = light_cols[i];
-					light.attenuation.constant = 75;
-					light.attenuation.quadratic = 631;
+					light.falloff.falloff = 0.8f;
 				}
 			}
 
@@ -1286,7 +1285,7 @@ namespace test_scenes {
 			l.set_logic_transform(transformr(vec2(200, 1200)));
 			auto& ll = l.template get<components::light>();
 
-			ll.attenuation.trim_alpha = 20;
+			ll.falloff.intensity = 0.6f;
 		}
 
 		save_all_reported_weapons();

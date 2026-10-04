@@ -36,14 +36,19 @@ struct point_light_shadow_settings {
 };
 
 /*
-	posterize_light brightens lit pixels by up to twice as much, in a few discrete bands of the light's intensity.
+	physical_lights chooses the falloff of point lights: the physical one (light_falloff) or the legacy one (legacy_attenuation).
+
+	brighten_lights brightens lit pixels by up to twice as much, the more the more intense the light -
+	so that a lit texture can reach its full brightness under a light dimmer than white.
+	With physical lights smoothly, with the legacy ones in a few discrete bands.
 	Without it, the light is applied as it is.
 */
 
 struct cosmos_light_settings {
 	// GEN INTROSPECTOR struct cosmos_light_settings
 	rgba ambient_color = rgba(53, 97, 102, 255);
-	bool posterize_light = true;
+	bool physical_lights = true;
+	bool brighten_lights = true;
 	sun_shadow_settings sun_shadows;
 	point_light_shadow_settings point_light_shadows;
 	// END GEN INTROSPECTOR

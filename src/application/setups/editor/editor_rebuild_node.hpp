@@ -66,17 +66,6 @@ bool setup_entity_from_node(
 		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {
-		auto set_attn_from_falloff = [&](auto& attn, const auto& foff) {
-			const auto mult = foff.calc_attenuation_mult_for_requested_radius();
-
-			attn.constant = foff.constant * mult * CONST_MULT;
-			attn.linear = foff.linear * mult * LINEAR_MULT;
-			attn.quadratic = foff.quadratic * mult * QUADRATIC_MULT;
-
-			attn.trim_alpha = foff.strength;
-			// LOG_NVPS(foff.radius, attn.calc_reach(), attn.calc_reach_trimmed());
-		};
-
 		auto& light = agg.template get<components::light>();
 		light.color *= editable.color;
 		light.cast_shadows = editable.cast_shadows;
@@ -84,32 +73,51 @@ bool setup_entity_from_node(
 		light.shadow_smoothness = editable.shadow_smoothness;
 		light.height = editable.height;
 
-		set_attn_from_falloff(light.attenuation, node.editable.falloff);
+		auto set_attn_from_falloff = [&](auto& attn, const auto& foff) {
+			const auto mult = foff.calc_attenuation_mult_for_requested_radius();
+
+			const auto physical = foff.to_physical();
+
+			attn.constant = physical.calc_legacy_constant() * mult * CONST_MULT;
+			attn.linear = physical.calc_legacy_linear() * mult * LINEAR_MULT;
+			attn.quadratic = physical.calc_legacy_quadratic() * mult * QUADRATIC_MULT;
+
+			attn.trim_alpha = physical.calc_legacy_strength();
+		};
+
+		auto set_falloffs = [&](auto& physical, auto& legacy, const editor_light_falloff& foff) {
+			physical = foff.to_physical();
+			set_attn_from_falloff(legacy, foff);
+		};
+
+		set_falloffs(light.falloff, light.attenuation, node.editable.falloff);
 
 		{
 			auto& wall_foff = node.editable.wall_falloff;
 
 			if (wall_foff.is_enabled) {
-				set_attn_from_falloff(light.wall_attenuation, wall_foff.value);
+				set_falloffs(light.wall_falloff, light.wall_attenuation, wall_foff.value);
 			}
 			else {
 				auto auto_wall_falloff = node.editable.falloff;
 				auto_wall_falloff.radius /= 1.5f; 
 
-				set_attn_from_falloff(light.wall_attenuation, auto_wall_falloff);
+				set_falloffs(light.wall_falloff, light.wall_attenuation, auto_wall_falloff);
 			}
 		}
 
-		light.wall_variation = light.variation;
-
 		{
+			/*
+				The intensity flickers down by at most half the vibration.
+			*/
+
 			const float intensity_vibration = node.editable.intensity_vibration;
 
 			light.variation.is_enabled = intensity_vibration > 0.0f;
-			light.wall_variation.is_enabled = intensity_vibration > 0.0f;
+			light.variation.value.magnitude = intensity_vibration;
+			light.variation.value.change_speed = intensity_vibration * 2.0f;
 
-			light.variation.value *= intensity_vibration;
-			light.wall_variation.value *= intensity_vibration;
+			light.wall_variation = light.variation;
 		}
 
 	}
@@ -306,12 +314,14 @@ void setup_entity_from_node_post_construct(
 }
 
 inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius() const {
+	const auto physical = to_physical();
+
 	return ::calc_attenuation_mult_for_requested_radius(
-		constant,
-		linear,
-		quadratic,
+		physical.calc_legacy_constant(),
+		physical.calc_legacy_linear(),
+		physical.calc_legacy_quadratic(),
 		radius,
-		strength
+		physical.calc_legacy_strength()
 	);
 }
 

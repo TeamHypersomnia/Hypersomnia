@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- osobne flagi na podglad przy rzucaniu granatem a podglad przy rzucaniu nozem
+	- wylaczyc domyslnie w ogole dla melee
+
 - lagodniejsza interpolacja tych markerow szczegolnie dla melee
 
 - swiecacy dev label
