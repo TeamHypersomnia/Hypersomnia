@@ -88,6 +88,53 @@ bool is_throwing_melee(const E& handle) {
 	return handle.template get<components::item_slot_transfers>().when_throw_requested.was_set();
 }
 
+/*
+	A single gun held in the primary hand is moved to the secondary hand
+	so that the item to be thrown can be drawn into the primary hand,
+	which keeps the crosshair as steady as possible.
+
+	The move is silent, recoilless and keeps when_last_transferred,
+	so e.g. the gun can fire right after the throw without a transfer cooldown.
+*/
+
+template <class E>
+bool can_move_primary_to_secondary_for_throw(const E& character) {
+	const auto primary_hand = character.get_hand_no(0);
+	const auto secondary_hand = character.get_hand_no(1);
+
+	if (primary_hand.dead() || secondary_hand.dead()) {
+		return false;
+	}
+
+	const auto in_primary = primary_hand.get_item_if_any();
+
+	return in_primary.alive() && in_primary.template has<components::gun>() && secondary_hand.is_empty_slot();
+}
+
+template <class E>
+void move_between_hands_for_throw(const logic_step step, const E& character, const entity_id item, const std::size_t target_hand_index) {
+	const auto& cosm = character.get_cosmos();
+	const auto target_hand = character.get_hand_no(target_hand_index);
+	const auto source_hand = character.get_hand_no(1 - target_hand_index);
+
+	if (target_hand.dead() || source_hand.dead()) {
+		return;
+	}
+
+	if (const auto moved_item = cosm[item]) {
+		if (source_hand.get_item_if_any() == moved_item && target_hand.is_empty_slot()) {
+			auto request = item_slot_transfer_request::standard(moved_item, target_hand);
+
+			request.params.play_transfer_sounds = false;
+			request.params.play_transfer_particles = false;
+			request.params.perform_recoils = false;
+			request.params.keep_when_last_transferred = true;
+
+			perform_transfer(request, step);
+		}
+	}
+}
+
 template <class E>
 void drop_mag_to_ground(const E& mag) {
 	auto& cosm = mag.get_cosmos();
@@ -1048,6 +1095,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					auto& wield_after_throwing_knives = transfers_state.wield_after_throw_operation;
 
 					if (wield_after_throwing_knives.is_set()) {
+						::move_between_hands_for_throw(step, typed_subject, wield_after_throwing_knives.hand_selections[0], 0);
+
 						::perform_wielding(
 							step,
 							typed_subject,
@@ -1210,7 +1259,18 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
 						auto& wield_after_throwing_explosive = transfers_state.wield_after_throw_operation;
 
-						const auto target_index = current_wielding.least_weapon_index(cosm);
+						const bool moves_primary_to_secondary = ::can_move_primary_to_secondary_for_throw(typed_subject);
+
+						const auto target_index = 
+							moves_primary_to_secondary ?
+							std::size_t(0) :
+							current_wielding.least_weapon_index(cosm)
+						;
+
+						if (moves_primary_to_secondary) {
+							requested_wield.hand_selections[1] = current_wielding.hand_selections[0];
+						}
+
 						const auto wielded_items = typed_subject.get_wielded_items();
 
 						if (r.was_released()) {
@@ -1227,6 +1287,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 												released = true;
 
 												if (wield_after_throwing_explosive.is_set() && !transfers_state.mid_akimbo_chambered_gun.is_set()) {
+													::move_between_hands_for_throw(step, typed_subject, wield_after_throwing_explosive.hand_selections[0], 0);
+
 													::perform_wielding(
 														step,
 														typed_subject,
@@ -1278,8 +1340,12 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						typed_subject.for_each_contained_item_recursive(finder);
 
 						if (found_fused.is_set()) {
-							if (current_wielding.is_akimbo(cosm)) {
+							if (current_wielding.is_akimbo(cosm) || moves_primary_to_secondary) {
 								wield_after_throwing_explosive = current_wielding;
+							}
+
+							if (moves_primary_to_secondary) {
+								::move_between_hands_for_throw(step, typed_subject, current_wielding.hand_selections[0], 1);
 							}
 
 							::perform_wielding(
@@ -1322,6 +1388,38 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					case game_intent_type::THROW_KNIFE: requested_knives = 1; break;
 					case game_intent_type::THROW_TWO_KNIVES: requested_knives = 2; break;
 					default: break;
+				}
+
+				/*
+					With a gun in the primary hand and only a single knife to draw,
+					throwing two knives behaves like throwing one,
+					so that the gun stays wielded in the secondary hand during the throw.
+				*/
+
+				if (requested_knives == 2 && ::can_move_primary_to_secondary_for_throw(typed_subject)) {
+					int num_drawable_melees = 0;
+
+					typed_subject.for_each_contained_item_recursive(
+						[&](const auto& candidate_item) {
+							if (candidate_item.get_current_slot().is_hand_slot()) {
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
+
+							if (candidate_item.template has<components::melee>()) {
+								++num_drawable_melees;
+
+								if (num_drawable_melees >= 2) {
+									return recursive_callback_result::ABORT;
+								}
+							}
+
+							return recursive_callback_result::CONTINUE_AND_RECURSE;
+						}
+					);
+
+					if (num_drawable_melees < 2) {
+						requested_knives = 1;
+					}
 				}
 
 				auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
@@ -1377,7 +1475,25 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						return entity.template has<components::melee>();
 					};
 
-					auto target_index = current_wielding.least_weapon_index(cosm);
+					/*
+						Only a single knife keeps the gun in the other hand.
+						Two knives replace whatever is wielded anyway.
+					*/
+
+					const bool moves_primary_to_secondary = 
+						requested_knives == 1 
+						&& ::can_move_primary_to_secondary_for_throw(typed_subject)
+					;
+
+					auto target_index = 
+						moves_primary_to_secondary ?
+						std::size_t(0) :
+						current_wielding.least_weapon_index(cosm)
+					;
+
+					if (moves_primary_to_secondary) {
+						requested_wield.hand_selections[1] = current_wielding.hand_selections[0];
+					}
 
 					int num_found_melees = 0;
 					auto num_additional_melees = requested_knives - num_wielded_melees;
@@ -1439,12 +1555,17 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					if (any_found) {
 						const bool any_item_was_replaced =
 							current_wielding.is_akimbo(cosm) ||
-							total_wielded_melees == 2
+							total_wielded_melees == 2 ||
+							moves_primary_to_secondary
 						;
 
 						if (any_item_was_replaced) {
 							auto& wield_after_throwing_knives = transfers_state.wield_after_throw_operation;
 							wield_after_throwing_knives = current_wielding;
+						}
+
+						if (moves_primary_to_secondary) {
+							::move_between_hands_for_throw(step, typed_subject, current_wielding.hand_selections[0], 1);
 						}
 
 						::perform_wielding(

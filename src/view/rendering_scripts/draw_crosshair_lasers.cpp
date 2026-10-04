@@ -15,6 +15,8 @@
 #include "view/game_drawing_settings.h"
 #include "game/detail/weapon_like.h"
 #include "game/detail/crosshair_math.hpp"
+#include "game/detail/explosive/like_explosive.h"
+#include "game/components/item_slot_transfers_component.h"
 
 #include "augs/drawing/drawing.hpp"
 #include "augs/log.h"
@@ -256,8 +258,50 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}
 		};
 
-		for (const auto& subject_item_id : in.character.get_wielded_items()) {
+		const auto wielded_items = in.character.get_wielded_items();
+
+		/*
+			Right before a throw, two items might be wielded at once,
+			e.g. a gun and a grenade drawn with a throw key.
+			Show the laser only for the item about to be thrown.
+		*/
+
+		const bool throwing_explosive = [&]() {
+			for (const auto& w : wielded_items) {
+				if (::is_armed_explosive(cosm[w])) {
+					return true;
+				}
+			}
+
+			return false;
+		}();
+
+		const bool throwing_melee = [&]() {
+			if (const auto transfers = in.character.find<components::item_slot_transfers>()) {
+				return transfers->when_throw_requested.was_set();
+			}
+
+			return false;
+		}();
+
+		auto is_laser_shown = [&](const const_entity_handle subject_item) {
+			if (throwing_explosive) {
+				return ::is_armed_explosive(subject_item);
+			}
+
+			if (throwing_melee) {
+				return subject_item.has<components::melee>();
+			}
+
+			return true;
+		};
+
+		for (const auto& subject_item_id : wielded_items) {
 			const auto subject_item = cosm[subject_item_id];
+
+			if (!is_laser_shown(subject_item)) {
+				continue;
+			}
 
 			std::optional<b2Filter> queried_filter;
 

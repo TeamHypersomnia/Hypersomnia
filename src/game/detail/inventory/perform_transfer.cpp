@@ -383,7 +383,7 @@ perform_transfer_result perform_transfer_impl::operator()(
    		because some stances might have changed completely. 
 	*/
 
-	{
+	if (!r.params.keep_when_last_transferred) {
 		const auto now = cosm.get_timestamp();
 		item.when_last_transferred = now;
 	}

@@ -36,7 +36,8 @@ public:
 
 	bool drop_to_the_side = false;
 	bool play_start_mounting_sound = true;
-	pad_bytes<3> pad;
+	bool keep_when_last_transferred = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	void set_specified_quantity(allocate_new_entity_access, int);
