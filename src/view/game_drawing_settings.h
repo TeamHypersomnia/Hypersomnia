@@ -285,9 +285,9 @@ struct game_drawing_settings {
 	bool draw_melee_trajectories = true;
 	bool draw_throw_trajectory_when_throwing = false;
 	bool draw_throw_trajectories_during_side_throws = false;
-	float throw_trajectory_alpha = 0.7f;
+	float throw_trajectory_alpha = 0.25f;
 	float throw_trajectory_end_alpha = 0.9f;
-	float throw_trajectory_gap = 1.5f;
+	float throw_trajectory_gap = 2.f;
 	bool draw_aabb_highlighter = true;
 	bool draw_inventory = true;
 	bool draw_hotbar = true;

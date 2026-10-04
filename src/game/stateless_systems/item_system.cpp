@@ -55,6 +55,7 @@
 
 #include "game/detail/gun/gun_getters.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/detail/inventory/is_throwing.h"
 #include "game/cosmos/might_allocate_entities_having.hpp"
 #include "game/detail/inventory/wield_same_as.hpp"
 #include "game/messages/collected_message.h"
@@ -83,9 +84,45 @@ bool holds_armed_explosive(const E& handle) {
 	return false;
 }
 
+/*
+	The melee weapons a character could draw for a throw, at most two, in the order they would be drawn:
+	the one kept in the SHOULDER slot first, then any other one not held in hands.
+*/
+
 template <class E>
-bool is_throwing_melee(const E& handle) {
-	return handle.template get<components::item_slot_transfers>().when_throw_requested.was_set();
+auto find_drawable_melees(const E& character) {
+	augs::constant_size_vector<entity_id, 2> found;
+
+	if (const auto shoulder_slot = character[slot_function::SHOULDER]) {
+		if (const auto shoulder_item = shoulder_slot.get_item_if_any()) {
+			if (shoulder_item.template has<components::melee>()) {
+				found.push_back(shoulder_item.get_id());
+			}
+		}
+	}
+
+	character.for_each_contained_item_recursive(
+		[&](const auto& candidate_item) {
+			if (found.size() >= found.max_size()) {
+				return recursive_callback_result::ABORT;
+			}
+
+			if (candidate_item.get_current_slot().is_hand_slot()) {
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
+			}
+
+			const auto candidate_id = entity_id(candidate_item.get_id());
+			const bool already_found = !found.empty() && found[0] == candidate_id;
+
+			if (candidate_item.template has<components::melee>() && !already_found) {
+				found.push_back(candidate_id);
+			}
+
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
+		}
+	);
+
+	return found;
 }
 
 /*
@@ -1397,25 +1434,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				*/
 
 				if (requested_knives == 2 && ::can_move_primary_to_secondary_for_throw(typed_subject)) {
-					int num_drawable_melees = 0;
-
-					typed_subject.for_each_contained_item_recursive(
-						[&](const auto& candidate_item) {
-							if (candidate_item.get_current_slot().is_hand_slot()) {
-								return recursive_callback_result::CONTINUE_AND_RECURSE;
-							}
-
-							if (candidate_item.template has<components::melee>()) {
-								++num_drawable_melees;
-
-								if (num_drawable_melees >= 2) {
-									return recursive_callback_result::ABORT;
-								}
-							}
-
-							return recursive_callback_result::CONTINUE_AND_RECURSE;
-						}
-					);
+					const auto num_drawable_melees = ::find_drawable_melees(typed_subject).size();
 
 					if (num_drawable_melees < 2) {
 						requested_knives = 1;
@@ -1471,10 +1490,6 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					const auto current_wielding = wielding_setup::from_current(typed_subject);
 					auto requested_wield = current_wielding;
 
-					auto is_melee_like = [&](const auto& entity) {
-						return entity.template has<components::melee>();
-					};
-
 					/*
 						Only a single knife keeps the gun in the other hand.
 						Two knives replace whatever is wielded anyway.
@@ -1499,56 +1514,22 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					auto num_additional_melees = requested_knives - num_wielded_melees;
 					bool any_found = false;
 
-					entity_id prioritized_shoulder_melee;
-
 					/*
-						Priority: a melee weapon kept in the SHOULDER slot is always
-						the first candidate to be drawn for throwing.
+						See find_drawable_melees for the order they are drawn in.
 					*/
-					if (num_additional_melees > 0) {
-						if (const auto shoulder_slot = typed_subject[slot_function::SHOULDER]) {
-							if (const auto shoulder_item = shoulder_slot.get_item_if_any()) {
-								if (is_melee_like(shoulder_item)) {
-									requested_wield.hand_selections[target_index] = shoulder_item;
-									target_index = 1 - target_index;
-									++num_found_melees;
-									--num_additional_melees;
 
-									any_found = true;
-									prioritized_shoulder_melee = shoulder_item.get_id();
-								}
-							}
+					for (const auto& candidate_id : ::find_drawable_melees(typed_subject)) {
+						if (num_additional_melees <= 0) {
+							break;
 						}
+
+						requested_wield.hand_selections[target_index] = candidate_id;
+						target_index = 1 - target_index;
+						++num_found_melees;
+						--num_additional_melees;
+
+						any_found = true;
 					}
-
-					typed_subject.for_each_contained_item_recursive(
-						[&](const auto& candidate_item) {
-							if (num_additional_melees <= 0) {
-								return recursive_callback_result::ABORT;
-							}
-
-							if (candidate_item.get_current_slot().is_hand_slot()) {
-								return recursive_callback_result::CONTINUE_AND_RECURSE;
-							}
-
-							if (entity_id(candidate_item.get_id()) == prioritized_shoulder_melee) {
-								return recursive_callback_result::CONTINUE_AND_RECURSE;
-							}
-
-							if (is_melee_like(candidate_item)) {
-								requested_wield.hand_selections[target_index] = candidate_item;
-								target_index = 1 - target_index;
-								++num_found_melees;
-								--num_additional_melees;
-
-								any_found = true;
-
-								return num_additional_melees > 0 ? recursive_callback_result::CONTINUE_AND_RECURSE : recursive_callback_result::ABORT;
-							}
-
-							return recursive_callback_result::CONTINUE_AND_RECURSE;
-						}
-					);
 
 					const auto total_wielded_melees = num_found_melees + num_wielded_melees;
 

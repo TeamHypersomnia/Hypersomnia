@@ -103,7 +103,7 @@ namespace {
 	};
 
 	/*
-		Finds how far along a ray the nearest stopper - a sensor, see make_world_with_obstacles -
+		Finds how far along a ray the nearest stopper - a sensor, see classify_collider -
 		and the nearest obstacle are, ignoring the thrown body.
 	*/
 
@@ -232,114 +232,266 @@ namespace {
 		return !sentience->spawn_protection_cooldown.lasts(target.get_cosmos().get_clock());
 	}
 
+	enum class copied_collider_type {
+		NONE,
+		STATIC_OBSTACLE,
+		DYNAMIC_OBSTACLE,
+		STOPPER
+	};
+
 	/*
-		A world with copies of the static colliders and of the dynamic obstacles that the thrown item collides with, found within the aabb,
-		and of the stoppers as sensors, where the throw is not followed further, only shown as blocked from there on:
-		- portals,
-		- if melee_thrower is alive, the characters it would stop at - see stops_thrown_melee.
+		What a collider the thrown item collides with is copied as:
+		- static obstacles like walls,
+		- dynamic obstacles like crates - but not characters, nor items held, lying or flying, nor missiles,
+		- stoppers, as sensors, where the throw is not followed further, only shown as blocked from there on:
+			- portals,
+			- if melee_thrower is alive, the characters it would stop at - see stops_thrown_melee.
 	*/
 
-	std::unique_ptr<b2World> make_world_with_obstacles(
+	copied_collider_type classify_collider(
 		const cosmos& cosm,
-		const ltrb aabb,
+		const b2Fixture& fixture,
+		const const_entity_handle melee_thrower
+	) {
+		const auto source_body = fixture.GetBody();
+		const auto owner = cosm[fixture.GetUserData()];
+
+		/*
+			Portals might not be sensors - their contacts are disabled by the contact listener instead.
+		*/
+
+		const bool is_portal = owner.find<components::portal>() != nullptr;
+		const bool is_stopping_character = melee_thrower.alive() && !fixture.IsSensor() && ::stops_thrown_melee(melee_thrower, owner);
+
+		if (is_portal || is_stopping_character) {
+			return copied_collider_type::STOPPER;
+		}
+
+		if (fixture.IsSensor()) {
+			return copied_collider_type::NONE;
+		}
+
+		if (source_body->GetType() == b2_staticBody) {
+			return copied_collider_type::STATIC_OBSTACLE;
+		}
+
+		const bool is_dynamic_obstacle = 
+			source_body->GetType() == b2_dynamicBody
+			&& owner.find<components::sentience>() == nullptr
+			&& owner.find<components::item>() == nullptr
+			&& owner.find<components::missile>() == nullptr
+		;
+
+		return is_dynamic_obstacle ? copied_collider_type::DYNAMIC_OBSTACLE : copied_collider_type::NONE;
+	}
+
+	/*
+		A static collider copied into an obstacle world, compared between the steps to tell if the copies are up to date.
+		The fixture could be destroyed and another one made at its address, so its owner and bounds are compared too.
+	*/
+
+	struct copied_static_collider {
+		const b2Fixture* fixture = nullptr;
+		unversioned_entity_id owner;
+		b2AABB bounds;
+
+		bool operator==(const copied_static_collider& b) const {
+			return
+				fixture == b.fixture
+				&& owner == b.owner
+				&& bounds.lowerBound == b.bounds.lowerBound
+				&& bounds.upperBound == b.bounds.upperBound
+			;
+		}
+	};
+
+	/*
+		The copies of the static colliders found within copied_area are kept between the steps.
+		The dynamic obstacles and the stoppers - transient_bodies - are copied anew for every simulation,
+		since they move, and a simulation pushes the dynamic ones.
+	*/
+
+	struct obstacle_world {
+		std::unique_ptr<b2World> world;
+		ltrb copied_area;
+		std::vector<copied_static_collider> static_colliders;
+		std::vector<b2Body*> transient_bodies;
+	};
+
+	/*
+		How much bigger than needed the area of the copied static colliders is,
+		so that they are not copied anew with every move of the thrower.
+	*/
+
+	static constexpr real32 COPIED_AREA_MULT = 1.5f;
+
+	std::unique_ptr<b2World> make_empty_world() {
+		auto world = std::make_unique<b2World>(b2Vec2(0.f, 0.f));
+		world->SetAllowSleeping(false);
+		return world;
+	}
+
+	b2AABB to_meters_aabb(const si_scaling si, const ltrb area) {
+		const auto lt = si.get_meters(area.lt());
+		const auto rb = si.get_meters(area.rb());
+
+		b2AABB result;
+		result.lowerBound = b2Vec2(lt.x, lt.y);
+		result.upperBound = b2Vec2(rb.x, rb.y);
+
+		return result;
+	}
+
+	void copy_fixture(b2Body& to, const b2Fixture& fixture, const bool is_sensor) {
+		b2FixtureDef def;
+		def.density = fixture.GetDensity();
+		def.shape = fixture.GetShape();
+		def.friction = fixture.GetFriction();
+		def.restitution = fixture.GetRestitution();
+		def.filter = fixture.GetFilterData();
+		def.isSensor = is_sensor;
+		def.userData = fixture.GetUserData();
+
+		to.CreateFixture(&def);
+	}
+
+	b2Body* copy_body(b2World& world, const b2Body& source, const bool dynamic) {
+		b2BodyDef def;
+		set_body_def_transform(def, source.GetPosition(), source.GetAngle());
+
+		if (dynamic) {
+			/*
+				Pushed by the throw like the real ones, from where they are and how they move now.
+			*/
+
+			def.type = b2_dynamicBody;
+			def.allowSleep = false;
+			def.linearVelocity = source.GetLinearVelocity();
+			def.angularVelocity = source.GetAngularVelocity();
+			def.linearDamping = source.GetLinearDamping();
+			def.angularDamping = source.GetAngularDamping();
+			def.fixedRotation = source.IsFixedRotation();
+		}
+		else {
+			def.type = b2_staticBody;
+		}
+
+		return world.CreateBody(&def);
+	}
+
+	/*
+		Brings the obstacle world up to date for a throw that could reach anywhere within needed_area.
+		Returns whether there are any dynamic obstacles in it.
+	*/
+
+	bool update_obstacle_world(
+		obstacle_world& w,
+		std::vector<copied_static_collider>& found_static_colliders,
+		std::unordered_map<const b2Body*, b2Body*>& copied_bodies,
+		const cosmos& cosm,
+		const ltrb needed_area,
 		const b2Filter thrown_filter,
-		const const_entity_handle melee_thrower,
-		bool& has_dynamic_obstacles
+		const const_entity_handle melee_thrower
 	) {
 		const auto si = cosm.get_si();
 		const auto& physics = cosm.get_solvable_inferred().physics;
 
-		auto world = std::make_unique<b2World>(b2Vec2(0.f, 0.f));
-		world->SetAllowSleeping(false);
+		const bool area_covered = 
+			w.world != nullptr
+			&& w.copied_area.l <= needed_area.l
+			&& w.copied_area.t <= needed_area.t
+			&& w.copied_area.r >= needed_area.r
+			&& w.copied_area.b >= needed_area.b
+		;
 
-		thread_local std::unordered_map<const b2Body*, b2Body*> copied_bodies;
-		copied_bodies.clear();
+		if (!area_covered) {
+			w.copied_area = needed_area;
+			w.copied_area.expand_from_center_mult(COPIED_AREA_MULT);
+		}
 
-		const auto lt = si.get_meters(aabb.lt());
-		const auto rb = si.get_meters(aabb.rb());
-
-		b2AABB query_aabb;
-		query_aabb.lowerBound = b2Vec2(lt.x, lt.y);
-		query_aabb.upperBound = b2Vec2(rb.x, rb.y);
+		found_static_colliders.clear();
 
 		physics.for_each_in_aabb_meters(
-			query_aabb,
+			to_meters_aabb(si, w.copied_area),
 			thrown_filter,
 			[&](const b2Fixture& fixture) {
-				const auto source_body = fixture.GetBody();
-
-				/*
-					Portals might not be sensors - their contacts are disabled by the contact listener instead.
-				*/
-
-				const auto owner = cosm[fixture.GetUserData()];
-
-				const bool is_portal = owner.find<components::portal>() != nullptr;
-				const bool is_stopping_character = melee_thrower.alive() && !fixture.IsSensor() && ::stops_thrown_melee(melee_thrower, owner);
-				const bool is_stopper = is_portal || is_stopping_character;
-				const bool is_obstacle = !fixture.IsSensor() && !is_stopper;
-				const bool is_static_obstacle = is_obstacle && source_body->GetType() == b2_staticBody;
-
-				/*
-					Like crates - but not characters, nor items held, lying or flying, nor missiles.
-				*/
-
-				const bool is_dynamic_obstacle = 
-					is_obstacle
-					&& source_body->GetType() == b2_dynamicBody
-					&& owner.find<components::sentience>() == nullptr
-					&& owner.find<components::item>() == nullptr
-					&& owner.find<components::missile>() == nullptr
-				;
-
-				if (!is_stopper && !is_static_obstacle && !is_dynamic_obstacle) {
-					return callback_result::CONTINUE;
+				if (::classify_collider(cosm, fixture, melee_thrower) == copied_collider_type::STATIC_OBSTACLE) {
+					found_static_colliders.push_back({ std::addressof(fixture), fixture.GetUserData(), fixture.GetAABB(0) });
 				}
-
-				auto& copied_body = copied_bodies[source_body];
-
-				if (copied_body == nullptr) {
-					b2BodyDef def;
-					set_body_def_transform(def, source_body->GetPosition(), source_body->GetAngle());
-
-					if (is_dynamic_obstacle) {
-						/*
-							Pushed by the throw like the real ones, from where they are and how they move now.
-						*/
-
-						def.type = b2_dynamicBody;
-						def.allowSleep = false;
-						def.linearVelocity = source_body->GetLinearVelocity();
-						def.angularVelocity = source_body->GetAngularVelocity();
-						def.linearDamping = source_body->GetLinearDamping();
-						def.angularDamping = source_body->GetAngularDamping();
-						def.fixedRotation = source_body->IsFixedRotation();
-
-						has_dynamic_obstacles = true;
-					}
-					else {
-						def.type = b2_staticBody;
-					}
-
-					copied_body = world->CreateBody(&def);
-				}
-
-				b2FixtureDef def;
-				def.density = fixture.GetDensity();
-				def.shape = fixture.GetShape();
-				def.friction = fixture.GetFriction();
-				def.restitution = fixture.GetRestitution();
-				def.filter = fixture.GetFilterData();
-				def.isSensor = is_stopper;
-				def.userData = fixture.GetUserData();
-
-				copied_body->CreateFixture(&def);
 
 				return callback_result::CONTINUE;
 			}
 		);
 
-		return world;
+		/*
+			Sorted, since the order of a query changes whenever the tree of the real world is rebalanced.
+		*/
+
+		std::sort(
+			found_static_colliders.begin(),
+			found_static_colliders.end(),
+			[](const auto& a, const auto& b) {
+				return std::less<const b2Fixture*>()(a.fixture, b.fixture);
+			}
+		);
+
+		if (!area_covered || found_static_colliders != w.static_colliders) {
+			w.world = ::make_empty_world();
+			w.transient_bodies.clear();
+			copied_bodies.clear();
+
+			for (const auto& collider : found_static_colliders) {
+				const auto& fixture = *collider.fixture;
+				auto& copied_body = copied_bodies[fixture.GetBody()];
+
+				if (copied_body == nullptr) {
+					copied_body = ::copy_body(*w.world, *fixture.GetBody(), false);
+				}
+
+				::copy_fixture(*copied_body, fixture, false);
+			}
+
+			std::swap(w.static_colliders, found_static_colliders);
+		}
+
+		for (const auto body : w.transient_bodies) {
+			w.world->DestroyBody(body);
+		}
+
+		w.transient_bodies.clear();
+		copied_bodies.clear();
+
+		bool has_dynamic_obstacles = false;
+
+		physics.for_each_in_aabb_meters(
+			to_meters_aabb(si, needed_area),
+			thrown_filter,
+			[&](const b2Fixture& fixture) {
+				const auto type = ::classify_collider(cosm, fixture, melee_thrower);
+
+				const bool is_stopper = type == copied_collider_type::STOPPER;
+				const bool is_dynamic_obstacle = type == copied_collider_type::DYNAMIC_OBSTACLE;
+
+				if (!is_stopper && !is_dynamic_obstacle) {
+					return callback_result::CONTINUE;
+				}
+
+				auto& copied_body = copied_bodies[fixture.GetBody()];
+
+				if (copied_body == nullptr) {
+					copied_body = ::copy_body(*w.world, *fixture.GetBody(), is_dynamic_obstacle);
+					w.transient_bodies.push_back(copied_body);
+				}
+
+				::copy_fixture(*copied_body, fixture, is_stopper);
+
+				has_dynamic_obstacles = has_dynamic_obstacles || is_dynamic_obstacle;
+
+				return callback_result::CONTINUE;
+			}
+		);
+
+		return has_dynamic_obstacles;
 	}
 
 	simulated_flight simulate_flight(
@@ -363,10 +515,14 @@ namespace {
 		body_def.bullet = true;
 		body_def.allowSleep = false;
 		set_body_def_transform(body_def, b2Vec2(start_pos.x, start_pos.y), in.start.rotation * DEG_TO_RAD<real32>);
-		body_def.linearDamping = in.linear_damping;
-		body_def.angularDamping = in.angular_damping;
+		body_def.linearDamping = in.damping.linear;
+		body_def.angularDamping = in.damping.angular;
+		body_def.fixedRotation = in.fixed_rotation;
 
 		const auto body = world.CreateBody(&body_def);
+
+		body->SetLinearDampingVec(b2Vec2(in.damping.linear_axis_aligned.x, in.damping.linear_axis_aligned.y));
+		body->SetAngledDampingEnabled(in.angled_damping);
 
 		b2FixtureDef fixture_def;
 		fixture_def.density = fixtures_def.density;
@@ -564,6 +720,8 @@ namespace {
 			}
 		}
 
+		world.DestroyBody(body);
+
 		return result;
 	}
 
@@ -579,7 +737,13 @@ namespace {
 		in.nontemporal_seed = cosm.get_nontemporal_rng_seed_for(item);
 		in.num_falls = item.get<components::item>().get_fall().num_falls;
 
+		/*
+			Items have no movement, which alone could disable angled damping - see calc_angled_damping_enabled.
+		*/
+
 		const auto& body_def = item.get<invariants::rigid_body>();
+		in.angled_damping = body_def.angled_damping;
+		in.fixed_rotation = body_def.fixed_rotation;
 
 		if (const auto fuse = item.find<components::hand_fuse>()) {
 			const auto& fuse_def = item.get<invariants::hand_fuse>();
@@ -595,7 +759,12 @@ namespace {
 			const auto arming_source = fuse->armed() ? fuse->arming_source : static_cast<uint8_t>(arming_source_type::SHOOT_INTENT);
 			const auto launch = ::calc_explosive_throw_launch(item, character, arming_source);
 
+			/*
+				Damped like in calc_damping_mults.
+			*/
+
 			auto damping = body_def.damping;
+			damping.linear *= launch.damping_mult;
 			damping.sanitize();
 
 			in.explosive = true;
@@ -603,8 +772,7 @@ namespace {
 			in.angular_impulse = launch.angular_impulse;
 			in.floor_hits_when_thrown = fuse_def.floor_hits_when_thrown;
 			in.fuse_delay_ms = fuse->fuse_delay_ms;
-			in.linear_damping = damping.linear * launch.damping_mult;
-			in.angular_damping = damping.angular;
+			in.damping = damping;
 			in.max_steps = ::calc_explosive_flight_steps(cosm.get_clock(), fuse->fuse_delay_ms, fuse->when_armed);
 
 			return in;
@@ -626,8 +794,7 @@ namespace {
 			in.angular_velocity = mult * melee_def->throw_def.throw_angular_speed;
 			in.faces_flight_direction = ::faces_flight_direction(*melee_def);
 			in.min_speed = melee_def->throw_def.min_speed_to_hurt;
-			in.linear_damping = damping.linear;
-			in.angular_damping = damping.angular;
+			in.damping = damping;
 			in.max_steps = static_cast<uint32_t>(MAX_MELEE_FLIGHT_SECS / cosm.get_clock().dt.in_seconds());
 
 			return in;
@@ -700,6 +867,25 @@ namespace {
 	*/
 
 	void interpolate_from(throw_trajectory& next, const throw_trajectory* const last) {
+		/*
+			make_silhouettes outputs them by type in this order, and by increasing index within a type,
+			so the two steps are matched by merging.
+		*/
+
+		auto order_of = [](const throw_silhouette& t) {
+			const auto type_order = [&]() {
+				switch (t.type) {
+					case throw_silhouette_type::BLOCKED: return 0;
+					case throw_silhouette_type::PATH: return 1;
+					default: return 2;
+				}
+			}();
+
+			return std::make_pair(type_order, t.index);
+		};
+
+		std::size_t j = 0;
+
 		for (auto& silhouette : next.silhouettes) {
 			silhouette.previous = silhouette.current;
 
@@ -707,11 +893,15 @@ namespace {
 				continue;
 			}
 
-			for (const auto& last_silhouette : last->silhouettes) {
-				if (last_silhouette.type == silhouette.type && last_silhouette.index == silhouette.index) {
-					silhouette.previous = last_silhouette.current;
-					break;
-				}
+			const auto& last_silhouettes = last->silhouettes;
+			const auto order = order_of(silhouette);
+
+			while (j < last_silhouettes.size() && order_of(last_silhouettes[j]) < order) {
+				++j;
+			}
+
+			if (j < last_silhouettes.size() && order_of(last_silhouettes[j]) == order) {
+				silhouette.previous = last_silhouettes[j].current;
 			}
 		}
 	}
@@ -729,6 +919,27 @@ namespace {
 	}
 }
 
+struct throw_trajectory_system::obstacle_worlds {
+	obstacle_world explosive;
+	obstacle_world melee;
+	std::unique_ptr<b2World> empty_world = ::make_empty_world();
+
+	std::vector<copied_static_collider> found_static_colliders;
+	std::unordered_map<const b2Body*, b2Body*> copied_bodies;
+};
+
+throw_trajectory_system::throw_trajectory_system() = default;
+throw_trajectory_system::~throw_trajectory_system() = default;
+
+throw_trajectory_system::throw_trajectory_system(throw_trajectory_system&&) noexcept = default;
+throw_trajectory_system& throw_trajectory_system::operator=(throw_trajectory_system&&) noexcept = default;
+
+void throw_trajectory_system::clear() {
+	trajectories.clear();
+	previous.clear();
+	worlds.reset();
+}
+
 void throw_trajectory_system::advance(
 	const const_entity_handle viewed_character,
 	const throw_trajectory_flags& flags,
@@ -741,14 +952,17 @@ void throw_trajectory_system::advance(
 
 	const auto& cosm = viewed_character.get_cosmos();
 
-	thread_local std::vector<throw_trajectory> previous;
-	previous = std::move(trajectories);
+	if (worlds == nullptr) {
+		worlds = std::make_unique<obstacle_worlds>();
+	}
+
+	std::swap(previous, trajectories);
 	trajectories.clear();
 
 	for (const auto& item_id : viewed_character.get_wielded_items()) {
 		const auto item = cosm[item_id];
 
-		if (item.dead() || !flags.shown_for(item) || !::is_aimed_with(viewed_character, item, flags.during_side_throws)) {
+		if (item.dead() || !::is_throw_trajectory_shown(viewed_character, item, flags)) {
 			continue;
 		}
 
@@ -796,11 +1010,17 @@ void throw_trajectory_system::advance(
 		const auto dt_secs = cosm.get_clock().dt.in_seconds();
 
 		/*
-			With all the pushes of its floor hits, a thrown melee weapon flies at most a few of them farther.
+			With all the pushes of its floor hits, a thrown melee weapon flies at most a few of them farther -
+			and only until it is too slow to hurt.
 		*/
 
 		const auto pushes_speed = in->explosive ? 0.f : 2 * DROPPED_ITEM_PUSH_SPEED;
-		const auto max_distance = augs::calc_damped_distance(in->speed + pushes_speed, in->linear_damping, dt_secs, in->max_steps);
+		const auto launch_speed = in->speed + pushes_speed;
+
+		const auto max_distance = std::min(
+			augs::calc_damped_distance(launch_speed, in->damping.linear, dt_secs, in->max_steps),
+			augs::calc_damped_distance_until_speed(launch_speed, in->min_speed, in->damping.linear)
+		);
 		const auto size = ::calc_silhouette_size(item);
 		const auto radius = static_cast<real32>(std::max(size.x, size.y)) / 2;
 		const auto reach = max_distance + radius + OBSTACLES_QUERY_MARGIN;
@@ -813,18 +1033,24 @@ void throw_trajectory_system::advance(
 
 		const auto melee_thrower = in->explosive ? cosm[entity_id()] : viewed_character;
 
-		bool has_dynamic_obstacles = false;
+		auto& obstacles = in->explosive ? worlds->explosive : worlds->melee;
 
-		const auto world = ::make_world_with_obstacles(cosm, aabb, thrown_filter, melee_thrower, has_dynamic_obstacles);
-		const auto flight = ::simulate_flight(*world, cosm, *in, shapes, fixtures_def, thrown_filter);
+		const bool has_dynamic_obstacles = ::update_obstacle_world(
+			obstacles,
+			worlds->found_static_colliders,
+			worlds->copied_bodies,
+			cosm,
+			aabb,
+			thrown_filter,
+			melee_thrower
+		);
+
+		const auto flight = ::simulate_flight(*obstacles.world, cosm, *in, shapes, fixtures_def, thrown_filter);
 
 		auto free_flight = simulated_flight();
 
 		if (flight.first_contact_index.has_value()) {
-			const auto empty_world = std::make_unique<b2World>(b2Vec2(0.f, 0.f));
-			empty_world->SetAllowSleeping(false);
-
-			free_flight = ::simulate_flight(*empty_world, cosm, *in, shapes, fixtures_def, thrown_filter);
+			free_flight = ::simulate_flight(*worlds->empty_world, cosm, *in, shapes, fixtures_def, thrown_filter);
 		}
 
 		auto new_trajectory = throw_trajectory();

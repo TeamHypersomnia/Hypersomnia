@@ -1,5 +1,7 @@
 #pragma once
+#include <algorithm>
 #include <cstdint>
+#include <limits>
 #include "augs/math/declare_math.h"
 
 namespace augs {
@@ -13,7 +15,7 @@ namespace augs {
 
 		since a / (1 - a) = 1 / (dt * c).
 
-		a^n is computed by repeated multiplication, not pow, so that it stays deterministic across platforms.
+		a^n is computed by repeated squaring, not pow, so that it stays deterministic across platforms.
 	*/
 
 	inline real32 calc_damped_distance_mult(
@@ -28,9 +30,14 @@ namespace augs {
 		const auto a = 1.f / (1.f + dt_secs * linear_damping);
 
 		auto a_to_n = 1.f;
+		auto base = a;
 
-		for (uint32_t i = 0; i < steps; ++i) {
-			a_to_n *= a;
+		for (auto n = steps; n > 0; n /= 2) {
+			if (n % 2 == 1) {
+				a_to_n *= base;
+			}
+
+			base *= base;
 		}
 
 		return (1.f - a_to_n) / linear_damping;
@@ -43,6 +50,24 @@ namespace augs {
 		const uint32_t steps
 	) {
 		return initial_speed * calc_damped_distance_mult(linear_damping, dt_secs, steps);
+	}
+
+	/*
+		How far a body starting at initial_speed flies until it slows down to final_speed:
+		calc_damped_distance at the step n where a^n = final_speed / initial_speed.
+		Unbounded without damping.
+	*/
+
+	inline real32 calc_damped_distance_until_speed(
+		const real32 initial_speed,
+		const real32 final_speed,
+		const real32 linear_damping
+	) {
+		if (linear_damping <= 0.f) {
+			return std::numeric_limits<real32>::max();
+		}
+
+		return std::max(0.f, initial_speed - final_speed) / linear_damping;
 	}
 
 	/*

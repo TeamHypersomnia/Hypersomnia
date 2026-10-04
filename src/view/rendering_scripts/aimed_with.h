@@ -1,8 +1,8 @@
 #pragma once
 #include "game/components/gun_component.h"
-#include "game/components/item_slot_transfers_component.h"
 #include "game/components/melee_component.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/detail/inventory/is_throwing.h"
 #include "view/rendering_scripts/throw_trajectory_flags.h"
 
 /*
@@ -19,29 +19,13 @@
 template <class H, class I>
 bool is_aimed_with(const H& character, const I& item, const bool aim_side_throws) {
 	const auto& cosm = character.get_cosmos();
-	const auto wielded_items = character.get_wielded_items();
 
-	const bool throwing_explosive = [&]() {
-		for (const auto& w : wielded_items) {
-			if (::is_armed_explosive(cosm[w])) {
-				return true;
-			}
-		}
-
-		return false;
-	}();
-
-	const bool throwing_melee = [&]() {
-		if (const auto transfers = character.template find<components::item_slot_transfers>()) {
-			return transfers->when_throw_requested.was_set();
-		}
-
-		return false;
-	}();
+	const bool throwing_explosive = ::is_throwing_explosive(character);
+	const bool throwing_melee = ::is_throwing_melee(character);
 
 	if (!aim_side_throws && (throwing_explosive || throwing_melee)) {
 		const bool gun_wielded = [&]() {
-			for (const auto& w : wielded_items) {
+			for (const auto& w : character.get_wielded_items()) {
 				if (const auto wielded = cosm[w]; wielded.alive() && wielded.template has<components::gun>()) {
 					return true;
 				}
@@ -61,6 +45,28 @@ bool is_aimed_with(const H& character, const I& item, const bool aim_side_throws
 
 	if (throwing_melee) {
 		return item.template has<components::melee>();
+	}
+
+	return true;
+}
+
+/*
+	Whether the trajectory of a held item is shown - see throw_trajectory_flags:
+	with only_when_throwing, only that of an armed grenade or of a melee weapon about to be thrown.
+*/
+
+template <class H, class I>
+bool is_throw_trajectory_shown(const H& character, const I& item, const throw_trajectory_flags& flags) {
+	if (!flags.shown_for(item) || !::is_aimed_with(character, item, flags.during_side_throws)) {
+		return false;
+	}
+
+	if (flags.only_when_throwing) {
+		if (::is_armed_explosive(item)) {
+			return true;
+		}
+
+		return item.template has<components::melee>() && ::is_throwing_melee(character);
 	}
 
 	return true;

@@ -18,7 +18,6 @@
 #include "view/rendering_scripts/draw_entity.h"
 
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/melee_component.h"
 #include "game/debug_drawing_settings.h"
 #include "game/detail/visible_entities.h"
 
@@ -43,7 +42,6 @@
 
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "game/detail/crosshair_math.hpp"
-#include "game/detail/explosive/like_explosive.h"
 
 #include "application/performance_settings.h"
 #include "augs/gui/text/printer.h"
@@ -85,11 +83,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto real_global_time_seconds = cosm.get_clock().get_real_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 
-	const auto throw_trajectories = throw_trajectory_flags {
-		settings.draw_grenade_trajectories,
-		settings.draw_melee_trajectories,
-		settings.draw_throw_trajectories_during_side_throws
-	};
+	const auto throw_trajectories = throw_trajectory_flags::from(settings);
 
 	const auto matrix = cone.get_projection_matrix();
 
@@ -566,39 +560,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		constexpr auto end_max_size_mult = 2.f;
 		constexpr auto dash_length = 10.f;
 
-		/*
-			With the laser off, a trajectory is shown only right before the throw, if enabled:
-			of an armed grenade, or of a melee weapon about to be thrown.
-		*/
-
-		auto is_shown = [&](const throw_trajectory& trajectory) {
-			if (settings.draw_weapon_laser) {
-				return true;
-			}
-
-			if (!settings.draw_throw_trajectory_when_throwing) {
-				return false;
-			}
-
-			const auto item = cosm[trajectory.input.item];
-
-			if (::is_armed_explosive(item)) {
-				return true;
-			}
-
-			if (item.alive() && item.has<components::melee>()) {
-				if (const auto transfers = viewed_character.find<components::item_slot_transfers>()) {
-					return transfers->when_throw_requested.was_set();
-				}
-			}
-
-			return false;
-		};
-
-		if (std::none_of(trajectories.begin(), trajectories.end(), is_shown)) {
-			return;
-		}
-
 		const auto alpha = std::clamp(settings.throw_trajectory_alpha, 0.f, 1.f);
 		const auto end_alpha = std::clamp(settings.throw_trajectory_end_alpha, 0.f, 1.f);
 		const auto ratio = static_cast<real32>(in.interpolation_ratio);
@@ -649,10 +610,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			auto& output = renderer.get_triangle_buffer();
 
 			for (const auto& trajectory : reverse(trajectories)) {
-				if (!is_shown(trajectory)) {
-					continue;
-				}
-
 				const auto& entry = game_images.find_or(trajectory.image).diffuse;
 
 				for (const auto& silhouette : reverse(trajectory.silhouettes)) {
@@ -687,7 +644,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			for (const auto& trajectory : trajectories) {
 				const auto item = cosm[trajectory.input.item];
 
-				if (item.dead() || !is_shown(trajectory)) {
+				if (item.dead()) {
 					continue;
 				}
 
@@ -746,8 +703,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.start_single_coverage();
 #endif
 
-		set_shader_with_matrix(shaders.shadow_sprite);
-		draw_silhouettes();
+		/*
+			Flat colors need the shadow sprite shader - without it, only the dashed lines are drawn.
+		*/
+
+		if (shaders.shadow_sprite) {
+			set_shader_with_matrix(shaders.shadow_sprite);
+			draw_silhouettes();
+		}
 
 		set_shader_with_non_zoomed_matrix(shaders.standard);
 		draw_dashed_lines();

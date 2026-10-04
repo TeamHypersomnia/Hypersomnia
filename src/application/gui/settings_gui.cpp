@@ -1617,27 +1617,6 @@ void settings_gui_state::perform(
 
 						revertable_checkbox(SCOPE_CFG_NVP(draw_weapon_laser));
 
-						revertable_checkbox("Draw trajectories of grenades", config.drawing.draw_grenade_trajectories);
-						revertable_checkbox("Draw trajectories of knives", config.drawing.draw_melee_trajectories);
-						text_disabled("(instead of their laser)");
-
-						if (config.drawing.draw_grenade_trajectories || config.drawing.draw_melee_trajectories) {
-							auto indent = scoped_indent();
-
-							if (!config.drawing.draw_weapon_laser) {
-								revertable_checkbox("Still draw them right before a throw", config.drawing.draw_throw_trajectory_when_throwing);
-								text_disabled("(of an armed grenade, or of a knife about to be thrown)");
-							}
-
-							revertable_checkbox("Draw them when throwing with a gun in the other hand", config.drawing.draw_throw_trajectories_during_side_throws);
-							text_disabled("(otherwise the gun keeps its laser for the short while)");
-
-							revertable_slider("Grenade and knife trajectory alpha", config.drawing.throw_trajectory_alpha, 0.f, 1.f);
-							revertable_slider("Grenade and knife trajectory end alpha", config.drawing.throw_trajectory_end_alpha, 0.f, 1.f);
-							revertable_slider("Grenade and knife trajectory gap", config.drawing.throw_trajectory_gap, 0.f, 5.f);
-							text_disabled("(between the silhouettes, in their radii)");
-						}
-
 						revertable_checkbox(SCOPE_CFG_NVP(draw_crosshairs));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_health_numbers));
@@ -1712,6 +1691,27 @@ void settings_gui_state::perform(
 						}
 
 						//revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
+					}
+
+					if (auto node = scoped_tree_node("Throw trajectories")) {
+						revertable_checkbox("Grenades", config.drawing.draw_grenade_trajectories);
+						revertable_checkbox("Melee weapons", config.drawing.draw_melee_trajectories);
+						text_disabled("(instead of their laser)");
+
+						if (config.drawing.draw_grenade_trajectories || config.drawing.draw_melee_trajectories) {
+							if (!config.drawing.draw_weapon_laser) {
+								revertable_checkbox("Still draw them right before a throw", config.drawing.draw_throw_trajectory_when_throwing);
+								text_disabled("(of an armed grenade, or of a melee weapon about to be thrown)");
+							}
+
+							revertable_checkbox("Draw them when throwing with a gun in the other hand", config.drawing.draw_throw_trajectories_during_side_throws);
+							text_disabled("(otherwise the gun keeps its laser for the short while)");
+
+							revertable_slider("Alpha", config.drawing.throw_trajectory_alpha, 0.f, 1.f);
+							revertable_slider("End alpha", config.drawing.throw_trajectory_end_alpha, 0.f, 1.f);
+							revertable_slider("Gap", config.drawing.throw_trajectory_gap, 0.f, 5.f);
+							text_disabled("(between the silhouettes, in their radii)");
+						}
 					}
 				}
 

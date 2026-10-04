@@ -1,8 +1,10 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <vector>
 #include "augs/math/transform.h"
+#include "augs/math/physics_structs.h"
 #include "augs/misc/randomization_declaration.h"
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
@@ -19,9 +21,12 @@ struct throw_trajectory_flags;
 	Grenades fly through characters, and thrown melee weapons stop at them, as they stand now.
 
 	A trajectory is simulated at most once per step.
-	That of an explosive only when what it is launched with changes -
-	the item, where it starts from, how fast and how it is damped -
-	since the static colliders never move, unless there are dynamic obstacles around.
+	The copies of the static colliders are kept between the steps, for each kind of thrown item,
+	and made anew only once the thrower leaves the area they were copied from, or they change.
+	The dynamic obstacles and the stoppers are copied anew for every simulation.
+	An explosive is not simulated again while what it is launched with does not change -
+	the item, where it starts from, how fast and how it is damped - unless there are dynamic obstacles around.
+	It rarely helps while aiming, since the start and the speed follow the crosshair.
 
 	Thrown explosives are launched just like the logic launches them - see calc_explosive_throw_launch -
 	and fly until their fuse runs out. Thrown melee weapons hop off the floor just like in item_system,
@@ -72,13 +77,14 @@ struct throw_trajectory_input {
 	rng_seed_type nontemporal_seed = 0;
 	uint8_t num_falls = 0;
 	uint8_t floor_hits_when_thrown = 0;
-	real32 linear_damping = 0.f;
-	real32 angular_damping = 0.f;
+	damping_mults damping;
 	uint32_t max_steps = 0;
 	real32 min_speed = 0.f;
 	real32 silhouette_gap = 0.f;
 	bool explosive = false;
 	bool faces_flight_direction = false;
+	bool angled_damping = false;
+	bool fixed_rotation = false;
 
 	bool operator==(const throw_trajectory_input& b) const {
 		return
@@ -91,13 +97,16 @@ struct throw_trajectory_input {
 			&& nontemporal_seed == b.nontemporal_seed
 			&& num_falls == b.num_falls
 			&& floor_hits_when_thrown == b.floor_hits_when_thrown
-			&& linear_damping == b.linear_damping
-			&& angular_damping == b.angular_damping
+			&& damping.linear == b.damping.linear
+			&& damping.linear_axis_aligned == b.damping.linear_axis_aligned
+			&& damping.angular == b.damping.angular
 			&& max_steps == b.max_steps
 			&& min_speed == b.min_speed
 			&& silhouette_gap == b.silhouette_gap
 			&& explosive == b.explosive
 			&& faces_flight_direction == b.faces_flight_direction
+			&& angled_damping == b.angled_damping
+			&& fixed_rotation == b.fixed_rotation
 		;
 	}
 };
@@ -124,18 +133,26 @@ struct throw_trajectory {
 };
 
 class throw_trajectory_system {
+	struct obstacle_worlds;
+
 	std::vector<throw_trajectory> trajectories;
+	std::vector<throw_trajectory> previous;
+	std::unique_ptr<obstacle_worlds> worlds;
 
 public:
+	throw_trajectory_system();
+	~throw_trajectory_system();
+
+	throw_trajectory_system(throw_trajectory_system&&) noexcept;
+	throw_trajectory_system& operator=(throw_trajectory_system&&) noexcept;
+
 	void advance(const_entity_handle viewed_character, const throw_trajectory_flags& flags, real32 silhouette_gap);
 
 	const auto& get_trajectories() const {
 		return trajectories;
 	}
 
-	void clear() {
-		trajectories.clear();
-	}
+	void clear();
 
 	void reserve_caches_for_entities(const std::size_t) const {}
 };

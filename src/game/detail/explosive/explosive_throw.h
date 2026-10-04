@@ -58,8 +58,23 @@ inline uint32_t calc_explosive_flight_steps(
 	constexpr uint32_t max_steps = 10000;
 
 	const auto armed = when_armed.was_set() ? when_armed : clk.now;
+	const auto dt_ms = clk.dt.in_milliseconds();
 
-	uint32_t steps = 0;
+	/*
+		Starts from an estimate a few steps below the answer,
+		then finds it exactly with is_ready, just like the fuse logic checks it.
+	*/
+
+	uint32_t steps = [&]() {
+		if (dt_ms <= 0.f) {
+			return uint32_t(0);
+		}
+
+		const auto passed_steps = static_cast<real32>(clk.now.step - armed.step);
+		const auto estimate = fuse_delay_ms / dt_ms - passed_steps - 2.f;
+
+		return static_cast<uint32_t>(std::clamp(estimate, 0.f, static_cast<real32>(max_steps)));
+	}();
 
 	while (steps < max_steps) {
 		const auto at = augs::stepped_clock::from_timestamp(clk, augs::stepped_timestamp { clk.now.step + steps });
@@ -128,30 +143,6 @@ bool wants_aimed_throw_farther(const H& holder) {
 	return false;
 }
 
-/*
-	Just in case we want to configure it later.
-*/
-
-inline constexpr real32 AIMED_THROW_MIN_DISTANCE_MULT = 0.0f;
-
-template <class E, class H>
-real32 calc_min_aimed_explosive_throw_distance(
-	const E& explosive,
-	const H& holder,
-	const real32 linear_damping,
-	const real32 dt_secs,
-	const uint32_t steps
-) {
-	if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-		const auto& fuse_def = explosive.template get<invariants::hand_fuse>();
-		const auto secondary_speed = (capability->standard_drop_impulse + fuse_def.additional_secondary_release_impulse).linear;
-
-		return AIMED_THROW_MIN_DISTANCE_MULT * augs::calc_damped_distance(secondary_speed, linear_damping, dt_secs, steps);
-	}
-
-	return 0.f;
-}
-
 struct aimed_explosive_throw {
 	real32 speed = 0.f;
 	real32 damping_mult = 1.f;
@@ -189,9 +180,7 @@ aimed_explosive_throw calc_aimed_explosive_throw(const E& explosive, const H& ho
 	const auto crosshair_pos = holder.get_world_crosshair_transform().pos;
 	const auto distance_mult = ::wants_aimed_throw_farther(holder) ? AIMED_THROW_SPRINT_DISTANCE_MULT : 1.f;
 	const auto aimed_distance = (crosshair_pos - explosive.get_logic_transform().pos).length() * distance_mult;
-	const auto distance = std::max(aimed_distance, ::calc_min_aimed_explosive_throw_distance(explosive, holder, linear_damping, dt_secs, steps));
-
-	const auto speed = augs::calc_initial_speed_for_damped_distance(distance, linear_damping, dt_secs, steps);
+	const auto speed = augs::calc_initial_speed_for_damped_distance(aimed_distance, linear_damping, dt_secs, steps);
 
 	const auto max_speed = AIMED_THROW_MAX_TRANSLATION_MULT * cosm.get_si().get_pixels(b2_maxTranslation) / dt_secs;
 
@@ -205,7 +194,7 @@ aimed_explosive_throw calc_aimed_explosive_throw(const E& explosive, const H& ho
 	for (int i = 0; i < AIMED_THROW_DAMPING_BISECTION_ITERATIONS; ++i) {
 		const auto middle = (lower + upper) / 2;
 
-		if (augs::calc_damped_distance(max_speed, middle, dt_secs, steps) > distance) {
+		if (augs::calc_damped_distance(max_speed, middle, dt_secs, steps) > aimed_distance) {
 			lower = middle;
 		}
 		else {
