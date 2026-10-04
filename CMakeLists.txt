@@ -1742,6 +1742,29 @@ if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 		set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
 		set(ALSOFT_ENABLE_MODULES FALSE CACHE BOOL "Enable use of C++20 modules when supported" FORCE)
 
+		# With modules disabled there is nothing to scan, and CI runners have no clang-scan-deps.
+		set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+		if(MSVC)
+			# MSVC's STL can't invoke member function pointers marked [[clang::nonblocking]].
+			# Upstream fixed it after 1.25.2 the same way - remove this once the submodule includes that fix.
+			set(ALSOFT_OPTHELPERS "${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft/common/opthelpers.h")
+			file(READ "${ALSOFT_OPTHELPERS}" ALSOFT_OPTHELPERS_CONTENT)
+
+			# The line end is matched too (also CRLF), so a second configure doesn't patch twice.
+			string(REGEX REPLACE
+				"#if HAS_ATTRIBUTE\\(clang::nonblocking\\)(\r?\n)"
+				"#if HAS_ATTRIBUTE(clang::nonblocking) && !defined(_MSVC_STL_UPDATE)\\1"
+				ALSOFT_OPTHELPERS_PATCHED
+				"${ALSOFT_OPTHELPERS_CONTENT}"
+			)
+
+			if(NOT ALSOFT_OPTHELPERS_PATCHED STREQUAL ALSOFT_OPTHELPERS_CONTENT)
+				message("Patching ${ALSOFT_OPTHELPERS} for MSVC's STL.")
+				file(WRITE "${ALSOFT_OPTHELPERS}" "${ALSOFT_OPTHELPERS_PATCHED}")
+			endif()
+		endif()
+
 		if(CLANG AND NOT MSVC)
 			string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 		endif()
