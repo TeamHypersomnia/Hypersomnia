@@ -196,6 +196,7 @@ void sound_system::update_listener(
 
 	cmd.si = listener_handle.get_cosmos().get_si();
 	cmd.orientation = orientation;
+	cmd.screen_vertical_as_front_back = settings.screen_vertical_as == screen_vertical_hearing::FRONT_AND_BACK;
 	
 	renderer.push_command(cmd);
 }

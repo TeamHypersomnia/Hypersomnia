@@ -1146,6 +1146,7 @@ void settings_gui_state::perform(
 
 					revertable_enum_radio("Keep listener position at:", scope_cfg.listener_reference);
 					revertable_checkbox("Make listener face the same direction as character", scope_cfg.set_listener_orientation_to_character_orientation);
+					revertable_enum("Hear screen up/down as", scope_cfg.screen_vertical_as);
 				}
 
 				text_disabled("\n");

@@ -56,10 +56,22 @@ namespace augs {
 					set_listener_velocity(si, t.velocity);
 
 					const auto& orientation = t.orientation;
-					set_listener_orientation({ 0.f, -1.f, 0.f, orientation.x, 0.f, orientation.y });
-					// (void)orientation;
-					// set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f }); // - upwards screen
-					// set_listener_orientation({ 0.f, 0.f, 1.f, 0.f, -1.f, 0.f }); //  - towards screen
+
+					/*
+						By default the listener looks into the floor, with orientation as its up vector:
+						sounds up/down the screen come from above/below the head (elevation).
+
+						Optionally the listener looks along orientation, with up out of the floor:
+						sounds up/down the screen come from the front/back instead.
+						Sounds from the back are muffled - the pinna shadows high frequencies.
+					*/
+
+					if (t.screen_vertical_as_front_back) {
+						set_listener_orientation({ orientation.x, 0.f, orientation.y, 0.f, 1.f, 0.f });
+					}
+					else {
+						set_listener_orientation({ 0.f, -1.f, 0.f, orientation.x, 0.f, orientation.y });
+					}
 				}
 				else if constexpr(same<C, update_multiple_properties>) {
 					const auto& source = source_pool[t.proxy_id];

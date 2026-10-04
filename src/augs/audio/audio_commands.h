@@ -25,6 +25,7 @@ namespace augs {
 		vec2 position;
 		vec2 velocity;
 		vec2 orientation;
+		bool screen_vertical_as_front_back = false;
 	};
 
 	struct update_multiple_properties {

@@ -18,6 +18,14 @@ enum class listener_position_reference {
 	// END GEN INTROSPECTOR
 };
 
+enum class screen_vertical_hearing {
+	// GEN INTROSPECTOR enum class screen_vertical_hearing
+	ABOVE_AND_BELOW,
+	FRONT_AND_BACK,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct sound_system_settings {
 	// GEN INTROSPECTOR struct sound_system_settings
 	bool allow_sounds_without_character_listener = true;
@@ -32,6 +40,7 @@ struct sound_system_settings {
 
 	listener_position_reference listener_reference = listener_position_reference::CHARACTER_POSITION;
 	bool set_listener_orientation_to_character_orientation = false;
+	screen_vertical_hearing screen_vertical_as = screen_vertical_hearing::ABOVE_AND_BELOW;
 	int max_simultaneous_bullet_trace_sounds = 6;
 	int max_shell_sounds_per_gun = 4;
 	int max_shell_roll_sounds_per_gun = 3;
