@@ -1734,6 +1734,7 @@ if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 		set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
 		set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
 		set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
+		set(ALSOFT_ENABLE_MODULES FALSE CACHE BOOL "Enable use of C++20 modules when supported" FORCE)
 
 		if(CLANG AND NOT MSVC)
 			string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
