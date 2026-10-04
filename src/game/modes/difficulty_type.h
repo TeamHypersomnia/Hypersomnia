@@ -6,7 +6,7 @@ enum class difficulty_type {
 	EASY,
 	MEDIUM,
 	HARD,
-	LEVELLING,
+	PROGRESSIVE,
 	COUNT
 	// END GEN INTROSPECTOR
 };

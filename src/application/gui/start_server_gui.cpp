@@ -177,14 +177,14 @@ as well as to test your skills in a laggy environment.
 
 			text_disabled("Sending \"/bots hard\" in chat changes difficulty.");
 
-			if (into_vars.bot_difficulty != difficulty_type::LEVELLING) {
+			if (into_vars.bot_difficulty != difficulty_type::PROGRESSIVE) {
 				text("Bot quota:");
 				edit_bot_quota_widget(into_vars.bot_quota);
 
 				text_disabled("Sending \"/bots 2 5\" in chat changes bot quotas.");
 			}
 			else {
-				text_disabled("\"Levelling\" uses the map's default bot quota.");
+				text_disabled("\"Progressive\" uses the map's default bot quota.");
 			}
 		}
 

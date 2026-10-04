@@ -1,7 +1,6 @@
 #pragma once
 #include "view/audiovisual_state/special_effects_settings.h"
 #include "augs/templates/maybe.h"
-#include "augs/enums/accuracy_type.h"
 
 enum class swap_buffers_moment {
 	// GEN INTROSPECTOR enum class swap_buffers_moment
@@ -56,7 +55,6 @@ struct performance_settings {
 	special_effects_settings special_effects;
 	int max_particles_in_single_job = 2500;
 	augs::maybe<int> custom_num_pool_workers = augs::maybe<int>(0, false);
-	accuracy_type wall_light_drawing_precision = accuracy_type::EXACT;
 	sun_shadow_preferences sun_shadows;
 	point_light_shadow_preferences point_light_shadows;
 	bool posterize_neons = true;

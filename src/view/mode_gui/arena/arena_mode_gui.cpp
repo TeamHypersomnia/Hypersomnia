@@ -367,6 +367,12 @@ void arena_gui_state::draw_mode_gui(
 	const auto& cfg = in.config.arena_mode_gui;
 	const auto line_height = in.gui_fonts.gui.metrics.get_height();
 
+	/*
+		Cinematic mode leaves only what the player opens - the scoreboard.
+	*/
+
+	const bool cinematic = in.config.drawing.cinematic_mode;
+
 	auto get_drawer = [&in]() {
 		return in.get_drawer();
 	};
@@ -475,7 +481,7 @@ void arena_gui_state::draw_mode_gui(
 			draw_scoreboard();
 		}
 
-		if (prediction.play_predictable) {
+		if (prediction.play_predictable && !cinematic) {
 			draw_context_tip();
 			draw_time_left(typed_mode);
 		}
@@ -1754,6 +1760,14 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 		};
+
+		if (cinematic) {
+			if (prediction.play_unpredictable) {
+				draw_scoreboard();
+			}
+
+			return;
+		}
 
 		if (prediction.play_unpredictable) {
 			if (cfg.show_client_resyncing_notifier && resyncing_notifier) {

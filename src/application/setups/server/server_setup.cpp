@@ -4892,14 +4892,20 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return false;
 	}();
 
-	integrated_client_gui.chat.draw_recent_messages(
-		in.get_drawer(),
-		integrated_client_vars.client_chat,
-		in.config.faction_view,
-		in.gui_fonts.gui,
-		get_current_time(),
-		should_censor
-	);
+	/*
+		Cinematic mode hides the recent messages until the chat is opened.
+	*/
+
+	if (const bool shown = is_open || !in.config.drawing.cinematic_mode) {
+		integrated_client_gui.chat.draw_recent_messages(
+			in.get_drawer(),
+			integrated_client_vars.client_chat,
+			in.config.faction_view,
+			in.gui_fonts.gui,
+			get_current_time(),
+			should_censor
+		);
+	}
 
 	arena_gui_base::draw_custom_gui(in);
 }
@@ -5317,13 +5323,13 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 
 	const auto new_vars = make_synced_dynamic_vars();
 
-	if (new_vars.bot_override_difficulty == difficulty_type::LEVELLING) {
+	if (new_vars.bot_override_difficulty == difficulty_type::PROGRESSIVE) {
 		/*
-			Levelling keeps recalculating both the counts and the difficulty on its own,
+			Progressive keeps recalculating both the counts and the difficulty on its own,
 			so any concrete numbers here would only look like they're set in stone.
 		*/
 
-		broadcast_info("Bots adjusted: LEVELLING.", chat_target_type::INFO);
+		broadcast_info("Bots adjusted: PROGRESSIVE.", chat_target_type::INFO);
 		return;
 	}
 
@@ -5473,8 +5479,8 @@ void server_setup::handle_client_chat_command(
 			else if (begins_with(chat.message, "/bots veasy") || chat.message == "/bots ve") {
 				set_difficulty(difficulty_type::VERY_EASY);
 			}
-			else if (begins_with(chat.message, "/bots levelling") || chat.message == "/bots l") {
-				set_difficulty(difficulty_type::LEVELLING);
+			else if (begins_with(chat.message, "/bots progressive") || chat.message == "/bots p") {
+				set_difficulty(difficulty_type::PROGRESSIVE);
 			}
 			else {
 				unsigned first = 0;
@@ -5504,10 +5510,10 @@ void server_setup::handle_client_chat_command(
 
 					const auto current_difficulty = last_broadcast_dynamic_vars.bot_override_difficulty;
 
-					if (current_difficulty == difficulty_type::LEVELLING) {
+					if (current_difficulty == difficulty_type::PROGRESSIVE) {
 						/*
-							"levelling" would ignore the requested quota and use the map's,
-							so freeze the difficulty at whatever the levelling currently yields.
+							"progressive" would ignore the requested quota and use the map's,
+							so freeze the difficulty at whatever the progressive difficulty currently yields.
 						*/
 
 						overrides.bot_difficulty = {

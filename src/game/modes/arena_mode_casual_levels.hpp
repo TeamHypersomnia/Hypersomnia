@@ -9,7 +9,7 @@ bool arena_mode::casual_levels_enabled(const_input_type in) const {
 		return false;
 	}
 
-	if (in.dynamic_vars.bot_override_difficulty != difficulty_type::LEVELLING) {
+	if (in.dynamic_vars.bot_override_difficulty != difficulty_type::PROGRESSIVE) {
 		return false;
 	}
 
@@ -129,7 +129,7 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_casual_levels(
 difficulty_type arena_mode::calc_bot_difficulty(const_input_type in) const {
 	const auto override_diff = in.dynamic_vars.bot_override_difficulty;
 
-	if (override_diff != difficulty_type::LEVELLING) {
+	if (override_diff != difficulty_type::PROGRESSIVE) {
 		return override_diff;
 	}
 

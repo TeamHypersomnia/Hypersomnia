@@ -380,7 +380,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_interaction_sensor = [&]() {
-		if (!viewed_character) {
+		if (!viewed_character || settings.cinematic_mode) {
 			return;
 		}
 

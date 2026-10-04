@@ -18,7 +18,9 @@ class start_server_gui_state;
 enum class rcon_pane;
 struct server_runtime_info;
 struct server_vars;
-void do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*);
+void do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*, bool);
+enum class server_vars_section : uint8_t;
+void do_server_vars_section(server_vars&, server_vars&, server_vars_section, const server_runtime_info*);
 
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
@@ -121,7 +123,8 @@ struct server_vars {
 
 	friend augs::introspection_access;
 	friend start_server_gui_state;
-	friend void ::do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*);
+	friend void ::do_server_vars(server_vars&, server_vars&, rcon_pane, const server_runtime_info*, bool);
+	friend void ::do_server_vars_section(server_vars&, server_vars&, server_vars_section, const server_runtime_info*);
 
 	bool operator==(const server_vars&) const = default;
 
@@ -149,7 +152,7 @@ public:
 private:
 	bool allow_setting_speed = true;
 public:
-	difficulty_type bot_difficulty = difficulty_type::LEVELLING;
+	difficulty_type bot_difficulty = difficulty_type::PROGRESSIVE;
 	bot_quota bot_quota;
 
 	bool allow_overtime = false;

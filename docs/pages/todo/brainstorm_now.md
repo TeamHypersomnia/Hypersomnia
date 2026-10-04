@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- kiedys mozna byloby symulowac te trajektorie granatow
+- sprofilowac de facing worlds
 
 - swiecacy dev label
 - te public keye cale dla linuxiarzy

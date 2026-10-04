@@ -1633,7 +1633,7 @@ void test_scene_setup::draw_range_test_bar(const draw_setup_gui_input& in) {
 void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 	using namespace augs::gui::text;
 
-	if (!is_tutorial()) {
+	if (!is_tutorial() || in.config.drawing.cinematic_mode) {
 		return;
 	}
 

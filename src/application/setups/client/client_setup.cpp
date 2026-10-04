@@ -2237,14 +2237,20 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return false;
 	}();
 
-	client_gui.chat.draw_recent_messages(
-		in.get_drawer(),
-		vars.client_chat,
-		in.config.faction_view,
-		in.gui_fonts.gui,
-		get_current_time(),
-		should_censor
-	);
+	/*
+		Cinematic mode hides the recent messages until the chat is opened.
+	*/
+
+	if (const bool shown = is_open || !in.config.drawing.cinematic_mode) {
+		client_gui.chat.draw_recent_messages(
+			in.get_drawer(),
+			vars.client_chat,
+			in.config.faction_view,
+			in.gui_fonts.gui,
+			get_current_time(),
+			should_censor
+		);
+	}
 
 	arena_gui_base::draw_custom_gui(in);
 }

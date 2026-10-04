@@ -2982,6 +2982,12 @@ work_result work(
 				d.show_danger_indicator_for_seconds = 0;
 				d.show_death_indicator_for_seconds = 0;
 				d.nickname_characters_for_offscreen_indicators = 0;
+				d.draw_grenade_trajectories = false;
+				d.draw_melee_trajectories = false;
+
+				config_copy.hud_messages.is_enabled = false;
+				config_copy.arena_mode_gui.context_tip_settings.is_enabled = false;
+				config_copy.arena_mode_gui.show_spectator_overlay = false;
 			}
 
 			if (!game_gui_mode_flag) {

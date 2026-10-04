@@ -445,12 +445,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 			const auto variation_vals = request.variation_cache.value_or(std::array<float, 10>{});
 
-			const auto wall_light_aabb = [&]() {
-				const bool exact = in.perf_settings.wall_light_drawing_precision == accuracy_type::EXACT;
-				const auto wall_reach = exact ? light.calc_wall_reach_trimmed() : light.calc_reach_trimmed();
-
-				return xywh::center_and_size(world_light_pos, wall_reach);
-			}();
+			const auto wall_light_aabb = xywh::center_and_size(world_light_pos, light.calc_wall_reach_trimmed());
 
 			if (!queried_camera_aabb.hover(wall_light_aabb)) {
 				continue;

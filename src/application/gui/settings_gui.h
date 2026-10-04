@@ -24,15 +24,121 @@ enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
 	GENERAL,
 	CONTROLS,
-	GAMEPLAY,
+	INTERFACE,
 	GRAPHICS,
 	AUDIO,
 	CLIENT,
 #if !WEB_LOWEND
+	SERVER,
 	EDITOR,
 #endif
-	INTERFACE,
 	ADVANCED,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class audio_settings_pane {
+	// GEN INTROSPECTOR enum class audio_settings_pane
+	VOLUME,
+	SPATIALIZATION,
+	HRTF,
+	QUALITY,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class graphics_settings_pane {
+	// GEN INTROSPECTOR enum class graphics_settings_pane
+	RENDERING,
+	LIGHTING,
+	EFFECTS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class interface_settings_pane {
+	// GEN INTROSPECTOR enum class interface_settings_pane
+	LAYOUT,
+	HUD,
+	CROSSHAIR,
+	MINIMAP,
+	FOG_OF_WAR,
+	CHAT,
+	HUD_SKIN,
+	STYLE_EDITOR,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class controls_settings_pane {
+	// GEN INTROSPECTOR enum class controls_settings_pane
+	MOUSE,
+	KEYBINDINGS,
+	CAMERA,
+	INVENTORY,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class keybindings_settings_pane {
+	// GEN INTROSPECTOR enum class keybindings_settings_pane
+	COMBAT,
+	GUI,
+	INVENTORY,
+	APPLICATION,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class client_settings_pane {
+	// GEN INTROSPECTOR enum class client_settings_pane
+	PROFILE,
+	LAG_COMPENSATION,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class editor_settings_pane {
+	// GEN INTROSPECTOR enum class editor_settings_pane
+	AUTOSAVE,
+	NODES,
+	GRID,
+	CAMERA,
+	NOTIFICATIONS,
+	UPLOADING,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class server_settings_pane {
+	// GEN INTROSPECTOR enum class server_settings_pane
+	GAME,
+	MAP_CYCLE,
+	SERVER_LIST,
+	NETWORK,
+	TIME_LIMITS,
+	RANKED,
+	PASSWORDS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class advanced_settings_pane {
+	// GEN INTROSPECTOR enum class advanced_settings_pane
+	SYSTEM,
+	NETWORK,
+	RENDERING,
+	PERFORMANCE,
+	DEBUG,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -79,6 +185,15 @@ struct stun_manager_window : public standard_window_mixin<stun_manager_window> {
 
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::GENERAL;
+	audio_settings_pane active_audio_pane = audio_settings_pane::VOLUME;
+	graphics_settings_pane active_graphics_pane = graphics_settings_pane::RENDERING;
+	interface_settings_pane active_interface_pane = interface_settings_pane::LAYOUT;
+	controls_settings_pane active_controls_pane = controls_settings_pane::MOUSE;
+	keybindings_settings_pane active_keybindings_pane = keybindings_settings_pane::COMBAT;
+	client_settings_pane active_client_pane = client_settings_pane::PROFILE;
+	editor_settings_pane active_editor_pane = editor_settings_pane::AUTOSAVE;
+	server_settings_pane active_server_pane = server_settings_pane::GAME;
+	advanced_settings_pane active_advanced_pane = advanced_settings_pane::SYSTEM;
 
 #if BUILD_NETWORKING
 	stun_manager_window stun_manager = std::string("STUN manager");

@@ -19,7 +19,7 @@ struct bots_request {
 
 struct bot_difficulty_request {
 	mode_player_id requester;
-	difficulty_type difficulty = difficulty_type::LEVELLING;
+	difficulty_type difficulty = difficulty_type::PROGRESSIVE;
 
 	bool is_set() const {
 		return requester.is_set();
@@ -50,7 +50,7 @@ struct synced_dynamic_vars {
 	augs::maybe<uint32_t> max_team_score;
 	server_ranked_vars ranked;
 	bots_request bots_override;
-	difficulty_type bot_override_difficulty = difficulty_type::LEVELLING;
+	difficulty_type bot_override_difficulty = difficulty_type::PROGRESSIVE;
 	real32 logic_speed = 1.f;
 	real32 bullet_speed = 1.f;
 	bool apply_logic_speed_immediately = false;

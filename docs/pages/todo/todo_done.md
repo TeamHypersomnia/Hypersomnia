@@ -7540,3 +7540,7 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - chowaj na strzelnicy timer
 - pokazuj playing with players na steamie poprawnie bo jak ktos gra z botami to teraz liczy ich jako prawdziwych ludzi
 - audyt hrtfu
+- rzucanie nozy i granatow bardziej celne
+- kiedys mozna byloby symulowac te trajektorie granatow
+- troche settingi poorganizowac bo syf szczegolnie te serverowe moze nie wiem tab osobny
+
