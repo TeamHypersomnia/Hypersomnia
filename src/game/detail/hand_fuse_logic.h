@@ -8,6 +8,7 @@
 #include "game/messages/start_sound_effect.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/bombsite_in_range.h"
+#include "game/detail/hand_fuse_math.h"
 #include "game/messages/battle_event_message.h"
 #include "game/messages/sound_cue_message.h"
 #include "game/detail/sentience/sentience_getters.h"
@@ -521,10 +522,14 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 						}
 
 						/*
-							Defusing always takes the same real time (e.g. 5s, 2.5s with a defusal kit), regardless of logic speed.
+							amount_defused stays in the units of defusing_duration_ms, so that the progress ratio is unaffected.
+							See calc_real_defusing_duration_ms.
 						*/
 
-						fuse.amount_defused += defusing_speed_mult * clk.get_real_dt().in_milliseconds();
+						const auto real_duration_ms = ::calc_real_defusing_duration_ms(fuse_def.defusing_duration_ms, clk);
+						const auto real_time_mult = fuse_def.defusing_duration_ms / real_duration_ms;
+
+						fuse.amount_defused += defusing_speed_mult * real_time_mult * clk.get_real_dt().in_milliseconds();
 					}
 					else {
 						interrupt_defusing();

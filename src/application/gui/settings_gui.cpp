@@ -2548,20 +2548,17 @@ bool do_bullet_speed_slider(server_vars& vars, const bool game_speed_changed) {
 
 void do_game_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
-		"Slows down the logic (movement, physics, bullets, reloads, bots).\n"
-		"Fire rates and recoil stay the same.\n"
-		"The round time limit gets proportionally longer.\n\n"
-		"Players can change it in chat, e.g. \"/speed 0.7\".\n"
-		"\"/speed\" alone reverts to this setting."
+		"Slows down the entire game:\n"
+		"movement, physics, bullets, reloads, bots.\n"
+		"Fire rates and recoil stay the same.\n\n"
+		"Type \"/speed 0.7\" to adjust in-game."
 	);
 }
 
 void do_bullet_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
-		"Speed of the bullets. Follows Game speed until moved.\n"
-		"1.0x keeps the bullets as fast as in a normal-speed game.\n\n"
-		"Players can change it in chat, e.g. \"/bspeed 1\".\n"
-		"\"/bspeed\" alone reverts to this setting."
+		"Separate setting for bullet speeds.\n\n"
+		"Type \"/bspeed 0.8\". to adjust in-game.\n"
 	);
 }
 

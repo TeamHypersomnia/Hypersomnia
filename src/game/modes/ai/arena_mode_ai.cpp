@@ -3,6 +3,7 @@
 #include "game/components/gun_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/hand_fuse_component.h"
+#include "game/detail/hand_fuse_math.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/cosmos/entity_handle.h"
 #include "augs/math/math.h"
@@ -444,10 +445,12 @@ arena_ai_result update_arena_mode_ai(
 	constexpr auto CRITICAL_DEFUSE_TIME_SECS = 5.0f;
 
 	/*
-		bomb_time_remaining is in logic time, but defusing takes real time - see hand_fuse_logic.
+		bomb_time_remaining is in logic time, but defusing takes real time - see calc_real_defusing_duration_ms.
 	*/
 
-	const auto critical_defuse_time_logic_secs = CRITICAL_DEFUSE_TIME_SECS * cosm.get_clock().logic_speed;
+	const auto& clk = cosm.get_clock();
+	const auto critical_defuse_real_secs = ::calc_real_defusing_duration_ms(CRITICAL_DEFUSE_TIME_SECS * 1000.f, clk) / 1000.f;
+	const auto critical_defuse_time_logic_secs = critical_defuse_real_secs * clk.logic_speed;
 	const bool should_avoid_combat = (team_state.bot_with_defuse_mission == controlled_character_id) && bomb_time_remaining < critical_defuse_time_logic_secs;
 
 	/* Commit LOS change alert (dedicated slot, never evicted). */
