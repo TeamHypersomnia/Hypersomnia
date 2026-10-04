@@ -43,6 +43,7 @@ namespace augs {
 		void destroy();
 
 		audio_paths paths;
+		unsigned period_size_at_launch = 0;
 
 		audio_device(const audio_settings&, const audio_paths&);
 		~audio_device();
@@ -68,6 +69,11 @@ namespace augs {
 
 		const auto& get_paths() const {
 			return paths;
+		}
+
+		/* OpenAL reads the period size only once per process. */
+		auto get_period_size_at_launch() const {
+			return period_size_at_launch;
 		}
 		void log_hrtf_status() const;
 

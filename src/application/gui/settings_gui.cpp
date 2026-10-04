@@ -1150,6 +1150,37 @@ void settings_gui_state::perform(
 
 				text_disabled("\n");
 
+#if !PLATFORM_WEB
+				ImGui::Separator();
+				text_color("Latency", yellow);
+				ImGui::Separator();
+
+				{
+					auto& audio_cfg = config.audio;
+					const auto& device = audio.get_device();
+
+					revertable_slider("Audio period (samples)", audio_cfg.period_size, 64u, 2048u);
+
+					/* OpenAL Soft keeps 3 periods queued by default. */
+					const auto num_periods = 3;
+					const auto sample_rate = std::max(1, device.get_sample_rate());
+					const auto period_ms = 1000.f * static_cast<float>(audio_cfg.period_size) / static_cast<float>(sample_rate);
+
+					text_disabled(typesafe_sprintf(
+						"%2f ms per period at %x Hz, ~%2f ms buffered.\nLower is more responsive, but too low will crackle when the CPU can't keep up.",
+						period_ms,
+						sample_rate,
+						period_ms * num_periods
+					));
+
+					if (audio_cfg.period_size != device.get_period_size_at_launch()) {
+						text_color("Restart the game to apply the new period.", orange);
+					}
+				}
+
+				text_disabled("\n");
+#endif
+
 				ImGui::Separator();
 				text_color("Sound physics", yellow);
 				ImGui::Separator();
