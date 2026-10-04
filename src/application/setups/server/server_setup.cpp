@@ -2824,14 +2824,21 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 		Administrative changes: override whatever was requested with /speed or /bspeed.
 	*/
 
+	/*
+		A live ranked match keeps its speeds, so there is nothing to apply immediately -
+		the new speeds wait for the warmup after it.
+	*/
+
+	const bool can_apply_immediately = !first_time && !is_ranked_live_or_starting();
+
 	if (!first_time && ::sanitize_logic_speed(vars.game_speed) != new_speed) {
 		overrides.speed = {};
-		apply_speed_immediately = true;
+		apply_speed_immediately = can_apply_immediately;
 	}
 
 	if (!first_time && vars.bullet_speed != new_bullet_speed) {
 		overrides.bullet_speed = {};
-		apply_speed_immediately = true;
+		apply_speed_immediately = can_apply_immediately;
 	}
 
 	vars = new_vars;
@@ -3911,11 +3918,11 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 	}
 
 	/*
-		On ranked servers, the speeds agreed upon in warmup stay for the whole match,
-		even if their requester leaves.
+		Once a ranked match starts, the speeds agreed upon in warmup are locked in,
+		even if their requester leaves. In warmup, they revert like on casual servers.
 	*/
 
-	const bool keep_speeds_after_requester_leaves = vars.ranked.is_ranked_server();
+	const bool keep_speeds_after_requester_leaves = is_ranked_live_or_starting();
 
 	auto revert_if_requester_left = [&](speed_request& request, const std::string& what_reverted, auto get_new_speed) {
 		if (keep_speeds_after_requester_leaves || !request.requester.is_set()) {
@@ -5248,11 +5255,16 @@ static std::string trim_speed_command_argument(const std::string& message, const
 }
 
 /*
-	Accepts a decimal comma too. Rejects trailing junk, non-finite and non-positive values.
+	Accepts a decimal comma and the "x" suffix the server prints, e.g. "0,8x".
+	Rejects other trailing junk, non-finite and non-positive values.
 	The result still has to be sanitized into the allowed range.
 */
 
 static std::optional<real32> parse_requested_speed(std::string argument) {
+	if (!argument.empty() && (argument.back() == 'x' || argument.back() == 'X')) {
+		argument.pop_back();
+	}
+
 	if (argument.empty()) {
 		return std::nullopt;
 	}
@@ -5541,6 +5553,22 @@ void server_setup::handle_client_chat_command(
 			if (!reset_to_default && !requested_speed.has_value()) {
 				broadcast_info(typesafe_sprintf("Wrong command format. Example: %x 0.8", command), chat_target_type::INFO_CRITICAL);
 				return;
+			}
+
+			const bool out_of_range =
+				requested_speed.has_value()
+				&& (*requested_speed < min_logic_speed_v || *requested_speed > max_logic_speed_v)
+			;
+
+			if (out_of_range) {
+				broadcast_info(
+					typesafe_sprintf(
+						"Allowed speeds: %x - %x.",
+						::format_logic_speed(min_logic_speed_v),
+						::format_logic_speed(max_logic_speed_v)
+					),
+					chat_target_type::INFO
+				);
 			}
 
 			const auto previous_speed = get_effective_speed();
