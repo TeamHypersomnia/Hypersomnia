@@ -2378,6 +2378,26 @@ work_result work(
 		save_last_activity(activity_type::EDITOR);
 	};
 
+	/*
+		A project opened with --edit leaves the last activity and the last project as they were.
+	*/
+
+	WEBSTATIC auto command_line_editor_target = params.editor_target;
+
+	WEBSTATIC auto launch_editor_from_command_line = [&](const augs::path_type& project_path) {
+		setup_launcher([&]() {
+			const bool remember_last_project = false;
+
+			emplace_current_setup(
+				std::in_place_type_t<editor_setup>(),
+				config.editor,
+				*official,
+				project_path,
+				remember_last_project
+			);
+		});
+	};
+
 	WEBSTATIC auto launch_setup = [&](const activity_type mode) {
 		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
 			change_with_save(
@@ -2450,9 +2470,10 @@ work_result work(
 				break;
 
 			case activity_type::EDITOR:
-				if (!params.editor_target.empty()) {
-					launch_editor(params.editor_target);
-					break;
+				if (!command_line_editor_target.empty()) {
+					launch_editor_from_command_line(command_line_editor_target);
+					command_line_editor_target.clear();
+					return;
 				}
 				else {
 					try {
@@ -4589,6 +4610,17 @@ work_result work(
 						editor.warp_cursor_once = false;
 
 						common_input_state.mouse.pos = ImGui::GetIO().MousePos;
+					}
+
+					/*
+						--playtest: once, on the first frame of the editor opened with --edit.
+					*/
+
+					static bool playtest_requested = params.playtest;
+
+					if (playtest_requested) {
+						playtest_requested = false;
+						editor.start_playtesting();
 					}
 				});
 

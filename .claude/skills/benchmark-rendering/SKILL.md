@@ -32,9 +32,10 @@ One run with alternating phases cancels out scene, thermal and clock differences
     `navmesh.nav`, `editor_view.json` and autosaves there. `user/projects` is a symlink to `../content/arenas`,
     so a copy there lands in the repo too. Copy the arena to the scratchpad instead - `--edit` takes an absolute path -
     rename its json to match the folder, drop `last_saved.json`, and set `meta.name`.
-  - **`--edit` overwrites `user/editor_last_project.txt`** with the scratch path: the user's next launch without arguments
-    opens the scratch copy, and they edit it unknowingly (it happened - a whole round of map work landed in /tmp).
-    Back the file up before the first run and restore it after the last one, and never name the copy like the original.
+  - Builds before 2026-10-05: `--edit` opened the editor only when the last activity was the editor, and overwrote
+    `user/editor_last_project.txt` with the scratch path - the user then edited the scratch copy unknowingly.
+    Since then `--edit` always opens the editor and leaves both untouched; `--playtest` starts playtesting right away.
+    Still never name the copy like the original.
   - The editor camera comes from `editor_view.json` (`panned_camera.transform.pos`, `zoom`) - set it to frame
     what is measured, e.g. zoom 0.45 at the average position of the lights to catch many of them.
 - **Never use `--apply-config` for a benchmark variant:** the patch lands in `user/runtime_prefs.json` when the game quits

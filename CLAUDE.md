@@ -12,6 +12,15 @@ A `build` MCP server is available with four tools:
 
 Prefer `build_file` to verify edits to a specific file before running a full `build`.
 
+# Running a map
+
+From `hypersomnia/` (the game reads its config relative to the working directory):
+
+- `../build/current/Hypersomnia --edit <project dir>` - opens the map in the editor, e.g. `--edit user/projects/de_cyberaqua` or an absolute path.
+- Add `--playtest` to start playtesting right away, like pressing Space.
+- `--edit` leaves the last activity and `user/editor_last_project.txt` untouched, so the user's normal launch isn't affected.
+- The editor writes `editor_view.json`, autosaves and `navmesh.nav` into the project folder - for experiments, copy the map to the scratchpad under a distinct name first.
+
 # General programming rules
 
 - **Do not change formatting style like tabs or other spacing conventions in the files you are editing.**

@@ -19,6 +19,12 @@ struct cmd_line_params {
 	augs::path_type appimage_path;
 	augs::path_type debugger_target;
 	augs::path_type editor_target;
+
+	/*
+		With --edit: start playtesting right away.
+	*/
+
+	bool playtest = false;
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
 	bool help_only = false;
@@ -235,6 +241,10 @@ struct cmd_line_params {
 			}
 			else if (a == "--edit") {
 				editor_target = get_next();
+				launch_activity = activity_type::EDITOR;
+			}
+			else if (a == "--playtest") {
+				playtest = true;
 			}
 			else if (a == "--signature") {
 				verified_signature = get_next();

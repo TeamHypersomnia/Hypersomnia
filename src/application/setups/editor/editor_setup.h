@@ -264,10 +264,16 @@ public:
 	static constexpr bool has_additional_highlights = true;
 	static constexpr bool has_arena_gui = true;
 
+	/*
+		remember_last_project is false for a project opened from the command line,
+		so that it doesn't replace the one the editor opens normally.
+	*/
+
 	editor_setup(
 		const editor_settings& settings,
 		const packaged_official_content& official,
-		const augs::path_type& project_path
+		const augs::path_type& project_path,
+		bool remember_last_project = true
 	);
 	
 	~editor_setup();
@@ -842,6 +848,7 @@ public:
 	void perform_remove_unused_resources();
 
 	bool warp_cursor_once = false;
+	bool remember_last_project = true;
 
 	void advance_uploading();
 	bool upload_icon_visible() const;

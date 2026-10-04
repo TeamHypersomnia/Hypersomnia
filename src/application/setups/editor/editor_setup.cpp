@@ -84,8 +84,11 @@ render_layer_filter get_layer_filter_for_miniature();
 editor_setup::editor_setup(
 	const editor_settings& settings,
 	const packaged_official_content& official,
-	const augs::path_type& project_path
+	const augs::path_type& project_path,
+	const bool remember_last_project
 ) : settings(settings), last_autosave_settings(settings.autosave), official(official), paths(project_path) {
+	this->remember_last_project = remember_last_project;
+
 	create_official_filesystems();
 
 	LOG("Loading editor project at: %x", project_path);
@@ -1746,6 +1749,10 @@ void editor_setup::save_gui_state() {
 }
 
 void editor_setup::save_last_project_location() {
+	if (!remember_last_project) {
+		return;
+	}
+
 	augs::save_as_text(get_editor_last_project_path(), paths.project_folder.string());
 }
 
