@@ -58,6 +58,12 @@ public:
 
 	void set(const cosmos_solvable_significant& signi);
 
+	/*
+		Like set, but with the clock timing taken from the given clock, in a single reinference.
+	*/
+
+	void set(const cosmos_solvable_significant& signi, const augs::stepped_clock& timing);
+
 	si_scaling get_si() const {
 		return get_common_significant().si;
 	}

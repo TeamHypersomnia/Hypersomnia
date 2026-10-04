@@ -70,6 +70,19 @@ namespace augs {
 			}
 		}
 
+		/*
+			Takes tickrate, logic_speed and bullet_speed from source, keeping the current timestamp.
+		*/
+
+		void copy_timing_from(const stepped_clock& source) {
+			set_timing(source.tickrate, source.logic_speed);
+			bullet_speed = source.bullet_speed;
+		}
+
+		bool same_timing_as(const stepped_clock& b) const {
+			return tickrate == b.tickrate && logic_speed == b.logic_speed && bullet_speed == b.bullet_speed;
+		}
+
 		delta get_real_dt() const {
 			return delta::steps_per_second(tickrate);
 		}

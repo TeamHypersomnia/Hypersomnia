@@ -1133,7 +1133,29 @@ void arena_mode::setup_round(
 
 	stable_round_rng = randomization(total_mode_steps_passed).generator;
 
-	cosm.set(in.clean_round_state);
+	/*
+		The clean round state carries its own clock timing.
+		Keep the tickrate we were running at and apply the requested logic and bullet speeds at every round start -
+		except during a live ranked match, which keeps the speeds it started with.
+		Applied together with the clean round state, so that it is reinferred once, with the final timing.
+	*/
+
+	const bool keep_speeds = is_ranked_live();
+
+	auto pick_round_speed = [keep_speeds](const real32 current, const real32 requested) {
+		return keep_speeds ? current : ::sanitize_logic_speed(requested);
+	};
+
+	auto round_timing = clock_before_setup;
+
+	round_timing.set_timing(
+		clock_before_setup.tickrate,
+		pick_round_speed(clock_before_setup.logic_speed, in.dynamic_vars.logic_speed)
+	);
+
+	round_timing.bullet_speed = pick_round_speed(clock_before_setup.bullet_speed, in.dynamic_vars.bullet_speed);
+
+	cosm.set(in.clean_round_state, round_timing);
 
 	/* 
 		If there are any entries in message queues, 
@@ -1149,26 +1171,6 @@ void arena_mode::setup_round(
 		step.transient.flush_everything();
 		step.get_queue<messages::mode_notification>() = notifications;
 	}
-
-	/*
-		The clean round state carries its own clock timing.
-		Keep the tickrate we were running at and apply the requested logic and bullet speeds at every round start -
-		except during a live ranked match, which keeps the speeds it started with.
-	*/
-
-	const auto round_logic_speed =
-		is_ranked_live() ?
-		clock_before_setup.logic_speed :
-		::sanitize_logic_speed(in.dynamic_vars.logic_speed)
-	;
-
-	const auto round_bullet_speed =
-		is_ranked_live() ?
-		clock_before_setup.bullet_speed :
-		::sanitize_logic_speed(in.dynamic_vars.bullet_speed)
-	;
-
-	cosm.set_clock_timing(clock_before_setup.tickrate, round_logic_speed, round_bullet_speed);
 
 	remove_test_characters(cosm);
 

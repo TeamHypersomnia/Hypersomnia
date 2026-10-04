@@ -153,11 +153,37 @@ void cosmos::reinfer_everything() {
 	cosmic::reinfer_solvable(*this);
 }
 
-void cosmos::set_clock_timing(const uint32_t tickrate, const real32 logic_speed, const real32 bullet_speed) {
+void cosmos::set(const cosmos_solvable_significant& new_signi, const augs::stepped_clock& timing) {
 	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
-		current_signi.clk.set_timing(tickrate, logic_speed);
-		current_signi.clk.bullet_speed = bullet_speed;
-		return changer_callback_result::DONT_REFRESH; 
+		{
+			auto scope = measure_scope(profiler.duplication);
+			current_signi = new_signi; 
+		}
+
+		current_signi.clk.copy_timing_from(timing);
+
+		return changer_callback_result::REFRESH; 
+	});
+}
+
+void cosmos::set_clock_timing(const uint32_t tickrate, const real32 logic_speed, const real32 bullet_speed) {
+	auto timing = get_clock();
+	timing.set_timing(tickrate, logic_speed);
+	timing.bullet_speed = bullet_speed;
+
+	if (timing.same_timing_as(get_clock())) {
+		return;
+	}
+
+	/*
+		Inferred state depends on the timing, e.g. the damping of missiles and characters.
+		Reinfer everything so that it never depends on when the timing changed -
+		otherwise whoever reinfers later (e.g. a client that just joined) would get a different physics state.
+	*/
+
+	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
+		current_signi.clk.copy_timing_from(timing);
+		return changer_callback_result::REFRESH; 
 	});
 }
 
