@@ -14,6 +14,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/inventory/item_falling.h"
+#include "game/detail/explosive/explosive_throw.h"
 #include "game/cosmos/logic_step.h"
 #include "augs/log.h"
 
@@ -265,25 +266,13 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		float momentum_boost = 0.f;
 
 		if (holder) {
-			const auto total_impulse = [&]() {
-				if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-					if (fuse.arming_source == arming_source_type::SHOOT_SECONDARY_INTENT) {
-						return capability->standard_drop_impulse + fuse_def.additional_secondary_release_impulse;
-					}
+			const auto launch = ::calc_explosive_throw_launch(fused_entity, holder, fuse.arming_source);
+			momentum_boost = launch.momentum_boost;
 
-					return capability->standard_throw_impulse + fuse_def.additional_release_impulse;
-				}
-
-				return impulse_mults();
-			}();
-
-			auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
+			auto request = item_slot_transfer_request::drop(fused_entity, impulse_mults { launch.speed, launch.angular_impulse });
 			request.params.apply_standard_impulse = false;
 
-			if (fuse_def.override_release_impulse) {
-				/* True for the bomb so it never gets thrown. */
-				request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
-			}
+			fuse.damping_mult = launch.damping_mult;
 
 			/* 
 				Note that the dropping transfer will effectively reinfer
@@ -293,44 +282,8 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 
 			perform_transfer(request, step);
 
-			if (fuse_def.apply_movement_boost) {
-				const auto vel = holder.get_effective_velocity();
-				const auto speed = vel.length();
-
-				if (speed > 1.0f) {
-					const auto look_dir = holder.get_logic_transform().get_direction();
-					const auto vel_dir = vec2(vel).normalize_hint(speed);
-
-					auto parallel_mult = (look_dir.dot(vel_dir) + 1) / 2;
-
-					if (parallel_mult > 0.8f) {
-						parallel_mult -= 0.8f;
-						parallel_mult *= 5.0f;
-
-						float dash_bonus = 0.0f;
-
-						if (const auto movement = holder.template find<components::movement>()) {
-							dash_bonus = movement->linear_inertia_ms;
-						}
-
-						if (auto body = fused_entity.template find<components::rigid_body>()) {
-							const auto total_speed = dash_bonus * 8 + speed * 4;
-							momentum_boost = total_speed * parallel_mult;
-							body.set_velocity(body.get_velocity().add_length(momentum_boost));
-
-							const auto considered_max_speed = 10000.0f;
-							const auto speed_mult = total_speed / considered_max_speed;
-
-							const auto min_damping = 0.4f;
-
-							// LOG_NVPS(total_speed, parallel_mult);
-							fuse.damping_mult = augs::interp(1.0f, min_damping, speed_mult * parallel_mult);
-							fuse.damping_mult = std::max(fuse.damping_mult, min_damping);
-
-							body.infer_damping();
-						}
-					}
-				}
+			if (const auto body = fused_entity.template find<components::rigid_body>()) {
+				body.infer_damping();
 			}
 
 			if (!fuse_def.is_like_plantable_bomb()) {
@@ -338,14 +291,12 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 					const auto speed = body.get_velocity().length();
 					auto& fall = fused_entity.template get<components::item>().get_fall();
 
-					::start_falling(
+					::start_falling_like_thrown_explosive(
 						fall,
-						::calc_thrown_explosive_floor_hits(speed, fuse_def.floor_hits_when_thrown),
-						::calc_thrown_explosive_first_hop_secs(speed, fuse.fuse_delay_ms / 1000.f),
-						::calc_thrown_explosive_height(speed),
-						EXPLOSIVE_HOP_DURATION_VARIATION,
-						true,
-						::calc_next_fall_seed(fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity), fall),
+						speed,
+						fuse_def.floor_hits_when_thrown,
+						fuse.fuse_delay_ms,
+						fused_entity.get_cosmos().get_nontemporal_rng_seed_for(fused_entity),
 						clk.now
 					);
 				}

@@ -1703,19 +1703,7 @@ void item_system::advance_falling_items(const logic_step step) {
 			return;
 		}
 
-		const bool last_silent_hit = !explosive && fall.floor_hits_left == 1;
-
-		/*
-			How much the third and later hits of dropped items and thrown melee weapons still spin and push them.
-		*/
-
-		auto later_hit_mult = [&](const real32 last_hit_mult, const real32 third_hit_mult) {
-			if (last_silent_hit) {
-				return last_hit_mult;
-			}
-
-			return hit_index >= 2 ? third_hit_mult : 1.f;
-		};
+		const bool last_silent_hit = ::is_floor_hit_silent(fall, explosive);
 
 		/*
 			Thrown explosives have their own floor hit sounds, other items those of their invariants::item.
@@ -1735,46 +1723,10 @@ void item_system::advance_falling_items(const logic_step step) {
 			::play_floor_hit_sound(step, sounds, fall, typed_item.get_logic_transform());
 		};
 
-		auto spin = [&]() {
-			const auto current_spin = body.get_degree_velocity();
-			const auto current_direction = current_spin < 0.f ? -1.f : 1.f;
-
-			if (fall.thrown_up) {
-				body.set_angular_velocity(current_direction * EXPLOSIVE_FLOOR_HIT_SPIN_DEGREES);
-			}
-			else if (hit_index == 0) {
-				body.set_angular_velocity(current_spin * DROPPED_ITEM_SPIN_KEPT);
-			}
-			else {
-				const auto counter_direction = hit_index == 1 ? -current_direction : current_direction;
-				const auto mult = later_hit_mult(LAST_FLOOR_HIT_SPIN_MULT, THIRD_FLOOR_HIT_SPIN_MULT);
-
-				body.set_angular_velocity(counter_direction * mult * DROPPED_ITEM_COUNTER_SPIN_DEGREES);
-			}
-		};
-
-		auto push = [&]() {
-			::push_along_motion(body, later_hit_mult(LAST_FLOOR_HIT_PUSH_MULT, THIRD_FLOOR_HIT_PUSH_MULT) * DROPPED_ITEM_PUSH_SPEED);
-		};
-
 		if (!last_silent_hit) {
 			play_hit_sound();
 		}
 
-		spin();
-
-		if (!explosive) {
-			push();
-		}
-
-		const auto variation = explosive ? EXPLOSIVE_HOP_DURATION_VARIATION : 0.f;
-
-		const auto min_hop_secs = 
-			explosive ? 
-			EXPLOSIVE_MIN_HOP_SECS : 
-			DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
-		;
-
-		::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, now, logic_speed);
+		::hit_the_floor(body, fall, explosive, now, logic_speed);
 	});
 }

@@ -436,6 +436,84 @@ void push_along_motion(const B& body, const real32 push_speed) {
 }
 
 /*
+	The last floor hit of dropped items and thrown melee weapons is silent - see DROPPED_ITEM_FLOOR_HITS.
+*/
+
+inline bool is_floor_hit_silent(const item_fall_state& fall, const bool explosive) {
+	return !explosive && fall.floor_hits_left == 1;
+}
+
+/*
+	What a floor hit does to items not hopping like shells, before it is counted:
+	thrown explosives are only spun, dropped items and thrown melee weapons are also pushed on along their motion.
+	B is anything with the velocity getters and setters of a rigid body, in pixels and degrees.
+*/
+
+template <class B>
+void spin_and_push_on_floor_hit(const B& body, const item_fall_state& fall, const bool explosive) {
+	const auto hit_index = fall.floor_hits_done;
+	const bool last_silent_hit = ::is_floor_hit_silent(fall, explosive);
+
+	/*
+		How much the third and later hits of dropped items and thrown melee weapons still spin and push them.
+	*/
+
+	auto later_hit_mult = [&](const real32 last_hit_mult, const real32 third_hit_mult) {
+		if (last_silent_hit) {
+			return last_hit_mult;
+		}
+
+		return hit_index >= 2 ? third_hit_mult : 1.f;
+	};
+
+	const auto current_spin = body.get_degree_velocity();
+	const auto current_direction = current_spin < 0.f ? -1.f : 1.f;
+
+	if (fall.thrown_up) {
+		body.set_angular_velocity(current_direction * EXPLOSIVE_FLOOR_HIT_SPIN_DEGREES);
+	}
+	else if (hit_index == 0) {
+		body.set_angular_velocity(current_spin * DROPPED_ITEM_SPIN_KEPT);
+	}
+	else {
+		const auto counter_direction = hit_index == 1 ? -current_direction : current_direction;
+		const auto mult = later_hit_mult(LAST_FLOOR_HIT_SPIN_MULT, THIRD_FLOOR_HIT_SPIN_MULT);
+
+		body.set_angular_velocity(counter_direction * mult * DROPPED_ITEM_COUNTER_SPIN_DEGREES);
+	}
+
+	if (!explosive) {
+		::push_along_motion(body, later_hit_mult(LAST_FLOOR_HIT_PUSH_MULT, THIRD_FLOOR_HIT_PUSH_MULT) * DROPPED_ITEM_PUSH_SPEED);
+	}
+}
+
+/*
+	A floor hit of an item not hopping like shells, after its sound:
+	spins and pushes it, counts the hit and starts the next hop.
+*/
+
+template <class B>
+void hit_the_floor(
+	const B& body,
+	item_fall_state& fall,
+	const bool explosive,
+	const augs::stepped_timestamp now,
+	const real32 logic_speed
+) {
+	::spin_and_push_on_floor_hit(body, fall, explosive);
+
+	const auto variation = explosive ? EXPLOSIVE_HOP_DURATION_VARIATION : 0.f;
+
+	const auto min_hop_secs = 
+		explosive ? 
+		EXPLOSIVE_MIN_HOP_SECS : 
+		DROPPED_ITEM_MIN_HOP_SECS * (fall.thrown_melee ? THROWN_MELEE_HOP_DURATION_MULT : 1.f)
+	;
+
+	::count_floor_hit_and_start_next_hop(fall, variation, min_hop_secs, now, logic_speed);
+}
+
+/*
 	Pushes them slightly on along their motion.
 */
 
@@ -549,6 +627,26 @@ inline real32 calc_thrown_explosive_first_hop_secs(const real32 speed, const rea
 
 inline real32 calc_thrown_explosive_height(const real32 speed) {
 	return EXPLOSIVE_THROW_HEIGHT * std::clamp(speed / NORMAL_THROW_SPEED, EXPLOSIVE_MIN_THROW_HEIGHT_MULT, EXPLOSIVE_MAX_THROW_HEIGHT_MULT);
+}
+
+inline void start_falling_like_thrown_explosive(
+	item_fall_state& fall,
+	const real32 speed,
+	const uint8_t floor_hits_when_thrown,
+	const real32 fuse_delay_ms,
+	const rng_seed_type nontemporal_item_seed,
+	const augs::stepped_timestamp now
+) {
+	::start_falling(
+		fall,
+		::calc_thrown_explosive_floor_hits(speed, floor_hits_when_thrown),
+		::calc_thrown_explosive_first_hop_secs(speed, fuse_delay_ms / 1000.f),
+		::calc_thrown_explosive_height(speed),
+		EXPLOSIVE_HOP_DURATION_VARIATION,
+		true,
+		::calc_next_fall_seed(nontemporal_item_seed, fall),
+		now
+	);
 }
 
 /*
