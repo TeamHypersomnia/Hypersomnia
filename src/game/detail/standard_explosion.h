@@ -20,7 +20,7 @@ struct damage_cause;
 /*
 	leaves_ground_decal leaves a scorch mark on the ground, sized by the damage -
 	or ground_decal_fixed_size_mult if above 0, e.g. for flashes, which deal negligible damage.
-	leaves_surface_decals leaves marks on the surfaces the blast hits whose materials define explosion_decals.
+	leaves_surface_decals leaves marks on the surfaces the blast hits whose materials define explosion_decals (or melee_decals as fallback).
 	draws_color_rings draws the flat colored rings of the explosion.
 	inner_ring_emits_light and outer_ring_emits_light pick the rings whose colors light up the surroundings -
 	the lights add up, so two overlapping saturated lights would clip into white.

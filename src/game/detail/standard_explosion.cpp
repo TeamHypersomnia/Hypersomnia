@@ -194,7 +194,7 @@ void standard_explosion_input::instantiate(
 
 	/*
 		Marks left by the blast on the surfaces it hits.
-		Only surfaces whose material defines explosion_decals get them, e.g. glass.
+		Only surfaces whose material defines explosion_decals (or melee_decals as fallback) get them, e.g. glass.
 
 		Where the blast touches a surface:
 		every visibility triangle ends exactly on the wall it hit,

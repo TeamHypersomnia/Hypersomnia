@@ -349,7 +349,20 @@ const material_decal_variants* find_material_decal_variants(
 		return nullptr;
 	}
 
-	const auto& variants = found_decals->second.*variants_of_material;
+	const auto& variants = [&]() -> const material_decal_variants& {
+		const auto& defs = found_decals->second;
+		const auto& requested = defs.*variants_of_material;
+
+		/*
+			Explosion decals default to melee decals if the material defines none.
+		*/
+
+		if (requested.empty() && variants_of_material == &material_decals_def::explosion_decals) {
+			return defs.melee_decals;
+		}
+
+		return requested;
+	}();
 
 	if (variants.empty()) {
 		return nullptr;
