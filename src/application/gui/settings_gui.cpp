@@ -1052,11 +1052,92 @@ void settings_gui_state::perform(
 					text(" Device output status:");
 					ImGui::SameLine();
 					text_color(output_mode, gray4);
+
+					if (stat.success) {
+						text(" Loaded HRTF:");
+						ImGui::SameLine();
+						text_color(audio.get_device().get_hrtf_name(), gray4);
+					}
 #endif
 				}
 
 #if !PLATFORM_WEB
-				text_disabled("If you experience a drop in sound quality with HRTF,\ntry setting the sample rate of your audio device to 48 kHz,\nor consider providing your own presets in detail/hrtf.");
+				{
+					auto& audio_cfg = config.audio;
+
+					const auto built_in_label = std::string("Built-in (MIT KEMAR)");
+
+					const auto current_preset_label = [&]() {
+						if (audio_cfg.hrtf_preset.empty()) {
+							return built_in_label;
+						}
+
+						return audio_cfg.hrtf_preset + (audio_cfg.hrtf_preset_is_user ? " (User)" : "");
+					}();
+
+					if (auto combo = scoped_combo("HRTF preset", current_preset_label.c_str(), ImGuiComboFlags_HeightLargest)) {
+						const auto presets = augs::find_hrtf_presets(audio.get_device().get_paths());
+
+						auto preset_selectable = [&](const std::string& label, const std::string& preset, const bool is_user) {
+							const bool is_current = 
+								audio_cfg.hrtf_preset == preset 
+								&& (preset.empty() || audio_cfg.hrtf_preset_is_user == is_user)
+							;
+
+							if (ImGui::Selectable(label.c_str(), is_current)) {
+								audio_cfg.hrtf_preset = preset;
+								audio_cfg.hrtf_preset_is_user = is_user;
+							}
+						};
+
+						auto preset_section = [&](const auto& header, const auto& stems, const bool is_user) {
+							ImGui::Separator();
+							text_disabled(header);
+
+							if (!is_user) {
+								/* Built into OpenAL Soft, so it's not in the official folder. */
+								preset_selectable(built_in_label, "", false);
+							}
+							else if (stems.empty()) {
+								text_disabled("  (Empty)");
+							}
+
+							for (const auto& stem : stems) {
+								/* The same name can be in both folders. */
+								const auto label = stem + (is_user ? "##user" : "##official");
+								preset_selectable(label, stem, is_user);
+							}
+						};
+
+						preset_section("(Official presets)", presets.official, false);
+						preset_section("(User presets)", presets.user, true);
+					}
+
+					{
+						const auto& last_saved_audio = last_saved_config.audio;
+
+						const bool preset_changed = 
+							audio_cfg.hrtf_preset != last_saved_audio.hrtf_preset
+							|| audio_cfg.hrtf_preset_is_user != last_saved_audio.hrtf_preset_is_user
+						;
+
+						if (preset_changed) {
+							auto id = scoped_id("hrtf_preset_revert");
+							ImGui::SameLine();
+
+							if (ImGui::Button("Revert")) {
+								audio_cfg.hrtf_preset = last_saved_audio.hrtf_preset;
+								audio_cfg.hrtf_preset_is_user = last_saved_audio.hrtf_preset_is_user;
+							}
+						}
+					}
+
+					if (ImGui::Button("Open user HRTF presets folder")) {
+						window.reveal_in_explorer(USER_HRTFS_DIR);
+					}
+
+					text_disabled("Every head hears directions differently - try a few presets to find the one\nthat tells you best whether a sound is above, below, left or right.\nUser presets are OpenAL Soft .mhr files.");
+				}
 #endif
 
 				{

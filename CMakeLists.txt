@@ -1505,6 +1505,9 @@ if(BUILD_FOR_WEB)
 	# Embed all files
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/content@/content")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/detail@/detail")
+
+	# HRTF presets are for OpenAL Soft - the browser does its own HRTF.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --exclude-file *.mhr")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.json@/default_config.json")
 
 	if (BUILD_OPENGL)

@@ -74,6 +74,8 @@ namespace augs {
 		std::string output_device_name = "";
 		unsigned max_number_of_sound_sources = 4096u;
 		float sound_meters_per_second = 180.f;
+		std::string hrtf_preset = "";
+		bool hrtf_preset_is_user = false;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const audio_settings& b) const = default;

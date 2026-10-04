@@ -20,3 +20,4 @@
 *.woff binary
 *.pyc binary
 *.pdf binary
+*.mhr binary

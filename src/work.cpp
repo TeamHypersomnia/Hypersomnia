@@ -560,6 +560,7 @@ work_result work(
 			USER_DIR,
 			DEMOS_DIR,
 			CONFD_DIR,
+			USER_HRTFS_DIR,
 
 			DOWNLOADED_ARENAS_DIR,
 			EDITOR_PROJECTS_DIR
@@ -1510,7 +1511,13 @@ work_result work(
 
 	LOG("Initializing the audio context.");
 
-	WEBSTATIC augs::audio_context audio(config.audio);
+	WEBSTATIC const auto audio_paths = augs::audio_paths {
+		OFFICIAL_HRTFS_DIR,
+		USER_HRTFS_DIR,
+		CACHE_DIR / "alsoft.conf"
+	};
+
+	WEBSTATIC augs::audio_context audio(config.audio, audio_paths);
 
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));

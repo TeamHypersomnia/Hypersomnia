@@ -105,6 +105,8 @@ extern augs::path_type USER_DIR;
 #define DEMOS_DIR (USER_DIR / "demos")
 #define EDITOR_PROJECTS_DIR (USER_DIR / "projects")
 #define CONFD_DIR (USER_DIR / "conf.d")
+#define OFFICIAL_HRTFS_DIR (DETAIL_DIR / "hrtf")
+#define USER_HRTFS_DIR (USER_DIR / "hrtf")
 
 #define CACHED_AUTH_PATH (USER_DIR / "cached_auth.json")
 #define CACHED_AVATAR (USER_DIR / "cached_avatar.png")

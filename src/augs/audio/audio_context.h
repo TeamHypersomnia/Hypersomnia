@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "augs/filesystem/path.h"
 #include "augs/templates/exception_templates.h"
 #include "augs/audio/audio_settings.h"
@@ -20,6 +21,19 @@ namespace augs {
 	};
 
 	void log_all_audio_devices(const path_type& output_path);
+
+	struct audio_paths {
+		path_type official_hrtfs_dir;
+		path_type user_hrtfs_dir;
+		path_type generated_openal_config;
+	};
+
+	struct hrtf_presets {
+		std::vector<std::string> official;
+		std::vector<std::string> user;
+	};
+
+	hrtf_presets find_hrtf_presets(const audio_paths&);
 	
 	class audio_device {
 		friend class audio_context;
@@ -28,7 +42,9 @@ namespace augs {
 
 		void destroy();
 
-		audio_device(const std::string& device_name);
+		audio_paths paths;
+
+		audio_device(const audio_settings&, const audio_paths&);
 		~audio_device();
 
 		audio_device(audio_device&&) noexcept;
@@ -46,6 +62,13 @@ namespace augs {
 		void reset_device(audio_settings);
 		hrtf_stat get_hrtf_status() const;
 		std::string get_output_mode() const;
+		std::string get_hrtf_name() const;
+		int get_sample_rate() const;
+		int find_hrtf_id(const audio_settings&) const;
+
+		const auto& get_paths() const {
+			return paths;
+		}
 		void log_hrtf_status() const;
 
 		operator ALCdevice*() {
@@ -69,7 +92,7 @@ namespace augs {
 		void speed_of_sound(float);
 
 	public:
-		audio_context(const audio_settings& device_name);
+		audio_context(const audio_settings&, const audio_paths&);
 		~audio_context();
 
 		audio_context(audio_context&&) noexcept;
