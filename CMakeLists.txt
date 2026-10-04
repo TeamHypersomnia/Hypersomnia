@@ -592,6 +592,7 @@ if(HAS_HEAD)
 	"src/view/audiovisual_state/aabb_highlighter.cpp"
 	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
 	"src/view/audiovisual_state/systems/finishing_trace_system.cpp"
+	"src/view/audiovisual_state/systems/throw_trajectory_system.cpp"
 	"src/view/audiovisual_state/systems/light_system.cpp"
 	"src/view/rendering_scripts/draw_sentiences_hud.cpp"
 	"src/view/rendering_scripts/draw_explosion_body_highlights.cpp"

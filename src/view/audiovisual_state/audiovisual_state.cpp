@@ -169,7 +169,21 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 	};
 
+	auto advance_throw_trajectories = [&]() {
+		auto& trajectories = get<throw_trajectory_system>();
+
+		if (!input.throw_trajectories.any()) {
+			trajectories.clear();
+			return;
+		}
+
+		if (input.new_state_delta.has_value()) {
+			trajectories.advance(viewed_character, input.throw_trajectories, input.throw_trajectory_gap);
+		}
+	};
+
 	auto synchronous_facade = [&]() {
+		advance_throw_trajectories();
 		advance_visible_particle_streams();
 		advance_world_hover_highlighter();
 		advance_highlights();

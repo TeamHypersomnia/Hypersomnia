@@ -7,6 +7,7 @@
 #include "augs/texture_atlas/atlas_entry.h"
 
 #include "view/game_gui/special_indicator.h"
+#include "view/rendering_scripts/throw_trajectory_flags.h"
 #include "augs/drawing/drawing.h"
 #include "augs/graphics/dedicated_buffers.h"
 
@@ -135,6 +136,11 @@ struct draw_crosshair_lasers_input {
 	const vec2 crosshair_displacement;
 	const vec2i screen_size;
 	const ltrb visible_world_aabb;
+
+	/*
+		Grenades and melee weapons whose trajectories are drawn get no laser.
+	*/
+	const throw_trajectory_flags throw_trajectories;
 };
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);

@@ -4087,6 +4087,17 @@ work_result work(
 			viewing_config.gore,
 			viewing_config.drawing.bullet_trails == bullet_trails_mode::FULL,
 			is_camera_pixel_snapped(viewing_config),
+			[&]() {
+				const auto& d = viewing_config.drawing;
+				const bool any_drawn = d.draw_weapon_laser || d.draw_throw_trajectory_when_throwing;
+
+				return throw_trajectory_flags {
+					any_drawn && d.draw_grenade_trajectories,
+					any_drawn && d.draw_melee_trajectories,
+					d.draw_throw_trajectories_during_side_throws
+				};
+			}(),
+			viewing_config.drawing.throw_trajectory_gap,
 
 			thread_pool
 		});

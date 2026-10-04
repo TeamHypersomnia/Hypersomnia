@@ -22,6 +22,7 @@
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 
 #include "view/audiovisual_state/all_audiovisual_systems.h"
+#include "view/rendering_scripts/throw_trajectory_flags.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/audiovisual_state/audiovisual_post_solve_settings.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
@@ -85,6 +86,8 @@ struct audiovisual_advance_input {
 	const bool gore_enabled;
 	const bool bullet_trails_enabled;
 	const bool integerize_viewed_character;
+	const throw_trajectory_flags throw_trajectories;
+	const float throw_trajectory_gap;
 
 	augs::thread_pool& pool;
 };

@@ -3,6 +3,8 @@
 #include "augs/math/matrix.h"
 
 #include "augs/drawing/drawing.hpp"
+#include "augs/drawing/sprite_helpers.h"
+#include "augs/algorithm/sample_along_path.h"
 
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"
@@ -16,6 +18,7 @@
 #include "view/rendering_scripts/draw_entity.h"
 
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/melee_component.h"
 #include "game/debug_drawing_settings.h"
 #include "game/detail/visible_entities.h"
 
@@ -40,6 +43,7 @@
 
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "game/detail/crosshair_math.hpp"
+#include "game/detail/explosive/like_explosive.h"
 
 #include "application/performance_settings.h"
 #include "augs/gui/text/printer.h"
@@ -80,6 +84,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
 	const auto real_global_time_seconds = cosm.get_clock().get_real_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
+
+	const auto throw_trajectories = throw_trajectory_flags {
+		settings.draw_grenade_trajectories,
+		settings.draw_melee_trajectories,
+		settings.draw_throw_trajectories_during_side_throws
+	};
+
 	const auto matrix = cone.get_projection_matrix();
 
 	const bool strict_fow = in.strict_fow_mode();
@@ -530,6 +541,225 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 	};
 
+	/*
+		Silhouettes of the held grenades and melee weapons along their simulated trajectories - see throw_trajectory_system.
+		Drawn in flat colors with a 1px black border, like the weapons of knockout indicators,
+		over a still white dashed line through the item and its silhouettes.
+		They are rotated as they would be at that point, and the silhouette where the throw really ends
+		pulses in size and towards white on top of everything else - spinning in place if it is an explosive.
+
+		All of it is translucent by game_drawing_settings::throw_trajectory_alpha - the end silhouette by its own throw_trajectory_end_alpha -
+		so it is drawn from the top down with every pixel drawn at most once -
+		the borders and the lines never show through the silhouettes over them.
+	*/
+
+	auto draw_throw_trajectories = [&]() {
+		const auto& trajectories = av.get<throw_trajectory_system>().get_trajectories();
+
+		if (trajectories.empty()) {
+			return;
+		}
+
+		constexpr auto explosive_spin_degrees_per_sec = 360.0;
+		constexpr auto end_pulses_per_sec = 2.0;
+		constexpr auto end_min_size_mult = 1.5f;
+		constexpr auto end_max_size_mult = 2.f;
+		constexpr auto dash_length = 10.f;
+
+		/*
+			With the laser off, a trajectory is shown only right before the throw, if enabled:
+			of an armed grenade, or of a melee weapon about to be thrown.
+		*/
+
+		auto is_shown = [&](const throw_trajectory& trajectory) {
+			if (settings.draw_weapon_laser) {
+				return true;
+			}
+
+			if (!settings.draw_throw_trajectory_when_throwing) {
+				return false;
+			}
+
+			const auto item = cosm[trajectory.input.item];
+
+			if (::is_armed_explosive(item)) {
+				return true;
+			}
+
+			if (item.alive() && item.has<components::melee>()) {
+				if (const auto transfers = viewed_character.find<components::item_slot_transfers>()) {
+					return transfers->when_throw_requested.was_set();
+				}
+			}
+
+			return false;
+		};
+
+		if (std::none_of(trajectories.begin(), trajectories.end(), is_shown)) {
+			return;
+		}
+
+		const auto alpha = std::clamp(settings.throw_trajectory_alpha, 0.f, 1.f);
+		const auto end_alpha = std::clamp(settings.throw_trajectory_end_alpha, 0.f, 1.f);
+		const auto ratio = static_cast<real32>(in.interpolation_ratio);
+		const auto spin = static_cast<real32>(std::fmod(real_global_time_seconds * explosive_spin_degrees_per_sec, 360.0));
+		const auto pulse = static_cast<real32>(0.5 - 0.5 * std::cos(real_global_time_seconds * end_pulses_per_sec * 2.0 * PI<double>));
+
+		auto translucent = [](rgba col, const real32 a) {
+			return col.mult_alpha(a);
+		};
+
+		auto calc_alpha = [&](const throw_silhouette_type type) {
+			return type == throw_silhouette_type::END ? end_alpha : alpha;
+		};
+
+		const auto border = 1.f / cone.eye.zoom;
+
+		const vec2 border_offsets[4] = {
+			vec2(-border, 0), vec2(border, 0), vec2(0, -border), vec2(0, border)
+		};
+
+		/*
+			A melee weapon stopping at an enemy is red to the end, at a friend green.
+		*/
+
+		auto calc_color = [&](const throw_silhouette_type type, const throw_end_type end_type) {
+			const auto end_color = [&]() {
+				switch (end_type) {
+					case throw_end_type::ENEMY: return red;
+					case throw_end_type::FRIEND: return green;
+					default: return cyan;
+				}
+			}();
+
+			const auto blocked_color = end_type == throw_end_type::FRIEND ? green : red;
+
+			switch (type) {
+				case throw_silhouette_type::BLOCKED: return translucent(blocked_color, alpha);
+				case throw_silhouette_type::END: return translucent(augs::interp(end_color, white, pulse), end_alpha);
+				default: return translucent(white, alpha);
+			}
+		};
+
+		auto calc_size_mult = [&](const throw_silhouette_type type) {
+			return type == throw_silhouette_type::END ? augs::interp(end_min_size_mult, end_max_size_mult, pulse) : 1.f;
+		};
+
+		auto draw_silhouettes = [&]() {
+			auto& output = renderer.get_triangle_buffer();
+
+			for (const auto& trajectory : reverse(trajectories)) {
+				if (!is_shown(trajectory)) {
+					continue;
+				}
+
+				const auto& entry = game_images.find_or(trajectory.image).diffuse;
+
+				for (const auto& silhouette : reverse(trajectory.silhouettes)) {
+					const auto type = silhouette.type;
+					const auto interpolated = silhouette.get_interpolated(ratio);
+					const auto size = vec2i(vec2(trajectory.size) * calc_size_mult(type));
+
+					const bool spins = trajectory.input.explosive && type == throw_silhouette_type::END;
+					const auto rotation = interpolated.rotation + (spins ? spin : 0.f);
+
+					augs::detail_sprite(output, entry, size, interpolated.pos, rotation, calc_color(type, trajectory.end_type));
+
+					for (const auto& o : border_offsets) {
+						augs::detail_sprite(output, entry, size, interpolated.pos + o, rotation, translucent(black, calc_alpha(type)));
+					}
+				}
+			}
+
+			renderer.call_and_clear_triangles();
+		};
+
+		/*
+			Dashes in screen space, so that they keep their on-screen size regardless of zoom, like the laser.
+		*/
+
+		auto draw_dashed_lines = [&]() {
+			thread_local std::vector<transformr> points;
+			thread_local std::vector<std::pair<vec2, vec2>> dashes;
+
+			dashes.clear();
+
+			for (const auto& trajectory : trajectories) {
+				const auto item = cosm[trajectory.input.item];
+
+				if (item.dead() || !is_shown(trajectory)) {
+					continue;
+				}
+
+				points.clear();
+				points.push_back(transformr(vec2(cone.to_screen_space(item.get_viewing_transform(interp).pos)), 0.f));
+
+				for (const auto& silhouette : trajectory.silhouettes) {
+					if (silhouette.type != throw_silhouette_type::BLOCKED) {
+						points.push_back(transformr(vec2(cone.to_screen_space(silhouette.get_interpolated(ratio).pos)), 0.f));
+					}
+				}
+
+				std::optional<vec2> dash_start;
+
+				augs::sample_along_path(
+					points,
+					dash_length,
+					0.f,
+					std::numeric_limits<real32>::max(),
+					[](const transformr& a, const transformr& b, const real32 t) { return a.interp(b, t); },
+					[&](const transformr& t, real32) {
+						if (dash_start.has_value()) {
+							dashes.emplace_back(*dash_start, t.pos);
+							dash_start = std::nullopt;
+						}
+						else {
+							dash_start = t.pos;
+						}
+					}
+				);
+			}
+
+			const auto line_drawer = get_line_drawer();
+			const auto laser = necessarys.at(assets::necessary_image_id::LASER);
+
+			for (const auto& d : dashes) {
+				line_drawer.line(laser, d.first, d.second, translucent(white, alpha));
+			}
+
+			for (const auto& d : dashes) {
+				for (const auto& o : border_offsets) {
+					const auto screen_offset = o * cone.eye.zoom;
+					line_drawer.line(laser, d.first + screen_offset, d.second + screen_offset, translucent(black, alpha));
+				}
+			}
+
+			renderer.call_and_clear_lines();
+		};
+
+		renderer.call_and_clear_triangles();
+		renderer.call_and_clear_lines();
+
+#if BUILD_STENCIL_BUFFER
+		renderer.set_stencil(true);
+		renderer.clear_single_coverage();
+		renderer.start_single_coverage();
+#endif
+
+		set_shader_with_matrix(shaders.shadow_sprite);
+		draw_silhouettes();
+
+		set_shader_with_non_zoomed_matrix(shaders.standard);
+		draw_dashed_lines();
+
+#if BUILD_STENCIL_BUFFER
+		renderer.finish_single_coverage();
+		renderer.set_stencil(false);
+#endif
+
+		set_shader_with_matrix(shaders.standard);
+	};
+
 	auto draw_weapon_laser = [&]() {
 		if (settings.draw_weapon_laser && viewed_character.alive()) {
 			const auto laser = necessarys.at(assets::necessary_image_id::LASER);
@@ -609,11 +839,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				viewed_character,
 				in.pre_step_crosshair_displacement,
 				screen_size,
-				cone.get_visible_world_rect_aabb()
+				cone.get_visible_world_rect_aabb(),
+				throw_trajectories
 			});
 
 			renderer.call_and_clear_lines();
 			shaders.standard->set_projection(renderer, matrix);
+		}
+
+		if (throw_trajectories.any() && viewed_character.alive()) {
+			draw_throw_trajectories();
 		}
 	};
 
@@ -692,7 +927,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						viewed_character,
 						in.pre_step_crosshair_displacement,
 						screen_size,
-						cone.get_visible_world_rect_aabb()
+						cone.get_visible_world_rect_aabb(),
+						throw_trajectories
 					});
 				}
 

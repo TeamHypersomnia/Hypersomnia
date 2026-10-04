@@ -11,6 +11,7 @@
 #include "view/audiovisual_state/systems/thunder_system.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
 #include "view/audiovisual_state/systems/finishing_trace_system.h"
+#include "view/audiovisual_state/systems/throw_trajectory_system.h"
 
 namespace augs {
 	template <class...>
@@ -29,5 +30,6 @@ using all_audiovisual_systems = augs::storage_for_systems<
 	exploding_ring_system,
 	thunder_system,
 	minimap_sighting_system,
-	finishing_trace_system
+	finishing_trace_system,
+	throw_trajectory_system
 >;

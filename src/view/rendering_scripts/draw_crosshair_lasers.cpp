@@ -15,8 +15,7 @@
 #include "view/game_drawing_settings.h"
 #include "game/detail/weapon_like.h"
 #include "game/detail/crosshair_math.hpp"
-#include "game/detail/explosive/like_explosive.h"
-#include "game/components/item_slot_transfers_component.h"
+#include "view/rendering_scripts/aimed_with.h"
 
 #include "augs/drawing/drawing.hpp"
 #include "augs/log.h"
@@ -258,48 +257,10 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}
 		};
 
-		const auto wielded_items = in.character.get_wielded_items();
-
-		/*
-			Right before a throw, two items might be wielded at once,
-			e.g. a gun and a grenade drawn with a throw key.
-			Show the laser only for the item about to be thrown.
-		*/
-
-		const bool throwing_explosive = [&]() {
-			for (const auto& w : wielded_items) {
-				if (::is_armed_explosive(cosm[w])) {
-					return true;
-				}
-			}
-
-			return false;
-		}();
-
-		const bool throwing_melee = [&]() {
-			if (const auto transfers = in.character.find<components::item_slot_transfers>()) {
-				return transfers->when_throw_requested.was_set();
-			}
-
-			return false;
-		}();
-
-		auto is_laser_shown = [&](const const_entity_handle subject_item) {
-			if (throwing_explosive) {
-				return ::is_armed_explosive(subject_item);
-			}
-
-			if (throwing_melee) {
-				return subject_item.has<components::melee>();
-			}
-
-			return true;
-		};
-
-		for (const auto& subject_item_id : wielded_items) {
+		for (const auto& subject_item_id : in.character.get_wielded_items()) {
 			const auto subject_item = cosm[subject_item_id];
 
-			if (!is_laser_shown(subject_item)) {
+			if (!::is_aimed_with(in.character, subject_item, in.throw_trajectories.during_side_throws)) {
 				continue;
 			}
 
@@ -309,12 +270,18 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				queried_filter = ::calc_gun_bullet_physical_filter(subject_item);
 			}
 
-			if (subject_item.has<components::hand_fuse>()) {
-				queried_filter = filters[predefined_filter_type::FLYING_EXPLOSIVE];
-			}
+			/*
+				Grenades and melee weapons get a laser unless they show their trajectories instead - see throw_trajectory_system.
+			*/
 
-			if (subject_item.has<components::melee>()) {
-				queried_filter = filters[predefined_filter_type::FLYING_MELEE];
+			if (!in.throw_trajectories.shown_for(subject_item)) {
+				if (subject_item.has<components::hand_fuse>()) {
+					queried_filter = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+				}
+
+				if (subject_item.has<components::melee>()) {
+					queried_filter = filters[predefined_filter_type::FLYING_MELEE];
+				}
 			}
 
 			if (queried_filter.has_value()) {
