@@ -708,6 +708,16 @@ void test_scene_setup::restart_mode() {
 		}
 	}
 
+	if (!is_tutorial()) {
+		/*
+			Shooting range has no time limit - 0 disables the round end and hides the round timer at the top.
+		*/
+
+		if (auto* rs = std::get_if<test_mode_ruleset>(&ruleset)) {
+			rs->round_secs = 0;
+		}
+	}
+
 
 	if (is_planting_level) {
 		auto b1 = to_handle("bomb1");

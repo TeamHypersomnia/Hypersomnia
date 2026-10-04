@@ -7537,3 +7537,6 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 
 - zwolnic gre 15-20% separate constants in balance vars
 
+- chowaj na strzelnicy timer
+- pokazuj playing with players na steamie poprawnie bo jak ktos gra z botami to teraz liczy ich jako prawdziwych ludzi
+- audyt hrtfu

@@ -55,7 +55,7 @@ void get_arena_steam_rich_presence_pairs(
 	handle.on_mode_with_input(
 		[&]<typename T>(const T& mode, const auto& input) {
 			gamemode = mode.get_name(input);
-			num_others_in_group = mode.get_num_players();
+			num_others_in_group = mode.get_num_human_players();
 
 			if (auto player_data = mode.find(local_id)) {
 				if (player_data->get_faction() == faction_type::SPECTATOR) {

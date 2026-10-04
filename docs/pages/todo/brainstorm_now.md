@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- audyt hrtfu
 - kiedys mozna byloby symulowac te trajektorie granatow
 
 - swiecacy dev label
