@@ -1,10 +1,8 @@
 #pragma once
 #include <algorithm>
 #include <cmath>
-#include <string>
 #include "augs/math/declare_math.h"
 #include "augs/misc/timing/stepped_timing.h"
-#include "augs/string/typesafe_sprintf.h"
 
 /*
 	Logic speed scales the delta passed to the solver while the tickrate stays the same.
@@ -60,20 +58,6 @@ void apply_requested_logic_speed(
 	if (can_change_now()) {
 		cosm.set_clock_timing(clk.tickrate, sanitized_speed, sanitized_bullet_speed);
 	}
-}
-
-/*
-	At least one and at most two decimal places, e.g. "1.0x", "0.8x", "0.75x".
-*/
-
-inline std::string format_logic_speed(const real32 speed) {
-	auto result = typesafe_sprintf("%2f", speed);
-
-	if (result.size() > 1 && result.back() == '0') {
-		result.pop_back();
-	}
-
-	return result + "x";
 }
 
 /*

@@ -61,5 +61,14 @@ struct synced_dynamic_vars {
 	bool is_ranked_server() const {
 		return ranked.is_ranked_server();
 	}
+
+	/*
+		For local setups (test scene, editor playtest) - the speeds the player would host a server at.
+	*/
+
+	void set_speeds_from(const server_vars& vars) {
+		logic_speed = vars.game_speed;
+		bullet_speed = vars.calc_bullet_speed(vars.game_speed);
+	}
 };
 

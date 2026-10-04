@@ -56,6 +56,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/logic_speed.h"
+#include "view/format_logic_speed.h"
 #include "game/messages/mode_notification.h"
 #include "augs/misc/httplib_utils.h"
 #include "application/gui/client/chat_gui_entry.hpp"

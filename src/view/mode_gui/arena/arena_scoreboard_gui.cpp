@@ -8,7 +8,7 @@
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/casual_level_logic.h"
 #include "game/modes/test_mode.h"
-#include "game/modes/logic_speed.h"
+#include "view/format_logic_speed.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_json_table.h"

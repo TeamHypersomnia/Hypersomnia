@@ -49,7 +49,7 @@ struct general_particle {
 	// END GEN INTROSPECTOR
 
 	/*
-		Runtime only. Bullet trail particles slow down together with the logic speed.
+		Runtime only. Bullet trail particles run at the bullet speed - see augs::stepped_clock::bullet_speed.
 	*/
 
 	float time_mult = 1.f;
