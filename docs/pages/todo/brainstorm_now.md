@@ -6,8 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- jeszcze zrozumiec relacje miedzy physical/kwantyzacja
 - osobne flagi na podglad przy rzucaniu granatem a podglad przy rzucaniu nozem
 	- wylaczyc domyslnie w ogole dla melee
+	- albo flage domyslnie on zeby rysowac to jako zwykly laser a nie te sylwetki durne
 
 - lagodniejsza interpolacja tych markerow szczegolnie dla melee
 

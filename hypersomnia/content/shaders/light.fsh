@@ -78,11 +78,37 @@ float light_amount(float light_distance, float vertex_alpha) {
 	Then:
 
 	4 - the light itself over its whole reach, premultiplied, to be scaled by its mask,
+	11 - instead of 4 for a quantized muzzle flash - the same, in discrete bands,
 	7 - the light all shadows removed, into the removed light texture
 	    (and into the hue light texture for lights keeping their hue through walls).
 */
 
 uniform int light_pass;
+
+/*
+	The bands of quantized muzzle flashes - the same as of quantized neons, see posterized_neon.fsh.
+*/
+
+uniform vec4 ambient_color;
+uniform int smooth_brightening;
+
+const float band_levels = 3.0;
+
+float stepped_brightening(float intensity) {
+	return 1.0 + floor(min(intensity, 1.0) * band_levels) / band_levels;
+}
+
+float banded_scale(float light) {
+	float ambient = max(max(ambient_color.r, ambient_color.g), ambient_color.b);
+	float total = ambient + light;
+	float banded = total * stepped_brightening(total) / stepped_brightening(ambient);
+
+	if (smooth_brightening != 0) {
+		banded *= (1.0 + ambient) / (1.0 + min(total, 1.0));
+	}
+
+	return max(banded - ambient, 0.0) / max(light, 0.0001);
+}
 uniform sampler2D light_mask_texture;
 
 float penumbra_fade(float t) {
@@ -139,6 +165,12 @@ void main()
 
 	if (light_pass == 4) {
 		outputColor = vec4(premultiplied, 0.0);
+		return;
+	}
+
+	if (light_pass == 11) {
+		float light = max(max(premultiplied.r, premultiplied.g), premultiplied.b);
+		outputColor = vec4(premultiplied * banded_scale(light), 0.0);
 		return;
 	}
 

@@ -44,6 +44,12 @@ namespace messages {
 		*/
 		std::optional<std::array<float, 10>> variation_cache;
 
+		/*
+			Muzzle flashes are drawn in discrete bands, like quantized neons.
+		*/
+
+		bool muzzle_flash = false;
+
 		bool valid() const;
 	};
 

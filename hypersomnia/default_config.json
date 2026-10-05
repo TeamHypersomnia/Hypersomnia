@@ -1114,6 +1114,7 @@
                 }
             },
             "muzzle_flash_intensity": 0.9,
+            "muzzle_flash_falloff": 0.5,
             "particle_stream_amount": 1.0,
             "particle_burst_amount": 1.0
         },

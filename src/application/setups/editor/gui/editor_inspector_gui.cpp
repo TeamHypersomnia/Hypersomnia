@@ -1411,6 +1411,12 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Color", color);
 	MULTIPROPERTY("Intensity vibration", intensity_vibration);
+	MULTIPROPERTY("Quantized", quantized);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("The light goes in a few discrete bands of brightness, like quantized neons.\nOnly with the arena's Physical lights - legacy ones that Brighten lights are banded as a whole already.");
+	}
+
 	MULTIPROPERTY("Casts shadows", cast_shadows);
 
 	if (ImGui::IsItemHovered()) {

@@ -19,6 +19,7 @@ struct editor_light_node_editable {
 
 	bool cast_shadows = true;
 	bool hue_through_walls = true;
+	bool quantized = false;
 	float shadow_smoothness = 1.0f;
 	float height = 64.0f;
 	// END GEN INTROSPECTOR

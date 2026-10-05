@@ -72,7 +72,7 @@ void main()
 		amount = theColor.a * light_intensity * window * window / (1.0 + core_x * core_x);
 	}
 	else {
-		amount = min(theColor.a, legacy_attenuation(light_distance) * texture_alpha);
+		amount = min(theColor.a, legacy_attenuation(light_distance));
 	}
 
 	outputColor = vec4(color * amount, 1.0);

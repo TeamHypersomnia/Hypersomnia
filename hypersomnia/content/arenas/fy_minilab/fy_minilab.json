@@ -2,7 +2,7 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2026-10-04 22:37:24.624052 UTC"
+        "version_timestamp": "2026-10-05 01:06:34.310065 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -202,7 +202,6 @@
         },
         {
             "id": "aquarium_top",
-            "is_open_in_editor": false,
             "nodes": [
                 "aquarium",
                 "water_room_floor (1)"
@@ -210,7 +209,6 @@
         },
         {
             "id": "aquarium_bottom",
-            "is_open_in_editor": false,
             "nodes": [
                 "point_light (10)",
                 "point_light (9)",
@@ -1004,9 +1002,9 @@
             "pos": [1601.0, -737.0],
             "color": [73, 192, 255, 255],
             "falloff": {
-                "radius": 943.039,
-                "intensity": 0.64,
-                "falloff": 0.65
+                "radius": 943.0390014648438,
+                "intensity": 0.6399999856948853,
+                "falloff": 0.6499999761581421
             },
             "wall_falloff": {}
         },
@@ -1016,9 +1014,9 @@
             "pos": [2403.0, 514.0],
             "color": [0, 180, 59, 255],
             "falloff": {
-                "radius": 770.886,
-                "intensity": 0.66,
-                "falloff": 0.24
+                "radius": 770.885986328125,
+                "intensity": 0.6600000262260437,
+                "falloff": 0.23999999463558197
             }
         },
         {
@@ -1027,9 +1025,9 @@
             "pos": [2751.0, -1345.0],
             "color": [255, 183, 0, 255],
             "falloff": {
-                "radius": 1020.08,
-                "intensity": 0.66,
-                "falloff": 0.39
+                "radius": 1020.0800170898438,
+                "intensity": 0.6600000262260437,
+                "falloff": 0.38999998569488525
             }
         },
         {
@@ -1038,9 +1036,9 @@
             "pos": [1601.0, 737.0],
             "color": [73, 192, 255, 255],
             "falloff": {
-                "radius": 943.039,
-                "intensity": 0.64,
-                "falloff": 0.65
+                "radius": 943.0390014648438,
+                "intensity": 0.6399999856948853,
+                "falloff": 0.6499999761581421
             },
             "wall_falloff": {}
         },
@@ -1050,9 +1048,9 @@
             "pos": [-1215.0, -737.0],
             "color": [255, 225, 73, 250],
             "falloff": {
-                "radius": 1246.835,
-                "intensity": 0.63,
-                "falloff": 0.83
+                "radius": 1246.8349609375,
+                "intensity": 0.6299999952316284,
+                "falloff": 0.8299999833106995
             },
             "wall_falloff": {}
         },
@@ -1062,9 +1060,9 @@
             "pos": [-1265.0, 721.0],
             "color": [255, 225, 73, 250],
             "falloff": {
-                "radius": 1246.835,
-                "intensity": 0.63,
-                "falloff": 0.83
+                "radius": 1246.8349609375,
+                "intensity": 0.6299999952316284,
+                "falloff": 0.8299999833106995
             },
             "wall_falloff": {}
         },
@@ -1074,9 +1072,9 @@
             "pos": [323.0, 889.0],
             "color": [19, 255, 23, 122],
             "falloff": {
-                "radius": 985.673,
-                "intensity": 0.91,
-                "falloff": 0.69
+                "radius": 985.6729736328125,
+                "intensity": 0.9100000262260437,
+                "falloff": 0.6899999976158142
             }
         },
         {
@@ -1085,8 +1083,8 @@
             "pos": [639.0, 799.0],
             "color": [0, 255, 59, 25],
             "falloff": {
-                "radius": 601.719,
-                "intensity": 0.89,
+                "radius": 601.718994140625,
+                "intensity": 0.8899999856948853,
                 "falloff": 0.0
             }
         },
@@ -1096,8 +1094,8 @@
             "pos": [602.0, -784.0],
             "color": [0, 179, 255, 20],
             "falloff": {
-                "radius": 727.794,
-                "intensity": 1.36,
+                "radius": 727.7940063476563,
+                "intensity": 1.3600000143051147,
                 "falloff": 0.0
             }
         },
@@ -1127,9 +1125,9 @@
             "pos": [-2497.0, -1345.0],
             "color": [255, 183, 0, 255],
             "falloff": {
-                "radius": 1020.08,
-                "intensity": 0.66,
-                "falloff": 0.39
+                "radius": 1020.0800170898438,
+                "intensity": 0.6600000262260437,
+                "falloff": 0.38999998569488525
             }
         },
         {

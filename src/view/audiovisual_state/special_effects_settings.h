@@ -90,6 +90,7 @@ struct special_effects_settings {
 	// GEN INTROSPECTOR struct special_effects_settings
 	explosions_settings explosions;
 	float muzzle_flash_intensity = 1.f;
+	float muzzle_flash_falloff = 0.5f;
 	float particle_stream_amount = 1.f;
 	float particle_burst_amount = 1.f;
 	// END GEN INTROSPECTOR

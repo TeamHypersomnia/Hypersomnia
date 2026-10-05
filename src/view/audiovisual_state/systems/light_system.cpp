@@ -254,6 +254,15 @@ void light_system::render_all_lights(const light_system_input in) const {
 		set_uniform(light_shader, light_uniform.physical, physical_lights ? 1 : 0);
 		set_uniform(light_shader, augs::common_uniform_name::light_pass, 0);
 
+		/*
+			For quantized muzzle flashes - the same bands as quantized neons, see posterized_neon.fsh.
+		*/
+
+		const auto& light_settings = cosm.get_common_significant().light;
+
+		set_uniform(light_shader, augs::common_uniform_name::ambient_color, light_settings.ambient_color);
+		set_uniform(light_shader, augs::common_uniform_name::smooth_brightening, physical_lights && light_settings.brighten_lights ? 1 : 0);
+
 		renderer.set_additive_blending();
 	};
 
@@ -424,7 +433,15 @@ void light_system::render_all_lights(const light_system_input in) const {
 					renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_PENUMBRAS, i);
 				}
 
-				set_pass(4);
+				/*
+					Lights quantized in the editor go in discrete bands unless all light is banded already.
+					Muzzle flashes - whenever neons are quantized too.
+				*/
+
+				const bool quantized_flash = request.muzzle_flash && in.posterized_neon_shader != nullptr;
+				const bool quantized = quantized_flash || (light.quantized && !legacy_bands);
+
+				set_pass(quantized ? 11 : 4);
 				renderer.set_dst_alpha_additive_blending();
 				::draw_light_area(renderer, reach, world_light_pos, max_distance, request.color);
 

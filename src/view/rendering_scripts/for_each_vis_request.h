@@ -111,6 +111,7 @@ void for_each_light_vis_request(
 			*/
 			request.light_data = light_component;
 			request.variation_cache = std::nullopt;
+			request.muzzle_flash = true;
 
 			callback(request);
 		}

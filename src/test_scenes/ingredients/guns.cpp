@@ -4448,13 +4448,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
-			/*
-				A wider spread over a longer reach than other guns - the strongest flash.
-			*/
-
-			gun_def.muzzle_light_radius *= 1.4f * 1.3f;
-			gun_def.muzzle_light_intensity = 0.55f;
-			gun_def.muzzle_light_falloff = 0.35f;
+			gun_def.muzzle_light_radius *= 1.4f;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_light_duration *= 1.45f;
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HPSR_MUZZLE);

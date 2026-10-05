@@ -1,4 +1,5 @@
 #include <cmath>
+#include <limits>
 #include "augs/misc/randomization.h"
 #include "game/components/light_component.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
@@ -12,20 +13,98 @@ real32 light_falloff::calc_core() const {
 	return std::pow(0.08f, std::clamp(falloff, 0.0f, 1.0f));
 }
 
-real32 light_falloff::calc_legacy_constant() const {
-	return std::max(0.0f, 1.0f - 2.0f * falloff);
-}
+legacy_attenuation light_falloff::calc_legacy(const real32 alpha) const {
+	/*
+		Least squares over the radius, weighted by the area each distance covers.
+		The candidates: attenuations mixing constant, linear and quadratic terms, in units of the radius,
+		times the brightness they have at the radius (strength) - the legacy model's own parameters.
+		Both curves are compared as they reach the light texture: the physical one scaled by the color's alpha,
+		the legacy one capped by it.
+	*/
 
-real32 light_falloff::calc_legacy_linear() const {
-	return 1.0f - std::abs(2.0f * falloff - 1.0f);
-}
+	legacy_attenuation result;
 
-real32 light_falloff::calc_legacy_quadratic() const {
-	return std::max(0.0f, 2.0f * falloff - 1.0f);
-}
+	if (radius <= 0.0f) {
+		return result;
+	}
 
-rgba_channel light_falloff::calc_legacy_strength() const {
-	return static_cast<rgba_channel>(std::clamp(intensity * 30.0f, 1.0f, 255.0f));
+	constexpr int num_samples = 24;
+	constexpr int num_mixes = 21;
+	constexpr int num_strengths = 40;
+
+	std::array<real32, num_samples> xs;
+	std::array<real32, num_samples> target;
+
+	const auto core = calc_core();
+
+	for (int i = 0; i < num_samples; ++i) {
+		const auto x = (i + 0.5f) / num_samples;
+		const auto core_x = x / core;
+		const auto window = std::clamp(1.0f - x * x * x * x, 0.0f, 1.0f);
+
+		xs[i] = x;
+		target[i] = std::min(1.0f, alpha * intensity * window * window / (1.0f + core_x * core_x));
+	}
+
+	auto mix_terms = [](const real32 t) {
+		return std::array<real32, 3> {
+			std::max(0.0f, 1.0f - 2.0f * t),
+			1.0f - std::abs(2.0f * t - 1.0f),
+			std::max(0.0f, 2.0f * t - 1.0f)
+		};
+	};
+
+	auto best_error = std::numeric_limits<real32>::max();
+	auto best_terms = mix_terms(0.5f);
+	auto best_strength = 30.0f;
+
+	for (int m = 0; m < num_mixes; ++m) {
+		const auto terms = mix_terms(static_cast<real32>(m) / (num_mixes - 1));
+		const auto edge = terms[0] + terms[1] + terms[2];
+
+		for (int k = 0; k < num_strengths; ++k) {
+			const auto strength = std::round(std::pow(255.0f, static_cast<real32>(k) / (num_strengths - 1)));
+			const auto cutoff_x = std::max(0.0f, 1.0f - 3.0f * strength / radius);
+
+			auto error = 0.0f;
+
+			for (int i = 0; i < num_samples; ++i) {
+				const auto x = xs[i];
+				const auto atten = terms[0] + terms[1] * x + terms[2] * x * x;
+
+				auto legacy = atten > 0.0f ? (strength / 255.0f) * edge / atten : 1.0f;
+
+				if (x > cutoff_x) {
+					const auto u = (x - cutoff_x) / (1.0f - cutoff_x);
+					legacy *= 0.5f * (1.0f - u * u);
+				}
+
+				const auto diff = std::min(alpha, legacy) - target[i];
+				error += diff * diff * x;
+			}
+
+			if (error < best_error) {
+				best_error = error;
+				best_terms = terms;
+				best_strength = strength;
+			}
+		}
+	}
+
+	/*
+		From units of the radius to pixels, scaled like the editor's legacy lights:
+		the attenuation at the radius gives exactly strength / 255.
+	*/
+
+	const auto edge = best_terms[0] + best_terms[1] + best_terms[2];
+	const auto mult = 255.0f / (edge * best_strength);
+
+	result.constant = best_terms[0] * mult * CONST_MULT;
+	result.linear = best_terms[1] / radius * mult * LINEAR_MULT;
+	result.quadratic = best_terms[2] / (radius * radius) * mult * QUADRATIC_MULT;
+	result.trim_alpha = static_cast<rgba_channel>(best_strength);
+
+	return result;
 }
 
 namespace components {

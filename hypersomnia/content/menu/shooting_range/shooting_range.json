@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-10-04 23:08:24.128614 UTC"
+        "version_timestamp": "2026-10-05 00:52:10.487298 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1682,14 +1682,13 @@
             "pos": [2945.0, 1297.0],
             "color": [255, 183, 71, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -1698,8 +1697,8 @@
             "pos": [1.0, 4095.0],
             "color": [0, 180, 255, 65],
             "falloff": {
-                "radius": 676.364,
-                "intensity": 0.93,
+                "radius": 676.364013671875,
+                "intensity": 0.9300000071525574,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0
@@ -1710,8 +1709,8 @@
             "pos": [-1.0, 4609.0],
             "color": [255, 255, 255, 13],
             "falloff": {
-                "radius": 676.364,
-                "intensity": 1.4,
+                "radius": 676.364013671875,
+                "intensity": 1.399999976158142,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0,
@@ -1723,8 +1722,8 @@
             "pos": [-1.0, 5117.0],
             "color": [0, 255, 126, 46],
             "falloff": {
-                "radius": 676.364,
-                "intensity": 1.12,
+                "radius": 676.364013671875,
+                "intensity": 1.1200000047683716,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0,
@@ -1737,7 +1736,7 @@
             "color": [0, 157, 255, 41],
             "falloff": {
                 "radius": 1240.0,
-                "intensity": 1.24,
+                "intensity": 1.2400000095367432,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0,
@@ -1750,7 +1749,7 @@
             "color": [0, 157, 255, 41],
             "falloff": {
                 "radius": 1240.0,
-                "intensity": 1.24,
+                "intensity": 1.2400000095367432,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0,
@@ -1761,9 +1760,9 @@
             "type": "point_light",
             "pos": [-3777.0, 4161.0],
             "falloff": {
-                "radius": 221.818,
-                "intensity": 0.76,
-                "falloff": 0.47
+                "radius": 221.8179931640625,
+                "intensity": 0.7599999904632568,
+                "falloff": 0.4699999988079071
             },
             "intensity_vibration": 0.0
         },
@@ -1772,9 +1771,9 @@
             "type": "point_light",
             "pos": [-3265.0, 4033.0],
             "falloff": {
-                "radius": 221.818,
-                "intensity": 0.76,
-                "falloff": 0.47
+                "radius": 221.8179931640625,
+                "intensity": 0.7599999904632568,
+                "falloff": 0.4699999988079071
             },
             "intensity_vibration": 0.0
         },
@@ -1783,9 +1782,9 @@
             "type": "point_light",
             "pos": [-3393.0, 3521.0],
             "falloff": {
-                "radius": 221.818,
-                "intensity": 0.76,
-                "falloff": 0.47
+                "radius": 221.8179931640625,
+                "intensity": 0.7599999904632568,
+                "falloff": 0.4699999988079071
             },
             "intensity_vibration": 0.0
         },
@@ -1795,8 +1794,8 @@
             "pos": [-153.0, 2234.0],
             "color": [255, 0, 255, 60],
             "falloff": {
-                "radius": 676.364,
-                "intensity": 0.98,
+                "radius": 676.364013671875,
+                "intensity": 0.9800000190734863,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0
@@ -1807,8 +1806,8 @@
             "pos": [574.0, 2747.0],
             "color": [0, 255, 0, 60],
             "falloff": {
-                "radius": 676.364,
-                "intensity": 0.98,
+                "radius": 676.364013671875,
+                "intensity": 0.9800000190734863,
                 "falloff": 0.0
             },
             "intensity_vibration": 0.0

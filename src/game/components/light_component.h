@@ -8,6 +8,26 @@
 struct randomization;
 
 /*
+	The legacy model, on maps without Physical lights: 1 / (constant + linear * d + quadratic * d^2),
+	cut off where it falls to trim_alpha / 255 - with a visible edge.
+*/
+
+struct legacy_attenuation {
+	// GEN INTROSPECTOR struct legacy_attenuation
+	real32 constant = 0.f;
+	real32 linear = 0.f;
+	real32 quadratic = 0.f;
+
+	rgba_channel trim_alpha = 3;
+	pad_bytes<3> pad;
+	// END GEN INTROSPECTOR
+
+	real32 calc_reach() const;
+
+	friend bool operator==(const legacy_attenuation&, const legacy_attenuation&) = default;
+};
+
+/*
 	A light fades out from its center to exactly zero at its radius,
 	following the inverse square law of a source of finite size, windowed so that it ends smoothly - see light.fsh.
 
@@ -33,37 +53,13 @@ struct light_falloff {
 	real32 calc_core() const;
 
 	/*
-		The same parameters approximated by the legacy model, on maps without Physical lights:
-		falloff 0 is a constant attenuation, 0.5 linear, 1 quadratic,
-		and intensity 1 is the brightness of 30 / 255 at the radius.
+		The legacy attenuation that looks the most like this falloff, for maps without Physical lights -
+		fitted when the light is built, for a light color of this alpha.
 	*/
 
-	real32 calc_legacy_constant() const;
-	real32 calc_legacy_linear() const;
-	real32 calc_legacy_quadratic() const;
-	rgba_channel calc_legacy_strength() const;
+	legacy_attenuation calc_legacy(real32 alpha) const;
 
 	friend bool operator==(const light_falloff&, const light_falloff&) = default;
-};
-
-/*
-	The legacy model, on maps without Physical lights: 1 / (constant + linear * d + quadratic * d^2),
-	cut off where it falls to trim_alpha / 255 - with a visible edge.
-*/
-
-struct legacy_attenuation {
-	// GEN INTROSPECTOR struct legacy_attenuation
-	real32 constant = 0.f;
-	real32 linear = 0.f;
-	real32 quadratic = 0.f;
-
-	rgba_channel trim_alpha = 3;
-	pad_bytes<3> pad;
-	// END GEN INTROSPECTOR
-
-	real32 calc_reach() const;
-
-	friend bool operator==(const legacy_attenuation&, const legacy_attenuation&) = default;
 };
 
 /*
@@ -115,7 +111,8 @@ namespace components {
 		rgba color = white;
 		bool cast_shadows = true;
 		bool hue_through_walls = true;
-		pad_bytes<2> pad;
+		bool quantized = false;
+		pad_bytes<1> pad;
 		real32 shadow_smoothness = 1.0f;
 		real32 height = 64.0f;
 		// END GEN INTROSPECTOR

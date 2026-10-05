@@ -27,8 +27,6 @@
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/rendering_scripts/falling_item_offsets.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
-#include "view/audiovisual_state/systems/light_attenuation.h"
-#include "view/audiovisual_state/systems/legacy_light_mults.h"
 #include "augs/graphics/gore_colors.h"
 #include "augs/templates/traits/is_nullopt.h"
 #include "game/detail/gun/firearm_engine.h"
@@ -1313,24 +1311,21 @@ components::light temporary_light::to_light_component() const {
 	light.wall_falloff = { wall_effective_radius, intensity, falloff };
 
 	/*
-		The legacy model approximates the same parameters - see light_falloff.
+		The legacy attenuation, for maps without Physical lights, fitted at the full radius when the flash was spawned,
+		follows the shrinking radius: in units of the radius it stays the same.
 	*/
 
-	auto set_legacy = [&](legacy_attenuation& attn, const light_falloff& foff) {
-		const auto c = foff.calc_legacy_constant();
-		const auto l = foff.calc_legacy_linear();
-		const auto q = foff.calc_legacy_quadratic();
-		const auto strength = foff.calc_legacy_strength();
-		const auto mult = ::calc_attenuation_mult_for_requested_radius(c, l, q, foff.radius, strength);
+	auto scaled_legacy = [&](const legacy_attenuation& fitted, const real32 radius_mult) {
+		const auto mult = std::max(radius_mult, 0.001f);
 
-		attn.constant = c * mult * CONST_MULT;
-		attn.linear = l * mult * LINEAR_MULT;
-		attn.quadratic = q * mult * QUADRATIC_MULT;
-		attn.trim_alpha = strength;
+		auto attn = fitted;
+		attn.linear /= mult;
+		attn.quadratic /= mult * mult;
+		return attn;
 	};
 
-	set_legacy(light.attenuation, light.falloff);
-	set_legacy(light.wall_attenuation, light.wall_falloff);
+	light.attenuation = scaled_legacy(legacy, fade_mult);
+	light.wall_attenuation = scaled_legacy(wall_legacy, fade_mult);
 
 	/*
 		No variations for temporary lights (no flickering).
@@ -1354,8 +1349,20 @@ void particles_simulation_system::spawn_temporary_lights(
 
 	const auto& events = step.get_queue<messages::start_temporary_light>();
 
+	/*
+		The setting shifts the falloff of every gun alike, 0.5 leaving it as the gun has it.
+	*/
+
+	const auto falloff_shift = settings.muzzle_flash_falloff - 0.5f;
+
 	for (auto event : events) {
-		event.light.radius *= settings.muzzle_flash_intensity;
-		temporary_lights.push_back(event.light);
+		auto& light = event.light;
+
+		light.radius *= settings.muzzle_flash_intensity;
+		light.falloff = std::clamp(light.falloff + falloff_shift, 0.0f, 1.0f);
+		light.legacy = light_falloff { light.radius, light.intensity, light.falloff }.calc_legacy(light.color.a / 255.0f);
+		light.wall_legacy = light_falloff { light.radius / 1.3f, light.intensity, light.falloff }.calc_legacy(1.0f);
+
+		temporary_lights.push_back(light);
 	}
 }

@@ -2,8 +2,6 @@
 #include <cstdint>
 #include "application/setups/editor/to_game_effect.hpp"
 #include "augs/misc/enum/enum_bitset.h"
-#include "view/audiovisual_state/systems/legacy_light_mults.h"
-#include "view/audiovisual_state/systems/light_attenuation.h"
 #include "game/enums/filters.h"
 #include "augs/templates/traits/has_flip.h"
 
@@ -70,39 +68,36 @@ bool setup_entity_from_node(
 		light.color *= editable.color;
 		light.cast_shadows = editable.cast_shadows;
 		light.hue_through_walls = editable.hue_through_walls;
+		light.quantized = editable.quantized;
 		light.shadow_smoothness = editable.shadow_smoothness;
 		light.height = editable.height;
 
-		auto set_attn_from_falloff = [&](auto& attn, const auto& foff) {
-			const auto mult = foff.calc_attenuation_mult_for_requested_radius();
+		/*
+			The legacy attenuation, for maps without Physical lights, fitted to look like the physical falloff.
+			Wall lights take only the color of the light, not its alpha.
+		*/
 
-			const auto physical = foff.to_physical();
+		const auto light_alpha = light.color.a / 255.0f;
+		const auto wall_light_alpha = 1.0f;
 
-			attn.constant = physical.calc_legacy_constant() * mult * CONST_MULT;
-			attn.linear = physical.calc_legacy_linear() * mult * LINEAR_MULT;
-			attn.quadratic = physical.calc_legacy_quadratic() * mult * QUADRATIC_MULT;
-
-			attn.trim_alpha = physical.calc_legacy_strength();
-		};
-
-		auto set_falloffs = [&](auto& physical, auto& legacy, const editor_light_falloff& foff) {
+		auto set_falloffs = [&](auto& physical, auto& legacy, const editor_light_falloff& foff, const real32 alpha) {
 			physical = foff.to_physical();
-			set_attn_from_falloff(legacy, foff);
+			legacy = physical.calc_legacy(alpha);
 		};
 
-		set_falloffs(light.falloff, light.attenuation, node.editable.falloff);
+		set_falloffs(light.falloff, light.attenuation, node.editable.falloff, light_alpha);
 
 		{
 			auto& wall_foff = node.editable.wall_falloff;
 
 			if (wall_foff.is_enabled) {
-				set_falloffs(light.wall_falloff, light.wall_attenuation, wall_foff.value);
+				set_falloffs(light.wall_falloff, light.wall_attenuation, wall_foff.value, wall_light_alpha);
 			}
 			else {
 				auto auto_wall_falloff = node.editable.falloff;
 				auto_wall_falloff.radius /= 1.5f; 
 
-				set_falloffs(light.wall_falloff, light.wall_attenuation, auto_wall_falloff);
+				set_falloffs(light.wall_falloff, light.wall_attenuation, auto_wall_falloff, wall_light_alpha);
 			}
 		}
 
@@ -311,18 +306,6 @@ void setup_entity_from_node_post_construct(
 			anim->speed_factor *= node.editable.animation_speed_factor;
 		}
 	}
-}
-
-inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius() const {
-	const auto physical = to_physical();
-
-	return ::calc_attenuation_mult_for_requested_radius(
-		physical.calc_legacy_constant(),
-		physical.calc_legacy_linear(),
-		physical.calc_legacy_quadratic(),
-		radius,
-		physical.calc_legacy_strength()
-	);
 }
 
 inline uint16_t editor_filter_flags::get_mask_bits() const {

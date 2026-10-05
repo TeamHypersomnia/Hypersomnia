@@ -961,7 +961,7 @@ void settings_gui_state::perform(
 							ImGui::Separator();
 
 							revertable_checkbox("Quantize neons", scope_cfg.quantize_neons);
-							tooltip_on_hover("If ticked, neon maps and the glow of electric armor light the scene in a few discrete bands.\nOn maps with legacy lights that Brighten lights, all light is already banded.");
+							tooltip_on_hover("If ticked, neon maps, the glow of electric armor and muzzle flashes light the scene in a few discrete bands.\nOn maps with legacy lights that Brighten lights, all light is already banded.");
 						}
 
 						break;
@@ -979,6 +979,8 @@ void settings_gui_state::perform(
 						{
 							auto& scope_cfg = config.performance.special_effects;
 							revertable_slider(SCOPE_CFG_NVP(muzzle_flash_intensity), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(muzzle_flash_falloff), 0.f, 1.f);
+							tooltip_on_hover("Shape of muzzle flashes - the same for every gun at 0.5.\nLower spreads them further out, higher concentrates them near the muzzle.");
 							revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
 						}
