@@ -2,6 +2,8 @@
 # One end-to-end ranked match: dedicated server on arena (match.sh), clients here, backend on arenaus.
 # The second client is killed once the match is live, so it abandons and the match ends with a report at once.
 # Usage: run_match.sh <client A> <client B> [live wait secs]
+# Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
+export ALSOFT_DRIVERS=null
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 E=${SCRATCH:-/tmp/hypersomnia-nettest}/e2e
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}

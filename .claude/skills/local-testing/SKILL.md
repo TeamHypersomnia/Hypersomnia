@@ -24,7 +24,10 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 4. **Port 3000 is the user's local hypersomnia.io** (the site repo, `node app.js`, its `private/mmr.db`). Never post to it.
 5. **Check ports are free first** (`ss -tulpn`, `lsof -ti tcp:<port>`) and abort if busy - a server that fails to bind
    silently leaves the requests going to whatever else listens there.
-6. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
+6. **Silence.** Test clients play sound on the user's speakers. Run native clients with `ALSOFT_DRIVERS=null`
+   (OpenAL's null backend, "No Output"; the scenario scripts export it) and give Firefox profiles
+   `user_pref("media.volume_scale", "0.0");`.
+7. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).
 
@@ -36,8 +39,9 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_webrtc_secure.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server: token by WebRTC alias, secure connection, key auth |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`), secure over WebRTC; screenshot in `$SCRATCH/web_test/screen.png` |
 | `build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web`, the same steps as `build.sh Release Web` |
-| `prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master (see below) |
+| `[USER_FILES=dir] prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master (see below); USER_FILES also writes files into its `/user` before start |
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
+| `steam_tickets.py IDENTITY...` | Steam Web API tickets from the user's running Steam client, to probe `AuthenticateUserTicket` without the game |
 | `xinput.py click x y` / `type TEXT` / `key NAME` / `scroll x y n` | Clicks, types, presses keys and scrolls on `$DISPLAY` through XTest (no xdotool needed) |
 | `local_stack.sh [web build] [hours]` | Leaves running, for the user to test by hand: master, official ranked [PL] and casual [DE] servers, the web build on http://localhost:8765 pointed at them; `local_stack.sh stop` |
 | `build_headless_ubuntu2204.sh` | Headless Release build inside an unprivileged Ubuntu 22.04 rootfs (bwrap) - glibc 2.35, runs on both arenaus and arena; prints where the libc++ to ship lies |
@@ -98,6 +102,26 @@ heartbeating to that master and reporting to that site. `run_match.sh A B` plays
   Settings - Client (~833,218) - Account (~417,278); click the code field (~415,580), `xinput.py type CODE`, click Link (~588,582),
   scroll down to read "Linked. ..." (a reused code shows "Invalid or expired code"). Check with `db.sh show`.
   For a quick link without UI: `db.sh sql "INSERT INTO associations ..."`.
+
+## Real identities: Steam and Discord (needs the user)
+
+One match covers both: the web build signed in with the user's Discord against the Steam dev build signed in with
+their running Steam client, on the arena test server, reported to the arenaus test site.
+
+- **Discord token:** the user signs in on https://play.hypersomnia.io and runs in the devtools console
+  `FS.readFile('/user/cached_auth.json', {encoding: 'utf8'})`. Save it 0600 in the scratchpad only.
+  `USER_FILES=<dir> prepare_web.sh` writes `<dir>/cached_auth.json` and `<dir>/conf.d/test.json` (the test master's
+  URLs - the connect token URL with an IP does not fit in place in `Hypersomnia.data`) into `/user` before the game starts.
+  Serve on a port other than 8765 if `local_stack.sh` still runs there. Join with `/game/ranked-` (the alias the
+  tournament-named test server gets). Signing out revokes the token; from localhost the revoke fails on CORS, which keeps it.
+- **Steam:** the user's Steam client must run. `build/Debug-x64-clang-claude-steam/Hypersomnia --connect <arena>:9005
+  --appdata-dir <scratch>` from `hypersomnia/` (it writes `steam_appid.txt` there, gitignored). The server needs the real
+  Steam Web API key: the user puts it in a file, copy it to `arena:~/yojimbo-test/e2e/steam_web_api_key` (0600, never print it),
+  `match.sh` reads it; `shred -u` it right after the test.
+- Tournament teams are the real ids: `match.sh start discord_<id> steam_<id64>`. Kill one client once both are
+  `Authenticated` - the abandon reports at once.
+- Steam verifies a Web API ticket only for an identity of at most 31 characters. `steam_tickets.py` gets tickets
+  for any identities to probe the Web API directly.
 
 ## The hypersomnia.io site
 

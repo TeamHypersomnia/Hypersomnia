@@ -1,6 +1,8 @@
 #!/bin/bash
 # The web build in Firefox (under Xvfb) joining a local official server over WebRTC with a secure connect token.
 # Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, Xvfb :78.
+# Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
+export ALSOFT_DRIVERS=null
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
@@ -58,6 +60,7 @@ user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);
 user_pref("webgl.force-enabled", true);
 user_pref("media.autoplay.default", 0);
 user_pref("devtools.console.stdout.content", true);
+user_pref("media.volume_scale", "0.0");
 EOF
 
 cd $GAME

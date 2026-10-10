@@ -1,6 +1,8 @@
 #!/bin/bash
 # Native client over WebRTC to a local official ranked server: the token is requested by the WebRTC alias,
 # the same path a browser takes. Everything on localhost.
+# Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
+export ALSOFT_DRIVERS=null
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S

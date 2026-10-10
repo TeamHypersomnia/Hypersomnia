@@ -2,6 +2,8 @@
 # One ranked match on arena, all inside ~/yojimbo-test/e2e: a dedicated server with its own official_server_secret,
 # heartbeating to the test masterserver on arenaus and reporting to the test site there.
 # Tournament mode puts the two given accounts on the teams, so that idle CLI clients get to play.
+# A real Steam Web API key in ~/yojimbo-test/e2e/steam_web_api_key (0600) makes Steam tickets verifiable;
+# delete it after the test.
 # Usage: match.sh start <account A> <account B> | stop | log
 E=$HOME/yojimbo-test/e2e
 export LD_LIBRARY_PATH=$E/lib
@@ -32,6 +34,7 @@ EOF
 {
   "tournament_file": "$E/tournament.json",
   "server_start": { "ip": "0.0.0.0", "port": 9005, "slots": 16 },
+  "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
   "server": {
     "server_name": "[PL] E2E ranked",
     "domain": "e2e-test.hypersomnia.io",
@@ -42,12 +45,14 @@ EOF
     "move_to_spectators_if_afk_for_secs": 999999,
     "kick_if_afk_for_secs": 999999,
     "freeze_time": false,
-    "game_speed": 1.0
+    "game_speed": 1.0,
+    "webrtc_port_range_begin": 9006,
+    "webrtc_port_range_end": 9010
   },
   "server_private": {
     "official_server_secret": "$(cat $E/secret)",
     "report_ranked_match_url": "http://${ARENAUS_IP:-154.12.226.211}:13000/report_match",
-    "steam_web_api_key": "e2e-dummy"
+    "steam_web_api_key": "$(cat $E/steam_web_api_key 2>/dev/null || echo e2e-dummy)"
   }
 }
 EOF
