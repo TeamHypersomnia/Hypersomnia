@@ -1826,7 +1826,7 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.color = muzzle_cyan;
+				dest_eff.particles.modifier.color = muzzle_pink;
 				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
 			}

@@ -1555,7 +1555,7 @@ void load_test_scene_particle_effects(
 				set_with_size(particle_definition,
 					to_image_id(test_scene_image_id::BLANK), 
 					vec2i(4, 1),
-					cyan
+					white
 				);
 
 
@@ -1575,7 +1575,7 @@ void load_test_scene_particle_effects(
 				set_with_size(particle_definition,
 					to_image_id(test_scene_image_id::BLANK), 
 					vec2i(7, 2),
-					cyan
+					white
 				);
 
 				//particle_definition.unshrinking_time_ms = 50.f;
