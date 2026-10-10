@@ -21,10 +21,10 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
    and build there with `nice -n 19 ninja -j10`. Generated sources go into the build dir, so parallel builds don't clash.
 3. **Never `pkill -f <pattern>` (or `pgrep -f`) in a command whose own text contains the pattern** - it kills your own shell
    (exit 144). Put the kill in a script file and run the script, or kill by exact PID.
-4. **Port 3000 is the user's local hypersomnia.io** (`~/page`, `node app.js`, `~/page/private/mmr.db`). Never post to it.
+4. **Port 3000 is the user's local hypersomnia.io** (the site repo, `node app.js`, its `private/mmr.db`). Never post to it.
 5. **Check ports are free first** (`ss -tulpn`, `lsof -ti tcp:<port>`) and abort if busy - a server that fails to bind
    silently leaves the requests going to whatever else listens there.
-6. On remote hosts, production runs from `~/hypersomnia/Hypersomnia-Headless.AppImage` (masterserver, official server).
+6. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).
 
@@ -75,7 +75,7 @@ The appdata remembers the last connect string - the first screen may be a reconn
 
 ## The hypersomnia.io site
 
-Test only in a scratch copy of `~/page` (rsync without `.git`, `node_modules` symlinked, no `private/*.db*`).
+Test only in a scratch copy of the site repo (ask the user where it is; rsync without `.git`, `.env` and `private/*.db*`, `node_modules` symlinked).
 `src/db.js` always opens `../private/mmr.db` next to the code (it ignores `DB_PATH`) - put a test DB exactly there.
 Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/official_servers.d/{pl,au}` with the secrets `pl`, `au`.
 `run_mmr_tests.py` reads `private/mmr.db` too; 25/46 of its assertions fail on the baseline as well (environment, not code).
@@ -89,8 +89,8 @@ Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/officia
 - The web build is single-threaded: synchronous `emscripten_fetch` returns nothing (status -1). Use `augs::async_get`.
 - Over WebRTC the netcode client takes packets only from the server address in the connect token; a secure token's
   public address list must point at the data channel's internal address.
-- The Steamworks SDK is not in the repo: unpack it with `cmake/steam_integration/steamworks/put_sdk_here.sh
-  ~/Downloads/steamworks_sdk_165.zip` (into the gitignored `steamworks/sdk`). A Steam build (`-DDEVELOP_STEAM_INTEGRATION=1
+- The Steamworks SDK is not in the repo: unpack a `steamworks_sdk_*.zip` (ask the user where it is) with
+  `cmake/steam_integration/steamworks/put_sdk_here.sh <zip>` into the gitignored `steamworks/sdk`. A Steam build (`-DDEVELOP_STEAM_INTEGRATION=1
   -DUSE_SYSTEM_FREETYPE=0`) compiles without the Steam client; testing tickets needs it running and a `steam_web_api_key` on the server.
 - Upstream yojimbo tests: `cmake -S src/3rdparty/yojimbo -B $SCRATCH/yjbuild && cmake --build ... && ./bin/test`
   (Unix Makefiles - the Ninja generator clashes on a target named `test`).

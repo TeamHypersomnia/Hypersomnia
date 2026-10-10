@@ -4,7 +4,11 @@ set -e
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 SRC=$REPO
 B=$SRC/build/Release-Web-clang-claude-web
-source ${EMSDK:-$HOME/rep/emsdk}/emsdk_env.sh > /dev/null 2>&1
+if [ -n "$EMSDK" ]; then
+	source $EMSDK/emsdk_env.sh > /dev/null 2>&1
+fi
+
+command -v emcmake > /dev/null || { echo "emsdk not found: set EMSDK to the emsdk directory or put emcmake in PATH"; exit 1; }
 
 mkdir -p $B/prebuilt-version $B/prebuilt-introspector
 cd $B/prebuilt-version
