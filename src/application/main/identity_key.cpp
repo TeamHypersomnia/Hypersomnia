@@ -9,11 +9,16 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/misc/date_time.h"
 #include "application/main/identity_key.h"
 
 namespace identity_key {
 	std::string signed_message(const std::string& auth_identity) {
 		return "hypersomnia-auth-v1 " + auth_identity;
+	}
+
+	std::string link_message(const std::string& code) {
+		return "hypersomnia-link-v1 " + code;
 	}
 
 	std::string account_id(const augs::ed25519_public_key_type& public_key) {
@@ -171,5 +176,29 @@ namespace identity_key {
 
 		LOG("Created a new identity key at %x.", path);
 		return seed;
+	}
+
+	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
+		auto backup = augs::path_type();
+
+		if (augs::exists(path)) {
+			backup = path;
+			backup += ".bak-" + augs::date_time().get_readable_for_file();
+
+			std::error_code ec;
+			std::filesystem::rename(path, backup, ec);
+
+			if (ec) {
+				LOG("Could not back up %x: %x", path, ec.message());
+				return std::nullopt;
+			}
+		}
+
+		if (!write_private_file(path, to_export_string(seed) + "\n")) {
+			LOG("Failed to save the identity key to %x.", path);
+			return std::nullopt;
+		}
+
+		return backup;
 	}
 }

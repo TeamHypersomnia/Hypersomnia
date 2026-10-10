@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/misc/future.h"
 #include <set>
 #include <unordered_set>
 
@@ -100,6 +101,9 @@ enum class keybindings_settings_pane {
 enum class client_settings_pane {
 	// GEN INTROSPECTOR enum class client_settings_pane
 	PROFILE,
+#if !PLATFORM_WEB
+	ACCOUNT,
+#endif
 	LAG_COMPENSATION,
 
 	COUNT
@@ -209,7 +213,16 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::vector<std::string> official_hrtf_presets;
 	std::vector<std::string> user_hrtf_presets;
 
+	std::string import_key_text;
+	std::string link_code_text;
+	std::string account_status;
+	augs::future<std::string> link_request;
+
+	void perform_account_pane(augs::window& window);
+
 public:
+	bool is_steam_client = false;
+
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;
 

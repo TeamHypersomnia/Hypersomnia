@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -23,12 +24,18 @@
 
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/window.h"
+#include "augs/misc/httplib_utils.h"
+#include "augs/templates/thread_templates.h"
+#include "augs/misc/secure_hash.h"
 
 #include "game/modes/logic_speed.h"
 #include "game/modes/zoom_override.h"
 #include "view/necessary_resources.h"
 
+#include "all_paths.h"
 #include "application/config_json_table.h"
+#include "application/main/auth_provider_type.h"
+#include "application/main/identity_key.h"
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
 #include "augs/audio/sound_sizes.h"
@@ -336,6 +343,179 @@ std::string get_custom_binding_name(const inventory_gui_intent_type) {
 std::string get_custom_binding_name(const app_intent_type) {
 	return "";
 }
+
+#if !PLATFORM_WEB
+void settings_gui_state::perform_account_pane(augs::window& window) {
+	using namespace augs::imgui;
+
+	if (is_steam_client) {
+		text("Your account is your Steam account.");
+		text_disabled("Your ranked matches and badges go on it automatically.");
+		return;
+	}
+
+	const auto key_path = USER_DIR / identity_key::file_name;
+	const auto seed = identity_key::load(key_path);
+
+	const auto public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+		if (seed.has_value()) {
+			return augs::ed25519_public_key(*seed);
+		}
+
+		return std::nullopt;
+	}();
+
+	text_disabled(
+		"Without Steam, your account is a key kept in your user folder on this computer.\n"
+		"It is created the first time you join a ranked server, or an official server securely.\n"
+		"Back it up: whoever has it plays as you, and without it the account is lost."
+	);
+
+	ImGui::Separator();
+
+	if (public_key.has_value()) {
+		auto account = ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
+
+		input_text("##AccountId", account, ImGuiInputTextFlags_ReadOnly);
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##AccountId")) {
+			ImGui::SetClipboardText(account.c_str());
+		}
+
+		ImGui::SameLine();
+		text("Account");
+
+		if (ImGui::Button("Open profile")) {
+			augs::open_url("https://hypersomnia.io/user/" + account);
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy key to clipboard")) {
+			ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
+			account_status = "Key copied. Anyone with it plays as you - keep it safe.";
+		}
+
+		tooltip_on_hover("To back it up, or to play from another computer: there, paste it below in Import key.\nAnyone with it plays as you.");
+	}
+	else if (augs::exists(key_path)) {
+		text_color("The key file is not a valid key. Fix it, import a key, or remove the file.", red);
+	}
+	else {
+		text("No key yet.");
+
+		if (ImGui::Button("Create key now")) {
+			identity_key::load_or_create(key_path);
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Reveal in explorer")) {
+		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
+	}
+
+	ImGui::Separator();
+
+	{
+		input_text("##ImportKey", import_key_text, ImGuiInputTextFlags_Password);
+		ImGui::SameLine();
+
+		if (ImGui::Button("Import key")) {
+			if (const auto imported = identity_key::from_export_string(import_key_text)) {
+				if (const auto backup = identity_key::save_replacing(key_path, *imported)) {
+					account_status = backup->empty()
+						? std::string("Key imported.")
+						: typesafe_sprintf("Key imported. The previous one was kept as %x.", backup->filename().string())
+					;
+
+					import_key_text.clear();
+				}
+				else {
+					account_status = "Could not save the key. See the logs.";
+				}
+			}
+			else {
+				account_status = "That is not a valid key. It starts with hypersomnia-key-v1:";
+			}
+		}
+
+		tooltip_on_hover("Paste a key copied with \"Copy key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
+	}
+
+	ImGui::Separator();
+
+	text("Link to your Steam account");
+
+	text_disabled(
+		"Sign in through Steam on hypersomnia.io/profile,\n"
+		"press \"Link a game key\" and enter the code here.\n"
+		"The ranked matches you play with this key will then count for your Steam account."
+	);
+
+	{
+		input_text("##LinkCode", link_code_text);
+		ImGui::SameLine();
+
+		const bool requesting = link_request.valid();
+
+		if (requesting) {
+			text_disabled("Linking...");
+		}
+		else if (ImGui::Button("Link") && seed.has_value() && public_key.has_value()) {
+			auto code = link_code_text;
+
+			while (!code.empty() && code.back() == ' ') {
+				code.pop_back();
+			}
+
+			for (auto& c : code) {
+				c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+			}
+
+			if (const auto signature = augs::ed25519_sign(*seed, identity_key::link_message(code))) {
+				const auto body = typesafe_sprintf(
+					"{\"public_key\":\"%x\",\"code\":\"%x\",\"signature\":\"%x\"}",
+					augs::bytes_to_hex(*public_key),
+					code,
+					augs::bytes_to_hex(*signature)
+				);
+
+				link_request = launch_async([body]() -> std::string {
+					auto client = httplib_utils::make_client("https://hypersomnia.io");
+					const auto result = client->Post("/link_key", body, "application/json");
+
+					if (!result) {
+						return "Couldn't reach hypersomnia.io.";
+					}
+
+					if (httplib_utils::successful(result->status)) {
+						return "Linked. Your ranked matches now count for your Steam account.";
+					}
+
+					return typesafe_sprintf("Linking failed: %x", result->body);
+				});
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Open hypersomnia.io/profile")) {
+			augs::open_url("https://hypersomnia.io/profile");
+		}
+
+		if (valid_and_is_ready(link_request)) {
+			account_status = link_request.get();
+		}
+	}
+
+	if (!account_status.empty()) {
+		ImGui::Separator();
+		text(account_status);
+	}
+}
+#endif
 
 void settings_gui_state::perform(
 	augs::window& window,
@@ -2136,6 +2316,12 @@ void settings_gui_state::perform(
 				auto& scope_cfg = config.client;
 
 				switch (active_client_pane) {
+#if !PLATFORM_WEB
+					case client_settings_pane::ACCOUNT: {
+						perform_account_pane(window);
+						break;
+					}
+#endif
 					case client_settings_pane::PROFILE: {
 						{
 #if PLATFORM_WEB

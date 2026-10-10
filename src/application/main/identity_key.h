@@ -24,6 +24,12 @@ namespace identity_key {
 	std::string signed_message(const std::string& auth_identity);
 
 	/*
+		Signed to link the key to a Steam account on hypersomnia.io with a one-time code shown there.
+	*/
+
+	std::string link_message(const std::string& code);
+
+	/*
 		The account id without the "key_" provider prefix.
 	*/
 
@@ -55,4 +61,11 @@ namespace identity_key {
 	*/
 
 	std::optional<augs::ed25519_seed_type> load_or_create(const augs::path_type& path);
+
+	/*
+		Saves an imported key. An existing key file is first renamed to identity.key.bak-<timestamp>, never deleted.
+		Returns the backup's path (empty if there was nothing to back up), or std::nullopt on failure.
+	*/
+
+	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed);
 }

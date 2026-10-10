@@ -1704,6 +1704,7 @@ work_result work(
 	WEBSTATIC start_server_gui_state start_server_gui = std::string("Host a server");
 
 	start_client_gui.is_steam_client = is_steam_client;
+	settings_gui.is_steam_client = is_steam_client;
 	start_server_gui.is_steam_client = is_steam_client;
 
 #if BUILD_NETWORKING
