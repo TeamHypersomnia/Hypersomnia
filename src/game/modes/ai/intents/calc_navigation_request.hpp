@@ -131,8 +131,9 @@ inline std::optional<ai_navigation_request> calc_current_navigation_request(
 		else if constexpr (std::is_same_v<T, ai_behavior_defuse>) {
 			/*
 				Defuse - pathfind to bomb if not close.
+				Past the end of the path, calc_movement_and_crosshair walks straight at the bomb.
 			*/
-			if (b.is_defusing) {
+			if (b.is_defusing || b.is_approaching_directly) {
 				return std::nullopt;
 			}
 

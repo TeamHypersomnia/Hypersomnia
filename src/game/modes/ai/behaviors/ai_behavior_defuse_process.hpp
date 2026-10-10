@@ -7,6 +7,8 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/enums/requested_interaction_type.h"
+#include "game/detail/hand_fuse_logic.h"
+#include "game/cosmos/make_physics_path_hints.h"
 
 /*
 	Implementation of ai_behavior_defuse::process().
@@ -18,45 +20,66 @@
 	via calc_movement_and_crosshair() and calc_requested_interaction().
 */
 
+/*
+	Same check as the one that lets the defuse begin in query_use_interaction:
+	the bomb must overlap the character's interaction hitbox (a sector in front of it).
+*/
+
+template <class C, class B>
+inline bool is_bomb_within_defuse_reach(const C& character_handle, const B& bomb_handle) {
+	auto in_reach = false;
+
+	bomb_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto& typed_bomb) {
+		in_reach = stepless_fuse_logic_provider(typed_bomb).defusing_character_in_range(character_handle);
+	});
+
+	return in_reach;
+}
+
 inline void ai_behavior_defuse::process(ai_behavior_process_ctx& ctx) {
-	auto& cosm = ctx.cosm;
-	const auto bomb_entity = ctx.bomb_entity;
-	const bool navigation_just_completed = ctx.navigation_just_completed;
-
+	const auto& cosm = ctx.cosm;
 	const auto character_handle = cosm[ctx.controlled_character_id];
+	const auto bomb_handle = cosm[ctx.bomb_entity];
 
-	if (!character_handle.alive()) {
+	if (!character_handle.alive() || !bomb_handle.alive()) {
+		is_defusing = false;
+		is_approaching_directly = false;
 		return;
 	}
 
-	/*
-		If defusing, check if the bomb's character_now_defusing still matches this bot.
-		If someone else took over or the defuse was interrupted, stop defusing.
-	*/
-	if (is_defusing && bomb_entity.is_set()) {
-		const auto bomb_handle = cosm[bomb_entity];
+	const auto bomb_pos = bomb_handle.get_logic_transform().pos;
 
-		if (bomb_handle.alive()) {
-			/*
-				Check if the bomb's character_now_defusing still matches this bot.
-				If not, the defuse was interrupted (e.g. pushed by another bot).
-			*/
-			if (const auto* hand_fuse = bomb_handle.find<components::hand_fuse>()) {
-				if (hand_fuse->character_now_defusing != ctx.controlled_character_id) {
-					/*
-						Defuse was interrupted - stop defusing state.
-						The behavior tree will re-evaluate and the bot will
-						try to reach the bomb again or get back in queue.
-					*/
-					is_defusing = false;
-					return;
-				}
-			}
+	/*
+		The path ends on the closest walkable cell, which might still be out of reach
+		if the bomb lies on unwalkable cells, e.g. in a nook between walls.
+		Cover the rest by walking straight at it.
+		If a wall gets between the bot and the bomb, go back to pathfinding.
+	*/
+	if (ctx.navigation_just_completed) {
+		is_approaching_directly = true;
+	}
+
+	if (is_approaching_directly) {
+		const auto physics_hints = ::make_physics_path_hints(cosm);
+
+		if (!physics_hints.has_line_of_sight(ctx.character_pos, bomb_pos)) {
+			is_approaching_directly = false;
 		}
 	}
 
-	if (!is_defusing && navigation_just_completed) {
-		AI_LOG("Reached bomb - starting defuse");
-		is_defusing = true;
+	/*
+		Defuse only while the bomb is actually within reach.
+		Otherwise the bot would holster and stand still out of reach,
+		then flip back to its weapon and the path every other frame.
+
+		If someone else is already defusing, keep waiting by the bomb
+		with bare hands to take over as soon as they stop.
+	*/
+	const bool in_reach = ::is_bomb_within_defuse_reach(character_handle, bomb_handle);
+
+	if (!is_defusing && in_reach) {
+		AI_LOG("Bomb within reach - starting defuse");
 	}
+
+	is_defusing = in_reach;
 }

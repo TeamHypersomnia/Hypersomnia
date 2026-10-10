@@ -62,21 +62,29 @@ inline navigate_path_result calc_movement_and_crosshair(
 
 	/*
 		Check if defusing - don't move, but aim at the bomb statelessly.
+		If the path has ended out of reach of the bomb, walk straight at it,
+		facing it so that it falls within the interaction hitbox.
+		nearing_end keeps the weapons holstered on the way.
 	*/
 	if (const auto* defuse = ::get_behavior_if<ai_behavior_defuse>(behavior)) {
-		if (defuse->is_defusing) {
-			/*
-				Statelessly calculate crosshair offset to aim at the bomb.
-			*/
-			if (bomb_entity.is_set()) {
-				const auto bomb_handle = cosm[bomb_entity];
+		const auto bomb_handle = cosm[bomb_entity];
 
-				if (bomb_handle.alive()) {
-					const auto bomb_pos = bomb_handle.get_logic_transform().pos;
-					result.crosshair_offset = bomb_pos - character_pos;
-				}
+		if (bomb_handle.alive()) {
+			const auto bomb_offset = bomb_handle.get_logic_transform().pos - character_pos;
+
+			if (defuse->is_defusing) {
+				result.crosshair_offset = bomb_offset;
+				return result;
 			}
 
+			if (defuse->is_approaching_directly) {
+				result.movement_direction = bomb_offset;
+				result.crosshair_offset = bomb_offset;
+				result.nearing_end = true;
+				return result;
+			}
+		}
+		else if (defuse->is_defusing) {
 			return result;
 		}
 	}
