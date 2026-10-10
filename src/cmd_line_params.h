@@ -25,6 +25,13 @@ struct cmd_line_params {
 	*/
 
 	bool playtest = false;
+
+	/*
+		With --playtest: start with this numpad-like playtest speed warp.
+	*/
+
+	double playtest_speed = 1.0;
+
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
 	bool help_only = false;
@@ -245,6 +252,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--playtest") {
 				playtest = true;
+			}
+			else if (a == "--playtest-speed") {
+				playtest_speed = std::stod(get_next());
 			}
 			else if (a == "--signature") {
 				verified_signature = get_next();

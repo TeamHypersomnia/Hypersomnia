@@ -616,6 +616,10 @@ public:
 		return history;
 	}
 
+	void set_playtest_speed(const double speed) {
+		playtest_speed = speed;
+	}
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/

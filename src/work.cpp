@@ -4636,6 +4636,7 @@ work_result work(
 
 					/*
 						--playtest: once, on the first frame of the editor opened with --edit.
+						--playtest-speed: the starting numpad speed warp of that playtest.
 					*/
 
 					static bool playtest_requested = params.playtest;
@@ -4643,6 +4644,7 @@ work_result work(
 					if (playtest_requested) {
 						playtest_requested = false;
 						editor.start_playtesting();
+						editor.set_playtest_speed(params.playtest_speed);
 					}
 				});
 
