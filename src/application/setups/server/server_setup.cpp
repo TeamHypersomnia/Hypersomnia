@@ -43,6 +43,7 @@
 #include "augs/network/netcode_utils.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/official_server_signing.h"
+#include "application/network/secure_connect.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
@@ -725,7 +726,14 @@ server_setup::server_setup(
 			[this](auto&&... args) {
 				return this->receive_packet_override(std::forward<decltype(args)>(args)...);
 			},
-			is_webrtc_only()
+			is_webrtc_only(),
+			[&]() -> std::optional<std::array<uint8_t, yojimbo::KeyBytes>> {
+				if (const auto keys = official_server_keys::derive(private_initial_vars.official_server_secret)) {
+					return keys->netcode_key;
+				}
+
+				return std::nullopt;
+			}()
 		)
 	),
 #if CRASH_RECOVERY
@@ -1079,7 +1087,10 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 		const auto api_key = private_vars.steam_web_api_key;
 		const auto& ticket = payload.ticket_bytes;
 		const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
-		const auto identity = std::string(get_client_state(player_id).auth_challenge);
+		const auto identity = secure_connect::auth_identity(
+			std::string(get_client_state(player_id).auth_challenge),
+			server->get_secure_server_id(to_client_id(player_id)).value_or("")
+		);
 
 		push_auth_job(
 			player_id,
@@ -3344,6 +3355,10 @@ void server_setup::init_client(const client_id_type& id) {
 	}();
 
 	LOG("Client %x connected. SID: %x", id, new_client.session_id);
+
+	if (const auto secure_server_id = server->get_secure_server_id(id)) {
+		LOG("Client %x connected securely with a token issued for %x.", id, *secure_server_id);
+	}
 }
 
 void server_setup::unset_client(const client_id_type& id) {
@@ -3604,6 +3619,15 @@ void server_setup::advance_clients_state() {
 						}
 					}
 				}
+			}
+
+			/*
+				Authentication only ever happens over a secure connection,
+				so where it is required, an insecure client could never get in.
+			*/
+
+			if (vars.requires_authentication() && !c.when_kicked.has_value() && !server->get_secure_server_id(client_id).has_value()) {
+				kick(client_id, "This server requires a secure connection.\nMake sure the game can reach hypersomnia.io and try again.");
 			}
 
 			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {

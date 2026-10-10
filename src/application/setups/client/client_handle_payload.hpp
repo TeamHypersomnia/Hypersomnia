@@ -468,9 +468,14 @@ message_handler_result client_setup::handle_payload(
 		client_gui.rcon.level = payload.rcon_level;
 		server_requires_authentication = payload.requires_authentication;
 
-		if (!steam_auth_identity_received && !payload.challenge.empty()) {
+		/*
+			The ticket is requested for the challenge and the official server the connect token was issued for,
+			and only over a secure connection - see secure_connect.h.
+		*/
+
+		if (!steam_auth_identity_received && !payload.challenge.empty() && secure_server_id.has_value()) {
 			steam_auth_identity_received = true;
-			steam_auth_identity_to_request = std::string(payload.challenge);
+			steam_auth_identity_to_request = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
 		}
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {

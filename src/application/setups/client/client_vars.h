@@ -72,6 +72,7 @@ struct client_vars {
 
 	client_arena_type spectated_arena_type = client_arena_type::REFERENTIAL;
 	server_password_type server_password;
+	bool secure_connection_to_official_casual_servers = false;
 	client_chat_settings client_chat;
 	augs::path_type avatar_image_path;
 	bool record_demo = true;

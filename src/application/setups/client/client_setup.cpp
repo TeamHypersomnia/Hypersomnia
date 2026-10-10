@@ -5,6 +5,7 @@
 #include "augs/misc/imgui/maybe_different.h"
 #include "augs/misc/profanity_filter.h"
 
+#include "application/network/secure_connect.h"
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
 
@@ -696,6 +697,10 @@ bool client_setup::is_webrtc() const {
 }
 
 bool client_setup::pending_pre_connection_handshake() const {
+	if (secure_token_fetch.valid() && !is_ready(secure_token_fetch)) {
+		return true;
+	}
+
 	return is_webrtc() && !webrtc_client->is_ready();
 }
 
@@ -711,7 +716,8 @@ client_setup::client_setup(
 	const std::string& displayed,
 	const client_vars& initial_vars,
 	const port_type preferred_binding_port,
-	const std::string& webrtc_signalling_server_url
+	const std::string& webrtc_signalling_server_url,
+	const std::optional<secure_connect_request>& secure_request
 ) : 
 	official(official),
 	connect_string(connect_string),
@@ -763,6 +769,42 @@ client_setup::client_setup(
 	}
 	else {
 		LOG("Connecting directly without WebRTC.");
+	}
+
+	this->secure_request = secure_request;
+
+	if (secure_request.has_value() && !is_opening_demo) {
+		secure_token_fetch = launch_async(
+			[provider = secure_request->provider_url, in_connect_string = connect_string, use_webrtc, webrtc_id]() -> std::optional<fetched_connect_token> {
+				const auto target = [&]() -> std::optional<std::string> {
+					if (use_webrtc) {
+						return webrtc_id;
+					}
+
+#if PLATFORM_WEB
+					return std::nullopt;
+#else
+					host_with_default_port in;
+					in.address = in_connect_string;
+					in.default_port = DEFAULT_GAME_PORT_V;
+
+					const auto resolved = resolve_address(in);
+
+					if (resolved.result != resolve_result_type::OK) {
+						return std::nullopt;
+					}
+
+					return ::ToString(resolved.addr);
+#endif
+				}();
+
+				if (!target.has_value()) {
+					return std::nullopt;
+				}
+
+				return connect_token_fetch::fetch(provider, *target);
+			}
+		);
 	}
 
 	LOG("Initializing connection with %x", connect_string);
@@ -824,7 +866,22 @@ void client_setup::connect() {
 
 	augs::network::enable_detailed_logs(true);
 
-	const auto resolution = adapter->connect(connect_string);
+	auto secure_token = std::optional<fetched_connect_token>();
+
+	if (secure_token_fetch.valid()) {
+		secure_token = secure_token_fetch.get();
+	}
+
+	if (secure_request.has_value() && secure_request->required && !secure_token.has_value()) {
+		set_disconnect_reason("Couldn't get a secure connection to this server.\nMake sure the game can reach hypersomnia.io and try again.");
+		return;
+	}
+
+	if (secure_token.has_value()) {
+		secure_server_id = secure_token->server_id;
+	}
+
+	const auto resolution = adapter->connect(connect_string, secure_token);
 
 	if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 		const auto reason = typesafe_sprintf(
@@ -1337,6 +1394,24 @@ void client_setup::advance_demo_recorder() {
 }
 
 void client_setup::send_pending_auth_tickets() { 
+	if (!connect_called) {
+		/*
+			Still getting the connect token - only then is it known whether the connection is secure.
+		*/
+
+		return;
+	}
+
+	if (!is_connected_securely()) {
+		if (pending_steam_auth.has_value() || pending_web_auth.has_value()) {
+			LOG("Not sending authentication over an insecure connection.");
+			pending_steam_auth.reset();
+			pending_web_auth.reset();
+		}
+
+		return;
+	}
+
 	auto send_pending_steam_auth = [&]() {
 		if (!pending_steam_auth.has_value()) {
 			return;
@@ -2378,6 +2453,10 @@ void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
 
 void client_setup::send_auth_ticket(const web_auth_data& ticket) {
 	pending_web_auth = ticket;
+}
+
+bool client_setup::is_connected_securely() const {
+	return secure_server_id.has_value();
 }
 
 std::optional<std::string> client_setup::consume_steam_auth_identity() {

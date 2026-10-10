@@ -6,6 +6,7 @@
 #include "augs/network/network_simulator_settings.h"
 #include "application/network/resolve_address_result.h"
 #include "application/network/game_channel_type.h"
+#include "application/network/connect_token_fetch.h"
 
 struct netcode_socket_t;
 
@@ -59,7 +60,12 @@ public:
 		return yojimbo_allocator;
 	}
 
-	resolve_address_result connect(const client_connect_string&);
+	/*
+		With a token from the masterserver, connects securely to the official server it was issued for.
+		Otherwise connects with an insecure token made right here.
+	*/
+
+	resolve_address_result connect(const client_connect_string&, const std::optional<fetched_connect_token>& secure_token);
 
 	template <class H>
 	void advance(

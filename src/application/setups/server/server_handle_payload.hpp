@@ -38,6 +38,16 @@ message_handler_result server_setup::handle_payload(
 		}
 
 		/*
+			A ticket or a signature sent over an insecure connection could have been read or swapped on the way,
+			so it is never taken from one.
+		*/
+
+		if (!server->get_secure_server_id(client_id).has_value()) {
+			LOG("Ignoring auth_request_payload from %x: the connection is not secure.", c.get_nickname());
+			return continue_v;
+		}
+
+		/*
 			Where authentication is not required, it is still verified if possible -
 			only for the badges and the admin profiles, without kicking anyone over it.
 		*/

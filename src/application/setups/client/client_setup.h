@@ -51,6 +51,7 @@
 #include "steam_integration_callbacks.h"
 #include "application/main/auth_provider_type.h"
 #include "application/gui/ingame_menu_button_type.h"
+#include "application/network/secure_connect.h"
 #include "game/messages/hud_message.h"
 
 #include "steam_rich_presence_pairs.h"
@@ -72,6 +73,16 @@ struct arena_download_input {
 };
 
 struct webrtc_client_detail;
+
+/*
+	Asks the masterserver for a secure connect token before connecting.
+	Without one, a required secure connection (ranked) fails, otherwise the client connects insecurely.
+*/
+
+struct secure_connect_request {
+	std::string provider_url;
+	bool required = false;
+};
 
 class client_setup : 
 	public default_setup_settings,
@@ -110,6 +121,16 @@ class client_setup :
 
 	std::optional<std::string> steam_auth_identity_to_request;
 	bool steam_auth_identity_received = false;
+
+	std::optional<secure_connect_request> secure_request;
+	augs::future<std::optional<fetched_connect_token>> secure_token_fetch;
+
+	/*
+		The official server this client is securely connected to, if any.
+		Authentication only ever goes over a secure connection - see secure_connect.h.
+	*/
+
+	std::optional<std::string> secure_server_id;
 	bool server_requires_authentication = false;
 
 	bool now_resyncing = false;
@@ -658,7 +679,8 @@ public:
 		const std::string& displayed_connecting_server_name,
 		const client_vars& initial_vars,
 		port_type preferred_binding_port,
-		const std::string& webrtc_signalling_server_url
+		const std::string& webrtc_signalling_server_url,
+		const std::optional<secure_connect_request>& secure_request
 	);
 
 	~client_setup();
@@ -769,7 +791,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(official, in_string, disp_backup, vars_backup, port_type(0), "");
+					new (this) client_setup(official, in_string, disp_backup, vars_backup, port_type(0), "", std::nullopt);
 				}
 
 				demo_player = std::move(player_backup);
@@ -972,6 +994,7 @@ public:
 
 	void send_auth_ticket(const steam_auth_ticket&);
 	std::optional<std::string> consume_steam_auth_identity();
+	bool is_connected_securely() const;
 	void send_auth_ticket(const web_auth_data&);
 
 	bool is_ranked_live_or_starting() const;

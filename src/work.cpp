@@ -2315,6 +2315,37 @@ work_result work(
 
 		LOG("Launching client setup with connect string: %x", connect_string);
 
+		/*
+			Ranked servers are always joined securely, official casual ones only if the player wants to be authenticated there.
+			Community servers never - they have no keys the masterserver could issue tokens for.
+		*/
+
+		const auto secure_request = [&]() -> std::optional<secure_connect_request> {
+			const auto found = find_chosen_server_info();
+
+			const bool is_official = (found != nullptr && found->is_official_server()) || ::is_official_webrtc_id(connect_string);
+			const bool is_ranked = (found != nullptr && found->heartbeat.is_ranked_server()) || begins_with(connect_string, "ranked");
+
+			if (found == nullptr && !is_official) {
+				/*
+					Not on the server list yet, e.g. joined from the command line or a Steam invite.
+					It might be official, so ask anyway - the masterserver refuses a token for any other.
+				*/
+
+				return secure_connect_request { config.connect_token_provider, false };
+			}
+
+			if (!is_official) {
+				return std::nullopt;
+			}
+
+			if (!is_ranked && !config.client.secure_connection_to_official_casual_servers) {
+				return std::nullopt;
+			}
+
+			return secure_connect_request { config.connect_token_provider, is_ranked };
+		}();
+
 		streaming.wait_demos_compressed();
 
 		setup_launcher([&]() {
@@ -2327,7 +2358,8 @@ work_result work(
 				config.client,
 				preferred_binding_port,
 
-				config.webrtc_signalling_server_url
+				config.webrtc_signalling_server_url,
+				secure_request
 			);
 		});
 
@@ -3246,18 +3278,11 @@ work_result work(
 		steam_events.clear();
 
 		/*
-			The ticket is requested for the challenge of the server - see server_auth_state -
-			and only for the official servers: any other could pass on the challenge of another server
-			it is connected to, and replay the ticket there.
-			Waits until the server list tells if the server is official.
+			The ticket is requested for the challenge of the server and the official server the connect token was issued for,
+			and only over a secure connection - see secure_connect.h. consume_steam_auth_identity is empty otherwise.
 		*/
 
-		const bool connected_to_official = [&]() {
-			const auto found = find_chosen_server_info();
-			return found != nullptr && found->is_official_server();
-		}();
-
-		if (is_steam_client && connected_to_official) {
+		if (is_steam_client) {
 			visit_current_setup([&](auto& setup) {
 				using T = remove_cref<decltype(setup)>;
 

@@ -10,6 +10,7 @@
 #include "hypersomnia_version.h"
 
 #include "application/network/net_serialize.h"
+#include "application/network/secure_connect.h"
 #include "3rdparty/yojimbo/netcode/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/thread_templates.h"
@@ -80,6 +81,8 @@ game_connection_config::game_connection_config() {
 	networkSimulator = true;
 
 	set_max_packet_size(max_packet_size_v);
+
+	maxConnectTokenLifetime = secure_connect::token_lifetime_secs;
 }
 
 void game_connection_config::set_max_packet_size(const unsigned s) {
@@ -94,6 +97,21 @@ game_connection_config::game_connection_config(const augs::server_listen_input& 
 #if 0
 	set_max_packet_size(in.max_packet_size);
 #endif
+}
+
+std::optional<std::string> server_adapter::get_secure_server_id(const client_id_type& id) const {
+	static_assert(secure_connect::user_data_bytes == NETCODE_USER_DATA_BYTES);
+
+	/*
+		Without a netcode key, insecure tokens decrypt with this server's (all-zero) key
+		and keep whatever user data their clients wrote.
+	*/
+
+	if (!has_netcode_key || !server.IsClientConnected(id)) {
+		return std::nullopt;
+	}
+
+	return secure_connect::read_server_id(server.GetClientUserData(id));
 }
 
 bool server_adapter::is_running() const {
@@ -200,8 +218,11 @@ server_adapter::server_adapter(
 	auxiliary_command_callback_type auxiliary_command_callback,
 	send_packet_override_type send_packet_override,
 	receive_packet_override_type receive_packet_override,
-	const bool is_webrtc_only
+	const bool is_webrtc_only,
+	const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key
 ) :
+	privateKey(netcode_key.has_value() ? *netcode_key : std::array<uint8_t, yojimbo::KeyBytes>()),
+	has_netcode_key(netcode_key.has_value()),
 	connection_config(in),
 	adapter(this),
 	server(
@@ -235,6 +256,14 @@ server_adapter::server_adapter(
 			netcode's disconnect packets could arrive first and drop the reason.
 		*/
 		detail->config.disable_disconnect_packets = 1;
+
+		/*
+			An official server takes both the secure tokens from the masterserver and the insecure ones,
+			telling them apart by get_secure_server_id. Whatever requires a secure connection, like ranked,
+			kicks the insecure clients itself, so that they learn why.
+		*/
+
+		detail->config.accept_insecure_connect_tokens = has_netcode_key ? 1 : 0;
 
 		if (is_webrtc_only) {
 			detail->config.override_send_and_receive = 1;
@@ -609,7 +638,7 @@ int client_receive_packet_override(void* context, netcode_address_t* from, uint8
 	return adapter->receive_packet_override(*from, reinterpret_cast<std::byte*>(packet), bytes);
 }
 
-resolve_address_result client_adapter::connect(const client_connect_string& str) {
+resolve_address_result client_adapter::connect(const client_connect_string& str, const std::optional<fetched_connect_token>& secure_token) {
 	auto resolved_addr = resolve_address_result();
 
 #if PLATFORM_WEB
@@ -659,15 +688,23 @@ resolve_address_result client_adapter::connect(const client_connect_string& str)
 		local_addr
 	};
 
-	uint64_t clientId;
-	yojimbo_random_bytes((uint8_t*)&clientId, 8);
+	if (secure_token.has_value()) {
+		LOG("Connecting securely to the official server %x.", secure_token->server_id);
 
-	client.InsecureConnect(
-		privateKey.data(), 
-		clientId,
-		addresses,
-		2
-	);
+		auto token = secure_token->token;
+		client.Connect(secure_token->client_id, token.data());
+	}
+	else {
+		uint64_t clientId;
+		yojimbo_random_bytes((uint8_t*)&clientId, 8);
+
+		client.InsecureConnect(
+			privateKey.data(), 
+			clientId,
+			addresses,
+			2
+		);
+	}
 
 	if (auto detail = client.GetClientDetail()) {
 		detail->config.auxiliary_command_function = client_auxiliary_command_function;

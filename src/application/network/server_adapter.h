@@ -1,7 +1,10 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <array>
 #include <functional>
+#include <optional>
+#include <string>
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 
@@ -20,6 +23,7 @@ class server_adapter {
 	friend int receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes);
 
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
+	bool has_netcode_key = false;
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::DefaultAllocator yojimbo_allocator;
@@ -56,8 +60,17 @@ public:
 		auxiliary_command_callback_type,
 		send_packet_override_type,
 		receive_packet_override_type,
-		bool is_webrtc_only
+		bool is_webrtc_only,
+		const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key
 	);
+
+	/*
+		The id of the official server the client's connect token was issued for,
+		if this is an official server and the client connected with a token from the masterserver.
+		std::nullopt for every insecure connection.
+	*/
+
+	std::optional<std::string> get_secure_server_id(const client_id_type& id) const;
 
 	template <class H>
 	void advance(

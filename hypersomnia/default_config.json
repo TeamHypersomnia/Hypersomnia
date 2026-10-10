@@ -13,6 +13,8 @@
     // "log_timestamp_format": "",
 
     "server_list_provider": "http://masterserver.hypersomnia.io:8410",
+    // Where the game gets the tokens for the secure connections to the official servers.
+    "connect_token_provider": "https://hypersomnia.io/connect_token",
     "webrtc_signalling_server_url": "wss://masterserver.hypersomnia.io:8000",
 
     "streamer_mode": false,
@@ -292,6 +294,11 @@
     "client_connect": "127.0.0.1",
 
     "client": {
+        /*
+            Ranked servers are always joined over a secure connection.
+            This also joins the official casual servers securely, so that you are authenticated there too - e.g. for your badge.
+        */
+        "secure_connection_to_official_casual_servers": false,
         "use_account_nickname": true,
         "use_account_avatar": true,
         "nickname": "",

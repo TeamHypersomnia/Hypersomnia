@@ -103,6 +103,7 @@ struct config_json_table {
 	float_consistency_test_settings float_consistency_test;
 
 	std::string server_list_provider;
+	std::string connect_token_provider;
 	std::string webrtc_signalling_server_url;
 
 	nat_detection_settings nat_detection;
