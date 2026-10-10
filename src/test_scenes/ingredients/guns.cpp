@@ -966,7 +966,7 @@ namespace test_flavours {
 					jet.angular_offset = { -2.f, 2.f };
 					jet.spread = { 3.f, 3.f };
 					jet.lifetime_ms = { 20.f, 32.f };
-					jet.muzzle_offset = 25.0f;
+					jet.muzzle_offset = 35.0f;
 
 					e.jets.push_back(jet);
 				}
@@ -980,7 +980,7 @@ namespace test_flavours {
 					jet.angular_offset = { -2.f, 2.f };
 					jet.spread = { 0.f, 0.f };
 					jet.lifetime_ms = { 20.f, 32.f };
-					jet.muzzle_offset = 50.0f;
+					jet.muzzle_offset = 60.0f;
 
 					e.jets.push_back(jet);
 				}
