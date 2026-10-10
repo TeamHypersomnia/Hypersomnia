@@ -2679,6 +2679,7 @@ void settings_gui_state::perform(
 					case advanced_settings_pane::NETWORK: {
 						input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
 						input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
+						input_text("Connect token provider", config.connect_token_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.connect_token_provider);
 
 #if 0
 						input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
