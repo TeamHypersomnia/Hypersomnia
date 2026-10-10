@@ -15,6 +15,8 @@
     "server_list_provider": "http://masterserver.hypersomnia.io:8410",
     // Where the game gets the tokens for the secure connections to the official servers.
     "connect_token_provider": "https://hypersomnia.io/connect_token",
+    // Where the account settings link an identity key to a Steam account and open profiles.
+    "website_url": "https://hypersomnia.io",
     "webrtc_signalling_server_url": "wss://masterserver.hypersomnia.io:8000",
 
     "streamer_mode": false,

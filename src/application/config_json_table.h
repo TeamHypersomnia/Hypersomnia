@@ -104,6 +104,7 @@ struct config_json_table {
 
 	std::string server_list_provider;
 	std::string connect_token_provider;
+	std::string website_url;
 	std::string webrtc_signalling_server_url;
 
 	nat_detection_settings nat_detection;

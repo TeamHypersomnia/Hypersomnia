@@ -218,7 +218,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string account_status;
 	augs::future<std::string> link_request;
 
-	void perform_account_pane(augs::window& window);
+	void perform_account_pane(augs::window& window, const std::string& website_url);
 
 public:
 	bool is_steam_client = false;

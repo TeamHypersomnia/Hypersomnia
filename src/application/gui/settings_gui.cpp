@@ -345,7 +345,7 @@ std::string get_custom_binding_name(const app_intent_type) {
 }
 
 #if !PLATFORM_WEB
-void settings_gui_state::perform_account_pane(augs::window& window) {
+void settings_gui_state::perform_account_pane(augs::window& window, const std::string& website_url) {
 	using namespace augs::imgui;
 
 	if (is_steam_client) {
@@ -387,7 +387,7 @@ void settings_gui_state::perform_account_pane(augs::window& window) {
 		text("Account");
 
 		if (ImGui::Button("Open profile")) {
-			augs::open_url("https://hypersomnia.io/user/" + account);
+			augs::open_url(website_url + "/user/" + account);
 		}
 
 		ImGui::SameLine();
@@ -482,12 +482,12 @@ void settings_gui_state::perform_account_pane(augs::window& window) {
 					augs::bytes_to_hex(*signature)
 				);
 
-				link_request = launch_async([body]() -> std::string {
-					auto client = httplib_utils::make_client("https://hypersomnia.io");
+				link_request = launch_async([body, website_url]() -> std::string {
+					auto client = httplib_utils::make_client(website_url);
 					const auto result = client->Post("/link_key", body, "application/json");
 
 					if (!result) {
-						return "Couldn't reach hypersomnia.io.";
+						return typesafe_sprintf("Couldn't reach %x.", website_url);
 					}
 
 					if (httplib_utils::successful(result->status)) {
@@ -502,7 +502,7 @@ void settings_gui_state::perform_account_pane(augs::window& window) {
 		ImGui::SameLine();
 
 		if (ImGui::Button("Open hypersomnia.io/profile")) {
-			augs::open_url("https://hypersomnia.io/profile");
+			augs::open_url(website_url + "/profile");
 		}
 
 		if (valid_and_is_ready(link_request)) {
@@ -2318,7 +2318,7 @@ void settings_gui_state::perform(
 				switch (active_client_pane) {
 #if !PLATFORM_WEB
 					case client_settings_pane::ACCOUNT: {
-						perform_account_pane(window);
+						perform_account_pane(window, config.website_url);
 						break;
 					}
 #endif
@@ -2680,6 +2680,7 @@ void settings_gui_state::perform(
 						input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
 						input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
 						input_text("Connect token provider", config.connect_token_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.connect_token_provider);
+						input_text("Website", config.website_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.website_url);
 
 #if 0
 						input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);
