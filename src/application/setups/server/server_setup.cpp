@@ -2469,7 +2469,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 	);
 
-	heartbeat.official_domain = private_vars.official_domain;
+	heartbeat.domain = vars.domain;
 	heartbeat.validate();
 
 	if (!heartbeat.is_valid()) {

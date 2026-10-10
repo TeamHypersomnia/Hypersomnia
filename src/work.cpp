@@ -2356,8 +2356,12 @@ work_result work(
 		std::string saved_for_next_launch;
 
 #if !PLATFORM_WEB
-		if (const auto found = find_chosen_server_info(); found && found->is_official_server()) {
-			saved_for_next_launch = found->meta.official_url;
+		/*
+			A domain survives the server changing its IP, so remember it for the next launch.
+		*/
+
+		if (const auto found = find_chosen_server_info(); found != nullptr) {
+			saved_for_next_launch = found->get_domain_with_port();
 		}
 #endif
 

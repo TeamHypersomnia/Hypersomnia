@@ -11,17 +11,18 @@ struct masterserver_entry_meta {
 
 	// GEN INTROSPECTOR struct masterserver_entry_meta
 	double time_hosted = 0.0;
-	host_string_type official_url;
+	bool is_official = false;
+	host_string_type domain;
 	webrtc_id_type webrtc_id;
 	server_type type = server_type::NATIVE;
 	// END GEN INTROSPECTOR
 
 	bool is_community_server() const {
-		return official_url.empty();
+		return !is_official;
 	}
 
 	bool is_official_server() const {
-		return !official_url.empty();
+		return is_official;
 	}
 };
 

@@ -425,7 +425,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 			next.server_version = data.server_version;
 
-			next.official_url = meta.official_url;
+			next.is_official = meta.is_official;
+			next.domain = meta.domain;
 			next.is_ranked = meta.is_official_server() && data.is_ranked_server();
 			next.is_web_server = meta.type == server_type::WEB;
 			next.name = data.server_name;
@@ -475,9 +476,9 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.players_metropolis = data.players_metropolis;
 			next.players_spectating = data.players_spectating;
 
-			next.site_displayed_address = [&next]() {
-				if (!next.official_url.empty()) {
-					return next.official_url;
+			next.site_displayed_address = [&next, &ip]() {
+				if (!next.domain.empty()) {
+					return typesafe_sprintf("%x:%x", next.domain, ip.port);
 				}
 
 				if (next.is_web_server) {
@@ -817,19 +818,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							server_entry.time_last_heartbeat = current_time;
 							server_entry.official_server_id = signer != nullptr ? signer->server_id : std::string();
 
-							server_entry.meta.official_url = [&]() -> std::string {
-								if (signer == nullptr) {
-									return "";
-								}
-
-								const auto& domain = typed_request.official_domain;
-
-								if (domain.empty()) {
-									return ip_str;
-								}
-
-								return typesafe_sprintf("%x:%x", std::string(domain), from.port);
-							}();
+							server_entry.meta.is_official = signer != nullptr;
+							server_entry.meta.domain = typed_request.domain;
 
 							if (server_entry.meta.is_official_server()) {
 								const auto new_webrtc_alias = ::to_webrtc_alias(

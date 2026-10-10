@@ -73,7 +73,7 @@ struct server_heartbeat {
 	uint8_t bullet_speed_hundredths = 100;
 	uint8_t zoom_hundredths = 100;
 
-	host_string_type official_domain;
+	host_string_type domain;
 	std::optional<official_server_signature> signature;
 	// END GEN INTROSPECTOR
 

@@ -81,6 +81,13 @@ struct server_list_entry {
 	std::string get_web_connect_string() const;
 	std::string get_native_connect_string(bool for_sending) const;
 
+	/*
+		"domain:port" if the server reports a domain, otherwise empty.
+		The domain is only a label the server declares for itself - official or not - never a proof of anything.
+	*/
+
+	std::string get_domain_with_port() const;
+
 	netcode_address_t get_ip_address(bool for_sending) const;
 
 	bool is_set() const;

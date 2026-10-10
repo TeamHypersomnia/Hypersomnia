@@ -178,6 +178,7 @@ public:
 	port_type webrtc_port_range_end = 9050;
 
 	server_name_type server_name;
+	host_string_type domain;
 	address_string_type notified_server_list;
 	bool suppress_new_community_server_webhook = false;
 	bool show_on_server_list = true;
@@ -340,7 +341,6 @@ struct server_private_vars {
 	std::string steam_web_api_key = "";
 
 	std::string official_server_secret = "";
-	host_string_type official_domain;
 	std::string report_ranked_match_url = "https://hypersomnia.io/report_match";
 
 	std::vector<url_and_key_pair> report_ranked_match_aux_endpoints;

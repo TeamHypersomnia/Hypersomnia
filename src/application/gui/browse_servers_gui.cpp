@@ -384,7 +384,9 @@ std::string server_list_entry::get_native_connect_string(const bool for_sending)
 
 	if (for_sending) {
 		if (is_official_server()) {
-			return meta.official_url;
+			if (const auto domain = get_domain_with_port(); !domain.empty()) {
+				return domain;
+			}
 		}
 	}
 	else {
@@ -398,6 +400,14 @@ std::string server_list_entry::get_native_connect_string(const bool for_sending)
 	}
 
 	return ip_address;
+}
+
+std::string server_list_entry::get_domain_with_port() const {
+	if (meta.domain.empty()) {
+		return "";
+	}
+
+	return typesafe_sprintf("%x:%x", std::string(meta.domain), address.port);
 }
 
 bool server_list_entry::is_internal_network() const {
@@ -1775,20 +1785,24 @@ bool server_details_gui_state::perform(
 		}
 	}
 
-	auto official_url = entry.meta.official_url;
+	auto domain = entry.get_domain_with_port();
 
-	if (!official_url.empty()) {
-		input_text("##Official Domain", official_url, rdonly_flags);
+	/*
+		A community server's domain reveals as much as its IP in the streamer mode.
+	*/
+
+	if (!domain.empty() && (do_show_ips || entry.is_official_server())) {
+		input_text("##Domain", domain, rdonly_flags);
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##OffDom")) {
-			ImGui::SetClipboardText(official_url.c_str());
+		if (ImGui::Button("Copy##Domain")) {
+			ImGui::SetClipboardText(domain.c_str());
 		}
 
 		ImGui::SameLine();
 
-		text("Official Domain");
+		text("Domain");
 	}
 
 	{

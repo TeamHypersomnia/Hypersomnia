@@ -382,6 +382,7 @@
         "webrtc_port_range_begin": 9000,
         "webrtc_port_range_end": 9050, // only matters if "webrtc_udp_mux": false
         "server_name": "", // Will be "Nickname's server" by default.
+        "domain": "", // Optional, e.g. "hypersomnia.example.com" - shown in the server list so players can remember it instead of the IP.
         "notified_server_list": "masterserver.hypersomnia.io:8430",
         "suppress_new_community_server_webhook": false,
         "is_behind_nat": true,
@@ -480,11 +481,8 @@
             Only for the official servers. The one secret this server proves itself with:
             it is sent to report ranked matches, signs the heartbeats so that the masterserver lists it as official,
             and derives the key of its secure connections. Given out once per server by the developers.
-
-            official_domain is the address shown in the server list instead of the IP, e.g. "arena-de.hypersomnia.io".
         */
         "official_server_secret": "",
-        "official_domain": "",
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
         "check_ban_url": "",

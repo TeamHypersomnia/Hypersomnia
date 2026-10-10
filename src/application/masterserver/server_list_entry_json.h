@@ -13,7 +13,8 @@ struct server_list_entry_json {
 
 	std::string name;
 	std::string ip;
-	std::string official_url;
+	bool is_official = false;
+	std::string domain;
 	std::string webrtc_id;
 	std::string browser_connect_string;
 
