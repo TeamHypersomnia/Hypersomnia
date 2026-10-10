@@ -30,7 +30,7 @@ EOF
 	echo $! > $B/ms.pid
 
 	cd $B/page
-	PORT=13000 NODE_ENV=development OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
+	PORT=13000 NODE_ENV=development SESSION_SECRET=hs-e2e-session-secret OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
 		setsid nohup timeout 7200 $B/node/bin/node app.js > $B/site.out 2>&1 < /dev/null &
 	echo $! > $B/site.pid
 

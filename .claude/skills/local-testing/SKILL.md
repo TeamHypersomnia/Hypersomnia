@@ -38,7 +38,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web`, the same steps as `build.sh Release Web` |
 | `prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master (see below) |
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
-| `xclick.py x y` | Moves and left-clicks on `$DISPLAY` through XTest (no xdotool needed) |
+| `xinput.py click x y` / `type TEXT` / `key NAME` / `scroll x y n` | Clicks, types, presses keys and scrolls on `$DISPLAY` through XTest (no xdotool needed) |
 | `local_stack.sh [web build] [hours]` | Leaves running, for the user to test by hand: master, official ranked [PL] and casual [DE] servers, the web build on http://localhost:8765 pointed at them; `local_stack.sh stop` |
 | `build_headless_ubuntu2204.sh` | Headless Release build inside an unprivileged Ubuntu 22.04 rootfs (bwrap) - glibc 2.35, runs on both arenaus and arena; prints where the libc++ to ship lies |
 | `build_headless_ubuntu_container.sh` | The same in Ubuntu 24.04 (glibc 2.39) - arena only |
@@ -61,7 +61,8 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `connec
 ## UI checks
 
 Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscreen window (conf.d `"window"`),
-`import -window root shot.png` to screenshot, read the image, and `python3 xclick.py x y` to click.
+`import -window root shot.png` to screenshot, read the image, and `python3 xinput.py click x y` to click.
+A fresh appdata starts in the tutorial: `xinput.py key Escape` opens the menu (Settings at ~156,555).
 The appdata remembers the last connect string - the first screen may be a reconnect dialog with Abort.
 
 ## Remote hosts (arena, arenaus)
@@ -89,8 +90,14 @@ heartbeating to that master and reporting to that site. `run_match.sh A B` plays
   client after the match goes live: it abandons at once and the report goes out immediately (`losers_abandoned`).
   Also disable the AFK kicks (`move_to_spectators_if_afk_for_secs`, `kick_if_afk_for_secs` = 999999).
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
-- Account linking without Steam: insert the association directly (`db.sh sql "INSERT INTO associations ..."`); the
-  `/link_key` endpoint itself is covered by the scratch-copy test.
+- **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
+  session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
+  `curl -b "$cookie"` then reaches `/profile`; `POST /profile/link_code` returns a page with the 8-character code,
+  `POST /profile/unlink_key` with `key=key_...` unlinks.
+- **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb:
+  Settings - Client (~833,218) - Account (~417,278); click the code field (~415,580), `xinput.py type CODE`, click Link (~588,582),
+  scroll down to read "Linked. ..." (a reused code shows "Invalid or expired code"). Check with `db.sh show`.
+  For a quick link without UI: `db.sh sql "INSERT INTO associations ..."`.
 
 ## The hypersomnia.io site
 
