@@ -38,7 +38,11 @@ constexpr std::size_t max_chat_message_length_v = 180;
 
 constexpr std::size_t min_nickname_length_v = 1;
 constexpr std::size_t max_nickname_length_v = 40;
-constexpr std::size_t max_ranked_account_id_length_v = 64;
+/*
+	Enough for "key_" followed by an Ed25519 public key in hex (68 characters).
+*/
+
+constexpr std::size_t max_ranked_account_id_length_v = 80;
 constexpr std::size_t max_clan_length_v = 20;
 constexpr std::size_t max_server_name_length_v = 60;
 

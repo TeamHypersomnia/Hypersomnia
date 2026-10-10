@@ -6,6 +6,7 @@
 #include "augs/misc/profanity_filter.h"
 
 #include "application/network/secure_connect.h"
+#include "application/main/identity_key.h"
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
 
@@ -1403,10 +1404,11 @@ void client_setup::send_pending_auth_tickets() {
 	}
 
 	if (!is_connected_securely()) {
-		if (pending_steam_auth.has_value() || pending_web_auth.has_value()) {
+		if (pending_steam_auth.has_value() || pending_web_auth.has_value() || pending_key_auth.has_value()) {
 			LOG("Not sending authentication over an insecure connection.");
 			pending_steam_auth.reset();
 			pending_web_auth.reset();
+			pending_key_auth.reset();
 		}
 
 		return;
@@ -1476,8 +1478,28 @@ void client_setup::send_pending_auth_tickets() {
 		pending_web_auth.reset();
 	};
 
+	auto send_pending_key_auth = [&]() {
+		if (!pending_key_auth.has_value()) {
+			return;
+		}
+
+		LOG("Sending the identity key signature to the server.");
+
+		send_payload(
+			game_channel_type::RELIABLE_MESSAGES,
+
+			auth_request_payload({ 
+				auth_provider_type::KEY,
+				*pending_key_auth
+			})
+		);
+
+		pending_key_auth.reset();
+	};
+
 	send_pending_steam_auth();
 	send_pending_web_auth();
+	send_pending_key_auth();
 }
 
 void client_setup::send_pending_commands() {
@@ -2453,6 +2475,10 @@ void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
 
 void client_setup::send_auth_ticket(const web_auth_data& ticket) {
 	pending_web_auth = ticket;
+}
+
+void client_setup::use_identity_key(const augs::path_type& path) {
+	identity_key_path = path;
 }
 
 bool client_setup::is_connected_securely() const {

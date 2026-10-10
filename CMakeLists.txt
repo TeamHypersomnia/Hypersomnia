@@ -716,6 +716,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/secure_hash.cpp"
 	"src/augs/misc/hmac_sha256.cpp"
 	"src/augs/misc/ed25519.cpp"
+	"src/application/main/identity_key.cpp"
 	"src/augs/string/path_sanitization.cpp"
 	"src/application/config_json_table.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"

@@ -44,6 +44,7 @@
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/official_server_signing.h"
 #include "application/network/secure_connect.h"
+#include "application/main/identity_key.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
@@ -1135,8 +1136,33 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 		);
 	};
 
+	auto push_key_auth_job = [&]() {
+		const auto identity = secure_connect::auth_identity(
+			std::string(get_client_state(player_id).auth_challenge),
+			server->get_secure_server_id(to_client_id(player_id)).value_or("")
+		);
+
+		push_auth_job(
+			player_id,
+
+			[ticket_bytes = payload.ticket_bytes, identity]() {
+				const auto ticket = identity_key::from_bytes(ticket_bytes);
+
+				if (!ticket.has_value() || !identity_key::verify(*ticket, identity)) {
+					LOG("Rejected an identity key signature.");
+					return std::string("");
+				}
+
+				return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(ticket->public_key);
+			}
+		);
+	};
+
 	if (payload.type == auth_provider_type::STEAM_NATIVE) {
 		push_steam_native_auth_job();
+	}
+	else if (payload.type == auth_provider_type::KEY) {
+		push_key_auth_job();
 	}
 	else {
 		push_web_auth_job();

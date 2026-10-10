@@ -477,6 +477,18 @@ message_handler_result client_setup::handle_payload(
 			steam_auth_identity_received = true;
 			steam_auth_identity_to_request = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
 		}
+
+		if (identity_key_path.has_value() && !identity_key_signed && !payload.challenge.empty() && secure_server_id.has_value()) {
+			identity_key_signed = true;
+
+			const auto identity = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
+
+			if (const auto seed = identity_key::load_or_create(*identity_key_path)) {
+				if (const auto ticket = identity_key::sign(*seed, identity)) {
+					pending_key_auth = identity_key::to_bytes(*ticket);
+				}
+			}
+		}
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		mode_player_id player_id;

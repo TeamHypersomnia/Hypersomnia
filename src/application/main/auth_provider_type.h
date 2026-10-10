@@ -11,6 +11,12 @@ enum class auth_provider_type {
 
 	STEAM_NATIVE,
 
+	/*
+		An Ed25519 key in the user folder - see identity_key.h.
+	*/
+
+	KEY,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -23,6 +29,8 @@ inline std::string get_provider_preffix(const auth_provider_type t) {
 			return "steam_";
 		case auth_provider_type::CRAZYGAMES:
 			return "crazygames_";
+		case auth_provider_type::KEY:
+			return "key_";
 		default:
 			return "unknown_";
 	}

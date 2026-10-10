@@ -115,6 +115,15 @@ class client_setup :
 	std::optional<web_auth_data> pending_web_auth;
 
 	/*
+		Set for the players without Steam - see identity_key.h.
+		The key is only loaded, or created, once a secure connection asks for authentication.
+	*/
+
+	std::optional<augs::path_type> identity_key_path;
+	bool identity_key_signed = false;
+	std::optional<std::vector<std::byte>> pending_key_auth;
+
+	/*
 		The challenge of the server to request the Steam ticket for - see server_auth_state.
 		Requested once per connection.
 	*/
@@ -995,6 +1004,7 @@ public:
 	void send_auth_ticket(const steam_auth_ticket&);
 	std::optional<std::string> consume_steam_auth_identity();
 	bool is_connected_securely() const;
+	void use_identity_key(const augs::path_type& path);
 	void send_auth_ticket(const web_auth_data&);
 
 	bool is_ranked_live_or_starting() const;

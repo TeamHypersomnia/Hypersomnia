@@ -70,6 +70,7 @@
 
 #include "application/session_profiler.h"
 #include "application/config_json_table.h"
+#include "application/main/identity_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
 
@@ -505,7 +506,11 @@ work_result work(
 	});
 
 	WEBSTATIC const bool is_steam_client = steam_initialized;
-	WEBSTATIC const bool ranked_servers_enabled = is_steam_client;
+	/*
+		Without Steam, ranked matches go on the account of the identity key - see identity_key.h.
+	*/
+
+	WEBSTATIC const bool ranked_servers_enabled = true;
 	(void)ranked_servers_enabled;
 
 	LOG_NVPS(is_steam_client);
@@ -2362,6 +2367,18 @@ work_result work(
 				secure_request
 			);
 		});
+
+#if !PLATFORM_WEB
+		/*
+			Without Steam, the account is the identity key in the user folder - see identity_key.h.
+		*/
+
+		if (!is_steam_client) {
+			on_specific_setup([&](client_setup& setup) {
+				setup.use_identity_key(USER_DIR / identity_key::file_name);
+			});
+		}
+#endif
 
 #if PLATFORM_WEB
 		const bool send_auth = requires_sign_in;
