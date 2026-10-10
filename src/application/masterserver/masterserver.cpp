@@ -515,6 +515,14 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.score_resistance = data.score_resistance;
 			next.score_metropolis = data.score_metropolis;
 
+			/*
+				Exact decimals in the JSON, e.g. 0.8 - not the float nearest to it.
+			*/
+
+			next.speed = data.speed_hundredths / 100.0;
+			next.bullet_speed = data.bullet_speed_hundredths / 100.0;
+			next.zoom = data.zoom_hundredths / 100.0;
+
 			next.players_resistance = data.players_resistance;
 			next.players_metropolis = data.players_metropolis;
 			next.players_spectating = data.players_spectating;

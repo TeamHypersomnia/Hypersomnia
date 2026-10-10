@@ -2356,6 +2356,31 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.show_on_server_list = vars.show_on_server_list;
 	heartbeat.require_password = !private_vars.server_password.empty();
 
+	{
+		const auto& clk = scene.world.get_clock();
+
+		/*
+			The zoom the players currently get - the applied override (see arena_mode::update_round_settings) or the map's default.
+		*/
+
+		const auto current_zoom = arena.on_mode_with_input(
+			[&]<typename M>(const M& mode, const auto&) -> real32 {
+				if constexpr(std::is_same_v<M, arena_mode>) {
+					if (const auto zoom_override = mode.get_zoom_override(); zoom_override.has_value()) {
+						return *zoom_override;
+					}
+				}
+				else {
+					(void)mode;
+				}
+
+				return scene.world.get_common_significant().default_zoom;
+			}
+		);
+
+		heartbeat.set_mults(clk.logic_speed, clk.bullet_speed, current_zoom);
+	}
+
 #if BUILD_NATIVE_SOCKETS
 	heartbeat.internal_network_address = internal_address;
 #endif

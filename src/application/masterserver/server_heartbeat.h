@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <cmath>
+#include <algorithm>
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_type.h"
@@ -65,7 +67,30 @@ struct server_heartbeat {
 	bool require_authentication = false;
 	uint8_t ranked_state = 0;
 	bool require_password = false;
+
+	uint8_t speed_hundredths = 100;
+	uint8_t bullet_speed_hundredths = 100;
+	uint8_t zoom_hundredths = 100;
 	// END GEN INTROSPECTOR
+
+	/*
+		The game speed, the bullet speed and the zoom the players currently get,
+		all quantized to 0.01 in the game, so in hundredths they fit a byte (up to 2.55).
+	*/
+
+	static uint8_t to_hundredths(const real32 value) {
+		if (!std::isfinite(value)) {
+			return 0;
+		}
+
+		return static_cast<uint8_t>(std::clamp(std::round(value * 100.f), 0.f, 255.f));
+	}
+
+	void set_mults(const real32 speed, const real32 bullet_speed, const real32 zoom) {
+		speed_hundredths = to_hundredths(speed);
+		bullet_speed_hundredths = to_hundredths(bullet_speed);
+		zoom_hundredths = to_hundredths(zoom);
+	}
 
 	double cached_time_to_event = 0.0;
 

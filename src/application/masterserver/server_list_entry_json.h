@@ -36,6 +36,10 @@ struct server_list_entry_json {
 	uint8_t score_resistance = 0;
 	uint8_t score_metropolis = 0;
 
+	double speed = 1.0;
+	double bullet_speed = 1.0;
+	double zoom = 1.0;
+
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_resistance;
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_metropolis;
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_spectating;
