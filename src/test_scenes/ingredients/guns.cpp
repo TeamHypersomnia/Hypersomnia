@@ -1196,7 +1196,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 1.65f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.6f;
 
 			invariants::missile missile;
 
@@ -1774,7 +1774,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 1.65f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.6f;
 
 			invariants::missile missile;
 
@@ -5416,7 +5416,7 @@ namespace test_flavours {
 				|| gun_def->buy_type == buy_menu_type::SUBMACHINE_GUNS
 			;
 
-			const auto straight_below = small_pistol_or_smg ? 0.4f : 0.5f;
+			const auto straight_below = small_pistol_or_smg ? 0.5f : 0.5f;
 
 			/*
 				The fiery muzzles (white smokes) take the Baka47's fire colors.

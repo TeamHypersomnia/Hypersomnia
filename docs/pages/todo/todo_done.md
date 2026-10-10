@@ -7545,3 +7545,7 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - troche settingi poorganizowac bo syf szczegolnie te serverowe moze nie wiem tab osobny
 
 - sprofilowac de facing worlds
+- chciałbym przerobić, na razie na flage taka dac by default, lasery trajektorii dla granatow i nozy na taka sama semantyke kolorystyczno/ksztaltna jak zwykly laser broni - czyli bez tych sylwetek renderowanych co odstep tylko po prostu cala trajektoria granatu połamaną linią cyjanowa dokladnie taka sama jak ta broni, i tylko ta linia przerywana biala od pierwszego odbicia do crosshaira obecnego. To samo dla melee. na enuma jakiegos melee oraz grenade trajectory mode SILHOUETTES, LASER (osobno dla melee i grenade). jedyne co to tutaj jakos sprytniej trzeba interpolowac te segmenty bo cala trajektoria od jednego do drugiego odbicia bedzie linia prosta, i to jakos sensownie trzeba interpolowac jak sie zmienia ta pozycja i rozne odbicia sa, zeby bylo przyjemne dla oka nie przeskakiwalo tak dziwnie. Sylwetki pulsujące w finale trajektorii zostaw takie jakie sa, tylko wyłącz im puls jak jest ten tryb laserowy.
+- cos w minimapie jest jakis sygnal jak sie zaczyna playtesting samemu ale nie moge tego zreprodukowac 
+
+- lagodniejsza interpolacja tych markerow szczegolnie dla melee

@@ -360,11 +360,15 @@ void load_test_scene_particle_effects(
 				particles_emission em;
 
 				em.num_of_particles_to_spawn_initially = amount;
-				em.randomize_spawn_point_within_circle_of_inner_radius = float_range(4.f, 4.f);
-				em.randomize_spawn_point_within_circle_of_outer_radius = float_range(4.f, 4.f);
-				em.local_spawn_offset = vec2(muzzle_offset, 0.f);
+				em.num_of_particles_to_spawn_initially.first *= 0.05f;
+				em.num_of_particles_to_spawn_initially.second *= 0.6f;
+				em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = float_range(14.f, 14.f);
+				em.local_spawn_offset = vec2(muzzle_offset*1.2f, 0.f);
 				em.base_speed = speed;
-				em.angular_offset = float_range(-2.f, 2.f);
+				em.base_speed.first *= 0.9f;
+				em.base_speed.second *= 0.9f;
+				em.angular_offset = float_range(-4.f, 4.f);
 				em.spread_degrees = spread;
 				em.particle_lifetime_ms = jet_lifetime_ms;
 				em.rotation_speed = float_range(0.f, 0.f);
