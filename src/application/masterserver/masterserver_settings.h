@@ -27,7 +27,7 @@ struct masterserver_settings {
 
 	bool report_rtc_errors_to_webhook = false;
 
-	std::vector<std::string> official_hosts;
+	augs::path_type official_servers_dir;
 	// END GEN INTROSPECTOR
 
 	port_type get_last_udp_command_port() const {

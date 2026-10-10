@@ -42,6 +42,7 @@
 #include "application/masterserver/masterserver.h"
 #include "augs/network/netcode_utils.h"
 #include "application/masterserver/masterserver_requests.h"
+#include "application/masterserver/official_server_signing.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
@@ -967,6 +968,20 @@ void server_setup::reset_afk_timer() {
 	integrated_client.last_keyboard_activity_time = server_time;
 }
 
+/*
+	Official servers sign what they send to the masterserver with their official_server_secret,
+	so that nobody else can make the server list show them as official or remove them from it.
+*/
+
+template <class Request>
+static void sign_if_official(Request& request, const server_private_vars& private_vars) {
+	if (const auto keys = official_server_keys::derive(private_vars.official_server_secret); keys.has_value()) {
+		if (!::sign_official_request(request, *keys, ::next_official_signature_timestamp_ms())) {
+			LOG("Failed to sign a request to the masterserver with the official_server_secret.");
+		}
+	}
+}
+
 void server_setup::send_goodbye_to_masterserver() {
 #if PLATFORM_WEB
 	/*
@@ -976,8 +991,10 @@ void server_setup::send_goodbye_to_masterserver() {
 	if (has_sent_any_heartbeats() && resolved_server_list_addr.has_value()) {
 		const auto destination_address = resolved_server_list_addr.value();
 
-		const auto goodbye = masterserver_request(masterserver_in::goodbye {});
-		auto goodbye_bytes = augs::to_bytes(goodbye);
+		auto goodbye = masterserver_in::goodbye {};
+		::sign_if_official(goodbye, private_vars);
+
+		auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
 
 		for (int i = 0; i < 5; ++i) {
 			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
@@ -1692,7 +1709,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 	if (is_ranked_server()) {
 		if (!post_to(
 			private_vars.report_ranked_match_url, 
-			private_vars.report_ranked_match_api_key
+			private_vars.official_server_secret
 		)) {
 			LOG("report_ranked_match_url was not set.");
 		}
@@ -2452,11 +2469,16 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 	);
 
+	heartbeat.official_domain = private_vars.official_domain;
 	heartbeat.validate();
 
 	if (!heartbeat.is_valid()) {
 		LOG("THE SERVER HAS SENT AN INVALID HEARTBEAT!!!");
 	}
+
+#if !PLATFORM_WEB
+	::sign_if_official(heartbeat, private_vars);
+#endif
 
 	heartbeat_buffer.clear();
 

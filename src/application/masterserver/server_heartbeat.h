@@ -6,6 +6,7 @@
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/nat/nat_type.h"
 #include "hypersomnia_version.h"
+#include "application/masterserver/official_server_signature.h"
 
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
@@ -71,6 +72,9 @@ struct server_heartbeat {
 	uint8_t speed_hundredths = 100;
 	uint8_t bullet_speed_hundredths = 100;
 	uint8_t zoom_hundredths = 100;
+
+	host_string_type official_domain;
+	std::optional<official_server_signature> signature;
 	// END GEN INTROSPECTOR
 
 	/*

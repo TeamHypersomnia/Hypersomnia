@@ -476,7 +476,15 @@
         */
 
         "steam_web_api_key": "",
-        "report_ranked_match_api_key": "",
+        /*
+            Only for the official servers. The one secret this server proves itself with:
+            it is sent to report ranked matches, signs the heartbeats so that the masterserver lists it as official,
+            and derives the key of its secure connections. Given out once per server by the developers.
+
+            official_domain is the address shown in the server list instead of the IP, e.g. "arena-de.hypersomnia.io".
+        */
+        "official_server_secret": "",
+        "official_domain": "",
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
         "check_ban_url": "",
@@ -549,16 +557,12 @@
         "key_pem_path": "",
         "sleep_ms": 8.0,
         "report_rtc_errors_to_webhook": true,
-        "official_hosts": [
-            "arena.hypersomnia.io",
-            "arena-us.hypersomnia.io",
-            "arena-de.hypersomnia.io",
-            "arena-au.hypersomnia.io",
-            "arena-ru.hypersomnia.io",
-            "arena-ch.hypersomnia.io",
-            "arena-fi.hypersomnia.io",
-            "arena-nl.hypersomnia.io"
-        ]
+        /*
+            A directory with one file per official server:
+            the file name is the server id (e.g. "de"), the content is its official_server_secret.
+            Only servers whose heartbeats are signed with one of these secrets are listed as official.
+        */
+        "official_servers_dir": ""
     },
 
     "nat_detection": {

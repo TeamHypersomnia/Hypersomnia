@@ -339,7 +339,8 @@ struct server_private_vars {
 
 	std::string steam_web_api_key = "";
 
-	std::string report_ranked_match_api_key = "";
+	std::string official_server_secret = "";
+	host_string_type official_domain;
 	std::string report_ranked_match_url = "https://hypersomnia.io/report_match";
 
 	std::vector<url_and_key_pair> report_ranked_match_aux_endpoints;

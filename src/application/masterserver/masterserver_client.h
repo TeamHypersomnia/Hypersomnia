@@ -28,6 +28,12 @@ struct masterserver_entry_meta {
 struct masterserver_client {
 	double time_last_heartbeat = -1;
 
+	/*
+		The id of the official server that has signed the last heartbeat, empty for community servers.
+	*/
+
+	std::string official_server_id;
+
 	masterserver_entry_meta meta;
 	server_heartbeat last_heartbeat;
 };

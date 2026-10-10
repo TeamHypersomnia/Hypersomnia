@@ -6,7 +6,12 @@ namespace masterserver_in {
 	using heartbeat = server_heartbeat;
 
 	struct tell_me_my_address { double session_timestamp = 0.0; };
-	struct goodbye {};
+
+	struct goodbye {
+		// GEN INTROSPECTOR struct masterserver_in::goodbye
+		std::optional<official_server_signature> signature;
+		// END GEN INTROSPECTOR
+	};
 }
 
 namespace masterserver_out {

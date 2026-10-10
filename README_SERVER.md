@@ -168,6 +168,10 @@ The files in ``conf.d/`` are *never* modified. Another config file will be creat
 
 To be able to access the administration panel of your server, make sure to setup ``master_rcon_password`` - . Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
 
+### Official servers
+
+Official servers are hosted by volunteers together with the developers. Each gets one `official_server_secret` from the developers, put in the `server_private` section. It reports ranked matches, signs the heartbeats so that the server list shows the server as official, and will secure the connections of its players. Keep it private, and keep the host's clock synchronized (e.g. `systemd-timesyncd` or `chrony`): the server list rejects signatures from a clock more than 30 seconds off.
+
 If you have a Discord server, you might want to setup a [Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) and set `discord_webhook_url` to the webhook URL. This will notify your community whenever someone connects, as well as report all match results.
 
 ## Config loading order:

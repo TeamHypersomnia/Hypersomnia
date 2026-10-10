@@ -21,6 +21,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"
+#include "application/masterserver/official_servers_registry.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "augs/string/parse_url.h"
 #include "application/detail_file_paths.h"
@@ -71,43 +72,6 @@ static void set_cors(httplib::Response& res) {
 	res.set_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 };
 
-using ip_to_host = std::unordered_map<
-	std::string,
-	std::string
->;
-
-std::string to_string_no_port(netcode_address_t n) {
-	n.port = 0;
-	return ::ToString(n);
-}
-
-static std::string find_official_url(
-	const ip_to_host& map,
-	const netcode_address_t& ip
-) {
-	if (const auto host = mapped_or_nullptr(map, to_string_no_port(ip))) {
-		return typesafe_sprintf("%x:%x", *host, ip.port);
-	}
-
-	return "";
-}
-
-static ip_to_host resolve_all(
-	const std::vector<std::string>& official_hosts
-) {
-	LOG("Resolving all official servers.");
-
-	ip_to_host out;
-
-	for (const auto& host : official_hosts) {
-		if (auto result = hostname_to_netcode_address_t(host)) {
-			out[::to_string_no_port(*result)] = host;
-		}
-	}
-
-	return out;
-}
-
 static auto to_webrtc_alias(
 	const bool is_ranked,
 	std::string location_id,
@@ -144,32 +108,16 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	augs::timer since_launch;
 
-	augs::timer since_last_official_hosts_refresh;
-	std::future<ip_to_host> future_ip_to_host;
+	auto official_servers = official_servers_registry(settings.official_servers_dir);
+	augs::timer since_last_official_servers_reload;
 
-	const auto official_hosts = settings.official_hosts;
-	auto ip_noport_to_official = resolve_all(official_hosts);
+	LOG("Loaded %x official servers from %x.", official_servers.size(), settings.official_servers_dir);
 
-	auto keep_official_hosts_up_to_date = [&]() {
-		if (valid_and_is_ready(future_ip_to_host)) {
-			ip_noport_to_official = future_ip_to_host.get();
+	auto keep_official_servers_up_to_date = [&]() {
+		if (since_last_official_servers_reload.get<std::chrono::seconds>() >= 60.0) {
+			since_last_official_servers_reload.reset();
+			official_servers.reload();
 		}
-
-		if (since_last_official_hosts_refresh.get<std::chrono::hours>() >= 1.0) {
-			if (is_free_slot(future_ip_to_host)) {
-				since_last_official_hosts_refresh.reset();
-
-				future_ip_to_host = launch_async(
-					[official_hosts]() {
-						return resolve_all(official_hosts);
-					}
-				);
-			}
-		}
-	};
-
-	auto find_official_url = [&](const netcode_address_t& n) {
-		return ::find_official_url(ip_noport_to_official, n);
 	};
 
 	for (int i = 0; i < num_sockets; ++i) {
@@ -811,9 +759,21 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 					using R = remove_cref<decltype(typed_request)>;
 
 					if constexpr(std::is_same_v<R, masterserver_in::goodbye>) {
-						// TODO_SECURITY: has to include a ticket
-
 						if (const auto entry = mapped_or_nullptr(server_list, from)) {
+							/*
+								An official server can only be removed with its own signature,
+								otherwise a goodbye from a spoofed address could take it off the list.
+							*/
+
+							if (entry->meta.is_official_server()) {
+								const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ::ToString(from));
+
+								if (signer == nullptr) {
+									LOG("Ignoring an unauthenticated goodbye for the official server at %x.", ::ToString(from));
+									return;
+								}
+							}
+
 							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
 							remove_from_list(from);
 						}
@@ -830,6 +790,22 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						}
 
 						if (typed_request.is_valid()) {
+							const auto ip_str = ::ToString(from);
+							const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ip_str);
+
+							/*
+								Only the official server itself can update its entry,
+								otherwise a heartbeat from a spoofed address could rename it or change its ranked status.
+								A revoked or misconfigured official server thus times out and then gets listed as a community one.
+							*/
+
+							if (signer == nullptr) {
+								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
+									LOG("Ignoring an unauthenticated heartbeat from the official server at %x.", ip_str);
+									return;
+								}
+							}
+
 							auto it = server_list.try_emplace(from);
 
 							const bool is_new_server = it.second;
@@ -837,10 +813,23 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							const auto heartbeat_before = server_entry.last_heartbeat;
 							server_entry.last_heartbeat = typed_request;
+							server_entry.last_heartbeat.signature.reset();
 							server_entry.time_last_heartbeat = current_time;
-							server_entry.meta.official_url = find_official_url(from);
+							server_entry.official_server_id = signer != nullptr ? signer->server_id : std::string();
 
-							const auto ip_str = ::ToString(from);
+							server_entry.meta.official_url = [&]() -> std::string {
+								if (signer == nullptr) {
+									return "";
+								}
+
+								const auto& domain = typed_request.official_domain;
+
+								if (domain.empty()) {
+									return ip_str;
+								}
+
+								return typesafe_sprintf("%x:%x", std::string(domain), from.port);
+							}();
 
 							if (server_entry.meta.is_official_server()) {
 								const auto new_webrtc_alias = ::to_webrtc_alias(
@@ -939,7 +928,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			reserialize_list();
 		}
 
-		keep_official_hosts_up_to_date();
+		keep_official_servers_up_to_date();
 
 		signalling.send_signalling_packets(send_to_gameserver);
 		signalling.process_timeouts_if_its_time();
