@@ -110,6 +110,7 @@ class client_setup :
 
 	std::optional<std::string> steam_auth_identity_to_request;
 	bool steam_auth_identity_received = false;
+	bool server_requires_authentication = false;
 
 	bool now_resyncing = false;
 	bool schedule_disconnect = false;

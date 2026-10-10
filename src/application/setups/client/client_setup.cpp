@@ -3,6 +3,7 @@
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/maybe_different.h"
+#include "augs/misc/profanity_filter.h"
 
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
@@ -1344,6 +1345,16 @@ void client_setup::send_pending_auth_tickets() {
 		auto& ticket = *pending_steam_auth;
 
 		if (!ticket.successful()) {
+			/*
+				Where authentication is optional, it only goes without the badge.
+			*/
+
+			if (!server_requires_authentication) {
+				LOG("Couldn't authenticate Steam account. Error code: %x. Not required by the server.", ticket.result);
+				pending_steam_auth.reset();
+				return;
+			}
+
 			const auto reason = typesafe_sprintf(
 				"Couldn't authenticate Steam account.\nError code: %x",
 				ticket.result

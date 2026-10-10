@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <string>
 
 /*
@@ -14,6 +15,14 @@ inline const auto DEVELOPER_ACCOUNT_IDS = std::array<const char*, 2> {
 	"steam_76561198051900812",
 	"discord_231574084931026944"
 };
+
+inline bool is_developer_badge(std::string badge) {
+	std::transform(badge.begin(), badge.end(), badge.begin(), [](const unsigned char c) {
+		return static_cast<char>(std::toupper(c));
+	});
+
+	return badge == "DEV";
+}
 
 inline bool is_developer_account(const std::string& account_id) {
 	return std::any_of(DEVELOPER_ACCOUNT_IDS.begin(), DEVELOPER_ACCOUNT_IDS.end(), [&](const char* const id) {

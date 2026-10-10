@@ -7,7 +7,6 @@
 #include "augs/graphics/renderer.h"
 #include "augs/gui/text/printer.h"
 #include "augs/gui/text/rainbow_string.h"
-#include "augs/misc/profanity_filter.h"
 #include "augs/misc/date_time.h"
 #include "augs/drawing/drawing.h"
 #include "augs/string/format_enum.h"
@@ -471,7 +470,7 @@ void chat_gui_state::draw_recent_messages(
 		const auto badge_text = [&]() {
 			const bool hidden = streamer_mode && !entry.is_my_message;
 
-			if (entry.author_badge.empty() || entry.author.empty() || hidden || augs::has_profanity(entry.author_badge)) {
+			if (entry.author_badge.empty() || entry.author.empty() || hidden) {
 				return formatted_string();
 			}
 

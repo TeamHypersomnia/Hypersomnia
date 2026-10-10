@@ -160,6 +160,8 @@ namespace net_messages {
 		serialize_int(s, level, static_cast<int>(rcon_level_type::INTEGRATED_ONLY), static_cast<int>(rcon_level_type::MASTER));
 		c.rcon_level = static_cast<rcon_level_type>(level);
 
+		serialize_bool(s, c.requires_authentication);
+
 		return true;
 	}
 

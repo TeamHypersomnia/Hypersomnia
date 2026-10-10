@@ -1968,6 +1968,15 @@ void server_setup::finalize_webhook_jobs() {
 							break;
 						}
 
+						/*
+							Before the duplicates - the first one might still linger after being kicked.
+						*/
+
+						if (new_id == "publisherbanned") {
+							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
+							break;
+						}
+
 						if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
 							LOG(
 								"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
@@ -2011,10 +2020,6 @@ void server_setup::finalize_webhook_jobs() {
 							client->authenticated_id,
 							client->secs_since_connected(server_time)
 						);
-
-						if (client->authenticated_id == "publisherbanned") {
-							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
-						}
 
 						update_badges();
 
@@ -2682,6 +2687,18 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 	private_vars = private_new_vars;
 
 	if (old_vars.admin_profiles != private_vars.admin_profiles) {
+		for (const auto& entry : private_vars.admin_profiles) {
+			if (!::is_valid_admin_profile(entry)) {
+				auto joined = std::string();
+
+				for (const auto& field : entry) {
+					joined += "\"" + field + "\" ";
+				}
+
+				LOG("WARNING! Invalid admin profile: [ %x]. Expected: [ \"account id\", \"NONE\" | \"RCON\" | \"MASTER_RCON\", optional badge ].", joined);
+			}
+		}
+
 		update_badges();
 	}
 }
@@ -2713,14 +2730,30 @@ bool server_setup::can_verify_optional_auth(const auth_request_payload& payload)
 	otherwise ADMIN for the admin profiles.
 */
 
+/*
+	Not where the nicknames are the accounts - anyone could take the nickname of an admin.
+*/
+
+std::optional<admin_profile> server_setup::find_admin_profile_of(const std::string& account_id) const {
+	if (vars.authenticate_with_nicknames) {
+		return std::nullopt;
+	}
+
+	return ::find_admin_profile(private_vars.admin_profiles, account_id);
+}
+
 std::string server_setup::calc_badge(const std::string& account_id) const {
 	if (account_id.empty()) {
 		return "";
 	}
 
-	const auto profile = ::find_admin_profile(private_vars.admin_profiles, account_id);
+	const auto profile = find_admin_profile_of(account_id);
 
-	if (profile.has_value() && !profile->badge.empty()) {
+	/*
+		A custom badge can not pass for the one of the developers.
+	*/
+
+	if (profile.has_value() && !profile->badge.empty() && !::is_developer_badge(profile->badge)) {
 		return profile->badge;
 	}
 
@@ -2750,6 +2783,14 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 		return;
 	}
 
+	/*
+		Only the authentication changes it after the welcome - see update_badges.
+	*/
+
+	if (only_if_rcon_changed && !c.is_authenticated()) {
+		return;
+	}
+
 	const auto level = get_rcon_level(id);
 
 	if (only_if_rcon_changed && level == c.last_sent_rcon_level) {
@@ -2762,7 +2803,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 		id,
 		game_channel_type::RELIABLE_MESSAGES,
 
-		server_auth_state { c.auth_challenge, level }
+		server_auth_state { c.auth_challenge, level, vars.requires_authentication() }
 	);
 
 	/*
@@ -4837,7 +4878,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	*/
 
 	const auto profile_level = [&]() {
-		if (const auto profile = ::find_admin_profile(private_vars.admin_profiles, c.authenticated_id); profile.has_value()) {
+		if (const auto profile = find_admin_profile_of(c.authenticated_id); profile.has_value()) {
 			return profile->rcon_level;
 		}
 

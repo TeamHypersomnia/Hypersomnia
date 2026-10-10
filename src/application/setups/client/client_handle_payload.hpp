@@ -425,6 +425,14 @@ message_handler_result client_setup::handle_payload(
 		player_metas[payload.subject_id.value].synced = payload.new_meta;
 
 		/*
+			Filtered once here instead of with every drawing.
+		*/
+
+		if (auto& badge = player_metas[payload.subject_id.value].synced.badge; augs::has_profanity(std::string(badge))) {
+			badge = {};
+		}
+
+		/*
 			The predicted cosmos was predicted under the assumption of old metas.
 		*/
 
@@ -458,6 +466,7 @@ message_handler_result client_setup::handle_payload(
 	}
 	else if constexpr (std::is_same_v<T, server_auth_state>) {
 		client_gui.rcon.level = payload.rcon_level;
+		server_requires_authentication = payload.requires_authentication;
 
 		if (!steam_auth_identity_received && !payload.challenge.empty()) {
 			steam_auth_identity_received = true;

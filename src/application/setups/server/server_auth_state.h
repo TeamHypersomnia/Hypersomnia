@@ -4,7 +4,9 @@
 
 /*
 	A random string the server makes for every client - the identity it requests its Steam ticket for,
-	so that a ticket given to one server can not be replayed on another - see steam_request_auth_ticket.
+	so that a ticket given to one server can not be simply replayed on another - see steam_request_auth_ticket.
+	A server could still pass on the challenge of another server it is connected to,
+	so the tickets are only sent to the official servers.
 */
 
 using auth_challenge_type = augs::constant_size_string<32>;
@@ -17,4 +19,5 @@ using auth_challenge_type = augs::constant_size_string<32>;
 struct server_auth_state {
 	auth_challenge_type challenge;
 	rcon_level_type rcon_level = rcon_level_type::DENIED;
+	bool requires_authentication = false;
 };

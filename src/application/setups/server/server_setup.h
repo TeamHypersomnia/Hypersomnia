@@ -288,6 +288,7 @@ class server_setup :
 
 	std::string integrated_account_id;
 
+	std::optional<admin_profile> find_admin_profile_of(const std::string& account_id) const;
 	std::string calc_badge(const std::string& account_id) const;
 	void update_badges();
 	void send_auth_state(client_id_type, bool only_if_rcon_changed);

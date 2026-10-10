@@ -4,7 +4,6 @@
 #include "augs/gui/text/printer.h"
 #include "augs/gui/text/rainbow_string.h"
 #include "augs/misc/date_time.h"
-#include "augs/misc/profanity_filter.h"
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -405,13 +404,15 @@ void arena_scoreboard_gui::draw_gui(
 	*/
 
 	auto get_badge = [&](const mode_player_id id) {
-		if (in.player_metas == nullptr) {
+		const bool hidden = streamer_mode && id != draw_in.local_player_id;
+
+		if (in.player_metas == nullptr || hidden) {
 			return std::string("");
 		}
 
 		const auto result = std::string((*in.player_metas)[id.value].synced.badge);
 
-		if (result.empty() || augs::has_profanity(result)) {
+		if (result.empty()) {
 			return std::string("");
 		}
 
@@ -921,7 +922,7 @@ void arena_scoreboard_gui::draw_gui(
 				clan = "[BOT]";
 			}
 
-			const auto badge = player_data.is_bot ? std::string("") : get_badge(player_id);
+			const auto badge = get_badge(player_id);
 
 			if (clan.empty() && badge.empty() && in.player_metas) {
 				clan = (*in.player_metas)[player_id.value].synced.public_settings.clan;

@@ -2332,12 +2332,7 @@ work_result work(
 		});
 
 #if PLATFORM_WEB
-		/*
-			Official servers also get the auth of a signed in player when they don't require it - for the badges and the admin profiles.
-			Never the others - it is an access token to the account.
-		*/
-
-		const bool send_auth = requires_sign_in || (is_official_connect_string && is_signed_in() && !is_auth_expired());
+		const bool send_auth = requires_sign_in;
 
 		if (send_auth) {
 			/*
@@ -3247,10 +3242,18 @@ work_result work(
 		steam_events.clear();
 
 		/*
-			The ticket is requested for the challenge of the server - see server_auth_state.
+			The ticket is requested for the challenge of the server - see server_auth_state -
+			and only for the official servers: any other could pass on the challenge of another server
+			it is connected to, and replay the ticket there.
+			Waits until the server list tells if the server is official.
 		*/
 
-		if (is_steam_client) {
+		const bool connected_to_official = [&]() {
+			const auto found = find_chosen_server_info();
+			return found != nullptr && found->is_official_server();
+		}();
+
+		if (is_steam_client && connected_to_official) {
 			visit_current_setup([&](auto& setup) {
 				using T = remove_cref<decltype(setup)>;
 

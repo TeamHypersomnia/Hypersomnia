@@ -26,6 +26,14 @@ struct admin_profile {
 	std::string badge;
 };
 
+inline bool is_valid_rcon_level_name(const std::string& level) {
+	return level == "NONE" || level == "RCON" || level == "MASTER_RCON";
+}
+
+inline bool is_valid_admin_profile(const std::vector<std::string>& entry) {
+	return entry.size() >= 2 && entry.size() <= 3 && !entry[0].empty() && ::is_valid_rcon_level_name(entry[1]);
+}
+
 inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type& profiles, const std::string& account_id) {
 	if (account_id.empty()) {
 		return std::nullopt;
