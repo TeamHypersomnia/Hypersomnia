@@ -4008,6 +4008,25 @@ work_result work(
 			return std::nullopt;
 		});
 
+		const auto default_zoom_override = visit_current_setup([&]<typename S>(S& setup) -> std::optional<float> {
+			if constexpr(S::has_game_mode) {
+				return setup.on_mode_with_input(
+					[&]<typename M>(const M& typed_mode, const auto&) -> std::optional<float> {
+						if constexpr(std::is_same_v<M, arena_mode>) {
+							return typed_mode.get_zoom_override();
+						}
+						else {
+							(void)typed_mode;
+							return std::nullopt;
+						}
+					}
+				);
+			}
+			else {
+				return std::nullopt;
+			}
+		});
+
 		gameplay_camera.tick(
 			screen_size,
 			nonzoomedout_area,
@@ -4018,6 +4037,7 @@ work_result work(
 			calc_pre_step_crosshair_displacement(viewing_config),
 			get_current_input_settings(viewing_config),
 			is_buy_time_active(),
+			default_zoom_override,
 			forced_area_zoom
 		);
 

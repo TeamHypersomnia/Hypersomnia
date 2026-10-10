@@ -26,9 +26,13 @@ struct bot_difficulty_request {
 	}
 };
 
-struct speed_request {
+/*
+	A multiplier requested by a player with a chat command - /speed, /bspeed or /zoom.
+*/
+
+struct mult_request {
 	mode_player_id requester;
-	real32 speed = 1.f;
+	real32 value = 1.f;
 
 	bool is_set() const {
 		return requester.is_set();
@@ -44,6 +48,9 @@ struct synced_dynamic_vars {
 	bool all_authenticated = false;
 	bool all_not_banned = false;
 	bool friendly_fire = false;
+	bool freeze_time = true;
+	augs::maybe<real32> zoom_override;
+	bool apply_zoom_immediately = false;
 	bool force_short_match = false;
 	bool allow_overtime = false;
 	bool shutdown_after_one_match = false;

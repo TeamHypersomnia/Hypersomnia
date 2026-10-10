@@ -56,7 +56,8 @@
 #include "application/setups/editor/editor_paths.h"
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/logic_speed.h"
-#include "view/format_logic_speed.h"
+#include "game/modes/zoom_override.h"
+#include "view/format_multiplier.h"
 #include "game/messages/mode_notification.h"
 #include "augs/misc/httplib_utils.h"
 #include "application/gui/client/chat_gui_entry.hpp"
@@ -2707,6 +2708,15 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	}
 
 	out.friendly_fire = vars.get_friendly_fire();
+	out.freeze_time = vars.freeze_time;
+	out.zoom_override = vars.zoom_override;
+
+	if (overrides.zoom.is_set()) {
+		out.zoom_override = augs::maybe<real32>::enabled(overrides.zoom.value);
+	}
+
+	out.zoom_override.value = ::sanitize_zoom_override(out.zoom_override.value);
+	out.apply_zoom_immediately = apply_zoom_immediately;
 	out.ranked = vars.ranked;
 
 	out.force_short_match = has_browser_clients_playing;
@@ -2733,7 +2743,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.bot_override_difficulty = overrides.bot_difficulty.difficulty;
 	}
 
-	out.logic_speed = ::sanitize_logic_speed(overrides.speed.is_set() ? overrides.speed.speed : vars.game_speed);
+	out.logic_speed = ::sanitize_logic_speed(overrides.speed.is_set() ? overrides.speed.value : vars.game_speed);
 
 	/*
 		Unless set, the bullet speed follows the game speed, including the one requested with /speed.
@@ -2741,7 +2751,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	out.bullet_speed = ::sanitize_logic_speed(
 		overrides.bullet_speed.is_set() ?
-		overrides.bullet_speed.speed :
+		overrides.bullet_speed.value :
 		vars.calc_bullet_speed(out.logic_speed)
 	);
 	out.apply_logic_speed_immediately = apply_speed_immediately;
@@ -2839,6 +2849,11 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	if (!first_time && vars.bullet_speed != new_bullet_speed) {
 		overrides.bullet_speed = {};
 		apply_speed_immediately = can_apply_immediately;
+	}
+
+	if (!first_time && vars.zoom_override != new_vars.zoom_override) {
+		overrides.zoom = {};
+		apply_zoom_immediately = can_apply_immediately;
 	}
 
 	vars = new_vars;
@@ -3918,27 +3933,47 @@ void server_setup::rebroadcast_synced_dynamic_vars() {
 	}
 
 	/*
-		Once a ranked match starts, the speeds agreed upon in warmup are locked in,
+		Once a ranked match starts, the speeds and the zoom agreed upon in warmup are locked in,
 		even if their requester leaves. In warmup, they revert like on casual servers.
 	*/
 
-	const bool keep_speeds_after_requester_leaves = is_ranked_live_or_starting();
+	const bool keep_mults_after_requester_leaves = is_ranked_live_or_starting();
 
-	auto revert_if_requester_left = [&](speed_request& request, const std::string& what_reverted, auto get_new_speed) {
-		if (keep_speeds_after_requester_leaves || !request.requester.is_set()) {
+	auto revert_if_requester_left = [&](mult_request& request, bool& apply_immediately, const std::string& what_reverted, auto get_new_value) {
+		if (keep_mults_after_requester_leaves || !request.requester.is_set()) {
 			return;
 		}
 
 		if (const bool disconnected_already = !get_client_state(request.requester).is_set()) {
 			request = {};
-			apply_speed_immediately = false;
+			apply_immediately = false;
 
-			broadcast_speed_adjusted(what_reverted, get_new_speed(make_synced_dynamic_vars()));
+			broadcast_mult_adjusted(what_reverted, get_new_value());
 		}
 	};
 
-	revert_if_requester_left(overrides.speed, "Speed reverted", [](const auto& v) { return v.logic_speed; });
-	revert_if_requester_left(overrides.bullet_speed, "Bullet speed reverted", [](const auto& v) { return v.bullet_speed; });
+	revert_if_requester_left(overrides.speed, apply_speed_immediately, "Speed reverted", [&]() { return make_synced_dynamic_vars().logic_speed; });
+	revert_if_requester_left(overrides.bullet_speed, apply_speed_immediately, "Bullet speed reverted", [&]() { return make_synced_dynamic_vars().bullet_speed; });
+	revert_if_requester_left(overrides.zoom, apply_zoom_immediately, "Zoom reverted", [&]() { return calc_effective_zoom(); });
+
+	if (apply_zoom_immediately) {
+		const bool already_applied = get_arena_handle().on_mode_with_input(
+			[&](const auto& mode, const auto&) {
+				using M = remove_cref<decltype(mode)>;
+
+				if constexpr(std::is_same_v<M, arena_mode>) {
+					return mode.get_applied_zoom_override() == current_dynamic_vars.zoom_override;
+				}
+				else {
+					return true;
+				}
+			}
+		);
+
+		if (already_applied) {
+			apply_zoom_immediately = false;
+		}
+	}
 
 	if (apply_speed_immediately) {
 		const auto& clk = scene.world.get_clock();
@@ -5244,7 +5279,7 @@ difficulty_type server_setup::calc_current_bot_difficulty() const {
 	"/speed 0.8" -> "0.8", "/speed" -> "".
 */
 
-static std::string trim_speed_command_argument(const std::string& message, const std::string& command) {
+static std::string trim_command_argument(const std::string& message, const std::string& command) {
 	const auto first = message.find_first_not_of(' ', command.size());
 
 	if (first == std::string::npos) {
@@ -5261,7 +5296,7 @@ static std::string trim_speed_command_argument(const std::string& message, const
 	The result still has to be sanitized into the allowed range.
 */
 
-static std::optional<real32> parse_requested_speed(std::string argument) {
+static std::optional<real32> parse_requested_mult(std::string argument) {
 	if (!argument.empty() && (argument.back() == 'x' || argument.back() == 'X')) {
 		argument.pop_back();
 	}
@@ -5286,7 +5321,21 @@ static std::optional<real32> parse_requested_speed(std::string argument) {
 	return value;
 }
 
-void server_setup::broadcast_speed_adjusted(const std::string& what_happened, const real32 new_speed) {
+/*
+	The zoom the players get - the map's default unless overridden.
+*/
+
+real32 server_setup::calc_effective_zoom() const {
+	const auto dynamic_vars = make_synced_dynamic_vars();
+
+	if (dynamic_vars.zoom_override.is_enabled) {
+		return dynamic_vars.zoom_override.value;
+	}
+
+	return scene.world.get_common_significant().default_zoom;
+}
+
+void server_setup::broadcast_mult_adjusted(const std::string& what_happened, const real32 new_value) {
 	const bool applies_now = get_arena_handle().on_mode_with_input(
 		[&](const auto& mode, const auto& in) {
 			using M = remove_cref<decltype(mode)>;
@@ -5303,7 +5352,7 @@ void server_setup::broadcast_speed_adjusted(const std::string& what_happened, co
 	const auto message = typesafe_sprintf(
 		"%x to %x%x",
 		what_happened,
-		::format_logic_speed(new_speed),
+		::format_multiplier(new_value),
 		applies_now ? "." : " from the next round."
 	);
 
@@ -5521,13 +5570,29 @@ void server_setup::handle_client_chat_command(
 				}
 			}
 		}
-		else if (begins_with(chat.message, "/speed") || begins_with(chat.message, "/bspeed")) {
+		else if (begins_with(chat.message, "/speed") || begins_with(chat.message, "/bspeed") || begins_with(chat.message, "/zoom")) {
+			const bool zoom = begins_with(chat.message, "/zoom");
 			const bool bullets = begins_with(chat.message, "/bspeed");
-			const auto command = std::string(bullets ? "/bspeed" : "/speed");
-			const auto label = std::string(bullets ? "Bullet speed" : "Speed");
-			auto& request = bullets ? overrides.bullet_speed : overrides.speed;
 
-			auto get_effective_speed = [&]() {
+			const auto command = std::string(zoom ? "/zoom" : bullets ? "/bspeed" : "/speed");
+			const auto label = std::string(zoom ? "Zoom" : bullets ? "Bullet speed" : "Speed");
+			const auto example = std::string(zoom ? "0.9" : "0.8");
+
+			auto& request = zoom ? overrides.zoom : bullets ? overrides.bullet_speed : overrides.speed;
+			auto& apply_immediately = zoom ? apply_zoom_immediately : apply_speed_immediately;
+
+			const auto min_value = zoom ? min_zoom_override_v : min_logic_speed_v;
+			const auto max_value = zoom ? max_zoom_override_v : max_logic_speed_v;
+
+			auto sanitize = [zoom](const real32 value) {
+				return zoom ? ::sanitize_zoom_override(value) : ::sanitize_logic_speed(value);
+			};
+
+			auto get_effective_value = [&]() {
+				if (zoom) {
+					return calc_effective_zoom();
+				}
+
 				const auto dynamic_vars = make_synced_dynamic_vars();
 				return bullets ? dynamic_vars.bullet_speed : dynamic_vars.logic_speed;
 			};
@@ -5537,61 +5602,64 @@ void server_setup::handle_client_chat_command(
 				return;
 			}
 
-			if (!vars.get_allow_setting_speed()) {
-				broadcast_info("Changing speed is disabled on this server.", chat_target_type::INFO_CRITICAL);
+			const bool allowed = zoom ? vars.get_allow_setting_zoom() : vars.get_allow_setting_speed();
+
+			if (!allowed) {
+				broadcast_info(typesafe_sprintf("Changing %x is disabled on this server.", zoom ? "zoom" : "speed"), chat_target_type::INFO_CRITICAL);
 				return;
 			}
 
 			/*
 				A bare command resets to the server's setting -
-				for the bullet speed, that's usually following the game speed.
+				for the bullet speed, that's usually following the game speed, for the zoom - the map's default.
 			*/
 
-			const auto argument = ::trim_speed_command_argument(chat.message, command);
+			const auto argument = ::trim_command_argument(chat.message, command);
 			const bool reset_to_default = argument.empty();
-			const auto requested_speed = ::parse_requested_speed(argument);
+			const auto requested_value = ::parse_requested_mult(argument);
 
-			if (!reset_to_default && !requested_speed.has_value()) {
-				broadcast_info(typesafe_sprintf("Wrong command format. Example: %x 0.8", command), chat_target_type::INFO_CRITICAL);
+			if (!reset_to_default && !requested_value.has_value()) {
+				broadcast_info(typesafe_sprintf("Wrong command format. Example: %x %x", command, example), chat_target_type::INFO_CRITICAL);
 				return;
 			}
 
 			const bool out_of_range =
-				requested_speed.has_value()
-				&& (*requested_speed < min_logic_speed_v || *requested_speed > max_logic_speed_v)
+				requested_value.has_value()
+				&& (*requested_value < min_value || *requested_value > max_value)
 			;
 
 			if (out_of_range) {
 				broadcast_info(
 					typesafe_sprintf(
-						"Allowed speeds: %x - %x.",
-						::format_logic_speed(min_logic_speed_v),
-						::format_logic_speed(max_logic_speed_v)
+						"Allowed %x: %x - %x.",
+						zoom ? "zooms" : "speeds",
+						::format_multiplier(min_value),
+						::format_multiplier(max_value)
 					),
 					chat_target_type::INFO
 				);
 			}
 
-			const auto previous_speed = get_effective_speed();
+			const auto previous_value = get_effective_value();
 
 			if (reset_to_default) {
 				request = {};
 			}
 			else {
 				request.requester = to_mode_player_id(id);
-				request.speed = ::sanitize_logic_speed(*requested_speed);
+				request.value = sanitize(*requested_value);
 			}
 
-			apply_speed_immediately = false;
+			apply_immediately = false;
 
-			const auto new_speed = get_effective_speed();
+			const auto new_value = get_effective_value();
 
-			if (new_speed == previous_speed) {
-				broadcast_info(typesafe_sprintf("%x is already %x.", label, ::format_logic_speed(previous_speed)), chat_target_type::INFO);
+			if (new_value == previous_value) {
+				broadcast_info(typesafe_sprintf("%x is already %x.", label, ::format_multiplier(previous_value)), chat_target_type::INFO);
 				return;
 			}
 
-			broadcast_speed_adjusted(label + (reset_to_default ? " reset" : " changed"), new_speed);
+			broadcast_mult_adjusted(label + (reset_to_default ? " reset" : " changed"), new_value);
 		}
 		else if (chat.message == "/next") {
 			if (!can_use_map_command_now()) {

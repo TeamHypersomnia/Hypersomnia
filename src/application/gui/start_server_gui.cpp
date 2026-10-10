@@ -163,7 +163,9 @@ as well as to test your skills in a laggy environment.
 
 		::do_bullet_speed_tooltip();
 
-		text_disabled("Sending \"/speed 0.7\" or \"/bspeed 1\" in chat changes the speeds.");
+		::do_zoom_slider("Zoom", into_vars.zoom_override);
+
+		text_disabled("Sending \"/speed 0.7\", \"/bspeed 1\" or \"/zoom 0.9\" in chat changes them.");
 
 		{
 			auto scope = scoped_text_color(new_feature_color);
@@ -189,6 +191,7 @@ as well as to test your skills in a laggy environment.
 		}
 
 		checkbox("Friendly fire", into_vars.friendly_fire);
+		checkbox("Freeze time", into_vars.freeze_time);
 
 		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");

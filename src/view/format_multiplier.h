@@ -7,8 +7,8 @@
 	At least one and at most two decimal places, e.g. "1.0x", "0.8x", "0.75x".
 */
 
-inline std::string format_logic_speed(const real32 speed) {
-	auto result = typesafe_sprintf("%2f", speed);
+inline std::string format_multiplier(const real32 mult) {
+	auto result = typesafe_sprintf("%2f", mult);
 
 	if (result.size() > 1 && result.back() == '0') {
 		result.pop_back();

@@ -215,6 +215,8 @@ struct arena_mode_round_state {
 	// GEN INTROSPECTOR struct arena_mode_round_state
 	bool cache_players_frozen = false;
 	bool skip_freeze_time = false;
+	bool freeze_time_disabled = false;
+	augs::maybe<real32> zoom_override;
 	arena_mode_win last_win;
 	arena_mode_knockouts_vector knockouts;
 	mode_player_id bomb_planter;
@@ -380,6 +382,7 @@ private:
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS, setup_next_round_params = {});
 	void setup_round(input, logic_step, const round_transferred_players&, setup_next_round_params = {});
 	void update_logic_speed(input);
+	void update_round_settings(input);
 
 	void reshuffle_spawns(const cosmos&, arena_mode_faction_state&);
 
@@ -553,6 +556,11 @@ public:
 	float get_match_summary_seconds_left(const_input) const;
 	float get_round_end_seconds_left(const_input) const;
 	float get_buy_seconds_left(const_input) const;
+	std::optional<real32> get_zoom_override() const;
+
+	const auto& get_applied_zoom_override() const {
+		return current_round.zoom_override;
+	}
 
 	real32 get_critical_seconds_left(const_input) const;
 	float get_seconds_since_planting(const_input) const;
@@ -602,6 +610,7 @@ public:
 		settings.friendly_fire = in.rules.is_ffa() ? true : in.dynamic_vars.friendly_fire;
 
 		update_logic_speed(in);
+		update_round_settings(in);
 
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 

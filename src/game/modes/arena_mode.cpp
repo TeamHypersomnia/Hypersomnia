@@ -1,5 +1,8 @@
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
+#include <algorithm>
+#include <optional>
 #include "augs/log.h"
 #include "augs/ensure_rel.h"
 #include "game/cosmos/solvers/standard_solver.h"
@@ -77,6 +80,7 @@ using const_input_type = arena_mode::const_input;
 
 #include "game/modes/arena_mode_casual_levels.hpp"
 #include "game/modes/logic_speed.h"
+#include "game/modes/zoom_override.h"
 
 int arena_mode_player_stats::calc_score() const {
 	return 
@@ -1181,9 +1185,23 @@ void arena_mode::setup_round(
 		remove_all_dropped_items(cosm);
 	}
 
+	const auto previous_zoom_override = current_round.zoom_override;
+	const bool previous_freeze_time_disabled = current_round.freeze_time_disabled;
+
 	current_round = {};
 
-	if (params.skip_freeze_time) {
+	/*
+		Disabling the freeze time in server vars applies only from the next round,
+		so the timers of the current one never jump.
+		A live ranked match keeps the freeze time and the zoom it started with, just like the speeds.
+	*/
+
+	const bool keep_match_settings = is_ranked_live();
+
+	current_round.freeze_time_disabled = keep_match_settings ? previous_freeze_time_disabled : !in.dynamic_vars.freeze_time;
+	current_round.zoom_override = keep_match_settings ? previous_zoom_override : in.dynamic_vars.zoom_override;
+
+	if (params.skip_freeze_time || current_round.freeze_time_disabled) {
 		current_round.skip_freeze_time = true;
 	}
 
@@ -4546,6 +4564,46 @@ void arena_mode::update_logic_speed(const input_type in) {
 	};
 
 	::apply_requested_logic_speed(in.cosm, in.dynamic_vars.logic_speed, in.dynamic_vars.bullet_speed, can_change_now);
+}
+
+void arena_mode::update_round_settings(const input_type in) {
+	/*
+		The settings setup_round applies at the start of every round,
+		except during a live ranked match, which keeps the ones it started with.
+
+		The match starts with the freeze time set at the end of the warmup.
+
+		The zoom decides how much of the map the players see,
+		so one requested with /zoom applies right away only in warmup and freeze time,
+		administrative changes - always right away.
+	*/
+
+	if (is_ranked_live()) {
+		return;
+	}
+
+	if (state == arena_mode_state::WARMUP) {
+		current_round.freeze_time_disabled = !in.dynamic_vars.freeze_time;
+	}
+
+	if (in.dynamic_vars.apply_zoom_immediately || is_logic_speed_change_unnoticeable(in)) {
+		current_round.zoom_override = in.dynamic_vars.zoom_override;
+	}
+}
+
+/*
+	Overrides the map's default zoom, not the camera zoom areas.
+	Sanitized, as it comes from the server.
+*/
+
+std::optional<real32> arena_mode::get_zoom_override() const {
+	const auto& zoom = current_round.zoom_override;
+
+	if (!zoom.is_enabled) {
+		return std::nullopt;
+	}
+
+	return ::sanitize_zoom_override(zoom.value);
 }
 
 float arena_mode::get_seconds_passed_in_cosmos(const const_input_type in) const {

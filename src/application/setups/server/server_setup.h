@@ -239,6 +239,7 @@ class server_setup :
 	*/
 
 	bool apply_speed_immediately = false;
+	bool apply_zoom_immediately = false;
 
 	enum class job_type {
 		AVATAR,
@@ -903,7 +904,8 @@ public:
 
 	difficulty_type calc_current_bot_difficulty() const;
 	void broadcast_bots_adjusted(const mode_player_id& requester);
-	void broadcast_speed_adjusted(const std::string& what_happened, real32 new_speed);
+	void broadcast_mult_adjusted(const std::string& what_happened, real32 new_value);
+	real32 calc_effective_zoom() const;
 
 	void choose_next_map_from_cycle();
 	bool is_idle() const;

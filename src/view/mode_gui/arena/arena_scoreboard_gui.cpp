@@ -8,7 +8,7 @@
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/casual_level_logic.h"
 #include "game/modes/test_mode.h"
-#include "view/format_logic_speed.h"
+#include "view/format_multiplier.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_json_table.h"
@@ -261,10 +261,10 @@ void arena_scoreboard_gui::draw_gui(
 		const auto& clk = mode_input.cosm.get_clock();
 
 		const auto speed_caption = [&]() {
-			auto result = "   Speed: " + ::format_logic_speed(clk.logic_speed);
+			auto result = "   Speed: " + ::format_multiplier(clk.logic_speed);
 
 			if (clk.bullet_speed != clk.logic_speed) {
-				result += ", bullets: " + ::format_logic_speed(clk.bullet_speed);
+				result += ", bullets: " + ::format_multiplier(clk.bullet_speed);
 			}
 
 			return result;

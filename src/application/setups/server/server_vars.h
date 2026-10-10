@@ -12,6 +12,7 @@
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/difficulty_type.h"
 #include "game/modes/bot_quota.h"
+#include "game/balance_params.h"
 
 namespace augs { struct introspection_access; }
 class start_server_gui_state;
@@ -84,6 +85,7 @@ struct server_ranked_overrides_vars {
 	bool friendly_fire = true;
 	float client_network_timeout_secs = 1.0f;
 	bool allow_setting_speed = true;
+	bool allow_setting_zoom = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_overrides_vars&) const = default;
@@ -131,7 +133,7 @@ struct server_vars {
 	/*
 		Fields marked private in the GEN INTROSPECTOR block below are overridable
 		in ranked mode via ranked.overrides.*. Read them via getters
-		(get_friendly_fire / get_client_network_timeout_secs / get_allow_setting_speed) so the right value
+		(get_friendly_fire / get_client_network_timeout_secs / get_allow_setting_speed / get_allow_setting_zoom) so the right value
 		is picked depending on the server mode. Direct write access is granted
 		only to introspection and the settings GUIs.
 	*/
@@ -145,12 +147,15 @@ struct server_vars {
 private:
 	bool friendly_fire = false;
 public:
+	bool freeze_time = true;
 	bool bots = true;
 
 	real32 game_speed = 0.75f;
 	augs::maybe<real32> bullet_speed = augs::maybe<real32>::disabled(1.f);
+	augs::maybe<real32> zoom_override = augs::maybe<real32>::disabled(BALANCE_ZOOM_OUT);
 private:
 	bool allow_setting_speed = true;
+	bool allow_setting_zoom = true;
 public:
 	difficulty_type bot_difficulty = difficulty_type::PROGRESSIVE;
 	bot_quota bot_quota;
@@ -256,6 +261,14 @@ public:
 		}
 
 		return allow_setting_speed;
+	}
+
+	bool get_allow_setting_zoom() const {
+		if (ranked.is_ranked_server()) {
+			return ranked.overrides.allow_setting_zoom;
+		}
+
+		return allow_setting_zoom;
 	}
 
 	bool get_friendly_fire() const {

@@ -50,7 +50,7 @@ struct world_camera {
 
 	/*
 		Multiplier applied on top of the final zoom.
-		Defaults to the map's default_zoom; driven by camera_zoom
+		Defaults to the map's default_zoom (or the server's override); driven by camera_zoom
 		area markers, queried once per logic step.
 	*/
 
@@ -71,6 +71,7 @@ struct world_camera {
 		const vec2 mid_step_crosshair_displacement,
 		const input_settings& input_cfg,
 		bool during_buy_time,
+		std::optional<float> default_zoom_override,
 		std::optional<float> forced_area_zoom
 	);
 

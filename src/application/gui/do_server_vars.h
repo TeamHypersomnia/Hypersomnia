@@ -20,6 +20,14 @@ bool do_bullet_speed_slider(
 );
 
 /*
+	Unset, the zoom follows the map's default - moving the slider sets it,
+	the "Map default" button next to it unsets it again.
+	Returns true if changed.
+*/
+
+bool do_zoom_slider(const char* label, augs::maybe<real32>& zoom);
+
+/*
 	Call right after the respective slider.
 */
 

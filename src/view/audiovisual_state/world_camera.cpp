@@ -106,6 +106,7 @@ void world_camera::tick(
 	const vec2 mid_step_crosshair_displacement,
 	const input_settings& input_cfg,
 	const bool during_buy_time,
+	const std::optional<float> default_zoom_override,
 	const std::optional<float> forced_area_zoom
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
@@ -355,11 +356,12 @@ void world_camera::tick(
 			last_area_zoom_query_step = current_step;
 
 			/*
-				The map-wide default applies wherever no camera zoom area
-				covers the player. Sanitize, as these values come from
-				arbitrary map files.
+				The map-wide default - unless the server overrides it - applies
+				wherever no camera zoom area covers the player.
+				Sanitize, as these values come from arbitrary map files.
 			*/
-			target_area_zoom_mult = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+			const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : cosm.get_common_significant().default_zoom;
+			target_area_zoom_mult = std::clamp(default_zoom, 0.2f, 4.0f);
 
 			if (forced_area_zoom.has_value()) {
 				/* E.g. chosen with the zoom pads at the shooting range. */

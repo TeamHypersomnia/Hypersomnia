@@ -25,6 +25,7 @@
 #include "augs/window_framework/window.h"
 
 #include "game/modes/logic_speed.h"
+#include "game/modes/zoom_override.h"
 #include "view/necessary_resources.h"
 
 #include "application/config_json_table.h"
@@ -2731,6 +2732,40 @@ bool do_bullet_speed_slider(
 	return moved;
 }
 
+bool do_zoom_slider(const char* const label, augs::maybe<real32>& zoom) {
+	using namespace augs::imgui;
+
+	/*
+		Unset, the slider rests at the far left.
+	*/
+
+	auto shown_zoom = zoom.is_enabled ? zoom.value : min_zoom_override_v;
+	const bool moved = slider(label, shown_zoom, min_zoom_override_v, max_zoom_override_v, zoom.is_enabled ? "%.2fx" : "Map default");
+
+	if (moved) {
+		zoom = augs::maybe<real32>::enabled(::sanitize_zoom_override(shown_zoom));
+	}
+
+	tooltip_on_hover(
+		"Overrides the map's default zoom - the camera zoom areas still apply.\n"
+		"Less shows more of the map.\n"
+		"Changed here, applies right away - a live ranked match keeps its zoom until it ends.\n\n"
+		"Type \"/zoom 0.9\" to adjust in-game -\n"
+		"applies right away in warmup and freeze time, otherwise from the next round."
+	);
+
+	if (zoom.is_enabled) {
+		ImGui::SameLine();
+
+		if (ImGui::SmallButton((std::string("Map default##") + label).c_str())) {
+			zoom.is_enabled = false;
+			return true;
+		}
+	}
+
+	return moved;
+}
+
 void do_game_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
 		"Slows down the entire game:\n"
@@ -2898,8 +2933,14 @@ void do_server_vars_section(
 			::do_bullet_speed_tooltip();
 			revert(vars.bullet_speed);
 
+			::do_zoom_slider("Zoom", vars.zoom_override);
+			revert(vars.zoom_override);
+
 			revertable_checkbox("Allow /speed command", vars.allow_setting_speed);
+			revertable_checkbox("Allow /zoom command", vars.allow_setting_zoom);
 			revertable_checkbox("Friendly fire", vars.friendly_fire);
+			revertable_checkbox("Freeze time", vars.freeze_time);
+			tooltip_on_hover("Disabled, rounds start right away, without the freeze time.\nApplies from the next round - a live ranked match keeps its freeze time until it ends.");
 
 			revertable_checkbox("Allow overtime", vars.allow_overtime);
 			tooltip_on_hover("A tie at (max team score - 1) each plays out into overtime\nuntil one team leads by two rounds (e.g. 17:15, then 18:16...).");
@@ -2974,6 +3015,7 @@ void do_server_vars_section(
 				auto indent = scoped_indent();
 
 				revertable_checkbox("Allow /speed command##ranked", vars.ranked.overrides.allow_setting_speed);
+				revertable_checkbox("Allow /zoom command##ranked", vars.ranked.overrides.allow_setting_zoom);
 				revertable_checkbox("Friendly fire##ranked", vars.ranked.overrides.friendly_fire);
 				revertable_slider("Client network timeout secs##ranked", scope_cfg.ranked.overrides.client_network_timeout_secs, 0.2f, 10.0f);
 			}
