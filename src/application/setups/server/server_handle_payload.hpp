@@ -37,7 +37,12 @@ message_handler_result server_setup::handle_payload(
 			return abort_v;
 		}
 
-		if (!vars.requires_authentication()) {
+		/*
+			Where authentication is not required, it is still verified if possible -
+			only for the badges and the admin profiles, without kicking anyone over it.
+		*/
+
+		if (!vars.requires_authentication() && !can_verify_optional_auth(payload)) {
 			return continue_v;
 		}
 
@@ -131,6 +136,12 @@ message_handler_result server_setup::handle_payload(
 		if (c.state == S::PENDING_WELCOME) {
 			LOG("Client %x requested nickname: %x", client_id, c.get_nickname());
 			c.state = S::WELCOME_ARRIVED;
+
+			/*
+				Right away, so that the client authenticates in the background while it downloads the arena.
+			*/
+
+			send_auth_state(client_id, false);
 
 #if !PLATFORM_WEB
 			if (vars.authenticate_with_nicknames) {

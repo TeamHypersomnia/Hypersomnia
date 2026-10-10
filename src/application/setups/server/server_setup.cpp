@@ -4,6 +4,8 @@
 #include <cmath>
 #include <algorithm>
 #include <optional>
+#include <random>
+#include <array>
 #include <string>
 #include "augs/misc/date_time.h"
 #include "augs/misc/pool/pool_io.hpp"
@@ -14,6 +16,7 @@
 
 #include "application/setups/server/server_setup.h"
 #include "application/config_json_table.h"
+#include "developer_keys.h"
 
 #include "application/network/server_adapter.hpp"
 
@@ -1059,12 +1062,13 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 		const auto api_key = private_vars.steam_web_api_key;
 		const auto& ticket = payload.ticket_bytes;
 		const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
+		const auto identity = std::string(get_client_state(player_id).auth_challenge);
 
 		push_auth_job(
 			player_id,
 
-			[api_key, ticket_hex]() {
-				const auto result = verify_steam_token(api_key, ticket_hex);
+			[api_key, ticket_hex, identity]() {
+				const auto result = verify_steam_token(api_key, ticket_hex, identity);
 
 				if (result.empty() || result == "publisherbanned") {
 					return result;
@@ -1944,6 +1948,12 @@ void server_setup::finalize_webhook_jobs() {
 						}
 #endif
 
+						/*
+							Where authentication is optional, a failure or a duplicate only leaves the client unauthenticated.
+						*/
+
+						const bool required = vars.requires_authentication();
+
 						if (new_id.empty()) {
 							LOG(
 								"Failed to authenticate \"%x\". There was a problem with authentication endpoint. Took %x secs.", 
@@ -1951,7 +1961,10 @@ void server_setup::finalize_webhook_jobs() {
 								client->secs_since_connected(server_time)
 							);
 
-							kick(to_client_id(webhook_job.player_id), "Authentication failure. Try again.");
+							if (required) {
+								kick(to_client_id(webhook_job.player_id), "Authentication failure. Try again.");
+							}
+
 							break;
 						}
 
@@ -1962,6 +1975,10 @@ void server_setup::finalize_webhook_jobs() {
 								new_id,
 								client->secs_since_connected(server_time)
 							);
+
+							if (!required) {
+								break;
+							}
 
 							auto duplicate_message = std::string("Duplicate client.");
 
@@ -1998,6 +2015,8 @@ void server_setup::finalize_webhook_jobs() {
 						if (client->authenticated_id == "publisherbanned") {
 							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
 						}
+
+						update_badges();
 
 						if (private_vars.check_ban_url.empty()) {
 							client->verified_has_no_ban = true;
@@ -2661,6 +2680,139 @@ void server_setup::customize_for_viewing(config_json_table& config) const {
 void server_setup::apply(const server_private_vars& private_new_vars) {
 	const auto old_vars = private_vars;
 	private_vars = private_new_vars;
+
+	if (old_vars.admin_profiles != private_vars.admin_profiles) {
+		update_badges();
+	}
+}
+
+/*
+	Optional authentication is verified only with what the server has -
+	Steam needs the Web API key - and never where the nicknames are the accounts.
+*/
+
+bool server_setup::can_verify_optional_auth(const auth_request_payload& payload) const {
+#if PLATFORM_WEB
+	(void)payload;
+	return false;
+#else
+	if (vars.authenticate_with_nicknames) {
+		return false;
+	}
+
+	if (payload.type == auth_provider_type::STEAM_NATIVE) {
+		return !private_vars.steam_web_api_key.empty();
+	}
+
+	return true;
+#endif
+}
+
+/*
+	A custom badge of an admin profile, otherwise DEV for the developers - see developer_keys.h -
+	otherwise ADMIN for the admin profiles.
+*/
+
+std::string server_setup::calc_badge(const std::string& account_id) const {
+	if (account_id.empty()) {
+		return "";
+	}
+
+	const auto profile = ::find_admin_profile(private_vars.admin_profiles, account_id);
+
+	if (profile.has_value() && !profile->badge.empty()) {
+		return profile->badge;
+	}
+
+	if (::is_developer_account(account_id)) {
+		return "DEV";
+	}
+
+	if (profile.has_value()) {
+		return "ADMIN";
+	}
+
+	return "";
+}
+
+void server_setup::send_auth_state(const client_id_type id, const bool only_if_rcon_changed) {
+	/*
+		The integrated client is not in clients - and needs no messages.
+	*/
+
+	if ((is_integrated() && id == get_integrated_client_id()) || id >= clients.size()) {
+		return;
+	}
+
+	auto& c = clients[id];
+
+	if (!c.is_set()) {
+		return;
+	}
+
+	const auto level = get_rcon_level(id);
+
+	if (only_if_rcon_changed && level == c.last_sent_rcon_level) {
+		return;
+	}
+
+	c.last_sent_rcon_level = level;
+
+	server->send_payload(
+		id,
+		game_channel_type::RELIABLE_MESSAGES,
+
+		server_auth_state { c.auth_challenge, level }
+	);
+
+	/*
+		Like to a client connecting with the rcon password.
+	*/
+
+	if (only_if_rcon_changed && level >= rcon_level_type::BASIC) {
+		refresh_runtime_info_for_rcon();
+
+		server->send_payload(
+			id,
+			game_channel_type::RELIABLE_MESSAGES,
+
+			vars
+		);
+	}
+}
+
+void server_setup::update_badges() {
+	for_each_id_and_client([&](const auto id, auto& c) {
+		const bool integrated = is_integrated() && id == get_integrated_client_id();
+		const auto& account_id = integrated ? integrated_account_id : c.authenticated_id;
+		const auto new_badge = clan_name_type([&]() {
+			const auto badge = calc_badge(account_id);
+
+#if !IS_PRODUCTION_BUILD
+			/*
+				Whoever hosts with a development build is a developer.
+			*/
+
+			if (integrated && badge.empty()) {
+				return std::string("DEV");
+			}
+#endif
+
+			return badge;
+		}());
+
+		if (c.badge != new_badge) {
+			c.badge = new_badge;
+			c.rebroadcast_synced_meta = true;
+		}
+
+		send_auth_state(id, true);
+	}, connected_and_integrated_v);
+}
+
+void server_setup::set_integrated_account_id(const std::string& account_id) {
+	integrated_account_id = account_id;
+	update_badges();
 }
 
 synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
@@ -3115,6 +3267,18 @@ void server_setup::init_client(const client_id_type& id) {
 	}
 
 	new_client.init(server_time, next_session_id++, new_address);
+
+	new_client.auth_challenge = [&]() {
+		thread_local auto device = std::random_device();
+
+		auto bytes = std::array<std::byte, 12>();
+
+		for (auto& b : bytes) {
+			b = static_cast<std::byte>(device() & 0xff);
+		}
+
+		return auth_challenge_type("hs_" + ::get_hex_representation(bytes.data(), bytes.size()));
+	}();
 
 	LOG("Client %x connected. SID: %x", id, new_client.session_id);
 }
@@ -4668,6 +4832,23 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 		}
 	}
 
+	/*
+		The admin profile of an authenticated client authorizes it without any password.
+	*/
+
+	const auto profile_level = [&]() {
+		if (const auto profile = ::find_admin_profile(private_vars.admin_profiles, c.authenticated_id); profile.has_value()) {
+			return profile->rcon_level;
+		}
+
+		return rcon_level_type::DENIED;
+	}();
+
+	if (profile_level == rcon_level_type::MASTER) {
+		LOG("Authorized the admin profile %x for master rcon.", c.authenticated_id);
+		return rcon_level_type::MASTER;
+	}
+
 	if (::safe_equal(c.settings.server_password, private_vars.master_rcon_password)) {
 		LOG("Authorized the remote client for master rcon.");
 		return rcon_level_type::MASTER;
@@ -4680,6 +4861,11 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 		}
 
 		LOG("Authorized the remote client for basic rcon.");
+		return rcon_level_type::BASIC;
+	}
+
+	if (profile_level == rcon_level_type::BASIC) {
+		LOG("Authorized the admin profile %x for basic rcon.", c.authenticated_id);
 		return rcon_level_type::BASIC;
 	}
 
@@ -4745,15 +4931,23 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 
 	bool integrated_received = false;
 
-	const auto new_entry = chat_gui_entry::from(
-		payload,
-		get_current_time(),
-		sender_player_nickname,
-		sender_player_faction,
-		payload.author == get_local_player_id(),
-		sender_player_level,
-		!is_ranked_server()
-	);
+	const auto new_entry = [&]() {
+		auto result = chat_gui_entry::from(
+			payload,
+			get_current_time(),
+			sender_player_nickname,
+			sender_player_faction,
+			payload.author == get_local_player_id(),
+			sender_player_level,
+			!is_ranked_server()
+		);
+
+		if (const auto author = std::as_const(*this).find_client_state(payload.author); author != nullptr) {
+			result.author_badge = author->badge;
+		}
+
+		return result;
+	}();
 
 	auto send_it = [&](const auto recipient_client_id, auto&) {
 		if (except.has_value() && *except == recipient_client_id) {

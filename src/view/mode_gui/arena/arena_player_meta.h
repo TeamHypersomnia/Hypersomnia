@@ -19,9 +19,15 @@ struct arena_player_network_stats {
 	uint8_t download_progress = 255;
 };
 
+/*
+	badge is decided by the server - shown in front of the nickname in the chat, and in place of the clan in the scoreboard.
+	See server_setup::calc_badge.
+*/
+
 struct synced_player_meta {
 	public_client_settings public_settings;
 	uint8_t platform_type = 0;
+	clan_name_type badge;
 };
 
 struct arena_player_meta {

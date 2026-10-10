@@ -7,6 +7,7 @@
 
 #include "application/network/requested_client_settings.h"
 #include "application/network/client_state_type.h"
+#include "application/setups/server/server_auth_state.h"
 
 #include "3rdparty/yojimbo/include/yojimbo_address.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
@@ -68,6 +69,10 @@ struct server_client_state {
 
 	bool auth_requested = false;
 	std::string authenticated_id;
+	clan_name_type badge;
+
+	auth_challenge_type auth_challenge;
+	rcon_level_type last_sent_rcon_level = rcon_level_type::DENIED;
 	bool verified_has_no_ban = false;
 
 	server_client_session_id session_id = 0;
@@ -196,6 +201,7 @@ struct server_client_state {
 
 		new_meta.public_settings = settings.public_settings;
 		new_meta.platform_type = settings.platform_type;
+		new_meta.badge = badge;
 
 		return new_meta;
 	}

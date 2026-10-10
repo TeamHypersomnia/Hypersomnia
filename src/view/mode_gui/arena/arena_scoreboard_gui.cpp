@@ -2,6 +2,9 @@
 #include "augs/log.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
+#include "augs/gui/text/rainbow_string.h"
+#include "augs/misc/date_time.h"
+#include "augs/misc/profanity_filter.h"
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -395,6 +398,28 @@ void arena_scoreboard_gui::draw_gui(
 		else {
 			text_stroked(text, col, vec2i(c.l + pp.x, pp.y), {}, preffix);
 		}
+	};
+
+	/*
+		The badge set by the server, in place of the clan - see synced_player_meta::badge.
+	*/
+
+	auto get_badge = [&](const mode_player_id id) {
+		if (in.player_metas == nullptr) {
+			return std::string("");
+		}
+
+		const auto result = std::string((*in.player_metas)[id.value].synced.badge);
+
+		if (result.empty() || augs::has_profanity(result)) {
+			return std::string("");
+		}
+
+		return "[" + result + "]";
+	};
+
+	auto badge_preffix = [&](const std::string& badge, const rgba col) {
+		return rainbow_string(badge, style(in.gui_fonts.gui, col), augs::steady_secs());
 	};
 
 	const auto column_label_color = gray;
@@ -896,7 +921,9 @@ void arena_scoreboard_gui::draw_gui(
 				clan = "[BOT]";
 			}
 
-			if (clan.empty() && in.player_metas) {
+			const auto badge = player_data.is_bot ? std::string("") : get_badge(player_id);
+
+			if (clan.empty() && badge.empty() && in.player_metas) {
 				clan = (*in.player_metas)[player_id.value].synced.public_settings.clan;
 
 				if (!clan.empty()) {
@@ -910,7 +937,14 @@ void arena_scoreboard_gui::draw_gui(
 				preffix = fmt("[Web]", pref_col);
 			}
 
-			if (!clan.empty()) {
+			if (!badge.empty()) {
+				if (!preffix.empty()) {
+					preffix += fmt(" ", pref_col);
+				}
+
+				preffix += badge_preffix(badge, pref_col);
+			}
+			else if (!clan.empty()) {
 				if (!preffix.empty()) {
 					clan = " " + clan;
 				}
@@ -1057,7 +1091,18 @@ void arena_scoreboard_gui::draw_gui(
 			pen.y += cell_h;
 
 			for (const auto& p : sorted_players) {
-				print_col_text(columns[3], clip_to_player_column(get_nickname_str(p.second, p.first)), column_label_color);
+				const auto badge = get_badge(p.second);
+
+				if (badge.empty()) {
+					print_col_text(columns[3], clip_to_player_column(get_nickname_str(p.second, p.first)), column_label_color);
+				}
+				else {
+					const auto preffix = badge_preffix(badge + " ", column_label_color);
+					const auto taken = static_cast<int>(get_text_bbox(preffix).x);
+
+					print_col_text(columns[3], clip_to_player_column(get_nickname_str(p.second, p.first), taken), column_label_color, preffix);
+				}
+
 				pen.y += cell_h;
 			}
 		}

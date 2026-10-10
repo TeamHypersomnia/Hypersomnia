@@ -479,8 +479,13 @@
         "report_ranked_match_api_key": "",
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
-        "check_ban_url": ""
+        "check_ban_url": "",
         // [ { "url": "example.com", "api_key": "example" }, { ... } ]
+
+        // Admins recognized by their authenticated account - no password needed.
+        // [ "account id", "NONE" | "RCON" | "MASTER_RCON", optional badge shown in place of [ADMIN] ], e.g.:
+        // [ [ "steam_76561198000000000", "NONE" ], [ "discord_100000000000000000", "RCON", "MOD" ] ]
+        "admin_profiles": []
     },
 
     "dedicated_server": {

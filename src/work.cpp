@@ -2056,6 +2056,32 @@ work_result work(
 		}
 	};
 
+	/*
+		The host shows its own badge - e.g. DEV - for the account the game is signed in with.
+	*/
+
+	WEBSTATIC auto set_integrated_account_id = [&]() {
+		const auto account_id = [&]() {
+#if PLATFORM_WEB
+			if (is_signed_in()) {
+				return social_sign_in.cached_auth.profile_id;
+			}
+
+			return std::string("");
+#else
+			if (is_steam_client) {
+				return typesafe_sprintf("steam_%x", steam_id);
+			}
+
+			return std::string("");
+#endif
+		}();
+
+		on_specific_setup([&](server_setup& setup) {
+			setup.set_integrated_account_id(account_id);
+		});
+	};
+
 	WEBSTATIC auto get_unofficial_content_dir = [&]() {
 		return visit_current_setup([&](const auto& s) { return s.get_unofficial_content_dir(); });
 	};
@@ -2291,14 +2317,6 @@ work_result work(
 
 		streaming.wait_demos_compressed();
 
-#if !PLATFORM_WEB
-		if (is_steam_client) {
-			LOG("Calling steam_request_auth_ticket.");
-			steam_auth_request_id = ::steam_request_auth_ticket("hypersomnia_gameserver");
-			LOG_NVPS(steam_auth_request_id);
-		}
-#endif
-
 		setup_launcher([&]() {
 			const auto preferred_binding_port = 0;
 
@@ -2314,7 +2332,12 @@ work_result work(
 		});
 
 #if PLATFORM_WEB
-		const bool send_auth = requires_sign_in;
+		/*
+			Official servers also get the auth of a signed in player when they don't require it - for the badges and the admin profiles.
+			Never the others - it is an access token to the account.
+		*/
+
+		const bool send_auth = requires_sign_in || (is_official_connect_string && is_signed_in() && !is_auth_expired());
 
 		if (send_auth) {
 			/*
@@ -2459,6 +2482,8 @@ work_result work(
 						config.webrtc_signalling_server_url,
 						""
 					);
+
+					set_integrated_account_id();
 				});
 
 				break;
@@ -3167,6 +3192,8 @@ work_result work(
 								server_assigned_teams(),
 								config.webrtc_signalling_server_url
 							);
+
+							set_integrated_account_id();
 						});
 					}
 #endif
@@ -3218,6 +3245,24 @@ work_result work(
 		thread_local steam_queue_type steam_events;
 
 		steam_events.clear();
+
+		/*
+			The ticket is requested for the challenge of the server - see server_auth_state.
+		*/
+
+		if (is_steam_client) {
+			visit_current_setup([&](auto& setup) {
+				using T = remove_cref<decltype(setup)>;
+
+				if constexpr(is_one_of_v<T, client_setup>) {
+					if (const auto identity = setup.consume_steam_auth_identity(); identity.has_value()) {
+						LOG("Calling steam_request_auth_ticket.");
+						steam_auth_request_id = ::steam_request_auth_ticket(identity->c_str());
+						LOG_NVPS(steam_auth_request_id);
+					}
+				}
+			});
+		}
 
 		auto handler_c = [](void* ctx, uint32_t idx, void* object) {
 			auto check_index = [&]<typename T>(T) {

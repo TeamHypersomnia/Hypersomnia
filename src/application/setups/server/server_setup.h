@@ -280,6 +280,17 @@ class server_setup :
 	void push_auth_job(mode_player_id player_id, F&& f);
 
 	void request_auth(mode_player_id player_id, const auth_request_payload&);
+	bool can_verify_optional_auth(const auth_request_payload&) const;
+
+	/*
+		The account the integrated client is signed in with - trusted, since it hosts - only for its badge.
+	*/
+
+	std::string integrated_account_id;
+
+	std::string calc_badge(const std::string& account_id) const;
+	void update_badges();
+	void send_auth_state(client_id_type, bool only_if_rcon_changed);
 
 	void finalize_webhook_jobs();
 
@@ -755,6 +766,7 @@ public:
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
 
 	rcon_level_type get_rcon_level(const client_id_type&) const;
+	void set_integrated_account_id(const std::string&);
 	bool is_authorized_for_access(const client_id_type&) const;
 
 	const entropy_accumulator& get_entropy_accumulator() const {

@@ -224,11 +224,14 @@ std::string verify_discord_token(const std::string& token) {
 	}
 }
 
-std::string verify_steam_token(const std::string& api_key, const std::string& ticket_hex) {
+/*
+	identity is what the ticket was requested for - see server_auth_state.
+*/
+
+std::string verify_steam_token(const std::string& api_key, const std::string& ticket_hex, const std::string& identity) {
 	auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
 
 	const auto appid = std::to_string(::steam_get_appid());
-	const auto identity = "hypersomnia_gameserver";
 
 	httplib::Params params;
 	params.emplace("key", api_key);

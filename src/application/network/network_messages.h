@@ -17,6 +17,7 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/synced_meta_update.h"
+#include "application/setups/server/server_auth_state.h"
 #include "application/setups/server/request_arena_file_download.h"
 #include "game/modes/session_id.h"
 #include "application/network/net_serialize.h"
@@ -316,6 +317,11 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 	};
 
+	struct server_auth_state : net_message_with_payload<::server_auth_state> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		synced_meta_update*, 
@@ -339,7 +345,8 @@ namespace net_messages {
 		file_download_link*,
 		download_progress_message*,
 		file_chunks_request*,
-		auth_request*
+		auth_request*,
+		server_auth_state*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

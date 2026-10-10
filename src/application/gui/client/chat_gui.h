@@ -34,6 +34,12 @@ struct chat_gui_entry {
 	net_time_t timestamp = 0.0;
 
 	std::string author;
+
+	/*
+		Drawn in rainbow colors in front of the author - see synced_player_meta::badge.
+	*/
+
+	std::string author_badge;
 	faction_type author_faction = faction_type::DEFAULT;
 	uint16_t author_level = 0;
 	bool show_author_level = false;

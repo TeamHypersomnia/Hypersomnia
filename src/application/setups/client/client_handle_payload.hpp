@@ -196,6 +196,10 @@ message_handler_result client_setup::handle_payload(
 				!sv_dynamic_vars.is_ranked_server()
 			);
 
+			if (author_id.is_set() && author_id.value < player_metas.size()) {
+				new_entry.author_badge = player_metas[author_id.value].synced.badge;
+			}
+
 			LOG(new_entry.to_string());
 			client_gui.chat.add_entry(std::move(new_entry));
 		}
@@ -451,6 +455,14 @@ message_handler_result client_setup::handle_payload(
 			}
 		);
 
+	}
+	else if constexpr (std::is_same_v<T, server_auth_state>) {
+		client_gui.rcon.level = payload.rcon_level;
+
+		if (!steam_auth_identity_received && !payload.challenge.empty()) {
+			steam_auth_identity_received = true;
+			steam_auth_identity_to_request = std::string(payload.challenge);
+		}
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		mode_player_id player_id;

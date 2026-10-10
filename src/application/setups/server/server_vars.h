@@ -8,6 +8,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "application/network/host_with_default_port.h"
 #include "application/setups/server/server_webhook_vars.h"
+#include "application/setups/server/admin_profiles.h"
 #include "augs/misc/secure_hash.h"
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/difficulty_type.h"
@@ -344,6 +345,8 @@ struct server_private_vars {
 	std::vector<url_and_key_pair> report_ranked_match_aux_endpoints;
 
 	std::string check_ban_url = "https://hypersomnia.io/check_ban";
+
+	admin_profiles_type admin_profiles;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_private_vars& b) const = default;

@@ -10,6 +10,7 @@
 #include "game/modes/mode_commands/match_command.h"
 #include "augs/window_framework/mouse_rel_bound.h"
 #include "application/setups/server/request_arena_file_download.h"
+#include "application/setups/server/server_auth_state.h"
 #include "application/network/download_progress_message.h"
 
 namespace sanitization {
@@ -150,6 +151,19 @@ namespace net_messages {
 	}
 
 	template <class Stream>
+	bool serialize(Stream& s, ::server_auth_state& c) {
+		if (!serialize_fixed_size_str(s, c.challenge)) {
+			return false;
+		}
+
+		auto level = static_cast<int>(c.rcon_level);
+		serialize_int(s, level, static_cast<int>(rcon_level_type::INTEGRATED_ONLY), static_cast<int>(rcon_level_type::MASTER));
+		c.rcon_level = static_cast<rcon_level_type>(level);
+
+		return true;
+	}
+
+	template <class Stream>
 	bool serialize(Stream& s, ::client_requested_chat& c) {
 		if (!serialize_enum(s, c.target)) {
 			LOG("FAILED TO SERIALIZE ENUM! %x", int(c.target));
@@ -244,6 +258,10 @@ namespace net_messages {
 		}
 
 		serialize_bits(stream, payload.platform_type, 8);
+
+		if (!serialize_fixed_size_str(stream, payload.badge)) {
+			return false;
+		}
 
 		return true;
 	}

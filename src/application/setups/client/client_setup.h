@@ -103,6 +103,14 @@ class client_setup :
 	std::optional<steam_auth_ticket> pending_steam_auth;
 	std::optional<web_auth_data> pending_web_auth;
 
+	/*
+		The challenge of the server to request the Steam ticket for - see server_auth_state.
+		Requested once per connection.
+	*/
+
+	std::optional<std::string> steam_auth_identity_to_request;
+	bool steam_auth_identity_received = false;
+
 	bool now_resyncing = false;
 	bool schedule_disconnect = false;
 
@@ -962,6 +970,7 @@ public:
 	std::string get_steam_join_command_line() const;
 
 	void send_auth_ticket(const steam_auth_ticket&);
+	std::optional<std::string> consume_steam_auth_identity();
 	void send_auth_ticket(const web_auth_data&);
 
 	bool is_ranked_live_or_starting() const;

@@ -2369,6 +2369,12 @@ void client_setup::send_auth_ticket(const web_auth_data& ticket) {
 	pending_web_auth = ticket;
 }
 
+std::optional<std::string> client_setup::consume_steam_auth_identity() {
+	auto result = steam_auth_identity_to_request;
+	steam_auth_identity_to_request.reset();
+	return result;
+}
+
 bool client_setup::is_ranked_live_or_starting() const {
 	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
 		[&](const auto& mode) {
