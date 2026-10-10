@@ -16,7 +16,7 @@
 #include "augs/misc/httplib_utils.h"
 
 inline std::string fetch_crazygames_public_key() {
-    auto http_client = httplib_utils::make_client("sdk.crazygames.com", 4);
+    auto http_client = httplib_utils::make_client("https://sdk.crazygames.com", 4);
     auto res = http_client->Get("/publicKey.json");
 
     if (!res || res->status != 200) {
@@ -184,7 +184,7 @@ std::optional<T> GetIf(F& from, const std::string& label) {
 }
 
 std::string verify_discord_token(const std::string& token) {
-	auto http_client = httplib_utils::make_client("discord.com", 4);
+	auto http_client = httplib_utils::make_client("https://discord.com", 4);
 
 	httplib::Headers headers = {
 		{"Authorization", "Bearer " + token }
@@ -229,7 +229,7 @@ std::string verify_discord_token(const std::string& token) {
 */
 
 std::string verify_steam_token(const std::string& api_key, const std::string& ticket_hex, const std::string& identity) {
-	auto http_client = httplib_utils::make_client("api.steampowered.com", 4);
+	auto http_client = httplib_utils::make_client("https://api.steampowered.com", 4);
 
 	const auto appid = std::to_string(::steam_get_appid());
 
