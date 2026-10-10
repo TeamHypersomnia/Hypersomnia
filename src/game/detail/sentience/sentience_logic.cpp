@@ -739,7 +739,7 @@ void perform_knockout(
 		
 		if (typed_subject.template get<components::item_slot_transfers>().allow_drop_and_pick) {
 			if (const auto* const container = typed_subject.template find<invariants::container>()) {
-				drop_from_all_slots(*container, entity_handle(typed_subject), sentience_def.drop_impulse_on_knockout, step);
+				drop_from_all_slots(*container, entity_handle(typed_subject), sentience_def.drop_distance_on_knockout, step);
 			}
 		}
 		else {

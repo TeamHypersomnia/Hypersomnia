@@ -1052,7 +1052,14 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 
 	const bool held_item = sentience == nullptr && owning_capability;
 
-	if (!held_item) {
+	/*
+		Items not held by anyone - lying, dropped or thrown - aren't pushed by impacts (explosions, bullets) either.
+		Otherwise e.g. a corpse explosion would blast the items its victim has just dropped far away.
+	*/
+
+	const bool lying_item = !owning_capability && subject.template has<components::item>();
+
+	if (!held_item && !lying_item) {
 		const bool conscious = sentience && sentience->is_conscious();
 		(void)conscious;
 

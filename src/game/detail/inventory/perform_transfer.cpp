@@ -30,9 +30,42 @@
 #include "game/cosmos/might_allocate_entities_having.hpp"
 #include "game/components/melee_component.h"
 #include "game/detail/inventory/manage_shoulder_storage.hpp"
+#include "game/detail/physics/infer_damping.hpp"
 
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
-	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const real32 slide_distance, const logic_step step) {
+	auto& cosm = handle.get_cosmos();
+
+	/*
+		A body moving at v with the linear damping d stops v / d away -
+		also with Box2D's discrete damping, v *= 1 / (1 + h * d) every step.
+	*/
+
+	constexpr auto fan_step_degrees = 30.f;
+
+	auto num_slid = 0;
+
+	auto slide = [&](const auto& typed_item) {
+		const auto fan_side = num_slid % 2 == 0 ? -1.f : 1.f;
+		const auto fan_degrees = fan_side * fan_step_degrees * static_cast<real32>((num_slid + 1) / 2);
+
+		const auto damping = ::calc_damping_mults(typed_item, typed_item.template get<invariants::rigid_body>());
+		const auto direction = typed_item.get_logic_transform().get_direction().rotate(fan_degrees);
+
+		typed_item.template get<components::rigid_body>().set_velocity(direction * slide_distance * damping.linear);
+
+		++num_slid;
+	};
+
+	drop_from_all_slots(container, handle, [&](const auto& result) {
+		if (result) {
+			if (const auto dropped_item = cosm[result.result.item]) {
+				dropped_item.template dispatch_on_having_all<components::rigid_body>(slide);
+			}
+		}
+
+		result.notify(step);
+		result.play_effects(step);
+	});
 }
 
 void perform_transfer_result::notify_logical(const logic_step step) const {

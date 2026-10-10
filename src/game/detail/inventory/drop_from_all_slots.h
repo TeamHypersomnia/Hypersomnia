@@ -12,7 +12,7 @@ void queue_delete_all_owned_items(const logic_step step, const E handle) {
 }
 
 template <class F, class E>
-void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {
+void drop_from_all_slots(const invariants::container& container, const E handle, F result_callback) {
 	auto& cosm = handle.get_cosmos();
 
 	for (auto&& s : container.slots) {
@@ -20,7 +20,7 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 
 		for (const auto& item : items) {
 			auto drop_item = [&](const auto& dropped_item) {
-				result_callback(perform_transfer_no_step(item_slot_transfer_request::drop(dropped_item, impulse), cosm));
+				result_callback(perform_transfer_no_step(item_slot_transfer_request::drop(dropped_item), cosm));
 			};
 
 			if (s.first == slot_function::PERSONAL_DEPOSIT) {
@@ -37,4 +37,9 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 	}
 }
 
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step);
+/*
+	The dropped items slide about slide_distance away, fanning out around the direction they faced
+	- the first one straight, the next ones turned by ever more to alternating sides - so they don't pile up.
+*/
+
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, real32 slide_distance, const logic_step step);
