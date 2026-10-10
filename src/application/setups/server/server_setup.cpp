@@ -2547,6 +2547,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
 
 		server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_bytes);
+		sent_any_heartbeat = true;
 #endif
 	}
 }
@@ -2557,7 +2558,7 @@ void server_setup::request_immediate_heartbeat() {
 }
 
 bool server_setup::has_sent_any_heartbeats() const {
-	return when_last_sent_heartbeat_to_server_list != 0;
+	return sent_any_heartbeat;
 }
 
 void server_setup::send_heartbeat_to_server_list_if_its_time() {

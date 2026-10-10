@@ -174,6 +174,13 @@ class server_setup :
 	net_time_t when_last_sent_net_statistics = 0;
 	net_time_t when_last_sent_admin_public_settings = 0;
 	net_time_t when_last_sent_heartbeat_to_server_list = 0;
+
+	/*
+		Not when_last_sent_heartbeat_to_server_list != 0 - an immediate heartbeat request zeroes that,
+		which used to skip the goodbye when a server shut down right after one (e.g. after the last players left).
+	*/
+
+	bool sent_any_heartbeat = false;
 	net_time_t when_last_sent_tell_me_my_address = 0;
 	net_time_t when_last_resolved_server_list_addr = 0;
 	net_time_t when_last_resolved_internal_address = 0;
