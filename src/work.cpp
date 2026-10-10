@@ -401,7 +401,7 @@ extern "C" {
 
 #if PLATFORM_WEB
 #include "application/main/check_token_still_valid.hpp"
-augs::future<bool> token_still_valid_check;
+augs::async_response_ptr token_still_valid_check;
 #endif
 
 work_result work(
@@ -1840,7 +1840,7 @@ work_result work(
 			}
 			else {
 				LOG("Starting token_still_valid_check");
-				token_still_valid_check = launch_async([ch = social_sign_in.cached_auth]() { return ch.check_token_still_valid(); });
+				token_still_valid_check = ::request_token_still_valid_check(social_sign_in.cached_auth);
 			}
 		}
 	}
@@ -2306,8 +2306,12 @@ work_result work(
 				social_log_out();
 			}
 
-			if (token_still_valid_check.valid()) {
-				if (!token_still_valid_check.get()) {
+			/*
+				Still pending - connect anyway, the server verifies the token itself.
+			*/
+
+			if (augs::is_ready(token_still_valid_check)) {
+				if (!::token_still_valid(augs::get_once(token_still_valid_check))) {
 					social_log_out();
 				}
 			}
@@ -3566,8 +3570,8 @@ work_result work(
 						start_client_setup();
 					}
 				}
-				else if (valid_and_is_ready(token_still_valid_check)) {
-					if (!token_still_valid_check.get()) {
+				else if (augs::is_ready(token_still_valid_check)) {
+					if (!::token_still_valid(augs::get_once(token_still_valid_check))) {
 						social_log_out();
 					}
 				}

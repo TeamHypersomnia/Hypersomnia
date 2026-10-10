@@ -76,5 +76,4 @@ struct web_auth_data {
 
 	bool self_refresh();
 	bool can_self_refresh() const;
-	bool check_token_still_valid() const;
 };

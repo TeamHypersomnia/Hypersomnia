@@ -1,43 +1,44 @@
 #pragma once
+#include "augs/misc/async_get.h"
 
-bool web_auth_data::check_token_still_valid() const {
-	if (const bool trivial_case = !is_signed_in() || expired()) {
-		return false;
+/*
+	The web build is single-threaded and a synchronous fetch on the main thread always fails,
+	so the token is checked with an asynchronous request, polled every frame.
+
+	Returns nullptr when there is nothing to check over the network.
+*/
+
+augs::async_response_ptr request_token_still_valid_check(const web_auth_data& auth) {
+	if (auth.type == auth_provider_type::DISCORD) {
+		LOG("Checking if the Discord token is still valid.");
+
+		return augs::async_get(
+			"https://discord.com",
+			"/api/v10/users/@me",
+			{ { "Authorization", "Bearer " + auth.auth_token } }
+		);
 	}
 
-	if (type == auth_provider_type::DISCORD) {
-		auto http_client = httplib_utils::make_client("https://discord.com", 4);
+	return nullptr;
+}
 
-		const auto result = http_client->Get("/api/v10/users/@me", nullptr, { { "Authorization", "Bearer " + auth_token } });
+bool token_still_valid(const augs::http_response& response) {
+	LOG_NVPS(response.status);
 
-		if (result) {
-			LOG_NVPS(result->status);
+	if (httplib_utils::successful(response.status)) {
+		try {
+			const auto doc = augs::json_document_from(response.body);
 
-			if (httplib_utils::successful(result->status)) {
-				LOG("Discord auth response: %x", result->body);
-
-				try {
-					auto doc = augs::json_document_from(result->body);
-
-					if (doc.IsObject()) {
-						if (doc.HasMember("id") && doc["id"].IsString()) {
-							LOG("The Discord token is confirmed to be still valid.");
-							return true;
-						}
-					}
-				}
-				catch (...) {
-					LOG("Unknown error when verifying Discord auth.");
-				}
+			if (doc.IsObject() && doc.HasMember("id") && doc["id"].IsString()) {
+				LOG("The Discord token is confirmed to be still valid.");
+				return true;
 			}
 		}
-		else {
-			LOG("Result was null");
+		catch (...) {
+			LOG("Unknown error when verifying Discord auth.");
 		}
-
-		LOG("The Discord token is confirmed to be already invalid.");
-		return false;
 	}
 
-	return true;
+	LOG("The Discord token is confirmed to be already invalid.");
+	return false;
 }
