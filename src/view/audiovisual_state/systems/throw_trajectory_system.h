@@ -2,8 +2,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 #include "augs/math/transform.h"
+#include "augs/math/vec2.h"
 #include "augs/math/physics_structs.h"
 #include "augs/misc/randomization_declaration.h"
 #include "game/cosmos/entity_id.h"
@@ -39,6 +41,9 @@ struct throw_trajectory_flags;
 
 	The silhouettes are a diameter plus a gap apart along the trajectory - see game_drawing_settings::throw_trajectory_gap -
 	where the radius is half the longer side of the item as it lies on the ground.
+
+	Drawn as a laser instead - see throw_trajectory_mode - only the END silhouette is made,
+	and the trajectory is a polyline through its bounces - see throw_laser.
 */
 
 enum class throw_silhouette_type : uint8_t {
@@ -67,6 +72,39 @@ struct throw_silhouette {
 	}
 };
 
+/*
+	The trajectory drawn as a laser: the points where it starts, bounces and ends, simplified to within a pixel,
+	so that it is drawn as straight lines between the bounces.
+
+	Interpolated between the steps like the silhouettes, with the points matched by their index -
+	how many bounces along the trajectory they are - so that every bounce moves on its own and the line never cuts its corners.
+	The shorter of the two polylines is padded with its last point: the bounces that appear grow out of the old end,
+	and those that disappear shrink into the new one.
+*/
+
+struct throw_laser {
+	std::vector<vec2> previous;
+	std::vector<vec2> current;
+
+	/*
+		The index of the point of the first bounce - or where the throw is stopped - if any.
+	*/
+
+	std::optional<std::size_t> first_contact;
+
+	vec2 get_interpolated(const std::size_t index, const real32 interpolation_ratio) const {
+		return augs::interp(previous[index], current[index], interpolation_ratio);
+	}
+
+	std::optional<vec2> get_interpolated_end(const real32 interpolation_ratio) const {
+		if (current.empty()) {
+			return std::nullopt;
+		}
+
+		return get_interpolated(current.size() - 1, interpolation_ratio);
+	}
+};
+
 struct throw_trajectory_input {
 	entity_id item;
 	transformr start;
@@ -85,6 +123,7 @@ struct throw_trajectory_input {
 	bool faces_flight_direction = false;
 	bool angled_damping = false;
 	bool fixed_rotation = false;
+	bool as_laser = false;
 
 	bool operator==(const throw_trajectory_input& b) const {
 		return
@@ -107,6 +146,7 @@ struct throw_trajectory_input {
 			&& faces_flight_direction == b.faces_flight_direction
 			&& angled_damping == b.angled_damping
 			&& fixed_rotation == b.fixed_rotation
+			&& as_laser == b.as_laser
 		;
 	}
 };
@@ -130,6 +170,7 @@ struct throw_trajectory {
 	vec2i size;
 
 	std::vector<throw_silhouette> silhouettes;
+	throw_laser laser;
 };
 
 class throw_trajectory_system {

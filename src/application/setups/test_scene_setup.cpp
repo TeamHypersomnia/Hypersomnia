@@ -1508,6 +1508,13 @@ void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 		}
 
 		/*
+			Off by default elsewhere, but here they teach where the thrown knives fly.
+		*/
+
+		config.drawing.draw_melee_trajectories = true;
+		config.drawing.melee_trajectory_mode = throw_trajectory_mode::LASER;
+
+		/*
 			Make room for the tutorial progress HUD:
 			the minimap has to sit above the bottom progress bar,
 			and anything sharing the minimap's corner (e.g. the value bars)

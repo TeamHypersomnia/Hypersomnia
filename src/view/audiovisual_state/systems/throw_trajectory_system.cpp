@@ -6,8 +6,10 @@
 #include <unordered_map>
 #include "3rdparty/Box2D/Box2D.h"
 #include "augs/algorithm/sample_along_path.h"
+#include "augs/algorithm/simplify_polyline.h"
 #include "augs/math/damped_motion.h"
 #include "augs/math/arithmetical.h"
+#include "augs/math/math.h"
 #include "augs/math/rects.h"
 #include "augs/misc/convex_partitioned_shape.hpp"
 #include "game/cosmos/cosmos.h"
@@ -47,6 +49,20 @@ static constexpr real32 REST_SPEED = 2.f;
 */
 
 static constexpr real32 OBSTACLES_QUERY_MARGIN = 200.f;
+
+/*
+	A turn of the flight in a single step by at least this many degrees is a bounce,
+	whose corner is put where the flight before and after it meet - see simulate_flight.
+	Gentler turns - only shallow bounces, or curving by axis-aligned damping - are left to the simplification of the laser.
+*/
+
+static constexpr real32 BOUNCE_MIN_DEGREES = 10.f;
+
+/*
+	How far in pixels the simplified laser may stray from the simulated flight.
+*/
+
+static constexpr real32 LASER_TOLERANCE = 0.5f;
 
 namespace {
 	/*
@@ -132,10 +148,17 @@ namespace {
 		}
 	};
 
+	/*
+		The laser path follows the positions of the path, with the corners of the bounces put between them.
+	*/
+
 	struct simulated_flight {
 		std::vector<transformr> path;
 		std::optional<std::size_t> first_contact_index;
 		unversioned_entity_id stopped_by;
+
+		std::vector<vec2> laser_path;
+		std::optional<std::size_t> laser_first_contact_index;
 	};
 
 	real32 calc_ground_size_mult(const const_entity_handle item) {
@@ -582,6 +605,40 @@ namespace {
 
 		auto result = simulated_flight();
 		result.path.push_back(in.start);
+		result.laser_path.push_back(in.start.pos);
+
+		/*
+			Where the laser path was when the flight first touched something, in case no bounce is found.
+		*/
+
+		std::optional<std::size_t> laser_contact_fallback;
+
+		const auto bounce_max_cos = std::cos(BOUNCE_MIN_DEGREES * DEG_TO_RAD<real32>);
+
+		/*
+			Where the flight before and after a step meet - each extended up to twice as far as it flies in a step.
+		*/
+
+		auto find_bounce_corner = [&](const vec2 pos_before, const vec2 velocity_before, const vec2 pos_after, const vec2 velocity_after) {
+			if (velocity_before.is_epsilon(1.f) || velocity_after.is_epsilon(1.f)) {
+				return std::optional<vec2>();
+			}
+
+			if (vec2(velocity_before).normalize().dot(vec2(velocity_after).normalize()) > bounce_max_cos) {
+				return std::optional<vec2>();
+			}
+
+			const auto reach = 2 * dt_secs;
+
+			const auto corner = ::segment_segment_intersection(
+				pos_before,
+				pos_before + velocity_before * reach,
+				pos_after,
+				pos_after - velocity_after * reach
+			);
+
+			return corner.hit ? std::optional<vec2>(corner.intersection) : std::optional<vec2>();
+		};
 
 		/*
 			Spun like in perform_transfer and by its floor hits like in item_system,
@@ -660,9 +717,14 @@ namespace {
 						const auto entry_pos = si.get_pixels(vec2(entry.x, entry.y));
 
 						result.path.push_back(transformr(entry_pos, body->GetAngle() * RAD_TO_DEG<real32>));
+						result.laser_path.push_back(entry_pos);
 
 						if (!result.first_contact_index.has_value()) {
 							result.first_contact_index = result.path.size() - 1;
+						}
+
+						if (!result.laser_first_contact_index.has_value()) {
+							result.laser_first_contact_index = result.laser_path.size() - 1;
 						}
 
 						result.stopped_by = callback.stopper;
@@ -670,6 +732,9 @@ namespace {
 					}
 				}
 			}
+
+			const auto pos_before = read_transform().pos;
+			const auto velocity_before = adapter.get_velocity();
 
 			world.Step(dt_secs, 8, 3);
 
@@ -690,6 +755,22 @@ namespace {
 
 			result.path.push_back(read_transform());
 
+			{
+				const auto pos_after = result.path.back().pos;
+
+				const auto corner = find_bounce_corner(pos_before, velocity_before, pos_after, adapter.get_velocity());
+
+				if (corner.has_value()) {
+					result.laser_path.push_back(*corner);
+
+					if (!result.laser_first_contact_index.has_value()) {
+						result.laser_first_contact_index = result.laser_path.size() - 1;
+					}
+				}
+
+				result.laser_path.push_back(pos_after);
+			}
+
 			bool entered_stopper = false;
 
 			for (auto edge = body->GetContactList(); edge != nullptr; edge = edge->next) {
@@ -701,6 +782,7 @@ namespace {
 
 				if (!result.first_contact_index.has_value()) {
 					result.first_contact_index = result.path.size() - 1;
+					laser_contact_fallback = result.laser_path.size() - 1;
 				}
 
 				for (const auto fixture : { contact->GetFixtureA(), contact->GetFixtureB() }) {
@@ -721,6 +803,10 @@ namespace {
 		}
 
 		world.DestroyBody(body);
+
+		if (!result.laser_first_contact_index.has_value()) {
+			result.laser_first_contact_index = laser_contact_fallback;
+		}
 
 		return result;
 	}
@@ -803,13 +889,26 @@ namespace {
 		return std::nullopt;
 	}
 
+	/*
+		As a laser, only the END silhouette is made.
+	*/
+
 	void make_silhouettes(
 		std::vector<throw_silhouette>& output,
 		const simulated_flight& flight,
 		const simulated_flight& free_flight,
-		const real32 spacing
+		const real32 spacing,
+		const bool as_laser
 	) {
 		output.clear();
+
+		if (as_laser) {
+			if (!flight.path.empty()) {
+				output.push_back({ flight.path.back(), flight.path.back(), throw_silhouette_type::END, throw_silhouette::LAST_INDEX });
+			}
+
+			return;
+		}
 
 		auto lerp = [](const transformr& a, const transformr& b, const real32 t) {
 			return a.interp(b, t);
@@ -862,6 +961,56 @@ namespace {
 	}
 
 	/*
+		Simplified separately before and after the first contact, so that it stays a point of the laser.
+	*/
+
+	void make_laser(throw_laser& output, const simulated_flight& flight) {
+		output.current.clear();
+		output.first_contact = std::nullopt;
+
+		const auto& points = flight.laser_path;
+
+		if (points.empty()) {
+			return;
+		}
+
+		const auto last_index = points.size() - 1;
+
+		if (const auto contact = flight.laser_first_contact_index; contact.has_value() && *contact > 0) {
+			augs::simplify_polyline(points, 0, *contact, LASER_TOLERANCE, output.current);
+			output.first_contact = output.current.size() - 1;
+			output.current.pop_back();
+			augs::simplify_polyline(points, *contact, last_index, LASER_TOLERANCE, output.current);
+		}
+		else {
+			augs::simplify_polyline(points, 0, last_index, LASER_TOLERANCE, output.current);
+		}
+	}
+
+	/*
+		See throw_laser.
+	*/
+
+	void interpolate_laser_from(throw_laser& next, const throw_laser* const last) {
+		next.previous = last != nullptr ? last->current : next.current;
+
+		if (next.previous.empty() || next.current.empty()) {
+			next.previous = next.current;
+			return;
+		}
+
+		const auto size = std::max(next.previous.size(), next.current.size());
+
+		auto pad = [size](std::vector<vec2>& points) {
+			const auto last_point = points.back();
+			points.resize(size, last_point);
+		};
+
+		pad(next.previous);
+		pad(next.current);
+	}
+
+	/*
 		Every silhouette starts from where the one of the same type and index was in the previous step,
 		or from where it is now if there was none.
 	*/
@@ -883,6 +1032,8 @@ namespace {
 
 			return std::make_pair(type_order, t.index);
 		};
+
+		::interpolate_laser_from(next.laser, last != nullptr ? std::addressof(last->laser) : nullptr);
 
 		std::size_t j = 0;
 
@@ -973,6 +1124,7 @@ void throw_trajectory_system::advance(
 		}
 
 		in->silhouette_gap = std::max(0.f, silhouette_gap);
+		in->as_laser = ::is_throw_trajectory_laser(viewed_character, item, flags);
 
 		const auto last = std::find_if(previous.begin(), previous.end(), [&](const throw_trajectory& t) {
 			return t.input.item == in->item;
@@ -1049,7 +1201,11 @@ void throw_trajectory_system::advance(
 
 		auto free_flight = simulated_flight();
 
-		if (flight.first_contact_index.has_value()) {
+		/*
+			The flight as if nothing was in the way is needed only for the BLOCKED silhouettes.
+		*/
+
+		if (flight.first_contact_index.has_value() && !in->as_laser) {
 			free_flight = ::simulate_flight(*worlds->empty_world, cosm, *in, shapes, fixtures_def, thrown_filter);
 		}
 
@@ -1072,7 +1228,12 @@ void throw_trajectory_system::advance(
 			new_trajectory.end_type = enemy ? throw_end_type::ENEMY : throw_end_type::FRIEND;
 		}
 
-		::make_silhouettes(new_trajectory.silhouettes, flight, free_flight, (2.f + in->silhouette_gap) * std::max(radius, 1.f));
+		::make_silhouettes(new_trajectory.silhouettes, flight, free_flight, (2.f + in->silhouette_gap) * std::max(radius, 1.f), in->as_laser);
+
+		if (in->as_laser) {
+			::make_laser(new_trajectory.laser, flight);
+		}
+
 		::interpolate_from(new_trajectory, last_ptr);
 
 		trajectories.emplace_back(std::move(new_trajectory));

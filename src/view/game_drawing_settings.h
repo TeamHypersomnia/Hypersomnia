@@ -10,6 +10,7 @@
 #include "augs/graphics/rgba.h"
 #include "game/modes/detail/fog_of_war_settings.h"
 #include "view/character_hud_type.h"
+#include "view/throw_trajectory_mode.h"
 
 struct fog_of_war_appearance_settings {
 	// GEN INTROSPECTOR struct fog_of_war_appearance_settings
@@ -282,7 +283,9 @@ struct game_drawing_settings {
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_grenade_trajectories = true;
-	bool draw_melee_trajectories = true;
+	bool draw_melee_trajectories = false;
+	throw_trajectory_mode grenade_trajectory_mode = throw_trajectory_mode::LASER;
+	throw_trajectory_mode melee_trajectory_mode = throw_trajectory_mode::LASER;
 	bool draw_throw_trajectory_when_throwing = false;
 	bool draw_throw_trajectories_during_side_throws = false;
 	float throw_trajectory_alpha = 0.25f;

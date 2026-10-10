@@ -545,6 +545,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		All of it is translucent by game_drawing_settings::throw_trajectory_alpha - the end silhouette by its own throw_trajectory_end_alpha -
 		so it is drawn from the top down with every pixel drawn at most once -
 		the borders and the lines never show through the silhouettes over them.
+
+		The trajectories drawn as lasers - see draw_crosshair_lasers - have only the end silhouette here, and it does not pulse -
+		white for grenades.
 	*/
 
 	auto draw_throw_trajectories = [&]() {
@@ -584,7 +587,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			A melee weapon stopping at an enemy is red to the end, at a friend green.
 		*/
 
-		auto calc_color = [&](const throw_silhouette_type type, const throw_end_type end_type) {
+		auto calc_pulse = [&](const throw_trajectory& trajectory) {
+			return trajectory.input.as_laser ? 0.f : pulse;
+		};
+
+		auto calc_color = [&](const throw_silhouette_type type, const throw_end_type end_type, const real32 end_pulse) {
 			const auto end_color = [&]() {
 				switch (end_type) {
 					case throw_end_type::ENEMY: return red;
@@ -597,13 +604,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			switch (type) {
 				case throw_silhouette_type::BLOCKED: return translucent(blocked_color, alpha);
-				case throw_silhouette_type::END: return translucent(augs::interp(end_color, white, pulse), end_alpha);
+				case throw_silhouette_type::END: return translucent(augs::interp(end_color, white, end_pulse), end_alpha);
 				default: return translucent(white, alpha);
 			}
 		};
 
-		auto calc_size_mult = [&](const throw_silhouette_type type) {
-			return type == throw_silhouette_type::END ? augs::interp(end_min_size_mult, end_max_size_mult, pulse) : 1.f;
+		auto calc_size_mult = [&](const throw_silhouette_type type, const real32 end_pulse) {
+			return type == throw_silhouette_type::END ? augs::interp(end_min_size_mult, end_max_size_mult, end_pulse) : 1.f;
 		};
 
 		auto draw_silhouettes = [&]() {
@@ -611,16 +618,36 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			for (const auto& trajectory : reverse(trajectories)) {
 				const auto& entry = game_images.find_or(trajectory.image).diffuse;
+				const auto trajectory_pulse = calc_pulse(trajectory);
+
+				/*
+					The end of a grenade drawn as a laser is white, so that it stands out from the cyan laser.
+				*/
+
+				const auto color_pulse = trajectory.input.as_laser && trajectory.input.explosive ? 1.f : trajectory_pulse;
 
 				for (const auto& silhouette : reverse(trajectory.silhouettes)) {
 					const auto type = silhouette.type;
-					const auto interpolated = silhouette.get_interpolated(ratio);
-					const auto size = vec2i(vec2(trajectory.size) * calc_size_mult(type));
+					const auto interpolated = [&]() {
+						auto result = silhouette.get_interpolated(ratio);
+
+						/*
+							Where its laser ends - see throw_laser.
+						*/
+
+						if (const auto laser_end = trajectory.laser.get_interpolated_end(ratio); trajectory.input.as_laser && laser_end.has_value()) {
+							result.pos = *laser_end;
+						}
+
+						return result;
+					}();
+
+					const auto size = vec2i(vec2(trajectory.size) * calc_size_mult(type, trajectory_pulse));
 
 					const bool spins = trajectory.input.explosive && type == throw_silhouette_type::END;
 					const auto rotation = interpolated.rotation + (spins ? spin : 0.f);
 
-					augs::detail_sprite(output, entry, size, interpolated.pos, rotation, calc_color(type, trajectory.end_type));
+					augs::detail_sprite(output, entry, size, interpolated.pos, rotation, calc_color(type, trajectory.end_type, color_pulse));
 
 					for (const auto& o : border_offsets) {
 						augs::detail_sprite(output, entry, size, interpolated.pos + o, rotation, translucent(black, calc_alpha(type)));
@@ -644,7 +671,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			for (const auto& trajectory : trajectories) {
 				const auto item = cosm[trajectory.input.item];
 
-				if (item.dead()) {
+				if (item.dead() || trajectory.input.as_laser) {
 					continue;
 				}
 
@@ -724,7 +751,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_weapon_laser = [&]() {
-		if (settings.draw_weapon_laser && viewed_character.alive()) {
+		if ((settings.draw_weapon_laser || throw_trajectories.any()) && viewed_character.alive()) {
 			const auto laser = necessarys.at(assets::necessary_image_id::LASER);
 
 			/*
@@ -803,7 +830,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				in.pre_step_crosshair_displacement,
 				screen_size,
 				cone.get_visible_world_rect_aabb(),
-				throw_trajectories
+				throw_trajectories,
+				settings.draw_weapon_laser,
+				av.get<throw_trajectory_system>().get_trajectories(),
+				static_cast<real32>(in.interpolation_ratio)
 			});
 
 			renderer.call_and_clear_lines();
@@ -877,10 +907,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 					draw_crosshair_lasers({
 						[&](const vec2 from, const vec2 to, rgba col) {
-							if (!settings.draw_weapon_laser) {
-								return;
-							}
-
 							col.mult_alpha(0.5f);
 
 							const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
@@ -900,7 +926,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						in.pre_step_crosshair_displacement,
 						screen_size,
 						cone.get_visible_world_rect_aabb(),
-						throw_trajectories
+						throw_trajectories,
+						settings.draw_weapon_laser,
+						av.get<throw_trajectory_system>().get_trajectories(),
+						static_cast<real32>(in.interpolation_ratio)
 					});
 				}
 

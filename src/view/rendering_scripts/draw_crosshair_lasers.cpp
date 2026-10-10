@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <optional>
+#include <vector>
 #include "rendering_scripts.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
@@ -16,6 +19,7 @@
 #include "game/detail/weapon_like.h"
 #include "game/detail/crosshair_math.hpp"
 #include "view/rendering_scripts/aimed_with.h"
+#include "view/audiovisual_state/systems/throw_trajectory_system.h"
 
 #include "augs/drawing/drawing.hpp"
 #include "augs/log.h"
@@ -257,10 +261,76 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}
 		};
 
+		/*
+			A trajectory drawn as a laser - see throw_laser - is cyan like the laser of a gun,
+			only red at its last segment if it stops at an enemy, green if at a friend,
+			with the dashed line from the first bounce to the crosshair - towards where it would fly if nothing was in the way.
+			It starts from the item where it is drawn now.
+		*/
+
+		const auto draw_trajectory_laser = [&](const const_entity_handle item) {
+			const auto found = std::find_if(in.trajectories.begin(), in.trajectories.end(), [&](const throw_trajectory& t) {
+				return t.input.item == item.get_id();
+			});
+
+			if (found == in.trajectories.end() || !found->input.as_laser) {
+				return;
+			}
+
+			const auto& laser = found->laser;
+
+			if (laser.current.empty()) {
+				return;
+			}
+
+			thread_local std::vector<vec2> points;
+			points.clear();
+
+			std::optional<vec2> dashed_from;
+
+			for (std::size_t i = 0; i < laser.current.size(); ++i) {
+				const auto point = i == 0 ? item.get_viewing_transform(in.interpolation).pos : laser.get_interpolated(i, in.interpolation_ratio);
+
+				if (laser.first_contact == i) {
+					dashed_from = point;
+				}
+
+				if (points.empty() || (point - points.back()).length_sq() > 0.25f) {
+					points.push_back(point);
+				}
+			}
+
+			const auto last_color = [&]() {
+				switch (found->end_type) {
+					case throw_end_type::ENEMY: return red;
+					case throw_end_type::FRIEND: return green;
+					default: return cyan;
+				}
+			}();
+
+			for (std::size_t i = 0; i + 1 < points.size(); ++i) {
+				const bool is_last = i + 2 == points.size();
+				in.callback(points[i], points[i + 1], is_last ? last_color : cyan);
+			}
+
+			if (dashed_from.has_value() && (crosshair_pos - *dashed_from).length_sq() > 1.0f) {
+				in.dashed_line_callback(*dashed_from, crosshair_pos, white);
+			}
+		};
+
 		for (const auto& subject_item_id : in.character.get_wielded_items()) {
 			const auto subject_item = cosm[subject_item_id];
 
-			if (!::is_aimed_with(in.character, subject_item, in.throw_trajectories.during_side_throws)) {
+			if (!::is_aimed_with(in.character, subject_item)) {
+				continue;
+			}
+
+			if (in.throw_trajectories.shown_for(subject_item) && ::is_throw_trajectory_laser(in.character, subject_item, in.throw_trajectories)) {
+				draw_trajectory_laser(subject_item);
+				continue;
+			}
+
+			if (!in.draw_lasers) {
 				continue;
 			}
 

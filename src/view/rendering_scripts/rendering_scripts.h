@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <vector>
 
 #include "augs/graphics/vertex.h"
 #include "game/components/sentience_component.h"
@@ -17,6 +18,7 @@ namespace augs {
 
 class cosmos;
 class interpolation_system;
+struct throw_trajectory;
 class damage_indication_system;
 struct damage_indication_settings;
 
@@ -141,6 +143,14 @@ struct draw_crosshair_lasers_input {
 		Grenades and melee weapons whose trajectories are drawn get no laser.
 	*/
 	const throw_trajectory_flags throw_trajectories;
+
+	/*
+		Whether the lasers of guns - and of grenades and melee weapons without their trajectories - are drawn.
+		The trajectories drawn as lasers are drawn regardless - see throw_trajectory_mode.
+	*/
+	const bool draw_lasers;
+	const std::vector<throw_trajectory>& trajectories;
+	const real32 interpolation_ratio;
 };
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);

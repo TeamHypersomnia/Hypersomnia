@@ -1747,19 +1747,38 @@ void settings_gui_state::perform(
 							revertable_checkbox("Melee weapons", config.drawing.draw_melee_trajectories);
 							text_disabled("(instead of their laser)");
 
+							if (config.drawing.draw_grenade_trajectories) {
+								revertable_enum("Grenade trajectory mode", config.drawing.grenade_trajectory_mode);
+							}
+
+							if (config.drawing.draw_melee_trajectories) {
+								revertable_enum("Melee trajectory mode", config.drawing.melee_trajectory_mode);
+							}
+
 							if (config.drawing.draw_grenade_trajectories || config.drawing.draw_melee_trajectories) {
 								if (!config.drawing.draw_weapon_laser) {
 									revertable_checkbox("Still draw them right before a throw", config.drawing.draw_throw_trajectory_when_throwing);
 									text_disabled("(of an armed grenade, or of a melee weapon about to be thrown)");
 								}
 
-								revertable_checkbox("Draw them when throwing with a gun in the other hand", config.drawing.draw_throw_trajectories_during_side_throws);
-								text_disabled("(otherwise the gun keeps its laser for the short while)");
+								revertable_checkbox("Draw them as set when throwing with a gun in the other hand", config.drawing.draw_throw_trajectories_during_side_throws);
+								text_disabled("(otherwise always as a laser, replacing the gun's for the short while)");
 
-								revertable_slider("Alpha", config.drawing.throw_trajectory_alpha, 0.f, 1.f);
+								const bool any_silhouettes =
+									(config.drawing.draw_grenade_trajectories && config.drawing.grenade_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
+									|| (config.drawing.draw_melee_trajectories && config.drawing.melee_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
+								;
+
+								if (any_silhouettes) {
+									revertable_slider("Alpha", config.drawing.throw_trajectory_alpha, 0.f, 1.f);
+								}
+
 								revertable_slider("End alpha", config.drawing.throw_trajectory_end_alpha, 0.f, 1.f);
-								revertable_slider("Gap", config.drawing.throw_trajectory_gap, 0.f, 5.f);
-								text_disabled("(between the silhouettes, in their radii)");
+
+								if (any_silhouettes) {
+									revertable_slider("Gap", config.drawing.throw_trajectory_gap, 0.f, 5.f);
+									text_disabled("(between the silhouettes, in their radii)");
+								}
 							}
 						}
 

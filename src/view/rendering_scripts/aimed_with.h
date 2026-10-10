@@ -11,33 +11,13 @@
 	Only the item about to be thrown is aimed with then -
 	its laser or its trajectory is shown, and not those of the other item.
 
-	Unless aim_side_throws is false and the other item is a gun:
-	then the gun keeps being aimed with, so that its laser does not flicker
-	for the short while the item is thrown from the other hand.
+	The thrown item is aimed with even when thrown from the hand other than a gun's - see is_side_throw.
 */
 
 template <class H, class I>
-bool is_aimed_with(const H& character, const I& item, const bool aim_side_throws) {
-	const auto& cosm = character.get_cosmos();
-
+bool is_aimed_with(const H& character, const I& item) {
 	const bool throwing_explosive = ::is_throwing_explosive(character);
 	const bool throwing_melee = ::is_throwing_melee(character);
-
-	if (!aim_side_throws && (throwing_explosive || throwing_melee)) {
-		const bool gun_wielded = [&]() {
-			for (const auto& w : character.get_wielded_items()) {
-				if (const auto wielded = cosm[w]; wielded.alive() && wielded.template has<components::gun>()) {
-					return true;
-				}
-			}
-
-			return false;
-		}();
-
-		if (gun_wielded) {
-			return item.template has<components::gun>();
-		}
-	}
 
 	if (throwing_explosive) {
 		return ::is_armed_explosive(item);
@@ -51,13 +31,45 @@ bool is_aimed_with(const H& character, const I& item, const bool aim_side_throws
 }
 
 /*
+	Whether an item is about to be thrown from the hand other than a gun's.
+*/
+
+template <class H>
+bool is_side_throw(const H& character) {
+	if (!::is_throwing_explosive(character) && !::is_throwing_melee(character)) {
+		return false;
+	}
+
+	const auto& cosm = character.get_cosmos();
+
+	for (const auto& w : character.get_wielded_items()) {
+		if (const auto wielded = cosm[w]; wielded.alive() && wielded.template has<components::gun>()) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*
+	Whether the trajectory of a held item is drawn as a laser - see throw_trajectory_mode.
+	A side throw is always drawn as a laser unless throw_trajectory_flags::during_side_throws -
+	the gun's laser is only replaced by it for the short while.
+*/
+
+template <class H, class I>
+bool is_throw_trajectory_laser(const H& character, const I& item, const throw_trajectory_flags& flags) {
+	return flags.as_laser_for(item) || (!flags.during_side_throws && ::is_side_throw(character));
+}
+
+/*
 	Whether the trajectory of a held item is shown - see throw_trajectory_flags:
 	with only_when_throwing, only that of an armed grenade or of a melee weapon about to be thrown.
 */
 
 template <class H, class I>
 bool is_throw_trajectory_shown(const H& character, const I& item, const throw_trajectory_flags& flags) {
-	if (!flags.shown_for(item) || !::is_aimed_with(character, item, flags.during_side_throws)) {
+	if (!flags.shown_for(item) || !::is_aimed_with(character, item)) {
 		return false;
 	}
 
