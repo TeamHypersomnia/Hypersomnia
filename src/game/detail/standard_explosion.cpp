@@ -502,6 +502,32 @@ void standard_explosion_input::instantiate(
 
 	// TODO_PERFORMANCE: This code is unnecessary for the server
 
+	auto rings = explosion_rings_input();
+	rings.pos = explosion_pos;
+	rings.radius = effective_radius;
+	rings.ring_duration_seconds = ring_duration_seconds;
+	rings.inner_ring_color = inner_ring_color;
+	rings.outer_ring_color = outer_ring_color;
+	rings.particles = explosion_particles;
+	rings.draws_color_rings = draws_color_rings;
+	rings.inner_ring_emits_light = inner_ring_emits_light;
+	rings.outer_ring_emits_light = outer_ring_emits_light;
+
+	::post_explosion_rings(step, predictability, rings, response);
+}
+
+void post_explosion_rings(
+	const logic_step step,
+	const predictability_info predictability,
+	const explosion_rings_input& in,
+	const messages::visibility_information_response& response
+) {
+	const auto explosion_pos = in.pos;
+	const auto effective_radius = in.radius;
+	const auto inner_ring_color = in.inner_ring_color;
+	const auto outer_ring_color = in.outer_ring_color;
+	const auto& explosion_particles = in.particles;
+
 	/*
 		Each ring of the explosion is made of the pixel art particles,
 		accompanied by a thin ring following its outer edge with the particles' timing, to accentuate the explosion.
@@ -536,19 +562,21 @@ void standard_explosion_input::instantiate(
 		ring.inner_radius_start_value = inner_start;
 		ring.inner_radius_end_value = inner_end;
 
-		ring.emit_ring_end_particles = true;
+		ring.emit_ring_end_particles = in.emit_ring_end_particles;
 		ring.emit_explosion_particles = explosion_particles.enabled;
 		ring.explosion_particles = explosion_particles;
 		ring.explosion_particles_palette_offset = palette_offset;
 		ring.explosion_particles_hot_color = inner_ring_color;
-		ring.draw_color_rings = draws_color_rings;
+		ring.draw_color_rings = in.draws_color_rings;
 		ring.emit_light = emit_light;
 
-		ring.maximum_duration_seconds = ring_duration_seconds / std::max(0.01f, explosion_particles.playback_speed);
+		ring.maximum_duration_seconds = in.ring_duration_seconds / std::max(0.01f, explosion_particles.playback_speed);
 
 		ring.color = color;
 		ring.center = explosion_pos;
 		ring.visibility = response;
+		ring.pending_visibility_radius = in.pending_visibility_radius;
+		ring.visibility_subject = in.visibility_subject;
 
 		step.post_message(msg);
 
@@ -566,8 +594,8 @@ void standard_explosion_input::instantiate(
 		step.post_message(msg);
 	};
 
-	post_rings(effective_radius / 2, effective_radius, 0.f, effective_radius, inner_ring_color, 0.f, inner_ring_emits_light);
-	post_rings(effective_radius, effective_radius / 2, effective_radius / 1.5f, effective_radius / 2, outer_ring_color, 0.5f, outer_ring_emits_light);
+	post_rings(effective_radius / 2, effective_radius, 0.f, effective_radius, inner_ring_color, 0.f, in.inner_ring_emits_light);
+	post_rings(effective_radius, effective_radius / 2, effective_radius / 1.5f, effective_radius / 2, outer_ring_color, 0.5f, in.outer_ring_emits_light);
 
 	{
 		/*
@@ -595,7 +623,83 @@ void standard_explosion_input::instantiate(
 		ring.color.a = 255;
 		ring.center = explosion_pos;
 		ring.visibility = response;
+		ring.pending_visibility_radius = in.pending_visibility_radius;
+		ring.visibility_subject = in.visibility_subject;
 
 		step.post_message(msg);
 	}
+}
+
+/*
+	The muzzle explosion is purely visual - no damage, sounds, ring end smokes or lights of its own,
+	occluded by walls like any explosion, but only on the client (see pending_visibility_radius).
+*/
+
+void post_particle_explosion(
+	const logic_step step,
+	const predictability_info predictability,
+	const particle_explosion_def& def,
+	const transformr where,
+	const entity_id subject_if_any
+) {
+	if (!def.is_set()) {
+		return;
+	}
+
+	const auto reach = [&]() {
+		auto result = def.radius;
+
+		for (const auto& jet : def.jets) {
+			result = std::max(result, jet.calc_max_reach());
+		}
+
+		return result;
+	}();
+
+	for (const auto& jet : def.jets) {
+		auto msg = messages::exploding_ring_effect(predictability);
+		auto& ring = msg.payload;
+
+		/* Only for culling - no rings are drawn. */
+		ring.outer_radius_start_value = jet.calc_max_reach();
+		ring.outer_radius_end_value = jet.calc_max_reach();
+
+		ring.maximum_duration_seconds = jet.lifetime_ms.second / 1000.f;
+
+		ring.emit_explosion_particles = true;
+		ring.explosion_particles = def.particles;
+		ring.explosion_particles_hot_color = def.inner_ring_color;
+		ring.draw_color_rings = false;
+		ring.emit_light = false;
+
+		ring.emit_jet = true;
+		ring.jet = jet;
+		ring.jet_degrees = where.rotation;
+
+		ring.color = def.outer_ring_color;
+		ring.center = where.pos;
+		ring.pending_visibility_radius = reach;
+		ring.visibility_subject = subject_if_any;
+
+		step.post_message(msg);
+	}
+
+	if (def.radius <= 0.f) {
+		return;
+	}
+
+	auto rings = explosion_rings_input();
+	rings.pos = where.pos;
+	rings.radius = def.radius;
+	rings.ring_duration_seconds = def.ring_duration_seconds;
+	rings.inner_ring_color = def.inner_ring_color;
+	rings.outer_ring_color = def.outer_ring_color;
+	rings.particles = def.particles;
+	rings.inner_ring_emits_light = false;
+	rings.outer_ring_emits_light = false;
+	rings.emit_ring_end_particles = false;
+	rings.pending_visibility_radius = reach;
+	rings.visibility_subject = subject_if_any;
+
+	::post_explosion_rings(step, predictability, rings, messages::visibility_information_response());
 }

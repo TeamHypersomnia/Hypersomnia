@@ -38,6 +38,24 @@ struct exploding_ring_input {
 	float halve_per_ms = -1.0f;
 	float fixed_thickness = -1.0f;
 
+	/*
+		With emit_jet, the explosion particles shoot out of the center as the jet describes,
+		around jet_degrees (the muzzle's direction), instead of filling the ring.
+	*/
+
+	bool emit_jet = false;
+	float jet_degrees = 0.f;
+	particle_jet_def jet;
+
+	/*
+		Above 0, only the client calculates the visibility, within that radius, once the ring shows up on screen -
+		for the purely visual explosions, of no use to the server. Off screen, such a ring is dropped right away.
+		visibility_subject is ignored by the visibility, e.g. the shooter.
+	*/
+
+	float pending_visibility_radius = 0.f;
+	entity_id visibility_subject;
+
 	vec2 center;
 	entity_id target;
 

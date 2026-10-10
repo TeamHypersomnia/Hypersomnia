@@ -36,6 +36,21 @@ public:
 
 	double global_time_seconds = 0.0;
 
+	/*
+		The visibility last calculated for a purely visual explosion (see pending_visibility_radius) -
+		reused by all its rings and jets, which come in the same advance.
+	*/
+
+	struct cached_visibility {
+		vec2 center;
+		entity_id subject;
+		float radius = -1.f;
+		double time_seconds = -1.0;
+		messages::visibility_information_response response;
+	};
+
+	cached_visibility last_visibility;
+
 	augs::constant_size_vector<ring, MAX_EXPLODING_RINGS> rings;
 
 	template <class C>

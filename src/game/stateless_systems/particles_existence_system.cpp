@@ -23,6 +23,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/physics/calc_physical_material.hpp"
+#include "game/detail/standard_explosion.h"
 
 void particles_existence_system::displace_streams(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -128,13 +129,21 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				(which spawn many pellets per shot) would stack the muzzle explosion
 				as many times as they have pellets.
 			*/
-			const auto& effect = cosm[g.spawned_rounds.front()].get<invariants::missile>().muzzle_leave_particles;
+			const auto& missile_def = cosm[g.spawned_rounds.front()].get<invariants::missile>();
 
-			effect.start(
+			missile_def.muzzle_leave_particles.start(
 				step,
 				particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform),
 				predictability
 			);
+
+			const auto& muzzle_explosion = 
+				gun->muzzle_leave_explosion.is_set() ?
+				gun->muzzle_leave_explosion :
+				missile_def.muzzle_leave_explosion
+			;
+
+			::post_particle_explosion(step, predictability, muzzle_explosion, g.muzzle_transform, g.subject);
 		}
 
 		for (auto& r : g.spawned_rounds) {

@@ -74,3 +74,43 @@ struct standard_explosion_input {
 		predictability_info info = always_predictable_v
 	) const;
 };
+
+namespace messages {
+	struct visibility_information_response;
+}
+
+/*
+	The rings of an explosion - its pixel art particles, thin rings and the flash - without any of its logic.
+	emit_ring_end_particles spawns the sparkles and smokes along the rings right before they vanish.
+	pending_visibility_radius and visibility_subject - see exploding_ring_input.
+*/
+
+struct explosion_rings_input {
+	vec2 pos;
+	real32 radius = 0.f;
+	real32 ring_duration_seconds = 0.2f;
+	rgba inner_ring_color = white;
+	rgba outer_ring_color = white;
+	explosion_particles_def particles;
+	bool draws_color_rings = true;
+	bool inner_ring_emits_light = true;
+	bool outer_ring_emits_light = true;
+	bool emit_ring_end_particles = true;
+	real32 pending_visibility_radius = 0.f;
+	entity_id visibility_subject;
+};
+
+void post_explosion_rings(
+	logic_step step,
+	predictability_info predictability,
+	const explosion_rings_input& in,
+	const messages::visibility_information_response& response
+);
+
+void post_particle_explosion(
+	logic_step step,
+	predictability_info predictability,
+	const particle_explosion_def& def,
+	transformr where,
+	entity_id subject_if_any
+);

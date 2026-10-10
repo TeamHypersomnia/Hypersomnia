@@ -942,6 +942,49 @@ namespace test_flavours {
 			*/
 			meta.get<invariants::missile>().damage.effects.destruction.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION_PLAIN);
 			meta.get<invariants::missile>().muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION_PLAIN);
+
+			{
+				/*
+					The muzzle flash - jets of fire explosion particles.
+					The baseline for the jets of the other guns.
+				*/
+
+				auto& e = meta.get<invariants::missile>().muzzle_leave_explosion;
+
+				e.inner_ring_color = yellow;
+				e.outer_ring_color = white;
+				e.particles.fire = true;
+				e.particles.cool_color = muzzle_cyan;
+				e.particles.cool_from_mult = 2.5f;
+
+				{
+					auto jet = particle_jet_def();
+					jet.amount = { 30.f, 120.f };
+					jet.spawn_radius = { 4.f, 4.f };
+					jet.speed = { 250.f, 6700.f };
+					jet.damping = 20.f;
+					jet.angular_offset = { -2.f, 2.f };
+					jet.spread = { 3.f, 3.f };
+					jet.lifetime_ms = { 20.f, 32.f };
+					jet.muzzle_offset = 25.0f;
+
+					e.jets.push_back(jet);
+				}
+
+				{
+					auto jet = particle_jet_def();
+					jet.amount = { 30.f, 60.f };
+					jet.spawn_radius = { 4.f, 4.f };
+					jet.speed = { 250.f, 4900.f };
+					jet.damping = 20.f;
+					jet.angular_offset = { -2.f, 2.f };
+					jet.spread = { 0.f, 0.f };
+					jet.lifetime_ms = { 20.f, 32.f };
+					jet.muzzle_offset = 50.0f;
+
+					e.jets.push_back(jet);
+				}
+			}
 		}
 
 		{
@@ -1286,6 +1329,23 @@ namespace test_flavours {
 			//missile.trace_particles.modifier.scale_velocities = 1.8f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HPSR_ROUND_MUZZLE_LEAVE_EXPLOSION);
+
+			{
+				/*
+					Like a corpse explosion, only much faster and in the AWKA's blue.
+				*/
+
+				auto& e = missile.muzzle_leave_explosion;
+
+				e.radius = 80.f;
+				e.inner_ring_color = bright_cyan;
+				e.outer_ring_color = muzzle_cyan;
+				e.particles.variation = 0.2f;
+				e.particles.cool_color = muzzle_cyan;
+				e.particles.cool_from_mult = 2.5f;
+				e.particles.playback_speed = 1.9f;
+			}
+
 			missile.trace_particles_fly_backwards = true;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -1775,7 +1835,7 @@ namespace test_flavours {
 			missile.trace_particles.modifier.color = bullet_violet_neon;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.color = muzzle_cyan;
+			missile.muzzle_leave_particles.modifier.color = muzzle_pink;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -5298,6 +5358,177 @@ namespace test_flavours {
 					}
 				}
 			});
+		});
+
+		/*
+			Muzzle flashes: the jets of the Baka47's round for the other guns,
+			with more particles flying farther for the more powerful guns - relative to magazine_baseline_power, the Baka47's shot.
+			The excluded guns are left as they are.
+		*/
+
+		const auto baseline_muzzle_explosion = get_test_flavour(flavours, test_plain_missiles::BAKA47_ROUND).template get<invariants::missile>().muzzle_leave_explosion;
+
+		auto find_charge_of_chamber = [&](const auto& charge_flavour_id) -> const invariants::cartridge* {
+			const invariants::cartridge* found = nullptr;
+
+			augs::for_each_enum_except_bounds([&](const test_shootable_charges charge) {
+				if (found == nullptr && ::to_entity_flavour_id(charge) == charge_flavour_id) {
+					found = get_test_flavour(flavours, charge).template find<invariants::cartridge>();
+				}
+			});
+
+			return found;
+		};
+
+		auto find_round = [&](const auto& round_flavour_id) {
+			std::optional<test_plain_missiles> found;
+
+			augs::for_each_enum_except_bounds([&](const test_plain_missiles round) {
+				if (!found.has_value() && ::to_entity_flavour_id(round) == round_flavour_id) {
+					found = round;
+				}
+			});
+
+			return found;
+		};
+
+		augs::for_each_enum_except_bounds([&](const test_shootable_weapons weapon) {
+			using W = test_shootable_weapons;
+
+			const bool excluded = 
+				weapon == W::BAKA47
+				|| weapon == W::BILMER2000
+				|| weapon == W::COVERT
+				|| weapon == W::SZCZUR
+				|| weapon == W::AMPLIFIER_ARM
+				|| weapon == W::BLUNAZ
+			;
+
+			if (excluded) {
+				return;
+			}
+
+			auto& gun_meta = get_test_flavour(flavours, weapon);
+
+			const auto gun_def = gun_meta.template find<invariants::gun>();
+			const auto container = gun_meta.template find<invariants::container>();
+
+			if (gun_def == nullptr || container == nullptr) {
+				return;
+			}
+
+			const auto charge = [&]() -> const invariants::cartridge* {
+				const auto magazine_slot = mapped_or_nullptr(container->slots, slot_function::GUN_DETACHABLE_MAGAZINE);
+
+				if (magazine_slot != nullptr && magazine_slot->only_allow_flavour.is_set()) {
+					return find_charge_of(magazine_slot->only_allow_flavour);
+				}
+
+				if (const auto chamber_slot = mapped_or_nullptr(container->slots, slot_function::GUN_CHAMBER)) {
+					return find_charge_of_chamber(chamber_slot->only_allow_flavour);
+				}
+
+				return nullptr;
+			}();
+
+			if (charge == nullptr) {
+				return;
+			}
+
+			const auto round = find_round(charge->round_flavour);
+
+			if (!round.has_value()) {
+				return;
+			}
+
+			auto& round_meta = get_test_flavour(flavours, *round);
+			const auto missile = round_meta.template find<invariants::missile>();
+			const auto round_sprite = round_meta.template find<invariants::sprite>();
+
+			if (missile == nullptr) {
+				return;
+			}
+
+			const auto pellets = static_cast<real32>(charge->num_rounds_spawned);
+			const auto intensity = gun_def->damage_multiplier * repro::sqrt(pellets) / magazine_baseline_power;
+
+			const auto amount_mult = std::clamp(intensity, 0.35f, 3.f);
+			const auto speed_mult = std::clamp(static_cast<real32>(repro::sqrt(intensity)), 0.6f, 1.6f);
+
+			/*
+				The weaker guns' jets are also narrower, start closer to the muzzle and have their particles less turned
+				- only narrower, never wider than the Baka47's.
+				From half the Baka47's power down, they're straight lines from a single point -
+				from 0.4 of it down for the small pistols and SMGs, to keep a bit of their spread.
+			*/
+
+			const bool small_pistol_or_smg = 
+				weapon == W::KEK9
+				|| weapon == W::SN69
+				|| gun_def->buy_type == buy_menu_type::SUBMACHINE_GUNS
+			;
+
+			const auto straight_below = small_pistol_or_smg ? 0.4f : 0.5f;
+			const auto narrowing_mult = std::clamp((intensity - straight_below) / straight_below, 0.f, 1.f);
+
+			/*
+				A round with its own explosion at the muzzle (AWKA) keeps it as it is, with the jets added in its colors.
+			*/
+
+			const bool keeps_own_explosion = missile->muzzle_leave_explosion.radius > 0.f;
+
+			auto explosion = keeps_own_explosion ? missile->muzzle_leave_explosion : baseline_muzzle_explosion;
+			explosion.jets = baseline_muzzle_explosion.jets;
+
+			for (auto& jet : explosion.jets) {
+				jet.amount.first *= amount_mult;
+				jet.amount.second *= amount_mult;
+				jet.speed.first *= speed_mult;
+				jet.speed.second *= speed_mult;
+				jet.spread.first *= narrowing_mult;
+				jet.spread.second *= narrowing_mult;
+				jet.spawn_radius.first *= narrowing_mult;
+				jet.spawn_radius.second *= narrowing_mult;
+				jet.rotation_variation *= narrowing_mult;
+			}
+
+			/*
+				The fiery muzzles (white smokes) keep the Baka47's colors.
+				The others take the color of their round's almost white inside -
+				their muzzles' saturated colors make the flash too dark.
+			*/
+
+			const bool fiery_muzzle = missile->muzzle_leave_particles.modifier.color == white;
+
+			const auto color_exception = [&]() -> std::optional<rgba> {
+				switch (weapon) {
+					case W::ZAMIEC: return rgba(150, 255, 255, 255);
+					case W::KEK9: return white;
+					default: return std::nullopt;
+				}
+			}();
+
+			if (!keeps_own_explosion) {
+				if (color_exception.has_value()) {
+					explosion.inner_ring_color = white;
+					explosion.outer_ring_color = *color_exception;
+					explosion.particles.cool_color = *color_exception;
+				}
+				else if (!fiery_muzzle && round_sprite != nullptr) {
+					auto inside_color = round_sprite->color;
+					inside_color.a = 255;
+
+					explosion.inner_ring_color = white;
+					explosion.outer_ring_color = inside_color;
+					explosion.particles.cool_color = inside_color;
+				}
+			}
+
+			/*
+				Set on the gun, not on its round - guns sharing a round differ in power (Bilmik and Bilmer, Lews and Vindicator).
+			*/
+
+			gun_def->muzzle_leave_explosion = explosion;
 		});
 	}
 }

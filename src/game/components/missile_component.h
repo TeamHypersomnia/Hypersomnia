@@ -19,6 +19,7 @@
 #include "game/detail/sentience_shake.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/view_input/explosion_particles_def.h"
 
 #include "game/detail/damage/damage_definition.h"
 
@@ -93,6 +94,7 @@ namespace invariants {
 
 		particle_effect_input ricochet_particles;
 		particle_effect_input muzzle_leave_particles;
+		particle_explosion_def muzzle_leave_explosion;
 		bool trace_particles_fly_backwards = false;
 		bool trace_sound_audible_to_shooter = false;
 		bool use_polygon_shape = false;
