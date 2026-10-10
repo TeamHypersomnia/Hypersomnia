@@ -230,6 +230,11 @@ server_adapter::server_adapter(
 	if (auto detail = server.GetServerDetail()) {
 		detail->config.auxiliary_command_function = auxiliary_command_function;
 		detail->config.auxiliary_command_context = this;
+		/*
+			We send our own disconnect messages with e.g. kick reasons included.
+			netcode's disconnect packets could arrive first and drop the reason.
+		*/
+		detail->config.disable_disconnect_packets = 1;
 
 		if (is_webrtc_only) {
 			detail->config.override_send_and_receive = 1;
@@ -711,6 +716,14 @@ bool client_adapter::has_connection_failed() const {
 }
 
 void client_adapter::set(augs::maybe_network_simulator s) {
+	/*
+		yojimbo only has a network simulator while connecting or connected,
+		and asserts if we try to configure it otherwise.
+	*/
+	if (client.IsDisconnected()) {
+		return;
+	}
+
 	if (!s.is_enabled) {
 		s = augs::network_simulator_settings::zero();
 	}
@@ -724,6 +737,14 @@ void client_adapter::set(augs::maybe_network_simulator s) {
 }
 
 void server_adapter::set(augs::maybe_network_simulator s) {
+	/*
+		yojimbo only has a network simulator while running,
+		and asserts if we try to configure it otherwise.
+	*/
+	if (!server.IsRunning()) {
+		return;
+	}
+
 	if (!s.is_enabled) {
 		s = augs::network_simulator_settings::zero();
 	}

@@ -575,13 +575,13 @@ namespace net_messages {
 				const auto pos_after = s.GetBytesProcessed();
 
 				if (motion_writable_in_one_byte) {
-					ensure_eq(1, pos_after - pos_before);
+					ensure_eq(1, static_cast<int>(pos_after - pos_before));
 				}
 				else if (motion_writable_in_two_bytes) {
-					ensure_eq(2, pos_after - pos_before);
+					ensure_eq(2, static_cast<int>(pos_after - pos_before));
 				}
 				else {
-					ensure_eq(3, pos_after - pos_before);
+					ensure_eq(3, static_cast<int>(pos_after - pos_before));
 				}
 			}
 		}
