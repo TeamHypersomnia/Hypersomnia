@@ -692,6 +692,23 @@ resolve_address_result client_adapter::connect(const client_connect_string& str,
 		LOG("Connecting securely to the official server %x.", secure_token->server_id);
 
 		auto token = secure_token->token;
+
+		if (use_webrtc) {
+			/*
+				Over WebRTC, the server's packets come from the address the data channel is given here, not the server's IP,
+				and the netcode client takes packets only from the server address in the token.
+				That list is in the token's public part, which the server never reads, so it is safe to point it at the channel.
+			*/
+
+			struct netcode_connect_token_t parsed;
+
+			if (netcode_read_connect_token(token.data(), static_cast<int>(token.size()), &parsed) == NETCODE_OK) {
+				parsed.num_server_addresses = 1;
+				parsed.server_addresses[0] = connected_ip_address;
+				netcode_write_connect_token(&parsed, token.data(), static_cast<int>(token.size()));
+			}
+		}
+
 		client.Connect(secure_token->client_id, token.data());
 	}
 	else {

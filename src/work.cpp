@@ -2329,8 +2329,17 @@ work_result work(
 		const auto secure_request = [&]() -> std::optional<secure_connect_request> {
 			const auto found = find_chosen_server_info();
 
-			const bool is_official = (found != nullptr && found->is_official_server()) || ::is_official_webrtc_id(connect_string);
-			const bool is_ranked = (found != nullptr && found->heartbeat.is_ranked_server()) || begins_with(connect_string, "ranked");
+			/*
+				E.g. "ranked-pl" for "rtc:ranked-pl" - the official WebRTC aliases are ranked-<location> or <location>:<index>.
+			*/
+
+			const auto target = [&]() {
+				const auto webrtc_id = ::find_webrtc_id(connect_string);
+				return webrtc_id.empty() ? std::string(connect_string) : webrtc_id;
+			}();
+
+			const bool is_ranked = (found != nullptr && found->heartbeat.is_ranked_server()) || begins_with(target, "ranked");
+			const bool is_official = (found != nullptr && found->is_official_server()) || ::is_official_webrtc_id(target) || is_ranked;
 
 			if (found == nullptr && !is_official) {
 				/*
