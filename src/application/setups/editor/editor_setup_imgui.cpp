@@ -283,6 +283,48 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	}
 }
 
+void editor_setup::perform_toast() {
+	if (toast.content.empty()) {
+		return;
+	}
+
+	toast.mark_shown();
+
+	const auto secs_left = toast.get_secs_left();
+
+	if (secs_left <= 0.0) {
+		return;
+	}
+
+	const auto fade_secs = 0.6;
+	const auto alpha = static_cast<float>(std::min(1.0, secs_left / fade_secs));
+
+	auto faded = [alpha](rgba col) {
+		return ImGui::GetColorU32(ImVec4(col.mult_alpha(alpha)));
+	};
+
+	auto* const font = ImGui::GetIO().Fonts->Fonts[1];
+	const auto text = toast.content.c_str();
+
+	const auto text_size = vec2(font->CalcTextSizeA(font->FontSize, FLT_MAX, 0.0f, text));
+	const auto text_padding = vec2(24, 14);
+	const auto top_offset = 100.0f;
+	const auto rounding = 12.0f;
+
+	const auto rect_size = text_size + text_padding * 2;
+	const auto rect_lt = vec2(ImGui::GetIO().DisplaySize.x / 2 - rect_size.x / 2, top_offset);
+
+	const auto lt = static_cast<ImVec2>(rect_lt);
+	const auto rb = static_cast<ImVec2>(rect_lt + rect_size);
+	const auto text_pos = static_cast<ImVec2>(rect_lt + text_padding);
+
+	auto* const draw_list = ImGui::GetForegroundDrawList();
+
+	draw_list->AddRectFilled(lt, rb, faded(rgba(0, 0, 0, 160)), rounding);
+	draw_list->AddRect(lt, rb, faded(yellow), rounding, 0, 1.5f);
+	draw_list->AddText(font, font->FontSize, text_pos, faded(yellow), text);
+}
+
 custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
 
@@ -430,6 +472,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		});
 
 	ImGui::End();
+
+	perform_toast();
 
 	if (autosave_popup) {
 		if (autosave_popup->perform()) {

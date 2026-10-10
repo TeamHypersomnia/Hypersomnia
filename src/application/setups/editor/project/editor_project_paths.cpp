@@ -1,3 +1,4 @@
+#include "augs/string/string_templates.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/arena/arena_paths.h"
 #include "application/setups/editor/editor_paths.h"
@@ -136,13 +137,20 @@ bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) 
 	}
 
 	/*
-		Stamps are cache artifacts and never project resources.
+		Stamps, generated neon maps and desaturations are cache artifacts, never project resources.
 		Older builds generated them next to the source images.
+		A custom neon map (image.neon_map.png) is auxiliary to its image, not a resource either.
 	*/
 
-	const bool is_stamp = path.extension() == ".stamp";
+	const auto filename = path.filename().string();
 
-	if (is_stamp) {
+	const bool is_cache_artifact =
+		path.extension() == ".stamp"
+		|| ends_with(filename, ".neon_map.png")
+		|| ends_with(filename, ".desaturation.png")
+	;
+
+	if (is_cache_artifact) {
 		return true;
 	}
 

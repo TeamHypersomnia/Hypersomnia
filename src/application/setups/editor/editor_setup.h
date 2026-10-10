@@ -165,6 +165,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	const editor_project_paths paths;
 
 	editor_recent_message recent_message;
+	editor_toast toast;
 
 	client_vars simulated_client;
 	faction_view_settings faction_view;
@@ -712,6 +713,7 @@ public:
 	void draw_custom_gui(const draw_setup_gui_input&);
 	void draw_custom_gui_over_imgui(const draw_setup_gui_input&);
 	void draw_recent_message(const draw_setup_gui_input&);
+	void perform_toast();
 
 	void ensure_handler() {}
 

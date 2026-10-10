@@ -150,31 +150,21 @@ editor_setup::editor_setup(
 
 			autosaved_project->meta.name = paths.arena_name;
 
-			simple_popup new_autosave_popup;
-			new_autosave_popup.title = "WARNING";
-
 			replace_whole_project_command cmd;
 			cmd.after = std::move(autosaved_project);
 			cmd.before = std::make_unique<editor_project>(project);
 			cmd.built_description = std::string("Loaded autosave from ") + path.filename().string();
 
-			if (settings.autosave.if_loaded_autosave_show == editor_autosave_load_option::LAST_SAVED_VERSION) {
-				new_autosave_popup.warning_notice_above = "Autosaved changes are available in: " + path.filename().string();
+			if (settings.autosave.alert_when_loaded_autosave) {
+				const auto toast_text = [&]() {
+					if (settings.autosave.if_loaded_autosave_show == editor_autosave_load_option::LAST_SAVED_VERSION) {
+						return std::string("Autosaved changes available - Redo (CTRL+SHIFT+Z) to load them.");
+					}
 
-				new_autosave_popup.message = "You're now on the last saved version from: " + paths.last_saved_json.filename().string() + ".\n";
-				new_autosave_popup.message += "To load the autosave, press Redo (CTRL+SHIFT+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
-			}
-			else {
-				new_autosave_popup.warning_notice_above = "Loaded autosaved changes from " + path.filename().string() + ".";
+					return std::string("Loaded autosaved changes - Undo (CTRL+Z) to go back to the last save.");
+				}();
 
-				new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
-
-			}
-
-			if (!autosave_popup.has_value()) {
-				if (settings.autosave.alert_when_loaded_autosave) {
-					autosave_popup = new_autosave_popup;
-				}
+				toast.set(toast_text, 4.0);
 			}
 
 			post_new_command(std::move(cmd));
