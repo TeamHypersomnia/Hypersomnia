@@ -1239,7 +1239,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 2.f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.65f;
 
 			invariants::missile missile;
 
@@ -1817,7 +1817,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 2.f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.65f;
 
 			invariants::missile missile;
 
