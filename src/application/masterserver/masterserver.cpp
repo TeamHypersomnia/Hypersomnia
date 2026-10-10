@@ -22,6 +22,8 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/official_servers_registry.h"
+#include "application/network/secure_connect.h"
+#include "augs/misc/to_hex_str.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "augs/string/parse_url.h"
 #include "application/detail_file_paths.h"
@@ -117,8 +119,30 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		if (since_last_official_servers_reload.get<std::chrono::seconds>() >= 60.0) {
 			since_last_official_servers_reload.reset();
 			official_servers.reload();
+
+			return true;
 		}
+
+		return false;
 	};
+
+	/*
+		The official servers clients can get secure connect tokens for, by their address and by their WebRTC alias.
+		Rebuilt on the main thread whenever the list changes, read by the HTTP threads.
+	*/
+
+	struct secure_connect_target {
+		std::string address;
+		std::string server_id;
+		augs::hmac_sha256_type netcode_key;
+	};
+
+	std::mutex secure_connect_targets_mutex;
+	std::unordered_map<std::string, secure_connect_target> secure_connect_targets;
+
+	std::mutex token_requests_mutex;
+	std::unordered_map<std::string, unsigned> token_requests_this_minute;
+	augs::timer since_token_requests_reset;
 
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
@@ -345,8 +369,35 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	auto previous_peers = signalling_server::peer_map();
 
+	auto rebuild_secure_connect_targets = [&]() {
+		std::scoped_lock lk(secure_connect_targets_mutex);
+
+		secure_connect_targets.clear();
+
+		for (const auto& server : server_list) {
+			const auto& entry = server.second;
+
+			if (!entry.meta.is_official) {
+				continue;
+			}
+
+			if (const auto official = official_servers.find_by_server_id(entry.official_server_id)) {
+				const auto address = ::ToString(server.first);
+				const auto target = secure_connect_target { address, official->server_id, official->keys.netcode_key };
+
+				secure_connect_targets[address] = target;
+
+				if (!entry.meta.webrtc_id.empty()) {
+					secure_connect_targets[std::string(entry.meta.webrtc_id)] = target;
+				}
+			}
+		}
+	};
+
 	auto reserialize_list = [&]() {
 		// MSR_LOG("Reserializing the server list.");
+
+		rebuild_secure_connect_targets();
 
 		const auto peer_map = signalling.get_new_peers_map();
 
@@ -661,6 +712,108 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 		});
 
+		/*
+			A secure connect token for one official server, by its address or WebRTC alias.
+			Served over HTTPS (nginx in front), so the session keys inside reach only the client asking.
+		*/
+
+		server.Get("/connect_token", [&](const Request& req, Response& res) {
+			set_cors(res);
+
+			const auto requester = [&]() {
+				if (req.remote_addr == "127.0.0.1" && req.has_header("X-Real-IP")) {
+					return req.get_header_value("X-Real-IP");
+				}
+
+				return req.remote_addr;
+			}();
+
+			{
+				std::scoped_lock lk(token_requests_mutex);
+
+				if (since_token_requests_reset.get<std::chrono::seconds>() >= 60.0) {
+					since_token_requests_reset.reset();
+					token_requests_this_minute.clear();
+				}
+
+				if (++token_requests_this_minute[requester] > 30) {
+					res.status = 429;
+					return;
+				}
+			}
+
+			const auto requested = req.get_param_value("server");
+
+			const auto target = [&]() -> std::optional<secure_connect_target> {
+				std::scoped_lock lk(secure_connect_targets_mutex);
+
+				if (const auto found = mapped_or_nullptr(secure_connect_targets, requested)) {
+					return *found;
+				}
+
+				return std::nullopt;
+			}();
+
+			if (!target.has_value()) {
+				res.status = 404;
+				res.set_content("{\"error\":\"Not an official server.\"}", "application/json");
+				return;
+			}
+
+			const auto user_data = secure_connect::make_user_data(target->server_id);
+
+			if (!user_data.has_value()) {
+				res.status = 500;
+				return;
+			}
+
+			const auto client_id = [&]() {
+				thread_local auto device = std::random_device();
+				return (static_cast<uint64_t>(device()) << 32) | static_cast<uint64_t>(device());
+			}();
+
+			auto token = std::array<uint8_t, NETCODE_CONNECT_TOKEN_BYTES>();
+			auto user_data_copy = *user_data;
+			const char* address = target->address.c_str();
+
+			/*
+				No netcode timeout, the same as the clients' own insecure tokens - the game times connections out itself.
+			*/
+
+			const auto result = netcode_generate_connect_token(
+				1,
+				&address,
+				&address,
+				secure_connect::token_lifetime_secs,
+				-1,
+				client_id,
+				DEFAULT_GAME_PORT_V,
+				target->netcode_key.data(),
+				user_data_copy.data(),
+				token.data()
+			);
+
+			if (result != NETCODE_OK) {
+				LOG("Failed to generate a connect token for %x (%x).", target->server_id, target->address);
+				res.status = 500;
+				return;
+			}
+
+			const auto json = typesafe_sprintf(
+				"{\"client_id\":\"%x\",\"server_id\":\"%x\",\"token\":\"%x\"}",
+				client_id,
+				target->server_id,
+				::get_hex_representation(token.data(), token.size())
+			);
+
+			res.set_content(json, "application/json");
+		});
+
+		server.Options("/connect_token", [](const httplib::Request&, httplib::Response& res) {
+			set_cors(res);
+			res.status = 204;
+		});
+
 		server.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
 			set_cors(res);
 			res.status = 204;
@@ -813,6 +966,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							auto& server_entry = (*it.first).second;
 
 							const auto heartbeat_before = server_entry.last_heartbeat;
+							const bool was_official = server_entry.meta.is_official;
 							server_entry.last_heartbeat = typed_request;
 							server_entry.last_heartbeat.signature.reset();
 							server_entry.time_last_heartbeat = current_time;
@@ -832,7 +986,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								signalling.set_webrtc_id_alias(new_webrtc_alias, ip_str);
 							}
 
-							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
+							const bool heartbeats_mismatch = 
+								heartbeat_before != server_entry.last_heartbeat
+								|| was_official != server_entry.meta.is_official
+							;
 
 							if (is_new_server) {
 								server_entry.meta.time_hosted = current_time;
@@ -918,7 +1075,9 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			reserialize_list();
 		}
 
-		keep_official_servers_up_to_date();
+		if (keep_official_servers_up_to_date()) {
+			reserialize_list();
+		}
 
 		signalling.send_signalling_packets(send_to_gameserver);
 		signalling.process_timeouts_if_its_time();

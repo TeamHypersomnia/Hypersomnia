@@ -119,6 +119,16 @@ public:
 		return by_key_id.size();
 	}
 
+	const official_server_entry* find_by_server_id(const std::string& server_id) const {
+		for (const auto& entry : by_key_id) {
+			if (entry.second.server_id == server_id) {
+				return std::addressof(entry.second);
+			}
+		}
+
+		return nullptr;
+	}
+
 	/*
 		The official server that has signed this request, or nullptr if the request is unsigned,
 		signed with an unknown secret, forged, too old, from too far in the future, or replayed.
