@@ -2647,11 +2647,12 @@ void editor_setup::apply(const config_json_table& cfg) {
 	simulated_client = cfg.client;
 
 	/*
-		Playtest at the same speed the map would be hosted at.
+		Playtest at the singleplayer speeds from the settings.
+		A server hosted from the editor is a server_setup and uses the server speeds instead.
 		playtest_speed remains a separate warp of the whole application on top of it.
 	*/
 
-	dummy_dynamic_vars.set_speeds_from(cfg.server);
+	dummy_dynamic_vars.set_speeds(cfg.singleplayer_game_speed, cfg.singleplayer_bullet_speed);
 	dummy_dynamic_vars.apply_logic_speed_immediately = true;
 }
 

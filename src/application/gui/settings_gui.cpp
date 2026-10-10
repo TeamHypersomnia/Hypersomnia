@@ -788,6 +788,25 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
 
+				ImGui::Separator();
+
+				{
+					text_disabled("Shooting range, Tutorial and Editor playtesting:");
+
+					const bool game_speed_changed = revertable_slider("Singleplayer game speed", config.singleplayer_game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+					config.singleplayer_game_speed = ::sanitize_logic_speed(config.singleplayer_game_speed);
+
+					::do_bullet_speed_slider(
+						"Singleplayer bullet speed",
+						config.singleplayer_game_speed,
+						config.singleplayer_bullet_speed,
+						game_speed_changed
+					);
+
+					tooltip_on_hover("Follows the singleplayer game speed until moved.\nMoving the game speed again makes it follow once more.");
+					revert(config.singleplayer_bullet_speed);
+				}
+
 				text("\n");
 				ImGui::Separator();
 
@@ -2690,18 +2709,23 @@ bool perform_arena_chooser(
 	return changed;
 }
 
-bool do_bullet_speed_slider(server_vars& vars, const bool game_speed_changed) {
+bool do_bullet_speed_slider(
+	const char* const label,
+	const real32 game_speed,
+	augs::maybe<real32>& bullet_speed,
+	const bool game_speed_changed
+) {
 	using namespace augs::imgui;
 
 	if (game_speed_changed) {
-		vars.bullet_speed.is_enabled = false;
+		bullet_speed.is_enabled = false;
 	}
 
-	auto shown_speed = vars.bullet_speed.is_enabled ? vars.bullet_speed.value : vars.game_speed;
-	const bool moved = slider("Bullet speed", shown_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+	auto shown_speed = bullet_speed.is_enabled ? bullet_speed.value : game_speed;
+	const bool moved = slider(label, shown_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
 
 	if (moved) {
-		vars.bullet_speed = augs::maybe<real32>::enabled(::sanitize_logic_speed(shown_speed));
+		bullet_speed = augs::maybe<real32>::enabled(::sanitize_logic_speed(shown_speed));
 	}
 
 	return moved;
@@ -2870,7 +2894,7 @@ void do_server_vars_section(
 			vars.game_speed = ::sanitize_logic_speed(vars.game_speed);
 			::do_game_speed_tooltip();
 
-			::do_bullet_speed_slider(vars, game_speed_changed);
+			::do_bullet_speed_slider("Bullet speed", vars.game_speed, vars.bullet_speed, game_speed_changed);
 			::do_bullet_speed_tooltip();
 			revert(vars.bullet_speed);
 

@@ -400,6 +400,14 @@ public:
 		return type == test_scene_type::TUTORIAL;
 	}
 
+	/*
+		The level with the two ticking bombs to defuse.
+	*/
+
+	bool is_tutorial_defusing_level() const {
+		return is_tutorial() && tutorial.level == 15;
+	}
+
 	void restart_mode();
 	void restart_arena();
 

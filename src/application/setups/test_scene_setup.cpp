@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include "game/cosmos/logic_step.h"
+#include "game/modes/logic_speed.h"
 #include "game/organization/all_messages_includes.h"
 
 #include "view/viewables/viewables_loading_type.h"
@@ -688,7 +689,7 @@ void test_scene_setup::restart_mode() {
 	const bool is_ricochets_level = tutorial.level == 7;
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
 	const bool is_planting_level = tutorial.level == 14;
-	const bool is_defusing_level = tutorial.level == 15;
+	const bool is_defusing_level = is_tutorial_defusing_level();
 	const bool is_normal_spells_level = tutorial.level == 16;
 	const bool is_offensive_spells_level = tutorial.level == 17;
 
@@ -936,7 +937,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 		}
 	}
 
-	if (const bool is_defusing_level = tutorial.level == 15) {
+	if (is_tutorial_defusing_level()) {
 		auto carrier = to_handle("carrier");
 		auto carrier_bomb = to_handle("carrier_bomb");
 
@@ -1465,10 +1466,19 @@ std::string test_scene_setup::get_scoreboard_caption() const {
 
 void test_scene_setup::apply(const config_json_table& cfg) {
 	/*
-		Shooting range and tutorial run at the same speed the player would host a server at.
+		Shooting range and tutorial run at the singleplayer speeds from the settings.
+		The level with the two ticking bombs to defuse is slowed down further so that it's easier.
 	*/
 
-	dummy_dynamic_vars.set_speeds_from(cfg.server);
+	const auto game_speed = [&]() {
+		if (is_tutorial_defusing_level()) {
+			return ::sanitize_logic_speed(cfg.singleplayer_game_speed * 0.75f);
+		}
+
+		return cfg.singleplayer_game_speed;
+	}();
+
+	dummy_dynamic_vars.set_speeds(game_speed, cfg.singleplayer_bullet_speed);
 }
 
 void test_scene_setup::customize_for_viewing(config_json_table& config) const {

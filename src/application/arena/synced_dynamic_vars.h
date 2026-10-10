@@ -63,12 +63,13 @@ struct synced_dynamic_vars {
 	}
 
 	/*
-		For local setups (test scene, editor playtest) - the speeds the player would host a server at.
+		For local setups (test scene, editor playtest).
+		The bullet speed follows the game speed unless set separately.
 	*/
 
-	void set_speeds_from(const server_vars& vars) {
-		logic_speed = vars.game_speed;
-		bullet_speed = vars.calc_bullet_speed(vars.game_speed);
+	void set_speeds(const real32 game_speed, const augs::maybe<real32>& separate_bullet_speed) {
+		logic_speed = game_speed;
+		bullet_speed = separate_bullet_speed.is_enabled ? separate_bullet_speed.value : game_speed;
 	}
 };
 

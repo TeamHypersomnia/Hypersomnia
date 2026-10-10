@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "augs/templates/maybe.h"
 #include "application/setups/client/rcon_pane.h"
 
 struct server_vars;
@@ -11,7 +12,12 @@ struct server_runtime_info;
 	Returns true if the slider was moved.
 */
 
-bool do_bullet_speed_slider(server_vars& vars, bool game_speed_changed);
+bool do_bullet_speed_slider(
+	const char* label,
+	real32 game_speed,
+	augs::maybe<real32>& bullet_speed,
+	bool game_speed_changed
+);
 
 /*
 	Call right after the respective slider.

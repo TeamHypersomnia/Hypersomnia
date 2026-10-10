@@ -158,7 +158,7 @@ as well as to test your skills in a laggy environment.
 
 		{
 			auto scope = scoped_text_color(new_feature_color);
-			::do_bullet_speed_slider(into_vars, game_speed_changed);
+			::do_bullet_speed_slider("Bullet speed", into_vars.game_speed, into_vars.bullet_speed, game_speed_changed);
 		}
 
 		::do_bullet_speed_tooltip();

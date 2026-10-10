@@ -91,6 +91,8 @@ struct config_json_table {
 
 	bool gore = true;
 	bool skip_tutorial = false;
+	real32 singleplayer_game_speed = 1.0f;
+	augs::maybe<real32> singleplayer_bullet_speed = augs::maybe<real32>::disabled(1.0f);
 	bool log_to_live_file = false;
 	bool remove_live_log_file_on_start = true;
 
