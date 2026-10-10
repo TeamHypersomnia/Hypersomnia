@@ -73,6 +73,25 @@ The appdata remembers the last connect string - the first screen may be a reconn
 - Upload the content dir (`hypersomnia/`, ~35 MB) with rsync, excluding `logs`, `user`, `cache`.
 - Never copy production secrets anywhere but `~/yojimbo-test`, and delete them after the test.
 
+## Remote end to end: official server, ranked, accounts (scripts/remote_e2e)
+
+The whole production flow on real hosts without touching production:
+`arenaus:~/hs-test-backend` runs a test masterserver (UDP 18430, HTTP 18420) and a copy of the site (port 13000, clean DB,
+Node from the official tarball - the host has none) via `backend.sh start|stop|status`; both read its `official_servers.d`.
+`arena:~/yojimbo-test/e2e` runs a dedicated server with its own `official_server_secret` via `match.sh`,
+heartbeating to that master and reporting to that site. `run_match.sh A B` plays one match with two local CLI clients
+(pre-generated identity keys in `$SCRATCH/e2e/client_<name>/user/identity.key`, ids in `id_<name>`); `db.sh show|sql` reads or changes the site DB.
+
+- **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
+  `match.sh` writes a two-team `tournament.json` with the clients' `key_...` ids. Give the server any `steam_web_api_key`
+  (e.g. "e2e-dummy"), otherwise tournament mode switches to nickname auth (`nick_...`).
+- **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one
+  client after the match goes live: it abandons at once and the report goes out immediately (`losers_abandoned`).
+  Also disable the AFK kicks (`move_to_spectators_if_afk_for_secs`, `kick_if_afk_for_secs` = 999999).
+- Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
+- Account linking without Steam: insert the association directly (`db.sh sql "INSERT INTO associations ..."`); the
+  `/link_key` endpoint itself is covered by the scratch-copy test.
+
 ## The hypersomnia.io site
 
 Test only in a scratch copy of the site repo (ask the user where it is; rsync without `.git`, `.env` and `private/*.db*`, `node_modules` symlinked).
@@ -92,5 +111,7 @@ Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/officia
 - The Steamworks SDK is not in the repo: unpack a `steamworks_sdk_*.zip` (ask the user where it is) with
   `cmake/steam_integration/steamworks/put_sdk_here.sh <zip>` into the gitignored `steamworks/sdk`. A Steam build (`-DDEVELOP_STEAM_INTEGRATION=1
   -DUSE_SYSTEM_FREETYPE=0`) compiles without the Steam client; testing tickets needs it running and a `steam_web_api_key` on the server.
+- A server shutting down right after an immediate heartbeat request skipped its goodbye and lingered on the list
+  (fixed in ce4720e4a); after a stop, the list should be empty at once.
 - Upstream yojimbo tests: `cmake -S src/3rdparty/yojimbo -B $SCRATCH/yjbuild && cmake --build ... && ./bin/test`
   (Unix Makefiles - the Ninja generator clashes on a target named `test`).
