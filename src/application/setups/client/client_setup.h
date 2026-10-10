@@ -51,6 +51,7 @@
 #include "steam_integration_callbacks.h"
 #include "application/main/auth_provider_type.h"
 #include "application/gui/ingame_menu_button_type.h"
+#include "augs/misc/async_response.h"
 #include "application/network/secure_connect.h"
 #include "game/messages/hud_message.h"
 
@@ -133,6 +134,12 @@ class client_setup :
 
 	std::optional<secure_connect_request> secure_request;
 	augs::future<std::optional<fetched_connect_token>> secure_token_fetch;
+
+	/*
+		The web build is single-threaded and can only fetch asynchronously.
+	*/
+
+	augs::async_response_ptr secure_token_web_fetch;
 
 	/*
 		The official server this client is securely connected to, if any.

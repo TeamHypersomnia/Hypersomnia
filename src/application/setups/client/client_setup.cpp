@@ -5,6 +5,8 @@
 #include "augs/misc/imgui/maybe_different.h"
 #include "augs/misc/profanity_filter.h"
 
+#include "augs/log.h"
+#include "augs/misc/async_get.h"
 #include "application/network/secure_connect.h"
 #include "application/main/identity_key.h"
 #include "application/setups/client/client_setup.h"
@@ -702,6 +704,10 @@ bool client_setup::pending_pre_connection_handshake() const {
 		return true;
 	}
 
+	if (secure_token_web_fetch != nullptr && !secure_token_web_fetch->is_ready()) {
+		return true;
+	}
+
 	return is_webrtc() && !webrtc_client->is_ready();
 }
 
@@ -774,6 +780,14 @@ client_setup::client_setup(
 
 	this->secure_request = secure_request;
 
+#if PLATFORM_WEB
+	if (secure_request.has_value() && !is_opening_demo && use_webrtc) {
+		if (const auto provider = parsed_url(secure_request->provider_url); provider.valid()) {
+			LOG("Requesting a secure connect token for %x.", webrtc_id);
+			secure_token_web_fetch = augs::async_get(provider.get_base_url(), provider.location + "?server=" + webrtc_id);
+		}
+	}
+#else
 	if (secure_request.has_value() && !is_opening_demo) {
 		secure_token_fetch = launch_async(
 			[provider = secure_request->provider_url, in_connect_string = connect_string, use_webrtc, webrtc_id]() -> std::optional<fetched_connect_token> {
@@ -807,6 +821,7 @@ client_setup::client_setup(
 			}
 		);
 	}
+#endif
 
 	LOG("Initializing connection with %x", connect_string);
 
@@ -871,6 +886,18 @@ void client_setup::connect() {
 
 	if (secure_token_fetch.valid()) {
 		secure_token = secure_token_fetch.get();
+	}
+
+	if (secure_token_web_fetch != nullptr) {
+		const auto response = augs::get_once(secure_token_web_fetch);
+
+		if (httplib_utils::successful(response.status)) {
+			secure_token = connect_token_fetch::parse(response.body);
+		}
+
+		if (!secure_token.has_value()) {
+			LOG("Couldn't get a secure connect token. Status: %x", response.status);
+		}
 	}
 
 	if (secure_request.has_value() && secure_request->required && !secure_token.has_value()) {
