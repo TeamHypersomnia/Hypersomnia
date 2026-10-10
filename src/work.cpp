@@ -2289,8 +2289,12 @@ work_result work(
 		auto connect_string = config.client_connect;
 
 #if PLATFORM_WEB
-		const bool is_official_connect_string = ::is_official_webrtc_id(connect_string);
-		const bool requires_sign_in = is_official_connect_string && begins_with(connect_string, "ranked");
+		/*
+			The official ranked aliases are ranked-<location>, with :<index> only if the server name has #<index>.
+			The authentication is sent over a secure connection only, so any other server named like this gets nothing.
+		*/
+
+		const bool requires_sign_in = begins_with(::find_webrtc_id(connect_string), "ranked");
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
