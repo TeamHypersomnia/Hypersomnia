@@ -6,17 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- jeszcze zrozumiec relacje miedzy physical/kwantyzacja
-
 - osobne flagi na podglad przy rzucaniu granatem a podglad przy rzucaniu nozem
 	- wylaczyc domyslnie w ogole dla melee
 	- albo flage domyslnie on zeby rysowac to jako zwykly laser a nie te sylwetki durne
 
 - swiecacy dev label
 - te public keye cale dla linuxiarzy
-
-- upewnij sie ze te stampy naprawic te kurwa invalid filenames i jebane stampy w projectach z menu, czy to jest naprawione czy juz nie robia sie neon stampy kurwa a plikach projektu nigdy i nie lądują nigdy generowane pliki tam
-	- loaded from autosave jako toast bardzo widoczny z gory ktory znika zaraz a nie kurwa cos co trzeba kliknac okejke modal jebany bo to wkurwia
 
 - proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp

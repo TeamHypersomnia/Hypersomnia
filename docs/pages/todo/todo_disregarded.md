@@ -746,3 +746,5 @@ summary: Just a hidden scratchpad.
 	- i nie beda sie pokazywac splattery za scianami w dziwnych miejscach
 - cos zeby bylo widac zawsze moje pociski i ich particle w tym extended fowie
 
+- jeszcze zrozumiec relacje miedzy physical/kwantyzacja
+
