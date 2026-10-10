@@ -1088,10 +1088,10 @@ void server_setup::request_auth(mode_player_id player_id, const auth_request_pay
 		const auto api_key = private_vars.steam_web_api_key;
 		const auto& ticket = payload.ticket_bytes;
 		const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
-		const auto identity = secure_connect::auth_identity(
+		const auto identity = secure_connect::steam_ticket_identity(secure_connect::auth_identity(
 			std::string(get_client_state(player_id).auth_challenge),
 			server->get_secure_server_id(to_client_id(player_id)).value_or("")
-		);
+		));
 
 		push_auth_job(
 			player_id,

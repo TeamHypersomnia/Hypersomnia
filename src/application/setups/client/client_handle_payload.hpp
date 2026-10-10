@@ -475,7 +475,9 @@ message_handler_result client_setup::handle_payload(
 
 		if (!steam_auth_identity_received && !payload.challenge.empty() && secure_server_id.has_value()) {
 			steam_auth_identity_received = true;
-			steam_auth_identity_to_request = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
+			steam_auth_identity_to_request = secure_connect::steam_ticket_identity(
+				secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id)
+			);
 		}
 
 		if (identity_key_path.has_value() && !identity_key_signed && !payload.challenge.empty() && secure_server_id.has_value()) {

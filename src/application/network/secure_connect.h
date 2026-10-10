@@ -6,6 +6,9 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
+
+#include "augs/misc/secure_hash.h"
 
 /*
 	Secure connections to the official servers.
@@ -68,6 +71,19 @@ namespace secure_connect {
 
 	inline std::string auth_identity(const std::string& challenge, const std::string& server_id) {
 		return challenge + "@" + server_id;
+	}
+
+	/*
+		Steam verifies a Web API ticket only if its identity has at most 31 characters - a longer one never matches
+		(checked against the live API). The ticket is therefore requested for a hash of the whole auth identity:
+		30 hex characters.
+	*/
+
+	inline std::string steam_ticket_identity(const std::string& auth_identity) {
+		const auto hash = augs::secure_hash(auth_identity);
+		const auto truncated = std::vector<uint8_t>(hash.begin(), hash.begin() + 15);
+
+		return augs::bytes_to_hex(truncated);
 	}
 
 	inline std::optional<std::string> read_server_id(const uint8_t* const user_data) {
