@@ -151,6 +151,13 @@ struct draw_crosshair_lasers_input {
 	const bool draw_lasers;
 	const std::vector<throw_trajectory>& trajectories;
 	const real32 interpolation_ratio;
+
+	/*
+		If set, draws the segments of the trajectories drawn as lasers instead of callback,
+		told whether their starts and ends are those of the whole polyline -
+		so that e.g. the caps of the glow are drawn only there, not at the bounces.
+	*/
+	const std::function<void(vec2, vec2, rgba, bool, bool)> polyline_callback = nullptr;
 };
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);

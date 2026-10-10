@@ -999,6 +999,14 @@ namespace {
 			return;
 		}
 
+		/*
+			Without the padding of the last step, so that it does not pile up while the trajectory is shown.
+		*/
+
+		while (next.previous.size() >= 2 && next.previous[next.previous.size() - 2] == next.previous.back()) {
+			next.previous.pop_back();
+		}
+
 		const auto size = std::max(next.previous.size(), next.current.size());
 
 		auto pad = [size](std::vector<vec2>& points) {

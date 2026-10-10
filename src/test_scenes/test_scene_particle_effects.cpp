@@ -364,7 +364,7 @@ void load_test_scene_particle_effects(
 				em.num_of_particles_to_spawn_initially.second *= 0.6f;
 				em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 				em.randomize_spawn_point_within_circle_of_outer_radius = float_range(14.f, 14.f);
-				em.local_spawn_offset = vec2(muzzle_offset*1.2f, 0.f);
+				em.local_spawn_offset = vec2(muzzle_offset * 1.2f, 0.f);
 				em.base_speed = speed;
 				em.base_speed.first *= 0.9f;
 				em.base_speed.second *= 0.9f;

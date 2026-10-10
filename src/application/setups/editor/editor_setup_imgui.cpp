@@ -293,6 +293,7 @@ void editor_setup::perform_toast() {
 	const auto secs_left = toast.get_secs_left();
 
 	if (secs_left <= 0.0) {
+		toast.content.clear();
 		return;
 	}
 

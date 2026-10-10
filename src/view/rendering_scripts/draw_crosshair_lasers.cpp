@@ -309,8 +309,16 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}();
 
 			for (std::size_t i = 0; i + 1 < points.size(); ++i) {
+				const bool is_first = i == 0;
 				const bool is_last = i + 2 == points.size();
-				in.callback(points[i], points[i + 1], is_last ? last_color : cyan);
+				const auto color = is_last ? last_color : cyan;
+
+				if (in.polyline_callback != nullptr) {
+					in.polyline_callback(points[i], points[i + 1], color, is_first, is_last);
+				}
+				else {
+					in.callback(points[i], points[i + 1], color);
+				}
 			}
 
 			if (dashed_from.has_value() && (crosshair_pos - *dashed_from).length_sq() > 1.0f) {

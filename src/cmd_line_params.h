@@ -1,5 +1,7 @@
 #pragma once
+#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include "augs/filesystem/path.h"
 #include "augs/app_type.h"
 #include "augs/network/network_types.h"
@@ -254,7 +256,7 @@ struct cmd_line_params {
 				playtest = true;
 			}
 			else if (a == "--playtest-speed") {
-				playtest_speed = std::stod(get_next());
+				playtest_speed = std::max(0.01, std::atof(get_next()));
 			}
 			else if (a == "--signature") {
 				verified_signature = get_next();

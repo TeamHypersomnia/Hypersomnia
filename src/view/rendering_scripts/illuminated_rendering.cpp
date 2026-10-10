@@ -905,19 +905,28 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
 					const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
-					draw_crosshair_lasers({
-						[&](const vec2 from, const vec2 to, rgba col) {
-							col.mult_alpha(0.5f);
+					auto draw_glow = [&](const vec2 from, const vec2 to, rgba col, const bool from_cap, const bool to_cap) {
+						col.mult_alpha(0.5f);
 
-							const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
+						const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
 
-							get_drawer().line(laser_glow, from, to, edge_size.y / 5.f, col);
+						get_drawer().line(laser_glow, from, to, edge_size.y / 5.f, col);
 
-							const auto edge_dir = (to - from).normalize();
-							const auto edge_offset = edge_dir * edge_size.x;
+						const auto edge_dir = (to - from).normalize();
+						const auto edge_offset = edge_dir * edge_size.x;
 
+						if (to_cap) {
 							get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
+						}
+
+						if (from_cap) {
 							get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 5.f, col, flip_flags::make_horizontally());
+						}
+					};
+
+					draw_crosshair_lasers({
+						[&](const vec2 from, const vec2 to, const rgba col) {
+							draw_glow(from, to, col, true, true);
 						},
 						[](const vec2, const vec2, const rgba) {},
 						[](const vec2, const vec2, const rgba) {},
@@ -929,7 +938,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						throw_trajectories,
 						settings.draw_weapon_laser,
 						av.get<throw_trajectory_system>().get_trajectories(),
-						static_cast<real32>(in.interpolation_ratio)
+						static_cast<real32>(in.interpolation_ratio),
+						draw_glow
 					});
 				}
 
