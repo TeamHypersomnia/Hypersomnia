@@ -642,48 +642,6 @@ void post_particle_explosion(
 	const transformr where,
 	const entity_id subject_if_any
 ) {
-	if (!def.is_set()) {
-		return;
-	}
-
-	const auto reach = [&]() {
-		auto result = def.radius;
-
-		for (const auto& jet : def.jets) {
-			result = std::max(result, jet.calc_max_reach());
-		}
-
-		return result;
-	}();
-
-	for (const auto& jet : def.jets) {
-		auto msg = messages::exploding_ring_effect(predictability);
-		auto& ring = msg.payload;
-
-		/* Only for culling - no rings are drawn. */
-		ring.outer_radius_start_value = jet.calc_max_reach();
-		ring.outer_radius_end_value = jet.calc_max_reach();
-
-		ring.maximum_duration_seconds = jet.lifetime_ms.second / 1000.f;
-
-		ring.emit_explosion_particles = true;
-		ring.explosion_particles = def.particles;
-		ring.explosion_particles_hot_color = def.inner_ring_color;
-		ring.draw_color_rings = false;
-		ring.emit_light = false;
-
-		ring.emit_jet = true;
-		ring.jet = jet;
-		ring.jet_degrees = where.rotation;
-
-		ring.color = def.outer_ring_color;
-		ring.center = where.pos;
-		ring.pending_visibility_radius = reach;
-		ring.visibility_subject = subject_if_any;
-
-		step.post_message(msg);
-	}
-
 	if (def.radius <= 0.f) {
 		return;
 	}
@@ -698,7 +656,7 @@ void post_particle_explosion(
 	rings.inner_ring_emits_light = false;
 	rings.outer_ring_emits_light = false;
 	rings.emit_ring_end_particles = false;
-	rings.pending_visibility_radius = reach;
+	rings.pending_visibility_radius = def.radius;
 	rings.visibility_subject = subject_if_any;
 
 	::post_explosion_rings(step, predictability, rings, messages::visibility_information_response());

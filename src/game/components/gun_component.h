@@ -21,7 +21,6 @@
 #include "game/detail/adversarial_meta.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/detail/view_input/explosion_particles_def.h"
 #include "game/detail/sentience_shake.h"
 #include "game/enums/weapon_action_type.h"
 #include "augs/pad_bytes.h"
@@ -166,7 +165,7 @@ namespace invariants {
 		real32 randomize_spawn_point_within_circle_of_radius = 0.f;
 		real32 shot_pitch_drop_at_low_ammo = 0.f;
 		real32 unmounted_magazine_velocity_mult = 1.f;
-		particle_explosion_def muzzle_leave_explosion;
+		particle_effect_input muzzle_jet_particles;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

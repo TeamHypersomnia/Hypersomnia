@@ -137,13 +137,17 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				predictability
 			);
 
-			const auto& muzzle_explosion = 
-				gun->muzzle_leave_explosion.is_set() ?
-				gun->muzzle_leave_explosion :
-				missile_def.muzzle_leave_explosion
-			;
+			/*
+				The jet is the gun's own - guns sharing a round differ in power.
+			*/
 
-			::post_particle_explosion(step, predictability, muzzle_explosion, g.muzzle_transform, g.subject);
+			gun->muzzle_jet_particles.start(
+				step,
+				particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform),
+				predictability
+			);
+
+			::post_particle_explosion(step, predictability, missile_def.muzzle_leave_explosion, g.muzzle_transform, g.subject);
 		}
 
 		for (auto& r : g.spawned_rounds) {

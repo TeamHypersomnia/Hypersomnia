@@ -10,6 +10,7 @@ struct particle_effect_modifier {
 	real32 scale_velocities = 1.f;
 	real32 scale_sizes = 1.f;
 	real32 scale_stream_lifetimes = 1.f;
+	real32 scale_spread = 1.f;
 	real32 radius = 0.0f;
 	vec2 box = vec2::zero;
 	// END GEN INTROSPECTOR
@@ -36,6 +37,7 @@ struct particle_effect_modifier {
 		scale_velocities *= b.scale_velocities;
 		scale_sizes *= b.scale_sizes;
 		scale_stream_lifetimes *= b.scale_stream_lifetimes;
+		scale_spread *= b.scale_spread;
 		return *this;
 	}
 

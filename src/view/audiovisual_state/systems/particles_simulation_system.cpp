@@ -163,6 +163,15 @@ particles_simulation_system::basic_cache::basic_cache(
 
 				scale(emission.stream_lifetime_ms, m.scale_stream_lifetimes);
 				emission.stream_shrink_out_ms *= m.scale_stream_lifetimes;
+
+				/*
+					How widely the particles scatter - in direction, spawn point and rotation.
+				*/
+
+				scale(emission.spread_degrees, m.scale_spread);
+				scale(emission.randomize_spawn_point_within_circle_of_inner_radius, m.scale_spread);
+				scale(emission.randomize_spawn_point_within_circle_of_outer_radius, m.scale_spread);
+				emission.initial_rotation_variation *= m.scale_spread;
 			}
 
 			emission_instances.emplace_back(emission, rng);

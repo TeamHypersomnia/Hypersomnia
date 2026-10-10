@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <cmath>
 #include <limits>
-#include <vector>
 #include "augs/drawing/drawing.hpp"
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
@@ -351,177 +350,6 @@ static void spawn_explosion_particles(
 	}
 }
 
-/*
-	The angular sectors of the visibility triangles fanning out from the center - see calc_jet_boundary.
-*/
-
-struct visibility_sector {
-	float start_degrees = 0.f;
-	float sweep_degrees = 0.f;
-	vec2 first_dir;
-	vec2 far_edge;
-	float fallback_boundary = 0.f;
-};
-
-static float degrees_from(const float start_degrees, const float degrees) {
-	auto result = std::fmod(degrees - start_degrees, 360.f);
-
-	if (result < 0.f) {
-		result += 360.f;
-	}
-
-	return result;
-}
-
-/*
-	A jet's particles fly within the jet's own sector, so only the visibility sectors overlapping it are gathered, once per jet.
-*/
-
-static void gather_visibility_sectors(
-	std::vector<visibility_sector>& out,
-	const exploding_ring_input& r,
-	const float jet_degrees,
-	const float jet_spread
-) {
-	out.clear();
-
-	const auto& vis = r.visibility;
-	const auto jet_start = jet_degrees - jet_spread;
-	const auto jet_sweep = 2 * jet_spread;
-
-	for (std::size_t i = 0; i < vis.get_num_triangles(); ++i) {
-		const auto tri = vis.get_world_triangle(i, r.center);
-		const auto first_dir = tri[1] - r.center;
-		const auto second_dir = tri[2] - r.center;
-		const auto sweep = first_dir.full_degrees_between(second_dir);
-		const auto first_degrees = first_dir.degrees();
-
-		if (!std::isfinite(sweep) || !std::isfinite(first_degrees)) {
-			continue;
-		}
-
-		auto sector = visibility_sector();
-		sector.start_degrees = sweep >= 0.f ? first_degrees : first_degrees + sweep;
-		sector.sweep_degrees = std::abs(sweep);
-		sector.first_dir = first_dir;
-		sector.far_edge = tri[2] - tri[1];
-		sector.fallback_boundary = std::max(first_dir.length(), second_dir.length());
-
-		const bool overlaps_jet =
-			::degrees_from(sector.start_degrees, jet_start) <= sector.sweep_degrees
-			|| ::degrees_from(jet_start, sector.start_degrees) <= jet_sweep
-		;
-
-		if (overlaps_jet) {
-			out.push_back(sector);
-		}
-	}
-}
-
-/*
-	How far from the center the explosion is visible in the given direction -
-	up to the far edge of the visibility sector containing it, unbounded without visibility.
-*/
-
-static float calc_jet_boundary(
-	const std::vector<visibility_sector>& sectors,
-	const exploding_ring_input& r,
-	const float degrees
-) {
-	if (r.visibility.get_num_triangles() == 0) {
-		return std::numeric_limits<float>::max();
-	}
-
-	for (const auto& sector : sectors) {
-		if (::degrees_from(sector.start_degrees, degrees) > sector.sweep_degrees) {
-			continue;
-		}
-
-		const auto dir = vec2::from_degrees(degrees);
-		const auto denom = dir.cross(sector.far_edge);
-
-		if (std::abs(denom) > 0.0001f) {
-			return sector.first_dir.cross(sector.far_edge) / denom;
-		}
-
-		return sector.fallback_boundary;
-	}
-
-	return 0.f;
-}
-
-/*
-	A jet shoots the particles straight out of the center - see particle_jet_def.
-	They take the explosion particles' look and colors, without the ring's motion.
-	The jet's direction and spread are picked here, being purely visual.
-*/
-
-static void spawn_jet_particles(
-	const exploding_ring_input& r,
-	randomization& rng,
-	const explosions_settings& settings,
-	const particles_emission& emission,
-	particles_simulation_system& particles
-) {
-	const auto& definitions = emission.get_definitions<general_particle>();
-	const auto& look = ::get_particles_look(r, settings);
-	const auto& jet = r.jet;
-
-	if (definitions.empty()) {
-		return;
-	}
-
-	const auto jet_degrees = r.jet_degrees + rng.randval(jet.angular_offset);
-	const auto jet_spread = rng.randval(jet.spread);
-
-	thread_local std::vector<visibility_sector> sectors;
-	::gather_visibility_sectors(sectors, r, jet_degrees, jet_spread);
-
-	const auto coloring = ::calc_particle_coloring(r, look);
-	const auto amount = std::min(rng.randval(jet.amount), static_cast<float>(settings.max_particles_per_explosion));
-
-	for (auto i = 0.f; i < amount; i += 1.f) {
-		const auto spawn_offset = 
-			vec2::from_degrees(jet_degrees) * jet.muzzle_offset
-			+ rng.random_point_in_ring(jet.spawn_radius.first, jet.spawn_radius.second)
-		;
-
-		const auto degrees = jet_degrees + rng.randval_h(jet_spread);
-		const auto dir = vec2::from_degrees(degrees);
-
-		auto p = explosion_particle();
-
-		p.sprite = definitions[rng.randval(0u, static_cast<unsigned>(definitions.size()) - 1)];
-		p.sprite.multiply_size(look.particle_size_mult * jet.size_mult);
-		p.sprite.max_lifetime_ms = rng.randval(jet.lifetime_ms);
-		p.sprite.shrink_when_ms_remaining = jet.lifetime_ms.second;
-
-		p.center = r.center + spawn_offset;
-		p.angle = degrees;
-		p.radial_vel = rng.randval(jet.speed);
-		p.velocity_damping = jet.damping;
-
-		/* Along the flight, not across it like on a ring. */
-		p.rotation_offset = -90.f + rng.randval_h(jet.rotation_variation);
-
-		/*
-			Dies at the walls - measured from the explosion's center, along the particle's own direction.
-		*/
-
-		p.max_radius = ::calc_jet_boundary(sectors, r, degrees) - spawn_offset.dot(dir);
-
-		if (p.max_radius <= 0.f) {
-			continue;
-		}
-
-		::apply_coloring(p, coloring, r);
-
-		p.update_sprite_transform();
-		p.update_sprite_color();
-		particles.add_explosion_particle(p);
-	}
-}
-
 void exploding_ring_system::clear() {
 	rings.clear();
 }
@@ -611,12 +439,7 @@ void exploding_ring_system::advance(
 			if (visible) {
 				if (const auto* const effect = mapped_or_nullptr(manager, common.exploding_ring_explosion_particles)) {
 					if (!effect->emissions.empty()) {
-						if (r.emit_jet) {
-							::spawn_jet_particles(r, rng, settings, effect->emissions[0], particles);
-						}
-						else {
-							::spawn_explosion_particles(r, rng, settings, effect->emissions[0], particles);
-						}
+						::spawn_explosion_particles(r, rng, settings, effect->emissions[0], particles);
 					}
 				}
 			}

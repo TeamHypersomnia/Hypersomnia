@@ -5,7 +5,6 @@
 #include "augs/math/arithmetical.h"
 #include "augs/graphics/rgba.h"
 #include "augs/misc/constant_size_vector.h"
-#include "augs/misc/bound.h"
 
 constexpr std::size_t MAX_EXPLOSION_PARTICLES_PALETTE_COLORS = 6;
 using explosion_particles_palette = augs::constant_size_vector<rgba, MAX_EXPLOSION_PARTICLES_PALETTE_COLORS>;
@@ -77,49 +76,8 @@ struct explosion_particles_def {
 };
 
 /*
-	A jet of the explosion particles shooting out of the muzzle, like the smokes of a muzzle flash.
-
-	amount particles spawn anywhere in the ring between spawn_radius.first and spawn_radius.second
-	around the point muzzle_offset px ahead of the muzzle, along the jet,
-	then fly straight at speed (px/s) - in the muzzle's direction tilted by angular_offset
-	and spread by at most spread degrees either way, both picked once per shot.
-	Each lives lifetime_ms, going through the explosion particles' colors and shrinking over the longest lifetime.
-
-	The particles are drawn along their flight, turned by at most rotation_variation degrees either way,
-	their sprites scaled by size_mult - the explosion particles' sprites are made for big blasts.
-	damping (per second) slows them down exponentially.
-*/
-
-struct particle_jet_def {
-	// GEN INTROSPECTOR struct particle_jet_def
-	augs::bound<real32> amount = { 0.f, 0.f };
-	augs::bound<real32> spawn_radius = { 0.f, 0.f };
-	augs::bound<real32> speed = { 0.f, 0.f };
-	augs::bound<real32> angular_offset = { 0.f, 0.f };
-	augs::bound<real32> spread = { 0.f, 0.f };
-	augs::bound<real32> lifetime_ms = { 0.f, 0.f };
-	real32 size_mult = 0.25f;
-	real32 rotation_variation = 25.f;
-	real32 damping = 0.f;
-	real32 muzzle_offset = 5.f;
-	// END GEN INTROSPECTOR
-
-	real32 calc_max_reach() const {
-		return muzzle_offset + spawn_radius.second + speed.second * lifetime_ms.second / 1000.f;
-	}
-};
-
-constexpr std::size_t MAX_PARTICLE_EXPLOSION_JETS = 2;
-using particle_jets_vector = augs::constant_size_vector<particle_jet_def, MAX_PARTICLE_EXPLOSION_JETS>;
-
-/*
 	A purely visual explosion of the pixel art particles, e.g. leaving the muzzle with the round.
-	Its rings spawn only with radius above 0, ring_duration_seconds further shortened by particles.playback_speed.
-
-	Any jets shoot out besides the rings - their particles go from inner_ring_color to outer_ring_color.
-
-	A gun's own muzzle_leave_explosion, if set, replaces the one of its round,
-	e.g. for guns sharing a round, but not its muzzle flash.
+	Spawned only with radius above 0. ring_duration_seconds is further shortened by particles.playback_speed.
 */
 
 struct particle_explosion_def {
@@ -129,10 +87,5 @@ struct particle_explosion_def {
 	rgba inner_ring_color = white;
 	rgba outer_ring_color = white;
 	explosion_particles_def particles;
-	particle_jets_vector jets;
 	// END GEN INTROSPECTOR
-
-	bool is_set() const {
-		return radius > 0.f || !jets.empty();
-	}
 };

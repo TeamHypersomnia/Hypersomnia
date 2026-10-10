@@ -20,6 +20,7 @@
 #include "view/viewables/image_definition.h"
 #include "view/viewables/particle_types.h"
 #include "view/viewables/particle_effect.h"
+#include "view/audiovisual_state/special_effects_settings.h"
 
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_cache.h"
@@ -318,6 +319,94 @@ void load_test_scene_particle_effects(
 
 			definitions.push_back(straight);
 		}
+	}
+
+	{
+		/*
+			Muzzle jets - the explosion particles shooting straight out of the muzzle, as a muzzle flash.
+			Two bursts: a wider one, and a narrower one starting and reaching farther ahead.
+
+			The particles start in the hot color - like the explosion particles, brightened - and take the ring color
+			over the first particle_hot_fraction of the longest lifetime. They're too short-lived to cool down.
+			Their sizes are those of the explosions' particles at the default settings, scaled down.
+
+			Every gun scales its jet by its power with the effect's modifier (see guns.cpp).
+		*/
+
+		const auto explosion_particle_definitions = acquire_effect(test_scene_particle_effect_id::EXPLODING_RING_EXPLOSION_PARTICLES).emissions.back().get_definitions<general_particle>();
+
+		constexpr auto jet_size_mult = 0.25f;
+		constexpr auto jet_damping = 20.f;
+		const auto jet_lifetime_ms = float_range(20.f, 32.f);
+
+		auto make_jet_effect = [&](const test_id_type id, rgba hot_color, rgba ring_color, const bool fire) {
+			const auto look = fire ? explosion_particles_settings::fire_defaults() : explosion_particles_settings();
+
+			{
+				auto hot_hsl = hot_color.get_hsl();
+				hot_hsl.l += (1.f - hot_hsl.l) * 0.35f;
+				hot_color.set_hsl(hot_hsl);
+			}
+
+			hot_color.a = 255;
+			ring_color.a = 255;
+
+			auto make_jet = [&](
+				const augs::bound<float> amount,
+				const augs::bound<float> speed,
+				const augs::bound<float> spread,
+				const float muzzle_offset
+			) {
+				particles_emission em;
+
+				em.num_of_particles_to_spawn_initially = amount;
+				em.randomize_spawn_point_within_circle_of_inner_radius = float_range(4.f, 4.f);
+				em.randomize_spawn_point_within_circle_of_outer_radius = float_range(4.f, 4.f);
+				em.local_spawn_offset = vec2(muzzle_offset, 0.f);
+				em.base_speed = speed;
+				em.angular_offset = float_range(-2.f, 2.f);
+				em.spread_degrees = spread;
+				em.particle_lifetime_ms = jet_lifetime_ms;
+				em.rotation_speed = float_range(0.f, 0.f);
+				em.size_multiplier = float_range(1.f, 1.f);
+				em.should_particles_look_towards_velocity = true;
+				em.initial_rotation_variation = 25.f;
+				em.target_layer = particle_layer::TRAILS;
+
+				em.randomize_acceleration = true;
+				em.acceleration = float_range(40000.0f, 100000.0f);
+
+				for (auto particle_definition : explosion_particle_definitions) {
+					particle_definition.vel = vec2::zero;
+					particle_definition.acc = vec2::zero;
+					particle_definition.linear_damping = 0.f;
+					particle_definition.angular_damping = 0.f;
+					particle_definition.exponential_damping = jet_damping;
+					particle_definition.unshrinking_time_ms = 0.f;
+					particle_definition.shrink_when_ms_remaining = jet_lifetime_ms.second;
+					particle_definition.multiply_size(look.particle_size_mult * jet_size_mult);
+
+					particle_definition.color = ring_color;
+					particle_definition.start_color = hot_color;
+					particle_definition.start_color_fade_ms = jet_lifetime_ms.second * look.particle_hot_fraction;
+
+					em.add_particle_definition(particle_definition);
+				}
+
+				return em;
+			};
+
+			auto& effect = acquire_effect(id);
+
+			effect.emissions.push_back(make_jet(float_range(30.f, 120.f), float_range(250.f, 6700.f), float_range(3.f, 3.f), 35.f));
+			effect.emissions.push_back(make_jet(float_range(30.f, 60.f), float_range(250.f, 4900.f), float_range(0.f, 0.f), 60.f));
+		};
+
+		make_jet_effect(test_scene_particle_effect_id::MUZZLE_JET_FIRE, yellow, white, true);
+		make_jet_effect(test_scene_particle_effect_id::MUZZLE_JET_WHITE, white, white, true);
+		make_jet_effect(test_scene_particle_effect_id::MUZZLE_JET_VIOLET, white, rgba(255, 236, 255, 255), true);
+		make_jet_effect(test_scene_particle_effect_id::MUZZLE_JET_LIGHT_CYAN, white, rgba(150, 255, 255, 255), true);
+		make_jet_effect(test_scene_particle_effect_id::MUZZLE_JET_AWKA, rgba(cyan).mult_brightness(1.1f), rgba(0, 146, 222, 255), false);
 	}
 
 	{

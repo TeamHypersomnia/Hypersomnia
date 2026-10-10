@@ -22,6 +22,14 @@ FORCE_INLINE void generic_integrate_particle(T& p, const float dt) {
 }
 
 FORCE_INLINE void general_particle::integrate(const float dt) {
+	/*
+		Slows down by the same fraction every second, unlike linear_damping's constant deceleration.
+	*/
+
+	if (exponential_damping > 0.f) {
+		vel *= std::exp(-exponential_damping * dt);
+	}
+
 	generic_integrate_particle(*this, dt);
 }
 

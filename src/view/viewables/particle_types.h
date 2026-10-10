@@ -38,6 +38,7 @@ struct general_particle {
 	float rotation_speed = 0.f;
 	float linear_damping = 0.f;
 	float angular_damping = 0.f;
+	float exponential_damping = 0.f;
 	float current_lifetime_ms = 0.f;
 	float max_lifetime_ms = 0.f;
 	float shrink_when_ms_remaining = 0.f;
