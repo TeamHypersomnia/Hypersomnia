@@ -63,6 +63,7 @@ enum class interface_settings_pane {
 	// GEN INTROSPECTOR enum class interface_settings_pane
 	LAYOUT,
 	HUD,
+	LASER,
 	CROSSHAIR,
 	MINIMAP,
 	FOG_OF_WAR,

@@ -19,16 +19,16 @@ struct throw_trajectory_flags {
 	throw_trajectory_mode melee_mode = throw_trajectory_mode::SILHOUETTES;
 
 	/*
-		With the laser off, trajectories are shown only right before a throw, if enabled.
+		With the laser off, trajectories are shown only right before a throw, if enabled - separately for grenades and melee weapons.
 	*/
 
 	template <class S>
 	static throw_trajectory_flags from(const S& drawing) {
-		const bool any_drawn = drawing.draw_weapon_laser || drawing.draw_throw_trajectory_when_throwing;
+		const bool laser = drawing.draw_weapon_laser;
 
 		return {
-			any_drawn && drawing.draw_grenade_trajectories,
-			any_drawn && drawing.draw_melee_trajectories,
+			(laser || drawing.draw_grenade_trajectory_when_throwing) && drawing.draw_grenade_trajectories,
+			(laser || drawing.draw_melee_trajectory_when_throwing) && drawing.draw_melee_trajectories,
 			drawing.draw_throw_trajectories_during_side_throws,
 			!drawing.draw_weapon_laser,
 			drawing.grenade_trajectory_mode,

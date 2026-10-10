@@ -1740,48 +1740,6 @@ void settings_gui_state::perform(
 						revertable_checkbox("Draw remaining ammo", config.drawing.draw_remaining_ammo);
 						revertable_checkbox("Draw damage indicators", config.drawing.draw_damage_indicators);
 
-						revertable_checkbox(SCOPE_CFG_NVP(draw_weapon_laser));
-
-						if (auto node = scoped_tree_node("Throw trajectories")) {
-							revertable_checkbox("Grenades", config.drawing.draw_grenade_trajectories);
-							revertable_checkbox("Melee weapons", config.drawing.draw_melee_trajectories);
-							text_disabled("(instead of their laser)");
-
-							if (config.drawing.draw_grenade_trajectories) {
-								revertable_enum("Grenade trajectory mode", config.drawing.grenade_trajectory_mode);
-							}
-
-							if (config.drawing.draw_melee_trajectories) {
-								revertable_enum("Melee trajectory mode", config.drawing.melee_trajectory_mode);
-							}
-
-							if (config.drawing.draw_grenade_trajectories || config.drawing.draw_melee_trajectories) {
-								if (!config.drawing.draw_weapon_laser) {
-									revertable_checkbox("Still draw them right before a throw", config.drawing.draw_throw_trajectory_when_throwing);
-									text_disabled("(of an armed grenade, or of a melee weapon about to be thrown)");
-								}
-
-								revertable_checkbox("Draw them as set when throwing with a gun in the other hand", config.drawing.draw_throw_trajectories_during_side_throws);
-								text_disabled("(otherwise always as a laser, replacing the gun's for the short while)");
-
-								const bool any_silhouettes =
-									(config.drawing.draw_grenade_trajectories && config.drawing.grenade_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
-									|| (config.drawing.draw_melee_trajectories && config.drawing.melee_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
-								;
-
-								if (any_silhouettes) {
-									revertable_slider("Alpha", config.drawing.throw_trajectory_alpha, 0.f, 1.f);
-								}
-
-								revertable_slider("End alpha", config.drawing.throw_trajectory_end_alpha, 0.f, 1.f);
-
-								if (any_silhouettes) {
-									revertable_slider("Gap", config.drawing.throw_trajectory_gap, 0.f, 5.f);
-									text_disabled("(between the silhouettes, in their radii)");
-								}
-							}
-						}
-
 						revertable_checkbox(SCOPE_CFG_NVP(draw_crosshairs));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_health_numbers));
@@ -1967,14 +1925,83 @@ void settings_gui_state::perform(
 								revertable_color_edit(SCOPE_CFG_NVP(enemy_color));
 							}
 
-							revertable_checkbox(SCOPE_CFG_NVP(draw_lasers));
-
-							if (scope_cfg.draw_lasers) {
-								revertable_checkbox(SCOPE_CFG_NVP(animate_laser_dashes));
-							}
-
 							revertable_checkbox(SCOPE_CFG_NVP(clamp_important_to_border));
 							revertable_checkbox(SCOPE_CFG_NVP(draw_viewed_player_ring));
+						}
+
+						break;
+					}
+					case interface_settings_pane::LASER: {
+						auto& scope_cfg = config.drawing;
+
+						const auto laser_hotkey = [&]() -> std::string {
+							const auto found_k = key_or_default(config.general_gui_controls, general_gui_intent_type::TOGGLE_WEAPON_LASER);
+
+							if (found_k == augs::event::keys::key()) {
+								return "(UNASSIGNED)";
+							}
+
+							return key_to_string(found_k);
+						}();
+
+						text_disabled(typesafe_sprintf("Toggle the laser in game with %x.", laser_hotkey));
+
+						auto trajectory_options = [&](const auto label, bool& drawn, throw_trajectory_mode& mode) {
+							revertable_checkbox(label, drawn);
+							tooltip_on_hover("Shows where it would fly if thrown right now, bouncing off the walls.\nOtherwise it gets a straight laser like guns.");
+
+							if (drawn) {
+								auto indent = scoped_indent();
+								revertable_enum(std::string("Style##") + label, mode);
+							}
+						};
+
+						trajectory_options("Grenade trajectory", scope_cfg.draw_grenade_trajectories, scope_cfg.grenade_trajectory_mode);
+						trajectory_options("Melee weapon trajectory", scope_cfg.draw_melee_trajectories, scope_cfg.melee_trajectory_mode);
+
+						const bool any_trajectories = scope_cfg.draw_grenade_trajectories || scope_cfg.draw_melee_trajectories;
+
+						const bool any_silhouettes =
+							(scope_cfg.draw_grenade_trajectories && scope_cfg.grenade_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
+							|| (scope_cfg.draw_melee_trajectories && scope_cfg.melee_trajectory_mode == throw_trajectory_mode::SILHOUETTES)
+						;
+
+						if (any_trajectories) {
+							ImGui::Separator();
+
+							if (scope_cfg.draw_grenade_trajectories) {
+								revertable_checkbox("Show trajectories right before a throw, even with the laser off (grenades)", scope_cfg.draw_grenade_trajectory_when_throwing);
+								tooltip_on_hover("Of an armed grenade.");
+							}
+
+							if (scope_cfg.draw_melee_trajectories) {
+								revertable_checkbox("Show trajectories right before a throw, even with the laser off (melee)", scope_cfg.draw_melee_trajectory_when_throwing);
+								tooltip_on_hover("Of a melee weapon about to be thrown.");
+							}
+
+							if (any_silhouettes) {
+								revertable_checkbox("Keep silhouettes when throwing with a gun in the other hand", scope_cfg.draw_throw_trajectories_during_side_throws);
+								tooltip_on_hover("Otherwise the trajectory is drawn as a laser for that short moment,\nin place of the laser of the gun.");
+
+								revertable_slider("Silhouette alpha", scope_cfg.throw_trajectory_alpha, 0.f, 1.f);
+								revertable_slider("Silhouette gap", scope_cfg.throw_trajectory_gap, 0.f, 5.f);
+								tooltip_on_hover("Between the silhouettes, in their radii.");
+							}
+
+							revertable_slider("Landing silhouette alpha", scope_cfg.throw_trajectory_end_alpha, 0.f, 1.f);
+						}
+
+						ImGui::Separator();
+
+						{
+							auto& scope_cfg = config.drawing.minimap;
+
+							revertable_checkbox("Draw lasers on the minimap", scope_cfg.draw_lasers);
+
+							if (scope_cfg.draw_lasers) {
+								auto indent = scoped_indent();
+								revertable_checkbox("Animate their dashes", scope_cfg.animate_laser_dashes);
+							}
 						}
 
 						break;
