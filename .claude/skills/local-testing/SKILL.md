@@ -1,9 +1,9 @@
 ---
-name: local-network-test
-description: Test Hypersomnia networking end to end without the user - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), secure connect tokens and authentication, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, and test servers on the remote hosts (arena, arenaus). Use whenever the user asks to test connections, servers, the masterserver, ranked/auth, WebRTC or the web build "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", or to verify networking changes before a release.
+name: local-testing
+description: Test Hypersomnia end to end without the user, mainly networking - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), secure connect tokens and authentication, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, isolated builds (native, Steam, web, Ubuntu containers for the remote hosts) and test servers on arena and arenaus. Use whenever the user asks to test something "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", to check a UI change on screen, or to verify networking, ranked/auth, WebRTC or web build changes before a release.
 ---
 
-# Local network testing
+# Local testing
 
 Everything runs from scripts in `scripts/`, each fully isolated: own appdata dirs, own ports, own scratch dir
 (`SCRATCH`, default `/tmp/hypersomnia-nettest` - point it at the session scratchpad).
@@ -40,7 +40,8 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
 | `xclick.py x y` | Moves and left-clicks on `$DISPLAY` through XTest (no xdotool needed) |
 | `local_stack.sh [web build] [hours]` | Leaves running, for the user to test by hand: master, official ranked [PL] and casual [DE] servers, the web build on http://localhost:8765 pointed at them; `local_stack.sh stop` |
-| `build_headless_ubuntu_container.sh` | Headless Release build inside an unprivileged Ubuntu 24.04 rootfs (bwrap), for hosts with an older glibc |
+| `build_headless_ubuntu2204.sh` | Headless Release build inside an unprivileged Ubuntu 22.04 rootfs (bwrap) - glibc 2.35, runs on both arenaus and arena; prints where the libc++ to ship lies |
+| `build_headless_ubuntu_container.sh` | The same in Ubuntu 24.04 (glibc 2.39) - arena only |
 
 Pass/fail is read from the logs - the scripts grep the meaningful lines: `connected securely with a token issued for X`,
 `Authenticated "nick". ID: key_...`, `This server requires a secure connection`, `Received initial public vars`.
@@ -88,8 +89,8 @@ Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/officia
 - The web build is single-threaded: synchronous `emscripten_fetch` returns nothing (status -1). Use `augs::async_get`.
 - Over WebRTC the netcode client takes packets only from the server address in the connect token; a secure token's
   public address list must point at the data channel's internal address.
-- The Steamworks SDK is not in the repo: `cmake/steam_integration/steamworks/sdk` (gitignored) is a symlink to
-  `~/Downloads/steamworks_sdk_158/sdk`. A Steam build compiles without the Steam client; testing tickets needs it running
-  and a `steam_web_api_key` on the server.
+- The Steamworks SDK is not in the repo: unpack it with `cmake/steam_integration/steamworks/put_sdk_here.sh
+  ~/Downloads/steamworks_sdk_165.zip` (into the gitignored `steamworks/sdk`). A Steam build (`-DDEVELOP_STEAM_INTEGRATION=1
+  -DUSE_SYSTEM_FREETYPE=0`) compiles without the Steam client; testing tickets needs it running and a `steam_web_api_key` on the server.
 - Upstream yojimbo tests: `cmake -S src/3rdparty/yojimbo -B $SCRATCH/yjbuild && cmake --build ... && ./bin/test`
   (Unix Makefiles - the Ninja generator clashes on a target named `test`).
