@@ -702,7 +702,9 @@ bool client_setup::pending_pre_connection_handshake() const {
 		A cert already on its way is waited for a moment - and for ranked, which needs it, until it comes or fails.
 	*/
 
-	if (identity.session != nullptr && identity.session->request_in_flight()) {
+	const bool has_cert_already = identity.session != nullptr && identity.session->has_broker_cert(augs::steady_secs());
+
+	if (identity.session != nullptr && identity.session->request_in_flight() && !has_cert_already) {
 		const auto waited = get_current_time() - when_initiated_connection;
 		const auto limit = identity.is_ranked ? 20.0 : 3.0;
 

@@ -576,7 +576,13 @@ private:
 					meta->open = true;
 				}
 
-				self->opened_at[id] = augs::high_precision_secs();
+				/*
+					Only for the peer that still holds this id - an onOpen arriving after a disconnect must not mark a reused id.
+				*/
+
+				if (const auto dc_it = self->dcs.find(id); dc_it != self->dcs.end() && found_in(self->pcs, id)) {
+					self->opened_at[id] = augs::high_precision_secs();
+				}
 
 				/* 
 					No longer need external id mapping,
@@ -683,61 +689,54 @@ public:
 	}
 
 	/*
-		has_game_client(id): whether the game has a connected client over that WebRTC id - one that has, is checked no more.
+		connected_ids: the WebRTC ids the game has a connected client over - those are no longer waiting.
+		The waiting ones: freed after max_secs_to_connect_v, and beyond max_waiting_peers_per_address_v from one address
+		(peers without an address - relayed through TURN - count as one address with a larger limit).
 	*/
 
-	template <class F>
-	void free_idle_opened_peers(F has_game_client) {
+	static constexpr std::size_t max_waiting_peers_without_address_v = 16;
+
+	template <class S>
+	void free_idle_opened_peers(const S& connected_ids) {
 		const auto now = augs::high_precision_secs();
-		auto due = std::vector<client_id>();
-		auto over_limit = std::vector<client_id>();
+		auto to_free = std::vector<client_id>();
 
 		{
 			std::scoped_lock lock(connections_lk);
+
+			erase_if(opened_at, [&](const auto& entry) { return connected_ids.contains(entry.first); });
 
 			auto waiting_by_address = std::unordered_map<std::string, std::vector<std::pair<double, client_id>>>();
 
 			for (const auto& [id, when] : opened_at) {
 				if (now - when > max_secs_to_connect_v) {
-					due.push_back(id);
+					to_free.push_back(id);
 				}
-				else if (const auto ip = remote_ip_locked(id); !ip.empty()) {
-					waiting_by_address[ip].emplace_back(when, id);
+				else {
+					waiting_by_address[remote_ip_locked(id)].emplace_back(when, id);
 				}
 			}
 
 			for (auto& [ip, waiting] : waiting_by_address) {
-				if (waiting.size() > max_waiting_peers_per_address_v) {
+				const auto limit = ip.empty() ? max_waiting_peers_without_address_v : max_waiting_peers_per_address_v;
+
+				if (waiting.size() > limit) {
 					std::sort(waiting.begin(), waiting.end());
 
-					for (std::size_t i = max_waiting_peers_per_address_v; i < waiting.size(); ++i) {
-						over_limit.push_back(waiting[i].second);
+					for (std::size_t i = limit; i < waiting.size(); ++i) {
+						to_free.push_back(waiting[i].second);
 					}
 				}
 			}
-		}
 
-		for (const auto id : over_limit) {
-			const bool connected = has_game_client(id);
-
-			if (!connected) {
-				set_message(typesafe_sprintf("Too many WebRTC peers waiting from one address - freeing %x.", id));
-				disconnect(id);
-			}
-		}
-
-		for (const auto id : due) {
-			const bool connected = has_game_client(id);
-
-			{
-				std::scoped_lock lock(connections_lk);
+			for (const auto id : to_free) {
 				opened_at.erase(id);
 			}
+		}
 
-			if (!connected) {
-				set_message(typesafe_sprintf("WebRTC peer %x opened its DataChannel but never connected - freeing its id.", id));
-				disconnect(id);
-			}
+		for (const auto id : to_free) {
+			set_message(typesafe_sprintf("WebRTC peer %x opened its DataChannel but did not connect in time, or too many wait from its address - freeing its id.", id));
+			disconnect(id);
 		}
 	}
 
@@ -5187,17 +5186,17 @@ void server_setup::send_packets_if_its_time() {
 		--ticks_remaining;
 
 		if (webrtc_server) {
-			webrtc_server->free_idle_opened_peers([&](const auto webrtc_id) {
-				bool found = false;
+			{
+				auto connected_webrtc_ids = std::unordered_set<port_type>();
 
 				for_each_id_and_client([&](const auto, const auto& c) {
-					if (c.is_webrtc_client() && c.address.GetPort() == webrtc_id) {
-						found = true;
+					if (c.is_webrtc_client()) {
+						connected_webrtc_ids.insert(c.address.GetPort());
 					}
 				}, only_connected_v);
 
-				return found;
-			});
+				webrtc_server->free_idle_opened_peers(connected_webrtc_ids);
+			}
 
 			webrtc_server->send_pending_packets(webrtc_server);
 		}
@@ -5542,18 +5541,21 @@ static std::string password_guess_key(const std::string& ban_address) {
 static const std::string overflow_password_key_v = "*";
 
 /*
-	Peers without an address (relayed through TURN, or every peer of a server in the browser) share one record too.
+	Peers without an address (relayed through TURN, or every peer of a server in the browser) are not limited:
+	one record shared by all of them would let anyone lock all of them out.
 */
 
-static const std::string no_address_password_key_v = "-";
-
 bool server_setup::too_many_wrong_passwords(const std::string& address) const {
-	const auto key = address.empty() ? no_address_password_key_v : ::password_guess_key(address);
+	if (address.empty()) {
+		return false;
+	}
+
+	const auto key = ::password_guess_key(address);
 	const auto record = mapped_or_nullptr(wrong_passwords, key);
 	const auto used = record != nullptr ? record : mapped_or_nullptr(wrong_passwords, overflow_password_key_v);
 
 	if (used != nullptr) {
-		const bool shared = record == nullptr || key == no_address_password_key_v;
+		const bool shared = record == nullptr;
 		const auto limit = shared ? 10 * max_wrong_passwords_per_minute_v : max_wrong_passwords_per_minute_v;
 		return server_time - used->since < 60.0 && used->count >= limit;
 	}
@@ -5562,7 +5564,11 @@ bool server_setup::too_many_wrong_passwords(const std::string& address) const {
 }
 
 void server_setup::note_wrong_password(const std::string& address) {
-	auto key = address.empty() ? no_address_password_key_v : ::password_guess_key(address);
+	if (address.empty()) {
+		return;
+	}
+
+	auto key = ::password_guess_key(address);
 
 	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, key)) {
 		erase_if(wrong_passwords, [&](const auto& entry) { return server_time - entry.second.since >= 60.0; });

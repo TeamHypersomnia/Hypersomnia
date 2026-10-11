@@ -2596,7 +2596,7 @@ work_result work(
 			Ranked without a broker cert: asked for right now, so that the client waits for it instead of connecting without.
 		*/
 
-		if (is_ranked && !identity->has_broker_cert(augs::steady_secs())) {
+		if (is_ranked && !identity->has_broker_cert(augs::steady_secs()) && !identity->request_in_flight()) {
 			identity->retry_now();
 		}
 

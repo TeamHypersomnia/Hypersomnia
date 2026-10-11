@@ -183,8 +183,25 @@ private:
 									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
 										const auto now = augs::high_precision_secs();
 
-										if (!peer->take_message_token(now)) {
-											return;
+										/*
+											A server in the browser answers every joining client with its candidates - not limited.
+										*/
+
+										if (!peer->is_server()) {
+											if (!peer->take_message_token(now)) {
+												return;
+											}
+
+											/*
+												Every offer takes a WebRTC id of some server for a while: at most 16 at once from one network,
+												then one a second - so that no single place holds all 64 ids of a server.
+											*/
+
+											const bool is_offer = json_message.is_object() && json_message.contains("type") && json_message["type"] == "offer";
+
+											if (is_offer && !take_offer_token(peer->ip_informational, now)) {
+												return;
+											}
 										}
 
 										peer->time_last_correct_message = now;
@@ -372,6 +389,34 @@ private:
 		return requested;
 	}
 
+	struct offer_bucket {
+		double tokens = 16.0;
+		double when_last = 0.0;
+	};
+
+	std::unordered_map<std::string, offer_bucket> offers_by_network;
+
+	bool take_offer_token(const netcode_address_t& address, const double now) {
+		if (offers_by_network.size() > 16384) {
+			offers_by_network.clear();
+		}
+
+		auto& b = offers_by_network[::ToString(masterserver_network_of(address))];
+
+		if (b.when_last > 0.0) {
+			b.tokens = std::min(16.0, b.tokens + (now - b.when_last) * 1.0);
+		}
+
+		b.when_last = now;
+
+		if (b.tokens < 1.0) {
+			return false;
+		}
+
+		b.tokens -= 1.0;
+		return true;
+	}
+
 	static constexpr std::size_t max_web_peers_per_network_v = 64;
 	static constexpr std::size_t max_web_peers_v = 8192;
 
@@ -386,9 +431,28 @@ private:
 			of some server, so that nobody holds them all from one place.
 		*/
 
+		auto address = netcode_address_t();
+		bool known = false;
+
 		{
-			auto address = netcode_address_t();
-			const bool known = addr.has_value() && netcode_parse_address(addr->c_str(), &address) == NETCODE_OK;
+			/*
+				An IPv6 peer may come as host:port without brackets.
+			*/
+
+			auto parse = [&](const std::string& text) {
+				if (netcode_parse_address(text.c_str(), &address) == NETCODE_OK) {
+					return true;
+				}
+
+				if (const auto colon = text.rfind(':'); colon != std::string::npos && text.find(':') != colon) {
+					const auto bracketed = "[" + text.substr(0, colon) + "]" + text.substr(colon);
+					return netcode_parse_address(bracketed.c_str(), &address) == NETCODE_OK;
+				}
+
+				return false;
+			};
+
+			known = addr.has_value() && parse(*addr);
 
 			const auto from_this_network = known ? std::count_if(peers.begin(), peers.end(), [&](const auto& p) {
 				return masterserver_network_of(p.second.ip_informational) == masterserver_network_of(address);
@@ -417,7 +481,9 @@ private:
 		if (addr) {
 			LOG("Web peer connected from %x. Chosen WebRTC id: %x", *addr, chosen_webrtc_id);
 
-			netcode_parse_address(addr->c_str(), &p.ip_informational);
+			if (known) {
+				p.ip_informational = address;
+			}
 
 			/* 
 				Port is irrelevant.
