@@ -20,6 +20,8 @@ inline uint64_t official_signature_now_ms() {
 /*
 	The masterserver only accepts a newer timestamp than the last one,
 	and a server can send several requests within the same millisecond.
+	After the clock is set back by more than a second, e.g. by NTP, the clock is followed again -
+	counting up from a timestamp now in the future would get every request refused as one from the future.
 */
 
 inline uint64_t next_official_signature_timestamp_ms() {
@@ -28,7 +30,8 @@ inline uint64_t next_official_signature_timestamp_ms() {
 	auto previous = last.load();
 
 	while (true) {
-		const auto next = std::max(::official_signature_now_ms(), previous + 1);
+		const auto now = ::official_signature_now_ms();
+		const auto next = previous + 1 > now + 1000 ? now : std::max(now, previous + 1);
 
 		if (last.compare_exchange_weak(previous, next)) {
 			return next;
