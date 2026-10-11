@@ -158,6 +158,10 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   the first-start nickname popup comes up right after.
 - A scenario's server list check right after start can be empty: the first heartbeat goes ~10 s after start - wait 14 s.
 - Scripts that `cd $REPO/hypersomnia` must not use `$(dirname "$0")` afterwards - resolve `HERE` to an absolute path first.
+- A key added to `official_servers.d` is picked up at the master's next rescan (~40 s): the first heartbeat ack says "community"
+  and a ranked server logs the ERROR and holds its match until the ack says official - expected, not a failure.
+- In `run_match.sh` tournament mode the server name is built from the rosters, so with `key_...` ids it is a long `[key_...` string.
+- On the site, a `key_` account gets its MMR row only with a match it did not abandon - the abandoning loser shows no row.
 - The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
   `build/Debug-x64-clang-claude-headless`.
 
