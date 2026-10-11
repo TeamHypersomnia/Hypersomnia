@@ -100,7 +100,16 @@ message_handler_result server_setup::handle_payload(
 
 		c.settings = std::move(payload);
 
+		const auto guessing_address = get_client_ip_for_bans(client_id);
+
+		if (too_many_wrong_passwords(guessing_address) && !find_admin_profile_of(c.cert_account).has_value()) {
+			kick(client_id, "Too many wrong passwords. Try again in a minute.");
+			return continue_v;
+		}
+
 		if (!is_authorized_for_access(client_id)) {
+			note_wrong_password(guessing_address);
+
 			/*
 				Don't return abort_v here: that would disconnect the client immediately
 				(see server_adapter::advance) before the reliable KICK_WRONG_PASSWORD message

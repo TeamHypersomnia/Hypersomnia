@@ -3,6 +3,7 @@
 #include <sodium.h>
 #endif
 #include "augs/misc/secure_hash.h"
+#include "augs/string/hex.h"
 #include "application/network/identity_cert.h"
 
 namespace identity_cert {
@@ -160,32 +161,7 @@ namespace identity_cert {
 			return std::nullopt;
 		}
 
-		auto out = augs::ed25519_public_key_type();
-
-		for (std::size_t i = 0; i < out.size(); ++i) {
-			auto nibble = [&](const char ch) -> int {
-				if (ch >= '0' && ch <= '9') {
-					return ch - '0';
-				}
-
-				if (ch >= 'a' && ch <= 'f') {
-					return ch - 'a' + 10;
-				}
-
-				return -1;
-			};
-
-			const auto hi = nibble(account[prefix.size() + i * 2]);
-			const auto lo = nibble(account[prefix.size() + i * 2 + 1]);
-
-			if (hi < 0 || lo < 0) {
-				return std::nullopt;
-			}
-
-			out[i] = static_cast<uint8_t>(hi * 16 + lo);
-		}
-
-		return out;
+		return augs::hex_to_array<32>(std::string_view(account).substr(prefix.size()), true);
 	}
 
 	std::optional<verified_identity> verify(

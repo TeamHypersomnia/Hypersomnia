@@ -22,6 +22,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/misc/date_time.h"
+#include "augs/string/hex.h"
 #include "application/main/identity_key.h"
 
 namespace identity_key {
@@ -90,38 +91,7 @@ namespace identity_key {
 			return std::nullopt;
 		}
 
-		const auto hex = trimmed.substr(export_prefix.size());
-		auto seed = augs::ed25519_seed_type();
-
-		if (hex.size() != seed.size() * 2) {
-			return std::nullopt;
-		}
-
-		for (std::size_t i = 0; i < seed.size(); ++i) {
-			unsigned value = 0;
-
-			for (std::size_t j = 0; j < 2; ++j) {
-				const char c = hex[i * 2 + j];
-				value <<= 4;
-
-				if (c >= '0' && c <= '9') {
-					value |= static_cast<unsigned>(c - '0');
-				}
-				else if (c >= 'a' && c <= 'f') {
-					value |= static_cast<unsigned>(c - 'a' + 10);
-				}
-				else if (c >= 'A' && c <= 'F') {
-					value |= static_cast<unsigned>(c - 'A' + 10);
-				}
-				else {
-					return std::nullopt;
-				}
-			}
-
-			seed[i] = static_cast<uint8_t>(value);
-		}
-
-		return seed;
+		return augs::hex_to_array<32>(std::string_view(trimmed).substr(export_prefix.size()));
 	}
 
 	std::optional<augs::ed25519_seed_type> load(const augs::path_type& path) {

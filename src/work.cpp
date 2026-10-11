@@ -1913,6 +1913,10 @@ work_result work(
 			if (const auto steam_identity = identity->steam_identity_to_request()) {
 				LOG("Calling steam_request_auth_ticket for the identity cert.");
 				steam_auth_request_id = ::steam_request_auth_ticket(steam_identity->c_str());
+
+				if (steam_auth_request_id == 0) {
+					identity->on_steam_ticket({}, false);
+				}
 			}
 		}
 #endif
@@ -2019,6 +2023,8 @@ work_result work(
 			A new cert after linking or unlinking the key - not during a ranked match,
 			whose account would change under it and then not let the player back after a drop.
 		*/
+
+		identity->in_ranked_match = would_abandon_ranked_match();
 
 		if (settings_gui.identity_retry_wanted && !would_abandon_ranked_match()) {
 			settings_gui.identity_retry_wanted = false;

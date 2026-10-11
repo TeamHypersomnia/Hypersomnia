@@ -44,7 +44,7 @@ std::string server_request_signed_message(Request request) {
 }
 
 template <class Request>
-bool sign_server_request(Request& request, const augs::ed25519_seed_type& server_key, const masterserver_cookie_type& cookie) {
+bool sign_server_request(Request& request, const augs::ed25519_seed_type& server_key, const masterserver_cookie_type& cookie, const uint64_t nonce) {
 	const auto public_key = augs::ed25519_public_key(server_key);
 
 	if (!public_key.has_value()) {
@@ -52,7 +52,7 @@ bool sign_server_request(Request& request, const augs::ed25519_seed_type& server
 		return false;
 	}
 
-	request.signature = server_request_signature { *public_key, cookie, {} };
+	request.signature = server_request_signature { *public_key, cookie, nonce, {} };
 
 	if (const auto signature = augs::ed25519_sign(server_key, ::server_request_signed_message(request))) {
 		request.signature->signature = *signature;

@@ -46,6 +46,7 @@ private:
 
 	std::optional<identity_cert::cert> broker_cert;
 	double broker_cert_received_at = 0.0;
+	double broker_cert_received_at_wall = 0.0;
 
 	augs::async_response_ptr request;
 	double request_started_at = 0.0;
@@ -60,16 +61,25 @@ private:
 
 	bool steam_ticket_wanted = false;
 	bool steam_ticket_requested = false;
+	double steam_ticket_requested_at = 0.0;
+	double last_now = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
 
 	input last_input;
 
 	void start_request(const input&, double now);
 	void schedule_retry(double now, bool refused);
+	double cert_secs_left(double now) const;
 	std::optional<std::string> build_location(const input&) const;
 
 public:
 	std::string last_error;
+
+	/*
+		Set by the game while the player is in a ranked match - see hold_in_match_until_left_secs.
+	*/
+
+	bool in_ranked_match = false;
 
 	identity_session();
 

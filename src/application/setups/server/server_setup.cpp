@@ -58,6 +58,7 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "augs/misc/to_hex_str.h"
+#include "augs/string/hex.h"
 
 #include "application/setups/server/server_json_events.h"
 #include "augs/readwrite/json_readwrite.h"
@@ -1127,13 +1128,19 @@ void server_setup::reset_afk_timer() {
 }
 
 /*
-	Official servers sign what they send to the masterserver with their official_server_secret,
-	so that nobody else can make the server list show them as official or remove them from it.
+	Servers sign what they send to the masterserver with their key, so that nobody else can list them
+	under it or remove them from the list. The nonce of each request is kept to recognize the answers to it.
 */
 
 template <class Request>
 void server_setup::sign_for_masterserver(Request& request) const {
-	if (!::sign_server_request(request, this_server_key, masterserver_cookie)) {
+	auto nonce = uint64_t(0);
+	randombytes_buf(&nonce, sizeof(nonce));
+
+	recent_masterserver_nonces[next_masterserver_nonce % recent_masterserver_nonces.size()] = nonce;
+	++next_masterserver_nonce;
+
+	if (!::sign_server_request(request, this_server_key, masterserver_cookie, nonce)) {
 		LOG("Failed to sign a request to the masterserver with the server key.");
 	}
 }
@@ -1236,24 +1243,12 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 	const auto& configured = private_vars.identity_broker_public_key;
 	const auto hex = configured.empty() ? std::string(default_identity_broker_public_key_v) : configured;
 
-	auto key = augs::ed25519_public_key_type();
-
-	if (hex.size() != key.size() * 2) {
-		LOG("ERROR: identity_broker_public_key is not 64 hex characters. No broker certs are accepted.");
-		return {};
+	if (const auto key = augs::hex_to_array<32>(hex)) {
+		return { *key };
 	}
 
-	for (std::size_t i = 0; i < key.size(); ++i) {
-		try {
-			key[i] = static_cast<uint8_t>(std::stoi(hex.substr(i * 2, 2), nullptr, 16));
-		}
-		catch (...) {
-			LOG("ERROR: identity_broker_public_key is not valid hex. No broker certs are accepted.");
-			return {};
-		}
-	}
-
-	return { key };
+	LOG("ERROR: identity_broker_public_key is not 64 hex characters. No broker certs are accepted.");
+	return {};
 }
 
 /*
@@ -1310,7 +1305,20 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			}
 		}
 		else {
-			LOG("Client %x presented a cert that did not verify (account: %x).", id, blob->identity->account);
+			/*
+				A broker cert outside its time is most often this host's clock being off.
+			*/
+
+			const auto& cert = *blob->identity;
+
+			LOG(
+				"Client %x presented a cert that did not verify (account: %x, valid %x..%x, this server's time %x).",
+				id,
+				cert.account,
+				cert.not_before,
+				cert.not_after,
+				static_cast<int64_t>(now)
+			);
 		}
 	}
 
@@ -2349,7 +2357,7 @@ void server_setup::finalize_webhook_jobs() {
 }
 
 bool server_setup::handle_masterserver_response(
-	const netcode_address_t&,
+	const netcode_address_t& from,
 	const std::byte* packet_buffer,
 	const std::size_t packet_bytes
 ) {
@@ -2357,6 +2365,20 @@ bool server_setup::handle_masterserver_response(
 		using T = remove_cref<decltype(typed_request)>;
 
 		if constexpr(std::is_same_v<T, masterserver_out::heartbeat_ack>) {
+			/*
+				Only an answer to a heartbeat this server sent, from the masterserver it sent it to -
+				anyone can send a packet to the game port.
+			*/
+
+			{
+				const bool from_masterserver = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
+				const bool our_nonce = typed_request.nonce != 0 && found_in(recent_masterserver_nonces, typed_request.nonce);
+
+				if (!from_masterserver || !our_nonce) {
+					return true;
+				}
+			}
+
 			masterserver_cookie = typed_request.cookie;
 
 			/*
@@ -5295,6 +5317,47 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	return rcon_level_type::DENIED;
 }
 
+static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
+static constexpr std::size_t max_wrong_password_addresses_v = 4096;
+
+bool server_setup::too_many_wrong_passwords(const std::string& address) const {
+	if (address.empty()) {
+		return false;
+	}
+
+	if (const auto record = mapped_or_nullptr(wrong_passwords, address)) {
+		return server_time - record->since < 60.0 && record->count >= max_wrong_passwords_per_minute_v;
+	}
+
+	return false;
+}
+
+void server_setup::note_wrong_password(const std::string& address) {
+	if (address.empty()) {
+		return;
+	}
+
+	/*
+		A bounded table: the stale records go first, and if all are fresh, everything - never refusing everyone.
+	*/
+
+	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, address)) {
+		erase_if(wrong_passwords, [&](const auto& entry) { return server_time - entry.second.since >= 60.0; });
+
+		if (wrong_passwords.size() >= max_wrong_password_addresses_v) {
+			wrong_passwords.clear();
+		}
+	}
+
+	auto& record = wrong_passwords[address];
+
+	if (server_time - record.since >= 60.0) {
+		record = { 0, server_time };
+	}
+
+	++record.count;
+}
+
 bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 	if (private_vars.server_password.empty()) {
 		return true;
@@ -5529,12 +5592,44 @@ void server_setup::save_bans() const {
 	}
 }
 
+/*
+	One IPv6 user commonly holds a whole /64 and switches addresses within it at will:
+	an IPv6 address counts as its /64, an IPv4-mapped one as the IPv4 address.
+*/
+
+static std::string address_for_bans(const std::string& ip) {
+	if (ip.empty() || ip.find(':') == std::string::npos) {
+		return ip;
+	}
+
+	auto bare = ip;
+
+	if (bare.size() >= 2 && bare.front() == '[' && bare.back() == ']') {
+		bare = bare.substr(1, bare.size() - 2);
+	}
+
+	auto parsed = netcode_address_t();
+
+	if (netcode_parse_address(bare.c_str(), &parsed) != NETCODE_OK || parsed.type != NETCODE_ADDRESS_IPV6) {
+		return ip;
+	}
+
+	const auto& g = parsed.data.ipv6;
+	const bool ipv4_mapped = g[0] == 0 && g[1] == 0 && g[2] == 0 && g[3] == 0 && g[4] == 0 && g[5] == 0xffff;
+
+	if (ipv4_mapped) {
+		return typesafe_sprintf("%x.%x.%x.%x", g[6] >> 8, g[6] & 0xff, g[7] >> 8, g[7] & 0xff);
+	}
+
+	return typesafe_sprintf("%h:%h:%h:%h::/64", g[0], g[1], g[2], g[3]);
+}
+
 std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const {
 	const auto& c = clients[id];
 
 	if (c.is_webrtc_client()) {
 		if (webrtc_server) {
-			return webrtc_server->remote_ip(c.address.GetPort());
+			return ::address_for_bans(webrtc_server->remote_ip(c.address.GetPort()));
 		}
 
 		return "";
@@ -5547,7 +5642,7 @@ std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const
 	auto without_port = c.address;
 	without_port.SetPort(0);
 
-	return ::ToString(without_port);
+	return ::address_for_bans(::ToString(without_port));
 }
 
 const server_ban* server_setup::find_ban(const std::string& account, const std::string& ip) const {
@@ -6812,4 +6907,16 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 	REQUIRE(received == sent);
 }
 
+#endif
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Ban addresses: IPv6 counts as its /64") {
+	REQUIRE(::address_for_bans("1.2.3.4") == "1.2.3.4");
+	REQUIRE(::address_for_bans("") == "");
+	REQUIRE(::address_for_bans("2001:db8:aa:bb:1:2:3:4") == ::address_for_bans("[2001:db8:aa:bb:ffff:0:0:9]"));
+	REQUIRE(::address_for_bans("2001:db8:aa:bb:1:2:3:4") != ::address_for_bans("2001:db8:aa:bc:1:2:3:4"));
+	REQUIRE(::address_for_bans("::ffff:1.2.3.4") == "1.2.3.4");
+}
 #endif

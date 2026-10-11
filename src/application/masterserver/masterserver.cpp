@@ -870,15 +870,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								Signed by the key the server is listed with - see server_request_signature.h.
 								Without a fresh cookie for this address the heartbeat changes nothing:
 								it gets a cookie back, and the server sends again with it.
+								The cheap cookie check goes first - the signature is verified only for a heartbeat that can change the list.
 							*/
 
-							if (!::server_request_signature_valid(typed_request)) {
-								static uint64_t last_logged_ms = 0;
-
-								if (::official_log_allowed(last_logged_ms)) {
-									LOG("Ignoring an unsigned or badly signed heartbeat from %x.", ip_str);
-								}
-
+							if (!typed_request.signature.has_value()) {
 								return;
 							}
 
@@ -887,10 +882,21 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							auto ack = masterserver_out::heartbeat_ack();
 							ack.cookie = cookies.make(from);
+							ack.nonce = typed_request.signature->nonce;
 							ack.official = official_id != nullptr;
 
 							if (!cookies.valid(typed_request.signature->cookie, from)) {
 								send_back(ack);
+								return;
+							}
+
+							if (!::server_request_signature_valid(typed_request)) {
+								static uint64_t last_logged_ms = 0;
+
+								if (::official_log_allowed(last_logged_ms)) {
+									LOG("Ignoring a badly signed heartbeat from %x.", ip_str);
+								}
+
 								return;
 							}
 
@@ -1078,7 +1084,15 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			reserialize_list();
 		}
 
-		signalling.send_signalling_packets(send_to_gameserver);
+		/*
+			Only to servers on the list - otherwise anyone with a WebSocket could make the masterserver send packets anywhere.
+		*/
+
+		signalling.send_signalling_packets([&](const auto& payload, const netcode_address_t& target) {
+			if (found_in(server_list, target)) {
+				send_to_gameserver(payload, target);
+			}
+		});
 		signalling.process_timeouts_if_its_time();
 
 		if (signalling.should_reserialize()) {

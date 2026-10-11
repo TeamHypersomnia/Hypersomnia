@@ -75,6 +75,14 @@ def cert_account():
 
 check('cert before linking is the key', cert_account() == 'key_' + pub)
 
+# Ranked progress of the key: moves to a Steam account without matches on linking, comes back on the key's own unlink
+with db:
+    db.execute("INSERT INTO mmr_team (account_id, nickname, mmr, mu, sigma, matches_won, matches_lost) VALUES (?, 'k', 7.5, 30, 5, 3, 2)", ('key_' + pub,))
+
+def mmr_owner():
+    rows = db.execute("SELECT account_id FROM mmr_team WHERE mmr = 7.5 AND matches_won = 3").fetchall()
+    return [r[0] for r in rows]
+
 link_sig = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code, steam_id)).encode()).hex()
 status, body, headers = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code, '0' * 128))
 check('link refuses a bad signature', status == 401, body)
@@ -85,6 +93,7 @@ status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub
 check('a code links once', status == 401, body)
 
 check('cert after linking is the Steam account', cert_account() == 'steam_' + steam_id)
+check('progress moved to the Steam account', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
 
 ts = int(time.time())
 unlink_sig = key.sign(('hypersomnia-unlink-v1 %s %d' % (pub, ts)).encode()).hex()
@@ -94,6 +103,7 @@ status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s'
 check('unlink by GET', status == 200 and json.loads(body).get('from') == 'steam_' + steam_id, body)
 
 check('cert after unlinking is the key again', cert_account() == 'key_' + pub)
+check('progress moved back to the key', mmr_owner() == ['key_' + pub], str(mmr_owner()))
 
 print('%d failed' % len(failed))
 sys.exit(1 if failed else 0)

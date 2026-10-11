@@ -119,6 +119,8 @@ class server_setup :
 	*/
 
 	masterserver_cookie_type masterserver_cookie = {};
+	mutable std::array<uint64_t, 4> recent_masterserver_nonces = {};
+	mutable uint32_t next_masterserver_nonce = 0;
 	bool resent_heartbeat_for_cookie = false;
 
 	/*
@@ -776,6 +778,20 @@ public:
 	void disconnect_and_unset(const client_id_type&);
 
 	void kick(const client_id_type&, const std::string& reason, chat_target_type target = chat_target_type::KICK);
+
+	/*
+		Wrong server passwords per address (see get_client_ip_for_bans): a few a minute, then none for a minute.
+	*/
+
+	struct wrong_password_record {
+		uint32_t count = 0;
+		net_time_t since = 0.0;
+	};
+
+	std::unordered_map<std::string, wrong_password_record> wrong_passwords;
+
+	bool too_many_wrong_passwords(const std::string& address) const;
+	void note_wrong_password(const std::string& address);
 	message_handler_result abort_or_kick_if_debug(const client_id_type&, const std::string& reason);
 	/*
 		minutes == 0 bans for good.

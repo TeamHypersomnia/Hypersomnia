@@ -23,7 +23,11 @@ namespace augs {
         auto response = std::make_shared<async_response>();
         response->set_on_progress(on_progress);
 
-		LOG("async_get: %x%x", base_url, location); 
+		/*
+			Without the query - it can hold a Steam ticket or a signature.
+		*/
+
+		LOG("async_get: %x%x", base_url, location.substr(0, location.find('?'))); 
 
 #if PLATFORM_WEB
 		(void)follow_redirects;
@@ -69,7 +73,7 @@ namespace augs {
 
 			attr.userData = response.get();
 			std::string full_url = base_url + location;
-			LOG("async_get: emscripten_fetch %x", full_url);
+			LOG("async_get: emscripten_fetch %x%x", base_url, location.substr(0, location.find('?')));
 			const auto fetch = emscripten_fetch(&attr, full_url.c_str());
 
 			ensure(fetch != nullptr);

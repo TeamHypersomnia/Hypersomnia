@@ -21,12 +21,13 @@ namespace masterserver_out {
 	};
 
 	/*
-		The answer to every heartbeat: a cookie for the next request (see server_request_signature.h)
+		The answer to every heartbeat: a cookie for the next request (see server_request_signature.h), the request's nonce,
 		and whether the masterserver knows this server's key as an official one.
 	*/
 
 	struct heartbeat_ack {
 		masterserver_cookie_type cookie = {};
+		uint64_t nonce = 0;
 		bool accepted = false;
 		bool official = false;
 	};

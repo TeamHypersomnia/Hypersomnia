@@ -58,13 +58,18 @@ public:
 		reload();
 	}
 
-	void reload() {
-		id_by_key.clear();
+	/*
+		A scan that fails (the directory gone or unreadable for a moment) keeps the previous list:
+		emptying it would take every official server off ranked at once.
+	*/
 
+	void reload() {
 		if (directory.empty()) {
+			id_by_key.clear();
 			return;
 		}
 
+		auto fresh = std::unordered_map<std::string, std::string>();
 		std::error_code ec;
 		auto duplicated = std::unordered_map<std::string, std::string>();
 
@@ -102,22 +107,25 @@ public:
 				One key in two files: which id wins would depend on the directory order - neither is used.
 			*/
 
-			if (id_by_key.contains(key) || duplicated.contains(key)) {
+			if (fresh.contains(key) || duplicated.contains(key)) {
 				LOG("Official server %x: the same key as another one, skipping both.", server_id);
 				duplicated.emplace(key, server_id);
 				continue;
 			}
 
-			id_by_key.emplace(key, server_id);
+			fresh.emplace(key, server_id);
 		}
 
 		for (const auto& d : duplicated) {
-			id_by_key.erase(d.first);
+			fresh.erase(d.first);
 		}
 
 		if (ec) {
-			LOG("Could not read the official servers from %x: %x", directory, ec.message());
+			LOG("Could not read the official servers from %x: %x. Keeping the previous %x.", directory, ec.message(), id_by_key.size());
+			return;
 		}
+
+		id_by_key = std::move(fresh);
 	}
 
 	std::size_t size() const {

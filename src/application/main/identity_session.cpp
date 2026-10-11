@@ -2,6 +2,8 @@
 #include "augs/log.h"
 #include "augs/misc/async_get.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/misc/date_time.h"
+#include "augs/string/hex.h"
 #include "augs/string/parse_url.h"
 #include "application/main/identity_session.h"
 
@@ -13,24 +15,17 @@
 static constexpr double cert_expiry_margin_secs = 120.0;
 static constexpr double max_retry_delay_secs = 300.0;
 static constexpr double refused_retry_delay_secs = 600.0;
+static constexpr double steam_ticket_timeout_secs = 10.0;
 
-static std::vector<std::byte> from_hex(const std::string& hex) {
-	auto out = std::vector<std::byte>();
+/*
+	During a ranked match the cert is not refreshed while it has this much left: a linked or unlinked key
+	would otherwise change the account under the match, and a rejoin after a drop would not be let back.
+*/
 
-	if (hex.size() % 2 != 0) {
-		return out;
-	}
+static constexpr double hold_in_match_until_left_secs = 15 * 60.0;
 
-	for (std::size_t i = 0; i + 1 < hex.size(); i += 2) {
-		try {
-			out.push_back(static_cast<std::byte>(std::stoi(hex.substr(i, 2), nullptr, 16)));
-		}
-		catch (...) {
-			return {};
-		}
-	}
-
-	return out;
+static double wall_now() {
+	return augs::date_time::secs_since_epoch();
 }
 
 identity_session::identity_session() {
@@ -123,6 +118,8 @@ void identity_session::schedule_retry(const double now, const bool refused) {
 }
 
 void identity_session::advance(const input& in, const double now) {
+	last_now = now;
+
 	if (in != last_input) {
 		/*
 			Another account (e.g. an imported key, a CrazyGames sign in): the old cert is no longer it.
@@ -144,12 +141,13 @@ void identity_session::advance(const input& in, const double now) {
 		const auto response = augs::get_once(request);
 
 		if (response.status == 200) {
-			const auto bytes = from_hex(response.body);
-			const auto cert = identity_cert::from_bytes(bytes.data(), bytes.size());
+			const auto bytes = augs::hex_to_bytes(response.body).value_or(std::vector<uint8_t>());
+			const auto cert = identity_cert::from_bytes(reinterpret_cast<const std::byte*>(bytes.data()), bytes.size());
 
 			if (cert.has_value() && cert->session_public_key == session_public && cert->not_after > cert->not_before) {
 				broker_cert = cert;
 				broker_cert_received_at = now;
+				broker_cert_received_at_wall = wall_now();
 				last_error.clear();
 				retry_delay = 30.0;
 
@@ -164,7 +162,7 @@ void identity_session::advance(const input& in, const double now) {
 				schedule_retry(now, false);
 			}
 		}
-		else if (response.status >= 400 && response.status < 500) {
+		else if (response.status >= 400 && response.status < 500 && response.status != 429) {
 			last_error = response.body.empty() ? typesafe_sprintf("The identity broker refused (HTTP %x).", response.status) : response.body;
 			LOG("Identity cert refused (HTTP %x): %x", response.status, last_error);
 			schedule_retry(now, true);
@@ -185,7 +183,32 @@ void identity_session::advance(const input& in, const double now) {
 		return;
 	}
 
-	if (now < next_attempt_at) {
+	/*
+		Steam may never answer a ticket request.
+	*/
+
+	if (steam_ticket_requested && now - steam_ticket_requested_at > steam_ticket_timeout_secs) {
+		on_steam_ticket({}, false);
+	}
+
+	/*
+		Monotonic time stops while the computer sleeps - the wall clock tells a cert that ran out meanwhile.
+	*/
+
+	const bool cert_due_by_wall_clock = [&]() {
+		if (!broker_cert.has_value()) {
+			return false;
+		}
+
+		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+		return wall_now() - broker_cert_received_at_wall >= lifetime / 2;
+	}();
+
+	if (now < next_attempt_at && !cert_due_by_wall_clock) {
+		return;
+	}
+
+	if (in_ranked_match && cert_secs_left(now) > hold_in_match_until_left_secs) {
 		return;
 	}
 
@@ -203,6 +226,7 @@ std::optional<std::string> identity_session::steam_identity_to_request() {
 	}
 
 	steam_ticket_requested = true;
+	steam_ticket_requested_at = last_now;
 	return identity_cert::steam_ticket_identity(session_public);
 }
 
@@ -213,7 +237,7 @@ void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_byte
 	if (!successful || ticket_bytes.empty()) {
 		last_error = "Steam did not give a ticket. Is Steam online?";
 		LOG(last_error);
-		schedule_retry(next_attempt_at, false);
+		schedule_retry(last_now, false);
 		return;
 	}
 
@@ -233,18 +257,31 @@ void identity_session::retry_now() {
 void identity_session::reset() {
 	broker_cert.reset();
 	broker_cert_received_at = 0.0;
+	broker_cert_received_at_wall = 0.0;
 	next_attempt_at = 0.0;
 	retry_delay = 30.0;
 	last_error.clear();
 }
 
-bool identity_session::has_broker_cert(const double now) const {
+/*
+	The lifetime left by both the monotonic clock (immune to clock changes) and the wall clock (which runs on while the computer sleeps),
+	whichever says less.
+*/
+
+double identity_session::cert_secs_left(const double now) const {
 	if (!broker_cert.has_value()) {
-		return false;
+		return 0.0;
 	}
 
 	const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
-	return now < broker_cert_received_at + lifetime - cert_expiry_margin_secs;
+	const auto by_steady = broker_cert_received_at + lifetime - now;
+	const auto by_wall = broker_cert_received_at_wall + lifetime - wall_now();
+
+	return std::min(by_steady, by_wall);
+}
+
+bool identity_session::has_broker_cert(const double now) const {
+	return broker_cert.has_value() && cert_secs_left(now) > cert_expiry_margin_secs;
 }
 
 std::optional<identity_cert::cert> identity_session::cert_for_connect(const input& in, const double now) const {
