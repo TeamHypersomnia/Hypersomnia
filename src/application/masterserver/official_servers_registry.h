@@ -75,6 +75,20 @@ public:
 
 		std::error_code ec;
 
+		/*
+			A secret shared by two files would let the tokens, tickets and signatures for one server
+			pass on the other, and which file wins would depend on the directory order - neither is used.
+		*/
+
+		auto duplicated_keys = std::unordered_map<uint64_t, std::string>();
+
+		/*
+			A new entry accepts only the timestamps from now on, so a signed request recorded
+			before the masterserver started can not be replayed after it.
+		*/
+
+		const auto load_time_ms = ::official_signature_now_ms();
+
 		for (const auto& file : std::filesystem::directory_iterator(directory, ec)) {
 			if (!file.is_regular_file(ec)) {
 				continue;
@@ -96,18 +110,26 @@ public:
 
 			const auto key = to_map_key(keys->key_id);
 
-			if (by_key_id.contains(key)) {
-				LOG("Official server %x: the same secret as %x, skipping.", server_id, by_key_id.at(key).server_id);
+			if (by_key_id.contains(key) || duplicated_keys.contains(key)) {
+				LOG("Official server %x: the same secret as another one, skipping both.", server_id);
+				duplicated_keys.emplace(key, server_id);
 				continue;
 			}
 
-			auto entry = official_server_entry { server_id, *keys, 0 };
+			auto entry = official_server_entry { server_id, *keys, load_time_ms };
 
 			if (const auto it = previous.find(key); it != previous.end()) {
 				entry.last_timestamp_ms = it->second.last_timestamp_ms;
 			}
 
 			by_key_id.emplace(key, std::move(entry));
+		}
+
+		for (const auto& duplicated : duplicated_keys) {
+			if (const auto it = by_key_id.find(duplicated.first); it != by_key_id.end()) {
+				LOG("Official server %x: the same secret as another one, skipping both.", it->second.server_id);
+				by_key_id.erase(it);
+			}
 		}
 
 		if (ec) {

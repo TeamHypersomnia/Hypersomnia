@@ -613,6 +613,13 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 				entry.time_last_heartbeat = current_time;
 
+				/*
+					The dump does not say which official server an entry was -
+					its next signed heartbeat makes it official again.
+				*/
+
+				entry.meta.is_official = false;
+
 				server_list.try_emplace(address, std::move(entry));
 			}
 
@@ -922,7 +929,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							if (entry->meta.is_official_server()) {
 								const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ::ToString(from));
 
-								if (signer == nullptr) {
+								if (signer == nullptr || signer->server_id != entry->official_server_id) {
 									LOG("Ignoring an unauthenticated goodbye for the official server at %x.", ::ToString(from));
 									return;
 								}
@@ -957,6 +964,38 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
 									LOG("Ignoring an unauthenticated heartbeat from the official server at %x.", ip_str);
 									return;
+								}
+
+								/*
+									A signature that fails (a replay, a request delayed past a newer one, a clock off)
+									must not list the server as a community one under its official name either.
+								*/
+
+								if (typed_request.signature.has_value()) {
+									LOG("Ignoring a heartbeat with an invalid signature from %x.", ip_str);
+									return;
+								}
+							}
+							else {
+								/*
+									The secret of one official server must not take over the entry of another
+									(their operators are not all the same people), and one official server is listed
+									at one address only - otherwise anyone who saw its signed heartbeat could
+									send it first from their own address.
+								*/
+
+								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
+									if (existing->official_server_id != signer->server_id) {
+										LOG("Ignoring a heartbeat signed by %x for the official server %x at %x.", signer->server_id, existing->official_server_id, ip_str);
+										return;
+									}
+								}
+
+								for (const auto& other : server_list) {
+									if (other.first != from && other.second.meta.is_official_server() && other.second.official_server_id == signer->server_id) {
+										LOG("Ignoring a heartbeat signed by %x from %x: it is already listed at %x.", signer->server_id, ip_str, ::ToString(other.first));
+										return;
+									}
 								}
 							}
 
@@ -1031,16 +1070,27 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				const auto request = augs::from_bytes<masterserver_request>(packet_buffer, packet_bytes);
 				std::visit(handle, request);
 			}
+			/*
+				An official server is only ever removed by its signed goodbye or a timeout -
+				anyone can send garbage with its address spoofed as the source.
+			*/
+
 			catch (const std::exception& err) {
 				if (const auto entry = mapped_or_nullptr(server_list, from)) {
 					LOG("The server at %x (%x) has sent invalid data: %x", ::ToString(from), entry->last_heartbeat.server_name, err.what());
-					remove_from_list(from);
+
+					if (!entry->meta.is_official) {
+						remove_from_list(from);
+					}
 				}
 			}
 			catch (...) {
 				if (const auto entry = mapped_or_nullptr(server_list, from)) {
 					LOG("The server at %x (%x) has sent invalid data: unknown error.", ::ToString(from), entry->last_heartbeat.server_name);
-					remove_from_list(from);
+
+					if (!entry->meta.is_official) {
+						remove_from_list(from);
+					}
 				}
 			}
 		};
@@ -1076,6 +1126,22 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		}
 
 		if (keep_official_servers_up_to_date()) {
+			/*
+				A server whose secret was removed or changed is no longer official right away,
+				instead of until it times out.
+			*/
+
+			for (auto& server : server_list) {
+				auto& entry = server.second;
+
+				if (entry.meta.is_official && official_servers.find_by_server_id(entry.official_server_id) == nullptr) {
+					LOG("The server at %x is no longer official.", ::ToString(server.first));
+
+					entry.meta.is_official = false;
+					entry.official_server_id.clear();
+				}
+			}
+
 			reserialize_list();
 		}
 
