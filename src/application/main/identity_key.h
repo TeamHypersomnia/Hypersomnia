@@ -31,6 +31,13 @@ namespace identity_key {
 	std::string link_message(const std::string& code, const std::string& steam_account);
 
 	/*
+		Signed to unlink the key from whatever Steam account it is linked to, from the game itself -
+		e.g. after linking it with a code someone else gave. unix_time keeps an old request from being reused later.
+	*/
+
+	std::string unlink_message(const augs::ed25519_public_key_type& public_key, int64_t unix_time);
+
+	/*
 		The account id without the "key_" provider prefix.
 	*/
 

@@ -218,6 +218,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string link_code_text;
 	std::string account_status;
 	bool confirm_forget_key = false;
+	std::optional<augs::ed25519_seed_type> import_to_confirm;
 
 	std::optional<augs::ed25519_seed_type> account_seed;
 	double when_account_seed_loaded = -1.0;

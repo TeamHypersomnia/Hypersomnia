@@ -27,6 +27,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/misc/date_time.h"
 #include "augs/readwrite/json_readwrite.h"
 
 #include "game/modes/logic_speed.h"
@@ -385,7 +386,10 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	text_disabled(
 		"Without Steam, your account is a key kept in your user folder on this computer.\n"
 		"It is created the first time you join a ranked server, or an official server securely.\n"
-		"Back it up: whoever has it plays as you, and without it the account is lost."
+		"Back it up - without it, the account is lost:\n"
+		"keep it in a password manager (Copy key to clipboard),\n"
+		"or copy the identity.key file somewhere safe (Reveal in explorer).\n"
+		"Whoever has it plays as you - never share it."
 	);
 
 	ImGui::Separator();
@@ -417,13 +421,16 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		tooltip_on_hover("To back it up, or to play from another computer: there, paste it below in Import key.\nAnyone with it plays as you.");
 	}
 	else if (augs::exists(key_path)) {
-		text_color("The key file is not a valid key. Fix it, import a key, or remove the file.", red);
+		text_color("The key file is not a valid key. Fix it, import a key,\nor use Forget this key - the file is then kept as a backup.", red);
 	}
 	else {
 		text("No key yet.");
 
 		if (ImGui::Button("Create key now")) {
-			identity_key::load_or_create(key_path);
+			if (!identity_key::load_or_create(key_path).has_value()) {
+				account_status = "Could not create the key. See the logs.";
+			}
+
 			account_seed_reload_needed = true;
 		}
 	}
@@ -436,32 +443,81 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 	ImGui::Separator();
 
+	auto import_now = [&](const augs::ed25519_seed_type& imported) {
+		account_seed_reload_needed = true;
+
+		if (const auto backup = identity_key::save_replacing(key_path, imported)) {
+			account_status = backup->empty()
+				? std::string("Key imported.")
+				: typesafe_sprintf("Key imported. The previous one was kept as %x.", backup->filename().string())
+			;
+
+			import_key_text.clear();
+		}
+		else {
+			account_status = "Could not save the key - your previous key was kept. See the logs.";
+		}
+	};
+
 	{
 		input_text("##ImportKey", import_key_text, ImGuiInputTextFlags_Password);
-		ImGui::SameLine();
 
-		if (ImGui::Button("Import key")) {
-			if (const auto imported = identity_key::from_export_string(import_key_text)) {
-				account_seed_reload_needed = true;
+		if (!import_to_confirm.has_value()) {
+			ImGui::SameLine();
 
-				if (const auto backup = identity_key::save_replacing(key_path, *imported)) {
-					account_status = backup->empty()
-						? std::string("Key imported.")
-						: typesafe_sprintf("Key imported. The previous one was kept as %x.", backup->filename().string())
-					;
-
-					import_key_text.clear();
+			if (ImGui::Button("Import key")) {
+				if (const auto imported = identity_key::from_export_string(import_key_text)) {
+					if (seed.has_value() && *seed == *imported) {
+						account_status = "That is already your key.";
+						import_key_text.clear();
+					}
+					else if (seed.has_value()) {
+						import_to_confirm = *imported;
+					}
+					else {
+						import_now(*imported);
+					}
 				}
 				else {
-					account_status = "Could not save the key. See the logs.";
+					account_status = "That is not a valid key. It starts with hypersomnia-key-v1:";
 				}
 			}
-			else {
-				account_status = "That is not a valid key. It starts with hypersomnia-key-v1:";
-			}
+
+			tooltip_on_hover("Paste a key copied with \"Copy key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
+		}
+	}
+
+	/*
+		Importing switches the account - shown before it happens, in case the wrong key was pasted.
+	*/
+
+	if (import_to_confirm.has_value() && public_key.has_value()) {
+		const auto short_id = [](const augs::ed25519_seed_type& s) {
+			const auto id = identity_key::account_id(*augs::ed25519_public_key(s));
+			return "key_" + id.substr(0, 12) + "...";
+		};
+
+		const auto current = "key_" + identity_key::account_id(*public_key).substr(0, 12) + "...";
+
+		text_color(
+			typesafe_sprintf(
+				"Switch your account from %x to %x?\nThe current key is kept in your user folder as a backup file.",
+				current,
+				short_id(*import_to_confirm)
+			),
+			orange
+		);
+
+		if (ImGui::Button("Switch account")) {
+			import_now(*import_to_confirm);
+			import_to_confirm.reset();
 		}
 
-		tooltip_on_hover("Paste a key copied with \"Copy key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel##Import")) {
+			import_to_confirm.reset();
+		}
 	}
 
 	if (augs::exists(key_path)) {
@@ -501,7 +557,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 					if (const auto backup = identity_key::forget(key_path)) {
 						account_status = typesafe_sprintf(
-							"Key forgotten. It was kept as %x.\nA new one is created when you join a ranked server, or with Create key now.",
+							"Key forgotten. It was kept as %x.\nA new one is created when you join a ranked or official server securely, or with Create key now.",
 							backup->filename().string()
 						);
 					}
@@ -538,12 +594,36 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		*/
 
 		auto request_link_target = [&]() {
+			/*
+				Pasting the key here instead of in Import would send it to the website in the request -
+				it never leaves the game, the field is just cleared.
+			*/
+
+			{
+				auto lowercase = link_code_text;
+
+				for (auto& c : lowercase) {
+					c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+				}
+
+				if (identity_key::from_export_string(link_code_text).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || link_code_text.size() > 40) {
+					link_code_text.clear();
+					account_status = "That was your key, not a link code - it was not sent anywhere.\nNever paste the key anywhere but Import key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/profile.";
+					return;
+				}
+			}
+
 			auto code = std::string();
 
 			for (const auto c : link_code_text) {
 				if (std::isalnum(static_cast<unsigned char>(c))) {
 					code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
 				}
+			}
+
+			if (code.size() != 8) {
+				account_status = "The link code is the 8 letters and digits shown on hypersomnia.io/profile.";
+				return;
 			}
 
 			link_target_request = launch_async([code, website_url]() {
@@ -655,9 +735,15 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			if (requesting) {
 				text_disabled("Linking...");
 			}
-			else if (ImGui::Button("Link") && seed.has_value() && public_key.has_value()) {
+			else if (ImGui::Button("Link")) {
 				account_status.clear();
-				request_link_target();
+
+				if (seed.has_value() && public_key.has_value()) {
+					request_link_target();
+				}
+				else {
+					account_status = "There is no key to link yet - create or import one above first.";
+				}
 			}
 
 			ImGui::SameLine();
@@ -665,6 +751,44 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			if (ImGui::Button("Open hypersomnia.io/profile")) {
 				augs::open_url(website_url + "/profile");
 			}
+
+			if (!requesting && seed.has_value() && public_key.has_value() && ImGui::Button("Unlink from Steam")) {
+				account_status.clear();
+
+				const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+
+				if (const auto signature = augs::ed25519_sign(*seed, identity_key::unlink_message(*public_key, unix_time))) {
+					const auto body = typesafe_sprintf(
+						"{\"public_key\":\"%x\",\"timestamp\":%x,\"signature\":\"%x\"}",
+						augs::bytes_to_hex(*public_key),
+						unix_time,
+						augs::bytes_to_hex(*signature)
+					);
+
+					link_request = launch_async([body, website_url]() -> std::string {
+						auto client = httplib_utils::make_client(website_url);
+						client->set_follow_location(false);
+
+						const auto result = client->Post("/link_key/unlink", body, "application/json");
+
+						if (!result) {
+							return typesafe_sprintf("Couldn't reach %x.", website_url);
+						}
+
+						if (httplib_utils::successful(result->status)) {
+							if (result->body.find("\"from\":null") != std::string::npos) {
+								return "This key was not linked to any Steam account.";
+							}
+
+							return "Unlinked. Your ranked matches count for this key's own account again.";
+						}
+
+						return typesafe_sprintf("Unlinking failed: %x", result->body);
+					});
+				}
+			}
+
+			tooltip_on_hover("Unlinks this key from whatever Steam account it is linked to,\ne.g. if you linked it with a code that was not yours.");
 		}
 
 		if (valid_and_is_ready(link_target_request)) {

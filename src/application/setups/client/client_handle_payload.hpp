@@ -484,11 +484,32 @@ message_handler_result client_setup::handle_payload(
 			identity_key_signed = true;
 
 			const auto identity = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
+			const bool had_key = augs::exists(*identity_key_path);
 
 			if (const auto seed = identity_key::load_or_create(*identity_key_path)) {
 				if (const auto ticket = identity_key::sign(*seed, identity)) {
 					pending_key_auth = identity_key::to_bytes(*ticket);
 				}
+
+				/*
+					Most players never open the Account settings - told once, when their account comes into being.
+				*/
+
+				if (!had_key) {
+					chat_gui_entry notice;
+					notice.timestamp = get_current_time();
+					notice.message = "Your account key was created. Back it up in Settings - Client - Account: without it, the account is lost for good.";
+					notice.overridden_message_color = orange;
+					client_gui.chat.add_entry(std::move(notice));
+				}
+			}
+			else if (secure_request.has_value() && secure_request->required) {
+				/*
+					Clearer than the server's authentication timeout.
+				*/
+
+				set_disconnect_reason("Your account key file is not valid.\nSee Settings - Client - Account.");
+				return abort_v;
 			}
 		}
 	}
