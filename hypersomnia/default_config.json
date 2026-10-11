@@ -489,8 +489,8 @@
         "identity_broker_public_key": "",
 
         // Admins recognized by the account their cert proves - no password needed. Never a nickname.
-        // [ "account id", "NONE" | "RCON" | "MASTER_RCON", optional badge shown in place of [ADMIN] ], e.g.:
-        // [ [ "steam_76561198000000000", "MASTER_RCON" ], [ "key_<64 hex characters>", "RCON", "MOD" ] ]
+        // { "account": "<account id>", "rcon": "NONE" (default) | "RCON" | "MASTER_RCON", "badge": optional, shown in place of [ADMIN] }, e.g.:
+        // [ { "account": "steam_76561198000000000", "rcon": "MASTER_RCON" }, { "account": "key_<64 hex characters>", "rcon": "RCON", "badge": "MOD" } ]
         // Your id: Settings - Advanced - "Copy my account id".
         "admin_profiles": []
     },

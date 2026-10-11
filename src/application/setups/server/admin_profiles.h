@@ -5,20 +5,29 @@
 #include "application/setups/server/rcon_level.h"
 
 /*
-	A server admin recognized by the authenticated account id - see server_private_vars::admin_profiles.
-	Written in the config as [ "account_id", "RCON level", "optional badge" ], e.g.:
+	A server admin recognized by the authenticated account id - see server_private_vars::admin_profiles, e.g.:
 
 	"admin_profiles": [
-		[ "steam_76561198000000000", "NONE" ],
-		[ "key_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "RCON", "MOD" ],
-		[ "steam_76561198000000001", "MASTER_RCON" ]
+		{ "account": "steam_76561198000000000", "rcon": "MASTER_RCON" },
+		{ "account": "key_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "rcon": "RCON", "badge": "MOD" },
+		{ "account": "steam_76561198000000001" }
 	]
 
-	The RCON level is one of NONE, RCON, MASTER_RCON.
+	rcon is one of NONE (default), RCON, MASTER_RCON.
 	Regardless of it, the admin is shown with the [ADMIN] badge - or with the optional badge in its place.
 */
 
-using admin_profiles_type = std::vector<std::vector<std::string>>;
+struct admin_profile_entry {
+	// GEN INTROSPECTOR struct admin_profile_entry
+	std::string account;
+	std::string rcon = "NONE";
+	std::string badge;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const admin_profile_entry&) const = default;
+};
+
+using admin_profiles_type = std::vector<admin_profile_entry>;
 
 struct admin_profile {
 	std::string account_id;
@@ -30,8 +39,8 @@ inline bool is_valid_rcon_level_name(const std::string& level) {
 	return level == "NONE" || level == "RCON" || level == "MASTER_RCON";
 }
 
-inline bool is_valid_admin_profile(const std::vector<std::string>& entry) {
-	return entry.size() >= 2 && entry.size() <= 3 && !entry[0].empty() && ::is_valid_rcon_level_name(entry[1]);
+inline bool is_valid_admin_profile(const admin_profile_entry& entry) {
+	return !entry.account.empty() && ::is_valid_rcon_level_name(entry.rcon);
 }
 
 inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type& profiles, const std::string& account_id) {
@@ -40,28 +49,21 @@ inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type
 	}
 
 	for (const auto& entry : profiles) {
-		if (entry.empty() || entry[0] != account_id) {
+		if (entry.account != account_id) {
 			continue;
 		}
 
 		auto result = admin_profile();
-		result.account_id = entry[0];
+		result.account_id = entry.account;
 
-		if (entry.size() > 1) {
-			const auto& level = entry[1];
-
-			if (level == "MASTER_RCON") {
-				result.rcon_level = rcon_level_type::MASTER;
-			}
-			else if (level == "RCON") {
-				result.rcon_level = rcon_level_type::BASIC;
-			}
+		if (entry.rcon == "MASTER_RCON") {
+			result.rcon_level = rcon_level_type::MASTER;
+		}
+		else if (entry.rcon == "RCON") {
+			result.rcon_level = rcon_level_type::BASIC;
 		}
 
-		if (entry.size() > 2) {
-			result.badge = entry[2];
-		}
-
+		result.badge = entry.badge;
 		return result;
 	}
 

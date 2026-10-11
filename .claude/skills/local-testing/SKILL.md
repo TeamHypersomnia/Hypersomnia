@@ -41,6 +41,10 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, certs from the broker, ranked takes only broker certs, `account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
 | `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server to the official ranked server by its alias, with a broker cert |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
+| `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
+| `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
+| `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
+| `pw_driver.js`, `fake_steam_session.py` | Chromium (Playwright in `~/.cache/hs-playwright`) driven over HTTP for clicking the web build; a Steam session cookie for the local site |
 | `[VARIANT=crazygames] build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web[-crazygames]`, the same steps as `build.sh Release Web` |
 | `[USER_FILES=dir] prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master and the broker on 13500 (see below); USER_FILES also writes files into its `/user` before start |
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
@@ -140,6 +144,22 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
 `run_mmr_tests.py` reads `private/mmr.db` too; 25/46 of its assertions fail on the baseline as well (environment, not code).
 
 ## Findings worth knowing
+
+- **The pgrep trap also fires through heredocs:** a `pgrep -f PATTERN` inside a script written by a heredoc in the same Bash
+  call matches the calling shell, whose command line holds the heredoc text - exit 144. Write the script in one call, run it in another.
+- **Site to a remote host:** `rsync` it without `.git`, `.env`, `private/`, `node_modules`, `hosting` and **`infra`** (725 MB - took 10 minutes).
+- `broker.sh stop` finds its pid under `$SCRATCH` - stopping with another `SCRATCH` than the start leaves the old one on 13500
+  ("port 13500 is busy"); check `readlink /proc/<pid>/cwd` before killing a leftover.
+- `SESSION_SECRET` for `fake_steam_session.py` must be the one the site was started with: keep it in a file (`$SCRATCH/session_secret`).
+- **Clicking the game in Chromium (pw_driver.js):** ImGui misses a press and release in one frame - the driver moves, waits and
+  clicks with a 120 ms delay. A tab the game opened (Sign in with Steam) takes the focus and the game tab is throttled to almost no
+  frames: switch back with `/page?i=0` before clicking. A fresh driver is a fresh browser profile - a new account key each start.
+- The game's console in the browser: `curl localhost:<port>/console`; wait for `Received an identity cert` before clicking -
+  the first-start nickname popup comes up right after.
+- A scenario's server list check right after start can be empty: the first heartbeat goes ~10 s after start - wait 14 s.
+- Scripts that `cd $REPO/hypersomnia` must not use `$(dirname "$0")` afterwards - resolve `HERE` to an absolute path first.
+- The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
+  `build/Debug-x64-clang-claude-headless`.
 
 - Symptom `ignored packet. sequence 0000000000000000 already received (replay protection)` and a client that connects
   but never gets `Received initial public vars`: packets sent outside netcode's normal path without advancing the sequence.

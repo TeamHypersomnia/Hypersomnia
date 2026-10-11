@@ -3034,13 +3034,11 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 	if (old_vars.admin_profiles != private_vars.admin_profiles) {
 		for (const auto& entry : private_vars.admin_profiles) {
 			if (!::is_valid_admin_profile(entry)) {
-				auto joined = std::string();
-
-				for (const auto& field : entry) {
-					joined += "\"" + field + "\" ";
-				}
-
-				LOG("WARNING! Invalid admin profile: [ %x]. Expected: [ \"account id\", \"NONE\" | \"RCON\" | \"MASTER_RCON\", optional badge ].", joined);
+				LOG(
+					"WARNING! Invalid admin profile: { account: \"%x\", rcon: \"%x\" }. Expected: { \"account\": \"<account id>\", \"rcon\": \"NONE\" | \"RCON\" | \"MASTER_RCON\", \"badge\": optional }.",
+					entry.account,
+					entry.rcon
+				);
 			}
 		}
 
