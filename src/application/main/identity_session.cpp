@@ -126,14 +126,8 @@ void identity_session::advance(const input& in, const double now) {
 			A refreshed CrazyGames token is the same account - its cert stays.
 		*/
 
-		auto same_account = [](input a, input b) {
-			a.crazygames_token.clear();
-			b.crazygames_token.clear();
-			return a == b;
-		};
-
 		const bool had_input = last_input.source != source_type::NONE;
-		const bool account_changed = !same_account(in, last_input);
+		const bool account_changed = !in.same_account(last_input);
 		last_input = in;
 
 		if (had_input && account_changed) {
@@ -168,6 +162,20 @@ void identity_session::advance(const input& in, const double now) {
 		}
 
 		const auto response = augs::get_once(request);
+
+		/*
+			Asked for an account that is no longer the player's (a key imported or forgotten, another CrazyGames user
+			meanwhile): whatever came back is not theirs - asked again right away.
+		*/
+
+		if (!requested_for.same_account(last_input)) {
+			LOG("Dropping an identity cert answer for the previous account.");
+			next_attempt_at = 0.0;
+			steam_ticket.reset();
+			steam_ticket_requested = false;
+			steam_ticket_wanted = false;
+			return;
+		}
 
 		if (response.status == 200) {
 			const auto bytes = augs::hex_to_bytes(response.body).value_or(std::vector<uint8_t>());
@@ -205,6 +213,12 @@ void identity_session::advance(const input& in, const double now) {
 		steam_ticket.reset();
 		steam_ticket_requested = false;
 		steam_ticket_wanted = false;
+
+		if (retry_after_request) {
+			retry_after_request = false;
+			next_attempt_at = now;
+		}
+
 		return;
 	}
 
@@ -265,8 +279,15 @@ bool identity_session::request_in_flight() const {
 }
 
 void identity_session::retry_now() {
+	/*
+		With a request on its way (e.g. made just before a link), another one right after it - its answer may predate the change.
+	*/
+
 	if (request == nullptr) {
 		next_attempt_at = 0.0;
+	}
+	else {
+		retry_after_request = true;
 	}
 }
 

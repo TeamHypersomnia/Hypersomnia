@@ -432,6 +432,13 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 
+		/*
+			Servers in the browser count like the native ones: 32 from one network, and the list stays within 4096.
+		*/
+
+		auto listed_web_by_network = std::map<std::string, std::size_t>();
+		auto listed_total = server_list.size();
+
 		for (auto& server : peer_map) {
 			if (!server.second.is_server()) {
 				continue;
@@ -442,6 +449,17 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 
 			const auto ip_address = server.second.ip_informational;
+
+			{
+				auto& from_this_network = listed_web_by_network[::ToString(masterserver_network_of(ip_address))];
+
+				if (from_this_network >= 32 || listed_total >= 4096) {
+					continue;
+				}
+
+				++from_this_network;
+				++listed_total;
+			}
 
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
@@ -921,32 +939,25 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							/*
 								At most 32 servers from one address (e.g. the instances of one host; an IPv6 /64 counts as one),
-								and 4096 in all, so that nobody fills the list.
+								64 from an IPv6 /48 and 4096 in all, so that nobody fills the list.
+								The official servers are always listed.
 							*/
 
-							if (!found_in(server_list, from)) {
-								auto network_of = [](netcode_address_t a) {
-									a.port = 0;
-
-									if (a.type == NETCODE_ADDRESS_IPV6) {
-										for (int i = 4; i < 8; ++i) {
-											a.data.ipv6[i] = 0;
-										}
-									}
-
-									return a;
-								};
-
+							if (!found_in(server_list, from) && official_id == nullptr) {
 								std::size_t from_this_ip = 0;
-								const auto this_network = network_of(from);
+								std::size_t from_this_48 = 0;
 
 								for (const auto& other : server_list) {
-									if (network_of(other.first) == this_network) {
+									if (masterserver_network_of(other.first) == masterserver_network_of(from)) {
 										++from_this_ip;
+									}
+
+									if (masterserver_network_of(other.first, 3) == masterserver_network_of(from, 3)) {
+										++from_this_48;
 									}
 								}
 
-								if (from_this_ip >= 32 || server_list.size() >= 4096) {
+								if (from_this_ip >= 32 || from_this_48 >= 64 || server_list.size() >= 4096) {
 									static uint64_t last_logged_ms = 0;
 
 									if (::official_log_allowed(last_logged_ms)) {

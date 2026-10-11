@@ -22,6 +22,7 @@
 #include "augs/misc/imgui/imgui_enum_combo.h"
 #include "augs/misc/imgui/imgui_enum_radio.h"
 #include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/maybe_different.h"
 #include "augs/audio/audio_context.h"
 
 #include "augs/window_framework/platform_utils.h"
@@ -3069,11 +3070,22 @@ void settings_gui_state::perform(
 
 							ImGui::SameLine();
 
-							if (ImGui::Button("Copy my account id")) {
-								ImGui::SetClipboardText(current_account_id.c_str());
+							/*
+								Never a remembered id - it could be one the key is no longer linked to.
+							*/
+
+							{
+								auto scope = maybe_disabled_cols({}, !current_account_confirmed);
+
+								if (ImGui::Button("Copy my account id") && current_account_confirmed) {
+									ImGui::SetClipboardText(current_account_id.c_str());
+								}
 							}
 
-							tooltip_on_hover("For a server admin - e.g. to make you an admin of their server, or to unban you.");
+							tooltip_on_hover(current_account_confirmed
+								? "For a server admin - e.g. to make you an admin of their server, or to unban you."
+								: "Available once hypersomnia.io confirms the account."
+							);
 						}
 
 						if (!identity_error.empty()) {

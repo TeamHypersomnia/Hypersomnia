@@ -8,6 +8,23 @@
 
 void yojimbo_random_bytes( uint8_t * data, int bytes );
 
+/*
+	The network an address belongs to for the per-address limits: an IPv4 address, or an IPv6 prefix of ipv6_groups
+	groups of 16 bits (4 for a /64, 3 for a /48). The port is ignored.
+*/
+
+inline netcode_address_t masterserver_network_of(netcode_address_t a, const int ipv6_groups = 4) {
+	a.port = 0;
+
+	if (a.type == NETCODE_ADDRESS_IPV6) {
+		for (int i = ipv6_groups; i < 8; ++i) {
+			a.data.ipv6[i] = 0;
+		}
+	}
+
+	return a;
+}
+
 class signalling_server {
 public:
 	struct signalling_peer {
@@ -17,6 +34,29 @@ public:
 		double time_hosted = 0.0;
 		double time_last_heartbeat = -1;
 		double time_last_correct_message = -1;
+
+		/*
+			Messages a peer may send: 20 a second, bursts of 100 - plenty for any ICE negotiation.
+		*/
+
+		double message_tokens = 100.0;
+		double when_last_message = -1;
+
+		bool take_message_token(const double now) {
+			if (when_last_message >= 0.0) {
+				message_tokens = std::min(100.0, message_tokens + (now - when_last_message) * 20.0);
+			}
+
+			when_last_message = now;
+
+			if (message_tokens < 1.0) {
+				return false;
+			}
+
+			message_tokens -= 1.0;
+			return true;
+		}
+
 		server_heartbeat last_heartbeat;
 		std::array<uint8_t, 32> server_public_key = {};
 
@@ -141,7 +181,13 @@ private:
 									*/
 
 									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-										peer->time_last_correct_message = augs::high_precision_secs();
+										const auto now = augs::high_precision_secs();
+
+										if (!peer->take_message_token(now)) {
+											return;
+										}
+
+										peer->time_last_correct_message = now;
 									}
 
 									relay_message(peers, json_message, webrtc_id);
@@ -326,12 +372,40 @@ private:
 		return requested;
 	}
 
+	static constexpr std::size_t max_web_peers_per_network_v = 64;
+	static constexpr std::size_t max_web_peers_v = 8192;
+
 	void register_web_peer(
 		peer_map& peers,
 		std::shared_ptr<rtc::WebSocket> ws,
 		std::optional<std::string> path,
 		std::optional<std::string> addr
 	) {
+		/*
+			At most 64 peers from one network (a school fits) and 8192 in all - every peer can take a WebRTC id
+			of some server, so that nobody holds them all from one place.
+		*/
+
+		{
+			auto address = netcode_address_t();
+			const bool known = addr.has_value() && netcode_parse_address(addr->c_str(), &address) == NETCODE_OK;
+
+			const auto from_this_network = known ? std::count_if(peers.begin(), peers.end(), [&](const auto& p) {
+				return masterserver_network_of(p.second.ip_informational) == masterserver_network_of(address);
+			}) : 0;
+
+			if (peers.size() >= max_web_peers_v || static_cast<std::size_t>(from_this_network) >= max_web_peers_per_network_v) {
+				static uint64_t last_logged_ms = 0;
+
+				if (::official_log_allowed(last_logged_ms)) {
+					LOG("Refusing a web peer from %x: too many from its network, or in all.", addr.has_value() ? *addr : std::string("?"));
+				}
+
+				ws->close();
+				return;
+			}
+		}
+
 		dirty = true;
 
 		const auto chosen_webrtc_id = choose_webrtc_id(peers, path);

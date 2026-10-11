@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
@@ -11,6 +12,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/httplib_utils.h"
 #include "augs/misc/date_time.h"
+#include "augs/templates/container_templates.h"
 
 /*
 	Match reports wait on the disk until hypersomnia.io takes them - a report made while the site is down
@@ -35,12 +37,23 @@ private:
 
 	struct in_flight_result {
 		augs::path_type file;
+		std::string url;
 		int status = -1;
 	};
 
 	std::future<in_flight_result> in_flight;
 	double next_attempt_at = 0.0;
-	double retry_delay = 15.0;
+
+	/*
+		Each endpoint backs off on its own: one that is down must not hold back the reports to the others.
+	*/
+
+	struct endpoint_backoff {
+		double next_attempt_at = 0.0;
+		double retry_delay = 15.0;
+	};
+
+	std::unordered_map<std::string, endpoint_backoff> backoff_by_url;
 
 	static uint64_t now_unix() {
 		return static_cast<uint64_t>(augs::date_time::secs_since_epoch());
@@ -130,9 +143,8 @@ public:
 			return;
 		}
 
-		/* Right away */
+		/* Right away, unless its endpoint is backing off */
 		next_attempt_at = 0.0;
-		retry_delay = 15.0;
 	}
 
 	void advance(const double now) {
@@ -154,7 +166,7 @@ public:
 			if ((status >= 200 && status < 300) || status == 409) {
 				LOG("Match report %x delivered (HTTP %x).", result.file.filename(), status);
 				remove(result.file);
-				retry_delay = 15.0;
+				backoff_by_url.erase(result.url);
 				next_attempt_at = now;
 				return;
 			}
@@ -173,9 +185,12 @@ public:
 				return;
 			}
 
-			LOG("Match report %x not delivered (HTTP %x). Retrying in %x seconds.", result.file.filename(), status, retry_delay);
-			next_attempt_at = now + retry_delay;
-			retry_delay = std::min(retry_delay * 2, 600.0);
+			auto& backoff = backoff_by_url[result.url];
+
+			LOG("Match report %x not delivered (HTTP %x). Retrying its endpoint in %x seconds.", result.file.filename(), status, backoff.retry_delay);
+			backoff.next_attempt_at = now + backoff.retry_delay;
+			backoff.retry_delay = std::min(backoff.retry_delay * 2, 600.0);
+			next_attempt_at = now;
 			return;
 		}
 
@@ -183,33 +198,48 @@ public:
 			return;
 		}
 
-		const auto files = list_sorted();
+		/*
+			The oldest report whose endpoint is not backing off.
+		*/
 
-		if (files.empty()) {
-			next_attempt_at = now + 5.0;
-			return;
-		}
-
-		const auto& file = files.front();
-
-		if (const auto at = queued_at(file); at != 0 && at + max_age_secs < now_unix()) {
-			LOG("ERROR: the match report %x is older than the site accepts. Dropping it.", file.filename());
-			remove(file);
-			return;
-		}
-
+		augs::path_type file;
 		std::string url;
 		std::string body;
 
-		try {
-			if (!parse(augs::file_to_string(file), url, body)) {
-				LOG("ERROR: unreadable match report %x. Dropping it.", file);
-				remove(file);
-				return;
+		for (const auto& candidate : list_sorted()) {
+			if (const auto at = queued_at(candidate); at != 0 && at + max_age_secs < now_unix()) {
+				LOG("ERROR: the match report %x is older than the site accepts. Dropping it.", candidate.filename());
+				remove(candidate);
+				continue;
 			}
+
+			std::string candidate_url;
+			std::string candidate_body;
+
+			try {
+				if (!parse(augs::file_to_string(candidate), candidate_url, candidate_body)) {
+					LOG("ERROR: unreadable match report %x. Dropping it.", candidate);
+					remove(candidate);
+					continue;
+				}
+			}
+			catch (...) {
+				remove(candidate);
+				continue;
+			}
+
+			if (const auto backoff = mapped_or_nullptr(backoff_by_url, candidate_url); backoff != nullptr && now < backoff->next_attempt_at) {
+				continue;
+			}
+
+			file = candidate;
+			url = std::move(candidate_url);
+			body = std::move(candidate_body);
+			break;
 		}
-		catch (...) {
-			remove(file);
+
+		if (file.empty()) {
+			next_attempt_at = now + 5.0;
 			return;
 		}
 
@@ -223,7 +253,7 @@ public:
 
 		in_flight = launch_async(
 			[file, url, body, signature_hex = augs::bytes_to_hex(*signature), key_hex = server_public_key_hex]() {
-				auto out = in_flight_result { file, -1 };
+				auto out = in_flight_result { file, url, -1 };
 
 				const auto parsed = parsed_url(url);
 

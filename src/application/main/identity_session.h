@@ -34,9 +34,26 @@ public:
 		std::string broker_url;
 		source_type source = source_type::NONE;
 		std::string crazygames_token;
+
+		/*
+			Whose token it is: a refreshed token of the same user keeps the cert, another user's does not.
+		*/
+
+		std::string crazygames_user;
 		std::optional<augs::ed25519_seed_type> account_seed;
 
 		bool operator==(const input&) const = default;
+
+		/*
+			The same account, whatever its token.
+		*/
+
+		bool same_account(input other) const {
+			auto self = *this;
+			self.crazygames_token.clear();
+			other.crazygames_token.clear();
+			return self == other;
+		}
 	};
 
 private:
@@ -65,6 +82,7 @@ private:
 	double last_now = 0.0;
 	double last_wall = 0.0;
 	double last_steady = 0.0;
+	bool retry_after_request = false;
 	std::optional<std::vector<std::byte>> steam_ticket;
 
 	input last_input;

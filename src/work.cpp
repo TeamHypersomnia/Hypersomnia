@@ -1900,6 +1900,7 @@ work_result work(
 			if (social_sign_in.cached_auth.is_set() && social_sign_in.cached_auth.type == auth_provider_type::CRAZYGAMES) {
 				in.source = identity_session::source_type::CRAZYGAMES;
 				in.crazygames_token = social_sign_in.cached_auth.auth_token;
+				in.crazygames_user = social_sign_in.cached_auth.profile_id;
 			}
 		}
 #endif
@@ -2592,7 +2593,12 @@ work_result work(
 
 		/*
 			E.g. joining right at start (from the command line): the key is read and the cert asked for before connecting.
+			Ranked without a broker cert: asked for right now, so that the client waits for it instead of connecting without.
 		*/
+
+		if (is_ranked && !identity->has_broker_cert(augs::steady_secs())) {
+			identity->retry_now();
+		}
 
 		advance_identity();
 
