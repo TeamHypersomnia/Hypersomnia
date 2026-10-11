@@ -44,6 +44,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
 | `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
 | `scenario_steam.sh` | The Steam build with the user's running Steam: a real Web API ticket -> broker cert -> ranked (broker started with `STEAM_API_KEY_FILE`) |
+| `scenario_ranked_report.sh` | A whole ranked match to its natural end in about a minute: the test map `de_e2e_short` (de_cyberaqua, max team score 2, 5 s rounds, no warmup) on a ranked server, two key clients clicking Auto-assign, the signed report at the local broker, the site's match and MMR rows |
 | `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
 | `account_linked_as_check.sh <appdata> <broker url> <png>` | One start of a key client, Advanced - Network screenshotted: the remembered account and "(not confirmed)" |
 | `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
@@ -177,6 +178,12 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   wait a minute, that is the limit working.
 - Release builds of the netcode tests: run `stdbuf -o0 ./bin/test` - without it a failed `check` shows the last *buffered* test name,
   not the failing one.
+- **A ranked match that ends by itself:** tournaments force overtime (win by two) and idle players only win their defending rounds
+  (time runs out, no bomb), so a tournament match of idle clients never ends - use a regular ranked server, where 1:1 after both
+  halves ends it, and click Auto-assign (585,430 in 1280x720) in the faction window. A map's rules (max_team_score - at least 2 -,
+  round_time, warmup_time, freeze_time, buy_time, round_end_time) are in its JSON under game_modes.bomb_defusal; a server takes
+  test maps from user/downloads/arenas, clients download them from it directly when hypersomnia.io has no such map.
+- The site counts wins only from 5 rounds (MIN_ROUNDS_TO_COUNT_WINS): short test matches update MMR but show W 0 / L 0.
 - The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
   `build/Debug-x64-clang-claude-headless`.
 
