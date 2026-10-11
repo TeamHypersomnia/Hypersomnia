@@ -2,8 +2,11 @@
 #include "augs/network/port_type.h"
 
 /*
-	connect_tokens_over_plain_http: serve /connect_token over plain HTTP to anyone, not only to 127.0.0.1 (nginx in front).
-	Only for test masterservers - a connect token carries the session keys in the clear.
+	The limits of the list, so that nobody fills it:
+	max_servers_per_address - native servers from one address (an IPv6 /64 counts as one); official servers are never limited.
+	max_servers - native servers in all.
+	max_web_peers - WebSocket peers (players and servers in the browser) connected at once.
+	max_new_server_notifications_per_hour - "new server" webhooks.
 */
 
 struct masterserver_settings {
@@ -33,7 +36,11 @@ struct masterserver_settings {
 	bool report_rtc_errors_to_webhook = false;
 
 	augs::path_type official_servers_dir;
-	bool connect_tokens_over_plain_http = false;
+
+	unsigned max_servers_per_address = 32;
+	unsigned max_servers = 4096;
+	unsigned max_web_peers = 8192;
+	unsigned max_new_server_notifications_per_hour = 20;
 	// END GEN INTROSPECTOR
 
 	port_type get_last_udp_command_port() const {

@@ -558,10 +558,19 @@
         "report_rtc_errors_to_webhook": true,
         /*
             A directory with one file per official server:
-            the file name is the server id (e.g. "de"), the content is its official_server_secret.
-            Only servers whose heartbeats are signed with one of these secrets are listed as official.
+            the file name is the server id (e.g. "de"), the content is its public key (what --print-server-key prints).
+            Only servers whose heartbeats are signed with one of these keys are listed as official.
         */
-        "official_servers_dir": ""
+        "official_servers_dir": "",
+
+        /*
+            Limits of the list: native servers from one address (an IPv6 /64 counts as one; official servers are never limited),
+            native servers in all, WebSocket peers (players and servers in the browser) at once, "new server" webhooks an hour.
+        */
+        "max_servers_per_address": 32,
+        "max_servers": 4096,
+        "max_web_peers": 8192,
+        "max_new_server_notifications_per_hour": 20
     },
 
     "nat_detection": {

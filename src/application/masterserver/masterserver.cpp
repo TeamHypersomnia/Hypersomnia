@@ -246,6 +246,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		settings.signalling_ssl_private_key_path
 	);
 
+	signalling.max_web_peers = settings.max_web_peers;
+
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;
@@ -318,7 +320,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			const auto now = augs::steady_secs();
 			erase_if(new_server_notifications, [now](const double t) { return now - t > 3600.0; });
 
-			if (new_server_notifications.size() >= 20) {
+			if (new_server_notifications.size() >= settings.max_new_server_notifications_per_hour) {
 				MSR_LOG("Too many new server notifications this hour - skipping one for %x.", ip_str);
 				return;
 			}
@@ -432,13 +434,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 
-		/*
-			Servers in the browser count like the native ones: 32 from one network, and the list stays within 4096.
-		*/
-
-		auto listed_web_by_network = std::map<std::string, std::size_t>();
-		auto listed_total = server_list.size();
-
 		for (auto& server : peer_map) {
 			if (!server.second.is_server()) {
 				continue;
@@ -450,16 +445,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 			const auto ip_address = server.second.ip_informational;
 
-			{
-				auto& from_this_network = listed_web_by_network[::ToString(masterserver_network_of(ip_address))];
-
-				if (from_this_network >= 32 || listed_total >= 4096) {
-					continue;
-				}
-
-				++from_this_network;
-				++listed_total;
-			}
 
 			masterserver_entry_meta meta;
 			meta.time_hosted = server.second.time_hosted;
@@ -938,30 +923,24 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							}
 
 							/*
-								At most 32 servers from one address (e.g. the instances of one host; an IPv6 /64 counts as one),
-								64 from an IPv6 /48 and 4096 in all, so that nobody fills the list.
-								The official servers are always listed.
+								See masterserver_settings: at most max_servers_per_address from one address (e.g. the instances of one host)
+								and max_servers in all, so that nobody fills the list. The official servers are always listed.
 							*/
 
 							if (!found_in(server_list, from) && official_id == nullptr) {
 								std::size_t from_this_ip = 0;
-								std::size_t from_this_48 = 0;
 
 								for (const auto& other : server_list) {
 									if (masterserver_network_of(other.first) == masterserver_network_of(from)) {
 										++from_this_ip;
 									}
-
-									if (masterserver_network_of(other.first, 3) == masterserver_network_of(from, 3)) {
-										++from_this_48;
-									}
 								}
 
-								if (from_this_ip >= 32 || from_this_48 >= 64 || server_list.size() >= 4096) {
+								if (from_this_ip >= settings.max_servers_per_address || server_list.size() >= settings.max_servers) {
 									static uint64_t last_logged_ms = 0;
 
 									if (::official_log_allowed(last_logged_ms)) {
-										LOG("Ignoring a new server at %x: already 32 servers from this address, or 4096 in all.", ip_str);
+										LOG("Ignoring a new server at %x: already %x servers from this address, or %x in all.", ip_str, settings.max_servers_per_address, settings.max_servers);
 									}
 
 									send_back(ack);

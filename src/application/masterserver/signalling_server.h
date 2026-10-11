@@ -9,15 +9,14 @@
 void yojimbo_random_bytes( uint8_t * data, int bytes );
 
 /*
-	The network an address belongs to for the per-address limits: an IPv4 address, or an IPv6 prefix of ipv6_groups
-	groups of 16 bits (4 for a /64, 3 for a /48). The port is ignored.
+	The network an address belongs to for the per-address limits: an IPv4 address, or an IPv6 /64. The port is ignored.
 */
 
-inline netcode_address_t masterserver_network_of(netcode_address_t a, const int ipv6_groups = 4) {
+inline netcode_address_t masterserver_network_of(netcode_address_t a) {
 	a.port = 0;
 
 	if (a.type == NETCODE_ADDRESS_IPV6) {
-		for (int i = ipv6_groups; i < 8; ++i) {
+		for (int i = 4; i < 8; ++i) {
 			a.data.ipv6[i] = 0;
 		}
 	}
@@ -187,21 +186,8 @@ private:
 											A server in the browser answers every joining client with its candidates - not limited.
 										*/
 
-										if (!peer->is_server()) {
-											if (!peer->take_message_token(now)) {
-												return;
-											}
-
-											/*
-												Every offer takes a WebRTC id of some server for a while: at most 16 at once from one network,
-												then one a second - so that no single place holds all 64 ids of a server.
-											*/
-
-											const bool is_offer = json_message.is_object() && json_message.contains("type") && json_message["type"] == "offer";
-
-											if (is_offer && !take_offer_token(peer->ip_informational, now)) {
-												return;
-											}
+										if (!peer->is_server() && !peer->take_message_token(now)) {
+											return;
 										}
 
 										peer->time_last_correct_message = now;
@@ -389,36 +375,10 @@ private:
 		return requested;
 	}
 
-	struct offer_bucket {
-		double tokens = 16.0;
-		double when_last = 0.0;
-	};
+public:
+	std::size_t max_web_peers = 8192;
 
-	std::unordered_map<std::string, offer_bucket> offers_by_network;
-
-	bool take_offer_token(const netcode_address_t& address, const double now) {
-		if (offers_by_network.size() > 16384) {
-			offers_by_network.clear();
-		}
-
-		auto& b = offers_by_network[::ToString(masterserver_network_of(address))];
-
-		if (b.when_last > 0.0) {
-			b.tokens = std::min(16.0, b.tokens + (now - b.when_last) * 1.0);
-		}
-
-		b.when_last = now;
-
-		if (b.tokens < 1.0) {
-			return false;
-		}
-
-		b.tokens -= 1.0;
-		return true;
-	}
-
-	static constexpr std::size_t max_web_peers_per_network_v = 64;
-	static constexpr std::size_t max_web_peers_v = 8192;
+private:
 
 	void register_web_peer(
 		peer_map& peers,
@@ -427,8 +387,7 @@ private:
 		std::optional<std::string> addr
 	) {
 		/*
-			At most 64 peers from one network (a school fits) and 8192 in all - every peer can take a WebRTC id
-			of some server, so that nobody holds them all from one place.
+			At most max_web_peers in all (masterserver_settings), so that the masterserver's memory stays bounded.
 		*/
 
 		auto address = netcode_address_t();
@@ -454,15 +413,11 @@ private:
 
 			known = addr.has_value() && parse(*addr);
 
-			const auto from_this_network = known ? std::count_if(peers.begin(), peers.end(), [&](const auto& p) {
-				return masterserver_network_of(p.second.ip_informational) == masterserver_network_of(address);
-			}) : 0;
-
-			if (peers.size() >= max_web_peers_v || static_cast<std::size_t>(from_this_network) >= max_web_peers_per_network_v) {
+			if (peers.size() >= max_web_peers) {
 				static uint64_t last_logged_ms = 0;
 
 				if (::official_log_allowed(last_logged_ms)) {
-					LOG("Refusing a web peer from %x: too many from its network, or in all.", addr.has_value() ? *addr : std::string("?"));
+					LOG("Refusing a web peer from %x: %x peers already.", addr.has_value() ? *addr : std::string("?"), max_web_peers);
 				}
 
 				ws->close();
