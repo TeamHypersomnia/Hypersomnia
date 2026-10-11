@@ -272,6 +272,13 @@ class server_setup :
 	};
 
 	std::vector<webhook_job> pending_jobs;
+
+	struct closed_datachannel {
+		yojimbo::Address address;
+		net_time_t when;
+	};
+
+	std::vector<closed_datachannel> closed_datachannels_of_unset_clients;
 #endif
 
 	template <class F>

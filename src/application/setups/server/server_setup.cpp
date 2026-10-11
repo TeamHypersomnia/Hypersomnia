@@ -179,11 +179,52 @@ class webrtc_server_detail {
 
 	rtc::WebSocket ws;
 
+	/*
+		The connection to the signalling server is reopened whenever it closes - a masterserver restart,
+		a network hiccup, a throttled background tab - or the server would quietly vanish from the list for good.
+		Only touched on the main thread.
+	*/
+
+	std::string signalling_url;
+	bool reopen_pending = false;
+	double when_closed = 0.0;
+	int reopen_attempts = 0;
+
 	void mark_ready() {
         set_message("WebSocket server connected, ready for clients.");
 
 		std::scoped_lock lock(ready_lk);
 		ready = true;
+	}
+
+	void mark_closed() {
+		{
+			std::scoped_lock lock(ready_lk);
+			ready = false;
+		}
+
+		main_thread_queue::execute([&]() {
+			reopen_pending = true;
+			when_closed = augs::high_precision_secs();
+		});
+	}
+
+	void keep_websocket_open() {
+		if (!reopen_pending) {
+			return;
+		}
+
+		const auto backoff_secs = std::min(30.0, static_cast<double>(1 << std::min(reopen_attempts, 5)));
+
+		if (augs::high_precision_secs() - when_closed < backoff_secs) {
+			return;
+		}
+
+		reopen_pending = false;
+		++reopen_attempts;
+
+		set_message("Reopening the WebSocket connection to the signalling server.");
+		ws.open(add_ws_preffix(signalling_url));
 	}
 
 	static void setup_websocket(
@@ -192,8 +233,11 @@ class webrtc_server_detail {
 	) {
 		auto& ws = self->ws;
 
+		self->signalling_url = url;
+
 		ws.onOpen([wself = std::weak_ptr(self)]() {
 			if (auto self = wself.lock()) {
+				self->reopen_attempts = 0;
 				self->mark_ready();
 			}
         });
@@ -225,6 +269,7 @@ class webrtc_server_detail {
 		ws.onClosed([wself = std::weak_ptr(self)]() {
 			if (auto self = wself.lock()) {
 				self->set_message("WebSocket closed.");
+				self->mark_closed();
 			}
         });
 
@@ -267,6 +312,21 @@ class webrtc_server_detail {
 	}
 
 	static void handle_message(this_sptr self, const nlohmann::json& message) {
+		auto is_string_field = [&](const char* const field) {
+			return message.is_object() && message.contains(field) && message[field].is_string();
+		};
+
+		if (!is_string_field("id") || !is_string_field("type")) {
+			self->set_message("Ignoring a signalling message without an id or a type.");
+			return;
+		}
+
+		/*
+			Destroyed only after the lock is released - its callbacks call disconnect, which takes the lock.
+		*/
+
+		std::shared_ptr<rtc::PeerConnection> failed_pc;
+
 		std::scoped_lock lock(self->connections_lk);  
 		auto external_id = message["id"].get<std::string>();
 		auto type = message["type"].get<std::string>();
@@ -278,6 +338,16 @@ class webrtc_server_detail {
 		if (type == "offer") {
 			LOG("Received SDP offer.");
 			if (!found_in(id_map, external_id)) {
+				/*
+					An offer that can not be set must not take a WebRTC id: its peer connection would never
+					change state, so nothing would ever free the id, and enough of them would refuse every peer.
+				*/
+
+				if (!is_string_field("description")) {
+					self->set_message("Ignoring an offer without a description.");
+					return;
+				}
+
 				const auto id = self->assign_client_id();
 
 				LOG("New peer: mapping %x to %x", external_id, id);
@@ -286,16 +356,34 @@ class webrtc_server_detail {
 					id_map[external_id] = id;
 
 					main_thread_queue::execute([&]() {		
-						auto pc = setup_peer_connection(self, id, external_id);
-						pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+						try {
+							auto pc = setup_peer_connection(self, id, external_id);
 
-						pc_metas[id].has_description = true;
+							try {
+								pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
+							}
+							catch (...) {
+								failed_pc = pc;
+								throw;
+							}
 
-						for (auto& candidate : pc_metas[id].pending_candidates) {
-							pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+							pc_metas[id].has_description = true;
+
+							for (auto& candidate : pc_metas[id].pending_candidates) {
+								if (candidate.contains("candidate") && candidate["candidate"].is_string() && candidate.contains("mid") && candidate["mid"].is_string()) {
+									pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+								}
+							}
+
+							pc_metas[id].pending_candidates.clear();
 						}
+						catch (const std::exception& err) {
+							self->set_message(std::string("Invalid offer, freeing its id: ") + err.what());
 
-						pc_metas[id].pending_candidates.clear();
+							pcs.erase(id);
+							pc_metas.erase(id);
+							id_map.erase(external_id);
+						}
 					});
 				}
 				else {
@@ -319,6 +407,11 @@ class webrtc_server_detail {
 				LOG("Peer: %x maps to %x", external_id, id);
 
 				if (const auto pc = mapped_or_nullptr(pcs, id)) {
+					if (!is_string_field("candidate") || !is_string_field("mid")) {
+						self->set_message("Ignoring a candidate without its fields.");
+						return;
+					}
+
 					LOG("calling addRemoteCandidate.");
 
 					main_thread_queue::execute([&]() {		
@@ -947,6 +1040,7 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 
 			if (packet->disconnect_packet) {
 				const auto to_kick = to_yojimbo_addr(from);
+				bool found = false;
 
 				for (auto& c : clients) {
 					if (c.is_set() && c.address == to_kick) {
@@ -956,8 +1050,19 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 						}
 
 						c.queue_kick_due_to_closed_datachannel = true;
+						found = true;
 						break;
 					}
+				}
+
+				/*
+					The channel can close in the very receive that completes the handshake, before the connection
+					event sets the client. Lost here, the client would hold its slot and its WebRTC id until a restart:
+					a paused WebRTC client is never timed out, and its id would refuse every next peer given it.
+				*/
+
+				if (!found) {
+					closed_datachannels_of_unset_clients.push_back({ to_kick, server_time });
 				}
 
 				return 0;
@@ -3527,6 +3632,22 @@ void server_setup::advance_clients_state() {
 	bool added_someone_already = false;
 	bool removed_someone_already = false;
 
+	erase_if(closed_datachannels_of_unset_clients, [&](const auto& closed) {
+		for (auto& c : clients) {
+			if (c.is_set() && c.address == closed.address) {
+				LOG("queue_kick_due_to_closed_datachannel (id: %x): the channel closed before the client was set.", index_in(clients, c));
+				c.queue_kick_due_to_closed_datachannel = true;
+				return true;
+			}
+		}
+
+		/*
+			A handshake that never completed has nothing to kick.
+		*/
+
+		return server_time - closed.when > 10.0;
+	});
+
 	const auto inv_simulation_delta_ms = 1.0 / (get_inv_tickrate() * 1000.0);
 
 	auto in_steps = [inv_simulation_delta_ms](const auto ms) {
@@ -3634,6 +3755,20 @@ void server_setup::advance_clients_state() {
 				}
 
 				automove_to_spectators_if_afk(client_id, c);
+			}
+
+			/*
+				A paused WebRTC client is kept for when its tab comes back, but not for good -
+				it would hold its slot and its WebRTC id until a restart.
+			*/
+
+			if (c.is_web_client_paused() && !c.when_kicked.has_value()) {
+				const auto paused_limit_secs = c.state == server_client_state::type::IN_GAME ? 600.0 : 60.0;
+
+				if (server_time - c.last_valid_payload_time > paused_limit_secs) {
+					kick(client_id, "Connection timed out!");
+					c.kick_no_linger = true;
+				}
 			}
 
 			if (server_time >= dont_check_timeouts_until) {
@@ -4695,13 +4830,17 @@ void server_setup::send_packets_if_its_time() {
 
 #if PLATFORM_WEB
 	if (webrtc_server) {
-		if (resolved_this_server_webrtc_id.empty()) {
-			const auto resolved_id = webrtc_server->get_this_server_id();
+		webrtc_server->keep_websocket_open();
 
-			if (!resolved_id.empty()) {
-				LOG("This server WebRTC id: %x", resolved_id);
-				resolved_this_server_webrtc_id = resolved_id;
-			}
+		/*
+			A reopened connection gets a new id from the signalling server.
+		*/
+
+		const auto resolved_id = webrtc_server->get_this_server_id();
+
+		if (!resolved_id.empty() && resolved_id != resolved_this_server_webrtc_id) {
+			LOG("This server WebRTC id: %x", resolved_id);
+			resolved_this_server_webrtc_id = resolved_id;
 		}
 	}
 #endif
