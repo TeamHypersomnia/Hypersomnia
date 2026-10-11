@@ -2305,7 +2305,8 @@ work_result work(
 			The alias decides only for a server not on the list - a listed community server could be named anything.
 		*/
 
-		const bool is_ranked = found != nullptr ? found->heartbeat.is_ranked_server() : begins_with(target, "ranked");
+		const bool looks_like_alias = target.find('.') == std::string::npos;
+		const bool is_ranked = found != nullptr ? found->heartbeat.is_ranked_server() : (looks_like_alias && begins_with(target, "ranked"));
 		const bool is_official = found != nullptr ? found->is_official_server() : (::is_official_webrtc_id(target) || is_ranked);
 
 #if PLATFORM_WEB

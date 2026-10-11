@@ -840,12 +840,14 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				}
 
 				/*
-					Also a limit for everyone together, so that the map stays small whatever the number of addresses.
+					Also a bound on the number of requesters, so that the map stays small whatever the number of addresses.
+					Once reached, only the requesters not yet counted this minute wait - the others keep their limit.
 				*/
 
-				const bool too_many_overall = token_requests_this_minute.size() >= 10000;
+				const bool new_requester = !token_requests_this_minute.contains(requester);
+				const bool too_many_requesters = new_requester && token_requests_this_minute.size() >= 100000;
 
-				if (too_many_overall || ++token_requests_this_minute[requester] > 30) {
+				if (too_many_requesters || ++token_requests_this_minute[requester] > 30) {
 					res.status = 429;
 					return;
 				}
@@ -1036,6 +1038,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									return;
 								}
 							}
+
+							/*
+								TODO_SECURITY: a community server's goodbye is not authenticated -
+								anyone spoofing its address can take it off the list until its next heartbeat.
+							*/
 
 							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
 							remove_from_list(from);
