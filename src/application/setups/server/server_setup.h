@@ -171,6 +171,14 @@ class server_setup :
 
 	unsigned ticks_until_sending_packets = 0;
 	unsigned ticks_until_sending_hash = 0;
+
+	struct closed_datachannel {
+		yojimbo::Address address;
+		net_time_t when;
+	};
+
+	std::vector<closed_datachannel> closed_datachannels_of_unset_clients;
+
 	net_time_t when_last_sent_net_statistics = 0;
 	net_time_t when_last_sent_admin_public_settings = 0;
 	net_time_t when_last_sent_heartbeat_to_server_list = 0;
@@ -272,13 +280,6 @@ class server_setup :
 	};
 
 	std::vector<webhook_job> pending_jobs;
-
-	struct closed_datachannel {
-		yojimbo::Address address;
-		net_time_t when;
-	};
-
-	std::vector<closed_datachannel> closed_datachannels_of_unset_clients;
 #endif
 
 	template <class F>

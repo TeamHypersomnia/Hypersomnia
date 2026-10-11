@@ -209,6 +209,7 @@ class webrtc_server_detail {
 		});
 	}
 
+public:
 	void keep_websocket_open() {
 		if (!reopen_pending) {
 			return;
@@ -226,6 +227,8 @@ class webrtc_server_detail {
 		set_message("Reopening the WebSocket connection to the signalling server.");
 		ws.open(add_ws_preffix(signalling_url));
 	}
+
+private:
 
 	static void setup_websocket(
 		this_sptr self,
@@ -3632,12 +3635,18 @@ void server_setup::advance_clients_state() {
 	bool added_someone_already = false;
 	bool removed_someone_already = false;
 
-	erase_if(closed_datachannels_of_unset_clients, [&](const auto& closed) {
-		for (auto& c : clients) {
-			if (c.is_set() && c.address == closed.address) {
-				LOG("queue_kick_due_to_closed_datachannel (id: %x): the channel closed before the client was set.", index_in(clients, c));
-				c.queue_kick_due_to_closed_datachannel = true;
-				return true;
+	for (std::size_t i = 0; i < closed_datachannels_of_unset_clients.size();) {
+		const auto& closed = closed_datachannels_of_unset_clients[i];
+		bool handled = false;
+
+		for (std::size_t cid = 0; cid < clients.size(); ++cid) {
+			auto& candidate = clients[cid];
+
+			if (candidate.is_set() && candidate.address == closed.address) {
+				LOG("queue_kick_due_to_closed_datachannel (id: %x): the channel closed before the client was set.", cid);
+				candidate.queue_kick_due_to_closed_datachannel = true;
+				handled = true;
+				break;
 			}
 		}
 
@@ -3645,8 +3654,13 @@ void server_setup::advance_clients_state() {
 			A handshake that never completed has nothing to kick.
 		*/
 
-		return server_time - closed.when > 10.0;
-	});
+		if (handled || server_time - closed.when > 10.0) {
+			closed_datachannels_of_unset_clients.erase(closed_datachannels_of_unset_clients.begin() + i);
+		}
+		else {
+			++i;
+		}
+	}
 
 	const auto inv_simulation_delta_ms = 1.0 / (get_inv_tickrate() * 1000.0);
 
