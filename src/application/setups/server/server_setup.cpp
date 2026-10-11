@@ -225,7 +225,16 @@ public:
 		++reopen_attempts;
 
 		set_message("Reopening the WebSocket connection to the signalling server.");
-		ws.open(add_ws_preffix(signalling_url));
+
+		try {
+			ws.open(add_ws_preffix(signalling_url));
+		}
+		catch (const std::exception& err) {
+			set_message(std::string("Could not reopen the WebSocket: ") + err.what());
+
+			reopen_pending = true;
+			when_closed = augs::high_precision_secs();
+		}
 	}
 
 private:
@@ -830,7 +839,8 @@ server_setup::server_setup(
 				}
 
 				return std::nullopt;
-			}()
+			}(),
+			initial_vars.requires_authentication()
 		)
 	),
 #if CRASH_RECOVERY

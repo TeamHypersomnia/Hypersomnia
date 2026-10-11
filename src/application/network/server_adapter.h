@@ -61,7 +61,8 @@ public:
 		send_packet_override_type,
 		receive_packet_override_type,
 		bool is_webrtc_only,
-		const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key
+		const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key,
+		bool secure_connections_only
 	);
 
 	/*

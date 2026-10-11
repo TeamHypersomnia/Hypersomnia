@@ -219,7 +219,8 @@ server_adapter::server_adapter(
 	send_packet_override_type send_packet_override,
 	receive_packet_override_type receive_packet_override,
 	const bool is_webrtc_only,
-	const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key
+	const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key,
+	const bool secure_connections_only
 ) :
 	privateKey(netcode_key.has_value() ? *netcode_key : std::array<uint8_t, yojimbo::KeyBytes>()),
 	has_netcode_key(netcode_key.has_value()),
@@ -259,11 +260,15 @@ server_adapter::server_adapter(
 
 		/*
 			An official server takes both the secure tokens from the masterserver and the insecure ones,
-			telling them apart by get_secure_server_id. Whatever requires a secure connection, like ranked,
-			kicks the insecure clients itself, so that they learn why.
+			telling them apart by get_secure_server_id.
+
+			Except where every connection must be secure (ranked): anyone can make insecure tokens,
+			so a flood of them would take every pending handshake slot and keep out the players with secure ones.
+			An insecure client is then not answered at all - it times out instead of learning why,
+			but the game only connects there without a token when it could not reach the masterserver anyway.
 		*/
 
-		detail->config.accept_insecure_connect_tokens = has_netcode_key ? 1 : 0;
+		detail->config.accept_insecure_connect_tokens = has_netcode_key && !secure_connections_only ? 1 : 0;
 
 		if (is_webrtc_only) {
 			detail->config.override_send_and_receive = 1;
