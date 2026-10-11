@@ -5,7 +5,8 @@
 # Usage: local_stack.sh [web build dir] [hours]     Stop: local_stack.sh stop
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
-REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd)
+REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 T=$S/local_stack
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
@@ -15,7 +16,7 @@ HOURS=${2:-2}
 stop() {
 	for p in $(pgrep -f "^(timeout [0-9]+ )?(nice -n 10 )?$BIN --.* --appdata-dir $T/"); do kill $p; done
 	for p in $(pgrep -f "webserve.py $T/web"); do kill $p; done
-	"$(dirname "$0")/broker.sh" stop
+	"$HERE/broker.sh" stop
 }
 
 if [ "$1" == "stop" ]; then
@@ -33,7 +34,7 @@ done
 
 rm -rf $T
 mkdir -p $T/official_servers.d
-eval "$(LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html OFFICIAL_SERVERS_DIR=$T/official_servers.d "$(dirname "$0")/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
+eval "$(LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html OFFICIAL_SERVERS_DIR=$T/official_servers.d "$HERE/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
@@ -59,7 +60,7 @@ EOF
 server_conf ranked 10002 "[PL] Local ranked" TEAMS_EQUAL 19000 pl
 server_conf casual 10004 "[DE] Local casual" NEVER 19100 de
 
-"$(dirname "$0")/prepare_web.sh" "$WEB_BUILD" $T/web > /dev/null
+"$HERE/prepare_web.sh" "$WEB_BUILD" $T/web > /dev/null
 
 SECS=$((HOURS * 3600))
 cd $REPO/hypersomnia
@@ -71,7 +72,7 @@ timeout $SECS $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T
 sleep 3
 timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked --no-update-on-launch > $T/ranked.out 2>&1 &
 timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/casual --no-update-on-launch > $T/casual.out 2>&1 &
-timeout $SECS python3 "$(dirname "$0")/webserve.py" $T/web 8765 > $T/web.out 2>&1 &
+timeout $SECS python3 "$HERE/webserve.py" $T/web 8765 > $T/web.out 2>&1 &
 sleep 10
 
 curl -s http://127.0.0.1:18420/server_list_json | python3 -c "

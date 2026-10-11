@@ -7,7 +7,8 @@ export ALSOFT_DRIVERS=null
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
 umask 077
-REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd)
+REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
 T=$S/web_test
@@ -73,8 +74,8 @@ $BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]
 timeout $((WAIT + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
 sleep 3
 timeout $((WAIT + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
-timeout $((WAIT + 50)) python3 "$(dirname "$0")/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
-sleep 10
+timeout $((WAIT + 50)) python3 "$HERE/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
+sleep 14
 
 echo "=== list"
 curl -s http://127.0.0.1:18420/server_list_json | python3 -c "

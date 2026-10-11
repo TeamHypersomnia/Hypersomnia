@@ -33,8 +33,9 @@
     "matchup_scheme": "STRONGEST_VS_WEAKEST",
 
     // The teams.
-    // On LAN parties these are just nicknames by default.
-    // On production dedicated servers these will be e.g. Steam identifiers.
+    // On LAN parties these are just nicknames: players join with exactly these nicknames.
+    // Account ids instead (steam_..., key_..., crazygames_... - "Copy my account id" in Settings - Advanced - Network)
+    // are checked against the players' certs - all of them must be account ids then.
     //
     // Order matters when "skill_level_source" is "ORDER": the first team is the
     // strongest seed. At least 2 teams are required, or the tournament aborts.

@@ -10,8 +10,8 @@
 
 	"admin_profiles": [
 		[ "steam_76561198000000000", "NONE" ],
-		[ "discord_100000000000000000", "RCON", "MOD" ],
-		[ "discord_200000000000000000", "MASTER_RCON" ]
+		[ "key_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "RCON", "MOD" ],
+		[ "steam_76561198000000001", "MASTER_RCON" ]
 	]
 
 	The RCON level is one of NONE, RCON, MASTER_RCON.

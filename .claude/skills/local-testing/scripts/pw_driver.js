@@ -6,6 +6,7 @@
 	  curl "localhost:<port>/pages"               urls of the open tabs; /page?i=N switches to one
 	  curl "localhost:<port>/console"             the console lines so far     /quit
 	Sound muted, WebGL through SwiftShader. Headed - run it under Xvfb.
+	PW_ROUTES='{"<url>": "<local file>"}' serves those URLs from local files, e.g. a stub of the CrazyGames SDK.
 */
 const http = require('http');
 const { chromium } = require('playwright');
@@ -22,6 +23,12 @@ const { chromium } = require('playwright');
 		const [nv, domain] = cookie.split('@');
 		const eq = nv.indexOf('=');
 		await context.addCookies([{ name: nv.slice(0, eq), value: nv.slice(eq + 1), domain, path: '/' }]);
+	}
+
+	const routes = JSON.parse(process.env.PW_ROUTES || '{}');
+
+	for (const [routed_url, file] of Object.entries(routes)) {
+		await context.route(routed_url, r => r.fulfill({ path: file, contentType: 'application/javascript' }));
 	}
 
 	const lines = [];

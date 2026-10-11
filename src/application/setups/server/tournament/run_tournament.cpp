@@ -184,16 +184,35 @@ work_result run_tournament(const run_tournament_input& in) {
 			server_assigned_teams roster;
 
 			/*
-				Without a Steam Web API key the server can't validate Steam auth
-				tickets, so a tournament run in that mode has to fall back to
-				nickname auth or every client would be kicked as unauthenticated.
-				Force the flag on here so LAN tournaments work out of the box -
-				operators don't have to remember to also flip
-				authenticate_with_nicknames in the dedicated-server config.
+				Rosters of account ids (steam_..., key_..., crazygames_...) are matched against the players' certs.
+				Rosters of plain nicknames fall back to nickname auth, so LAN tournaments work out of the box -
+				operators don't have to remember to also flip authenticate_with_nicknames in the dedicated-server config.
 			*/
 
-			if (this_config.server_private.steam_web_api_key.empty()) {
-				this_config.server.authenticate_with_nicknames = true;
+			{
+				auto is_account_id = [](const account_id_string& id) {
+					for (const auto prefix : { "steam_", "key_", "crazygames_" }) {
+						if (id.rfind(prefix, 0) == 0) {
+							return true;
+						}
+					}
+
+					return false;
+				};
+
+				auto all_account_ids = [&](const std::vector<account_id_string>& ids) {
+					return std::all_of(ids.begin(), ids.end(), is_account_id);
+				};
+
+				const bool rosters_are_accounts =
+					all_account_ids(match.team_a_player_ids)
+					&& all_account_ids(match.team_b_player_ids)
+					&& all_account_ids(match.spectator_player_ids)
+				;
+
+				if (!rosters_are_accounts) {
+					this_config.server.authenticate_with_nicknames = true;
+				}
 			}
 
 			/*

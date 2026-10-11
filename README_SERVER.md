@@ -156,7 +156,10 @@ A good start would be:
 
   "server_private": {
     // "discord_webhook_url": "https://discord.com/api/webhooks/put_your/secret_here",
-    "master_rcon_password": "...",
+    // "server_password": "...", // only players who know it can join
+    "admin_profiles": [
+      [ "steam_76561198000000000", "MASTER_RCON" ] // your account id - see below
+    ]
   },
 
   "num_casual_servers": 1, // explained later
@@ -167,15 +170,29 @@ You can put any number of files in the `conf.d` folder - they will be applied in
 
 The files in ``conf.d/`` are *never* modified. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/runtime_prefs.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON). **It will override** the changes in ``conf.d``.
 
-To be able to access the administration panel of your server, make sure to setup ``master_rcon_password`` - . Open your game client. Setup your RCON password in ``Settings -> Client``. Then, press ``Esc`` when you're on your server to open the administration panel.
+To be able to access the administration panel of your server, add your account to ``admin_profiles`` in ``server_private``: ``[ "<account id>", "RCON" | "MASTER_RCON" | "NONE", "optional badge" ]``. Find your account id in the game under ``Settings -> Advanced -> Network`` (*Copy my account id*) - ``steam_...`` on Steam, ``key_...`` with an account key. Then press ``Esc`` when you're on your server to open the administration panel. There are no RCON passwords; a connection from the server's own machine (localhost) gets the panel by default (``auto_authorize_loopback_for_rcon``).
+
+The panel's *Players* tab kicks and bans by account. Bans are kept in ``server_bans.json`` in the user folder and can be edited by hand - each holds the account and the address of the player.
 
 If your server has a domain pointing to it, set `domain` in the `server` section, e.g. `"domain": "hypersomnia.example.com"` - without the port. The server list will show it instead of the bare IP, players can copy it, and the game remembers it for the next launch, so they still find your server if its IP changes. It is only a label: nothing checks that the domain really points to your server, and it does not make the server official.
 
+### The server key
+
+Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/server.key``). Every connection to the server is encrypted to it, and the server signs its heartbeats to the server list with it. Print its public part with:
+
+```sh
+./Hypersomnia-Headless.AppImage --print-server-key
+```
+
+Back the file up and keep it private. Players who joined from the server list know the server by this key: a server with another key (e.g. reinstalled without the file) is shown to them as a possible impostor.
+
 ### Official servers
 
-Official servers are hosted by volunteers together with the developers. Each gets one `official_server_secret` from the developers, put in the `server_private` section. It reports ranked matches, signs the heartbeats so that the server list shows the server as official, and will secure the connections of its players. Keep it private, and keep the host's clock synchronized (e.g. `systemd-timesyncd` or `chrony`): the server list rejects signatures from a clock more than 30 seconds off.
+Official servers are hosted by volunteers together with the developers. Send the developers the output of ``--print-server-key`` - the server list then shows the server as official, and hypersomnia.io takes its ranked match reports, which it signs with that key. Nothing secret changes hands.
 
-Ranked servers authenticate every player, and that only happens over the secure connections an `official_server_secret` makes possible - so a ranked server needs one. A community server without it refuses every player once ranked is on.
+Ranked servers take only players whose account was confirmed by hypersomnia.io (Steam, CrazyGames, or an account key) - at most ``max_ranked_players_per_ip`` (2) per address. A community server that turns ranked on needs to be official for its matches to count.
+
+Players carry their account to every server in the handshake; the server checks it offline, so a server keeps taking players while hypersomnia.io or the server list is down. Keep the host's clock synchronized (e.g. `systemd-timesyncd` or `chrony`): accounts are confirmed for 2 hours at a time.
 
 If you have a Discord server, you might want to setup a [Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) and set `discord_webhook_url` to the webhook URL. This will notify your community whenever someone connects, as well as report all match results.
 
@@ -338,7 +355,7 @@ Relative paths are resolved against ``~/.config/Hypersomnia/user/``. If the file
 
 - Every match of a stage runs concurrently on its own UDP port - consecutive ports starting from ``server_start.port``, exactly like with [multiple server instances](#many-server-instances). With ``N`` teams, open ``N / 2`` consecutive native ports, and as many web ports starting from ``webrtc_port_range_begin``.
 - The matches appear on the server list with names built from the team rosters, e.g. ``[alice] vs [bob]`` - semifinals and finals are specially tagged.
-- If no ``steam_web_api_key`` is configured, nickname authentication is forced on, so LAN tournaments work out of the box: a player simply connects with the exact nickname listed in ``"teams"``. Clients that are not on the match's roster are kicked, so nobody can wander onto the wrong server.
+- If ``"teams"`` hold plain nicknames, nickname authentication is forced on, so LAN tournaments work out of the box: a player simply connects with the exact nickname listed in ``"teams"``. If they hold account ids (``steam_...``, ``key_...``), players are matched by their accounts instead. Clients that are not on the match's roster are kicked, so nobody can wander onto the wrong server.
 - People listed in ``"additional_spectators"`` (casters, admins) may spectate every match of every stage.
 - A match autostarts as soon as both teams join, with full ranked logistics: the match freezes when someone disconnects so they can rejoin, and overtime is forced on since a bracket cannot handle ties.
 
