@@ -251,6 +251,7 @@ public:
 	*/
 
 	std::string current_account_id;
+	bool current_account_confirmed = false;
 	std::string identity_error;
 
 	/*

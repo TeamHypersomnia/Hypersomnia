@@ -2026,10 +2026,24 @@ work_result work(
 	*/
 
 	/*
-		The account the key played as at the last start - see sync_identity_with_settings.
+		The account the key played as when the broker last answered - see sync_identity_with_settings.
+		Only for showing the account before the broker answers: what servers see is always the cert.
+		"<key account> <account>", both checked - a hand-edited or broken file is just ignored.
 	*/
 
 	WEBSTATIC auto key_account_linked_as = [&]() -> std::pair<std::string, std::string> {
+		auto valid_account = [](const std::string& id) {
+			if (id.empty() || id.size() > 100) {
+				return false;
+			}
+
+			const bool known_prefix = id.rfind("key_", 0) == 0 || id.rfind("steam_", 0) == 0;
+
+			return known_prefix && std::all_of(id.begin(), id.end(), [](const char c) {
+				return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+			});
+		};
+
 		try {
 			const auto text = augs::file_to_string(USER_DIR / "account_linked_as.txt");
 			const auto space = text.find(' ');
@@ -2041,7 +2055,11 @@ work_result work(
 					account.pop_back();
 				}
 
-				return { text.substr(0, space), account };
+				auto key_account = text.substr(0, space);
+
+				if (valid_account(key_account) && key_account.rfind("key_", 0) == 0 && valid_account(account)) {
+					return { std::move(key_account), std::move(account) };
+				}
 			}
 		}
 		catch (...) {
@@ -2068,6 +2086,12 @@ work_result work(
 
 		settings_gui.identity_error = identity->last_error;
 
+		/*
+			Confirmed: what servers see now (a broker cert, or Steam). Otherwise remembered or the key's own until the broker answers.
+		*/
+
+		settings_gui.current_account_confirmed = identity->has_broker_cert(now) || is_steam_client;
+
 		settings_gui.current_account_id = [&]() -> std::string {
 			const auto key_account = [&]() -> std::string {
 				if (account_seed.has_value()) {
@@ -2087,8 +2111,10 @@ work_result work(
 					not as the key until the broker answers.
 				*/
 
-				if (!key_account.empty() && account != key_account_linked_as.second) {
-					key_account_linked_as = { key_account, account };
+				const auto confirmed = std::make_pair(key_account, account);
+
+				if (!key_account.empty() && confirmed != key_account_linked_as) {
+					key_account_linked_as = confirmed;
 
 					try {
 						augs::save_as_text(USER_DIR / "account_linked_as.txt", key_account + " " + account);

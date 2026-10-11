@@ -605,7 +605,12 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	text("Link to your Steam account");
 
 	if (current_account_id.rfind(::get_provider_preffix(auth_provider_type::STEAM_NATIVE), 0) == 0) {
-		text_color("This key is linked to " + current_account_id + ".", green);
+		if (current_account_confirmed) {
+			text_color("This key is linked to " + current_account_id + ".", green);
+		}
+		else {
+			text_disabled("This key was linked to " + current_account_id + " when hypersomnia.io last answered.");
+		}
 	}
 
 #if PLATFORM_WEB
@@ -3056,6 +3061,12 @@ void settings_gui_state::perform(
 						}
 						else {
 							text("Account: " + current_account_id);
+
+							if (!current_account_confirmed) {
+								ImGui::SameLine();
+								text_disabled("(not confirmed)");
+							}
+
 							ImGui::SameLine();
 
 							if (ImGui::Button("Copy my account id")) {
