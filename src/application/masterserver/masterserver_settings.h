@@ -1,6 +1,11 @@
 #pragma once
 #include "augs/network/port_type.h"
 
+/*
+	connect_tokens_over_plain_http: serve /connect_token over plain HTTP to anyone, not only to 127.0.0.1 (nginx in front).
+	Only for test masterservers - a connect token carries the session keys in the clear.
+*/
+
 struct masterserver_settings {
 	// GEN INTROSPECTOR struct masterserver_settings
 	std::string ip = "127.0.0.1";
@@ -28,6 +33,7 @@ struct masterserver_settings {
 	bool report_rtc_errors_to_webhook = false;
 
 	augs::path_type official_servers_dir;
+	bool connect_tokens_over_plain_http = false;
 	// END GEN INTROSPECTOR
 
 	port_type get_last_udp_command_port() const {

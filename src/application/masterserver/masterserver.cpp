@@ -686,7 +686,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		}
 	};
 
-	auto define_http_server = [&](auto& server) {
+	auto define_http_server = [&](auto& server, const bool encrypted) {
 		server.Get("/server_list_binary", [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
 
@@ -724,15 +724,78 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			Served over HTTPS (nginx in front), so the session keys inside reach only the client asking.
 		*/
 
-		server.Get("/connect_token", [&](const Request& req, Response& res) {
+		server.Get("/connect_token", [&, encrypted](const Request& req, Response& res) {
 			set_cors(res);
 
-			const auto requester = [&]() {
-				if (req.remote_addr == "127.0.0.1" && req.has_header("X-Real-IP")) {
-					return req.get_header_value("X-Real-IP");
+			const bool from_this_machine = 
+				req.remote_addr == "127.0.0.1" 
+				|| req.remote_addr == "::1" 
+				|| req.remote_addr == "::ffff:127.0.0.1"
+			;
+
+			/*
+				The token carries the session keys in the clear, so over plain HTTP it goes only to this machine -
+				nginx, which serves it over HTTPS - never straight to anyone who asks on the public port.
+			*/
+
+			if (!encrypted && !from_this_machine && !settings.connect_tokens_over_plain_http) {
+				res.status = 403;
+				return;
+			}
+
+			const auto requester = [&]() -> std::string {
+				const auto address = from_this_machine && req.has_header("X-Real-IP") ? req.get_header_value("X-Real-IP") : req.remote_addr;
+
+				/*
+					An IPv6 client usually has a whole /64 to rotate through, so it is limited as one.
+				*/
+
+				if (address.find(':') == std::string::npos || begins_with(address, "::ffff:")) {
+					return address;
 				}
 
-				return req.remote_addr;
+				const auto double_colon = address.find("::");
+				const auto head = address.substr(0, double_colon);
+				const auto tail = double_colon == std::string::npos ? std::string() : address.substr(double_colon + 2);
+
+				auto split = [](const std::string& s) {
+					auto out = std::vector<std::string>();
+					std::size_t start = 0;
+
+					while (!s.empty() && start <= s.size()) {
+						const auto end = s.find(':', start);
+						out.push_back(s.substr(start, end == std::string::npos ? std::string::npos : end - start));
+
+						if (end == std::string::npos) {
+							break;
+						}
+
+						start = end + 1;
+					}
+
+					return out;
+				};
+
+				const auto head_groups = split(head);
+				const auto tail_groups = split(tail);
+
+				auto groups = head_groups;
+
+				const auto missing = 8 - static_cast<int>(head_groups.size() + tail_groups.size());
+
+				for (int i = 0; i < missing; ++i) {
+					groups.push_back("0");
+				}
+
+				groups.insert(groups.end(), tail_groups.begin(), tail_groups.end());
+
+				std::string prefix;
+
+				for (std::size_t i = 0; i < 4 && i < groups.size(); ++i) {
+					prefix += groups[i] + ":";
+				}
+
+				return prefix + ":/64";
 			}();
 
 			{
@@ -743,7 +806,13 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 					token_requests_this_minute.clear();
 				}
 
-				if (++token_requests_this_minute[requester] > 30) {
+				/*
+					Also a limit for everyone together, so that the map stays small whatever the number of addresses.
+				*/
+
+				const bool too_many_overall = token_requests_this_minute.size() >= 10000;
+
+				if (too_many_overall || ++token_requests_this_minute[requester] > 30) {
 					res.status = 429;
 					return;
 				}
@@ -832,10 +901,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		});
 	};
 
-	define_http_server(*http_ptr);
+	define_http_server(*http_ptr, fallback_http_ptr != nullptr);
 
 	if (fallback_http_ptr) {
-		define_http_server(*fallback_http_ptr);
+		define_http_server(*fallback_http_ptr, false);
 	}
 
 	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
