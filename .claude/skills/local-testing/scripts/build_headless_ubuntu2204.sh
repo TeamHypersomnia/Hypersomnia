@@ -6,7 +6,8 @@ set -e
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
-R=$S/rootfs22
+# Outside /tmp by default: a reboot clears /tmp, and the rootfs takes minutes to rebuild
+R=${ROOTFS22:-$HOME/.cache/hypersomnia-rootfs22}
 
 run() {
 	bwrap --unshare-user --uid 0 --gid 0 --bind $R / --dev /dev --proc /proc --tmpfs /tmp --bind $REPO /src \

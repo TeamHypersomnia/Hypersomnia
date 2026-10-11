@@ -162,6 +162,12 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   and a ranked server logs the ERROR and holds its match until the ack says official - expected, not a failure.
 - In `run_match.sh` tournament mode the server name is built from the rosters, so with `key_...` ids it is a long `[key_...` string.
 - On the site, a `key_` account gets its MMR row only with a match it did not abandon - the abandoning loser shows no row.
+- **A reboot clears /tmp** - the session scratchpad, test keys, the broker copy and a rootfs under /tmp are gone. Commit before long
+  runs; the Ubuntu 22.04 rootfs now defaults to `~/.cache/hypersomnia-rootfs22` (`ROOTFS22=`), the rest is recreated in seconds.
+- **Soak RSS:** a server's RSS jumps ~25 MB with the first ~2000 connections and then stays flat (+0.1 MB per 2000) - per-client
+  buffers touched once, not a leak. To tell, measure after several batches against one server, not just before/after one run,
+  and never with a build running at the same time.
+- After the WebRTC soak, `grep -c "did not open its DataChannel in time"` in the server log shows the 15 s freeing of unopened peers working.
 - The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
   `build/Debug-x64-clang-claude-headless`.
 
