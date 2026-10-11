@@ -272,8 +272,17 @@ server_adapter::server_adapter(
 		slots -= 1;
 	}
 
-	LOG("Starting yojimbo::Server.");
-	server.Start(std::max(1, slots));
+	/*
+		A few connections more than the game slots: the game decides who gets a slot (server_setup::admit_or_refuse) -
+		e.g. a player back after a crash replaces the connection that has not timed out yet, even on a full server,
+		and a full server answers why instead of netcode saying nothing.
+	*/
+
+	const auto spare_connections = 4;
+	const auto netcode_slots = std::min(std::max(1, slots) + spare_connections, static_cast<int>(yojimbo::MaxClients));
+
+	LOG("Starting yojimbo::Server with %x connections for %x slots.", netcode_slots, std::max(1, slots));
+	server.Start(netcode_slots);
 	LOG("Server address is %x", ToString(server.GetAddress()));
 
 	if (auto detail = server.GetServerDetail()) {

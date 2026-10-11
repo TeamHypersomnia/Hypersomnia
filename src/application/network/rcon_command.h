@@ -15,9 +15,34 @@ enum class server_maintenance_command : unsigned char {
 	COUNT
 };
 
+enum class rcon_player_action {
+	// GEN INTROSPECTOR enum class rcon_player_action
+	KICK,
+	BAN,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+/*
+	Kicks or bans one player. A ban holds the account and the address - see server_bans.h.
+	ban_minutes == 0 bans for good.
+*/
+
+struct rcon_player_command {
+	// GEN INTROSPECTOR struct rcon_player_command
+	mode_player_id target;
+	rcon_player_action action = rcon_player_action::KICK;
+	uint32_t ban_minutes = 0;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const rcon_player_command&) const = default;
+};
+
 using rcon_command_variant = std::variant<
 	std::monostate,
 	match_command,
 	server_maintenance_command,
-	custom_game_commands_string_type
+	custom_game_commands_string_type,
+	rcon_player_command
 >;

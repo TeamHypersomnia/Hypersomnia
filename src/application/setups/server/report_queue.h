@@ -132,6 +132,13 @@ public:
 	}
 
 	void advance(const double now) {
+#if PLATFORM_WEB
+		/*
+			A server in the browser is never official - it has nothing to report.
+		*/
+
+		(void)now;
+#else
 		if (in_flight.valid()) {
 			if (!::is_ready(in_flight)) {
 				return;
@@ -228,6 +235,7 @@ public:
 				return out;
 			}
 		);
+#endif
 	}
 
 	void wait_for_in_flight() {

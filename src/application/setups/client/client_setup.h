@@ -127,6 +127,8 @@ class client_setup :
 
 	client_identity_context identity;
 	bool sent_password = false;
+	bool key_mismatch_failure = false;
+	bool connect_anyway_requested = false;
 
 	/*
 		Whether ranked is required by the server - from server_auth_state.
@@ -1001,6 +1003,14 @@ public:
 		Kicked for a wrong password without having sent any - e.g. joined by address, so its saved password
 		could not be picked before the server's key was known. The game then retries with the one saved for that key.
 	*/
+
+	/*
+		"Connect anyway" after a key that did not match the server list: the next attempt takes any key, with no saved password.
+	*/
+
+	bool wants_connect_anyway() const {
+		return connect_anyway_requested;
+	}
 
 	bool kicked_for_password_not_sent() const {
 		return wrong_password_kick && !sent_password;

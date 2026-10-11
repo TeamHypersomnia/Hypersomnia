@@ -1714,7 +1714,8 @@ void client_setup::do_rcon_gui(const bool force) {
 					rcon_gui,
 					is_remote_server,
 					during_ranked,
-					on_new_payload
+					on_new_payload,
+					::make_rcon_gui_players(get_arena_handle(client_arena_type::REFERENTIAL))
 				);
 			}
 		}
@@ -1953,6 +1954,34 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 			else if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
 				text("Failed to establish connection with %x", get_displayed_connecting_server_name());
+
+				/*
+					What the handshake learned - each only a hint, but better than a bare timeout.
+				*/
+
+				if (last_disconnect_reason.empty() && adapter->has_connection_failed()) {
+					switch (adapter->get_disconnect_reason()) {
+						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_SERVER_KEY_MISMATCH:
+							key_mismatch_failure = true;
+							set_disconnect_reason(
+								"The server's key does not match the server list.\n"
+								"The server may have been reinstalled - or someone may be intercepting the connection.\n"
+								"Connecting anyway sends no saved password, and your account can not be taken over."
+							);
+							break;
+
+						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_VERSION_MISMATCH:
+							set_disconnect_reason("The server runs another version of the game.\nUpdate the game, or wait for the server to be updated.");
+							break;
+
+						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_CONNECTION_DENIED:
+							set_disconnect_reason("The server is full.");
+							break;
+
+						default:
+							break;
+					}
+				}
 			}
 			else {
 				text("Failed to join %x", get_displayed_connecting_server_name());
@@ -2009,6 +2038,15 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 			else {
 				ImGui::Separator();
+
+				if (key_mismatch_failure) {
+					if (ImGui::Button("Connect anyway")) {
+						connect_anyway_requested = true;
+						return custom_imgui_result::RETRY;
+					}
+
+					ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Retry")) {
 					return custom_imgui_result::RETRY;

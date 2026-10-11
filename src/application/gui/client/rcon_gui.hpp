@@ -18,12 +18,41 @@ void do_pending_rcon_payloads(
 	}
 }
 
+struct rcon_gui_player {
+	mode_player_id id;
+	std::string nickname;
+};
+
+/*
+	The players of the arena the rcon GUI can kick or ban.
+*/
+
+template <class A>
+std::vector<rcon_gui_player> make_rcon_gui_players(const A& arena) {
+	auto out = std::vector<rcon_gui_player>();
+
+	arena.on_mode(
+		[&](const auto& mode) {
+			mode.for_each_player_id([&](const auto id) {
+				if (const auto p = mode.find(id)) {
+					out.push_back({ id, p->get_nickname() });
+				}
+
+				return callback_result::CONTINUE;
+			});
+		}
+	);
+
+	return out;
+}
+
 template <class F>
 void perform_rcon_gui(
 	rcon_gui_state& state, 
 	const bool is_remote_server,
 	const bool during_ranked,
-	F&& on_new_payload
+	F&& on_new_payload,
+	const std::vector<rcon_gui_player>& players = {}
 ) {
 	const server_runtime_info* runtime_info = nullptr;
 
@@ -153,6 +182,49 @@ void perform_rcon_gui(
 						state.request_execute_custom_game_commands = false;
 					}
 				}
+
+				break;
+
+			case rcon_pane::PLAYERS:
+				if (players.empty()) {
+					text_disabled("No players.");
+				}
+
+				for (const auto& p : players) {
+					auto id_scope = scoped_id(static_cast<int>(p.id.value));
+
+					text(p.nickname);
+					ImGui::SameLine();
+
+					auto player_command = [&](const rcon_player_action action, const uint32_t minutes) {
+						on_new_payload(rcon_player_command { p.id, action, minutes });
+					};
+
+					if (ImGui::Button("Kick")) {
+						player_command(rcon_player_action::KICK, 0);
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Ban 1 hour")) {
+						player_command(rcon_player_action::BAN, 60);
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Ban 1 day")) {
+						player_command(rcon_player_action::BAN, 60 * 24);
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Ban for good")) {
+						player_command(rcon_player_action::BAN, 0);
+					}
+				}
+
+				ImGui::Separator();
+				text_disabled("A ban holds the player's account and address. The bans are in server_bans.json in the server's user folder.");
 
 				break;
 

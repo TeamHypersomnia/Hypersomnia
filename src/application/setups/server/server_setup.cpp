@@ -168,6 +168,14 @@ class webrtc_server_detail {
 
 public:
 	std::string remote_ip(const client_id id) {
+#if PLATFORM_WEB
+		/*
+			The browser's WebRTC does not tell the peer's address.
+		*/
+
+		(void)id;
+		return "";
+#else
 		std::scoped_lock lock(connections_lk);
 
 		if (const auto it = pcs.find(id); it != pcs.end() && it->second != nullptr) {
@@ -183,6 +191,7 @@ public:
 		}
 
 		return "";
+#endif
 	}
 
 private:
@@ -1317,7 +1326,111 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && !c.authenticated_by_broker) {
 		kick(id, "Ranked matches need an account.\nSign in with Steam, or make sure the game can reach hypersomnia.io, and try again.");
 		c.kick_no_linger = true;
+		return;
 	}
+
+	admit_or_refuse(id);
+}
+
+uint32_t server_setup::get_game_capacity() const {
+	const auto slots = static_cast<int>(get_num_slots()) - (is_integrated() ? 1 : 0);
+	return static_cast<uint32_t>(std::max(1, slots));
+}
+
+/*
+	Whether a new connection gets a game slot.
+
+	No fixed limit per address (schools, LAN parties, carrier NAT). But when the server is full and someone from
+	another address wants in, an address holding more than half of the slots gives one up: its newest player
+	(a spectator first, never an admin) is told why. A troll's clients can not keep a server for themselves,
+	a school still fills an empty one. Not on tournament servers, where everyone sits at one address.
+
+	On a ranked server at most max_ranked_players_per_ip from one address: two at home, never a team of one's own accounts.
+*/
+
+void server_setup::admit_or_refuse(const client_id_type id) {
+	auto& c = clients[id];
+	const auto ip = get_client_ip_for_bans(id);
+
+	auto is_counted = [&](const auto other_id, const auto& other) {
+		return other_id != id && other.is_set() && !other.when_kicked.has_value();
+	};
+
+	auto admitted = std::vector<client_id_type>();
+
+	for_each_id_and_client([&](const auto other_id, const auto& other) {
+		if (is_counted(other_id, other)) {
+			admitted.push_back(other_id);
+		}
+	}, only_connected_v);
+
+	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && !ip.empty()) {
+		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
+			return get_client_ip_for_bans(other_id) == ip;
+		});
+
+		if (static_cast<uint32_t>(from_this_ip) >= vars.max_ranked_players_per_ip) {
+			kick(id, typesafe_sprintf("At most %x players from one network can join a ranked server.", vars.max_ranked_players_per_ip));
+			c.kick_no_linger = true;
+			return;
+		}
+	}
+
+	const auto capacity = get_game_capacity();
+
+	if (admitted.size() < capacity) {
+		return;
+	}
+
+	if (!vars.authenticate_with_nicknames && !vars.requires_authentication() && !ip.empty()) {
+		auto count_by_ip = std::unordered_map<std::string, std::vector<client_id_type>>();
+
+		for (const auto other_id : admitted) {
+			count_by_ip[get_client_ip_for_bans(other_id)].push_back(other_id);
+		}
+
+		const auto biggest = std::max_element(count_by_ip.begin(), count_by_ip.end(), [](const auto& a, const auto& b) {
+			return a.second.size() < b.second.size();
+		});
+
+		const bool holds_more_than_half = biggest != count_by_ip.end() && biggest->second.size() * 2 > capacity;
+
+		if (holds_more_than_half && biggest->first != ip) {
+			/*
+				The newest from that address, a spectator before a player, never an admin.
+			*/
+
+			auto candidates = biggest->second;
+
+			erase_if(candidates, [&](const auto other_id) {
+				return get_rcon_level(other_id) >= rcon_level_type::BASIC;
+			});
+
+			std::stable_sort(candidates.begin(), candidates.end(), [&](const auto a, const auto b) {
+				const bool a_spectates = !::is_actual_faction(get_assigned_faction(to_mode_player_id(a)));
+				const bool b_spectates = !::is_actual_faction(get_assigned_faction(to_mode_player_id(b)));
+
+				if (a_spectates != b_spectates) {
+					return a_spectates;
+				}
+
+				return clients[a].when_connected > clients[b].when_connected;
+			});
+
+			if (!candidates.empty()) {
+				const auto freed = candidates.front();
+
+				LOG("Server full: freeing the slot of %x for a player from another network.", clients[freed].get_nickname());
+
+				kick(freed, "A slot was freed for a player from another network:\ntoo many players from your network on this server.");
+				clients[freed].kick_no_linger = true;
+				return;
+			}
+		}
+	}
+
+	kick(id, "The server is full.");
+	c.kick_no_linger = true;
 }
 
 void server_setup::apply_authentication(
@@ -4257,7 +4370,37 @@ message_handler_result server_setup::handle_rcon_payload(
 		broadcast_info(typesafe_sprintf("%x %x.", nickname, action), chat_target_type::INFO);
 	};
 
-	if constexpr(std::is_same_v<P, match_command>) {
+	if constexpr(std::is_same_v<P, rcon_player_command>) {
+		const auto target_id = to_client_id(typed_payload.target);
+
+		if (target_id >= clients.size() || !clients[target_id].is_set() || (is_integrated() && target_id == get_integrated_client_id())) {
+			return continue_v;
+		}
+
+		/*
+			Admins are not kicked or banned from rcon - remove their admin profile first.
+		*/
+
+		if (get_rcon_level(target_id) >= rcon_level_type::BASIC) {
+			LOG("Refused to kick/ban an admin.");
+			return continue_v;
+		}
+
+		const auto by = get_client_state(to_mode_player_id(rcon_client_id)).get_nickname();
+		const auto who = clients[target_id].get_nickname();
+
+		if (typed_payload.action == rcon_player_action::BAN) {
+			ban(target_id, typesafe_sprintf("Banned by %x.", by), std::min(typed_payload.ban_minutes, 60u * 24 * 365 * 10));
+			notification(typesafe_sprintf("banned %x", who));
+		}
+		else {
+			kick(target_id, typesafe_sprintf("Kicked by %x.", by));
+			notification(typesafe_sprintf("kicked %x", who));
+		}
+
+		return continue_v;
+	}
+	else if constexpr(std::is_same_v<P, match_command>) {
 		local_collected.mode_general.special_command = typed_payload;
 
 		switch (typed_payload) {
@@ -5568,7 +5711,8 @@ void server_setup::do_integrated_rcon_gui(const bool force) {
 			rcon_gui,
 			has_maintenance,
 			during_ranked,
-			on_new_payload
+			on_new_payload,
+			::make_rcon_gui_players(get_arena_handle())
 		);
 	}
 

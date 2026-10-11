@@ -12,6 +12,7 @@
 #include "application/setups/server/request_arena_file_download.h"
 #include "application/setups/server/server_auth_state.h"
 #include "application/network/download_progress_message.h"
+#include "application/network/rcon_command.h"
 
 namespace sanitization {
 	bool arena_name_safe(const std::string& untrusted_map_name);
@@ -71,6 +72,14 @@ namespace net_messages {
 	bool serialize(Stream& s, ::mode_player_id& i) {
 		static_assert(std::is_same_v<mode_player_id::id_value_type, uint8_t>);
 		serialize_int(s, i.value, 0, std::numeric_limits<uint8_t>::max());
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::rcon_player_command& c) {
+		serialize(s, c.target);
+		serialize_enum(s, c.action);
+		serialize_uint32(s, c.ban_minutes);
 		return true;
 	}
 

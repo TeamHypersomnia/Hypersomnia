@@ -318,6 +318,8 @@ class server_setup :
 	void push_auth_job(mode_player_id player_id, F&& f);
 
 	void verify_client_identity(client_id_type);
+	void admit_or_refuse(client_id_type);
+	uint32_t get_game_capacity() const;
 	void apply_authentication(mode_player_id, const std::string& new_id, bool signed_by_broker, bool from_nickname);
 
 	/*
