@@ -68,4 +68,12 @@ namespace identity_key {
 	*/
 
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed);
+
+	/*
+		Forgets the key, so that a new one - a new account - can be created.
+		The file is only renamed to identity.key.bak-<timestamp>, never deleted: a lost key can never be recovered.
+		Returns the backup's path, or std::nullopt on failure.
+	*/
+
+	std::optional<augs::path_type> forget(const augs::path_type& path);
 }

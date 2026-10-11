@@ -216,6 +216,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string import_key_text;
 	std::string link_code_text;
 	std::string account_status;
+	bool confirm_forget_key = false;
 	augs::future<std::string> link_request;
 
 	void perform_account_pane(augs::window& window, const std::string& website_url);

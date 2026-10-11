@@ -190,18 +190,37 @@ namespace identity_key {
 		return seed;
 	}
 
+	static std::optional<augs::path_type> back_up(const augs::path_type& path) {
+		auto backup = path;
+		backup += ".bak-" + augs::date_time().get_readable_for_file();
+
+		std::error_code ec;
+		std::filesystem::rename(path, backup, ec);
+
+		if (ec) {
+			LOG("Could not back up %x: %x", path, ec.message());
+			return std::nullopt;
+		}
+
+		return backup;
+	}
+
+	std::optional<augs::path_type> forget(const augs::path_type& path) {
+		if (!augs::exists(path)) {
+			return std::nullopt;
+		}
+
+		return back_up(path);
+	}
+
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
 		auto backup = augs::path_type();
 
 		if (augs::exists(path)) {
-			backup = path;
-			backup += ".bak-" + augs::date_time().get_readable_for_file();
-
-			std::error_code ec;
-			std::filesystem::rename(path, backup, ec);
-
-			if (ec) {
-				LOG("Could not back up %x: %x", path, ec.message());
+			if (const auto new_backup = back_up(path)) {
+				backup = *new_backup;
+			}
+			else {
 				return std::nullopt;
 			}
 		}

@@ -444,6 +444,61 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		tooltip_on_hover("Paste a key copied with \"Copy key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
 	}
 
+	if (augs::exists(key_path)) {
+		auto button_colors = [](const rgba col) {
+			const auto increment = rgba(25, 20, 0, 0);
+
+			return std::make_tuple(
+				scoped_style_color(ImGuiCol_Button, col),
+				scoped_style_color(ImGuiCol_ButtonHovered, col + increment),
+				scoped_style_color(ImGuiCol_ButtonActive, col + increment + increment)
+			);
+		};
+
+		if (!confirm_forget_key) {
+			const auto cols = button_colors(rgba(200, 80, 0, 255));
+
+			if (ImGui::Button("Forget this key...")) {
+				confirm_forget_key = true;
+			}
+
+			tooltip_on_hover("To start over with a new account.");
+		}
+		else {
+			text_color(
+				"Forget this key and start over with a new account?\n"
+				"Without the key you can never play as this account again:\n"
+				"its rating, matches and Steam link stay with the old key.\n"
+				"The file is kept in your user folder as a backup - delete it yourself to remove it for good.",
+				orange
+			);
+
+			{
+				const auto cols = button_colors(rgba(200, 40, 0, 255));
+
+				if (ImGui::Button("Forget key")) {
+					if (const auto backup = identity_key::forget(key_path)) {
+						account_status = typesafe_sprintf(
+							"Key forgotten. It was kept as %x.\nA new one is created when you join a ranked server, or with Create key now.",
+							backup->filename().string()
+						);
+					}
+					else {
+						account_status = "Could not forget the key. See the logs.";
+					}
+
+					confirm_forget_key = false;
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel")) {
+				confirm_forget_key = false;
+			}
+		}
+	}
+
 	ImGui::Separator();
 
 	text("Link to your Steam account");
