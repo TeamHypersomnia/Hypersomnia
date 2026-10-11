@@ -4,6 +4,8 @@
 # Usage: run_match.sh <client A> <client B> [live wait secs]
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 export ALSOFT_DRIVERS=null
+# A failing game opens its failure log with $VISUAL - never in the user's editor
+export VISUAL=true
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 E=${SCRATCH:-/tmp/hypersomnia-nettest}/e2e
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}

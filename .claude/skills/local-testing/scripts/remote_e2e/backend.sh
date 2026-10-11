@@ -29,8 +29,11 @@ EOF
 	setsid nohup timeout 7200 $B/Hypersomnia --masterserver --appdata-dir $B/ms --no-update-on-launch > $B/ms.out 2>&1 < /dev/null &
 	echo $! > $B/ms.pid
 
+	# A new session secret every start, readable only here - fake_steam_session.sh signs cookies with it
+	(umask 077; openssl rand -hex 32 > $B/session_secret)
+
 	cd $B/page
-	PORT=13000 NODE_ENV=development SESSION_SECRET=hs-e2e-session-secret OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
+	PORT=13000 NODE_ENV=development SESSION_SECRET=$(cat $B/session_secret) OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
 		setsid nohup timeout 7200 $B/node/bin/node app.js > $B/site.out 2>&1 < /dev/null &
 	echo $! > $B/site.pid
 

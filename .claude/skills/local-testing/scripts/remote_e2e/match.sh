@@ -7,12 +7,16 @@
 # Usage: match.sh start <account A> <account B> | stop | log
 E=$HOME/yojimbo-test/e2e
 export LD_LIBRARY_PATH=$E/lib
+# The server config holds its official_server_secret (and a real Steam Web API key, if given) - owner only
+umask 077
 
 stop() {
 	if [ -f $E/server.pid ]; then
 		kill $(cat $E/server.pid) 2>/dev/null
 		rm -f $E/server.pid
 	fi
+
+	rm -f $E/server/user/conf.d/test.json
 }
 
 case "$1" in

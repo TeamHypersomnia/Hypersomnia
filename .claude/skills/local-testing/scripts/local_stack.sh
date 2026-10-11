@@ -2,6 +2,8 @@
 # A local stack for manual testing, left running: test masterserver, an official ranked server [PL] and an official
 # casual server [DE] (both with WebRTC), and the web build pointed at this master on http://localhost:8765.
 # Usage: local_stack.sh [web build dir] [hours]     Stop: local_stack.sh stop
+# A failing game opens its failure log with $VISUAL - never in the user's editor
+export VISUAL=true
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 T=$S/local_stack

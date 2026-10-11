@@ -3,6 +3,8 @@
 # Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, Xvfb :78.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 export ALSOFT_DRIVERS=null
+# A failing game opens its failure log with $VISUAL - never in the user's editor
+export VISUAL=true
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S

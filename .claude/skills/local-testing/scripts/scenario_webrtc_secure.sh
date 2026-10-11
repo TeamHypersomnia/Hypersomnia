@@ -3,6 +3,8 @@
 # the same path a browser takes. Everything on localhost.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 export ALSOFT_DRIVERS=null
+# A failing game opens its failure log with $VISUAL - never in the user's editor
+export VISUAL=true
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S

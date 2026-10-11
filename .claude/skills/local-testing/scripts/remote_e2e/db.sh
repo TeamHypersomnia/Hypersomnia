@@ -1,11 +1,14 @@
 #!/bin/bash
 # Shows (or changes) the test site's database on arenaus. Usage: db.sh show | db.sh sql "<statement>"
 if [ "$1" == "sql" ]; then
+	# Passed as hex, so the remote shell never interprets the statement
+	SQL_HEX=$(printf '%s' "$2" | xxd -p | tr -d '\n')
+
 	timeout 60 ssh arenaus "python3 -c \"
 import sqlite3,sys
 c=sqlite3.connect('/home/ubuntu/hs-test-backend/page/private/mmr.db')
-with c: n=c.execute(sys.argv[1]).rowcount
-print('rows affected:', n)\" \"$2\""
+with c: n=c.execute(bytes.fromhex(sys.argv[1]).decode()).rowcount
+print('rows affected:', n)\" $SQL_HEX"
 	exit
 fi
 

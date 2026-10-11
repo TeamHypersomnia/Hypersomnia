@@ -27,6 +27,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 6. **Silence.** Test clients play sound on the user's speakers. Run native clients with `ALSOFT_DRIVERS=null`
    (OpenAL's null backend, "No Output"; the scenario scripts export it) and give Firefox profiles
    `user_pref("media.volume_scale", "0.0");`.
+   Also `VISUAL=true`: a game that exits with a failure opens its failure log with `$VISUAL` - a tab in the user's editor.
 7. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).
