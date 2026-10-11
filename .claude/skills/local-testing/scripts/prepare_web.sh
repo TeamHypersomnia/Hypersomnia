@@ -1,10 +1,9 @@
 #!/bin/bash
-# Copies a web build and points its packaged default_config.json at a local masterserver:
-# the three URLs are replaced in place in Hypersomnia.data with text of the same length (padded with spaces),
+# Copies a web build and points its packaged default_config.json at a local masterserver and a local broker (broker.sh, port 13500):
+# the URLs are replaced in place in Hypersomnia.data with text of the same length (padded with spaces),
 # so the package offsets stay valid without repackaging.
 # USER_FILES=<dir> also writes every file under <dir> into the game's /user right after IDBFS loads, e.g.
-# conf.d/test.json pointing at a remote test master, or cached_auth.json - a Discord sign-in the user copied
-# from the real web build, so the game starts signed in.
+# conf.d/test.json pointing at a remote test master, or account.key - so the game starts with a known account.
 # Usage: [USER_FILES=dir] prepare_web.sh <web build dir> <output dir>
 set -e
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
@@ -62,7 +61,8 @@ d = bytearray(open(p, 'rb').read())
 replacements = [
 	(b'"server_list_provider": "http://masterserver.hypersomnia.io:8410",', b'"server_list_provider": "http://127.0.0.1:18420",'),
 	(b'"webrtc_signalling_server_url": "wss://masterserver.hypersomnia.io:8000",', b'"webrtc_signalling_server_url": "ws://127.0.0.1:18000",'),
-	(b'"connect_token_provider": "https://hypersomnia.io/connect_token",', b'"connect_token_provider": "http://127.0.0.1:18420/connect_token",'),
+	(b'"identity_broker_url": "https://hypersomnia.io",', b'"identity_broker_url": "http://127.0.0.1:13500",'),
+	(b'"website_url": "https://hypersomnia.io",', b'"website_url": "http://127.0.0.1:13500",'),
 ]
 for old, new in replacements:
 	assert d.count(old) == 1, old
@@ -71,5 +71,5 @@ for old, new in replacements:
 	i = d.find(old)
 	d[i:i + len(old)] = new
 open(p, 'wb').write(bytes(d))
-print("pointed the web build at the local masterserver")
+print("pointed the web build at the local masterserver and broker")
 EOF

@@ -26,7 +26,7 @@ mk srv <<J
 J
 mk client <<J
 { "server_list_provider": "http://127.0.0.1:18420", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
-  "connect_token_provider": "http://127.0.0.1:18420/connect_token", "client": { "nickname": "rtc_soak" } }
+  "identity_broker_url": "http://127.0.0.1:1", "client": { "nickname": "rtc_soak" } }
 J
 
 cd $REPO/hypersomnia

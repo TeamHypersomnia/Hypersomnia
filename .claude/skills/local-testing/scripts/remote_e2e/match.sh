@@ -1,13 +1,10 @@
 #!/bin/bash
-# One ranked match on arena, all inside ~/yojimbo-test/e2e: a dedicated server with its own official_server_secret,
-# heartbeating to the test masterserver on arenaus and reporting to the test site there.
+# One ranked match on arena, all inside ~/yojimbo-test/e2e: a dedicated server with its own server key (official on the
+# test masterserver by that key, see run_match.sh), heartbeating to the test masterserver on arenaus and reporting to the test site there.
 # Tournament mode puts the two given accounts on the teams, so that idle CLI clients get to play.
-# A real Steam Web API key in ~/yojimbo-test/e2e/steam_web_api_key (0600) makes Steam tickets verifiable;
-# delete it after the test.
-# Usage: match.sh start <account A> <account B> | stop | log
+# Usage: match.sh start <account A> <account B> <test broker public key> | key | stop | log
 E=$HOME/yojimbo-test/e2e
 export LD_LIBRARY_PATH=$E/lib
-# The server config holds its official_server_secret (and a real Steam Web API key, if given) - owner only
 umask 077
 
 stop() {
@@ -28,6 +25,8 @@ start)
 	for id in "$2" "$3"; do
 		[[ "$id" =~ ^[A-Za-z0-9_]+$ ]] || { echo "invalid account id: $id"; exit 1; }
 	done
+
+	[[ "$4" =~ ^[0-9a-f]{64}$ ]] || { echo "invalid broker key: $4"; exit 1; }
 
 	stop
 	sleep 1
@@ -62,9 +61,8 @@ EOF
     "webrtc_port_range_end": 9010
   },
   "server_private": {
-    "official_server_secret": "$(cat $E/secret)",
-    "report_ranked_match_url": "http://${ARENAUS_IP:-154.12.226.211}:13000/report_match",
-    "steam_web_api_key": "$(cat $E/steam_web_api_key 2>/dev/null || echo e2e-dummy)"
+    "identity_broker_public_key": "$4",
+    "report_ranked_match_url": "http://${ARENAUS_IP:-154.12.226.211}:13000/report_match"
   }
 }
 EOF
@@ -75,11 +73,16 @@ EOF
 	sleep 6
 	grep -hE "Tournament|listening|heartbeat through UDP" $E/server.out | head -4
 	;;
+key)
+	mkdir -p $E/server/user
+	cd $E/hypersomnia
+	$E/Hypersomnia --print-server-key --appdata-dir $E/server 2>/dev/null | grep -E '^[0-9a-f]{64}$'
+	;;
 stop)
 	stop
 	echo stopped
 	;;
 log)
-	grep -hE "connected securely|Authenticated|wrong match|kicked|Reason|ABANDON|report|Report|webhook|RANKED|ranked" $E/server.out | sed 's/^\[[0-9:]*\] //' | head -40
+	grep -hE "connected\. SID|Authenticated|did not verify|wrong match|kicked|Reason|ABANDON|report|Report|webhook|RANKED|ranked" $E/server.out | sed 's/^\[[0-9:]*\] //' | head -40
 	;;
 esac

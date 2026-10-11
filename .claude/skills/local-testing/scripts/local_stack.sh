@@ -1,6 +1,7 @@
 #!/bin/bash
 # A local stack for manual testing, left running: test masterserver, an official ranked server [PL] and an official
-# casual server [DE] (both with WebRTC), and the web build pointed at this master on http://localhost:8765.
+# casual server [DE] (both with WebRTC, official by their keys), the broker (broker.sh, port 13500), and the web build
+# pointed at both on http://localhost:8765.
 # Usage: local_stack.sh [web build dir] [hours]     Stop: local_stack.sh stop
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
@@ -14,6 +15,7 @@ HOURS=${2:-2}
 stop() {
 	for p in $(pgrep -f "^(timeout [0-9]+ )?(nice -n 10 )?$BIN --.* --appdata-dir $T/"); do kill $p; done
 	for p in $(pgrep -f "webserve.py $T/web"); do kill $p; done
+	"$(dirname "$0")/broker.sh" stop
 }
 
 if [ "$1" == "stop" ]; then
@@ -25,15 +27,13 @@ fi
 stop
 sleep 1
 
-for port in 18000 18410 18420 18430 10002 10004 8765; do
+for port in 18000 18410 18420 18430 10002 10004 8765 13500; do
 	if ss -tulpn 2>/dev/null | grep -q ":$port\b"; then echo "port $port busy, abort"; exit 1; fi
 done
 
 rm -rf $T
 mkdir -p $T/official_servers.d
-openssl rand -hex 24 > $T/official_servers.d/pl
-openssl rand -hex 24 > $T/official_servers.d/de
-chmod 600 $T/official_servers.d/*
+eval "$(LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html OFFICIAL_SERVERS_DIR=$T/official_servers.d "$(dirname "$0")/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
@@ -51,7 +51,7 @@ mkconf $1 <<EOF
   "server": { "server_name": "$3", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$4" },
               "webrtc_port_range_begin": $5, "webrtc_port_range_end": $(($5 + 50)) },
-  "server_private": { "official_server_secret": "$(cat $T/official_servers.d/$6)" }
+  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "$BROKER_URL/report_match" }
 }
 EOF
 }
@@ -63,6 +63,10 @@ server_conf casual 10004 "[DE] Local casual" NEVER 19100 de
 
 SECS=$((HOURS * 3600))
 cd $REPO/hypersomnia
+for s in ranked:pl casual:de; do
+	$BIN --print-server-key --appdata-dir $T/${s%%:*} 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/${s##*:}
+done
+
 timeout $SECS $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
 sleep 3
 timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked --no-update-on-launch > $T/ranked.out 2>&1 &
@@ -77,11 +81,12 @@ for e in json.load(sys.stdin): print(' ', e['name'], 'webrtc_id=', e.get('webrtc
 cat <<EOF
 
 Running for $HOURS h. Logs: $T/{ms,ranked,casual}.out
-  Web, ranked:   http://localhost:8765/game/ranked-pl   (needs Discord sign-in - only if localhost is an allowed redirect)
-  Web, casual:   http://localhost:8765/game/de          (secure: joined by URL the server is not on the list yet, so the token is asked for anyway)
+  Web, ranked:   http://localhost:8765/game/ranked-pl
+  Web, casual:   http://localhost:8765/game/de
   Web, list:     http://localhost:8765/
+  Broker:        $BROKER_URL (key $BROKER_PUBLIC_KEY)
   Native:        add to a conf.d:  "server_list_provider": "http://127.0.0.1:18420",
-                 "connect_token_provider": "http://127.0.0.1:18420/connect_token",
+                 "identity_broker_url": "$BROKER_URL", "website_url": "$BROKER_URL",
                  "webrtc_signalling_server_url": "ws://127.0.0.1:18000"
                  then connect to 127.0.0.1:10002 (ranked) or 127.0.0.1:10004 (casual)
   Stop:          $0 stop

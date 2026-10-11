@@ -1,11 +1,11 @@
 #!/bin/bash
-# The web build in Firefox (under Xvfb) joining a local official server over WebRTC with a secure connect token.
-# Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, Xvfb :78.
+# The web build in Firefox (under Xvfb) joining a local official server over WebRTC, with a cert from the local broker.
+# Start the broker first (broker.sh start) and prepare the build with prepare_web.sh - it points the game at both.
+# Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, broker on 13500, Xvfb :78.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 export ALSOFT_DRIVERS=null
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
-# Test secrets in the configs - owner only
 umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -15,6 +15,8 @@ BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
 WEB=$S/webserve
 CONNECT=${1:-pl}
+BROKER_URL=${BROKER_URL:-http://127.0.0.1:13500}
+BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 WAIT=${2:-120}
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
@@ -29,9 +31,6 @@ done
 
 rm -rf $T
 mkdir -p $T/official_servers.d $T/ff
-SECRET_PL=$(openssl rand -hex 24)
-echo "$SECRET_PL" > $T/official_servers.d/pl
-chmod 600 $T/official_servers.d/*
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
@@ -52,7 +51,7 @@ mkconf server <<EOF
   "server": { "server_name": "$NAME", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$RANKED" },
               "webrtc_port_range_begin": 19000, "webrtc_port_range_end": 19050 },
-  "server_private": { "official_server_secret": "$SECRET_PL" }
+  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "$BROKER_URL/report_match" }
 }
 EOF
 
@@ -68,6 +67,9 @@ user_pref("media.volume_scale", "0.0");
 EOF
 
 cd $GAME
+# Official by its public key
+$BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
+
 timeout $((WAIT + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
 sleep 3
 timeout $((WAIT + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
@@ -86,11 +88,9 @@ sleep $((WAIT - 10))
 DISPLAY=:78 import -window root $T/screen.png
 
 echo "=== server"
-grep -hE "connected\. SID|connected securely|requested nickname|Adding|Authenticated|kicked|Reason" $T/server.out | sed 's/^\[[0-9:]*\] //' | head -10
-echo "=== master token requests (web)"
-grep -cE "connect_token" $T/web.out
+grep -hE "connected\. SID|requested nickname|Adding|Authenticated|did not verify|kicked|Reason|Ranked matches need" $T/server.out | sed 's/^\[[0-9:]*\] //' | head -10
 echo "=== browser console (game)"
-grep -E "secure connect token|Connecting securely|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
+grep -E "identity cert|Connecting as|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
 
 sleep 12
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done

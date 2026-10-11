@@ -1,6 +1,6 @@
 ---
 name: local-testing
-description: Test Hypersomnia end to end without the user, mainly networking - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), secure connect tokens and authentication, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, isolated builds (native, Steam, web, Ubuntu containers for the remote hosts) and test servers on arena and arenaus. Use whenever the user asks to test something "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", to check a UI change on screen, or to verify networking, ranked/auth, WebRTC or web build changes before a release.
+description: Test Hypersomnia end to end without the user, mainly networking - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), server keys, certs and the identity broker, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, isolated builds (native, Steam, web, Ubuntu containers for the remote hosts) and test servers on arena and arenaus. Use whenever the user asks to test something "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", to check a UI change on screen, or to verify networking, ranked/auth, WebRTC or web build changes before a release.
 ---
 
 # Local testing
@@ -37,11 +37,12 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 
 | Script | What it proves |
 |---|---|
-| `scenario_udp_secure.sh` | Master with `official_servers.d`, official casual (de) + ranked (pl) + community servers, 4 CLI clients: token endpoint 200/404, secure vs insecure, ranked does not answer insecure clients at all (no token from an unreachable master: the client times out), identity key auth (`key_...`), key file only where needed (0600), same account on reconnect, rate limit |
-| `scenario_webrtc_secure.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server: token by WebRTC alias, secure connection, key auth |
-| `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`), secure over WebRTC; screenshot in `$SCRATCH/web_test/screen.png` |
-| `build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web`, the same steps as `build.sh Release Web` |
-| `[USER_FILES=dir] prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master (see below); USER_FILES also writes files into its `/user` before start |
+| `broker.sh start\|stop\|sql` | A scratch copy of the site on 13500 as the identity broker and report endpoint, with its own broker key; prints `BROKER_URL` and `BROKER_PUBLIC_KEY` to export for the scenarios |
+| `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, certs from the broker, ranked takes only broker certs, `account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
+| `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server to the official ranked server by its alias, with a broker cert |
+| `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
+| `[VARIANT=crazygames] build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web[-crazygames]`, the same steps as `build.sh Release Web` |
+| `[USER_FILES=dir] prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master and the broker on 13500 (see below); USER_FILES also writes files into its `/user` before start |
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
 | `steam_tickets.py IDENTITY...` | Steam Web API tickets from the user's running Steam client, to probe `AuthenticateUserTicket` without the game |
 | `xinput.py click x y` / `type TEXT` / `key NAME` / `scroll x y n` | Clicks, types, presses keys and scrolls on `$DISPLAY` through XTest (no xdotool needed) |
@@ -49,8 +50,8 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `build_headless_ubuntu2204.sh` | Headless Release build inside an unprivileged Ubuntu 22.04 rootfs (bwrap) - glibc 2.35, runs on both arenaus and arena; prints where the libc++ to ship lies |
 | `build_headless_ubuntu_container.sh` | The same in Ubuntu 24.04 (glibc 2.39) - arena only |
 
-Pass/fail is read from the logs - the scripts grep the meaningful lines: `connected securely with a token issued for X`,
-`Authenticated "nick". ID: key_...`, `This server requires a secure connection`, `Received initial public vars`.
+Pass/fail is read from the logs - the scripts grep the meaningful lines: `Received an identity cert for X`,
+`Authenticated "nick". ID: steam_...|key_...`, `Ranked matches need`, `Received initial public vars`.
 
 ## The web build headless - how it works
 
@@ -61,8 +62,9 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `connec
 - **Firefox:** `firefox --no-remote --profile <fresh dir> --new-instance URL` under `Xvfb`, with `user.js` setting
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
-- Discord sign-in can not be done headless: its redirect is `<origin>/assets/discord_redirect.html` and must be allowed
-  in the Discord app. Web ranked therefore stops at sign-in; casual servers work fully.
+- The web account is a key in IDBFS (`/user/account.key`), made on the first start. Sign in with Steam (Settings - Client - Account)
+  opens `<website>/link_key/start?state=..`; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
+  which passes it to the game through BroadcastChannel/opener. For a local site set `LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html`.
 
 ## UI checks
 
@@ -76,8 +78,8 @@ The appdata remembers the last connect string - the first screen may be a reconn
 The worst bug class: after N connections a table fills up and the server silently refuses everyone.
 `build_soak.sh` builds a netcode-level client from the game's own netcode; then:
 
-- `soak_netcode.sh [scale]` - ~9000 connect/disconnect cycles, half abandoned mid-handshake, insecure and secure tokens,
-  against a community and an official dedicated server; 0 failures expected, then a real client must join.
+- `soak_netcode.sh [scale]` - ~9000 connect/disconnect cycles, half abandoned mid-handshake, by address and with the server's key,
+  each with a new session key; 0 failures expected, a wrong key must fail, then a real client must join.
   (Before the fixes of 2026-10-11 a server stopped taking anyone after ~1060 abandoned handshakes.)
 - `soak_webrtc.sh [cycles]` - native clients over WebRTC killed at random moments, more than the 64 WebRTC ids;
   then a full join must work. A native community server's WebRTC id is its address (`browser_connect_string`).
@@ -95,14 +97,14 @@ The worst bug class: after N connections a table fills up and the server silentl
 
 The whole production flow on real hosts without touching production:
 `arenaus:~/hs-test-backend` runs a test masterserver (UDP 18430, HTTP 18420) and a copy of the site (port 13000, clean DB,
-Node from the official tarball - the host has none) via `backend.sh start|stop|status`; both read its `official_servers.d`.
-`arena:~/yojimbo-test/e2e` runs a dedicated server with its own `official_server_secret` via `match.sh`,
-heartbeating to that master and reporting to that site. `run_match.sh A B` plays one match with two local CLI clients
-(pre-generated identity keys in `$SCRATCH/e2e/client_<name>/user/identity.key`, ids in `id_<name>`); `db.sh show|sql` reads or changes the site DB.
+its own `broker.key`, Node from the official tarball - the host has none) via `backend.sh start|stop|status|broker_key`; both read its `official_servers.d`.
+`arena:~/yojimbo-test/e2e` runs a dedicated server with its own server key via `match.sh`, heartbeating to that master
+and reporting to that site; `run_match.sh` puts its key in arenaus's `official_servers.d/pl` and passes the test broker's key.
+`run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/account.key`,
+or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
-  `match.sh` writes a two-team `tournament.json` with the clients' `key_...` ids. Give the server any `steam_web_api_key`
-  (e.g. "e2e-dummy"), otherwise tournament mode switches to nickname auth (`nick_...`).
+  `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one
   client after the match goes live: it abandons at once and the report goes out immediately (`losers_abandoned`).
   Also disable the AFK kicks (`move_to_spectators_if_afk_for_secs`, `kick_if_afk_for_secs` = 999999).
@@ -116,24 +118,16 @@ heartbeating to that master and reporting to that site. `run_match.sh A B` plays
   scroll down to read "Linked. ..." (a reused code shows "Invalid or expired code"). Check with `db.sh show`.
   For a quick link without UI: `db.sh sql "INSERT INTO associations ..."`.
 
-## Real identities: Steam and Discord (needs the user)
+## Real identities: Steam (needs the user's running Steam client)
 
-One match covers both: the web build signed in with the user's Discord against the Steam dev build signed in with
-their running Steam client, on the arena test server, reported to the arenaus test site.
-
-- **Discord token:** the user signs in on https://play.hypersomnia.io and runs in the devtools console
-  `FS.readFile('/user/cached_auth.json', {encoding: 'utf8'})`. Save it 0600 in the scratchpad only. Note that `prepare_web.sh` then builds it into the served `inject_user_files.js`:
-  any local process can fetch it while `webserve.py` runs - stop it right after the test and delete the copy.
-  `USER_FILES=<dir> prepare_web.sh` writes `<dir>/cached_auth.json` and `<dir>/conf.d/test.json` (the test master's
-  URLs - the connect token URL with an IP does not fit in place in `Hypersomnia.data`) into `/user` before the game starts.
-  Serve on a port other than 8765 if `local_stack.sh` still runs there. Join with `/game/ranked-` (the alias the
-  tournament-named test server gets). Signing out revokes the token; from localhost the revoke fails on CORS, which keeps it.
-- **Steam:** the user's Steam client must run. `build/Debug-x64-clang-claude-steam/Hypersomnia --connect <arena>:9005
-  --appdata-dir <scratch>` from `hypersomnia/` (it writes `steam_appid.txt` there, gitignored). The server needs the real
-  Steam Web API key: the user puts it in a file, copy it to `arena:~/yojimbo-test/e2e/steam_web_api_key` (0600, never print it),
-  `match.sh` reads it; `shred -u` it right after the test.
-- Tournament teams are the real ids: `match.sh start discord_<id> steam_<id64>`. Kill one client once both are
-  `Authenticated` - the abandon reports at once.
+- **Steam:** `build/Debug-x64-clang-claude-steam/Hypersomnia --connect <server> --appdata-dir <scratch>` from `hypersomnia/`
+  (it writes `steam_appid.txt` there, gitignored), with `"identity_broker_url"` pointing at a test broker. Only the broker needs
+  the real Steam Web API key (`STEAM_API_KEY_FILE=<file> broker.sh start` locally, or `~/hs-test-backend/steam_web_api_key` on arenaus,
+  0600, never printed; `shred -u` it right after the test). The game servers never ask Steam anything.
+- The web build in the e2e: `USER_FILES=<dir> prepare_web.sh` with `<dir>/conf.d/test.json` holding the test master's and broker's
+  URLs (an IP does not fit in place in `Hypersomnia.data`). Join with `/game/ranked-pl`.
+- CrazyGames: `VARIANT=crazygames build_web.sh`; the broker checks the JWT with `CRAZYGAMES_PUBLIC_KEY_PEM` (a test key pair) and
+  `CRAZYGAMES_GAME_ID`.
 - Steam verifies a Web API ticket only for an identity of at most 31 characters. `steam_tickets.py` gets tickets
   for any identities to probe the Web API directly.
 
@@ -141,7 +135,8 @@ their running Steam client, on the arena test server, reported to the arenaus te
 
 Test only in a scratch copy of the site repo (ask the user where it is; rsync without `.git`, `.env` and `private/*.db*`, `node_modules` symlinked).
 `src/db.js` always opens `../private/mmr.db` next to the code (it ignores `DB_PATH`) - put a test DB exactly there.
-Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/official_servers.d/{pl,au}` with the secrets `pl`, `au`.
+Run with `PORT=<free port> node app.js --test` (or `broker.sh`). Test mode seeds `private/official_servers.d/{pl,au}` with the public keys of
+the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its reports with them.
 `run_mmr_tests.py` reads `private/mmr.db` too; 25/46 of its assertions fail on the baseline as well (environment, not code).
 
 ## Findings worth knowing
@@ -151,8 +146,8 @@ Run with `PORT=<free port> node app.js --test`. Test mode seeds `private/officia
 - netcode 1.4.8 refuses to create a client or server with `override_send_and_receive` but without both overrides
   (`error: override_send_and_receive requires both ...`) - the web build connects nowhere.
 - The web build is single-threaded: synchronous `emscripten_fetch` returns nothing (status -1). Use `augs::async_get`.
-- Over WebRTC the netcode client takes packets only from the server address in the connect token; a secure token's
-  public address list must point at the data channel's internal address.
+- Over WebRTC every peer is 127.255.255.255 inside netcode, with its id as the port; the per-address handshake limit and bans
+  use the data channel's real address instead.
 - The Steamworks SDK is not in the repo: unpack a `steamworks_sdk_*.zip` (ask the user where it is) with
   `cmake/steam_integration/steamworks/put_sdk_here.sh <zip>` into the gitignored `steamworks/sdk`. A Steam build (`-DDEVELOP_STEAM_INTEGRATION=1
   -DUSE_SYSTEM_FREETYPE=0`) compiles without the Steam client; testing tickets needs it running and a `steam_web_api_key` on the server.

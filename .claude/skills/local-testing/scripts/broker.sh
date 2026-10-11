@@ -28,7 +28,7 @@ start)
 		console.log(ic.rawPublicKey(ic.privateKeyFromSeed(seed)).toString("hex"));')
 	(cd $B && PORT=$PORT NODE_ENV=development OFFICIAL_SERVERS_DIR=${OFFICIAL_SERVERS_DIR:-$B/private/official_servers.d} \
 		STEAM_APIKEY=$(cat ${STEAM_API_KEY_FILE:-/dev/null} 2>/dev/null) CRAZYGAMES_PUBLIC_KEY_PEM="${CRAZYGAMES_PUBLIC_KEY_PEM:-}" \
-		CRAZYGAMES_GAME_ID="${CRAZYGAMES_GAME_ID:-}" \
+		CRAZYGAMES_GAME_ID="${CRAZYGAMES_GAME_ID:-}" SESSION_SECRET="${SESSION_SECRET:-}" LINK_RETURN_URL="${LINK_RETURN_URL:-http://127.0.0.1:8765/assets/auth_redirect.html}" \
 		nohup node app.js --test > $B/site.out 2>&1 &)
 	for i in $(seq 1 50); do
 		curl -s -o /dev/null http://127.0.0.1:$PORT/ && break
