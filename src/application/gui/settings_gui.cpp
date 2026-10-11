@@ -4,6 +4,8 @@
 #include <cstring>
 #include <thread>
 #include <algorithm>
+#include <array>
+#include <random>
 
 #include "augs/log.h"
 #include "augs/log_path_getters.h"
@@ -25,6 +27,7 @@
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/window.h"
 #include "augs/misc/httplib_utils.h"
+#include "augs/misc/async_get.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/misc/date_time.h"
@@ -346,15 +349,20 @@ std::string get_custom_binding_name(const app_intent_type) {
 	return "";
 }
 
-#if !PLATFORM_WEB
-void settings_gui_state::perform_account_pane(augs::window& window, const std::string& website_url) {
-	using namespace augs::imgui;
-
-	if (is_steam_client) {
-		text("Your account is your Steam account.");
-		text_disabled("Your ranked matches and badges go on it automatically.");
+void settings_gui_state::on_steam_link_code(const std::string& code, const std::string& state) {
+	if (steam_link_state.empty() || state != steam_link_state) {
+		LOG("Ignoring a Steam link code for another state.");
 		return;
 	}
+
+	steam_link_state.clear();
+	link_code_from_steam = code;
+	account_status = "Signed in with Steam - checking the account...";
+}
+
+#if !WEB_CRAZYGAMES
+void settings_gui_state::perform_account_pane(augs::window& window, const std::string& website_url) {
+	using namespace augs::imgui;
 
 	const auto key_path = USER_DIR / identity_key::file_name;
 
@@ -383,14 +391,25 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		return std::nullopt;
 	}();
 
+#if PLATFORM_WEB
+	text_disabled(
+		"In the browser, your account is a key kept in this site's storage.\n"
+		"Clearing the site data, or another browser, means another account.\n"
+		"Back it up - without it, the account is lost:\n"
+		"keep it in a password manager (Copy key to clipboard),\n"
+		"or link it to your Steam account below.\n"
+		"Whoever has it plays as you - never share it."
+	);
+#else
 	text_disabled(
 		"Without Steam, your account is a key kept in your user folder on this computer.\n"
-		"It is created the first time you join a ranked server, or an official server securely.\n"
+		"It is created when the game first starts.\n"
 		"Back it up - without it, the account is lost:\n"
 		"keep it in a password manager (Copy key to clipboard),\n"
 		"or copy the account.key file somewhere safe (Reveal in explorer).\n"
 		"Whoever has it plays as you - never share it."
 	);
+#endif
 
 	ImGui::Separator();
 
@@ -435,11 +454,15 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		}
 	}
 
+#if !PLATFORM_WEB
 	ImGui::SameLine();
 
 	if (ImGui::Button("Reveal in explorer")) {
 		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 	}
+#else
+	(void)window;
+#endif
 
 	ImGui::Separator();
 
@@ -557,7 +580,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 					if (const auto backup = identity_key::forget(key_path)) {
 						account_status = typesafe_sprintf(
-							"Key forgotten. It was kept as %x.\nA new one is created when you join a ranked or official server securely, or with Create key now.",
+							"Key forgotten. It was kept as %x.\nA new one is created with Create key now, or when the game starts next.",
 							backup->filename().string()
 						);
 					}
@@ -581,32 +604,61 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 	text("Link to your Steam account");
 
+	if (current_account_id.rfind(::get_provider_preffix(auth_provider_type::STEAM_NATIVE), 0) == 0) {
+		text_color("This key is linked to " + current_account_id + ".", green);
+	}
+
+#if PLATFORM_WEB
+	text_disabled(
+		"Sign in with Steam to link this browser's key to your Steam account,\n"
+		"or get a code on hypersomnia.io/profile (\"Link a game key\") and enter it here.\n"
+		"The ranked matches you play with this key will then count for your Steam account."
+	);
+#else
 	text_disabled(
 		"Sign in through Steam on hypersomnia.io/profile,\n"
 		"press \"Link a game key\" and enter the code here.\n"
 		"The ranked matches you play with this key will then count for your Steam account."
 	);
+#endif
 
 	{
+		/*
+			All through GET requests without redirects, as the web build can only make those.
+			Redirects could send the signed link on over plain http.
+		*/
+
+		auto get_from_website = [&](const std::string& location) {
+			return augs::async_get(website_url, location, {}, nullptr, false);
+		};
+
+		auto response_error = [&](const augs::http_response& response, const std::string& what) {
+			if (response.status <= 0) {
+				return typesafe_sprintf("Couldn't reach %x.", website_url);
+			}
+
+			return typesafe_sprintf("%x failed: %x", what, response.body);
+		};
+
 		/*
 			First the website says whose Steam account the code is for, and the player confirms it:
 			a code someone else gave them ("enter this for a badge") would give that person their ranked matches.
 		*/
 
-		auto request_link_target = [&]() {
+		auto request_link_target = [&](const std::string& entered) {
 			/*
 				Pasting the key here instead of in Import would send it to the website in the request -
 				it never leaves the game, the field is just cleared.
 			*/
 
 			{
-				auto lowercase = link_code_text;
+				auto lowercase = entered;
 
 				for (auto& c : lowercase) {
 					c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 				}
 
-				if (identity_key::from_export_string(link_code_text).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || link_code_text.size() > 40) {
+				if (identity_key::from_export_string(entered).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || entered.size() > 40) {
 					link_code_text.clear();
 					account_status = "That was your key, not a link code - it was not sent anywhere.\nNever paste the key anywhere but Import key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/profile.";
 					return;
@@ -615,7 +667,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 			auto code = std::string();
 
-			for (const auto c : link_code_text) {
+			for (const auto c : entered) {
 				if (std::isalnum(static_cast<unsigned char>(c))) {
 					code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
 				}
@@ -626,43 +678,8 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 				return;
 			}
 
-			link_target_request = launch_async([code, website_url]() {
-				auto target = link_target { code, "", "", "" };
-
-				auto client = httplib_utils::make_client(website_url);
-				client->set_follow_location(false);
-				const auto result = client->Get(("/link_key/info?code=" + code).c_str());
-
-				if (!result) {
-					target.error = typesafe_sprintf("Couldn't reach %x.", website_url);
-					return target;
-				}
-
-				if (!httplib_utils::successful(result->status)) {
-					target.error = typesafe_sprintf("Linking failed: %x", result->body);
-					return target;
-				}
-
-				try {
-					const auto doc = augs::json_document_from(result->body);
-
-					if (doc.IsObject() && doc.HasMember("steam_id") && doc["steam_id"].IsString()) {
-						target.steam_account = doc["steam_id"].GetString();
-
-						if (doc.HasMember("name") && doc["name"].IsString()) {
-							target.name = doc["name"].GetString();
-						}
-
-						return target;
-					}
-				}
-				catch (...) {
-
-				}
-
-				target.error = "Linking failed: unexpected response from the website.";
-				return target;
-			});
+			link_target_code = code;
+			link_target_request = get_from_website("/link_key/info?code=" + code);
 		};
 
 		auto link_to_confirmed_target = [&](const link_target& target) {
@@ -671,37 +688,45 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			}
 
 			if (const auto signature = augs::ed25519_sign(*seed, identity_key::link_message(target.code, target.steam_account))) {
-				const auto body = typesafe_sprintf(
-					"{\"public_key\":\"%x\",\"code\":\"%x\",\"signature\":\"%x\"}",
+				link_request_is_unlink = false;
+
+				link_request = get_from_website(typesafe_sprintf(
+					"/link_key/link?public_key=%x&code=%x&signature=%x",
 					augs::bytes_to_hex(*public_key),
 					target.code,
 					augs::bytes_to_hex(*signature)
-				);
-
-				link_request = launch_async([body, website_url]() -> std::string {
-					auto client = httplib_utils::make_client(website_url);
-
-					/*
-						No redirects: one could send the signed link on over plain http.
-					*/
-
-					client->set_follow_location(false);
-					const auto result = client->Post("/link_key", body, "application/json");
-
-					if (!result) {
-						return typesafe_sprintf("Couldn't reach %x.", website_url);
-					}
-
-					if (httplib_utils::successful(result->status)) {
-						return "Linked. Your ranked matches now count for your Steam account.";
-					}
-
-					return typesafe_sprintf("Linking failed: %x", result->body);
-				});
+				));
 			}
 		};
 
-		const bool requesting = link_request.valid() || link_target_request.valid();
+		auto unlink = [&]() {
+			const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+
+			if (const auto signature = augs::ed25519_sign(*seed, identity_key::unlink_message(*public_key, unix_time))) {
+				link_request_is_unlink = true;
+
+				link_request = get_from_website(typesafe_sprintf(
+					"/link_key/unlink?public_key=%x&timestamp=%x&signature=%x",
+					augs::bytes_to_hex(*public_key),
+					unix_time,
+					augs::bytes_to_hex(*signature)
+				));
+			}
+		};
+
+		const bool has_key = seed.has_value() && public_key.has_value();
+		const bool requesting = augs::in_progress(link_request) || augs::in_progress(link_target_request);
+
+		/*
+			A code that came back from Sign in with Steam - still confirmed like a typed one.
+		*/
+
+		if (link_code_from_steam.has_value() && !requesting && has_key) {
+			const auto code = *link_code_from_steam;
+			link_code_from_steam.reset();
+			account_status.clear();
+			request_link_target(code);
+		}
 
 		if (link_target_to_confirm.has_value()) {
 			const auto& target = *link_target_to_confirm;
@@ -729,6 +754,28 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			}
 		}
 		else {
+#if PLATFORM_WEB
+			if (!requesting && ImGui::Button("Sign in with Steam")) {
+				account_status.clear();
+
+				if (has_key) {
+					auto state_bytes = std::array<uint8_t, 16>();
+					auto rd = std::random_device();
+
+					for (auto& b : state_bytes) {
+						b = static_cast<uint8_t>(rd());
+					}
+
+					steam_link_state = augs::bytes_to_hex(state_bytes);
+					augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
+					account_status = "Sign in with Steam in the new tab, then come back here.";
+				}
+				else {
+					account_status = "There is no key to link yet - create or import one above first.";
+				}
+			}
+#endif
+
 			input_text("##LinkCode", link_code_text);
 			ImGui::SameLine();
 
@@ -738,8 +785,8 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			else if (ImGui::Button("Link")) {
 				account_status.clear();
 
-				if (seed.has_value() && public_key.has_value()) {
-					request_link_target();
+				if (has_key) {
+					request_link_target(link_code_text);
 				}
 				else {
 					account_status = "There is no key to link yet - create or import one above first.";
@@ -752,65 +799,88 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 				augs::open_url(website_url + "/profile");
 			}
 
-			if (!requesting && seed.has_value() && public_key.has_value() && ImGui::Button("Unlink from Steam")) {
+			if (!requesting && has_key && ImGui::Button("Unlink from Steam")) {
 				account_status.clear();
-
-				const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
-
-				if (const auto signature = augs::ed25519_sign(*seed, identity_key::unlink_message(*public_key, unix_time))) {
-					const auto body = typesafe_sprintf(
-						"{\"public_key\":\"%x\",\"timestamp\":%x,\"signature\":\"%x\"}",
-						augs::bytes_to_hex(*public_key),
-						unix_time,
-						augs::bytes_to_hex(*signature)
-					);
-
-					link_request = launch_async([body, website_url]() -> std::string {
-						auto client = httplib_utils::make_client(website_url);
-						client->set_follow_location(false);
-
-						const auto result = client->Post("/link_key/unlink", body, "application/json");
-
-						if (!result) {
-							return typesafe_sprintf("Couldn't reach %x.", website_url);
-						}
-
-						if (httplib_utils::successful(result->status)) {
-							if (result->body.find("\"from\":null") != std::string::npos) {
-								return "This key was not linked to any Steam account.";
-							}
-
-							return "Unlinked. Your ranked matches count for this key's own account again.";
-						}
-
-						return typesafe_sprintf("Unlinking failed: %x", result->body);
-					});
-				}
+				unlink();
 			}
 
 			tooltip_on_hover("Unlinks this key from whatever Steam account it is linked to,\ne.g. if you linked it with a code that was not yours.");
 		}
 
-		if (valid_and_is_ready(link_target_request)) {
-			auto target = link_target_request.get();
+		if (augs::is_ready(link_target_request)) {
+			const auto response = augs::get_once(link_target_request);
 
-			if (target.error.empty()) {
-				link_target_to_confirm = std::move(target);
+			const auto target = [&]() -> std::optional<link_target> {
+				if (!httplib_utils::successful(response.status)) {
+					return std::nullopt;
+				}
+
+				try {
+					const auto doc = augs::json_document_from(response.body);
+
+					if (doc.IsObject() && doc.HasMember("steam_id") && doc["steam_id"].IsString()) {
+						auto result = link_target { link_target_code, doc["steam_id"].GetString(), "" };
+
+						if (doc.HasMember("name") && doc["name"].IsString()) {
+							result.name = doc["name"].GetString();
+						}
+
+						return result;
+					}
+				}
+				catch (...) {
+
+				}
+
+				return std::nullopt;
+			}();
+
+			if (target.has_value()) {
+				link_target_to_confirm = *target;
+			}
+			else if (httplib_utils::successful(response.status)) {
+				account_status = "Linking failed: unexpected response from the website.";
 			}
 			else {
-				account_status = target.error;
+				account_status = response_error(response, "Linking");
 			}
 		}
 
-		if (valid_and_is_ready(link_request)) {
-			account_status = link_request.get();
+		if (augs::is_ready(link_request)) {
+			const auto response = augs::get_once(link_request);
 			link_code_text.clear();
+
+			if (httplib_utils::successful(response.status)) {
+				/*
+					The account in the cert changes - asked for again once not in a match.
+				*/
+
+				identity_retry_wanted = true;
+
+				if (!link_request_is_unlink) {
+					account_status = "Linked. Your ranked matches now count for your Steam account.";
+				}
+				else if (response.body.find("\"from\":null") != std::string::npos) {
+					account_status = "This key was not linked to any Steam account.";
+				}
+				else {
+					account_status = "Unlinked. Your ranked matches count for this key's own account again.";
+				}
+			}
+			else {
+				account_status = response_error(response, link_request_is_unlink ? "Unlinking" : "Linking");
+			}
 		}
 	}
 
 	if (!account_status.empty()) {
 		ImGui::Separator();
 		text(account_status);
+	}
+
+	if (!identity_error.empty()) {
+		ImGui::Separator();
+		text_color("Signing in: " + identity_error, orange);
 	}
 }
 #endif
@@ -2595,12 +2665,33 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::CLIENT: {
+#if WEB_CRAZYGAMES
 				do_pretty_tabs(active_client_pane);
+#else
+				{
+					/*
+						Steam players have no key - their account is their Steam account. Its id is in Advanced.
+					*/
+
+					const auto num_client_panes = static_cast<int>(client_settings_pane::COUNT);
+					const bool hide_account = is_steam_client;
+
+					if (hide_account && active_client_pane == client_settings_pane::ACCOUNT) {
+						active_client_pane = client_settings_pane::PROFILE;
+					}
+
+					do_pretty_tabs(
+						active_client_pane,
+						[](const client_settings_pane) -> std::optional<std::string> { return std::nullopt; },
+						hide_account ? num_client_panes - 1 : num_client_panes
+					);
+				}
+#endif
 
 				auto& scope_cfg = config.client;
 
 				switch (active_client_pane) {
-#if !PLATFORM_WEB
+#if !WEB_CRAZYGAMES
 					case client_settings_pane::ACCOUNT: {
 						perform_account_pane(window, config.website_url);
 						break;
@@ -2608,7 +2699,7 @@ void settings_gui_state::perform(
 #endif
 					case client_settings_pane::PROFILE: {
 						{
-#if PLATFORM_WEB
+#if WEB_CRAZYGAMES
 							const auto label = "Nickname (guest)";
 #else
 							const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
@@ -2957,6 +3048,26 @@ void settings_gui_state::perform(
 						input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
 						input_text("Identity broker", config.identity_broker_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.identity_broker_url);
 						input_text("Website", config.website_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.website_url);
+
+						ImGui::Separator();
+
+						if (current_account_id.empty()) {
+							text_disabled("Account: not signed in.");
+						}
+						else {
+							text("Account: " + current_account_id);
+							ImGui::SameLine();
+
+							if (ImGui::Button("Copy my account id")) {
+								ImGui::SetClipboardText(current_account_id.c_str());
+							}
+
+							tooltip_on_hover("For a server admin - e.g. to make you an admin of their server, or to unban you.");
+						}
+
+						if (!identity_error.empty()) {
+							text_color("Signing in: " + identity_error, orange);
+						}
 
 #if 0
 						input_text("Port probing host", config.nat_detection.port_probing.host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing.host.address);

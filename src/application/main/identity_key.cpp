@@ -284,6 +284,11 @@ namespace identity_key {
 			return false;
 		}
 
+		/*
+			The web build keeps the user folder in the browser's storage - written there only on a sync.
+		*/
+
+		::persistent_filesystem_sync();
 		return true;
 	}
 
@@ -334,6 +339,7 @@ namespace identity_key {
 			backup += ".bak-" + stamp + (attempt == 1 ? std::string() : "-" + std::to_string(attempt));
 
 			if (link_without_replacing(path, backup)) {
+				::persistent_filesystem_sync();
 				return backup;
 			}
 

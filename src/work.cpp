@@ -1935,6 +1935,7 @@ work_result work(
 	*/
 
 	WEBSTATIC std::optional<std::string> next_connect_password;
+	WEBSTATIC bool connect_anyway_once = false;
 
 	try {
 		augs::image avatar;
@@ -2005,6 +2006,52 @@ work_result work(
 #endif
 
 		return false;
+	};
+
+	/*
+		The Account settings and the identity session, once per frame.
+	*/
+
+	WEBSTATIC auto sync_identity_with_settings = [&]() {
+		const auto now = augs::steady_secs();
+
+		/*
+			A new cert after linking or unlinking the key - not during a ranked match,
+			whose account would change under it and then not let the player back after a drop.
+		*/
+
+		if (settings_gui.identity_retry_wanted && !would_abandon_ranked_match()) {
+			settings_gui.identity_retry_wanted = false;
+			identity->retry_now();
+		}
+
+		settings_gui.identity_error = identity->last_error;
+
+		settings_gui.current_account_id = [&]() -> std::string {
+			if (identity->has_broker_cert(now)) {
+				return identity->get_broker_cert()->account;
+			}
+
+#if !PLATFORM_WEB
+			if (is_steam_client) {
+				return ::get_provider_preffix(auth_provider_type::STEAM_NATIVE) + steam_id;
+			}
+#endif
+
+			if (account_seed.has_value()) {
+				if (const auto public_key = augs::ed25519_public_key(*account_seed)) {
+					return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
+				}
+			}
+
+			return "";
+		}();
+
+#if PLATFORM_WEB
+		if (const auto link = take_pending_steam_link()) {
+			settings_gui.on_steam_link_code(link->first, link->second);
+		}
+#endif
 	};
 
 	WEBSTATIC auto is_during_tutorial = [&]() {
@@ -2470,6 +2517,16 @@ work_result work(
 			next_connect_password.reset();
 		}
 
+		/*
+			"Connect anyway" after a key that did not match: whatever key the server presents, and no saved password.
+		*/
+
+		if (connect_anyway_once) {
+			connect_anyway_once = false;
+			identity_context.expected_server_public_key.reset();
+			identity_context.password.clear();
+		}
+
 		streaming.wait_demos_compressed();
 
 		setup_launcher([&]() {
@@ -2842,9 +2899,9 @@ work_result work(
 		leaderboards_gui.perform({
 			config.client.get_nickname(),
 #if PLATFORM_WEB
-			social_sign_in.cached_auth.profile_id,
+			params.is_crazygames ? social_sign_in.cached_auth.profile_id : settings_gui.current_account_id,
 #else
-			typesafe_sprintf("steam_%x", steam_id),
+			settings_gui.current_account_id,
 #endif
 
 			config.main_menu.leaderboards_provider_url,
@@ -2853,7 +2910,11 @@ work_result work(
 
 			menu_ltrb
 #if PLATFORM_WEB
-			, is_signed_in(),
+			/*
+				Outside CrazyGames the account is the key in the browser - always there.
+			*/
+
+			, params.is_crazygames ? is_signed_in() : true,
 			params.is_crazygames
 #endif
 		});
@@ -3265,6 +3326,10 @@ work_result work(
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
+						if (setup.wants_connect_anyway()) {
+							connect_anyway_once = true;
+						}
+
 						if (auto new_password = setup.take_pending_password_save()) {
 							if (const auto key = setup.get_server_public_key()) {
 								saved_server_passwords.set(*key, *new_password);
@@ -3421,7 +3486,15 @@ work_result work(
 			else if constexpr(std::is_same_v<E, steam_change_server_request>) {
 				LOG("(Steam Callback) steam_change_server_request.");
 
-				connect_to(std::string(event.server_address.data()));
+				const auto& password = event.server_password;
+				const auto password_length = ::strnlen(password.data(), password.size());
+
+				if (password_length > 0) {
+					next_connect_password = std::string(password.data(), password_length);
+				}
+
+				const auto& address = event.server_address;
+				connect_to(std::string(address.data(), ::strnlen(address.data(), address.size())));
 			}
 			else if constexpr(std::is_same_v<E, steam_auth_ticket>) {
 				LOG("(Steam Callback) steam_auth_ticket.");
@@ -4931,6 +5004,7 @@ work_result work(
 				process_steam_callbacks();
 #endif
 				advance_identity();
+				sync_identity_with_settings();
 
 				{
 					/*

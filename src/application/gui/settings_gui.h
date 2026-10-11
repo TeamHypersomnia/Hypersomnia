@@ -9,6 +9,7 @@
 #include "augs/network/netcode_socket_raii.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/ed25519.h"
+#include "augs/misc/async_response.h"
 #include "application/nat/stun_server_provider.h"
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
@@ -102,10 +103,10 @@ enum class keybindings_settings_pane {
 enum class client_settings_pane {
 	// GEN INTROSPECTOR enum class client_settings_pane
 	PROFILE,
-#if !PLATFORM_WEB
+	LAG_COMPENSATION,
+#if !WEB_CRAZYGAMES
 	ACCOUNT,
 #endif
-	LAG_COMPENSATION,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -223,22 +224,46 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::optional<augs::ed25519_seed_type> account_seed;
 	double when_account_seed_loaded = -1.0;
 	bool account_seed_reload_needed = true;
-	augs::future<std::string> link_request;
+
+	augs::async_response_ptr link_request;
+	bool link_request_is_unlink = false;
 
 	struct link_target {
 		std::string code;
 		std::string steam_account;
 		std::string name;
-		std::string error;
 	};
 
-	augs::future<link_target> link_target_request;
+	augs::async_response_ptr link_target_request;
+	std::string link_target_code;
 	std::optional<link_target> link_target_to_confirm;
+
+	std::string steam_link_state;
+	std::optional<std::string> link_code_from_steam;
 
 	void perform_account_pane(augs::window& window, const std::string& website_url);
 
 public:
 	bool is_steam_client = false;
+
+	/*
+		Set by the game every frame: the account the player is known as, and why the identity broker last refused or failed.
+	*/
+
+	std::string current_account_id;
+	std::string identity_error;
+
+	/*
+		Set here after linking or unlinking the key - the game then asks for a new cert once not in a match.
+	*/
+
+	bool identity_retry_wanted = false;
+
+	/*
+		Web: the code Sign in with Steam came back with - taken only for the state this game opened it with.
+	*/
+
+	void on_steam_link_code(const std::string& code, const std::string& state);
 
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;

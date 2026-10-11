@@ -17,7 +17,8 @@ namespace augs {
         const std::string& base_url,
         const std::string& location,
         const Headers& headers = {},
-        async_get_progress_callback on_progress = nullptr
+        async_get_progress_callback on_progress = nullptr,
+        const bool follow_redirects = true
     ) {
         auto response = std::make_shared<async_response>();
         response->set_on_progress(on_progress);
@@ -25,6 +26,8 @@ namespace augs {
 		LOG("async_get: %x%x", base_url, location); 
 
 #if PLATFORM_WEB
+		(void)follow_redirects;
+
 		auto fetch_lbd = [=]() {
 			emscripten_fetch_attr_t attr;
 			emscripten_fetch_attr_init(&attr);
@@ -74,8 +77,9 @@ namespace augs {
 
 		main_thread_queue::execute_async(fetch_lbd);
 #else
-        std::thread([base_url, location, headers, on_progress, response]() {
+        std::thread([base_url, location, headers, on_progress, response, follow_redirects]() {
             auto cli = httplib_utils::make_client(base_url);
+            cli->set_follow_location(follow_redirects);
 
             httplib::Headers httplib_headers;
 

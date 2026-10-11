@@ -407,32 +407,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 	}
 
-#if PLATFORM_WEB
-	if (logged_in) {
-		if (in.is_crazygames) {
-			/* No Log Out button. */
-		}
-		else {
-			ImGui::SameLine();
-			const auto avail = ImGui::GetContentRegionAvail();
-
-			float offset_x = avail.x - ImGui::CalcTextSize("Sign in 9").x;
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset_x);
-
-			auto darkened_selectables = scoped_selectable_colors({
-				rgba(255, 255, 255, 20) * leaderboards_tint,
-				rgba(255, 255, 255, 30) * leaderboards_tint,
-				rgba(255, 255, 255, 60) * leaderboards_tint
-			});
-
-			//auto sc = scoped_text_color(rgba(255, 255, 255, 200));
-
-			if (ImGui::Selectable("Log out", false, 0, ImVec2(100, 0))) {
-				wants_log_out = true;
-			}
-		}
-	}
-#endif
+/*
+	No Log Out: on CrazyGames it is theirs, elsewhere the account is the key - see Settings - Client - Account.
+*/
 
 
 	ImGui::NextColumn();

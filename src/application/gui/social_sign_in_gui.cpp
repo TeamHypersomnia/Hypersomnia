@@ -28,6 +28,13 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		if (in.is_crazygames) {
 			h -= 60;
 		}
+		else {
+			/*
+				Outside CrazyGames there is nothing to sign in to - the account is the key in the browser.
+			*/
+
+			h -= 120;
+		}
 
 		ImGui::SetNextWindowSize(ImVec2(450 * ratio, h * ratio), ImGuiCond_Always);
 	}
@@ -84,7 +91,12 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		reason = "compete on Leaderboards";
 	}
 
-	centered_text(typesafe_sprintf("Sign in to %x:", reason));
+	if (in.is_crazygames) {
+		centered_text(typesafe_sprintf("Sign in to %x:", reason));
+	}
+	else {
+		centered_text("Choose your nickname:");
+	}
 
 	ImGui::Separator();
 
@@ -141,7 +153,9 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 
 	if (!in.prompted_once) {
-		centered_text("...or play as Guest:");
+		if (in.is_crazygames) {
+			centered_text("...or play as Guest:");
+		}
 
 		{
 			auto sc = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,10));
