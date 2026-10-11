@@ -25,6 +25,18 @@ augs::async_response_ptr request_token_still_valid_check(const web_auth_data& au
 bool token_still_valid(const augs::http_response& response) {
 	LOG_NVPS(response.status);
 
+	/*
+		Only Discord saying the token is not good signs the player out -
+		not a network error, a rate limit or Discord being down.
+	*/
+
+	if (response.status != 401 && response.status != 403) {
+		if (!httplib_utils::successful(response.status)) {
+			LOG("Could not check the Discord token. Assuming it is still valid.");
+			return true;
+		}
+	}
+
 	if (httplib_utils::successful(response.status)) {
 		try {
 			const auto doc = augs::json_document_from(response.body);
