@@ -708,11 +708,11 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 			text_color(
 				typesafe_sprintf(
-					"Link this key to the Steam account \"%x\" (%x)?\n"
+					"Link this key to the Steam account %x (named \"%x\" - a name anyone can copy)?\n"
 					"Your ranked matches will count for that account.\n"
 					"Confirm only if it is yours - never for a code someone else gave you.",
-					target.name,
-					target.steam_account
+					target.steam_account,
+					target.name
 				),
 				orange
 			);

@@ -1074,7 +1074,7 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 					a paused WebRTC client is never timed out, and its id would refuse every next peer given it.
 				*/
 
-				if (!found) {
+				if (!found && closed_datachannels_of_unset_clients.size() < max_incoming_connections_v) {
 					closed_datachannels_of_unset_clients.push_back({ to_kick, server_time });
 				}
 

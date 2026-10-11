@@ -580,7 +580,26 @@ void arena_mode::notify_ranked_banned(
 	const client_nickname_type& nickname,
 	const const_logic_step step
 ) {
-	auto& abandoned_player = abandoned_players[id_when_suspended];
+	/*
+		The key only has to be unique: a player who rejoined into the slot of one who already abandoned
+		and then abandoned too would otherwise overwrite them - and the first would escape the abandon in the report.
+	*/
+
+	auto key = id_when_suspended;
+
+	if (found_in(abandoned_players, key)) {
+		auto free_key = mode_player_id::first();
+
+		while (free_key.value < max_mode_players_v && found_in(abandoned_players, free_key)) {
+			++free_key;
+		}
+
+		if (free_key.value < max_mode_players_v) {
+			key = free_key;
+		}
+	}
+
+	auto& abandoned_player = abandoned_players[key];
 	abandoned_player = banned_player;
 	abandoned_player.stats.abandoned_at_score = get_score(abandoned_player.get_faction());
 

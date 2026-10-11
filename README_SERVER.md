@@ -175,6 +175,8 @@ If your server has a domain pointing to it, set `domain` in the `server` section
 
 Official servers are hosted by volunteers together with the developers. Each gets one `official_server_secret` from the developers, put in the `server_private` section. It reports ranked matches, signs the heartbeats so that the server list shows the server as official, and will secure the connections of its players. Keep it private, and keep the host's clock synchronized (e.g. `systemd-timesyncd` or `chrony`): the server list rejects signatures from a clock more than 30 seconds off.
 
+Ranked servers authenticate every player, and that only happens over the secure connections an `official_server_secret` makes possible - so a ranked server needs one. A community server without it refuses every player once ranked is on.
+
 If you have a Discord server, you might want to setup a [Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) and set `discord_webhook_url` to the webhook URL. This will notify your community whenever someone connects, as well as report all match results.
 
 ## Config loading order:
