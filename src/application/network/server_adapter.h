@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include "augs/global_libraries.h"
+#include "augs/misc/ed25519.h"
 #include "application/network/network_adapters.h"
 
 struct netcode_socket_t;
@@ -22,8 +23,7 @@ class server_adapter {
 	friend bool aux_send_packet(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes);
 	friend int receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes);
 
-	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
-	bool has_netcode_key = false;
+	std::array<uint8_t, yojimbo::ServerSecretKeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::DefaultAllocator yojimbo_allocator;
@@ -61,17 +61,19 @@ public:
 		send_packet_override_type,
 		receive_packet_override_type,
 		bool is_webrtc_only,
-		const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key,
-		bool secure_connections_only
+		const augs::ed25519_seed_type& server_key
 	);
 
 	/*
-		The id of the official server the client's connect token was issued for,
-		if this is an official server and the client connected with a token from the masterserver.
-		std::nullopt for every insecure connection.
+		What the client sealed to this server's key in its handshake - see identity_cert.h.
+		nullptr for a client that is not connected.
 	*/
 
-	std::optional<std::string> get_secure_server_id(const client_id_type& id) const;
+	const uint8_t* get_client_user_data(const client_id_type& id) const;
+	const uint8_t* get_client_binding(const client_id_type& id) const;
+	const uint8_t* get_client_session_signature(const client_id_type& id) const;
+
+	augs::ed25519_public_key_type get_public_key() const;
 
 	template <class H>
 	void advance(

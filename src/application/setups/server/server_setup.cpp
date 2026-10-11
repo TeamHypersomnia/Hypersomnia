@@ -42,8 +42,10 @@
 #include "application/masterserver/masterserver.h"
 #include "augs/network/netcode_utils.h"
 #include "application/masterserver/masterserver_requests.h"
-#include "application/masterserver/official_server_signing.h"
-#include "application/network/secure_connect.h"
+#include "application/masterserver/server_request_signing.h"
+#include "application/network/identity_cert.h"
+#include "application/main/server_key.h"
+#include "application/network/identity_broker_key.h"
 #include "application/main/identity_key.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
@@ -74,7 +76,6 @@
 #include <queue>
 
 #if !PLATFORM_WEB
-#include "augs/misc/verify_token.hpp"
 #endif
 
 #include "augs/templates/bit_cast.h"
@@ -160,6 +161,31 @@ class webrtc_server_detail {
         LOG_NOFORMAT(message);
     }
 
+	/*
+		The address the peer connects from, without the port - what a ban or a per-address rule needs,
+		since inside netcode every WebRTC peer shows as 127.255.255.255 with its id as the port.
+	*/
+
+public:
+	std::string remote_ip(const client_id id) {
+		std::scoped_lock lock(connections_lk);
+
+		if (const auto it = pcs.find(id); it != pcs.end() && it->second != nullptr) {
+			if (const auto address = it->second->remoteAddress()) {
+				const auto& a = *address;
+
+				if (const auto colon = a.rfind(':'); colon != std::string::npos) {
+					return a.substr(0, colon);
+				}
+
+				return a;
+			}
+		}
+
+		return "";
+	}
+
+private:
 	client_id assign_client_id() {
 		for (client_id i = 0; i < max_clients; ++i) {
 			const auto id = (next_client_id + i) % max_clients;
@@ -814,6 +840,7 @@ server_setup::server_setup(
 ) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
+	this_server_key(server_key::obtain(USER_DIR / server_key::file_name)),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
@@ -833,14 +860,7 @@ server_setup::server_setup(
 				return this->receive_packet_override(std::forward<decltype(args)>(args)...);
 			},
 			is_webrtc_only(),
-			[&]() -> std::optional<std::array<uint8_t, yojimbo::KeyBytes>> {
-				if (const auto keys = official_server_keys::derive(private_initial_vars.official_server_secret)) {
-					return keys->netcode_key;
-				}
-
-				return std::nullopt;
-			}(),
-			initial_vars.requires_authentication()
+			this_server_key
 		)
 	),
 #if CRASH_RECOVERY
@@ -948,12 +968,14 @@ server_setup::server_setup(
 		);
 	}
 
-	if (private_initial_vars.master_rcon_password.empty()) {
-		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
-	}
+	load_bans();
 
-	if (private_initial_vars.rcon_password.empty()) {
-		LOG("WARNING! The rcon password is empty! This means that only the localhost can access the rcon.");
+	reports.init(USER_DIR, in.port, this_server_key);
+
+	LOG("Server key: %x (server.key in the user folder)", server_key::public_key_hex(this_server_key));
+
+	if (private_initial_vars.admin_profiles.empty()) {
+		LOG("No admin_profiles: only the localhost can access rcon.");
 	}
 
 	if (dedicated == std::nullopt) {
@@ -1101,11 +1123,9 @@ void server_setup::reset_afk_timer() {
 */
 
 template <class Request>
-static void sign_if_official(Request& request, const server_private_vars& private_vars) {
-	if (const auto keys = official_server_keys::derive(private_vars.official_server_secret); keys.has_value()) {
-		if (!::sign_official_request(request, *keys, ::next_official_signature_timestamp_ms())) {
-			LOG("Failed to sign a request to the masterserver with the official_server_secret.");
-		}
+void server_setup::sign_for_masterserver(Request& request) const {
+	if (!::sign_server_request(request, this_server_key, masterserver_cookie)) {
+		LOG("Failed to sign a request to the masterserver with the server key.");
 	}
 }
 
@@ -1119,7 +1139,7 @@ void server_setup::send_goodbye_to_masterserver() {
 		const auto destination_address = resolved_server_list_addr.value();
 
 		auto goodbye = masterserver_in::goodbye {};
-		::sign_if_official(goodbye, private_vars);
+		sign_for_masterserver(goodbye);
 
 		auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
 
@@ -1145,6 +1165,8 @@ server_setup::~server_setup() {
 		broadcast_shutdown_message();
 		shutdown();
 	}
+
+	reports.wait_for_in_flight();
 }
 
 bool server_heartbeat::is_full() const {
@@ -1197,95 +1219,205 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 
 std::string get_hex_representation(const std::byte*, size_t length);
 
-void server_setup::request_auth(mode_player_id player_id, const auth_request_payload& payload) {
-#if PLATFORM_WEB
-	(void)player_id;
-	(void)payload;
+/*
+	The broker key the server trusts: built in, unless the config names another (e.g. a test broker).
+*/
+
+static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const server_private_vars& private_vars) {
+	const auto& configured = private_vars.identity_broker_public_key;
+	const auto hex = configured.empty() ? std::string(default_identity_broker_public_key_v) : configured;
+
+	auto key = augs::ed25519_public_key_type();
+
+	if (hex.size() != key.size() * 2) {
+		LOG("ERROR: identity_broker_public_key is not 64 hex characters. No broker certs are accepted.");
+		return {};
+	}
+
+	for (std::size_t i = 0; i < key.size(); ++i) {
+		try {
+			key[i] = static_cast<uint8_t>(std::stoi(hex.substr(i * 2, 2), nullptr, 16));
+		}
+		catch (...) {
+			LOG("ERROR: identity_broker_public_key is not valid hex. No broker certs are accepted.");
+			return {};
+		}
+	}
+
+	return { key };
+}
+
+/*
+	Reads what the client sealed into its handshake - see identity_cert.h - right as it connects.
+	Nothing here waits for anything: the cert and the signature are checked with what the server has.
+*/
+
+void server_setup::verify_client_identity(const client_id_type id) {
+	auto& c = clients[id];
+
+	const auto blob = identity_cert::read_blob(server->get_client_user_data(id));
+
+	if (!blob.has_value()) {
+		LOG("Client %x sent unreadable handshake data.", id);
+		kick(id, "Invalid connection data. Update the game.");
+		c.kick_no_linger = true;
+		return;
+	}
+
+	c.connect_password = blob->password;
+
+	if (const auto b = find_ban("", get_client_ip_for_bans(id))) {
+		kick(id, ban_message(*b));
+		c.kick_no_linger = true;
+		return;
+	}
+
+	if (blob->identity.has_value()) {
+		const auto broker_keys = ::identity_broker_keys(private_vars);
+		const auto now = augs::date_time::secs_since_epoch();
+
+		const auto verified = identity_cert::verify(
+			*blob->identity,
+			broker_keys,
+			static_cast<int64_t>(now),
+			server->get_client_binding(id),
+			server->get_client_session_signature(id)
+		);
+
+		if (verified.has_value()) {
+			c.cert_account = verified->account;
+
+			/*
+				Where the nicknames are the accounts (tournaments), the cert only decides who may administer.
+			*/
+
+			if (!vars.authenticate_with_nicknames) {
+				apply_authentication(
+					to_mode_player_id(id),
+					verified->account,
+					verified->signer == identity_cert::signer_type::BROKER,
+					false
+				);
+			}
+		}
+		else {
+			LOG("Client %x presented a cert that did not verify (account: %x).", id, blob->identity->account);
+		}
+	}
+
+	if (c.when_kicked.has_value()) {
+		return;
+	}
+
+	/*
+		Ranked is played only on accounts the identity broker vouches for.
+		Refused right away, not after a timeout.
+	*/
+
+	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && !c.authenticated_by_broker) {
+		kick(id, "Ranked matches need an account.\nSign in with Steam, or make sure the game can reach hypersomnia.io, and try again.");
+		c.kick_no_linger = true;
+	}
+}
+
+void server_setup::apply_authentication(
+	const mode_player_id player_id,
+	const std::string& authenticated,
+	const bool signed_by_broker,
+	const bool from_nickname
+) {
+	auto client = find_client_state(player_id);
+
+	if (client == nullptr) {
+		return;
+	}
+
+#if IS_PRODUCTION_BUILD
+	const auto new_id = authenticated;
 #else
-	auto push_steam_native_auth_job = [&]() {
-		const auto api_key = private_vars.steam_web_api_key;
-		const auto& ticket = payload.ticket_bytes;
-		const auto ticket_hex = ::get_hex_representation(ticket.data(), ticket.size());
-		const auto identity = secure_connect::steam_ticket_identity(secure_connect::auth_identity(
-			std::string(get_client_state(player_id).auth_challenge),
-			server->get_secure_server_id(to_client_id(player_id)).value_or("")
-		));
+	auto new_id = authenticated;
 
-		push_auth_job(
-			player_id,
+	if (begins_with(new_id, "steam_") && from_nickname == false && !vars.requires_authentication()) {
+		/*
+			For testing so we can use just a single steam account on casual servers
+		*/
 
-			[api_key, ticket_hex, identity]() {
-				const auto result = verify_steam_token(api_key, ticket_hex, identity);
-
-				if (result.empty() || result == "publisherbanned") {
-					return result;
-				}
-
-				const auto type = auth_provider_type::STEAM_NATIVE;
-				return ::get_provider_preffix(type) + result;
-			}
-		);
-	};
-
-	auto push_web_auth_job = [&]() {
-		push_auth_job(
-			player_id,
-
-			[payload]() {
-				const auto token_str = augs::bytes_to_string(payload.ticket_bytes);
-				const auto result_id = [&]() {
-					if (payload.type == auth_provider_type::CRAZYGAMES) {
-						return verify_crazygames_token(token_str);
-					}
-					else if (payload.type == auth_provider_type::DISCORD) {
-						return verify_discord_token(token_str);
-					}
-
-					LOG("Unknown auth type: %x", payload.type);
-					return std::string("");
-				}();
-
-				if (result_id.empty()) {
-					return result_id;
-				}
-
-				return ::get_provider_preffix(payload.type) + result_id;
-			}
-		);
-	};
-
-	auto push_key_auth_job = [&]() {
-		const auto identity = secure_connect::auth_identity(
-			std::string(get_client_state(player_id).auth_challenge),
-			server->get_secure_server_id(to_client_id(player_id)).value_or("")
-		);
-
-		push_auth_job(
-			player_id,
-
-			[ticket_bytes = payload.ticket_bytes, identity]() {
-				const auto ticket = identity_key::from_bytes(ticket_bytes);
-
-				if (!ticket.has_value() || !identity_key::verify(*ticket, identity)) {
-					LOG("Rejected an identity key signature.");
-					return std::string("");
-				}
-
-				return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(ticket->public_key);
-			}
-		);
-	};
-
-	if (payload.type == auth_provider_type::STEAM_NATIVE) {
-		push_steam_native_auth_job();
-	}
-	else if (payload.type == auth_provider_type::KEY) {
-		push_key_auth_job();
-	}
-	else {
-		push_web_auth_job();
+		new_id = std::string("steam_") + client->get_nickname();
 	}
 #endif
+
+	const bool required = vars.requires_authentication();
+	const auto client_id = to_client_id(player_id);
+
+	if (new_id.empty()) {
+		LOG("Failed to authenticate \"%x\".", client->get_nickname());
+
+		if (required) {
+			kick(client_id, "Authentication failure. Try again.");
+		}
+
+		return;
+	}
+
+	/*
+		The authenticated id is later assigned to server_ranked_account_id
+		(a constant_size_string) which silently truncates - two distinct ids
+		that truncate to the same prefix would alias on suspended-player
+		rejoin matching. Refused at the source instead of corrupting state.
+	*/
+
+	if (new_id.size() > max_ranked_account_id_length_v) {
+		LOG("\"%x\" has an account ID too long: %x", client->get_nickname(), new_id);
+		return;
+	}
+
+	if (is_banned(new_id)) {
+		kick(client_id, ban_message_for(new_id));
+		client->kick_no_linger = true;
+		return;
+	}
+
+	if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
+		LOG("\"%x\" has a duplicate account ID: %x.", client->get_nickname(), new_id);
+
+		if (from_nickname) {
+			if (!required) {
+				return;
+			}
+
+			const auto chosen_nick = account_id_to_nickname(new_id);
+
+			kick(client_id, typesafe_sprintf("Your nickname: '%x'\nis already taken!", chosen_nick));
+			return;
+		}
+
+		/*
+			The newer connection wins: e.g. the game restarted after a crash
+			while its old connection had not timed out yet. Only a valid cert for this very account gets here.
+		*/
+
+		kick(to_client_id(existing), "You have connected again from elsewhere.");
+
+		if (auto old = find_client_state(existing)) {
+			old->kick_no_linger = true;
+			old->authenticated_id.clear();
+			old->authenticated_by_broker = false;
+		}
+	}
+
+	client->authenticated_id = new_id;
+	client->authenticated_by_broker = signed_by_broker;
+	client->verified_has_no_ban = true;
+
+	LOG(
+		"Authenticated \"%x\". ID: %x (%x). Took %x secs.", 
+		client->get_nickname(), 
+		client->authenticated_id,
+		signed_by_broker ? "broker" : (from_nickname ? "nickname" : "self-signed"),
+		client->secs_since_connected(server_time)
+	);
+
+	update_badges();
 }
 
 void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
@@ -1812,77 +1944,45 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 void server_setup::push_report_match_webhook(const messages::match_summary_message& summary) {
 	finalize_webhook_jobs();
 
-	auto post_to = [&](const auto& url, const auto& header_apikey) {
-		if (const auto report_webhook_url = parsed_url(url); report_webhook_url.valid()) {
-			const auto server_name = get_server_name();
+	if (!is_ranked_server()) {
+		LOG("push_report_match_webhook: not a ranked server, skipping.");
+		return;
+	}
 
-			LOG("Reporting ranked match result to: %x", url);
-
-			const auto json_body = ranked_webhooks::json_report_match(
-				server_name,
-				get_current_arena_name(),
-				get_current_game_mode_name(),
-				summary,
-				[this](const mode_player_id id) -> std::string {
-					if (auto c = find_client_state(id)) {
-						return c->settings.public_settings.clan;
-					}
-
-					return "";
-				}
-			);
-
-			LOG("Match report JSON: %x", json_body);
-
-			push_notification_job(
-				[report_webhook_url, header_apikey, json_body]() -> std::string {
-					auto http_client = httplib_utils::make_client(report_webhook_url, 60 * 3);
-
-					httplib::Headers headers;
-					headers.emplace("apikey", header_apikey);
-
-					auto result = http_client->Post(report_webhook_url.location.c_str(), headers, json_body, "application/json");
-
-					if (result) {
-						LOG("/report_match HTTP %x: %x", result->status, result->body);
-					}
-					else {
-						LOG("/report_match: null result (network error or timeout).");
-					}
-
-					return "";
-				}
-			);
-
-			return true;
-		}
-
-		return false;
-
-	};
-
-	if (is_ranked_server()) {
-		const auto report_apikey = [&]() -> std::string {
-			if (const auto keys = official_server_keys::derive(private_vars.official_server_secret)) {
-				return augs::bytes_to_hex(keys->report_key);
+	const auto json_body = ranked_webhooks::json_report_match(
+		get_server_name(),
+		get_current_arena_name(),
+		get_current_game_mode_name(),
+		summary,
+		[this](const mode_player_id id) -> std::string {
+			if (auto c = find_client_state(id)) {
+				return c->settings.public_settings.clan;
 			}
 
 			return "";
-		}();
-
-		if (!post_to(
-			private_vars.report_ranked_match_url, 
-			report_apikey
-		)) {
-			LOG("report_ranked_match_url was not set.");
 		}
+	);
 
-		for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
-			post_to(aux_endpoint.url, aux_endpoint.header_apikey);
+	LOG("Match report JSON: %x", json_body);
+
+	const auto match_id = augs::bytes_to_hex(summary.ranked_match_id);
+
+	auto queue_for = [&](const std::string& url) {
+		if (parsed_url(url).valid()) {
+			LOG("Queueing the ranked match report for: %x", url);
+			reports.push(url, json_body, match_id);
 		}
+	};
+
+	if (private_vars.report_ranked_match_url.empty()) {
+		LOG("report_ranked_match_url was not set.");
 	}
 	else {
-		LOG("push_report_match_webhook: not a ranked server, skipping.");
+		queue_for(private_vars.report_ranked_match_url);
+	}
+
+	for (const auto& aux_endpoint : private_vars.report_ranked_match_aux_endpoints) {
+		queue_for(aux_endpoint);
 	}
 }
 
@@ -2113,105 +2213,13 @@ void server_setup::finalize_webhook_jobs() {
 						LOG("Received avatar from %x.", client->get_nickname());
 						break;
 
-					case job_type::AUTH: {
-#if IS_PRODUCTION_BUILD
-						const auto new_id = webhook_result;
-#else
-						auto new_id = webhook_result;
-
-						if (begins_with(new_id, "steam_")) {
-							/*
-								For testing so we can use just a single steam account
-							*/
-
-							new_id = std::string("steam_") + client->get_nickname();
-						}
-#endif
-
+					case job_type::AUTH:
 						/*
-							Where authentication is optional, a failure or a duplicate only leaves the client unauthenticated.
+							Only the nickname authentication goes through a job now - see verify_client_identity.
 						*/
 
-						const bool required = vars.requires_authentication();
-
-						if (new_id.empty()) {
-							LOG(
-								"Failed to authenticate \"%x\". There was a problem with authentication endpoint. Took %x secs.", 
-								client->get_nickname(), 
-								client->secs_since_connected(server_time)
-							);
-
-							if (required) {
-								kick(to_client_id(webhook_job.player_id), "Authentication failure. Try again.");
-							}
-
-							break;
-						}
-
-						/*
-							Before the duplicates - the first one might still linger after being kicked.
-						*/
-
-						if (new_id == "publisherbanned") {
-							kick(to_client_id(webhook_job.player_id), "Banned by the game developer.");
-							break;
-						}
-
-						if (const auto existing = find_client_by_account_id(new_id); existing.is_set()) {
-							LOG(
-								"\"%x\" has a duplicate account ID: %x. Took %x secs.", 
-								client->get_nickname(), 
-								new_id,
-								client->secs_since_connected(server_time)
-							);
-
-							if (!required) {
-								break;
-							}
-
-							auto duplicate_message = std::string("Duplicate client.");
-
-							if (vars.authenticate_with_nicknames) {
-								const auto chosen_nick = account_id_to_nickname(new_id);
-
-								duplicate_message = 
-									typesafe_sprintf("Your nickname: '%x'\nis already taken!", chosen_nick)
-								;
-							}
-
-							kick(to_client_id(webhook_job.player_id), duplicate_message);
-
-							break;
-						}
-
-						/*
-							The authenticated id is later assigned to server_ranked_account_id
-							(a constant_size_string) which silently truncates - two distinct ids
-							that truncate to the same prefix would alias on suspended-player
-							rejoin matching. Hard-fail at the source instead of corrupting state.
-						*/
-						ensure(new_id.size() <= max_ranked_account_id_length_v);
-
-						client->authenticated_id = new_id;
-
-						LOG(
-							"Authenticated \"%x\". ID: %x. Took %x secs.", 
-							client->get_nickname(), 
-							client->authenticated_id,
-							client->secs_since_connected(server_time)
-						);
-
-						update_badges();
-
-						if (private_vars.check_ban_url.empty()) {
-							client->verified_has_no_ban = true;
-						}
-						else {
-							// TODO: Check ban.
-						}
-
+						apply_authentication(webhook_job.player_id, webhook_result, false, true);
 						break;
-					}
 					
 
 					default:
@@ -2235,7 +2243,47 @@ bool server_setup::handle_masterserver_response(
 	auto handle = [&](const auto& typed_request) {
 		using T = remove_cref<decltype(typed_request)>;
 
-		if constexpr(std::is_same_v<T, masterserver_out::tell_me_my_address>) {
+		if constexpr(std::is_same_v<T, masterserver_out::heartbeat_ack>) {
+			masterserver_cookie = typed_request.cookie;
+
+			/*
+				A heartbeat without a fresh cookie only got us one - sent again right away, once.
+			*/
+
+			if (!typed_request.accepted) {
+				if (!resent_heartbeat_for_cookie) {
+					resent_heartbeat_for_cookie = true;
+					when_last_sent_heartbeat_to_server_list = 0;
+				}
+			}
+			else {
+				resent_heartbeat_for_cookie = false;
+			}
+
+			if (masterserver_says_official != typed_request.official) {
+				masterserver_says_official = typed_request.official;
+
+				LOG("The masterserver knows this server's key as %x.", typed_request.official ? "an official server" : "a community server");
+			}
+
+			if (!typed_request.official && is_ranked_server()) {
+				static double last_logged = -1000.0;
+
+				if (server_time - last_logged > 600.0) {
+					last_logged = server_time;
+
+					LOG(
+						"ERROR: this is a ranked server, but the masterserver does not know its key (%x) as an official one.\n"
+						"Ranked matches will not start and their reports would be refused. Send the key to the developers, "
+						"or check server.key in the user folder was not replaced.",
+						server_key::public_key_hex(this_server_key)
+					);
+				}
+			}
+
+			return true;
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::tell_me_my_address>) {
 			if (!external_address.has_value()) {
 				if (!std::memcmp(&tell_me_my_address_stamp, &typed_request.session_timestamp, sizeof(tell_me_my_address_stamp))) {
 					external_address = typed_request.address;
@@ -2639,9 +2687,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		LOG("THE SERVER HAS SENT AN INVALID HEARTBEAT!!!");
 	}
 
-#if !PLATFORM_WEB
-	::sign_if_official(heartbeat, private_vars);
-#endif
+	sign_for_masterserver(heartbeat);
 
 	heartbeat_buffer.clear();
 
@@ -2890,38 +2936,16 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 }
 
 /*
-	Optional authentication is verified only with what the server has -
-	Steam needs the Web API key - and never where the nicknames are the accounts.
-*/
-
-bool server_setup::can_verify_optional_auth(const auth_request_payload& payload) const {
-#if PLATFORM_WEB
-	(void)payload;
-	return false;
-#else
-	if (vars.authenticate_with_nicknames) {
-		return false;
-	}
-
-	if (payload.type == auth_provider_type::STEAM_NATIVE) {
-		return !private_vars.steam_web_api_key.empty();
-	}
-
-	return true;
-#endif
-}
-
-/*
 	A custom badge of an admin profile, otherwise DEV for the developers - see developer_keys.h -
 	otherwise ADMIN for the admin profiles.
 */
 
 /*
-	Not where the nicknames are the accounts - anyone could take the nickname of an admin.
+	Matched against the account a cert proves, never a nickname - anyone could take the nickname of an admin.
 */
 
 std::optional<admin_profile> server_setup::find_admin_profile_of(const std::string& account_id) const {
-	if (vars.authenticate_with_nicknames) {
+	if (account_id.empty() || begins_with(account_id, nickname_account_id_prefix_v)) {
 		return std::nullopt;
 	}
 
@@ -2989,7 +3013,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 		id,
 		game_channel_type::RELIABLE_MESSAGES,
 
-		server_auth_state { c.auth_challenge, level, vars.requires_authentication() }
+		server_auth_state { level, vars.requires_authentication() }
 	);
 
 	/*
@@ -3011,7 +3035,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 void server_setup::update_badges() {
 	for_each_id_and_client([&](const auto id, auto& c) {
 		const bool integrated = is_integrated() && id == get_integrated_client_id();
-		const auto& account_id = integrated ? integrated_account_id : c.authenticated_id;
+		const auto& account_id = integrated ? integrated_account_id : c.cert_account;
 		const auto new_badge = clan_name_type([&]() {
 			const auto badge = calc_badge(account_id);
 
@@ -3109,6 +3133,15 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	if (!vars.requires_authentication()) {
 		out.all_authenticated = true;
 		out.all_not_banned = true;
+	}
+
+	/*
+		A ranked server the masterserver explicitly does not know as official starts no ranked matches:
+		hypersomnia.io would refuse their reports. No answer (the masterserver down) does not stop them.
+	*/
+
+	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && masterserver_says_official == false) {
+		out.all_authenticated = false;
 	}
 
 	out.friendly_fire = vars.get_friendly_fire();
@@ -3495,23 +3528,9 @@ void server_setup::init_client(const client_id_type& id) {
 
 	new_client.init(server_time, next_session_id++, new_address);
 
-	new_client.auth_challenge = [&]() {
-		thread_local auto device = std::random_device();
-
-		auto bytes = std::array<std::byte, 12>();
-
-		for (auto& b : bytes) {
-			b = static_cast<std::byte>(device() & 0xff);
-		}
-
-		return auth_challenge_type("hs_" + ::get_hex_representation(bytes.data(), bytes.size()));
-	}();
-
 	LOG("Client %x connected. SID: %x", id, new_client.session_id);
 
-	if (const auto secure_server_id = server->get_secure_server_id(id)) {
-		LOG("Client %x connected securely with a token issued for %x.", id, *secure_server_id);
-	}
+	verify_client_identity(id);
 }
 
 void server_setup::unset_client(const client_id_type& id) {
@@ -3813,15 +3832,6 @@ void server_setup::advance_clients_state() {
 						}
 					}
 				}
-			}
-
-			/*
-				Authentication only ever happens over a secure connection,
-				so where it is required, an insecure client could never get in.
-			*/
-
-			if (vars.requires_authentication() && !c.when_kicked.has_value() && !server->get_secure_server_id(client_id).has_value()) {
-				kick(client_id, "This server requires a secure connection.\nMake sure the game can reach hypersomnia.io and try again.");
 			}
 
 			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
@@ -5032,7 +5042,7 @@ augs::path_type server_setup::get_unofficial_content_dir() const {
 	Timing attack resistant password comparator.
 */
 
-bool safe_equal(const decltype(requested_client_settings::server_password)& candidate_password, const std::string& actual_password) {
+bool safe_equal(const std::string& candidate_password, const std::string& actual_password) {
 	const bool password_is_disabled = actual_password.empty();
 
 	if (password_is_disabled) {
@@ -5122,7 +5132,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	*/
 
 	const auto profile_level = [&]() {
-		if (const auto profile = find_admin_profile_of(c.authenticated_id); profile.has_value()) {
+		if (const auto profile = find_admin_profile_of(c.cert_account); profile.has_value()) {
 			return profile->rcon_level;
 		}
 
@@ -5130,27 +5140,12 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	}();
 
 	if (profile_level == rcon_level_type::MASTER) {
-		LOG("Authorized the admin profile %x for master rcon.", c.authenticated_id);
+		LOG("Authorized the admin profile %x for master rcon.", c.cert_account);
 		return rcon_level_type::MASTER;
-	}
-
-	if (::safe_equal(c.settings.server_password, private_vars.master_rcon_password)) {
-		LOG("Authorized the remote client for master rcon.");
-		return rcon_level_type::MASTER;
-	}
-
-	if (::safe_equal(c.settings.server_password, private_vars.rcon_password)) {
-		if (private_vars.master_rcon_password.empty()) {
-			LOG("Authorized the remote client for master rcon.");
-			return rcon_level_type::MASTER;
-		}
-
-		LOG("Authorized the remote client for basic rcon.");
-		return rcon_level_type::BASIC;
 	}
 
 	if (profile_level == rcon_level_type::BASIC) {
-		LOG("Authorized the admin profile %x for basic rcon.", c.authenticated_id);
+		LOG("Authorized the admin profile %x for basic rcon.", c.cert_account);
 		return rcon_level_type::BASIC;
 	}
 
@@ -5184,19 +5179,15 @@ bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 		}
 	}
 
-	if (::safe_equal(c.settings.server_password, private_vars.server_password)) {
+	if (::safe_equal(c.connect_password, private_vars.server_password)) {
 		return true;
 	}
 
-	if (::safe_equal(c.settings.server_password, private_vars.rcon_password)) {
-		return true;
-	}
+	/*
+		An admin needs no password.
+	*/
 
-	if (::safe_equal(c.settings.server_password, private_vars.master_rcon_password)) {
-		return true;
-	}
-
-	return false;
+	return find_admin_profile_of(c.cert_account).has_value();
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
@@ -5363,10 +5354,118 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 	);
 }
 
-void server_setup::ban(const client_id_type& id, const std::string& reason) {
-	// TODO!!!
-	(void)id;
-	(void)reason;
+static auto bans_path() {
+	return USER_DIR / "server_bans.json";
+}
+
+static uint64_t unix_now_secs() {
+	return static_cast<uint64_t>(augs::date_time::secs_since_epoch());
+}
+
+void server_setup::load_bans() {
+	const auto path = bans_path();
+
+	if (!augs::exists(path)) {
+		return;
+	}
+
+	try {
+		augs::from_json_file(path, bans);
+		LOG("Loaded %x bans from %x.", bans.bans.size(), path);
+	}
+	catch (const std::exception& e) {
+		LOG("ERROR: could not read the bans from %x: %x. Not banning anyone until fixed.", path, e.what());
+		bans = {};
+	}
+}
+
+void server_setup::save_bans() const {
+	try {
+		augs::save_as_json_atomic(bans, bans_path());
+	}
+	catch (const std::exception& e) {
+		LOG("ERROR: could not save the bans to %x: %x", bans_path(), e.what());
+	}
+}
+
+std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const {
+	const auto& c = clients[id];
+
+	if (c.is_webrtc_client()) {
+		if (webrtc_server) {
+			return webrtc_server->remote_ip(c.address.GetPort());
+		}
+
+		return "";
+	}
+
+	/*
+		yojimbo prints no port when it is zero.
+	*/
+
+	auto without_port = c.address;
+	without_port.SetPort(0);
+
+	return ::ToString(without_port);
+}
+
+const server_ban* server_setup::find_ban(const std::string& account, const std::string& ip) const {
+	return bans.find_active(account, ip, ::unix_now_secs());
+}
+
+bool server_setup::is_banned(const std::string& account) const {
+	return find_ban(account, "") != nullptr;
+}
+
+std::string server_setup::ban_message(const server_ban& b) const {
+	const auto reason = b.reason.empty() ? std::string() : "\nReason: " + b.reason;
+
+	if (b.is_forever()) {
+		return "You are banned from this server." + reason;
+	}
+
+	const auto minutes_left = (b.until_unix - std::min(b.until_unix, ::unix_now_secs()) + 59) / 60;
+
+	return typesafe_sprintf("You are banned from this server for %x more minutes.", minutes_left) + reason;
+}
+
+std::string server_setup::ban_message_for(const std::string& account) const {
+	if (const auto b = find_ban(account, "")) {
+		return ban_message(*b);
+	}
+
+	return "";
+}
+
+void server_setup::ban(const client_id_type& id, const std::string& reason, const uint32_t minutes) {
+	if (id >= clients.size() || !clients[id].is_set()) {
+		return;
+	}
+
+	auto& c = clients[id];
+
+	auto entry = server_ban();
+	entry.account = c.cert_account.empty() ? c.authenticated_id : c.cert_account;
+	entry.nickname = c.get_nickname();
+	entry.reason = reason;
+	entry.until_unix = minutes == 0 ? 0 : ::unix_now_secs() + static_cast<uint64_t>(minutes) * 60;
+
+	{
+		/*
+			The address without the port; for a WebRTC player its real address as the signalling saw it.
+		*/
+
+		entry.ip = get_client_ip_for_bans(id);
+	}
+
+	bans.remove_expired(::unix_now_secs());
+	bans.bans.push_back(entry);
+	save_bans();
+
+	LOG("Banned %x (account: %x, ip: %x) %x. Reason: %x", entry.nickname, entry.account, entry.ip, minutes == 0 ? std::string("for good") : typesafe_sprintf("for %x minutes", minutes), reason);
+
+	kick(id, ban_message(entry));
+	c.kick_no_linger = true;
 }
 
 std::optional<arena_player_metas> server_setup::get_new_player_metas() {

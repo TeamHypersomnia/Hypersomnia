@@ -467,51 +467,6 @@ message_handler_result client_setup::handle_payload(
 	else if constexpr (std::is_same_v<T, server_auth_state>) {
 		client_gui.rcon.level = payload.rcon_level;
 		server_requires_authentication = payload.requires_authentication;
-
-		/*
-			The ticket is requested for the challenge and the official server the connect token was issued for,
-			and only over a secure connection - see secure_connect.h.
-		*/
-
-		if (!steam_auth_identity_received && !payload.challenge.empty() && secure_server_id.has_value()) {
-			steam_auth_identity_received = true;
-			steam_auth_identity_to_request = secure_connect::steam_ticket_identity(
-				secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id)
-			);
-		}
-
-		if (identity_key_path.has_value() && !identity_key_signed && !payload.challenge.empty() && secure_server_id.has_value()) {
-			identity_key_signed = true;
-
-			const auto identity = secure_connect::auth_identity(std::string(payload.challenge), *secure_server_id);
-			const bool had_key = augs::exists(*identity_key_path);
-
-			if (const auto seed = identity_key::load_or_create(*identity_key_path)) {
-				if (const auto ticket = identity_key::sign(*seed, identity)) {
-					pending_key_auth = identity_key::to_bytes(*ticket);
-				}
-
-				/*
-					Most players never open the Account settings - told once, when their account comes into being.
-				*/
-
-				if (!had_key) {
-					chat_gui_entry notice;
-					notice.timestamp = get_current_time();
-					notice.message = "Your account key was created. Back it up in Settings - Client - Account: without it, the account is lost for good.";
-					notice.overridden_message_color = orange;
-					client_gui.chat.add_entry(std::move(notice));
-				}
-			}
-			else if (secure_request.has_value() && secure_request->required) {
-				/*
-					Clearer than the server's authentication timeout.
-				*/
-
-				set_disconnect_reason("Your account key file is not valid.\nSee Settings - Client - Account.");
-				return abort_v;
-			}
-		}
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		mode_player_id player_id;

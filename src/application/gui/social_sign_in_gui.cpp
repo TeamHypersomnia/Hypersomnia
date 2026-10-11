@@ -5,7 +5,6 @@
 #include "augs/misc/imgui/maybe_different.h"
 #include "augs/misc/imgui/imgui_controls.h"
 
-void sign_in_with_discord();
 void sign_in_with_crazygames();
 
 social_sign_in_state::social_sign_in_state(const std::string& title)
@@ -130,21 +129,7 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 		}
 	}
 	else {
-		{
-			auto sc = scoped_text_color(rgba(255, 255, 255, 230));
-
-			if (login_option(N::SOCIAL_STEAM, "(opt.) Connect Discord to Steam", 1.0f, vec2(0.5, 0.2), 0.6f, "(Optional)\nUseful if you sometimes play Steam version\nand don't want a duplicate Web account.\n\nMatches played with Discord account\nwill count towards your Steam account.")) {
-				augs::open_url("https://hypersomnia.io/profile");
-			}
-		}
-
 		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-
-		if (login_option(N::SOCIAL_DISCORD, "Sign in with Discord")) {
-#if PLATFORM_WEB
-			::sign_in_with_discord();
-#endif
-		}
 	}
 
 

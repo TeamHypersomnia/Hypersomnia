@@ -17,6 +17,7 @@ struct server_list_entry_json {
 	std::string domain;
 	std::string webrtc_id;
 	std::string browser_connect_string;
+	std::string server_public_key;
 
 	double time_hosted = 0.0;
 	double time_last_heartbeat = 0.0;

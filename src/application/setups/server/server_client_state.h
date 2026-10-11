@@ -69,9 +69,28 @@ struct server_client_state {
 
 	bool auth_requested = false;
 	std::string authenticated_id;
+
+	/*
+		Whether the identity broker vouches for authenticated_id - see identity_cert.h.
+		Only such accounts play ranked and report matches.
+	*/
+
+	bool authenticated_by_broker = false;
+
+	/*
+		The account its cert proves, whatever authenticated_id is - e.g. a nick_ on a tournament server.
+		What the admin profiles are matched against.
+	*/
+
+	std::string cert_account;
+
+	/*
+		The server password the client sealed into its handshake.
+	*/
+
+	std::string connect_password;
 	clan_name_type badge;
 
-	auth_challenge_type auth_challenge;
 	rcon_level_type last_sent_rcon_level = rcon_level_type::DENIED;
 	bool verified_has_no_ban = false;
 

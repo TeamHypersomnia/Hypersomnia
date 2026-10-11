@@ -22,7 +22,7 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/official_servers_registry.h"
-#include "application/network/secure_connect.h"
+#include "application/masterserver/server_request_signing.h"
 #include "augs/misc/to_hex_str.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "augs/string/parse_url.h"
@@ -160,22 +160,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	};
 
 	/*
-		The official servers clients can get secure connect tokens for, by their address and by their WebRTC alias.
-		Rebuilt on the main thread whenever the list changes, read by the HTTP threads.
+		See server_request_signature.h.
 	*/
 
-	struct secure_connect_target {
-		std::string address;
-		std::string server_id;
-		augs::hmac_sha256_type netcode_key;
-	};
-
-	std::mutex secure_connect_targets_mutex;
-	std::unordered_map<std::string, secure_connect_target> secure_connect_targets;
-
-	std::mutex token_requests_mutex;
-	std::unordered_map<std::string, unsigned> token_requests_this_minute;
-	augs::timer since_token_requests_reset;
+	const auto cookies = masterserver_cookies();
 
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
@@ -402,35 +390,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	auto previous_peers = signalling_server::peer_map();
 
-	auto rebuild_secure_connect_targets = [&]() {
-		std::scoped_lock lk(secure_connect_targets_mutex);
-
-		secure_connect_targets.clear();
-
-		for (const auto& server : server_list) {
-			const auto& entry = server.second;
-
-			if (!entry.meta.is_official) {
-				continue;
-			}
-
-			if (const auto official = official_servers.find_by_server_id(entry.official_server_id)) {
-				const auto address = ::ToString(server.first);
-				const auto target = secure_connect_target { address, official->server_id, official->keys.netcode_key };
-
-				secure_connect_targets[address] = target;
-
-				if (!entry.meta.webrtc_id.empty()) {
-					secure_connect_targets[std::string(entry.meta.webrtc_id)] = target;
-				}
-			}
-		}
-	};
-
 	auto reserialize_list = [&]() {
 		// MSR_LOG("Reserializing the server list.");
-
-		rebuild_secure_connect_targets();
 
 		const auto peer_map = signalling.get_new_peers_map();
 
@@ -467,6 +428,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			meta.time_hosted = server.second.time_hosted;
 			meta.type = server_type::WEB;
 			meta.webrtc_id = webrtc_id_type(server.first);
+			meta.server_public_key = server.second.server_public_key;
 
 			augs::write_bytes(ss, ip_address);
 			augs::write_bytes(ss, meta);
@@ -516,6 +478,14 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.name = data.server_name;
 			next.ip = ::ToString(ip);
 			next.webrtc_id = meta.webrtc_id;
+
+			{
+				const bool has_key = std::any_of(meta.server_public_key.begin(), meta.server_public_key.end(), [](const auto b) { return b != 0; });
+
+				if (has_key) {
+					next.server_public_key = augs::bytes_to_hex(meta.server_public_key);
+				}
+			}
 
 			if (!next.webrtc_id.empty()) {
 				next.browser_connect_string = next.webrtc_id;
@@ -601,6 +571,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			meta.time_hosted = server.second.time_hosted;
 			meta.type = server_type::WEB;
 			meta.webrtc_id = webrtc_id_type(server.first);
+			meta.server_public_key = server.second.server_public_key;
 			
 			write_json_entry(
 				server.second.last_heartbeat,
@@ -719,7 +690,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		}
 	};
 
-	auto define_http_server = [&](auto& server, const bool encrypted) {
+	auto define_http_server = [&](auto& server) {
 		server.Get("/server_list_binary", [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
 
@@ -752,179 +723,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 		});
 
-		/*
-			A secure connect token for one official server, by its address or WebRTC alias.
-			Served over HTTPS (nginx in front), so the session keys inside reach only the client asking.
-		*/
-
-		server.Get("/connect_token", [&, encrypted](const Request& req, Response& res) {
-			set_cors(res);
-
-			const bool from_this_machine = 
-				req.remote_addr == "127.0.0.1" 
-				|| req.remote_addr == "::1" 
-				|| req.remote_addr == "::ffff:127.0.0.1"
-			;
-
-			/*
-				The token carries the session keys in the clear, so over plain HTTP it goes only to this machine -
-				nginx, which serves it over HTTPS - never straight to anyone who asks on the public port.
-			*/
-
-			if (!encrypted && !from_this_machine && !settings.connect_tokens_over_plain_http) {
-				res.status = 403;
-				return;
-			}
-
-			const auto requester = [&]() -> std::string {
-				const auto address = from_this_machine && req.has_header("X-Real-IP") ? req.get_header_value("X-Real-IP") : req.remote_addr;
-
-				/*
-					An IPv6 client usually has a whole /64 to rotate through, so it is limited as one.
-				*/
-
-				if (address.find(':') == std::string::npos || begins_with(address, "::ffff:")) {
-					return address;
-				}
-
-				const auto double_colon = address.find("::");
-				const auto head = address.substr(0, double_colon);
-				const auto tail = double_colon == std::string::npos ? std::string() : address.substr(double_colon + 2);
-
-				auto split = [](const std::string& s) {
-					auto out = std::vector<std::string>();
-					std::size_t start = 0;
-
-					while (!s.empty() && start <= s.size()) {
-						const auto end = s.find(':', start);
-						out.push_back(s.substr(start, end == std::string::npos ? std::string::npos : end - start));
-
-						if (end == std::string::npos) {
-							break;
-						}
-
-						start = end + 1;
-					}
-
-					return out;
-				};
-
-				const auto head_groups = split(head);
-				const auto tail_groups = split(tail);
-
-				auto groups = head_groups;
-
-				const auto missing = 8 - static_cast<int>(head_groups.size() + tail_groups.size());
-
-				for (int i = 0; i < missing; ++i) {
-					groups.push_back("0");
-				}
-
-				groups.insert(groups.end(), tail_groups.begin(), tail_groups.end());
-
-				std::string prefix;
-
-				for (std::size_t i = 0; i < 4 && i < groups.size(); ++i) {
-					prefix += groups[i] + ":";
-				}
-
-				return prefix + ":/64";
-			}();
-
-			{
-				std::scoped_lock lk(token_requests_mutex);
-
-				if (since_token_requests_reset.get<std::chrono::seconds>() >= 60.0) {
-					since_token_requests_reset.reset();
-					token_requests_this_minute.clear();
-				}
-
-				/*
-					Also a bound on the number of requesters, so that the map stays small whatever the number of addresses.
-					Once reached, only the requesters not yet counted this minute wait - the others keep their limit.
-				*/
-
-				const bool new_requester = !token_requests_this_minute.contains(requester);
-				const bool too_many_requesters = new_requester && token_requests_this_minute.size() >= 100000;
-
-				if (too_many_requesters || ++token_requests_this_minute[requester] > 30) {
-					res.status = 429;
-					return;
-				}
-			}
-
-			const auto requested = req.get_param_value("server");
-
-			const auto target = [&]() -> std::optional<secure_connect_target> {
-				std::scoped_lock lk(secure_connect_targets_mutex);
-
-				if (const auto found = mapped_or_nullptr(secure_connect_targets, requested)) {
-					return *found;
-				}
-
-				return std::nullopt;
-			}();
-
-			if (!target.has_value()) {
-				res.status = 404;
-				res.set_content("{\"error\":\"Not an official server.\"}", "application/json");
-				return;
-			}
-
-			const auto user_data = secure_connect::make_user_data(target->server_id);
-
-			if (!user_data.has_value()) {
-				res.status = 500;
-				return;
-			}
-
-			const auto client_id = [&]() {
-				thread_local auto device = std::random_device();
-				return (static_cast<uint64_t>(device()) << 32) | static_cast<uint64_t>(device());
-			}();
-
-			auto token = std::array<uint8_t, NETCODE_CONNECT_TOKEN_BYTES>();
-			auto user_data_copy = *user_data;
-			const char* address = target->address.c_str();
-
-			/*
-				No netcode timeout, the same as the clients' own insecure tokens - the game times connections out itself.
-			*/
-
-			const auto result = netcode_generate_connect_token(
-				1,
-				&address,
-				&address,
-				secure_connect::token_lifetime_secs,
-				-1,
-				client_id,
-				DEFAULT_GAME_PORT_V,
-				target->netcode_key.data(),
-				user_data_copy.data(),
-				token.data()
-			);
-
-			if (result != NETCODE_OK) {
-				LOG("Failed to generate a connect token for %x (%x).", target->server_id, target->address);
-				res.status = 500;
-				return;
-			}
-
-			const auto json = typesafe_sprintf(
-				"{\"client_id\":\"%x\",\"server_id\":\"%x\",\"token\":\"%x\"}",
-				client_id,
-				target->server_id,
-				::get_hex_representation(token.data(), token.size())
-			);
-
-			res.set_content(json, "application/json");
-		});
-
-		server.Options("/connect_token", [](const httplib::Request&, httplib::Response& res) {
-			set_cors(res);
-			res.status = 204;
-		});
-
 		server.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
 			set_cors(res);
 			res.status = 204;
@@ -936,10 +734,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		});
 	};
 
-	define_http_server(*http_ptr, fallback_http_ptr != nullptr);
+	define_http_server(*http_ptr);
 
 	if (fallback_http_ptr) {
-		define_http_server(*fallback_http_ptr, false);
+		define_http_server(*fallback_http_ptr);
 	}
 
 	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
@@ -952,10 +750,14 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	std::optional<std::thread> fallback_listening_thread;
 
 	if (fallback_http_ptr) {
-		LOG("Hosting a FALLBACK HTTP server list at port: %x (HTTP)", settings.fallback_http_server_list_port);
+		/*
+			Plain HTTP only for this machine - hypersomnia.io reads the list from here. Everyone else gets HTTPS.
+		*/
+
+		LOG("Hosting a FALLBACK HTTP server list at 127.0.0.1:%x (HTTP)", settings.fallback_http_server_list_port);
 
 		fallback_listening_thread = std::thread([&fallback_http_ptr, in_settings=settings]() {
-			fallback_http_ptr->listen(in_settings.ip.c_str(), in_settings.fallback_http_server_list_port);
+			fallback_http_ptr->listen("127.0.0.1", in_settings.fallback_http_server_list_port);
 			LOG("The fallback HTTP listening thread has quit.");
 		});
 	}
@@ -1026,27 +828,25 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 					if constexpr(std::is_same_v<R, masterserver_in::goodbye>) {
 						if (const auto entry = mapped_or_nullptr(server_list, from)) {
 							/*
-								An official server can only be removed with its own signature,
-								otherwise a goodbye from a spoofed address could take it off the list.
+								Only the server itself takes itself off the list: signed with the key it is listed with,
+								and with a fresh cookie for its address - so neither a spoofed nor a recorded goodbye works.
 							*/
 
-							if (entry->meta.is_official_server()) {
-								const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ::ToString(from));
+							const bool authentic = 
+								::server_request_signature_valid(typed_request)
+								&& typed_request.signature->server_public_key == entry->meta.server_public_key
+								&& cookies.valid(typed_request.signature->cookie, from)
+							;
 
-								if (signer == nullptr || signer->server_id != entry->official_server_id) {
-									static uint64_t last_logged_ms = 0;
+							if (!authentic) {
+								static uint64_t last_logged_ms = 0;
 
-									if (::official_log_allowed(last_logged_ms)) {
-										LOG("Ignoring an unauthenticated goodbye for the official server at %x.", ::ToString(from));
-									}
-									return;
+								if (::official_log_allowed(last_logged_ms)) {
+									LOG("Ignoring an unauthenticated goodbye for the server at %x.", ::ToString(from));
 								}
-							}
 
-							/*
-								TODO_SECURITY: a community server's goodbye is not authenticated -
-								anyone spoofing its address can take it off the list until its next heartbeat.
-							*/
+								return;
+							}
 
 							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
 							remove_from_list(from);
@@ -1065,68 +865,67 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 						if (typed_request.is_valid()) {
 							const auto ip_str = ::ToString(from);
-							const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ip_str);
 
 							/*
-								Only the official server itself can update its entry,
-								otherwise a heartbeat from a spoofed address could rename it or change its ranked status.
-								A revoked or misconfigured official server thus times out and then gets listed as a community one.
+								Signed by the key the server is listed with - see server_request_signature.h.
+								Without a fresh cookie for this address the heartbeat changes nothing:
+								it gets a cookie back, and the server sends again with it.
 							*/
 
-							if (signer == nullptr) {
-								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
-									static uint64_t last_logged_ms = 0;
+							if (!::server_request_signature_valid(typed_request)) {
+								static uint64_t last_logged_ms = 0;
 
-									if (::official_log_allowed(last_logged_ms)) {
-										LOG("Ignoring an unauthenticated heartbeat from the official server at %x.", ip_str);
-									}
-									return;
+								if (::official_log_allowed(last_logged_ms)) {
+									LOG("Ignoring an unsigned or badly signed heartbeat from %x.", ip_str);
 								}
 
-								/*
-									A signature that fails (a replay, a request delayed past a newer one, a clock off)
-									must not list the server as a community one under its official name either.
-								*/
-
-								if (typed_request.signature.has_value()) {
-									static uint64_t last_logged_ms = 0;
-
-									if (::official_log_allowed(last_logged_ms)) {
-										LOG("Ignoring a heartbeat with an invalid signature from %x.", ip_str);
-									}
-									return;
-								}
+								return;
 							}
-							else {
-								/*
-									The secret of one official server must not take over the entry of another
-									(their operators are not all the same people), and one official server is listed
-									at one address only - otherwise anyone who saw its signed heartbeat could
-									send it first from their own address.
-								*/
 
-								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
-									if (existing->official_server_id != signer->server_id) {
-										static uint64_t last_logged_ms = 0;
+							const auto& public_key = typed_request.signature->server_public_key;
+							const auto official_id = official_servers.find(public_key);
 
-										if (::official_log_allowed(last_logged_ms)) {
-											LOG("Ignoring a heartbeat signed by %x for the official server %x at %x.", signer->server_id, existing->official_server_id, ip_str);
-										}
-										return;
-									}
-								}
+							auto ack = masterserver_out::heartbeat_ack();
+							ack.cookie = cookies.make(from);
+							ack.official = official_id != nullptr;
+
+							if (!cookies.valid(typed_request.signature->cookie, from)) {
+								send_back(ack);
+								return;
+							}
+
+							/*
+								At most 32 servers from one address (e.g. the instances of one host), so that nobody fills the list.
+							*/
+
+							if (!found_in(server_list, from)) {
+								std::size_t from_this_ip = 0;
 
 								for (const auto& other : server_list) {
-									if (other.first != from && other.second.meta.is_official_server() && other.second.official_server_id == signer->server_id) {
-										static uint64_t last_logged_ms = 0;
+									auto a_ip = other.first;
+									auto b_ip = from;
+									a_ip.port = 0;
+									b_ip.port = 0;
 
-										if (::official_log_allowed(last_logged_ms)) {
-											LOG("Ignoring a heartbeat signed by %x from %x: it is already listed at %x.", signer->server_id, ip_str, ::ToString(other.first));
-										}
-										return;
+									if (a_ip == b_ip) {
+										++from_this_ip;
 									}
 								}
+
+								if (from_this_ip >= 32) {
+									static uint64_t last_logged_ms = 0;
+
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Ignoring a new server at %x: already 32 servers from this address.", ip_str);
+									}
+
+									send_back(ack);
+									return;
+								}
 							}
+
+							ack.accepted = true;
+							send_back(ack);
 
 							auto it = server_list.try_emplace(from);
 
@@ -1135,15 +934,22 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							const auto heartbeat_before = server_entry.last_heartbeat;
 							const bool was_official = server_entry.meta.is_official;
+							const auto key_before = server_entry.meta.server_public_key;
+
 							server_entry.last_heartbeat = typed_request;
 							server_entry.last_heartbeat.signature.reset();
 							server_entry.time_last_heartbeat = current_time;
-							server_entry.official_server_id = signer != nullptr ? signer->server_id : std::string();
+							server_entry.official_server_id = official_id != nullptr ? *official_id : std::string();
 
-							server_entry.meta.is_official = signer != nullptr;
+							/*
+								Another key at the same address (e.g. a reinstalled server) simply replaces the entry.
+							*/
+
+							server_entry.meta.server_public_key = public_key;
+							server_entry.meta.is_official = official_id != nullptr;
 							{
 								const auto domain = std::string(typed_request.domain);
-								server_entry.meta.domain = ::is_acceptable_domain(domain, signer != nullptr) ? typed_request.domain : decltype(typed_request.domain)();
+								server_entry.meta.domain = ::is_acceptable_domain(domain, official_id != nullptr) ? typed_request.domain : decltype(typed_request.domain)();
 							}
 
 							if (server_entry.meta.is_official_server()) {
@@ -1160,6 +966,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							const bool heartbeats_mismatch = 
 								heartbeat_before != server_entry.last_heartbeat
 								|| was_official != server_entry.meta.is_official
+								|| key_before != server_entry.meta.server_public_key
 							;
 
 							if (is_new_server) {
@@ -1203,26 +1010,18 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				std::visit(handle, request);
 			}
 			/*
-				An official server is only ever removed by its signed goodbye or a timeout -
+				A server is only ever removed by its signed goodbye or a timeout -
 				anyone can send garbage with its address spoofed as the source.
 			*/
 
 			catch (const std::exception& err) {
 				if (const auto entry = mapped_or_nullptr(server_list, from)) {
 					LOG("The server at %x (%x) has sent invalid data: %x", ::ToString(from), entry->last_heartbeat.server_name, err.what());
-
-					if (!entry->meta.is_official) {
-						remove_from_list(from);
-					}
 				}
 			}
 			catch (...) {
 				if (const auto entry = mapped_or_nullptr(server_list, from)) {
 					LOG("The server at %x (%x) has sent invalid data: unknown error.", ::ToString(from), entry->last_heartbeat.server_name);
-
-					if (!entry->meta.is_official) {
-						remove_from_list(from);
-					}
 				}
 			}
 		};
@@ -1259,18 +1058,20 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		if (keep_official_servers_up_to_date()) {
 			/*
-				A server whose secret was removed or changed is no longer official right away,
-				instead of until it times out.
+				A server whose key was removed is no longer official right away, instead of until it times out -
+				and one whose key was just added is official right away.
 			*/
 
 			for (auto& server : server_list) {
 				auto& entry = server.second;
+				const auto official_id = official_servers.find(entry.meta.server_public_key);
+				const bool now_official = official_id != nullptr;
 
-				if (entry.meta.is_official && official_servers.find_by_server_id(entry.official_server_id) == nullptr) {
-					LOG("The server at %x is no longer official.", ::ToString(server.first));
+				if (entry.meta.is_official != now_official) {
+					LOG("The server at %x is %x.", ::ToString(server.first), now_official ? "now official" : "no longer official");
 
-					entry.meta.is_official = false;
-					entry.official_server_id.clear();
+					entry.meta.is_official = now_official;
+					entry.official_server_id = now_official ? *official_id : std::string();
 				}
 			}
 

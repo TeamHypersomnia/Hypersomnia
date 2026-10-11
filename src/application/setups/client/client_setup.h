@@ -52,7 +52,7 @@
 #include "application/main/auth_provider_type.h"
 #include "application/gui/ingame_menu_button_type.h"
 #include "augs/misc/async_response.h"
-#include "application/network/secure_connect.h"
+#include "application/main/identity_session.h"
 #include "game/messages/hud_message.h"
 
 #include "steam_rich_presence_pairs.h"
@@ -76,13 +76,26 @@ struct arena_download_input {
 struct webrtc_client_detail;
 
 /*
-	Asks the masterserver for a secure connect token before connecting.
-	Without one, a required secure connection (ranked) fails, otherwise the client connects insecurely.
+	What the game tells a client about who the player is and what server it expects - see identity_session.h.
 */
 
-struct secure_connect_request {
-	std::string provider_url;
-	bool required = false;
+struct client_identity_context {
+	std::shared_ptr<identity_session> session;
+	identity_session::input input;
+
+	/*
+		From the server list; none when connecting by address, to take whatever key the server presents.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> expected_server_public_key;
+
+	/*
+		The password saved for this server's key, if any - never sent to another key.
+	*/
+
+	std::string password;
+
+	bool is_ranked = false;
 };
 
 class client_setup : 
@@ -112,41 +125,13 @@ class client_setup :
 
 	std::vector<special_client_request> pending_requests;
 
-	std::optional<steam_auth_ticket> pending_steam_auth;
-	std::optional<web_auth_data> pending_web_auth;
+	client_identity_context identity;
+	bool sent_password = false;
 
 	/*
-		Set for the players without Steam - see identity_key.h.
-		The key is only loaded, or created, once a secure connection asks for authentication.
+		Whether ranked is required by the server - from server_auth_state.
 	*/
 
-	std::optional<augs::path_type> identity_key_path;
-	bool identity_key_signed = false;
-	std::optional<std::vector<std::byte>> pending_key_auth;
-
-	/*
-		The challenge of the server to request the Steam ticket for - see server_auth_state.
-		Requested once per connection.
-	*/
-
-	std::optional<std::string> steam_auth_identity_to_request;
-	bool steam_auth_identity_received = false;
-
-	std::optional<secure_connect_request> secure_request;
-	augs::future<std::optional<fetched_connect_token>> secure_token_fetch;
-
-	/*
-		The web build is single-threaded and can only fetch asynchronously.
-	*/
-
-	augs::async_response_ptr secure_token_web_fetch;
-
-	/*
-		The official server this client is securely connected to, if any.
-		Authentication only ever goes over a secure connection - see secure_connect.h.
-	*/
-
-	std::optional<std::string> secure_server_id;
 	bool server_requires_authentication = false;
 
 	bool now_resyncing = false;
@@ -271,7 +256,6 @@ class client_setup :
 	}
 
 	void handle_incoming_payloads();
-	void send_pending_auth_tickets();
 	void send_pending_commands();
 	void send_packets();
 	void exchange_file_packets();
@@ -696,7 +680,7 @@ public:
 		const client_vars& initial_vars,
 		port_type preferred_binding_port,
 		const std::string& webrtc_signalling_server_url,
-		const std::optional<secure_connect_request>& secure_request
+		const client_identity_context& identity
 	);
 
 	~client_setup();
@@ -807,7 +791,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(official, in_string, disp_backup, vars_backup, port_type(0), "", std::nullopt);
+					new (this) client_setup(official, in_string, disp_backup, vars_backup, port_type(0), "", client_identity_context());
 				}
 
 				demo_player = std::move(player_backup);
@@ -840,7 +824,6 @@ public:
 		}
 
 		if (downloading) {
-			send_pending_auth_tickets();
 
 			if (is_trying_external_download()) {
 				if (send_keepalive_download_progress()) {
@@ -1008,11 +991,20 @@ public:
 	std::string get_connect_string() const;
 	std::string get_steam_join_command_line() const;
 
-	void send_auth_ticket(const steam_auth_ticket&);
-	std::optional<std::string> consume_steam_auth_identity();
-	bool is_connected_securely() const;
-	void use_identity_key(const augs::path_type& path);
-	void send_auth_ticket(const web_auth_data&);
+	/*
+		The key the server presented, once the handshake got that far - e.g. to save its password under.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+
+	/*
+		Kicked for a wrong password without having sent any - e.g. joined by address, so its saved password
+		could not be picked before the server's key was known. The game then retries with the one saved for that key.
+	*/
+
+	bool kicked_for_password_not_sent() const {
+		return wrong_password_kick && !sent_password;
+	}
 
 	bool is_ranked_live_or_starting() const;
 	bool would_abandon_match() const;

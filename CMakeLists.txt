@@ -717,6 +717,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/hmac_sha256.cpp"
 	"src/augs/misc/ed25519.cpp"
 	"src/application/main/identity_key.cpp"
+	"src/application/network/identity_cert.cpp"
+	"src/application/main/identity_session.cpp"
 	"src/augs/string/path_sanitization.cpp"
 	"src/application/config_json_table.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
@@ -1192,7 +1194,6 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/sodium"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/serialize"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo"
@@ -2392,20 +2393,29 @@ if (BUILD_NETWORKING)
 	message("Building Networking.")
 
 	if (MSVC OR BUILD_FOR_WEB)
-		file(GLOB_RECURSE SODIUM_SOURCE_FILES "src/3rdparty/yojimbo/sodium/*.c")
+		# Whole libsodium 1.0.22 sources, unmodified, in their portable form (no SIMD variants without configure's HAVE_* macros).
+		file(GLOB_RECURSE SODIUM_SOURCE_FILES "src/3rdparty/libsodium/*.c")
 
-		if (NOT BUILD_FOR_WEB)
-			set_source_files_properties(${SODIUM_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-mssse3 -msse4.1")
-		endif()
 		add_library(sodium STATIC ${SODIUM_SOURCE_FILES})
+		target_compile_definitions(sodium PUBLIC SODIUM_STATIC)
+
+		if (MSVC)
+			target_compile_options(sodium PRIVATE /w)
+		else()
+			target_compile_options(sodium PRIVATE -w)
+		endif()
+
+		target_include_directories(sodium PUBLIC "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include" PRIVATE "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include/sodium")
 		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()
 		prefer_static_libraries()
 
 		find_library(SODIUM NAMES sodium)
+		find_path(SODIUM_INCLUDE_DIR NAMES sodium.h)
 
 		prefer_shared_libraries()
 
+		target_include_directories(Hypersomnia PRIVATE "${SODIUM_INCLUDE_DIR}")
 		list(APPEND HYPERSOMNIA_LIBS ${SODIUM})
 	endif()
 endif()

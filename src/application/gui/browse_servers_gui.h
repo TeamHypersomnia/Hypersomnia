@@ -25,7 +25,11 @@ struct browse_servers_input {
 	const faction_view_settings& faction_view;
 	const bool streamer_mode;
 
-	const std::string& current_server_password;
+	/*
+		Whether a password is saved for the key of this server - else a server that requires one asks for it first.
+	*/
+
+	std::function<bool(const server_list_entry&)> has_saved_password;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
@@ -58,7 +62,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 		const std::vector<server_list_entry*>&,
 		const faction_view_settings&,
 		const bool streamer_mode,
-		const std::string& current_server_password
+		const std::function<bool(const server_list_entry&)>& has_saved_password
 	);
 
 	std::optional<std::string> requested_connection;
@@ -67,6 +71,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::optional<server_list_entry> pending_password_entry;
 	std::string password_prompt_input;
 	std::optional<std::string> pending_password_save;
+	std::optional<server_list_entry> pending_password_save_entry;
 
 	net_time_t when_last_started_refreshing_server_list = 0;
 	net_time_t when_last_updated_time_to_events = 0;
@@ -147,9 +152,19 @@ public:
 
 	bool refresh_in_progress() const;
 
-	std::optional<std::string> take_pending_password_save() {
-		auto out = std::move(pending_password_save);
+	/*
+		A password entered before connecting, with the server it was entered for.
+	*/
+
+	std::optional<std::pair<std::string, server_list_entry>> take_pending_password_save() {
+		auto out = std::optional<std::pair<std::string, server_list_entry>>();
+
+		if (pending_password_save.has_value() && pending_password_save_entry.has_value()) {
+			out = std::make_pair(*pending_password_save, *pending_password_save_entry);
+		}
+
 		pending_password_save.reset();
+		pending_password_save_entry.reset();
 		return out;
 	}
 };

@@ -76,6 +76,20 @@ struct server_list_entry {
 		return meta.is_official_server();
 	}
 
+	/*
+		The key from the server list, if the masterserver gave one - what the client expects in the handshake.
+	*/
+
+	std::optional<std::array<uint8_t, 32>> get_public_key() const {
+		for (const auto b : meta.server_public_key) {
+			if (b != 0) {
+				return meta.server_public_key;
+			}
+		}
+
+		return std::nullopt;
+	}
+
 	std::string get_my_connect_string() const;
 
 	std::string get_web_connect_string() const;

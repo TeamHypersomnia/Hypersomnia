@@ -25,10 +25,6 @@
 #include "application/main/identity_key.h"
 
 namespace identity_key {
-	std::string signed_message(const std::string& auth_identity) {
-		return "hypersomnia-auth-v1 " + auth_identity;
-	}
-
 	std::string link_message(const std::string& code, const std::string& steam_account) {
 		return "hypersomnia-link-v1 " + code + " " + steam_account;
 	}
@@ -39,43 +35,6 @@ namespace identity_key {
 
 	std::string account_id(const augs::ed25519_public_key_type& public_key) {
 		return augs::bytes_to_hex(public_key);
-	}
-
-	std::vector<std::byte> to_bytes(const ticket& t) {
-		auto out = std::vector<std::byte>(t.public_key.size() + t.signature.size());
-
-		std::memcpy(out.data(), t.public_key.data(), t.public_key.size());
-		std::memcpy(out.data() + t.public_key.size(), t.signature.data(), t.signature.size());
-
-		return out;
-	}
-
-	std::optional<ticket> from_bytes(const std::vector<std::byte>& bytes) {
-		auto out = ticket();
-
-		if (bytes.size() != out.public_key.size() + out.signature.size()) {
-			return std::nullopt;
-		}
-
-		std::memcpy(out.public_key.data(), bytes.data(), out.public_key.size());
-		std::memcpy(out.signature.data(), bytes.data() + out.public_key.size(), out.signature.size());
-
-		return out;
-	}
-
-	std::optional<ticket> sign(const augs::ed25519_seed_type& seed, const std::string& auth_identity) {
-		const auto public_key = augs::ed25519_public_key(seed);
-		const auto signature = augs::ed25519_sign(seed, signed_message(auth_identity));
-
-		if (!public_key.has_value() || !signature.has_value()) {
-			return std::nullopt;
-		}
-
-		return ticket { *public_key, *signature };
-	}
-
-	bool verify(const ticket& t, const std::string& auth_identity) {
-		return augs::ed25519_verify(t.public_key, signed_message(auth_identity), t.signature);
 	}
 
 	std::string to_export_string(const augs::ed25519_seed_type& seed) {
@@ -463,7 +422,7 @@ TEST_CASE("Identity key export string round trip, with whitespace around") {
 
 TEST_CASE("Identity key files are created once, replaced and forgotten only with a backup") {
 	const auto dir = std::filesystem::temp_directory_path() / ("hypersomnia-identity-key-test-" + std::to_string(std::random_device()()));
-	const auto path = dir / "identity.key";
+	const auto path = dir / "account.key";
 
 	const auto created = identity_key::load_or_create(path);
 	REQUIRE(created.has_value());

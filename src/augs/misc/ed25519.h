@@ -7,8 +7,8 @@
 
 namespace augs {
 	/*
-		Ed25519 through OpenSSL. Every function returns std::nullopt or false
-		on builds without OpenSSL (e.g. the web) or if OpenSSL fails.
+		Ed25519 through libsodium. Every function returns std::nullopt or false
+		on builds without networking or if libsodium fails.
 
 		The private key is kept as its 32-byte seed, the form RFC 8032 defines it in.
 	*/

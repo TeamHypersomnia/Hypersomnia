@@ -1,10 +1,15 @@
 #pragma once
+#include <array>
 #include <cstdint>
 
 enum class server_type : uint8_t {
 	NATIVE,
 	WEB
 };
+
+/*
+	server_public_key: the Ed25519 key the server signs its heartbeats with and seals its handshakes to; all zero if unknown.
+*/
 
 struct masterserver_entry_meta {
 	static constexpr bool force_read_field_by_field = true;
@@ -15,6 +20,7 @@ struct masterserver_entry_meta {
 	host_string_type domain;
 	webrtc_id_type webrtc_id;
 	server_type type = server_type::NATIVE;
+	std::array<uint8_t, 32> server_public_key = {};
 	// END GEN INTROSPECTOR
 
 	bool is_community_server() const {

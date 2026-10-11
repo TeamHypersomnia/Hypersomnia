@@ -616,7 +616,7 @@ void browse_servers_gui_state::show_server_list(
 	const std::vector<server_list_entry*>& server_list,
 	const faction_view_settings& faction_view,
 	const bool streamer_mode,
-	const std::string& current_server_password
+	const std::function<bool(const server_list_entry&)>& has_saved_password
 ) {
 	using namespace augs::imgui;
 
@@ -765,7 +765,7 @@ void browse_servers_gui_state::show_server_list(
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
-				if (d.require_password && current_server_password.empty()) {
+				if (d.require_password && !(has_saved_password && has_saved_password(s))) {
 					pending_password_entry = s;
 					password_prompt_input.clear();
 				}
@@ -1218,18 +1218,18 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (has_local_servers) {
 			header_or_separator(local_servers_label, green);
-			show_server_list("local", local_server_list, in.faction_view, in.streamer_mode, in.current_server_password);
+			show_server_list("local", local_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
 		}
 
 		if (has_tournament_servers) {
 			header_or_separator(tournament_servers_label, cyan);
-			show_server_list("tournament", tournament_server_list, in.faction_view, in.streamer_mode, in.current_server_password);
+			show_server_list("tournament", tournament_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
 		}
 
 		header_or_separator(official_servers_label, yellow);
 
 		if (has_official_servers) {
-			show_server_list("official", official_server_list, in.faction_view, in.streamer_mode, in.current_server_password);
+			show_server_list("official", official_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
 		}
 		else {
 			ImGui::NextColumn();
@@ -1240,7 +1240,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		separate_with_label_only(community_servers_label, orange);
 
 		if (has_community_servers) {
-			show_server_list("community", community_server_list, in.faction_view, in.streamer_mode, in.current_server_password);
+			show_server_list("community", community_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
 		}
 		else {
 			ImGui::NextColumn();
@@ -1316,7 +1316,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				LOG("Chosen server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
 
-				if (s.heartbeat.require_password && in.current_server_password.empty()) {
+				if (s.heartbeat.require_password && !(in.has_saved_password && in.has_saved_password(s))) {
 					pending_password_entry = s;
 					password_prompt_input.clear();
 				}
@@ -1412,6 +1412,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				displayed_connecting_server_name = pending_password_entry->heartbeat.server_name;
 				requested_connection = pending_password_entry->get_my_connect_string();
 				pending_password_save = password_prompt_input;
+				pending_password_save_entry = pending_password_entry;
 				pending_password_entry.reset();
 				ImGui::CloseCurrentPopup();
 			}

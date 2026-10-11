@@ -93,6 +93,7 @@ Options:
                                 --verify-updater Hypersomnia-for-Windows.exe --signature Hypersomnia-for-Windows.exe.sig
 
     --unit-tests-only           Perform unit tests only and quit.
+    --print-server-key          Print this server's public key (server.key in the user folder, made if missing) and quit.
     --connect [ADDRESS]         Connect to an arena server in accordance with client_start inside the config file.
                                 The ADDRESS argument is optional - if specified, it will override the custom_address field from the config file.
     --server                    Host an arena server in accordance with server_start inside the config file.

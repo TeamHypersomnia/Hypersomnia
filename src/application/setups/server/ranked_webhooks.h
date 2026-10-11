@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/misc/date_time.h"
 #include "augs/misc/secure_hash.h"
 
 namespace ranked_webhooks {
@@ -20,6 +21,10 @@ namespace ranked_webhooks {
 		/* Hex string of the random 64-bit match id, for deduplicating reports (e.g. after a crash recovery). */
 		writer.Key("match_id");
 		writer.String(augs::bytes_to_hex(info.ranked_match_id).c_str());
+
+		/* When the report was made: the site accepts it for a few days, and the signature covers it. */
+		writer.Key("reported_at");
+		writer.Uint64(static_cast<uint64_t>(augs::date_time::secs_since_epoch()));
 
 		writer.Key("match_start_date");
 		writer.String(info.match_start_timestamp.c_str());

@@ -7,8 +7,6 @@
 
 #include "augs/log.h"
 #include "augs/misc/async_get.h"
-#include "application/network/secure_connect.h"
-#include "application/main/identity_key.h"
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
 
@@ -700,12 +698,17 @@ bool client_setup::is_webrtc() const {
 }
 
 bool client_setup::pending_pre_connection_handshake() const {
-	if (secure_token_fetch.valid() && !is_ready(secure_token_fetch)) {
-		return true;
-	}
+	/*
+		A cert already on its way is waited for a moment - and for ranked, which needs it, until it comes or fails.
+	*/
 
-	if (secure_token_web_fetch != nullptr && !secure_token_web_fetch->is_ready()) {
-		return true;
+	if (identity.session != nullptr && identity.session->request_in_flight()) {
+		const auto waited = get_current_time() - when_initiated_connection;
+		const auto limit = identity.is_ranked ? 20.0 : 3.0;
+
+		if (waited < limit) {
+			return true;
+		}
 	}
 
 	return is_webrtc() && !webrtc_client->is_ready();
@@ -724,7 +727,7 @@ client_setup::client_setup(
 	const client_vars& initial_vars,
 	const port_type preferred_binding_port,
 	const std::string& webrtc_signalling_server_url,
-	const std::optional<secure_connect_request>& secure_request
+	const client_identity_context& identity
 ) : 
 	official(official),
 	connect_string(connect_string),
@@ -778,50 +781,11 @@ client_setup::client_setup(
 		LOG("Connecting directly without WebRTC.");
 	}
 
-	this->secure_request = secure_request;
+	this->identity = identity;
 
-#if PLATFORM_WEB
-	if (secure_request.has_value() && !is_opening_demo && use_webrtc) {
-		if (const auto provider = parsed_url(secure_request->provider_url); provider.valid()) {
-			LOG("Requesting a secure connect token for %x.", webrtc_id);
-			secure_token_web_fetch = augs::async_get(provider.get_base_url(), provider.location + "?server=" + webrtc_id);
-		}
+	if (identity.is_ranked && identity.session != nullptr && !identity.session->has_broker_cert(augs::steady_secs())) {
+		identity.session->retry_now();
 	}
-#else
-	if (secure_request.has_value() && !is_opening_demo) {
-		secure_token_fetch = launch_async(
-			[provider = secure_request->provider_url, in_connect_string = connect_string, use_webrtc, webrtc_id]() -> std::optional<fetched_connect_token> {
-				const auto target = [&]() -> std::optional<std::string> {
-					if (use_webrtc) {
-						return webrtc_id;
-					}
-
-#if PLATFORM_WEB
-					return std::nullopt;
-#else
-					host_with_default_port in;
-					in.address = in_connect_string;
-					in.default_port = DEFAULT_GAME_PORT_V;
-
-					const auto resolved = resolve_address(in);
-
-					if (resolved.result != resolve_result_type::OK) {
-						return std::nullopt;
-					}
-
-					return ::ToString(resolved.addr);
-#endif
-				}();
-
-				if (!target.has_value()) {
-					return std::nullopt;
-				}
-
-				return connect_token_fetch::fetch(provider, *target);
-			}
-		);
-	}
-#endif
 
 	LOG("Initializing connection with %x", connect_string);
 
@@ -882,34 +846,32 @@ void client_setup::connect() {
 
 	augs::network::enable_detailed_logs(true);
 
-	auto secure_token = std::optional<fetched_connect_token>();
+	auto connect_identity = client_connect_identity();
+	connect_identity.expected_server_public_key = identity.expected_server_public_key;
 
-	if (secure_token_fetch.valid()) {
-		secure_token = secure_token_fetch.get();
-	}
+	auto blob = identity_cert::connect_blob();
+	blob.password = identity.password;
 
-	if (secure_token_web_fetch != nullptr) {
-		const auto response = augs::get_once(secure_token_web_fetch);
+	if (identity.session != nullptr) {
+		blob.identity = identity.session->cert_for_connect(identity.input, augs::steady_secs());
 
-		if (httplib_utils::successful(response.status)) {
-			secure_token = connect_token_fetch::parse(response.body);
-		}
-
-		if (!secure_token.has_value()) {
-			LOG("Couldn't get a secure connect token. Status: %x", response.status);
+		if (blob.identity.has_value()) {
+			LOG("Connecting as %x.", blob.identity->account);
+			connect_identity.session_secret_key = identity.session->session_secret_key();
 		}
 	}
 
-	if (secure_request.has_value() && secure_request->required && !secure_token.has_value()) {
-		set_disconnect_reason("Couldn't get a secure connection to this server.\nMake sure the game can reach hypersomnia.io and try again.");
+	if (const auto written = identity_cert::write_blob(blob)) {
+		connect_identity.blob = *written;
+	}
+	else {
+		set_disconnect_reason("The server password is too long.");
 		return;
 	}
 
-	if (secure_token.has_value()) {
-		secure_server_id = secure_token->server_id;
-	}
+	sent_password = !blob.password.empty();
 
-	const auto resolution = adapter->connect(connect_string, secure_token);
+	const auto resolution = adapter->connect(connect_string, connect_identity);
 
 	if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 		const auto reason = typesafe_sprintf(
@@ -1421,114 +1383,6 @@ void client_setup::advance_demo_recorder() {
 #endif
 }
 
-void client_setup::send_pending_auth_tickets() { 
-	if (!connect_called) {
-		/*
-			Still getting the connect token - only then is it known whether the connection is secure.
-		*/
-
-		return;
-	}
-
-	if (!is_connected_securely()) {
-		if (pending_steam_auth.has_value() || pending_web_auth.has_value() || pending_key_auth.has_value()) {
-			LOG("Not sending authentication over an insecure connection.");
-			pending_steam_auth.reset();
-			pending_web_auth.reset();
-			pending_key_auth.reset();
-		}
-
-		return;
-	}
-
-	auto send_pending_steam_auth = [&]() {
-		if (!pending_steam_auth.has_value()) {
-			return;
-		}
-
-		auto& ticket = *pending_steam_auth;
-
-		if (!ticket.successful()) {
-			/*
-				Where authentication is optional, it only goes without the badge.
-			*/
-
-			if (!server_requires_authentication) {
-				LOG("Couldn't authenticate Steam account. Error code: %x. Not required by the server.", ticket.result);
-				pending_steam_auth.reset();
-				return;
-			}
-
-			const auto reason = typesafe_sprintf(
-				"Couldn't authenticate Steam account.\nError code: %x",
-				ticket.result
-			);
-
-			set_disconnect_reason(reason, true);
-			disconnect();
-
-			return;
-		}
-
-		LOG("Correct auth ticket received. Sending ticket to server.");
-
-		send_payload(
-			game_channel_type::RELIABLE_MESSAGES,
-
-			auth_request_payload({ 
-				auth_provider_type::STEAM_NATIVE,
-				ticket.ticket_bytes 
-			})
-		);
-
-		pending_steam_auth.reset();
-	};
-
-	auto send_pending_web_auth = [&]() {
-		if (!pending_web_auth.has_value()) {
-			return;
-		}
-
-		auto& ticket = *pending_web_auth;
-
-		LOG("Sending %x web auth ticket to server.", ticket.type);
-
-		send_payload(
-			game_channel_type::RELIABLE_MESSAGES,
-
-			auth_request_payload({ 
-				ticket.type,
-				augs::string_to_bytes(ticket.auth_token)
-			})
-		);
-
-		pending_web_auth.reset();
-	};
-
-	auto send_pending_key_auth = [&]() {
-		if (!pending_key_auth.has_value()) {
-			return;
-		}
-
-		LOG("Sending the identity key signature to the server.");
-
-		send_payload(
-			game_channel_type::RELIABLE_MESSAGES,
-
-			auth_request_payload({ 
-				auth_provider_type::KEY,
-				*pending_key_auth
-			})
-		);
-
-		pending_key_auth.reset();
-	};
-
-	send_pending_steam_auth();
-	send_pending_web_auth();
-	send_pending_key_auth();
-}
-
 void client_setup::send_pending_commands() {
 	using C = client_state_type;
 
@@ -1554,8 +1408,6 @@ void client_setup::send_pending_commands() {
 		when_sent_client_settings = client_time;
 		current_requested_settings = requested_settings;
 	};
-
-	send_pending_auth_tickets();
 
 	if (!is_connected()) {
 		return;
@@ -2208,7 +2060,6 @@ void client_setup::apply(const config_json_table& cfg) {
 	auto& r = requested_settings;
 	r.chosen_nickname = get_nickname();
 	r.platform_type = ::u8_get_client_platform_type(vars.suppress_webhooks);
-	r.server_password = vars.server_password;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;
 	r.public_settings.clan = cfg.client.clan;
@@ -2496,26 +2347,8 @@ std::string client_setup::get_connect_string() const {
 	return connect_string;
 }
 
-void client_setup::send_auth_ticket(const steam_auth_ticket& ticket) {
-	pending_steam_auth = ticket;
-}
-
-void client_setup::send_auth_ticket(const web_auth_data& ticket) {
-	pending_web_auth = ticket;
-}
-
-void client_setup::use_identity_key(const augs::path_type& path) {
-	identity_key_path = path;
-}
-
-bool client_setup::is_connected_securely() const {
-	return secure_server_id.has_value();
-}
-
-std::optional<std::string> client_setup::consume_steam_auth_identity() {
-	auto result = steam_auth_identity_to_request;
-	steam_auth_identity_to_request.reset();
-	return result;
+std::optional<augs::ed25519_public_key_type> client_setup::get_server_public_key() const {
+	return adapter->get_server_public_key();
 }
 
 bool client_setup::is_ranked_live_or_starting() const {

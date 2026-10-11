@@ -325,8 +325,6 @@ struct custom_webhook_data {
 
 struct server_private_vars {
 	// GEN INTROSPECTOR struct server_private_vars
-	std::string master_rcon_password = "";
-	std::string rcon_password = "";
 	server_password_type server_password;
 
 	std::string discord_webhook_url = "";
@@ -338,14 +336,11 @@ struct server_private_vars {
 
 	std::vector<custom_webhook_data> custom_webhook_urls;
 
-	std::string steam_web_api_key = "";
-
-	std::string official_server_secret = "";
 	std::string report_ranked_match_url = "https://hypersomnia.io/report_match";
 
-	std::vector<url_and_key_pair> report_ranked_match_aux_endpoints;
+	std::vector<std::string> report_ranked_match_aux_endpoints;
 
-	std::string check_ban_url = "https://hypersomnia.io/check_ban";
+	std::string identity_broker_public_key = "";
 
 	admin_profiles_type admin_profiles;
 	// END GEN INTROSPECTOR

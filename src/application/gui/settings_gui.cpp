@@ -388,7 +388,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		"It is created the first time you join a ranked server, or an official server securely.\n"
 		"Back it up - without it, the account is lost:\n"
 		"keep it in a password manager (Copy key to clipboard),\n"
-		"or copy the identity.key file somewhere safe (Reveal in explorer).\n"
+		"or copy the account.key file somewhere safe (Reveal in explorer).\n"
 		"Whoever has it plays as you - never share it."
 	);
 
@@ -1023,23 +1023,9 @@ void settings_gui_state::perform(
 						text_disabled("If set, clients must provide this password to connect to the server.\nLeave empty to allow anyone to join.");
 					}
 
-					{
-						thread_local bool show = false;
-						const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
-
-						input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show##rcon_password", show); revert(scope_cfg.rcon_password);
-						text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
-					}
+					text_disabled("Rcon is given by admin_profiles in the server config: account ids (steam_..., key_...) with their level.\nSee README_SERVER.md.");
 
 #if !PLATFORM_WEB
-					{
-						thread_local bool show = false;
-						const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
-
-						input_text(SCOPE_CFG_NVP(master_rcon_password), flags); revert(scope_cfg.master_rcon_password);
-						text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
-					}
-
 					{
 						auto& scope_cfg = config.server;
 						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
@@ -2641,14 +2627,6 @@ void settings_gui_state::perform(
 							scope_cfg.nickname = "Player";
 						}
 
-						{
-							thread_local bool show = false;
-							const auto flags = show ? 0 : ImGuiInputTextFlags_Password;
-
-							input_text(SCOPE_CFG_NVP(server_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.server_password);
-							text_disabled("Used when connecting to password-protected servers.");
-						}
-
 						revertable_checkbox("Record demo", scope_cfg.record_demo);
 
 #if 0
@@ -2977,7 +2955,7 @@ void settings_gui_state::perform(
 					case advanced_settings_pane::NETWORK: {
 						input_text("Server list provider", config.server_list_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
 						input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
-						input_text("Connect token provider", config.connect_token_provider, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.connect_token_provider);
+						input_text("Identity broker", config.identity_broker_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.identity_broker_url);
 						input_text("Website", config.website_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.website_url);
 
 #if 0

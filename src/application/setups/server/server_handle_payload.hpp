@@ -30,44 +30,7 @@ message_handler_result server_setup::handle_payload(
 
 	ensure(c.is_set());
 
-	if constexpr (std::is_same_v<T, auth_request_payload>) {
-		if (c.auth_requested) {
-			kick(client_id, "Client requested authentication twice.");
-
-			return abort_v;
-		}
-
-		/*
-			A ticket or a signature sent over an insecure connection could have been read or swapped on the way,
-			so it is never taken from one.
-		*/
-
-		if (!server->get_secure_server_id(client_id).has_value()) {
-			/*
-				Counted as the one request, so that flooding them is kicked like any second one, not logged without end.
-			*/
-
-			LOG("Ignoring auth_request_payload from %x: the connection is not secure.", c.get_nickname());
-			c.auth_requested = true;
-			return continue_v;
-		}
-
-		/*
-			Where authentication is not required, it is still verified if possible -
-			only for the badges and the admin profiles, without kicking anyone over it.
-		*/
-
-		if (!vars.requires_authentication() && !can_verify_optional_auth(payload)) {
-			return continue_v;
-		}
-
-		LOG("auth_request_payload from: %x. Took %x secs.", c.get_nickname(), server_time - c.when_connected);
-
-		c.auth_requested = true;
-		c.when_sent_auth_ticket = server_time;
-		request_auth(to_mode_player_id(client_id), payload);
-	}
-	else if constexpr (std::is_same_v<T, requested_client_settings>) {
+	if constexpr (std::is_same_v<T, requested_client_settings>) {
 		/* 
 			A client might re-state its requested settings
 			even outside of the PENDING_WELCOME state

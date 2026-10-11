@@ -47,6 +47,9 @@
 #include "application/setups/server/server_temp_var_overrides.h"
 #include "steam_rich_presence_pairs.h"
 #include "application/network/resolve_address_result.h"
+#include "application/setups/server/server_bans.h"
+#include "application/setups/server/report_queue.h"
+#include "application/masterserver/server_request_signature.h"
 
 struct netcode_socket_t;
 struct config_json_table;
@@ -107,6 +110,26 @@ class server_setup :
 	server_vars canon_with_confd_vars;
 	server_vars vars;
 	server_private_vars private_vars;
+	server_bans bans;
+	report_queue reports;
+	augs::ed25519_seed_type this_server_key = {};
+
+	/*
+		See server_request_signature.h.
+	*/
+
+	masterserver_cookie_type masterserver_cookie = {};
+	bool resent_heartbeat_for_cookie = false;
+
+	/*
+		None until the masterserver answers. An explicit "no" keeps a ranked server from starting ranked matches;
+		no answer at all (the masterserver down) does not.
+	*/
+
+	std::optional<bool> masterserver_says_official;
+
+	template <class Request>
+	void sign_for_masterserver(Request& request) const;
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
@@ -294,8 +317,8 @@ class server_setup :
 	template <class F>
 	void push_auth_job(mode_player_id player_id, F&& f);
 
-	void request_auth(mode_player_id player_id, const auth_request_payload&);
-	bool can_verify_optional_auth(const auth_request_payload&) const;
+	void verify_client_identity(client_id_type);
+	void apply_authentication(mode_player_id, const std::string& new_id, bool signed_by_broker, bool from_nickname);
 
 	/*
 		The account the integrated client is signed in with - trusted, since it hosts - only for its badge.
@@ -611,6 +634,7 @@ public:
 				resolve_internal_address_if_its_time();
 				resolve_heartbeat_host_if_its_time();
 				send_heartbeat_to_server_list_if_its_time();
+				reports.advance(server_time);
 				send_tell_me_my_address_if_its_time();
 			}
 
@@ -751,7 +775,19 @@ public:
 
 	void kick(const client_id_type&, const std::string& reason, chat_target_type target = chat_target_type::KICK);
 	message_handler_result abort_or_kick_if_debug(const client_id_type&, const std::string& reason);
-	void ban(const client_id_type&, const std::string& reason);
+	/*
+		minutes == 0 bans for good.
+	*/
+
+	void ban(const client_id_type&, const std::string& reason, uint32_t minutes);
+
+	std::string get_client_ip_for_bans(const client_id_type&) const;
+	const server_ban* find_ban(const std::string& account, const std::string& ip) const;
+	bool is_banned(const std::string& account) const;
+	std::string ban_message_for(const std::string& account) const;
+	std::string ban_message(const server_ban&) const;
+	void load_bans();
+	void save_bans() const;
 
 	mode_player_id get_local_player_id() const {
 		return get_integrated_player_id();

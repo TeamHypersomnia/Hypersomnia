@@ -18,6 +18,7 @@ public:
 		double time_last_heartbeat = -1;
 		double time_last_correct_message = -1;
 		server_heartbeat last_heartbeat;
+		std::array<uint8_t, 32> server_public_key = {};
 
 		// TODO_SECURITY: use proper secure channels
 		std::unordered_set<uint64_t> recvd_messages;
@@ -154,7 +155,19 @@ private:
 					else if (std::holds_alternative<rtc::binary>(data)) {
 						try {
 							const auto bytes = std::get<rtc::binary>(data);
-							const auto hb = augs::from_bytes<server_heartbeat>(bytes);
+							auto hb = augs::from_bytes<server_heartbeat>(bytes);
+
+							/*
+								A server in the browser signs its heartbeats too; its WebSocket session tells it from others,
+								so no cookie is needed - but its key stays the same for the session.
+							*/
+
+							if (!::server_request_signature_valid(hb)) {
+								return;
+							}
+
+							const auto public_key = hb.signature->server_public_key;
+							hb.signature.reset();
 
 							on_peers(
 								[&](auto& peers) {
@@ -167,6 +180,11 @@ private:
 
 										if (!peer->is_server()) {
 											peer->time_hosted = unix_time;
+											peer->server_public_key = public_key;
+										}
+										else if (peer->server_public_key != public_key) {
+											LOG("Ignoring a heartbeat from Web peer %x signed with another key.", webrtc_id);
+											return;
 										}
 
 										peer->last_heartbeat = hb;

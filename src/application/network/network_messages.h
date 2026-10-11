@@ -260,21 +260,6 @@ namespace net_messages {
 		);
 	};
 
-	struct auth_request : only_block_message {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-
-		bool read_payload(
-			auth_request_payload&
-		);
-
-		template <class F>
-		bool write_payload(
-			F block_allocator,
-			const auth_request_payload&
-		);
-	};
-
 	struct player_avatar_exchange : only_block_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = true;
@@ -345,7 +330,6 @@ namespace net_messages {
 		file_download_link*,
 		download_progress_message*,
 		file_chunks_request*,
-		auth_request*,
 		server_auth_state*
 	>;
 	

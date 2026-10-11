@@ -24,36 +24,12 @@ void sign_in_with_crazygames() {
 	});
 }
 
-void sign_in_with_discord() {
-	main_thread_queue::execute([&]() {
-		EM_ASM({
-			Module.loginDiscord();
-		});
-	});
-}
-
-EM_JS(void, call_revokeDiscord, (const char* access_token), {
-	Module.revokeDiscord(access_token);
-});
-
 inline void web_auth_data::log_out() {
 	if (!is_set()) {
 		return;
 	}
 
 	LOG("Logging out at timestamp: %x", augs::secs_since_epoch());
-
-	switch(type) {
-		case auth_provider_type::DISCORD:
-			main_thread_queue::execute([&]() {
-				call_revokeDiscord(auth_token.c_str());
-			});
-
-			break;
-	
-		default:
-			break;
-	}
 
 	*this = {};
 }

@@ -29,7 +29,6 @@ struct requested_client_settings {
 
 	// GEN INTROSPECTOR struct requested_client_settings
 	client_nickname_type chosen_nickname;
-	server_password_type server_password;
 
 	public_client_settings public_settings;
 	client_net_vars net;

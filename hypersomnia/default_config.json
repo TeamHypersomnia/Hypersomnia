@@ -13,8 +13,8 @@
     // "log_timestamp_format": "",
 
     "server_list_provider": "http://masterserver.hypersomnia.io:8410",
-    // Where the game gets the tokens for the secure connections to the official servers.
-    "connect_token_provider": "https://hypersomnia.io/connect_token",
+    // Where the game gets the cert that says which account it plays on (Steam, CrazyGames or an account key).
+    "identity_broker_url": "https://hypersomnia.io",
     // Where the account settings link an identity key to a Steam account and open profiles.
     "website_url": "https://hypersomnia.io",
     "webrtc_signalling_server_url": "wss://masterserver.hypersomnia.io:8000",
@@ -296,11 +296,6 @@
     "client_connect": "127.0.0.1",
 
     "client": {
-        /*
-            Ranked servers are always joined over a secure connection.
-            This also joins the official casual servers securely, so that you are authenticated there too - e.g. for your badge.
-        */
-        "secure_connection_to_official_casual_servers": false,
         "use_account_nickname": true,
         "use_account_avatar": true,
         "nickname": "",
@@ -323,7 +318,6 @@
         "max_predicted_client_commands": 1500,
         "flush_demo_to_disk_once_every_secs": 10,
         "spectated_arena_type": "REFERENTIAL",
-        "rcon_password": "",
         "client_chat": {
             "chat_window_width": 600,
             "chat_window_offset": [10, 300],
@@ -460,12 +454,10 @@
     // Private vars aren't known to any clients.
 
     "server_private": {
-        // Access password.
-        // Empty to let everybody in.
+        // Access password, sealed to the server key in every player's handshake.
+        // Empty to let everybody in. Admins (admin_profiles) need none.
         "server_password": "",
 
-        "master_rcon_password": "",
-        "rcon_password": "",
         "discord_webhook_url": "",
         "telegram_webhook_url": "",
         "telegram_channel_id": "@hypersomnia_monitor",
@@ -485,21 +477,21 @@
         ],
         */
 
-        "steam_web_api_key": "",
         /*
-            Only for the official servers. The one secret this server proves itself with:
-            it is sent to report ranked matches, signs the heartbeats so that the masterserver lists it as official,
-            and derives the key of its secure connections. Given out once per server by the developers.
+            Ranked match reports, signed with this server's key (server.key in the user folder).
+            hypersomnia.io takes them only from the official servers - those whose public key is in its official_servers.d.
+            The aux endpoints get the same signed reports: ["https://example.com/report", ...]
         */
-        "official_server_secret": "",
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
-        "check_ban_url": "",
-        // [ { "url": "example.com", "api_key": "example" }, { ... } ]
 
-        // Admins recognized by their authenticated account - no password needed.
+        // Which identity broker's certs this server trusts. Empty: the one of hypersomnia.io built into the game.
+        "identity_broker_public_key": "",
+
+        // Admins recognized by the account their cert proves - no password needed. Never a nickname.
         // [ "account id", "NONE" | "RCON" | "MASTER_RCON", optional badge shown in place of [ADMIN] ], e.g.:
-        // [ [ "steam_76561198000000000", "NONE" ], [ "discord_100000000000000000", "RCON", "MOD" ] ]
+        // [ [ "steam_76561198000000000", "MASTER_RCON" ], [ "key_<64 hex characters>", "RCON", "MOD" ] ]
+        // Your id: Settings - Advanced - "Copy my account id".
         "admin_profiles": []
     },
 

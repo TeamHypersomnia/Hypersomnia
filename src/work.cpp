@@ -71,6 +71,9 @@
 #include "application/session_profiler.h"
 #include "application/config_json_table.h"
 #include "application/main/identity_key.h"
+#include "application/main/identity_session.h"
+#include "application/main/server_passwords.h"
+#include "application/main/server_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
 
@@ -400,8 +403,6 @@ extern "C" {
 #endif
 
 #if PLATFORM_WEB
-#include "application/main/check_token_still_valid.hpp"
-augs::async_response_ptr token_still_valid_check;
 #endif
 
 work_result work(
@@ -507,7 +508,7 @@ work_result work(
 
 	WEBSTATIC const bool is_steam_client = steam_initialized;
 	/*
-		Without Steam, ranked matches go on the account of the identity key - see identity_key.h.
+		Without Steam, the account is the account key in the user folder - see identity_key.h and identity_session.h.
 	*/
 
 	WEBSTATIC const bool ranked_servers_enabled = true;
@@ -531,6 +532,12 @@ work_result work(
 		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 	}
 #endif
+
+	/*
+		Who the player is in this run - see identity_session.h. Only a client needs it.
+	*/
+
+	WEBSTATIC auto identity = std::make_shared<identity_session>();
 
 	/*
 		On Web, ::USER_DIR will be CWD/user,
@@ -733,6 +740,16 @@ work_result work(
 	netcode_rng = randomization(random_seed);
 #endif
 #endif
+
+	if (params.print_server_key_only) {
+		/*
+			What an official server's operator sends to the developers: the public part of server.key, made if missing.
+		*/
+
+		const auto key = server_key::obtain(USER_DIR / server_key::file_name);
+		std::cout << server_key::public_key_hex(key) << std::endl;
+		return work_result::SUCCESS;
+	}
 
 	if (config.unit_tests.run || params.unit_tests_only) {
 		/* Needed by some unit tests */
@@ -1824,29 +1841,100 @@ work_result work(
 		}
 	}
 	else {
-		try {
-			social_sign_in.cached_auth = augs::from_json_file<web_auth_data>(CACHED_AUTH_PATH);
-			LOG("Loaded some cached auth from %x", CACHED_AUTH_PATH);
-		}
-		catch (...) {
-			social_sign_in.cached_auth = {};
-			LOG("No cached auth found in %x", CACHED_AUTH_PATH);
-		}
+		/*
+			Outside CrazyGames the web build signs in to nothing: the account is the key in the browser.
+		*/
 
-		if (social_sign_in.cached_auth.is_set()) {
-			if (is_auth_expired()) {
-				LOG("Auth expired. Logging out.");
-				social_log_out();
-			}
-			else {
-				LOG("Starting token_still_valid_check");
-				token_still_valid_check = ::request_token_still_valid_check(social_sign_in.cached_auth);
-			}
-		}
+		social_sign_in.cached_auth = {};
 	}
 
 	social_sign_in.guest_nickname = config.client.nickname;
 #endif
+
+	/*
+		The account key, for the players without Steam and outside CrazyGames - created on the first start.
+		Read again when the file changes (an import or a forget in the Account settings).
+	*/
+
+	WEBSTATIC const bool uses_account_key = !is_steam_client && !params.is_crazygames;
+
+	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
+	WEBSTATIC double account_seed_checked_at = -1000.0;
+
+	WEBSTATIC auto refresh_account_seed = [&](const double now) {
+		if (!uses_account_key || now - account_seed_checked_at < 1.0) {
+			return;
+		}
+
+		const bool first = account_seed_checked_at < 0.0;
+		account_seed_checked_at = now;
+
+		const auto path = USER_DIR / identity_key::file_name;
+
+		if (first) {
+			account_seed = identity_key::load_or_create(path);
+		}
+		else {
+			account_seed = identity_key::load(path);
+		}
+	};
+
+	WEBSTATIC auto get_identity_input = [&]() {
+		auto in = identity_session::input();
+		in.broker_url = config.identity_broker_url;
+
+		if (is_steam_client) {
+			in.source = identity_session::source_type::STEAM;
+		}
+#if PLATFORM_WEB
+		else if (params.is_crazygames) {
+			if (social_sign_in.cached_auth.is_set() && social_sign_in.cached_auth.type == auth_provider_type::CRAZYGAMES) {
+				in.source = identity_session::source_type::CRAZYGAMES;
+				in.crazygames_token = social_sign_in.cached_auth.auth_token;
+			}
+		}
+#endif
+		else if (account_seed.has_value()) {
+			in.source = identity_session::source_type::KEY;
+			in.account_seed = account_seed;
+		}
+
+		return in;
+	};
+
+	WEBSTATIC auto advance_identity = [&]() {
+		const auto now = augs::steady_secs();
+
+		refresh_account_seed(now);
+		identity->advance(get_identity_input(), now);
+
+#if !PLATFORM_WEB
+		if (is_steam_client) {
+			if (const auto steam_identity = identity->steam_identity_to_request()) {
+				LOG("Calling steam_request_auth_ticket for the identity cert.");
+				steam_auth_request_id = ::steam_request_auth_ticket(steam_identity->c_str());
+			}
+		}
+#endif
+	};
+
+	/*
+		Server passwords, each saved for the key of its server and sent to no other.
+	*/
+
+	WEBSTATIC auto saved_server_passwords = server_passwords(USER_DIR / server_passwords::file_name);
+
+	/*
+		Keys of the servers joined by address, learned in this run - to pick the saved password on a retry.
+	*/
+
+	WEBSTATIC std::map<std::string, augs::ed25519_public_key_type> learned_server_keys;
+
+	/*
+		A password entered for a server whose key is not known yet - used once, for the next connection only.
+	*/
+
+	WEBSTATIC std::optional<std::string> next_connect_password;
 
 	try {
 		augs::image avatar;
@@ -2281,7 +2369,13 @@ work_result work(
 			displayed_connecting_server_name,
 			config.faction_view,
 			config.streamer_mode && config.streamer_mode_flags.community_servers,
-			config.client.server_password
+			[&](const server_list_entry& entry) {
+				if (const auto key = entry.get_public_key()) {
+					return !saved_server_passwords.find(*key).empty();
+				}
+
+				return false;
+			}
 		};
 	};
 
@@ -2307,14 +2401,13 @@ work_result work(
 
 		const bool looks_like_alias = target.find('.') == std::string::npos;
 		const bool is_ranked = found != nullptr ? found->heartbeat.is_ranked_server() : (looks_like_alias && begins_with(target, "ranked"));
-		const bool is_official = found != nullptr ? found->is_official_server() : (::is_official_webrtc_id(target) || is_ranked);
 
 #if PLATFORM_WEB
 		/*
-			The authentication is sent over a secure connection only, so a community server named like an alias gets nothing.
+			On CrazyGames, ranked is played on the CrazyGames account.
 		*/
 
-		const bool requires_sign_in = is_ranked;
+		const bool requires_sign_in = is_ranked && params.is_crazygames;
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
@@ -2330,16 +2423,6 @@ work_result work(
 				social_log_out();
 			}
 
-			/*
-				Still pending - connect anyway, the server verifies the token itself.
-			*/
-
-			if (augs::is_ready(token_still_valid_check)) {
-				if (!::token_still_valid(augs::get_once(token_still_valid_check))) {
-					social_log_out();
-				}
-			}
-
 			if (!is_signed_in()) {
 				social_sign_in.open("play ranked matches", connect_string);
 				return false;
@@ -2350,30 +2433,42 @@ work_result work(
 		LOG("Launching client setup with connect string: %x", connect_string);
 
 		/*
-			Ranked servers are always joined securely, official casual ones only if the player wants to be authenticated there.
-			Community servers never - they have no keys the masterserver could issue tokens for.
+			The server key from the list - or the one this server presented before, e.g. when asked for a password
+			after being joined by address - picks the saved password, so it goes to no other server.
 		*/
 
-		const auto secure_request = [&]() -> std::optional<secure_connect_request> {
-			if (found == nullptr && !is_official) {
-				/*
-					Not on the server list yet, e.g. joined from the command line or a Steam invite.
-					It might be official, so ask anyway - the masterserver refuses a token for any other.
-				*/
+		/*
+			E.g. joining right at start (from the command line): the key is read and the cert asked for before connecting.
+		*/
 
-				return secure_connect_request { config.connect_token_provider, false };
+		advance_identity();
+
+		auto identity_context = client_identity_context();
+		identity_context.session = identity;
+		identity_context.input = get_identity_input();
+		identity_context.is_ranked = is_ranked;
+		identity_context.expected_server_public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+			if (found != nullptr) {
+				if (const auto key = found->get_public_key()) {
+					return *key;
+				}
 			}
 
-			if (!is_official) {
-				return std::nullopt;
+			if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
+				return *learned;
 			}
 
-			if (!is_ranked && !config.client.secure_connection_to_official_casual_servers) {
-				return std::nullopt;
-			}
-
-			return secure_connect_request { config.connect_token_provider, is_ranked };
+			return std::nullopt;
 		}();
+
+		if (identity_context.expected_server_public_key.has_value()) {
+			identity_context.password = saved_server_passwords.find(*identity_context.expected_server_public_key);
+		}
+
+		if (next_connect_password.has_value()) {
+			identity_context.password = *next_connect_password;
+			next_connect_password.reset();
+		}
 
 		streaming.wait_demos_compressed();
 
@@ -2388,41 +2483,9 @@ work_result work(
 				preferred_binding_port,
 
 				config.webrtc_signalling_server_url,
-				secure_request
+				identity_context
 			);
 		});
-
-#if !PLATFORM_WEB
-		/*
-			Without Steam, the account is the identity key in the user folder - see identity_key.h.
-		*/
-
-		if (!is_steam_client) {
-			on_specific_setup([&](client_setup& setup) {
-				setup.use_identity_key(USER_DIR / identity_key::file_name);
-			});
-		}
-#endif
-
-#if PLATFORM_WEB
-		const bool send_auth = requires_sign_in;
-
-		if (send_auth) {
-			/*
-				At this point we verified we're signed in.
-			*/
-
-			on_specific_setup([&](client_setup& setup) {
-				LOG("Server requires_sign_in. Calling send_auth_ticket.");
-
-				auto& cached_auth = social_sign_in.cached_auth;
-				setup.send_auth_ticket(cached_auth);
-			});
-		}
-		else {
-			LOG("Server doesn't require sign in.");
-		}
-#endif
 
 		displayed_connecting_server_name.clear();
 
@@ -2660,9 +2723,14 @@ work_result work(
 
 		if (perform_result) {
 			if (auto new_password = browse_servers_gui.take_pending_password_save()) {
-				change_with_save([&new_password](config_json_table& cfg) {
-					cfg.client.server_password = *new_password;
-				});
+				const auto& [password, entry] = *new_password;
+
+				if (const auto key = entry.get_public_key()) {
+					saved_server_passwords.set(*key, password);
+				}
+				else {
+					next_connect_password = password;
+				}
 			}
 
 			start_client_setup();
@@ -3198,9 +3266,13 @@ work_result work(
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
 						if (auto new_password = setup.take_pending_password_save()) {
-							change_with_save([&new_password](config_json_table& cfg) {
-								cfg.client.server_password = *new_password;
-							});
+							if (const auto key = setup.get_server_public_key()) {
+								saved_server_passwords.set(*key, *new_password);
+								learned_server_keys[setup.get_connect_string()] = *key;
+							}
+							else {
+								next_connect_password = *new_password;
+							}
 						}
 
 						launch_setup(activity_type::CLIENT);
@@ -3318,25 +3390,6 @@ work_result work(
 
 		steam_events.clear();
 
-		/*
-			The ticket is requested for the challenge of the server and the official server the connect token was issued for,
-			and only over a secure connection - see secure_connect.h. consume_steam_auth_identity is empty otherwise.
-		*/
-
-		if (is_steam_client) {
-			visit_current_setup([&](auto& setup) {
-				using T = remove_cref<decltype(setup)>;
-
-				if constexpr(is_one_of_v<T, client_setup>) {
-					if (const auto identity = setup.consume_steam_auth_identity(); identity.has_value()) {
-						LOG("Calling steam_request_auth_ticket.");
-						steam_auth_request_id = ::steam_request_auth_ticket(identity->c_str());
-						LOG_NVPS(steam_auth_request_id);
-					}
-				}
-			});
-		}
-
 		auto handler_c = [](void* ctx, uint32_t idx, void* object) {
 			auto check_index = [&]<typename T>(T) {
 				if (idx == T::index) {
@@ -3374,13 +3427,7 @@ work_result work(
 				LOG("(Steam Callback) steam_auth_ticket.");
 
 				if (event.request_id == steam_auth_request_id) {
-					visit_current_setup([&](auto& setup) {
-						using T = remove_cref<decltype(setup)>;
-
-						if constexpr(is_one_of_v<T, client_setup>) {
-							setup.send_auth_ticket(event);
-						}
-					});
+					identity->on_steam_ticket(event.ticket_bytes, event.successful());
 				}
 			}
 			else {
@@ -3580,11 +3627,7 @@ work_result work(
 						start_client_setup();
 					}
 				}
-				else if (augs::is_ready(token_still_valid_check)) {
-					if (!::token_still_valid(augs::get_once(token_still_valid_check))) {
-						social_log_out();
-					}
-				}
+
 
 				const bool should_prompt_for_social_sign_in = [&]() {
 					if (!streaming.completed_all_loading()) {
@@ -4887,6 +4930,34 @@ work_result work(
 #if !PLATFORM_WEB
 				process_steam_callbacks();
 #endif
+				advance_identity();
+
+				{
+					/*
+						Joined by address, kicked for a password it could not send before the server's key was known:
+						retried right away with the one saved for that key.
+					*/
+
+					bool relaunch_with_saved_password = false;
+
+					visit_current_setup([&](auto& setup) {
+						if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
+							if (setup.kicked_for_password_not_sent()) {
+								if (const auto key = setup.get_server_public_key()) {
+									if (!saved_server_passwords.find(*key).empty()) {
+										learned_server_keys[setup.get_connect_string()] = *key;
+										relaunch_with_saved_password = true;
+									}
+								}
+							}
+						}
+					});
+
+					if (relaunch_with_saved_password) {
+						LOG("Reconnecting with the password saved for this server's key.");
+						launch_setup(activity_type::CLIENT);
+					}
+				}
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;

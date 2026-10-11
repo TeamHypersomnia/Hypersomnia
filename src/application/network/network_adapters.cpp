@@ -10,7 +10,7 @@
 #include "hypersomnia_version.h"
 
 #include "application/network/net_serialize.h"
-#include "application/network/secure_connect.h"
+#include "application/network/identity_cert.h"
 #include "3rdparty/yojimbo/netcode/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/thread_templates.h"
@@ -82,7 +82,6 @@ game_connection_config::game_connection_config() {
 
 	set_max_packet_size(max_packet_size_v);
 
-	maxConnectTokenLifetime = secure_connect::token_lifetime_secs;
 }
 
 void game_connection_config::set_max_packet_size(const unsigned s) {
@@ -99,19 +98,36 @@ game_connection_config::game_connection_config(const augs::server_listen_input& 
 #endif
 }
 
-std::optional<std::string> server_adapter::get_secure_server_id(const client_id_type& id) const {
-	static_assert(secure_connect::user_data_bytes == NETCODE_USER_DATA_BYTES);
+const uint8_t* server_adapter::get_client_user_data(const client_id_type& id) const {
+	static_assert(identity_cert::blob_bytes == NETCODE_USER_DATA_BYTES);
 
-	/*
-		Without a netcode key, insecure tokens decrypt with this server's (all-zero) key
-		and keep whatever user data their clients wrote.
-	*/
-
-	if (!has_netcode_key || !server.IsClientConnected(id)) {
-		return std::nullopt;
+	if (!server.IsClientConnected(id)) {
+		return nullptr;
 	}
 
-	return secure_connect::read_server_id(server.GetClientUserData(id));
+	return server.GetClientUserData(id);
+}
+
+const uint8_t* server_adapter::get_client_binding(const client_id_type& id) const {
+	if (!server.IsClientConnected(id)) {
+		return nullptr;
+	}
+
+	return server.GetClientBinding(id);
+}
+
+const uint8_t* server_adapter::get_client_session_signature(const client_id_type& id) const {
+	if (!server.IsClientConnected(id)) {
+		return nullptr;
+	}
+
+	return server.GetClientSessionSignature(id);
+}
+
+augs::ed25519_public_key_type server_adapter::get_public_key() const {
+	auto out = augs::ed25519_public_key_type();
+	std::memcpy(out.data(), privateKey.data() + 32, out.size());
+	return out;
 }
 
 bool server_adapter::is_running() const {
@@ -219,11 +235,22 @@ server_adapter::server_adapter(
 	send_packet_override_type send_packet_override,
 	receive_packet_override_type receive_packet_override,
 	const bool is_webrtc_only,
-	const std::optional<std::array<uint8_t, yojimbo::KeyBytes>>& netcode_key,
-	const bool secure_connections_only
+	const augs::ed25519_seed_type& server_key
 ) :
-	privateKey(netcode_key.has_value() ? *netcode_key : std::array<uint8_t, yojimbo::KeyBytes>()),
-	has_netcode_key(netcode_key.has_value()),
+	privateKey([&server_key]() {
+		/*
+			netcode takes the secret key the way libsodium keeps it: the seed and then the public key.
+		*/
+
+		auto out = std::array<uint8_t, yojimbo::ServerSecretKeyBytes>();
+		std::memcpy(out.data(), server_key.data(), server_key.size());
+
+		if (const auto public_key = augs::ed25519_public_key(server_key)) {
+			std::memcpy(out.data() + server_key.size(), public_key->data(), public_key->size());
+		}
+
+		return out;
+	}()),
 	connection_config(in),
 	adapter(this),
 	server(
@@ -257,18 +284,6 @@ server_adapter::server_adapter(
 			netcode's disconnect packets could arrive first and drop the reason.
 		*/
 		detail->config.disable_disconnect_packets = 1;
-
-		/*
-			An official server takes both the secure tokens from the masterserver and the insecure ones,
-			telling them apart by get_secure_server_id.
-
-			Except where every connection must be secure (ranked): anyone can make insecure tokens,
-			so a flood of them would take every pending handshake slot and keep out the players with secure ones.
-			An insecure client is then not answered at all - it times out instead of learning why,
-			but the game only connects there without a token when it could not reach the masterserver anyway.
-		*/
-
-		detail->config.accept_insecure_connect_tokens = has_netcode_key && !secure_connections_only ? 1 : 0;
 
 		if (is_webrtc_only) {
 			detail->config.override_send_and_receive = 1;
@@ -643,7 +658,7 @@ int client_receive_packet_override(void* context, netcode_address_t* from, uint8
 	return adapter->receive_packet_override(*from, reinterpret_cast<std::byte*>(packet), bytes);
 }
 
-resolve_address_result client_adapter::connect(const client_connect_string& str, const std::optional<fetched_connect_token>& secure_token) {
+resolve_address_result client_adapter::connect(const client_connect_string& str, const client_connect_identity& identity) {
 	auto resolved_addr = resolve_address_result();
 
 #if PLATFORM_WEB
@@ -693,40 +708,20 @@ resolve_address_result client_adapter::connect(const client_connect_string& str,
 		local_addr
 	};
 
-	if (secure_token.has_value()) {
-		LOG("Connecting securely to the official server %x.", secure_token->server_id);
+	/*
+		Over WebRTC the server's packets come from the address the data channel is given here, not the server's IP.
+		The second address is the same port on localhost, e.g. for a server on this very machine behind a NAT.
+	*/
 
-		auto token = secure_token->token;
+	const auto num_addresses = use_webrtc ? 1 : 2;
 
-		if (use_webrtc) {
-			/*
-				Over WebRTC, the server's packets come from the address the data channel is given here, not the server's IP,
-				and the netcode client takes packets only from the server address in the token.
-				That list is in the token's public part, which the server never reads, so it is safe to point it at the channel.
-			*/
-
-			struct netcode_connect_token_t parsed;
-
-			if (netcode_read_connect_token(token.data(), static_cast<int>(token.size()), &parsed) == NETCODE_OK) {
-				parsed.num_server_addresses = 1;
-				parsed.server_addresses[0] = connected_ip_address;
-				netcode_write_connect_token(&parsed, token.data(), static_cast<int>(token.size()));
-			}
-		}
-
-		client.Connect(secure_token->client_id, token.data());
-	}
-	else {
-		uint64_t clientId;
-		yojimbo_random_bytes((uint8_t*)&clientId, 8);
-
-		client.InsecureConnect(
-			privateKey.data(), 
-			clientId,
-			addresses,
-			2
-		);
-	}
+	client.Connect(
+		addresses,
+		num_addresses,
+		identity.expected_server_public_key.has_value() ? identity.expected_server_public_key->data() : nullptr,
+		identity.session_secret_key.has_value() ? identity.session_secret_key->data() : nullptr,
+		identity.blob.data()
+	);
 
 	if (auto detail = client.GetClientDetail()) {
 		detail->config.auxiliary_command_function = client_auxiliary_command_function;
@@ -740,6 +735,20 @@ resolve_address_result client_adapter::connect(const client_connect_string& str,
 	}
 
 	return resolved_addr;
+}
+
+std::optional<augs::ed25519_public_key_type> client_adapter::get_server_public_key() const {
+	if (const auto key = client.GetServerPublicKey()) {
+		auto out = augs::ed25519_public_key_type();
+		std::memcpy(out.data(), key, out.size());
+		return out;
+	}
+
+	return std::nullopt;
+}
+
+int client_adapter::get_disconnect_reason() const {
+	return client.GetDisconnectReason();
 }
 
 void client_adapter::disconnect() {

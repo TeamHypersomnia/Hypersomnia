@@ -152,10 +152,6 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::server_auth_state& c) {
-		if (!serialize_fixed_size_str(s, c.challenge)) {
-			return false;
-		}
-
 		auto level = static_cast<int>(c.rcon_level);
 		serialize_int(s, level, static_cast<int>(rcon_level_type::INTEGRATED_ONLY), static_cast<int>(rcon_level_type::MASTER));
 		c.rcon_level = static_cast<rcon_level_type>(level);
@@ -378,10 +374,6 @@ namespace net_messages {
 	bool serialize(Stream& stream, ::requested_client_settings& payload) {
 		{
 			if (!serialize_fixed_size_str(stream, payload.chosen_nickname)) {
-				return false;
-			}
-
-			if (!serialize_fixed_size_str(stream, payload.server_password)) {
 				return false;
 			}
 		}

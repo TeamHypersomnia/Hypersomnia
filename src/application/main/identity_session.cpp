@@ -1,0 +1,260 @@
+#include <cstring>
+#include "augs/log.h"
+#include "augs/misc/async_get.h"
+#include "augs/misc/secure_hash.h"
+#include "augs/string/parse_url.h"
+#include "application/main/identity_session.h"
+
+/*
+	What is left of a cert's lifetime before it is used no more: its clock started when it arrived,
+	so the broker's and the player's wall clocks never matter.
+*/
+
+static constexpr double cert_expiry_margin_secs = 120.0;
+static constexpr double max_retry_delay_secs = 300.0;
+static constexpr double refused_retry_delay_secs = 600.0;
+
+static std::vector<std::byte> from_hex(const std::string& hex) {
+	auto out = std::vector<std::byte>();
+
+	if (hex.size() % 2 != 0) {
+		return out;
+	}
+
+	for (std::size_t i = 0; i + 1 < hex.size(); i += 2) {
+		try {
+			out.push_back(static_cast<std::byte>(std::stoi(hex.substr(i, 2), nullptr, 16)));
+		}
+		catch (...) {
+			return {};
+		}
+	}
+
+	return out;
+}
+
+identity_session::identity_session() {
+	if (const auto seed = augs::ed25519_generate_seed()) {
+		session_seed = *seed;
+
+		if (const auto public_key = augs::ed25519_public_key(session_seed)) {
+			session_public = *public_key;
+		}
+	}
+
+	std::memcpy(session_secret.data(), session_seed.data(), session_seed.size());
+	std::memcpy(session_secret.data() + session_seed.size(), session_public.data(), session_public.size());
+}
+
+std::optional<std::string> identity_session::build_location(const input& in) const {
+	auto location = std::string("/cert?session=") + augs::bytes_to_hex(session_public);
+
+	switch (in.source) {
+		case source_type::STEAM:
+			if (!steam_ticket.has_value()) {
+				return std::nullopt;
+			}
+
+			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket);
+
+		case source_type::CRAZYGAMES:
+			if (in.crazygames_token.empty()) {
+				return std::nullopt;
+			}
+
+			return location + "&crazygames=" + in.crazygames_token;
+
+		case source_type::KEY: {
+			if (!in.account_seed.has_value()) {
+				return std::nullopt;
+			}
+
+			const auto account_public = augs::ed25519_public_key(*in.account_seed);
+			const auto signature = augs::ed25519_sign(*in.account_seed, identity_cert::cert_request_message(session_public));
+
+			if (!account_public.has_value() || !signature.has_value()) {
+				return std::nullopt;
+			}
+
+			return location + "&key=" + augs::bytes_to_hex(*account_public) + "&sig=" + augs::bytes_to_hex(*signature);
+		}
+
+		default:
+			return std::nullopt;
+	}
+}
+
+void identity_session::start_request(const input& in, const double now) {
+	const auto location = build_location(in);
+
+	if (!location.has_value()) {
+		return;
+	}
+
+	const auto url = parsed_url(in.broker_url);
+
+	if (!url.valid()) {
+		last_error = "Invalid identity broker address: " + in.broker_url;
+		schedule_retry(now, true);
+		return;
+	}
+
+	LOG("Requesting an identity cert from %x.", in.broker_url);
+
+	auto prefix = url.location;
+
+	while (!prefix.empty() && prefix.back() == '/') {
+		prefix.pop_back();
+	}
+
+	request = augs::async_get(url.get_base_url(), prefix + *location);
+	request_started_at = now;
+	requested_for = in;
+}
+
+void identity_session::schedule_retry(const double now, const bool refused) {
+	if (refused) {
+		next_attempt_at = now + refused_retry_delay_secs;
+		return;
+	}
+
+	next_attempt_at = now + retry_delay;
+	retry_delay = std::min(retry_delay * 2, max_retry_delay_secs);
+}
+
+void identity_session::advance(const input& in, const double now) {
+	if (in != last_input) {
+		/*
+			Another account (e.g. an imported key, a CrazyGames sign in): the old cert is no longer it.
+		*/
+
+		const bool had_input = last_input.source != source_type::NONE;
+		last_input = in;
+
+		if (had_input) {
+			reset();
+		}
+	}
+
+	if (request != nullptr) {
+		if (!request->is_ready()) {
+			return;
+		}
+
+		const auto response = augs::get_once(request);
+
+		if (response.status == 200) {
+			const auto bytes = from_hex(response.body);
+			const auto cert = identity_cert::from_bytes(bytes.data(), bytes.size());
+
+			if (cert.has_value() && cert->session_public_key == session_public && cert->not_after > cert->not_before) {
+				broker_cert = cert;
+				broker_cert_received_at = now;
+				last_error.clear();
+				retry_delay = 30.0;
+
+				const auto lifetime = static_cast<double>(cert->not_after - cert->not_before);
+				next_attempt_at = now + lifetime / 2;
+
+				LOG("Received an identity cert for %x, valid for %x minutes.", cert->account, static_cast<int>(lifetime / 60));
+			}
+			else {
+				last_error = "The identity broker sent an invalid cert.";
+				LOG(last_error);
+				schedule_retry(now, false);
+			}
+		}
+		else if (response.status >= 400 && response.status < 500) {
+			last_error = response.body.empty() ? typesafe_sprintf("The identity broker refused (HTTP %x).", response.status) : response.body;
+			LOG("Identity cert refused (HTTP %x): %x", response.status, last_error);
+			schedule_retry(now, true);
+		}
+		else {
+			last_error = typesafe_sprintf("Could not reach hypersomnia.io (HTTP %x).", response.status);
+			LOG("Identity cert request failed (HTTP %x). Retrying in %x seconds.", response.status, retry_delay);
+			schedule_retry(now, false);
+		}
+
+		steam_ticket.reset();
+		steam_ticket_requested = false;
+		steam_ticket_wanted = false;
+		return;
+	}
+
+	if (in.source == source_type::NONE || in.broker_url.empty()) {
+		return;
+	}
+
+	if (now < next_attempt_at) {
+		return;
+	}
+
+	if (in.source == source_type::STEAM && !steam_ticket.has_value()) {
+		steam_ticket_wanted = true;
+		return;
+	}
+
+	start_request(in, now);
+}
+
+std::optional<std::string> identity_session::steam_identity_to_request() {
+	if (!steam_ticket_wanted || steam_ticket_requested) {
+		return std::nullopt;
+	}
+
+	steam_ticket_requested = true;
+	return identity_cert::steam_ticket_identity(session_public);
+}
+
+void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_bytes, const bool successful) {
+	steam_ticket_wanted = false;
+	steam_ticket_requested = false;
+
+	if (!successful || ticket_bytes.empty()) {
+		last_error = "Steam did not give a ticket. Is Steam online?";
+		LOG(last_error);
+		schedule_retry(next_attempt_at, false);
+		return;
+	}
+
+	steam_ticket = ticket_bytes;
+}
+
+bool identity_session::request_in_flight() const {
+	return request != nullptr || steam_ticket_wanted;
+}
+
+void identity_session::retry_now() {
+	if (request == nullptr) {
+		next_attempt_at = 0.0;
+	}
+}
+
+void identity_session::reset() {
+	broker_cert.reset();
+	broker_cert_received_at = 0.0;
+	next_attempt_at = 0.0;
+	retry_delay = 30.0;
+	last_error.clear();
+}
+
+bool identity_session::has_broker_cert(const double now) const {
+	if (!broker_cert.has_value()) {
+		return false;
+	}
+
+	const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+	return now < broker_cert_received_at + lifetime - cert_expiry_margin_secs;
+}
+
+std::optional<identity_cert::cert> identity_session::cert_for_connect(const input& in, const double now) const {
+	if (has_broker_cert(now)) {
+		return broker_cert;
+	}
+
+	if (in.account_seed.has_value()) {
+		return identity_cert::make_self_signed(*in.account_seed, session_public);
+	}
+
+	return std::nullopt;
+}

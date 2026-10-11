@@ -36,6 +36,7 @@ struct cmd_line_params {
 
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
+	bool print_server_key_only = false;
 	bool help_only = false;
 	bool version_only = false;
 	bool version_line_only = false;
@@ -176,6 +177,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
+			}
+			else if (a == "--print-server-key") {
+				print_server_key_only = true;
 			}
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
