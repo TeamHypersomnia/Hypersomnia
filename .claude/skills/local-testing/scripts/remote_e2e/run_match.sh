@@ -17,8 +17,25 @@ LIVE_WAIT=${3:-35}
 
 for p in $(pgrep -f "^$BIN --connect $ARENA_IP:9005"); do kill $p; done
 
+ID_A=$(cat $E/id_$A)
+ID_B=$(cat $E/id_$B)
+
+# The ids go into a remote shell command and a JSON file there
+for id in "$ID_A" "$ID_B"; do
+	[[ "$id" =~ ^[A-Za-z0-9_]+$ ]] || { echo "invalid account id: $id"; exit 1; }
+done
+
+# The clients ask the test backend for the list and the tokens, never production
+for c in $A $B; do
+	mkdir -p $E/client_$c/user/conf.d
+	cat > $E/client_$c/user/conf.d/test.json <<J
+{ "server_list_provider": "http://$ARENAUS_IP:18420", "connect_token_provider": "http://$ARENAUS_IP:18420/connect_token",
+  "webrtc_signalling_server_url": "ws://$ARENAUS_IP:18000", "website_url": "http://$ARENAUS_IP:13000", "client": { "nickname": "$c" } }
+J
+done
+
 echo "=== server: $A vs $B"
-timeout 60 ssh arena "bash ~/yojimbo-test/e2e/match.sh start $(cat $E/id_$A) $(cat $E/id_$B)"
+timeout 60 ssh arena "bash ~/yojimbo-test/e2e/match.sh start $ID_A $ID_B"
 sleep 6
 
 echo "=== test masterserver list"

@@ -44,6 +44,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
 	def do_GET(self):
 		file = self.resolve()
 
+		# Nothing outside the build and its assets (a symlink), whatever ../ the path holds
+		real = os.path.realpath(file)
+		allowed = [os.path.realpath(ROOT), os.path.realpath(os.path.join(ROOT, "assets"))]
+
+		if not any(real == base or real.startswith(base + os.sep) for base in allowed):
+			self.send_error(404)
+			return
+
 		if not os.path.isfile(file):
 			self.send_error(404)
 			return

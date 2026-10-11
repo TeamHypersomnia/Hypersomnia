@@ -8,7 +8,11 @@ export LD_LIBRARY_PATH=$B/lib
 stop() {
 	for f in $B/*.pid; do
 		[ -f "$f" ] || continue
-		kill $(cat $f) 2>/dev/null
+		# Only if that pid is still ours - after a reboot it could be anything
+		pid=$(cat $f)
+		if ps -o args= -p $pid 2>/dev/null | grep -q -- "$B"; then
+			kill $pid 2>/dev/null
+		fi
 		rm -f $f
 	done
 }

@@ -4,6 +4,8 @@
 export ALSOFT_DRIVERS=null
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
+# Test secrets in the configs - owner only
+umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
@@ -11,7 +13,7 @@ T=$S/secure_test
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
 
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
 rm -rf $T
 mkdir -p $T/official_servers.d
@@ -126,6 +128,6 @@ grep -ohE "key_[0-9a-f]{64}" $T/ranked_pl.out | sort | uniq -c
 echo "=== rate limit (40 requests from one IP)"
 for i in $(seq 1 40); do curl -s -o /dev/null -w '%{http_code}\n' "http://127.0.0.1:18420/connect_token?server=127.0.0.1:10000"; done | sort | uniq -c
 
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
 echo "=== leftover: $(pgrep -fc "^$BIN")"

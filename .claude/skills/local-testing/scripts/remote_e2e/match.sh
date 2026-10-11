@@ -12,7 +12,11 @@ umask 077
 
 stop() {
 	if [ -f $E/server.pid ]; then
-		kill $(cat $E/server.pid) 2>/dev/null
+		# Only if that pid is still our server - after a reboot it could be anything
+		pid=$(cat $E/server.pid)
+		if ps -o args= -p $pid 2>/dev/null | grep -q -- "--appdata-dir $E/server"; then
+			kill $pid 2>/dev/null
+		fi
 		rm -f $E/server.pid
 	fi
 
@@ -21,6 +25,10 @@ stop() {
 
 case "$1" in
 start)
+	for id in "$2" "$3"; do
+		[[ "$id" =~ ^[A-Za-z0-9_]+$ ]] || { echo "invalid account id: $id"; exit 1; }
+	done
+
 	stop
 	sleep 1
 

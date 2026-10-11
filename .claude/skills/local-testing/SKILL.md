@@ -5,7 +5,8 @@ description: Test Hypersomnia end to end without the user, mainly networking - l
 
 # Local testing
 
-Everything runs from scripts in `scripts/`, each fully isolated: own appdata dirs, own ports, own scratch dir
+Everything runs from scripts in `scripts/`, each isolated: own appdata dirs, own scratch dir, and they check their ports
+are free (the scenarios share 18000/18410/18420/18430/10002 - run one at a time)
 (`SCRATCH`, default `/tmp/hypersomnia-nettest` - point it at the session scratchpad).
 Build into your own build folder first and pass it as `BIN` (default `build/Debug-x64-clang-claude/Hypersomnia`).
 
@@ -36,7 +37,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 
 | Script | What it proves |
 |---|---|
-| `scenario_udp_secure.sh` | Master with `official_servers.d`, official casual (de) + ranked (pl) + community servers, 4 CLI clients: token endpoint 200/404, secure vs insecure, ranked kicks insecure clients, identity key auth (`key_...`), key file only where needed (0600), same account on reconnect, rate limit |
+| `scenario_udp_secure.sh` | Master with `official_servers.d`, official casual (de) + ranked (pl) + community servers, 4 CLI clients: token endpoint 200/404, secure vs insecure, ranked does not answer insecure clients at all (no token from an unreachable master: the client times out), identity key auth (`key_...`), key file only where needed (0600), same account on reconnect, rate limit |
 | `scenario_webrtc_secure.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server: token by WebRTC alias, secure connection, key auth |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`), secure over WebRTC; screenshot in `$SCRATCH/web_test/screen.png` |
 | `build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web`, the same steps as `build.sh Release Web` |
@@ -70,6 +71,17 @@ Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscre
 A fresh appdata starts in the tutorial: `xinput.py key Escape` opens the menu (Settings at ~156,555).
 The appdata remembers the last connect string - the first screen may be a reconnect dialog with Abort.
 
+## Soak: servers must never quietly stop taking players (scripts/soak)
+
+The worst bug class: after N connections a table fills up and the server silently refuses everyone.
+`build_soak.sh` builds a netcode-level client from the game's own netcode; then:
+
+- `soak_netcode.sh [scale]` - ~9000 connect/disconnect cycles, half abandoned mid-handshake, insecure and secure tokens,
+  against a community and an official dedicated server; 0 failures expected, then a real client must join.
+  (Before the fixes of 2026-10-11 a server stopped taking anyone after ~1060 abandoned handshakes.)
+- `soak_webrtc.sh [cycles]` - native clients over WebRTC killed at random moments, more than the 64 WebRTC ids;
+  then a full join must work. A native community server's WebRTC id is its address (`browser_connect_string`).
+
 ## Remote hosts (arena, arenaus)
 
 - `arena` = Ubuntu 25.04, glibc 2.41; `arenaus` = Ubuntu 22.04, glibc 2.35. A binary from this Arch machine (glibc 2.44+)
@@ -77,7 +89,7 @@ The appdata remembers the last connect string - the first screen may be a reconn
   from the rootfs next to it with `LD_LIBRARY_PATH`.
 - `arena` has ufw: ports 9000-9010/udp are open and unused - use 9005. `arenaus` has no firewall.
 - Upload the content dir (`hypersomnia/`, ~35 MB) with rsync, excluding `logs`, `user`, `cache`.
-- Never copy production secrets anywhere but `~/yojimbo-test`, and delete them after the test.
+- Never copy production secrets anywhere but `~/yojimbo-test` (arena) or `~/hs-test-backend` (arenaus), and delete them after the test.
 
 ## Remote end to end: official server, ranked, accounts (scripts/remote_e2e)
 
@@ -110,7 +122,8 @@ One match covers both: the web build signed in with the user's Discord against t
 their running Steam client, on the arena test server, reported to the arenaus test site.
 
 - **Discord token:** the user signs in on https://play.hypersomnia.io and runs in the devtools console
-  `FS.readFile('/user/cached_auth.json', {encoding: 'utf8'})`. Save it 0600 in the scratchpad only.
+  `FS.readFile('/user/cached_auth.json', {encoding: 'utf8'})`. Save it 0600 in the scratchpad only. Note that `prepare_web.sh` then builds it into the served `inject_user_files.js`:
+  any local process can fetch it while `webserve.py` runs - stop it right after the test and delete the copy.
   `USER_FILES=<dir> prepare_web.sh` writes `<dir>/cached_auth.json` and `<dir>/conf.d/test.json` (the test master's
   URLs - the connect token URL with an IP does not fit in place in `Hypersomnia.data`) into `/user` before the game starts.
   Serve on a port other than 8765 if `local_stack.sh` still runs there. Join with `/game/ranked-` (the alias the

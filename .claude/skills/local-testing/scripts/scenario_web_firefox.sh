@@ -5,6 +5,8 @@
 export ALSOFT_DRIVERS=null
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
+# Test secrets in the configs - owner only
+umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
@@ -15,7 +17,7 @@ WEB=$S/webserve
 CONNECT=${1:-pl}
 WAIT=${2:-120}
 
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 for p in $(pgrep -f "webserve.py $WEB"); do kill $p; done
 for p in $(pgrep -f "firefox --no-remote --profile $T"); do kill $p; done
 for p in $(pgrep -f "^Xvfb :78"); do kill $p; done
@@ -91,7 +93,7 @@ echo "=== browser console (game)"
 grep -E "secure connect token|Connecting securely|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
 
 sleep 12
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 for p in $(pgrep -f "webserve.py $WEB"); do kill $p; done
 for p in $(pgrep -f "^Xvfb :78"); do kill $p; done
 echo "=== screenshot: $T/screen.png"

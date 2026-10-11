@@ -5,6 +5,8 @@
 export ALSOFT_DRIVERS=null
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
+# Test secrets in the configs - owner only
+umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
@@ -12,7 +14,7 @@ T=$S/rtc_test
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
 
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
 rm -rf $T
 mkdir -p $T/official_servers.d
@@ -70,6 +72,6 @@ grep -hE "WebRTC|secure connect token|Connecting securely|client connected to se
 echo "=== server"
 grep -hE "connected securely|connected\. SID|Authenticated|kicked|Reason|Ignoring auth" $T/ranked.out | sed 's/^\[[0-9:]*\] //' | head -10
 
-for p in $(pgrep -f "^$BIN"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
 echo "=== leftover: $(pgrep -fc "^$BIN")"
