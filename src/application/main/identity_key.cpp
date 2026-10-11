@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -67,11 +68,22 @@ namespace identity_key {
 	}
 
 	std::optional<augs::ed25519_seed_type> from_export_string(const std::string& text) {
+		/*
+			Pasted keys often come with whitespace around them, e.g. copied from a chat or a text editor.
+		*/
+
+		const auto is_space = [](const char c) {
+			return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+		};
+
 		auto trimmed = text;
 
-		while (!trimmed.empty() && (trimmed.back() == '\n' || trimmed.back() == '\r' || trimmed.back() == ' ')) {
+		while (!trimmed.empty() && is_space(trimmed.back())) {
 			trimmed.pop_back();
 		}
+
+		const auto first = std::find_if_not(trimmed.begin(), trimmed.end(), is_space);
+		trimmed.erase(trimmed.begin(), first);
 
 		if (trimmed.rfind(export_prefix, 0) != 0) {
 			return std::nullopt;
@@ -202,3 +214,28 @@ namespace identity_key {
 		return backup;
 	}
 }
+
+#if BUILD_UNIT_TESTS && BUILD_OPENSSL
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Identity key export string round trip, with whitespace around") {
+	auto seed = augs::ed25519_seed_type();
+
+	for (std::size_t i = 0; i < seed.size(); ++i) {
+		seed[i] = static_cast<uint8_t>(i * 7 + 1);
+	}
+
+	const auto exported = identity_key::to_export_string(seed);
+
+	REQUIRE(identity_key::from_export_string(exported) == seed);
+	REQUIRE(identity_key::from_export_string(exported + "\n") == seed);
+	REQUIRE(identity_key::from_export_string("  \t" + exported + " \r\n") == seed);
+	REQUIRE(identity_key::from_export_string("\n" + exported) == seed);
+
+	REQUIRE_FALSE(identity_key::from_export_string("").has_value());
+	REQUIRE_FALSE(identity_key::from_export_string("hypersomnia-key-v1:nothex").has_value());
+	REQUIRE_FALSE(identity_key::from_export_string(exported.substr(0, exported.size() - 1)).has_value());
+	REQUIRE_FALSE(identity_key::from_export_string(exported + "0").has_value());
+	REQUIRE_FALSE(identity_key::from_export_string("x" + exported).has_value());
+}
+#endif
