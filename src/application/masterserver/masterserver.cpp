@@ -74,6 +74,39 @@ static void set_cors(httplib::Response& res) {
 	res.set_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 };
 
+/*
+	A server's domain is shown on the server list and joined by players, so it has to be a plain host name -
+	and only the official servers may have one under hypersomnia.io, or a community server could pass for one.
+*/
+
+static bool is_acceptable_domain(const std::string& domain, const bool is_official) {
+	if (domain.empty() || domain.size() > 253 || domain.front() == '.' || domain.back() == '.' || domain.front() == '-') {
+		return false;
+	}
+
+	for (const auto c : domain) {
+		const bool allowed = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
+
+		if (!allowed) {
+			return false;
+		}
+	}
+
+	if (domain.find("..") != std::string::npos) {
+		return false;
+	}
+
+	auto lowercase = domain;
+
+	for (auto& c : lowercase) {
+		c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+	}
+
+	const bool under_hypersomnia_io = lowercase == "hypersomnia.io" || ends_with(lowercase, ".hypersomnia.io");
+
+	return is_official || !under_hypersomnia_io;
+}
+
 static auto to_webrtc_alias(
 	const bool is_ranked,
 	std::string location_id,
@@ -1081,7 +1114,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							server_entry.official_server_id = signer != nullptr ? signer->server_id : std::string();
 
 							server_entry.meta.is_official = signer != nullptr;
-							server_entry.meta.domain = typed_request.domain;
+							{
+								const auto domain = std::string(typed_request.domain);
+								server_entry.meta.domain = ::is_acceptable_domain(domain, signer != nullptr) ? typed_request.domain : decltype(typed_request.domain)();
+							}
 
 							if (server_entry.meta.is_official_server()) {
 								const auto new_webrtc_alias = ::to_webrtc_alias(
