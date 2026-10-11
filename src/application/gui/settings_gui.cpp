@@ -356,7 +356,23 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	}
 
 	const auto key_path = USER_DIR / identity_key::file_name;
-	const auto seed = identity_key::load(key_path);
+
+	/*
+		Read from the disk at most once a second while the pane is open,
+		right away after this pane changed the key.
+	*/
+
+	{
+		const auto now = augs::high_precision_secs();
+
+		if (account_seed_reload_needed || now - when_account_seed_loaded > 1.0) {
+			account_seed = identity_key::load(key_path);
+			when_account_seed_loaded = now;
+			account_seed_reload_needed = false;
+		}
+	}
+
+	const auto seed = account_seed;
 
 	const auto public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
 		if (seed.has_value()) {
@@ -408,6 +424,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 		if (ImGui::Button("Create key now")) {
 			identity_key::load_or_create(key_path);
+			account_seed_reload_needed = true;
 		}
 	}
 
@@ -425,6 +442,8 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 		if (ImGui::Button("Import key")) {
 			if (const auto imported = identity_key::from_export_string(import_key_text)) {
+				account_seed_reload_needed = true;
+
 				if (const auto backup = identity_key::save_replacing(key_path, *imported)) {
 					account_status = backup->empty()
 						? std::string("Key imported.")
@@ -478,6 +497,8 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 				const auto cols = button_colors(rgba(200, 40, 0, 255));
 
 				if (ImGui::Button("Forget key")) {
+					account_seed_reload_needed = true;
+
 					if (const auto backup = identity_key::forget(key_path)) {
 						account_status = typesafe_sprintf(
 							"Key forgotten. It was kept as %x.\nA new one is created when you join a ranked server, or with Create key now.",
@@ -529,6 +550,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 				auto target = link_target { code, "", "", "" };
 
 				auto client = httplib_utils::make_client(website_url);
+				client->set_follow_location(false);
 				const auto result = client->Get(("/link_key/info?code=" + code).c_str());
 
 				if (!result) {
@@ -578,6 +600,12 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 				link_request = launch_async([body, website_url]() -> std::string {
 					auto client = httplib_utils::make_client(website_url);
+
+					/*
+						No redirects: one could send the signed link on over plain http.
+					*/
+
+					client->set_follow_location(false);
 					const auto result = client->Post("/link_key", body, "application/json");
 
 					if (!result) {

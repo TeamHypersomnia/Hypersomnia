@@ -8,6 +8,7 @@
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/network/netcode_socket_raii.h"
 #include "augs/misc/randomization.h"
+#include "augs/misc/ed25519.h"
 #include "application/nat/stun_server_provider.h"
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
@@ -217,6 +218,10 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string link_code_text;
 	std::string account_status;
 	bool confirm_forget_key = false;
+
+	std::optional<augs::ed25519_seed_type> account_seed;
+	double when_account_seed_loaded = -1.0;
+	bool account_seed_reload_needed = true;
 	augs::future<std::string> link_request;
 
 	struct link_target {
