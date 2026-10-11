@@ -2,7 +2,8 @@
 #   python3 xinput.py click X Y      move and left-click
 #   python3 xinput.py type TEXT      type letters, digits and spaces
 #   python3 xinput.py scroll X Y N   scroll down N notches at X Y (up if N < 0)
-#   python3 xinput.py key NAME       press one key by its X keysym name, e.g. Return, Escape, BackSpace
+#   python3 xinput.py key NAME       press one key by its X keysym name, e.g. Return, Escape, BackSpace,
+#                                    or a combination like Control_L+v
 import ctypes
 import sys
 import time
@@ -85,6 +86,16 @@ elif mode == "type":
 	for c in sys.argv[2]:
 		press("space" if c == " " else c.lower(), c.isupper())
 elif mode == "key":
-	press(sys.argv[2])
+	*modifiers, key = sys.argv[2].split("+")
+
+	for m in modifiers:
+		xtst.XTestFakeKeyEvent(display, keycode_of(m), 1, 0)
+
+	press(key)
+
+	for m in reversed(modifiers):
+		xtst.XTestFakeKeyEvent(display, keycode_of(m), 0, 0)
+
+	x11.XFlush(display)
 
 x11.XCloseDisplay(display)
