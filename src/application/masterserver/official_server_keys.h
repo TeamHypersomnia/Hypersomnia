@@ -19,7 +19,26 @@ struct official_server_keys {
 	official_server_key_id_type key_id = {};
 	augs::hmac_sha256_type report_key = {};
 
-	static std::optional<official_server_keys> derive(const std::string& secret) {
+	/*
+		The secret is trimmed of spaces, tabs and line breaks around it, like the masterserver and the website read it -
+		a stray space in a config would otherwise make other keys than theirs.
+	*/
+
+	static std::optional<official_server_keys> derive(const std::string& untrimmed_secret) {
+		const auto is_space = [](const char c) {
+			return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+		};
+
+		auto secret = untrimmed_secret;
+
+		while (!secret.empty() && is_space(secret.back())) {
+			secret.pop_back();
+		}
+
+		while (!secret.empty() && is_space(secret.front())) {
+			secret.erase(secret.begin());
+		}
+
 		if (secret.empty()) {
 			return std::nullopt;
 		}

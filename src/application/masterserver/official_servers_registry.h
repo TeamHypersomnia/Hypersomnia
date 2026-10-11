@@ -100,7 +100,19 @@ public:
 				continue;
 			}
 
-			const auto secret = trimmed(augs::file_to_string(file.path()));
+			/*
+				An unreadable file (wrong owner, removed mid-reload) must not take the masterserver down.
+			*/
+
+			const auto secret = [&]() -> std::string {
+				try {
+					return trimmed(augs::file_to_string(file.path()));
+				}
+				catch (const std::exception& err) {
+					LOG("Official server %x: could not read the secret: %x", server_id, err.what());
+					return std::string();
+				}
+			}();
 			const auto keys = official_server_keys::derive(secret);
 
 			if (!keys.has_value()) {
@@ -166,7 +178,11 @@ public:
 		const auto it = by_key_id.find(to_map_key(signature.key_id));
 
 		if (it == by_key_id.end()) {
-			LOG("Rejected a signed request from %x: unknown key id.", from);
+			static uint64_t last_logged_ms = 0;
+
+			if (::official_log_allowed(last_logged_ms)) {
+				LOG("Rejected a signed request from %x: unknown key id.", from);
+			}
 			return nullptr;
 		}
 

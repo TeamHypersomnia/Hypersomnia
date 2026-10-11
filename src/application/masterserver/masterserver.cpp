@@ -1034,7 +1034,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								const auto signer = official_servers.authenticate(typed_request, ::official_signature_now_ms(), ::ToString(from));
 
 								if (signer == nullptr || signer->server_id != entry->official_server_id) {
-									LOG("Ignoring an unauthenticated goodbye for the official server at %x.", ::ToString(from));
+									static uint64_t last_logged_ms = 0;
+
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Ignoring an unauthenticated goodbye for the official server at %x.", ::ToString(from));
+									}
 									return;
 								}
 							}
@@ -1071,7 +1075,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							if (signer == nullptr) {
 								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
-									LOG("Ignoring an unauthenticated heartbeat from the official server at %x.", ip_str);
+									static uint64_t last_logged_ms = 0;
+
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Ignoring an unauthenticated heartbeat from the official server at %x.", ip_str);
+									}
 									return;
 								}
 
@@ -1081,7 +1089,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								*/
 
 								if (typed_request.signature.has_value()) {
-									LOG("Ignoring a heartbeat with an invalid signature from %x.", ip_str);
+									static uint64_t last_logged_ms = 0;
+
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Ignoring a heartbeat with an invalid signature from %x.", ip_str);
+									}
 									return;
 								}
 							}
@@ -1095,14 +1107,22 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 								if (const auto existing = mapped_or_nullptr(server_list, from); existing != nullptr && existing->meta.is_official_server()) {
 									if (existing->official_server_id != signer->server_id) {
-										LOG("Ignoring a heartbeat signed by %x for the official server %x at %x.", signer->server_id, existing->official_server_id, ip_str);
+										static uint64_t last_logged_ms = 0;
+
+										if (::official_log_allowed(last_logged_ms)) {
+											LOG("Ignoring a heartbeat signed by %x for the official server %x at %x.", signer->server_id, existing->official_server_id, ip_str);
+										}
 										return;
 									}
 								}
 
 								for (const auto& other : server_list) {
 									if (other.first != from && other.second.meta.is_official_server() && other.second.official_server_id == signer->server_id) {
-										LOG("Ignoring a heartbeat signed by %x from %x: it is already listed at %x.", signer->server_id, ip_str, ::ToString(other.first));
+										static uint64_t last_logged_ms = 0;
+
+										if (::official_log_allowed(last_logged_ms)) {
+											LOG("Ignoring a heartbeat signed by %x from %x: it is already listed at %x.", signer->server_id, ip_str, ::ToString(other.first));
+										}
 										return;
 									}
 								}

@@ -12,6 +12,22 @@
 	so its variant index tells a heartbeat from a goodbye and neither can be passed off as the other.
 */
 
+/*
+	For the logs of requests anyone can send: at most one line every 10 seconds per call site,
+	so that a flood of them does not fill the disk.
+*/
+
+inline bool official_log_allowed(uint64_t& last_logged_ms) {
+	const auto now = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+
+	if (now - last_logged_ms < 10000 && last_logged_ms != 0) {
+		return false;
+	}
+
+	last_logged_ms = now;
+	return true;
+}
+
 inline uint64_t official_signature_now_ms() {
 	using namespace std::chrono;
 	return static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
