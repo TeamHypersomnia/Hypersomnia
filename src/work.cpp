@@ -2288,13 +2288,28 @@ work_result work(
 	WEBSTATIC auto launch_client_setup = [&]() {
 		auto connect_string = config.client_connect;
 
-#if PLATFORM_WEB
 		/*
-			The official ranked aliases are ranked-<location>, with :<index> only if the server name has #<index>.
-			The authentication is sent over a secure connection only, so any other server named like this gets nothing.
+			What the server list says about the chosen server - or, when it is not on the list yet (e.g. joined from the URL,
+			the command line or a Steam invite), its WebRTC alias: the masterserver gives aliases only to the official servers,
+			ranked-<location> to the ranked ones, with :<index> if the name has #<index> - e.g. "ranked-pl:1" for "[PL] Ranked #1".
 		*/
 
-		const bool requires_sign_in = begins_with(::find_webrtc_id(connect_string), "ranked");
+		const auto found = find_chosen_server_info();
+
+		const auto target = [&]() {
+			const auto webrtc_id = ::find_webrtc_id(connect_string);
+			return webrtc_id.empty() ? std::string(connect_string) : webrtc_id;
+		}();
+
+		const bool is_ranked = (found != nullptr && found->heartbeat.is_ranked_server()) || begins_with(target, "ranked");
+		const bool is_official = (found != nullptr && found->is_official_server()) || ::is_official_webrtc_id(target) || is_ranked;
+
+#if PLATFORM_WEB
+		/*
+			The authentication is sent over a secure connection only, so a community server named like an alias gets nothing.
+		*/
+
+		const bool requires_sign_in = is_ranked;
 
 		if (requires_sign_in) {
 			if (is_auth_expired()) {
@@ -2335,20 +2350,6 @@ work_result work(
 		*/
 
 		const auto secure_request = [&]() -> std::optional<secure_connect_request> {
-			const auto found = find_chosen_server_info();
-
-			/*
-				E.g. "ranked-pl" for "rtc:ranked-pl" - the official WebRTC aliases are ranked-<location> or <location>:<index>.
-			*/
-
-			const auto target = [&]() {
-				const auto webrtc_id = ::find_webrtc_id(connect_string);
-				return webrtc_id.empty() ? std::string(connect_string) : webrtc_id;
-			}();
-
-			const bool is_ranked = (found != nullptr && found->heartbeat.is_ranked_server()) || begins_with(target, "ranked");
-			const bool is_official = (found != nullptr && found->is_official_server()) || ::is_official_webrtc_id(target) || is_ranked;
-
 			if (found == nullptr && !is_official) {
 				/*
 					Not on the server list yet, e.g. joined from the command line or a Steam invite.
