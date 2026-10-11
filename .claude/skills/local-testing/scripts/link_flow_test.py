@@ -80,7 +80,8 @@ with db:
     db.execute("INSERT INTO mmr_team (account_id, nickname, mmr, mu, sigma, matches_won, matches_lost) VALUES (?, 'k', 7.5, 30, 5, 3, 2)", ('key_' + pub,))
 
 def mmr_owner():
-    rows = db.execute("SELECT account_id FROM mmr_team WHERE mmr = 7.5 AND matches_won = 3").fetchall()
+    # Only this run's two accounts - the database may hold earlier runs
+    rows = db.execute("SELECT account_id FROM mmr_team WHERE mmr = 7.5 AND matches_won = 3 AND account_id IN (?, ?)", ('key_' + pub, 'steam_' + steam_id)).fetchall()
     return [r[0] for r in rows]
 
 link_sig = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code, steam_id)).encode()).hex()
