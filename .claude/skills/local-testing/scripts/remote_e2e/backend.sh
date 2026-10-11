@@ -22,7 +22,7 @@ start)
 	cat > $B/ms/user/conf.d/test.json <<EOF
 { "masterserver": { "ip": "0.0.0.0", "signalling_server_port": 18000, "first_udp_command_port": 18430, "num_udp_command_ports": 1,
   "server_list_port": 18420, "fallback_http_server_list_port": 18410, "report_rtc_errors_to_webhook": false,
-  "official_servers_dir": "$B/official_servers.d" } }
+  "official_servers_dir": "$B/official_servers.d", "connect_tokens_over_plain_http": true } }
 EOF
 
 	cd $B/hypersomnia
