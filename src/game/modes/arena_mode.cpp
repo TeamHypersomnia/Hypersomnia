@@ -618,6 +618,25 @@ void arena_mode::remove_player(input_type in, const logic_step step, const mode_
 				LOG("Arena: suspending %x.", id.value);
 				entry->unset_inputs_once = true;
 
+				/*
+					Suspended players are found by their account, the key only has to be unique.
+					A player who rejoined into the slot of another still suspended one and then left again
+					would otherwise overwrite them - and that one could never rejoin.
+				*/
+
+				if (found_in(suspended_players, id)) {
+					auto free_key = mode_player_id::first();
+
+					while (free_key.value < integrated_client_id_v && (found_in(suspended_players, free_key) || found_in(players, free_key))) {
+						++free_key;
+					}
+
+					if (free_key.value < integrated_client_id_v) {
+						LOG("Arena: moving the suspended %x to the free key %x.", id.value, free_key.value);
+						suspended_players[free_key] = suspended_players.at(id);
+					}
+				}
+
 				suspended_players[id] = *entry;
 				erase_element(players, id);
 			}
