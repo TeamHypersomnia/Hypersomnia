@@ -5,10 +5,16 @@
 #include <fstream>
 #include <random>
 #include <string>
+#include <string_view>
 #include <system_error>
 #if PLATFORM_UNIX
+#include <cerrno>
 #include <fcntl.h>
 #include <unistd.h>
+#if PLATFORM_LINUX
+#include <linux/fs.h>
+#include <sys/syscall.h>
+#endif
 #elif defined(_WIN32)
 #include <io.h>
 #endif
@@ -81,7 +87,34 @@ namespace identity_key {
 			return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 		};
 
-		auto trimmed = text;
+		/*
+			A key file saved again by a text editor can come back with a byte order mark, or even as UTF-16.
+			The key itself is plain ASCII, so the UTF-16 is read by dropping the zero bytes.
+		*/
+
+		auto trimmed = [&]() {
+			const auto starts_with_bytes = [&](const std::string_view prefix) {
+				return text.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), text.begin());
+			};
+
+			if (starts_with_bytes("\xEF\xBB\xBF")) {
+				return text.substr(3);
+			}
+
+			if (starts_with_bytes("\xFF\xFE") || starts_with_bytes("\xFE\xFF")) {
+				auto ascii = std::string();
+
+				for (std::size_t i = 2; i < text.size(); ++i) {
+					if (text[i] != '\0') {
+						ascii += text[i];
+					}
+				}
+
+				return ascii;
+			}
+
+			return text;
+		}();
 
 		while (!trimmed.empty() && is_space(trimmed.back())) {
 			trimmed.pop_back();
@@ -188,21 +221,87 @@ namespace identity_key {
 		Where hard links are not supported (e.g. FAT), it is renamed instead, after checking the name is free.
 	*/
 
+	static void sync_directory_of(const augs::path_type& path) {
+#if PLATFORM_UNIX
+		const auto fd = ::open(path.parent_path().string().c_str(), O_RDONLY | O_DIRECTORY);
+
+		if (fd >= 0) {
+			::fsync(fd);
+			::close(fd);
+		}
+#else
+		(void)path;
+#endif
+	}
+
+	/*
+		Renames, failing if the new name is taken - atomically where the system can, else after checking the name is free.
+	*/
+
+	static bool rename_without_replacing(const augs::path_type& from, const augs::path_type& to) {
+#if PLATFORM_LINUX
+		if (::syscall(SYS_renameat2, AT_FDCWD, from.string().c_str(), AT_FDCWD, to.string().c_str(), RENAME_NOREPLACE) == 0) {
+			return true;
+		}
+
+		if (errno != EINVAL && errno != ENOSYS) {
+			return false;
+		}
+#elif PLATFORM_MACOS
+		if (::renamex_np(from.string().c_str(), to.string().c_str(), RENAME_EXCL) == 0) {
+			return true;
+		}
+
+		if (errno != ENOTSUP) {
+			return false;
+		}
+#endif
+
+		std::error_code ec;
+
+		if (std::filesystem::exists(to, ec)) {
+			return false;
+		}
+
+		std::filesystem::rename(from, to, ec);
+		return !ec;
+	}
+
+	/*
+		Moves the file to a new name, failing if that name is taken.
+		A hard link first, so the file is never missing under both names; renamed where links are not supported (e.g. FAT).
+		Fails, leaving everything as it was, if the old name can not be removed - e.g. the file is held open on Windows.
+	*/
+
 	static bool link_without_replacing(const augs::path_type& from, const augs::path_type& to) {
 		std::error_code ec;
 		std::filesystem::create_hard_link(from, to, ec);
 
 		if (!ec) {
 			std::filesystem::remove(from, ec);
+
+			if (ec) {
+				LOG("Could not remove %x after linking it as %x: %x", from, to, ec.message());
+
+				std::error_code undo_ec;
+				std::filesystem::remove(to, undo_ec);
+				return false;
+			}
+
+			sync_directory_of(to);
 			return true;
 		}
 
-		if (std::filesystem::exists(to)) {
+		if (std::filesystem::exists(to, ec)) {
 			return false;
 		}
 
-		std::filesystem::rename(from, to, ec);
-		return !ec;
+		if (!rename_without_replacing(from, to)) {
+			return false;
+		}
+
+		sync_directory_of(to);
+		return true;
 	}
 
 	static bool write_private_file(const augs::path_type& path, const std::string& content) {
@@ -306,6 +405,15 @@ namespace identity_key {
 
 		if (!write_private_file(path, to_export_string(seed) + "\n")) {
 			LOG("Failed to save the identity key to %x.", path);
+
+			/*
+				Put the previous key back - otherwise the next secure connection would quietly create a new account.
+			*/
+
+			if (!backup.empty() && !link_without_replacing(backup, path)) {
+				LOG("Could not restore %x from %x.", path, backup);
+			}
+
 			return std::nullopt;
 		}
 
@@ -329,6 +437,18 @@ TEST_CASE("Identity key export string round trip, with whitespace around") {
 	REQUIRE(identity_key::from_export_string(exported + "\n") == seed);
 	REQUIRE(identity_key::from_export_string("  \t" + exported + " \r\n") == seed);
 	REQUIRE(identity_key::from_export_string("\n" + exported) == seed);
+
+	/* Saved again by a text editor: a UTF-8 byte order mark, or UTF-16 */
+	REQUIRE(identity_key::from_export_string("\xEF\xBB\xBF" + exported + "\r\n") == seed);
+
+	auto utf16 = std::string("\xFF\xFE");
+
+	for (const auto c : exported + "\r\n") {
+		utf16 += c;
+		utf16 += '\0';
+	}
+
+	REQUIRE(identity_key::from_export_string(utf16) == seed);
 
 	REQUIRE_FALSE(identity_key::from_export_string("").has_value());
 	REQUIRE_FALSE(identity_key::from_export_string("hypersomnia-key-v1:nothex").has_value());
