@@ -1,11 +1,16 @@
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <random>
+#include <string>
 #include <system_error>
 #if PLATFORM_UNIX
 #include <fcntl.h>
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <io.h>
 #endif
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
@@ -133,13 +138,12 @@ namespace identity_key {
 	}
 
 	/*
-		Created readable by the owner only from the start, so the key is never visible to other users even for a moment.
+		The key is never left half-written and never overwrites a file:
+		it is written to a temporary file next to it (readable by the owner only from the start),
+		flushed to the disk, and only then linked under its name - which fails if that name is taken.
 	*/
 
-	static bool write_private_file(const augs::path_type& path, const std::string& content) {
-		std::error_code ec;
-		std::filesystem::create_directories(path.parent_path(), ec);
-
+	static bool write_and_sync(const augs::path_type& path, const std::string& content) {
 #if PLATFORM_UNIX
 		const auto fd = ::open(path.string().c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
 
@@ -148,19 +152,77 @@ namespace identity_key {
 		}
 
 		const auto written = ::write(fd, content.data(), content.size());
+		const bool synced = ::fsync(fd) == 0;
 		::close(fd);
 
-		return written == static_cast<decltype(written)>(content.size());
-#else
-		auto out = std::ofstream(path, std::ios::out | std::ios::binary | std::ios::trunc);
+		return synced && written == static_cast<decltype(written)>(content.size());
+#elif defined(_WIN32)
+		std::FILE* const file = ::_wfopen(path.c_str(), L"wbx");
 
-		if (!out) {
+		if (file == nullptr) {
 			return false;
 		}
 
-		out << content;
-		return static_cast<bool>(out);
+		const auto written = std::fwrite(content.data(), 1, content.size(), file);
+		const bool synced = std::fflush(file) == 0 && ::_commit(::_fileno(file)) == 0;
+		std::fclose(file);
+
+		return synced && written == content.size();
+#else
+		std::FILE* const file = std::fopen(path.string().c_str(), "wbx");
+
+		if (file == nullptr) {
+			return false;
+		}
+
+		const auto written = std::fwrite(content.data(), 1, content.size(), file);
+		const bool flushed = std::fflush(file) == 0;
+		std::fclose(file);
+
+		return flushed && written == content.size();
 #endif
+	}
+
+	/*
+		Gives the file a second name, failing if that name is taken.
+		Where hard links are not supported (e.g. FAT), it is renamed instead, after checking the name is free.
+	*/
+
+	static bool link_without_replacing(const augs::path_type& from, const augs::path_type& to) {
+		std::error_code ec;
+		std::filesystem::create_hard_link(from, to, ec);
+
+		if (!ec) {
+			std::filesystem::remove(from, ec);
+			return true;
+		}
+
+		if (std::filesystem::exists(to)) {
+			return false;
+		}
+
+		std::filesystem::rename(from, to, ec);
+		return !ec;
+	}
+
+	static bool write_private_file(const augs::path_type& path, const std::string& content) {
+		std::error_code ec;
+		std::filesystem::create_directories(path.parent_path(), ec);
+
+		auto temporary = path;
+		temporary += ".tmp-" + std::to_string(std::random_device()());
+
+		if (!write_and_sync(temporary, content)) {
+			std::filesystem::remove(temporary, ec);
+			return false;
+		}
+
+		if (!link_without_replacing(temporary, path)) {
+			std::filesystem::remove(temporary, ec);
+			return false;
+		}
+
+		return true;
 	}
 
 	std::optional<augs::ed25519_seed_type> load_or_create(const augs::path_type& path) {
@@ -182,6 +244,14 @@ namespace identity_key {
 		}
 
 		if (!write_private_file(path, to_export_string(*seed) + "\n")) {
+			/*
+				E.g. another instance of the game created it in the meantime - that one is the key.
+			*/
+
+			if (augs::exists(path)) {
+				return load(path);
+			}
+
 			LOG("Failed to save the identity key to %x.", path);
 			return std::nullopt;
 		}
@@ -190,19 +260,28 @@ namespace identity_key {
 		return seed;
 	}
 
+	/*
+		Never overwrites an earlier backup, even one made within the same second.
+	*/
+
 	static std::optional<augs::path_type> back_up(const augs::path_type& path) {
-		auto backup = path;
-		backup += ".bak-" + augs::date_time().get_readable_for_file();
+		const auto stamp = augs::date_time().get_readable_for_file();
 
-		std::error_code ec;
-		std::filesystem::rename(path, backup, ec);
+		for (int attempt = 1; attempt <= 100; ++attempt) {
+			auto backup = path;
+			backup += ".bak-" + stamp + (attempt == 1 ? std::string() : "-" + std::to_string(attempt));
 
-		if (ec) {
-			LOG("Could not back up %x: %x", path, ec.message());
-			return std::nullopt;
+			if (link_without_replacing(path, backup)) {
+				return backup;
+			}
+
+			if (!augs::exists(path)) {
+				break;
+			}
 		}
 
-		return backup;
+		LOG("Could not back up %x.", path);
+		return std::nullopt;
 	}
 
 	std::optional<augs::path_type> forget(const augs::path_type& path) {
@@ -256,5 +335,44 @@ TEST_CASE("Identity key export string round trip, with whitespace around") {
 	REQUIRE_FALSE(identity_key::from_export_string(exported.substr(0, exported.size() - 1)).has_value());
 	REQUIRE_FALSE(identity_key::from_export_string(exported + "0").has_value());
 	REQUIRE_FALSE(identity_key::from_export_string("x" + exported).has_value());
+}
+
+TEST_CASE("Identity key files are created once, replaced and forgotten only with a backup") {
+	const auto dir = std::filesystem::temp_directory_path() / ("hypersomnia-identity-key-test-" + std::to_string(std::random_device()()));
+	const auto path = dir / "identity.key";
+
+	const auto created = identity_key::load_or_create(path);
+	REQUIRE(created.has_value());
+	REQUIRE(identity_key::load_or_create(path) == created);
+	REQUIRE(identity_key::load(path) == created);
+
+	auto other = augs::ed25519_seed_type();
+	other[0] = 42;
+
+	const auto first_backup = identity_key::save_replacing(path, other);
+	REQUIRE(first_backup.has_value());
+	REQUIRE(identity_key::load(*first_backup) == created);
+	REQUIRE(identity_key::load(path) == other);
+
+	/* Within the same second: a second backup does not overwrite the first */
+	const auto second_backup = identity_key::forget(path);
+	REQUIRE(second_backup.has_value());
+	REQUIRE(*second_backup != *first_backup);
+	REQUIRE(identity_key::load(*first_backup) == created);
+	REQUIRE(identity_key::load(*second_backup) == other);
+	REQUIRE_FALSE(std::filesystem::exists(path));
+	REQUIRE_FALSE(identity_key::forget(path).has_value());
+
+	/* No temporary files left behind */
+	for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+		REQUIRE(entry.path().filename().string().find(".tmp-") == std::string::npos);
+	}
+
+#if PLATFORM_UNIX
+	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::group_read) == std::filesystem::perms::none);
+	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::others_read) == std::filesystem::perms::none);
+#endif
+
+	std::filesystem::remove_all(dir);
 }
 #endif
