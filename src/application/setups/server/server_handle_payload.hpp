@@ -100,15 +100,23 @@ message_handler_result server_setup::handle_payload(
 
 		c.settings = std::move(payload);
 
+		/*
+			Only for joining: settings sent again later (e.g. a nickname change) must not kick a player
+			already in, because someone else at the same address guessed passwords.
+		*/
+
+		const bool joining = c.state == S::PENDING_WELCOME;
 		const auto guessing_address = get_client_ip_for_bans(client_id);
 
-		if (too_many_wrong_passwords(guessing_address) && !find_admin_profile_of(c.cert_account).has_value()) {
+		if (joining && too_many_wrong_passwords(guessing_address) && !find_admin_profile_of(c.cert_account).has_value()) {
 			kick(client_id, "Too many wrong passwords. Try again in a minute.");
 			return continue_v;
 		}
 
 		if (!is_authorized_for_access(client_id)) {
-			note_wrong_password(guessing_address);
+			if (joining) {
+				note_wrong_password(guessing_address);
+			}
 
 			/*
 				Don't return abort_v here: that would disconnect the client immediately

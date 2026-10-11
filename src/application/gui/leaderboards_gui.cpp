@@ -367,6 +367,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 		else {
 			text("No matches yet!");
+			tooltip_on_hover("Your account gets onto the leaderboards with its first ranked match.");
 
 			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 

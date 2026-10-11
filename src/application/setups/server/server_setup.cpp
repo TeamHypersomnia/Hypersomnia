@@ -140,7 +140,17 @@ class webrtc_server_detail {
 	struct pc_meta {
 		bool has_description = false;
 		std::vector<nlohmann::json> pending_candidates;
+		double created_at = 0.0;
+		bool open = false;
 	};
+
+	/*
+		A peer that got an id but never opened its DataChannel within this time gives the id back -
+		otherwise 64 bogus offers would keep every web player out until ICE gave up on each (~40 s).
+	*/
+
+	static constexpr double max_secs_to_open_v = 15.0;
+	static constexpr std::size_t max_pending_candidates_v = 32;
 
     rtc::Configuration config;
     std::unordered_map<client_id, std::shared_ptr<rtc::PeerConnection>> pcs;
@@ -180,6 +190,20 @@ public:
 		std::scoped_lock lock(connections_lk);
 
 		if (const auto it = pcs.find(id); it != pcs.end() && it->second != nullptr) {
+			/*
+				A peer behind a TURN relay shows the relay's address - shared by everyone relayed there,
+				so it is no address of this player: no bans or per-address limits by it.
+			*/
+
+			{
+				auto local = rtc::Candidate();
+				auto remote = rtc::Candidate();
+
+				if (it->second->getSelectedCandidatePair(&local, &remote) && remote.type() == rtc::Candidate::Type::Relayed) {
+					return "";
+				}
+			}
+
 			if (const auto address = it->second->remoteAddress()) {
 				const auto& a = *address;
 
@@ -402,6 +426,7 @@ private:
 
 				if (id < max_clients) {
 					id_map[external_id] = id;
+					pc_metas[id].created_at = augs::high_precision_secs();
 
 					main_thread_queue::execute([&]() {		
 						try {
@@ -447,6 +472,10 @@ private:
 				const auto id = *id_ptr;
 
 				if (!pc_metas[id].has_description) {
+					if (pc_metas[id].pending_candidates.size() >= max_pending_candidates_v) {
+						return;
+					}
+
 					pc_metas[id].pending_candidates.push_back(message);
 					LOG("Candidate arrived too early. Saving.");
 					return;
@@ -528,6 +557,10 @@ private:
 				LOG("DataChannel opened. Removing %x from internal guid map", id);
 
 				std::scoped_lock lk(self->connections_lk);  
+
+				if (const auto meta = mapped_or_nullptr(self->pc_metas, id)) {
+					meta->open = true;
+				}
 
 				/* 
 					No longer need external id mapping,
@@ -633,7 +666,29 @@ public:
 		packets_to_send.emplace_back(packet{ id, { data, data + size } });
 	}
 
+	void free_unopened_peers() {
+		const auto now = augs::high_precision_secs();
+		auto stale = std::vector<client_id>();
+
+		{
+			std::scoped_lock lock(connections_lk);
+
+			for (const auto& [id, meta] : pc_metas) {
+				if (!meta.open && meta.created_at > 0.0 && now - meta.created_at > max_secs_to_open_v) {
+					stale.push_back(id);
+				}
+			}
+		}
+
+		for (const auto id : stale) {
+			set_message(typesafe_sprintf("WebRTC peer %x did not open its DataChannel in time - freeing its id.", id));
+			disconnect(id);
+		}
+	}
+
 	static void send_pending_packets(this_sptr self) {
+		self->free_unopened_peers();
+
 		if (self->packets_to_send.empty()) {
 			return;
 		}
@@ -1303,22 +1358,35 @@ void server_setup::verify_client_identity(const client_id_type id) {
 					false
 				);
 			}
+			else if (is_banned(verified->account)) {
+				/*
+					Banned by account also where the nicknames are the accounts.
+				*/
+
+				kick(id, ban_message_for(verified->account));
+				c.kick_no_linger = true;
+			}
 		}
 		else {
 			/*
 				A broker cert outside its time is most often this host's clock being off.
+				The account is anyone's text - logged escaped, and at most every 10 seconds.
 			*/
 
-			const auto& cert = *blob->identity;
+			static uint64_t last_logged_ms = 0;
 
-			LOG(
-				"Client %x presented a cert that did not verify (account: %x, valid %x..%x, this server's time %x).",
-				id,
-				cert.account,
-				cert.not_before,
-				cert.not_after,
-				static_cast<int64_t>(now)
-			);
+			if (::official_log_allowed(last_logged_ms)) {
+				const auto& cert = *blob->identity;
+
+				LOG(
+					"Client %x presented a cert that did not verify (account: %x, valid %x..%x, this server's time %x).",
+					id,
+					augs::bytes_to_hex(cert.account),
+					cert.not_before,
+					cert.not_after,
+					static_cast<int64_t>(now)
+				);
+			}
 		}
 	}
 
@@ -2088,10 +2156,12 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 
 	const auto match_id = augs::bytes_to_hex(summary.ranked_match_id);
 
+	std::size_t endpoint_index = 0;
+
 	auto queue_for = [&](const std::string& url) {
 		if (parsed_url(url).valid()) {
 			LOG("Queueing the ranked match report for: %x", url);
-			reports.push(url, json_body, match_id);
+			reports.push(url, json_body, match_id, endpoint_index++);
 		}
 	};
 
@@ -2618,6 +2688,26 @@ bool server_setup::handle_gameserver_command(
 			return true;
 		}
 		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
+			/*
+				Signalling only from the masterserver (its address, any of its command ports) - anyone can send a packet to the game port.
+			*/
+
+			const bool from_masterserver = [&]() {
+				if (!resolved_server_list_addr.has_value()) {
+					return false;
+				}
+
+				auto a = *resolved_server_list_addr;
+				auto b = from;
+				a.port = 0;
+				b.port = 0;
+				return a == b;
+			}();
+
+			if (!from_masterserver) {
+				return true;
+			}
+
 			LOG("webrtc_signalling_payload: %x", typed_request.message);
 
 			if (webrtc_server) {
@@ -5320,13 +5410,42 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
 static constexpr std::size_t max_wrong_password_addresses_v = 4096;
 
+/*
+	Counted per IPv6 /48 (one user can hold a whole one), an IPv4 address per itself.
+*/
+
+static std::string password_guess_key(const std::string& ban_address) {
+	if (const auto suffix = ban_address.find("::/64"); suffix != std::string::npos) {
+		const auto groups = ban_address.substr(0, suffix);
+		const auto third_colon = groups.rfind(':');
+
+		if (third_colon != std::string::npos) {
+			return groups.substr(0, third_colon) + "::/48";
+		}
+	}
+
+	return ban_address;
+}
+
+/*
+	Once the table is full of fresh records, new addresses share one record - so that a flood
+	from many addresses neither grows it nor resets anyone's count.
+*/
+
+static const std::string overflow_password_key_v = "*";
+
 bool server_setup::too_many_wrong_passwords(const std::string& address) const {
 	if (address.empty()) {
 		return false;
 	}
 
-	if (const auto record = mapped_or_nullptr(wrong_passwords, address)) {
-		return server_time - record->since < 60.0 && record->count >= max_wrong_passwords_per_minute_v;
+	const auto key = ::password_guess_key(address);
+	const auto record = mapped_or_nullptr(wrong_passwords, key);
+	const auto used = record != nullptr ? record : mapped_or_nullptr(wrong_passwords, overflow_password_key_v);
+
+	if (used != nullptr) {
+		const auto limit = record != nullptr ? max_wrong_passwords_per_minute_v : 10 * max_wrong_passwords_per_minute_v;
+		return server_time - used->since < 60.0 && used->count >= limit;
 	}
 
 	return false;
@@ -5337,19 +5456,17 @@ void server_setup::note_wrong_password(const std::string& address) {
 		return;
 	}
 
-	/*
-		A bounded table: the stale records go first, and if all are fresh, everything - never refusing everyone.
-	*/
+	auto key = ::password_guess_key(address);
 
-	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, address)) {
+	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, key)) {
 		erase_if(wrong_passwords, [&](const auto& entry) { return server_time - entry.second.since >= 60.0; });
 
 		if (wrong_passwords.size() >= max_wrong_password_addresses_v) {
-			wrong_passwords.clear();
+			key = overflow_password_key_v;
 		}
 	}
 
-	auto& record = wrong_passwords[address];
+	auto& record = wrong_passwords[key];
 
 	if (server_time - record.since >= 60.0) {
 		record = { 0, server_time };

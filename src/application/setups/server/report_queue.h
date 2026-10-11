@@ -107,7 +107,11 @@ public:
 		}
 	}
 
-	void push(const std::string& url, const std::string& body, const std::string& match_id) {
+	/*
+		endpoint_index tells apart the files of one match for several endpoints (hypersomnia.io and the aux ones).
+	*/
+
+	void push(const std::string& url, const std::string& body, const std::string& match_id, const std::size_t endpoint_index) {
 		auto existing = list_sorted();
 
 		while (existing.size() >= max_reports) {
@@ -116,7 +120,7 @@ public:
 			existing.erase(existing.begin());
 		}
 
-		const auto file = folder / (std::to_string(now_unix()) + "-" + match_id + ".report");
+		const auto file = folder / (std::to_string(now_unix()) + "-" + match_id + "-" + std::to_string(endpoint_index) + ".report");
 
 		try {
 			augs::save_as_text_atomic(file, url + "\n" + body);
@@ -155,7 +159,14 @@ public:
 				return;
 			}
 
-			if (status >= 400 && status < 500) {
+			/*
+				401 and 403 can be the site not reading its list of official servers for a moment, 429 its limits:
+				retried, like a network error, until the report is too old.
+			*/
+
+			const bool retryable = status == 401 || status == 403 || status == 429;
+
+			if (status >= 400 && status < 500 && !retryable) {
 				LOG("ERROR: hypersomnia.io refused the match report %x (HTTP %x). Dropping it.", result.file.filename(), status);
 				remove(result.file);
 				next_attempt_at = now;

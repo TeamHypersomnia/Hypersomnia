@@ -63,6 +63,8 @@ private:
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	double last_now = 0.0;
+	double last_wall = 0.0;
+	double last_steady = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
 
 	input last_input;

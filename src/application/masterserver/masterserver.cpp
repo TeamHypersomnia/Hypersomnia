@@ -7,6 +7,7 @@
 #include "application/masterserver/masterserver.h"
 #include "3rdparty/include_httplib.h"
 #include "augs/log.h"
+#include "augs/misc/date_time.h"
 
 #include "application/config_json_table.h"
 #include "augs/network/netcode_sockets.h"
@@ -300,11 +301,29 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
 	};
 
+	/*
+		At most a few "new server" notifications an hour, whatever comes - a flood of new servers must not spam the channels.
+	*/
+
+	auto new_server_notifications = std::vector<double>();
+
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data, const bool is_web) {
 		const auto ip_str = ::ToString(from);
 
 		if (is_banned_notifications(from)) {
 			return;
+		}
+
+		{
+			const auto now = augs::steady_secs();
+			erase_if(new_server_notifications, [now](const double t) { return now - t > 3600.0; });
+
+			if (new_server_notifications.size() >= 20) {
+				MSR_LOG("Too many new server notifications this hour - skipping one for %x.", ip_str);
+				return;
+			}
+
+			new_server_notifications.push_back(now);
 		}
 
 		if (is_banned_notifications_name(data.server_name)) {
@@ -901,28 +920,37 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							}
 
 							/*
-								At most 32 servers from one address (e.g. the instances of one host), so that nobody fills the list.
+								At most 32 servers from one address (e.g. the instances of one host; an IPv6 /64 counts as one),
+								and 4096 in all, so that nobody fills the list.
 							*/
 
 							if (!found_in(server_list, from)) {
+								auto network_of = [](netcode_address_t a) {
+									a.port = 0;
+
+									if (a.type == NETCODE_ADDRESS_IPV6) {
+										for (int i = 4; i < 8; ++i) {
+											a.data.ipv6[i] = 0;
+										}
+									}
+
+									return a;
+								};
+
 								std::size_t from_this_ip = 0;
+								const auto this_network = network_of(from);
 
 								for (const auto& other : server_list) {
-									auto a_ip = other.first;
-									auto b_ip = from;
-									a_ip.port = 0;
-									b_ip.port = 0;
-
-									if (a_ip == b_ip) {
+									if (network_of(other.first) == this_network) {
 										++from_this_ip;
 									}
 								}
 
-								if (from_this_ip >= 32) {
+								if (from_this_ip >= 32 || server_list.size() >= 4096) {
 									static uint64_t last_logged_ms = 0;
 
 									if (::official_log_allowed(last_logged_ms)) {
-										LOG("Ignoring a new server at %x: already 32 servers from this address.", ip_str);
+										LOG("Ignoring a new server at %x: already 32 servers from this address, or 4096 in all.", ip_str);
 									}
 
 									send_back(ack);

@@ -1875,7 +1875,16 @@ work_result work(
 			account_seed = identity_key::load_or_create(path);
 		}
 		else {
-			account_seed = identity_key::load(path);
+			/*
+				A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had -
+				changing the account would drop the cert. Only a missing file (Forget this key) or another key changes it.
+			*/
+
+			const auto loaded = identity_key::load(path);
+
+			if (loaded.has_value() || !augs::exists(path)) {
+				account_seed = loaded;
+			}
 		}
 	};
 

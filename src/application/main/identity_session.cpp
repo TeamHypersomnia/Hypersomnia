@@ -123,13 +123,42 @@ void identity_session::advance(const input& in, const double now) {
 	if (in != last_input) {
 		/*
 			Another account (e.g. an imported key, a CrazyGames sign in): the old cert is no longer it.
+			A refreshed CrazyGames token is the same account - its cert stays.
 		*/
 
+		auto same_account = [](input a, input b) {
+			a.crazygames_token.clear();
+			b.crazygames_token.clear();
+			return a == b;
+		};
+
 		const bool had_input = last_input.source != source_type::NONE;
+		const bool account_changed = !same_account(in, last_input);
 		last_input = in;
 
-		if (had_input) {
+		if (had_input && account_changed) {
 			reset();
+		}
+	}
+
+	/*
+		Monotonic time stops while the computer sleeps: once a wake is seen (the wall clock ran on further),
+		the next attempt is brought forward - once - and a cert that ran out meanwhile is dropped.
+	*/
+
+	{
+		const auto wall = wall_now();
+
+		if (last_wall > 0.0 && (wall - last_wall) - (now - last_steady) > 30.0) {
+			LOG("The computer slept - checking the identity cert.");
+			next_attempt_at = std::min(next_attempt_at, now);
+		}
+
+		last_wall = wall;
+		last_steady = now;
+
+		if (broker_cert.has_value() && cert_secs_left(now) <= 0.0) {
+			broker_cert.reset();
 		}
 	}
 
@@ -191,20 +220,7 @@ void identity_session::advance(const input& in, const double now) {
 		on_steam_ticket({}, false);
 	}
 
-	/*
-		Monotonic time stops while the computer sleeps - the wall clock tells a cert that ran out meanwhile.
-	*/
-
-	const bool cert_due_by_wall_clock = [&]() {
-		if (!broker_cert.has_value()) {
-			return false;
-		}
-
-		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
-		return wall_now() - broker_cert_received_at_wall >= lifetime / 2;
-	}();
-
-	if (now < next_attempt_at && !cert_due_by_wall_clock) {
+	if (now < next_attempt_at) {
 		return;
 	}
 
