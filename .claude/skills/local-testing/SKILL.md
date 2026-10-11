@@ -43,6 +43,9 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
 | `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
 | `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
+| `scenario_steam.sh` | The Steam build with the user's running Steam: a real Web API ticket -> broker cert -> ranked (broker started with `STEAM_API_KEY_FILE`) |
+| `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
+| `account_linked_as_check.sh <appdata> <broker url> <png>` | One start of a key client, Advanced - Network screenshotted: the remembered account and "(not confirmed)" |
 | `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
 | `pw_driver.js`, `fake_steam_session.py` | Chromium (Playwright in `~/.cache/hs-playwright`) driven over HTTP for clicking the web build; a Steam session cookie for the local site |
 | `[VARIANT=crazygames] build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web[-crazygames]`, the same steps as `build.sh Release Web` |
@@ -168,6 +171,12 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   buffers touched once, not a leak. To tell, measure after several batches against one server, not just before/after one run,
   and never with a build running at the same time.
 - After the WebRTC soak, `grep -c "did not open its DataChannel in time"` in the server log shows the 15 s freeing of unopened peers working.
+- **Commit before anything long.** The machine was rebooted twice mid-test (network outages) - each time /tmp, the scratch scripts
+  and the test broker were gone; anything worth keeping goes into this skill's scripts, not the scratchpad.
+- The site's link limits are per minute: running `link_flow_test.py` several times in a row from localhost hits "Too many attempts" -
+  wait a minute, that is the limit working.
+- Release builds of the netcode tests: run `stdbuf -o0 ./bin/test` - without it a failed `check` shows the last *buffered* test name,
+  not the failing one.
 - The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
   `build/Debug-x64-clang-claude-headless`.
 
