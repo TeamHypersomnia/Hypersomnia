@@ -116,8 +116,10 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 #if PLATFORM_WEB
 	const bool logged_in = in.is_logged_in && !in.our_id.empty();
+	const bool account_pending = in.is_logged_in && in.our_id.empty();
 #else
 	const bool logged_in = true;
+	const bool account_pending = in.our_id.empty();
 #endif
 
 	if (refresh_requested) {
@@ -339,6 +341,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		ImGui::SameLine();
 		text_color(mmr_num_text, our_rank.number_color);
 		ImGui::PopFont();
+	}
+	else if (account_pending || !refreshed_once) {
+		/*
+			The account or the leaderboards are still on their way - nothing rather than what may change in a moment.
+		*/
+
+		text_disabled("...");
 	}
 	else {
 		if (!logged_in) {

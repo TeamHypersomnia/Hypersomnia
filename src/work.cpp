@@ -2016,6 +2016,32 @@ work_result work(
 		The Account settings and the identity session, once per frame.
 	*/
 
+	/*
+		The account the key played as at the last start - see sync_identity_with_settings.
+	*/
+
+	WEBSTATIC auto key_account_linked_as = [&]() -> std::pair<std::string, std::string> {
+		try {
+			const auto text = augs::file_to_string(USER_DIR / "account_linked_as.txt");
+			const auto space = text.find(' ');
+
+			if (space != std::string::npos) {
+				auto account = text.substr(space + 1);
+
+				while (!account.empty() && (account.back() == '\n' || account.back() == '\r' || account.back() == ' ')) {
+					account.pop_back();
+				}
+
+				return { text.substr(0, space), account };
+			}
+		}
+		catch (...) {
+
+		}
+
+		return {};
+	}();
+
 	WEBSTATIC auto sync_identity_with_settings = [&]() {
 		const auto now = augs::steady_secs();
 
@@ -2034,8 +2060,36 @@ work_result work(
 		settings_gui.identity_error = identity->last_error;
 
 		settings_gui.current_account_id = [&]() -> std::string {
+			const auto key_account = [&]() -> std::string {
+				if (account_seed.has_value()) {
+					if (const auto public_key = augs::ed25519_public_key(*account_seed)) {
+						return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
+					}
+				}
+
+				return "";
+			}();
+
 			if (identity->has_broker_cert(now)) {
-				return identity->get_broker_cert()->account;
+				const auto& account = identity->get_broker_cert()->account;
+
+				/*
+					Remembered for the next start: a key linked to Steam shows as the Steam account right away,
+					not as the key until the broker answers.
+				*/
+
+				if (!key_account.empty() && account != key_account_linked_as.second) {
+					key_account_linked_as = { key_account, account };
+
+					try {
+						augs::save_as_text(USER_DIR / "account_linked_as.txt", key_account + " " + account);
+					}
+					catch (...) {
+
+					}
+				}
+
+				return account;
 			}
 
 #if !PLATFORM_WEB
@@ -2044,13 +2098,24 @@ work_result work(
 			}
 #endif
 
-			if (account_seed.has_value()) {
-				if (const auto public_key = augs::ed25519_public_key(*account_seed)) {
-					return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
-				}
+			if (key_account.empty()) {
+				return "";
 			}
 
-			return "";
+			if (key_account_linked_as.first == key_account && !key_account_linked_as.second.empty()) {
+				return key_account_linked_as.second;
+			}
+
+			/*
+				Not known yet whether the key is linked: nothing rather than an account that may change in a moment.
+				After a failed request (e.g. the broker is down) - the key's own.
+			*/
+
+			if (identity->last_error.empty()) {
+				return "";
+			}
+
+			return key_account;
 		}();
 
 #if PLATFORM_WEB
