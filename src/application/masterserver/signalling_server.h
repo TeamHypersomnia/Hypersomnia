@@ -72,6 +72,11 @@ private:
 
 	double when_last_processed_timeouts = -1;
 	double when_last_sent_packets = -1;
+	/*
+		Filled by the WebSocket thread, sent and erased by the main thread.
+	*/
+
+	std::mutex pending_packets_mutex;
 	std::vector<pending_signalling_packet> pending_packets;
 
 	void setup_server_callbacks() {
@@ -127,7 +132,18 @@ private:
 
 							on_peers(
 								[&](auto& peers) {
-									relay_message(peers, json_message, get_webrtc_id(peers, client));
+									const auto webrtc_id = get_webrtc_id(peers, client);
+
+									/*
+										A client still negotiating (offers, candidates, a slow ICE or TURN) is alive too -
+										timed out after its registration, its join would hang.
+									*/
+
+									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
+										peer->time_last_correct_message = augs::high_precision_secs();
+									}
+
+									relay_message(peers, json_message, webrtc_id);
 								}
 							);
 						}
@@ -362,7 +378,10 @@ private:
 				packet.message = message.dump();
 				packet.target = maybe_native;
 
-				pending_packets.emplace_back(std::move(packet));
+				{
+					std::scoped_lock pending_lk(pending_packets_mutex);
+					pending_packets.emplace_back(std::move(packet));
+				}
 			}
 			else {
 				LOG("Relaying to peer with id %x", dest_id);
@@ -490,6 +509,8 @@ public:
 	template <class P>
 	void send_signalling_packets(P send) {
 		const auto current_time = augs::high_precision_secs();
+
+		std::scoped_lock pending_lk(pending_packets_mutex);
 
 		if (current_time - when_last_sent_packets > 0.1) {
 			when_last_sent_packets = current_time;
