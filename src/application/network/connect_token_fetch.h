@@ -109,11 +109,13 @@ namespace connect_token_fetch {
 
 		auto client = httplib_utils::make_client(parsed);
 
+#if !PLATFORM_WEB
 		/*
 			A redirect could send the request on over plain http, and the token carries the session keys.
 		*/
 
 		client->set_follow_location(false);
+#endif
 		const auto location = parsed.location + "?server=" + target;
 
 		LOG("Requesting a secure connect token for %x.", target);

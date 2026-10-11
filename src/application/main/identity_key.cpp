@@ -11,7 +11,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <unistd.h>
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX && !PLATFORM_WEB
 #include <linux/fs.h>
 #include <sys/syscall.h>
 #endif
@@ -243,7 +243,7 @@ namespace identity_key {
 	*/
 
 	static bool rename_without_replacing(const augs::path_type& from, const augs::path_type& to) {
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX && !PLATFORM_WEB
 		if (::syscall(SYS_renameat2, AT_FDCWD, from.string().c_str(), AT_FDCWD, to.string().c_str(), RENAME_NOREPLACE) == 0) {
 			return true;
 		}
