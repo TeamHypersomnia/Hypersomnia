@@ -27,6 +27,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/readwrite/json_readwrite.h"
 
 #include "game/modes/logic_speed.h"
 #include "game/modes/zoom_override.h"
@@ -510,30 +511,68 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	);
 
 	{
-		input_text("##LinkCode", link_code_text);
-		ImGui::SameLine();
+		/*
+			First the website says whose Steam account the code is for, and the player confirms it:
+			a code someone else gave them ("enter this for a badge") would give that person their ranked matches.
+		*/
 
-		const bool requesting = link_request.valid();
+		auto request_link_target = [&]() {
+			auto code = std::string();
 
-		if (requesting) {
-			text_disabled("Linking...");
-		}
-		else if (ImGui::Button("Link") && seed.has_value() && public_key.has_value()) {
-			auto code = link_code_text;
-
-			while (!code.empty() && code.back() == ' ') {
-				code.pop_back();
+			for (const auto c : link_code_text) {
+				if (std::isalnum(static_cast<unsigned char>(c))) {
+					code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+				}
 			}
 
-			for (auto& c : code) {
-				c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+			link_target_request = launch_async([code, website_url]() {
+				auto target = link_target { code, "", "", "" };
+
+				auto client = httplib_utils::make_client(website_url);
+				const auto result = client->Get(("/link_key/info?code=" + code).c_str());
+
+				if (!result) {
+					target.error = typesafe_sprintf("Couldn't reach %x.", website_url);
+					return target;
+				}
+
+				if (!httplib_utils::successful(result->status)) {
+					target.error = typesafe_sprintf("Linking failed: %x", result->body);
+					return target;
+				}
+
+				try {
+					const auto doc = augs::json_document_from(result->body);
+
+					if (doc.IsObject() && doc.HasMember("steam_id") && doc["steam_id"].IsString()) {
+						target.steam_account = doc["steam_id"].GetString();
+
+						if (doc.HasMember("name") && doc["name"].IsString()) {
+							target.name = doc["name"].GetString();
+						}
+
+						return target;
+					}
+				}
+				catch (...) {
+
+				}
+
+				target.error = "Linking failed: unexpected response from the website.";
+				return target;
+			});
+		};
+
+		auto link_to_confirmed_target = [&](const link_target& target) {
+			if (!seed.has_value() || !public_key.has_value()) {
+				return;
 			}
 
-			if (const auto signature = augs::ed25519_sign(*seed, identity_key::link_message(code))) {
+			if (const auto signature = augs::ed25519_sign(*seed, identity_key::link_message(target.code, target.steam_account))) {
 				const auto body = typesafe_sprintf(
 					"{\"public_key\":\"%x\",\"code\":\"%x\",\"signature\":\"%x\"}",
 					augs::bytes_to_hex(*public_key),
-					code,
+					target.code,
 					augs::bytes_to_hex(*signature)
 				);
 
@@ -552,16 +591,68 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 					return typesafe_sprintf("Linking failed: %x", result->body);
 				});
 			}
+		};
+
+		const bool requesting = link_request.valid() || link_target_request.valid();
+
+		if (link_target_to_confirm.has_value()) {
+			const auto& target = *link_target_to_confirm;
+
+			text_color(
+				typesafe_sprintf(
+					"Link this key to the Steam account \"%x\" (%x)?\n"
+					"Your ranked matches will count for that account.\n"
+					"Confirm only if it is yours - never for a code someone else gave you.",
+					target.name,
+					target.steam_account
+				),
+				orange
+			);
+
+			if (ImGui::Button("Confirm")) {
+				link_to_confirmed_target(target);
+				link_target_to_confirm.reset();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel##Link")) {
+				link_target_to_confirm.reset();
+			}
+		}
+		else {
+			input_text("##LinkCode", link_code_text);
+			ImGui::SameLine();
+
+			if (requesting) {
+				text_disabled("Linking...");
+			}
+			else if (ImGui::Button("Link") && seed.has_value() && public_key.has_value()) {
+				account_status.clear();
+				request_link_target();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Open hypersomnia.io/profile")) {
+				augs::open_url(website_url + "/profile");
+			}
 		}
 
-		ImGui::SameLine();
+		if (valid_and_is_ready(link_target_request)) {
+			auto target = link_target_request.get();
 
-		if (ImGui::Button("Open hypersomnia.io/profile")) {
-			augs::open_url(website_url + "/profile");
+			if (target.error.empty()) {
+				link_target_to_confirm = std::move(target);
+			}
+			else {
+				account_status = target.error;
+			}
 		}
 
 		if (valid_and_is_ready(link_request)) {
 			account_status = link_request.get();
+			link_code_text.clear();
 		}
 	}
 

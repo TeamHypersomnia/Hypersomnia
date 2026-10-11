@@ -18,8 +18,8 @@ namespace identity_key {
 		return "hypersomnia-auth-v1 " + auth_identity;
 	}
 
-	std::string link_message(const std::string& code) {
-		return "hypersomnia-link-v1 " + code;
+	std::string link_message(const std::string& code, const std::string& steam_account) {
+		return "hypersomnia-link-v1 " + code + " " + steam_account;
 	}
 
 	std::string account_id(const augs::ed25519_public_key_type& public_key) {

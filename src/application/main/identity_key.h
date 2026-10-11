@@ -25,9 +25,10 @@ namespace identity_key {
 
 	/*
 		Signed to link the key to a Steam account on hypersomnia.io with a one-time code shown there.
+		The signature also names the Steam account (e.g. "steam_7656..."), the one the player was shown and agreed to.
 	*/
 
-	std::string link_message(const std::string& code);
+	std::string link_message(const std::string& code, const std::string& steam_account);
 
 	/*
 		The account id without the "key_" provider prefix.

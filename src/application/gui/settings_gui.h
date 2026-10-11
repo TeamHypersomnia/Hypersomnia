@@ -219,6 +219,16 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool confirm_forget_key = false;
 	augs::future<std::string> link_request;
 
+	struct link_target {
+		std::string code;
+		std::string steam_account;
+		std::string name;
+		std::string error;
+	};
+
+	augs::future<link_target> link_target_request;
+	std::optional<link_target> link_target_to_confirm;
+
 	void perform_account_pane(augs::window& window, const std::string& website_url);
 
 public:
