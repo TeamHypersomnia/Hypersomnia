@@ -43,7 +43,12 @@ message_handler_result server_setup::handle_payload(
 		*/
 
 		if (!server->get_secure_server_id(client_id).has_value()) {
+			/*
+				Counted as the one request, so that flooding them is kicked like any second one, not logged without end.
+			*/
+
 			LOG("Ignoring auth_request_payload from %x: the connection is not secure.", c.get_nickname());
+			c.auth_requested = true;
 			return continue_v;
 		}
 

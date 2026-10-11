@@ -95,6 +95,18 @@ namespace connect_token_fetch {
 			return std::nullopt;
 		}
 
+#if !BUILD_OPENSSL
+		/*
+			Without OpenSSL, the HTTP client quietly turns https into http,
+			and a connect token carries the session keys in the clear.
+		*/
+
+		if (begins_with(provider_url, "https")) {
+			LOG("This build has no HTTPS support, not fetching a connect token from %x.", provider_url);
+			return std::nullopt;
+		}
+#endif
+
 		auto client = httplib_utils::make_client(parsed);
 		const auto location = parsed.location + "?server=" + target;
 
