@@ -1744,9 +1744,17 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 	};
 
 	if (is_ranked_server()) {
+		const auto report_apikey = [&]() -> std::string {
+			if (const auto keys = official_server_keys::derive(private_vars.official_server_secret)) {
+				return augs::bytes_to_hex(keys->report_key);
+			}
+
+			return "";
+		}();
+
 		if (!post_to(
 			private_vars.report_ranked_match_url, 
-			private_vars.official_server_secret
+			report_apikey
 		)) {
 			LOG("report_ranked_match_url was not set.");
 		}
