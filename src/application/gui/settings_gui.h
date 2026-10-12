@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include "augs/filesystem/path.h"
+#include "augs/image/image.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/network/netcode_socket_raii.h"
@@ -248,6 +249,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 		std::string code;
 		std::string steam_account;
 		std::string name;
+		bool has_avatar = false;
 	};
 
 	augs::async_response_ptr link_target_request;
@@ -349,6 +351,12 @@ public:
 	*/
 
 	bool account_avatar_previewed = false;
+
+	/*
+		The avatar of the Steam account a link code is for, decoded here - the game uploads it as the LINK_AVATAR texture.
+	*/
+
+	std::optional<augs::image> link_avatar_to_upload;
 
 	/*
 		For icons, e.g. the Steam logo on its tab. Set by the game.

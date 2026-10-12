@@ -129,6 +129,13 @@ public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
 	std::optional<augs::path_type> requested_avatar_preview;
 
+	/*
+		The avatar of the Steam account a link code is for - shown before the player confirms the link.
+	*/
+
+	augs::graphics::texture link_avatar_tex = augs::image::white_pixel();
+	std::optional<augs::image> requested_link_avatar;
+
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
 

@@ -80,7 +80,8 @@ namespace augs {
 			graphics::texture* game_world_atlas,
 			graphics::texture* avatar_atlas,
 			graphics::texture* avatar_preview_atlas,
-			graphics::texture* ad_hoc_texture
+			graphics::texture* ad_hoc_texture,
+			graphics::texture* link_avatar_texture = nullptr
 		);
 
 		void draw_debug_lines(

@@ -47,6 +47,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/image/image.h"
+#include "augs/string/base64.h"
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
 #include "augs/audio/sound_sizes.h"
@@ -1152,6 +1153,22 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 						result.name = doc["name"].GetString();
 					}
 
+					if (doc.HasMember("avatar") && doc["avatar"].IsString()) {
+						if (const auto bytes = augs::from_base64(doc["avatar"].GetString()); bytes.has_value() && !bytes->empty()) {
+							try {
+								auto image = augs::image();
+								image.from_bytes_stbi(*bytes, "link avatar");
+								image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
+
+								link_avatar_to_upload = std::move(image);
+								result.has_avatar = true;
+							}
+							catch (...) {
+								LOG("Could not read the avatar of the Steam account to link.");
+							}
+						}
+					}
+
 					return result;
 				}
 			}
@@ -1320,15 +1337,28 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			else if (link_flow == F::CONFIRMING && link_target_to_confirm.has_value()) {
 				const auto target = *link_target_to_confirm;
 
-				text("Link this key to the Steam account\n");
-				text_color(typesafe_sprintf("    \"%x\"?", target.name), orange);
+				text("Link this key to the Steam account");
 
 				/*
-					The id under the name - anyone can copy a name, the id is the account; it opens the real Steam profile.
+					Laid out as after linking: the avatar, the name beside it - the id under them, in gray.
 				*/
 
-				ImGui::Dummy(ImVec2(ImGui::CalcTextSize("    ").x, 0));
-				ImGui::SameLine(0, 0);
+				if (target.has_avatar) {
+					augs::atlas_entry entry;
+					entry.atlas_space = xywh(0, 0, 1, 1);
+					const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
+
+					game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::LINK_AVATAR);
+					ImGui::Dummy(ImVec2(size.x, size.y));
+					ImGui::SameLine();
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
+				}
+
+				text_color(typesafe_sprintf("\"%x\"?", target.name), orange);
+
+				/*
+					Anyone can copy a name, the id is the account - it opens the real Steam profile.
+				*/
 
 				if (external_link("SteamProfile", target.steam_account, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
 					const auto id64 = target.steam_account.rfind("steam_", 0) == 0 ? target.steam_account.substr(6) : target.steam_account;

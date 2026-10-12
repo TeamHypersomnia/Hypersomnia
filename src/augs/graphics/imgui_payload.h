@@ -6,6 +6,7 @@ namespace augs {
 		GAME,
 		AVATARS,
 		AVATAR_PREVIEW,
+		LINK_AVATAR,
 		AD_HOC
 	};
 }

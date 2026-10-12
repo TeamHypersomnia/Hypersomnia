@@ -2331,6 +2331,11 @@ work_result work(
 
 		settings_gui.account_avatar_previewed = previewed_avatar_path == augs::path_type(ACCOUNT_AVATAR);
 
+		if (settings_gui.link_avatar_to_upload.has_value()) {
+			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
+			settings_gui.link_avatar_to_upload.reset();
+		}
+
 #if PLATFORM_WEB
 		if (const auto link = take_pending_steam_link()) {
 			settings_gui.on_steam_link_code(link->first, link->second);
@@ -6254,7 +6259,8 @@ work_result work(
 					std::addressof(streaming.get_general_atlas()), 
 					std::addressof(streaming.avatars.texture), 
 					std::addressof(streaming.avatar_preview_tex),
-					std::addressof(streaming.ad_hoc.texture)
+					std::addressof(streaming.ad_hoc.texture),
+					std::addressof(streaming.link_avatar_tex)
 				);
 			};
 
