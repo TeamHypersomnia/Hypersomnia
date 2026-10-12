@@ -613,6 +613,12 @@ void settings_gui_state::perform_account_pane(
 			entry.atlas_space = xywh(0, 0, 1, 1);
 			const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
 			game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
+
+			/*
+				game_image only draws - the space it took is taken here.
+			*/
+
+			ImGui::Dummy(ImVec2(size.x, size.y));
 			ImGui::SameLine();
 			text(name);
 		};

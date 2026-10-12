@@ -11,7 +11,8 @@
 # REJOIN=1: alice is killed (SIGKILL) during the match and her game is started again after REJOIN_AFTER (5) seconds, without
 # --connect - user/ranked_match.json must bring her back into the same match, and the report must still have her
 # (use a longer ROUND_TIME, e.g. 15).
-# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] scenario_ranked_report.sh
+# AVATAR=<png>: both play with this avatar - the report carries it, the site keeps it for the accounts.
+# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] [AVATAR=<png>] scenario_ranked_report.sh
 export ALSOFT_DRIVERS=null VISUAL=true
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -77,10 +78,13 @@ echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
 timeout 180 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
 sleep 8
 
+AVATAR_JSON=""
+[ -n "$AVATAR" ] && AVATAR_JSON=", \"avatar_image_path\": \"$AVATAR\""
+
 for c in alice bob; do
 	mkdir -p $T/$c/user/conf.d
 	cat > $T/$c/user/conf.d/test.json <<J
-{ "identity_broker_url": "$BROKER_URL", "server_list_provider": "http://127.0.0.1:1", "client": { "nickname": "$c" } }
+{ "identity_broker_url": "$BROKER_URL", "server_list_provider": "http://127.0.0.1:1", "client": { "nickname": "$c"$AVATAR_JSON } }
 J
 done
 

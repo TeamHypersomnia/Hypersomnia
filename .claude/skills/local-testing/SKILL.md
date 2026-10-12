@@ -38,7 +38,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | Script | What it proves |
 |---|---|
 | `broker.sh start\|stop\|sql` | A scratch copy of the site on 13500 as the identity broker and report endpoint, with its own broker key; prints `BROKER_URL` and `BROKER_PUBLIC_KEY` to export for the scenarios |
-| `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, certs from the broker, ranked takes only broker certs, `account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
+| `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, every client self-signed (unlinked keys never ask the broker) and taken by ranked too, `.keys/account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
 | `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server to the official ranked server by its alias, with a broker cert |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
 | `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
@@ -47,7 +47,6 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_ranked_report.sh` | A whole ranked match to its natural end in about a minute: the test map `de_e2e_short` (de_cyberaqua, max team score 2, 5 s rounds, no warmup) on a ranked server, two key clients clicking Auto-assign, the signed report at the local broker, the site's match and MMR rows |
 | `scenario_disconnects.sh` (`CASES=...`) | Filmstrips of each disconnect as the player sees it, with timings: server SIGTERM/SIGKILL/SIGSTOP, full, the same key joining again, wrong password, AFK, client SIGSTOP/SIGKILL/SIGTERM. Expected: every kick reason shows at once; a dead server or a dropped network shows "Nothing came from the server for 10 seconds" (native only); a 6 s server freeze is survived; a killed client frees its slot in about 5 s, a quitting one at once |
 | `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
-| `account_linked_as_check.sh <appdata> <broker url> <png>` | One start of a key client, Advanced - Network screenshotted: the remembered account and "(not confirmed)" |
 | `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
 | `pw_driver.js`, `fake_steam_session.py` | Chromium (Playwright in `~/.cache/hs-playwright`) driven over HTTP for clicking the web build; a Steam session cookie for the local site |
 | `[VARIANT=crazygames] build_web.sh` | Web Release build (`-DUSE_O3=1`) in `build/Release-Web-clang-claude-web[-crazygames]`, the same steps as `build.sh Release Web` |
@@ -71,7 +70,7 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
 - **Firefox:** `firefox --no-remote --profile <fresh dir> --new-instance URL` under `Xvfb`, with `user.js` setting
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
-- The web account is a key in IDBFS (`/user/account.key`), made on the first start. Sign in with Steam (Settings - Client - Account)
+- The web account is a key in IDBFS (`/user/.keys/account.key`), made on the first start. Sign in with Steam (Settings - Client - Account)
   opens `<website>/link_key/start?state=..`; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
   which passes it to the game through BroadcastChannel/opener. For a local site set `LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html`.
 
@@ -81,6 +80,27 @@ Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscre
 `import -window root shot.png` to screenshot, read the image, and `python3 xinput.py click x y` to click.
 A fresh appdata starts in the tutorial: `xinput.py key Escape` opens the menu (Settings at ~156,555).
 The appdata remembers the last connect string - the first screen may be a reconnect dialog with Abort.
+
+### Identity UI end to end (scripts/identity_ui)
+
+Helpers, all under `SCRATCH_ROOT` (default `/tmp/hypersomnia-ui`; the broker is `broker.sh` with `SCRATCH=$SCRATCH_ROOT/nettest`,
+started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/nettest/session_secret`):
+- `ui.sh conf <name> [broker url]` (a client in `$SCRATCH_ROOT/ui/<name>`, main menu, the scratch site's leaderboards; `NICK=`),
+  `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
+- `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
+  then Settings 155,555, Client 629,112, Account 408,144, Import field 280,377, Import key 556,378, Switch account 139,458.
+- `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
+- `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game.
+- `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
+- An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
+
+What each state looks like (screenshots of all of them were reviewed on 2026-10-12): an unlinked key never asks the broker and the
+leaderboards say `Account: this computer (key xxxxxxxx...)`; Link first asks /cert (an already linked key is "Successfully linked" at
+once, otherwise the code flow); a valid steam.cert is used at once after a restart; an expired one shows the cached Steam profile and,
+after loading, a dimmed "Signing in to your Steam account..."; a dead broker gives one "Not signed in" message per run (with
+Connect anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
+"Signed in to Steam" at the top; importing shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
+Continue without Steam); a key unlinked elsewhere silently loses its steam.cert.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
@@ -109,7 +129,7 @@ The whole production flow on real hosts without touching production:
 its own `broker.key`, Node from the official tarball - the host has none) via `backend.sh start|stop|status|broker_key`; both read its `official_servers.d`.
 `arena:~/yojimbo-test/e2e` runs a dedicated server with its own server key via `match.sh`, heartbeating to that master
 and reporting to that site; `run_match.sh` puts its key in arenaus's `official_servers.d/pl` and passes the test broker's key.
-`run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/account.key`,
+`run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/.keys/account.key`,
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
