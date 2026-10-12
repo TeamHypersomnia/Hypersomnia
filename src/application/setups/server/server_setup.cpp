@@ -4052,9 +4052,14 @@ void server_setup::advance_clients_state() {
 
 			if (!removed_someone_already) {
 				if (c.when_kicked.has_value()) {
-					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
+					/*
+						A kick "without lingering" still waits half a second: enough for the message with its reason to go out -
+						otherwise the client only times out, never knowing why - but not to hold a slot.
+					*/
 
-					if (c.kick_no_linger || server_time - *c.when_kicked > linger_secs) {
+					const auto linger_secs = c.kick_no_linger ? 0.5f : std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
+
+					if (server_time - *c.when_kicked > linger_secs) {
 						LOG("Disconnecting kicked client %x.", client_id);
 						disconnect_and_unset(client_id);
 					}
