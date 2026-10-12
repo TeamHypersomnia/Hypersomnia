@@ -569,7 +569,11 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 				"Forget this key and start over with a new account?\n"
 				"Without the key you can never play as this account again:\n"
 				"its rating, matches and Steam link stay with the old key.\n"
+#if PLATFORM_WEB
+				"In the browser you can not reach the backup - copy the key first (Copy key to clipboard) if you may want it back.",
+#else
 				"The file is kept in your user folder as a backup - delete it yourself to remove it for good.",
+#endif
 				orange
 			);
 

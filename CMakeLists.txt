@@ -714,7 +714,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/image/image.cpp"
 	"src/augs/graphics/rgba.cpp"
 	"src/augs/misc/secure_hash.cpp"
-	"src/augs/misc/hmac_sha256.cpp"
 	"src/augs/misc/ed25519.cpp"
 	"src/application/main/identity_key.cpp"
 	"src/application/network/identity_cert.cpp"

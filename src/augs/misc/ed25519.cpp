@@ -113,7 +113,6 @@ namespace augs {
 #if BUILD_UNIT_TESTS && BUILD_NETWORKING
 #include <string>
 #include <Catch/single_include/catch2/catch.hpp>
-#include "augs/misc/hmac_sha256.h"
 
 template <std::size_t N>
 static std::array<uint8_t, N> from_hex(const std::string& hex) {
@@ -175,13 +174,4 @@ TEST_CASE("Ed25519 generated keys sign and verify") {
 	REQUIRE(!augs::ed25519_verify(*public_key, "hypersomnia-auth-v1 hs_0123@pl", *signature));
 }
 
-#if BUILD_OPENSSL
-TEST_CASE("HMAC-SHA256 RFC 4231 test case 2") {
-	const auto mac = augs::hmac_sha256(std::string("Jefe"), std::string("what do ya want for nothing?"));
-
-	REQUIRE(mac.has_value());
-	REQUIRE(*mac == from_hex<32>("5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"));
-	REQUIRE(augs::constant_time_equal(*mac, *mac));
-}
-#endif
 #endif

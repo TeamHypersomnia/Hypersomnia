@@ -294,7 +294,7 @@ public:
 			return false;
 		}
 
-		return ranked.is_ranked_server() && kick_if_unauthenticated_for_secs > 0;
+		return ranked.is_ranked_server();
 	}
 };
 
