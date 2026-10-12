@@ -143,6 +143,12 @@ public:
 
 	const server_list_entry* find_entry_by_connect_string(const client_connect_string& in) const;
 	std::optional<server_list_entry> find_best_server(bool allow_ranked) const;
+
+	/*
+		Quick play: the best casual server, skipping the ones behind NAT unless there is nothing else.
+	*/
+
+	std::optional<server_list_entry> find_quick_play_server() const;
 	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;

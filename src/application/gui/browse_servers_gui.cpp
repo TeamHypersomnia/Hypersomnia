@@ -1453,6 +1453,29 @@ std::optional<server_list_entry> browse_servers_gui_state::find_best_server(cons
 	return minimum_of(filtered, compare_servers);
 }
 
+std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_server() const {
+	auto candidates = server_list;
+
+	erase_if(candidates, [&](const auto& s) {
+		const bool is_ranked = s.is_official_server() && s.heartbeat.is_ranked_server();
+		return !s.heartbeat.versions_compatible() || is_ranked;
+	});
+
+	auto public_ones = candidates;
+
+	erase_if(public_ones, [&](const auto& s) {
+		return s.is_behind_nat() && !s.progress.found_on_internal_network;
+	});
+
+	const auto& chosen = public_ones.empty() ? candidates : public_ones;
+
+	if (chosen.empty()) {
+		return std::nullopt;
+	}
+
+	return minimum_of(chosen, compare_servers);
+}
+
 const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& in) const {
 	LOG("Finding the server entry by: %x", in);
 	LOG("Number of servers in the browser: %x", server_list.size());

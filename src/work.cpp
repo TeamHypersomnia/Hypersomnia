@@ -3204,6 +3204,82 @@ work_result work(
 		}
 	};
 
+	/*
+		Quick play joins the best server right away: the server list is downloaded again, the servers get a moment
+		to answer the pings, and then find_quick_play_server picks one - never one behind NAT if there is another.
+	*/
+
+	WEBSTATIC bool quick_play_pending = false;
+	WEBSTATIC std::optional<double> quick_play_list_ready_at;
+	WEBSTATIC std::optional<simple_popup> quick_play_popup;
+
+	WEBSTATIC auto start_quick_play = [&]() {
+		quick_play_pending = true;
+		quick_play_list_ready_at.reset();
+
+		if (!browse_servers_gui.refresh_in_progress()) {
+			browse_servers_gui.refresh_server_list(get_browse_servers_input());
+		}
+	};
+
+	WEBSTATIC auto perform_quick_play = [&]() {
+		using namespace augs::imgui;
+
+		if (quick_play_popup.has_value() && quick_play_popup->perform()) {
+			quick_play_popup.reset();
+		}
+
+		if (!quick_play_pending) {
+			return;
+		}
+
+		const auto now = augs::steady_secs();
+		const auto pings_secs = 1.5;
+
+		if (browse_servers_gui.refresh_in_progress()) {
+			quick_play_list_ready_at.reset();
+		}
+		else if (!quick_play_list_ready_at.has_value()) {
+			quick_play_list_ready_at = now;
+		}
+
+		if (quick_play_list_ready_at.has_value() && now - *quick_play_list_ready_at > pings_secs) {
+			quick_play_pending = false;
+
+			if (const auto best = browse_servers_gui.find_quick_play_server()) {
+				LOG("Quick play: %x (%x).", best->heartbeat.server_name, best->get_my_connect_string());
+
+				config.client_connect = best->get_my_connect_string();
+				displayed_connecting_server_name = best->heartbeat.server_name;
+				start_client_setup();
+			}
+			else {
+				auto popup = simple_popup();
+				popup.title = "Quick play";
+				popup.message = "No server to join right now.\n\nTry again in a moment, or host one yourself.";
+				quick_play_popup = popup;
+			}
+
+			return;
+		}
+
+		const auto display = ImGui::GetIO().DisplaySize;
+		ImGui::SetNextWindowPos(ImVec2(display.x / 2, display.y / 2), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::OpenPopup("Quick play##Finding");
+
+		if (ImGui::BeginPopupModal("Quick play##Finding", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			spinner_line("Finding the best server...", white);
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel##QuickPlay", ImVec2(120, 0))) {
+				quick_play_pending = false;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	};
+
 	WEBSTATIC auto perform_start_server_gui = [&]() {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
 			config.server_start,
@@ -4143,6 +4219,9 @@ work_result work(
 				perform_failed_to_load_arena_popup();
 				perform_abandon_are_you_sure_popup();
 				perform_sign_in_ui();
+#if BUILD_NETWORKING
+				perform_quick_play();
+#endif
 
 				streaming.display_loading_progress();
 			},
@@ -4315,8 +4394,9 @@ work_result work(
 #endif
 				}
 				else {
-					start_client_gui.open();
-					start_client_gui.current_tab = start_client_tab_type::BEST_SERVER;
+#if BUILD_NETWORKING
+					start_quick_play();
+#endif
 				}
 
 				break;
