@@ -274,6 +274,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	link_flow_type link_flow = link_flow_type::IDLE;
 	std::string link_flow_message;
 	std::string linked_name;
+
+	/*
+		The code already sent as typed - a failed one is not sent again until it changes.
+	*/
+
+	std::string auto_requested_code;
 	bool link_flow_succeeded = false;
 
 	bool import_modal_open = false;

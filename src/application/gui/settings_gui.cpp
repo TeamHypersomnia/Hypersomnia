@@ -411,6 +411,46 @@ static auto danger_button_colors(const rgba col) {
 }
 
 /*
+	Text and buttons whose words differ in color - e.g. "private key" in orange.
+*/
+
+using colored_segments = std::vector<std::pair<std::string, rgba>>;
+
+static float segments_width(const colored_segments& segments) {
+	auto width = 0.0f;
+
+	for (const auto& segment : segments) {
+		width += ImGui::CalcTextSize(segment.first.c_str()).x;
+	}
+
+	return width;
+}
+
+static void draw_segments(ImVec2 pos, const colored_segments& segments) {
+	auto* const draw_list = ImGui::GetWindowDrawList();
+
+	for (const auto& segment : segments) {
+		draw_list->AddText(pos, ImGui::GetColorU32(ImVec4(segment.second)), segment.first.c_str());
+		pos.x += ImGui::CalcTextSize(segment.first.c_str()).x;
+	}
+}
+
+static void colored_text(const colored_segments& segments) {
+	const auto pos = ImGui::GetCursorScreenPos();
+	ImGui::Dummy(ImVec2(segments_width(segments), ImGui::GetTextLineHeight()));
+	draw_segments(pos, segments);
+}
+
+static bool colored_button(const std::string& id, const colored_segments& segments) {
+	const auto padding = ImGui::GetStyle().FramePadding;
+	const auto clicked = ImGui::Button(("##" + id).c_str(), ImVec2(segments_width(segments) + padding.x * 2, ImGui::GetFrameHeight()));
+	const auto min = ImGui::GetItemRectMin();
+
+	draw_segments(ImVec2(min.x + padding.x, min.y + padding.y), segments);
+	return clicked;
+}
+
+/*
 	"Local key: 0x8aed41f2..." with a copy icon - on top of Link with Steam and Manage.
 */
 
@@ -624,13 +664,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	}
 
-	text_color("Whoever has your private key plays as you:", orange);
+	colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
 	text_color("NEVER share it!", red);
 
 	if (public_key.has_value()) {
 		key_unreadable_since = -1.0;
 
-		if (ImGui::Button("Copy private key to clipboard")) {
+		if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
 			ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
 			account_message = "Private key copied.\n\nWhoever has it plays as you - keep it safe,\ne.g. in a password manager.";
 		}
@@ -659,7 +699,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 #if !PLATFORM_WEB
-	if (ImGui::Button("Reveal private key in explorer")) {
+	if (colored_button("RevealPrivateKey", { { "Reveal ", white }, { "private key", orange }, { " in explorer", white } })) {
 		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 	}
 
@@ -693,21 +733,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	};
 
-	input_text("##ImportKey", import_key_text, ImGuiInputTextFlags_Password);
-
-	if (import_key_text.empty() && !ImGui::IsItemActive()) {
-		const auto min = ImGui::GetItemRectMin();
-		const auto padding = ImGui::GetStyle().FramePadding;
-
-		ImGui::GetWindowDrawList()->AddText(
-			ImVec2(min.x + padding.x, min.y + padding.y),
-			ImGui::GetColorU32(ImGuiCol_TextDisabled),
-			"e.g.: hypersomnia-key-v1..."
-		);
+	{
+		auto buffer = std::array<char, 256>();
+		input_text_with_hint(buffer, "##ImportKey", "e.g.: hypersomnia-key-v1...", import_key_text, ImGuiInputTextFlags_Password);
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Import private key")) {
+	if (colored_button("ImportPrivateKey", { { "Import ", white }, { "private key", orange } })) {
 		if (const auto imported = identity_key::from_export_string(import_key_text)) {
 			if (seed.has_value() && *seed == *imported) {
 				account_message = "That is already your key.";
@@ -985,6 +1017,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				link_flow = F::CHECKING_BEFORE;
 				link_flow_message.clear();
 				link_code_text.clear();
+				auto_requested_code.clear();
 			}
 			else {
 				account_message = "There is no key to link yet.";
@@ -1153,23 +1186,68 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
 #if PLATFORM_WEB
-				text("Sign in with Steam in the new tab.\n\nOr get a code on hypersomnia.io/link and enter it here:");
+				text("Sign in through Steam in the new tab\nto get the one-time code:");
 #else
-				text("Sign in through Steam on hypersomnia.io/link\nand enter the code shown there:");
+				text("Sign in through Steam on hypersomnia.io/link\nto get the one-time code:");
 
 				if (ImGui::Button("Open hypersomnia.io/link")) {
 					augs::open_url(website_url + "/link");
 				}
 #endif
 
-				input_text("##LinkCode", link_code_text);
-				ImGui::SameLine();
+				/*
+					No Link button: a code in the right form links as soon as it is pasted or typed.
+					Enter only tells what is wrong with one that is not - and a pasted private key is cleared at once.
+				*/
+
+				/*
+					Enter is only watched, not a flag of the field: the field keeps its focus and hands over every keystroke.
+				*/
+
+				{
+					auto buffer = std::array<char, 256>();
+					input_text_with_hint(buffer, "##LinkCode", "Paste the code here...", link_code_text);
+				}
+
+				const bool entered = ImGui::IsItemDeactivated() && ImGui::IsKeyPressed(ImGuiKey_Enter, false);
+
+				if (entered) {
+					/*
+						Enter leaves a field - the player goes on typing the code, not the game's shortcuts.
+					*/
+
+					ImGui::SetKeyboardFocusHere(-1);
+				}
 
 				if (requesting) {
+					ImGui::SameLine();
 					spinner(ImGui::GetTextLineHeight(), white);
 				}
-				else if (ImGui::Button("Link##Code")) {
-					request_link_target(link_code_text);
+				else {
+					auto code = std::string();
+
+					for (const auto c : link_code_text) {
+						if (std::isalnum(static_cast<unsigned char>(c))) {
+							code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+						}
+					}
+
+					auto lowercase = link_code_text;
+
+					for (auto& c : lowercase) {
+						c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+					}
+
+					const bool looks_like_key = lowercase.find("hypersomnia-key") != std::string::npos || link_code_text.size() > 40;
+					const bool complete = code.size() == 8 && link_code_text.size() <= 12;
+
+					if (looks_like_key || entered || (complete && code != auto_requested_code)) {
+						if (complete) {
+							auto_requested_code = code;
+						}
+
+						request_link_target(link_code_text);
+					}
 				}
 
 				if (!link_flow_message.empty()) {
