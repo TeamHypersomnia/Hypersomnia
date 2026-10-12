@@ -635,7 +635,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			account_message = "Private key copied.\n\nWhoever has it plays as you - keep it safe,\ne.g. in a password manager.";
 		}
 
-		tooltip_on_hover("To back it up - without it, the account is lost -\nor to play from another computer: paste it there in Import private key.");
+		tooltip_on_hover("This lets you play from another computer:\npaste it there in Import private key.\n\nYou can also back it up.");
 	}
 	else {
 		/*
@@ -663,7 +663,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 	}
 
-	tooltip_on_hover("The private key is the .keys/account.key file - you can also back it up by copying it.");
+	tooltip_on_hover("Your private key is in .keys/account.key -\nit's enough to copy this file to back up your account.");
 #else
 	(void)window;
 #endif
@@ -781,10 +781,18 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		ImGui::OpenPopup("Forget this key?##Modal");
 
 		if (ImGui::BeginPopupModal("Forget this key?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			text("Are you sure you want to forget this key?\n");
+
+			if (public_key.has_value()) {
+				text("    " + identity_key::short_form(*public_key));
+				ImGui::SameLine();
+				copy_icon_button("ForgetKey", "0x" + augs::bytes_to_hex(*public_key));
+			}
+
 			text(
-				"Are you sure you want to forget this key and start over with a new account?\n\n"
-				"Without the key you can never play as this account again -\n"
-				"its progress and its Steam link stay with the old key.\n\n"
+				"\n"
+				"You will lose progress if you haven't backed it up.\n"
+				"Your Steam progress, if any, stays intact.\n\n"
 #if PLATFORM_WEB
 				"In the browser you can not reach the backup -\ncopy the key first (Copy private key to clipboard) if you may want it back."
 #else
@@ -969,7 +977,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	}
 	else {
-		text_disabled("Progress will count towards the Steam account.\n");
+		text_disabled("Once linked, progress will count towards the Steam account.\n");
 
 		if (ImGui::Button("Link to your Steam account")) {
 			if (has_key && identity != nullptr) {
