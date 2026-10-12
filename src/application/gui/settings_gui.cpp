@@ -469,6 +469,15 @@ static void local_key_line(const std::optional<augs::ed25519_public_key_type>& p
 	ImGui::Separator();
 }
 
+void settings_gui_state::on_key_replaced_outside() {
+	open();
+	active_pane = settings_pane::ACCOUNT;
+	account_seed_reload_needed = true;
+	import_to_confirm.reset();
+	import_modal_open = true;
+	import_profile_applied = false;
+}
+
 void settings_gui_state::perform_import_modal(
 	config_json_table& config,
 	config_json_table& last_saved_config,
@@ -509,13 +518,18 @@ void settings_gui_state::perform_import_modal(
 
 	checkmark_line("Key successfully imported", green);
 
-	auto welcome_back = [&](const std::string& name) {
+	auto welcome_back = [&](const std::string& name, const bool avatar_shown) {
 		if (name.empty()) {
 			return;
 		}
 
 		ImGui::Separator();
 		text("Welcome back,");
+
+		if (!avatar_shown) {
+			text(name);
+			return;
+		}
 
 		augs::atlas_entry entry;
 		entry.atlas_space = xywh(0, 0, 1, 1);
@@ -543,8 +557,13 @@ void settings_gui_state::perform_import_modal(
 		spinner_line("Fetching account data from hypersomnia.io...", white);
 	}
 	else if (check == L::LINKED) {
+		if (!import_profile_applied) {
+			import_profile_applied = true;
+			account_profile_wanted = true;
+		}
+
 		checkmark_line("Linked to your Steam account", green);
-		welcome_back(profile.name);
+		welcome_back(profile.name, account_avatar_previewed);
 		may_close = true;
 	}
 	else if (check == L::NOT_LINKED) {
@@ -580,7 +599,7 @@ void settings_gui_state::perform_import_modal(
 			}
 		}
 
-		welcome_back(profile.name);
+		welcome_back(profile.name, true);
 		may_close = true;
 	}
 	else {
@@ -948,6 +967,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_flow = F::DONE;
 		link_flow_succeeded = succeeded;
 		link_flow_message = message;
+
+		if (succeeded) {
+			account_profile_wanted = true;
+		}
 	};
 
 	/*
@@ -1041,8 +1064,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	}
 	else {
-		text_disabled("Once linked, progress will count towards the Steam account.\n");
-
 		if (ImGui::Button("Link to your Steam account")) {
 			if (has_key && identity != nullptr) {
 				identity->start_link_check(identity_input.broker_url);
@@ -1055,6 +1076,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				account_message = "There is no key to link yet.";
 			}
 		}
+
+		text_disabled("Once linked, progress will count towards the Steam account.");
 	}
 
 	/*
@@ -1312,7 +1335,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					augs::open_url("https://steamcommunity.com/profiles/" + id64);
 				}
 
-				text("\nProgress will count towards that account.\nConfirm only if the account is yours.");
+				text("\nProgress will count towards that account.");
+				text_color("Confirm only if the account is yours.", orange);
 
 				ImGui::Separator();
 
@@ -1337,7 +1361,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 						The Steam avatar is the preview once the account's profile is in effect.
 					*/
 
-					if (const bool steam_avatar_shown = identity != nullptr && identity->has_valid_cert(augs::steady_secs()); steam_avatar_shown) {
+					if (const bool steam_avatar_shown = identity != nullptr && identity->has_valid_cert(augs::steady_secs()) && account_avatar_previewed; steam_avatar_shown) {
 						augs::atlas_entry entry;
 						entry.atlas_space = xywh(0, 0, 1, 1);
 						const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
@@ -3410,6 +3434,17 @@ void settings_gui_state::perform(
 #if !WEB_CRAZYGAMES
 				perform_import_modal(config, last_saved_config, canon_config_with_confd, config_path_for_saving);
 #endif
+
+				if (account_profile_wanted) {
+					/*
+						Saved right away, without the other unsaved changes of the settings.
+					*/
+
+					account_profile_wanted = false;
+					config.client.use_account_profile = true;
+					last_saved_config.client.use_account_profile = true;
+					last_saved_config.save_patch(canon_config_with_confd, config_path_for_saving, true);
+				}
 				perform_account_message_modal();
 
 				break;

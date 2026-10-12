@@ -282,6 +282,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string auto_requested_code;
 	bool link_flow_succeeded = false;
 
+	/*
+		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
+	*/
+
+	bool account_profile_wanted = false;
+
 	bool import_modal_open = false;
 	bool import_profile_applied = false;
 
@@ -339,6 +345,12 @@ public:
 	bool avatar_changed = false;
 
 	/*
+		Set by the game: the avatar preview shows the account's avatar, not one's own - only then is it shown as the account's.
+	*/
+
+	bool account_avatar_previewed = false;
+
+	/*
 		For icons, e.g. the Steam logo on its tab. Set by the game.
 	*/
 
@@ -349,6 +361,12 @@ public:
 	*/
 
 	void on_steam_link_code(const std::string& code, const std::string& state);
+
+	/*
+		A key not seen before appeared in account.key (pasted there by hand) - shown exactly as an import.
+	*/
+
+	void on_key_replaced_outside();
 
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;

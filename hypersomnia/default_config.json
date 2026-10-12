@@ -759,7 +759,7 @@
         "ImGuiCol_NavHighlight": [66, 150, 249, 255],
         "ImGuiCol_NavWindowingHighlight": [255, 255, 255, 178],
         "ImGuiCol_NavWindowingDimBg": [204, 204, 204, 51],
-        "ImGuiCol_ModalWindowDimBg": [204, 204, 204, 89]
+        "ImGuiCol_ModalWindowDimBg": [0, 0, 0, 140]
     },
     "debug": {
         "determinism_test_cloned_cosmoi_count": 0,

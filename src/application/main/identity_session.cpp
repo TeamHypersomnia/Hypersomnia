@@ -44,6 +44,7 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	cert_file = new_cert_file;
 	profile_file = keys_dir / "steam_profile.json";
+	checked_key_file = keys_dir / "account.checked";
 
 	forget_cert();
 
@@ -63,6 +64,42 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	last_error.clear();
 
 	load_saved_cert();
+
+	/*
+		A key whose Steam cert is saved is known; any other is asked about unless it is the one last asked about.
+	*/
+
+	if (cert_saved) {
+		key_check_wanted = false;
+		save_checked_key();
+	}
+	else {
+		const auto checked = [&]() {
+			try {
+				return augs::file_to_string(checked_key_file);
+			}
+			catch (...) {
+				return std::string();
+			}
+		}();
+
+		key_check_wanted = checked.find(augs::bytes_to_hex(key_public)) == std::string::npos;
+	}
+}
+
+void identity_session::save_checked_key() {
+	try {
+		std::filesystem::create_directories(checked_key_file.parent_path());
+		augs::save_as_text_atomic(checked_key_file, augs::bytes_to_hex(key_public) + "\n");
+	}
+	catch (...) {
+		LOG("Could not save %x.", checked_key_file);
+	}
+}
+
+void identity_session::on_key_created() {
+	key_check_wanted = false;
+	save_checked_key();
 }
 
 void identity_session::forget_cert() {
@@ -357,6 +394,12 @@ void identity_session::advance(const input& in, const double now) {
 		}
 	}
 
+	if (key_check_wanted && link_check_request == nullptr && !in.broker_url.empty()) {
+		LOG("The key in account.key was not seen before - asking whether it is linked, as on an import.");
+		start_link_check(in.broker_url);
+		key_check_started = link_check == link_check_state::PENDING;
+	}
+
 	if (link_check_request != nullptr && link_check_request->is_ready()) {
 		const auto response = augs::get_once(link_check_request);
 		const auto answer = response.status == 200 ? parse_answer(response.body) : std::nullopt;
@@ -368,6 +411,7 @@ void identity_session::advance(const input& in, const double now) {
 		else if (is_key_account(answer->cert.account)) {
 			link_check = link_check_state::NOT_LINKED;
 			link_check_profile = answer->profile;
+			save_checked_key();
 		}
 		else {
 			/*
@@ -385,6 +429,7 @@ void identity_session::advance(const input& in, const double now) {
 			last_attempt_failed = false;
 			last_error.clear();
 			save_cert();
+			save_checked_key();
 		}
 	}
 
@@ -579,6 +624,8 @@ identity_cert::cert identity_session::cert_for_connect(const double now, const s
 }
 
 void identity_session::start_link_check(const std::string& broker_url) {
+	key_check_wanted = false;
+
 	const auto key = key_location();
 	auto error = std::string();
 	const auto url = broker_url_of(broker_url, error);

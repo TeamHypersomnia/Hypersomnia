@@ -1844,12 +1844,18 @@ work_result work(
 			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
 		*/
 
-		if (const auto loaded = augs::exists(path) ? identity_key::load(path) : identity_key::load_or_create(path)) {
+		const bool existed = augs::exists(path);
+
+		if (const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path)) {
 			account_seed = loaded;
 		}
 
 		if (account_seed.has_value()) {
 			identity->set_key(*account_seed, USER_DIR / identity_key::keys_dir_name);
+
+			if (!existed) {
+				identity->on_key_created();
+			}
 		}
 	};
 
@@ -1898,6 +1904,12 @@ work_result work(
 
 		refresh_account_seed(now);
 		identity->advance(get_identity_input(), now);
+
+#if !WEB_CRAZYGAMES
+		if (identity->take_key_check_started()) {
+			settings_gui.on_key_replaced_outside();
+		}
+#endif
 
 #if !PLATFORM_WEB
 		if (is_steam_client) {
@@ -2316,6 +2328,8 @@ work_result work(
 			previewed_avatar_path = effective;
 			streaming.requested_avatar_preview = effective.empty() ? augs::path_type(BLANK_AVATAR) : effective;
 		}
+
+		settings_gui.account_avatar_previewed = previewed_avatar_path == augs::path_type(ACCOUNT_AVATAR);
 
 #if PLATFORM_WEB
 		if (const auto link = take_pending_steam_link()) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 #include <array>
 #include <cstddef>
 #include <optional>
@@ -123,6 +124,17 @@ private:
 	link_check_state link_check = link_check_state::NONE;
 	account_profile link_check_profile;
 
+	/*
+		account.checked: the public key last asked about at hypersomnia.io (or made by this game).
+		Any other key in account.key - pasted there with the game running or not - is asked about like an import.
+	*/
+
+	augs::path_type checked_key_file;
+	bool key_check_wanted = false;
+	bool key_check_started = false;
+
+	void save_checked_key();
+
 	input last_input;
 
 	void clear_steam_ticket();
@@ -214,6 +226,20 @@ public:
 	const std::array<uint8_t, 64>& session_secret_key() const { return key_secret; }
 	const augs::ed25519_public_key_type& public_key() const { return key_public; }
 	std::string key_account() const;
+
+	/*
+		The game made this key itself - nobody could have linked it, nothing to ask.
+	*/
+
+	void on_key_created();
+
+	/*
+		True once when a key not seen before began its link check - the game shows it as an import.
+	*/
+
+	bool take_key_check_started() {
+		return std::exchange(key_check_started, false);
+	}
 
 	void start_link_check(const std::string& broker_url);
 	link_check_state get_link_check() const { return link_check; }

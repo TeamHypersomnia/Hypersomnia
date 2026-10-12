@@ -136,12 +136,14 @@ namespace augs {
 			ImGui::PushID(id.c_str());
 			const bool clicked = ImGui::InvisibleButton("##external", ImVec2(width, size));
 			const bool hovered = ImGui::IsItemHovered();
+			const bool held = ImGui::IsItemActive();
 			ImGui::PopID();
 
 			auto* const draw_list = ImGui::GetWindowDrawList();
 
-			if (hovered) {
-				draw_list->AddRectFilled(ImVec2(pos.x - 2, pos.y), ImVec2(pos.x + width + 2, pos.y + size), IM_COL32(255, 255, 255, 30), size * 0.15f);
+			if (hovered || held) {
+				const auto highlight = held ? IM_COL32(255, 255, 255, 70) : IM_COL32(255, 255, 255, 30);
+				draw_list->AddRectFilled(ImVec2(pos.x - 2, pos.y), ImVec2(pos.x + width + 2, pos.y + size), highlight, size * 0.15f);
 				ImGui::SetTooltip("%s", tooltip.c_str());
 			}
 

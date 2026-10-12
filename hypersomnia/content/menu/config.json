@@ -76,6 +76,6 @@
     "ImGuiCol_NavHighlight": [222, 202, 150, 255],
     "ImGuiCol_NavWindowingHighlight": [255, 255, 255, 178],
     "ImGuiCol_NavWindowingDimBg": [204, 204, 204, 51],
-    "ImGuiCol_ModalWindowDimBg": [204, 204, 204, 89]
+    "ImGuiCol_ModalWindowDimBg": [0, 0, 0, 140]
   }
 }
