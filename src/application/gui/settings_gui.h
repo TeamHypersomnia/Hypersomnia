@@ -290,6 +290,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	*/
 
 	bool confirm_forget_key = false;
+	bool reveal_private_key_open = false;
+	double private_key_copied_at = -1000.0;
 	bool confirm_unlink = false;
 	std::optional<std::string> account_message;
 

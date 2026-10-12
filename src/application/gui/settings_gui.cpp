@@ -664,18 +664,8 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	}
 
-	colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
-	text_color("NEVER share it!", red);
-
 	if (public_key.has_value()) {
 		key_unreadable_since = -1.0;
-
-		if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
-			ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
-			account_message = "Private key copied.\n\nWhoever has it plays as you - keep it safe,\ne.g. in a password manager.";
-		}
-
-		tooltip_on_hover("This lets you play from another computer:\npaste it there in Import private key.\n\nYou can also back it up.");
 	}
 	else {
 		/*
@@ -697,18 +687,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			text_disabled("Creating the key...");
 		}
 	}
-
-#if !PLATFORM_WEB
-	if (colored_button("RevealPrivateKey", { { "Reveal ", white }, { "private key", orange }, { " in explorer", white } })) {
-		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
-	}
-
-	tooltip_on_hover("Your private key is in .keys/account.key -\nit's enough to copy this file to back up your account.");
-#else
-	(void)window;
-#endif
-
-	ImGui::Separator();
 
 	auto import_now = [&](const augs::ed25519_seed_type& imported) {
 		account_seed_reload_needed = true;
@@ -796,6 +774,59 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	ImGui::Separator();
 
+	ImGui::Separator();
+
+	/*
+		The private key itself only behind its own button - with the warning, copying it and finding its file.
+	*/
+
+	if (public_key.has_value() && colored_button("RevealThePrivateKey", { { "Reveal ", white }, { "the private key", orange } })) {
+		reveal_private_key_open = true;
+		private_key_copied_at = -1000.0;
+	}
+
+	if (reveal_private_key_open && public_key.has_value()) {
+		center_next_modal();
+		ImGui::OpenPopup("The private key##Modal");
+
+		if (ImGui::BeginPopupModal("The private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
+			text_color("NEVER share it!", red);
+			text("");
+
+			if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
+				ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
+				private_key_copied_at = ImGui::GetTime();
+			}
+
+			tooltip_on_hover("This lets you play from another computer:\npaste it there in Import private key.\n\nYou can also back it up.");
+
+			if (ImGui::GetTime() - private_key_copied_at < 2.0) {
+				ImGui::SameLine();
+				checkmark_line("Copied", green);
+			}
+
+#if !PLATFORM_WEB
+			if (colored_button("RevealPrivateKey", { { "Reveal ", white }, { "private key", orange }, { " in explorer", white } })) {
+				window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
+			}
+
+			tooltip_on_hover("Your private key is in .keys/account.key -\nit's enough to copy this file to back up your account.");
+#else
+			(void)window;
+#endif
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Close##PrivateKey", ImVec2(120, 0))) {
+				reveal_private_key_open = false;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
 	if (augs::exists(key_path)) {
 		{
 			const auto cols = danger_button_colors(rgba(200, 80, 0, 255));
@@ -821,12 +852,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				copy_icon_button("ForgetKey", "0x" + augs::bytes_to_hex(*public_key));
 			}
 
+			text("");
+			colored_text({ { "If you haven't backed up your ", white }, { "private key", orange }, { ", you will lose progress.", white } });
+
 			text(
-				"\n"
-				"You will lose progress if you haven't backed it up.\n"
 				"Your Steam progress, if any, stays intact.\n\n"
 #if PLATFORM_WEB
-				"In the browser you can not reach the backup -\ncopy the key first (Copy private key to clipboard) if you may want it back."
+				"In the browser you can not reach the backup -\ncopy the key first (Reveal the private key) if you may want it back."
 #else
 				"The file is kept in your user folder as a backup -\ndelete it yourself to remove it for good."
 #endif
@@ -1188,9 +1220,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 #if PLATFORM_WEB
 				text("Sign in through Steam in the new tab\nto get the one-time code:");
 #else
-				text("Sign in through Steam on hypersomnia.io/link\nto get the one-time code:");
+				text("You will have to sign in through Steam.");
 
-				if (ImGui::Button("Open hypersomnia.io/link")) {
+				if (ImGui::Button("Get the one-time code on hypersomnia.io")) {
 					augs::open_url(website_url + "/link");
 				}
 #endif
@@ -1254,6 +1286,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					text_color(link_flow_message, orange);
 				}
 
+				text_color("Do NOT paste somebody else's code!", red);
+
 				ImGui::Separator();
 
 				if (ImGui::Button("Cancel##LinkFlow", ImVec2(120, 0))) {
@@ -1264,12 +1298,21 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				const auto target = *link_target_to_confirm;
 
 				text("Link this key to the Steam account\n");
-				text_color(typesafe_sprintf("    \"%x\" (%x)?", target.name, target.steam_account), orange);
-				text(
-					"\nProgress will count towards that account.\n"
-					"The name is anyone's to copy - confirm only if the account is yours,\n"
-					"never for a code someone else gave you."
-				);
+				text_color(typesafe_sprintf("    \"%x\"?", target.name), orange);
+
+				/*
+					The id under the name - anyone can copy a name, the id is the account; it opens the real Steam profile.
+				*/
+
+				ImGui::Dummy(ImVec2(ImGui::CalcTextSize("    ").x, 0));
+				ImGui::SameLine(0, 0);
+
+				if (external_link("SteamProfile", target.steam_account, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
+					const auto id64 = target.steam_account.rfind("steam_", 0) == 0 ? target.steam_account.substr(6) : target.steam_account;
+					augs::open_url("https://steamcommunity.com/profiles/" + id64);
+				}
+
+				text("\nProgress will count towards that account.\nConfirm only if the account is yours.");
 
 				ImGui::Separator();
 
