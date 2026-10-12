@@ -4,35 +4,49 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include "augs/filesystem/path.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/async_response.h"
 #include "application/network/identity_cert.h"
 
 /*
-	The player's identity for this run of the game - see identity_cert.h.
+	The player's identity - see identity_cert.h.
 
-	The session key is made at start and lives only in memory. Right away the game asks the identity broker
-	on hypersomnia.io for a cert binding the player's account to it - with a Steam ticket, a CrazyGames token or
-	the signature of the account key - and asks again at half of its lifetime. Joining a server never waits for the broker
-	beyond a short moment for a request already on its way. A failed request is retried with a growing delay, one the broker
-	refused (e.g. a ban) only after a long one; the last reason is kept for the player to see.
+	Every game has its "this computer" key (account.key in the user folder, the browser's key on the web).
+	It is also the session key: the game signs its connections with it, and a cert names it.
+	With nothing more, the game signs its own cert - the account "key_" and the key in hex - and never asks anyone.
 
-	With an account key the player can always sign a cert himself - good everywhere but in ranked, e.g. for admins
-	while the broker is down.
+	An account the identity broker on hypersomnia.io vouches for (Steam, CrazyGames) is expected:
+	- in the Steam build, always - proven with a Steam ticket;
+	- with a key linked to a Steam account, while steam.cert is there - proven with the key's signature;
+	- in the CrazyGames build, once the player signs in to CrazyGames - proven with its token.
+
+	One loop keeps that cert: it lives 4 hours and is renewed at half of its lifetime, also during a match,
+	so a connection never waits for the broker; a failure is retried after 30 s, doubling up to 5 minutes.
+	A cert only matters when connecting - a new one counts from the next connection.
+
+	steam.cert keeps the Steam cert across restarts (a valid one is used at once), and its presence tells a key
+	that it is linked. It is no secret: useless without account.key, which lies next to it anyway.
+	It goes only when the broker answers with the key's own account - the key was unlinked on the site.
 */
 
 class identity_session {
 public:
-	enum class source_type {
+	enum class provider_type {
 		NONE,
 		STEAM,
-		CRAZYGAMES,
-		KEY
+		CRAZYGAMES
 	};
 
 	struct input {
 		std::string broker_url;
-		source_type source = source_type::NONE;
+		provider_type provider = provider_type::NONE;
+
+		/*
+			The Steam build proves its Steam account with a ticket, the other builds with the key's signature.
+		*/
+
+		bool steam_ticket_proof = false;
 		std::string crazygames_token;
 
 		/*
@@ -40,13 +54,8 @@ public:
 		*/
 
 		std::string crazygames_user;
-		std::optional<augs::ed25519_seed_type> account_seed;
 
 		bool operator==(const input&) const = default;
-
-		/*
-			The same account, whatever its token.
-		*/
 
 		bool same_account(input other) const {
 			auto self = *this;
@@ -56,20 +65,50 @@ public:
 		}
 	};
 
+	/*
+		The account's name and avatar as the broker sent them (Steam), shown instead of the player's own
+		when "Use my Steam name and avatar" is on - see the plan's "two profiles".
+	*/
+
+	struct account_profile {
+		std::string name;
+		std::vector<std::byte> avatar;
+	};
+
+	/*
+		The answer to "is this key linked?" - asked right after importing a key and by "Link to your Steam account".
+	*/
+
+	enum class link_check_state {
+		NONE,
+		PENDING,
+		LINKED,
+		NOT_LINKED,
+		FAILED
+	};
+
 private:
-	augs::ed25519_seed_type session_seed = {};
-	augs::ed25519_public_key_type session_public = {};
-	std::array<uint8_t, 64> session_secret = {};
+	augs::ed25519_seed_type key_seed = {};
+	augs::ed25519_public_key_type key_public = {};
+	std::array<uint8_t, 64> key_secret = {};
+
+	augs::path_type cert_file;
+	augs::path_type profile_file;
+	bool cert_saved = false;
 
 	std::optional<identity_cert::cert> broker_cert;
-	double broker_cert_received_at = 0.0;
-	double broker_cert_received_at_wall = 0.0;
+	double cert_received_at = 0.0;
+	double cert_received_at_wall = 0.0;
+	account_profile profile;
 
 	augs::async_response_ptr request;
 	input requested_for;
 
 	double next_attempt_at = 0.0;
 	double retry_delay = 30.0;
+	double last_now = 0.0;
+	int attempts_finished = 0;
+	bool last_attempt_failed = false;
 
 	/*
 		Steam: the ticket is requested once per attempt, through the game's Steam callbacks.
@@ -78,36 +117,42 @@ private:
 	bool steam_ticket_wanted = false;
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
-	double last_now = 0.0;
-	bool retry_after_request = false;
-	bool refresh_wanted = false;
-
-	void clear_steam_ticket();
-
-	/*
-		Forgets the cert when the account changed (e.g. the key was replaced) - the next one is asked for right away.
-	*/
-
-	void reset();
 	std::optional<std::vector<std::byte>> steam_ticket;
+
+	augs::async_response_ptr link_check_request;
+	link_check_state link_check = link_check_state::NONE;
+	account_profile link_check_profile;
 
 	input last_input;
 
-	void start_request(const input&, double now);
-	void schedule_retry(double now, bool refused);
-	double cert_secs_left(double now) const;
+	void clear_steam_ticket();
+	void forget_cert();
+	void load_saved_cert();
+	void save_cert();
+	void delete_saved_cert();
+
+	std::string key_location() const;
 	std::optional<std::string> build_location(const input&) const;
+	void start_request(const input&, double now);
+	void schedule_retry(double now);
+	double cert_secs_left(double now) const;
+
+	struct parsed_answer {
+		identity_cert::cert cert;
+		account_profile profile;
+	};
+
+	std::optional<parsed_answer> parse_answer(const std::string& body) const;
 
 public:
 	std::string last_error;
 
 	/*
-		Set by the game while the player is in a ranked match - see hold_in_match_until_left_secs.
+		The key and where the Steam cert is kept (.keys in the user folder). Another key - an import -
+		forgets the cert, which names the old key.
 	*/
 
-	bool in_ranked_match = false;
-
-	identity_session();
+	void set_key(const augs::ed25519_seed_type& seed, const augs::path_type& keys_dir);
 
 	void advance(const input&, double now);
 
@@ -118,24 +163,60 @@ public:
 	std::optional<std::string> steam_identity_to_request();
 	void on_steam_ticket(const std::vector<std::byte>& ticket_bytes, bool successful);
 
-	bool request_in_flight() const;
-
 	/*
-		Skips the wait before the next attempt - e.g. joining a ranked server without a cert,
-		or right after linking or unlinking the key.
+		Tries at once and starts the backoff over - the player's [Retry].
 	*/
 
 	void retry_now();
 
-	bool has_broker_cert(double now) const;
-	const std::optional<identity_cert::cert>& get_broker_cert() const { return broker_cert; }
-
 	/*
-		What to show a server: the broker's cert while it is valid, else one signed with the account key if there is one.
+		A key linked to Steam is expected to sign in while steam.cert is there.
 	*/
 
-	std::optional<identity_cert::cert> cert_for_connect(const input&, double now) const;
+	bool has_saved_cert() const {
+		return cert_saved;
+	}
 
-	const std::array<uint8_t, 64>& session_secret_key() const { return session_secret; }
-	const augs::ed25519_public_key_type& session_public_key() const { return session_public; }
+	/*
+		Unlinked from the game: back to "this computer" right away, steam.cert deleted.
+	*/
+
+	void on_unlinked();
+
+	bool has_valid_cert(double now) const;
+	const std::optional<identity_cert::cert>& get_cert() const { return broker_cert; }
+	const account_profile& get_profile() const { return profile; }
+
+	/*
+		The first sign-in of this run is still on its way - the start's "Signing in to your Steam account...".
+	*/
+
+	bool signing_in_first_time(const input&, double now) const;
+
+	/*
+		An account is expected, but there is no valid cert and the last attempt failed.
+	*/
+
+	bool sign_in_failed(const input&, double now) const;
+
+	int get_attempts_finished() const {
+		return attempts_finished;
+	}
+
+	/*
+		What to show a server. forced_account is the account of a ranked match being rejoined (see ranked_match.json):
+		a key_ account rejoins with a self-signed cert even when a Steam cert came meanwhile.
+		Without a valid broker cert, always a self-signed one.
+	*/
+
+	identity_cert::cert cert_for_connect(double now, const std::string& forced_account = "") const;
+
+	const std::array<uint8_t, 64>& session_secret_key() const { return key_secret; }
+	const augs::ed25519_public_key_type& public_key() const { return key_public; }
+	std::string key_account() const;
+
+	void start_link_check(const std::string& broker_url);
+	link_check_state get_link_check() const { return link_check; }
+	const account_profile& get_link_check_profile() const { return link_check_profile; }
+	void clear_link_check();
 };

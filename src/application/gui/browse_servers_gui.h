@@ -119,7 +119,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 #endif
 public:
 
-	bool allow_ranked_servers = false;
 
 	using base = standard_window_mixin<browse_servers_gui_state>;
 	browse_servers_gui_state(const std::string& title);

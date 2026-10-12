@@ -40,7 +40,6 @@ struct server_client_state {
 	net_time_t last_keyboard_activity_time = -1.0;
 
 	net_time_t when_last_sent_file_packet = 0.0f;
-	net_time_t when_sent_auth_ticket = -1.0;
 
 	std::optional<augs::secure_hash_type> now_downloading_file;
 
@@ -187,24 +186,6 @@ struct server_client_state {
 
 	bool is_authenticated() const {
 		return !authenticated_id.empty();
-	}
-
-	bool should_kick_due_to_unauthenticated(const server_vars& v, const net_time_t server_time) const {
-		if (!v.requires_authentication()) {
-			return false;
-		}
-
-		if (is_authenticated()) {
-			return false;
-		}
-
-		if (when_sent_auth_ticket != -1.0) {
-			const auto diff = server_time - when_sent_auth_ticket;
-			return diff > std::max(0.0f, v.kick_if_unauthenticated_for_secs);
-		}
-
-		const auto diff = server_time - when_connected;
-		return diff > std::max(0.0f, v.kick_if_unauthenticated_for_secs);
 	}
 
 	net_time_t secs_since_connected(const net_time_t server_time) const {

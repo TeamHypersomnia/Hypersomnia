@@ -72,6 +72,8 @@
 #include "application/config_json_table.h"
 #include "application/main/identity_key.h"
 #include "application/main/identity_session.h"
+#include "application/main/ranked_match_record.h"
+#include "augs/misc/imgui/imgui_status_icons.h"
 #include "application/main/server_passwords.h"
 #include "application/main/server_key.h"
 
@@ -450,12 +452,6 @@ work_result work(
 
 	WEBSTATIC const bool is_steam_client = false;
 
-#if WEB_ITCH
-	WEBSTATIC const bool ranked_servers_enabled = false;
-#else
-	WEBSTATIC const bool ranked_servers_enabled = true;
-#endif
-
 #else
 	WEBSTATIC const bool is_cli_tool = params.is_cli_tool();
 
@@ -510,9 +506,6 @@ work_result work(
 	/*
 		Without Steam, the account is the account key in the user folder - see identity_key.h and identity_session.h.
 	*/
-
-	WEBSTATIC const bool ranked_servers_enabled = true;
-	(void)ranked_servers_enabled;
 
 	LOG_NVPS(is_steam_client);
 
@@ -661,22 +654,6 @@ work_result work(
 			result->client.nickname = augs::get_user_name();
 		}
 #endif
-
-		if (is_steam_client) {
-			if (result->client.use_account_nickname) {
-				if (const auto steam_username = ::steam_get_username()) {
-					result->client.nickname = std::string(steam_username);
-				}
-			}
-
-			if (result->client.use_account_avatar) {
-				if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-					avatar.save_as_png(CACHED_AVATAR);
-
-					result->client.avatar_image_path = CACHED_AVATAR;
-				}
-			}
-		}
 
 		return result;
 	}();
@@ -1798,12 +1775,6 @@ work_result work(
 		augs::remove_file(CACHED_AVATAR);
 
 		config.client.signed_in.nickname = "";
-
-		change_with_save(
-			[&](auto& cfg) {
-				cfg.client.avatar_image_path = augs::path_type();
-			}
-		);
 	};
 
 	WEBSTATIC auto perform_social_sign_in_popup = [&](const bool prompted_once) {
@@ -1852,39 +1823,33 @@ work_result work(
 #endif
 
 	/*
-		The account key, for the players without Steam and outside CrazyGames - created on the first start.
-		Read again when the file changes (an import or a forget in the Account settings).
+		"This computer": the key every game has (.keys/account.key, the browser's key on the web), created on the first start.
+		Read again when the file changes (an import or a forget in the Account settings) - a forgotten key is replaced
+		by a new one right away, since every connection needs a cert. See identity_session.h.
 	*/
-
-	WEBSTATIC const bool uses_account_key = !is_steam_client && !params.is_crazygames;
 
 	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
 	WEBSTATIC double account_seed_checked_at = -1000.0;
 
 	WEBSTATIC auto refresh_account_seed = [&](const double now) {
-		if (!uses_account_key || now - account_seed_checked_at < 1.0) {
+		if (now - account_seed_checked_at < 1.0) {
 			return;
 		}
 
-		const bool first = account_seed_checked_at < 0.0;
 		account_seed_checked_at = now;
 
 		const auto path = USER_DIR / identity_key::file_name;
 
-		if (first) {
-			account_seed = identity_key::load_or_create(path);
+		/*
+			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
+		*/
+
+		if (const auto loaded = augs::exists(path) ? identity_key::load(path) : identity_key::load_or_create(path)) {
+			account_seed = loaded;
 		}
-		else {
-			/*
-				A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had -
-				changing the account would drop the cert. Only a missing file (Forget this key) or another key changes it.
-			*/
 
-			const auto loaded = identity_key::load(path);
-
-			if (loaded.has_value() || !augs::exists(path)) {
-				account_seed = loaded;
-			}
+		if (account_seed.has_value()) {
+			identity->set_key(*account_seed, USER_DIR / identity_key::keys_dir_name);
 		}
 	};
 
@@ -1893,27 +1858,43 @@ work_result work(
 		in.broker_url = config.identity_broker_url;
 
 		if (is_steam_client) {
-			in.source = identity_session::source_type::STEAM;
+			in.provider = identity_session::provider_type::STEAM;
+			in.steam_ticket_proof = true;
 		}
 #if PLATFORM_WEB
 		else if (params.is_crazygames) {
 			if (social_sign_in.cached_auth.is_set() && social_sign_in.cached_auth.type == auth_provider_type::CRAZYGAMES) {
-				in.source = identity_session::source_type::CRAZYGAMES;
+				in.provider = identity_session::provider_type::CRAZYGAMES;
 				in.crazygames_token = social_sign_in.cached_auth.auth_token;
 				in.crazygames_user = social_sign_in.cached_auth.profile_id;
 			}
 		}
 #endif
-		else if (account_seed.has_value()) {
-			in.source = identity_session::source_type::KEY;
-			in.account_seed = account_seed;
+		else if (identity->has_saved_cert()) {
+			in.provider = identity_session::provider_type::STEAM;
 		}
 
 		return in;
 	};
 
+	WEBSTATIC double crazygames_token_refreshed_at = -1000.0;
+
 	WEBSTATIC auto advance_identity = [&]() {
 		const auto now = augs::steady_secs();
+
+#if PLATFORM_WEB
+		/*
+			The CrazyGames token expires sooner than a cert - refreshed when it has, at most every 30 s,
+			so the loop renewing the cert always has a valid one.
+		*/
+
+		if (params.is_crazygames && is_auth_expired() && auth_can_self_refresh() && now - crazygames_token_refreshed_at > 30.0) {
+			crazygames_token_refreshed_at = now;
+			auth_self_refresh();
+		}
+#else
+		(void)crazygames_token_refreshed_at;
+#endif
 
 		refresh_account_seed(now);
 		identity->advance(get_identity_input(), now);
@@ -1953,7 +1934,7 @@ work_result work(
 
 	try {
 		augs::image avatar;
-		avatar.from_file(config.client.avatar_image_path);
+		avatar.from_file(config.client.get_avatar_image_path());
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 	catch (...) {
@@ -1966,7 +1947,7 @@ work_result work(
 		std::vector<std::byte> avatar;
 
 		try {
-			const auto& path = config.client.avatar_image_path;
+			const auto path = config.client.get_avatar_image_path();
 
 			if (!path.empty()) {
 				return augs::file_to_bytes(path);
@@ -2023,146 +2004,302 @@ work_result work(
 	};
 
 	/*
-		The Account settings and the identity session, once per frame.
-	*/
-
-	/*
-		The account the key played as when the broker last answered - see sync_identity_with_settings.
-		Only for showing the account before the broker answers: what servers see is always the cert.
-		"<key account> <account>", both checked - a hand-edited or broken file is just ignored.
-	*/
-
-	WEBSTATIC auto key_account_linked_as = [&]() -> std::pair<std::string, std::string> {
-		auto valid_account = [](const std::string& id) {
-			if (id.empty() || id.size() > 100) {
-				return false;
-			}
-
-			const bool known_prefix = id.rfind("key_", 0) == 0 || id.rfind("steam_", 0) == 0;
-
-			return known_prefix && std::all_of(id.begin(), id.end(), [](const char c) {
-				return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
-			});
-		};
-
-		try {
-			const auto text = augs::file_to_string(USER_DIR / "account_linked_as.txt");
-			const auto space = text.find(' ');
-
-			if (space != std::string::npos) {
-				auto account = text.substr(space + 1);
-
-				while (!account.empty() && (account.back() == '\n' || account.back() == '\r' || account.back() == ' ')) {
-					account.pop_back();
-				}
-
-				auto key_account = text.substr(0, space);
-
-				if (valid_account(key_account) && key_account.rfind("key_", 0) == 0 && valid_account(account)) {
-					return { std::move(key_account), std::move(account) };
-				}
-			}
-		}
-		catch (...) {
-
-		}
-
-		return {};
-	}();
-
-	/*
 		Set during a ranked match - the leaderboards are downloaded again on coming back to the main menu.
 	*/
 
 	WEBSTATIC bool joined_ranked_since_leaderboards = false;
 
-	WEBSTATIC auto sync_identity_with_settings = [&]() {
+	/*
+		The account the player is now: the signed-in one while its cert is valid, else "this computer".
+		Empty while the first sign-in of the run is on its way - the leaderboards show "..." rather than an account
+		that may change in a moment.
+	*/
+
+	WEBSTATIC auto current_account_id = [&]() -> std::string {
 		const auto now = augs::steady_secs();
+		const auto in = get_identity_input();
+
+		if (identity->has_valid_cert(now)) {
+			return identity->get_cert()->account;
+		}
 
 		/*
-			A new cert after linking or unlinking the key - not during a ranked match,
-			whose account would change under it and then not let the player back after a drop.
+			An expired steam.cert names the account the first sign-in is about to confirm - shown at once.
 		*/
 
-		identity->in_ranked_match = would_abandon_ranked_match();
+		if (identity->signing_in_first_time(in, now)) {
+			if (const auto& saved = identity->get_cert(); saved.has_value()) {
+				return saved->account;
+			}
 
-		if (identity->in_ranked_match) {
+			return "";
+		}
+
+		return identity->key_account();
+	};
+
+	/*
+		The account's name and avatar (Steam, CrazyGames) instead of the player's own, while signed in and
+		"Use my Steam name and avatar" is on. The config is never written - see client_vars::signed_in.
+	*/
+
+	WEBSTATIC std::vector<std::byte> applied_account_avatar;
+
+	WEBSTATIC auto apply_account_profile = [&]() {
+		const auto now = augs::steady_secs();
+		const auto in = get_identity_input();
+		auto& signed_in = config.client.signed_in;
+
+		signed_in.provider_label = [&]() -> std::string {
+			if (in.provider == identity_session::provider_type::CRAZYGAMES) {
+				return "CrazyGames";
+			}
+
+			if (in.provider == identity_session::provider_type::STEAM) {
+				return "Steam";
+			}
+
+			return "";
+		}();
+
+		/*
+			Also while the first sign-in confirms the account of an expired steam.cert - its cached profile at once.
+		*/
+
+		const bool confirming_saved = identity->signing_in_first_time(in, now) && identity->get_cert().has_value();
+		const bool signed_in_now = identity->has_valid_cert(now) || confirming_saved || (in.provider == identity_session::provider_type::CRAZYGAMES);
+
+		if (!signed_in_now || !config.client.use_account_profile || signed_in.provider_label.empty()) {
+			signed_in.nickname = "";
+			signed_in.avatar_image_path.clear();
+			return;
+		}
+
+#if PLATFORM_WEB
+		if (in.provider == identity_session::provider_type::CRAZYGAMES) {
+			signed_in.nickname = social_sign_in.cached_auth.profile_name;
+			signed_in.avatar_image_path = augs::exists(CACHED_AVATAR) ? augs::path_type(CACHED_AVATAR) : augs::path_type();
+			return;
+		}
+#endif
+
+		const auto& profile = identity->get_profile();
+
+		auto name = profile.name;
+		auto avatar = profile.avatar;
+
+#if !PLATFORM_WEB
+		if (is_steam_client) {
+			/*
+				The broker could not ask Steam - the local Steam client knows the same.
+			*/
+
+			if (name.empty()) {
+				if (const auto steam_username = ::steam_get_username()) {
+					name = steam_username;
+				}
+			}
+		}
+#endif
+
+		signed_in.nickname = name;
+
+		if (avatar != applied_account_avatar || !augs::exists(ACCOUNT_AVATAR)) {
+			applied_account_avatar = avatar;
+
+			try {
+				auto image = augs::image();
+
+				if (!avatar.empty()) {
+					image.from_bytes_stbi(avatar, "account avatar");
+				}
+#if !PLATFORM_WEB
+				else if (is_steam_client) {
+					image = ::steam_get_avatar_image();
+				}
+#endif
+
+				if (image.get_size().is_nonzero()) {
+					image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
+					image.save_as_png(ACCOUNT_AVATAR);
+					streaming.requested_avatar_preview = ACCOUNT_AVATAR;
+				}
+				else {
+					augs::remove_file(ACCOUNT_AVATAR);
+				}
+			}
+			catch (...) {
+				LOG("Could not read the account's avatar.");
+				augs::remove_file(ACCOUNT_AVATAR);
+			}
+		}
+
+		signed_in.avatar_image_path = augs::exists(ACCOUNT_AVATAR) ? augs::path_type(ACCOUNT_AVATAR) : augs::path_type();
+	};
+
+	/*
+		The avatar preview follows whichever avatar is in effect - one's own or the account's.
+	*/
+
+	WEBSTATIC augs::path_type previewed_avatar_path = config.client.get_avatar_image_path();
+
+	/*
+		user/ranked_match.json - see ranked_match_record.h. Rewritten every 10 s of a ranked match with the deadline of
+		a rejoin; deleted once the player is connected and not in a ranked match (it ended) for 30 s - longer than a rejoin takes to load -
+		or once no rejoin is left.
+	*/
+
+	WEBSTATIC double ranked_record_written_at = -1000.0;
+	WEBSTATIC double outside_ranked_match_since = -1.0;
+
+	WEBSTATIC auto maintain_ranked_match_record = [&]() {
+#if BUILD_NETWORKING
+		const auto now = augs::steady_secs();
+
+		if (!has_current_setup()) {
+			return;
+		}
+
+		const auto setup = std::get_if<client_setup>(std::addressof(*current_setup));
+
+		if (setup == nullptr) {
+			return;
+		}
+
+		[&](client_setup& client) {
+			if (!client.is_connected() || client.is_replaying()) {
+				outside_ranked_match_since = -1.0;
+				return;
+			}
+
+			const auto server_key = client.get_server_public_key();
+
+			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
+				outside_ranked_match_since = -1.0;
+
+				if (now - ranked_record_written_at > 10.0) {
+					ranked_record_written_at = now;
+
+					auto record = ranked_match_record();
+					record.connect = client.get_connect_string();
+					record.server_key = *server_key;
+					record.account = client.get_connected_account();
+					record.rejoin_until = static_cast<int64_t>(augs::date_time::secs_since_epoch() + *budget);
+					record.save(RANKED_MATCH_PATH);
+				}
+
+				return;
+			}
+
+			if (outside_ranked_match_since < 0.0) {
+				outside_ranked_match_since = now;
+			}
+
+			const bool settled = now - outside_ranked_match_since > 30.0;
+
+			if (settled && augs::exists(RANKED_MATCH_PATH)) {
+				if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH); !record.has_value() || record->connect == client.get_connect_string()) {
+					LOG("Not in a ranked match on %x any more - forgetting it.", client.get_connect_string());
+					augs::remove_file(RANKED_MATCH_PATH);
+				}
+			}
+		}(*setup);
+#endif
+	};
+
+	/*
+		Signing in as the player sees it - see identity_session.h:
+		- at start, while the first sign-in is on its way: nothing for a second, then a dimmed "Signing in to your Steam account..."
+		  (a join asked for meanwhile, e.g. --connect, waits for it);
+		- the first time it failed when it matters - in the main menu, or before a connection - one message per run,
+		  with [Connect anyway] [Cancel] before a connection; after it nothing asks again, but the loop keeps trying;
+		- [Retry] (leaderboards, Account settings) tries at once, a failed one shows the message again;
+		- signed in after a failure: a short "Signed in to Steam" in the menu.
+	*/
+
+	WEBSTATIC const double run_started_at = augs::steady_secs();
+	WEBSTATIC bool sign_in_message_shown = false;
+	WEBSTATIC bool launch_after_sign_in = false;
+	WEBSTATIC std::optional<int> retry_attempts_before;
+	WEBSTATIC std::optional<simple_popup> sign_in_popup;
+	WEBSTATIC bool sign_in_popup_before_connect = false;
+	WEBSTATIC bool had_valid_cert = false;
+	WEBSTATIC bool failed_since_last_cert = false;
+	WEBSTATIC double signed_in_notice_until = -1.0;
+
+	WEBSTATIC auto provider_name = [&]() -> std::string {
+		const auto in = get_identity_input();
+		return in.provider == identity_session::provider_type::CRAZYGAMES ? "CrazyGames" : "Steam";
+	};
+
+	WEBSTATIC auto open_sign_in_popup = [&](const bool before_connect) {
+		const auto provider = provider_name();
+
+		auto popup = simple_popup();
+		popup.title = "Not signed in";
+		popup.message = typesafe_sprintf(
+			"Couldn't sign in to your %x account.\n"
+			"You play as: this computer, until the game can sign you in again.\n"
+			"Matches you play until then will not count towards your %x account.\n"
+			"\n"
+			"If this keeps happening, try again later.",
+			provider,
+			provider
+		);
+
+		if (!identity->last_error.empty()) {
+			popup.details = identity->last_error;
+		}
+
+		sign_in_popup = popup;
+		sign_in_popup_before_connect = before_connect;
+		sign_in_message_shown = true;
+	};
+
+	WEBSTATIC auto retry_sign_in = [&]() {
+		retry_attempts_before = identity->get_attempts_finished();
+		identity->retry_now();
+	};
+
+	WEBSTATIC auto sync_identity_with_settings = [&]() {
+		maintain_ranked_match_record();
+
+		{
+			const auto now = augs::steady_secs();
+			const bool valid = identity->has_valid_cert(now);
+
+			if (identity->sign_in_failed(get_identity_input(), now)) {
+				failed_since_last_cert = true;
+			}
+
+			if (valid && !had_valid_cert && failed_since_last_cert) {
+				failed_since_last_cert = false;
+				signed_in_notice_until = now + 4.0;
+			}
+
+			had_valid_cert = valid;
+		}
+
+		if (would_abandon_ranked_match()) {
 			joined_ranked_since_leaderboards = true;
 		}
 
-		if (settings_gui.identity_retry_wanted && !would_abandon_ranked_match()) {
-			settings_gui.identity_retry_wanted = false;
-			identity->retry_now();
+		if (settings_gui.sign_in_retry_wanted) {
+			settings_gui.sign_in_retry_wanted = false;
+			retry_sign_in();
 		}
 
+		settings_gui.identity = identity.get();
+		settings_gui.identity_input = get_identity_input();
+		settings_gui.current_account_id = current_account_id();
 		settings_gui.identity_error = identity->last_error;
 
-		/*
-			Confirmed: what servers see now (a broker cert, or Steam). Otherwise remembered or the key's own until the broker answers.
-		*/
+		apply_account_profile();
 
-		settings_gui.current_account_confirmed = identity->has_broker_cert(now) || is_steam_client;
-
-		settings_gui.current_account_id = [&]() -> std::string {
-			const auto key_account = [&]() -> std::string {
-				if (account_seed.has_value()) {
-					if (const auto public_key = augs::ed25519_public_key(*account_seed)) {
-						return ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
-					}
-				}
-
-				return "";
-			}();
-
-			if (identity->has_broker_cert(now)) {
-				const auto& account = identity->get_broker_cert()->account;
-
-				/*
-					Remembered for the next start: a key linked to Steam shows as the Steam account right away,
-					not as the key until the broker answers.
-				*/
-
-				const auto confirmed = std::make_pair(key_account, account);
-
-				if (!key_account.empty() && confirmed != key_account_linked_as) {
-					key_account_linked_as = confirmed;
-
-					try {
-						augs::save_as_text(USER_DIR / "account_linked_as.txt", key_account + " " + account);
-					}
-					catch (...) {
-
-					}
-				}
-
-				return account;
-			}
-
-#if !PLATFORM_WEB
-			if (is_steam_client) {
-				return ::get_provider_preffix(auth_provider_type::STEAM_NATIVE) + steam_id;
-			}
-#endif
-
-			if (key_account.empty()) {
-				return "";
-			}
-
-			if (key_account_linked_as.first == key_account && !key_account_linked_as.second.empty()) {
-				return key_account_linked_as.second;
-			}
-
-			/*
-				Not known yet whether the key is linked: nothing rather than an account that may change in a moment.
-				After a failed request (e.g. the broker is down) - the key's own.
-			*/
-
-			if (identity->last_error.empty()) {
-				return "";
-			}
-
-			return key_account;
-		}();
+		if (const auto effective = config.client.get_avatar_image_path(); effective != previewed_avatar_path) {
+			previewed_avatar_path = effective;
+			streaming.requested_avatar_preview = effective.empty() ? augs::path_type(BLANK_AVATAR) : effective;
+		}
 
 #if PLATFORM_WEB
 		if (const auto link = take_pending_steam_link()) {
@@ -2570,76 +2707,67 @@ work_result work(
 		auto connect_string = config.client_connect;
 
 		/*
-			What the server list says about the chosen server - or, when it is not on the list yet (e.g. joined from the URL,
-			the command line or a Steam invite), its WebRTC alias: the masterserver gives aliases only to the official servers,
-			ranked-<location> to the ranked ones, with :<index> if the name has #<index> - e.g. "ranked-pl:1" for "[PL] Ranked #1".
+			What the server list says about the chosen server, e.g. its key.
 		*/
 
 		const auto found = find_chosen_server_info();
 
-		const auto target = [&]() {
-			const auto webrtc_id = ::find_webrtc_id(connect_string);
-			return webrtc_id.empty() ? std::string(connect_string) : webrtc_id;
+		LOG("Launching client setup with connect string: %x", connect_string);
+
+		advance_identity();
+
+		/*
+			Rejoining the ranked match this player is in: on the account it was joined with, and only to the same server.
+		*/
+
+		const auto rejoined_match = [&]() -> std::optional<ranked_match_record> {
+			if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH)) {
+				if (record->valid_now() && record->connect == std::string(connect_string)) {
+					LOG("Rejoining a ranked match as %x.", record->account);
+					return record;
+				}
+			}
+
+			return std::nullopt;
 		}();
 
 		/*
-			The alias decides only for a server not on the list - a listed community server could be named anything.
+			A join waits for the first sign-in of the run, and a failed one is told once, before connecting.
+			Rejoining a match played as this computer needs no sign-in.
 		*/
 
-		const bool looks_like_alias = target.find('.') == std::string::npos;
-		const bool is_ranked = found != nullptr ? found->heartbeat.is_ranked_server() : (looks_like_alias && begins_with(target, "ranked"));
+		{
+			const auto now = augs::steady_secs();
+			const auto in = get_identity_input();
+			const bool rejoining_as_key = rejoined_match.has_value() && rejoined_match->account.rfind("key_", 0) == 0;
 
-#if PLATFORM_WEB
-		/*
-			On CrazyGames, ranked is played on the CrazyGames account.
-		*/
-
-		const bool requires_sign_in = is_ranked && params.is_crazygames;
-
-		if (requires_sign_in) {
-			if (is_auth_expired()) {
-				LOG("Trying to connect with an expired auth.");
-
-				if (auth_self_refresh()) {
-					LOG("Requested self-refresh. Delaying connect. connect_string: %x", connect_string);
-
-					social_sign_in.connect_string_post_sign_in = connect_string;
+			if (!rejoining_as_key) {
+				if (identity->signing_in_first_time(in, now)) {
+					LOG("Waiting for the first sign-in before connecting.");
+					launch_after_sign_in = true;
 					return false;
 				}
 
-				social_log_out();
-			}
-
-			if (!is_signed_in()) {
-				social_sign_in.open("play ranked matches", connect_string);
-				return false;
+				if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
+					open_sign_in_popup(true);
+					return false;
+				}
 			}
 		}
-#endif
-
-		LOG("Launching client setup with connect string: %x", connect_string);
-
-		/*
-			The server key from the list - or the one this server presented before, e.g. when asked for a password
-			after being joined by address - picks the saved password, so it goes to no other server.
-		*/
-
-		/*
-			E.g. joining right at start (from the command line): the key is read and the cert asked for before connecting.
-			Ranked without a broker cert: asked for right now, so that the client waits for it instead of connecting without.
-		*/
-
-		if (is_ranked && !identity->has_broker_cert(augs::steady_secs()) && !identity->request_in_flight()) {
-			identity->retry_now();
-		}
-
-		advance_identity();
 
 		auto identity_context = client_identity_context();
 		identity_context.session = identity;
 		identity_context.input = get_identity_input();
-		identity_context.is_ranked = is_ranked;
+
+		if (rejoined_match.has_value()) {
+			identity_context.forced_account = rejoined_match->account;
+		}
+
 		identity_context.expected_server_public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+			if (rejoined_match.has_value()) {
+				return rejoined_match->server_key;
+			}
+
 			if (found != nullptr) {
 				if (const auto key = found->get_public_key()) {
 					return *key;
@@ -2918,9 +3046,98 @@ work_result work(
 		launch_setup(activity_type::CLIENT);
 	};
 
-	WEBSTATIC auto perform_browse_servers = [&]() {
-		browse_servers_gui.allow_ranked_servers = ranked_servers_enabled;
+	WEBSTATIC auto perform_sign_in_ui = [&]() {
+		using namespace augs::imgui;
 
+		const auto now = augs::steady_secs();
+		const auto in = get_identity_input();
+		const bool signing_in = identity->signing_in_first_time(in, now);
+
+		if (launch_after_sign_in && !signing_in) {
+			launch_after_sign_in = false;
+			start_client_setup();
+		}
+
+		/*
+			The start's modal - after a second, so a quick answer shows nothing.
+		*/
+
+		if (signing_in && now - run_started_at > 1.0 && streaming.completed_all_loading()) {
+			const auto display = ImGui::GetIO().DisplaySize;
+
+			{
+				/*
+					A lightly dimmed screen behind it.
+				*/
+
+				ImGui::SetNextWindowPos(ImVec2(0, 0));
+				ImGui::SetNextWindowSize(display);
+				ImGui::SetNextWindowBgAlpha(0.45f);
+
+				auto black = scoped_style_color(ImGuiCol_WindowBg, rgba(0, 0, 0, 255));
+				const auto dim_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+				auto dim = scoped_window("##SigningInDim", nullptr, dim_flags);
+			}
+
+			ImGui::SetNextWindowPos(ImVec2(display.x / 2, display.y / 2), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+			const auto flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+
+			if (auto window = scoped_window("##SigningIn", nullptr, flags)) {
+				spinner_line(typesafe_sprintf("Signing in to your %x account...", provider_name()), white);
+			}
+		}
+
+		/*
+			A failed [Retry] tells it again.
+		*/
+
+		if (retry_attempts_before.has_value() && identity->get_attempts_finished() > *retry_attempts_before) {
+			retry_attempts_before.reset();
+
+			if (identity->sign_in_failed(in, now)) {
+				open_sign_in_popup(false);
+			}
+		}
+
+		if (!has_current_setup() && !sign_in_message_shown && !sign_in_popup.has_value() && identity->sign_in_failed(in, now)) {
+			open_sign_in_popup(false);
+		}
+
+		if (sign_in_popup.has_value()) {
+			if (sign_in_popup_before_connect) {
+				const auto result = sign_in_popup->perform({
+					{ "Connect anyway", rgba::zero, rgba::zero },
+					{ "Cancel", rgba::zero, rgba::zero }
+				});
+
+				if (result) {
+					sign_in_popup = std::nullopt;
+
+					if (result == 1) {
+						start_client_setup();
+					}
+				}
+			}
+			else if (sign_in_popup->perform()) {
+				sign_in_popup = std::nullopt;
+			}
+		}
+
+		if (!has_current_setup() && now < signed_in_notice_until) {
+			const auto display = ImGui::GetIO().DisplaySize;
+
+			ImGui::SetNextWindowPos(ImVec2(display.x / 2, display.y * 0.08f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+			const auto flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs;
+
+			if (auto window = scoped_window("##SignedIn", nullptr, flags)) {
+				checkmark_line(typesafe_sprintf("Signed in to %x", provider_name()), green);
+			}
+		}
+	};
+
+	WEBSTATIC auto perform_browse_servers = [&]() {
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
@@ -3041,28 +3258,53 @@ work_result work(
 	WEBSTATIC auto perform_leaderboards = [&]() {
 		leaderboards_gui.show = !browse_servers_gui.show;
 
+		const auto now = augs::steady_secs();
+		const auto in = get_identity_input();
+		const auto account = settings_gui.current_account_id;
+		const bool signed_in_account = !account.empty() && account.rfind("key_", 0) != 0;
+
+		const auto account_label = [&]() -> std::string {
+			if (account.empty()) {
+				return "";
+			}
+
+			if (signed_in_account) {
+				const auto& name = identity->get_profile().name;
+				return provider_name() + ": " + (name.empty() ? account : name);
+			}
+
+			return "this computer (" + identity_key::short_form(identity->public_key()) + ")";
+		}();
+
 		leaderboards_gui.perform({
 			config.client.get_nickname(),
-#if PLATFORM_WEB
-			params.is_crazygames ? social_sign_in.cached_auth.profile_id : settings_gui.current_account_id,
-#else
-			settings_gui.current_account_id,
-#endif
+			account,
 
 			config.main_menu.leaderboards_provider_url,
 			streaming.necessary_images_in_atlas,
 			streaming.avatar_preview_tex,
 
-			menu_ltrb
+			menu_ltrb,
+
+			account_label,
+			config.website_url + "/user/" + account,
+			signed_in_account ? std::string() : augs::bytes_to_hex(identity->public_key()),
+			provider_name(),
+			identity->sign_in_failed(in, now)
 #if PLATFORM_WEB
 			/*
 				Outside CrazyGames the account is the key in the browser - always there.
 			*/
 
-			, params.is_crazygames ? is_signed_in() : true,
+			, true,
 			params.is_crazygames
 #endif
 		});
+
+		if (leaderboards_gui.wants_sign_in_retry) {
+			leaderboards_gui.wants_sign_in_retry = false;
+			retry_sign_in();
+		}
 	};
 
 	WEBSTATIC auto perform_map_catalogue = [&]() {
@@ -3824,13 +4066,15 @@ work_result work(
 						LOG("Failed to load the downloaded avatar.");
 					}
 
+					/*
+						The CrazyGames avatar is the account's - shown through client_vars::signed_in, never written to the config.
+					*/
+
+					(void)has_avatar;
+
 					change_with_save(
 						[&](auto& cfg) {
 							cfg.prompted_for_sign_in_once = true;
-
-							if (has_avatar) {
-								cfg.client.avatar_image_path = CACHED_AVATAR;
-							}
 						}
 					);
 
@@ -3863,8 +4107,6 @@ work_result work(
 					return true;
 				}();
 
-				config.client.signed_in.nickname = social_sign_in.cached_auth.profile_name;
-
 				if (should_prompt_for_social_sign_in) {
 					if (!social_sign_in.is_open()) {
 						config.client.nickname = gen_random_nickname();
@@ -3887,6 +4129,7 @@ work_result work(
 
 				perform_failed_to_load_arena_popup();
 				perform_abandon_are_you_sure_popup();
+				perform_sign_in_ui();
 
 				streaming.display_loading_progress();
 			},
@@ -4762,6 +5005,14 @@ work_result work(
 			else if (params.should_connect) {
 				connect_to(params.connect_address);
 			}
+			else if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH); record.has_value() && record->valid_now()) {
+				/*
+					A ranked match left by a crash or a restart - back to it before anything else.
+				*/
+
+				LOG("Rejoining the ranked match on %x.", record->connect);
+				connect_to(record->connect);
+			}
 			else if (params.launch_activity.has_value()) {
 				LOG("Activity %x was specified from the command line.", *params.launch_activity);
 				launch_setup(*params.launch_activity);
@@ -5322,6 +5573,12 @@ work_result work(
 								on_specific_setup([&](client_setup& client) {
 									client.request_abandon_ranked_match(*abandon_pending_op);
 								});
+
+								/*
+									Abandoned - nothing to come back to.
+								*/
+
+								augs::remove_file(RANKED_MATCH_PATH);
 
 								abandon_pending_op = std::nullopt;
 							}

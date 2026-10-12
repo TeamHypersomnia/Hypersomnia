@@ -656,6 +656,16 @@ namespace augs {
 		}
 	}
 
+	std::vector<std::byte> image::to_png_bytes() const {
+		auto bytes = std::vector<std::byte>();
+
+		if (encode_rgba(bytes, v, size.x, size.y)) {
+			return {};
+		}
+
+		return bytes;
+	}
+
 	void image::save_as_binary_file(const path_type& path) const {
 		augs::create_directories_for(path);
 

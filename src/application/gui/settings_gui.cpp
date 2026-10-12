@@ -42,6 +42,9 @@
 #include "application/config_json_table.h"
 #include "application/main/auth_provider_type.h"
 #include "application/main/identity_key.h"
+#include "augs/misc/imgui/imgui_status_icons.h"
+#include "augs/misc/imgui/imgui_game_image.h"
+#include "augs/image/image.h"
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
 #include "augs/audio/sound_sizes.h"
@@ -362,10 +365,18 @@ void settings_gui_state::on_steam_link_code(const std::string& code, const std::
 }
 
 #if !WEB_CRAZYGAMES
-void settings_gui_state::perform_account_pane(augs::window& window, const std::string& website_url) {
+void settings_gui_state::perform_account_pane(
+	augs::window& window,
+	const std::string& website_url,
+	config_json_table& config,
+	config_json_table& last_saved_config,
+	const config_json_table& canon_config_with_confd,
+	const augs::path_type& config_path_for_saving
+) {
 	using namespace augs::imgui;
 
 	const auto key_path = USER_DIR / identity_key::file_name;
+	const auto keys_dir = USER_DIR / identity_key::keys_dir_name;
 
 	/*
 		Read from the disk at most once a second while the pane is open,
@@ -392,9 +403,23 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		return std::nullopt;
 	}();
 
+	const auto now = augs::steady_secs();
+	const bool signed_in_to_steam = identity != nullptr && identity->has_valid_cert(now) && current_account_id.rfind("steam_", 0) == 0;
+	const bool sign_in_failed = identity != nullptr && identity->sign_in_failed(identity_input, now);
+
+	/*
+		Saved right away, without the other unsaved changes of the settings - e.g. the nickname an imported key played with.
+	*/
+
+	auto save_client_profile = [&](const auto& change) {
+		change(config.client);
+		change(last_saved_config.client);
+		last_saved_config.save_patch(canon_config_with_confd, config_path_for_saving, true);
+	};
+
 #if PLATFORM_WEB
 	text_disabled(
-		"In the browser, your account is a key kept in this site's storage.\n"
+		"In the browser, your account is a key kept in this site's storage - \"this computer\".\n"
 		"Clearing the site data, or another browser, means another account.\n"
 		"Back it up - without it, the account is lost:\n"
 		"keep it in a password manager (Copy key to clipboard),\n"
@@ -403,11 +428,11 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	);
 #else
 	text_disabled(
-		"Without Steam, your account is a key kept in your user folder on this computer.\n"
+		"Without Steam, your account is a key kept in your user folder on this computer - \"this computer\".\n"
 		"It is created when the game first starts.\n"
 		"Back it up - without it, the account is lost:\n"
 		"keep it in a password manager (Copy key to clipboard),\n"
-		"or copy the account.key file somewhere safe (Reveal in explorer).\n"
+		"or copy the .keys/account.key file somewhere safe (Reveal in explorer).\n"
 		"Whoever has it plays as you - never share it."
 	);
 #endif
@@ -415,20 +440,34 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	ImGui::Separator();
 
 	if (public_key.has_value()) {
-		auto account = ::get_provider_preffix(auth_provider_type::KEY) + identity_key::account_id(*public_key);
-
-		input_text("##AccountId", account, ImGuiInputTextFlags_ReadOnly);
-		ImGui::SameLine();
-
-		if (ImGui::Button("Copy##AccountId")) {
-			ImGui::SetClipboardText(account.c_str());
+		if (signed_in_to_steam) {
+			text("Account:");
+			ImGui::SameLine();
+			text_color("Steam: " + identity->get_profile().name, green);
+		}
+		else {
+			text("Account: this computer (" + identity_key::short_form(*public_key) + ")");
 		}
 
+		if (sign_in_failed) {
+			text_color("Couldn't sign in to your Steam account - you play as this computer.", orange);
+			ImGui::SameLine();
+
+			if (ImGui::Button("Retry##SignIn")) {
+				sign_in_retry_wanted = true;
+			}
+		}
+
+		if (ImGui::Button("Copy key id")) {
+			ImGui::SetClipboardText(augs::bytes_to_hex(*public_key).c_str());
+		}
+
+		tooltip_on_hover("The whole public key - e.g. for a server admin, to make you an admin of their server.");
+
 		ImGui::SameLine();
-		text("Account");
 
 		if (ImGui::Button("Open profile")) {
-			augs::open_url(website_url + "/user/" + account);
+			augs::open_url(website_url + "/user/" + (signed_in_to_steam ? current_account_id : "key_" + identity_key::account_id(*public_key)));
 		}
 
 		ImGui::SameLine();
@@ -444,15 +483,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		text_color("The key file is not a valid key. Fix it, import a key,\nor use Forget this key - the file is then kept as a backup.", red);
 	}
 	else {
-		text("No key yet.");
-
-		if (ImGui::Button("Create key now")) {
-			if (!identity_key::load_or_create(key_path).has_value()) {
-				account_status = "Could not create the key. See the logs.";
-			}
-
-			account_seed_reload_needed = true;
-		}
+		text("Creating the key...");
 	}
 
 #if !PLATFORM_WEB
@@ -470,13 +501,22 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	auto import_now = [&](const augs::ed25519_seed_type& imported) {
 		account_seed_reload_needed = true;
 
-		if (const auto backup = identity_key::save_replacing(key_path, imported)) {
-			account_status = backup->empty()
-				? std::string("Key imported.")
-				: typesafe_sprintf("Key imported. The previous one was kept as %x.", backup->filename().string())
-			;
-
+		if (identity_key::save_replacing(key_path, imported).has_value()) {
 			import_key_text.clear();
+			account_status.clear();
+
+			/*
+				Asked right away whether the key is linked - the modal waits for the answer.
+			*/
+
+			if (identity != nullptr) {
+				identity->set_key(imported, keys_dir);
+				identity->start_link_check(identity_input.broker_url);
+			}
+
+			import_modal_open = true;
+			import_profile_applied = false;
+			ImGui::OpenPopup("Import key##Modal");
 		}
 		else {
 			account_status = "Could not save the key - your previous key was kept. See the logs.";
@@ -516,18 +556,13 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	*/
 
 	if (import_to_confirm.has_value() && public_key.has_value()) {
-		const auto short_id = [](const augs::ed25519_seed_type& s) {
-			const auto id = identity_key::account_id(*augs::ed25519_public_key(s));
-			return "key_" + id.substr(0, 12) + "...";
-		};
-
-		const auto current = "key_" + identity_key::account_id(*public_key).substr(0, 12) + "...";
+		const auto imported_short = identity_key::short_form(*augs::ed25519_public_key(*import_to_confirm));
 
 		text_color(
 			typesafe_sprintf(
 				"Switch your account from %x to %x?\nThe current key is kept in your user folder as a backup file.",
-				current,
-				short_id(*import_to_confirm)
+				identity_key::short_form(*public_key),
+				imported_short
 			),
 			orange
 		);
@@ -542,6 +577,121 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		if (ImGui::Button("Cancel##Import")) {
 			import_to_confirm.reset();
 		}
+	}
+
+	/*
+		The import modal: the import itself is done (a green check right away), the result of asking hypersomnia.io
+		whether the key is linked comes in place - [OK] waits for it, so the player confirms where progress goes.
+	*/
+
+	if (import_modal_open) {
+		ImGui::OpenPopup("Import key##Modal");
+	}
+
+	{
+		const auto display = ImGui::GetIO().DisplaySize;
+		ImGui::SetNextWindowPos(ImVec2(display.x / 2, display.y / 2), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	}
+
+	if (ImGui::BeginPopupModal("Import key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		const auto check = identity != nullptr ? identity->get_link_check() : identity_session::link_check_state::FAILED;
+		const auto& profile = identity != nullptr ? identity->get_link_check_profile() : identity_session::account_profile();
+		using L = identity_session::link_check_state;
+
+		checkmark_line("Key successfully imported", green);
+
+		auto welcome_back = [&](const std::string& name) {
+			if (name.empty()) {
+				return;
+			}
+
+			ImGui::Separator();
+			text("Welcome back,");
+			ImGui::SameLine();
+
+			augs::atlas_entry entry;
+			entry.atlas_space = xywh(0, 0, 1, 1);
+			const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
+			game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
+			ImGui::SameLine();
+			text(name);
+		};
+
+		bool may_close = false;
+
+		if (check == L::PENDING) {
+			spinner_line("Fetching account data from hypersomnia.io...", white);
+		}
+		else if (check == L::LINKED) {
+			checkmark_line("Linked to your Steam account", green);
+			welcome_back(profile.name);
+			may_close = true;
+		}
+		else if (check == L::NOT_LINKED) {
+			/*
+				The nickname and avatar the key last played with, written to the config once - only here, on import.
+			*/
+
+			if (!import_profile_applied) {
+				import_profile_applied = true;
+
+				if (!profile.name.empty()) {
+					save_client_profile([&](auto& client) {
+						client.nickname = profile.name;
+					});
+				}
+
+				if (!profile.avatar.empty()) {
+					try {
+						auto image = augs::image();
+						image.from_bytes_stbi(profile.avatar, "imported avatar");
+						image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
+
+						const auto avatar_path = USER_DIR / "avatar.png";
+						image.save_as_png(avatar_path);
+
+						save_client_profile([&](auto& client) {
+							client.avatar_image_path = avatar_path;
+						});
+					}
+					catch (...) {
+						LOG("Could not read the imported key's avatar.");
+					}
+				}
+			}
+
+			welcome_back(profile.name);
+			may_close = true;
+		}
+		else {
+			text_color("Couldn't check whether this key is linked to a Steam account.", orange);
+			text("Progress will be saved to:");
+			text(public_key.has_value() ? "  the imported key (" + identity_key::short_form(*public_key) + ")" : "  the imported key");
+
+			if (ImGui::Button("Retry##ImportCheck")) {
+				identity->start_link_check(identity_input.broker_url);
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Continue without Steam")) {
+				identity->clear_link_check();
+				import_modal_open = false;
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		if (check != L::FAILED) {
+			auto scope = maybe_disabled_cols({}, !may_close);
+
+			if (ImGui::Button("OK##Import") && may_close) {
+				identity->clear_link_check();
+				import_modal_open = false;
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::EndPopup();
 	}
 
 	if (augs::exists(key_path)) {
@@ -585,7 +735,7 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 					if (const auto backup = identity_key::forget(key_path)) {
 						account_status = typesafe_sprintf(
-							"Key forgotten. It was kept as %x.\nA new one is created with Create key now, or when the game starts next.",
+							"Key forgotten. It was kept as %x. A new key - a new account - is made right away.",
 							backup->filename().string()
 						);
 					}
@@ -609,28 +759,15 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 	text("Link to your Steam account");
 
-	if (current_account_id.rfind(::get_provider_preffix(auth_provider_type::STEAM_NATIVE), 0) == 0) {
-		if (current_account_confirmed) {
-			text_color("This key is linked to " + current_account_id + ".", green);
-		}
-		else {
-			text_disabled("This key was linked to " + current_account_id + " when hypersomnia.io last answered.");
-		}
+	const bool linked = identity != nullptr && (identity->has_saved_cert() || signed_in_to_steam);
+
+	if (linked) {
+		text_color("This key is linked to your Steam account" + (identity->get_profile().name.empty() ? std::string(".") : ": " + identity->get_profile().name + "."), green);
 	}
 
-#if PLATFORM_WEB
-	text_disabled(
-		"Sign in with Steam to link this browser's key to your Steam account,\n"
-		"or get a code on hypersomnia.io/profile (\"Link a game key\") and enter it here.\n"
-		"The ranked matches you play with this key will then count for your Steam account."
-	);
-#else
-	text_disabled(
-		"Sign in through Steam on hypersomnia.io/profile,\n"
-		"press \"Link a game key\" and enter the code here.\n"
-		"The ranked matches you play with this key will then count for your Steam account."
-	);
-#endif
+	if (!linked) {
+		text_disabled("The ranked matches you play with this key count for your Steam account once it is linked.");
+	}
 
 	{
 		/*
@@ -728,6 +865,55 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 		const bool requesting = augs::in_progress(link_request) || augs::in_progress(link_target_request);
 
 		/*
+			"Link to your Steam account" asks hypersomnia.io first: a key linked already (e.g. imported on a new computer)
+			needs no Steam sign-in. After the link, asked again - the cert of the Steam account is what links it here.
+		*/
+
+		using F = link_flow_type;
+		using L = identity_session::link_check_state;
+
+		if (identity != nullptr && (link_flow == F::CHECKING_BEFORE || link_flow == F::CHECKING_AFTER)) {
+			const auto check = identity->get_link_check();
+
+			if (check == L::LINKED) {
+				const auto& name = identity->get_link_check_profile().name;
+				account_status = "Successfully linked. Progress will be saved to your Steam account" + (name.empty() ? std::string(".") : ": " + name + ".");
+				identity->clear_link_check();
+				link_flow = F::IDLE;
+			}
+			else if (check == L::NOT_LINKED) {
+				identity->clear_link_check();
+
+				if (link_flow == F::CHECKING_BEFORE) {
+					link_flow = F::NEEDS_STEAM_SIGN_IN;
+#if PLATFORM_WEB
+					auto state_bytes = std::array<uint8_t, 16>();
+					auto rd = std::random_device();
+
+					for (auto& b : state_bytes) {
+						b = static_cast<uint8_t>(rd());
+					}
+
+					steam_link_state = augs::bytes_to_hex(state_bytes);
+					augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
+					account_status = "Sign in with Steam in the new tab, then come back here.";
+#else
+					account_status.clear();
+#endif
+				}
+				else {
+					account_status = "The link did not take effect. Try again.";
+					link_flow = F::IDLE;
+				}
+			}
+			else if (check == L::FAILED) {
+				identity->clear_link_check();
+				account_status = typesafe_sprintf("Couldn't reach %x. Try again later.", website_url);
+				link_flow = F::IDLE;
+			}
+		}
+
+		/*
 			A code that came back from Sign in with Steam - still confirmed like a typed one.
 		*/
 
@@ -761,60 +947,61 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 
 			if (ImGui::Button("Cancel##Link")) {
 				link_target_to_confirm.reset();
+				link_flow = F::IDLE;
 			}
 		}
-		else {
-#if PLATFORM_WEB
-			if (!requesting && ImGui::Button("Sign in with Steam")) {
+		else if (linked) {
+			if (!requesting && has_key && ImGui::Button("Unlink from Steam")) {
+				account_status.clear();
+				unlink();
+			}
+
+			tooltip_on_hover("Unlinks this key from its Steam account - e.g. if you linked it with a code that was not yours.\nYour ranked matches then count for this key's own account again.");
+		}
+		else if (link_flow == F::CHECKING_BEFORE || link_flow == F::CHECKING_AFTER || requesting) {
+			spinner_line("Linking...", white);
+		}
+		else if (link_flow == F::IDLE) {
+			if (ImGui::Button("Link to your Steam account")) {
 				account_status.clear();
 
-				if (has_key) {
-					auto state_bytes = std::array<uint8_t, 16>();
-					auto rd = std::random_device();
-
-					for (auto& b : state_bytes) {
-						b = static_cast<uint8_t>(rd());
-					}
-
-					steam_link_state = augs::bytes_to_hex(state_bytes);
-					augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
-					account_status = "Sign in with Steam in the new tab, then come back here.";
+				if (has_key && identity != nullptr) {
+					identity->start_link_check(identity_input.broker_url);
+					link_flow = F::CHECKING_BEFORE;
 				}
 				else {
-					account_status = "There is no key to link yet - create or import one above first.";
+					account_status = "There is no key to link yet.";
 				}
+			}
+		}
+		else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
+#if PLATFORM_WEB
+			text_disabled("Sign in with Steam in the new tab - or get a code on hypersomnia.io/profile (\"Link a game key\") and enter it here.");
+#else
+			text_disabled(
+				"Sign in through Steam on hypersomnia.io/profile,\n"
+				"press \"Link a game key\" and enter the code here."
+			);
+
+			if (ImGui::Button("Open hypersomnia.io/profile")) {
+				augs::open_url(website_url + "/profile");
 			}
 #endif
 
 			input_text("##LinkCode", link_code_text);
 			ImGui::SameLine();
 
-			if (requesting) {
-				text_disabled("Linking...");
-			}
-			else if (ImGui::Button("Link")) {
+			if (ImGui::Button("Link")) {
 				account_status.clear();
-
-				if (has_key) {
-					request_link_target(link_code_text);
-				}
-				else {
-					account_status = "There is no key to link yet - create or import one above first.";
-				}
+				request_link_target(link_code_text);
 			}
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Open hypersomnia.io/profile")) {
-				augs::open_url(website_url + "/profile");
-			}
-
-			if (!requesting && has_key && ImGui::Button("Unlink from Steam")) {
+			if (ImGui::Button("Cancel##LinkFlow")) {
+				link_flow = F::IDLE;
 				account_status.clear();
-				unlink();
 			}
-
-			tooltip_on_hover("Unlinks this key from whatever Steam account it is linked to,\ne.g. if you linked it with a code that was not yours.");
 		}
 
 		if (augs::is_ready(link_target_request)) {
@@ -861,23 +1048,33 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 			link_code_text.clear();
 
 			if (httplib_utils::successful(response.status)) {
-				/*
-					The account in the cert changes - asked for again once not in a match.
-				*/
-
-				identity_retry_wanted = true;
-
 				if (!link_request_is_unlink) {
-					account_status = "Linked. Your ranked matches now count for your Steam account.";
-				}
-				else if (response.body.find("\"from\":null") != std::string::npos) {
-					account_status = "This key was not linked to any Steam account.";
+					/*
+						Linked on the site - the Steam cert the broker now gives for the key is what links it here.
+					*/
+
+					if (identity != nullptr) {
+						identity->start_link_check(identity_input.broker_url);
+						link_flow = F::CHECKING_AFTER;
+					}
 				}
 				else {
-					account_status = "Unlinked. Your ranked matches count for this key's own account again.";
+					if (identity != nullptr) {
+						identity->on_unlinked();
+					}
+
+					link_flow = F::IDLE;
+
+					if (response.body.find("\"from\":null") != std::string::npos) {
+						account_status = "This key was not linked to any Steam account.";
+					}
+					else {
+						account_status = "Unlinked. Your ranked matches count for this key's own account again.";
+					}
 				}
 			}
 			else {
+				link_flow = F::IDLE;
 				account_status = response_error(response, link_request_is_unlink ? "Unlinking" : "Linking");
 			}
 		}
@@ -886,11 +1083,6 @@ void settings_gui_state::perform_account_pane(augs::window& window, const std::s
 	if (!account_status.empty()) {
 		ImGui::Separator();
 		text(account_status);
-	}
-
-	if (!identity_error.empty()) {
-		ImGui::Separator();
-		text_color("Signing in: " + identity_error, orange);
 	}
 }
 #endif
@@ -2703,7 +2895,7 @@ void settings_gui_state::perform(
 				switch (active_client_pane) {
 #if !WEB_CRAZYGAMES
 					case client_settings_pane::ACCOUNT: {
-						perform_account_pane(window, config.website_url);
+						perform_account_pane(window, config.website_url, config, last_saved_config, canon_config_with_confd, config_path_for_saving);
 						break;
 					}
 #endif
@@ -2715,7 +2907,22 @@ void settings_gui_state::perform(
 							const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 #endif
 
-							revertable_input_text(label, scope_cfg.nickname);
+							/*
+								The account's name in effect - one's own nickname stays in the config, for when it is not.
+							*/
+
+							if (const auto& signed_in = scope_cfg.signed_in; !signed_in.nickname.empty()) {
+								auto shown = std::string(signed_in.nickname);
+								auto scope = maybe_disabled_cols({}, true);
+								input_text(label, shown, ImGuiInputTextFlags_ReadOnly);
+							}
+							else {
+								revertable_input_text(label, scope_cfg.nickname);
+							}
+						}
+
+						if (const auto& provider = scope_cfg.signed_in.provider_label; !provider.empty()) {
+							revertable_checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
 						}
 
 						{
@@ -3062,34 +3269,17 @@ void settings_gui_state::perform(
 						ImGui::Separator();
 
 						if (current_account_id.empty()) {
-							text_disabled("Account: not signed in.");
+							text_disabled("Account: signing in...");
 						}
 						else {
-							text("Account: " + current_account_id);
-
-							if (!current_account_confirmed) {
-								ImGui::SameLine();
-								text_disabled("(not confirmed)");
-							}
-
+							text("Account: " + identity_key::short_form_of_account(current_account_id));
 							ImGui::SameLine();
 
-							/*
-								Never a remembered id - it could be one the key is no longer linked to.
-							*/
-
-							{
-								auto scope = maybe_disabled_cols({}, !current_account_confirmed);
-
-								if (ImGui::Button("Copy my account id") && current_account_confirmed) {
-									ImGui::SetClipboardText(current_account_id.c_str());
-								}
+							if (ImGui::Button("Copy my account id")) {
+								ImGui::SetClipboardText(current_account_id.c_str());
 							}
 
-							tooltip_on_hover(current_account_confirmed
-								? "For a server admin - e.g. to make you an admin of their server, or to unban you."
-								: "Available once hypersomnia.io confirms the account."
-							);
+							tooltip_on_hover("For a server admin - e.g. to make you an admin of their server, or to unban you.");
 						}
 
 						if (!identity_error.empty()) {

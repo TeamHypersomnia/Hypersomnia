@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
@@ -86,7 +87,9 @@ int simple_popup::perform(const std::vector<button>& buttons) {
 					cond_scoped_style_color(custom_cols, ImGuiCol_ButtonActive, b.col + b.increment + b.increment)
 				);
 
-				if (ImGui::Button(b.label.c_str(), ImVec2(120, 0))) { 
+				const auto width = std::max(120.0f, ImGui::CalcTextSize(b.label.c_str()).x + ImGui::GetStyle().FramePadding.x * 2);
+
+				if (ImGui::Button(b.label.c_str(), ImVec2(width, 0))) { 
 					ImGui::CloseCurrentPopup();
 					return index_in(buttons, b) + 1;
 				}

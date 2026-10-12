@@ -20,7 +20,7 @@ for p in $(pgrep -f "^$BIN --connect $ARENA_IP:9005"); do kill $p; done
 
 # An account key per client, its account id from the public key
 account_id() {
-	local key=$E/client_$1/user/account.key
+	local key=$E/client_$1/user/.keys/account.key
 	mkdir -p $(dirname $key)
 	[ -f $key ] || (umask 077; echo "hypersomnia-key-v1:$(openssl rand -hex 32)" > $key)
 	python3 - $key <<'PY'

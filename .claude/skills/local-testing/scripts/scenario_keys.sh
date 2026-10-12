@@ -113,7 +113,7 @@ done
 
 echo "=== account.key files"
 for c in c_casual c_ranked c_community; do
-	F=$T/$c/user/account.key
+	F=$T/$c/user/.keys/account.key
 	if [ -f "$F" ]; then echo "  $c: $(stat -c %a $F)"; else echo "  $c: none"; fi
 done
 

@@ -13,6 +13,7 @@
 #include "application/nat/stun_server_provider.h"
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
+#include "application/main/identity_session.h"
 
 struct config_json_table;
 
@@ -241,7 +242,25 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string steam_link_state;
 	std::optional<std::string> link_code_from_steam;
 
-	void perform_account_pane(augs::window& window, const std::string& website_url);
+	enum class link_flow_type {
+		IDLE,
+		CHECKING_BEFORE,
+		NEEDS_STEAM_SIGN_IN,
+		CHECKING_AFTER
+	};
+
+	link_flow_type link_flow = link_flow_type::IDLE;
+	bool import_modal_open = false;
+	bool import_profile_applied = false;
+
+	void perform_account_pane(
+		augs::window& window,
+		const std::string& website_url,
+		config_json_table& config,
+		config_json_table& last_saved_config,
+		const config_json_table& canon_config_with_confd,
+		const augs::path_type& config_path_for_saving
+	);
 
 public:
 	bool is_steam_client = false;
@@ -251,14 +270,20 @@ public:
 	*/
 
 	std::string current_account_id;
-	bool current_account_confirmed = false;
 	std::string identity_error;
 
 	/*
-		Set here after linking or unlinking the key - the game then asks for a new cert once not in a match.
+		The identity session and what the game feeds it, for linking, importing and showing the account.
 	*/
 
-	bool identity_retry_wanted = false;
+	identity_session* identity = nullptr;
+	identity_session::input identity_input;
+
+	/*
+		[Retry] pressed here - the game retries, and tells a failure again.
+	*/
+
+	bool sign_in_retry_wanted = false;
 
 	/*
 		Web: the code Sign in with Steam came back with - taken only for the state this game opened it with.

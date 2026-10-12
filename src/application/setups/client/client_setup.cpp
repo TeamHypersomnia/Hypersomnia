@@ -699,23 +699,8 @@ bool client_setup::is_webrtc() const {
 
 bool client_setup::pending_pre_connection_handshake() const {
 	/*
-		A cert already on its way is waited for a while - and for ranked, which needs it, until it comes or fails.
-		10 seconds, not less: a server joined by its address and missing from the server list (never downloaded
-		before the Connect window or --connect) may be ranked, which would kick a self-signed join.
-		A request is in flight practically only right after the game starts, so this only ever delays the first join -
-		and at most by 10 seconds if hypersomnia.io is down.
+		The cert never makes a connection wait - it is always there (see identity_session.h). Only WebRTC does.
 	*/
-
-	const bool has_cert_already = identity.session != nullptr && identity.session->has_broker_cert(augs::steady_secs());
-
-	if (identity.session != nullptr && identity.session->request_in_flight() && !has_cert_already) {
-		const auto waited = get_current_time() - when_initiated_connection;
-		const auto limit = identity.is_ranked ? 20.0 : 10.0;
-
-		if (waited < limit) {
-			return true;
-		}
-	}
 
 	return is_webrtc() && !webrtc_client->is_ready();
 }
@@ -855,12 +840,10 @@ void client_setup::connect() {
 	blob.password = identity.password;
 
 	if (identity.session != nullptr) {
-		blob.identity = identity.session->cert_for_connect(identity.input, augs::steady_secs());
-
-		if (blob.identity.has_value()) {
-			LOG("Connecting as %x.", blob.identity->account);
-			connect_identity.session_secret_key = identity.session->session_secret_key();
-		}
+		blob.identity = identity.session->cert_for_connect(augs::steady_secs(), identity.forced_account);
+		connected_account = blob.identity->account;
+		LOG("Connecting as %x.", connected_account);
+		connect_identity.session_secret_key = identity.session->session_secret_key();
 	}
 
 	if (const auto written = identity_cert::write_blob(blob)) {
@@ -1935,12 +1918,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		}
 		else if (!connect_called && !is_replaying()) {
 			/*
-				Before the game connects: a moment for the identity cert on its way, longer for ranked, which needs it.
+				The frame before the game connects.
 			*/
 
 			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
-			text("\n");
-			text_color("Waiting for your account to be confirmed by hypersomnia.io...", yellow);
 			text("\n");
 			ImGui::Separator();
 
@@ -2426,6 +2407,22 @@ bool client_setup::would_abandon_match() const {
 	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
 		[&](const auto& mode, const auto& in) {
 			return mode.should_suspend_instead_of_remove(in);
+		}
+	);
+}
+
+std::optional<float> client_setup::ranked_rejoin_budget() const {
+	if (is_replaying() || !is_connected()) {
+		return std::nullopt;
+	}
+
+	if (get_assigned_faction() == faction_type::SPECTATOR) {
+		return std::nullopt;
+	}
+
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
+		[&](const auto& mode, const auto& in) {
+			return mode.rejoin_budget_of(in, get_local_player_id());
 		}
 	);
 }

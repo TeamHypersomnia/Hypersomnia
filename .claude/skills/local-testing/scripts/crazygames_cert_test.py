@@ -25,7 +25,7 @@ def cert(token):
     session = os.urandom(32).hex()
     try:
         r = urllib.request.urlopen(f'{url}/cert?session={session}&crazygames={urllib.parse.quote(token)}')
-        raw = bytes.fromhex(r.read().decode())
+        raw = bytes.fromhex(json.loads(r.read())['cert'])
         return 200, raw[2:2 + raw[1]].decode()
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode()

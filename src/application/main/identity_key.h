@@ -9,15 +9,20 @@
 /*
 	The accounts of the players without Steam and outside CrazyGames.
 
-	The game keeps an Ed25519 key in the user folder (account.key), created on the first start.
+	The game keeps an Ed25519 key in the user folder (.keys/account.key), created on the first start - "this computer".
 	The account is "key_" followed by the public key in hex - unless the key is linked to a Steam account on hypersomnia.io,
 	in which case the identity broker vouches for that Steam account instead. See identity_session.h.
 
-	The same file format serves the servers' keys (server.key) - see server_key.h.
+	The same file format serves the servers' keys (.keys/server.key) - see server_key.h.
 */
 
 namespace identity_key {
-	inline constexpr std::string_view file_name = "account.key";
+	/*
+		All keys and certs in one place, apart from the rest of the user folder.
+	*/
+
+	inline constexpr std::string_view keys_dir_name = ".keys";
+	inline constexpr std::string_view file_name = ".keys/account.key";
 	inline constexpr std::string_view export_prefix = "hypersomnia-key-v1:";
 
 	/*
@@ -39,6 +44,15 @@ namespace identity_key {
 	*/
 
 	std::string account_id(const augs::ed25519_public_key_type& public_key);
+
+	/*
+		The one public form of a key everywhere - menu, Settings, leaderboards, modals and the site:
+		"key " and the first 8 hex digits of the public key, e.g. "key 8aed41f2...".
+		For a "key_..." account id the same; any other account id is returned as it is.
+	*/
+
+	std::string short_form(const augs::ed25519_public_key_type& public_key);
+	std::string short_form_of_account(const std::string& account);
 
 	/*
 		The text the key file holds, also what "Export key" copies: "hypersomnia-key-v1:" and the seed in hex.

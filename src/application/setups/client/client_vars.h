@@ -46,15 +46,27 @@ struct client_chat_settings {
 	bool operator==(const client_chat_settings& b) const = default;
 };
 
+/*
+	The signed-in account's name and avatar (Steam, CrazyGames), shown instead of the player's own while
+	"Use my Steam name and avatar" is on. Set by the game every frame, never saved - the config keeps the player's own.
+*/
+
 struct override_holder {
 	mutable client_nickname_type nickname = "";
+	augs::path_type avatar_image_path;
+
+	/*
+		"Steam" or "CrazyGames" while such an account is expected - even with the setting off.
+	*/
+
+	std::string provider_label;
+
 	bool operator==(const override_holder&) const { return true; };
 };
 
 struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
-	bool use_account_nickname = true;
-	bool use_account_avatar = true;
+	bool use_account_profile = true;
 
 	client_nickname_type nickname = "";
 	clan_name_type clan = "";
@@ -90,6 +102,14 @@ struct client_vars {
 		}
 
 		return nickname;
+	}
+
+	augs::path_type get_avatar_image_path() const {
+		if (!signed_in.avatar_image_path.empty()) {
+			return signed_in.avatar_image_path;
+		}
+
+		return avatar_image_path;
 	}
 
 	bool operator==(const client_vars& b) const = default;

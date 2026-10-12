@@ -65,7 +65,6 @@ struct server_heartbeat {
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_metropolis;
 	augs::constant_size_vector<server_heartbeat_player_info, 32> players_spectating;
 
-	bool require_authentication = false;
 	uint8_t ranked_state = 0;
 	bool require_password = false;
 

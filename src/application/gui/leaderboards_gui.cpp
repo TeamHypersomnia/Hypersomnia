@@ -260,6 +260,41 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		text_color(typesafe_sprintf("Welcome home,", in.nickname), rgba(255, 215, 0, 255));
 	}
 
+	if (!in.account_label.empty()) {
+		text_disabled("Account:");
+		ImGui::SameLine();
+
+		{
+			auto disabled_text = scoped_style_color(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+
+			if (ImGui::Selectable((in.account_label + "##AccountLabel").c_str(), false, 0, ImGui::CalcTextSize(in.account_label.c_str()))) {
+				ImGui::OpenPopup("##AccountMenu");
+			}
+		}
+
+		if (ImGui::BeginPopup("##AccountMenu")) {
+			if (ImGui::MenuItem("Open profile on hypersomnia.io")) {
+				augs::open_url(in.account_profile_url);
+			}
+
+			if (!in.copyable_public_key.empty() && ImGui::MenuItem("Copy the public key")) {
+				ImGui::SetClipboardText(in.copyable_public_key.c_str());
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	if (in.sign_in_failed) {
+		text_color(typesafe_sprintf("Not signed in to %x.", in.provider_label), orange);
+		ImGui::SameLine();
+
+		if (ImGui::SmallButton("Retry##SignIn")) {
+			wants_sign_in_retry = true;
+		}
+	}
+
+
 	ImGui::Columns(3);
 
 	ImGui::SetColumnWidth(0, max_avatar_side_v + 10);

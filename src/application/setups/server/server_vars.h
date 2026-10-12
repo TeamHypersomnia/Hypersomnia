@@ -205,7 +205,6 @@ private:
 	float client_network_timeout_secs = 3.0f;
 public:
 	bool authenticate_with_nicknames = false;
-	float kick_if_unauthenticated_for_secs = 3.0f;
 	uint32_t max_ranked_players_per_ip = 2;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
 

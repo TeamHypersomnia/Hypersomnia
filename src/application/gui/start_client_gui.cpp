@@ -285,15 +285,8 @@ bool start_client_gui_state::perform(
 				nickname_choice_active = false;
 			}
 
-			if (is_steam_client && into_vars.use_account_nickname) {
-				nickname_choice_active = false;
-			}
-
-			auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
-
-			if (is_steam_client) {
-				label = "##NicknameInactive";
-			}
+			const auto& provider_label = into_vars.signed_in.provider_label;
+			const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 
 			{
 				auto scope = maybe_disabled_with_clear_text_cols({}, !nickname_choice_active);
@@ -306,16 +299,12 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			if (is_steam_client) {
-				ImGui::SameLine();
+			/*
+				The account's name and avatar instead of one's own - the setting stays, but takes effect only while signed in.
+			*/
 
-				if (checkbox("Use Steam nickname", into_vars.use_account_nickname)) {
-					if (into_vars.use_account_nickname) {
-						if (const auto steam_username = ::steam_get_username()) {
-							into_vars.nickname = std::string(steam_username);
-						}
-					}
-				}
+			if (!provider_label.empty()) {
+				checkbox(typesafe_sprintf("Use my %x name and avatar", provider_label), into_vars.use_account_profile);
 			}
 
 			thread_local augs::future<avatar_loading_result_info> avatar_loading_result;
@@ -345,7 +334,12 @@ bool start_client_gui_state::perform(
 				}
 			};
 
-			augs::path_type p = into_vars.avatar_image_path;
+			/*
+				The account's avatar is shown while it is in effect, but only one's own is ever written back to the config.
+			*/
+
+			const bool account_avatar_in_effect = !into_vars.signed_in.avatar_image_path.empty();
+			augs::path_type p = into_vars.get_avatar_image_path();
 			const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
 			const auto half_size = first_size / 2;
 			const auto icon_size = vec2::square(22);
@@ -388,25 +382,11 @@ bool start_client_gui_state::perform(
 			bool avatar_choice_active = true;
 #endif
 
-			if (is_steam_client) {
-				if (checkbox("Use Steam avatar", into_vars.use_account_avatar)) {
-					if (into_vars.use_account_avatar) {
-						if (const auto avatar = ::steam_get_avatar_image(); avatar.get_size().is_nonzero()) {
-							avatar.save_as_png(CACHED_AVATAR);
-
-							p = CACHED_AVATAR;
-							reload_avatar(p);
-						}
-					}
-				}
-
-				avatar_choice_active = !into_vars.use_account_avatar;
+			if (account_avatar_in_effect) {
+				avatar_choice_active = false;
 			}
 
 			if (avatar_choice_active) {
-				if (is_steam_client) {
-					ImGui::SameLine();
-				}
 
 				if (ImGui::Button("Browse Avatar") && !error_popup && !mouse_has_to_move_off_browse) {
 					mouse_has_to_move_off_browse = true;
@@ -518,7 +498,9 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			into_vars.avatar_image_path = p;
+			if (!account_avatar_in_effect) {
+				into_vars.avatar_image_path = p;
+			}
 
 			checkbox("Record demo", into_vars.record_demo);
 			ImGui::SameLine();

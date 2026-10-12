@@ -15,6 +15,17 @@ struct leaderboards_input {
 	augs::graphics::texture& avatar_preview_tex;
 
 	const ltrb menu_ltrb;
+
+	/*
+		"Account:" under the profile - "this computer (key 8aed41f2...)" or "Steam: <name>" - opening the account's
+		profile on hypersomnia.io. A key's whole public key can be copied. sign_in_failed adds a [Retry].
+	*/
+
+	const std::string account_label;
+	const std::string account_profile_url;
+	const std::string copyable_public_key;
+	const std::string provider_label;
+	const bool sign_in_failed;
 #if PLATFORM_WEB
 	const bool is_logged_in;
 	const bool is_crazygames;
@@ -70,6 +81,7 @@ class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_sta
 public:
 	bool wants_sign_in = false;
 	bool wants_log_out = false;
+	bool wants_sign_in_retry = false;
 
 	using base = standard_window_mixin<leaderboards_gui_state>;
 

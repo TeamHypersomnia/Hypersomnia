@@ -1345,11 +1345,20 @@ void server_setup::verify_client_identity(const client_id_type id) {
 		return;
 	}
 
-	if (blob->identity.has_value()) {
+	/*
+		Every client has a cert - signed by the identity broker, or by its own key ("this computer").
+		One that does not verify is most often a broker cert outside its time: this host's or the player's clock being off.
+	*/
+
+	const auto verified = [&]() -> std::optional<identity_cert::verified_identity> {
+		if (!blob->identity.has_value()) {
+			return std::nullopt;
+		}
+
 		const auto broker_keys = ::identity_broker_keys(private_vars);
 		const auto now = augs::date_time::secs_since_epoch();
 
-		const auto verified = identity_cert::verify(
+		auto result = identity_cert::verify(
 			*blob->identity,
 			broker_keys,
 			static_cast<int64_t>(now),
@@ -1357,33 +1366,8 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			server->get_client_session_signature(id)
 		);
 
-		if (verified.has_value()) {
-			c.cert_account = verified->account;
-
+		if (!result.has_value()) {
 			/*
-				Where the nicknames are the accounts (tournaments), the cert only decides who may administer.
-			*/
-
-			if (!vars.authenticate_with_nicknames) {
-				apply_authentication(
-					to_mode_player_id(id),
-					verified->account,
-					verified->signer == identity_cert::signer_type::BROKER,
-					false
-				);
-			}
-			else if (is_banned(verified->account)) {
-				/*
-					Banned by account also where the nicknames are the accounts.
-				*/
-
-				kick(id, ban_message_for(verified->account));
-				c.kick_no_linger = true;
-			}
-		}
-		else {
-			/*
-				A broker cert outside its time is most often this host's clock being off.
 				The account is anyone's text - logged escaped, and at most every 10 seconds.
 			*/
 
@@ -1402,20 +1386,45 @@ void server_setup::verify_client_identity(const client_id_type id) {
 				);
 			}
 		}
-	}
 
-	if (c.when_kicked.has_value()) {
+		return result;
+	}();
+
+	if (!verified.has_value()) {
+		kick(id, "Your account could not be verified.\nCheck that your computer's clock is right, or update the game.");
+		c.kick_no_linger = true;
 		return;
 	}
 
+	c.cert_account = verified->account;
+
 	/*
-		Ranked is played only on accounts the identity broker vouches for.
-		Refused right away, not after a timeout.
+		Where the nicknames are the accounts (tournaments), the cert only decides who may administer.
 	*/
 
-	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && !c.authenticated_by_broker) {
-		kick(id, "Ranked matches need an account.\nSign in with Steam, or make sure the game can reach hypersomnia.io, and try again.");
+	if (!vars.authenticate_with_nicknames) {
+		apply_authentication(
+			to_mode_player_id(id),
+			verified->account,
+			verified->signer == identity_cert::signer_type::BROKER,
+			false
+		);
+
+		if (!c.when_kicked.has_value() && !c.is_authenticated()) {
+			kick(id, "Authentication failure. Try again.");
+			c.kick_no_linger = true;
+		}
+	}
+	else if (is_banned(verified->account)) {
+		/*
+			Banned by account also where the nicknames are the accounts.
+		*/
+
+		kick(id, ban_message_for(verified->account));
 		c.kick_no_linger = true;
+	}
+
+	if (c.when_kicked.has_value()) {
 		return;
 	}
 
@@ -1452,7 +1461,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}, only_connected_v);
 
-	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && !ip.empty()) {
+	if (vars.requires_authentication() && !ip.empty()) {
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
 			return get_client_ip_for_bans(other_id) == ip;
 		});
@@ -2103,21 +2112,60 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		return;
 	}
 
+	auto get_clan_of = [this](const mode_player_id id) -> std::string {
+		if (auto c = find_client_state(id)) {
+			return c->settings.public_settings.clan;
+		}
+
+		return "";
+	};
+
+	/*
+		Re-encoded as PNG here, where it is decoded anyway - the site then only checks a PNG's header and size.
+	*/
+
+	auto get_avatar_of = [this](const mode_player_id id) -> std::vector<std::byte> {
+		if (auto c = find_client_state(id)) {
+			const auto& bytes = c->meta.avatar.image_bytes;
+
+			if (!bytes.empty()) {
+				try {
+					auto image = augs::image();
+					image.from_bytes_stbi(bytes, "report avatar");
+
+					if (image.get_size().x <= max_avatar_side_v && image.get_size().y <= max_avatar_side_v) {
+						return image.to_png_bytes();
+					}
+				}
+				catch (...) {
+
+				}
+			}
+		}
+
+		return {};
+	};
+
 	const auto json_body = ranked_webhooks::json_report_match(
 		get_server_name(),
 		get_current_arena_name(),
 		get_current_game_mode_name(),
 		summary,
-		[this](const mode_player_id id) -> std::string {
-			if (auto c = find_client_state(id)) {
-				return c->settings.public_settings.clan;
-			}
-
-			return "";
-		}
+		get_clan_of,
+		get_avatar_of
 	);
 
-	LOG("Match report JSON: %x", json_body);
+	LOG(
+		"Match report JSON: %x",
+		ranked_webhooks::json_report_match(
+			get_server_name(),
+			get_current_arena_name(),
+			get_current_game_mode_name(),
+			summary,
+			get_clan_of,
+			[](const mode_player_id) { return std::vector<std::byte>(); }
+		)
+	);
 
 	const auto match_id = augs::bytes_to_hex(summary.ranked_match_id);
 
@@ -2770,7 +2818,6 @@ void server_setup::send_heartbeat_to_server_list() {
 		heartbeat.nat = nat_detection_result();
 	}
 
-	heartbeat.require_authentication = vars.requires_authentication();
 
 	if (heartbeat_reported_tournament_stage.has_value()) {
 		heartbeat.set_ranked_type(*heartbeat_reported_tournament_stage);
@@ -4027,10 +4074,6 @@ void server_setup::advance_clients_state() {
 						}
 					}
 				}
-			}
-
-			if (c.should_kick_due_to_unauthenticated(vars, server_time)) {
-				kick(client_id, "Authentication timed out. Try connecting again.");
 			}
 
 			{

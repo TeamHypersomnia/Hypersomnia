@@ -922,21 +922,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const bool is_internal = s.progress.found_on_internal_network;
 
 		auto push_if_passes = [&](auto& target_list) {
-			const bool is_internal = s.progress.found_on_internal_network;
-
-			if (!is_internal) {
-				/*
-					Non-Steam builds can't authenticate against ranked servers,
-					so we hide them by default. Tournament servers using nickname
-					auth report require_authentication=false; let those through
-					so non-Steam clients can still browse and join them.
-				*/
-
-				if (!allow_ranked_servers && s.heartbeat.is_ranked_server() && s.heartbeat.require_authentication) {
-					return;
-				}
-			}
-
 			if (only_responding) {
 				if (!s.progress.responding()) {
 					return;

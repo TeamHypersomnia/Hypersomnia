@@ -38,6 +38,18 @@ namespace identity_key {
 		return augs::bytes_to_hex(public_key);
 	}
 
+	std::string short_form(const augs::ed25519_public_key_type& public_key) {
+		return short_form_of_account("key_" + account_id(public_key));
+	}
+
+	std::string short_form_of_account(const std::string& account) {
+		if (account.rfind("key_", 0) == 0 && account.size() >= 4 + 8) {
+			return "key " + account.substr(4, 8) + "...";
+		}
+
+		return account;
+	}
+
 	std::string to_export_string(const augs::ed25519_seed_type& seed) {
 		return std::string(export_prefix) + augs::bytes_to_hex(seed);
 	}

@@ -109,5 +109,7 @@ extern augs::path_type USER_DIR;
 #define USER_HRTFS_DIR (USER_DIR / "hrtf")
 
 #define CACHED_AUTH_PATH (USER_DIR / "cached_auth.json")
+#define RANKED_MATCH_PATH (USER_DIR / "ranked_match.json")
 #define CACHED_AVATAR (USER_DIR / "cached_avatar.png")
+#define ACCOUNT_AVATAR (USER_DIR / ".keys" / "account_avatar.png")
 #define BLANK_AVATAR ("content/gfx/necessary/blank_avatar.png")

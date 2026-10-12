@@ -69,7 +69,7 @@ def cert_account():
     s = key.sign(b'hs-cert-req-v1' + session).hex()
     status, body, _ = get('/cert?session=%s&key=%s&sig=%s' % (session.hex(), pub, s))
     if status != 200: return 'HTTP %d %s' % (status, body)
-    raw = bytes.fromhex(body)
+    raw = bytes.fromhex(json.loads(body)['cert'])
     n = raw[1]
     return raw[2:2 + n].decode()
 

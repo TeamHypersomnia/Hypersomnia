@@ -1,15 +1,21 @@
 #pragma once
 #include "augs/misc/date_time.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/string/base64.h"
 
 namespace ranked_webhooks {
-	template <class F>
+	/*
+		get_avatar_of gives a player's avatar as PNG bytes (empty for none) - the site keeps the last one of every account.
+	*/
+
+	template <class F, class A>
 	std::string json_report_match(
 		const std::string& server_name,
 		const std::string& arena,
 		const std::string& game_mode,
 		const messages::match_summary_message& info,
-		F get_clan_of
+		F get_clan_of,
+		A get_avatar_of
 	) {
 		using namespace rapidjson;
 
@@ -66,6 +72,11 @@ namespace ranked_webhooks {
 						if (f.abandoned_at_score != -1) {
 							writer.Key("abandoned_at_score");
 							writer.Int(f.abandoned_at_score);
+						}
+
+						if (const auto avatar = get_avatar_of(f.id); !avatar.empty()) {
+							writer.Key("avatar");
+							writer.String(augs::to_base64(avatar).c_str());
 						}
 
 						writer.EndObject();

@@ -326,6 +326,10 @@ public:
 		return false;
 	}
 
+	std::optional<float> rejoin_budget_of(const_input, const mode_player_id&) const {
+		return std::nullopt;
+	}
+
 	std::size_t num_suspended_players() const {
 		return 0;
 	};

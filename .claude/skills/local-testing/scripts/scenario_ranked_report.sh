@@ -8,8 +8,9 @@
 # STEAM_BOB=1: bob plays on the Steam build with the user's running Steam (the broker needs STEAM_API_KEY_FILE).
 # ALICE_FROM_MENU=1: alice starts in the main menu with the site's leaderboards, joins through Connect to server,
 # and goes back to the menu after the match - the leaderboards must be downloaded again (2 downloads), showing her new MMR.
-# REJOIN=1: alice is killed (SIGKILL) during the match and comes back after REJOIN_AFTER (5) seconds - she must be put back
-# into the same match, and the report must still have her (use a longer ROUND_TIME, e.g. 15).
+# REJOIN=1: alice is killed (SIGKILL) during the match and her game is started again after REJOIN_AFTER (5) seconds, without
+# --connect - user/ranked_match.json must bring her back into the same match, and the report must still have her
+# (use a longer ROUND_TIME, e.g. 15).
 # Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] scenario_ranked_report.sh
 export ALSOFT_DRIVERS=null VISUAL=true
 umask 077
@@ -42,9 +43,9 @@ json.dump(d, open(p, 'w'), indent=1)
 PY
 
 account_id() {
-	mkdir -p $T/$1/user
-	echo "hypersomnia-key-v1:$(openssl rand -hex 32)" > $T/$1/user/account.key
-	python3 - $T/$1/user/account.key <<'PY'
+	mkdir -p $T/$1/user/.keys
+	echo "hypersomnia-key-v1:$(openssl rand -hex 32)" > $T/$1/user/.keys/account.key
+	python3 - $T/$1/user/.keys/account.key <<'PY'
 import sys
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
@@ -119,7 +120,9 @@ if [ -n "$REJOIN" ]; then
 	kill -9 $(pgrep -f "^$BIN --connect 127.0.0.1:10060 --appdata-dir $T/alice ")
 	echo "alice killed at $(date +%T)"
 	sleep ${REJOIN_AFTER:-5}
-	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --connect 127.0.0.1:10060 --appdata-dir $T/alice --no-update-on-launch > $T/alice_rejoin.out 2>&1 &)
+	# No --connect: user/ranked_match.json brings the game back to the match by itself, on the account it was played on
+	echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null | sed 's/key_[0-9a-f]\{56\}/key_.../')"
+	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice --no-update-on-launch > $T/alice_rejoin.out 2>&1 &)
 	echo "alice rejoins at $(date +%T)"
 	for t in 4 8 12; do sleep 4; DISPLAY=:86 import -window root $T/rejoin_$t.png; done
 fi

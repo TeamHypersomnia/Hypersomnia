@@ -813,6 +813,13 @@ public:
 
 	bool is_ranked_live_and_not_summary(const const_input in) const;
 	bool should_suspend_instead_of_remove(const const_input in) const;
+
+	/*
+		How long a player who drops now could stay away and still come back to this ranked match:
+		what is left of the budget of all their drops, none once the rejoins are used up.
+	*/
+
+	std::optional<float> rejoin_budget_of(const const_input in, const mode_player_id& id) const;
 	float find_suspended_time_left(const const_input in) const;
 	float get_match_unfreezes_in_secs() const;
 

@@ -174,6 +174,12 @@ namespace augs {
 
 		std::vector<std::byte> to_image_bytes() const;
 		void save_as_png(const path_type& path) const;
+
+		/*
+			Empty if it could not be encoded.
+		*/
+
+		std::vector<std::byte> to_png_bytes() const;
 		void save_as_binary_file(const path_type& path) const;
 
 		void save(const augs::path_type& path) const;

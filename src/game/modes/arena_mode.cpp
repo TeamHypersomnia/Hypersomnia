@@ -3836,6 +3836,26 @@ float arena_mode::get_match_unfreezes_in_secs() const {
 	return unfreezing_match_in_secs;
 }
 
+std::optional<float> arena_mode::rejoin_budget_of(const const_input in, const mode_player_id& id) const {
+	if (!should_suspend_instead_of_remove(in)) {
+		return std::nullopt;
+	}
+
+	const auto player = find(id);
+
+	if (player == nullptr) {
+		return std::nullopt;
+	}
+
+	const auto& ranked = in.dynamic_vars.ranked;
+
+	if (player->stats.times_suspended >= ranked.max_rejoins) {
+		return std::nullopt;
+	}
+
+	return player->suspended_time_until_kick(ranked, short_match);
+}
+
 float arena_mode::find_suspended_time_left(const const_input in) const {
 	if (suspended_players.empty()) {
 		return 0.0f;

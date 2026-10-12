@@ -296,8 +296,7 @@
     "client_connect": "127.0.0.1",
 
     "client": {
-        "use_account_nickname": true,
-        "use_account_avatar": true,
+        "use_account_profile": true,
         "nickname": "",
         "clan": "",
         "net": {
@@ -403,7 +402,6 @@
         "web_client_network_timeout_secs": 1.5,
         "client_network_timeout_secs": 5.0,
         "authenticate_with_nicknames": false, // only use for LAN parties
-        "kick_if_unauthenticated_for_secs": 6.0,
         "time_limit_to_enter_game_since_connection": 15,
         "reset_resync_timer_once_every_secs": 4,
         "max_client_resyncs": 30,

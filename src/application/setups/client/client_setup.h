@@ -95,7 +95,11 @@ struct client_identity_context {
 
 	std::string password;
 
-	bool is_ranked = false;
+	/*
+		Rejoining a ranked match: the account it was played on - see ranked_match.json.
+	*/
+
+	std::string forced_account;
 };
 
 class client_setup : 
@@ -126,6 +130,7 @@ class client_setup :
 	std::vector<special_client_request> pending_requests;
 
 	client_identity_context identity;
+	std::string connected_account;
 	bool sent_password = false;
 	bool key_mismatch_failure = false;
 	bool connect_anyway_requested = false;
@@ -1021,6 +1026,20 @@ public:
 	*/
 
 	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+
+	/*
+		The account this connection was made as (what its cert says).
+	*/
+
+	const std::string& get_connected_account() const {
+		return connected_account;
+	}
+
+	/*
+		In a ranked match: how long the player could be away after a drop and still come back - see ranked_match.json.
+	*/
+
+	std::optional<float> ranked_rejoin_budget() const;
 
 	/*
 		Kicked for a wrong password without having sent any - e.g. joined by address, so its saved password
