@@ -88,8 +88,9 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `ui.sh conf <name> [broker url]` (a client in `$SCRATCH_ROOT/ui/<name>`, main menu, the scratch site's leaderboards; `NICK=`),
   `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
-  then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 255,144 / Manage 394,144; in Manage the Import field
-  280,238 and Import key 556,238, then the Switch account modal's button ~502,486. Every confirmation and result is a centered modal.
+  then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Manage 385,144 - the panes' own fields
+  move with their content, so screenshot first. Every confirmation and result is a centered modal. Manage of a key linked to Steam
+  shows only "Unlink from Steam to manage this key."
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
 - `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).

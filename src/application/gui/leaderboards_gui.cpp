@@ -449,7 +449,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			}
 		}
 
-		tooltip_on_hover("Open the profile on hypersomnia.io.");
+		tooltip_on_hover("View profile on hypersomnia.io");
 
 		if (!in.copyable_public_key.empty()) {
 			ImGui::SameLine();

@@ -31,13 +31,7 @@ public:
 	using base = standard_window_mixin<start_client_gui_state>;
 	using base::base;
 
-	std::optional<simple_popup> error_popup;
-
 	bool is_steam_client = false;
-
-	bool was_shrinked = false;
-	bool will_be_upscaled = false;
-	bool do_initial_load = true;
 
 	demo_file_meta demo_meta;
 	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
@@ -47,8 +41,6 @@ public:
 	std::string demo_size;
 
 	bool allow_start = false;
-	bool mouse_has_to_move_off_browse = false;
-	std::optional<augs::frame_num_type> avatar_submitted_when;
 
 	start_client_tab_type current_tab = start_client_tab_type::BEST_SERVER;
 	bool request_refresh_best_server = false;
@@ -59,9 +51,6 @@ public:
 	bool perform(
 		const std::optional<server_list_entry>& best_server,
 		const bool refresh_in_progress,
-		augs::frame_num_type current_frame,
-		augs::renderer& renderer,
-		augs::graphics::texture& avatar_preview_tex,
 		augs::window& window,
 		client_connect_string&,
 		std::string& into_displayed_connecting_server_name,

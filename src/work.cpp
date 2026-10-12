@@ -3172,15 +3172,12 @@ work_result work(
 		}
 	};
 
-	WEBSTATIC auto perform_start_client_gui = [&](const auto frame_num) {
+	WEBSTATIC auto perform_start_client_gui = [&]() {
 		auto best_casual = browse_servers_gui.find_best_server(false);
 
 		const bool perform_result = start_client_gui.perform(
 			best_casual,
 			browse_servers_gui.refresh_in_progress(),
-			frame_num,
-			get_general_renderer(), 
-			streaming.avatar_preview_tex, 
 			window, 
 			config.client_connect, 
 			displayed_connecting_server_name,
@@ -4138,7 +4135,7 @@ work_result work(
 				if (!has_current_setup()) {
 					perform_last_exit_incorrect();
 #if BUILD_NETWORKING
-					perform_start_client_gui(frame_num);
+					perform_start_client_gui();
 					perform_start_server_gui();
 #endif
 				}

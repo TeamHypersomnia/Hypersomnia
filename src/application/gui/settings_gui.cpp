@@ -410,6 +410,25 @@ static auto danger_button_colors(const rgba col) {
 	);
 }
 
+/*
+	"Local key: 0x8aed41f2..." with a copy icon - on top of Link with Steam and Manage.
+*/
+
+static void local_key_line(const std::optional<augs::ed25519_public_key_type>& public_key) {
+	using namespace augs::imgui;
+
+	if (!public_key.has_value()) {
+		return;
+	}
+
+	text("Local key:");
+	ImGui::SameLine();
+	text(identity_key::short_form(*public_key));
+	ImGui::SameLine();
+	copy_icon_button("LocalKey", "0x" + augs::bytes_to_hex(*public_key));
+	ImGui::Separator();
+}
+
 void settings_gui_state::perform_import_modal(
 	config_json_table& config,
 	config_json_table& last_saved_config,
@@ -428,9 +447,9 @@ void settings_gui_state::perform_import_modal(
 	}
 
 	center_next_modal();
-	ImGui::OpenPopup("Import key##Modal");
+	ImGui::OpenPopup("Import private key##Modal");
 
-	if (!ImGui::BeginPopupModal("Import key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	if (!ImGui::BeginPopupModal("Import private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		return;
 	}
 
@@ -587,17 +606,36 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		return std::nullopt;
 	}();
 
-	text_disabled("Your account on this computer is a key. Whoever has it plays as you - never share it.");
+	local_key_line(public_key);
+
+	/*
+		A key linked to Steam never has to leave this computer - every computer can link its own key.
+		Copying, revealing, importing over or forgetting it only risks someone playing on the Steam account,
+		so it is unlinked first.
+	*/
+
+	{
+		const bool signed_in_to_steam = identity != nullptr && identity->has_valid_cert(augs::steady_secs()) && current_account_id.rfind("steam_", 0) == 0;
+		const bool linked = identity != nullptr && (identity->has_saved_cert() || signed_in_to_steam);
+
+		if (linked) {
+			text("Unlink from Steam to manage this key.");
+			return;
+		}
+	}
+
+	text_color("Whoever has your private key plays as you:", orange);
+	text_color("NEVER share it!", red);
 
 	if (public_key.has_value()) {
 		key_unreadable_since = -1.0;
 
-		if (ImGui::Button("Copy key to clipboard")) {
+		if (ImGui::Button("Copy private key to clipboard")) {
 			ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
-			account_message = "Key copied.\n\nAnyone with it plays as you - keep it safe,\ne.g. in a password manager.";
+			account_message = "Private key copied.\n\nWhoever has it plays as you - keep it safe,\ne.g. in a password manager.";
 		}
 
-		tooltip_on_hover("To back it up - without it, the account is lost -\nor to play from another computer: paste it there in Import key.");
+		tooltip_on_hover("To back it up - without it, the account is lost -\nor to play from another computer: paste it there in Import private key.");
 	}
 	else {
 		/*
@@ -621,13 +659,11 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 #if !PLATFORM_WEB
-	ImGui::SameLine();
-
-	if (ImGui::Button("Reveal in explorer")) {
+	if (ImGui::Button("Reveal private key in explorer")) {
 		window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 	}
 
-	tooltip_on_hover("The key is the .keys/account.key file - you can also back it up by copying it.");
+	tooltip_on_hover("The private key is the .keys/account.key file - you can also back it up by copying it.");
 #else
 	(void)window;
 #endif
@@ -666,12 +702,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		ImGui::GetWindowDrawList()->AddText(
 			ImVec2(min.x + padding.x, min.y + padding.y),
 			ImGui::GetColorU32(ImGuiCol_TextDisabled),
-			"Paste a key to import (hypersomnia-key-v1:...)"
+			"e.g.: hypersomnia-key-v1..."
 		);
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Import key")) {
+	if (ImGui::Button("Import private key")) {
 		if (const auto imported = identity_key::from_export_string(import_key_text)) {
 			if (seed.has_value() && *seed == *imported) {
 				account_message = "That is already your key.";
@@ -689,7 +725,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	}
 
-	tooltip_on_hover("Paste a key copied with \"Copy key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
+	tooltip_on_hover("Paste a private key copied with \"Copy private key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
 
 	/*
 		Importing switches the account - confirmed first, in case the wrong key was pasted.
@@ -750,7 +786,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				"Without the key you can never play as this account again -\n"
 				"its progress and its Steam link stay with the old key.\n\n"
 #if PLATFORM_WEB
-				"In the browser you can not reach the backup -\ncopy the key first (Copy key to clipboard) if you may want it back."
+				"In the browser you can not reach the backup -\ncopy the key first (Copy private key to clipboard) if you may want it back."
 #else
 				"The file is kept in your user folder as a backup -\ndelete it yourself to remove it for good."
 #endif
@@ -862,7 +898,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			if (identity_key::from_export_string(entered).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || entered.size() > 40) {
 				link_code_text.clear();
-				finish(false, "That was your key, not a link code - it was not sent anywhere.\n\nNever paste the key anywhere but Import key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/profile.");
+				finish(false, "That was your key, not a link code - it was not sent anywhere.\n\nNever paste the private key anywhere but Import private key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/profile.");
 				return;
 			}
 		}
@@ -918,6 +954,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	};
 
+	local_key_line(public_key);
+
 	/*
 		The status.
 	*/
@@ -931,7 +969,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	}
 	else {
-		text_disabled("Link this key to your Steam account, and progress counts towards it\non every computer you play with this key.");
+		text_disabled("Progress will count towards the Steam account.\n");
 
 		if (ImGui::Button("Link to your Steam account")) {
 			if (has_key && identity != nullptr) {
@@ -960,7 +998,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			const auto name = identity->get_link_check_profile().name.empty() ? linked_name : identity->get_link_check_profile().name;
 			identity->clear_link_check();
-			finish(true, "Progress will count towards your Steam account" + (name.empty() ? std::string(".") : ":\n\n    " + name));
+			linked_name = name;
+			finish(true, "Progress will count towards your Steam account:");
 		}
 		else if (check == L::NOT_LINKED) {
 			identity->clear_link_check();
@@ -1164,6 +1203,23 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				if (link_flow_succeeded) {
 					checkmark_line("Successfully linked", green);
 					text(link_flow_message);
+
+					/*
+						The Steam avatar is the preview once the account's profile is in effect.
+					*/
+
+					if (const bool steam_avatar_shown = identity != nullptr && identity->has_valid_cert(augs::steady_secs()); steam_avatar_shown) {
+						augs::atlas_entry entry;
+						entry.atlas_space = xywh(0, 0, 1, 1);
+						const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
+
+						game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
+						ImGui::Dummy(ImVec2(size.x, size.y));
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
+					}
+
+					text(linked_name);
 				}
 				else {
 					text_color(link_flow_message, orange);
@@ -3011,7 +3067,7 @@ void settings_gui_state::perform(
 					active_account_pane = account_settings_pane::INFO;
 				}
 
-				const auto steam_icon_room = std::string("       ");
+				const auto steam_icon_room = std::string("     ");
 
 				do_pretty_tabs(
 					active_account_pane,
@@ -3036,10 +3092,16 @@ void settings_gui_state::perform(
 						const auto min = ImGui::GetItemRectMin();
 						const auto max = ImGui::GetItemRectMax();
 						const auto side = (max.y - min.y) * 0.6f;
-						const auto padding = ImGui::GetStyle().FramePadding;
+						const auto room = ImGui::CalcTextSize("     ").x;
+
+						/*
+							Its padding is wide - the logo ends a third of its side before the label.
+						*/
+
+						const auto label_x = (min.x + max.x) / 2 - ImGui::CalcTextSize(("     " + std::string("Link with Steam")).c_str()).x / 2 + room;
 
 						auto cursor = scoped_preserve_cursor();
-						ImGui::SetCursorScreenPos(ImVec2(min.x + padding.x * 0.6f, min.y + (max.y - min.y - side) / 2));
+						ImGui::SetCursorScreenPos(ImVec2(label_x - side - side / 3, min.y + (max.y - min.y - side) / 2));
 						game_image(entry, vec2::square(side), white, vec2::zero, augs::imgui_atlas_type::GAME);
 					}
 				);
@@ -3092,10 +3154,6 @@ void settings_gui_state::perform(
 						revertable_input_text("Clan", scope_cfg.clan);
 						tooltip_on_hover("Displayed e.g. in scoreboard.\n\nUp to 20 characters.");
 
-						if (const auto& provider = signed_in.provider_label; !provider.empty()) {
-							revertable_checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
-						}
-
 #if !PLATFORM_WEB
 						if (signed_in.avatar_image_path.empty()) {
 							if (ImGui::Button("Choose avatar...") && !chosen_avatar.valid()) {
@@ -3146,6 +3204,10 @@ void settings_gui_state::perform(
 						}
 #endif
 
+						if (const auto& provider = signed_in.provider_label; !provider.empty()) {
+							revertable_checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
+						}
+
 						ImGui::EndGroup();
 
 						ImGui::Separator();
@@ -3179,7 +3241,7 @@ void settings_gui_state::perform(
 
 							ImGui::SameLine();
 
-							if (ImGui::Button("Open profile")) {
+							if (ImGui::Button("View profile")) {
 								augs::open_url(config.website_url + "/user/" + current_account_id);
 							}
 
