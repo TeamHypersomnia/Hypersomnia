@@ -13,5 +13,5 @@ cat > $T/user/conf.d/test.json <<J
               "ranked": { "autostart_when": "$when" }, "webrtc_port_range_begin": $((port + 9000)), "webrtc_port_range_end": $((port + 9005)) },
   "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY" } }
 J
-(cd $(cd "$(dirname "$0")/../../../../.." && pwd)/hypersomnia && setsid timeout 3000 $BIN --dedicated-server --appdata-dir $T --no-update-on-launch > $T.out 2>&1 < /dev/null &)
+(cd $(cd "$(dirname "$0")/../../../../.." && pwd)/hypersomnia && setsid timeout ${SECS:-3000} $BIN --dedicated-server --appdata-dir $T --no-update-on-launch > $T.out 2>&1 < /dev/null &)
 sleep 5
