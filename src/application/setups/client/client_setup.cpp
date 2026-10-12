@@ -699,14 +699,18 @@ bool client_setup::is_webrtc() const {
 
 bool client_setup::pending_pre_connection_handshake() const {
 	/*
-		A cert already on its way is waited for a moment - and for ranked, which needs it, until it comes or fails.
+		A cert already on its way is waited for a while - and for ranked, which needs it, until it comes or fails.
+		10 seconds, not less: a server joined by its address and missing from the server list (never downloaded
+		before the Connect window or --connect) may be ranked, which would kick a self-signed join.
+		A request is in flight practically only right after the game starts, so this only ever delays the first join -
+		and at most by 10 seconds if hypersomnia.io is down.
 	*/
 
 	const bool has_cert_already = identity.session != nullptr && identity.session->has_broker_cert(augs::steady_secs());
 
 	if (identity.session != nullptr && identity.session->request_in_flight() && !has_cert_already) {
 		const auto waited = get_current_time() - when_initiated_connection;
-		const auto limit = identity.is_ranked ? 20.0 : 3.0;
+		const auto limit = identity.is_ranked ? 20.0 : 10.0;
 
 		if (waited < limit) {
 			return true;
