@@ -546,7 +546,7 @@ void settings_gui_state::perform_import_modal(
 	else {
 		text_color("Couldn't check whether this key is linked to a Steam account.", orange);
 		text("\nProgress will count towards:\n");
-		text("    the imported key (" + (identity != nullptr ? identity_key::short_form(identity->public_key()) : std::string()) + ")\n");
+		text("    Local key (" + (identity != nullptr ? identity_key::short_form(identity->public_key()) : std::string()) + ")\n");
 
 		if (ImGui::Button("Retry##ImportCheck") && identity != nullptr) {
 			identity->start_link_check(identity_input.broker_url);
@@ -962,7 +962,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 	if (linked) {
 		checkmark_line("This key is linked to your Steam account" + (steam_name.empty() ? std::string(".") : ": " + steam_name + "."), green);
-		text_disabled("Progress counts towards it on every computer you play with this key.");
+		text_disabled("All progress counts towards this Steam account.");
 
 		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink...")) {
 			confirm_unlink = true;
@@ -1103,7 +1103,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 				else {
 					account_message = typesafe_sprintf(
-						"Unlinked.\n\nProgress counts towards this computer again:\n\n    %x",
+						"Unlinked.\n\nProgress counts towards your local key again:\n\n    %x",
 						has_key ? identity_key::short_form(*public_key) : std::string()
 					);
 				}
@@ -1242,9 +1242,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (ImGui::BeginPopupModal("Unlink?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			text("Are you sure you want to unlink");
-			text_color(typesafe_sprintf("    \"%x\" (%x)?", steam_name, steam_account), orange);
+			text_color(typesafe_sprintf("    \"%x\"?", steam_name.empty() ? steam_account : steam_name), orange);
 			text(typesafe_sprintf(
-				"\nProgress will count towards this computer (%x) again.",
+				"\nProgress will count towards your local key (%x) again.",
 				has_key ? identity_key::short_form(*public_key) : std::string()
 			));
 
@@ -3225,7 +3225,7 @@ void settings_gui_state::perform(
 
 							const auto label = [&]() -> std::string {
 								if (is_key) {
-									return "this computer (" + identity_key::short_form_of_account(current_account_id) + ")";
+									return "Local key (" + identity_key::short_form_of_account(current_account_id) + ")";
 								}
 
 								const auto name = identity != nullptr ? identity->get_profile().name : std::string();
@@ -3246,7 +3246,7 @@ void settings_gui_state::perform(
 							}
 
 							if (is_key) {
-								text_disabled("Progress counts towards this computer's key - back it up in Manage.");
+								text_disabled("Progress counts towards your local key - back it up in Manage.");
 							}
 						}
 

@@ -2242,7 +2242,7 @@ work_result work(
 			"\n"
 			"You play as:\n"
 			"\n"
-			"    this computer (%x)\n"
+			"    Local key (%x)\n"
 			"\n"
 			"until the game can sign you in again.\n"
 			"Progress until then will not count towards your %x account.\n"
@@ -3362,7 +3362,7 @@ work_result work(
 				return provider_name() + ": " + (name.empty() ? account : name);
 			}
 
-			return "this computer (" + identity_key::short_form(identity->public_key()) + ")";
+			return "Local key (" + identity_key::short_form(identity->public_key()) + ")";
 		}();
 
 		leaderboards_gui.perform({
