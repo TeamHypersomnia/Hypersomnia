@@ -142,7 +142,7 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/profile`, which shows a valid 8-character code right away (`POST /profile/link_code` makes a new one),
+  `curl -b "$cookie"` then reaches `/link`, which shows a valid 8-character code right away (`POST /profile/link_code` makes a new one),
   `POST /profile/unlink_key` with `key=key_...` unlinks.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb:
   Settings - Client (~833,218) - Account (~417,278); click the code field (~415,580), `xinput.py type CODE`, click Link (~588,582),
