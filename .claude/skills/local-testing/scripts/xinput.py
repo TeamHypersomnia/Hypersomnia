@@ -83,8 +83,18 @@ elif mode == "scroll":
 		x11.XFlush(display)
 		time.sleep(0.1)
 elif mode == "type":
+	# Punctuation by its keysym on a US layout: (name, needs shift)
+	punctuation = {
+		" ": ("space", False), ".": ("period", False), ",": ("comma", False), ":": ("semicolon", True), ";": ("semicolon", False),
+		"-": ("minus", False), "_": ("minus", True), "/": ("slash", False), "[": ("bracketleft", False), "]": ("bracketright", False),
+		"@": ("2", True), "#": ("3", True), "=": ("equal", False)
+	}
+
 	for c in sys.argv[2]:
-		press("space" if c == " " else c.lower(), c.isupper())
+		if c in punctuation:
+			press(*punctuation[c])
+		else:
+			press(c.lower(), c.isupper())
 elif mode == "key":
 	*modifiers, key = sys.argv[2].split("+")
 

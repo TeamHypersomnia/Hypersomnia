@@ -5,7 +5,10 @@
 # as official "e2e". Then the site's database: the match and both players' rows.
 # Not a tournament server: tournaments force overtime (win by two), and idle players only ever win their defending rounds
 # (time out, no bomb), so the match would never end. Without overtime 1:1 after both halves ends it.
-# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] scenario_ranked_report.sh
+# STEAM_BOB=1: bob plays on the Steam build with the user's running Steam (the broker needs STEAM_API_KEY_FILE).
+# ALICE_FROM_MENU=1: alice starts in the main menu with the site's leaderboards, joins through Connect to server,
+# and goes back to the menu after the match - the leaderboards must be downloaded again (2 downloads), showing her new MMR.
+# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] scenario_ranked_report.sh
 export ALSOFT_DRIVERS=null VISUAL=true
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -50,6 +53,7 @@ PY
 
 ID_A=$(account_id alice)
 ID_B=$(account_id bob)
+[ -n "$STEAM_BOB" ] && ID_B=steam
 
 cat > $T/server/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": 10060, "slots": 16 },
@@ -84,12 +88,29 @@ for c in alice:86 bob:87; do
 	Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 &
 	DISPLAYS="$DISPLAYS $!"
 	sleep 1
-	(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $BIN --connect 127.0.0.1:10060 --appdata-dir $T/$name --no-update-on-launch > $T/$name.out 2>&1 &)
+	CBIN=$BIN
+	[ "$name" = bob ] && [ -n "$STEAM_BOB" ] && CBIN=$REPO/build/Debug-x64-clang-claude-steam/Hypersomnia
+
+	if [ "$name" = alice ] && [ -n "$ALICE_FROM_MENU" ]; then
+		cat > $T/alice/user/conf.d/menu.json <<J
+{ "launch_at_startup": "MAIN_MENU", "window": { "fullscreen": false, "size": [1280, 720] }, "main_menu": { "leaderboards_provider_url": "$BROKER_URL/leaderboards" } }
+J
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 200 $CBIN --appdata-dir $T/$name --no-update-on-launch > $T/$name.out 2>&1 &)
+		sleep 12
+		DISPLAY=:$d import -window root $T/alice_menu_before.png
+		DISPLAY=:$d python3 "$HERE/xinput.py" click 199 323; sleep 2
+		DISPLAY=:$d python3 "$HERE/xinput.py" click 455 340
+		DISPLAY=:$d python3 "$HERE/xinput.py" type "127.0.0.1:10060"
+		DISPLAY=:$d python3 "$HERE/xinput.py" click 380 524
+	else
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $CBIN --connect 127.0.0.1:10060 --appdata-dir $T/$name --no-update-on-launch > $T/$name.out 2>&1 &)
+	fi
 done
 
 for t in 1 2 3 4 5 6; do
 	sleep 5
 	for d in 86 87; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
+	[ $t = 4 ] && for d in 86 87; do DISPLAY=:$d import -window root $T/joined_$d.png; done
 done
 
 for i in $(seq 1 140); do
@@ -97,11 +118,19 @@ for i in $(seq 1 140); do
 	sleep 1
 done
 
+if [ -n "$ALICE_FROM_MENU" ]; then
+	sleep 3
+	DISPLAY=:86 python3 "$HERE/xinput.py" key Escape; sleep 2
+	DISPLAY=:86 python3 "$HERE/xinput.py" click 179 613; sleep 6
+	DISPLAY=:86 import -window root $T/alice_menu_after.png
+	echo "alice's leaderboards downloads (2 expected - at start and after the ranked match): $(grep -c 'Launching future_response' $T/alice.out)"
+fi
+
 echo "=== server ($i s)"
 grep -hE "Authenticated|Starting ranked|Match report JSON|delivered|refused|ERROR" $T/server.out | sed 's/^\[[0-9:]*\] //; s/key_[0-9a-f]\{56\}/key_…/g' | cut -c1-160 | head -12
 echo "=== site"
 "$HERE/broker.sh" sql "SELECT server_id, win_score, lose_score, report_id FROM matches ORDER BY match_id DESC LIMIT 1"
-"$HERE/broker.sh" sql "SELECT account_id, round(mmr,2) AS mmr, matches_won, matches_lost FROM mmr_team WHERE account_id IN ('$ID_A', '$ID_B')"
+"$HERE/broker.sh" sql "SELECT account_id, round(mmr,2) AS mmr, matches_won, matches_lost FROM mmr_team WHERE account_id IN ('$ID_A', '$ID_B') OR ('$ID_B' = 'steam' AND account_id LIKE 'steam_%')"
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 kill $DISPLAYS 2>/dev/null

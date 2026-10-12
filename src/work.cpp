@@ -2070,6 +2070,12 @@ work_result work(
 		return {};
 	}();
 
+	/*
+		Set during a ranked match - the leaderboards are downloaded again on coming back to the main menu.
+	*/
+
+	WEBSTATIC bool joined_ranked_since_leaderboards = false;
+
 	WEBSTATIC auto sync_identity_with_settings = [&]() {
 		const auto now = augs::steady_secs();
 
@@ -2079,6 +2085,10 @@ work_result work(
 		*/
 
 		identity->in_ranked_match = would_abandon_ranked_match();
+
+		if (identity->in_ranked_match) {
+			joined_ranked_since_leaderboards = true;
+		}
 
 		if (settings_gui.identity_retry_wanted && !would_abandon_ranked_match()) {
 			settings_gui.identity_retry_wanted = false;
@@ -2500,6 +2510,29 @@ work_result work(
 		}
 	};
 
+	/*
+		The leaderboards are downloaded again on coming back to the main menu only when they may have changed:
+		after a ranked game, or when they are 10 minutes old. Which row is the player's follows the account by itself.
+	*/
+
+	WEBSTATIC double when_leaderboards_refreshed = -1.0;
+
+	WEBSTATIC auto refresh_leaderboards_if_changed = [&]() {
+		const auto now = augs::steady_secs();
+
+		const bool due =
+			when_leaderboards_refreshed < 0.0
+			|| joined_ranked_since_leaderboards
+			|| now - when_leaderboards_refreshed > 10 * 60.0
+		;
+
+		if (due) {
+			leaderboards_gui.request_refresh();
+			when_leaderboards_refreshed = now;
+			joined_ranked_since_leaderboards = false;
+		}
+	};
+
 	WEBSTATIC auto launch_main_menu = [&]() {
 		if (!has_main_menu()) {
 			main_menu_gui = {};
@@ -2509,7 +2542,7 @@ work_result work(
 			});
 
 			map_catalogue_gui.request_refresh();
-			leaderboards_gui.request_refresh();
+			refresh_leaderboards_if_changed();
 
 			streaming.recompress_demos();
 		}
