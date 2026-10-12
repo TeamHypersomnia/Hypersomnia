@@ -8,7 +8,9 @@
 # STEAM_BOB=1: bob plays on the Steam build with the user's running Steam (the broker needs STEAM_API_KEY_FILE).
 # ALICE_FROM_MENU=1: alice starts in the main menu with the site's leaderboards, joins through Connect to server,
 # and goes back to the menu after the match - the leaderboards must be downloaded again (2 downloads), showing her new MMR.
-# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] scenario_ranked_report.sh
+# REJOIN=1: alice is killed (SIGKILL) during the match and comes back after REJOIN_AFTER (5) seconds - she must be put back
+# into the same match, and the report must still have her (use a longer ROUND_TIME, e.g. 15).
+# Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] scenario_ranked_report.sh
 export ALSOFT_DRIVERS=null VISUAL=true
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -112,6 +114,15 @@ for t in 1 2 3 4 5 6; do
 	for d in 86 87; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
 	[ $t = 4 ] && for d in 86 87; do DISPLAY=:$d import -window root $T/joined_$d.png; done
 done
+
+if [ -n "$REJOIN" ]; then
+	kill -9 $(pgrep -f "^$BIN --connect 127.0.0.1:10060 --appdata-dir $T/alice ")
+	echo "alice killed at $(date +%T)"
+	sleep ${REJOIN_AFTER:-5}
+	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --connect 127.0.0.1:10060 --appdata-dir $T/alice --no-update-on-launch > $T/alice_rejoin.out 2>&1 &)
+	echo "alice rejoins at $(date +%T)"
+	for t in 4 8 12; do sleep 4; DISPLAY=:86 import -window root $T/rejoin_$t.png; done
+fi
 
 for i in $(seq 1 140); do
 	grep -q "delivered (HTTP\|not delivered\|refused the match report" $T/server.out && break
