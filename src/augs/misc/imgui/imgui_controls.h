@@ -21,7 +21,11 @@ namespace augs {
 }
 
 namespace ImGui {
-	IMGUI_API bool TabLabels(const char **tabLabels, int tabSize, int &tabIndex, int *tabOrder = NULL);
+	/*
+		after_tab, if given, is called right after each tab's button - e.g. to draw an icon over it (ImGui::GetItemRectMin).
+	*/
+
+	IMGUI_API bool TabLabels(const char **tabLabels, int tabSize, int &tabIndex, int *tabOrder = NULL, const std::function<void(int)>& after_tab = nullptr);
 
 	bool BeginTabMenuBar(const float y);
 	void EndTabMenuBar();

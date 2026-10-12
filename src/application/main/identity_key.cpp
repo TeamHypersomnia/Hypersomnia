@@ -44,7 +44,7 @@ namespace identity_key {
 
 	std::string short_form_of_account(const std::string& account) {
 		if (account.rfind("key_", 0) == 0 && account.size() >= 4 + 8) {
-			return "key " + account.substr(4, 8) + "...";
+			return "0x" + account.substr(4, 8) + "...";
 		}
 
 		return account;

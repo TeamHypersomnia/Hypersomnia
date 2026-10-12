@@ -14,6 +14,7 @@
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "application/main/identity_session.h"
+#include "view/necessary_resources.h"
 
 struct config_json_table;
 
@@ -26,6 +27,7 @@ namespace augs {
 
 enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
+	ACCOUNT,
 	GENERAL,
 	CONTROLS,
 	INTERFACE,
@@ -103,11 +105,18 @@ enum class keybindings_settings_pane {
 
 enum class client_settings_pane {
 	// GEN INTROSPECTOR enum class client_settings_pane
-	PROFILE,
+	GENERAL,
 	LAG_COMPENSATION,
-#if !WEB_CRAZYGAMES
-	ACCOUNT,
-#endif
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class account_settings_pane {
+	// GEN INTROSPECTOR enum class account_settings_pane
+	INFO,
+	LINK_WITH_STEAM,
+	MANAGE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -198,7 +207,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	interface_settings_pane active_interface_pane = interface_settings_pane::LAYOUT;
 	controls_settings_pane active_controls_pane = controls_settings_pane::MOUSE;
 	keybindings_settings_pane active_keybindings_pane = keybindings_settings_pane::COMBAT;
-	client_settings_pane active_client_pane = client_settings_pane::PROFILE;
+	client_settings_pane active_client_pane = client_settings_pane::GENERAL;
+	account_settings_pane active_account_pane = account_settings_pane::INFO;
 	editor_settings_pane active_editor_pane = editor_settings_pane::AUTOSAVE;
 	server_settings_pane active_server_pane = server_settings_pane::GAME;
 	advanced_settings_pane active_advanced_pane = advanced_settings_pane::SYSTEM;
@@ -218,13 +228,18 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	std::string import_key_text;
 	std::string link_code_text;
-	std::string account_status;
-	bool confirm_forget_key = false;
 	std::optional<augs::ed25519_seed_type> import_to_confirm;
 
 	std::optional<augs::ed25519_seed_type> account_seed;
 	double when_account_seed_loaded = -1.0;
 	bool account_seed_reload_needed = true;
+
+	/*
+		A key file that does not read is told only once it stayed so for a moment -
+		right after Forget, the game makes the new key while this pane may already look.
+	*/
+
+	double key_unreadable_since = -1.0;
 
 	augs::async_response_ptr link_request;
 	bool link_request_is_unlink = false;
@@ -242,25 +257,49 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string steam_link_state;
 	std::optional<std::string> link_code_from_steam;
 
+	/*
+		"Link to your Steam account" runs in one dimmed modal, from asking whether the key is linked already to the result.
+	*/
+
 	enum class link_flow_type {
 		IDLE,
 		CHECKING_BEFORE,
 		NEEDS_STEAM_SIGN_IN,
-		CHECKING_AFTER
+		CONFIRMING,
+		LINKING,
+		CHECKING_AFTER,
+		DONE
 	};
 
 	link_flow_type link_flow = link_flow_type::IDLE;
+	std::string link_flow_message;
+	std::string linked_name;
+	bool link_flow_succeeded = false;
+
 	bool import_modal_open = false;
 	bool import_profile_applied = false;
 
-	void perform_account_pane(
-		augs::window& window,
-		const std::string& website_url,
+	/*
+		Confirmations and results of the Manage and Link panes, each in its own modal.
+	*/
+
+	bool confirm_forget_key = false;
+	bool confirm_unlink = false;
+	std::optional<std::string> account_message;
+
+	augs::future<std::optional<augs::path_type>> chosen_avatar;
+
+	void perform_account_link_pane(const std::string& website_url);
+	void perform_account_manage_pane(augs::window& window);
+
+	void perform_import_modal(
 		config_json_table& config,
 		config_json_table& last_saved_config,
 		const config_json_table& canon_config_with_confd,
 		const augs::path_type& config_path_for_saving
 	);
+
+	void perform_account_message_modal();
 
 public:
 	bool is_steam_client = false;
@@ -284,6 +323,18 @@ public:
 	*/
 
 	bool sign_in_retry_wanted = false;
+
+	/*
+		One's own avatar was chosen here - the game shows it again even if its path is the same.
+	*/
+
+	bool avatar_changed = false;
+
+	/*
+		For icons, e.g. the Steam logo on its tab. Set by the game.
+	*/
+
+	const necessary_images_in_atlas_map* necessary_images = nullptr;
 
 	/*
 		Web: the code Sign in with Steam came back with - taken only for the state this game opened it with.

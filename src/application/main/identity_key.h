@@ -47,7 +47,7 @@ namespace identity_key {
 
 	/*
 		The one public form of a key everywhere - menu, Settings, leaderboards, modals and the site:
-		"key " and the first 8 hex digits of the public key, e.g. "key 8aed41f2...".
+		"0x" and the first 8 hex digits of the public key, e.g. "0x8aed41f2..." - the 0x says it is a key.
 		For a "key_..." account id the same; any other account id is returned as it is.
 	*/
 

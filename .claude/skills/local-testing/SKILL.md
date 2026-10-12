@@ -88,7 +88,8 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `ui.sh conf <name> [broker url]` (a client in `$SCRATCH_ROOT/ui/<name>`, main menu, the scratch site's leaderboards; `NICK=`),
   `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
-  then Settings 155,555, Client 629,112, Account 408,144, Import field 280,377, Import key 556,378, Switch account 139,458.
+  then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 255,144 / Manage 394,144; in Manage the Import field
+  280,238 and Import key 556,238, then the Switch account modal's button ~502,486. Every confirmation and result is a centered modal.
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
 - `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
@@ -140,7 +141,7 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/profile`; `POST /profile/link_code` returns a page with the 8-character code,
+  `curl -b "$cookie"` then reaches `/profile`, which shows a valid 8-character code right away (`POST /profile/link_code` makes a new one),
   `POST /profile/unlink_key` with `key=key_...` unlinks.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb:
   Settings - Client (~833,218) - Account (~417,278); click the code field (~415,580), `xinput.py type CODE`, click Link (~588,582),

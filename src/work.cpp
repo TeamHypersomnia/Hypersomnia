@@ -2239,11 +2239,17 @@ work_result work(
 		popup.title = "Not signed in";
 		popup.message = typesafe_sprintf(
 			"Couldn't sign in to your %x account.\n"
-			"You play as: this computer, until the game can sign you in again.\n"
-			"Matches you play until then will not count towards your %x account.\n"
+			"\n"
+			"You play as:\n"
+			"\n"
+			"    this computer (%x)\n"
+			"\n"
+			"until the game can sign you in again.\n"
+			"Progress until then will not count towards your %x account.\n"
 			"\n"
 			"If this keeps happening, try again later.",
 			provider,
+			identity_key::short_form(identity->public_key()),
 			provider
 		);
 
@@ -2290,11 +2296,21 @@ work_result work(
 		}
 
 		settings_gui.identity = identity.get();
+		settings_gui.necessary_images = std::addressof(streaming.necessary_images_in_atlas);
 		settings_gui.identity_input = get_identity_input();
 		settings_gui.current_account_id = current_account_id();
 		settings_gui.identity_error = identity->last_error;
 
 		apply_account_profile();
+
+		if (settings_gui.avatar_changed) {
+			/*
+				Chosen again under the same file name - shown again all the same.
+			*/
+
+			settings_gui.avatar_changed = false;
+			previewed_avatar_path.clear();
+		}
 
 		if (const auto effective = config.client.get_avatar_image_path(); effective != previewed_avatar_path) {
 			previewed_avatar_path = effective;
@@ -3288,7 +3304,7 @@ work_result work(
 
 			account_label,
 			config.website_url + "/user/" + account,
-			signed_in_account ? std::string() : augs::bytes_to_hex(identity->public_key()),
+			signed_in_account ? std::string() : "0x" + augs::bytes_to_hex(identity->public_key()),
 			provider_name(),
 			identity->sign_in_failed(in, now)
 #if PLATFORM_WEB

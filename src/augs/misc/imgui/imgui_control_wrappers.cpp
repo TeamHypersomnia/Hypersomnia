@@ -16,7 +16,7 @@ namespace ImGui {
 	ImGui::Text("\nTab Page For Tab: \"%s\" here.\n",tabNames[tabSelected]);
 	*/
 
-	IMGUI_API bool TabLabels(const char **tabLabels, int tabSize, int &tabIndex, int *tabOrder) {
+	IMGUI_API bool TabLabels(const char **tabLabels, int tabSize, int &tabIndex, int *tabOrder, const std::function<void(int)>& after_tab) {
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		const ImVec2 itemSpacing = style.ItemSpacing;
@@ -69,6 +69,10 @@ namespace ImGui {
 			ImGui::PushID(i);   // otherwise two tabs with the same name would clash.
 			if (ImGui::Button(tabLabels[i])) { selection_changed = (tabIndex != i); newtabIndex = i; }
 			ImGui::PopID();
+
+			if (after_tab) {
+				after_tab(i);
+			}
 			if (i != tabIndex) {
 				// Reset the style
 				style.Colors[ImGuiCol_Button] = color;

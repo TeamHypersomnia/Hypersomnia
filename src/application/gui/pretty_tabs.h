@@ -1,5 +1,7 @@
 #pragma once
 #include <algorithm>
+#include <functional>
+#include <type_traits>
 #include "augs/templates/enum_introspect.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/string/format_enum.h"
@@ -9,7 +11,7 @@
 */
 
 template <class E, class F>
-void do_pretty_tabs(E& active_pane, F custom_name, const int num_shown) {
+void do_pretty_tabs(E& active_pane, F custom_name, const int num_shown, const std::type_identity_t<std::function<void(E)>>& after_tab = nullptr) {
 	using namespace augs::imgui;
 
 	{
@@ -31,7 +33,13 @@ void do_pretty_tabs(E& active_pane, F custom_name, const int num_shown) {
 			}();
 
 			auto index = static_cast<int>(active_pane);
-			ImGui::TabLabels(labels.data(), std::min(num_shown, static_cast<int>(labels.size())), index, nullptr);
+			const auto after = [&after_tab](const int i) {
+				if (after_tab) {
+					after_tab(static_cast<E>(i));
+				}
+			};
+
+			ImGui::TabLabels(labels.data(), std::min(num_shown, static_cast<int>(labels.size())), index, nullptr, after);
 			active_pane = static_cast<E>(index);
 		}
 	}

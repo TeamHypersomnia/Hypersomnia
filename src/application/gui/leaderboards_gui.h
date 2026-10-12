@@ -17,7 +17,7 @@ struct leaderboards_input {
 	const ltrb menu_ltrb;
 
 	/*
-		"Account:" under the profile - "this computer (key 8aed41f2...)" or "Steam: <name>" - opening the account's
+		"Account:" under the profile - "this computer (0x8aed41f2...)" or "Steam: <name>" - opening the account's
 		profile on hypersomnia.io. A key's whole public key can be copied. sign_in_failed adds a [Retry].
 	*/
 

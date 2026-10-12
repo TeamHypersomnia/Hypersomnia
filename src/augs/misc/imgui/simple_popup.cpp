@@ -58,15 +58,18 @@ int simple_popup::perform(const std::vector<button>& buttons) {
 		}
 
 		{
+			/*
+				A tree node, not a button - so the answer buttons are the only buttons.
+			*/
+
 			if (details.size() > 0) {
-				auto& f = details_expanded;
+				ImGui::SetNextItemOpen(details_expanded);
 
-				if (ImGui::Button(f ? "Hide details" : "Show details")) {
-					f = !f;
-				}
+				details_expanded = ImGui::TreeNode("Details");
 
-				if (f) {
+				if (details_expanded) {
 					text(details);
+					ImGui::TreePop();
 				}
 			}
 		}
