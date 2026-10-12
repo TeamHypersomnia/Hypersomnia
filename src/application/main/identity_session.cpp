@@ -103,8 +103,8 @@ void identity_session::start_request(const input& in, const double now) {
 	}
 
 	request = augs::async_get(url.get_base_url(), prefix + *location);
-	request_started_at = now;
 	requested_for = in;
+	refresh_wanted = false;
 }
 
 void identity_session::schedule_retry(const double now, const bool refused) {
@@ -135,25 +135,8 @@ void identity_session::advance(const input& in, const double now) {
 		}
 	}
 
-	/*
-		Monotonic time stops while the computer sleeps: once a wake is seen (the wall clock ran on further),
-		the next attempt is brought forward - once - and a cert that ran out meanwhile is dropped.
-	*/
-
-	{
-		const auto wall = wall_now();
-
-		if (last_wall > 0.0 && (wall - last_wall) - (now - last_steady) > 30.0) {
-			LOG("The computer slept - checking the identity cert.");
-			next_attempt_at = std::min(next_attempt_at, now);
-		}
-
-		last_wall = wall;
-		last_steady = now;
-
-		if (broker_cert.has_value() && cert_secs_left(now) <= 0.0) {
-			broker_cert.reset();
-		}
+	if (broker_cert.has_value() && cert_secs_left(now) <= 0.0) {
+		broker_cert.reset();
 	}
 
 	if (request != nullptr) {
@@ -171,9 +154,7 @@ void identity_session::advance(const input& in, const double now) {
 		if (!requested_for.same_account(last_input)) {
 			LOG("Dropping an identity cert answer for the previous account.");
 			next_attempt_at = 0.0;
-			steam_ticket.reset();
-			steam_ticket_requested = false;
-			steam_ticket_wanted = false;
+			clear_steam_ticket();
 			return;
 		}
 
@@ -187,9 +168,9 @@ void identity_session::advance(const input& in, const double now) {
 				broker_cert_received_at_wall = wall_now();
 				last_error.clear();
 				retry_delay = 30.0;
+				next_attempt_at = 0.0;
 
 				const auto lifetime = static_cast<double>(cert->not_after - cert->not_before);
-				next_attempt_at = now + lifetime / 2;
 
 				LOG("Received an identity cert for %x, valid for %x minutes.", cert->account, static_cast<int>(lifetime / 60));
 			}
@@ -210,12 +191,11 @@ void identity_session::advance(const input& in, const double now) {
 			schedule_retry(now, false);
 		}
 
-		steam_ticket.reset();
-		steam_ticket_requested = false;
-		steam_ticket_wanted = false;
+		clear_steam_ticket();
 
 		if (retry_after_request) {
 			retry_after_request = false;
+			refresh_wanted = true;
 			next_attempt_at = now;
 		}
 
@@ -232,6 +212,19 @@ void identity_session::advance(const input& in, const double now) {
 
 	if (steam_ticket_requested && now - steam_ticket_requested_at > steam_ticket_timeout_secs) {
 		on_steam_ticket({}, false);
+	}
+
+	/*
+		A cert is renewed at half of its lifetime - measured by both clocks (see cert_secs_left), so a computer that slept
+		renews it as soon as it wakes. After a failure, not before the retry delay.
+	*/
+
+	if (broker_cert.has_value() && !refresh_wanted) {
+		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+
+		if (cert_secs_left(now) > lifetime / 2) {
+			return;
+		}
 	}
 
 	if (now < next_attempt_at) {
@@ -260,6 +253,12 @@ std::optional<std::string> identity_session::steam_identity_to_request() {
 	return identity_cert::steam_ticket_identity(session_public);
 }
 
+void identity_session::clear_steam_ticket() {
+	steam_ticket.reset();
+	steam_ticket_wanted = false;
+	steam_ticket_requested = false;
+}
+
 void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_bytes, const bool successful) {
 	steam_ticket_wanted = false;
 	steam_ticket_requested = false;
@@ -285,6 +284,7 @@ void identity_session::retry_now() {
 
 	if (request == nullptr) {
 		next_attempt_at = 0.0;
+		refresh_wanted = true;
 	}
 	else {
 		retry_after_request = true;

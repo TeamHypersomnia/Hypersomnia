@@ -66,7 +66,6 @@ private:
 	double broker_cert_received_at_wall = 0.0;
 
 	augs::async_response_ptr request;
-	double request_started_at = 0.0;
 	input requested_for;
 
 	double next_attempt_at = 0.0;
@@ -80,9 +79,16 @@ private:
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	double last_now = 0.0;
-	double last_wall = 0.0;
-	double last_steady = 0.0;
 	bool retry_after_request = false;
+	bool refresh_wanted = false;
+
+	void clear_steam_ticket();
+
+	/*
+		Forgets the cert when the account changed (e.g. the key was replaced) - the next one is asked for right away.
+	*/
+
+	void reset();
 	std::optional<std::vector<std::byte>> steam_ticket;
 
 	input last_input;
@@ -120,12 +126,6 @@ public:
 	*/
 
 	void retry_now();
-
-	/*
-		Forgets the cert, e.g. after the account key was replaced - the next one is asked for right away.
-	*/
-
-	void reset();
 
 	bool has_broker_cert(double now) const;
 	const std::optional<identity_cert::cert>& get_broker_cert() const { return broker_cert; }

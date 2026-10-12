@@ -785,10 +785,6 @@ client_setup::client_setup(
 
 	this->identity = identity;
 
-	if (identity.is_ranked && identity.session != nullptr && !identity.session->has_broker_cert(augs::steady_secs())) {
-		identity.session->retry_now();
-	}
-
 	LOG("Initializing connection with %x", connect_string);
 
 	if (is_opening_demo) {
@@ -1930,6 +1926,21 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 			if (ImGui::Button("Abort")) {
 				disconnect();
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
+		else if (!connect_called && !is_replaying()) {
+			/*
+				Before the game connects: a moment for the identity cert on its way, longer for ranked, which needs it.
+			*/
+
+			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
+			text("\n");
+			text_color("Waiting for your account to be confirmed by hypersomnia.io...", yellow);
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
