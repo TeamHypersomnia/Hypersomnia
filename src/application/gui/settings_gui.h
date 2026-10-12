@@ -201,7 +201,7 @@ struct stun_manager_window : public standard_window_mixin<stun_manager_window> {
 };
 
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
-	settings_pane active_pane = settings_pane::GENERAL;
+	settings_pane active_pane = settings_pane::ACCOUNT;
 	audio_settings_pane active_audio_pane = audio_settings_pane::VOLUME;
 	graphics_settings_pane active_graphics_pane = graphics_settings_pane::RENDERING;
 	interface_settings_pane active_interface_pane = interface_settings_pane::LAYOUT;
