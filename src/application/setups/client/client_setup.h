@@ -869,6 +869,29 @@ public:
 
 				client_time = std::max(client_time, current_time - advanced_dt);
 			}
+
+#if !PLATFORM_WEB
+			/*
+				Netcode timeouts are off (a hidden browser tab is paused, not dropped),
+				so a server that died or a network that went away would leave the game frozen for good.
+				The server sends a step every tick - 10 seconds without one is a lost connection.
+				Not on the web: a tab coming back would time out before reading what waits for it.
+			*/
+
+			const bool server_went_silent =
+				state == client_state_type::IN_GAME
+				&& !pause_solvable_stream
+				&& when_sent_last_referential_step > 0
+				&& current_time - when_sent_last_referential_step > 10.0
+				&& is_connected()
+			;
+
+			if (server_went_silent) {
+				LOG("No steps from the server for 10 seconds - disconnecting.");
+				set_disconnect_reason("Nothing came from the server for 10 seconds.\nThe server may be down, or your connection may have dropped.");
+				disconnect();
+			}
+#endif
 		}
 	}
 
