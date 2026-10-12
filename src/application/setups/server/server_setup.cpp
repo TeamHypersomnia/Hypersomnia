@@ -59,6 +59,7 @@
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "augs/misc/to_hex_str.h"
 #include "augs/string/hex.h"
+#include "augs/network/address_network.h"
 
 #include "application/setups/server/server_json_events.h"
 #include "augs/readwrite/json_readwrite.h"
@@ -935,6 +936,9 @@ server_setup::server_setup(
 			[this](auto&&... args) {
 				return this->receive_packet_override(std::forward<decltype(args)>(args)...);
 			},
+			[this](const netcode_address_t& from) {
+				return this->allow_handshake(from);
+			},
 			is_webrtc_only(),
 			this_server_key
 		)
@@ -1168,8 +1172,7 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 
 				/*
 					The channel can close in the very receive that completes the handshake, before the connection
-					event sets the client. Lost here, the client would hold its slot and its WebRTC id until a restart:
-					a paused WebRTC client is never timed out, and its id would refuse every next peer given it.
+					event sets the client. Lost here, the client would hold its slot and its WebRTC id until it times out.
 				*/
 
 				if (!found && closed_datachannels_of_unset_clients.size() < max_incoming_connections_v) {
@@ -1427,10 +1430,8 @@ uint32_t server_setup::get_game_capacity() const {
 /*
 	Whether a new connection gets a game slot.
 
-	No fixed limit per address (schools, LAN parties, carrier NAT). But when the server is full and someone from
-	another address wants in, an address holding more than half of the slots gives one up: its newest player
-	(a spectator first, never an admin) is told why. A troll's clients can not keep a server for themselves,
-	a school still fills an empty one. Not on tournament servers, where everyone sits at one address.
+	No limit per address on casual servers (schools, LAN parties, carrier NAT) - a full server is just full,
+	and a troll is for the admins to ban.
 
 	On a ranked server at most max_ranked_players_per_ip from one address: two at home, never a team of one's own accounts.
 */
@@ -1467,70 +1468,6 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 
 	if (admitted.size() < capacity) {
 		return;
-	}
-
-	/*
-		Only for someone who may join at all - with the server password, if there is one.
-	*/
-
-	const bool may_evict =
-		!vars.authenticate_with_nicknames
-		&& !vars.requires_authentication()
-		&& !ip.empty()
-		&& is_authorized_for_access(id)
-	;
-
-	if (may_evict) {
-		auto count_by_ip = std::unordered_map<std::string, std::vector<client_id_type>>();
-
-		for (const auto other_id : admitted) {
-			/*
-				Players without an address (relayed through TURN) are no one network.
-			*/
-
-			if (const auto other_ip = get_client_ip_for_bans(other_id); !other_ip.empty()) {
-				count_by_ip[other_ip].push_back(other_id);
-			}
-		}
-
-		const auto biggest = std::max_element(count_by_ip.begin(), count_by_ip.end(), [](const auto& a, const auto& b) {
-			return a.second.size() < b.second.size();
-		});
-
-		const bool holds_more_than_half = biggest != count_by_ip.end() && biggest->second.size() * 2 > capacity;
-
-		if (holds_more_than_half && biggest->first != ip) {
-			/*
-				The newest from that address, a spectator before a player, never an admin.
-			*/
-
-			auto candidates = biggest->second;
-
-			erase_if(candidates, [&](const auto other_id) {
-				return get_rcon_level(other_id) >= rcon_level_type::BASIC;
-			});
-
-			std::stable_sort(candidates.begin(), candidates.end(), [&](const auto a, const auto b) {
-				const bool a_spectates = !::is_actual_faction(get_assigned_faction(to_mode_player_id(a)));
-				const bool b_spectates = !::is_actual_faction(get_assigned_faction(to_mode_player_id(b)));
-
-				if (a_spectates != b_spectates) {
-					return a_spectates;
-				}
-
-				return clients[a].when_connected > clients[b].when_connected;
-			});
-
-			if (!candidates.empty()) {
-				const auto freed = candidates.front();
-
-				LOG("Server full: freeing the slot of %x for a player from another network.", clients[freed].get_nickname());
-
-				kick(freed, "A slot was freed for a player from another network:\ntoo many players from your network on this server.");
-				clients[freed].kick_no_linger = true;
-				return;
-			}
-		}
 	}
 
 	kick(id, "The server is full.");
@@ -4005,9 +3942,15 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (!player_added_to_mode(mode_id)) {
+				/*
+					Neither kick lingers: during a match the netcode has only a few spare slots,
+					and connections that wait to be kicked could hold all of them - keeping out a player rejoining after a drop.
+				*/
+
 				if (!is_joinable()) {
 					/* Joined too late. */
 					kick(client_id, "Joined too late! Match is ongoing.");
+					c.kick_no_linger = true;
 				}
 
 				if (c.is_authenticated()) {
@@ -4029,6 +3972,7 @@ void server_setup::advance_clients_state() {
 						);
 
 						kick(client_id, "Connected to a wrong match.");
+						c.kick_no_linger = true;
 					}
 				}
 			}
@@ -5724,11 +5668,22 @@ void server_setup::save_bans() const {
 	an IPv6 address counts as its /64, an IPv4-mapped one as the IPv4 address.
 */
 
-static std::string address_for_bans(const std::string& ip) {
-	if (ip.empty() || ip.find(':') == std::string::npos) {
-		return ip;
+static std::string address_for_bans(const netcode_address_t& address) {
+	const auto n = augs::network_of(address);
+
+	if (n.type == NETCODE_ADDRESS_IPV4) {
+		return typesafe_sprintf("%x.%x.%x.%x", n.data.ipv4[0], n.data.ipv4[1], n.data.ipv4[2], n.data.ipv4[3]);
 	}
 
+	if (n.type == NETCODE_ADDRESS_IPV6) {
+		const auto& g = n.data.ipv6;
+		return typesafe_sprintf("%h:%h:%h:%h::/64", g[0], g[1], g[2], g[3]);
+	}
+
+	return "";
+}
+
+static std::string address_for_bans(const std::string& ip) {
 	auto bare = ip;
 
 	if (bare.size() >= 2 && bare.front() == '[' && bare.back() == ']') {
@@ -5737,18 +5692,11 @@ static std::string address_for_bans(const std::string& ip) {
 
 	auto parsed = netcode_address_t();
 
-	if (netcode_parse_address(bare.c_str(), &parsed) != NETCODE_OK || parsed.type != NETCODE_ADDRESS_IPV6) {
+	if (bare.empty() || netcode_parse_address(bare.c_str(), &parsed) != NETCODE_OK) {
 		return ip;
 	}
 
-	const auto& g = parsed.data.ipv6;
-	const bool ipv4_mapped = g[0] == 0 && g[1] == 0 && g[2] == 0 && g[3] == 0 && g[4] == 0 && g[5] == 0xffff;
-
-	if (ipv4_mapped) {
-		return typesafe_sprintf("%x.%x.%x.%x", g[6] >> 8, g[6] & 0xff, g[7] >> 8, g[7] & 0xff);
-	}
-
-	return typesafe_sprintf("%h:%h:%h:%h::/64", g[0], g[1], g[2], g[3]);
+	return ::address_for_bans(parsed);
 }
 
 std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const {
@@ -5762,14 +5710,74 @@ std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const
 		return "";
 	}
 
-	/*
-		yojimbo prints no port when it is zero.
-	*/
+	return ::address_for_bans(to_netcode_addr(c.address));
+}
 
-	auto without_port = c.address;
-	without_port.SetPort(0);
+/*
+	Handshakes (each an X25519) per address, before netcode's cap for all together: 20 a second, bursts of 40,
+	an address counted as for bans - a WebRTC peer by the address it really connects from, by its own id if that is unknown.
+	The local machine is not limited. A full table takes no new addresses - netcode's cap still holds then.
+*/
 
-	return ::address_for_bans(::ToString(without_port));
+bool server_setup::allow_handshake(const netcode_address_t& from) {
+	constexpr double per_second = 20.0;
+	constexpr double burst = 40.0;
+	constexpr std::size_t max_addresses = 4096;
+
+	const bool webrtc_peer = ::is_internal_webrtc_address(from);
+
+	const bool local = [&]() {
+		if (webrtc_peer) {
+			return false;
+		}
+
+		if (from.type == NETCODE_ADDRESS_IPV4) {
+			return from.data.ipv4[0] == 127;
+		}
+
+		const auto& g = from.data.ipv6;
+		return from.type == NETCODE_ADDRESS_IPV6 && g[0] == 0 && g[1] == 0 && g[2] == 0 && g[3] == 0 && g[4] == 0 && g[5] == 0 && g[6] == 0 && g[7] == 1;
+	}();
+
+	if (local) {
+		return true;
+	}
+
+	const auto key = [&]() -> std::string {
+		if (webrtc_peer) {
+			if (webrtc_server) {
+				if (const auto ip = webrtc_server->remote_ip(from.port); !ip.empty()) {
+					return ::address_for_bans(ip);
+				}
+			}
+
+			return typesafe_sprintf("webrtc:%x", from.port);
+		}
+
+		return ::address_for_bans(from);
+	}();
+
+	const auto now = augs::steady_secs();
+
+	if (handshakes_by_address.size() >= max_addresses && !found_in(handshakes_by_address, key)) {
+		erase_if(handshakes_by_address, [&](const auto& entry) { return now - entry.second.when_last > burst / per_second; });
+
+		if (handshakes_by_address.size() >= max_addresses) {
+			return true;
+		}
+	}
+
+	auto& b = handshakes_by_address.try_emplace(key, handshake_bucket { burst, now }).first->second;
+
+	b.tokens = std::min(burst, b.tokens + (now - b.when_last) * per_second);
+	b.when_last = now;
+
+	if (b.tokens < 1.0) {
+		return false;
+	}
+
+	b.tokens -= 1.0;
+	return true;
 }
 
 const server_ban* server_setup::find_ban(const std::string& account, const std::string& ip) const {

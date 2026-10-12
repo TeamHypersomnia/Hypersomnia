@@ -931,7 +931,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								std::size_t from_this_ip = 0;
 
 								for (const auto& other : server_list) {
-									if (masterserver_network_of(other.first) == masterserver_network_of(from)) {
+									if (augs::network_of(other.first) == augs::network_of(from)) {
 										++from_this_ip;
 									}
 								}

@@ -236,6 +236,14 @@ class server_setup :
 	static bool is_webrtc_only();
 
 	bool handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n);
+
+	struct handshake_bucket {
+		double tokens = 0.0;
+		double when_last = 0.0;
+	};
+
+	std::unordered_map<std::string, handshake_bucket> handshakes_by_address;
+	bool allow_handshake(const netcode_address_t& from);
 	bool send_packet_override(const netcode_address_t&,const std::byte*,int);
 	int receive_packet_override(netcode_address_t&,std::byte*,int);
 

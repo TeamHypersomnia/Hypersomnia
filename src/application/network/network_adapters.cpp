@@ -36,6 +36,14 @@ void GameAdapter::OnServerClientDisconnected(const int clientIndex) {
 	}
 }
 
+bool GameAdapter::AllowHandshake(const yojimbo::Address& from) {
+	if (m_server != nullptr && m_server->allow_handshake) {
+		return m_server->allow_handshake(to_netcode_addr(from));
+	}
+
+	return true;
+}
+
 void server_adapter::stop() {
 	server.Stop();
 }
@@ -234,6 +242,7 @@ server_adapter::server_adapter(
 	auxiliary_command_callback_type auxiliary_command_callback,
 	send_packet_override_type send_packet_override,
 	receive_packet_override_type receive_packet_override,
+	allow_handshake_type allow_handshake,
 	const bool is_webrtc_only,
 	const augs::ed25519_seed_type& server_key
 ) :
@@ -264,7 +273,8 @@ server_adapter::server_adapter(
 	),
 	auxiliary_command_callback(auxiliary_command_callback),
 	send_packet_override(send_packet_override),
-	receive_packet_override(receive_packet_override)
+	receive_packet_override(receive_packet_override),
+	allow_handshake(allow_handshake)
 {
 	auto slots = in.slots;
 

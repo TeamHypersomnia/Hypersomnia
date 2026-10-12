@@ -16,8 +16,10 @@ struct netcode_address_t;
 using auxiliary_command_callback_type = std::function<bool (const netcode_address_t&, const std::byte*, std::size_t n)>;
 using send_packet_override_type = std::function<bool (const netcode_address_t&,const std::byte*,int)>;
 using receive_packet_override_type = std::function<int (netcode_address_t&,std::byte*,int)>;
+using allow_handshake_type = std::function<bool (const netcode_address_t&)>;
 
 class server_adapter {
+	friend class GameAdapter;
 	friend bool auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes);
 	friend void send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes);
 	friend bool aux_send_packet(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes);
@@ -31,6 +33,7 @@ class server_adapter {
 	auxiliary_command_callback_type auxiliary_command_callback;
 	send_packet_override_type send_packet_override;
 	receive_packet_override_type receive_packet_override;
+	allow_handshake_type allow_handshake;
 
 	struct connection_event {
 		client_id_type client_id = dead_client_id_v;
@@ -60,6 +63,7 @@ public:
 		auxiliary_command_callback_type,
 		send_packet_override_type,
 		receive_packet_override_type,
+		allow_handshake_type,
 		bool is_webrtc_only,
 		const augs::ed25519_seed_type& server_key
 	);

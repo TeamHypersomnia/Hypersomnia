@@ -2,27 +2,12 @@
 #include <cstdint>
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
+#include "augs/network/address_network.h"
 
 #include "augs/string/path_sanitization.h"
 #include "augs/templates/bit_cast.h"
 
 void yojimbo_random_bytes( uint8_t * data, int bytes );
-
-/*
-	The network an address belongs to for the per-address limits: an IPv4 address, or an IPv6 /64. The port is ignored.
-*/
-
-inline netcode_address_t masterserver_network_of(netcode_address_t a) {
-	a.port = 0;
-
-	if (a.type == NETCODE_ADDRESS_IPV6) {
-		for (int i = 4; i < 8; ++i) {
-			a.data.ipv6[i] = 0;
-		}
-	}
-
-	return a;
-}
 
 class signalling_server {
 public:

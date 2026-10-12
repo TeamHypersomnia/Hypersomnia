@@ -39,6 +39,7 @@ public:
 
 	void OnServerClientConnected(int clientIndex) override;
 	void OnServerClientDisconnected(int clientIndex) override;
+	bool AllowHandshake(const yojimbo::Address& from) override;
    
 private:
     server_adapter* m_server;
