@@ -898,7 +898,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			if (identity_key::from_export_string(entered).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || entered.size() > 40) {
 				link_code_text.clear();
-				finish(false, "That was your key, not a link code - it was not sent anywhere.\n\nNever paste the private key anywhere but Import private key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/profile.");
+				finish(false, "That was your key, not a link code - it was not sent anywhere.\n\nNever paste the private key anywhere but Import private key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/link.");
 				return;
 			}
 		}
@@ -912,7 +912,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 
 		if (code.size() != 8) {
-			link_flow_message = "The link code is the 8 letters and digits shown on hypersomnia.io/profile.";
+			link_flow_message = "The link code is the 8 letters and digits shown on hypersomnia.io/link.";
 			return;
 		}
 
@@ -1145,12 +1145,12 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
 #if PLATFORM_WEB
-				text("Sign in with Steam in the new tab.\n\nOr get a code on hypersomnia.io/profile and enter it here:");
+				text("Sign in with Steam in the new tab.\n\nOr get a code on hypersomnia.io/link and enter it here:");
 #else
-				text("Sign in through Steam on hypersomnia.io/profile\nand enter the code shown there:");
+				text("Sign in through Steam on hypersomnia.io/link\nand enter the code shown there:");
 
-				if (ImGui::Button("Open hypersomnia.io/profile")) {
-					augs::open_url(website_url + "/profile");
+				if (ImGui::Button("Open hypersomnia.io/link")) {
+					augs::open_url(website_url + "/link");
 				}
 #endif
 
