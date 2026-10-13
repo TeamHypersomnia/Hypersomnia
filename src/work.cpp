@@ -2052,6 +2052,12 @@ work_result work(
 
 		identity->advance(get_identity_input(), now);
 
+		if (identity->take_linked_quietly() && !config.client.use_account_profile) {
+			change_with_save([](auto& cfg) {
+				cfg.client.use_account_profile = true;
+			});
+		}
+
 		/*
 			Not in the browser: nobody pastes a key into its storage by hand there - another tab's change is not an import.
 		*/

@@ -341,6 +341,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	*/
 
 	augs::future<std::optional<augs::path_type>> chosen_key_copy_path;
+	bool no_save_dialog_note = false;
 
 	void perform_account_link_pane(const std::string& website_url);
 	void perform_account_manage_pane(augs::window& window);

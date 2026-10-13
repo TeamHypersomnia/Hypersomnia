@@ -332,13 +332,31 @@ namespace identity_key {
 
 	bool save_copy(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
 		/*
-			The player chose to overwrite a file there in the save dialog.
+			The player chose to overwrite a file there in the save dialog (e.g. another account's copy).
 		*/
 
-		std::error_code ec;
-		std::filesystem::remove(path, ec);
+		/*
+			Written next to it first - a failed write leaves the file that was there as it was.
+		*/
 
-		return write_private_file(path, to_export_string(seed) + "\n");
+		auto temporary = path;
+		temporary += ".new";
+
+		std::error_code ec;
+		std::filesystem::remove(temporary, ec);
+
+		if (!write_private_file(temporary, to_export_string(seed) + "\n")) {
+			return false;
+		}
+
+		std::filesystem::rename(temporary, path, ec);
+
+		if (ec) {
+			std::filesystem::remove(temporary, ec);
+			return false;
+		}
+
+		return true;
 	}
 
 	bool restore_newest_backup(const augs::path_type& path) {

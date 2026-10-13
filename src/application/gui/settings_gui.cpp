@@ -722,6 +722,7 @@ void settings_gui_state::on_key_replaced_outside() {
 	link_flow = link_flow_type::IDLE;
 	link_answer_lost = false;
 	link_lost_reason.clear();
+	link_code_from_steam.reset();
 	link_target_request.reset();
 	link_listener.stop();
 	link_request.reset();
@@ -757,6 +758,12 @@ void settings_gui_state::perform_import_modal(
 	}
 
 	center_next_modal();
+
+	/*
+		At least as wide as its title - a short result ("Key restored") would cut it.
+	*/
+
+	ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::CalcTextSize("Restore from private key").x + ImGui::GetStyle().WindowPadding.x * 2 + 40, 0), ImVec2(FLT_MAX, FLT_MAX));
 	ImGui::OpenPopup("Restore from private key##Modal");
 
 	if (!ImGui::BeginPopupModal("Restore from private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -1092,7 +1099,10 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	*/
 
 	const bool import_clicked = [&]() {
-		auto scope = maybe_disabled_cols({}, in_ranked_match);
+		/*
+			Not greyed during ranked - clicked, it says why it can not be done now, as the other buttons do.
+		*/
+
 		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange }, { " file...", white } });
 	}();
 
@@ -1273,8 +1283,11 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			const bool save_copy_clicked = colored_button("SaveKeyCopy", { { "Save a copy...", white } });
 
 			if (save_copy_clicked && !window.has_file_dialog()) {
-				account_message = std::string("No file dialog on this system (install zenity).\nCopy account.key yourself - Show key file in folder.");
-				reveal_private_key_open = false;
+				/*
+					Said here, next to Show key file in folder - a message of its own would close this window.
+				*/
+
+				no_save_dialog_note = true;
 			}
 			else if (save_copy_clicked && !chosen_key_copy_path.valid()) {
 				chosen_key_copy_path = launch_async(
@@ -1299,6 +1312,10 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			if (ImGui::Button("Show key file in folder")) {
 				window.reveal_in_explorer(augs::exists(key_path) ? key_path : keys_dir);
 			}
+
+			if (no_save_dialog_note) {
+				text_color("No file dialog on this system (install zenity) - copy account.key yourself (Show key file in folder).", orange);
+			}
 #else
 			(void)window;
 
@@ -1317,6 +1334,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 			if (ImGui::Button("Close##PrivateKey", ImVec2(120, 0))) {
 				reveal_private_key_open = false;
+				no_save_dialog_note = false;
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -1391,9 +1409,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 						(void)backup;
 						account_message = std::string("A new account is made right away.");
 #else
+						/*
+							Only the file's name - the whole path does not fit; it is next to account.key (Show key file in folder).
+						*/
+
 						account_message = typesafe_sprintf(
-							"A new account is made right away.\n\nThe old key is kept as:\n    %x",
-							augs::string_windows_friendly(*backup)
+							"A new account is made right away.\n\nThe old key is kept next to account.key as:\n    %x",
+							augs::string_windows_friendly(backup->filename())
 						);
 #endif
 					}
@@ -4147,7 +4169,7 @@ void settings_gui_state::perform(
 									The account is Steam's or CrazyGames' - only not signed in right now.
 								*/
 
-								text_disabled(typesafe_sprintf("Until you are signed in to %x, progress counts towards this %x.", signed_in.provider_label, identity_key::account_kind_name_lowercase()));
+								text_disabled(typesafe_sprintf("Until you are signed in to %x,\nprogress counts towards this %x.", signed_in.provider_label, identity_key::account_kind_name_lowercase()));
 							}
 							else if (is_key) {
 #if WEB_CRAZYGAMES

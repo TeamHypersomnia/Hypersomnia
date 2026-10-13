@@ -168,11 +168,27 @@ namespace augs {
 	) {
 		const auto title = custom_title.empty() ? "Save File" : custom_title;
 
+		/*
+			A bare name would start in the game's working directory - read-only in an AppImage, gone with a reinstall.
+		*/
+
+		const auto default_path = [&]() -> std::string {
+			if (default_name.empty() || default_name.front() == '/') {
+				return default_name;
+			}
+
+			if (const char* const home = std::getenv("HOME")) {
+				return std::string(home) + "/" + default_name;
+			}
+
+			return default_name;
+		}();
+
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
 
-			if (!default_name.empty()) {
-				cmd += " --filename=" + shell_escape(default_name);
+			if (!default_path.empty()) {
+				cmd += " --filename=" + shell_escape(default_path);
 			}
 
 			for (const auto& f : filters) {
@@ -187,7 +203,7 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += f.patterns_joined(" ");
 			}
-			std::string cmd = "kdialog --getsavefilename " + shell_escape(default_name.empty() ? std::string(".") : default_name) + " " + shell_escape(filter_str) + " --title " + shell_escape(title);
+			std::string cmd = "kdialog --getsavefilename " + shell_escape(default_path.empty() ? std::string(".") : default_path) + " " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 

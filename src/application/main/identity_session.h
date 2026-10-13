@@ -121,6 +121,7 @@ private:
 
 	bool cert_held_for_ranked = false;
 	bool crazygames_token_refused = false;
+	bool linked_quietly = false;
 	double retry_delay = 30.0;
 	double last_now = 0.0;
 	int attempts_finished = 0;
@@ -238,6 +239,15 @@ public:
 	/*
 		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
 	*/
+
+	/*
+		A quiet check found the key linked (e.g. linked in another tab): the game uses the Steam name and avatar then,
+		as after linking here.
+	*/
+
+	bool take_linked_quietly() {
+		return std::exchange(linked_quietly, false);
+	}
 
 	bool take_crazygames_token_refused() {
 		return std::exchange(crazygames_token_refused, false);

@@ -555,6 +555,18 @@ void identity_session::advance(const input& in, const double now) {
 			}
 		}
 		else if (is_key_account(answer->cert.account)) {
+			/*
+				Asked quietly (e.g. after an unlink whose answer got lost) while still holding a Steam cert:
+				the key is no longer linked - back to its own account, as after an unlink.
+			*/
+
+			const bool holding_steam_cert = broker_cert.has_value() && !is_key_account(broker_cert->account);
+
+			if (key_check_quiet && holding_steam_cert && !cert_held_for_ranked) {
+				LOG("The key is no longer linked to a Steam account (found on a quiet check).");
+				on_unlinked();
+			}
+
 			link_check = link_check_state::NOT_LINKED;
 			link_check_profile = answer->profile;
 			key_check_quiet = false;
@@ -576,6 +588,10 @@ void identity_session::advance(const input& in, const double now) {
 			/*
 				Linked: the Steam cert is ours from now on, and steam.cert says so on the next start.
 			*/
+
+			if (key_check_quiet) {
+				linked_quietly = true;
+			}
 
 			link_check = link_check_state::LINKED;
 			link_check_profile = answer->profile;

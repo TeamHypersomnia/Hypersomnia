@@ -401,8 +401,10 @@ function pre_run() {
   // Safari clears a site's storage after 7 days without a visit unless it is persisted - the game warns there (Info).
   // Other browsers refusing persist() only clear it under storage pressure - no warning for them.
   // Every browser on iOS is WebKit underneath - the same rules
+  // (an iPad says "Macintosh" - told apart by its touch screen)
   const is_safari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent)
-    || /iPad|iPhone|iPod/.test(navigator.userAgent);
+    || /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
   if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().then(granted => {
