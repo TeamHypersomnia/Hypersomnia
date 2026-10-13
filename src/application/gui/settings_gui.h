@@ -15,6 +15,7 @@
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "application/main/identity_session.h"
+#include "application/main/loopback_link_listener.h"
 #include "view/necessary_resources.h"
 
 struct config_json_table;
@@ -228,12 +229,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::vector<std::string> user_hrtf_presets;
 
 	std::string import_key_text;
-	std::string link_code_text;
 	std::optional<augs::ed25519_seed_type> import_to_confirm;
 
-	std::optional<augs::ed25519_seed_type> account_seed;
-	double when_account_seed_loaded = -1.0;
-	bool account_seed_reload_needed = true;
 
 	/*
 		A key file that does not read is told only once it stayed so for a moment -
@@ -254,9 +251,15 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	augs::async_response_ptr link_target_request;
 	std::string link_target_code;
-	std::optional<link_target> link_target_to_confirm;
 
 	std::string steam_link_state;
+
+	/*
+		Native: where the browser comes back after the sign-in through Steam.
+	*/
+
+	loopback_link_listener link_listener;
+	int link_listener_port = 0;
 	std::optional<std::string> link_code_from_steam;
 
 	/*
@@ -267,7 +270,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 		IDLE,
 		CHECKING_BEFORE,
 		NEEDS_STEAM_SIGN_IN,
-		CONFIRMING,
 		LINKING,
 		CHECKING_AFTER,
 		DONE
@@ -277,12 +279,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string link_flow_message;
 	std::string linked_name;
 	bool linked_has_avatar = false;
-
-	/*
-		The code already sent as typed - a failed one is not sent again until it changes.
-	*/
-
-	std::string auto_requested_code;
 	bool link_flow_succeeded = false;
 
 	/*
@@ -334,6 +330,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	void perform_account_message_modal();
 
+	std::optional<augs::ed25519_seed_type> current_account_seed();
+
 public:
 	bool is_steam_client = false;
 
@@ -364,6 +362,18 @@ public:
 	bool avatar_changed = false;
 
 	/*
+		account.key was just replaced or forgotten here - the game reads it again.
+	*/
+
+	bool key_file_changed = false;
+
+	/*
+		Set by the game: a ranked match is on - the key may not be replaced meanwhile.
+	*/
+
+	bool in_ranked_match = false;
+
+	/*
 		Set by the game: the avatar preview shows the account's avatar, not one's own - only then is it shown as the account's.
 	*/
 
@@ -392,6 +402,12 @@ public:
 	*/
 
 	void on_key_replaced_outside();
+
+	/*
+		account.key does not read and there is no key to play with: Manage, with what to do.
+	*/
+
+	void on_key_unreadable();
 
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;

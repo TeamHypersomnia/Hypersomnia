@@ -90,6 +90,7 @@ public:
 
 private:
 	augs::ed25519_seed_type key_seed = {};
+	bool key_loaded = false;
 	augs::ed25519_public_key_type key_public = {};
 	std::array<uint8_t, 64> key_secret = {};
 
@@ -233,6 +234,14 @@ public:
 
 	const std::array<uint8_t, 64>& session_secret_key() const { return key_secret; }
 	const augs::ed25519_public_key_type& public_key() const { return key_public; }
+
+	/*
+		The key the game plays with, read from account.key - none until a file reads (e.g. a damaged one at the start).
+	*/
+
+	std::optional<augs::ed25519_seed_type> key_seed_if_loaded() const {
+		return key_loaded ? std::optional<augs::ed25519_seed_type>(key_seed) : std::nullopt;
+	}
 	std::string key_account() const;
 
 	/*
@@ -246,6 +255,12 @@ public:
 	*/
 
 	void recheck_link_quietly();
+
+	/*
+		"Continue without Steam" after a check that failed: the key counts as seen, and is asked about quietly later.
+	*/
+
+	void continue_without_link_check();
 
 	/*
 		True once when a key not seen before began its link check - the game shows it as an import.

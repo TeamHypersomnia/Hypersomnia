@@ -35,6 +35,7 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	}
 
 	key_seed = seed;
+	key_loaded = true;
 
 	if (const auto public_key = augs::ed25519_public_key(key_seed)) {
 		key_public = *public_key;
@@ -420,9 +421,18 @@ void identity_session::advance(const input& in, const double now) {
 			LOG("Checking the key's link failed (HTTP %x).", response.status);
 			link_check = link_check_state::FAILED;
 
-			if (key_check_quiet) {
+			/*
+				Asked again only when hypersomnia.io may answer later - not after a refusal (e.g. a ban).
+			*/
+
+			const bool may_answer_later = response.status <= 0 || response.status == 429 || response.status >= 500;
+
+			if (key_check_quiet && may_answer_later) {
 				key_check_wanted = true;
 				key_check_next_at = now + key_recheck_delay_secs;
+			}
+			else {
+				key_check_quiet = false;
 			}
 		}
 		else if (is_key_account(answer->cert.account)) {
@@ -667,7 +677,25 @@ void identity_session::start_link_check(const std::string& broker_url) {
 }
 
 void identity_session::clear_link_check() {
+	/*
+		A quiet check dropped by the UI is not given up - it is asked again in the background.
+	*/
+
+	if (key_check_quiet && link_check == link_check_state::PENDING) {
+		key_check_wanted = true;
+		key_check_next_at = last_now;
+	}
+
 	link_check_request.reset();
 	link_check = link_check_state::NONE;
 	link_check_profile = {};
+}
+
+void identity_session::continue_without_link_check() {
+	/*
+		Not asked again at every start - but quietly, until hypersomnia.io answers.
+	*/
+
+	save_checked_key();
+	recheck_link_quietly();
 }

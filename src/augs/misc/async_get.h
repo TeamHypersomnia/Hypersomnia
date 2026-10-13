@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "augs/misc/async_response.h"
 
 #if PLATFORM_WEB
@@ -47,31 +48,45 @@ namespace augs {
 			headerData.push_back(nullptr); // Terminate the headers array
 			attr.requestHeaders = headerData.data();
 
+			/*
+				The fetch owns a reference of its own - the caller may drop its pointer (a cancel, a new key)
+				while the request is still on its way.
+			*/
+
+			using owner_type = std::shared_ptr<async_response>;
+
 			attr.onsuccess = [](emscripten_fetch_t* fetch) {
 				ensure(fetch != nullptr);
 				LOG("async_get: onsuccess %x", fetch->status);
-				auto response = static_cast<async_response*>(fetch->userData);
-				response->set({ fetch->status, std::string(fetch->data, fetch->numBytes) });
+				const auto owner = std::unique_ptr<owner_type>(static_cast<owner_type*>(fetch->userData));
+				(*owner)->set({ fetch->status, std::string(fetch->data, fetch->numBytes) });
 				emscripten_fetch_close(fetch);
 			};
 
 			attr.onerror = [](emscripten_fetch_t* fetch) {
 				ensure(fetch != nullptr);
 				LOG("async_get: onerror %x", fetch->status);
-				auto response = static_cast<async_response*>(fetch->userData);
-				response->set({ fetch->status, "" });
+				const auto owner = std::unique_ptr<owner_type>(static_cast<owner_type*>(fetch->userData));
+
+				/*
+					An HTTP error still has a body - e.g. why a code or a link was refused.
+				*/
+
+				const auto body = fetch->status > 0 && fetch->data != nullptr ? std::string(fetch->data, fetch->numBytes) : std::string();
+				(*owner)->set({ fetch->status, body });
 				emscripten_fetch_close(fetch);
 			};
 
 			attr.onprogress = [](emscripten_fetch_t* fetch) {
 				ensure(fetch != nullptr);
-				auto response = static_cast<async_response*>(fetch->userData);
+				const auto& response = *static_cast<owner_type*>(fetch->userData);
+
 				if (fetch->totalBytes > 0 && response->get_on_progress()) {
 					response->get_on_progress()(fetch->numBytes, fetch->totalBytes);
 				}
 			};
 
-			attr.userData = response.get();
+			attr.userData = new owner_type(response);
 			std::string full_url = base_url + location;
 			LOG("async_get: emscripten_fetch %x%x", base_url, location.substr(0, location.find('?')));
 			const auto fetch = emscripten_fetch(&attr, full_url.c_str());

@@ -1824,19 +1824,27 @@ work_result work(
 
 	/*
 		"This computer": the key every game has (.keys/account.key, the browser's key on the web), created on the first start.
-		Read again when the file changes (an import or a forget in the Account settings) - a forgotten key is replaced
-		by a new one right away, since every connection needs a cert. See identity_session.h.
+		Read at the start, when the window gets the focus back (a key pasted into the file meanwhile) and after an import
+		or a forget in the Account settings - a forgotten key is replaced by a new one right away, since every connection
+		needs a cert. See identity_session.h.
 	*/
 
 	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
-	WEBSTATIC double account_seed_checked_at = -1000.0;
+	WEBSTATIC bool account_seed_read_once = false;
+	WEBSTATIC bool window_was_active = true;
 
-	WEBSTATIC auto refresh_account_seed = [&](const double now) {
-		if (now - account_seed_checked_at < 1.0) {
+	WEBSTATIC auto refresh_account_seed = [&]() {
+		const bool active = window.is_active();
+		const bool focused_again = active && !window_was_active;
+		window_was_active = active;
+
+		const bool wanted = !account_seed_read_once || focused_again || std::exchange(settings_gui.key_file_changed, false);
+
+		if (!wanted) {
 			return;
 		}
 
-		account_seed_checked_at = now;
+		account_seed_read_once = true;
 
 		const auto path = USER_DIR / identity_key::file_name;
 
@@ -1848,6 +1856,14 @@ work_result work(
 
 		if (const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path)) {
 			account_seed = loaded;
+		}
+		else if (!account_seed.has_value()) {
+			/*
+				No key to play with at all (e.g. a damaged file at the start) - shown where it can be fixed.
+			*/
+
+			LOG("account.key could not be read.");
+			settings_gui.on_key_unreadable();
 		}
 
 		if (account_seed.has_value()) {
@@ -1902,7 +1918,7 @@ work_result work(
 		(void)crazygames_token_refreshed_at;
 #endif
 
-		refresh_account_seed(now);
+		refresh_account_seed();
 		identity->advance(get_identity_input(), now);
 
 #if !WEB_CRAZYGAMES
@@ -2235,6 +2251,13 @@ work_result work(
 	WEBSTATIC std::optional<int> retry_attempts_before;
 	WEBSTATIC std::optional<simple_popup> sign_in_popup;
 	WEBSTATIC bool sign_in_popup_before_connect = false;
+
+	/*
+		A ranked match played on Steam is rejoined only on Steam - as the local key the server would take it for leaving.
+	*/
+
+	WEBSTATIC bool sign_in_popup_for_rejoin = false;
+	WEBSTATIC bool rejoin_after_retry = false;
 	WEBSTATIC bool had_valid_cert = false;
 	WEBSTATIC bool failed_since_last_cert = false;
 	WEBSTATIC double signed_in_notice_until = -1.0;
@@ -2271,7 +2294,29 @@ work_result work(
 
 		sign_in_popup = popup;
 		sign_in_popup_before_connect = before_connect;
+		sign_in_popup_for_rejoin = false;
 		sign_in_message_shown = true;
+	};
+
+	WEBSTATIC auto open_rejoin_sign_in_popup = [&]() {
+		auto popup = simple_popup();
+		popup.title = "Can't rejoin";
+		popup.message = typesafe_sprintf(
+			"Can't rejoin the ranked match:\n"
+			"couldn't sign in to your %x account.\n"
+			"\n"
+			"The match is played on it - joining as your local key\n"
+			"would count as leaving it.",
+			provider_name()
+		);
+
+		if (!identity->last_error.empty()) {
+			popup.details = identity->last_error;
+		}
+
+		sign_in_popup = popup;
+		sign_in_popup_before_connect = false;
+		sign_in_popup_for_rejoin = true;
 	};
 
 	WEBSTATIC auto retry_sign_in = [&]() {
@@ -2330,6 +2375,8 @@ work_result work(
 		}
 
 		settings_gui.account_avatar_previewed = previewed_avatar_path == augs::path_type(ACCOUNT_AVATAR);
+
+		settings_gui.in_ranked_match = would_abandon_ranked_match();
 
 		if (settings_gui.link_avatar_to_upload.has_value()) {
 			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
@@ -2783,11 +2830,32 @@ work_result work(
 					return false;
 				}
 
+				const bool can_rejoin_on_account = [&]() {
+					if (!rejoined_match.has_value()) {
+						return true;
+					}
+
+					const auto& cert = identity->get_cert();
+					return identity->has_valid_cert(now) && cert.has_value() && cert->account == rejoined_match->account;
+				}();
+
+				if (!can_rejoin_on_account) {
+					LOG("Not rejoining %x without a valid cert for it.", rejoined_match->account);
+					open_rejoin_sign_in_popup();
+					return false;
+				}
+
 				if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
 					open_sign_in_popup(true);
 					return false;
 				}
 			}
+		}
+
+		if (!account_seed.has_value()) {
+			LOG("Not connecting without a readable account.key.");
+			settings_gui.on_key_unreadable();
+			return false;
 		}
 
 		auto identity_context = client_identity_context();
@@ -3130,7 +3198,15 @@ work_result work(
 		if (retry_attempts_before.has_value() && identity->get_attempts_finished() > *retry_attempts_before) {
 			retry_attempts_before.reset();
 
-			if (identity->sign_in_failed(in, now)) {
+			if (rejoin_after_retry) {
+				/*
+					Tries the rejoin again - it connects, or tells why not.
+				*/
+
+				rejoin_after_retry = false;
+				start_client_setup();
+			}
+			else if (identity->sign_in_failed(in, now)) {
 				open_sign_in_popup(false);
 			}
 		}
@@ -3140,7 +3216,22 @@ work_result work(
 		}
 
 		if (sign_in_popup.has_value()) {
-			if (sign_in_popup_before_connect) {
+			if (sign_in_popup_for_rejoin) {
+				const auto result = sign_in_popup->perform({
+					{ "Retry", rgba::zero, rgba::zero },
+					{ "Cancel", rgba::zero, rgba::zero }
+				});
+
+				if (result) {
+					sign_in_popup = std::nullopt;
+
+					if (result == 1) {
+						rejoin_after_retry = true;
+						retry_sign_in();
+					}
+				}
+			}
+			else if (sign_in_popup_before_connect) {
 				const auto result = sign_in_popup->perform({
 					{ "Connect anyway", rgba::zero, rgba::zero },
 					{ "Cancel", rgba::zero, rgba::zero }

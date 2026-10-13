@@ -2,6 +2,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include "application/network/account_id.h"
 #include "application/setups/server/rcon_level.h"
 
 /*
@@ -49,7 +50,7 @@ inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type
 	}
 
 	for (const auto& entry : profiles) {
-		if (entry.account != account_id) {
+		if (::normalize_account_id(entry.account) != account_id) {
 			continue;
 		}
 

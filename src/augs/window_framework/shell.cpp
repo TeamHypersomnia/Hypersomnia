@@ -88,10 +88,27 @@ namespace augs {
 	}
 #elif PLATFORM_UNIX
 	void open_url(const std::string& url) {
+		/*
+			Quoted for the shell - a URL with "&" would otherwise be cut there.
+		*/
+
+		auto quoted = std::string("'");
+
+		for (const auto c : url) {
+			if (c == '\'') {
+				quoted += "'\\''";
+			}
+			else {
+				quoted += c;
+			}
+		}
+
+		quoted += "'";
+
 #if PLATFORM_LINUX
-		std::string command = "xdg-open " + url;
+		std::string command = "xdg-open " + quoted;
 #else
-		std::string command = "open " + url;
+		std::string command = "open " + quoted;
 #endif
 
 		std::thread th(run_command, command);

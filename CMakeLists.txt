@@ -718,6 +718,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/main/identity_key.cpp"
 	"src/application/network/identity_cert.cpp"
 	"src/application/main/identity_session.cpp"
+	"src/application/main/loopback_link_listener.cpp"
 	"src/augs/string/path_sanitization.cpp"
 	"src/application/config_json_table.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"

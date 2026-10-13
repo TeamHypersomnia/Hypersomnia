@@ -2,10 +2,12 @@
 # UI test helpers: ui.sh <command> ...
 #   start <name> <display> [extra game args...]   fresh-or-existing client dir $U/<name>, game under Xvfb :<display>
 #   stop <name> <display>
+#   (the game's opened URLs never reach a browser: they go to $U/<name>/opened_urls - see browser_sign_in.sh)
 #   shot <display> <out.png>
 #   click <display> X Y | type <display> TEXT | key <display> NAME
 #   conf <name> [broker_url]                    (re)write the client's test config
 export ALSOFT_DRIVERS=null VISUAL=true
+HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH_ROOT:-/tmp/hypersomnia-ui}
 U=$S/ui
@@ -34,7 +36,8 @@ start)
 		(setsid Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &)
 		sleep 1
 	fi
-	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout ${SECS:-600} $BIN --appdata-dir $U/$name --no-update-on-launch "$@" > $U/$name/game.out 2>&1 < /dev/null &)
+	# No real browser: URLs the game opens go to $U/<name>/opened_urls (browser_sign_in.sh plays the browser)
+	(cd $REPO/hypersomnia && PATH="$HERE/fake_bin:$PATH" OPENED_URLS=$U/$name/opened_urls DISPLAY=:$d setsid timeout ${SECS:-600} $BIN --appdata-dir $U/$name --no-update-on-launch "$@" > $U/$name/game.out 2>&1 < /dev/null &)
 	;;
 stop)
 	name=$1; d=$2

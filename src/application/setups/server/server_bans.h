@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "application/network/account_id.h"
 
 /*
 	Bans of one server, kept in server_bans.json in its user folder, so they survive restarts
@@ -40,7 +41,7 @@ struct server_bans {
 				continue;
 			}
 
-			if ((!account.empty() && b.account == account) || (!ip.empty() && b.ip == ip)) {
+			if ((!account.empty() && ::normalize_account_id(b.account) == account) || (!ip.empty() && b.ip == ip)) {
 				return &b;
 			}
 		}

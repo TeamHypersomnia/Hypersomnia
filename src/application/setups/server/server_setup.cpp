@@ -25,6 +25,7 @@
 
 #include "application/network/net_message_translation.h"
 #include "application/network/net_serialize.h"
+#include "application/network/account_id.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
@@ -5233,8 +5234,9 @@ const server_client_state* server_setup::find_client_state(const std::string& ni
 	return result;
 }
 
-mode_player_id server_setup::find_client_by_account_id(const std::string& account_id) const {
+mode_player_id server_setup::find_client_by_account_id(const std::string& written_account_id) const {
 	mode_player_id result;
+	const auto account_id = ::normalize_account_id(written_account_id);
 
 	auto check_id = [&](const auto id, const auto& c) {
 		if (c.authenticated_id == account_id) {

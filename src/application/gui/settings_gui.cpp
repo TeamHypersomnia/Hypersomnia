@@ -42,6 +42,7 @@
 #include "application/config_json_table.h"
 #include "application/main/auth_provider_type.h"
 #include "application/main/identity_key.h"
+#include "application/main/ranked_match_record.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/window_framework/window.h"
@@ -518,10 +519,36 @@ static void link_avatar_and_name(const std::string& name, const bool has_avatar)
 void settings_gui_state::on_key_replaced_outside() {
 	open();
 	active_pane = settings_pane::ACCOUNT;
-	account_seed_reload_needed = true;
 	import_to_confirm.reset();
 	import_modal_open = true;
 	import_profile_applied = false;
+
+	/*
+		Whatever was being linked or unlinked was for the old key - the import modal takes over.
+	*/
+
+	link_flow = link_flow_type::IDLE;
+	link_target_request.reset();
+	link_listener.stop();
+	link_request.reset();
+	steam_link_state.clear();
+	confirm_unlink = false;
+	unlinking = false;
+	unlink_result.reset();
+}
+
+void settings_gui_state::on_key_unreadable() {
+	open();
+	active_pane = settings_pane::ACCOUNT;
+	active_account_pane = account_settings_pane::MANAGE;
+}
+
+std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
+	/*
+		The key the game plays with - the game reads the file, the settings never do.
+	*/
+
+	return identity != nullptr ? identity->key_seed_if_loaded() : std::nullopt;
 }
 
 void settings_gui_state::perform_import_modal(
@@ -659,8 +686,9 @@ void settings_gui_state::perform_import_modal(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Continue without Steam")) {
+		if (ImGui::Button("Continue without Steam") && identity != nullptr) {
 			identity->clear_link_check();
+			identity->continue_without_link_check();
 			import_modal_open = false;
 			ImGui::CloseCurrentPopup();
 		}
@@ -691,17 +719,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	const auto key_path = USER_DIR / identity_key::file_name;
 	const auto keys_dir = USER_DIR / identity_key::keys_dir_name;
 
-	{
-		const auto now = augs::high_precision_secs();
-
-		if (account_seed_reload_needed || now - when_account_seed_loaded > 1.0) {
-			account_seed = identity_key::load(key_path);
-			when_account_seed_loaded = now;
-			account_seed_reload_needed = false;
-		}
-	}
-
-	const auto seed = account_seed;
+	const auto seed = current_account_seed();
 
 	const auto public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
 		if (seed.has_value()) {
@@ -743,8 +761,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			key_unreadable_since = now;
 		}
 
-		account_seed_reload_needed = true;
-
 		if (augs::exists(key_path) && now - key_unreadable_since > 2.0) {
 			text_color("The key file is not a valid key. Fix it, import a key,\nor use Forget this key - the file is then kept as a backup.", red);
 		}
@@ -754,7 +770,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 	auto import_now = [&](const augs::ed25519_seed_type& imported) {
-		account_seed_reload_needed = true;
+		key_file_changed = true;
 
 		if (identity_key::save_replacing(key_path, imported).has_value()) {
 			import_key_text.clear();
@@ -782,7 +798,33 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 	ImGui::SameLine();
 
-	if (colored_button("ImportPrivateKey", { { "Import ", white }, { "private key", orange } })) {
+	/*
+		Not while a ranked match is on: its rejoin is tied to the account it was joined with.
+	*/
+
+	auto locked_by_ranked = [&]() {
+		/*
+			Also a match that can still be rejoined - read only when asked, on a click.
+		*/
+
+		if (in_ranked_match) {
+			return true;
+		}
+
+		const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
+		return record.has_value() && record->valid_now();
+	};
+	const auto ranked_lock_tooltip = std::string("Not during a ranked match.");
+
+	const bool import_clicked = [&]() {
+		auto scope = maybe_disabled_cols({}, in_ranked_match);
+		return colored_button("ImportPrivateKey", { { "Import ", white }, { "private key", orange } });
+	}();
+
+	if (import_clicked && locked_by_ranked()) {
+		account_message = ranked_lock_tooltip;
+	}
+	else if (import_clicked) {
 		if (const auto imported = identity_key::from_export_string(import_key_text)) {
 			if (seed.has_value() && *seed == *imported) {
 				account_message = "That is already your key.";
@@ -904,7 +946,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			const auto cols = danger_button_colors(rgba(200, 80, 0, 255));
 
 			if (ImGui::Button("Forget this key...")) {
-				confirm_forget_key = true;
+				if (locked_by_ranked()) {
+					account_message = ranked_lock_tooltip;
+				}
+				else {
+					confirm_forget_key = true;
+				}
 			}
 		}
 
@@ -942,7 +989,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
 
 				if (ImGui::Button("Forget key", ImVec2(120, 0))) {
-					account_seed_reload_needed = true;
+					key_file_changed = true;
 					key_unreadable_since = -1.0;
 
 					if (const auto backup = identity_key::forget(key_path)) {
@@ -981,8 +1028,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	using F = link_flow_type;
 	using L = identity_session::link_check_state;
 
-	const auto key_path = USER_DIR / identity_key::file_name;
-	const auto seed = account_seed.has_value() ? account_seed : identity_key::load(key_path);
+	const auto seed = current_account_seed();
 
 	const auto public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
 		if (seed.has_value()) {
@@ -1017,6 +1063,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	auto finish = [&](const bool succeeded, const std::string& message) {
+		link_listener.stop();
 		link_flow = F::DONE;
 		link_flow_succeeded = succeeded;
 		link_flow_message = message;
@@ -1027,43 +1074,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	/*
-		First the website says whose Steam account the code is for, and the player confirms it:
-		a code someone else gave them ("enter this for a badge") would give that person their progress.
+		The code the browser brought back: whose Steam account it is (name and avatar, shown while linking), then the link.
+		It came only to this game (its state), from the player's own sign-in - nothing to confirm.
 	*/
 
-	auto request_link_target = [&](const std::string& entered) {
-		/*
-			Pasting the key here instead of in Import would send it to the website in the request -
-			it never leaves the game, the field is just cleared.
-		*/
-
-		{
-			auto lowercase = entered;
-
-			for (auto& c : lowercase) {
-				c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-			}
-
-			if (identity_key::from_export_string(entered).has_value() || lowercase.find("hypersomnia-key") != std::string::npos || entered.size() > 40) {
-				link_code_text.clear();
-				finish(false, "That was your key, not a link code - it was not sent anywhere.\n\nNever paste the private key anywhere but Import private key.\nThe link code is the 8 letters and digits shown on hypersomnia.io/link.");
-				return;
-			}
-		}
-
-		auto code = std::string();
-
-		for (const auto c : entered) {
-			if (std::isalnum(static_cast<unsigned char>(c))) {
-				code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-			}
-		}
-
-		if (code.size() != 8) {
-			link_flow_message = "The link code is the 8 letters and digits shown on hypersomnia.io/link.";
-			return;
-		}
-
+	auto request_link_target = [&](const std::string& code) {
 		link_flow_message.clear();
 		link_target_code = code;
 		link_target_request = get_from_website("/link_key/info?code=" + code);
@@ -1088,6 +1103,12 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	auto unlink = [&]() {
+		if (!has_key) {
+			unlink_result = std::string("There is no key to unlink.");
+			unlink_succeeded = false;
+			return;
+		}
+
 		const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
 
 		if (const auto signature = augs::ed25519_sign(*seed, identity_key::unlink_message(*public_key, unix_time))) {
@@ -1100,6 +1121,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				augs::bytes_to_hex(*signature)
 			));
 		}
+		else {
+			unlink_result = std::string("Couldn't sign the unlink with your local key.\n\nSee the logs.");
+			unlink_succeeded = false;
+		}
 	};
 
 	local_key_line(public_key);
@@ -1110,7 +1135,22 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 	if (linked) {
 		checkmark_line("This key is linked to your Steam account" + (steam_name.empty() ? std::string(".") : ": " + steam_name + "."), green);
-		text_disabled("All progress counts towards this Steam account.");
+
+		/*
+			Linked, but not signed in right now - progress goes to the local key until it is.
+		*/
+
+		if (identity != nullptr && identity->sign_in_failed(identity_input, now)) {
+			text_color("Couldn't sign in to Steam - until then, progress counts towards your local key.", orange);
+			ImGui::SameLine();
+
+			if (ImGui::Button("Retry##LinkPaneSignIn")) {
+				sign_in_retry_wanted = true;
+			}
+		}
+		else {
+			text_disabled("All progress counts towards this Steam account.");
+		}
 
 		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink...")) {
 			confirm_unlink = true;
@@ -1124,8 +1164,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				link_flow = F::CHECKING_BEFORE;
 				linked_has_avatar = false;
 				link_flow_message.clear();
-				link_code_text.clear();
-				auto_requested_code.clear();
 			}
 			else {
 				account_message = "There is no key to link yet.";
@@ -1134,6 +1172,43 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		text_disabled("Once linked, progress will count towards the Steam account.");
 	}
+
+	/*
+		The sign-in through Steam in the browser, with a random state only this game knows:
+		- native: the browser comes back to the game's listener on 127.0.0.1 (see loopback_link_listener.h);
+		- web: the code comes back to this tab (on_steam_link_code).
+	*/
+
+	auto open_steam_sign_in = [&]() {
+#if PLATFORM_WEB
+		augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
+#else
+		augs::open_url(typesafe_sprintf("%x/link_key/start?state=%x&port=%x", website_url, steam_link_state, link_listener_port));
+#endif
+	};
+
+	auto start_steam_sign_in = [&]() {
+		auto state_bytes = std::array<uint8_t, 16>();
+		auto rd = std::random_device();
+
+		for (auto& b : state_bytes) {
+			b = static_cast<uint8_t>(rd());
+		}
+
+		steam_link_state = augs::bytes_to_hex(state_bytes);
+
+#if !PLATFORM_WEB
+		if (const auto port = link_listener.start(steam_link_state)) {
+			link_listener_port = *port;
+		}
+		else {
+			finish(false, "Couldn't start linking - see the logs.");
+			return;
+		}
+#endif
+
+		open_steam_sign_in();
+	};
 
 	/*
 		The answers.
@@ -1166,17 +1241,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			if (link_flow == F::CHECKING_BEFORE) {
 				link_flow = F::NEEDS_STEAM_SIGN_IN;
-#if PLATFORM_WEB
-				auto state_bytes = std::array<uint8_t, 16>();
-				auto rd = std::random_device();
-
-				for (auto& b : state_bytes) {
-					b = static_cast<uint8_t>(rd());
-				}
-
-				steam_link_state = augs::bytes_to_hex(state_bytes);
-				augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
-#endif
+				start_steam_sign_in();
 			}
 			else {
 				finish(false, "The link did not take effect. Try again.");
@@ -1197,11 +1262,24 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				finish(false, typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", website_url));
 			}
 		}
+		else if (check == L::NONE) {
+			/*
+				The check was dropped on the way (e.g. the key changed) - never a modal waiting forever.
+			*/
+
+			finish(false, "The check was interrupted. Try again.");
+		}
 	}
 
-	/*
-		A code that came back from Sign in with Steam - still confirmed like a typed one.
-	*/
+#if !PLATFORM_WEB
+	if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
+		if (const auto code = link_listener.take_code()) {
+			link_listener.stop();
+			steam_link_state.clear();
+			link_code_from_steam = *code;
+		}
+	}
+#endif
 
 	if (link_code_from_steam.has_value() && !augs::in_progress(link_target_request) && has_key) {
 		const auto code = *link_code_from_steam;
@@ -1244,20 +1322,24 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}();
 
 		if (target.has_value()) {
-			link_target_to_confirm = *target;
-			link_flow = F::CONFIRMING;
+			linked_name = target->name;
+			linked_has_avatar = target->has_avatar;
+			link_to_confirmed_target(*target);
+
+			if (link_flow != F::LINKING) {
+				finish(false, "Couldn't sign the link with your local key.\n\nSee the logs.");
+			}
 		}
 		else if (httplib_utils::successful(response.status)) {
 			finish(false, "Linking failed:\nunexpected response from the website.");
 		}
 		else {
-			link_flow_message = response_error(response, "Linking");
+			finish(false, response_error(response, "Linking"));
 		}
 	}
 
 	if (augs::is_ready(link_request)) {
 		const auto response = augs::get_once(link_request);
-		link_code_text.clear();
 
 		if (httplib_utils::successful(response.status)) {
 			if (!link_request_is_unlink) {
@@ -1301,8 +1383,15 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		if (ImGui::BeginPopupModal("Link to your Steam account##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			auto close = [&]() {
 				link_flow = F::IDLE;
-				link_target_to_confirm.reset();
 				link_flow_message.clear();
+
+				/*
+					A code still on its way would go on linking by itself later.
+				*/
+
+				link_target_request.reset();
+				steam_link_state.clear();
+				link_listener.stop();
 
 				if (identity != nullptr) {
 					identity->clear_link_check();
@@ -1329,120 +1418,33 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else if (link_flow == F::CHECKING_BEFORE) {
 				spinner_line("Checking with hypersomnia.io...", white);
-			}
-			else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
-#if PLATFORM_WEB
-				text("Sign in through Steam in the new tab\nto get the one-time code:");
-#else
-				text("You will have to sign in through Steam.");
-
-				if (ImGui::Button("Get the one-time code on hypersomnia.io")) {
-					augs::open_url(website_url + "/link");
-				}
-#endif
-
-				/*
-					No Link button: a code in the right form links as soon as it is pasted or typed.
-					Enter only tells what is wrong with one that is not - and a pasted private key is cleared at once.
-				*/
-
-				/*
-					Enter is only watched, not a flag of the field: the field keeps its focus and hands over every keystroke.
-				*/
-
-				{
-					auto buffer = std::array<char, 256>();
-					input_text_with_hint(buffer, "##LinkCode", "Paste the code here...", link_code_text);
-				}
-
-				const bool entered = ImGui::IsItemDeactivated() && ImGui::IsKeyPressed(ImGuiKey_Enter, false);
-
-				if (entered) {
-					/*
-						Enter leaves a field - the player goes on typing the code, not the game's shortcuts.
-					*/
-
-					ImGui::SetKeyboardFocusHere(-1);
-				}
-
-				if (requesting) {
-					ImGui::SameLine();
-					spinner(ImGui::GetTextLineHeight(), white);
-				}
-				else {
-					auto code = std::string();
-
-					for (const auto c : link_code_text) {
-						if (std::isalnum(static_cast<unsigned char>(c))) {
-							code += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-						}
-					}
-
-					auto lowercase = link_code_text;
-
-					for (auto& c : lowercase) {
-						c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-					}
-
-					const bool looks_like_key = lowercase.find("hypersomnia-key") != std::string::npos || link_code_text.size() > 40;
-					const bool complete = code.size() == 8 && link_code_text.size() <= 12;
-
-					if (looks_like_key || entered || (complete && code != auto_requested_code)) {
-						if (complete) {
-							auto_requested_code = code;
-						}
-
-						request_link_target(link_code_text);
-					}
-				}
-
-				if (!link_flow_message.empty()) {
-					text_color(link_flow_message, orange);
-				}
-
-				text_color("Do NOT paste somebody else's code!", red);
-
 				ImGui::Separator();
 
-				if (ImGui::Button("Cancel##LinkFlow", ImVec2(120, 0))) {
+				if (ImGui::Button("Cancel##LinkChecking", ImVec2(120, 0))) {
 					close();
 				}
 			}
-			else if (link_flow == F::CONFIRMING && link_target_to_confirm.has_value()) {
-				const auto target = *link_target_to_confirm;
-
-				text_color("Is this your Steam account?", orange);
-
-				/*
-					Laid out as after linking: the avatar, the name beside it - the id under them, in gray.
-				*/
-
-				link_avatar_and_name(target.name, target.has_avatar);
-
-				/*
-					Anyone can copy a name, the id is the account - it opens the real Steam profile.
-				*/
-
-				if (external_link("SteamProfile", target.steam_account, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
-					augs::open_url(::steam_profile_url(target.steam_account));
-				}
+			else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
+#if PLATFORM_WEB
+				spinner_line("Sign in through Steam in the new tab.", white);
+#else
+				spinner_line("Sign in through Steam in your browser.", white);
+#endif
+				text_disabled("The game continues by itself.");
 
 				ImGui::Separator();
 
-				if (ImGui::Button("Yes, link it", ImVec2(120, 0))) {
-					link_target_to_confirm.reset();
-					linked_name = target.name;
-					linked_has_avatar = target.has_avatar;
-					link_to_confirmed_target(target);
+				{
+					auto scope = maybe_disabled_cols({}, requesting);
 
-					if (link_flow != F::LINKING) {
-						finish(false, "Couldn't sign the link with your local key.\n\nSee the logs.");
+					if (ImGui::Button("Open it again##LinkFlow") && !requesting) {
+						open_steam_sign_in();
 					}
 				}
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("No##Confirm", ImVec2(120, 0))) {
+				if (ImGui::Button("Cancel##LinkFlow", ImVec2(120, 0))) {
 					close();
 				}
 			}

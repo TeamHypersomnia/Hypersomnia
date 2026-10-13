@@ -1,0 +1,3 @@
+#!/bin/bash
+# Stands in for the browser in UI tests: the game's opened URLs go to $OPENED_URLS (one per line), nothing opens.
+echo "$1" >> "${OPENED_URLS:-/tmp/hypersomnia-opened-urls}"
