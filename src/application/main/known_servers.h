@@ -61,7 +61,7 @@ class known_servers {
 				const auto space = line.rfind(' ');
 
 				if (space != std::string::npos && space > 0 && line.size() - space - 1 == 64) {
-					key_by_address[line.substr(0, space)] = line.substr(space + 1);
+					key_by_address[normalized(line.substr(0, space))] = line.substr(space + 1);
 				}
 			}
 		}

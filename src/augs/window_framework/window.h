@@ -230,6 +230,18 @@ namespace augs {
 			}
 		};
 
+		/*
+			Whether the file dialogs can open at all - on Linux they need zenity, kdialog or ranger in $TERMINAL.
+		*/
+
+#if PLATFORM_LINUX
+		bool has_file_dialog() const;
+#else
+		bool has_file_dialog() const {
+			return true;
+		}
+#endif
+
 		std::optional<path_type> open_file_dialog(
 			const std::vector<file_dialog_filter>& filters,
 			const std::string& custom_title = std::string()

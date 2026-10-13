@@ -7,9 +7,12 @@ function decodeCrazyGamesToken(token) {
   const payload = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(base64), c => c.charCodeAt(0))));
   console.log("Decoded token payload", payload);
 
-  // How long it lives by the token's own clock - this computer's may be off by hours
+  // How long it still lives: by this computer's clock when that looks right (a cached token is not fresh),
+  // else by the token's own lifetime - this computer's clock may be off by hours
   const currentTime = Math.floor(Date.now() / 1000);
-  payload.expiresIn = typeof payload.iat === 'number' ? payload.exp - payload.iat : payload.exp - currentTime;
+  const lifetime = typeof payload.iat === 'number' ? payload.exp - payload.iat : null;
+  const left = payload.exp - currentTime;
+  payload.expiresIn = lifetime === null || (left > 0 && left <= lifetime) ? left : lifetime;
   console.log(currentTime, payload.exp);
 
   return payload;
@@ -397,7 +400,9 @@ function pre_run() {
   // The account key lives in this browser's storage: ask the browser not to clear it under storage pressure
   // Safari clears a site's storage after 7 days without a visit unless it is persisted - the game warns there (Info).
   // Other browsers refusing persist() only clear it under storage pressure - no warning for them.
-  const is_safari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+  // Every browser on iOS is WebKit underneath - the same rules
+  const is_safari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent)
+    || /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().then(granted => {

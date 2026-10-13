@@ -1878,13 +1878,17 @@ work_result work(
 		const auto path = KEYS_DIR / identity_key::file_name;
 
 #if PLATFORM_WEB
-		if (!account_seed_read_once && augs::exists(path)) {
+		if (!account_seed_read_once) {
 			/*
-				Left by older versions: nobody can reach them in the browser.
-				Only next to a key - a .bak alone may be all that is left of one (a tab closed mid-restore).
+				A backup alone is all that is left of a key (a tab closed mid-restore): it is the key again.
+				Next to a key, the backups (left by older versions) go - nobody can reach them in the browser.
 			*/
 
-			identity_key::remove_backups(path);
+			identity_key::restore_newest_backup(path);
+
+			if (augs::exists(path)) {
+				identity_key::remove_backups(path);
+			}
 		}
 #endif
 
@@ -2011,9 +2015,15 @@ work_result work(
 			Also when the broker refused the token as expired - this computer's clock may say otherwise.
 		*/
 
-		const bool token_refused = identity->take_crazygames_token_refused();
+		const bool can_refresh_token = params.is_crazygames && auth_can_self_refresh() && now - crazygames_token_refreshed_at > 30.0;
 
-		if (params.is_crazygames && (is_auth_expired() || token_refused) && auth_can_self_refresh() && now - crazygames_token_refreshed_at > 30.0) {
+		/*
+			Taken only when acted on - a refusal within the 30 seconds waits for them.
+		*/
+
+		const bool token_refused = can_refresh_token && identity->take_crazygames_token_refused();
+
+		if (can_refresh_token && (is_auth_expired() || token_refused)) {
 			crazygames_token_refreshed_at = now;
 			auth_self_refresh();
 		}
@@ -3049,7 +3059,9 @@ work_result work(
 			const bool rejoining_as_key = rejoined_match.has_value() && rejoined_match->account.rfind("key_", 0) == 0;
 
 			if (!rejoining_as_key) {
-				if (identity->signing_in_first_time(in, now) && !std::exchange(join_without_sign_in_once, false)) {
+				const bool join_without_sign_in = std::exchange(join_without_sign_in_once, false);
+
+				if (identity->signing_in_first_time(in, now) && !join_without_sign_in) {
 					LOG("Waiting for the first sign-in before connecting.");
 					launch_after_sign_in = true;
 					return false;

@@ -330,6 +330,45 @@ namespace identity_key {
 		return std::nullopt;
 	}
 
+	bool save_copy(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
+		/*
+			The player chose to overwrite a file there in the save dialog.
+		*/
+
+		std::error_code ec;
+		std::filesystem::remove(path, ec);
+
+		return write_private_file(path, to_export_string(seed) + "\n");
+	}
+
+	bool restore_newest_backup(const augs::path_type& path) {
+		if (augs::exists(path)) {
+			return false;
+		}
+
+		const auto prefix = path.filename().string() + ".bak-";
+		auto newest = std::optional<std::filesystem::directory_entry>();
+		auto ec = std::error_code();
+
+		for (const auto& entry : std::filesystem::directory_iterator(path.parent_path(), ec)) {
+			if (entry.path().filename().string().rfind(prefix, 0) != 0) {
+				continue;
+			}
+
+			if (!newest.has_value() || entry.last_write_time(ec) > newest->last_write_time(ec)) {
+				newest = entry;
+			}
+		}
+
+		if (!newest.has_value() || !link_without_replacing(newest->path(), path)) {
+			return false;
+		}
+
+		LOG("%x was missing - put back from %x.", path, newest->path());
+		::persistent_filesystem_sync();
+		return true;
+	}
+
 	void remove_backups(const augs::path_type& path) {
 		const auto prefix = path.filename().string() + ".bak-";
 		auto removed = false;
@@ -483,6 +522,22 @@ TEST_CASE("Identity key files are created once, replaced and forgotten only with
 	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::group_read) == std::filesystem::perms::none);
 	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::others_read) == std::filesystem::perms::none);
 #endif
+
+	/* No key but backups: the newest one is put back (the later of the two is "other") */
+	std::filesystem::last_write_time(*second_backup, std::filesystem::last_write_time(*first_backup) + std::chrono::seconds(5));
+	REQUIRE(identity_key::restore_newest_backup(path));
+	REQUIRE(identity_key::load(path) == other);
+	REQUIRE_FALSE(identity_key::restore_newest_backup(path));
+
+	/* A copy of the key elsewhere, over a file there, owner-readable only */
+	const auto copy = dir / "copy.key";
+	augs::save_as_text(copy, "something else");
+	REQUIRE(identity_key::save_copy(copy, *created));
+	REQUIRE(identity_key::load(copy) == created);
+#if PLATFORM_UNIX
+	REQUIRE((std::filesystem::status(copy).permissions() & std::filesystem::perms::group_read) == std::filesystem::perms::none);
+#endif
+
 
 	std::filesystem::remove_all(dir);
 }

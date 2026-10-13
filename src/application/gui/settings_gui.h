@@ -289,6 +289,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool link_answer_lost = false;
 
 	/*
+		What the site said when it failed on its side (a 5xx with a reason), shown if the link did not happen.
+	*/
+
+	std::string link_lost_reason;
+
+	/*
 		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
 	*/
 

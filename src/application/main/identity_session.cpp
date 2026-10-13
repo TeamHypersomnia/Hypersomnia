@@ -706,7 +706,7 @@ void identity_session::advance(const input& in, const double now) {
 				A CrazyGames token refused as expired is renewed by the game - a new one is asked about at once.
 			*/
 
-			if (response.status == 401 && in.provider == provider_type::CRAZYGAMES) {
+			if (response.status == 401 && in.provider == provider_type::CRAZYGAMES && response.body.find("expired") != std::string::npos) {
 				crazygames_token_refused = true;
 			}
 

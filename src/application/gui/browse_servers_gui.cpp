@@ -180,7 +180,15 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 	*/
 
 	if (status <= 0) {
+#if PLATFORM_WEB
+		/*
+			The browser joins through the same host's signalling - by address too.
+		*/
+
+		error_message = "Couldn't connect to the server list host.";
+#else
 		error_message = "Couldn't connect to the server list host.\nYou can still join a server by its address (Connect to server).";
+#endif
 		return {};
 	}
 

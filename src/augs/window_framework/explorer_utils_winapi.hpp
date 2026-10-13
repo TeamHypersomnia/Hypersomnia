@@ -181,11 +181,17 @@ namespace augs {
 
 		if (GetSaveFileName(&ofn) == TRUE) {
 			auto result = augs::path_type(ofn.lpstrFile);
-			const auto supposed_extension = filters[ofn.nFilterIndex - 1].extension;
 
-			if (supposed_extension != ".*") {
+			/*
+				The filter's first pattern ("*.key") gives the extension (".key") a name typed without it gets.
+			*/
+
+			const auto patterns = filters[ofn.nFilterIndex - 1].patterns();
+			const auto supposed_extension = patterns.empty() ? std::string() : patterns.front().substr(1);
+
+			if (supposed_extension.size() > 1 && supposed_extension.front() == '.' && supposed_extension.find('*') == std::string::npos) {
 				if (result.extension() != supposed_extension) {
-					result += filters[ofn.nFilterIndex - 1].extension;
+					result += supposed_extension;
 				}
 			}
 

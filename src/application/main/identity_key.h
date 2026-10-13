@@ -110,4 +110,17 @@ namespace identity_key {
 	*/
 
 	void remove_backups(const augs::path_type& path);
+
+	/*
+		Writes the key to a file of the player's choosing (Backup - Save a copy...), owner-readable only.
+	*/
+
+	bool save_copy(const augs::path_type& path, const augs::ed25519_seed_type& seed);
+
+	/*
+		No key file but its backups (e.g. the browser's tab closed while the key was being replaced): the newest is put back.
+		Returns whether one was.
+	*/
+
+	bool restore_newest_backup(const augs::path_type& path);
 }

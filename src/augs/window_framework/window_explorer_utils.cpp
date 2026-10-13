@@ -124,6 +124,10 @@ namespace augs {
 		}
 	}
 
+	bool window::has_file_dialog() const {
+		return command_exists("zenity") || command_exists("kdialog") || (std::getenv("TERMINAL") != nullptr && command_exists("ranger"));
+	}
+
 	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title

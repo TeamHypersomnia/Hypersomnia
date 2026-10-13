@@ -720,6 +720,8 @@ void settings_gui_state::on_key_replaced_outside() {
 	*/
 
 	link_flow = link_flow_type::IDLE;
+	link_answer_lost = false;
+	link_lost_reason.clear();
 	link_target_request.reset();
 	link_listener.stop();
 	link_request.reset();
@@ -931,12 +933,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if !PLATFORM_WEB
 	if (valid_and_is_ready(chosen_key_copy_path)) {
 		if (const auto to = chosen_key_copy_path.get()) {
-			try {
-				std::filesystem::copy_file(key_path, *to, std::filesystem::copy_options::overwrite_existing);
+			/*
+				The key the game plays with - not the file, which may be damaged.
+			*/
+
+			if (seed.has_value() && identity_key::save_copy(*to, *seed)) {
 				account_message = "Saved a copy of your private key:\n    " + augs::string_windows_friendly(*to);
 			}
-			catch (const std::exception& e) {
-				LOG("Could not copy the key file: %x", e.what());
+			else {
 				account_message = std::string("Could not save the copy.\n\nSee the logs.");
 			}
 
@@ -956,6 +960,24 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 		if (linked) {
 			text("Your progress is on your Steam account - nothing to back up.\nOn another computer, link it with Steam too.\nTo restore another key or start a new account, unlink first.");
+
+			/*
+				A linked key's file can get damaged too - without the file, the link is lost at the next start.
+			*/
+
+			if (key_file_unreadable_with_key_in_use && seed.has_value()) {
+				text_color("Your account.key file is damaged - the game still has the key it read before.", orange);
+
+				if (ImGui::Button("Write the key back##Linked")) {
+					if (identity_key::save_replacing(key_path, *seed).has_value()) {
+						key_file_changed = true;
+						key_file_unreadable_with_key_in_use = false;
+					}
+					else {
+						account_message = std::string("Could not save the key.\n\nSee the logs.");
+					}
+				}
+			}
 
 			/*
 				Linked meanwhile (e.g. in the browser): the modals below are no longer drawn - closed,
@@ -1083,7 +1105,10 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if PLATFORM_WEB
 		::web_pick_text_file();
 #else
-		if (!chosen_key_file.valid()) {
+		if (!window.has_file_dialog()) {
+			account_message = std::string("No file dialog on this system (install zenity).\nTo restore by hand, put your key file in place of account.key\n(Back up private key - Show key file in folder) - the game notices it.");
+		}
+		else if (!chosen_key_file.valid()) {
 			chosen_key_file = launch_async(
 				[&window]() -> std::optional<std::string> {
 					const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key;*.txt;*.key.bak-*" }, { "All files", "*" } };
@@ -1245,7 +1270,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if !PLATFORM_WEB
 			text("Your private key is the file account.key.\nCopy it somewhere safe (e.g. a USB stick) - with it you restore your account.\n");
 
-			if (colored_button("SaveKeyCopy", { { "Save a copy...", white } }) && !chosen_key_copy_path.valid()) {
+			const bool save_copy_clicked = colored_button("SaveKeyCopy", { { "Save a copy...", white } });
+
+			if (save_copy_clicked && !window.has_file_dialog()) {
+				account_message = std::string("No file dialog on this system (install zenity).\nCopy account.key yourself - Show key file in folder.");
+				reveal_private_key_open = false;
+			}
+			else if (save_copy_clicked && !chosen_key_copy_path.valid()) {
 				chosen_key_copy_path = launch_async(
 					[&window, file_name = backup_file_name]() -> std::optional<augs::path_type> {
 						const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key" } };
@@ -1434,6 +1465,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_flow_conflict = conflict;
 		link_flow_message_is_warning = false;
 		link_answer_lost = false;
+		link_lost_reason.clear();
 		link_flow_message = message;
 
 		if (succeeded) {
@@ -1629,7 +1661,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				start_steam_sign_in();
 			}
 			else if (link_answer_lost) {
-				finish(false, typesafe_sprintf("Linking failed: no answer from %x.\nTry again.", website_url));
+				finish(false, link_lost_reason.empty() ? typesafe_sprintf("Linking failed: no answer from %x.\nTry again.", website_url) : "Linking failed:\n" + link_lost_reason);
 			}
 			else {
 				finish(false, "The link did not take effect. Try again.");
@@ -1646,6 +1678,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				finish(false, refusal);
 			}
 			else if (link_flow == F::CHECKING_AFTER && link_answer_lost) {
+				/*
+					Asked again quietly - a link that did happen is picked up then.
+				*/
+
+				identity->recheck_link_quietly();
 				finish(false, typesafe_sprintf("Couldn't reach %x - it is not known whether the key got linked.\nTry again later.", website_url));
 			}
 			else if (link_flow == F::CHECKING_AFTER) {
@@ -1750,8 +1787,24 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			*/
 
 			link_answer_lost = true;
+			link_lost_reason = augs::plain_text_reason(response).value_or(std::string());
 			identity->start_link_check(identity_input.broker_url);
 			link_flow = F::CHECKING_AFTER;
+		}
+		else if (link_request_is_unlink && answer_lost) {
+			/*
+				Unlinking again is harmless - whether it happened is asked quietly meanwhile.
+			*/
+
+			unlinking = false;
+			unlink_succeeded = false;
+			unlink_result = augs::plain_text_reason(response).value_or(
+				typesafe_sprintf("Couldn't reach %x - it is not known whether the key got unlinked.\nTry again.", website_url)
+			);
+
+			if (identity != nullptr) {
+				identity->recheck_link_quietly();
+			}
 		}
 		else if (httplib_utils::successful(response.status)) {
 			if (!link_request_is_unlink) {
@@ -4006,7 +4059,11 @@ void settings_gui_state::perform(
 									}();
 								}
 
-								const bool recently = now - *profile_refreshed_at < 60;
+								/*
+									A time ahead of now (the clock set back) does not block it.
+								*/
+
+								const bool recently = now >= *profile_refreshed_at && now - *profile_refreshed_at < 60;
 
 								if (identity->is_refreshing_profile()) {
 									spinner(ImGui::GetTextLineHeight(), white);
