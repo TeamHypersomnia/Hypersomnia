@@ -292,7 +292,11 @@ std::optional<std::string> identity_session::build_location(const input& in) con
 				return std::nullopt;
 			}
 
-			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1";
+			/*
+				Linking needs the key's own signature too - a ticket alone could be asked for anyone's public key.
+			*/
+
+			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1" + key_location();
 		}
 
 		const auto key = key_location();
