@@ -1877,21 +1877,6 @@ work_result work(
 
 		const auto path = KEYS_DIR / identity_key::file_name;
 
-#if PLATFORM_WEB
-		if (!account_seed_read_once) {
-			/*
-				A backup alone is all that is left of a key (a tab closed mid-restore): it is the key again.
-				Next to a key, the backups (left by older versions) go - nobody can reach them in the browser.
-			*/
-
-			identity_key::restore_newest_backup(path);
-
-			if (augs::exists(path)) {
-				identity_key::remove_backups(path);
-			}
-		}
-#endif
-
 		account_seed_read_once = true;
 
 		/*
@@ -2093,12 +2078,6 @@ work_result work(
 	WEBSTATIC auto saved_server_passwords = server_passwords(KEYS_DIR / server_passwords::file_name);
 
 	/*
-		Keys of the servers joined by address, learned in this run - to pick the saved password on a retry.
-	*/
-
-	WEBSTATIC std::map<std::string, augs::ed25519_public_key_type> learned_server_keys;
-
-	/*
 		Keys of the servers connected to, kept between runs (.keys/known_servers.txt) - see known_servers.h.
 	*/
 
@@ -2112,15 +2091,9 @@ work_result work(
 	WEBSTATIC bool connect_anyway_once = false;
 
 	/*
-		Addresses the player chose "Connect anyway" for, this run: the key the server showed then (learned_server_keys)
-		comes before the server list's, so a password retry does not land on the mismatch again.
-	*/
-
-	WEBSTATIC std::unordered_set<std::string> connected_anyway_to;
-
-	/*
-		The key a server showed, for the next joins of this run - never one of a server on this machine
-		that answered in the remote one's place (the localhost fallback). Returns whether it was learned.
+		The key a server proved it holds (a connection, or a kick for a password - the server had to read the request
+		sealed to its key), remembered for its address - never one of a server on this machine that answered
+		in the remote one's place (the localhost fallback). Returns whether it was.
 	*/
 
 	WEBSTATIC auto learn_server_key = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
@@ -2128,7 +2101,7 @@ work_result work(
 			return false;
 		}
 
-		learned_server_keys[std::string(client.get_connect_string())] = key;
+		remembered_servers.set(std::string(client.get_connect_string()), key);
 		return true;
 	};
 
@@ -2468,6 +2441,7 @@ work_result work(
 	WEBSTATIC bool had_valid_cert = false;
 	WEBSTATIC bool failed_since_last_cert = false;
 	WEBSTATIC double signed_in_notice_until = -1.0;
+	WEBSTATIC bool signed_in_notice_pending = false;
 
 	WEBSTATIC auto provider_name = [&]() -> std::string {
 		const auto in = get_identity_input();
@@ -2565,10 +2539,19 @@ work_result work(
 
 			if (valid && !had_valid_cert && failed_since_last_cert) {
 				failed_since_last_cert = false;
-				signed_in_notice_until = now + 4.0;
+				signed_in_notice_pending = true;
 			}
 
 			had_valid_cert = valid;
+
+			/*
+				Shown in the menu - signed in during a match, it waits until the player is back there.
+			*/
+
+			if (signed_in_notice_pending && !has_current_setup()) {
+				signed_in_notice_pending = false;
+				signed_in_notice_until = now + 4.0;
+			}
 		}
 
 		if (would_abandon_ranked_match()) {
@@ -3118,15 +3101,6 @@ work_result work(
 				return rejoined_match->server_key;
 			}
 
-			if (connected_anyway_to.count(std::string(connect_string)) > 0) {
-				if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
-					source = S::EARLIER_CONNECTION;
-					return *learned;
-				}
-
-				return std::nullopt;
-			}
-
 			/*
 				An entry found only by its internal address (e.g. 192.168.1.10) may be any server in any LAN -
 				its name is fine to show, its key is not the one to expect.
@@ -3141,25 +3115,36 @@ work_result work(
 				return connected_address.has_value() && !(found->address == *connected_address);
 			}();
 
-			if (found != nullptr && !found_by_internal_address) {
-				if (const auto key = found->get_public_key()) {
-					source = S::SERVER_LIST;
-					return *key;
+			const auto list_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+				if (found != nullptr && !found_by_internal_address) {
+					return found->get_public_key();
 				}
-			}
 
-			if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
-				source = S::EARLIER_CONNECTION;
-				return *learned;
+				return std::nullopt;
+			}();
+
+			/*
+				An official server: the key the masterserver vouches for (official_servers.d) - always.
+			*/
+
+			if (list_key.has_value() && found->is_official_server()) {
+				source = S::SERVER_LIST;
+				return *list_key;
 			}
 
 			/*
-				Joined by address before: the key it showed then - a different one now is warned about.
+				Played on before: the key it showed then, wherever the join came from - a different one now is warned about
+				(and Connect anyway takes the new one, as SSH would). A community server's list key is only its own word.
 			*/
 
 			if (const auto remembered = remembered_servers.find(std::string(connect_string))) {
 				source = S::EARLIER_CONNECTION;
 				return *remembered;
+			}
+
+			if (list_key.has_value()) {
+				source = S::SERVER_LIST;
+				return *list_key;
 			}
 
 			return std::nullopt;
@@ -3180,7 +3165,7 @@ work_result work(
 
 		if (connect_anyway_once) {
 			connect_anyway_once = false;
-			connected_anyway_to.insert(std::string(connect_string));
+			identity_context.connected_anyway = true;
 			identity_context.expected_server_public_key.reset();
 			identity_context.password.clear();
 		}
@@ -3424,6 +3409,63 @@ work_result work(
 		}
 		else {
 			save_last_activity(mode);
+		}
+	};
+
+	/*
+		A join from the server list met another key than the list's: the list is downloaded again - if the fresh one
+		has another key for the server (the list was stale), the game joins again by itself; otherwise the message stays.
+	*/
+
+	WEBSTATIC std::optional<augs::ed25519_public_key_type> relisted_old_key;
+	WEBSTATIC bool relisting = false;
+	WEBSTATIC double relisting_since = 0.0;
+
+	WEBSTATIC auto relist_after_key_mismatch = [&]() {
+		const auto now = augs::steady_secs();
+
+		visit_current_setup([&](auto& setup) {
+			if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
+				if (setup.take_list_key_mismatch()) {
+					const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
+
+					relisted_old_key = found != nullptr ? found->get_public_key() : std::nullopt;
+					relisting = true;
+					relisting_since = now;
+					browse_servers_gui.refresh_server_list(get_browse_servers_input());
+				}
+			}
+		});
+
+		if (!relisting) {
+			return;
+		}
+
+		/*
+			The masterserver not answering in time: the message stays.
+		*/
+
+		if (now - relisting_since > 8.0) {
+			LOG("The server list did not come in time after a key mismatch.");
+			relisting = false;
+			return;
+		}
+
+		if (browse_servers_gui.refresh_in_progress()) {
+			return;
+		}
+
+		relisting = false;
+
+		const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
+		const auto fresh_key = found != nullptr ? found->get_public_key() : std::nullopt;
+
+		if (fresh_key.has_value() && fresh_key != relisted_old_key) {
+			LOG("The server list had a stale key for %x - joining again with the fresh one.", config.client_connect);
+			launch_setup(activity_type::CLIENT);
+		}
+		else {
+			LOG("The fresh server list has the same key for %x - not joining.", config.client_connect);
 		}
 	};
 
@@ -5949,6 +5991,7 @@ work_result work(
 #endif
 				advance_identity();
 				sync_identity_with_settings();
+				relist_after_key_mismatch();
 
 				{
 					/*

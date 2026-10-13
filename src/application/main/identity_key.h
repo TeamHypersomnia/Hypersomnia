@@ -91,8 +91,9 @@ namespace identity_key {
 	std::optional<augs::ed25519_seed_type> load_or_create(const augs::path_type& path);
 
 	/*
-		Saves an imported key. An existing key file is first renamed to account.key.bak-<timestamp>, never deleted.
-		Returns the backup's path (empty if there was nothing to back up), or std::nullopt on failure.
+		Saves an imported key. An existing key file is first renamed to account.key.bak-<timestamp>, never deleted -
+		except in the browser, where nobody could reach a backup: replaced there.
+		Returns the backup's path (empty if there was nothing to back up, or in the browser), or std::nullopt on failure.
 	*/
 
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed);
@@ -100,27 +101,15 @@ namespace identity_key {
 	/*
 		Forgets the key, so that a new one - a new account - can be created.
 		The file is only renamed to account.key.bak-<timestamp>, never deleted: a lost key can never be recovered.
-		Returns the backup's path, or std::nullopt on failure.
+		In the browser it is removed (the player was told to download it first). Returns the backup's path
+		(the key's own in the browser), or std::nullopt on failure.
 	*/
 
 	std::optional<augs::path_type> forget(const augs::path_type& path);
-
-	/*
-		Deletes every account.key.bak-<timestamp> next to the key - only for the web build, where nobody can reach them.
-	*/
-
-	void remove_backups(const augs::path_type& path);
 
 	/*
 		Writes the key to a file of the player's choosing (Backup - Save a copy...), owner-readable only.
 	*/
 
 	bool save_copy(const augs::path_type& path, const augs::ed25519_seed_type& seed);
-
-	/*
-		No key file but its backups (e.g. the browser's tab closed while the key was being replaced): the newest is put back.
-		Returns whether one was.
-	*/
-
-	bool restore_newest_backup(const augs::path_type& path);
 }

@@ -5,6 +5,7 @@
 
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_status_icons.h"
 #include "3rdparty/include_httplib.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/memory_stream.h"
@@ -1361,6 +1362,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			if (ImGui::Button("Refresh list")) {
 				refresh_server_list(in);
 			}
+		}
+
+		/*
+			The list on its way - the buttons are greyed meanwhile.
+		*/
+
+		if (refresh_in_progress()) {
+			ImGui::SameLine();
+			spinner(ImGui::GetTextLineHeight(), white);
 		}
 	}
 	

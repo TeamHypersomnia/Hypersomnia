@@ -1222,14 +1222,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				copy_icon_button("SwitchTo", "0x" + augs::bytes_to_hex(new_public_key));
 			}
 
-			text(
-				"\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n\n"
+			text("\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n");
+
 #if PLATFORM_WEB
-				"Your current key can't be recovered in the browser - back it up first."
+			text(typesafe_sprintf("To keep the progress of %x, download its private key first.", identity_key::short_form(*public_key)));
 #else
-				"The current key is kept as a backup file next to it."
+			text("The current key is kept as a backup file next to it.");
 #endif
-			);
 
 #if PLATFORM_WEB
 			if (seed.has_value() && colored_button("DownloadBeforeSwitch", { { "Download current ", white }, { "private key", orange } })) {
@@ -1374,7 +1373,9 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			text("");
 
 #if PLATFORM_WEB
-			text("In the browser you can not reach the old key afterwards -\nback it up first if you may want it back.");
+			if (public_key.has_value()) {
+				text(typesafe_sprintf("To keep the progress of %x, download its private key first.", identity_key::short_form(*public_key)));
+			}
 #else
 			colored_text({ { "The old ", white }, { "private key", orange }, { " file is kept next to the new one as a backup -", white } });
 			text("delete it yourself to remove it for good.");
@@ -3903,42 +3904,48 @@ void settings_gui_state::perform(
 
 				const auto steam_icon_room = std::string("     ");
 
-				do_pretty_tabs(
-					active_account_pane,
-					[steam_icon_room](const account_settings_pane p) -> std::optional<std::string> {
-						if (p == account_settings_pane::LINK_WITH_STEAM) {
-							return steam_icon_room + "Link with Steam";
+				/*
+					No tab row for a single pane (the Steam build, CrazyGames, itch.io) - just its content.
+				*/
+
+				if (num_account_panes > 1) {
+					do_pretty_tabs(
+						active_account_pane,
+						[steam_icon_room](const account_settings_pane p) -> std::optional<std::string> {
+							if (p == account_settings_pane::LINK_WITH_STEAM) {
+								return steam_icon_room + "Link with Steam";
+							}
+
+							return std::nullopt;
+						},
+						num_account_panes,
+						[this](const account_settings_pane p) {
+							if (p != account_settings_pane::LINK_WITH_STEAM || necessary_images == nullptr) {
+								return;
+							}
+
+							/*
+								The Steam logo in the room left for it before the label.
+							*/
+
+							const auto& entry = (*necessary_images)[assets::necessary_image_id::STEAM_BUTTON];
+							const auto min = ImGui::GetItemRectMin();
+							const auto max = ImGui::GetItemRectMax();
+							const auto side = (max.y - min.y) * 0.6f;
+							const auto room = ImGui::CalcTextSize("     ").x;
+
+							/*
+								Its padding is wide - the logo ends a third of its side before the label.
+							*/
+
+							const auto label_x = (min.x + max.x) / 2 - ImGui::CalcTextSize(("     " + std::string("Link with Steam")).c_str()).x / 2 + room;
+
+							auto cursor = scoped_preserve_cursor();
+							ImGui::SetCursorScreenPos(ImVec2(label_x - side - side / 3, min.y + (max.y - min.y - side) / 2));
+							game_image(entry, vec2::square(side), white, vec2::zero, augs::imgui_atlas_type::GAME);
 						}
-
-						return std::nullopt;
-					},
-					num_account_panes,
-					[this](const account_settings_pane p) {
-						if (p != account_settings_pane::LINK_WITH_STEAM || necessary_images == nullptr) {
-							return;
-						}
-
-						/*
-							The Steam logo in the room left for it before the label.
-						*/
-
-						const auto& entry = (*necessary_images)[assets::necessary_image_id::STEAM_BUTTON];
-						const auto min = ImGui::GetItemRectMin();
-						const auto max = ImGui::GetItemRectMax();
-						const auto side = (max.y - min.y) * 0.6f;
-						const auto room = ImGui::CalcTextSize("     ").x;
-
-						/*
-							Its padding is wide - the logo ends a third of its side before the label.
-						*/
-
-						const auto label_x = (min.x + max.x) / 2 - ImGui::CalcTextSize(("     " + std::string("Link with Steam")).c_str()).x / 2 + room;
-
-						auto cursor = scoped_preserve_cursor();
-						ImGui::SetCursorScreenPos(ImVec2(label_x - side - side / 3, min.y + (max.y - min.y - side) / 2));
-						game_image(entry, vec2::square(side), white, vec2::zero, augs::imgui_atlas_type::GAME);
-					}
-				);
+					);
+				}
 
 				auto& scope_cfg = config.client;
 
@@ -4058,7 +4065,11 @@ void settings_gui_state::perform(
 #endif
 
 						if (const auto& provider = signed_in.provider_label; !provider.empty()) {
-							revertable_checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
+							/*
+								No Revert next to it - it would be taken for Refresh. Saved like the other settings.
+							*/
+
+							checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
 
 							/*
 								The Steam name and avatar asked for anew (otherwise taken from hypersomnia.io's cache of a day).

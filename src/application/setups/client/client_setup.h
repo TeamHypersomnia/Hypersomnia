@@ -98,6 +98,12 @@ struct client_identity_context {
 	expected_server_key_source expected_key_source = expected_server_key_source::SERVER_LIST;
 
 	/*
+		The player chose "Connect anyway" for this connection - a key that did not match what was known.
+	*/
+
+	bool connected_anyway = false;
+
+	/*
 		The password saved for this server's key, if any - never sent to another key.
 	*/
 
@@ -141,6 +147,7 @@ class client_setup :
 	std::string connected_account;
 	bool sent_password = false;
 	bool key_mismatch_failure = false;
+	bool list_key_mismatch = false;
 	bool connect_anyway_requested = false;
 
 	/*
@@ -1066,6 +1073,14 @@ public:
 
 	bool wants_connect_anyway() const {
 		return connect_anyway_requested;
+	}
+
+	/*
+		The server's key did not match the server list: the game refreshes the list and joins again if it agrees now.
+	*/
+
+	bool take_list_key_mismatch() {
+		return std::exchange(list_key_mismatch, false);
 	}
 
 	bool kicked_for_password_not_sent() const {

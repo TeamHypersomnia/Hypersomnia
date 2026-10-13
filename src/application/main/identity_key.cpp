@@ -305,6 +305,7 @@ namespace identity_key {
 		return seed;
 	}
 
+#if !PLATFORM_WEB
 	/*
 		Never overwrites an earlier backup, even one made within the same second.
 	*/
@@ -329,6 +330,7 @@ namespace identity_key {
 		LOG("Could not back up %x.", path);
 		return std::nullopt;
 	}
+#endif
 
 	bool save_copy(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
 		/*
@@ -359,86 +361,42 @@ namespace identity_key {
 		return true;
 	}
 
-	bool restore_newest_backup(const augs::path_type& path) {
-		if (augs::exists(path)) {
-			return false;
-		}
-
-		const auto prefix = path.filename().string() + ".bak-";
-		auto newest = std::optional<std::filesystem::directory_entry>();
-		auto ec = std::error_code();
-
-		for (const auto& entry : std::filesystem::directory_iterator(path.parent_path(), ec)) {
-			if (entry.path().filename().string().rfind(prefix, 0) != 0) {
-				continue;
-			}
-
-			if (!newest.has_value() || entry.last_write_time(ec) > newest->last_write_time(ec)) {
-				newest = entry;
-			}
-		}
-
-		if (!newest.has_value() || !link_without_replacing(newest->path(), path)) {
-			return false;
-		}
-
-		LOG("%x was missing - put back from %x.", path, newest->path());
-		::persistent_filesystem_sync();
-		return true;
-	}
-
-	void remove_backups(const augs::path_type& path) {
-		const auto prefix = path.filename().string() + ".bak-";
-		auto removed = false;
-		auto ec = std::error_code();
-
-		for (const auto& entry : std::filesystem::directory_iterator(path.parent_path(), ec)) {
-			if (entry.path().filename().string().rfind(prefix, 0) == 0) {
-				removed = std::filesystem::remove(entry.path(), ec) || removed;
-			}
-		}
-
-		if (removed) {
-			LOG("Removed the backups of %x.", path);
-			::persistent_filesystem_sync();
-		}
-	}
-
 	/*
-		In the browser nobody can reach a backup file - a copy of the old key in the storage only waits to leak.
-		Made all the same, so a failed write can still put the old key back.
+		In the browser nobody can reach a backup file - none is made there. The key file is replaced or removed
+		in one sync of the browser's storage (the caller holds it), so the storage never has half of it.
 	*/
-
-	static void remove_backups_in_browser(const augs::path_type& path) {
-#if PLATFORM_WEB
-		remove_backups(path);
-#else
-		(void)path;
-#endif
-	}
 
 	std::optional<augs::path_type> forget(const augs::path_type& path) {
 		if (!augs::exists(path)) {
 			return std::nullopt;
 		}
 
-		/*
-			The browser's storage gets only the end state in one sync - never "a backup and no key".
-		*/
-
+#if PLATFORM_WEB
 		auto one_sync = hold_persistent_filesystem_raii();
+		std::error_code ec;
 
-		const auto backup = back_up(path);
-
-		if (backup.has_value()) {
-			remove_backups_in_browser(path);
+		if (!std::filesystem::remove(path, ec)) {
+			LOG("Could not remove %x.", path);
+			return std::nullopt;
 		}
 
-		return backup;
+		return path;
+#else
+		return back_up(path);
+#endif
 	}
 
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
 		auto one_sync = hold_persistent_filesystem_raii();
+
+#if PLATFORM_WEB
+		if (!save_copy(path, seed)) {
+			LOG("Failed to save the identity key to %x.", path);
+			return std::nullopt;
+		}
+
+		return augs::path_type();
+#else
 		auto backup = augs::path_type();
 
 		if (augs::exists(path)) {
@@ -464,8 +422,8 @@ namespace identity_key {
 			return std::nullopt;
 		}
 
-		remove_backups_in_browser(path);
 		return backup;
+#endif
 	}
 }
 
@@ -540,12 +498,6 @@ TEST_CASE("Identity key files are created once, replaced and forgotten only with
 	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::group_read) == std::filesystem::perms::none);
 	REQUIRE((std::filesystem::status(*second_backup).permissions() & std::filesystem::perms::others_read) == std::filesystem::perms::none);
 #endif
-
-	/* No key but backups: the newest one is put back (the later of the two is "other") */
-	std::filesystem::last_write_time(*second_backup, std::filesystem::last_write_time(*first_backup) + std::chrono::seconds(5));
-	REQUIRE(identity_key::restore_newest_backup(path));
-	REQUIRE(identity_key::load(path) == other);
-	REQUIRE_FALSE(identity_key::restore_newest_backup(path));
 
 	/* A copy of the key elsewhere, over a file there, owner-readable only */
 	const auto copy = dir / "copy.key";

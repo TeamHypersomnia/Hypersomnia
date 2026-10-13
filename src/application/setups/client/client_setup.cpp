@@ -1979,24 +1979,29 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				if (last_disconnect_reason.empty() && adapter->has_connection_failed()) {
 					switch (adapter->get_disconnect_reason()) {
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_SERVER_KEY_MISMATCH:
+							/*
+								Against the server list: nothing to accept - the list (refreshed by the game right away)
+								is what the server itself reported. Joined again by itself if the fresh list agrees.
+							*/
+
+							if (identity.expected_key_source == expected_server_key_source::SERVER_LIST) {
+								list_key_mismatch = true;
+								set_disconnect_reason("The server's key doesn't match the server list -\nit may be misconfigured or under maintenance. Try again later.");
+								break;
+							}
+
 							key_mismatch_failure = true;
 							set_disconnect_reason(
 								[&]() -> std::string {
 									switch (identity.expected_key_source) {
 										case expected_server_key_source::EARLIER_CONNECTION:
 											return "The server's key is different from the last time you played there.\n"
-												"Usually the server was just reinstalled - but it could also be someone pretending to be it.\n";
+												"Usually the server was just reinstalled - but it could also be someone impersonating it.\n";
 										case expected_server_key_source::REJOINED_MATCH:
 											return "The server's key is different from the one of the match you are rejoining.\n"
-												"Usually the server was just reinstalled - but it could also be someone pretending to be it.\n";
+												"Usually the server was just reinstalled - but it could also be someone impersonating it.\n";
 										default:
-											/*
-												A reinstalled server shows its new key on the list too - an old list is the usual reason.
-											*/
-
-											return "The server's key does not match the server list.\n"
-												"If the server was just reinstalled, refresh the server list and try again -\n"
-												"otherwise someone could be pretending to be it.\n";
+											return std::string();
 									}
 								}()
 								+ "\n"
@@ -2043,10 +2048,11 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 
 				/*
-					Any server could be answering on this address (e.g. after Connect anyway).
+					After Connect anyway: the key that answered is not the one known for this server.
+					(A first join by address is not warned about - nothing is known yet, as with SSH.)
 				*/
 
-				if (!identity.expected_server_public_key.has_value()) {
+				if (identity.connected_anyway) {
 					text_color("This server's key was not verified - don't type a password you use elsewhere.", orange);
 				}
 
