@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include "augs/string/hex.h"
 #include "augs/misc/future.h"
 
 #include "application/gui/browse_servers_gui.h"
@@ -1830,6 +1831,26 @@ bool server_details_gui_state::perform(
 
 			text("WebRTC id");
 		}
+	}
+
+	/*
+		The server's public key - what the game checks the server by; compare it with what the server's admin publishes
+		(e.g. its page on hypersomnia.io).
+	*/
+
+	if (const auto key = entry.get_public_key()) {
+		auto shown = "0x" + augs::bytes_to_hex(*key);
+		input_text("##Server key", shown, rdonly_flags);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Copy##ServerKey")) {
+			ImGui::SetClipboardText(shown.c_str());
+		}
+
+		ImGui::SameLine();
+
+		text("Server key");
 	}
 
 	if (!listed) {

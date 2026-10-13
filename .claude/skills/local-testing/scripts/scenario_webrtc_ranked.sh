@@ -36,7 +36,7 @@ mkconf ranked <<EOF
   "server": { "server_name": "[PL] Ranked test", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "TEAMS_EQUAL" },
               "webrtc_port_range_begin": 19000, "webrtc_port_range_end": 19050 },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY",
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"],
                       "report_ranked_match_url": "${BROKER_URL:-http://127.0.0.1:1}/report_match" }
 }
 EOF

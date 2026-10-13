@@ -340,7 +340,7 @@ struct server_private_vars {
 
 	std::vector<std::string> report_ranked_match_aux_endpoints;
 
-	std::string identity_broker_public_key = "";
+	std::vector<std::string> identity_broker_public_keys;
 
 	admin_profiles_type admin_profiles;
 	// END GEN INTROSPECTOR

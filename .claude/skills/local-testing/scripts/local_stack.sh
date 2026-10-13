@@ -52,7 +52,7 @@ mkconf $1 <<EOF
   "server": { "server_name": "$3", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$4" },
               "webrtc_port_range_begin": $5, "webrtc_port_range_end": $(($5 + 50)) },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "$BROKER_URL/report_match" }
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" }
 }
 EOF
 }

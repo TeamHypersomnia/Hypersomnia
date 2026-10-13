@@ -24,7 +24,7 @@ mkconf $1 <<J
   "server": { "server_name": "$1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$3" },
               "webrtc_port_range_begin": $(($2 + 9400)), "webrtc_port_range_end": $(($2 + 9405)) },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }
 J
 }
 

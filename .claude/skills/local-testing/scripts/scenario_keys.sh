@@ -39,7 +39,7 @@ mkconf $1 <<EOF
   "server_start": { "ip": "0.0.0.0", "port": $2, "slots": 16 },
   "server": { "server_name": "$1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$3" } },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "server_password": "$4",
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "server_password": "$4",
                       "report_ranked_match_url": "${BROKER_URL:-http://127.0.0.1:1}/report_match" }
 }
 EOF

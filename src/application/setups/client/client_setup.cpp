@@ -1981,7 +1981,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_SERVER_KEY_MISMATCH:
 							key_mismatch_failure = true;
 							set_disconnect_reason(
-								"The server's key is not the one the game expected\n(from the server list, or the match being rejoined).\n"
+								"The server's key is not the one the game expected\n(from the server list, from an earlier connection, or the match being rejoined).\n"
 								"The server may have been reinstalled - or someone may be intercepting the connection.\n"
 								"Connecting anyway sends no saved password, and your account can not be taken over."
 							);

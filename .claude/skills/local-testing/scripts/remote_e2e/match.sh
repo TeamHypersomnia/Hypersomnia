@@ -61,7 +61,7 @@ EOF
     "webrtc_port_range_end": 9010
   },
   "server_private": {
-    "identity_broker_public_key": "$4",
+    "identity_broker_public_keys": ["$4"],
     "report_ranked_match_url": "http://${ARENAUS_IP:-154.12.226.211}:13000/report_match"
   }
 }

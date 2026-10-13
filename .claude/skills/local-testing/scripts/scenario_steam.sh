@@ -24,7 +24,7 @@ cat > $T/ranked/user/conf.d/test.json <<J
   "server": { "server_name": "steam test ranked", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "TEAMS_EQUAL" },
               "webrtc_port_range_begin": 19500, "webrtc_port_range_end": 19505 },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }
 J
 cat > $T/steam/user/conf.d/test.json <<J
 { "identity_broker_url": "$BROKER_URL", "website_url": "$BROKER_URL", "server_list_provider": "http://127.0.0.1:1",

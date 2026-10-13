@@ -1306,19 +1306,33 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 std::string get_hex_representation(const std::byte*, size_t length);
 
 /*
-	The broker key the server trusts: built in, unless the config names another (e.g. a test broker).
+	The broker keys the server trusts: the one built in, unless the config lists others - a test broker,
+	an infrastructure of one's own, or the new and the old key while hypersomnia.io's key is rotated.
 */
 
 static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const server_private_vars& private_vars) {
-	const auto& configured = private_vars.identity_broker_public_key;
-	const auto hex = configured.empty() ? std::string(default_identity_broker_public_key_v) : configured;
+	const auto& configured = private_vars.identity_broker_public_keys;
 
-	if (const auto key = augs::hex_to_array<32>(hex)) {
-		return { *key };
+	if (configured.empty()) {
+		if (const auto key = augs::hex_to_array<32>(std::string(default_identity_broker_public_key_v))) {
+			return { *key };
+		}
+
+		return {};
 	}
 
-	LOG("ERROR: identity_broker_public_key is not 64 hex characters. No broker certs are accepted.");
-	return {};
+	auto keys = std::vector<augs::ed25519_public_key_type>();
+
+	for (const auto& hex : configured) {
+		if (const auto key = augs::hex_to_array<32>(hex)) {
+			keys.push_back(*key);
+		}
+		else {
+			LOG("ERROR: an identity_broker_public_keys entry is not 64 hex characters - skipped.");
+		}
+	}
+
+	return keys;
 }
 
 /*

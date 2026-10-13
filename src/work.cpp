@@ -76,6 +76,7 @@
 #include "application/main/ranked_match_record.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "application/main/server_passwords.h"
+#include "application/main/known_servers.h"
 #include "application/main/server_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
@@ -1982,6 +1983,12 @@ work_result work(
 	WEBSTATIC std::map<std::string, augs::ed25519_public_key_type> learned_server_keys;
 
 	/*
+		Keys of the servers connected to, kept between runs (.keys/known_servers.txt) - see known_servers.h.
+	*/
+
+	WEBSTATIC auto remembered_servers = known_servers(USER_DIR / identity_key::keys_dir_name / known_servers::file_name);
+
+	/*
 		A password entered for a server whose key is not known yet - used once, for the next connection only.
 	*/
 
@@ -2244,6 +2251,10 @@ work_result work(
 			}
 
 			const auto server_key = client.get_server_public_key();
+
+			if (server_key.has_value()) {
+				remembered_servers.set(std::string(client.get_connect_string()), *server_key);
+			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
 				outside_ranked_match_since = -1.0;
@@ -2944,6 +2955,14 @@ work_result work(
 
 			if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
 				return *learned;
+			}
+
+			/*
+				Joined by address before: the key it showed then - a different one now is warned about.
+			*/
+
+			if (const auto remembered = remembered_servers.find(std::string(connect_string))) {
+				return *remembered;
 			}
 
 			return std::nullopt;

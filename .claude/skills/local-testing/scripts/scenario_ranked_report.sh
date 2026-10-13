@@ -66,7 +66,7 @@ cat > $T/server/user/conf.d/test.json <<J
               "ranked": { "autostart_when": "TEAMS_EQUAL", "countdown_time": 2 },
               "move_to_spectators_if_afk_for_secs": 999999, "kick_if_afk_for_secs": 999999,
               "webrtc_port_range_begin": 19600, "webrtc_port_range_end": 19605 },
-  "server_private": { "identity_broker_public_key": "$BROKER_PUBLIC_KEY", "report_ranked_match_url": "$BROKER_URL/report_match" } }
+  "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" } }
 J
 
 cd $REPO/hypersomnia
