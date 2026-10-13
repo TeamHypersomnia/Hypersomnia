@@ -79,15 +79,23 @@ struct webrtc_client_detail;
 	What the game tells a client about who the player is and what server it expects - see identity_session.h.
 */
 
+enum class expected_server_key_source {
+	SERVER_LIST,
+	EARLIER_CONNECTION,
+	REJOINED_MATCH
+};
+
 struct client_identity_context {
 	std::shared_ptr<identity_session> session;
 	identity_session::input input;
 
 	/*
-		From the server list; none when connecting by address, to take whatever key the server presents.
+		From the server list, an earlier connection to this address (known_servers.h) or the match being rejoined;
+		none to take whatever key the server presents. Where it came from says what a mismatch means.
 	*/
 
 	std::optional<augs::ed25519_public_key_type> expected_server_public_key;
+	expected_server_key_source expected_key_source = expected_server_key_source::SERVER_LIST;
 
 	/*
 		The password saved for this server's key, if any - never sent to another key.

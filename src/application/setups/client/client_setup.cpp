@@ -1981,9 +1981,20 @@ custom_imgui_result client_setup::perform_custom_imgui(
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_SERVER_KEY_MISMATCH:
 							key_mismatch_failure = true;
 							set_disconnect_reason(
-								"The server's key is not the one the game expected\n(from the server list, from an earlier connection, or the match being rejoined).\n"
-								"The server may have been reinstalled - or someone may be intercepting the connection.\n"
-								"Connecting anyway sends no saved password, and your account can not be taken over."
+								[&]() -> std::string {
+									switch (identity.expected_key_source) {
+										case expected_server_key_source::EARLIER_CONNECTION:
+											return "The server's key is different from the last time you played there.\n";
+										case expected_server_key_source::REJOINED_MATCH:
+											return "The server's key is different from the one of the match you are rejoining.\n";
+										default:
+											return "The server's key does not match the server list.\n";
+									}
+								}()
+								+ "Usually the server was just reinstalled - but it could also be someone pretending to be it.\n"
+								+ "\n"
+								+ "If you connect anyway, your account stays safe - only what you do on this server (e.g. chat) could be seen."
+								+ (identity.password.empty() ? std::string() : std::string("\nThe password you saved for this server will not be sent."))
 							);
 							break;
 

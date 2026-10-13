@@ -5,6 +5,7 @@
 #include <string>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/secure_hash.h"
 
@@ -45,6 +46,7 @@ class server_passwords {
 		}
 
 		try {
+			augs::create_directories_for(path);
 			augs::save_as_text_atomic(path, content);
 		}
 		catch (const std::exception& e) {

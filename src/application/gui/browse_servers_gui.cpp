@@ -1850,7 +1850,7 @@ bool server_details_gui_state::perform(
 
 		ImGui::SameLine();
 
-		text("Server key");
+		text("Server public key");
 	}
 
 	if (!listed) {

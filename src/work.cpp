@@ -1999,7 +1999,7 @@ work_result work(
 		Server passwords, each saved for the key of its server and sent to no other.
 	*/
 
-	WEBSTATIC auto saved_server_passwords = server_passwords(USER_DIR / server_passwords::file_name);
+	WEBSTATIC auto saved_server_passwords = server_passwords(KEYS_DIR / server_passwords::file_name);
 
 	/*
 		Keys of the servers joined by address, learned in this run - to pick the saved password on a retry.
@@ -2350,17 +2350,36 @@ work_result work(
 		const auto provider = provider_name();
 
 		auto popup = simple_popup();
-		popup.title = "Not signed in";
-		popup.message = typesafe_sprintf(
-			"Couldn't sign in to your %x account.\n"
-			"\n"
-			"Until the game can, you play as your %x (%x) -\n"
-			"progress until then will not count towards %x.",
-			provider,
-			identity_key::account_kind_name_lowercase(),
-			identity_key::short_form(identity->public_key()),
-			provider
-		);
+		popup.title = typesafe_sprintf("Not signed in to %x", provider);
+
+		/*
+			Before joining: what joining now means. At the start: what it means until the game signs in.
+		*/
+
+		if (before_connect) {
+			popup.message = typesafe_sprintf(
+				"Couldn't sign in to your %x account.\n"
+				"\n"
+				"If you join now, you play as your %x (%x)\n"
+				"and progress from this game won't count towards %x.",
+				provider,
+				identity_key::account_kind_name_lowercase(),
+				identity_key::short_form(identity->public_key()),
+				provider
+			);
+		}
+		else {
+			popup.message = typesafe_sprintf(
+				"Couldn't sign in to your %x account - the game keeps trying.\n"
+				"\n"
+				"Until then you play as your %x (%x)\n"
+				"and progress won't count towards %x.",
+				provider,
+				identity_key::account_kind_name_lowercase(),
+				identity_key::short_form(identity->public_key()),
+				provider
+			);
+		}
 
 		if (!identity->last_error.empty()) {
 			popup.details = identity->last_error;
@@ -2960,12 +2979,17 @@ work_result work(
 		}
 
 		identity_context.expected_server_public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+			using S = expected_server_key_source;
+			auto& source = identity_context.expected_key_source;
+
 			if (rejoined_match.has_value()) {
+				source = S::REJOINED_MATCH;
 				return rejoined_match->server_key;
 			}
 
 			if (connected_anyway_to.count(std::string(connect_string)) > 0) {
 				if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
+					source = S::EARLIER_CONNECTION;
 					return *learned;
 				}
 
@@ -2974,11 +2998,13 @@ work_result work(
 
 			if (found != nullptr) {
 				if (const auto key = found->get_public_key()) {
+					source = S::SERVER_LIST;
 					return *key;
 				}
 			}
 
 			if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
+				source = S::EARLIER_CONNECTION;
 				return *learned;
 			}
 
@@ -2987,6 +3013,7 @@ work_result work(
 			*/
 
 			if (const auto remembered = remembered_servers.find(std::string(connect_string))) {
+				source = S::EARLIER_CONNECTION;
 				return *remembered;
 			}
 
@@ -3352,7 +3379,7 @@ work_result work(
 			}
 			else if (sign_in_popup_before_connect) {
 				const auto result = sign_in_popup->perform({
-					{ "Play without signing in", rgba::zero, rgba::zero },
+					{ "Join anyway", rgba::zero, rgba::zero },
 					{ "Cancel", rgba::zero, rgba::zero }
 				});
 
