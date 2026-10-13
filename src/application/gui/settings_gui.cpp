@@ -800,7 +800,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	}
 
-	tooltip_on_hover("Paste a private key copied with \"Copy private key to clipboard\" on another computer.\nThe current key is kept as a backup file.");
+	tooltip_on_hover(
+		"Share your account between computers:\n"
+		"on the other computer, open Manage -> Reveal the private key -> Copy,\n"
+		"and paste it here.\n"
+		"\n"
+		"Whoever has this key plays as you, for good.\n"
+		"With Steam, link each computer instead - you can unlink it later."
+	);
 
 	/*
 		Importing switches the account - confirmed first, in case the wrong key was pasted.
@@ -1152,7 +1159,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			identity->clear_link_check();
 			linked_name = name;
-			finish(true, "Progress will count towards your Steam account.");
+			finish(true, "Progress now counts towards your Steam account.");
 		}
 		else if (check == L::NOT_LINKED) {
 			identity->clear_link_check();
@@ -1503,7 +1510,17 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 
 				link_avatar_and_name(shown_name, unlink_has_avatar);
-				text(local_key_line);
+
+				if (unlinking) {
+					text(local_key_line);
+				}
+				else {
+					text(typesafe_sprintf(
+						"\nProgress now counts towards your local key (%x).",
+						has_key ? identity_key::short_form(*public_key) : std::string()
+					));
+				}
+
 				ImGui::Separator();
 
 				auto scope = maybe_disabled_cols({}, unlinking);
