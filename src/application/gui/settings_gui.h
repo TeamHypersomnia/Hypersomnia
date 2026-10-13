@@ -305,6 +305,15 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool unlink_has_avatar = false;
 
 	/*
+		The unlink modal stays open for the answer: "Unlinking..." in place of the question, then the result.
+	*/
+
+	bool unlinking = false;
+	std::optional<std::string> unlink_result;
+	bool unlink_succeeded = false;
+	std::string unlinked_name;
+
+	/*
 		Decodes an account's avatar into link_avatar_to_upload - true if there is one to show.
 	*/
 

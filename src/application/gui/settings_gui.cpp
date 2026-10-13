@@ -370,6 +370,11 @@ void settings_gui_state::on_steam_link_code(const std::string& code, const std::
 	A modal centered on the screen, with the screen behind it dimmed by ImGui.
 */
 
+static std::string steam_profile_url(const std::string& steam_account) {
+	const auto id64 = steam_account.rfind("steam_", 0) == 0 ? steam_account.substr(6) : steam_account;
+	return "https://steamcommunity.com/profiles/" + id64;
+}
+
 static void center_next_modal() {
 	const auto display = ImGui::GetIO().DisplaySize;
 	ImGui::SetNextWindowPos(ImVec2(display.x / 2, display.y / 2), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -1172,7 +1177,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 		else if (check == L::FAILED) {
 			identity->clear_link_check();
-			finish(false, typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", website_url));
+
+			if (link_flow == F::CHECKING_AFTER) {
+				/*
+					The site took the link - only the game could not hear it yet; it keeps asking by itself.
+				*/
+
+				identity->recheck_link_quietly();
+				finish(false, typesafe_sprintf("Linked, but couldn't reach %x to sign in to the Steam account.\n\nThe game will keep trying on its own.", website_url));
+			}
+			else {
+				finish(false, typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", website_url));
+			}
 		}
 	}
 
@@ -1252,19 +1268,15 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					identity->on_unlinked();
 				}
 
-				if (response.body.find("\"from\":null") != std::string::npos) {
-					account_message = "This key was not linked to any Steam account.";
-				}
-				else {
-					account_message = typesafe_sprintf(
-						"Unlinked.\n\nProgress counts towards your local key again:\n\n    %x",
-						has_key ? identity_key::short_form(*public_key) : std::string()
-					);
-				}
+				unlinking = false;
+				unlink_succeeded = response.body.find("\"from\":null") == std::string::npos;
+				unlink_result = unlink_succeeded ? std::string("Unlinked") : std::string("This key was not linked to any Steam account.");
 			}
 		}
 		else if (link_request_is_unlink) {
-			account_message = response_error(response, "Unlinking");
+			unlinking = false;
+			unlink_succeeded = false;
+			unlink_result = response_error(response, "Unlinking");
 		}
 		else {
 			finish(false, response_error(response, "Linking"));
@@ -1405,8 +1417,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				*/
 
 				if (external_link("SteamProfile", target.steam_account, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
-					const auto id64 = target.steam_account.rfind("steam_", 0) == 0 ? target.steam_account.substr(6) : target.steam_account;
-					augs::open_url("https://steamcommunity.com/profiles/" + id64);
+					augs::open_url(::steam_profile_url(target.steam_account));
 				}
 
 				ImGui::Separator();
@@ -1416,6 +1427,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					linked_name = target.name;
 					linked_has_avatar = target.has_avatar;
 					link_to_confirmed_target(target);
+
+					if (link_flow != F::LINKING) {
+						finish(false, "Couldn't sign the link with your local key.\n\nSee the logs.");
+					}
 				}
 
 				ImGui::SameLine();
@@ -1454,30 +1469,75 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		ImGui::OpenPopup("Unlink?##Modal");
 
 		if (ImGui::BeginPopupModal("Unlink?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text("Are you sure you want to unlink this Steam account?");
-			link_avatar_and_name(steam_name.empty() ? steam_account : steam_name, unlink_has_avatar);
-			text(typesafe_sprintf(
+			/*
+				The question, then "Unlinking..." and the result in its place - the avatar and the rest stay where they are.
+			*/
+
+			const auto shown_name = unlinked_name.empty() ? (steam_name.empty() ? steam_account : steam_name) : unlinked_name;
+			const auto local_key_line = typesafe_sprintf(
 				"\nProgress will count towards your local key (%x) again.",
 				has_key ? identity_key::short_form(*public_key) : std::string()
-			));
+			);
 
-			ImGui::Separator();
+			auto close_unlink = [&]() {
+				confirm_unlink = false;
+				unlink_result.reset();
+				unlinked_name.clear();
+				ImGui::CloseCurrentPopup();
+			};
 
-			{
-				const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
+			if (unlink_result.has_value() && !unlink_succeeded) {
+				text_color(*unlink_result, orange);
+				ImGui::Separator();
 
-				if (ImGui::Button("Unlink", ImVec2(120, 0))) {
-					confirm_unlink = false;
-					unlink();
-					ImGui::CloseCurrentPopup();
+				if (ImGui::Button("OK##Unlink", ImVec2(120, 0))) {
+					close_unlink();
 				}
 			}
+			else if (unlinking || unlink_result.has_value()) {
+				if (unlinking) {
+					spinner_line("Unlinking...", white);
+				}
+				else {
+					checkmark_line(*unlink_result, green);
+				}
 
-			ImGui::SameLine();
+				link_avatar_and_name(shown_name, unlink_has_avatar);
+				text(local_key_line);
+				ImGui::Separator();
 
-			if (ImGui::Button("Cancel##Unlink", ImVec2(120, 0))) {
-				confirm_unlink = false;
-				ImGui::CloseCurrentPopup();
+				auto scope = maybe_disabled_cols({}, unlinking);
+
+				if (ImGui::Button("OK##Unlink", ImVec2(120, 0)) && !unlinking) {
+					close_unlink();
+				}
+			}
+			else {
+				text("Are you sure you want to unlink this Steam account?");
+				link_avatar_and_name(shown_name, unlink_has_avatar);
+				text(local_key_line);
+
+				ImGui::Separator();
+
+				{
+					const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
+
+					if (ImGui::Button("Unlink", ImVec2(120, 0))) {
+						/*
+							The name stays as it was asked about - the linked account is gone a moment later.
+						*/
+
+						unlinked_name = shown_name;
+						unlink();
+						unlinking = augs::in_progress(link_request);
+					}
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel##Unlink", ImVec2(120, 0))) {
+					close_unlink();
+				}
 			}
 
 			ImGui::EndPopup();
@@ -3336,8 +3396,61 @@ void settings_gui_state::perform(
 							entry.atlas_space = xywh(0, 0, 1, 1);
 							const auto avatar_size = vec2::square(max_avatar_side_v);
 
+							const auto pos = ImGui::GetCursorScreenPos();
 							game_image(entry, avatar_size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
+
+							/*
+								One's own avatar is changed by clicking it - the account's comes from the account.
+							*/
+
+#if !PLATFORM_WEB
+							if (signed_in.avatar_image_path.empty()) {
+								const auto tooltip = typesafe_sprintf("Change avatar\n\nAn image of up to %xx%x.", max_avatar_side_v, max_avatar_side_v);
+
+								if (editable_image_overlay("Avatar", pos, ImVec2(avatar_size.x, avatar_size.y), tooltip) && !chosen_avatar.valid()) {
+									chosen_avatar = launch_async(
+										[&window]() -> std::optional<augs::path_type> {
+											const std::vector<augs::window::file_dialog_filter> filters = { {
+												"Image file",
+												"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
+											} };
+		
+											const auto path = window.open_file_dialog(filters, "Choose avatar image");
+		
+											if (!path.has_value()) {
+												return std::nullopt;
+											}
+		
+											try {
+												auto image = augs::image();
+												image.from_file(*path);
+		
+												const auto max_side = static_cast<unsigned>(max_avatar_side_v);
+												auto size = image.get_size();
+		
+												if (size.x > max_side || size.y > max_side) {
+													size.x = std::min(size.x, max_side);
+													size.y = std::min(size.y, max_side);
+													image.scale(size);
+												}
+		
+												image.save_as_png(CACHED_AVATAR);
+												return augs::path_type(CACHED_AVATAR);
+											}
+											catch (...) {
+												return std::nullopt;
+											}
+										}
+									);
+								}
+							}
+							else {
+								ImGui::Dummy(ImVec2(avatar_size.x, avatar_size.y));
+							}
+#else
+							(void)pos;
 							ImGui::Dummy(ImVec2(avatar_size.x, avatar_size.y));
+#endif
 							ImGui::SameLine();
 						}
 
@@ -3369,45 +3482,6 @@ void settings_gui_state::perform(
 
 #if !PLATFORM_WEB
 						if (signed_in.avatar_image_path.empty()) {
-							if (ImGui::Button("Choose avatar...") && !chosen_avatar.valid()) {
-								chosen_avatar = launch_async(
-									[&window]() -> std::optional<augs::path_type> {
-										const std::vector<augs::window::file_dialog_filter> filters = { {
-											"Image file",
-											"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
-										} };
-
-										const auto path = window.open_file_dialog(filters, "Choose avatar image");
-
-										if (!path.has_value()) {
-											return std::nullopt;
-										}
-
-										try {
-											auto image = augs::image();
-											image.from_file(*path);
-
-											const auto max_side = static_cast<unsigned>(max_avatar_side_v);
-											auto size = image.get_size();
-
-											if (size.x > max_side || size.y > max_side) {
-												size.x = std::min(size.x, max_side);
-												size.y = std::min(size.y, max_side);
-												image.scale(size);
-											}
-
-											image.save_as_png(CACHED_AVATAR);
-											return augs::path_type(CACHED_AVATAR);
-										}
-										catch (...) {
-											return std::nullopt;
-										}
-									}
-								);
-							}
-
-							tooltip_on_hover(typesafe_sprintf("An image of up to %xx%x.", max_avatar_side_v, max_avatar_side_v));
-
 							if (valid_and_is_ready(chosen_avatar)) {
 								if (const auto chosen = chosen_avatar.get()) {
 									scope_cfg.avatar_image_path = *chosen;
@@ -3460,6 +3534,11 @@ void settings_gui_state::perform(
 
 							if (is_key) {
 								text_disabled("Progress counts towards your local key - back it up in Manage.");
+							}
+							else if (current_account_id.rfind("steam_", 0) == 0) {
+								if (external_link("InfoSteamProfile", current_account_id, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
+									augs::open_url(::steam_profile_url(current_account_id));
+								}
 							}
 						}
 

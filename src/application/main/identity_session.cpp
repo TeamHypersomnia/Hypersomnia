@@ -19,6 +19,7 @@ static constexpr double cert_expiry_margin_secs = 120.0;
 static constexpr double first_retry_delay_secs = 30.0;
 static constexpr double max_retry_delay_secs = 300.0;
 static constexpr double steam_ticket_timeout_secs = 10.0;
+static constexpr double key_recheck_delay_secs = 30.0;
 
 static constexpr std::string_view cert_file_prefix = "hypersomnia-cert-v1:";
 
@@ -65,6 +66,9 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	load_saved_cert();
 
+	key_check_quiet = false;
+	key_check_next_at = 0.0;
+
 	/*
 		A key whose Steam cert is saved is known; any other is asked about unless it is the one last asked about.
 	*/
@@ -95,6 +99,12 @@ void identity_session::save_checked_key() {
 	catch (...) {
 		LOG("Could not save %x.", checked_key_file);
 	}
+}
+
+void identity_session::recheck_link_quietly() {
+	key_check_wanted = true;
+	key_check_quiet = true;
+	key_check_next_at = last_now + key_recheck_delay_secs;
 }
 
 void identity_session::on_key_created() {
@@ -394,10 +404,12 @@ void identity_session::advance(const input& in, const double now) {
 		}
 	}
 
-	if (key_check_wanted && link_check_request == nullptr && !in.broker_url.empty()) {
-		LOG("The key in account.key was not seen before - asking whether it is linked, as on an import.");
+	if (key_check_wanted && link_check_request == nullptr && !in.broker_url.empty() && now >= key_check_next_at) {
+		LOG("Asking whether the key is linked (%x).", key_check_quiet ? "again, quietly" : "not seen before - as on an import");
+		const bool quiet = key_check_quiet;
 		start_link_check(in.broker_url);
-		key_check_started = link_check == link_check_state::PENDING;
+		key_check_quiet = quiet;
+		key_check_started = !quiet && link_check == link_check_state::PENDING;
 	}
 
 	if (link_check_request != nullptr && link_check_request->is_ready()) {
@@ -407,10 +419,16 @@ void identity_session::advance(const input& in, const double now) {
 		if (!answer.has_value()) {
 			LOG("Checking the key's link failed (HTTP %x).", response.status);
 			link_check = link_check_state::FAILED;
+
+			if (key_check_quiet) {
+				key_check_wanted = true;
+				key_check_next_at = now + key_recheck_delay_secs;
+			}
 		}
 		else if (is_key_account(answer->cert.account)) {
 			link_check = link_check_state::NOT_LINKED;
 			link_check_profile = answer->profile;
+			key_check_quiet = false;
 			save_checked_key();
 		}
 		else {
@@ -429,6 +447,7 @@ void identity_session::advance(const input& in, const double now) {
 			last_attempt_failed = false;
 			last_error.clear();
 			save_cert();
+			key_check_quiet = false;
 			save_checked_key();
 		}
 	}
@@ -625,6 +644,7 @@ identity_cert::cert identity_session::cert_for_connect(const double now, const s
 
 void identity_session::start_link_check(const std::string& broker_url) {
 	key_check_wanted = false;
+	key_check_quiet = false;
 
 	const auto key = key_location();
 	auto error = std::string();

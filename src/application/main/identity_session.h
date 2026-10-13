@@ -133,6 +133,14 @@ private:
 	bool key_check_wanted = false;
 	bool key_check_started = false;
 
+	/*
+		A quiet check is retried until it gets an answer and never shown as an import - e.g. after linking
+		when the check that should follow could not reach hypersomnia.io.
+	*/
+
+	bool key_check_quiet = false;
+	double key_check_next_at = 0.0;
+
 	void save_checked_key();
 
 	input last_input;
@@ -232,6 +240,12 @@ public:
 	*/
 
 	void on_key_created();
+
+	/*
+		Linked on the site, but the check that should follow failed: asked again in the background until answered.
+	*/
+
+	void recheck_link_quietly();
 
 	/*
 		True once when a key not seen before began its link check - the game shows it as an import.

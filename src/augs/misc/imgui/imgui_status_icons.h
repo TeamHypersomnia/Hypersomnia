@@ -153,6 +153,76 @@ namespace augs {
 			return clicked;
 		}
 
+		/*
+			A pencil, the usual "edit" mark - filled, from its tip at the bottom left up to the top right.
+		*/
+
+		inline void edit_icon(const ImVec2 pos, const float size, const ImU32 col, const ImU32 gap_col) {
+			auto* const draw_list = ImGui::GetWindowDrawList();
+
+			const auto along = ImVec2(0.7071f, -0.7071f);
+			const auto across = ImVec2(0.7071f, 0.7071f);
+			const auto half_width = size * 0.13f;
+
+			auto at = [&](const ImVec2 from, const ImVec2 dir, const float len) {
+				return ImVec2(from.x + dir.x * len, from.y + dir.y * len);
+			};
+
+			const auto tip = ImVec2(pos.x + size * 0.12f, pos.y + size * 0.88f);
+			const auto tip_base = at(tip, along, size * 0.25f);
+			const auto end = at(tip_base, along, size * 0.6f);
+
+			draw_list->AddTriangleFilled(tip, at(tip_base, across, half_width), at(tip_base, across, -half_width), col);
+			draw_list->AddQuadFilled(
+				at(tip_base, across, half_width),
+				at(end, across, half_width),
+				at(end, across, -half_width),
+				at(tip_base, across, -half_width),
+				col
+			);
+
+			const auto band = at(end, along, -size * 0.16f);
+			const auto thickness = std::max(1.0f, size * 0.07f);
+
+			draw_list->AddLine(at(tip_base, across, half_width), at(tip_base, across, -half_width), gap_col, thickness);
+			draw_list->AddLine(at(band, across, half_width), at(band, across, -half_width), gap_col, thickness);
+		}
+
+		/*
+			An image that edits when clicked: on hover a light frame and a pencil in its corner.
+			Call after drawing the image at pos; returns true when clicked.
+		*/
+
+		inline bool editable_image_overlay(const std::string& id, const ImVec2 pos, const ImVec2 size, const std::string& tooltip) {
+			ImGui::SetCursorScreenPos(pos);
+
+			ImGui::PushID(id.c_str());
+			const bool clicked = ImGui::InvisibleButton("##editable", size);
+			const bool hovered = ImGui::IsItemHovered();
+			const bool held = ImGui::IsItemActive();
+			ImGui::PopID();
+
+			if (hovered || held) {
+				auto* const draw_list = ImGui::GetWindowDrawList();
+				const auto max = ImVec2(pos.x + size.x, pos.y + size.y);
+				const auto frame_col = held ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 200);
+
+				draw_list->AddRectFilled(pos, max, IM_COL32(0, 0, 0, held ? 110 : 70));
+				draw_list->AddRect(pos, max, frame_col, 0.0f, 0, 2.0f);
+
+				const auto icon = std::min(size.x, size.y) * 0.3f;
+				const auto badge_center = ImVec2(max.x - icon * 0.75f, max.y - icon * 0.75f);
+				const auto badge_col = IM_COL32(20, 20, 20, 220);
+
+				draw_list->AddCircleFilled(badge_center, icon * 0.68f, badge_col);
+				edit_icon(ImVec2(badge_center.x - icon * 0.4f, badge_center.y - icon * 0.4f), icon * 0.8f, frame_col, badge_col);
+
+				ImGui::SetTooltip("%s", tooltip.c_str());
+			}
+
+			return clicked;
+		}
+
 		inline void spinner_line(const std::string& label, const rgba col) {
 			const auto size = ImGui::GetTextLineHeight();
 
