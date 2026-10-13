@@ -3727,6 +3727,38 @@ void settings_gui_state::perform(
 
 						if (const auto& provider = signed_in.provider_label; !provider.empty()) {
 							revertable_checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
+
+							/*
+								The Steam name and avatar asked for anew (otherwise taken from hypersomnia.io's cache of a day).
+							*/
+
+							if (provider == "Steam" && identity != nullptr && identity->has_valid_cert(augs::steady_secs())) {
+								ImGui::SameLine();
+
+								/*
+									hypersomnia.io asks Steam anew at most once a minute per account - the button waits as long.
+								*/
+
+								const auto now = ImGui::GetTime();
+								const bool recently = now - profile_refreshed_at < 60.0;
+
+								if (identity->is_refreshing_profile()) {
+									spinner(ImGui::GetTextLineHeight(), white);
+								}
+								else {
+									const bool clicked = [&]() {
+										auto scope = maybe_disabled_cols({}, recently);
+										return ImGui::Button("Refresh##AccountProfile");
+									}();
+
+									if (clicked && !recently) {
+										identity->refresh_profile_now();
+										profile_refreshed_at = now;
+									}
+
+									tooltip_on_hover(recently ? "You can refresh again in a minute." : "Get your current Steam name and avatar.");
+								}
+							}
 						}
 
 						ImGui::EndGroup();

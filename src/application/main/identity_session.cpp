@@ -381,7 +381,11 @@ void identity_session::start_request(const input& in, const double now) {
 		headers["X-CrazyGames-Token"] = in.crazygames_token;
 	}
 
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location + device, headers);
+	const auto refresh = profile_refresh_wanted ? std::string("&refresh_profile=1") : std::string();
+	profile_refresh_pending = profile_refresh_wanted;
+	profile_refresh_wanted = false;
+
+	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location + device + refresh, headers);
 	requested_for = in;
 }
 
@@ -531,6 +535,7 @@ void identity_session::advance(const input& in, const double now) {
 		const auto response = augs::get_once(request);
 		clear_steam_ticket();
 		++attempts_finished;
+		profile_refresh_pending = false;
 
 		/*
 			Asked for an account that is no longer the player's: whatever came back is not theirs - asked again right away.
@@ -631,7 +636,7 @@ void identity_session::advance(const input& in, const double now) {
 		on_steam_ticket({}, false);
 	}
 
-	if (broker_cert.has_value()) {
+	if (broker_cert.has_value() && !profile_refresh_wanted) {
 		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
 
 		if (cert_secs_left(now) > lifetime / 2) {
@@ -681,6 +686,11 @@ void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_byte
 	}
 
 	steam_ticket = ticket_bytes;
+}
+
+void identity_session::refresh_profile_now() {
+	profile_refresh_wanted = true;
+	next_attempt_at = 0.0;
 }
 
 void identity_session::retry_now() {

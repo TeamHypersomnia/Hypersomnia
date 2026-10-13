@@ -381,6 +381,8 @@ public:
 
 	bool avatar_changed = false;
 
+	double profile_refreshed_at = -1000.0;
+
 	/*
 		account.key was just replaced or forgotten here - the game reads it again.
 	*/

@@ -136,6 +136,13 @@ private:
 	*/
 
 	std::string device_name;
+
+	/*
+		"Refresh" next to "Use my Steam name and avatar": a new cert at once, with the name and avatar fetched anew.
+	*/
+
+	bool profile_refresh_wanted = false;
+	bool profile_refresh_pending = false;
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
@@ -209,6 +216,12 @@ public:
 	*/
 
 	void retry_now();
+
+	void refresh_profile_now();
+
+	bool is_refreshing_profile() const {
+		return profile_refresh_wanted || profile_refresh_pending;
+	}
 
 	/*
 		A key linked to Steam is expected to sign in while steam.cert is there.
