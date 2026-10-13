@@ -301,6 +301,13 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool reveal_private_key_open = false;
 	double private_key_copied_at = -1000.0;
 	bool confirm_unlink = false;
+	bool unlink_has_avatar = false;
+
+	/*
+		Decodes an account's avatar into link_avatar_to_upload - true if there is one to show.
+	*/
+
+	bool upload_link_avatar(const std::vector<std::byte>& bytes);
 	std::optional<std::string> account_message;
 
 	augs::future<std::optional<augs::path_type>> chosen_avatar;

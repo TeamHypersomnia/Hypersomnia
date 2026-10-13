@@ -470,6 +470,46 @@ static void local_key_line(const std::optional<augs::ed25519_public_key_type>& p
 	ImGui::Separator();
 }
 
+bool settings_gui_state::upload_link_avatar(const std::vector<std::byte>& bytes) {
+	if (bytes.empty()) {
+		return false;
+	}
+
+	try {
+		auto image = augs::image();
+		image.from_bytes_stbi(bytes, "link avatar");
+		image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
+
+		link_avatar_to_upload = std::move(image);
+		return true;
+	}
+	catch (...) {
+		LOG("Could not read the avatar of the Steam account.");
+		return false;
+	}
+}
+
+/*
+	The avatar (LINK_AVATAR) with the name beside it, as in the link and unlink modals.
+*/
+
+static void link_avatar_and_name(const std::string& name, const bool has_avatar) {
+	using namespace augs::imgui;
+
+	if (has_avatar) {
+		augs::atlas_entry entry;
+		entry.atlas_space = xywh(0, 0, 1, 1);
+		const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
+
+		game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::LINK_AVATAR);
+		ImGui::Dummy(ImVec2(size.x, size.y));
+		ImGui::SameLine();
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
+	}
+
+	text(name);
+}
+
 void settings_gui_state::on_key_replaced_outside() {
 	open();
 	active_pane = settings_pane::ACCOUNT;
@@ -1062,6 +1102,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink...")) {
 			confirm_unlink = true;
+			unlink_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
 		}
 	}
 	else {
@@ -1154,18 +1195,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					}
 
 					if (doc.HasMember("avatar") && doc["avatar"].IsString()) {
-						if (const auto bytes = augs::from_base64(doc["avatar"].GetString()); bytes.has_value() && !bytes->empty()) {
-							try {
-								auto image = augs::image();
-								image.from_bytes_stbi(*bytes, "link avatar");
-								image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
-
-								link_avatar_to_upload = std::move(image);
-								result.has_avatar = true;
-							}
-							catch (...) {
-								LOG("Could not read the avatar of the Steam account to link.");
-							}
+						if (const auto bytes = augs::from_base64(doc["avatar"].GetString())) {
+							result.has_avatar = upload_link_avatar(*bytes);
 						}
 					}
 
@@ -1337,24 +1368,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			else if (link_flow == F::CONFIRMING && link_target_to_confirm.has_value()) {
 				const auto target = *link_target_to_confirm;
 
-				text("Link this key to the Steam account");
+				text_color("Confirm that this account is yours:", orange);
 
 				/*
 					Laid out as after linking: the avatar, the name beside it - the id under them, in gray.
 				*/
 
-				if (target.has_avatar) {
-					augs::atlas_entry entry;
-					entry.atlas_space = xywh(0, 0, 1, 1);
-					const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
-
-					game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::LINK_AVATAR);
-					ImGui::Dummy(ImVec2(size.x, size.y));
-					ImGui::SameLine();
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
-				}
-
-				text_color(typesafe_sprintf("\"%x\"?", target.name), orange);
+				link_avatar_and_name(target.name, target.has_avatar);
 
 				/*
 					Anyone can copy a name, the id is the account - it opens the real Steam profile.
@@ -1365,8 +1385,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					augs::open_url("https://steamcommunity.com/profiles/" + id64);
 				}
 
-				text("\nProgress will count towards that account.");
-				text_color("Confirm only if the account is yours.", orange);
+				text("\nProgress will count towards this Steam account.");
 
 				ImGui::Separator();
 
@@ -1424,8 +1443,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		ImGui::OpenPopup("Unlink?##Modal");
 
 		if (ImGui::BeginPopupModal("Unlink?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text("Are you sure you want to unlink");
-			text_color(typesafe_sprintf("    \"%x\"?", steam_name.empty() ? steam_account : steam_name), orange);
+			text("Are you sure you want to unlink this Steam account?");
+			link_avatar_and_name(steam_name.empty() ? steam_account : steam_name, unlink_has_avatar);
 			text(typesafe_sprintf(
 				"\nProgress will count towards your local key (%x) again.",
 				has_key ? identity_key::short_form(*public_key) : std::string()
