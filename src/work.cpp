@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <cstdint>
 /*
 	BEFORE YOU CONTINUE:
@@ -1921,7 +1922,11 @@ work_result work(
 		refresh_account_seed();
 		identity->advance(get_identity_input(), now);
 
-#if !WEB_CRAZYGAMES
+		/*
+			Not in the browser: nobody pastes a key into its storage by hand there - another tab's change is not an import.
+		*/
+
+#if !PLATFORM_WEB
 		if (identity->take_key_check_started()) {
 			settings_gui.on_key_replaced_outside();
 		}
@@ -1959,6 +1964,13 @@ work_result work(
 
 	WEBSTATIC std::optional<std::string> next_connect_password;
 	WEBSTATIC bool connect_anyway_once = false;
+
+	/*
+		Addresses the player chose "Connect anyway" for, this run: the key the server showed then (learned_server_keys)
+		comes before the server list's, so a password retry does not land on the mismatch again.
+	*/
+
+	WEBSTATIC std::unordered_set<std::string> connected_anyway_to;
 
 	try {
 		augs::image avatar;
@@ -2095,7 +2107,7 @@ work_result work(
 		*/
 
 		const bool confirming_saved = identity->signing_in_first_time(in, now) && identity->get_cert().has_value();
-		const bool signed_in_now = identity->has_valid_cert(now) || confirming_saved || (in.provider == identity_session::provider_type::CRAZYGAMES);
+		const bool signed_in_now = identity->has_valid_cert(now) || confirming_saved;
 
 		if (!signed_in_now || !config.client.use_account_profile || signed_in.provider_label.empty()) {
 			signed_in.nickname = "";
@@ -2275,15 +2287,10 @@ work_result work(
 		popup.message = typesafe_sprintf(
 			"Couldn't sign in to your %x account.\n"
 			"\n"
-			"You play as:\n"
-			"\n"
-			"    Local key (%x)\n"
-			"\n"
-			"until the game can sign you in again.\n"
-			"Progress until then will not count towards your %x account.\n"
-			"\n"
-			"If this keeps happening, try again later.",
+			"Until the game can, you play as your %x (%x) -\n"
+			"progress until then will not count towards %x.",
 			provider,
+			identity_key::account_kind_name_lowercase(),
 			identity_key::short_form(identity->public_key()),
 			provider
 		);
@@ -2305,7 +2312,7 @@ work_result work(
 			"Can't rejoin the ranked match:\n"
 			"couldn't sign in to your %x account.\n"
 			"\n"
-			"The match is played on it - joining as your local key\n"
+			"The match is played on it - joining as your " + identity_key::account_kind_name_lowercase() + "\n"
 			"would count as leaving it.",
 			provider_name()
 		);
@@ -2377,6 +2384,7 @@ work_result work(
 		settings_gui.account_avatar_previewed = previewed_avatar_path == augs::path_type(ACCOUNT_AVATAR);
 
 		settings_gui.in_ranked_match = would_abandon_ranked_match();
+		settings_gui.clear_copied_private_key_if_due();
 
 		if (settings_gui.link_avatar_to_upload.has_value()) {
 			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
@@ -2871,6 +2879,14 @@ work_result work(
 				return rejoined_match->server_key;
 			}
 
+			if (connected_anyway_to.count(std::string(connect_string)) > 0) {
+				if (const auto learned = mapped_or_nullptr(learned_server_keys, std::string(connect_string))) {
+					return *learned;
+				}
+
+				return std::nullopt;
+			}
+
 			if (found != nullptr) {
 				if (const auto key = found->get_public_key()) {
 					return *key;
@@ -2899,6 +2915,7 @@ work_result work(
 
 		if (connect_anyway_once) {
 			connect_anyway_once = false;
+			connected_anyway_to.insert(std::string(connect_string));
 			identity_context.expected_server_public_key.reset();
 			identity_context.password.clear();
 		}
@@ -3233,7 +3250,7 @@ work_result work(
 			}
 			else if (sign_in_popup_before_connect) {
 				const auto result = sign_in_popup->perform({
-					{ "Connect anyway", rgba::zero, rgba::zero },
+					{ "Play without signing in", rgba::zero, rgba::zero },
 					{ "Cancel", rgba::zero, rgba::zero }
 				});
 
@@ -3366,7 +3383,11 @@ work_result work(
 			else {
 				auto popup = simple_popup();
 				popup.title = "Quick play";
-				popup.message = "No server to join right now.\n\nTry again in a moment, or host one yourself.";
+				popup.message =
+					browse_servers_gui.server_list_failed() ?
+					"Couldn't reach the server list.\n\nYou can still join a server by its address in Connect to server." :
+					"No server to join right now.\n\nTry again in a moment, or host one yourself."
+				;
 				quick_play_popup = popup;
 			}
 
@@ -3472,7 +3493,7 @@ work_result work(
 				return provider_name() + ": " + (name.empty() ? account : name);
 			}
 
-			return "Local key (" + identity_key::short_form(identity->public_key()) + ")";
+			return identity_key::account_kind_name() + " (" + identity_key::short_form(identity->public_key()) + ")";
 		}();
 
 		leaderboards_gui.perform({

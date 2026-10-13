@@ -158,7 +158,17 @@ struct webrtc_client_detail {
 				return;
 			}
 
-			self->set_message("WebSocket closed");
+			/*
+				Closed before the connection was made: nothing more will come - not a wait without end.
+			*/
+
+			if (!self->is_ready()) {
+				self->set_message("Couldn't reach the server through masterserver.hypersomnia.io. Try again later.");
+				self->set_error();
+			}
+			else {
+				self->set_message("WebSocket closed");
+			}
         });
 
 		ws.onMessage([wself = std::weak_ptr(self)](const rtc::message_variant& data) {
@@ -1901,6 +1911,15 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (const bool webrtc_handshake_in_progress = is_webrtc() && !webrtc_client->is_ready() && !webrtc_client->is_error()) {
+			/*
+				Negotiating through the masterserver has a limit of its own.
+			*/
+
+			if (get_current_time() - when_initiated_connection > 20.0) {
+				webrtc_client->set_message("Couldn't reach the server through masterserver.hypersomnia.io. Try again later.");
+				webrtc_client->set_error();
+			}
+
 			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 
 			text("\n");

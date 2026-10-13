@@ -72,7 +72,17 @@ namespace augs {
 
 	inline decltype(auto) remove_file(const path_type& path) {
 		std::error_code err;
-		return std::filesystem::remove(path, err);
+		const auto removed = std::filesystem::remove(path, err);
+
+		/*
+			The web build's user folder lives in the browser - a removal not written there comes back on reload.
+		*/
+
+		if (removed) {
+			sync_if_persistent(path);
+		}
+
+		return removed;
 	}
 
 	inline decltype(auto) remove_directory(const path_type& path) {

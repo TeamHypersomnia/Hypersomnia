@@ -55,6 +55,26 @@ message_handler_result server_setup::handle_payload(
 			new_nick = "Player";
 		}
 
+		/*
+			No ranked from the itch.io build (its key lives where every itch.io game can read it)
+			nor for CrazyGames guests (a new account at every reload). The platform is the client's word - enough here.
+		*/
+
+		if (vars.requires_authentication()) {
+			const auto platform = payload.get_platform_type();
+			const bool guest_account = c.cert_account.rfind("key_", 0) == 0;
+
+			if (platform == client_platform_type::ITCH) {
+				kick(client_id, "Ranked is not available on itch.io.\nPlay on play.hypersomnia.io or on Steam.");
+				return abort_v;
+			}
+
+			if (platform == client_platform_type::CRAZYGAMES && guest_account) {
+				kick(client_id, "Sign in to CrazyGames to play ranked.");
+				return abort_v;
+			}
+		}
+
 		const bool nickname_changed = 
 			new_nick != c.settings.chosen_nickname
 		;

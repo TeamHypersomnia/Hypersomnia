@@ -75,7 +75,7 @@ bool chat_gui_state::add_entry_from_mode_notification(
 
 				case N::FAILED_TO_AUTHENTICATE:
 					do_entry(
-						"Failed to authenticate users for a ranked match.\nTry again.",
+						"Couldn't start the ranked match: a player could not be verified,\nor this server is not recognized as official.",
 						orange
 					);
 					break;

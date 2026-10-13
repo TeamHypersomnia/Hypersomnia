@@ -149,6 +149,10 @@ public:
 	*/
 
 	std::optional<server_list_entry> find_quick_play_server() const;
+
+	bool server_list_failed() const {
+		return !error_message.empty();
+	}
 	void refresh_server_list(browse_servers_input);
 
 	bool refreshed_at_least_once() const;

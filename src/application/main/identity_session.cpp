@@ -322,6 +322,12 @@ void identity_session::start_request(const input& in, const double now) {
 	const auto url = broker_url_of(in.broker_url, last_error);
 
 	if (!url.has_value()) {
+		/*
+			A failed attempt like any other - a start never waits forever on a broker it cannot ask.
+		*/
+
+		++attempts_finished;
+		last_attempt_failed = true;
 		schedule_retry(now);
 		return;
 	}

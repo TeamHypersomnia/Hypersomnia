@@ -55,6 +55,26 @@ namespace identity_key {
 	std::string short_form_of_account(const std::string& account);
 
 	/*
+		What a key's account is called to the player: it lives on this computer, or in this browser.
+	*/
+
+	inline std::string account_kind_name() {
+#if PLATFORM_WEB
+		return "Browser account";
+#else
+		return "Key account";
+#endif
+	}
+
+	inline std::string account_kind_name_lowercase() {
+#if PLATFORM_WEB
+		return "browser account";
+#else
+		return "key account";
+#endif
+	}
+
+	/*
 		The text the key file holds, also what "Export key" copies: "hypersomnia-key-v1:" and the seed in hex.
 	*/
 

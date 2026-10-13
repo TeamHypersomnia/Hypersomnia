@@ -357,7 +357,11 @@ function pre_run() {
 
   // Synchronize from IndexedDB to memory
   FS.syncfs(true, function (err) {
-    if (err) console.error('Error loading from IndexedDB', err);
+    if (err) {
+      // Nothing is ever written back then: an empty start would make a new account key and wipe the stored one
+      console.error('Error loading from IndexedDB', err);
+      Module.idbfs_failed = true;
+    }
     else console.log('Loaded from IndexedDB');
 
     // Remove the run dependency after IDBFS is fully loaded
@@ -383,6 +387,11 @@ function get_cli_args(for_cg) {
 }
 
 function sync_idbfs() {
+  if (Module.idbfs_failed) {
+    console.log("The browser's storage did not load - not writing over it.");
+    return;
+  }
+
   if (Module.isSyncing) {
     Module.needsSync = true; // Mark that a new sync is needed after the current one
     console.log("Still syncing, delaying syncfs");
@@ -397,9 +406,15 @@ function sync_idbfs() {
   FS.syncfs(false, function(err) {
     Module.isSyncing = false;
     if (err) {
+      // Tried again later, a few times - not in a tight loop (e.g. the quota is full)
       console.error("Filesystem sync failed", err);
-      Module.sync_idbfs();
+      Module.sync_failures = (Module.sync_failures || 0) + 1;
+
+      if (Module.sync_failures <= 5) {
+        setTimeout(() => Module.sync_idbfs(), 1000 * Math.min(30, Math.pow(2, Module.sync_failures)));
+      }
     } else {
+      Module.sync_failures = 0;
       console.log("Filesystem synced successfully");
       if (Module.needsSync) {
 	console.log("Resyncing.");

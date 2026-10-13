@@ -1392,7 +1392,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}();
 
 	if (!verified.has_value()) {
-		kick(id, "Your account could not be verified.\nCheck that your computer's clock is right, or update the game.");
+		kick(id, "This server could not verify your account.\nThe server's clock may be wrong, or one of you needs an update.\nTry another server.");
 		c.kick_no_linger = true;
 		return;
 	}

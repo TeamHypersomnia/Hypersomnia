@@ -118,7 +118,7 @@ enum class account_settings_pane {
 	// GEN INTROSPECTOR enum class account_settings_pane
 	INFO,
 	LINK_WITH_STEAM,
-	MANAGE,
+	BACKUP,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -291,12 +291,13 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool import_profile_applied = false;
 
 	/*
-		Confirmations and results of the Manage and Link panes, each in its own modal.
+		Confirmations and results of the Backup and Link panes, each in its own modal.
 	*/
 
 	bool confirm_forget_key = false;
 	bool reveal_private_key_open = false;
 	double private_key_copied_at = -1000.0;
+	std::string copied_private_key;
 	bool confirm_unlink = false;
 	bool unlink_has_avatar = false;
 
@@ -404,10 +405,16 @@ public:
 	void on_key_replaced_outside();
 
 	/*
-		account.key does not read and there is no key to play with: Manage, with what to do.
+		account.key does not read and there is no key to play with: Backup, with what to do.
 	*/
 
 	void on_key_unreadable();
+
+	/*
+		Called every frame by the game.
+	*/
+
+	void clear_copied_private_key_if_due();
 
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;

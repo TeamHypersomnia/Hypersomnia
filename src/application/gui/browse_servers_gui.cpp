@@ -1458,7 +1458,7 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 
 	erase_if(candidates, [&](const auto& s) {
 		const bool is_ranked = s.is_official_server() && s.heartbeat.is_ranked_server();
-		return !s.heartbeat.versions_compatible() || is_ranked;
+		return !s.heartbeat.versions_compatible() || is_ranked || s.heartbeat.require_password || s.heartbeat.is_full();
 	});
 
 	auto public_ones = candidates;

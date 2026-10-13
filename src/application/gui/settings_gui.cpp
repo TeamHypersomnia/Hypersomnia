@@ -458,7 +458,7 @@ static bool colored_button(const std::string& id, const colored_segments& segmen
 }
 
 /*
-	"Local key: 0x8aed41f2..." with a copy icon - on top of Link with Steam and Manage.
+	"Key account: 0x8aed41f2..." with a copy icon - on top of Link with Steam and Backup.
 */
 
 static void local_key_line(const std::optional<augs::ed25519_public_key_type>& public_key) {
@@ -468,7 +468,7 @@ static void local_key_line(const std::optional<augs::ed25519_public_key_type>& p
 		return;
 	}
 
-	text("Local key:");
+	text(identity_key::account_kind_name() + ":");
 	ImGui::SameLine();
 	text(identity_key::short_form(*public_key));
 	ImGui::SameLine();
@@ -537,10 +537,29 @@ void settings_gui_state::on_key_replaced_outside() {
 	unlink_result.reset();
 }
 
+void settings_gui_state::clear_copied_private_key_if_due() {
+#if !PLATFORM_WEB
+	/*
+		A private key does not stay in the clipboard (its history, a cloud sync, a paste into a chat) -
+		cleared after a minute, unless something else was copied meanwhile.
+	*/
+
+	if (copied_private_key.empty() || ImGui::GetTime() - private_key_copied_at < 60.0) {
+		return;
+	}
+
+	if (const auto* const current = ImGui::GetClipboardText(); current != nullptr && copied_private_key == current) {
+		ImGui::SetClipboardText("");
+	}
+
+	copied_private_key.clear();
+#endif
+}
+
 void settings_gui_state::on_key_unreadable() {
 	open();
 	active_pane = settings_pane::ACCOUNT;
-	active_account_pane = account_settings_pane::MANAGE;
+	active_account_pane = account_settings_pane::BACKUP;
 }
 
 std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
@@ -678,7 +697,7 @@ void settings_gui_state::perform_import_modal(
 	else {
 		text_color("Couldn't check whether this key is linked to a Steam account.", orange);
 		text("\nProgress will count towards:\n");
-		text("    Local key (" + (identity != nullptr ? identity_key::short_form(identity->public_key()) : std::string()) + ")\n");
+		text("    " + identity_key::account_kind_name() + " (" + (identity != nullptr ? identity_key::short_form(identity->public_key()) : std::string()) + ")\n");
 
 		if (ImGui::Button("Retry##ImportCheck") && identity != nullptr) {
 			identity->start_link_check(identity_input.broker_url);
@@ -710,7 +729,7 @@ void settings_gui_state::perform_import_modal(
 }
 
 /*
-	Manage: only what reads or replaces the private key - backing it up, importing one, forgetting it.
+	Backup: only what reads or replaces the private key - backing it up, restoring one, starting a new account.
 */
 
 void settings_gui_state::perform_account_manage_pane(augs::window& window) {
@@ -742,7 +761,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		const bool linked = identity != nullptr && (identity->has_saved_cert() || signed_in_to_steam);
 
 		if (linked) {
-			text("Unlink from Steam to manage this key.");
+			text("This key is linked to Steam - nothing to back up.\nOn another computer, link that computer's key too.\nUnlink only to restore another key or start a new account.");
 			return;
 		}
 	}
@@ -762,7 +781,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 
 		if (augs::exists(key_path) && now - key_unreadable_since > 2.0) {
-			text_color("The key file is not a valid key. Fix it, import a key,\nor use Forget this key - the file is then kept as a backup.", red);
+			text_color("Your account.key file is damaged. Fix it, restore from your private key,\nor start a new account - the file is then kept as a backup.", red);
 		}
 		else {
 			text_disabled("Creating the key...");
@@ -794,7 +813,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	{
 		auto buffer = std::array<char, 256>();
-		input_text_with_hint(buffer, "##ImportKey", "e.g.: hypersomnia-key-v1...", import_key_text, ImGuiInputTextFlags_Password);
+		input_text_with_hint(buffer, "##ImportKey", "Paste hypersomnia-key-v1:...", import_key_text, ImGuiInputTextFlags_Password);
 	}
 	ImGui::SameLine();
 
@@ -818,7 +837,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	const bool import_clicked = [&]() {
 		auto scope = maybe_disabled_cols({}, in_ranked_match);
-		return colored_button("ImportPrivateKey", { { "Import ", white }, { "private key", orange } });
+		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange } });
 	}();
 
 	if (import_clicked && locked_by_ranked()) {
@@ -843,12 +862,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 	tooltip_on_hover(
-		"Share your account between computers:\n"
-		"on the other computer, open Manage -> Reveal the private key -> Copy,\n"
-		"and paste it here.\n"
+		"Restore your account from a private key you backed up\n"
+		"(Backup -> Back up private key -> Copy).\n"
 		"\n"
 		"Whoever has this key plays as you, for good.\n"
-		"With Steam, link each computer instead - you can unlink it later."
+		"To play on several computers with Steam, link each of them instead -\n"
+		"you can unlink one later."
 	);
 
 	/*
@@ -861,7 +880,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 		if (ImGui::BeginPopupModal("Switch account?##Import", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			text(typesafe_sprintf(
-				"Switch your account\n\n    from %x\n    to %x?\n\nThe current key is kept in your user folder as a backup file.",
+				"Switch your account\n\n    from %x\n    to %x?\n\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n\n"
+#if PLATFORM_WEB
+				"Your current key can't be recovered in the browser - back it up first.",
+#else
+				"The current key is kept in your user folder as a backup file.",
+#endif
 				identity_key::short_form(*public_key),
 				identity_key::short_form(*augs::ed25519_public_key(*import_to_confirm))
 			));
@@ -888,32 +912,35 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	ImGui::Separator();
 
-	ImGui::Separator();
-
 	/*
 		The private key itself only behind its own button - with the warning, copying it and finding its file.
 	*/
 
-	if (public_key.has_value() && colored_button("RevealThePrivateKey", { { "Reveal ", white }, { "the private key", orange } })) {
+	if (public_key.has_value() && colored_button("RevealThePrivateKey", { { "Back up ", white }, { "private key", orange }, { "...", white } })) {
 		reveal_private_key_open = true;
 		private_key_copied_at = -1000.0;
 	}
 
 	if (reveal_private_key_open && public_key.has_value()) {
 		center_next_modal();
-		ImGui::OpenPopup("The private key##Modal");
+		ImGui::OpenPopup("Back up your account##Modal");
 
-		if (ImGui::BeginPopupModal("The private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("Back up your account##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
 			text_color("NEVER share it!", red);
 			text("");
 
 			if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
-				ImGui::SetClipboardText(identity_key::to_export_string(*seed).c_str());
+				copied_private_key = identity_key::to_export_string(*seed);
+				ImGui::SetClipboardText(copied_private_key.c_str());
 				private_key_copied_at = ImGui::GetTime();
 			}
 
-			tooltip_on_hover("This lets you play from another computer:\npaste it there in Import private key.\n\nYou can also back it up.");
+#if PLATFORM_WEB
+			tooltip_on_hover("Keep it somewhere safe - with it you restore your account\n(Backup -> Restore from private key).");
+#else
+			tooltip_on_hover("Keep it somewhere safe - with it you restore your account\n(Backup -> Restore from private key).\n\nThe clipboard is cleared in 60 seconds.");
+#endif
 
 			if (ImGui::GetTime() - private_key_copied_at < 2.0) {
 				ImGui::SameLine();
@@ -921,7 +948,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 
 #if !PLATFORM_WEB
-			if (colored_button("RevealPrivateKey", { { "Reveal ", white }, { "private key", orange }, { " in explorer", white } })) {
+			if (ImGui::Button("Show key file in folder")) {
 				window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 			}
 
@@ -945,7 +972,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		{
 			const auto cols = danger_button_colors(rgba(200, 80, 0, 255));
 
-			if (ImGui::Button("Forget this key...")) {
+			if (ImGui::Button("Start a new account...")) {
 				if (locked_by_ranked()) {
 					account_message = ranked_lock_tooltip;
 				}
@@ -955,15 +982,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 		}
 
-		tooltip_on_hover("To start over with a new account.");
 	}
 
 	if (confirm_forget_key) {
 		center_next_modal();
-		ImGui::OpenPopup("Forget this key?##Modal");
+		ImGui::OpenPopup("Start a new account?##Modal");
 
-		if (ImGui::BeginPopupModal("Forget this key?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text("Are you sure you want to forget this key?\n");
+		if (ImGui::BeginPopupModal("Start a new account?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			text("Start a new account in place of this one?\n");
 
 			if (public_key.has_value()) {
 				text("    " + identity_key::short_form(*public_key));
@@ -975,11 +1001,11 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			colored_text({ { "If you haven't backed up your ", white }, { "private key", orange }, { ", you will lose progress.", white } });
 
 			text(
-				"Your Steam progress, if any, stays intact.\n\n"
+				"\n"
 #if PLATFORM_WEB
-				"In the browser you can not reach the backup -\ncopy the key first (Reveal the private key) if you may want it back."
+				"In the browser you can not reach the old key afterwards -\nback it up first if you may want it back."
 #else
-				"The file is kept in your user folder as a backup -\ndelete it yourself to remove it for good."
+				"The old key file is kept in your user folder as a backup -\ndelete it yourself to remove it for good."
 #endif
 			);
 
@@ -988,18 +1014,18 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			{
 				const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
 
-				if (ImGui::Button("Forget key", ImVec2(120, 0))) {
+				if (ImGui::Button("Start new account")) {
 					key_file_changed = true;
 					key_unreadable_since = -1.0;
 
 					if (const auto backup = identity_key::forget(key_path)) {
 						account_message = typesafe_sprintf(
-							"Key forgotten.\n\nIt is kept as:\n    %x\n\nA new key - a new account - is made right away.",
+							"A new account is made right away.\n\nThe old key is kept as:\n    %x",
 							backup->filename().string()
 						);
 					}
 					else {
-						account_message = "Could not forget the key.\n\nSee the logs.";
+						account_message = "Could not start a new account.\n\nSee the logs.";
 					}
 
 					confirm_forget_key = false;
@@ -1122,7 +1148,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			));
 		}
 		else {
-			unlink_result = std::string("Couldn't sign the unlink with your local key.\n\nSee the logs.");
+			unlink_result = std::string("Couldn't sign the unlink with your key.\n\nSee the logs.");
 			unlink_succeeded = false;
 		}
 	};
@@ -1141,7 +1167,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		*/
 
 		if (identity != nullptr && identity->sign_in_failed(identity_input, now)) {
-			text_color("Couldn't sign in to Steam - until then, progress counts towards your local key.", orange);
+			text_color("Couldn't sign in to Steam - until then, progress counts towards your " + identity_key::account_kind_name_lowercase() + ".", orange);
 			ImGui::SameLine();
 
 			if (ImGui::Button("Retry##LinkPaneSignIn")) {
@@ -1152,7 +1178,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			text_disabled("All progress counts towards this Steam account.");
 		}
 
-		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink...")) {
+		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink from Steam...")) {
 			confirm_unlink = true;
 			unlink_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
 		}
@@ -1327,7 +1353,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			link_to_confirmed_target(*target);
 
 			if (link_flow != F::LINKING) {
-				finish(false, "Couldn't sign the link with your local key.\n\nSee the logs.");
+				finish(false, "Couldn't sign the link with your key.\n\nSee the logs.");
 			}
 		}
 		else if (httplib_utils::successful(response.status)) {
@@ -1484,7 +1510,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			const auto shown_name = unlinked_name.empty() ? (steam_name.empty() ? steam_account : steam_name) : unlinked_name;
 			const auto local_key_line = typesafe_sprintf(
-				"\nProgress will count towards your local key (%x) again.",
+				"\nProgress will count towards your " + identity_key::account_kind_name_lowercase() + " (%x) again.",
 				has_key ? identity_key::short_form(*public_key) : std::string()
 			);
 
@@ -1518,7 +1544,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 				else {
 					text(typesafe_sprintf(
-						"\nProgress now counts towards your local key (%x).",
+						"\nProgress now counts towards your " + identity_key::account_kind_name_lowercase() + " (%x).",
 						has_key ? identity_key::short_form(*public_key) : std::string()
 					));
 				}
@@ -3346,10 +3372,11 @@ void settings_gui_state::perform(
 			}
 			case settings_pane::ACCOUNT: {
 				/*
-					The Steam and CrazyGames builds have no key to link or manage here - only Info.
+					The Steam, CrazyGames and itch.io builds have no key to link or manage here - only Info.
+					itch.io: every itch.io game shares the browser storage, so its key stays for casual play only.
 				*/
 
-#if WEB_CRAZYGAMES
+#if WEB_CRAZYGAMES || WEB_ITCH
 				const int num_account_panes = 1;
 #else
 				const int num_account_panes = is_steam_client ? 1 : static_cast<int>(account_settings_pane::COUNT);
@@ -3486,6 +3513,7 @@ void settings_gui_state::perform(
 								auto shown = std::string(signed_in.nickname);
 								auto scope = maybe_disabled_cols({}, true);
 								input_text(label, shown, ImGuiInputTextFlags_ReadOnly);
+								tooltip_on_hover(typesafe_sprintf("Uncheck \"Use my %x name and avatar\" to use your own.", signed_in.provider_label));
 							}
 							else {
 								revertable_input_text(label, scope_cfg.nickname);
@@ -3531,7 +3559,7 @@ void settings_gui_state::perform(
 
 							const auto label = [&]() -> std::string {
 								if (is_key) {
-									return "Local key (" + identity_key::short_form_of_account(current_account_id) + ")";
+									return identity_key::account_kind_name() + " (" + identity_key::short_form_of_account(current_account_id) + ")";
 								}
 
 								const auto name = identity != nullptr ? identity->get_profile().name : std::string();
@@ -3552,7 +3580,13 @@ void settings_gui_state::perform(
 							}
 
 							if (is_key) {
-								text_disabled("Progress counts towards your local key - back it up in Manage.");
+#if WEB_ITCH
+								text_disabled("Progress is saved only in this browser.\nRanked and linking with Steam: play.hypersomnia.io or Steam.");
+#elif PLATFORM_WEB
+								text_disabled("Progress is saved only in this browser - clearing site data deletes it.\nBack it up, or link with Steam.");
+#else
+								text_disabled("Progress is saved only on this computer - back it up, or link with Steam.");
+#endif
 							}
 							else if (current_account_id.rfind("steam_", 0) == 0) {
 								if (external_link("InfoSteamProfile", current_account_id, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
@@ -3581,7 +3615,7 @@ void settings_gui_state::perform(
 						perform_account_link_pane(config.website_url);
 						break;
 					}
-					case account_settings_pane::MANAGE: {
+					case account_settings_pane::BACKUP: {
 						perform_account_manage_pane(window);
 						break;
 					}
