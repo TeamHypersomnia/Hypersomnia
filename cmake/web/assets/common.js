@@ -48,11 +48,13 @@ function getUserGeolocation() {
     });
 }
 
+// Module.hs_tab_blocked: the last tab did not open (e.g. Safari's popup blocker, a click too long ago) - the game says so
 function openUrl(url) {
   const urlStr = UTF8ToString(url);
   try {
-    window.open(urlStr, '_blank');
+    Module.hs_tab_blocked = !window.open(urlStr, '_blank');
   } catch (e) {
+    Module.hs_tab_blocked = true;
     console.warn("Could not open URL (may be blocked by iframe restrictions or popup blocker):", e);
   }
 }

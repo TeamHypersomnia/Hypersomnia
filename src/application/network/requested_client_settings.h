@@ -34,6 +34,7 @@ struct requested_client_settings {
 	client_net_vars net;
 
 	uint8_t platform_type = 0;
+	bool suppress_webhooks = false;
 	// END GEN INTROSPECTOR
 
 	client_platform_type get_platform_type() const {

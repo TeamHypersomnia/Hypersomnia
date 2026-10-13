@@ -3,6 +3,7 @@
 #include <filesystem>
 #include "application/setups/server/tournament/tournament_coordinator.h"
 #include "application/masterserver/server_heartbeat.h"
+#include "application/network/account_id.h"
 #include "augs/log.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/date_time.h"
@@ -115,7 +116,16 @@ void tournament_coordinator::initialize_state_if_fresh() {
 		const uint32_t team_idx = indices[rank];
 
 		tournament_team_state ts;
-		ts.player_ids = cfg.teams[team_idx];
+
+		/*
+			A key copied from the game is "0x<hex>" - written so, it would not count as an account id
+			and the whole match would fall back to nickname auth.
+		*/
+
+		for (const auto& written : cfg.teams[team_idx]) {
+			ts.player_ids.push_back(::normalize_account_id(written));
+		}
+
 		ts.skill = static_cast<float>(N - rank);
 		ts.eliminated = false;
 
@@ -225,7 +235,7 @@ void tournament_coordinator::pair_teams() {
 	*/
 
 	for (const auto& pid : cfg.additional_spectators) {
-		shared_spectator_ids.push_back(pid);
+		shared_spectator_ids.push_back(::normalize_account_id(pid));
 	}
 
 	const uint8_t heartbeat_value = [&]() -> uint8_t {

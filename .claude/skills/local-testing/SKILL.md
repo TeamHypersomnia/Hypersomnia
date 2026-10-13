@@ -98,13 +98,25 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
   then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Backup 385,144 - the panes' own fields
   move with their content, so screenshot first. Without it (the default 1280x720 layout): Info 307,278 / Link 440,278 / Backup 590,278,
-  Link to your Steam account 397,337. Every confirmation and result is a centered modal. Backup of a key linked to Steam
-  says only "This key is linked to Steam - nothing to back up...".
+  Link with Steam... 397,337. Every confirmation and result is a centered modal. Backup of a key linked to Steam
+  says only "Your progress is on your Steam account - nothing to back up...".
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
 - `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game
-  (a Steam account takes at most 10 keys - a test account full of them answers 409).
+  (a Steam account takes at most 32 keys - a test account full of them answers 409).
 - `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
+- `ui.sh conf <name> ""` - no identity broker at all. `srv.sh` wipes the server's dir, so every start is a **new server key**:
+  a client that joined before gets "The server's key is different..." - the way to test known_servers and Connect anyway.
+  `BROKER_KEYS_JSON='[]'` - a server trusting no broker; `SERVER_EXTRA` / `PRIVATE_EXTRA` - more JSON fields (see srv.sh).
+- **RCON levels:** make the client's key first (`node -e` in the broker site with `src/identity_cert.js`: `privateKeyFromSeed`,
+  `rawPublicKey`; write `hypersomnia-key-v1:<seed hex>` to `<client>/user/.keys/account.key`), then
+  `PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]' SERVER_EXTRA=', "auto_authorize_loopback_for_rcon": false'`
+  (else a loopback client is MASTER). In game F8; at 1280x720 the tabs Arenas 383,252 / Vars 651,252 / Maintenance 761,252,
+  the arena combo 450,284, Apply & Save 397,578. The server logs "Authorized the admin profile ... for basic rcon",
+  "<nick> changed arena to ...", "Restarting the server due to rcon's request". BASIC: arena, game mode, map cycle, match commands,
+  kick/ban, restart/shutdown/updates/logs; not Vars, not "Clear all" of the runtime prefs.
+- `../steam_link_test.js` - linking by a Steam ticket at the 32-key limit, straight on the scratch site's DB (copy it into the site dir).
+- `crazygames_sdk_stub.py <any pem> <game id> - <out.js>` - a CrazyGames guest (no token, no user).
 - An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
 
 What each state looks like (screenshots of all of them were reviewed on 2026-10-12): an unlinked key never asks the broker and the
@@ -113,7 +125,7 @@ once, otherwise the code flow); a valid steam.cert is used at once after a resta
 after loading, a dimmed "Signing in to your Steam account..."; a dead broker gives one "Not signed in" message per run (with
 Connect anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
 "Signed in to Steam" at the top; importing shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
-Continue without Steam); a key unlinked elsewhere silently loses its steam.cert.
+Continue unlinked); a key unlinked elsewhere silently loses its steam.cert.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
@@ -156,7 +168,7 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   `curl -b "$cookie"` then reaches `/link_key/start?state=..[&port=..]`, which redirects with a fresh code;
   `POST /profile/unlink_key` with `key=key_...` unlinks.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
-  fake xdg-open: Settings - Account - Link with Steam - Link to your Steam account, then `browser_sign_in.sh` against that site
+  fake xdg-open: Settings - Account - Link with Steam - Link with Steam..., then `browser_sign_in.sh` against that site
   (it needs the site's session secret for the fake Steam session). Check with `db.sh show`.
   For a quick link without UI: `db.sh sql "INSERT INTO associations ..."`.
 

@@ -334,12 +334,48 @@ namespace identity_key {
 		return std::nullopt;
 	}
 
+	void remove_backups(const augs::path_type& path) {
+		const auto prefix = path.filename().string() + ".bak-";
+		auto removed = false;
+		auto ec = std::error_code();
+
+		for (const auto& entry : std::filesystem::directory_iterator(path.parent_path(), ec)) {
+			if (entry.path().filename().string().rfind(prefix, 0) == 0) {
+				removed = std::filesystem::remove(entry.path(), ec) || removed;
+			}
+		}
+
+		if (removed) {
+			LOG("Removed the backups of %x.", path);
+			::persistent_filesystem_sync();
+		}
+	}
+
+	/*
+		In the browser nobody can reach a backup file - a copy of the old key in the storage only waits to leak.
+		Made all the same, so a failed write can still put the old key back.
+	*/
+
+	static void remove_backups_in_browser(const augs::path_type& path) {
+#if PLATFORM_WEB
+		remove_backups(path);
+#else
+		(void)path;
+#endif
+	}
+
 	std::optional<augs::path_type> forget(const augs::path_type& path) {
 		if (!augs::exists(path)) {
 			return std::nullopt;
 		}
 
-		return back_up(path);
+		const auto backup = back_up(path);
+
+		if (backup.has_value()) {
+			remove_backups_in_browser(path);
+		}
+
+		return backup;
 	}
 
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
@@ -368,6 +404,7 @@ namespace identity_key {
 			return std::nullopt;
 		}
 
+		remove_backups_in_browser(path);
 		return backup;
 	}
 }

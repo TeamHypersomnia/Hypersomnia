@@ -147,8 +147,19 @@ void perform_rcon_gui(
 		};
 
 		switch (state.active_pane) {
-			case rcon_pane::ARENAS:
 			case rcon_pane::VARS:
+				/*
+					BASIC changes what is played (Arenas), not the server's settings - the server takes nothing else from it.
+				*/
+
+				if (level == rcon_level_type::BASIC) {
+					text_disabled("Your RCON level allows changing only the arena and the map cycle.");
+					break;
+				}
+
+				[[fallthrough]];
+
+			case rcon_pane::ARENAS:
 				do_server_vars_panel(
 					state.edited_sv_vars, 
 					state.last_applied_sv_vars, 
@@ -235,12 +246,6 @@ void perform_rcon_gui(
 							LOG("Requesting the server refresh the map list.");
 						}
 
-						auto disabled = maybe_disabled_cols({}, level == rcon_level_type::BASIC);
-
-						if (level == rcon_level_type::BASIC) {
-							text_disabled("Your RCON level is too low to perform these tasks.");
-						}
-
 						if (do_command_button("Shutdown server", RS::SHUTDOWN)) {
 							LOG("Requesting the server to shut down");
 						}
@@ -263,6 +268,11 @@ void perform_rcon_gui(
 							auto prefs = runtime_info->runtime_prefs;
 							input_multiline_text("##RconJson", prefs, 10, ImGuiInputTextFlags_ReadOnly);
 
+							/*
+								Undoing the settings changed through RCON is changing settings - MASTER only.
+							*/
+
+							auto disabled = maybe_disabled_cols({}, level == rcon_level_type::BASIC);
 							do_command_button("Clear all", RS::CLEAR_RUNTIME_PREFS); 
 						}
 					}

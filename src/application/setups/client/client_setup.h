@@ -1036,6 +1036,12 @@ public:
 	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
 
 	/*
+		Not on the address joined, but on the same port on localhost (the second address tried).
+	*/
+
+	bool connected_through_localhost_fallback() const;
+
+	/*
 		The account this connection was made as (what its cert says).
 	*/
 

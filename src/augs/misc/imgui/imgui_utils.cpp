@@ -62,7 +62,7 @@ static void web_SetClipboardText(void*, const char* text) {
 	);
 }
 
-#elif PLATFORM_LINUX
+#elif PLATFORM_LINUX || PLATFORM_MACOS
 #if USE_GLFW
 #include <GLFW/glfw3.h>
 #include <mutex>
@@ -177,7 +177,7 @@ namespace augs {
 					web_pending_paste = paste_data;
 				}
 			});
-#elif PLATFORM_LINUX
+#elif PLATFORM_LINUX || PLATFORM_MACOS
 			io.SetClipboardTextFn = augs_SetClipboardText;
 			io.GetClipboardTextFn = augs_GetClipboardText;
 #endif
@@ -266,6 +266,12 @@ namespace augs {
 				io.KeyCtrl = io.KeysDown[static_cast<int>(keys::key::LCTRL)] || io.KeysDown[static_cast<int>(keys::key::RCTRL)];
 				io.KeyShift = io.KeysDown[static_cast<int>(keys::key::LSHIFT)] || io.KeysDown[static_cast<int>(keys::key::RSHIFT)];
 				io.KeyAlt = io.KeysDown[static_cast<int>(keys::key::LALT)] || io.KeysDown[static_cast<int>(keys::key::RALT)];
+
+				/*
+					Cmd on a Mac - ImGui's shortcuts (Cmd+C, Cmd+V...) are on it there.
+				*/
+
+				io.KeySuper = io.KeysDown[static_cast<int>(keys::key::LWIN)] || io.KeysDown[static_cast<int>(keys::key::RWIN)];
 			}
 		}
 

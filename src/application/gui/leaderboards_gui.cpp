@@ -618,7 +618,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 				auto progress_bg_cols = scoped_selectable_colors({ col_sin, this_rank_hov, this_rank_act });
 
 
-				if (ImGui::Selectable(s.nickname.c_str(), every_two || is_us || viewing, ImGuiSelectableFlags_SpanAllColumns)) {
+				/*
+					The id apart from the name: a name may be empty (an asserting ImGui id) or the same as another player's.
+				*/
+
+				const auto selectable_label = s.nickname + "##" + s.account_id;
+
+				if (ImGui::Selectable(selectable_label.c_str(), every_two || is_us || viewing, ImGuiSelectableFlags_SpanAllColumns)) {
 					open_url();
 				}
 

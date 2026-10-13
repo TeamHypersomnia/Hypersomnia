@@ -110,6 +110,12 @@ class server_setup :
 	server_vars canon_with_confd_vars;
 	server_vars vars;
 	server_private_vars private_vars;
+
+	/*
+		private_vars.identity_broker_public_keys read once, in apply.
+	*/
+
+	std::vector<augs::ed25519_public_key_type> trusted_broker_keys;
 	server_bans bans;
 	report_queue reports;
 	augs::ed25519_seed_type this_server_key = {};
@@ -119,7 +125,17 @@ class server_setup :
 	*/
 
 	masterserver_cookie_type masterserver_cookie = {};
-	mutable std::array<uint64_t, 16> recent_masterserver_nonces = {};
+	/*
+		Each nonce with the address it was sent to - an answer counts only from there
+		(an additional server list can not answer for the main one).
+	*/
+
+	struct sent_masterserver_nonce {
+		uint64_t nonce = 0;
+		std::optional<netcode_address_t> to;
+	};
+
+	mutable std::array<sent_masterserver_nonce, 16> recent_masterserver_nonces = {};
 	mutable uint32_t next_masterserver_nonce = 0;
 	bool resent_heartbeat_for_cookie = false;
 
@@ -134,7 +150,9 @@ class server_setup :
 	void sign_for_masterserver(Request& request) const;
 
 	template <class Request>
-	void sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const;
+	void sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie, const std::optional<netcode_address_t>& to) const;
+
+	std::optional<netcode_address_t> main_masterserver_address() const;
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
@@ -275,6 +293,7 @@ class server_setup :
 		std::optional<netcode_address_t> resolved;
 		net_time_t when_last_resolved = 0;
 		masterserver_cookie_type cookie = {};
+		bool resent_for_cookie = false;
 	};
 
 	std::vector<additional_server_list> additional_server_lists;

@@ -104,7 +104,7 @@ struct server_client_state {
 	}
 
 	bool should_post_webhooks() const {
-		return settings.get_platform_type() != client_platform_type::SUPPRESSED;
+		return !settings.suppress_webhooks;
 	}
 
 	bool is_web_client_paused() const {

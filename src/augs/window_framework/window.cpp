@@ -104,7 +104,7 @@ namespace augs {
 		) {
 			active = true;
 
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX || PLATFORM_MACOS
 #if USE_GLFW
 			refresh_clipboard_snapshot();
 #endif

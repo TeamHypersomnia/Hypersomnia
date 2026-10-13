@@ -262,7 +262,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::optional<std::string> link_code_from_steam;
 
 	/*
-		"Link to your Steam account" runs in one dimmed modal, from asking whether the key is linked already to the result.
+		"Link with Steam..." runs in one dimmed modal, from asking whether the key is linked already to the result.
 	*/
 
 	enum class link_flow_type {
@@ -279,6 +279,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string linked_name;
 	bool linked_has_avatar = false;
 	bool link_flow_succeeded = false;
+	bool link_flow_conflict = false;
+	bool link_flow_message_is_warning = false;
 
 	/*
 		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
@@ -335,12 +337,25 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	void perform_account_message_modal();
 
 	std::optional<augs::ed25519_seed_type> current_account_seed();
+	std::optional<augs::ed25519_public_key_type> current_public_key();
+
+	/*
+		Linked to Steam: a saved Steam cert, or signed in to a Steam account right now.
+	*/
+
+	bool is_key_linked() const;
 
 	/*
 		The key or its link may not change while a ranked match is on or can still be rejoined.
 	*/
 
 	bool is_locked_by_ranked() const;
+
+	/*
+		Why the key or its link may not change now (a ranked match, or the browser's storage not writable), if so.
+	*/
+
+	std::optional<std::string> account_change_blocked() const;
 
 public:
 	/*
@@ -386,6 +401,11 @@ public:
 		account.key was just replaced or forgotten here - the game reads it again.
 	*/
 
+	/*
+		CrazyGames' "Sign in" in Info - opened by work.cpp, like the leaderboards' one.
+	*/
+
+	bool wants_crazygames_sign_in = false;
 	bool key_file_changed = false;
 
 	/*

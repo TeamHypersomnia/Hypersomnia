@@ -212,7 +212,35 @@ work_result run_tournament(const run_tournament_input& in) {
 
 				if (!rosters_are_accounts) {
 					this_config.server.authenticate_with_nicknames = true;
+
+					auto any_account_id = [&](const std::vector<account_id_string>& ids) {
+						return std::any_of(ids.begin(), ids.end(), is_account_id);
+					};
+
+					const bool mixed =
+						any_account_id(match.team_a_player_ids)
+						|| any_account_id(match.team_b_player_ids)
+						|| any_account_id(match.spectator_player_ids)
+					;
+
+					if (mixed) {
+						LOG("WARNING! Tournament match on port %x mixes account ids with nicknames - all are treated as nicknames.", match.port);
+					}
 				}
+				else if (this_config.server.authenticate_with_nicknames) {
+					/*
+						Nickname auth would make the players "nick_..." - no account id in the roster could match.
+					*/
+
+					LOG("Tournament match on port %x: the roster is account ids - authenticate_with_nicknames turned off.", match.port);
+					this_config.server.authenticate_with_nicknames = false;
+				}
+
+				LOG(
+					"Tournament match on port %x authenticates players by %x.",
+					match.port,
+					this_config.server.authenticate_with_nicknames ? "nickname" : "account"
+				);
 			}
 
 			/*

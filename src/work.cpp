@@ -1874,9 +1874,19 @@ work_result work(
 			return;
 		}
 
-		account_seed_read_once = true;
-
 		const auto path = KEYS_DIR / identity_key::file_name;
+
+#if PLATFORM_WEB
+		if (!account_seed_read_once) {
+			/*
+				Left by older versions: nobody can reach them in the browser.
+			*/
+
+			identity_key::remove_backups(path);
+		}
+#endif
+
+		account_seed_read_once = true;
 
 		/*
 			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
@@ -1919,6 +1929,20 @@ work_result work(
 			if (!existed) {
 				identity->on_key_created();
 			}
+
+#if PLATFORM_WEB && !WEB_CRAZYGAMES && !WEB_ITCH
+			/*
+				Once a run, quietly: a link made where nothing was saved (another tab, a failed sync)
+				left no steam.cert here - the site still knows.
+			*/
+
+			static bool link_rechecked_this_run = false;
+
+			if (existed && !link_rechecked_this_run && !identity->has_saved_cert()) {
+				link_rechecked_this_run = true;
+				identity->recheck_link_quietly();
+			}
+#endif
 		}
 	};
 
@@ -1976,7 +2000,11 @@ work_result work(
 		*/
 
 #if !PLATFORM_WEB
-		if (identity->take_key_check_started()) {
+		/*
+			Not in the Steam build either: it has no Backup to restore in, and its account is the Steam one anyway.
+		*/
+
+		if (identity->take_key_check_started() && !is_steam_client) {
 			settings_gui.on_key_replaced_outside();
 		}
 #endif
@@ -2147,6 +2175,9 @@ work_result work(
 	*/
 
 	WEBSTATIC std::vector<std::byte> applied_account_avatar;
+	WEBSTATIC bool account_avatar_applied_once = false;
+	WEBSTATIC bool account_avatar_file_made = false;
+	WEBSTATIC double account_avatar_retried_at = -1000.0;
 
 	WEBSTATIC auto apply_account_profile = [&]() {
 		const auto now = augs::steady_secs();
@@ -2207,8 +2238,22 @@ work_result work(
 
 		signed_in.nickname = name;
 
-		if (avatar != applied_account_avatar || !augs::exists(ACCOUNT_AVATAR)) {
+		/*
+			Again only when the bytes change, or the file made is gone - not every frame for an avatar that can not be made.
+			Steam's own avatar may come a while after the start: asked again once a second until it does.
+		*/
+
+		const bool steam_avatar_pending = is_steam_client && avatar.empty() && !account_avatar_file_made && now - account_avatar_retried_at > 1.0;
+
+		if (!account_avatar_applied_once
+			|| avatar != applied_account_avatar
+			|| steam_avatar_pending
+			|| (account_avatar_file_made && !augs::exists(ACCOUNT_AVATAR))
+		) {
 			applied_account_avatar = avatar;
+			account_avatar_applied_once = true;
+			account_avatar_retried_at = now;
+			account_avatar_file_made = false;
 
 			try {
 				auto image = augs::image();
@@ -2226,6 +2271,7 @@ work_result work(
 					image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
 					image.save_as_png(ACCOUNT_AVATAR);
 					streaming.requested_avatar_preview = ACCOUNT_AVATAR;
+					account_avatar_file_made = true;
 				}
 				else {
 					augs::remove_file(ACCOUNT_AVATAR);
@@ -2277,8 +2323,20 @@ work_result work(
 
 			const auto server_key = client.get_server_public_key();
 
-			if (server_key.has_value()) {
-				remembered_servers.set(std::string(client.get_connect_string()), *server_key);
+			/*
+				Not a key of a server on this machine that answered in the remote one's place (the localhost fallback).
+			*/
+
+			if (server_key.has_value() && !client.connected_through_localhost_fallback()) {
+				const auto connect_string = std::string(client.get_connect_string());
+
+				remembered_servers.set(connect_string, *server_key);
+
+				/*
+					After "Connect anyway": the key it showed this time is checked on the next joins of this run.
+				*/
+
+				learned_server_keys[connect_string] = *server_key;
 			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
@@ -3644,9 +3702,10 @@ work_result work(
 #if PLATFORM_WEB
 			/*
 				Outside CrazyGames the account is the key in the browser - always there.
+				On CrazyGames a guest is offered to sign in instead.
 			*/
 
-			, true,
+			, params.is_crazygames ? is_signed_in() : true,
 			params.is_crazygames
 #endif
 		});
@@ -4463,6 +4522,11 @@ work_result work(
 						social_sign_in.guest_nickname = config.client.nickname;
 						social_sign_in.open();
 					}
+				}
+
+				if (settings_gui.wants_crazygames_sign_in) {
+					settings_gui.wants_crazygames_sign_in = false;
+					social_sign_in.open();
 				}
 
 				perform_social_sign_in_popup(config.prompted_for_sign_in_once);

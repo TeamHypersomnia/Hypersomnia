@@ -766,6 +766,10 @@ std::optional<augs::ed25519_public_key_type> client_adapter::get_server_public_k
 	return std::nullopt;
 }
 
+bool client_adapter::connected_through_localhost_fallback() const {
+	return client.GetServerAddressIndex() > 0;
+}
+
 int client_adapter::get_disconnect_reason() const {
 	return client.GetDisconnectReason();
 }

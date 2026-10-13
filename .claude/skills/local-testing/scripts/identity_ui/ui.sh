@@ -5,7 +5,7 @@
 #   (the game's opened URLs never reach a browser: they go to $U/<name>/opened_urls - see browser_sign_in.sh)
 #   shot <display> <out.png>
 #   click <display> X Y | type <display> TEXT | key <display> NAME
-#   conf <name> [broker_url]                    (re)write the client's test config
+#   conf <name> [broker_url]                    (re)write the client's test config ("" - no broker)
 export ALSOFT_DRIVERS=null VISUAL=true
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
@@ -19,7 +19,7 @@ mkdir -p $U
 cmd=$1; shift
 case $cmd in
 conf)
-	name=$1; broker=${2:-$SITE}
+	name=$1; broker=${2-$SITE}
 	mkdir -p $U/$name/user/conf.d
 	cat > $U/$name/user/conf.d/test.json <<J
 { "identity_broker_url": "$broker", "website_url": "$SITE", "server_list_provider": "http://127.0.0.1:1",

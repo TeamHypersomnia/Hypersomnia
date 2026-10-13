@@ -2106,16 +2106,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	return custom_imgui_result::NONE;
 }
 
-static uint8_t u8_get_client_platform_type(const bool suppress) {
-	return static_cast<uint8_t>([&]() {
-		if (suppress) {
-			return client_platform_type::SUPPRESSED;
-		}
-
-		return ::get_client_platform_type();
-	}());
-}
-
 void client_setup::apply(const config_json_table& cfg) {
 	vars = cfg.client;
 
@@ -2125,7 +2115,8 @@ void client_setup::apply(const config_json_table& cfg) {
 
 	auto& r = requested_settings;
 	r.chosen_nickname = get_nickname();
-	r.platform_type = ::u8_get_client_platform_type(vars.suppress_webhooks);
+	r.platform_type = static_cast<uint8_t>(::get_client_platform_type());
+	r.suppress_webhooks = vars.suppress_webhooks;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;
 	r.public_settings.clan = cfg.client.clan;
@@ -2415,6 +2406,10 @@ std::string client_setup::get_connect_string() const {
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_server_public_key() const {
 	return adapter->get_server_public_key();
+}
+
+bool client_setup::connected_through_localhost_fallback() const {
+	return adapter->connected_through_localhost_fallback();
 }
 
 bool client_setup::is_ranked_live_or_starting() const {

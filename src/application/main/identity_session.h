@@ -83,7 +83,7 @@ public:
 	};
 
 	/*
-		The answer to "is this key linked?" - asked right after importing a key and by "Link to your Steam account".
+		The answer to "is this key linked?" - asked right after importing a key and by "Link with Steam...".
 	*/
 
 	enum class link_check_state {
@@ -294,7 +294,7 @@ public:
 	void recheck_link_quietly();
 
 	/*
-		"Continue without Steam" after a check that failed: the key counts as seen, and is asked about quietly later.
+		"Continue unlinked" after a check that failed: the key counts as seen, and is asked about quietly later.
 	*/
 
 	void continue_without_link_check();

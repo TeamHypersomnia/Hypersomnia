@@ -7,7 +7,7 @@
 #include "application/main/identity_key.h"
 
 /*
-	Every server's Ed25519 key (.keys/server.key in the user folder), created on the first start and never overwritten.
+	Every server's Ed25519 key (server.key in KEYS_DIR - see all_paths.h), created on the first start and never overwritten.
 	The clients seal their handshakes to it, and the masterserver and hypersomnia.io know an official server by it.
 	The same format as the account keys - see identity_key.h.
 */

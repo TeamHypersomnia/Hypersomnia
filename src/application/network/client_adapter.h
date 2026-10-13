@@ -87,6 +87,7 @@ public:
 	*/
 
 	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+	bool connected_through_localhost_fallback() const;
 
 	/*
 		yojimbo's reason for the last failed or ended connection (YOJIMBO_CLIENT_DISCONNECT_REASON_*).

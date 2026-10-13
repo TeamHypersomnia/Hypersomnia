@@ -104,4 +104,10 @@ namespace identity_key {
 	*/
 
 	std::optional<augs::path_type> forget(const augs::path_type& path);
+
+	/*
+		Deletes every account.key.bak-<timestamp> next to the key - only for the web build, where nobody can reach them.
+	*/
+
+	void remove_backups(const augs::path_type& path);
 }

@@ -118,12 +118,19 @@ namespace augs {
 }
 
 #if PLATFORM_WINDOWS
+#include <Windows.h>
 #include <Shlobj.h>
+#undef min
+#undef max
 
 namespace augs {
 	path_type get_default_documents_dir() {
-		char path[MAX_PATH];
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+		/*
+			Wide: a user name outside the ANSI code page would come out as "?" in the path.
+		*/
+
+		wchar_t path[MAX_PATH];
+		HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 
 		if (SUCCEEDED(result)) {
 			return path_type(path) / "My Games" / "Hypersomnia";
@@ -135,9 +142,9 @@ namespace augs {
 	}
 
 	path_type get_default_local_appdata_dir() {
-		char path[MAX_PATH];
+		wchar_t path[MAX_PATH];
 
-		if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, path))) {
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, path))) {
 			return path_type(path) / "Hypersomnia";
 		}
 
@@ -227,11 +234,11 @@ namespace augs {
 #elif PLATFORM_WINDOWS
 namespace augs {
 	std::string get_device_name() {
-		char name[MAX_COMPUTERNAME_LENGTH + 1];
-		DWORD size = sizeof(name);
+		wchar_t name[MAX_COMPUTERNAME_LENGTH + 1];
+		DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
 
-		if (GetComputerNameA(name, &size)) {
-			return std::string(name, size);
+		if (GetComputerNameW(name, &size)) {
+			return wstr_to_utf8(name);
 		}
 
 		return "";

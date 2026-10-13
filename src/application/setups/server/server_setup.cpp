@@ -1052,7 +1052,7 @@ server_setup::server_setup(
 
 	reports.init(USER_DIR, in.port, this_server_key);
 
-	LOG("Server key: %x (server.key in the user folder)", server_key::public_key_hex(this_server_key));
+	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), KEYS_DIR / server_key::file_name);
 
 	if (private_initial_vars.admin_profiles.empty()) {
 		LOG("No admin_profiles: only the localhost can access rcon.");
@@ -1201,17 +1201,25 @@ void server_setup::reset_afk_timer() {
 	under it or remove them from the list. The nonce of each request is kept to recognize the answers to it.
 */
 
-template <class Request>
-void server_setup::sign_for_masterserver(Request& request) const {
-	sign_for_masterserver(request, masterserver_cookie);
+std::optional<netcode_address_t> server_setup::main_masterserver_address() const {
+#if BUILD_NATIVE_SOCKETS
+	return resolved_server_list_addr;
+#else
+	return std::nullopt;
+#endif
 }
 
 template <class Request>
-void server_setup::sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const {
+void server_setup::sign_for_masterserver(Request& request) const {
+	sign_for_masterserver(request, masterserver_cookie, main_masterserver_address());
+}
+
+template <class Request>
+void server_setup::sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie, const std::optional<netcode_address_t>& to) const {
 	auto nonce = uint64_t(0);
 	randombytes_buf(&nonce, sizeof(nonce));
 
-	recent_masterserver_nonces[next_masterserver_nonce % recent_masterserver_nonces.size()] = nonce;
+	recent_masterserver_nonces[next_masterserver_nonce % recent_masterserver_nonces.size()] = { nonce, to };
 	++next_masterserver_nonce;
 
 	if (!::sign_server_request(request, this_server_key, cookie, nonce)) {
@@ -1245,7 +1253,7 @@ void server_setup::send_goodbye_to_masterserver() {
 			}
 
 			auto goodbye = masterserver_in::goodbye {};
-			sign_for_masterserver(goodbye, list.cookie);
+			sign_for_masterserver(goodbye, list.cookie, list.resolved);
 
 			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
 
@@ -1337,15 +1345,23 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 
 	auto keys = std::vector<augs::ed25519_public_key_type>();
 
-	for (const auto& hex : configured) {
+	for (const auto& written : configured) {
+		/*
+			Also as the game shows keys: "0x<64 hex>".
+		*/
+
+		auto hex = ::normalize_account_id(written);
+		hex = cut_preffix(hex, "key_");
+
 		if (const auto key = augs::hex_to_array<32>(hex)) {
 			keys.push_back(*key);
 		}
 		else {
-			LOG("ERROR: an identity_broker_public_keys entry is not 64 hex characters - skipped.");
+			LOG("ERROR: the identity_broker_public_keys entry \"%x\" is not 64 hex characters - skipped.", written);
 		}
 	}
 
+	LOG("Trusting %x identity broker key(s).", keys.size());
 	return keys;
 }
 
@@ -1384,12 +1400,11 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			return std::nullopt;
 		}
 
-		const auto broker_keys = ::identity_broker_keys(private_vars);
 		const auto now = augs::date_time::secs_since_epoch();
 
 		auto result = identity_cert::verify(
 			*blob->identity,
-			broker_keys,
+			trusted_broker_keys,
 			static_cast<int64_t>(now),
 			server->get_client_binding(id),
 			server->get_client_session_signature(id)
@@ -1420,7 +1435,29 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}();
 
 	if (!verified.has_value()) {
-		kick(id, "This server could not verify your account.\nThe server's clock may be wrong, or one of you needs an update.\nTry another server.");
+		/*
+			A broker cert within its time that still did not verify: signed by a broker this server does not trust.
+		*/
+
+		const bool untrusted_broker = [&]() {
+			if (!blob->identity.has_value()) {
+				return false;
+			}
+
+			const auto& cert = *blob->identity;
+			const auto now = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+			const bool broker_cert = cert.not_after != 0;
+
+			return broker_cert && cert.not_before <= now && now <= cert.not_after;
+		}();
+
+		if (untrusted_broker) {
+			kick(id, "This server does not accept sign-ins from your identity provider.\nTry another server.");
+		}
+		else {
+			kick(id, "This server could not verify your account.\nThe server's clock may be wrong, or one of you needs an update.\nTry another server.");
+		}
+
 		c.kick_no_linger = true;
 		return;
 	}
@@ -2483,7 +2520,13 @@ bool server_setup::handle_masterserver_response(
 			*/
 
 			{
-				const bool our_nonce = typed_request.nonce != 0 && found_in(recent_masterserver_nonces, typed_request.nonce);
+				const bool our_nonce = typed_request.nonce != 0 && std::any_of(
+					recent_masterserver_nonces.begin(),
+					recent_masterserver_nonces.end(),
+					[&](const auto& sent) {
+						return sent.nonce == typed_request.nonce && (!sent.to.has_value() || *sent.to == from);
+					}
+				);
 
 				if (!our_nonce) {
 					return true;
@@ -2499,11 +2542,20 @@ bool server_setup::handle_masterserver_response(
 							A heartbeat without its cookie only got one - sent again right away, once per new cookie.
 						*/
 
-						const bool new_cookie = list.cookie != typed_request.cookie;
 						list.cookie = typed_request.cookie;
 
-						if (!typed_request.accepted && new_cookie) {
-							when_last_sent_heartbeat_to_server_list = 0;
+						/*
+							Once until a heartbeat is accepted - a masterserver that never accepts does not get them in a loop.
+						*/
+
+						if (!typed_request.accepted) {
+							if (!list.resent_for_cookie) {
+								list.resent_for_cookie = true;
+								when_last_sent_heartbeat_to_server_list = 0;
+							}
+						}
+						else {
+							list.resent_for_cookie = false;
 						}
 
 						return true;
@@ -2548,7 +2600,7 @@ bool server_setup::handle_masterserver_response(
 					LOG(
 						"ERROR: this is a ranked server, but the masterserver does not know its key (%x) as an official one.\n"
 						"Ranked matches will not start and their reports would be refused. Send the key to the developers, "
-						"or check server.key in the user folder was not replaced.",
+						"or check .keys/server.key was not replaced.",
 						server_key::public_key_hex(this_server_key)
 					);
 				}
@@ -3043,7 +3095,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 
 		auto copy = heartbeat;
-		sign_for_masterserver(copy, list.cookie);
+		sign_for_masterserver(copy, list.cookie, list.resolved);
 
 		auto bytes = augs::to_bytes(masterserver_request(std::move(copy)));
 		server->send_udp_packet(*list.resolved, bytes.data(), bytes.size());
@@ -3287,6 +3339,10 @@ void server_setup::customize_for_viewing(config_json_table& config) const {
 void server_setup::apply(const server_private_vars& private_new_vars) {
 	const auto old_vars = private_vars;
 	private_vars = private_new_vars;
+
+	if (trusted_broker_keys.empty() || old_vars.identity_broker_public_keys != private_vars.identity_broker_public_keys) {
+		trusted_broker_keys = ::identity_broker_keys(private_vars);
+	}
 
 	if (old_vars.admin_profiles != private_vars.admin_profiles) {
 		for (const auto& entry : private_vars.admin_profiles) {
@@ -4700,10 +4756,9 @@ message_handler_result server_setup::handle_rcon_payload(
 		using command = server_maintenance_command;
 
 		if (level == rcon_level_type::BASIC) {
-			if (typed_payload != command::REQUEST_RUNTIME_INFO) {
+			if (typed_payload == command::CLEAR_RUNTIME_PREFS) {
 				/* 
-					Basic RCON can only ask REQUEST_RUNTIME_INFO.
-					The other tasks are administrative.
+					Basic RCON can do everything but change the server's settings - resetting them is a change.
 				*/
 
 				LOG("Unauthorized RCON usage.");
@@ -4757,7 +4812,26 @@ message_handler_result server_setup::handle_rcon_payload(
 	else if constexpr(std::is_same_v<P, server_vars>) {
 		LOG("New server vars from the client.");
 
-		auto& new_v = typed_payload;
+		/*
+			Basic RCON does not change the server's settings - only what is played: the arena, the game mode and the map cycle.
+		*/
+
+		const auto requested_vars = [&]() {
+			if (level == rcon_level_type::BASIC) {
+				auto only_what_is_played = vars;
+				only_what_is_played.arena = typed_payload.arena;
+				only_what_is_played.game_mode = typed_payload.game_mode;
+				only_what_is_played.cycle = typed_payload.cycle;
+				only_what_is_played.cycle_list = typed_payload.cycle_list;
+				only_what_is_played.cycle_always_game_mode = typed_payload.cycle_always_game_mode;
+				only_what_is_played.cycle_randomize_order = typed_payload.cycle_randomize_order;
+				return only_what_is_played;
+			}
+
+			return typed_payload;
+		}();
+
+		const auto& new_v = requested_vars;
 		auto& old_v = vars;
 		
 		if (new_v.arena != old_v.arena) {
@@ -4767,7 +4841,7 @@ message_handler_result server_setup::handle_rcon_payload(
 			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode.empty() ? "map default" : new_v.game_mode));
 		}
 
-		apply(typed_payload);
+		apply(requested_vars);
 		write_vars_to_disk_once = true;
 
 		rescan_runtime_prefs();

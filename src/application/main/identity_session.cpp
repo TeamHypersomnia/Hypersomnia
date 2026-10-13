@@ -510,6 +510,18 @@ void identity_session::advance(const input& in, const double now) {
 			key_check_quiet = false;
 			save_checked_key();
 		}
+		else if (!last_input.steam_account.empty() && answer->cert.account != last_input.steam_account) {
+			/*
+				The Steam build with a key linked to another Steam account: not its cert -
+				the next request asks with this Steam account's ticket.
+			*/
+
+			LOG("The key is linked to %x, not to the Steam account signed in (%x).", answer->cert.account, last_input.steam_account);
+			link_check = link_check_state::NOT_LINKED;
+			link_check_profile = answer->profile;
+			key_check_quiet = false;
+			save_checked_key();
+		}
 		else {
 			/*
 				Linked: the Steam cert is ours from now on, and steam.cert says so on the next start.
@@ -628,7 +640,21 @@ void identity_session::advance(const input& in, const double now) {
 		return;
 	}
 
-	if (in.provider == provider_type::NONE || in.broker_url.empty()) {
+	if (in.provider == provider_type::NONE) {
+		return;
+	}
+
+	if (in.broker_url.empty()) {
+		/*
+			A failed attempt, or "Signing in..." would never end.
+		*/
+
+		if (!last_attempt_failed) {
+			last_error = "No identity broker set (Settings - Advanced).";
+			attempts_finished = std::max(attempts_finished, 1);
+			last_attempt_failed = true;
+		}
+
 		return;
 	}
 

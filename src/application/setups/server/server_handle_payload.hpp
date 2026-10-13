@@ -47,8 +47,13 @@ message_handler_result server_setup::handle_payload(
 				new_nick
 			);
 
+			/*
+				Lingering shortly, so the reason reaches the player instead of a bare disconnect.
+			*/
+
 			kick(client_id, reason);
-			return abort_v;
+			c.kick_no_linger = true;
+			return continue_v;
 		}
 
 		if (!nickname_len_in_range(new_nick.length())) {
@@ -66,12 +71,18 @@ message_handler_result server_setup::handle_payload(
 
 			if (platform == client_platform_type::ITCH) {
 				kick(client_id, "Ranked is not available on itch.io.\nPlay on play.hypersomnia.io or on Steam.");
-				return abort_v;
+				c.kick_no_linger = true;
+				return continue_v;
 			}
 
+			/*
+				A signed in CrazyGames player without a CrazyGames cert: its sign-in could not be confirmed (e.g. hypersomnia.io down).
+			*/
+
 			if (platform == client_platform_type::CRAZYGAMES && guest_account) {
-				kick(client_id, "Sign in to CrazyGames to play ranked.");
-				return abort_v;
+				kick(client_id, "Sign in to CrazyGames to play ranked.\nSigned in already? Your account could not be confirmed right now - try again in a moment.");
+				c.kick_no_linger = true;
+				return continue_v;
 			}
 		}
 

@@ -105,6 +105,12 @@ std::optional<int> loopback_link_listener::start(const std::string& state) {
 		self->server.listen_after_bind();
 	});
 
+	/*
+		stop() closes the socket only once the server runs - a stop right after this would otherwise wait forever.
+	*/
+
+	pimpl->server.wait_until_ready();
+
 	LOG("The link listener is on 127.0.0.1:%x.", port);
 	return port;
 #endif
