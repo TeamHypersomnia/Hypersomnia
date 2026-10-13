@@ -361,24 +361,34 @@ std::string get_custom_binding_name(const app_intent_type) {
 #include <emscripten.h>
 
 /*
-	Copying in the browser can be refused - its result is kept for the game to read: 0 on the way, 1 copied, -1 refused.
+	Choosing a file in the browser: its text is kept for the game to take - the length (-1 while nothing came), then the text.
 */
 
-EM_JS(void, web_copy_text, (const char* text), {
-	Module.hs_copy_result = 0;
+EM_JS(void, web_pick_text_file, (), {
+	const input = document.createElement("input");
+	input.type = "file";
+	input.accept = ".key,.txt,text/plain";
 
-	try {
-		navigator.clipboard.writeText(UTF8ToString(text))
-			.then(() => { Module.hs_copy_result = 1; })
-			.catch(() => { Module.hs_copy_result = -1; });
-	}
-	catch (e) {
-		Module.hs_copy_result = -1;
-	}
+	input.onchange = () => {
+		const file = input.files && input.files[0];
+
+		if (!file || file.size > 4096) {
+			return;
+		}
+
+		file.text().then(text => { Module.hs_picked_text = text; });
+	};
+
+	input.click();
 });
 
-EM_JS(int, web_copy_result, (), {
-	return Module.hs_copy_result || 0;
+EM_JS(int, web_picked_file_length, (), {
+	return typeof Module.hs_picked_text === "string" ? lengthBytesUTF8(Module.hs_picked_text) : -1;
+});
+
+EM_JS(void, web_take_picked_file, (char* out, int size), {
+	stringToUTF8(Module.hs_picked_text, out, size);
+	Module.hs_picked_text = undefined;
 });
 
 /*
@@ -477,25 +487,6 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 			identity->clear_link_check();
 		}
 	}
-}
-
-void settings_gui_state::clear_copied_private_key_if_due() {
-#if !PLATFORM_WEB
-	/*
-		A private key does not stay in the clipboard (its history, a cloud sync, a paste into a chat) -
-		cleared after a minute, unless something else was copied meanwhile.
-	*/
-
-	if (copied_private_key.empty() || ImGui::GetTime() - private_key_copied_at < 60.0) {
-		return;
-	}
-
-	if (const auto* const current = ImGui::GetClipboardText(); current != nullptr && copied_private_key == current) {
-		ImGui::SetClipboardText("");
-	}
-
-	copied_private_key.clear();
-#endif
 }
 
 bool settings_gui_state::account_modal_open(const bool with_message) const {
@@ -909,8 +900,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		key_file_changed = true;
 
 		if (identity_key::save_replacing(key_path, imported).has_value()) {
-			import_key_text.clear();
-
 			/*
 				Asked right away whether the key is linked - the import modal waits for the answer.
 			*/
@@ -928,12 +917,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 	};
 
-	{
-		auto buffer = std::array<char, 256>();
-		input_text_with_hint(buffer, "##ImportKey", "Paste hypersomnia-key-v1:...", import_key_text, ImGuiInputTextFlags_Password);
-	}
-	ImGui::SameLine();
-
 	/*
 		Not while a ranked match is on: its rejoin is tied to the account it was joined with.
 	*/
@@ -944,19 +927,64 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	const auto ranked_lock_tooltip = std::string("Not during a ranked match.");
 
+	/*
+		The key only ever as a file - backed up by copying the file (or downloading it on the web), restored by choosing it.
+		Never through the clipboard: its history, a cloud sync or a paste into a chat would keep it.
+	*/
+
 	const bool import_clicked = [&]() {
 		auto scope = maybe_disabled_cols({}, in_ranked_match);
-		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange } });
+		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange }, { " file...", white } });
 	}();
 
 	if (import_clicked && locked_by_ranked()) {
 		account_message = ranked_lock_tooltip;
 	}
 	else if (import_clicked) {
-		if (const auto imported = identity_key::from_export_string(import_key_text)) {
+#if PLATFORM_WEB
+		::web_pick_text_file();
+#else
+		if (!chosen_key_file.valid()) {
+			chosen_key_file = launch_async(
+				[&window]() -> std::optional<std::string> {
+					const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key;*.txt" } };
+
+					if (const auto path = window.open_file_dialog(filters, "Choose your private key file")) {
+						try {
+							return augs::file_to_string(*path);
+						}
+						catch (...) {
+							return std::string();
+						}
+					}
+
+					return std::nullopt;
+				}
+			);
+		}
+#endif
+	}
+
+	const auto chosen_key_text = [&]() -> std::optional<std::string> {
+#if PLATFORM_WEB
+		if (const auto length = ::web_picked_file_length(); length >= 0) {
+			auto text = std::string(static_cast<std::size_t>(length) + 1, '\0');
+			::web_take_picked_file(text.data(), length + 1);
+			text.resize(static_cast<std::size_t>(length));
+			return text;
+		}
+#else
+		if (valid_and_is_ready(chosen_key_file)) {
+			return chosen_key_file.get();
+		}
+#endif
+		return std::nullopt;
+	}();
+
+	if (chosen_key_text.has_value()) {
+		if (const auto imported = identity_key::from_export_string(*chosen_key_text)) {
 			if (seed.has_value() && *seed == *imported) {
 				account_message = "That is already your key.";
-				import_key_text.clear();
 			}
 			else if (seed.has_value()) {
 				import_to_confirm = *imported;
@@ -966,15 +994,15 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 		}
 		else {
-			account_message = "That is not a valid key.\n\nA key starts with hypersomnia-key-v1:";
+			account_message = "That file is not a private key.\n\nA key file holds a line starting with hypersomnia-key-v1:";
 		}
 	}
 
 	tooltip_on_hover(
-		"Restore your account from a private key you backed up\n"
-		"(Backup -> Back up private key -> Copy).\n"
+		"Restore your account from its private key file -\n"
+		"one you backed up (Backup -> Back up private key).\n"
 		"\n"
-		"Whoever has this key plays as you, for good.\n"
+		"Whoever has this file plays as you, for good.\n"
 		"To play on several computers with Steam, link each of them instead -\n"
 		"you can unlink one later."
 	);
@@ -993,7 +1021,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if PLATFORM_WEB
 				"Your current key can't be recovered in the browser - back it up first.",
 #else
-				"The current key is kept in your user folder as a backup file.",
+				"The current key is kept as a backup file next to it.",
 #endif
 				identity_key::short_form(*public_key),
 				identity_key::short_form(*augs::ed25519_public_key(*import_to_confirm))
@@ -1032,12 +1060,11 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	ImGui::Separator();
 
 	/*
-		The private key itself only behind its own button - with the warning, copying it and finding its file.
+		The private key itself only behind its own button - with the warning, and its file to back up.
 	*/
 
 	if (public_key.has_value() && colored_button("RevealThePrivateKey", { { "Back up ", white }, { "private key", orange }, { "...", white } })) {
 		reveal_private_key_open = true;
-		private_key_copied_at = -1000.0;
 	}
 
 	if (reveal_private_key_open && public_key.has_value()) {
@@ -1049,60 +1076,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			text_color("NEVER share it!", red);
 			text("");
 
-			if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
-				copied_private_key = identity_key::to_export_string(*seed);
-#if PLATFORM_WEB
-				/*
-					The browser may refuse (no permission, an iframe, Safari) - "Copied" only once it says it did.
-				*/
-
-				::web_copy_text(copied_private_key.c_str());
-				private_key_copy_pending = true;
-				private_key_copy_failed = false;
-#else
-				ImGui::SetClipboardText(copied_private_key.c_str());
-				private_key_copied_at = ImGui::GetTime();
-#endif
-			}
-
-#if PLATFORM_WEB
-			if (private_key_copy_pending) {
-				const auto result = ::web_copy_result();
-
-				if (result != 0) {
-					private_key_copy_pending = false;
-					private_key_copy_failed = result < 0;
-
-					if (result > 0) {
-						private_key_copied_at = ImGui::GetTime();
-					}
-				}
-			}
-#endif
-
-#if PLATFORM_WEB
-			tooltip_on_hover("Keep it somewhere safe - with it you restore your account\n(Backup -> Restore from private key).");
-#else
-			tooltip_on_hover("Keep it somewhere safe - with it you restore your account\n(Backup -> Restore from private key).\n\nThe clipboard is cleared in 60 seconds.");
-#endif
-
-			if (ImGui::GetTime() - private_key_copied_at < 2.0) {
-				ImGui::SameLine();
-				checkmark_line("Copied", green);
-			}
-
 #if !PLATFORM_WEB
 			if (ImGui::Button("Show key file in folder")) {
 				window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 			}
 
-			tooltip_on_hover("Your private key is the file account.key -\nit's enough to copy this file to back up your account.");
+			tooltip_on_hover("Your private key is the file account.key - copy it somewhere safe to back up your account.\nWith it you restore your account (Backup -> Restore from private key file).");
 #else
 			(void)window;
-
-			if (private_key_copy_failed) {
-				text_color("The browser did not let the game copy it - download it instead.", orange);
-			}
 
 			/*
 				The browser has no folder to show - the key is saved as a file instead.
@@ -1112,7 +1093,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				::web_download_text("hypersomnia-account.key", identity_key::to_export_string(*seed).c_str());
 			}
 
-			tooltip_on_hover("Keep the file somewhere safe - paste its contents into\nBackup -> Restore from private key to restore your account.");
+			tooltip_on_hover("Keep the file somewhere safe - with it you restore your account\n(Backup -> Restore from private key file).");
 #endif
 
 			ImGui::Separator();
@@ -1163,7 +1144,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if PLATFORM_WEB
 				"In the browser you can not reach the old key afterwards -\nback it up first if you may want it back."
 #else
-				"The old key file is kept in your user folder as a backup -\ndelete it yourself to remove it for good."
+				"The old key file is kept next to the new one as a backup -\ndelete it yourself to remove it for good."
 #endif
 			);
 

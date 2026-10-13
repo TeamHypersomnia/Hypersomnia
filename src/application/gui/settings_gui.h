@@ -228,7 +228,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::vector<std::string> official_hrtf_presets;
 	std::vector<std::string> user_hrtf_presets;
 
-	std::string import_key_text;
 	std::optional<augs::ed25519_seed_type> import_to_confirm;
 
 
@@ -296,12 +295,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	bool confirm_forget_key = false;
 	bool reveal_private_key_open = false;
-	double private_key_copied_at = -1000.0;
-	std::string copied_private_key;
-#if PLATFORM_WEB
-	bool private_key_copy_pending = false;
-	bool private_key_copy_failed = false;
-#endif
 	bool confirm_unlink = false;
 	bool unlink_has_avatar = false;
 
@@ -322,6 +315,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::optional<std::string> account_message;
 
 	augs::future<std::optional<augs::path_type>> chosen_avatar;
+
+	/*
+		The private key file chosen to restore from - its text (empty if it could not be read).
+	*/
+
+	augs::future<std::optional<std::string>> chosen_key_file;
 
 	void perform_account_link_pane(const std::string& website_url);
 	void perform_account_manage_pane(augs::window& window);
@@ -431,11 +430,6 @@ public:
 
 	void on_key_unreadable();
 
-	/*
-		Called every frame by the game.
-	*/
-
-	void clear_copied_private_key_if_due();
 	void cancel_link_flow_if_hidden();
 
 	using base = standard_window_mixin<settings_gui_state>;

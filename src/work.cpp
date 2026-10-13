@@ -2477,7 +2477,6 @@ work_result work(
 		settings_gui.account_avatar_previewed = previewed_avatar_path == augs::path_type(ACCOUNT_AVATAR);
 
 		settings_gui.in_ranked_match = would_abandon_ranked_match();
-		settings_gui.clear_copied_private_key_if_due();
 		settings_gui.cancel_link_flow_if_hidden();
 
 		if (settings_gui.link_avatar_to_upload.has_value()) {

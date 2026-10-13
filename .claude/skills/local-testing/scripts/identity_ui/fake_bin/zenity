@@ -1,0 +1,4 @@
+#!/bin/bash
+# Stands in for the file dialog in UI tests: "chooses" $FAKE_ZENITY_FILE (nothing - a cancel - when unset).
+[ -n "$FAKE_ZENITY_FILE" ] && echo "$FAKE_ZENITY_FILE" && exit 0
+exit 1
