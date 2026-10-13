@@ -1294,7 +1294,21 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 			const bool requesting = augs::in_progress(link_request) || augs::in_progress(link_target_request);
 
-			if (link_flow == F::CHECKING_BEFORE || link_flow == F::CHECKING_AFTER || link_flow == F::LINKING) {
+			if (link_flow == F::LINKING || link_flow == F::CHECKING_AFTER) {
+				/*
+					Laid out as the result, which mostly comes a few frames later - the modal does not flicker in between.
+				*/
+
+				spinner_line("Linking...", white);
+				link_avatar_and_name(linked_name, linked_has_avatar);
+				text("Progress will count towards your Steam account.");
+
+				ImGui::Separator();
+
+				auto scope = maybe_disabled_cols({}, true);
+				ImGui::Button("OK##LinkFlow", ImVec2(120, 0));
+			}
+			else if (link_flow == F::CHECKING_BEFORE) {
 				spinner_line("Checking with hypersomnia.io...", white);
 			}
 			else if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
