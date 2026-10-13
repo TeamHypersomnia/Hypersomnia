@@ -2360,25 +2360,27 @@ work_result work(
 			popup.message = typesafe_sprintf(
 				"Couldn't sign in to your %x account.\n"
 				"\n"
-				"If you join now, you play as your %x (%x)\n"
-				"and progress from this game won't count towards %x.",
+				"If you join now, you play as your %x (%x)",
 				provider,
 				identity_key::account_kind_name_lowercase(),
-				identity_key::short_form(identity->public_key()),
-				provider
+				identity_key::short_form(identity->public_key())
 			);
+
+			popup.warning_notice = typesafe_sprintf("and progress from this game won't count towards %x.", provider);
+			popup.warning_notice_col = orange;
 		}
 		else {
 			popup.message = typesafe_sprintf(
 				"Couldn't sign in to your %x account - the game keeps trying.\n"
 				"\n"
-				"Until then you play as your %x (%x)\n"
-				"and progress won't count towards %x.",
+				"Until then you play as your %x (%x)",
 				provider,
 				identity_key::account_kind_name_lowercase(),
-				identity_key::short_form(identity->public_key()),
-				provider
+				identity_key::short_form(identity->public_key())
 			);
+
+			popup.warning_notice = typesafe_sprintf("and progress won't count towards %x.", provider);
+			popup.warning_notice_col = orange;
 		}
 
 		if (!identity->last_error.empty()) {

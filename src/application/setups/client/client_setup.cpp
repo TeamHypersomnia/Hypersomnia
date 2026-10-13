@@ -1993,7 +1993,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 								}()
 								+ "Usually the server was just reinstalled - but it could also be someone pretending to be it.\n"
 								+ "\n"
-								+ "If you connect anyway, your account stays safe - only what you do on this server (e.g. chat) could be seen."
+								+ "Connecting anyway keeps your account safe, but what you do on this server (e.g. chat) could be seen."
 								+ (identity.password.empty() ? std::string() : std::string("\nThe password you saved for this server will not be sent."))
 							);
 							break;

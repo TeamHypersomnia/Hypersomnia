@@ -54,7 +54,7 @@ int simple_popup::perform(const std::vector<button>& buttons) {
 		text(message);
 
 		if (!warning_notice.empty()) {
-			text_color(warning_notice, yellow);
+			text_color(warning_notice, warning_notice_col);
 		}
 
 		{

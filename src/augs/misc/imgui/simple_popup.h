@@ -11,6 +11,7 @@ struct simple_popup {
 	std::string details;
 
 	std::string warning_notice = "";
+	rgba warning_notice_col = yellow;
 	std::string warning_notice_above = "";
 
 	struct button {
