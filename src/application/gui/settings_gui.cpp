@@ -1368,7 +1368,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			else if (link_flow == F::CONFIRMING && link_target_to_confirm.has_value()) {
 				const auto target = *link_target_to_confirm;
 
-				text_color("Confirm that this account is yours:", orange);
+				text_color("Is this your Steam account?", orange);
 
 				/*
 					Laid out as after linking: the avatar, the name beside it - the id under them, in gray.
@@ -1385,11 +1385,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					augs::open_url("https://steamcommunity.com/profiles/" + id64);
 				}
 
-				text("\nProgress will count towards this Steam account.");
-
 				ImGui::Separator();
 
-				if (ImGui::Button("Confirm", ImVec2(120, 0))) {
+				if (ImGui::Button("Yes, link it", ImVec2(120, 0))) {
 					link_target_to_confirm.reset();
 					linked_name = target.name;
 					link_to_confirmed_target(target);
@@ -1397,7 +1395,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("Cancel##Confirm", ImVec2(120, 0))) {
+				if (ImGui::Button("No##Confirm", ImVec2(120, 0))) {
 					close();
 				}
 			}
