@@ -172,6 +172,16 @@ void identity_session::load_saved_cert() {
 
 		cert_received_at = augs::steady_secs() - (wall_now() - received_wall);
 
+		/*
+			Arrived "in the future": this computer's clock went back since. Its age is unknown - taken as expired,
+			so it is renewed at once instead of being shown to servers that refuse it.
+		*/
+
+		if (received_wall > wall_now() + 60.0) {
+			LOG("steam.cert arrived later than now by this computer's clock - renewing it.");
+			cert_received_at = augs::steady_secs() - static_cast<double>(cert->not_after - cert->not_before) - 1.0;
+		}
+
 		LOG("Loaded the saved cert for %x.", cert->account);
 	}
 	catch (...) {
@@ -428,6 +438,14 @@ void identity_session::advance(const input& in, const double now) {
 			link_check = link_check_state::FAILED;
 
 			/*
+				A refusal (e.g. a ban) tells why - only short plain text, never a page.
+			*/
+
+			const bool refused = response.status >= 400 && response.status < 500 && response.status != 429;
+			const bool plain_text = response.body.size() <= 300 && response.body.find('<') == std::string::npos;
+			link_check_error = refused && plain_text ? response.body : std::string();
+
+			/*
 				Asked again only when hypersomnia.io may answer later - not after a refusal (e.g. a ban).
 			*/
 
@@ -680,6 +698,7 @@ void identity_session::start_link_check(const std::string& broker_url) {
 
 	link_check = link_check_state::PENDING;
 	link_check_profile = {};
+	link_check_error.clear();
 }
 
 void identity_session::clear_link_check() {

@@ -11,10 +11,11 @@
 /*
 	Who a player is, proven inside the connection handshake.
 
-	A cert binds an account to the player's session key: the Ed25519 key the game makes at every start
-	and keeps only in memory. The identity broker on hypersomnia.io signs certs after checking a Steam ticket,
-	a CrazyGames token or the signature of an account key. A player with an account key can sign one himself -
-	the account is then always "key_" with that very key, and the servers trust it for nothing global, e.g. ranked.
+	A cert binds an account to the player's session key: the account key itself (.keys/account.key).
+	The identity broker on hypersomnia.io signs certs after checking a Steam ticket, a CrazyGames token
+	or the signature of an account key. A player can sign one with the account key himself - the account is then
+	always "key_" with that very key. Servers take such a cert everywhere, ranked included: a key_ account is
+	whoever holds the key; bans of such accounts are applied by hypersomnia.io when it rates the match.
 
 	netcode signs the binding of each connection (its server key, secret and cookie) with the session key,
 	so a cert is good only together with a connection its owner made. See netcode_connection_binding.

@@ -392,16 +392,7 @@ void settings_gui_state::perform_account_message_modal() {
 		Waits for any other account modal - two open at once would close each other every frame.
 	*/
 
-	const bool other_modal_open =
-		import_modal_open
-		|| import_to_confirm.has_value()
-		|| link_flow != link_flow_type::IDLE
-		|| confirm_unlink
-		|| confirm_forget_key
-		|| reveal_private_key_open
-	;
-
-	if (other_modal_open) {
+	if (account_modal_open(false)) {
 		return;
 	}
 
@@ -562,6 +553,32 @@ void settings_gui_state::on_key_replaced_outside() {
 	reveal_private_key_open = false;
 }
 
+void settings_gui_state::cancel_link_flow_if_hidden() {
+	/*
+		Settings closed while waiting for the sign-in through Steam: the link is given up - not finished by itself
+		the next time the pane is opened.
+	*/
+
+	if (show) {
+		return;
+	}
+
+	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
+
+	if (waiting || link_code_from_steam.has_value()) {
+		link_flow = link_flow_type::IDLE;
+		link_flow_message.clear();
+		link_target_request.reset();
+		link_code_from_steam.reset();
+		steam_link_state.clear();
+		link_listener.stop();
+
+		if (identity != nullptr) {
+			identity->clear_link_check();
+		}
+	}
+}
+
 void settings_gui_state::clear_copied_private_key_if_due() {
 #if !PLATFORM_WEB
 	/*
@@ -579,6 +596,32 @@ void settings_gui_state::clear_copied_private_key_if_due() {
 
 	copied_private_key.clear();
 #endif
+}
+
+bool settings_gui_state::account_modal_open(const bool with_message) const {
+	const bool any =
+		import_modal_open
+		|| import_to_confirm.has_value()
+		|| link_flow != link_flow_type::IDLE
+		|| confirm_unlink
+		|| confirm_forget_key
+		|| reveal_private_key_open
+	;
+
+	return any || (with_message && account_message.has_value());
+}
+
+bool settings_gui_state::is_locked_by_ranked() const {
+	/*
+		Also a match that can still be rejoined - read only when asked, on a click.
+	*/
+
+	if (in_ranked_match) {
+		return true;
+	}
+
+	const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
+	return record.has_value() && record->valid_now();
 }
 
 void settings_gui_state::on_key_unreadable() {
@@ -716,11 +759,19 @@ void settings_gui_state::perform_import_modal(
 			}
 		}
 
-		welcome_back(profile.name, true);
+		/*
+			The avatar shown is the one just written for the key - with none, the old one would still be in the preview.
+		*/
+
+		welcome_back(profile.name, !profile.avatar.empty());
 		may_close = true;
 	}
 	else {
 		text_color("Couldn't check whether this key is linked to a Steam account.", orange);
+
+		if (identity != nullptr && !identity->get_link_check_error().empty()) {
+			text_color(identity->get_link_check_error(), orange);
+		}
 		text("\nProgress will count towards:\n");
 		text("    " + identity_key::account_kind_name() + " (" + (identity != nullptr ? identity_key::short_form(identity->public_key()) : std::string()) + ")\n");
 
@@ -847,17 +898,9 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	*/
 
 	auto locked_by_ranked = [&]() {
-		/*
-			Also a match that can still be rejoined - read only when asked, on a click.
-		*/
-
-		if (in_ranked_match) {
-			return true;
-		}
-
-		const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
-		return record.has_value() && record->valid_now();
+		return is_locked_by_ranked();
 	};
+
 	const auto ranked_lock_tooltip = std::string("Not during a ranked match.");
 
 	const bool import_clicked = [&]() {
@@ -921,7 +964,17 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				const auto imported = *import_to_confirm;
 				import_to_confirm.reset();
 				ImGui::CloseCurrentPopup();
-				import_now(imported);
+
+				/*
+					A ranked match may have started while this was open.
+				*/
+
+				if (locked_by_ranked()) {
+					account_message = ranked_lock_tooltip;
+				}
+				else {
+					import_now(imported);
+				}
 			}
 
 			ImGui::SameLine();
@@ -1044,10 +1097,15 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 					key_unreadable_since = -1.0;
 
 					if (const auto backup = identity_key::forget(key_path)) {
+#if PLATFORM_WEB
+						(void)backup;
+						account_message = std::string("A new account is made right away.");
+#else
 						account_message = typesafe_sprintf(
 							"A new account is made right away.\n\nThe old key is kept as:\n    %x",
 							backup->filename().string()
 						);
+#endif
 					}
 					else {
 						account_message = "Could not start a new account.\n\nSee the logs.";
@@ -1204,8 +1262,17 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 
 		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink from Steam...")) {
-			confirm_unlink = true;
-			unlink_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
+			/*
+				Not during a ranked match: its rejoin is on the Steam account.
+			*/
+
+			if (is_locked_by_ranked()) {
+				account_message = "Not during a ranked match.";
+			}
+			else {
+				confirm_unlink = true;
+				unlink_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
+			}
 		}
 	}
 	else {
@@ -1309,8 +1376,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				identity->recheck_link_quietly();
 				finish(false, typesafe_sprintf("Linked, but couldn't reach %x to sign in to the Steam account.\n\nThe game will keep trying on its own.", website_url));
 			}
+			else if (const auto& refusal = identity->get_link_check_error(); !refusal.empty()) {
+				finish(false, refusal);
+			}
 			else {
-				finish(false, typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", website_url));
+				finish(false, typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", identity_input.broker_url));
 			}
 		}
 		else if (check == L::NONE) {
@@ -3607,8 +3677,17 @@ void settings_gui_state::perform(
 								augs::open_url(config.website_url + "/user/" + current_account_id);
 							}
 
-							if (is_key) {
-#if WEB_ITCH
+							if (is_key && !signed_in.provider_label.empty()) {
+								/*
+									The account is Steam's or CrazyGames' - only not signed in right now.
+								*/
+
+								text_disabled(typesafe_sprintf("Until you are signed in to %x, progress counts towards this %x.", signed_in.provider_label, identity_key::account_kind_name_lowercase()));
+							}
+							else if (is_key) {
+#if WEB_CRAZYGAMES
+								text_disabled("Sign in to CrazyGames to keep your progress and play ranked.");
+#elif WEB_ITCH
 								text_disabled("Progress is saved only in this browser.\nRanked and linking with Steam: play.hypersomnia.io or Steam.");
 #elif PLATFORM_WEB
 								text_disabled("Progress is saved only in this browser - clearing site data deletes it.\nBack it up, or link with Steam.");

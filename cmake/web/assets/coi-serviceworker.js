@@ -11,7 +11,7 @@ self.addEventListener("fetch", function (e) {
     const headers = new Headers(r.headers);
     if (e.request.mode === "navigate") {
       const url = new URL(e.request.url);
-      if (url.pathname.endsWith('/discord_redirect.html')) {
+      if (url.pathname.endsWith('/discord_redirect.html') || url.pathname.endsWith('/auth_redirect.html')) {
         // OAuth redirect page must NOT have COOP so window.opener survives
         // the cross-origin navigation chain (game iframe -> Discord -> redirect)
         headers.delete("Cross-Origin-Opener-Policy");

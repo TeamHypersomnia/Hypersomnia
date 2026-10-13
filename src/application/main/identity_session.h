@@ -124,6 +124,7 @@ private:
 	augs::async_response_ptr link_check_request;
 	link_check_state link_check = link_check_state::NONE;
 	account_profile link_check_profile;
+	std::string link_check_error;
 
 	/*
 		account.checked: the public key last asked about at hypersomnia.io (or made by this game).
@@ -273,5 +274,11 @@ public:
 	void start_link_check(const std::string& broker_url);
 	link_check_state get_link_check() const { return link_check; }
 	const account_profile& get_link_check_profile() const { return link_check_profile; }
+
+	/*
+		Why hypersomnia.io refused the last check, if it did (empty when it was not reached).
+	*/
+
+	const std::string& get_link_check_error() const { return link_check_error; }
 	void clear_link_check();
 };

@@ -1859,18 +1859,35 @@ work_result work(
 			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
 		*/
 
-		const bool existed = augs::exists(path);
+		bool existed = augs::exists(path);
 
 		if (const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path)) {
 			account_seed = loaded;
 		}
 		else if (!account_seed.has_value()) {
 			/*
-				No key to play with at all (e.g. a damaged file at the start) - shown where it can be fixed.
+				No key to play with at all (e.g. a damaged file at the start).
+				Where the account is Steam's or CrazyGames' and there is no Backup tab to fix it in (Steam, CrazyGames,
+				itch.io), the damaged file is kept as a backup and a new key made - the account stays the same.
+				Elsewhere it is shown where it can be fixed.
 			*/
 
 			LOG("account.key could not be read.");
-			key_unreadable_shown_wanted = true;
+
+#if WEB_CRAZYGAMES || WEB_ITCH
+			const bool key_is_not_the_account = true;
+#else
+			const bool key_is_not_the_account = is_steam_client;
+#endif
+
+			if (key_is_not_the_account && identity_key::forget(path).has_value()) {
+				LOG("The damaged account.key was kept as a backup; a new key is made.");
+				account_seed = identity_key::load_or_create(path);
+				existed = false;
+			}
+			else {
+				key_unreadable_shown_wanted = true;
+			}
 		}
 
 		if (account_seed.has_value()) {
@@ -2404,6 +2421,7 @@ work_result work(
 
 		settings_gui.in_ranked_match = would_abandon_ranked_match();
 		settings_gui.clear_copied_private_key_if_due();
+		settings_gui.cancel_link_flow_if_hidden();
 
 		if (settings_gui.link_avatar_to_upload.has_value()) {
 			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
@@ -2832,6 +2850,18 @@ work_result work(
 		const auto rejoined_match = [&]() -> std::optional<ranked_match_record> {
 			if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH)) {
 				if (record->valid_now() && record->connect == std::string(connect_string)) {
+					/*
+						A match played on a key is rejoined only with that key - after another key came into account.key
+						the server would take it for another player.
+					*/
+
+					const bool other_key = record->account.rfind("key_", 0) == 0 && record->account != identity->key_account();
+
+					if (other_key) {
+						LOG("Not rejoining %x - the account.key is another key now.", record->account);
+						return std::nullopt;
+					}
+
 					LOG("Rejoining a ranked match as %x.", record->account);
 					return record;
 				}
@@ -3251,7 +3281,7 @@ work_result work(
 			open_sign_in_popup(false);
 		}
 
-		if (sign_in_popup.has_value()) {
+		if (sign_in_popup.has_value() && !(settings_gui.show && settings_gui.account_modal_open())) {
 			if (sign_in_popup_for_rejoin) {
 				const auto result = sign_in_popup->perform({
 					{ "Retry", rgba::zero, rgba::zero },

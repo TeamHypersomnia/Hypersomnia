@@ -341,7 +341,35 @@ function request_fresh_auth_token() {
   }
 }
 
+// A line over the game when what it saves can not reach this browser's storage
+function show_storage_notice(text) {
+  let notice = document.getElementById('storage-notice');
+
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'storage-notice';
+    notice.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:1000;padding:6px 10px;background:#a02020;color:#fff;font:14px sans-serif;text-align:center;pointer-events:none';
+    document.body.appendChild(notice);
+  }
+
+  notice.textContent = text;
+}
+
 function pre_run() {
+  // One tab writes the account at a time - two would each write their own copy over the other's (a new account, a link)
+  if (navigator.locks && navigator.locks.request) {
+    navigator.locks.request('hypersomnia_user', { ifAvailable: true }, lock => {
+      if (!lock) {
+        Module.idbfs_readonly = true;
+        show_storage_notice('The game is open in another tab - nothing is saved in this one. Close it here and play in the other tab.');
+        return;
+      }
+
+      // Held while this tab lives
+      return new Promise(() => {});
+    }).catch(() => {});
+  }
+
   // Add a run dependency to ensure syncing is done before the application starts
   Module.addRunDependency('idbfs');
 
@@ -361,6 +389,7 @@ function pre_run() {
       // Nothing is ever written back then: an empty start would make a new account key and wipe the stored one
       console.error('Error loading from IndexedDB', err);
       Module.idbfs_failed = true;
+      show_storage_notice("Couldn't read this browser's storage - your account was not loaded and nothing is saved. Reload the page.");
     }
     else console.log('Loaded from IndexedDB');
 
@@ -387,8 +416,8 @@ function get_cli_args(for_cg) {
 }
 
 function sync_idbfs() {
-  if (Module.idbfs_failed) {
-    console.log("The browser's storage did not load - not writing over it.");
+  if (Module.idbfs_failed || Module.idbfs_readonly) {
+    console.log("Not writing to the browser's storage (it did not load, or another tab writes it).");
     return;
   }
 
@@ -412,6 +441,9 @@ function sync_idbfs() {
 
       if (Module.sync_failures <= 5) {
         setTimeout(() => Module.sync_idbfs(), 1000 * Math.min(30, Math.pow(2, Module.sync_failures)));
+      }
+      else {
+        show_storage_notice("Your progress can't be saved in this browser (its storage is full or blocked). Back up your private key.");
       }
     } else {
       Module.sync_failures = 0;

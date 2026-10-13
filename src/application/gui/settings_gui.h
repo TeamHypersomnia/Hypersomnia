@@ -333,6 +333,21 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	std::optional<augs::ed25519_seed_type> current_account_seed();
 
+	/*
+		The key or its link may not change while a ranked match is on or can still be rejoined.
+	*/
+
+	bool is_locked_by_ranked() const;
+
+public:
+	/*
+		Any modal of the Account settings - another modal waits while one is open (two would close each other every frame).
+	*/
+
+	bool account_modal_open(bool with_message = true) const;
+
+private:
+
 public:
 	bool is_steam_client = false;
 
@@ -415,6 +430,7 @@ public:
 	*/
 
 	void clear_copied_private_key_if_due();
+	void cancel_link_flow_if_hidden();
 
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;
