@@ -142,7 +142,8 @@ namespace augs {
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
+		const std::string& custom_title,
+		const std::string& default_name
 	) {
 		const auto filter = get_filter(filters);
 		const auto title = widen(custom_title);
@@ -155,7 +156,10 @@ namespace augs {
 		ofn.lStructSize = sizeof(ofn);
 		ofn.lpstrFile = szFile.data();
 		ofn.hwndOwner = get_hwnd(*platform);
-		ofn.lpstrFile[0] = '\0';
+		{
+			const auto suggested = widen(default_name);
+			std::copy_n(suggested.begin(), std::min(suggested.size(), szFile.size() - 1), szFile.begin());
+		}
 		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
 		ofn.lpstrTitle = title.data();

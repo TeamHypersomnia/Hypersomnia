@@ -247,9 +247,14 @@ namespace augs {
 			const std::string& custom_title = std::string()
 		);
 
+		/*
+			default_name: the file name suggested in the dialog (e.g. "account.key").
+		*/
+
 		std::optional<path_type> save_file_dialog(
 			const std::vector<file_dialog_filter>& filters,
-			const std::string& custom_title = std::string()
+			const std::string& custom_title = std::string(),
+			const std::string& default_name = std::string()
 		);
 
 		std::optional<path_type> choose_directory_dialog(

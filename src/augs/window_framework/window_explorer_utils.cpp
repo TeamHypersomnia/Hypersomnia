@@ -20,7 +20,8 @@ namespace augs {
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& /* custom_title */
+		const std::string& /* custom_title */,
+		const std::string& /* default_name */
 	) {
 		return std::nullopt;
 	}
@@ -162,12 +163,18 @@ namespace augs {
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
+		const std::string& custom_title,
+		const std::string& default_name
 	) {
 		const auto title = custom_title.empty() ? "Save File" : custom_title;
 
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
+
+			if (!default_name.empty()) {
+				cmd += " --filename=" + shell_escape(default_name);
+			}
+
 			for (const auto& f : filters) {
 				cmd += " --file-filter=" + shell_escape(f.description + " | " + f.patterns_joined(" "));
 			}
@@ -180,7 +187,7 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += f.patterns_joined(" ");
 			}
-			std::string cmd = "kdialog --getsavefilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
+			std::string cmd = "kdialog --getsavefilename " + shell_escape(default_name.empty() ? std::string(".") : default_name) + " " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -298,9 +305,16 @@ namespace augs {
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& custom_title
+		const std::string& custom_title,
+		const std::string& default_name
 	) {
-		return run_applescript_dialog("choose file name", custom_title.empty() ? "Save File" : custom_title);
+		auto chooser = std::string("choose file name");
+
+		if (!default_name.empty() && default_name.find_first_of("\"'\\") == std::string::npos) {
+			chooser += " default name \"" + default_name + "\"";
+		}
+
+		return run_applescript_dialog(chooser, custom_title.empty() ? "Save File" : custom_title);
 	}
 
 	std::optional<path_type> window::choose_directory_dialog(

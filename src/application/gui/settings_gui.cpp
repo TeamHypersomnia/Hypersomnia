@@ -1278,10 +1278,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 			else if (save_copy_clicked && !chosen_key_copy_path.valid()) {
 				chosen_key_copy_path = launch_async(
-					[&window, file_name = backup_file_name]() -> std::optional<augs::path_type> {
+					[&window]() -> std::optional<augs::path_type> {
 						const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key" } };
 
-						if (auto path = window.save_file_dialog(filters, "Save a copy of your private key as " + file_name)) {
+						/*
+							Named as the game's own file - where to put it back is plain then.
+						*/
+
+						if (auto path = window.save_file_dialog(filters, "Save a copy of your private key", std::string(identity_key::file_name))) {
 							return path;
 						}
 
