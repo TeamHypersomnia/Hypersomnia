@@ -217,3 +217,38 @@ namespace augs {
 	}
 }
 #endif
+
+#if PLATFORM_WEB
+namespace augs {
+	std::string get_device_name() {
+		return "Browser";
+	}
+}
+#elif PLATFORM_WINDOWS
+namespace augs {
+	std::string get_device_name() {
+		char name[MAX_COMPUTERNAME_LENGTH + 1];
+		DWORD size = sizeof(name);
+
+		if (GetComputerNameA(name, &size)) {
+			return std::string(name, size);
+		}
+
+		return "";
+	}
+}
+#else
+#include <unistd.h>
+
+namespace augs {
+	std::string get_device_name() {
+		char name[256] = {};
+
+		if (gethostname(name, sizeof(name) - 1) == 0) {
+			return std::string(name);
+		}
+
+		return "";
+	}
+}
+#endif

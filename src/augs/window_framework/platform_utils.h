@@ -21,6 +21,12 @@ namespace augs {
 
 	augs::path_type get_default_local_appdata_dir();
 
+	/*
+		This computer's name (hostname) - "Browser" in the web build.
+	*/
+
+	std::string get_device_name();
+
 	std::string wstr_to_utf8(const wchar_t* wstr);
 	std::wstring widen(const std::string& s);
 }

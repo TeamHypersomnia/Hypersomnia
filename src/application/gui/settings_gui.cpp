@@ -1668,6 +1668,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				if (ImGui::Button("OK##LinkFlow", ImVec2(120, 0))) {
 					close();
 				}
+
+				/*
+					The account has as many keys linked as it may: they are let go of on the site.
+				*/
+
+				if (!link_flow_succeeded && link_flow_message.find("keys linked") != std::string::npos) {
+					ImGui::SameLine();
+
+					if (ImGui::Button("Manage linked keys##LinkFlow")) {
+						augs::open_url(website_url + "/profile");
+					}
+				}
 			}
 
 			ImGui::EndPopup();

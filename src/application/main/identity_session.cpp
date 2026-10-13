@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cstring>
 #include <filesystem>
 #include "augs/log.h"
@@ -36,6 +37,7 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	key_seed = seed;
 	key_loaded = true;
+	steam_ticket_needed = false;
 
 	if (const auto public_key = augs::ed25519_public_key(key_seed)) {
 		key_public = *public_key;
@@ -285,12 +287,12 @@ std::optional<std::string> identity_session::build_location(const input& in) con
 	}
 
 	if (in.provider == provider_type::STEAM) {
-		if (in.steam_ticket_proof) {
+		if (in.steam_ticket_proof && steam_ticket_needed) {
 			if (!steam_ticket.has_value()) {
 				return std::nullopt;
 			}
 
-			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket);
+			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1";
 		}
 
 		const auto key = key_location();
@@ -350,11 +352,36 @@ void identity_session::start_request(const input& in, const double now) {
 
 	auto headers = augs::Headers();
 
+	/*
+		The device's name, percent-encoded - only letters, digits and a few marks go as they are.
+	*/
+
+	const auto device = [&]() {
+		auto encoded = std::string();
+
+		for (const auto c : device_name.substr(0, 64)) {
+			const auto u = static_cast<unsigned char>(c);
+			const bool plain = std::isalnum(u) || c == '-' || c == '_' || c == '.';
+
+			if (plain) {
+				encoded += c;
+			}
+			else {
+				const auto digits = std::string_view("0123456789ABCDEF");
+				encoded += '%';
+				encoded += digits[u >> 4];
+				encoded += digits[u & 15];
+			}
+		}
+
+		return encoded.empty() ? std::string() : "&device=" + encoded;
+	}();
+
 	if (in.provider == provider_type::CRAZYGAMES) {
 		headers["X-CrazyGames-Token"] = in.crazygames_token;
 	}
 
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers);
+	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location + device, headers);
 	requested_for = in;
 }
 
@@ -517,7 +544,28 @@ void identity_session::advance(const input& in, const double now) {
 
 		const auto answer = response.status == 200 ? parse_answer(response.body) : std::nullopt;
 
-		if (answer.has_value()) {
+		if (answer.has_value() && in.steam_ticket_proof && answer->cert.account != in.steam_account) {
+			if (!steam_ticket_needed) {
+				/*
+					The key is not linked to this Steam account (yet, or no longer): once with a ticket, which links it.
+					Not an attempt of its own - the first sign-in still waits for that one.
+				*/
+
+				LOG("The key is not linked to %x - asking with a Steam ticket.", in.steam_account);
+				steam_ticket_needed = true;
+				next_attempt_at = 0.0;
+				--attempts_finished;
+				return;
+			}
+
+			LOG("A cert for %x came for a Steam ticket of %x - not used.", answer->cert.account, in.steam_account);
+		}
+
+		if (answer.has_value() && in.steam_ticket_proof && answer->cert.account == in.steam_account) {
+			steam_ticket_needed = false;
+		}
+
+		if (answer.has_value() && (!in.steam_ticket_proof || answer->cert.account == in.steam_account)) {
 			last_attempt_failed = false;
 			last_error.clear();
 			retry_delay = first_retry_delay_secs;
@@ -595,7 +643,7 @@ void identity_session::advance(const input& in, const double now) {
 		return;
 	}
 
-	if (in.steam_ticket_proof && !steam_ticket.has_value()) {
+	if (in.steam_ticket_proof && steam_ticket_needed && !steam_ticket.has_value()) {
 		steam_ticket_wanted = true;
 		return;
 	}

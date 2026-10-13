@@ -48,6 +48,12 @@ public:
 		*/
 
 		bool steam_ticket_proof = false;
+
+		/*
+			The Steam build: its own account ("steam_<id64>") - a cert for it by the key's signature needs no ticket.
+		*/
+
+		std::string steam_account;
 		std::string crazygames_token;
 
 		/*
@@ -117,6 +123,19 @@ private:
 	*/
 
 	bool steam_ticket_wanted = false;
+
+	/*
+		The Steam build asks with the key's signature first; only when that is not its Steam account yet
+		(not linked, or unlinked on the site) once with a ticket, which links the key - see broker.js.
+	*/
+
+	bool steam_ticket_needed = false;
+
+	/*
+		The device the game runs on, sent with every request - shown only on the owner's hypersomnia.io/profile.
+	*/
+
+	std::string device_name;
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
@@ -250,6 +269,10 @@ public:
 	*/
 
 	void on_key_created();
+
+	void set_device_name(const std::string& name) {
+		device_name = name;
+	}
 
 	/*
 		Linked on the site, but the check that should follow failed: asked again in the background until answered.
