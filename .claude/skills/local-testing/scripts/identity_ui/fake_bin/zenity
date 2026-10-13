@@ -1,4 +1,6 @@
 #!/bin/bash
 # Stands in for the file dialog in UI tests: "chooses" $FAKE_ZENITY_FILE (nothing - a cancel - when unset).
+# ZENITY_LOG=<file> gets each call's arguments (e.g. to check the file filters).
+[ -n "$ZENITY_LOG" ] && printf '%s\n' "$*" >> "$ZENITY_LOG"
 [ -n "$FAKE_ZENITY_FILE" ] && echo "$FAKE_ZENITY_FILE" && exit 0
 exit 1

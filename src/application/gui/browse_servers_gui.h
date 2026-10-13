@@ -118,6 +118,12 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void send_pings_and_punch_requests(netcode_socket_t&);
 #endif
 public:
+	/*
+		Why this game can not play ranked (itch.io, a CrazyGames guest) - ranked servers are not joined then, and say why.
+	*/
+
+	std::string ranked_unavailable_reason;
+
 
 
 	using base = standard_window_mixin<browse_servers_gui_state>;

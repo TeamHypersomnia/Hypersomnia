@@ -1,13 +1,15 @@
 const ipinfo_endpoint = 'https://hypersomnia.io/geolocation';
 
 function decodeCrazyGamesToken(token) {
-  const payloadBase64 = token.split('.')[1];
-  const payloadDecoded = atob(payloadBase64);
-  const payload = JSON.parse(payloadDecoded);
+  // A JWT's payload is base64url (- and _, no padding) of UTF-8 JSON - atob alone throws on it or garbles names
+  const base64url = token.split('.')[1];
+  const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - base64url.length % 4) % 4);
+  const payload = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(base64), c => c.charCodeAt(0))));
   console.log("Decoded token payload", payload);
 
+  // How long it lives by the token's own clock - this computer's may be off by hours
   const currentTime = Math.floor(Date.now() / 1000);
-  payload.expiresIn = payload.exp - currentTime;
+  payload.expiresIn = typeof payload.iat === 'number' ? payload.exp - payload.iat : payload.exp - currentTime;
   console.log(currentTime, payload.exp);
 
   return payload;
@@ -281,6 +283,15 @@ async function pre_run_cg() {
       const available = window.CrazyGames.SDK.user.isUserAccountAvailable;
       console.log("User account system available", available);
 
+      // Signed in on the portal itself while the game runs: the game gets the token at once, no reload
+      if (available && window.CrazyGames.SDK.user.addAuthListener) {
+        window.CrazyGames.SDK.user.addAuthListener(user => {
+          if (user && Module.ccall) {
+            window.CrazyGames.SDK.user.getUserToken().then(passCrazyGamesToken).catch(e => console.log("Token retrieval failed:", e));
+          }
+        });
+      }
+
       if (available) {
         try {
           const token = await window.CrazyGames.SDK.user.getUserToken();
@@ -404,7 +415,11 @@ function pre_run() {
       // Nothing is ever written back then: an empty start would make a new account key and wipe the stored one
       console.error('Error loading from IndexedDB', err);
       Module.idbfs_failed = true;
-      show_storage_notice("Couldn't read this browser's storage - your account was not loaded and nothing is saved. Reload the page.");
+      // Embedded on another site (or in private mode) the browser may keep no storage at all - reloading does not help there
+      const embedded = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+      show_storage_notice(embedded
+        ? "This browser keeps no storage for the game here (embedded on another site, or in private mode) - nothing is saved. Play at play.hypersomnia.io to keep your account."
+        : "Couldn't read this browser's storage - your account was not loaded and nothing is saved. Reload the page.");
     }
     else console.log('Loaded from IndexedDB');
 
@@ -475,6 +490,11 @@ function sync_idbfs_cg() {
   save_config_cg();
 }
 
+function passCrazyGamesToken(token) {
+  const payload = decodeCrazyGamesToken(token);
+  passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, payload.expiresIn);
+}
+
 function loginCrazyGames() {
   if (window.CrazyGames) {
     window.CrazyGames.SDK.user.showAuthPrompt()
@@ -482,15 +502,17 @@ function loginCrazyGames() {
         if (user) {
           return window.CrazyGames.SDK.user.getUserToken();
         } else {
-          throw new Error('User cancelled login or already signed in');
+          throw new Error('User cancelled login');
         }
       })
-      .then(token => {
-        const payload = decodeCrazyGamesToken(token);
-
-        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, payload.expiresIn);
-      })
+      .then(passCrazyGamesToken)
       .catch(e => {
+        // Signed in on the portal already (e.g. in another game): the prompt refuses, the token is there
+        if (e && (e.code === 'userAlreadySignedIn' || String(e.message || e).includes('userAlreadySignedIn'))) {
+          window.CrazyGames.SDK.user.getUserToken().then(passCrazyGamesToken).catch(e2 => console.log("Token retrieval failed:", e2));
+          return;
+        }
+
         console.log("Auth prompt or token retrieval failed:", e);
       });
   }
@@ -603,23 +625,27 @@ function create_module(for_cg) {
       The game checks the state it made.
     */
 
-    const channel = new BroadcastChannel('auth_bridge');
-
     function handleSteamLink(data) {
       if (data && data.type === 'steam_link' && typeof data.code === 'string' && typeof data.state === 'string') {
         Module.ccall('on_steam_link_code', 'void', ['string', 'string'], [data.code, data.state]);
       }
     }
 
-    channel.addEventListener('message', event => handleSteamLink(event.data));
+    // Older Safari has no BroadcastChannel - the game must start all the same (postMessage still works)
+    try {
+      // Kept on Module - a channel nothing references may be collected, and its messages with it
+      Module.channel = new BroadcastChannel('auth_bridge');
+      Module.channel.addEventListener('message', event => handleSteamLink(event.data));
+    }
+    catch (e) {
+      console.warn('No BroadcastChannel:', e);
+    }
 
     window.addEventListener('message', event => {
       if (event.origin === window.location.origin) {
         handleSteamLink(event.data);
       }
     });
-
-    Module.channel = channel;
 
     Module.setBrowserLocation = setBrowserLocation;
   }

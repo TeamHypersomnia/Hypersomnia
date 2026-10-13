@@ -36,7 +36,7 @@
   "Sign in with Steam" from the web build: hypersomnia.io sends the one-time link code here with the game's state.
   Handed only to the game in this browser (same origin) - the game checks the state and links.
 */
-window.onload = function() {
+function handOver() {
     const params = new URLSearchParams(window.location.hash.substring(1));
     const code = params.get('code');
     const state = params.get('state');
@@ -67,16 +67,29 @@ window.onload = function() {
 
         // Back to the game - browsers allow it for a tab the game opened, otherwise the text below says it
         setTimeout(function() { window.close(); }, 500);
+        return true;
     }
-};
+
+    return false;
+}
+
+// At once - the code leaves the address bar as soon as it can; the text once the page is there
+const handedOver = handOver();
+
+window.addEventListener('DOMContentLoaded', function() {
+    if (handedOver) {
+        document.getElementById('title').textContent = 'Signed in with Steam.';
+        document.getElementById('detail').textContent = 'Go back to the game - it finishes the link.';
+    }
+});
 </script>
 </head>
 <body>
 
   <div class="center-container">
-<span class="close-text">Signed in.</span><br>
+<span class="close-text" id="title">Nothing to do here.</span><br>
 <br>
-<span class="close-text2">Go back to the game.</span>
+<span class="close-text2" id="detail">Start again in the game: Settings - Account - Link with Steam.</span>
   </div>
 </body>
 </html>

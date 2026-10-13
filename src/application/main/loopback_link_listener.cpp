@@ -1,6 +1,7 @@
 #include <mutex>
 #include <thread>
 #include <utility>
+#include "augs/string/constant_time_equal.h"
 #include "augs/log.h"
 #include "application/main/loopback_link_listener.h"
 
@@ -78,7 +79,7 @@ std::optional<int> loopback_link_listener::start(const std::string& state) {
 		res.set_header("Cache-Control", "no-store");
 		res.set_header("Connection", "close");
 
-		if (state != self->state || !is_link_code(code)) {
+		if (!augs::constant_time_equal(state, self->state) || !is_link_code(code)) {
 			LOG("The link listener got a request that is not for this game.");
 			res.status = 400;
 			res.set_content(page("Not for this game", "This link was not started by the game on this computer. Start again in the game: Settings - Account - Link with Steam."), "text/html");
@@ -90,8 +91,17 @@ std::optional<int> loopback_link_listener::start(const std::string& state) {
 			self->code = code;
 		}
 
-		res.set_content(page("Signed in", "Go back to Hypersomnia - it finishes the link by itself. You can close this tab."), "text/html");
+		res.set_content(page("Back to Hypersomnia", "The game finishes linking by itself. You can close this tab."), "text/html");
 	});
+
+	/*
+		A browser keeps idle connections open (keep-alive, preconnects) - stop() waits for them,
+		so none may hold a worker for long: one request per connection, a short read timeout.
+	*/
+
+	pimpl->server.set_keep_alive_max_count(1);
+	pimpl->server.set_keep_alive_timeout(0);
+	pimpl->server.set_read_timeout(0, 200000);
 
 	const auto port = pimpl->server.bind_to_any_port("127.0.0.1");
 

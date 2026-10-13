@@ -117,6 +117,10 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   kick/ban, restart/shutdown/updates/logs; not Vars, not "Clear all" of the runtime prefs.
 - `../steam_link_test.js` - linking by a Steam ticket at the 32-key limit, straight on the scratch site's DB (copy it into the site dir).
 - `crazygames_sdk_stub.py <any pem> <game id> - <out.js>` - a CrazyGames guest (no token, no user).
+- `../link1_signature_test.py` (`STEAM_CWD=<dir with steam_appid.txt: 2660970>`, the user's Steam running) - the broker's link=1:
+  the replayable cert request signature must not link ("Not linking"), the one over the ticket must.
+- The fake `zenity` writes its arguments to `$ZENITY_LOG` (the file filters, the save dialog's title) and "chooses" `$FAKE_ZENITY_FILE`.
+- `ui.sh stop` finds the client by its dir, whatever `BIN` started it.
 - An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
 
 What each state looks like (screenshots of all of them were reviewed on 2026-10-12): an unlinked key never asks the broker and the
@@ -205,7 +209,9 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   clicks with a 120 ms delay. A tab the game opened (Sign in with Steam) takes the focus and the game tab is throttled to almost no
   frames: switch back with `/page?i=0` before clicking. A fresh driver is a fresh browser profile - a new account key each start.
 - The game's console in the browser: `curl localhost:<port>/console`; wait for `Received an identity cert` before clicking -
-  the first-start nickname popup comes up right after.
+  the first-start nickname popup comes up right after. Uncaught exceptions show there as `PAGE ERROR:` - a page stuck after
+  "App data directory" is usually one (e.g. a ReferenceError in common.js).
+- **Never `prepare_web.sh` while that web build is building** - it copies a half-written wasm and the game hangs at start.
 - A scenario's server list check right after start can be empty: the first heartbeat goes ~10 s after start - wait 14 s.
 - Scripts that `cd $REPO/hypersomnia` must not use `$(dirname "$0")` afterwards - resolve `HERE` to an absolute path first.
 - A key added to `official_servers.d` is picked up at the master's next rescan (~40 s): the first heartbeat ack says "community"

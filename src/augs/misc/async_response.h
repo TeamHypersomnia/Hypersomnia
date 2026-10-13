@@ -6,6 +6,7 @@
 #include <future>
 #include <atomic>
 #include <memory>
+#include <optional>
 
 #include "augs/templates/thread_templates.h"
 
@@ -14,6 +15,24 @@ namespace augs {
         int status = -1;
         std::string body;
     };
+
+	/*
+		A body fit to show the player: short plain text (e.g. a refusal's reason) - never a page (an error page of a proxy).
+	*/
+
+	inline std::optional<std::string> plain_text_reason(const http_response& response) {
+		const bool plain_text =
+			!response.body.empty()
+			&& response.body.size() <= 300
+			&& response.body.find('<') == std::string::npos
+		;
+
+		if (plain_text) {
+			return response.body;
+		}
+
+		return std::nullopt;
+	}
 
 	using async_get_progress_callback = std::function<bool(std::size_t, std::size_t)>;
 

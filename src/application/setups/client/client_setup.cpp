@@ -1984,14 +1984,21 @@ custom_imgui_result client_setup::perform_custom_imgui(
 								[&]() -> std::string {
 									switch (identity.expected_key_source) {
 										case expected_server_key_source::EARLIER_CONNECTION:
-											return "The server's key is different from the last time you played there.\n";
+											return "The server's key is different from the last time you played there.\n"
+												"Usually the server was just reinstalled - but it could also be someone pretending to be it.\n";
 										case expected_server_key_source::REJOINED_MATCH:
-											return "The server's key is different from the one of the match you are rejoining.\n";
+											return "The server's key is different from the one of the match you are rejoining.\n"
+												"Usually the server was just reinstalled - but it could also be someone pretending to be it.\n";
 										default:
-											return "The server's key does not match the server list.\n";
+											/*
+												A reinstalled server shows its new key on the list too - an old list is the usual reason.
+											*/
+
+											return "The server's key does not match the server list.\n"
+												"If the server was just reinstalled, refresh the server list and try again -\n"
+												"otherwise someone could be pretending to be it.\n";
 									}
 								}()
-								+ "Usually the server was just reinstalled - but it could also be someone pretending to be it.\n"
 								+ "\n"
 								+ "Connecting anyway keeps your account safe, but what you do on this server (e.g. chat) could be seen."
 								+ (identity.password.empty() ? std::string() : std::string("\nThe password you saved for this server will not be sent."))
@@ -2033,6 +2040,14 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				if (password_retry_focus_pending) {
 					ImGui::SetKeyboardFocusHere();
 					password_retry_focus_pending = false;
+				}
+
+				/*
+					Any server could be answering on this address (e.g. after Connect anyway).
+				*/
+
+				if (!identity.expected_server_public_key.has_value()) {
+					text_color("This server's key was not verified - don't type a password you use elsewhere.", orange);
 				}
 
 				input_text("Server password", password_retry_input, flags);

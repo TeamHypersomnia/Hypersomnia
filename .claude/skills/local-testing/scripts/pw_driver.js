@@ -36,6 +36,8 @@ const { chromium } = require('playwright');
 
 	const watch = p => {
 		p.on('console', m => lines.push(`[${p.url().slice(0, 60)}] ${m.text()}`));
+		// Uncaught exceptions too (e.g. a wasm abort) - they never reach the console
+		p.on('pageerror', e => lines.push(`[${p.url().slice(0, 60)}] PAGE ERROR: ${e && e.stack ? e.stack : e}`));
 
 		// A file the page downloads is saved into PW_DOWNLOADS (or /tmp) and named in the console lines
 		p.on('download', async d => {

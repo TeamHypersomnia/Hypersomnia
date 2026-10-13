@@ -293,10 +293,17 @@ std::optional<std::string> identity_session::build_location(const input& in) con
 			}
 
 			/*
-				Linking needs the key's own signature too - a ticket alone could be asked for anyone's public key.
+				Linking needs the key's own signature too - a ticket alone could be asked for anyone's public key -
+				over this very ticket, so a signature seen once can not link the key to another Steam account.
 			*/
 
-			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1" + key_location();
+			const auto link_signature = augs::ed25519_sign(key_seed, identity_cert::link_request_message(key_public, *steam_ticket));
+
+			if (!link_signature.has_value()) {
+				return std::nullopt;
+			}
+
+			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1&key=" + augs::bytes_to_hex(key_public) + "&sig=" + augs::bytes_to_hex(*link_signature);
 		}
 
 		const auto key = key_location();
@@ -363,7 +370,21 @@ void identity_session::start_request(const input& in, const double now) {
 	const auto device = [&]() {
 		auto encoded = std::string();
 
-		for (const auto c : device_name.substr(0, 64)) {
+		/*
+			At most 64 bytes, cut before a character, not inside one (UTF-8 continuation bytes are 10xxxxxx).
+		*/
+
+		const auto cut = [&]() {
+			auto length = std::min<std::size_t>(device_name.size(), 64);
+
+			while (length > 0 && length < device_name.size() && (static_cast<unsigned char>(device_name[length]) & 0xC0) == 0x80) {
+				--length;
+			}
+
+			return device_name.substr(0, length);
+		}();
+
+		for (const auto c : cut) {
 			const auto u = static_cast<unsigned char>(c);
 			const bool plain = std::isalnum(u) || c == '-' || c == '_' || c == '.';
 
@@ -455,7 +476,13 @@ void identity_session::advance(const input& in, const double now) {
 
 		const bool account_changed = !in.same_account(last_input);
 		const bool had_provider = last_input.provider != provider_type::NONE;
+		const bool new_token_after_failure = !account_changed && in.crazygames_token != last_input.crazygames_token && last_attempt_failed;
 		last_input = in;
+
+		if (new_token_after_failure) {
+			retry_delay = first_retry_delay_secs;
+			next_attempt_at = 0.0;
+		}
 
 		if (account_changed && had_provider) {
 			forget_cert();
@@ -487,8 +514,7 @@ void identity_session::advance(const input& in, const double now) {
 			*/
 
 			const bool refused = response.status >= 400 && response.status < 500 && response.status != 429;
-			const bool plain_text = response.body.size() <= 300 && response.body.find('<') == std::string::npos;
-			link_check_error = refused && plain_text ? response.body : std::string();
+			link_check_error = refused ? augs::plain_text_reason(response).value_or(std::string()) : std::string();
 
 			/*
 				Asked again only when hypersomnia.io may answer later - not after a refusal (e.g. a ban).
@@ -551,7 +577,19 @@ void identity_session::advance(const input& in, const double now) {
 		const auto response = augs::get_once(request);
 		clear_steam_ticket();
 		++attempts_finished;
+
+		/*
+			Asked for along with another request still on its way: it waits for the next one - unless that one failed.
+		*/
+
+		const bool refresh_was_pending = profile_refresh_pending;
 		profile_refresh_pending = false;
+		profile_refresh_failed = refresh_was_pending && response.status != 200;
+
+		if (response.status != 200) {
+			profile_refresh_failed = profile_refresh_failed || profile_refresh_wanted;
+			profile_refresh_wanted = false;
+		}
 
 		/*
 			Asked for an account that is no longer the player's: whatever came back is not theirs - asked again right away.
@@ -597,6 +635,16 @@ void identity_session::advance(const input& in, const double now) {
 					The key's own account: it was unlinked on the site. Back to "this computer", no error.
 				*/
 
+				if (cert_held_for_ranked && broker_cert.has_value() && !is_key_account(broker_cert->account)) {
+					/*
+						Its rejoin is tied to the account it was joined with - the key's own account comes after the match.
+					*/
+
+					LOG("The key is no longer linked to a Steam account - its cert is kept until the ranked match is over.");
+					next_attempt_at = now + 60.0;
+					return;
+				}
+
 				LOG("The key is no longer linked to a Steam account.");
 				forget_cert();
 				delete_saved_cert();
@@ -620,19 +668,32 @@ void identity_session::advance(const input& in, const double now) {
 
 		last_attempt_failed = true;
 
+		const auto broker_host = parsed_url(in.broker_url).host;
+
 		if (response.status == 200) {
-			last_error = "hypersomnia.io sent an invalid answer.";
+			last_error = typesafe_sprintf("%x sent an invalid answer.", broker_host);
 		}
-		else if (response.status >= 400 && response.status < 500 && response.status != 429) {
+		else if (response.status == 429) {
+			last_error = typesafe_sprintf("%x is busy - the game keeps trying.", broker_host);
+		}
+		else if (response.status >= 400 && response.status < 500) {
 			/*
 				Refused (e.g. a ban): the reason is the player's to see, and asking again soon changes nothing.
+				A CrazyGames token refused as expired is renewed by the game - a new one is asked about at once.
 			*/
 
-			last_error = response.body.empty() ? typesafe_sprintf("hypersomnia.io refused (HTTP %x).", response.status) : response.body;
+			if (response.status == 401 && in.provider == provider_type::CRAZYGAMES) {
+				crazygames_token_refused = true;
+			}
+
+			last_error = augs::plain_text_reason(response).value_or(typesafe_sprintf("%x refused (HTTP %x).", broker_host, response.status));
 			retry_delay = max_retry_delay_secs;
 		}
+		else if (response.status <= 0) {
+			last_error = typesafe_sprintf("Could not reach %x.", broker_host);
+		}
 		else {
-			last_error = typesafe_sprintf("Could not reach hypersomnia.io (HTTP %x).", response.status);
+			last_error = typesafe_sprintf("%x is not working right now (HTTP %x).", broker_host, response.status);
 		}
 
 		LOG("Identity cert request failed: %x Retrying in %x seconds.", last_error, retry_delay);
@@ -648,6 +709,9 @@ void identity_session::advance(const input& in, const double now) {
 		/*
 			A failed attempt, or "Signing in..." would never end.
 		*/
+
+		profile_refresh_failed = profile_refresh_failed || profile_refresh_wanted;
+		profile_refresh_wanted = false;
 
 		if (!last_attempt_failed) {
 			last_error = "No identity broker set (Settings - Advanced).";
@@ -720,6 +784,7 @@ void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_byte
 
 void identity_session::refresh_profile_now() {
 	profile_refresh_wanted = true;
+	profile_refresh_failed = false;
 	next_attempt_at = 0.0;
 }
 

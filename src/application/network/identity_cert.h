@@ -81,6 +81,14 @@ namespace identity_cert {
 	std::string cert_request_message(const augs::ed25519_public_key_type& session_public_key);
 
 	/*
+		What an account key signs to link itself to the Steam account of a ticket (/cert with link=1):
+		the tag, the session public key and the SHA-256 of the ticket - good for that one ticket only,
+		unlike the cert request signature, which is the same in every request.
+	*/
+
+	std::string link_request_message(const augs::ed25519_public_key_type& session_public_key, const std::vector<std::byte>& steam_ticket);
+
+	/*
 		What the game requests a Steam Web API ticket for, so the ticket is good only with this session key:
 		the first 15 bytes of SHA-256 of "hs-steam-v1" and the key, in hex. Steam takes an identity of at most 31 characters.
 	*/
@@ -98,8 +106,21 @@ namespace identity_cert {
 	};
 
 	/*
+		Why a cert did not verify - for the message the player gets.
+	*/
+
+	enum class verify_failure {
+		NONE,
+		NO_CONNECTION_DATA,
+		UNKNOWN_SIGNER,
+		OUTSIDE_VALIDITY,
+		BAD_SESSION_SIGNATURE
+	};
+
+	/*
 		Checks the cert's signature - by one of the broker keys, or for a "key_" account by its own key -
 		its validity for a broker cert, and that the session key signed this connection's binding.
+		why (if given) gets the reason it did not verify.
 	*/
 
 	std::optional<verified_identity> verify(
@@ -107,7 +128,8 @@ namespace identity_cert {
 		const std::vector<augs::ed25519_public_key_type>& broker_keys,
 		int64_t unix_now,
 		const uint8_t* connection_binding,
-		const uint8_t* session_signature
+		const uint8_t* session_signature,
+		verify_failure* why = nullptr
 	);
 
 	struct connect_blob {

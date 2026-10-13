@@ -1,4 +1,7 @@
 #pragma once
+#include <algorithm>
+#include <string>
+#include <vector>
 
 #if PLATFORM_UNIX
 /*
@@ -191,7 +194,40 @@ namespace augs {
 
 		struct file_dialog_filter {
 			std::string description;
+
+			/*
+				An extension ("png"), or glob patterns split by ";" ("*.png;*.jpg", "*" for all files).
+			*/
+
 			std::string extension;
+
+			std::vector<std::string> patterns() const {
+				std::vector<std::string> out;
+				std::size_t begin = 0;
+
+				while (begin <= extension.size()) {
+					const auto end = std::min(extension.find(';', begin), extension.size());
+					const auto one = extension.substr(begin, end - begin);
+
+					if (!one.empty()) {
+						out.push_back(one.front() == '*' ? one : (one.front() == '.' ? "*" + one : "*." + one));
+					}
+
+					begin = end + 1;
+				}
+
+				return out;
+			}
+
+			std::string patterns_joined(const std::string& separator) const {
+				std::string out;
+
+				for (const auto& p : patterns()) {
+					out += (out.empty() ? "" : separator) + p;
+				}
+
+				return out;
+			}
 		};
 
 		std::optional<path_type> open_file_dialog(

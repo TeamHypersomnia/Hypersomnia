@@ -139,6 +139,20 @@ namespace identity_cert {
 		return out;
 	}
 
+	std::string link_request_message(const augs::ed25519_public_key_type& session_public_key, const std::vector<std::byte>& steam_ticket) {
+		auto out = std::string("hs-cert-link-v1");
+		out.append(reinterpret_cast<const char*>(session_public_key.data()), session_public_key.size());
+
+#if BUILD_NETWORKING
+		auto hash = std::array<uint8_t, crypto_hash_sha256_BYTES>();
+		crypto_hash_sha256(hash.data(), reinterpret_cast<const unsigned char*>(steam_ticket.data()), steam_ticket.size());
+		out.append(reinterpret_cast<const char*>(hash.data()), hash.size());
+#else
+		(void)steam_ticket;
+#endif
+		return out;
+	}
+
 	std::string steam_ticket_identity(const augs::ed25519_public_key_type& session_public_key) {
 #if BUILD_NETWORKING
 		auto message = std::string("hs-steam-v1");
@@ -169,10 +183,19 @@ namespace identity_cert {
 		const std::vector<augs::ed25519_public_key_type>& broker_keys,
 		const int64_t unix_now,
 		const uint8_t* const connection_binding,
-		const uint8_t* const session_signature
+		const uint8_t* const session_signature,
+		verify_failure* const why
 	) {
-		if (connection_binding == nullptr || session_signature == nullptr) {
+		auto fail = [why](const verify_failure reason) -> std::optional<verified_identity> {
+			if (why != nullptr) {
+				*why = reason;
+			}
+
 			return std::nullopt;
+		};
+
+		if (connection_binding == nullptr || session_signature == nullptr) {
+			return fail(verify_failure::NO_CONNECTION_DATA);
 		}
 
 		const auto message = signed_message(c);
@@ -187,7 +210,7 @@ namespace identity_cert {
 				;
 
 				if (!valid_now) {
-					return std::nullopt;
+					return fail(verify_failure::OUTSIDE_VALIDITY);
 				}
 
 				out = verified_identity { c.account, signer_type::BROKER };
@@ -203,7 +226,7 @@ namespace identity_cert {
 			const auto own_key = key_of_key_account(c.account);
 
 			if (!own_key.has_value() || !augs::ed25519_verify(*own_key, message, c.signature)) {
-				return std::nullopt;
+				return fail(verify_failure::UNKNOWN_SIGNER);
 			}
 
 			out = verified_identity { c.account, signer_type::SELF };
@@ -215,7 +238,11 @@ namespace identity_cert {
 		const auto binding = std::string_view(reinterpret_cast<const char*>(connection_binding), 32);
 
 		if (!augs::ed25519_verify(c.session_public_key, binding, signature)) {
-			return std::nullopt;
+			return fail(verify_failure::BAD_SESSION_SIGNATURE);
+		}
+
+		if (why != nullptr) {
+			*why = verify_failure::NONE;
 		}
 
 		return out;

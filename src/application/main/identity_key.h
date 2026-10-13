@@ -9,7 +9,7 @@
 /*
 	The accounts of the players without Steam and outside CrazyGames.
 
-	The game keeps an Ed25519 key in the user folder (.keys/account.key), created on the first start - "this computer".
+	The game keeps an Ed25519 key in KEYS_DIR (account.key - see all_paths.h), created on the first start - "this computer".
 	The account is "key_" followed by the public key in hex - unless the key is linked to a Steam account on hypersomnia.io,
 	in which case the identity broker vouches for that Steam account instead. See identity_session.h.
 
@@ -75,7 +75,7 @@ namespace identity_key {
 	}
 
 	/*
-		The text the key file holds, also what "Export key" copies: "hypersomnia-key-v1:" and the seed in hex.
+		The text the key file holds, also what a downloaded backup holds: "hypersomnia-key-v1:" and the seed in hex.
 	*/
 
 	std::string to_export_string(const augs::ed25519_seed_type& seed);

@@ -13,7 +13,7 @@
 /*
 	The player's identity - see identity_cert.h.
 
-	Every game has its "this computer" key (account.key in the user folder, the browser's key on the web).
+	Every game has its "this computer" key (account.key in KEYS_DIR, the browser's key on the web).
 	It is also the session key: the game signs its connections with it, and a cert names it.
 	With nothing more, the game signs its own cert - the account "key_" and the key in hex - and never asks anyone.
 
@@ -113,6 +113,14 @@ private:
 	input requested_for;
 
 	double next_attempt_at = 0.0;
+
+	/*
+		A ranked match on, or one that can still be rejoined: the Steam cert it was joined with is kept
+		even if the key got unlinked meanwhile (on the site) - see hold_cert_for_ranked.
+	*/
+
+	bool cert_held_for_ranked = false;
+	bool crazygames_token_refused = false;
 	double retry_delay = 30.0;
 	double last_now = 0.0;
 	int attempts_finished = 0;
@@ -143,6 +151,7 @@ private:
 
 	bool profile_refresh_wanted = false;
 	bool profile_refresh_pending = false;
+	bool profile_refresh_failed = false;
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
@@ -219,6 +228,22 @@ public:
 
 	void refresh_profile_now();
 
+	/*
+		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
+	*/
+
+	bool take_crazygames_token_refused() {
+		return std::exchange(crazygames_token_refused, false);
+	}
+
+	bool is_requesting() const {
+		return request != nullptr;
+	}
+
+	bool did_profile_refresh_fail() const {
+		return profile_refresh_failed;
+	}
+
 	bool is_refreshing_profile() const {
 		return profile_refresh_wanted || profile_refresh_pending;
 	}
@@ -292,6 +317,10 @@ public:
 	*/
 
 	void recheck_link_quietly();
+
+	void hold_cert_for_ranked(const bool hold) {
+		cert_held_for_ranked = hold;
+	}
 
 	/*
 		"Continue unlinked" after a check that failed: the key counts as seen, and is asked about quietly later.

@@ -27,7 +27,6 @@ server {
 
     location /assets/ {
         alias /var/www/html/assets/;
-        autoindex on;  # This is optional; it allows directory listing if no index file is found
 
         # Allow the service worker in coi-serviceworker.js to control the root scope
 		add_header Service-Worker-Allowed "/" always;

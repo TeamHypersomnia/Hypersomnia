@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include <string_view>
 #include "augs/log.h"
 #include "augs/filesystem/path.h"
@@ -31,7 +32,11 @@ namespace server_key {
 			return *seed;
 		}
 
-		return {};
+		/*
+			Never a made-up key (e.g. all zeros - the same for every such server, its private key known to all).
+		*/
+
+		throw std::runtime_error("Could not generate a server key.");
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {

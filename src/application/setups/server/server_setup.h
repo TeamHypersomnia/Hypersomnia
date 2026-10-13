@@ -116,6 +116,7 @@ class server_setup :
 	*/
 
 	std::vector<augs::ed25519_public_key_type> trusted_broker_keys;
+	bool broker_keys_read = false;
 	server_bans bans;
 	report_queue reports;
 	augs::ed25519_seed_type this_server_key = {};
@@ -135,7 +136,7 @@ class server_setup :
 		std::optional<netcode_address_t> to;
 	};
 
-	mutable std::array<sent_masterserver_nonce, 16> recent_masterserver_nonces = {};
+	mutable std::array<sent_masterserver_nonce, 64> recent_masterserver_nonces = {};
 	mutable uint32_t next_masterserver_nonce = 0;
 	bool resent_heartbeat_for_cookie = false;
 
@@ -294,6 +295,7 @@ class server_setup :
 		net_time_t when_last_resolved = 0;
 		masterserver_cookie_type cookie = {};
 		bool resent_for_cookie = false;
+		std::string last_resolve_error;
 	};
 
 	std::vector<additional_server_list> additional_server_lists;

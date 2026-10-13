@@ -1,4 +1,5 @@
 #pragma once
+#include <cctype>
 #include <map>
 #include <optional>
 #include <sstream>
@@ -8,6 +9,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/ed25519.h"
 #include "augs/string/hex.h"
+#include "augs/network/network_types.h"
 
 /*
 	The keys of the servers this game connected to, by the address it connected with - like SSH's known_hosts.
@@ -21,6 +23,25 @@ class known_servers {
 	augs::path_type path;
 	std::map<std::string, std::string> key_by_address;
 
+	std::string last_set_address;
+	augs::ed25519_public_key_type last_set_key = {};
+
+	/*
+		One server written two ways is one entry: "Host.com" and "host.com:8412" alike.
+	*/
+
+	static std::string normalized(std::string address) {
+		for (auto& c : address) {
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
+
+		if (address.find(':') == std::string::npos) {
+			address += ":" + std::to_string(DEFAULT_GAME_PORT_V);
+		}
+
+		return address;
+	}
+
 	void load() {
 		key_by_address.clear();
 
@@ -29,6 +50,14 @@ class known_servers {
 			std::string line;
 
 			while (std::getline(in, line)) {
+				/*
+					Saved again by an editor on Windows.
+				*/
+
+				if (!line.empty() && line.back() == '\r') {
+					line.pop_back();
+				}
+
 				const auto space = line.rfind(' ');
 
 				if (space != std::string::npos && space > 0 && line.size() - space - 1 == 64) {
@@ -64,7 +93,7 @@ public:
 	}
 
 	std::optional<augs::ed25519_public_key_type> find(const std::string& address) const {
-		if (const auto it = key_by_address.find(address); it != key_by_address.end()) {
+		if (const auto it = key_by_address.find(normalized(address)); it != key_by_address.end()) {
 			return augs::hex_to_array<32>(it->second);
 		}
 
@@ -73,19 +102,29 @@ public:
 
 	/*
 		Saved only when it changes - called every frame while connected.
+		Read again first: another game running on this computer may have added its own servers since.
 	*/
 
-	void set(const std::string& address, const augs::ed25519_public_key_type& key) {
-		if (address.empty() || address.find_first_of(" \n") != std::string::npos) {
+	void set(const std::string& written_address, const augs::ed25519_public_key_type& key) {
+		if (written_address == last_set_address && key == last_set_key) {
 			return;
 		}
 
+		last_set_address = written_address;
+		last_set_key = key;
+
+		if (written_address.empty() || written_address.find_first_of(" \r\n") != std::string::npos) {
+			return;
+		}
+
+		const auto address = normalized(written_address);
 		const auto hex = augs::bytes_to_hex(key);
 
 		if (const auto it = key_by_address.find(address); it != key_by_address.end() && it->second == hex) {
 			return;
 		}
 
+		load();
 		key_by_address[address] = hex;
 		save();
 	}

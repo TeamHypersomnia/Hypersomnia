@@ -1868,7 +1868,8 @@ work_result work(
 		const bool focused_again = active && !window_was_active;
 		window_was_active = active;
 
-		const bool wanted = !account_seed_read_once || focused_again || std::exchange(settings_gui.key_file_changed, false);
+		const bool changed_in_settings = std::exchange(settings_gui.key_file_changed, false);
+		const bool wanted = !account_seed_read_once || focused_again || changed_in_settings;
 
 		if (!wanted) {
 			return;
@@ -1877,9 +1878,10 @@ work_result work(
 		const auto path = KEYS_DIR / identity_key::file_name;
 
 #if PLATFORM_WEB
-		if (!account_seed_read_once) {
+		if (!account_seed_read_once && augs::exists(path)) {
 			/*
 				Left by older versions: nobody can reach them in the browser.
+				Only next to a key - a .bak alone may be all that is left of one (a tab closed mid-restore).
 			*/
 
 			identity_key::remove_backups(path);
@@ -1894,7 +1896,28 @@ work_result work(
 
 		bool existed = augs::exists(path);
 
-		if (const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path)) {
+		if (!existed && account_seed.has_value() && !changed_in_settings) {
+			/*
+				Gone while the game runs (e.g. moved away as a backup): the key the game has is written back.
+				A new account is made only at the first start or by Start a new account.
+			*/
+
+			LOG("account.key is gone - writing back the key in use.");
+
+			if (identity_key::save_replacing(path, *account_seed).has_value()) {
+				existed = true;
+			}
+		}
+
+		const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path);
+
+		/*
+			Damaged while the game plays with the key it read before: Backup offers to write that one back.
+		*/
+
+		settings_gui.key_file_unreadable_with_key_in_use = !loaded.has_value() && account_seed.has_value();
+
+		if (loaded.has_value()) {
 			account_seed = loaded;
 		}
 		else if (!account_seed.has_value()) {
@@ -1984,7 +2007,13 @@ work_result work(
 			so the loop renewing the cert always has a valid one.
 		*/
 
-		if (params.is_crazygames && is_auth_expired() && auth_can_self_refresh() && now - crazygames_token_refreshed_at > 30.0) {
+		/*
+			Also when the broker refused the token as expired - this computer's clock may say otherwise.
+		*/
+
+		const bool token_refused = identity->take_crazygames_token_refused();
+
+		if (params.is_crazygames && (is_auth_expired() || token_refused) && auth_can_self_refresh() && now - crazygames_token_refreshed_at > 30.0) {
 			crazygames_token_refreshed_at = now;
 			auth_self_refresh();
 		}
@@ -1993,6 +2022,24 @@ work_result work(
 #endif
 
 		refresh_account_seed();
+		{
+			/*
+				The rejoin record read from the disk at most every 5 seconds.
+			*/
+
+			static double rejoin_record_checked_at = -1000.0;
+			static bool can_rejoin_ranked = false;
+
+			if (now - rejoin_record_checked_at > 5.0) {
+				rejoin_record_checked_at = now;
+
+				const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
+				can_rejoin_ranked = record.has_value() && record->valid_now();
+			}
+
+			identity->hold_cert_for_ranked(settings_gui.in_ranked_match || can_rejoin_ranked);
+		}
+
 		identity->advance(get_identity_input(), now);
 
 		/*
@@ -2054,6 +2101,20 @@ work_result work(
 	*/
 
 	WEBSTATIC std::unordered_set<std::string> connected_anyway_to;
+
+	/*
+		The key a server showed, for the next joins of this run - never one of a server on this machine
+		that answered in the remote one's place (the localhost fallback). Returns whether it was learned.
+	*/
+
+	WEBSTATIC auto learn_server_key = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
+		if (client.connected_through_localhost_fallback()) {
+			return false;
+		}
+
+		learned_server_keys[std::string(client.get_connect_string())] = key;
+		return true;
+	};
 
 	try {
 		augs::image avatar;
@@ -2324,19 +2385,11 @@ work_result work(
 			const auto server_key = client.get_server_public_key();
 
 			/*
-				Not a key of a server on this machine that answered in the remote one's place (the localhost fallback).
+				After "Connect anyway" too: the key it showed this time is checked on the next joins.
 			*/
 
-			if (server_key.has_value() && !client.connected_through_localhost_fallback()) {
-				const auto connect_string = std::string(client.get_connect_string());
-
-				remembered_servers.set(connect_string, *server_key);
-
-				/*
-					After "Connect anyway": the key it showed this time is checked on the next joins of this run.
-				*/
-
-				learned_server_keys[connect_string] = *server_key;
+			if (server_key.has_value() && learn_server_key(client, *server_key)) {
+				remembered_servers.set(std::string(client.get_connect_string()), *server_key);
 			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
@@ -2385,6 +2438,7 @@ work_result work(
 	WEBSTATIC const double run_started_at = augs::steady_secs();
 	WEBSTATIC bool sign_in_message_shown = false;
 	WEBSTATIC bool launch_after_sign_in = false;
+	WEBSTATIC bool join_without_sign_in_once = false;
 	WEBSTATIC std::optional<int> retry_attempts_before;
 	WEBSTATIC std::optional<simple_popup> sign_in_popup;
 	WEBSTATIC bool sign_in_popup_before_connect = false;
@@ -2995,7 +3049,7 @@ work_result work(
 			const bool rejoining_as_key = rejoined_match.has_value() && rejoined_match->account.rfind("key_", 0) == 0;
 
 			if (!rejoining_as_key) {
-				if (identity->signing_in_first_time(in, now)) {
+				if (identity->signing_in_first_time(in, now) && !std::exchange(join_without_sign_in_once, false)) {
 					LOG("Waiting for the first sign-in before connecting.");
 					launch_after_sign_in = true;
 					return false;
@@ -3055,7 +3109,21 @@ work_result work(
 				return std::nullopt;
 			}
 
-			if (found != nullptr) {
+			/*
+				An entry found only by its internal address (e.g. 192.168.1.10) may be any server in any LAN -
+				its name is fine to show, its key is not the one to expect.
+			*/
+
+			const bool found_by_internal_address = [&]() {
+				if (found == nullptr) {
+					return false;
+				}
+
+				const auto connected_address = ::find_netcode_addr(client_connect_string(connect_string));
+				return connected_address.has_value() && !(found->address == *connected_address);
+			}();
+
+			if (found != nullptr && !found_by_internal_address) {
 				if (const auto key = found->get_public_key()) {
 					source = S::SERVER_LIST;
 					return *key;
@@ -3187,6 +3255,14 @@ work_result work(
 	};
 
 	WEBSTATIC auto launch_setup = [&](const activity_type mode) {
+		/*
+			Something else started while a join waited for the sign-in: that join is off.
+		*/
+
+		if (mode != activity_type::CLIENT) {
+			launch_after_sign_in = false;
+		}
+
 		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
 			change_with_save(
 				[&](auto& cfg) {
@@ -3354,7 +3430,10 @@ work_result work(
 
 		if (launch_after_sign_in && !signing_in) {
 			launch_after_sign_in = false;
-			start_client_setup();
+
+			if (!has_current_setup()) {
+				start_client_setup();
+			}
 		}
 
 		/*
@@ -3384,6 +3463,26 @@ work_result work(
 
 			if (auto window = scoped_window("##SigningIn", nullptr, flags)) {
 				spinner_line(typesafe_sprintf("Signing in to your %x account...", provider_name()), white);
+
+				/*
+					A join waiting for it can go on without it, or be called off.
+				*/
+
+				if (launch_after_sign_in) {
+					ImGui::Separator();
+
+					if (ImGui::Button("Join anyway##SigningIn")) {
+						launch_after_sign_in = false;
+						join_without_sign_in_once = true;
+						start_client_setup();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel##SigningIn")) {
+						launch_after_sign_in = false;
+					}
+				}
 			}
 		}
 
@@ -3469,6 +3568,16 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_browse_servers = [&]() {
+		/*
+			The ranked servers would send these players away on joining - the browser says so before.
+		*/
+
+#if WEB_ITCH
+		browse_servers_gui.ranked_unavailable_reason = "Ranked is not available on itch.io.\nPlay on play.hypersomnia.io or on Steam.";
+#elif WEB_CRAZYGAMES
+		browse_servers_gui.ranked_unavailable_reason = is_signed_in() ? std::string() : std::string("Sign in to CrazyGames to play ranked.");
+#endif
+
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
@@ -3698,7 +3807,7 @@ work_result work(
 			config.website_url + "/user/" + account,
 			signed_in_account ? std::string() : "0x" + augs::bytes_to_hex(identity->public_key()),
 			provider_name(),
-			identity->sign_in_failed(in, now)
+			identity->sign_in_failed(in, now) && !identity->is_requesting()
 #if PLATFORM_WEB
 			/*
 				Outside CrazyGames the account is the key in the browser - always there.
@@ -4129,7 +4238,10 @@ work_result work(
 						if (auto new_password = setup.take_pending_password_save()) {
 							if (const auto key = setup.get_server_public_key()) {
 								saved_server_passwords.set(*key, *new_password);
-								learned_server_keys[setup.get_connect_string()] = *key;
+
+								if (!learn_server_key(setup, *key)) {
+									next_connect_password = *new_password;
+								}
 							}
 							else {
 								next_connect_password = *new_password;
@@ -5832,8 +5944,11 @@ work_result work(
 						if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
 							if (setup.kicked_for_password_not_sent()) {
 								if (const auto key = setup.get_server_public_key()) {
-									if (!saved_server_passwords.find(*key).empty()) {
-										learned_server_keys[setup.get_connect_string()] = *key;
+									if (const auto saved = saved_server_passwords.find(*key); !saved.empty()) {
+										if (!learn_server_key(setup, *key)) {
+											next_connect_password = saved;
+										}
+
 										relaunch_with_saved_password = true;
 									}
 								}

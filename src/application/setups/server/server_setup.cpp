@@ -1395,6 +1395,8 @@ void server_setup::verify_client_identity(const client_id_type id) {
 		One that does not verify is most often a broker cert outside its time: this host's or the player's clock being off.
 	*/
 
+	auto failure = identity_cert::verify_failure::NONE;
+
 	const auto verified = [&]() -> std::optional<identity_cert::verified_identity> {
 		if (!blob->identity.has_value()) {
 			return std::nullopt;
@@ -1407,7 +1409,8 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			trusted_broker_keys,
 			static_cast<int64_t>(now),
 			server->get_client_binding(id),
-			server->get_client_session_signature(id)
+			server->get_client_session_signature(id),
+			&failure
 		);
 
 		if (!result.has_value()) {
@@ -1435,29 +1438,26 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}();
 
 	if (!verified.has_value()) {
-		/*
-			A broker cert within its time that still did not verify: signed by a broker this server does not trust.
-		*/
+		const bool broker_account = blob->identity.has_value() && blob->identity->account.rfind("key_", 0) != 0;
 
-		const bool untrusted_broker = [&]() {
-			if (!blob->identity.has_value()) {
-				return false;
+		const auto reason = [&]() -> std::string {
+			using F = identity_cert::verify_failure;
+
+			switch (failure) {
+				case F::OUTSIDE_VALIDITY:
+					return "This server could not verify your account.\nThe server's clock may be wrong, or one of you needs an update.\nTry another server.";
+				case F::UNKNOWN_SIGNER:
+					if (broker_account) {
+						return "This server does not accept sign-ins from your identity provider.\nTry another server.";
+					}
+
+					return "This server could not verify your account.\nTry another server.";
+				default:
+					return "This server could not verify your connection.\nTry again, or update the game.";
 			}
-
-			const auto& cert = *blob->identity;
-			const auto now = static_cast<int64_t>(augs::date_time::secs_since_epoch());
-			const bool broker_cert = cert.not_after != 0;
-
-			return broker_cert && cert.not_before <= now && now <= cert.not_after;
 		}();
 
-		if (untrusted_broker) {
-			kick(id, "This server does not accept sign-ins from your identity provider.\nTry another server.");
-		}
-		else {
-			kick(id, "This server could not verify your account.\nThe server's clock may be wrong, or one of you needs an update.\nTry another server.");
-		}
-
+		kick(id, reason);
 		c.kick_no_linger = true;
 		return;
 	}
@@ -2720,7 +2720,17 @@ void server_setup::resolve_server_list() {
 }
 
 void server_setup::sync_additional_server_lists() {
-	const auto& configured = private_vars.additional_notified_server_lists;
+	/*
+		Not the main list again: its acks would be taken for the additional one's.
+	*/
+
+	auto configured = std::vector<std::string>();
+
+	for (const auto& address : private_vars.additional_notified_server_lists) {
+		if (address != vars.notified_server_list) {
+			configured.push_back(address);
+		}
+	}
 
 	const bool same = configured.size() == additional_server_lists.size() && std::equal(
 		configured.begin(),
@@ -2733,7 +2743,27 @@ void server_setup::sync_additional_server_lists() {
 		return;
 	}
 
+	/*
+		The lists no longer configured are told goodbye, as at a shutdown.
+	*/
+
+	for (const auto& old : additional_server_lists) {
+		const bool removed = std::find(configured.begin(), configured.end(), old.address) == configured.end();
+
+		if (removed && old.resolved.has_value() && has_sent_any_heartbeats()) {
+			auto goodbye = masterserver_in::goodbye {};
+			sign_for_masterserver(goodbye, old.cookie, old.resolved);
+
+			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
+			server->send_udp_packet(*old.resolved, goodbye_bytes.data(), goodbye_bytes.size());
+		}
+	}
+
 	additional_server_lists.clear();
+
+	if (configured.size() != private_vars.additional_notified_server_lists.size()) {
+		LOG("Skipping an additional server list that is the main one (notified_server_list).");
+	}
 
 	for (const auto& address : configured) {
 		auto list = additional_server_list();
@@ -2756,17 +2786,26 @@ void server_setup::resolve_heartbeat_host_if_its_time() {
 					}
 
 					list.resolved = result.addr;
+					list.last_resolve_error.clear();
 				}
-				else {
-					LOG("Could not resolve the additional server list %x: %x", list.address, result.report());
+				else if (const auto report = result.report(); report != list.last_resolve_error) {
+					LOG("Could not resolve the additional server list %x: %x", list.address, report);
+					list.last_resolve_error = report;
 				}
+
+				list.when_last_resolved = server_time;
 			}
 
 			if (list.future_resolved.valid()) {
 				continue;
 			}
 
-			const bool due = !list.resolved.has_value() || server_time - list.when_last_resolved >= vars.resolve_server_list_address_once_every_secs;
+			/*
+				One that does not resolve (e.g. a typo) is asked about again every 10 seconds, not every tick.
+			*/
+
+			const auto resolve_every = list.resolved.has_value() ? vars.resolve_server_list_address_once_every_secs : 10.0;
+			const bool due = server_time - list.when_last_resolved >= resolve_every;
 
 			if (due) {
 				if (auto parsed = parsed_url(list.address); parsed.valid()) {
@@ -2805,7 +2844,7 @@ void server_setup::resolve_heartbeat_host_if_its_time() {
 	const auto since_last = server_time - when_last;
 	const auto resolve_every = vars.resolve_server_list_address_once_every_secs;
 
-	if (resolved_server_list_addr == std::nullopt || since_last >= resolve_every) {
+	if ((resolved_server_list_addr == std::nullopt && since_last >= 10.0) || since_last >= resolve_every) {
 		resolve_server_list();
 		when_last = server_time;
 	}
@@ -3101,7 +3140,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		server->send_udp_packet(*list.resolved, bytes.data(), bytes.size());
 	}
 
-	if (!resolved_server_list_addr.has_value()) {
+	if (!server_list_enabled() || !resolved_server_list_addr.has_value()) {
 		sent_any_heartbeat = sent_any_heartbeat || !additional_server_lists.empty();
 		return;
 	}
@@ -3340,8 +3379,9 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 	const auto old_vars = private_vars;
 	private_vars = private_new_vars;
 
-	if (trusted_broker_keys.empty() || old_vars.identity_broker_public_keys != private_vars.identity_broker_public_keys) {
+	if (!broker_keys_read || old_vars.identity_broker_public_keys != private_vars.identity_broker_public_keys) {
 		trusted_broker_keys = ::identity_broker_keys(private_vars);
+		broker_keys_read = true;
 	}
 
 	if (old_vars.admin_profiles != private_vars.admin_profiles) {
@@ -3678,6 +3718,17 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	) {
 		shuffled_cycle_indices.clear();
 	}
+
+#if BUILD_NATIVE_SOCKETS
+	if (!first_time && vars.notified_server_list != new_vars.notified_server_list) {
+		/*
+			Off the old list at once - with none set, no heartbeats go out anymore; another one is resolved anew.
+		*/
+
+		send_goodbye_to_masterserver();
+		resolved_server_list_addr.reset();
+	}
+#endif
 
 	bool chosen_next_area = false;
 

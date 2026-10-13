@@ -175,8 +175,12 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 
     const auto status = response.status;
 
-	if (status == -1) {
-		error_message = "Couldn't connect to the server list host.";
+	/*
+		The web build gets 0 for anything that did not arrive (offline, CORS).
+	*/
+
+	if (status <= 0) {
+		error_message = "Couldn't connect to the server list host.\nYou can still join a server by its address (Connect to server).";
 		return {};
 	}
 
@@ -727,8 +731,15 @@ void browse_servers_gui_state::show_server_list(
 			}
 		}
 
+		const bool ranked_unavailable = s.is_official_server() && d.is_ranked_server() && !ranked_unavailable_reason.empty();
+
 		if (ImGui::IsItemHovered()) {
 			auto tool = scoped_tooltip();
+
+			if (ranked_unavailable) {
+				text_color(ranked_unavailable_reason, orange);
+				ImGui::Separator();
+			}
 
 			if (d.num_online == 0) {
 				text_disabled("No players online.");
@@ -762,7 +773,7 @@ void browse_servers_gui_state::show_server_list(
 			}
 		}
 		
-		if (ImGui::IsItemClicked()) {
+		if (ImGui::IsItemClicked() && !ranked_unavailable) {
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
@@ -1295,9 +1306,16 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		{
-			auto scope = maybe_disabled_cols({}, !selected_server.is_set());
+			const bool ranked_unavailable =
+				selected_server.is_set()
+				&& selected_server.is_official_server()
+				&& selected_server.heartbeat.is_ranked_server()
+				&& !ranked_unavailable_reason.empty()
+			;
 
-			if (ImGui::Button("Connect")) {
+			auto scope = maybe_disabled_cols({}, !selected_server.is_set() || ranked_unavailable);
+
+			if (ImGui::Button("Connect") && !ranked_unavailable) {
 				auto& s = selected_server;
 
 				LOG("Chosen server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);

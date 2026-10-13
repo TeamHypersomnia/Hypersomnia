@@ -22,6 +22,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/misc/date_time.h"
+#include "augs/persistent_filesystem.h"
 #include "augs/string/hex.h"
 #include "application/main/identity_key.h"
 
@@ -56,7 +57,7 @@ namespace identity_key {
 
 	std::optional<augs::ed25519_seed_type> from_export_string(const std::string& text) {
 		/*
-			Pasted keys often come with whitespace around them, e.g. copied from a chat or a text editor.
+			Key files often come with whitespace around the key, e.g. saved again by a text editor.
 		*/
 
 		const auto is_space = [](const char c) {
@@ -160,11 +161,6 @@ namespace identity_key {
 		return flushed && written == content.size();
 #endif
 	}
-
-	/*
-		Gives the file a second name, failing if that name is taken.
-		Where hard links are not supported (e.g. FAT), it is renamed instead, after checking the name is free.
-	*/
 
 	static void sync_directory_of(const augs::path_type& path) {
 #if PLATFORM_UNIX
@@ -369,6 +365,12 @@ namespace identity_key {
 			return std::nullopt;
 		}
 
+		/*
+			The browser's storage gets only the end state in one sync - never "a backup and no key".
+		*/
+
+		auto one_sync = hold_persistent_filesystem_raii();
+
 		const auto backup = back_up(path);
 
 		if (backup.has_value()) {
@@ -379,6 +381,7 @@ namespace identity_key {
 	}
 
 	std::optional<augs::path_type> save_replacing(const augs::path_type& path, const augs::ed25519_seed_type& seed) {
+		auto one_sync = hold_persistent_filesystem_raii();
 		auto backup = augs::path_type();
 
 		if (augs::exists(path)) {

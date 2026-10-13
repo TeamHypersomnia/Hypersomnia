@@ -3,7 +3,6 @@
 
 enum class client_platform_type : uint8_t {
 	UNKNOWN,
-	SUPPRESSED,
 
 	WINDOWS,
 	LINUX,

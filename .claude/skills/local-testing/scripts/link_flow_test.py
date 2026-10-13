@@ -169,5 +169,23 @@ check('unlink on /profile', status in (302, 303) and cert_account().startswith('
 with db:
     db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
 
+# A banned Steam account posting someone else's key to /profile/unlink_key: that key is not its, nothing happens to it
+foreign = 'key_' + secrets.token_hex(32)
+with db:
+    db.execute('INSERT OR IGNORE INTO broker_bans (account, reason) VALUES (?, ?)', ('steam_' + steam_id, 'Test ban.'))
+post('/profile/unlink_key', { 'key': foreign }, cookie)
+banned_foreign = db.execute('SELECT 1 FROM broker_bans WHERE account = ?', (foreign,)).fetchone()
+check('a foreign key posted to /profile/unlink_key is not banned', banned_foreign is None, str(banned_foreign))
+
+# No linking to a banned Steam account
+state5 = secrets.token_hex(16)
+_, _, headers = start(state5, cookie)
+code5 = urllib.parse.parse_qs(headers.get('Location', '').split('#', 1)[-1]).get('code', [''])[0]
+link_sig5 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code5, steam_id)).encode()).hex()
+status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code5, link_sig5))
+check('no link to a banned Steam account', status == 403 and 'banned' in body, '%s %s' % (status, body))
+with db:
+    db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
+
 print('%d failed' % len(failed))
 sys.exit(1 if failed else 0)

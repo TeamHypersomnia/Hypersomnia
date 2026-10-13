@@ -283,6 +283,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool link_flow_message_is_warning = false;
 
 	/*
+		The site's answer to the link did not arrive (or it failed on its side): whether it linked is asked after.
+	*/
+
+	bool link_answer_lost = false;
+
+	/*
 		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
 	*/
 
@@ -324,6 +330,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	augs::future<std::optional<std::string>> chosen_key_file;
 
+	/*
+		Where to save a copy of the key file (Backup - Save a copy...).
+	*/
+
+	augs::future<std::optional<augs::path_type>> chosen_key_copy_path;
+
 	void perform_account_link_pane(const std::string& website_url);
 	void perform_account_manage_pane(augs::window& window);
 
@@ -346,13 +358,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool is_key_linked() const;
 
 	/*
-		The key or its link may not change while a ranked match is on or can still be rejoined.
-	*/
-
-	bool is_locked_by_ranked() const;
-
-	/*
-		Why the key or its link may not change now (a ranked match, or the browser's storage not writable), if so.
+		Why the key or its link may not change now, if so: a ranked match on or one that can still be rejoined
+		(read from the disk only when asked, on a click), or the browser's storage not writable.
 	*/
 
 	std::optional<std::string> account_change_blocked() const;
@@ -364,9 +371,6 @@ public:
 
 	bool account_modal_open(bool with_message = true) const;
 
-private:
-
-public:
 	bool is_steam_client = false;
 
 	/*
@@ -407,6 +411,7 @@ public:
 
 	bool wants_crazygames_sign_in = false;
 	bool key_file_changed = false;
+	bool key_file_unreadable_with_key_in_use = false;
 
 	/*
 		Set by the game: a ranked match is on - the key may not be replaced meanwhile.

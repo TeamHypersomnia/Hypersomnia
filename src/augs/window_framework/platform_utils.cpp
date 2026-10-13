@@ -234,11 +234,20 @@ namespace augs {
 #elif PLATFORM_WINDOWS
 namespace augs {
 	std::string get_device_name() {
-		wchar_t name[MAX_COMPUTERNAME_LENGTH + 1];
-		DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+		/*
+			The hostname as the user named it - not the NetBIOS name (upper case, at most 15 characters).
+		*/
 
-		if (GetComputerNameW(name, &size)) {
-			return wstr_to_utf8(name);
+		DWORD size = 0;
+		GetComputerNameExW(ComputerNameDnsHostname, nullptr, &size);
+
+		if (size > 0) {
+			auto name = std::wstring(size, L'\0');
+
+			if (GetComputerNameExW(ComputerNameDnsHostname, name.data(), &size)) {
+				name.resize(size);
+				return wstr_to_utf8(name.c_str());
+			}
 		}
 
 		return "";

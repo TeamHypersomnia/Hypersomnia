@@ -133,7 +133,7 @@ namespace augs {
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --title=" + shell_escape(title);
 			for (const auto& f : filters) {
-				cmd += " --file-filter=" + shell_escape(f.description + " | *." + f.extension);
+				cmd += " --file-filter=" + shell_escape(f.description + " | " + f.patterns_joined(" "));
 			}
 			return run_dialog_command(cmd);
 		}
@@ -142,7 +142,7 @@ namespace augs {
 			std::string filter_str;
 			for (const auto& f : filters) {
 				if (!filter_str.empty()) filter_str += " ";
-				filter_str += "*." + f.extension;
+				filter_str += f.patterns_joined(" ");
 			}
 			std::string cmd = "kdialog --getopenfilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
@@ -165,7 +165,7 @@ namespace augs {
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
 			for (const auto& f : filters) {
-				cmd += " --file-filter=" + shell_escape(f.description + " | *." + f.extension);
+				cmd += " --file-filter=" + shell_escape(f.description + " | " + f.patterns_joined(" "));
 			}
 			return run_dialog_command(cmd);
 		}
@@ -174,7 +174,7 @@ namespace augs {
 			std::string filter_str;
 			for (const auto& f : filters) {
 				if (!filter_str.empty()) filter_str += " ";
-				filter_str += "*." + f.extension;
+				filter_str += f.patterns_joined(" ");
 			}
 			std::string cmd = "kdialog --getsavefilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
 			return run_dialog_command(cmd);
@@ -238,20 +238,65 @@ namespace augs {
 }
 
 #elif PLATFORM_MACOS
+#include <array>
+#include <cstdio>
 
 namespace augs {
+	/*
+		The system's own file dialogs through AppleScript - "choose file" or "choose file name" (no filters there).
+		The chosen path, or nullopt when cancelled.
+	*/
+
+	static std::optional<path_type> run_applescript_dialog(const std::string& chooser, const std::string& custom_title) {
+		auto prompt = custom_title;
+
+		for (auto& c : prompt) {
+			if (c == '"' || c == '\'' || c == '\\') {
+				c = ' ';
+			}
+		}
+
+		const auto command = "osascript -e 'POSIX path of (" + chooser + " with prompt \"" + prompt + "\")' 2>/dev/null";
+
+		FILE* const pipe = popen(command.c_str(), "r");
+
+		if (pipe == nullptr) {
+			LOG("Failed to run osascript for the file dialog.");
+			return std::nullopt;
+		}
+
+		std::array<char, 4096> buffer;
+		std::string result;
+
+		while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+			result += buffer.data();
+		}
+
+		const bool chosen = pclose(pipe) == 0;
+
+		while (!result.empty() && (result.back() == '\n' || result.back() == '\r')) {
+			result.pop_back();
+		}
+
+		if (!chosen || result.empty()) {
+			return std::nullopt;
+		}
+
+		return path_type(result);
+	}
+
 	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& /* custom_title */
+		const std::string& custom_title
 	) {
-		return std::nullopt;
+		return run_applescript_dialog("choose file", custom_title.empty() ? "Open File" : custom_title);
 	}
 
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
-		const std::string& /* custom_title */
+		const std::string& custom_title
 	) {
-		return std::nullopt;
+		return run_applescript_dialog("choose file name", custom_title.empty() ? "Save File" : custom_title);
 	}
 
 	std::optional<path_type> window::choose_directory_dialog(

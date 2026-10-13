@@ -7,6 +7,7 @@
 #include <array>
 #include <random>
 
+#include "augs/string/constant_time_equal.h"
 #include "augs/log.h"
 #include "augs/log_path_getters.h"
 #include "augs/window_framework/shell.h"
@@ -384,11 +385,27 @@ EM_JS(void, web_pick_text_file, (), {
 	input.onchange = () => {
 		const file = input.files && input.files[0];
 
-		if (!file || file.size > 4096) {
+		if (!file) {
 			return;
 		}
 
-		file.text().then(text => { Module.hs_picked_text = text; });
+		/* Too large to be a key: an empty text, so the game says it is not one. */
+		if (file.size > 4096) {
+			Module.hs_picked_text = "";
+			return;
+		}
+
+		/* Saved by Notepad as UTF-16 too - the game reads such files natively as well. */
+		file.arrayBuffer().then(buffer => {
+			const bytes = new Uint8Array(buffer);
+			const encoding =
+				bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE ? "utf-16le" :
+				bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF ? "utf-16be" :
+				"utf-8"
+			;
+
+			Module.hs_picked_text = new TextDecoder(encoding).decode(bytes);
+		}).catch(() => { Module.hs_picked_text = ""; });
 	};
 
 	input.click();
@@ -421,7 +438,7 @@ EM_JS(void, web_download_text, (const char* file_name, const char* text), {
 #endif
 
 void settings_gui_state::on_steam_link_code(const std::string& code, const std::string& state) {
-	if (steam_link_state.empty() || state != steam_link_state) {
+	if (steam_link_state.empty() || !augs::constant_time_equal(state, steam_link_state)) {
 		LOG("Ignoring a Steam link code for another state.");
 		return;
 	}
@@ -512,19 +529,6 @@ bool settings_gui_state::account_modal_open(const bool with_message) const {
 	;
 
 	return any || (with_message && account_message.has_value());
-}
-
-bool settings_gui_state::is_locked_by_ranked() const {
-	/*
-		Also a match that can still be rejoined - read only when asked, on a click.
-	*/
-
-	if (in_ranked_match) {
-		return true;
-	}
-
-	const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
-	return record.has_value() && record->valid_now();
 }
 
 std::optional<augs::ed25519_public_key_type> settings_gui_state::current_public_key() {
@@ -905,7 +909,33 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	const auto public_key = current_public_key();
 
+	/*
+		Backups of several accounts told apart by the start of the key.
+	*/
+
+	const auto backup_file_name = public_key.has_value()
+		? "hypersomnia-account-0x" + augs::bytes_to_hex(*public_key).substr(0, 8) + ".key"
+		: std::string("hypersomnia-account.key")
+	;
+
 	local_key_line(public_key);
+
+#if !PLATFORM_WEB
+	if (valid_and_is_ready(chosen_key_copy_path)) {
+		if (const auto to = chosen_key_copy_path.get()) {
+			try {
+				std::filesystem::copy_file(key_path, *to, std::filesystem::copy_options::overwrite_existing);
+				account_message = "Saved a copy of your private key:\n    " + augs::string_windows_friendly(*to);
+			}
+			catch (const std::exception& e) {
+				LOG("Could not copy the key file: %x", e.what());
+				account_message = std::string("Could not save the copy.\n\nSee the logs.");
+			}
+
+			reveal_private_key_open = false;
+		}
+	}
+#endif
 
 	/*
 		A key linked to Steam never has to leave this computer - every computer can link its own key.
@@ -927,12 +957,41 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			reveal_private_key_open = false;
 			confirm_forget_key = false;
 			import_to_confirm.reset();
+
+#if PLATFORM_WEB
+			if (::web_picked_file_length() >= 0) {
+				auto discarded = std::string(static_cast<std::size_t>(::web_picked_file_length()) + 1, '\0');
+				::web_take_picked_file(discarded.data(), static_cast<int>(discarded.size()));
+			}
+#else
+			if (valid_and_is_ready(chosen_key_file)) {
+				(void)chosen_key_file.get();
+			}
+#endif
 			return;
 		}
 	}
 
 	if (public_key.has_value()) {
 		key_unreadable_since = -1.0;
+
+		if (key_file_unreadable_with_key_in_use) {
+#if PLATFORM_WEB
+			text_color("The key saved in this browser is damaged - the game still has the one it started with.", orange);
+#else
+			text_color("Your account.key file is damaged - the game still has the key it read before.", orange);
+#endif
+
+			if (ImGui::Button("Write the key back") && seed.has_value()) {
+				if (identity_key::save_replacing(key_path, *seed).has_value()) {
+					key_file_changed = true;
+					key_file_unreadable_with_key_in_use = false;
+				}
+				else {
+					account_message = std::string("Could not save the key.\n\nSee the logs.");
+				}
+			}
+		}
 	}
 	else {
 		/*
@@ -949,7 +1008,11 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if PLATFORM_WEB
 			text_color("Your account key in this browser is damaged.\nRestore from your private key file, or start a new account.", red);
 #else
-			text_color("Your account.key file is damaged. Fix it, restore from your private key,\nor start a new account - the file is then kept as a backup.", red);
+			text_color("Your account.key file is damaged. Put back a copy you backed up, restore from your private key file,\nor start a new account (the damaged file is kept as a backup).", red);
+
+			if (ImGui::Button("Show key file in folder##Damaged")) {
+				window.reveal_in_explorer(key_path);
+			}
 #endif
 		}
 		else {
@@ -1015,10 +1078,18 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		if (!chosen_key_file.valid()) {
 			chosen_key_file = launch_async(
 				[&window]() -> std::optional<std::string> {
-					const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key;*.txt" } };
+					const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key;*.txt;*.key.bak-*" }, { "All files", "*" } };
 
 					if (const auto path = window.open_file_dialog(filters, "Choose your private key file")) {
 						try {
+							/*
+								A key file is under a hundred bytes - a large one is not it (and is not read whole).
+							*/
+
+							if (std::filesystem::file_size(*path) > 4096) {
+								return std::string();
+							}
+
 							return augs::file_to_string(*path);
 						}
 						catch (...) {
@@ -1076,7 +1147,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	);
 
 	/*
-		Importing switches the account - confirmed first, in case the wrong key was pasted.
+		Restoring switches the account - confirmed first, in case the wrong file was chosen.
 	*/
 
 	if (import_to_confirm.has_value() && public_key.has_value()) {
@@ -1094,6 +1165,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				identity_key::short_form(*public_key),
 				identity_key::short_form(*augs::ed25519_public_key(*import_to_confirm))
 			));
+
+#if PLATFORM_WEB
+			if (seed.has_value() && colored_button("DownloadBeforeSwitch", { { "Download current ", white }, { "private key", orange } })) {
+				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
+			}
+#endif
 
 			ImGui::Separator();
 
@@ -1136,11 +1213,27 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			text("");
 
 #if !PLATFORM_WEB
-			if (ImGui::Button("Show key file in folder")) {
-				window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
+			text("Your private key is the file account.key.\nCopy it somewhere safe (e.g. a USB stick) - with it you restore your account.\n");
+
+			if (colored_button("SaveKeyCopy", { { "Save a copy...", white } }) && !chosen_key_copy_path.valid()) {
+				chosen_key_copy_path = launch_async(
+					[&window, file_name = backup_file_name]() -> std::optional<augs::path_type> {
+						const std::vector<augs::window::file_dialog_filter> filters = { { "Key file", "*.key" } };
+
+						if (auto path = window.save_file_dialog(filters, "Save a copy of your private key as " + file_name)) {
+							return path;
+						}
+
+						return std::nullopt;
+					}
+				);
 			}
 
-			tooltip_on_hover("Your private key is the file account.key - copy it somewhere safe to back up your account.\nWith it you restore your account (Backup -> Restore from private key file).");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Show key file in folder")) {
+				window.reveal_in_explorer(augs::exists(key_path) ? key_path : keys_dir);
+			}
 #else
 			(void)window;
 
@@ -1149,7 +1242,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			*/
 
 			if (colored_button("DownloadPrivateKey", { { "Download ", white }, { "private key", orange }, { " as a file", white } })) {
-				::web_download_text("hypersomnia-account.key", identity_key::to_export_string(*seed).c_str());
+				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
 			}
 
 			tooltip_on_hover("Keep the file somewhere safe - with it you restore your account\n(Backup -> Restore from private key file).");
@@ -1207,6 +1300,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #endif
 			);
 
+#if PLATFORM_WEB
+			if (seed.has_value() && colored_button("DownloadBeforeForget", { { "Download current ", white }, { "private key", orange } })) {
+				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
+			}
+#endif
+
 			ImGui::Separator();
 
 			{
@@ -1232,7 +1331,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #else
 						account_message = typesafe_sprintf(
 							"A new account is made right away.\n\nThe old key is kept as:\n    %x",
-							backup->string()
+							augs::string_windows_friendly(*backup)
 						);
 #endif
 					}
@@ -1294,13 +1393,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			A page instead of a message (e.g. the site being deployed) would not even fit the screen.
 		*/
 
-		const bool plain_text = !response.body.empty() && response.body.size() <= 300 && response.body.find('<') == std::string::npos;
-
-		if (!plain_text) {
-			return typesafe_sprintf("%x failed:\n%x answered HTTP %x. Try again later.", what, website_url, response.status);
+		if (const auto reason = augs::plain_text_reason(response)) {
+			return typesafe_sprintf("%x failed:\n%x", what, *reason);
 		}
 
-		return typesafe_sprintf("%x failed:\n%x", what, response.body);
+		return typesafe_sprintf("%x failed:\n%x answered HTTP %x. Try again later.", what, website_url, response.status);
 	};
 
 	auto finish = [&](const bool succeeded, const std::string& message, const bool conflict = false) {
@@ -1309,6 +1406,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_flow_succeeded = succeeded;
 		link_flow_conflict = conflict;
 		link_flow_message_is_warning = false;
+		link_answer_lost = false;
 		link_flow_message = message;
 
 		if (succeeded) {
@@ -1425,7 +1523,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 		}
 
-		text_disabled("Once linked, progress will count towards the Steam account.\nYour MMR moves there if it has no matches yet - otherwise its own stays,\nand this key's comes back if you unlink.");
+		text_disabled("Once linked, progress counts towards the Steam account.\nIf it has no ranked matches yet, this key's MMR moves there\n(and comes back if you unlink before playing one).\nOtherwise the Steam account keeps its own.");
 	}
 
 	/*
@@ -1498,6 +1596,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				link_flow = F::NEEDS_STEAM_SIGN_IN;
 				start_steam_sign_in();
 			}
+			else if (link_answer_lost) {
+				finish(false, typesafe_sprintf("Linking failed: no answer from %x.\nTry again.", website_url));
+			}
 			else {
 				finish(false, "The link did not take effect. Try again.");
 			}
@@ -1505,7 +1606,17 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		else if (check == L::FAILED) {
 			identity->clear_link_check();
 
-			if (link_flow == F::CHECKING_AFTER) {
+			if (const auto& refusal = identity->get_link_check_error(); !refusal.empty() && link_flow == F::CHECKING_AFTER) {
+				/*
+					Linked, but the broker refuses the account (e.g. a banned Steam account) - not a success.
+				*/
+
+				finish(false, refusal);
+			}
+			else if (link_flow == F::CHECKING_AFTER && link_answer_lost) {
+				finish(false, typesafe_sprintf("Couldn't reach %x - it is not known whether the key got linked.\nTry again later.", website_url));
+			}
+			else if (link_flow == F::CHECKING_AFTER) {
 				/*
 					The site took the link - only the game could not hear it yet; it keeps asking by itself.
 				*/
@@ -1599,8 +1710,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 	if (augs::is_ready(link_request)) {
 		const auto response = augs::get_once(link_request);
+		const bool answer_lost = response.status <= 0 || response.status >= 500;
 
-		if (httplib_utils::successful(response.status)) {
+		if (!link_request_is_unlink && answer_lost && identity != nullptr) {
+			/*
+				The code is used up either way - whether the site linked is asked instead of guessed.
+			*/
+
+			link_answer_lost = true;
+			identity->start_link_check(identity_input.broker_url);
+			link_flow = F::CHECKING_AFTER;
+		}
+		else if (httplib_utils::successful(response.status)) {
 			if (!link_request_is_unlink) {
 				/*
 					Linked on the site - the Steam cert the broker now gives for the key is what links it here.
@@ -1617,7 +1738,19 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 
 				unlinking = false;
-				unlink_succeeded = response.body.find("\"from\":null") == std::string::npos;
+				/*
+					{"unlinked": "key_...", "from": "steam_..." or null}
+				*/
+
+				unlink_succeeded = [&]() {
+					try {
+						const auto doc = augs::json_document_from(response.body);
+						return doc.IsObject() && doc.HasMember("from") && doc["from"].IsString();
+					}
+					catch (...) {
+						return false;
+					}
+				}();
 				unlink_result = unlink_succeeded ? std::string("Unlinked") : std::string("This key was not linked to any Steam account.");
 			}
 		}
@@ -1693,10 +1826,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					text_color("The browser blocked the new tab - click Open it again.", orange);
 				}
 				else {
-					spinner_line("Sign in through Steam in the new tab.", white);
+					spinner_line("Continue in the new tab: sign in with Steam if asked, then click Link.", white);
 				}
 #else
-				spinner_line("Sign in through Steam in your browser.", white);
+				spinner_line("Continue in your browser: sign in with Steam if asked, then click Link.", white);
 #endif
 				text_disabled("The game continues by itself.");
 
@@ -1819,7 +1952,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 			}
 			else {
-				text("Are you sure you want to unlink this Steam account?");
+				text("Unlink this game from your Steam account?");
 				link_avatar_and_name(shown_name, unlink_has_avatar);
 				text(local_key_line);
 
@@ -3722,15 +3855,15 @@ void settings_gui_state::perform(
 
 #if !PLATFORM_WEB
 							if (signed_in.avatar_image_path.empty()) {
-								const auto tooltip = typesafe_sprintf("Change avatar\n\nAn image of up to %xx%x.", max_avatar_side_v, max_avatar_side_v);
+								const auto tooltip = typesafe_sprintf("Change avatar\n\nAny image - scaled down to %xx%x.", max_avatar_side_v, max_avatar_side_v);
 
 								if (editable_image_overlay("Avatar", pos, ImVec2(avatar_size.x, avatar_size.y), tooltip) && !chosen_avatar.valid()) {
 									chosen_avatar = launch_async(
 										[&window]() -> std::optional<augs::path_type> {
-											const std::vector<augs::window::file_dialog_filter> filters = { {
-												"Image file",
-												"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
-											} };
+											const std::vector<augs::window::file_dialog_filter> filters = {
+												{ "Image file", "*.png;*.jpg;*.jpeg;*.bmp;*.tga" },
+												{ "All files", "*" }
+											};
 		
 											const auto path = window.open_file_dialog(filters, "Choose avatar image");
 		
@@ -3791,7 +3924,11 @@ void settings_gui_state::perform(
 							}
 						}
 
-						if (scope_cfg.nickname.length() < min_nickname_length_v) {
+						/*
+							Not while it is being typed - deleting the last letter must not put "Player" under the cursor.
+						*/
+
+						if (scope_cfg.nickname.length() < min_nickname_length_v && !ImGui::IsAnyItemActive()) {
 							scope_cfg.nickname = "Player";
 						}
 
@@ -3840,7 +3977,11 @@ void settings_gui_state::perform(
 										profile_refreshed_at = now;
 									}
 
-									tooltip_on_hover(recently ? "You can refresh again in a minute." : "Get your current Steam name and avatar.");
+									tooltip_on_hover(
+										identity->did_profile_refresh_fail() ? "Couldn't refresh - try again later." :
+										recently ? "You can refresh again in a minute." :
+										"Get your current Steam name and avatar."
+									);
 								}
 							}
 						}
@@ -3854,7 +3995,11 @@ void settings_gui_state::perform(
 						*/
 
 						if (!current_account_seed().has_value()) {
+#if PLATFORM_WEB
+							text_color("No account - your account key in this browser is damaged. See Backup.", orange);
+#else
 							text_color("No account - your account.key file is damaged. See Backup.", orange);
+#endif
 						}
 						else if (current_account_id.empty()) {
 							spinner_line("Signing in...", white);
@@ -3906,24 +4051,53 @@ void settings_gui_state::perform(
 #else
 								text_disabled("Progress is saved only on this computer - back it up, or link with Steam.");
 #endif
+
+#if !WEB_CRAZYGAMES && !WEB_ITCH
+								/*
+									Signing in is linking - on its own tab, reached from here too.
+								*/
+
+								if (!is_steam_client && ImGui::Button("Link with Steam...##Info")) {
+									active_account_pane = account_settings_pane::LINK_WITH_STEAM;
+								}
+#endif
 							}
 							else if (current_account_id.rfind("steam_", 0) == 0) {
 								if (external_link("InfoSteamProfile", current_account_id, "View Steam profile", ImGui::GetColorU32(ImGuiCol_TextDisabled))) {
 									augs::open_url(::steam_profile_url(current_account_id));
 								}
+
+#if !WEB_CRAZYGAMES && !WEB_ITCH
+								if (!is_steam_client) {
+									ImGui::SameLine();
+
+									if (ImGui::SmallButton("Unlink...##Info")) {
+										active_account_pane = account_settings_pane::LINK_WITH_STEAM;
+									}
+								}
+#endif
 							}
 						}
 
 						if (identity != nullptr && identity->sign_in_failed(identity_input, augs::steady_secs())) {
-							text_color(typesafe_sprintf("Couldn't sign in to your %x account.", signed_in.provider_label), orange);
-							ImGui::SameLine();
-
-							if (ImGui::Button("Retry##SignIn")) {
-								sign_in_retry_wanted = true;
+							if (identity->is_requesting()) {
+								spinner_line(typesafe_sprintf("Signing in to your %x account...", signed_in.provider_label), white);
 							}
+							else {
+								text_color(typesafe_sprintf("Couldn't sign in to your %x account.", signed_in.provider_label), orange);
+								ImGui::SameLine();
 
-							if (!identity_error.empty()) {
-								tooltip_on_hover(identity_error);
+								if (ImGui::Button("Retry##SignIn")) {
+									sign_in_retry_wanted = true;
+								}
+
+								/*
+									Why - a ban, no broker set - right under it, not only on hover.
+								*/
+
+								if (!identity_error.empty()) {
+									text_disabled(identity_error);
+								}
 							}
 						}
 

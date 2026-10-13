@@ -41,7 +41,8 @@ start)
 	;;
 stop)
 	name=$1; d=$2
-	for p in $(pgrep -f "^$BIN --appdata-dir $U/$name "); do kill $p; done
+	# Any build (BIN= for the Steam one or not) - the client dir tells which game it is
+	for p in $(pgrep -f -- "Hypersomnia --appdata-dir $U/$name "); do kill $p; done
 	sleep 1
 	;;
 xstop)

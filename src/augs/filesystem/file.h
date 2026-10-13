@@ -170,8 +170,12 @@ namespace augs {
 	*/
 	template <class S>
 	void save_as_text_atomic(const path_type& path, const S& text) {
+		/*
+			A temporary name of its own - two games writing the same file must not write into one temporary file.
+		*/
+
 		auto tmp = path;
-		tmp += ".tmp";
+		tmp += ".tmp-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
 
 		{
 			auto out = with_exceptions<std::ofstream>();

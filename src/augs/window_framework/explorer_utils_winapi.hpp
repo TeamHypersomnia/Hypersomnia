@@ -24,20 +24,16 @@ namespace augs {
 
 		for (const auto& f : filters) {
 			to_reserve += f.description.length();
-			to_reserve += f.extension.length() + 1;
+			to_reserve += f.patterns_joined(";").length();
 			to_reserve += 2;
 		}
 
 		filter.reserve(to_reserve);
 
 		for (const auto& f : filters) {
-			const auto description = widen(f.description);
-			const auto extension = widen(f.extension);
-
 			filter += widen(f.description);
 			filter.push_back(L'\0');
-			filter += L'*';
-			filter += widen(f.extension);
+			filter += widen(f.patterns_joined(";"));
 			filter.push_back(L'\0');
 		}
 
@@ -52,7 +48,7 @@ namespace augs {
 		const auto title = widen(custom_title);
 		
 		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
+		std::array<wchar_t, 4096> szFile;
 		fill_range(szFile, 0);
 
 		ZeroMemory(&ofn, sizeof(ofn));
@@ -73,6 +69,18 @@ namespace augs {
 
 		auto show_after = scope_guard([this]() {
 			ShowWindow(get_hwnd(*platform), SW_SHOW);
+		});
+
+		/*
+			Called from a worker thread (launch_async): the shell dialog wants COM there.
+		*/
+
+		const auto com_result = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+
+		auto uninit = augs::scope_guard([com_result]() {
+			if (SUCCEEDED(com_result)) {
+				CoUninitialize();
+			}
 		});
 
 		if (GetOpenFileName(&ofn) == TRUE) {
@@ -140,7 +148,7 @@ namespace augs {
 		const auto title = widen(custom_title);
 
 		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
+		std::array<wchar_t, 4096> szFile;
 		fill_range(szFile, 0);
 
 		ZeroMemory(&ofn, sizeof(ofn));
@@ -163,6 +171,14 @@ namespace augs {
 			ShowWindow(get_hwnd(*platform), SW_SHOW);
 		});
 
+		const auto com_result = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+
+		auto uninit = augs::scope_guard([com_result]() {
+			if (SUCCEEDED(com_result)) {
+				CoUninitialize();
+			}
+		});
+
 		if (GetSaveFileName(&ofn) == TRUE) {
 			auto result = augs::path_type(ofn.lpstrFile);
 			const auto supposed_extension = filters[ofn.nFilterIndex - 1].extension;
@@ -182,7 +198,11 @@ namespace augs {
 
 	static void BrowseToFile(LPCTSTR filename)
 	{
-		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+		/*
+			Uninitialized only if this call initialized it - not after RPC_E_CHANGED_MODE (another mode already set here).
+		*/
+
+		const auto com_result = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		const auto pidl = ILCreateFromPath(filename);
 		
@@ -195,13 +215,15 @@ namespace augs {
 			LOG("pidl is null");
 		}
 
-		CoUninitialize();
+		if (SUCCEEDED(com_result)) {
+			CoUninitialize();
+		}
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
 		auto absolute_path = std::filesystem::absolute(p);
 		const auto wide_path = absolute_path.wstring();
-		LOG_NVPS(absolute_path.string());
+		LOG("Revealing in explorer: %x", augs::string_windows_friendly(absolute_path));
 		BrowseToFile(wide_path.c_str());
 	}
 
