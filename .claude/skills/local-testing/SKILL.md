@@ -70,9 +70,11 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
 - **Firefox:** `firefox --no-remote --profile <fresh dir> --new-instance URL` under `Xvfb`, with `user.js` setting
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
-- The web account is a key in IDBFS (`/user/.keys/account.key`), made on the first start. Sign in with Steam (Settings - Client - Account)
-  opens `<website>/link_key/start?state=..`; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
+- The web account is a key in IDBFS (`/user/.keys/account.key`), made on the first start. Link with Steam (Settings - Account)
+  opens `<website>/link_key/start?state=..` in a new tab; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
   which passes it to the game through BroadcastChannel/opener. For a local site set `LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html`.
+  The native game instead opens `/link_key/start?state=..&port=P` and listens on 127.0.0.1:P (`loopback_link_listener`); the site
+  redirects the browser to `http://127.0.0.1:P/linked?code=..&state=..`. No code is ever typed; `/link` only says where to start.
 
 ## UI checks
 
@@ -87,12 +89,21 @@ Helpers, all under `SCRATCH_ROOT` (default `/tmp/hypersomnia-ui`; the broker is 
 started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/nettest/session_secret`):
 - `ui.sh conf <name> [broker url]` (a client in `$SCRATCH_ROOT/ui/<name>`, main menu, the scratch site's leaderboards; `NICK=`),
   `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
+  The game never opens a real browser there: `fake_bin/xdg-open` writes the URLs to `<client>/opened_urls`.
+- `browser_sign_in.sh [steam id64]` (with `OPENED_URLS=<client>/opened_urls`) plays the player's browser for Link with Steam:
+  opens the last `/link_key/start` URL signed in to Steam on the scratch site and follows the redirect to the game's listener.
+  An attacker's link is `curl http://127.0.0.1:P/linked?code=X&state=<another>` - the listener answers 400.
+- `../xinput.py blur` / `focus` - the game loses / gets back the keyboard focus: account.key is read again only on focus
+  (and at the start, and after Restore / Start a new account), so a key swapped on disk is noticed on `focus`.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
-  then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Manage 385,144 - the panes' own fields
-  move with their content, so screenshot first. Every confirmation and result is a centered modal. Manage of a key linked to Steam
-  shows only "Unlink from Steam to manage this key."
+  then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Backup 385,144 - the panes' own fields
+  move with their content, so screenshot first. Without it (the default 1280x720 layout): Info 307,278 / Link 440,278 / Backup 590,278,
+  Link to your Steam account 397,337. Every confirmation and result is a centered modal. Backup of a key linked to Steam
+  says only "This key is linked to Steam - nothing to back up...".
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
-- `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game.
+- `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game
+  (a Steam account takes at most 10 keys - a test account full of them answers 409).
+- `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
 - An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
 
@@ -142,11 +153,11 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/link`, which shows a valid 8-character code right away (`POST /profile/link_code` makes a new one),
+  `curl -b "$cookie"` then reaches `/link_key/start?state=..[&port=..]`, which redirects with a fresh code;
   `POST /profile/unlink_key` with `key=key_...` unlinks.
-- **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb:
-  Settings - Client (~833,218) - Account (~417,278); click the code field (~415,580), `xinput.py type CODE`, click Link (~588,582),
-  scroll down to read "Linked. ..." (a reused code shows "Invalid or expired code"). Check with `db.sh show`.
+- **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
+  fake xdg-open: Settings - Account - Link with Steam - Link to your Steam account, then `browser_sign_in.sh` against that site
+  (it needs the site's session secret for the fake Steam session). Check with `db.sh show`.
   For a quick link without UI: `db.sh sql "INSERT INTO associations ..."`.
 
 ## Real identities: Steam (needs the user's running Steam client)

@@ -2,6 +2,7 @@
 #   python3 xinput.py click X Y      move and left-click
 #   python3 xinput.py type TEXT      type letters, digits and spaces
 #   python3 xinput.py scroll X Y N   scroll down N notches at X Y (up if N < 0)
+#   python3 xinput.py blur | focus     the game loses / gets back the keyboard focus
 #   python3 xinput.py key NAME       press one key by its X keysym name, e.g. Return, Escape, BackSpace,
 #                                    or a combination like Control_L+v
 import ctypes
@@ -95,6 +96,18 @@ elif mode == "type":
 			press(*punctuation[c])
 		else:
 			press(c.lower(), c.isupper())
+elif mode == "blur":
+	# The game loses the keyboard focus (to no window), as when the player switches to another program
+	x11.XSetInputFocus.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
+	x11.XSetInputFocus(display, 0, 1, 0)
+	x11.XFlush(display)
+	time.sleep(0.2)
+elif mode == "focus":
+	# Focus back to the window under the pointer (PointerRoot) - the game in a test display
+	x11.XSetInputFocus.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
+	x11.XSetInputFocus(display, 1, 1, 0)
+	x11.XFlush(display)
+	time.sleep(0.2)
 elif mode == "key":
 	*modifiers, key = sys.argv[2].split("+")
 

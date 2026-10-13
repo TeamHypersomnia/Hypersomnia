@@ -106,5 +106,37 @@ check('unlink by GET', status == 200 and json.loads(body).get('from') == 'steam_
 check('cert after unlinking is the key again', cert_account() == 'key_' + pub)
 check('progress moved back to the key', mmr_owner() == ['key_' + pub], str(mmr_owner()))
 
+status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts, unlink_sig))
+check('a signed unlink can not be replayed', status == 401, body)
+
+# The native game: &port sends the code to its listener on 127.0.0.1
+state2 = secrets.token_hex(16)
+status, _, headers = get('/link_key/start?state=%s&port=40123' % state2, cookie)
+location = headers.get('Location', '')
+check('start with a port goes back to the game on 127.0.0.1', status == 302 and location.startswith('http://127.0.0.1:40123/linked?code=') and ('state=' + state2) in location, location)
+status, _, _ = get('/link_key/start?state=%s&port=80' % state2, cookie)
+check('start refuses a port below 1024', status == 400)
+code2 = urllib.parse.parse_qs(urllib.parse.urlparse(location).query).get('code', [''])[0]
+
+# Bans: a key unlinked from a banned Steam account stays banned; a banned key can not be linked
+link_sig2 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code2, steam_id)).encode()).hex()
+status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code2, link_sig2))
+check('relink', status == 200, body)
+with db:
+    db.execute('INSERT OR IGNORE INTO broker_bans (account, reason) VALUES (?, ?)', ('steam_' + steam_id, 'Test ban.'))
+ts2 = ts + 1
+unlink_sig2 = key.sign(('hypersomnia-unlink-v1 %s %d' % (pub, ts2)).encode()).hex()
+status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts2, unlink_sig2))
+check('unlink from a banned account', status == 200, body)
+check('the unlinked key is banned too', cert_account().startswith('HTTP 403'), cert_account())
+state3 = secrets.token_hex(16)
+_, _, headers = get('/link_key/start?state=' + state3, cookie)
+code3 = urllib.parse.parse_qs(headers.get('Location', '').split('#', 1)[-1]).get('code', [''])[0]
+link_sig3 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code3, steam_id)).encode()).hex()
+status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code3, link_sig3))
+check('a banned key can not be linked', status == 403, body)
+with db:
+    db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
+
 print('%d failed' % len(failed))
 sys.exit(1 if failed else 0)

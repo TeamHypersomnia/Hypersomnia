@@ -1831,6 +1831,12 @@ work_result work(
 	*/
 
 	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
+
+	/*
+		Settings are shown on Backup for a key that does not read - once the main menu is up (a setup change closes them).
+	*/
+
+	WEBSTATIC bool key_unreadable_shown_wanted = false;
 	WEBSTATIC bool account_seed_read_once = false;
 	WEBSTATIC bool window_was_active = true;
 
@@ -1864,7 +1870,7 @@ work_result work(
 			*/
 
 			LOG("account.key could not be read.");
-			settings_gui.on_key_unreadable();
+			key_unreadable_shown_wanted = true;
 		}
 
 		if (account_seed.has_value()) {
@@ -2058,6 +2064,14 @@ work_result work(
 	WEBSTATIC auto current_account_id = [&]() -> std::string {
 		const auto now = augs::steady_secs();
 		const auto in = get_identity_input();
+
+		/*
+			No key read yet (e.g. a damaged file): no account to show.
+		*/
+
+		if (!account_seed.has_value()) {
+			return "";
+		}
 
 		if (identity->has_valid_cert(now)) {
 			return identity->get_cert()->account;
@@ -2333,6 +2347,11 @@ work_result work(
 
 	WEBSTATIC auto sync_identity_with_settings = [&]() {
 		maintain_ranked_match_record();
+
+		if (key_unreadable_shown_wanted && main_menu != nullptr) {
+			key_unreadable_shown_wanted = false;
+			settings_gui.on_key_unreadable();
+		}
 
 		{
 			const auto now = augs::steady_secs();
@@ -2862,7 +2881,7 @@ work_result work(
 
 		if (!account_seed.has_value()) {
 			LOG("Not connecting without a readable account.key.");
-			settings_gui.on_key_unreadable();
+			key_unreadable_shown_wanted = true;
 			return false;
 		}
 
@@ -3243,8 +3262,17 @@ work_result work(
 					sign_in_popup = std::nullopt;
 
 					if (result == 1) {
-						rejoin_after_retry = true;
-						retry_sign_in();
+						if (get_identity_input().provider == identity_session::provider_type::NONE) {
+							/*
+								Nothing to sign in to - tried again at once, which tells it again.
+							*/
+
+							start_client_setup();
+						}
+						else {
+							rejoin_after_retry = true;
+							retry_sign_in();
+						}
 					}
 				}
 			}

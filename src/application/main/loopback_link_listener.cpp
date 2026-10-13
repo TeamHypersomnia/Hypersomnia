@@ -27,6 +27,7 @@ loopback_link_listener::~loopback_link_listener() {
 	stop();
 }
 
+#if !PLATFORM_WEB
 static bool is_link_code(const std::string& code) {
 	if (code.size() != 8) {
 		return false;
@@ -43,6 +44,7 @@ static bool is_link_code(const std::string& code) {
 
 	return true;
 }
+#endif
 
 std::optional<int> loopback_link_listener::start(const std::string& state) {
 #if PLATFORM_WEB

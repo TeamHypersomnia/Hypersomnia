@@ -388,6 +388,23 @@ void settings_gui_state::perform_account_message_modal() {
 		return;
 	}
 
+	/*
+		Waits for any other account modal - two open at once would close each other every frame.
+	*/
+
+	const bool other_modal_open =
+		import_modal_open
+		|| import_to_confirm.has_value()
+		|| link_flow != link_flow_type::IDLE
+		|| confirm_unlink
+		|| confirm_forget_key
+		|| reveal_private_key_open
+	;
+
+	if (other_modal_open) {
+		return;
+	}
+
 	center_next_modal();
 	ImGui::OpenPopup("Account##Message");
 
@@ -535,6 +552,14 @@ void settings_gui_state::on_key_replaced_outside() {
 	confirm_unlink = false;
 	unlinking = false;
 	unlink_result.reset();
+
+	/*
+		One modal at a time - two that both want to be open would close each other every frame and neither shows.
+	*/
+
+	account_message.reset();
+	confirm_forget_key = false;
+	reveal_private_key_open = false;
 }
 
 void settings_gui_state::clear_copied_private_key_if_due() {
@@ -588,9 +613,9 @@ void settings_gui_state::perform_import_modal(
 	}
 
 	center_next_modal();
-	ImGui::OpenPopup("Import private key##Modal");
+	ImGui::OpenPopup("Restore from private key##Modal");
 
-	if (!ImGui::BeginPopupModal("Import private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	if (!ImGui::BeginPopupModal("Restore from private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		return;
 	}
 
@@ -608,7 +633,7 @@ void settings_gui_state::perform_import_modal(
 	const auto& profile = identity != nullptr ? identity->get_link_check_profile() : identity_session::account_profile();
 	using L = identity_session::link_check_state;
 
-	checkmark_line("Key successfully imported", green);
+	checkmark_line("Key restored", green);
 
 	auto welcome_back = [&](const std::string& name, const bool avatar_shown) {
 		if (name.empty()) {
@@ -3550,7 +3575,10 @@ void settings_gui_state::perform(
 							The account, its id to copy (e.g. for a server admin) and its profile on hypersomnia.io.
 						*/
 
-						if (current_account_id.empty()) {
+						if (!current_account_seed().has_value()) {
+							text_color("No account - your account.key file is damaged. See Backup.", orange);
+						}
+						else if (current_account_id.empty()) {
 							spinner_line("Signing in...", white);
 						}
 						else {
