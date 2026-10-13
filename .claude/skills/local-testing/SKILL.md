@@ -145,6 +145,13 @@ The worst bug class: after N connections a table fills up and the server silentl
 
 ## Remote hosts (arena, arenaus)
 
+`arena` and `arenaus` are this user's ssh aliases (`ssh arena`, `ssh arenaus`) - for someone else they may be named
+differently or not exist: if `ssh <alias> true` fails, ask the user for their test hosts.
+Use them for serious tests that a local setup can not show, without asking first - e.g. anything that needs real public
+addresses: a test masterserver there (see Remote end to end below) listing a server by its public IP, so joins from the
+server list match by the public address (locally every server is a "local server", matched by its LAN address, which gives
+no key to expect), key mismatches against the list, NAT/WebRTC from outside. Same rules as below: only our own dirs and PIDs.
+
 - `arena` = Ubuntu 25.04, glibc 2.41; `arenaus` = Ubuntu 22.04, glibc 2.35. A binary from this Arch machine (glibc 2.44+)
   does not run there - build in the Ubuntu container (24.04 for arena, 22.04 for arenaus) and ship libc++/libc++abi/libunwind
   from the rootfs next to it with `LD_LIBRARY_PATH`.
