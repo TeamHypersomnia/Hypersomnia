@@ -395,8 +395,20 @@ function pre_run() {
   Module.addRunDependency('idbfs');
 
   // The account key lives in this browser's storage: ask the browser not to clear it under storage pressure
+  // Safari clears a site's storage after 7 days without a visit unless it is persisted - the game warns there (Info).
+  // Other browsers refusing persist() only clear it under storage pressure - no warning for them.
+  const is_safari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+
   if (navigator.storage && navigator.storage.persist) {
-    navigator.storage.persist().then(granted => console.log("Persistent storage:", granted)).catch(() => {});
+    navigator.storage.persist().then(granted => {
+      console.log("Persistent storage:", granted);
+      Module.hs_storage_may_be_cleared = is_safari && !granted;
+    }).catch(() => {
+      Module.hs_storage_may_be_cleared = is_safari;
+    });
+  }
+  else {
+    Module.hs_storage_may_be_cleared = is_safari;
   }
 
   // Create a folder inside our virtual file system

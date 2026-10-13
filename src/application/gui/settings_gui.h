@@ -399,7 +399,12 @@ public:
 
 	bool avatar_changed = false;
 
-	double profile_refreshed_at = -1000.0;
+	/*
+		When Refresh was last clicked (unix time) - kept in the cache folder, so a restart does not let it be clicked
+		again before hypersomnia.io's minute is over. Read once, on the first draw.
+	*/
+
+	std::optional<int64_t> profile_refreshed_at;
 
 	/*
 		account.key was just replaced or forgotten here - the game reads it again.

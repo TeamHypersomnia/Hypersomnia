@@ -91,7 +91,7 @@ std::optional<int> loopback_link_listener::start(const std::string& state) {
 			self->code = code;
 		}
 
-		res.set_content(page("Back to Hypersomnia", "The game finishes linking by itself. You can close this tab."), "text/html");
+		res.set_content(page("You can go back to Hypersomnia", "This tab can be closed now."), "text/html");
 	});
 
 	/*

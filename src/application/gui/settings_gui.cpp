@@ -373,6 +373,14 @@ EM_JS(int, web_storage_state, (), {
 	return Module.idbfs_readonly ? 1 : (Module.idbfs_failed ? 2 : 0);
 });
 
+/*
+	1 when this browser may clear the game's storage after days without a visit (Safari, storage not persisted).
+*/
+
+EM_JS(int, web_storage_may_be_cleared, (), {
+	return Module.hs_storage_may_be_cleared ? 1 : 0;
+});
+
 EM_JS(int, web_tab_was_blocked, (), {
 	return Module.hs_tab_blocked ? 1 : 0;
 });
@@ -1155,16 +1163,38 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		ImGui::OpenPopup("Switch account?##Import");
 
 		if (ImGui::BeginPopupModal("Switch account?##Import", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text(typesafe_sprintf(
-				"Switch your account\n\n    from %x\n    to %x?\n\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n\n"
+			text("Switch your account\n");
+
+			/*
+				Both keys in one column.
+			*/
+
+			{
+				const auto key_column = ImGui::GetCursorPosX() + ImGui::CalcTextSize("    from ").x;
+
+				const auto new_public_key = *augs::ed25519_public_key(*import_to_confirm);
+
+				text("    from");
+				ImGui::SameLine(key_column);
+				text(identity_key::short_form(*public_key));
+				ImGui::SameLine();
+				copy_icon_button("SwitchFrom", "0x" + augs::bytes_to_hex(*public_key));
+
+				text("    to");
+				ImGui::SameLine(key_column);
+				text(identity_key::short_form(new_public_key) + "?");
+				ImGui::SameLine();
+				copy_icon_button("SwitchTo", "0x" + augs::bytes_to_hex(new_public_key));
+			}
+
+			text(
+				"\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n\n"
 #if PLATFORM_WEB
-				"Your current key can't be recovered in the browser - back it up first.",
+				"Your current key can't be recovered in the browser - back it up first."
 #else
-				"The current key is kept as a backup file next to it.",
+				"The current key is kept as a backup file next to it."
 #endif
-				identity_key::short_form(*public_key),
-				identity_key::short_form(*augs::ed25519_public_key(*import_to_confirm))
-			));
+			);
 
 #if PLATFORM_WEB
 			if (seed.has_value() && colored_button("DownloadBeforeSwitch", { { "Download current ", white }, { "private key", orange } })) {
@@ -1245,7 +1275,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
 			}
 
-			tooltip_on_hover("Keep the file somewhere safe - with it you restore your account\n(Backup -> Restore from private key file).");
+			tooltip_on_hover("Keep the file somewhere safe - it lets you restore your account\n(Backup -> Restore from private key file).");
 #endif
 
 			ImGui::Separator();
@@ -1289,16 +1319,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 
 			text("");
-			colored_text({ { "Your progress stays with the old key - you get it back only with its ", white }, { "private key", orange }, { ".", white } });
 
-			text(
-				"\n"
 #if PLATFORM_WEB
-				"In the browser you can not reach the old key afterwards -\nback it up first if you may want it back."
+			text("In the browser you can not reach the old key afterwards -\nback it up first if you may want it back.");
 #else
-				"The old key file is kept next to the new one as a backup -\ndelete it yourself to remove it for good."
+			colored_text({ { "The old ", white }, { "private key", orange }, { " file is kept next to the new one as a backup -", white } });
+			text("delete it yourself to remove it for good.");
 #endif
-			);
 
 #if PLATFORM_WEB
 			if (seed.has_value() && colored_button("DownloadBeforeForget", { { "Download current ", white }, { "private key", orange } })) {
@@ -1434,11 +1461,16 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			link_request_is_unlink = false;
 			link_flow = F::LINKING;
 
+			/*
+				With the device and its system - the site shows them next to the key right away.
+			*/
+
 			link_request = get_from_website(typesafe_sprintf(
-				"/link_key/link?public_key=%x&code=%x&signature=%x",
+				"/link_key/link?public_key=%x&code=%x&signature=%x%x",
 				augs::bytes_to_hex(*public_key),
 				target.code,
-				augs::bytes_to_hex(*signature)
+				augs::bytes_to_hex(*signature),
+				identity != nullptr ? identity->device_query() : std::string()
 			));
 		}
 	};
@@ -1523,7 +1555,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 		}
 
-		text_disabled("Once linked, progress counts towards the Steam account.\nIf it has no ranked matches yet, this key's MMR moves there\n(and comes back if you unlink before playing one).\nOtherwise the Steam account keeps its own.");
+		text_disabled("Once linked, progress counts towards the Steam account.\nIf Steam profile has no progress yet,\nthis key's progress moves there.");
 	}
 
 	/*
@@ -3953,15 +3985,28 @@ void settings_gui_state::perform(
 								The Steam name and avatar asked for anew (otherwise taken from hypersomnia.io's cache of a day).
 							*/
 
-							if (provider == "Steam" && identity != nullptr && identity->has_valid_cert(augs::steady_secs())) {
+							if (provider == "Steam" && scope_cfg.use_account_profile && identity != nullptr && identity->has_valid_cert(augs::steady_secs())) {
 								ImGui::SameLine();
 
 								/*
 									hypersomnia.io asks Steam anew at most once a minute per account - the button waits as long.
 								*/
 
-								const auto now = ImGui::GetTime();
-								const bool recently = now - profile_refreshed_at < 60.0;
+								const auto refreshed_at_path = CACHE_DIR / "profile_refreshed_at.txt";
+								const auto now = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+
+								if (!profile_refreshed_at.has_value()) {
+									profile_refreshed_at = [&]() -> int64_t {
+										try {
+											return std::stoll(augs::file_to_string(refreshed_at_path));
+										}
+										catch (...) {
+											return 0;
+										}
+									}();
+								}
+
+								const bool recently = now - *profile_refreshed_at < 60;
 
 								if (identity->is_refreshing_profile()) {
 									spinner(ImGui::GetTextLineHeight(), white);
@@ -3975,6 +4020,12 @@ void settings_gui_state::perform(
 									if (clicked && !recently) {
 										identity->refresh_profile_now();
 										profile_refreshed_at = now;
+
+										try {
+											augs::save_as_text(refreshed_at_path, std::to_string(now));
+										}
+										catch (...) {
+										}
 									}
 
 									tooltip_on_hover(
@@ -4046,19 +4097,15 @@ void settings_gui_state::perform(
 								}
 #elif WEB_ITCH
 								text_disabled("Progress is saved only in this browser.\nRanked and linking with Steam: play.hypersomnia.io or Steam.");
-#elif PLATFORM_WEB
-								text_disabled("Progress is saved only in this browser - clearing site data deletes it.\nBack it up, or link with Steam.");
-#else
-								text_disabled("Progress is saved only on this computer - back it up, or link with Steam.");
 #endif
 
-#if !WEB_CRAZYGAMES && !WEB_ITCH
-								/*
-									Signing in is linking - on its own tab, reached from here too.
-								*/
-
-								if (!is_steam_client && ImGui::Button("Link with Steam...##Info")) {
-									active_account_pane = account_settings_pane::LINK_WITH_STEAM;
+#if PLATFORM_WEB && !WEB_CRAZYGAMES
+								if (::web_storage_may_be_cleared() != 0) {
+#if WEB_ITCH
+									text_color("This browser may clear your account after a few days without playing - back it up.", orange);
+#else
+									text_color("This browser may clear your account after a few days without playing -\nback it up or link with Steam.", orange);
+#endif
 								}
 #endif
 							}
@@ -4067,15 +4114,6 @@ void settings_gui_state::perform(
 									augs::open_url(::steam_profile_url(current_account_id));
 								}
 
-#if !WEB_CRAZYGAMES && !WEB_ITCH
-								if (!is_steam_client) {
-									ImGui::SameLine();
-
-									if (ImGui::SmallButton("Unlink...##Info")) {
-										active_account_pane = account_settings_pane::LINK_WITH_STEAM;
-									}
-								}
-#endif
 							}
 						}
 

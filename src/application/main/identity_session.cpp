@@ -11,6 +11,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "application/main/identity_session.h"
+#include "application/network/client_platform_type.h"
 
 /*
 	A cert is not used for its last two minutes: a server's clock may be a little ahead.
@@ -261,6 +262,61 @@ std::string identity_session::key_account() const {
 	return identity_cert::key_account(key_public);
 }
 
+std::string identity_session::device_query() const {
+	const auto device = [&]() {
+		auto encoded = std::string();
+
+		/*
+			At most 64 bytes, cut before a character, not inside one (UTF-8 continuation bytes are 10xxxxxx).
+		*/
+
+		const auto cut = [&]() {
+			auto length = std::min<std::size_t>(device_name.size(), 64);
+
+			while (length > 0 && length < device_name.size() && (static_cast<unsigned char>(device_name[length]) & 0xC0) == 0x80) {
+				--length;
+			}
+
+			return device_name.substr(0, length);
+		}();
+
+		for (const auto c : cut) {
+			const auto u = static_cast<unsigned char>(c);
+			const bool plain = std::isalnum(u) || c == '-' || c == '_' || c == '.';
+
+			if (plain) {
+				encoded += c;
+			}
+			else {
+				const auto digits = std::string_view("0123456789ABCDEF");
+				encoded += '%';
+				encoded += digits[u >> 4];
+				encoded += digits[u & 15];
+			}
+		}
+
+		return encoded.empty() ? std::string() : "&device=" + encoded;
+	}();
+
+	/*
+		The system, for the icon next to the key on its owner's /profile.
+	*/
+
+	const auto os = [&]() -> std::string {
+		switch (::get_client_platform_type()) {
+			case client_platform_type::WINDOWS: return "&os=windows";
+			case client_platform_type::LINUX: return "&os=linux";
+			case client_platform_type::MACOS: return "&os=mac";
+			case client_platform_type::WEB:
+			case client_platform_type::ITCH:
+			case client_platform_type::CRAZYGAMES: return "&os=web";
+			default: return "";
+		}
+	}();
+
+	return device + os;
+}
+
 std::string identity_session::key_location() const {
 	const auto signature = augs::ed25519_sign(key_seed, identity_cert::cert_request_message(key_public));
 
@@ -367,40 +423,7 @@ void identity_session::start_request(const input& in, const double now) {
 		The device's name, percent-encoded - only letters, digits and a few marks go as they are.
 	*/
 
-	const auto device = [&]() {
-		auto encoded = std::string();
-
-		/*
-			At most 64 bytes, cut before a character, not inside one (UTF-8 continuation bytes are 10xxxxxx).
-		*/
-
-		const auto cut = [&]() {
-			auto length = std::min<std::size_t>(device_name.size(), 64);
-
-			while (length > 0 && length < device_name.size() && (static_cast<unsigned char>(device_name[length]) & 0xC0) == 0x80) {
-				--length;
-			}
-
-			return device_name.substr(0, length);
-		}();
-
-		for (const auto c : cut) {
-			const auto u = static_cast<unsigned char>(c);
-			const bool plain = std::isalnum(u) || c == '-' || c == '_' || c == '.';
-
-			if (plain) {
-				encoded += c;
-			}
-			else {
-				const auto digits = std::string_view("0123456789ABCDEF");
-				encoded += '%';
-				encoded += digits[u >> 4];
-				encoded += digits[u & 15];
-			}
-		}
-
-		return encoded.empty() ? std::string() : "&device=" + encoded;
-	}();
+	const auto device = device_query();
 
 	if (in.provider == provider_type::CRAZYGAMES) {
 		headers["X-CrazyGames-Token"] = in.crazygames_token;
@@ -409,6 +432,7 @@ void identity_session::start_request(const input& in, const double now) {
 	const auto refresh = profile_refresh_wanted ? std::string("&refresh_profile=1") : std::string();
 	profile_refresh_pending = profile_refresh_wanted;
 	profile_refresh_wanted = false;
+
 
 	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location + device + refresh, headers);
 	requested_for = in;

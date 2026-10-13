@@ -202,6 +202,13 @@ private:
 	std::optional<parsed_answer> parse_answer(const std::string& body) const;
 
 public:
+	/*
+		"&device=<the device's name>&os=<windows|linux|mac|web>" - what the site shows next to a linked key
+		on its owner's /profile; sent with every cert request and with a link.
+	*/
+
+	std::string device_query() const;
+
 	std::string last_error;
 
 	/*
