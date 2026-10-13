@@ -46,6 +46,10 @@ bool start_client_gui_state::perform(
 	
 	using namespace augs::imgui;
 
+#if PLATFORM_WEB
+	(void)window;
+#endif
+
 #if WEB_LOWEND
 	centered_size_mult = vec2(0.55f, 0.7f);
 #else
