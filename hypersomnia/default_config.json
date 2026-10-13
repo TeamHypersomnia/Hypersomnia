@@ -483,9 +483,9 @@
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
 
-        // Which identity brokers' certs this server trusts, as public keys in hex. Empty: the one of hypersomnia.io built into the game.
-        // Listed: only those - e.g. an infrastructure of one's own, or hypersomnia.io's new and old key while it is rotated.
-        "identity_broker_public_keys": [],
+        // Which identity brokers' certs this server trusts, as public keys in hex - hypersomnia.io's by default.
+        // E.g. an infrastructure of one's own, or hypersomnia.io's new and old key while it is rotated. Empty: only self-signed certs (key_ accounts).
+        "identity_broker_public_keys": ["b1f8f0b2711cf0596c83b17f8d8904f547c2243705edc1e8c560fcc126c5cfbc"],
 
         // Admins recognized by the account their cert proves - no password needed. Never a nickname.
         // { "account": "<account id>", "rcon": "NONE" (default) | "RCON" | "MASTER_RCON", "badge": optional, shown in place of [ADMIN] }, e.g.:

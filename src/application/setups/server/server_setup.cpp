@@ -46,7 +46,6 @@
 #include "application/masterserver/server_request_signing.h"
 #include "application/network/identity_cert.h"
 #include "application/main/server_key.h"
-#include "application/network/identity_broker_key.h"
 #include "application/main/identity_key.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
@@ -1306,20 +1305,13 @@ void server_setup::push_session_webhook_job(const mode_player_id player_id, job_
 std::string get_hex_representation(const std::byte*, size_t length);
 
 /*
-	The broker keys the server trusts: the one built in, unless the config lists others - a test broker,
-	an infrastructure of one's own, or the new and the old key while hypersomnia.io's key is rotated.
+	The broker keys the server trusts, from its config - hypersomnia.io's by default (default_config.json);
+	a test broker, an infrastructure of one's own, or the new and the old key while hypersomnia.io's key is rotated.
+	None: only self-signed certs (key_ accounts).
 */
 
 static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const server_private_vars& private_vars) {
 	const auto& configured = private_vars.identity_broker_public_keys;
-
-	if (configured.empty()) {
-		if (const auto key = augs::hex_to_array<32>(std::string(default_identity_broker_public_key_v))) {
-			return { *key };
-		}
-
-		return {};
-	}
 
 	auto keys = std::vector<augs::ed25519_public_key_type>();
 
