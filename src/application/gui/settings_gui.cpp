@@ -357,6 +357,47 @@ std::string get_custom_binding_name(const app_intent_type) {
 	return "";
 }
 
+#if PLATFORM_WEB
+#include <emscripten.h>
+
+/*
+	Copying in the browser can be refused - its result is kept for the game to read: 0 on the way, 1 copied, -1 refused.
+*/
+
+EM_JS(void, web_copy_text, (const char* text), {
+	Module.hs_copy_result = 0;
+
+	try {
+		navigator.clipboard.writeText(UTF8ToString(text))
+			.then(() => { Module.hs_copy_result = 1; })
+			.catch(() => { Module.hs_copy_result = -1; });
+	}
+	catch (e) {
+		Module.hs_copy_result = -1;
+	}
+});
+
+EM_JS(int, web_copy_result, (), {
+	return Module.hs_copy_result || 0;
+});
+
+/*
+	Saves the text as a file through the browser's download.
+*/
+
+EM_JS(void, web_download_text, (const char* file_name, const char* text), {
+	const blob = new Blob([UTF8ToString(text) + "\n"], { type: "text/plain" });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = UTF8ToString(file_name);
+	document.body.appendChild(a);
+	a.click();
+	a.remove();
+	setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+#endif
+
 void settings_gui_state::on_steam_link_code(const std::string& code, const std::string& state) {
 	if (steam_link_state.empty() || state != steam_link_state) {
 		LOG("Ignoring a Steam link code for another state.");
@@ -811,8 +852,8 @@ void settings_gui_state::perform_import_modal(
 void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	using namespace augs::imgui;
 
-	const auto key_path = USER_DIR / identity_key::file_name;
-	const auto keys_dir = USER_DIR / identity_key::keys_dir_name;
+	const auto key_path = KEYS_DIR / identity_key::file_name;
+	const auto keys_dir = KEYS_DIR;
 
 	const auto seed = current_account_seed();
 
@@ -1010,9 +1051,34 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 			if (colored_button("CopyPrivateKey", { { "Copy ", white }, { "private key", orange }, { " to clipboard", white } })) {
 				copied_private_key = identity_key::to_export_string(*seed);
+#if PLATFORM_WEB
+				/*
+					The browser may refuse (no permission, an iframe, Safari) - "Copied" only once it says it did.
+				*/
+
+				::web_copy_text(copied_private_key.c_str());
+				private_key_copy_pending = true;
+				private_key_copy_failed = false;
+#else
 				ImGui::SetClipboardText(copied_private_key.c_str());
 				private_key_copied_at = ImGui::GetTime();
+#endif
 			}
+
+#if PLATFORM_WEB
+			if (private_key_copy_pending) {
+				const auto result = ::web_copy_result();
+
+				if (result != 0) {
+					private_key_copy_pending = false;
+					private_key_copy_failed = result < 0;
+
+					if (result > 0) {
+						private_key_copied_at = ImGui::GetTime();
+					}
+				}
+			}
+#endif
 
 #if PLATFORM_WEB
 			tooltip_on_hover("Keep it somewhere safe - with it you restore your account\n(Backup -> Restore from private key).");
@@ -1030,9 +1096,23 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				window.reveal_in_explorer(augs::exists(key_path) ? key_path : augs::path_type(USER_DIR));
 			}
 
-			tooltip_on_hover("Your private key is in .keys/account.key -\nit's enough to copy this file to back up your account.");
+			tooltip_on_hover("Your private key is the file account.key -\nit's enough to copy this file to back up your account.");
 #else
 			(void)window;
+
+			if (private_key_copy_failed) {
+				text_color("The browser did not let the game copy it - download it instead.", orange);
+			}
+
+			/*
+				The browser has no folder to show - the key is saved as a file instead.
+			*/
+
+			if (colored_button("DownloadPrivateKey", { { "Download ", white }, { "private key", orange }, { " as a file", white } })) {
+				::web_download_text("hypersomnia-account.key", identity_key::to_export_string(*seed).c_str());
+			}
+
+			tooltip_on_hover("Keep the file somewhere safe - paste its contents into\nBackup -> Restore from private key to restore your account.");
 #endif
 
 			ImGui::Separator();

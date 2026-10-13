@@ -133,6 +133,16 @@ namespace augs {
 			return path_type();
 		}
 	}
+
+	path_type get_default_local_appdata_dir() {
+		char path[MAX_PATH];
+
+		if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, path))) {
+			return path_type(path) / "Hypersomnia";
+		}
+
+		return path_type();
+	}
 }
 #elif PLATFORM_MACOS
 #include <sysdir.h>  // for sysdir_start_search_path_enumeration
@@ -197,6 +207,13 @@ namespace augs {
 	
 	std::wstring widen(const std::string& s) {
 		return std::wstring(s.begin(), s.end());
+	}
+}
+#endif
+#if !PLATFORM_WINDOWS
+namespace augs {
+	path_type get_default_local_appdata_dir() {
+		return path_type();
 	}
 }
 #endif

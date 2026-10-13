@@ -13,7 +13,7 @@
 */
 
 namespace server_key {
-	inline constexpr std::string_view file_name = ".keys/server.key";
+	inline constexpr std::string_view file_name = "server.key";
 
 	/*
 		A server that can not read its key file still starts - with a key for this run only,

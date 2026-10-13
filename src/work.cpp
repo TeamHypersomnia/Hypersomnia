@@ -80,6 +80,7 @@
 #include "application/main/server_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
+#include "augs/window_framework/platform_utils.h"
 
 #if HEADLESS
 
@@ -549,6 +550,26 @@ work_result work(
 	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
 #endif
 
+	::KEYS_DIR = [&]() {
+#if PLATFORM_WEB
+		/*
+			Its own IndexedDB database in the browser - see pre_run in common.js.
+		*/
+
+		return ::APPDATA_DIR / "hypersomnia_keys";
+#endif
+
+		if (params.appdata_dir.empty()) {
+			if (const auto local = augs::get_default_local_appdata_dir(); !local.empty()) {
+				return local / ::USER_DIR.filename() / identity_key::keys_dir_name;
+			}
+		}
+
+		return ::USER_DIR / identity_key::keys_dir_name;
+	}();
+
+	LOG("Keys directory: %x", ::KEYS_DIR);
+
 #if PLATFORM_UNIX && !PLATFORM_WEB
 	WEBSTATIC auto signal_handler = [](const int signal_type) {
    		signal_status = signal_type;
@@ -725,7 +746,7 @@ work_result work(
 			What an official server's operator sends to the developers: the public part of server.key, made if missing.
 		*/
 
-		const auto key = server_key::obtain(USER_DIR / server_key::file_name);
+		const auto key = server_key::obtain(KEYS_DIR / server_key::file_name);
 		std::cout << server_key::public_key_hex(key) << std::endl;
 		return work_result::SUCCESS;
 	}
@@ -1854,7 +1875,7 @@ work_result work(
 
 		account_seed_read_once = true;
 
-		const auto path = USER_DIR / identity_key::file_name;
+		const auto path = KEYS_DIR / identity_key::file_name;
 
 		/*
 			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
@@ -1892,7 +1913,7 @@ work_result work(
 		}
 
 		if (account_seed.has_value()) {
-			identity->set_key(*account_seed, USER_DIR / identity_key::keys_dir_name);
+			identity->set_key(*account_seed, KEYS_DIR);
 
 			if (!existed) {
 				identity->on_key_created();
@@ -1986,7 +2007,7 @@ work_result work(
 		Keys of the servers connected to, kept between runs (.keys/known_servers.txt) - see known_servers.h.
 	*/
 
-	WEBSTATIC auto remembered_servers = known_servers(USER_DIR / identity_key::keys_dir_name / known_servers::file_name);
+	WEBSTATIC auto remembered_servers = known_servers(KEYS_DIR / known_servers::file_name);
 
 	/*
 		A password entered for a server whose key is not known yet - used once, for the next connection only.

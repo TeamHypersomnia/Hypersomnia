@@ -298,6 +298,10 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool reveal_private_key_open = false;
 	double private_key_copied_at = -1000.0;
 	std::string copied_private_key;
+#if PLATFORM_WEB
+	bool private_key_copy_pending = false;
+	bool private_key_copy_failed = false;
+#endif
 	bool confirm_unlink = false;
 	bool unlink_has_avatar = false;
 

@@ -24,7 +24,9 @@ def jwt(payload, alg='RS256', sign_key=key):
 def cert(token):
     session = os.urandom(32).hex()
     try:
-        r = urllib.request.urlopen(f'{url}/cert?session={session}&crazygames={urllib.parse.quote(token)}')
+        # The token in its header, as the game sends it
+        req = urllib.request.Request(f'{url}/cert?session={session}&crazygames=header', headers={ 'X-CrazyGames-Token': token })
+        r = urllib.request.urlopen(req)
         raw = bytes.fromhex(json.loads(r.read())['cert'])
         return 200, raw[2:2 + raw[1]].decode()
     except urllib.error.HTTPError as e:

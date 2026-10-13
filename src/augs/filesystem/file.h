@@ -17,7 +17,9 @@ void persistent_filesystem_sync();
 namespace augs {
 	inline void sync_if_persistent(const path_type& path) {
 #if PLATFORM_WEB
-		if (!path.empty() && path.begin()->string() == "user") {
+		const auto first = path.empty() ? std::string() : path.begin()->string();
+
+		if (first == "user" || first == "hypersomnia_keys") {
 			LOG("sync_if_persistent: %x", path);
 			persistent_filesystem_sync();
 		}

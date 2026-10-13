@@ -277,7 +277,11 @@ std::optional<std::string> identity_session::build_location(const input& in) con
 			return std::nullopt;
 		}
 
-		return location + "&crazygames=" + in.crazygames_token;
+		/*
+			The token itself goes in a header (see start_request) - never in a URL, which logs keep.
+		*/
+
+		return location + "&crazygames=header";
 	}
 
 	if (in.provider == provider_type::STEAM) {
@@ -344,7 +348,13 @@ void identity_session::start_request(const input& in, const double now) {
 
 	LOG("Requesting an identity cert from %x.", in.broker_url);
 
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location);
+	auto headers = augs::Headers();
+
+	if (in.provider == provider_type::CRAZYGAMES) {
+		headers["X-CrazyGames-Token"] = in.crazygames_token;
+	}
+
+	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers);
 	requested_for = in;
 }
 

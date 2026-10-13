@@ -14,6 +14,13 @@ namespace augs {
 	augs::path_type get_executable_path();
 	augs::path_type get_default_documents_dir();
 
+	/*
+		Windows: %LOCALAPPDATA%\Hypersomnia - not synced to the cloud like Documents may be (OneDrive).
+		Elsewhere empty.
+	*/
+
+	augs::path_type get_default_local_appdata_dir();
+
 	std::string wstr_to_utf8(const wchar_t* wstr);
 	std::wstring widen(const std::string& s);
 }

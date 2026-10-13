@@ -355,6 +355,14 @@ function show_storage_notice(text) {
   notice.textContent = text;
 }
 
+// Ctrl/Cmd+V is left to the browser: it then fires its "paste" event with the system clipboard, which the game types
+// into the focused field. Reaching the game, the shortcut would be stopped there and paste the game's own older copy.
+window.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
+    e.stopImmediatePropagation();
+  }
+}, true);
+
 function pre_run() {
   // One tab writes the account at a time - two would each write their own copy over the other's (a new account, a link)
   if (navigator.locks && navigator.locks.request) {
@@ -382,6 +390,11 @@ function pre_run() {
   FS.mkdir('/user');
   // Mount IDBFS on this folder
   FS.mount(IDBFS, {}, '/user');
+
+  // The account key apart from everything else (maps, caches): its own IndexedDB database, so a full or failed write
+  // of the rest never takes the key with it, and a name no other game's "/user" shares
+  FS.mkdir('/hypersomnia_keys');
+  FS.mount(IDBFS, {}, '/hypersomnia_keys');
 
   // Synchronize from IndexedDB to memory
   FS.syncfs(true, function (err) {

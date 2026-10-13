@@ -26,6 +26,13 @@ static std::string web_clipboard;
 
 static std::recursive_mutex clipboard_lk;
 
+/*
+	What the browser pasted (Ctrl/Cmd+V) - typed into the focused field on the next frame.
+	The shortcut itself never reaches the game (see common.js), so ImGui does not paste its own older copy as well.
+*/
+
+static std::string web_pending_paste;
+
 static const char* web_GetClipboardText(void*) {
 	thread_local std::string clip_storage;
 
@@ -167,6 +174,7 @@ namespace augs {
 				{
 					std::scoped_lock lk(clipboard_lk);
 					web_clipboard = paste_data;
+					web_pending_paste = paste_data;
 				}
 			});
 #elif PLATFORM_LINUX
@@ -188,6 +196,17 @@ namespace augs {
 			using namespace event::keys;
 
 			auto& io = GetIO();
+
+#if PLATFORM_WEB
+			{
+				std::scoped_lock lk(clipboard_lk);
+
+				if (!web_pending_paste.empty()) {
+					io.AddInputCharactersUTF8(web_pending_paste.c_str());
+					web_pending_paste.clear();
+				}
+			}
+#endif
 
 			io.MouseDrawCursor = false;
 			io.DeltaTime = delta_seconds;

@@ -70,7 +70,7 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
 - **Firefox:** `firefox --no-remote --profile <fresh dir> --new-instance URL` under `Xvfb`, with `user.js` setting
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
-- The web account is a key in IDBFS (`/user/.keys/account.key`), made on the first start. Link with Steam (Settings - Account)
+- The web account is a key in its own IDBFS database (`/hypersomnia_keys/account.key`, apart from `/user`), made on the first start. Link with Steam (Settings - Account)
   opens `<website>/link_key/start?state=..` in a new tab; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
   which passes it to the game through BroadcastChannel/opener. For a local site set `LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html`.
   The native game instead opens `/link_key/start?state=..&port=P` and listens on 127.0.0.1:P (`loopback_link_listener`); the site

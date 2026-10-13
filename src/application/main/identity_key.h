@@ -22,7 +22,7 @@ namespace identity_key {
 	*/
 
 	inline constexpr std::string_view keys_dir_name = ".keys";
-	inline constexpr std::string_view file_name = ".keys/account.key";
+	inline constexpr std::string_view file_name = "account.key";
 	inline constexpr std::string_view export_prefix = "hypersomnia-key-v1:";
 
 	/*

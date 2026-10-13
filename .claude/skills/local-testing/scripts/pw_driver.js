@@ -4,7 +4,7 @@
 	  curl "localhost:<port>/shot?f=/path.png"   screenshot of the current page
 	  curl "localhost:<port>/click?x=..&y=.."     /type?t=..   /key?k=Escape   /wheel?x=..&y=..&dy=..
 	  curl "localhost:<port>/pages"               urls of the open tabs; /page?i=N switches to one
-	  curl "localhost:<port>/console"             the console lines so far     /reload (same profile: the browser storage stays)     /open?u=<url> (a new tab, same profile)     /quit
+	  curl "localhost:<port>/console"             the console lines so far     /reload (same profile: the browser storage stays)     /open?u=<url> (a new tab, same profile)     /clipboard?t=<text> (the system clipboard)     /quit
 	Sound muted, WebGL through SwiftShader. Headed - run it under Xvfb.
 	PW_ROUTES='{"<url>": "<local file>"}' serves those URLs from local files, e.g. a stub of the CrazyGames SDK.
 */
@@ -17,7 +17,7 @@ const { chromium } = require('playwright');
 		headless: false,
 		args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--mute-audio', '--autoplay-policy=no-user-gesture-required']
 	});
-	const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+	const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, acceptDownloads: true });
 
 	if (cookie) {
 		const [nv, domain] = cookie.split('@');
@@ -34,7 +34,16 @@ const { chromium } = require('playwright');
 	const lines = [];
 	let page = await context.newPage();
 
-	const watch = p => p.on('console', m => lines.push(`[${p.url().slice(0, 60)}] ${m.text()}`));
+	const watch = p => {
+		p.on('console', m => lines.push(`[${p.url().slice(0, 60)}] ${m.text()}`));
+
+		// A file the page downloads is saved into PW_DOWNLOADS (or /tmp) and named in the console lines
+		p.on('download', async d => {
+			const to = require('path').join(process.env.PW_DOWNLOADS || '/tmp', d.suggestedFilename());
+			await d.saveAs(to);
+			lines.push(`[download] ${to}`);
+		});
+	};
 	watch(page);
 	context.on('page', p => watch(p));
 
@@ -55,6 +64,10 @@ const { chromium } = require('playwright');
 				case '/console': return res.end(lines.join('\n') + '\n');
 				case '/reload': await page.reload(); break;
 				case '/open': page = await context.newPage(); await page.goto(q('u')); break;
+				case '/clipboard':
+					await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(page.url()).origin });
+					await page.evaluate(t => navigator.clipboard.writeText(t), q('t'));
+					break;
 				case '/quit': res.end('bye\n'); await browser.close(); process.exit(0);
 			}
 			res.end('ok\n');

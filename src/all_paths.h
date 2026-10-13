@@ -95,6 +95,13 @@ extern augs::path_type APPDATA_DIR;
 extern augs::path_type USER_DIR;
 
 /*
+	The account and server keys and the known servers: USER_DIR/.keys, but on Windows (without --appdata-dir)
+	%LOCALAPPDATA%\Hypersomnia\<the user folder's name>\.keys - Documents is often synced to OneDrive.
+*/
+
+extern augs::path_type KEYS_DIR;
+
+/*
 	Derived subdirectories.
 */
 

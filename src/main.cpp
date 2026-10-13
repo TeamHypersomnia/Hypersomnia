@@ -20,6 +20,7 @@
 augs::path_type CALLING_CWD;
 augs::path_type APPDATA_DIR;
 augs::path_type USER_DIR;
+augs::path_type KEYS_DIR;
 
 extern augs::mutex log_mutex;
 
