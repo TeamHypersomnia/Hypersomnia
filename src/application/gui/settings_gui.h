@@ -276,6 +276,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	link_flow_type link_flow = link_flow_type::IDLE;
 	std::string link_flow_message;
 	std::string linked_name;
+	bool linked_has_avatar = false;
 
 	/*
 		The code already sent as typed - a failed one is not sent again until it changes.

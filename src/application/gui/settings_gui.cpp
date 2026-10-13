@@ -1110,6 +1110,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			if (has_key && identity != nullptr) {
 				identity->start_link_check(identity_input.broker_url);
 				link_flow = F::CHECKING_BEFORE;
+				linked_has_avatar = false;
 				link_flow_message.clear();
 				link_code_text.clear();
 				auto_requested_code.clear();
@@ -1135,9 +1136,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			*/
 
 			const auto name = identity->get_link_check_profile().name.empty() ? linked_name : identity->get_link_check_profile().name;
+
+			/*
+				The avatar as the broker has it - else the one the site showed for the code stays.
+			*/
+
+			if (upload_link_avatar(identity->get_link_check_profile().avatar)) {
+				linked_has_avatar = true;
+			}
+
 			identity->clear_link_check();
 			linked_name = name;
-			finish(true, "Progress will count towards your Steam account:");
+			finish(true, "Progress will count towards your Steam account.");
 		}
 		else if (check == L::NOT_LINKED) {
 			identity->clear_link_check();
@@ -1390,6 +1400,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				if (ImGui::Button("Yes, link it", ImVec2(120, 0))) {
 					link_target_to_confirm.reset();
 					linked_name = target.name;
+					linked_has_avatar = target.has_avatar;
 					link_to_confirmed_target(target);
 				}
 
@@ -1401,25 +1412,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else if (link_flow == F::DONE) {
 				if (link_flow_succeeded) {
-					checkmark_line("Successfully linked", green);
-					text(link_flow_message);
-
 					/*
-						The Steam avatar is the preview once the account's profile is in effect.
+						The avatar where the question had it - the modal changes as little as it can.
 					*/
 
-					if (const bool steam_avatar_shown = identity != nullptr && identity->has_valid_cert(augs::steady_secs()) && account_avatar_previewed; steam_avatar_shown) {
-						augs::atlas_entry entry;
-						entry.atlas_space = xywh(0, 0, 1, 1);
-						const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
-
-						game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
-						ImGui::Dummy(ImVec2(size.x, size.y));
-						ImGui::SameLine();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
-					}
-
-					text(linked_name);
+					checkmark_line("Successfully linked", green);
+					link_avatar_and_name(linked_name, linked_has_avatar);
+					text(link_flow_message);
 				}
 				else {
 					text_color(link_flow_message, orange);
