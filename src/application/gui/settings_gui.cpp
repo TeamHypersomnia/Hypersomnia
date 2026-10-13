@@ -412,6 +412,91 @@ void settings_gui_state::perform_account_message_modal() {
 	}
 }
 
+void settings_gui_state::cancel_link_flow_if_hidden() {
+	/*
+		Settings closed while waiting for the sign-in through Steam: the link is given up - not finished by itself
+		the next time the pane is opened.
+	*/
+
+	if (show) {
+		return;
+	}
+
+	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
+
+	if (waiting || link_code_from_steam.has_value()) {
+		link_flow = link_flow_type::IDLE;
+		link_flow_message.clear();
+		link_target_request.reset();
+		link_code_from_steam.reset();
+		steam_link_state.clear();
+		link_listener.stop();
+
+		if (identity != nullptr) {
+			identity->clear_link_check();
+		}
+	}
+}
+
+void settings_gui_state::clear_copied_private_key_if_due() {
+#if !PLATFORM_WEB
+	/*
+		A private key does not stay in the clipboard (its history, a cloud sync, a paste into a chat) -
+		cleared after a minute, unless something else was copied meanwhile.
+	*/
+
+	if (copied_private_key.empty() || ImGui::GetTime() - private_key_copied_at < 60.0) {
+		return;
+	}
+
+	if (const auto* const current = ImGui::GetClipboardText(); current != nullptr && copied_private_key == current) {
+		ImGui::SetClipboardText("");
+	}
+
+	copied_private_key.clear();
+#endif
+}
+
+bool settings_gui_state::account_modal_open(const bool with_message) const {
+	const bool any =
+		import_modal_open
+		|| import_to_confirm.has_value()
+		|| link_flow != link_flow_type::IDLE
+		|| confirm_unlink
+		|| confirm_forget_key
+		|| reveal_private_key_open
+	;
+
+	return any || (with_message && account_message.has_value());
+}
+
+bool settings_gui_state::is_locked_by_ranked() const {
+	/*
+		Also a match that can still be rejoined - read only when asked, on a click.
+	*/
+
+	if (in_ranked_match) {
+		return true;
+	}
+
+	const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
+	return record.has_value() && record->valid_now();
+}
+
+void settings_gui_state::on_key_unreadable() {
+	open();
+	active_pane = settings_pane::ACCOUNT;
+	active_account_pane = account_settings_pane::BACKUP;
+}
+
+std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
+	/*
+		The key the game plays with - the game reads the file, the settings never do.
+	*/
+
+	return identity != nullptr ? identity->key_seed_if_loaded() : std::nullopt;
+}
+
 #if !WEB_CRAZYGAMES
 static auto danger_button_colors(const rgba col) {
 	using namespace augs::imgui;
@@ -551,91 +636,6 @@ void settings_gui_state::on_key_replaced_outside() {
 	account_message.reset();
 	confirm_forget_key = false;
 	reveal_private_key_open = false;
-}
-
-void settings_gui_state::cancel_link_flow_if_hidden() {
-	/*
-		Settings closed while waiting for the sign-in through Steam: the link is given up - not finished by itself
-		the next time the pane is opened.
-	*/
-
-	if (show) {
-		return;
-	}
-
-	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
-
-	if (waiting || link_code_from_steam.has_value()) {
-		link_flow = link_flow_type::IDLE;
-		link_flow_message.clear();
-		link_target_request.reset();
-		link_code_from_steam.reset();
-		steam_link_state.clear();
-		link_listener.stop();
-
-		if (identity != nullptr) {
-			identity->clear_link_check();
-		}
-	}
-}
-
-void settings_gui_state::clear_copied_private_key_if_due() {
-#if !PLATFORM_WEB
-	/*
-		A private key does not stay in the clipboard (its history, a cloud sync, a paste into a chat) -
-		cleared after a minute, unless something else was copied meanwhile.
-	*/
-
-	if (copied_private_key.empty() || ImGui::GetTime() - private_key_copied_at < 60.0) {
-		return;
-	}
-
-	if (const auto* const current = ImGui::GetClipboardText(); current != nullptr && copied_private_key == current) {
-		ImGui::SetClipboardText("");
-	}
-
-	copied_private_key.clear();
-#endif
-}
-
-bool settings_gui_state::account_modal_open(const bool with_message) const {
-	const bool any =
-		import_modal_open
-		|| import_to_confirm.has_value()
-		|| link_flow != link_flow_type::IDLE
-		|| confirm_unlink
-		|| confirm_forget_key
-		|| reveal_private_key_open
-	;
-
-	return any || (with_message && account_message.has_value());
-}
-
-bool settings_gui_state::is_locked_by_ranked() const {
-	/*
-		Also a match that can still be rejoined - read only when asked, on a click.
-	*/
-
-	if (in_ranked_match) {
-		return true;
-	}
-
-	const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
-	return record.has_value() && record->valid_now();
-}
-
-void settings_gui_state::on_key_unreadable() {
-	open();
-	active_pane = settings_pane::ACCOUNT;
-	active_account_pane = account_settings_pane::BACKUP;
-}
-
-std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
-	/*
-		The key the game plays with - the game reads the file, the settings never do.
-	*/
-
-	return identity != nullptr ? identity->key_seed_if_loaded() : std::nullopt;
 }
 
 void settings_gui_state::perform_import_modal(

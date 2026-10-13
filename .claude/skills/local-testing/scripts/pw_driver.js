@@ -4,7 +4,7 @@
 	  curl "localhost:<port>/shot?f=/path.png"   screenshot of the current page
 	  curl "localhost:<port>/click?x=..&y=.."     /type?t=..   /key?k=Escape   /wheel?x=..&y=..&dy=..
 	  curl "localhost:<port>/pages"               urls of the open tabs; /page?i=N switches to one
-	  curl "localhost:<port>/console"             the console lines so far     /reload (same profile: the browser storage stays)     /quit
+	  curl "localhost:<port>/console"             the console lines so far     /reload (same profile: the browser storage stays)     /open?u=<url> (a new tab, same profile)     /quit
 	Sound muted, WebGL through SwiftShader. Headed - run it under Xvfb.
 	PW_ROUTES='{"<url>": "<local file>"}' serves those URLs from local files, e.g. a stub of the CrazyGames SDK.
 */
@@ -54,6 +54,7 @@ const { chromium } = require('playwright');
 				case '/page': page = context.pages()[Number(q('i'))]; await page.bringToFront(); break;
 				case '/console': return res.end(lines.join('\n') + '\n');
 				case '/reload': await page.reload(); break;
+				case '/open': page = await context.newPage(); await page.goto(q('u')); break;
 				case '/quit': res.end('bye\n'); await browser.close(); process.exit(0);
 			}
 			res.end('ok\n');
