@@ -237,6 +237,16 @@ namespace augs {
 		return "";
 	}
 }
+#elif PLATFORM_MACOS
+namespace augs {
+	std::string get_device_name() {
+		/*
+			A Mac's hostname is usually its owner's full name - only the system is told.
+		*/
+
+		return "Mac";
+	}
+}
 #else
 #include <unistd.h>
 
