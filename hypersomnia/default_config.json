@@ -483,6 +483,10 @@
         "report_ranked_match_url": "https://hypersomnia.io/report_match",
         "report_ranked_match_aux_endpoints": [],
 
+        // More masterservers to be listed on besides "notified_server_list", e.g. ["masterserver.example.com:8430"].
+        // They get the same heartbeats (each signed with its own cookie); WebRTC signalling and "official" come from the main one.
+        "additional_notified_server_lists": [],
+
         // Which identity brokers' certs this server trusts, as public keys in hex - hypersomnia.io's by default.
         // E.g. an infrastructure of one's own, or hypersomnia.io's new and old key while it is rotated. Empty: only self-signed certs (key_ accounts).
         "identity_broker_public_keys": ["b1f8f0b2711cf0596c83b17f8d8904f547c2243705edc1e8c560fcc126c5cfbc"],

@@ -119,7 +119,7 @@ class server_setup :
 	*/
 
 	masterserver_cookie_type masterserver_cookie = {};
-	mutable std::array<uint64_t, 4> recent_masterserver_nonces = {};
+	mutable std::array<uint64_t, 16> recent_masterserver_nonces = {};
 	mutable uint32_t next_masterserver_nonce = 0;
 	bool resent_heartbeat_for_cookie = false;
 
@@ -132,6 +132,9 @@ class server_setup :
 
 	template <class Request>
 	void sign_for_masterserver(Request& request) const;
+
+	template <class Request>
+	void sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const;
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
@@ -260,6 +263,22 @@ class server_setup :
 
 	std::optional<netcode_address_t> resolved_server_list_addr;
 	std::optional<netcode_address_t> external_address;
+
+	/*
+		More masterservers to be listed on (additional_notified_server_lists): each gets the same heartbeats,
+		signed with its own cookie, and the goodbye. Signalling, the external address and "official" come from the main one.
+	*/
+
+	struct additional_server_list {
+		std::string address;
+		std::future<resolve_address_result> future_resolved;
+		std::optional<netcode_address_t> resolved;
+		net_time_t when_last_resolved = 0;
+		masterserver_cookie_type cookie = {};
+	};
+
+	std::vector<additional_server_list> additional_server_lists;
+	void sync_additional_server_lists();
 #endif
 
 	net_time_t server_time = 0.0;

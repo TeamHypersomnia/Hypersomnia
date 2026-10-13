@@ -1203,13 +1203,18 @@ void server_setup::reset_afk_timer() {
 
 template <class Request>
 void server_setup::sign_for_masterserver(Request& request) const {
+	sign_for_masterserver(request, masterserver_cookie);
+}
+
+template <class Request>
+void server_setup::sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const {
 	auto nonce = uint64_t(0);
 	randombytes_buf(&nonce, sizeof(nonce));
 
 	recent_masterserver_nonces[next_masterserver_nonce % recent_masterserver_nonces.size()] = nonce;
 	++next_masterserver_nonce;
 
-	if (!::sign_server_request(request, this_server_key, masterserver_cookie, nonce)) {
+	if (!::sign_server_request(request, this_server_key, cookie, nonce)) {
 		LOG("Failed to sign a request to the masterserver with the server key.");
 	}
 }
@@ -1230,6 +1235,23 @@ void server_setup::send_goodbye_to_masterserver() {
 
 		for (int i = 0; i < 5; ++i) {
 			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
+		}
+	}
+
+	if (has_sent_any_heartbeats()) {
+		for (const auto& list : additional_server_lists) {
+			if (!list.resolved.has_value()) {
+				continue;
+			}
+
+			auto goodbye = masterserver_in::goodbye {};
+			sign_for_masterserver(goodbye, list.cookie);
+
+			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
+
+			for (int i = 0; i < 5; ++i) {
+				server->send_udp_packet(*list.resolved, goodbye_bytes.data(), goodbye_bytes.size());
+			}
 		}
 	}
 #endif
@@ -2461,10 +2483,36 @@ bool server_setup::handle_masterserver_response(
 			*/
 
 			{
-				const bool from_masterserver = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
 				const bool our_nonce = typed_request.nonce != 0 && found_in(recent_masterserver_nonces, typed_request.nonce);
 
-				if (!from_masterserver || !our_nonce) {
+				if (!our_nonce) {
+					return true;
+				}
+
+				/*
+					An additional server list keeps only its cookie - the rest (official or not) is the main one's to say.
+				*/
+
+				for (auto& list : additional_server_lists) {
+					if (list.resolved.has_value() && *list.resolved == from) {
+						/*
+							A heartbeat without its cookie only got one - sent again right away, once per new cookie.
+						*/
+
+						const bool new_cookie = list.cookie != typed_request.cookie;
+						list.cookie = typed_request.cookie;
+
+						if (!typed_request.accepted && new_cookie) {
+							when_last_sent_heartbeat_to_server_list = 0;
+						}
+
+						return true;
+					}
+				}
+
+				const bool from_masterserver = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
+
+				if (!from_masterserver) {
 					return true;
 				}
 			}
@@ -2619,7 +2667,64 @@ void server_setup::resolve_server_list() {
 	}
 }
 
+void server_setup::sync_additional_server_lists() {
+	const auto& configured = private_vars.additional_notified_server_lists;
+
+	const bool same = configured.size() == additional_server_lists.size() && std::equal(
+		configured.begin(),
+		configured.end(),
+		additional_server_lists.begin(),
+		[](const auto& address, const auto& list) { return address == list.address; }
+	);
+
+	if (same) {
+		return;
+	}
+
+	additional_server_lists.clear();
+
+	for (const auto& address : configured) {
+		auto list = additional_server_list();
+		list.address = address;
+		additional_server_lists.emplace_back(std::move(list));
+	}
+}
+
 void server_setup::resolve_heartbeat_host_if_its_time() {
+	if (server->is_running()) {
+		sync_additional_server_lists();
+
+		for (auto& list : additional_server_lists) {
+			if (valid_and_is_ready(list.future_resolved)) {
+				const auto result = list.future_resolved.get();
+
+				if (result.result == resolve_result_type::OK) {
+					if (result.addr != list.resolved) {
+						request_immediate_heartbeat();
+					}
+
+					list.resolved = result.addr;
+				}
+				else {
+					LOG("Could not resolve the additional server list %x: %x", list.address, result.report());
+				}
+			}
+
+			if (list.future_resolved.valid()) {
+				continue;
+			}
+
+			const bool due = !list.resolved.has_value() || server_time - list.when_last_resolved >= vars.resolve_server_list_address_once_every_secs;
+
+			if (due) {
+				if (auto parsed = parsed_url(list.address); parsed.valid()) {
+					list.future_resolved = async_resolve_address({ parsed.host, port_type(parsed.port) });
+					list.when_last_resolved = server_time;
+				}
+			}
+		}
+	}
+
 	if (!server_list_enabled()) {
 		return;
 	}
@@ -2798,10 +2903,6 @@ bool server_setup::is_ranked_server() const {
 }
 
 void server_setup::send_heartbeat_to_server_list() {
-#if BUILD_NATIVE_SOCKETS
-	ensure(resolved_server_list_addr.has_value());
-#endif
-
 	const auto& arena = get_arena_handle();
 
 	server_heartbeat heartbeat;
@@ -2931,6 +3032,29 @@ void server_setup::send_heartbeat_to_server_list() {
 		LOG("THE SERVER HAS SENT AN INVALID HEARTBEAT!!!");
 	}
 
+#if BUILD_NATIVE_SOCKETS
+	/*
+		The same heartbeat to every additional server list, signed with its own cookie.
+	*/
+
+	for (const auto& list : additional_server_lists) {
+		if (!list.resolved.has_value()) {
+			continue;
+		}
+
+		auto copy = heartbeat;
+		sign_for_masterserver(copy, list.cookie);
+
+		auto bytes = augs::to_bytes(masterserver_request(std::move(copy)));
+		server->send_udp_packet(*list.resolved, bytes.data(), bytes.size());
+	}
+
+	if (!resolved_server_list_addr.has_value()) {
+		sent_any_heartbeat = sent_any_heartbeat || !additional_server_lists.empty();
+		return;
+	}
+#endif
+
 	sign_for_masterserver(heartbeat);
 
 	heartbeat_buffer.clear();
@@ -2989,11 +3113,13 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 
 	const int times_to_send_first_time = 1;
 #else
-	if (!server_list_enabled()) {
-		return;
-	}
+	const bool any_additional = std::any_of(additional_server_lists.begin(), additional_server_lists.end(), [](const auto& list) {
+		return list.resolved.has_value();
+	});
 
-	if (resolved_server_list_addr == std::nullopt) {
+	const bool main_resolved = server_list_enabled() && resolved_server_list_addr.has_value();
+
+	if (!server->is_running() || (!main_resolved && !any_additional)) {
 		return;
 	}
 
