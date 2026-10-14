@@ -13,9 +13,8 @@
 /*
 	The player's identity - see identity_cert.h.
 
-	Every game has its account key (account.key in KEYS_DIR, the browser's key on the web; the Steam build only a new one
-	in memory each run - its account is the Steam one). It is also the session key: the game signs its connections with it,
-	and a cert names it.
+	Every game has its account key (account.key in KEYS_DIR, the browser's key on the web - in the Steam build never linked,
+	its account is the Steam one). It is also the session key: the game signs its connections with it, and a cert names it.
 	With nothing more, the game signs its own cert - the account "key_" and the key in hex - and never asks anyone.
 
 	An account the identity broker on hypersomnia.io vouches for (Steam, CrazyGames) is expected:

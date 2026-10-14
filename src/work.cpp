@@ -1847,8 +1847,8 @@ work_result work(
 #endif
 
 	/*
-		The account key (.keys/account.key, the browser's key on the web), created on the first start - the Steam build's is only
-		in memory, new each run.
+		The account key (.keys/account.key, the browser's key on the web), created on the first start - in the Steam build
+		only the session key of its Steam certs (never linked, no tabs to manage it).
 		Read at the start and after an import or a forget in the Account settings - a forgotten key is replaced by a new one
 		right away, since every connection needs a cert. A file changed outside the game counts from the next start.
 		See identity_session.h.
@@ -1856,11 +1856,6 @@ work_result work(
 
 	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
 
-	/*
-		Settings are shown on Backup for a key that does not read - once the main menu is up (a setup change closes them).
-	*/
-
-	WEBSTATIC bool key_unreadable_shown_wanted = false;
 	WEBSTATIC bool account_seed_read_once = false;
 
 	WEBSTATIC auto refresh_account_seed = [&]() {
@@ -1872,24 +1867,6 @@ work_result work(
 		}
 
 		account_seed_read_once = true;
-
-		/*
-			The Steam build keeps no account.key: its account is the Steam one (a cert by a ticket for every start),
-			so its key is only the session key - a new one in memory each run.
-		*/
-
-		if (is_steam_client) {
-			if (!account_seed.has_value()) {
-				account_seed = augs::ed25519_generate_seed();
-
-				if (account_seed.has_value()) {
-					identity->set_key(*account_seed, KEYS_DIR);
-					identity->on_key_created();
-				}
-			}
-
-			return;
-		}
 
 		const auto path = KEYS_DIR / identity_key::file_name;
 
@@ -1913,7 +1890,7 @@ work_result work(
 #if WEB_CRAZYGAMES || WEB_ITCH
 			const bool key_is_not_the_account = true;
 #else
-			const bool key_is_not_the_account = false;
+			const bool key_is_not_the_account = is_steam_client;
 #endif
 
 			if (key_is_not_the_account && identity_key::forget(path).has_value()) {
@@ -1922,7 +1899,7 @@ work_result work(
 				existed = false;
 			}
 			else {
-				key_unreadable_shown_wanted = true;
+				LOG("account.key is damaged - the game waits for it to be restored or replaced.");
 			}
 		}
 
@@ -2452,10 +2429,6 @@ work_result work(
 
 		settings_gui.key_damaged = account_seed_read_once && !account_seed.has_value();
 
-		if (key_unreadable_shown_wanted && main_menu != nullptr) {
-			key_unreadable_shown_wanted = false;
-			settings_gui.on_key_unreadable();
-		}
 
 		{
 			const auto now = augs::steady_secs();
@@ -2979,7 +2952,6 @@ work_result work(
 
 		if (!account_seed.has_value()) {
 			LOG("Not connecting without a readable account.key.");
-			key_unreadable_shown_wanted = true;
 			return false;
 		}
 

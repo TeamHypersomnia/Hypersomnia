@@ -580,12 +580,6 @@ std::optional<std::string> settings_gui_state::account_change_blocked() const {
 	return std::nullopt;
 }
 
-void settings_gui_state::on_key_unreadable() {
-	open();
-	active_pane = settings_pane::ACCOUNT;
-	active_account_pane = account_settings_pane::BACKUP;
-}
-
 std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
 	/*
 		The key the game plays with - the game reads the file, the settings never do.
@@ -971,20 +965,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			key_unreadable_since = now;
 		}
 
-		if (augs::exists(key_path) && now - key_unreadable_since > 2.0) {
+		if (augs::exists(key_path) && (key_damaged || now - key_unreadable_since > 2.0)) {
 #if PLATFORM_WEB
 			text_color("Your account key in this browser is damaged.\nRestore from your private key file, or start a new account.", red);
 #else
-			text_color("Your account.key file is damaged.\nPut back a copy you backed up, restore from your private key file,\nor start a new account (the damaged file is kept as a backup).", red);
+			text_color("Your account.key file is damaged.\nRestore from your private key file, put back a copy you backed up and start the game again,\nor start a new account (the damaged file is kept as a backup).", red);
 
 			if (ImGui::Button("Show key file in folder##Damaged")) {
 				window.reveal_in_explorer(key_path);
-			}
-
-			ImGui::SameLine();
-
-			if (ImGui::Button("Quit the game##Damaged")) {
-				quit_requested = true;
 			}
 #endif
 		}
@@ -1996,9 +1984,37 @@ void settings_gui_state::perform(
 	using namespace augs::imgui;
 
 	centered_size_mult = vec2::square(0.65f);
-	
+
+	/*
+		A damaged account.key: Backup in a modal over everything - restore the key, start a new account or quit -
+		the only thing to do until the key reads. Then the Account settings show how it went (e.g. the restored key).
+	*/
+
 	if (key_damaged) {
-		show = true;
+		was_key_damaged = true;
+
+		center_next_modal();
+		ImGui::OpenPopup("Your account key is damaged##Modal");
+
+		if (ImGui::BeginPopupModal("Your account key is damaged##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			perform_account_manage_pane(window);
+
+#if !PLATFORM_WEB
+			ImGui::Separator();
+
+			if (ImGui::Button("Quit the game##Damaged")) {
+				quit_requested = true;
+			}
+#endif
+
+			ImGui::EndPopup();
+		}
+
+		return;
+	}
+
+	if (std::exchange(was_key_damaged, false)) {
+		open();
 		active_pane = settings_pane::ACCOUNT;
 		active_account_pane = account_settings_pane::BACKUP;
 	}
@@ -2015,11 +2031,9 @@ void settings_gui_state::perform(
 
 		int field_id = 0;
 
-		if (!key_damaged) {
-			do_pretty_tabs(active_pane, [](const settings_pane) -> std::optional<std::string> { 
-				return std::nullopt; 
-			});
-		}
+		do_pretty_tabs(active_pane, [](const settings_pane) -> std::optional<std::string> { 
+			return std::nullopt; 
+		});
 
 		auto revert = make_revert_button_lambda(config, last_saved_config);
 
@@ -3750,7 +3764,7 @@ void settings_gui_state::perform(
 					No tab row for a single pane (the Steam build, CrazyGames, itch.io) - just its content.
 				*/
 
-				if (num_account_panes > 1 && !key_damaged) {
+				if (num_account_panes > 1) {
 					do_pretty_tabs(
 						active_account_pane,
 						[steam_icon_room](const account_settings_pane p) -> std::optional<std::string> {
