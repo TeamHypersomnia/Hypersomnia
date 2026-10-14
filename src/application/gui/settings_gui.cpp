@@ -959,24 +959,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			text("Your progress is on your Steam account - nothing to back up.\nOn another computer, link it with Steam too.\nTo restore another key or start a new account, unlink first.");
 
 			/*
-				A linked key's file can get damaged too - without the file, the link is lost at the next start.
-			*/
-
-			if (key_file_unreadable_with_key_in_use && seed.has_value()) {
-				text_color("Your account.key file is damaged - the game still has the key it read before.", orange);
-
-				if (ImGui::Button("Write the key back##Linked")) {
-					if (identity_key::save_replacing(key_path, *seed).has_value()) {
-						key_file_changed = true;
-						key_file_unreadable_with_key_in_use = false;
-					}
-					else {
-						account_message = std::string("Could not save the key.\n\nSee the logs.");
-					}
-				}
-			}
-
-			/*
 				Linked meanwhile (e.g. in the browser): the modals below are no longer drawn - closed,
 				or they would stay open unseen and block the rest.
 			*/
@@ -1001,24 +983,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	if (public_key.has_value()) {
 		key_unreadable_since = -1.0;
-
-		if (key_file_unreadable_with_key_in_use) {
-#if PLATFORM_WEB
-			text_color("The key saved in this browser is damaged - the game still has the one it started with.", orange);
-#else
-			text_color("Your account.key file is damaged - the game still has the key it read before.", orange);
-#endif
-
-			if (ImGui::Button("Write the key back") && seed.has_value()) {
-				if (identity_key::save_replacing(key_path, *seed).has_value()) {
-					key_file_changed = true;
-					key_file_unreadable_with_key_in_use = false;
-				}
-				else {
-					account_message = std::string("Could not save the key.\n\nSee the logs.");
-				}
-			}
-		}
 	}
 	else {
 		/*

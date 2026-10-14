@@ -1848,9 +1848,9 @@ work_result work(
 
 	/*
 		"This computer": the key every game has (.keys/account.key, the browser's key on the web), created on the first start.
-		Read at the start, when the window gets the focus back (a key pasted into the file meanwhile) and after an import
-		or a forget in the Account settings - a forgotten key is replaced by a new one right away, since every connection
-		needs a cert. See identity_session.h.
+		Read at the start and after an import or a forget in the Account settings - a forgotten key is replaced by a new one
+		right away, since every connection needs a cert. A file changed outside the game counts from the next start.
+		See identity_session.h.
 	*/
 
 	WEBSTATIC std::optional<augs::ed25519_seed_type> account_seed;
@@ -1861,15 +1861,10 @@ work_result work(
 
 	WEBSTATIC bool key_unreadable_shown_wanted = false;
 	WEBSTATIC bool account_seed_read_once = false;
-	WEBSTATIC bool window_was_active = true;
 
 	WEBSTATIC auto refresh_account_seed = [&]() {
-		const bool active = window.is_active();
-		const bool focused_again = active && !window_was_active;
-		window_was_active = active;
-
 		const bool changed_in_settings = std::exchange(settings_gui.key_file_changed, false);
-		const bool wanted = !account_seed_read_once || focused_again || changed_in_settings;
+		const bool wanted = !account_seed_read_once || changed_in_settings;
 
 		if (!wanted) {
 			return;
@@ -1879,32 +1874,9 @@ work_result work(
 
 		account_seed_read_once = true;
 
-		/*
-			A file that is there but could not be read this once (e.g. mid-write by an editor) keeps the key we had.
-		*/
-
 		bool existed = augs::exists(path);
 
-		if (!existed && account_seed.has_value() && !changed_in_settings) {
-			/*
-				Gone while the game runs (e.g. moved away as a backup): the key the game has is written back.
-				A new account is made only at the first start or by Start a new account.
-			*/
-
-			LOG("account.key is gone - writing back the key in use.");
-
-			if (identity_key::save_replacing(path, *account_seed).has_value()) {
-				existed = true;
-			}
-		}
-
 		const auto loaded = existed ? identity_key::load(path) : identity_key::load_or_create(path);
-
-		/*
-			Damaged while the game plays with the key it read before: Backup offers to write that one back.
-		*/
-
-		settings_gui.key_file_unreadable_with_key_in_use = !loaded.has_value() && account_seed.has_value();
 
 		if (loaded.has_value()) {
 			account_seed = loaded;

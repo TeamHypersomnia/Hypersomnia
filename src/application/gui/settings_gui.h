@@ -422,7 +422,6 @@ public:
 
 	bool wants_crazygames_sign_in = false;
 	bool key_file_changed = false;
-	bool key_file_unreadable_with_key_in_use = false;
 
 	/*
 		Set by the game: a ranked match is on - the key may not be replaced meanwhile.
