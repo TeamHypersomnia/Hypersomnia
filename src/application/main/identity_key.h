@@ -26,15 +26,15 @@ namespace identity_key {
 	inline constexpr std::string_view export_prefix = "hypersomnia-key-v1:";
 
 	/*
-		Signed to link the key to a Steam account on hypersomnia.io with a one-time code shown there.
-		The signature also names the Steam account (e.g. "steam_7656..."), the one the player was shown and agreed to.
+		Signed to link the key to a Steam account on hypersomnia.io: the game's random state for this linking -
+		the Steam account is whoever confirms the page opened with it.
 	*/
 
-	std::string link_message(const std::string& code, const std::string& steam_account);
+	std::string link_message(const std::string& state);
 
 	/*
 		Signed to unlink the key from whatever Steam account it is linked to, from the game itself -
-		e.g. after linking it with a code someone else gave. unix_time keeps an old request from being reused later.
+		e.g. after confirming a link page someone else sent. unix_time keeps an old request from being reused later.
 	*/
 
 	std::string unlink_message(const augs::ed25519_public_key_type& public_key, int64_t unix_time);

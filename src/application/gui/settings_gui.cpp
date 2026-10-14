@@ -502,11 +502,9 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 
 	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
 
-	if (waiting || link_code_from_steam.has_value()) {
+	if (waiting) {
 		link_flow = link_flow_type::IDLE;
 		link_flow_message.clear();
-		link_target_request.reset();
-		link_code_from_steam.reset();
 		steam_link_state.clear();
 		link_result_request.reset();
 
@@ -710,12 +708,8 @@ void settings_gui_state::on_key_replaced_outside() {
 	*/
 
 	link_flow = link_flow_type::IDLE;
-	link_answer_lost = false;
-	link_lost_reason.clear();
-	link_code_from_steam.reset();
-	link_target_request.reset();
 	link_result_request.reset();
-	link_request.reset();
+	unlink_request.reset();
 	steam_link_state.clear();
 	confirm_unlink = false;
 	unlinking = false;
@@ -1445,46 +1439,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_flow_succeeded = succeeded;
 		link_flow_conflict = conflict;
 		link_flow_message_is_warning = false;
-		link_answer_lost = false;
-		link_lost_reason.clear();
 		link_flow_message = message;
 
 		if (succeeded) {
 			account_profile_wanted = true;
-		}
-	};
-
-	/*
-		The code the browser brought back: whose Steam account it is (name and avatar, shown while linking), then the link.
-		It came only to this game (its state), from the player's own sign-in - nothing to confirm.
-	*/
-
-	auto request_link_target = [&](const std::string& code) {
-		link_flow_message.clear();
-		link_target_code = code;
-		link_target_request = get_from_website("/link_key/info?code=" + code);
-	};
-
-	auto link_to_confirmed_target = [&](const link_target& target) {
-		if (!has_key) {
-			return;
-		}
-
-		if (const auto signature = augs::ed25519_sign(*seed, identity_key::link_message(target.code, target.steam_account))) {
-			link_request_is_unlink = false;
-			link_flow = F::LINKING;
-
-			/*
-				With the device and its system - the site shows them next to the key right away.
-			*/
-
-			link_request = get_from_website(typesafe_sprintf(
-				"/link_key/link?public_key=%x&code=%x&signature=%x%x",
-				augs::bytes_to_hex(*public_key),
-				target.code,
-				augs::bytes_to_hex(*signature),
-				identity != nullptr ? identity->device_query() : std::string()
-			));
 		}
 	};
 
@@ -1498,9 +1456,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
 
 		if (const auto signature = augs::ed25519_sign(*seed, identity_key::unlink_message(*public_key, unix_time))) {
-			link_request_is_unlink = true;
-
-			link_request = get_from_website(typesafe_sprintf(
+			unlink_request = get_from_website(typesafe_sprintf(
 				"/link_key/unlink?public_key=%x&timestamp=%x&signature=%x",
 				augs::bytes_to_hex(*public_key),
 				unix_time,
@@ -1538,7 +1494,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			text_disabled("All progress counts towards this Steam account.");
 		}
 
-		if (!augs::in_progress(link_request) && has_key && ImGui::Button("Unlink from Steam...")) {
+		if (!augs::in_progress(unlink_request) && has_key && ImGui::Button("Unlink from Steam...")) {
 			/*
 				Not during a ranked match: its rejoin is on the Steam account.
 			*/
@@ -1572,16 +1528,17 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	/*
-		The sign-in through Steam in the browser, with a random state only this game knows, its public key and the device
-		(shown on the page the player confirms). The code then waits on hypersomnia.io under the state - the game asks for it.
+		The sign-in through Steam in the browser, with a random state only this game knows, signed with the key, and the
+		device (shown on the page the player confirms). Confirmed there, the key is linked - the game asks how it went.
 	*/
 
 	auto open_steam_sign_in = [&]() {
 		augs::open_url(typesafe_sprintf(
-			"%x/link_key/start?state=%x&key=%x%x",
+			"%x/link_key/start?state=%x&key=%x&sig=%x%x",
 			website_url,
 			steam_link_state,
 			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
+			steam_link_signature,
 			identity != nullptr ? identity->device_query() : std::string()
 		));
 	};
@@ -1598,6 +1555,14 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_result_request.reset();
 		link_result_asked_at = -1000.0;
 
+		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state)) : std::nullopt;
+
+		if (!signature.has_value()) {
+			finish(false, "Couldn't sign the link with your key.\n\nSee the logs.");
+			return;
+		}
+
+		steam_link_signature = augs::bytes_to_hex(*signature);
 		open_steam_sign_in();
 	};
 
@@ -1610,21 +1575,15 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (check == L::LINKED) {
 			/*
-				The broker may not have reached Steam for the name - the one the site showed for the code then.
-			*/
-
-			const auto name = identity->get_link_check_profile().name.empty() ? linked_name : identity->get_link_check_profile().name;
-
-			/*
-				The avatar as the broker has it - else the one the site showed for the code stays.
+				The name and avatar as the broker has them.
 			*/
 
 			if (upload_link_avatar(identity->get_link_check_profile().avatar)) {
 				linked_has_avatar = true;
 			}
 
+			linked_name = identity->get_link_check_profile().name;
 			identity->clear_link_check();
-			linked_name = name;
 			finish(true, "Progress now counts towards your Steam account.");
 		}
 		else if (check == L::NOT_LINKED) {
@@ -1633,9 +1592,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			if (link_flow == F::CHECKING_BEFORE) {
 				link_flow = F::NEEDS_STEAM_SIGN_IN;
 				start_steam_sign_in();
-			}
-			else if (link_answer_lost) {
-				finish(false, link_lost_reason.empty() ? typesafe_sprintf("Linking failed: no answer from %x.\nTry again.", website_url) : "Linking failed:\n" + link_lost_reason);
 			}
 			else {
 				finish(false, "The link did not take effect. Try again.");
@@ -1650,14 +1606,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				*/
 
 				finish(false, refusal);
-			}
-			else if (link_flow == F::CHECKING_AFTER && link_answer_lost) {
-				/*
-					Asked again quietly - a link that did happen is picked up then.
-				*/
-
-				identity->recheck_link_quietly();
-				finish(false, typesafe_sprintf("Couldn't reach %x - it is not known whether the key got linked.\nTry again later.", website_url));
 			}
 			else if (link_flow == F::CHECKING_AFTER) {
 				/*
@@ -1685,7 +1633,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	/*
-		Asked every second while the browser is out - 204 until the player confirmed there, then the code once.
+		Asked every second while the browser is out - 204 until the player confirmed there, then how it went once:
+		{"linked": "steam_..."} - the Steam cert the broker now gives for the key is what links it here -
+		or {"error", "conflict"}.
 	*/
 
 	if (link_flow == F::NEEDS_STEAM_SIGN_IN && !steam_link_state.empty()) {
@@ -1698,13 +1648,23 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				try {
 					const auto doc = augs::json_document_from(response.body);
 
-					if (doc.IsObject() && doc.HasMember("code") && doc["code"].IsString()) {
+					if (doc.IsObject() && doc.HasMember("linked") && doc["linked"].IsString()) {
 						steam_link_state.clear();
-						link_code_from_steam = std::string(doc["code"].GetString());
+
+						if (identity != nullptr) {
+							identity->start_link_check(identity_input.broker_url);
+							link_flow = F::CHECKING_AFTER;
+						}
+					}
+					else if (doc.IsObject() && doc.HasMember("error") && doc["error"].IsString()) {
+						steam_link_state.clear();
+
+						const bool conflict = doc.HasMember("conflict") && doc["conflict"].IsBool() && doc["conflict"].GetBool();
+						finish(false, std::string("Linking failed:\n") + doc["error"].GetString(), conflict);
 					}
 				}
 				catch (...) {
-					LOG("Unreadable answer for the link code: %x", response.body);
+					LOG("Unreadable answer for the link: %x", response.body);
 				}
 			}
 		}
@@ -1714,83 +1674,17 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	}
 
-	if (link_code_from_steam.has_value() && !augs::in_progress(link_target_request) && has_key) {
-		const auto code = *link_code_from_steam;
-		link_code_from_steam.reset();
-		request_link_target(code);
-	}
-
-	if (augs::is_ready(link_target_request)) {
-		const auto response = augs::get_once(link_target_request);
-
-		const auto target = [&]() -> std::optional<link_target> {
-			if (!httplib_utils::successful(response.status)) {
-				return std::nullopt;
-			}
-
-			try {
-				const auto doc = augs::json_document_from(response.body);
-
-				if (doc.IsObject() && doc.HasMember("steam_id") && doc["steam_id"].IsString()) {
-					auto result = link_target { link_target_code, doc["steam_id"].GetString(), "" };
-
-					if (doc.HasMember("name") && doc["name"].IsString()) {
-						result.name = doc["name"].GetString();
-					}
-
-					if (doc.HasMember("avatar") && doc["avatar"].IsString()) {
-						if (const auto bytes = augs::from_base64(doc["avatar"].GetString())) {
-							result.has_avatar = upload_link_avatar(*bytes);
-						}
-					}
-
-					return result;
-				}
-			}
-			catch (...) {
-
-			}
-
-			return std::nullopt;
-		}();
-
-		if (target.has_value()) {
-			linked_name = target->name;
-			linked_has_avatar = target->has_avatar;
-			link_to_confirmed_target(*target);
-
-			if (link_flow != F::LINKING) {
-				finish(false, "Couldn't sign the link with your key.\n\nSee the logs.");
-			}
-		}
-		else if (httplib_utils::successful(response.status)) {
-			finish(false, "Linking failed:\nunexpected response from the website.");
-		}
-		else {
-			finish(false, response_error(response, "Linking"));
-		}
-	}
-
-	if (augs::is_ready(link_request)) {
-		const auto response = augs::get_once(link_request);
+	if (augs::is_ready(unlink_request)) {
+		const auto response = augs::get_once(unlink_request);
 		const bool answer_lost = response.status <= 0 || response.status >= 500;
 
-		if (!link_request_is_unlink && answer_lost && identity != nullptr) {
-			/*
-				The code is used up either way - whether the site linked is asked instead of guessed.
-			*/
+		unlinking = false;
 
-			link_answer_lost = true;
-			link_lost_reason = augs::plain_text_reason(response).value_or(std::string());
-			identity->start_link_check(identity_input.broker_url);
-			link_flow = F::CHECKING_AFTER;
-		}
-		else if (link_request_is_unlink && answer_lost) {
+		if (answer_lost) {
 			/*
 				Unlinking again is harmless - whether it happened is asked quietly meanwhile.
 			*/
 
-			unlinking = false;
 			unlink_succeeded = false;
 			unlink_result = augs::plain_text_reason(response).value_or(
 				typesafe_sprintf("Couldn't reach %x - it is not known whether the key got unlinked.\nTry again.", website_url)
@@ -1801,45 +1695,28 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 		}
 		else if (httplib_utils::successful(response.status)) {
-			if (!link_request_is_unlink) {
-				/*
-					Linked on the site - the Steam cert the broker now gives for the key is what links it here.
-				*/
-
-				if (identity != nullptr) {
-					identity->start_link_check(identity_input.broker_url);
-					link_flow = F::CHECKING_AFTER;
-				}
+			if (identity != nullptr) {
+				identity->on_unlinked();
 			}
-			else {
-				if (identity != nullptr) {
-					identity->on_unlinked();
+
+			/*
+				{"unlinked": "key_...", "from": "steam_..." or null}
+			*/
+
+			unlink_succeeded = [&]() {
+				try {
+					const auto doc = augs::json_document_from(response.body);
+					return doc.IsObject() && doc.HasMember("from") && doc["from"].IsString();
 				}
-
-				unlinking = false;
-				/*
-					{"unlinked": "key_...", "from": "steam_..." or null}
-				*/
-
-				unlink_succeeded = [&]() {
-					try {
-						const auto doc = augs::json_document_from(response.body);
-						return doc.IsObject() && doc.HasMember("from") && doc["from"].IsString();
-					}
-					catch (...) {
-						return false;
-					}
-				}();
-				unlink_result = unlink_succeeded ? std::string("Unlinked") : std::string("This key was not linked to any Steam account.");
-			}
-		}
-		else if (link_request_is_unlink) {
-			unlinking = false;
-			unlink_succeeded = false;
-			unlink_result = response_error(response, "Unlinking");
+				catch (...) {
+					return false;
+				}
+			}();
+			unlink_result = unlink_succeeded ? std::string("Unlinked") : std::string("This key was not linked to any Steam account.");
 		}
 		else {
-			finish(false, response_error(response, "Linking"), response.status == 409);
+			unlink_succeeded = false;
+			unlink_result = response_error(response, "Unlinking");
 		}
 	}
 
@@ -1856,11 +1733,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				link_flow = F::IDLE;
 				link_flow_message.clear();
 
-				/*
-					A code still on its way would go on linking by itself later.
-				*/
-
-				link_target_request.reset();
 				steam_link_state.clear();
 				link_result_request.reset();
 
@@ -1871,15 +1743,12 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				ImGui::CloseCurrentPopup();
 			};
 
-			const bool requesting = augs::in_progress(link_request) || augs::in_progress(link_target_request);
-
-			if (link_flow == F::LINKING || link_flow == F::CHECKING_AFTER) {
+			if (link_flow == F::CHECKING_AFTER) {
 				/*
-					Laid out as the result, which mostly comes a few frames later - the modal does not flicker in between.
+					Linked on the site - the Steam cert with the name and avatar comes a moment later.
 				*/
 
 				spinner_line("Linking...", white);
-				link_avatar_and_name(linked_name, linked_has_avatar);
 				text("Progress will count towards your Steam account.");
 
 				ImGui::Separator();
@@ -1914,12 +1783,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 				ImGui::Separator();
 
-				{
-					auto scope = maybe_disabled_cols({}, requesting);
-
-					if (ImGui::Button("Open it again##LinkFlow") && !requesting) {
-						open_steam_sign_in();
-					}
+				if (ImGui::Button("Open it again##LinkFlow")) {
+					open_steam_sign_in();
 				}
 
 				ImGui::SameLine();
@@ -2056,7 +1921,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 						else {
 							unlinked_name = shown_name;
 							unlink();
-							unlinking = augs::in_progress(link_request);
+							unlinking = augs::in_progress(unlink_request);
 						}
 					}
 				}

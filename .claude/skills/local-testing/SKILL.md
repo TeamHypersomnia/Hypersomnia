@@ -72,10 +72,10 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
 - The web account is a key in its own IDBFS database (`/hypersomnia_keys/account.key`, apart from `/user`), made on the first start. Link with Steam (Settings - Account)
-  opens `<website>/link_key/start?state=..&key=..&device=..&os=..` in a new tab (native: in the browser); signed in through Steam,
-  the player confirms the device on that page, and the code waits on the site under the state - the game asks
-  `/link_key/result?state=..` every second and takes it (no redirect back, no local listener; the same natively, in a tab or an iframe).
-  No code is ever typed; `/link` only says where to start.
+  opens `<website>/link_key/start?state=..&key=..&sig=..&device=..&os=..` (the state signed with the key) in a new tab (native:
+  in the browser); signed in through Steam, the player confirms the device on that page and the key is linked at once - the game
+  asks `/link_key/result?state=..` every second and learns how it went (no redirect back, no local listener, no code; the same
+  natively, in a tab or an iframe).
 
 ## UI checks
 
@@ -92,8 +92,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
   The game never opens a real browser there: `fake_bin/xdg-open` writes the URLs to `<client>/opened_urls`.
 - `browser_sign_in.sh [steam id64]` (with `OPENED_URLS=<client>/opened_urls`) plays the player's browser for Link with Steam:
-  opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then fetches the code itself.
-  A code is made for the key in the URL - a link someone else opened gives a code `/link_key/link` refuses for any other key.
+  opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then learns it by itself.
 - account.key is read only at the start and after Restore / Start a new account - a key swapped on disk counts from the
   next start (restart the client to test it).
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
@@ -102,7 +101,8 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   Link with Steam... 397,337. Every confirmation and result is a centered modal. Backup of a key linked to Steam
   says only "Your progress is on your Steam account - nothing to back up...".
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
-- `link_code.sh <key hex> [steam id64]` - a link code made for that key from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game
+- `link_key.py <account.key> [steam id64]` - links that key to a fake Steam session's account, as confirming the game's
+  link page would (prints what /link_key/result gives the game)
   (a Steam account takes at most 32 keys - a test account full of them answers 409).
 - `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
@@ -185,8 +185,8 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/link_key/start?state=..&key=..` (the confirm page); a POST of the same fields keeps a code
-  for that key under the state, which `GET /link_key/result?state=..` gives once;
+  `curl -b "$cookie"` then reaches `/link_key/start?state=..&key=..&sig=..` (the confirm page); a POST of the same fields links
+  the key, and `GET /link_key/result?state=..` gives `{"linked"}` or `{"error"}` once;
   `POST /profile/unlink_key` with `key=key_...` unlinks.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
   fake xdg-open: Settings - Account - Link with Steam - Link with Steam..., then `browser_sign_in.sh` against that site

@@ -237,28 +237,22 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	double key_unreadable_since = -1.0;
 
-	augs::async_response_ptr link_request;
-	bool link_request_is_unlink = false;
-
-	struct link_target {
-		std::string code;
-		std::string steam_account;
-		std::string name;
-		bool has_avatar = false;
-	};
-
-	augs::async_response_ptr link_target_request;
-	std::string link_target_code;
-
-	std::string steam_link_state;
+	augs::async_response_ptr unlink_request;
 
 	/*
-		While the browser is out: the game asks hypersomnia.io every second for the code waiting under its state.
+		This linking's random state and the key's signature of it - the page opened in the browser links the key at once
+		when the player confirms there.
+	*/
+
+	std::string steam_link_state;
+	std::string steam_link_signature;
+
+	/*
+		While the browser is out: the game asks hypersomnia.io every second how the link for its state went.
 	*/
 
 	augs::async_response_ptr link_result_request;
 	double link_result_asked_at = -1000.0;
-	std::optional<std::string> link_code_from_steam;
 
 	/*
 		"Link with Steam..." runs in one dimmed modal, from asking whether the key is linked already to the result.
@@ -268,7 +262,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 		IDLE,
 		CHECKING_BEFORE,
 		NEEDS_STEAM_SIGN_IN,
-		LINKING,
 		CHECKING_AFTER,
 		DONE
 	};
@@ -280,18 +273,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool link_flow_succeeded = false;
 	bool link_flow_conflict = false;
 	bool link_flow_message_is_warning = false;
-
-	/*
-		The site's answer to the link did not arrive (or it failed on its side): whether it linked is asked after.
-	*/
-
-	bool link_answer_lost = false;
-
-	/*
-		What the site said when it failed on its side (a 5xx with a reason), shown if the link did not happen.
-	*/
-
-	std::string link_lost_reason;
 
 	/*
 		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
