@@ -237,7 +237,13 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	double key_unreadable_since = -1.0;
 
-	augs::async_response_ptr unlink_request;
+	/*
+		"Unlink from Steam...": the page on hypersomnia.io with this state, asked every second how it went.
+	*/
+
+	std::string unlink_state;
+	augs::async_response_ptr unlink_result_request;
+	double unlink_result_asked_at = -1000.0;
 
 	/*
 		This linking's random state and the key's signature of it - the page opened in the browser links the key at once

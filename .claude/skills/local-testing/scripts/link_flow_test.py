@@ -2,7 +2,7 @@
 """
 The whole key <-> Steam link flow against a test site (broker.sh), as the game does it - without Steam:
 a fake Steam session in the site's DB, the confirm page /link_key/start?state&key&sig, its POST (links at once),
-/link_key/result for the game, a cert for the key (now the Steam account), the signed GET /link_key/unlink,
+/link_key/result for the game, a cert for the key (now the Steam account), the unlink page and its POST,
 a cert again (the key's own account), bans, a page for another key.
 Usage: SESSION_SECRET=<the site's> link_flow_test.py <site dir> <site url>
 """
@@ -58,6 +58,14 @@ def result_for(state):
     # What the game asks every second: how the link for its state went, once
     status, body, _ = get('/link_key/result?state=' + state)
     return json.loads(body) if status == 200 else None
+
+def unlink(cookie_of=None):
+    # "Unlink from Steam..." in the game: the page signed in as the account, its [Unlink this game key]
+    state = secrets.token_hex(16)
+    fields = { 'state': state, 'key': pub, 'device': 'test', 'os': 'linux' }
+    page_status, page, _ = get('/link_key/unlink?' + urllib.parse.urlencode(fields), cookie_of or cookie)
+    status, body, _ = post('/link_key/unlink', fields, cookie_of or cookie)
+    return page_status, page, status, result_for(state)
 
 def link(signer=None):
     state = secrets.token_hex(16)
@@ -135,28 +143,27 @@ check('a state links once', status == 409, '%s %s' % (status, body[:100]))
 check('cert after linking is the Steam account', cert_account() == 'steam_' + steam_id)
 check('progress moved to the Steam account', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
 
-ts = int(time.time())
-unlink_sig = key.sign(('hypersomnia-unlink-v1 %s %d' % (pub, ts)).encode()).hex()
-status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts - 3600, unlink_sig))
-check('unlink refuses another timestamp', status == 401, body)
-status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts, unlink_sig))
-check('unlink by GET', status == 200 and json.loads(body).get('from') == 'steam_' + steam_id, body)
+
+status, _, headers = get('/link_key/unlink?state=%s&key=%s' % (secrets.token_hex(16), pub))
+check('the unlink page without a session goes to Steam sign in', status == 302 and '/auth/steam' in headers.get('Location', ''))
+page_status, page, status, result = unlink()
+check('the unlink page shows the device and one button', page_status == 200 and 'Unlink this game key' in page and 'test' in page)
+check('unlink on that page, the game learns it', status == 200 and result == { 'unlinked': 'steam_' + steam_id }, str(result))
 
 check('cert after unlinking is the key again', cert_account() == 'key_' + pub)
 check('progress stays with the Steam account after the unlink', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
 
-status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts, unlink_sig))
-check('a signed unlink can not be replayed', status == 401, body)
+page_status, page, status, result = unlink()
+check('a key not linked: the page says so', page_status == 409 and 'not linked' in page and 'not linked' in (result or {}).get('error', ''), str(result))
 
 # Bans: a key unlinked from a banned Steam account stays banned; a banned key can not be linked
 status, result = link()
 check('relink', status == 200 and result == { 'linked': 'steam_' + steam_id }, str(result))
 with db:
     db.execute('INSERT OR IGNORE INTO broker_bans (account, reason) VALUES (?, ?)', ('steam_' + steam_id, 'Test ban.'))
-ts2 = ts + 1
-unlink_sig2 = key.sign(('hypersomnia-unlink-v1 %s %d' % (pub, ts2)).encode()).hex()
-status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts2, unlink_sig2))
-check('unlink from a banned account', status == 200, body)
+
+page_status, page, status, result = unlink()
+check('unlink from a banned account', status == 200, str(result))
 check('the unlinked key is banned too', cert_account().startswith('HTTP 403'), cert_account())
 status, result = link()
 check('a banned key can not be linked (the game learns why)', status == 403 and 'banned' in (result or {}).get('error', ''), str(result))

@@ -129,7 +129,7 @@ the link page in the browser); a valid steam.cert is used at once after a restar
 after loading, a dimmed "Signing in to your Steam account..."; a dead broker gives one "Not signed in" message per run (with
 Join anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
 "Signed in to Steam" at the top; Restore shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
-Continue unlinked); a key unlinked elsewhere silently loses its steam.cert; a damaged account.key holds Settings on Backup.
+Continue unlinked); a key unlinked elsewhere silently loses its steam.cert; a damaged account.key shows Backup in a modal.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
@@ -186,7 +186,8 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
   `curl -b "$cookie"` then reaches `/link_key/start?state=..&key=..&sig=..` (the confirm page); a POST of the same fields links
   the key, and `GET /link_key/result?state=..` gives `{"linked"}` or `{"error"}` once;
-  `POST /profile/unlink_key` with `key=key_...` unlinks.
+  `POST /profile/unlink_key` with `key=key_...` unlinks; the game's Unlink from Steam... opens `/link_key/unlink?state=..&key=..`
+  (one button, POSTs the same fields) and asks `/link_key/result` like linking - `browser_sign_in.sh` clicks either page.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
   fake xdg-open: Settings - Account - Link with Steam - Link with Steam..., then `browser_sign_in.sh` against that site
   (it needs the site's session secret for the fake Steam session). Check with `db.sh show`.
