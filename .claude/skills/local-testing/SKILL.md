@@ -169,10 +169,14 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 `run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/.keys/account.key`,
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
-- **Server keys from the list:** only an official server's key (official_servers.d) is expected from the list - a mismatch says
-  "misconfigured or under maintenance", no Connect anyway. A community server's list key is ignored: the first join takes the
-  key it presents (known_servers), later ones warn with Connect anyway. Test the official case with `run_match.sh`'s server
-  (its key in `official_servers.d/pl`) restarted with a new key.
+- **Server keys from the list (remote_e2e/community.sh on arena):** a join from the list always expects the list's key
+  (official or community) - a mismatch says "doesn't match the server list ... Refresh the list and join again" (no Connect
+  anyway; Go back refreshes the list). A list key other than the one remembered (known_servers) asks "Server key changed"
+  before connecting; its Connect anyway still expects the list's key. A join by an address not on the list: known_servers,
+  Connect anyway takes any key (SSH). `community.sh start` - a community server on 9005 with a new key each start, listed on
+  the test master; `crash` then `start silent` - a server whose list entry (60 s) keeps the previous key. Never `kill -9`
+  the pid file's pid (it is `timeout`'s). A client with `"server_list_provider": "http://<arenaus>:18420"`: open Browse
+  servers, restart the server, join the row - stale list: the message; Go back, join: the popup; Connect anyway: connected.
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one

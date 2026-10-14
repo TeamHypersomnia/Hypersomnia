@@ -2412,6 +2412,12 @@ work_result work(
 	WEBSTATIC bool join_without_sign_in_once = false;
 	WEBSTATIC std::optional<int> retry_attempts_before;
 	WEBSTATIC std::optional<simple_popup> sign_in_popup;
+
+	/*
+		A join from the server list to a server that showed another key the last time - asked before connecting.
+	*/
+
+	WEBSTATIC std::optional<simple_popup> key_changed_popup;
 	WEBSTATIC bool sign_in_popup_before_connect = false;
 
 	WEBSTATIC bool had_valid_cert = false;
@@ -3001,6 +3007,59 @@ work_result work(
 			return false;
 		}
 
+		/*
+			An entry found only by its internal address (e.g. 192.168.1.10) may be any server in any LAN -
+			its name is fine to show, its key is not the one to expect.
+		*/
+
+		const bool found_by_internal_address = [&]() {
+			if (found == nullptr) {
+				return false;
+			}
+
+			const auto connected_address = ::find_netcode_addr(client_connect_string(connect_string));
+			return connected_address.has_value() && !(found->address == *connected_address);
+		}();
+
+		const auto list_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
+			if (found != nullptr && !found_by_internal_address) {
+				return found->get_public_key();
+			}
+
+			return std::nullopt;
+		}();
+
+		const auto remembered_key = remembered_servers.find(std::string(connect_string));
+
+		/*
+			From the server list to a server that showed another key the last time: asked before connecting -
+			Connect anyway still expects the list's key, never just any.
+		*/
+
+		{
+			const bool key_changed_since_last_time =
+				!rejoined_match.has_value()
+				&& list_key.has_value()
+				&& remembered_key.has_value()
+				&& *remembered_key != *list_key
+			;
+
+			if (key_changed_since_last_time && !connect_anyway_once) {
+				LOG("The server list has another key for %x than the last time - asking before connecting.", connect_string);
+
+				auto popup = simple_popup();
+				popup.title = "Server key changed";
+				popup.message =
+					"The server's key changed since you last played there.\n"
+					"Usually the server was just reinstalled - but someone could also be impersonating it!\n"
+					"\n"
+					"Connecting anyway expects the key on the server list.";
+
+				key_changed_popup = popup;
+				return false;
+			}
+		}
+
 		auto identity_context = client_identity_context();
 		identity_context.session = identity;
 		identity_context.input = get_identity_input();
@@ -3015,45 +3074,23 @@ work_result work(
 			}
 
 			/*
-				An entry found only by its internal address (e.g. 192.168.1.10) may be any server in any LAN -
-				its name is fine to show, its key is not the one to expect.
+				A join from the server list: the key there - what the player can compare before joining
+				(e.g. with what an event's page publishes). The masterserver has it from the server itself, signed, at its address.
 			*/
 
-			const bool found_by_internal_address = [&]() {
-				if (found == nullptr) {
-					return false;
-				}
-
-				const auto connected_address = ::find_netcode_addr(client_connect_string(connect_string));
-				return connected_address.has_value() && !(found->address == *connected_address);
-			}();
-
-			const auto list_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
-				if (found != nullptr && !found_by_internal_address) {
-					return found->get_public_key();
-				}
-
-				return std::nullopt;
-			}();
-
-			/*
-				An official server: the key the masterserver vouches for (official_servers.d) - always.
-			*/
-
-			if (list_key.has_value() && found->is_official_server()) {
-				source = S::OFFICIAL_SERVER_LIST;
+			if (list_key.has_value()) {
+				source = S::SERVER_LIST;
 				return *list_key;
 			}
 
 			/*
-				Played on before: the key it showed then, wherever the join came from - a different one now is warned about
-				(and Connect anyway takes the new one, as SSH would). A community server's key on the list is only its own
-				word - the first join takes whatever key it presents and remembers it.
+				Played on before: the key it showed then - a different one now is warned about
+				(and Connect anyway takes the new one, as SSH would). Otherwise whatever key it presents, remembered.
 			*/
 
-			if (const auto remembered = remembered_servers.find(std::string(connect_string))) {
+			if (remembered_key.has_value()) {
 				source = S::EARLIER_CONNECTION;
-				return *remembered;
+				return *remembered_key;
 			}
 
 			return std::nullopt;
@@ -3069,14 +3106,16 @@ work_result work(
 		}
 
 		/*
-			"Connect anyway" after a key that did not match: whatever key the server presents, and no saved password.
+			"Connect anyway" after a key that did not match what was known: whatever key the server presents, and no saved
+			password - except from the server list, which stays the key to expect.
 		*/
 
-		if (connect_anyway_once) {
-			connect_anyway_once = false;
-			identity_context.connected_anyway = true;
-			identity_context.expected_server_public_key.reset();
-			identity_context.password.clear();
+		if (std::exchange(connect_anyway_once, false)) {
+			if (identity_context.expected_key_source != expected_server_key_source::SERVER_LIST) {
+				identity_context.connected_anyway = true;
+				identity_context.expected_server_public_key.reset();
+				identity_context.password.clear();
+			}
 		}
 
 		streaming.wait_demos_compressed();
@@ -3431,6 +3470,22 @@ work_result work(
 			}
 			else if (sign_in_popup->perform()) {
 				sign_in_popup = std::nullopt;
+			}
+		}
+
+		if (key_changed_popup.has_value()) {
+			const auto result = key_changed_popup->perform({
+				{ "Connect anyway", rgba::zero, rgba::zero },
+				{ "Cancel", rgba::zero, rgba::zero }
+			});
+
+			if (result) {
+				key_changed_popup = std::nullopt;
+
+				if (result == 1) {
+					connect_anyway_once = true;
+					start_client_setup();
+				}
 			}
 		}
 
@@ -4102,6 +4157,13 @@ work_result work(
 
 			switch (result) {
 				case custom_imgui_result::GO_TO_MAIN_MENU:
+					if constexpr(std::is_same_v<S, client_setup>) {
+						if (setup.failed_on_list_key()) {
+							browse_servers_gui.refresh_server_list(get_browse_servers_input());
+							was_browser_open_in_main_menu = true;
+						}
+					}
+
 					launch_setup(activity_type::MAIN_MENU);
 					break;
 

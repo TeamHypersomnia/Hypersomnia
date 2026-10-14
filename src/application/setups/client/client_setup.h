@@ -80,7 +80,7 @@ struct webrtc_client_detail;
 */
 
 enum class expected_server_key_source {
-	OFFICIAL_SERVER_LIST,
+	SERVER_LIST,
 	EARLIER_CONNECTION,
 	REJOINED_MATCH
 };
@@ -90,12 +90,12 @@ struct client_identity_context {
 	identity_session::input input;
 
 	/*
-		From the server list (official servers only), an earlier connection to this address (known_servers.h) or the match
-		being rejoined; none to take whatever key the server presents. Where it came from says what a mismatch means.
+		From the server list, an earlier connection to this address (known_servers.h) or the match being rejoined;
+		none to take whatever key the server presents. Where it came from says what a mismatch means.
 	*/
 
 	std::optional<augs::ed25519_public_key_type> expected_server_public_key;
-	expected_server_key_source expected_key_source = expected_server_key_source::OFFICIAL_SERVER_LIST;
+	expected_server_key_source expected_key_source = expected_server_key_source::SERVER_LIST;
 
 	/*
 		The player chose "Connect anyway" for this connection - a key that did not match what was known.
@@ -141,6 +141,7 @@ class client_setup :
 	std::string connected_account;
 	bool sent_password = false;
 	bool key_mismatch_failure = false;
+	bool list_key_mismatch = false;
 	bool connect_anyway_requested = false;
 
 	/*
@@ -1066,6 +1067,14 @@ public:
 
 	bool wants_connect_anyway() const {
 		return connect_anyway_requested;
+	}
+
+	/*
+		The server's key did not match the server list - Go back shows a fresh list.
+	*/
+
+	bool failed_on_list_key() const {
+		return list_key_mismatch;
 	}
 
 	bool kicked_for_password_not_sent() const {
