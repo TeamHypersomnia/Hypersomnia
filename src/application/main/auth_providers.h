@@ -67,30 +67,7 @@ auto get_new_auth_data() {
 	return new_auth;
 }
 
-/*
-	Sign in with Steam for the account key: hypersomnia.io sends the player back to auth_redirect.html
-	with a link code and the state the game opened it with - see common.js.
-*/
-
-augs::mutex pending_steam_link_lk;
-std::optional<std::pair<std::string, std::string>> pending_steam_link;
-
-auto take_pending_steam_link() {
-	auto lock = augs::scoped_lock(pending_steam_link_lk);
-	auto result = pending_steam_link;
-	pending_steam_link.reset();
-	return result;
-}
-
 extern "C" {
-	EMSCRIPTEN_KEEPALIVE
-	void on_steam_link_code(const char* code, const char* state) {
-		LOG("on_steam_link_code");
-
-		auto lock = augs::scoped_lock(pending_steam_link_lk);
-		pending_steam_link.emplace(std::string(code), std::string(state));
-	}
-
 	EMSCRIPTEN_KEEPALIVE
 	void on_auth_data_received(
 		const char* provider,

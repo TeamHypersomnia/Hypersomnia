@@ -15,7 +15,6 @@
 #include "application/nat/stun_session.h"
 #include "application/masterserver/netcode_address_hash.h"
 #include "application/main/identity_session.h"
-#include "application/main/loopback_link_listener.h"
 #include "view/necessary_resources.h"
 
 struct config_json_table;
@@ -257,8 +256,13 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 		Native: where the browser comes back after the sign-in through Steam.
 	*/
 
-	loopback_link_listener link_listener;
-	int link_listener_port = 0;
+
+	/*
+		While the browser is out: the game asks hypersomnia.io every second for the code waiting under its state.
+	*/
+
+	augs::async_response_ptr link_result_request;
+	double link_result_asked_at = -1000.0;
 	std::optional<std::string> link_code_from_steam;
 
 	/*
@@ -448,12 +452,6 @@ public:
 	*/
 
 	const necessary_images_in_atlas_map* necessary_images = nullptr;
-
-	/*
-		Web: the code Sign in with Steam came back with - taken only for the state this game opened it with.
-	*/
-
-	void on_steam_link_code(const std::string& code, const std::string& state);
 
 	/*
 		A key not seen before appeared in account.key (pasted there by hand) - shown exactly as an import.

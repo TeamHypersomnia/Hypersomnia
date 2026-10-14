@@ -2594,12 +2594,6 @@ work_result work(
 			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
 			settings_gui.link_avatar_to_upload.reset();
 		}
-
-#if PLATFORM_WEB
-		if (const auto link = take_pending_steam_link()) {
-			settings_gui.on_steam_link_code(link->first, link->second);
-		}
-#endif
 	};
 
 	WEBSTATIC auto is_during_tutorial = [&]() {

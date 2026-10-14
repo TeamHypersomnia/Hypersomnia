@@ -33,9 +33,14 @@ def post(path, fields, cookie=None):
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode(), dict(e.headers)
 
-def start(state, cookie, port=''):
-    # The confirm page's [Link]: the code only comes from the POST
-    return post('/link_key/start', { 'state': state, 'port': port }, cookie)
+def start(state, cookie, public_key=None):
+    # The confirm page's [Link]: the code only comes from the POST, kept under the state for the game
+    return post('/link_key/start', { 'state': state, 'key': public_key or pub, 'device': 'test', 'os': 'linux' }, cookie)
+
+def code_for(state):
+    # What the game asks every second: the code waiting under its state, once
+    status, body, _ = get('/link_key/result?state=' + state)
+    return json.loads(body)['code'] if status == 200 else ''
 
 def get(path, cookie=None):
     req = urllib.request.Request(url + path)
@@ -57,29 +62,33 @@ with db:
 sig = base64.b64encode(hmac.new(secret, sid.encode(), hashlib.sha256).digest()).decode().rstrip('=')
 cookie = 'connect.sid=' + urllib.parse.quote('s:' + sid + '.' + sig, safe='')
 
+key = Ed25519PrivateKey.generate()
+pub = key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
+
 state = secrets.token_hex(16)
-status, body, _ = get('/link_key/start?state=' + state, cookie)
-check('start asks which Steam account first (no code yet)', status == 200 and 'Link Test' in body and '#code=' not in body)
-status, _, headers = start(state, cookie)
-location = headers.get('Location', '')
-check('Link on that page goes to the return url with code and state', status == 303 and '#code=' in location and ('state=' + state) in location, location)
+status, body, _ = get('/link_key/start?state=%s&key=%s&device=test&os=linux' % (state, pub), cookie)
+check('start asks about the device and the Steam account first (no code yet)', status == 200 and 'Link Test' in body and 'Yes, this is my device' in body and 'test' in body)
+check('no code before the player confirms', code_for(state) == '')
+status, body, headers = start(state, cookie)
+check('Link on that page says to go back to the game (no redirect)', status == 200 and 'You can go back to Hypersomnia' in body and 'Location' not in headers, body[:200])
 status, _, _ = start(secrets.token_hex(16), None)
 check('Link without a session is refused', status == 400)
-fragment = urllib.parse.parse_qs(location.split('#', 1)[1]) if '#' in location else {}
-code = fragment.get('code', [''])[0]
+code = code_for(state)
+check('the game gets the code for its state', len(code) == 8, code)
+check('the code is given once', code_for(state) == '')
 
-status, _, headers = get('/link_key/start?state=' + state)
+status, _, headers = get('/link_key/start?state=%s&key=%s' % (state, pub))
 check('start without a session goes to Steam sign in', status == 302 and '/auth/steam' in headers.get('Location', ''), headers.get('Location', ''))
 
-status, _, _ = get('/link_key/start?state=xyz', cookie)
+status, _, _ = get('/link_key/start?state=xyz&key=' + pub, cookie)
 check('start refuses a malformed state', status == 400)
+status, _, _ = get('/link_key/start?state=' + secrets.token_hex(16), cookie)
+check('start refuses a link without the game key', status == 400)
 
 status, body, headers = get('/link_key/info?code=' + code)
 check('info names the Steam account', status == 200 and json.loads(body).get('steam_id') == 'steam_' + steam_id, body)
 check('info allows the game origin (CORS)', headers.get('Access-Control-Allow-Origin') == '*')
 
-key = Ed25519PrivateKey.generate()
-pub = key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
 
 def cert_account():
     session = Ed25519PrivateKey.generate().public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
@@ -126,14 +135,17 @@ check('progress moved back to the key', mmr_owner() == ['key_' + pub], str(mmr_o
 status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts, unlink_sig))
 check('a signed unlink can not be replayed', status == 401, body)
 
-# The native game: &port sends the code to its listener on 127.0.0.1
+# A code made for another key (a link someone else opened) links no other key
+state_other = secrets.token_hex(16)
+start(state_other, cookie, secrets.token_hex(32))
+code_other = code_for(state_other)
+sig_other = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code_other, steam_id)).encode()).hex()
+status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code_other, sig_other))
+check('a code made for another key does not link this one', status == 401 and 'another device' in body, '%s %s' % (status, body))
+
 state2 = secrets.token_hex(16)
-status, _, headers = start(state2, cookie, '40123')
-location = headers.get('Location', '')
-check('start with a port goes back to the game on 127.0.0.1', status == 303 and location.startswith('http://127.0.0.1:40123/linked?code=') and ('state=' + state2) in location, location)
-status, _, _ = get('/link_key/start?state=%s&port=80' % state2, cookie)
-check('start refuses a port below 1024', status == 400)
-code2 = urllib.parse.parse_qs(urllib.parse.urlparse(location).query).get('code', [''])[0]
+start(state2, cookie)
+code2 = code_for(state2)
 
 # Bans: a key unlinked from a banned Steam account stays banned; a banned key can not be linked
 link_sig2 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code2, steam_id)).encode()).hex()
@@ -147,8 +159,8 @@ status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s'
 check('unlink from a banned account', status == 200, body)
 check('the unlinked key is banned too', cert_account().startswith('HTTP 403'), cert_account())
 state3 = secrets.token_hex(16)
-_, _, headers = start(state3, cookie)
-code3 = urllib.parse.parse_qs(headers.get('Location', '').split('#', 1)[-1]).get('code', [''])[0]
+start(state3, cookie)
+code3 = code_for(state3)
 link_sig3 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code3, steam_id)).encode()).hex()
 status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code3, link_sig3))
 check('a banned key can not be linked', status == 403, body)
@@ -157,8 +169,8 @@ with db:
 
 # Unlinking on /profile works like the key's own unlink: the Steam account's ban goes with the key
 state4 = secrets.token_hex(16)
-_, _, headers = start(state4, cookie)
-code4 = urllib.parse.parse_qs(headers.get('Location', '').split('#', 1)[-1]).get('code', [''])[0]
+start(state4, cookie)
+code4 = code_for(state4)
 link_sig4 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code4, steam_id)).encode()).hex()
 status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code4, link_sig4))
 check('link again', status == 200, body)
@@ -179,8 +191,8 @@ check('a foreign key posted to /profile/unlink_key is not banned', banned_foreig
 
 # No linking to a banned Steam account
 state5 = secrets.token_hex(16)
-_, _, headers = start(state5, cookie)
-code5 = urllib.parse.parse_qs(headers.get('Location', '').split('#', 1)[-1]).get('code', [''])[0]
+start(state5, cookie)
+code5 = code_for(state5)
 link_sig5 = key.sign(('hypersomnia-link-v1 %s steam_%s' % (code5, steam_id)).encode()).hex()
 status, body, _ = get('/link_key/link?public_key=%s&code=%s&signature=%s' % (pub, code5, link_sig5))
 check('no link to a banned Steam account', status == 403 and 'banned' in body, '%s %s' % (status, body))

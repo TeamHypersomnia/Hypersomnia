@@ -17,14 +17,6 @@ server {
 		add_header Cross-Origin-Embedder-Policy "credentialless" always;
     }
 
-    # The sign in redirect page must NOT have COOP so window.opener survives
-    # the cross-origin navigation chain (game iframe -> hypersomnia.io -> Steam -> redirect).
-    location = /assets/auth_redirect.html {
-        alias /var/www/html/assets/auth_redirect.html;
-		add_header Cross-Origin-Resource-Policy "cross-origin" always;
-		add_header Cross-Origin-Embedder-Policy "credentialless" always;
-    }
-
     location /assets/ {
         alias /var/www/html/assets/;
 

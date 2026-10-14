@@ -1996,10 +1996,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 									switch (identity.expected_key_source) {
 										case expected_server_key_source::EARLIER_CONNECTION:
 											return "The server's key is different from the last time you played there.\n"
-												"Usually the server was just reinstalled - but it could also be someone impersonating it.\n";
+												"Usually the server was just reinstalled - but someone could also be impersonating it!\n";
 										case expected_server_key_source::REJOINED_MATCH:
 											return "The server's key is different from the one of the match you are rejoining.\n"
-												"Usually the server was just reinstalled - but it could also be someone impersonating it.\n";
+												"Usually the server was just reinstalled - but someone could also be impersonating it!\n";
 										default:
 											return std::string();
 									}

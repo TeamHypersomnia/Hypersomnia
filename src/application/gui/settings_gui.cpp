@@ -445,16 +445,6 @@ EM_JS(void, web_download_text, (const char* file_name, const char* text), {
 });
 #endif
 
-void settings_gui_state::on_steam_link_code(const std::string& code, const std::string& state) {
-	if (steam_link_state.empty() || !augs::constant_time_equal(state, steam_link_state)) {
-		LOG("Ignoring a Steam link code for another state.");
-		return;
-	}
-
-	steam_link_state.clear();
-	link_code_from_steam = code;
-}
-
 /*
 	A modal centered on the screen, with the screen behind it dimmed by ImGui.
 */
@@ -518,7 +508,7 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 		link_target_request.reset();
 		link_code_from_steam.reset();
 		steam_link_state.clear();
-		link_listener.stop();
+		link_result_request.reset();
 
 		if (identity != nullptr) {
 			identity->clear_link_check();
@@ -724,7 +714,7 @@ void settings_gui_state::on_key_replaced_outside() {
 	link_lost_reason.clear();
 	link_code_from_steam.reset();
 	link_target_request.reset();
-	link_listener.stop();
+	link_result_request.reset();
 	link_request.reset();
 	steam_link_state.clear();
 	confirm_unlink = false;
@@ -1486,7 +1476,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	auto finish = [&](const bool succeeded, const std::string& message, const bool conflict = false) {
-		link_listener.stop();
+		link_result_request.reset();
 		link_flow = F::DONE;
 		link_flow_succeeded = succeeded;
 		link_flow_conflict = conflict;
@@ -1618,17 +1608,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	/*
-		The sign-in through Steam in the browser, with a random state only this game knows:
-		- native: the browser comes back to the game's listener on 127.0.0.1 (see loopback_link_listener.h);
-		- web: the code comes back to this tab (on_steam_link_code).
+		The sign-in through Steam in the browser, with a random state only this game knows, its public key and the device
+		(shown on the page the player confirms). The code then waits on hypersomnia.io under the state - the game asks for it.
 	*/
 
 	auto open_steam_sign_in = [&]() {
-#if PLATFORM_WEB
-		augs::open_url(website_url + "/link_key/start?state=" + steam_link_state);
-#else
-		augs::open_url(typesafe_sprintf("%x/link_key/start?state=%x&port=%x", website_url, steam_link_state, link_listener_port));
-#endif
+		augs::open_url(typesafe_sprintf(
+			"%x/link_key/start?state=%x&key=%x%x",
+			website_url,
+			steam_link_state,
+			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
+			identity != nullptr ? identity->device_query() : std::string()
+		));
 	};
 
 	auto start_steam_sign_in = [&]() {
@@ -1640,16 +1631,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 
 		steam_link_state = augs::bytes_to_hex(state_bytes);
-
-#if !PLATFORM_WEB
-		if (const auto port = link_listener.start(steam_link_state)) {
-			link_listener_port = *port;
-		}
-		else {
-			finish(false, "Couldn't start linking - see the logs.");
-			return;
-		}
-#endif
+		link_result_request.reset();
+		link_result_asked_at = -1000.0;
 
 		open_steam_sign_in();
 	};
@@ -1737,15 +1720,35 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 	}
 
-#if !PLATFORM_WEB
-	if (link_flow == F::NEEDS_STEAM_SIGN_IN) {
-		if (const auto code = link_listener.take_code()) {
-			link_listener.stop();
-			steam_link_state.clear();
-			link_code_from_steam = *code;
+	/*
+		Asked every second while the browser is out - 204 until the player confirmed there, then the code once.
+	*/
+
+	if (link_flow == F::NEEDS_STEAM_SIGN_IN && !steam_link_state.empty()) {
+		const auto now = augs::steady_secs();
+
+		if (augs::is_ready(link_result_request)) {
+			const auto response = augs::get_once(link_result_request);
+
+			if (response.status == 200) {
+				try {
+					const auto doc = augs::json_document_from(response.body);
+
+					if (doc.IsObject() && doc.HasMember("code") && doc["code"].IsString()) {
+						steam_link_state.clear();
+						link_code_from_steam = std::string(doc["code"].GetString());
+					}
+				}
+				catch (...) {
+					LOG("Unreadable answer for the link code: %x", response.body);
+				}
+			}
+		}
+		else if (!augs::in_progress(link_result_request) && now - link_result_asked_at >= 1.0) {
+			link_result_asked_at = now;
+			link_result_request = get_from_website("/link_key/result?state=" + steam_link_state);
 		}
 	}
-#endif
 
 	if (link_code_from_steam.has_value() && !augs::in_progress(link_target_request) && has_key) {
 		const auto code = *link_code_from_steam;
@@ -1895,7 +1898,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 				link_target_request.reset();
 				steam_link_state.clear();
-				link_listener.stop();
+				link_result_request.reset();
 
 				if (identity != nullptr) {
 					identity->clear_link_check();

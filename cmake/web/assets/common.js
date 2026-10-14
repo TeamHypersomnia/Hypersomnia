@@ -638,34 +638,6 @@ function create_module(for_cg) {
     Module.sync_idbfs = sync_idbfs;
     Module['preRun'].push(pre_run);
 
-    /*
-      "Sign in with Steam": the link code comes back from hypersomnia.io through auth_redirect.html,
-      over this channel (the game in a top-level tab) or postMessage (the game in an iframe).
-      The game checks the state it made.
-    */
-
-    function handleSteamLink(data) {
-      if (data && data.type === 'steam_link' && typeof data.code === 'string' && typeof data.state === 'string') {
-        Module.ccall('on_steam_link_code', 'void', ['string', 'string'], [data.code, data.state]);
-      }
-    }
-
-    // Older Safari has no BroadcastChannel - the game must start all the same (postMessage still works)
-    try {
-      // Kept on Module - a channel nothing references may be collected, and its messages with it
-      Module.channel = new BroadcastChannel('auth_bridge');
-      Module.channel.addEventListener('message', event => handleSteamLink(event.data));
-    }
-    catch (e) {
-      console.warn('No BroadcastChannel:', e);
-    }
-
-    window.addEventListener('message', event => {
-      if (event.origin === window.location.origin) {
-        handleSteamLink(event.data);
-      }
-    });
-
     Module.setBrowserLocation = setBrowserLocation;
   }
 

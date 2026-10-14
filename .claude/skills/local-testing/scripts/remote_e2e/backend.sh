@@ -46,7 +46,7 @@ EOF
 
 	cd $B/page
 	PORT=13000 NODE_ENV=development SESSION_SECRET=$(cat $B/session_secret) OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
-		BROKER_KEY_PATH=$B/broker.key STEAM_APIKEY=$(cat $B/steam_web_api_key 2>/dev/null) LINK_RETURN_URL=${LINK_RETURN_URL:-http://127.0.0.1:8765/assets/auth_redirect.html} \
+		BROKER_KEY_PATH=$B/broker.key STEAM_APIKEY=$(cat $B/steam_web_api_key 2>/dev/null) \
 		setsid nohup timeout 7200 $B/node/bin/node app.js > $B/site.out 2>&1 < /dev/null &
 	echo $! > $B/site.pid
 

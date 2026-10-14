@@ -34,7 +34,7 @@ done
 
 rm -rf $T
 mkdir -p $T/official_servers.d
-eval "$(LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html OFFICIAL_SERVERS_DIR=$T/official_servers.d "$HERE/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
+eval "$(OFFICIAL_SERVERS_DIR=$T/official_servers.d "$HERE/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 

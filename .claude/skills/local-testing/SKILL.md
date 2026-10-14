@@ -72,10 +72,10 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   `devtools.console.stdout.content=true` - the game's console output then lands in Firefox's stdout.
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
 - The web account is a key in its own IDBFS database (`/hypersomnia_keys/account.key`, apart from `/user`), made on the first start. Link with Steam (Settings - Account)
-  opens `<website>/link_key/start?state=..` in a new tab; the site sends the code back to `LINK_RETURN_URL` (`<game origin>/assets/auth_redirect.html`),
-  which passes it to the game through BroadcastChannel/opener. For a local site set `LINK_RETURN_URL=http://127.0.0.1:8765/assets/auth_redirect.html`.
-  The native game instead opens `/link_key/start?state=..&port=P` and listens on 127.0.0.1:P (`loopback_link_listener`); the site
-  redirects the browser to `http://127.0.0.1:P/linked?code=..&state=..`. No code is ever typed; `/link` only says where to start.
+  opens `<website>/link_key/start?state=..&key=..&device=..&os=..` in a new tab (native: in the browser); signed in through Steam,
+  the player confirms the device on that page, and the code waits on the site under the state - the game asks
+  `/link_key/result?state=..` every second and takes it (no redirect back, no local listener; the same natively, in a tab or an iframe).
+  No code is ever typed; `/link` only says where to start.
 
 ## UI checks
 
@@ -92,8 +92,8 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   `ui.sh start <name> <display> [game args]`, `stop`, `shot <display> <png>`, `click`, `type`, `key`. `BIN=` for the Steam build.
   The game never opens a real browser there: `fake_bin/xdg-open` writes the URLs to `<client>/opened_urls`.
 - `browser_sign_in.sh [steam id64]` (with `OPENED_URLS=<client>/opened_urls`) plays the player's browser for Link with Steam:
-  opens the last `/link_key/start` URL signed in to Steam on the scratch site and follows the redirect to the game's listener.
-  An attacker's link is `curl http://127.0.0.1:P/linked?code=X&state=<another>` - the listener answers 400.
+  opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then fetches the code itself.
+  A code is made for the key in the URL - a link someone else opened gives a code `/link_key/link` refuses for any other key.
 - `../xinput.py blur` / `focus` - the game loses / gets back the keyboard focus: account.key is read again only on focus
   (and at the start, and after Restore / Start a new account), so a key swapped on disk is noticed on `focus`.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
@@ -102,7 +102,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   Link with Steam... 397,337. Every confirmation and result is a centered modal. Backup of a key linked to Steam
   says only "Your progress is on your Steam account - nothing to back up...".
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
-- `link_code.sh [steam id64]` - a link code from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game
+- `link_code.sh <key hex> [steam id64]` - a link code made for that key from a fake Steam session; `link_api.py <account.key> <code> <steam id64>` links like the game
   (a Steam account takes at most 32 keys - a test account full of them answers 409).
 - `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
