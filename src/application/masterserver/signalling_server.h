@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <functional>
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 #include "augs/network/address_network.h"
@@ -196,16 +197,30 @@ private:
 								so no cookie is needed - but its key stays the same for the session.
 							*/
 
+							/*
+								Checked like a native one's (a sane heartbeat, no banned name) - and signed for this session.
+							*/
+
+							if (!hb.is_valid() || (heartbeat_rejected && heartbeat_rejected(hb))) {
+								return;
+							}
+
 							if (!::server_request_signature_valid(hb)) {
 								return;
 							}
 
 							const auto public_key = hb.signature->server_public_key;
+							const auto signed_cookie = hb.signature->cookie;
 							hb.signature.reset();
 
 							on_peers(
 								[&](auto& peers) {
 									const auto webrtc_id = get_webrtc_id(peers, client);
+
+									if (signed_cookie != ::web_session_cookie(webrtc_id)) {
+										LOG("Ignoring a heartbeat from Web peer %x signed for another session.", webrtc_id);
+										return;
+									}
 
 									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
 										const auto unix_time = augs::date_time::secs_since_epoch();
@@ -362,6 +377,12 @@ private:
 
 public:
 	std::size_t max_web_peers = 8192;
+
+	/*
+		The masterserver's own checks of a heartbeat (e.g. a banned server name) - for the servers in browsers too.
+	*/
+
+	std::function<bool(const server_heartbeat&)> heartbeat_rejected;
 
 private:
 

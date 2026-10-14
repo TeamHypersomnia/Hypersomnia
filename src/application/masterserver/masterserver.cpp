@@ -248,6 +248,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	signalling.max_web_peers = settings.max_web_peers;
 
+	signalling.heartbeat_rejected = [&](const server_heartbeat& hb) {
+		return is_banned_server_name(hb.server_name);
+	};
+
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;

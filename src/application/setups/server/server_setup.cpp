@@ -3121,7 +3121,19 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 #endif
 
+#if PLATFORM_WEB
+	/*
+		Signed for this WebSocket session (see web_session_cookie) - none until the signalling server gave the id.
+	*/
+
+	if (resolved_this_server_webrtc_id.empty()) {
+		return;
+	}
+
+	sign_for_masterserver(heartbeat, ::web_session_cookie(resolved_this_server_webrtc_id));
+#else
 	sign_for_masterserver(heartbeat);
+#endif
 
 	heartbeat_buffer.clear();
 

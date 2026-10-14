@@ -17,8 +17,8 @@ namespace server_key {
 	inline constexpr std::string_view file_name = "server.key";
 
 	/*
-		A server that can not read its key file still starts - with a key for this run only,
-		so it is not known as the server it was. The file is left as it is.
+		Hosting from the game with a key file it can not read still starts - with a key for this run only, so it is not known
+		as the server it was; the file is left as it is. A dedicated server does not start then (see damaged).
 	*/
 
 	inline augs::ed25519_seed_type obtain(const augs::path_type& path) {
@@ -37,6 +37,15 @@ namespace server_key {
 		*/
 
 		throw std::runtime_error("Could not generate a server key.");
+	}
+
+	/*
+		There, but not readable (damaged, no permission): a dedicated server does not start then - on a key for this run only
+		it would not be the server it was (e.g. no longer official).
+	*/
+
+	inline bool damaged(const augs::path_type& path) {
+		return augs::exists(path) && !identity_key::load(path).has_value();
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {

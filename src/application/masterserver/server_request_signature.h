@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <string>
 
 /*
 	Every request a server sends the masterserver (a heartbeat or a goodbye) is signed with its key (server.key).
@@ -11,6 +12,24 @@
 */
 
 using masterserver_cookie_type = std::array<uint8_t, 24>;
+
+/*
+	A server in the browser has no cookie: it signs its heartbeats with its WebSocket session's id in its place,
+	so a native server's signed heartbeat can not be passed off as one of a browser's session (a clone on the list).
+*/
+
+inline masterserver_cookie_type web_session_cookie(const std::string& webrtc_id) {
+	auto out = masterserver_cookie_type();
+	out.fill(0);
+
+	const auto tag = std::string("hs-ws:") + webrtc_id;
+
+	for (std::size_t i = 0; i < out.size() && i < tag.size(); ++i) {
+		out[i] = static_cast<uint8_t>(tag[i]);
+	}
+
+	return out;
+}
 
 struct server_request_signature {
 	// GEN INTROSPECTOR struct server_request_signature

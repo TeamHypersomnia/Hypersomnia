@@ -747,7 +747,14 @@ work_result work(
 			What an official server's operator sends to the developers: the public part of server.key, made if missing.
 		*/
 
-		const auto key = server_key::obtain(KEYS_DIR / server_key::file_name);
+		const auto path = KEYS_DIR / server_key::file_name;
+
+		if (server_key::damaged(path)) {
+			std::cerr << "ERROR: " << path.string() << " is there but can not be read." << std::endl;
+			return work_result::FAILURE;
+		}
+
+		const auto key = server_key::obtain(path);
 		std::cout << server_key::public_key_hex(key) << std::endl;
 		return work_result::SUCCESS;
 	}
@@ -1396,6 +1403,11 @@ work_result work(
 		const auto num_casual = std::min(uint16_t(20u), config_pattern.num_casual_servers);
 
 		const auto num_total = num_ranked + num_casual;
+
+		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
+			LOG("ERROR: %x is there but can not be read - not starting. Restore it, or move it away to make a new key.", KEYS_DIR / server_key::file_name);
+			return work_result::FAILURE;
+		}
 
 		if (num_total == 0) {
 			LOG("This is a single-instance dedicated server.");
@@ -2338,8 +2350,8 @@ work_result work(
 		Signing in as the player sees it - see identity_session.h:
 		- at start, while the first sign-in is on its way: nothing for a second, then a dimmed "Signing in to your Steam account..."
 		  (a join asked for meanwhile, e.g. --connect, waits for it);
-		- the first time it failed when it matters - in the main menu, or before a connection - one message per run,
-		  with [Join anyway] [Cancel] before a connection; after it nothing asks again, but the loop keeps trying;
+		- the first time it failed when it matters - in the main menu, or before a connection - one message per loss
+		  (again only once signed in meanwhile), with [Join anyway] [Cancel] before a connection; the loop keeps trying;
 		- [Retry] (leaderboards, Account settings) tries at once, a failed one shows the message again;
 		- signed in after a failure: a short "Signed in to Steam" in the menu.
 	*/
@@ -2429,7 +2441,6 @@ work_result work(
 
 		settings_gui.key_damaged = account_seed_read_once && !account_seed.has_value();
 
-
 		{
 			const auto now = augs::steady_secs();
 			const bool valid = identity->has_valid_cert(now);
@@ -2441,6 +2452,15 @@ work_result work(
 			if (valid && !had_valid_cert && failed_since_last_cert) {
 				failed_since_last_cert = false;
 				signed_in_notice_pending = true;
+			}
+
+			/*
+				Signed in: a later loss of it (e.g. the broker down when the cert runs out) is told again - never silently
+				played on the key account.
+			*/
+
+			if (valid) {
+				sign_in_message_shown = false;
 			}
 
 			had_valid_cert = valid;
