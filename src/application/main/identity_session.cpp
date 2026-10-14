@@ -56,7 +56,7 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	*/
 
 	request.reset();
-	link_check_request.reset();
+	check_in_flight = false;
 	link_check = link_check_state::NONE;
 	clear_steam_ticket();
 
@@ -351,8 +351,8 @@ static std::string location_prefix(const parsed_url& url) {
 	return prefix;
 }
 
-void identity_session::start_request(const input& in, const double now) {
-	const auto location = build_location(in);
+void identity_session::start_request(const input& in, const double now, const std::string& key_query) {
+	const auto location = key_query.empty() ? build_location(in) : std::optional<std::string>("/cert?session=" + augs::bytes_to_hex(key_public) + key_query);
 
 	if (!location.has_value()) {
 		return;
@@ -467,22 +467,146 @@ void identity_session::advance(const input& in, const double now) {
 	}
 
 	/*
-		Not the Steam build (its key is never linked) nor CrazyGames (its account is the token's).
+		Whether the key is linked is asked through the same /cert as every cert - by the key's signature:
+		once a run, quietly, for a key without steam.cert, and when the player links (start_link_check).
+		Not in the Steam build (its key is never linked) nor on CrazyGames (its account is the token's).
 	*/
 
 	const bool key_can_be_linked = !in.steam_ticket_proof && in.provider != provider_type::CRAZYGAMES;
 
-	if (key_check_wanted && key_can_be_linked && link_check_request == nullptr && !in.broker_url.empty() && now >= key_check_next_at) {
-		LOG("Asking quietly whether the key is linked.");
-		start_link_check(in.broker_url);
-		key_check_quiet = true;
+	if (key_check_wanted && key_can_be_linked && request == nullptr && !in.broker_url.empty() && now >= key_check_next_at) {
+		LOG(key_check_quiet ? "Asking quietly whether the key is linked." : "Checking whether the key is linked to a Steam account.");
+
+		key_check_wanted = false;
+		check_in_flight = true;
+		start_request(in, now, key_location());
+
+		if (request == nullptr) {
+			check_in_flight = false;
+			link_check = link_check_state::FAILED;
+		}
 	}
 
-	if (link_check_request != nullptr && link_check_request->is_ready()) {
-		const auto response = augs::get_once(link_check_request);
+	if (request != nullptr) {
+		if (!request->is_ready()) {
+			return;
+		}
+
+		const auto response = augs::get_once(request);
+		const bool was_check = std::exchange(check_in_flight, false);
+		clear_steam_ticket();
+
+		/*
+			Asked for an account that is no longer the player's: whatever came back is not theirs - asked again right away.
+		*/
+
+		if (!requested_for.same_account(last_input)) {
+			LOG("Dropping an identity cert answer for the previous account.");
+			next_attempt_at = 0.0;
+			key_check_wanted = key_check_wanted || was_check;
+			return;
+		}
+
 		const auto answer = response.status == 200 ? parse_answer(response.body) : std::nullopt;
 
-		if (!answer.has_value()) {
+		/*
+			A check is no attempt of the sign-in - an unlinked key has nothing to sign in to.
+		*/
+
+		const bool signs_in = in.provider != provider_type::NONE;
+
+		if (signs_in) {
+			++attempts_finished;
+		}
+
+		if (answer.has_value() && is_key_account(answer->cert.account) && key_can_be_linked) {
+			/*
+				The key's own account: not linked - or no longer (unlinked on the site, or an unlink whose answer got lost).
+				Back to the key account, no error.
+			*/
+
+			if (cert_saved || (broker_cert.has_value() && !is_key_account(broker_cert->account))) {
+				LOG("The key is no longer linked to a Steam account.");
+				on_unlinked();
+			}
+
+			last_attempt_failed = false;
+			last_error.clear();
+			retry_delay = first_retry_delay_secs;
+			next_attempt_at = 0.0;
+
+			if (was_check) {
+				link_check = link_check_state::NOT_LINKED;
+				link_check_profile = answer->profile;
+				key_check_quiet = false;
+			}
+
+			return;
+		}
+
+		if (answer.has_value()) {
+			/*
+				A cert for the account: Steam (a linked key, the Steam build), CrazyGames.
+			*/
+
+			last_attempt_failed = false;
+			last_error.clear();
+			retry_delay = first_retry_delay_secs;
+			next_attempt_at = 0.0;
+
+			broker_cert = answer->cert;
+			profile = answer->profile;
+			cert_received_at = now;
+			cert_received_at_wall = wall_now();
+			attempts_finished = std::max(attempts_finished, 1);
+
+			const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+			LOG("Received an identity cert for %x, valid for %x minutes.", broker_cert->account, static_cast<int>(lifetime / 60));
+
+			/*
+				steam.cert: a valid one is used at once after a restart, and it tells a key that it is linked.
+			*/
+
+			if (in.provider == provider_type::STEAM || was_check) {
+				save_cert();
+			}
+
+			if (was_check) {
+				if (key_check_quiet) {
+					linked_quietly = true;
+				}
+
+				link_check = link_check_state::LINKED;
+				link_check_profile = answer->profile;
+				key_check_quiet = false;
+			}
+
+			return;
+		}
+
+		const auto broker_host = parsed_url(in.broker_url).host;
+
+		const auto error = [&]() -> std::string {
+			if (response.status == 200) {
+				return typesafe_sprintf("%x sent an invalid answer.", broker_host);
+			}
+
+			if (response.status == 429) {
+				return typesafe_sprintf("%x is busy - the game keeps trying.", broker_host);
+			}
+
+			if (response.status >= 400 && response.status < 500) {
+				return augs::plain_text_reason(response).value_or(typesafe_sprintf("%x refused (HTTP %x).", broker_host, response.status));
+			}
+
+			if (response.status <= 0) {
+				return typesafe_sprintf("Could not reach %x.", broker_host);
+			}
+
+			return typesafe_sprintf("%x is not working right now (HTTP %x).", broker_host, response.status);
+		}();
+
+		if (was_check) {
 			LOG("Checking the key's link failed (HTTP %x).", response.status);
 			link_check = link_check_state::FAILED;
 
@@ -494,7 +618,7 @@ void identity_session::advance(const input& in, const double now) {
 			link_check_error = refused ? augs::plain_text_reason(response).value_or(std::string()) : std::string();
 
 			/*
-				Asked again only when hypersomnia.io may answer later - not after a refusal (e.g. a ban).
+				A quiet one is asked again only when hypersomnia.io may answer later - not after a refusal (e.g. a ban).
 			*/
 
 			const bool may_answer_later = response.status <= 0 || response.status == 429 || response.status >= 500;
@@ -506,112 +630,16 @@ void identity_session::advance(const input& in, const double now) {
 			else {
 				key_check_quiet = false;
 			}
-		}
-		else if (is_key_account(answer->cert.account)) {
-			/*
-				Asked quietly (e.g. after an unlink whose answer got lost) while still holding a Steam cert:
-				the key is no longer linked - back to its own account, as after an unlink.
-			*/
 
-			const bool holding_steam_cert = broker_cert.has_value() && !is_key_account(broker_cert->account);
-
-			if (key_check_quiet && holding_steam_cert) {
-				LOG("The key is no longer linked to a Steam account (found on a quiet check).");
-				on_unlinked();
-			}
-
-			link_check = link_check_state::NOT_LINKED;
-			link_check_profile = answer->profile;
-			key_check_quiet = false;
-		}
-		else {
-			/*
-				Linked: the Steam cert is ours from now on, and steam.cert says so on the next start.
-			*/
-
-			if (key_check_quiet) {
-				linked_quietly = true;
-			}
-
-			link_check = link_check_state::LINKED;
-			link_check_profile = answer->profile;
-
-			broker_cert = answer->cert;
-			profile = answer->profile;
-			cert_received_at = now;
-			cert_received_at_wall = wall_now();
-			attempts_finished = std::max(attempts_finished, 1);
-			last_attempt_failed = false;
-			last_error.clear();
-			save_cert();
-			key_check_quiet = false;
-		}
-	}
-
-	if (request != nullptr) {
-		if (!request->is_ready()) {
-			return;
-		}
-
-		const auto response = augs::get_once(request);
-		clear_steam_ticket();
-		++attempts_finished;
-
-		/*
-			Asked for an account that is no longer the player's: whatever came back is not theirs - asked again right away.
-		*/
-
-		if (!requested_for.same_account(last_input)) {
-			LOG("Dropping an identity cert answer for the previous account.");
-			next_attempt_at = 0.0;
-			return;
-		}
-
-		const auto answer = response.status == 200 ? parse_answer(response.body) : std::nullopt;
-
-		if (answer.has_value()) {
-			last_attempt_failed = false;
-			last_error.clear();
-			retry_delay = first_retry_delay_secs;
-			next_attempt_at = 0.0;
-
-			if (is_key_account(answer->cert.account) && !in.steam_ticket_proof && in.provider == provider_type::STEAM) {
-				/*
-					The key's own account: it was unlinked on the site. Back to the key account, no error.
-				*/
-
-				LOG("The key is no longer linked to a Steam account.");
-				forget_cert();
-				delete_saved_cert();
+			if (!signs_in) {
 				return;
 			}
-
-			broker_cert = answer->cert;
-			profile = answer->profile;
-			cert_received_at = now;
-			cert_received_at_wall = wall_now();
-
-			const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
-			LOG("Received an identity cert for %x, valid for %x minutes.", broker_cert->account, static_cast<int>(lifetime / 60));
-
-			if (in.provider == provider_type::STEAM) {
-				save_cert();
-			}
-
-			return;
 		}
 
 		last_attempt_failed = true;
+		last_error = error;
 
-		const auto broker_host = parsed_url(in.broker_url).host;
-
-		if (response.status == 200) {
-			last_error = typesafe_sprintf("%x sent an invalid answer.", broker_host);
-		}
-		else if (response.status == 429) {
-			last_error = typesafe_sprintf("%x is busy - the game keeps trying.", broker_host);
-		}
-		else if (response.status >= 400 && response.status < 500) {
+		if (response.status >= 400 && response.status < 500 && response.status != 429) {
 			/*
 				Refused (e.g. a ban): the reason is the player's to see, and asking again soon changes nothing.
 				A CrazyGames token refused as expired is renewed by the game - a new one is asked about at once.
@@ -621,14 +649,7 @@ void identity_session::advance(const input& in, const double now) {
 				crazygames_token_refused = true;
 			}
 
-			last_error = augs::plain_text_reason(response).value_or(typesafe_sprintf("%x refused (HTTP %x).", broker_host, response.status));
 			retry_delay = max_retry_delay_secs;
-		}
-		else if (response.status <= 0) {
-			last_error = typesafe_sprintf("Could not reach %x.", broker_host);
-		}
-		else {
-			last_error = typesafe_sprintf("%x is not working right now (HTTP %x).", broker_host, response.status);
 		}
 
 		LOG("Identity cert request failed: %x Retrying in %x seconds.", last_error, retry_delay);
@@ -761,27 +782,18 @@ identity_cert::cert identity_session::cert_for_connect(const double now) const {
 }
 
 void identity_session::start_link_check(const std::string& broker_url) {
-	key_check_wanted = false;
-	key_check_quiet = false;
+	/*
+		Asked through the cert loop (see advance) - right away, or after the request on its way.
+	*/
 
-	const auto key = key_location();
-	auto error = std::string();
-	const auto url = broker_url_of(broker_url, error);
-
-	if (key.empty() || !url.has_value()) {
+	if (broker_url.empty() || key_location().empty()) {
 		link_check = link_check_state::FAILED;
 		return;
 	}
 
-	LOG("Checking whether the key is linked to a Steam account.");
-
-	link_check_request = augs::async_get(
-		url->get_base_url(),
-		location_prefix(*url) + "/cert?session=" + augs::bytes_to_hex(key_public) + key,
-		{},
-		nullptr,
-		false
-	);
+	key_check_wanted = true;
+	key_check_quiet = false;
+	key_check_next_at = 0.0;
 
 	link_check = link_check_state::PENDING;
 	link_check_profile = {};
@@ -798,7 +810,6 @@ void identity_session::clear_link_check() {
 		key_check_next_at = last_now;
 	}
 
-	link_check_request.reset();
 	link_check = link_check_state::NONE;
 	link_check_profile = {};
 }

@@ -132,7 +132,11 @@ private:
 	double steam_ticket_requested_at = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
 
-	augs::async_response_ptr link_check_request;
+	/*
+		The request on its way asks whether the key is linked (see advance) - its answer is the link check's too.
+	*/
+
+	bool check_in_flight = false;
 	link_check_state link_check = link_check_state::NONE;
 	account_profile link_check_profile;
 	std::string link_check_error;
@@ -157,7 +161,7 @@ private:
 
 	std::string key_location() const;
 	std::optional<std::string> build_location(const input&) const;
-	void start_request(const input&, double now);
+	void start_request(const input&, double now, const std::string& key_query = "");
 	void schedule_retry(double now);
 	double cert_secs_left(double now) const;
 
