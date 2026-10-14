@@ -138,23 +138,14 @@ private:
 	std::string link_check_error;
 
 	/*
-		account.checked: the public key last asked about at hypersomnia.io (or made by this game).
-		Any other key in account.key - pasted there with the game running or not - is asked about like an import.
+		Once a run, quietly, for a key without steam.cert (and not made just now): is it linked? A link made elsewhere
+		(another computer the key was copied from, a tab whose save failed) shows up so - the site knows.
+		Retried until it gets an answer, never shown - also after linking when the check that should follow failed.
 	*/
 
-	augs::path_type checked_key_file;
 	bool key_check_wanted = false;
-	bool key_check_started = false;
-
-	/*
-		A quiet check is retried until it gets an answer and never shown as an import - e.g. after linking
-		when the check that should follow could not reach hypersomnia.io.
-	*/
-
 	bool key_check_quiet = false;
 	double key_check_next_at = 0.0;
-
-	void save_checked_key();
 
 	input last_input;
 
@@ -297,20 +288,6 @@ public:
 	*/
 
 	void recheck_link_quietly();
-
-	/*
-		"Continue unlinked" after a check that failed: the key counts as seen, and is asked about quietly later.
-	*/
-
-	void continue_without_link_check();
-
-	/*
-		True once when a key not seen before began its link check - the game shows it as an import.
-	*/
-
-	bool take_key_check_started() {
-		return std::exchange(key_check_started, false);
-	}
 
 	void start_link_check(const std::string& broker_url);
 	link_check_state get_link_check() const { return link_check; }

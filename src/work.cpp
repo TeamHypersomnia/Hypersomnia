@@ -1914,19 +1914,6 @@ work_result work(
 				identity->on_key_created();
 			}
 
-#if PLATFORM_WEB && !WEB_CRAZYGAMES && !WEB_ITCH
-			/*
-				Once a run, quietly: a link made where nothing was saved (another tab, a failed sync)
-				left no steam.cert here - the site still knows.
-			*/
-
-			static bool link_rechecked_this_run = false;
-
-			if (existed && !link_rechecked_this_run && !identity->has_saved_cert()) {
-				link_rechecked_this_run = true;
-				identity->recheck_link_quietly();
-			}
-#endif
 		}
 	};
 
@@ -1994,20 +1981,6 @@ work_result work(
 				cfg.client.use_account_profile = true;
 			});
 		}
-
-		/*
-			Not in the browser: nobody pastes a key into its storage by hand there - another tab's change is not an import.
-		*/
-
-#if !PLATFORM_WEB
-		/*
-			Not in the Steam build either: it has no Backup to restore in, and its account is the Steam one anyway.
-		*/
-
-		if (identity->take_key_check_started() && !is_steam_client) {
-			settings_gui.on_key_replaced_outside();
-		}
-#endif
 
 #if !PLATFORM_WEB
 		if (is_steam_client) {

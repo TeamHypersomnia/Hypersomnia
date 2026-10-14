@@ -48,7 +48,6 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	cert_file = new_cert_file;
 	profile_file = keys_dir / "steam_profile.json";
-	checked_key_file = keys_dir / "account.checked";
 
 	forget_cert();
 
@@ -69,39 +68,9 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	load_saved_cert();
 
-	key_check_quiet = false;
+	key_check_wanted = !cert_saved;
+	key_check_quiet = true;
 	key_check_next_at = 0.0;
-
-	/*
-		A key whose Steam cert is saved is known; any other is asked about unless it is the one last asked about.
-	*/
-
-	if (cert_saved) {
-		key_check_wanted = false;
-		save_checked_key();
-	}
-	else {
-		const auto checked = [&]() {
-			try {
-				return augs::file_to_string(checked_key_file);
-			}
-			catch (...) {
-				return std::string();
-			}
-		}();
-
-		key_check_wanted = checked.find(augs::bytes_to_hex(key_public)) == std::string::npos;
-	}
-}
-
-void identity_session::save_checked_key() {
-	try {
-		std::filesystem::create_directories(checked_key_file.parent_path());
-		augs::save_as_text_atomic(checked_key_file, augs::bytes_to_hex(key_public) + "\n");
-	}
-	catch (...) {
-		LOG("Could not save %x.", checked_key_file);
-	}
 }
 
 void identity_session::recheck_link_quietly() {
@@ -112,7 +81,6 @@ void identity_session::recheck_link_quietly() {
 
 void identity_session::on_key_created() {
 	key_check_wanted = false;
-	save_checked_key();
 }
 
 void identity_session::forget_cert() {
@@ -494,12 +462,16 @@ void identity_session::advance(const input& in, const double now) {
 		}
 	}
 
-	if (key_check_wanted && link_check_request == nullptr && !in.broker_url.empty() && now >= key_check_next_at) {
-		LOG("Asking whether the key is linked (%x).", key_check_quiet ? "again, quietly" : "not seen before - as on an import");
-		const bool quiet = key_check_quiet;
+	/*
+		Not the Steam build (its key is never linked) nor CrazyGames (its account is the token's).
+	*/
+
+	const bool key_can_be_linked = !in.steam_ticket_proof && in.provider != provider_type::CRAZYGAMES;
+
+	if (key_check_wanted && key_can_be_linked && link_check_request == nullptr && !in.broker_url.empty() && now >= key_check_next_at) {
+		LOG("Asking quietly whether the key is linked.");
 		start_link_check(in.broker_url);
-		key_check_quiet = quiet;
-		key_check_started = !quiet && link_check == link_check_state::PENDING;
+		key_check_quiet = true;
 	}
 
 	if (link_check_request != nullptr && link_check_request->is_ready()) {
@@ -547,7 +519,6 @@ void identity_session::advance(const input& in, const double now) {
 			link_check = link_check_state::NOT_LINKED;
 			link_check_profile = answer->profile;
 			key_check_quiet = false;
-			save_checked_key();
 		}
 		else {
 			/*
@@ -570,7 +541,6 @@ void identity_session::advance(const input& in, const double now) {
 			last_error.clear();
 			save_cert();
 			key_check_quiet = false;
-			save_checked_key();
 		}
 	}
 
@@ -826,11 +796,3 @@ void identity_session::clear_link_check() {
 	link_check_profile = {};
 }
 
-void identity_session::continue_without_link_check() {
-	/*
-		Not asked again at every start - but quietly, until hypersomnia.io answers.
-	*/
-
-	save_checked_key();
-	recheck_link_quietly();
-}

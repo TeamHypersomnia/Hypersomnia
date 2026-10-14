@@ -422,12 +422,6 @@ public:
 	const necessary_images_in_atlas_map* necessary_images = nullptr;
 
 	/*
-		A key not seen before appeared in account.key (pasted there by hand) - shown exactly as an import.
-	*/
-
-	void on_key_replaced_outside();
-
-	/*
 		account.key does not read and there is no key to play with: Backup, with what to do.
 	*/
 

@@ -94,7 +94,9 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `browser_sign_in.sh [steam id64]` (with `OPENED_URLS=<client>/opened_urls`) plays the player's browser for Link with Steam:
   opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then learns it by itself.
 - account.key is read only at the start and after Restore / Start a new account - a key swapped on disk counts from the
-  next start (restart the client to test it).
+  next start (restart the client to test it). Every start of a key without steam.cert (not one made just now) asks the broker
+  quietly whether it is linked ("Asking quietly whether the key is linked") - linked elsewhere, it plays as the Steam account;
+  never a modal. Not in the Steam build or CrazyGames.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
   then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Backup 385,144 - the panes' own fields
   move with their content, so screenshot first. Without it (the default 1280x720 layout): Info 307,278 / Link 440,278 / Backup 590,278,

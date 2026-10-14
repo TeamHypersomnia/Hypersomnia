@@ -696,34 +696,6 @@ static void link_avatar_and_name(const std::string& name, const bool has_avatar)
 	text(name);
 }
 
-void settings_gui_state::on_key_replaced_outside() {
-	open();
-	active_pane = settings_pane::ACCOUNT;
-	import_to_confirm.reset();
-	import_modal_open = true;
-	import_profile_applied = false;
-
-	/*
-		Whatever was being linked or unlinked was for the old key - the import modal takes over.
-	*/
-
-	link_flow = link_flow_type::IDLE;
-	link_result_request.reset();
-	unlink_request.reset();
-	steam_link_state.clear();
-	confirm_unlink = false;
-	unlinking = false;
-	unlink_result.reset();
-
-	/*
-		One modal at a time - two that both want to be open would close each other every frame and neither shows.
-	*/
-
-	account_message.reset();
-	confirm_forget_key = false;
-	reveal_private_key_open = false;
-}
-
 void settings_gui_state::perform_import_modal(
 	config_json_table& config,
 	config_json_table& last_saved_config,
@@ -875,7 +847,7 @@ void settings_gui_state::perform_import_modal(
 
 		if (ImGui::Button("Continue unlinked") && identity != nullptr) {
 			identity->clear_link_check();
-			identity->continue_without_link_check();
+			identity->recheck_link_quietly();
 			import_modal_open = false;
 			ImGui::CloseCurrentPopup();
 		}
