@@ -5,7 +5,7 @@
 #   community.sh start [silent]   starts it with a new key each time (its server.key removed); "silent" never tells the masterserver,
 #                                 so the list keeps the previous key (within the master's 60 s entry timeout) - a misconfigured server
 #   community.sh crash            kills it without a goodbye to the masterserver (its entry, with the key, stays for 60 s)
-#   community.sh stop | key | log
+#   community.sh stop | key | log                (PASSWORD=<pw> start - a server with a password)
 E=$HOME/yojimbo-test/e2e
 C=$E/community
 export LD_LIBRARY_PATH=$E/lib
@@ -47,7 +47,8 @@ start)
     "suppress_new_community_server_webhook": true,
     "webrtc_port_range_begin": 9006,
     "webrtc_port_range_end": 9010
-  }
+  },
+  "server_private": { "server_password": "${PASSWORD:-}" }
 }
 EOF
 

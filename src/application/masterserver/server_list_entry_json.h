@@ -8,6 +8,7 @@ struct server_list_entry_json {
 
 	bool is_web_server = false;
 	bool is_ranked = false;
+	bool require_password = false;
 
 	std::string site_displayed_address;
 

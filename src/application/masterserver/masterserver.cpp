@@ -497,6 +497,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.domain = meta.domain;
 			next.is_ranked = meta.is_official_server() && data.is_ranked_server();
 			next.is_web_server = meta.type == server_type::WEB;
+			next.require_password = data.require_password;
 			next.name = data.server_name;
 			next.ip = ::ToString(ip);
 			next.webrtc_id = meta.webrtc_id;

@@ -223,6 +223,27 @@ namespace augs {
 			return clicked;
 		}
 
+		/*
+			A padlock (e.g. before a server with a password): a filled body, the shackle a half ring above it.
+		*/
+
+		inline void padlock(const float size, const rgba col) {
+			const auto pos = ImGui::GetCursorScreenPos();
+			const auto col_u32 = ImGui::GetColorU32(ImVec4(col));
+			auto* const draw_list = ImGui::GetWindowDrawList();
+
+			const auto body_min = ImVec2(pos.x + size * 0.15f, pos.y + size * 0.45f);
+			const auto body_max = ImVec2(pos.x + size * 0.75f, pos.y + size * 0.92f);
+			const auto shackle_center = ImVec2((body_min.x + body_max.x) / 2, body_min.y);
+
+			draw_list->PathClear();
+			draw_list->PathArcTo(shackle_center, size * 0.2f, 3.14159265f, 3.14159265f * 2, 12);
+			draw_list->PathStroke(col_u32, 0, std::max(1.0f, size * 0.09f));
+			draw_list->AddRectFilled(body_min, body_max, col_u32, size * 0.08f);
+
+			ImGui::Dummy(ImVec2(size * 0.8f, size));
+		}
+
 		inline void spinner_line(const std::string& label, const rgba col) {
 			const auto size = ImGui::GetTextLineHeight();
 

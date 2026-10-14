@@ -723,6 +723,15 @@ void browse_servers_gui_state::show_server_list(
 				}
 			}
 
+			/*
+				A padlock before the name of a server with a password.
+			*/
+
+			if (d.require_password) {
+				padlock(ImGui::GetTextLineHeight(), rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]));
+				ImGui::SameLine();
+			}
+
 			auto col_scope = scoped_style_color(ImGuiCol_Text, color);
 
 			auto displayed_name = d.server_name;
