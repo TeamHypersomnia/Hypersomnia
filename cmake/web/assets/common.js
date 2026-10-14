@@ -18,8 +18,9 @@ function decodeCrazyGamesToken(token) {
   return payload;
 }
 
+// At most 3 s - the sign-in waits for it, and a join started meanwhile would go in as a guest
 function downloadAvatar(avatarUrl, callback) {
-  fetch(avatarUrl)
+  fetch(avatarUrl, { signal: AbortSignal.timeout(3000) })
     .then(response => response.arrayBuffer())
     .then(buffer => {
       const byteArray = new Uint8Array(buffer);
@@ -53,14 +54,45 @@ function getUserGeolocation() {
     });
 }
 
-// Module.hs_tab_blocked: the last tab did not open (e.g. Safari's popup blocker, a click too long ago) - the game says so
+// Module.hs_tab_blocked: the last tab did not open (e.g. Safari's popup blocker, a click too long ago) - the game says so.
+// The game opens it a frame after the click, which a strict browser (Safari) does not count as the click's -
+// a blocked one is opened again from inside the next click itself (e.g. on "Open it again").
+function tryOpenTab(urlStr) {
+  try {
+    const opened = !!window.open(urlStr, '_blank');
+
+    if (opened) {
+      Module.hs_last_opened_url = urlStr;
+      Module.hs_last_opened_at = Date.now();
+    }
+
+    return opened;
+  } catch (e) {
+    console.warn("Could not open URL (may be blocked by iframe restrictions or popup blocker):", e);
+    return false;
+  }
+}
+
 function openUrl(url) {
   const urlStr = UTF8ToString(url);
-  try {
-    Module.hs_tab_blocked = !window.open(urlStr, '_blank');
-  } catch (e) {
-    Module.hs_tab_blocked = true;
-    console.warn("Could not open URL (may be blocked by iframe restrictions or popup blocker):", e);
+
+  // Just opened by the click itself (below) - the game's own call for the same click opens no second tab
+  if (Module.hs_last_opened_url === urlStr && Date.now() - Module.hs_last_opened_at < 2000) {
+    Module.hs_tab_blocked = false;
+    return;
+  }
+
+  Module.hs_tab_blocked = !tryOpenTab(urlStr);
+
+  if (Module.hs_tab_blocked) {
+    Module.hs_blocked_url = urlStr;
+
+    document.addEventListener('pointerup', () => {
+      if (Module.hs_blocked_url === urlStr) {
+        Module.hs_blocked_url = null;
+        Module.hs_tab_blocked = !tryOpenTab(urlStr);
+      }
+    }, { once: true, capture: true });
   }
 }
 

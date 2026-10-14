@@ -1232,23 +1232,6 @@ void server_setup::send_goodbye_to_masterserver() {
 			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
 		}
 	}
-
-	if (has_sent_any_heartbeats()) {
-		for (const auto& list : additional_server_lists) {
-			if (!list.resolved.has_value()) {
-				continue;
-			}
-
-			auto goodbye = masterserver_in::goodbye {};
-			sign_for_masterserver(goodbye, list.cookie);
-
-			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
-
-			for (int i = 0; i < 5; ++i) {
-				server->send_udp_packet(*list.resolved, goodbye_bytes.data(), goodbye_bytes.size());
-			}
-		}
-	}
 #endif
 }
 
@@ -2507,38 +2490,6 @@ bool server_setup::handle_masterserver_response(
 			*/
 
 			{
-				/*
-					An additional server list keeps its own cookie - the main one's address answers for the main one.
-				*/
-
-				const bool from_main = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
-
-				for (auto& list : additional_server_lists) {
-					if (!from_main && list.resolved.has_value() && *list.resolved == from) {
-						/*
-							A heartbeat without its cookie only got one - sent again right away, once per new cookie.
-						*/
-
-						list.cookie = typed_request.cookie;
-
-						/*
-							Once until a heartbeat is accepted - a masterserver that never accepts does not get them in a loop.
-						*/
-
-						if (!typed_request.accepted) {
-							if (!list.resent_for_cookie) {
-								list.resent_for_cookie = true;
-								when_last_sent_heartbeat_to_server_list = 0;
-							}
-						}
-						else {
-							list.resent_for_cookie = false;
-						}
-
-						return true;
-					}
-				}
-
 				const bool from_masterserver = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
 
 				if (!from_masterserver) {
@@ -2675,103 +2626,7 @@ void server_setup::resolve_server_list() {
 	}
 }
 
-void server_setup::sync_additional_server_lists() {
-	/*
-		Not the main list again: its acks would be taken for the additional one's.
-	*/
-
-	auto configured = std::vector<std::string>();
-
-	for (const auto& address : private_vars.additional_notified_server_lists) {
-		if (address != vars.notified_server_list) {
-			configured.push_back(address);
-		}
-	}
-
-	const bool same = configured.size() == additional_server_lists.size() && std::equal(
-		configured.begin(),
-		configured.end(),
-		additional_server_lists.begin(),
-		[](const auto& address, const auto& list) { return address == list.address; }
-	);
-
-	if (same) {
-		return;
-	}
-
-	/*
-		The lists no longer configured are told goodbye, as at a shutdown.
-	*/
-
-	for (const auto& old : additional_server_lists) {
-		const bool removed = std::find(configured.begin(), configured.end(), old.address) == configured.end();
-
-		if (removed && old.resolved.has_value() && has_sent_any_heartbeats()) {
-			auto goodbye = masterserver_in::goodbye {};
-			sign_for_masterserver(goodbye, old.cookie);
-
-			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
-			server->send_udp_packet(*old.resolved, goodbye_bytes.data(), goodbye_bytes.size());
-		}
-	}
-
-	additional_server_lists.clear();
-
-	if (configured.size() != private_vars.additional_notified_server_lists.size()) {
-		LOG("Skipping an additional server list that is the main one (notified_server_list).");
-	}
-
-	for (const auto& address : configured) {
-		auto list = additional_server_list();
-		list.address = address;
-		additional_server_lists.emplace_back(std::move(list));
-	}
-}
-
 void server_setup::resolve_heartbeat_host_if_its_time() {
-	if (server->is_running()) {
-		sync_additional_server_lists();
-
-		for (auto& list : additional_server_lists) {
-			if (valid_and_is_ready(list.future_resolved)) {
-				const auto result = list.future_resolved.get();
-
-				if (result.result == resolve_result_type::OK) {
-					if (result.addr != list.resolved) {
-						request_immediate_heartbeat();
-					}
-
-					list.resolved = result.addr;
-					list.last_resolve_error.clear();
-				}
-				else if (const auto report = result.report(); report != list.last_resolve_error) {
-					LOG("Could not resolve the additional server list %x: %x", list.address, report);
-					list.last_resolve_error = report;
-				}
-
-				list.when_last_resolved = server_time;
-			}
-
-			if (list.future_resolved.valid()) {
-				continue;
-			}
-
-			/*
-				One that does not resolve (e.g. a typo) is asked about again every 10 seconds, not every tick.
-			*/
-
-			const auto resolve_every = list.resolved.has_value() ? vars.resolve_server_list_address_once_every_secs : 10.0;
-			const bool due = server_time - list.when_last_resolved >= resolve_every;
-
-			if (due) {
-				if (auto parsed = parsed_url(list.address); parsed.valid()) {
-					list.future_resolved = async_resolve_address({ parsed.host, port_type(parsed.port) });
-					list.when_last_resolved = server_time;
-				}
-			}
-		}
-	}
-
 	if (!server_list_enabled()) {
 		return;
 	}
@@ -3080,43 +2935,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	}
 
 #if BUILD_NATIVE_SOCKETS
-	/*
-		The same heartbeat to every additional server list, signed with its own cookie.
-	*/
-
-	for (std::size_t i = 0; i < additional_server_lists.size(); ++i) {
-		const auto& list = additional_server_lists[i];
-
-		if (!list.resolved.has_value()) {
-			continue;
-		}
-
-		/*
-			One at the main server list's address, or at another one's, is the same masterserver under another name:
-			not sent to twice - their answers would take each other's cookies and the heartbeats would go round.
-		*/
-
-		const bool same_as_main = resolved_server_list_addr.has_value() && *resolved_server_list_addr == *list.resolved;
-
-		const bool same_as_earlier = std::any_of(
-			additional_server_lists.begin(),
-			additional_server_lists.begin() + static_cast<std::ptrdiff_t>(i),
-			[&](const auto& earlier) { return earlier.resolved == list.resolved; }
-		);
-
-		if (same_as_main || same_as_earlier) {
-			continue;
-		}
-
-		auto copy = heartbeat;
-		sign_for_masterserver(copy, list.cookie);
-
-		auto bytes = augs::to_bytes(masterserver_request(std::move(copy)));
-		server->send_udp_packet(*list.resolved, bytes.data(), bytes.size());
-	}
-
 	if (!server_list_enabled() || !resolved_server_list_addr.has_value()) {
-		sent_any_heartbeat = sent_any_heartbeat || !additional_server_lists.empty();
 		return;
 	}
 #endif
@@ -3191,13 +3010,9 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 
 	const int times_to_send_first_time = 1;
 #else
-	const bool any_additional = std::any_of(additional_server_lists.begin(), additional_server_lists.end(), [](const auto& list) {
-		return list.resolved.has_value();
-	});
-
 	const bool main_resolved = server_list_enabled() && resolved_server_list_addr.has_value();
 
-	if (!server->is_running() || (!main_resolved && !any_additional)) {
+	if (!server->is_running() || !main_resolved) {
 		return;
 	}
 

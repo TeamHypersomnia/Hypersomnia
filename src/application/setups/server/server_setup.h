@@ -262,23 +262,6 @@ class server_setup :
 	std::optional<netcode_address_t> resolved_server_list_addr;
 	std::optional<netcode_address_t> external_address;
 
-	/*
-		More masterservers to be listed on (additional_notified_server_lists): each gets the same heartbeats,
-		signed with its own cookie, and the goodbye. Signalling, the external address and "official" come from the main one.
-	*/
-
-	struct additional_server_list {
-		std::string address;
-		std::future<resolve_address_result> future_resolved;
-		std::optional<netcode_address_t> resolved;
-		net_time_t when_last_resolved = 0;
-		masterserver_cookie_type cookie = {};
-		bool resent_for_cookie = false;
-		std::string last_resolve_error;
-	};
-
-	std::vector<additional_server_list> additional_server_lists;
-	void sync_additional_server_lists();
 #endif
 
 	net_time_t server_time = 0.0;
