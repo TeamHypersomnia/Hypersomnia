@@ -1937,9 +1937,6 @@ work_result work(
 		if (is_steam_client) {
 			in.provider = identity_session::provider_type::STEAM;
 			in.steam_ticket_proof = true;
-#if !PLATFORM_WEB
-			in.steam_account = "steam_" + steam_id;
-#endif
 		}
 #if PLATFORM_WEB
 		else if (params.is_crazygames) {

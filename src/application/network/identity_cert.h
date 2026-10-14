@@ -81,14 +81,6 @@ namespace identity_cert {
 	std::string cert_request_message(const augs::ed25519_public_key_type& session_public_key);
 
 	/*
-		What an account key signs to link itself to the Steam account of a ticket (/cert with link=1):
-		the tag, the session public key and the SHA-256 of the ticket - good for that one ticket only,
-		unlike the cert request signature, which is the same in every request.
-	*/
-
-	std::string link_request_message(const augs::ed25519_public_key_type& session_public_key, const std::vector<std::byte>& steam_ticket);
-
-	/*
 		What the game requests a Steam Web API ticket for, so the ticket is good only with this session key:
 		the first 15 bytes of SHA-256 of "hs-steam-v1" and the key, in hex. Steam takes an identity of at most 31 characters.
 	*/

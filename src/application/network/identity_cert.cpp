@@ -139,20 +139,6 @@ namespace identity_cert {
 		return out;
 	}
 
-	std::string link_request_message(const augs::ed25519_public_key_type& session_public_key, const std::vector<std::byte>& steam_ticket) {
-		auto out = std::string("hs-cert-link-v1");
-		out.append(reinterpret_cast<const char*>(session_public_key.data()), session_public_key.size());
-
-#if BUILD_NETWORKING
-		auto hash = std::array<uint8_t, crypto_hash_sha256_BYTES>();
-		crypto_hash_sha256(hash.data(), reinterpret_cast<const unsigned char*>(steam_ticket.data()), steam_ticket.size());
-		out.append(reinterpret_cast<const char*>(hash.data()), hash.size());
-#else
-		(void)steam_ticket;
-#endif
-		return out;
-	}
-
 	std::string steam_ticket_identity(const augs::ed25519_public_key_type& session_public_key) {
 #if BUILD_NETWORKING
 		auto message = std::string("hs-steam-v1");

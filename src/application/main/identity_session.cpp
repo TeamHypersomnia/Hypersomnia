@@ -38,7 +38,6 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	key_seed = seed;
 	key_loaded = true;
-	steam_ticket_needed = false;
 
 	if (const auto public_key = augs::ed25519_public_key(key_seed)) {
 		key_public = *public_key;
@@ -343,23 +342,12 @@ std::optional<std::string> identity_session::build_location(const input& in) con
 	}
 
 	if (in.provider == provider_type::STEAM) {
-		if (in.steam_ticket_proof && steam_ticket_needed) {
+		if (in.steam_ticket_proof) {
 			if (!steam_ticket.has_value()) {
 				return std::nullopt;
 			}
 
-			/*
-				Linking needs the key's own signature too - a ticket alone could be asked for anyone's public key -
-				over this very ticket, so a signature seen once can not link the key to another Steam account.
-			*/
-
-			const auto link_signature = augs::ed25519_sign(key_seed, identity_cert::link_request_message(key_public, *steam_ticket));
-
-			if (!link_signature.has_value()) {
-				return std::nullopt;
-			}
-
-			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket) + "&link=1&key=" + augs::bytes_to_hex(key_public) + "&sig=" + augs::bytes_to_hex(*link_signature);
+			return location + "&steam=" + augs::bytes_to_hex(*steam_ticket);
 		}
 
 		const auto key = key_location();
@@ -561,18 +549,6 @@ void identity_session::advance(const input& in, const double now) {
 			key_check_quiet = false;
 			save_checked_key();
 		}
-		else if (!last_input.steam_account.empty() && answer->cert.account != last_input.steam_account) {
-			/*
-				The Steam build with a key linked to another Steam account: not its cert -
-				the next request asks with this Steam account's ticket.
-			*/
-
-			LOG("The key is linked to %x, not to the Steam account signed in (%x).", answer->cert.account, last_input.steam_account);
-			link_check = link_check_state::NOT_LINKED;
-			link_check_profile = answer->profile;
-			key_check_quiet = false;
-			save_checked_key();
-		}
 		else {
 			/*
 				Linked: the Steam cert is ours from now on, and steam.cert says so on the next start.
@@ -619,28 +595,7 @@ void identity_session::advance(const input& in, const double now) {
 
 		const auto answer = response.status == 200 ? parse_answer(response.body) : std::nullopt;
 
-		if (answer.has_value() && in.steam_ticket_proof && answer->cert.account != in.steam_account) {
-			if (!steam_ticket_needed) {
-				/*
-					The key is not linked to this Steam account (yet, or no longer): once with a ticket, which links it.
-					Not an attempt of its own - the first sign-in still waits for that one.
-				*/
-
-				LOG("The key is not linked to %x - asking with a Steam ticket.", in.steam_account);
-				steam_ticket_needed = true;
-				next_attempt_at = 0.0;
-				--attempts_finished;
-				return;
-			}
-
-			LOG("A cert for %x came for a Steam ticket of %x - not used.", answer->cert.account, in.steam_account);
-		}
-
-		if (answer.has_value() && in.steam_ticket_proof && answer->cert.account == in.steam_account) {
-			steam_ticket_needed = false;
-		}
-
-		if (answer.has_value() && (!in.steam_ticket_proof || answer->cert.account == in.steam_account)) {
+		if (answer.has_value()) {
 			last_attempt_failed = false;
 			last_error.clear();
 			retry_delay = first_retry_delay_secs;
@@ -745,7 +700,7 @@ void identity_session::advance(const input& in, const double now) {
 		return;
 	}
 
-	if (in.steam_ticket_proof && steam_ticket_needed && !steam_ticket.has_value()) {
+	if (in.steam_ticket_proof && !steam_ticket.has_value()) {
 		steam_ticket_wanted = true;
 		return;
 	}

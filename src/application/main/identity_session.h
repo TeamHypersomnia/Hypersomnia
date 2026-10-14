@@ -44,16 +44,11 @@ public:
 		provider_type provider = provider_type::NONE;
 
 		/*
-			The Steam build proves its Steam account with a ticket, the other builds with the key's signature.
+			The Steam build proves its Steam account with a ticket for every cert (its key is never linked),
+			the other builds with the key's signature.
 		*/
 
 		bool steam_ticket_proof = false;
-
-		/*
-			The Steam build: its own account ("steam_<id64>") - a cert for it by the key's signature needs no ticket.
-		*/
-
-		std::string steam_account;
 		std::string crazygames_token;
 
 		/*
@@ -126,13 +121,6 @@ private:
 	*/
 
 	bool steam_ticket_wanted = false;
-
-	/*
-		The Steam build asks with the key's signature first; only when that is not its Steam account yet
-		(not linked, or unlinked on the site) once with a ticket, which links the key - see broker.js.
-	*/
-
-	bool steam_ticket_needed = false;
 
 	/*
 		The device the game runs on, sent with every request - shown only on the owner's hypersomnia.io/profile.

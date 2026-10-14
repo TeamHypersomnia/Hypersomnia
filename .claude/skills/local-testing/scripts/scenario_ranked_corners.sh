@@ -62,7 +62,7 @@ ID_B=$(account_id bob)
 (cd $S/broker_site && node -e '
 const db = require("./src/db");
 db.prepare("INSERT OR IGNORE INTO associations (child_id, parent_id) VALUES (?, ?)").run(process.argv[1], process.argv[2]);
-db.prepare("INSERT OR REPLACE INTO key_links (child_id, linked_via, device, last_cert_at, os) VALUES (?, ?, ?, ?, ?)").run(process.argv[1], "browser", "corners", 1, "linux");
+db.prepare("INSERT OR REPLACE INTO key_devices (child_id, device, os, last_cert_at) VALUES (?, ?, ?, ?)").run(process.argv[1], "corners", "linux", 1);
 process.exit(0);' $ID_A $STEAM_ID)
 
 cat > $T/server/user/conf.d/test.json <<J

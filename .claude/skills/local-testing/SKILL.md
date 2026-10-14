@@ -116,10 +116,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   the arena combo 450,284, Apply & Save 397,578. The server logs "Authorized the admin profile ... for basic rcon",
   "<nick> changed arena to ...", "Restarting the server due to rcon's request". BASIC: arena, game mode, map cycle, match commands,
   kick/ban, restart/shutdown/updates/logs; not Vars, not "Clear all" of the runtime prefs.
-- `../steam_link_test.js` - linking by a Steam ticket at the 32-key limit, straight on the scratch site's DB (copy it into the site dir).
 - `crazygames_sdk_stub.py <any pem> <game id> - <out.js>` - a CrazyGames guest (no token, no user).
-- `../link1_signature_test.py` (`STEAM_CWD=<dir with steam_appid.txt: 2660970>`, the user's Steam running) - the broker's link=1:
-  the replayable cert request signature must not link ("Not linking"), the one over the ticket must.
 - The fake `zenity` writes its arguments to `$ZENITY_LOG` (the file filters, the save dialog's title) and "chooses" `$FAKE_ZENITY_FILE`.
 - `ui.sh stop` finds the client by its dir, whatever `BIN` started it.
 - An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
