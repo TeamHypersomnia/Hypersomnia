@@ -289,6 +289,8 @@ void browse_servers_gui_state::sync_download_server_entry(
 	(void)server;
 	(void)in;
 
+	error_message.clear();
+
 	/* Todo: make async */
 	auto lbd = 
 		[address = in.server_list_provider]() -> std::optional<httplib_result> {
@@ -307,7 +309,15 @@ void browse_servers_gui_state::sync_download_server_entry(
 	auto result = lbd();
 
 	if (result.has_value() && *result != nullptr) {
-		server_list = ::to_server_list( { (*result)->status, (*result)->body } , error_message);
+		/*
+			A failed download keeps the last list, as in perform.
+		*/
+
+		auto new_list = ::to_server_list( { (*result)->status, (*result)->body } , error_message);
+
+		if (error_message.empty()) {
+			server_list = std::move(new_list);
+		}
 	}
 }
 #endif

@@ -114,7 +114,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - **RCON levels:** make the client's key first (`node -e` in the broker site with `src/identity_cert.js`: `privateKeyFromSeed`,
   `rawPublicKey`; write `hypersomnia-key-v1:<seed hex>` to `<client>/user/.keys/account.key`), then
   `PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]' SERVER_EXTRA=', "auto_authorize_loopback_for_rcon": false'`
-  (else a loopback client is MASTER). In game F8; at 1280x720 the tabs Arenas 383,252 / Vars 651,252 / Maintenance 761,252,
+  (a loopback client gets no RCON by default; `"auto_authorize_loopback_for_rcon": true` makes it MASTER - off since TURN could relay anyone to loopback). In game F8; at 1280x720 the tabs Arenas 383,252 / Vars 651,252 / Maintenance 761,252,
   the arena combo 450,284, Apply & Save 397,578. The server logs "Authorized the admin profile ... for basic rcon",
   "<nick> changed arena to ...", "Restarting the server due to rcon's request". BASIC: arena, game mode, map cycle, match commands,
   kick/ban, restart/shutdown/updates/logs; not Vars, not "Clear all" of the runtime prefs.

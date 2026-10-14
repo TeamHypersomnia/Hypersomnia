@@ -633,10 +633,16 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 				masterserver_client entry;
 
-				webrtc_id_type dummy;
-				augs::read_bytes(source, dummy);
 				augs::read_bytes(source, entry.meta);
 				augs::read_bytes(source, entry.last_heartbeat);
+
+				/*
+					The list has the servers in browsers too - they come back through the signalling, not as native entries.
+				*/
+
+				if (entry.meta.type == server_type::WEB) {
+					continue;
+				}
 
 				entry.time_last_heartbeat = current_time;
 

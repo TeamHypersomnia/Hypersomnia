@@ -7,6 +7,7 @@
 #include <random>
 #include <array>
 #include <string>
+#include <mutex>
 #include "augs/misc/date_time.h"
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -2507,11 +2508,13 @@ bool server_setup::handle_masterserver_response(
 
 			{
 				/*
-					An additional server list keeps its own cookie.
+					An additional server list keeps its own cookie - the main one's address answers for the main one.
 				*/
 
+				const bool from_main = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
+
 				for (auto& list : additional_server_lists) {
-					if (list.resolved.has_value() && *list.resolved == from) {
+					if (!from_main && list.resolved.has_value() && *list.resolved == from) {
 						/*
 							A heartbeat without its cookie only got one - sent again right away, once per new cookie.
 						*/
@@ -3081,8 +3084,27 @@ void server_setup::send_heartbeat_to_server_list() {
 		The same heartbeat to every additional server list, signed with its own cookie.
 	*/
 
-	for (const auto& list : additional_server_lists) {
+	for (std::size_t i = 0; i < additional_server_lists.size(); ++i) {
+		const auto& list = additional_server_lists[i];
+
 		if (!list.resolved.has_value()) {
+			continue;
+		}
+
+		/*
+			One at the main server list's address, or at another one's, is the same masterserver under another name:
+			not sent to twice - their answers would take each other's cookies and the heartbeats would go round.
+		*/
+
+		const bool same_as_main = resolved_server_list_addr.has_value() && *resolved_server_list_addr == *list.resolved;
+
+		const bool same_as_earlier = std::any_of(
+			additional_server_lists.begin(),
+			additional_server_lists.begin() + static_cast<std::ptrdiff_t>(i),
+			[&](const auto& earlier) { return earlier.resolved == list.resolved; }
+		);
+
+		if (same_as_main || same_as_earlier) {
 			continue;
 		}
 
@@ -4836,8 +4858,24 @@ message_handler_result server_setup::handle_rcon_payload(
 			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode.empty() ? "map default" : new_v.game_mode));
 		}
 
+		const bool changed = !(requested_vars == vars);
+
 		apply(requested_vars);
 		write_vars_to_disk_once = true;
+
+		/*
+			Nothing changed (e.g. what BASIC may not change, or a ranked match about to start): the sender still gets
+			the settings back - its window waits for them ("Applying changes...").
+		*/
+
+		if (!changed && rcon_client_id != get_integrated_client_id()) {
+			server->send_payload(
+				rcon_client_id,
+				game_channel_type::RELIABLE_MESSAGES,
+
+				vars
+			);
+		}
 
 		rescan_runtime_prefs();
 		broadcast_runtime_info_for_rcon();
@@ -5905,12 +5943,47 @@ void server_setup::load_bans() {
 	}
 }
 
-void server_setup::save_bans() const {
+/*
+	The servers of one process (num_ranked_servers, num_casual_servers) share the file: each save first takes in what
+	the others banned meanwhile, so that no ban is lost - and this server knows those from then on too.
+*/
+
+void server_setup::save_bans() {
+	static std::mutex bans_file_mutex;
+	auto lock = std::lock_guard<std::mutex>(bans_file_mutex);
+
+	const auto path = bans_path();
+
+	if (augs::exists(path)) {
+		try {
+			auto on_disk = server_bans();
+			augs::from_json_file(path, on_disk);
+
+			for (const auto& b : on_disk.bans) {
+				if (std::find(bans.bans.begin(), bans.bans.end(), b) == bans.bans.end()) {
+					bans.bans.push_back(b);
+				}
+			}
+
+			bans.remove_expired(::unix_now_secs());
+		}
+		catch (const std::exception& e) {
+			/*
+				A damaged file is kept aside - it is replaced by this server's bans now.
+			*/
+
+			LOG("ERROR: could not read the bans from %x: %x. Kept as .damaged; saving only this server's.", path, e.what());
+
+			std::error_code ec;
+			std::filesystem::copy_file(path, augs::path_type(path).concat(".damaged"), std::filesystem::copy_options::overwrite_existing, ec);
+		}
+	}
+
 	try {
-		augs::save_as_json_atomic(bans, bans_path());
+		augs::save_as_json_atomic(bans, path);
 	}
 	catch (const std::exception& e) {
-		LOG("ERROR: could not save the bans to %x: %x", bans_path(), e.what());
+		LOG("ERROR: could not save the bans to %x: %x", path, e.what());
 	}
 }
 
@@ -5967,7 +6040,8 @@ std::string server_setup::get_client_ip_for_bans(const client_id_type& id) const
 /*
 	Handshakes (each an X25519) per address, before netcode's cap for all together: 20 a second, bursts of 40,
 	an address counted as for bans - a WebRTC peer by the address it really connects from, by its own id if that is unknown.
-	The local machine is not limited. A full table takes no new addresses - netcode's cap still holds then.
+	The local machine is not limited. A full table tracks no new addresses - they pass, held only by netcode's cap for
+	all together: refusing them would turn away every new player.
 */
 
 bool server_setup::allow_handshake(const netcode_address_t& from) {

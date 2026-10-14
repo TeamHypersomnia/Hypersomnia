@@ -1490,7 +1490,7 @@ work_result work(
 		sp.warning_notice_above = "Are you sure you want to abandon the match?";
 		sp.message = "You will NOT be able to rejoin!\n";
 
-		sp.warning_notice = "\nYou will LOSE MMR - as if you lost the match THREE TIMES!\n \n";
+		sp.warning_notice = "\nIt counts as a lost match.\n \n";
 
 		abandon_are_you_sure_popup = sp;
 	};
@@ -2027,7 +2027,7 @@ work_result work(
 	WEBSTATIC auto remembered_servers = known_servers(KEYS_DIR / known_servers::file_name);
 
 	/*
-		A password entered for a server whose key is not known yet - used once, for the next connection only.
+		A password entered for a server whose key is not known yet, and Connect anyway - for the next launch only.
 	*/
 
 	WEBSTATIC std::optional<std::string> next_connect_password;
@@ -2320,8 +2320,8 @@ work_result work(
 				After "Connect anyway" too: the key it showed this time is checked on the next joins.
 			*/
 
-			if (server_key.has_value() && learn_server_key(client, *server_key)) {
-				remembered_servers.set(std::string(client.get_connect_string()), *server_key);
+			if (server_key.has_value()) {
+				(void)learn_server_key(client, *server_key);
 			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
@@ -2922,6 +2922,14 @@ work_result work(
 		auto connect_string = config.client_connect;
 
 		/*
+			A password or Connect anyway is for the launch right after it - one that stops early (e.g. waiting for the
+			sign-in, the player cancelling) drops them, so they never reach the next server joined.
+		*/
+
+		auto password_for_this_launch = std::exchange(next_connect_password, std::nullopt);
+		const bool connect_anyway_this_launch = std::exchange(connect_anyway_once, false);
+
+		/*
 			What the server list says about the chosen server, e.g. its key.
 		*/
 
@@ -3011,7 +3019,7 @@ work_result work(
 				&& *remembered_key != *list_key
 			;
 
-			if (key_changed_since_last_time && !connect_anyway_once) {
+			if (key_changed_since_last_time && !connect_anyway_this_launch) {
 				LOG("The server list has another key for %x than the last time - asking before connecting.", connect_string);
 
 				auto popup = simple_popup();
@@ -3067,9 +3075,8 @@ work_result work(
 			identity_context.password = saved_server_passwords.find(*identity_context.expected_server_public_key);
 		}
 
-		if (next_connect_password.has_value()) {
-			identity_context.password = *next_connect_password;
-			next_connect_password.reset();
+		if (password_for_this_launch.has_value()) {
+			identity_context.password = *password_for_this_launch;
 		}
 
 		/*
@@ -3077,7 +3084,7 @@ work_result work(
 			password - except from the server list, which stays the key to expect.
 		*/
 
-		if (std::exchange(connect_anyway_once, false)) {
+		if (connect_anyway_this_launch) {
 			if (identity_context.expected_key_source != expected_server_key_source::SERVER_LIST) {
 				identity_context.connected_anyway = true;
 				identity_context.expected_server_public_key.reset();

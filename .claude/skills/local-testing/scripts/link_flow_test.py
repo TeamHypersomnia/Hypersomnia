@@ -47,7 +47,8 @@ def fields(state, signer=None):
     # What the game puts in the URL: its state signed with its key, the device
     signer = signer or key
     public = signer.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
-    return { 'state': state, 'key': public, 'sig': signer.sign(('hypersomnia-link-v1 ' + state).encode()).hex(), 'device': 'test', 'os': 'linux' }
+    t = str(int(time.time()))
+    return { 'state': state, 't': t, 'key': public, 'sig': signer.sign(('hypersomnia-link-v1 %s %s' % (state, t)).encode()).hex(), 'device': 'test', 'os': 'linux' }
 
 def confirm(state, cookie, signer=None):
     # The confirm page's [Link]: links at once
@@ -87,7 +88,12 @@ check('result allows the game origin (CORS) - the web build asks it from another
 
 status, _, headers = get('/link_key/start?' + start_query)
 check('start without a session goes to Steam sign in', status == 302 and '/auth/steam' in headers.get('Location', ''), headers.get('Location', ''))
-status, _, _ = get('/link_key/start?state=xyz&key=%s&sig=%s' % (pub, '0' * 128), cookie)
+old = fields(state)
+old_t = str(int(time.time()) - 3600)
+old.update({ 't': old_t, 'sig': key.sign(('hypersomnia-link-v1 %s %s' % (state, old_t)).encode()).hex() })
+status, body, _ = get('/link_key/start?' + urllib.parse.urlencode(old), cookie)
+check('start refuses a link page an hour old', status == 400 and 'too old' in body)
+status, _, _ = get('/link_key/start?state=xyz&t=1&key=%s&sig=%s' % (pub, '0' * 128), cookie)
 check('start refuses a malformed state', status == 400)
 bad = fields(state)
 bad['sig'] = fields(secrets.token_hex(16))['sig']
@@ -122,7 +128,7 @@ def mmr_owner():
 status, body, headers = confirm(state, cookie)
 check('Link on that page links and says to go back to the game (no redirect)', status == 200 and 'You can go back to Hypersomnia' in body and 'Location' not in headers, body[:200])
 check('the game learns it is linked', result_for(state) == { 'linked': 'steam_' + steam_id })
-check('the result is given once', result_for(state) is None)
+check('the result is given again until it expires (one lost on the way)', result_for(state) == { 'linked': 'steam_' + steam_id })
 status, body, _ = confirm(state, cookie)
 check('a state links once', status == 409, '%s %s' % (status, body[:100]))
 

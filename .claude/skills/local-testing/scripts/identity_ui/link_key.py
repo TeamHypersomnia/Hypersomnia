@@ -13,7 +13,9 @@ state = secrets.token_hex(16)
 env = dict(os.environ, SESSION_SECRET=open(S + '/nettest/session_secret').read().strip())
 here = os.path.dirname(os.path.abspath(__file__))
 cookie = subprocess.check_output(['python3', here + '/../fake_steam_session.py', S + '/nettest/broker_site', steam, 'Pythagoras of Samos'], env=env).decode().strip()
-fields = { 'state': state, 'key': pub, 'sig': key.sign(('hypersomnia-link-v1 ' + state).encode()).hex(), 'device': 'test', 'os': 'linux' }
+import time
+t = str(int(time.time()))
+fields = { 'state': state, 't': t, 'key': pub, 'sig': key.sign(('hypersomnia-link-v1 %s %s' % (state, t)).encode()).hex(), 'device': 'test', 'os': 'linux' }
 req = urllib.request.Request('http://127.0.0.1:13500/link_key/start', data=urllib.parse.urlencode(fields).encode(), headers={ 'Cookie': cookie })
 try:
     urllib.request.urlopen(req).read()

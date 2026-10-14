@@ -38,7 +38,11 @@ namespace augs {
 			emscripten_fetch_attr_init(&attr);
 			strcpy(attr.requestMethod, "GET");
 			attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-			attr.timeoutMSecs = 5000;
+			/*
+				A download with its progress shown (e.g. a map from a mirror) may take long - only the rest give up after 5 s.
+			*/
+
+			attr.timeoutMSecs = on_progress ? 0 : 5000;
 
 			std::vector<const char*> headerData;
 			for (const auto& header : headers) {

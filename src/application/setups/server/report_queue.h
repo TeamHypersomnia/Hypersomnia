@@ -173,10 +173,11 @@ public:
 
 			/*
 				429 is the site's limits: retried, like a network error (and a 503 - e.g. the site not reading its list of
-				official servers for a moment), until the report is too old. Other 4xx are final.
+				official servers for a moment), until the report is too old. So is a 401: the site may not know this
+				server's key yet (its official_servers.d behind the masterserver's). Other 4xx are final.
 			*/
 
-			const bool retryable = status == 429;
+			const bool retryable = status == 429 || status == 401;
 
 			if (status >= 400 && status < 500 && !retryable) {
 				LOG("ERROR: hypersomnia.io refused the match report %x (HTTP %x). Dropping it.", result.file.filename(), status);

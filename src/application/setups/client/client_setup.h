@@ -1035,6 +1035,7 @@ public:
 	*/
 
 	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+	mutable std::optional<augs::ed25519_public_key_type> server_public_key_seen;
 
 	/*
 		Not on the address joined, but on the same port on localhost (the second address tried).

@@ -298,7 +298,7 @@ async function pre_run_cg() {
       if (available) {
         try {
           const token = await window.CrazyGames.SDK.user.getUserToken();
-          console.log("Get token result", token);
+          console.log("Got a CrazyGames token.");
 
           const payload = decodeCrazyGamesToken(token);
 

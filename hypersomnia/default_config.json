@@ -416,7 +416,7 @@
             "loss_percent": 1.0,
             "duplicates_percent": 1.0
         },
-        "auto_authorize_loopback_for_rcon": true,
+        "auto_authorize_loopback_for_rcon": false,
         "auto_authorize_internal_for_rcon": false,
         "max_unauthorized_rcon_commands": 100,
         "log_performance_once_every_secs": 0.0,

@@ -214,6 +214,17 @@ message_handler_result server_setup::handle_payload(
 #if IS_PRODUCTION_BUILD
 		if (is_ranked_live_or_starting()) {
 			LOG("Cannot execute RCON commands during a ranked match.");
+
+			/*
+				The settings go back as they are - the window waits for them ("Applying changes...").
+			*/
+
+			if constexpr(std::is_same_v<T, server_vars>) {
+				if (level >= rcon_level_type::BASIC) {
+					server->send_payload(client_id, game_channel_type::RELIABLE_MESSAGES, vars);
+				}
+			}
+
 			return continue_v;
 		}
 #endif

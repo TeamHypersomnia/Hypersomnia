@@ -832,7 +832,7 @@ public:
 	std::string ban_message_for(const std::string& account) const;
 	std::string ban_message(const server_ban&) const;
 	void load_bans();
-	void save_bans() const;
+	void save_bans();
 
 	mode_player_id get_local_player_id() const {
 		return get_integrated_player_id();

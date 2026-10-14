@@ -606,7 +606,7 @@ void arena_mode::notify_ranked_banned(
 	messages::mode_notification notification;
 
 	notification.subject_mode_id = id_when_suspended;
-	notification.subject_name = nickname,
+	notification.subject_name = nickname;
 	notification.payload = messages::joined_or_left::RANKED_BANNED;
 	notification.subject_account_id = banned_player.server_ranked_account_id;
 

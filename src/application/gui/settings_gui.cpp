@@ -503,6 +503,8 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
 
 	if (waiting) {
+		const bool page_was_open = link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
+
 		link_flow = link_flow_type::IDLE;
 		link_flow_message.clear();
 		steam_link_state.clear();
@@ -510,6 +512,14 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 
 		if (identity != nullptr) {
 			identity->clear_link_check();
+
+			/*
+				The page may still be confirmed in the browser - asked quietly in a while (and at every start).
+			*/
+
+			if (page_was_open) {
+				identity->recheck_link_quietly();
+			}
 		}
 	}
 }
@@ -1512,9 +1522,10 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 	auto open_steam_sign_in = [&]() {
 		augs::open_url(typesafe_sprintf(
-			"%x/link_key/start?state=%x&key=%x&sig=%x%x",
+			"%x/link_key/start?state=%x&t=%x&key=%x&sig=%x%x",
 			website_url,
 			steam_link_state,
+			steam_link_time,
 			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
 			steam_link_signature,
 			identity != nullptr ? identity->device_query() : std::string()
@@ -1533,7 +1544,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		link_result_request.reset();
 		link_result_asked_at = -1000.0;
 
-		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state)) : std::nullopt;
+		steam_link_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+
+		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state, steam_link_time)) : std::nullopt;
 
 		if (!signature.has_value()) {
 			finish(false, "Couldn't sign the link with your key.\n\nSee the logs.");
@@ -1708,6 +1721,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (ImGui::BeginPopupModal("Link to your Steam account##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			auto close = [&]() {
+				const bool page_was_open = link_flow == F::NEEDS_STEAM_SIGN_IN;
+
 				link_flow = F::IDLE;
 				link_flow_message.clear();
 
@@ -1716,6 +1731,15 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 				if (identity != nullptr) {
 					identity->clear_link_check();
+
+					/*
+						Cancelled with the page still open in the browser - confirmed there later, it is found quietly
+						in a while (and at every start).
+					*/
+
+					if (page_was_open) {
+						identity->recheck_link_quietly();
+					}
 				}
 
 				ImGui::CloseCurrentPopup();

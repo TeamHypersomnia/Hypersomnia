@@ -1935,6 +1935,28 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
+		else if (const bool webrtc_failed = is_webrtc() && webrtc_client->is_error() && !connect_called) {
+			/*
+				WebRTC failed before its DataChannel opened (the masterserver down, a server gone, the time out):
+				the game never connects then - said so, with Retry.
+			*/
+
+			text("Failed to establish connection with %x", get_displayed_connecting_server_name());
+			text("Reason:\n");
+			text(webrtc_client->get_status());
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Retry")) {
+				return custom_imgui_result::RETRY;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
 		else if (!connect_called && !is_replaying()) {
 			/*
 				The frame before the game connects.
@@ -2426,7 +2448,15 @@ std::string client_setup::get_connect_string() const {
 }
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_server_public_key() const {
-	return adapter->get_server_public_key();
+	/*
+		Kept once the handshake proved it - a kick (e.g. for a wrong password) destroys the client that knew it.
+	*/
+
+	if (const auto key = adapter->get_server_public_key()) {
+		server_public_key_seen = key;
+	}
+
+	return server_public_key_seen;
 }
 
 bool client_setup::connected_through_localhost_fallback() const {

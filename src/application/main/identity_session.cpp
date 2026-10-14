@@ -379,7 +379,11 @@ void identity_session::start_request(const input& in, const double now) {
 		headers["X-CrazyGames-Token"] = in.crazygames_token;
 	}
 
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers);
+	/*
+		Never after a redirect: the request carries a Steam ticket, a CrazyGames token or the key's signature.
+	*/
+
+	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers, nullptr, false);
 	requested_for = in;
 }
 
@@ -773,7 +777,10 @@ void identity_session::start_link_check(const std::string& broker_url) {
 
 	link_check_request = augs::async_get(
 		url->get_base_url(),
-		location_prefix(*url) + "/cert?session=" + augs::bytes_to_hex(key_public) + key
+		location_prefix(*url) + "/cert?session=" + augs::bytes_to_hex(key_public) + key,
+		{},
+		nullptr,
+		false
 	);
 
 	link_check = link_check_state::PENDING;

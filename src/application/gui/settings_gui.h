@@ -245,6 +245,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	*/
 
 	std::string steam_link_state;
+	int64_t steam_link_time = 0;
 	std::string steam_link_signature;
 
 	/*

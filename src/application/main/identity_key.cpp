@@ -27,8 +27,8 @@
 #include "application/main/identity_key.h"
 
 namespace identity_key {
-	std::string link_message(const std::string& state) {
-		return "hypersomnia-link-v1 " + state;
+	std::string link_message(const std::string& state, const int64_t unix_time) {
+		return "hypersomnia-link-v1 " + state + " " + std::to_string(unix_time);
 	}
 
 	std::string unlink_message(const augs::ed25519_public_key_type& public_key, const int64_t unix_time) {
