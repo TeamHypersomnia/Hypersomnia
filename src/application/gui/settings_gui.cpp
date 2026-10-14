@@ -1986,6 +1986,11 @@ void settings_gui_state::perform(
 		the only thing to do until the key reads. Then the Account settings show how it went (e.g. the restored key).
 	*/
 
+#if !WEB_CRAZYGAMES
+	/*
+		Not on CrazyGames: its account is the token's - a damaged key is replaced by a new one right away (work.cpp).
+	*/
+
 	if (key_damaged) {
 		was_key_damaged = true;
 
@@ -2014,6 +2019,7 @@ void settings_gui_state::perform(
 		active_pane = settings_pane::ACCOUNT;
 		active_account_pane = account_settings_pane::BACKUP;
 	}
+#endif
 
 	auto settings = make_scoped_window(ImGuiWindowFlags_NoDocking);
 
