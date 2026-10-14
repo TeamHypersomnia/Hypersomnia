@@ -114,12 +114,6 @@ private:
 
 	double next_attempt_at = 0.0;
 
-	/*
-		A ranked match on, or one that can still be rejoined: the Steam cert it was joined with is kept
-		even if the key got unlinked meanwhile (on the site) - see hold_cert_for_ranked.
-	*/
-
-	bool cert_held_for_ranked = false;
 	bool crazygames_token_refused = false;
 	bool linked_quietly = false;
 	double retry_delay = 30.0;
@@ -300,12 +294,10 @@ public:
 	}
 
 	/*
-		What to show a server. forced_account is the account of a ranked match being rejoined (see ranked_match.json):
-		a key_ account rejoins with a self-signed cert even when a Steam cert came meanwhile.
-		Without a valid broker cert, always a self-signed one.
+		What to show a server: the broker's cert, or without a valid one a self-signed one.
 	*/
 
-	identity_cert::cert cert_for_connect(double now, const std::string& forced_account = "") const;
+	identity_cert::cert cert_for_connect(double now) const;
 
 	const std::array<uint8_t, 64>& session_secret_key() const { return key_secret; }
 	const augs::ed25519_public_key_type& public_key() const { return key_public; }
@@ -334,10 +326,6 @@ public:
 	*/
 
 	void recheck_link_quietly();
-
-	void hold_cert_for_ranked(const bool hold) {
-		cert_held_for_ranked = hold;
-	}
 
 	/*
 		"Continue unlinked" after a check that failed: the key counts as seen, and is asked about quietly later.

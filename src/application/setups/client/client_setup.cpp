@@ -850,7 +850,7 @@ void client_setup::connect() {
 	blob.password = identity.password;
 
 	if (identity.session != nullptr) {
-		blob.identity = identity.session->cert_for_connect(augs::steady_secs(), identity.forced_account);
+		blob.identity = identity.session->cert_for_connect(augs::steady_secs());
 		connected_account = blob.identity->account;
 		LOG("Connecting as %x.", connected_account);
 		connect_identity.session_secret_key = identity.session->session_secret_key();

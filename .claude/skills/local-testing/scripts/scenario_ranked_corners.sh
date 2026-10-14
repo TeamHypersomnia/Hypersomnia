@@ -5,7 +5,9 @@
 #   Once the match is live:
 #     unlink      - alice's key is unlinked on the site (as /profile would), then alice is killed and started again;
 #     broker_down - the proxy is stopped (hypersomnia.io down), then alice is killed and started again.
-#   Expected: alice rejoins as the same Steam account (her saved steam.cert), the match ends and the report names that account.
+#   Expected: broker_down - alice rejoins as the same Steam account (her saved steam.cert), the match ends and the report names
+#   that account. unlink - nothing holds the Steam cert for the match any more: alice rejoins with it only if she connects
+#   before the broker says the key is unlinked; otherwise the server refuses her key account (an accepted loss, two rare events).
 # Needs broker.sh running (BROKER_URL, BROKER_PUBLIC_KEY exported, SCRATCH as for broker.sh).
 # Resources: port 18710 (+ WebRTC 19710-19715), broker proxy 13710, displays :96 :97.
 # Usage: CASE=unlink|broker_down [ROUND_TIME=15] scenario_ranked_corners.sh

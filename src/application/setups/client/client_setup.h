@@ -108,12 +108,6 @@ struct client_identity_context {
 	*/
 
 	std::string password;
-
-	/*
-		Rejoining a ranked match: the account it was played on - see ranked_match.json.
-	*/
-
-	std::string forced_account;
 };
 
 class client_setup : 

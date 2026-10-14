@@ -2017,23 +2017,6 @@ work_result work(
 #endif
 
 		refresh_account_seed();
-		{
-			/*
-				The rejoin record read from the disk at most every 5 seconds.
-			*/
-
-			static double rejoin_record_checked_at = -1000.0;
-			static bool can_rejoin_ranked = false;
-
-			if (now - rejoin_record_checked_at > 5.0) {
-				rejoin_record_checked_at = now;
-
-				const auto record = ranked_match_record::load(RANKED_MATCH_PATH);
-				can_rejoin_ranked = record.has_value() && record->valid_now();
-			}
-
-			identity->hold_cert_for_ranked(settings_gui.in_ranked_match || can_rejoin_ranked);
-		}
 
 		identity->advance(get_identity_input(), now);
 
@@ -2390,7 +2373,6 @@ work_result work(
 					auto record = ranked_match_record();
 					record.connect = client.get_connect_string();
 					record.server_key = *server_key;
-					record.account = client.get_connected_account();
 					record.rejoin_until = static_cast<int64_t>(augs::date_time::secs_since_epoch() + *budget);
 					record.save(RANKED_MATCH_PATH);
 				}
@@ -2432,12 +2414,6 @@ work_result work(
 	WEBSTATIC std::optional<simple_popup> sign_in_popup;
 	WEBSTATIC bool sign_in_popup_before_connect = false;
 
-	/*
-		A ranked match played on Steam is rejoined only on Steam - as the local key the server would take it for leaving.
-	*/
-
-	WEBSTATIC bool sign_in_popup_for_rejoin = false;
-	WEBSTATIC bool rejoin_after_retry = false;
 	WEBSTATIC bool had_valid_cert = false;
 	WEBSTATIC bool failed_since_last_cert = false;
 	WEBSTATIC double signed_in_notice_until = -1.0;
@@ -2491,29 +2467,7 @@ work_result work(
 
 		sign_in_popup = popup;
 		sign_in_popup_before_connect = before_connect;
-		sign_in_popup_for_rejoin = false;
 		sign_in_message_shown = true;
-	};
-
-	WEBSTATIC auto open_rejoin_sign_in_popup = [&]() {
-		auto popup = simple_popup();
-		popup.title = "Can't rejoin";
-		popup.message = typesafe_sprintf(
-			"Can't rejoin the ranked match:\n"
-			"couldn't sign in to your %x account.\n"
-			"\n"
-			"The match is played on it - joining as your " + identity_key::account_kind_name_lowercase() + "\n"
-			"would count as leaving it.",
-			provider_name()
-		);
-
-		if (!identity->last_error.empty()) {
-			popup.details = identity->last_error;
-		}
-
-		sign_in_popup = popup;
-		sign_in_popup_before_connect = false;
-		sign_in_popup_for_rejoin = true;
 	};
 
 	WEBSTATIC auto retry_sign_in = [&]() {
@@ -3005,25 +2959,14 @@ work_result work(
 		advance_identity();
 
 		/*
-			Rejoining the ranked match this player is in: on the account it was joined with, and only to the same server.
+			Rejoining the ranked match this player is in: only to the same server, with the cert there is now -
+			on another account than the match's the server says why it refuses.
 		*/
 
 		const auto rejoined_match = [&]() -> std::optional<ranked_match_record> {
 			if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH)) {
 				if (record->valid_now() && record->connect == std::string(connect_string)) {
-					/*
-						A match played on a key is rejoined only with that key - after another key came into account.key
-						the server would take it for another player.
-					*/
-
-					const bool other_key = record->account.rfind("key_", 0) == 0 && record->account != identity->key_account();
-
-					if (other_key) {
-						LOG("Not rejoining %x - the account.key is another key now.", record->account);
-						return std::nullopt;
-					}
-
-					LOG("Rejoining a ranked match as %x.", record->account);
+					LOG("Rejoining a ranked match on %x.", record->connect);
 					return record;
 				}
 			}
@@ -3033,42 +2976,22 @@ work_result work(
 
 		/*
 			A join waits for the first sign-in of the run, and a failed one is told once, before connecting.
-			Rejoining a match played as this computer needs no sign-in.
 		*/
 
 		{
 			const auto now = augs::steady_secs();
 			const auto in = get_identity_input();
-			const bool rejoining_as_key = rejoined_match.has_value() && rejoined_match->account.rfind("key_", 0) == 0;
+			const bool join_without_sign_in = std::exchange(join_without_sign_in_once, false);
 
-			if (!rejoining_as_key) {
-				const bool join_without_sign_in = std::exchange(join_without_sign_in_once, false);
+			if (identity->signing_in_first_time(in, now) && !join_without_sign_in) {
+				LOG("Waiting for the first sign-in before connecting.");
+				launch_after_sign_in = true;
+				return false;
+			}
 
-				if (identity->signing_in_first_time(in, now) && !join_without_sign_in) {
-					LOG("Waiting for the first sign-in before connecting.");
-					launch_after_sign_in = true;
-					return false;
-				}
-
-				const bool can_rejoin_on_account = [&]() {
-					if (!rejoined_match.has_value()) {
-						return true;
-					}
-
-					const auto& cert = identity->get_cert();
-					return identity->has_valid_cert(now) && cert.has_value() && cert->account == rejoined_match->account;
-				}();
-
-				if (!can_rejoin_on_account) {
-					LOG("Not rejoining %x without a valid cert for it.", rejoined_match->account);
-					open_rejoin_sign_in_popup();
-					return false;
-				}
-
-				if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
-					open_sign_in_popup(true);
-					return false;
-				}
+			if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
+				open_sign_in_popup(true);
+				return false;
 			}
 		}
 
@@ -3081,10 +3004,6 @@ work_result work(
 		auto identity_context = client_identity_context();
 		identity_context.session = identity;
 		identity_context.input = get_identity_input();
-
-		if (rejoined_match.has_value()) {
-			identity_context.forced_account = rejoined_match->account;
-		}
 
 		identity_context.expected_server_public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
 			using S = expected_server_key_source;
@@ -3486,15 +3405,7 @@ work_result work(
 		if (retry_attempts_before.has_value() && identity->get_attempts_finished() > *retry_attempts_before) {
 			retry_attempts_before.reset();
 
-			if (rejoin_after_retry) {
-				/*
-					Tries the rejoin again - it connects, or tells why not.
-				*/
-
-				rejoin_after_retry = false;
-				start_client_setup();
-			}
-			else if (identity->sign_in_failed(in, now)) {
+			if (identity->sign_in_failed(in, now)) {
 				open_sign_in_popup(false);
 			}
 		}
@@ -3504,31 +3415,7 @@ work_result work(
 		}
 
 		if (sign_in_popup.has_value() && !(settings_gui.show && settings_gui.account_modal_open())) {
-			if (sign_in_popup_for_rejoin) {
-				const auto result = sign_in_popup->perform({
-					{ "Retry", rgba::zero, rgba::zero },
-					{ "Cancel", rgba::zero, rgba::zero }
-				});
-
-				if (result) {
-					sign_in_popup = std::nullopt;
-
-					if (result == 1) {
-						if (get_identity_input().provider == identity_session::provider_type::NONE) {
-							/*
-								Nothing to sign in to - tried again at once, which tells it again.
-							*/
-
-							start_client_setup();
-						}
-						else {
-							rejoin_after_retry = true;
-							retry_sign_in();
-						}
-					}
-				}
-			}
-			else if (sign_in_popup_before_connect) {
+			if (sign_in_popup_before_connect) {
 				const auto result = sign_in_popup->perform({
 					{ "Join anyway", rgba::zero, rgba::zero },
 					{ "Cancel", rgba::zero, rgba::zero }

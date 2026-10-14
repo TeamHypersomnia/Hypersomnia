@@ -11,10 +11,8 @@
 #include "augs/readwrite/json_readwrite.h"
 
 /*
-	user/ranked_match.json - a ranked match the player is in, kept so that:
-	- the account stays set in stone: the server takes back a dropped player by account, so a rejoin must be made
-	  on the account the match was joined with, even if a Steam cert came in the meantime;
-	- the game brings the player back to it on its own after a crash or a restart.
+	user/ranked_match.json - a ranked match the player is in, kept so that the game brings the player back to it on its own
+	after a crash or a restart - to that server only, expecting its key.
 
 	rejoin_until is rewritten during the match as now + what is left of the player's rejoin budget,
 	so after a crash at any moment it is right within the rewrite period. Past it a rejoin is refused anyway -
@@ -24,7 +22,6 @@
 struct ranked_match_record {
 	std::string connect;
 	augs::ed25519_public_key_type server_key = {};
-	std::string account;
 	int64_t rejoin_until = 0;
 
 	bool valid_now() const {
@@ -53,7 +50,6 @@ struct ranked_match_record {
 
 			auto out = ranked_match_record();
 			out.connect = string_of("connect");
-			out.account = string_of("account");
 
 			if (document.HasMember("rejoin_until") && document["rejoin_until"].IsInt64()) {
 				out.rejoin_until = document["rejoin_until"].GetInt64();
@@ -61,7 +57,7 @@ struct ranked_match_record {
 
 			const auto key = augs::hex_to_array<32>(string_of("server_key"));
 
-			if (out.connect.empty() || out.account.empty() || !key.has_value()) {
+			if (out.connect.empty() || !key.has_value()) {
 				return std::nullopt;
 			}
 
@@ -85,8 +81,6 @@ struct ranked_match_record {
 		writer.String(connect.c_str(), static_cast<rapidjson::SizeType>(connect.size()));
 		writer.Key("server_key");
 		writer.String(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
-		writer.Key("account");
-		writer.String(account.c_str(), static_cast<rapidjson::SizeType>(account.size()));
 		writer.Key("rejoin_until");
 		writer.Int64(rejoin_until);
 		writer.EndObject();

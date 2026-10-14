@@ -562,7 +562,7 @@ void identity_session::advance(const input& in, const double now) {
 
 			const bool holding_steam_cert = broker_cert.has_value() && !is_key_account(broker_cert->account);
 
-			if (key_check_quiet && holding_steam_cert && !cert_held_for_ranked) {
+			if (key_check_quiet && holding_steam_cert) {
 				LOG("The key is no longer linked to a Steam account (found on a quiet check).");
 				on_unlinked();
 			}
@@ -674,16 +674,6 @@ void identity_session::advance(const input& in, const double now) {
 				/*
 					The key's own account: it was unlinked on the site. Back to "this computer", no error.
 				*/
-
-				if (cert_held_for_ranked && broker_cert.has_value() && !is_key_account(broker_cert->account)) {
-					/*
-						Its rejoin is tied to the account it was joined with - the key's own account comes after the match.
-					*/
-
-					LOG("The key is no longer linked to a Steam account - its cert is kept until the ranked match is over.");
-					next_attempt_at = now + 60.0;
-					return;
-				}
 
 				LOG("The key is no longer linked to a Steam account.");
 				forget_cert();
@@ -866,14 +856,9 @@ bool identity_session::sign_in_failed(const input& in, const double now) const {
 	return in.provider != provider_type::NONE && !has_valid_cert(now) && attempts_finished > 0 && last_attempt_failed;
 }
 
-identity_cert::cert identity_session::cert_for_connect(const double now, const std::string& forced_account) const {
-	const bool forced_key = is_key_account(forced_account);
-	const bool forced_other = !forced_account.empty() && !forced_key;
-
-	if (!forced_key && has_valid_cert(now)) {
-		if (!forced_other || broker_cert->account == forced_account) {
-			return *broker_cert;
-		}
+identity_cert::cert identity_session::cert_for_connect(const double now) const {
+	if (has_valid_cert(now)) {
+		return *broker_cert;
 	}
 
 	return identity_cert::make_self_signed(key_seed, key_public).value_or(identity_cert::cert());
