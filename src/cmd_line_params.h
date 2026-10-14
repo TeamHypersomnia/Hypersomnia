@@ -266,6 +266,18 @@ struct cmd_line_params {
 				verified_signature = get_next();
 			}
 			else if (a == "--connect") {
+				/*
+					A server's key (found on the server list, else among the favorites), "<address>,<key>", or an address
+					(see connect_target.h).
+				*/
+
+				set_connect(get_next());
+			}
+			else if (a == "--connect-ip") {
+				/*
+					Straight to an address - with ",<key>" expecting that key, without it verifying nothing.
+				*/
+
 				set_connect(get_next());
 			}
 			else if (a == "--live-log") {

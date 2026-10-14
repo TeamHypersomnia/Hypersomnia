@@ -920,7 +920,7 @@ server_setup::server_setup(
 	canon_with_confd_vars(canon_with_confd_vars),
 	this_server_key(server_key::instance_seed(
 		server_key::obtain(KEYS_DIR / server_key::file_name),
-		initial_vars.ranked.is_ranked_server(),
+		server_key::kind_of(initial_vars.ranked.is_ranked_server()),
 		private_initial_vars.instance_number
 	)),
 	official(official),

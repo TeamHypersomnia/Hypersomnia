@@ -52,12 +52,23 @@ namespace server_key {
 	}
 
 	/*
-		One key per server, all from one server.key - as many wallets from one seed: a casual or a ranked (any with progress,
-		tournaments too) instance number N has its own key, the same on any host and port. Moving instances elsewhere
-		(or splitting them between hosts) keeps their keys: copy server.key and set their numbers (instance_number).
+		The kind of a server instance, a byte of its key's derivation: casual, ranked (tournaments too) or aura -
+		each kind of progress counts its instances on its own.
 	*/
 
-	inline augs::ed25519_seed_type instance_seed(const augs::ed25519_seed_type& server_seed, const bool with_progress, const uint16_t number) {
+	enum class instance_kind : uint8_t {
+		CASUAL = 0,
+		RANKED = 1,
+		AURA = 2
+	};
+
+	/*
+		One key per server, all from one server.key - as many wallets from one seed: instance number N of a kind has its own
+		key, the same on any host and port. Moving instances elsewhere (or splitting them between hosts) keeps their keys:
+		copy server.key and set their numbers (instance_number).
+	*/
+
+	inline augs::ed25519_seed_type instance_seed(const augs::ed25519_seed_type& server_seed, const instance_kind kind, const uint16_t number) {
 		const auto tag = std::string_view("hs-instance-v1");
 
 		uint8_t message[32];
@@ -67,7 +78,7 @@ namespace server_key {
 			message[n++] = static_cast<uint8_t>(c);
 		}
 
-		message[n++] = with_progress ? 1 : 0;
+		message[n++] = static_cast<uint8_t>(kind);
 		message[n++] = static_cast<uint8_t>(number & 0xff);
 		message[n++] = static_cast<uint8_t>(number >> 8);
 
@@ -85,8 +96,16 @@ namespace server_key {
 		return out;
 	}
 
-	inline std::string kind_name(const bool with_progress) {
-		return with_progress ? "ranked" : "casual";
+	inline std::string kind_name(const instance_kind kind) {
+		switch (kind) {
+			case instance_kind::RANKED: return "ranked";
+			case instance_kind::AURA: return "aura";
+			default: return "casual";
+		}
+	}
+
+	inline instance_kind kind_of(const bool ranked) {
+		return ranked ? instance_kind::RANKED : instance_kind::CASUAL;
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {

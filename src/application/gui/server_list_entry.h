@@ -92,6 +92,12 @@ struct server_list_entry {
 
 	std::string get_my_connect_string() const;
 
+	/*
+		What a join from the server list names: where it is and its key (see connect_target.h).
+	*/
+
+	std::string get_join_string() const;
+
 	std::string get_web_connect_string() const;
 	std::string get_native_connect_string(bool for_sending) const;
 

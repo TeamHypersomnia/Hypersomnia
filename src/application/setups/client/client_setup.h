@@ -81,7 +81,7 @@ struct webrtc_client_detail;
 
 enum class expected_server_key_source {
 	SERVER_LIST,
-	EARLIER_CONNECTION,
+	CHOSEN_KEY,
 	REJOINED_MATCH
 };
 
@@ -90,18 +90,12 @@ struct client_identity_context {
 	identity_session::input input;
 
 	/*
-		From the server list, an earlier connection to this address (known_servers.h) or the match being rejoined;
-		none to take whatever key the server presents. Where it came from says what a mismatch means.
+		The key the join names (the server list's, a favorite's, an invite's) or the rejoined match's;
+		none for a join by an address alone - whatever key the server presents. Where it came from says what a mismatch means.
 	*/
 
 	std::optional<augs::ed25519_public_key_type> expected_server_public_key;
 	expected_server_key_source expected_key_source = expected_server_key_source::SERVER_LIST;
-
-	/*
-		The player chose "Connect anyway" for this connection - a key that did not match what was known.
-	*/
-
-	bool connected_anyway = false;
 
 	/*
 		The password saved for this server's key, if any - never sent to another key.
@@ -140,9 +134,7 @@ class client_setup :
 	client_identity_context identity;
 	std::string connected_account;
 	bool sent_password = false;
-	bool key_mismatch_failure = false;
 	bool list_key_mismatch = false;
-	bool connect_anyway_requested = false;
 
 	/*
 		Whether ranked is required by the server - from server_auth_state.
@@ -1063,15 +1055,6 @@ public:
 	*/
 
 	/*
-		"Connect anyway" after a key that did not match the one known for the address or the rejoined match's: the next attempt
-		takes any key, with no saved password. A mismatch with the server list has no Connect anyway.
-	*/
-
-	bool wants_connect_anyway() const {
-		return connect_anyway_requested;
-	}
-
-	/*
 		The server's key did not match the server list - Go back shows a fresh list.
 	*/
 
@@ -1095,6 +1078,10 @@ public:
 
 	std::string get_current_arena_name() const {
 		return sv_public_vars.arena;
+	}
+
+	std::string get_server_name() const {
+		return std::string(sv_public_vars.server_name);
 	}
 
 	std::string get_scoreboard_caption() const;

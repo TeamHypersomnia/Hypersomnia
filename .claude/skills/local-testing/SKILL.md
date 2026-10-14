@@ -109,7 +109,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
 - `ui.sh conf <name> ""` - no identity broker at all. `srv.sh` wipes the server's dir, so every start is a **new server key**:
-  a client that joined before gets "The server's key is different..." - the way to test known_servers and Connect anyway.
+  a client joining with the old key (`--connect <address>,<key>`, its last join) gets "another key than the one you chose".
   `BROKER_KEYS_JSON='[]'` - a server trusting no broker; `SERVER_EXTRA` / `PRIVATE_EXTRA` - more JSON fields (see srv.sh).
 - **RCON levels:** make the client's key first (`node -e` in the broker site with `src/identity_cert.js`: `privateKeyFromSeed`,
   `rawPublicKey`; write `hypersomnia-key-v1:<seed hex>` to `<client>/user/.keys/account.key`), then
@@ -168,14 +168,14 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 `run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/.keys/account.key`,
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
-- **Server keys from the list (remote_e2e/community.sh on arena):** a join from the list always expects the list's key
-  (official or community) - a mismatch says "doesn't match the server list ... Refresh the list and join again" (no Connect
-  anyway; Go back refreshes the list). A list key other than the one remembered (known_servers) asks "Server key changed"
-  before connecting; its Connect anyway still expects the list's key. A join by an address not on the list: known_servers,
-  Connect anyway takes any key (SSH). `community.sh start` - a community server on 9005 with a new key each start, listed on
-  the test master; `crash` then `start silent` - a server whose list entry (60 s) keeps the previous key. Never `kill -9`
-  the pid file's pid (it is `timeout`'s). A client with `"server_list_provider": "http://<arenaus>:18420"`: open Browse
-  servers, restart the server, join the row - stale list: the message; Go back, join: the popup; Connect anyway: connected.
+- **Joins name the server's key (connect_target.h):** `--connect <key>` (found on the list, else the favorites' last address;
+  without a list yet it waits up to 8 s), `--connect <address>,<key>` / `--connect-ip` (straight there, expecting the key), or an
+  address alone (nothing verified). A join from the server list is `<address>,<key>` and so is the last join saved in
+  runtime_prefs (`client_connect`) - the next start joins without the masterserver. A mismatch: "doesn't match the server list"
+  (list key) or "another key than the one you chose" - no Connect anyway anywhere. `remote_e2e/community.sh start` - a
+  community server on 9005 with a new key each start, listed on the test master; `crash` then `start silent` - a server whose
+  list entry (60 s) keeps the previous key. Never `kill -9` the pid file's pid (it is `timeout`'s). A client with
+  `"server_list_provider": "http://<arenaus>:18420"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one

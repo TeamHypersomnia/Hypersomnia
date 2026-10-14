@@ -7,6 +7,7 @@
 
 #include "augs/log.h"
 #include "augs/misc/async_get.h"
+#include "application/setups/client/connect_target.h"
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
 
@@ -2012,23 +2013,18 @@ custom_imgui_result client_setup::perform_custom_imgui(
 								break;
 							}
 
-							key_mismatch_failure = true;
+							/*
+								Not the server chosen: nothing to accept - it is someone else at that address
+								(or the server got a new key: then it is another server, to be added anew).
+							*/
+
 							set_disconnect_reason(
-								[&]() -> std::string {
-									switch (identity.expected_key_source) {
-										case expected_server_key_source::EARLIER_CONNECTION:
-											return "The server's key is different from the last time you played there.\n"
-												"Usually the server was just reinstalled - but someone could also be impersonating it!\n";
-										case expected_server_key_source::REJOINED_MATCH:
-											return "The server's key is different from the one of the match you are rejoining.\n"
-												"Usually the server was just reinstalled - but someone could also be impersonating it!\n";
-										default:
-											return std::string();
-									}
-								}()
-								+ "\n"
-								+ "Connecting anyway keeps your account safe, but what you do on this server (e.g. chat) could be seen."
-								+ (identity.password.empty() ? std::string() : std::string("\nThe password you saved for this server will not be sent."))
+								identity.expected_key_source == expected_server_key_source::REJOINED_MATCH
+								? std::string("The server's key is different from the one of the match you are rejoining.\n"
+									"Usually the server was just reinstalled - but someone could also be impersonating it!")
+								: std::string("The server at this address has another key than the one you chose.\n"
+									"Usually the server was just reinstalled - but someone could also be impersonating it!\n"
+									"If it was reinstalled, add it to your favorites anew.")
 							);
 							break;
 
@@ -2070,12 +2066,11 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 
 				/*
-					After Connect anyway: the key that answered is not the one known for this server.
-					(A first join by address is not warned about - nothing is known yet, as with SSH.)
+					Joined by an address alone: nothing verified who answers.
 				*/
 
-				if (identity.connected_anyway) {
-					text_color("This server's key was not verified - don't type a password you use elsewhere.", orange);
+				if (!identity.expected_server_public_key.has_value()) {
+					text_color("This server's key was not verified (joined by its address) - don't type a password you use elsewhere.", orange);
 				}
 
 				input_text("Server password", password_retry_input, flags);
@@ -2109,15 +2104,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 			else {
 				ImGui::Separator();
-
-				if (key_mismatch_failure) {
-					if (ImGui::Button("Connect anyway")) {
-						connect_anyway_requested = true;
-						return custom_imgui_result::RETRY;
-					}
-
-					ImGui::SameLine();
-				}
 
 				if (ImGui::Button("Retry")) {
 					return custom_imgui_result::RETRY;
@@ -2425,7 +2411,11 @@ void client_setup::wait_for_demo_flush() {
 }
 
 std::string client_setup::get_steam_join_command_line() const {
-	return get_connect_string();
+	/*
+		Where the server is and its key - a friend joins exactly this server, the masterserver not needed.
+	*/
+
+	return connect_target { get_connect_string(), get_server_public_key() }.to_string();
 }
 
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {

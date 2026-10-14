@@ -3,6 +3,7 @@
 #include "augs/string/hex.h"
 #include "augs/misc/future.h"
 
+#include "application/setups/client/connect_target.h"
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -389,6 +390,10 @@ std::string server_list_entry::get_my_connect_string() const {
 	const bool for_sending = false;
 	return get_native_connect_string(for_sending);
 #endif
+}
+
+std::string server_list_entry::get_join_string() const {
+	return connect_target { get_my_connect_string(), get_public_key() }.to_string();
 }
 
 std::string server_list_entry::get_web_connect_string() const {
@@ -815,7 +820,7 @@ void browse_servers_gui_state::show_server_list(
 				}
 				else {
 					displayed_connecting_server_name = d.server_name;
-					requested_connection = s.get_my_connect_string();
+					requested_connection = s.get_join_string();
 				}
 			}
 		}
@@ -1367,7 +1372,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				}
 				else {
 					displayed_connecting_server_name = s.heartbeat.server_name;
-					requested_connection = s.get_my_connect_string();
+					requested_connection = s.get_join_string();
 				}
 			}
 
@@ -1464,7 +1469,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			if (can_connect && (connect_clicked || enter_pressed)) {
 				displayed_connecting_server_name = pending_password_entry->heartbeat.server_name;
-				requested_connection = pending_password_entry->get_my_connect_string();
+				requested_connection = pending_password_entry->get_join_string();
 				pending_password_save = password_prompt_input;
 				pending_password_save_entry = pending_password_entry;
 				pending_password_entry.reset();
@@ -1545,9 +1550,27 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 	return minimum_of(chosen, compare_servers);
 }
 
-const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& in) const {
-	LOG("Finding the server entry by: %x", in);
+const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& joined) const {
+	LOG("Finding the server entry by: %x", joined);
 	LOG("Number of servers in the browser: %x", server_list.size());
+
+	/*
+		A join that names the key finds the server by it - wherever it is now.
+	*/
+
+	const auto target = connect_target::parse(joined);
+
+	if (target.key.has_value()) {
+		for (auto& s : server_list) {
+			if (s.get_public_key() == target.key) {
+				return &s;
+			}
+		}
+
+		return nullptr;
+	}
+
+	const auto& in = target.address;
 
 	if (const auto connected_address = ::find_netcode_addr(in)) {
 		LOG("%x is an IP address.", in);

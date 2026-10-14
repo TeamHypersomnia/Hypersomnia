@@ -76,7 +76,8 @@
 #include "application/main/ranked_match_record.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "application/main/server_passwords.h"
-#include "application/main/known_servers.h"
+#include "application/main/favorite_servers.h"
+#include "application/setups/client/connect_target.h"
 #include "application/main/server_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
@@ -766,19 +767,19 @@ work_result work(
 		const auto first = pattern.server_private.instance_number;
 
 		if (num_ranked == 0 && num_casual == 0) {
-			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, pattern.server.ranked.is_ranked_server(), first)) << std::endl;
+			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, server_key::kind_of(pattern.server.ranked.is_ranked_server()), first)) << std::endl;
 			return work_result::SUCCESS;
 		}
 
-		auto print_kind = [&](const bool with_progress, const uint16_t count) {
+		auto print_kind = [&](const server_key::instance_kind kind, const uint16_t count) {
 			for (uint16_t i = 0; i < count; ++i) {
 				const auto number = static_cast<uint16_t>(first + i);
-				std::cout << server_key::kind_name(with_progress) << " " << number << ": " << server_key::public_key_hex(server_key::instance_seed(server_seed, with_progress, number)) << std::endl;
+				std::cout << server_key::kind_name(kind) << " " << number << ": " << server_key::public_key_hex(server_key::instance_seed(server_seed, kind, number)) << std::endl;
 			}
 		};
 
-		print_kind(false, num_casual);
-		print_kind(true, num_ranked);
+		print_kind(server_key::instance_kind::CASUAL, num_casual);
+		print_kind(server_key::instance_kind::RANKED, num_ranked);
 		return work_result::SUCCESS;
 	}
 
@@ -2043,31 +2044,26 @@ work_result work(
 	WEBSTATIC auto saved_server_passwords = server_passwords(KEYS_DIR / server_passwords::file_name);
 
 	/*
-		Keys of the servers connected to, kept between runs (.keys/known_servers.txt) - see known_servers.h.
+		The favorite servers, by their keys - see favorite_servers.h.
 	*/
 
-	WEBSTATIC auto remembered_servers = known_servers(KEYS_DIR / known_servers::file_name);
+	WEBSTATIC auto favorites = favorite_servers(USER_DIR / favorite_servers::file_name);
 
 	/*
-		A password entered for a server whose key is not known yet, and Connect anyway - for the next launch only.
+		A password entered for a server whose key is not known yet - for the next launch only.
 	*/
 
 	WEBSTATIC std::optional<std::string> next_connect_password;
-	WEBSTATIC bool connect_anyway_once = false;
 
 	/*
-		The key a server proved it holds (a connection, or a kick for a password - the server had to read the request
-		sealed to its key), remembered for its address - never one of a server on this machine that answered
-		in the remote one's place (the localhost fallback). Returns whether it was.
+		A favorite server's name and address kept up to date while connected - never from a server on this machine
+		that answered in the remote one's place (the localhost fallback).
 	*/
 
-	WEBSTATIC auto learn_server_key = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
-		if (client.connected_through_localhost_fallback()) {
-			return false;
+	WEBSTATIC auto update_favorite_of = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
+		if (!client.connected_through_localhost_fallback()) {
+			favorites.update_if_favorite(key, client.get_connect_string(), client.get_server_name());
 		}
-
-		remembered_servers.set(std::string(client.get_connect_string()), key);
-		return true;
 	};
 
 	try {
@@ -2338,12 +2334,8 @@ work_result work(
 
 			const auto server_key = client.get_server_public_key();
 
-			/*
-				After "Connect anyway" too: the key it showed this time is checked on the next joins.
-			*/
-
 			if (server_key.has_value()) {
-				(void)learn_server_key(client, *server_key);
+				update_favorite_of(client, *server_key);
 			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
@@ -2391,15 +2383,17 @@ work_result work(
 	WEBSTATIC const double run_started_at = augs::steady_secs();
 	WEBSTATIC bool sign_in_message_shown = false;
 	WEBSTATIC bool launch_after_sign_in = false;
+
+	/*
+		A join by a server's key only, before the server list came: it waits for it - 8 s at most.
+	*/
+
+	WEBSTATIC bool launch_after_server_list = false;
+	WEBSTATIC double launch_after_server_list_since = 0.0;
 	WEBSTATIC bool join_without_sign_in_once = false;
 	WEBSTATIC std::optional<int> retry_attempts_before;
 	WEBSTATIC std::optional<simple_popup> sign_in_popup;
 
-	/*
-		A join from the server list to a server that showed another key the last time - asked before connecting.
-	*/
-
-	WEBSTATIC std::optional<simple_popup> key_changed_popup;
 	WEBSTATIC bool sign_in_popup_before_connect = false;
 
 	WEBSTATIC bool had_valid_cert = false;
@@ -2945,21 +2939,63 @@ work_result work(
 	};
 
 	WEBSTATIC auto launch_client_setup = [&]() {
-		auto connect_string = config.client_connect;
+		/*
+			What to join - see connect_target.h: a server by its key (with where it was), or just an address.
+		*/
+
+		const auto target = connect_target::parse(config.client_connect);
 
 		/*
-			A password or Connect anyway is for the launch right after it - one that stops early (e.g. waiting for the
-			sign-in, the player cancelling) drops them, so they never reach the next server joined.
+			A password is for the launch right after it - one that stops early (e.g. waiting for the sign-in,
+			the player cancelling) drops it, so it never reaches the next server joined.
 		*/
 
 		auto password_for_this_launch = std::exchange(next_connect_password, std::nullopt);
-		const bool connect_anyway_this_launch = std::exchange(connect_anyway_once, false);
 
 		/*
-			What the server list says about the chosen server, e.g. its key.
+			What the server list says about the chosen server - found by its key if the join names one.
 		*/
 
 		const auto found = find_chosen_server_info();
+
+		/*
+			Only the key: where the server is now - on the server list, else where it was last as a favorite.
+			With no list yet, the join waits for it (a few seconds at most).
+		*/
+
+		auto connect_string = client_connect_string(target.address);
+
+		if (connect_string.empty() && target.key.has_value()) {
+			if (found != nullptr) {
+				connect_string = found->get_my_connect_string();
+			}
+			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
+				connect_string = favorite->address;
+			}
+			else if (!browse_servers_gui.refreshed_at_least_once() || browse_servers_gui.refresh_in_progress()) {
+				LOG("Waiting for the server list to find %x.", config.client_connect);
+
+				if (!browse_servers_gui.refresh_in_progress()) {
+					browse_servers_gui.refresh_server_list(get_browse_servers_input());
+				}
+
+				launch_after_server_list = true;
+				launch_after_server_list_since = augs::steady_secs();
+				return false;
+			}
+			else {
+				auto popup = simple_popup();
+				popup.title = "Server not found";
+				popup.message = typesafe_sprintf(
+					"No server with the key %x is on the server list,\nand it is not among your favorites with an address.",
+					"0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "..."
+				);
+
+				sign_in_popup = popup;
+				sign_in_popup_before_connect = false;
+				return false;
+			}
+		}
 
 		LOG("Launching client setup with connect string: %x", connect_string);
 
@@ -3007,59 +3043,6 @@ work_result work(
 			return false;
 		}
 
-		/*
-			An entry found only by its internal address (e.g. 192.168.1.10) may be any server in any LAN -
-			its name is fine to show, its key is not the one to expect.
-		*/
-
-		const bool found_by_internal_address = [&]() {
-			if (found == nullptr) {
-				return false;
-			}
-
-			const auto connected_address = ::find_netcode_addr(client_connect_string(connect_string));
-			return connected_address.has_value() && !(found->address == *connected_address);
-		}();
-
-		const auto list_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
-			if (found != nullptr && !found_by_internal_address) {
-				return found->get_public_key();
-			}
-
-			return std::nullopt;
-		}();
-
-		const auto remembered_key = remembered_servers.find(std::string(connect_string));
-
-		/*
-			From the server list to a server that showed another key the last time: asked before connecting -
-			Connect anyway still expects the list's key, never just any.
-		*/
-
-		{
-			const bool key_changed_since_last_time =
-				!rejoined_match.has_value()
-				&& list_key.has_value()
-				&& remembered_key.has_value()
-				&& *remembered_key != *list_key
-			;
-
-			if (key_changed_since_last_time && !connect_anyway_this_launch) {
-				LOG("The server list has another key for %x than the last time - asking before connecting.", connect_string);
-
-				auto popup = simple_popup();
-				popup.title = "Server key changed";
-				popup.message =
-					"The server's key changed since you last played there.\n"
-					"Usually the server was just reinstalled - but someone could also be impersonating it!\n"
-					"\n"
-					"Connecting anyway expects the key on the server list.";
-
-				key_changed_popup = popup;
-				return false;
-			}
-		}
-
 		auto identity_context = client_identity_context();
 		identity_context.session = identity;
 		identity_context.input = get_identity_input();
@@ -3074,23 +3057,14 @@ work_result work(
 			}
 
 			/*
-				A join from the server list: the key there - what the player can compare before joining
-				(e.g. with what an event's page publishes). The masterserver has it from the server itself, signed, at its address.
+				A join names its key (from the server list, the favorites, an invite): that one - what the player can
+				compare before joining (e.g. with what an event's page publishes). An address alone verifies nothing.
 			*/
 
-			if (list_key.has_value()) {
-				source = S::SERVER_LIST;
-				return *list_key;
-			}
-
-			/*
-				Played on before: the key it showed then - a different one now is warned about
-				(and Connect anyway takes the new one, as SSH would). Otherwise whatever key it presents, remembered.
-			*/
-
-			if (remembered_key.has_value()) {
-				source = S::EARLIER_CONNECTION;
-				return *remembered_key;
+			if (target.key.has_value()) {
+				const bool as_on_the_list = found != nullptr && found->get_public_key() == target.key;
+				source = as_on_the_list ? S::SERVER_LIST : S::CHOSEN_KEY;
+				return target.key;
 			}
 
 			return std::nullopt;
@@ -3102,19 +3076,6 @@ work_result work(
 
 		if (password_for_this_launch.has_value()) {
 			identity_context.password = *password_for_this_launch;
-		}
-
-		/*
-			"Connect anyway" after a key that did not match what was known: whatever key the server presents, and no saved
-			password - except from the server list, which stays the key to expect.
-		*/
-
-		if (connect_anyway_this_launch) {
-			if (identity_context.expected_key_source != expected_server_key_source::SERVER_LIST) {
-				identity_context.connected_anyway = true;
-				identity_context.expected_server_public_key.reset();
-				identity_context.password.clear();
-			}
 		}
 
 		streaming.wait_demos_compressed();
@@ -3138,15 +3099,22 @@ work_result work(
 
 		std::string saved_for_next_launch;
 
-#if !PLATFORM_WEB
 		/*
-			A domain survives the server changing its IP, so remember it for the next launch.
+			The next launch joins the same server right away, without asking the masterserver: where it is and its key.
+			A domain survives the server changing its IP.
 		*/
 
-		if (const auto found = find_chosen_server_info(); found != nullptr) {
-			saved_for_next_launch = found->get_domain_with_port();
-		}
+		if (target.key.has_value()) {
+			auto next = connect_target { std::string(connect_string), target.key };
+
+#if !PLATFORM_WEB
+			if (found != nullptr && !found->get_domain_with_port().empty()) {
+				next.address = found->get_domain_with_port();
+			}
 #endif
+
+			saved_for_next_launch = next.to_string();
+		}
 
 		change_with_save(
 			[&](auto& cfg) {
@@ -3157,7 +3125,7 @@ work_result work(
 					cfg.last_activity = activity_type::CLIENT;
 				}
 				else {
-					if (const bool same_as_last_launch = cfg.client_connect == connect_string) {
+					if (const bool same_as_last_launch = cfg.client_connect == config.client_connect) {
 						cfg.last_activity = activity_type::CLIENT;
 					}
 					else {
@@ -3386,6 +3354,25 @@ work_result work(
 			}
 		}
 
+		if (launch_after_server_list) {
+			if (!browse_servers_gui.refresh_in_progress()) {
+				launch_after_server_list = false;
+
+				if (!has_current_setup()) {
+					start_client_setup();
+				}
+			}
+			else if (now - launch_after_server_list_since > 8.0) {
+				launch_after_server_list = false;
+
+				auto popup = simple_popup();
+				popup.title = "Server not found";
+				popup.message = "The server list did not come - the server could not be found by its key.\nTry again later, or join it by its address.";
+				sign_in_popup = popup;
+				sign_in_popup_before_connect = false;
+			}
+		}
+
 		/*
 			The start's modal - after a second, so a quick answer shows nothing.
 		*/
@@ -3469,22 +3456,6 @@ work_result work(
 			}
 			else if (sign_in_popup->perform()) {
 				sign_in_popup = std::nullopt;
-			}
-		}
-
-		if (key_changed_popup.has_value()) {
-			const auto result = key_changed_popup->perform({
-				{ "Connect anyway", rgba::zero, rgba::zero },
-				{ "Cancel", rgba::zero, rgba::zero }
-			});
-
-			if (result) {
-				key_changed_popup = std::nullopt;
-
-				if (result == 1) {
-					connect_anyway_once = true;
-					start_client_setup();
-				}
 			}
 		}
 
@@ -3605,9 +3576,9 @@ work_result work(
 			quick_play_pending = false;
 
 			if (const auto best = browse_servers_gui.find_quick_play_server()) {
-				LOG("Quick play: %x (%x).", best->heartbeat.server_name, best->get_my_connect_string());
+				LOG("Quick play: %x (%x).", best->heartbeat.server_name, best->get_join_string());
 
-				config.client_connect = best->get_my_connect_string();
+				config.client_connect = best->get_join_string();
 				displayed_connecting_server_name = best->heartbeat.server_name;
 				start_client_setup();
 			}
@@ -4172,21 +4143,12 @@ work_result work(
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
-						if (setup.wants_connect_anyway()) {
-							connect_anyway_once = true;
-						}
-
 						if (auto new_password = setup.take_pending_password_save()) {
-							if (const auto key = setup.get_server_public_key()) {
+							if (const auto key = setup.get_server_public_key(); key.has_value() && !setup.connected_through_localhost_fallback()) {
 								saved_server_passwords.set(*key, *new_password);
+							}
 
-								if (!learn_server_key(setup, *key)) {
-									next_connect_password = *new_password;
-								}
-							}
-							else {
-								next_connect_password = *new_password;
-							}
+							next_connect_password = *new_password;
 						}
 
 						launch_setup(activity_type::CLIENT);
@@ -5903,10 +5865,7 @@ work_result work(
 							if (setup.kicked_for_password_not_sent()) {
 								if (const auto key = setup.get_server_public_key()) {
 									if (const auto saved = saved_server_passwords.find(*key); !saved.empty()) {
-										if (!learn_server_key(setup, *key)) {
-											next_connect_password = saved;
-										}
-
+										next_connect_password = saved;
 										relaunch_with_saved_password = true;
 									}
 								}
