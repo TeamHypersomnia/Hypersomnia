@@ -108,7 +108,7 @@ for CASE in $CASES; do
 			kill $(game_pid $T/c_elsewhere_twin) $SPID 2> /dev/null; rm -rf $T/c_elsewhere_twin
 			;;
 		password)
-			server $CASE $PORT 8 ', "auto_authorize_loopback_for_rcon": false' ', "server_private": { "server_password": "sekret" }'
+			server $CASE $PORT 8 '' ', "server_private": { "server_password": "sekret" }'
 			film $CASE 127.0.0.1:$PORT 10
 			srv_log $CASE
 			kill $SPID

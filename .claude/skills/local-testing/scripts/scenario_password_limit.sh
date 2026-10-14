@@ -13,7 +13,7 @@ rm -rf $T; mkdir -p $T/srv/user/conf.d $T/c/user/conf.d
 cat > $T/srv/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": 10040, "slots": 8 },
   "server": { "server_name": "pw test", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
-              "auto_authorize_loopback_for_rcon": false, "webrtc_port_range_begin": 19440, "webrtc_port_range_end": 19445 },
+              "webrtc_port_range_begin": 19440, "webrtc_port_range_end": 19445 },
   "server_private": { "server_password": "sekret" } }
 J
 cat > $T/c/user/conf.d/test.json <<J

@@ -1,7 +1,7 @@
 #!/bin/bash
 # srv.sh start|stop <name> <port> [ranked: NEVER|TEAMS_EQUAL] - a local server trusting the scratch broker
 #   SERVER_EXTRA / PRIVATE_EXTRA: more JSON fields for "server" / "server_private", each starting with a comma, e.g.
-#   PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]' SERVER_EXTRA=', "auto_authorize_loopback_for_rcon": false'
+#   PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]'
 S=${SCRATCH_ROOT:-/tmp/hypersomnia-ui}
 BIN=${BIN:-$(cd "$(dirname "$0")/../../../../.." && pwd)/build/Debug-x64-clang-claude/Hypersomnia}
 eval "$(cat $S/nettest/broker_env)"

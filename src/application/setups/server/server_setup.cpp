@@ -5634,25 +5634,6 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 
 	const auto& c = clients[id];
 
-	if (c.is_webrtc_client()) {
-		LOG("Avoiding loopback/internal RCON check since it's a webrtc client.");
-	}
-	else {
-		if (vars.auto_authorize_loopback_for_rcon) {
-			if (get_client_address(id).IsLoopback()) {
-				LOG("Auto-authorizing the loopback client for master rcon.");
-				return rcon_level_type::MASTER;
-			}
-		}
-
-		if (vars.auto_authorize_internal_for_rcon) {
-			if (is_internal(to_netcode_addr(get_client_address(id)))) {
-				LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(get_client_address(id)));
-				return rcon_level_type::MASTER;
-			}
-		}
-	}
-
 	/*
 		The admin profile of an authenticated client authorizes it without any password.
 	*/
@@ -5728,20 +5709,6 @@ bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 	}
 
 	const auto& c = clients[id];
-
-	if (!c.is_webrtc_client()) {
-		if (vars.auto_authorize_loopback_for_rcon) {
-			if (get_client_address(id).IsLoopback()) {
-				return true;
-			}
-		}
-
-		if (vars.auto_authorize_internal_for_rcon) {
-			if (is_internal(to_netcode_addr(get_client_address(id)))) {
-				return true;
-			}
-		}
-	}
 
 	if (::safe_equal(c.connect_password, private_vars.server_password)) {
 		return true;
